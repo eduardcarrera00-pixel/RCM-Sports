@@ -287,7 +287,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
     </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
-<link rel="stylesheet" href="assets/community.css">
+<link rel="stylesheet" href="assets/community.css?v=20261013-2">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 
@@ -382,17 +382,17 @@ html.dark [data-reading-size][aria-pressed="true"] {
                 <button onclick="filterByCategory('Picks')" class="category-btn px-4 py-2 rounded-lg bg-slate-100 text-slate-600 hover:text-pitch-700 hover:bg-pitch-50 transition-all whitespace-nowrap" data-category="Picks">
                     <i class="fa-solid fa-bullseye mr-1.5 text-pitch-600"></i> Picks
                 </button>
+                <button onclick="filterByCategory('NFL')" class="category-btn px-4 py-2 rounded-lg bg-slate-100 text-slate-600 hover:text-pitch-700 hover:bg-pitch-50 transition-all whitespace-nowrap" data-category="NFL">
+                    <i class="fa-solid fa-football mr-1.5 text-amber-700"></i> NFL
+                </button>
                 <button onclick="filterByCategory('Fútbol')" class="category-btn px-4 py-2 rounded-lg bg-slate-100 text-slate-600 hover:text-pitch-700 hover:bg-pitch-50 transition-all whitespace-nowrap" data-category="Fútbol">
                     <i class="fa-solid fa-futbol mr-1.5 text-pitch-600"></i> Fútbol
                 </button>
                 <button onclick="filterByCategory('Fútbol Americano Colegial')" class="category-btn px-4 py-2 rounded-lg bg-slate-100 text-slate-600 hover:text-pitch-700 hover:bg-pitch-50 transition-all whitespace-nowrap" data-category="Fútbol Americano Colegial">
                     <i class="fa-solid fa-graduation-cap mr-1.5 text-amber-600"></i> Colegial
                 </button>
-                <button onclick="filterByCategory('NFL')" class="category-btn px-4 py-2 rounded-lg bg-slate-100 text-slate-600 hover:text-pitch-700 hover:bg-pitch-50 transition-all whitespace-nowrap" data-category="NFL">
-                    <i class="fa-solid fa-football mr-1.5 text-amber-700"></i> NFL
-                </button>
-                <button onclick="filterByCategory('Básquetbol')" class="category-btn px-4 py-2 rounded-lg bg-slate-100 text-slate-600 hover:text-pitch-700 hover:bg-pitch-50 transition-all whitespace-nowrap" data-category="Básquetbol">
-                    <i class="fa-solid fa-basketball mr-1.5 text-orange-500"></i> Básquetbol
+                <button onclick="filterByCategory('NBA')" class="category-btn px-4 py-2 rounded-lg bg-slate-100 text-slate-600 hover:text-pitch-700 hover:bg-pitch-50 transition-all whitespace-nowrap" data-category="NBA">
+                    <i class="fa-solid fa-basketball mr-1.5 text-orange-500"></i> NBA
                 </button>
                 <button onclick="filterByCategory('Tenis')" class="category-btn px-4 py-2 rounded-lg bg-slate-100 text-slate-600 hover:text-pitch-700 hover:bg-pitch-50 transition-all whitespace-nowrap" data-category="Tenis">
                     <i class="fa-solid fa-table-tennis-paddle-ball mr-1.5 text-lime-600"></i> Tenis
@@ -400,6 +400,12 @@ html.dark [data-reading-size][aria-pressed="true"] {
                 <button onclick="filterByCategory('Ciclismo')" class="category-btn px-4 py-2 rounded-lg bg-slate-100 text-slate-600 hover:text-pitch-700 hover:bg-pitch-50 transition-all whitespace-nowrap" data-category="Ciclismo">
                     <i class="fa-solid fa-bicycle mr-1.5 text-sky-600"></i> Ciclismo
                 </button>
+            </nav>
+            <nav id="footballTeams" class="rcm-row hidden" aria-label="Equipos de fútbol">
+                <button type="button" data-team="" onclick="filterByTeam('')">Todo Fútbol</button>
+                <button type="button" data-team="barcelona" onclick="filterByTeam('barcelona')">FC Barcelona</button>
+                <button type="button" data-team="real-madrid" onclick="filterByTeam('real-madrid')">Real Madrid</button>
+                <button type="button" data-team="manchester-united" onclick="filterByTeam('manchester-united')">Manchester United</button>
             </nav>
         </div>
     </header>
@@ -496,7 +502,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
                         <span class="text-[10px] bg-pitch-100 text-pitch-800 font-bold px-2 py-0.5 rounded-full">TENDENCIA</span>
                     </div>
 
-                    <p class="text-xs text-slate-500 mb-3">Selección ordenada por tus «me gusta» en este navegador. Todavía no medimos lecturas reales.</p>
+                    <p class="text-xs text-slate-500 mb-3">Selección ordenada por los likes de la comunidad. Todavía no medimos lecturas reales.</p>
                     <div id="trendingList" class="space-y-4">
                         <!-- Trending items injected by JS -->
                     </div>
@@ -511,21 +517,21 @@ html.dark [data-reading-size][aria-pressed="true"] {
 
                     <h3 class="text-lg font-bold">Boletín RCM Sports</h3>
                     <p class="text-xs text-slate-300 mt-1 mb-4 leading-relaxed">
-                        Recibe los mejores análisis deportivos y crónicas de la semana directamente en tu e-mail.
+                        Próximamente: análisis deportivos por correo. Este formulario es una demostración y no registra suscripciones.
                     </p>
 
                     <form id="newsletterForm" onsubmit="handleNewsletter(event)" class="space-y-3">
                         <input type="email" id="newsletterEmail" required placeholder="tu.correo@deporte.com"
                             class="w-full bg-white/10 border border-white/20 text-xs text-white placeholder-slate-400 rounded-xl px-4 py-3 focus:outline-none focus:bg-white/20 transition-all">
                         <button type="submit" class="w-full bg-pitch-500 hover:bg-pitch-600 text-white font-bold text-xs uppercase tracking-wider py-3 rounded-xl transition-all shadow-md">
-                            Suscribirme Gratis
+                            Probar formulario
                         </button>
                     </form>
 
                     <div id="newsletterSuccess" class="hidden mt-3 p-3 bg-pitch-800/80 border border-pitch-400 rounded-xl text-center">
                         <i class="fa-solid fa-circle-check text-pitch-200 text-xl mb-1"></i>
-                        <p class="text-xs font-bold text-white">¡Suscripción confirmada!</p>
-                        <p class="text-[11px] text-pitch-200 mt-0.5">Te enviaremos el próximo boletín.</p>
+                        <p class="text-xs font-bold text-white">Demostración completada</p>
+                        <p class="text-[11px] text-pitch-200 mt-0.5">No se ha guardado tu correo ni creado una suscripción.</p>
                     </div>
                 </div>
 
@@ -640,17 +646,26 @@ html.dark [data-reading-size][aria-pressed="true"] {
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Categoría *</label>
-                        <select id="pubCategory" required class="w-full bg-slate-50 border border-slate-200 text-sm text-slate-800 rounded-xl px-3 py-2.5 focus:outline-none focus:border-pitch-600 focus:bg-white">
+                        <select id="pubCategory" onchange="updateTeamField()" required class="w-full bg-slate-50 border border-slate-200 text-sm text-slate-800 rounded-xl px-3 py-2.5 focus:outline-none focus:border-pitch-600 focus:bg-white">
                             <option value="Picks">Picks</option>
                             <option value="Fútbol">Fútbol</option>
                             <option value="Fútbol Americano Colegial">Fútbol Americano Colegial</option>
                             <option value="NFL">NFL</option>
-                            <option value="Básquetbol">Básquetbol</option>
+                            <option value="Básquetbol">NBA</option>
                             <option value="Tenis">Tenis</option>
                             <option value="Ciclismo">Ciclismo</option>
                         </select>
                     </div>
 
+                    <div id="pubTeamField" class="hidden">
+                        <label for="pubTeam">Equipo de fútbol</label>
+                        <select id="pubTeam" class="w-full">
+                            <option value="">Sin equipo / Fútbol general</option>
+                            <option value="barcelona">FC Barcelona</option>
+                            <option value="real-madrid">Real Madrid</option>
+                            <option value="manchester-united">Manchester United</option>
+                        </select>
+                    </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Autor de la Nota</label>
                         <input type="text" id="pubAuthor" required
@@ -846,7 +861,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
                         <li><a href="#" onclick="filterByCategory('Fútbol')" class="hover:text-pitch-400 transition-colors">Fútbol</a></li>
                         <li><a href="#" onclick="filterByCategory('Fútbol Americano Colegial')" class="hover:text-pitch-400 transition-colors">Fútbol Colegial</a></li>
                         <li><a href="#" onclick="filterByCategory('NFL')" class="hover:text-pitch-400 transition-colors">NFL</a></li>
-                        <li><a href="#" onclick="filterByCategory('Básquetbol')" class="hover:text-pitch-400 transition-colors">Básquetbol</a></li>
+                        <li><a href="#" onclick="filterByCategory('NBA')" class="hover:text-pitch-400 transition-colors">NBA</a></li>
                         <li><a href="#" onclick="filterByCategory('Tenis')" class="hover:text-pitch-400 transition-colors">Tenis</a></li>
                         <li><a href="#" onclick="filterByCategory('Ciclismo')" class="hover:text-pitch-400 transition-colors">Ciclismo</a></li>
                     </ul>
@@ -933,6 +948,10 @@ html.dark [data-reading-size][aria-pressed="true"] {
         let articles = [];
         let currentAdmin = null; // Verified Supabase editor
         let currentCategory = 'Todos';
+        let currentTeam = '';
+        function categoryKey(category) { return category === 'Básquetbol' ? 'NBA' : category; }
+        function updateTeamField() { document.getElementById('pubTeamField').classList.toggle('hidden', document.getElementById('pubCategory').value !== 'Fútbol'); }
+        function filterByTeam(team) { currentTeam = team; renderArticlesFeed(); }
         let currentSearchQuery = '';
         let activeModalArticleId = null;
 let currentUser = null;
@@ -1317,15 +1336,15 @@ currentUser = {
         }
 
         function fromDatabase(row) {
-            return withLocalInteractions({
-                id: row.id, legacyId: row.legacy_id, title: row.title, category: row.category,
+            return {
+                id: row.id, legacyId: row.legacy_id, title: row.title, category: row.category, team: row.football_team || '', createdAt: row.created_at,
                 author: row.author, image: safeImageURL(row.image),
                 authorAvatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=' + encodeURIComponent(row.author),
                 summary: row.summary, body: row.body, featured: row.featured,
                 date: new Date(row.created_at).toLocaleDateString('es', {year:'numeric', month:'short', day:'numeric'}),
                 readTime: Math.max(1, Math.ceil(row.body.replace(/<[^>]*>/g, ' ').split(/\s+/).length / 220)) + ' min de lectura',
-                remote: true, likes: 0, userLiked: false, comments: []
-            });
+                remote: true, likes: null, userLiked: false, comments: []
+            };
         }
 
         async function loadArticlesFromStorage() {
@@ -1346,18 +1365,11 @@ currentUser = {
                 renderArticlesFeed();
                 renderTrending();
                 refreshCommunity();
+                await refreshArticleStats();
                 setDataStatus('');
             } catch {
                 setDataStatus('No se pudieron cargar las publicaciones en línea. Comprueba tu conexión y recarga la página.');
             } finally { loadingArticles = false; }
-        }
-
-        function saveArticlesToStorage() {
-            // Interactions stay local in this release. Never overwrite published articles or the legacy backup.
-            const saved = readJSON('rcm_sports_interactions_v2', {});
-            for (const a of articles) saved[a.id] = {likes: a.likes, userLiked: a.userLiked, comments: a.remote ? [] : a.comments};
-            try { localStorage.setItem('rcm_sports_interactions_v2', JSON.stringify(saved)); }
-            catch { setDataStatus('El navegador no pudo guardar esta interacción.'); }
         }
 
         function exportLegacyArticles() {
@@ -1407,13 +1419,15 @@ currentUser = {
 
         function renderArticlesFeed() {
             document.getElementById('nflRankings').classList.toggle('hidden', currentCategory !== 'NFL');
+            document.getElementById('footballTeams').classList.toggle('hidden', currentCategory !== 'Fútbol');
+            document.querySelectorAll('[data-team]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.team === currentTeam)));
             const filtered = articles.filter(art => {
-                const matchesCat = currentCategory === 'Todos' || art.category === currentCategory;
+                const matchesCat = currentCategory === 'Todos' || categoryKey(art.category) === currentCategory;
                 const matchesSearch = art.title.toLowerCase().includes(currentSearchQuery.toLowerCase()) ||
                                       art.summary.toLowerCase().includes(currentSearchQuery.toLowerCase()) ||
-                                      art.category.toLowerCase().includes(currentSearchQuery.toLowerCase());
-                return matchesCat && matchesSearch;
-            });
+                                      categoryKey(art.category).toLowerCase().includes(currentSearchQuery.toLowerCase());
+                return matchesCat && matchesSearch && (currentCategory !== 'Fútbol' || !currentTeam || art.team === currentTeam);
+            }).sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt) || String(a.id).localeCompare(String(b.id)));
 
             const heroSection = document.getElementById('heroSection');
             const articlesGrid = document.getElementById('articlesGrid');
@@ -1432,7 +1446,7 @@ currentUser = {
             noResults.classList.add('hidden');
             articlesGrid.classList.remove('hidden');
 
-            let heroArticle = filtered.find(a => a.remote && a.featured) || filtered.find(a => a.remote) || filtered.find(a => a.featured) || filtered[0];
+            let heroArticle = filtered[0];
             let gridArticles = filtered.filter(a => a.id !== heroArticle.id);
 
             if (currentCategory !== 'Todos' || currentSearchQuery !== '') {
@@ -1477,14 +1491,13 @@ currentUser = {
 
                     <div class="px-5 pb-5 pt-0 flex items-center justify-between border-t border-slate-100 mt-auto">
                         <div class="flex items-center space-x-2">
-                            <img src="${escapeHTML(safeImageURL(art.authorAvatar))}" class="w-6 h-6 rounded-full object-cover" alt="${escapeHTML(art.author)}">
-                            <span class="text-xs text-slate-700 font-medium">${escapeHTML(art.author)}</span>
+                            <p class="text-xs text-slate-700 line-clamp-2">${escapeHTML(art.topComment || 'Sin comentarios destacados')}</p>
                         </div>
 
                         <div class="flex items-center space-x-3">
                             <button onclick="toggleLike(${articleIdArgument(art.id)}, event)" class="flex items-center space-x-1 text-xs ${art.userLiked ? 'text-red-500' : 'text-slate-400 hover:text-red-500'} transition-colors">
                                 <i class="${art.userLiked ? 'fa-solid' : 'fa-regular'} fa-heart"></i>
-                                <span class="font-bold">${art.likes}</span>
+                                <span class="font-bold">${art.likes ?? '—'}</span>
                             </button>
                             <button onclick="openArticleModal(${articleIdArgument(art.id)})" class="text-xs font-bold text-pitch-600 hover:underline flex items-center">
                                 Leer <i class="fa-solid fa-arrow-right ml-1 text-[10px]"></i>
@@ -1527,12 +1540,9 @@ currentUser = {
                             </div>
 
                             <div class="flex items-center justify-between border-t border-slate-100 pt-4 mt-4">
-                                <div class="flex items-center space-x-3">
-                                    <img src="${escapeHTML(safeImageURL(hero.authorAvatar))}" class="w-8 h-8 rounded-full object-cover border border-pitch-600" alt="${escapeHTML(hero.author)}">
-                                    <div>
-                                        <p class="text-xs font-bold text-slate-800">${escapeHTML(hero.author)}</p>
-                                        <p class="text-[10px] text-slate-400">${escapeHTML(hero.date)}</p>
-                                    </div>
+                                <div class="text-xs">
+                                    <p>${escapeHTML(hero.topComment || 'Sin comentarios destacados')}</p>
+                                    <button onclick="toggleLike(${articleIdArgument(hero.id)}, event)" aria-label="Me gusta la publicación">♥ ${hero.likes ?? '—'}</button>
                                 </div>
                                 <button onclick="openArticleModal(${articleIdArgument(hero.id)})" class="bg-pitch-600 hover:bg-pitch-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-md shadow-pitch-600/20 transition-all hover:scale-105">
                                     Leer Noticia
@@ -1546,7 +1556,7 @@ currentUser = {
 
         function renderPoll() {
             document.getElementById('pollQuestion').innerText = pollData.question;
-            document.getElementById('pollTotalVotes').innerText = `Total de votos: ${pollData.totalVotes.toLocaleString()}`;
+            document.getElementById('pollTotalVotes').innerText = `Demostración local · ${pollData.totalVotes.toLocaleString()} votos de ejemplo`;
 
             const container = document.getElementById('pollOptionsContainer');
             container.innerHTML = pollData.options.map(opt => {
@@ -1604,6 +1614,8 @@ currentUser = {
                 openLoginModal();
                 return;
             }
+            document.getElementById('pubTeam').value = '';
+            updateTeamField();
             document.getElementById('pubAuthor').value = currentAdmin.name;
             document.getElementById('publishModal').classList.remove('hidden');
             syncModalScrollLock();
@@ -1633,6 +1645,7 @@ currentUser = {
                 publishDraftId = editingArticleId || publishDraftId || crypto.randomUUID();
                 const payload = {
                     id: publishDraftId, title, category,
+                    football_team: category === 'Fútbol' ? (document.getElementById('pubTeam').value || null) : null,
                     author: document.getElementById('pubAuthor').value.trim() || currentAdmin.name,
                     image: safeImageURL(document.getElementById('pubImage').value.trim() || categoryFallbackImages[category]),
                     summary: document.getElementById('pubSummary').value.trim(),
@@ -1645,7 +1658,7 @@ currentUser = {
                 }
                 const request = editingArticleId ? db.from('articles').update(payload).eq('id', editingArticleId) : db.from('articles').insert(payload);
                 const {data, error} = await request.select().single();
-                if (error) throw new Error('No se pudo guardar en línea. Comprueba tu conexión y tu sesión e inténtalo de nuevo. El formulario conserva tu texto.');
+                if (error) throw new Error('No se pudo guardar en línea: ' + error.message + '. El formulario conserva tu texto.');
                 articles = [fromDatabase(data), ...articles.filter(a => a.id !== data.id)];
                 publishDraftId = null;
                 editingArticleId = null;
@@ -1657,6 +1670,7 @@ currentUser = {
                 document.getElementById('searchInput').value = '';
                 document.getElementById('mobileSearchInput').value = '';
                 filterByCategory(category);
+                await refreshArticleStats();
                 renderTrending();
                 setDataStatus('Publicación guardada en línea. Ya puede leerse desde otros dispositivos al abrir o recargar la página.');
             } catch (error) {
@@ -1747,7 +1761,7 @@ loadCommentsFromSupabase(article.id);
             const likeIcon = document.getElementById('modalLikeIcon');
             const likeCount = document.getElementById('modalLikeCount');
 
-            likeCount.innerText = article.likes;
+            likeCount.innerText = article.likes ?? '—';
             if (article.userLiked) {
                 likeIcon.className = 'fa-solid fa-heart text-red-500 text-base';
                 likeBtn.classList.add('border-red-200', 'bg-red-50');
@@ -1757,40 +1771,8 @@ loadCommentsFromSupabase(article.id);
             }
         }
 
-        function toggleLikeModal() {
-            if (!activeModalArticleId) return;
-            const article = articles.find(a => a.id === activeModalArticleId);
-            if (article) {
-                if (article.userLiked) {
-                    article.likes--;
-                    article.userLiked = false;
-                } else {
-                    article.likes++;
-                    article.userLiked = true;
-                }
-                saveArticlesToStorage();
-                updateModalLikeBtn(article);
-                renderArticlesFeed();
-                renderTrending();
-            }
-        }
-
-        function toggleLike(articleId, event) {
-            event.stopPropagation();
-            const article = articles.find(a => a.id === articleId);
-            if (article) {
-                if (article.userLiked) {
-                    article.likes--;
-                    article.userLiked = false;
-                } else {
-                    article.likes++;
-                    article.userLiked = true;
-                }
-                saveArticlesToStorage();
-                renderArticlesFeed();
-                renderTrending();
-            }
-        }
+        function toggleLikeModal() { return setArticleLike(activeModalArticleId); }
+        function toggleLike(articleId, event) { event.stopPropagation(); return setArticleLike(articleId); }
 
 function prepareComments(article) {
     article.comments = article.comments || [];
@@ -1862,7 +1844,10 @@ function prepareComments(article) {
 
 
         function filterByCategory(category) {
-    currentCategory = category;
+    currentCategory = categoryKey(category);
+    category = currentCategory;
+    currentTeam = '';
+    if (category === 'NFL') loadRanking();
             document.querySelectorAll('.category-btn').forEach(btn => {
                 if (btn.dataset.category === category) {
                     btn.className = 'category-btn active px-4 py-2 rounded-lg bg-pitch-600 text-white font-bold transition-all whitespace-nowrap shadow-sm';
@@ -2019,6 +2004,6 @@ function toggleDarkMode() {
 updateThemeButton();
     </script>
 <script src="assets/nfl-teams.js"></script>
-<script src="assets/community.js"></script>
+<script src="assets/community.js?v=20261013-2"></script>
 </body>
 </html>

@@ -39,6 +39,8 @@ assert.equal((await db.query("select article_id from comments where id='30000000
 assert.equal((await db.query("select count(*)::int n from rcm_comment_totals where body='Existing legacy comment'")).rows[0].n,1);
 // Re-running should not delete data or duplicate catalog entries.
 await db.exec(migration);
+const extraMigration=fs.readFileSync(new URL('../supabase/03_equipos_y_likes.sql',import.meta.url),'utf8');
+await db.exec(extraMigration); await db.exec(extraMigration);
 async function asUser(n,sql){await db.exec(`reset role;set role ${n?'authenticated':'anon'};select set_config('request.jwt.claim.sub','${n?'00000000-0000-0000-0000-00000000000'+n:''}',false);`);return db.query(sql);}
 const cid='20000000-0000-0000-0000-000000000001',cid2='20000000-0000-0000-0000-000000000002';
 await asUser(2,`select rcm_set_comment_vote('${cid}',1)`);
@@ -88,5 +90,30 @@ await assert.rejects(()=>asUser(1,`select rcm_set_comment_vote('${cid}',-1)`), /
 await assert.rejects(()=>asUser(1,`insert into comment_votes(comment_id,user_id,value) values('30000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-000000000001',1)`), /row-level security/);
 await db.exec("reset role;select set_config('test.is_anonymous','false',false)");
 assert.equal((await db.query('select count(*)::int n from nfl_teams')).rows[0].n,32);
+const aid='10000000-0000-0000-0000-000000000001';
+await asUser(1,`select rcm_set_article_like('${aid}',true)`);
+await asUser(1,`select rcm_set_article_like('${aid}',true)`);
+await asUser(2,`select rcm_set_article_like('${aid}',true)`);
+let stats=(await asUser(0,`select * from rcm_article_totals where article_id='${aid}'`)).rows[0];
+assert.equal(Number(stats.likes),2); assert.equal(stats.my_like,false); assert.equal(stats.top_comment,'First');
+assert.equal((await asUser(1,`select * from rcm_article_totals where article_id='${aid}'`)).rows[0].my_like,true);
+await asUser(1,`select rcm_set_article_like('${aid}',false)`);
+assert.equal(Number((await asUser(0,`select * from rcm_article_totals where article_id='${aid}'`)).rows[0].likes),1);
+await assert.rejects(()=>asUser(0,`select rcm_set_article_like('${aid}',true)`));
+await assert.rejects(()=>asUser(1,`insert into article_likes(article_id,user_id) values('${aid}','00000000-0000-0000-0000-000000000002')`));
+assert.equal((await asUser(1,`delete from article_likes where user_id='00000000-0000-0000-0000-000000000002' returning *`)).rows.length,0);
+await asUser(3,`update articles set category='Fútbol',football_team='barcelona',image='https://example.test/new.jpg' where id='${aid}'`);
+assert.equal((await asUser(0,`select football_team from articles where id='${aid}'`)).rows[0].football_team,'barcelona');
+assert.equal((await asUser(0,`select * from rcm_comment_totals where id='${cid}'`)).rows.length,1);
+await assert.rejects(()=>asUser(3,`update articles set category='NFL' where id='${aid}'`));
+await assert.rejects(()=>asUser(3,`update articles set football_team='unknown' where id='${aid}'`));
+await asUser(3,`update articles set is_public=false where id='${aid}'`);
+assert.equal((await asUser(0,`select * from rcm_article_totals where article_id='${aid}'`)).rows.length,0);
+await assert.rejects(()=>asUser(1,`select rcm_set_article_like('${aid}',true)`));
+await asUser(3,`update articles set is_public=true where id='${aid}'`);
+await asUser(1,`select set_config('test.is_anonymous','true',false)`);
+await assert.rejects(()=>asUser(1,`select rcm_set_article_like('${aid}',true)`));
+await db.exec("reset role;select set_config('test.is_anonymous','false',false)");
+console.log('PASS: migration 03 twice, shared likes/idempotency/removal/private ownership/hidden articles/anonymous denial, team validation, article ID and comments preserved.');
 console.log((process.env.RCM_OBSERVED_SCHEMA ? 'OBSERVED SCHEMA ' : 'BASELINE SCHEMA ')+'PASS: migration twice, old votes preserved, two users, change/remove/idempotent votes, duplicate rejection, own votes only, anonymous totals, reader/editor RLS, tie-breaking, hidden/deleted articles/comments, ranking authorization/atomic validation/conflicts.');
 await db.close();
