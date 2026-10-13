@@ -6,15 +6,16 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const root='http://127.0.0.1:8765/RCM-Sports/';
 const aid='10000000-0000-0000-0000-000000000001';
-const state={votes:{},failVotes:false,ranking:null,drafts:{},articles:[{id:aid,legacy_id:'1',title:'Análisis NFL de prueba',category:'NFL',author:'Redacción',image:'https://example.test/image.jpg',summary:'Resumen de prueba',body:'<p>Contenido del artículo.</p>',created_at:'2026-10-12T12:00:00Z',featured:true,is_public:true}],comments:[{id:'c1',article_id:aid,parent_id:null,author:'Lector <img src=x onerror=alert(1)>',body:'Comentario de prueba <script>window.pwned=1</script>',created_at:'2026-10-12T12:00:00Z'}]};
+const state={articleLikes:{},failRankingRead:false,publicRankingHidden:false,failRankingPublish:false,votes:{},failVotes:false,ranking:null,drafts:{},articles:[{id:aid,legacy_id:'1',title:'Análisis NFL de prueba',category:'NFL',author:'Redacción',image:'https://example.test/image.jpg',summary:'Resumen de prueba',body:'<p>Contenido del artículo.</p>',created_at:'2026-10-12T12:00:00Z',featured:true,is_public:true}],comments:[{id:'c1',article_id:aid,parent_id:null,author:'Lector <img src=x onerror=alert(1)>',body:'Comentario de prueba <script>window.pwned=1</script>',created_at:'2026-10-12T12:00:00Z'}]};
 const mockClient=`(()=>{
 let user=JSON.parse(localStorage.getItem('testSession')||'null');const listeners=[];
-window.supabase={createClient:()=>({
+window.supabase={createClient:(url,key,options)=>({
+ supabaseUrl:url,supabaseKey:key,
  auth:{getUser:async()=>({data:{user},error:null}),onAuthStateChange:fn=>{listeners.push(fn);return {data:{subscription:{unsubscribe(){}}}}},
  signInWithPassword:async({email})=>{const name=email.split('@')[0];user={id:name,email,user_metadata:{username:name}};localStorage.setItem('testSession',JSON.stringify(user));listeners.forEach(f=>f());return {data:{user,session:{}},error:null}},
  signUp:async({email,options})=>{user={id:options.data.username,email,user_metadata:options.data};localStorage.setItem('testSession',JSON.stringify(user));listeners.forEach(f=>f());return {data:{user,session:{}},error:null}},
  signOut:async()=>{user=null;localStorage.removeItem('testSession');listeners.forEach(f=>f());return {error:null}}},
- from:table=>{let q={table,user:user?.id,filters:[],op:'select'};const b={select:()=>b,eq:(k,v)=>{q.filters.push([k,v]);return b},order:()=>b,range:(a,z)=>{q.range=[a,z];return b},maybeSingle:()=>{q.single=true;return b},single:()=>{q.single=true;return b},insert:v=>{q.op='insert';q.payload=v;return b},update:v=>{q.op='update';q.payload=v;return b},upsert:v=>{q.op='upsert';q.payload=v;return b},delete:()=>{q.op='delete';return b},then:(a,z)=>window.mockDb(q).then(a,z)};return b},
+ from:table=>{let q={table,user:options?.auth?.persistSession===false?undefined:user?.id,filters:[],op:'select'};const b={select:()=>b,eq:(k,v)=>{q.filters.push([k,v]);return b},order:()=>b,range:(a,z)=>{q.range=[a,z];return b},maybeSingle:()=>{q.single=true;return b},single:()=>{q.single=true;return b},insert:v=>{q.op='insert';q.payload=v;return b},update:v=>{q.op='update';q.payload=v;return b},upsert:v=>{q.op='upsert';q.payload=v;return b},delete:()=>{q.op='delete';return b},then:(a,z)=>window.mockDb(q).then(a,z)};return b},
  rpc:(name,args)=>window.mockDb({rpc:name,args,user:user?.id})
 })};})();`;
 function totals(user){return state.comments.filter(c=>state.articles.some(a=>a.id===c.article_id&&a.is_public)).map(c=>{
@@ -25,10 +26,14 @@ async function backend(q){
  if(q.rpc){
   if(q.rpc==='rcm_set_comment_vote'){if(state.failVotes)return {error:{message:'offline'}};state.votes[q.args.p_comment_id+':'+q.user]=q.args.p_vote;return {data:null,error:null};}
   if(q.rpc==='rcm_community_leaders'){const rows=totals(q.user);const top=key=>rows.filter(c=>c[key]>0).sort((a,b)=>b[key]-a[key]||b.created_at.localeCompare(a.created_at))[0]||null;return {data:{supported:top('upvotes'),questioned:top('downvotes')}};}
-  if(q.rpc==='rcm_publish_ranking'){state.ranking={id:1,edition:q.args.p_edition,team_ids:q.args.p_team_ids,updated_at:new Date().toISOString()};return {data:null};}
+  if(q.rpc==='rcm_set_article_like'){if(state.failVotes)return {error:{message:'offline'}};state.articleLikes[q.args.p_article_id+':'+q.user]=q.args.p_liked;return {data:null};}
+  if(q.rpc==='rcm_publish_ranking'){if(state.failRankingPublish)return {error:{message:'permission denied',code:'42501'}};state.ranking={id:1,edition:q.args.p_edition,team_ids:q.args.p_team_ids,updated_at:new Date().toISOString()};return {data:null};}
  }
- let rows=q.table==='articles'?state.articles.filter(a=>a.is_public):q.table==='editors'?(q.user==='admin'?[{user_id:'admin'}]:[]):q.table==='rcm_comment_totals'?totals(q.user):q.table==='nfl_rankings'?(state.ranking?[state.ranking]:[]):q.table==='nfl_ranking_drafts'?(state.drafts[q.user]?[state.drafts[q.user]]:[]):q.table==='comments'?state.comments:[];
+ if(q.table==='nfl_rankings'&&state.publicRankingHidden&&!q.user)return {data:null};
+ if(q.table==='nfl_rankings'&&state.failRankingRead)return {error:{message:'public read unavailable'}};
+ let rows=q.table==='rcm_article_totals'?state.articles.filter(a=>a.is_public).map(a=>({article_id:a.id,likes:Object.entries(state.articleLikes).filter(([k,v])=>k.startsWith(a.id+':')&&v).length,my_like:!!state.articleLikes[a.id+':'+q.user],top_comment:totals(q.user).filter(c=>c.article_id===a.id&&c.upvotes>0).sort((a,b)=>b.upvotes-a.upvotes)[0]?.body||null})):q.table==='articles'?state.articles.filter(a=>a.is_public):q.table==='editors'?(q.user==='admin'?[{user_id:'admin'}]:[]):q.table==='rcm_comment_totals'?totals(q.user):q.table==='nfl_rankings'?(state.ranking?[state.ranking]:[]):q.table==='nfl_ranking_drafts'?(state.drafts[q.user]?[state.drafts[q.user]]:[]):q.table==='comments'?state.comments:[];
  const matches=x=>q.filters.every(([k,v])=>String(x[k])===String(v));
+ if(q.op==='insert'&&q.table==='articles'){const row={...q.payload,created_at:new Date().toISOString(),is_public:true};state.articles.push(row);return {data:row};}
  if(q.op==='insert'&&q.table==='comments'){const row={...q.payload,id:'c'+(state.comments.length+1),created_at:new Date().toISOString()};state.comments.push(row);return {data:q.single?row:[row]};}
  if(q.op==='update'&&q.table==='articles'){const row=state.articles.find(matches);Object.assign(row,q.payload);return {data:row};}
  if(q.op==='upsert'&&q.table==='nfl_ranking_drafts'){state.drafts[q.user]=q.payload;return {data:q.payload};}
@@ -85,6 +90,18 @@ async function backend(q){
  await two.reload();await two.locator('#comment-c1').waitFor();await two.waitForFunction(()=>commentRows.get('c1')?.my_vote===1);
  await two.evaluate(()=>handleUserLogout());await two.waitForFunction(()=>commentRows.get('c1')?.my_vote===0);assert.equal(await two.locator('#comment-c1 button').nth(0).textContent(),'▲ 1');
  await two.locator('#comment-c1 button').nth(0).click();await two.locator('#userAuthModal:not(.hidden)').waitFor();assert.equal(await two.locator('#articleModal').evaluate(el=>el.classList.contains('hidden')),false);await two.evaluate(()=>closeUserAuthModal());
+ // Shared article likes: two independent sessions, reload/logout and failed write.
+ await one.evaluate(()=>setArticleLike(articles[0].id));
+ await login(two,'bob');await two.evaluate(()=>setArticleLike(articles[0].id));
+ await one.evaluate(()=>refreshArticleStats());assert.equal(await one.locator('#modalLikeCount').textContent(),'2');
+ await two.reload();await two.waitForFunction(()=>articles[0]?.likes===2&&articles[0]?.userLiked);
+ await two.evaluate(()=>handleUserLogout());await two.waitForFunction(()=>articles[0]?.likes===2&&!articles[0]?.userLiked);
+ state.failVotes=true;await one.evaluate(()=>setArticleLike(articles[0].id));assert.equal(await one.locator('#modalLikeCount').textContent(),'2');state.failVotes=false;
+ await one.evaluate(()=>setArticleLike(articles[0].id));assert.equal(await one.locator('#modalLikeCount').textContent(),'1');
+ // A reply survives a separate visitor reload.
+ await one.locator('#comment-c1 button').nth(2).click();await one.locator('form[data-reply="c1"] textarea').fill('Respuesta persistente');
+ await one.locator('form[data-reply="c1"] button').click();await one.waitForFunction(()=>[...commentRows.values()].some(c=>c.body==='Respuesta persistente'));
+ await two.reload();await two.waitForFunction(()=>[...commentRows.values()].some(c=>c.body==='Respuesta persistente'&&c.parent_id==='c1'));
  // Browser history and stable alias.
  await one.evaluate(()=>closeModal());assert.ok(!one.url().includes('article='));await one.goBack();await one.locator('#comment-c1').waitFor();await one.goForward();assert.equal(await one.locator('#articleModal').evaluate(el=>el.classList.contains('hidden')),true);
  await ready(one,root+'?article=1');await one.locator('#comment-c1').waitFor();
@@ -96,14 +113,46 @@ async function backend(q){
  await one.getByRole('button',{name:'Publicar las diez posiciones'}).click();assert.match(await one.locator('#rankingEditorStatus').textContent(),/diez equipos distintos/);
  const teams=['ARI','ATL','BAL','BUF','CAR','CHI','CIN','CLE','DAL','DEN'];for(let i=0;i<10;i++)await one.locator('#rank-'+i).selectOption(teams[i]);
  await one.getByRole('button',{name:'Guardar borrador',exact:true}).click();await one.waitForFunction(()=>document.getElementById('rankingEditorStatus').textContent.includes('Borrador guardado'));assert.equal(state.ranking,null);
+ state.failRankingPublish=true;
+ await one.getByRole('button',{name:'Publicar las diez posiciones'}).click();await one.waitForFunction(()=>document.getElementById('rankingEditorStatus').textContent.includes('42501'));assert.equal(state.ranking,null);state.failRankingPublish=false;
+ state.failRankingRead=true;
+ await one.getByRole('button',{name:'Publicar las diez posiciones'}).click();await one.waitForFunction(()=>document.getElementById('rankingEditorStatus').textContent.includes('public read unavailable'));
+ assert.ok(!(await one.locator('#rankingEditorStatus').textContent()).includes('Ranking publicado'));state.failRankingRead=false;
+ state.publicRankingHidden=true;
+ await one.getByRole('button',{name:'Publicar las diez posiciones'}).click();await one.waitForFunction(()=>document.getElementById('rankingEditorStatus').textContent.includes('lectura pública no devuelve'));state.publicRankingHidden=false;
  await one.getByRole('button',{name:'Publicar las diez posiciones'}).click();await one.waitForFunction(()=>document.getElementById('rankingEditorStatus').textContent.includes('Ranking publicado'));
  await one.getByRole('button',{name:'Cerrar',exact:true}).click();await two.evaluate(()=>{filterByCategory('NFL');loadRanking();});await two.waitForFunction(()=>rankingPublished?.team_ids.length===10);assert.equal(await two.locator('#rankingList li').count(),10);
+ assert.deepEqual(await two.evaluate(()=>rankingPublished.team_ids),teams);
+ await two.reload();await two.waitForFunction(()=>rankingPublished?.team_ids.length===10);assert.deepEqual(await two.evaluate(()=>rankingPublished.team_ids),teams);
  await one.locator('#rankingPause').click();assert.equal(await one.locator('#rankingTrack').evaluate(e=>e.classList.contains('paused')),true);
  await one.screenshot({path:'/tmp/rcm-desktop.png',fullPage:true});
- const mobile=await newPage({width:390,height:844});await ready(mobile);await mobile.evaluate(()=>filterByCategory('NFL'));await mobile.waitForFunction(()=>rankingPublished?.team_ids.length===10);await mobile.screenshot({path:'/tmp/rcm-mobile.png',fullPage:true});
+ const mobile=await newPage({width:390,height:844});await ready(mobile);await mobile.evaluate(()=>filterByCategory('NFL'));await mobile.waitForFunction(()=>rankingPublished?.team_ids.length===10);assert.equal(await mobile.locator('#footballTeams').isVisible(),false);await mobile.screenshot({path:'/tmp/rcm-mobile.png',fullPage:true});
  assert.equal(await mobile.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),true);
  await mobile.emulateMedia({reducedMotion:'reduce'});assert.equal(await mobile.locator('#rankingTrack').evaluate(e=>getComputedStyle(e).animationName),'none');
  await one.evaluate(()=>closeModal());await one.locator('#communityLeaders a').first().click();await one.waitForFunction(()=>document.activeElement?.id==='comment-c1');
+ // All navigation categories, legacy NBA aliases and dated order.
+ await one.evaluate(()=>closeModal());
+ assert.deepEqual(await one.locator('.category-btn').allTextContents().then(x=>x.map(v=>v.trim())),['Todos','Picks','NFL','Fútbol','Colegial','NBA','Tenis','Ciclismo']);
+ for (const [i,category] of ['Picks','Fútbol','Fútbol Americano Colegial','Básquetbol','NBA','Tenis','Ciclismo'].entries())
+  state.articles.push({...state.articles[0],id:'fixture-'+i,title:'Fixture '+category,category,featured:false,created_at:'2026-10-01T12:00:00Z'});
+ await one.evaluate(()=>loadArticlesFromStorage());
+ for(const category of ['Picks','NFL','Fútbol','Fútbol Americano Colegial','NBA','Tenis','Ciclismo']) {
+  await one.locator('[data-category="'+category+'"]').click();
+  assert.equal(await one.locator('#articlesGrid > article').count(),category==='NBA'?2:1);
+ }
+ await one.evaluate(()=>openPublishModal());await one.locator('#pubTitle').fill('Barcelona noticia');await one.locator('#pubCategory').selectOption('Fútbol');await one.locator('#pubTeam').selectOption('barcelona');await one.locator('#pubBody').fill('Noticia del equipo');await one.locator('#pubSummary').fill('Resumen Barcelona');await one.locator('#publishModal form button[type=submit]').click();
+ await one.waitForFunction(()=>articles.some(a=>a.title==='Barcelona noticia'));
+ const barcaId=state.articles.find(a=>a.title==='Barcelona noticia').id;
+ await one.locator('[data-team="barcelona"]').click();assert.equal(await one.locator('#articlesGrid > article').count(),1);
+ for(const team of ['real-madrid','manchester-united']) {await one.locator('[data-team="'+team+'"]').click();assert.equal(await one.locator('#noResults:not(.hidden)').count(),1);}
+ await one.locator('[data-team=""]').click();assert.equal(await one.locator('#articlesGrid > article').count(),2);
+ await one.locator('[data-team="barcelona"]').click();await one.locator('#searchInput').fill('not-matching');await one.evaluate(()=>handleSearch());assert.equal(await one.locator('#noResults:not(.hidden)').count(),1);
+ await one.evaluate(()=>resetFilters());assert.equal(await one.locator('#footballTeams').isVisible(),false);
+ await ready(two);await two.evaluate(()=>{filterByCategory('Fútbol');filterByTeam('barcelona');});await two.waitForFunction(()=>articles.some(a=>a.title==='Barcelona noticia'));assert.equal(await two.locator('#articlesGrid > article').count(),1);
+ await one.evaluate(id=>openArticleModal(id),barcaId);await one.locator('#editArticleButton').click();assert.equal(await one.locator('#pubTeam').inputValue(),'barcelona');await one.locator('#pubTeam').selectOption('real-madrid');await one.locator('#publishModal form button[type=submit]').click();await one.waitForFunction(()=>articles.some(a=>a.title==='Barcelona noticia'&&a.team==='real-madrid'));assert.equal(state.articles.find(a=>a.title==='Barcelona noticia').id,barcaId);
+ await one.evaluate(()=>{closeModal();resetFilters();});assert.equal(await one.locator('#heroSection h1').textContent().then(x=>x.trim()),'Barcelona noticia');
+ await mobile.evaluate(()=>{filterByCategory('Fútbol');});assert.equal(await mobile.locator('#footballTeams').isVisible(),true);await mobile.screenshot({path:'/tmp/rcm-football-mobile.png',fullPage:true});assert.equal(await mobile.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+ console.log('PASS: article likes shared/reload/logout/failure, replies, failed ranking publication/readback, exact ranking order after reload, category order and legacy NBA, create/filter/edit/persist football teams, search and mobile.');
  assert.deepEqual(errors,[]);console.log('PASS: mock-transport browser integration: two readers, votes/change/remove/error/reload/logout, escaped content, deep links/alias/history/not-found, login over article, NFL filter/search, image edit preserves ID/body, draft/publish ranking, shared ranking, reduced motion, mobile width, highlighted comment navigation.');
  await browser.close();server.close();
 })().catch(e=>{console.error(e.stack);process.exit(1)});

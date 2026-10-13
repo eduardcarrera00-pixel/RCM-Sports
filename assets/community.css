@@ -47,3 +47,10 @@ button:focus-visible,a:focus-visible,summary:focus-visible,select:focus-visible,
 .dark .rcm-leader-link:hover {background:#1e293b}
 @media (max-width:640px) {.rcm-comment-columns,.rcm-ranking-list {grid-template-columns:1fr}.rcm-panel{padding:1rem}.rcm-comment{padding:.7rem}.rcm-track{animation:none;transform:none}.rcm-track-group:nth-child(2){display:none}#rankingPause{display:none}}
 @media (prefers-reduced-motion:reduce) {.rcm-track{animation:none;transform:none}.rcm-track-group:nth-child(2){display:none}#rankingPause{display:none}}
+
+#footballTeams { padding: .5rem 0; gap: .5rem; flex-wrap: wrap; }
+#footballTeams button { padding: .5rem .75rem; border: 1px solid currentColor; border-radius: .5rem; font-size: .8rem; }
+#footballTeams button[aria-pressed="true"] { background: #166534; color: white; }
+#pubTeam { padding: .6rem; border: 1px solid #94a3b8; border-radius: .5rem; color: #0f172a; background: white; }
+
+#footballTeams.hidden { display: none; }

@@ -1,0 +1,10 @@
+select count(*) from public.article_likes;
+select article_id,user_id,count(*) from public.article_likes group by article_id,user_id having count(*)>1;
+select football_team,count(*) from public.articles group by football_team;
+select * from public.rcm_article_totals;
+select edition,team_ids,cardinality(team_ids) positions,updated_at from public.nfl_rankings;
+begin;
+set local role anon;
+select * from public.rcm_article_totals;
+select edition,team_ids from public.nfl_rankings;
+rollback;

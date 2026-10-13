@@ -54,6 +54,9 @@ function openArticleEditor() {
         pubCategory: article.category, pubImage: article.image, pubSummary: article.summary})) {
         document.getElementById(id).value = value || '';
     }
+    if (article.category === 'NBA') document.getElementById('pubCategory').value = 'Básquetbol';
+    document.getElementById('pubTeam').value = article.team || '';
+    updateTeamField();
     const body = document.createElement('div'); body.innerHTML = cleanBody(article.body);
     editingBodyText = [...body.childNodes].map(n => n.textContent).join('\n').trim();
     editingBodyHTML = article.body;
@@ -160,7 +163,7 @@ function renderCommentRows(rows, article) {
                     user_id: currentUser.id, author: currentUser.username, body: text});
                 if (error) throw error;
                 input.value = ''; form.hidden = true;
-                await loadCommentsFromSupabase(article.id, true); await refreshCommunity();
+                await loadCommentsFromSupabase(article.id, true); await refreshCommunity(); await refreshArticleStats();
                 notifyCommunity('Respuesta publicada.');
             } catch { notifyCommunity('No se pudo publicar tu respuesta. Conservamos el texto para reintentar.', true); }
             finally { submit.disabled = false; }
@@ -194,7 +197,7 @@ async function voteComment(articleId, commentId, direction) {
         const desired = Number(row.my_vote) === direction ? 0 : direction;
         const {error} = await db.rpc('rcm_set_comment_vote', {p_comment_id: key, p_vote: desired});
         if (error) throw error;
-        await Promise.all([loadCommentsFromSupabase(articleId, true), refreshCommunity()]);
+        await Promise.all([loadCommentsFromSupabase(articleId, true), refreshCommunity(), refreshArticleStats()]);
     } catch {
         notifyCommunity('No pudimos confirmar el voto. No cambiamos el contador; vuelve a cargar para comprobarlo.', true);
     } finally {
@@ -301,14 +304,17 @@ function teamNode(id, position) {
     } else item.append(node('span', id || 'Equipo no disponible'));
     return item;
 }
-async function loadRanking(quiet = false) {
-    if (!db) return;
+async function loadRanking(quiet = false, strict = false, client = db) {
+    if (!client) return;
     try {
-        const {data, error} = await db.from('nfl_rankings').select('*').eq('id',1).maybeSingle();
+        const {data, error} = await client.from('nfl_rankings').select('*').eq('id',1).maybeSingle();
         if (error) throw error;
         if (quiet && JSON.stringify(data) === JSON.stringify(rankingPublished)) return;
-        rankingPublished = data; renderRanking();
-    } catch { document.getElementById('rankingStatus').textContent = 'No pudimos cargar el ranking. Comprueba la conexión; volveremos a intentarlo.'; }
+        rankingPublished = data; renderRanking(); return data;
+    } catch (error) {
+        document.getElementById('rankingStatus').textContent = 'No pudimos cargar el ranking: ' + (error.message || 'error de conexión');
+        if (strict) throw error;
+    }
 }
 function renderRanking() {
     const list = document.getElementById('rankingList'), track = document.getElementById('rankingTrack');
@@ -347,7 +353,7 @@ async function openRankingEditor() {
             db.from('nfl_ranking_drafts').select('*').eq('user_id',currentAdmin.id).maybeSingle(),
             db.from('nfl_rankings').select('*').eq('id',1).maybeSingle()
         ]);
-        if (draftResult.error || publishedResult.error) throw new Error('No pudimos cargar el editor. Cierra y vuelve a intentarlo.');
+        if (draftResult.error || publishedResult.error) throw (draftResult.error || publishedResult.error);
         const source = draftResult.data || publishedResult.data;
         rankingDraft = source?.team_ids ? [...source.team_ids] : Array(10).fill('');
         rankingEditingBase = publishedResult.data?.updated_at || null;
@@ -357,7 +363,7 @@ async function openRankingEditor() {
         const save=node('button','Guardar borrador'); save.type='button'; save.onclick=()=>saveRanking(false);
         const publish=node('button','Publicar las diez posiciones'); publish.type='button'; publish.onclick=()=>saveRanking(true);
         dialog.append(label,edition,rows,save,publish);
-        status.textContent='El borrador es privado para tu cuenta. El público solo verá los cambios cuando pulses Publicar.';
+        status.textContent=(publishedResult.data ? 'Edición pública: ' + publishedResult.data.edition + '. ' : 'Aún no hay una edición pública. ') + 'El borrador es privado. Guardar borrador no publica: pulsa Publicar las diez posiciones para hacerlo visible.';
         renderRankingEditorRows();
     } catch(error) { status.textContent=error.message; }
 }
@@ -393,10 +399,18 @@ async function saveRanking(publish) {
         const result=publish?await db.rpc('rcm_publish_ranking',{p_edition:edition,p_team_ids:[...rankingDraft],p_expected_updated_at:rankingEditingBase})
             :await db.from('nfl_ranking_drafts').upsert({user_id:currentAdmin.id,edition,team_ids:[...rankingDraft]},{onConflict:'user_id'});
         if(result.error) throw result.error;
-        if(publish){ await loadRanking();rankingEditingBase=rankingPublished?.updated_at||null; }
+        if(publish){
+            // A separate non-persistent client verifies what an unsigned visitor can read.
+            const publicClient = window.supabase.createClient(db.supabaseUrl, db.supabaseKey,
+                {auth:{storageKey:'rcm-public-ranking-check',persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
+            const published = await loadRanking(false, true, publicClient);
+            if (!published || published.edition !== edition || JSON.stringify(published.team_ids) !== JSON.stringify(rankingDraft))
+                throw new Error('La solicitud terminó, pero la lectura pública no devuelve esta edición. Reabre el editor y comprueba los permisos antes de reintentar.');
+            rankingEditingBase=published.updated_at;
+        }
         status.textContent=publish?'Ranking publicado. Las diez posiciones se guardaron juntas.':'Borrador guardado. El ranking público no ha cambiado.';
     } catch(error) {
-        status.textContent=error.message?.includes('RCM_CONFLICT')?'Otro administrador publicó cambios. Cierra y vuelve a abrir el editor para revisar la versión actual.':'No se pudo confirmar el guardado. Conservamos tus cambios; revisa la conexión y vuelve a intentarlo.';
+        status.textContent=error.message?.includes('RCM_CONFLICT')?'Otro administrador publicó cambios. Cierra y vuelve a abrir el editor para revisar la versión actual.':'No se pudo confirmar el guardado: ' + (error.message || 'error de conexión') + (error.code ? ' (' + error.code + ')' : '') + '. Conservamos tus cambios.';
     } finally {
         rankingBusy=false;document.querySelectorAll('#rankingDialog button, #rankingDialog input').forEach(e=>e.disabled=false);renderRankingEditorRows();
     }
@@ -404,7 +418,7 @@ async function saveRanking(publish) {
 async function refreshVisibleCommunity() {
     if (document.hidden||refreshInFlight||!db) return;
     refreshInFlight=true;
-    try { await Promise.all([refreshCommunity(),currentCategory==='NFL'?loadRanking(true):Promise.resolve(),
+    try { await Promise.all([refreshCommunity(),refreshArticleStats(),currentCategory==='NFL'?loadRanking(true):Promise.resolve(),
         activeModalArticleId!=null?loadCommentsFromSupabase(activeModalArticleId,true):Promise.resolve()]); }
     finally {refreshInFlight=false;}
 }
@@ -416,6 +430,7 @@ window.addEventListener('DOMContentLoaded',()=>{
     if(db)db.auth.onAuthStateChange(()=>setTimeout(async()=>{
         await Promise.all([loadUserSession(),loadAdminSession()]);
         if(activeModalArticleId!=null)await loadCommentsFromSupabase(activeModalArticleId,true);
+        await refreshArticleStats();
         renderSessionHeader();
         if(!currentAdmin)document.getElementById('rankingDialog')?.close();
     },0));
@@ -432,3 +447,43 @@ document.addEventListener('keydown', event => {
     if (event.shiftKey && document.activeElement === first) { last.focus(); event.preventDefault(); }
     else if (!event.shiftKey && document.activeElement === last) { first.focus(); event.preventDefault(); }
 });
+
+// Shared article likes and card comments are read from Supabase, never localStorage.
+let articleStatsRequest = 0;
+const articleLikePending = new Set();
+async function refreshArticleStats() {
+    if (!db) return false;
+    const request = ++articleStatsRequest;
+    try {
+        const rows = await fetchAll(() => db.from('rcm_article_totals').select('*').order('article_id'));
+        if (request !== articleStatsRequest) return false;
+        const byId = new Map(rows.map(r => [String(r.article_id), r]));
+        for (const article of articles) {
+            const row = byId.get(String(article.id));
+            article.likes = row ? Number(row.likes) : null;
+            article.userLiked = Boolean(row?.my_like);
+            article.topComment = row?.top_comment || '';
+        }
+        renderArticlesFeed(); renderTrending();
+        const active = articles.find(a => String(a.id) === String(activeModalArticleId));
+        if (active) updateModalLikeBtn(active);
+        return true;
+    } catch {
+        notifyCommunity('No pudimos cargar los likes compartidos. Vuelve a intentarlo más tarde.', true);
+        return false;
+    }
+}
+async function setArticleLike(id) {
+    if (!currentUser) { openUserAuthModal(); return; }
+    const article = articles.find(a => String(a.id) === String(id));
+    if (!article || articleLikePending.has(String(id))) return;
+    articleLikePending.add(String(id));
+    try {
+        if (article.likes == null) { await refreshArticleStats(); if (article.likes == null) return; }
+        const {error} = await db.rpc('rcm_set_article_like', {p_article_id:String(id),p_liked:!article.userLiked});
+        if (error) throw error;
+        if (!await refreshArticleStats()) throw new Error('No se pudo comprobar el conteo actualizado');
+    } catch (error) {
+        notifyCommunity('No pudimos confirmar el like: ' + (error.message || 'error de conexión') + '. Recarga para comprobar su estado.', true);
+    } finally { articleLikePending.delete(String(id)); }
+}
