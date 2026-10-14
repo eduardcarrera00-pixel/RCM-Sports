@@ -45,7 +45,7 @@ button:focus-visible,a:focus-visible,summary:focus-visible,select:focus-visible,
 .dark .rcm-panel button,.dark .rcm-comment button,.dark .rcm-dialog button,.dark .rcm-button,.dark #readerSession button {background:#1e293b;color:#bbf7d0;border-color:#475569}
 .dark .rcm-comment button[aria-pressed=true] {background:#166534;color:#fff}
 .dark .rcm-leader-link:hover {background:#1e293b}
-@media (max-width:640px) {.rcm-comment-columns,.rcm-ranking-list {grid-template-columns:1fr}.rcm-panel{padding:1rem}.rcm-comment{padding:.7rem}.rcm-track{animation:none;transform:none}.rcm-track-group:nth-child(2){display:none}#rankingPause{display:none}}
+@media (max-width:640px) {.rcm-comment-columns,.rcm-ranking-list {grid-template-columns:1fr}.rcm-panel{padding:1rem}.rcm-comment{padding:.7rem}}
 @media (prefers-reduced-motion:reduce) {.rcm-track{animation:none;transform:none}.rcm-track-group:nth-child(2){display:none}#rankingPause{display:none}}
 
 #footballTeams { padding: .5rem 0; gap: .5rem; flex-wrap: wrap; }
@@ -72,3 +72,23 @@ button:focus-visible,a:focus-visible,summary:focus-visible,select:focus-visible,
 .rcm-dialog textarea {width:100%;min-height:80px;padding:.6rem;border:1px solid #94a3b8;border-radius:.5rem;color:#0f172a;background:white}
 .rcm-dialog button {min-height:44px}
 .rcm-outcome {font-size:.75rem;font-weight:bold;color:#527460}
+
+/* Automatic on all screen sizes; only reduced motion or deliberate interaction stops it. */
+.rcm-ticker {scrollbar-width:none;-ms-overflow-style:none;touch-action:pan-x pan-y}
+.rcm-ticker::-webkit-scrollbar {display:none}
+.rcm-ticker .rcm-track {backface-visibility:hidden;transform:translate3d(0,0,0)}
+@keyframes rcm-scroll {to {transform:translate3d(-50%,0,0)}}
+@media (hover:hover) {.rcm-ticker:hover .rcm-track {animation-play-state:paused}}
+@media (hover:none) {.rcm-ticker:hover .rcm-track {animation-play-state:running}}
+.rcm-accessible-list {position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+@media (prefers-reduced-motion:reduce) {.rcm-track{animation:none!important;transform:none!important}.rcm-track-group:nth-child(2){display:none}}
+.ae-controls {display:flex;gap:1rem;flex-wrap:wrap;margin:1rem 0}
+.ae-controls select {padding:.7rem;border:1px solid #94a3b8;border-radius:8px;color:#173e32;background:white;max-width:100%}
+#aeLeague h3 {font-weight:800;margin:1.5rem 0 .6rem;font-size:1.05rem}
+.ae-cards {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:.8rem}
+.ae-rank-row {display:grid;grid-template-columns:1fr auto;gap:.5rem;padding:1rem;border-bottom:1px solid #cbd5e1}
+.ae-rank-row small {grid-column:1/-1}.ae-podium {border-left:3px solid #c29d58}
+.ae-json {white-space:pre-wrap;overflow-wrap:anywhere;font-size:.75rem;max-height:300px;overflow:auto;border-bottom:1px solid #94a3b8;padding:.6rem}
+#aeLeague details {padding:.6rem 0}#aeLeague summary {cursor:pointer;font-weight:bold}
+
+.ae-event {border:1px solid #cbd5e1;border-radius:12px;padding:1rem!important;min-width:0}.ae-event summary small {display:block;margin-top:.4rem;font-weight:400;font-size:.8rem}.ae-event[open] {grid-column:1/-1}#aeWeeklySlot #picksOptions {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:.8rem}

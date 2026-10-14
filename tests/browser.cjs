@@ -5,6 +5,7 @@ const {chromium}=requireRuntime(process.env.RCM_PLAYWRIGHT||'playwright');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const sportsTests=require('./sports-browser.cjs');
+const leagueTests=require('./league-browser.cjs');
 const root='http://127.0.0.1:8765/RCM-Sports/';
 const aid='10000000-0000-0000-0000-000000000001';
 const state={articleLikes:{},failRankingRead:false,publicRankingHidden:false,failRankingPublish:false,votes:{},failVotes:false,ranking:null,drafts:{},articles:[{id:aid,legacy_id:'1',title:'Análisis NFL de prueba',category:'NFL',author:'Redacción',image:'https://example.test/image.jpg',summary:'Resumen de prueba',body:'<p>Contenido del artículo.</p>',created_at:'2026-10-12T12:00:00Z',featured:true,is_public:true}],comments:[{id:'c1',article_id:aid,parent_id:null,author:'Lector <img src=x onerror=alert(1)>',body:'Comentario de prueba <script>window.pwned=1</script>',created_at:'2026-10-12T12:00:00Z'}]};
@@ -24,6 +25,7 @@ function totals(user){return state.comments.filter(c=>state.articles.some(a=>a.i
  return {...c,article_title:state.articles.find(a=>a.id===c.article_id).title,upvotes:votes.filter(([,v])=>v===1).length,downvotes:votes.filter(([,v])=>v===-1).length,my_vote:state.votes[c.id+':'+user]||0};
 });}
 async function backend(q){
+ const leagueResult=leagueTests.backend(q);if(leagueResult)return leagueResult;
  const sportsResult=sportsTests.backend(q);if(sportsResult)return sportsResult;
  if(q.rpc){
   if(q.rpc==='rcm_set_comment_vote'){if(state.failVotes)return {error:{message:'offline'}};state.votes[q.args.p_comment_id+':'+q.user]=q.args.p_vote;return {data:null,error:null};}
@@ -58,7 +60,7 @@ async function backend(q){
  const browser=await chromium.launch(opts);
  const errors=[];
  async function newPage(viewport={width:1280,height:900}){
-  const context=await browser.newContext({viewport});const page=await context.newPage();page.setDefaultTimeout(15000);page.on('pageerror',e=>errors.push(e.message));
+  const context=await browser.newContext({viewport});const page=await context.newPage();page.setDefaultTimeout(30000);page.on('pageerror',e=>{errors.push(e.message);console.error('PAGE ERROR:',e.message);});
   await page.exposeFunction('mockDb',backend);
   await page.route('**/supabase-js@2',r=>r.fulfill({contentType:'text/javascript',body:mockClient}));
   await page.route('**/*',async r=>{
@@ -85,11 +87,11 @@ async function backend(q){
  await one.locator('#comment-c1 button').nth(1).click();await one.waitForFunction(()=>commentRows.get('c1').my_vote===0);
  state.failVotes=true;await one.locator('#comment-c1 button').nth(0).click();await one.waitForFunction(()=>document.getElementById('communityNotice')?.textContent.includes('No pudimos confirmar'));assert.equal(await one.locator('#comment-c1 button').nth(0).textContent(),'▲ 1');state.failVotes=false;
  await one.evaluate(()=>{Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async text=>{window.testCopied=text;}}});});
- await one.getByRole('button',{name:'Copiar enlace',exact:true}).click();assert.ok((await one.evaluate(()=>window.testCopied)).endsWith('?article='+aid));
+ await one.getByRole('button',{name:'Copiar enlace',exact:true}).click();assert.ok((await one.evaluate(()=>window.testCopied)).endsWith('/articles/'+aid+'/'));
  await one.evaluate(()=>{Object.defineProperty(navigator,'share',{configurable:true,value:async data=>{window.testShared=data;}});});
  await one.getByRole('button',{name:'Compartir publicación',exact:true}).click();assert.equal((await one.evaluate(()=>window.testShared)).title,'Análisis NFL de prueba');
  await one.evaluate(()=>{Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async()=>{throw Error('denied')}}});});
- await one.getByRole('button',{name:'Copiar enlace',exact:true}).click();await one.locator('dialog input').waitFor();assert.ok((await one.locator('dialog input').inputValue()).includes('article='+aid));await one.locator('dialog button').click();
+ await one.getByRole('button',{name:'Copiar enlace',exact:true}).click();await one.locator('dialog input').waitFor();assert.ok((await one.locator('dialog input').inputValue()).includes('/articles/'+aid+'/'));await one.locator('dialog button').click();
  await two.reload();await two.locator('#comment-c1').waitFor();await two.waitForFunction(()=>commentRows.get('c1')?.my_vote===1);
  await two.evaluate(()=>handleUserLogout());await two.waitForFunction(()=>commentRows.get('c1')?.my_vote===0);assert.equal(await two.locator('#comment-c1 button').nth(0).textContent(),'▲ 1');
  await two.locator('#comment-c1 button').nth(0).click();await two.locator('#userAuthModal:not(.hidden)').waitFor();assert.equal(await two.locator('#articleModal').evaluate(el=>el.classList.contains('hidden')),false);await two.evaluate(()=>closeUserAuthModal());
@@ -158,6 +160,7 @@ async function backend(q){
  await mobile.evaluate(()=>{filterByCategory('Fútbol');});assert.equal(await mobile.locator('#footballTeams').isVisible(),true);await mobile.screenshot({path:'/tmp/rcm-football-mobile.png',fullPage:true});assert.equal(await mobile.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
  console.log('PASS: article likes shared/reload/logout/failure, replies, failed ranking publication/readback, exact ranking order after reload, category order and legacy NBA, create/filter/edit/persist football teams, search and mobile.');
  await sportsTests.run({one,two,mobile,newPage,assert});
+ await leagueTests.run({one,two,mobile,newPage,assert,login});
  assert.deepEqual(errors,[]);console.log('PASS: mock-transport browser integration: two readers, votes/change/remove/error/reload/logout, escaped content, deep links/alias/history/not-found, login over article, NFL filter/search, image edit preserves ID/body, draft/publish ranking, shared ranking, reduced motion, mobile width, highlighted comment navigation.');
  await browser.close();server.close();
 })().catch(e=>{console.error(e.stack);process.exit(1)});

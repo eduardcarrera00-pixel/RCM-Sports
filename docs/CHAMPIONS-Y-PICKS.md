@@ -1,4 +1,6 @@
-# Champions y Picks — entrega y despliegue
+# Champions y Picks — entrega anterior
+
+> La liga AE SPORTS sustituye en la interfaz la votación simple descrita aquí. Se conservan sus tablas y votos históricos. Para la instalación actual consulta [AE-SPORTS.md](AE-SPORTS.md).
 
 Rama: `feature/champions-power-rankings`. No se fusiona ni se migra producción automáticamente.
 

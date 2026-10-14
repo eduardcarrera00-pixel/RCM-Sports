@@ -225,7 +225,7 @@ async function refreshCommunity() {
                     node('p', row.author || 'Usuario'), node('p', `▲ ${row.upvotes} · ▼ ${row.downvotes}`), node('strong', row.article_title));
                 link.onclick = async event => {
                     if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
-                    event.preventDefault(); history.pushState({}, '', url);
+                    event.preventDefault(); const internal=new URL(location.href);internal.searchParams.set('article',row.article_id);internal.searchParams.set('comment',row.id);history.pushState({}, '', internal);
                     await openArticleFromShareLink();
                 };
                 panel.append(link);
@@ -237,8 +237,7 @@ async function refreshCommunity() {
     }
 }
 function articleURL(articleId, commentId = null) {
-    const url = new URL(location.href); url.searchParams.set('article', String(articleId));
-    url.hash = ''; url.searchParams.delete('comment');
+    const url = new URL('articles/' + encodeURIComponent(String(articleId)) + '/', new URL('.', location.href));
     if (commentId != null) url.searchParams.set('comment', String(commentId));
     return url.toString();
 }

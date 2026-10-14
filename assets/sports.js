@@ -77,6 +77,7 @@ function pickCard(p,e,canVote=false){
  if(p.article_id){const a=node('a','Ver análisis');a.href=articleURL(p.article_id);card.append(a);}return card;
 }
 function renderPicks(){
+ if(window.renderLeague){window.renderLeague();return;}
  const e=activeEdition(),box=document.getElementById('picksOptions');box.replaceChildren();
  document.getElementById('picksStatus').textContent=e?`${e.edition} · ${editionOpen(e)?'Cierra '+new Date(e.closes_at).toLocaleString('es'):'Votación cerrada'}`:'Estamos preparando los próximos picks.';
  if(e)sports.picks.filter(p=>p.edition_id===e.id).sort((a,b)=>a.position-b.position).forEach(p=>box.append(pickCard(p,e,editionOpen(e)&&p.outcome==='pending')));
@@ -87,6 +88,7 @@ function renderPicks(){
  if(!best.children.length)best.append(node('p','Aquí aparecerán nuestros aciertos destacados cuando haya resultados registrados.'));
 }
 async function refreshPicks(){
+ if(window.renderLeague)return;
  const request=++sports.request;
  try {
  const [editions,picks,totals]=await Promise.all([
@@ -109,6 +111,7 @@ function optionFields(parent,source={}) {
 function values(fields){return Object.fromEntries(Object.entries(fields).map(([k,input])=>[k,input.value.trim()]));}
 function localDate(iso){const d=iso?new Date(iso):new Date();return new Date(d-d.getTimezoneOffset()*60000).toISOString().slice(0,16);}
 async function openPicksEditor(){
+ if(window.openLeagueAdmin)return window.openLeagueAdmin();
  if(!currentAdmin)return;const ui=sportsDialog('Preparar Picks de la Semana');if(!ui)return;
  try{
  const [draft,latest]=await Promise.all([checked(db.from('pick_drafts').select('*').eq('user_id',currentAdmin.id).maybeSingle()),checked(db.from('pick_editions').select('*').order('published_at',{ascending:false}).order('id',{ascending:false}).limit(1))]);
@@ -131,6 +134,7 @@ async function openPicksEditor(){
  }catch(e){ui.status.textContent=errorText(e);}
 }
 async function openResultsEditor(){
+ if(window.openLeagueAdmin)return window.openLeagueAdmin();
  if(!currentAdmin)return;const ui=sportsDialog('Historial y mejores aciertos');if(!ui)return;
  await refreshPicks();
  const select=sportsSelect(ui.d,'Pick',[['','Seleccionar pick'],...sports.picks.map(p=>[p.id,`${sports.editions.find(e=>e.id===p.edition_id)?.edition||''} · ${p.title}`])]);
@@ -148,7 +152,7 @@ async function openResultsEditor(){
 async function refreshSportsSession(){
  document.querySelectorAll('[data-sports-admin]').forEach(b=>b.hidden=!currentAdmin);
  if(!currentAdmin)document.getElementById('sportsDialog')?.close();
- await refreshPicks();if(currentUser&&sports.pending){const {edition,id}=sports.pending;sports.pending=null;await choosePick(edition,id);}
+ await refreshPicks();window.refreshLeague?.();if(currentUser&&sports.pending){const {edition,id}=sports.pending;sports.pending=null;await choosePick(edition,id);}
 }
 window.addEventListener('DOMContentLoaded',()=>{
  document.querySelectorAll('.rcm-ticker').forEach(t=>{for(const event of ['pointerdown','keydown','wheel'])t.addEventListener(event,()=>t.classList.add('manual'),{passive:true});});

@@ -41,7 +41,7 @@ assert.equal((await db.query("select count(*)::int n from rcm_comment_totals whe
 await db.exec(migration);
 const extraMigration=fs.readFileSync(new URL('../supabase/03_equipos_y_likes.sql',import.meta.url),'utf8');
 await db.exec(extraMigration); await db.exec(extraMigration);
-async function asUser(n,sql){await db.exec(`reset role;set role ${n?'authenticated':'anon'};select set_config('request.jwt.claim.sub','${n?'00000000-0000-0000-0000-00000000000'+n:''}',false);`);return db.query(sql);}
+async function asUser(n,sql){await db.exec(`reset role;set role ${n?'authenticated':'anon'};select set_config('request.jwt.claim.sub','${n?'00000000-0000-0000-0000-'+String(n).padStart(12,'0'):''}',false);`);return db.query(sql);}
 const cid='20000000-0000-0000-0000-000000000001',cid2='20000000-0000-0000-0000-000000000002';
 await asUser(2,`select rcm_set_comment_vote('${cid}',1)`);
 let rows=(await asUser(0,'select * from rcm_comment_totals order by id')).rows;
@@ -118,4 +118,6 @@ console.log('PASS: migration 03 twice, shared likes/idempotency/removal/private 
 console.log((process.env.RCM_OBSERVED_SCHEMA ? 'OBSERVED SCHEMA ' : 'BASELINE SCHEMA ')+'PASS: migration twice, old votes preserved, two users, change/remove/idempotent votes, duplicate rejection, own votes only, anonymous totals, reader/editor RLS, tie-breaking, hidden/deleted articles/comments, ranking authorization/atomic validation/conflicts.');
 const {testSports}=await import('./sports-database.mjs');
 await testSports({db,asUser,assert,fs});
+const {testLeague}=await import('./league-database.mjs');
+await testLeague({db,asUser,assert,fs});
 await db.close();

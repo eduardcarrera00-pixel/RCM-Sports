@@ -24,29 +24,14 @@ async function run({one,two,mobile,newPage,assert}){
  assert.equal(await two.locator('#championsList li').count(),10);assert.equal(await two.locator('#championsEdition').innerText(),'Jornada 3');
  await two.evaluate(()=>filterByTeam('barcelona'));assert.equal(await two.locator('#championsRankings').isVisible(),false);
  await two.reload();await two.waitForFunction(()=>sports.ranking?.edition==='Jornada 3');assert.equal(await two.locator('#championsList img').count(),10);
- await one.evaluate(()=>openPicksEditor());await one.getByLabel('Semana o edición',{exact:true}).fill('Semana 8');
- await one.getByLabel('Inicio (tu hora local)',{exact:true}).fill('2020-01-01T12:00');await one.getByLabel('Cierre (tu hora local)',{exact:true}).fill('2099-01-01T12:00');
- for(let i=0;i<2;i++){const f=one.locator('#sportsDialog fieldset').nth(i);await f.getByLabel('Título corto',{exact:true}).fill('Predicción '+i);await f.getByLabel('Deporte',{exact:true}).fill('NFL');await f.getByLabel('Partido o evento',{exact:true}).fill('Partido de prueba');}
- await one.locator('#sportsDialog').getByRole('button',{name:'Guardar borrador',exact:true}).click();await one.waitForFunction(()=>document.querySelector('#sportsDialog [role=status]').textContent.includes('Borrador privado guardado'));
- await one.locator('#sportsDialog').getByRole('button',{name:'Cerrar',exact:true}).click();await one.evaluate(()=>openPicksEditor());await one.getByLabel('Semana o edición',{exact:true}).waitFor();assert.equal(await one.getByLabel('Semana o edición',{exact:true}).inputValue(),'Semana 8');
- await one.locator('#sportsDialog').getByRole('button',{name:'Publicar edición',exact:true}).click();await one.waitForFunction(()=>document.querySelector('#sportsDialog [role=status]').textContent.includes('lectura pública verificada'));
- await one.locator('#sportsDialog').getByRole('button',{name:'Cerrar',exact:true}).click();await two.evaluate(()=>refreshPicks());assert.equal(await two.locator('#picksOptions .rcm-pick-card').count(),2);
- await one.locator('#picksOptions button').first().click();await one.waitForFunction(()=>sports.totals.some(t=>t.my_vote));
- await two.evaluate(()=>refreshPicks());assert.ok((await two.locator('#picksOptions').innerText()).includes('1 apoyos'));
- await one.reload();await one.waitForFunction(()=>sports.totals.some(t=>t.my_vote));assert.equal(await one.locator('#picksOptions button[aria-pressed=true]').count(),1);
- await one.locator('#picksOptions button').nth(1).click();await one.waitForFunction(()=>sports.totals.find(t=>t.pick_id==='edition-0-1')?.my_vote);assert.equal(Object.keys(state.votes).length,1);
- const guest=await newPage();await guest.goto('http://127.0.0.1:8765/RCM-Sports/');await guest.waitForFunction(()=>sports.totals.length===2);
- await guest.locator('#picksOptions button').first().click();await guest.locator('#userAuthUsername').fill('carol');await guest.locator('#userAuthPassword').fill('password123');await guest.locator('#userAuthModal button[type=submit]').click();await guest.waitForFunction(()=>sports.totals.some(t=>t.my_vote));
- assert.equal(await guest.locator('#picksOptions button[aria-pressed=true]').count(),1);
- await one.waitForFunction(()=>Boolean(currentAdmin));
- await one.evaluate(()=>{filterByCategory('Picks');openResultsEditor();});await one.getByLabel('Pick',{exact:true}).selectOption('edition-0-1');
- await one.getByLabel('Resultado',{exact:true}).selectOption('won');await one.getByLabel('Resultado real y explicación',{exact:true}).fill('Resultado verificado de prueba');await one.getByLabel('Posición destacada',{exact:true}).selectOption('1');
- await one.getByRole('button',{name:'Guardar resultado',exact:true}).click();await one.waitForFunction(()=>document.querySelector('#sportsDialog [role=status]').textContent.includes('Resultado guardado'));
- await one.getByRole('button',{name:'Cerrar',exact:true}).click();await two.evaluate(()=>{filterByCategory('Picks');return refreshPicks();});assert.equal(await two.locator('#bestPicksCards .rcm-pick-card').count(),1);
- await two.reload();await two.waitForFunction(()=>sports.picks.some(p=>p.outcome==='won'));assert.equal(await two.locator('#bestPicksCards .rcm-pick-card').count(),1);
- const tablet=await newPage({width:768,height:1024});await tablet.goto('http://127.0.0.1:8765/RCM-Sports/');await tablet.waitForFunction(()=>sports.editions.length===1);await tablet.evaluate(()=>filterByCategory('Fútbol'));assert.equal(await tablet.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
- await mobile.evaluate(()=>{filterByCategory('Fútbol');filterByTeam('');return refreshChampions();});assert.equal(await mobile.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
- await one.evaluate(()=>filterByCategory('Picks'));await one.screenshot({path:'/tmp/rcm-sports-picks.png',fullPage:true});await mobile.screenshot({path:'/tmp/rcm-sports-mobile.png',fullPage:true});
- console.log('PASS sports browser (mock transport): Champions editor/draft/publish/public read/reload/subcategory; picks draft reopened/publish/two cards/vote/change/shared counts/reload; results/featured/reload; desktop/tablet/mobile.');
+ await mobile.emulateMedia({reducedMotion:'no-preference'});
+ await mobile.evaluate(()=>{filterByCategory('Fútbol');filterByTeam('');return refreshChampions();});
+ assert.equal(await mobile.locator('#championsTrack').evaluate(e=>getComputedStyle(e).animationName),'rcm-scroll');
+ const first=await mobile.locator('#championsTrack').evaluate(e=>getComputedStyle(e).transform);
+ await mobile.waitForTimeout(150);assert.notEqual(await mobile.locator('#championsTrack').evaluate(e=>getComputedStyle(e).transform),first);
+ assert.equal(await mobile.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+ await mobile.emulateMedia({reducedMotion:'reduce'});assert.equal(await mobile.locator('#championsTrack').evaluate(e=>getComputedStyle(e).animationName),'none');
+ const tablet=await newPage({width:768,height:1024});await tablet.goto('http://127.0.0.1:8765/RCM-Sports/');await tablet.waitForFunction(()=>sports.ranking?.edition==='Jornada 3');await tablet.evaluate(()=>filterByCategory('Fútbol'));assert.equal(await tablet.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+ console.log('PASS Champions browser: admin draft/publish, public reload, clubs/logos, categories, automatic mobile motion, reduced motion, tablet/mobile overflow.');
 }
 module.exports={backend,run};
