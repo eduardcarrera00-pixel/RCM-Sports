@@ -1,0 +1,42 @@
+-- Fuente: UEFA league phase teams y /uefachampionsleague/clubs/ consultados 2026-10-13.
+-- No cambia temporadas ni rankings anteriores.
+begin;
+insert into public.champions_clubs(season,id,name,logo) values
+('2026/27','50129','AEK Athens','https://img.uefa.com/imgml/TP/teams/logos/70x70/50129.png'),
+('2026/27','52280','Arsenal','https://img.uefa.com/imgml/TP/teams/logos/70x70/52280.png'),
+('2026/27','52683','Aston Villa','https://img.uefa.com/imgml/TP/teams/logos/70x70/52683.png'),
+('2026/27','50124','Atlético de Madrid','https://img.uefa.com/imgml/TP/teams/logos/70x70/50124.png'),
+('2026/27','52758','Borussia Dortmund','https://img.uefa.com/imgml/TP/teams/logos/70x70/52758.png'),
+('2026/27','50080','Barcelona','https://img.uefa.com/imgml/TP/teams/logos/70x70/50080.png'),
+('2026/27','50037','Bayern München','https://img.uefa.com/imgml/TP/teams/logos/70x70/50037.png'),
+('2026/27','59333','Bodø/Glimt','https://img.uefa.com/imgml/TP/teams/logos/70x70/59333.png'),
+('2026/27','50043','Club Brugge','https://img.uefa.com/imgml/TP/teams/logos/70x70/50043.png'),
+('2026/27','79946','Como','https://img.uefa.com/imgml/TP/teams/logos/70x70/79946.png'),
+('2026/27','52692','Fenerbahçe','https://img.uefa.com/imgml/TP/teams/logos/70x70/52692.png'),
+('2026/27','52749','Feyenoord','https://img.uefa.com/imgml/TP/teams/logos/70x70/52749.png'),
+('2026/27','50067','Galatasaray','https://img.uefa.com/imgml/TP/teams/logos/70x70/50067.png'),
+('2026/27','50138','Inter','https://img.uefa.com/imgml/TP/teams/logos/70x70/50138.png'),
+('2026/27','63405','LASK','https://img.uefa.com/imgml/TP/teams/logos/70x70/63405.png'),
+('2026/27','2603790','Leipzig','https://img.uefa.com/imgml/TP/teams/logos/70x70/2603790.png'),
+('2026/27','52277','Lens','https://img.uefa.com/imgml/TP/teams/logos/70x70/52277.png'),
+('2026/27','75797','Lille','https://img.uefa.com/imgml/TP/teams/logos/70x70/75797.png'),
+('2026/27','7889','Liverpool','https://img.uefa.com/imgml/TP/teams/logos/70x70/7889.png'),
+('2026/27','52919','Manchester City','https://img.uefa.com/imgml/TP/teams/logos/70x70/52919.png'),
+('2026/27','52682','Manchester United','https://img.uefa.com/imgml/TP/teams/logos/70x70/52682.png'),
+('2026/27','50136','Napoli','https://img.uefa.com/imgml/TP/teams/logos/70x70/50136.png'),
+('2026/27','52747','Paris Saint-Germain','https://img.uefa.com/imgml/TP/teams/logos/70x70/52747.png'),
+('2026/27','50064','Porto','https://img.uefa.com/imgml/TP/teams/logos/70x70/50064.png'),
+('2026/27','50062','PSV','https://img.uefa.com/imgml/TP/teams/logos/70x70/50062.png'),
+('2026/27','52265','Real Betis','https://img.uefa.com/imgml/TP/teams/logos/70x70/52265.png'),
+('2026/27','50051','Real Madrid','https://img.uefa.com/imgml/TP/teams/logos/70x70/50051.png'),
+('2026/27','50137','Roma','https://img.uefa.com/imgml/TP/teams/logos/70x70/50137.png'),
+('2026/27','52797','Slovan Bratislava','https://img.uefa.com/imgml/TP/teams/logos/70x70/52797.png'),
+('2026/27','2609356','Sabah','https://img.uefa.com/imgml/TP/teams/logos/70x70/2609356.png'),
+('2026/27','52707','Shakhtar Donetsk','https://img.uefa.com/imgml/TP/teams/logos/70x70/52707.png'),
+('2026/27','52498','Slavia Praha','https://img.uefa.com/imgml/TP/teams/logos/70x70/52498.png'),
+('2026/27','50149','Sporting CP','https://img.uefa.com/imgml/TP/teams/logos/70x70/50149.png'),
+('2026/27','50107','Stuttgart','https://img.uefa.com/imgml/TP/teams/logos/70x70/50107.png'),
+('2026/27','52319','Viking','https://img.uefa.com/imgml/TP/teams/logos/70x70/52319.png'),
+('2026/27','70691','Villarreal','https://img.uefa.com/imgml/TP/teams/logos/70x70/70691.png')
+on conflict(season,id) do nothing;
+commit;

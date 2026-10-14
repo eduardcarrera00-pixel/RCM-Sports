@@ -29,6 +29,7 @@ function notifyCommunity(text, error = false) {
     notifyCommunity.timer = setTimeout(() => { el.hidden = true; }, error ? 10000 : 4500);
 }
 function renderSessionHeader() {
+    document.querySelectorAll('[data-sports-admin]').forEach(b => { b.hidden = !currentAdmin; });
     const readers = document.getElementById('readerSession');
     if (!readers) return;
     readers.replaceChildren();
@@ -319,23 +320,20 @@ async function loadRanking(quiet = false, strict = false, client = db) {
 function renderRanking() {
     const list = document.getElementById('rankingList'), track = document.getElementById('rankingTrack');
     list.replaceChildren(); track.replaceChildren();
-    document.getElementById('rankingPause').classList.toggle('hidden', !rankingPublished);
     document.getElementById('rankingStatic').classList.toggle('hidden', !rankingPublished);
-    document.getElementById('rankingEdition').textContent = rankingPublished ? `${rankingPublished.edition} · Actualizado: ${new Date(rankingPublished.updated_at).toLocaleString('es')}` : '';
+    document.getElementById('rankingEdition').textContent = rankingPublished ? rankingPublished.edition : '';
     document.getElementById('rankingStatus').textContent = rankingPublished ? '' : 'Aún no hay un ranking publicado. Nuestro equipo está preparando la primera edición.';
     if (!rankingPublished) return;
     rankingPublished.team_ids.forEach((id,i) => list.append(teamNode(id,i+1)));
     for (let copy=0; copy<2; copy++) {
-        const group = node('ol', null, 'rcm-track-group');
+        const group = node('ol', null, 'rcm-track-group'); group.setAttribute('aria-hidden', 'true');
         rankingPublished.team_ids.forEach((id,i) => group.append(teamNode(id,i+1))); track.append(group);
     }
     applyRankingMotion();
 }
 function applyRankingMotion() {
     document.getElementById('rankingTrack').classList.toggle('paused', rankingPaused);
-    const button = document.getElementById('rankingPause');
-    button.textContent = rankingPaused ? 'Reanudar movimiento' : 'Pausar movimiento';
-    button.setAttribute('aria-pressed', String(rankingPaused));
+
 }
 function toggleRankingMotion() { rankingPaused = !rankingPaused; applyRankingMotion(); }
 async function openRankingEditor() {
@@ -432,6 +430,7 @@ window.addEventListener('DOMContentLoaded',()=>{
         if(activeModalArticleId!=null)await loadCommentsFromSupabase(activeModalArticleId,true);
         await refreshArticleStats();
         renderSessionHeader();
+        window.refreshSportsSession?.();
         if(!currentAdmin)document.getElementById('rankingDialog')?.close();
     },0));
 });

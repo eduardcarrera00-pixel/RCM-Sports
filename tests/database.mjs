@@ -116,4 +116,6 @@ await assert.rejects(()=>asUser(1,`select rcm_set_article_like('${aid}',true)`))
 await db.exec("reset role;select set_config('test.is_anonymous','false',false)");
 console.log('PASS: migration 03 twice, shared likes/idempotency/removal/private ownership/hidden articles/anonymous denial, team validation, article ID and comments preserved.');
 console.log((process.env.RCM_OBSERVED_SCHEMA ? 'OBSERVED SCHEMA ' : 'BASELINE SCHEMA ')+'PASS: migration twice, old votes preserved, two users, change/remove/idempotent votes, duplicate rejection, own votes only, anonymous totals, reader/editor RLS, tie-breaking, hidden/deleted articles/comments, ranking authorization/atomic validation/conflicts.');
+const {testSports}=await import('./sports-database.mjs');
+await testSports({db,asUser,assert,fs});
 await db.close();

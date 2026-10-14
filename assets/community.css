@@ -54,3 +54,21 @@ button:focus-visible,a:focus-visible,summary:focus-visible,select:focus-visible,
 #pubTeam { padding: .6rem; border: 1px solid #94a3b8; border-radius: .5rem; color: #0f172a; background: white; }
 
 #footballTeams.hidden { display: none; }
+/* Shared ranking interaction: keyboard, pointer and touch stop automatic movement. */
+.rcm-ticker:focus-within .rcm-track,.rcm-ticker.manual .rcm-track {animation:none;transform:none}
+.rcm-ticker.manual .rcm-track-group:nth-child(2) {display:none}
+.rcm-ticker:focus-visible {outline:2px solid #668ca6;outline-offset:3px}
+.rcm-track .rcm-team {width:170px;flex-direction:column;gap:.3rem;padding:1rem;text-align:center;white-space:normal}
+.rcm-track .rcm-team img {width:58px;height:58px}
+.rcm-track .rcm-team span {font-size:.75rem}
+.rcm-pick-card {border:1px solid #a58d77;border-radius:12px;padding:1rem;margin:.6rem 0;overflow-wrap:anywhere}
+.rcm-pick-card p {margin:.4rem 0;font-size:.85rem;white-space:pre-wrap}
+.rcm-pick-card button {width:100%;min-height:44px;text-align:left}
+.rcm-pick-card button[aria-pressed=true] {background:#35566b!important;color:white!important}
+.rcm-pick-card a {display:inline-block;margin-top:.5rem;text-decoration:underline;color:#476e89}
+.rcm-pick-grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:.6rem}
+.rcm-dialog fieldset {border:1px solid #a58d77;border-radius:8px;padding:.7rem;margin:.8rem 0}
+.rcm-dialog label {display:block;font-size:.9rem;margin-top:.5rem}
+.rcm-dialog textarea {width:100%;min-height:80px;padding:.6rem;border:1px solid #94a3b8;border-radius:.5rem;color:#0f172a;background:white}
+.rcm-dialog button {min-height:44px}
+.rcm-outcome {font-size:.75rem;font-weight:bold;color:#527460}

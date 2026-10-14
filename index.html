@@ -423,9 +423,14 @@ html.dark [data-reading-size][aria-pressed="true"] {
         <section id="nflRankings" class="rcm-panel hidden" aria-labelledby="rankingTitle">
             <div class="rcm-row"><h2 id="rankingTitle">NFL Power Rankings</h2><button id="rankingEditButton" class="hidden" onclick="openRankingEditor()">Editar ranking</button></div>
             <p id="rankingEdition"></p><p id="rankingStatus" role="status">Cargando ranking…</p>
-            <button id="rankingPause" class="hidden" onclick="toggleRankingMotion()" aria-pressed="false">Pausar movimiento</button>
-            <div id="rankingViewport" class="rcm-ticker" aria-hidden="true"><div id="rankingTrack" class="rcm-track"></div></div>
+            <div id="rankingViewport" class="rcm-ticker" tabindex="0" aria-label="Ranking NFL, desplaza para ver equipos"><div id="rankingTrack" class="rcm-track"></div></div>
             <details id="rankingStatic"><summary>Lista completa de los diez equipos</summary><ol id="rankingList" class="rcm-ranking-list"></ol></details>
+        </section>
+        <section id="championsRankings" class="rcm-panel hidden" aria-labelledby="championsTitle">
+          <div class="rcm-row"><h2 id="championsTitle">Champions Power Rankings</h2><button data-sports-admin hidden onclick="openChampionsEditor()">Editar ranking</button></div>
+          <p id="championsEdition"></p><p id="championsStatus" role="status">Cargando ranking…</p>
+          <div class="rcm-ticker" tabindex="0" aria-label="Ranking Champions, desplaza para ver equipos"><div id="championsTrack" class="rcm-track"></div></div>
+          <details><summary>Lista completa de los diez equipos</summary><ol id="championsList" class="rcm-ranking-list"></ol></details>
         </section>
         <!-- Active Filter Indicator Bar -->
         <div id="filterIndicator" class="hidden mb-6 flex items-center justify-between bg-pitch-50 border border-pitch-200 px-4 py-3 rounded-xl text-pitch-900">
@@ -460,6 +465,10 @@ html.dark [data-reading-size][aria-pressed="true"] {
                     <!-- Cards JS Injected -->
                 </section>
 
+                <section id="bestPicks" class="rcm-panel hidden">
+                  <div class="rcm-row"><h2>NUESTROS MEJORES ACIERTOS</h2><button data-sports-admin hidden onclick="openResultsEditor()">Gestionar resultados</button></div>
+                  <div id="bestPicksCards" class="rcm-pick-grid"></div>
+                </section>
                 <!-- Empty State View -->
                 <div id="noResults" class="hidden text-center py-16 bg-white rounded-2xl border border-slate-200 shadow-sm">
                     <i class="fa-solid fa-newspaper text-5xl text-slate-300 mb-4"></i>
@@ -472,25 +481,13 @@ html.dark [data-reading-size][aria-pressed="true"] {
 
             <aside class="lg:col-span-4 space-y-8">
 
-                <!-- Interactive Daily Poll Widget -->
-                <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm grass-glow relative overflow-hidden">
-                    <div class="flex items-center space-x-2 text-pitch-600 text-xs font-bold uppercase tracking-widest mb-3">
-                        <i class="fa-solid fa-chart-pie text-sm"></i>
-                        <span>Encuesta de la Semana</span>
-                    </div>
-
-                    <h3 id="pollQuestion" class="text-base font-bold text-slate-900 mb-4 leading-snug">
-                        <!-- Poll Question -->
-                    </h3>
-
-                    <div id="pollOptionsContainer" class="space-y-3">
-                        <!-- Poll Options -->
-                    </div>
-
-                    <div id="pollTotalVotes" class="mt-4 text-right text-[11px] text-slate-400 font-medium">
-                        <!-- Total Votes -->
-                    </div>
-                </div>
+                <section id="weeklyPicks" class="rcm-panel">
+                  <h2>PICKS DE LA SEMANA</h2>
+                  <button data-sports-admin hidden onclick="openPicksEditor()">Preparar edición</button>
+                  <p id="picksStatus" role="status">Cargando picks…</p>
+                  <div id="picksOptions"></div>
+                  <details><summary>Ediciones anteriores</summary><div id="picksHistory"></div></details>
+                </section>
 
                 <!-- Trending / Most Liked Articles -->
                 <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
@@ -924,18 +921,6 @@ html.dark [data-reading-size][aria-pressed="true"] {
 
         const defaultArticles = []; // Existing static articles are preserved by the SQL migration.
 
-        let pollData = {
-            question: '¿Qué disciplina dará la mayor sorpresa esta temporada?',
-            totalVotes: 1420,
-            userVoted: false,
-            votedOptionId: null,
-            options: [
-                { id: 1, text: 'Fútbol Americano Colegial', votes: 680 },
-                { id: 2, text: 'Fútbol Internacional', votes: 450 },
-                { id: 3, text: 'NFL & Básquetbol', votes: 290 }
-            ]
-        };
-
         const db = window.supabase ? window.supabase.createClient(
             'https://zahuhmvmqvxaunqebqaa.supabase.co',
             'sb_publishable_QK4qV6totowE4KjolNANrQ_O46olHYg'
@@ -1187,7 +1172,7 @@ async function handleUserLogout() {
 
     renderAdminUI();
     renderArticlesFeed();
-    renderPoll();
+
     renderTrending();
 
     await loadUserSession();
@@ -1418,6 +1403,8 @@ currentUser = {
 
 
         function renderArticlesFeed() {
+            document.getElementById('championsRankings').classList.toggle('hidden', currentCategory !== 'Fútbol' || Boolean(currentTeam));
+            document.getElementById('bestPicks').classList.toggle('hidden', currentCategory !== 'Picks');
             document.getElementById('nflRankings').classList.toggle('hidden', currentCategory !== 'NFL');
             document.getElementById('footballTeams').classList.toggle('hidden', currentCategory !== 'Fútbol');
             document.querySelectorAll('[data-team]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.team === currentTeam)));
@@ -1552,42 +1539,6 @@ currentUser = {
                     </div>
                 </div>
             `;
-        }
-
-        function renderPoll() {
-            document.getElementById('pollQuestion').innerText = pollData.question;
-            document.getElementById('pollTotalVotes').innerText = `Demostración local · ${pollData.totalVotes.toLocaleString()} votos de ejemplo`;
-
-            const container = document.getElementById('pollOptionsContainer');
-            container.innerHTML = pollData.options.map(opt => {
-                const percentage = Math.round((opt.votes / pollData.totalVotes) * 100) || 0;
-                const isUserChoice = pollData.votedOptionId === opt.id;
-
-                return `
-                    <div onclick="votePoll(${opt.id})" class="relative overflow-hidden bg-slate-50 border ${isUserChoice ? 'border-pitch-600' : 'border-slate-200'} hover:border-pitch-400 rounded-xl p-3 cursor-pointer transition-all group">
-                        <div class="absolute left-0 top-0 bottom-0 bg-pitch-100 transition-all duration-700" style="width: ${pollData.userVoted ? percentage : 0}%"></div>
-                        <div class="relative flex items-center justify-between text-xs font-semibold z-10">
-                            <span class="flex items-center text-slate-800">
-                                ${isUserChoice ? '<i class="fa-solid fa-circle-check text-pitch-600 mr-2"></i>' : ''}
-                                ${opt.text}
-                            </span>
-                            ${pollData.userVoted ? `<span class="font-bold text-pitch-700">${percentage}%</span>` : '<i class="fa-solid fa-chevron-right text-slate-400 group-hover:text-pitch-600 text-[10px]"></i>'}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function votePoll(optionId) {
-            if (pollData.userVoted) return;
-            const option = pollData.options.find(o => o.id === optionId);
-            if (option) {
-                option.votes++;
-                pollData.totalVotes++;
-                pollData.userVoted = true;
-                pollData.votedOptionId = optionId;
-                renderPoll();
-            }
         }
 
         function renderTrending() {
@@ -2004,6 +1955,7 @@ function toggleDarkMode() {
 updateThemeButton();
     </script>
 <script src="assets/nfl-teams.js"></script>
-<script src="assets/community.js?v=20261013-2"></script>
+<script src="assets/community.js?v=20261013-3"></script>
+<script src="assets/sports.js?v=20261013-3"></script>
 </body>
 </html>
