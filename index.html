@@ -16,7 +16,21 @@
 
     document.documentElement.classList.toggle('dark', useDarkMode);
 </script>
-    <title>RCM SPORTS | Blog Deportivo</title>
+    <title>AE SPORTS | Noticias, rankings y Liga de Picks</title>
+    <meta name="description" content="Noticias, análisis, Power Rankings y una liga gratuita de Picks deportivos con AE Points.">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="canonical" href="https://eduardcarrera00-pixel.github.io/RCM-Sports/">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="AE SPORTS">
+    <meta property="og:title" content="AE SPORTS">
+    <meta property="og:description" content="Noticias, análisis, Power Rankings y una liga competitiva de Picks deportivos.">
+    <meta property="og:url" content="https://eduardcarrera00-pixel.github.io/RCM-Sports/">
+    <meta property="og:image" content="https://eduardcarrera00-pixel.github.io/RCM-Sports/assets/social-card.png">
+    <meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="AE SPORTS">
+    <meta name="twitter:description" content="Noticias, análisis, Power Rankings y Liga de Picks.">
+    <meta name="twitter:image" content="https://eduardcarrera00-pixel.github.io/RCM-Sports/assets/social-card.png">
 
     <link rel="stylesheet" href="assets/site.css">
 
@@ -301,7 +315,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
                         <i class="fa-solid fa-trophy text-2xl"></i>
                     </div>
                     <div>
-                        <span class="text-2xl font-black tracking-tight text-slate-900">RCM <span class="text-pitch-600">SPORTS</span></span>
+                        <span class="text-2xl font-black tracking-tight text-slate-900">AE <span class="text-pitch-600">SPORTS</span></span>
                         <span class="block text-[10px] text-slate-500 font-bold tracking-widest uppercase -mt-1">BLOG DEPORTIVO</span>
                     </div>
                 </a>
@@ -371,7 +385,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 
             <!-- Mobile Search Dropdown -->
             <div id="mobileSearchBox" class="hidden md:hidden pb-4 pt-1">
-                <input type="text" id="mobileSearchInput" oninput="handleMobileSearch()" placeholder="Buscar en RCM SPORTS..."
+                <input type="text" id="mobileSearchInput" oninput="handleMobileSearch()" placeholder="Buscar en AE SPORTS..."
                     class="w-full bg-slate-100 border border-slate-200 text-sm text-slate-800 rounded-xl px-4 py-2.5 focus:outline-none focus:border-pitch-600">
             </div>
 
@@ -423,9 +437,28 @@ html.dark [data-reading-size][aria-pressed="true"] {
         <section id="nflRankings" class="rcm-panel hidden" aria-labelledby="rankingTitle">
             <div class="rcm-row"><h2 id="rankingTitle">NFL Power Rankings</h2><button id="rankingEditButton" class="hidden" onclick="openRankingEditor()">Editar ranking</button></div>
             <p id="rankingEdition"></p><p id="rankingStatus" role="status">Cargando ranking…</p>
-            <button id="rankingPause" class="hidden" onclick="toggleRankingMotion()" aria-pressed="false">Pausar movimiento</button>
-            <div id="rankingViewport" class="rcm-ticker" aria-hidden="true"><div id="rankingTrack" class="rcm-track"></div></div>
-            <details id="rankingStatic"><summary>Lista completa de los diez equipos</summary><ol id="rankingList" class="rcm-ranking-list"></ol></details>
+            <div id="rankingViewport" class="rcm-ticker" tabindex="0" aria-label="Ranking NFL, desplaza para ver equipos"><div id="rankingTrack" class="rcm-track"></div></div>
+            <div id="rankingStatic" class="rcm-accessible-list"><ol id="rankingList" aria-label="Diez equipos NFL"></ol></div>
+        </section>
+        <section id="championsRankings" class="rcm-panel hidden" aria-labelledby="championsTitle">
+          <div class="rcm-row"><h2 id="championsTitle">Champions Power Rankings</h2><button data-sports-admin hidden onclick="openChampionsEditor()">Editar ranking</button></div>
+          <p id="championsEdition"></p><p id="championsStatus" role="status">Cargando ranking…</p>
+          <div class="rcm-ticker" tabindex="0" aria-label="Ranking Champions, desplaza para ver equipos"><div id="championsTrack" class="rcm-track"></div></div>
+          <ol id="championsList" class="rcm-accessible-list" aria-label="Diez equipos Champions"></ol>
+        </section>
+        <div id="aeWeeklySlot"></div>
+        <section id="aeLeague" class="rcm-panel hidden" aria-labelledby="aeLeagueTitle">
+          <div class="rcm-row"><h2 id="aeLeagueTitle">Liga de Picks · AE Points</h2><button data-sports-admin hidden onclick="openLeagueAdmin()">Administrar liga</button></div>
+          <p>Pronósticos gratuitos. Solo puntos virtuales, sin depósitos ni premios monetarios.</p>
+          <p id="aeQuota"></p>
+          <p id="aeStatus" role="status">Cargando competición…</p>
+          <div class="ae-controls"><label>Competición <select id="aeSport" onchange="refreshLeague()"><option value="">General</option><option value="NFL">NFL</option><option value="UCL">Fútbol · Champions</option></select></label>
+          <label>Período <select id="aePeriod" onchange="refreshLeague()"><option value="week">Esta semana</option><option value="season">Temporada</option><option value="all">Histórico</option></select></label></div>
+          <h3>Próximos encuentros</h3><div id="aeEvents" class="ae-cards"></div>
+          <h3>Mis Picks</h3><div id="aeMine" class="ae-cards"></div>
+          <h3>Top 10</h3><div id="aeLeaderboard"></div><p id="aeMyRank"></p>
+          <h3>MEJOR PICK</h3><div id="aeRecord"></div>
+          <h3>Mi perfil e historial</h3><div id="aeProfile"></div>
         </section>
         <!-- Active Filter Indicator Bar -->
         <div id="filterIndicator" class="hidden mb-6 flex items-center justify-between bg-pitch-50 border border-pitch-200 px-4 py-3 rounded-xl text-pitch-900">
@@ -460,6 +493,10 @@ html.dark [data-reading-size][aria-pressed="true"] {
                     <!-- Cards JS Injected -->
                 </section>
 
+                <section id="bestPicks" class="rcm-panel hidden">
+                  <div class="rcm-row"><h2>NUESTROS MEJORES ACIERTOS</h2><button data-sports-admin hidden onclick="openResultsEditor()">Elegir aciertos</button></div>
+                  <div id="bestPicksCards" class="rcm-pick-grid"></div>
+                </section>
                 <!-- Empty State View -->
                 <div id="noResults" class="hidden text-center py-16 bg-white rounded-2xl border border-slate-200 shadow-sm">
                     <i class="fa-solid fa-newspaper text-5xl text-slate-300 mb-4"></i>
@@ -472,25 +509,14 @@ html.dark [data-reading-size][aria-pressed="true"] {
 
             <aside class="lg:col-span-4 space-y-8">
 
-                <!-- Interactive Daily Poll Widget -->
-                <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm grass-glow relative overflow-hidden">
-                    <div class="flex items-center space-x-2 text-pitch-600 text-xs font-bold uppercase tracking-widest mb-3">
-                        <i class="fa-solid fa-chart-pie text-sm"></i>
-                        <span>Encuesta de la Semana</span>
-                    </div>
-
-                    <h3 id="pollQuestion" class="text-base font-bold text-slate-900 mb-4 leading-snug">
-                        <!-- Poll Question -->
-                    </h3>
-
-                    <div id="pollOptionsContainer" class="space-y-3">
-                        <!-- Poll Options -->
-                    </div>
-
-                    <div id="pollTotalVotes" class="mt-4 text-right text-[11px] text-slate-400 font-medium">
-                        <!-- Total Votes -->
-                    </div>
-                </div>
+                <div id="aeWeeklyHome"></div>
+                <section id="weeklyPicks" class="rcm-panel">
+                  <h2>PICKS DE LA SEMANA</h2>
+                  <button data-sports-admin hidden onclick="openPicksEditor()">Elegir destacados</button>
+                  <p id="picksStatus" role="status">Cargando picks…</p>
+                  <div id="picksOptions"></div>
+                  <details><summary>Ediciones anteriores</summary><div id="picksHistory"></div></details>
+                </section>
 
                 <!-- Trending / Most Liked Articles -->
                 <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
@@ -515,7 +541,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
                         <i class="fa-solid fa-paper-plane text-lg"></i>
                     </div>
 
-                    <h3 class="text-lg font-bold">Boletín RCM Sports</h3>
+                    <h3 class="text-lg font-bold">Boletín AE SPORTS</h3>
                     <p class="text-xs text-slate-300 mt-1 mb-4 leading-relaxed">
                         Próximamente: análisis deportivos por correo. Este formulario es una demostración y no registra suscripciones.
                     </p>
@@ -549,7 +575,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
         <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50">
             <div class="flex items-center space-x-2 text-pitch-700 font-bold">
                 <i class="fa-solid fa-user"></i>
-                <span class="text-base text-slate-900">Cuenta RCM Sports</span>
+                <span class="text-base text-slate-900">Cuenta AE SPORTS</span>
             </div>
 
             <button type="button"
@@ -848,7 +874,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
                         <div class="w-8 h-8 bg-pitch-600 rounded-lg flex items-center justify-center text-white">
                             <i class="fa-solid fa-trophy"></i>
                         </div>
-                        <span class="text-lg font-black text-white tracking-tight">RCM <span class="text-pitch-500">SPORTS</span></span>
+                        <span class="text-lg font-black text-white tracking-tight">AE <span class="text-pitch-500">SPORTS</span></span>
                     </div>
                     <p class="text-slate-400 leading-relaxed text-xs">
                         Periodismo deportivo de alto nivel. Cobertura, estrategia y pasión en la cancha.
@@ -914,7 +940,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
             </div>
 
             <div class="pt-8 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between text-slate-500 space-y-4 sm:space-y-0">
-                <p>&copy; 2026 RCM Sports Blog Deportivo. Todos los derechos reservados.</p>
+                <p>&copy; 2026 AE SPORTS Blog Deportivo. Todos los derechos reservados.</p>
             </div>
         </div>
     </footer>
@@ -923,18 +949,6 @@ html.dark [data-reading-size][aria-pressed="true"] {
 
 
         const defaultArticles = []; // Existing static articles are preserved by the SQL migration.
-
-        let pollData = {
-            question: '¿Qué disciplina dará la mayor sorpresa esta temporada?',
-            totalVotes: 1420,
-            userVoted: false,
-            votedOptionId: null,
-            options: [
-                { id: 1, text: 'Fútbol Americano Colegial', votes: 680 },
-                { id: 2, text: 'Fútbol Internacional', votes: 450 },
-                { id: 3, text: 'NFL & Básquetbol', votes: 290 }
-            ]
-        };
 
         const db = window.supabase ? window.supabase.createClient(
             'https://zahuhmvmqvxaunqebqaa.supabase.co',
@@ -1187,7 +1201,7 @@ async function handleUserLogout() {
 
     renderAdminUI();
     renderArticlesFeed();
-    renderPoll();
+
     renderTrending();
 
     await loadUserSession();
@@ -1418,6 +1432,10 @@ currentUser = {
 
 
         function renderArticlesFeed() {
+            if(window.renderLeague)renderLeague();
+            document.getElementById('aeLeague').classList.toggle('hidden',currentCategory!=='Picks');
+            document.getElementById('championsRankings').classList.toggle('hidden', currentCategory !== 'Fútbol' || Boolean(currentTeam));
+            document.getElementById('bestPicks').classList.toggle('hidden', currentCategory !== 'Picks');
             document.getElementById('nflRankings').classList.toggle('hidden', currentCategory !== 'NFL');
             document.getElementById('footballTeams').classList.toggle('hidden', currentCategory !== 'Fútbol');
             document.querySelectorAll('[data-team]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.team === currentTeam)));
@@ -1552,42 +1570,6 @@ currentUser = {
                     </div>
                 </div>
             `;
-        }
-
-        function renderPoll() {
-            document.getElementById('pollQuestion').innerText = pollData.question;
-            document.getElementById('pollTotalVotes').innerText = `Demostración local · ${pollData.totalVotes.toLocaleString()} votos de ejemplo`;
-
-            const container = document.getElementById('pollOptionsContainer');
-            container.innerHTML = pollData.options.map(opt => {
-                const percentage = Math.round((opt.votes / pollData.totalVotes) * 100) || 0;
-                const isUserChoice = pollData.votedOptionId === opt.id;
-
-                return `
-                    <div onclick="votePoll(${opt.id})" class="relative overflow-hidden bg-slate-50 border ${isUserChoice ? 'border-pitch-600' : 'border-slate-200'} hover:border-pitch-400 rounded-xl p-3 cursor-pointer transition-all group">
-                        <div class="absolute left-0 top-0 bottom-0 bg-pitch-100 transition-all duration-700" style="width: ${pollData.userVoted ? percentage : 0}%"></div>
-                        <div class="relative flex items-center justify-between text-xs font-semibold z-10">
-                            <span class="flex items-center text-slate-800">
-                                ${isUserChoice ? '<i class="fa-solid fa-circle-check text-pitch-600 mr-2"></i>' : ''}
-                                ${opt.text}
-                            </span>
-                            ${pollData.userVoted ? `<span class="font-bold text-pitch-700">${percentage}%</span>` : '<i class="fa-solid fa-chevron-right text-slate-400 group-hover:text-pitch-600 text-[10px]"></i>'}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function votePoll(optionId) {
-            if (pollData.userVoted) return;
-            const option = pollData.options.find(o => o.id === optionId);
-            if (option) {
-                option.votes++;
-                pollData.totalVotes++;
-                pollData.userVoted = true;
-                pollData.votedOptionId = optionId;
-                renderPoll();
-            }
         }
 
         function renderTrending() {
@@ -2004,6 +1986,8 @@ function toggleDarkMode() {
 updateThemeButton();
     </script>
 <script src="assets/nfl-teams.js"></script>
-<script src="assets/community.js?v=20261013-2"></script>
+<script src="assets/community.js?v=20261014-1"></script>
+<script src="assets/sports.js?v=20261014-1"></script>
+<script src="assets/league.js?v=20261014-1"></script>
 </body>
 </html>

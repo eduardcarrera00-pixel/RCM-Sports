@@ -1,0 +1,2 @@
+[functions.ae-sync]
+verify_jwt = false
