@@ -6,11 +6,13 @@
     "build:css": "tailwindcss -i assets/styles-input.css -o assets/site.css --minify",
     "test:database": "node tests/database.mjs",
     "test:browser": "node tests/browser.cjs",
-    "test": "npm run test:database && npm run test:browser",
-    "test:database:observed": "node -e \"process.env.RCM_OBSERVED_SCHEMA='1';import('./tests/database.mjs')\""
+    "test": "npm run test:database && npm run test:picks && npm run test:browser",
+    "test:database:observed": "node -e \"process.env.RCM_OBSERVED_SCHEMA='1';import('./tests/database.mjs')\"",
+    "test:picks": "node tests/community-picks.mjs && node tests/community-picks-ui.mjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.9",
+    "happy-dom": "21.0.1",
     "playwright": "1.62.1",
     "tailwindcss": "3.4.17"
   }
