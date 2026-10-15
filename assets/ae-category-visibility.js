@@ -2,7 +2,7 @@
 (() => {
  'use strict';
  const $=id=>document.getElementById(id);
- const categories=['NBA','Tenis','Ciclismo'];
+ const categories=['NBA','Tenis','Ciclismo','Fútbol Americano Colegial'];
  const enabled=new Map(categories.map(x=>[x,false]));
  function apply(){
   for(const category of categories){
@@ -35,7 +35,7 @@
   for(const category of categories){
    const label=document.createElement('label');label.className='ae-sport-toggle';
    const input=document.createElement('input');input.type='checkbox';input.checked=enabled.get(category)===true;
-   const name=document.createElement('span');name.textContent=category;label.append(input,name);root.append(label);
+   const name=document.createElement('span');name.textContent=category==='Fútbol Americano Colegial'?'Colegial':category;label.append(input,name);root.append(label);
    input.addEventListener('change',async()=>{
     input.disabled=true;
     try{
