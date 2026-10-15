@@ -296,6 +296,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/football-takes.css?v=20261015-1">
 <link rel="stylesheet" href="assets/free-takes.css?v=20261015-3">
 <link rel="stylesheet" href="assets/ae-picks-editorial.css?v=20261015-1">
+<link rel="stylesheet" href="assets/ae-editorial-weekly-profile.css?v=20261015-1">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 
@@ -337,6 +338,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
                     <!-- Guest State: User sign-in and registration -->
                     
                     <div id="readerSession" class="hidden rcm-row"></div>
+                    <button id="aeMyTakesButton" type="button" hidden class="ae-profile-open" onclick="openAeProfile()" aria-label="Abrir mi perfil y mis Takes"><i class="fa-solid fa-user" aria-hidden="true"></i><span>Mi perfil</span></button>
                     <div id="guestAdminContainer">
                         <button type="button" onclick="openUserAuthModal()" aria-label="Iniciar sesión o crear cuenta" class="flex items-center space-x-2 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 text-xs font-bold py-2.5 px-3.5 sm:px-4 rounded-xl transition-all">
                             <i class="fa-solid fa-right-to-bracket text-pitch-700"></i>
@@ -410,6 +412,10 @@ html.dark [data-reading-size][aria-pressed="true"] {
             <div class="ae-picks-feature-label"><span>DESTACADO · AE SPORTS</span><h3 id="picksFeaturedTitle">Pick de la semana</h3></div>
             <div id="picksFeaturedCard" aria-live="polite"><p>Cargando Pick editorial…</p></div>
           </section>
+          <section id="picksNews" class="ae-picks-news" aria-labelledby="picksNewsTitle">
+            <div class="ae-picks-news-heading"><span>ACTUALIDAD Y ANÁLISIS</span><h3 id="picksNewsTitle">Noticias de Picks</h3><p>Nuestras últimas noticias y análisis de pronósticos.</p></div>
+            <div id="picksNewsList" class="ae-picks-news-list" aria-live="polite"></div>
+          </section>
           <div class="ae-picks-layout">
             <div class="ae-picks-feed">
               <div class="ae-picks-feed-heading"><span>LA COMUNIDAD ELIGE</span><h3>Picks de la comunidad</h3><p>Participa en los pronósticos de cada deporte y consulta tus elecciones.</p></div>
@@ -444,6 +450,18 @@ html.dark [data-reading-size][aria-pressed="true"] {
               </section>
             </aside>
           </div>
+          <details id="aeWeeklyPickAdmin" class="ae-takes-admin ae-weekly-admin" hidden><summary>Administrar · Publicar Pick de la Semana</summary>
+            <form id="aeWeeklyPickForm">
+              <label class="ae-full">Título del Pick<input name="title" minlength="5" maxlength="160" required placeholder="Nuestra selección de la semana"></label>
+              <label>Evento o partido<input name="event_name" minlength="3" maxlength="160" required placeholder="Equipo A vs Equipo B"></label>
+              <label>Selección<input name="selection" minlength="2" maxlength="180" required placeholder="Ganador, hándicap, más de…"></label>
+              <label>Cuota americana<input name="american_odds" type="text" pattern="[+-]?[0-9]{3,6}" required placeholder="+150 o -110"></label>
+              <label>Cierre de la recomendación<input name="expires_at" type="datetime-local" required></label>
+              <label class="ae-full">Análisis del Pick<textarea name="analysis" minlength="12" maxlength="2400" required placeholder="Explica los motivos de la recomendación."></textarea></label>
+              <div class="ae-full"><button type="submit">Publicar Pick de la Semana</button></div>
+              <p id="aeWeeklyPickAdminStatus" class="ae-full ae-takes-status" role="status"></p>
+            </form>
+          </details>
           <details id="takesAdmin" class="ae-takes-admin" hidden><summary>Administrar · Crear un Pick</summary>
             <form id="takesCreateForm">
               <label>Competición<select name="competition" required>
@@ -524,9 +542,9 @@ html.dark [data-reading-size][aria-pressed="true"] {
             <aside class="lg:col-span-4 space-y-8">
                 <section class="editorial-pick" aria-labelledby="weeklyPickTitle">
                     <h2 id="weeklyPickTitle">Pick de la Semana</h2>
-                    <div class="editorial-pick-body"><span class="editorial-eyebrow">LA VOZ DE LA COMUNIDAD</span>
-                    <h3>El Pick más apoyado de la semana.</h3>
-                    <div id="cpWeekly" aria-live="polite"><p>Cargando el Pick más apoyado…</p></div></div>
+                    <div class="editorial-pick-body"><span class="editorial-eyebrow">PICK EDITORIAL DE AE SPORTS</span>
+                    <h3>Nuestra selección de la semana</h3>
+                    <div id="cpWeekly" aria-live="polite"><p>Cargando nuestra selección…</p></div></div>
                 </section>
 
         <section class="rcm-panel editorial-community" aria-labelledby="communityTitle"><div class="ae-section-heading"><span class="ae-overline">LA COMUNIDAD OPINA</span><h2 id="communityTitle">Las voces de AE SPORTS</h2></div><div id="communityLeaders" aria-live="polite">Cargando comentarios destacados…</div></section>
@@ -610,6 +628,13 @@ html.dark [data-reading-size][aria-pressed="true"] {
         </section>
 
     </main>
+
+<dialog id="aeProfileDialog" class="ae-profile-dialog" aria-labelledby="aeProfileTitle">
+ <div class="ae-profile-top"><div><span>MI CUENTA · AE SPORTS</span><h2 id="aeProfileTitle">Mis Takes</h2><p id="aeProfileUsername">Tu historial de opiniones deportivas</p></div><button type="button" class="ae-profile-close" onclick="closeAeProfile()" aria-label="Cerrar perfil">✕</button></div>
+ <div class="ae-profile-overview"><strong id="aeProfileCount">0 Takes</strong><p>Consulta las opiniones que has publicado, sus votos y su estado. Solo se muestran las de tu cuenta.</p></div>
+ <p id="aeProfileStatus" role="status" aria-live="polite"></p>
+ <div id="aeProfileTakes" class="ae-profile-takes"></div>
+</dialog>
 
 <!-- User Account Modal -->
 <div id="userAuthModal" role="dialog" aria-modal="true" aria-label="Iniciar sesión o crear una cuenta"
@@ -1358,6 +1383,10 @@ currentUser = {
             document.getElementById('aeMoreNews').hidden = true;
             if(isPicksPage) {
                 document.querySelector('.editorial-layout').hidden = true;
+                document.getElementById('nflRankings').classList.add('hidden');
+                if (typeof renderChampionsVisibility === 'function') renderChampionsVisibility();
+                document.getElementById('footballTeams').classList.add('hidden');
+                if(typeof renderAePicksNews === 'function') renderAePicksNews();
                 document.body.classList.remove('ae-is-home');
                 return;
             }
@@ -1983,5 +2012,7 @@ updateThemeButton();
 <script src="assets/username-auth.js?v=1"></script>
 <script src="assets/football-takes.js?v=20261015-6"></script>
 <script src="assets/free-takes.js?v=20261015-3"></script>
+<script src="assets/ae-editorial-weekly.js?v=20261015-1"></script>
+<script src="assets/ae-profile.js?v=20261015-1"></script>
 </body>
 </html>
