@@ -302,7 +302,8 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/ae-design-harmony.css?v=20261015-1">
 <link rel="stylesheet" href="assets/ae-takes-picks-refit.css?v=20261015-1">
 <link rel="stylesheet" href="assets/ae-conversation-refine.css?v=20261015-3">
-<link rel="stylesheet" href="assets/ae-premium-atmosphere.css?v=20261015-1">
+<link rel="stylesheet" href="assets/ae-premium-atmosphere.css?v=20261015-2">
+<link rel="stylesheet" href="assets/ae-home-picks-ranking-visuals.css?v=20261015-1">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 
@@ -434,11 +435,11 @@ html.dark [data-reading-size][aria-pressed="true"] {
           <div class="ae-picks-layout">
             <section class="ae-picks-feed" id="communityPicks" hidden aria-labelledby="cpTitle">
               <div class="ae-picks-feed-heading"><span>LA COMUNIDAD ELIGE</span><h3 id="cpTitle">Picks de la comunidad</h3><p>Publica tu pronóstico y tu cuota americana. AE SPORTS revisará la cuota y la comunidad decidirá con sus votos.</p></div>
-              <details class="ae-cp-compose" id="cpComposePanel"><summary>✍ Publicar mi Pick</summary><form id="cpForm"></form></details>
-              <div class="ae-cp-sort"><label for="cpSort">Ordenar Picks</label><select id="cpSort"><option value="score">Más votados</option><option value="created_at">Más recientes</option><option value="comments_count">Más comentados</option></select></div>
+              <div class="ae-recent-picks-heading"><span>PUBLICACIONES RECIENTES</span><h4>Últimos Picks</h4></div>
               <p id="cpStatus" role="status" aria-live="polite"></p>
               <div id="cpFeed" aria-live="polite"></div>
-              <button id="cpMore" class="ae-take-button" type="button" hidden>Ver más Picks</button>
+              <button id="cpMore" class="ae-take-button" type="button" hidden>Ver Picks anteriores</button>
+              <details class="ae-cp-compose" id="cpComposePanel"><summary>✍ Publicar mi Pick</summary><form id="cpForm"></form></details>
             </section>
             <aside class="ae-picks-rail">
 
@@ -2055,13 +2056,13 @@ updateThemeButton();
 <script src="assets/nfl-teams.js"></script>
 <script src="assets/community.js?v=ticker-only-20261015-4"></script>
 <script src="assets/champions.js?v=qa1-20261015-5"></script>
-<script src="assets/community-picks.js?v=20261015-6"></script>
+<script src="assets/community-picks.js?v=20261015-7"></script>
 <script src="assets/weekly-picks.js?v=20261015-1"></script>
 <script src="assets/username-auth.js?v=1"></script>
 <script src="assets/ae-category-visibility.js?v=20261015-3"></script>
 <script src="assets/ae-nfl-takes.js?v=20261015-3"></script>
 <script src="assets/free-takes.js?v=20261015-7"></script>
-<script src="assets/ae-editorial-weekly.js?v=20261015-4"></script>
+<script src="assets/ae-editorial-weekly.js?v=20261015-5"></script>
 <script src="assets/ae-profile.js?v=20261015-4"></script>
 <script src="assets/ae-home-takes.js?v=20261015-3"></script>
 <script src="assets/ae-sport-top-takes.js?v=20261015-3"></script>

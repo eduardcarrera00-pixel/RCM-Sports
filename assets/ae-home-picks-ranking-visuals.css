@@ -1,0 +1,167 @@
+/* AE SPORTS · fondos deportivos editoriales y banner semanal compartido · oct 2026
+   Imágenes reducidas para carga rápida; capas oscuras preservan legibilidad y movimiento. */
+
+/* La portada y Picks usan el MISMO banner de la selección editorial guardado en Supabase. */
+.editorial-pick.ae-home-weekly-banner,
+html.dark .editorial-pick.ae-home-weekly-banner {
+  position:relative!important;isolation:isolate!important;overflow:hidden!important;
+  background:#091f30!important;border:1px solid #aa815f77!important;
+  min-height:178px;
+}
+.editorial-pick.ae-home-weekly-banner>.ae-weekly-home-banner{
+  position:absolute;inset:0;z-index:0;width:100%;height:100%;
+  object-fit:cover;object-position:center 40%;opacity:.86;
+  pointer-events:none;user-select:none;
+}
+.editorial-pick.ae-home-weekly-banner::before{
+  content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(90deg,
+    rgba(7,23,35,.96) 0%,rgba(8,25,37,.92) 33%,
+    rgba(9,27,40,.79) 67%,rgba(10,27,39,.62) 100%);
+}
+.editorial-pick.ae-home-weekly-banner> :not(.ae-weekly-home-banner){
+  position:relative;z-index:2;background:transparent!important;
+}
+.editorial-pick.ae-home-weekly-banner h2,
+html.dark .editorial-pick.ae-home-weekly-banner h2{
+  background:transparent!important;border:0!important;color:#fff0df!important;
+  padding-bottom:9px!important;
+}
+.editorial-pick.ae-home-weekly-banner .editorial-pick-body,
+html.dark .editorial-pick.ae-home-weekly-banner .editorial-pick-body{
+  background:transparent!important;padding-top:7px!important;
+}
+.editorial-pick.ae-home-weekly-banner .editorial-eyebrow,
+.editorial-pick.ae-home-weekly-banner .ae-weekly-title,
+.editorial-pick.ae-home-weekly-banner .ae-weekly-event,
+.editorial-pick.ae-home-weekly-banner .ae-weekly-selection strong,
+.editorial-pick.ae-home-weekly-banner .ae-weekly-link,
+.editorial-pick.ae-home-weekly-banner .ae-weekly-empty,
+html:not(.dark) .editorial-pick.ae-home-weekly-banner .ae-weekly-title,
+html:not(.dark) .editorial-pick.ae-home-weekly-banner .ae-weekly-event,
+html:not(.dark) .editorial-pick.ae-home-weekly-banner .ae-weekly-selection strong{
+  color:#fff0e1!important;
+}
+.editorial-pick.ae-home-weekly-banner .ae-weekly-odds,
+html:not(.dark) .editorial-pick.ae-home-weekly-banner .ae-weekly-odds{
+  color:#fff3e8!important;background:#77523fc7!important;border:1px solid #d4b08b55!important;
+}
+.editorial-pick.ae-home-weekly-banner #cpWeekly .ae-weekly-preview{
+  background:transparent!important;
+}
+
+/* Mostrar las aportaciones antes de invitar a publicar. */
+#footballTakes #communityPicks #cpComposePanel{
+  margin:20px 0 0!important;border-color:#c69b775b!important;
+  background:linear-gradient(105deg,#203c4c,#172f40)!important;
+}
+#communityPicks .ae-recent-picks-heading{
+  display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;
+  gap:8px;margin:5px 0 15px;border-bottom:1px solid #b69c7938;padding-bottom:9px;
+}
+#communityPicks .ae-recent-picks-heading span{
+  font:800 9px/1.4 Inter,system-ui,sans-serif;letter-spacing:.13em;
+  color:#daa981;
+}
+#communityPicks .ae-recent-picks-heading h4{
+  font:600 clamp(18px,1.9vw,24px)/1.2 Newsreader,Georgia,serif;
+  color:#f2e1d0;margin:0;
+}
+#communityPicks #cpMore:not([hidden]){margin:14px 0 0!important}
+
+/* Portada: cards de ranking con ilustración específica y discreta. */
+#homeRankingLink.ae-ranking-card-link,
+#homeChampionsLink.ae-ranking-card-link{
+  background-size:cover!important;background-repeat:no-repeat!important;
+  background-position:center 35%!important;isolation:isolate;
+}
+#homeRankingLink.ae-ranking-card-link,
+html.dark #homeRankingLink.ae-ranking-card-link{
+  background-image:
+    linear-gradient(100deg,#0d2535f7 0%,#102a3ae9 52%,#112b3cc7 100%),
+    url("rankings/nfl-atmosphere.webp")!important;
+}
+#homeChampionsLink.ae-ranking-card-link,
+html.dark #homeChampionsLink.ae-ranking-card-link{
+  background-image:
+    linear-gradient(100deg,#0c2333f7 0%,#112c3be8 52%,#122e3dc6 100%),
+    url("rankings/champions-atmosphere.webp")!important;
+}
+#homeRankingLink .editorial-module-heading,
+#homeChampionsLink .editorial-module-heading,
+#homeRankingLink .editorial-ranking-list,
+#homeChampionsLink .editorial-ranking-list{
+  position:relative;z-index:1;
+}
+
+/* Pantalla deportiva completa, incluyendo título, controles y Top 10. */
+html.dark body #nflRankings.rcm-panel,
+html.dark body #championsRankings.rcm-panel,
+body #nflRankings.rcm-panel,
+body #championsRankings.rcm-panel{
+  background-size:cover!important;background-position:center 38%!important;
+  background-repeat:no-repeat!important;overflow:hidden;isolation:isolate;
+  border:1px solid #bb977050!important;border-radius:14px!important;
+  box-shadow:0 14px 36px #05121e44!important;color:#f9eadd!important;
+}
+html.dark body #nflRankings.rcm-panel,
+body #nflRankings.rcm-panel{
+  background-image:
+    linear-gradient(100deg,#0a2233f5,#0e2636e5 64%,#10283be0),
+    url("rankings/nfl-atmosphere.webp")!important;
+}
+html.dark body #championsRankings.rcm-panel,
+body #championsRankings.rcm-panel{
+  background-image:
+    linear-gradient(100deg,#0a2232f5,#0d2737e8 64%,#10293ada),
+    url("rankings/champions-atmosphere.webp")!important;
+}
+#nflRankings>.rcm-row,
+#championsRankings>.rcm-row{
+  padding:12px 14px;border:1px solid #c4a17d31;border-radius:10px;
+  background:linear-gradient(90deg,#0c2336cb,#0e2738aa)!important;
+  margin-bottom:12px;
+}
+#nflRankings>.rcm-row h2,#championsRankings>.rcm-row h2{
+  color:#ffe9d6!important;
+}
+
+/* Bandas de rankings que se mueven: no modificar keyframes ni animación. */
+#rankingViewport.rcm-ticker,
+#championsViewport.rcm-ticker{
+  position:relative;isolation:isolate;overflow:hidden;
+  border:1px solid #c29c794c;border-radius:11px;
+  background-size:cover;background-position:center 55%;
+  background-repeat:no-repeat;
+  min-height:110px;
+  box-shadow:inset 0 5px 24px #050f1970;
+}
+#rankingViewport.rcm-ticker{
+  background-image:
+    linear-gradient(90deg,#0b2434e8,#0c2434b5 35%,#0b2333b8 67%,#0b2434ed),
+    url("rankings/nfl-atmosphere.webp");
+}
+#championsViewport.rcm-ticker{
+  background-image:
+    linear-gradient(90deg,#0b2434e8,#0b2434b9 35%,#0b2333bc 67%,#0b2434ee),
+    url("rankings/champions-atmosphere.webp");
+}
+#rankingViewport.rcm-ticker::before,
+#championsViewport.rcm-ticker::before{
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:linear-gradient(180deg,#142f4010,#06162634);
+}
+#rankingTrack.rcm-track,#championsTrack.rcm-track{
+  position:relative;z-index:1;
+}
+@media(max-width:640px){
+  .editorial-pick.ae-home-weekly-banner>.ae-weekly-home-banner{object-position:65% center}
+  .editorial-pick.ae-home-weekly-banner::before{
+    background:linear-gradient(90deg,#081c2cf6,#0b2234df 62%,#0b2234c9);
+  }
+  #rankingViewport.rcm-ticker,#championsViewport.rcm-ticker{min-height:96px}
+  #nflRankings>.rcm-row,#championsRankings>.rcm-row{padding:10px}
+}
+@media(prefers-reduced-motion:reduce){
+  .editorial-pick.ae-home-weekly-banner>.ae-weekly-home-banner{transition:none}
+}

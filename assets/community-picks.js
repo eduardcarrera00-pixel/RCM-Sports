@@ -65,9 +65,9 @@ async function vote(p,value,b){if(p.moderation_status!=='approved')return;b.disa
  const r=await q;if(r.error)throw r.error;await load();if($('cpDialog')?.open)await showDetail(p.id);
  }catch(e){notifyCommunity(message(e),true);}finally{b.disabled=false;}}
 async function load(){
- if(!db)return;const seq=++request;const order=$('cpSort')?.value||'score';
+ if(!db)return;const seq=++request;
  try{
-   const feed=await db.from('ae_pick_feed').select('*').order(order,{ascending:false}).order('created_at',{ascending:false}).order('id').range(0,limit-1);
+   const feed=await db.from('ae_pick_feed').select('*').order('created_at',{ascending:false}).order('id',{ascending:false}).range(0,limit-1);
    if(seq!==request)return;if(feed.error)throw feed.error;
    $('cpFeed').replaceChildren(...(feed.data||[]).map(p=>card(p)));
    $('cpStatus').textContent=feed.data?.length?'':'Todavía no hay Picks. Comparte el primero.';
@@ -181,7 +181,7 @@ async function showDetail(id){
  }catch(e){dialog.replaceChildren(button('Cerrar',closeDetail),el('p',message(e)));}
 }
 window.renderCommunityPicksVisibility=()=>{const root=$('communityPicks');if(!root)return;root.hidden=currentCategory!=='Picks';if(!root.hidden&&!loaded)load();};
-document.addEventListener('DOMContentLoaded',()=>{buildComposer();renderCommunityPicksVisibility();load();$('cpReload')?.addEventListener('click',load);$('cpCloseWeek')?.addEventListener('click',closePreviousWeek);for(const [id,mode] of [['cpRankWeekly','weekly'],['cpRankOverall','overall']]){$(id)?.addEventListener('click',()=>{currentRank=mode;for(const [i,m] of [['cpRankWeekly','weekly'],['cpRankOverall','overall']])$(i).setAttribute('aria-pressed',String(currentRank===m));loadRanking();});}const id=new URL(location.href).searchParams.get('pick');if(id)showDetail(id);$('cpSort').onchange=()=>{limit=20;load();};$('cpMore').onclick=()=>{limit+=20;load();};if(db)db.auth.onAuthStateChange(()=>setTimeout(()=>{load();const id=new URL(location.href).searchParams.get('pick');if(id)showDetail(id);},0));});
+document.addEventListener('DOMContentLoaded',()=>{buildComposer();renderCommunityPicksVisibility();load();$('cpReload')?.addEventListener('click',load);$('cpCloseWeek')?.addEventListener('click',closePreviousWeek);for(const [id,mode] of [['cpRankWeekly','weekly'],['cpRankOverall','overall']]){$(id)?.addEventListener('click',()=>{currentRank=mode;for(const [i,m] of [['cpRankWeekly','weekly'],['cpRankOverall','overall']])$(i).setAttribute('aria-pressed',String(currentRank===m));loadRanking();});}const id=new URL(location.href).searchParams.get('pick');if(id)showDetail(id);$('cpMore').onclick=()=>{limit+=20;load();};if(db)db.auth.onAuthStateChange(()=>setTimeout(()=>{load();const id=new URL(location.href).searchParams.get('pick');if(id)showDetail(id);},0));});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)load();});
 window.addEventListener('popstate',()=>{const id=new URL(location.href).searchParams.get('pick');if(id)showDetail(id);else closeDetail();});
 })();
