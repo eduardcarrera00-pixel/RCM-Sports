@@ -35,7 +35,7 @@
    return r.data?.path||name;
  }
  function publicUrl(path){
-   if(!path||typeof path!=='string'||!/^(?:weekly\\/(?:banner|article)\\/|articles\\/)[0-9a-f-]{36}\\.(?:jpg|png|webp)$/.test(path))return '';
+   if(!path||typeof path!=='string'||!/^(?:weekly\/(?:banner|article)\/|articles\/)[0-9a-f-]{36}\.(?:jpg|png|webp)$/.test(path))return '';
    if(typeof db==='undefined'||!db?.storage)return '';
    const result=db.storage.from('article-images').getPublicUrl(path);
    return result.data?.publicUrl||'';
