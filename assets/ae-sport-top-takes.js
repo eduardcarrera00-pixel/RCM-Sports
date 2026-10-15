@@ -35,6 +35,11 @@
      content.append(author);
      const score=el('span',undefined,'ae-top-take-votes');
      score.append(el('span','▲ '+Number(t.upvotes||0),'ae-top-take-up'),el('span','▼ '+Number(t.downvotes||0),'ae-top-take-down'));
+     const reply=el('button','Responder','ae-top-take-reply');
+     reply.type='button';
+     reply.setAttribute('aria-label','Responder al Take: '+t.title);
+     reply.addEventListener('click',()=>window.aeTakeReplies?.open(t,{focusComposer:true}));
+     score.append(reply);
      content.append(score);
      li.append(content);
      li.addEventListener('click',event=>{
