@@ -304,6 +304,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/ae-conversation-refine.css?v=20261015-3">
 <link rel="stylesheet" href="assets/ae-premium-atmosphere.css?v=20261015-2">
 <link rel="stylesheet" href="assets/ae-home-picks-ranking-visuals.css?v=20261015-1">
+<link rel="stylesheet" href="assets/ae-square-sport-identity.css?v=20261015-1">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 
@@ -405,14 +406,38 @@ html.dark [data-reading-size][aria-pressed="true"] {
 
         <div id="articleMissing" class="rcm-panel hidden" role="alert"><p>No encontramos esta publicación. Puede que haya sido eliminada.</p><button type="button" onclick="closeModal()">Volver al inicio</button></div>
         <section id="nflRankings" class="rcm-panel hidden" aria-labelledby="rankingTitle">
-            <div class="rcm-row"><h2 id="rankingTitle">NFL Power Rankings</h2><button id="rankingEditButton" class="hidden" onclick="openRankingEditor()">Editar ranking</button></div>
-            <p id="rankingEdition"></p><p id="rankingStatus" role="status">Cargando ranking…</p>
+            <div class="rcm-row ae-rank-hero-head">
+                <div class="ae-rank-title-wrap">
+                    <span class="ae-rank-overline">NFL · LA ÉLITE DE LA LIGA</span>
+                    <h2 id="rankingTitle">NFL <span>Power Rankings</span></h2>
+                    <p class="ae-rank-subtitle">El pulso de los diez mejores</p>
+                    <p id="rankingEdition" class="ae-rank-edition"></p>
+                </div>
+                <aside id="nflRankOne" class="ae-ranking-leader" aria-label="Equipo número uno de NFL" hidden>
+                    <span class="ae-leader-overline">EL NÚMERO UNO</span>
+                    <ol id="nflRankOneList" class="ae-rank-leader-list" aria-live="polite"></ol>
+                </aside>
+                <button id="rankingEditButton" class="hidden" onclick="openRankingEditor()">Editar ranking</button>
+            </div>
+            <p id="rankingStatus" role="status">Cargando ranking…</p>
             <button id="rankingPause" class="hidden" onclick="toggleRankingMotion()" aria-pressed="false">Pausar movimiento</button>
             <div id="rankingViewport" class="rcm-ticker" aria-hidden="true"><div id="rankingTrack" class="rcm-track"></div></div>
             <div id="rankingStatic" class="ae-ranking-accessible"><ol id="rankingList" class="rcm-ranking-list" aria-label="Top 10 NFL"></ol></div>
         </section>
         <section id="championsRankings" tabindex="0" class="rcm-panel ae-champions-full hidden" aria-labelledby="championsTitle">
-            <div class="rcm-row"><h2 id="championsTitle">Champions League · Power Rankings</h2><span class="ae-edition" id="championsEdition"></span><button type="button" id="championsEditButton" class="hidden" onclick="openChampionsEditor()">Editar ranking</button></div>
+            <div class="rcm-row ae-rank-hero-head">
+                <div class="ae-rank-title-wrap">
+                    <span class="ae-rank-overline">FÚTBOL · CHAMPIONS LEAGUE</span>
+                    <h2 id="championsTitle">Power Rankings</h2>
+                    <p class="ae-rank-subtitle">Diez clubes, un primer puesto</p>
+                    <span class="ae-edition ae-rank-edition" id="championsEdition"></span>
+                </div>
+                <aside id="championsRankOne" class="ae-ranking-leader" aria-label="Club número uno de Champions League" hidden>
+                    <span class="ae-leader-overline">EL NÚMERO UNO</span>
+                    <ol id="championsRankOneList" class="ae-rank-leader-list" aria-live="polite"></ol>
+                </aside>
+                <button type="button" id="championsEditButton" class="hidden" onclick="openChampionsEditor()">Editar ranking</button>
+            </div>
             <p id="championsStatus" role="status">Cargando clasificación publicada…</p>
             <div id="championsViewport" class="rcm-ticker ae-ranking-motion" aria-hidden="true" hidden><div id="championsTrack" class="rcm-track"></div></div>
             <ol id="championsList" class="ae-full-ranking-list ae-ranking-accessible" aria-label="Top 10 Champions League"></ol>
