@@ -8,6 +8,12 @@
  'NFC Este':['DAL','NYG','PHI','WAS'],'NFC Norte':['CHI','DET','GB','MIN'],
  'NFC Sur':['ATL','CAR','NO','TB'],'NFC Oeste':['ARI','LAR','SF','SEA']
  };
+ function option(select,value,label) {
+   const item=document.createElement('option');
+   item.value=value;
+   item.textContent=label;
+   select.append(item);
+ }
  function init() {
    for(const key of ['aeNflDivision','aeNflFeedDivision']){
      const select=$(key);if(!select||select.options.length>1)continue;
@@ -38,7 +44,7 @@
    if(!active)return text;
    const div=$('aeNflDivision')?.value||'';
    const team=$('aeNflTeam')?.value.trim()||'';
-   const topic=$('aeNflTopic')?.value||'';
+   const topic=$('aeNflTopic')?.value.trim()||'';
    // Everything remains part of the immutable historical Take text, including in public profiles.
    const context=['NFL',div,team,topic].filter(Boolean).join(' · ');
    return context+'\n\n'+text;
