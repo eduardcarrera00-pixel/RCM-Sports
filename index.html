@@ -293,6 +293,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/username-auth.css?v=2">
 <link rel="stylesheet" href="assets/ae-premium-home.css?v=20261015-3">
 <link rel="stylesheet" href="assets/ae-refinement.css?v=20261015-1">
+<link rel="stylesheet" href="assets/football-takes.css?v=20261015-1">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 
@@ -400,6 +401,43 @@ html.dark [data-reading-size][aria-pressed="true"] {
             <p id="championsStatus" role="status">Cargando clasificación publicada…</p>
             <div id="championsViewport" class="rcm-ticker ae-ranking-motion" aria-hidden="true" hidden><div id="championsTrack" class="rcm-track"></div></div>
             <ol id="championsList" class="ae-full-ranking-list ae-ranking-accessible" aria-label="Top 10 Champions League"></ol>
+        </section>
+        <section id="footballTakes" class="ae-takes" hidden aria-labelledby="takesTitle">
+          <div class="ae-takes-head"><span class="ae-takes-eyebrow">LA COMUNIDAD PREDICE</span><h2 id="takesTitle">Takes de Fútbol</h2><p>Elige tus pronósticos, suma puntos por tus aciertos y asciende en la clasificación.</p></div>
+          <nav class="ae-takes-tabs" aria-label="Competiciones de Takes">
+            <button type="button" data-takes-league="laliga" aria-pressed="true">LaLiga</button>
+            <button type="button" data-takes-league="premier" aria-pressed="false">Premier League</button>
+            <button type="button" data-takes-league="ligamx" aria-pressed="false">Liga MX</button>
+            <button type="button" data-takes-league="champions" aria-pressed="false">Champions League</button>
+          </nav>
+          <div class="ae-takes-meta"><div class="ae-takes-tabs" aria-label="Duración de Takes">
+            <button type="button" data-takes-period="all" aria-pressed="true">Todos</button>
+            <button type="button" data-takes-period="weekly" aria-pressed="false">Semanales</button>
+            <button type="button" data-takes-period="season" aria-pressed="false">Temporada</button>
+          </div><span id="takesCount">0 Takes</span></div>
+          <p id="takesStatus" class="ae-takes-status" role="status" aria-live="polite"></p>
+          <div class="ae-takes-grid">
+            <div id="takesQuestions" aria-live="polite"></div>
+            <aside class="ae-takes-side"><h3>Ranking de Takes</h3><div class="ae-takes-tabs">
+              <button type="button" data-takes-rank="general" aria-pressed="true">Temporada</button>
+              <button type="button" data-takes-rank="weekly" aria-pressed="false">Esta semana</button>
+            </div><div id="takesLeaderboard" aria-live="polite"></div>
+            <button id="takesReload" type="button" class="ae-take-button">Actualizar Takes</button></aside>
+          </div>
+          <details id="takesAdmin" class="ae-takes-admin" hidden><summary>Administrar · Crear un Take</summary>
+            <form id="takesCreateForm">
+              <label>Competición<select name="competition" required>
+                <option value="laliga">LaLiga</option><option value="premier">Premier League</option>
+                <option value="ligamx">Liga MX</option><option value="champions">Champions League</option></select></label>
+              <label>Modalidad<select name="period" required>
+                <option value="weekly">Semanal</option><option value="season">Temporada</option></select></label>
+              <label class="ae-full">Pregunta<input name="prompt" minlength="10" maxlength="220" required placeholder="¿Quién ganará el próximo partido?"></label>
+              <label class="ae-full">Opciones (una por línea)<textarea name="options" required placeholder="Equipo A&#10;Empate&#10;Equipo B"></textarea></label>
+              <label>Cierre de predicciones<input name="closes" type="datetime-local" required></label>
+              <label>Puntos por acierto<input name="points" type="number" min="1" max="100" value="5" required></label>
+              <div class="ae-full"><button type="submit">Publicar Take</button></div>
+            </form>
+          </details>
         </section>
         <section id="communityPicks" hidden aria-labelledby="cpTitle">
           <h2 id="cpTitle">Picks de la comunidad</h2>
@@ -1275,6 +1313,7 @@ currentUser = {
 
         function renderArticlesFeed() {
             if (typeof renderCommunityPicksVisibility === 'function') renderCommunityPicksVisibility();
+             if (typeof renderFootballTakesVisibility === 'function') renderFootballTakesVisibility();
             document.getElementById('editorialBottom').hidden = currentCategory !== 'Todos' || Boolean(currentSearchQuery);
             document.querySelector('.editorial-pick').hidden = currentCategory !== 'Todos' || Boolean(currentSearchQuery);
             document.querySelector('.editorial-trending').hidden = currentCategory !== 'Todos' || Boolean(currentSearchQuery);
@@ -1894,5 +1933,6 @@ updateThemeButton();
 <script src="assets/community-picks.js?v=1"></script>
 <script src="assets/weekly-picks.js?v=20261015-1"></script>
 <script src="assets/username-auth.js?v=1"></script>
+<script src="assets/football-takes.js?v=20261015-1"></script>
 </body>
 </html>
