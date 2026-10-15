@@ -38,8 +38,11 @@
     const stats = element('span', undefined, 'ae-top-take-votes');
     stats.append(element('span', '▲ ' + Number(t.upvotes || 0), 'ae-top-take-up'));
     stats.append(element('span', '▼ ' + Number(t.downvotes || 0), 'ae-top-take-down'));
-    const count = negative ? Number(t.downvotes || 0) : Number(t.upvotes || 0);
-    stats.append(element('small',count === 1 ? '1 voto' : count + ' votos'));
+    const reply=element('button','Responder','ae-top-take-reply');
+    reply.type='button';
+    reply.setAttribute('aria-label','Responder al Take: '+t.title);
+    reply.addEventListener('click',()=>window.aeTakeReplies?.open(t,{focusComposer:true}));
+    stats.append(reply);
     content.append(stats);
     item.append(content);
     item.addEventListener('click',event=>{
@@ -85,7 +88,24 @@
     }
   }
   window.refreshAeHomeTopTakes = refresh;
-  document.addEventListener('DOMContentLoaded',()=>{refresh(true);});
+  document.addEventListener('DOMContentLoaded',()=>{
+    refresh(true);
+    const publish=$('aeHomeTakePublish'),choices=$('aeHomeTakeChoice');
+    publish?.addEventListener('click',()=>{
+      if(!choices)return;
+      choices.hidden=!choices.hidden;
+      publish.setAttribute('aria-expanded',String(!choices.hidden));
+      if(!choices.hidden)choices.querySelector('button')?.focus();
+    });
+    choices?.querySelectorAll('button[data-ae-take-sport]').forEach(btn=>btn.addEventListener('click',()=>{
+      choices.hidden=true;
+      publish?.setAttribute('aria-expanded','false');
+      window.aeOpenTakeComposer?.(btn.dataset.aeTakeSport);
+    }));
+    choices?.addEventListener('keydown',e=>{
+      if(e.key==='Escape'){choices.hidden=true;publish?.setAttribute('aria-expanded','false');publish?.focus();}
+    });
+  });
   document.addEventListener('ae:takes-updated',()=>refresh(true));
   document.addEventListener('visibilitychange',()=>{if (!document.hidden) refresh();});
 })();
