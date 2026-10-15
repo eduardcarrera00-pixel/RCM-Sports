@@ -310,6 +310,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/ae-ticker-takes-color-finish.css?v=20261015-1">
 <link rel="stylesheet" href="assets/ae-home-compact-and-clean-logos.css?v=20261015-1">
 <link rel="stylesheet" href="assets/ae-day-mode.css?v=20261015-1">
+<link rel="stylesheet" href="assets/ae-community-participation.css?v=20261015-1">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 
@@ -464,7 +465,12 @@ html.dark [data-reading-size][aria-pressed="true"] {
           </div>
           <div class="ae-picks-layout">
             <section class="ae-picks-feed" id="communityPicks" hidden aria-labelledby="cpTitle">
-              <div class="ae-picks-feed-heading"><span>LA COMUNIDAD ELIGE</span><h3 id="cpTitle">Picks de la comunidad</h3><p>Publica tu pronóstico y tu cuota americana. AE SPORTS revisará la cuota y la comunidad decidirá con sus votos.</p></div>
+              <div class="ae-picks-feed-heading">
+                 <span>LA COMUNIDAD ELIGE</span>
+                 <h3 id="cpTitle" class="sr-only">Picks de la comunidad</h3>
+                 <button id="cpPublishCta" type="button" class="ae-participate-cta ae-picks-publish-cta" aria-controls="cpComposePanel" aria-expanded="false">＋ Subir mi Pick <span aria-hidden="true">→</span></button>
+                 <p>Publica tu pronóstico y tu cuota americana. AE SPORTS revisará la cuota y la comunidad decidirá con sus votos.</p>
+               </div>
               <div class="ae-recent-picks-heading"><span>PUBLICACIONES RECIENTES</span><h4>Últimos Picks</h4></div>
               <p id="cpStatus" role="status" aria-live="polite"></p>
               <div id="cpFeed" aria-live="polite"></div>
@@ -576,7 +582,14 @@ html.dark [data-reading-size][aria-pressed="true"] {
             <section id="aeHomeTopTakes" aria-labelledby="aeHomeTopTakesTitle">
               <div class="ae-top-takes-heading">
                 <div><span>LA COMUNIDAD DECIDE</span><h2 id="aeHomeTopTakesTitle">Los Takes de la comunidad</h2></div>
-                <p id="aeTopTakesStatus" role="status" aria-live="polite">Cargando los Takes destacados…</p>
+                <div class="ae-top-takes-heading-side">
+                  <p id="aeTopTakesStatus" role="status" aria-live="polite">Cargando los Takes destacados…</p>
+                  <button id="aeHomeTakePublish" type="button" class="ae-participate-cta ae-home-take-publish" aria-expanded="false" aria-controls="aeHomeTakeChoice">✍ Publicar mi Take <span aria-hidden="true">→</span></button>
+                  <div id="aeHomeTakeChoice" class="ae-home-take-choice" role="group" aria-label="Elige dónde publicar tu Take" hidden>
+                    <button type="button" data-ae-take-sport="NFL">NFL</button>
+                    <button type="button" data-ae-take-sport="Fútbol">Fútbol</button>
+                  </div>
+                </div>
               </div>
               <div class="ae-top-takes-grid">
                 <section class="ae-top-takes-card" aria-labelledby="aeTopTakesPositiveTitle">
@@ -668,7 +681,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 
         <!-- Los Takes son una función editorial al final de NFL y Fútbol, no una categoría de navegación. -->
         <section id="freeTakes" class="ae-takes ae-free-takes" hidden aria-labelledby="freeTakesTitle">
-          <div class="ae-takes-head"><span class="ae-takes-eyebrow">TU OPINIÓN CUENTA</span><h2 id="freeTakesTitle">Takes de la comunidad</h2><p>Haz el pronóstico u opinión que quieras. Sin preguntas predefinidas y sin cuotas.</p></div>
+          <div class="ae-takes-head"><span class="ae-takes-eyebrow">TU OPINIÓN CUENTA</span><h2 id="freeTakesTitle">Takes de la comunidad</h2><p>Haz el pronóstico u opinión que quieras. Sin preguntas predefinidas y sin cuotas.</p><button id="aeSportTakePublish" type="button" class="ae-participate-cta ae-sport-take-publish" aria-controls="aeTakeComposePanel" aria-expanded="false">✍ Publicar mi Take <span aria-hidden="true">→</span></button></div>
 
           <h3 id="aeTakesFeedHeading" class="ae-takes-history-heading">Historial de Takes</h3>
           <div class="ae-free-controls"><label id="aeNflFeedFilterWrap" hidden>División NFL<select id="aeNflFeedDivision"><option value="">Todas las divisiones</option></select></label><label id="freeTakesFilterWrap">Mostrar<select id="freeTakesSportFilter"><option value="all">Todos los deportes</option><option value="general">General</option><option value="laliga">LaLiga</option><option value="premier">Premier League</option><option value="ligamx">Liga MX</option><option value="champions">Champions League</option><option value="nfl">NFL</option><option value="colegial">Fútbol colegial</option></select></label><label>Ordenar<select id="freeTakesSort"><option value="new">Más recientes</option><option value="top">Más apoyados</option></select></label></div>
@@ -2088,17 +2101,17 @@ updateThemeButton();
 <script src="assets/nfl-teams.js"></script>
 <script src="assets/community.js?v=ticker-only-20261015-5"></script>
 <script src="assets/champions.js?v=qa1-20261015-6"></script>
-<script src="assets/community-picks.js?v=20261015-8"></script>
+<script src="assets/community-picks.js?v=20261015-9"></script>
 <script src="assets/weekly-picks.js?v=20261015-1"></script>
 <script src="assets/username-auth.js?v=20261015-2"></script>
 <script src="assets/ae-category-visibility.js?v=20261015-3"></script>
 <script src="assets/ae-nfl-takes.js?v=20261015-3"></script>
-<script src="assets/free-takes.js?v=20261015-9"></script>
+<script src="assets/free-takes.js?v=20261015-10"></script>
 <script src="assets/ae-editorial-weekly.js?v=20261015-5"></script>
 <script src="assets/ae-profile.js?v=20261015-4"></script>
-<script src="assets/ae-home-takes.js?v=20261015-3"></script>
-<script src="assets/ae-sport-top-takes.js?v=20261015-4"></script>
-<script src="assets/ae-take-replies.js?v=20261015-1"></script>
+<script src="assets/ae-home-takes.js?v=20261015-4"></script>
+<script src="assets/ae-sport-top-takes.js?v=20261015-5"></script>
+<script src="assets/ae-take-replies.js?v=20261015-2"></script>
 <script src="assets/ae-picks-premium.js?v=20261015-1"></script>
 </body>
 </html>
