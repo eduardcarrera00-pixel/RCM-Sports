@@ -561,6 +561,9 @@ html:not(.dark) body #footballTakes #picksFeatured.ae-picks-feature:not(:has(.ae
   background:linear-gradient(120deg,#f7f2eb,#e8eee9)!important;
   border-color:#d6d9d1!important;
 }
+html:not(.dark) body #footballTakes #picksFeatured.ae-picks-feature:not(:has(.ae-weekly-banner))::before{
+  display:none!important;
+}
 html:not(.dark) body #footballTakes #picksFeatured.ae-picks-feature:not(:has(.ae-weekly-banner)) .ae-picks-feature-label h3,
 html:not(.dark) body #footballTakes #picksFeatured.ae-picks-feature:not(:has(.ae-weekly-banner)) .ae-weekly-title{
   color:#334b58!important;
