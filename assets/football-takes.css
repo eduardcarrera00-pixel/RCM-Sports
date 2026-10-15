@@ -1,0 +1,57 @@
+/* AE SPORTS · Takes: madera y azul marino editorial, sin bordes duros */
+#footballTakes[hidden],#takesAdmin[hidden]{display:none!important}
+.ae-takes{margin:0 0 30px;padding:24px 26px;border-radius:12px;color:#ebeff0;background:linear-gradient(145deg,#1e394a,#142a39 78%);box-shadow:0 12px 32px #0516242b}
+.ae-takes h2{font:600 clamp(25px,3vw,35px)/1.1 Georgia,serif;letter-spacing:-.025em;color:#f3e6d7;margin:2px 0 7px}
+.ae-takes h3{font:600 19px/1.28 Georgia,serif;color:#f6e9d9}
+.ae-takes-eyebrow,.ae-take-overline{color:#c9a381;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.11em}
+.ae-takes-head{margin:-24px -26px 18px;padding:19px 26px 18px;background:linear-gradient(90deg,#74503f,#976c50,#ae8060);border-radius:12px 12px 0 0}
+.ae-takes-head h2{color:#fff6ea}
+.ae-takes-head p{font-size:12px;color:#fae9da;margin:4px 0 0}
+.ae-takes-tabs{display:flex;flex-wrap:wrap;gap:7px;margin:11px 0 17px}
+.ae-takes-tabs button{border:0;border-radius:8px;padding:9px 12px;background:#ffffff0b;color:#d6dfe5;font:700 12px/1.2 system-ui,sans-serif;cursor:pointer;transition:background .15s}
+.ae-takes-tabs button[aria-pressed="true"]{background:#a4785a;color:#fff8f0}
+.ae-takes-tabs button:hover{background:#ffffff1d}
+.ae-takes-tabs button:focus-visible,.ae-take-button:focus-visible{outline:2px solid #f1b88e;outline-offset:3px}
+.ae-takes-meta{display:flex;gap:8px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.ae-takes-meta span{font:700 12px system-ui;color:#ddd2c6}
+.ae-takes-grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(250px,.8fr);gap:20px;align-items:start}
+.ae-take-card{padding:17px 18px;margin:0 0 12px;border-radius:10px;background:linear-gradient(130deg,#294557,#21394a);box-shadow:0 8px 19px #0c20302b}
+.ae-take-card h3{margin:7px 0 6px}
+.ae-take-info{margin:0 0 12px;color:#bfcad0;font-size:11px}
+.ae-take-choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}
+.ae-take-button{padding:10px 11px;border:1px solid #c3a88d30;border-radius:7px;background:#364c5b;color:#fff5e8;font:600 12px/1.3 system-ui;cursor:pointer;text-align:left}
+.ae-take-button:hover:not(:disabled){background:#936f55}
+.ae-take-button:disabled{opacity:.62;cursor:default}
+.ae-take-button.ae-take-selected{background:#79563f;opacity:1}
+.ae-take-button.ae-take-win{background:#245544;color:#c9ffdb;opacity:1}
+.ae-take-award{margin:12px 0 0;font-weight:700;font-size:12px;color:#c1e9c9}
+.ae-take-admin-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding-top:13px;margin-top:13px;border-top:1px solid #ffffff12}
+.ae-take-admin-actions select{min-width:160px}
+.ae-take-minor{padding:8px 11px;border:0;background:none;color:#e3b0a4;font-size:11px;cursor:pointer}
+.ae-takes-side{border-radius:10px;padding:16px;background:linear-gradient(150deg,#243d4d,#1b3040)}
+.ae-takes-side h3{margin:0 0 7px}
+.ae-take-leaderboard-list{list-style:none;margin:8px 0 0;padding:0}
+.ae-take-leaderboard-list li{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:8px;align-items:center;padding:11px 0;border-bottom:1px solid #ffffff12;font-size:12px}
+.ae-take-leaderboard-list li:last-child{border:0}
+.ae-take-number{color:#d4a783;font:700 14px Georgia,serif}
+.ae-take-name{overflow-wrap:anywhere}
+.ae-take-leaderboard-list strong{color:#f0ba8b;white-space:nowrap}
+.ae-take-empty{color:#d3d2cf;font-size:12px;line-height:1.55;padding:16px 0}
+.ae-takes-status{font-size:12px;color:#e7c69f;min-height:17px;margin:8px 0}
+.ae-takes-admin{margin-top:22px;border-radius:10px;background:#253f50;padding:18px}
+.ae-takes-admin summary{cursor:pointer;color:#eac09a;font-weight:700;font-size:13px}
+.ae-takes-admin form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px}
+.ae-takes-admin label{display:flex;flex-direction:column;gap:5px;font:600 12px system-ui;color:#e9dfd4}
+.ae-takes-admin input,.ae-takes-admin select,.ae-takes-admin textarea,.ae-take-admin-actions select{width:100%;border:1px solid #ffffff30;border-radius:7px;background:#172e3c;color:#fff;padding:10px;font:12px system-ui}
+.ae-takes-admin textarea{min-height:96px;resize:vertical}
+.ae-takes-admin .ae-full{grid-column:1/-1}
+.ae-takes-admin button[type=submit]{background:#946a50;border:0;color:#fff;border-radius:7px;padding:11px 18px;font-weight:700;cursor:pointer}
+html:not(.dark) .ae-takes{background:linear-gradient(145deg,#eae1d4,#e6e9e7);color:#273a44}
+html:not(.dark) .ae-take-card,html:not(.dark) .ae-takes-side,html:not(.dark) .ae-takes-admin{background:#e0e6e7;color:#283e4c}
+html:not(.dark) .ae-take-card h3,html:not(.dark) .ae-takes-side h3{color:#213948}
+html:not(.dark) .ae-take-info,html:not(.dark) .ae-take-empty{color:#52636e}
+html:not(.dark) .ae-takes-tabs button{color:#2a4350;background:#d2d4d1}
+html:not(.dark) .ae-takes-tabs button[aria-pressed=true]{background:#92694e;color:white}
+html:not(.dark) .ae-takes-meta span{color:#5a4940}
+html:not(.dark) .ae-takes-admin label{color:#274352}
+@media(max-width:720px){.ae-takes{padding:17px}.ae-takes-head{margin:-17px -17px 15px;padding:17px}.ae-takes-grid{grid-template-columns:1fr}.ae-takes-side{margin-top:4px}.ae-takes-admin form{grid-template-columns:1fr}.ae-take-choices{grid-template-columns:1fr 1fr}.ae-takes-tabs button{flex:1}}
