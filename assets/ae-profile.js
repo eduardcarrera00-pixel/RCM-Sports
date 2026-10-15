@@ -53,6 +53,7 @@ async function showOwn(){
  privateView=true;activeAuthor=user.id;const ticket=++request;
  const dialog=$('aeProfileDialog');if(!dialog.open)dialog.showModal();
  $('aeProfileTitle').textContent='Mis Takes';
+ $('aeProfileDialog').querySelector('.ae-profile-overview p').textContent='Consulta todas tus opiniones, incluidos los Takes que hayan sido ocultados por moderación.';
  $('aeProfileUsername').textContent='@'+(user.user_metadata?.username||user.user_metadata?.display_name||'Usuario');
  $('aeProfileStatus').textContent='Cargando tu historial…';$('aeProfileTakes').replaceChildren();
  const {data,error}=await db.rpc('ae_my_free_takes');
@@ -67,6 +68,7 @@ async function showPublic(id,push=true){
  privateView=false;activeAuthor=id;const ticket=++request;
  const dialog=$('aeProfileDialog');if(!dialog.open)dialog.showModal();
  $('aeProfileTitle').textContent='Perfil de aficionado';
+ $('aeProfileDialog').querySelector('.ae-profile-overview p').textContent='Historial público de Takes. Ningún usuario puede editar o borrar sus publicaciones; las personas pueden votarlas a favor o en contra.';
  $('aeProfileUsername').textContent='Takes publicados y votaciones';
  $('aeProfileStatus').textContent='Cargando historial público…';$('aeProfileTakes').replaceChildren();
  if(push){const u=new URL(location.href);u.searchParams.set('perfil',id);history.pushState({},'',u);}
