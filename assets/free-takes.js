@@ -29,6 +29,7 @@
        const b=button(label+' '+count,()=>vote(t,val,b));b.disabled=busy;b.setAttribute('aria-pressed',String(Number(t.my_vote)===val));row.append(b);
      }
      row.append(el('span','Balance '+(t.upvotes-t.downvotes),'ae-free-take-score'));
+     row.append(button('Comentar Take',()=>window.aeTakeReplies?.open(t),'ae-take-comment-button'));
      if(typeof currentAdmin!=='undefined'&&currentAdmin)row.append(button('Ocultar',async()=>{
        if(!confirm('¿Ocultar este Take?'))return;try{const r=await db.rpc('ae_hide_free_take',{p_take_id:t.id});if(r.error)throw r.error;await load();}catch(e){status(e.message||'No se pudo ocultar.');}
      },'ae-take-minor'));
