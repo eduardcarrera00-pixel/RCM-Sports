@@ -6,7 +6,7 @@
  const sports={laliga:'LaLiga',premier:'Premier League',ligamx:'Liga MX',champions:'Champions League',nfl:'NFL',colegial:'Fútbol colegial',general:'Deportes'};
  let sequence=0;
  async function session(){
-   if(!window.db)return null;
+   if(!(typeof db!=='undefined' && db))return null;
    const {data,error}=await db.auth.getUser();
    return error?null:data?.user||null;
  }
@@ -50,7 +50,7 @@
  window.closeAeProfile=close;
  document.addEventListener('DOMContentLoaded',()=>{
    updateButton();
-   if(window.db)db.auth.onAuthStateChange(()=>setTimeout(updateButton,120));
+   if((typeof db!=='undefined' && db))db.auth.onAuthStateChange(()=>setTimeout(updateButton,120));
    $('aeProfileDialog')?.addEventListener('click',e=>{if(e.target===$('aeProfileDialog'))close();});
    $('aeProfileDialog')?.addEventListener('close',()=>{++sequence;});
  });
