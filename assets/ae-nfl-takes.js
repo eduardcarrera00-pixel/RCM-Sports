@@ -8,33 +8,16 @@
  'NFC Este':['DAL','NYG','PHI','WAS'],'NFC Norte':['CHI','DET','GB','MIN'],
  'NFC Sur':['ATL','CAR','NO','TB'],'NFC Oeste':['ARI','LAR','SF','SEA']
  };
- const teams=()=>typeof NFL_TEAMS==='undefined'?[]:NFL_TEAMS;
- let active=false;
- function option(select,value,label) {
-   const o=document.createElement('option');o.value=value;o.textContent=label;select.append(o);
- }
- function fillTeams(){
-   const picker=$('aeNflTeam');if(!picker)return;
-   const wanted=$('aeNflDivision')?.value||'';
-   const previous=picker.value;picker.replaceChildren();option(picker,'','Toda la NFL');
-   for(const team of teams()) {
-     if(wanted&&!divisions[wanted].includes(team.id))continue;
-     option(picker,team.id,team.name);
-   }
-   picker.value=[...picker.options].some(o=>o.value===previous)?previous:'';
- }
  function init() {
    for(const key of ['aeNflDivision','aeNflFeedDivision']){
      const select=$(key);if(!select||select.options.length>1)continue;
      for(const division of Object.keys(divisions))option(select,division,division);
    }
-   fillTeams();
-   $('aeNflDivision')?.addEventListener('change',fillTeams);
    $('aeNflTitleSuggest')?.addEventListener('click',()=>{
      const form=$('freeTakesForm');if(!form||form.elements.title.value.trim())return;
      const div=$('aeNflDivision')?.value||'';
-     const team=teams().find(t=>t.id===$('aeNflTeam')?.value)?.name||'';
-     const topic=$('aeNflTopic')?.value||'';
+     const team=$('aeNflTeam')?.value.trim()||'';
+     const topic=$('aeNflTopic')?.value.trim()||'';
      const prefix={
        'Pronóstico':'Mi pronóstico sobre ','Debate':'Mi opinión sobre ',
        'Jugador':'El jugador clave de ','Playoffs':'¿Hasta dónde llegará ',
@@ -54,8 +37,7 @@
  function body(text){
    if(!active)return text;
    const div=$('aeNflDivision')?.value||'';
-   const code=$('aeNflTeam')?.value||'';
-   const team=teams().find(t=>t.id===code)?.name||'';
+   const team=$('aeNflTeam')?.value.trim()||'';
    const topic=$('aeNflTopic')?.value||'';
    // Everything remains part of the immutable historical Take text, including in public profiles.
    const context=['NFL',div,team,topic].filter(Boolean).join(' · ');
