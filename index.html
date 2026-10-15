@@ -311,6 +311,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/ae-home-compact-and-clean-logos.css?v=20261015-1">
 <link rel="stylesheet" href="assets/ae-day-mode.css?v=20261015-1">
 <link rel="stylesheet" href="assets/ae-community-participation.css?v=20261015-1">
+<link rel="stylesheet" href="assets/ae-editorial-day-v2.css?v=20261015-1">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 
@@ -466,16 +467,18 @@ html.dark [data-reading-size][aria-pressed="true"] {
           <div class="ae-picks-layout">
             <section class="ae-picks-feed" id="communityPicks" hidden aria-labelledby="cpTitle">
               <div class="ae-picks-feed-heading">
-                 <span>LA COMUNIDAD ELIGE</span>
+                 <div class="ae-picks-heading-cta-row">
+                   <span class="ae-picks-nudge">PREDECIR PARA LA COMUNIDAD</span>
+                   <button id="cpPublishCta" type="button" class="ae-participate-cta ae-picks-publish-cta" aria-controls="cpComposePanel" aria-expanded="false"><span aria-hidden="true">＋</span> Mi Pick</button>
+                 </div>
                  <h3 id="cpTitle" class="sr-only">Picks de la comunidad</h3>
-                 <button id="cpPublishCta" type="button" class="ae-participate-cta ae-picks-publish-cta" aria-controls="cpComposePanel" aria-expanded="false">＋ Subir mi Pick <span aria-hidden="true">→</span></button>
                  <p>Publica tu pronóstico y tu cuota americana. AE SPORTS revisará la cuota y la comunidad decidirá con sus votos.</p>
                </div>
               <div class="ae-recent-picks-heading"><span>PUBLICACIONES RECIENTES</span><h4>Últimos Picks</h4></div>
               <p id="cpStatus" role="status" aria-live="polite"></p>
               <div id="cpFeed" aria-live="polite"></div>
               <button id="cpMore" class="ae-take-button" type="button" hidden>Ver Picks anteriores</button>
-              <details class="ae-cp-compose" id="cpComposePanel"><summary>✍ Publicar mi Pick</summary><form id="cpForm"></form></details>
+              <details class="ae-cp-compose" id="cpComposePanel"><summary>Preparar mi Pick</summary><form id="cpForm"></form></details>
             </section>
             <aside class="ae-picks-rail">
 
@@ -581,10 +584,13 @@ html.dark [data-reading-size][aria-pressed="true"] {
             </section>
             <section id="aeHomeTopTakes" aria-labelledby="aeHomeTopTakesTitle">
               <div class="ae-top-takes-heading">
-                <div><span>LA COMUNIDAD DECIDE</span><h2 id="aeHomeTopTakesTitle">Los Takes de la comunidad</h2></div>
+                <div><h2 id="aeHomeTopTakesTitle">Takes de la comunidad</h2></div>
                 <div class="ae-top-takes-heading-side">
-                  <p id="aeTopTakesStatus" role="status" aria-live="polite">Cargando los Takes destacados…</p>
-                  <button id="aeHomeTakePublish" type="button" class="ae-participate-cta ae-home-take-publish" aria-expanded="false" aria-controls="aeHomeTakeChoice">✍ Publicar mi Take <span aria-hidden="true">→</span></button>
+                  <div class="ae-home-take-cta-line">
+                    <span class="ae-home-take-nudge">TÚ DECIDES <span aria-hidden="true">→</span></span>
+                    <button id="aeHomeTakePublish" type="button" class="ae-participate-cta ae-home-take-publish" aria-expanded="false" aria-controls="aeHomeTakeChoice">Publicar mi Take <span aria-hidden="true">→</span></button>
+                  </div>
+                  <p id="aeTopTakesStatus" class="sr-only" role="status" aria-live="polite">Cargando los Takes destacados…</p>
                   <div id="aeHomeTakeChoice" class="ae-home-take-choice" role="group" aria-label="Elige dónde publicar tu Take" hidden>
                     <button type="button" data-ae-take-sport="NFL">NFL</button>
                     <button type="button" data-ae-take-sport="Fútbol">Fútbol</button>
@@ -2101,7 +2107,7 @@ updateThemeButton();
 <script src="assets/nfl-teams.js"></script>
 <script src="assets/community.js?v=ticker-only-20261015-5"></script>
 <script src="assets/champions.js?v=qa1-20261015-6"></script>
-<script src="assets/community-picks.js?v=20261015-9"></script>
+<script src="assets/community-picks.js?v=20261015-10"></script>
 <script src="assets/weekly-picks.js?v=20261015-1"></script>
 <script src="assets/username-auth.js?v=20261015-2"></script>
 <script src="assets/ae-category-visibility.js?v=20261015-3"></script>
@@ -2109,7 +2115,7 @@ updateThemeButton();
 <script src="assets/free-takes.js?v=20261015-10"></script>
 <script src="assets/ae-editorial-weekly.js?v=20261015-5"></script>
 <script src="assets/ae-profile.js?v=20261015-4"></script>
-<script src="assets/ae-home-takes.js?v=20261015-4"></script>
+<script src="assets/ae-home-takes.js?v=20261015-5"></script>
 <script src="assets/ae-sport-top-takes.js?v=20261015-5"></script>
 <script src="assets/ae-take-replies.js?v=20261015-2"></script>
 <script src="assets/ae-picks-premium.js?v=20261015-1"></script>
