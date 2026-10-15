@@ -21,6 +21,8 @@
      content.append(el('span',names[t.sport]||'Fútbol','ae-top-take-sport'));
      const title=el('strong',t.title,'ae-sport-take-title');
      content.append(title);
+     const excerpt=String(t.body||'').replace(/^NFL[^\n]*\n\n/,'').trim();
+     if(excerpt)content.append(el('p',excerpt.length>145?excerpt.slice(0,142).trimEnd()+'…':excerpt,'ae-sport-take-summary'));
      const author=el('button','@'+(t.author||'Aficionado'),'ae-top-take-author');
      author.type='button';author.addEventListener('click',()=>{
        if(typeof openAePublicProfile==='function')openAePublicProfile(t.author_id);
@@ -29,6 +31,9 @@
      const score=el('span',undefined,'ae-top-take-votes');
      score.append(el('span','▲ '+Number(t.upvotes||0),'ae-top-take-up'),el('span','▼ '+Number(t.downvotes||0),'ae-top-take-down'));
      content.append(score);
+     const comment=el('button','Comentar Take','ae-take-discuss-link');
+     comment.type='button';comment.addEventListener('click',()=>window.aeTakeReplies?.open(t));
+     content.append(comment);
      li.append(content);list.append(li);
    }
    if(!items.length)list.append(el('li',mode==='up'?'Todavía no hay Takes con votos positivos.':'Todavía no hay Takes con votos negativos.','ae-top-takes-empty'));

@@ -20,6 +20,8 @@
     const content = element('div', undefined, 'ae-top-take-content');
     content.append(element('span', labels[t.sport] || 'Deportes', 'ae-top-take-sport'));
     content.append(element('h4', t.title, 'ae-top-take-title'));
+    const excerpt=String(t.body||'').replace(/^NFL[^\n]*\n\n/,'').trim();
+    if(excerpt)content.append(element('p',excerpt.length>160?excerpt.slice(0,157).trimEnd()+'…':excerpt,'ae-top-take-summary'));
     const author = element('button', '@' + (t.author || 'Comunidad'), 'ae-top-take-author');
     author.type = 'button';
     author.setAttribute('aria-label','Ver historial de Takes de ' + (t.author || 'este usuario'));
@@ -33,6 +35,9 @@
     const count = negative ? Number(t.downvotes || 0) : Number(t.upvotes || 0);
     stats.append(element('small',count === 1 ? '1 voto' : count + ' votos'));
     content.append(stats);
+    const discuss=element('button','Comentar Take','ae-take-discuss-link');
+    discuss.type='button';discuss.addEventListener('click',()=>window.aeTakeReplies?.open(t));
+    content.append(discuss);
     item.append(content);
     return item;
   }
