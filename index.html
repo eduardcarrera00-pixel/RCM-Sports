@@ -289,7 +289,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
 <link rel="stylesheet" href="assets/community.css?v=20261013-2">
 <link rel="stylesheet" href="assets/editorial.css?v=qa1-20261015-2">
-<link rel="stylesheet" href="assets/unified-editorial.css?v=20261015-5">
+<link rel="stylesheet" href="assets/unified-editorial.css?v=20261015-ticker-only">
 <link rel="stylesheet" href="assets/community-picks.css?v=1">
 <link rel="stylesheet" href="assets/username-auth.css?v=2">
 </head>
@@ -389,17 +389,16 @@ html.dark [data-reading-size][aria-pressed="true"] {
         <div id="articleMissing" class="rcm-panel hidden" role="alert"><p>No encontramos esta publicación. Puede que haya sido eliminada.</p><button type="button" onclick="closeModal()">Volver al inicio</button></div>
         <section id="nflRankings" class="rcm-panel hidden" aria-labelledby="rankingTitle">
             <div class="rcm-row"><h2 id="rankingTitle">NFL Power Rankings</h2><button id="rankingEditButton" class="hidden" onclick="openRankingEditor()">Editar ranking</button></div>
-            <p id="rankingEdition"></p><p id="rankingStatus" role="status">Cargando ranking…</p><p class="ae-trend-explanation" id="rankingTrendStatus" aria-live="polite"></p>
+            <p id="rankingEdition"></p><p id="rankingStatus" role="status">Cargando ranking…</p>
             <button id="rankingPause" class="hidden" onclick="toggleRankingMotion()" aria-pressed="false">Pausar movimiento</button>
             <div id="rankingViewport" class="rcm-ticker" aria-hidden="true"><div id="rankingTrack" class="rcm-track"></div></div>
-            <details id="rankingStatic" open><summary>Lista completa de los diez equipos</summary><ol id="rankingList" class="rcm-ranking-list"></ol></details>
+            <div id="rankingStatic" class="ae-ranking-accessible"><ol id="rankingList" class="rcm-ranking-list" aria-label="Top 10 NFL"></ol></div>
         </section>
         <section id="championsRankings" tabindex="0" class="rcm-panel ae-champions-full hidden" aria-labelledby="championsTitle">
             <div class="rcm-row"><h2 id="championsTitle">Champions League · Power Rankings</h2><span class="ae-edition" id="championsEdition"></span></div>
             <p id="championsStatus" role="status">Cargando clasificación publicada…</p>
             <div id="championsViewport" class="rcm-ticker ae-ranking-motion" aria-hidden="true" hidden><div id="championsTrack" class="rcm-track"></div></div>
-            <ol id="championsList" class="ae-full-ranking-list" aria-label="Top 10 Champions League"></ol>
-            <p class="ae-safety-note">Clasificación editorial de AE SPORTS, no una tabla oficial de resultados.</p>
+            <ol id="championsList" class="ae-full-ranking-list ae-ranking-accessible" aria-label="Top 10 Champions League"></ol>
         </section>
         <section id="communityPicks" hidden aria-labelledby="cpTitle">
           <h2 id="cpTitle">Picks de la comunidad</h2>
@@ -1276,8 +1275,6 @@ currentUser = {
 
         function openNflTopTen() {
             filterByCategory('NFL');
-            const full = document.getElementById('rankingStatic');
-            full.open = true;
             document.getElementById('nflRankings').scrollIntoView({block:'start', behavior:'instant'});
         }
         function openChampionsTopTen() {
@@ -1857,7 +1854,7 @@ function toggleDarkMode() {
 updateThemeButton();
     </script>
 <script src="assets/nfl-teams.js"></script>
-<script src="assets/community.js?v=20261015-4"></script>
+<script src="assets/community.js?v=ticker-only-20261015-4"></script>
 <script src="assets/champions.js?v=qa1-20261015-5"></script>
 <script src="assets/community-picks.js?v=1"></script>
 <script src="assets/weekly-picks.js?v=20261015-1"></script>

@@ -413,4 +413,11 @@ html.dark #loggedAdminContainer .ae-admin-profile span {color:#3e3129!important}
 @media(hover:hover){#championsViewport:hover #championsTrack {animation-play-state:paused}}
 @media(hover:none){#championsViewport:hover #championsTrack {animation-play-state:running}}
 #championsRankings:focus-within #championsTrack {animation-play-state:paused}
-@media(prefers-reduced-motion:reduce){#championsViewport {display:none!important}}
+
+
+/* A single visual carousel; canonical lists remain available to screen readers. */
+#rankingStatic.ae-ranking-accessible,#championsList.ae-ranking-accessible{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;clip-path:inset(50%)!important;white-space:nowrap!important;border:0!important}
+#rankingViewport,#championsViewport{overflow:hidden;scrollbar-width:none;-ms-overflow-style:none}
+#rankingViewport::-webkit-scrollbar,#championsViewport::-webkit-scrollbar{display:none;width:0;height:0}
+@media(hover:none){#rankingViewport:hover #rankingTrack{animation-play-state:running}}
+@media(prefers-reduced-motion:reduce){#rankingViewport,#championsViewport{overflow-x:auto}#rankingTrack,#championsTrack{animation:none!important;transform:none!important}}
