@@ -346,3 +346,20 @@ html:not(.dark) body #aeSportTakeLeaders .ae-top-take-author{
     overflow-x:auto!important;
   }
 }
+
+/* Ajustes puntuales: tarjetas de Últimas noticias con esquinas rectas.
+   No cambia la portada editorial principal ni los demás módulos. */
+html body #articlesGrid > article,
+html.dark body #articlesGrid > article,
+html body #articlesGrid > article > div:first-child,
+html body #articlesGrid > article .relative.h-48,
+html body #articlesGrid > article .relative.h-48 img {
+  border-radius:0!important;
+}
+html body #articlesGrid > article { overflow:hidden!important; }
+
+/* El título Power Rankings de Fútbol comparte el acento bronce de NFL. */
+#championsRankings .ae-rank-title-wrap h2 span,
+html.dark #championsRankings .ae-rank-title-wrap h2 span {
+  color:#efc8a7!important;
+}
