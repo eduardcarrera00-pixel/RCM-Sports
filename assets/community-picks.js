@@ -30,8 +30,8 @@ function card(p,compact=false){
  const legs=el('div',null,'cp-card-legs');
  for(const leg of p.legs||[]){
    const row=el('p');
-   row.append(el('span',String(leg.event||leg.sport||'Evento')));
-   if(leg.selection)row.append(el('strong',' · '+leg.selection));
+   row.append(el('span',String(leg.event||leg.sport||'Evento'),'cp-leg-event'));
+   if(leg.selection)row.append(el('strong',leg.selection,'cp-leg-selection'));
    legs.append(row);
  }
  n.append(legs);
