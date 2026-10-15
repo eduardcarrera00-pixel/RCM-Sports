@@ -65,3 +65,26 @@ html:not(.dark) #aeNflTakeOptions input::placeholder{color:#887766}
 html:not(.dark) #aeNflTakeOptions label small{color:#8e6040}
 html:not(.dark) .ae-top-take-summary,html:not(.dark) #aeSportTakeLeaders .ae-sport-take-summary{color:#5f554b}
 @media(max-width:630px){.ae-take-discussion{max-width:calc(100vw - 12px)}.ae-discussion-header{padding:17px}.ae-discussion-list{max-height:33vh}.ae-discussion-comment.ae-discussion-nested{margin-left:9px}.ae-top-take-summary{-webkit-line-clamp:2}}
+
+/* Editorial Pick: encabezado discreto y análisis bajo demanda en la sección Picks. */
+#footballTakes #picksFeatured.ae-picks-feature{min-height:0!important;box-shadow:0 6px 20px #06162215!important}
+#footballTakes #picksFeatured .ae-picks-feature-label{padding:19px clamp(18px,2.5vw,32px) 3px!important}
+#footballTakes #picksFeatured .ae-picks-feature-label span{font-size:9px!important}
+#footballTakes #picksFeatured .ae-picks-feature-label h3{font:600 clamp(23px,2.7vw,30px)/1.15 Newsreader,Georgia,serif!important;margin:6px 0 0!important}
+#footballTakes #picksFeaturedCard{padding:7px clamp(18px,2.5vw,32px) 19px!important}
+#footballTakes #picksFeaturedCard .ae-weekly-card{padding:0}
+#picksFeaturedCard .ae-weekly-expandable{border-top:1px solid #f5dcc42a;padding-top:9px}
+#picksFeaturedCard .ae-weekly-expand-summary{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:7px 15px;list-style:none;cursor:pointer}
+#picksFeaturedCard .ae-weekly-expand-summary::-webkit-details-marker{display:none}
+#picksFeaturedCard .ae-weekly-expand-summary .ae-weekly-title{font:600 clamp(17px,1.9vw,23px)/1.28 Newsreader,Georgia,serif!important;color:#f7e7d6;margin:0!important}
+#picksFeaturedCard .ae-weekly-compact-selection{grid-column:1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:#e2dbd4;font:400 12px/1.5 Inter,system-ui}
+#picksFeaturedCard .ae-weekly-expand-summary .ae-weekly-odds{grid-column:2;grid-row:1/3;white-space:nowrap;font-size:11px!important;padding:5px 8px}
+#picksFeaturedCard .ae-weekly-expand-hint{grid-column:1/-1;font:700 10px Inter,system-ui;color:#d6ab85;padding-top:4px}
+#picksFeaturedCard .ae-weekly-expandable[open] .ae-weekly-expand-hint{font-size:0}
+#picksFeaturedCard .ae-weekly-expandable[open] .ae-weekly-expand-hint:after{content:"Ocultar análisis ↑";font-size:10px}
+#picksFeaturedCard .ae-weekly-expanded-content{border-top:1px solid #e3c8aa24;margin-top:15px;padding-top:14px}
+#picksFeaturedCard .ae-weekly-expanded-content .ae-weekly-event{margin:0 0 8px;font-size:12px}
+#picksFeaturedCard .ae-weekly-expanded-content .ae-weekly-analysis{font-size:13px;line-height:1.65;margin:0 0 10px;white-space:pre-wrap}
+.editorial-pick #cpWeekly .ae-weekly-preview{cursor:pointer;border-radius:7px;outline-offset:5px}
+.editorial-pick #cpWeekly .ae-weekly-preview:hover .ae-weekly-link{text-decoration:underline}
+@media(max-width:550px){#footballTakes #picksFeaturedCard{padding:8px 18px 17px!important}#picksFeaturedCard .ae-weekly-expand-summary{grid-template-columns:minmax(0,1fr) auto;gap:5px 8px}}
