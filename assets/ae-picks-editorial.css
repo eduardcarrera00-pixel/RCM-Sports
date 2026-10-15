@@ -1,0 +1,104 @@
+/* AE SPORTS · Editorial Picks / sport-level Takes / warm walnut Voices
+ * Scope deliberately excludes the already-approved Pick de la Semana and Lo más leído widgets.
+ */
+#footballTakes[hidden],#freeTakes[hidden],#communityPicks[hidden],.editorial-layout[hidden],#heroSection[hidden]{display:none!important}
+#aeMoreNews[hidden]{display:none!important}
+.ae-picks-editorial{
+  background:linear-gradient(155deg,#1b3446,#142a3a 73%)!important;
+  border:1px solid rgba(204,180,150,.12)!important;
+  border-radius:14px!important;
+  padding:0 0 24px!important;
+  overflow:hidden;
+  box-shadow:0 16px 38px #071c2b29;
+  color:#f5e8db!important;
+}
+.ae-picks-editorial>.ae-takes-head{
+  margin:0!important;
+  padding:24px clamp(18px,3vw,33px) 21px!important;
+  border-radius:14px 14px 0 0!important;
+  background:linear-gradient(110deg,#553a30,#825942 57%,#a27454)!important;
+}
+.ae-picks-editorial>.ae-takes-head h2{font-size:clamp(28px,3.2vw,39px)!important;letter-spacing:-.025em;color:#fff7eb!important}
+.ae-picks-editorial>.ae-takes-head p{color:#f6e1cf!important;font-size:13px!important}
+.ae-picks-feature{margin:22px clamp(15px,2.9vw,29px);padding:0;border-radius:13px;overflow:hidden;background:radial-gradient(circle at 88% 0%,rgba(170,116,75,.23),transparent 50%),linear-gradient(135deg,#2b4556,#203849 70%);border:1px solid rgba(209,180,149,.20);box-shadow:0 12px 28px #04121d34}
+.ae-picks-feature-label{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;padding:17px 22px 11px}
+.ae-picks-feature-label span,.ae-picks-feed-heading span,.ae-picks-rail-heading span{color:#d4a983;letter-spacing:.12em;font:800 10px/1.4 system-ui,sans-serif}
+.ae-picks-feature-label h3{font:600 clamp(23px,2.5vw,33px)/1.18 Georgia,serif!important;color:#fff4e7!important;margin:0!important}
+#aePicksFeature,#picksFeaturedCard{min-width:0}
+#picksFeaturedCard>.ae-take-card{border:0;background:transparent!important;margin:0!important;padding:8px 22px 22px!important;box-shadow:none!important}
+#picksFeaturedCard .ae-take-card h3{font:600 clamp(22px,2.6vw,34px)/1.22 Georgia,serif!important;margin:8px 0 12px!important;color:#fff1e3!important;max-width:940px}
+#picksFeaturedCard .ae-take-choices{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+#picksFeaturedCard .ae-take-button{background:rgba(14,35,50,.7)!important;border:1px solid rgba(209,175,144,.35)!important;color:#fff2e4!important;min-height:47px;border-radius:8px!important;font-size:13px!important}
+#picksFeaturedCard .ae-take-button:hover:not(:disabled){background:#875e48!important}
+#picksFeaturedCard .ae-take-button.ae-take-selected{background:#805942!important}
+#picksFeaturedCard .ae-take-button.ae-take-win{background:#235544!important}
+.ae-picks-layout{display:grid;grid-template-columns:minmax(0,1.74fr) minmax(270px,.86fr);gap:22px;padding:2px clamp(15px,2.9vw,29px) 0;align-items:start}
+.ae-picks-feed{min-width:0}
+.ae-picks-feed-heading{padding:0 0 12px;border-bottom:1px solid rgba(212,183,152,.17);margin-bottom:14px}
+.ae-picks-feed-heading h3{font:600 clamp(23px,2.4vw,30px)/1.2 Georgia,serif!important;margin:4px 0 5px!important;color:#f8e9d9!important}
+.ae-picks-feed-heading p{font-size:12px;color:#c6d2d9;margin:0}
+.ae-picks-feed .ae-takes-tabs{margin:12px 0!important;gap:6px}
+.ae-picks-feed .ae-takes-tabs button{border-radius:7px!important}
+.ae-picks-feed .ae-take-card{border:1px solid rgba(209,180,146,.12);box-shadow:0 8px 20px rgba(0,0,0,.08)}
+.ae-picks-rail{display:grid;gap:17px;min-width:0}
+.ae-picks-top-three,.ae-picks-rail .ae-takes-side{background:linear-gradient(160deg,#263f4f,#1d3444)!important;border:1px solid rgba(205,174,143,.15)!important;border-radius:11px;padding:18px!important;min-width:0}
+.ae-picks-rail-heading{border-bottom:1px solid rgba(208,175,148,.17);padding-bottom:12px;margin-bottom:10px}
+.ae-picks-rail h3{font:600 clamp(20px,1.9vw,25px)/1.16 Georgia,serif!important;color:#f8e9da!important;margin:4px 0 6px!important}
+.ae-picks-rail-heading p{color:#bfcbd2;font:400 12px/1.5 system-ui;margin:0}
+#picksPopular{list-style:none;padding:0;margin:0}
+#picksPopular li{display:grid;grid-template-columns:24px minmax(0,1fr);gap:10px;align-items:start;padding:13px 0;border-bottom:1px solid rgba(204,183,153,.12)}
+#picksPopular li:last-child{border-bottom:0;padding-bottom:2px}
+#picksPopular .ae-popular-position{font:600 22px Georgia,serif;color:#d9aa83}
+#picksPopular .ae-popular-copy{display:grid;gap:4px;overflow-wrap:anywhere}
+#picksPopular .ae-popular-copy small{font:700 10px system-ui;letter-spacing:.055em;color:#c0a48c}
+#picksPopular .ae-popular-copy strong{font:600 15px/1.3 Georgia,serif;color:#fff0e2}
+#picksPopular .ae-popular-copy span{font:400 11px/1.45 system-ui;color:#c0ced6}
+#picksPopular .ae-popular-votes{grid-column:2;font:700 11px system-ui;color:#e5b78e}
+.ae-picks-rail .ae-takes-side h3{margin-bottom:9px!important}
+.ae-picks-editorial>.ae-takes-admin{margin:23px clamp(15px,2.9vw,29px) 0!important}
+.ae-picks-editorial .ae-takes-admin summary{color:#efd0b4!important}
+.ae-picks-editorial .ae-take-leaderboard-list li{gap:8px}
+.ae-free-takes{clear:both;margin-top:32px!important}
+.ae-free-takes .ae-takes-head h2{color:#fff6eb!important}
+.ae-free-compose label[hidden],.ae-free-controls label[hidden]{display:none!important}
+.ae-free-take-card{background:linear-gradient(150deg,#294456,#1f3647)!important}
+.ae-free-take-card h3{color:#fff1e3!important}
+.ae-free-archive[hidden],.cp-legacy-compose[hidden]{display:none!important}
+/* Keep the existing Top 5 untouched; improve only the Voices color hierarchy. */
+.editorial-community,.editorial-community.rcm-panel{
+  background:linear-gradient(160deg,#fbf6f0,#f0e5d9)!important;
+  border:1px solid rgba(133,90,62,.14)!important;
+  box-shadow:0 11px 27px rgba(25,24,27,.12)!important;
+}
+html.dark .editorial-community,html.dark .editorial-community.rcm-panel{
+  background:linear-gradient(155deg,#223a48,#172d3e 83%)!important;
+  border:1px solid rgba(183,150,116,.13)!important;
+}
+.editorial-community .ae-section-heading,html.dark .editorial-community .ae-section-heading{
+  background:linear-gradient(110deg,#54382e 0%,#74503d 53%,#906547 100%)!important;
+  border:0!important;
+  padding:13px 19px 14px!important;
+  margin:0!important;
+}
+.editorial-community .ae-section-heading h2,html.dark .editorial-community .ae-section-heading h2{
+  color:#fff5e7!important;
+  font:600 clamp(20px,1.95vw,26px)/1.15 Georgia,serif!important;
+  margin:3px 0 0!important;
+  text-shadow:none!important
+}
+.editorial-community .ae-section-heading .ae-overline,html.dark .editorial-community .ae-section-heading .ae-overline{
+  color:#ebcaa8!important;font-size:9px!important;letter-spacing:.13em!important
+}
+html.dark .editorial-community .rcm-leader blockquote{color:#eadfd2!important}
+html.dark .editorial-community .rcm-leader strong{color:#d7ad88!important}
+@media(max-width:910px){.ae-picks-layout{grid-template-columns:minmax(0,1fr)}.ae-picks-rail{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:610px){
+ .ae-picks-editorial>.ae-takes-head{padding:19px 17px!important}
+ .ae-picks-feature{margin:14px}
+ .ae-picks-feature-label{padding:16px 15px 8px}
+ #picksFeaturedCard>.ae-take-card{padding:6px 15px 17px!important}
+ .ae-picks-layout{padding:0 14px;gap:14px}
+ .ae-picks-rail{grid-template-columns:minmax(0,1fr)}
+ #picksFeaturedCard .ae-take-choices{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .ae-picks-editorial>.ae-takes-admin{margin:15px 14px 0!important}
+}
