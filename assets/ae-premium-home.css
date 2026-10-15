@@ -291,3 +291,60 @@ html.dark .editorial-community .ae-section-heading p,html.dark .editorial-trendi
   font-size:10px!important;
 }
 .editorial-community .rcm-leader-link {padding:2px!important}
+
+
+/* Top 5 de lecturas reales, inmediatamente debajo de Las voces */
+.editorial-trending[hidden]{display:none!important}
+.editorial-trending .ae-trending-list {
+  display:block!important;margin:0!important;padding:6px 16px 9px!important;list-style:none!important;
+}
+.ae-trending-item {
+  display:grid;grid-template-columns:22px minmax(0,1fr) auto;
+  align-items:center;gap:9px;padding:10px 0;
+  border-bottom:1px solid rgba(127,93,71,.11);
+}
+.ae-trending-item:last-child{border-bottom:0}
+.ae-trending-rank{color:var(--ae-wood)!important;font:700 17px/1 var(--ae-serif)!important}
+.editorial-trending .ae-trending-link,
+html.dark .editorial-trending .ae-trending-link {
+  display:grid;gap:3px;text-align:left!important;
+  border:0!important;border-radius:4px!important;
+  background:transparent!important;padding:2px!important;cursor:pointer;
+  color:var(--ae-ink)!important;
+}
+.editorial-trending .ae-trending-link:hover .ae-trending-title{color:var(--ae-action)!important}
+.editorial-trending .ae-trending-link:focus-visible{outline:2px solid var(--ae-bronze)!important}
+.ae-trending-category {
+  font:700 9px/1.2 var(--ae-sans)!important;letter-spacing:.12em;
+  color:var(--ae-wood)!important;text-transform:uppercase;
+}
+.ae-trending-title {
+  font:600 15px/1.2 var(--ae-serif)!important;color:var(--ae-ink)!important;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.ae-trending-meta {
+  color:var(--ae-muted)!important;font:600 11px var(--ae-sans)!important;white-space:nowrap;
+}
+.ae-trending-meta .fa-eye {color:var(--ae-wood)!important}
+.ae-trending-empty {padding:14px 0;font:400 12px/1.5 var(--ae-sans);color:var(--ae-muted)}
+
+/* Movimiento: contraste independiente del tema en portada y ambas bandas completas. */
+.ae-ranking-card-link .ae-rank-trend,#rankingTrack .ae-rank-trend,
+#championsTrack .ae-rank-trend,#rankingList .ae-rank-trend,#championsList .ae-rank-trend {
+  display:inline-flex!important;justify-self:end!important;align-items:center;justify-content:center;
+  min-width:27px!important;white-space:nowrap!important;
+  font:800 11px/1 var(--ae-sans)!important;padding:6px 5px!important;border-radius:5px!important;
+}
+.ae-rank-trend.ae-rank-up{background:#dff0e2!important;color:#216a43!important}
+.ae-rank-trend.ae-rank-down{background:#f8e5e3!important;color:#a73439!important}
+.ae-rank-trend.ae-rank-flat{background:#e7edf0!important;color:#607080!important}
+.ae-rank-trend.ae-rank-new{background:#f5e8d6!important;color:#915a37!important}
+html.dark .ae-rank-trend.ae-rank-up{background:#193f35!important;color:#86e1ad!important}
+html.dark .ae-rank-trend.ae-rank-down{background:#452c36!important;color:#ffa098!important}
+html.dark .ae-rank-trend.ae-rank-flat{background:#294151!important;color:#c5d5dc!important}
+html.dark .ae-rank-trend.ae-rank-new{background:#514132!important;color:#efc39f!important}
+@media(max-width:620px){
+  .editorial-trending .ae-trending-list{padding:6px 12px!important}
+  .ae-trending-title{font-size:14px!important}
+  .ae-trending-item{grid-template-columns:19px minmax(0,1fr) auto;gap:7px}
+}
