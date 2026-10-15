@@ -50,7 +50,8 @@
   function paint(data) {
     const positive = $('aeTopTakesPositive'), negative = $('aeTopTakesNegative');
     if (!positive || !negative) return;
-    const takes = Array.isArray(data) ? data : [];
+    const eligibleSports = new Set(['nfl','laliga','premier','ligamx','champions']);
+    const takes = (Array.isArray(data) ? data : []).filter(t=>eligibleSports.has(t.sport));
     const up = takes.filter(t => Number(t.upvotes) > 0)
       .sort((a,b)=>Number(b.upvotes)-Number(a.upvotes) || Number(a.downvotes)-Number(b.downvotes) || new Date(b.created_at)-new Date(a.created_at)).slice(0,3);
     const down = takes.filter(t => Number(t.downvotes) > 0)
