@@ -1,0 +1,67 @@
+/* AE SPORTS · Takes primero, participación después, picks breves y conversación. */
+#aeTakeComposePanel{margin-top:18px;border:1px solid #b9987980;border-radius:12px;overflow:hidden;background:linear-gradient(130deg,#1e3545,#253f4e)}
+#aeTakeComposePanel>summary{list-style:none;cursor:pointer;padding:17px 20px;font:700 13px Inter,system-ui;color:#f4e5d7}
+#aeTakeComposePanel>summary::-webkit-details-marker{display:none}
+#aeTakeComposePanel>summary:after{content:"+";float:right;font-size:19px;color:#e1b18c}
+#aeTakeComposePanel[open]>summary:after{content:"−"}
+#aeTakeComposePanel .ae-free-compose{padding:15px 18px 20px;margin:0!important;border:0!important;box-shadow:none!important;background:transparent!important}
+#ae-free-empty-intro{font-size:13px}
+#aeNflTakeOptions input{display:block;width:100%;min-height:45px;margin-top:8px;padding:11px 10px;background:#142f41;color:#fff5eb;border:1px solid #aa8a6e66;border-radius:7px;font:400 13px Inter,system-ui}
+#aeNflTakeOptions input::placeholder{color:#b8bbb9}
+#aeNflTakeOptions .ae-nfl-fields{align-items:start!important}
+#aeNflTakeOptions label{font:600 12px Inter,system-ui}
+#aeNflTakeOptions label small{color:#d5b99e;font-weight:500}
+.ae-take-comment-button,.ae-take-discuss-link{border:1px solid #c2987480;border-radius:7px;background:#795842;color:#fff6ec;cursor:pointer;font:700 11px Inter,system-ui;padding:9px 12px;transition:background .2s}
+.ae-take-comment-button:hover,.ae-take-discuss-link:hover{background:#936b4e}
+.ae-top-take-summary{font:400 12px/1.45 Inter,system-ui;color:#d6d0c9;margin:6px 0!important;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.ae-top-take-content .ae-take-discuss-link{margin-top:9px}
+#aeSportTakeLeaders .ae-sport-take-summary{font:400 12px/1.5 Inter,system-ui;color:#d9d0c6;margin:5px 0!important;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+#aeSportTakeLeaders .ae-take-discuss-link{margin-top:8px}
+.editorial-pick{min-height:0!important}
+.editorial-pick .editorial-pick-body{padding:12px 18px 17px!important}
+.editorial-pick #cpWeekly .ae-weekly-preview{display:flex;flex-direction:column;gap:7px;margin:0;padding:0}
+.editorial-pick #cpWeekly .ae-weekly-kicker{display:none}
+.editorial-pick #cpWeekly .ae-weekly-title{font:600 16px/1.28 Newsreader,Georgia,serif!important;margin:0!important}
+.editorial-pick #cpWeekly .ae-weekly-event{font:500 11px/1.4 Inter,system-ui;margin:0!important}
+.editorial-pick #cpWeekly .ae-weekly-selection{margin:2px 0 4px}
+.editorial-pick #cpWeekly .ae-weekly-selection strong{font:600 12px/1.42 Inter,system-ui}
+.editorial-pick #cpWeekly .ae-weekly-odds{font-size:10px!important;padding:4px 7px}
+.editorial-pick #cpWeekly .ae-weekly-link{align-self:flex-start;margin:4px 0 0!important;padding:7px 11px!important;font-size:11px}
+.editorial-pick #cpWeekly .ae-weekly-analysis,.editorial-pick #cpWeekly .ae-weekly-disclaimer{display:none!important}
+.ae-take-discussion{border:1px solid #b9987b80;border-radius:16px;padding:0!important;max-width:min(650px,calc(100vw - 20px));width:100%;max-height:90vh;color:#f9ede0;background:#182f3f;box-shadow:0 30px 80px #0008}
+.ae-take-discussion::backdrop{background:rgba(10,20,28,.8);backdrop-filter:blur(3px)}
+.ae-take-discussion-inner{padding:0 0 20px;max-height:88vh;overflow-y:auto}
+.ae-discussion-header{display:flex;align-items:start;justify-content:space-between;gap:15px;padding:22px 23px 18px;background:linear-gradient(110deg,#664936,#80563e)}
+.ae-discussion-header span{font:800 10px Inter,system-ui;letter-spacing:.14em;color:#ffe2bd}
+.ae-discussion-header h2{font:600 27px/1.2 Newsreader,Georgia,serif;margin:5px 0 0;color:#fff5e8}
+.ae-discussion-header button{border:0;background:transparent;color:white;font-size:22px;cursor:pointer}
+.ae-discussion-subject{padding:18px 22px;border-bottom:1px solid #dfb68c31}
+.ae-discussion-subject strong{display:block;font:600 19px/1.3 Newsreader,Georgia,serif;color:#f9e8d8}
+.ae-discussion-subject p{font:400 13px/1.55 Inter,system-ui;color:#d8d1cb;white-space:pre-wrap;overflow-wrap:anywhere;margin:9px 0 0}
+.ae-discussion-counter{font:600 18px Newsreader,Georgia,serif;margin:19px 22px 9px;color:#eac09d}
+#aeDiscussionStatus{font-size:12px;color:#e7b5a6;margin:5px 22px}
+#aeDiscussionStatus:empty{display:none}
+.ae-discussion-list{margin:0 22px 17px;max-height:40vh;overflow-y:auto}
+.ae-discussion-comment{padding:14px 0;border-bottom:1px solid #ffffff19}
+.ae-discussion-comment.ae-discussion-nested{margin:11px 0 0 20px;padding:12px;border:1px solid #ffffff19;border-left:3px solid #b48b69;border-radius:7px;background:#ffffff08}
+.ae-discussion-meta{display:flex;justify-content:space-between;gap:10px;color:#d9b393;font:600 11px Inter,system-ui}
+.ae-discussion-meta time{color:#b3b9bb;font-weight:400}
+.ae-discussion-text{font:400 13px/1.55 Inter,system-ui;color:#f1e4d8;margin:9px 0;white-space:pre-wrap;overflow-wrap:anywhere}
+.ae-discussion-actions{display:flex;gap:12px}
+.ae-discussion-actions button,.ae-discussion-reply-target button{border:0;padding:0;background:transparent;color:#d8ab89;text-decoration:underline;cursor:pointer;font:600 11px Inter,system-ui}
+.ae-discussion-actions .ae-discussion-hide{color:#e49b9b}
+.ae-discussion-empty{color:#c4cbd1;font:400 12px Inter,system-ui;padding:10px 0}
+.ae-discussion-reply-target{display:flex;justify-content:space-between;gap:10px;margin:0 22px 12px;padding:11px 12px;border-radius:7px;background:#a8784b30;color:#eed3b7;font-size:12px}
+.ae-discussion-reply-target[hidden]{display:none}
+#aeDiscussionForm{display:flex;flex-direction:column;gap:9px;margin:0 22px}
+#aeDiscussionForm label{font:700 12px Inter,system-ui;color:#f6e4d4}
+#aeDiscussionText{display:block;width:100%;resize:vertical;min-height:90px;border:1px solid #c4a28385;background:#0e2635;color:#fff4e8;border-radius:8px;padding:12px;font:400 13px Inter,system-ui}
+#aeDiscussionSubmit{align-self:flex-end;background:#9b7052;color:white;border:0;border-radius:7px;padding:10px 15px;cursor:pointer;font:700 12px Inter,system-ui}
+#aeDiscussionSubmit:disabled{opacity:.5;cursor:wait}
+html:not(.dark) #aeTakeComposePanel{background:#f3e8da;border-color:#d6bd9f}
+html:not(.dark) #aeTakeComposePanel>summary{color:#563c2c}
+html:not(.dark) #aeNflTakeOptions input{background:#fdf9f2;color:#3b2d22;border-color:#bda68d}
+html:not(.dark) #aeNflTakeOptions input::placeholder{color:#887766}
+html:not(.dark) #aeNflTakeOptions label small{color:#8e6040}
+html:not(.dark) .ae-top-take-summary,html:not(.dark) #aeSportTakeLeaders .ae-sport-take-summary{color:#5f554b}
+@media(max-width:630px){.ae-take-discussion{max-width:calc(100vw - 12px)}.ae-discussion-header{padding:17px}.ae-discussion-list{max-height:33vh}.ae-discussion-comment.ae-discussion-nested{margin-left:9px}.ae-top-take-summary{-webkit-line-clamp:2}}
