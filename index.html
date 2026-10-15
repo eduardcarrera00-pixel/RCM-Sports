@@ -1428,6 +1428,7 @@ currentUser = {
 
         // Counts real article opens rather than inferring popularity from likes.
         let articleViewsRequest = 0;
+        const pendingArticleReads = new Set();
         async function loadArticleViews() {
             if (!db) return;
             const request = ++articleViewsRequest;
@@ -1447,11 +1448,12 @@ currentUser = {
 
         // At most one counted open per article per browser every 24 hours.
         async function recordArticleRead(article) {
-            if (!db || !article?.remote) return;
+            if (!db || !article?.remote || pendingArticleReads.has(String(article.id))) return;
             const key = 'ae_article_read_24h_' + article.id;
             let lastViewed = 0;
             try { lastViewed = Number(localStorage.getItem(key)) || 0; } catch {}
             if (Date.now() - lastViewed < 86400000) return;
+            pendingArticleReads.add(String(article.id));
             try {
                 const {data, error} = await db.rpc('ae_record_article_view', {p_article_id: article.id});
                 if (error) throw error;
@@ -1461,7 +1463,7 @@ currentUser = {
                 renderTrending();
             } catch (error) {
                 console.warn('No se pudo registrar la lectura:', error.message);
-            }
+            } finally { pendingArticleReads.delete(String(article.id)); }
         }
 
         function renderTrending() {
