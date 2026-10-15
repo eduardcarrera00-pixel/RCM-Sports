@@ -10,9 +10,8 @@
         savedTheme = localStorage.getItem('rcm_sports_theme');
     } catch {}
 
-    const useDarkMode = savedTheme === 'dark' ||
-        (savedTheme !== 'light' &&
-         window.matchMedia('(prefers-color-scheme: dark)').matches);
+    // La estética editorial nocturna es el punto de partida; respetamos la elección guardada.
+    const useDarkMode = savedTheme !== 'light';
 
     document.documentElement.classList.toggle('dark', useDarkMode);
 </script>
@@ -292,6 +291,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/unified-editorial.css?v=20261015-ticker-only">
 <link rel="stylesheet" href="assets/community-picks.css?v=1">
 <link rel="stylesheet" href="assets/username-auth.css?v=2">
+<link rel="stylesheet" href="assets/ae-premium-home.css?v=20261015-2">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 
@@ -447,6 +447,25 @@ html.dark [data-reading-size][aria-pressed="true"] {
                     <button onclick="resetFilters()" class="mt-4 px-5 py-2 bg-pitch-600 text-white text-xs font-bold rounded-xl hover:bg-pitch-700">Ver todas las noticias</button>
                 </div>
 
+                <div id="editorialBottom" class="editorial-bottom">
+            <section class="rcm-panel editorial-ranking" aria-labelledby="homeRankingTitle">
+                <a href="#nflRankings" id="homeRankingLink" class="ae-ranking-card-link" onclick="event.preventDefault(); openNflTopTen();" aria-label="Abrir clasificación completa NFL Power Rankings, Top 10">
+                    <div class="editorial-module-heading"><h2 id="homeRankingTitle">NFL Power Rankings <span id="homeRankingEdition"></span></h2><span class="ae-ranking-link-arrow" aria-hidden="true">↗</span></div>
+                    <p id="homeRankingStatus" role="status">Cargando ranking…</p>
+                    <ol id="homeRankingList" class="editorial-ranking-list"></ol>
+                    <span class="ae-ranking-hint">Selecciona para ver el Top 10 <span aria-hidden="true">→</span></span>
+                </a>
+            </section>
+            <section class="rcm-panel editorial-ranking" aria-labelledby="homeChampionsTitle">
+                <a href="#championsRankings" id="homeChampionsLink" class="ae-ranking-card-link" onclick="event.preventDefault(); openChampionsTopTen();" aria-label="Abrir clasificación completa Champions League, Top 10">
+                    <div class="editorial-module-heading"><h2 id="homeChampionsTitle">Champions League <span id="homeChampionsEdition"></span></h2><span class="ae-ranking-link-arrow" aria-hidden="true">↗</span></div>
+                    <p id="homeChampionsStatus" role="status">Comprobando ediciones publicadas…</p>
+                    <ol id="homeChampionsList" class="editorial-ranking-list"></ol>
+                    <span class="ae-ranking-hint">Selecciona para ver el Top 10 <span aria-hidden="true">→</span></span>
+                </a>
+            </section>
+        </div>
+
             </div>
 
             <aside class="lg:col-span-4 space-y-8">
@@ -523,25 +542,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 
             </aside>
         </div>
-        <div id="editorialBottom" class="editorial-bottom">
-            <section class="rcm-panel editorial-ranking" aria-labelledby="homeRankingTitle">
-                <a href="#nflRankings" id="homeRankingLink" class="ae-ranking-card-link" onclick="event.preventDefault(); openNflTopTen();" aria-label="Abrir clasificación completa NFL Power Rankings, Top 10">
-                    <div class="editorial-module-heading"><h2 id="homeRankingTitle">NFL Power Rankings <span id="homeRankingEdition"></span></h2><span class="ae-ranking-link-arrow" aria-hidden="true">↗</span></div>
-                    <p id="homeRankingStatus" role="status">Cargando ranking…</p>
-                    <ol id="homeRankingList" class="editorial-ranking-list"></ol>
-                    <span class="ae-ranking-hint">Selecciona para ver el Top 10 <span aria-hidden="true">→</span></span>
-                </a>
-            </section>
-            <section class="rcm-panel editorial-ranking" aria-labelledby="homeChampionsTitle">
-                <a href="#championsRankings" id="homeChampionsLink" class="ae-ranking-card-link" onclick="event.preventDefault(); openChampionsTopTen();" aria-label="Abrir clasificación completa Champions League, Top 10">
-                    <div class="editorial-module-heading"><h2 id="homeChampionsTitle">Champions League <span id="homeChampionsEdition"></span></h2><span class="ae-ranking-link-arrow" aria-hidden="true">↗</span></div>
-                    <p id="homeChampionsStatus" role="status">Comprobando ediciones publicadas…</p>
-                    <ol id="homeChampionsList" class="editorial-ranking-list"></ol>
-                    <span class="ae-ranking-hint">Selecciona para ver el Top 10 <span aria-hidden="true">→</span></span>
-                </a>
-            </section>
-        </div>
-        <section id="aeMoreNews" class="ae-more-news" hidden aria-labelledby="aeMoreNewsTitle">
+                <section id="aeMoreNews" class="ae-more-news" hidden aria-labelledby="aeMoreNewsTitle">
             <div class="ae-more-heading"><h2 id="aeMoreNewsTitle">Más noticias</h2><span>Historias de AE SPORTS</span></div>
             <div id="moreArticlesGrid" class="ae-more-grid"></div>
         </section>
@@ -1303,8 +1304,9 @@ currentUser = {
             const noResults = document.getElementById('noResults');
             const articlesCount = document.getElementById('articlesCount');
 
-            articlesCount.innerText = `${filtered.length} ${filtered.length === 1 ? 'noticia' : 'noticias'}`;
             const isHome = currentCategory === 'Todos' && !currentSearchQuery;
+            const visibleCount = isHome ? Math.min(3, filtered.length) : filtered.length;
+            articlesCount.innerText = `${visibleCount} ${visibleCount === 1 ? 'noticia' : 'noticias'}`;
             const moreNews = document.getElementById('aeMoreNews');
             const moreArticlesGrid = document.getElementById('moreArticlesGrid');
             moreNews.hidden = true;
@@ -1324,7 +1326,7 @@ currentUser = {
             articlesGrid.classList.remove('hidden');
 
             let heroArticle = filtered[0];
-            let gridArticles = filtered;
+            let gridArticles = isHome ? filtered.slice(0, 3) : filtered;
 
             if (currentCategory !== 'Todos' || currentSearchQuery !== '') {
                 heroSection.classList.add('hidden');
@@ -1383,11 +1385,7 @@ currentUser = {
                     </div>
                 </article>
             `).join('');
-            // Keep the editorial cover compact and showcase rankings sooner. All articles remain available below.
-            if (isHome && articlesGrid.children.length > 3) {
-                moreArticlesGrid.replaceChildren(...Array.from(articlesGrid.children).slice(3));
-                moreNews.hidden = false;
-            }
+            // Portada: exactamente tres noticias recientes. El resto permanece en cada deporte.
         }
 
         function renderHeroCard(hero) {
@@ -1396,8 +1394,7 @@ currentUser = {
                 <div class="editorial-hero">
                     <img class="editorial-hero-image" src="${escapeHTML(safeImageURL(hero.image))}" alt="" onerror="this.hidden=true">
                     <div class="editorial-hero-copy">
-                        <p class="editorial-eyebrow">AE SPORTS <span> / </span> EN PORTADA <span> / </span> ${escapeHTML(hero.category)}</p>
-                        <h1>${escapeHTML(hero.title)}</h1>
+                                                <h1>${escapeHTML(hero.title)}</h1>
                         <p>${escapeHTML(hero.summary || 'La historia completa, desde otra perspectiva.')}</p>
                         <div class="editorial-actions"><button type="button" class="editorial-featured" onclick="openArticleModal(${articleIdArgument(hero.id)})">Leer la historia <span class="ae-action-title">· ${escapeHTML(hero.title)}</span><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></button><button type="button" class="ae-quiet-cta" onclick="filterByCategory('Picks')">Explorar Picks →</button></div>
                     </div>
