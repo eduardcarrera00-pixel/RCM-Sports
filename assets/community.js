@@ -313,6 +313,7 @@ async function loadRanking(quiet = false, strict = false, client = db) {
         rankingPublished = data; renderRanking(); return data;
     } catch (error) {
         document.getElementById('rankingStatus').textContent = 'No pudimos cargar el ranking: ' + (error.message || 'error de conexión');
+        document.getElementById('homeRankingStatus').textContent = 'No pudimos cargar el ranking. Inténtalo de nuevo más tarde.';
         if (strict) throw error;
     }
 }
@@ -321,9 +322,15 @@ function renderRanking() {
     list.replaceChildren(); track.replaceChildren();
     document.getElementById('rankingPause').classList.toggle('hidden', !rankingPublished);
     document.getElementById('rankingStatic').classList.toggle('hidden', !rankingPublished);
-    document.getElementById('rankingEdition').textContent = rankingPublished ? `${rankingPublished.edition} · Actualizado: ${new Date(rankingPublished.updated_at).toLocaleString('es')}` : '';
+    document.getElementById('rankingEdition').textContent = rankingPublished ? rankingPublished.edition : '';
     document.getElementById('rankingStatus').textContent = rankingPublished ? '' : 'Aún no hay un ranking publicado. Nuestro equipo está preparando la primera edición.';
+    const preview = document.getElementById('homeRankingList');
+    preview.replaceChildren();
+    document.getElementById('homeRankingEdition').textContent = rankingPublished?.edition ? ' · ' + rankingPublished.edition : '';
+    document.getElementById('homeRankingStatus').textContent = document.getElementById('rankingStatus').textContent;
+    document.getElementById('homeRankingLink').hidden = !rankingPublished;
     if (!rankingPublished) return;
+    rankingPublished.team_ids.slice(0,6).forEach((id,i) => preview.append(teamNode(id,i+1)));
     rankingPublished.team_ids.forEach((id,i) => list.append(teamNode(id,i+1)));
     for (let copy=0; copy<2; copy++) {
         const group = node('ol', null, 'rcm-track-group');
@@ -418,7 +425,7 @@ async function saveRanking(publish) {
 async function refreshVisibleCommunity() {
     if (document.hidden||refreshInFlight||!db) return;
     refreshInFlight=true;
-    try { await Promise.all([refreshCommunity(),refreshArticleStats(),currentCategory==='NFL'?loadRanking(true):Promise.resolve(),
+    try { await Promise.all([refreshCommunity(),refreshArticleStats(),['NFL','Todos'].includes(currentCategory)?loadRanking(true):Promise.resolve(),
         activeModalArticleId!=null?loadCommentsFromSupabase(activeModalArticleId,true):Promise.resolve()]); }
     finally {refreshInFlight=false;}
 }

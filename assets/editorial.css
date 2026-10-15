@@ -1,0 +1,64 @@
+/* AE SPORTS: editorial surfaces, shared with existing community controls. */
+:root{--ae-cream:#f5f0e7;--ae-paper:#fffcf7;--ae-blue:#294963;--ae-ink:#443026;--ae-muted:#746b62;--ae-action:#a95334;--ae-bronze:#c99a70;--ae-line:#e4dbcf;--ae-sage:#53694f}
+html.dark{--ae-cream:#191e22;--ae-paper:#242a2d;--ae-blue:#9bb7ca;--ae-ink:#f4eadc;--ae-muted:#c3b6a9;--ae-action:#c88160;--ae-line:#414344;--ae-sage:#a2b99a}
+body,html.dark body{background:var(--ae-cream);color:var(--ae-ink)}
+body>header{background:#294963!important;border-color:#526778!important;box-shadow:none!important;color:#fff9ee}
+body>header .text-slate-900,body>header .text-slate-500,body>header .text-pitch-600,body>header .text-slate-600{color:#fff9ee!important}
+body>header a>div:first-child{background:none;box-shadow:none;color:#c99a70}
+body>header a>div:nth-child(2)>span:first-child{font-family:Georgia,serif;letter-spacing:.05em;font-weight:500}
+body>header nav{border-color:#ffffff24!important;gap:8px}
+.category-btn{background:transparent!important;color:#eee8df!important;border-radius:0!important;box-shadow:none!important;letter-spacing:.08em;text-transform:uppercase;min-height:44px}
+.category-btn i{color:#c99a70!important}.category-btn.active{border-bottom:2px solid #c99a70}
+.category-btn[data-category=Todos]{display:none}
+#searchInput{background:#fff8ee!important;color:#443026!important;border:0}
+#themeToggle,#guestAdminContainer button{background:transparent!important;border-color:#c99a70!important;color:#fff9ee!important}
+#themeToggle i,#guestAdminContainer i{color:#c99a70!important}
+#mainContent{max-width:1440px;padding-top:12px}body>header>div{max-width:1440px}
+h1,h2,h3{font-family:Georgia,'Times New Roman',serif;letter-spacing:-.025em}
+.editorial-hero{min-height:355px;position:relative;isolation:isolate;background:var(--ae-paper);overflow:hidden;margin-bottom:32px}
+.editorial-hero-image{position:absolute;right:0;top:0;width:65%;height:100%;object-fit:cover;z-index:-2}
+.editorial-hero:after{content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,var(--ae-paper) 30%,transparent 82%)}
+.editorial-hero-copy{padding:32px 36px;max-width:650px}
+.editorial-eyebrow{font-size:10px;letter-spacing:.25em;font-weight:700;color:var(--ae-sage);margin-bottom:14px}
+.editorial-hero h1{font-size:clamp(32px,4vw,59px);line-height:1.04;font-weight:700;color:var(--ae-ink);margin:12px 0 18px}
+.editorial-hero-copy>p:not(.editorial-eyebrow){max-width:425px;font:18px/1.5 Georgia,serif}
+.editorial-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
+.editorial-actions a,.editorial-actions button,.editorial-pick button{padding:12px 22px;border:1px solid var(--ae-action);border-radius:5px;font-weight:600;font-size:14px;min-height:44px}
+.editorial-actions a,.editorial-pick button{background:var(--ae-action);color:#fff}
+.editorial-featured{display:block;max-width:460px;text-align:left;margin-top:22px;font-size:11px;letter-spacing:.06em;min-height:44px}
+.editorial-layout{gap:24px!important}.editorial-layout>div{min-width:0}.editorial-layout>div>div:first-of-type{border:0;padding:0;margin-bottom:12px}
+.editorial-layout h2{font-size:30px;text-transform:none;font-weight:700;letter-spacing:-.025em;color:var(--ae-ink)!important}
+.editorial-layout h2>span{display:none}
+#articlesGrid{gap:16px!important;margin-top:16px!important;align-items:stretch}
+#articlesGrid>article{background:var(--ae-paper)!important;border:0;border-radius:0;box-shadow:0 4px 20px #44302606;transform:none!important}
+#articlesGrid h3{font-size:21px;line-height:1.15;color:var(--ae-ink)!important}
+#articlesGrid p,#articlesGrid .text-slate-400{color:var(--ae-muted)!important}
+#articlesGrid .p-5{padding:16px}#articlesGrid .h-48{height:170px}
+#articlesGrid>article>div:last-child{padding:12px 16px;gap:12px;flex-wrap:wrap;border-color:var(--ae-line)}
+#articlesGrid>article>div:last-child>div:first-child{flex-basis:100%}
+#articlesGrid .absolute.top-3.left-3{background:var(--ae-sage);color:var(--ae-paper);border:0;border-radius:3px}
+.editorial-pick{background:var(--ae-paper);border:1px solid var(--ae-line)}
+.editorial-pick h2{background:#294963;color:#fff9ee!important;padding:15px 20px;font-size:22px;margin:0}
+.editorial-pick-body{padding:24px}.editorial-pick h3{font-size:27px;line-height:1.15;margin:22px 0 16px}
+.editorial-pick-body>p{color:var(--ae-muted);line-height:1.7;font-size:14px}.editorial-pick button{width:100%;margin-top:24px}
+.editorial-bottom{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:28px}
+.editorial-bottom .rcm-panel,html.dark .editorial-bottom .rcm-panel{background:var(--ae-paper);border:1px solid var(--ae-line);border-radius:0;padding:20px;margin:0;color:var(--ae-ink)}
+.editorial-bottom h2,.dark .editorial-bottom h2{font-size:23px;color:var(--ae-blue);margin-bottom:12px;font-weight:700}
+#homeRankingEdition{font:13px/1.5 Inter,sans-serif;white-space:nowrap;color:var(--ae-muted)}
+.editorial-ranking-list{display:grid;grid-auto-flow:column;grid-template-rows:repeat(3,auto);grid-template-columns:1fr 1fr;gap:0 18px;margin:12px 0}
+.editorial-ranking-list .rcm-team{display:grid;grid-template-columns:20px 44px 1fr;gap:10px;min-width:0;width:auto;padding:10px 0;border-bottom:1px solid var(--ae-line);font-size:13px;background:none;color:var(--ae-ink)}
+.editorial-ranking-list img{width:44px;height:44px;object-fit:contain}.editorial-ranking-list .rcm-team span{white-space:normal}
+#communityLeaders{display:grid;grid-template-columns:1fr 1fr;gap:20px}#communityLeaders .rcm-leader{border-color:var(--ae-line)}
+#communityLeaders h3{font-family:Inter,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--ae-sage)}
+#communityLeaders blockquote{font:18px/1.5 Georgia,serif;margin:12px 0}#communityLeaders strong{color:var(--ae-blue);font-size:12px}
+.rcm-leader-link:hover,.dark .rcm-leader-link:hover{background:var(--ae-cream)}
+#filterIndicator{display:none!important}#nflRankings{scroll-margin-top:180px;border-radius:0;background:var(--ae-paper);color:var(--ae-ink)}
+#nflRankings .rcm-row{display:inline-flex}#rankingEdition{display:inline;margin-left:10px}#rankingEdition:not(:empty):before{content:'· '}
+#nflRankings h2{color:var(--ae-blue)}
+button:focus-visible,a:focus-visible,summary:focus-visible,input:focus-visible{outline:3px solid var(--ae-bronze);outline-offset:3px}
+@media(min-width:1100px){#articlesGrid{grid-template-columns:repeat(3,minmax(0,1fr))}.editorial-layout>div{grid-column:span 8}.editorial-layout>aside{grid-column:span 4}}
+@media(max-width:760px){.editorial-hero{min-height:300px}.editorial-hero-copy{padding:24px}.editorial-hero-image{width:100%;opacity:.24}.editorial-hero:after{background:linear-gradient(90deg,var(--ae-paper),transparent)}.editorial-hero-copy>p:not(.editorial-eyebrow){font-size:16px}.editorial-bottom{grid-template-columns:1fr}#communityLeaders{grid-template-columns:1fr}.editorial-ranking-list{gap:0 12px}.editorial-ranking-list .rcm-team{grid-template-columns:16px 36px 1fr;gap:7px;font-size:12px}.editorial-ranking-list img{width:36px;height:36px}body>header a>div:first-child{display:none}.editorial-layout h2{font-size:26px}}
+/* Retain a moving full ranking on mobile, with an accessible static list. */
+@media(max-width:640px) and (prefers-reduced-motion:no-preference){.rcm-track{animation:rcm-scroll 40s linear infinite}.rcm-track-group:nth-child(2){display:flex}#rankingPause:not(.hidden){display:inline-block}}
+.rcm-ticker:focus-within .rcm-track{animation-play-state:paused}
+@media(prefers-reduced-motion:reduce){.rcm-track{animation:none!important}.rcm-track-group:nth-child(2){display:none!important}}

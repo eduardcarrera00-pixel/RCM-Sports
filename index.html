@@ -16,7 +16,7 @@
 
     document.documentElement.classList.toggle('dark', useDarkMode);
 </script>
-    <title>RCM SPORTS | Blog Deportivo</title>
+    <title>AE SPORTS | Tu blog deportivo</title>
 
     <link rel="stylesheet" href="assets/site.css">
 
@@ -288,6 +288,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
 <link rel="stylesheet" href="assets/community.css?v=20261013-2">
+<link rel="stylesheet" href="assets/editorial.css">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 
@@ -301,8 +302,8 @@ html.dark [data-reading-size][aria-pressed="true"] {
                         <i class="fa-solid fa-trophy text-2xl"></i>
                     </div>
                     <div>
-                        <span class="text-2xl font-black tracking-tight text-slate-900">RCM <span class="text-pitch-600">SPORTS</span></span>
-                        <span class="block text-[10px] text-slate-500 font-bold tracking-widest uppercase -mt-1">BLOG DEPORTIVO</span>
+                        <span class="text-2xl font-black tracking-tight text-slate-900">AE <span class="text-pitch-600">SPORTS</span></span>
+                        <span class="block text-[10px] text-slate-500 font-bold tracking-widest uppercase -mt-1">TU BLOG DEPORTIVO</span>
                     </div>
                 </a>
 
@@ -371,7 +372,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 
             <!-- Mobile Search Dropdown -->
             <div id="mobileSearchBox" class="hidden md:hidden pb-4 pt-1">
-                <input type="text" id="mobileSearchInput" oninput="handleMobileSearch()" placeholder="Buscar en RCM SPORTS..."
+                <input type="text" id="mobileSearchInput" oninput="handleMobileSearch()" placeholder="Buscar en AE SPORTS..."
                     class="w-full bg-slate-100 border border-slate-200 text-sm text-slate-800 rounded-xl px-4 py-2.5 focus:outline-none focus:border-pitch-600">
             </div>
 
@@ -436,21 +437,20 @@ html.dark [data-reading-size][aria-pressed="true"] {
             <button onclick="resetFilters()" class="text-xs font-semibold text-pitch-700 hover:text-pitch-900 underline">Limpiar filtros</button>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <section id="heroSection" aria-label="Portada editorial"></section>
+        <div class="editorial-layout grid grid-cols-1 lg:grid-cols-12 gap-8">
 
             <!-- Main Content Area (8 Columns) -->
             <div class="lg:col-span-8 space-y-8">
 
                 <!-- Featured Hero Article -->
-                <section id="heroSection">
-                    <!-- Hero Card JS Injected -->
-                </section>
+
 
                 <!-- Articles Section Header -->
                 <div class="flex items-center justify-between border-b border-slate-200 pb-3">
                     <h2 class="text-xl font-extrabold uppercase tracking-wider flex items-center text-slate-900">
                         <span class="w-3 h-6 bg-pitch-600 rounded-full mr-3"></span>
-                        Noticias Recientes
+                        Últimas noticias
                     </h2>
                     <span id="articlesCount" class="text-xs text-slate-500 font-medium">Cargando...</span>
                 </div>
@@ -471,9 +471,16 @@ html.dark [data-reading-size][aria-pressed="true"] {
             </div>
 
             <aside class="lg:col-span-4 space-y-8">
+                <section class="editorial-pick" aria-labelledby="weeklyPickTitle">
+                    <h2 id="weeklyPickTitle">Pick de la Semana</h2>
+                    <div class="editorial-pick-body"><span class="editorial-eyebrow">LA VOZ DE LA COMUNIDAD</span>
+                    <h3>El próximo gran Pick empieza contigo.</h3>
+                    <p>El Pick comunitario de la semana aún no está disponible en esta versión.</p>
+                    <button type="button" onclick="filterByCategory('Picks')">Explorar publicaciones de Picks →</button></div>
+                </section>
 
                 <!-- Interactive Daily Poll Widget -->
-                <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm grass-glow relative overflow-hidden">
+                <div hidden class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm grass-glow relative overflow-hidden">
                     <div class="flex items-center space-x-2 text-pitch-600 text-xs font-bold uppercase tracking-widest mb-3">
                         <i class="fa-solid fa-chart-pie text-sm"></i>
                         <span>Encuesta de la Semana</span>
@@ -493,7 +500,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
                 </div>
 
                 <!-- Trending / Most Liked Articles -->
-                <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+                <div hidden class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
                     <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
                         <h3 class="font-bold text-sm uppercase tracking-wider text-slate-900 flex items-center">
                             <i class="fa-solid fa-fire text-amber-500 mr-2 text-base"></i>
@@ -508,9 +515,9 @@ html.dark [data-reading-size][aria-pressed="true"] {
                     </div>
                 </div>
 
-                <section class="rcm-panel" aria-labelledby="communityTitle"><h2 id="communityTitle">La comunidad opina</h2><div id="communityLeaders" aria-live="polite">Cargando comentarios destacados…</div></section>
+
                 <!-- Newsletter Subscription Card -->
-                <div class="bg-gradient-to-br from-pitch-900 to-darkslate rounded-2xl p-6 text-white shadow-xl relative overflow-hidden">
+                <div hidden class="bg-gradient-to-br from-pitch-900 to-darkslate rounded-2xl p-6 text-white shadow-xl relative overflow-hidden">
                     <div class="w-10 h-10 bg-white/10 text-pitch-200 rounded-xl flex items-center justify-center mb-3">
                         <i class="fa-solid fa-paper-plane text-lg"></i>
                     </div>
@@ -537,6 +544,15 @@ html.dark [data-reading-size][aria-pressed="true"] {
 
             </aside>
         </div>
+        <div id="editorialBottom" class="editorial-bottom">
+            <section class="rcm-panel editorial-ranking" aria-labelledby="homeRankingTitle">
+                <div class="editorial-module-heading"><h2 id="homeRankingTitle">NFL Power Rankings <span id="homeRankingEdition"></span></h2></div>
+                <p id="homeRankingStatus" role="status">Cargando ranking…</p>
+                <ol id="homeRankingList" class="editorial-ranking-list"></ol>
+                <button type="button" id="homeRankingLink" onclick="filterByCategory('NFL'); document.getElementById('rankingStatic').open = true; document.getElementById('nflRankings').scrollIntoView({block:'start'});">Ver Top 10 completo →</button>
+            </section>
+            <section class="rcm-panel" aria-labelledby="communityTitle"><h2 id="communityTitle">Comentarios destacados</h2><div id="communityLeaders" aria-live="polite">Cargando comentarios destacados…</div></section>
+        </div>
     </main>
 
 <!-- User Account Modal -->
@@ -549,7 +565,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
         <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50">
             <div class="flex items-center space-x-2 text-pitch-700 font-bold">
                 <i class="fa-solid fa-user"></i>
-                <span class="text-base text-slate-900">Cuenta RCM Sports</span>
+                <span class="text-base text-slate-900">Cuenta AE SPORTS</span>
             </div>
 
             <button type="button"
@@ -848,7 +864,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
                         <div class="w-8 h-8 bg-pitch-600 rounded-lg flex items-center justify-center text-white">
                             <i class="fa-solid fa-trophy"></i>
                         </div>
-                        <span class="text-lg font-black text-white tracking-tight">RCM <span class="text-pitch-500">SPORTS</span></span>
+                        <span class="text-lg font-black text-white tracking-tight">AE <span class="text-pitch-500">SPORTS</span></span>
                     </div>
                     <p class="text-slate-400 leading-relaxed text-xs">
                         Periodismo deportivo de alto nivel. Cobertura, estrategia y pasión en la cancha.
@@ -1418,6 +1434,8 @@ currentUser = {
 
 
         function renderArticlesFeed() {
+            document.getElementById('editorialBottom').hidden = currentCategory !== 'Todos' || Boolean(currentSearchQuery);
+            document.querySelector('.editorial-pick').hidden = currentCategory !== 'Todos' || Boolean(currentSearchQuery);
             document.getElementById('nflRankings').classList.toggle('hidden', currentCategory !== 'NFL');
             document.getElementById('footballTeams').classList.toggle('hidden', currentCategory !== 'Fútbol');
             document.querySelectorAll('[data-team]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.team === currentTeam)));
@@ -1447,7 +1465,7 @@ currentUser = {
             articlesGrid.classList.remove('hidden');
 
             let heroArticle = filtered[0];
-            let gridArticles = filtered.filter(a => a.id !== heroArticle.id);
+            let gridArticles = filtered;
 
             if (currentCategory !== 'Todos' || currentSearchQuery !== '') {
                 heroSection.classList.add('hidden');
@@ -1511,47 +1529,16 @@ currentUser = {
         function renderHeroCard(hero) {
             const container = document.getElementById('heroSection');
             container.innerHTML = `
-                <div class="bg-white rounded-2xl overflow-hidden border border-pitch-200 relative shadow-lg grass-glow">
-                    <div class="grid grid-cols-1 md:grid-cols-12">
-                        <div class="md:col-span-7 h-64 md:h-auto relative overflow-hidden group">
-                            <img src="${escapeHTML(safeImageURL(hero.image))}" alt="${escapeHTML(hero.title)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
-                            <span class="absolute top-4 left-4 bg-pitch-600 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-md shadow-md">
-                                <i class="fa-solid fa-star mr-1"></i> Destacado
-                            </span>
-                            ${currentAdmin && hero.remote ? `
-                                <button type="button" onclick="deleteArticle(${articleIdArgument(hero.id)}, event)" title="Eliminar publicación" aria-label="Eliminar publicación" class="absolute top-4 right-4 bg-red-600 hover:bg-red-700 text-white w-9 h-9 rounded-lg flex items-center justify-center shadow-md transition-colors">
-                                    <i class="fa-solid fa-trash-can"></i>
-                                </button>
-                            ` : ''}
-                        </div>
-                        <div class="md:col-span-5 p-6 sm:p-8 flex flex-col justify-between">
-                            <div>
-                                <div class="flex items-center space-x-2 text-xs text-pitch-700 font-bold uppercase tracking-wider mb-2">
-                                    <span>${escapeHTML(hero.category)}</span>
-                                    <span class="text-slate-300">•</span>
-                                    <span class="text-slate-400 font-normal">${escapeHTML(hero.readTime)}</span>
-                                </div>
-                                <h1 onclick="openArticleModal(${articleIdArgument(hero.id)})" class="text-xl sm:text-2xl font-black text-slate-900 hover:text-pitch-600 cursor-pointer transition-colors leading-tight mb-3">
-                                    ${escapeHTML(hero.title)}
-                                </h1>
-                                <p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6">
-                                    ${escapeHTML(hero.summary)}
-                                </p>
-                            </div>
-
-                            <div class="flex items-center justify-between border-t border-slate-100 pt-4 mt-4">
-                                <div class="text-xs">
-                                    <p>${escapeHTML(hero.topComment || 'Sin comentarios destacados')}</p>
-                                    <button onclick="toggleLike(${articleIdArgument(hero.id)}, event)" aria-label="Me gusta la publicación">♥ ${hero.likes ?? '—'}</button>
-                                </div>
-                                <button onclick="openArticleModal(${articleIdArgument(hero.id)})" class="bg-pitch-600 hover:bg-pitch-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-md shadow-pitch-600/20 transition-all hover:scale-105">
-                                    Leer Noticia
-                                </button>
-                            </div>
-                        </div>
+                <div class="editorial-hero">
+                    <img class="editorial-hero-image" src="${escapeHTML(safeImageURL(hero.image))}" alt="" onerror="this.hidden=true">
+                    <div class="editorial-hero-copy">
+                        <p class="editorial-eyebrow">ANÁLISIS · NOTICIAS · COMUNIDAD</p>
+                        <h1>El deporte con calma,<br>clase y pasión.</h1>
+                        <p>Análisis, historias y una comunidad que vive el deporte de otra manera.</p>
+                        <div class="editorial-actions"><a href="#articlesGrid">Ver historias →</a><button type="button" onclick="filterByCategory('Picks')">Explorar Picks</button></div>
+                        <button class="editorial-featured" type="button" onclick="openArticleModal(${articleIdArgument(hero.id)})">EN PORTADA · ${escapeHTML(hero.title)} →</button>
                     </div>
-                </div>
-            `;
+                </div>`;
         }
 
         function renderPoll() {
