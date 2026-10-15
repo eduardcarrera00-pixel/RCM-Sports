@@ -64,7 +64,7 @@
     if (!up.length) empty(positive,'Aún no hay Takes con votos positivos.');
     if (!down.length) empty(negative,'Aún no hay Takes con votos negativos.');
     const status = $('aeTopTakesStatus');
-    if (status) status.textContent = 'Clasificación basada en votos de la comunidad.';
+    if (status) status.textContent = '';
   }
   async function refresh(force=false) {
     const root = $('aeHomeTopTakes');
