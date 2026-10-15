@@ -1,9 +1,9 @@
-/* AE SPORTS · Takes de fútbol. Picks y Power Rankings permanecen independientes. */
+/* AE SPORTS · Admin-curated Picks. Freeform Takes are separate. */
 (() => {
  'use strict';
  const $ = id => document.getElementById(id);
- const leagues = {laliga:'LaLiga',premier:'Premier League',ligamx:'Liga MX',champions:'Champions League'};
- let league = 'laliga', period = 'all', questions = [], options = [], mine = [], pending = false, request = 0, rankingMode = 'general';
+ const leagues = {laliga:'LaLiga',premier:'Premier League',ligamx:'Liga MX',champions:'Champions League',nfl:'NFL',colegial:'Fútbol colegial'};
+ let league = 'all', period = 'all', questions = [], options = [], mine = [], pending = false, request = 0, rankingMode = 'general';
  const el = (tag, content, cls) => {const n=document.createElement(tag); if(content!==undefined) n.textContent=String(content); if(cls)n.className=cls;return n;};
  const message = txt => {$('takesStatus').textContent=txt;};
  function optionList(q) {return options.filter(o=>o.question_id===q.id);}
@@ -12,7 +12,7 @@
  function btn(text,action,cls='ae-take-button'){const n=el('button',text,cls);n.type='button';n.onclick=action;return n;}
  function renderCard(q) {
    const box=el('article',undefined,'ae-take-card');
-   const label=el('div',(q.period==='weekly'?'Semanal':'Temporada')+' · '+q.points+' puntos','ae-take-overline');
+   const label=el('div',(leagues[q.competition]||'Deportes')+' · '+(q.period==='weekly'?'Semanal':'Temporada')+' · '+q.points+' puntos','ae-take-overline');
    const title=el('h3',q.prompt);
    const info=el('p',q.status==='settled'?'Resultado confirmado':isOpen(q)?'Cierra el '+formatClose(q.closes_at):'Predicción cerrada','ae-take-info');
    const choices=el('div',undefined,'ae-take-choices');
@@ -20,7 +20,7 @@
    optionList(q).forEach(o=>{
      const chosen=existing?.option_id===o.id;
      const winner=q.status==='settled' && q.correct_option_id===o.id;
-     const text=o.label+(chosen?' · Tu elección':'')+(winner?' · Acertó':'');
+     const text=o.label+(chosen?' · Tu elección':'')+(winner?' · Correcta':'');
      const b=btn(text,()=>submit(q,o));
      b.disabled=pending || !isOpen(q) || Boolean(existing);
      if(chosen)b.classList.add('ae-take-selected');
@@ -50,10 +50,10 @@
  }
  function renderQuestions(){
    const target=$('takesQuestions');target.replaceChildren();
-   const visible=questions.filter(q=>q.competition===league && (period==='all'||q.period===period))
+   const visible=questions.filter(q=>(league==='all'||q.competition===league) && (period==='all'||q.period===period))
        .filter(q=>q.status!=='void').sort((a,b)=>(isOpen(b)?1:0)-(isOpen(a)?1:0)||new Date(a.closes_at)-new Date(b.closes_at));
-   $('takesCount').textContent=visible.length+' Takes';
-   if(!visible.length)target.append(el('p','Todavía no hay Takes publicados para esta selección.','ae-take-empty'));
+   $('takesCount').textContent=visible.length+' Picks';
+   if(!visible.length)target.append(el('p','Todavía no hay Picks publicados para esta selección.','ae-take-empty'));
    else visible.forEach(q=>target.append(renderCard(q)));
    document.querySelectorAll('[data-takes-league]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.takesLeague===league)));
    document.querySelectorAll('[data-takes-period]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.takesPeriod===period)));
@@ -64,12 +64,12 @@
    if(!db)return message('La conexión no está disponible.');
    const session=await db.auth.getUser();
    if(!session.data?.user){if(typeof openUserAuthModal==='function')openUserAuthModal();return;}
-   if(!confirm('Guardar tu Take: '+o.label+'\nNo podrás cambiarlo después.'))return;
+   if(!confirm('Guardar tu Pick: '+o.label+'\nNo podrás cambiarlo después.'))return;
    pending=true;renderQuestions();
    try{
      const r=await db.rpc('ae_submit_take',{p_question_id:q.id,p_option_id:o.id});
      if(r.error)throw r.error;
-     message('¡Take registrado! Se validará cuando finalice el evento.');
+     message('¡Pick registrado! Se validará cuando finalice el evento.');
      await load();
    }catch(e){message(e.message||'No se pudo registrar la predicción.');}
    finally{pending=false;renderQuestions();}
@@ -84,7 +84,7 @@
    const target=$('takesLeaderboard');target.replaceChildren();
    const r=await db.rpc('ae_take_leaderboard',{p_scope:rankingMode});
    if(r.error){target.append(el('p','Clasificación temporalmente no disponible.'));return;}
-   if(!r.data?.length){target.append(el('p','La clasificación empezará al validarse los primeros Takes.','ae-take-empty'));return;}
+   if(!r.data?.length){target.append(el('p','La clasificación empezará al validarse los primeros Picks.','ae-take-empty'));return;}
    const ol=el('ol',undefined,'ae-take-leaderboard-list');
    r.data.forEach((x,i)=>{const li=el('li');li.append(el('span',String(i+1).padStart(2,'0'),'ae-take-number'),el('span',x.username,'ae-take-name'),el('strong',x.points+' pts'));ol.append(li);});
    target.append(ol);
@@ -108,8 +108,8 @@
      if(results[1].error)throw results[1].error;
      options=results[0].data||[];mine=results[1].data||[];
      message('');
-     renderQuestions();await renderLeaderboard();
-   }catch(e){message('No pudimos cargar los Takes. '+(e.message||'Inténtalo más tarde.'));}
+     renderQuestions();featured();await renderLeaderboard();
+   }catch(e){message('No pudimos cargar los Picks. '+(e.message||'Inténtalo más tarde.'));}
  }
  async function create(e){
    e.preventDefault();if(pending)return;
@@ -126,24 +126,26 @@
        p_points:Number(f.elements.points.value),p_options:opts});
      if(r.error)throw r.error;
      f.reset();league=selectedLeague;period='all';
-     message('Take publicado. Ya pueden participar los usuarios.');
+     message('Pick publicado. Ya pueden participar los usuarios.');
      await load();
    }catch(err){message(err.message||'No se pudo publicar el Take.');}
    finally{pending=false;f.querySelector('[type=submit]').disabled=false;}
  }
  function visibility(){
    const root=$('footballTakes');if(!root)return;
-   root.hidden=typeof currentCategory==='undefined'||currentCategory!=='Fútbol';
+   root.hidden=typeof currentCategory==='undefined'||currentCategory!=='Picks';
    if(!root.hidden)load();
  }
- window.renderFootballTakesVisibility=visibility;
+ window.renderPicksVisibility=visibility;
+ // Home features an official weekly Pick, never an old odds post.
+ function featured(){const box=$('cpWeekly');if(!box)return;box.replaceChildren();const q=questions.filter(x=>x.period==='weekly' && isOpen(x)).sort((a,b)=>new Date(a.closes_at)-new Date(b.closes_at))[0];if(!q){box.append(el('p','Los Picks semanales destacados aparecerán aquí.'));return;}const card=el('div',undefined,'ae-pick-home-preview');card.append(el('strong',q.prompt),el('p',(leagues[q.competition]||'Deportes')+' · '+q.points+' puntos'));card.append(btn('Elegir mi Pick →',()=>{filterByCategory('Picks');$('footballTakes')?.scrollIntoView({block:'start',behavior:'smooth'});}));box.append(card);}
  document.addEventListener('DOMContentLoaded',()=>{
    document.querySelectorAll('[data-takes-league]').forEach(b=>b.addEventListener('click',()=>{league=b.dataset.takesLeague;renderQuestions();}));
    document.querySelectorAll('[data-takes-period]').forEach(b=>b.addEventListener('click',()=>{period=b.dataset.takesPeriod;renderQuestions();}));
    document.querySelectorAll('[data-takes-rank]').forEach(b=>b.addEventListener('click',()=>{rankingMode=b.dataset.takesRank;document.querySelectorAll('[data-takes-rank]').forEach(t=>t.setAttribute('aria-pressed',String(t===b)));renderLeaderboard();}));
    $('takesCreateForm')?.addEventListener('submit',create);
    $('takesReload')?.addEventListener('click',load);
-   db?.auth.onAuthStateChange(()=>setTimeout(()=>{if(typeof currentCategory!=='undefined'&&currentCategory==='Fútbol')load();},150));
+   db?.auth.onAuthStateChange(()=>setTimeout(()=>{if(typeof currentCategory!=='undefined'&&currentCategory==='Picks')load();},150));
    visibility();
  });
 })();
