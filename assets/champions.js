@@ -177,7 +177,7 @@
         try {
             if (!db) throw new Error('Sin conexión con los datos publicados.');
             const [editionResult, clubsResult] = await Promise.all([
-                db.from('champions_rankings').select('edition,team_ids,published_at,season')
+                db.from('champions_rankings').select('id,edition,team_ids,published_at,season')
                     .eq('season', SEASON).order('published_at', {ascending:false}).range(0,1),
                 db.from('champions_clubs').select('id,name,logo,season').eq('season', SEASON)
             ]);
