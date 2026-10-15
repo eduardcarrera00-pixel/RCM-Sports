@@ -50,6 +50,7 @@
    if(!root||!voices)return;
    const sport=section==='NFL'?'nfl':section==='Fútbol'?'football':'';
    root.hidden=!sport;voices.hidden=!!sport;
+   root.dataset.sport=sport;
    if(!sport){current='';return;}
    $('aeSportTakeTitle').textContent='Takes destacados · '+(sport==='nfl'?'NFL':'Fútbol');
    if(!force&&sport===current&&Date.now()-lastRun<15000)return;

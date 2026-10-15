@@ -146,8 +146,13 @@
         const full = byId('championsList');
         const track = byId('championsTrack');
         preview.replaceChildren(); full.replaceChildren(); track.replaceChildren();
+        const leader=byId('championsRankOne');
+        const leaderList=byId('championsRankOneList');
+        if(leaderList)leaderList.replaceChildren();
         const hasPublished = !!(latest && Array.isArray(latest.team_ids) && latest.team_ids.length === 10);
         byId('championsViewport').hidden = !hasPublished;
+        if(leader)leader.hidden=!hasPublished;
+        if(hasPublished&&leaderList)leaderList.append(row(latest.team_ids[0],0));
         const status = hasPublished ? '' : 'Todavía no hay una clasificación de Champions publicada.';
         byId('homeChampionsStatus').textContent = status;
         byId('championsStatus').textContent = status;

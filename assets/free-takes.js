@@ -101,6 +101,7 @@
    const root=$('freeTakes');if(!root)return;
    const section=typeof currentCategory==='undefined'?'':currentCategory;
    root.hidden=section!=='Fútbol' && section!=='NFL';
+   root.dataset.sport=section==='NFL'?'nfl':section==='Fútbol'?'football':'';
    if(root.hidden){activeSection='';request++;return;}
    const changed=activeSection!==section;
    activeSection=section;
