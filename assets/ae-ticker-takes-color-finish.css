@@ -1,0 +1,172 @@
+/* AE SPORTS · ajuste de emblemas móviles y cromática de Takes
+   Sin alterar carruseles, posiciones, votos, comentarios ni portada. */
+
+/* Misma presentación transparente que el club/equipo #1: el fondo beige
+   proviene del .ae-team-emblem histórico, NO del ranking publicado. */
+html body #nflRankings #rankingTrack .ae-team-emblem,
+html body #championsRankings #championsTrack .ae-team-emblem,
+html.dark body #nflRankings #rankingTrack .ae-team-emblem,
+html.dark body #championsRankings #championsTrack .ae-team-emblem {
+  position:relative!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  box-sizing:border-box!important;
+  flex:none!important;
+  width:40px!important;
+  height:40px!important;
+  min-width:0!important;
+  padding:2px!important;
+  margin:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  background-color:transparent!important;
+  box-shadow:none!important;
+  overflow:visible!important;
+}
+/* Se respeta el logo original (PNG/SVG transparente, sin recortar escudos).
+   Ningún filtro de mezcla que altere los colores reales de los equipos. */
+html body #nflRankings #rankingTrack .ae-team-emblem img,
+html body #championsRankings #championsTrack .ae-team-emblem img,
+html.dark body #nflRankings #rankingTrack .ae-team-emblem img,
+html.dark body #championsRankings #championsTrack .ae-team-emblem img {
+  position:absolute!important;
+  inset:2px!important;
+  display:block!important;
+  width:calc(100% - 4px)!important;
+  height:calc(100% - 4px)!important;
+  max-width:100%!important;
+  max-height:100%!important;
+  padding:0!important;
+  margin:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  object-fit:contain!important;
+  object-position:center!important;
+  transform:none!important;
+  clip-path:none!important;
+  filter:drop-shadow(0 2px 3px rgba(2,12,22,.20));
+}
+/* Fallback visual para cuando el proveedor no entrega un escudo. */
+#rankingTrack .ae-team-emblem:not(.ae-logo-loaded) .ae-logo-initials,
+#championsTrack .ae-team-emblem:not(.ae-logo-loaded) .ae-logo-initials {
+  display:grid;
+  place-items:center;
+  width:34px;height:34px;
+  border:1px solid rgba(196,215,223,.24);
+  border-radius:50%;
+  background:rgba(27,57,75,.83);
+  font:700 11px/1 Georgia,serif;
+  color:#f4e5d6!important;
+}
+#rankingTrack .ae-team-emblem.ae-logo-loaded .ae-logo-initials,
+#championsTrack .ae-team-emblem.ae-logo-loaded .ae-logo-initials {
+  opacity:0!important;
+}
+
+/* Takes de la comunidad, colores cálidos/azules sin competir con el texto.
+   La categoría exacta se toma de t.sport, no se infiere del voto ni del autor. */
+html body #freeTakes #freeTakesFeed>.ae-free-take-card,
+html.dark body #freeTakes #freeTakesFeed>.ae-free-take-card{
+  --take-hue:#78b5ac;
+  --take-glow:rgba(120,181,172,.13);
+  position:relative!important;
+  isolation:isolate;
+  border-radius:0!important;
+  border:1px solid rgba(155,188,204,.25)!important;
+  border-left:3px solid var(--take-hue)!important;
+  background:
+    radial-gradient(ellipse 77% 140% at 112% -37%,var(--take-glow),transparent 72%),
+    linear-gradient(122deg,rgba(21,55,75,.97),rgba(15,43,61,.96) 79%)!important;
+  box-shadow:0 8px 21px rgba(3,14,24,.16)!important;
+  transition:border-color .18s ease,box-shadow .18s ease;
+}
+html body #freeTakes #freeTakesFeed>.ae-free-take-card[data-sport="nfl"]{
+  --take-hue:#dea77b;
+  --take-glow:rgba(215,154,108,.17);
+}
+html body #freeTakes #freeTakesFeed>.ae-free-take-card[data-sport="laliga"]{
+  --take-hue:#92b0e8;
+  --take-glow:rgba(130,159,220,.18);
+}
+html body #freeTakes #freeTakesFeed>.ae-free-take-card[data-sport="premier"]{
+  --take-hue:#ac9dde;
+  --take-glow:rgba(152,128,211,.15);
+}
+html body #freeTakes #freeTakesFeed>.ae-free-take-card[data-sport="champions"]{
+  --take-hue:#94b9e8;
+  --take-glow:rgba(121,167,220,.18);
+}
+html body #freeTakes #freeTakesFeed>.ae-free-take-card[data-sport="ligamx"]{
+  --take-hue:#d2a487;
+  --take-glow:rgba(200,144,111,.15);
+}
+html body #freeTakes #freeTakesFeed>.ae-free-take-card:hover{
+  border-top-color:rgba(188,212,224,.46)!important;
+  border-right-color:rgba(188,212,224,.46)!important;
+  border-bottom-color:rgba(188,212,224,.46)!important;
+  box-shadow:0 11px 23px rgba(3,14,24,.22)!important;
+}
+#freeTakes #freeTakesFeed>.ae-free-take-card .ae-take-overline{
+  display:flex;align-items:center;flex-wrap:wrap;gap:7px;
+  color:#d1dce1!important;
+  font:700 10px/1.5 Inter,system-ui,sans-serif!important;
+  letter-spacing:.045em;
+}
+/* Etiqueta de deporte: acento claro y lo bastante contrastado para leer. */
+#freeTakes #freeTakesFeed>.ae-free-take-card .ae-take-overline>span:first-child{
+  display:inline-flex;align-items:center;
+  padding:4px 8px;
+  border:1px solid color-mix(in srgb,var(--take-hue) 58%,transparent);
+  border-radius:0!important;
+  background:var(--take-glow)!important;
+  color:#f6e8dc!important;
+  letter-spacing:.06em;
+}
+#freeTakes #freeTakesFeed>.ae-free-take-card .ae-feed-take-title,
+#freeTakes #freeTakesFeed>.ae-free-take-card .ae-feed-take-open{
+  color:#fff0e2!important;
+}
+#freeTakes #freeTakesFeed>.ae-free-take-card .ae-feed-take-open:hover,
+#freeTakes #freeTakesFeed>.ae-free-take-card .ae-feed-take-open:focus-visible{
+  color:var(--take-hue)!important;
+}
+#freeTakes #freeTakesFeed>.ae-free-take-card .ae-free-take-body{
+  color:#d8e1e3!important;
+}
+#freeTakes #freeTakesFeed>.ae-free-take-card .ae-take-author-link{
+  color:#f1d6bf!important;
+}
+#freeTakes #freeTakesFeed>.ae-free-take-card .ae-free-vote-row{
+  border-top:1px solid rgba(178,206,216,.13);
+  padding-top:10px;
+  margin-top:12px!important;
+}
+/* Los botones seleccionados usan el acento real del deporte y mantienen
+   un fondo oscuro para contrastar con el texto. */
+#freeTakes #freeTakesFeed>.ae-free-take-card .ae-free-vote-row .ae-take-button[aria-pressed="true"]{
+  background:color-mix(in srgb,var(--take-hue) 34%,#172d3e)!important;
+  border-color:var(--take-hue)!important;
+  color:#fff6e9!important;
+}
+#freeTakes #freeTakesFeed>.ae-free-take-card .ae-free-take-score{
+  color:#f1c7a2!important;
+}
+html:not(.dark) body #freeTakes #freeTakesFeed>.ae-free-take-card,
+html:not(.dark) body #freeTakes #freeTakesFeed>.ae-free-take-card .ae-feed-take-open{
+  color:#fff0df!important;
+}
+@media(max-width:640px){
+  html body #rankingTrack .ae-team-emblem,
+  html body #championsTrack .ae-team-emblem,
+  html.dark body #rankingTrack .ae-team-emblem,
+  html.dark body #championsTrack .ae-team-emblem{
+    width:35px!important;height:35px!important;padding:1px!important;
+  }
+  #freeTakes #freeTakesFeed>.ae-free-take-card{padding:15px 14px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  #freeTakes #freeTakesFeed>.ae-free-take-card{transition:none!important}
+}
