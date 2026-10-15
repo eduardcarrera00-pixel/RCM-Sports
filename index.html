@@ -290,6 +290,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/community.css?v=20261013-2">
 <link rel="stylesheet" href="assets/editorial.css?v=20261015-2">
 <link rel="stylesheet" href="assets/unified-editorial.css?v=20261015-5">
+<link rel="stylesheet" href="assets/community-picks.css?v=1">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 
@@ -398,6 +399,13 @@ html.dark [data-reading-size][aria-pressed="true"] {
             <ol id="championsList" class="ae-full-ranking-list" aria-label="Top 10 Champions League"></ol>
             <p class="ae-safety-note">Clasificación editorial de AE SPORTS, no una tabla oficial de resultados.</p>
         </section>
+        <section id="communityPicks" hidden aria-labelledby="cpTitle">
+          <h2 id="cpTitle">Picks de la comunidad</h2>
+          <p class="cp-intro">Comparte tu análisis, apoya los Picks que te convencen y participa en la conversación. Un Pick al día, sin ligas ni puntos por apuestas.</p>
+          <details><summary>Publicar mi Pick</summary><form id="cpForm"></form></details>
+          <div class="cp-layout"><div><label for="cpSort">Ordenar Picks</label><select id="cpSort"><option value="score">Más votados</option><option value="created_at">Más recientes</option></select><p id="cpStatus" role="status">Cargando Picks…</p><div id="cpFeed"></div><button id="cpMore" type="button" hidden>Ver más Picks</button></div>
+          <aside class="cp-highlights"><details><summary>Votación semanal · Dos opciones</summary><div id="weeklyPickOptions"></div></details><h3>Mejor Pick · Top 3</h3><div id="cpTop"></div><h3>Peor Pick · Más cuestionado</h3><div id="cpWorst"></div></aside></div>
+        </section>
         <!-- Active Filter Indicator Bar -->
         <div id="filterIndicator" class="hidden mb-6 flex items-center justify-between bg-pitch-50 border border-pitch-200 px-4 py-3 rounded-xl text-pitch-900">
             <div class="text-sm">
@@ -444,8 +452,8 @@ html.dark [data-reading-size][aria-pressed="true"] {
                 <section class="editorial-pick" aria-labelledby="weeklyPickTitle">
                     <h2 id="weeklyPickTitle">Pick de la Semana</h2>
                     <div class="editorial-pick-body"><span class="editorial-eyebrow">LA VOZ DE LA COMUNIDAD</span>
-                    <h3>Dos opciones. Una comunidad.</h3>
-                    <div id="weeklyPickOptions" aria-live="polite"><p>Comprobando la edición publicada…</p></div></div>
+                    <h3>El Pick más apoyado de la semana.</h3>
+                    <div id="cpWeekly" aria-live="polite"><p>Cargando el Pick más apoyado…</p></div></div>
                 </section>
 
         <section class="rcm-panel editorial-community" aria-labelledby="communityTitle"><div class="ae-section-heading"><span class="ae-overline">LA COMUNIDAD OPINA</span><h2 id="communityTitle">Las voces de AE SPORTS</h2><p>Los comentarios más apoyados y más cuestionados, según votos reales.</p></div><div id="communityLeaders" aria-live="polite">Cargando comentarios destacados…</div></section>
@@ -1400,6 +1408,7 @@ currentUser = {
         }
 
         function renderArticlesFeed() {
+            if (typeof renderCommunityPicksVisibility === 'function') renderCommunityPicksVisibility();
             document.getElementById('editorialBottom').hidden = currentCategory !== 'Todos' || Boolean(currentSearchQuery);
             document.querySelector('.editorial-pick').hidden = currentCategory !== 'Todos' || Boolean(currentSearchQuery);
             document.getElementById('nflRankings').classList.toggle('hidden', currentCategory !== 'NFL');
@@ -1972,6 +1981,7 @@ updateThemeButton();
 <script src="assets/nfl-teams.js"></script>
 <script src="assets/community.js?v=20261015-4"></script>
 <script src="assets/champions.js?v=20261015-5"></script>
+<script src="assets/community-picks.js?v=1"></script>
 <script src="assets/weekly-picks.js?v=20261015-1"></script>
 </body>
 </html>
