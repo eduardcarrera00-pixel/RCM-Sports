@@ -298,6 +298,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/ae-picks-editorial.css?v=20261015-1">
 <link rel="stylesheet" href="assets/ae-editorial-weekly-profile.css?v=20261015-1">
 <link rel="stylesheet" href="assets/ae-community-picks-refresh.css?v=20261015-1">
+<link rel="stylesheet" href="assets/ae-layout-oct15.css?v=20261015-1">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 
@@ -379,7 +380,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
                 </div>
             </div>
             <input type="search" id="mobileSearchInput" hidden aria-hidden="true" tabindex="-1" oninput="handleMobileSearch()">
-            <nav id="footballTeams" class="rcm-row hidden" aria-label="Equipos de fútbol">
+            <nav id="footballTeams" class="rcm-row hidden" aria-label="Equipos de fútbol" aria-hidden="true" hidden inert>
                 <button type="button" data-team="" onclick="filterByTeam('')">Todo Fútbol</button>
                 <button type="button" data-team="barcelona" onclick="filterByTeam('barcelona')">FC Barcelona</button>
                 <button type="button" data-team="real-madrid" onclick="filterByTeam('real-madrid')">Real Madrid</button>
@@ -412,7 +413,13 @@ html.dark [data-reading-size][aria-pressed="true"] {
             <ol id="championsList" class="ae-full-ranking-list ae-ranking-accessible" aria-label="Top 10 Champions League"></ol>
         </section>
         <section id="footballTakes" class="ae-takes ae-picks-editorial" hidden aria-labelledby="takesTitle">
-          <div class="ae-takes-head"><span class="ae-takes-eyebrow">LA COMUNIDAD COMPITE</span><h2 id="takesTitle">Picks de AE SPORTS</h2><p>El equipo editorial propone los escenarios. Tú eliges, sumas puntos por tus aciertos y compites con la comunidad.</p></div>
+          <div class="ae-takes-head"><span class="ae-takes-eyebrow">ANÁLISIS · PRONÓSTICOS · COMUNIDAD</span><h2 id="takesTitle">Picks de AE SPORTS</h2><p>Nuestra selección editorial abre la conversación. Después, explora las noticias, comparte tu Pick y deja que la comunidad vote.</p>
+          <nav class="ae-picks-jump" aria-label="Explorar la sección Picks">
+            <a href="#picksFeatured"><span>01</span> Pick de la semana</a>
+            <a href="#picksNews"><span>02</span> Noticias</a>
+            <a href="#communityPicks"><span>03</span> Comunidad</a>
+            <a href="#picksRankingTitle"><span>04</span> Clasificación</a>
+          </nav></div>
           <section id="picksFeatured" class="ae-picks-feature" aria-labelledby="picksFeaturedTitle">
             <div class="ae-picks-feature-label"><span>DESTACADO · AE SPORTS</span><h3 id="picksFeaturedTitle">Pick de la semana</h3></div>
             <div id="picksFeaturedCard" aria-live="polite"><p>Cargando Pick editorial…</p></div>
@@ -522,6 +529,22 @@ html.dark [data-reading-size][aria-pressed="true"] {
                     <ol id="homeChampionsList" class="editorial-ranking-list"></ol>
                     <span class="ae-ranking-hint">Selecciona para ver el Top 10 <span aria-hidden="true">→</span></span>
                 </a>
+            </section>
+            <section id="aeHomeTopTakes" aria-labelledby="aeHomeTopTakesTitle">
+              <div class="ae-top-takes-heading">
+                <div><span>LA COMUNIDAD DECIDE</span><h2 id="aeHomeTopTakesTitle">Los Takes que marcan el debate</h2></div>
+                <p id="aeTopTakesStatus" role="status" aria-live="polite">Cargando los Takes destacados…</p>
+              </div>
+              <div class="ae-top-takes-grid">
+                <section class="ae-top-takes-card" aria-labelledby="aeTopTakesPositiveTitle">
+                  <header class="ae-top-takes-card-head"><span>TOP 3 · MÁS APOYADOS</span><h3 id="aeTopTakesPositiveTitle">Las opiniones que convencen</h3></header>
+                  <ol id="aeTopTakesPositive" class="ae-top-takes-list"><li class="ae-top-takes-empty">Cargando Takes…</li></ol>
+                </section>
+                <section class="ae-top-takes-card is-questioned" aria-labelledby="aeTopTakesNegativeTitle">
+                  <header class="ae-top-takes-card-head"><span>TOP 3 · MÁS CUESTIONADOS</span><h3 id="aeTopTakesNegativeTitle">Las opiniones que dividen</h3></header>
+                  <ol id="aeTopTakesNegative" class="ae-top-takes-list"><li class="ae-top-takes-empty">Cargando Takes…</li></ol>
+                </section>
+              </div>
             </section>
         </div>
 
@@ -1403,6 +1426,7 @@ currentUser = {
             moreNews.hidden = true;
             moreArticlesGrid.replaceChildren();
             document.body.classList.toggle('ae-is-home', isHome);
+            if (isHome && typeof refreshAeHomeTopTakes === 'function') refreshAeHomeTopTakes();
             // Show all news without a secondary button or artificially hidden cards.
 
 
@@ -1999,5 +2023,6 @@ updateThemeButton();
 <script src="assets/free-takes.js?v=20261015-4"></script>
 <script src="assets/ae-editorial-weekly.js?v=20261015-2"></script>
 <script src="assets/ae-profile.js?v=20261015-4"></script>
+<script src="assets/ae-home-takes.js?v=20261015-1"></script>
 </body>
 </html>
