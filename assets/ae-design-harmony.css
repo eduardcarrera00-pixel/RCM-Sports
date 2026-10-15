@@ -1,0 +1,176 @@
+/* AE SPORTS · armonia editorial / accesibilidad del modo claro · 15 oct 2026
+   Capa visual: no altera consultas, moderacion, perfiles ni votos. */
+
+/* PICKS: el encabezado se integra con el estilo sereno de NFL y Futbol. */
+#footballTakes.ae-picks-editorial>.ae-takes-head {
+  background:linear-gradient(124deg,#23394a 0%,#294255 58%,#354b58 100%)!important;
+  border:1px solid rgba(192,166,136,.20)!important;
+  box-shadow:0 9px 25px rgba(3,17,28,.13)!important;
+  padding:26px clamp(20px,3vw,39px) 24px!important;
+}
+#footballTakes>.ae-takes-head .ae-takes-eyebrow{color:#dfb994!important;letter-spacing:.14em}
+#footballTakes>.ae-takes-head h2{font-size:clamp(31px,3.6vw,45px)!important;line-height:1.15!important;color:#f8ebdf!important}
+#footballTakes>.ae-takes-head p{color:#dfe2e0!important}
+#footballTakes .ae-picks-jump{margin-top:18px}
+#footballTakes .ae-picks-jump a{background:rgba(255,255,255,.055)!important;border-color:rgba(213,191,167,.25)!important;color:#f0e7df!important}
+#footballTakes .ae-picks-jump a span{color:#dfb78d!important}
+#footballTakes .ae-picks-jump a:hover,#footballTakes .ae-picks-jump a:focus-visible{background:rgba(255,255,255,.13)!important}
+
+/* Piezas con el mismo lenguaje visual, sin bloques de color compitiendo entre si. */
+#footballTakes .ae-picks-feature{
+  background:linear-gradient(144deg,#21394b 0%,#263d4c 100%)!important;
+  border-color:rgba(188,166,144,.20)!important;
+  box-shadow:0 7px 22px rgba(3,17,26,.14)!important;
+}
+#footballTakes .ae-picks-feature-label span{
+  background:transparent!important;border:0!important;padding:0!important;color:#d8b492!important;
+}
+#footballTakes .ae-picks-feature-label h3{color:#f6e9dc!important}
+#footballTakes .ae-picks-news{
+  background:linear-gradient(145deg,#253b4b,#203646)!important;
+  border-color:rgba(188,166,144,.16)!important;
+  box-shadow:0 7px 21px rgba(3,17,26,.11)!important;
+}
+#footballTakes #picksNews .ae-picks-news-heading{border-color:rgba(210,184,159,.20)!important}
+#footballTakes #picksNews .ae-picks-news-heading span{color:#d9b18d!important}
+#footballTakes #picksNews .ae-picks-news-heading h3{color:#f7eadd!important}
+#footballTakes #picksNews .ae-picks-news-heading p{color:#cbd5d8!important}
+#footballTakes #picksNews .ae-picks-news-card{
+  background:#2a4051!important;border-color:rgba(218,197,177,.13)!important;box-shadow:none!important;
+}
+#footballTakes #picksNews .ae-picks-news-copy h4{color:#f7e9dc!important}
+#footballTakes #picksNews .ae-picks-news-copy p{color:#c9d0d2!important}
+#footballTakes #picksNews .ae-picks-news-label{color:#dfb68e!important}
+#footballTakes #picksNews .ae-picks-news-empty{color:#d1d1cb!important}
+
+/* Mantenemos la distribucion de comunidad, los paneles y el ranking. */
+#footballTakes .ae-picks-layout{
+  background:linear-gradient(145deg,#22394a,#1c3344)!important;
+  border-color:rgba(185,159,134,.18)!important;
+  box-shadow:0 8px 22px rgba(2,17,29,.11)!important;
+}
+#footballTakes .ae-cp-compose{background:#344d5b!important;border-color:#cda98b51!important;box-shadow:none!important}
+
+/* Modo claro: fondos pergamino un poco mas profundos, letras marron tinta. */
+html:not(.dark) body{background:#e8e3dc!important;color:#352f2a!important}
+html:not(.dark) #mainContent{color:#352f2a}
+html:not(.dark) #footballTakes.ae-picks-editorial{color:#352f2a!important}
+html:not(.dark) #footballTakes.ae-picks-editorial>.ae-takes-head{
+  background:linear-gradient(120deg,#e0d5c6,#e9e0d5 65%,#d9cbbc)!important;
+  border-color:#c7b5a0!important;box-shadow:0 7px 22px rgba(77,58,43,.08)!important;
+}
+html:not(.dark) #footballTakes>.ae-takes-head .ae-takes-eyebrow{color:#835b42!important}
+html:not(.dark) #footballTakes>.ae-takes-head h2{color:#382e27!important}
+html:not(.dark) #footballTakes>.ae-takes-head p{color:#5d5148!important}
+html:not(.dark) #footballTakes .ae-picks-jump a{
+  background:#f1e9de!important;border-color:#cbb9a5!important;color:#4c3c30!important;
+}
+html:not(.dark) #footballTakes .ae-picks-jump a span{color:#875c3e!important}
+html:not(.dark) #footballTakes .ae-picks-jump a:hover{background:#e1d0bf!important}
+html:not(.dark) #footballTakes .ae-picks-feature{
+  background:linear-gradient(145deg,#eee7dd,#e4d9cc)!important;
+  border-color:#c8b7a5!important;box-shadow:0 6px 20px rgba(78,53,37,.08)!important;
+}
+html:not(.dark) #footballTakes .ae-picks-feature-label h3{color:#3c3029!important}
+html:not(.dark) #footballTakes .ae-picks-feature-label span{color:#85593d!important}
+html:not(.dark) #picksFeaturedCard .ae-weekly-card,
+html:not(.dark) #picksFeaturedCard .ae-weekly-preview{color:#44362c!important}
+html:not(.dark) #picksFeaturedCard .ae-weekly-title{color:#3d3028!important}
+html:not(.dark) #picksFeaturedCard .ae-weekly-kicker{color:#80553c!important}
+html:not(.dark) #picksFeaturedCard .ae-weekly-event{color:#584b40!important}
+html:not(.dark) #picksFeaturedCard .ae-weekly-selection strong{color:#362e29!important}
+html:not(.dark) #picksFeaturedCard .ae-weekly-analysis{color:#51463c!important}
+html:not(.dark) #picksFeaturedCard .ae-weekly-disclaimer{color:#62574f!important}
+html:not(.dark) #picksFeaturedCard .ae-weekly-empty{color:#5b5047!important}
+html:not(.dark) #picksFeaturedCard .ae-weekly-odds{background:#78563f!important;border-color:#78563f!important;color:#fff9f3!important}
+
+/* Noticias y comunidad usan superficies de valor tonal parecido al resto. */
+html:not(.dark) #footballTakes .ae-picks-news{
+  background:linear-gradient(145deg,#eee7dd,#e6dcd0)!important;border-color:#cebdac!important;
+  box-shadow:0 6px 19px rgba(78,53,37,.06)!important;
+}
+html:not(.dark) #footballTakes #picksNews .ae-picks-news-heading{border-color:#cbb9a6!important}
+html:not(.dark) #footballTakes #picksNews .ae-picks-news-heading span{color:#7f553a!important}
+html:not(.dark) #footballTakes #picksNews .ae-picks-news-heading h3{color:#392e27!important}
+html:not(.dark) #footballTakes #picksNews .ae-picks-news-heading p{color:#5b524b!important}
+html:not(.dark) #footballTakes #picksNews .ae-picks-news-card{background:#f5efe7!important;border-color:#d8c7b6!important}
+html:not(.dark) #footballTakes #picksNews .ae-picks-news-copy h4{color:#41332b!important}
+html:not(.dark) #footballTakes #picksNews .ae-picks-news-copy p{color:#5b5149!important}
+html:not(.dark) #footballTakes #picksNews .ae-picks-news-label{color:#82543c!important}
+html:not(.dark) #footballTakes #picksNews .ae-picks-news-empty{color:#5b5149!important}
+html:not(.dark) #footballTakes .ae-picks-layout{
+  background:linear-gradient(140deg,#e7ded3,#dfd4c7)!important;border-color:#cbbba9!important;
+  box-shadow:0 7px 22px rgba(78,53,37,.08)!important;
+}
+html:not(.dark) #footballTakes .ae-picks-feed-heading{border-color:#c7b8a8!important}
+html:not(.dark) #footballTakes #communityPicks h3#cpTitle{color:#3c3028!important}
+html:not(.dark) #footballTakes .ae-picks-feed-heading span{color:#775036!important}
+html:not(.dark) #footballTakes .ae-picks-feed-heading p{color:#584d44!important}
+html:not(.dark) #footballTakes .ae-cp-compose{background:#e1d1bf!important;border-color:#bfa58b!important}
+html:not(.dark) #footballTakes .ae-cp-compose>summary{color:#3b2e25!important}
+html:not(.dark) #footballTakes .ae-cp-sort{color:#514338!important}
+html:not(.dark) #footballTakes #cpSort{background:#f7f0e8!important;color:#302922!important;border:1px solid #ab9786!important}
+html:not(.dark) #footballTakes #cpStatus{color:#5f5246!important}
+html:not(.dark) #footballTakes #communityPicks .cp-card{
+  background:#f2ebe2!important;color:#352d27!important;border:1px solid #d2c1ae!important;
+}
+html:not(.dark) #footballTakes #communityPicks .cp-card h3,
+html:not(.dark) #footballTakes #communityPicks .cp-card h3 a{color:#382c26!important}
+html:not(.dark) #footballTakes #communityPicks .cp-card p,
+html:not(.dark) #footballTakes #communityPicks .cp-card .cp-explanation,
+html:not(.dark) #footballTakes #communityPicks .cp-card .cp-legs p{color:#4f4136!important}
+html:not(.dark) #footballTakes #communityPicks .cp-card .cp-meta,
+html:not(.dark) #footballTakes #communityPicks .cp-card small{color:#5e5146!important}
+html:not(.dark) #footballTakes #communityPicks .cp-card .cp-odds{color:#795036!important}
+html:not(.dark) #footballTakes #communityPicks .cp-card .cp-actions{border-color:#cbbcae!important;color:#4a3e33}
+html:not(.dark) #footballTakes #communityPicks .cp-card .cp-actions button{background:#e3d6c7!important;color:#433328!important;border-color:#bda58e!important}
+html:not(.dark) #footballTakes #communityPicks .cp-card .cp-actions button[aria-pressed=true]{background:#785842!important;color:#fff!important}
+html:not(.dark) #footballTakes .ae-picks-rail .ae-picks-top-three,
+html:not(.dark) #footballTakes .ae-picks-rail .ae-takes-side{
+  background:#f1e9df!important;border-color:#d0bead!important;box-shadow:none!important;
+}
+html:not(.dark) #footballTakes .ae-picks-rail h3{color:#392f28!important}
+html:not(.dark) #footballTakes .ae-picks-rail-heading span{color:#83583e!important}
+html:not(.dark) #footballTakes .ae-picks-rail-heading p,
+html:not(.dark) #footballTakes .ae-picks-ranking-intro{color:#5a5149!important}
+html:not(.dark) #footballTakes #picksPopular li,
+html:not(.dark) #footballTakes #cpLeaderboard li{border-color:#d7c9b9!important;color:#45392f!important}
+html:not(.dark) #footballTakes #picksPopular .ae-popular-position,
+html:not(.dark) #footballTakes #cpLeaderboard strong{color:#805338!important}
+html:not(.dark) #footballTakes #picksPopular .ae-popular-copy strong{color:#3e322b!important}
+html:not(.dark) #footballTakes #picksPopular .ae-popular-copy small,
+html:not(.dark) #footballTakes #picksPopular .ae-popular-copy span{color:#605248!important}
+html:not(.dark) #footballTakes #picksPopular .ae-popular-votes{color:#7c5239!important}
+html:not(.dark) #footballTakes .ae-takes-tabs button{color:#45362c!important;border-color:#bea890!important;background:#e7dbce!important}
+html:not(.dark) #footballTakes .ae-takes-tabs button[aria-pressed=true]{background:#765641!important;color:#fff9f1!important}
+html:not(.dark) #footballTakes #cpReload{background:#785840!important;color:#fff9f3!important}
+html:not(.dark) #footballTakes #cpForm label,
+html:not(.dark) #footballTakes #cpForm legend{color:#443529!important}
+html:not(.dark) #footballTakes #cpForm input:not([type=checkbox]),
+html:not(.dark) #footballTakes #cpForm textarea{background:#f8f3eb!important;border-color:#b7a28d!important;color:#352c25!important}
+html:not(.dark) #footballTakes #cpForm input::placeholder,
+html:not(.dark) #footballTakes #cpForm textarea::placeholder{color:#796b5e!important;opacity:1}
+html:not(.dark) #footballTakes #cpForm output{color:#795039!important}
+html:not(.dark) #footballTakes .ae-cp-moderate{background:#eee5da!important;color:#3a3029!important;border-color:#cbb9a6!important}
+html:not(.dark) #footballTakes .ae-cp-moderate p{color:#544637!important}
+html:not(.dark) #footballTakes #cpAdminStatus{color:#6c4835!important}
+
+/* Vista del Pick editorial de la portada: seleccionar eventos y cuota se ve en claro. */
+html:not(.dark) .editorial-pick .ae-weekly-event,
+html:not(.dark) .editorial-pick .ae-weekly-selection strong{color:#3d332b!important}
+html:not(.dark) .editorial-pick .ae-weekly-analysis,
+html:not(.dark) .editorial-pick .ae-weekly-disclaimer{color:#574b43!important}
+html:not(.dark) .editorial-pick .ae-weekly-odds{background:#80583d!important;color:#fffaf5!important}
+html:not(.dark) .editorial-pick .ae-weekly-title{color:#372e27!important}
+html:not(.dark) .editorial-pick .ae-weekly-kicker{color:#80563b!important}
+html:not(.dark) .editorial-pick .ae-weekly-empty{color:#53463b!important}
+
+/* Encabezados de takes: menos ruido visual; ambas etiquetas mantienen humor. */
+.ae-top-takes-card-head {background:linear-gradient(110deg,#445669,#4e6270)!important}
+.ae-top-takes-card.is-questioned .ae-top-takes-card-head{background:linear-gradient(110deg,#485b68,#546576)!important}
+.ae-top-takes-card-head h3{font-size:clamp(21px,1.9vw,27px)!important}
+.ae-top-takes-card-head .ae-top-takes-subtitle{display:block;margin-top:4px;color:#ebe0d6;font:400 11px/1.5 Inter,system-ui}
+@media(max-width:610px){
+  #footballTakes.ae-picks-editorial>.ae-takes-head{padding:23px 19px!important}
+  #footballTakes .ae-picks-jump a{min-width:0}
+}
