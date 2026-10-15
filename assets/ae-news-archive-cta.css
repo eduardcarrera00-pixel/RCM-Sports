@@ -1,0 +1,296 @@
+/* AE SPORTS · Cocina Picks / archivo editorial de noticias, oct 2026.
+   Reglas añadidas al final: compatibles con modo claro, oscuro y móvil. */
+
+/* El botón de crear un Pick es la primera acción; "¿Eres Chef?" acompaña.
+   El signo + indica explícitamente que permite publicar, no apostar. */
+html body #footballTakes #communityPicks .ae-picks-heading-cta-row{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  flex-wrap:wrap!important;
+  gap:9px 17px!important;
+}
+html body #footballTakes #communityPicks #cpPublishCta.ae-picks-publish-cta{
+  flex:0 0 auto!important;
+  min-height:42px!important;
+  padding:10px 16px!important;
+  font:800 13.5px/1.2 Inter,system-ui,sans-serif!important;
+}
+html body #footballTakes #communityPicks #cpPublishCta>span{
+  font:800 17px/1 Inter,system-ui,sans-serif!important;
+  margin-right:2px!important;
+}
+html body #footballTakes #communityPicks .ae-picks-nudge{
+  flex:0 1 auto!important;
+  font:650 clamp(20px,2.15vw,27px)/1.12 Newsreader,Georgia,serif!important;
+  margin:0!important;
+}
+
+/* Cuota del Pick de la Semana, tanto en portada como en el detalle editorial:
+   esquinas cuadradas, sin alterar el importe ni la tipografía. */
+html body .ae-weekly-odds,
+html.dark body .ae-weekly-odds,
+html:not(.dark) body .ae-weekly-odds,
+html body #footballTakes #picksFeatured .ae-weekly-odds,
+html body .editorial-pick .ae-weekly-odds{
+  border-radius:0!important;
+}
+
+/* Pequeños accesos al archivo, integrados en cada título editorial. */
+html body .ae-news-heading-row,
+html body .ae-news-inline-tools{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px 14px;
+  flex-wrap:wrap;
+}
+html body .ae-news-inline-tools{
+  justify-content:flex-end;
+}
+html body .ae-news-all-button{
+  appearance:none;
+  display:inline-flex!important;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  box-sizing:border-box;
+  border:1px solid rgba(200,159,118,.55)!important;
+  background:rgba(24,57,72,.86)!important;
+  border-radius:2px!important;
+  color:#f5dbc1!important;
+  padding:8px 11px!important;
+  min-height:34px;
+  width:auto;
+  white-space:normal;
+  font:750 11px/1.2 Inter,system-ui,sans-serif!important;
+  letter-spacing:.012em;
+  cursor:pointer;
+  text-decoration:none;
+}
+html body .ae-news-all-button>span{font-size:14px;line-height:1}
+html body .ae-news-all-button:hover{
+  border-color:#d9a77b!important;
+  background:#31556a!important;
+  color:#fff4e7!important;
+}
+html body .ae-news-all-button:focus-visible{
+  outline:2px solid #e1b389;
+  outline-offset:2px;
+}
+html body .ae-news-all-button[hidden]{display:none!important;}
+html:not(.dark) body .ae-news-all-button{
+  background:#f7f0e5!important;
+  color:#79513c!important;
+  border-color:#c7a889!important;
+}
+html:not(.dark) body .ae-news-all-button:hover{
+  color:#284b5c!important;
+  background:#ece6dc!important;
+}
+html body #picksNews .ae-news-heading-row{margin:3px 0 5px;}
+html body #picksNews .ae-news-heading-row h3{margin:0!important;}
+html body .ae-news-inline-tools #articlesCount{font-size:11px;}
+html body .ae-footer-all-news{
+  display:inline-flex;
+  align-items:center;
+  font-weight:700;
+  color:#efc7a3!important;
+  padding:3px 0;
+}
+html body .ae-footer-all-news:hover{color:#fff3e2!important;}
+
+/* El archivo usa <dialog> nativo: mantiene foco y cierre por Escape,
+   y evita afectar la navegación o el diseño normal de la portada. */
+html body .ae-news-archive-dialog{
+  position:fixed!important;
+  box-sizing:border-box!important;
+  width:min(920px,calc(100vw - 28px))!important;
+  max-width:920px!important;
+  max-height:min(90dvh,950px)!important;
+  height:auto!important;
+  padding:0!important;
+  margin:auto!important;
+  border:1px solid #bc9674!important;
+  border-radius:3px!important;
+  color:#f6e5d5!important;
+  background:#102d3c!important;
+  box-shadow:0 26px 90px rgba(0,10,20,.46)!important;
+  overflow-y:auto!important;
+  overscroll-behavior:contain;
+  z-index:9999!important;
+}
+html body .ae-news-archive-dialog:not([open]){display:none!important;}
+html body .ae-news-archive-dialog::backdrop{
+  background:rgba(6,24,37,.76);
+  backdrop-filter:blur(5px);
+}
+html body .ae-news-archive{padding:clamp(17px,3vw,30px);}
+html body .ae-news-archive-head{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  gap:15px;
+  margin:0 0 17px;
+}
+html body .ae-news-archive-head h2{
+  margin:5px 0 5px!important;
+  color:#fff0df!important;
+  font:600 clamp(28px,3.8vw,40px)/1.08 Newsreader,Georgia,serif!important;
+}
+html body .ae-news-archive-head p{
+  margin:0;color:#c3d0d0;font:400 12px/1.48 Inter,system-ui,sans-serif;
+}
+html body .ae-news-archive-kicker{
+  color:#e1b58f;
+  letter-spacing:.1em;
+  font:800 10px/1.35 Inter,system-ui,sans-serif;
+}
+html body .ae-news-archive-close{
+  display:inline-flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  width:38px;height:38px;
+  margin:0;padding:0;
+  border:1px solid rgba(213,177,143,.36);border-radius:2px;
+  background:#214559;color:#f8e7d7;
+  font:500 26px/1 Inter,system-ui;
+  cursor:pointer;
+}
+html body .ae-news-archive-filters{
+  padding:14px 0 10px;
+  margin:0 0 12px;
+  border-block:1px solid rgba(195,164,135,.22);
+}
+html body .ae-news-search-label{
+  display:flex;flex-direction:column;
+  gap:6px;
+  color:#e5c3a1;
+  font:750 11px/1.3 Inter,system-ui,sans-serif;
+}
+html body .ae-news-search-label input{
+  box-sizing:border-box;
+  display:block;width:100%;min-height:42px;
+  border:1px solid #7b9395;border-radius:2px;
+  padding:10px 13px;
+  background:#f6f3ed;
+  color:#254459;
+  outline-offset:2px;
+  font:500 13px/1.3 Inter,system-ui,sans-serif;
+}
+html body .ae-news-search-label input:focus-visible{
+  outline:2px solid #d2a578;
+}
+html body .ae-news-archive-chips{
+  display:flex;flex-wrap:wrap;gap:7px;
+  margin:12px 0 8px;
+}
+html body .ae-news-archive-chips button{
+  border:1px solid rgba(197,166,132,.48);
+  border-radius:2px;padding:7px 12px;
+  color:#e4d2bd;background:#1c4154;
+  font:750 11px/1.3 Inter,system-ui,sans-serif;
+  cursor:pointer;
+  min-height:33px;
+}
+html body .ae-news-archive-chips button[aria-pressed="true"]{
+  background:#c79671;
+  color:#102d3e;
+  border-color:#e0b78f;
+}
+html body .ae-news-archive-status{min-height:0}
+html body #aeNewsArchiveStatus{
+  color:#c2d0cf;margin:5px 0 0;
+  font:500 11px/1.35 Inter,system-ui,sans-serif;
+}
+html body .ae-news-archive-grid{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;
+}
+html body .ae-news-archive-card{
+  min-width:0;
+  border:1px solid rgba(197,163,127,.22);
+  border-radius:2px;
+  overflow:hidden;
+  background:linear-gradient(140deg,#1a3c4e,#143345);
+}
+html body .ae-news-archive-card-link{
+  display:flex;align-items:stretch;min-height:112px;
+  width:100%;text-decoration:none!important;
+  color:inherit!important;outline-offset:2px;
+}
+html body .ae-news-archive-card-link img{
+  display:block;width:112px;min-height:112px;max-height:168px;
+  flex:0 0 112px;object-fit:cover;
+}
+html body .ae-news-archive-card-copy{padding:12px;min-width:0;flex:1;}
+html body .ae-news-archive-card-category{
+  color:#d6ac88;
+  font:800 10px/1.25 Inter,system-ui,sans-serif;
+  letter-spacing:.07em;
+}
+html body .ae-news-archive-card-copy h3{
+  color:#f9ecdd!important;
+  font:600 17px/1.2 Newsreader,Georgia,serif!important;
+  margin:5px 0 7px!important;overflow-wrap:anywhere;
+}
+html body .ae-news-archive-card-copy p{
+  color:#ccd4d3;
+  font:400 11px/1.44 Inter,system-ui,sans-serif;
+  margin:0 0 6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+html body .ae-news-archive-card-copy small{
+  color:#dbbb9e;font:500 10px/1.2 Inter,system-ui,sans-serif;
+}
+html body .ae-news-archive-card-link:hover h3{color:#edbd98!important;}
+html body .ae-news-archive-empty{
+  grid-column:1/-1;padding:26px 16px;
+  text-align:center;color:#d5c5b8;font:400 13px/1.5 Inter,system-ui,sans-serif;
+}
+html body .ae-news-archive-more{
+  display:block;margin:17px auto 0;
+  border:1px solid #d5a77b;border-radius:2px;
+  background:#c79b78;color:#153346;
+  padding:10px 18px;font:800 12px/1.3 Inter,system-ui,sans-serif;
+  cursor:pointer;
+}
+html body .ae-news-archive-more[hidden]{display:none!important;}
+
+/* Versión diurna del mismo archivo, cálida y de alto contraste. */
+html:not(.dark) body .ae-news-archive-dialog{
+  background:#f8f6ef!important;color:#2b4555!important;
+  border-color:#cdbba8!important;
+}
+html:not(.dark) body .ae-news-archive-head h2{color:#294758!important;}
+html:not(.dark) body .ae-news-archive-head p,
+html:not(.dark) body #aeNewsArchiveStatus{color:#526b78!important;}
+html:not(.dark) body .ae-news-archive-kicker,
+html:not(.dark) body .ae-news-search-label{color:#84573b!important;}
+html:not(.dark) body .ae-news-archive-close{background:#e9e9e2;color:#305066;border-color:#bdc8c5;}
+html:not(.dark) body .ae-news-archive-filters{border-color:#d9d8cd;}
+html:not(.dark) body .ae-news-archive-chips button{
+  color:#325567;background:#edf2ef;border-color:#c5d2d1;
+}
+html:not(.dark) body .ae-news-archive-chips button[aria-pressed="true"]{
+  color:#fffbf5;background:#355c71;border-color:#355c71;
+}
+html:not(.dark) body .ae-news-archive-card{
+  border-color:#d9ddda;background:#fffefa;
+  box-shadow:0 4px 12px rgba(38,63,75,.045);
+}
+html:not(.dark) body .ae-news-archive-card-category,
+html:not(.dark) body .ae-news-archive-card-copy small{color:#825f46!important;}
+html:not(.dark) body .ae-news-archive-card-copy h3{color:#2b4657!important;}
+html:not(.dark) body .ae-news-archive-card-copy p{color:#536874!important;}
+html:not(.dark) body .ae-news-archive-card-link:hover h3{color:#80563a!important;}
+html:not(.dark) body .ae-news-archive-empty{color:#5d6e76;}
+@media(max-width:780px){
+  html body .ae-news-archive-grid{grid-template-columns:1fr;}
+  html body .ae-news-archive-card-link img{width:104px;flex-basis:104px;min-height:104px;}
+  html body .ae-news-all-button{font-size:10px!important;padding:7px 9px!important;}
+  html body #footballTakes #communityPicks .ae-picks-heading-cta-row{gap:8px 13px!important;}
+}
+@media(max-width:450px){
+  html body .ae-news-archive-dialog{width:calc(100vw - 14px)!important;max-height:94dvh!important;}
+  html body .ae-news-archive{padding:15px;}
+  html body .ae-news-archive-card-link img{width:95px;flex-basis:95px;}
+  html body .ae-news-inline-tools{align-items:flex-start;gap:5px;flex-direction:column;}
+  html body #footballTakes #communityPicks .ae-picks-nudge{font-size:20px!important;}
+}
+@media(prefers-reduced-motion:reduce){html body .ae-news-archive-dialog *{scroll-behavior:auto!important}}

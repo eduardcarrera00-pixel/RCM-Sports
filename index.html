@@ -315,6 +315,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/ae-chef-picks-takes-finish.css?v=20261015-1">
 <link rel="stylesheet" href="assets/ae-chef-compact-sport-authors.css?v=20261015-2">
 <link rel="stylesheet" href="assets/ae-chef-leaderboards.css?v=20261015-1">
+<link rel="stylesheet" href="assets/ae-news-archive-cta.css?v=20261015-1">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 
@@ -459,7 +460,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
           </section>
           <div class="ae-picks-overview">
           <section id="picksNews" class="ae-picks-news" aria-labelledby="picksNewsTitle">
-            <div class="ae-picks-news-heading"><span>ACTUALIDAD Y ANÁLISIS</span><h3 id="picksNewsTitle">Noticias de Picks</h3><p>Nuestras últimas noticias y análisis de pronósticos.</p></div>
+            <div class="ae-picks-news-heading"><span>ACTUALIDAD Y ANÁLISIS</span><div class="ae-news-heading-row"><h3 id="picksNewsTitle">Noticias de Picks</h3><button class="ae-news-all-button" type="button" data-ae-news-category="Picks">Todas las noticias <span aria-hidden="true">→</span></button></div><p>Nuestras últimas noticias y análisis de pronósticos.</p></div>
             <div id="picksNewsList" class="ae-picks-news-list" aria-live="polite"></div>
           </section>
 
@@ -468,8 +469,8 @@ html.dark [data-reading-size][aria-pressed="true"] {
             <section class="ae-picks-feed" id="communityPicks" hidden aria-labelledby="cpTitle">
               <div class="ae-picks-feed-heading">
                  <div class="ae-picks-heading-cta-row">
+                   <button id="cpPublishCta" type="button" class="ae-participate-cta ae-picks-publish-cta" aria-label="Cocina Picks: publicar un nuevo pronóstico" aria-controls="cpComposePanel" aria-expanded="false"><span aria-hidden="true">＋</span> Cocina Picks</button>
                    <span class="ae-picks-nudge">¿Eres Chef?</span>
-                   <button id="cpPublishCta" type="button" class="ae-participate-cta ae-picks-publish-cta" aria-controls="cpComposePanel" aria-expanded="false">Cocina Picks</button>
                  </div>
                  <h3 id="cpTitle" class="sr-only">Picks de la comunidad</h3>
                  
@@ -556,7 +557,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
                         <span class="w-3 h-6 bg-pitch-600 rounded-full mr-3"></span>
                         Últimas noticias
                     </h2>
-                    <span id="articlesCount" class="text-xs text-slate-500 font-medium">Cargando...</span>
+                    <div class="ae-news-inline-tools"><span id="articlesCount" class="text-xs text-slate-500 font-medium">Cargando...</span><button id="aeAllNewsSport" type="button" class="ae-news-all-button" data-ae-news-category="NFL" hidden>Todas las noticias <span aria-hidden="true">→</span></button></div>
                 </div>
 
                 <!-- Articles Cards Grid -->
@@ -1028,6 +1029,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
                         <li><a href="#" onclick="filterByCategory('NBA')" class="hover:text-pitch-400 transition-colors">NBA</a></li>
                         <li><a href="#" onclick="filterByCategory('Tenis')" class="hover:text-pitch-400 transition-colors">Tenis</a></li>
                         <li><a href="#" onclick="filterByCategory('Ciclismo')" class="hover:text-pitch-400 transition-colors">Ciclismo</a></li>
+                        <li><a href="#todas-las-noticias" data-ae-news-category="Todas" class="ae-footer-all-news hover:text-pitch-400 transition-colors">Todas las noticias</a></li>
                     </ul>
                 </div>
 
@@ -1083,6 +1085,29 @@ html.dark [data-reading-size][aria-pressed="true"] {
             </div>
         </div>
     </footer>
+
+    <dialog id="aeNewsArchiveDialog" class="ae-news-archive-dialog" aria-labelledby="aeNewsArchiveTitle" aria-describedby="aeNewsArchiveDescription">
+      <div class="ae-news-archive">
+        <div class="ae-news-archive-head">
+          <div><span class="ae-news-archive-kicker">ARCHIVO EDITORIAL DE AE SPORTS</span><h2 id="aeNewsArchiveTitle">Todas las noticias</h2><p id="aeNewsArchiveDescription">Todas nuestras publicaciones, de las más recientes a las más antiguas.</p></div>
+          <button id="aeNewsArchiveClose" type="button" class="ae-news-archive-close" aria-label="Cerrar todas las noticias">×</button>
+        </div>
+        <div class="ae-news-archive-filters">
+          <label class="ae-news-search-label" for="aeNewsArchiveSearch">Buscar noticias
+            <input id="aeNewsArchiveSearch" type="search" placeholder="Buscar por título, equipo o tema…" autocomplete="off">
+          </label>
+          <div class="ae-news-archive-chips" role="group" aria-label="Filtrar noticias por categoría">
+            <button type="button" data-ae-archive-filter="Todas" aria-pressed="true">Todas</button>
+            <button type="button" data-ae-archive-filter="Picks" aria-pressed="false">Picks</button>
+            <button type="button" data-ae-archive-filter="NFL" aria-pressed="false">NFL</button>
+            <button type="button" data-ae-archive-filter="Fútbol" aria-pressed="false">Fútbol</button>
+          </div>
+          <p id="aeNewsArchiveStatus" role="status" aria-live="polite"></p>
+        </div>
+        <div id="aeNewsArchiveGrid" class="ae-news-archive-grid"></div>
+        <button id="aeNewsArchiveMore" type="button" class="ae-news-archive-more" hidden>Ver más noticias</button>
+      </div>
+    </dialog>
 
     <script>
 
@@ -1408,6 +1433,7 @@ currentUser = {
                 }
                 articles = [...rows.map(fromDatabase), ...defaultArticles.map(a => withLocalInteractions({...a, remote: false}))];
                 renderArticlesFeed();
+                window.aeRefreshNewsArchive?.();
                 renderTrending();
                 refreshCommunity();
                 await refreshArticleStats();
@@ -1513,7 +1539,10 @@ currentUser = {
             const articlesCount = document.getElementById('articlesCount');
 
             const isHome = currentCategory === 'Todos' && !currentSearchQuery;
-            const visibleCount = isHome ? Math.min(3, filtered.length) : filtered.length;
+            const isSportNewsPreview = ['NFL','Fútbol'].includes(currentCategory) && !currentSearchQuery;
+            const archiveLink = document.getElementById('aeAllNewsSport');
+            if(archiveLink) {archiveLink.hidden=!isSportNewsPreview; archiveLink.dataset.aeNewsCategory=currentCategory;}
+            const visibleCount = (isHome || isSportNewsPreview) ? Math.min(3, filtered.length) : filtered.length;
             articlesCount.innerText = `${visibleCount} ${visibleCount === 1 ? 'noticia' : 'noticias'}`;
             const moreNews = document.getElementById('aeMoreNews');
             const moreArticlesGrid = document.getElementById('moreArticlesGrid');
@@ -1535,11 +1564,11 @@ currentUser = {
             articlesGrid.classList.remove('hidden');
 
             let heroArticle = filtered[0];
-            let gridArticles = isHome ? filtered.slice(0, 3) : filtered;
+            let gridArticles = (isHome || isSportNewsPreview) ? filtered.slice(0, 3) : filtered;
 
             if (currentCategory !== 'Todos' || currentSearchQuery !== '') {
                 heroSection.classList.add('hidden');
-                gridArticles = filtered;
+                gridArticles = isSportNewsPreview ? filtered.slice(0,3) : filtered;
             } else {
                 heroSection.classList.remove('hidden');
                 renderHeroCard(heroArticle);
@@ -2126,5 +2155,6 @@ updateThemeButton();
 <script src="assets/ae-sport-top-takes.js?v=20261015-6"></script>
 <script src="assets/ae-take-replies.js?v=20261015-2"></script>
 <script src="assets/ae-picks-premium.js?v=20261015-1"></script>
+<script src="assets/ae-news-archive.js?v=20261015-1"></script>
 </body>
 </html>
