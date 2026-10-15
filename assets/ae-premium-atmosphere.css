@@ -175,3 +175,10 @@ html.dark #publishModal [id^=pub]{color-scheme:dark}
  #cpFeed .cp-card .cp-actions{gap:5px}
 }
 @media(prefers-reduced-motion:reduce){html.dark body:after{filter:none}}
+
+/* Imagen editorial opcional en el avance de portada. */
+.editorial-pick #cpWeekly .ae-weekly-home-thumbnail{display:block;width:100%;height:94px;object-fit:cover;object-position:center 36%;border-radius:7px;margin:0 0 8px;border:1px solid #bb9b7a4d}
+.editorial-pick #cpWeekly .ae-weekly-preview{cursor:pointer}
+.editorial-pick #cpWeekly .ae-weekly-preview:focus-visible{outline:2px solid #d9b18b;outline-offset:4px}
+html.dark #publishModal{color-scheme:dark}
+html.dark #publishModal label{color:#d8dfe4}
