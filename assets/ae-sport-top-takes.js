@@ -19,7 +19,12 @@
      li.append(el('span',String(i+1).padStart(2,'0'),'ae-top-take-number'));
      const content=el('div',undefined,'ae-top-take-content');
      content.append(el('span',names[t.sport]||'Fútbol','ae-top-take-sport'));
-     const title=el('strong',t.title,'ae-sport-take-title');
+     const title=el('strong',undefined,'ae-sport-take-title');
+     const openTake=el('button',t.title,'ae-sport-take-open');
+     openTake.type='button';
+     openTake.setAttribute('aria-label','Leer Take y ver su conversación: '+t.title);
+     openTake.addEventListener('click',()=>window.aeTakeReplies?.open(t));
+     title.append(openTake);
      content.append(title);
      const excerpt=String(t.body||'').replace(/^NFL[^\n]*\n\n/,'').trim();
      if(excerpt)content.append(el('p',excerpt.length>145?excerpt.slice(0,142).trimEnd()+'…':excerpt,'ae-sport-take-summary'));
@@ -31,10 +36,11 @@
      const score=el('span',undefined,'ae-top-take-votes');
      score.append(el('span','▲ '+Number(t.upvotes||0),'ae-top-take-up'),el('span','▼ '+Number(t.downvotes||0),'ae-top-take-down'));
      content.append(score);
-     const comment=el('button','Comentar Take','ae-take-discuss-link');
-     comment.type='button';comment.addEventListener('click',()=>window.aeTakeReplies?.open(t));
-     content.append(comment);
-     li.append(content);list.append(li);
+     li.append(content);
+     li.addEventListener('click',event=>{
+       if(!event.target.closest('button'))window.aeTakeReplies?.open(t);
+     });
+     list.append(li);
    }
    if(!items.length)list.append(el('li',mode==='up'?'Todavía no hay Takes con votos positivos.':'Todavía no hay Takes con votos negativos.','ae-top-takes-empty'));
  }
