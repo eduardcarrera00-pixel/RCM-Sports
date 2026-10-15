@@ -24,6 +24,8 @@
    }
    for(const t of sorted){
      const card=el('article',null,'ae-take-card ae-free-take-card');
+     // Acento basado exclusivamente en el deporte real; no altera contenido ni votos.
+     card.dataset.sport=Object.prototype.hasOwnProperty.call(sports,t.sport)?t.sport:'general';
      const meta=el('div',null,'ae-take-overline');
      meta.append(el('span',(sports[t.sport]||'Deportes')+' · '));
      const author=button('@'+t.author,()=>{
