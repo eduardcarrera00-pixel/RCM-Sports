@@ -35,12 +35,16 @@
             }
             item.append(emblem, element('span', club.name,'ae-team-name'));
             if (Array.isArray(previousTeamIds) && previousTeamIds.length === 10) {
-                const oldPos = previousTeamIds.indexOf(id);
+                const oldPos = previousTeamIds.findIndex(teamId => String(teamId) === String(id));
                 const delta = oldPos < 0 ? null : oldPos - index;
                 const trend = element('span', delta === null ? 'Nuevo' : delta > 0 ? '▲ ' + delta : delta < 0 ? '▼ ' + (-delta) : '–',
                     'ae-rank-trend ' + (delta === null ? 'ae-rank-new' : delta > 0 ? 'ae-rank-up' : delta < 0 ? 'ae-rank-down' : 'ae-rank-flat'));
                 trend.setAttribute('aria-label',delta === null ? 'Nuevo equipo en el Top 10' : delta === 0 ? 'Sin cambios' : (delta > 0 ? 'Subió ' : 'Bajó ') + Math.abs(delta) + ' posiciones');
                 item.append(trend);
+            } else {
+                const first = element('span', '–', 'ae-rank-trend ae-rank-flat');
+                first.setAttribute('aria-label','No existe todavía una edición anterior para comparar');
+                item.append(first);
             }
         } else {
             item.append(element('span', String(id), 'rcm-logo-fallback'), element('span', 'Club pendiente de catálogo'));
