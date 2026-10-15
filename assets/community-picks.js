@@ -77,32 +77,81 @@ async function load(){
    $('cpStatus').textContent=feed.data?.length?'':'Todavía no hay Picks. Comparte el primero.';
    $('cpMore').hidden=(feed.data?.length||0)<limit;
    loaded=true;
-   await Promise.all([loadRanking(),loadModeration()]);
+   await Promise.all([loadRanking(),loadModeration(),loadChefLists()]);
  }catch(e){if(seq!==request)return;$('cpFeed').replaceChildren();$('cpMore').hidden=true;$('cpStatus').textContent='No pudimos cargar los Picks. '+message(e);}
 }
 let currentRank='weekly';
 function row(label,cls){const li=el('li',null,cls||'ae-cp-leader');li.append(el('span',label));return li;}
 async function loadRanking(){
- const list=$('cpLeaderboard'),popular=$('picksPopular');if(!list)return;
+ const list=$('cpLeaderboard');if(!list)return;
  const r=currentRank==='weekly'?await db.rpc('ae_community_pick_week_top'):await db.rpc('ae_community_pick_totals');
  if(r.error){list.replaceChildren(row('No fue posible cargar la clasificación.'));return;}
  list.replaceChildren();
  if(!r.data?.length)list.append(row('Aún no hay posiciones con puntos.'));
  for(const [i,x] of (r.data||[]).entries()){
-   const li=el('li',null,'ae-cp-leader');
-   li.append(el('span',String(x.rank_position||i+1).padStart(2,'0'),'ae-take-number'),el('span',x.author||x.username||'Aficionado','ae-take-name'),el('strong',String(x.points)+' pts'));
-   list.append(li);
+  const li=el('li',null,'ae-cp-leader');
+  li.append(el('span',String(x.rank_position||i+1).padStart(2,'0'),'ae-take-number'),el('span',x.author||x.username||'Aficionado','ae-take-name'),el('strong',String(x.points)+' pts'));
+  list.append(li);
  }
- if(popular){
-   const top=await db.rpc('ae_community_pick_week_top');
-   popular.replaceChildren();
-   if(top.error||!top.data?.length){popular.append(row('Los 3 Picks con más votos de la semana aparecerán aquí.'));return;}
-   for(const x of top.data.slice(0,3)){
-     const li=el('li',null,'ae-popular-item');
-     li.append(el('span',String(x.rank_position).padStart(2,'0'),'ae-popular-position'));
-     const detail=el('div',null,'ae-popular-copy');detail.append(el('strong',x.title),el('small','Por '+x.author+' · '+x.score+' votos netos'),el('span',x.points+' puntos provisionales'));
-     li.append(detail);popular.append(li);
-   }
+}
+/* Clasificación editorial basada en votos netos reales, separada de los
+   puntos de la liga semanal. Sólo pronósticos aprobados de esta semana. */
+let chefRequest=0;
+function paintChefList(id,result,kind){
+ const target=$(id);
+ if(!target)return;
+ target.replaceChildren();
+ const good=kind==='best';
+ if(result?.error){
+   target.append(row('No se pudo cargar esta clasificación.','ae-chef-empty'));
+   return;
+ }
+ const picks=Array.isArray(result?.data)?result.data:[];
+ if(!picks.length){
+   target.append(row(good?'Aún no hay Picks con votos netos positivos esta semana.':'Aún no hay Picks con votos netos negativos esta semana.','ae-chef-empty'));
+   return;
+ }
+ for(const [index,p] of picks.entries()){
+   const item=el('li',null,'ae-popular-item ae-chef-entry');
+   const rank=el('span',String(index+1).padStart(2,'0'),'ae-popular-position');
+   const info=el('div',null,'ae-popular-copy');
+   const chef=el('button','@'+(p.author||'Aficionado'),'ae-chef-author');
+   chef.type='button';
+   chef.setAttribute('aria-label','Ver perfil de '+(p.author||'Aficionado'));
+   chef.onclick=()=>{if(typeof openAePublicProfile==='function')openAePublicProfile(p.user_id);};
+   const pick=el('a',p.title||'Ver pronóstico','ae-chef-pick-link');
+   pick.href=link(p.id);
+   pick.onclick=e=>{
+     if(e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;
+     e.preventDefault();open(p.id);
+   };
+   const score=Number(p.score||0);
+   const votes=el('span',(score>0?'+':'')+score+' votos netos','ae-chef-votes');
+   info.append(chef,pick,votes);
+   item.append(rank,info);
+   target.append(item);
+ }
+}
+async function loadChefLists(){
+ const seq=++chefRequest;
+ const cols='id,user_id,author,title,score,upvotes,downvotes,created_at';
+ const query=()=>db.from('ae_pick_feed').select(cols)
+   .eq('moderation_status','approved').eq('is_current_week',true);
+ try{
+   const [best,worst]=await Promise.all([
+     query().gt('score',0).order('score',{ascending:false})
+       .order('upvotes',{ascending:false}).order('created_at',{ascending:true}).order('id',{ascending:true}).limit(3),
+     query().lt('score',0).order('score',{ascending:true})
+       .order('downvotes',{ascending:false}).order('created_at',{ascending:true}).order('id',{ascending:true}).limit(3)
+   ]);
+   if(seq!==chefRequest)return;
+   paintChefList('picksPopular',best,'best');
+   paintChefList('picksQuestioned',worst,'worst');
+ }catch(e){
+   if(seq!==chefRequest)return;
+   const failure={error:e};
+   paintChefList('picksPopular',failure,'best');
+   paintChefList('picksQuestioned',failure,'worst');
  }
 }
 async function loadModeration(){
