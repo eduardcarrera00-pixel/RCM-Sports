@@ -1,0 +1,58 @@
+/* AE SPORTS · Editorial Weekly Pick, Picks news and private My Takes profile */
+#aeMyTakesButton[hidden],#aeWeeklyPickAdmin[hidden]{display:none!important}
+.ae-profile-open{display:inline-flex;gap:7px;align-items:center;white-space:nowrap;border:1px solid rgba(204,170,132,.40);border-radius:8px;padding:9px 12px;background:#213f51;color:#f7e6d5;font:700 12px/1.2 system-ui;cursor:pointer}
+.ae-profile-open:hover{background:#875e48}
+.ae-picks-news{margin:13px clamp(15px,2.9vw,29px) 23px;padding:20px 20px 16px;background:linear-gradient(145deg,#253d4d,#1b3040);border-radius:12px;border:1px solid rgba(205,177,148,.12)}
+.ae-picks-news-heading{margin-bottom:16px;border-bottom:1px solid #ffffff18;padding-bottom:12px}
+.ae-picks-news-heading span{font:800 10px/1.2 system-ui;letter-spacing:.13em;color:#d4a983}
+.ae-picks-news-heading h3{font:600 clamp(23px,2.2vw,31px)/1.2 Georgia,serif!important;color:#fff1e3!important;margin:4px 0 6px!important}
+.ae-picks-news-heading p{font:400 12px/1.5 system-ui;color:#ced4d5;margin:0}
+.ae-picks-news-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.ae-picks-news-card{background:#1c3444;border:1px solid #ffffff12;border-radius:9px;overflow:hidden}
+.ae-picks-news-open{display:flex;align-items:stretch;width:100%;gap:13px;padding:0;text-align:left;background:transparent;border:0;cursor:pointer;color:inherit}
+.ae-picks-news-open img{width:118px;min-height:104px;object-fit:cover;flex-shrink:0}
+.ae-picks-news-copy{padding:13px 10px 12px 0;min-width:0}
+.ae-picks-news-card:not(:has(img)) .ae-picks-news-copy{padding-left:13px}
+.ae-picks-news-label{font:800 9px/1.4 system-ui;letter-spacing:.1em;color:#cb9c77}
+.ae-picks-news-copy h4{font:600 17px/1.3 Georgia,serif;color:#fff0dd;margin:5px 0 8px}
+.ae-picks-news-copy p{font:400 11px/1.4 system-ui;color:#bccbd1;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin:0}
+.ae-picks-news-open:hover h4{color:#e3b994}
+.ae-picks-news-empty{font:400 12px/1.5 system-ui;color:#d4c8bd;padding:8px 0}
+.ae-weekly-card{padding:4px 0 12px;color:#f2e4d6}
+.ae-weekly-kicker{font:800 10px/1.4 system-ui;letter-spacing:.11em;color:#dab08d;margin:0 0 5px}
+.ae-weekly-title{font:600 clamp(25px,2.8vw,36px)/1.18 Georgia,serif!important;color:#fff1df!important;margin:7px 0 11px!important}
+.ae-weekly-event{font:600 13px/1.35 system-ui;color:#d0d9df;margin:0 0 12px}
+.ae-weekly-selection{display:flex;align-items:center;flex-wrap:wrap;gap:9px 15px;margin:5px 0 13px}
+.ae-weekly-selection strong{font:600 19px/1.3 Georgia,serif;color:#fff4ea}
+.ae-weekly-odds{font:800 15px/1.3 system-ui;padding:7px 11px;background:#855d44;border:1px solid #c39a7785;border-radius:7px;color:#fff4e6}
+.ae-weekly-analysis{font:400 14px/1.58 system-ui;color:#e8d8c9;white-space:pre-wrap;overflow-wrap:anywhere;margin:9px 0}
+.ae-weekly-disclaimer{display:block;font:400 10px/1.4 system-ui;color:#c1bac0}
+.ae-weekly-empty{font:400 13px/1.55 system-ui;color:#decbb9;padding:10px 0}
+.ae-weekly-link{margin:12px 0 0;padding:9px 13px;border:1px solid #b78c6a;color:#fff0de;background:#865e43;border-radius:7px;cursor:pointer;font:700 12px system-ui}
+.editorial-pick .ae-weekly-title{font:600 20px/1.22 Georgia,serif!important}
+.editorial-pick .ae-weekly-analysis{font-size:12px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.editorial-pick .ae-weekly-odds{font-size:13px}
+.editorial-pick .ae-weekly-selection strong{font-size:16px}
+#picksFeaturedCard{padding:9px 22px 20px}
+#picksFeaturedCard .ae-weekly-title{font-size:clamp(27px,2.7vw,36px)!important}
+.ae-weekly-admin{margin-top:17px!important}
+.ae-profile-dialog{width:min(680px,calc(100% - 22px));max-height:85vh;border:1px solid rgba(206,172,136,.3);border-radius:15px;background:#192e3d;color:#f2e4d7;padding:0;box-shadow:0 25px 75px #020e19ac}
+.ae-profile-dialog::backdrop{background:rgba(4,17,29,.8)}
+.ae-profile-top{display:flex;align-items:start;justify-content:space-between;padding:23px;background:linear-gradient(110deg,#573d30,#8c6247)}
+.ae-profile-top span{font:800 10px/1.4 system-ui;letter-spacing:.12em;color:#f3d1b4}
+.ae-profile-top h2{font:600 29px/1.2 Georgia,serif;color:#fff7ea;margin:3px 0}
+.ae-profile-top p{font-size:12px;color:#f6e2d3}
+.ae-profile-close{border:0;background:transparent;color:#fff6e7;font-size:21px;cursor:pointer;padding:4px 9px}
+.ae-profile-overview{padding:17px 23px 4px}
+.ae-profile-overview strong{font:700 17px/1.2 system-ui;color:#f6d9bc}
+.ae-profile-overview p,#aeProfileStatus{font:400 12px/1.5 system-ui;color:#d7d2cf;margin:8px 0}
+#aeProfileStatus{padding:0 23px}
+.ae-profile-takes{padding:0 23px 23px;max-height:48vh;overflow:auto}
+.ae-profile-item{padding:16px 0;border-bottom:1px solid #ffffff1d}
+.ae-profile-item-meta{font:800 10px/1.3 system-ui;letter-spacing:.09em;color:#d9b18e}
+.ae-profile-item h3{font:600 20px/1.3 Georgia,serif;color:#fff1e2;margin:6px 0}
+.ae-profile-item p{font:400 13px/1.6 system-ui;white-space:pre-wrap;overflow-wrap:anywhere;color:#e1d9d0}
+.ae-profile-item-stats{display:flex;gap:15px;flex-wrap:wrap;font:700 11px/1.4 system-ui;color:#e0b790}
+.ae-profile-empty{font-size:13px;color:#d9c9b8}
+@media(max-width:750px){.ae-picks-news-list{grid-template-columns:1fr}.ae-picks-news{padding:15px;margin:13px 13px 22px}.ae-picks-news-open img{width:108px}#picksFeaturedCard{padding:7px 15px 19px}}
+@media(max-width:500px){.ae-profile-open span{display:none}.ae-profile-open{padding:9px}.ae-weekly-selection strong{font-size:17px}}
