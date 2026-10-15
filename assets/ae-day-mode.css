@@ -541,6 +541,21 @@ html:not(.dark) body #footballTakes .ae-picks-rail #picksNews .ae-picks-news-car
 html:not(.dark) body #footballTakes #picksFeatured.ae-picks-feature:has(.ae-weekly-banner) {
   background-color:#172e3d!important;
 }
+/* Con fotografía editorial seguimos usando el banner nocturno original,
+   por lo que todos sus textos deben conservar suficiente contraste. */
+html:not(.dark) body #footballTakes #picksFeatured.ae-picks-feature:has(.ae-weekly-banner) .ae-picks-feature-label h3,
+html:not(.dark) body #footballTakes #picksFeatured.ae-picks-feature:has(.ae-weekly-banner) .ae-picks-feature-label span,
+html:not(.dark) body #footballTakes #picksFeatured.ae-picks-feature:has(.ae-weekly-banner) .ae-weekly-title,
+html:not(.dark) body #footballTakes #picksFeatured.ae-picks-feature:has(.ae-weekly-banner) .ae-weekly-event,
+html:not(.dark) body #footballTakes #picksFeatured.ae-picks-feature:has(.ae-weekly-banner) .ae-weekly-selection strong,
+html:not(.dark) body #footballTakes #picksFeatured.ae-picks-feature:has(.ae-weekly-banner) .ae-weekly-compact-selection,
+html:not(.dark) body #footballTakes #picksFeatured.ae-picks-feature:has(.ae-weekly-banner) .ae-weekly-expand-hint{
+  color:#fff4e8!important;
+}
+html:not(.dark) body #footballTakes #picksFeatured.ae-picks-feature:has(.ae-weekly-banner) .ae-weekly-analysis,
+html:not(.dark) body #footballTakes #picksFeatured.ae-picks-feature:has(.ae-weekly-banner) .ae-weekly-disclaimer{
+  color:#e3e6e3!important;
+}
 /* Sin imagen: un Pick de la Semana legible sobre pergamino claro. */
 html:not(.dark) body #footballTakes #picksFeatured.ae-picks-feature:not(:has(.ae-weekly-banner)){
   background:linear-gradient(120deg,#f7f2eb,#e8eee9)!important;
