@@ -11,6 +11,10 @@ function link(id){const u=new URL(location.href);u.searchParams.delete('article'
 function open(id){history.pushState({},'',link(id));showDetail(id);}
 function card(p,compact=false){
  const n=el('article',null,'cp-card');
+ const pickSports=Array.isArray(p.legs)?p.legs.map(l=>String(l?.sport||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')):[];
+ const hasNfl=pickSports.some(t=>/nfl|americano|american football|gridiron/.test(t));
+ const hasFootball=pickSports.some(t=>/futbol|football|soccer|champions|liga|premier|barca|madrid|uefa|bundesliga|serie a/.test(t));
+ n.dataset.sport=hasNfl&&hasFootball?'mixed':hasNfl?'nfl':hasFootball?'football':'general';
  const first=Array.isArray(p.legs)&&p.legs.length?p.legs[0]:null;
  const header=el('div',null,'cp-card-header');
  header.append(el('span','@'+(p.author||'Aficionado')));
