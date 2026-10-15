@@ -1,0 +1,176 @@
+/* AE SPORTS · detalles de participación y Picks, octubre 2026
+   Aplica sobre la última capa editorial sin afectar votos, datos ni formularios. */
+
+/* Takes: la flecha permanece sólo junto a "Tú decides".
+   El botón no lleva ícono y centra su texto en todas las pantallas. */
+html body #aeHomeTopTakes #aeHomeTakePublish.ae-home-take-publish{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  text-align:center!important;
+  white-space:normal!important;
+  line-height:1.25!important;
+}
+
+/* Picks: la invitación al lado del botón queda simple y pequeña,
+   siguiendo la composición editorial de Takes de la comunidad. */
+html body #footballTakes #communityPicks .ae-picks-heading-cta-row {
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  flex-wrap:wrap!important;
+  gap:8px 16px!important;
+}
+html body #footballTakes #communityPicks .ae-picks-nudge{
+  font:800 11px/1.3 Inter,system-ui,sans-serif!important;
+  letter-spacing:.105em!important;
+  color:#d7a781!important;
+}
+html body #footballTakes #communityPicks #cpPublishCta.ae-picks-publish-cta{
+  display:inline-flex!important;
+  justify-content:center!important;
+  align-items:center!important;
+  text-align:center!important;
+  margin:0!important;
+  width:auto!important;
+  min-height:36px!important;
+  padding:8px 13px!important;
+  border-radius:2px!important;
+  font:800 11.5px/1.25 Inter,system-ui,sans-serif!important;
+  letter-spacing:0!important;
+  white-space:nowrap!important;
+}
+html:not(.dark) body #footballTakes #communityPicks .ae-picks-nudge{
+  color:#80553c!important;
+}
+
+/* Publicaciones: título y selección comparten escala editorial.
+   El pronóstico es texto con un acento, nunca una etiqueta rectangular. */
+html body #footballTakes #communityPicks #cpFeed>.cp-card .cp-card-title,
+html.dark body #footballTakes #communityPicks #cpFeed>.cp-card .cp-card-title{
+  margin:1px 0 2px!important;
+  font:600 clamp(16px,1.4vw,18px)/1.28 Newsreader,Georgia,serif!important;
+  letter-spacing:-.005em!important;
+  min-width:0!important;
+  overflow-wrap:anywhere;
+}
+html body #footballTakes #communityPicks #cpFeed>.cp-card .cp-card-title a,
+html.dark body #footballTakes #communityPicks #cpFeed>.cp-card .cp-card-title a{
+  font:inherit!important;
+  text-decoration:none!important;
+}
+html body #footballTakes #communityPicks #cpFeed>.cp-card .cp-card-legs{
+  display:grid!important;
+  align-content:start!important;
+  gap:5px!important;
+  min-width:0!important;
+}
+html body #footballTakes #communityPicks #cpFeed>.cp-card .cp-card-legs p{
+  display:flex!important;
+  align-items:baseline!important;
+  flex-wrap:wrap!important;
+  gap:3px 9px!important;
+  min-width:0!important;
+  margin:0!important;
+  line-height:1.45!important;
+}
+html body #footballTakes #communityPicks #cpFeed>.cp-card .cp-leg-event{
+  font:500 12px/1.45 Inter,system-ui,sans-serif!important;
+  letter-spacing:0!important;
+  color:#b9cbd5!important;
+  overflow-wrap:anywhere;
+}
+html body #footballTakes #communityPicks #cpFeed>.cp-card .cp-leg-selection,
+html.dark body #footballTakes #communityPicks #cpFeed>.cp-card .cp-leg-selection{
+  display:inline!important;
+  box-sizing:content-box!important;
+  width:auto!important;
+  min-width:0!important;
+  max-width:100%!important;
+  padding:0!important;
+  margin:0!important;
+  border:0!important;
+  border-left:0!important;
+  border-radius:0!important;
+  background:none!important;
+  background-color:transparent!important;
+  box-shadow:none!important;
+  font:700 clamp(15px,1.35vw,17px)/1.37 Newsreader,Georgia,serif!important;
+  letter-spacing:.002em!important;
+  color:#f4ccaa!important;
+  overflow-wrap:anywhere;
+  -webkit-box-decoration-break:clone;
+  box-decoration-break:clone;
+}
+html body #footballTakes #communityPicks #cpFeed>.cp-card .cp-leg-selection::before{
+  content:"·";
+  display:inline;
+  margin-right:6px;
+  color:#d9a881;
+  opacity:.85;
+  font-weight:600;
+}
+html body #footballTakes #communityPicks #cpFeed>.cp-card[data-sport="football"] .cp-leg-selection{
+  color:#bfd6f5!important;
+}
+html body #footballTakes #communityPicks #cpFeed>.cp-card[data-sport="mixed"] .cp-leg-selection{
+  color:#dfc6ef!important;
+}
+html body #footballTakes #communityPicks #cpFeed>.cp-card[data-sport="general"] .cp-leg-selection{
+  color:#a9ded5!important;
+}
+
+/* Reglas diurnas con especificidad igual o superior a los estilos anteriores. */
+html:not(.dark) body #footballTakes #communityPicks #cpFeed>.cp-card .cp-card-title a{
+  color:#2e4858!important;
+}
+html:not(.dark) body #footballTakes #communityPicks #cpFeed>.cp-card .cp-leg-event{
+  color:#586c78!important;
+}
+html:not(.dark) body #footballTakes #communityPicks #cpFeed>.cp-card .cp-leg-selection{
+  padding:0!important;
+  border:0!important;
+  border-left:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  color:#885338!important;
+}
+html:not(.dark) body #footballTakes #communityPicks #cpFeed>.cp-card[data-sport="nfl"] .cp-leg-selection{
+  border:0!important;
+  border-left:0!important;
+  background:transparent!important;
+  color:#855031!important;
+}
+html:not(.dark) body #footballTakes #communityPicks #cpFeed>.cp-card[data-sport="football"] .cp-leg-selection{
+  border:0!important;
+  border-left:0!important;
+  background:transparent!important;
+  color:#365a88!important;
+}
+html:not(.dark) body #footballTakes #communityPicks #cpFeed>.cp-card[data-sport="mixed"] .cp-leg-selection{
+  border:0!important;
+  border-left:0!important;
+  background:transparent!important;
+  color:#72528b!important;
+}
+html:not(.dark) body #footballTakes #communityPicks #cpFeed>.cp-card[data-sport="general"] .cp-leg-selection{
+  border:0!important;
+  border-left:0!important;
+  background:transparent!important;
+  color:#236a69!important;
+}
+html:not(.dark) body #footballTakes #communityPicks #cpFeed>.cp-card .cp-leg-selection::before{
+  color:#97745d;
+}
+@media(max-width:620px){
+  html body #footballTakes #communityPicks #cpFeed>.cp-card .cp-card-title{
+    font-size:16px!important;
+  }
+  html body #footballTakes #communityPicks #cpFeed>.cp-card .cp-leg-selection{
+    font-size:15.5px!important;
+  }
+  html body #footballTakes #communityPicks #cpPublishCta.ae-picks-publish-cta{
+    min-height:38px!important;
+    padding:9px 12px!important;
+  }
+}
