@@ -22,6 +22,7 @@
     const url = new URL(location.href);
     url.searchParams.set('article', String(id));
     url.searchParams.delete('comment');
+    url.searchParams.delete('pick');
     url.hash = '';
     return url.href;
   }
