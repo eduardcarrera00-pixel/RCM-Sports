@@ -185,7 +185,21 @@ async function showDetail(id){
  }catch(e){dialog.replaceChildren(button('Cerrar',closeDetail),el('p',message(e)));}
 }
 window.renderCommunityPicksVisibility=()=>{const root=$('communityPicks');if(!root)return;root.hidden=currentCategory!=='Picks';if(!root.hidden&&!loaded)load();};
-document.addEventListener('DOMContentLoaded',()=>{buildComposer();renderCommunityPicksVisibility();load();$('cpReload')?.addEventListener('click',load);$('cpCloseWeek')?.addEventListener('click',closePreviousWeek);for(const [id,mode] of [['cpRankWeekly','weekly'],['cpRankOverall','overall']]){$(id)?.addEventListener('click',()=>{currentRank=mode;for(const [i,m] of [['cpRankWeekly','weekly'],['cpRankOverall','overall']])$(i).setAttribute('aria-pressed',String(currentRank===m));loadRanking();});}const id=new URL(location.href).searchParams.get('pick');if(id)showDetail(id);$('cpMore').onclick=()=>{limit+=20;load();};if(db)db.auth.onAuthStateChange(()=>setTimeout(()=>{load();const id=new URL(location.href).searchParams.get('pick');if(id)showDetail(id);},0));});
+function openPickComposer(){
+ const panel=$('cpComposePanel'),button=$('cpPublishCta');
+ if(!panel)return;
+ panel.open=true;
+ button?.setAttribute('aria-expanded','true');
+ panel.scrollIntoView({behavior:window.matchMedia?.('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'center'});
+ window.setTimeout(()=>panel.querySelector('input')?.focus({preventScroll:true}),170);
+}
+document.addEventListener('DOMContentLoaded',()=>{
+ buildComposer();
+ $('cpPublishCta')?.addEventListener('click',openPickComposer);
+ $('cpComposePanel')?.addEventListener('toggle',e=>{
+  $('cpPublishCta')?.setAttribute('aria-expanded',String(e.currentTarget.open));
+ });
+ renderCommunityPicksVisibility();load();$('cpReload')?.addEventListener('click',load);$('cpCloseWeek')?.addEventListener('click',closePreviousWeek);for(const [id,mode] of [['cpRankWeekly','weekly'],['cpRankOverall','overall']]){$(id)?.addEventListener('click',()=>{currentRank=mode;for(const [i,m] of [['cpRankWeekly','weekly'],['cpRankOverall','overall']])$(i).setAttribute('aria-pressed',String(currentRank===m));loadRanking();});}const id=new URL(location.href).searchParams.get('pick');if(id)showDetail(id);$('cpMore').onclick=()=>{limit+=20;load();};if(db)db.auth.onAuthStateChange(()=>setTimeout(()=>{load();const id=new URL(location.href).searchParams.get('pick');if(id)showDetail(id);},0));});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)load();});
 window.addEventListener('popstate',()=>{const id=new URL(location.href).searchParams.get('pick');if(id)showDetail(id);else closeDetail();});
 })();
