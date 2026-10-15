@@ -305,6 +305,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/ae-premium-atmosphere.css?v=20261015-2">
 <link rel="stylesheet" href="assets/ae-home-picks-ranking-visuals.css?v=20261015-1">
 <link rel="stylesheet" href="assets/ae-square-sport-identity.css?v=20261015-1">
+<link rel="stylesheet" href="assets/ae-ranking-proportions.css?v=20261015-1">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 
@@ -599,8 +600,10 @@ html.dark [data-reading-size][aria-pressed="true"] {
         <section id="aeSportTakeLeaders" class="rcm-panel ae-sport-voice" hidden aria-labelledby="aeSportTakeTitle">
           <div class="ae-section-heading"><span class="ae-overline">LA COMUNIDAD OPINA</span><h2 id="aeSportTakeTitle">Takes destacados</h2></div>
           <p id="aeSportTakeStatus" role="status" aria-live="polite">Cargando Takes…</p>
-          <div class="ae-sport-takes-group"><h3>Más apoyados</h3><ol id="aeSportTakePositive" class="ae-sport-takes-list"></ol></div>
-          <div class="ae-sport-takes-group"><h3>Más cuestionados</h3><ol id="aeSportTakeNegative" class="ae-sport-takes-list"></ol></div>
+          <div class="ae-sport-takes-grid">
+            <div class="ae-sport-takes-group" aria-labelledby="aeSportGeniosTitle"><h3 id="aeSportGeniosTitle">Genios</h3><ol id="aeSportTakePositive" class="ae-sport-takes-list"></ol></div>
+            <div class="ae-sport-takes-group is-questioned" aria-labelledby="aeSportAnoetosTitle"><h3 id="aeSportAnoetosTitle">Ánoetos</h3><ol id="aeSportTakeNegative" class="ae-sport-takes-list"></ol></div>
+          </div>
         </section>
         <section class="rcm-panel editorial-trending" aria-labelledby="trendingTitle" hidden>
     <div class="ae-section-heading"><span class="ae-overline">LECTURAS DE LA COMUNIDAD</span><h2 id="trendingTitle">Lo más leído · Top 5</h2><p>Las publicaciones con más likes de la comunidad.</p></div>
