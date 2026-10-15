@@ -341,9 +341,6 @@ async function loadRankingPrevious(client = db) {
         if (!error && Array.isArray(data?.team_ids) && data.team_ids.length === 10)
             rankingPreviousTeamIds = data.team_ids;
     } catch { /* Optional migration is not installed yet. Keep displaying current ranking. */ }
-    document.getElementById('rankingTrendStatus').textContent = rankingPreviousTeamIds
-      ? '▲ Subió · ▼ Bajó · – Sin cambios respecto a la edición anterior'
-      : 'Los cambios de posición aparecerán cuando se publique otra edición con el historial activado.';
     renderRanking();
 }
 async function loadRanking(quiet = false, strict = false, client = db) {
