@@ -16,7 +16,14 @@
    if(!sorted.length){area.append(el('p','Todavía no hay Takes. Comparte una opinión para abrir la conversación.','ae-take-empty'));return;}
    for(const t of sorted){
      const card=el('article',null,'ae-take-card ae-free-take-card');
-     card.append(el('div',(sports[t.sport]||'Deportes')+' · '+t.author+' · '+new Date(t.created_at).toLocaleDateString('es'),'ae-take-overline'),el('h3',t.title),el('p',t.body,'ae-free-take-body'));
+     const meta=el('div',null,'ae-take-overline');
+     meta.append(el('span',(sports[t.sport]||'Deportes')+' · '));
+     const author=button('@'+t.author,()=>{
+       if(typeof openAePublicProfile==='function')openAePublicProfile(t.author_id);
+     },'ae-take-author-link');
+     author.setAttribute('aria-label','Ver perfil y Takes de '+t.author);
+     meta.append(author,el('span',' · '+new Date(t.created_at).toLocaleDateString('es')));
+     card.append(meta,el('h3',t.title),el('p',t.body,'ae-free-take-body'));
      const row=el('div',null,'ae-free-vote-row');
      for(const [val,label,count] of [[1,'▲ Apoyar',t.upvotes],[-1,'▼ Cuestionar',t.downvotes]]){
        const b=button(label+' '+count,()=>vote(t,val,b));b.disabled=busy;b.setAttribute('aria-pressed',String(Number(t.my_vote)===val));row.append(b);
@@ -31,7 +38,7 @@
  async function load(){
    if(!db)return status('No hay conexión.');
    const seq=++request;
-   const r=await db.rpc('ae_free_takes_feed',{p_sport:filter});
+   const r=await db.rpc('ae_public_take_feed',{p_sport:filter});
    if(seq!==request)return;
    if(r.error)return status('No se pudieron cargar los Takes. '+r.error.message);
    items=r.data||[];status('');render();
