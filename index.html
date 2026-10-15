@@ -302,6 +302,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/ae-design-harmony.css?v=20261015-1">
 <link rel="stylesheet" href="assets/ae-takes-picks-refit.css?v=20261015-1">
 <link rel="stylesheet" href="assets/ae-conversation-refine.css?v=20261015-3">
+<link rel="stylesheet" href="assets/ae-premium-atmosphere.css?v=20261015-1">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 
@@ -434,7 +435,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
             <section class="ae-picks-feed" id="communityPicks" hidden aria-labelledby="cpTitle">
               <div class="ae-picks-feed-heading"><span>LA COMUNIDAD ELIGE</span><h3 id="cpTitle">Picks de la comunidad</h3><p>Publica tu pronóstico y tu cuota americana. AE SPORTS revisará la cuota y la comunidad decidirá con sus votos.</p></div>
               <details class="ae-cp-compose" id="cpComposePanel"><summary>✍ Publicar mi Pick</summary><form id="cpForm"></form></details>
-              <div class="ae-cp-sort"><label for="cpSort">Ordenar Picks</label><select id="cpSort"><option value="score">Más votados</option><option value="created_at">Más recientes</option></select></div>
+              <div class="ae-cp-sort"><label for="cpSort">Ordenar Picks</label><select id="cpSort"><option value="score">Más votados</option><option value="created_at">Más recientes</option><option value="comments_count">Más comentados</option></select></div>
               <p id="cpStatus" role="status" aria-live="polite"></p>
               <div id="cpFeed" aria-live="polite"></div>
               <button id="cpMore" class="ae-take-button" type="button" hidden>Ver más Picks</button>
@@ -467,6 +468,18 @@ html.dark [data-reading-size][aria-pressed="true"] {
               <label>Cuota americana<input name="american_odds" type="text" pattern="[+-]?[0-9]{3,6}" required placeholder="+150 o -110"></label>
               <label>Cierre de la recomendación<input name="expires_at" type="datetime-local" required></label>
               <label class="ae-full">Análisis del Pick<textarea name="analysis" minlength="12" maxlength="2400" required placeholder="Explica los motivos de la recomendación."></textarea></label>
+              <div class="ae-weekly-media-fields">
+                <label class="ae-upload-field">Banner del Pick de la Semana
+                  <small>Imagen horizontal para el encabezado (recomendado 1600 × 600). JPG, PNG o WEBP; máximo 5 MB.</small>
+                  <input id="aeWeeklyBannerInput" type="file" name="banner_file" accept="image/jpeg,image/png,image/webp">
+                  <span id="aeWeeklyBannerPreview" class="ae-upload-preview">Vista previa del banner</span>
+                </label>
+                <label class="ae-upload-field">Imagen de la publicación
+                  <small>Imagen para la tarjeta y el análisis (recomendado 800 × 450). Opcional.</small>
+                  <input id="aeWeeklyImageInput" type="file" name="image_file" accept="image/jpeg,image/png,image/webp">
+                  <span id="aeWeeklyImagePreview" class="ae-upload-preview">Vista previa de publicación</span>
+                </label>
+              </div>
               <div class="ae-full"><button type="submit">Publicar Pick de la Semana</button></div>
               <p id="aeWeeklyPickAdminStatus" class="ae-full ae-takes-status" role="status"></p>
             </form>
@@ -796,6 +809,11 @@ html.dark [data-reading-size][aria-pressed="true"] {
                         class="w-full bg-slate-50 border border-slate-200 text-sm text-slate-800 rounded-xl px-4 py-2.5 focus:outline-none focus:border-pitch-600 focus:bg-white">
                 </div>
 
+                <div>
+                    <label for="pubImageFile" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">O subir una imagen de portada (JPG, PNG, WEBP · máximo 5 MB)</label>
+                    <input id="pubImageFile" type="file" accept="image/jpeg,image/png,image/webp" class="w-full text-sm">
+                    <div id="pubImagePreview" class="ae-upload-preview">Vista previa de la imagen</div>
+                </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Resumen Breve *</label>
                     <input type="text" id="pubSummary" required placeholder="Una o dos oraciones descriptivas para la tarjeta..."
@@ -1648,6 +1666,8 @@ currentUser = {
 
         function closePublishModal() {
             document.getElementById('publishModal').classList.add('hidden');
+            document.getElementById('pubImageFile').value='';
+            document.getElementById('pubImagePreview').textContent='Vista previa de la imagen';
             syncModalScrollLock();
         }
 
@@ -1668,11 +1688,13 @@ currentUser = {
             try {
                 if (!title || !bodyText) throw new Error('Completa el título y el contenido.');
                 publishDraftId = editingArticleId || publishDraftId || crypto.randomUUID();
+                const uploadedPath = await window.aeEditorialMedia.upload(document.getElementById('pubImageFile').files?.[0],'articles');
+                const uploadedUrl = uploadedPath ? window.aeEditorialMedia.publicUrl(uploadedPath) : '';
                 const payload = {
                     id: publishDraftId, title, category,
                     football_team: category === 'Fútbol' ? (document.getElementById('pubTeam').value || null) : null,
                     author: document.getElementById('pubAuthor').value.trim() || currentAdmin.name,
-                    image: safeImageURL(document.getElementById('pubImage').value.trim() || categoryFallbackImages[category]),
+                    image: safeImageURL(uploadedUrl || document.getElementById('pubImage').value.trim() || categoryFallbackImages[category]),
                     summary: document.getElementById('pubSummary').value.trim(),
                     body: bodyText.split(/\n/).map(p => '<p>' + escapeHTML(p) + '</p>').join(''),
                     featured: false, created_by: currentAdmin.id
@@ -2039,10 +2061,11 @@ updateThemeButton();
 <script src="assets/ae-category-visibility.js?v=20261015-3"></script>
 <script src="assets/ae-nfl-takes.js?v=20261015-3"></script>
 <script src="assets/free-takes.js?v=20261015-7"></script>
-<script src="assets/ae-editorial-weekly.js?v=20261015-3"></script>
+<script src="assets/ae-editorial-weekly.js?v=20261015-4"></script>
 <script src="assets/ae-profile.js?v=20261015-4"></script>
 <script src="assets/ae-home-takes.js?v=20261015-3"></script>
 <script src="assets/ae-sport-top-takes.js?v=20261015-3"></script>
 <script src="assets/ae-take-replies.js?v=20261015-1"></script>
+<script src="assets/ae-picks-premium.js?v=20261015-1"></script>
 </body>
 </html>
