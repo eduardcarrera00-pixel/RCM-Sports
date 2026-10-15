@@ -33,6 +33,7 @@ function renderSessionHeader() {
     const readers = document.getElementById('readerSession');
     if (!readers) return;
     readers.replaceChildren();
+    document.getElementById('accountRecoveryButton')?.classList.toggle('hidden', !currentUser);
     readers.classList.toggle('hidden', !currentUser || Boolean(currentAdmin));
     if (currentUser && !currentAdmin) {
         readers.append(node('span', currentUser.username, 'rcm-username'));

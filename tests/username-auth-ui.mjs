@@ -1,0 +1,14 @@
+import assert from 'node:assert/strict';import fs from 'node:fs';
+const {Window}=await import(process.env.AE_HAPPY_DOM||'happy-dom');
+const w=new Window({url:'https://example.test'}),d=w.document;
+d.body.innerHTML=fs.readFileSync('index.html','utf8').replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,'');
+w.normalizeUsername=s=>s.trim().toLowerCase();w.authSubmitting=false;w.activeModalArticleId=null;w.setAuthBusy=b=>{w.authSubmitting=b};w.showUserAuthError=s=>{w.lastError=s};w.loadAdminSession=async()=>{};w.updateCommentAuthUI=()=>{};w.closeUserAuthModal=()=>{w.closed=true;w.clearAuthSecrets()};
+let calls=0;w.db={supabaseUrl:'https://example.test',supabaseKey:'fake',auth:{setSession:async()=>({data:{user:{id:'reader'}}})}};
+w.fetch=async()=>{calls++;return {ok:true,json:async()=>({username:'reader',session:{access_token:'test',refresh_token:'test'},recovery_code:'a'.repeat(64)})}};
+w.eval(fs.readFileSync('assets/username-auth.js','utf8'));
+w.setAuthMode('register');assert.equal(d.getElementById('authConfirmWrap').hidden,false);assert.equal(d.getElementById('userAuthPassword').minLength,8);
+d.getElementById('userAuthUsername').value='Reader';d.getElementById('userAuthPassword').value='password123';d.getElementById('authPasswordConfirm').value='different';
+await w.handleUserLogin({preventDefault(){}});assert.equal(calls,0);assert.match(w.lastError,/coinciden/);
+d.getElementById('authPasswordConfirm').value='password123';await w.handleUserLogin({preventDefault(){}});assert.equal(calls,1);assert.equal(w.currentUser.id,'reader');assert.equal(d.getElementById('authRecoveryResult').hidden,false);assert.equal(d.getElementById('authRecoveryOutput').value.length,64);assert.equal(d.getElementById('userAuthPassword').value,'');
+w.finishRecoveryCode();assert.equal(w.closed,true);assert.equal(d.getElementById('authRecoveryOutput').value,'');w.setAuthMode('recover');assert.equal(d.getElementById('authRecoveryCode').required,true);w.setAuthMode('login');assert.equal(d.getElementById('authRecoveryCode').required,false);assert.equal(d.getElementById('userAuthPassword').minLength,1);
+console.log('PASS: confirmation mismatch blocked, session saved, recovery code displayed and cleared, recovery/login constraints.');await w.happyDOM.close();

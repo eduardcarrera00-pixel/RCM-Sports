@@ -291,6 +291,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/editorial.css?v=20261015-2">
 <link rel="stylesheet" href="assets/unified-editorial.css?v=20261015-5">
 <link rel="stylesheet" href="assets/community-picks.css?v=1">
+<link rel="stylesheet" href="assets/username-auth.css?v=1">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 
@@ -330,6 +331,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 </button>
 
                     <!-- Guest State: User sign-in and registration -->
+                    <button id="accountRecoveryButton" type="button" class="hidden" onclick="openUserAuthModal(); setAuthMode('code');">Recuperación</button>
                     <div id="readerSession" class="hidden rcm-row"></div>
                     <div id="guestAdminContainer">
                         <button type="button" onclick="openUserAuthModal()" aria-label="Iniciar sesión o crear cuenta" class="flex items-center space-x-2 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 text-xs font-bold py-2.5 px-3.5 sm:px-4 rounded-xl transition-all">
@@ -567,7 +569,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
             </button>
         </div>
 
-        <form onsubmit="handleUserLogin(event)" class="p-6 space-y-4">
+        <form id="userAuthForm" onsubmit="handleUserLogin(event)" class="p-6 space-y-4">
 
             <p class="text-sm text-slate-600">
                 Inicia sesión para comentar, responder y votar.
@@ -579,7 +581,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 
             <div>
                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                    Usuario o correo de una cuenta existente
+                    Nombre de usuario
                 </label>
 
                 <input type="text"
@@ -600,33 +602,33 @@ html.dark [data-reading-size][aria-pressed="true"] {
                 <input type="password"
                        id="userAuthPassword"
                        required
-                       minlength="6"
+                       minlength="1"
                        autocomplete="current-password"
                        placeholder="••••••••"
                        class="w-full bg-slate-50 border border-slate-200 text-sm text-slate-800 rounded-xl px-4 py-2.5 focus:outline-none focus:border-pitch-600 focus:bg-white">
             </div>
 
+            <button type="button" onclick="toggleAuthPassword()" id="authShowPassword">Mostrar contraseña</button>
+            <label id="authConfirmWrap" hidden>Confirmar contraseña<input id="authPasswordConfirm" type="password" autocomplete="new-password"></label>
+            <label id="authCodeWrap" hidden>Código de recuperación<input id="authRecoveryCode" autocomplete="off" spellcheck="false"></label>
+            <p id="authModeHelp">Inicia sesión con tu usuario. Las cuentas anteriores también pueden usar su correo.</p>
             <div class="space-y-2 pt-2">
-
-                <button type="submit"
-                        class="w-full bg-pitch-600 hover:bg-pitch-700 text-white font-bold text-xs uppercase px-5 py-3 rounded-xl">
-                    Iniciar sesión
-                </button>
-
-                <button type="button"
-                        onclick="handleUserRegister()"
-                        class="w-full border border-pitch-600 text-pitch-700 hover:bg-pitch-50 font-bold text-xs uppercase px-5 py-3 rounded-xl">
-                    Crear cuenta
-                </button>
-
+                <button id="authSubmit" type="submit" class="w-full bg-pitch-600 text-white font-bold px-5 py-3 rounded-xl">Iniciar sesión</button>
+                <button type="button" onclick="setAuthMode('register')">Crear cuenta</button>
+                <button type="button" onclick="setAuthMode('login')">Ya tengo cuenta</button>
+                <button type="button" onclick="setAuthMode('recover')">Recuperar con mi código</button>
+                <button type="button" onclick="setAuthMode('code')">Generar un código nuevo</button>
             </div>
 
-            <p class="text-[11px] text-slate-400 text-center">
-                Para crear tu cuenta: usuario y contraseña. Si ya tienes una cuenta con correo, úsalo para iniciar sesión. Sin correo real, no hay recuperación automática de contraseña.
-            </p>
-
         </form>
-
+        <section id="authRecoveryResult" hidden class="p-6" aria-labelledby="authRecoveryTitle">
+            <h2 id="authRecoveryTitle">Guarda tu código de recuperación</h2>
+            <p id="authRecoveryMessage"></p>
+            <p>Guárdalo en un lugar privado. Permite cambiar tu contraseña sin correo y solo se puede usar una vez. Un código nuevo sustituye al anterior.</p>
+            <label>Código<input id="authRecoveryOutput" readonly autocomplete="off" spellcheck="false"></label>
+            <button type="button" onclick="copyRecoveryCode()">Copiar código</button>
+            <button type="button" onclick="finishRecoveryCode()">Ya lo guardé</button>
+        </section>
     </div>
 </div>
     <div id="publishModal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
@@ -939,10 +941,6 @@ function normalizeUsername(username) {
     return username.trim().toLowerCase();
 }
 
-function usernameToEmail(username) {
-    return `${normalizeUsername(username)}@users.rcmsports.local`;
-}
-
 function validateUsername(username) {
     return /^[a-zA-Z0-9_]{3,30}$/.test(username);
 }
@@ -966,6 +964,7 @@ function openUserAuthModal() {
 
 function closeUserAuthModal() {
     document.getElementById('userAuthModal').classList.add('hidden');
+    if (typeof clearAuthSecrets === 'function') clearAuthSecrets();
     authPreviousFocus?.focus();
     syncModalScrollLock();
 }
@@ -974,127 +973,6 @@ function showUserAuthError(message) {
     const box = document.getElementById('userAuthError');
     box.textContent = message;
     box.classList.remove('hidden');
-}
-
-async function handleUserRegister() {
-    const usernameInput = document.getElementById('userAuthUsername');
-    const passwordInput = document.getElementById('userAuthPassword');
-
-    const username = normalizeUsername(usernameInput.value);
-    const password = passwordInput.value;
-
-    document.getElementById('userAuthError').classList.add('hidden');
-
-    if (!validateUsername(username)) {
-        showUserAuthError(
-            'El nombre de usuario debe tener entre 3 y 30 caracteres y usar solo letras, números o _.'
-        );
-        return;
-    }
-
-    if (password.length < 6) {
-        showUserAuthError('La contraseña debe tener al menos 6 caracteres.');
-        return;
-    }
-
-    if (authSubmitting) return;
-    setAuthBusy(true);
-    try {
-        if (!db) throw new Error('No se pudo conectar con Supabase.');
-
-        const email = usernameToEmail(username);
-
-        const { data, error } = await db.auth.signUp({
-            email,
-            password,
-            options: {
-                data: {
-                    username
-                }
-            }
-        });
-
-        if (error) {
-            if (error.message.toLowerCase().includes('already')) {
-                throw new Error('Ese nombre de usuario ya está registrado.');
-            }
-
-            throw error;
-        }
-
-        if (!data.user || !data.session) {
-            throw new Error(
-                'No se pudo abrir la sesión. La configuración de confirmación por correo requiere revisión por el administrador.'
-            );
-        }
-
-        currentUser = {
-            id: data.user.id,
-            username
-        };
-
-        passwordInput.value = '';
-        closeUserAuthModal();
-        updateCommentAuthUI();
-
-    } catch (error) {
-        showUserAuthError(
-            error.message || 'No se pudo crear la cuenta.'
-        );
-    } finally { setAuthBusy(false); }
-}
-
-async function handleUserLogin(event) {
-    event.preventDefault();
-
-const usernameInput = document.getElementById('userAuthUsername');
-const passwordInput = document.getElementById('userAuthPassword');
-
-const username = normalizeUsername(usernameInput.value);
-const password = passwordInput.value;
-
-    document.getElementById('userAuthError').classList.add('hidden');
-
-    if (!validateUsername(username) && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(username)) {
-        showUserAuthError('Escribe tu usuario o el correo de tu cuenta existente.');
-        return;
-    }
-
-    if (authSubmitting) return;
-    setAuthBusy(true);
-    try {
-        if (!db) throw new Error('No se pudo conectar con Supabase.');
-
-        const { data, error } = await db.auth.signInWithPassword({
-            email: username.includes('@') ? username : usernameToEmail(username),
-            password
-        });
-
-        if (error || !data.user) {
-            throw new Error('Nombre de usuario o contraseña incorrectos.');
-        }
-
-        currentUser = {
-    id: data.user.id,
-    username: data.user.user_metadata?.username || data.user.user_metadata?.display_name || data.user.email?.split('@')[0] || username
-};
-
-        passwordInput.value = '';
-
-closeUserAuthModal();
-
-if (activeModalArticleId) {
-    await loadCommentsFromSupabase(activeModalArticleId);
-    refreshCommunity();
-}
-
-updateCommentAuthUI();
-
-    } catch (error) {
-        showUserAuthError(
-            error.message || 'No se pudo iniciar sesión.'
-        );
-    } finally { setAuthBusy(false); }
 }
 
 function updateCommentAuthUI() {
@@ -1983,5 +1861,6 @@ updateThemeButton();
 <script src="assets/champions.js?v=20261015-5"></script>
 <script src="assets/community-picks.js?v=1"></script>
 <script src="assets/weekly-picks.js?v=20261015-1"></script>
+<script src="assets/username-auth.js?v=1"></script>
 </body>
 </html>

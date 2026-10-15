@@ -1,0 +1,6 @@
+#userAuthForm [hidden],#authRecoveryResult[hidden]{display:none!important}
+#authConfirmWrap,#authCodeWrap,#authRecoveryResult label{display:block;font-size:13px;color:var(--ae-ink);margin:12px 0}
+#authPasswordConfirm,#authRecoveryCode,#authRecoveryOutput{display:block;width:100%;border:1px solid var(--ae-line);background:var(--ae-paper);color:var(--ae-ink);padding:12px;margin:6px 0;border-radius:5px}
+#authRecoveryOutput{font-family:monospace;font-size:13px}#authRecoveryResult p,#authModeHelp{font-size:13px;line-height:1.6;color:var(--ae-muted);margin:12px 0}
+#authRecoveryResult button,#authShowPassword,#accountRecoveryButton{border:1px solid var(--ae-bronze);padding:9px 12px;border-radius:5px;min-height:44px;font-size:12px;margin:6px 4px 6px 0}
+#userAuthForm .space-y-2 button{display:block;width:100%;min-height:44px;padding:10px;font-size:13px}
