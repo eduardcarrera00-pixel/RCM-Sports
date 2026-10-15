@@ -1,3 +1,6 @@
+/* Las categorías Picks y Takes muestran su propio contenido sin duplicar noticias. */
+.editorial-layout[hidden]{display:none!important}
+#footballTakes[hidden],#freeTakes[hidden],#communityPicks[hidden]{display:none!important}
 /* Libre opinión de aficionados dentro de la paleta madera y azul marino */
 #freeTakes[hidden],#communityPicks[hidden]{display:none!important}
 .ae-free-takes {margin-bottom:22px}
