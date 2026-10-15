@@ -1,0 +1,140 @@
+/* AE SPORTS · retoque editorial de participación.
+   Sin cambios en los datos, comentarios, votos ni formularios. */
+
+/* Picks: jerarquía clara, con CTA perceptible y menos altura de cabecera. */
+html body #footballTakes #communityPicks .ae-picks-feed-heading{
+  margin:0 0 8px!important;
+  padding:0 0 8px!important;
+  border-bottom:1px solid rgba(194,160,126,.26)!important;
+}
+html body #footballTakes #communityPicks .ae-picks-heading-cta-row{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:9px 16px!important;
+  flex-wrap:wrap!important;
+  width:100%!important;
+}
+html body #footballTakes #communityPicks .ae-picks-nudge{
+  font:650 clamp(20px,2.15vw,27px)/1.12 Newsreader,Georgia,serif!important;
+  letter-spacing:-.015em!important;
+  text-transform:none!important;
+  color:#f3d0ad!important;
+  white-space:normal!important;
+}
+html body #footballTakes #communityPicks #cpPublishCta.ae-picks-publish-cta{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:auto!important;
+  min-height:42px!important;
+  padding:10px 16px!important;
+  font:800 13.5px/1.2 Inter,system-ui,sans-serif!important;
+  letter-spacing:0!important;
+  white-space:nowrap!important;
+  border-radius:2px!important;
+  margin:0!important;
+}
+html:not(.dark) body #footballTakes #communityPicks .ae-picks-nudge{
+  color:#875537!important;
+}
+html body #footballTakes #communityPicks .ae-picks-feed-heading>p{
+  display:none!important;
+}
+
+/* Sólo Últimos Picks, sin 'Publicaciones recientes', en una línea compacta. */
+html body #footballTakes #communityPicks .ae-recent-picks-heading{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:0!important;
+  margin:3px 0 8px!important;
+  padding:3px 0 6px!important;
+  border-bottom:1px solid rgba(199,178,152,.2)!important;
+}
+html body #footballTakes #communityPicks .ae-recent-picks-heading h4{
+  margin:0!important;
+  font:600 clamp(18px,1.75vw,21px)/1.13 Newsreader,Georgia,serif!important;
+  letter-spacing:-.008em!important;
+  color:#f5e5d5!important;
+}
+html:not(.dark) body #footballTakes #communityPicks .ae-recent-picks-heading h4{
+  color:#305063!important;
+}
+html body #footballTakes #communityPicks #cpStatus:empty{
+  display:none!important;
+}
+
+/* Takes destacados: NFL (o liga) a la izquierda, @usuario a la derecha.
+   Nunca dibujar una pastilla o recuadro alrededor del nombre. */
+html body #aeSportTakeLeaders .ae-sport-take-meta{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  flex-wrap:wrap!important;
+  gap:4px 9px!important;
+  min-width:0!important;
+  width:100%!important;
+  margin:0 0 6px!important;
+}
+html body #aeSportTakeLeaders .ae-sport-take-meta .ae-top-take-sport{
+  flex:0 1 auto!important;
+  min-width:0!important;
+  margin:0!important;
+}
+html body #aeSportTakeLeaders .ae-sport-take-meta .ae-top-take-author,
+html.dark body #aeSportTakeLeaders .ae-sport-take-meta .ae-top-take-author{
+  display:inline!important;
+  flex:0 1 auto!important;
+  align-self:center!important;
+  min-width:0!important;
+  max-width:100%!important;
+  width:auto!important;
+  min-height:0!important;
+  margin:0 0 0 auto!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  background-color:transparent!important;
+  background-image:none!important;
+  box-shadow:none!important;
+  color:#e4b58e!important;
+  font:600 11px/1.35 Inter,system-ui,sans-serif!important;
+  text-align:right!important;
+  text-decoration:none!important;
+  white-space:normal!important;
+  overflow-wrap:anywhere!important;
+  cursor:pointer!important;
+}
+html body #aeSportTakeLeaders .ae-sport-take-meta .ae-top-take-author:hover{
+  text-decoration:underline!important;
+  text-underline-offset:3px!important;
+}
+html body #aeSportTakeLeaders .ae-sport-take-meta .ae-top-take-author:focus-visible{
+  outline:2px solid #d7ac85!important;
+  outline-offset:3px!important;
+}
+html:not(.dark) body #aeSportTakeLeaders .ae-sport-take-meta .ae-top-take-author{
+  color:#785238!important;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+}
+html:not(.dark) body #aeSportTakeLeaders .ae-sport-take-meta .ae-top-take-author:focus-visible{
+  outline-color:#795440!important;
+}
+
+@media(max-width:540px){
+  html body #footballTakes #communityPicks .ae-picks-nudge{
+    font-size:21px!important;
+  }
+  html body #footballTakes #communityPicks #cpPublishCta.ae-picks-publish-cta{
+    min-height:40px!important;
+    padding:9px 12px!important;
+    font-size:12px!important;
+  }
+  html body #aeSportTakeLeaders .ae-sport-take-meta .ae-top-take-author{
+    font-size:10.5px!important;
+  }
+}
