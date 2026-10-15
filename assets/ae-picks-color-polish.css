@@ -1,0 +1,150 @@
+/* AE SPORTS · detalles cuadrados de portada y color deportivo en Picks.
+   Deliberadamente NO se modifican la portada hero, NFL ni los rankings. */
+
+/* Sólo los tres módulos de la columna editorial de la portada. */
+html body .editorial-pick,
+html.dark body .editorial-pick,
+html body .editorial-community,
+html.dark body .editorial-community,
+html body .editorial-trending,
+html.dark body .editorial-trending,
+html body .editorial-pick .editorial-pick-body,
+html.dark body .editorial-pick .editorial-pick-body,
+html body .editorial-community>.ae-section-heading,
+html.dark body .editorial-community>.ae-section-heading,
+html body .editorial-trending>.ae-section-heading,
+html.dark body .editorial-trending>.ae-section-heading {
+ border-radius:0!important;
+}
+/* Los bordes interiores del Pick de la Semana tampoco deben redondear el panel. */
+.editorial-pick .ae-weekly-preview,.editorial-pick #cpWeekly{
+ border-radius:0!important;
+}
+
+/* Identidad cromática: matices de estadio, tinta azul y acentos por deporte.
+   El color no depende de resultados inventados ni de apuestas verificadas. */
+html body #footballTakes #communityPicks.ae-picks-feed,
+html.dark body #footballTakes #communityPicks.ae-picks-feed{
+ position:relative!important;
+ overflow:hidden!important;
+ border-radius:0!important;
+ background:
+  radial-gradient(ellipse 67% 41% at 92% 0%,rgba(84,133,162,.21),transparent 70%),
+  radial-gradient(ellipse 49% 41% at 6% 98%,rgba(201,133,101,.15),transparent 74%),
+  linear-gradient(150deg,#122c40 0%,#14384d 52%,#0e2637 100%)!important;
+ border:1px solid rgba(148,180,193,.28)!important;
+}
+#footballTakes #communityPicks .ae-picks-feed-heading{
+ border-bottom:1px solid rgba(179,206,222,.17)!important;
+}
+#footballTakes #communityPicks .ae-recent-picks-heading{
+ border-bottom:1px solid rgba(179,206,222,.18)!important;
+}
+#footballTakes #communityPicks .ae-recent-picks-heading h4{
+ color:#fff0df!important;
+}
+html body #footballTakes #communityPicks #cpFeed>.cp-card,
+html.dark body #footballTakes #communityPicks #cpFeed>.cp-card{
+ --ae-pick-accent:#62b7b3;
+ --ae-pick-glow:rgba(98,183,179,.14);
+ position:relative;
+ isolation:isolate;
+ border-radius:0!important;
+ border:1px solid rgba(177,205,214,.22)!important;
+ border-left:3px solid var(--ae-pick-accent)!important;
+ background:
+   radial-gradient(ellipse 64% 125% at 108% -30%,var(--ae-pick-glow),transparent 77%),
+   linear-gradient(108deg,#1a3a4e 0%,#123044 63%,#0f293d 100%)!important;
+ box-shadow:0 8px 20px rgba(4,17,27,.13)!important;
+ transition:border-color .2s ease,background-color .2s ease;
+}
+html body #footballTakes #communityPicks #cpFeed>.cp-card[data-sport="nfl"]{
+ --ae-pick-accent:#e3a578;
+ --ae-pick-glow:rgba(227,165,120,.22);
+}
+html body #footballTakes #communityPicks #cpFeed>.cp-card[data-sport="football"]{
+ --ae-pick-accent:#85a9ec;
+ --ae-pick-glow:rgba(90,131,221,.20);
+}
+html body #footballTakes #communityPicks #cpFeed>.cp-card[data-sport="mixed"]{
+ --ae-pick-accent:#d2a6db;
+ --ae-pick-glow:rgba(173,116,189,.16);
+}
+html body #footballTakes #communityPicks #cpFeed>.cp-card:hover{
+ border-top-color:rgba(206,221,222,.45)!important;
+ border-right-color:rgba(206,221,222,.45)!important;
+ border-bottom-color:rgba(206,221,222,.45)!important;
+}
+/* Puntos cromáticos pequeños como marcadores de deporte. */
+#footballTakes #communityPicks #cpFeed>.cp-card .cp-card-header::before{
+ content:"";
+ display:inline-block;
+ flex:0 0 6px;
+ width:6px;height:6px;
+ border-radius:50%;
+ background:var(--ae-pick-accent);
+ box-shadow:0 0 0 3px var(--ae-pick-glow);
+}
+#footballTakes #communityPicks #cpFeed>.cp-card .cp-card-sport{
+ border-radius:0!important;
+ border-color:var(--ae-pick-accent)!important;
+ color:#f7e6d7!important;
+ background:var(--ae-pick-glow)!important;
+}
+#footballTakes #communityPicks #cpFeed>.cp-card .cp-odds{
+ border-radius:0!important;
+ border-color:rgba(230,188,136,.38)!important;
+ background:linear-gradient(100deg,#825d46,#5c4d55)!important;
+ color:#fff0e3!important;
+}
+#footballTakes #communityPicks #cpFeed>.cp-card[data-sport="football"] .cp-odds{
+ background:linear-gradient(100deg,#385984,#384a73)!important;
+ border-color:rgba(151,178,232,.4)!important;
+}
+#footballTakes #communityPicks #cpFeed>.cp-card[data-sport="mixed"] .cp-odds{
+ background:linear-gradient(100deg,#644c77,#45446a)!important;
+}
+#footballTakes #communityPicks #cpFeed>.cp-card[data-sport="general"] .cp-odds{
+ background:linear-gradient(100deg,#286c70,#2e596a)!important;
+}
+#footballTakes #communityPicks #cpFeed>.cp-card .cp-card-title a{
+ color:#fff0e1!important;
+}
+#footballTakes #communityPicks #cpFeed>.cp-card .cp-card-title a:hover{
+ color:var(--ae-pick-accent)!important;
+}
+/* Panel para publicar: energía sin competir con las tarjetas. */
+html body #footballTakes #communityPicks #cpComposePanel{
+ border-radius:0!important;
+ border:1px solid rgba(211,170,136,.38)!important;
+ background:linear-gradient(115deg,#23465a,#213b52 65%,#4a4350)!important;
+}
+#footballTakes #communityPicks #cpComposePanel>summary{
+ color:#fff1e1!important;
+}
+
+/* Columna editorial de Picks: un acento identificable por panel. */
+#footballTakes .ae-picks-rail>#picksNews{
+ border-top:2px solid #8dadd5!important;
+}
+#footballTakes .ae-picks-rail>.ae-picks-small-top{
+ border-top:2px solid #dbac7c!important;
+}
+#footballTakes .ae-picks-rail>.ae-takes-side{
+ border-top:2px solid #70bab8!important;
+}
+html body #footballTakes .ae-picks-rail>#picksNews,
+html body #footballTakes .ae-picks-rail>.ae-picks-small-top,
+html body #footballTakes .ae-picks-rail>.ae-takes-side,
+html.dark body #footballTakes .ae-picks-rail>#picksNews,
+html.dark body #footballTakes .ae-picks-rail>.ae-picks-small-top,
+html.dark body #footballTakes .ae-picks-rail>.ae-takes-side{
+ border-radius:0!important;
+}
+@media(max-width:600px){
+ html body #footballTakes #communityPicks.ae-picks-feed{padding:16px!important}
+ html body #footballTakes #communityPicks #cpFeed>.cp-card{padding:13px 12px!important}
+}
+@media(prefers-reduced-motion:reduce){
+ html body #footballTakes #communityPicks #cpFeed>.cp-card{transition:none!important}
+}
