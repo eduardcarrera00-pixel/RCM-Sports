@@ -7,6 +7,7 @@ function setAuthBusy(busy) {
 let editingArticleId = null, editingBodyText = '', editingBodyHTML = '';
 let commentsRequest = 0, communityRequest = 0, refreshInFlight = false;
 let rankingPublished = null, rankingDraft = Array(10).fill(''), rankingPaused = false;
+let rankingPreviousTeamIds = null;
 let rankingEditingBase = null, rankingBusy = false;
 const votePending = new Set();
 const commentRows = new Map();
@@ -293,16 +294,56 @@ async function shareArticle() {
     catch (error) { if (error.name !== 'AbortError') await copyShareLink(); }
 }
 
-function teamNode(id, position) {
+function teamNode(id, position, priorTeamIds = null) {
     const team = NFL_TEAMS.find(t => t.id === id);
     const item = node('li', null, 'rcm-team');
     item.append(node('strong', String(position)));
     if (team) {
-        const image = node('img'); image.src = team.logo; image.alt = ''; image.width = 36; image.height = 36;
-        image.loading = 'lazy'; image.onerror = () => { image.replaceWith(node('span', team.id, 'rcm-logo-fallback')); };
-        item.append(image, node('span', team.name));
+        const emblem = node('span', null, 'ae-team-emblem');
+        emblem.append(node('span', team.id, 'ae-logo-initials'));
+        const image = node('img'); image.src = team.logo; image.alt = team.name;
+        image.width = 56; image.height = 56; image.decoding = 'async'; image.loading = 'eager';
+        image.onload = () => emblem.classList.add('ae-logo-loaded');
+        image.onerror = () => image.remove();
+        emblem.append(image);
+        item.append(emblem, node('span', team.name, 'ae-team-name'));
+        const trend = rankingTrendNode(id, position, priorTeamIds);
+        if (trend) item.append(trend);
     } else item.append(node('span', id || 'Equipo no disponible'));
     return item;
+}
+// Compare against the previous *published* order only. No simulated movement.
+function rankingTrendNode(teamId, position, priorTeamIds) {
+    if (!Array.isArray(priorTeamIds) || priorTeamIds.length !== 10) return null;
+    const previousIndex = priorTeamIds.indexOf(teamId);
+    if (previousIndex < 0) {
+        const badge = node('span', 'Nuevo', 'ae-rank-trend ae-rank-new');
+        badge.setAttribute('aria-label','Equipo nuevo en el Top 10');
+        return badge;
+    }
+    const delta = previousIndex + 1 - position;
+    if (delta === 0) {
+        const flat = node('span', '–', 'ae-rank-trend ae-rank-flat');
+        flat.setAttribute('aria-label','Sin cambios respecto a la edición anterior');
+        return flat;
+    }
+    const badge = node('span', (delta > 0 ? '▲ ' : '▼ ') + Math.abs(delta),
+        'ae-rank-trend ' + (delta > 0 ? 'ae-rank-up' : 'ae-rank-down'));
+    badge.setAttribute('aria-label',(delta > 0 ? 'Subió ' : 'Bajó ') + Math.abs(delta) + ' posiciones desde la edición anterior');
+    return badge;
+}
+async function loadRankingPrevious(client = db) {
+    rankingPreviousTeamIds = null;
+    try {
+        const {data, error} = await client.from('nfl_ranking_history')
+            .select('team_ids').order('id',{ascending:false}).limit(1).maybeSingle();
+        if (!error && Array.isArray(data?.team_ids) && data.team_ids.length === 10)
+            rankingPreviousTeamIds = data.team_ids;
+    } catch { /* Optional migration is not installed yet. Keep displaying current ranking. */ }
+    document.getElementById('rankingTrendStatus').textContent = rankingPreviousTeamIds
+      ? '▲ Subió · ▼ Bajó · – Sin cambios respecto a la edición anterior'
+      : 'Los cambios de posición aparecerán cuando se publique otra edición con el historial activado.';
+    renderRanking();
 }
 async function loadRanking(quiet = false, strict = false, client = db) {
     if (!client) return;
@@ -310,7 +351,9 @@ async function loadRanking(quiet = false, strict = false, client = db) {
         const {data, error} = await client.from('nfl_rankings').select('*').eq('id',1).maybeSingle();
         if (error) throw error;
         if (quiet && JSON.stringify(data) === JSON.stringify(rankingPublished)) return;
-        rankingPublished = data; renderRanking(); return data;
+        rankingPublished = data; renderRanking();
+        await loadRankingPrevious(client);
+        return data;
     } catch (error) {
         document.getElementById('rankingStatus').textContent = 'No pudimos cargar el ranking: ' + (error.message || 'error de conexión');
         document.getElementById('homeRankingStatus').textContent = 'No pudimos cargar el ranking. Inténtalo de nuevo más tarde.';
@@ -328,13 +371,12 @@ function renderRanking() {
     preview.replaceChildren();
     document.getElementById('homeRankingEdition').textContent = rankingPublished?.edition ? ' · ' + rankingPublished.edition : '';
     document.getElementById('homeRankingStatus').textContent = document.getElementById('rankingStatus').textContent;
-    document.getElementById('homeRankingLink').hidden = !rankingPublished;
     if (!rankingPublished) return;
-    rankingPublished.team_ids.slice(0,6).forEach((id,i) => preview.append(teamNode(id,i+1)));
-    rankingPublished.team_ids.forEach((id,i) => list.append(teamNode(id,i+1)));
+    rankingPublished.team_ids.slice(0,6).forEach((id,i) => preview.append(teamNode(id,i+1,rankingPreviousTeamIds)));
+    rankingPublished.team_ids.forEach((id,i) => list.append(teamNode(id,i+1,rankingPreviousTeamIds)));
     for (let copy=0; copy<2; copy++) {
         const group = node('ol', null, 'rcm-track-group');
-        rankingPublished.team_ids.forEach((id,i) => group.append(teamNode(id,i+1))); track.append(group);
+        rankingPublished.team_ids.forEach((id,i) => group.append(teamNode(id,i+1,rankingPreviousTeamIds))); track.append(group);
     }
     applyRankingMotion();
 }

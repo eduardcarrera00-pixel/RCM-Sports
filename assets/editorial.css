@@ -62,3 +62,113 @@ button:focus-visible,a:focus-visible,summary:focus-visible,input:focus-visible{o
 @media(max-width:640px) and (prefers-reduced-motion:no-preference){.rcm-track{animation:rcm-scroll 40s linear infinite}.rcm-track-group:nth-child(2){display:flex}#rankingPause:not(.hidden){display:inline-block}}
 .rcm-ticker:focus-within .rcm-track{animation-play-state:paused}
 @media(prefers-reduced-motion:reduce){.rcm-track{animation:none!important}.rcm-track-group:nth-child(2){display:none!important}}
+
+/* AE SPORTS / editorial polish — companion to the shipped Tailwind build. */
+:root{--ae-highlight:#b77a4e;--ae-soft:#eee7dc}
+html.dark{--ae-soft:#303638}
+body>header{position:sticky;z-index:40}
+body>header a>div:first-child{border-radius:50%;width:44px;height:44px;min-width:44px;box-shadow:none!important;background:#b78159!important;color:#fff4df}
+body>header a>div:nth-child(2)>span:first-child{font-size:clamp(22px,2vw,28px);letter-spacing:.065em}
+body>header a>div:nth-child(2)>span:first-child span{color:#d5ac89!important}
+body>header a>div:nth-child(2)>span:last-child{letter-spacing:.22em;color:#e7d0bb!important}
+body>header .category-btn:hover,body>header .category-btn:focus-visible{background:#ffffff12!important;color:white!important}
+#readerSession button{background:transparent;color:#fff8ec;border-color:#ad9583}
+.editorial-hero{min-height:420px;border:1px solid var(--ae-line);box-shadow:0 8px 40px #3828190d}
+.editorial-hero-image{width:59%;object-position:center}
+.editorial-hero:after{background:linear-gradient(90deg,var(--ae-paper) 27%,var(--ae-paper) 31%,color-mix(in srgb,var(--ae-paper) 87%,transparent) 47%,transparent 90%)}
+.editorial-hero-copy{padding:46px 44px;max-width:670px}
+.editorial-hero h1{font-size:clamp(36px,4.2vw,64px);max-width:570px}
+.editorial-hero-copy>p:not(.editorial-eyebrow){max-width:390px;color:var(--ae-muted)}
+.editorial-featured{padding:6px 0;color:var(--ae-action);font-weight:700;text-decoration:underline;text-underline-offset:4px;line-height:1.4}
+.editorial-featured:hover{color:var(--ae-blue)}
+.editorial-pick h2{border-bottom:4px solid var(--ae-bronze)}
+.editorial-pick-body{padding:28px}
+#articlesGrid h3{font-size:20px;line-height:1.25}
+#articlesGrid .relative.h-48{background:var(--ae-soft)}
+#articlesGrid>article{border:1px solid var(--ae-line)!important}
+#articlesGrid>article:hover{box-shadow:0 12px 25px #44302618!important;border-color:var(--ae-bronze)!important}
+#articlesGrid>article>div:last-child{border-top:1px solid var(--ae-line);padding-top:14px!important}
+.editorial-bottom{align-items:stretch}
+.editorial-bottom>.editorial-ranking{display:flex;flex-direction:column;min-height:345px}
+.editorial-bottom .rcm-panel{padding:24px}
+.editorial-bottom h2{font-size:25px;color:var(--ae-ink);margin:0}
+.editorial-bottom h2 span{display:block!important;font:600 12px/1.8 Inter,sans-serif;letter-spacing:.09em;color:var(--ae-muted)}
+.editorial-ranking-list{margin:14px 0 18px;grid-template-rows:repeat(3,minmax(75px,auto));gap:0 12px}
+.editorial-ranking-list .rcm-team{grid-template-columns:24px 58px 1fr;align-items:center;gap:9px;min-height:75px;padding:8px 0;font-size:14px}
+.editorial-ranking-list .rcm-team strong,.ae-full-ranking-list .rcm-team strong{font:700 17px Georgia,serif;color:var(--ae-action)}
+.editorial-ranking-list .rcm-team img{width:58px;height:58px;max-width:none;filter:drop-shadow(0 2px 2px #00000010)}
+.editorial-ranking-list .rcm-team span:last-child{font-weight:700;line-height:1.26}
+.editorial-ranking-list .rcm-team .rcm-logo-fallback{font-size:10px}
+#homeRankingLink,#homeChampionsLink{margin-top:auto;align-self:flex-start;border:0;border-top:1px solid var(--ae-line);border-radius:0;padding:15px 0 2px;background:transparent;color:var(--ae-action);font-weight:800}
+#homeRankingLink:hover,#homeChampionsLink:hover{text-decoration:underline}
+#homeRankingStatus:empty,#homeChampionsStatus:empty{display:none}
+.editorial-community{margin-top:26px!important;padding:28px!important;background:var(--ae-paper)!important;color:var(--ae-ink)!important;border:1px solid var(--ae-line)!important;border-radius:0!important}
+.editorial-community h2{font-size:28px;color:var(--ae-ink)!important;font-weight:700}
+.editorial-community .ae-section-heading{border-bottom:1px solid var(--ae-line);padding-bottom:12px}
+.ae-overline{font:700 10px Inter,sans-serif;color:var(--ae-sage);letter-spacing:.22em}
+.editorial-community .ae-section-heading p{color:var(--ae-muted)}
+#communityLeaders{gap:24px;padding-top:12px}
+#communityLeaders .rcm-leader{padding:16px 2px}
+#communityLeaders blockquote{font-size:clamp(16px,1.6vw,21px)}
+#championsRankings{scroll-margin-top:190px;border-radius:0;background:var(--ae-paper);color:var(--ae-ink);border:1px solid var(--ae-line)}
+#championsRankings h2{font:700 26px Georgia,serif;color:var(--ae-ink)}
+.ae-edition{font-size:13px;color:var(--ae-muted)}
+.ae-full-ranking-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 28px;margin:16px 0;list-style:none}
+.ae-full-ranking-list .rcm-team{display:grid;grid-template-columns:30px 64px 1fr;min-height:84px;border-bottom:1px solid var(--ae-line);gap:14px}
+.ae-full-ranking-list .rcm-team img{width:64px;height:64px;object-fit:contain}
+.ae-full-ranking-list .rcm-team span:last-child{font-weight:650}
+.ae-safety-note{color:var(--ae-muted);font-size:12px}
+/* The rankings move by default; pointer/focus and OS reduced motion can pause them. */
+#rankingPause{display:none!important}
+.rcm-track-group:nth-child(2){display:flex}
+#rankingTrack .rcm-team strong{color:var(--ae-action)}
+#nflRankings .rcm-ranking-list .rcm-team strong{color:var(--ae-action)}
+#nflRankings .rcm-ranking-list img{width:48px;height:48px}
+#nflRankings .rcm-track{animation-duration:45s}
+@media(max-width:1100px){.editorial-ranking-list .rcm-team{grid-template-columns:20px 44px 1fr;gap:6px;font-size:12px}.editorial-ranking-list .rcm-team img{width:44px;height:44px}.editorial-bottom>.editorial-ranking{min-height:320px}}
+@media(max-width:850px){.editorial-hero{min-height:375px}.editorial-hero-copy{max-width:560px}.editorial-bottom{grid-template-columns:1fr 1fr}}
+@media(max-width:760px){.editorial-hero{min-height:350px}.editorial-hero-copy{padding:28px 24px}.editorial-hero:after{background:linear-gradient(90deg,var(--ae-paper) 5%,color-mix(in srgb,var(--ae-paper) 84%,transparent) 63%,transparent)}.editorial-bottom{grid-template-columns:1fr}.editorial-ranking-list .rcm-team{grid-template-columns:24px 58px 1fr;min-height:73px;font-size:14px}.editorial-ranking-list .rcm-team img{width:58px;height:58px}.ae-full-ranking-list{grid-template-columns:1fr}.editorial-community{padding:20px!important}}
+@media(max-width:390px){.editorial-ranking-list .rcm-team{grid-template-columns:17px 44px 1fr;gap:5px;font-size:12px}.editorial-ranking-list .rcm-team img{width:44px;height:44px}.editorial-hero h1{font-size:37px}body>header nav{gap:3px}}
+@media(prefers-reduced-motion:reduce){.editorial-hero *,#articlesGrid *{transition:none!important}.rcm-track-group:nth-child(2){display:none}}
+
+/* Weekly Picks: real published two-option ballot only */
+#ae-no-fixture{display:none}
+#weeklyPickOptions{display:block;margin-top:12px}
+.editorial-pick .ae-ballot-edition{font:700 14px Georgia,serif;color:var(--ae-ink)}
+.ae-ballot-description,.ae-pick-empty{color:var(--ae-muted);font-size:13px;line-height:1.6;margin:10px 0 16px}
+.ae-ballot-options{display:grid;gap:12px;margin:12px 0}
+.editorial-pick .ae-ballot-choice{display:flex;flex-direction:column;gap:8px;align-items:flex-start;text-align:left;padding:14px 16px;margin:0;width:100%;border:1px solid var(--ae-line);background:var(--ae-paper);color:var(--ae-ink);border-radius:5px;font-size:14px}
+.editorial-pick .ae-ballot-choice:hover:not(:disabled){border-color:var(--ae-action);background:var(--ae-cream)}
+.editorial-pick .ae-ballot-choice[aria-pressed=true]{border:2px solid var(--ae-action);background:var(--ae-cream)}
+.ae-ballot-choice-name{font:700 17px Georgia,serif}
+.ae-ballot-choice-description{font-size:12px;color:var(--ae-muted)}
+.ae-ballot-votes{font-size:11px;color:var(--ae-sage);font-weight:700}
+.editorial-pick .ae-pick-fineprint{font-size:11px;color:var(--ae-muted);margin:8px 0}
+.editorial-pick .ae-ballot-secondary{font-size:12px;background:transparent;border:1px solid var(--ae-action);color:var(--ae-action);padding:10px 16px;margin:14px 0 0}
+/* Remove residual legacy green links and unify the footer with the editorial palette. */
+#articlesGrid .text-pitch-600,#articlesGrid .hover\:text-pitch-600:hover{color:var(--ae-action)!important}
+footer{background:#283e4f!important;color:#f4ede4!important;border-color:#405a67!important}
+footer .text-pitch-500,footer .text-pitch-600,footer .text-pitch-400{color:#cc9d75!important}
+footer .bg-pitch-600,footer .bg-pitch-500{background:#bd8a64!important}
+footer .text-slate-500,footer .text-slate-400{color:#c2b9af!important}
+footer a:hover{color:#f6d1b4!important}
+
+/* Compact equal-height interwoven letters; neutral victory sparkle. */
+.ae-brand-monogram{display:flex;align-items:baseline;justify-content:center;position:relative;font:700 21px Georgia,serif;letter-spacing:-.08em;line-height:1}
+.ae-brand-monogram b{font-weight:700;font-size:21px}
+.ae-brand-monogram b:nth-child(2){margin-left:-4px;color:#f5e6d6}
+.ae-brand-monogram em{position:absolute;top:-10px;right:-8px;font:normal 10px Georgia,serif;color:#fbe4a7}
+
+/* Escudos: preserve the position and a legible abbreviation during slow CDN loads. */
+.ae-team-emblem{position:relative;display:flex;align-items:center;justify-content:center;flex:none;width:58px;height:58px;border-radius:50%;background:#e9dfd2;color:#634a3b;overflow:hidden}
+.ae-logo-initials{font:700 15px Georgia,serif;letter-spacing:.02em;color:#785037}
+.ae-team-emblem img{position:absolute;inset:0;width:100%!important;height:100%!important;object-fit:contain;opacity:0;transition:opacity .12s ease-in}
+.ae-team-emblem.ae-logo-loaded img{opacity:1}
+.ae-team-emblem.ae-logo-loaded .ae-logo-initials{opacity:0}
+.ae-full-ranking-list .ae-team-emblem{width:64px;height:64px}
+.rcm-track .ae-team-emblem{width:44px;height:44px}
+@media(max-width:1100px){.editorial-ranking-list .ae-team-emblem{width:44px;height:44px}}
+@media(min-width:761px){.editorial-ranking-list .ae-team-emblem{width:58px;height:58px}}
+@media(max-width:760px){.editorial-ranking-list .ae-team-emblem{width:58px;height:58px}}
+@media(max-width:390px){.editorial-ranking-list .ae-team-emblem{width:44px;height:44px}}
+@media(prefers-reduced-motion:reduce){.ae-team-emblem img{transition:none}}

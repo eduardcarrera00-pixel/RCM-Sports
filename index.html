@@ -22,7 +22,7 @@
 
     <!-- Font Awesome Icons & Google Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600;6..72,700&display=swap" rel="stylesheet">
 
     <style>
         body {
@@ -288,7 +288,8 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
 <link rel="stylesheet" href="assets/community.css?v=20261013-2">
-<link rel="stylesheet" href="assets/editorial.css">
+<link rel="stylesheet" href="assets/editorial.css?v=20261015-2">
+<link rel="stylesheet" href="assets/unified-editorial.css?v=20261015-4">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 
@@ -296,25 +297,23 @@ html.dark [data-reading-size][aria-pressed="true"] {
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-20">
 
-                <!-- Brand Logo -->
-                <a href="#" onclick="filterByCategory('Todos')" class="flex items-center space-x-3 group">
-                    <div class="w-11 h-11 bg-gradient-to-tr from-pitch-700 to-pitch-500 rounded-xl flex items-center justify-center text-white shadow-md shadow-pitch-600/30 group-hover:scale-105 transition-transform duration-300">
-                        <i class="fa-solid fa-trophy text-2xl"></i>
-                    </div>
-                    <div>
-                        <span class="text-2xl font-black tracking-tight text-slate-900">AE <span class="text-pitch-600">SPORTS</span></span>
-                        <span class="block text-[10px] text-slate-500 font-bold tracking-widest uppercase -mt-1">TU BLOG DEPORTIVO</span>
-                    </div>
+                <!-- Marca AE SPORTS: monograma A + pluma, sin círculo. -->
+                <a href="#" onclick="filterByCategory('Todos')" class="ae-brand group" aria-label="AE SPORTS — inicio">
+                    <img class="ae-brand-mark" src="assets/ae-feather.svg" alt="" width="52" height="52">
+                    <span class="ae-brand-words"><strong>AE <span>SPORTS</span></strong><small>TU BLOG DE DEPORTE</small></span>
                 </a>
-
-                <!-- Search Input Bar (Desktop) -->
-                <div class="hidden md:flex flex-1 max-w-md mx-8">
-                    <div class="relative w-full">
-                        <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Buscar noticias, análisis, jugadas..."
-                            class="w-full bg-slate-100 border border-slate-200 text-sm text-slate-800 rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:border-pitch-600 focus:bg-white transition-all shadow-inner placeholder-slate-400">
-                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-400 text-sm"></i>
-                    </div>
-                </div>
+                <!-- Este input conserva compatibilidad con los filtros y pruebas, pero no se muestra en la interfaz. -->
+                <input id="searchInput" type="search" hidden aria-hidden="true" tabindex="-1" oninput="handleSearch()">
+                <nav class="ae-sport-nav" aria-label="Explorar deportes">
+                    <button onclick="filterByCategory('Todos')" class="category-btn active" data-category="Todos" hidden>Todos</button>
+                    <button onclick="filterByCategory('Picks')" class="category-btn" data-category="Picks"><span class="ae-nav-icon"><i class="fa-solid fa-bullseye" aria-hidden="true"></i></span><span>Picks</span></button>
+                    <button onclick="filterByCategory('NFL')" class="category-btn" data-category="NFL"><span class="ae-nav-icon"><i class="fa-solid fa-football" aria-hidden="true"></i></span><span>NFL</span></button>
+                    <button onclick="filterByCategory('Fútbol')" class="category-btn" data-category="Fútbol"><span class="ae-nav-icon"><i class="fa-solid fa-futbol" aria-hidden="true"></i></span><span>Fútbol</span></button>
+                    <button onclick="filterByCategory('Fútbol Americano Colegial')" class="category-btn" data-category="Fútbol Americano Colegial"><span class="ae-nav-icon"><i class="fa-solid fa-graduation-cap" aria-hidden="true"></i></span><span>Colegial</span></button>
+                    <button onclick="filterByCategory('NBA')" class="category-btn" data-category="NBA"><span class="ae-nav-icon"><i class="fa-solid fa-basketball" aria-hidden="true"></i></span><span>NBA</span></button>
+                    <button onclick="filterByCategory('Tenis')" class="category-btn" data-category="Tenis"><span class="ae-nav-icon"><i class="fa-solid fa-table-tennis-paddle-ball" aria-hidden="true"></i></span><span>Tenis</span></button>
+                    <button onclick="filterByCategory('Ciclismo')" class="category-btn" data-category="Ciclismo"><span class="ae-nav-icon"><i class="fa-solid fa-bicycle" aria-hidden="true"></i></span><span>Ciclismo</span></button>
+                </nav>
 
                 <!-- Admin Status & Header Actions -->
                 <div class="flex items-center space-x-3"> <button
@@ -341,7 +340,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
                     <!-- Logged-in State: Admin Profile & Actions -->
                     <div id="loggedAdminContainer" class="hidden flex items-center space-x-2 sm:space-x-3">
                         <!-- Profile Tag -->
-                        <div class="bg-pitch-50 border border-pitch-200 rounded-xl px-3 py-1.5 flex items-center space-x-2">
+                        <div class="ae-admin-profile bg-pitch-50 border border-pitch-200 rounded-xl px-3 py-1.5 flex items-center space-x-2">
                             <div class="w-6 h-6 bg-pitch-600 text-white rounded-full flex items-center justify-center text-[10px] font-bold">
                                 <i class="fa-solid fa-user-shield"></i>
                             </div>
@@ -352,56 +351,20 @@ html.dark [data-reading-size][aria-pressed="true"] {
                         </div>
 
                         <!-- Publish Button (Visible ONLY when logged in) -->
-                        <button onclick="openPublishModal()" class="flex items-center space-x-2 bg-pitch-600 hover:bg-pitch-700 text-white text-xs font-bold uppercase tracking-wider py-2.5 px-3.5 sm:px-4 rounded-xl shadow-md shadow-pitch-600/20 transition-all hover:scale-105">
+                        <button onclick="openPublishModal()" class="ae-publish-action flex items-center space-x-2 bg-pitch-600 hover:bg-pitch-700 text-white text-xs font-bold uppercase tracking-wider py-2.5 px-3.5 sm:px-4 rounded-xl shadow-md shadow-pitch-600/20 transition-all hover:scale-105">
                             <i class="fa-solid fa-plus text-sm"></i>
                             <span class="hidden sm:inline">Publicar</span>
                         </button>
 
                         <!-- Logout Button -->
-                        <button onclick="handleAdminLogout()" title="Cerrar Sesión" class="w-9 h-9 bg-slate-100 hover:bg-red-50 hover:text-red-600 border border-slate-200 text-slate-500 rounded-xl flex items-center justify-center transition-all">
+                        <button onclick="handleAdminLogout()" title="Cerrar Sesión" aria-label="Cerrar sesión" class="ae-signout-action w-9 h-9 bg-slate-100 hover:bg-red-50 hover:text-red-600 border border-slate-200 text-slate-500 rounded-xl flex items-center justify-center transition-all">
                             <i class="fa-solid fa-right-from-bracket text-xs"></i>
                         </button>
                     </div>
 
-                    <!-- Mobile Search Trigger Button -->
-                    <button onclick="toggleMobileSearch()" class="md:hidden text-slate-600 hover:text-pitch-600 p-2">
-                        <i class="fa-solid fa-magnifying-glass text-xl"></i>
-                    </button>
                 </div>
             </div>
-
-            <!-- Mobile Search Dropdown -->
-            <div id="mobileSearchBox" class="hidden md:hidden pb-4 pt-1">
-                <input type="text" id="mobileSearchInput" oninput="handleMobileSearch()" placeholder="Buscar en AE SPORTS..."
-                    class="w-full bg-slate-100 border border-slate-200 text-sm text-slate-800 rounded-xl px-4 py-2.5 focus:outline-none focus:border-pitch-600">
-            </div>
-
-            <nav class="flex space-x-2 overflow-x-auto py-3 no-scrollbar border-t border-slate-100 text-xs font-semibold">
-                <button onclick="filterByCategory('Todos')" class="category-btn active px-4 py-2 rounded-lg bg-pitch-600 text-white font-bold transition-all whitespace-nowrap shadow-sm" data-category="Todos">
-                    <i class="fa-solid fa-border-all mr-1.5"></i> Todos
-                </button>
-                <button onclick="filterByCategory('Picks')" class="category-btn px-4 py-2 rounded-lg bg-slate-100 text-slate-600 hover:text-pitch-700 hover:bg-pitch-50 transition-all whitespace-nowrap" data-category="Picks">
-                    <i class="fa-solid fa-bullseye mr-1.5 text-pitch-600"></i> Picks
-                </button>
-                <button onclick="filterByCategory('NFL')" class="category-btn px-4 py-2 rounded-lg bg-slate-100 text-slate-600 hover:text-pitch-700 hover:bg-pitch-50 transition-all whitespace-nowrap" data-category="NFL">
-                    <i class="fa-solid fa-football mr-1.5 text-amber-700"></i> NFL
-                </button>
-                <button onclick="filterByCategory('Fútbol')" class="category-btn px-4 py-2 rounded-lg bg-slate-100 text-slate-600 hover:text-pitch-700 hover:bg-pitch-50 transition-all whitespace-nowrap" data-category="Fútbol">
-                    <i class="fa-solid fa-futbol mr-1.5 text-pitch-600"></i> Fútbol
-                </button>
-                <button onclick="filterByCategory('Fútbol Americano Colegial')" class="category-btn px-4 py-2 rounded-lg bg-slate-100 text-slate-600 hover:text-pitch-700 hover:bg-pitch-50 transition-all whitespace-nowrap" data-category="Fútbol Americano Colegial">
-                    <i class="fa-solid fa-graduation-cap mr-1.5 text-amber-600"></i> Colegial
-                </button>
-                <button onclick="filterByCategory('NBA')" class="category-btn px-4 py-2 rounded-lg bg-slate-100 text-slate-600 hover:text-pitch-700 hover:bg-pitch-50 transition-all whitespace-nowrap" data-category="NBA">
-                    <i class="fa-solid fa-basketball mr-1.5 text-orange-500"></i> NBA
-                </button>
-                <button onclick="filterByCategory('Tenis')" class="category-btn px-4 py-2 rounded-lg bg-slate-100 text-slate-600 hover:text-pitch-700 hover:bg-pitch-50 transition-all whitespace-nowrap" data-category="Tenis">
-                    <i class="fa-solid fa-table-tennis-paddle-ball mr-1.5 text-lime-600"></i> Tenis
-                </button>
-                <button onclick="filterByCategory('Ciclismo')" class="category-btn px-4 py-2 rounded-lg bg-slate-100 text-slate-600 hover:text-pitch-700 hover:bg-pitch-50 transition-all whitespace-nowrap" data-category="Ciclismo">
-                    <i class="fa-solid fa-bicycle mr-1.5 text-sky-600"></i> Ciclismo
-                </button>
-            </nav>
+            <input type="search" id="mobileSearchInput" hidden aria-hidden="true" tabindex="-1" oninput="handleMobileSearch()">
             <nav id="footballTeams" class="rcm-row hidden" aria-label="Equipos de fútbol">
                 <button type="button" data-team="" onclick="filterByTeam('')">Todo Fútbol</button>
                 <button type="button" data-team="barcelona" onclick="filterByTeam('barcelona')">FC Barcelona</button>
@@ -423,10 +386,16 @@ html.dark [data-reading-size][aria-pressed="true"] {
         <div id="articleMissing" class="rcm-panel hidden" role="alert"><p>No encontramos esta publicación. Puede que haya sido eliminada.</p><button type="button" onclick="closeModal()">Volver al inicio</button></div>
         <section id="nflRankings" class="rcm-panel hidden" aria-labelledby="rankingTitle">
             <div class="rcm-row"><h2 id="rankingTitle">NFL Power Rankings</h2><button id="rankingEditButton" class="hidden" onclick="openRankingEditor()">Editar ranking</button></div>
-            <p id="rankingEdition"></p><p id="rankingStatus" role="status">Cargando ranking…</p>
+            <p id="rankingEdition"></p><p id="rankingStatus" role="status">Cargando ranking…</p><p class="ae-trend-explanation" id="rankingTrendStatus" aria-live="polite"></p>
             <button id="rankingPause" class="hidden" onclick="toggleRankingMotion()" aria-pressed="false">Pausar movimiento</button>
             <div id="rankingViewport" class="rcm-ticker" aria-hidden="true"><div id="rankingTrack" class="rcm-track"></div></div>
-            <details id="rankingStatic"><summary>Lista completa de los diez equipos</summary><ol id="rankingList" class="rcm-ranking-list"></ol></details>
+            <details id="rankingStatic" open><summary>Lista completa de los diez equipos</summary><ol id="rankingList" class="rcm-ranking-list"></ol></details>
+        </section>
+        <section id="championsRankings" class="rcm-panel ae-champions-full hidden" aria-labelledby="championsTitle">
+            <div class="rcm-row"><h2 id="championsTitle">Champions League · Power Rankings</h2><span class="ae-edition" id="championsEdition"></span></div>
+            <p id="championsStatus" role="status">Cargando clasificación publicada…</p>
+            <ol id="championsList" class="ae-full-ranking-list" aria-label="Top 10 Champions League"></ol>
+            <p class="ae-safety-note">Clasificación editorial de AE SPORTS, no una tabla oficial de resultados.</p>
         </section>
         <!-- Active Filter Indicator Bar -->
         <div id="filterIndicator" class="hidden mb-6 flex items-center justify-between bg-pitch-50 border border-pitch-200 px-4 py-3 rounded-xl text-pitch-900">
@@ -474,11 +443,11 @@ html.dark [data-reading-size][aria-pressed="true"] {
                 <section class="editorial-pick" aria-labelledby="weeklyPickTitle">
                     <h2 id="weeklyPickTitle">Pick de la Semana</h2>
                     <div class="editorial-pick-body"><span class="editorial-eyebrow">LA VOZ DE LA COMUNIDAD</span>
-                    <h3>El próximo gran Pick empieza contigo.</h3>
-                    <p>El Pick comunitario de la semana aún no está disponible en esta versión.</p>
-                    <button type="button" onclick="filterByCategory('Picks')">Explorar publicaciones de Picks →</button></div>
+                    <h3>Dos opciones. Una comunidad.</h3>
+                    <div id="weeklyPickOptions" aria-live="polite"><p>Comprobando la edición publicada…</p></div></div>
                 </section>
 
+        <section class="rcm-panel editorial-community" aria-labelledby="communityTitle"><div class="ae-section-heading"><span class="ae-overline">LA COMUNIDAD OPINA</span><h2 id="communityTitle">Las voces de AE SPORTS</h2><p>Los comentarios más apoyados y más cuestionados, según votos reales.</p></div><div id="communityLeaders" aria-live="polite">Cargando comentarios destacados…</div></section>
                 <!-- Interactive Daily Poll Widget -->
                 <div hidden class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm grass-glow relative overflow-hidden">
                     <div class="flex items-center space-x-2 text-pitch-600 text-xs font-bold uppercase tracking-widest mb-3">
@@ -546,13 +515,27 @@ html.dark [data-reading-size][aria-pressed="true"] {
         </div>
         <div id="editorialBottom" class="editorial-bottom">
             <section class="rcm-panel editorial-ranking" aria-labelledby="homeRankingTitle">
-                <div class="editorial-module-heading"><h2 id="homeRankingTitle">NFL Power Rankings <span id="homeRankingEdition"></span></h2></div>
-                <p id="homeRankingStatus" role="status">Cargando ranking…</p>
-                <ol id="homeRankingList" class="editorial-ranking-list"></ol>
-                <button type="button" id="homeRankingLink" onclick="filterByCategory('NFL'); document.getElementById('rankingStatic').open = true; document.getElementById('nflRankings').scrollIntoView({block:'start'});">Ver Top 10 completo →</button>
+                <a href="#nflRankings" id="homeRankingLink" class="ae-ranking-card-link" onclick="event.preventDefault(); openNflTopTen();" aria-label="Abrir clasificación completa NFL Power Rankings, Top 10">
+                    <div class="editorial-module-heading"><h2 id="homeRankingTitle">NFL Power Rankings <span id="homeRankingEdition"></span></h2><span class="ae-ranking-link-arrow" aria-hidden="true">↗</span></div>
+                    <p id="homeRankingStatus" role="status">Cargando ranking…</p>
+                    <ol id="homeRankingList" class="editorial-ranking-list"></ol>
+                    <span class="ae-ranking-hint">Selecciona para ver el Top 10 <span aria-hidden="true">→</span></span>
+                </a>
             </section>
-            <section class="rcm-panel" aria-labelledby="communityTitle"><h2 id="communityTitle">Comentarios destacados</h2><div id="communityLeaders" aria-live="polite">Cargando comentarios destacados…</div></section>
+            <section class="rcm-panel editorial-ranking" aria-labelledby="homeChampionsTitle">
+                <a href="#championsRankings" id="homeChampionsLink" class="ae-ranking-card-link" onclick="event.preventDefault(); openChampionsTopTen();" aria-label="Abrir clasificación completa Champions League, Top 10">
+                    <div class="editorial-module-heading"><h2 id="homeChampionsTitle">Champions League <span id="homeChampionsEdition"></span></h2><span class="ae-ranking-link-arrow" aria-hidden="true">↗</span></div>
+                    <p id="homeChampionsStatus" role="status">Comprobando ediciones publicadas…</p>
+                    <ol id="homeChampionsList" class="editorial-ranking-list"></ol>
+                    <span class="ae-ranking-hint">Selecciona para ver el Top 10 <span aria-hidden="true">→</span></span>
+                </a>
+            </section>
         </div>
+        <section id="aeMoreNews" class="ae-more-news" hidden aria-labelledby="aeMoreNewsTitle">
+            <div class="ae-more-heading"><h2 id="aeMoreNewsTitle">Más noticias</h2><span>Historias de AE SPORTS</span></div>
+            <div id="moreArticlesGrid" class="ae-more-grid"></div>
+        </section>
+
     </main>
 
 <!-- User Account Modal -->
@@ -738,9 +721,9 @@ html.dark [data-reading-size][aria-pressed="true"] {
                 </div>
             </div>
 
-            <div class="p-6 overflow-y-auto space-y-6 flex-1">
+            <div class="ae-article-scroll p-6 overflow-y-auto space-y-6 flex-1">
 
-                <div>
+                <div class="ae-article-intro"><div class="ae-article-eyebrow">AE SPORTS <span> / </span> HISTORIAS QUE IMPORTAN</div>
                     <h1 id="modalTitle" class="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-tight mb-3"></h1>
                     <div class="flex flex-wrap items-center gap-4 text-xs text-slate-500 pb-4 border-b border-slate-100">
                         <div class="flex items-center space-x-2">
@@ -757,35 +740,6 @@ html.dark [data-reading-size][aria-pressed="true"] {
                 <div class="relative rounded-xl overflow-hidden h-64 sm:h-96 shadow-md">
                     <img id="modalImage" src="" alt="Portada" class="w-full h-full object-cover">
                 </div>
-<div class="flex flex-wrap items-center gap-2"
-     role="group"
-     aria-label="Tamaño del texto">
-    <span class="text-sm text-slate-500 mr-2">Texto:</span>
-
-    <button type="button" data-reading-size="normal"
-            onclick="setReadingSize('normal')"
-            aria-pressed="true"
-            class="px-3 py-2 rounded-lg border border-slate-200
-                   bg-slate-100 text-slate-800 text-sm">
-        Normal
-    </button>
-
-    <button type="button" data-reading-size="large"
-            onclick="setReadingSize('large')"
-            aria-pressed="false"
-            class="px-3 py-2 rounded-lg border border-slate-200
-                   bg-slate-100 text-slate-800 text-sm">
-        Grande
-    </button>
-
-    <button type="button" data-reading-size="extra"
-            onclick="setReadingSize('extra')"
-            aria-pressed="false"
-            class="px-3 py-2 rounded-lg border border-slate-200
-                   bg-slate-100 text-slate-800 text-sm">
-        Extra grande
-    </button>
-</div>
                 <div id="modalBody" class="text-slate-700 text-sm sm:text-base leading-relaxed space-y-4">
                     <!-- Article HTML Body -->
                 </div>
@@ -816,7 +770,8 @@ html.dark [data-reading-size][aria-pressed="true"] {
                     </div>
                 </div>
 
-                <div class="space-y-6 pt-2">
+                <div class="ae-conversation space-y-6 pt-2">
+                    <p class="ae-overline">EL DEBATE CONTINÚA</p>
                     <h3 class="text-lg font-bold text-slate-900 flex items-center">
                         <i class="fa-solid fa-comments text-pitch-600 mr-2"></i>
                         Comentarios (<span id="modalCommentCount">0</span>)
@@ -861,9 +816,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 
                 <div class="space-y-3">
                     <div class="flex items-center space-x-2">
-                        <div class="w-8 h-8 bg-pitch-600 rounded-lg flex items-center justify-center text-white">
-                            <i class="fa-solid fa-trophy"></i>
-                        </div>
+                        <img src="assets/ae-feather.svg" alt="" width="38" height="38" class="ae-footer-mark">
                         <span class="text-lg font-black text-white tracking-tight">AE <span class="text-pitch-500">SPORTS</span></span>
                     </div>
                     <p class="text-slate-400 leading-relaxed text-xs">
@@ -930,7 +883,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
             </div>
 
             <div class="pt-8 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between text-slate-500 space-y-4 sm:space-y-0">
-                <p>&copy; 2026 RCM Sports Blog Deportivo. Todos los derechos reservados.</p>
+                <p>&copy; 2026 AE SPORTS. Todos los derechos reservados.</p>
             </div>
         </div>
     </footer>
@@ -969,6 +922,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
         function updateTeamField() { document.getElementById('pubTeamField').classList.toggle('hidden', document.getElementById('pubCategory').value !== 'Fútbol'); }
         function filterByTeam(team) { currentTeam = team; renderArticlesFeed(); }
         let currentSearchQuery = '';
+
         let activeModalArticleId = null;
 let currentUser = null;
 
@@ -1433,10 +1387,22 @@ currentUser = {
         }
 
 
+        function openNflTopTen() {
+            filterByCategory('NFL');
+            const full = document.getElementById('rankingStatic');
+            full.open = true;
+            document.getElementById('nflRankings').scrollIntoView({block:'start', behavior:'instant'});
+        }
+        function openChampionsTopTen() {
+            filterByCategory('Fútbol');
+            document.getElementById('championsRankings').scrollIntoView({block:'start', behavior:'instant'});
+        }
+
         function renderArticlesFeed() {
             document.getElementById('editorialBottom').hidden = currentCategory !== 'Todos' || Boolean(currentSearchQuery);
             document.querySelector('.editorial-pick').hidden = currentCategory !== 'Todos' || Boolean(currentSearchQuery);
             document.getElementById('nflRankings').classList.toggle('hidden', currentCategory !== 'NFL');
+            if (typeof renderChampionsVisibility === 'function') renderChampionsVisibility();
             document.getElementById('footballTeams').classList.toggle('hidden', currentCategory !== 'Fútbol');
             document.querySelectorAll('[data-team]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.team === currentTeam)));
             const filtered = articles.filter(art => {
@@ -1453,6 +1419,14 @@ currentUser = {
             const articlesCount = document.getElementById('articlesCount');
 
             articlesCount.innerText = `${filtered.length} ${filtered.length === 1 ? 'noticia' : 'noticias'}`;
+            const isHome = currentCategory === 'Todos' && !currentSearchQuery;
+            const moreNews = document.getElementById('aeMoreNews');
+            const moreArticlesGrid = document.getElementById('moreArticlesGrid');
+            moreNews.hidden = true;
+            moreArticlesGrid.replaceChildren();
+            document.body.classList.toggle('ae-is-home', isHome);
+            // Show all news without a secondary button or artificially hidden cards.
+
 
             if (filtered.length === 0) {
                 heroSection.classList.add('hidden');
@@ -1524,6 +1498,11 @@ currentUser = {
                     </div>
                 </article>
             `).join('');
+            // Keep the editorial cover compact and showcase rankings sooner. All articles remain available below.
+            if (isHome && articlesGrid.children.length > 3) {
+                moreArticlesGrid.replaceChildren(...Array.from(articlesGrid.children).slice(3));
+                moreNews.hidden = false;
+            }
         }
 
         function renderHeroCard(hero) {
@@ -1532,11 +1511,10 @@ currentUser = {
                 <div class="editorial-hero">
                     <img class="editorial-hero-image" src="${escapeHTML(safeImageURL(hero.image))}" alt="" onerror="this.hidden=true">
                     <div class="editorial-hero-copy">
-                        <p class="editorial-eyebrow">ANÁLISIS · NOTICIAS · COMUNIDAD</p>
-                        <h1>El deporte con calma,<br>clase y pasión.</h1>
-                        <p>Análisis, historias y una comunidad que vive el deporte de otra manera.</p>
-                        <div class="editorial-actions"><a href="#articlesGrid">Ver historias →</a><button type="button" onclick="filterByCategory('Picks')">Explorar Picks</button></div>
-                        <button class="editorial-featured" type="button" onclick="openArticleModal(${articleIdArgument(hero.id)})">EN PORTADA · ${escapeHTML(hero.title)} →</button>
+                        <p class="editorial-eyebrow">AE SPORTS <span> / </span> EN PORTADA <span> / </span> ${escapeHTML(hero.category)}</p>
+                        <h1>${escapeHTML(hero.title)}</h1>
+                        <p>${escapeHTML(hero.summary || 'La historia completa, desde otra perspectiva.')}</p>
+                        <div class="editorial-actions"><button type="button" class="editorial-featured" onclick="openArticleModal(${articleIdArgument(hero.id)})">Leer la historia <span class="ae-action-title">· ${escapeHTML(hero.title)}</span><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></button><button type="button" class="ae-quiet-cta" onclick="filterByCategory('Picks')">Explorar Picks →</button></div>
                     </div>
                 </div>`;
         }
@@ -1991,6 +1969,8 @@ function toggleDarkMode() {
 updateThemeButton();
     </script>
 <script src="assets/nfl-teams.js"></script>
-<script src="assets/community.js?v=20261013-2"></script>
+<script src="assets/community.js?v=20261015-4"></script>
+<script src="assets/champions.js?v=20261015-4"></script>
+<script src="assets/weekly-picks.js?v=20261015-1"></script>
 </body>
 </html>

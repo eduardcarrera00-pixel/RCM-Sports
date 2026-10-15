@@ -124,7 +124,7 @@ async function backend(q){
  await one.getByRole('button',{name:'Cerrar',exact:true}).click();await two.evaluate(()=>{filterByCategory('NFL');loadRanking();});await two.waitForFunction(()=>rankingPublished?.team_ids.length===10);assert.equal(await two.locator('#rankingList li').count(),10);
  assert.deepEqual(await two.evaluate(()=>rankingPublished.team_ids),teams);
  await two.reload();await two.waitForFunction(()=>rankingPublished?.team_ids.length===10);assert.deepEqual(await two.evaluate(()=>rankingPublished.team_ids),teams);
- await one.locator('#rankingPause').click();assert.equal(await one.locator('#rankingTrack').evaluate(e=>e.classList.contains('paused')),true);
+ assert.equal(await one.locator('#rankingPause').isVisible(),false);await one.evaluate(()=>toggleRankingMotion());assert.equal(await one.locator('#rankingTrack').evaluate(e=>e.classList.contains('paused')),true);
  await one.screenshot({path:'/tmp/rcm-desktop.png',fullPage:true});
  const mobile=await newPage({width:390,height:844});await ready(mobile);await mobile.evaluate(()=>filterByCategory('NFL'));await mobile.waitForFunction(()=>rankingPublished?.team_ids.length===10);assert.equal(await mobile.locator('#footballTeams').isVisible(),false);await mobile.screenshot({path:'/tmp/rcm-mobile.png',fullPage:true});
  assert.equal(await mobile.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),true);
@@ -146,7 +146,7 @@ async function backend(q){
  await one.locator('[data-team="barcelona"]').click();assert.equal(await one.locator('#articlesGrid > article').count(),1);
  for(const team of ['real-madrid','manchester-united']) {await one.locator('[data-team="'+team+'"]').click();assert.equal(await one.locator('#noResults:not(.hidden)').count(),1);}
  await one.locator('[data-team=""]').click();assert.equal(await one.locator('#articlesGrid > article').count(),2);
- await one.locator('[data-team="barcelona"]').click();await one.locator('#searchInput').fill('not-matching');await one.evaluate(()=>handleSearch());assert.equal(await one.locator('#noResults:not(.hidden)').count(),1);
+ await one.locator('[data-team="barcelona"]').click();await one.evaluate(()=>{document.getElementById('searchInput').value='not-matching';handleSearch();});assert.equal(await one.locator('#noResults:not(.hidden)').count(),1);
  await one.evaluate(()=>resetFilters());assert.equal(await one.locator('#footballTeams').isVisible(),false);
  await ready(two);await two.evaluate(()=>{filterByCategory('Fútbol');filterByTeam('barcelona');});await two.waitForFunction(()=>articles.some(a=>a.title==='Barcelona noticia'));assert.equal(await two.locator('#articlesGrid > article').count(),1);
  await one.evaluate(id=>openArticleModal(id),barcaId);await one.locator('#editArticleButton').click();assert.equal(await one.locator('#pubTeam').inputValue(),'barcelona');await one.locator('#pubTeam').selectOption('real-madrid');await one.locator('#publishModal form button[type=submit]').click();await one.waitForFunction(()=>articles.some(a=>a.title==='Barcelona noticia'&&a.team==='real-madrid'));assert.equal(state.articles.find(a=>a.title==='Barcelona noticia').id,barcaId);
