@@ -12,6 +12,7 @@ let user=JSON.parse(localStorage.getItem('testSession')||'null');const listeners
 window.supabase={createClient:(url,key,options)=>({
  supabaseUrl:url,supabaseKey:key,
  auth:{getUser:async()=>({data:{user},error:null}),onAuthStateChange:fn=>{listeners.push(fn);return {data:{subscription:{unsubscribe(){}}}}},
+ setSession:async({access_token:name})=>{user={id:name,email:name+'@test.invalid',user_metadata:{username:name}};localStorage.setItem('testSession',JSON.stringify(user));listeners.forEach(f=>f());return {data:{user,session:{}},error:null}},
  signInWithPassword:async({email})=>{const name=email.split('@')[0];user={id:name,email,user_metadata:{username:name}};localStorage.setItem('testSession',JSON.stringify(user));listeners.forEach(f=>f());return {data:{user,session:{}},error:null}},
  signUp:async({email,options})=>{user={id:options.data.username,email,user_metadata:options.data};localStorage.setItem('testSession',JSON.stringify(user));listeners.forEach(f=>f());return {data:{user,session:{}},error:null}},
  signOut:async()=>{user=null;localStorage.removeItem('testSession');listeners.forEach(f=>f());return {error:null}}},
@@ -61,6 +62,7 @@ async function backend(q){
   await page.route('**/supabase-js@2',r=>r.fulfill({contentType:'text/javascript',body:mockClient}));
   await page.route('**/*',async r=>{
    const url=r.request().url();
+   if(url.includes('/functions/v1/username-auth')){const {username}=r.request().postDataJSON();return r.fulfill({contentType:'application/json',body:JSON.stringify({username,session:{access_token:username,refresh_token:'test'}})});}
    if(url.includes('/supabase-js@2'))return r.fallback();
    if(url.startsWith('http://127.0.0.1'))return r.continue();
    // Keep actual CDN Tailwind for screenshot when available; all private/live services remain blocked.

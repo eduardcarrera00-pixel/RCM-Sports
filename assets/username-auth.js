@@ -1,0 +1,36 @@
+/* Username/password UX. Credentials are verified by Supabase Auth on the server. */
+// Public anon JWT for the Edge gateway; account access still requires password/code.
+const authGatewayKey="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InphaHVobXZtcXZ4YXVucWVicWFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTExNDQ1MTcsImV4cCI6MjEwNjcyMDUxN30.0tszsvlScd-IG4YoJ0LMs9F4J-q1ukiMTHeWFixom7o";
+let authMode='login',authRecoveryNeedsLogin=false;
+function setAuthMode(mode){
+ authMode=mode;const extra=mode==='register'||mode==='recover';
+ document.getElementById('authConfirmWrap').hidden=!extra;document.getElementById('authPasswordConfirm').required=extra;
+ document.getElementById('authCodeWrap').hidden=mode!=='recover';document.getElementById('authRecoveryCode').required=mode==='recover';
+ const password=document.getElementById('userAuthPassword');password.minLength=extra?8:1;password.maxLength=128;password.autocomplete=extra?'new-password':'current-password';
+ document.getElementById('authSubmit').textContent={login:'Iniciar sesión',register:'Crear cuenta',recover:'Restablecer contraseña',code:'Generar código de recuperación'}[mode];
+ document.getElementById('authModeHelp').textContent={login:'Inicia sesión con tu usuario. Las cuentas anteriores también pueden usar su correo.',register:'Usuario único y contraseña de al menos 8 caracteres. No necesitas correo. Al terminar, guarda tu código de recuperación.',recover:'Introduce tu usuario, una contraseña nueva y tu código de recuperación. El código se sustituirá por uno nuevo.',code:'Confirma tu usuario y contraseña actual. El código nuevo sustituirá al anterior.'}[mode];
+ document.getElementById('userAuthError').classList.add('hidden');
+}
+function clearAuthSecrets(){for(const id of ['userAuthPassword','authPasswordConfirm','authRecoveryCode','authRecoveryOutput'])document.getElementById(id).value='';document.getElementById('userAuthForm').hidden=false;document.getElementById('authRecoveryResult').hidden=true;document.getElementById('userAuthPassword').type='password';document.getElementById('authShowPassword').textContent='Mostrar contraseña';setAuthMode('login');}
+function toggleAuthPassword(){const p=document.getElementById('userAuthPassword');p.type=p.type==='password'?'text':'password';document.getElementById('authShowPassword').textContent=p.type==='password'?'Mostrar contraseña':'Ocultar contraseña';}
+function handleUserRegister(){setAuthMode('register');}
+async function handleUserLogin(event){
+ event.preventDefault();if(authSubmitting)return;
+ const username=normalizeUsername(document.getElementById('userAuthUsername').value),password=document.getElementById('userAuthPassword').value;
+ if((authMode==='register'||authMode==='recover')&&password!==document.getElementById('authPasswordConfirm').value){showUserAuthError('Las contraseñas no coinciden.');return;}
+ setAuthBusy(true);document.getElementById('userAuthError').classList.add('hidden');
+ try{
+  if(!db)throw Error('No se pudo conectar.');
+  const response=await fetch(db.supabaseUrl+'/functions/v1/username-auth',{method:'POST',headers:{'Content-Type':'application/json','apikey':db.supabaseKey,'Authorization':'Bearer '+authGatewayKey},body:JSON.stringify({action:authMode,username,password,recovery_code:document.getElementById('authRecoveryCode').value})});
+  const result=await response.json();if(!response.ok)throw Error(result.error||'No se pudo completar la solicitud.');
+  let sessionError=false;
+  if(result.session){const saved=await db.auth.setSession({access_token:result.session.access_token,refresh_token:result.session.refresh_token});if(saved.error)sessionError=true;else{currentUser={id:saved.data.user.id,username:result.username};await loadAdminSession();updateCommentAuthUI();}}
+  if(result.recovery_code){authRecoveryNeedsLogin=!!result.recovered||!result.session||sessionError;document.getElementById('userAuthForm').hidden=true;document.getElementById('authRecoveryResult').hidden=false;document.getElementById('authRecoveryOutput').value=result.recovery_code;document.getElementById('authRecoveryMessage').textContent=result.recovered?'Contraseña actualizada. Guarda este código e inicia sesión.':authRecoveryNeedsLogin?'Cuenta preparada. Guarda este código y vuelve a iniciar sesión.':'Tu cuenta está lista y la sesión está abierta.';document.getElementById('authRecoveryOutput').focus();}
+  else{if(sessionError)throw Error('No se pudo guardar la sesión. Vuelve a iniciar sesión.');closeUserAuthModal();}
+  for(const id of ['userAuthPassword','authPasswordConfirm','authRecoveryCode'])document.getElementById(id).value='';
+  if(activeModalArticleId){await loadCommentsFromSupabase(activeModalArticleId);refreshCommunity();}
+ }catch(error){showUserAuthError(error.message||'No se pudo conectar. Inténtalo de nuevo.');}
+ finally{setAuthBusy(false);}
+}
+async function copyRecoveryCode(){const input=document.getElementById('authRecoveryOutput');try{await navigator.clipboard.writeText(input.value);document.getElementById('authRecoveryMessage').textContent='Código copiado. Guárdalo en un lugar privado.';}catch{input.focus();input.select();document.getElementById('authRecoveryMessage').textContent='Copia el código seleccionado y guárdalo.';}}
+function finishRecoveryCode(){const login=authRecoveryNeedsLogin;clearAuthSecrets();if(!login)closeUserAuthModal();else document.getElementById('userAuthUsername').focus();}
