@@ -127,7 +127,7 @@
       sending=false;$('aeDiscussionSubmit').disabled=false;
     }
   }
-  function open(take) {
+  function open(take, options={}) {
     if(!take?.id)return;
     init();
     current=take;
@@ -140,6 +140,7 @@
     $('aeDiscussionStatus').textContent='';
     if(!dialog.open)dialog.showModal();
     load();
+    if(options.focusComposer)$('aeDiscussionText')?.focus();
   }
   window.aeTakeReplies={open};
 })();
