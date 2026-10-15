@@ -40,9 +40,9 @@ async function load(){
  $('cpMore').hidden=feed.data.length<limit;
  $('cpTop').replaceChildren(...top.data.map(p=>card(p,true)));if(!top.data.length)$('cpTop').append(el('p','Los Picks con votos positivos aparecerán aquí.'));
  $('cpWorst').replaceChildren(...worst.data.map(p=>card(p,true)));if(!worst.data.length)$('cpWorst').append(el('p','Todavía no hay Picks con votos negativos.'));
- $('cpWeekly').replaceChildren(...weekly.data.map(p=>card(p,true)));if(!weekly.data.length)$('cpWeekly').append(el('p','El Pick más apoyado de esta semana aparecerá aquí cuando reciba votos.'),button('Explorar Picks →',()=>filterByCategory('Picks')));
+
  loaded=true;
- }catch(e){if(seq!==request)return;for(const id of ['cpFeed','cpTop','cpWorst'])$(id).replaceChildren();$('cpMore').hidden=true;$('cpStatus').textContent='No pudimos cargar los Picks. '+message(e);$('cpWeekly').replaceChildren(el('p','No pudimos cargar el Pick de la Semana.'),button('Reintentar',load));}
+ }catch(e){if(seq!==request)return;for(const id of ['cpFeed','cpTop','cpWorst'])$(id).replaceChildren();$('cpMore').hidden=true;$('cpStatus').textContent='No pudimos cargar los Picks. '+message(e);}
 }
 function field(label,type='text'){const wrap=el('label',label);const input=el(type==='textarea'?'textarea':'input');if(type!=='textarea')input.type=type;input.required=true;wrap.append(input);return {wrap,input};}
 function buildComposer(){
@@ -76,7 +76,7 @@ async function showDetail(id){
  const send=el('button','Enviar respuesta');send.type='submit';form.append(replyStatus,cancel,body.wrap,send);form.onsubmit=async e=>{e.preventDefault();send.disabled=true;try{if(!await account())return;const r=await db.from('ae_pick_comments').insert({pick_id:id,parent_id:parent,body:body.input.value.trim()});if(r.error)throw r.error;await load();await showDetail(id);}catch(e){notifyCommunity(message(e),true);}finally{send.disabled=false;}};dialog.append(form);
  }catch(e){dialog.replaceChildren(button('Cerrar',closeDetail),el('p',message(e)));}
 }
-window.renderCommunityPicksVisibility=()=>{const root=$('communityPicks');if(!root)return;root.hidden=currentCategory!=='Picks';document.querySelector('.editorial-layout').hidden=!root.hidden;if(!root.hidden&&!loaded)load();};
+window.renderCommunityPicksVisibility=()=>{const root=$('communityPicks');if(!root)return;root.hidden=currentCategory!=='Takes';document.querySelector('.editorial-layout').hidden=currentCategory==='Picks'||currentCategory==='Takes';if(!root.hidden&&!loaded)load();};
 document.addEventListener('DOMContentLoaded',()=>{buildComposer();renderCommunityPicksVisibility();load();const id=new URL(location.href).searchParams.get('pick');if(id)showDetail(id);$('cpSort').onchange=()=>{limit=20;load();};$('cpMore').onclick=()=>{limit+=20;load();};if(db)db.auth.onAuthStateChange(()=>setTimeout(()=>{load();const id=new URL(location.href).searchParams.get('pick');if(id)showDetail(id);},0));});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)load();});
 window.addEventListener('popstate',()=>{const id=new URL(location.href).searchParams.get('pick');if(id)showDetail(id);else closeDetail();});
