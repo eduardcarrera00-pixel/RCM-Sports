@@ -8,6 +8,8 @@
  function createCard(p,isPreview){
    const box=make('article',undefined,isPreview?'ae-weekly-card ae-weekly-preview':'ae-weekly-card');
    if(isPreview){
+     const photoUrl=window.aeEditorialMedia?.publicUrl(p.image_path);
+     if(photoUrl){const photo=make('img',undefined,'ae-weekly-home-thumbnail');photo.src=photoUrl;photo.alt='Imagen del Pick editorial';photo.loading='lazy';box.append(photo);}
      const go=()=>{
        if(typeof filterByCategory==='function')filterByCategory('Picks');
        const detail=$('picksFeaturedCard')?.querySelector('details');
@@ -31,12 +33,20 @@
    summary.append(make('span','Cuota '+odds(p.american_odds),'ae-weekly-odds'));
    summary.append(make('span','Ver análisis y detalles ↓','ae-weekly-expand-hint'));
    const expanded=make('div',undefined,'ae-weekly-expanded-content');
+   const photoUrl=window.aeEditorialMedia?.publicUrl(p.image_path);
+   if(photoUrl){const photo=make('img',undefined,'ae-weekly-inline-photo');photo.src=photoUrl;photo.alt='Imagen del Pick de la Semana';photo.loading='lazy';expanded.append(photo);}
    expanded.append(make('p',p.event_name,'ae-weekly-event'),make('p',p.analysis,'ae-weekly-analysis'));
    expanded.append(make('small','Cuota publicada por AE SPORTS; no verificada en tiempo real. Sin apuestas en esta página.','ae-weekly-disclaimer'));
    details.append(summary,expanded);box.append(details);
    return box;
  }
  function render(){
+   const featured=$('picksFeatured');
+   if(featured){
+     featured.querySelector('.ae-weekly-banner')?.remove();
+     const url=window.aeEditorialMedia?.publicUrl(active?.banner_path);
+     if(url){const banner=make('img',undefined,'ae-weekly-banner');banner.src=url;banner.alt='';banner.loading='lazy';featured.prepend(banner);}
+   }
    for(const [id,preview] of [['cpWeekly',true],['picksFeaturedCard',false]]){
      const area=$(id);if(!area)continue;
      area.replaceChildren();
@@ -49,7 +59,7 @@
    refreshing=true;
    try{
      const {data,error}=await db.from('ae_editorial_weekly_picks')
-       .select('id,title,event_name,selection,american_odds,analysis,expires_at,created_at')
+       .select('id,title,event_name,selection,american_odds,analysis,expires_at,created_at,banner_path,image_path')
        .eq('is_published',true).order('created_at',{ascending:false}).limit(1);
      if(error)throw error;
      active=data?.[0]&&new Date(data[0].expires_at).getTime()>Date.now()?data[0]:null;
@@ -69,13 +79,18 @@
    const oddsValue=Number(raw);if(!Number.isInteger(oddsValue)||Math.abs(oddsValue)<100||Math.abs(oddsValue)>100000){status.textContent='La cuota debe ser al menos +100 o -100, en valor absoluto.';return;}
    const expires=new Date(form.elements.expires_at.value);
    if(!Number.isFinite(expires.getTime())||expires.getTime()<=Date.now()){status.textContent='Elige un cierre futuro.';return;}
-   submitting=true;send.disabled=true;status.textContent='Publicando…';
+   submitting=true;send.disabled=true;status.textContent='Validando publicación…';
    try{
      if(!confirm('¿Publicar el Pick editorial y sustituir el anterior?'))return;
-     const {error}=await db.rpc('ae_publish_editorial_weekly_pick',{
+     status.textContent='Guardando imágenes…';
+     const banner=await window.aeEditorialMedia.upload(form.elements.banner_file?.files?.[0],'weekly/banner');
+     const image=await window.aeEditorialMedia.upload(form.elements.image_file?.files?.[0],'weekly/article');
+     status.textContent='Publicando Pick editorial…';
+     const {error}=await db.rpc('ae_publish_editorial_weekly_pick_visual',{
        p_title:form.elements.title.value.trim(),p_event_name:form.elements.event_name.value.trim(),
        p_selection:form.elements.selection.value.trim(),p_american_odds:oddsValue,
-       p_analysis:form.elements.analysis.value.trim(),p_expires_at:expires.toISOString()
+       p_analysis:form.elements.analysis.value.trim(),p_expires_at:expires.toISOString(),
+       p_banner_path:banner,p_image_path:image
      });
      if(error)throw error;
      status.textContent='Pick de la Semana publicado correctamente.';
