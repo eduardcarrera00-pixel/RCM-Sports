@@ -315,7 +315,11 @@ function teamNode(id, position, priorTeamIds = null) {
 }
 // Compare against the previous *published* order only. No simulated movement.
 function rankingTrendNode(teamId, position, priorTeamIds) {
-    if (!Array.isArray(priorTeamIds) || priorTeamIds.length !== 10) return null;
+    if (!Array.isArray(priorTeamIds) || priorTeamIds.length !== 10) {
+        const first = node('span', '–', 'ae-rank-trend ae-rank-flat');
+        first.setAttribute('aria-label','No existe todavía una edición anterior para comparar');
+        return first;
+    }
     const previousIndex = priorTeamIds.indexOf(teamId);
     if (previousIndex < 0) {
         const badge = node('span', 'Nuevo', 'ae-rank-trend ae-rank-new');
