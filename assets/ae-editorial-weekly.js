@@ -9,7 +9,7 @@
    const box=make('article',undefined,isPreview?'ae-weekly-card ae-weekly-preview':'ae-weekly-card');
    if(isPreview){
      const photoUrl=window.aeEditorialMedia?.publicUrl(p.image_path);
-     if(photoUrl){const photo=make('img',undefined,'ae-weekly-home-thumbnail');photo.src=photoUrl;photo.alt='Imagen del Pick editorial';photo.loading='lazy';box.append(photo);}
+     if(photoUrl&&!window.aeEditorialMedia?.publicUrl(p.banner_path)){const photo=make('img',undefined,'ae-weekly-home-thumbnail');photo.src=photoUrl;photo.alt='Imagen del Pick editorial';photo.loading='lazy';box.append(photo);}
      const go=()=>{
        if(typeof filterByCategory==='function')filterByCategory('Picks');
        const detail=$('picksFeaturedCard')?.querySelector('details');
@@ -40,7 +40,27 @@
    details.append(summary,expanded);box.append(details);
    return box;
  }
+ function renderHomeBanner(){
+   const panel=document.querySelector('.editorial-pick');
+   if(!panel)return;
+   panel.querySelector('.ae-weekly-home-banner')?.remove();
+   panel.classList.remove('ae-home-weekly-banner');
+   const url=window.aeEditorialMedia?.publicUrl(active?.banner_path);
+   if(!url)return;
+   const banner=make('img',undefined,'ae-weekly-home-banner');
+   banner.src=url;
+   banner.alt='';
+   banner.setAttribute('aria-hidden','true');
+   banner.loading='lazy';
+   banner.addEventListener('error',()=>{
+     banner.remove();
+     panel.classList.remove('ae-home-weekly-banner');
+   },{once:true});
+   panel.prepend(banner);
+   panel.classList.add('ae-home-weekly-banner');
+ }
  function render(){
+   renderHomeBanner();
    const featured=$('picksFeatured');
    if(featured){
      featured.querySelector('.ae-weekly-banner')?.remove();
@@ -65,6 +85,9 @@
      active=data?.[0]&&new Date(data[0].expires_at).getTime()>Date.now()?data[0]:null;
      render();
    }catch(e){
+     active=null;
+     renderHomeBanner();
+     $('picksFeatured')?.querySelector('.ae-weekly-banner')?.remove();
      for(const id of ['cpWeekly','picksFeaturedCard']){$(id)?.replaceChildren(make('p','No se pudo cargar el Pick editorial.','ae-weekly-empty'));}
    }finally{refreshing=false;adminVisibility();}
  }
