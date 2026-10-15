@@ -372,6 +372,12 @@ function renderRanking() {
     document.getElementById('rankingStatus').textContent = rankingPublished ? '' : 'Aún no hay un ranking publicado. Nuestro equipo está preparando la primera edición.';
     const preview = document.getElementById('homeRankingList');
     preview.replaceChildren();
+    const leader=document.getElementById('nflRankOne');
+    const leaderList=document.getElementById('nflRankOneList');
+    if(leaderList)leaderList.replaceChildren();
+    const topId=Array.isArray(rankingPublished?.team_ids)?rankingPublished.team_ids[0]:null;
+    if(leader)leader.hidden=!topId;
+    if(topId&&leaderList)leaderList.append(teamNode(topId,1,rankingPreviousTeamIds));
     document.getElementById('homeRankingEdition').textContent = rankingPublished?.edition ? ' · ' + rankingPublished.edition : '';
     document.getElementById('homeRankingStatus').textContent = document.getElementById('rankingStatus').textContent;
     if (!rankingPublished) return;
