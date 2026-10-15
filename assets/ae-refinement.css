@@ -1,0 +1,128 @@
+/* AE SPORTS · October 2026 · visual polish, ranking ticker and Picks */
+:root{--ae-walnut:#86543c;--ae-walnut-light:#bd8764}
+#nflRankings,#championsRankings{overflow:hidden}
+#rankingViewport,#championsViewport{width:100%;max-width:100%;overflow:hidden!important}
+#rankingTrack .rcm-track-group,#championsTrack .rcm-track-group{align-items:center}
+#rankingTrack .rcm-team,#championsTrack .rcm-team,
+#nflRankings #rankingTrack .rcm-team,#championsRankings #championsTrack .rcm-team{
+    display:grid!important;grid-template-columns:42px 46px minmax(150px,1fr) 48px!important;
+    box-sizing:border-box;width:322px!important;min-width:322px!important;max-width:322px!important;
+    align-items:center;column-gap:10px!important;padding:11px 14px!important;
+    overflow:hidden;white-space:normal;min-height:72px;
+}
+#rankingTrack .rcm-team>strong,#championsTrack .rcm-team>strong{
+    min-width:0!important;margin:0!important;line-height:1.15;text-align:center;font-size:16px
+}
+#rankingTrack .ae-team-emblem,#championsTrack .ae-team-emblem{width:45px!important;height:45px!important}
+#rankingTrack .ae-team-name,#championsTrack .ae-team-name{
+    display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;font-size:13px;
+    line-height:1.25;max-height:2.6em;overflow-wrap:break-word;
+}
+#rankingTrack .ae-rank-trend,#championsTrack .ae-rank-trend{justify-self:end!important;margin:0!important;min-width:38px!important}
+#championsEditButton,#rankingEditButton{
+    min-height:40px;padding:8px 14px!important;border-radius:7px!important;
+    background:#25445a!important;border:1px solid #b68a6850!important;color:#e7ae87!important;
+    font-size:12px!important;font-weight:700;
+}
+#championsEditButton.hidden{display:none!important}
+.ae-champions-editor{width:min(760px,96vw)!important;padding:24px!important}
+.ae-champions-positions{display:grid;gap:7px;margin:16px 0;max-height:45vh;overflow-y:auto;padding-right:5px}
+.ae-champions-positions .rcm-ranking-edit-row{grid-template-columns:25px minmax(0,1fr) 42px 42px;gap:9px}
+.ae-champions-editor>button:not(:first-of-type){background:var(--ae-wood)!important;color:#fff!important}
+.ae-champions-editor #aeChampionsEditorStatus{margin:10px 0}
+.ae-champions-editor select{width:100%;min-width:0}
+
+.editorial-community,.editorial-trending{overflow:hidden!important;border-radius:10px!important}
+.editorial-community .ae-section-heading,.editorial-trending .ae-section-heading,
+html.dark .editorial-community .ae-section-heading,html.dark .editorial-trending .ae-section-heading{
+    padding:14px 19px!important;background:linear-gradient(105deg,#76503e,#a36a4d 55%,#b78360)!important;
+    color:#fff5e8!important;border:0!important;
+}
+.editorial-community .ae-section-heading h2,html.dark .editorial-community .ae-section-heading h2{
+    font-size:clamp(22px,1.95vw,29px)!important;line-height:1.13!important;
+    color:#fff5e9!important;margin:3px 0!important;
+}
+.editorial-community .ae-section-heading .ae-overline{color:#f1d4bc!important}
+.editorial-community #communityLeaders{padding:6px 17px 10px!important}
+.editorial-community .rcm-leader{padding:9px 0!important}
+.editorial-community .rcm-leader blockquote{font-size:15px!important;line-height:1.35!important;margin:5px 0!important}
+.editorial-trending .ae-section-heading h2{color:#fff5e9!important}
+.ae-trending-meta .fa-heart{color:#da9975!important}
+.ae-footer-recovery{
+    color:#dcb392!important;background:transparent!important;border:1px solid #dcb39245!important;
+    padding:9px 15px;border-radius:6px;font-size:11px;letter-spacing:.03em;
+}
+.ae-footer-recovery:hover{background:#ffffff0e!important}
+.ae-footer-recovery.hidden{display:none!important}
+
+/* Picks: editorial page with continuous walnut panels */
+#communityPicks{max-width:1470px;margin:18px auto 40px!important;color:var(--ae-ink)!important}
+#communityPicks>h2{font:600 clamp(34px,3vw,48px)/1.1 var(--ae-serif)!important;color:var(--ae-ink)!important;margin:18px 0 9px!important}
+#communityPicks>.cp-intro{font-size:14px;line-height:1.65;color:var(--ae-muted)!important;margin:0 0 24px!important;max-width:850px}
+#communityPicks>details{
+    background:linear-gradient(120deg,#244256,#1a3244)!important;
+    border:1px solid #b99b7a2b;border-radius:11px;margin:0 0 22px;overflow:hidden;
+    box-shadow:0 10px 30px #07152023;
+}
+#communityPicks>details>summary{
+    position:relative;padding:17px 23px;color:#f9e9d8!important;font:600 21px/1.2 var(--ae-serif)!important;
+    list-style:none;cursor:pointer;
+}
+#communityPicks>details>summary::-webkit-details-marker{display:none}
+#communityPicks>details>summary:after{content:'+';position:absolute;right:23px;top:14px;font:600 26px var(--ae-sans);color:#e7a981}
+#communityPicks>details[open]>summary:after{content:'−'}
+#communityPicks .cp-layout{display:grid;grid-template-columns:minmax(0,1.85fr) minmax(300px,1fr);gap:22px;align-items:start}
+#communityPicks .cp-layout>div:first-child{min-width:0;background:linear-gradient(155deg,#1a3040,#142938);padding:21px;border-radius:11px;box-shadow:0 10px 30px #07152226}
+#communityPicks label[for=cpSort]{display:block;font:700 10px var(--ae-sans);letter-spacing:.16em;text-transform:uppercase;color:#d9b497!important;margin-bottom:7px}
+#communityPicks #cpSort{width:100%;border-radius:8px!important;border:1px solid #93abb238!important;background:#203c4f!important;color:#faeadb!important;padding:12px 14px!important;font-size:14px;min-height:46px}
+#communityPicks #cpStatus{font-size:13px;line-height:1.6;color:#d0c6bd!important;padding-top:14px}
+#communityPicks .cp-highlights{
+    display:flex;flex-direction:column;gap:0;background:linear-gradient(160deg,#1d3444,#152a38)!important;
+    border:1px solid #a4bdc820;border-radius:11px;padding:0!important;overflow:hidden;box-shadow:0 10px 30px #07152226;
+}
+#communityPicks .cp-highlights>details{border-bottom:1px solid #b58b6840}
+#communityPicks .cp-highlights>details>summary{
+    background:linear-gradient(110deg,#78523e,#a46c4f,#b78361);
+    padding:16px 20px!important;color:#fff5eb!important;
+    font:600 19px var(--ae-serif);list-style:none;
+}
+#communityPicks .cp-highlights>details>summary::-webkit-details-marker{display:none}
+#communityPicks .cp-highlights>details>summary:before{content:'▸ ';color:#f6c9a5}
+#communityPicks .cp-highlights>details[open]>summary:before{content:'▾ '}
+#communityPicks #weeklyPickOptions{padding:14px 18px!important}
+#communityPicks .cp-highlights>h3{
+    margin:0!important;padding:15px 19px 11px!important;
+    font:600 23px/1.2 var(--ae-serif)!important;color:#fae2cd!important;
+    border-top:1px solid #b58b6828;
+}
+#communityPicks #cpTop,#communityPicks #cpWorst{padding:0 18px 16px}
+#communityPicks #cpTop>p,#communityPicks #cpWorst>p{margin:0;color:#c1cbd2!important;font-size:13px;line-height:1.55}
+#communityPicks .cp-card{
+    background:linear-gradient(150deg,#20394b,#192d3b)!important;
+    color:#f5e8dc!important;border:1px solid #c3ac9421!important;border-radius:10px!important;
+    margin:12px 0!important;padding:18px!important;box-shadow:none!important;
+}
+#communityPicks .cp-card h3{font:600 22px/1.2 var(--ae-serif)!important;color:#fbe6d1!important;margin:7px 0 12px!important}
+#communityPicks .cp-card h3 a{color:inherit!important}
+#communityPicks .cp-card h3 a:hover{color:#e5aa81!important}
+#communityPicks .cp-card p{color:#dbd0c6!important;font-size:13px;line-height:1.55}
+#communityPicks .cp-card .cp-meta,#communityPicks .cp-card small{color:#abbfc8!important;font-size:11px}
+#communityPicks .cp-card .cp-odds{color:#e2ad89!important}
+#communityPicks .cp-actions{border-top:1px solid #b7c0c020;padding-top:12px}
+#communityPicks .cp-actions button{background:#253f4f!important;border:1px solid #bd95754a!important;color:#f2ddcb!important;border-radius:6px!important}
+#communityPicks .cp-actions button[aria-pressed=true]{background:#b27b58!important;color:#fff!important}
+#communityPicks #cpForm{margin:0!important;padding:23px!important;border:0!important;border-top:1px solid #b58b6850!important;background:#1b3445!important;border-radius:0;color:#fff2e5!important}
+#communityPicks #cpForm label,#communityPicks #cpForm legend{color:#ebdbc9!important}
+#communityPicks #cpForm input:not([type=checkbox]),#communityPicks #cpForm textarea{background:#102b3b!important;color:#f8ede1!important;border:1px solid #abc3cb40!important;border-radius:7px!important}
+#communityPicks #cpForm fieldset{border-color:#b4c3c02a!important;border-radius:8px!important}
+#communityPicks #cpForm button[type=submit]{background:linear-gradient(100deg,#c58a64,#a8684c)!important;color:#fff!important}
+#communityPicks .cp-dialog,#cpDialog{color:var(--ae-ink)!important}
+@media(max-width:1000px){#communityPicks .cp-layout{grid-template-columns:minmax(0,1fr) minmax(265px,.75fr)}}
+@media(max-width:760px){
+ #communityPicks .cp-layout{grid-template-columns:1fr}
+ #communityPicks .cp-layout>div:first-child{padding:14px}
+ #communityPicks>details>summary{font-size:19px!important}
+ #rankingTrack .rcm-team,#championsTrack .rcm-team{width:295px!important;min-width:295px!important;max-width:295px!important;grid-template-columns:29px 39px minmax(134px,1fr) 39px!important;gap:7px!important;padding:9px!important}
+ #rankingTrack .ae-team-emblem,#championsTrack .ae-team-emblem{width:39px!important;height:39px!important}
+}
+@media(prefers-reduced-motion:reduce){#rankingViewport,#championsViewport{overflow-x:auto!important}}
