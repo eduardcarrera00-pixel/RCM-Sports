@@ -1,0 +1,23 @@
+/* Libre opinión de aficionados dentro de la paleta madera y azul marino */
+#freeTakes[hidden],#communityPicks[hidden]{display:none!important}
+.ae-free-takes {margin-bottom:22px}
+.ae-free-takes .ae-takes-head{margin-bottom:18px}
+.ae-free-compose{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;padding:17px;border-radius:10px;background:#254255}
+.ae-free-compose label{display:flex;flex-direction:column;gap:6px;font:600 12px system-ui;color:#e9ddd1}
+.ae-free-compose label.ae-wide{grid-column:1/-1}
+.ae-free-compose input,.ae-free-compose select,.ae-free-compose textarea,.ae-free-controls select{background:#162e3f;border:1px solid #ffffff34;color:#fffaf3;border-radius:8px;padding:11px;font:13px system-ui;width:100%}
+.ae-free-compose textarea{min-height:90px;resize:vertical}
+.ae-free-compose button{grid-column:1/-1;background:#9c7154;color:white;border:0;border-radius:8px;padding:11px;font-weight:700;cursor:pointer}
+.ae-free-controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:5px 0 16px}
+.ae-free-controls label{font:600 12px system-ui;display:flex;gap:8px;align-items:center}
+.ae-free-controls select{width:auto;max-width:240px}
+.ae-free-take-card h3{margin:6px 0 9px}
+.ae-free-take-body{font-size:13px;line-height:1.65;color:#e1e5e8;white-space:pre-wrap;overflow-wrap:anywhere}
+.ae-free-vote-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.ae-free-vote-row .ae-take-button[aria-pressed="true"]{background:#996d4d;color:white}
+.ae-free-take-score{font:700 12px system-ui;color:#e3c39e;margin-left:auto}
+.ae-free-archive{margin-top:25px;padding:16px;border-radius:10px;background:#1b3242;color:#e7d8c8}
+.ae-free-archive summary{cursor:pointer;font:700 14px system-ui;color:#e3b992}
+html:not(.dark) .ae-free-compose,html:not(.dark) .ae-free-archive{background:#dce2e1;color:#1c3545}
+html:not(.dark) .ae-free-compose label,html:not(.dark) .ae-free-take-body{color:#2a4552}
+@media(max-width:700px){.ae-free-compose{grid-template-columns:1fr}.ae-free-controls select{max-width:160px}}
