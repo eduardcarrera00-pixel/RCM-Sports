@@ -1,0 +1,348 @@
+/* AE SPORTS · jerarquía editorial y estadios de marca · 2026-10-15
+   Nuevo fondo SVG real para NFL y fútbol; compatible con día/noche.
+   Los datos y animaciones de rankings permanecen intactos. */
+
+/* CABECERA DE TAKES: título simplificado y llamado a participar. */
+#aeHomeTopTakes .ae-top-takes-heading {
+  align-items:center!important;
+  gap:12px 24px!important;
+  padding-top:19px!important;padding-bottom:19px!important;
+}
+#aeHomeTopTakes .ae-top-takes-heading>div:first-child{
+  flex:1 1 280px!important;
+}
+#aeHomeTopTakes .ae-top-takes-heading-side{
+  flex:0 1 auto!important;min-width:0!important;
+  align-items:flex-end!important;
+  max-width:100%!important;
+}
+#aeHomeTopTakes .ae-home-take-cta-line{
+  display:flex;align-items:center;justify-content:flex-end;
+  flex-wrap:wrap;gap:8px 16px;
+  max-width:100%;
+}
+#aeHomeTopTakes .ae-home-take-nudge{
+  display:inline-flex;align-items:center;gap:7px;
+  color:#e7b18a!important;
+  font:800 11px/1.3 Inter,system-ui,sans-serif!important;
+  letter-spacing:.115em!important;
+  white-space:nowrap;
+}
+#aeHomeTopTakes .ae-home-take-nudge>span{
+  color:#ecd5bc;font-size:19px;line-height:1;
+}
+#aeHomeTopTakes #aeHomeTakePublish.ae-home-take-publish{
+  min-height:45px!important;
+  padding:12px 19px!important;
+  font:800 13px/1.3 Inter,system-ui,sans-serif!important;
+  border-radius:2px!important;
+}
+#aeHomeTopTakes #aeHomeTakePublish>span{font-size:16px!important}
+#aeHomeTopTakes #aeTopTakesStatus.sr-only{
+  position:absolute!important;width:1px!important;height:1px!important;
+  padding:0!important;margin:-1px!important;overflow:hidden!important;
+  clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important;
+}
+html:not(.dark) body #aeHomeTopTakes .ae-home-take-nudge{color:#84533a!important}
+html:not(.dark) body #aeHomeTopTakes .ae-home-take-nudge>span{color:#a87b57!important}
+
+/* PICKS: un overline a la izquierda y Mi Pick como acción a la derecha. */
+#footballTakes #communityPicks .ae-picks-heading-cta-row{
+  box-sizing:border-box;display:flex;align-items:center;
+  justify-content:space-between;flex-wrap:wrap;
+  gap:12px 20px;width:100%;min-width:0;
+}
+#footballTakes #communityPicks .ae-picks-nudge{
+  display:block;
+  max-width:100%;
+  font:800 11px/1.4 Inter,system-ui,sans-serif!important;
+  letter-spacing:.14em!important;color:#e8af86!important;
+}
+#footballTakes #communityPicks #cpPublishCta{
+  margin:0!important;min-height:42px!important;
+  padding:10px 16px!important;
+  font:800 13px/1.3 Inter,system-ui,sans-serif!important;
+}
+#footballTakes #communityPicks #cpPublishCta>span{
+  font-size:21px!important;font-weight:500!important;
+}
+html:not(.dark) body #footballTakes #communityPicks .ae-picks-nudge{color:#84583f!important}
+
+/* PICK: el pronóstico publicado tiene ahora tanto peso visual como el
+   título. Ya no se confunde el evento con el resultado pronosticado. */
+html body #footballTakes #communityPicks #cpFeed>.cp-card .cp-card-title,
+html.dark body #footballTakes #communityPicks #cpFeed>.cp-card .cp-card-title{
+  font:600 clamp(17px,1.48vw,19px)/1.27 Newsreader,Georgia,serif!important;
+  letter-spacing:-.009em!important;
+  margin:0!important;
+}
+html body #footballTakes #communityPicks #cpFeed>.cp-card .cp-card-legs{
+  display:grid!important;
+  align-content:start!important;
+  gap:7px!important;
+  min-width:0!important;
+}
+html body #footballTakes #communityPicks #cpFeed>.cp-card .cp-card-legs p{
+  display:flex!important;flex-wrap:wrap!important;
+  align-items:center!important;
+  gap:5px 11px!important;
+  margin:0!important;
+  font:500 13px/1.4 Inter,system-ui,sans-serif!important;
+  color:#bed0d7!important;
+}
+html body #footballTakes #communityPicks #cpFeed>.cp-card .cp-leg-event{
+  font:500 12px/1.45 Inter,system-ui,sans-serif!important;
+  color:#c5d5dc!important;
+  max-width:100%;
+  overflow-wrap:anywhere;
+}
+html body #footballTakes #communityPicks #cpFeed>.cp-card .cp-leg-selection{
+  display:inline-block!important;box-sizing:border-box;
+  max-width:100%;min-width:0;
+  margin:0!important;
+  padding:5px 10px!important;
+  border:1px solid rgba(209,168,125,.32)!important;
+  border-left:3px solid #e0aa7a!important;
+  border-radius:0!important;
+  background:rgba(23,55,72,.79)!important;
+  font:750 clamp(15px,1.35vw,18px)/1.3 Inter,system-ui,sans-serif!important;
+  color:#fff4e8!important;
+  overflow-wrap:anywhere;
+}
+html:not(.dark) body #footballTakes #communityPicks #cpFeed>.cp-card .cp-card-title a{
+  color:#2b4352!important;
+}
+html:not(.dark) body #footballTakes #communityPicks #cpFeed>.cp-card .cp-card-legs p{
+  color:#4b6170!important;
+}
+html:not(.dark) body #footballTakes #communityPicks #cpFeed>.cp-card .cp-leg-event{
+  color:#506875!important;
+}
+html:not(.dark) body #footballTakes #communityPicks #cpFeed>.cp-card .cp-leg-selection{
+  border-color:#d5b896!important;
+  border-left:3px solid #a66d3e!important;
+  background:linear-gradient(110deg,#f3e3cc,#efe8d9)!important;
+  color:#263f52!important;
+  box-shadow:0 2px 7px rgba(53,56,45,.035)!important;
+}
+html:not(.dark) body #footballTakes #communityPicks #cpFeed>.cp-card[data-sport="nfl"] .cp-leg-selection{
+  border-left-color:#ad7040!important;background:#f5e5d1!important;
+}
+html:not(.dark) body #footballTakes #communityPicks #cpFeed>.cp-card[data-sport="football"] .cp-leg-selection{
+  border-left-color:#506f9d!important;background:#e5ecf2!important;
+}
+html:not(.dark) body #footballTakes #communityPicks #cpFeed>.cp-card[data-sport="mixed"] .cp-leg-selection{
+  border-left-color:#81609b!important;background:#efe8f2!important;
+}
+html:not(.dark) body #footballTakes #communityPicks #cpFeed>.cp-card .cp-card-header,
+html:not(.dark) body #footballTakes #communityPicks #cpFeed>.cp-card .cp-card-state,
+html:not(.dark) body #footballTakes #communityPicks #cpFeed>.cp-card .cp-explanation,
+html:not(.dark) body #footballTakes #communityPicks #cpFeed>.cp-card .cp-vote-score{
+  color:#516877!important;
+}
+html:not(.dark) body #footballTakes #communityPicks #cpFeed>.cp-card .cp-actions button{
+  background:#edf3f1!important;
+  color:#2f5063!important;
+  border:1px solid #c6d6d7!important;
+}
+html:not(.dark) body #footballTakes #communityPicks #cpFeed>.cp-card .cp-actions button[aria-pressed="true"]{
+  background:#315f73!important;color:#fffaf3!important;border-color:#315f73!important;
+}
+html:not(.dark) body #footballTakes #communityPicks #cpFeed>.cp-card .cp-card-sport{
+  color:#31566e!important;
+}
+html:not(.dark) body #footballTakes .ae-picks-rail #picksPopular .ae-popular-copy strong{
+  color:#2c495b!important;
+}
+
+/* Los nuevos ambientes están construidos con SVG livianos: grada, focos,
+   afición y silueta anónima. No son logos ni partidos reales. */
+html.dark body #nflRankings.rcm-panel,
+html.dark body #championsRankings.rcm-panel,
+html.dark body #aeSportTakeLeaders[data-sport="nfl"],
+html.dark body #aeSportTakeLeaders[data-sport="football"]{
+  background-size:cover!important;background-repeat:no-repeat!important;
+  background-position:center 48%!important;
+}
+html.dark body #nflRankings.rcm-panel{
+  background-image:linear-gradient(105deg,rgba(9,30,44,.92),rgba(11,35,51,.81) 55%,rgba(13,37,52,.61)),
+    url("atmospheres/ae-nfl-stadium.svg")!important;
+}
+html.dark body #championsRankings.rcm-panel{
+  background-image:linear-gradient(105deg,rgba(9,30,44,.92),rgba(11,35,51,.80) 55%,rgba(13,37,52,.63)),
+    url("atmospheres/ae-football-stadium.svg")!important;
+}
+html.dark body #aeSportTakeLeaders[data-sport="nfl"]{
+  background-image:linear-gradient(118deg,rgba(12,35,48,.95),rgba(12,35,49,.87) 65%,rgba(14,37,50,.74)),
+    url("atmospheres/ae-nfl-stadium.svg")!important;
+}
+html.dark body #aeSportTakeLeaders[data-sport="football"]{
+  background-image:linear-gradient(118deg,rgba(12,35,48,.95),rgba(12,35,49,.87) 65%,rgba(14,37,50,.74)),
+    url("atmospheres/ae-football-stadium.svg")!important;
+}
+html.dark body #aeSportTakeLeaders[data-sport="nfl"]>.ae-section-heading{
+  background-image:linear-gradient(108deg,rgba(18,47,63,.89),rgba(17,49,64,.73)),
+    url("atmospheres/ae-nfl-stadium.svg")!important;
+  background-position:center 45%!important;background-size:cover!important;
+}
+html.dark body #aeSportTakeLeaders[data-sport="football"]>.ae-section-heading{
+  background-image:linear-gradient(108deg,rgba(18,47,63,.89),rgba(17,49,64,.73)),
+    url("atmospheres/ae-football-stadium.svg")!important;
+  background-position:center 45%!important;background-size:cover!important;
+}
+
+/* MODO DÍA: Power Rankings con tonos marfil, oro suave y arena.
+   Los logos originales permanecen completamente transparentes. */
+html:not(.dark) body #nflRankings.rcm-panel,
+html:not(.dark) body #championsRankings.rcm-panel{
+  background-size:cover!important;
+  background-position:center 42%!important;
+  border:1px solid #d8c2a5!important;
+  box-shadow:0 14px 30px rgba(91,72,52,.11)!important;
+}
+html:not(.dark) body #nflRankings.rcm-panel{
+  background-image:
+    radial-gradient(ellipse 70% 95% at 95% 0%,rgba(230,190,130,.33),transparent 80%),
+    linear-gradient(110deg,rgba(255,249,237,.97),rgba(252,241,218,.94) 58%,rgba(243,223,189,.81)),
+    url("atmospheres/ae-nfl-stadium.svg")!important;
+  background-color:#f8eedb!important;
+}
+html:not(.dark) body #championsRankings.rcm-panel{
+  background-image:
+    radial-gradient(ellipse 70% 90% at 93% 0%,rgba(225,187,128,.31),transparent 80%),
+    linear-gradient(110deg,rgba(255,251,241,.97),rgba(246,235,216,.93) 59%,rgba(235,220,200,.81)),
+    url("atmospheres/ae-football-stadium.svg")!important;
+  background-color:#f9eee1!important;
+}
+html:not(.dark) body #nflRankings .ae-rank-title-wrap h2,
+html:not(.dark) body #championsRankings .ae-rank-title-wrap h2{
+  color:#223e54!important;
+}
+html:not(.dark) body #nflRankings .ae-rank-title-wrap h2 span,
+html:not(.dark) body #championsRankings .ae-rank-title-wrap h2 span{
+  color:#99643d!important;
+}
+html:not(.dark) body #nflRankings .ae-rank-overline,
+html:not(.dark) body #championsRankings .ae-rank-overline,
+html:not(.dark) body #rankingEdition,
+html:not(.dark) body #championsEdition{
+  color:#7e583d!important;
+}
+html:not(.dark) body #nflRankings .ae-ranking-leader,
+html:not(.dark) body #championsRankings .ae-ranking-leader{
+  background:linear-gradient(125deg,rgba(255,252,245,.97),rgba(247,231,202,.93))!important;
+  border-left:3px solid #c19158!important;
+  border-top:1px solid rgba(196,155,102,.20)!important;
+  box-shadow:0 7px 23px rgba(79,60,41,.10)!important;
+}
+html:not(.dark) body #nflRankOneList .ae-team-name,
+html:not(.dark) body #championsRankOneList .ae-team-name{
+  color:#203b4e!important;
+}
+html:not(.dark) body #nflRankings .ae-leader-overline,
+html:not(.dark) body #championsRankings .ae-leader-overline{
+  color:#815637!important;
+}
+html:not(.dark) body #nflRankings #rankingViewport.rcm-ticker{
+  background-image:linear-gradient(110deg,rgba(252,242,222,.95),rgba(246,225,191,.83),rgba(253,241,222,.92)),
+    url("atmospheres/ae-nfl-stadium.svg")!important;
+  border-top:1px solid rgba(170,124,69,.36)!important;
+  border-bottom:1px solid rgba(170,124,69,.36)!important;
+  box-shadow:inset 0 4px 14px rgba(103,71,39,.06)!important;
+}
+html:not(.dark) body #championsRankings #championsViewport.rcm-ticker{
+  background-image:linear-gradient(110deg,rgba(252,242,222,.95),rgba(248,228,197,.83),rgba(253,243,225,.92)),
+    url("atmospheres/ae-football-stadium.svg")!important;
+  border-top:1px solid rgba(170,124,69,.36)!important;
+  border-bottom:1px solid rgba(170,124,69,.36)!important;
+  box-shadow:inset 0 4px 14px rgba(103,71,39,.06)!important;
+}
+html:not(.dark) body #nflRankings #rankingTrack .rcm-team,
+html:not(.dark) body #championsRankings #championsTrack .rcm-team{
+  background:linear-gradient(145deg,rgba(255,252,244,.78),rgba(250,236,213,.64))!important;
+  border-right:1px solid rgba(173,133,81,.37)!important;
+}
+html:not(.dark) body #nflRankings #rankingTrack .ae-team-name,
+html:not(.dark) body #championsRankings #championsTrack .ae-team-name{
+  color:#2a4054!important;
+}
+html:not(.dark) body #nflRankings #rankingTrack .rcm-team>strong,
+html:not(.dark) body #championsRankings #championsTrack .rcm-team>strong{
+  color:#94603c!important;
+}
+html:not(.dark) body #rankingViewport .ae-team-emblem,
+html:not(.dark) body #championsViewport .ae-team-emblem{
+  background:transparent!important;border:0!important;box-shadow:none!important;
+}
+
+/* Takes destacados NFL / Fútbol: cada uno tiene estadio original y versión diurna. */
+html:not(.dark) body #aeSportTakeLeaders[data-sport="nfl"]{
+  background-image:linear-gradient(118deg,rgba(255,252,244,.96),rgba(250,241,224,.92) 68%,rgba(241,225,199,.87)),
+    url("atmospheres/ae-nfl-stadium.svg")!important;
+  background-position:center 43%!important;background-size:cover!important;
+  border:1px solid #d8cab5!important;
+}
+html:not(.dark) body #aeSportTakeLeaders[data-sport="football"]{
+  background-image:linear-gradient(118deg,rgba(255,252,244,.96),rgba(245,240,230,.92) 68%,rgba(233,230,218,.87)),
+    url("atmospheres/ae-football-stadium.svg")!important;
+  background-position:center 43%!important;background-size:cover!important;
+  border:1px solid #d8cab5!important;
+}
+html:not(.dark) body #aeSportTakeLeaders[data-sport="nfl"]>.ae-section-heading{
+  background-image:linear-gradient(110deg,rgba(246,230,206,.96),rgba(238,224,207,.87)),
+    url("atmospheres/ae-nfl-stadium.svg")!important;
+  background-position:center 30%!important;background-size:cover!important;
+}
+html:not(.dark) body #aeSportTakeLeaders[data-sport="football"]>.ae-section-heading{
+  background-image:linear-gradient(110deg,rgba(239,236,223,.96),rgba(234,228,210,.87)),
+    url("atmospheres/ae-football-stadium.svg")!important;
+  background-position:center 30%!important;background-size:cover!important;
+}
+html:not(.dark) body #aeSportTakeLeaders .ae-sport-takes-grid>.ae-sport-takes-group{
+  background:linear-gradient(140deg,rgba(255,254,250,.97),rgba(247,242,231,.91))!important;
+  border-color:#ddd1c2!important;
+}
+html:not(.dark) body #aeSportTakeLeaders .ae-sport-takes-group h3,
+html:not(.dark) body #aeSportTakeLeaders .ae-sport-take-title,
+html:not(.dark) body #aeSportTakeLeaders .ae-sport-take-open{
+  color:#274459!important;
+}
+
+/* Fondos también en la vista previa de la portada; elegancia cálida en día. */
+html.dark body #homeRankingLink.ae-ranking-card-link{
+  background-image:linear-gradient(100deg,rgba(9,30,44,.93),rgba(12,36,51,.80) 65%,rgba(13,39,52,.71)),
+    url("atmospheres/ae-nfl-stadium.svg")!important;
+}
+html.dark body #homeChampionsLink.ae-ranking-card-link{
+  background-image:linear-gradient(100deg,rgba(9,30,44,.93),rgba(12,36,51,.80) 65%,rgba(13,39,52,.71)),
+    url("atmospheres/ae-football-stadium.svg")!important;
+}
+html:not(.dark) body #homeRankingLink.ae-ranking-card-link{
+  background-image:linear-gradient(108deg,rgba(255,252,245,.98),rgba(249,237,218,.95) 66%,rgba(240,223,195,.90)),
+    url("atmospheres/ae-nfl-stadium.svg")!important;
+  border-color:#dccab0!important;
+}
+html:not(.dark) body #homeChampionsLink.ae-ranking-card-link{
+  background-image:linear-gradient(108deg,rgba(255,252,245,.98),rgba(248,237,219,.95) 66%,rgba(239,223,197,.90)),
+    url("atmospheres/ae-football-stadium.svg")!important;
+  border-color:#dccab0!important;
+}
+html:not(.dark) body #homeRankingLink .ae-team-name,
+html:not(.dark) body #homeChampionsLink .ae-team-name{
+  color:#2b4354!important;
+}
+@media(max-width:660px){
+  #aeHomeTopTakes .ae-top-takes-heading{align-items:flex-start!important;}
+  #aeHomeTopTakes .ae-top-takes-heading-side{align-items:flex-start!important;width:100%!important}
+  #aeHomeTopTakes .ae-home-take-cta-line{justify-content:flex-start!important;}
+  #aeHomeTopTakes #aeHomeTakePublish.ae-home-take-publish{
+    min-height:42px!important;padding:10px 14px!important;font-size:12px!important;
+  }
+  #footballTakes #communityPicks .ae-picks-heading-cta-row{gap:8px 12px;}
+  html body #footballTakes #communityPicks #cpFeed>.cp-card .cp-leg-selection{
+    font-size:15px!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  #aeHomeTakes .ae-home-take-cta-line{scroll-behavior:auto!important}
+}
