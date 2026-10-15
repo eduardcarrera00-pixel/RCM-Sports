@@ -292,6 +292,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/community-picks.css?v=1">
 <link rel="stylesheet" href="assets/username-auth.css?v=2">
 <link rel="stylesheet" href="assets/ae-premium-home.css?v=20261015-3">
+<link rel="stylesheet" href="assets/ae-refinement.css?v=20261015-1">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 
@@ -331,7 +332,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 </button>
 
                     <!-- Guest State: User sign-in and registration -->
-                    <button id="accountRecoveryButton" type="button" class="hidden" onclick="openUserAuthModal(); setAuthMode('code');">Recuperación</button>
+                    
                     <div id="readerSession" class="hidden rcm-row"></div>
                     <div id="guestAdminContainer">
                         <button type="button" onclick="openUserAuthModal()" aria-label="Iniciar sesión o crear cuenta" class="flex items-center space-x-2 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 text-xs font-bold py-2.5 px-3.5 sm:px-4 rounded-xl transition-all">
@@ -395,7 +396,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
             <div id="rankingStatic" class="ae-ranking-accessible"><ol id="rankingList" class="rcm-ranking-list" aria-label="Top 10 NFL"></ol></div>
         </section>
         <section id="championsRankings" tabindex="0" class="rcm-panel ae-champions-full hidden" aria-labelledby="championsTitle">
-            <div class="rcm-row"><h2 id="championsTitle">Champions League · Power Rankings</h2><span class="ae-edition" id="championsEdition"></span></div>
+            <div class="rcm-row"><h2 id="championsTitle">Champions League · Power Rankings</h2><span class="ae-edition" id="championsEdition"></span><button type="button" id="championsEditButton" class="hidden" onclick="openChampionsEditor()">Editar ranking</button></div>
             <p id="championsStatus" role="status">Cargando clasificación publicada…</p>
             <div id="championsViewport" class="rcm-ticker ae-ranking-motion" aria-hidden="true" hidden><div id="championsTrack" class="rcm-track"></div></div>
             <ol id="championsList" class="ae-full-ranking-list ae-ranking-accessible" aria-label="Top 10 Champions League"></ol>
@@ -405,7 +406,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
           <p class="cp-intro">Comparte tu análisis, apoya los Picks que te convencen y participa en la conversación. Un Pick al día, sin ligas ni puntos por apuestas.</p>
           <details><summary>Publicar mi Pick</summary><form id="cpForm"></form></details>
           <div class="cp-layout"><div><label for="cpSort">Ordenar Picks</label><select id="cpSort"><option value="score">Más votados</option><option value="created_at">Más recientes</option></select><p id="cpStatus" role="status">Cargando Picks…</p><div id="cpFeed"></div><button id="cpMore" type="button" hidden>Ver más Picks</button></div>
-          <aside class="cp-highlights"><details><summary>Votación semanal · Dos opciones</summary><div id="weeklyPickOptions"></div></details><h3>Mejor Pick · Top 3</h3><div id="cpTop"></div><h3>Peor Pick · Más cuestionado</h3><div id="cpWorst"></div></aside></div>
+          <aside class="cp-highlights"><details><summary>Votación semanal · Dos opciones</summary><div id="weeklyPickOptions"></div></details><h3>Mejor Pick</h3><div id="cpTop"></div><h3>Peor Pick</h3><div id="cpWorst"></div></aside></div>
         </section>
         <!-- Active Filter Indicator Bar -->
         <div id="filterIndicator" class="hidden mb-6 flex items-center justify-between bg-pitch-50 border border-pitch-200 px-4 py-3 rounded-xl text-pitch-900">
@@ -476,9 +477,9 @@ html.dark [data-reading-size][aria-pressed="true"] {
                     <div id="cpWeekly" aria-live="polite"><p>Cargando el Pick más apoyado…</p></div></div>
                 </section>
 
-        <section class="rcm-panel editorial-community" aria-labelledby="communityTitle"><div class="ae-section-heading"><span class="ae-overline">LA COMUNIDAD OPINA</span><h2 id="communityTitle">Las voces de AE SPORTS</h2><p>Los comentarios más apoyados y más cuestionados, según votos reales.</p></div><div id="communityLeaders" aria-live="polite">Cargando comentarios destacados…</div></section>
+        <section class="rcm-panel editorial-community" aria-labelledby="communityTitle"><div class="ae-section-heading"><span class="ae-overline">LA COMUNIDAD OPINA</span><h2 id="communityTitle">Las voces de AE SPORTS</h2></div><div id="communityLeaders" aria-live="polite">Cargando comentarios destacados…</div></section>
         <section class="rcm-panel editorial-trending" aria-labelledby="trendingTitle" hidden>
-    <div class="ae-section-heading"><span class="ae-overline">LECTURAS DE LA COMUNIDAD</span><h2 id="trendingTitle">Lo más leído · Top 5</h2><p>Artículos más abiertos desde que contabilizamos lecturas.</p></div>
+    <div class="ae-section-heading"><span class="ae-overline">LECTURAS DE LA COMUNIDAD</span><h2 id="trendingTitle">Lo más leído · Top 5</h2><p>Las publicaciones con más likes de la comunidad.</p></div>
     <ol id="trendingList" class="ae-trending-list" aria-live="polite"></ol>
 </section>
                 <!-- Interactive Daily Poll Widget -->
@@ -882,6 +883,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 
             <div class="pt-8 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between text-slate-500 space-y-4 sm:space-y-0">
                 <p>&copy; 2026 AE SPORTS. Todos los derechos reservados.</p>
+                <button id="accountRecoveryButton" type="button" class="hidden ae-footer-recovery" onclick="openUserAuthModal(); setAuthMode('code');">Recuperación de cuenta</button>
             </div>
         </div>
     </footer>
@@ -1470,7 +1472,7 @@ currentUser = {
             const container = document.getElementById('trendingList');
             if (!container) return;
             const ranked = articles.filter(article => article.remote && article.title)
-                .sort((a,b) => (Number(b.views)||0) - (Number(a.views)||0)
+                .sort((a,b) => (Number(b.likes)||0) - (Number(a.likes)||0)
                     || new Date(b.createdAt) - new Date(a.createdAt))
                 .slice(0,5);
             if (!ranked.length) {
@@ -1478,14 +1480,14 @@ currentUser = {
                 return;
             }
             container.innerHTML = ranked.map((article, index) => {
-                const views = Number(article.views)||0;
+                const likes = Number(article.likes)||0;
                 return '<li class="ae-trending-item">'
                     + '<span class="ae-trending-rank">' + (index+1) + '</span>'
                     + '<button type="button" class="ae-trending-link" onclick="openArticleModal(' + articleIdArgument(article.id) + ')">'
                     + '<span class="ae-trending-category">' + escapeHTML(article.category) + '</span>'
                     + '<span class="ae-trending-title">' + escapeHTML(article.title) + '</span></button>'
-                    + '<span class="ae-trending-meta" aria-label="' + views + ' aperturas contabilizadas">'
-                    + '<i class="fa-regular fa-eye" aria-hidden="true"></i> ' + views + '</span></li>';
+                    + '<span class="ae-trending-meta" aria-label="' + likes + ' me gusta">'
+                    + '<i class="fa-regular fa-heart" aria-hidden="true"></i> ' + likes + '</span></li>';
             }).join('');
         }
 
