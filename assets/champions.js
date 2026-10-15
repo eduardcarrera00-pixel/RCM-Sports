@@ -94,7 +94,7 @@
             render();
         } catch(error) {
             latest = null; previousTeamIds = null; clubs.clear(); render();
-            showError('Este módulo requiere una edición publicada y su catálogo.');
+            showError('Vuelve a consultar más tarde.');
         } finally { loading = false; }
     }
     window.renderChampionsVisibility = function renderChampionsVisibility() {

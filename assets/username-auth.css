@@ -4,3 +4,10 @@
 #authRecoveryOutput{font-family:monospace;font-size:13px}#authRecoveryResult p,#authModeHelp{font-size:13px;line-height:1.6;color:var(--ae-muted);margin:12px 0}
 #authRecoveryResult button,#authShowPassword,#accountRecoveryButton{border:1px solid var(--ae-bronze);padding:9px 12px;border-radius:5px;min-height:44px;font-size:12px;margin:6px 4px 6px 0}
 #userAuthForm .space-y-2 button{display:block;width:100%;min-height:44px;padding:10px;font-size:13px}
+
+/* Keep every recovery control reachable on small or short viewports. */
+#userAuthModal>div{max-height:calc(100vh - 32px);max-height:calc(100dvh - 32px);overflow-y:auto;overscroll-behavior:contain}
+#userAuthForm .space-y-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+#userAuthForm .space-y-2>button{margin:0;line-height:1.4}
+#userAuthForm .space-y-2>#authSubmit{grid-column:1/-1}
+@media(max-width:480px){#userAuthForm,#authRecoveryResult{padding:20px}#userAuthModal input{font-size:16px}#userAuthForm .space-y-2 button{padding:8px;font-size:12px}}
