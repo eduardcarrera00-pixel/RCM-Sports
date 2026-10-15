@@ -92,7 +92,7 @@ body>header .category-btn:hover,body>header .category-btn:focus-visible{backgrou
 .editorial-bottom>.editorial-ranking{display:flex;flex-direction:column;min-height:345px}
 .editorial-bottom .rcm-panel{padding:24px}
 .editorial-bottom h2{font-size:25px;color:var(--ae-ink);margin:0}
-.editorial-bottom h2 span{display:block!important;font:600 12px/1.8 Inter,sans-serif;letter-spacing:.09em;color:var(--ae-muted)}
+.editorial-bottom h2 span{display:inline!important;white-space:nowrap;font:600 12px/1.8 Inter,sans-serif;letter-spacing:.09em;color:var(--ae-muted)}
 .editorial-ranking-list{margin:14px 0 18px;grid-template-rows:repeat(3,minmax(75px,auto));gap:0 12px}
 .editorial-ranking-list .rcm-team{grid-template-columns:24px 58px 1fr;align-items:center;gap:9px;min-height:75px;padding:8px 0;font-size:14px}
 .editorial-ranking-list .rcm-team strong,.ae-full-ranking-list .rcm-team strong{font:700 17px Georgia,serif;color:var(--ae-action)}

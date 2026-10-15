@@ -288,10 +288,10 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
 <link rel="stylesheet" href="assets/community.css?v=20261013-2">
-<link rel="stylesheet" href="assets/editorial.css?v=20261015-2">
+<link rel="stylesheet" href="assets/editorial.css?v=qa1-20261015-2">
 <link rel="stylesheet" href="assets/unified-editorial.css?v=20261015-5">
 <link rel="stylesheet" href="assets/community-picks.css?v=1">
-<link rel="stylesheet" href="assets/username-auth.css?v=1">
+<link rel="stylesheet" href="assets/username-auth.css?v=2">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 
@@ -563,7 +563,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
             </div>
 
             <button type="button"
-                    onclick="closeUserAuthModal()"
+                    onclick="closeUserAuthModal()" aria-label="Cerrar ventana de acceso"
                     class="w-8 h-8 rounded-full bg-slate-200/60 text-slate-500 hover:text-slate-800 flex items-center justify-center">
                 <i class="fa-solid fa-xmark"></i>
             </button>
@@ -580,7 +580,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
             </div>
 
             <div>
-                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                <label for="userAuthUsername" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                     Nombre de usuario
                 </label>
 
@@ -595,7 +595,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
             </div>
 
             <div>
-                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                <label for="userAuthPassword" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                     Contraseña
                 </label>
 
@@ -1858,7 +1858,7 @@ updateThemeButton();
     </script>
 <script src="assets/nfl-teams.js"></script>
 <script src="assets/community.js?v=20261015-4"></script>
-<script src="assets/champions.js?v=20261015-5"></script>
+<script src="assets/champions.js?v=qa1-20261015-5"></script>
 <script src="assets/community-picks.js?v=1"></script>
 <script src="assets/weekly-picks.js?v=20261015-1"></script>
 <script src="assets/username-auth.js?v=1"></script>
