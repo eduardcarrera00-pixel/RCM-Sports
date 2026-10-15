@@ -1357,8 +1357,8 @@ currentUser = {
         }
 
         function renderArticlesFeed() {
+            document.getElementById('footballTakes').hidden = currentCategory !== 'Picks';
             if (typeof renderCommunityPicksVisibility === 'function') renderCommunityPicksVisibility();
-             if (typeof renderPicksVisibility === 'function') renderPicksVisibility();
             if (typeof renderFreeTakesVisibility === 'function') renderFreeTakesVisibility();
             const isPicksPage = currentCategory === 'Picks';
             document.getElementById('heroSection').hidden = isPicksPage;
@@ -1998,6 +1998,6 @@ updateThemeButton();
 <script src="assets/ae-category-visibility.js?v=20261015-2"></script>
 <script src="assets/free-takes.js?v=20261015-4"></script>
 <script src="assets/ae-editorial-weekly.js?v=20261015-2"></script>
-<script src="assets/ae-profile.js?v=20261015-3"></script>
+<script src="assets/ae-profile.js?v=20261015-4"></script>
 </body>
 </html>
