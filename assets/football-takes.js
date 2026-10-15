@@ -105,6 +105,7 @@
      ]);
      if(seq!==request)return;
      if(results[0].error)throw results[0].error;
+     if(results[1].error)throw results[1].error;
      options=results[0].data||[];mine=results[1].data||[];
      message('');
      renderQuestions();await renderLeaderboard();
@@ -114,6 +115,7 @@
    e.preventDefault();if(pending)return;
    const f=e.currentTarget;
    const opts=f.elements.options.value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+   const selectedLeague=f.elements.competition.value;
    const close=new Date(f.elements.closes.value);
    if(!Number.isFinite(close.getTime()))return message('Introduce una fecha de cierre válida.');
    pending=true;f.querySelector('[type=submit]').disabled=true;
@@ -123,7 +125,7 @@
        p_prompt:f.elements.prompt.value,p_closes_at:close.toISOString(),
        p_points:Number(f.elements.points.value),p_options:opts});
      if(r.error)throw r.error;
-     f.reset();league=f.elements.competition.value;period='all';
+     f.reset();league=selectedLeague;period='all';
      message('Take publicado. Ya pueden participar los usuarios.');
      await load();
    }catch(err){message(err.message||'No se pudo publicar el Take.');}
