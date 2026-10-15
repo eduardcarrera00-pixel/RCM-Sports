@@ -43,7 +43,7 @@
          await adminAction('ae_settle_take',{p_question_id:q.id,p_option_id:select.value},'Resultado confirmado');
        }));
      }
-     admin.append(btn('Anular Take',async()=>{if(confirm('¿Anular esta pregunta sin otorgar puntos?'))await adminAction('ae_void_take',{p_question_id:q.id},'Pregunta anulada');},'ae-take-minor'));
+     admin.append(btn('Anular Pick',async()=>{if(confirm('¿Anular este Pick sin otorgar puntos?'))await adminAction('ae_void_take',{p_question_id:q.id},'Pregunta anulada');},'ae-take-minor'));
      box.append(admin);
    }
    return box;
@@ -108,7 +108,7 @@
      if(results[1].error)throw results[1].error;
      options=results[0].data||[];mine=results[1].data||[];
      message('');
-     renderQuestions();featured();await renderLeaderboard();
+     renderQuestions();featured();renderEditorialFeatured();await Promise.all([renderPopular(),renderLeaderboard()]);
    }catch(e){message('No pudimos cargar los Picks. '+(e.message||'Inténtalo más tarde.'));}
  }
  async function create(e){
@@ -128,7 +128,7 @@
      f.reset();league=selectedLeague;period='all';
      message('Pick publicado. Ya pueden participar los usuarios.');
      await load();
-   }catch(err){message(err.message||'No se pudo publicar el Take.');}
+   }catch(err){message(err.message||'No se pudo publicar el Pick.');}
    finally{pending=false;f.querySelector('[type=submit]').disabled=false;}
  }
  function visibility(){
@@ -137,6 +137,36 @@
    if(!root.hidden)load();
  }
  window.renderPicksVisibility=visibility;
+
+ function weeklyEditorial(){
+   const weekly=questions.filter(q=>q.period==='weekly' && q.status!=='void');
+   weekly.sort((a,b)=>(isOpen(b)?1:0)-(isOpen(a)?1:0)||new Date(b.closes_at)-new Date(a.closes_at));
+   return weekly[0]||null;
+ }
+ function renderEditorialFeatured(){
+   const target=$('picksFeaturedCard');if(!target)return;
+   target.replaceChildren();
+   const chosen=weeklyEditorial();
+   if(!chosen){target.append(el('p','Pronto publicaremos nuestra selección de la semana.','ae-take-empty'));return;}
+   const card=renderCard(chosen);
+   card.classList.add('ae-picks-featured-card');
+   target.append(card);
+ }
+ async function renderPopular(){
+   const target=$('picksPopular');if(!target||!db)return;
+   const result=await db.rpc('ae_pick_top_choices',{p_limit:3});
+   if(result.error){target.replaceChildren(el('li','No pudimos cargar los picks más votados.'));return;}
+   target.replaceChildren();
+   if(!result.data?.length){target.append(el('li','El Top 3 aparecerá cuando la comunidad empiece a elegir sus Picks.'));return;}
+   result.data.forEach((choice,i)=>{
+     const li=el('li',undefined,'ae-popular-item');
+     li.append(el('span',String(i+1).padStart(2,'0'),'ae-popular-position'));
+     const copy=el('div',undefined,'ae-popular-copy');
+     copy.append(el('small',leagues[choice.competition]||choice.competition),el('strong',choice.option_label),el('span',choice.question_prompt));
+     li.append(copy,el('span',choice.votes+' votos','ae-popular-votes'));
+     target.append(li);
+   });
+ }
  // Home features an official weekly Pick, never an old odds post.
  function featured(){const box=$('cpWeekly');if(!box)return;box.replaceChildren();const q=questions.filter(x=>x.period==='weekly' && isOpen(x)).sort((a,b)=>new Date(a.closes_at)-new Date(b.closes_at))[0];if(!q){box.append(el('p','Los Picks semanales destacados aparecerán aquí.'));return;}const card=el('div',undefined,'ae-pick-home-preview');card.append(el('strong',q.prompt),el('p',(leagues[q.competition]||'Deportes')+' · '+q.points+' puntos'));card.append(btn('Elegir mi Pick →',()=>{filterByCategory('Picks');$('footballTakes')?.scrollIntoView({block:'start',behavior:'smooth'});}));box.append(card);}
  document.addEventListener('DOMContentLoaded',()=>{
