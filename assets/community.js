@@ -42,6 +42,7 @@ function renderSessionHeader() {
     }
     document.getElementById('guestAdminContainer').classList.toggle('hidden', Boolean(currentUser || currentAdmin));
     document.getElementById('rankingEditButton')?.classList.toggle('hidden', !currentAdmin);
+    document.getElementById('championsEditButton')?.classList.toggle('hidden', !currentAdmin);
     updateArticleEditorButton();
 }
 function updateArticleEditorButton(article) {
