@@ -50,8 +50,10 @@
     function render() {
         const preview = byId('homeChampionsList');
         const full = byId('championsList');
-        preview.replaceChildren(); full.replaceChildren();
+        const track = byId('championsTrack');
+        preview.replaceChildren(); full.replaceChildren(); track.replaceChildren();
         const hasPublished = !!(latest && Array.isArray(latest.team_ids) && latest.team_ids.length === 10);
+        byId('championsViewport').hidden = !hasPublished;
         const status = hasPublished ? '' : 'Todavía no hay una clasificación de Champions publicada.';
         byId('homeChampionsStatus').textContent = status;
         byId('championsStatus').textContent = status;
@@ -60,6 +62,13 @@
         if (hasPublished) {
             latest.team_ids.slice(0, 6).forEach((id,i) => preview.append(row(id,i)));
             latest.team_ids.forEach((id,i) => full.append(row(id,i)));
+            // Two identical groups make a seamless visual loop. The canonical,
+            // screen-reader-accessible Top 10 above is never duplicated.
+            for (let copy = 0; copy < 2; copy++) {
+                const group = element('ol', null, 'rcm-track-group');
+                latest.team_ids.forEach((id,i) => group.append(row(id,i)));
+                track.append(group);
+            }
         }
     }
     function showError(message) {
