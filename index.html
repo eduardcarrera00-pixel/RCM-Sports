@@ -1214,6 +1214,7 @@ currentUser = {
             renderSessionHeader();
             if(typeof updateAeWeeklyAdmin==='function') updateAeWeeklyAdmin();
             if(typeof updateAeCategoryAdmin==='function') updateAeCategoryAdmin();
+            if(typeof updateAePicksAdmin==='function') updateAePicksAdmin();
         }
 
         function escapeHTML(value) {
@@ -1829,6 +1830,7 @@ function prepareComments(article) {
 
         function filterByCategory(category) {
     currentCategory = categoryKey(category);
+    if(typeof aeSportIsVisible==='function' && !aeSportIsVisible(currentCategory)) currentCategory='Todos';
     category = currentCategory;
     currentTeam = '';
     if (category === 'NFL') loadRanking();
@@ -1990,12 +1992,12 @@ updateThemeButton();
 <script src="assets/nfl-teams.js"></script>
 <script src="assets/community.js?v=ticker-only-20261015-4"></script>
 <script src="assets/champions.js?v=qa1-20261015-5"></script>
-<script src="assets/community-picks.js?v=20261015-5"></script>
+<script src="assets/community-picks.js?v=20261015-6"></script>
 <script src="assets/weekly-picks.js?v=20261015-1"></script>
 <script src="assets/username-auth.js?v=1"></script>
-<script src="assets/ae-category-visibility.js?v=20261015-1"></script>
-<script src="assets/free-takes.js?v=20261015-3"></script>
+<script src="assets/ae-category-visibility.js?v=20261015-2"></script>
+<script src="assets/free-takes.js?v=20261015-4"></script>
 <script src="assets/ae-editorial-weekly.js?v=20261015-2"></script>
-<script src="assets/ae-profile.js?v=20261015-2"></script>
+<script src="assets/ae-profile.js?v=20261015-3"></script>
 </body>
 </html>
