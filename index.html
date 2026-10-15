@@ -301,6 +301,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/ae-layout-oct15.css?v=20261015-1">
 <link rel="stylesheet" href="assets/ae-design-harmony.css?v=20261015-1">
 <link rel="stylesheet" href="assets/ae-takes-picks-refit.css?v=20261015-1">
+<link rel="stylesheet" href="assets/ae-conversation-refine.css?v=20261015-2">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 
@@ -623,15 +624,18 @@ html.dark [data-reading-size][aria-pressed="true"] {
         <!-- Los Takes son una función editorial al final de NFL y Fútbol, no una categoría de navegación. -->
         <section id="freeTakes" class="ae-takes ae-free-takes" hidden aria-labelledby="freeTakesTitle">
           <div class="ae-takes-head"><span class="ae-takes-eyebrow">TU OPINIÓN CUENTA</span><h2 id="freeTakesTitle">Takes de la comunidad</h2><p>Haz el pronóstico u opinión que quieras. Sin preguntas predefinidas y sin cuotas.</p></div>
+
+          <div class="ae-free-controls"><label id="aeNflFeedFilterWrap" hidden>División NFL<select id="aeNflFeedDivision"><option value="">Todas las divisiones</option></select></label><label id="freeTakesFilterWrap">Mostrar<select id="freeTakesSportFilter"><option value="all">Todos los deportes</option><option value="general">General</option><option value="laliga">LaLiga</option><option value="premier">Premier League</option><option value="ligamx">Liga MX</option><option value="champions">Champions League</option><option value="nfl">NFL</option><option value="colegial">Fútbol colegial</option></select></label><label>Ordenar<select id="freeTakesSort"><option value="new">Más recientes</option><option value="top">Más apoyados</option></select></label></div>
+          <p id="freeTakesStatus" class="ae-takes-status" role="status" aria-live="polite"></p>
+          <div id="freeTakesFeed" aria-live="polite"></div>
+          <details id="aeTakeComposePanel" class="ae-compose-disclosure"><summary>✍ Publicar mi Take</summary>
           <form id="freeTakesForm" class="ae-free-compose">
             <label id="freeTakeSportLabel">Deporte o competición<select name="sport" required><option value="general">General</option><option value="laliga">LaLiga</option><option value="premier">Premier League</option><option value="ligamx">Liga MX</option><option value="champions">Champions League</option><option value="nfl">NFL</option><option value="colegial">Fútbol colegial</option></select></label>
             <div id="aeNflTakeOptions" class="ae-nfl-take-options ae-wide" hidden>
               <div class="ae-nfl-fields">
-                <label>División<select id="aeNflDivision" name="nfl_division"><option value="">Toda la NFL</option></select></label>
-                <label>Equipo<select id="aeNflTeam" name="nfl_team"><option value="">Toda la NFL</option></select></label>
-                <label>Tema<select id="aeNflTopic" name="nfl_topic">
-                  <option value="">Opinión libre</option><option value="Pronóstico">Pronóstico</option><option value="Debate">Debate</option><option value="Jugador">Jugador</option><option value="Playoffs">Playoffs</option><option value="Rivalidad">Rivalidad</option><option value="Análisis">Análisis</option>
-                </select></label>
+                <label>División <small>(opcional)</small><select id="aeNflDivision" name="nfl_division"><option value="">Toda la NFL</option></select></label>
+                <label>Equipo <small>(opcional)</small><input id="aeNflTeam" name="nfl_team" type="text" maxlength="80" placeholder="Escribe el equipo…"></label>
+                <label>Tema <small>(opcional)</small><input id="aeNflTopic" name="nfl_topic" type="text" maxlength="80" placeholder="Escribe tu tema libremente…"></label>
               </div>
               <button id="aeNflTitleSuggest" type="button">Sugerir título</button>
             </div>
@@ -639,9 +643,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
             <label class="ae-wide">Desarrolla tu Take<textarea name="body" required minlength="15" maxlength="1800" placeholder="Explica tu predicción o argumento, sin limitarte a opciones predefinidas."></textarea></label>
             <button type="submit">Publicar mi Take</button>
           </form>
-          <div class="ae-free-controls"><label id="aeNflFeedFilterWrap" hidden>División NFL<select id="aeNflFeedDivision"><option value="">Todas las divisiones</option></select></label><label id="freeTakesFilterWrap">Mostrar<select id="freeTakesSportFilter"><option value="all">Todos los deportes</option><option value="general">General</option><option value="laliga">LaLiga</option><option value="premier">Premier League</option><option value="ligamx">Liga MX</option><option value="champions">Champions League</option><option value="nfl">NFL</option><option value="colegial">Fútbol colegial</option></select></label><label>Ordenar<select id="freeTakesSort"><option value="new">Más recientes</option><option value="top">Más apoyados</option></select></label></div>
-          <p id="freeTakesStatus" class="ae-takes-status" role="status" aria-live="polite"></p>
-          <div id="freeTakesFeed" aria-live="polite"></div>
+          </details>
         </section>
 
 
@@ -2035,11 +2037,12 @@ updateThemeButton();
 <script src="assets/weekly-picks.js?v=20261015-1"></script>
 <script src="assets/username-auth.js?v=1"></script>
 <script src="assets/ae-category-visibility.js?v=20261015-3"></script>
-<script src="assets/ae-nfl-takes.js?v=20261015-1"></script>
-<script src="assets/free-takes.js?v=20261015-5"></script>
-<script src="assets/ae-editorial-weekly.js?v=20261015-2"></script>
+<script src="assets/ae-nfl-takes.js?v=20261015-2"></script>
+<script src="assets/free-takes.js?v=20261015-6"></script>
+<script src="assets/ae-editorial-weekly.js?v=20261015-3"></script>
 <script src="assets/ae-profile.js?v=20261015-4"></script>
-<script src="assets/ae-home-takes.js?v=20261015-1"></script>
-<script src="assets/ae-sport-top-takes.js?v=20261015-1"></script>
+<script src="assets/ae-home-takes.js?v=20261015-2"></script>
+<script src="assets/ae-sport-top-takes.js?v=20261015-2"></script>
+<script src="assets/ae-take-replies.js?v=20261015-1"></script>
 </body>
 </html>
