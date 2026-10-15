@@ -1,0 +1,68 @@
+/* AE SPORTS: destacados de Takes por deporte, sin sustituir los comentarios de portada. */
+(() => {
+ 'use strict';
+ const $=id=>document.getElementById(id);
+ const footballSports=new Set(['laliga','premier','ligamx','champions']);
+ const names={nfl:'NFL',laliga:'LaLiga',premier:'Premier League',ligamx:'Liga MX',champions:'Champions League'};
+ let request=0,current='',lastRun=0;
+ const el=(tag,text,cls)=>{
+   const n=document.createElement(tag);
+   if(text!==undefined)n.textContent=String(text);
+   if(cls)n.className=cls;
+   return n;
+ };
+ function renderList(id,items,mode) {
+   const list=$(id);if(!list)return;
+   list.replaceChildren();
+   for(const [i,t] of items.entries()) {
+     const li=el('li',undefined,'ae-sport-take-item');
+     li.append(el('span',String(i+1).padStart(2,'0'),'ae-top-take-number'));
+     const content=el('div',undefined,'ae-top-take-content');
+     content.append(el('span',names[t.sport]||'Fútbol','ae-top-take-sport'));
+     const title=el('strong',t.title,'ae-sport-take-title');
+     content.append(title);
+     const author=el('button','@'+(t.author||'Aficionado'),'ae-top-take-author');
+     author.type='button';author.addEventListener('click',()=>{
+       if(typeof openAePublicProfile==='function')openAePublicProfile(t.author_id);
+     });
+     content.append(author);
+     const score=el('span',undefined,'ae-top-take-votes');
+     score.append(el('span','▲ '+Number(t.upvotes||0),'ae-top-take-up'),el('span','▼ '+Number(t.downvotes||0),'ae-top-take-down'));
+     content.append(score);
+     li.append(content);list.append(li);
+   }
+   if(!items.length)list.append(el('li',mode==='up'?'Todavía no hay Takes con votos positivos.':'Todavía no hay Takes con votos negativos.','ae-top-takes-empty'));
+ }
+ async function refresh(force=false) {
+   const section=typeof currentCategory==='undefined'?'':currentCategory;
+   const root=$('aeSportTakeLeaders'),voices=document.querySelector('.editorial-community');
+   if(!root||!voices)return;
+   const sport=section==='NFL'?'nfl':section==='Fútbol'?'football':'';
+   root.hidden=!sport;voices.hidden=!!sport;
+   if(!sport){current='';return;}
+   $('aeSportTakeTitle').textContent='Takes destacados · '+(sport==='nfl'?'NFL':'Fútbol');
+   if(!force&&sport===current&&Date.now()-lastRun<15000)return;
+   current=sport;
+   const seq=++request;const status=$('aeSportTakeStatus');
+   status.textContent='Cargando opiniones de la comunidad…';
+   try{
+     if(!db)throw Error('Sin conexión');
+     const r=await db.rpc('ae_public_take_feed',{p_sport:sport==='nfl'?'nfl':'all'});
+     if(r.error)throw r.error;
+     if(seq!==request||current!==sport)return;
+     const data=(r.data||[]).filter(t=>sport==='nfl'?t.sport==='nfl':footballSports.has(t.sport));
+     const positive=data.filter(t=>Number(t.upvotes)>0).sort((a,b)=>Number(b.upvotes)-Number(a.upvotes)||Number(a.downvotes)-Number(b.downvotes)||new Date(b.created_at)-new Date(a.created_at)).slice(0,3);
+     const negative=data.filter(t=>Number(t.downvotes)>0).sort((a,b)=>Number(b.downvotes)-Number(a.downvotes)||Number(a.upvotes)-Number(b.upvotes)||new Date(b.created_at)-new Date(a.created_at)).slice(0,3);
+     renderList('aeSportTakePositive',positive,'up');
+     renderList('aeSportTakeNegative',negative,'down');
+     status.textContent='Clasificación según los votos de Takes de '+(sport==='nfl'?'NFL.':'Fútbol.');
+     lastRun=Date.now();
+   }catch(e){
+     if(seq===request)status.textContent='No se pudieron cargar los Takes destacados.';
+   }
+ }
+ window.refreshAeSportTopTakes=refresh;
+ document.addEventListener('DOMContentLoaded',()=>refresh(true));
+ document.addEventListener('ae:takes-updated',()=>refresh(true));
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh();});
+})();
