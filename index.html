@@ -297,6 +297,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/free-takes.css?v=20261015-3">
 <link rel="stylesheet" href="assets/ae-picks-editorial.css?v=20261015-1">
 <link rel="stylesheet" href="assets/ae-editorial-weekly-profile.css?v=20261015-1">
+<link rel="stylesheet" href="assets/ae-community-picks-refresh.css?v=20261015-1">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 
@@ -346,6 +347,10 @@ html.dark [data-reading-size][aria-pressed="true"] {
                         </button>
                     </div>
 
+                    <details id="aeCategoryAdmin" hidden class="ae-category-admin"><summary>Gestionar deportes</summary>
+                      <div id="aeCategoryToggles" role="group" aria-label="Visibilidad de categorías"></div>
+                      <p id="aeCategoryStatus" role="status"></p>
+                    </details>
                     <!-- Logged-in State: Admin Profile & Actions -->
                     <div id="loggedAdminContainer" class="hidden flex items-center space-x-2 sm:space-x-3">
                         <!-- Profile Tag -->
@@ -417,36 +422,34 @@ html.dark [data-reading-size][aria-pressed="true"] {
             <div id="picksNewsList" class="ae-picks-news-list" aria-live="polite"></div>
           </section>
           <div class="ae-picks-layout">
-            <div class="ae-picks-feed">
-              <div class="ae-picks-feed-heading"><span>LA COMUNIDAD ELIGE</span><h3>Picks de la comunidad</h3><p>Participa en los pronósticos de cada deporte y consulta tus elecciones.</p></div>
-              <nav class="ae-takes-tabs" aria-label="Competiciones de Picks">
-                <button type="button" data-takes-league="all" aria-pressed="true">Todos</button>
-                <button type="button" data-takes-league="laliga" aria-pressed="false">LaLiga</button>
-                <button type="button" data-takes-league="premier" aria-pressed="false">Premier League</button>
-                <button type="button" data-takes-league="ligamx" aria-pressed="false">Liga MX</button>
-                <button type="button" data-takes-league="champions" aria-pressed="false">Champions</button>
-                <button type="button" data-takes-league="nfl" aria-pressed="false">NFL</button>
-                <button type="button" data-takes-league="colegial" aria-pressed="false">Colegial</button>
-              </nav>
-              <div class="ae-takes-meta"><div class="ae-takes-tabs" aria-label="Duración de Picks">
-                <button type="button" data-takes-period="all" aria-pressed="true">Todos</button>
-                <button type="button" data-takes-period="weekly" aria-pressed="false">Semanales</button>
-                <button type="button" data-takes-period="season" aria-pressed="false">Temporada</button>
-              </div><span id="takesCount">0 Picks</span></div>
-              <p id="takesStatus" class="ae-takes-status" role="status" aria-live="polite"></p>
-              <div id="takesQuestions" aria-live="polite"></div>
-            </div>
+            <section class="ae-picks-feed" id="communityPicks" hidden aria-labelledby="cpTitle">
+              <div class="ae-picks-feed-heading"><span>LA COMUNIDAD ELIGE</span><h3 id="cpTitle">Picks de la comunidad</h3><p>Publica tu pronóstico y tu cuota americana. AE SPORTS revisará la cuota y la comunidad decidirá con sus votos.</p></div>
+              <details class="ae-cp-compose" id="cpComposePanel"><summary>✍ Publicar mi Pick</summary><form id="cpForm"></form></details>
+              <div class="ae-cp-sort"><label for="cpSort">Ordenar Picks</label><select id="cpSort"><option value="score">Más votados</option><option value="created_at">Más recientes</option></select></div>
+              <p id="cpStatus" role="status" aria-live="polite"></p>
+              <div id="cpFeed" aria-live="polite"></div>
+              <button id="cpMore" class="ae-take-button" type="button" hidden>Ver más Picks</button>
+            </section>
             <aside class="ae-picks-rail">
               <section class="ae-picks-top-three" aria-labelledby="picksPopularTitle">
-                <div class="ae-picks-rail-heading"><span>LA COMUNIDAD VOTA</span><h3 id="picksPopularTitle">Top 3 Picks</h3><p>Las opciones más elegidas por los usuarios.</p></div>
+                <div class="ae-picks-rail-heading"><span>LOS MÁS APOYADOS</span><h3 id="picksPopularTitle">Top 3 Picks</h3><p>Pronósticos de la comunidad con más apoyo.</p></div>
                 <ol id="picksPopular" aria-live="polite"></ol>
               </section>
               <section class="ae-takes-side" aria-labelledby="picksRankingTitle">
-                <h3 id="picksRankingTitle">Ranking de Picks</h3><div class="ae-takes-tabs">
-                  <button type="button" data-takes-rank="general" aria-pressed="true">Temporada</button>
-                  <button type="button" data-takes-rank="weekly" aria-pressed="false">Esta semana</button>
-                </div><div id="takesLeaderboard" aria-live="polite"></div>
-                <button id="takesReload" type="button" class="ae-take-button">Actualizar Picks</button>
+                <h3 id="picksRankingTitle">Ranking de Picks</h3>
+                <div class="ae-takes-tabs" role="group" aria-label="Clasificación">
+                  <button id="cpRankWeekly" type="button" aria-pressed="true">Esta semana</button>
+                  <button id="cpRankOverall" type="button" aria-pressed="false">General</button>
+                </div>
+                <p class="ae-picks-ranking-intro">Cada semana: 10 puntos al 1.º, 9 al 2.º, hasta 1 al 10.º. Clasificación provisional hasta el cierre.</p>
+                <ol id="cpLeaderboard" class="ae-take-leaderboard-list" aria-live="polite"></ol>
+                <button id="cpReload" type="button" class="ae-take-button">Actualizar</button>
+              </section>
+              <section id="cpModeration" class="ae-picks-top-three" hidden aria-labelledby="cpModerationTitle">
+                <h3 id="cpModerationTitle">Administrar cuotas</h3><p>Revisa las cuotas declaradas antes de permitir votos.</p>
+                <div id="cpPending"></div>
+                <button id="cpCloseWeek" type="button" class="ae-take-button">Cerrar semana anterior y asignar puntos</button>
+                <p id="cpAdminStatus" role="status"></p>
               </section>
             </aside>
           </div>
@@ -460,21 +463,6 @@ html.dark [data-reading-size][aria-pressed="true"] {
               <label class="ae-full">Análisis del Pick<textarea name="analysis" minlength="12" maxlength="2400" required placeholder="Explica los motivos de la recomendación."></textarea></label>
               <div class="ae-full"><button type="submit">Publicar Pick de la Semana</button></div>
               <p id="aeWeeklyPickAdminStatus" class="ae-full ae-takes-status" role="status"></p>
-            </form>
-          </details>
-          <details id="takesAdmin" class="ae-takes-admin" hidden><summary>Administrar · Crear un Pick</summary>
-            <form id="takesCreateForm">
-              <label>Competición<select name="competition" required>
-                <option value="laliga">LaLiga</option><option value="premier">Premier League</option>
-                <option value="ligamx">Liga MX</option><option value="champions">Champions League</option>
-                <option value="nfl">NFL</option><option value="colegial">Fútbol colegial</option></select></label>
-              <label>Modalidad<select name="period" required>
-                <option value="weekly">Semanal</option><option value="season">Temporada</option></select></label>
-              <label class="ae-full">Pregunta<input name="prompt" minlength="10" maxlength="220" required placeholder="¿Quién ganará el próximo partido?"></label>
-              <label class="ae-full">Opciones (una por línea)<textarea name="options" required placeholder="Equipo A&#10;Empate&#10;Equipo B"></textarea></label>
-              <label>Cierre de predicciones<input name="closes" type="datetime-local" required></label>
-              <label>Puntos por acierto<input name="points" type="number" min="1" max="100" value="5" required></label>
-              <div class="ae-full"><button type="submit">Publicar Pick</button></div>
             </form>
           </details>
         </section>
@@ -618,14 +606,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
           <p id="freeTakesStatus" class="ae-takes-status" role="status" aria-live="polite"></p>
           <div id="freeTakesFeed" aria-live="polite"></div>
         </section>
-        <section id="communityPicks" hidden aria-labelledby="cpTitle" class="ae-free-archive">
-          <details><summary id="cpTitle">Archivo de Picks anteriores</summary>
-          <p class="cp-intro">Las publicaciones de cuotas y sus conversaciones siguen accesibles como archivo. Los nuevos Picks por puntos están en la pestaña Picks.</p>
-          <div class="cp-legacy-compose" hidden><form id="cpForm"></form></div>
-          <div class="cp-layout"><div><label for="cpSort">Ordenar Picks</label><select id="cpSort"><option value="score">Más votados</option><option value="created_at">Más recientes</option></select><p id="cpStatus" role="status">Cargando Picks…</p><div id="cpFeed"></div><button id="cpMore" type="button" hidden>Ver más Picks</button></div>
-          <aside class="cp-highlights"><details><summary>Votación semanal · Dos opciones</summary><div id="weeklyPickOptions"></div></details><h3>Mejor Pick</h3><div id="cpTop"></div><h3>Peor Pick</h3><div id="cpWorst"></div></aside></div>
-          </details>
-        </section>
+
 
     </main>
 
@@ -1232,6 +1213,7 @@ currentUser = {
             }
             renderSessionHeader();
             if(typeof updateAeWeeklyAdmin==='function') updateAeWeeklyAdmin();
+            if(typeof updateAeCategoryAdmin==='function') updateAeCategoryAdmin();
         }
 
         function escapeHTML(value) {
@@ -2008,10 +1990,10 @@ updateThemeButton();
 <script src="assets/nfl-teams.js"></script>
 <script src="assets/community.js?v=ticker-only-20261015-4"></script>
 <script src="assets/champions.js?v=qa1-20261015-5"></script>
-<script src="assets/community-picks.js?v=20261015-4"></script>
+<script src="assets/community-picks.js?v=20261015-5"></script>
 <script src="assets/weekly-picks.js?v=20261015-1"></script>
 <script src="assets/username-auth.js?v=1"></script>
-<script src="assets/football-takes.js?v=20261015-7"></script>
+<script src="assets/ae-category-visibility.js?v=20261015-1"></script>
 <script src="assets/free-takes.js?v=20261015-3"></script>
 <script src="assets/ae-editorial-weekly.js?v=20261015-2"></script>
 <script src="assets/ae-profile.js?v=20261015-2"></script>
