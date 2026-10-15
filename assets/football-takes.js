@@ -108,7 +108,7 @@
      if(results[1].error)throw results[1].error;
      options=results[0].data||[];mine=results[1].data||[];
      message('');
-     renderQuestions();featured();renderEditorialFeatured();await Promise.all([renderPopular(),renderLeaderboard()]);
+     renderQuestions();await Promise.all([renderPopular(),renderLeaderboard()]);
    }catch(e){message('No pudimos cargar los Picks. '+(e.message||'Inténtalo más tarde.'));}
  }
  async function create(e){
@@ -138,20 +138,6 @@
  }
  window.renderPicksVisibility=visibility;
 
- function weeklyEditorial(){
-   const weekly=questions.filter(q=>q.period==='weekly' && q.status!=='void');
-   weekly.sort((a,b)=>(isOpen(b)?1:0)-(isOpen(a)?1:0)||new Date(b.closes_at)-new Date(a.closes_at));
-   return weekly[0]||null;
- }
- function renderEditorialFeatured(){
-   const target=$('picksFeaturedCard');if(!target)return;
-   target.replaceChildren();
-   const chosen=weeklyEditorial();
-   if(!chosen){target.append(el('p','Pronto publicaremos nuestra selección de la semana.','ae-take-empty'));return;}
-   const card=renderCard(chosen);
-   card.classList.add('ae-picks-featured-card');
-   target.append(card);
- }
  async function renderPopular(){
    const target=$('picksPopular');if(!target||!db)return;
    const result=await db.rpc('ae_pick_top_choices',{p_limit:3});
@@ -167,8 +153,6 @@
      target.append(li);
    });
  }
- // Home features an official weekly Pick, never an old odds post.
- function featured(){const box=$('cpWeekly');if(!box)return;box.replaceChildren();const q=questions.filter(x=>x.period==='weekly' && isOpen(x)).sort((a,b)=>new Date(a.closes_at)-new Date(b.closes_at))[0];if(!q){box.append(el('p','Los Picks semanales destacados aparecerán aquí.'));return;}const card=el('div',undefined,'ae-pick-home-preview');card.append(el('strong',q.prompt),el('p',(leagues[q.competition]||'Deportes')+' · '+q.points+' puntos'));card.append(btn('Elegir mi Pick →',()=>{filterByCategory('Picks');$('footballTakes')?.scrollIntoView({block:'start',behavior:'smooth'});}));box.append(card);}
  document.addEventListener('DOMContentLoaded',()=>{
    document.querySelectorAll('[data-takes-league]').forEach(b=>b.addEventListener('click',()=>{league=b.dataset.takesLeague;renderQuestions();}));
    document.querySelectorAll('[data-takes-period]').forEach(b=>b.addEventListener('click',()=>{period=b.dataset.takesPeriod;renderQuestions();}));
