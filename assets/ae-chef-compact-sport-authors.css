@@ -3,9 +3,9 @@
 
 /* Picks: jerarquía clara, con CTA perceptible y menos altura de cabecera. */
 html body #footballTakes #communityPicks .ae-picks-feed-heading{
-  margin:0 0 8px!important;
-  padding:0 0 8px!important;
-  border-bottom:1px solid rgba(194,160,126,.26)!important;
+  margin:0 0 10px!important;
+  padding:0!important;
+  border-bottom:0!important;
 }
 html body #footballTakes #communityPicks .ae-picks-heading-cta-row{
   display:flex!important;
@@ -42,25 +42,6 @@ html body #footballTakes #communityPicks .ae-picks-feed-heading>p{
   display:none!important;
 }
 
-/* Sólo Últimos Picks, sin 'Publicaciones recientes', en una línea compacta. */
-html body #footballTakes #communityPicks .ae-recent-picks-heading{
-  display:flex!important;
-  align-items:center!important;
-  justify-content:flex-start!important;
-  gap:0!important;
-  margin:3px 0 8px!important;
-  padding:3px 0 6px!important;
-  border-bottom:1px solid rgba(199,178,152,.2)!important;
-}
-html body #footballTakes #communityPicks .ae-recent-picks-heading h4{
-  margin:0!important;
-  font:600 clamp(18px,1.75vw,21px)/1.13 Newsreader,Georgia,serif!important;
-  letter-spacing:-.008em!important;
-  color:#f5e5d5!important;
-}
-html:not(.dark) body #footballTakes #communityPicks .ae-recent-picks-heading h4{
-  color:#305063!important;
-}
 html body #footballTakes #communityPicks #cpStatus:empty{
   display:none!important;
 }
