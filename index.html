@@ -1426,21 +1426,65 @@ currentUser = {
             }
         }
 
+        // Counts real article opens rather than inferring popularity from likes.
+        let articleViewsRequest = 0;
+        async function loadArticleViews() {
+            if (!db) return;
+            const request = ++articleViewsRequest;
+            try {
+                const {data, error} = await db.from('ae_article_views').select('article_id,views');
+                if (error) throw error;
+                if (request !== articleViewsRequest) return;
+                const counts = new Map((data || []).map(row => [String(row.article_id), Number(row.views) || 0]));
+                for (const article of articles) {
+                    if (article.remote) article.views = counts.get(String(article.id)) || 0;
+                }
+                renderTrending();
+            } catch (error) {
+                console.warn('No se pudieron cargar las estadísticas de lecturas:', error.message);
+            }
+        }
+
+        // At most one counted open per article per browser every 24 hours.
+        async function recordArticleRead(article) {
+            if (!db || !article?.remote) return;
+            const key = 'ae_article_read_24h_' + article.id;
+            let lastViewed = 0;
+            try { lastViewed = Number(localStorage.getItem(key)) || 0; } catch {}
+            if (Date.now() - lastViewed < 86400000) return;
+            try {
+                const {data, error} = await db.rpc('ae_record_article_view', {p_article_id: article.id});
+                if (error) throw error;
+                if (data == null) return;
+                try { localStorage.setItem(key, String(Date.now())); } catch {}
+                article.views = Number(data) || 0;
+                renderTrending();
+            } catch (error) {
+                console.warn('No se pudo registrar la lectura:', error.message);
+            }
+        }
+
         function renderTrending() {
             const container = document.getElementById('trendingList');
-            const sortedByLikes = [...articles].sort((a, b) => b.likes - a.likes).slice(0, 4);
-
-            container.innerHTML = sortedByLikes.map((art, idx) => `
-                <div onclick="openArticleModal(${articleIdArgument(art.id)})" class="flex items-center space-x-3 cursor-pointer group p-2 rounded-xl hover:bg-slate-50 transition-colors">
-                    <span class="text-xl font-black text-slate-300 group-hover:text-pitch-600 transition-colors w-6 text-center">0${idx + 1}</span>
-                    <div class="flex-1">
-                        <span class="text-[10px] font-bold text-pitch-700 uppercase tracking-wider">${escapeHTML(art.category)}</span>
-                        <h4 class="text-xs font-bold text-slate-800 group-hover:text-pitch-600 leading-snug line-clamp-2">
-                            ${escapeHTML(art.title)}
-                        </h4>
-                    </div>
-                </div>
-            `).join('');
+            if (!container) return;
+            const ranked = articles.filter(article => article.remote && article.title)
+                .sort((a,b) => (Number(b.views)||0) - (Number(a.views)||0)
+                    || new Date(b.createdAt) - new Date(a.createdAt))
+                .slice(0,5);
+            if (!ranked.length) {
+                container.innerHTML = '<li class="ae-trending-empty">Todavía no hay artículos publicados para este ranking.</li>';
+                return;
+            }
+            container.innerHTML = ranked.map((article, index) => {
+                const views = Number(article.views)||0;
+                return '<li class="ae-trending-item">'
+                    + '<span class="ae-trending-rank">' + (index+1) + '</span>'
+                    + '<button type="button" class="ae-trending-link" onclick="openArticleModal(' + articleIdArgument(article.id) + ')">'
+                    + '<span class="ae-trending-category">' + escapeHTML(article.category) + '</span>'
+                    + '<span class="ae-trending-title">' + escapeHTML(article.title) + '</span></button>'
+                    + '<span class="ae-trending-meta" aria-label="' + views + ' aperturas contabilizadas">'
+                    + '<i class="fa-regular fa-eye" aria-hidden="true"></i> ' + views + '</span></li>';
+            }).join('');
         }
 
         function openPublishModal() {
