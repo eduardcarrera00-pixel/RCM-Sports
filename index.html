@@ -291,7 +291,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/unified-editorial.css?v=20261015-ticker-only">
 <link rel="stylesheet" href="assets/community-picks.css?v=1">
 <link rel="stylesheet" href="assets/username-auth.css?v=2">
-<link rel="stylesheet" href="assets/ae-premium-home.css?v=20261015-2">
+<link rel="stylesheet" href="assets/ae-premium-home.css?v=20261015-3">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 
@@ -477,6 +477,10 @@ html.dark [data-reading-size][aria-pressed="true"] {
                 </section>
 
         <section class="rcm-panel editorial-community" aria-labelledby="communityTitle"><div class="ae-section-heading"><span class="ae-overline">LA COMUNIDAD OPINA</span><h2 id="communityTitle">Las voces de AE SPORTS</h2><p>Los comentarios más apoyados y más cuestionados, según votos reales.</p></div><div id="communityLeaders" aria-live="polite">Cargando comentarios destacados…</div></section>
+        <section class="rcm-panel editorial-trending" aria-labelledby="trendingTitle" hidden>
+    <div class="ae-section-heading"><span class="ae-overline">LECTURAS DE LA COMUNIDAD</span><h2 id="trendingTitle">Lo más leído · Top 5</h2><p>Artículos más abiertos desde que contabilizamos lecturas.</p></div>
+    <ol id="trendingList" class="ae-trending-list" aria-live="polite"></ol>
+</section>
                 <!-- Interactive Daily Poll Widget -->
                 <div hidden class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm grass-glow relative overflow-hidden">
                     <div class="flex items-center space-x-2 text-pitch-600 text-xs font-bold uppercase tracking-widest mb-3">
@@ -496,23 +500,6 @@ html.dark [data-reading-size][aria-pressed="true"] {
                         <!-- Total Votes -->
                     </div>
                 </div>
-
-                <!-- Trending / Most Liked Articles -->
-                <div hidden class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
-                    <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
-                        <h3 class="font-bold text-sm uppercase tracking-wider text-slate-900 flex items-center">
-                            <i class="fa-solid fa-fire text-amber-500 mr-2 text-base"></i>
-                            Lo Más Leído
-                        </h3>
-                        <span class="text-[10px] bg-pitch-100 text-pitch-800 font-bold px-2 py-0.5 rounded-full">TENDENCIA</span>
-                    </div>
-
-                    <p class="text-xs text-slate-500 mb-3">Selección ordenada por los likes de la comunidad. Todavía no medimos lecturas reales.</p>
-                    <div id="trendingList" class="space-y-4">
-                        <!-- Trending items injected by JS -->
-                    </div>
-                </div>
-
 
                 <!-- Newsletter Subscription Card -->
                 <div hidden class="bg-gradient-to-br from-pitch-900 to-darkslate rounded-2xl p-6 text-white shadow-xl relative overflow-hidden">
@@ -1223,6 +1210,7 @@ currentUser = {
                 renderTrending();
                 refreshCommunity();
                 await refreshArticleStats();
+                await loadArticleViews();
                 setDataStatus('');
             } catch {
                 setDataStatus('No se pudieron cargar las publicaciones en línea. Comprueba tu conexión y recarga la página.');
@@ -1287,6 +1275,7 @@ currentUser = {
             if (typeof renderCommunityPicksVisibility === 'function') renderCommunityPicksVisibility();
             document.getElementById('editorialBottom').hidden = currentCategory !== 'Todos' || Boolean(currentSearchQuery);
             document.querySelector('.editorial-pick').hidden = currentCategory !== 'Todos' || Boolean(currentSearchQuery);
+            document.querySelector('.editorial-trending').hidden = currentCategory !== 'Todos' || Boolean(currentSearchQuery);
             document.getElementById('nflRankings').classList.toggle('hidden', currentCategory !== 'NFL');
             if (typeof renderChampionsVisibility === 'function') renderChampionsVisibility();
             document.getElementById('footballTeams').classList.toggle('hidden', currentCategory !== 'Fútbol');
@@ -1583,6 +1572,7 @@ loadCommentsFromSupabase(article.id);
 
             document.getElementById('articleModal').classList.remove('hidden');
             syncModalScrollLock();
+            void recordArticleRead(article);
         }
 
         function closeModal() {
