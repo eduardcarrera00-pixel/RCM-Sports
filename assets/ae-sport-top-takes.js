@@ -18,7 +18,17 @@
      const li=el('li',undefined,'ae-sport-take-item');
      li.append(el('span',String(i+1).padStart(2,'0'),'ae-top-take-number'));
      const content=el('div',undefined,'ae-top-take-content');
-     content.append(el('span',names[t.sport]||'Fútbol','ae-top-take-sport'));
+     // Etiqueta del deporte y autor comparten una única línea editorial.
+     const meta=el('div',undefined,'ae-sport-take-meta');
+     meta.append(el('span',names[t.sport]||'Fútbol','ae-top-take-sport'));
+     const author=el('button','@'+(t.author||'Aficionado'),'ae-top-take-author');
+     author.type='button';
+     author.setAttribute('aria-label','Ver perfil de '+(t.author||'Aficionado'));
+     author.addEventListener('click',()=>{
+       if(typeof openAePublicProfile==='function')openAePublicProfile(t.author_id);
+     });
+     meta.append(author);
+     content.append(meta);
      const title=el('strong',undefined,'ae-sport-take-title');
      const openTake=el('button',t.title,'ae-sport-take-open');
      openTake.type='button';
@@ -28,11 +38,6 @@
      content.append(title);
      const excerpt=String(t.body||'').replace(/^NFL[^\n]*\n\n/,'').trim();
      if(excerpt)content.append(el('p',excerpt.length>145?excerpt.slice(0,142).trimEnd()+'…':excerpt,'ae-sport-take-summary'));
-     const author=el('button','@'+(t.author||'Aficionado'),'ae-top-take-author');
-     author.type='button';author.addEventListener('click',()=>{
-       if(typeof openAePublicProfile==='function')openAePublicProfile(t.author_id);
-     });
-     content.append(author);
      const score=el('span',undefined,'ae-top-take-votes');
      score.append(el('span','▲ '+Number(t.upvotes||0),'ae-top-take-up'),el('span','▼ '+Number(t.downvotes||0),'ae-top-take-down'));
      const reply=el('button','Responder','ae-top-take-reply');
