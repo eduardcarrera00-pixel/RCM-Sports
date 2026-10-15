@@ -1,0 +1,180 @@
+/* AE SPORTS · portada compacta y escudos transparentes en los dos
+   Power Rankings del inicio. No altera las páginas NFL, Fútbol ni Picks. */
+
+/* Los rankings en la portada reutilizan el mismo escudo sin anillo/fondo
+   que la insignia del primer puesto en las páginas deportivas. */
+html body #homeRankingLink .editorial-ranking-list .ae-team-emblem,
+html body #homeChampionsLink .editorial-ranking-list .ae-team-emblem,
+html.dark body #homeRankingLink .editorial-ranking-list .ae-team-emblem,
+html.dark body #homeChampionsLink .editorial-ranking-list .ae-team-emblem {
+  box-sizing:border-box!important;
+  position:relative!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  padding:2px!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  background-color:transparent!important;
+  box-shadow:none!important;
+  overflow:visible!important;
+}
+html body #homeRankingLink .editorial-ranking-list .ae-team-emblem img,
+html body #homeChampionsLink .editorial-ranking-list .ae-team-emblem img {
+  box-sizing:border-box!important;
+  display:block!important;
+  position:absolute!important;
+  inset:2px!important;
+  width:calc(100% - 4px)!important;
+  height:calc(100% - 4px)!important;
+  max-width:100%!important;
+  max-height:100%!important;
+  padding:0!important;
+  margin:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  object-fit:contain!important;
+  object-position:center!important;
+  transform:none!important;
+  clip-path:none!important;
+  filter:drop-shadow(0 2px 3px rgba(2,12,22,.18));
+}
+/* Cuando falla una imagen, las iniciales del equipo mantienen contraste
+   sin recuperar el antiguo círculo beige. */
+#homeRankingLink .editorial-ranking-list .ae-team-emblem:not(.ae-logo-loaded) .ae-logo-initials,
+#homeChampionsLink .editorial-ranking-list .ae-team-emblem:not(.ae-logo-loaded) .ae-logo-initials {
+  color:#f5ddc7!important;
+  font-size:11px!important;
+  text-shadow:0 1px 4px rgba(5,18,27,.65);
+}
+#homeRankingLink .editorial-ranking-list .ae-team-emblem.ae-logo-loaded .ae-logo-initials,
+#homeChampionsLink .editorial-ranking-list .ae-team-emblem.ae-logo-loaded .ae-logo-initials {
+  opacity:0!important;
+}
+
+/* El recorte vertical se aplica SOLO al inicio AE SPORTS. Las otras
+   categorías y las vistas de artículo mantienen sus dimensiones actuales. */
+body.ae-is-home #mainContent {
+  padding-top:2px!important;
+}
+body.ae-is-home > header + div {
+  padding-top:4px!important;
+}
+body.ae-is-home #heroSection {
+  padding:0!important;
+  margin:0!important;
+}
+body.ae-is-home #heroSection .editorial-hero,
+html.dark body.ae-is-home #heroSection .editorial-hero {
+  box-sizing:border-box!important;
+  height:clamp(205px,17vw,235px)!important;
+  min-height:0!important;
+  margin-top:0!important;
+  margin-bottom:12px!important;
+  overflow:hidden!important;
+}
+body.ae-is-home #heroSection .editorial-hero-copy {
+  box-sizing:border-box!important;
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:center!important;
+  align-items:flex-start!important;
+  width:100%;
+  height:100%!important;
+  max-width:660px!important;
+  min-height:0!important;
+  padding:14px clamp(20px,2.8vw,38px)!important;
+}
+body.ae-is-home #heroSection .editorial-hero h1 {
+  display:-webkit-box!important;
+  -webkit-box-orient:vertical!important;
+  -webkit-line-clamp:2!important;
+  line-clamp:2!important;
+  overflow:hidden!important;
+  font-size:clamp(26px,2.75vw,39px)!important;
+  line-height:1.06!important;
+  max-width:600px!important;
+  margin:0 0 8px!important;
+}
+body.ae-is-home #heroSection .editorial-hero-copy>p:not(.editorial-eyebrow) {
+  display:-webkit-box!important;
+  -webkit-box-orient:vertical!important;
+  -webkit-line-clamp:2!important;
+  line-clamp:2!important;
+  overflow:hidden!important;
+  font-size:clamp(12px,1vw,14px)!important;
+  line-height:1.45!important;
+  margin:0!important;
+  max-width:440px!important;
+}
+body.ae-is-home #heroSection .editorial-actions {
+  display:flex!important;
+  align-items:center!important;
+  flex-wrap:wrap!important;
+  gap:7px!important;
+  margin:10px 0 0!important;
+}
+body.ae-is-home #heroSection .editorial-actions button {
+  min-height:36px!important;
+  padding:8px 13px!important;
+  margin:0!important;
+  font-size:11px!important;
+  line-height:1.2!important;
+}
+/* Imagen continúa hasta los extremos del banner; el texto no tapa
+   por completo la parte visual. */
+body.ae-is-home #heroSection .editorial-hero-image {
+  height:100%!important;
+  object-fit:cover!important;
+}
+@media(max-width:800px) {
+  body.ae-is-home #heroSection .editorial-hero h1 {
+    font-size:clamp(26px,4vw,33px)!important;
+  }
+  body.ae-is-home #heroSection .editorial-hero-copy {
+    max-width:600px!important;
+  }
+}
+@media(max-width:760px) {
+  body.ae-is-home #heroSection .editorial-hero,
+  html.dark body.ae-is-home #heroSection .editorial-hero {
+    height:auto!important;
+    min-height:220px!important;
+    max-height:none!important;
+  }
+  body.ae-is-home #heroSection .editorial-hero-copy {
+    height:auto!important;
+    min-height:220px!important;
+    padding:18px 19px!important;
+    max-width:100%!important;
+  }
+  body.ae-is-home #heroSection .editorial-hero h1 {
+    font-size:clamp(25px,6.2vw,32px)!important;
+    max-width:95%!important;
+  }
+  body.ae-is-home #heroSection .editorial-hero-copy>p:not(.editorial-eyebrow) {
+    max-width:85%!important;
+  }
+  body.ae-is-home #heroSection .editorial-actions button {
+    min-height:34px!important;
+    padding:7px 11px!important;
+  }
+}
+@media(max-width:390px) {
+  body.ae-is-home #heroSection .editorial-hero-copy {
+    padding:15px 16px!important;
+    min-height:225px!important;
+  }
+  body.ae-is-home #heroSection .editorial-hero h1 {
+    font-size:25px!important;
+  }
+  body.ae-is-home #heroSection .editorial-actions {
+    gap:5px!important;
+    margin-top:8px!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  body.ae-is-home #heroSection .editorial-hero * {transition:none!important}
+}
