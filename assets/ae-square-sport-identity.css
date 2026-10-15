@@ -379,3 +379,54 @@ html body #footballTakes .ae-picks-rail .ae-picks-rail-heading{
     overflow-x:auto!important;
   }
 }
+/* Contraste correcto también cuando el visitante elige modo claro: los módulos
+   ilustrados siguen siendo nocturnos, pero los artículos normales siguen claros. */
+html:not(.dark) body #aeSportTakeLeaders .ae-sport-take-title,
+html:not(.dark) body #aeSportTakeLeaders .ae-sport-take-summary,
+html:not(.dark) body #aeSportTakeLeaders .ae-sport-takes-group h3,
+html:not(.dark) body #aeSportTakeLeaders #aeSportTakeStatus,
+html:not(.dark) body #aeSportTakeLeaders .ae-top-takes-empty,
+html:not(.dark) body #aeSportTakeLeaders .ae-top-take-content,
+html:not(.dark) body #freeTakes .ae-takes-history-heading,
+html:not(.dark) body #freeTakes .ae-feed-take-open,
+html:not(.dark) body #freeTakes .ae-free-take-body,
+html:not(.dark) body #freeTakes .ae-free-take-score,
+html:not(.dark) body #freeTakes .ae-take-empty,
+html:not(.dark) body #aeHomeTopTakes .ae-top-take-title,
+html:not(.dark) body #aeHomeTopTakes .ae-top-take-sport,
+html:not(.dark) body #aeHomeTopTakes .ae-top-take-votes small,
+html:not(.dark) body #aeHomeTopTakes .ae-top-takes-empty{
+  color:#f3e7dc!important;
+}
+html:not(.dark) body #freeTakes .ae-free-take-card{
+  color:#f4e8dc!important;
+  border-color:#8daaba66!important;
+}
+html:not(.dark) body #freeTakes .ae-free-take-card .ae-take-author-link,
+html:not(.dark) body #aeSportTakeLeaders .ae-top-take-author,
+html:not(.dark) body #aeHomeTopTakes .ae-top-take-author{color:#d7bb9c!important}
+html:not(.dark) body #freeTakes .ae-free-controls label,
+html:not(.dark) body #freeTakes .ae-takes-status,
+html:not(.dark) body #freeTakes #freeTakesStatus{color:#e5dcd4!important}
+html:not(.dark) body #freeTakes .ae-free-controls select{
+  color:#f3eadd!important;background:#153346!important;
+}
+html:not(.dark) body #aeHomeTopTakes .ae-top-takes-heading h2,
+html:not(.dark) body #aeHomeTopTakes .ae-top-takes-heading span{color:#fff1e5!important}
+html:not(.dark) body #footballTakes .ae-picks-rail #picksNewsTitle,
+html:not(.dark) body #footballTakes .ae-picks-rail #picksPopularTitle,
+html:not(.dark) body #footballTakes .ae-picks-rail #picksRankingTitle,
+html:not(.dark) body #footballTakes .ae-picks-rail #picksNews .ae-picks-news-copy h4,
+html:not(.dark) body #footballTakes .ae-picks-rail .ae-popular-copy strong,
+html:not(.dark) body #footballTakes .ae-picks-rail #cpLeaderboard,
+html:not(.dark) body #footballTakes .ae-picks-rail .ae-picks-ranking-intro{
+  color:#fff0e1!important;
+}
+html:not(.dark) body #footballTakes .ae-picks-rail #picksNews .ae-picks-news-heading p,
+html:not(.dark) body #footballTakes .ae-picks-rail .ae-picks-rail-heading p,
+html:not(.dark) body #footballTakes .ae-picks-rail .ae-popular-copy small{
+  color:#c9d6d8!important;
+}
+html:not(.dark) body #footballTakes .ae-picks-rail .ae-takes-side button{
+  color:#f8e9d8!important;
+}
