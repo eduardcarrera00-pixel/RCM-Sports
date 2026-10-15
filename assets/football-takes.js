@@ -147,5 +147,6 @@
    $('takesReload')?.addEventListener('click',load);
    db?.auth.onAuthStateChange(()=>setTimeout(()=>{if(typeof currentCategory!=='undefined'&&currentCategory==='Picks')load();},150));
    visibility();
+   if(typeof currentCategory==='undefined'||currentCategory!=='Picks') load();
  });
 })();
