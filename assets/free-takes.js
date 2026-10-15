@@ -12,7 +12,7 @@
  function render(){
    const area=$('freeTakesFeed');if(!area)return;
    area.replaceChildren();
-   const sorted=items.filter(t=>activeSection==='NFL'?t.sport==='nfl':footballSports.has(t.sport));if(order==='top')sorted.sort((a,b)=>(b.upvotes-b.downvotes)-(a.upvotes-a.downvotes)||new Date(b.created_at)-new Date(a.created_at));
+   const sorted=items.filter(t=>activeSection==='NFL'?(t.sport==='nfl'&&(!window.aeNflTakes||window.aeNflTakes.matches(t))):footballSports.has(t.sport));if(order==='top')sorted.sort((a,b)=>(b.upvotes-b.downvotes)-(a.upvotes-a.downvotes)||new Date(b.created_at)-new Date(a.created_at));
    if(!sorted.length){area.append(el('p','Todavía no hay Takes. Comparte una opinión para abrir la conversación.','ae-take-empty'));return;}
    for(const t of sorted){
      const card=el('article',null,'ae-take-card ae-free-take-card');
@@ -50,7 +50,7 @@
      busy=true;render();
      const r=await db.rpc('ae_vote_free_take',{p_take_id:t.id,p_value:value});
      if(r.error)throw r.error;
-     await load();
+     await load();document.dispatchEvent(new Event('ae:takes-updated'));
    }catch(e){status(e.message||'No se pudo votar.');}
    finally{busy=false;render();}
  }
@@ -60,9 +60,11 @@
    try{
      if(!await requireLogin())return;
      busy=true;send.disabled=true;
-     const r=await db.rpc('ae_post_free_take',{p_sport:form.elements.sport.value,p_title:form.elements.title.value.trim(),p_body:form.elements.body.value.trim()});
+     const body=activeSection==='NFL'&&window.aeNflTakes?window.aeNflTakes.body(form.elements.body.value.trim()):form.elements.body.value.trim();
+     if(body.length>1800)throw Error('El Take debe tener menos de 1800 caracteres, incluyendo el equipo y división.');
+     const r=await db.rpc('ae_post_free_take',{p_sport:form.elements.sport.value,p_title:form.elements.title.value.trim(),p_body:body});
      if(r.error)throw r.error;
-     form.reset();filter=activeSection==='NFL'?'nfl':'all';$('freeTakesSportFilter').value=filter;form.elements.sport.value=activeSection==='NFL'?'nfl':'laliga';await load();status('Tu Take se publicó correctamente.');
+     form.reset();filter=activeSection==='NFL'?'nfl':'all';$('freeTakesSportFilter').value=filter;form.elements.sport.value=activeSection==='NFL'?'nfl':'laliga';await load();status('Tu Take se publicó correctamente.');document.dispatchEvent(new Event('ae:takes-updated'));
    }catch(err){status(err.message||'No se pudo publicar.');}
    finally{busy=false;send.disabled=false;}
  }
@@ -81,6 +83,7 @@
      $('freeTakesTitle').textContent=nfl?'Takes de la comunidad · NFL':'Takes de la comunidad · Fútbol';
      $('freeTakeSportLabel').hidden=nfl;
      $('freeTakesFilterWrap').hidden=nfl;
+     if(window.aeNflTakes)window.aeNflTakes.visibility(nfl);
      for(const option of sport.options){
        const available=nfl?option.value==='nfl':footballSports.has(option.value);
        option.hidden=!available;option.disabled=!available;
@@ -99,6 +102,8 @@
    $('freeTakesForm')?.addEventListener('submit',create);
    $('freeTakesSportFilter')?.addEventListener('change',e=>{filter=e.target.value;load();});
    $('freeTakesSort')?.addEventListener('change',e=>{order=e.target.value;render();});
+   if(window.aeNflTakes)window.aeNflTakes.init();
+   document.addEventListener('ae:nfl-filter-updated',render);
    db?.auth.onAuthStateChange(()=>setTimeout(()=>{if(typeof currentCategory!=='undefined'&&(currentCategory==='Fútbol'||currentCategory==='NFL'))load();},150));
    visibility();
  });
