@@ -14,6 +14,7 @@
    item.textContent=label;
    select.append(item);
  }
+ let active=false;
  function init() {
    for(const key of ['aeNflDivision','aeNflFeedDivision']){
      const select=$(key);if(!select||select.options.length>1)continue;
