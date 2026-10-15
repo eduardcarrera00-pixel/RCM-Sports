@@ -10,6 +10,8 @@
    if(isPreview){
      const go=()=>{
        if(typeof filterByCategory==='function')filterByCategory('Picks');
+       const detail=$('picksFeaturedCard')?.querySelector('details');
+       if(detail)detail.open=true;
        $('picksFeatured')?.scrollIntoView({behavior:'smooth',block:'start'});
      };
      box.setAttribute('role','button');box.tabIndex=0;
@@ -22,12 +24,16 @@
      box.append(selection,make('span','Ver análisis completo →','ae-weekly-link'));
      return box;
    }
-   box.append(make('p','AE SPORTS · PICK EDITORIAL','ae-weekly-kicker'),make('h3',p.title,'ae-weekly-title'));
-   box.append(make('p',p.event_name,'ae-weekly-event'));
-   const row=make('div',undefined,'ae-weekly-selection');
-   row.append(make('strong',p.selection),make('span','Cuota '+odds(p.american_odds),'ae-weekly-odds'));
-   box.append(row,make('p',p.analysis,'ae-weekly-analysis'));
-   box.append(make('small','Cuota publicada por AE SPORTS; no verificada en tiempo real. Sin apuestas en esta página.','ae-weekly-disclaimer'));
+   const details=make('details',undefined,'ae-weekly-expandable');
+   const summary=make('summary',undefined,'ae-weekly-expand-summary');
+   summary.append(make('strong',p.title,'ae-weekly-title'));
+   summary.append(make('span',p.selection,'ae-weekly-compact-selection'));
+   summary.append(make('span','Cuota '+odds(p.american_odds),'ae-weekly-odds'));
+   summary.append(make('span','Ver análisis y detalles ↓','ae-weekly-expand-hint'));
+   const expanded=make('div',undefined,'ae-weekly-expanded-content');
+   expanded.append(make('p',p.event_name,'ae-weekly-event'),make('p',p.analysis,'ae-weekly-analysis'));
+   expanded.append(make('small','Cuota publicada por AE SPORTS; no verificada en tiempo real. Sin apuestas en esta página.','ae-weekly-disclaimer'));
+   details.append(summary,expanded);box.append(details);
    return box;
  }
  function render(){
