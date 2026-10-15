@@ -2,6 +2,39 @@
 // Public anon JWT for the Edge gateway; account access still requires password/code.
 const authGatewayKey="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InphaHVobXZtcXZ4YXVucWVicWFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTExNDQ1MTcsImV4cCI6MjEwNjcyMDUxN30.0tszsvlScd-IG4YoJ0LMs9F4J-q1ukiMTHeWFixom7o";
 let authMode='login',authRecoveryNeedsLogin=false;
+/* El login es repetible, pero registrar y recuperar contraseñas NO: no se
+   reintentan automáticamente para evitar cuentas o códigos duplicados. */
+async function aeAuthRequest(payload){
+ if(!db?.supabaseUrl||!db?.supabaseKey)throw Error('No se pudo inicializar la conexión con AE SPORTS. Recarga la página.');
+ const endpoint=db.supabaseUrl+'/functions/v1/username-auth';
+ const maxAttempts=payload.action==='login'?2:1;
+ for(let attempt=0;attempt<maxAttempts;attempt++){
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),15000);
+  try{
+   const response=await fetch(endpoint,{
+    method:'POST',
+    headers:{'Content-Type':'application/json','apikey':db.supabaseKey,'Authorization':'Bearer '+authGatewayKey},
+    body:JSON.stringify(payload),
+    signal:controller.signal
+   });
+   const result=await response.json().catch(()=>null);
+   if(!response.ok)throw Error(result?.error||'El servicio de cuentas devolvió un error. Inténtalo de nuevo.');
+   if(!result||typeof result!=='object')throw Error('Respuesta inválida del servicio de cuentas. Vuelve a intentarlo.');
+   return result;
+  }catch(error){
+   const detail=String(error?.message||'');
+   const timeout=error?.name==='AbortError';
+   const network=timeout||/failed to fetch|networkerror|network request failed|load failed/i.test(detail);
+   if(!network)throw error;
+   if(attempt+1<maxAttempts)continue;
+   throw Error(timeout
+    ?'La conexión con el servicio de cuentas tardó demasiado. Inténtalo de nuevo.'
+    :'No pudimos conectar con el servicio de cuentas. Comprueba tu conexión, recarga la página e inténtalo otra vez.');
+  }finally{clearTimeout(timer);}
+ }
+ throw Error('No pudimos conectar con el servicio de cuentas.');
+}
 function setAuthMode(mode){
  authMode=mode;const extra=mode==='register'||mode==='recover';
  document.getElementById('authConfirmWrap').hidden=!extra;document.getElementById('authPasswordConfirm').required=extra;
@@ -21,8 +54,7 @@ async function handleUserLogin(event){
  setAuthBusy(true);document.getElementById('userAuthError').classList.add('hidden');
  try{
   if(!db)throw Error('No se pudo conectar.');
-  const response=await fetch(db.supabaseUrl+'/functions/v1/username-auth',{method:'POST',headers:{'Content-Type':'application/json','apikey':db.supabaseKey,'Authorization':'Bearer '+authGatewayKey},body:JSON.stringify({action:authMode,username,password,recovery_code:document.getElementById('authRecoveryCode').value})});
-  const result=await response.json();if(!response.ok)throw Error(result.error||'No se pudo completar la solicitud.');
+  const result=await aeAuthRequest({action:authMode,username,password,recovery_code:document.getElementById('authRecoveryCode').value});
   let sessionError=false;
   if(result.session){const saved=await db.auth.setSession({access_token:result.session.access_token,refresh_token:result.session.refresh_token});if(saved.error)sessionError=true;else{currentUser={id:saved.data.user.id,username:result.username};await loadAdminSession();updateCommentAuthUI();}}
   if(result.recovery_code){authRecoveryNeedsLogin=!!result.recovered||!result.session||sessionError;document.getElementById('userAuthForm').hidden=true;document.getElementById('authRecoveryResult').hidden=false;document.getElementById('authRecoveryOutput').value=result.recovery_code;document.getElementById('authRecoveryMessage').textContent=result.recovered?'Contraseña actualizada. Guarda este código e inicia sesión.':authRecoveryNeedsLogin?'Cuenta preparada. Guarda este código y vuelve a iniciar sesión.':'Tu cuenta está lista y la sesión está abierta.';document.getElementById('authRecoveryOutput').focus();}
