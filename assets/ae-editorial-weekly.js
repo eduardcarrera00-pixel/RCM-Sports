@@ -29,7 +29,7 @@
    }
  }
  async function load(){
-   if(refreshing||!window.db)return;
+   if(refreshing||!(typeof db!=='undefined' && db))return;
    refreshing=true;
    try{
      const {data,error}=await db.from('ae_editorial_weekly_picks')
@@ -92,7 +92,7 @@
  document.addEventListener('DOMContentLoaded',()=>{
    $('aeWeeklyPickForm')?.addEventListener('submit',publish);
    adminVisibility();load();renderNews();
-   if(window.db)db.auth.onAuthStateChange(()=>setTimeout(adminVisibility,100));
+   if((typeof db!=='undefined' && db))db.auth.onAuthStateChange(()=>setTimeout(adminVisibility,100));
    document.addEventListener('visibilitychange',()=>{if(!document.hidden)load();});
  });
 })();
