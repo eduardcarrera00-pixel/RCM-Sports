@@ -10,17 +10,52 @@ async function account(){if(!db)throw Error('Sin conexión.');const r=await db.a
 function link(id){const u=new URL(location.href);u.searchParams.delete('article');u.searchParams.delete('comment');u.searchParams.set('pick',id);u.hash='';return u.href;}
 function open(id){history.pushState({},'',link(id));showDetail(id);}
 function card(p,compact=false){
- const n=el('article',null,'cp-card');n.append(el('p',p.author+' · '+new Date(p.created_at).toLocaleDateString('es'),'cp-meta'));
- const title=el('h3');const a=el('a',p.title);a.href=link(p.id);a.onclick=e=>{if(e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;e.preventDefault();open(p.id);};title.append(a);n.append(title);
- for(const leg of p.legs||[]){n.append(el('p',leg.sport+' · '+leg.event,'cp-meta'),el('p',leg.selection));}
- n.append(el('strong','Cuota '+(Number(p.american_odds)>0?'+':'')+p.american_odds+' · '+Number(p.decimal_odds).toFixed(2)+' decimal','cp-odds'));
- n.append(el('small',p.moderation_status==='approved'?'Cuota revisada por AE SPORTS · Pick aprobado':p.moderation_status==='rejected'?'Cuota rechazada · No participa en las votaciones':'Pendiente de revisión de cuota por AE SPORTS','cp-meta'));
+ const n=el('article',null,'cp-card');
+ const first=Array.isArray(p.legs)&&p.legs.length?p.legs[0]:null;
+ const header=el('div',null,'cp-card-header');
+ header.append(el('span','@'+(p.author||'Aficionado')));
+ const date=new Date(p.created_at);
+ if(!Number.isNaN(date.getTime()))header.append(el('time',date.toLocaleDateString('es',{day:'numeric',month:'short',year:'numeric'})));
+ if(first?.sport)header.append(el('span',String(first.sport),'cp-card-sport'));
+ n.append(header);
+ const title=el('h3',null,'cp-card-title');
+ const a=el('a',p.title);
+ a.href=link(p.id);
+ a.onclick=e=>{if(e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;e.preventDefault();open(p.id);};
+ title.append(a);n.append(title);
+ const legs=el('div',null,'cp-card-legs');
+ for(const leg of p.legs||[]){
+   const row=el('p');
+   row.append(el('span',String(leg.event||leg.sport||'Evento')));
+   if(leg.selection)row.append(el('strong',' · '+leg.selection));
+   legs.append(row);
+ }
+ n.append(legs);
+ const odds=el('div',null,'cp-card-odds');
+ odds.append(el('strong','Cuota '+(Number(p.american_odds)>0?'+':'')+p.american_odds,'cp-odds'));
+ odds.append(el('small',p.moderation_status==='approved'?'Cuota aprobada':p.moderation_status==='rejected'?'Cuota rechazada':'En revisión','cp-card-state'));
+ n.append(odds);
  if(p.explanation)n.append(el('p',p.explanation,'cp-explanation'));
  const controls=el('div',null,'cp-actions');
- for(const [value,label,count] of (p.moderation_status==='approved'?[[1,'▲',p.upvotes],[-1,'▼',p.downvotes]]:[])){
- const b=button(label+' '+count,()=>vote(p,value,b));b.setAttribute('aria-label',(value===1?'Apoyar':'Cuestionar')+' Pick de '+p.author);b.setAttribute('aria-pressed',String(Number(p.my_vote)===value));controls.append(b);}
- controls.append(el('span','Balance '+p.score),button('Respuestas · '+p.comments_count,()=>open(p.id)));n.append(controls);
- if(currentAdmin&&!compact)n.append(button('Ocultar Pick',async()=>{const r=await db.from('ae_community_picks').update({hidden:true}).eq('id',p.id);if(r.error)notifyCommunity(message(r.error),true);else{closeDetail();load();}}));
+ if(p.moderation_status==='approved'){
+  for(const [value,label,count] of [[1,'▲',p.upvotes],[-1,'▼',p.downvotes]]){
+    const b=button(label+' '+Number(count||0),()=>vote(p,value,b));
+    b.setAttribute('aria-label',(value===1?'Apoyar':'Cuestionar')+' Pick de '+(p.author||'la comunidad'));
+    b.setAttribute('aria-pressed',String(Number(p.my_vote)===value));
+    controls.append(b);
+  }
+ }
+ controls.append(el('span','Balance '+Number(p.score||0),'cp-vote-score'));
+ controls.append(button('Respuestas · '+Number(p.comments_count||0),()=>open(p.id)));
+ n.append(controls);
+ if(typeof currentAdmin!=='undefined'&&currentAdmin&&!compact){
+   const hide=button('Ocultar Pick',async()=>{
+     const r=await db.from('ae_community_picks').update({hidden:true}).eq('id',p.id);
+     if(r.error)notifyCommunity(message(r.error),true);
+     else{closeDetail();load();}
+   });
+   hide.className='cp-card-admin';n.append(hide);
+ }
  return n;
 }
 async function vote(p,value,b){if(p.moderation_status!=='approved')return;b.disabled=true;try{const user=await account();if(!user)return;if(user.id===p.user_id)throw Error('No puedes votar tu propio Pick.');
