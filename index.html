@@ -293,13 +293,14 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/ae-custom-nav-icons.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-classical-auth-buttons.css?v=20261016-3">
 <link rel="stylesheet" href="assets/ae-reference-community-design.css?v=20261016-1">
+<link rel="stylesheet" href="assets/ae-mobile-header-ranking-polish.css?v=20261016-1">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 <a class="ae-skip-link" href="#mainContent">Ir al contenido</a>
 
     <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-20">
+            <div class="ae-mobile-header-grid flex items-center justify-between h-20">
 
                 <!-- Emblema original separado de un wordmark textual sin recortes del logo antiguo. -->
                 <a href="#" onclick="filterByCategory('Todos'); return false;" class="ae-brand ae-brand-gold ae-brand-runner ae-brand-runner-clean group" aria-label="AE SPORTS — TU BLOG DE DEPORTE, ir al inicio">
@@ -320,7 +321,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
                 </nav>
 
                 <!-- Admin Status & Header Actions -->
-                <div class="flex items-center space-x-3"> <button
+                <div class="ae-header-actions flex items-center space-x-3"> <button
     id="themeToggle"
     type="button"
     onclick="toggleDarkMode()"
@@ -574,7 +575,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
                 <div id="editorialBottom" class="editorial-bottom">
             <section class="rcm-panel editorial-ranking" aria-labelledby="homeRankingTitle">
                 <a href="#nflRankings" id="homeRankingLink" class="ae-ranking-card-link" onclick="event.preventDefault(); openNflTopTen();" aria-label="Abrir clasificación completa NFL Power Rankings, Top 10">
-                    <div class="editorial-module-heading"><h2 id="homeRankingTitle">NFL Power Rankings <span id="homeRankingEdition"></span></h2><span class="ae-ranking-link-arrow" aria-hidden="true">↗</span></div>
+                    <div class="editorial-module-heading"><h2 id="homeRankingTitle">NFL Power Rankings <span id="homeRankingEdition"></span></h2><span class="ae-ranking-link-arrow" aria-hidden="true"><svg class="ae-ranking-open-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M7 17 17 7M8 7h9v9"/></svg></span></div>
                     <p id="homeRankingStatus" role="status">Cargando ranking…</p>
                     <ol id="homeRankingList" class="editorial-ranking-list"></ol>
                     <span class="ae-ranking-hint">Selecciona para ver el Top 10 <span aria-hidden="true">→</span></span>
@@ -582,7 +583,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
             </section>
             <section class="rcm-panel editorial-ranking" aria-labelledby="homeChampionsTitle">
                 <a href="#championsRankings" id="homeChampionsLink" class="ae-ranking-card-link" onclick="event.preventDefault(); openChampionsTopTen();" aria-label="Abrir clasificación completa Champions League, Top 10">
-                    <div class="editorial-module-heading"><h2 id="homeChampionsTitle">Champions League <span id="homeChampionsEdition"></span></h2><span class="ae-ranking-link-arrow" aria-hidden="true">↗</span></div>
+                    <div class="editorial-module-heading"><h2 id="homeChampionsTitle">Champions League <span id="homeChampionsEdition"></span></h2><span class="ae-ranking-link-arrow" aria-hidden="true"><svg class="ae-ranking-open-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M7 17 17 7M8 7h9v9"/></svg></span></div>
                     <p id="homeChampionsStatus" role="status">Comprobando ediciones publicadas…</p>
                     <ol id="homeChampionsList" class="editorial-ranking-list"></ol>
                     <span class="ae-ranking-hint">Selecciona para ver el Top 10 <span aria-hidden="true">→</span></span>
