@@ -168,7 +168,15 @@ function paintChefList(id,result,kind){
  target.onscroll=updateHint;
  for(const [index,p] of picks.entries()){
    const item=el('li',null,'ae-popular-item ae-chef-entry');
+   // Full-plate click target; preserve the existing li grid and its direct children.
    const entryLink=el('a',null,'ae-chef-entry-link');
+   item.style.position='relative';
+   entryLink.style.position='absolute';
+   entryLink.style.inset='0';
+   entryLink.style.zIndex='2';
+   entryLink.style.display='block';
+   entryLink.style.cursor='pointer';
+   entryLink.style.outlineOffset='-2px';
    entryLink.href=link(p.id);
    entryLink.setAttribute('aria-label','Abrir Pick '+(index+1)+' de '+(p.author||'Aficionado')+': '+(p.title||'Ver pronóstico'));
    entryLink.onclick=e=>{
@@ -191,8 +199,7 @@ function paintChefList(id,result,kind){
      authorRow.append(el('span','Cuota '+(americanOdds>0?'+':'')+americanOdds,'ae-chef-odds'));
    }
    info.append(authorRow,pick,votes);
-   entryLink.append(rank,info);
-   item.append(entryLink);
+   item.append(rank,info,entryLink);
    target.append(item);
    updateHint();
  }

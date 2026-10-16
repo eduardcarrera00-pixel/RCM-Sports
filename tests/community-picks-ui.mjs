@@ -110,8 +110,11 @@ assert.match(d.querySelector('#cpDialog').textContent,/Comentario antes de la ap
 d.querySelector('#cpDialog button').click();await settle();
 // The "Mejores platos" Pick title must ask the guest to log in BEFORE
 // showing its conversation; after login resume at the same Pick and focus reply.
-const bestPick=d.querySelector('#picksPopular .ae-chef-pick-link');
+const bestPick=d.querySelector('#picksPopular .ae-chef-entry-link');
 assert.ok(bestPick,'A positively voted Pick must appear in Mejores platos');
+assert.equal(bestPick.parentElement.classList.contains('ae-chef-entry'),true);
+assert.equal(bestPick.style.position,'absolute','Whole Mejores platos square must be clickable');
+assert.ok(bestPick.getAttribute('aria-label').includes('Abrir Pick'));
 user=null;w.authOpened=false;bestPick.click();await settle();
 assert.equal(w.authOpened,true,'Mejores platos requests account access');
 assert.equal(d.querySelector('#cpDialog')?.open||false,false,'Guest cannot open the reply composer');
@@ -119,6 +122,18 @@ user={id:'voter'};w.pendingPublication();await settle();
 assert.equal(d.querySelector('#cpDialog')?.open,true,'Reply conversation resumes after login');
 assert.equal(d.activeElement,d.querySelector('#cpDialog form textarea'),'Reply field is focused');
 d.querySelector('#cpDialog button').click();await settle();
+// Archived Picks must enforce the same authentication requirement.
+user=null;w.authOpened=false;
+d.getElementById('cpViewAll').click();await settle();
+const archivedReply=d.querySelector('#cpArchiveFeed .cp-replies-button');
+assert.ok(archivedReply,'Archive has a replies button');
+archivedReply.click();await settle();
+assert.equal(w.authOpened,true,'Archive replies require account access');
+assert.equal(d.querySelector('#cpDialog')?.open||false,false);
+user={id:'voter'};w.pendingPublication();await settle();
+assert.equal(d.querySelector('#cpDialog')?.open,true,'Login resumes archived Pick replies');
+d.querySelector('#cpDialog button').click();await settle();
+d.getElementById('cpArchiveClose').click();await settle();
 // Reading a Pick remains public, but its reply form stays behind login.
 user=null;w.authOpened=false;
 d.querySelector('#cpFeed .cp-card-title a').click();await settle();
