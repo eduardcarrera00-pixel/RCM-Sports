@@ -10,41 +10,63 @@
    if(cls)n.className=cls;
    return n;
  };
- function renderList(id,items,mode) {
+ let desktopHomeMarker=null;
+ function syncFootballDesktopPlacement(){
+   const root=$('aeSportTakeLeaders');
+   if(!root || window.matchMedia('(max-width:760px)').matches)return;
+   const layout=document.querySelector('#mainContent .editorial-layout');
+   const sidebar=layout?.querySelector('aside');
+   if(!layout||!sidebar)return;
+   if(!desktopHomeMarker){
+     desktopHomeMarker=document.createComment('AE Sports: posición original de Takes deportivos');
+     sidebar.insertBefore(desktopHomeMarker,root.parentElement===sidebar?root:null);
+   }
+   if(typeof currentCategory!=='undefined' && currentCategory==='Fútbol'){
+     if(root.parentElement!==layout) layout.appendChild(root);
+   } else if(root.parentElement!==sidebar){
+     desktopHomeMarker.after(root);
+   }
+ }
+ function renderList(id,items,mode){
    const list=$(id);if(!list)return;
    list.replaceChildren();
-   for(const [i,t] of items.entries()) {
+   const football=list.closest('#aeSportTakeLeaders')?.dataset.sport==='football';
+   for(const [i,t] of items.entries()){
      const li=el('li',undefined,'ae-sport-take-item ae-sport-chef-entry');
      const number=el('span',String(i+1).padStart(2,'0'),'ae-top-take-number');
      const content=el('div',undefined,'ae-top-take-content');
      const meta=el('div',undefined,'ae-sport-take-meta');
-     const author=el('button','@'+(t.author||'Aficionado'),'ae-top-take-author');
+     const author=el('button',(football?'':'@')+(t.author||'Aficionado'),'ae-top-take-author');
      author.type='button';
      author.setAttribute('aria-label','Ver perfil de '+(t.author||'Aficionado'));
      author.addEventListener('click',()=>{
-       if(typeof openAePublicProfile==='function')openAePublicProfile(t.author_id);
+       if(t.author_id && typeof openAePublicProfile==='function')openAePublicProfile(t.author_id);
      });
+     const up=Number(t.upvotes||0),down=Number(t.downvotes||0);
+     const net=up-down;
+     const score=el('span',(net>0?'+':'')+net+' votos netos','ae-sport-take-net');
+     score.setAttribute('title',up+' votos positivos · '+down+' negativos');
+     score.setAttribute('aria-label',up+' votos positivos, '+down+' negativos, balance '+net);
      meta.append(author);
-     content.append(meta);
      const title=el('strong',undefined,'ae-sport-take-title');
-     const openTake=el('button',t.title||'Ver Take','ae-sport-take-open');
+     const takeText=football?String(t.body||t.title||'Ver Take').trim():String(t.title||'Ver Take');
+     const openTake=el('button',takeText,'ae-sport-take-open');
      openTake.type='button';
      openTake.setAttribute('aria-label','Leer Take y ver su conversación: '+(t.title||'Publicación'));
      openTake.addEventListener('click',()=>window.aeTakeReplies?.open(t));
      title.append(openTake);
-     content.append(title);
-     const up=Number(t.upvotes||0),down=Number(t.downvotes||0);
-     const net=up-down;
      const stats=el('div',undefined,'ae-sport-take-statline');
-     const score=el('span',(net>0?'+':'')+net+' votos netos','ae-sport-take-net');
-     score.setAttribute('title',up+' votos positivos · '+down+' negativos');
-     score.setAttribute('aria-label',up+' votos positivos, '+down+' negativos, balance '+net);
      const reply=el('button','Responder','ae-top-take-reply');
      reply.type='button';
      reply.setAttribute('aria-label','Responder al Take: '+(t.title||'Publicación'));
      reply.addEventListener('click',()=>window.aeTakeReplies?.open(t,{focusComposer:true}));
-     stats.append(score,reply);
-     content.append(stats);
+     if(football){
+       meta.append(score);
+       stats.append(reply);
+     }else{
+       stats.append(score,reply);
+     }
+     content.append(meta,title,stats);
      li.append(number,content);
      li.addEventListener('click',event=>{
        if(!event.target.closest('button'))window.aeTakeReplies?.open(t);
@@ -62,6 +84,7 @@
    const sport=section==='NFL'?'nfl':section==='Fútbol'?'football':'';
    root.hidden=!sport;voices.hidden=!!sport;
    root.dataset.sport=sport;
+   syncFootballDesktopPlacement();
    if(!sport){current='';request++;return;}
    // Los destacados deportivos tienen nombres propios; los de portada
    // (#aeTopTakesPositiveTitle / #aeTopTakesNegativeTitle) no se modifican.
@@ -98,6 +121,10 @@
  }
  window.refreshAeSportTopTakes=refresh;
  document.addEventListener('DOMContentLoaded',()=>refresh(true));
+ window.matchMedia('(min-width:761px)').addEventListener('change',()=>{
+   syncFootballDesktopPlacement();
+   if(window.matchMedia('(min-width:761px)').matches)refresh(true);
+ });
  document.addEventListener('ae:takes-updated',()=>refresh(true));
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh();});
 })();
