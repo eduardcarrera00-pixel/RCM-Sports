@@ -136,6 +136,12 @@ function paintChefList(id,result,kind){
  const target=$(id);
  if(!target)return;
  target.replaceChildren();
+ // Reset de carrusel si la lista queda vacía o falla la carga.
+ target.classList.remove('ae-chef-scroll');
+ target.removeAttribute('tabindex');
+ target.onscroll=null;
+ const oldHint=target.closest('.ae-chef-board')?.querySelector('.ae-chef-scroll-note');
+ if(oldHint)oldHint.hidden=true;
  const good=kind==='best';
  if(result?.error){
    target.append(row('No se pudo cargar esta clasificación.','ae-chef-empty'));
