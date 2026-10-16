@@ -1,120 +1,106 @@
-/* AE SPORTS — destacados reales de Takes en portada (15 oct 2026). */
+/* AE SPORTS · Portada: Genios (tres líderes) y Anoetos (cola del ranking).
+   Puntos de Takes combinados NFL + Fútbol, revisados por administradores. */
 (() => {
   'use strict';
-  const $ = id => document.getElementById(id);
-  const labels = {general:'General',football:'Fútbol',laliga:'LaLiga',premier:'Premier League',ligamx:'Liga MX',champions:'Champions League',nfl:'NFL',colegial:'Colegial'};
-  let loading = false, lastLoad = 0, pending = false;
-  const element = (tag, text, className) => {
-    const node = document.createElement(tag);
-    if (text !== undefined) node.textContent = String(text);
-    if (className) node.className = className;
-    return node;
+  const $=id=>document.getElementById(id);
+  const el=(tag,text,className)=>{
+    const n=document.createElement(tag);
+    if(text!==undefined&&text!==null)n.textContent=String(text);
+    if(className)n.className=className;
+    return n;
   };
-  function empty(list, text) {
-    const item = element('li', text, 'ae-top-takes-empty');
-    list.replaceChildren(item);
+  let period='all',loading=false,pending=false,sequence=0,lastLoad=0;
+
+  function empty(list,text){
+    if(list)list.replaceChildren(el('li',text,'ae-top-takes-empty ae-points-empty'));
   }
-  const dateLabel=value=>{
-    if(!value)return '';
-    const d=new Date(value);
-    return Number.isFinite(d.getTime())
-      ?new Intl.DateTimeFormat('es-ES',{day:'numeric',month:'short',year:'numeric'}).format(d).replace(/\./g,'')
-      :'';
-  };
-  function card(t,n,negative){
-    const item=element('li',undefined,'ae-top-take');
-    const content=element('div',undefined,'ae-top-take-content');
-    const header=element('div',undefined,'ae-home-take-head');
-    const titleRow=element('div',undefined,'ae-home-take-title-row');
-    const rank=element('span',String(n).padStart(2,'0'),'ae-top-take-number');
-    const title=element('h4',undefined,'ae-top-take-title');
-    const open=element('button',t.title||'Ver Take','ae-top-take-open');
-    open.type='button';
-    open.setAttribute('aria-label','Leer Take y ver su conversación: '+(t.title||'Publicación'));
-    open.addEventListener('click',()=>window.aeTakeReplies?.open(t));
-    title.append(open);
-    titleRow.append(rank,title);
-    const badge=element('span',t.competition||labels[t.sport]||'Deportes','ae-top-take-sport');
-    header.append(titleRow,badge);
-    content.append(header);
-    const excerpt=String(t.body||'').replace(/^NFL[^\n]*\n\n/,'').trim();
-    if(excerpt)content.append(element('p',excerpt.length>160?excerpt.slice(0,157).trimEnd()+'…':excerpt,'ae-top-take-summary'));
-    const bottom=element('div',undefined,'ae-take-reference-footer');
-    const identity=element('div',undefined,'ae-take-reference-identity');
-    const avatar=element('span','', 'ae-take-reference-avatar');
-    avatar.setAttribute('aria-hidden','true');
-    const author=element('button','@'+(t.author||'Comunidad'),'ae-top-take-author');
-    author.type='button';
-    author.setAttribute('aria-label','Ver historial de Takes de '+(t.author||'este usuario'));
-    author.addEventListener('click',()=>{
-      if(typeof openAePublicProfile==='function')openAePublicProfile(t.author_id);
-    });
-    identity.append(avatar,author);
-    const when=dateLabel(t.created_at);
-    if(when)identity.append(element('span','· '+when,'ae-take-reference-date'));
-    const stats=element('div',undefined,'ae-top-take-votes');
-    for(const [direction,symbol,value] of [
-      ['up','▲',Number(t.upvotes||0)],['down','▼',Number(t.downvotes||0)]
-    ]){
-      const tally=element('span',symbol+' '+value,'ae-top-take-'+direction);
-      tally.setAttribute('aria-label',(direction==='up'?'Votos positivos: ':'Votos negativos: ')+value);
-      stats.append(tally);
+  function leader(r,side){
+    const item=el('li',null,'ae-top-take ae-points-take');
+    item.dataset.side=side;
+    const content=el('div',null,'ae-top-take-content');
+    const headline=el('div',null,'ae-points-headline');
+    headline.append(el('span',String(r.rank_number||'').padStart(2,'0'),'ae-points-position'));
+    const user=el('button','@'+(r.username||'Aficionado'),'ae-points-user');
+    user.type='button';
+    user.setAttribute('aria-label','Ver perfil y Takes de '+(r.username||'Aficionado'));
+    user.addEventListener('click',()=>window.openAePublicProfile?.(r.user_id));
+    headline.append(user);
+    headline.append(el('strong',Number(r.points||0)+' pts','ae-points-total'));
+    content.append(headline);
+
+    if(r.best_take_title){
+      const best=el('div',null,'ae-points-best');
+      best.append(el('span','Mejor Take · +'+Number(r.best_take_points||0)+' pts','ae-points-best-kicker'));
+      best.append(el('p',r.best_take_title,'ae-points-best-title'));
+      if(r.best_take_excerpt)best.append(el('p',r.best_take_excerpt,'ae-points-best-excerpt'));
+      content.append(best);
+    }else{
+      content.append(el('p','Todavía no tiene Takes acertados en este periodo.','ae-points-best-excerpt'));
     }
-    const reply=element('button','Responder','ae-top-take-reply');
-    reply.type='button';
-    reply.setAttribute('aria-label','Responder al Take: '+(t.title||'Publicación'));
-    reply.addEventListener('click',()=>window.aeTakeReplies?.open(t,{focusComposer:true}));
-    stats.append(reply);
-    bottom.append(identity,stats);
-    content.append(bottom);
+    const count=Number(r.correct_takes||0)+' aciertos · '+Number(r.total_resolved||0)+' resueltos';
+    content.append(el('span',count,'ae-points-count'));
     item.append(content);
-    item.addEventListener('click',event=>{
-      if(!event.target.closest('button'))window.aeTakeReplies?.open(t);
-    });
     return item;
   }
-  function paint(data) {
-    const positive = $('aeTopTakesPositive'), negative = $('aeTopTakesNegative');
-    if (!positive || !negative) return;
-    const eligibleSports = new Set(['nfl','football','laliga','premier','ligamx','champions']);
-    const takes = (Array.isArray(data) ? data : []).filter(t=>eligibleSports.has(t.sport));
-    const up = takes.filter(t => Number(t.upvotes) > 0)
-      .sort((a,b)=>Number(b.upvotes)-Number(a.upvotes) || Number(a.downvotes)-Number(b.downvotes) || new Date(b.created_at)-new Date(a.created_at)).slice(0,3);
-    const down = takes.filter(t => Number(t.downvotes) > 0)
-      .sort((a,b)=>Number(b.downvotes)-Number(a.downvotes) || Number(a.upvotes)-Number(b.upvotes) || new Date(b.created_at)-new Date(a.created_at)).slice(0,3);
-    positive.replaceChildren(...up.map((t,i)=>card(t,i+1,false)));
-    negative.replaceChildren(...down.map((t,i)=>card(t,i+1,true)));
-    if (!up.length) empty(positive,'Aún no hay Takes con votos positivos.');
-    if (!down.length) empty(negative,'Aún no hay Takes con votos negativos.');
-    const status = $('aeTopTakesStatus');
-    if (status) status.textContent = '';
+  function paint(data){
+    const best=$('aeTopTakesPositive'),worst=$('aeTopTakesNegative');
+    const rows=Array.isArray(data)?data:[];
+    const top=rows.filter(x=>x?.side==='genios').sort((a,b)=>Number(a.rank_number)-Number(b.rank_number)).slice(0,3);
+    const tail=rows.filter(x=>x?.side==='anoetos').sort((a,b)=>Number(a.rank_number)-Number(b.rank_number)).slice(0,10);
+    if(top.length)best.replaceChildren(...top.map(r=>leader(r,'genios')));
+    else empty(best,'Todavía no hay Takes puntuados en este periodo.');
+    if(tail.length)worst.replaceChildren(...tail.map(r=>leader(r,'anoetos')));
+    else empty(worst,'No hay más participantes puntuados fuera del Top 3.');
+    const status=$('aeTopTakesStatus');
+    if(status)status.textContent='';
   }
-  async function refresh(force=false) {
-    const root = $('aeHomeTopTakes');
-    if (!root || !window.db && typeof db === 'undefined') return;
-    // Esta sección solo se muestra en portada. Nunca consultamos cada vez que cambia un filtro.
-    if (typeof currentCategory !== 'undefined' && currentCategory !== 'Todos') return;
-    if (loading) { pending = pending || force; return; }
-    if (!force && Date.now() - lastLoad < 30000) return;
-    loading = true;
-    try {
-      const result = await db.rpc('ae_public_take_feed', {p_sport:'all'});
-      if (result.error) throw result.error;
-      paint(result.data);
-      lastLoad = Date.now();
-    } catch (err) {
-      const status=$('aeTopTakesStatus');
-      if (status) status.textContent = 'No pudimos cargar los Takes destacados. Vuelve a intentarlo.';
-    } finally {
-      loading = false;
-      if (pending) { pending = false; refresh(true); }
+  function paintTabs(){
+    const panel=$('aeHomeTopTakes');
+    panel?.querySelectorAll('[data-home-take-period]').forEach(btn=>{
+      const pressed=btn.dataset.homeTakePeriod===period;
+      btn.setAttribute('aria-pressed',String(pressed));
+    });
+  }
+  async function refresh(force=false){
+    if(!$('aeHomeTopTakes')||typeof db==='undefined'||!db)return;
+    if(typeof currentCategory!=='undefined'&&currentCategory!=='Todos')return;
+    if(loading){pending=true;return;}
+    if(!force&&Date.now()-lastLoad<30000)return;
+    const request=++sequence,selected=period;
+    loading=true;
+    try{
+      const result=await db.rpc('ae_home_take_point_extremes',{p_period:selected});
+      if(result.error)throw result.error;
+      if(sequence!==request||selected!==period)return;
+      paint(result.data||[]);
+      lastLoad=Date.now();
+    }catch(error){
+      if(sequence===request){
+        empty($('aeTopTakesPositive'),'No se pudo cargar la clasificación por puntos.');
+        empty($('aeTopTakesNegative'),'No se pudo cargar la cola de la clasificación.');
+        const status=$('aeTopTakesStatus');
+        if(status)status.textContent='No se pudo cargar la clasificación. Actualiza para volver a intentarlo.';
+      }
+    }finally{
+      loading=false;
+      if(pending){pending=false;void refresh(true);}
     }
   }
-  window.refreshAeHomeTopTakes = refresh;
+  window.refreshAeHomeTopTakes=refresh;
   document.addEventListener('DOMContentLoaded',()=>{
-    refresh(true);
+    paintTabs();
+    $('aeHomeTopTakes')?.querySelectorAll('[data-home-take-period]').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const next=btn.dataset.homeTakePeriod;
+        if(!['month','all'].includes(next)||next===period)return;
+        period=next;
+        paintTabs();
+        void refresh(true);
+      });
+    });
+    void refresh(true);
     $('aeHomeTakePublish')?.addEventListener('click',()=>window.aeOpenTakeComposer?.());
   });
-  document.addEventListener('ae:takes-updated',()=>refresh(true));
-  document.addEventListener('visibilitychange',()=>{if (!document.hidden) refresh();});
+  document.addEventListener('ae:takes-updated',()=>void refresh(true));
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)void refresh();});
 })();
