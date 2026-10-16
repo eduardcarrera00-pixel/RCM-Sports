@@ -65,7 +65,9 @@ html body #footballTakes .ae-picks-rail #picksNews .ae-picks-news-card.ae-picks-
   isolation:isolate;
   width:100%!important;
   box-sizing:border-box;
-  aspect-ratio:16 / 10;
+  /* Altura definida: el botón y la foto heredan el 100% sin espacios vacíos. */
+  height:clamp(205px,23vw,280px)!important;
+  aspect-ratio:auto!important;
   min-height:190px;
   margin:0!important;
   padding:0!important;
@@ -175,7 +177,8 @@ html:not(.dark) body #footballTakes .ae-picks-rail #picksNews .ae-picks-news-fea
 @media(max-width:670px){
   html body #footballTakes .ae-picks-rail #picksNews .ae-picks-news-feature{
     min-height:185px;
-    aspect-ratio:16 / 9;
+    height:clamp(200px,52vw,260px)!important;
+    aspect-ratio:auto!important;
   }
   html body #footballTakes .ae-picks-rail #picksNews .ae-picks-news-feature .ae-picks-news-open{
     min-height:185px!important;
