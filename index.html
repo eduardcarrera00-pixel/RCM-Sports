@@ -1627,7 +1627,7 @@ currentUser = {
                 <article class="bg-white rounded-2xl border border-slate-200 overflow-hidden flex flex-col justify-between shadow-sm hover:shadow-xl hover:border-pitch-300 transition-all duration-300 hover:-translate-y-1 relative">
                     <div>
                         <div class="relative h-48 overflow-hidden group">
-                            <img src="${escapeHTML(safeImageURL(art.image))}" alt="${escapeHTML(art.title)}" style="object-position:${imagePosition(art)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <img src="${escapeHTML(safeImageURL(art.image))}" alt="${escapeHTML(art.title)}" style="--ae-image-focus:${imagePosition(art)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                             <div class="absolute top-3 left-3 bg-white/90 backdrop-blur-md border border-slate-200 text-pitch-800 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md shadow-sm">
                                 ${escapeHTML(art.category)}
                             </div>
@@ -1679,7 +1679,7 @@ currentUser = {
             const container = document.getElementById('heroSection');
             container.innerHTML = `
                 <div class="editorial-hero">
-                    <img class="editorial-hero-image" src="${escapeHTML(safeImageURL(hero.image))}" style="object-position:${imagePosition(hero)}" alt="" onerror="this.hidden=true">
+                    <img class="editorial-hero-image" src="${escapeHTML(safeImageURL(hero.image))}" style="--ae-image-focus:${imagePosition(hero)}" alt="" onerror="this.hidden=true">
                     <div class="editorial-hero-copy">
                                                 <h1>${escapeHTML(hero.title)}</h1>
                         <p>${escapeHTML(hero.summary || 'La historia completa, desde otra perspectiva.')}</p>
@@ -1909,7 +1909,7 @@ currentUser = {
             document.getElementById('modalAuthor').innerText = article.author || 'AE SPORTS';
             document.getElementById('modalDate').innerText = article.date || '';
             document.getElementById('modalImage').src = safeImageURL(article.image);
-            document.getElementById('modalImage').style.objectPosition = imagePosition(article);
+            document.getElementById('modalImage').style.setProperty('--ae-image-focus', imagePosition(article));
             document.getElementById('modalBody').innerHTML = cleanBody(article.body);
             restoreReadingSize();
 renderRelatedStories(article);
