@@ -697,3 +697,74 @@ html:not(.dark) body>header #aeCategoryAdmin .ae-category-admin-menu{
     white-space:nowrap!important;
   }
 }
+
+
+/* v3 · Smaller + PUBLICAR and completely frameless admin profile. */
+@media (min-width:980px){
+  html body>header #loggedAdminContainer .ae-publish-action{
+    flex-basis:78px!important;
+    width:78px!important;
+    min-width:78px!important;
+    max-width:78px!important;
+    height:30px!important;
+    min-height:30px!important;
+    max-height:30px!important;
+    padding:5px 7px!important;
+    gap:4px!important;
+    font:800 8px/1 Inter,system-ui,sans-serif!important;
+    letter-spacing:.025em!important;
+  }
+  html body>header #loggedAdminContainer .ae-publish-action i{
+    font-size:8px!important;
+  }
+  html body>header #loggedAdminContainer .ae-publish-action span{
+    max-width:56px!important;
+    font:800 8px/1 Inter,system-ui,sans-serif!important;
+    letter-spacing:.025em!important;
+  }
+
+  html body>header #loggedAdminContainer .ae-admin-profile,
+  html body>header #loggedAdminContainer .ae-admin-profile:hover,
+  html body>header #loggedAdminContainer .ae-admin-profile:focus,
+  html body>header #loggedAdminContainer .ae-admin-profile:focus-visible,
+  html body>header #loggedAdminContainer .ae-admin-profile:active{
+    border:0!important;
+    outline:0!important;
+    background:transparent!important;
+    background-color:transparent!important;
+    background-image:none!important;
+    box-shadow:none!important;
+  }
+  html body>header #loggedAdminContainer .ae-admin-profile:focus-visible #adminNameDisplay{
+    text-decoration:underline!important;
+    text-underline-offset:2px!important;
+  }
+}
+
+@media (min-width:980px) and (max-width:1180px){
+  html body>header #loggedAdminContainer .ae-publish-action{
+    flex-basis:72px!important;
+    width:72px!important;
+    min-width:72px!important;
+    max-width:72px!important;
+    padding-inline:5px!important;
+    font-size:7.5px!important;
+  }
+  html body>header #loggedAdminContainer .ae-publish-action span{
+    max-width:51px!important;
+    font-size:7.5px!important;
+  }
+}
+
+@media (max-width:979px){
+  html body>header #loggedAdminContainer .ae-admin-profile,
+  html body>header #loggedAdminContainer .ae-admin-profile:hover,
+  html body>header #loggedAdminContainer .ae-admin-profile:focus,
+  html body>header #loggedAdminContainer .ae-admin-profile:focus-visible,
+  html body>header #loggedAdminContainer .ae-admin-profile:active{
+    border:0!important;
+    outline:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+  }
+}
