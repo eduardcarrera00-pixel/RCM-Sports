@@ -1,0 +1,57 @@
+/* AE SPORTS — motivo de puntuacion por usuario en el Top 10 de Takes.
+   El mensual y el historico comparten diseño; la consulta filtra cada periodo. */
+html body :is(#aeHomeTakeRanking,#aeSportTakeRanking) .ae-take-ranking-row{
+  align-items:start;
+}
+html body :is(#aeHomeTakeRanking,#aeSportTakeRanking) .ae-take-ranking-best{
+  grid-column:2 / -1;
+  display:grid;
+  gap:4px;
+  min-width:0;
+  padding:10px 12px;
+  margin:1px 0 2px;
+  border-left:2px solid var(--ae-tr-bronze,#e1b783);
+  background:rgba(188,147,105,.09);
+  border-radius:0;
+}
+html body :is(#aeHomeTakeRanking,#aeSportTakeRanking) .ae-take-ranking-best-label{
+  display:block;
+  color:var(--ae-tr-bronze,#e1b783)!important;
+  font:750 10px/1.4 Inter,system-ui,sans-serif;
+  letter-spacing:.055em;
+  text-transform:uppercase;
+  overflow-wrap:anywhere;
+}
+html body :is(#aeHomeTakeRanking,#aeSportTakeRanking) .ae-take-ranking-best-title{
+  display:block;
+  color:var(--ae-tr-ink,#f7ecdc)!important;
+  font:650 14px/1.35 Inter,system-ui,sans-serif;
+  overflow-wrap:anywhere;
+  white-space:normal;
+}
+html body :is(#aeHomeTakeRanking,#aeSportTakeRanking) .ae-take-ranking-best-excerpt{
+  display:-webkit-box;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:2;
+  line-clamp:2;
+  overflow:hidden;
+  max-width:100%;
+  margin:0;
+  color:var(--ae-tr-muted,#bdc7c8)!important;
+  font:400 12px/1.45 Inter,system-ui,sans-serif;
+  overflow-wrap:anywhere;
+}
+html body :is(#aeHomeTakeRanking,#aeSportTakeRanking) .ae-take-ranking-count{
+  grid-column:2 / -1;
+}
+@media(max-width:600px){
+  html body :is(#aeHomeTakeRanking,#aeSportTakeRanking) .ae-take-ranking-best{
+    padding:8px 9px;
+  }
+  html body :is(#aeHomeTakeRanking,#aeSportTakeRanking) .ae-take-ranking-best-title{
+    font-size:12.5px;
+  }
+  html body :is(#aeHomeTakeRanking,#aeSportTakeRanking) .ae-take-ranking-best-excerpt{
+    font-size:11px;
+  }
+}
