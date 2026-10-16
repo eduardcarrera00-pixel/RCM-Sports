@@ -1778,7 +1778,7 @@ currentUser = {
                     + (byline?'<span class="ae-trending-byline">'+escapeHTML(byline)+'</span>':'')+'</button>'
                     + '<span class="ae-trending-meta" aria-label="' + likes + ' me gusta">'
                     + '<i class="fa-regular fa-heart" aria-hidden="true"></i> ' + likes + '</span>'
-                    + '<span class="ae-trending-arrow" aria-hidden="true">→</span></li>';
+                    + '<button type="button" class="ae-trending-arrow" onclick="openArticleModal(' + articleIdArgument(article.id) + ')" aria-label="Leer artículo: ' + escapeHTML(article.title) + '">→</button></li>';
             }).join('');
         }
 
