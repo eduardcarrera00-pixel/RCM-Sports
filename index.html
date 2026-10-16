@@ -327,6 +327,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
     <link rel="stylesheet" href="assets/ae-sport-chef-cards.css?v=20261016-1">
     <link rel="stylesheet" href="assets/ae-light-ranking-art.css?v=20261016-1">
     <link rel="stylesheet" href="assets/ae-editorial-community-twin-cards.css?v=20261016-1">
+    <link rel="stylesheet" href="assets/ae-runner-brand.css?v=20261016-1">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 
@@ -334,9 +335,10 @@ html.dark [data-reading-size][aria-pressed="true"] {
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-20">
 
-                <!-- Identidad oficial: monograma y logotipo dorados de AE SPORTS. -->
-                <a href="#" onclick="filterByCategory('Todos'); return false;" class="ae-brand ae-brand-gold group" aria-label="AE SPORTS — ir al inicio">
-                    <img class="ae-brand-art" src="assets/ae-brand-gold-header.webp?v=20261016-1" alt="AE SPORTS — TU BLOG DE DEPORTE" width="400" height="109" decoding="async">
+                <!-- Nuevo emblema dorado y azul de AE SPORTS, con la tipografía editorial original. -->
+                <a href="#" onclick="filterByCategory('Todos'); return false;" class="ae-brand ae-brand-gold ae-brand-runner group" aria-label="AE SPORTS — TU BLOG DE DEPORTE, ir al inicio">
+                    <img class="ae-runner-symbol" src="assets/ae-runner-emblem.png?v=20261016-1" alt="" width="128" height="128" decoding="async" fetchpriority="high">
+                    <span class="ae-runner-wordmark" aria-hidden="true"><img class="ae-runner-wordmark-art" src="assets/ae-brand-gold-header.webp?v=20261016-1" alt="" width="400" height="109" decoding="async"></span>
                 </a>
                 <!-- Este input conserva compatibilidad con los filtros y pruebas, pero no se muestra en la interfaz. -->
                 <input id="searchInput" type="search" hidden aria-hidden="true" tabindex="-1" oninput="handleSearch()">
@@ -1058,15 +1060,16 @@ html.dark [data-reading-size][aria-pressed="true"] {
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
 
                 <div class="space-y-3">
-                    <!-- Misma identidad dorada que la cabecera: sin el logo de pluma antiguo. -->
+                    <!-- Misma identidad y emblema del encabezado. -->
                     <a href="#" onclick="filterByCategory('Todos'); return false;"
-                       class="ae-footer-gold-brand"
+                       class="ae-footer-gold-brand ae-brand-runner"
                        aria-label="AE SPORTS — TU BLOG DE DEPORTE, ir al inicio">
-                        <img src="assets/ae-brand-gold-header.webp?v=20261016-footer-1"
-                             alt="AE SPORTS — TU BLOG DE DEPORTE"
-                             width="400" height="109"
-                             decoding="async" loading="lazy"
-                             class="ae-footer-gold-brand-art">
+                        <img class="ae-runner-symbol" src="assets/ae-runner-emblem.png?v=20261016-1"
+                             alt="" width="128" height="128" decoding="async" loading="lazy">
+                        <span class="ae-runner-wordmark" aria-hidden="true">
+                            <img class="ae-runner-wordmark-art" src="assets/ae-brand-gold-header.webp?v=20261016-1"
+                                 alt="" width="400" height="109" decoding="async" loading="lazy">
+                        </span>
                     </a>
                     <p class="text-slate-400 leading-relaxed text-xs">
                         Periodismo deportivo de alto nivel. Cobertura, estrategia y pasión en la cancha.
