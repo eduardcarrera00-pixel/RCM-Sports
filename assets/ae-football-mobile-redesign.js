@@ -199,8 +199,8 @@
       if (trending) trending.hidden = false;
 
       if (newsHeading?.querySelector('h2')) newsHeading.querySelector('h2').textContent = 'Noticias de Fútbol';
-      if (byId('aeSportGeniosTitle')) byId('aeSportGeniosTitle').textContent = 'Genios';
-      if (byId('aeSportAnoetosTitle')) byId('aeSportAnoetosTitle').textContent = 'Anoetos';
+      if (byId('aeSportGeniosTitle')) byId('aeSportGeniosTitle').textContent = 'Respira fútbol';
+      if (byId('aeSportAnoetosTitle')) byId('aeSportAnoetosTitle').textContent = 'Vende Humos';
 
       if (ranking) {
         ranking.classList.add('ae-football-ranking-feature');
