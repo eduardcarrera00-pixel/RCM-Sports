@@ -325,6 +325,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/ae-home-weekly-match-picks-mobile.css?v=20261016-mobile-photo-parity-2">
 <link rel="stylesheet" href="assets/ae-mobile-home-takes-swipe-and-football-news.css?v=20261016-top3-swipe-v1">
 <link rel="stylesheet" href="assets/ae-article-floating-close.css?v=20261016-1">
+<link rel="stylesheet" href="assets/ae-sport-news-headings.css?v=20261016-1">
 <style id="ae-home-weekly-reference-mobile">
 /* Mobile home now hosts the ORIGINAL #picksFeatured element from Picks.
    Only transplant the few selectors normally scoped under #footballTakes.
@@ -1721,7 +1722,7 @@ currentUser = {
             const isHome = currentCategory === 'Todos' && !currentSearchQuery;
             const isSportNewsPreview = ['NFL','Fútbol'].includes(currentCategory) && !currentSearchQuery;
             const newsHeading = document.getElementById('aeNewsSectionTitle');
-            if(newsHeading) newsHeading.lastChild.textContent = currentCategory === 'Fútbol' ? ' Noticias de Fútbol' : ' Últimas noticias';
+            if(newsHeading) newsHeading.lastChild.textContent = currentCategory === 'Fútbol' ? ' Noticias de Fútbol' : currentCategory === 'NFL' ? ' Noticias de NFL' : ' Últimas noticias';
             const archiveLink = document.getElementById('aeAllNewsSport');
             if(archiveLink) {archiveLink.hidden=!isSportNewsPreview; archiveLink.dataset.aeNewsCategory=currentCategory;}
             const visibleCount = isHome ? Math.min(3, Math.max(0,filtered.length-1)) : isSportNewsPreview ? Math.min(3, filtered.length) : filtered.length;
