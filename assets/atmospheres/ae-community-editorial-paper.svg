@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="520" viewBox="0 0 960 520" fill="none">
+  <defs>
+    <linearGradient id="paper" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#fff9ec"/><stop offset=".54" stop-color="#f4efe4"/><stop offset="1" stop-color="#e6ded1"/>
+    </linearGradient>
+    <radialGradient id="glow"><stop stop-color="#c79d69" stop-opacity=".22"/><stop offset="1" stop-color="#c79d69" stop-opacity="0"/></radialGradient>
+    <pattern id="fibres" width="27" height="27" patternUnits="userSpaceOnUse"><path d="M0 27 27 0M-7 7 7-7M20 34 34 20" stroke="#bd9a78" stroke-opacity=".055" stroke-width=".65"/></pattern>
+  </defs>
+  <rect width="960" height="520" fill="url(#paper)"/><rect width="960" height="520" fill="url(#fibres)"/>
+  <ellipse cx="871" cy="107" rx="270" ry="250" fill="url(#glow)"/>
+  <g opacity=".16" stroke="#b48765" stroke-width="2">
+    <path d="M482-56c100 86 183 54 260 82 82 31 149 112 265 121"/>
+    <path d="M454-13c100 86 186 58 260 85 87 32 159 112 264 129"/>
+    <path d="M437 26c102 81 180 55 262 87 84 30 146 107 264 128"/>
+  </g>
+  <g opacity=".13" stroke="#385b68" stroke-width="2">
+    <path d="M724 24q95-20 143 39l-5 63-25-23-97 9-16-25z"/>
+    <path d="M770 48h62M770 62h73M770 76h50"/>
+    <path d="M700 182q79-31 137 12l2 61-24-18-93 19-22-18z"/>
+    <path d="M739 211h69M739 225h48"/>
+  </g>
+  <g stroke="#ae815d" stroke-opacity=".13" stroke-width="1.5">
+    <path d="M468 398c145-146 281-126 492-202"/>
+    <path d="M496 426c126-121 264-121 464-171"/>
+    <path d="M521 452c105-103 247-113 439-144"/>
+    <circle cx="819" cy="361" r="87"/><circle cx="819" cy="361" r="112"/>
+  </g>
+  <g fill="#9a6c4b" fill-opacity=".055">
+    <path d="M664 326q-12-12-33-5-22 10-22 34 0 13 15 20-23 17-23 45h-29q-2-53 30-81 26-25 62-13z"/>
+    <path d="M761 311q-12-12-33-5-22 10-22 34 0 13 15 20-23 17-23 45h-29q-2-53 30-81 26-25 62-13z"/>
+  </g>
+</svg>
