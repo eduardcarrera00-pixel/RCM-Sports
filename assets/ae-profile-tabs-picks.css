@@ -339,3 +339,141 @@ html:not(.dark) body #aeProfileDialog .ae-profile-accuracy>p{color:#586975}
   #aeProfileDialog #aeProfilePicks.ae-profile-picks{padding-inline:14px}
   #aeProfileDialog .ae-profile-accuracy{margin-inline:14px}
 }
+
+
+/* Unpopular Take: user-selected third profile highlight. */
+#aeProfileDialog .ae-profile-feature-unpopular{
+  border-left-color:#b08a72;
+  background:
+    radial-gradient(circle at 92% 10%,rgba(188,139,103,.12),transparent 42%),
+    linear-gradient(135deg,rgba(24,52,68,.95),rgba(12,35,49,.82));
+}
+#aeProfileDialog .ae-profile-feature-unpopular .ae-profile-feature-label{
+  color:#d4b29a;
+}
+#aeProfileDialog .ae-profile-feature-unpopular.is-empty{
+  border-style:dashed;
+  border-left-style:solid;
+}
+#aeProfileDialog .ae-profile-feature-action{
+  margin-left:auto;
+  min-height:24px;
+  padding:4px 8px;
+  border:1px solid rgba(208,169,127,.52);
+  border-radius:0;
+  background:rgba(199,146,94,.08);
+  color:#ead7c3;
+  font:750 8.5px/1 Inter,system-ui,sans-serif;
+  letter-spacing:.025em;
+  cursor:pointer;
+}
+#aeProfileDialog .ae-profile-feature-action:hover{
+  border-color:#dfb07c;
+  background:rgba(199,146,94,.17);
+}
+#aeProfileDialog .ae-profile-feature-action:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+}
+#aeProfileDialog .ae-profile-unpopular-chooser{
+  grid-column:1/-1;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(220px,1.4fr) auto;
+  align-items:center;
+  gap:10px 14px;
+  margin:0;
+  padding:13px 14px;
+  border:1px solid rgba(194,156,119,.30);
+  background:linear-gradient(110deg,rgba(16,43,58,.93),rgba(9,31,45,.77));
+}
+#aeProfileDialog .ae-profile-unpopular-copy{
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  min-width:0;
+}
+#aeProfileDialog .ae-profile-unpopular-copy strong{
+  color:#f0d7bd;
+  font:650 13px/1.2 Newsreader,Georgia,serif;
+}
+#aeProfileDialog .ae-profile-unpopular-copy span{
+  color:#aebdc2;
+  font:400 9.5px/1.35 Inter,system-ui,sans-serif;
+}
+#aeProfileDialog .ae-profile-unpopular-select{
+  width:100%;
+  min-width:0;
+  height:32px;
+  padding:5px 8px;
+  border:1px solid rgba(191,158,125,.33);
+  border-radius:0;
+  background:#0b293a;
+  color:#eee2d4;
+  font:500 10px/1 Inter,system-ui,sans-serif;
+}
+#aeProfileDialog .ae-profile-unpopular-actions{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+#aeProfileDialog .ae-profile-unpopular-actions button{
+  min-height:30px;
+  padding:5px 9px;
+  border-radius:0;
+  font:750 9px/1 Inter,system-ui,sans-serif;
+  cursor:pointer;
+}
+#aeProfileDialog .ae-profile-unpopular-save{
+  border:1px solid #d2a06b;
+  background:#a96f43;
+  color:#fff0df;
+}
+#aeProfileDialog .ae-profile-unpopular-cancel{
+  border:1px solid rgba(183,158,133,.32);
+  background:transparent;
+  color:#c6d0d2;
+}
+
+html:not(.dark) body #aeProfileDialog .ae-profile-feature-unpopular{
+  border-color:#d9c2aa;
+  border-left-color:#a6795a;
+  background:
+    radial-gradient(circle at 92% 10%,rgba(174,112,63,.08),transparent 42%),
+    linear-gradient(115deg,rgba(255,253,248,.98),rgba(244,239,229,.90));
+}
+html:not(.dark) body #aeProfileDialog .ae-profile-feature-unpopular .ae-profile-feature-label{color:#7e563e}
+html:not(.dark) body #aeProfileDialog .ae-profile-feature-action{
+  border-color:#b68c66;
+  background:#f2e5d7;
+  color:#5b402d;
+}
+html:not(.dark) body #aeProfileDialog .ae-profile-unpopular-chooser{
+  border-color:#d7c2ad;
+  background:linear-gradient(110deg,#fffaf2,#f2e9dd);
+}
+html:not(.dark) body #aeProfileDialog .ae-profile-unpopular-copy strong{color:#284253}
+html:not(.dark) body #aeProfileDialog .ae-profile-unpopular-copy span{color:#62717a}
+html:not(.dark) body #aeProfileDialog .ae-profile-unpopular-select{
+  border-color:#ccb499;
+  background:#fffdf8;
+  color:#213b4c;
+}
+html:not(.dark) body #aeProfileDialog .ae-profile-unpopular-save{
+  border-color:#a87348;
+  background:#b77d4c;
+  color:#fffaf1;
+}
+html:not(.dark) body #aeProfileDialog .ae-profile-unpopular-cancel{
+  border-color:#cbb39a;
+  color:#5f6c73;
+}
+
+@media(max-width:760px){
+  #aeProfileDialog .ae-profile-unpopular-chooser{
+    grid-template-columns:minmax(0,1fr);
+    gap:8px;
+  }
+  #aeProfileDialog .ae-profile-unpopular-actions{
+    justify-content:flex-start;
+  }
+}
