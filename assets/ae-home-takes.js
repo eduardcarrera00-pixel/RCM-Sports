@@ -14,40 +14,59 @@
     const item = element('li', text, 'ae-top-takes-empty');
     list.replaceChildren(item);
   }
-  function card(t, n, negative) {
-    const item = element('li', undefined, 'ae-top-take');
-    const content = element('div', undefined, 'ae-top-take-content');
-    const head=element('div',undefined,'ae-home-take-head');
+  const dateLabel=value=>{
+    if(!value)return '';
+    const d=new Date(value);
+    return Number.isFinite(d.getTime())
+      ?new Intl.DateTimeFormat('es-ES',{day:'numeric',month:'short',year:'numeric'}).format(d).replace(/\./g,'')
+      :'';
+  };
+  function card(t,n,negative){
+    const item=element('li',undefined,'ae-top-take');
+    const content=element('div',undefined,'ae-top-take-content');
+    const header=element('div',undefined,'ae-home-take-head');
     const titleRow=element('div',undefined,'ae-home-take-title-row');
     const rank=element('span',String(n).padStart(2,'0'),'ae-top-take-number');
+    const title=element('h4',undefined,'ae-top-take-title');
+    const open=element('button',t.title||'Ver Take','ae-top-take-open');
+    open.type='button';
+    open.setAttribute('aria-label','Leer Take y ver su conversación: '+(t.title||'Publicación'));
+    open.addEventListener('click',()=>window.aeTakeReplies?.open(t));
+    title.append(open);
+    titleRow.append(rank,title);
     const badge=element('span',labels[t.sport]||'Deportes','ae-top-take-sport');
-    const heading=element('h4',undefined,'ae-top-take-title');
-    const openTake=element('button',t.title,'ae-top-take-open');
-    openTake.type='button';
-    openTake.setAttribute('aria-label','Leer Take y ver su conversación: '+t.title);
-    openTake.addEventListener('click',()=>window.aeTakeReplies?.open(t));
-    heading.append(openTake);
-    titleRow.append(rank,heading);
-    head.append(titleRow,badge);
-    content.append(head);
+    header.append(titleRow,badge);
+    content.append(header);
     const excerpt=String(t.body||'').replace(/^NFL[^\n]*\n\n/,'').trim();
     if(excerpt)content.append(element('p',excerpt.length>160?excerpt.slice(0,157).trimEnd()+'…':excerpt,'ae-top-take-summary'));
-    const author = element('button', '@' + (t.author || 'Comunidad'), 'ae-top-take-author');
-    author.type = 'button';
-    author.setAttribute('aria-label','Ver historial de Takes de ' + (t.author || 'este usuario'));
-    author.addEventListener('click', () => {
-      if (typeof openAePublicProfile === 'function') openAePublicProfile(t.author_id);
+    const bottom=element('div',undefined,'ae-take-reference-footer');
+    const identity=element('div',undefined,'ae-take-reference-identity');
+    const avatar=element('span','', 'ae-take-reference-avatar');
+    avatar.setAttribute('aria-hidden','true');
+    const author=element('button','@'+(t.author||'Comunidad'),'ae-top-take-author');
+    author.type='button';
+    author.setAttribute('aria-label','Ver historial de Takes de '+(t.author||'este usuario'));
+    author.addEventListener('click',()=>{
+      if(typeof openAePublicProfile==='function')openAePublicProfile(t.author_id);
     });
-    content.append(author);
-    const stats = element('span', undefined, 'ae-top-take-votes');
-    stats.append(element('span', '▲ ' + Number(t.upvotes || 0), 'ae-top-take-up'));
-    stats.append(element('span', '▼ ' + Number(t.downvotes || 0), 'ae-top-take-down'));
+    identity.append(avatar,author);
+    const when=dateLabel(t.created_at);
+    if(when)identity.append(element('span','· '+when,'ae-take-reference-date'));
+    const stats=element('div',undefined,'ae-top-take-votes');
+    for(const [direction,symbol,value] of [
+      ['up','▲',Number(t.upvotes||0)],['down','▼',Number(t.downvotes||0)]
+    ]){
+      const tally=element('span',symbol+' '+value,'ae-top-take-'+direction);
+      tally.setAttribute('aria-label',(direction==='up'?'Votos positivos: ':'Votos negativos: ')+value);
+      stats.append(tally);
+    }
     const reply=element('button','Responder','ae-top-take-reply');
     reply.type='button';
-    reply.setAttribute('aria-label','Responder al Take: '+t.title);
+    reply.setAttribute('aria-label','Responder al Take: '+(t.title||'Publicación'));
     reply.addEventListener('click',()=>window.aeTakeReplies?.open(t,{focusComposer:true}));
     stats.append(reply);
-    content.append(stats);
+    bottom.append(identity,stats);
+    content.append(bottom);
     item.append(content);
     item.addEventListener('click',event=>{
       if(!event.target.closest('button'))window.aeTakeReplies?.open(t);

@@ -292,6 +292,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
     <link rel="stylesheet" href="assets/ae-muted-navigation-icons.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-custom-nav-icons.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-classical-auth-buttons.css?v=20261016-3">
+<link rel="stylesheet" href="assets/ae-reference-community-design.css?v=20261016-1">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 <a class="ae-skip-link" href="#mainContent">Ir al contenido</a>
@@ -1765,13 +1766,19 @@ currentUser = {
             }
             container.innerHTML = ranked.map((article, index) => {
                 const likes = Number(article.likes)||0;
+                const day = article.createdAt && !Number.isNaN(new Date(article.createdAt).getTime())
+                  ? new Intl.DateTimeFormat('es-ES',{day:'numeric',month:'short',year:'numeric'}).format(new Date(article.createdAt)).replace(/\./g,'')
+                  : '';
+                const byline = [day,article.author?'por '+article.author:''].filter(Boolean).join(' · ');
                 return '<li class="ae-trending-item">'
                     + '<span class="ae-trending-rank">' + (index+1) + '</span>'
                     + '<button type="button" class="ae-trending-link" onclick="openArticleModal(' + articleIdArgument(article.id) + ')">'
                     + '<span class="ae-trending-category">' + escapeHTML(article.category) + '</span>'
-                    + '<span class="ae-trending-title">' + escapeHTML(article.title) + '</span></button>'
+                    + '<span class="ae-trending-title">' + escapeHTML(article.title) + '</span>'
+                    + (byline?'<span class="ae-trending-byline">'+escapeHTML(byline)+'</span>':'')+'</button>'
                     + '<span class="ae-trending-meta" aria-label="' + likes + ' me gusta">'
-                    + '<i class="fa-regular fa-heart" aria-hidden="true"></i> ' + likes + '</span></li>';
+                    + '<i class="fa-regular fa-heart" aria-hidden="true"></i> ' + likes + '</span>'
+                    + '<button type="button" class="ae-trending-arrow" onclick="openArticleModal(' + articleIdArgument(article.id) + ')" aria-label="Leer artículo: ' + escapeHTML(article.title) + '">→</button></li>';
             }).join('');
         }
 
@@ -2201,7 +2208,7 @@ function toggleDarkMode() {
 updateThemeButton();
     </script>
 <script src="assets/nfl-teams.js"></script>
-<script src="assets/community.js?v=20261016-authicons-3"></script>
+<script src="assets/community.js?v=20261016-reference-1"></script>
 <script src="assets/champions.js?v=qa1-20261015-6"></script>
 <script src="assets/community-picks.js?v=20261016-ranking-1"></script>
 <script src="assets/weekly-picks.js?v=20261015-1"></script>
@@ -2211,7 +2218,7 @@ updateThemeButton();
 <script src="assets/free-takes.js?v=20261016-grid-1"></script>
 <script src="assets/ae-editorial-weekly.js?v=20261016-network-1"></script>
 <script src="assets/ae-profile.js?v=20261016-1"></script>
-<script src="assets/ae-home-takes.js?v=20261016-badges-1"></script>
+<script src="assets/ae-home-takes.js?v=20261016-reference-1"></script>
 <script src="assets/ae-sport-top-takes.js?v=20261016-chef-cards-1"></script>
 <script src="assets/ae-take-replies.js?v=20261015-2"></script>
 <script src="assets/ae-picks-premium.js?v=20261015-1"></script>

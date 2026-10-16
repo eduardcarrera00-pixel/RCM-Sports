@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 240" preserveAspectRatio="xMidYMid slice" fill="none">
+<defs><linearGradient id="ink" x1="0" y1="0" x2="1" y2=".8"><stop stop-color="#dab077" stop-opacity="0"/><stop offset=".5" stop-color="#d7ab79" stop-opacity=".18"/><stop offset="1" stop-color="#ba7843" stop-opacity=".65"/></linearGradient><linearGradient id="copper" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#f9e6c9" stop-opacity="0"/><stop offset="1" stop-color="#d9ad70" stop-opacity=".55"/></linearGradient></defs>
+<g transform="translate(440 -54) rotate(-12 400 100)">
+<path d="M0 180Q210 113 400 135T1010 42" stroke="url(#ink)" stroke-width="45"/>
+<path d="M5 160Q260 103 465 126T1015 25" stroke="url(#copper)" stroke-width="12"/>
+<path d="M90 203Q330 132 540 147T1010 91" stroke="#bf8a62" stroke-opacity=".28" stroke-width="6"/>
+<path d="M75 186Q300 131 510 141T990 76" stroke="#b57b4a" stroke-opacity=".23" stroke-width="4"/>
+<path d="M160 224Q360 153 625 169T1000 118" stroke="#bc8e64" stroke-opacity=".21" stroke-width="4"/>
+<path d="M140 208Q410 120 540 136T1020 62" stroke="#f4d6ac" stroke-opacity=".35" stroke-width="2"/>
+</g></svg>
