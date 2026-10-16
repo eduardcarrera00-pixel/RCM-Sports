@@ -15,7 +15,18 @@ const resultLabel=p=>p.outcome==='won'?'Acertado · +'+Math.abs(Number(p.result_
 function el(tag,text,cls){const n=document.createElement(tag);if(text!=null)n.textContent=text;if(cls)n.className=cls;return n;}
 function button(text,fn){const b=el('button',text);b.type='button';b.onclick=fn;return b;}
 function message(error){return error?.message||'No pudimos completar la operación. Inténtalo de nuevo.';}
-async function account(){if(!db)throw Error('Sin conexión.');const r=await db.auth.getUser();if(r.error)throw r.error;if(!r.data.user){closeDetail();closePickComposer(true);openUserAuthModal();return null;}return r.data.user;}
+async function account(resumePublishing=false){
+ if(!db)throw Error('Sin conexión.');
+ const r=await db.auth.getUser();
+ if(r.error&&r.error.name!=='AuthSessionMissingError'&&r.error.code!=='session_not_found')throw r.error;
+ if(!r.data?.user){
+  closeDetail();closePickComposer(true);
+  if(resumePublishing&&typeof aeRequestPublication==='function')await aeRequestPublication('pick',showPickComposer);
+  else openUserAuthModal();
+  return null;
+ }
+ return r.data.user;
+}
 function link(id){const u=new URL(location.href);u.searchParams.delete('article');u.searchParams.delete('comment');u.searchParams.set('pick',id);u.hash='';return u.href;}
 function open(id){history.pushState({},'',link(id));showDetail(id);}
 window.openAeCommunityPick=open;
@@ -249,7 +260,7 @@ function buildComposer(){
   const closer=$('cpComposeClose');if(closer)closer.disabled=true;
   status.textContent='';
   try{
-   const user=await account();if(!user)return;
+   const user=await account(true);if(!user)return;
    if(!calculate())throw Error('Revisa la cuota americana y las selecciones.');
    submit.textContent='Guardando…';
    const r=await db.from('ae_community_picks').insert({title:title.input.value.trim(),explanation:explanation.input.value.trim(),legs:values(),event_date:eventDay.input.value}).select('id').single();
@@ -307,11 +318,14 @@ function closePickComposer(force=false){
  if(dialog?.open)dialog.close();
  syncPickComposer();
 }
-function openPickComposer(){
+function showPickComposer(){
  const dialog=$('cpComposePanel');if(!dialog)return;
  if(!dialog.open)dialog.showModal();
  syncPickComposer();
  dialog.querySelector('input')?.focus({preventScroll:true});
+}
+function openPickComposer(){
+ if(typeof aeRequestPublication==='function')return aeRequestPublication('pick',showPickComposer);
 }
 document.addEventListener('DOMContentLoaded',()=>{
  buildComposer();

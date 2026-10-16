@@ -2,6 +2,46 @@
 // Public anon JWT for the Edge gateway; account access still requires password/code.
 const authGatewayKey="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InphaHVobXZtcXZ4YXVucWVicWFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTExNDQ1MTcsImV4cCI6MjEwNjcyMDUxN30.0tszsvlScd-IG4YoJ0LMs9F4J-q1ukiMTHeWFixom7o";
 let authMode='login',authRecoveryNeedsLogin=false;
+/* Only the latest publication request is retained, until completion or dismissal. */
+let aePendingPublication=null,aePublicationRequest=0;
+function aeClearPendingPublication(){
+ aePublicationRequest++;
+ aePendingPublication=null;
+ const hint=document.getElementById('aeAuthPublishHint');
+ if(hint){hint.hidden=true;hint.textContent='';}
+}
+function aeResumePendingPublication(){
+ const next=aePendingPublication;
+ aeClearPendingPublication();
+ if(typeof next==='function')next();
+}
+async function aeRequestPublication(kind,continueToComposer){
+ if(typeof continueToComposer!=='function')return;
+ const request=++aePublicationRequest;
+ try{
+  if(!db?.auth?.getUser)throw Error('No se pudo conectar con AE SPORTS.');
+  const result=await db.auth.getUser();
+  if(request!==aePublicationRequest)return;
+  if(result.error&&result.error.name!=='AuthSessionMissingError'&&result.error.code!=='session_not_found')throw result.error;
+  if(result.data?.user){
+   aeClearPendingPublication();
+   continueToComposer();
+   return;
+  }
+  aePendingPublication=continueToComposer;
+  const hint=document.getElementById('aeAuthPublishHint');
+  if(hint){
+   hint.textContent='Para publicar tu '+(kind==='pick'?'Pick':'Take')+', inicia sesión o crea una cuenta. Después volverás directamente al formulario.';
+   hint.hidden=false;
+  }
+  setAuthMode('login');
+  openUserAuthModal();
+ }catch(error){
+  if(request!==aePublicationRequest)return;
+  aeClearPendingPublication();
+  window.alert(error.message||'No se pudo comprobar tu sesión. Inténtalo de nuevo.');
+ }
+}
 /* El login es repetible, pero registrar y recuperar contraseñas NO: no se
    reintentan automáticamente para evitar cuentas o códigos duplicados. */
 async function aeAuthRequest(payload){
@@ -58,11 +98,11 @@ async function handleUserLogin(event){
   let sessionError=false;
   if(result.session){const saved=await db.auth.setSession({access_token:result.session.access_token,refresh_token:result.session.refresh_token});if(saved.error)sessionError=true;else{currentUser={id:saved.data.user.id,username:result.username};await loadAdminSession();updateCommentAuthUI();}}
   if(result.recovery_code){authRecoveryNeedsLogin=!!result.recovered||!result.session||sessionError;document.getElementById('userAuthForm').hidden=true;document.getElementById('authRecoveryResult').hidden=false;document.getElementById('authRecoveryOutput').value=result.recovery_code;document.getElementById('authRecoveryMessage').textContent=result.recovered?'Contraseña actualizada. Guarda este código e inicia sesión.':authRecoveryNeedsLogin?'Cuenta preparada. Guarda este código y vuelve a iniciar sesión.':'Tu cuenta está lista y la sesión está abierta.';document.getElementById('authRecoveryOutput').focus();}
-  else{if(sessionError)throw Error('No se pudo guardar la sesión. Vuelve a iniciar sesión.');closeUserAuthModal();}
+  else{if(sessionError)throw Error('No se pudo guardar la sesión. Vuelve a iniciar sesión.');closeUserAuthModal(true);}
   for(const id of ['userAuthPassword','authPasswordConfirm','authRecoveryCode'])document.getElementById(id).value='';
   if(activeModalArticleId){await loadCommentsFromSupabase(activeModalArticleId);refreshCommunity();}
  }catch(error){showUserAuthError(error.message||'No se pudo conectar. Inténtalo de nuevo.');}
  finally{setAuthBusy(false);}
 }
 async function copyRecoveryCode(){const input=document.getElementById('authRecoveryOutput');try{await navigator.clipboard.writeText(input.value);document.getElementById('authRecoveryMessage').textContent='Código copiado. Guárdalo en un lugar privado.';}catch{input.focus();input.select();document.getElementById('authRecoveryMessage').textContent='Copia el código seleccionado y guárdalo.';}}
-function finishRecoveryCode(){const login=authRecoveryNeedsLogin;clearAuthSecrets();if(!login)closeUserAuthModal();else document.getElementById('userAuthUsername').focus();}
+function finishRecoveryCode(){const login=authRecoveryNeedsLogin;clearAuthSecrets();if(!login)closeUserAuthModal(true);else document.getElementById('userAuthUsername').focus();}

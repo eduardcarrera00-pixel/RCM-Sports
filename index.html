@@ -986,9 +986,8 @@ html.dark [data-reading-size][aria-pressed="true"] {
 
         <form id="userAuthForm" onsubmit="handleUserLogin(event)" class="p-6 space-y-4">
 
-            <p class="text-sm text-slate-600">
-                Inicia sesión para comentar, responder y votar.
-            </p>
+            <p id="aeAuthPublishHint" hidden class="text-sm font-semibold text-pitch-700" role="status"></p>
+            <p class="text-sm text-slate-600">Inicia sesión o crea una cuenta para comentar, responder, votar y publicar Takes o Picks.</p>
 
             <div id="userAuthError"
                  class="hidden p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl">
@@ -1417,11 +1416,13 @@ function openUserAuthModal() {
     syncModalScrollLock();
 }
 
-function closeUserAuthModal() {
+function closeUserAuthModal(resumePublication = false) {
     document.getElementById('userAuthModal').classList.add('hidden');
     if (typeof clearAuthSecrets === 'function') clearAuthSecrets();
     authPreviousFocus?.focus();
     syncModalScrollLock();
+    if (resumePublication && typeof aeResumePendingPublication === 'function') aeResumePendingPublication();
+    else if (typeof aeClearPendingPublication === 'function') aeClearPendingPublication();
 }
 
 function showUserAuthError(message) {
@@ -2484,12 +2485,12 @@ updateThemeButton();
 <script src="assets/community.js?v=20261016-admin-header-1"></script>
 <script src="assets/ae-home-community-spotlight.js?v=20261016-1"></script>
 <script src="assets/champions.js?v=qa1-20261015-6"></script>
-<script src="assets/community-picks.js?v=20261016-profile-open-1"></script>
+<script src="assets/community-picks.js?v=20261016-publication-gate-1"></script>
 <script src="assets/weekly-picks.js?v=20261015-1"></script>
-<script src="assets/username-auth.js?v=20261015-2"></script>
+<script src="assets/username-auth.js?v=20261016-publication-gate-1"></script>
 <script src="assets/ae-category-visibility.js?v=20261016-dynamic-nav-1"></script>
 <script src="assets/ae-nfl-takes.js?v=20261015-3"></script>
-<script src="assets/free-takes.js?v=20261016-clean-sport-heading-1"></script>
+<script src="assets/free-takes.js?v=20261016-publication-gate-1"></script>
 <script src="assets/ae-editorial-weekly.js?v=20261016-native-picks-final-1"></script>
 <script src="assets/ae-profile.js?v=20261016-unpopular-take-1"></script>
 <script src="assets/ae-home-takes.js?v=20261016-unified-composer-1"></script>

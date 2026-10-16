@@ -11,7 +11,20 @@
    const n=$('freeTakesStatus');if(n)n.textContent=msg;
    const modal=$('aeTakeComposerStatus');if(modal)modal.textContent=msg;
  }
- async function requireLogin(){if(!db)throw Error('No hay conexión.');const r=await db.auth.getUser();if(r.error)throw r.error;if(!r.data?.user){if(typeof openUserAuthModal==='function')openUserAuthModal();return null;}return r.data.user;}
+ async function requireLogin(resumeComposer=false){
+  if(!db)throw Error('No hay conexión.');
+  const r=await db.auth.getUser();
+  if(r.error&&r.error.name!=='AuthSessionMissingError'&&r.error.code!=='session_not_found')throw r.error;
+  if(!r.data?.user){
+    if(resumeComposer&&typeof aeRequestPublication==='function'){
+      const dialog=$('aeTakeComposerDialog');
+      if(dialog?.open)dialog.close();
+      await aeRequestPublication('take',()=>{if(dialog&&!dialog.open)dialog.showModal();});
+    }else if(typeof openUserAuthModal==='function')openUserAuthModal();
+    return null;
+  }
+  return r.data.user;
+}
  function render(){
    const area=$('freeTakesFeed');if(!area)return;
    area.replaceChildren();
@@ -108,7 +121,7 @@
    e.preventDefault();if(busy)return;
    const form=e.currentTarget,send=form.querySelector('button[type="submit"]');
    try{
-     if(!await requireLogin())return;
+     if(!await requireLogin(true))return;
      const selected=form.elements.sport.value;
      const competition=form.elements.competition.value.trim();
      const title=form.elements.title.value.trim();
@@ -159,6 +172,8 @@
  }
  window.renderFreeTakesVisibility=visibility;
  window.aeOpenTakeComposer=(requestedSport)=>{
+  if(typeof aeRequestPublication!=='function')return;
+  return aeRequestPublication('take',()=>{
    const dialog=$('aeTakeComposerDialog');
    const form=$('freeTakesForm');
    if(!dialog||!form)return;
@@ -176,6 +191,7 @@
      const focusTarget=value?form.elements.competition:form.querySelector('input[name="sport"]');
      focusTarget?.focus();
    },40);
+  });
  };
  document.addEventListener('DOMContentLoaded',()=>{
    $('freeTakesForm')?.addEventListener('submit',create);
