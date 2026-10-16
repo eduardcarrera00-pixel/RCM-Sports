@@ -18,15 +18,21 @@
     dialog.innerHTML = `
       <div class="ae-take-discussion-inner">
         <header class="ae-discussion-header">
-          <div><span>LA COMUNIDAD DEBATE</span><h2 id="aeTakeDiscussionTitle">Conversación del Take</h2></div>
-          <button type="button" id="aeDiscussionClose" aria-label="Cerrar comentarios">✕</button>
+          <div class="ae-discussion-titleblock"><span>LA COMUNIDAD DEBATE</span><h2 id="aeTakeDiscussionTitle">Mis Takes</h2></div>
+          <button type="button" id="aeDiscussionClose" aria-label="Cerrar comentarios"><span aria-hidden="true"></span></button>
         </header>
-        <section class="ae-discussion-subject"><strong id="aeDiscussionSubject"></strong><p id="aeDiscussionBody"></p></section>
-        <h3 class="ae-discussion-counter" id="aeDiscussionCount">Comentarios</h3>
-        <p id="aeDiscussionStatus" role="status" aria-live="polite"></p>
-        <div id="aeDiscussionList" class="ae-discussion-list" aria-live="polite"></div>
+        <section class="ae-discussion-subject">
+          <strong id="aeDiscussionSubject"></strong>
+          <span id="aeDiscussionSport" class="ae-discussion-sport"></span>
+          <p id="aeDiscussionBody"></p>
+        </section>
+        <section class="ae-discussion-thread" aria-labelledby="aeDiscussionCount">
+          <h3 class="ae-discussion-counter" id="aeDiscussionCount">Comentarios</h3>
+          <p id="aeDiscussionStatus" role="status" aria-live="polite"></p>
+          <div id="aeDiscussionList" class="ae-discussion-list" aria-live="polite"></div>
+        </section>
         <div class="ae-discussion-reply-target" id="aeDiscussionTarget" hidden><span id="aeDiscussionTargetName"></span><button id="aeDiscussionCancel" type="button">Cancelar respuesta</button></div>
-        <form id="aeDiscussionForm"><label for="aeDiscussionText">Tu opinión</label><textarea id="aeDiscussionText" name="body" required minlength="2" maxlength="900" rows="3" placeholder="Responde a este Take con respeto…"></textarea><button type="submit" id="aeDiscussionSubmit">Publicar comentario</button></form>
+        <form id="aeDiscussionForm"><label for="aeDiscussionText">Tu opinión</label><textarea id="aeDiscussionText" name="body" required minlength="2" maxlength="900" rows="3" placeholder="Responde a este Take con respeto…"></textarea><button type="submit" id="aeDiscussionSubmit">Publicar comentario <span aria-hidden="true">→</span></button></form>
       </div>`;
     document.body.append(dialog);
     $('aeDiscussionClose').addEventListener('click',()=>dialog.close());
@@ -55,10 +61,15 @@
     const nodes=new Map();
     for(const r of comments) {
       const card=el('article',undefined,'ae-discussion-comment');
+      const avatar=el('span',String(r.author||'Aficionado').trim().charAt(0).toUpperCase()||'A','ae-discussion-avatar');
+      avatar.setAttribute('aria-hidden','true');
+      const content=el('div',undefined,'ae-discussion-comment-content');
       const meta=el('div',undefined,'ae-discussion-meta');
       const author=el('strong','@'+(r.author||'Aficionado'));
-      meta.append(author,el('time',new Date(r.created_at).toLocaleDateString('es',{day:'numeric',month:'short',year:'numeric'})));
-      card.append(meta,el('p',r.body,'ae-discussion-text'));
+      const time=el('time',new Date(r.created_at).toLocaleDateString('es',{day:'numeric',month:'short',year:'numeric'}));
+      try{time.dateTime=new Date(r.created_at).toISOString();}catch(_){}
+      meta.append(author,time);
+      content.append(meta,el('p',r.body,'ae-discussion-text'));
       const actions=el('div',undefined,'ae-discussion-actions');
       const reply=el('button','Responder');
       reply.type='button';
@@ -75,7 +86,8 @@
         });
         actions.append(hide);
       }
-      card.append(actions);
+      content.append(actions);
+      card.append(avatar,content);
       nodes.set(r.id,{card,data:r});
     }
     for(const r of comments) {
@@ -132,7 +144,13 @@
     init();
     current=take;
     setParent(null);
+    const footballSports=new Set(['laliga','premier','ligamx','champions','football','futbol','fútbol']);
+    const sport=String(take.sport||'').toLowerCase();
+    const isNfl=sport==='nfl';
+    const isFootball=!isNfl&&(footballSports.has(sport)||document.body.classList.contains('ae-is-football'));
+    dialog.dataset.sport=isNfl?'nfl':isFootball?'football':'general';
     $('aeDiscussionSubject').textContent=take.title||'Take de la comunidad';
+    $('aeDiscussionSport').textContent=isNfl?'NFL':isFootball?'FÚTBOL':'TAKE';
     $('aeDiscussionBody').textContent=take.body||'';
     $('aeDiscussionText').value='';
     $('aeDiscussionCount').textContent='Comentarios';
