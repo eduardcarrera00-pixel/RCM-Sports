@@ -38,6 +38,7 @@ function renderSessionHeader() {
     // El nombre se muestra en el botón Mi perfil, no duplicado junto al tema.
     const profileButton = document.getElementById('aeMyTakesButton');
     if (profileButton) {
+        profileButton.hidden = !currentUser || Boolean(currentAdmin);
         const displayName = String(currentAdmin?.name || currentUser?.username || '').trim();
         const caption = profileButton.querySelector('.ae-auth-caption');
         if (caption) caption.textContent = displayName || 'Mi perfil';
