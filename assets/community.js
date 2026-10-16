@@ -58,9 +58,7 @@ function renderSessionHeader() {
         illustration.alt = '';
         illustration.setAttribute('aria-hidden', 'true');
         illustration.decoding = 'async';
-        const caption = node('span', 'Cerrar sesión', 'ae-auth-caption');
-        caption.setAttribute('aria-hidden', 'true');
-        out.append(illustration, caption);
+        out.append(illustration);
         readers.append(out);
     }
     document.getElementById('guestAdminContainer').classList.toggle('hidden', Boolean(currentUser || currentAdmin));
