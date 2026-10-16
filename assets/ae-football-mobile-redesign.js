@@ -42,10 +42,10 @@
      if(!stage){stage=document.createElement('div');stage.id='aeFootballMobileStage';main.insertBefore(stage,layout);}
      const grid=$('articlesGrid');
      const heading=grid?.previousElementSibling;
+     const rank=$('championsRankings');relocate(rank,stage);
      relocate($('heroSection'),stage);
      relocate(heading,stage);
      relocate(grid,stage);
-     const rank=$('championsRankings');relocate(rank,stage);
      if(rank&&!$('aeFootballTicker')){
        const ticker=document.createElement('div');ticker.id='aeFootballTicker';ticker.setAttribute('aria-label','Power Rankings de Champions League en movimiento');
        const track=document.createElement('div');track.id='aeFootballTickerTrack';ticker.append(track);rank.append(ticker);
@@ -58,6 +58,7 @@
      if(heading?.querySelector('h2'))heading.querySelector('h2').textContent='Noticias de Fútbol';
      if($('aeSportGeniosTitle'))$('aeSportGeniosTitle').textContent='Genios';
      if($('aeSportAnoetosTitle'))$('aeSportAnoetosTitle').textContent='Anoetos';
+     if(rank){rank.setAttribute('aria-label','Power Rankings Champions League');rank.classList.add('ae-football-ranking-feature');}
      tick();
    }finally{updating=false;}
  }
