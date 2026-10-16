@@ -543,7 +543,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 }
 </style>
     <link rel="stylesheet" href="assets/ae-chef-platos-scroll.css?v=20261016-1">
-<link rel="stylesheet" href="assets/ae-take-rankings-palette.css?v=20261016-2">
+<link rel="stylesheet" href="assets/ae-take-rankings-palette.css?v=20261016-duel-3">
     <link rel="stylesheet" href="assets/ae-take-rankings-best-take.css?v=20261016-1">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
@@ -864,16 +864,29 @@ html.dark [data-reading-size][aria-pressed="true"] {
               <ol id="aeHomeTakeRankingList" class="ae-take-ranking-list" aria-live="polite"><li>Cargando clasificación…</li></ol>
             </section>
               <div class="ae-home-take-extras" aria-label="Destacados de Takes">
-                <section id="aeHomeTakesCurious" class="ae-home-take-feature" aria-labelledby="aeHomeTakesCuriousTitle">
-                  <p class="ae-home-take-feature-kicker">Voces de la comunidad</p>
-                  <h3 id="aeHomeTakesCuriousTitle">Takes curiosos</h3>
-                  <p class="ae-home-take-feature-intro">Opiniones inesperadas y debates que dan que pensar.</p>
-                  <ul id="aeHomeTakesCuriousList" class="ae-discovery-list" aria-live="polite"><li class="ae-discovery-empty">Cargando Takes…</li></ul>
+                <section id="aeHomeTakesCurious" class="ae-home-take-feature" aria-label="Los Takes más votados">
+                  <p class="ae-home-take-feature-kicker">El veredicto de la comunidad</p>
+                  <div class="ae-vote-duel">
+                    <section class="ae-vote-column is-positive" aria-labelledby="aeHomeTakesPositiveTitle">
+                      <div class="ae-vote-column-heading">
+                        <h3 id="aeHomeTakesPositiveTitle">Takes que arrasan</h3>
+                        <p>Los más aplaudidos</p>
+                      </div>
+                      <ol id="aeHomeTakesPositiveList" class="ae-discovery-list" aria-live="polite"><li class="ae-discovery-empty">Cargando Takes…</li></ol>
+                    </section>
+                    <section class="ae-vote-column is-negative" aria-labelledby="aeHomeTakesNegativeTitle">
+                      <div class="ae-vote-column-heading">
+                        <h3 id="aeHomeTakesNegativeTitle">Takes que arden</h3>
+                        <p>Los más cuestionados</p>
+                      </div>
+                      <ol id="aeHomeTakesNegativeList" class="ae-discovery-list" aria-live="polite"><li class="ae-discovery-empty">Cargando Takes…</li></ol>
+                    </section>
+                  </div>
                 </section>
                 <section id="aeHomeTakeHistoric" class="ae-home-take-feature" aria-labelledby="aeHomeTakeHistoricTitle">
                   <p class="ae-home-take-feature-kicker">De todos los tiempos</p>
                   <h3 id="aeHomeTakeHistoricTitle">Mejor take histórico</h3>
-                  <p class="ae-home-take-feature-intro">El más apoyado por la comunidad desde el comienzo.</p>
+                  <p class="ae-home-take-feature-intro">El Take individual con más puntos otorgados por los administradores.</p>
                   <div id="aeHomeTakeHistoricTake" aria-live="polite"><p class="ae-discovery-empty">Cargando Take…</p></div>
                 </section>
               </div>
@@ -2637,7 +2650,7 @@ updateThemeButton();
 <script src="assets/ae-editorial-weekly.js?v=20261016-native-picks-final-1"></script>
 <script src="assets/ae-profile.js?v=20261016-unpopular-take-1"></script>
 <script src="assets/ae-home-takes.js?v=20261016-unified-composer-1"></script>
-<script src="assets/ae-home-take-discoveries.js?v=20261016-1"></script>
+<script src="assets/ae-home-take-discoveries.js?v=20261016-votes-historic-points-2"></script>
 <script src="assets/ae-nfl-latest-comments.js?v=20261016-football-2"></script>
 <script src="assets/ae-sport-top-takes.js?v=20261016-unified-composer-1"></script>
 <script src="assets/ae-take-replies.js?v=20261016-reply-login-1"></script>
