@@ -321,6 +321,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/ae-champions-mobile-ranking-compact.css?v=20261016-desktop-unified-v2">
 <link rel="stylesheet" href="assets/ae-take-category-edit.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-profile-city-editorial.css?v=20261016-profile-city-1">
+<link rel="stylesheet" href="assets/ae-profile-tabs-picks.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-home-weekly-match-picks-mobile.css?v=20261016-mobile-photo-parity-2">
 <link rel="stylesheet" href="assets/ae-mobile-home-takes-swipe-and-football-news.css?v=20261016-top3-swipe-v1">
 <link rel="stylesheet" href="assets/ae-article-floating-close.css?v=20261016-1">
@@ -966,11 +967,18 @@ html.dark [data-reading-size][aria-pressed="true"] {
  <button id="cpArchiveMore" type="button" class="ae-history-more" hidden>Ver más Picks</button>
 </dialog>
 <dialog id="aeProfileDialog" class="ae-profile-dialog" aria-labelledby="aeProfileTitle">
- <div class="ae-profile-top"><div><span>MI CUENTA · AE SPORTS</span><h2 id="aeProfileTitle">Mis Takes</h2><p id="aeProfileUsername">Tu historial de opiniones deportivas</p></div><button type="button" class="ae-profile-close" onclick="closeAeProfile()" aria-label="Cerrar perfil">✕</button></div>
- <div class="ae-profile-overview"><strong id="aeProfileCount">0 Takes</strong><p>Consulta las opiniones que has publicado, sus votos y su estado. Solo se muestran las de tu cuenta.</p></div>
+ <div class="ae-profile-top"><div><span>MI CUENTA · AE SPORTS</span><h2 id="aeProfileTitle">Mi perfil</h2><p id="aeProfileUsername">Tu historial deportivo</p></div><button type="button" class="ae-profile-close" onclick="closeAeProfile()" aria-label="Cerrar perfil">✕</button></div>
+ <nav id="aeProfileTabs" class="ae-profile-tabs" aria-label="Secciones de mi perfil" hidden>
+   <button id="aeProfileTabTakes" type="button" role="tab" aria-selected="true" class="is-active">Mis Takes</button>
+   <button id="aeProfileTabPicks" type="button" role="tab" aria-selected="false">Mis Picks</button>
+ </nav>
+ <div class="ae-profile-overview"><strong id="aeProfileCount">0 Takes</strong><p id="aeProfileOverviewText">Tu historial deportivo en AE SPORTS.</p></div>
  <p id="aeProfileStatus" role="status" aria-live="polite"></p>
- <section id="aeProfileHistoricTake" class="ae-profile-historic" aria-label="El Take histórico de este usuario" hidden></section>
+ <section id="aeProfileTakeHighlights" class="ae-profile-highlights" aria-label="Takes destacados" hidden></section>
  <div id="aeProfileTakes" class="ae-profile-takes"></div>
+ <section id="aeProfilePickHighlights" class="ae-profile-pick-highlights" aria-label="Picks destacados" hidden></section>
+ <div id="aeProfilePicks" class="ae-profile-picks" hidden></div>
+ <section id="aeProfileAccuracy" class="ae-profile-accuracy" aria-label="Porcentaje de acierto" hidden></section>
 </dialog>
 
 <!-- User Account Modal -->
@@ -2493,14 +2501,14 @@ updateThemeButton();
 <script src="assets/community.js?v=20261016-admin-header-1"></script>
 <script src="assets/ae-home-community-spotlight.js?v=20261016-1"></script>
 <script src="assets/champions.js?v=qa1-20261015-6"></script>
-<script src="assets/community-picks.js?v=20261016-odds-right-2"></script>
+<script src="assets/community-picks.js?v=20261016-profile-open-1"></script>
 <script src="assets/weekly-picks.js?v=20261015-1"></script>
 <script src="assets/username-auth.js?v=20261015-2"></script>
 <script src="assets/ae-category-visibility.js?v=20261015-3"></script>
 <script src="assets/ae-nfl-takes.js?v=20261015-3"></script>
 <script src="assets/free-takes.js?v=20261016-know-how-heading-1"></script>
 <script src="assets/ae-editorial-weekly.js?v=20261016-home-picks-exact-v3"></script>
-<script src="assets/ae-profile.js?v=20261016-take-sport-edit-1"></script>
+<script src="assets/ae-profile.js?v=20261016-takes-picks-profile-1"></script>
 <script src="assets/ae-home-takes.js?v=20261016-unified-composer-1"></script>
 <script src="assets/ae-nfl-latest-comments.js?v=20261016-football-2"></script>
 <script src="assets/ae-sport-top-takes.js?v=20261016-unified-composer-1"></script>
