@@ -321,6 +321,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/ae-champions-mobile-ranking-compact.css?v=20261016-desktop-unified-v2">
 <link rel="stylesheet" href="assets/ae-home-weekly-match-picks-mobile.css?v=20261016-picks-match-mobile-1">
 <link rel="stylesheet" href="assets/ae-mobile-home-takes-swipe-and-football-news.css?v=20261016-top3-swipe-v1">
+<link rel="stylesheet" href="assets/ae-article-floating-close.css?v=20261016-1">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 <a class="ae-skip-link" href="#mainContent">Ir al contenido</a>
@@ -971,6 +972,9 @@ html.dark [data-reading-size][aria-pressed="true"] {
     </div>
 
     <div id="articleModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" tabindex="-1" class="fixed inset-0 z-50 hidden overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6">
+        <button type="button" onclick="closeModal()" class="ae-article-floating-close" aria-label="Cerrar publicación" title="Cerrar publicación">
+            <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        </button>
         <div class="relative bg-white border border-slate-200 w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden max-h-[92vh] flex flex-col my-auto">
 
             <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50 sticky top-0 z-10">
