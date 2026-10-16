@@ -894,6 +894,9 @@
 @media(max-width:760px) and (prefers-reduced-motion:reduce){html body.ae-is-football #aeFootballTickerTrack.is-moving{animation:none!important}}
 @media(max-width:760px){html:not(.dark) body.ae-is-football #championsRankings.rcm-panel{background:#fffaf3!important;border-color:#d9bfa6!important}html:not(.dark) body.ae-is-football #aeFootballTickerTrack .ae-team-name{color:#183247!important}html:not(.dark) body.ae-is-football #freeTakes .ae-takes-head{background:#fffaf4!important}html:not(.dark) body.ae-is-football #heroSection .editorial-hero:after{background:linear-gradient(90deg,rgba(255,250,242,.96),rgba(255,250,242,.8) 45%,rgba(255,250,242,.05) 100%)}html:not(.dark) body.ae-is-football #heroSection .editorial-hero-copy h1,html:not(.dark) body.ae-is-football #heroSection .editorial-hero-copy p{color:#112b42!important;text-shadow:none!important}}
 
+/* Controles creados por JS: invisibles fuera de Fútbol en teléfono. */
+#aeFootballTicker, #aeFootballRankingControls { display:none; }
+
 /* AE SPORTS · Fútbol · portada del Power Ranking (solo teléfonos).
    Una sola propuesta editorial: campeón destacado + Top 3 animado, día y noche. */
 @media (max-width:760px) {
