@@ -39,7 +39,7 @@ html body.ae-is-home #mainContent #heroSection .editorial-hero-image{
   inset:0 0 0 auto!important;
   z-index:1!important;
   display:block!important;
-  width:61%!important;
+  width:64%!important;
   height:100%!important;
   max-width:none!important;
   max-height:none!important;
@@ -50,6 +50,12 @@ html body.ae-is-home #mainContent #heroSection .editorial-hero-image{
   transform-origin:var(--ae-image-focus,50% 50%)!important;
   transform:scale(var(--ae-image-zoom,1))!important;
   pointer-events:none!important;
+  -webkit-mask-image:linear-gradient(104deg,transparent 0%,rgba(0,0,0,.08) 9%,rgba(0,0,0,.38) 17%,rgba(0,0,0,.78) 25%,#000 34%);
+  mask-image:linear-gradient(104deg,transparent 0%,rgba(0,0,0,.08) 9%,rgba(0,0,0,.38) 17%,rgba(0,0,0,.78) 25%,#000 34%);
+  -webkit-mask-size:100% 100%;
+  mask-size:100% 100%;
+  -webkit-mask-repeat:no-repeat;
+  mask-repeat:no-repeat;
 }
 html body.ae-is-home #mainContent #heroSection .editorial-hero::after{
   content:""!important;
@@ -57,7 +63,8 @@ html body.ae-is-home #mainContent #heroSection .editorial-hero::after{
   inset:0!important;
   z-index:2!important;
   pointer-events:none!important;
-  background:linear-gradient(90deg,#091d2b 0%,#091d2bfa 24%,#0b2231ed 39%,rgba(11,34,49,.65) 52%,rgba(11,34,49,.20) 67%,transparent 84%)!important;
+  background:
+    linear-gradient(104deg,#091d2b 0%,#091d2bfa 25%,#0b2231ee 39%,rgba(11,34,49,.72) 50%,rgba(11,34,49,.28) 62%,rgba(11,34,49,.08) 72%,transparent 82%)!important;
 }
 html body.ae-is-home #mainContent #heroSection .editorial-hero::before{
   content:none!important;
@@ -184,9 +191,11 @@ html body.ae-is-home #mainContent #heroSection .ae-action-title{
     width:100%!important;
     opacity:.39!important;
     filter:saturate(.9) brightness(.63)!important;
+    -webkit-mask-image:linear-gradient(100deg,rgba(0,0,0,.32) 0%,rgba(0,0,0,.74) 28%,#000 48%);
+    mask-image:linear-gradient(100deg,rgba(0,0,0,.32) 0%,rgba(0,0,0,.74) 28%,#000 48%);
   }
   html body.ae-is-home #mainContent #heroSection .editorial-hero::after{
-    background:linear-gradient(90deg,#091d2bfa 0%,#091d2bea 55%,rgba(9,29,43,.66) 82%,rgba(9,29,43,.45) 100%)!important;
+    background:linear-gradient(100deg,#091d2bfa 0%,#091d2bea 54%,rgba(9,29,43,.66) 80%,rgba(9,29,43,.44) 100%)!important;
   }
   html body.ae-is-home #mainContent #heroSection .editorial-hero-copy{
     width:100%!important;
