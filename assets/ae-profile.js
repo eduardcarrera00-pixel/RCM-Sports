@@ -1,45 +1,116 @@
-/* AE SPORTS · Profile history for the reader and for other Take authors.
- * Only public Take text and vote totals are exposed by the public profile API.
+/* AE SPORTS · Unified private profile: Takes + Picks.
+ * Public author profiles remain Takes-only.
  */
 (() => {
 'use strict';
-const $=id=>document.getElementById(id);
-const el=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=String(text);if(cls)n.className=cls;return n;};
-const labels={football:'Fútbol',laliga:'LaLiga',premier:'Premier League',ligamx:'Liga MX',champions:'Champions League',nfl:'NFL',colegial:'Fútbol colegial',general:'Deportes'};
-let request=0,activeAuthor=null,privateView=false,working=false;
+
+const $ = id => document.getElementById(id);
+const el = (tag,text,cls) => {
+  const n=document.createElement(tag);
+  if(text!==undefined&&text!==null)n.textContent=String(text);
+  if(cls)n.className=cls;
+  return n;
+};
+
+const labels={
+  football:'Fútbol',laliga:'LaLiga',premier:'Premier League',ligamx:'Liga MX',
+  champions:'Champions League',nfl:'NFL',colegial:'Fútbol colegial',general:'Deportes'
+};
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-async function me(){if(typeof db==='undefined'||!db)return null;const r=await db.auth.getUser();return r.error?null:r.data?.user||null;}
+
+let request=0;
+let activeAuthor=null;
+let privateView=false;
+let working=false;
+let activeTab='takes';
+let ownTakes=[];
+let ownPicks=[];
+
+async function me(){
+  if(typeof db==='undefined'||!db)return null;
+  const r=await db.auth.getUser();
+  return r.error?null:r.data?.user||null;
+}
+
 async function updateButton(){
- const b=$('aeMyTakesButton');if(!b)return;
- const user=await me();
- const adminActive=typeof currentAdmin!=='undefined' && Boolean(currentAdmin);
- b.hidden=!user || adminActive;
- if(!user&&privateView)close();
+  const b=$('aeMyTakesButton');
+  if(!b)return;
+  const user=await me();
+  const adminActive=typeof currentAdmin!=='undefined'&&Boolean(currentAdmin);
+  b.hidden=!user||adminActive;
+  if(!user&&privateView)close();
 }
+
 function close(){
- ++request;activeAuthor=null;privateView=false;
- const dialog=$('aeProfileDialog');if(dialog?.open)dialog.close();
- if(new URL(location.href).searchParams.has('perfil')){
-  const url=new URL(location.href);url.searchParams.delete('perfil');history.replaceState({},'',url);
- }
+  ++request;
+  activeAuthor=null;
+  privateView=false;
+  activeTab='takes';
+  ownTakes=[];
+  ownPicks=[];
+  const dialog=$('aeProfileDialog');
+  if(dialog?.open)dialog.close();
+  if(new URL(location.href).searchParams.has('perfil')){
+    const url=new URL(location.href);
+    url.searchParams.delete('perfil');
+    history.replaceState({},'',url);
+  }
 }
-function display(entries,owner,canVote){
- const target=$('aeProfileTakes');target.replaceChildren();
- const featured=$('aeProfileHistoricTake');if(featured){featured.replaceChildren();featured.hidden=true;}
- const published=entries.filter(t=>!t.hidden);
- const best=published.slice().sort((a,b)=>Number(b.upvotes||0)-Number(a.upvotes||0)||Number(a.downvotes||0)-Number(b.downvotes||0)||new Date(b.created_at)-new Date(a.created_at))[0];
- if(featured&&best){
-   featured.append(el('span',privateView?'TU TAKE HISTÓRICO':'SU TAKE HISTÓRICO','ae-profile-historic-label'),el('h3',best.title),el('p',best.body),el('strong','▲ '+Number(best.upvotes||0)+' apoyos · ▼ '+Number(best.downvotes||0)+' cuestionamientos'));
-   featured.hidden=false;
- }
- $('aeProfileCount').textContent=entries.length+' '+(entries.length===1?'Take histórico':'Takes históricos');
- if(!entries.length){target.append(el('p',privateView?'Aún no has publicado Takes. Puedes escribirlos en Fútbol o NFL.':'Todavía no hay Takes públicos en este perfil.','ae-profile-empty'));return;}
- for(const entry of entries){
-  const box=el('article',undefined,'ae-profile-item');
-  box.append(el('small',(labels[entry.sport]||'Deportes')+' · '+new Date(entry.created_at).toLocaleDateString('es')+(entry.hidden?' · Oculto por moderación':''),'ae-profile-item-meta'),el('h3',entry.title),el('p',entry.body));
-  const actions=el('div',undefined,'ae-profile-item-stats');
-  actions.append(el('span','▲ '+entry.upvotes+' apoyos'),el('span','▼ '+entry.downvotes+' cuestionamientos'));
-  if(privateView && ['nfl','football','laliga','premier','ligamx','champions'].includes(entry.sport)){
+
+function dateText(value){
+  const d=new Date(value);
+  return Number.isNaN(d.getTime())?'':d.toLocaleDateString('es',{day:'numeric',month:'short',year:'numeric'});
+}
+
+function numeric(value){const n=Number(value);return Number.isFinite(n)?n:0;}
+function takeNet(t){return numeric(t.upvotes)-numeric(t.downvotes);}
+function takeActivity(t){return numeric(t.upvotes)+numeric(t.downvotes);}
+
+function uniqueChoice(sorted,used){
+  return sorted.find(item=>!used.has(String(item.id)))||sorted[0]||null;
+}
+
+function featuredTakes(entries){
+  const published=entries.filter(t=>!t.hidden);
+  if(!published.length)return [];
+  const byBest=published.slice().sort((a,b)=>takeNet(b)-takeNet(a)||numeric(b.upvotes)-numeric(a.upvotes)||new Date(b.created_at)-new Date(a.created_at));
+  const byWorst=published.slice().sort((a,b)=>takeNet(a)-takeNet(b)||numeric(b.downvotes)-numeric(a.downvotes)||new Date(b.created_at)-new Date(a.created_at));
+  const byPopular=published.slice().sort((a,b)=>takeActivity(b)-takeActivity(a)||Math.abs(takeNet(b))-Math.abs(takeNet(a))||new Date(b.created_at)-new Date(a.created_at));
+  const used=new Set();
+  const best=uniqueChoice(byBest,used);if(best)used.add(String(best.id));
+  const worst=uniqueChoice(byWorst,used);if(worst)used.add(String(worst.id));
+  const popular=uniqueChoice(byPopular,used);
+  return [
+    ['Mejor Take',best,'best'],
+    ['Peor Take',worst,'worst'],
+    ['Más popular',popular,'popular']
+  ].filter(([,item])=>item);
+}
+
+function makeTakeFeature(label,tone,entry){
+  const card=el('article',null,'ae-profile-feature ae-profile-feature-'+tone);
+  card.append(el('span',label,'ae-profile-feature-label'));
+  card.append(el('h3',entry.title||'Take'));
+  const body=String(entry.body||'').trim();
+  if(body)card.append(el('p',body.length>190?body.slice(0,190).trimEnd()+'…':body));
+  const stats=el('div',null,'ae-profile-feature-stats');
+  stats.append(el('strong','▲ '+numeric(entry.upvotes)),el('span','▼ '+numeric(entry.downvotes)));
+  card.append(stats);
+  return card;
+}
+
+function renderTakeItem(entry,owner,canVote){
+  const box=el('article',null,'ae-profile-item');
+  const competition=entry.competition||labels[entry.sport]||'Deportes';
+  box.append(
+    el('small',competition+' · '+dateText(entry.created_at)+(entry.hidden?' · Oculto por moderación':''),'ae-profile-item-meta'),
+    el('h3',entry.title),
+    el('p',entry.body)
+  );
+  const actions=el('div',null,'ae-profile-item-stats');
+  actions.append(el('span','▲ '+numeric(entry.upvotes)+' apoyos'),el('span','▼ '+numeric(entry.downvotes)+' cuestionamientos'));
+
+  if(privateView&&['nfl','football','laliga','premier','ligamx','champions'].includes(entry.sport)){
     const change=el('button','Cambiar comunidad','ae-profile-change-sport');
     change.type='button';
     change.setAttribute('aria-label','Cambiar entre NFL y Fútbol el Take: '+entry.title);
@@ -48,73 +119,338 @@ function display(entries,owner,canVote){
     }));
     actions.append(change);
   }
+
   if(canVote&&!entry.hidden){
-   for(const [value,label] of [[1,'▲ Apoyar'],[-1,'▼ Cuestionar']]){
-    const b=el('button',label,'ae-take-button');b.type='button';b.disabled=working;b.setAttribute('aria-pressed',String(Number(entry.my_vote)===value));
-    b.addEventListener('click',async()=>{
-     const viewer=await me();
-     if(!viewer){if(typeof openUserAuthModal==='function')openUserAuthModal();return;}
-     if(viewer.id===entry.author_id)return;
-     if(working)return;working=true;b.disabled=true;
-     const result=await db.rpc('ae_vote_free_take',{p_take_id:entry.id,p_value:value});
-     if(result.error){$('aeProfileStatus').textContent=result.error.message;working=false;b.disabled=false;return;}
-     working=false;await showPublic(owner,false);
-    });actions.append(b);
-   }
+    for(const [value,label] of [[1,'▲ Apoyar'],[-1,'▼ Cuestionar']]){
+      const b=el('button',label,'ae-take-button');
+      b.type='button';
+      b.disabled=working;
+      b.setAttribute('aria-pressed',String(Number(entry.my_vote)===value));
+      b.addEventListener('click',async()=>{
+        const viewer=await me();
+        if(!viewer){if(typeof openUserAuthModal==='function')openUserAuthModal();return;}
+        if(viewer.id===entry.author_id||working)return;
+        working=true;b.disabled=true;
+        const result=await db.rpc('ae_vote_free_take',{p_take_id:entry.id,p_value:value});
+        if(result.error){
+          $('aeProfileStatus').textContent=result.error.message;
+          working=false;b.disabled=false;return;
+        }
+        working=false;
+        await showPublic(owner,false);
+      });
+      actions.append(b);
+    }
   }
-  box.append(actions);target.append(box);
- }
+  box.append(actions);
+  return box;
 }
+
+function renderTakes(entries,owner,canVote){
+  const highlights=$('aeProfileTakeHighlights');
+  const target=$('aeProfileTakes');
+  highlights.replaceChildren();
+  target.replaceChildren();
+
+  const featured=featuredTakes(entries);
+  if(featured.length){
+    for(const [label,item,tone] of featured)highlights.append(makeTakeFeature(label,tone,item));
+    highlights.hidden=false;
+  }else{
+    highlights.hidden=true;
+  }
+
+  $('aeProfileCount').textContent=entries.length+' '+(entries.length===1?'Take':'Takes');
+  const overview=$('aeProfileOverviewText');
+  if(overview)overview.textContent=privateView
+    ?'Tus mejores, peores y más populares opiniones, seguidas por tus publicaciones más recientes.'
+    :'Selección histórica de Takes públicos de este aficionado.';
+
+  if(!entries.length){
+    target.append(el('p',privateView?'Aún no has publicado Takes.':'Todavía no hay Takes públicos en este perfil.','ae-profile-empty'));
+    return;
+  }
+
+  const heading=el('h3',privateView?'Últimos Takes':'Takes recientes','ae-profile-list-heading');
+  target.append(heading);
+  for(const entry of entries.slice(0,privateView?12:30))target.append(renderTakeItem(entry,owner,canVote));
+}
+
+function pickOutcomeLabel(p){
+  if(p.outcome==='won')return 'Acertado';
+  if(p.outcome==='lost')return 'Fallado';
+  if(p.outcome==='void')return 'Anulado';
+  return 'Pendiente';
+}
+
+function pickTone(p){
+  return p.outcome==='won'?'won':p.outcome==='lost'?'lost':p.outcome==='void'?'void':'pending';
+}
+
+function pickOdds(p){
+  const n=Number(p.american_odds);
+  return Number.isFinite(n)?(n>0?'+':'')+n:'—';
+}
+
+function pickPoints(p){
+  const n=Number(p.result_points);
+  if(!Number.isFinite(n))return '';
+  if(n>0)return '+'+n.toFixed(2)+' pts';
+  if(n<0)return '−'+Math.abs(n).toFixed(2)+' pts';
+  return '0 pts';
+}
+
+function openPick(id){
+  if(typeof window.openAeCommunityPick==='function'){
+    window.openAeCommunityPick(id);
+    return;
+  }
+  const u=new URL(location.href);
+  u.searchParams.delete('article');
+  u.searchParams.delete('comment');
+  u.searchParams.set('pick',id);
+  history.pushState({},'',u);
+  window.dispatchEvent(new PopStateEvent('popstate'));
+}
+
+function renderPickCard(p,feature=false){
+  const box=el('article',null,'ae-profile-pick '+(feature?'ae-profile-pick-feature ':'')+'is-'+pickTone(p));
+  const meta=el('div',null,'ae-profile-pick-meta');
+  meta.append(el('span',pickOutcomeLabel(p)),el('span','Cuota '+pickOdds(p)));
+  if(p.created_at)meta.append(el('time',dateText(p.created_at)));
+  box.append(meta,el('h4',p.title||'Pick'));
+
+  const legs=Array.isArray(p.legs)?p.legs:[];
+  if(legs.length){
+    const list=el('div',null,'ae-profile-pick-legs');
+    for(const leg of legs.slice(0,2)){
+      const row=el('p');
+      row.append(el('span',String(leg.event||leg.sport||'Evento')));
+      if(leg.selection)row.append(el('strong',String(leg.selection)));
+      list.append(row);
+    }
+    box.append(list);
+  }
+  if(p.explanation){
+    const text=String(p.explanation);
+    box.append(el('p',text.length>170?text.slice(0,170).trimEnd()+'…':text,'ae-profile-pick-explanation'));
+  }
+
+  const foot=el('div',null,'ae-profile-pick-footer');
+  const points=pickPoints(p);
+  if(points)foot.append(el('strong',points));
+  foot.append(el('span','▲ '+numeric(p.upvotes)),el('span','▼ '+numeric(p.downvotes)));
+  const open=el('button','Ver Pick','ae-profile-pick-open');
+  open.type='button';
+  open.addEventListener('click',()=>openPick(p.id));
+  foot.append(open);
+  box.append(foot);
+  return box;
+}
+
+function renderPickGroup(title,items,tone){
+  const group=el('section',null,'ae-profile-pick-group ae-profile-pick-group-'+tone);
+  group.append(el('h3',title));
+  const grid=el('div',null,'ae-profile-pick-grid');
+  if(items.length){
+    for(const p of items)grid.append(renderPickCard(p,true));
+  }else{
+    grid.append(el('p',tone==='best'?'Todavía no tienes Picks acertados.':'Todavía no tienes Picks fallados.','ae-profile-empty'));
+  }
+  group.append(grid);
+  return group;
+}
+
+function renderAccuracy(entries){
+  const target=$('aeProfileAccuracy');
+  target.replaceChildren();
+  const won=entries.filter(p=>p.outcome==='won').length;
+  const lost=entries.filter(p=>p.outcome==='lost').length;
+  const voids=entries.filter(p=>p.outcome==='void').length;
+  const pending=entries.filter(p=>p.outcome==='pending').length;
+  const decided=won+lost;
+  const pct=decided?Math.round((won/decided)*100):null;
+
+  const copy=el('div',null,'ae-profile-accuracy-copy');
+  copy.append(el('span','PORCENTAJE DE ACIERTO'),el('strong',pct===null?'—':pct+'%'));
+  const detail=el('p',decided
+    ?won+' acertados · '+lost+' fallados'+(voids?' · '+voids+' anulados':'')+(pending?' · '+pending+' pendientes':'')
+    :'Todavía no hay Picks acertados o fallados para calcular el porcentaje.');
+  target.append(copy,detail);
+  target.hidden=false;
+}
+
+function renderPicks(entries){
+  const highlights=$('aeProfilePickHighlights');
+  const target=$('aeProfilePicks');
+  highlights.replaceChildren();
+  target.replaceChildren();
+
+  $('aeProfileCount').textContent=entries.length+' '+(entries.length===1?'Pick':'Picks');
+  const overview=$('aeProfileOverviewText');
+  if(overview)overview.textContent='Tus mejores y peores resultados, tus Picks recientes y tu porcentaje de acierto real.';
+
+  const won=entries.filter(p=>p.outcome==='won').sort((a,b)=>numeric(b.result_points)-numeric(a.result_points)||numeric(b.american_odds)-numeric(a.american_odds)||new Date(b.created_at)-new Date(a.created_at));
+  const lost=entries.filter(p=>p.outcome==='lost').sort((a,b)=>numeric(a.result_points)-numeric(b.result_points)||numeric(b.american_odds)-numeric(a.american_odds)||new Date(b.created_at)-new Date(a.created_at));
+
+  highlights.append(renderPickGroup('Mejores Picks',won.slice(0,3),'best'),renderPickGroup('Peores Picks',lost.slice(0,3),'worst'));
+  highlights.hidden=false;
+
+  if(entries.length){
+    target.append(el('h3','Últimos Picks','ae-profile-list-heading'));
+    for(const p of entries.slice(0,10))target.append(renderPickCard(p,false));
+  }else{
+    target.append(el('p','Aún no has publicado Picks.','ae-profile-empty'));
+  }
+  renderAccuracy(entries);
+}
+
+function setPrivateTab(tab){
+  if(!privateView)return;
+  activeTab=tab==='picks'?'picks':'takes';
+  const takesButton=$('aeProfileTabTakes');
+  const picksButton=$('aeProfileTabPicks');
+  takesButton?.setAttribute('aria-selected',String(activeTab==='takes'));
+  picksButton?.setAttribute('aria-selected',String(activeTab==='picks'));
+  takesButton?.classList.toggle('is-active',activeTab==='takes');
+  picksButton?.classList.toggle('is-active',activeTab==='picks');
+
+  const takeHighlights=$('aeProfileTakeHighlights');
+  const takeList=$('aeProfileTakes');
+  const pickHighlights=$('aeProfilePickHighlights');
+  const pickList=$('aeProfilePicks');
+  const accuracy=$('aeProfileAccuracy');
+
+  if(activeTab==='takes'){
+    takeHighlights.hidden=false;
+    takeList.hidden=false;
+    pickHighlights.hidden=true;
+    pickList.hidden=true;
+    accuracy.hidden=true;
+    $('aeProfileTitle').textContent='Mis Takes';
+    renderTakes(ownTakes,activeAuthor,false);
+  }else{
+    takeHighlights.hidden=true;
+    takeList.hidden=true;
+    pickHighlights.hidden=false;
+    pickList.hidden=false;
+    $('aeProfileTitle').textContent='Mis Picks';
+    renderPicks(ownPicks);
+  }
+}
+
+async function loadOwnPicks(userId){
+  const result=await db.from('ae_pick_feed').select('*')
+    .eq('user_id',userId)
+    .order('created_at',{ascending:false})
+    .order('id',{ascending:false})
+    .limit(200);
+  if(result.error)throw result.error;
+  return result.data||[];
+}
+
 async function showOwn(){
- const user=await me();
- if(!user){if(typeof openUserAuthModal==='function')openUserAuthModal();return;}
- privateView=true;activeAuthor=user.id;const ticket=++request;
- const dialog=$('aeProfileDialog');if(!dialog.open)dialog.showModal();
- $('aeProfileTitle').textContent='Mis Takes';
- $('aeProfileDialog').querySelector('.ae-profile-overview p').textContent='Consulta todas tus opiniones, incluidos los Takes que hayan sido ocultados por moderación.';
- $('aeProfileUsername').textContent='@'+(user.user_metadata?.username||user.user_metadata?.display_name||'Usuario');
- $('aeProfileStatus').textContent='Cargando tu historial…';$('aeProfileTakes').replaceChildren();
- const {data,error}=await db.rpc('ae_my_free_takes');
- if(ticket!==request||!dialog.open)return;
- $('aeProfileStatus').textContent=error?'No se pudo cargar tu historial: '+error.message:'';
- if(!error)display(data||[],user.id,false);
+  const user=await me();
+  if(!user){if(typeof openUserAuthModal==='function')openUserAuthModal();return;}
+
+  privateView=true;
+  activeAuthor=user.id;
+  activeTab='takes';
+  const ticket=++request;
+  const dialog=$('aeProfileDialog');
+  if(!dialog.open)dialog.showModal();
+
+  $('aeProfileTabs').hidden=false;
+  $('aeProfileUsername').textContent='@'+(user.user_metadata?.username||user.user_metadata?.display_name||'Usuario');
+  $('aeProfileStatus').textContent='Cargando tu perfil…';
+  $('aeProfileTakeHighlights').replaceChildren();
+  $('aeProfileTakes').replaceChildren();
+  $('aeProfilePickHighlights').replaceChildren();
+  $('aeProfilePicks').replaceChildren();
+  $('aeProfileAccuracy').replaceChildren();
+  $('aeProfileAccuracy').hidden=true;
+
+  const [takesResult,picksResult]=await Promise.allSettled([
+    db.rpc('ae_my_free_takes'),
+    loadOwnPicks(user.id)
+  ]);
+  if(ticket!==request||!dialog.open)return;
+
+  const takeError=takesResult.status==='rejected'?takesResult.reason:takesResult.value.error;
+  const pickError=picksResult.status==='rejected'?picksResult.reason:null;
+  ownTakes=takeError?[]:(takesResult.value.data||[]);
+  ownPicks=pickError?[]:picksResult.value;
+
+  const errors=[];
+  if(takeError)errors.push('Takes: '+(takeError.message||'no disponibles'));
+  if(pickError)errors.push('Picks: '+(pickError.message||'no disponibles'));
+  $('aeProfileStatus').textContent=errors.length?'No se pudo cargar todo el perfil. '+errors.join(' · '):'';
+  setPrivateTab('takes');
 }
+
 async function showPublic(id,push=true){
- if(!UUID.test(id))return;
- const user=await me();
- if(user?.id===id){await showOwn();return;}
- privateView=false;activeAuthor=id;const ticket=++request;
- const dialog=$('aeProfileDialog');if(!dialog.open)dialog.showModal();
- $('aeProfileTitle').textContent='Perfil de aficionado';
- $('aeProfileDialog').querySelector('.ae-profile-overview p').textContent='Historial público de Takes. El contenido no puede editarse ni borrarse; solo el autor puede cambiar un Take entre NFL y Fútbol.';
- $('aeProfileUsername').textContent='Takes publicados y votaciones';
- $('aeProfileStatus').textContent='Cargando historial público…';$('aeProfileTakes').replaceChildren();
- if(push){const u=new URL(location.href);u.searchParams.set('perfil',id);history.pushState({},'',u);}
- const {data,error}=await db.rpc('ae_public_take_profile',{p_author_id:id});
- if(ticket!==request||!dialog.open)return;
- $('aeProfileStatus').textContent=error?'No se pudo cargar este perfil: '+error.message:'';
- if(error)return;
- $('aeProfileTitle').textContent=(data?.[0]?.author||'Aficionado')+' · Takes';
- $('aeProfileUsername').textContent='Opiniones históricas del autor. Puedes apoyar o cuestionar sus Takes.';
- display(data||[],id,true);
+  if(!UUID.test(id))return;
+  const user=await me();
+  if(user?.id===id){await showOwn();return;}
+
+  privateView=false;
+  activeAuthor=id;
+  activeTab='takes';
+  const ticket=++request;
+  const dialog=$('aeProfileDialog');
+  if(!dialog.open)dialog.showModal();
+
+  $('aeProfileTabs').hidden=true;
+  $('aeProfilePickHighlights').hidden=true;
+  $('aeProfilePicks').hidden=true;
+  $('aeProfileAccuracy').hidden=true;
+  $('aeProfileTitle').textContent='Perfil de aficionado';
+  $('aeProfileUsername').textContent='Takes publicados y votaciones';
+  $('aeProfileStatus').textContent='Cargando historial público…';
+  $('aeProfileTakeHighlights').replaceChildren();
+  $('aeProfileTakes').replaceChildren();
+
+  if(push){
+    const u=new URL(location.href);
+    u.searchParams.set('perfil',id);
+    history.pushState({},'',u);
+  }
+
+  const {data,error}=await db.rpc('ae_public_take_profile',{p_author_id:id});
+  if(ticket!==request||!dialog.open)return;
+  $('aeProfileStatus').textContent=error?'No se pudo cargar este perfil: '+error.message:'';
+  if(error)return;
+  $('aeProfileTitle').textContent=(data?.[0]?.author||'Aficionado')+' · Takes';
+  $('aeProfileUsername').textContent='Opiniones históricas del autor. Puedes apoyar o cuestionar sus Takes.';
+  renderTakes(data||[],id,true);
 }
+
 window.openAeProfile=showOwn;
 window.openAePublicProfile=showPublic;
 window.closeAeProfile=close;
+
 document.addEventListener('DOMContentLoaded',()=>{
- updateButton();
- if(typeof db!=='undefined'&&db)db.auth.onAuthStateChange(()=>setTimeout(updateButton,150));
- $('aeProfileDialog')?.addEventListener('click',e=>{if(e.target===$('aeProfileDialog'))close();});
- $('aeProfileDialog')?.addEventListener('close',()=>{++request;});
- window.addEventListener('ae:take-category-changed',()=>{
-   if($('aeProfileDialog')?.open && privateView)showOwn();
-   else if($('aeProfileDialog')?.open && activeAuthor)showPublic(activeAuthor,false);
- });
- const id=new URL(location.href).searchParams.get('perfil');if(id&&UUID.test(id))showPublic(id,false);
- window.addEventListener('popstate',()=>{
-  const newId=new URL(location.href).searchParams.get('perfil');
-  if(newId&&UUID.test(newId))showPublic(newId,false);
-  else if($('aeProfileDialog')?.open&&!privateView)close();
- });
+  updateButton();
+  if(typeof db!=='undefined'&&db)db.auth.onAuthStateChange(()=>setTimeout(updateButton,150));
+
+  $('aeProfileTabTakes')?.addEventListener('click',()=>setPrivateTab('takes'));
+  $('aeProfileTabPicks')?.addEventListener('click',()=>setPrivateTab('picks'));
+
+  $('aeProfileDialog')?.addEventListener('click',e=>{if(e.target===$('aeProfileDialog'))close();});
+  $('aeProfileDialog')?.addEventListener('close',()=>{++request;});
+
+  window.addEventListener('ae:take-category-changed',()=>{
+    if($('aeProfileDialog')?.open&&privateView)showOwn();
+    else if($('aeProfileDialog')?.open&&activeAuthor)showPublic(activeAuthor,false);
+  });
+
+  const id=new URL(location.href).searchParams.get('perfil');
+  if(id&&UUID.test(id))showPublic(id,false);
+
+  window.addEventListener('popstate',()=>{
+    const newId=new URL(location.href).searchParams.get('perfil');
+    if(newId&&UUID.test(newId))showPublic(newId,false);
+    else if($('aeProfileDialog')?.open&&!privateView)close();
+  });
 });
 })();
