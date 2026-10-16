@@ -1,109 +1,140 @@
-/* AE SPORTS · Botones originales aportados por el propietario.
-   La imagen aporta el marco, busto/puerta y lettering dorado.
-   Los controles siguen siendo botones HTML accesibles. */
+/* AE SPORTS · Mi perfil y Cerrar sesión ahora siguen la identidad de los deportes:
+   icono dorado pequeño + etiqueta, sin marco ni fondo de botón. */
 html body>header #aeMyTakesButton.ae-classical-auth-button,
 html body>header #readerSession button.ae-classical-auth-button,
-html body>header #loggedAdminContainer button.ae-signout-action.ae-classical-auth-button {
+html body>header #loggedAdminContainer button.ae-signout-action.ae-classical-auth-button{
   display:inline-flex!important;
+  flex-direction:column!important;
   align-items:center!important;
   justify-content:center!important;
   flex:0 0 auto!important;
   box-sizing:border-box!important;
-  width:clamp(111px,11.5vw,156px)!important;
+  gap:5px!important;
+  width:80px!important;
   min-width:0!important;
-  max-width:156px!important;
-  height:44px!important;
-  min-height:44px!important;
+  max-width:80px!important;
+  height:55px!important;
+  min-height:55px!important;
   margin:0!important;
-  padding:0!important;
+  padding:5px 2px!important;
   border:0!important;
-  border-radius:6px!important;
-  color:inherit!important;
-  background:transparent!important;
+  border-radius:0!important;
+  background:none!important;
+  background-image:none!important;
   box-shadow:none!important;
-  outline-offset:3px!important;
-  overflow:hidden!important;
+  color:#f0e6da!important;
+  text-decoration:none!important;
+  outline-offset:2px!important;
+  overflow:visible!important;
+  white-space:nowrap!important;
   cursor:pointer!important;
-  vertical-align:middle!important;
   transform:none!important;
-  transition:filter .18s ease,transform .18s ease!important;
+  transition:none!important;
+}
+html body>header #aeMyTakesButton.ae-classical-auth-button{
+  width:64px!important;
+  max-width:64px!important;
 }
 html body>header #aeMyTakesButton.ae-classical-auth-button[hidden]{
   display:none!important;
 }
-html body>header #aeMyTakesButton.ae-classical-auth-button{
-  width:clamp(107px,11vw,150px)!important;
-}
 html body>header .ae-classical-auth-button img.ae-classical-auth-art{
   display:block!important;
-  box-sizing:border-box!important;
+  position:static!important;
   flex:0 0 auto!important;
-  width:100%!important;
-  max-width:100%!important;
-  height:100%!important;
-  max-height:100%!important;
-  margin:0!important;
+  box-sizing:border-box!important;
+  width:22px!important;
+  height:22px!important;
+  min-width:22px!important;
+  min-height:22px!important;
+  max-width:22px!important;
+  max-height:22px!important;
   padding:0!important;
+  margin:0!important;
   border:0!important;
   border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
   object-fit:contain!important;
   object-position:center!important;
-  opacity:1!important;
-  filter:none!important;
-  box-shadow:none!important;
-  background:transparent!important;
+  opacity:.84!important;
+  filter:brightness(.80) saturate(.77) contrast(.96)!important;
   pointer-events:none!important;
   user-select:none!important;
+  transition:opacity .16s ease,filter .16s ease!important;
 }
-html body>header .ae-classical-auth-button:hover,
-html body>header .ae-classical-auth-button:focus-visible{
-  filter:brightness(1.11)!important;
+html body>header .ae-classical-auth-button .ae-auth-caption{
+  display:block!important;
+  box-sizing:border-box!important;
+  padding:0!important;
+  margin:0!important;
+  border:0!important;
+  color:inherit!important;
+  font:800 9px/1.2 Inter,system-ui,sans-serif!important;
+  letter-spacing:.025em!important;
+  text-align:center!important;
+  text-transform:uppercase!important;
+  white-space:nowrap!important;
+  text-shadow:none!important;
 }
-html body>header .ae-classical-auth-button:active{
-  transform:translateY(1px)!important;
+html body>header .ae-classical-auth-button:is(:hover,:focus-visible) img.ae-classical-auth-art{
+  opacity:.95!important;
+  filter:brightness(.91) saturate(.88) contrast(.98)!important;
 }
 html body>header .ae-classical-auth-button:focus-visible{
   outline:2px solid #e7ba78!important;
+  outline-offset:2px!important;
+}
+html:not(.dark) body>header .ae-classical-auth-button .ae-auth-caption{
+  color:#2b4250!important;
 }
 html body>header #readerSession.rcm-row{
+  display:flex!important;
   flex-wrap:nowrap!important;
+  align-items:center!important;
   gap:7px!important;
 }
 html body>header #readerSession .rcm-username{
-  max-width:85px!important;
+  max-width:95px!important;
   overflow:hidden!important;
   white-space:nowrap!important;
   text-overflow:ellipsis!important;
 }
-/* Si ya no caben dos botones completos, conserva sus símbolos originales
-   en botones cuadrados y con etiquetas accesibles; evita desbordar la cabecera. */
-@media(max-width:650px){
+@media(max-width:760px){
   html body>header #aeMyTakesButton.ae-classical-auth-button,
   html body>header #readerSession button.ae-classical-auth-button,
   html body>header #loggedAdminContainer button.ae-signout-action.ae-classical-auth-button{
-    width:44px!important;
-    max-width:44px!important;
-    height:44px!important;
-    min-height:44px!important;
-    border:1px solid rgba(209,154,96,.78)!important;
-    border-radius:5px!important;
-    background:#09263a!important;
+    width:65px!important;
+    max-width:65px!important;
+    min-height:48px!important;
+    height:48px!important;
+    padding:3px 1px!important;
+    gap:4px!important;
+  }
+  html body>header #aeMyTakesButton.ae-classical-auth-button{
+    width:54px!important;
+    max-width:54px!important;
   }
   html body>header .ae-classical-auth-button img.ae-classical-auth-art{
-    width:44px!important;
-    max-width:44px!important;
-    height:42px!important;
-    max-height:42px!important;
-    object-fit:cover!important;
-    object-position:left center!important;
+    width:19px!important;
+    height:19px!important;
+    min-width:19px!important;
+    min-height:19px!important;
+    max-width:19px!important;
+    max-height:19px!important;
   }
+  html body>header .ae-classical-auth-button .ae-auth-caption{
+    font-size:7.5px!important;
+    letter-spacing:0!important;
+  }
+  html body>header #readerSession.rcm-row{gap:3px!important;}
   html body>header #readerSession .rcm-username{
     max-width:55px!important;
     font-size:10px!important;
   }
 }
 @media(prefers-reduced-motion:reduce){
-  html body>header .ae-classical-auth-button{
+  html body>header .ae-classical-auth-button img.ae-classical-auth-art{
     transition:none!important;
   }
 }
