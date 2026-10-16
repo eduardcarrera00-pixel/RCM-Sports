@@ -1,0 +1,334 @@
+/* AE SPORTS · auditoría móvil 16 oct 2026
+ * Recuperar el banner auténtico del Pick de la semana en portada,
+ * respetando la composición cuadrada y las acciones de escritorio.
+ * No cambiar datos, orden de elementos ni comportamiento de los botones.
+ */
+@media(max-width:760px){
+  /* El módulo original se desplaza bajo la noticia principal mediante
+     ae-home-weekly-layout.js. Decoramos el contenedor y NO otro recuadro. */
+  html body.ae-is-home #mainContent>.editorial-pick{
+    display:block!important;
+    position:relative!important;
+    isolation:isolate!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    max-width:none!important;
+    min-width:0!important;
+    min-height:170px!important;
+    height:auto!important;
+    margin:0 0 13px!important;
+    padding:12px 13px 13px!important;
+    overflow:hidden!important;
+    border:1px solid rgba(221,166,104,.91)!important;
+    border-radius:0!important;
+    background:#081f30!important;
+    box-shadow:0 0 0 1px rgba(231,184,125,.12),0 6px 20px rgba(2,16,26,.19)!important;
+    color:#f7eada!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick[hidden]{
+    display:none!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick::after{
+    content:""!important;
+    position:absolute!important;
+    inset:3px!important;
+    z-index:4!important;
+    pointer-events:none!important;
+    border:1px solid rgba(238,195,133,.18)!important;
+    box-shadow:none!important;
+  }
+
+  /* Error original: el CSS móvil ocultaba el banner que carga Supabase.
+     Restaurarlo como fotografía de fondo que llene toda la tarjeta. */
+  html body.ae-is-home #mainContent>.editorial-pick.ae-home-weekly-banner>.ae-weekly-home-banner{
+    display:block!important;
+    position:absolute!important;
+    z-index:0!important;
+    inset:0!important;
+    width:100%!important;
+    height:100%!important;
+    min-height:100%!important;
+    max-height:none!important;
+    margin:0!important;
+    padding:0!important;
+    object-fit:cover!important;
+    object-position:var(--ae-image-focus,center)!important;
+    opacity:.98!important;
+    pointer-events:none!important;
+    user-select:none!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick.ae-home-weekly-banner::before{
+    content:""!important;
+    position:absolute!important;
+    z-index:1!important;
+    inset:0!important;
+    pointer-events:none!important;
+    background:linear-gradient(100deg,rgba(4,21,33,.95) 0%,rgba(6,23,36,.85) 43%,rgba(7,28,39,.39) 100%)!important;
+  }
+
+  /* Cabecera, CTA y contenido real por encima de la imagen. */
+  html body.ae-is-home #mainContent>.editorial-pick>h2,
+  html body.ae-is-home #mainContent>.editorial-pick>.ae-home-weekly-more,
+  html body.ae-is-home #mainContent>.editorial-pick>.editorial-pick-body{
+    position:relative!important;
+    z-index:2!important;
+    background:transparent!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick>h2{
+    width:calc(100% - 75px)!important;
+    margin:0 0 9px!important;
+    padding:0!important;
+    border:0!important;
+    font:600 clamp(22px,6.2vw,28px)/1.08 Newsreader,Georgia,serif!important;
+    color:#fff1dd!important;
+    text-shadow:0 2px 8px rgba(3,15,25,.35)!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick>.ae-home-weekly-more{
+    position:absolute!important;
+    top:11px!important;
+    right:12px!important;
+    min-height:30px!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    padding:5px 2px!important;
+    border:0!important;
+    color:#f0c796!important;
+    text-shadow:0 1px 6px rgba(2,10,19,.45)!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick>.editorial-pick-body,
+  html.dark body.ae-is-home #mainContent>.editorial-pick>.editorial-pick-body{
+    display:block!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    border-radius:0!important;
+    box-shadow:none!important;
+    overflow:visible!important;
+    color:#fff0df!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick #cpWeekly{
+    display:block!important;
+    width:100%!important;
+    min-width:0!important;
+    margin:0!important;
+    padding:0!important;
+    background:transparent!important;
+    border:0!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick #cpWeekly .ae-weekly-preview,
+  html.dark body.ae-is-home #mainContent>.editorial-pick #cpWeekly .ae-weekly-preview{
+    position:relative!important;
+    isolation:isolate!important;
+    box-sizing:border-box!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:flex-start!important;
+    justify-content:center!important;
+    gap:5px!important;
+    width:100%!important;
+    min-width:0!important;
+    min-height:119px!important;
+    height:auto!important;
+    margin:0!important;
+    padding:6px 0 2px!important;
+    overflow:hidden!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    text-align:left!important;
+    cursor:pointer!important;
+  }
+
+  /* Si el editor subió foto, pero no banner horizontal, usar esa foto como
+     fondo completo de la tarjeta en vez de una miniatura cortada a la izquierda.
+     También sirve de respaldo cuando la portada carece de banner. */
+  html body.ae-is-home #mainContent>.editorial-pick:not(.ae-home-weekly-banner) #cpWeekly .ae-weekly-preview:has(>img){
+    min-height:151px!important;
+    padding:8px 1px!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick:not(.ae-home-weekly-banner) #cpWeekly .ae-weekly-preview>img{
+    display:block!important;
+    position:absolute!important;
+    inset:0!important;
+    z-index:0!important;
+    grid-column:auto!important;
+    grid-row:auto!important;
+    align-self:stretch!important;
+    width:100%!important;
+    height:100%!important;
+    max-height:none!important;
+    min-height:0!important;
+    object-fit:cover!important;
+    object-position:var(--ae-image-focus,center)!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    border-radius:0!important;
+    opacity:.97!important;
+    pointer-events:none!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick:not(.ae-home-weekly-banner) #cpWeekly .ae-weekly-preview:has(>img)::before{
+    content:"";
+    position:absolute;
+    z-index:1;
+    inset:0;
+    pointer-events:none;
+    background:linear-gradient(96deg,rgba(5,21,32,.97),rgba(6,25,36,.86) 46%,rgba(7,26,39,.45));
+  }
+  html body.ae-is-home #mainContent>.editorial-pick.ae-home-weekly-banner #cpWeekly .ae-weekly-preview>img{
+    display:none!important; /* Ya se muestra el banner original detrás de todo. */
+  }
+  html body.ae-is-home #mainContent>.editorial-pick #cpWeekly .ae-weekly-preview>:not(img){
+    position:relative!important;
+    z-index:2!important;
+    flex:0 0 auto!important;
+    box-sizing:border-box!important;
+    width:auto!important;
+    max-width:100%!important;
+    min-width:0!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    grid-column:auto!important;
+    grid-row:auto!important;
+    text-align:left!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick #cpWeekly .ae-weekly-preview .ae-weekly-title{
+    margin:0 0 2px!important;
+    color:#fff1e1!important;
+    font:600 clamp(17px,4.8vw,22px)/1.14 Newsreader,Georgia,serif!important;
+    -webkit-line-clamp:3!important;
+    line-clamp:3!important;
+    overflow-wrap:anywhere!important;
+    text-shadow:0 1px 7px rgba(3,15,26,.55)!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick #cpWeekly .ae-weekly-preview .ae-weekly-event{
+    margin:0!important;
+    color:#d7e0e1!important;
+    font:500 11px/1.35 Inter,system-ui,sans-serif!important;
+    text-shadow:0 1px 4px rgba(3,15,26,.48)!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick #cpWeekly .ae-weekly-preview .ae-weekly-selection{
+    display:flex!important;
+    flex-wrap:wrap!important;
+    gap:5px!important;
+    align-items:center!important;
+    margin-top:2px!important;
+    padding:0!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick #cpWeekly .ae-weekly-preview .ae-weekly-selection strong{
+    color:#f4e4d2!important;
+    font-size:11px!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick #cpWeekly .ae-weekly-preview .ae-weekly-odds{
+    padding:3px 6px!important;
+    border-radius:0!important;
+    border:1px solid rgba(232,178,116,.50)!important;
+    background:rgba(137,89,49,.73)!important;
+    color:#fff1da!important;
+    font:750 10px/1.2 Inter,system-ui,sans-serif!important;
+    white-space:nowrap!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick #cpWeekly .ae-weekly-preview .ae-weekly-link{
+    min-height:28px!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    margin-top:4px!important;
+    padding:0!important;
+    color:#f4c791!important;
+    font-size:11px!important;
+    text-decoration:underline!important;
+    text-underline-offset:3px!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick #cpWeekly .ae-weekly-preview:focus-visible{
+    outline:2px solid #f5c78f!important;
+    outline-offset:-2px!important;
+  }
+
+  /* Modo día: mismo banner y marco, con velo marfil para evitar perder
+     contraste sobre fotografías muy brillantes. */
+  html:not(.dark) body.ae-is-home #mainContent>.editorial-pick{
+    background:linear-gradient(120deg,#fffbf3,#f5e7d1)!important;
+    border-color:rgba(173,117,59,.80)!important;
+    box-shadow:0 0 0 1px rgba(168,119,63,.12),0 7px 16px rgba(79,51,28,.12)!important;
+    color:#1b3342!important;
+  }
+  html:not(.dark) body.ae-is-home #mainContent>.editorial-pick.ae-home-weekly-banner::before{
+    background:linear-gradient(100deg,rgba(255,250,241,.97) 0%,rgba(255,248,235,.91) 42%,rgba(255,245,228,.33) 100%)!important;
+  }
+  html:not(.dark) body.ae-is-home #mainContent>.editorial-pick:not(.ae-home-weekly-banner) #cpWeekly .ae-weekly-preview:has(>img)::before{
+    background:linear-gradient(100deg,rgba(255,251,244,.97),rgba(255,247,232,.88) 44%,rgba(255,244,225,.33))!important;
+  }
+  html:not(.dark) body.ae-is-home #mainContent>.editorial-pick>h2,
+  html:not(.dark) body.ae-is-home #mainContent>.editorial-pick #cpWeekly .ae-weekly-preview .ae-weekly-title{
+    color:#183143!important;
+    text-shadow:0 1px 3px rgba(255,252,242,.75)!important;
+  }
+  html:not(.dark) body.ae-is-home #mainContent>.editorial-pick #cpWeekly .ae-weekly-preview .ae-weekly-event{
+    color:#445866!important;
+    text-shadow:0 1px 3px rgba(255,253,244,.6)!important;
+  }
+  html:not(.dark) body.ae-is-home #mainContent>.editorial-pick>.ae-home-weekly-more,
+  html:not(.dark) body.ae-is-home #mainContent>.editorial-pick #cpWeekly .ae-weekly-preview .ae-weekly-link{
+    color:#83502b!important;
+    text-shadow:none!important;
+  }
+  html:not(.dark) body.ae-is-home #mainContent>.editorial-pick #cpWeekly .ae-weekly-preview .ae-weekly-selection strong{
+    color:#2d4551!important;
+  }
+  html:not(.dark) body.ae-is-home #mainContent>.editorial-pick #cpWeekly .ae-weekly-preview .ae-weekly-odds{
+    color:#794724!important;
+    background:rgba(246,226,199,.9)!important;
+    border-color:#cda271!important;
+  }
+  html:not(.dark) body.ae-is-home #mainContent>.editorial-pick .ae-weekly-empty{
+    color:#425364!important;
+  }
+
+  /* El resto de módulos recientes conservan sus tamaños pero nunca
+     deben ensanchar la pantalla del teléfono por un texto o una cuota. */
+  html body #footballTakes .ae-picks-rail,
+  html body #footballTakes .ae-picks-rail>.ae-chef-board,
+  html body #footballTakes .ae-chef-entry>.ae-popular-copy{
+    min-width:0!important;
+    max-width:100%!important;
+  }
+  html body #footballTakes .ae-picks-rail>.ae-chef-board .ae-chef-author-row{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) max-content!important;
+    gap:6px!important;
+    min-width:0!important;
+    width:100%!important;
+  }
+  html body #footballTakes .ae-picks-rail>.ae-chef-board .ae-chef-author-row .ae-chef-odds{
+    justify-self:end!important;
+    padding:3px 5px!important;
+    font-size:10px!important;
+    white-space:nowrap!important;
+  }
+  html body.ae-is-home #heroSection .editorial-actions,
+  html body.ae-is-home #heroSection .editorial-actions button{
+    min-width:0!important;
+    max-width:100%!important;
+  }
+}
+@media(max-width:360px){
+  html body.ae-is-home #mainContent>.editorial-pick{
+    padding:10px 11px!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick>h2{
+    width:calc(100% - 65px)!important;
+    font-size:21px!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick>.ae-home-weekly-more{
+    top:9px!important;
+    right:10px!important;
+    font-size:10px!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick #cpWeekly .ae-weekly-preview .ae-weekly-title{
+    font-size:16px!important;
+  }
+}
