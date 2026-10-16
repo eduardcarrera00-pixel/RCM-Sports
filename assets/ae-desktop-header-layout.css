@@ -1,0 +1,209 @@
+/* AE SPORTS · Desktop header balance.
+   Logo left, sports centered, account controls right. */
+@media (min-width: 980px) {
+  html body>header .ae-mobile-header-grid{
+    display:grid!important;
+    grid-template-columns:minmax(255px,1fr) auto minmax(255px,1fr)!important;
+    align-items:center!important;
+    column-gap:24px!important;
+    width:100%!important;
+    height:80px!important;
+  }
+  html body>header .ae-mobile-header-grid>a.ae-brand{
+    justify-self:start!important;
+    min-width:0!important;
+    width:clamp(235px,19vw,300px)!important;
+    max-width:300px!important;
+  }
+  html body>header .ae-mobile-header-grid>nav.ae-sport-nav{
+    justify-self:center!important;
+    width:auto!important;
+    min-width:0!important;
+    max-width:none!important;
+    margin:0!important;
+    padding-inline:0!important;
+    overflow:visible!important;
+  }
+  html body>header .ae-mobile-header-grid>.ae-header-actions{
+    justify-self:end!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:flex-end!important;
+    flex-wrap:nowrap!important;
+    gap:9px!important;
+    min-width:0!important;
+    max-width:100%!important;
+    margin:0!important;
+  }
+}
+@media (min-width: 761px) {
+  html body>header .ae-header-actions>*{
+    margin-left:0!important;
+    margin-right:0!important;
+    flex-shrink:0!important;
+  }
+  html body>header #themeToggle{
+    width:39px!important;
+    min-width:39px!important;
+    max-width:39px!important;
+    height:39px!important;
+    min-height:39px!important;
+    padding:0!important;
+    border-radius:0!important;
+  }
+  html body>header #aeMyTakesButton.ae-classical-auth-button{
+    display:inline-flex!important;
+    flex-direction:row!important;
+    align-items:center!important;
+    justify-content:flex-start!important;
+    gap:7px!important;
+    width:auto!important;
+    min-width:0!important;
+    max-width:145px!important;
+    height:40px!important;
+    min-height:40px!important;
+    padding:5px 8px!important;
+    border:0!important;
+    background:transparent!important;
+  }
+  html body>header #aeMyTakesButton .ae-classical-auth-art{
+    width:22px!important;
+    height:22px!important;
+    min-width:22px!important;
+    min-height:22px!important;
+    max-width:22px!important;
+    max-height:22px!important;
+  }
+  html body>header #aeMyTakesButton .ae-auth-caption{
+    display:block!important;
+    min-width:0!important;
+    max-width:106px!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+    font:800 10px/1.2 Inter,system-ui,sans-serif!important;
+    letter-spacing:.025em!important;
+    text-align:left!important;
+  }
+  html body>header #readerSession.rcm-row{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:0!important;
+    width:auto!important;
+    min-width:0!important;
+    margin:0!important;
+    padding:0!important;
+  }
+  html body>header #readerSession.hidden{
+    display:none!important;
+  }
+  html body>header #readerSession button.ae-classical-logout,
+  html body>header #loggedAdminContainer button.ae-signout-action{
+    display:inline-flex!important;
+    flex-direction:row!important;
+    align-items:center!important;
+    justify-content:center!important;
+    width:39px!important;
+    min-width:39px!important;
+    max-width:39px!important;
+    height:40px!important;
+    min-height:40px!important;
+    max-height:40px!important;
+    padding:0!important;
+    margin:0!important;
+    gap:0!important;
+    overflow:hidden!important;
+    border:0!important;
+    background:transparent!important;
+  }
+  html body>header #readerSession button.ae-classical-logout .ae-classical-auth-art,
+  html body>header #loggedAdminContainer button.ae-signout-action .ae-classical-auth-art{
+    width:23px!important;
+    height:23px!important;
+    min-width:23px!important;
+    min-height:23px!important;
+    max-width:23px!important;
+    max-height:23px!important;
+  }
+  html body>header #readerSession button.ae-classical-logout .ae-auth-caption,
+  html body>header #loggedAdminContainer button.ae-signout-action .ae-auth-caption{
+    display:none!important;
+  }
+  html body>header #loggedAdminContainer{
+    align-items:center!important;
+    flex-wrap:nowrap!important;
+    gap:8px!important;
+    min-width:0!important;
+  }
+  html body>header #loggedAdminContainer .ae-admin-profile{
+    display:flex!important;
+    align-items:center!important;
+    gap:7px!important;
+    min-width:0!important;
+    max-width:145px!important;
+    min-height:40px!important;
+    padding:5px 8px!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+  }
+  html body>header #loggedAdminContainer .ae-admin-profile>div:first-child{
+    flex:0 0 24px!important;
+    width:24px!important;
+    height:24px!important;
+    border-radius:50%!important;
+  }
+  html body>header #loggedAdminContainer .ae-admin-profile>div:last-child{
+    display:block!important;
+    min-width:0!important;
+    max-width:105px!important;
+  }
+  html body>header #loggedAdminContainer .ae-admin-profile>div:last-child>span:first-child{
+    display:none!important;
+  }
+  html body>header #adminNameDisplay{
+    display:block!important;
+    min-width:0!important;
+    max-width:105px!important;
+    margin:0!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+    color:#f1e4d5!important;
+    font:800 10px/1.2 Inter,system-ui,sans-serif!important;
+    letter-spacing:.02em!important;
+  }
+  html:not(.dark) body>header #adminNameDisplay{
+    color:#f1e4d5!important;
+  }
+  html body>header #loggedAdminContainer .ae-publish-action{
+    min-height:39px!important;
+    height:39px!important;
+    padding:7px 10px!important;
+    border-radius:0!important;
+    transform:none!important;
+  }
+}
+@media (min-width:761px) and (max-width:979px) {
+  html body>header .ae-mobile-header-grid{
+    gap:12px!important;
+  }
+  html body>header .ae-mobile-header-grid>a.ae-brand{
+    flex:0 1 235px!important;
+    width:min(235px,28vw)!important;
+  }
+  html body>header .ae-sport-nav{
+    flex:1 1 auto!important;
+    min-width:0!important;
+  }
+  html body>header .ae-header-actions{
+    flex:0 0 auto!important;
+    gap:6px!important;
+  }
+  html body>header #aeMyTakesButton.ae-classical-auth-button,
+  html body>header #loggedAdminContainer .ae-admin-profile{
+    max-width:112px!important;
+  }
+}
