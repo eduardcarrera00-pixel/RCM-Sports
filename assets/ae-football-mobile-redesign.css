@@ -894,79 +894,547 @@
 @media(max-width:760px) and (prefers-reduced-motion:reduce){html body.ae-is-football #aeFootballTickerTrack.is-moving{animation:none!important}}
 @media(max-width:760px){html:not(.dark) body.ae-is-football #championsRankings.rcm-panel{background:#fffaf3!important;border-color:#d9bfa6!important}html:not(.dark) body.ae-is-football #aeFootballTickerTrack .ae-team-name{color:#183247!important}html:not(.dark) body.ae-is-football #freeTakes .ae-takes-head{background:#fffaf4!important}html:not(.dark) body.ae-is-football #heroSection .editorial-hero:after{background:linear-gradient(90deg,rgba(255,250,242,.96),rgba(255,250,242,.8) 45%,rgba(255,250,242,.05) 100%)}html:not(.dark) body.ae-is-football #heroSection .editorial-hero-copy h1,html:not(.dark) body.ae-is-football #heroSection .editorial-hero-copy p{color:#112b42!important;text-shadow:none!important}}
 
+/* AE SPORTS · Fútbol · portada del Power Ranking (solo teléfonos).
+   Una sola propuesta editorial: campeón destacado + Top 3 animado, día y noche. */
+@media (max-width:760px) {
+  html body.ae-is-football #aeFootballMobileStage > #championsRankings.ae-football-ranking-feature:not(.hidden) {
+    display:block!important;
+    position:relative!important;
+    isolation:isolate!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    min-width:0!important;
+    height:auto!important;
+    min-height:0!important;
+    margin:0 0 5px!important;
+    padding:0!important;
+    border:1px solid #b9906b!important;
+    border-left:3px solid #c99c6b!important;
+    border-radius:2px!important;
+    overflow:hidden!important;
+    background-color:#092536!important;
+    background-image:
+      linear-gradient(105deg,rgba(5,26,40,.98),rgba(8,35,51,.96) 56%,rgba(12,47,62,.81)),
+      url("atmospheres/ae-football-stadium.svg")!important;
+    background-size:cover,cover!important;
+    background-position:center,center!important;
+    box-shadow:0 5px 18px rgba(0,10,20,.16)!important;
+  }
 
-/* Fútbol móvil: Power Rankings como portada editorial compacta. */
-@media(max-width:760px){
- html body.ae-is-football #aeFootballMobileStage>#championsRankings.ae-football-ranking-feature{
-  order:0!important;display:block!important;position:relative!important;
-  border:1px solid rgba(211,165,111,.65)!important;border-left:3px solid #c99a66!important;
-  background:radial-gradient(ellipse at 100% 0%,rgba(56,99,113,.30),transparent 65%),linear-gradient(125deg,#071d2c,#0d3041 65%,#102f3d)!important;
-  box-shadow:0 7px 20px rgba(0,0,0,.12)!important;overflow:hidden!important;
- }
- html body.ae-is-football #championsRankings.ae-football-ranking-feature .ae-rank-hero-head{
-  position:relative!important;min-height:66px!important;padding:13px 14px 10px!important;
-  display:flex!important;align-items:center!important;justify-content:space-between!important;
-  border-bottom:1px solid rgba(203,161,114,.25)!important;
- }
- html body.ae-is-football #championsRankings.ae-football-ranking-feature .ae-rank-title-wrap{
-  display:flex!important;flex-direction:column!important;align-items:flex-start!important;
-  justify-content:center!important;gap:4px!important;width:auto!important;
- }
- html body.ae-is-football #championsRankings.ae-football-ranking-feature .ae-rank-overline{
-  display:block!important;color:#d6ae82!important;font:700 9px/1.1 system-ui,sans-serif!important;
-  letter-spacing:.16em!important;text-transform:uppercase!important;
- }
- html body.ae-is-football #championsRankings.ae-football-ranking-feature #championsTitle{
-  margin:0!important;padding:0!important;line-height:1!important;
- }
- html body.ae-is-football #championsRankings.ae-football-ranking-feature #championsTitle span{
-  font:600 clamp(25px,7vw,33px)/1 Georgia,serif!important;color:#f6eadb!important;
-  letter-spacing:-.035em!important;
- }
- html body.ae-is-football #championsRankings.ae-football-ranking-feature #championsEdition{
-  display:block!important;font:600 9px/1.2 system-ui,sans-serif!important;
-  color:#d2b28f!important;letter-spacing:.04em!important;
- }
- html body.ae-is-football #championsRankings.ae-football-ranking-feature #aeFootballTicker{
-  position:relative!important;display:block!important;overflow:hidden!important;
-  padding:5px 0!important;background:rgba(4,22,33,.28)!important;border:0!important;
-  mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent);
- }
- html body.ae-is-football #championsRankings.ae-football-ranking-feature #aeFootballTickerTrack{
-  display:flex!important;width:max-content!important;gap:0!important;
- }
- html body.ae-is-football #championsRankings.ae-football-ranking-feature #aeFootballTickerTrack.is-moving{
-  animation:ae-football-slide 17s linear infinite!important;
- }
- html body.ae-is-football #championsRankings.ae-football-ranking-feature .ae-football-rank-item{
-  flex:0 0 154px!important;width:154px!important;min-width:154px!important;min-height:65px!important;
-  display:grid!important;grid-template-columns:21px 36px minmax(0,1fr)!important;
-  gap:6px!important;align-items:center!important;padding:8px!important;
-  border-right:1px solid rgba(206,166,124,.23)!important;
- }
- html body.ae-is-football #championsRankings.ae-football-ranking-feature .ae-football-rank-item>strong{
-  font:600 24px/1 Georgia,serif!important;color:#dca875!important;
- }
- html body.ae-is-football #championsRankings.ae-football-ranking-feature .ae-football-rank-item .ae-team-emblem{
-  width:35px!important;height:35px!important;min-width:35px!important;
- }
- html body.ae-is-football #championsRankings.ae-football-ranking-feature .ae-football-rank-item .ae-team-name{
-  font:600 11px/1.15 system-ui,sans-serif!important;color:#f5eee5!important;
-  overflow-wrap:anywhere!important;
- }
- html body.ae-is-football #championsRankings.ae-football-ranking-feature #championsStatus:not(:empty){
-  font-size:11px!important;margin:5px 12px!important;
- }
- html:not(.dark) body.ae-is-football #aeFootballMobileStage>#championsRankings.ae-football-ranking-feature{
-  background:radial-gradient(ellipse at 100% 0%,rgba(222,196,158,.26),transparent 65%),linear-gradient(125deg,#fffaf2,#f4e8d9)!important;
-  border-color:#c69b73!important;box-shadow:0 6px 18px rgba(91,59,37,.07)!important;
- }
- html:not(.dark) body.ae-is-football #championsRankings.ae-football-ranking-feature #championsTitle span{color:#183147!important}
- html:not(.dark) body.ae-is-football #championsRankings.ae-football-ranking-feature .ae-rank-overline,
- html:not(.dark) body.ae-is-football #championsRankings.ae-football-ranking-feature #championsEdition{color:#a26a40!important}
- html:not(.dark) body.ae-is-football #championsRankings.ae-football-ranking-feature #aeFootballTicker{background:rgba(240,225,207,.45)!important}
- html:not(.dark) body.ae-is-football #championsRankings.ae-football-ranking-feature .ae-football-rank-item .ae-team-name{color:#183147!important}
+  /* Cabecera serena, en la línea de las antiguas clasificaciones de AE. */
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature .ae-rank-hero-head {
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) minmax(108px,39%)!important;
+    align-items:center!important;
+    gap:8px!important;
+    position:relative!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:120px!important;
+    margin:0!important;
+    padding:15px 11px 13px!important;
+    border:0!important;
+    background:transparent!important;
+    overflow:visible!important;
+  }
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature .ae-rank-title-wrap {
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:flex-start!important;
+    justify-content:center!important;
+    gap:0!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    margin:0!important;
+    padding:0!important;
+    text-align:left!important;
+  }
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature .ae-rank-overline {
+    display:block!important;
+    margin:0 0 7px!important;
+    color:#e3b886!important;
+    font:800 8px/1.3 Inter,system-ui,sans-serif!important;
+    letter-spacing:.12em!important;
+    white-space:normal!important;
+    text-transform:uppercase!important;
+    text-shadow:none!important;
+  }
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature #championsTitle {
+    display:block!important;
+    margin:0!important;
+    padding:0!important;
+    line-height:1!important;
+  }
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature #championsTitle span {
+    display:block!important;
+    margin:0!important;
+    padding:0!important;
+    font:600 clamp(25px,7.5vw,32px)/.97 Newsreader,Georgia,serif!important;
+    letter-spacing:-.035em!important;
+    white-space:normal!important;
+    overflow-wrap:normal!important;
+    color:#f5ebdf!important;
+    text-shadow:0 1px 6px rgba(0,12,20,.22)!important;
+  }
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature #championsEdition {
+    display:block!important;
+    margin:9px 0 0!important;
+    padding:0!important;
+    color:#dbc1a3!important;
+    font:600 10px/1.2 Inter,system-ui,sans-serif!important;
+    letter-spacing:.035em!important;
+    white-space:normal!important;
+  }
+
+  /* Líder real publicado: recupera lo mejor de la portada original. */
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature #championsRankOne.ae-ranking-leader:not([hidden]) {
+    display:block!important;
+    position:relative!important;
+    inset:auto!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:none!important;
+    height:auto!important;
+    min-height:72px!important;
+    margin:18px 0 0!important;
+    padding:9px!important;
+    border:1px solid rgba(217,176,132,.44)!important;
+    border-left:2px solid #c79a68!important;
+    border-radius:0!important;
+    background:linear-gradient(135deg,rgba(12,43,58,.92),rgba(8,35,50,.83))!important;
+    box-shadow:none!important;
+    backdrop-filter:none!important;
+    z-index:1!important;
+  }
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature #championsRankOne .ae-leader-overline {
+    display:block!important;
+    margin:0 0 7px!important;
+    padding:0!important;
+    color:#dcb382!important;
+    font:800 8px/1.15 Inter,system-ui,sans-serif!important;
+    letter-spacing:.10em!important;
+    white-space:nowrap!important;
+  }
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature #championsRankOneList {
+    display:block!important;
+    width:100%!important;
+    padding:0!important;
+    margin:0!important;
+  }
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature #championsRankOneList .rcm-team {
+    display:grid!important;
+    grid-template-columns:17px 31px minmax(0,1fr)!important;
+    align-items:center!important;
+    gap:4px!important;
+    width:100%!important;
+    min-height:33px!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    background:none!important;
+  }
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature #championsRankOneList .rcm-team > strong {
+    color:#dfaa72!important;
+    font:600 24px/1 Newsreader,Georgia,serif!important;
+  }
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature #championsRankOneList .ae-team-emblem {
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    width:31px!important;
+    min-width:31px!important;
+    height:31px!important;
+    margin:0!important;
+    padding:0!important;
+    background:transparent!important;
+  }
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature #championsRankOneList .ae-team-emblem img {
+    width:100%!important;
+    height:100%!important;
+    object-fit:contain!important;
+  }
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature #championsRankOneList .ae-team-name {
+    min-width:0!important;
+    color:#f5e9da!important;
+    font:700 11px/1.14 Inter,system-ui,sans-serif!important;
+    white-space:normal!important;
+    overflow-wrap:anywhere!important;
+  }
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature #championsRankOneList .ae-rank-trend {
+    display:none!important;
+  }
+
+  /* Controles pequeños, útiles, sin romper la portada. */
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature #aeFootballRankingControls {
+    position:absolute!important;
+    top:8px!important;
+    right:9px!important;
+    z-index:4!important;
+    display:flex!important;
+    align-items:center!important;
+    gap:5px!important;
+    width:auto!important;
+    padding:0!important;
+    margin:0!important;
+  }
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature #aeFootballRankingControls button {
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    box-sizing:border-box!important;
+    width:27px!important;
+    height:27px!important;
+    min-width:27px!important;
+    min-height:27px!important;
+    margin:0!important;
+    padding:0!important;
+    border:1px solid rgba(216,174,124,.65)!important;
+    border-radius:0!important;
+    background:rgba(7,30,46,.58)!important;
+    color:#f2d3af!important;
+    font:700 17px/1 Inter,system-ui,sans-serif!important;
+    cursor:pointer!important;
+  }
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature #aeFootballRankingControls button[hidden] {
+    display:none!important;
+  }
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature #aeFootballRankingControls button:disabled {
+    opacity:.4!important;
+    cursor:default!important;
+  }
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature #aeFootballRankingControls button:focus-visible {
+    outline:2px solid #f6d9ae!important;
+    outline-offset:2px!important;
+  }
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature #championsEditButton:not(.hidden) {
+    position:relative!important;
+    grid-column:1/-1!important;
+    inset:auto!important;
+    width:max-content!important;
+    margin:0!important;
+    padding:6px 9px!important;
+    z-index:5!important;
+    font-size:10px!important;
+  }
+
+  /* La clasificación canónica sigue disponible para accesibilidad y Supabase. */
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature #championsList.ae-full-ranking-list {
+    display:block!important;
+    position:absolute!important;
+    left:-10000px!important;
+    top:auto!important;
+    width:1px!important;
+    height:1px!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    clip-path:inset(50%)!important;
+    opacity:0!important;
+    overflow:hidden!important;
+  }
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature #championsViewport {
+    display:none!important;
+  }
+
+  /* Dos copias idénticas del Top 3 = movimiento infinito sin saltos. */
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature #aeFootballTicker {
+    display:block!important;
+    position:relative!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    margin:0!important;
+    padding:3px 0!important;
+    border:0!important;
+    border-top:1px solid rgba(204,165,126,.33)!important;
+    overflow:hidden!important;
+    background:rgba(3,20,33,.31)!important;
+    -webkit-mask-image:linear-gradient(to right,rgba(0,0,0,.7),#000 3%,#000 97%,rgba(0,0,0,.7));
+    mask-image:linear-gradient(to right,rgba(0,0,0,.7),#000 3%,#000 97%,rgba(0,0,0,.7));
+  }
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature #aeFootballTickerTrack {
+    display:flex!important;
+    flex-direction:row!important;
+    align-items:stretch!important;
+    box-sizing:border-box!important;
+    gap:0!important;
+    width:max-content!important;
+    min-width:0!important;
+    max-width:none!important;
+    margin:0!important;
+    padding:0!important;
+    transform:translate3d(0,0,0);
+  }
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature #aeFootballTickerTrack.is-moving {
+    animation:ae-champions-mobile-marquee 15s linear infinite!important;
+    -webkit-animation:ae-champions-mobile-marquee 15s linear infinite!important;
+    will-change:transform!important;
+  }
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature #aeFootballTickerTrack.is-moving.is-paused {
+    animation-play-state:paused!important;
+    -webkit-animation-play-state:paused!important;
+  }
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature #aeFootballTickerTrack .ae-football-rank-item {
+    display:grid!important;
+    grid-template-columns:21px 34px minmax(0,1fr)!important;
+    gap:6px!important;
+    flex:0 0 143px!important;
+    align-items:center!important;
+    box-sizing:border-box!important;
+    width:143px!important;
+    min-width:143px!important;
+    max-width:143px!important;
+    height:66px!important;
+    min-height:66px!important;
+    margin:0!important;
+    padding:8px!important;
+    border:0!important;
+    border-right:1px solid rgba(199,156,112,.27)!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    list-style:none!important;
+  }
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature #aeFootballTickerTrack .ae-football-rank-item > strong {
+    display:block!important;
+    margin:0!important;
+    color:#d7a16c!important;
+    font:600 24px/1 Newsreader,Georgia,serif!important;
+  }
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature #aeFootballTickerTrack .ae-football-rank-item .ae-team-emblem {
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    box-sizing:border-box!important;
+    width:34px!important;
+    min-width:34px!important;
+    height:34px!important;
+    margin:0!important;
+    padding:0!important;
+    background:transparent!important;
+  }
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature #aeFootballTickerTrack .ae-football-rank-item .ae-team-emblem img {
+    width:100%!important;
+    height:100%!important;
+    object-fit:contain!important;
+  }
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature #aeFootballTickerTrack .ae-football-rank-item .ae-team-name {
+    display:block!important;
+    min-width:0!important;
+    color:#f3e9de!important;
+    font:700 11px/1.2 Inter,system-ui,sans-serif!important;
+    white-space:normal!important;
+    overflow-wrap:anywhere!important;
+    text-overflow:clip!important;
+  }
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature #aeFootballTickerTrack .ae-football-rank-item .ae-rank-trend {
+    display:none!important;
+  }
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature #championsStatus:empty {
+    display:none!important;
+  }
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature #championsStatus:not(:empty) {
+    display:block!important;
+    margin:0!important;
+    padding:8px 12px!important;
+    color:#e3c7aa!important;
+    font-size:11px!important;
+  }
 }
-@media(max-width:760px) and (prefers-reduced-motion:reduce){
- html body.ae-is-football #championsRankings.ae-football-ranking-feature #aeFootballTickerTrack.is-moving{animation:none!important}
+
+@-webkit-keyframes ae-champions-mobile-marquee {
+  from { transform:translate3d(0,0,0); }
+  to { transform:translate3d(-50%,0,0); }
 }
+@keyframes ae-champions-mobile-marquee {
+  from { transform:translate3d(0,0,0); }
+  to { transform:translate3d(-50%,0,0); }
+}
+
+/* Modo día: crema, cobre y azul profundo sin perder contraste. */
+@media(max-width:760px) {
+  html:not(.dark) body.ae-is-football #aeFootballMobileStage > #championsRankings.ae-football-ranking-feature:not(.hidden) {
+    background-color:#fffaf2!important;
+    background-image:
+      linear-gradient(110deg,rgba(255,252,247,.98),rgba(255,249,241,.95) 57%,rgba(246,234,217,.79)),
+      url("atmospheres/ae-football-stadium.svg")!important;
+    border-color:#cfb193!important;
+    border-left-color:#bf8756!important;
+    box-shadow:0 5px 15px rgba(95,66,44,.09)!important;
+  }
+  html:not(.dark) body.ae-is-football #championsRankings.ae-football-ranking-feature #championsTitle span {
+    color:#182e43!important;
+    text-shadow:none!important;
+  }
+  html:not(.dark) body.ae-is-football #championsRankings.ae-football-ranking-feature .ae-rank-overline,
+  html:not(.dark) body.ae-is-football #championsRankings.ae-football-ranking-feature #championsEdition {
+    color:#93633f!important;
+  }
+  html:not(.dark) body.ae-is-football #championsRankings.ae-football-ranking-feature #championsRankOne.ae-ranking-leader:not([hidden]) {
+    background:linear-gradient(125deg,rgba(255,255,254,.97),rgba(246,234,219,.90))!important;
+    border-color:#d3ad89!important;
+    border-left-color:#b77d4d!important;
+  }
+  html:not(.dark) body.ae-is-football #championsRankings.ae-football-ranking-feature #championsRankOne .ae-leader-overline {
+    color:#98683f!important;
+  }
+  html:not(.dark) body.ae-is-football #championsRankings.ae-football-ranking-feature #championsRankOneList .ae-team-name {
+    color:#1e364b!important;
+  }
+  html:not(.dark) body.ae-is-football #championsRankings.ae-football-ranking-feature #aeFootballTicker {
+    background:rgba(242,230,215,.47)!important;
+    border-top-color:#dac3ac!important;
+  }
+  html:not(.dark) body.ae-is-football #championsRankings.ae-football-ranking-feature #aeFootballTickerTrack .ae-football-rank-item .ae-team-name {
+    color:#1f3549!important;
+  }
+  html:not(.dark) body.ae-is-football #championsRankings.ae-football-ranking-feature #aeFootballRankingControls button {
+    background:rgba(255,252,247,.9)!important;
+    color:#945f38!important;
+    border-color:#cda985!important;
+  }
+  html:not(.dark) body.ae-is-football #championsRankings.ae-football-ranking-feature #championsStatus:not(:empty) {
+    color:#775840!important;
+  }
+}
+
+/* Movimiento reducido por defecto, con opción expresa para reanudarlo. */
+@media (max-width:760px) and (prefers-reduced-motion:reduce) {
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature #aeFootballTickerTrack.is-moving:not(.ae-user-play) {
+    animation:none!important;
+    -webkit-animation:none!important;
+  }
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature #aeFootballTickerTrack.is-moving.ae-user-play {
+    animation:ae-champions-mobile-marquee 15s linear infinite!important;
+    -webkit-animation:ae-champions-mobile-marquee 15s linear infinite!important;
+  }
+}
+
+/* Ventana accesible de Top 10: nunca se ve si el usuario no la abre. */
+@media(max-width:760px) {
+  html body .ae-football-ranking-dialog {
+    box-sizing:border-box!important;
+    width:min(92vw,420px)!important;
+    max-height:84dvh!important;
+    padding:16px!important;
+    border:1px solid #c59b72!important;
+    border-radius:3px!important;
+    background:#082638!important;
+    color:#f4e9da!important;
+    box-shadow:0 16px 50px rgba(0,0,0,.4)!important;
+    overflow:auto!important;
+  }
+  html body .ae-football-ranking-dialog::backdrop {
+    background:rgba(2,14,23,.73)!important;
+    backdrop-filter:blur(4px);
+  }
+  html body .ae-football-ranking-dialog-head {
+    display:flex!important;
+    align-items:flex-start!important;
+    justify-content:space-between!important;
+    gap:10px!important;
+    padding:0 0 9px!important;
+    border-bottom:1px solid rgba(203,157,113,.35)!important;
+  }
+  html body .ae-football-ranking-dialog-head h2 {
+    margin:0!important;
+    font:600 23px/1.06 Newsreader,Georgia,serif!important;
+    color:inherit!important;
+  }
+  html body .ae-football-ranking-dialog-close {
+    flex-shrink:0!important;
+    padding:6px 8px!important;
+    color:#f2d7b8!important;
+    border:1px solid #ae825d!important;
+    background:transparent!important;
+    font-size:11px!important;
+  }
+  html body .ae-football-ranking-dialog-edition {
+    margin:10px 0!important;
+    color:#d0ae8f!important;
+    font-size:11px!important;
+  }
+  html body .ae-football-ranking-dialog-list {
+    display:grid!important;
+    gap:0!important;
+    padding:0!important;
+    margin:0!important;
+    list-style:none!important;
+  }
+  html body .ae-football-ranking-dialog-list .rcm-team {
+    display:grid!important;
+    grid-template-columns:25px 38px minmax(0,1fr) auto!important;
+    align-items:center!important;
+    min-height:47px!important;
+    gap:8px!important;
+    margin:0!important;
+    padding:6px 4px!important;
+    border:0!important;
+    border-bottom:1px solid rgba(198,153,111,.2)!important;
+    background:none!important;
+    color:inherit!important;
+  }
+  html body .ae-football-ranking-dialog-list .rcm-team > strong {
+    color:#e3af79!important;
+    font:600 24px/1 Newsreader,Georgia,serif!important;
+  }
+  html body .ae-football-ranking-dialog-list .ae-team-emblem {
+    width:34px!important;
+    height:34px!important;
+    background:transparent!important;
+    padding:0!important;
+  }
+  html body .ae-football-ranking-dialog-list .ae-team-emblem img {
+    width:100%!important;
+    height:100%!important;
+    object-fit:contain!important;
+  }
+  html body .ae-football-ranking-dialog-list .ae-team-name {
+    min-width:0!important;
+    font:600 13px/1.2 Inter,system-ui,sans-serif!important;
+    white-space:normal!important;
+    overflow-wrap:anywhere!important;
+  }
+  html body .ae-football-ranking-dialog-list .ae-rank-trend {
+    font-size:10px!important;
+    padding:4px!important;
+  }
+  html:not(.dark) body .ae-football-ranking-dialog {
+    background:#fffaf2!important;
+    color:#1a3449!important;
+    box-shadow:0 16px 50px rgba(38,30,20,.25)!important;
+  }
+  html:not(.dark) body .ae-football-ranking-dialog-head h2 {color:#1a3449!important;}
+  html:not(.dark) body .ae-football-ranking-dialog-close {
+    color:#875a38!important;
+    border-color:#caac8e!important;
+  }
+  html:not(.dark) body .ae-football-ranking-dialog-edition {color:#8b6245!important;}
+  html:not(.dark) body .ae-football-ranking-dialog-list .ae-team-name {color:#1a3449!important;}
+}
+@media(max-width:360px) {
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature .ae-rank-hero-head {
+    grid-template-columns:minmax(0,1fr) 107px!important;
+    padding-left:9px!important;
+    padding-right:9px!important;
+  }
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature #championsTitle span {
+    font-size:25px!important;
+  }
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature #championsRankOne.ae-ranking-leader:not([hidden]) {
+    padding:7px 5px!important;
+  }
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature #championsRankOneList .rcm-team {
+    grid-template-columns:12px 25px minmax(0,1fr)!important;
+    gap:3px!important;
+  }
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature #championsRankOneList .ae-team-emblem {
+    width:25px!important;min-width:25px!important;height:25px!important;
+  }
+  html body.ae-is-football #championsRankings.ae-football-ranking-feature #championsRankOneList .ae-team-name {
+    font-size:10px!important;
+  }
+}
+
