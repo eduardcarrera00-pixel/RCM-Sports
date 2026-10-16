@@ -22,7 +22,11 @@
    const box=make('article',undefined,isPreview?'ae-weekly-card ae-weekly-preview':'ae-weekly-card');
    if(isPreview){
      const photoUrl=editorialUrl(p.image_path,p.image_url);
-     if(photoUrl&&!editorialUrl(p.banner_path,p.banner_url)){const photo=make('img',undefined,'ae-weekly-home-thumbnail');photo.src=photoUrl;photo.style.setProperty('--ae-image-focus',framedPosition(p,'image'));photo.alt='Imagen del Pick editorial';photo.loading='lazy';box.append(photo);}
+     const bannerUrl=editorialUrl(p.banner_path,p.banner_url);
+     if(photoUrl&&!bannerUrl){const photo=make('img',undefined,'ae-weekly-home-thumbnail');photo.src=photoUrl;photo.style.setProperty('--ae-image-focus',framedPosition(p,'image'));photo.alt='Imagen del Pick editorial';photo.loading='lazy';box.append(photo);}
+     // El banner sigue intacto en escritorio; en el diseño móvil usamos
+     // una miniatura auténtica del Pick sin duplicar sus datos.
+     if(bannerUrl){const thumb=make('img',undefined,'ae-weekly-mobile-banner-thumb');thumb.src=photoUrl||bannerUrl;thumb.style.setProperty('--ae-image-focus',framedPosition(p,photoUrl?'image':'banner'));thumb.alt='Imagen del Pick de la Semana';thumb.loading='lazy';box.append(thumb);}
      const go=()=>{
        if(typeof filterByCategory==='function')filterByCategory('Picks');
        const detail=$('picksFeaturedCard')?.querySelector('details');
