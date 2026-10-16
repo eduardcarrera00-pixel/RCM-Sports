@@ -11,8 +11,21 @@
     const item=element('li',null,'ae-take-ranking-row');
     item.append(element('span',String(i+1).padStart(2,'0'),'ae-take-ranking-position'));
     const author=element('button','@'+(r.username||'Aficionado'),'ae-take-ranking-author');
-    author.type='button';author.onclick=()=>window.openAePublicProfile?.(r.user_id);
+    author.type='button';
+    author.onclick=()=>window.openAePublicProfile?.(r.user_id);
     item.append(author,element('strong',Number(r.points||0)+' pts','ae-take-ranking-points'));
+
+    // Un único mejor Take por usuario, calculado dentro del periodo seleccionado.
+    const best=element('div',null,'ae-take-ranking-best');
+    if(r.best_take_id){
+      const earned=Number(r.best_take_points||0);
+      best.append(element('span','Mejor Take · +'+earned+' pts','ae-take-ranking-best-label'));
+      best.append(element('strong',r.best_take_title||'Take acertado','ae-take-ranking-best-title'));
+      if(r.best_take_excerpt)best.append(element('p',r.best_take_excerpt,'ae-take-ranking-best-excerpt'));
+    }else{
+      best.append(element('span','Sin Takes acertados en este periodo','ae-take-ranking-best-label'));
+    }
+    item.append(best);
     item.append(element('small',Number(r.correct_takes||0)+' aciertos · '+Number(r.total_resolved||0)+' resueltos','ae-take-ranking-count'));
     return item;
   }
@@ -22,7 +35,7 @@
     const seq=++rankRequest[where], selectedSport=isHome?'all':sport,period=rankState[where];
     list.replaceChildren(element('li','Cargando clasificación…'));
     try{
-      const result=await db.rpc('ae_take_result_ranking',{p_sport:selectedSport,p_period:period});
+      const result=await db.rpc('ae_take_result_ranking_details',{p_sport:selectedSport,p_period:period});
       if(result.error)throw result.error;
       if(seq!==rankRequest[where])return;
       if(!isHome&&selectedSport!==sport)return;
