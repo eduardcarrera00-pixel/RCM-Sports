@@ -155,9 +155,10 @@
    const section=typeof currentCategory==='undefined'?'':currentCategory;
    root.hidden=section!=='Fútbol' && section!=='NFL';
    root.dataset.sport=section==='NFL'?'nfl':section==='Fútbol'?'football':'';
-   if(root.hidden){activeSection='';request++;return;}
+   if(root.hidden){activeSection='';request++;window.aeTakeRankings?.setSport('');return;}
    const changed=activeSection!==section;
    activeSection=section;
+   window.aeTakeRankings?.setSport(section);
    if(changed){
      filter=section==='NFL'?'nfl':'all';
      if($('freeTakesSort'))$('freeTakesSort').value='new';

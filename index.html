@@ -854,6 +854,11 @@ html.dark [data-reading-size][aria-pressed="true"] {
                 </section>
               </div>
             </section>
+            <section id="aeHomeTakeRanking" class="ae-take-ranking" aria-labelledby="aeHomeTakeRankingTitle">
+              <div class="ae-take-ranking-head"><div><span class="ae-take-ranking-kicker">AE SPORTS · COMUNIDAD</span><h2 id="aeHomeTakeRankingTitle">Top 10 · Takes combinados</h2></div><p>NFL + Fútbol · puntos otorgados por los administradores</p></div>
+              <div class="ae-take-ranking-tabs" role="group" aria-label="Periodo del ranking combinado"><button type="button" data-take-rank="month" aria-pressed="true">Mensual</button><button type="button" data-take-rank="all" aria-pressed="false">Histórico</button></div>
+              <ol id="aeHomeTakeRankingList" class="ae-take-ranking-list" aria-live="polite"><li>Cargando clasificación…</li></ol>
+            </section>
         </div>
 
             </div>
@@ -947,6 +952,12 @@ html.dark [data-reading-size][aria-pressed="true"] {
           <div id="freeTakesFeed" aria-live="polite"></div>
           <button id="aeFootballMoreTakes" type="button" class="ae-football-mobile-cta" aria-controls="freeTakesFeed" aria-expanded="false">Ver todos los Takes <span aria-hidden="true">→</span></button>
           <button id="freeTakesMore" type="button" class="ae-history-more" hidden>Ver todos los Takes <span aria-hidden="true">→</span></button>
+          <section id="aeSportTakeRanking" class="ae-take-ranking" aria-labelledby="aeSportTakeRankingTitle">
+            <div class="ae-take-ranking-head"><div><span class="ae-take-ranking-kicker">AE SPORTS · COMUNIDAD</span><h2 id="aeSportTakeRankingTitle">Top 10 · NFL</h2></div><p>Los admins confirman cada acierto y asignan de 1 a 100 puntos. Un fallo vale 0.</p></div>
+            <div class="ae-take-ranking-tabs" role="group" aria-label="Periodo del ranking de Takes"><button type="button" data-take-rank="month" aria-pressed="true">Mensual</button><button type="button" data-take-rank="all" aria-pressed="false">Histórico</button></div>
+            <ol id="aeSportTakeRankingList" class="ae-take-ranking-list" aria-live="polite"><li>Cargando clasificación…</li></ol>
+          </section>
+          <details id="aeTakeReview" class="ae-take-review" hidden><summary>Administrar · Puntuar Takes</summary><p>Revisa los resultados y asigna puntos manualmente. Puedes corregir una puntuación; la corrección se contará en el mes en que la guardes.</p><p id="aeTakeReviewStatus" role="status" aria-live="polite"></p><div id="aeTakeReviewList"></div></details>
           
           
         </section>
@@ -1584,6 +1595,7 @@ async function handleUserLogout() {
             currentAdmin = editor;
             renderAdminUI();
             renderArticlesFeed();
+            window.aeTakeRankings?.refresh();
         }
 async function loadUserSession() {
     try {
@@ -2541,6 +2553,7 @@ updateThemeButton();
 <script src="assets/ae-category-visibility.js?v=20261016-dynamic-nav-1"></script>
 <script src="assets/ae-nfl-takes.js?v=20261015-3"></script>
 <script src="assets/free-takes.js?v=20261016-publication-gate-1"></script>
+<script src="assets/ae-take-rankings.js?v=20261016-1"></script>
 <script src="assets/ae-editorial-weekly.js?v=20261016-native-picks-final-1"></script>
 <script src="assets/ae-profile.js?v=20261016-unpopular-take-1"></script>
 <script src="assets/ae-home-takes.js?v=20261016-unified-composer-1"></script>

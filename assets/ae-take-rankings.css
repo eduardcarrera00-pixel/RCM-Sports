@@ -1,0 +1,20 @@
+.ae-take-ranking{margin:2.25rem 0 1rem;padding:1.5rem;border:1px solid rgba(181,139,65,.5);background:linear-gradient(145deg,#10231e,#071612);color:#f8f3e8;border-radius:8px;box-shadow:0 12px 30px rgba(0,0,0,.13)}
+.ae-take-ranking-head{display:flex;justify-content:space-between;align-items:end;gap:1rem;flex-wrap:wrap;border-bottom:1px solid rgba(218,184,116,.25);padding-bottom:1rem}
+.ae-take-ranking-kicker{color:#d9b667;text-transform:uppercase;letter-spacing:.18em;font-size:.68rem;font-weight:800}
+.ae-take-ranking-head h2{font-size:clamp(1.35rem,2.5vw,2rem);font-weight:800;line-height:1.2;margin:.35rem 0 0;color:#f8f3e8}
+.ae-take-ranking-head p{font-size:.82rem;color:#e0d4bd;max-width:22rem;line-height:1.45;margin:0}
+.ae-take-ranking-tabs{display:flex;gap:.5rem;margin:1.15rem 0}
+.ae-take-ranking-tabs button{padding:.48rem 1rem;border:1px solid #b69454;border-radius:4px;color:#e9d7a8;background:transparent;font-size:.85rem;font-weight:750;cursor:pointer}
+.ae-take-ranking-tabs button[aria-pressed="true"]{background:#d8b66c;color:#18221c;border-color:#d8b66c}
+.ae-take-ranking-tabs button:focus-visible,.ae-take-review button:focus-visible,.ae-take-ranking-author:focus-visible{outline:2px solid #f6db99;outline-offset:3px}
+.ae-take-ranking-list{list-style:none;margin:0;padding:0;display:grid;gap:.35rem}
+.ae-take-ranking-row{display:grid;grid-template-columns:2.25rem minmax(6rem,1fr) auto;align-items:center;gap:.5rem;padding:.65rem .7rem;border-bottom:1px solid rgba(221,193,127,.18)}
+.ae-take-ranking-position{color:#d6b46d;font-weight:800}.ae-take-ranking-author{border:0;background:none;color:#f8f3e8;font-weight:700;text-align:left;cursor:pointer;overflow-wrap:anywhere}
+.ae-take-ranking-points{color:#efd18b;white-space:nowrap}.ae-take-ranking-count{grid-column:2/4;color:#c9c6bc;font-size:.75rem}
+.ae-take-ranking-empty{padding:1rem 0;color:#e0d4bd}
+.ae-take-review{margin:1.3rem 0 2rem;padding:1rem;border:1px solid #b9934c;border-radius:6px;background:#f8f4ea;color:#222}
+.ae-take-review[hidden]{display:none}.ae-take-review summary{font-weight:800;cursor:pointer}.ae-take-review>p{font-size:.86rem;margin:.7rem 0}
+#aeTakeReviewList{display:grid;gap:.65rem;max-height:38rem;overflow:auto}.ae-take-review-entry{border:1px solid #d5c7a4;padding:.8rem;display:grid;gap:.65rem;background:white}
+.ae-take-review-heading{display:flex;justify-content:space-between;gap:.6rem;flex-wrap:wrap}.ae-take-review-heading strong{overflow-wrap:anywhere}.ae-take-review-meta{font-size:.75rem;color:#626157}
+.ae-take-review-fields{display:flex;align-items:end;gap:.65rem;flex-wrap:wrap}.ae-take-review-fields label{display:grid;gap:.25rem;font-size:.78rem;font-weight:700}.ae-take-review-fields select,.ae-take-review-fields input{border:1px solid #8b8069;border-radius:3px;padding:.5rem;min-height:2.3rem;background:white;color:#222}.ae-take-review-fields input{width:5.5rem}.ae-take-review-fields button{background:#1d3a2d;color:#fff;border:0;border-radius:3px;padding:.55rem .9rem;font-weight:700;cursor:pointer}.ae-take-review-fields button:disabled{opacity:.5;cursor:wait}
+@media(max-width:600px){.ae-take-ranking{padding:1rem}.ae-take-ranking-row{grid-template-columns:1.7rem minmax(5rem,1fr) auto;padding:.65rem .25rem}.ae-take-ranking-count{font-size:.7rem}}
