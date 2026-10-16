@@ -39,6 +39,8 @@
     link.addEventListener('click',event=>openArticle(article,event));
     if(article.image){
       const img=element('img');img.src=article.image;
+      const pos=key=>{const n=Number(article?.[key]);return Number.isFinite(n)?Math.max(0,Math.min(100,n)):50;};
+      img.style.setProperty('--ae-image-focus',pos('image_focus_x')+'% '+pos('image_focus_y')+'%');
       img.alt='';img.loading='lazy';img.decoding='async';
       img.addEventListener('error',()=>img.remove());
       link.append(img);

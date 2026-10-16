@@ -4,12 +4,25 @@
  const $=id=>document.getElementById(id);
  const make=(tag,content,cls)=>{const n=document.createElement(tag);if(content!==undefined)n.textContent=String(content);if(cls)n.className=cls;return n;};
  const odds=n=>(n>0?'+':'')+String(n);
+ const framedPosition=(p,prefix)=>{
+   const x=Number(p?.[prefix+'_focus_x']),y=Number(p?.[prefix+'_focus_y']);
+   return (Number.isFinite(x)?Math.max(0,Math.min(100,x)):50)+'% '+
+          (Number.isFinite(y)?Math.max(0,Math.min(100,y)):50)+'%';
+ };
+ const editorialUrl=(path,url)=>{
+   const uploaded=window.aeEditorialMedia?.publicUrl(path);
+   if(uploaded)return uploaded;
+   try{
+     const u=new URL(url);
+     return u.protocol==='https:'&&!u.username&&!u.password?u.href:'';
+   }catch{return '';}
+ };
  let refreshing=false,active=null,submitting=false;
  function createCard(p,isPreview){
    const box=make('article',undefined,isPreview?'ae-weekly-card ae-weekly-preview':'ae-weekly-card');
    if(isPreview){
-     const photoUrl=window.aeEditorialMedia?.publicUrl(p.image_path);
-     if(photoUrl&&!window.aeEditorialMedia?.publicUrl(p.banner_path)){const photo=make('img',undefined,'ae-weekly-home-thumbnail');photo.src=photoUrl;photo.alt='Imagen del Pick editorial';photo.loading='lazy';box.append(photo);}
+     const photoUrl=editorialUrl(p.image_path,p.image_url);
+     if(photoUrl&&!editorialUrl(p.banner_path,p.banner_url)){const photo=make('img',undefined,'ae-weekly-home-thumbnail');photo.src=photoUrl;photo.style.setProperty('--ae-image-focus',framedPosition(p,'image'));photo.alt='Imagen del Pick editorial';photo.loading='lazy';box.append(photo);}
      const go=()=>{
        if(typeof filterByCategory==='function')filterByCategory('Picks');
        const detail=$('picksFeaturedCard')?.querySelector('details');
@@ -33,8 +46,8 @@
    summary.append(make('span','Cuota '+odds(p.american_odds),'ae-weekly-odds'));
    summary.append(make('span','Ver análisis y detalles ↓','ae-weekly-expand-hint'));
    const expanded=make('div',undefined,'ae-weekly-expanded-content');
-   const photoUrl=window.aeEditorialMedia?.publicUrl(p.image_path);
-   if(photoUrl){const photo=make('img',undefined,'ae-weekly-inline-photo');photo.src=photoUrl;photo.alt='Imagen del Pick de la Semana';photo.loading='lazy';expanded.append(photo);}
+   const photoUrl=editorialUrl(p.image_path,p.image_url);
+   if(photoUrl){const photo=make('img',undefined,'ae-weekly-inline-photo');photo.src=photoUrl;photo.style.setProperty('--ae-image-focus',framedPosition(p,'image'));photo.alt='Imagen del Pick de la Semana';photo.loading='lazy';expanded.append(photo);}
    expanded.append(make('p',p.event_name,'ae-weekly-event'),make('p',p.analysis,'ae-weekly-analysis'));
    expanded.append(make('small','Cuota publicada por AE SPORTS; no verificada en tiempo real. Sin apuestas en esta página.','ae-weekly-disclaimer'));
    details.append(summary,expanded);box.append(details);
@@ -45,10 +58,11 @@
    if(!panel)return;
    panel.querySelector('.ae-weekly-home-banner')?.remove();
    panel.classList.remove('ae-home-weekly-banner');
-   const url=window.aeEditorialMedia?.publicUrl(active?.banner_path);
+   const url=editorialUrl(active?.banner_path,active?.banner_url);
    if(!url)return;
    const banner=make('img',undefined,'ae-weekly-home-banner');
    banner.src=url;
+   banner.style.setProperty('--ae-image-focus',framedPosition(active,'banner'));
    banner.alt='';
    banner.setAttribute('aria-hidden','true');
    banner.loading='lazy';
@@ -64,8 +78,8 @@
    const featured=$('picksFeatured');
    if(featured){
      featured.querySelector('.ae-weekly-banner')?.remove();
-     const url=window.aeEditorialMedia?.publicUrl(active?.banner_path);
-     if(url){const banner=make('img',undefined,'ae-weekly-banner');banner.src=url;banner.alt='';banner.loading='lazy';featured.prepend(banner);}
+     const url=editorialUrl(active?.banner_path,active?.banner_url);
+     if(url){const banner=make('img',undefined,'ae-weekly-banner');banner.src=url;banner.style.setProperty('--ae-image-focus',framedPosition(active,'banner'));banner.alt='';banner.loading='lazy';featured.prepend(banner);}
    }
    for(const [id,preview] of [['cpWeekly',true],['picksFeaturedCard',false]]){
      const area=$(id);if(!area)continue;
@@ -79,7 +93,7 @@
    refreshing=true;
    try{
      const {data,error}=await db.from('ae_editorial_weekly_picks')
-       .select('id,title,event_name,selection,american_odds,analysis,expires_at,created_at,banner_path,image_path')
+       .select('id,title,event_name,selection,american_odds,analysis,expires_at,created_at,banner_path,image_path,banner_url,image_url,banner_focus_x,banner_focus_y,image_focus_x,image_focus_y')
        .eq('is_published',true).order('created_at',{ascending:false}).limit(1);
      if(error)throw error;
      active=data?.[0]&&new Date(data[0].expires_at).getTime()>Date.now()?data[0]:null;
@@ -108,12 +122,23 @@
      status.textContent='Guardando imágenes…';
      const banner=await window.aeEditorialMedia.upload(form.elements.banner_file?.files?.[0],'weekly/banner');
      const image=await window.aeEditorialMedia.upload(form.elements.image_file?.files?.[0],'weekly/article');
+     const bannerTyped=form.elements.banner_url.value.trim();
+     const imageTyped=form.elements.image_url.value.trim();
+     const bannerUrl=banner ? null : (bannerTyped ? window.aeImageFraming?.safeUrl(bannerTyped) : null);
+     const imageUrl=image ? null : (imageTyped ? window.aeImageFraming?.safeUrl(imageTyped) : null);
+     if(bannerTyped&&!banner&&!bannerUrl)throw Error('El banner necesita un enlace HTTPS válido.');
+     if(imageTyped&&!image&&!imageUrl)throw Error('La imagen necesita un enlace HTTPS válido.');
+     const bannerFocus=window.aeImageFraming?.get('banner')||{x:50,y:50};
+     const imageFocus=window.aeImageFraming?.get('weekly')||{x:50,y:50};
      status.textContent='Publicando Pick editorial…';
-     const {error}=await db.rpc('ae_publish_editorial_weekly_pick_visual',{
+     const {error}=await db.rpc('ae_publish_editorial_weekly_pick_visual_v2',{
        p_title:form.elements.title.value.trim(),p_event_name:form.elements.event_name.value.trim(),
        p_selection:form.elements.selection.value.trim(),p_american_odds:oddsValue,
        p_analysis:form.elements.analysis.value.trim(),p_expires_at:expires.toISOString(),
-       p_banner_path:banner,p_image_path:image
+       p_banner_path:banner,p_image_path:image,
+       p_banner_url:bannerUrl,p_image_url:imageUrl,
+       p_banner_focus_x:bannerFocus.x,p_banner_focus_y:bannerFocus.y,
+       p_image_focus_x:imageFocus.x,p_image_focus_y:imageFocus.y
      });
      if(error)throw error;
      status.textContent='Pick de la Semana publicado correctamente.';
@@ -146,6 +171,7 @@
    const imageUrl=newest.image && typeof safeImageURL==='function'?safeImageURL(newest.image):'';
    if(imageUrl){
      const img=make('img');img.loading='lazy';img.decoding='async';img.alt='';img.src=imageUrl;
+     img.style.setProperty('--ae-image-focus',(Number.isFinite(Number(newest.image_focus_x))?Math.max(0,Math.min(100,Number(newest.image_focus_x))):50)+'% '+(Number.isFinite(Number(newest.image_focus_y))?Math.max(0,Math.min(100,Number(newest.image_focus_y))):50)+'%');
      card.classList.add('has-photo');
      img.addEventListener('error',()=>{
        img.remove();
