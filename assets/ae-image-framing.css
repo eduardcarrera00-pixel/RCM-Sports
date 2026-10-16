@@ -29,3 +29,25 @@ html body .ae-weekly-home-thumbnail{
 html body #footballTakes .ae-picks-rail #picksNews .ae-picks-news-feature .ae-picks-news-open img{
  object-position:var(--ae-image-focus,50% 50%)!important;
 }
+
+
+/* Zoom es el tercer eje de encuadre: preview y publicación usan la misma escala guardada. */
+.ae-zoom-frame-row{display:grid;grid-template-columns:34px minmax(110px,1fr) 34px 52px;align-items:center;gap:8px}
+.ae-zoom-frame-row button{min-height:32px!important;height:32px;padding:0!important;font-size:18px!important;line-height:1!important}
+.ae-zoom-frame-row output{font-variant-numeric:tabular-nums;font-weight:700;text-align:right;min-width:48px}
+.ae-image-framing-preview img{
+  transform-origin:var(--ae-image-focus,50% 50%)!important;
+  transform:scale(var(--ae-image-zoom,1))!important;
+  transition:object-position .12s ease,transform .12s ease!important;
+}
+html body .ae-picks-news-feature img,
+html body .editorial-hero-image,
+html body #articlesGrid img,
+html body #modalImage,
+html body .ae-news-archive-card img{
+  transform-origin:var(--ae-image-focus,50% 50%)!important;
+  transform:scale(var(--ae-image-zoom,1))!important;
+}
+@media(max-width:600px){
+  .ae-zoom-frame-row{grid-template-columns:32px minmax(90px,1fr) 32px 48px}
+}
