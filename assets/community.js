@@ -64,6 +64,7 @@ function openArticleEditor() {
     const body = document.createElement('div'); body.innerHTML = cleanBody(article.body);
     editingBodyText = [...body.childNodes].map(n => n.textContent).join('\n').trim();
     editingBodyHTML = article.body;
+    window.aeNewsEditor?.set(cleanBody(article.body));
     document.getElementById('pubBody').value = editingBodyText;
     document.getElementById('pubTitle').focus();
 }

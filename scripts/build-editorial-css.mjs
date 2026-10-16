@@ -1,0 +1,13 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {spawnSync} from 'node:child_process';
+import {createRequire} from 'node:module';
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const sources = JSON.parse(fs.readFileSync(path.join(root, 'assets/style-sources.json'), 'utf8'));
+const css = sources.map(file => `/* ${file} */\n${fs.readFileSync(path.join(root, file), 'utf8')}`).join('\n');
+fs.writeFileSync(path.join(root, 'assets/ae-editorial-bundle.css'), css);
+const require = createRequire(import.meta.url);
+const result = spawnSync(process.execPath, [require.resolve('tailwindcss/lib/cli.js'), '-i', 'assets/ae-editorial-bundle.css', '-o', 'assets/ae-editorial-bundle.css', '--minify'], {cwd:root,stdio:'inherit'});
+if (result.status !== 0) throw new Error('Could not minify editorial CSS');
+console.log(`Editorial CSS: ${sources.length} stylesheets combined, original order preserved.`);
