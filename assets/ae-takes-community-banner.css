@@ -4,25 +4,14 @@ html body #aeHomeTopTakes .ae-top-takes-heading.ae-takes-banner {
   position:relative!important;
   isolation:isolate;
   width:100%!important;
-  aspect-ratio:2048/280;
+  aspect-ratio:1984/270;
   min-height:0!important;
   padding:0!important;
   margin:0 0 18px!important;
-  border:0!important;
-  background:none!important;
+  box-sizing:border-box!important;
+  border:1px solid #9f8057!important;
+  background:#082432 url("ae-takes-community-banner.webp") 50% 47.573% / 103.226% auto no-repeat!important;
   overflow:visible!important;
-}
-html body #aeHomeTopTakes .ae-takes-banner>.ae-takes-banner-art {
-  display:block!important;
-  position:absolute!important;
-  inset:0;
-  width:100%!important;
-  height:100%!important;
-  max-height:none!important;
-  object-fit:cover!important;
-  object-position:50% 47.6%!important;
-  pointer-events:none;
-  z-index:-1;
 }
 html body #aeHomeTopTakes .ae-takes-banner #aeHomeTopTakesTitle,
 html body #aeHomeTopTakes .ae-takes-banner .ae-home-take-nudge {
@@ -38,10 +27,10 @@ html body #aeHomeTopTakes .ae-takes-banner .ae-home-take-nudge {
 }
 html body #aeHomeTopTakes .ae-takes-banner .ae-top-takes-heading-side {
   position:absolute!important;
-  left:76.17%!important;
-  top:31.7%!important;
-  width:20.46%!important;
-  height:40.4%!important;
+  left:77.016%!important;
+  top:31.48%!important;
+  width:21.12%!important;
+  height:41.85%!important;
   padding:0!important;
   margin:0!important;
   display:block!important;
@@ -92,7 +81,6 @@ html body #aeHomeTopTakes .ae-takes-banner #aeHomeTakeChoice {
     border:1px solid #b58a53!important;
     background:radial-gradient(ellipse at 100% 0,#234c5d,transparent 65%),linear-gradient(120deg,#071f2d,#103545)!important;
   }
-  html body #aeHomeTopTakes .ae-takes-banner>.ae-takes-banner-art {display:none!important;}
   html body #aeHomeTopTakes .ae-takes-banner #aeHomeTopTakesTitle {
     position:static!important;
     width:auto!important;height:auto!important;
