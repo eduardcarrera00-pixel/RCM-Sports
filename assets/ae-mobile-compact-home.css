@@ -685,41 +685,70 @@
   html body .ae-mobile-expand-button { transition:none!important; }
 }
 
-/* El selector de tema presenta sol y luna como en la referencia;
-   sigue existiendo un solo botón accesible que llama a toggleDarkMode(). */
-@media(min-width:381px) and (max-width:760px){
+/* Selector compacto de día/noche: una sola imagen que ya intercambia
+   updateThemeButton() (sol en oscuro, luna en claro).
+   Sin pseudo-elementos duplicados en ninguna anchura móvil. */
+@media(max-width:760px){
   html body>header .ae-mobile-header-grid>.ae-header-actions #themeToggle{
-    display:flex!important;flex-direction:row!important;
-    align-items:center!important;justify-content:center!important;
-    gap:2px!important;
-    flex:0 0 48px!important;
-    width:48px!important;min-width:48px!important;
-    height:36px!important;min-height:36px!important;
-    border-radius:20px!important;
+    box-sizing:border-box!important;
+    display:inline-flex!important;
+    flex-direction:row!important;
+    align-items:center!important;
+    justify-content:center!important;
+    flex:0 0 38px!important;
+    width:38px!important;
+    min-width:38px!important;
+    max-width:38px!important;
+    height:38px!important;
+    min-height:38px!important;
+    max-height:38px!important;
+    margin:0!important;
+    padding:0!important;
+    gap:0!important;
+    border:1px solid rgba(177,135,91,.27)!important;
+    border-radius:0!important;
+    background:rgba(196,154,102,.045)!important;
   }
-  html body>header .ae-mobile-header-grid #themeToggle img.ae-custom-theme-icon{
-    width:17px!important;height:17px!important;
-    min-width:17px!important;min-height:17px!important;
-    max-width:17px!important;max-height:17px!important;
-    flex:0 0 17px!important;
-  }
-  html body>header .ae-mobile-header-grid #themeToggle:before,
-  html body>header .ae-mobile-header-grid #themeToggle:after{
+  html body>header .ae-mobile-header-grid #themeToggle::before,
+  html body>header .ae-mobile-header-grid #themeToggle::after{
+    content:none!important;
     display:none!important;
-    flex:0 0 17px!important;
-    content:""!important;
-    width:17px!important;height:17px!important;
-    background-position:center!important;
-    background-repeat:no-repeat!important;
-    background-size:contain!important;
-    filter:brightness(.8) saturate(.77)!important;
+    background-image:none!important;
   }
-  html:not(.dark) body>header .ae-mobile-header-grid #themeToggle:before{
-    display:block!important;
-    background-image:url('icons/ae-sol-gold.webp?v=20261016-1')!important;
+  html body>header .ae-mobile-header-grid #themeToggle .ae-mobile-theme-caption{
+    display:none!important;
   }
-  html.dark body>header .ae-mobile-header-grid #themeToggle:after{
+  html body>header .ae-mobile-header-grid #themeIcon.ae-custom-theme-icon{
     display:block!important;
-    background-image:url('icons/ae-luna-gold.webp?v=20261016-1')!important;
+    flex:0 0 24px!important;
+    width:24px!important;
+    min-width:24px!important;
+    max-width:24px!important;
+    height:24px!important;
+    min-height:24px!important;
+    max-height:24px!important;
+    padding:0!important;
+    margin:0!important;
+    object-fit:contain!important;
+  }
+}
+@media(max-width:380px){
+  html body>header .ae-mobile-header-grid>.ae-header-actions #themeToggle{
+    flex-basis:34px!important;
+    width:34px!important;
+    min-width:34px!important;
+    max-width:34px!important;
+    height:36px!important;
+    min-height:36px!important;
+    max-height:36px!important;
+  }
+  html body>header .ae-mobile-header-grid #themeIcon.ae-custom-theme-icon{
+    flex-basis:22px!important;
+    width:22px!important;
+    min-width:22px!important;
+    max-width:22px!important;
+    height:22px!important;
+    min-height:22px!important;
+    max-height:22px!important;
   }
 }
