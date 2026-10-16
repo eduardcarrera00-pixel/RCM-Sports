@@ -8,6 +8,7 @@
     news:{file:'pubImageFile',url:'pubImage',preview:'pubImagePreview',x:'pubImageFocusX',y:'pubImageFocusY'}
   };
   const blobUrls={};
+  const existingUrls={};
   const limit = v => Math.max(0,Math.min(100,Number.isFinite(Number(v))?Math.round(Number(v)):50));
   const get = key => {
     const c=configs[key];
@@ -30,7 +31,7 @@
       target.textContent='Selecciona JPG, PNG o WEBP de máximo 5 MB.';
       return;
     }
-    const url=file?(blobUrls[key]=URL.createObjectURL(file)):safeUrl(typed);
+    const url=file?(blobUrls[key]=URL.createObjectURL(file)):(safeUrl(typed)||existingUrls[key]||'');
     target.replaceChildren();
     target.classList.add('ae-image-framing-preview');
     if(!url){
@@ -54,7 +55,15 @@
     if($(c.y))$(c.y).value=String(limit(y));
     repaint(key);
   }
-  function reset(key){set(key,50,50);}
+  function setExisting(key,url){
+    if(!configs[key])return;
+    existingUrls[key]=safeUrl(url);
+    repaint(key);
+  }
+  function reset(key){
+    existingUrls[key]='';
+    set(key,50,50);
+  }
   function init(){
     for(const [key,c] of Object.entries(configs)){
       $(c.file)?.addEventListener('change',()=>{
@@ -71,6 +80,6 @@
     }
     $('aeWeeklyPickForm')?.addEventListener('reset',()=>setTimeout(()=>{reset('banner');reset('weekly');},0));
   }
-  window.aeImageFraming={get,set,reset,repaint,safeUrl};
+  window.aeImageFraming={get,set,setExisting,reset,repaint,safeUrl};
   document.addEventListener('DOMContentLoaded',init);
 })();
