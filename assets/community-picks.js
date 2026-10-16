@@ -379,9 +379,12 @@ async function showDetail(id,options={}){
    body.input.focus();
   }
  }else{
-  const login=button('Inicia sesión para responder',()=>{void requestPickReply(id,null,closeDetail);});
-  login.className='cp-login-to-reply';
-  dialog.append(login);
+  // Invitación directa a responder: una sola pulsación abre el acceso si falta sesión.
+  // aeRequestPublication retoma este mismo Pick y enfoca el comentario tras acceder.
+  const reply=button('Responder',()=>{void requestPickReply(id,null,closeDetail);});
+  reply.className='cp-login-to-reply';
+  reply.setAttribute('aria-label','Responder a este Pick');
+  dialog.append(reply);
  }
  }catch(e){dialog.replaceChildren(button('Cerrar',closeDetail),el('p',message(e)));}
 }
