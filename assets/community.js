@@ -232,6 +232,7 @@ async function voteComment(articleId, commentId, direction) {
     }
 }
 async function refreshCommunity() {
+    window.refreshAeNflLatestComments?.(true);
     if (!db) return;
     const request = ++communityRequest;
     const target = document.getElementById('communityLeaders');
