@@ -768,3 +768,99 @@ html:not(.dark) body>header #aeCategoryAdmin .ae-category-admin-menu{
     box-shadow:none!important;
   }
 }
+
+
+/* v4 · Tiny + PUBLICAR label and hover-only profile outline. */
+@media (min-width:980px){
+  html body>header #loggedAdminContainer .ae-publish-action{
+    box-sizing:border-box!important;
+    flex:0 0 72px!important;
+    width:72px!important;
+    min-width:72px!important;
+    max-width:72px!important;
+    height:28px!important;
+    min-height:28px!important;
+    max-height:28px!important;
+    padding:4px 6px!important;
+    gap:3px!important;
+    overflow:hidden!important;
+    justify-content:center!important;
+    font:800 6.5px/1 Inter,system-ui,sans-serif!important;
+    letter-spacing:.015em!important;
+    white-space:nowrap!important;
+  }
+  html body>header #loggedAdminContainer .ae-publish-action i{
+    flex:0 0 auto!important;
+    font-size:7px!important;
+    line-height:1!important;
+  }
+  html body>header #loggedAdminContainer .ae-publish-action span{
+    display:block!important;
+    flex:0 0 auto!important;
+    width:auto!important;
+    min-width:0!important;
+    max-width:52px!important;
+    margin:0!important;
+    padding:0!important;
+    overflow:hidden!important;
+    font:800 6.5px/1 Inter,system-ui,sans-serif!important;
+    letter-spacing:.015em!important;
+    text-overflow:clip!important;
+    white-space:nowrap!important;
+  }
+
+  /* No frame at rest. Show a small consumer-style square only on hover/focus. */
+  html body>header #loggedAdminContainer .ae-admin-profile{
+    box-sizing:border-box!important;
+    padding:3px 4px!important;
+    border:1px solid transparent!important;
+    outline:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    transition:border-color .14s ease,background-color .14s ease!important;
+  }
+  html body>header #loggedAdminContainer .ae-admin-profile:hover,
+  html body>header #loggedAdminContainer .ae-admin-profile:focus-visible{
+    border:1px solid rgba(211,166,105,.50)!important;
+    outline:0!important;
+    background:rgba(214,171,112,.035)!important;
+    box-shadow:none!important;
+  }
+  html body>header #loggedAdminContainer .ae-admin-profile:active{
+    border:1px solid rgba(211,166,105,.40)!important;
+    background:rgba(214,171,112,.025)!important;
+    box-shadow:none!important;
+  }
+}
+
+@media (min-width:980px) and (max-width:1180px){
+  html body>header #loggedAdminContainer .ae-publish-action{
+    flex-basis:68px!important;
+    width:68px!important;
+    min-width:68px!important;
+    max-width:68px!important;
+    padding-inline:5px!important;
+  }
+  html body>header #loggedAdminContainer .ae-publish-action span{
+    max-width:49px!important;
+    font-size:6px!important;
+  }
+  html body>header #loggedAdminContainer .ae-publish-action i{
+    font-size:6.5px!important;
+  }
+}
+
+@media (max-width:979px){
+  html body>header #loggedAdminContainer .ae-admin-profile{
+    box-sizing:border-box!important;
+    border:1px solid transparent!important;
+    outline:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+  }
+  html body>header #loggedAdminContainer .ae-admin-profile:hover,
+  html body>header #loggedAdminContainer .ae-admin-profile:focus-visible{
+    border-color:rgba(211,166,105,.50)!important;
+    background:rgba(214,171,112,.035)!important;
+  }
+}
