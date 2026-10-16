@@ -3,7 +3,7 @@ import fs from 'node:fs';
 const {Window}=await import(process.env.AE_HAPPY_DOM||'happy-dom');
 const w=new Window({url:'https://example.test/RCM-Sports/'});
 const d=w.document;
-d.body.innerHTML=fs.readFileSync('index.html','utf8').replace(/<script\\b[^>]*>[\\s\\S]*?<\\/script>/gi,'');
+d.body.innerHTML=fs.readFileSync('index.html','utf8').replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,'');
 w.HTMLElement.prototype.scrollIntoView=()=>{};
 w.matchMedia=()=>({matches:false});
 const today=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'America/Toronto',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
