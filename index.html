@@ -298,6 +298,8 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/ae-football-mobile-redesign.css?v=20261016-ranking-first-1">
 <link rel="stylesheet" href="assets/ae-home-weekly-layout-top4.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-nfl-mobile-reference.css?v=20261016-1">
+<link rel="stylesheet" href="assets/ae-nfl-mobile-telephoto.css?v=20261016-1">
+<script defer src="assets/ae-nfl-mobile-telephoto.js?v=20261016-1"></script>
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 <a class="ae-skip-link" href="#mainContent">Ir al contenido</a>
@@ -417,7 +419,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
             <p id="rankingStatus" role="status">Cargando ranking…</p>
             <button id="rankingPause" class="hidden" onclick="toggleRankingMotion()" aria-pressed="false">Pausar movimiento</button>
             <div id="rankingViewport" class="rcm-ticker" aria-hidden="true"><div id="rankingTrack" class="rcm-track"></div></div>
-            <div id="rankingStatic" class="ae-ranking-accessible"><button id="aeNflRankingPrevious" class="ae-nfl-ranking-nav" type="button" aria-label="Ver posiciones anteriores" aria-controls="rankingList" disabled><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></button><ol id="rankingList" class="rcm-ranking-list" aria-label="Clasificación NFL publicada"></ol><button id="aeNflRankingNext" class="ae-nfl-ranking-nav" type="button" aria-label="Ver siguientes posiciones" aria-controls="rankingList"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m10 6 6 6-6 6"/></svg></button></div>
+            <div id="rankingStatic" class="ae-ranking-accessible"><ol id="rankingList" class="rcm-ranking-list" aria-label="Clasificación NFL publicada"></ol></div>
         </section>
         <section id="championsRankings" tabindex="0" class="rcm-panel ae-champions-full hidden" aria-labelledby="championsTitle">
             <div class="rcm-row ae-rank-hero-head">
@@ -557,7 +559,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 
                 <!-- Articles Section Header -->
                 <div class="flex items-center justify-between border-b border-slate-200 pb-3">
-                    <h2 class="text-xl font-extrabold uppercase tracking-wider flex items-center text-slate-900">
+                    <h2 id="aeNewsSectionTitle" class="text-xl font-extrabold uppercase tracking-wider flex items-center text-slate-900">
                         <span class="w-3 h-6 bg-pitch-600 rounded-full mr-3"></span>
                         Últimas noticias
                     </h2>
@@ -1593,6 +1595,8 @@ currentUser = {
 
             const isHome = currentCategory === 'Todos' && !currentSearchQuery;
             const isSportNewsPreview = ['NFL','Fútbol'].includes(currentCategory) && !currentSearchQuery;
+            const newsHeading = document.getElementById('aeNewsSectionTitle');
+            if(newsHeading) newsHeading.lastChild.textContent = currentCategory === 'Fútbol' ? ' Noticias de Fútbol' : ' Últimas noticias';
             const archiveLink = document.getElementById('aeAllNewsSport');
             if(archiveLink) {archiveLink.hidden=!isSportNewsPreview; archiveLink.dataset.aeNewsCategory=currentCategory;}
             const visibleCount = isHome ? Math.min(3, Math.max(0,filtered.length-1)) : isSportNewsPreview ? Math.min(3, filtered.length) : filtered.length;
@@ -2245,6 +2249,5 @@ updateThemeButton();
 <script src="assets/ae-mobile-compact-home.js?v=20261016-1"></script>
 <script src="assets/ae-football-mobile-redesign.js?v=20261016-ranking-first-1"></script>
 <script src="assets/ae-home-weekly-layout.js?v=20261016-1"></script>
-<script src="assets/ae-nfl-mobile-reference.js?v=20261016-1"></script>
 </body>
 </html>
