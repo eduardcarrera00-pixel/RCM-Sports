@@ -23,9 +23,9 @@ html body>header #themeToggle .ae-mobile-theme-caption{display:none!important;}
     display:flex!important;
     align-items:center!important;
     justify-content:center!important;
-    width:min(82vw,310px)!important;
+    width:clamp(184px,59vw,240px)!important;
     min-width:0!important;
-    max-width:310px!important;
+    max-width:240px!important;
     margin:0 auto!important;
     padding:0 0 9px!important;
     justify-self:center!important;
@@ -221,7 +221,7 @@ html body>header #themeToggle .ae-mobile-theme-caption{display:none!important;}
 }
 @media(max-width:365px){
   html body>header .ae-mobile-header-grid>a.ae-brand.ae-brand-runner-clean{
-    width:min(87vw,285px)!important;
+    width:clamp(178px,62vw,215px)!important;
   }
   html body>header .ae-mobile-header-grid>.ae-header-actions{
     gap:5px 7px!important;
