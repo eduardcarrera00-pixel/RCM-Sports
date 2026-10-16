@@ -11,7 +11,9 @@ const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 async function me(){if(typeof db==='undefined'||!db)return null;const r=await db.auth.getUser();return r.error?null:r.data?.user||null;}
 async function updateButton(){
  const b=$('aeMyTakesButton');if(!b)return;
- const user=await me();b.hidden=!user;
+ const user=await me();
+ const adminActive=typeof currentAdmin!=='undefined' && Boolean(currentAdmin);
+ b.hidden=!user || adminActive;
  if(!user&&privateView)close();
 }
 function close(){
