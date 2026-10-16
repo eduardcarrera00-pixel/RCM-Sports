@@ -192,6 +192,7 @@
       moveTo(newsHeading, stage);
       moveTo(grid, stage);
       moveTo(byId('freeTakes'), stage);
+      moveTo(byId('aeNflLatestComments'), stage);
       moveTo(byId('aeSportTakeLeaders'), stage);
       moveTo(byId('communityLeaders')?.closest('.editorial-community'), stage);
       const trending = document.querySelector('.editorial-trending');
