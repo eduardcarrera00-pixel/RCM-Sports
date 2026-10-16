@@ -25,6 +25,7 @@ let working=false;
 let activeTab='takes';
 let ownTakes=[];
 let ownPicks=[];
+let ownUnpopularTakeId=null;
 
 async function me(){
   if(typeof db==='undefined'||!db)return null;
@@ -48,6 +49,7 @@ function close(){
   activeTab='takes';
   ownTakes=[];
   ownPicks=[];
+  ownUnpopularTakeId=null;
   const dialog=$('aeProfileDialog');
   if(dialog?.open)dialog.close();
   if(new URL(location.href).searchParams.has('perfil')){
@@ -87,7 +89,7 @@ function featuredTakes(entries){
   ].filter(([,item])=>item);
 }
 
-function makeTakeFeature(label,tone,entry){
+function makeTakeFeature(label,tone,entry,actionLabel,actionFn){
   const card=el('article',null,'ae-profile-feature ae-profile-feature-'+tone);
   card.append(el('span',label,'ae-profile-feature-label'));
   card.append(el('h3',entry.title||'Take'));
@@ -95,8 +97,80 @@ function makeTakeFeature(label,tone,entry){
   if(body)card.append(el('p',body.length>190?body.slice(0,190).trimEnd()+'…':body));
   const stats=el('div',null,'ae-profile-feature-stats');
   stats.append(el('strong','▲ '+numeric(entry.upvotes)),el('span','▼ '+numeric(entry.downvotes)));
+  if(actionLabel&&actionFn){
+    const action=el('button',actionLabel,'ae-profile-feature-action');
+    action.type='button';
+    action.addEventListener('click',actionFn);
+    stats.append(action);
+  }
   card.append(stats);
   return card;
+}
+
+function makeUnpopularPlaceholder(entries){
+  const card=el('article',null,'ae-profile-feature ae-profile-feature-unpopular is-empty');
+  card.append(el('span','Unpopular Take','ae-profile-feature-label'));
+  card.append(el('h3','Elige tu Take'));
+  card.append(el('p','Tú decides qué opinión quieres destacar aquí. Puedes cambiarla cuando quieras.'));
+  const action=el('button',entries.some(t=>!t.hidden)?'Elegir':'Sin Takes disponibles','ae-profile-feature-action');
+  action.type='button';
+  action.disabled=!entries.some(t=>!t.hidden);
+  action.addEventListener('click',()=>openUnpopularChooser(entries));
+  card.append(action);
+  return card;
+}
+
+function openUnpopularChooser(entries){
+  const highlights=$('aeProfileTakeHighlights');
+  if(!highlights)return;
+  highlights.querySelector('.ae-profile-unpopular-chooser')?.remove();
+
+  const published=entries.filter(t=>!t.hidden);
+  if(!published.length)return;
+
+  const chooser=el('div',null,'ae-profile-unpopular-chooser');
+  const copy=el('div',null,'ae-profile-unpopular-copy');
+  copy.append(el('strong','Elige tu Unpopular Take'),el('span','Este Take quedará fijado como tu elección personal.'));
+  const select=el('select',null,'ae-profile-unpopular-select');
+  select.setAttribute('aria-label','Elegir Unpopular Take');
+
+  for(const entry of published){
+    const option=el('option',(entry.title||'Take')+' · '+dateText(entry.created_at));
+    option.value=entry.id;
+    if(String(entry.id)===String(ownUnpopularTakeId))option.selected=true;
+    select.append(option);
+  }
+
+  const actions=el('div',null,'ae-profile-unpopular-actions');
+  const save=el('button','Guardar','ae-profile-unpopular-save');
+  const cancel=el('button','Cancelar','ae-profile-unpopular-cancel');
+  save.type='button';cancel.type='button';
+
+  cancel.addEventListener('click',()=>chooser.remove());
+  save.addEventListener('click',async()=>{
+    if(working)return;
+    working=true;save.disabled=true;cancel.disabled=true;
+    $('aeProfileStatus').textContent='Guardando tu Unpopular Take…';
+    try{
+      const result=await db.rpc('ae_set_my_profile_unpopular_take',{p_take_id:select.value});
+      if(result.error)throw result.error;
+      ownUnpopularTakeId=select.value;
+      $('aeProfileStatus').textContent='Unpopular Take actualizado.';
+      renderTakes(ownTakes,activeAuthor,false);
+      window.setTimeout(()=>{
+        if($('aeProfileStatus')?.textContent==='Unpopular Take actualizado.')$('aeProfileStatus').textContent='';
+      },1800);
+    }catch(error){
+      $('aeProfileStatus').textContent=error?.message||'No se pudo guardar tu elección.';
+      save.disabled=false;cancel.disabled=false;
+    }finally{
+      working=false;
+    }
+  });
+
+  actions.append(save,cancel);
+  chooser.append(copy,select,actions);
+  highlights.append(chooser);
 }
 
 function renderTakeItem(entry,owner,canVote){
@@ -153,7 +227,16 @@ function renderTakes(entries,owner,canVote){
   target.replaceChildren();
 
   const featured=featuredTakes(entries);
-  if(featured.length){
+  if(privateView){
+    for(const [label,item,tone] of featured.slice(0,2))highlights.append(makeTakeFeature(label,tone,item));
+    const chosen=entries.find(t=>!t.hidden&&String(t.id)===String(ownUnpopularTakeId));
+    if(chosen){
+      highlights.append(makeTakeFeature('Unpopular Take','unpopular',chosen,'Cambiar',()=>openUnpopularChooser(entries)));
+    }else if(entries.some(t=>!t.hidden)){
+      highlights.append(makeUnpopularPlaceholder(entries));
+    }
+    highlights.hidden=!entries.some(t=>!t.hidden);
+  }else if(featured.length){
     for(const [label,item,tone] of featured)highlights.append(makeTakeFeature(label,tone,item));
     highlights.hidden=false;
   }else{
@@ -163,7 +246,7 @@ function renderTakes(entries,owner,canVote){
   $('aeProfileCount').textContent=entries.length+' '+(entries.length===1?'Take':'Takes');
   const overview=$('aeProfileOverviewText');
   if(overview)overview.textContent=privateView
-    ?'Tus mejores, peores y más populares opiniones, seguidas por tus publicaciones más recientes.'
+    ?'Tu mejor Take, tu peor Take y el Unpopular Take que tú elijas, seguidos por tus publicaciones más recientes.'
     :'Selección histórica de Takes públicos de este aficionado.';
 
   if(!entries.length){
@@ -370,20 +453,24 @@ async function showOwn(){
   $('aeProfileAccuracy').replaceChildren();
   $('aeProfileAccuracy').hidden=true;
 
-  const [takesResult,picksResult]=await Promise.allSettled([
+  const [takesResult,picksResult,unpopularResult]=await Promise.allSettled([
     db.rpc('ae_my_free_takes'),
-    loadOwnPicks(user.id)
+    loadOwnPicks(user.id),
+    db.rpc('ae_my_profile_unpopular_take')
   ]);
   if(ticket!==request||!dialog.open)return;
 
   const takeError=takesResult.status==='rejected'?takesResult.reason:takesResult.value.error;
   const pickError=picksResult.status==='rejected'?picksResult.reason:null;
+  const unpopularError=unpopularResult.status==='rejected'?unpopularResult.reason:unpopularResult.value.error;
   ownTakes=takeError?[]:(takesResult.value.data||[]);
   ownPicks=pickError?[]:picksResult.value;
+  ownUnpopularTakeId=unpopularError?null:(unpopularResult.value.data||null);
 
   const errors=[];
   if(takeError)errors.push('Takes: '+(takeError.message||'no disponibles'));
   if(pickError)errors.push('Picks: '+(pickError.message||'no disponibles'));
+  if(unpopularError)errors.push('Unpopular Take: '+(unpopularError.message||'no disponible'));
   $('aeProfileStatus').textContent=errors.length?'No se pudo cargar todo el perfil. '+errors.join(' · '):'';
   setPrivateTab('takes');
 }
