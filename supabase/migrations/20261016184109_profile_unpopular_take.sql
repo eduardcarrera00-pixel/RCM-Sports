@@ -11,6 +11,13 @@ ALTER TABLE public.ae_profile_take_preferences ENABLE ROW LEVEL SECURITY;
 
 REVOKE ALL ON TABLE public.ae_profile_take_preferences FROM anon, authenticated;
 
+DROP POLICY IF EXISTS ae_profile_take_preferences_owner_read ON public.ae_profile_take_preferences;
+CREATE POLICY ae_profile_take_preferences_owner_read
+ON public.ae_profile_take_preferences
+FOR SELECT
+TO authenticated
+USING ((SELECT auth.uid()) = user_id);
+
 CREATE OR REPLACE FUNCTION public.ae_my_profile_unpopular_take()
 RETURNS uuid
 LANGUAGE plpgsql
