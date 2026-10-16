@@ -83,7 +83,7 @@ function openArticleEditor() {
     if (article.category === 'NBA') document.getElementById('pubCategory').value = 'Básquetbol';
     document.getElementById('pubTeam').value = article.team || '';
     updateTeamField();
-    window.aeImageFraming?.set('news',article.image_focus_x ?? 50,article.image_focus_y ?? 50);
+    window.aeImageFraming?.set('news',article.image_focus_x ?? 50,article.image_focus_y ?? 50,article.image_zoom !== false);
     const body = document.createElement('div'); body.innerHTML = cleanBody(article.body);
     editingBodyText = [...body.childNodes].map(n => n.textContent).join('\n').trim();
     editingBodyHTML = article.body;
