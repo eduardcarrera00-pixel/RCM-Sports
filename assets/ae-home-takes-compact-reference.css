@@ -24,8 +24,9 @@ html body.ae-is-home #aeHomeTopTakes .ae-top-takes-heading.ae-takes-banner{
   border:1px solid #9f8057!important;
   border-radius:0!important;
   background:
-    linear-gradient(90deg,rgba(5,28,41,.92) 0%,rgba(7,34,47,.78) 55%,rgba(8,38,51,.60) 100%),
-    url(ae-takes-community-banner.webp) center/cover no-repeat!important;
+    radial-gradient(ellipse at 88% 18%,rgba(207,151,86,.16),transparent 34%),
+    linear-gradient(90deg,rgba(5,28,41,.98) 0%,rgba(7,34,47,.94) 58%,rgba(8,38,51,.88) 100%),
+    url(atmospheres/ae-reference-brush.svg) right center/cover no-repeat!important;
   box-shadow:none!important;
 }
 html body.ae-is-home #aeHomeTopTakes .ae-takes-banner #aeHomeTopTakesTitle{
