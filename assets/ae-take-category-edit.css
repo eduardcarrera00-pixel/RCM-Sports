@@ -1,0 +1,94 @@
+/* AE SPORTS · Corrección de comunidad. Cuadrado, discreto y coherente con día/noche. */
+#aeTakeDiscussion #aeDiscussionEditSport[hidden]{display:none!important}
+#aeTakeDiscussion #aeDiscussionEditSport{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-height:28px;margin:7px 0 0 8px;padding:4px 8px;
+  border:1px solid rgba(209,165,116,.58);border-radius:0;
+  background:rgba(8,29,43,.65);color:#f2dfc7;
+  font:600 10px/1.2 Inter,system-ui,sans-serif;letter-spacing:.01em;
+  cursor:pointer;
+}
+html:not(.dark) #aeTakeDiscussion #aeDiscussionEditSport{
+  background:rgba(255,249,237,.85);color:#634a34;border-color:#bb946d;
+}
+#aeTakeDiscussion #aeDiscussionEditSport:focus-visible,
+.ae-profile-item .ae-profile-change-sport:focus-visible{
+  outline:2px solid #d9a771;outline-offset:3px;
+}
+.ae-profile-item .ae-profile-change-sport,
+.ae-free-vote-row .ae-take-category-link{
+  display:inline-flex;justify-content:center;align-items:center;
+  min-height:28px;padding:5px 9px;border:1px solid rgba(181,137,93,.65);
+  border-radius:0;background:transparent;color:inherit;
+  font:600 11px/1.2 Inter,system-ui,sans-serif;cursor:pointer;
+}
+#aeTakeCategoryDialog.ae-take-category-dialog{
+  color-scheme:dark;box-sizing:border-box;position:fixed;
+  inset:50% auto auto 50%;transform:translate(-50%,-50%);
+  width:min(440px,calc(100vw - 24px));max-width:440px;
+  max-height:calc(100dvh - 24px);overflow-y:auto;
+  margin:0;padding:25px 24px 22px;
+  border:1px solid #c49a70;border-radius:0;
+  color:#f3e7da;background:#0b2535;
+  box-shadow:0 24px 74px rgba(0,0,0,.48);
+}
+#aeTakeCategoryDialog::backdrop{background:rgba(2,12,21,.76);backdrop-filter:blur(3px)}
+#aeTakeCategoryDialog .ae-take-category-kicker{
+  display:block;color:#d9a771;font:700 10px/1.3 Inter,system-ui,sans-serif;
+  letter-spacing:.13em;
+}
+#aeTakeCategoryDialog h2{
+  margin:7px 0 12px;color:inherit;
+  font:600 30px/1.1 Newsreader,Georgia,serif;
+}
+#aeTakeCategoryDialog #aeTakeCategoryHelp{
+  font:400 13px/1.6 Inter,system-ui,sans-serif;
+  color:#d6dce0;margin:0 0 14px;
+}
+#aeTakeCategoryDialog .ae-take-category-subject{
+  display:block;margin:0 0 16px;padding:10px 12px;
+  border-left:2px solid #c49a70;background:rgba(233,195,151,.08);
+  color:inherit;font:600 15px/1.3 Newsreader,Georgia,serif;
+}
+#aeTakeCategoryDialog .ae-take-category-choices{margin:0;padding:0;border:0;min-width:0}
+#aeTakeCategoryDialog legend{
+  color:inherit;font:600 12px/1.3 Inter,system-ui,sans-serif;margin-bottom:10px;
+}
+#aeTakeCategoryDialog .ae-take-category-choice{
+  display:flex;gap:10px;align-items:center;padding:12px 13px;margin:0 0 8px;
+  border:1px solid rgba(203,164,122,.46);border-radius:0;
+  background:rgba(20,48,64,.9);color:inherit;cursor:pointer;
+  font:600 14px/1.2 Inter,system-ui,sans-serif;
+}
+#aeTakeCategoryDialog .ae-take-category-choice:has(input:checked){
+  border-color:#dfb47e;background:rgba(171,115,63,.24);
+}
+#aeTakeCategoryDialog input[type=radio]{
+  appearance:auto;accent-color:#d7a16c;width:17px;height:17px;margin:0;flex:none;
+}
+#aeTakeCategoryDialog .ae-take-category-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+#aeTakeCategoryDialog .ae-take-category-actions button{
+  padding:10px 12px;min-height:39px;border-radius:0;
+  font:700 12px/1.2 Inter,system-ui,sans-serif;cursor:pointer;
+}
+#aeTakeCategoryDialog .ae-take-category-cancel{
+  background:transparent;color:inherit;border:1px solid rgba(202,160,121,.6);
+}
+#aeTakeCategoryDialog .ae-take-category-save{
+  background:#c69b70;color:#172531;border:1px solid #c69b70;
+}
+#aeTakeCategoryDialog .ae-take-category-actions button:disabled{opacity:.42;cursor:not-allowed}
+#aeTakeCategoryDialog .ae-take-category-status{min-height:1em;margin:8px 0 0;font:500 12px/1.4 Inter,system-ui,sans-serif;color:#f5c59f}
+#aeTakeCategoryDialog input:focus-visible,
+#aeTakeCategoryDialog button:focus-visible{outline:2px solid #e0b480;outline-offset:2px}
+html:not(.dark) #aeTakeCategoryDialog.ae-take-category-dialog{
+  color-scheme:light;color:#183247;background:#fff8ed;border-color:#b58b63;
+}
+html:not(.dark) #aeTakeCategoryDialog #aeTakeCategoryHelp{color:#4c5d64}
+html:not(.dark) #aeTakeCategoryDialog .ae-take-category-choice{background:#fbf0df;border-color:#d6bb9b}
+html:not(.dark) #aeTakeCategoryDialog .ae-take-category-choice:has(input:checked){background:#f0ddc4;border-color:#aa754d}
+html:not(.dark) #aeTakeCategoryDialog .ae-take-category-status{color:#8d422f}
+@media(max-width:760px){
+  #aeTakeCategoryDialog.ae-take-category-dialog{padding:19px 16px 18px;width:calc(100vw - 28px)}
+  #aeTakeDiscussion #aeDiscussionEditSport{font-size:10px;margin-left:3px}
+}
