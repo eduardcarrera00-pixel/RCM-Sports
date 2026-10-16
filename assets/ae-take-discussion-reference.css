@@ -105,7 +105,7 @@
   color:#fff1df;
   font:600 clamp(32px,4vw,43px)/1 Newsreader,Georgia,serif;
   letter-spacing:-.028em;
-  text-transform:uppercase;
+  text-transform:none;
 }
 #aeTakeDiscussion #aeDiscussionClose{
   position:relative;
