@@ -864,3 +864,51 @@ html:not(.dark) body>header #aeCategoryAdmin .ae-category-admin-menu{
     background:rgba(214,171,112,.035)!important;
   }
 }
+
+
+/* v5 · Admin publish is icon-only. */
+@media (min-width:980px){
+  html body>header #loggedAdminContainer .ae-publish-action{
+    display:grid!important;
+    place-items:center!important;
+    flex:0 0 30px!important;
+    width:30px!important;
+    min-width:30px!important;
+    max-width:30px!important;
+    height:30px!important;
+    min-height:30px!important;
+    max-height:30px!important;
+    padding:0!important;
+    gap:0!important;
+    overflow:hidden!important;
+  }
+  html body>header #loggedAdminContainer .ae-publish-action i{
+    margin:0!important;
+    font-size:11px!important;
+    line-height:1!important;
+  }
+  html body>header #loggedAdminContainer .ae-publish-action span{
+    display:none!important;
+  }
+}
+@media (max-width:979px){
+  html body>header #loggedAdminContainer .ae-publish-action{
+    display:grid!important;
+    place-items:center!important;
+    width:30px!important;
+    min-width:30px!important;
+    max-width:30px!important;
+    height:30px!important;
+    min-height:30px!important;
+    max-height:30px!important;
+    padding:0!important;
+    gap:0!important;
+  }
+  html body>header #loggedAdminContainer .ae-publish-action i{
+    font-size:11px!important;
+    line-height:1!important;
+  }
+  html body>header #loggedAdminContainer .ae-publish-action span{
+    display:none!important;
+  }
+}
