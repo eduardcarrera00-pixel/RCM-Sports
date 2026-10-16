@@ -1,0 +1,49 @@
+/* AE SPORTS — Mejores/Peores Platos, carrusel vertical de tres puestos */
+#footballTakes .ae-picks-rail>.ae-chef-board ol.ae-chef-scroll{
+ display:flex!important;flex-direction:column!important;height:144px!important;max-height:144px!important;
+ overflow-y:auto!important;overflow-x:hidden!important;scroll-snap-type:y mandatory;
+ scroll-behavior:smooth;scrollbar-width:thin;scrollbar-color:rgba(182,146,108,.6) transparent;
+ touch-action:pan-y;overscroll-behavior-y:auto;
+}
+#footballTakes .ae-picks-rail>.ae-chef-board ol.ae-chef-scroll::-webkit-scrollbar{width:3px}
+#footballTakes .ae-picks-rail>.ae-chef-board ol.ae-chef-scroll::-webkit-scrollbar-thumb{background:rgba(182,146,108,.6)}
+#footballTakes .ae-picks-rail>.ae-chef-board ol.ae-chef-scroll>li.ae-chef-entry,
+#footballTakes .ae-picks-rail>.ae-chef-board ol.ae-chef-scroll>li.ae-chef-entry:last-child{
+ display:block!important;flex:0 0 144px!important;width:100%!important;height:144px!important;min-height:144px!important;
+ padding:0!important;margin:0!important;box-sizing:border-box!important;scroll-snap-align:start;scroll-snap-stop:always;overflow:hidden;
+}
+#footballTakes .ae-chef-entry .ae-chef-entry-link{
+ box-sizing:border-box;width:100%;height:100%;padding:11px 8px 9px 0;display:grid!important;
+ grid-template-columns:24px minmax(0,1fr);gap:9px;align-items:start;color:inherit;text-decoration:none!important;cursor:pointer;
+}
+#footballTakes .ae-chef-entry .ae-chef-entry-link>.ae-popular-position{
+ color:var(--chef-tint)!important;font:600 21px/1.1 Newsreader,Georgia,serif!important;
+}
+#footballTakes .ae-chef-entry .ae-chef-entry-link>.ae-popular-copy{
+ display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:5px!important;min-width:0!important;
+}
+#footballTakes .ae-chef-entry .ae-chef-entry-link .ae-chef-author{cursor:inherit!important;text-decoration:none!important}
+#footballTakes .ae-chef-entry .ae-chef-entry-link .ae-chef-pick-link{
+ display:-webkit-box!important;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden;
+}
+#footballTakes .ae-chef-entry .ae-chef-entry-link:hover,
+#footballTakes .ae-chef-entry .ae-chef-entry-link:focus-visible{background:rgba(197,157,119,.09)}
+#footballTakes .ae-chef-entry .ae-chef-entry-link:focus-visible{outline:2px solid var(--chef-tint,#d9aa83);outline-offset:-2px}
+#footballTakes .ae-picks-rail>.ae-chef-board .ae-chef-scroll-note{
+ display:block;margin:5px 0 1px!important;color:#b6c8ca!important;font:600 10px/1.2 Inter,system-ui,sans-serif!important;
+ letter-spacing:.055em;
+}
+#footballTakes .ae-picks-rail>.ae-chef-board .ae-chef-scroll-note[hidden]{display:none!important}
+html:not(.dark) body #footballTakes .ae-picks-rail>.ae-chef-board .ae-chef-scroll-note{color:#61717b!important}
+.cp-dialog .cp-detail-author{
+ appearance:none;background:transparent;color:inherit;border:0;border-bottom:1px solid currentColor;
+ padding:1px 0;font:750 15px/1.3 Inter,system-ui,sans-serif;letter-spacing:.01em;cursor:pointer;
+}
+.cp-dialog .cp-detail-author:focus-visible{outline:2px solid #b7865b;outline-offset:3px}
+@media(max-width:560px){
+ #footballTakes .ae-picks-rail>.ae-chef-board ol.ae-chef-scroll{height:152px!important;max-height:152px!important}
+ #footballTakes .ae-picks-rail>.ae-chef-board ol.ae-chef-scroll>li.ae-chef-entry,
+ #footballTakes .ae-picks-rail>.ae-chef-board ol.ae-chef-scroll>li.ae-chef-entry:last-child{
+  flex-basis:152px!important;height:152px!important;min-height:152px!important;
+ }
+}
