@@ -314,7 +314,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/ae-home-focus-hierarchy.css?v=20261016-2">
 <link rel="stylesheet" href="assets/ae-take-composer-modal.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-picks-platos-odds.css?v=20261016-odds-right-2">
-<link rel="stylesheet" href="assets/ae-mobile-polish-weekly-pick.css?v=20261016-weekly-bg-fix-1">
+<link rel="stylesheet" href="assets/ae-mobile-polish-weekly-pick.css?v=20261016-soft-banner-take-click-2">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 <a class="ae-skip-link" href="#mainContent">Ir al contenido</a>
@@ -617,7 +617,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
                 <div class="ae-top-takes-heading-side">
                   <div class="ae-home-take-cta-line">
                     <span class="ae-home-take-nudge">TÚ DECIDES <span aria-hidden="true">→</span></span>
-                    <button id="aeHomeTakePublish" type="button" class="ae-participate-cta ae-home-take-publish" aria-controls="aeTakeComposerDialog">Publicar mi Take</button>
+                    <button id="aeHomeTakePublish" onclick="event.stopImmediatePropagation(); if(typeof window.aeOpenTakeComposer==='function'){window.aeOpenTakeComposer();}else{const modal=document.getElementById('aeTakeComposerDialog');if(modal&&!modal.open)modal.showModal();}" type="button" class="ae-participate-cta ae-home-take-publish" aria-controls="aeTakeComposerDialog">Publicar mi Take</button>
                   </div>
                   <p id="aeTopTakesStatus" class="sr-only" role="status" aria-live="polite">Cargando los Takes destacados…</p>
                 </div>
@@ -718,7 +718,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 
         <!-- Los Takes son una función editorial al final de NFL y Fútbol, no una categoría de navegación. -->
         <section id="freeTakes" class="ae-takes ae-free-takes" hidden aria-labelledby="freeTakesTitle">
-          <div class="ae-takes-head"><span class="ae-takes-eyebrow">TU OPINIÓN CUENTA</span><h2 id="freeTakesTitle">Takes de la comunidad</h2><p>Escribe tu pronóstico para la historia. Una vez publicado, no podrás editarlo ni borrarlo.</p><button id="aeSportTakePublish" type="button" class="ae-participate-cta ae-sport-take-publish" aria-controls="aeTakeComposerDialog">Publicar mi Take <span aria-hidden="true">→</span></button></div>
+          <div class="ae-takes-head"><span class="ae-takes-eyebrow">TU OPINIÓN CUENTA</span><h2 id="freeTakesTitle">Takes de la comunidad</h2><p>Escribe tu pronóstico para la historia. Una vez publicado, no podrás editarlo ni borrarlo.</p><button id="aeSportTakePublish" onclick="event.stopImmediatePropagation(); if(typeof window.aeOpenTakeComposer==='function'){window.aeOpenTakeComposer();}else{const modal=document.getElementById('aeTakeComposerDialog');if(modal&&!modal.open)modal.showModal();}" type="button" class="ae-participate-cta ae-sport-take-publish" aria-controls="aeTakeComposerDialog">Publicar mi Take <span aria-hidden="true">→</span></button></div>
 
           <h3 id="aeTakesFeedHeading" class="ae-takes-history-heading">Historial de Takes</h3>
           <div class="ae-free-controls"><label id="aeNflFeedFilterWrap" hidden>División NFL<select id="aeNflFeedDivision"><option value="">Todas las divisiones</option></select></label><label id="freeTakesFilterWrap">Mostrar<select id="freeTakesSportFilter"><option value="all">Todos los deportes</option><option value="general">General</option><option value="laliga">LaLiga</option><option value="premier">Premier League</option><option value="ligamx">Liga MX</option><option value="champions">Champions League</option><option value="nfl">NFL</option><option value="colegial">Fútbol colegial</option></select></label><label>Ordenar<select id="freeTakesSort"><option value="new">Más recientes</option><option value="top">Más apoyados</option></select></label></div>

@@ -332,3 +332,66 @@
     font-size:16px!important;
   }
 }
+
+
+/* AE SPORTS · último pulido móvil: desenfoque fotográfico y botón Takes activo. */
+@media(max-width:760px){
+  /* Desenfocar sólo las fotografías: textos y cuotas conservan su nitidez. */
+  html body.ae-is-home #mainContent>.editorial-pick.ae-home-weekly-banner>.ae-weekly-home-banner{
+    filter:blur(4.5px) saturate(.89)!important;
+    transform:scale(1.055)!important;
+    transform-origin:center center!important;
+    opacity:.96!important;
+    will-change:auto!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick:not(.ae-home-weekly-banner) #cpWeekly .ae-weekly-preview>img{
+    filter:blur(4.5px) saturate(.89)!important;
+    transform:scale(1.055)!important;
+    transform-origin:center center!important;
+    opacity:.96!important;
+    will-change:auto!important;
+  }
+  /* Velo editorial del diseño web: suficiente contraste, imagen aún visible. */
+  html body.ae-is-home #mainContent>.editorial-pick.ae-home-weekly-banner::before{
+    background:linear-gradient(98deg,rgba(4,19,31,.95) 0%,rgba(6,22,34,.82) 48%,rgba(7,26,38,.50) 100%)!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick:not(.ae-home-weekly-banner) #cpWeekly .ae-weekly-preview:has(>img)::before{
+    background:linear-gradient(98deg,rgba(4,19,31,.95),rgba(5,22,34,.81) 50%,rgba(7,26,38,.50))!important;
+  }
+  html:not(.dark) body.ae-is-home #mainContent>.editorial-pick.ae-home-weekly-banner::before{
+    background:linear-gradient(98deg,rgba(255,251,244,.95) 0%,rgba(255,248,238,.82) 48%,rgba(255,247,232,.47) 100%)!important;
+  }
+  html:not(.dark) body.ae-is-home #mainContent>.editorial-pick:not(.ae-home-weekly-banner) #cpWeekly .ae-weekly-preview:has(>img)::before{
+    background:linear-gradient(98deg,rgba(255,251,244,.95),rgba(255,248,238,.82) 50%,rgba(255,246,231,.47))!important;
+  }
+  /* Elementos de la portada que responden al toque, no a los overlays. */
+  html body.ae-is-home #aeHomeTopTakes .ae-takes-banner .ae-top-takes-heading-side,
+  html body.ae-is-home #aeHomeTopTakes .ae-takes-banner .ae-home-take-cta-line{
+    position:relative!important;
+    z-index:8!important;
+  }
+  html body.ae-is-home #aeHomeTopTakes button#aeHomeTakePublish{
+    position:relative!important;
+    z-index:9!important;
+    pointer-events:auto!important;
+    touch-action:manipulation!important;
+    cursor:pointer!important;
+    min-height:42px!important;
+  }
+  html body.ae-is-home #aeHomeTopTakes button#aeHomeTakePublish::before,
+  html body.ae-is-home #aeHomeTopTakes button#aeHomeTakePublish::after{
+    pointer-events:none!important;
+  }
+  /* Modal táctil: el contenido puede deslizarse y cerrar sin recorte. */
+  html body #aeTakeComposerDialog[open]{
+    display:block!important;
+    visibility:visible!important;
+    z-index:99999!important;
+    max-height:min(92dvh,760px)!important;
+  }
+  html body #aeTakeComposerDialog .ae-take-composer-shell{
+    max-height:min(92dvh,760px)!important;
+    overscroll-behavior:contain!important;
+    -webkit-overflow-scrolling:touch!important;
+  }
+}
