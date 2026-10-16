@@ -12,6 +12,11 @@ let user={id:'reader'},records=[],comments=[],votes=new Map(),pickCounter=0,fail
 w.currentCategory='Picks';w.currentAdmin=null;
 w.notifyCommunity=()=>{};
 w.openUserAuthModal=()=>{w.authOpened=true;};
+w.aeRequestPublication=async(kind,continueToComposer)=>{
+ const response=await w.db.auth.getUser();
+ if(response.data?.user)continueToComposer();
+ else{w.authOpened=true;w.pendingPublication=continueToComposer;}
+};
 w.filterByCategory=category=>{w.currentCategory=category;w.renderCommunityPicksVisibility();};
 w.db={
   auth:{getUser:async()=>({data:{user},error:null}),onAuthStateChange:()=>{}},
@@ -72,12 +77,12 @@ const modal=d.getElementById('cpComposePanel'),cta=d.getElementById('cpPublishCt
 assert.equal(modal.tagName,'DIALOG');
 assert.equal(d.querySelector('#communityPicks #cpComposePanel'),null,'Composer must be outside the feed');
 assert.ok(!d.body.textContent.includes('Preparar mi Pick'));
-cta.click();assert.equal(modal.open,true);assert.equal(cta.getAttribute('aria-expanded'),'true');
+cta.click();await settle();assert.equal(modal.open,true);assert.equal(cta.getAttribute('aria-expanded'),'true');
 assert.ok(d.body.classList.contains('ae-pick-composing'));
 fill('Mi primer Pick','Equipo A vs B');
 d.getElementById('cpComposeClose').click();await settle();assert.equal(modal.open,false);
 assert.equal(fields()[0].value,'Mi primer Pick','Closing preserves the draft');
-cta.click();
+cta.click();await settle();
 failPublish=true;await form.onsubmit({preventDefault(){}});await settle();
 assert.equal(records.length,0);assert.equal(modal.open,true);
 assert.equal(fields()[0].value,'Mi primer Pick');assert.match(form.querySelector('.cp-status').textContent,/Fallo de conexión/);
@@ -111,7 +116,7 @@ assert.equal(d.querySelectorAll('#cpFeed .cp-card').length,2);
 w.filterByCategory('NFL');
 assert.equal(d.getElementById('communityPicks').hidden,true);
 // Authentication can take time: an immediate second submission must be ignored.
-w.filterByCategory('Picks');cta.click();fill('Tercer Pick sin duplicado','Equipo E vs F');
+w.filterByCategory('Picks');cta.click();await settle();fill('Tercer Pick sin duplicado','Equipo E vs F');
 let releaseAuth;const authGate=new Promise(resolve=>{releaseAuth=resolve;});
 const getUser=w.db.auth.getUser;w.db.auth.getUser=async()=>{await authGate;return {data:{user},error:null};};
 const first=form.onsubmit({preventDefault(){}});
@@ -121,10 +126,14 @@ const cancellation=new w.Event('cancel',{cancelable:true});modal.dispatchEvent(c
 await form.onsubmit({preventDefault(){}});releaseAuth();await first;await settle();
 assert.equal(records.length,3,'Double submit must only save one record');assert.equal(modal.open,false);
 w.db.auth.getUser=getUser;
-// A signed-out user reaches authentication with their draft preserved.
-cta.click();fill('Borrador sin sesión','Equipo G vs H');user=null;
+// A signed-out user must authenticate before the composer becomes visible.
+user=null;w.authOpened=false;cta.click();await settle();
+assert.equal(w.authOpened,true);assert.equal(modal.open,false,'Guests cannot open the Pick composer');
+user={id:'reader'};w.pendingPublication();assert.equal(modal.open,true,'Authentication resumes the Pick composer');
+// If the session expires during editing, retain the draft and reopen after login.
+fill('Borrador sin sesión','Equipo G vs H');user=null;w.authOpened=false;
 await form.onsubmit({preventDefault(){}});await settle();assert.equal(w.authOpened,true);assert.equal(modal.open,false);
 assert.equal(fields()[0].value,'Borrador sin sesión');assert.equal(records.length,3);
 assert.equal(d.body.classList.contains('ae-pick-composing'),false);
-console.log('PASS: modal opening, draft retention, failed save, successful closure, duplicate-submit protection, login handoff, voting, replies and visibility.');
+console.log('PASS: publication auth gate, login resume, drafts, saves, duplicate protection, votes and replies.');
 await w.happyDOM.close();
