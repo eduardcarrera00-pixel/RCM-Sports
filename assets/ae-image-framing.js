@@ -57,7 +57,14 @@
   function reset(key){set(key,50,50);}
   function init(){
     for(const [key,c] of Object.entries(configs)){
-      for(const id of [c.file,c.url])$(id)?.addEventListener(id===c.file?'change':'input',()=>repaint(key));
+      $(c.file)?.addEventListener('change',()=>{
+        if($(c.file)?.files?.length && $(c.url))$(c.url).value='';
+        repaint(key);
+      });
+      $(c.url)?.addEventListener('input',()=>{
+        if($(c.url)?.value.trim() && $(c.file))$(c.file).value='';
+        repaint(key);
+      });
       for(const id of [c.x,c.y])$(id)?.addEventListener('input',()=>move(key));
       document.querySelector('[data-ae-center="'+key+'"]')?.addEventListener('click',()=>set(key,50,50));
       repaint(key);
