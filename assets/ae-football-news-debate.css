@@ -275,3 +275,45 @@
   }
   /* El resumen va junto a las noticias. El feed completo sigue por debajo. */
 }
+
+
+/* AE SPORTS · Fondos de ciudad aprobados para Respira fútbol y Vende Humos.
+   Paisajes independientes sin textos ni controles incrustados. */
+html body.ae-is-football #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-chef-card.is-supported .ae-sport-chef-heading{
+  background-color:#071c2c!important;
+  background-image:
+    linear-gradient(90deg,rgba(2,19,30,.96) 0%,rgba(3,23,34,.82) 38%,rgba(4,20,30,.14) 100%),
+    url("atmospheres/ae-respira-futbol-reference.webp")!important;
+  background-position:center,right center!important;
+  background-size:cover,cover!important;
+  background-repeat:no-repeat!important;
+}
+html body.ae-is-football #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-chef-card.is-questioned .ae-sport-chef-heading{
+  background-color:#23101a!important;
+  background-image:
+    linear-gradient(90deg,rgba(24,8,13,.96) 0%,rgba(30,11,14,.77) 39%,rgba(46,15,13,.12) 100%),
+    url("atmospheres/ae-vende-humos-reference.webp")!important;
+  background-position:center,right center!important;
+  background-size:cover,cover!important;
+  background-repeat:no-repeat!important;
+}
+html:not(.dark) body.ae-is-football #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-chef-card.is-supported .ae-sport-chef-heading{
+  background-color:#fff4df!important;
+  background-image:
+    linear-gradient(90deg,rgba(255,250,241,.98) 0%,rgba(255,247,233,.84) 38%,rgba(255,247,233,.10) 100%),
+    url("atmospheres/ae-respira-futbol-reference.webp")!important;
+}
+html:not(.dark) body.ae-is-football #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-chef-card.is-questioned .ae-sport-chef-heading{
+  background-color:#fff0dd!important;
+  background-image:
+    linear-gradient(90deg,rgba(255,248,238,.98) 0%,rgba(255,239,223,.80) 39%,rgba(255,237,218,.08) 100%),
+    url("atmospheres/ae-vende-humos-reference.webp")!important;
+}
+/* La zona superior conserva la única llamada para publicar.
+   El formulario completo sigue abriéndose desde #aeSportTakePublish. */
+html body.ae-is-football #freeTakes #aeFootballPublishBottom{
+  display:none!important;
+}
+html body.ae-is-football #freeTakes #aeTakeComposePanel:not([open]){
+  display:none!important;
+}
