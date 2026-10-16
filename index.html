@@ -2086,9 +2086,8 @@ currentUser = {
                         <h1>${escapeHTML(hero.title)}</h1>
                         <p>${escapeHTML(hero.summary || 'La historia completa, desde otra perspectiva.')}</p>
                         <div class="editorial-actions">
-                            <button type="button" class="editorial-featured" onclick="openArticleModal(${articleIdArgument(hero.id)})">
-                                <span class="ae-hero-cta-symbol ae-hero-cta-symbol--book" aria-hidden="true"></span>
-                                <span>Leer la historia</span>
+                            <button type="button" class="editorial-featured ae-hero-read-cta" onclick="openArticleModal(${articleIdArgument(hero.id)})">
+                                <span>LEER LA HISTORIA</span>
                                 <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
                             </button>
                         </div>
