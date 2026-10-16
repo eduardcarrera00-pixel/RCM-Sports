@@ -294,6 +294,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/ae-classical-auth-buttons.css?v=20261016-3">
 <link rel="stylesheet" href="assets/ae-reference-community-design.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-mobile-header-ranking-polish.css?v=20261016-1">
+<link rel="stylesheet" href="assets/ae-mobile-compact-home.css?v=20261016-1">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 <a class="ae-skip-link" href="#mainContent">Ir al contenido</a>
@@ -557,7 +558,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
                         <span class="w-3 h-6 bg-pitch-600 rounded-full mr-3"></span>
                         Últimas noticias
                     </h2>
-                    <div class="ae-news-inline-tools"><span id="articlesCount" class="text-xs text-slate-500 font-medium">Cargando...</span><button id="aeAllNewsSport" type="button" class="ae-news-all-button" data-ae-news-category="NFL" hidden>Todas las noticias <span aria-hidden="true">→</span></button></div>
+                    <div class="ae-news-inline-tools"><span id="articlesCount" class="text-xs text-slate-500 font-medium">Cargando...</span><button id="aeMobileNewsMore" class="ae-mobile-expand-button" type="button" aria-controls="articlesGrid" aria-expanded="false">Ver todas <span aria-hidden="true">→</span></button><button id="aeAllNewsSport" type="button" class="ae-news-all-button" data-ae-news-category="NFL" hidden>Todas las noticias <span aria-hidden="true">→</span></button></div>
                 </div>
 
                 <!-- Articles Cards Grid -->
@@ -607,11 +608,11 @@ html.dark [data-reading-size][aria-pressed="true"] {
               </div>
               <div class="ae-top-takes-grid">
                 <section class="ae-top-takes-card" aria-labelledby="aeTopTakesPositiveTitle">
-                  <header class="ae-top-takes-card-head"><h3 id="aeTopTakesPositiveTitle">Genios</h3></header>
+                  <header class="ae-top-takes-card-head"><h3 id="aeTopTakesPositiveTitle">Genios</h3><button type="button" class="ae-mobile-expand-button ae-mobile-takes-more" aria-controls="aeTopTakesPositive" aria-expanded="false">Ver más <span aria-hidden="true">→</span></button></header>
                   <ol id="aeTopTakesPositive" class="ae-top-takes-list"><li class="ae-top-takes-empty">Cargando Takes…</li></ol>
                 </section>
                 <section class="ae-top-takes-card is-questioned" aria-labelledby="aeTopTakesNegativeTitle">
-                  <header class="ae-top-takes-card-head"><h3 id="aeTopTakesNegativeTitle">Ánoetos</h3></header>
+                  <header class="ae-top-takes-card-head"><h3 id="aeTopTakesNegativeTitle">Ánoetos</h3><button type="button" class="ae-mobile-expand-button ae-mobile-takes-more" aria-controls="aeTopTakesNegative" aria-expanded="false">Ver más <span aria-hidden="true">→</span></button></header>
                   <ol id="aeTopTakesNegative" class="ae-top-takes-list"><li class="ae-top-takes-empty">Cargando Takes…</li></ol>
                 </section>
               </div>
@@ -2231,5 +2232,6 @@ updateThemeButton();
 <script src="assets/ae-image-framing.js?v=20261016-admin-edit-1"></script>
 <script src="assets/ae-news-editor.js?v=20261016-1"></script>
 <script src="assets/ae-news-archive.js?v=20261016-focus-1"></script>
+<script src="assets/ae-mobile-compact-home.js?v=20261016-1"></script>
 </body>
 </html>
