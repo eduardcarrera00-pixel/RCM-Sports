@@ -1,0 +1,299 @@
+/* AE SPORTS · Portada: Top 4 en previews. La clasificación guardada
+   en Supabase y las pantallas completas siguen mostrando todos los clubes. */
+html body.ae-is-home #homeRankingList>li:nth-child(n+5),
+html body.ae-is-home #homeChampionsList>li:nth-child(n+5){
+  display:none!important;
+}
+.ae-home-weekly-more,
+.ae-weekly-mobile-banner-thumb{display:none!important;}
+/* La cabecera móvil de inicio coloca el Pick DESPUÉS del hero y ANTES
+   de Últimas noticias. El componente editorial es el original, no una copia. */
+@media(max-width:760px){
+  html body.ae-is-home #heroSection{
+    margin-bottom:0!important;
+  }
+  html body.ae-is-home #heroSection .editorial-hero,
+  html.dark body.ae-is-home #heroSection .editorial-hero{
+    margin-bottom:10px!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick{
+    display:block!important;
+    box-sizing:border-box!important;
+    position:relative!important;
+    isolation:isolate!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:none!important;
+    margin:0 0 13px!important;
+    padding:0!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    overflow:visible!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick[hidden]{
+    display:none!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick>h2{
+    display:block!important;
+    box-sizing:border-box!important;
+    position:relative!important;
+    z-index:2!important;
+    width:calc(100% - 85px)!important;
+    min-width:0!important;
+    min-height:0!important;
+    max-height:none!important;
+    margin:0 0 9px!important;
+    padding:0!important;
+    background:transparent!important;
+    border:0!important;
+    border-radius:0!important;
+    color:#f4e5d4!important;
+    font:600 clamp(24px,6.6vw,30px)/1.08 Newsreader,Georgia,serif!important;
+    letter-spacing:-.025em!important;
+    text-shadow:none!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick>.ae-home-weekly-more{
+    display:inline-flex!important;
+    align-items:center!important;
+    gap:5px!important;
+    justify-content:flex-end!important;
+    box-sizing:border-box!important;
+    position:absolute!important;
+    right:0!important;top:0!important;
+    z-index:3!important;
+    margin:0!important;
+    padding:6px 4px!important;
+    border:0!important;
+    background:transparent!important;
+    color:#d3a071!important;
+    font:700 11px/1.15 Inter,system-ui,sans-serif!important;
+    cursor:pointer!important;
+    white-space:nowrap!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick>.ae-home-weekly-more:focus-visible{
+    outline:2px solid #d8ac7c!important;outline-offset:3px!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick>.ae-weekly-home-banner{
+    display:none!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick>.editorial-pick-body,
+  html.dark body.ae-is-home #mainContent>.editorial-pick>.editorial-pick-body{
+    display:block!important;
+    position:relative!important;
+    z-index:1!important;
+    box-sizing:border-box!important;
+    min-height:0!important;
+    width:100%!important;
+    margin:0!important;
+    padding:0!important;
+    border:1px solid rgba(205,161,119,.52)!important;
+    border-radius:5px!important;
+    background:linear-gradient(120deg,#09283a,#102f43)!important;
+    color:#f8e7d5!important;
+    overflow:hidden!important;
+    box-shadow:0 4px 13px rgba(2,15,26,.12)!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick .editorial-eyebrow{
+    display:none!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick #cpWeekly{
+    display:block!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    margin:0!important;
+    padding:0!important;
+    background:transparent!important;
+    border:0!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick #cpWeekly .ae-weekly-preview,
+  html.dark body.ae-is-home #mainContent>.editorial-pick #cpWeekly .ae-weekly-preview{
+    display:grid!important;
+    box-sizing:border-box!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    align-content:center!important;
+    align-items:center!important;
+    gap:5px 8px!important;
+    position:relative!important;
+    min-width:0!important;
+    width:100%!important;
+    max-width:none!important;
+    min-height:116px!important;
+    height:auto!important;
+    margin:0!important;
+    padding:11px 13px!important;
+    border:0!important;
+    border-radius:0!important;
+    box-shadow:none!important;
+    background:transparent!important;
+    text-align:left!important;
+    overflow:hidden!important;
+    cursor:pointer!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick #cpWeekly .ae-weekly-preview:has(>img){
+    grid-template-columns:minmax(0,37%) minmax(0,1fr)!important;
+    padding:0!important;
+    gap:0 10px!important;
+    align-items:stretch!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick #cpWeekly .ae-weekly-preview>img.ae-weekly-home-thumbnail,
+  html body.ae-is-home #mainContent>.editorial-pick #cpWeekly .ae-weekly-preview>img.ae-weekly-mobile-banner-thumb{
+    display:block!important;
+    grid-column:1!important;
+    grid-row:1/5!important;
+    align-self:stretch!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    max-width:none!important;
+    min-width:0!important;
+    height:100%!important;
+    min-height:120px!important;
+    max-height:172px!important;
+    margin:0!important;
+    padding:0!important;
+    object-fit:cover!important;
+    object-position:var(--ae-image-focus,center)!important;
+    border:0!important;
+    border-radius:0!important;
+    box-shadow:none!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick #cpWeekly .ae-weekly-preview:has(>img)>:not(img){
+    grid-column:2!important;
+    margin-left:0!important;
+    margin-right:9px!important;
+    min-width:0!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick #cpWeekly .ae-weekly-preview:has(>img)>h3{
+    margin-top:9px!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick #cpWeekly .ae-weekly-preview:has(>img)>.ae-weekly-link{
+    margin-bottom:8px!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick #cpWeekly .ae-weekly-preview .ae-weekly-title{
+    display:-webkit-box!important;
+    -webkit-box-orient:vertical!important;
+    -webkit-line-clamp:3!important;
+    line-clamp:3!important;
+    overflow:hidden!important;
+    margin-bottom:0!important;
+    padding:0!important;
+    color:#f5e8da!important;
+    font:600 clamp(15px,4vw,19px)/1.14 Newsreader,Georgia,serif!important;
+    overflow-wrap:anywhere!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick #cpWeekly .ae-weekly-preview .ae-weekly-event{
+    display:-webkit-box!important;
+    -webkit-box-orient:vertical!important;
+    -webkit-line-clamp:2!important;
+    line-clamp:2!important;
+    overflow:hidden!important;
+    color:#bcced5!important;
+    font:500 10px/1.24 Inter,system-ui,sans-serif!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick #cpWeekly .ae-weekly-preview .ae-weekly-selection{
+    display:flex!important;
+    align-items:center!important;
+    flex-wrap:wrap!important;
+    gap:3px 5px!important;
+    min-width:0!important;
+    margin-top:0!important;
+    margin-bottom:0!important;
+    padding:0!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick #cpWeekly .ae-weekly-preview .ae-weekly-selection strong{
+    display:inline-block!important;
+    color:#efdfce!important;
+    font:500 10px/1.24 Inter,system-ui,sans-serif!important;
+    overflow-wrap:anywhere!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick #cpWeekly .ae-weekly-preview .ae-weekly-odds{
+    display:inline-block!important;
+    padding:2px 5px!important;
+    margin:0!important;
+    background:rgba(159,109,70,.43)!important;
+    color:#fff0e0!important;
+    border:1px solid rgba(229,178,129,.28)!important;
+    font:700 9px/1.2 Inter,system-ui,sans-serif!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick #cpWeekly .ae-weekly-preview .ae-weekly-link{
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:flex-start!important;
+    width:max-content!important;
+    max-width:100%!important;
+    min-height:24px!important;
+    margin-top:0!important;
+    padding:0!important;
+    background:transparent!important;
+    border:0!important;
+    color:#e5b888!important;
+    font:700 10px/1.2 Inter,system-ui,sans-serif!important;
+    text-decoration:none!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick .ae-weekly-empty{
+    margin:0!important;
+    padding:15px!important;
+    min-height:80px!important;
+    font:400 12px/1.4 Inter,system-ui,sans-serif!important;
+    color:#d7c6b7!important;
+  }
+  /* Segunda sección: noticias distintas de la hero, dos a la vista. */
+  html body.ae-is-home .editorial-layout{
+    margin-top:0!important;
+    gap:10px!important;
+  }
+  html body.ae-is-home #articlesGrid>article:nth-child(2){
+    display:flex!important;
+  }
+  html body.ae-is-home #articlesGrid>article:nth-child(n+3){
+    display:none!important;
+  }
+  html body.ae-is-home #articlesGrid.ae-mobile-expanded>article:nth-child(n+3){
+    display:flex!important;
+  }
+  /* Los cuatro equipos del preview ocupan una altura más contenida. */
+  html body.ae-is-home #editorialBottom .editorial-ranking-list .rcm-team{
+    min-height:36px!important;
+    padding-block:4px!important;
+  }
+  html:not(.dark) body.ae-is-home #mainContent>.editorial-pick>h2{
+    color:#163248!important;
+  }
+  html:not(.dark) body.ae-is-home #mainContent>.editorial-pick>.ae-home-weekly-more{
+    color:#9c673e!important;
+  }
+  html:not(.dark) body.ae-is-home #mainContent>.editorial-pick>.editorial-pick-body{
+    background:linear-gradient(120deg,#fffdf9,#f8f1e7)!important;
+    border-color:#d6b393!important;
+    box-shadow:0 3px 11px rgba(69,52,33,.06)!important;
+    color:#273d50!important;
+  }
+  html:not(.dark) body.ae-is-home #mainContent>.editorial-pick #cpWeekly .ae-weekly-preview .ae-weekly-title{
+    color:#193247!important;
+  }
+  html:not(.dark) body.ae-is-home #mainContent>.editorial-pick #cpWeekly .ae-weekly-preview .ae-weekly-event{
+    color:#566c7b!important;
+  }
+  html:not(.dark) body.ae-is-home #mainContent>.editorial-pick #cpWeekly .ae-weekly-preview .ae-weekly-selection strong{
+    color:#354f5b!important;
+  }
+  html:not(.dark) body.ae-is-home #mainContent>.editorial-pick #cpWeekly .ae-weekly-preview .ae-weekly-odds{
+    background:#f0e2d0!important;color:#805639!important;border-color:#cfa77d!important;
+  }
+  html:not(.dark) body.ae-is-home #mainContent>.editorial-pick #cpWeekly .ae-weekly-preview .ae-weekly-link{
+    color:#986138!important;
+  }
+  html:not(.dark) body.ae-is-home #mainContent>.editorial-pick .ae-weekly-empty{
+    color:#5d6c78!important;
+  }
+}
+@media(max-width:365px){
+  html body.ae-is-home #mainContent>.editorial-pick #cpWeekly .ae-weekly-preview:has(>img){
+    grid-template-columns:minmax(0,33%) minmax(0,1fr)!important;
+    gap:0 7px!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick #cpWeekly .ae-weekly-preview .ae-weekly-title{
+    font-size:14px!important;
+  }
+}
