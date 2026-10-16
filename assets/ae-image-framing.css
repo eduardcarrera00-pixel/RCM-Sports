@@ -25,3 +25,7 @@ html body .ae-weekly-inline-photo,
 html body .ae-weekly-home-thumbnail{
   object-position:var(--ae-image-focus,50% 50%)!important;
 }
+
+html body #footballTakes .ae-picks-rail #picksNews .ae-picks-news-feature .ae-picks-news-open img{
+ object-position:var(--ae-image-focus,50% 50%)!important;
+}
