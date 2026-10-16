@@ -21,9 +21,13 @@
      desktopHomeMarker=document.createComment('AE Sports: posición original de Takes deportivos');
      sidebar.insertBefore(desktopHomeMarker,root.parentElement===sidebar?root:null);
    }
+   // En Fútbol, ambos destacados van a la derecha junto a las noticias.
+   // NFL regresa a su ubicación original, sin alterar su diseño.
    if(typeof currentCategory!=='undefined' && currentCategory==='Fútbol'){
-     if(root.parentElement!==layout) layout.appendChild(root);
-   } else if(root.parentElement!==sidebar){
+     if(root.parentElement!==sidebar || sidebar.firstElementChild!==root){
+       sidebar.insertBefore(root, sidebar.firstChild);
+     }
+   } else if(root.parentElement!==sidebar || desktopHomeMarker.nextSibling!==root){
      desktopHomeMarker.after(root);
    }
  }
