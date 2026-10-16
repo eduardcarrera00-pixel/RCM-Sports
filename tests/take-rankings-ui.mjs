@@ -1,0 +1,50 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {Window} from 'happy-dom';
+
+const w=new Window({url:'https://aesportsclub.github.io/'});
+const d=w.document;
+d.body.innerHTML=fs.readFileSync('index.html','utf8').replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,'');
+w.currentAdmin=null;
+const calls=[];
+const take={id:'take-1',title:'Pronóstico NFL',author:'Aficionado',sport:'nfl',created_at:new Date().toISOString(),outcome:null,points:null};
+w.db={rpc:async(name,args)=>{
+  calls.push({name,args});
+  if(name==='ae_take_review_queue')return {data:args.p_sport==='nfl'?[take]:[],error:null};
+  if(name==='ae_take_result_ranking')return {data:take.outcome&&['all',take.sport].includes(args.p_sport)?[
+    {user_id:'author-1',username:'Aficionado',points:take.points,correct_takes:1,total_resolved:1}]:[],error:null};
+  if(name==='ae_score_free_take'){take.outcome=args.p_outcome;take.points=args.p_points;return {data:take.points,error:null};}
+  throw Error(name);
+}};
+const settle=()=>new Promise(resolve=>setTimeout(resolve,45));
+w.eval(fs.readFileSync('assets/ae-take-rankings.js','utf8'));
+d.dispatchEvent(new w.Event('DOMContentLoaded'));
+await settle();
+assert.match(d.querySelector('#aeHomeTakeRankingList').textContent,/aún no hay/i);
+w.aeTakeRankings.setSport('NFL');
+await settle();
+assert.match(d.querySelector('#aeSportTakeRankingTitle').textContent,/NFL/);
+assert.equal(d.querySelector('#aeTakeReview').hidden,true);
+w.currentAdmin={id:'editor'};
+w.aeTakeRankings.refresh();
+await settle();
+assert.equal(d.querySelector('#aeTakeReview').hidden,false);
+const form=d.querySelector('.ae-take-review-entry');
+assert.ok(form,'The existing Take is available for admin scoring');
+form.querySelector('[name=outcome]').value='won';
+form.querySelector('[name=outcome]').dispatchEvent(new w.Event('change'));
+form.querySelector('[name=points]').value='86';
+form.dispatchEvent(new w.Event('submit',{cancelable:true}));
+await settle();
+assert.deepEqual(JSON.parse(JSON.stringify(calls.find(c=>c.name==='ae_score_free_take').args)),{p_take_id:'take-1',p_outcome:'won',p_points:86});
+assert.match(d.querySelector('#aeSportTakeRankingList').textContent,/86 pts/);
+assert.match(d.querySelector('#aeHomeTakeRankingList').textContent,/86 pts/);
+await d.querySelector('#aeSportTakeRanking [data-take-rank=all]').click();
+await settle();
+assert.equal(d.querySelector('#aeSportTakeRanking [data-take-rank=all]').getAttribute('aria-pressed'),'true');
+w.aeTakeRankings.setSport('Fútbol');
+await settle();
+assert.match(d.querySelector('#aeSportTakeRankingTitle').textContent,/Fútbol/);
+assert.doesNotMatch(d.querySelector('#aeSportTakeRankingList').textContent,/86 pts/);
+console.log('PASS: home/individual tabs, admin-only form, score submission and isolated sport rankings.');
+await w.happyDOM.close();
