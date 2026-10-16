@@ -323,7 +323,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/ae-nav-menu-takes-finishing.css?v=20261016-1">
     <link rel="stylesheet" href="assets/ae-footer-gold-brand.css?v=20261016-1">
     <link rel="stylesheet" href="assets/ae-image-framing.css?v=20261016-1">
-    <link rel="stylesheet" href="assets/ae-weekly-admin-edit.css?v=20261016-1">
+    <link rel="stylesheet" href="assets/ae-weekly-admin-edit.css?v=20261016-2">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 
@@ -558,7 +558,8 @@ html.dark [data-reading-size][aria-pressed="true"] {
                 <button type="submit" id="aeWeeklySaveButton">Publicar Pick de la Semana</button>
                 <button type="button" id="aeWeeklyCancelEdit" hidden>Cancelar edición</button>
               </div>
-              <p id="aeWeeklyPickAdminStatus" class="ae-full ae-takes-status" role="status"></p>
+              <p id="aeWeeklyPickAdminStatus" class="ae-full ae-takes-status" role="status" aria-live="polite"></p>
+              <div class="ae-full"><button id="aeWeeklyCheckSave" type="button" class="ae-weekly-check-save" hidden>Comprobar si se guardó</button></div>
             </form>
           </details>
         </section>
@@ -2211,7 +2212,7 @@ updateThemeButton();
 <script src="assets/ae-category-visibility.js?v=20261015-3"></script>
 <script src="assets/ae-nfl-takes.js?v=20261015-3"></script>
 <script src="assets/free-takes.js?v=20261016-1"></script>
-<script src="assets/ae-editorial-weekly.js?v=20261016-admin-edit-1"></script>
+<script src="assets/ae-editorial-weekly.js?v=20261016-network-1"></script>
 <script src="assets/ae-profile.js?v=20261016-1"></script>
 <script src="assets/ae-home-takes.js?v=20261015-5"></script>
 <script src="assets/ae-sport-top-takes.js?v=20261016-2"></script>
