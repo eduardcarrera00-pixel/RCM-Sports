@@ -18,8 +18,9 @@ function message(error){return error?.code==='23505'?'Ya publicaste tu Pick de h
 async function account(){if(!db)throw Error('Sin conexión.');const r=await db.auth.getUser();if(r.error)throw r.error;if(!r.data.user){closeDetail();openUserAuthModal();return null;}return r.data.user;}
 function link(id){const u=new URL(location.href);u.searchParams.delete('article');u.searchParams.delete('comment');u.searchParams.set('pick',id);u.hash='';return u.href;}
 function open(id){history.pushState({},'',link(id));showDetail(id);}
-function card(p,compact=false){
- const n=el('article',null,'cp-card');
+function card(p,compact=false,detail=false){
+
+ const n=el('article',null,detail?'cp-card cp-card-detail':'cp-card');
  const pickSports=Array.isArray(p.legs)?p.legs.map(l=>String(l?.sport||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')):[];
  const hasNfl=pickSports.some(t=>/nfl|americano|american football|gridiron/.test(t));
  const hasFootball=pickSports.some(t=>!/nfl|americano|american football|gridiron/.test(t)&&/futbol|football|soccer|champions|liga|premier|barca|madrid|uefa|bundesliga|serie a/.test(t));
@@ -28,10 +29,10 @@ function card(p,compact=false){
  const header=el('div',null,'cp-card-header');
  header.append(el('span','@'+(p.author||'Aficionado')));
  const date=new Date(p.created_at);
- if(!Number.isNaN(date.getTime()))header.append(el('time',date.toLocaleDateString('es',{day:'numeric',month:'short',year:'numeric'})));
- if(first?.sport)header.append(el('span',String(first.sport),'cp-card-sport'));
-  if(p.event_date)header.append(el('span','Evento '+p.event_date,'cp-event-date'));
-  if(!isActive(p))header.append(el('strong',resultLabel(p),'cp-result-badge'));
+ if(!detail&&!Number.isNaN(date.getTime()))header.append(el('time',date.toLocaleDateString('es',{day:'numeric',month:'short',year:'numeric'})));
+ if(!detail&&first?.sport)header.append(el('span',String(first.sport),'cp-card-sport'));
+  if(!detail&&p.event_date)header.append(el('span','Evento '+p.event_date,'cp-event-date'));
+  if(!detail&&!isActive(p))header.append(el('strong',resultLabel(p),'cp-result-badge'));
  n.append(header);
  const title=el('h3',null,'cp-card-title');
  const a=el('a',p.title);
@@ -62,16 +63,8 @@ function card(p,compact=false){
    if(!canVote)b.title=p.moderation_status==='pending'?'Votación disponible tras la revisión del Pick':'Votación cerrada';
    controls.append(b);
  }
- controls.append(button('Respuestas · '+Number(p.comments_count||0),()=>open(p.id)));
+ if(!detail){const replies=button('Respuestas · '+Number(p.comments_count||0),()=>open(p.id));replies.classList.add('cp-replies-button');controls.append(replies);}
  n.append(controls);
- if(typeof currentAdmin!=='undefined'&&currentAdmin&&!compact){
-   const hide=button('Ocultar Pick',async()=>{
-     const r=await db.from('ae_community_picks').update({hidden:true}).eq('id',p.id);
-     if(r.error)notifyCommunity(message(r.error),true);
-     else{closeDetail();load();}
-   });
-   hide.className='cp-card-admin';n.append(hide);
- }
  return n;
 }
 async function vote(p,value,b){if(p.moderation_status!=='approved'||!isActive(p))return;b.disabled=true;try{const user=await account();if(!user)return;if(user.id===p.user_id)throw Error('No puedes votar tu propio Pick.');
@@ -295,8 +288,8 @@ async function showDetail(id){
  dialog.replaceChildren(button('Cerrar',closeDetail),el('p','Cargando Pick…'));if(!dialog.open)dialog.showModal();
  try{const [pick,comments]=await Promise.all([db.from('ae_pick_feed').select('*').eq('id',id).maybeSingle(),db.from('ae_pick_comments').select('*').eq('pick_id',id).eq('hidden',false).order('created_at').limit(200)]);
  if(!dialog.isConnected||new URL(location.href).searchParams.get('pick')!==id)return;
- if(pick.error||comments.error)throw pick.error||comments.error;dialog.replaceChildren(button('Cerrar',closeDetail));if(!pick.data){dialog.append(el('p','Este Pick no está disponible.'));return;}dialog.append(card(pick.data));
- const share=el('a','Enlace permanente');share.href=link(id);dialog.append(share,el('h3','Conversación'));
+ if(pick.error||comments.error)throw pick.error||comments.error;dialog.replaceChildren(button('Cerrar',closeDetail));if(!pick.data){dialog.append(el('p','Este Pick no está disponible.'));return;}dialog.append(card(pick.data,false,true));
+ const heading=el('h3','Respuestas · '+Number(pick.data.comments_count||comments.data.length),'cp-detail-replies-heading');dialog.append(heading);
  const replyStatus=el('p',''),form=el('form'),body=field('Tu comentario','textarea');body.input.maxLength=2000;let parent=null;
  const cancel=button('Cancelar respuesta',()=>{parent=null;replyStatus.textContent='';cancel.hidden=true;});cancel.hidden=true;
  const names=new Map(comments.data.map(c=>[c.id,c.author]));
