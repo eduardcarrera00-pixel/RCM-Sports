@@ -191,25 +191,41 @@ async function loadModeration(){
    target.append(n);
  }
 }
-function previousWeekMonday(){
- const parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/Toronto',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
- const get=k=>parts.find(x=>x.type===k).value;
- const d=new Date(Date.UTC(+get('year'),+get('month')-1,+get('day'),12));
- const offset=(d.getUTCDay()+6)%7;d.setUTCDate(d.getUTCDate()-offset-7);
- return d.toISOString().slice(0,10);
+async function loadSettlement(){
+ const area=$('cpSettleList');if(!area)return;
+ const admin=typeof currentAdmin!=='undefined'&&Boolean(currentAdmin);
+ area.replaceChildren();
+ if(!admin)return;
+ const r=await db.from('ae_pick_feed').select('*').eq('moderation_status','approved')
+   .eq('outcome','pending').lte('event_date',todayToronto())
+   .order('event_date',{ascending:true}).limit(50);
+ if(r.error){area.append(el('p','No pudimos cargar los resultados pendientes. '+message(r.error)));return;}
+ if(!r.data?.length){area.append(el('p','No hay eventos pendientes de verificación.'));return;}
+ for(const p of r.data){
+  const entry=el('article',null,'ae-pick-settle-entry');
+  entry.append(el('strong',p.title),el('small',p.author+' · Evento '+p.event_date+' · '+p.american_odds));
+  for(const leg of p.legs||[])entry.append(el('p',leg.event+' · '+leg.selection));
+  for(const [outcome,label] of [['won','Acertó'],['lost','Falló'],['void','Anulado']]){
+   const b=button(label,async()=>{
+    if(!confirm('¿Has comprobado el resultado oficial? Confirmar '+label+' para '+p.title+'. Esta acción es definitiva.'))return;
+    b.disabled=true;
+    try{
+     const r=await db.rpc('ae_pick_settle_result',{p_pick_id:p.id,p_outcome:outcome});
+     if(r.error)throw r.error;
+     $('cpAdminStatus').textContent='Resultado verificado: '+label+' · '+Number(r.data||0).toFixed(2)+' pts.';
+     await load();
+    }catch(e){$('cpAdminStatus').textContent=message(e);}
+    finally{b.disabled=false;}
+   });entry.append(b);
+  }
+  area.append(entry);
+ }
 }
-async function closePreviousWeek(){
- const monday=previousWeekMonday();
- if(!confirm('¿Cerrar definitivamente la semana del '+monday+' y asignar 10 a 1 puntos al Top 10?'))return;
- const r=await db.rpc('ae_finalize_community_pick_week',{p_week_start:monday});
- $('cpAdminStatus').textContent=r.error?message(r.error):'Semana cerrada: '+r.data+' Picks premiados.';
- await loadRanking();
-}
-window.updateAePicksAdmin=loadModeration;
+window.updateAePicksAdmin=()=>{loadModeration();loadSettlement();};
 
 function field(label,type='text'){const wrap=el('label',label);const input=el(type==='textarea'?'textarea':'input');if(type!=='textarea')input.type=type;input.required=true;wrap.append(input);return {wrap,input};}
 function buildComposer(){
- const form=$('cpForm'),title=field('Título del Pick'),explanation=field('Tu explicación (opcional)','textarea');title.input.maxLength=160;title.input.minLength=3;explanation.input.required=false;explanation.input.maxLength=2000;form.append(title.wrap,explanation.wrap);
+ const form=$('cpForm'),title=field('Título del Pick'),explanation=field('Tu explicación (opcional)','textarea'),eventDay=field('Día del evento (sin hora)','date');eventDay.input.min=todayToronto();eventDay.input.max=new Date(Date.parse(todayToronto()+'T12:00:00Z')+180*86400000).toISOString().slice(0,10);title.input.maxLength=160;title.input.minLength=3;explanation.input.required=false;explanation.input.maxLength=2000;form.append(title.wrap,eventDay.wrap,explanation.wrap);
  const legs=el('div',null,'cp-legs'),rows=[];const output=el('output',''),status=el('p','', 'cp-status');status.setAttribute('role','status');
  function values(){return rows.map(r=>({sport:r.sport.input.value.trim(),event:r.event.input.value.trim(),selection:r.selection.input.value.trim(),odds:Number(r.odds.input.value)}));}
  function calculate(){
@@ -222,12 +238,24 @@ function buildComposer(){
  }
  const add=button('Añadir segunda selección',()=>addRow());
  function addRow(){if(rows.length>=2)return;const box=el('fieldset');box.append(el('legend','Selección '+(rows.length+1)));const row={box};for(const [key,label] of [['sport','Deporte'],['event','Partido (equipos)'],['selection','Pronóstico'],['odds','Cuota americana (+150, -110)']]){row[key]=field(label);row[key].input.maxLength=key==='odds'?7:key==='selection'?200:key==='sport'?40:160;if(key==='odds')row[key].input.pattern='[+-]?[0-9]{3,6}';box.append(row[key].wrap);}rows.push(row);if(rows.length===2)box.append(button('Quitar segunda selección',()=>{rows.pop();box.remove();add.hidden=false;calculate();}));legs.append(box);add.hidden=rows.length===2;}
- addRow();form.append(legs,add,output,el('p','Una publicación al día (Toronto). La cuota se revisará manualmente antes de habilitar los votos. No combines selecciones del mismo partido. El Pick no se puede editar después de publicarlo.','cp-meta'));
+ addRow();form.append(legs,add,output,el('p','Una publicación al día (Toronto). Elige el día del evento: al terminar desaparecerá de los Picks activos y seguirá en el historial. La cuota y el resultado se verifican por separado. No podrás editar el Pick.','cp-meta'));
  const confirm=el('label','He revisado las selecciones y la cuota.');const checkbox=el('input');checkbox.type='checkbox';checkbox.required=true;confirm.prepend(checkbox);form.append(confirm);
  const submit=el('button','Publicar Pick');submit.type='submit';form.append(submit,status);form.addEventListener('input',calculate);
- form.onsubmit=async e=>{e.preventDefault();if(posting)return;status.textContent='';try{const user=await account();if(!user)return;if(!calculate())throw Error('Revisa la cuota americana y las selecciones.');posting=true;submit.disabled=true;const r=await db.from('ae_community_picks').insert({title:title.input.value.trim(),explanation:explanation.input.value.trim(),legs:values()}).select('id').single();if(r.error)throw r.error;form.reset();calculate();await load();status.textContent='Pick enviado. AE SPORTS revisará tu cuota antes de recibir votos.';await load();}catch(e){status.textContent=message(e);}finally{posting=false;submit.disabled=false;}};
+ form.onsubmit=async e=>{e.preventDefault();if(posting)return;status.textContent='';try{const user=await account();if(!user)return;if(!calculate())throw Error('Revisa la cuota americana y las selecciones.');posting=true;submit.disabled=true;const r=await db.from('ae_community_picks').insert({title:title.input.value.trim(),explanation:explanation.input.value.trim(),legs:values(),event_date:eventDay.input.value}).select('id').single();if(r.error)throw r.error;form.reset();calculate();await load();status.textContent='Pick enviado. AE SPORTS revisará tu cuota antes de recibir votos.';await load();}catch(e){status.textContent=message(e);}finally{posting=false;submit.disabled=false;}};
  calculate();
 }
+async function loadArchive(){
+ const target=$('cpArchiveFeed'),status=$('cpArchiveStatus'),more=$('cpArchiveMore');
+ if(!target||!db)return;
+ target.replaceChildren(el('p','Cargando historial…'));status.textContent='';
+ const r=await db.from('ae_pick_feed').select('*').order('created_at',{ascending:false}).order('id',{ascending:false}).range(0,archiveLimit-1);
+ if(r.error){target.replaceChildren(el('p','No se pudo cargar el historial. '+message(r.error)));more.hidden=true;return;}
+ const records=r.data||[];
+ target.replaceChildren(...records.map(p=>card(p,true)));
+ status.textContent=records.length?'Picks publicados, incluso vencidos y con resultado verificado.':'Todavía no hay Picks disponibles.';
+ more.hidden=records.length<archiveLimit;
+}
+function closeArchive(){const dialog=$('cpArchiveDialog');if(dialog?.open)dialog.close();}
 function closeDetail(){const d=$('cpDialog');if(d)d.close();}
 async function showDetail(id){
  if(!/^[0-9a-f-]{36}$/i.test(id))return;
@@ -261,7 +289,7 @@ document.addEventListener('DOMContentLoaded',()=>{
  $('cpComposePanel')?.addEventListener('toggle',e=>{
   $('cpPublishCta')?.setAttribute('aria-expanded',String(e.currentTarget.open));
  });
- renderCommunityPicksVisibility();load();$('cpReload')?.addEventListener('click',load);$('cpCloseWeek')?.addEventListener('click',closePreviousWeek);for(const [id,mode] of [['cpRankWeekly','weekly'],['cpRankOverall','overall']]){$(id)?.addEventListener('click',()=>{currentRank=mode;for(const [i,m] of [['cpRankWeekly','weekly'],['cpRankOverall','overall']])$(i).setAttribute('aria-pressed',String(currentRank===m));loadRanking();});}const id=new URL(location.href).searchParams.get('pick');if(id)showDetail(id);$('cpMore').onclick=()=>{limit+=20;load();};if(db)db.auth.onAuthStateChange(()=>setTimeout(()=>{load();const id=new URL(location.href).searchParams.get('pick');if(id)showDetail(id);},0));});
+ renderCommunityPicksVisibility();load();$('cpReload')?.addEventListener('click',load);$('cpViewAll')?.addEventListener('click',()=>{const dlg=$('cpArchiveDialog');if(dlg&&!dlg.open)dlg.showModal();archiveLimit=30;loadArchive();});$('cpArchiveClose')?.addEventListener('click',closeArchive);$('cpArchiveMore')?.addEventListener('click',()=>{archiveLimit+=30;loadArchive();});for(const [id,mode] of [['cpRankMonth','month'],['cpRankHistory','all']]){$(id)?.addEventListener('click',()=>{currentRank=mode;for(const [i,m] of [['cpRankWeekly','weekly'],['cpRankOverall','overall']])$(i).setAttribute('aria-pressed',String(currentRank===m));loadRanking();});}const id=new URL(location.href).searchParams.get('pick');if(id)showDetail(id);$('cpMore').onclick=()=>{limit+=20;load();};if(db)db.auth.onAuthStateChange(()=>setTimeout(()=>{load();const id=new URL(location.href).searchParams.get('pick');if(id)showDetail(id);},0));});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)load();});
 window.addEventListener('popstate',()=>{const id=new URL(location.href).searchParams.get('pick');if(id)showDetail(id);else closeDetail();});
 })();
