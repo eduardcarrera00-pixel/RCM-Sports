@@ -88,7 +88,7 @@ async function load(){
    $('cpStatus').textContent=feed.data?.length?'':'Todavía no hay Picks. Comparte el primero.';
    $('cpMore').hidden=(feed.data?.length||0)<limit;
    loaded=true;
-   await Promise.all([loadRanking(),loadModeration(),loadChefLists(),loadSettlement()]);
+   await Promise.all([loadRanking(),loadModeration(),loadChefLists(),loadSettlement(),loadLegacyDates()]);
  }catch(e){if(seq!==request)return;$('cpFeed').replaceChildren();$('cpMore').hidden=true;$('cpStatus').textContent='No pudimos cargar los Picks. '+message(e);}
 }
 let currentRank='month';
@@ -191,6 +191,30 @@ async function loadModeration(){
    target.append(n);
  }
 }
+async function loadLegacyDates(){
+ const area=$('cpLegacyList');if(!area)return;
+ const admin=typeof currentAdmin!=='undefined'&&Boolean(currentAdmin);
+ area.replaceChildren();if(!admin)return;
+ const r=await db.from('ae_pick_feed').select('id,title,author,publication_day,event_date').is('event_date',null)
+   .order('created_at',{ascending:false}).limit(30);
+ if(r.error){area.append(el('p','No se pudo comprobar fechas pendientes. '+message(r.error)));return;}
+ if(!r.data?.length){area.append(el('p','Todos los Picks visibles tienen fecha de evento.'));return;}
+ for(const p of r.data){
+  const item=el('div',null,'ae-pick-settle-entry');
+  const label=el('label','Evento: '+p.title+' · '+p.author+' · Publicado '+p.publication_day);
+  const day=el('input');day.type='date';day.required=true;day.min=p.publication_day;day.max=new Date(Date.parse(todayToronto()+'T12:00:00Z')+180*86400000).toISOString().slice(0,10);
+  const save=button('Confirmar fecha',async()=>{
+   if(!day.value){$('cpAdminStatus').textContent='Indica la fecha real del evento.';return;}
+   if(!confirm('¿Verificaste que '+day.value+' fue la fecha del evento de '+p.title+'?'))return;
+   save.disabled=true;
+   const r=await db.rpc('ae_pick_set_legacy_event_date',{p_pick_id:p.id,p_event_date:day.value});
+   $('cpAdminStatus').textContent=r.error?message(r.error):'Fecha verificada: '+r.data+'.';
+   save.disabled=false;
+   if(!r.error)await load();
+  });
+  label.append(day);item.append(label,save);area.append(item);
+ }
+}
 async function loadSettlement(){
  const area=$('cpSettleList');if(!area)return;
  const admin=typeof currentAdmin!=='undefined'&&Boolean(currentAdmin);
@@ -221,7 +245,7 @@ async function loadSettlement(){
   area.append(entry);
  }
 }
-window.updateAePicksAdmin=()=>{loadModeration();loadSettlement();};
+window.updateAePicksAdmin=()=>{loadModeration();loadSettlement();loadLegacyDates();};
 
 function field(label,type='text'){const wrap=el('label',label);const input=el(type==='textarea'?'textarea':'input');if(type!=='textarea')input.type=type;input.required=true;wrap.append(input);return {wrap,input};}
 function buildComposer(){
