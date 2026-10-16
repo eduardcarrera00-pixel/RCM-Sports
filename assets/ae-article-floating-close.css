@@ -1,0 +1,75 @@
+/* AE SPORTS · Always-visible article close control. */
+html body #articleModal{
+  --ae-article-close-top:92px;
+}
+html body #articleModal .ae-article-floating-close{
+  position:fixed!important;
+  top:var(--ae-article-close-top)!important;
+  right:max(16px,calc((100vw - min(896px,calc(100vw - 48px)))/2 + 14px))!important;
+  z-index:2147483000!important;
+  display:grid!important;
+  place-items:center!important;
+  box-sizing:border-box!important;
+  width:34px!important;
+  min-width:34px!important;
+  max-width:34px!important;
+  height:34px!important;
+  min-height:34px!important;
+  max-height:34px!important;
+  margin:0!important;
+  padding:0!important;
+  border:1px solid rgba(218,174,117,.42)!important;
+  border-radius:0!important;
+  background:rgba(7,29,42,.92)!important;
+  color:#f1dfc7!important;
+  box-shadow:0 6px 18px rgba(0,8,14,.24)!important;
+  backdrop-filter:blur(8px)!important;
+  cursor:pointer!important;
+  transition:border-color .15s ease,background .15s ease,transform .15s ease!important;
+}
+html body #articleModal .ae-article-floating-close:hover{
+  border-color:rgba(232,190,135,.82)!important;
+  background:rgba(15,45,59,.96)!important;
+  transform:translateY(-1px)!important;
+}
+html body #articleModal .ae-article-floating-close:focus-visible{
+  outline:2px solid #e4b77e!important;
+  outline-offset:3px!important;
+}
+html body #articleModal .ae-article-floating-close i{
+  margin:0!important;
+  font-size:15px!important;
+  line-height:1!important;
+}
+html:not(.dark) body #articleModal .ae-article-floating-close{
+  border-color:rgba(144,101,62,.36)!important;
+  background:rgba(255,249,239,.94)!important;
+  color:#57381f!important;
+  box-shadow:0 6px 18px rgba(76,48,22,.14)!important;
+}
+html:not(.dark) body #articleModal .ae-article-floating-close:hover{
+  border-color:rgba(160,108,61,.66)!important;
+  background:#fffaf2!important;
+}
+@media(max-width:760px){
+  html body #articleModal{
+    --ae-article-close-top:76px;
+  }
+  html body #articleModal .ae-article-floating-close{
+    right:11px!important;
+    width:32px!important;
+    min-width:32px!important;
+    max-width:32px!important;
+    height:32px!important;
+    min-height:32px!important;
+    max-height:32px!important;
+  }
+}
+@media(max-width:480px){
+  html body #articleModal{
+    --ae-article-close-top:70px;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  html body #articleModal .ae-article-floating-close{transition:none!important}
+}
