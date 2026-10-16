@@ -140,3 +140,175 @@ html body.ae-is-home .editorial-pick button:focus-visible{
     font-size:24px!important;
   }
 }
+
+
+/* 2026-10-16 · Takes banner glow + compact community crowd treatment */
+
+/* Takes de la comunidad shares the warm illuminated contour with Pick de la Semana. */
+html body.ae-is-home #aeHomeTopTakes .ae-top-takes-heading.ae-takes-banner{
+  border:1px solid rgba(230,178,111,.84)!important;
+  box-shadow:
+    0 0 0 1px rgba(232,180,113,.11),
+    0 0 18px rgba(222,158,87,.20),
+    0 9px 23px rgba(3,15,23,.10)!important;
+}
+html.dark body.ae-is-home #aeHomeTopTakes .ae-top-takes-heading.ae-takes-banner{
+  border-color:rgba(230,178,111,.88)!important;
+  box-shadow:
+    0 0 0 1px rgba(236,190,127,.12),
+    0 0 20px rgba(219,151,79,.23),
+    0 9px 25px rgba(2,12,20,.14)!important;
+}
+html:not(.dark) body.ae-is-home #aeHomeTopTakes .ae-top-takes-heading.ae-takes-banner{
+  border-color:rgba(190,131,73,.62)!important;
+  box-shadow:
+    0 0 0 1px rgba(201,142,78,.08),
+    0 0 14px rgba(191,128,65,.12),
+    0 7px 18px rgba(80,53,28,.06)!important;
+}
+
+/* Tu voz cuenta: smaller, livelier, sports-neutral crowd background. */
+html body.ae-is-home aside .editorial-community.rcm-panel>.ae-section-heading{
+  min-height:62px!important;
+  height:62px!important;
+  max-height:62px!important;
+  padding:10px 15px!important;
+  overflow:hidden!important;
+  border-bottom:1px solid rgba(184,196,201,.10)!important;
+  background:
+    linear-gradient(90deg,rgba(4,24,35,.95) 0%,rgba(6,29,41,.78) 48%,rgba(8,34,46,.42) 100%),
+    radial-gradient(ellipse at 79% 20%,rgba(226,167,100,.18),transparent 36%),
+    url('atmospheres/ae-community-crowd.svg') center 58%/cover no-repeat!important;
+}
+html body.ae-is-home aside .editorial-community.rcm-panel>.ae-section-heading::after{
+  content:""!important;
+  display:block!important;
+  position:absolute!important;
+  inset:0!important;
+  z-index:1!important;
+  width:auto!important;
+  height:auto!important;
+  border:0!important;
+  border-radius:0!important;
+  background:linear-gradient(90deg,rgba(6,25,36,.34),transparent 54%,rgba(223,164,96,.08))!important;
+  box-shadow:none!important;
+  transform:none!important;
+  opacity:1!important;
+  pointer-events:none!important;
+}
+html body.ae-is-home aside .editorial-community.rcm-panel>.ae-section-heading h2{
+  position:relative!important;
+  z-index:2!important;
+  width:auto!important;
+  max-width:100%!important;
+  margin:0!important;
+  color:#f3e5d2!important;
+  font:600 clamp(21px,1.72vw,26px)/1 Newsreader,Georgia,serif!important;
+  letter-spacing:-.022em!important;
+  text-shadow:0 2px 9px rgba(0,8,14,.34)!important;
+}
+
+/* Tighten the community cards without touching their functionality. */
+html body.ae-is-home aside .editorial-community.rcm-panel #communityLeaders{
+  gap:8px!important;
+  padding:9px!important;
+}
+html body.ae-is-home aside .editorial-community.rcm-panel #communityLeaders>.ae-community-spotlight{
+  padding:11px 12px 10px 13px!important;
+  border-left-width:3px!important;
+}
+html body.ae-is-home aside .editorial-community.rcm-panel .ae-community-card-head{
+  gap:7px!important;
+  margin:0 0 6px!important;
+}
+html body.ae-is-home aside .editorial-community.rcm-panel .ae-community-signal{
+  flex-basis:22px!important;
+  width:22px!important;
+  height:22px!important;
+  font-size:16px!important;
+}
+html body.ae-is-home aside .editorial-community.rcm-panel .ae-community-category{
+  min-height:23px!important;
+  max-width:145px!important;
+  padding:3px 7px!important;
+  font-size:8.5px!important;
+}
+html body.ae-is-home aside .editorial-community.rcm-panel .ae-community-card-head::after{
+  height:19px!important;
+}
+html body.ae-is-home aside .editorial-community.rcm-panel .ae-community-story-link{
+  margin-bottom:7px!important;
+  font:600 clamp(16px,1.38vw,20px)/1.12 Newsreader,Georgia,serif!important;
+}
+html body.ae-is-home aside .editorial-community.rcm-panel .ae-community-story-link::after{
+  font-size:12px!important;
+}
+html body.ae-is-home aside .editorial-community.rcm-panel .ae-community-quote{
+  margin-bottom:8px!important;
+  padding:8px 10px 8px 28px!important;
+  font-size:11.5px!important;
+  line-height:1.36!important;
+}
+html body.ae-is-home aside .editorial-community.rcm-panel .ae-community-quote::before{
+  margin-left:-18px!important;
+  font-size:20px!important;
+}
+html body.ae-is-home aside .editorial-community.rcm-panel .ae-community-card-footer{
+  gap:7px!important;
+}
+html body.ae-is-home aside .editorial-community.rcm-panel .ae-community-user-actions{
+  gap:6px!important;
+}
+html body.ae-is-home aside .editorial-community.rcm-panel .ae-community-author{
+  max-width:120px!important;
+  font-size:10px!important;
+}
+html body.ae-is-home aside .editorial-community.rcm-panel .ae-community-reply{
+  min-height:27px!important;
+  padding:4px 8px!important;
+  font-size:9.5px!important;
+}
+html body.ae-is-home aside .editorial-community.rcm-panel .ae-community-votes{
+  gap:5px!important;
+}
+html body.ae-is-home aside .editorial-community.rcm-panel .ae-community-vote{
+  min-width:45px!important;
+  min-height:29px!important;
+  padding:4px 7px!important;
+  font-size:10.5px!important;
+}
+
+/* Day mode uses the same crowd with a warm paper wash. */
+html:not(.dark) body.ae-is-home aside .editorial-community.rcm-panel>.ae-section-heading{
+  border-bottom-color:rgba(143,110,78,.14)!important;
+  background:
+    linear-gradient(90deg,rgba(255,250,240,.95) 0%,rgba(255,247,232,.82) 52%,rgba(248,228,198,.48) 100%),
+    radial-gradient(ellipse at 79% 20%,rgba(202,137,69,.18),transparent 36%),
+    url('atmospheres/ae-community-crowd.svg') center 58%/cover no-repeat!important;
+}
+html:not(.dark) body.ae-is-home aside .editorial-community.rcm-panel>.ae-section-heading::after{
+  background:linear-gradient(90deg,rgba(255,250,241,.38),transparent 55%,rgba(176,113,55,.06))!important;
+}
+html:not(.dark) body.ae-is-home aside .editorial-community.rcm-panel>.ae-section-heading h2{
+  color:#102a42!important;
+  text-shadow:0 1px 0 rgba(255,255,255,.55)!important;
+}
+
+@media(max-width:640px){
+  html body.ae-is-home aside .editorial-community.rcm-panel>.ae-section-heading{
+    min-height:56px!important;
+    height:56px!important;
+    max-height:56px!important;
+    padding:9px 12px!important;
+  }
+  html body.ae-is-home aside .editorial-community.rcm-panel>.ae-section-heading h2{
+    font-size:21px!important;
+  }
+  html body.ae-is-home aside .editorial-community.rcm-panel #communityLeaders{
+    gap:7px!important;
+    padding:7px!important;
+  }
+  html body.ae-is-home aside .editorial-community.rcm-panel #communityLeaders>.ae-community-spotlight{
+    padding:10px!important;
+  }
+}
