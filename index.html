@@ -322,6 +322,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/ae-header-gold-and-picks-centering.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-nav-menu-takes-finishing.css?v=20261016-1">
     <link rel="stylesheet" href="assets/ae-footer-gold-brand.css?v=20261016-1">
+    <link rel="stylesheet" href="assets/ae-image-framing.css?v=20261016-1">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 
@@ -504,15 +505,14 @@ html.dark [data-reading-size][aria-pressed="true"] {
                   <button id="cpRankMonth" type="button" aria-pressed="true">Mensual</button>
                   <button id="cpRankHistory" type="button" aria-pressed="false">Histórico</button>
                 </div>
-                <p class="ae-picks-ranking-intro">Puntos por resultados verificados: acierto +cuota ÷ 100, fallo −cuota ÷ 100 y anulado 0. La administración confirma los resultados.</p>
+                <p class="ae-picks-ranking-intro">Top 10 por puntos verificados: acierto +cuota ÷ 100; fallo −cuota ÷ 100; anulado 0. Mensual se reinicia automáticamente el día 1 según la fecha de confirmación (Toronto); Histórico conserva todos los resultados.</p>
                 <ol id="cpLeaderboard" class="ae-take-leaderboard-list" aria-live="polite"></ol>
                 <button id="cpReload" type="button" class="ae-take-button">Actualizar</button>
               </section>
               <section id="cpModeration" class="ae-picks-top-three" hidden aria-labelledby="cpModerationTitle">
-                <h3 id="cpModerationTitle">Administrar cuotas</h3><p>Revisa las cuotas declaradas antes de permitir votos.</p>
+                <h3 id="cpModerationTitle">Administrar cuotas</h3><p>Revisa las cuotas cuando corresponda; la comunidad puede votar y comentar mientras tanto.</p>
                 <div id="cpPending"></div>
-                <h4 class="ae-admin-settlement-title">Confirmar resultados terminados</h4><p class="ae-admin-settlement-hint">Comprueba el marcador oficial antes de asignar puntos. Un resultado confirmado no puede cambiarse.</p><div id="cpSettleList" role="region" aria-label="Picks pendientes de resultado"></div>
-                 <h4 class="ae-admin-settlement-title">Picks antiguos sin fecha</h4><p class="ae-admin-settlement-hint">Verifica la fecha real de los pronósticos publicados antes de esta actualización.</p><div id="cpLegacyList" role="region" aria-label="Verificar fechas antiguas"></div>
+                <h4 class="ae-admin-settlement-title">Confirmar resultados terminados</h4><p class="ae-admin-settlement-hint">Confirma los resultados oficiales: los puntos se actualizarán automáticamente en el ranking mensual e histórico. Los Picks antiguos sin fecha no requieren rellenarla.</p><div id="cpSettleList" role="region" aria-label="Picks pendientes de resultado"></div>
                 <p id="cpAdminStatus" role="status"></p>
               </section>
             </aside>
@@ -530,11 +530,25 @@ html.dark [data-reading-size][aria-pressed="true"] {
                   <small>Imagen horizontal para el encabezado (recomendado 1600 × 600). JPG, PNG o WEBP; máximo 5 MB.</small>
                   <input id="aeWeeklyBannerInput" type="file" name="banner_file" accept="image/jpeg,image/png,image/webp">
                   <span id="aeWeeklyBannerPreview" class="ae-upload-preview">Vista previa del banner</span>
+                  <span class="ae-framing-note">También puedes pegar un enlace directo HTTPS.</span>
+                  <input type="url" name="banner_url" id="aeWeeklyBannerUrl" placeholder="https://ejemplo.com/banner.jpg" inputmode="url">
+                  <div class="ae-framing-controls" data-ae-frame="banner">
+                    <label>Encuadre horizontal <input id="aeWeeklyBannerX" type="range" min="0" max="100" value="50"></label>
+                    <label>Encuadre vertical <input id="aeWeeklyBannerY" type="range" min="0" max="100" value="50"></label>
+                    <button type="button" data-ae-center="banner">Centrar imagen</button>
+                  </div>
                 </label>
                 <label class="ae-upload-field">Imagen de la publicación
                   <small>Imagen para la tarjeta y el análisis (recomendado 800 × 450). Opcional.</small>
                   <input id="aeWeeklyImageInput" type="file" name="image_file" accept="image/jpeg,image/png,image/webp">
                   <span id="aeWeeklyImagePreview" class="ae-upload-preview">Vista previa de publicación</span>
+                  <span class="ae-framing-note">O pega el enlace HTTPS de una imagen.</span>
+                  <input type="url" name="image_url" id="aeWeeklyImageUrl" placeholder="https://ejemplo.com/imagen.jpg" inputmode="url">
+                  <div class="ae-framing-controls" data-ae-frame="weekly">
+                    <label>Encuadre horizontal <input id="aeWeeklyImageX" type="range" min="0" max="100" value="50"></label>
+                    <label>Encuadre vertical <input id="aeWeeklyImageY" type="range" min="0" max="100" value="50"></label>
+                    <button type="button" data-ae-center="weekly">Centrar imagen</button>
+                  </div>
                 </label>
               </div>
               <div class="ae-full"><button type="submit">Publicar Pick de la Semana</button></div>
@@ -890,6 +904,12 @@ html.dark [data-reading-size][aria-pressed="true"] {
                     <label for="pubImageFile" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">O subir una imagen de portada (JPG, PNG, WEBP · máximo 5 MB)</label>
                     <input id="pubImageFile" type="file" accept="image/jpeg,image/png,image/webp" class="w-full text-sm">
                     <div id="pubImagePreview" class="ae-upload-preview">Vista previa de la imagen</div>
+                    <div class="ae-framing-controls" data-ae-frame="news">
+                      <label>Encuadre horizontal <input id="pubImageFocusX" type="range" min="0" max="100" value="50"></label>
+                      <label>Encuadre vertical <input id="pubImageFocusY" type="range" min="0" max="100" value="50"></label>
+                      <button type="button" data-ae-center="news">Centrar imagen</button>
+                    </div>
+                    <small class="ae-framing-note">Arrastra los controles para colocar la parte importante de la foto. La elección se guarda también al editar.</small>
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Resumen Breve *</label>
@@ -1366,6 +1386,7 @@ currentUser = {
                 adminNameDisplay.innerText = currentAdmin.name;
                 // Prefill author in publish modal
                 document.getElementById('pubAuthor').value = currentAdmin.name;
+            window.aeImageFraming?.reset('news');
             } else {
                 guestContainer.classList.remove('hidden');
                 loggedContainer.classList.add('hidden');
@@ -1427,6 +1448,8 @@ currentUser = {
             return {
                 id: row.id, legacyId: row.legacy_id, title: row.title, category: row.category, team: row.football_team || '', createdAt: row.created_at,
                 author: row.author, image: safeImageURL(row.image),
+                image_focus_x: Number.isInteger(Number(row.image_focus_x)) ? Number(row.image_focus_x) : 50,
+                image_focus_y: Number.isInteger(Number(row.image_focus_y)) ? Number(row.image_focus_y) : 50,
                 authorAvatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=' + encodeURIComponent(row.author),
                 summary: row.summary, body: row.body, featured: row.featured,
                 date: new Date(row.created_at).toLocaleDateString('es', {year:'numeric', month:'short', day:'numeric'}),
@@ -1596,7 +1619,7 @@ currentUser = {
                 <article class="bg-white rounded-2xl border border-slate-200 overflow-hidden flex flex-col justify-between shadow-sm hover:shadow-xl hover:border-pitch-300 transition-all duration-300 hover:-translate-y-1 relative">
                     <div>
                         <div class="relative h-48 overflow-hidden group">
-                            <img src="${escapeHTML(safeImageURL(art.image))}" alt="${escapeHTML(art.title)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <img src="${escapeHTML(safeImageURL(art.image))}" alt="${escapeHTML(art.title)}" style="object-position:${Math.min(100,Math.max(0,Number(art.image_focus_x)||50))}% ${Math.min(100,Math.max(0,Number(art.image_focus_y)||50))}%" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                             <div class="absolute top-3 left-3 bg-white/90 backdrop-blur-md border border-slate-200 text-pitch-800 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md shadow-sm">
                                 ${escapeHTML(art.category)}
                             </div>
@@ -1648,7 +1671,7 @@ currentUser = {
             const container = document.getElementById('heroSection');
             container.innerHTML = `
                 <div class="editorial-hero">
-                    <img class="editorial-hero-image" src="${escapeHTML(safeImageURL(hero.image))}" alt="" onerror="this.hidden=true">
+                    <img class="editorial-hero-image" src="${escapeHTML(safeImageURL(hero.image))}" style="object-position:${Math.min(100,Math.max(0,Number(hero.image_focus_x)??50))}% ${Math.min(100,Math.max(0,Number(hero.image_focus_y)??50))}%" alt="" onerror="this.hidden=true">
                     <div class="editorial-hero-copy">
                                                 <h1>${escapeHTML(hero.title)}</h1>
                         <p>${escapeHTML(hero.summary || 'La historia completa, desde otra perspectiva.')}</p>
@@ -1773,7 +1796,7 @@ currentUser = {
         function closePublishModal() {
             document.getElementById('publishModal').classList.add('hidden');
             document.getElementById('pubImageFile').value='';
-            document.getElementById('pubImagePreview').textContent='Vista previa de la imagen';
+            window.aeImageFraming?.reset('news');
             syncModalScrollLock();
         }
 
@@ -1801,6 +1824,8 @@ currentUser = {
                     football_team: category === 'Fútbol' ? (document.getElementById('pubTeam').value || null) : null,
                     author: document.getElementById('pubAuthor').value.trim() || currentAdmin.name,
                     image: safeImageURL(uploadedUrl || document.getElementById('pubImage').value.trim() || categoryFallbackImages[category]),
+                    image_focus_x: window.aeImageFraming?.get('news').x ?? 50,
+                    image_focus_y: window.aeImageFraming?.get('news').y ?? 50,
                     summary: document.getElementById('pubSummary').value.trim(),
                     body: bodyText.split(/\n/).map(p => '<p>' + escapeHTML(p) + '</p>').join(''),
                     featured: false, created_by: currentAdmin.id
@@ -1876,6 +1901,8 @@ currentUser = {
             document.getElementById('modalAuthor').innerText = article.author || 'AE SPORTS';
             document.getElementById('modalDate').innerText = article.date || '';
             document.getElementById('modalImage').src = safeImageURL(article.image);
+            document.getElementById('modalImage').style.objectPosition =
+                `${Math.min(100,Math.max(0,Number(article.image_focus_x) || 50))}% ${Math.min(100,Math.max(0,Number(article.image_focus_y) || 50))}%`;
             document.getElementById('modalBody').innerHTML = cleanBody(article.body);
             restoreReadingSize();
 renderRelatedStories(article);
@@ -2163,20 +2190,21 @@ function toggleDarkMode() {
 updateThemeButton();
     </script>
 <script src="assets/nfl-teams.js"></script>
-<script src="assets/community.js?v=ticker-only-20261015-5"></script>
+<script src="assets/community.js?v=20261016-framing-1"></script>
 <script src="assets/champions.js?v=qa1-20261015-6"></script>
-<script src="assets/community-picks.js?v=20261016-4"></script>
+<script src="assets/community-picks.js?v=20261016-ranking-1"></script>
 <script src="assets/weekly-picks.js?v=20261015-1"></script>
 <script src="assets/username-auth.js?v=20261015-2"></script>
 <script src="assets/ae-category-visibility.js?v=20261015-3"></script>
 <script src="assets/ae-nfl-takes.js?v=20261015-3"></script>
 <script src="assets/free-takes.js?v=20261016-1"></script>
-<script src="assets/ae-editorial-weekly.js?v=20261015-6"></script>
+<script src="assets/ae-editorial-weekly.js?v=20261016-focus-1"></script>
 <script src="assets/ae-profile.js?v=20261016-1"></script>
 <script src="assets/ae-home-takes.js?v=20261015-5"></script>
 <script src="assets/ae-sport-top-takes.js?v=20261016-2"></script>
 <script src="assets/ae-take-replies.js?v=20261015-2"></script>
 <script src="assets/ae-picks-premium.js?v=20261015-1"></script>
+<script src="assets/ae-image-framing.js?v=20261016-1"></script>
 <script src="assets/ae-news-archive.js?v=20261015-1"></script>
 </body>
 </html>
