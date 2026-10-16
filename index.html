@@ -289,6 +289,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
 <link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261016-editor-1">
+<link rel="stylesheet" href="assets/ae-custom-nav-icons.css?v=20261016-1">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 <a class="ae-skip-link" href="#mainContent">Ir al contenido</a>
@@ -306,10 +307,10 @@ html.dark [data-reading-size][aria-pressed="true"] {
                 <input id="searchInput" type="search" hidden aria-hidden="true" tabindex="-1" oninput="handleSearch()">
                 <nav class="ae-sport-nav" aria-label="Explorar deportes">
                     <button onclick="filterByCategory('Todos')" class="category-btn active" data-category="Todos" hidden>Todos</button>
-                    <button onclick="filterByCategory('Picks')" class="category-btn" data-category="Picks"><span class="ae-nav-icon"><i class="fa-solid fa-bullseye" aria-hidden="true"></i></span><span>Picks</span></button>
-                    <button onclick="filterByCategory('NFL')" class="category-btn" data-category="NFL"><span class="ae-nav-icon"><i class="fa-solid fa-football" aria-hidden="true"></i></span><span>NFL</span></button>
-                    <button onclick="filterByCategory('Fútbol')" class="category-btn" data-category="Fútbol"><span class="ae-nav-icon"><i class="fa-solid fa-futbol" aria-hidden="true"></i></span><span>Fútbol</span></button>
-                    <button onclick="filterByCategory('Fútbol Americano Colegial')" class="category-btn" data-category="Fútbol Americano Colegial"><span class="ae-nav-icon"><i class="fa-solid fa-graduation-cap" aria-hidden="true"></i></span><span>Colegial</span></button>
+                    <button onclick="filterByCategory('Picks')" class="category-btn" data-category="Picks"><span class="ae-nav-icon"><img class="ae-custom-sport-icon" src="assets/icons/ae-picks-gold.webp?v=20261016-1" width="40" height="40" loading="eager" decoding="async" alt="" aria-hidden="true"></span><span>Picks</span></button>
+                    <button onclick="filterByCategory('NFL')" class="category-btn" data-category="NFL"><span class="ae-nav-icon"><img class="ae-custom-sport-icon" src="assets/icons/ae-nfl-gold.webp?v=20261016-1" width="40" height="40" loading="eager" decoding="async" alt="" aria-hidden="true"></span><span>NFL</span></button>
+                    <button onclick="filterByCategory('Fútbol')" class="category-btn" data-category="Fútbol"><span class="ae-nav-icon"><img class="ae-custom-sport-icon" src="assets/icons/ae-futbol-gold.webp?v=20261016-1" width="40" height="40" loading="eager" decoding="async" alt="" aria-hidden="true"></span><span>Fútbol</span></button>
+                    <button onclick="filterByCategory('Fútbol Americano Colegial')" class="category-btn" data-category="Fútbol Americano Colegial"><span class="ae-nav-icon"><img class="ae-custom-sport-icon" src="assets/icons/ae-colegial-gold.webp?v=20261016-1" width="40" height="40" loading="eager" decoding="async" alt="" aria-hidden="true"></span><span>Colegial</span></button>
                     <button onclick="filterByCategory('NBA')" class="category-btn" data-category="NBA"><span class="ae-nav-icon"><i class="fa-solid fa-basketball" aria-hidden="true"></i></span><span>NBA</span></button>
                     <button onclick="filterByCategory('Tenis')" class="category-btn" data-category="Tenis"><span class="ae-nav-icon"><i class="fa-solid fa-table-tennis-paddle-ball" aria-hidden="true"></i></span><span>Tenis</span></button>
                     <button onclick="filterByCategory('Ciclismo')" class="category-btn" data-category="Ciclismo"><span class="ae-nav-icon"><i class="fa-solid fa-bicycle" aria-hidden="true"></i></span><span>Ciclismo</span></button>
@@ -325,7 +326,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
     title="Activar modo oscuro"
     class="w-9 h-9 rounded-xl bg-slate-100 border border-slate-200
            text-slate-600 flex items-center justify-center">
-    <i id="themeIcon" class="fa-solid fa-moon" aria-hidden="true"></i>
+    <img id="themeIcon" class="ae-custom-theme-icon" src="assets/icons/ae-luna-gold.webp?v=20261016-1" width="32" height="32" alt="" aria-hidden="true" decoding="async">
 </button>
 
                     <!-- Guest State: User sign-in and registration -->
@@ -2181,7 +2182,7 @@ function renderRelatedStories(article) {
     const icon = document.getElementById('themeIcon');
     const label = isDark ? 'Activar modo claro' : 'Activar modo oscuro';
 
-    icon.className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+    icon.src = isDark ? 'assets/icons/ae-sol-gold.webp?v=20261016-1' : 'assets/icons/ae-luna-gold.webp?v=20261016-1';
     button.setAttribute('aria-label', label);
     button.setAttribute('aria-pressed', String(isDark));
     button.title = label;
