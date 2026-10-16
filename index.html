@@ -316,7 +316,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/ae-take-composer-modal.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-picks-platos-odds.css?v=20261016-odds-right-2">
 <link rel="stylesheet" href="assets/ae-mobile-polish-weekly-pick.css?v=20261016-first-pick-blur-center-takes-3">
-<link rel="stylesheet" href="assets/ae-admin-header-final.css?v=20261016-4">
+<link rel="stylesheet" href="assets/ae-admin-header-final.css?v=20261016-5">
 <link rel="stylesheet" href="assets/ae-nfl-mobile-ranking-compact.css?v=20261016-tight-ranking-v1">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
@@ -378,9 +378,8 @@ html.dark [data-reading-size][aria-pressed="true"] {
                     <!-- Logged-in State: Admin Profile & Actions -->
                     <div id="loggedAdminContainer" class="hidden flex items-center space-x-2 sm:space-x-3">
                         <!-- Publish Button -->
-                        <button onclick="openPublishModal()" class="ae-publish-action flex items-center space-x-2 bg-pitch-600 hover:bg-pitch-700 text-white text-xs font-bold uppercase tracking-wider">
+                        <button onclick="openPublishModal()" class="ae-publish-action flex items-center bg-pitch-600 hover:bg-pitch-700 text-white" aria-label="Publicar" title="Publicar">
                             <i class="fa-solid fa-plus" aria-hidden="true"></i>
-                            <span>Publicar</span>
                         </button>
 
                         <!-- Logout Button -->
