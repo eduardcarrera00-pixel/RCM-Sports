@@ -24,6 +24,7 @@
         <section class="ae-discussion-subject">
           <strong id="aeDiscussionSubject"></strong>
           <span id="aeDiscussionSport" class="ae-discussion-sport"></span>
+          <button type="button" id="aeDiscussionEditSport" hidden>Cambiar comunidad</button>
           <p id="aeDiscussionBody"></p>
         </section>
         <section class="ae-discussion-thread" aria-labelledby="aeDiscussionCount">
@@ -36,6 +37,14 @@
       </div>`;
     document.body.append(dialog);
     $('aeDiscussionClose').addEventListener('click',()=>dialog.close());
+    $('aeDiscussionEditSport').addEventListener('click',()=>{
+      if (current && window.aeTakeCategoryEdit) {
+        window.aeTakeCategoryEdit.open(current, sport=>{
+          current.sport=sport;
+          displaySport(current);
+        });
+      }
+    });
     $('aeDiscussionCancel').addEventListener('click',()=>setParent(null));
     dialog.addEventListener('click',(event)=>{if(event.target===dialog)dialog.close();});
     dialog.addEventListener('close',()=>{current=null;sequence++;setParent(null);});
@@ -139,24 +148,39 @@
       sending=false;$('aeDiscussionSubmit').disabled=false;
     }
   }
+  function displaySport(take) {
+    const footballSports=new Set(['laliga','premier','ligamx','champions','football','futbol','fútbol']);
+    const sport=String(take.sport||'').toLowerCase();
+    const isNfl=sport==='nfl';
+    const isFootball=!isNfl&&footballSports.has(sport);
+    dialog.dataset.sport=isNfl?'nfl':isFootball?'football':'general';
+    $('aeDiscussionSport').textContent=isNfl?'NFL':isFootball?'FÚTBOL':'TAKE';
+  }
+  async function showEditIfOwner(take) {
+    const edit=$('aeDiscussionEditSport');
+    edit.hidden=true;
+    if(!take?.author_id || typeof db==='undefined'||!db)return;
+    try {
+      const response=await db.auth.getUser();
+      if(current?.id===take.id && dialog.open && response.data?.user?.id===take.author_id){
+        edit.hidden=false;
+      }
+    } catch(_) {}
+  }
   function open(take, options={}) {
     if(!take?.id)return;
     init();
     current=take;
     setParent(null);
-    const footballSports=new Set(['laliga','premier','ligamx','champions','football','futbol','fútbol']);
-    const sport=String(take.sport||'').toLowerCase();
-    const isNfl=sport==='nfl';
-    const isFootball=!isNfl&&(footballSports.has(sport)||document.body.classList.contains('ae-is-football'));
-    dialog.dataset.sport=isNfl?'nfl':isFootball?'football':'general';
+    displaySport(take);
     $('aeDiscussionSubject').textContent=take.title||'Take de la comunidad';
-    $('aeDiscussionSport').textContent=isNfl?'NFL':isFootball?'FÚTBOL':'TAKE';
     $('aeDiscussionBody').textContent=take.body||'';
     $('aeDiscussionText').value='';
     $('aeDiscussionCount').textContent='Comentarios';
     $('aeDiscussionList').replaceChildren();
     $('aeDiscussionStatus').textContent='';
     if(!dialog.open)dialog.showModal();
+    showEditIfOwner(take);
     load();
     if(options.focusComposer)$('aeDiscussionText')?.focus();
   }
