@@ -84,7 +84,7 @@ GRANT EXECUTE ON FUNCTION public.ae_publish_editorial_weekly_pick_visual_v2(
 
 -- Confirm outcomes of legacy Picks without forcing admins to invent a date.
 -- New Picks still require a real, elapsed event_date; legacy records must have
--- been published before today and remain approved.
+-- been published before the dated-Pick rollout and remain approved.
 CREATE OR REPLACE FUNCTION public.ae_pick_settle_result(p_pick_id uuid,p_outcome text)
 RETURNS numeric LANGUAGE plpgsql SECURITY DEFINER SET search_path TO ''
 AS $function$
@@ -111,7 +111,7 @@ BEGIN
   IF eventday IS NOT NULL AND eventday > today THEN
     RAISE EXCEPTION 'El evento todavía no ha llegado';
   END IF;
-  IF eventday IS NULL AND (published >= today OR published > DATE '2026-10-15') THEN
+  IF eventday IS NULL AND published > DATE '2026-10-15' THEN
     RAISE EXCEPTION 'Los Picks nuevos necesitan una fecha de evento';
   END IF;
   UPDATE public.ae_community_picks
