@@ -43,7 +43,7 @@ function renderSessionHeader() {
         out.title = 'Cerrar sesión';
         out.onclick = handleUserLogout;
         const illustration = node('img', null, 'ae-classical-auth-art');
-        illustration.src = 'assets/ui/ae-logout-mark.svg?v=20261016-2';
+        illustration.src = 'assets/ui/ae-logout-mark.png?v=20261016-3';
         illustration.width = 96;
         illustration.height = 96;
         illustration.alt = '';
