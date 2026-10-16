@@ -395,3 +395,191 @@
     -webkit-overflow-scrolling:touch!important;
   }
 }
+
+
+/* AE SPORTS · portada móvil: Pick primero, imagen visible y Takes centrado. */
+/* La noticia destacada sigue disponible en las tarjetas de Últimas noticias
+   y en escritorio. Sólo se oculta su preview superior en el inicio móvil. */
+@media(max-width:760px){
+  html body.ae-is-home #mainContent>#heroSection{
+    display:none!important;
+    width:0!important;
+    height:0!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    overflow:hidden!important;
+  }
+  /* La vista Pick ocupa el primer bloque tras el indicador (normalmente oculto). */
+  html body.ae-is-home #mainContent>.editorial-pick{
+    margin-top:0!important;
+    margin-bottom:12px!important;
+  }
+
+  /* El fondo anterior seguía opacado por una capa casi sólida.
+     Desenfoque fotográfico perceptible; velo más ligero a la derecha. */
+  html body.ae-is-home #mainContent>.editorial-pick.ae-home-weekly-banner>.ae-weekly-home-banner{
+    display:block!important;
+    filter:blur(11px) saturate(.88)!important;
+    -webkit-filter:blur(11px) saturate(.88)!important;
+    transform:scale(1.13)!important;
+    object-fit:cover!important;
+    opacity:1!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick:not(.ae-home-weekly-banner) #cpWeekly .ae-weekly-preview>img{
+    display:block!important;
+    filter:blur(11px) saturate(.88)!important;
+    -webkit-filter:blur(11px) saturate(.88)!important;
+    transform:scale(1.13)!important;
+    object-fit:cover!important;
+    opacity:1!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick.ae-home-weekly-banner::before{
+    background:linear-gradient(100deg,rgba(5,19,30,.86) 0%,rgba(6,24,36,.63) 50%,rgba(7,25,39,.30) 100%)!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick:not(.ae-home-weekly-banner) #cpWeekly .ae-weekly-preview:has(>img)::before{
+    background:linear-gradient(100deg,rgba(5,19,30,.87),rgba(6,23,36,.65) 50%,rgba(8,25,38,.30))!important;
+  }
+  html:not(.dark) body.ae-is-home #mainContent>.editorial-pick.ae-home-weekly-banner::before{
+    background:linear-gradient(100deg,rgba(255,250,243,.90) 0%,rgba(255,249,238,.66) 52%,rgba(255,247,231,.28) 100%)!important;
+  }
+  html:not(.dark) body.ae-is-home #mainContent>.editorial-pick:not(.ae-home-weekly-banner) #cpWeekly .ae-weekly-preview:has(>img)::before{
+    background:linear-gradient(100deg,rgba(255,250,243,.90),rgba(255,249,237,.66) 52%,rgba(255,247,231,.28))!important;
+  }
+  html body.ae-is-home #mainContent>.editorial-pick #cpWeekly .ae-weekly-preview .ae-weekly-title,
+  html body.ae-is-home #mainContent>.editorial-pick #cpWeekly .ae-weekly-preview .ae-weekly-selection strong{
+    text-shadow:0 1px 6px rgba(1,12,22,.62)!important;
+  }
+  html:not(.dark) body.ae-is-home #mainContent>.editorial-pick #cpWeekly .ae-weekly-preview .ae-weekly-title,
+  html:not(.dark) body.ae-is-home #mainContent>.editorial-pick #cpWeekly .ae-weekly-preview .ae-weekly-selection strong{
+    text-shadow:0 1px 4px rgba(255,250,241,.78)!important;
+  }
+
+  /* Takes: un módulo único cuadrado, sin la estructura apretada en dos
+     columnas. Centrar de verdad el CTA dentro del mismo encabezado. */
+  html body.ae-is-home #aeHomeTopTakes>.ae-top-takes-heading.ae-takes-banner{
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:center!important;
+    flex-wrap:nowrap!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    min-width:0!important;
+    min-height:142px!important;
+    height:auto!important;
+    max-height:none!important;
+    gap:14px!important;
+    padding:17px 14px 18px!important;
+    margin:0 0 10px!important;
+    text-align:center!important;
+    border:1px solid rgba(218,172,114,.79)!important;
+    border-radius:0!important;
+    box-shadow:0 0 0 1px rgba(229,184,124,.10),0 8px 22px rgba(2,15,25,.15)!important;
+    background:
+      radial-gradient(ellipse at 50% 15%,rgba(191,142,90,.19),transparent 72%),
+      linear-gradient(180deg,rgba(7,29,43,.84),rgba(8,28,40,.91)),
+      url("atmospheres/ae-reference-brush.svg") center / cover no-repeat!important;
+    isolation:isolate!important;
+  }
+  html body.ae-is-home #aeHomeTopTakes>.ae-top-takes-heading.ae-takes-banner>div:first-child{
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:center!important;
+    flex:0 1 auto!important;
+    width:100%!important;
+    min-width:0!important;
+    margin:0!important;
+    padding:0!important;
+    text-align:center!important;
+  }
+  html body.ae-is-home #aeHomeTopTakes .ae-takes-banner #aeHomeTopTakesTitle{
+    position:relative!important;
+    display:block!important;
+    width:100%!important;
+    max-width:100%!important;
+    margin:0!important;
+    padding:0!important;
+    color:#f4e5d1!important;
+    text-align:center!important;
+    font:600 clamp(24px,6.5vw,31px)/1.06 Newsreader,Georgia,serif!important;
+    letter-spacing:-.026em!important;
+    overflow-wrap:normal!important;
+  }
+  html body.ae-is-home #aeHomeTopTakes>.ae-top-takes-heading.ae-takes-banner .ae-top-takes-heading-side{
+    position:relative!important;
+    inset:auto!important;
+    display:flex!important;
+    flex:0 0 auto!important;
+    justify-content:center!important;
+    align-items:center!important;
+    align-self:center!important;
+    width:100%!important;
+    min-width:0!important;
+    height:auto!important;
+    margin:0!important;
+    padding:0!important;
+    text-align:center!important;
+    z-index:8!important;
+  }
+  html body.ae-is-home #aeHomeTopTakes .ae-takes-banner .ae-home-take-cta-line{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    width:100%!important;
+    min-width:0!important;
+    height:auto!important;
+    margin:0!important;
+    padding:0!important;
+  }
+  html body.ae-is-home #aeHomeTopTakes .ae-takes-banner button#aeHomeTakePublish.ae-home-take-publish{
+    display:inline-flex!important;
+    flex:0 1 auto!important;
+    align-items:center!important;
+    justify-content:center!important;
+    align-self:center!important;
+    box-sizing:border-box!important;
+    min-width:168px!important;
+    max-width:calc(100vw - 90px)!important;
+    width:auto!important;
+    min-height:44px!important;
+    height:auto!important;
+    max-height:none!important;
+    margin:0 auto!important;
+    padding:10px 17px!important;
+    border:1px solid #e6bb84!important;
+    border-radius:0!important;
+    background:linear-gradient(105deg,#e8c491,#ca925c)!important;
+    color:#092839!important;
+    font:750 12px/1.2 Inter,system-ui,sans-serif!important;
+    box-shadow:0 3px 14px rgba(1,13,23,.14)!important;
+    touch-action:manipulation!important;
+    pointer-events:auto!important;
+  }
+  html:not(.dark) body.ae-is-home #aeHomeTopTakes>.ae-top-takes-heading.ae-takes-banner{
+    background:
+      radial-gradient(ellipse at 50% 15%,rgba(203,149,91,.12),transparent 72%),
+      linear-gradient(180deg,rgba(255,251,242,.87),rgba(246,236,221,.94)),
+      url("atmospheres/ae-reference-brush.svg") center / cover no-repeat!important;
+    border-color:rgba(167,115,65,.65)!important;
+    box-shadow:0 0 0 1px rgba(157,109,62,.08),0 7px 17px rgba(71,47,29,.10)!important;
+  }
+  html:not(.dark) body.ae-is-home #aeHomeTopTakes .ae-takes-banner #aeHomeTopTakesTitle{
+    color:#193546!important;
+    text-shadow:none!important;
+  }
+  html:not(.dark) body.ae-is-home #aeHomeTopTakes .ae-takes-banner button#aeHomeTakePublish.ae-home-take-publish{
+    background:linear-gradient(105deg,#dba974,#bd814b)!important;
+    color:#172b3c!important;
+    border-color:#a56d37!important;
+  }
+}
+@media(max-width:370px){
+  html body.ae-is-home #aeHomeTopTakes>.ae-top-takes-heading.ae-takes-banner{
+    min-height:130px!important;
+    padding:15px 10px!important;
+    gap:10px!important;
+  }
+}
