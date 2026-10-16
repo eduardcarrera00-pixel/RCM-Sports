@@ -1,0 +1,83 @@
+/* AE SPORTS · Top 10 de Takes (portada, NFL y fútbol).
+   Unifica el ranking con la paleta editorial de la web, sin tocar su lógica. */
+
+html body #aeHomeTakeRanking,
+html body #aeSportTakeRanking {
+  --ae-tr-ink: #f7ecdc;
+  --ae-tr-muted: #bdc7c8;
+  --ae-tr-bronze: #e1b783;
+  --ae-tr-line: rgba(208, 163, 115, .4);
+  --ae-tr-line-soft: rgba(208, 163, 115, .18);
+  --ae-tr-hover: rgba(208, 163, 115, .12);
+  --ae-tr-tab: rgba(13, 43, 59, .7);
+  --ae-tr-active: #d9aa78;
+  --ae-tr-active-ink: #1b2932;
+  color: var(--ae-tr-ink) !important;
+  background: linear-gradient(145deg, #132f40 0%, #0a2231 66%, #172d38 100%) !important;
+  border: 1px solid var(--ae-tr-line) !important;
+  border-radius: 2px !important;
+  box-shadow: 0 12px 30px rgba(5, 17, 25, .18) !important;
+}
+
+html:not(.dark) body #aeHomeTakeRanking,
+html:not(.dark) body #aeSportTakeRanking {
+  --ae-tr-ink: #382e29;
+  --ae-tr-muted: #685a51;
+  --ae-tr-bronze: #8b593e;
+  --ae-tr-line: rgba(137, 92, 61, .43);
+  --ae-tr-line-soft: rgba(137, 92, 61, .2);
+  --ae-tr-hover: rgba(137, 92, 61, .1);
+  --ae-tr-tab: rgba(255, 250, 243, .75);
+  --ae-tr-active: #84573d;
+  --ae-tr-active-ink: #fff9f0;
+  background: linear-gradient(145deg, #f8f2e8 0%, #eee4d6 100%) !important;
+  box-shadow: 0 9px 24px rgba(90, 64, 48, .09) !important;
+}
+
+html body :is(#aeHomeTakeRanking, #aeSportTakeRanking) .ae-take-ranking-head {
+  border-bottom-color: var(--ae-tr-line-soft) !important;
+}
+
+html body :is(#aeHomeTakeRanking, #aeSportTakeRanking) .ae-take-ranking-head h2,
+html body :is(#aeHomeTakeRanking, #aeSportTakeRanking) .ae-take-ranking-author {
+  color: var(--ae-tr-ink) !important;
+}
+
+html body :is(#aeHomeTakeRanking, #aeSportTakeRanking) .ae-take-ranking-kicker,
+html body :is(#aeHomeTakeRanking, #aeSportTakeRanking) .ae-take-ranking-position,
+html body :is(#aeHomeTakeRanking, #aeSportTakeRanking) .ae-take-ranking-points {
+  color: var(--ae-tr-bronze) !important;
+}
+
+html body :is(#aeHomeTakeRanking, #aeSportTakeRanking) .ae-take-ranking-head p,
+html body :is(#aeHomeTakeRanking, #aeSportTakeRanking) .ae-take-ranking-count,
+html body :is(#aeHomeTakeRanking, #aeSportTakeRanking) .ae-take-ranking-empty {
+  color: var(--ae-tr-muted) !important;
+}
+
+html body :is(#aeHomeTakeRanking, #aeSportTakeRanking) .ae-take-ranking-row {
+  border-bottom-color: var(--ae-tr-line-soft) !important;
+}
+html body :is(#aeHomeTakeRanking, #aeSportTakeRanking) .ae-take-ranking-row:hover {
+  background: var(--ae-tr-hover);
+}
+html body :is(#aeHomeTakeRanking, #aeSportTakeRanking) .ae-take-ranking-tabs button {
+  background: var(--ae-tr-tab) !important;
+  color: var(--ae-tr-ink) !important;
+  border: 1px solid var(--ae-tr-line) !important;
+  border-radius: 2px !important;
+}
+html body :is(#aeHomeTakeRanking, #aeSportTakeRanking) .ae-take-ranking-tabs button:hover {
+  background: var(--ae-tr-hover) !important;
+}
+html body :is(#aeHomeTakeRanking, #aeSportTakeRanking) .ae-take-ranking-tabs button[aria-pressed="true"],
+html body :is(#aeHomeTakeRanking, #aeSportTakeRanking) .ae-take-ranking-tabs button[aria-pressed="true"]:hover {
+  background: var(--ae-tr-active) !important;
+  color: var(--ae-tr-active-ink) !important;
+  border-color: var(--ae-tr-active) !important;
+}
+html body :is(#aeHomeTakeRanking, #aeSportTakeRanking) .ae-take-ranking-tabs button:focus-visible,
+html body :is(#aeHomeTakeRanking, #aeSportTakeRanking) .ae-take-ranking-author:focus-visible {
+  outline: 2px solid var(--ae-tr-bronze) !important;
+  outline-offset: 3px !important;
+}
