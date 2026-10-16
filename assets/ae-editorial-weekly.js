@@ -17,7 +17,7 @@
      return u.protocol==='https:'&&!u.username&&!u.password?u.href:'';
    }catch{return '';}
  };
- let refreshing=false,active=null,submitting=false;
+ let refreshing=false,active=null,submitting=false,editing=null;
  function createCard(p,isPreview){
    const box=make('article',undefined,isPreview?'ae-weekly-card ae-weekly-preview':'ae-weekly-card');
    if(isPreview){
@@ -93,7 +93,7 @@
    refreshing=true;
    try{
      const {data,error}=await db.from('ae_editorial_weekly_picks')
-       .select('id,title,event_name,selection,american_odds,analysis,expires_at,created_at,banner_path,image_path,banner_url,image_url,banner_focus_x,banner_focus_y,image_focus_x,image_focus_y')
+       .select('id,title,event_name,selection,american_odds,analysis,expires_at,created_at,banner_path,image_path,banner_url,image_url,banner_focus_x,banner_focus_y,image_focus_x,image_focus_y,edited_at')
        .eq('is_published',true).order('created_at',{ascending:false}).limit(1);
      if(error)throw error;
      active=data?.[0]&&new Date(data[0].expires_at).getTime()>Date.now()?data[0]:null;
@@ -105,33 +105,91 @@
      for(const id of ['cpWeekly','picksFeaturedCard']){$(id)?.replaceChildren(make('p','No se pudo cargar el Pick editorial.','ae-weekly-empty'));}
    }finally{refreshing=false;adminVisibility();}
  }
+ const localDatetime=iso=>{
+   const d=new Date(iso);
+   if(!Number.isFinite(d.getTime()))return '';
+   const pad=n=>String(n).padStart(2,'0');
+   return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes());
+ };
  function adminVisibility(){
-   const d=$('aeWeeklyPickAdmin');if(d)d.hidden=!(typeof currentAdmin!=='undefined'&&currentAdmin);
+   const admin=typeof currentAdmin!=='undefined'&&Boolean(currentAdmin);
+   const panel=$('aeWeeklyPickAdmin');
+   if(panel)panel.hidden=!admin;
+   const button=$('aeWeeklyEditButton');
+   if(button)button.hidden=!(admin&&active);
+   if(!admin&&editing)cancelEdit();
+ }
+ function updateEditorLabels(){
+   const isEditing=Boolean(editing);
+   const save=$('aeWeeklySaveButton');
+   if(save)save.textContent=isEditing?'Guardar cambios':'Publicar Pick de la Semana';
+   const cancel=$('aeWeeklyCancelEdit');if(cancel)cancel.hidden=!isEditing;
+   const note=$('aeWeeklyEditorMode');if(note)note.hidden=!isEditing;
+   const summary=$('aeWeeklyAdminSummary');
+   if(summary)summary.textContent=isEditing?'Administrar · Editando Pick de la Semana':'Administrar · Publicar Pick de la Semana';
+ }
+ function cancelEdit(){
+   if(submitting)return;
+   editing=null;
+   const form=$('aeWeeklyPickForm');
+   form?.reset();
+   updateEditorLabels();
+   const status=$('aeWeeklyPickAdminStatus');
+   if(status)status.textContent='';
+ }
+ function startEdit(){
+   if(submitting||!(typeof currentAdmin!=='undefined'&&currentAdmin)||!active)return;
+   const p=active,form=$('aeWeeklyPickForm');
+   if(!form)return;
+   editing={id:p.id,expectedEditedAt:p.edited_at||null};
+   form.elements.title.value=p.title||'';
+   form.elements.event_name.value=p.event_name||'';
+   form.elements.selection.value=p.selection||'';
+   form.elements.american_odds.value=odds(p.american_odds);
+   form.elements.expires_at.value=localDatetime(p.expires_at);
+   form.elements.analysis.value=p.analysis||'';
+   for(const name of ['banner_file','image_file','banner_url','image_url']){
+     if(form.elements[name])form.elements[name].value='';
+   }
+   const framing=window.aeImageFraming;
+   framing?.setExisting('banner',editorialUrl(p.banner_path,p.banner_url));
+   framing?.set('banner',p.banner_focus_x??50,p.banner_focus_y??50);
+   framing?.setExisting('weekly',editorialUrl(p.image_path,p.image_url));
+   framing?.set('weekly',p.image_focus_x??50,p.image_focus_y??50);
+   updateEditorLabels();
+   const status=$('aeWeeklyPickAdminStatus');
+   if(status)status.textContent='Modifica lo necesario y guarda. Las fotos actuales se conservan si no eliges una nueva.';
+   const panel=$('aeWeeklyPickAdmin');
+   panel.hidden=false;
+   panel.open=true;
+   panel.scrollIntoView?.({behavior:'smooth',block:'start'});
+   form.elements.title.focus({preventScroll:true});
  }
  async function publish(e){
    e.preventDefault();if(submitting)return;
    const form=e.currentTarget,status=$('aeWeeklyPickAdminStatus'),send=form.querySelector('[type=submit]');
+   if(!(typeof currentAdmin!=='undefined'&&currentAdmin)){status.textContent='Solo administradores';return;}
    const raw=form.elements.american_odds.value.trim();
    if(!/^[+-]?\d{3,6}$/.test(raw)){status.textContent='Introduce una cuota americana válida, por ejemplo +150 o -110.';return;}
-   const oddsValue=Number(raw);if(!Number.isInteger(oddsValue)||Math.abs(oddsValue)<100||Math.abs(oddsValue)>100000){status.textContent='La cuota debe ser al menos +100 o -100, en valor absoluto.';return;}
+   const oddsValue=Number(raw);
+   if(!Number.isInteger(oddsValue)||Math.abs(oddsValue)<100||Math.abs(oddsValue)>100000){status.textContent='La cuota debe ser al menos +100 o -100, en valor absoluto.';return;}
    const expires=new Date(form.elements.expires_at.value);
    if(!Number.isFinite(expires.getTime())||expires.getTime()<=Date.now()){status.textContent='Elige un cierre futuro.';return;}
-   submitting=true;send.disabled=true;status.textContent='Validando publicación…';
+   const isEditing=Boolean(editing);
+   if(!confirm(isEditing?'¿Guardar los cambios en este Pick de la Semana? La publicación conservará su identidad.':'¿Publicar el Pick editorial y sustituir el anterior?'))return;
+   submitting=true;send.disabled=true;status.textContent='Guardando imágenes…';
    try{
-     if(!confirm('¿Publicar el Pick editorial y sustituir el anterior?'))return;
-     status.textContent='Guardando imágenes…';
      const banner=await window.aeEditorialMedia.upload(form.elements.banner_file?.files?.[0],'weekly/banner');
      const image=await window.aeEditorialMedia.upload(form.elements.image_file?.files?.[0],'weekly/article');
      const bannerTyped=form.elements.banner_url.value.trim();
      const imageTyped=form.elements.image_url.value.trim();
-     const bannerUrl=banner ? null : (bannerTyped ? window.aeImageFraming?.safeUrl(bannerTyped) : null);
-     const imageUrl=image ? null : (imageTyped ? window.aeImageFraming?.safeUrl(imageTyped) : null);
+     const bannerUrl=banner?null:(bannerTyped?window.aeImageFraming?.safeUrl(bannerTyped):null);
+     const imageUrl=image?null:(imageTyped?window.aeImageFraming?.safeUrl(imageTyped):null);
      if(bannerTyped&&!banner&&!bannerUrl)throw Error('El banner necesita un enlace HTTPS válido.');
      if(imageTyped&&!image&&!imageUrl)throw Error('La imagen necesita un enlace HTTPS válido.');
      const bannerFocus=window.aeImageFraming?.get('banner')||{x:50,y:50};
      const imageFocus=window.aeImageFraming?.get('weekly')||{x:50,y:50};
-     status.textContent='Publicando Pick editorial…';
-     const {error}=await db.rpc('ae_publish_editorial_weekly_pick_visual_v2',{
+     const params={
        p_title:form.elements.title.value.trim(),p_event_name:form.elements.event_name.value.trim(),
        p_selection:form.elements.selection.value.trim(),p_american_odds:oddsValue,
        p_analysis:form.elements.analysis.value.trim(),p_expires_at:expires.toISOString(),
@@ -139,11 +197,21 @@
        p_banner_url:bannerUrl,p_image_url:imageUrl,
        p_banner_focus_x:bannerFocus.x,p_banner_focus_y:bannerFocus.y,
        p_image_focus_x:imageFocus.x,p_image_focus_y:imageFocus.y
-     });
+     };
+     if(isEditing){
+       params.p_pick_id=editing.id;
+       params.p_expected_edited_at=editing.expectedEditedAt;
+     }
+     status.textContent=isEditing?'Guardando cambios…':'Publicando Pick editorial…';
+     const rpc=isEditing?'ae_update_editorial_weekly_pick':'ae_publish_editorial_weekly_pick_visual_v2';
+     const {error}=await db.rpc(rpc,params);
      if(error)throw error;
-     status.textContent='Pick de la Semana publicado correctamente.';
-     form.reset();await load();
-   }catch(err){status.textContent=err.message||'No se pudo publicar.';}
+     editing=null;
+     form.reset();
+     updateEditorLabels();
+     status.textContent=isEditing?'Cambios guardados correctamente en el Pick de la Semana.':'Pick de la Semana publicado correctamente.';
+     await load();
+   }catch(err){status.textContent=err.message||'No se pudo guardar. Conservamos los cambios del formulario.';}
    finally{submitting=false;send.disabled=false;}
  }
  function renderNews(){
@@ -192,6 +260,9 @@
  window.updateAeWeeklyAdmin=adminVisibility;
  document.addEventListener('DOMContentLoaded',()=>{
    $('aeWeeklyPickForm')?.addEventListener('submit',publish);
+   $('aeWeeklyEditButton')?.addEventListener('click',startEdit);
+   $('aeWeeklyCancelEdit')?.addEventListener('click',cancelEdit);
+   updateEditorLabels();
    adminVisibility();load();renderNews();
    if((typeof db!=='undefined' && db))db.auth.onAuthStateChange(()=>setTimeout(adminVisibility,100));
    document.addEventListener('visibilitychange',()=>{if(!document.hidden)load();});
