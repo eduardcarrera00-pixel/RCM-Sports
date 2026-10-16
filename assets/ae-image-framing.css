@@ -1,0 +1,14 @@
+/* AE SPORTS: encuadre editorial manual de imágenes, claro y oscuro. */
+.ae-framing-controls{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px;margin-top:10px;padding:10px;border:1px solid rgba(163,131,105,.35);background:rgba(116,141,157,.08)}
+.ae-framing-controls label{display:flex!important;flex:1 1 140px;flex-direction:column;gap:7px;font-size:12px!important;line-height:1.3!important;text-transform:none!important;letter-spacing:0!important}
+.ae-framing-controls input[type=range]{width:100%;min-width:80px;accent-color:#b77c54;padding:0!important;height:20px!important;background:transparent!important;border:0!important}
+.ae-framing-controls button{min-height:36px;padding:6px 12px;background:#855b43!important;color:#fff7ea!important;font-size:12px;border:1px solid #b98c66;cursor:pointer}
+.ae-framing-note{display:block;margin:8px 0;font-size:12px;line-height:1.5;color:inherit;opacity:.8}
+.ae-image-framing-preview{display:flex;align-items:center;justify-content:center;overflow:hidden;max-width:100%;min-height:140px;height:clamp(150px,25vw,220px);background:#142c3b;color:#fff1e6;border:1px solid #b9977566;margin:10px 0}
+.ae-image-framing-preview img{display:block!important;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:cover!important;transition:object-position .12s ease}
+#aeWeeklyBannerPreview.ae-image-framing-preview{aspect-ratio:8/3;height:auto;max-height:240px}
+#aeWeeklyImagePreview.ae-image-framing-preview,#pubImagePreview.ae-image-framing-preview{aspect-ratio:16/9;height:auto;max-height:300px}
+#aeWeeklyPickForm input[type=url]{width:100%;min-width:0;max-width:100%;padding:11px;border:1px solid #b9977566;background:#112e42;color:#fff4e7;box-sizing:border-box}
+#publishModal .ae-framing-controls label{color:#374d5a!important}
+@media(max-width:600px){.ae-framing-controls{gap:10px}.ae-framing-controls label{flex-basis:42%}}
+@media(prefers-reduced-motion:reduce){.ae-image-framing-preview img{transition:none}}
