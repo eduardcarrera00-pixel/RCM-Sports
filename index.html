@@ -328,6 +328,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
     <link rel="stylesheet" href="assets/ae-light-ranking-art.css?v=20261016-1">
     <link rel="stylesheet" href="assets/ae-editorial-community-twin-cards.css?v=20261016-1">
     <link rel="stylesheet" href="assets/ae-runner-brand.css?v=20261016-1">
+    <link rel="stylesheet" href="assets/ae-final-takes-brand-mobile.css?v=20261016-1">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 
@@ -335,10 +336,10 @@ html.dark [data-reading-size][aria-pressed="true"] {
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-20">
 
-                <!-- Nuevo emblema dorado y azul de AE SPORTS, con la tipografía editorial original. -->
-                <a href="#" onclick="filterByCategory('Todos'); return false;" class="ae-brand ae-brand-gold ae-brand-runner group" aria-label="AE SPORTS — TU BLOG DE DEPORTE, ir al inicio">
+                <!-- Emblema original separado de un wordmark textual sin recortes del logo antiguo. -->
+                <a href="#" onclick="filterByCategory('Todos'); return false;" class="ae-brand ae-brand-gold ae-brand-runner ae-brand-runner-clean group" aria-label="AE SPORTS — TU BLOG DE CONFIANZA, ir al inicio">
                     <img class="ae-runner-symbol" src="assets/ae-runner-emblem.png?v=20261016-1" alt="" width="128" height="128" decoding="async" fetchpriority="high">
-                    <span class="ae-runner-wordmark" aria-hidden="true"><img class="ae-runner-wordmark-art" src="assets/ae-brand-gold-header.webp?v=20261016-1" alt="" width="400" height="109" decoding="async"></span>
+                    <span class="ae-runner-wordmark" aria-hidden="true"><strong class="ae-runner-title">AE SPORTS</strong><span class="ae-runner-tagline">TU BLOG DE CONFIANZA</span></span>
                 </a>
                 <!-- Este input conserva compatibilidad con los filtros y pruebas, pero no se muestra en la interfaz. -->
                 <input id="searchInput" type="search" hidden aria-hidden="true" tabindex="-1" oninput="handleSearch()">
@@ -1060,16 +1061,10 @@ html.dark [data-reading-size][aria-pressed="true"] {
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
 
                 <div class="space-y-3">
-                    <!-- Misma identidad y emblema del encabezado. -->
-                    <a href="#" onclick="filterByCategory('Todos'); return false;"
-                       class="ae-footer-gold-brand ae-brand-runner"
-                       aria-label="AE SPORTS — TU BLOG DE DEPORTE, ir al inicio">
-                        <img class="ae-runner-symbol" src="assets/ae-runner-emblem.png?v=20261016-1"
-                             alt="" width="128" height="128" decoding="async" loading="lazy">
-                        <span class="ae-runner-wordmark" aria-hidden="true">
-                            <img class="ae-runner-wordmark-art" src="assets/ae-brand-gold-header.webp?v=20261016-1"
-                                 alt="" width="400" height="109" decoding="async" loading="lazy">
-                        </span>
+                    <!-- Mismo emblema transparente y palabra-marca limpia de la cabecera. -->
+                    <a href="#" onclick="filterByCategory('Todos'); return false;" class="ae-footer-gold-brand ae-brand-runner ae-brand-runner-clean" aria-label="AE SPORTS — TU BLOG DE CONFIANZA, ir al inicio">
+                        <img class="ae-runner-symbol" src="assets/ae-runner-emblem.png?v=20261016-1" alt="" width="128" height="128" decoding="async" loading="lazy">
+                        <span class="ae-runner-wordmark" aria-hidden="true"><strong class="ae-runner-title">AE SPORTS</strong><span class="ae-runner-tagline">TU BLOG DE CONFIANZA</span></span>
                     </a>
                     <p class="text-slate-400 leading-relaxed text-xs">
                         Periodismo deportivo de alto nivel. Cobertura, estrategia y pasión en la cancha.
@@ -2222,10 +2217,10 @@ updateThemeButton();
 <script src="assets/username-auth.js?v=20261015-2"></script>
 <script src="assets/ae-category-visibility.js?v=20261015-3"></script>
 <script src="assets/ae-nfl-takes.js?v=20261015-3"></script>
-<script src="assets/free-takes.js?v=20261016-1"></script>
+<script src="assets/free-takes.js?v=20261016-grid-1"></script>
 <script src="assets/ae-editorial-weekly.js?v=20261016-network-1"></script>
 <script src="assets/ae-profile.js?v=20261016-1"></script>
-<script src="assets/ae-home-takes.js?v=20261015-5"></script>
+<script src="assets/ae-home-takes.js?v=20261016-badges-1"></script>
 <script src="assets/ae-sport-top-takes.js?v=20261016-chef-cards-1"></script>
 <script src="assets/ae-take-replies.js?v=20261015-2"></script>
 <script src="assets/ae-picks-premium.js?v=20261015-1"></script>

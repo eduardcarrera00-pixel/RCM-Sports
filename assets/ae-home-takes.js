@@ -16,16 +16,20 @@
   }
   function card(t, n, negative) {
     const item = element('li', undefined, 'ae-top-take');
-    item.append(element('span', String(n).padStart(2,'0'), 'ae-top-take-number'));
     const content = element('div', undefined, 'ae-top-take-content');
-    content.append(element('span', labels[t.sport] || 'Deportes', 'ae-top-take-sport'));
+    const head=element('div',undefined,'ae-home-take-head');
+    const titleRow=element('div',undefined,'ae-home-take-title-row');
+    const rank=element('span',String(n).padStart(2,'0'),'ae-top-take-number');
+    const badge=element('span',labels[t.sport]||'Deportes','ae-top-take-sport');
     const heading=element('h4',undefined,'ae-top-take-title');
     const openTake=element('button',t.title,'ae-top-take-open');
     openTake.type='button';
     openTake.setAttribute('aria-label','Leer Take y ver su conversación: '+t.title);
     openTake.addEventListener('click',()=>window.aeTakeReplies?.open(t));
     heading.append(openTake);
-    content.append(heading);
+    titleRow.append(rank,heading);
+    head.append(titleRow,badge);
+    content.append(head);
     const excerpt=String(t.body||'').replace(/^NFL[^\n]*\n\n/,'').trim();
     if(excerpt)content.append(element('p',excerpt.length>160?excerpt.slice(0,157).trimEnd()+'…':excerpt,'ae-top-take-summary'));
     const author = element('button', '@' + (t.author || 'Comunidad'), 'ae-top-take-author');
