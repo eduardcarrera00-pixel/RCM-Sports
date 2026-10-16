@@ -46,7 +46,16 @@ function card(p,compact=false,detail=false){
  n.dataset.sport=hasNfl&&hasFootball?'mixed':hasNfl?'nfl':hasFootball?'football':'general';
  const first=Array.isArray(p.legs)&&p.legs.length?p.legs[0]:null;
  const header=el('div',null,'cp-card-header');
- header.append(el('span','@'+(p.author||'Aficionado')));
+ if(detail&&p.user_id){
+   const profileButton=button('@'+(p.author||'Aficionado'),()=>{
+     if(typeof window.openAePublicProfile==='function')window.openAePublicProfile(p.user_id);
+   });
+   profileButton.className='cp-detail-author';
+   profileButton.setAttribute('aria-label','Ver perfil de '+(p.author||'Aficionado'));
+   header.append(profileButton);
+ }else{
+   header.append(el('span','@'+(p.author||'Aficionado')));
+ }
  const date=new Date(p.created_at);
  if(!detail&&!Number.isNaN(date.getTime()))header.append(el('time',date.toLocaleDateString('es',{day:'numeric',month:'short',year:'numeric'})));
  if(!detail&&first?.sport)header.append(el('span',String(first.sport),'cp-card-sport'));
@@ -137,20 +146,35 @@ function paintChefList(id,result,kind){
    target.append(row(good?'Aún no hay Picks con votos netos positivos esta semana.':'Aún no hay Picks con votos netos negativos esta semana.','ae-chef-empty'));
    return;
  }
+ const scrollable=picks.length>1;
+ target.classList.toggle('ae-chef-scroll',scrollable);
+ target.tabIndex=scrollable?0:-1;
+ target.scrollTop=0;
+ const heading=target.closest('.ae-chef-board')?.querySelector('.ae-picks-rail-heading');
+ let hint=heading?.querySelector('.ae-chef-scroll-note');
+ if(heading&&!hint){hint=el('p',null,'ae-chef-scroll-note');heading.append(hint);}
+ const updateHint=()=>{
+   if(!hint)return;
+   hint.hidden=!scrollable;
+   const index=Math.min(picks.length,1+Math.round(target.scrollTop/Math.max(1,target.clientHeight)));
+   hint.textContent=String(index).padStart(2,'0')+' / '+String(picks.length).padStart(2,'0')+' · Desliza ↑↓';
+ };
+ target.onscroll=updateHint;
  for(const [index,p] of picks.entries()){
    const item=el('li',null,'ae-popular-item ae-chef-entry');
+   const entryLink=el('a',null,'ae-chef-entry-link');
+   entryLink.href=link(p.id);
+   entryLink.setAttribute('aria-label','Abrir Pick '+(index+1)+' de '+(p.author||'Aficionado')+': '+(p.title||'Ver pronóstico'));
+   entryLink.onclick=e=>{
+     if(e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;
+     e.preventDefault();
+     open(p.id);
+   };
    const rank=el('span',String(index+1).padStart(2,'0'),'ae-popular-position');
    const info=el('div',null,'ae-popular-copy');
-   const chef=el('button','@'+(p.author||'Aficionado'),'ae-chef-author');
-   chef.type='button';
-   chef.setAttribute('aria-label','Ver perfil de '+(p.author||'Aficionado'));
-   chef.onclick=()=>{if(typeof openAePublicProfile==='function')openAePublicProfile(p.user_id);};
-   const pick=el('a',p.title||'Ver pronóstico','ae-chef-pick-link');
-   pick.href=link(p.id);
-   pick.onclick=e=>{
-     if(e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;
-     e.preventDefault();void requestPickReply(p.id);
-   };
+   // Aquí el nombre es informativo; el acceso al perfil queda dentro del detalle.
+   const chef=el('span','@'+(p.author||'Aficionado'),'ae-chef-author');
+   const pick=el('span',p.title||'Ver pronóstico','ae-chef-pick-link');
    const score=Number(p.score||0);
    const votes=el('span',(score>0?'+':'')+score+' votos netos','ae-chef-votes');
    const authorRow=el('div',null,'ae-chef-author-row');
@@ -161,8 +185,10 @@ function paintChefList(id,result,kind){
      authorRow.append(el('span','Cuota '+(americanOdds>0?'+':'')+americanOdds,'ae-chef-odds'));
    }
    info.append(authorRow,pick,votes);
-   item.append(rank,info);
+   entryLink.append(rank,info);
+   item.append(entryLink);
    target.append(item);
+   updateHint();
  }
 }
 async function loadChefLists(){
