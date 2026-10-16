@@ -1,0 +1,79 @@
+/* AE SPORTS · Navegación adaptable a deportes visibles.
+   Los controles que se ocultan en Gestionar deportes no reservan columnas.
+   Ningún icono, botón o funcionalidad se sustituye ni se elimina. */
+
+/* CSS previos asignan display a .category-btn y podrían sobreescribir [hidden].
+   Respetar el atributo de ocultación en todos los anchos, incluidos tablets. */
+html body>header nav.ae-sport-nav > .category-btn[hidden] {
+  display:none!important;
+}
+
+/* Móvil: cada fila usa el número real de columnas, no cuatro huecos fijos.
+   Se utiliza flexbox para centrar también la última fila incompleta (5 o 7). */
+@media (max-width:760px) {
+  html body>header .ae-mobile-header-grid > nav.ae-sport-nav {
+    box-sizing:border-box!important;
+    display:flex!important;
+    flex-direction:row!important;
+    flex-wrap:wrap!important;
+    align-items:stretch!important;
+    align-content:center!important;
+    justify-content:center!important;
+    column-gap:4px!important;
+    row-gap:5px!important;
+    min-width:0!important;
+    overflow:visible!important;
+  }
+  html body>header .ae-mobile-header-grid > nav.ae-sport-nav > .category-btn:not([hidden]) {
+    box-sizing:border-box!important;
+    display:flex!important;
+    flex:0 0 calc(100% / var(--ae-visible-sport-columns,3) - 4px)!important;
+    width:calc(100% / var(--ae-visible-sport-columns,3) - 4px)!important;
+    max-width:calc(100% / var(--ae-visible-sport-columns,3) - 4px)!important;
+    min-width:0!important;
+    margin:0!important;
+    justify-self:auto!important;
+  }
+  html body>header .ae-mobile-header-grid > nav.ae-sport-nav > .category-btn[hidden] {
+    display:none!important;
+    flex:0 0 0!important;
+  }
+}
+
+/* Tablet: si el admin activa muchas disciplinas, permitir dos filas centradas
+   sin solapar el logo de AE SPORTS ni los controles de la cuenta. */
+@media (min-width:761px) and (max-width:979px) {
+  html body>header .ae-mobile-header-grid {
+    height:auto!important;
+    min-height:80px!important;
+  }
+  html body>header .ae-mobile-header-grid > nav.ae-sport-nav {
+    box-sizing:border-box!important;
+    display:flex!important;
+    flex-wrap:wrap!important;
+    align-items:center!important;
+    align-content:center!important;
+    justify-content:center!important;
+    min-width:0!important;
+    max-width:100%!important;
+    column-gap:3px!important;
+    row-gap:4px!important;
+    overflow:visible!important;
+  }
+  html body>header .ae-mobile-header-grid > nav.ae-sport-nav > .category-btn:not([hidden]) {
+    flex:0 0 auto!important;
+    margin:0!important;
+  }
+}
+
+/* Escritorio: mantener el menú como grupo compacto y centrado, sea cual
+   sea la cantidad de categorías visibles. */
+@media (min-width:980px) {
+  html body>header .ae-mobile-header-grid > nav.ae-sport-nav {
+    justify-self:center!important;
+    justify-content:center!important;
+    width:max-content!important;
+    max-width:100%!important;
+    min-width:0!important;
+  }
+}
