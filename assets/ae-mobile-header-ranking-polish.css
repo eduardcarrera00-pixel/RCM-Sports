@@ -1,0 +1,296 @@
+/* AE SPORTS · Cabecera móvil centrada y accesos deportivos en cuadrícula.
+   No se alteran acciones JS, visibilidad por deporte ni emblemas originales. */
+html body>header #themeToggle .ae-mobile-theme-caption{display:none!important;}
+@media (max-width:760px) {
+  html body>header .ae-mobile-header-grid {
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    grid-template-areas:"brand" "account" "sports"!important;
+    align-items:center!important;
+    justify-items:center!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:12px 0 10px!important;
+    row-gap:0!important;
+    column-gap:0!important;
+    overflow:visible!important;
+  }
+  /* La marca completa ocupa la fila superior; el atleta NO se modifica. */
+  html body>header .ae-mobile-header-grid>a.ae-brand.ae-brand-runner-clean {
+    grid-area:brand!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    width:clamp(184px,59vw,240px)!important;
+    min-width:0!important;
+    max-width:240px!important;
+    margin:0 auto!important;
+    padding:0 0 9px!important;
+    justify-self:center!important;
+    height:auto!important;
+  }
+  html body>header .ae-mobile-header-grid>a.ae-brand-runner-clean .ae-runner-wordmark {
+    min-width:0!important;
+  }
+  /* Fila de cuenta: Tema · Nombre de usuario (perfil) · Cerrar sesión. */
+  html body>header .ae-mobile-header-grid>.ae-header-actions {
+    grid-area:account!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    justify-self:stretch!important;
+    flex-wrap:wrap!important;
+    gap:7px 12px!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    margin:0!important;
+    padding:10px 0 11px!important;
+    border-bottom:1px solid rgba(190,170,148,.25)!important;
+  }
+  html body>header .ae-mobile-header-grid>.ae-header-actions>* {
+    margin:0!important;
+    flex-shrink:0!important;
+  }
+  html body>header .ae-mobile-header-grid>.ae-header-actions #themeToggle {
+    order:0!important;
+    box-sizing:border-box!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:5px!important;
+    flex:0 0 72px!important;
+    width:72px!important;
+    min-width:72px!important;
+    height:60px!important;
+    min-height:60px!important;
+    max-width:72px!important;
+    margin:0!important;
+    padding:5px 2px!important;
+    background:transparent!important;
+    border:1px solid transparent!important;
+    border-radius:0!important;
+    box-shadow:none!important;
+    color:#f2e6d6!important;
+  }
+  html body>header .ae-mobile-header-grid #themeIcon.ae-custom-theme-icon{
+    width:21px!important;height:21px!important;
+    min-width:21px!important;min-height:21px!important;
+    max-width:21px!important;max-height:21px!important;
+    opacity:.85!important;
+    filter:brightness(.81) saturate(.78)!important;
+  }
+  html body>header .ae-mobile-header-grid #themeToggle .ae-mobile-theme-caption {
+    display:block!important;
+    font:800 9px/1.2 Inter,system-ui,sans-serif!important;
+    text-align:center!important;
+    text-transform:uppercase!important;
+    letter-spacing:.02em!important;
+  }
+  html body>header .ae-mobile-header-grid>.ae-header-actions #aeMyTakesButton {
+    order:1!important;
+    width:clamp(80px,26vw,112px)!important;
+    min-width:0!important;
+    max-width:112px!important;
+    height:60px!important;
+    min-height:60px!important;
+    padding:5px 3px!important;
+    flex:0 0 auto!important;
+    gap:5px!important;
+  }
+  html body>header .ae-mobile-header-grid>.ae-header-actions #readerSession {
+    order:2!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    min-width:0!important;
+    flex:0 0 auto!important;
+    margin:0!important;
+    padding:0!important;
+    gap:0!important;
+  }
+  html body>header .ae-mobile-header-grid>.ae-header-actions #readerSession.hidden {
+    display:none!important;
+  }
+  html body>header .ae-mobile-header-grid>.ae-header-actions #readerSession button.ae-classical-auth-button,
+  html body>header .ae-mobile-header-grid>.ae-header-actions #loggedAdminContainer .ae-signout-action {
+    box-sizing:border-box!important;
+    width:83px!important;max-width:83px!important;
+    height:60px!important;min-height:60px!important;
+    padding:5px 2px!important;
+    gap:5px!important;
+  }
+  html body>header .ae-mobile-header-grid>.ae-header-actions .ae-classical-auth-art{
+    width:21px!important;height:21px!important;
+    min-width:21px!important;min-height:21px!important;
+    max-width:21px!important;max-height:21px!important;
+  }
+  html body>header .ae-mobile-header-grid>.ae-header-actions .ae-auth-caption{
+    max-width:100%!important;min-width:0!important;
+    overflow:hidden!important;text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+    font:800 9px/1.2 Inter,system-ui,sans-serif!important;
+    letter-spacing:.01em!important;
+  }
+  html body>header .ae-mobile-header-grid>.ae-header-actions #guestAdminContainer {
+    order:2!important;
+  }
+  html body>header .ae-mobile-header-grid>.ae-header-actions #loggedAdminContainer {
+    order:3!important;
+    display:flex!important;
+    justify-content:center!important;
+    flex-wrap:wrap!important;
+    gap:7px!important;
+  }
+  html body>header .ae-mobile-header-grid>.ae-header-actions #loggedAdminContainer.hidden,
+  html body>header .ae-mobile-header-grid>.ae-header-actions #guestAdminContainer.hidden{
+    display:none!important;
+  }
+  /* Los administradores conservan Publicar y Gestionar deportes. */
+  html body>header .ae-mobile-header-grid>.ae-header-actions #aeCategoryAdmin {
+    order:4!important;
+  }
+  /* Navegación coherente en cuatro columnas; otras disciplinas ocupan
+     una segunda fila cuando el administrador las habilita. */
+  html body>header .ae-mobile-header-grid>nav.ae-sport-nav {
+    grid-area:sports!important;
+    display:grid!important;
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    align-items:stretch!important;
+    justify-items:stretch!important;
+    column-gap:4px!important;
+    row-gap:5px!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:440px!important;
+    margin:0 auto!important;
+    padding:12px 0 0!important;
+    border:0!important;
+    background:transparent!important;
+  }
+  html body>header .ae-mobile-header-grid>nav.ae-sport-nav .category-btn:not([hidden]) {
+    box-sizing:border-box!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:5px!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    min-height:64px!important;
+    height:auto!important;
+    margin:0!important;
+    padding:5px 1px 7px!important;
+    border:0!important;
+    border-bottom:2px solid transparent!important;
+    border-radius:0!important;
+    background:transparent!important;
+    text-align:center!important;
+    font-size:10px!important;
+    line-height:1.15!important;
+    letter-spacing:.04em!important;
+    overflow-wrap:anywhere!important;
+  }
+  html body>header .ae-mobile-header-grid>nav.ae-sport-nav .category-btn.active:not([hidden]){
+    border-bottom-color:#c69b71!important;
+  }
+  html body>header .ae-mobile-header-grid>nav.ae-sport-nav .category-btn .ae-nav-icon{
+    width:30px!important;height:30px!important;
+    min-width:30px!important;min-height:30px!important;
+    border:1px solid transparent!important;
+    background:transparent!important;
+  }
+  html body>header .ae-mobile-header-grid>nav.ae-sport-nav .category-btn img.ae-custom-sport-icon{
+    width:22px!important;height:22px!important;
+    min-width:22px!important;min-height:22px!important;
+    max-width:22px!important;max-height:22px!important;
+    opacity:.85!important;
+    filter:brightness(.81) saturate(.78)!important;
+  }
+  html body>header .ae-mobile-header-grid>nav.ae-sport-nav .category-btn.active img.ae-custom-sport-icon{
+    opacity:.95!important;
+  }
+  html:not(.dark) body>header .ae-mobile-header-grid #themeToggle .ae-mobile-theme-caption,
+  html:not(.dark) body>header .ae-mobile-header-grid .ae-header-actions .ae-auth-caption{
+    color:#f2e6d6!important;
+  }
+}
+@media(max-width:365px){
+  html body>header .ae-mobile-header-grid>a.ae-brand.ae-brand-runner-clean{
+    width:clamp(178px,62vw,215px)!important;
+  }
+  html body>header .ae-mobile-header-grid>.ae-header-actions{
+    gap:5px 7px!important;
+  }
+  html body>header .ae-mobile-header-grid>nav.ae-sport-nav .category-btn:not([hidden]){
+    font-size:9px!important;
+    letter-spacing:0!important;
+  }
+}
+
+/* Ranking de portada: flecha SVG, sin glifo emoji de sistema. */
+html body #editorialBottom .ae-ranking-card-link .ae-ranking-link-arrow {
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  box-sizing:border-box!important;
+  flex:0 0 35px!important;
+  width:35px!important;
+  height:35px!important;
+  min-width:35px!important;
+  min-height:35px!important;
+  padding:0!important;
+  margin:0!important;
+  border:1px solid rgba(205,159,110,.65)!important;
+  border-radius:50%!important;
+  background:rgba(210,160,103,.065)!important;
+  color:#e3b27f!important;
+  box-shadow:none!important;
+  font-size:0!important;
+  line-height:1!important;
+  transition:background-color .18s ease,border-color .18s ease!important;
+}
+html body #editorialBottom .ae-ranking-card-link .ae-ranking-link-arrow .ae-ranking-open-icon {
+  display:block!important;
+  flex:0 0 18px!important;
+  width:18px!important;
+  height:18px!important;
+  stroke:currentColor!important;
+  pointer-events:none!important;
+}
+html body #editorialBottom .ae-ranking-card-link:hover .ae-ranking-link-arrow,
+html body #editorialBottom .ae-ranking-card-link:focus-visible .ae-ranking-link-arrow{
+  background:rgba(210,160,103,.17)!important;
+  border-color:#e3b27f!important;
+}
+html:not(.dark) body #editorialBottom .ae-ranking-card-link .ae-ranking-link-arrow{
+  background:rgba(183,123,70,.06)!important;
+  border-color:#b98457!important;
+  color:#9a663e!important;
+}
+html body #editorialBottom .ae-ranking-card-link .editorial-module-heading h2{
+  min-width:0!important;
+  overflow-wrap:anywhere!important;
+}
+@media(max-width:760px){
+  html body #editorialBottom .ae-ranking-card-link .editorial-module-heading{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+    gap:10px!important;
+  }
+  html body #editorialBottom .ae-ranking-card-link .ae-ranking-link-arrow {
+    flex-basis:34px!important;
+    width:34px!important;height:34px!important;
+    min-width:34px!important;min-height:34px!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  html body #editorialBottom .ae-ranking-card-link .ae-ranking-link-arrow{
+    transition:none!important;
+  }
+}
