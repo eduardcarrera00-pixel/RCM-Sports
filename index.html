@@ -323,6 +323,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/ae-nav-menu-takes-finishing.css?v=20261016-1">
     <link rel="stylesheet" href="assets/ae-footer-gold-brand.css?v=20261016-1">
     <link rel="stylesheet" href="assets/ae-image-framing.css?v=20261016-1">
+    <link rel="stylesheet" href="assets/ae-weekly-admin-edit.css?v=20261016-1">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 
@@ -463,7 +464,8 @@ html.dark [data-reading-size][aria-pressed="true"] {
         </section>
         <section id="footballTakes" class="ae-takes ae-picks-editorial" hidden aria-labelledby="takesTitle">
           <section id="picksFeatured" class="ae-picks-feature" aria-labelledby="picksFeaturedTitle">
-            <div class="ae-picks-feature-label"><span>LA SELECCIÓN EDITORIAL DE AE SPORTS</span><h3 id="picksFeaturedTitle">Pick de la Semana</h3></div>
+            <div class="ae-picks-feature-label"><span>LA SELECCIÓN EDITORIAL DE AE SPORTS</span><h3 id="picksFeaturedTitle">Pick de la Semana</h3>
+              <button type="button" id="aeWeeklyEditButton" class="ae-weekly-edit-trigger" hidden aria-controls="aeWeeklyPickAdmin">Editar Pick de la Semana</button></div>
             <div id="picksFeaturedCard" aria-live="polite"><p>Cargando Pick editorial…</p></div>
           </section>
           <div class="ae-picks-overview">
@@ -517,8 +519,9 @@ html.dark [data-reading-size][aria-pressed="true"] {
               </section>
             </aside>
           </div>
-          <details id="aeWeeklyPickAdmin" class="ae-takes-admin ae-weekly-admin" hidden><summary>Administrar · Publicar Pick de la Semana</summary>
+          <details id="aeWeeklyPickAdmin" class="ae-takes-admin ae-weekly-admin" hidden><summary id="aeWeeklyAdminSummary">Administrar · Publicar Pick de la Semana</summary>
             <form id="aeWeeklyPickForm">
+               <p id="aeWeeklyEditorMode" class="ae-weekly-edit-status" hidden role="status">Editando el Pick de la Semana. Los archivos originales se conservarán mientras no los sustituyas.</p>
               <label class="ae-full">Título del Pick<input name="title" minlength="5" maxlength="160" required placeholder="Nuestra selección de la semana"></label>
               <label>Evento o partido<input name="event_name" minlength="3" maxlength="160" required placeholder="Equipo A vs Equipo B"></label>
               <label>Selección<input name="selection" minlength="2" maxlength="180" required placeholder="Ganador, hándicap, más de…"></label>
@@ -551,7 +554,10 @@ html.dark [data-reading-size][aria-pressed="true"] {
                   </div>
                 </div>
               </div>
-              <div class="ae-full"><button type="submit">Publicar Pick de la Semana</button></div>
+              <div class="ae-full ae-weekly-admin-actions">
+                <button type="submit" id="aeWeeklySaveButton">Publicar Pick de la Semana</button>
+                <button type="button" id="aeWeeklyCancelEdit" hidden>Cancelar edición</button>
+              </div>
               <p id="aeWeeklyPickAdminStatus" class="ae-full ae-takes-status" role="status"></p>
             </form>
           </details>
@@ -2205,13 +2211,13 @@ updateThemeButton();
 <script src="assets/ae-category-visibility.js?v=20261015-3"></script>
 <script src="assets/ae-nfl-takes.js?v=20261015-3"></script>
 <script src="assets/free-takes.js?v=20261016-1"></script>
-<script src="assets/ae-editorial-weekly.js?v=20261016-focus-1"></script>
+<script src="assets/ae-editorial-weekly.js?v=20261016-admin-edit-1"></script>
 <script src="assets/ae-profile.js?v=20261016-1"></script>
 <script src="assets/ae-home-takes.js?v=20261015-5"></script>
 <script src="assets/ae-sport-top-takes.js?v=20261016-2"></script>
 <script src="assets/ae-take-replies.js?v=20261015-2"></script>
 <script src="assets/ae-picks-premium.js?v=20261015-1"></script>
-<script src="assets/ae-image-framing.js?v=20261016-1"></script>
+<script src="assets/ae-image-framing.js?v=20261016-admin-edit-1"></script>
 <script src="assets/ae-news-archive.js?v=20261016-focus-1"></script>
 </body>
 </html>
