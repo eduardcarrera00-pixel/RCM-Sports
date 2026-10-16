@@ -1,0 +1,833 @@
+/* AE SPORTS · Fútbol en teléfono · editorial compacto día/noche.
+   Acotado al filtro Fútbol sin búsqueda/equipo y a pantallas <= 760 px.
+   No modifica Supabase, puntuaciones, opiniones ni el Top 10 guardado. */
+.ae-football-leaders-more,
+#aeFootballMoreTakes,
+#aeFootballPublishBottom { display:none; }
+@media (max-width:760px) {
+  html body.ae-is-football #mainContent{
+    padding-top:5px!important;
+    padding-bottom:20px!important;
+    overflow-x:clip!important;
+  }
+  html body.ae-is-football #filterIndicator,
+  html body.ae-is-football #heroSection { display:none!important; }
+  html body.ae-is-football .editorial-layout{
+    display:block!important;
+    margin:0!important;
+    padding:0!important;
+  }
+  html body.ae-is-football .editorial-layout>.lg\:col-span-8,
+  html body.ae-is-football .editorial-layout>aside{
+    min-width:0!important;
+    width:100%!important;
+    margin:0!important;
+    padding:0!important;
+  }
+  html body.ae-is-football .editorial-layout>aside{
+    margin-top:12px!important;
+  }
+  /* Hero futbolístico y Top 3 a partir de la clasificación de Supabase. */
+  html body.ae-is-football #championsRankings.rcm-panel{
+    display:block!important;
+    box-sizing:border-box!important;
+    position:relative!important;
+    isolation:isolate!important;
+    min-width:0!important;
+    min-height:0!important;
+    height:auto!important;
+    width:100%!important;
+    margin:0 0 17px!important;
+    padding:0!important;
+    border:1px solid rgba(202,157,110,.48)!important;
+    border-radius:6px!important;
+    overflow:hidden!important;
+    background-color:#082539!important;
+    background-image:linear-gradient(100deg,rgba(8,32,47,.91) 0%,rgba(8,30,46,.82) 49%,rgba(8,28,44,.51) 100%),
+      url("rankings/champions-atmosphere.webp")!important;
+    background-position:center,center 46%!important;
+    background-size:cover,cover!important;
+    background-repeat:no-repeat!important;
+    box-shadow:0 6px 18px rgba(4,20,32,.12)!important;
+  }
+  html body.ae-is-football #championsRankings.rcm-panel.hidden{
+    display:none!important;
+  }
+  html body.ae-is-football #championsRankings .ae-rank-hero-head{
+    box-sizing:border-box!important;
+    display:flex!important;
+    align-items:flex-start!important;
+    position:relative!important;
+    min-height:171px!important;
+    height:auto!important;
+    margin:0!important;
+    padding:17px 12px 19px!important;
+    background:transparent!important;
+    border:0!important;
+    overflow:visible!important;
+  }
+  html body.ae-is-football #championsRankings .ae-rank-title-wrap{
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:flex-start!important;
+    justify-content:flex-start!important;
+    width:55%!important;
+    max-width:55%!important;
+    min-width:0!important;
+    margin:0!important;padding:0!important;
+    text-align:left!important;
+  }
+  html body.ae-is-football #championsRankings .ae-rank-overline{
+    margin:0 0 8px!important;
+    padding:0!important;
+    color:#e6b984!important;
+    font:800 8px/1.3 Inter,system-ui,sans-serif!important;
+    letter-spacing:.12em!important;
+    text-transform:uppercase!important;
+    text-shadow:none!important;
+  }
+  html body.ae-is-football #championsRankings .ae-rank-title-wrap h2,
+  html body.ae-is-football #championsRankings .ae-rank-title-wrap h2 span{
+    display:block!important;
+    max-width:100%!important;
+    margin:0!important;padding:0!important;
+    color:#f7e9d9!important;
+    font:600 clamp(34px,9vw,46px)/.93 Newsreader,Georgia,serif!important;
+    letter-spacing:-.035em!important;
+    overflow-wrap:normal!important;
+    word-break:normal!important;
+    text-shadow:0 1px 7px rgba(1,18,31,.24)!important;
+  }
+  html body.ae-is-football #championsEdition.ae-rank-edition{
+    display:block!important;
+    margin:11px 0 0!important;
+    color:#ead2b0!important;
+    font:600 10px/1.4 Inter,system-ui,sans-serif!important;
+  }
+  html body.ae-is-football #championsRankings #championsRankOne.ae-ranking-leader{
+    box-sizing:border-box!important;
+    display:block!important;
+    position:absolute!important;
+    right:8px!important;
+    top:67px!important;
+    left:auto!important;
+    bottom:auto!important;
+    width:min(49%,164px)!important;
+    min-width:0!important;
+    max-width:49%!important;
+    min-height:74px!important;
+    padding:9px 7px!important;
+    margin:0!important;
+    border:1px solid rgba(214,176,132,.32)!important;
+    border-left:2px solid #c79a67!important;
+    border-radius:4px!important;
+    background:linear-gradient(115deg,rgba(7,33,49,.96),rgba(8,39,54,.86))!important;
+    box-shadow:0 3px 8px rgba(0,9,22,.17)!important;
+    backdrop-filter:blur(3px)!important;
+    z-index:2!important;
+  }
+  html body.ae-is-football #championsRankings #championsRankOne[hidden]{
+    display:none!important;
+  }
+  html body.ae-is-football #championsRankings .ae-leader-overline{
+    display:block!important;
+    margin:0 0 6px!important;
+    padding:0!important;
+    color:#d8ae7d!important;
+    font:800 8px/1.15 Inter,system-ui,sans-serif!important;
+    letter-spacing:.06em!important;
+    white-space:normal!important;
+  }
+  html body.ae-is-football #championsRankOneList{
+    margin:0!important;padding:0!important;width:100%!important;
+  }
+  html body.ae-is-football #championsRankOneList .rcm-team{
+    display:grid!important;
+    grid-template-columns:12px 29px minmax(0,1fr)!important;
+    align-items:center!important;
+    width:100%!important;
+    min-width:0!important;
+    min-height:34px!important;
+    gap:4px!important;
+    padding:0!important;
+    margin:0!important;
+    border:0!important;
+    background:transparent!important;
+  }
+  html body.ae-is-football #championsRankOneList .rcm-team>strong{
+    color:#d1a06d!important;
+    font:700 19px/1 Newsreader,Georgia,serif!important;
+  }
+  html body.ae-is-football #championsRankOneList .ae-team-emblem{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    width:29px!important;height:29px!important;
+    min-width:29px!important;max-width:29px!important;
+    margin:0!important;padding:0!important;
+    border:0!important;background:transparent!important;
+  }
+  html body.ae-is-football #championsRankOneList .ae-team-emblem img{
+    width:100%!important;height:100%!important;
+    object-fit:contain!important;
+  }
+  html body.ae-is-football #championsRankOneList .ae-team-name{
+    color:#f7e8d8!important;
+    font:700 10px/1.15 Inter,system-ui,sans-serif!important;
+    white-space:normal!important;
+    overflow-wrap:anywhere!important;
+  }
+  html body.ae-is-football #championsRankings #championsStatus:empty{
+    display:none!important;
+  }
+  html body.ae-is-football #championsRankings #championsStatus:not(:empty){
+    margin:0!important;
+    padding:5px 12px 8px!important;
+    font-size:11px!important;
+  }
+  /* El ticker original no se destruye, solo se oculta en móvil. */
+  html body.ae-is-football #championsRankings #championsViewport{
+    display:none!important;
+  }
+  /* La lista sigue conteniendo 10 equipos reales en el DOM.
+     Visualmente se usan los puestos 2 y 3: el #1 está en la cabecera. */
+  html body.ae-is-football #championsRankings #championsList.ae-full-ranking-list{
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:0!important;
+    box-sizing:border-box!important;
+    position:relative!important;
+    visibility:visible!important;
+    width:100%!important;height:auto!important;
+    max-height:none!important;
+    min-width:0!important;
+    margin:0!important;padding:0!important;
+    border:0!important;
+    border-top:1px solid rgba(198,166,134,.45)!important;
+    border-radius:0!important;
+    background:rgba(6,27,41,.86)!important;
+    overflow:visible!important;
+    clip:auto!important;clip-path:none!important;
+    transform:none!important;
+    opacity:1!important;
+  }
+  html body.ae-is-football #championsRankings #championsList>li{
+    display:none!important;
+  }
+  html body.ae-is-football #championsRankings #championsList>li:nth-child(2),
+  html body.ae-is-football #championsRankings #championsList>li:nth-child(3){
+    display:grid!important;
+    box-sizing:border-box!important;
+    grid-template-columns:13px 25px minmax(0,1fr) auto!important;
+    gap:4px!important;
+    align-items:center!important;
+    min-height:42px!important;
+    min-width:0!important;
+    width:100%!important;
+    margin:0!important;
+    padding:6px 5px!important;
+    background:transparent!important;
+    border:0!important;
+    border-right:1px solid rgba(199,156,114,.3)!important;
+    box-shadow:none!important;
+  }
+  html body.ae-is-football #championsRankings #championsList>li:nth-child(3){
+    border-right:0!important;
+  }
+  html body.ae-is-football #championsRankings #championsList .rcm-team>strong{
+    color:#d3a475!important;
+    font:700 17px/1 Newsreader,Georgia,serif!important;
+  }
+  html body.ae-is-football #championsRankings #championsList .ae-team-emblem{
+    display:flex!important;align-items:center!important;justify-content:center!important;
+    width:25px!important;height:25px!important;
+    min-width:25px!important;max-width:25px!important;
+    padding:0!important;margin:0!important;
+    border:0!important;background:transparent!important;
+  }
+  html body.ae-is-football #championsRankings #championsList .ae-team-emblem img{
+    width:100%!important;height:100%!important;
+    max-width:100%!important;max-height:100%!important;
+    object-fit:contain!important;
+  }
+  html body.ae-is-football #championsRankings #championsList .ae-team-name{
+    color:#f6e9dc!important;
+    font:600 10px/1.18 Inter,system-ui,sans-serif!important;
+    min-width:0!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+  }
+  html body.ae-is-football #championsRankings #championsList .ae-rank-trend{
+    display:inline-flex!important;
+    justify-content:center!important;
+    align-items:center!important;
+    min-width:23px!important;
+    max-width:43px!important;
+    min-height:23px!important;
+    margin:0!important;padding:3px!important;
+    font:700 9px/1 Inter,system-ui,sans-serif!important;
+    white-space:nowrap!important;
+  }
+  html body.ae-is-football #championsRankings #championsEditButton:not(.hidden){
+    position:relative!important;
+    z-index:4!important;
+    margin:0 9px 7px!important;
+    padding:6px 8px!important;
+    font-size:10px!important;
+  }
+  /* Dos noticias horizontales, con la foto real y las acciones intactas. */
+  html body.ae-is-football .editorial-layout>div:first-child{
+    margin:0!important;
+    padding:0!important;
+  }
+  html body.ae-is-football .editorial-layout>div:first-child.space-y-8>*+*{
+    margin-top:9px!important;
+  }
+  html body.ae-is-football .editorial-layout>div:first-child>div:first-of-type{
+    display:flex!important;
+    align-items:center!important;
+    gap:8px!important;
+    margin:0 0 10px!important;
+    padding:0!important;
+    border:0!important;
+  }
+  html body.ae-is-football .editorial-layout>div:first-child>div:first-of-type h2{
+    margin:0!important;
+    font:600 clamp(24px,7vw,29px)/1.08 Newsreader,Georgia,serif!important;
+    letter-spacing:-.02em!important;
+    text-transform:none!important;
+  }
+  html body.ae-is-football .editorial-layout>div:first-child>div:first-of-type h2 .w-3{
+    display:none!important;
+  }
+  html body.ae-is-football #aeMobileNewsMore{
+    display:none!important;
+  }
+  html body.ae-is-football .ae-news-inline-tools{
+    display:flex!important;
+    align-items:center!important;
+    flex-direction:column!important;
+    gap:2px!important;
+    margin-left:auto!important;
+  }
+  html body.ae-is-football #articlesCount{
+    display:block!important;
+    font-size:9px!important;
+    text-align:right!important;
+  }
+  html body.ae-is-football #aeAllNewsSport:not([hidden]){
+    display:inline-flex!important;
+    align-items:center!important;
+    gap:4px!important;
+    min-height:26px!important;
+    padding:4px 7px!important;
+    margin:0!important;
+    background:transparent!important;
+    border:1px solid rgba(189,143,99,.53)!important;
+    border-radius:2px!important;
+    color:#d8ab7b!important;
+    font:600 9px/1.2 Inter,system-ui,sans-serif!important;
+    text-transform:none!important;
+  }
+  html body.ae-is-football #articlesGrid{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:8px!important;
+    width:100%!important;
+    min-width:0!important;
+    margin:0!important;
+  }
+  html body.ae-is-football #articlesGrid>article:nth-child(n+3){
+    display:none!important;
+  }
+  html body.ae-is-football #articlesGrid>article{
+    display:flex!important;
+    flex-direction:column!important;
+    position:relative!important;
+    min-height:105px!important;
+    max-height:150px!important;
+    margin:0!important;
+    padding:0!important;
+    border:1px solid rgba(204,167,129,.22)!important;
+    border-radius:4px!important;
+    overflow:hidden!important;
+    transform:none!important;
+    box-shadow:0 4px 12px rgba(7,21,31,.07)!important;
+  }
+  html body.ae-is-football #articlesGrid>article>div:first-child{
+    display:grid!important;
+    grid-template-columns:36% minmax(0,1fr)!important;
+    align-items:stretch!important;
+    min-width:0!important;
+    width:100%!important;
+    height:100%!important;
+    min-height:105px!important;
+  }
+  html body.ae-is-football #articlesGrid>article>div:first-child>div:first-child{
+    position:relative!important;
+    min-width:0!important;
+    min-height:105px!important;
+    height:100%!important;
+    overflow:hidden!important;
+  }
+  html body.ae-is-football #articlesGrid>article>div:first-child>div:first-child img{
+    display:block!important;
+    width:100%!important;height:100%!important;
+    object-fit:cover!important;
+    object-position:var(--ae-image-focus,center center)!important;
+  }
+  html body.ae-is-football #articlesGrid>article>div:first-child>.p-5{
+    padding:8px 9px 29px!important;
+    min-width:0!important;
+    margin:0!important;
+  }
+  html body.ae-is-football #articlesGrid>article .p-5>div:first-child{
+    display:flex!important;
+    flex-wrap:wrap!important;
+    align-items:center!important;
+    gap:3px!important;
+    margin-bottom:4px!important;
+    font-size:9px!important;
+  }
+  html body.ae-is-football #articlesGrid>article h3{
+    display:-webkit-box!important;
+    -webkit-box-orient:vertical!important;
+    -webkit-line-clamp:3!important;
+    line-clamp:3!important;
+    overflow:hidden!important;
+    margin:0 0 4px!important;
+    font:600 clamp(13px,3.5vw,17px)/1.15 Newsreader,Georgia,serif!important;
+  }
+  html body.ae-is-football #articlesGrid>article p.line-clamp-2{
+    display:none!important;
+  }
+  html body.ae-is-football #articlesGrid>article>div:last-child{
+    display:flex!important;
+    position:absolute!important;
+    align-items:center!important;
+    justify-content:flex-end!important;
+    right:0!important;
+    bottom:0!important;
+    width:64%!important;
+    min-height:27px!important;
+    margin:0!important;
+    padding:3px 9px!important;
+    background:transparent!important;
+    border:0!important;
+  }
+  html body.ae-is-football #articlesGrid>article>div:last-child>div:first-child{
+    display:none!important;
+  }
+  html body.ae-is-football #articlesGrid>article>div:last-child button{
+    min-height:25px!important;
+    padding:3px 4px!important;
+    font-size:10px!important;
+  }
+  /* Dos tarjetas de destacados, con un Take visible de entrada. */
+  html body.ae-is-football #aeSportTakeLeaders.ae-sport-chefs{
+    width:100%!important;
+    margin:0 0 12px!important;
+    padding:0!important;
+    background:transparent!important;
+    border:0!important;
+  }
+  html body.ae-is-football #aeSportTakeLeaders .ae-sport-takes-grid{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:10px!important;
+  }
+  html body.ae-is-football #aeSportTakeLeaders .ae-sport-takes-grid>.ae-sport-chef-card{
+    padding:0!important;
+    margin:0!important;
+    min-height:0!important;
+    border-radius:4px!important;
+    border:1px solid rgba(203,158,109,.50)!important;
+    border-left:3px solid var(--ae-take-accent)!important;
+    background-image:linear-gradient(105deg,rgba(7,34,49,.96) 0%,rgba(7,36,51,.83) 69%,rgba(8,35,50,.68)),
+      url("atmospheres/ae-reference-trophy.svg")!important;
+    background-position:center,right center!important;
+    background-size:cover,auto 100%!important;
+    background-repeat:no-repeat!important;
+  }
+  html body.ae-is-football #aeSportTakeLeaders .ae-sport-takes-grid>.is-questioned{
+    --ae-take-accent:#b7657d;
+  }
+  html body.ae-is-football #aeSportTakeLeaders .ae-sport-chef-heading{
+    display:flex!important;
+    flex-direction:row!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+    gap:8px!important;
+    min-height:53px!important;
+    margin:0!important;
+    padding:11px 13px 7px!important;
+    border:0!important;
+    background:transparent!important;
+  }
+  html body.ae-is-football #aeSportTakeLeaders .ae-sport-chef-heading h3{
+    display:block!important;
+    min-width:0!important;
+    flex:1 1 auto!important;
+    width:auto!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:0!important;
+    background:transparent!important;
+    border:0!important;
+    font:600 23px/1.05 Newsreader,Georgia,serif!important;
+    color:#f4e5d5!important;
+    text-align:left!important;
+  }
+  html body.ae-is-football #aeSportTakeLeaders .ae-football-leaders-more{
+    display:inline-flex!important;
+    align-items:center!important;
+    flex:0 0 auto!important;
+    min-height:29px!important;
+    padding:5px 7px!important;
+    gap:4px!important;
+    background:rgba(5,28,43,.14)!important;
+    border:1px solid rgba(211,163,121,.54)!important;
+    border-radius:2px!important;
+    color:#e2b78c!important;
+    font:600 9px/1.2 Inter,system-ui,sans-serif!important;
+    white-space:nowrap!important;
+    cursor:pointer!important;
+  }
+  html body.ae-is-football #aeSportTakeLeaders .ae-sport-takes-list{
+    padding:0 13px 9px!important;
+    margin:0!important;
+    width:100%!important;
+  }
+  html body.ae-is-football #aeSportTakeLeaders .ae-sport-takes-list>li:nth-child(n+2){
+    display:none!important;
+  }
+  html body.ae-is-football #aeSportTakeLeaders .ae-sport-takes-list.ae-football-expanded>li:nth-child(n+2){
+    display:grid!important;
+  }
+  html body.ae-is-football #aeSportTakeLeaders .ae-sport-takes-list>.ae-sport-take-item{
+    padding:7px 0!important;
+    grid-template-columns:27px minmax(0,1fr)!important;
+    gap:7px!important;
+    margin:0!important;
+  }
+  html body.ae-is-football #aeSportTakeLeaders .ae-top-take-number{
+    font-size:25px!important;
+    line-height:1!important;
+    color:#d6a16b!important;
+  }
+  html body.ae-is-football #aeSportTakeLeaders .ae-sport-take-meta .ae-top-take-author{
+    font-size:11px!important;
+  }
+  html body.ae-is-football #aeSportTakeLeaders .ae-sport-take-title,
+  html body.ae-is-football #aeSportTakeLeaders .ae-sport-take-open{
+    color:#f3e7d9!important;
+    font:600 14px/1.15 Newsreader,Georgia,serif!important;
+  }
+  html body.ae-is-football #aeSportTakeLeaders .ae-sport-take-statline{
+    margin-top:3px!important;
+    font-size:10px!important;
+  }
+  /* Publicaciones de Fútbol en tarjetas estrechas: votos, comentar, moderación. */
+  html body.ae-is-football #freeTakes{
+    box-sizing:border-box!important;
+    width:100%!important;
+    min-width:0!important;
+    margin:0!important;
+    padding:0!important;
+    background:transparent!important;
+    border:0!important;
+    box-shadow:none!important;
+  }
+  html body.ae-is-football #freeTakes .ae-takes-head{
+    box-sizing:border-box!important;
+    min-height:125px!important;
+    margin:0 0 9px!important;
+    padding:14px 13px!important;
+    border:1px solid rgba(203,155,107,.49)!important;
+    border-left:3px solid #68a783!important;
+    border-radius:4px!important;
+    background:linear-gradient(110deg,rgba(5,33,48,.97),rgba(5,34,49,.86)),
+      url('atmospheres/ae-football-ranking-light.svg') right center/cover no-repeat!important;
+  }
+  html body.ae-is-football #freeTakes .ae-takes-eyebrow{
+    font-size:9px!important;
+    letter-spacing:.13em!important;
+    color:#bddea8!important;
+    margin:0 0 3px!important;
+  }
+  html body.ae-is-football #freeTakes #freeTakesTitle{
+    margin:0 0 6px!important;
+    padding:0!important;
+    color:#f7eadb!important;
+    font:600 clamp(21px,5.8vw,27px)/1.08 Newsreader,Georgia,serif!important;
+  }
+  html body.ae-is-football #freeTakes .ae-takes-head>p{
+    max-width:96%!important;
+    margin:0 0 10px!important;
+    color:#c8d3d7!important;
+    font:400 11px/1.3 Inter,system-ui,sans-serif!important;
+  }
+  html body.ae-is-football #freeTakes #aeSportTakePublish{
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    min-height:34px!important;
+    padding:7px 12px!important;
+    margin:0!important;
+    font:700 11px/1.2 Inter,system-ui,sans-serif!important;
+    border-radius:2px!important;
+    background:linear-gradient(110deg,#e4bc8b,#c89162)!important;
+    color:#19364a!important;
+    border:1px solid #e0b582!important;
+  }
+  html body.ae-is-football #freeTakes #aeTakesFeedHeading{
+    margin:0 0 5px!important;
+    padding:0!important;
+    font:600 17px/1.2 Newsreader,Georgia,serif!important;
+  }
+  html body.ae-is-football #freeTakes .ae-free-controls{
+    display:flex!important;
+    flex-direction:row!important;
+    flex-wrap:wrap!important;
+    align-items:center!important;
+    gap:7px!important;
+    margin:0 0 7px!important;
+    padding:0!important;
+  }
+  html body.ae-is-football #freeTakes .ae-free-controls label{
+    display:flex!important;
+    gap:4px!important;
+    align-items:center!important;
+    min-width:0!important;
+    margin:0!important;
+    font-size:10px!important;
+  }
+  html body.ae-is-football #freeTakes #freeTakesFeed{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:6px!important;
+    min-width:0!important;
+    margin:0!important;
+  }
+  html body.ae-is-football #freeTakes #freeTakesFeed>article:nth-child(n+3){
+    display:none!important;
+  }
+  html body.ae-is-football #freeTakes #freeTakesFeed.ae-football-expanded>article:nth-child(n+3){
+    display:flex!important;
+  }
+  html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card{
+    display:flex!important;
+    flex-direction:column!important;
+    min-height:0!important;
+    box-sizing:border-box!important;
+    margin:0!important;
+    padding:10px 11px!important;
+    border:1px solid rgba(200,160,120,.42)!important;
+    border-left:3px solid #b68763!important;
+    border-radius:3px!important;
+    background:linear-gradient(130deg,rgba(11,39,56,.93),rgba(11,39,56,.71))!important;
+    box-shadow:none!important;
+  }
+  html body.ae-is-football #freeTakes .ae-take-overline{
+    display:flex!important;align-items:center!important;
+    flex-wrap:wrap!important;gap:5px!important;
+    margin:0 0 5px!important;
+    color:#c9b2a0!important;
+    font:600 10px/1.3 Inter,system-ui,sans-serif!important;
+  }
+  html body.ae-is-football #freeTakes .ae-feed-take-title{
+    margin:0 0 4px!important;padding:0!important;
+    font:600 15px/1.15 Newsreader,Georgia,serif!important;
+  }
+  html body.ae-is-football #freeTakes .ae-free-take-body{
+    display:-webkit-box!important;
+    -webkit-box-orient:vertical!important;
+    -webkit-line-clamp:2!important;
+    line-clamp:2!important;
+    max-height:3.1em!important;
+    overflow:hidden!important;
+    margin:0 0 6px!important;
+    padding:0!important;
+    font:400 11px/1.4 Inter,system-ui,sans-serif!important;
+  }
+  html body.ae-is-football #freeTakes .ae-free-vote-row{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:flex-start!important;
+    flex-wrap:wrap!important;
+    gap:5px!important;
+    margin-top:auto!important;
+    padding-top:5px!important;
+    border-top:1px solid rgba(190,156,129,.13)!important;
+  }
+  html body.ae-is-football #freeTakes .ae-free-vote-row .ae-take-button{
+    min-height:28px!important;
+    padding:5px 6px!important;
+    font-size:10px!important;
+    white-space:nowrap!important;
+  }
+  html body.ae-is-football #freeTakes .ae-free-vote-row .ae-take-reply-link{
+    display:inline-flex!important;
+    align-items:center!important;
+    min-height:27px!important;
+    margin:0 0 0 2px!important;
+    padding:3px 6px!important;
+    color:#e3b484!important;
+    background:transparent!important;
+    border:0!important;
+    font:600 10px/1.2 Inter,system-ui,sans-serif!important;
+    text-decoration:underline!important;
+    text-underline-offset:3px!important;
+  }
+  html body.ae-is-football #aeFootballMoreTakes,
+  html body.ae-is-football #aeFootballPublishBottom{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    min-height:37px!important;
+    margin:8px 0 0!important;
+    padding:8px 10px!important;
+    border:1px solid rgba(198,154,112,.55)!important;
+    border-radius:2px!important;
+    background:rgba(12,43,60,.3)!important;
+    color:#f0d2b5!important;
+    font:700 11px/1.2 Inter,system-ui,sans-serif!important;
+    cursor:pointer!important;
+  }
+  html body.ae-is-football #freeTakes #freeTakesFeed:not(.ae-football-expanded) ~ #freeTakesMore{
+    display:none!important;
+  }
+  html body.ae-is-football #aeFootballPublishBottom{
+    min-height:44px!important;
+    margin-top:10px!important;
+    border-color:#d0a26e!important;
+    background:rgba(14,43,61,.55)!important;
+  }
+  html body.ae-is-football #aeFootballPublishBottom span{
+    font-size:23px!important;
+    line-height:.7!important;
+    color:#e8b57f!important;
+  }
+  html body.ae-is-football #freeTakes .ae-compose-disclosure{
+    margin:0!important;
+  }
+  html body.ae-is-football #freeTakes .ae-compose-disclosure:not([open]){
+    display:none!important;
+  }
+  html body.ae-is-football #aeFootballMoreTakes:focus-visible,
+  html body.ae-is-football #aeFootballPublishBottom:focus-visible,
+  html body.ae-is-football .ae-football-leaders-more:focus-visible{
+    outline:2px solid #d5a579!important;
+    outline-offset:3px!important;
+  }
+  /* Marfil y cobre — modo día, sin perder contraste. */
+  html:not(.dark) body.ae-is-football #championsRankings.rcm-panel{
+    background-color:#fcf8f0!important;
+    background-image:linear-gradient(100deg,rgba(255,252,245,.96),rgba(252,246,235,.84) 51%,rgba(251,240,225,.51)),
+      url("rankings/champions-atmosphere.webp")!important;
+    border-color:#d0ae89!important;
+    box-shadow:0 5px 14px rgba(93,66,40,.07)!important;
+  }
+  html:not(.dark) body.ae-is-football #championsRankings .ae-rank-overline,
+  html:not(.dark) body.ae-is-football #championsEdition{
+    color:#845b41!important;
+    text-shadow:none!important;
+  }
+  html:not(.dark) body.ae-is-football #championsRankings .ae-rank-title-wrap h2 span{
+    color:#1a3549!important;
+    text-shadow:none!important;
+  }
+  html:not(.dark) body.ae-is-football #championsRankings #championsRankOne.ae-ranking-leader{
+    background:linear-gradient(110deg,rgba(255,253,248,.95),rgba(244,232,216,.90))!important;
+    border-color:#caa680!important;
+    box-shadow:0 3px 10px rgba(98,69,36,.05)!important;
+  }
+  html:not(.dark) body.ae-is-football #championsRankOneList .ae-team-name{
+    color:#253e50!important;
+  }
+  html:not(.dark) body.ae-is-football #championsRankings #championsList.ae-full-ranking-list{
+    background:rgba(252,246,235,.94)!important;
+    border-top-color:#d5bba0!important;
+  }
+  html:not(.dark) body.ae-is-football #championsRankings #championsList .ae-team-name{
+    color:#2b4757!important;
+  }
+  html:not(.dark) body.ae-is-football #articlesGrid>article{
+    background:#fffdf9!important;
+    border-color:#dbc8b5!important;
+    box-shadow:0 4px 12px rgba(90,66,44,.05)!important;
+  }
+  html:not(.dark) body.ae-is-football #aeAllNewsSport:not([hidden]){
+    color:#946138!important;
+    border-color:#c5a281!important;
+  }
+  html:not(.dark) body.ae-is-football #aeSportTakeLeaders .ae-sport-takes-grid>.ae-sport-chef-card{
+    background-image:linear-gradient(100deg,rgba(255,253,248,.99),rgba(255,250,243,.88) 69%,rgba(246,232,215,.78)),
+      url("atmospheres/ae-reference-trophy.svg")!important;
+    border-color:#d3b190!important;
+    box-shadow:none!important;
+  }
+  html:not(.dark) body.ae-is-football #aeSportTakeLeaders .ae-sport-chef-heading h3,
+  html:not(.dark) body.ae-is-football #aeSportTakeLeaders .ae-sport-take-title,
+  html:not(.dark) body.ae-is-football #aeSportTakeLeaders .ae-sport-take-open{
+    color:#213a4c!important;
+  }
+  html:not(.dark) body.ae-is-football #aeSportTakeLeaders .ae-football-leaders-more{
+    background:rgba(181,126,74,.04)!important;
+    border-color:#d0ac8a!important;
+    color:#92623e!important;
+  }
+  html:not(.dark) body.ae-is-football #freeTakes .ae-takes-head{
+    background:linear-gradient(110deg,rgba(255,253,248,.96),rgba(252,248,240,.90)),
+      url('atmospheres/ae-football-ranking-light.svg') right center/cover no-repeat!important;
+    border-color:#d9b89b!important;
+    border-left-color:#7da289!important;
+  }
+  html:not(.dark) body.ae-is-football #freeTakes .ae-takes-eyebrow{
+    color:#517f5c!important;
+  }
+  html:not(.dark) body.ae-is-football #freeTakes #freeTakesTitle{
+    color:#1a354a!important;
+  }
+  html:not(.dark) body.ae-is-football #freeTakes .ae-takes-head>p{
+    color:#5e6f78!important;
+  }
+  html:not(.dark) body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card{
+    background:#fefaf3!important;
+    border-color:#d7bba0!important;
+  }
+  html:not(.dark) body.ae-is-football #aeFootballMoreTakes,
+  html:not(.dark) body.ae-is-football #aeFootballPublishBottom{
+    color:#254354!important;
+    background:#fbf8f1!important;
+    border-color:#d0af8a!important;
+  }
+  html:not(.dark) body.ae-is-football #aeFootballPublishBottom span{
+    color:#a06d3a!important;
+  }
+}
+@media(max-width:380px){
+  html body.ae-is-football #championsRankings .ae-rank-title-wrap h2 span{
+    font-size:33px!important;
+  }
+  html body.ae-is-football #championsRankings #championsRankOne.ae-ranking-leader{
+    top:68px!important;
+    width:50%!important;max-width:50%!important;
+    right:5px!important;
+  }
+  html body.ae-is-football #championsRankings #championsList>li:nth-child(2),
+  html body.ae-is-football #championsRankings #championsList>li:nth-child(3){
+    grid-template-columns:11px 20px minmax(0,1fr) auto!important;
+    gap:3px!important;
+  }
+  html body.ae-is-football #championsRankings #championsList .ae-team-emblem{
+    width:20px!important;height:20px!important;
+    min-width:20px!important;max-width:20px!important;
+  }
+  html body.ae-is-football #championsRankings #championsList .ae-team-name{
+    font-size:9px!important;
+  }
+}
