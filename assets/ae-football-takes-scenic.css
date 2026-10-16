@@ -239,3 +239,155 @@ html body.ae-is-football #freeTakes .ae-takes-head>.ae-takes-eyebrow{display:blo
 @media(max-width:760px){
   html body.ae-is-football #freeTakes #freeTakesFeed{display:none!important;}
 }
+
+
+/* AE SPORTS · ajuste compacto de Takes de Fútbol (octubre 2026).
+   Los Takes son mensajes, no banners. Sin imágenes de fondo ni alturas forzadas.
+   Exclusivo de Fútbol: NFL, resultados, votos y respuestas no cambian. */
+
+/* Dos columnas naturales: las filas no se estiran para rellenar huecos. */
+html body.ae-is-football #freeTakes #freeTakesFeed{
+  align-items:start!important;
+  grid-auto-rows:auto!important;
+  gap:10px!important;
+}
+
+/* Encabezado editorial más discreto, conservando la escena del estadio. */
+html body.ae-is-football #freeTakes[data-sport="football"] .ae-takes-head{
+  min-height:112px!important;
+  height:auto!important;
+  padding:13px clamp(14px,2vw,25px)!important;
+  margin:0 0 11px!important;
+  gap:3px 15px!important;
+  box-shadow:0 5px 15px rgba(3,19,30,.12)!important;
+}
+html body.ae-is-football #freeTakes .ae-takes-head>.ae-takes-eyebrow{
+  font-size:10px!important;
+  letter-spacing:.12em!important;
+}
+html body.ae-is-football #freeTakes .ae-takes-head>#freeTakesTitle{
+  font-size:clamp(24px,2.65vw,39px)!important;
+  line-height:1.06!important;
+  letter-spacing:-.024em!important;
+}
+html body.ae-is-football #freeTakes .ae-takes-head>p{
+  font-size:clamp(11px,.97vw,13px)!important;
+  line-height:1.4!important;
+  max-width:100%!important;
+}
+html body.ae-is-football #freeTakes .ae-takes-head>#aeSportTakePublish{
+  min-height:36px!important;
+  padding:9px 13px!important;
+  font-size:clamp(11px,1vw,13px)!important;
+  box-shadow:0 3px 12px rgba(3,20,32,.16)!important;
+}
+
+/* Tarjetas de texto: nada de escenas de fondo ni zonas vacías artificiales. */
+html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card{
+  height:auto!important;
+  min-height:0!important;
+  align-self:start!important;
+  padding:11px 13px!important;
+  border-radius:0!important;
+  border-left-width:2px!important;
+  box-shadow:0 2px 9px rgba(3,21,33,.10)!important;
+}
+/* Abarcar también las variantes de liga y las tarjetas pares/impares,
+   que antes tenían ilustraciones con selectores más específicos. */
+html.dark body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card,
+html.dark body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card[data-sport],
+html.dark body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card[data-sport]:nth-child(n){
+  background:#112b3b!important;
+  background-image:none!important;
+}
+html:not(.dark) body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card,
+html:not(.dark) body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card[data-sport],
+html:not(.dark) body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card[data-sport]:nth-child(n){
+  background:#fbf7f0!important;
+  background-image:none!important;
+}
+html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card .ae-take-overline{
+  margin:0!important;
+  gap:5px!important;
+  font-size:10px!important;
+  line-height:1.35!important;
+}
+html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card .ae-take-overline>span:first-child{
+  padding:3px 6px!important;
+  font-size:10px!important;
+}
+html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card .ae-feed-take-title{
+  margin:4px 0 4px!important;
+  font-size:clamp(17px,1.5vw,21px)!important;
+  line-height:1.18!important;
+}
+/* Contenido completo, sin limitarlo a cuatro líneas. La tarjeta crece sólo
+   cuando el propio mensaje lo necesita. */
+html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card .ae-free-take-body{
+  display:block!important;
+  -webkit-line-clamp:unset!important;
+  -webkit-box-orient:initial!important;
+  overflow:visible!important;
+  max-width:100%!important;
+  margin:0 0 5px!important;
+  padding:0!important;
+  font-size:13px!important;
+  line-height:1.42!important;
+  overflow-wrap:anywhere!important;
+}
+html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card .ae-free-vote-row{
+  margin-top:4px!important;
+  padding-top:5px!important;
+  gap:5px!important;
+}
+html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card .ae-free-vote-row button{
+  min-height:29px!important;
+  padding:4px 8px!important;
+  font-size:11px!important;
+}
+html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card .ae-free-vote-row .ae-take-reply-link{
+  min-height:29px!important;
+  padding:4px 6px!important;
+}
+
+/* Móvil: cabecera proporcionada, texto legible y controles táctiles.
+   Respeta la vista móvil existente (que muestra un resumen de Takes). */
+@media(max-width:780px){
+  html body.ae-is-football #freeTakes[data-sport="football"] .ae-takes-head{
+    min-height:0!important;
+    height:auto!important;
+    padding:12px 13px!important;
+    gap:3px 8px!important;
+    margin-bottom:10px!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    grid-template-rows:auto auto auto auto!important;
+  }
+  html body.ae-is-football #freeTakes .ae-takes-head>#freeTakesTitle{
+    font-size:clamp(21px,5.6vw,30px)!important;
+  }
+  html body.ae-is-football #freeTakes .ae-takes-head>p{
+    font-size:11px!important;
+    line-height:1.35!important;
+    max-width:100%!important;
+  }
+  html body.ae-is-football #freeTakes .ae-takes-head>#aeSportTakePublish{
+    min-height:34px!important;
+    margin-top:4px!important;
+    padding:7px 11px!important;
+    font-size:11px!important;
+  }
+  html body.ae-is-football #freeTakes #freeTakesFeed{
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:8px!important;
+  }
+  html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card{
+    min-height:0!important;
+    padding:10px 11px!important;
+  }
+  html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card .ae-feed-take-title{
+    font-size:18px!important;
+  }
+  html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card .ae-free-vote-row button{
+    min-height:34px!important;
+  }
+}
