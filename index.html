@@ -295,6 +295,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/ae-reference-community-design.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-mobile-header-ranking-polish.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-mobile-compact-home.css?v=20261016-1">
+<link rel="stylesheet" href="assets/ae-football-mobile-redesign.css?v=20261016-1">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 <a class="ae-skip-link" href="#mainContent">Ir al contenido</a>
@@ -432,7 +433,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
             </div>
             <p id="championsStatus" role="status">Cargando clasificación publicada…</p>
             <div id="championsViewport" class="rcm-ticker ae-ranking-motion" aria-hidden="true" hidden><div id="championsTrack" class="rcm-track"></div></div>
-            <ol id="championsList" class="ae-full-ranking-list ae-ranking-accessible" aria-label="Top 10 Champions League"></ol>
+            <ol id="championsList" class="ae-full-ranking-list ae-ranking-accessible" aria-label="Clasificación publicada de Champions League"></ol>
         </section>
         <section id="footballTakes" class="ae-takes ae-picks-editorial" hidden aria-labelledby="takesTitle">
           <section id="picksFeatured" class="ae-picks-feature" aria-labelledby="picksFeaturedTitle">
@@ -633,11 +634,11 @@ html.dark [data-reading-size][aria-pressed="true"] {
           <p id="aeSportTakeStatus" class="sr-only" role="status" aria-live="polite">Cargando Takes…</p>
           <div class="ae-sport-takes-grid">
             <section class="ae-sport-takes-group ae-sport-chef-card is-supported" aria-labelledby="aeSportGeniosTitle">
-              <header class="ae-sport-chef-heading"><h3 id="aeSportGeniosTitle">NFL Savant</h3></header>
+              <header class="ae-sport-chef-heading"><h3 id="aeSportGeniosTitle">NFL Savant</h3><button type="button" class="ae-football-leaders-more" aria-controls="aeSportTakePositive" aria-expanded="false">Ver todos <span aria-hidden="true">→</span></button></header>
               <ol id="aeSportTakePositive" class="ae-sport-takes-list" aria-live="polite"></ol>
             </section>
             <section class="ae-sport-takes-group ae-sport-chef-card is-questioned" aria-labelledby="aeSportAnoetosTitle">
-              <header class="ae-sport-chef-heading"><h3 id="aeSportAnoetosTitle">NFL Rookie</h3></header>
+              <header class="ae-sport-chef-heading"><h3 id="aeSportAnoetosTitle">NFL Rookie</h3><button type="button" class="ae-football-leaders-more" aria-controls="aeSportTakeNegative" aria-expanded="false">Ver todos <span aria-hidden="true">→</span></button></header>
               <ol id="aeSportTakeNegative" class="ae-sport-takes-list" aria-live="polite"></ol>
             </section>
           </div>
@@ -707,7 +708,9 @@ html.dark [data-reading-size][aria-pressed="true"] {
           <div class="ae-free-controls"><label id="aeNflFeedFilterWrap" hidden>División NFL<select id="aeNflFeedDivision"><option value="">Todas las divisiones</option></select></label><label id="freeTakesFilterWrap">Mostrar<select id="freeTakesSportFilter"><option value="all">Todos los deportes</option><option value="general">General</option><option value="laliga">LaLiga</option><option value="premier">Premier League</option><option value="ligamx">Liga MX</option><option value="champions">Champions League</option><option value="nfl">NFL</option><option value="colegial">Fútbol colegial</option></select></label><label>Ordenar<select id="freeTakesSort"><option value="new">Más recientes</option><option value="top">Más apoyados</option></select></label></div>
           <p id="freeTakesStatus" class="ae-takes-status" role="status" aria-live="polite"></p>
           <div id="freeTakesFeed" aria-live="polite"></div>
+          <button id="aeFootballMoreTakes" type="button" class="ae-football-mobile-cta" aria-controls="freeTakesFeed" aria-expanded="false">Ver todos los Takes <span aria-hidden="true">→</span></button>
           <button id="freeTakesMore" type="button" class="ae-history-more" hidden>Ver todos los Takes <span aria-hidden="true">→</span></button>
+          <button id="aeFootballPublishBottom" type="button" class="ae-football-publish-bottom" aria-controls="aeTakeComposePanel">Publicar mi Take <span aria-hidden="true">＋</span></button>
           <details id="aeTakeComposePanel" class="ae-compose-disclosure"><summary>Publicar mi Take</summary>
           <form id="freeTakesForm" class="ae-free-compose">
             <label id="freeTakeSportLabel">Deporte o competición<select name="sport" required><option value="general">General</option><option value="laliga">LaLiga</option><option value="premier">Premier League</option><option value="ligamx">Liga MX</option><option value="champions">Champions League</option><option value="nfl">NFL</option><option value="colegial">Fútbol colegial</option></select></label>
@@ -1544,6 +1547,7 @@ currentUser = {
         }
 
         function renderArticlesFeed() {
+            document.body.classList.toggle('ae-is-football', currentCategory === 'Fútbol' && !currentSearchQuery && !currentTeam);
             document.getElementById('footballTakes').hidden = currentCategory !== 'Picks';
             if (typeof renderCommunityPicksVisibility === 'function') renderCommunityPicksVisibility();
             if (typeof renderFreeTakesVisibility === 'function') renderFreeTakesVisibility();
@@ -2233,5 +2237,6 @@ updateThemeButton();
 <script src="assets/ae-news-editor.js?v=20261016-1"></script>
 <script src="assets/ae-news-archive.js?v=20261016-focus-1"></script>
 <script src="assets/ae-mobile-compact-home.js?v=20261016-1"></script>
+<script src="assets/ae-football-mobile-redesign.js?v=20261016-1"></script>
 </body>
 </html>
