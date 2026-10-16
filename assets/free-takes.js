@@ -17,6 +17,7 @@
    const heading=$('aeTakesFeedHeading');
    if(heading)heading.textContent='Historial de Takes'+(sorted.length?' · '+sorted.length:'');
    if(!sorted.length){
+     const more=$('freeTakesMore');if(more)more.hidden=true;
      const text=activeSection==='NFL'
        ? 'Todavía no hay Takes publicados en NFL. Sé el primero en abrir el debate.'
        : 'Todavía no hay Takes publicados en Fútbol.';
