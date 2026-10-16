@@ -43,13 +43,15 @@ function renderSessionHeader() {
         out.title = 'Cerrar sesión';
         out.onclick = handleUserLogout;
         const illustration = node('img', null, 'ae-classical-auth-art');
-        illustration.src = 'assets/ui/ae-logout-classic.webp?v=20261016-1';
-        illustration.width = 520;
-        illustration.height = 136;
+        illustration.src = 'assets/ui/ae-logout-mark.svg?v=20261016-2';
+        illustration.width = 96;
+        illustration.height = 96;
         illustration.alt = '';
         illustration.setAttribute('aria-hidden', 'true');
         illustration.decoding = 'async';
-        out.append(illustration, node('span', 'Cerrar sesión', 'sr-only'));
+        const caption = node('span', 'Cerrar sesión', 'ae-auth-caption');
+        caption.setAttribute('aria-hidden', 'true');
+        out.append(illustration, caption);
         readers.append(out);
     }
     document.getElementById('guestAdminContainer').classList.toggle('hidden', Boolean(currentUser || currentAdmin));
