@@ -372,3 +372,19 @@ html:not(.dark) body.ae-is-football #mainContent #aeAllNewsSport:not([hidden]):h
     transition:none!important;
   }
 }
+
+
+/* Fútbol · Power Rankings alineado con el ancho del contenido editorial. */
+/* Neutraliza el max-width:1320px histórico sólo en Champions, sin alterar
+   medidas internas, fondos, animación, visibilidad ni la interfaz móvil. */
+@media (min-width:761px){
+  html body.ae-is-football #mainContent > #championsRankings.rcm-panel{
+    box-sizing:border-box!important;
+    width:100%!important;
+    max-width:none!important;
+    min-width:0!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    justify-self:stretch!important;
+  }
+}
