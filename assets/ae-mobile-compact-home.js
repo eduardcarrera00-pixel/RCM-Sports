@@ -36,7 +36,7 @@
       if(!list||!button)continue;
       list.tabIndex=0;
       list.setAttribute('role','region');
-      list.setAttribute('aria-label',label+': los puestos 1, 2 y 3. Desliza hacia abajo para ver el siguiente.');
+      list.setAttribute('aria-label',label+': '+(id==='aeTopTakesPositive'?'los 3 líderes por puntos.':'hasta 10 participantes de la parte baja del ranking.')+' Desliza hacia abajo para ver el siguiente.');
       button.removeAttribute('aria-expanded');
       button.setAttribute('aria-label','Ver siguiente puesto de '+label);
       button.textContent='Desliza ↓';
