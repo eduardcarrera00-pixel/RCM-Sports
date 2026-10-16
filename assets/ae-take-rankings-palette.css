@@ -231,3 +231,61 @@ html body #aeHomeTakeHighlights .ae-discovery-empty {
   html body #aeHomeTakeHighlights .ae-home-take-feature {padding:16px;}
   html body #aeHomeTakeHighlights .ae-discovery-take {padding:12px;}
 }
+
+
+/* Duelo de Takes en la portada: dos clasificaciones separadas por votos. */
+html body #aeHomeTakeHighlights .ae-vote-duel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+html body #aeHomeTakeHighlights .ae-vote-column {
+  --ae-vote-emphasis: #e1b783;
+  min-width: 0;
+}
+html body #aeHomeTakeHighlights .ae-vote-column.is-negative {
+  --ae-vote-emphasis: #d0999d;
+}
+html:not(.dark) body #aeHomeTakeHighlights .ae-vote-column.is-positive {
+  --ae-vote-emphasis: #81553e;
+}
+html:not(.dark) body #aeHomeTakeHighlights .ae-vote-column.is-negative {
+  --ae-vote-emphasis: #8d5967;
+}
+html body #aeHomeTakeHighlights .ae-vote-column-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: 5px 12px;
+  border-bottom: 1px solid var(--ae-discovery-line);
+  padding-bottom: 9px;
+  margin-bottom: 9px;
+}
+html body #aeHomeTakeHighlights .ae-vote-column-heading h3 {
+  margin: 0 !important;
+  padding-left: 10px;
+  border-left: 3px solid var(--ae-vote-emphasis);
+  font-size: clamp(20px,2vw,25px) !important;
+  line-height: 1.16 !important;
+  color: var(--ae-discovery-ink) !important;
+}
+html body #aeHomeTakeHighlights .ae-vote-column-heading p {
+  margin: 0;
+  color: var(--ae-vote-emphasis) !important;
+  font: 750 10px/1.45 Inter,system-ui,sans-serif;
+  letter-spacing: .035em;
+}
+html body #aeHomeTakeHighlights .ae-vote-column .ae-discovery-take {
+  border-left: 2px solid var(--ae-vote-emphasis);
+}
+html body #aeHomeTakeHighlights .ae-vote-column .ae-discovery-score {
+  color: var(--ae-vote-emphasis) !important;
+}
+html body #aeHomeTakeHighlights #aeHomeTakeHistoric .ae-discovery-score {
+  color: var(--ae-discovery-gold) !important;
+  font-weight: 850;
+}
+html body #aeHomeTakeHighlights .ae-discovery-list li {
+  min-width: 0;
+}
