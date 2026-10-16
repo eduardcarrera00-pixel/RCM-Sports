@@ -451,6 +451,10 @@ html.dark [data-reading-size][aria-pressed="true"] {
   html body.ae-is-home #mainContent > .editorial-pick #cpWeekly .ae-weekly-expand-summary:focus-visible {
     outline:2px solid #eabf8b!important; outline-offset:5px!important;
   }
+  /* Native disclosure stays collapsed until the reader explicitly opens it. */
+  html body.ae-is-home #mainContent > .editorial-pick #cpWeekly details.ae-weekly-expandable:not([open]) > .ae-weekly-expanded-content {
+    display:none!important;
+  }
   /* Expanded content uses the exact same title, photo and data as Picks. */
   html body.ae-is-home #mainContent > .editorial-pick #cpWeekly .ae-weekly-expanded-content {
     display:block!important; margin:14px 0 0!important; padding:12px 0 2px!important;
