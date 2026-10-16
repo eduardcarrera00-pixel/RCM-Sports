@@ -35,8 +35,17 @@ function renderSessionHeader() {
     readers.replaceChildren();
     document.getElementById('accountRecoveryButton')?.classList.toggle('hidden', !currentUser);
     readers.classList.toggle('hidden', !currentUser || Boolean(currentAdmin));
+    // El nombre se muestra en el botón Mi perfil, no duplicado junto al tema.
+    const profileButton = document.getElementById('aeMyTakesButton');
+    if (profileButton) {
+        const displayName = String(currentAdmin?.name || currentUser?.username || '').trim();
+        const caption = profileButton.querySelector('.ae-auth-caption');
+        if (caption) caption.textContent = displayName || 'Mi perfil';
+        profileButton.title = displayName ? 'Abrir perfil de ' + displayName : 'Mi perfil';
+        profileButton.setAttribute('aria-label',
+            displayName ? 'Abrir mi perfil de ' + displayName + ': consultar mis Takes' : 'Mi perfil: consultar mis Takes');
+    }
     if (currentUser && !currentAdmin) {
-        readers.append(node('span', currentUser.username, 'rcm-username'));
         const out = node('button', null, 'ae-classical-auth-button ae-classical-logout');
         out.type = 'button';
         out.setAttribute('aria-label', 'Cerrar sesión');
