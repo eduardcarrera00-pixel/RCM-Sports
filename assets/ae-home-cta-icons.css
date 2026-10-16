@@ -1,0 +1,60 @@
+/* AE SPORTS | Iconos originales clásicos para acciones de la portada.
+   El libro y la gráfica recrean el relieve/bronce de la referencia.
+   No reemplaza textos, enlaces ni los botones reales. */
+html body.ae-is-home #mainContent #heroSection .editorial-actions button>.ae-hero-cta-symbol{
+  display:inline-block!important;
+  flex:0 0 24px!important;
+  width:24px!important;
+  height:24px!important;
+  min-width:24px!important;
+  margin:0!important;
+  padding:0!important;
+  background-color:transparent!important;
+  background-repeat:no-repeat!important;
+  background-position:center!important;
+  background-size:contain!important;
+  vertical-align:middle!important;
+  pointer-events:none!important;
+}
+html body.ae-is-home #mainContent #heroSection .editorial-actions .ae-hero-cta-symbol--book{
+  background-image:url("icons/ae-hero-book-night.svg")!important;
+}
+html body.ae-is-home #mainContent #heroSection .editorial-actions .ae-hero-cta-symbol--chart{
+  background-image:url("icons/ae-hero-picks-night.svg")!important;
+}
+html:not(.dark) body.ae-is-home #mainContent #heroSection .editorial-actions .ae-hero-cta-symbol--book{
+  background-image:url("icons/ae-hero-book-day.svg")!important;
+}
+html:not(.dark) body.ae-is-home #mainContent #heroSection .editorial-actions .ae-hero-cta-symbol--chart{
+  background-image:url("icons/ae-hero-picks-day.svg")!important;
+}
+html body.ae-is-home #mainContent #heroSection .editorial-actions button{
+  align-items:center!important;
+  gap:7px!important;
+}
+html body.ae-is-home #mainContent #heroSection .editorial-actions button>span:not(.ae-hero-cta-symbol){
+  white-space:nowrap!important;
+}
+html body.ae-is-home #mainContent #heroSection .editorial-actions button>i.fa-arrow-right{
+  flex:0 0 auto!important;
+  margin-left:3px!important;
+}
+@media(max-width:760px){
+  html body.ae-is-home #mainContent #heroSection .editorial-actions button>.ae-hero-cta-symbol{
+    flex-basis:18px!important;
+    width:18px!important;
+    height:18px!important;
+    min-width:18px!important;
+  }
+  html body.ae-is-home #mainContent #heroSection .editorial-actions button{
+    gap:4px!important;
+  }
+}
+@media(max-width:380px){
+  html body.ae-is-home #mainContent #heroSection .editorial-actions button>.ae-hero-cta-symbol{
+    flex-basis:15px!important;
+    width:15px!important;
+    height:15px!important;
+    min-width:15px!important;
+  }
+}

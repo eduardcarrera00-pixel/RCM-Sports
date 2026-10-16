@@ -310,6 +310,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/ae-header-alignment-polish.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-home-community-spotlight.css?v=20261016-2">
 <link rel="stylesheet" href="assets/ae-home-takes-compact-reference.css?v=20261016-2">
+<link rel="stylesheet" href="assets/ae-home-cta-icons.css?v=20261016-classic-1">
 <link rel="stylesheet" href="assets/ae-home-focus-hierarchy.css?v=20261016-1">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
@@ -1726,12 +1727,12 @@ currentUser = {
                         <p>${escapeHTML(hero.summary || 'La historia completa, desde otra perspectiva.')}</p>
                         <div class="editorial-actions">
                             <button type="button" class="editorial-featured" onclick="openArticleModal(${articleIdArgument(hero.id)})">
-                                <i class="fa-solid fa-book-open" aria-hidden="true"></i>
+                                <span class="ae-hero-cta-symbol ae-hero-cta-symbol--book" aria-hidden="true"></span>
                                 <span>Leer la historia</span>
                                 <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
                             </button>
                             <button type="button" class="ae-quiet-cta" onclick="filterByCategory('Picks')">
-                                <i class="fa-solid fa-chart-column" aria-hidden="true"></i>
+                                <span class="ae-hero-cta-symbol ae-hero-cta-symbol--chart" aria-hidden="true"></span>
                                 <span>Explorar Picks</span>
                                 <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
                             </button>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Gráfica de barras">
+<defs><linearGradient id="bars" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ce9a63"/><stop offset=".49" stop-color="#a66331"/><stop offset="1" stop-color="#693518"/></linearGradient>
+<filter id="shadow" x="-20%" y="-25%" width="150%" height="155%"><feDropShadow dx="1.5" dy="2" stdDeviation="1.1" flood-color="#442610" flood-opacity=".64"/></filter></defs>
+<g filter="url(#shadow)" stroke-linejoin="round">
+<path d="M8.4 8v46.7h47.4" fill="none" stroke="#693518" stroke-width="6" stroke-linecap="square"/>
+<path d="M8.4 8v46.7h47.4" fill="none" stroke="#ce9a63" stroke-width="3.4" stroke-linecap="square"/>
+<path d="M17 36h7v13h-7zM29 26h7v23h-7zM41 15h7v34h-7z" fill="url(#bars)" stroke="#693518" stroke-width="1.1"/>
+<path d="M18.5 37v9M30.5 27v18M42.5 16v28" fill="none" stroke="#fbd5a2" stroke-width="1.8" opacity=".85"/>
+<path d="M24 36l2-2v13l-2 2M36 26l2-2v23l-2 2M48 15l2-2v34l-2 2" fill="#693518" opacity=".8"/>
+</g></svg>
