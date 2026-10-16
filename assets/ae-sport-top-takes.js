@@ -3,7 +3,6 @@
  'use strict';
  const $=id=>document.getElementById(id);
  const footballSports=new Set(['laliga','premier','ligamx','champions']);
- const names={nfl:'NFL',laliga:'LaLiga',premier:'Premier League',ligamx:'Liga MX',champions:'Champions League'};
  let request=0,current='',lastRun=0;
  const el=(tag,text,cls)=>{
    const n=document.createElement(tag);
@@ -18,9 +17,9 @@
      const li=el('li',undefined,'ae-sport-take-item');
      li.append(el('span',String(i+1).padStart(2,'0'),'ae-top-take-number'));
      const content=el('div',undefined,'ae-top-take-content');
-     // Etiqueta del deporte y autor comparten una única línea editorial.
+     // El deporte ya se conoce por la sección. Mostramos sólo el autor,
+     // clicable para consultar su perfil, sin insignia ni recuadro.
      const meta=el('div',undefined,'ae-sport-take-meta');
-     meta.append(el('span',names[t.sport]||'Fútbol','ae-top-take-sport'));
      const author=el('button','@'+(t.author||'Aficionado'),'ae-top-take-author');
      author.type='button';
      author.setAttribute('aria-label','Ver perfil de '+(t.author||'Aficionado'));

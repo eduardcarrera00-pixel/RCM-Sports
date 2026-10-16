@@ -320,6 +320,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/ae-picks-takes-history.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-all-square-corners.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-header-gold-and-picks-centering.css?v=20261016-1">
+<link rel="stylesheet" href="assets/ae-nav-menu-takes-finishing.css?v=20261016-1">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 
@@ -369,8 +370,10 @@ html.dark [data-reading-size][aria-pressed="true"] {
                     </div>
 
                     <details id="aeCategoryAdmin" hidden class="ae-category-admin"><summary>Gestionar deportes</summary>
-                      <div id="aeCategoryToggles" role="group" aria-label="Visibilidad de categorías"></div>
-                      <p id="aeCategoryStatus" role="status"></p>
+                      <div class="ae-category-admin-menu">
+                        <div id="aeCategoryToggles" role="group" aria-label="Visibilidad de categorías"></div>
+                        <p id="aeCategoryStatus" role="status" aria-live="polite"></p>
+                      </div>
                     </details>
                     <!-- Logged-in State: Admin Profile & Actions -->
                     <div id="loggedAdminContainer" class="hidden flex items-center space-x-2 sm:space-x-3">
@@ -2165,7 +2168,7 @@ updateThemeButton();
 <script src="assets/ae-editorial-weekly.js?v=20261015-6"></script>
 <script src="assets/ae-profile.js?v=20261016-1"></script>
 <script src="assets/ae-home-takes.js?v=20261015-5"></script>
-<script src="assets/ae-sport-top-takes.js?v=20261016-1"></script>
+<script src="assets/ae-sport-top-takes.js?v=20261016-2"></script>
 <script src="assets/ae-take-replies.js?v=20261015-2"></script>
 <script src="assets/ae-picks-premium.js?v=20261015-1"></script>
 <script src="assets/ae-news-archive.js?v=20261015-1"></script>
