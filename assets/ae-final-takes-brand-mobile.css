@@ -1,0 +1,176 @@
+
+/* AE SPORTS · limpieza definitiva de identidad.
+   El símbolo procede del recurso original del atleta, sin recortes de imágenes antiguas. */
+html body header a.ae-brand.ae-brand-gold.ae-brand-runner.ae-brand-runner-clean,
+html body footer a.ae-footer-gold-brand.ae-brand-runner.ae-brand-runner-clean{
+  display:flex!important;align-items:center!important;justify-content:flex-start!important;
+  flex-direction:row!important;gap:8px!important;box-sizing:border-box!important;
+  overflow:visible!important;text-decoration:none!important;line-height:normal!important;
+  background:transparent!important;border:0!important;
+}
+html body header a.ae-brand-runner-clean .ae-runner-symbol,
+html body footer a.ae-brand-runner-clean .ae-runner-symbol{
+  display:block!important;flex:0 0 24%!important;width:24%!important;max-width:24%!important;
+  height:auto!important;aspect-ratio:1!important;object-fit:contain!important;
+  background:transparent!important;
+}
+html body header a.ae-brand-runner-clean .ae-runner-wordmark,
+html body footer a.ae-brand-runner-clean .ae-runner-wordmark{
+  display:flex!important;position:static!important;flex:1 1 0!important;
+  flex-direction:column!important;align-items:flex-start!important;justify-content:center!important;
+  gap:1px!important;min-width:0!important;width:auto!important;max-width:none!important;
+  height:auto!important;min-height:0!important;aspect-ratio:auto!important;
+  margin:0!important;padding:0!important;overflow:visible!important;
+  background:none!important;line-height:normal!important;
+}
+html body header a.ae-brand-runner-clean .ae-runner-title,
+html body footer a.ae-brand-runner-clean .ae-runner-title{
+  display:block!important;max-width:100%!important;white-space:nowrap!important;
+  margin:0!important;padding:0!important;
+  color:#f2be72!important;
+  font:700 clamp(19px,2.15vw,32px)/.98 Newsreader,Georgia,'Times New Roman',serif!important;
+  letter-spacing:-.035em!important;
+  text-shadow:0 1px 0 #f8dba6,0 2px 0 #a3652c,1px 3px 2px #6c3a19,0 4px 9px rgba(7,19,31,.48)!important;
+}
+html body header a.ae-brand-runner-clean .ae-runner-tagline,
+html body footer a.ae-brand-runner-clean .ae-runner-tagline{
+  display:block!important;max-width:100%!important;white-space:nowrap!important;
+  padding:0!important;margin:4px 0 0!important;
+  font:500 clamp(7px,.68vw,10px)/1.2 Newsreader,Georgia,serif!important;
+  letter-spacing:.13em!important;color:#e3c797!important;
+  text-shadow:0 1px 2px rgba(8,20,33,.50)!important;
+}
+html body footer a.ae-brand-runner-clean .ae-runner-title{
+  font-size:clamp(25px,2.35vw,39px)!important;
+}
+html body footer a.ae-brand-runner-clean .ae-runner-tagline{
+  font-size:clamp(8px,.85vw,11px)!important;letter-spacing:.17em!important;
+}
+html:not(.dark) body header a.ae-brand-runner-clean .ae-runner-title,
+html:not(.dark) body footer a.ae-brand-runner-clean .ae-runner-title{
+  color:#b77a3c!important;text-shadow:0 1px 0 #f3cf91,0 2px 1px #7e553a,0 3px 5px rgba(44,52,54,.22)!important;
+}
+html:not(.dark) body header a.ae-brand-runner-clean .ae-runner-tagline,
+html:not(.dark) body footer a.ae-brand-runner-clean .ae-runner-tagline{
+  color:#8c6846!important;text-shadow:none!important;
+}
+/* Inicio: número y título juntos, deporte a la derecha, sin perder enlaces. */
+html body #aeHomeTopTakes .ae-top-take{
+  display:block!important;min-width:0!important;
+}
+html body #aeHomeTopTakes .ae-top-take-content{
+  display:flex!important;flex-direction:column!important;min-width:0!important;width:100%!important;
+}
+html body #aeHomeTopTakes .ae-home-take-head{
+  display:flex!important;align-items:flex-start!important;justify-content:space-between!important;
+  gap:9px!important;width:100%!important;min-width:0!important;margin:0 0 6px!important;
+}
+html body #aeHomeTopTakes .ae-home-take-title-row{
+  display:flex!important;align-items:baseline!important;gap:8px!important;
+  flex:1 1 auto!important;min-width:0!important;
+}
+html body #aeHomeTopTakes .ae-home-take-title-row .ae-top-take-number{
+  flex:0 0 auto!important;margin:0!important;padding:0!important;
+}
+html body #aeHomeTopTakes .ae-home-take-title-row .ae-top-take-title{
+  margin:0!important;padding:0!important;min-width:0!important;overflow-wrap:anywhere!important;
+  flex:1 1 auto!important;
+}
+html body #aeHomeTopTakes .ae-home-take-head .ae-top-take-sport{
+  display:inline-block!important;flex:0 0 auto!important;align-self:flex-start!important;
+  width:auto!important;max-width:43%!important;min-width:0!important;
+  margin:0!important;padding:4px 6px!important;
+  white-space:normal!important;text-align:right!important;
+  font-size:9px!important;overflow-wrap:anywhere!important;
+}
+html body #aeHomeTopTakes .ae-top-take-summary,
+html body #aeHomeTopTakes .ae-top-take-votes,
+html body #aeHomeTopTakes .ae-top-take-author{
+  margin-left:26px!important;
+}
+/* Historial deportivo: dos tarjetas por fila y ocho entradas iniciales. */
+html body #freeTakes #freeTakesFeed{
+  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  align-items:stretch!important;gap:12px!important;min-width:0!important;width:100%!important;
+}
+html body #freeTakes #freeTakesFeed>.ae-free-take-card{
+  display:flex!important;flex-direction:column!important;
+  box-sizing:border-box!important;min-width:0!important;width:100%!important;
+  margin:0!important;padding:13px 14px 12px!important;
+}
+html body #freeTakes #freeTakesFeed>.ae-free-take-card .ae-free-take-body{
+  overflow-wrap:anywhere!important;min-width:0!important;
+  display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;
+}
+html body #freeTakes #freeTakesFeed>.ae-free-take-card .ae-free-vote-row{
+  display:flex!important;flex-direction:row!important;align-items:center!important;
+  justify-content:flex-start!important;align-content:center!important;
+  flex-wrap:wrap!important;gap:5px!important;
+  width:100%!important;min-width:0!important;margin-top:auto!important;padding-top:9px!important;
+}
+html body #freeTakes #freeTakesFeed>.ae-free-take-card .ae-free-vote-row .ae-take-reply-link{
+  display:inline-flex!important;flex:0 0 auto!important;align-self:center!important;
+  margin:0 0 0 3px!important;padding:4px 5px!important;min-height:30px!important;
+  background:transparent!important;border:0!important;box-shadow:none!important;
+  white-space:nowrap!important;
+}
+html body #freeTakes #freeTakesFeed>.ae-free-take-card .ae-free-vote-row .ae-take-minor{
+  margin-left:auto!important;
+}
+html body #freeTakes #freeTakesFeed>.ae-take-empty{
+  grid-column:1/-1!important;
+}
+@media(max-width:780px){
+  html body #freeTakes #freeTakesFeed{grid-template-columns:minmax(0,1fr)!important;}
+}
+@media(max-width:650px){
+  html body header a.ae-brand-runner-clean{gap:5px!important;}
+  html body header a.ae-brand-runner-clean .ae-runner-title{font-size:clamp(17px,5vw,25px)!important;}
+  html body header a.ae-brand-runner-clean .ae-runner-tagline{font-size:clamp(6px,1.5vw,9px)!important;letter-spacing:.075em!important;}
+  html body footer a.ae-brand-runner-clean .ae-runner-title{font-size:clamp(23px,7vw,35px)!important;}
+  html body footer a.ae-brand-runner-clean .ae-runner-tagline{font-size:clamp(7px,2.1vw,10px)!important;letter-spacing:.1em!important;}
+  html body #freeTakes #freeTakesFeed>.ae-free-take-card{padding:12px!important;}
+}
+/* Power Rankings móvil: quitar únicamente adornos superpuestos, no sus
+   logos, tarjetas ni ticker animado. Se mantienen atmósferas suaves. */
+@media(max-width:768px){
+  html body #nflRankings.rcm-panel,
+  html body #championsRankings.rcm-panel{
+    overflow:hidden!important;isolation:isolate!important;
+    border-radius:0!important;
+  }
+  html body #nflRankings.rcm-panel::before,
+  html body #nflRankings.rcm-panel::after,
+  html body #championsRankings.rcm-panel::before,
+  html body #championsRankings.rcm-panel::after,
+  html body #nflRankings .ae-rank-hero-head::before,
+  html body #nflRankings .ae-rank-hero-head::after,
+  html body #championsRankings .ae-rank-hero-head::before,
+  html body #championsRankings .ae-rank-hero-head::after,
+  html body #nflRankings .ae-rank-title-wrap::before,
+  html body #nflRankings .ae-rank-title-wrap::after,
+  html body #championsRankings .ae-rank-title-wrap::before,
+  html body #championsRankings .ae-rank-title-wrap::after{
+    content:none!important;display:none!important;
+    background:none!important;border:0!important;box-shadow:none!important;
+  }
+  html body #nflRankings .ae-rank-hero-head,
+  html body #championsRankings .ae-rank-hero-head{
+    overflow:visible!important;min-width:0!important;position:relative!important;
+    z-index:1!important;
+  }
+  html body #nflRankings #rankingViewport.rcm-ticker,
+  html body #championsRankings #championsViewport.rcm-ticker{
+    position:relative!important;z-index:1!important;
+  }
+  html:not(.dark) body #nflRankings.rcm-panel{
+    background-image:linear-gradient(125deg,rgba(255,250,240,.93),rgba(248,237,218,.79)),
+      url('atmospheres/ae-nfl-ranking-light.svg')!important;
+    background-size:cover,cover!important;background-position:center,right center!important;
+  }
+  html:not(.dark) body #championsRankings.rcm-panel{
+    background-image:linear-gradient(125deg,rgba(255,250,240,.93),rgba(248,237,218,.79)),
+      url('atmospheres/ae-football-ranking-light.svg')!important;
+    background-size:cover,cover!important;background-position:center,right center!important;
+  }
+}
