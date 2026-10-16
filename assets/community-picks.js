@@ -82,7 +82,7 @@ async function load(){
    $('cpStatus').textContent=feed.data?.length?'':'Todavía no hay Picks. Comparte el primero.';
    $('cpMore').hidden=(feed.data?.length||0)<limit;
    loaded=true;
-   await Promise.all([loadRanking(),loadModeration(),loadChefLists(),loadSettlement(),loadLegacyDates()]);
+   await Promise.all([loadRanking(),loadModeration(),loadChefLists(),loadSettlement()]);
  }catch(e){if(seq!==request)return;$('cpFeed').replaceChildren();$('cpMore').hidden=true;$('cpStatus').textContent='No pudimos cargar los Picks. '+message(e);}
 }
 let currentRank='month';
@@ -92,8 +92,8 @@ async function loadRanking(){
  const r=await db.rpc('ae_pick_result_ranking',{p_period:currentRank});
  if(r.error){list.replaceChildren(row('No fue posible cargar el ranking de resultados.'));return;}
  list.replaceChildren();
- if(!r.data?.length)list.append(row('Aún no hay pronósticos con resultados confirmados.'));
- for(const [i,x] of (r.data||[]).entries()){
+ if(!r.data?.length)list.append(row(currentRank==='month'?'Este mes todavía no hay resultados confirmados.':'Aún no hay pronósticos con resultados confirmados.'));
+ for(const [i,x] of (r.data||[]).slice(0,10).entries()){
    const li=el('li',null,'ae-cp-leader');
    li.append(el('span',String(i+1).padStart(2,'0'),'ae-take-number'),
      el('span',x.username||'Aficionado','ae-take-name'),
@@ -185,47 +185,23 @@ async function loadModeration(){
    target.append(n);
  }
 }
-async function loadLegacyDates(){
- const area=$('cpLegacyList');if(!area)return;
- const admin=typeof currentAdmin!=='undefined'&&Boolean(currentAdmin);
- area.replaceChildren();if(!admin)return;
- const r=await db.from('ae_pick_feed').select('id,title,author,publication_day,event_date').is('event_date',null)
-   .order('created_at',{ascending:false}).limit(30);
- if(r.error){area.append(el('p','No se pudo comprobar fechas pendientes. '+message(r.error)));return;}
- if(!r.data?.length){area.append(el('p','Todos los Picks visibles tienen fecha de evento.'));return;}
- for(const p of r.data){
-  const item=el('div',null,'ae-pick-settle-entry');
-  const label=el('label','Evento: '+p.title+' · '+p.author+' · Publicado '+p.publication_day);
-  const day=el('input');day.type='date';day.required=true;day.min=p.publication_day;day.max=new Date(Date.parse(todayToronto()+'T12:00:00Z')+180*86400000).toISOString().slice(0,10);
-  const save=button('Confirmar fecha',async()=>{
-   if(!day.value){$('cpAdminStatus').textContent='Indica la fecha real del evento.';return;}
-   if(!confirm('¿Verificaste que '+day.value+' fue la fecha del evento de '+p.title+'?'))return;
-   save.disabled=true;
-   const r=await db.rpc('ae_pick_set_legacy_event_date',{p_pick_id:p.id,p_event_date:day.value});
-   $('cpAdminStatus').textContent=r.error?message(r.error):'Fecha verificada: '+r.data+'.';
-   save.disabled=false;
-   if(!r.error)await load();
-  });
-  label.append(day);item.append(label,save);area.append(item);
- }
-}
 async function loadSettlement(){
  const area=$('cpSettleList');if(!area)return;
  const admin=typeof currentAdmin!=='undefined'&&Boolean(currentAdmin);
  area.replaceChildren();
  if(!admin)return;
  const r=await db.from('ae_pick_feed').select('*').eq('moderation_status','approved')
-   .eq('outcome','pending').lte('event_date',todayToronto())
-   .order('event_date',{ascending:true}).limit(50);
+   .eq('outcome','pending').or('event_date.lte.'+todayToronto()+',event_date.is.null')
+   .order('created_at',{ascending:true}).limit(100);
  if(r.error){area.append(el('p','No pudimos cargar los resultados pendientes. '+message(r.error)));return;}
  if(!r.data?.length){area.append(el('p','No hay eventos pendientes de verificación.'));return;}
  for(const p of r.data){
   const entry=el('article',null,'ae-pick-settle-entry');
-  entry.append(el('strong',p.title),el('small',p.author+' · Evento '+p.event_date+' · '+p.american_odds));
+  entry.append(el('strong',p.title),el('small',p.author+' · '+(p.event_date?'Evento '+p.event_date:'Pick antiguo sin fecha · verifica que terminó')+' · '+p.american_odds));
   for(const leg of p.legs||[])entry.append(el('p',leg.event+' · '+leg.selection));
   for(const [outcome,label] of [['won','Acertó'],['lost','Falló'],['void','Anulado']]){
    const b=button(label,async()=>{
-    if(!confirm('¿Has comprobado el resultado oficial? Confirmar '+label+' para '+p.title+'. Esta acción es definitiva.'))return;
+    if(!confirm('¿Verificaste el resultado oficial '+(p.event_date?'del evento '+p.event_date:'de este Pick antiguo sin fecha')+'? Confirmar '+label+' para '+p.title+'. Los puntos afectarán el ranking del mes actual. Esta acción es definitiva.'))return;
     b.disabled=true;
     try{
      const r=await db.rpc('ae_pick_settle_result',{p_pick_id:p.id,p_outcome:outcome});
@@ -239,7 +215,7 @@ async function loadSettlement(){
   area.append(entry);
  }
 }
-window.updateAePicksAdmin=()=>{loadModeration();loadSettlement();loadLegacyDates();};
+window.updateAePicksAdmin=()=>{loadModeration();loadSettlement();};
 
 function field(label,type='text'){const wrap=el('label',label);const input=el(type==='textarea'?'textarea':'input');if(type!=='textarea')input.type=type;input.required=true;wrap.append(input);return {wrap,input};}
 function buildComposer(){
@@ -314,7 +290,7 @@ document.addEventListener('DOMContentLoaded',()=>{
  $('cpComposePanel')?.addEventListener('toggle',e=>{
   $('cpPublishCta')?.setAttribute('aria-expanded',String(e.currentTarget.open));
  });
- renderCommunityPicksVisibility();load();$('cpReload')?.addEventListener('click',load);$('cpViewAll')?.addEventListener('click',()=>{const dlg=$('cpArchiveDialog');if(dlg&&!dlg.open)dlg.showModal();archiveLimit=30;loadArchive();});$('cpArchiveClose')?.addEventListener('click',closeArchive);$('cpArchiveMore')?.addEventListener('click',()=>{archiveLimit+=30;loadArchive();});for(const [id,mode] of [['cpRankMonth','month'],['cpRankHistory','all']]){$(id)?.addEventListener('click',()=>{currentRank=mode;for(const [i,m] of [['cpRankWeekly','weekly'],['cpRankOverall','overall']])$(i).setAttribute('aria-pressed',String(currentRank===m));loadRanking();});}const id=new URL(location.href).searchParams.get('pick');if(id)showDetail(id);$('cpMore').onclick=()=>{limit+=20;load();};if(db)db.auth.onAuthStateChange(()=>setTimeout(()=>{load();const id=new URL(location.href).searchParams.get('pick');if(id)showDetail(id);},0));});
+ renderCommunityPicksVisibility();load();$('cpReload')?.addEventListener('click',load);$('cpViewAll')?.addEventListener('click',()=>{const dlg=$('cpArchiveDialog');if(dlg&&!dlg.open)dlg.showModal();archiveLimit=30;loadArchive();});$('cpArchiveClose')?.addEventListener('click',closeArchive);$('cpArchiveMore')?.addEventListener('click',()=>{archiveLimit+=30;loadArchive();});for(const [id,mode] of [['cpRankMonth','month'],['cpRankHistory','all']]){$(id)?.addEventListener('click',()=>{currentRank=mode;for(const [i,m] of [['cpRankMonth','month'],['cpRankHistory','all']])$(i)?.setAttribute('aria-pressed',String(currentRank===m));loadRanking();});}const id=new URL(location.href).searchParams.get('pick');if(id)showDetail(id);$('cpMore').onclick=()=>{limit+=20;load();};if(db)db.auth.onAuthStateChange(()=>setTimeout(()=>{load();const id=new URL(location.href).searchParams.get('pick');if(id)showDetail(id);},0));});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)load();});
 window.addEventListener('popstate',()=>{const id=new URL(location.href).searchParams.get('pick');if(id)showDetail(id);else closeDetail();});
 })();
