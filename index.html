@@ -316,7 +316,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/ae-take-composer-modal.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-picks-platos-odds.css?v=20261016-odds-right-2">
 <link rel="stylesheet" href="assets/ae-mobile-polish-weekly-pick.css?v=20261016-first-pick-blur-center-takes-3">
-<link rel="stylesheet" href="assets/ae-admin-header-final.css?v=20261016-1">
+<link rel="stylesheet" href="assets/ae-admin-header-final.css?v=20261016-2">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 <a class="ae-skip-link" href="#mainContent">Ir al contenido</a>
@@ -376,20 +376,20 @@ html.dark [data-reading-size][aria-pressed="true"] {
                     </details>
                     <!-- Logged-in State: Admin Profile & Actions -->
                     <div id="loggedAdminContainer" class="hidden flex items-center space-x-2 sm:space-x-3">
-                        <!-- Profile Tag -->
-                        <button type="button" class="ae-admin-profile" onclick="openAeProfile()" aria-label="Abrir mi perfil" title="Mi perfil">
-                            <img class="ae-admin-profile-art" src="assets/ui/ae-profile-mark.png?v=20261016-3" width="96" height="96" alt="" aria-hidden="true" decoding="async">
-                            <span id="adminNameDisplay">--</span>
-                        </button>
-
-                        <!-- Publish Button (Visible ONLY when logged in) -->
-                        <button onclick="openPublishModal()" class="ae-publish-action flex items-center space-x-2 bg-pitch-600 hover:bg-pitch-700 text-white text-xs font-bold uppercase tracking-wider py-2.5 px-3.5 sm:px-4 rounded-xl shadow-md shadow-pitch-600/20 transition-all hover:scale-105">
-                            <i class="fa-solid fa-plus text-sm"></i>
-                            <span class="hidden sm:inline">Publicar</span>
+                        <!-- Publish Button -->
+                        <button onclick="openPublishModal()" class="ae-publish-action flex items-center space-x-2 bg-pitch-600 hover:bg-pitch-700 text-white text-xs font-bold uppercase tracking-wider">
+                            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                            <span>Publicar</span>
                         </button>
 
                         <!-- Logout Button -->
                         <button type="button" onclick="handleAdminLogout()" title="Cerrar sesión" aria-label="Cerrar sesión" class="ae-signout-action ae-classical-auth-button ae-classical-logout"><img class="ae-classical-auth-art" src="assets/ui/ae-logout-mark.png?v=20261016-3" width="96" height="96" alt="" aria-hidden="true" decoding="async"></button>
+
+                        <!-- Compact admin profile, mirroring the consumer layout -->
+                        <button type="button" class="ae-admin-profile" onclick="openAeProfile()" aria-label="Abrir mi perfil" title="Mi perfil">
+                            <img class="ae-admin-profile-art" src="assets/ui/ae-profile-mark.png?v=20261016-3" width="96" height="96" alt="" aria-hidden="true" decoding="async">
+                            <span id="adminNameDisplay">--</span>
+                        </button>
                     </div>
 
                 </div>
