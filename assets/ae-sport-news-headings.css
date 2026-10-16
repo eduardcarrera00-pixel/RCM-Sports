@@ -1,0 +1,8 @@
+/* AE SPORTS · Cabeceras editoriales de NFL y Fútbol
+   Mantenemos "Noticias de NFL / Noticias de Fútbol" sin la antefirma
+   "Crónicas · Actualidad". Aplica a escritorio y móvil, día y noche. */
+html body.ae-is-nfl #mainContent #aeNewsSectionTitle::before,
+html body.ae-is-football #mainContent #aeNewsSectionTitle::before {
+  content:none!important;
+  display:none!important;
+}
