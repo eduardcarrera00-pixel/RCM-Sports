@@ -178,7 +178,7 @@ async function loadModeration(){
        if(!confirm('¿'+text+' de este Pick?'))return;
        b.disabled=true;
        const result=await db.rpc('ae_moderate_community_pick',{p_pick_id:p.id,p_approve:approve});
-       $('cpAdminStatus').textContent=result.error?message(result.error):approve?'Pick aprobado. Ya se puede votar.':'Pick rechazado; el autor podrá verlo en su cuenta.';
+       $('cpAdminStatus').textContent=result.error?message(result.error):approve?'Pick aprobado. Los votos y comentarios siguen abiertos.':'Pick rechazado; el autor podrá verlo en su cuenta.';
        await load();
      });n.append(b);
    }
