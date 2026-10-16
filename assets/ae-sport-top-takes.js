@@ -14,11 +14,9 @@
    const list=$(id);if(!list)return;
    list.replaceChildren();
    for(const [i,t] of items.entries()) {
-     const li=el('li',undefined,'ae-sport-take-item');
-     li.append(el('span',String(i+1).padStart(2,'0'),'ae-top-take-number'));
+     const li=el('li',undefined,'ae-sport-take-item ae-sport-chef-entry');
+     const number=el('span',String(i+1).padStart(2,'0'),'ae-top-take-number');
      const content=el('div',undefined,'ae-top-take-content');
-     // El deporte ya se conoce por la sección. Mostramos sólo el autor,
-     // clicable para consultar su perfil, sin insignia ni recuadro.
      const meta=el('div',undefined,'ae-sport-take-meta');
      const author=el('button','@'+(t.author||'Aficionado'),'ae-top-take-author');
      author.type='button';
@@ -29,29 +27,33 @@
      meta.append(author);
      content.append(meta);
      const title=el('strong',undefined,'ae-sport-take-title');
-     const openTake=el('button',t.title,'ae-sport-take-open');
+     const openTake=el('button',t.title||'Ver Take','ae-sport-take-open');
      openTake.type='button';
-     openTake.setAttribute('aria-label','Leer Take y ver su conversación: '+t.title);
+     openTake.setAttribute('aria-label','Leer Take y ver su conversación: '+(t.title||'Publicación'));
      openTake.addEventListener('click',()=>window.aeTakeReplies?.open(t));
      title.append(openTake);
      content.append(title);
-     const excerpt=String(t.body||'').replace(/^NFL[^\n]*\n\n/,'').trim();
-     if(excerpt)content.append(el('p',excerpt.length>145?excerpt.slice(0,142).trimEnd()+'…':excerpt,'ae-sport-take-summary'));
-     const score=el('span',undefined,'ae-top-take-votes');
-     score.append(el('span','▲ '+Number(t.upvotes||0),'ae-top-take-up'),el('span','▼ '+Number(t.downvotes||0),'ae-top-take-down'));
+     const up=Number(t.upvotes||0),down=Number(t.downvotes||0);
+     const net=up-down;
+     const stats=el('div',undefined,'ae-sport-take-statline');
+     const score=el('span',(net>0?'+':'')+net+' votos netos','ae-sport-take-net');
+     score.setAttribute('title',up+' votos positivos · '+down+' negativos');
+     score.setAttribute('aria-label',up+' votos positivos, '+down+' negativos, balance '+net);
      const reply=el('button','Responder','ae-top-take-reply');
      reply.type='button';
-     reply.setAttribute('aria-label','Responder al Take: '+t.title);
+     reply.setAttribute('aria-label','Responder al Take: '+(t.title||'Publicación'));
      reply.addEventListener('click',()=>window.aeTakeReplies?.open(t,{focusComposer:true}));
-     score.append(reply);
-     content.append(score);
-     li.append(content);
+     stats.append(score,reply);
+     content.append(stats);
+     li.append(number,content);
      li.addEventListener('click',event=>{
        if(!event.target.closest('button'))window.aeTakeReplies?.open(t);
      });
      list.append(li);
    }
-   if(!items.length)list.append(el('li',mode==='up'?'Todavía no hay Takes con votos positivos.':'Todavía no hay Takes con votos negativos.','ae-top-takes-empty'));
+   if(!items.length)list.append(el('li',mode==='up'?
+     'Aún no hay Takes con votos netos positivos.':
+     'Aún no hay Takes con votos netos negativos.','ae-top-takes-empty'));
  }
  async function refresh(force=false) {
    const section=typeof currentCategory==='undefined'?'':currentCategory;
@@ -60,12 +62,11 @@
    const sport=section==='NFL'?'nfl':section==='Fútbol'?'football':'';
    root.hidden=!sport;voices.hidden=!!sport;
    root.dataset.sport=sport;
-   if(!sport){current='';return;}
+   if(!sport){current='';request++;return;}
    // Los destacados deportivos tienen nombres propios; los de portada
    // (#aeTopTakesPositiveTitle / #aeTopTakesNegativeTitle) no se modifican.
    $('aeSportGeniosTitle').textContent=sport==='nfl'?'NFL Savant':'Respira fútbol';
    $('aeSportAnoetosTitle').textContent=sport==='nfl'?'NFL Rookie':'Vende Humos';
-   $('aeSportTakeTitle').textContent='Takes históricos';
    if(!force&&sport===current&&Date.now()-lastRun<15000)return;
    current=sport;
    const seq=++request;const status=$('aeSportTakeStatus');
@@ -76,14 +77,23 @@
      if(r.error)throw r.error;
      if(seq!==request||current!==sport)return;
      const data=(r.data||[]).filter(t=>sport==='nfl'?t.sport==='nfl':footballSports.has(t.sport));
-     const positive=data.filter(t=>Number(t.upvotes)>0).sort((a,b)=>Number(b.upvotes)-Number(a.upvotes)||Number(a.downvotes)-Number(b.downvotes)||new Date(b.created_at)-new Date(a.created_at)).slice(0,3);
-     const negative=data.filter(t=>Number(t.downvotes)>0).sort((a,b)=>Number(b.downvotes)-Number(a.downvotes)||Number(a.upvotes)-Number(b.upvotes)||new Date(b.created_at)-new Date(a.created_at)).slice(0,3);
+     const net=t=>Number(t.upvotes||0)-Number(t.downvotes||0);
+     const positive=data.filter(t=>net(t)>0)
+       .sort((a,b)=>net(b)-net(a)||Number(b.upvotes||0)-Number(a.upvotes||0)||new Date(b.created_at)-new Date(a.created_at)).slice(0,3);
+     const negative=data.filter(t=>net(t)<0)
+       .sort((a,b)=>net(a)-net(b)||Number(b.downvotes||0)-Number(a.downvotes||0)||new Date(b.created_at)-new Date(a.created_at)).slice(0,3);
      renderList('aeSportTakePositive',positive,'up');
      renderList('aeSportTakeNegative',negative,'down');
      status.textContent='Clasificación según los votos de Takes de '+(sport==='nfl'?'NFL.':'Fútbol.');
      lastRun=Date.now();
    }catch(e){
-     if(seq===request)status.textContent='No se pudieron cargar los Takes destacados.';
+     if(seq===request){
+       status.textContent='No se pudieron cargar los Takes destacados.';
+       for(const id of ['aeSportTakePositive','aeSportTakeNegative']){
+         const list=$(id);
+         if(list)list.replaceChildren(el('li','No pudimos cargar la clasificación.','ae-top-takes-empty'));
+       }
+     }
    }
  }
  window.refreshAeSportTopTakes=refresh;
