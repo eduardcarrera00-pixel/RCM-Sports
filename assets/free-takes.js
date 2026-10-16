@@ -3,7 +3,7 @@
  'use strict';
  const $ = id => document.getElementById(id);
  const sports = {all:'Todos',general:'Deporte en general',laliga:'LaLiga',premier:'Premier League',ligamx:'Liga MX',champions:'Champions League',nfl:'NFL',colegial:'Fútbol colegial'};
- let items = [], filter = 'all', busy = false, request = 0, activeSection = '';
+ let items = [], filter = 'all', busy = false, request = 0, activeSection = '', showAll = false;
  const footballSports=new Set(['laliga','premier','ligamx','champions']);
  function el(tag,text,cls){const n=document.createElement(tag);if(text!==undefined&&text!==null)n.textContent=String(text);if(cls)n.className=cls;return n;}
  function button(label,fn,cls='ae-take-button'){const n=el('button',label,cls);n.type='button';n.onclick=fn;return n;}
@@ -23,7 +23,9 @@
      area.append(el('p',text,'ae-take-empty'));
      return;
    }
-   for(const t of sorted){
+   const more=$('freeTakesMore');
+   if(more){more.hidden=showAll||sorted.length<=5;more.textContent='Ver todos los Takes ('+sorted.length+') →';}
+   for(const t of (showAll?sorted:sorted.slice(0,5))){
      const card=el('article',null,'ae-take-card ae-free-take-card');
      // Acento basado exclusivamente en el deporte real; no altera contenido ni votos.
      card.dataset.sport=Object.prototype.hasOwnProperty.call(sports,t.sport)?t.sport:'general';
@@ -132,7 +134,7 @@
      sport.value=nfl?'nfl':'laliga';
      select.value=filter;
    }
-   if(changed){items=[];load();}
+   if(changed){items=[];showAll=false;load();}
    else if(!items.length && !busy)load();
  }
  window.renderFreeTakesVisibility=visibility;
@@ -149,6 +151,7 @@
  };
  document.addEventListener('DOMContentLoaded',()=>{
    $('freeTakesForm')?.addEventListener('submit',create);
+   $('freeTakesMore')?.addEventListener('click',()=>{showAll=true;render();});
    $('aeSportTakePublish')?.addEventListener('click',()=>window.aeOpenTakeComposer());
    $('aeTakeComposePanel')?.addEventListener('toggle',event=>{
      $('aeSportTakePublish')?.setAttribute('aria-expanded',String(event.currentTarget.open));
