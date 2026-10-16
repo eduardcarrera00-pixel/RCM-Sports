@@ -160,10 +160,10 @@ html body :is(
   .ae-sport-take-item,.ae-free-take-card,.ae-take-card,
   .ae-takes-head,.ae-free-compose,.ae-compose-disclosure,
   .ae-picks-feed,.ae-picks-layout,.ae-picks-feature,.ae-picks-small-top,
-  .ae-chef-board,.ae-picks-news,.ae-picks-rail>.ae-takes-side,
+  .ae-chef-board,.ae-picks-rail>.ae-takes-side,
   .cp-card,.cp-dialog,.ae-take-button,
   .ae-participate-cta,.ae-picks-publish-cta,.ae-home-take-publish,
-  .ae-profile-dialog,.ae-profile-item,.ae-news-archive-card,
+  .ae-profile-dialog,.ae-profile-item,
   .ae-news-archive-dialog,.ae-news-archive-close,
   .ae-picks-jump a,.ae-picks-rail .ae-takes-tabs button
 ){border-radius:0!important;}
@@ -177,4 +177,10 @@ html body #nflRankings,html body #championsRankings{
 @media(max-width:670px){
  html body #cpArchiveFeed{grid-template-columns:1fr!important;}
  html body #cpArchiveDialog.ae-picks-archive-dialog{max-height:93dvh!important;}
+}
+
+/* Excepciones visuales que el proyecto conserva curvas: última noticia, Lo más leído y Power Rankings. */
+html body #footballTakes #picksNews .ae-picks-news-feature,
+html body #footballTakes #picksNews .ae-picks-news-feature .ae-picks-news-open{
+ border-radius:9px!important;
 }
