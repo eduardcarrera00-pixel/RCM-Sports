@@ -1,0 +1,87 @@
+/* AE SPORTS · Tipografía ORIGINAL extraída de la imagen facilitada.
+   El atleta no se modifica; el wordmark es un archivo independiente sin
+   la A antigua, y se alinea verticalmente con la mitad de su figura. */
+html body header a.ae-brand.ae-brand-gold.ae-brand-runner-clean,
+html body footer a.ae-footer-gold-brand.ae-brand-runner-clean{
+  display:flex!important;
+  flex-direction:row!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  box-sizing:border-box!important;
+  overflow:visible!important;
+  text-decoration:none!important;
+  background:transparent!important;
+}
+html body header a.ae-brand.ae-brand-gold.ae-brand-runner-clean{
+  gap:clamp(12px,1.35vw,19px)!important;
+}
+html body footer a.ae-footer-gold-brand.ae-brand-runner-clean{
+  gap:clamp(15px,1.6vw,23px)!important;
+}
+/* Preserve the original emblem, its proportions and transparency. */
+html body header a.ae-brand-runner-clean .ae-runner-symbol,
+html body footer a.ae-brand-runner-clean .ae-runner-symbol{
+  flex:0 0 24%!important;
+  width:24%!important;
+  max-width:24%!important;
+  height:auto!important;
+  aspect-ratio:1!important;
+  object-fit:contain!important;
+  transform:none!important;
+}
+html body header a.ae-brand-runner-clean .ae-runner-wordmark,
+html body footer a.ae-brand-runner-clean .ae-runner-wordmark{
+  position:static!important;
+  display:flex!important;
+  flex:1 1 0%!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  box-sizing:border-box!important;
+  min-width:0!important;
+  min-height:0!important;
+  width:auto!important;
+  height:auto!important;
+  max-width:none!important;
+  aspect-ratio:auto!important;
+  padding:0!important;
+  margin:0!important;
+  overflow:visible!important;
+  background:none!important;
+  transform:translateY(-1px)!important;
+}
+html body header a.ae-brand-runner-clean .ae-original-gold-wordmark,
+html body footer a.ae-brand-runner-clean .ae-original-gold-wordmark{
+  display:block!important;
+  width:100%!important;
+  min-width:0!important;
+  max-width:100%!important;
+  height:auto!important;
+  max-height:none!important;
+  aspect-ratio:5/1!important;
+  margin:0!important;
+  padding:0!important;
+  object-fit:contain!important;
+  object-position:center center!important;
+  background:transparent!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  transform:none!important;
+  filter:drop-shadow(0 1px 3px rgba(0,13,24,.32))!important;
+}
+html:not(.dark) body header a.ae-brand-runner-clean .ae-original-gold-wordmark{
+  filter:drop-shadow(0 1px 1px rgba(24,39,44,.25))!important;
+}
+@media(max-width:640px){
+  html body header a.ae-brand.ae-brand-gold.ae-brand-runner-clean{
+    gap:clamp(8px,2vw,12px)!important;
+  }
+  html body footer a.ae-footer-gold-brand.ae-brand-runner-clean{
+    gap:12px!important;
+  }
+}
+@media(max-width:395px){
+  html body header a.ae-brand.ae-brand-gold.ae-brand-runner-clean{
+    gap:8px!important;
+  }
+}
