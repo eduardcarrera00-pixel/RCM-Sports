@@ -52,15 +52,16 @@ function card(p,compact=false){
  n.append(odds);
  if(p.explanation)n.append(el('p',p.explanation,'cp-explanation'));
  const controls=el('div',null,'cp-actions');
- if(p.moderation_status==='approved'&&isActive(p)){
-  for(const [value,label,count] of [[1,'▲',p.upvotes],[-1,'▼',p.downvotes]]){
-    const b=button(label+' '+Number(count||0),()=>vote(p,value,b));
-    b.setAttribute('aria-label',(value===1?'Apoyar':'Cuestionar')+' Pick de '+(p.author||'la comunidad'));
-    b.setAttribute('aria-pressed',String(Number(p.my_vote)===value));
-    controls.append(b);
-  }
+ const canVote=p.moderation_status==='approved'&&isActive(p);
+ for(const [value,label,count] of [[1,'▲',p.upvotes],[-1,'▼',p.downvotes]]){
+   const b=button(label+' '+Number(count||0),()=>vote(p,value,b));
+   b.classList.add(value===1?'cp-upvote':'cp-downvote');
+   b.setAttribute('aria-label',(value===1?'Voto positivo':'Voto negativo')+' para el Pick de '+(p.author||'la comunidad'));
+   b.setAttribute('aria-pressed',String(Number(p.my_vote)===value));
+   b.disabled=!canVote;
+   if(!canVote)b.title=p.moderation_status==='pending'?'Votación disponible tras la revisión del Pick':'Votación cerrada';
+   controls.append(b);
  }
- controls.append(el('span','Balance '+Number(p.score||0),'cp-vote-score'));
  controls.append(button('Respuestas · '+Number(p.comments_count||0),()=>open(p.id)));
  n.append(controls);
  if(typeof currentAdmin!=='undefined'&&currentAdmin&&!compact){
@@ -265,7 +266,14 @@ function buildComposer(){
  addRow();form.append(legs,add,output,el('p','Una publicación al día (Toronto). Elige el día del evento: al terminar desaparecerá de los Picks activos y seguirá en el historial. La cuota y el resultado se verifican por separado. No podrás editar el Pick.','cp-meta'));
  const confirm=el('label','He revisado las selecciones y la cuota.');const checkbox=el('input');checkbox.type='checkbox';checkbox.required=true;confirm.prepend(checkbox);form.append(confirm);
  const submit=el('button','Publicar Pick');submit.type='submit';form.append(submit,status);form.addEventListener('input',calculate);
- form.onsubmit=async e=>{e.preventDefault();if(posting)return;status.textContent='';try{const user=await account();if(!user)return;if(!calculate())throw Error('Revisa la cuota americana y las selecciones.');posting=true;submit.disabled=true;const r=await db.from('ae_community_picks').insert({title:title.input.value.trim(),explanation:explanation.input.value.trim(),legs:values(),event_date:eventDay.input.value}).select('id').single();if(r.error)throw r.error;form.reset();calculate();await load();status.textContent='Pick enviado. AE SPORTS revisará tu cuota antes de recibir votos.';await load();}catch(e){status.textContent=message(e);}finally{posting=false;submit.disabled=false;}};
+ form.onsubmit=async e=>{e.preventDefault();if(posting)return;status.textContent='';try{const user=await account();if(!user)return;if(!calculate())throw Error('Revisa la cuota americana y las selecciones.');posting=true;submit.disabled=true;const r=await db.from('ae_community_picks').insert({title:title.input.value.trim(),explanation:explanation.input.value.trim(),legs:values(),event_date:eventDay.input.value}).select('id').single();if(r.error)throw r.error;form.reset();calculate();
+ const panel=$('cpComposePanel');
+ if(panel)panel.open=false;
+ $('cpPublishCta')?.setAttribute('aria-expanded','false');
+ if(typeof filterByCategory==='function')filterByCategory('Picks');
+ await load();
+ notifyCommunity('Pick publicado. Tu cuota está en revisión; los votos se habilitarán al aprobarla.');
+ $('communityPicks')?.scrollIntoView({behavior:'smooth',block:'start'});}catch(e){status.textContent=message(e);}finally{posting=false;submit.disabled=false;}};
  calculate();
 }
 async function loadArchive(){
