@@ -1,0 +1,65 @@
+/* AE SPORTS — Iconografía dorada y azul a escala editorial.
+   Solo afecta a los seis iconos personalizados de navegación y tema:
+   Picks, NFL, Fútbol, Colegial, sol y luna. No modifica el atleta ni la marca. */
+html body>header .ae-sport-nav .category-btn .ae-nav-icon img.ae-custom-sport-icon{
+  display:block!important;
+  width:22px!important;
+  height:22px!important;
+  min-width:0!important;
+  min-height:0!important;
+  max-width:22px!important;
+  max-height:22px!important;
+  margin:0!important;
+  padding:0!important;
+  flex:0 0 auto!important;
+  object-fit:contain!important;
+  object-position:center!important;
+  opacity:.84!important;
+  filter:brightness(.80) saturate(.77) contrast(.96)!important;
+  box-shadow:none!important;
+  transition:filter .16s ease,opacity .16s ease!important;
+}
+html body>header #themeToggle img.ae-custom-theme-icon{
+  display:block!important;
+  width:23px!important;
+  height:23px!important;
+  min-width:0!important;
+  min-height:0!important;
+  max-width:23px!important;
+  max-height:23px!important;
+  margin:0!important;
+  padding:0!important;
+  object-fit:contain!important;
+  object-position:center!important;
+  opacity:.84!important;
+  filter:brightness(.80) saturate(.77) contrast(.96)!important;
+  box-shadow:none!important;
+  transition:filter .16s ease,opacity .16s ease!important;
+}
+/* Recupera un poco de presencia al pasar el cursor o seleccionar la sección,
+   sin llegar al brillo anterior. */
+html body>header .ae-sport-nav .category-btn:is(:hover,.active,:focus-visible) .ae-nav-icon img.ae-custom-sport-icon,
+html body>header #themeToggle:is(:hover,:focus-visible) img.ae-custom-theme-icon{
+  opacity:.95!important;
+  filter:brightness(.91) saturate(.88) contrast(.98)!important;
+}
+@media(max-width:640px){
+  html body>header .ae-sport-nav .category-btn .ae-nav-icon img.ae-custom-sport-icon{
+    width:19px!important;
+    height:19px!important;
+    max-width:19px!important;
+    max-height:19px!important;
+  }
+  html body>header #themeToggle img.ae-custom-theme-icon{
+    width:21px!important;
+    height:21px!important;
+    max-width:21px!important;
+    max-height:21px!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  html body>header .ae-sport-nav .category-btn .ae-nav-icon img.ae-custom-sport-icon,
+  html body>header #themeToggle img.ae-custom-theme-icon{
+    transition:none!important;
+  }
+}
