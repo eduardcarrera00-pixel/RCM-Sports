@@ -40,8 +40,12 @@
     if(article.image){
       const img=element('img');img.src=article.image;
       const pos=key=>{const n=Number(article?.[key]);return Number.isFinite(n)?Math.max(0,Math.min(100,n)):50;};
-      img.style.setProperty('--ae-image-focus',pos('image_focus_x')+'% '+pos('image_focus_y')+'%');
-      img.style.setProperty('object-fit',article?.image_zoom===false?'contain':'cover','important');
+      const focus=pos('image_focus_x')+'% '+pos('image_focus_y')+'%';
+      const zoom=Number(article?.image_zoom_pct);
+      const zoomPct=Number.isFinite(zoom)?Math.max(1,Math.min(300,Math.round(zoom))):100;
+      img.style.setProperty('--ae-image-focus',focus);
+      img.style.transformOrigin=focus;
+      img.style.transform='scale('+(zoomPct/100)+')';
       img.alt='';img.loading='lazy';img.decoding='async';
       img.addEventListener('error',()=>img.remove());
       link.append(img);
