@@ -1,0 +1,43 @@
+/* AE SPORTS — geometría editorial completamente recta
+   Oct 2026. El pedido actual incluye también los Power Rankings, la última
+   noticia y Lo más leído, que antes conservaban esquinas redondeadas.
+   No altera imágenes, dimensiones, funcionalidad ni reglas de datos.
+
+   Layer: las declaraciones !important de esta capa se imponen a los
+   overrides !important sin capas cargados previamente, aunque tengan
+   selectores más específicos. La regla anterior sirve de respaldo para
+   navegadores o hojas que no utilicen capas. */
+
+html,
+html body,
+html body *,
+html body *::before,
+html body *::after{
+  border-radius:0!important;
+}
+
+@layer ae-editorial-square-corners {
+  html,
+  html body,
+  html body *,
+  html body *::before,
+  html body *::after{
+    border-radius:0!important;
+  }
+}
+
+/* Respaldo de especificidad para zonas centrales, incluidos los elementos
+   del banner, los previews y los tickers con selectores ID antiguos.
+   Los logos permanecen visibles: sólo se rectifica su marco CSS. */
+html.dark body :is(#heroSection,#articlesGrid,#moreArticlesGrid,#editorialBottom,
+  #homeRankingLink,#homeChampionsLink,#nflRankings,#championsRankings,
+  #footballTakes,#freeTakes,#aeSportTakeLeaders,#aeTopTakes,
+  #cpArchiveDialog,#aeNewsArchiveDialog,#aeProfileDialog,
+  #articleModal,#userAuthModal,#publishModal) *,
+html:not(.dark) body :is(#heroSection,#articlesGrid,#moreArticlesGrid,#editorialBottom,
+  #homeRankingLink,#homeChampionsLink,#nflRankings,#championsRankings,
+  #footballTakes,#freeTakes,#aeSportTakeLeaders,#aeTopTakes,
+  #cpArchiveDialog,#aeNewsArchiveDialog,#aeProfileDialog,
+  #articleModal,#userAuthModal,#publishModal) *{
+  border-radius:0!important;
+}
