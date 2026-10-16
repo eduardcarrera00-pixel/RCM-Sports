@@ -325,171 +325,183 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/ae-mobile-home-takes-swipe-and-football-news.css?v=20261016-top3-swipe-v1">
 <link rel="stylesheet" href="assets/ae-article-floating-close.css?v=20261016-1">
 <style id="ae-home-weekly-reference-mobile">
-/* Mobile home: use the same editorial photo treatment as the Picks tab.
-   Applied last to neutralize legacy solid-card rules without touching other sections. */
+/* Mobile AE SPORTS home: faithful equivalent of the Picks weekly feature.
+   The same expandable weekly card is rendered by ae-editorial-weekly.js.
+   Keep all overrides scoped to HOME MOBILE only. */
 @media (max-width:760px) {
-  html body.ae-is-home #mainContent > .editorial-pick:not([hidden]) {
-    position:relative!important; isolation:isolate!important; display:block!important;
-    box-sizing:border-box!important; width:100%!important; min-width:0!important;
-    max-width:none!important; min-height:265px!important; height:auto!important;
-    margin:0 0 14px!important; padding:17px 15px 18px!important; overflow:hidden!important;
-    border:1px solid #bd926b!important; border-radius:0!important;
-    background:#092638!important; box-shadow:0 5px 20px rgba(2,12,22,.15)!important;
+  html body.ae-is-home #mainContent > .editorial-pick:not([hidden]),
+  html.dark body.ae-is-home #mainContent > .editorial-pick:not([hidden]) {
+    display:block!important; position:relative!important; isolation:isolate!important;
+    box-sizing:border-box!important; width:100%!important; max-width:none!important; min-width:0!important;
+    min-height:235px!important; height:auto!important; margin:0 0 12px!important;
+    padding:18px 17px 17px!important; overflow:hidden!important;
+    border:1px solid rgba(190,155,124,.61)!important; border-radius:0!important;
+    background:#0d2738!important; box-shadow:none!important; color:#fff1e3!important;
   }
   html body.ae-is-home #mainContent > .editorial-pick[hidden] {display:none!important}
+  /* Picks uses one fine edge, not the glowing double ornamental frame. */
+  html body.ae-is-home #mainContent > .editorial-pick::after {
+    content:none!important; display:none!important; border:0!important; box-shadow:none!important;
+  }
+  /* Same real published banner, softly blurred and veiled like the Picks tab. */
   html body.ae-is-home #mainContent > .editorial-pick.ae-home-weekly-banner > img.ae-weekly-home-banner {
-    display:block!important; position:absolute!important; inset:0!important;
-    z-index:0!important; width:100%!important; height:100%!important;
-    min-height:100%!important; max-height:none!important; margin:0!important;
+    display:block!important; position:absolute!important; z-index:0!important;
+    inset:0!important; width:100%!important; height:100%!important;
+    min-height:100%!important; max-height:none!important; margin:0!important; padding:0!important;
     object-fit:cover!important; object-position:var(--ae-image-focus,center)!important;
-    opacity:.86!important; filter:none!important; -webkit-filter:none!important;
-    transform:none!important; pointer-events:none!important;
+    opacity:.84!important; filter:blur(5px) saturate(.88)!important;
+    -webkit-filter:blur(5px) saturate(.88)!important;
+    transform:scale(1.045)!important; transform-origin:center!important;
+    pointer-events:none!important;
   }
   html body.ae-is-home #mainContent > .editorial-pick.ae-home-weekly-banner::before {
-    content:""!important; display:block!important; position:absolute!important; z-index:1!important;
-    inset:0!important; pointer-events:none!important;
-    background:linear-gradient(95deg,rgba(5,23,36,.91) 0%,rgba(6,24,38,.82) 37%,rgba(7,25,37,.52) 72%,rgba(7,24,36,.35) 100%)!important;
+    content:""!important; display:block!important; position:absolute!important;
+    inset:0!important; z-index:1!important; pointer-events:none!important;
+    background:linear-gradient(95deg,rgba(9,35,51,.98) 0%,rgba(9,35,51,.93) 38%,rgba(9,35,51,.71) 67%,rgba(9,35,51,.46) 100%)!important;
   }
-  html body.ae-is-home #mainContent > .editorial-pick::after {
-    content:""!important; position:absolute!important; display:block!important;
-    inset:5px!important; z-index:5!important; border:1px solid rgba(220,177,127,.29)!important;
-    border-radius:0!important; box-shadow:none!important; pointer-events:none!important;
-  }
-  html body.ae-is-home #mainContent > .editorial-pick > h2#weeklyPickTitle {
-    position:relative!important; z-index:3!important; display:flex!important;
-    flex-direction:column!important; align-items:flex-start!important; justify-content:flex-start!important;
-    box-sizing:border-box!important; width:calc(100% - 76px)!important;
-    margin:0 0 14px!important; padding:0!important; border:0!important;
-    background:transparent!important; color:#fff0e2!important;
-    font:600 clamp(25px,7vw,32px)/1.08 Newsreader,Georgia,serif!important;
-    letter-spacing:-.025em!important; text-shadow:0 2px 8px rgba(1,12,23,.45)!important;
+  html body.ae-is-home #mainContent > .editorial-pick > h2#weeklyPickTitle,
+  html.dark body.ae-is-home #mainContent > .editorial-pick > h2#weeklyPickTitle {
+    display:flex!important; flex-direction:column!important; align-items:flex-start!important;
+    justify-content:flex-start!important; position:relative!important; z-index:3!important;
+    box-sizing:border-box!important; width:100%!important; min-width:0!important;
+    margin:0 0 14px!important; padding:0 0 18px!important;
+    border:0!important; border-bottom:1px solid rgba(207,176,144,.24)!important;
+    border-radius:0!important; background:transparent!important;
+    color:#fff0e1!important; text-shadow:none!important;
+    font:600 clamp(24px,6.7vw,30px)/1.09 Newsreader,Georgia,serif!important;
+    letter-spacing:-.02em!important;
   }
   html body.ae-is-home #mainContent > .editorial-pick > h2#weeklyPickTitle::before {
     content:"LA SELECCIÓN EDITORIAL DE AE SPORTS"!important; display:block!important;
-    margin:0 0 8px!important; padding:0!important;
-    color:#e5bc90!important; font:750 8px/1.3 Inter,system-ui,sans-serif!important;
-    letter-spacing:.14em!important; text-transform:uppercase!important; text-shadow:none!important;
+    width:100%!important; margin:0 0 7px!important; padding:0!important;
+    color:#e7b98d!important; font:800 9px/1.25 Inter,system-ui,sans-serif!important;
+    letter-spacing:.14em!important; text-transform:uppercase!important;
+    text-shadow:none!important;
   }
+  /* In Picks there is no second CTA in the upper corner. */
   html body.ae-is-home #mainContent > .editorial-pick > .ae-home-weekly-more {
-    position:absolute!important; z-index:6!important; display:inline-flex!important;
-    top:40px!important; right:16px!important; left:auto!important;
-    align-items:center!important; width:auto!important; min-height:28px!important;
-    padding:3px 0!important; margin:0!important;
-    background:transparent!important; border:0!important; color:#f0c392!important;
-    font:700 11px/1.2 Inter,system-ui,sans-serif!important;
-    text-shadow:0 1px 5px rgba(2,13,23,.4)!important;
+    display:none!important;
   }
+  /* Remove leftover boxes and blue surfaces from the old home preview. */
   html body.ae-is-home #mainContent > .editorial-pick > .editorial-pick-body,
   html.dark body.ae-is-home #mainContent > .editorial-pick > .editorial-pick-body,
   html body.ae-is-home #mainContent > .editorial-pick #cpWeekly,
-  html body.ae-is-home #mainContent > .editorial-pick #cpWeekly > article.ae-weekly-preview,
-  html.dark body.ae-is-home #mainContent > .editorial-pick #cpWeekly > article.ae-weekly-preview {
-    position:relative!important; z-index:3!important; display:block!important;
-    box-sizing:border-box!important; width:100%!important; min-width:0!important;
-    min-height:0!important; height:auto!important; max-height:none!important;
-    margin:0!important; padding:0!important; border:0!important; border-radius:0!important;
+  html body.ae-is-home #mainContent > .editorial-pick #cpWeekly > .ae-weekly-card {
+    display:block!important; position:relative!important; z-index:3!important;
+    box-sizing:border-box!important; min-width:0!important; width:100%!important;
+    min-height:0!important; max-height:none!important; height:auto!important;
+    margin:0!important; padding:0!important; overflow:visible!important;
     background:none!important; background-color:transparent!important; background-image:none!important;
-    box-shadow:none!important; overflow:visible!important;
+    border:0!important; border-radius:0!important; box-shadow:none!important;
     backdrop-filter:none!important; -webkit-backdrop-filter:none!important;
-  }
-  html body.ae-is-home #mainContent > .editorial-pick > .editorial-pick-body {
-    padding-top:13px!important; border-top:1px solid rgba(224,187,139,.30)!important;
+    color:#fff1e3!important;
   }
   html body.ae-is-home #mainContent > .editorial-pick .editorial-eyebrow {display:none!important}
-  html body.ae-is-home #mainContent > .editorial-pick #cpWeekly > article.ae-weekly-preview {
-    display:flex!important; flex-direction:column!important; align-items:stretch!important;
-    gap:9px!important; cursor:pointer!important; isolation:isolate!important;
+  html body.ae-is-home #mainContent > .editorial-pick #cpWeekly .ae-weekly-expandable {
+    display:block!important; width:100%!important; max-width:100%!important; min-width:0!important;
+    margin:0!important; padding:0!important; border:0!important;
+    background:transparent!important; box-shadow:none!important;
   }
-  html body.ae-is-home #mainContent > .editorial-pick #cpWeekly .ae-weekly-preview > :not(img) {
-    position:relative!important; z-index:3!important; box-sizing:border-box!important;
-    grid-column:auto!important; grid-row:auto!important;
-    width:100%!important; max-width:100%!important; min-width:0!important;
-    margin-left:0!important; margin-right:0!important; text-align:left!important;
+  html body.ae-is-home #mainContent > .editorial-pick #cpWeekly .ae-weekly-expand-summary {
+    display:grid!important; position:relative!important;
+    grid-template-columns:minmax(0,1fr) max-content!important;
+    grid-template-areas:"title title" "selection odds" "hint hint"!important;
+    column-gap:10px!important; row-gap:8px!important;
+    justify-items:start!important; align-items:center!important;
+    list-style:none!important; width:100%!important; min-width:0!important;
+    min-height:0!important; max-height:none!important; height:auto!important;
+    margin:0!important; padding:0!important; border:0!important;
+    background:transparent!important; box-shadow:none!important; color:#fff0e3!important;
+    cursor:pointer!important;
   }
-  html body.ae-is-home #mainContent > .editorial-pick #cpWeekly .ae-weekly-title {
-    display:block!important; overflow-wrap:anywhere!important;
-    margin:0!important; padding:0!important; color:#fff1e2!important;
-    font:600 clamp(20px,5.8vw,26px)/1.13 Newsreader,Georgia,serif!important;
-    letter-spacing:-.018em!important; text-shadow:0 2px 7px rgba(0,12,21,.48)!important;
+  html body.ae-is-home #mainContent > .editorial-pick #cpWeekly .ae-weekly-expand-summary::-webkit-details-marker {display:none!important}
+  html body.ae-is-home #mainContent > .editorial-pick #cpWeekly .ae-weekly-expand-summary::marker {content:""!important}
+  html body.ae-is-home #mainContent > .editorial-pick #cpWeekly .ae-weekly-expand-summary > .ae-weekly-title {
+    grid-area:title!important; display:block!important; box-sizing:border-box!important;
+    width:100%!important; min-width:0!important; max-width:100%!important;
+    margin:0 0 1px!important; padding:0!important; overflow-wrap:anywhere!important;
+    color:#fff3e7!important; text-shadow:0 1px 5px rgba(1,11,19,.30)!important;
+    font:600 clamp(20px,5.8vw,25px)/1.13 Newsreader,Georgia,serif!important;
+    letter-spacing:-.018em!important;
   }
-  html body.ae-is-home #mainContent > .editorial-pick #cpWeekly .ae-weekly-event {
-    display:block!important; margin:0!important; padding:0!important;
-    color:#e7dfd5!important; font:500 12px/1.4 Inter,system-ui,sans-serif!important;
-    text-shadow:0 1px 5px rgba(1,13,24,.5)!important;
-  }
-  html body.ae-is-home #mainContent > .editorial-pick #cpWeekly .ae-weekly-selection {
-    display:flex!important; flex-flow:row wrap!important; align-items:flex-start!important;
-    justify-content:space-between!important; gap:9px 12px!important; width:100%!important;
-    margin:0!important; padding:0!important; min-width:0!important;
-  }
-  html body.ae-is-home #mainContent > .editorial-pick #cpWeekly .ae-weekly-selection strong {
-    display:block!important; flex:1 1 175px!important; width:auto!important; min-width:0!important;
-    color:#fff1e2!important; font:500 12px/1.45 Inter,system-ui,sans-serif!important;
-    text-shadow:0 1px 5px rgba(1,14,24,.45)!important;
+  html body.ae-is-home #mainContent > .editorial-pick #cpWeekly .ae-weekly-compact-selection {
+    grid-area:selection!important; display:block!important; min-width:0!important;
+    max-width:100%!important; width:auto!important; margin:0!important; padding:0!important;
+    color:#f6eee4!important; font:500 12px/1.45 Inter,system-ui,sans-serif!important;
     overflow-wrap:anywhere!important; white-space:normal!important;
+    text-shadow:0 1px 4px rgba(2,14,23,.35)!important;
   }
   html body.ae-is-home #mainContent > .editorial-pick #cpWeekly .ae-weekly-odds {
-    display:inline-flex!important; flex:0 0 auto!important; align-self:flex-start!important;
-    width:auto!important; min-height:28px!important; margin:0!important; padding:5px 9px!important;
-    border:1px solid rgba(222,171,117,.72)!important; border-radius:0!important;
-    background:rgba(142,91,56,.90)!important; color:#fff4e9!important;
-    font:750 11px/1.2 Inter,system-ui,sans-serif!important; white-space:nowrap!important;
+    grid-area:odds!important; display:inline-flex!important; align-items:center!important;
+    justify-self:end!important; align-self:center!important;
+    min-height:27px!important; width:auto!important; max-width:none!important;
+    margin:0!important; padding:5px 9px!important;
+    border:1px solid rgba(217,166,118,.63)!important; border-radius:0!important;
+    background:#866146!important; color:#fff2e5!important; box-shadow:none!important;
+    font:800 11px/1.15 Inter,system-ui,sans-serif!important; white-space:nowrap!important;
   }
-  html body.ae-is-home #mainContent > .editorial-pick #cpWeekly .ae-weekly-link {
-    display:inline-flex!important; align-items:center!important; align-self:flex-start!important;
-    width:auto!important; min-height:30px!important; margin:4px 0 0!important; padding:0!important;
-    border:0!important; background:transparent!important; color:#f5ca98!important;
-    font:700 12px/1.25 Inter,system-ui,sans-serif!important;
-    text-decoration:underline!important; text-underline-offset:4px!important;
+  html body.ae-is-home #mainContent > .editorial-pick #cpWeekly .ae-weekly-expand-hint {
+    grid-area:hint!important; display:inline-flex!important; align-items:center!important;
+    justify-self:start!important; width:auto!important;
+    margin:2px 0 0!important; padding:0!important; border:0!important;
+    color:#e5ba8d!important; background:transparent!important;
+    font:750 12px/1.35 Inter,system-ui,sans-serif!important; text-decoration:none!important;
+    white-space:normal!important;
   }
-  html body.ae-is-home #mainContent > .editorial-pick.ae-home-weekly-banner #cpWeekly .ae-weekly-preview > img {
-    display:none!important;
+  html body.ae-is-home #mainContent > .editorial-pick #cpWeekly .ae-weekly-expand-summary:focus-visible {
+    outline:2px solid #eabf8b!important; outline-offset:5px!important;
   }
-  /* For picks without a banner, use their publication photo behind the text. */
-  html body.ae-is-home #mainContent > .editorial-pick:not(.ae-home-weekly-banner) #cpWeekly .ae-weekly-preview:has(>img) {
-    overflow:hidden!important; min-height:190px!important; padding:9px!important;
+  /* Expanded content uses the exact same title, photo and data as Picks. */
+  html body.ae-is-home #mainContent > .editorial-pick #cpWeekly .ae-weekly-expanded-content {
+    display:block!important; margin:14px 0 0!important; padding:12px 0 2px!important;
+    border-top:1px solid rgba(218,176,133,.28)!important; background:transparent!important;
+    color:#eee6dd!important;
   }
-  html body.ae-is-home #mainContent > .editorial-pick:not(.ae-home-weekly-banner) #cpWeekly .ae-weekly-preview > img {
-    display:block!important; position:absolute!important; inset:0!important; z-index:0!important;
-    width:100%!important; height:100%!important; min-height:100%!important; max-height:none!important;
-    object-fit:cover!important; object-position:var(--ae-image-focus,center)!important;
-    opacity:.85!important; filter:none!important; -webkit-filter:none!important;
-    transform:none!important; pointer-events:none!important;
+  html body.ae-is-home #mainContent > .editorial-pick #cpWeekly .ae-weekly-inline-photo {
+    display:block!important; width:100%!important; height:auto!important; max-height:210px!important;
+    margin:0 0 12px!important; padding:0!important; object-fit:cover!important;
+    object-position:var(--ae-image-focus,center)!important; border-radius:0!important;
   }
-  html body.ae-is-home #mainContent > .editorial-pick:not(.ae-home-weekly-banner) #cpWeekly .ae-weekly-preview:has(>img)::before {
-    content:""!important; position:absolute!important; display:block!important; z-index:1!important;
-    inset:0!important; pointer-events:none!important;
-    background:linear-gradient(95deg,rgba(5,22,35,.93),rgba(7,25,39,.64) 70%,rgba(7,25,39,.39))!important;
+  html body.ae-is-home #mainContent > .editorial-pick #cpWeekly .ae-weekly-event,
+  html body.ae-is-home #mainContent > .editorial-pick #cpWeekly .ae-weekly-analysis,
+  html body.ae-is-home #mainContent > .editorial-pick #cpWeekly .ae-weekly-disclaimer {
+    color:#ece2d7!important;
   }
-  html:not(.dark) body.ae-is-home #mainContent > .editorial-pick:not(.ae-home-weekly-banner) {
-    background:#faf3e9!important; border-color:#b38b62!important;
+  /* Match Picks on light theme as well: photographed editorial banner stays dark. */
+  html:not(.dark) body.ae-is-home #mainContent > .editorial-pick.ae-home-weekly-banner {
+    background:#0d2738!important; color:#fff1e3!important;
   }
   html:not(.dark) body.ae-is-home #mainContent > .editorial-pick.ae-home-weekly-banner::before {
-    background:linear-gradient(95deg,rgba(255,251,244,.95),rgba(255,249,239,.83) 40%,rgba(255,248,234,.45))!important;
+    background:linear-gradient(95deg,rgba(9,35,51,.98) 0%,rgba(9,35,51,.93) 38%,rgba(9,35,51,.71) 67%,rgba(9,35,51,.46) 100%)!important;
   }
-  html:not(.dark) body.ae-is-home #mainContent > .editorial-pick:not(.ae-home-weekly-banner) #cpWeekly .ae-weekly-preview:has(>img)::before {
-    background:linear-gradient(95deg,rgba(255,251,244,.95),rgba(255,249,239,.80) 55%,rgba(255,247,234,.42))!important;
+  html:not(.dark) body.ae-is-home #mainContent > .editorial-pick > h2#weeklyPickTitle {
+    color:#fff0e1!important;
   }
-  html:not(.dark) body.ae-is-home #mainContent > .editorial-pick > h2#weeklyPickTitle,
-  html:not(.dark) body.ae-is-home #mainContent > .editorial-pick #cpWeekly .ae-weekly-title,
-  html:not(.dark) body.ae-is-home #mainContent > .editorial-pick #cpWeekly .ae-weekly-selection strong {
-    color:#193143!important; text-shadow:0 1px 4px rgba(255,251,243,.65)!important;
+  html:not(.dark) body.ae-is-home #mainContent > .editorial-pick:not(.ae-home-weekly-banner) {
+    background:#f3ece2!important; color:#253b4a!important;
   }
-  html:not(.dark) body.ae-is-home #mainContent > .editorial-pick > h2#weeklyPickTitle::before,
-  html:not(.dark) body.ae-is-home #mainContent > .editorial-pick > .ae-home-weekly-more,
-  html:not(.dark) body.ae-is-home #mainContent > .editorial-pick #cpWeekly .ae-weekly-link {
-    color:#885b37!important; text-shadow:none!important;
+  html:not(.dark) body.ae-is-home #mainContent > .editorial-pick:not(.ae-home-weekly-banner) > h2#weeklyPickTitle,
+  html:not(.dark) body.ae-is-home #mainContent > .editorial-pick:not(.ae-home-weekly-banner) #cpWeekly .ae-weekly-title,
+  html:not(.dark) body.ae-is-home #mainContent > .editorial-pick:not(.ae-home-weekly-banner) #cpWeekly .ae-weekly-compact-selection {
+    color:#253b4a!important; text-shadow:none!important;
   }
-  html:not(.dark) body.ae-is-home #mainContent > .editorial-pick #cpWeekly .ae-weekly-event {
-    color:#405867!important; text-shadow:0 1px 3px rgba(255,250,239,.6)!important;
-  }
-  html:not(.dark) body.ae-is-home #mainContent > .editorial-pick #cpWeekly .ae-weekly-odds {
-    background:#e9c9a5!important; color:#57391d!important; border-color:#b98f61!important;
+  html:not(.dark) body.ae-is-home #mainContent > .editorial-pick:not(.ae-home-weekly-banner) #cpWeekly .ae-weekly-expand-hint,
+  html:not(.dark) body.ae-is-home #mainContent > .editorial-pick:not(.ae-home-weekly-banner) > h2#weeklyPickTitle::before {
+    color:#875938!important;
   }
 }
-@media(max-width:375px){
-  html body.ae-is-home #mainContent > .editorial-pick:not([hidden]) {padding:15px 12px!important}
-  html body.ae-is-home #mainContent > .editorial-pick > .ae-home-weekly-more {right:12px!important}
+@media (max-width:375px) {
+  html body.ae-is-home #mainContent > .editorial-pick:not([hidden]) {padding-inline:13px!important}
+  html body.ae-is-home #mainContent > .editorial-pick #cpWeekly .ae-weekly-expand-summary {
+    grid-template-columns:minmax(0,1fr) auto!important;
+    column-gap:7px!important;
+  }
+  html body.ae-is-home #mainContent > .editorial-pick #cpWeekly .ae-weekly-expand-summary > .ae-weekly-title {
+    font-size:20px!important;
+  }
+  html body.ae-is-home #mainContent > .editorial-pick #cpWeekly .ae-weekly-compact-selection {
+    font-size:11px!important;
+  }
 }
 </style>
 </head>
@@ -2483,7 +2495,7 @@ updateThemeButton();
 <script src="assets/ae-category-visibility.js?v=20261015-3"></script>
 <script src="assets/ae-nfl-takes.js?v=20261015-3"></script>
 <script src="assets/free-takes.js?v=20261016-know-how-heading-1"></script>
-<script src="assets/ae-editorial-weekly.js?v=20261016-framing-zoom-3"></script>
+<script src="assets/ae-editorial-weekly.js?v=20261016-home-picks-exact-v3"></script>
 <script src="assets/ae-profile.js?v=20261016-take-sport-edit-1"></script>
 <script src="assets/ae-home-takes.js?v=20261016-unified-composer-1"></script>
 <script src="assets/ae-nfl-latest-comments.js?v=20261016-football-2"></script>
