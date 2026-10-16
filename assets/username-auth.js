@@ -15,7 +15,7 @@ function aeResumePendingPublication(){
  aeClearPendingPublication();
  if(typeof next==='function')next();
 }
-async function aeRequestPublication(kind,continueToComposer){
+async function aeRequestPublication(kind,continueToComposer,onAuthRequired){
  if(typeof continueToComposer!=='function')return;
  const request=++aePublicationRequest;
  try{
@@ -31,9 +31,12 @@ async function aeRequestPublication(kind,continueToComposer){
   aePendingPublication=continueToComposer;
   const hint=document.getElementById('aeAuthPublishHint');
   if(hint){
-   hint.textContent='Para publicar tu '+(kind==='pick'?'Pick':'Take')+', inicia sesión o crea una cuenta. Después volverás directamente al formulario.';
+   hint.textContent=kind==='reply'
+    ? 'Para responder, inicia sesión o crea una cuenta. Después volverás directamente a la conversación.'
+    : 'Para publicar tu '+(kind==='pick'?'Pick':'Take')+', inicia sesión o crea una cuenta. Después volverás directamente al formulario.';
    hint.hidden=false;
   }
+  if(typeof onAuthRequired==='function')onAuthRequired();
   setAuthMode('login');
   openUserAuthModal();
  }catch(error){

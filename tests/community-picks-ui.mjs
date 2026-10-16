@@ -108,6 +108,27 @@ await reply.onsubmit({preventDefault(){}});await settle();
 assert.equal(comments.length,1);
 assert.match(d.querySelector('#cpDialog').textContent,/Comentario antes de la aprobación/);
 d.querySelector('#cpDialog button').click();await settle();
+// The "Mejores platos" Pick title must ask the guest to log in BEFORE
+// showing its conversation; after login resume at the same Pick and focus reply.
+const bestPick=d.querySelector('#picksPopular .ae-chef-pick-link');
+assert.ok(bestPick,'A positively voted Pick must appear in Mejores platos');
+user=null;w.authOpened=false;bestPick.click();await settle();
+assert.equal(w.authOpened,true,'Mejores platos requests account access');
+assert.equal(d.querySelector('#cpDialog')?.open||false,false,'Guest cannot open the reply composer');
+user={id:'voter'};w.pendingPublication();await settle();
+assert.equal(d.querySelector('#cpDialog')?.open,true,'Reply conversation resumes after login');
+assert.equal(d.activeElement,d.querySelector('#cpDialog form textarea'),'Reply field is focused');
+d.querySelector('#cpDialog button').click();await settle();
+// Reading a Pick remains public, but its reply form stays behind login.
+user=null;w.authOpened=false;
+d.querySelector('#cpFeed .cp-card-title a').click();await settle();
+assert.ok(d.querySelector('#cpDialog .cp-login-to-reply'),'Guests receive a sign-in CTA instead of the reply form');
+assert.equal(d.querySelector('#cpDialog form'),null);
+d.querySelector('#cpDialog .cp-login-to-reply').click();await settle();
+assert.equal(w.authOpened,true);assert.equal(d.querySelector('#cpDialog')?.open||false,false);
+user={id:'voter'};w.pendingPublication();await settle();
+assert.equal(d.querySelector('#cpDialog')?.open,true,'Login resumes the original Pick');
+d.querySelector('#cpDialog button').click();await settle();
 user={id:'reader'};
 fill('Mi segundo Pick','Equipo C vs D');
 await form.onsubmit({preventDefault(){}});await settle();
@@ -138,5 +159,5 @@ fill('Borrador sin sesión','Equipo G vs H');user=null;w.authOpened=false;
 await form.onsubmit({preventDefault(){}});await settle();assert.equal(w.authOpened,true);assert.equal(modal.open,false);
 assert.equal(fields()[0].value,'Borrador sin sesión');assert.equal(records.length,3);
 assert.equal(d.body.classList.contains('ae-pick-composing'),false);
-console.log('PASS: publication auth gate, login resume, drafts, saves, duplicate protection, votes and replies.');
+console.log('PASS: auth before Mejores platos replies, public reading, resume, publishing, voting and drafts.');
 await w.happyDOM.close();

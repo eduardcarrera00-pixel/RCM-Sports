@@ -82,7 +82,15 @@
       const actions=el('div',undefined,'ae-discussion-actions');
       const reply=el('button','Responder');
       reply.type='button';
-      reply.addEventListener('click',()=>setParent(r.parent_id && nodes.has(r.parent_id) ? nodes.get(r.parent_id).data : r));
+      reply.addEventListener('click',()=>{
+        const take=current,replyTo=r.parent_id&&nodes.has(r.parent_id)?nodes.get(r.parent_id).data:r;
+        if(typeof aeRequestPublication==='function'){
+          void aeRequestPublication('reply',()=>{
+            if(!dialog?.open||current?.id!==take?.id)show(take,{focusComposer:true});
+            setParent(replyTo);
+          },()=>{if(dialog?.open)dialog.close();});
+        }else if(typeof openUserAuthModal==='function')openUserAuthModal();
+      });
       actions.append(reply);
       if(typeof currentAdmin!=='undefined' && currentAdmin){
         const hide=el('button','Ocultar');
@@ -132,8 +140,17 @@
     try {
       const session=await db.auth.getUser();
       if(!session.data?.user) {
-        dialog.close();
-        if(typeof openUserAuthModal==='function')openUserAuthModal();
+        const take=current,replyTo=parentId,draft=text;
+        if(typeof aeRequestPublication==='function'){
+          await aeRequestPublication('reply',()=>{
+            show(take,{focusComposer:true});
+            $('aeDiscussionText').value=draft;
+            if(replyTo){parentId=replyTo;$('aeDiscussionTarget').hidden=false;}
+          },()=>{if(dialog?.open)dialog.close();});
+        }else{
+          dialog.close();
+          if(typeof openUserAuthModal==='function')openUserAuthModal();
+        }
         return;
       }
       const result=await db.rpc('ae_post_take_reply',{p_take_id:takeId,p_body:text,p_parent_id:parentId});
@@ -168,6 +185,13 @@
     } catch(_) {}
   }
   function open(take, options={}) {
+    if(!take?.id)return;
+    if(options.focusComposer&&typeof aeRequestPublication==='function'){
+      return aeRequestPublication('reply',()=>show(take,options),()=>{if(dialog?.open)dialog.close();});
+    }
+    show(take,options);
+  }
+  function show(take, options={}) {
     if(!take?.id)return;
     init();
     current=take;
