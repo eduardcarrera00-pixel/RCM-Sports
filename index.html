@@ -324,6 +324,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
     <link rel="stylesheet" href="assets/ae-footer-gold-brand.css?v=20261016-1">
     <link rel="stylesheet" href="assets/ae-image-framing.css?v=20261016-1">
     <link rel="stylesheet" href="assets/ae-weekly-admin-edit.css?v=20261016-2">
+    <link rel="stylesheet" href="assets/ae-sport-chef-cards.css?v=20261016-1">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 
@@ -658,12 +659,17 @@ html.dark [data-reading-size][aria-pressed="true"] {
                 </section>
 
         <section class="rcm-panel editorial-community" aria-labelledby="communityTitle"><div class="ae-section-heading"><span class="ae-overline">LA COMUNIDAD OPINA</span><h2 id="communityTitle">Las voces de AE SPORTS</h2></div><div id="communityLeaders" aria-live="polite">Cargando comentarios destacados…</div></section>
-        <section id="aeSportTakeLeaders" class="rcm-panel ae-sport-voice" hidden aria-labelledby="aeSportTakeTitle">
-          <div class="ae-section-heading"><h2 id="aeSportTakeTitle">Takes históricos</h2></div>
+        <section id="aeSportTakeLeaders" class="ae-sport-voice ae-sport-chefs" hidden aria-label="Takes más apoyados y más cuestionados de la comunidad">
           <p id="aeSportTakeStatus" class="sr-only" role="status" aria-live="polite">Cargando Takes…</p>
           <div class="ae-sport-takes-grid">
-            <div class="ae-sport-takes-group" aria-labelledby="aeSportGeniosTitle"><h3 id="aeSportGeniosTitle">Genios</h3><ol id="aeSportTakePositive" class="ae-sport-takes-list"></ol></div>
-            <div class="ae-sport-takes-group is-questioned" aria-labelledby="aeSportAnoetosTitle"><h3 id="aeSportAnoetosTitle">Ánoetos</h3><ol id="aeSportTakeNegative" class="ae-sport-takes-list"></ol></div>
+            <section class="ae-sport-takes-group ae-sport-chef-card is-supported" aria-labelledby="aeSportGeniosTitle">
+              <header class="ae-sport-chef-heading"><span>LOS MÁS APOYADOS</span><h3 id="aeSportGeniosTitle">NFL Savant</h3></header>
+              <ol id="aeSportTakePositive" class="ae-sport-takes-list" aria-live="polite"></ol>
+            </section>
+            <section class="ae-sport-takes-group ae-sport-chef-card is-questioned" aria-labelledby="aeSportAnoetosTitle">
+              <header class="ae-sport-chef-heading"><span>LOS MÁS CUESTIONADOS</span><h3 id="aeSportAnoetosTitle">NFL Rookie</h3></header>
+              <ol id="aeSportTakeNegative" class="ae-sport-takes-list" aria-live="polite"></ol>
+            </section>
           </div>
         </section>
         <section class="rcm-panel editorial-trending" aria-labelledby="trendingTitle" hidden>
@@ -2215,7 +2221,7 @@ updateThemeButton();
 <script src="assets/ae-editorial-weekly.js?v=20261016-network-1"></script>
 <script src="assets/ae-profile.js?v=20261016-1"></script>
 <script src="assets/ae-home-takes.js?v=20261015-5"></script>
-<script src="assets/ae-sport-top-takes.js?v=20261016-2"></script>
+<script src="assets/ae-sport-top-takes.js?v=20261016-chef-cards-1"></script>
 <script src="assets/ae-take-replies.js?v=20261015-2"></script>
 <script src="assets/ae-picks-premium.js?v=20261015-1"></script>
 <script src="assets/ae-image-framing.js?v=20261016-admin-edit-1"></script>
