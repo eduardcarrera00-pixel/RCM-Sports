@@ -18,4 +18,15 @@ await w.handleUserLogin({preventDefault(){}});assert.equal(calls,0);assert.match
 d.getElementById('authPasswordConfirm').value='password123';await w.handleUserLogin({preventDefault(){}});assert.equal(calls,1);assert.equal(w.currentUser.id,'reader');assert.equal(d.getElementById('authRecoveryResult').hidden,false);assert.equal(d.getElementById('authRecoveryOutput').value.length,64);assert.equal(d.getElementById('userAuthPassword').value,'');
 w.finishRecoveryCode();assert.equal(w.closed,true);assert.equal(publicationOpens,1,'Registration resumes the requested Pick');assert.equal(d.getElementById('aeAuthPublishHint').hidden,true);assert.equal(d.getElementById('authRecoveryOutput').value,'');
 await w.aeRequestPublication('take',()=>publicationOpens++);assert.equal(publicationOpens,2,'Logged-in users open a composer directly');w.setAuthMode('recover');assert.equal(d.getElementById('authRecoveryCode').required,true);w.setAuthMode('login');assert.equal(d.getElementById('authRecoveryCode').required,false);assert.equal(d.getElementById('userAuthPassword').minLength,1);
-console.log('PASS: auth, cancellation, pending Pick resume, logged-in shortcut and recovery.');await w.happyDOM.close();
+// The friendly acknowledgment must be a compact notice inside the login,
+// not a separate full-screen dialog, and must require OK before form access.
+const loginNotice=d.getElementById('aeAuthIntroNotice');
+assert.ok(loginNotice,'The login has the compact OK notice');
+assert.equal(loginNotice.parentElement.parentElement.id,'userAuthModal');
+assert.equal(loginNotice.hidden,true);
+assert.equal(d.getElementById('aeAuthMiniOk').textContent.trim(),'OK');
+assert.equal(d.getElementById('aeAuthIntroModal'),null,'The old separate modal is removed');
+const htmlSource=fs.readFileSync('index.html','utf8');
+assert.match(htmlSource, /document\.getElementById\('userAuthForm'\)\.inert = true/);
+assert.match(htmlSource, /document\.getElementById\('userAuthForm'\)\.inert = false/);
+console.log('PASS: auth, mini OK notice, cancellation, pending Pick resume, logged-in shortcut and recovery.');await w.happyDOM.close();
