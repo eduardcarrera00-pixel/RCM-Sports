@@ -1,0 +1,109 @@
+/* AE SPORTS · Botones originales aportados por el propietario.
+   La imagen aporta el marco, busto/puerta y lettering dorado.
+   Los controles siguen siendo botones HTML accesibles. */
+html body>header #aeMyTakesButton.ae-classical-auth-button,
+html body>header #readerSession button.ae-classical-auth-button,
+html body>header #loggedAdminContainer button.ae-signout-action.ae-classical-auth-button {
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  flex:0 0 auto!important;
+  box-sizing:border-box!important;
+  width:clamp(111px,11.5vw,156px)!important;
+  min-width:0!important;
+  max-width:156px!important;
+  height:44px!important;
+  min-height:44px!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:6px!important;
+  color:inherit!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  outline-offset:3px!important;
+  overflow:hidden!important;
+  cursor:pointer!important;
+  vertical-align:middle!important;
+  transform:none!important;
+  transition:filter .18s ease,transform .18s ease!important;
+}
+html body>header #aeMyTakesButton.ae-classical-auth-button[hidden]{
+  display:none!important;
+}
+html body>header #aeMyTakesButton.ae-classical-auth-button{
+  width:clamp(107px,11vw,150px)!important;
+}
+html body>header .ae-classical-auth-button img.ae-classical-auth-art{
+  display:block!important;
+  box-sizing:border-box!important;
+  flex:0 0 auto!important;
+  width:100%!important;
+  max-width:100%!important;
+  height:100%!important;
+  max-height:100%!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  object-fit:contain!important;
+  object-position:center!important;
+  opacity:1!important;
+  filter:none!important;
+  box-shadow:none!important;
+  background:transparent!important;
+  pointer-events:none!important;
+  user-select:none!important;
+}
+html body>header .ae-classical-auth-button:hover,
+html body>header .ae-classical-auth-button:focus-visible{
+  filter:brightness(1.11)!important;
+}
+html body>header .ae-classical-auth-button:active{
+  transform:translateY(1px)!important;
+}
+html body>header .ae-classical-auth-button:focus-visible{
+  outline:2px solid #e7ba78!important;
+}
+html body>header #readerSession.rcm-row{
+  flex-wrap:nowrap!important;
+  gap:7px!important;
+}
+html body>header #readerSession .rcm-username{
+  max-width:85px!important;
+  overflow:hidden!important;
+  white-space:nowrap!important;
+  text-overflow:ellipsis!important;
+}
+/* Si ya no caben dos botones completos, conserva sus símbolos originales
+   en botones cuadrados y con etiquetas accesibles; evita desbordar la cabecera. */
+@media(max-width:650px){
+  html body>header #aeMyTakesButton.ae-classical-auth-button,
+  html body>header #readerSession button.ae-classical-auth-button,
+  html body>header #loggedAdminContainer button.ae-signout-action.ae-classical-auth-button{
+    width:44px!important;
+    max-width:44px!important;
+    height:44px!important;
+    min-height:44px!important;
+    border:1px solid rgba(209,154,96,.78)!important;
+    border-radius:5px!important;
+    background:#09263a!important;
+  }
+  html body>header .ae-classical-auth-button img.ae-classical-auth-art{
+    width:44px!important;
+    max-width:44px!important;
+    height:42px!important;
+    max-height:42px!important;
+    object-fit:cover!important;
+    object-position:15% center!important;
+  }
+  html body>header #readerSession .rcm-username{
+    max-width:55px!important;
+    font-size:10px!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  html body>header .ae-classical-auth-button{
+    transition:none!important;
+  }
+}
