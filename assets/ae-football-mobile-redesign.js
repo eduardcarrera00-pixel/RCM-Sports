@@ -8,6 +8,28 @@
   const originalLocations = new Map();
   let working = false;
   let pending = false;
+  // The community's NFL Savant / NFL Rookie module is a single live node.
+  // On NFL mobile it belongs between news and recent Takes, not in the sidebar.
+  let nflTakeAnchor = null;
+  const nflMobileActive = () => mobile.matches && document.body.classList.contains('ae-is-nfl');
+
+  function placeNflTakes(onNfl){
+    const root = byId('aeSportTakeLeaders');
+    if(!root)return;
+    if(!nflTakeAnchor){
+      nflTakeAnchor = document.createComment('AE: posición original de NFL Savant / NFL Rookie');
+      root.parentNode?.insertBefore(nflTakeAnchor,root);
+    }
+    const beforeFeed = byId('freeTakes');
+    if(onNfl && beforeFeed && beforeFeed.parentNode){
+      // Move the existing lists, events and votes; never clone their DOM.
+      if(root.nextElementSibling !== beforeFeed || root.parentElement !== beforeFeed.parentElement){
+        beforeFeed.parentNode.insertBefore(root,beforeFeed);
+      }
+    } else if(nflTakeAnchor.parentNode && (root.parentElement !== nflTakeAnchor.parentElement || nflTakeAnchor.nextSibling !== root)){
+      nflTakeAnchor.parentNode.insertBefore(root,nflTakeAnchor.nextSibling);
+    }
+  }
 
   const footballActive = () =>
     mobile.matches && document.body.classList.contains('ae-is-football');
@@ -44,8 +66,11 @@
     try {
       if (!footballActive()) {
         if (originalLocations.size) restoreDesktopOrder();
+        placeNflTakes(nflMobileActive());
         return;
       }
+      // Restore the original sidebar anchor before Fútbol moves this live node.
+      placeNflTakes(false);
       const main = byId('mainContent');
       const layout = main?.querySelector('.editorial-layout');
       if (!main || !layout) return;
