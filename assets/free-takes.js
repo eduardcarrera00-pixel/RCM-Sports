@@ -152,7 +152,7 @@
      if($('aeNflFeedFilterWrap'))$('aeNflFeedFilterWrap').hidden=true;
      if($('freeTakesFilterWrap'))$('freeTakesFilterWrap').hidden=true;
      if($('freeTakesSportFilter'))$('freeTakesSportFilter').value=filter;
-     $('freeTakesTitle').textContent=section==='NFL'?'Demuestra tu conocimiento · NFL':'Demuestra tu conocimiento · Fútbol';
+     $('freeTakesTitle').textContent='Demuestra tu conocimiento';
    }
    if(changed){items=[];load();}
    else if(!items.length && !busy)load();
