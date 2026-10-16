@@ -1,0 +1,90 @@
+/* AE SPORTS · Nueva identidad de marca: figura dorada y azul enviada por el usuario.
+   Conservar el lettering dorado original, pero ocultar por completo el antiguo
+   monograma de pluma recortando la parte izquierda de su recurso tipográfico.
+   Un único emblema optimizado se reutiliza en cabecera y pie de página. */
+html body header .ae-brand.ae-brand-gold.ae-brand-runner,
+html body footer .ae-footer-gold-brand.ae-brand-runner{
+  --ae-runner-share:25%;
+  display:flex!important;
+  flex-direction:row!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:0!important;
+  box-sizing:border-box!important;
+  padding:0!important;
+  overflow:visible!important;
+  text-decoration:none!important;
+  line-height:0!important;
+  background:transparent!important;
+}
+html body header .ae-brand.ae-brand-gold.ae-brand-runner .ae-runner-symbol,
+html body footer .ae-footer-gold-brand.ae-brand-runner .ae-runner-symbol{
+  display:block!important;
+  position:relative!important;
+  flex:0 0 var(--ae-runner-share)!important;
+  width:var(--ae-runner-share)!important;
+  min-width:0!important;
+  max-width:var(--ae-runner-share)!important;
+  height:auto!important;
+  aspect-ratio:1!important;
+  margin:0!important;padding:0!important;
+  border:0!important;border-radius:0!important;
+  object-fit:contain!important;
+  background:transparent!important;
+  filter:drop-shadow(0 2px 3px rgba(5,20,34,.20))!important;
+}
+html body header .ae-brand.ae-brand-gold.ae-brand-runner .ae-runner-wordmark,
+html body footer .ae-footer-gold-brand.ae-brand-runner .ae-runner-wordmark{
+  display:block!important;
+  position:relative!important;
+  flex:1 1 0!important;
+  width:auto!important;
+  min-width:0!important;
+  max-width:none!important;
+  aspect-ratio:295 / 109!important;
+  height:auto!important;
+  margin:0!important;padding:0!important;
+  overflow:hidden!important;
+  line-height:0!important;
+  background:transparent!important;
+}
+html body header .ae-brand.ae-brand-gold.ae-brand-runner .ae-runner-wordmark-art,
+html body footer .ae-footer-gold-brand.ae-brand-runner .ae-runner-wordmark-art{
+  display:block!important;
+  position:absolute!important;
+  inset:0 auto auto 0!important;
+  width:135.59322%!important; /* old artwork is 400 px wide, text begins at x = 105 */
+  min-width:135.59322%!important;
+  max-width:none!important;
+  height:auto!important;
+  max-height:none!important;
+  aspect-ratio:400 / 109!important;
+  transform:translateX(-26.25%)!important;
+  object-fit:contain!important;
+  object-position:0 0!important;
+  margin:0!important;padding:0!important;
+  border:0!important;border-radius:0!important;
+  box-shadow:none!important;
+  background:transparent!important;
+  filter:drop-shadow(0 1px 2px rgba(7,19,34,.12))!important;
+}
+html:not(.dark) body header .ae-brand.ae-brand-runner .ae-runner-symbol,
+html:not(.dark) body header .ae-brand.ae-brand-runner .ae-runner-wordmark-art{
+  filter:drop-shadow(0 1px 2px rgba(20,43,56,.35))!important;
+}
+html body header .ae-brand.ae-brand-runner:focus-visible,
+html body footer .ae-footer-gold-brand.ae-brand-runner:focus-visible{
+  outline:2px solid #edbb8b!important;
+  outline-offset:5px!important;
+}
+@media (max-width:640px){
+  html body header .ae-brand.ae-brand-gold.ae-brand-runner{
+    --ae-runner-share:25%;
+  }
+}
+@media (prefers-reduced-motion:reduce){
+  html body .ae-brand-runner .ae-runner-symbol,
+  html body .ae-brand-runner .ae-runner-wordmark-art{
+    transition:none!important;
+  }
+}
