@@ -37,7 +37,19 @@ function renderSessionHeader() {
     readers.classList.toggle('hidden', !currentUser || Boolean(currentAdmin));
     if (currentUser && !currentAdmin) {
         readers.append(node('span', currentUser.username, 'rcm-username'));
-        const out = node('button', 'Cerrar sesión'); out.type = 'button'; out.onclick = handleUserLogout;
+        const out = node('button', null, 'ae-classical-auth-button ae-classical-logout');
+        out.type = 'button';
+        out.setAttribute('aria-label', 'Cerrar sesión');
+        out.title = 'Cerrar sesión';
+        out.onclick = handleUserLogout;
+        const illustration = node('img', null, 'ae-classical-auth-art');
+        illustration.src = 'assets/ui/ae-logout-classic.webp?v=20261016-1';
+        illustration.width = 520;
+        illustration.height = 136;
+        illustration.alt = '';
+        illustration.setAttribute('aria-hidden', 'true');
+        illustration.decoding = 'async';
+        out.append(illustration, node('span', 'Cerrar sesión', 'sr-only'));
         readers.append(out);
     }
     document.getElementById('guestAdminContainer').classList.toggle('hidden', Boolean(currentUser || currentAdmin));
