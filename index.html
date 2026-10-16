@@ -308,6 +308,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/ae-football-news-editorial.css?v=20261016-align-champions-1">
 <link rel="stylesheet" href="assets/ae-login-art-button.css?v=20261016-3">
 <link rel="stylesheet" href="assets/ae-header-alignment-polish.css?v=20261016-1">
+<link rel="stylesheet" href="assets/ae-admin-header-compact.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-home-community-spotlight.css?v=20261016-3">
 <link rel="stylesheet" href="assets/ae-home-takes-compact-reference.css?v=20261016-2">
 <link rel="stylesheet" href="assets/ae-home-cta-icons.css?v=20261016-classic-1">
@@ -366,7 +367,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
                         </button>
                     </div>
 
-                    <details id="aeCategoryAdmin" hidden class="ae-category-admin"><summary>Gestionar deportes</summary>
+                    <details id="aeCategoryAdmin" hidden class="ae-category-admin"><summary title="Gestionar deportes" aria-label="Gestionar deportes"><span class="ae-admin-manage-icon" aria-hidden="true"><i class="fa-solid fa-sliders"></i></span><span class="ae-admin-manage-label">Deportes</span></summary>
                       <div class="ae-category-admin-menu">
                         <div id="aeCategoryToggles" role="group" aria-label="Visibilidad de categorías"></div>
                         <p id="aeCategoryStatus" role="status" aria-live="polite"></p>
@@ -375,15 +376,10 @@ html.dark [data-reading-size][aria-pressed="true"] {
                     <!-- Logged-in State: Admin Profile & Actions -->
                     <div id="loggedAdminContainer" class="hidden flex items-center space-x-2 sm:space-x-3">
                         <!-- Profile Tag -->
-                        <div class="ae-admin-profile bg-pitch-50 border border-pitch-200 rounded-xl px-3 py-1.5 flex items-center space-x-2">
-                            <div class="w-6 h-6 bg-pitch-600 text-white rounded-full flex items-center justify-center text-[10px] font-bold">
-                                <i class="fa-solid fa-user" aria-hidden="true"></i>
-                            </div>
-                            <div class="text-left hidden sm:block">
-                                <span class="block text-[10px] text-pitch-700 font-bold uppercase tracking-wider">ADMIN</span>
-                                <span id="adminNameDisplay" class="block text-xs font-bold text-slate-900 -mt-1">--</span>
-                            </div>
-                        </div>
+                        <button type="button" class="ae-admin-profile" onclick="openAeProfile()" aria-label="Abrir mi perfil" title="Mi perfil">
+                            <img class="ae-admin-profile-art" src="assets/ui/ae-profile-mark.png?v=20261016-3" width="96" height="96" alt="" aria-hidden="true" decoding="async">
+                            <span id="adminNameDisplay">--</span>
+                        </button>
 
                         <!-- Publish Button (Visible ONLY when logged in) -->
                         <button onclick="openPublishModal()" class="ae-publish-action flex items-center space-x-2 bg-pitch-600 hover:bg-pitch-700 text-white text-xs font-bold uppercase tracking-wider py-2.5 px-3.5 sm:px-4 rounded-xl shadow-md shadow-pitch-600/20 transition-all hover:scale-105">
