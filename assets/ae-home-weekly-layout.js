@@ -44,7 +44,7 @@
         filterByCategory('Picks');
         // Category view is visible by now; return it to its natural position.
         sync();
-        document.getElementById('picksFeatured')?.scrollIntoView({block:'start',behavior:'instant'});
+        document.getElementById('picksFeatured')?.scrollIntoView({block:'start',behavior:'auto'});
       }
     }
 
