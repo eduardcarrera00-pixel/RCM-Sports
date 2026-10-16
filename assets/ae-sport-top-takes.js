@@ -55,20 +55,22 @@
      score.setAttribute('aria-label',up+' votos positivos, '+down+' negativos, balance '+net);
      meta.append(author);
      const title=el('strong',undefined,'ae-sport-take-title');
-     const takeText=String(t.body||t.title||'Ver Take').trim();
-     const openTake=el('button',takeText,'ae-sport-take-open');
+     const openTake=el('button',t.title||'Ver Take','ae-sport-take-open');
      openTake.type='button';
      openTake.setAttribute('aria-label','Leer Take y ver su conversación: '+(t.title||'Publicación'));
      openTake.addEventListener('click',()=>window.aeTakeReplies?.open(t));
      title.append(openTake);
-     const stats=el('div',undefined,'ae-sport-take-statline');
+     // NFL stores its optional sport/division/team context on the first line.
+     // Keep the original body for the discussion; omit that metadata in this preview.
+     const preview=String(t.body||'').replace(/\r\n/g,'\n').trim();
+     const takeText=t.sport==='nfl'?preview.replace(/^NFL(?: · [^\n]*)?\n\n/,'').trim():preview;
+     const excerpt=el('p',takeText,'ae-sport-take-excerpt');
      const reply=el('button','Responder','ae-top-take-reply');
      reply.type='button';
      reply.setAttribute('aria-label','Responder al Take: '+(t.title||'Publicación'));
      reply.addEventListener('click',()=>window.aeTakeReplies?.open(t,{focusComposer:true}));
-     meta.append(score);
-     stats.append(reply);
-     content.append(meta,title,stats);
+     meta.append(score,reply);
+     content.append(meta,title,excerpt);
      li.append(number,content);
      li.addEventListener('click',event=>{
        if(!event.target.closest('button'))window.aeTakeReplies?.open(t);
