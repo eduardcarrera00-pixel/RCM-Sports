@@ -8,7 +8,7 @@ w.HTMLElement.prototype.scrollIntoView=()=>{};
 w.matchMedia=()=>({matches:false});
 const today=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'America/Toronto',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
 const dayOffset=n=>new Date(Date.parse(today()+'T12:00:00Z')+n*86400000).toISOString().slice(0,10);
-let user={id:'reader'},records=[],comments=[],votes=new Map(),pickCounter=0;
+let user={id:'reader'},records=[],comments=[],votes=new Map(),pickCounter=0,failPublish=false;
 w.currentCategory='Picks';w.currentAdmin=null;
 w.notifyCommunity=()=>{};
 w.openUserAuthModal=()=>{w.authOpened=true;};
@@ -37,6 +37,7 @@ w.db={
       maybeSingle(){single=true;return q;},
       then(resolve,reject){
         if(operation==='insert'&&table==='ae_community_picks'){
+          if(failPublish)return Promise.resolve({data:null,error:{message:'Fallo de conexión de prueba'}}).then(resolve,reject);
           pickCounter++;
           records.push({...payload,id:'12345678-1234-1234-1234-'+String(pickCounter).padStart(12,'0'),user_id:user.id,author:'Lector',moderation_status:'pending',outcome:'pending',hidden:false,created_at:new Date().toISOString(),is_current_week:true,american_odds:150});
         }
@@ -67,7 +68,21 @@ const fill=(title,eventName)=>{
   f[3].value='NFL';f[4].value=eventName;f[5].value='Gana un equipo';f[6].value='+150';
   form.querySelector('[type=checkbox]').checked=true;
 };
+const modal=d.getElementById('cpComposePanel'),cta=d.getElementById('cpPublishCta');
+assert.equal(modal.tagName,'DIALOG');
+assert.equal(d.querySelector('#communityPicks #cpComposePanel'),null,'Composer must be outside the feed');
+assert.ok(!d.body.textContent.includes('Preparar mi Pick'));
+cta.click();assert.equal(modal.open,true);assert.equal(cta.getAttribute('aria-expanded'),'true');
+assert.ok(d.body.classList.contains('ae-pick-composing'));
 fill('Mi primer Pick','Equipo A vs B');
+d.getElementById('cpComposeClose').click();await settle();assert.equal(modal.open,false);
+assert.equal(fields()[0].value,'Mi primer Pick','Closing preserves the draft');
+cta.click();
+failPublish=true;await form.onsubmit({preventDefault(){}});await settle();
+assert.equal(records.length,0);assert.equal(modal.open,true);
+assert.equal(fields()[0].value,'Mi primer Pick');assert.match(form.querySelector('.cp-status').textContent,/Fallo de conexión/);
+assert.equal(form.querySelector('button[type=submit]').disabled,false);
+failPublish=false;
 await form.onsubmit({preventDefault(){}});
 await settle();
 assert.equal(records.length,1,'The first Pick must be saved');
@@ -95,5 +110,21 @@ assert.equal(records.length,2,'One account may publish multiple Picks on the sam
 assert.equal(d.querySelectorAll('#cpFeed .cp-card').length,2);
 w.filterByCategory('NFL');
 assert.equal(d.getElementById('communityPicks').hidden,true);
-console.log('PASS: unlimited Picks, pending voting, immediate comments, composer closure and category visibility.');
+// Authentication can take time: an immediate second submission must be ignored.
+w.filterByCategory('Picks');cta.click();fill('Tercer Pick sin duplicado','Equipo E vs F');
+let releaseAuth;const authGate=new Promise(resolve=>{releaseAuth=resolve;});
+const getUser=w.db.auth.getUser;w.db.auth.getUser=async()=>{await authGate;return {data:{user},error:null};};
+const first=form.onsubmit({preventDefault(){}});
+assert.equal(form.querySelector('button[type=submit]').disabled,true);
+assert.equal(d.getElementById('cpComposeClose').disabled,true);
+const cancellation=new w.Event('cancel',{cancelable:true});modal.dispatchEvent(cancellation);assert.equal(cancellation.defaultPrevented,true);
+await form.onsubmit({preventDefault(){}});releaseAuth();await first;await settle();
+assert.equal(records.length,3,'Double submit must only save one record');assert.equal(modal.open,false);
+w.db.auth.getUser=getUser;
+// A signed-out user reaches authentication with their draft preserved.
+cta.click();fill('Borrador sin sesión','Equipo G vs H');user=null;
+await form.onsubmit({preventDefault(){}});await settle();assert.equal(w.authOpened,true);assert.equal(modal.open,false);
+assert.equal(fields()[0].value,'Borrador sin sesión');assert.equal(records.length,3);
+assert.equal(d.body.classList.contains('ae-pick-composing'),false);
+console.log('PASS: modal opening, draft retention, failed save, successful closure, duplicate-submit protection, login handoff, voting, replies and visibility.');
 await w.happyDOM.close();

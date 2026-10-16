@@ -288,7 +288,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
     </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
-<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261016-cocina-compact-3">
+<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261016-pick-modal-1">
     <link rel="stylesheet" href="assets/ae-muted-navigation-icons.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-custom-nav-icons.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-classical-auth-buttons.css?v=20261016-3">
@@ -449,7 +449,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
               <div class="ae-picks-feed-heading">
                  <div class="ae-picks-heading-cta-row">
                    <span class="ae-picks-nudge">¿Eres Chef?</span>
-                   <button id="cpPublishCta" type="button" class="ae-participate-cta ae-picks-publish-cta ae-cocina-art" aria-label="Cocina Picks: publicar un nuevo pronóstico" aria-controls="cpComposePanel" aria-expanded="false"><img src="assets/ae-cocina-picks-button.webp" alt="" width="2048" height="512" decoding="async"></button>
+                   <button id="cpPublishCta" type="button" class="ae-participate-cta ae-picks-publish-cta ae-cocina-art" aria-label="Cocina Picks: publicar un nuevo pronóstico" aria-controls="cpComposePanel" aria-haspopup="dialog" aria-expanded="false"><img src="assets/ae-cocina-picks-button.webp" alt="" width="2048" height="512" decoding="async"></button>
                  </div>
                  <h3 id="cpTitle" class="sr-only">Picks de la comunidad</h3>
                  
@@ -458,7 +458,6 @@ html.dark [data-reading-size][aria-pressed="true"] {
               <div id="cpFeed" aria-live="polite"></div>
               <button id="cpMore" class="ae-take-button" type="button" hidden>Ver más Picks activos</button>
               <button id="cpViewAll" class="ae-history-more" type="button">Ver todos los Picks <span aria-hidden="true">→</span></button>
-              <details class="ae-cp-compose" id="cpComposePanel"><summary>Preparar mi Pick</summary><form id="cpForm"></form></details>
             </section>
             <aside class="ae-picks-rail">
               <section class="ae-picks-top-three ae-picks-small-top ae-chef-board ae-chef-best" aria-labelledby="picksPopularTitle">
@@ -727,6 +726,11 @@ html.dark [data-reading-size][aria-pressed="true"] {
 
     </main>
 
+<dialog id="cpComposePanel" class="ae-pick-compose-dialog" aria-labelledby="cpComposeTitle" aria-describedby="cpComposeIntro">
+ <header class="ae-pick-compose-head"><div><span>COCINA PICKS</span><h2 id="cpComposeTitle">Prepara tu Pick</h2></div><button id="cpComposeClose" type="button" aria-label="Cerrar formulario de Pick">×</button></header>
+ <p id="cpComposeIntro">Comparte tu pronóstico y sus selecciones. Al guardar, tu Pick aparecerá en la comunidad.</p>
+ <form id="cpForm"></form>
+</dialog>
 <dialog id="cpArchiveDialog" class="ae-picks-archive-dialog" aria-labelledby="cpArchiveTitle">
  <div class="ae-picks-archive-head"><h2 id="cpArchiveTitle">Todos los Picks</h2><button id="cpArchiveClose" type="button" aria-label="Cerrar historial de Picks">×</button></div>
  <p>Historial de pronósticos, incluidos los vencidos. Los Picks archivados no se eliminan y siguen disponibles para consultar sus resultados.</p>
@@ -2210,7 +2214,7 @@ updateThemeButton();
 <script src="assets/nfl-teams.js"></script>
 <script src="assets/community.js?v=20261016-reference-1"></script>
 <script src="assets/champions.js?v=qa1-20261015-6"></script>
-<script src="assets/community-picks.js?v=20261016-ranking-1"></script>
+<script src="assets/community-picks.js?v=20261016-modal-1"></script>
 <script src="assets/weekly-picks.js?v=20261015-1"></script>
 <script src="assets/username-auth.js?v=20261015-2"></script>
 <script src="assets/ae-category-visibility.js?v=20261015-3"></script>

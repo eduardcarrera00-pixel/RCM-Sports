@@ -15,7 +15,7 @@ const resultLabel=p=>p.outcome==='won'?'Acertado · +'+Math.abs(Number(p.result_
 function el(tag,text,cls){const n=document.createElement(tag);if(text!=null)n.textContent=text;if(cls)n.className=cls;return n;}
 function button(text,fn){const b=el('button',text);b.type='button';b.onclick=fn;return b;}
 function message(error){return error?.message||'No pudimos completar la operación. Inténtalo de nuevo.';}
-async function account(){if(!db)throw Error('Sin conexión.');const r=await db.auth.getUser();if(r.error)throw r.error;if(!r.data.user){closeDetail();openUserAuthModal();return null;}return r.data.user;}
+async function account(){if(!db)throw Error('Sin conexión.');const r=await db.auth.getUser();if(r.error)throw r.error;if(!r.data.user){closeDetail();closePickComposer(true);openUserAuthModal();return null;}return r.data.user;}
 function link(id){const u=new URL(location.href);u.searchParams.delete('article');u.searchParams.delete('comment');u.searchParams.set('pick',id);u.hash='';return u.href;}
 function open(id){history.pushState({},'',link(id));showDetail(id);}
 function card(p,compact=false,detail=false){
@@ -234,15 +234,27 @@ function buildComposer(){
  function addRow(){if(rows.length>=2)return;const box=el('fieldset');box.append(el('legend','Selección '+(rows.length+1)));const row={box};for(const [key,label] of [['sport','Deporte'],['event','Partido (equipos)'],['selection','Pronóstico'],['odds','Cuota americana (+150, -110)']]){row[key]=field(label);row[key].input.maxLength=key==='odds'?7:key==='selection'?200:key==='sport'?40:160;if(key==='odds')row[key].input.pattern='[+-]?[0-9]{3,6}';box.append(row[key].wrap);}rows.push(row);if(rows.length===2)box.append(button('Quitar segunda selección',()=>{rows.pop();box.remove();add.hidden=false;calculate();}));legs.append(box);add.hidden=rows.length===2;}
  addRow();form.append(legs,add,output,el('p','Publica tantos Picks como quieras. Los votos y comentarios están abiertos desde el primer momento, mientras AE SPORTS revisa la cuota. Al finalizar el evento, el Pick seguirá disponible en el historial. No podrás editarlo.','cp-meta'));
  const confirm=el('label','He revisado las selecciones y la cuota.');const checkbox=el('input');checkbox.type='checkbox';checkbox.required=true;confirm.prepend(checkbox);form.append(confirm);
- const submit=el('button','Publicar Pick');submit.type='submit';form.append(submit,status);form.addEventListener('input',calculate);
- form.onsubmit=async e=>{e.preventDefault();if(posting)return;status.textContent='';try{const user=await account();if(!user)return;if(!calculate())throw Error('Revisa la cuota americana y las selecciones.');posting=true;submit.disabled=true;const r=await db.from('ae_community_picks').insert({title:title.input.value.trim(),explanation:explanation.input.value.trim(),legs:values(),event_date:eventDay.input.value}).select('id').single();if(r.error)throw r.error;form.reset();calculate();
- const panel=$('cpComposePanel');
- if(panel)panel.open=false;
- $('cpPublishCta')?.setAttribute('aria-expanded','false');
- if(typeof filterByCategory==='function')filterByCategory('Picks');
- await load();
- notifyCommunity('Pick publicado. Ya puedes recibir votos y comentarios mientras revisamos la cuota.');
- $('communityPicks')?.scrollIntoView({behavior:'smooth',block:'start'});}catch(e){status.textContent=message(e);}finally{posting=false;submit.disabled=false;}};
+ const submit=el('button','Guardar Pick');submit.type='submit';form.append(submit,status);form.addEventListener('input',calculate);
+ form.onsubmit=async e=>{
+  e.preventDefault();if(posting)return;
+  posting=true;submit.disabled=true;
+  const closer=$('cpComposeClose');if(closer)closer.disabled=true;
+  status.textContent='';
+  try{
+   const user=await account();if(!user)return;
+   if(!calculate())throw Error('Revisa la cuota americana y las selecciones.');
+   submit.textContent='Guardando…';
+   const r=await db.from('ae_community_picks').insert({title:title.input.value.trim(),explanation:explanation.input.value.trim(),legs:values(),event_date:eventDay.input.value}).select('id').single();
+   if(r.error)throw r.error;
+   form.reset();
+   while(rows.length>1){rows.pop().box.remove();}
+   add.hidden=false;calculate();
+   closePickComposer(true);
+   void load();
+   notifyCommunity('Pick guardado. Ya puedes recibir votos y comentarios mientras revisamos la cuota.');
+  }catch(e){status.textContent=message(e);}
+  finally{posting=false;submit.disabled=false;submit.textContent='Guardar Pick';if(closer)closer.disabled=false;}
+ };
  calculate();
 }
 async function loadArchive(){
@@ -276,20 +288,29 @@ async function showDetail(id){
  }catch(e){dialog.replaceChildren(button('Cerrar',closeDetail),el('p',message(e)));}
 }
 window.renderCommunityPicksVisibility=()=>{const root=$('communityPicks');if(!root)return;root.hidden=currentCategory!=='Picks';if(!root.hidden&&!loaded)load();};
+function syncPickComposer(){
+ const open=Boolean($('cpComposePanel')?.open);
+ $('cpPublishCta')?.setAttribute('aria-expanded',String(open));
+ document.body.classList.toggle('ae-pick-composing',open);
+}
+function closePickComposer(force=false){
+ if(posting&&!force)return;
+ const dialog=$('cpComposePanel');
+ if(dialog?.open)dialog.close();
+ syncPickComposer();
+}
 function openPickComposer(){
- const panel=$('cpComposePanel'),button=$('cpPublishCta');
- if(!panel)return;
- panel.open=true;
- button?.setAttribute('aria-expanded','true');
- panel.scrollIntoView({behavior:window.matchMedia?.('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'center'});
- window.setTimeout(()=>panel.querySelector('input')?.focus({preventScroll:true}),170);
+ const dialog=$('cpComposePanel');if(!dialog)return;
+ if(!dialog.open)dialog.showModal();
+ syncPickComposer();
+ dialog.querySelector('input')?.focus({preventScroll:true});
 }
 document.addEventListener('DOMContentLoaded',()=>{
  buildComposer();
  $('cpPublishCta')?.addEventListener('click',openPickComposer);
- $('cpComposePanel')?.addEventListener('toggle',e=>{
-  $('cpPublishCta')?.setAttribute('aria-expanded',String(e.currentTarget.open));
- });
+ $('cpComposeClose')?.addEventListener('click',()=>closePickComposer());
+ $('cpComposePanel')?.addEventListener('close',syncPickComposer);
+ $('cpComposePanel')?.addEventListener('cancel',e=>{if(posting)e.preventDefault();});
  renderCommunityPicksVisibility();load();$('cpReload')?.addEventListener('click',load);$('cpViewAll')?.addEventListener('click',()=>{const dlg=$('cpArchiveDialog');if(dlg&&!dlg.open)dlg.showModal();archiveLimit=30;loadArchive();});$('cpArchiveClose')?.addEventListener('click',closeArchive);$('cpArchiveMore')?.addEventListener('click',()=>{archiveLimit+=30;loadArchive();});for(const [id,mode] of [['cpRankMonth','month'],['cpRankHistory','all']]){$(id)?.addEventListener('click',()=>{currentRank=mode;for(const [i,m] of [['cpRankMonth','month'],['cpRankHistory','all']])$(i)?.setAttribute('aria-pressed',String(currentRank===m));loadRanking();});}const id=new URL(location.href).searchParams.get('pick');if(id)showDetail(id);$('cpMore').onclick=()=>{limit+=20;load();};if(db)db.auth.onAuthStateChange(()=>setTimeout(()=>{load();const id=new URL(location.href).searchParams.get('pick');if(id)showDetail(id);},0));});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)load();});
 window.addEventListener('popstate',()=>{const id=new URL(location.href).searchParams.get('pick');if(id)showDetail(id);else closeDetail();});

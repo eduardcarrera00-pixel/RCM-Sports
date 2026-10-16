@@ -1,0 +1,64 @@
+body.ae-pick-composing {overflow:hidden!important;}
+html body dialog#cpComposePanel {
+  --cp-dialog-bg:#fcf8f1;--cp-dialog-ink:#173646;--cp-dialog-line:#cbb797;--cp-dialog-field:#fffdf8;
+  width:min(720px,calc(100% - 28px));
+  max-width:720px;
+  max-height:calc(100dvh - 40px);
+  margin:auto;
+  padding:0;
+  border:1px solid #b99062;
+  background:var(--cp-dialog-bg);
+  color:var(--cp-dialog-ink);
+  box-shadow:0 24px 80px #0007;
+  overflow:auto;
+  overscroll-behavior:contain;
+}
+html.dark body dialog#cpComposePanel {
+  --cp-dialog-bg:#102f40;--cp-dialog-ink:#f0e5d6;--cp-dialog-line:#567181;--cp-dialog-field:#0a2433;
+}
+#cpComposePanel::backdrop {background:#04131fbd;backdrop-filter:blur(5px);}
+#cpComposePanel .ae-pick-compose-head {
+  position:sticky;top:0;z-index:2;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:20px 24px;
+  background:var(--cp-dialog-bg);
+  border-bottom:1px solid var(--cp-dialog-line);
+}
+#cpComposePanel .ae-pick-compose-head span {font:700 10px/1.4 Inter,sans-serif;letter-spacing:.15em;color:#b38b5d;}
+#cpComposePanel #cpComposeTitle {margin:4px 0 0;font:600 30px/1.15 Newsreader,Georgia,serif;color:var(--cp-dialog-ink);}
+#cpComposePanel #cpComposeClose {
+  flex:0 0 44px;width:44px;min-height:44px;padding:0;
+  border:1px solid var(--cp-dialog-line);background:transparent;color:var(--cp-dialog-ink);
+  font:400 28px/1 system-ui;cursor:pointer;
+}
+#cpComposePanel #cpComposeIntro {padding:18px 24px 0;margin:0;font-size:14px;line-height:1.6;color:var(--cp-dialog-ink);}
+#cpComposePanel #cpForm {margin:0;padding:4px 24px 24px;border:0;background:transparent;color:var(--cp-dialog-ink);}
+#cpComposePanel #cpForm label,#cpComposePanel #cpForm legend {color:var(--cp-dialog-ink);font-size:14px;line-height:1.5;}
+#cpComposePanel #cpForm legend {font-weight:700;padding:0 6px;}
+#cpComposePanel #cpForm input:not([type=checkbox]),#cpComposePanel #cpForm textarea {
+  min-height:44px;font-size:16px;background:var(--cp-dialog-field);color:var(--cp-dialog-ink);border:1px solid var(--cp-dialog-line);
+}
+#cpComposePanel #cpForm input[type=checkbox] {width:18px;height:18px;vertical-align:middle;accent-color:#ad7c48;}
+#cpComposePanel #cpForm textarea {min-height:90px;resize:vertical;}
+#cpComposePanel #cpForm fieldset {min-width:0;border-color:var(--cp-dialog-line);}
+#cpComposePanel #cpForm .cp-legs {grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr));}
+#cpComposePanel #cpForm button {
+  min-height:44px;padding:10px 16px;border:1px solid var(--cp-dialog-line);
+  background:var(--cp-dialog-field);color:var(--cp-dialog-ink);font-size:14px;cursor:pointer;
+}
+#cpComposePanel #cpForm button[type=submit] {
+  width:100%;margin-top:14px;background:linear-gradient(110deg,#d7ad7d,#b98858);
+  border-color:#d3ac7b;color:#0c2939;font-weight:700;font-size:16px;
+}
+#cpComposePanel #cpForm button:disabled,#cpComposePanel #cpComposeClose:disabled {opacity:.6;cursor:wait;}
+#cpComposePanel #cpForm output {color:var(--cp-dialog-ink);}
+#cpComposePanel #cpForm .cp-meta {color:var(--cp-dialog-ink);opacity:.8;}
+#cpComposePanel #cpForm .cp-status {color:var(--cp-dialog-ink);font-weight:600;}
+@media(max-width:520px) {
+  html body dialog#cpComposePanel {width:calc(100% - 16px);max-height:calc(100dvh - 20px);}
+  #cpComposePanel .ae-pick-compose-head {padding:16px;}
+  #cpComposePanel #cpComposeTitle {font-size:27px;}
+  #cpComposePanel #cpComposeIntro {padding:16px 16px 0;}
+  #cpComposePanel #cpForm {padding:4px 16px 20px;}
+  #cpComposePanel #cpForm fieldset {padding:12px;}
+}
