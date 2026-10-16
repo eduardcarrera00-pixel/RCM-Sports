@@ -1,5 +1,9 @@
 # AE SPORTS maintenance
 
+Visual reference: `docs/visual-guide.md` and the illustrated `guia-visual.html`.
+Preserve the current brand assets and approved mobile sport layouts. Use the
+guide for new visual work; it does not authorize removing existing functionality.
+
 The published page loads `assets/site.css` and `assets/ae-editorial-bundle.css`.
 The latter combines the source stylesheets listed in `assets/style-sources.json`, in their original cascade order.
 
