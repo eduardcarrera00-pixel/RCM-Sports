@@ -22,7 +22,7 @@
    const box=make('article',undefined,isPreview?'ae-weekly-card ae-weekly-preview':'ae-weekly-card');
    if(isPreview){
      const photoUrl=editorialUrl(p.image_path,p.image_url);
-     if(photoUrl&&!editorialUrl(p.banner_path,p.banner_url)){const photo=make('img',undefined,'ae-weekly-home-thumbnail');photo.src=photoUrl;photo.style.objectPosition=framedPosition(p,'image');photo.alt='Imagen del Pick editorial';photo.loading='lazy';box.append(photo);}
+     if(photoUrl&&!editorialUrl(p.banner_path,p.banner_url)){const photo=make('img',undefined,'ae-weekly-home-thumbnail');photo.src=photoUrl;photo.style.setProperty('--ae-image-focus',framedPosition(p,'image'));photo.alt='Imagen del Pick editorial';photo.loading='lazy';box.append(photo);}
      const go=()=>{
        if(typeof filterByCategory==='function')filterByCategory('Picks');
        const detail=$('picksFeaturedCard')?.querySelector('details');
@@ -47,7 +47,7 @@
    summary.append(make('span','Ver análisis y detalles ↓','ae-weekly-expand-hint'));
    const expanded=make('div',undefined,'ae-weekly-expanded-content');
    const photoUrl=editorialUrl(p.image_path,p.image_url);
-   if(photoUrl){const photo=make('img',undefined,'ae-weekly-inline-photo');photo.src=photoUrl;photo.style.objectPosition=framedPosition(p,'image');photo.alt='Imagen del Pick de la Semana';photo.loading='lazy';expanded.append(photo);}
+   if(photoUrl){const photo=make('img',undefined,'ae-weekly-inline-photo');photo.src=photoUrl;photo.style.setProperty('--ae-image-focus',framedPosition(p,'image'));photo.alt='Imagen del Pick de la Semana';photo.loading='lazy';expanded.append(photo);}
    expanded.append(make('p',p.event_name,'ae-weekly-event'),make('p',p.analysis,'ae-weekly-analysis'));
    expanded.append(make('small','Cuota publicada por AE SPORTS; no verificada en tiempo real. Sin apuestas en esta página.','ae-weekly-disclaimer'));
    details.append(summary,expanded);box.append(details);
@@ -62,7 +62,7 @@
    if(!url)return;
    const banner=make('img',undefined,'ae-weekly-home-banner');
    banner.src=url;
-   banner.style.objectPosition=framedPosition(active,'banner');
+   banner.style.setProperty('--ae-image-focus',framedPosition(active,'banner'));
    banner.alt='';
    banner.setAttribute('aria-hidden','true');
    banner.loading='lazy';
@@ -79,7 +79,7 @@
    if(featured){
      featured.querySelector('.ae-weekly-banner')?.remove();
      const url=editorialUrl(active?.banner_path,active?.banner_url);
-     if(url){const banner=make('img',undefined,'ae-weekly-banner');banner.src=url;banner.style.objectPosition=framedPosition(active,'banner');banner.alt='';banner.loading='lazy';featured.prepend(banner);}
+     if(url){const banner=make('img',undefined,'ae-weekly-banner');banner.src=url;banner.style.setProperty('--ae-image-focus',framedPosition(active,'banner'));banner.alt='';banner.loading='lazy';featured.prepend(banner);}
    }
    for(const [id,preview] of [['cpWeekly',true],['picksFeaturedCard',false]]){
      const area=$(id);if(!area)continue;
@@ -171,7 +171,7 @@
    const imageUrl=newest.image && typeof safeImageURL==='function'?safeImageURL(newest.image):'';
    if(imageUrl){
      const img=make('img');img.loading='lazy';img.decoding='async';img.alt='';img.src=imageUrl;
-     img.style.objectPosition=(Number.isFinite(Number(newest.image_focus_x))?Math.max(0,Math.min(100,Number(newest.image_focus_x))):50)+'% '+(Number.isFinite(Number(newest.image_focus_y))?Math.max(0,Math.min(100,Number(newest.image_focus_y))):50)+'%';
+     img.style.setProperty('--ae-image-focus',(Number.isFinite(Number(newest.image_focus_x))?Math.max(0,Math.min(100,Number(newest.image_focus_x))):50)+'% '+(Number.isFinite(Number(newest.image_focus_y))?Math.max(0,Math.min(100,Number(newest.image_focus_y))):50)+'%');
      card.classList.add('has-photo');
      img.addEventListener('error',()=>{
        img.remove();
