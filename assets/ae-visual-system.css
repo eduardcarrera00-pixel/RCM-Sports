@@ -34,6 +34,9 @@ html body #mainContent #articlesGrid>article>div:last-child p {
 html:not(.dark) body #mainContent #articlesGrid>article button {
   color:var(--ae-system-bronze)!important;
 }
+html:not(.dark) body #mainContent #articlesGrid>article button :is(i,span) {
+  color:inherit!important;
+}
 /* Espacio suficiente para leer la historia principal sin cortar su título. */
 @media(min-width:761px) {
   html body.ae-is-home #mainContent #heroSection .editorial-hero {
