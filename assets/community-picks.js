@@ -18,6 +18,7 @@ function message(error){return error?.message||'No pudimos completar la operaci√
 async function account(){if(!db)throw Error('Sin conexi√≥n.');const r=await db.auth.getUser();if(r.error)throw r.error;if(!r.data.user){closeDetail();closePickComposer(true);openUserAuthModal();return null;}return r.data.user;}
 function link(id){const u=new URL(location.href);u.searchParams.delete('article');u.searchParams.delete('comment');u.searchParams.set('pick',id);u.hash='';return u.href;}
 function open(id){history.pushState({},'',link(id));showDetail(id);}
+window.openAeCommunityPick=open;
 function card(p,compact=false,detail=false){
 
  const n=el('article',null,detail?'cp-card cp-card-detail':'cp-card');
