@@ -291,6 +291,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261016-editor-1">
     <link rel="stylesheet" href="assets/ae-muted-navigation-icons.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-custom-nav-icons.css?v=20261016-1">
+<link rel="stylesheet" href="assets/ae-classical-auth-buttons.css?v=20261016-1">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 <a class="ae-skip-link" href="#mainContent">Ir al contenido</a>
@@ -333,7 +334,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
                     <!-- Guest State: User sign-in and registration -->
                     
                     <div id="readerSession" class="hidden rcm-row"></div>
-                    <button id="aeMyTakesButton" type="button" hidden class="ae-profile-open" onclick="openAeProfile()" aria-label="Abrir mi perfil y mis Takes"><i class="fa-solid fa-user" aria-hidden="true"></i><span>Mi perfil</span></button>
+                    <button id="aeMyTakesButton" type="button" hidden class="ae-profile-open ae-classical-auth-button ae-classical-profile" onclick="openAeProfile()" aria-label="Mi perfil: consultar mis Takes" title="Mi perfil"><img class="ae-classical-auth-art" src="assets/ui/ae-profile-classic.webp?v=20261016-1" width="520" height="145" alt="" aria-hidden="true" decoding="async"><span class="sr-only">Mi perfil</span></button>
                     <div id="guestAdminContainer">
                         <button type="button" onclick="openUserAuthModal()" aria-label="Iniciar sesión o crear cuenta" class="flex items-center space-x-2 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 text-xs font-bold py-2.5 px-3.5 sm:px-4 rounded-xl transition-all">
                             <i class="fa-solid fa-right-to-bracket text-pitch-700"></i>
@@ -367,9 +368,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
                         </button>
 
                         <!-- Logout Button -->
-                        <button onclick="handleAdminLogout()" title="Cerrar Sesión" aria-label="Cerrar sesión" class="ae-signout-action w-9 h-9 bg-slate-100 hover:bg-red-50 hover:text-red-600 border border-slate-200 text-slate-500 rounded-xl flex items-center justify-center transition-all">
-                            <i class="fa-solid fa-right-from-bracket text-xs"></i>
-                        </button>
+                        <button type="button" onclick="handleAdminLogout()" title="Cerrar sesión" aria-label="Cerrar sesión" class="ae-signout-action ae-classical-auth-button ae-classical-logout"><img class="ae-classical-auth-art" src="assets/ui/ae-logout-classic.webp?v=20261016-1" width="520" height="136" alt="" aria-hidden="true" decoding="async"><span class="sr-only">Cerrar sesión</span></button>
                     </div>
 
                 </div>
