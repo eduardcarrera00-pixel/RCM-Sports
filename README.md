@@ -1,4 +1,11 @@
-# RCM Sports
+# AE SPORTS
+
+Dirección pública con la marca: **https://aesportsclub.github.io/**
+
+El código se mantiene en este repositorio. La publicación con la marca se configura
+en [aesportsclub/aesportsclub.github.io](https://github.com/aesportsclub/aesportsclub.github.io)
+y comprueba los cambios cada cinco minutos mediante GitHub Actions. GitHub puede
+retrasar esas ejecuciones. La dirección anterior de GitHub Pages sigue disponible.
 
 Noticias deportivas y una comunidad de lectores que comentan, responden y votan.
 
