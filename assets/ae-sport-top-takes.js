@@ -62,6 +62,10 @@
    root.hidden=!sport;voices.hidden=!!sport;
    root.dataset.sport=sport;
    if(!sport){current='';return;}
+   // Los destacados deportivos tienen nombres propios; los de portada
+   // (#aeTopTakesPositiveTitle / #aeTopTakesNegativeTitle) no se modifican.
+   $('aeSportGeniosTitle').textContent=sport==='nfl'?'NFL Savant':'Respira fútbol';
+   $('aeSportAnoetosTitle').textContent=sport==='nfl'?'NFL Rookie':'Vende Humos';
    $('aeSportTakeTitle').textContent='Takes destacados · '+(sport==='nfl'?'NFL':'Fútbol');
    if(!force&&sport===current&&Date.now()-lastRun<15000)return;
    current=sport;

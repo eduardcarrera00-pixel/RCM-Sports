@@ -192,3 +192,31 @@ html:not(.dark) body #footballTakes .ae-picks-rail #picksNews .ae-picks-news-fea
     transition:none!important;
   }
 }
+
+/* Retoque: Cocina Picks más discreto y perfectamente centrado con ¿Eres Chef?
+   Mantener una zona táctil cómoda, sin alterar la acción de publicación. */
+html body #footballTakes #communityPicks #cpPublishCta.ae-picks-publish-cta{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  align-self:center!important;
+  gap:5px!important;
+  width:auto!important;
+  height:auto!important;
+  min-height:37px!important;
+  padding:7px 11px!important;
+  font:800 11.5px/1.2 Inter,system-ui,sans-serif!important;
+  text-align:center!important;
+  white-space:nowrap!important;
+  box-shadow:0 3px 9px rgba(5,27,41,.12)!important;
+}
+html body #footballTakes #communityPicks #cpPublishCta.ae-picks-publish-cta>span{
+  font:750 13px/1 Inter,system-ui,sans-serif!important;
+  margin:0!important;
+}
+@media(max-width:480px){
+  html body #footballTakes #communityPicks #cpPublishCta.ae-picks-publish-cta{
+    min-height:38px!important;
+    padding:8px 10px!important;
+  }
+}
