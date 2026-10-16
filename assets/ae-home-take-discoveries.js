@@ -1,83 +1,91 @@
-/* AE SPORTS · Portada: Takes curiosos y el Take histórico más apoyado. */
+/* AE SPORTS · Portada: votos positivos/negativos y récord histórico por puntos. */
 (() => {
   'use strict';
   const $=id=>document.getElementById(id);
-  const sportLabel={nfl:'NFL',football:'Fútbol',laliga:'LaLiga',premier:'Premier League',ligamx:'Liga MX',champions:'Champions League'};
-  const allowed=new Set(Object.keys(sportLabel));
   let inFlight=false, queued=false, lastFetch=0, loadId=0;
 
-  function make(tag,text,className){
+  function node(tag,text,className){
     const n=document.createElement(tag);
     if(text!==undefined&&text!==null)n.textContent=String(text);
     if(className)n.className=className;
     return n;
   }
-  function dateValue(t){return new Date(t.created_at||0).getTime()||0;}
-  function votes(t){return Math.max(0,Number(t.upvotes)||0);}
-  function doubts(t){return Math.max(0,Number(t.downvotes)||0);}
+  function votes(t,field){return Math.max(0,Number(t[field])||0);}
   function openTake(t){window.aeTakeReplies?.open(t);}
-  function makeCard(t,historic=false){
-    const card=make('button',null,'ae-discovery-take');
-    card.type='button';
-    card.setAttribute('aria-label','Leer Take: '+(t.title||'Publicación'));
-    card.addEventListener('click',()=>openTake(t));
-    const eyebrow=make('span',(t.competition||sportLabel[t.sport]||'Comunidad'),'ae-discovery-sport');
-    const title=make('strong',t.title||'Take de la comunidad','ae-discovery-title');
+  function card(t,kind){
+    const historic=kind==='historical';
+    const btn=node('button',null,'ae-discovery-take');
+    btn.type='button';
+    btn.setAttribute('aria-label','Leer Take y su conversación: '+(t.title||'Publicación'));
+    btn.addEventListener('click',()=>openTake(t));
+
+    btn.append(node('span',t.competition|| (t.sport==='nfl'?'NFL':'Fútbol'),'ae-discovery-sport'));
+    btn.append(node('strong',t.title||'Take de la comunidad','ae-discovery-title'));
+
     const excerpt=String(t.body||'').trim();
-    card.append(eyebrow,title);
-    if(excerpt)card.append(make('span',excerpt.length>(historic?170:95)?excerpt.slice(0,historic?167:92).trimEnd()+'…':excerpt,'ae-discovery-excerpt'));
-    const footer=make('span',null,'ae-discovery-meta');
-    footer.append(make('span','@'+String(t.author||'Aficionado').replace(/^@+/,'')));
-    footer.append(make('span','▲ '+votes(t)+'  ·  ▼ '+doubts(t),'ae-discovery-score'));
-    card.append(footer);
-    return card;
+    if(excerpt){
+      const max=historic?180:100;
+      btn.append(node('span',excerpt.length>max?excerpt.slice(0,max-3).trimEnd()+'…':excerpt,'ae-discovery-excerpt'));
+    }
+
+    const foot=node('span',null,'ae-discovery-meta');
+    foot.append(node('span','@'+String(t.author||'Aficionado').replace(/^@+/,'')));
+    const label=historic
+      ?Number(t.points||0)+' '+(Number(t.points)===1?'punto':'puntos')
+      :kind==='positive'
+        ?'▲ '+votes(t,'upvotes')+' apoyos'
+        :'▼ '+votes(t,'downvotes')+' rechazos';
+    foot.append(node('span',label,'ae-discovery-score'));
+    btn.append(foot);
+    return btn;
   }
-  function showMessage(target,text){
+  function empty(target,text,isList=false){
     if(!target)return;
-    target.replaceChildren(make('p',text,'ae-discovery-empty'));
+    const item=node(isList?'li':'p',text,'ae-discovery-empty');
+    target.replaceChildren(item);
   }
   function render(data){
-    const curious=$('aeHomeTakesCuriousList'),historic=$('aeHomeTakeHistoricTake');
-    if(!curious||!historic)return;
-    const takes=(Array.isArray(data)?data:[]).filter(t=>t&&t.id&&allowed.has(t.sport)&&String(t.title||'').trim());
-    const allTime=takes.filter(t=>votes(t)>0)
-      .sort((a,b)=>votes(b)-votes(a)||doubts(a)-doubts(b)||dateValue(a)-dateValue(b));
-    const winner=allTime[0];
-    if(winner)historic.replaceChildren(makeCard(winner,true));
-    else showMessage(historic,'Aún no hay un Take con votos positivos para destacar.');
+    const positive=$('aeHomeTakesPositiveList');
+    const negative=$('aeHomeTakesNegativeList');
+    const historic=$('aeHomeTakeHistoricTake');
+    if(!positive||!negative||!historic)return;
 
-    // Curiosidad = debate: priorizar Takes con opiniones divididas;
-    // después, participación y novedad. Sin ejemplos ni contenidos ficticios.
-    const options=takes.filter(t=>t.id!==winner?.id)
-      .sort((a,b)=>Math.min(votes(b),doubts(b))-Math.min(votes(a),doubts(a))
-        ||(votes(b)+doubts(b))-(votes(a)+doubts(a))
-        ||dateValue(b)-dateValue(a))
-      .slice(0,3);
-    if(options.length){
-      curious.replaceChildren(...options.map(t=>{
-        const li=make('li');
-        li.append(makeCard(t));
+    const rows=Array.isArray(data)?data:[];
+    function votesList(kind,target,message){
+      const selection=rows.filter(x=>x&&x.kind===kind&&x.id)
+        .sort((a,b)=>Number(a.rank_number)-Number(b.rank_number)).slice(0,3);
+      if(!selection.length){empty(target,message,true);return;}
+      target.replaceChildren(...selection.map(t=>{
+        const li=node('li');
+        li.append(card(t,kind));
         return li;
       }));
-    }else showMessage(curious,'Cuando haya nuevos Takes, aparecerán aquí las conversaciones de la comunidad.');
+    }
+    votesList('positive',positive,'Todavía no hay Takes con votos positivos.');
+    votesList('negative',negative,'Todavía no hay Takes con votos negativos.');
+
+    const champion=rows.find(x=>x&&x.kind==='historical'&&Number(x.points)>0);
+    if(champion)historic.replaceChildren(card(champion,'historical'));
+    else empty(historic,'Aún no hay un Take acertado con puntos asignados por los administradores.');
   }
   async function refresh(force=false){
     const root=$('aeHomeTakeHighlights');
-    if(!root||!db||$('editorialBottom')?.hidden)return;
+    if(!root||typeof db==='undefined'||!db||$('editorialBottom')?.hidden)return;
     if(typeof currentCategory!=='undefined'&&currentCategory!=='Todos')return;
     if(inFlight){queued=queued||force;return;}
     if(!force&&Date.now()-lastFetch<45000)return;
     const seq=++loadId;
     inFlight=true;
-    try {
-      const result=await db.rpc('ae_public_take_feed',{p_sport:'all'});
+    try{
+      const result=await db.rpc('ae_home_take_showcase');
       if(result.error)throw result.error;
       if(seq!==loadId)return;
       render(result.data);
       lastFetch=Date.now();
     }catch(error){
-      showMessage($('aeHomeTakesCuriousList'),'No pudimos cargar los Takes curiosos. Actualiza la página para reintentarlo.');
-      showMessage($('aeHomeTakeHistoricTake'),'No pudimos cargar el Take histórico.');
+      empty($('aeHomeTakesPositiveList'),'No se pudieron cargar los votos. Actualiza la página.',true);
+      empty($('aeHomeTakesNegativeList'),'No se pudieron cargar los votos. Actualiza la página.',true);
+      empty($('aeHomeTakeHistoricTake'),'No se pudo cargar el Take con más puntos.');
     }finally{
       inFlight=false;
       if(queued){queued=false;void refresh(true);}
