@@ -44,8 +44,7 @@
       const zoom=Number(article?.image_zoom_pct);
       const zoomPct=Number.isFinite(zoom)?Math.max(1,Math.min(300,Math.round(zoom))):100;
       img.style.setProperty('--ae-image-focus',focus);
-      img.style.transformOrigin=focus;
-      img.style.transform='scale('+(zoomPct/100)+')';
+      img.style.setProperty('--ae-image-zoom',String(zoomPct/100));
       img.alt='';img.loading='lazy';img.decoding='async';
       img.addEventListener('error',()=>img.remove());
       link.append(img);
