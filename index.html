@@ -544,6 +544,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 </style>
     <link rel="stylesheet" href="assets/ae-chef-platos-scroll.css?v=20261016-layout-restored-2">
 <link rel="stylesheet" href="assets/ae-take-rankings-palette.css?v=20261016-duel-3">
+<link rel="stylesheet" href="assets/ae-home-takes-restructure.css?v=20261016-1">
     <link rel="stylesheet" href="assets/ae-take-rankings-best-take.css?v=20261016-1">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
@@ -846,6 +847,10 @@ html.dark [data-reading-size][aria-pressed="true"] {
                   <p id="aeTopTakesStatus" class="sr-only" role="status" aria-live="polite">Cargando los Takes destacados…</p>
                 </div>
               </div>
+              <div class="ae-points-period" role="group" aria-label="Periodo de la clasificación por puntos de Takes">
+                <button type="button" data-home-take-period="month" aria-pressed="false">Mensual</button>
+                <button type="button" data-home-take-period="all" aria-pressed="true">Histórico</button>
+              </div>
               <div class="ae-top-takes-grid">
                 <section class="ae-top-takes-card" aria-labelledby="aeTopTakesPositiveTitle">
                   <header class="ae-top-takes-card-head"><h3 id="aeTopTakesPositiveTitle">Genios</h3><button type="button" class="ae-mobile-expand-button ae-mobile-takes-more" aria-controls="aeTopTakesPositive" aria-expanded="false">Ver más <span aria-hidden="true">→</span></button></header>
@@ -858,26 +863,21 @@ html.dark [data-reading-size][aria-pressed="true"] {
               </div>
             </section>
             <div id="aeHomeTakeHighlights" class="ae-home-take-highlights">
-            <section id="aeHomeTakeRanking" class="ae-take-ranking" aria-labelledby="aeHomeTakeRankingTitle">
-              <div class="ae-take-ranking-head"><div><span class="ae-take-ranking-kicker">AE SPORTS · COMUNIDAD</span><h2 id="aeHomeTakeRankingTitle">Top 10 · Takes combinados</h2></div><p>NFL + Fútbol · puntos otorgados por los administradores</p></div>
-              <div class="ae-take-ranking-tabs" role="group" aria-label="Periodo del ranking combinado"><button type="button" data-take-rank="month" aria-pressed="true">Mensual</button><button type="button" data-take-rank="all" aria-pressed="false">Histórico</button></div>
-              <ol id="aeHomeTakeRankingList" class="ae-take-ranking-list" aria-live="polite"><li>Cargando clasificación…</li></ol>
-            </section>
-              <div class="ae-home-take-extras" aria-label="Destacados de Takes">
-                <section id="aeHomeTakesCurious" class="ae-home-take-feature" aria-label="Los Takes más votados">
-                  <p class="ae-home-take-feature-kicker">El veredicto de la comunidad</p>
+            <div class="ae-home-take-extras" aria-label="Destacados de Takes">
+                <section id="aeHomeTakesCurious" class="ae-home-take-feature" aria-label="Popular y Unpopular Takes">
+                  <p class="ae-home-take-feature-kicker">El veredicto de la comunidad · NFL + Fútbol</p>
                   <div class="ae-vote-duel">
                     <section class="ae-vote-column is-positive" aria-labelledby="aeHomeTakesPositiveTitle">
                       <div class="ae-vote-column-heading">
-                        <h3 id="aeHomeTakesPositiveTitle">Takes que arrasan</h3>
-                        <p>Los más aplaudidos</p>
+                        <h3 id="aeHomeTakesPositiveTitle">Popular Takes</h3>
+                        <p>Los 10 más apoyados</p>
                       </div>
                       <ol id="aeHomeTakesPositiveList" class="ae-discovery-list" aria-live="polite"><li class="ae-discovery-empty">Cargando Takes…</li></ol>
                     </section>
                     <section class="ae-vote-column is-negative" aria-labelledby="aeHomeTakesNegativeTitle">
                       <div class="ae-vote-column-heading">
-                        <h3 id="aeHomeTakesNegativeTitle">Takes que arden</h3>
-                        <p>Los más cuestionados</p>
+                        <h3 id="aeHomeTakesNegativeTitle">Unpopular Takes</h3>
+                        <p>Los 10 más cuestionados</p>
                       </div>
                       <ol id="aeHomeTakesNegativeList" class="ae-discovery-list" aria-live="polite"><li class="ae-discovery-empty">Cargando Takes…</li></ol>
                     </section>
@@ -2646,8 +2646,8 @@ updateThemeButton();
 <script src="assets/ae-take-rankings.js?v=20261016-best-take-1"></script>
 <script src="assets/ae-editorial-weekly.js?v=20261016-native-picks-final-1"></script>
 <script src="assets/ae-profile.js?v=20261016-unpopular-take-1"></script>
-<script src="assets/ae-home-takes.js?v=20261016-unified-composer-1"></script>
-<script src="assets/ae-home-take-discoveries.js?v=20261016-votes-historic-points-2"></script>
+<script src="assets/ae-home-takes.js?v=20261016-points-extremes-1"></script>
+<script src="assets/ae-home-take-discoveries.js?v=20261016-top10-community-1"></script>
 <script src="assets/ae-nfl-latest-comments.js?v=20261016-football-2"></script>
 <script src="assets/ae-sport-top-takes.js?v=20261016-unified-composer-1"></script>
 <script src="assets/ae-take-replies.js?v=20261016-reply-login-1"></script>
