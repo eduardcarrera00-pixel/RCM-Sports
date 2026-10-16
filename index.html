@@ -2041,7 +2041,7 @@ currentUser = {
             if(newsHeading) newsHeading.lastChild.textContent = currentCategory === 'Fútbol' ? ' Noticias de Fútbol' : currentCategory === 'NFL' ? ' Noticias de NFL' : ' Últimas noticias';
             const archiveLink = document.getElementById('aeAllNewsSport');
             if(archiveLink) {archiveLink.hidden=!isSportNewsPreview; archiveLink.dataset.aeNewsCategory=currentCategory;}
-            const visibleCount = isHome ? Math.min(3, Math.max(0,filtered.length-1)) : isSportNewsPreview ? Math.min(3, filtered.length) : filtered.length;
+            const visibleCount = isHome ? Math.min(7, Math.max(0,filtered.length-1)) : isSportNewsPreview ? Math.min(3, filtered.length) : filtered.length;
             articlesCount.innerText = `${visibleCount} ${visibleCount === 1 ? 'noticia' : 'noticias'}`;
             // El número se deduce de las tarjetas en portada; conservarlo en otras vistas.
             articlesCount.hidden = isHome;
@@ -2065,7 +2065,7 @@ currentUser = {
             articlesGrid.classList.remove('hidden');
 
             let heroArticle = filtered[0];
-            let gridArticles = isHome ? filtered.slice(1, 4) : isSportNewsPreview ? filtered.slice(0, 3) : filtered;
+            let gridArticles = isHome ? filtered.slice(1, 8) : isSportNewsPreview ? filtered.slice(0, 3) : filtered;
 
             if (currentCategory !== 'Todos' || currentSearchQuery !== '') {
                 // Como NFL: en Fútbol móvil, Champions y luego Noticias,
@@ -2143,7 +2143,7 @@ currentUser = {
                 articlesGrid.removeAttribute('aria-roledescription');
                 articlesGrid.removeAttribute('tabindex');
             }
-            // Portada: exactamente tres noticias recientes. El resto permanece en cada deporte.
+            // Portada: hasta siete noticias recientes. El resto permanece en cada deporte.
         }
 
         function renderHeroCard(hero) {
