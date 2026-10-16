@@ -391,3 +391,102 @@ html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card .ae-free-v
     min-height:34px!important;
   }
 }
+
+
+/* Fútbol: 4 Takes pequeños por fila, alineados arriba y juntos. */
+html body.ae-is-football #freeTakes[data-sport="football"] .ae-takes-head{
+  margin-bottom:5px!important;
+}
+html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesStatus:empty{
+  display:none!important;
+}
+html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesFeed{
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  grid-auto-rows:min-content!important;
+  align-content:start!important;
+  align-items:start!important;
+  gap:6px!important;
+  width:100%!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:0!important;
+}
+html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesFeed>.ae-free-take-card{
+  box-sizing:border-box!important;
+  align-self:start!important;
+  justify-content:flex-start!important;
+  min-height:0!important;
+  height:auto!important;
+  width:100%!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:9px!important;
+  border-left-width:2px!important;
+  box-shadow:0 2px 7px rgba(3,20,32,.08)!important;
+}
+html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesFeed>.ae-free-take-card .ae-take-overline{
+  display:flex!important;
+  flex-wrap:wrap!important;
+  gap:3px 5px!important;
+  min-width:0!important;
+  margin:0!important;
+  font-size:9px!important;
+  line-height:1.22!important;
+}
+html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesFeed>.ae-free-take-card .ae-take-overline>span:first-child{
+  font-size:9px!important;
+  padding:2px 4px!important;
+}
+html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesFeed>.ae-free-take-card .ae-feed-take-title{
+  font-size:clamp(15px,1.35vw,18px)!important;
+  line-height:1.16!important;
+  margin:4px 0!important;
+  overflow-wrap:anywhere!important;
+}
+html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesFeed>.ae-free-take-card .ae-free-take-body{
+  display:block!important;
+  max-width:100%!important;
+  min-width:0!important;
+  font-size:12px!important;
+  line-height:1.35!important;
+  margin:0 0 4px!important;
+  -webkit-line-clamp:unset!important;
+  overflow:visible!important;
+  overflow-wrap:anywhere!important;
+}
+html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesFeed>.ae-free-take-card .ae-free-vote-row{
+  display:flex!important;
+  flex-wrap:wrap!important;
+  align-items:center!important;
+  gap:3px!important;
+  padding-top:4px!important;
+  margin-top:4px!important;
+}
+html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesFeed>.ae-free-take-card .ae-free-vote-row button{
+  flex:0 0 auto!important;
+  width:auto!important;
+  min-height:27px!important;
+  margin:0!important;
+  padding:3px 5px!important;
+  font-size:10px!important;
+  line-height:1.2!important;
+}
+@media (min-width:900px) and (max-width:1139px){
+  html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesFeed{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  }
+}
+@media (min-width:761px) and (max-width:899px){
+  html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesFeed{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+}
+@media (max-width:760px){
+  html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesFeed{
+    grid-template-columns:minmax(0,1fr)!important;
+  }
+  html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesFeed>.ae-free-take-card .ae-free-vote-row button{
+    min-height:34px!important;
+  }
+}

@@ -25,8 +25,9 @@
      return;
    }
    const more=$('freeTakesMore');
-   if(more){more.hidden=showAll||sorted.length<=8;more.textContent='Ver todos los Takes ('+sorted.length+') →';}
-   for(const t of (showAll?sorted:sorted.slice(0,8))){
+   const initialVisible=activeSection==='Fútbol'?16:8;
+   if(more){more.hidden=showAll||sorted.length<=initialVisible;more.textContent='Ver todos los Takes ('+sorted.length+') →';}
+   for(const t of (showAll?sorted:sorted.slice(0,initialVisible))){
      const card=el('article',null,'ae-take-card ae-free-take-card');
      // Acento basado exclusivamente en el deporte real; no altera contenido ni votos.
      card.dataset.sport=Object.prototype.hasOwnProperty.call(sports,t.sport)?t.sport:'general';
