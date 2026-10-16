@@ -492,6 +492,56 @@ html.dark [data-reading-size][aria-pressed="true"] {
   }
 }
 </style>
+<style id="ae-nfl-savant-rookie-mobile-visible">
+/* NFL on phones: visible original Savant/Rookie ranking between news and Takes.
+   Do not affect Fútbol, Picks, desktop or any live vote/reply interaction. */
+@media(max-width:760px){
+  html body.ae-is-nfl #mainContent > #aeSportTakeLeaders.ae-sport-chefs[data-sport="nfl"]:not([hidden]){
+    display:block!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    min-width:0!important;
+    height:auto!important;
+    margin:12px 0!important;
+    padding:0!important;
+    border:0!important;
+    background:transparent!important;
+    overflow:visible!important;
+  }
+  html body.ae-is-nfl #mainContent > #aeSportTakeLeaders[hidden]{display:none!important}
+  html body.ae-is-nfl #mainContent > #aeSportTakeLeaders.ae-sport-chefs[data-sport="nfl"] .ae-sport-takes-grid{
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    flex-direction:unset!important;
+    align-items:stretch!important;
+    gap:9px!important;
+    width:100%!important;
+  }
+  html body.ae-is-nfl #mainContent > #aeSportTakeLeaders.ae-sport-chefs[data-sport="nfl"] .ae-sport-takes-grid > .ae-sport-chef-card{
+    display:flex!important;
+    flex-direction:column!important;
+    min-width:0!important;
+    width:100%!important;
+    height:auto!important;
+    margin:0!important;
+  }
+  html body.ae-is-nfl #mainContent > #aeSportTakeLeaders.ae-sport-chefs[data-sport="nfl"] .ae-sport-chef-heading{
+    flex-shrink:0!important;
+  }
+  html body.ae-is-nfl #mainContent > #aeSportTakeLeaders.ae-sport-chefs[data-sport="nfl"] .ae-sport-takes-list{
+    flex:1 1 auto!important;
+    min-width:0!important;
+  }
+  html body.ae-is-nfl #mainContent > #aeSportTakeLeaders.ae-sport-chefs[data-sport="nfl"] .ae-sport-takes-list .ae-top-take-reply{
+    display:inline-flex!important;
+    min-height:28px!important;
+  }
+  html body.ae-is-nfl #mainContent > #aeSportTakeLeaders.ae-sport-chefs[data-sport="nfl"] .ae-sport-takes-list .ae-top-take-author{
+    max-width:100%!important;
+    overflow-wrap:anywhere!important;
+  }
+}
+</style>
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 <a class="ae-skip-link" href="#mainContent">Ir al contenido</a>
@@ -2503,7 +2553,7 @@ updateThemeButton();
 <script src="assets/ae-news-editor.js?v=20261016-1"></script>
 <script src="assets/ae-news-archive.js?v=20261016-framing-zoom-3"></script>
 <script src="assets/ae-mobile-compact-home.js?v=20261016-top3-swipe-v1"></script>
-<script src="assets/ae-football-mobile-redesign.js?v=20261016-unified-ranked-motion-v2"></script>
+<script src="assets/ae-football-mobile-redesign.js?v=20261016-nfl-savant-rookie-restored-1"></script>
 <script src="assets/ae-home-weekly-layout.js?v=20261016-native-picks-final-1"></script>
 </body>
 </html>
