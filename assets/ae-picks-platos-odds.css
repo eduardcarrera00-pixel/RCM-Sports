@@ -39,3 +39,29 @@ html:not(.dark) body #footballTakes .ae-chef-worst .ae-chef-odds{
   background:rgba(146,122,151,.10)!important;
   color:#72506c!important;
 }
+
+
+/* Cuota junto al usuario, alineada al extremo derecho; votos debajo. */
+html body #footballTakes .ae-picks-rail>.ae-chef-board .ae-chef-author-row{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  align-items:center!important;
+  gap:8px!important;
+  width:100%!important;
+  min-width:0!important;
+  margin:0 0 3px!important;
+}
+html body #footballTakes .ae-picks-rail>.ae-chef-board .ae-chef-author-row .ae-chef-author{
+  min-width:0!important;
+  max-width:100%!important;
+  overflow:hidden!important;
+  white-space:nowrap!important;
+  text-overflow:ellipsis!important;
+  justify-self:start!important;
+}
+html body #footballTakes .ae-picks-rail>.ae-chef-board .ae-chef-author-row .ae-chef-odds{
+  justify-self:end!important;
+  margin-left:auto!important;
+  flex-shrink:0!important;
+  white-space:nowrap!important;
+}

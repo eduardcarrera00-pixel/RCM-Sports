@@ -134,14 +134,14 @@ function paintChefList(id,result,kind){
    };
    const score=Number(p.score||0);
    const votes=el('span',(score>0?'+':'')+score+' votos netos','ae-chef-votes');
-   const stats=el('div',null,'ae-chef-pick-stats');
-   stats.append(votes);
+   const authorRow=el('div',null,'ae-chef-author-row');
+   authorRow.append(chef);
    const americanOdds=Number(p.american_odds);
    if(p.american_odds!==null && p.american_odds!==undefined &&
       p.american_odds!=='' && Number.isFinite(americanOdds) && americanOdds!==0){
-     stats.append(el('span','Cuota '+(americanOdds>0?'+':'')+americanOdds,'ae-chef-odds'));
+     authorRow.append(el('span','Cuota '+(americanOdds>0?'+':'')+americanOdds,'ae-chef-odds'));
    }
-   info.append(chef,pick,stats);
+   info.append(authorRow,pick,votes);
    item.append(rank,info);
    target.append(item);
  }
