@@ -1,5 +1,6 @@
 /* AE SPORTS · Cabecera móvil centrada y accesos deportivos en cuadrícula.
    No se alteran acciones JS, visibilidad por deporte ni emblemas originales. */
+html body>header #themeToggle .ae-mobile-theme-caption{display:none!important;}
 @media (max-width:760px) {
   html body>header .ae-mobile-header-grid {
     display:grid!important;
