@@ -288,7 +288,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
     </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
-<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261016-framing-zoom-3">
+<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261016-home-latest-story-1">
     <link rel="stylesheet" href="assets/ae-muted-navigation-icons.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-custom-nav-icons.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-classical-auth-buttons.css?v=20261016-3">
@@ -1708,13 +1708,30 @@ currentUser = {
 
         function renderHeroCard(hero) {
             const container = document.getElementById('heroSection');
+            const heroImage = escapeHTML(safeImageURL(hero.image));
             container.innerHTML = `
                 <div class="editorial-hero">
-                    <img class="editorial-hero-image" src="${escapeHTML(safeImageURL(hero.image))}" style="--ae-image-focus:${imagePosition(hero)};--ae-image-zoom:${imageScale(hero)}" alt="" onerror="this.hidden=true">
+                    <img class="ae-hero-image-backdrop" src="${heroImage}" style="--ae-image-focus:${imagePosition(hero)}" alt="" aria-hidden="true" onerror="this.hidden=true">
+                    <img class="editorial-hero-image" src="${heroImage}" style="--ae-image-focus:${imagePosition(hero)};--ae-image-zoom:${imageScale(hero)}" alt="" onerror="this.hidden=true">
                     <div class="editorial-hero-copy">
-                                                <h1>${escapeHTML(hero.title)}</h1>
+                        <div class="ae-hero-kicker" aria-label="Categoría ${escapeHTML(hero.category || 'AE Sports')}">
+                            <span>${escapeHTML(hero.category || 'AE Sports')}</span>
+                            <span class="ae-hero-kicker-rule" aria-hidden="true"></span>
+                        </div>
+                        <h1>${escapeHTML(hero.title)}</h1>
                         <p>${escapeHTML(hero.summary || 'La historia completa, desde otra perspectiva.')}</p>
-                        <div class="editorial-actions"><button type="button" class="editorial-featured" onclick="openArticleModal(${articleIdArgument(hero.id)})">Leer la historia <span class="ae-action-title">· ${escapeHTML(hero.title)}</span><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></button><button type="button" class="ae-quiet-cta" onclick="filterByCategory('Picks')">Explorar Picks →</button></div>
+                        <div class="editorial-actions">
+                            <button type="button" class="editorial-featured" onclick="openArticleModal(${articleIdArgument(hero.id)})">
+                                <i class="fa-regular fa-book-open" aria-hidden="true"></i>
+                                <span>Leer la historia</span>
+                                <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                            </button>
+                            <button type="button" class="ae-quiet-cta" onclick="filterByCategory('Picks')">
+                                <i class="fa-solid fa-chart-simple" aria-hidden="true"></i>
+                                <span>Explorar Picks</span>
+                                <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>`;
         }
