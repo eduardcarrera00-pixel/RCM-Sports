@@ -1,0 +1,211 @@
+/* AE SPORTS · Dos módulos de portada, una misma identidad editorial.
+   Los listados conservan sus datos reales y sus enlaces originales. */
+html body aside .editorial-community.rcm-panel,
+html body aside .editorial-trending.rcm-panel,
+html.dark body aside .editorial-community.rcm-panel,
+html.dark body aside .editorial-trending.rcm-panel {
+  box-sizing:border-box!important;
+  width:100%!important;min-width:0!important;
+  margin:0!important;padding:0!important;
+  border:1px solid rgba(158,187,199,.24)!important;
+  border-radius:0!important;overflow:hidden!important;
+  background:radial-gradient(ellipse 86% 38% at 100% 0%,rgba(109,145,164,.15),transparent 84%),
+             linear-gradient(150deg,#102c3d,#0c2434)!important;
+  box-shadow:0 7px 20px rgba(2,18,28,.10)!important;
+  color:#f0e4d7!important;
+}
+html body aside .editorial-community.rcm-panel>.ae-section-heading,
+html body aside .editorial-trending.rcm-panel>.ae-section-heading,
+html.dark body aside .editorial-community.rcm-panel>.ae-section-heading,
+html.dark body aside .editorial-trending.rcm-panel>.ae-section-heading {
+  box-sizing:border-box!important;
+  position:relative!important;
+  display:flex!important;flex-direction:column!important;justify-content:center!important;
+  width:100%!important;min-height:85px!important;
+  margin:0!important;padding:14px 19px!important;
+  border:0!important;border-bottom:1px solid rgba(194,168,139,.27)!important;
+  border-radius:0!important;
+  background:radial-gradient(ellipse 90% 180% at 100% 18%,rgba(101,146,164,.20),transparent 75%),
+             linear-gradient(110deg,#193a4e,#173447 64%,#203e50)!important;
+  box-shadow:none!important;
+  text-align:left!important;
+}
+html body aside .editorial-community.rcm-panel>.ae-section-heading .ae-overline,
+html body aside .editorial-trending.rcm-panel>.ae-section-heading .ae-overline {
+  margin:0 0 4px!important;padding:0!important;
+  font:800 10px/1.35 Inter,system-ui,sans-serif!important;
+  letter-spacing:.125em!important;text-transform:uppercase!important;
+  color:#dcb391!important;
+}
+html body aside .editorial-community.rcm-panel>.ae-section-heading h2,
+html body aside .editorial-trending.rcm-panel>.ae-section-heading h2,
+html.dark body aside .editorial-community.rcm-panel>.ae-section-heading h2,
+html.dark body aside .editorial-trending.rcm-panel>.ae-section-heading h2 {
+  margin:0!important;padding:0!important;
+  color:#fff1e1!important;
+  font:600 clamp(22px,2vw,28px)/1.13 Newsreader,Georgia,serif!important;
+  letter-spacing:-.015em!important;text-shadow:none!important;
+}
+html body aside .editorial-community.rcm-panel #communityLeaders,
+html body aside .editorial-trending.rcm-panel #trendingList {
+  box-sizing:border-box!important;
+  min-width:0!important;width:100%!important;
+  margin:0!important;padding:10px 18px 12px!important;
+  background:transparent!important;
+}
+html body aside .editorial-community.rcm-panel #communityLeaders{
+  display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:0!important;
+}
+html body aside .editorial-trending.rcm-panel #trendingList {
+  list-style:none!important;display:flex!important;flex-direction:column!important;gap:0!important;
+}
+html body aside .editorial-community.rcm-panel #communityLeaders>.rcm-leader,
+html body aside .editorial-trending.rcm-panel #trendingList>.ae-trending-item{
+  box-sizing:border-box!important;width:100%!important;min-width:0!important;
+  margin:0!important;padding:11px 0!important;
+  border:0!important;border-bottom:1px solid rgba(164,185,190,.15)!important;
+  border-radius:0!important;background:transparent!important;
+}
+html body aside .editorial-community.rcm-panel #communityLeaders>.rcm-leader:last-child,
+html body aside .editorial-trending.rcm-panel #trendingList>.ae-trending-item:last-child{
+  border-bottom:0!important;
+}
+html body aside .editorial-community.rcm-panel #communityLeaders .rcm-leader h3 {
+  margin:0 0 6px!important;
+  color:#d9b391!important;
+  font:800 10px/1.35 Inter,system-ui,sans-serif!important;
+  letter-spacing:.10em!important;text-transform:uppercase!important;
+}
+html body aside .editorial-community.rcm-panel #communityLeaders .rcm-leader blockquote {
+  margin:0 0 6px!important;
+  font:600 16px/1.32 Newsreader,Georgia,serif!important;
+  color:#fff0de!important;
+  overflow-wrap:anywhere!important;
+}
+html body aside .editorial-community.rcm-panel #communityLeaders .rcm-leader-link {
+  display:block!important;
+  width:100%!important;min-width:0!important;
+  padding:4px 0!important;margin:0!important;
+  color:#f3e6d8!important;background:transparent!important;
+  text-decoration:none!important;
+  overflow-wrap:anywhere!important;
+}
+html body aside .editorial-community.rcm-panel #communityLeaders .rcm-leader-link p {
+  margin:3px 0!important;color:#d0dce0!important;
+  font:500 11px/1.5 Inter,system-ui,sans-serif!important;
+}
+html body aside .editorial-community.rcm-panel #communityLeaders .rcm-leader-link strong {
+  display:block!important;margin-top:5px!important;
+  color:#dbb58e!important;
+  font:700 11px/1.4 Inter,system-ui,sans-serif!important;
+}
+html body aside .editorial-trending.rcm-panel .ae-trending-item{
+  grid-template-columns:20px minmax(0,1fr) auto!important;
+  gap:8px!important;
+  align-items:start!important;
+}
+html body aside .editorial-trending.rcm-panel .ae-trending-rank{
+  color:#cea17b!important;
+  font:700 14px/1.4 Newsreader,Georgia,serif!important;
+}
+html body aside .editorial-trending.rcm-panel .ae-trending-link{
+  min-width:0!important;
+  text-align:left!important;
+  background:transparent!important;
+  color:#f9e9da!important;
+  overflow-wrap:anywhere!important;
+}
+html body aside .editorial-trending.rcm-panel .ae-trending-category{
+  color:#d4a984!important;
+  font:800 9px/1.4 Inter,system-ui,sans-serif!important;
+  letter-spacing:.08em!important;
+}
+html body aside .editorial-trending.rcm-panel .ae-trending-title{
+  color:#f5e9dc!important;
+  font:600 14px/1.23 Newsreader,Georgia,serif!important;
+}
+html body aside .editorial-trending.rcm-panel .ae-trending-meta{
+  color:#d0a385!important;
+  font:600 10px/1.5 Inter,system-ui,sans-serif!important;
+}
+html body aside .editorial-community.rcm-panel .rcm-leader-link:hover blockquote,
+html body aside .editorial-trending.rcm-panel .ae-trending-link:hover .ae-trending-title{
+  color:#f4c6a3!important;
+  text-decoration:underline!important;text-underline-offset:3px!important;
+}
+html body aside .editorial-community.rcm-panel .rcm-leader-link:focus-visible,
+html body aside .editorial-trending.rcm-panel .ae-trending-link:focus-visible{
+  outline:2px solid #d9ad88!important;outline-offset:3px!important;
+}
+
+/* La imagen es ornamental y solo aparece en modo claro. Ambos módulos
+   usan exactamente la misma ilustración y jerarquía visual. */
+html:not(.dark) body aside .editorial-community.rcm-panel,
+html:not(.dark) body aside .editorial-trending.rcm-panel {
+  background-color:#f8f3e9!important;
+  background-image:
+    linear-gradient(110deg,rgba(255,252,247,.96) 0%,rgba(250,246,239,.87) 50%,rgba(247,239,228,.68) 100%),
+    url("atmospheres/ae-community-editorial-paper.svg")!important;
+  background-size:cover,cover!important;
+  background-position:center,right top!important;
+  background-repeat:no-repeat!important;
+  border:1px solid #d8c5b0!important;
+  box-shadow:0 8px 21px rgba(73,62,49,.07)!important;
+  color:#273f4e!important;
+}
+html:not(.dark) body aside .editorial-community.rcm-panel>.ae-section-heading,
+html:not(.dark) body aside .editorial-trending.rcm-panel>.ae-section-heading {
+  background-image:
+    linear-gradient(110deg,rgba(244,230,211,.90) 0%,rgba(242,226,205,.80) 54%,rgba(232,212,183,.68) 100%),
+    url("atmospheres/ae-community-editorial-paper.svg")!important;
+  background-size:cover,cover!important;
+  background-position:center,right 23%!important;
+  background-repeat:no-repeat!important;
+  border-bottom:1px solid #dac6af!important;
+}
+html:not(.dark) body aside .editorial-community.rcm-panel>.ae-section-heading .ae-overline,
+html:not(.dark) body aside .editorial-trending.rcm-panel>.ae-section-heading .ae-overline{
+  color:#8f5e40!important;
+}
+html:not(.dark) body aside .editorial-community.rcm-panel>.ae-section-heading h2,
+html:not(.dark) body aside .editorial-trending.rcm-panel>.ae-section-heading h2{
+  color:#294657!important;text-shadow:none!important;
+}
+html:not(.dark) body aside .editorial-community.rcm-panel #communityLeaders>.rcm-leader,
+html:not(.dark) body aside .editorial-trending.rcm-panel #trendingList>.ae-trending-item{
+  border-bottom-color:rgba(155,127,97,.20)!important;
+}
+html:not(.dark) body aside .editorial-community.rcm-panel #communityLeaders .rcm-leader h3,
+html:not(.dark) body aside .editorial-trending.rcm-panel .ae-trending-category,
+html:not(.dark) body aside .editorial-trending.rcm-panel .ae-trending-rank{
+  color:#885d44!important;
+}
+html:not(.dark) body aside .editorial-community.rcm-panel #communityLeaders .rcm-leader blockquote,
+html:not(.dark) body aside .editorial-trending.rcm-panel .ae-trending-title{
+  color:#2d4554!important;
+}
+html:not(.dark) body aside .editorial-community.rcm-panel #communityLeaders .rcm-leader-link p,
+html:not(.dark) body aside .editorial-trending.rcm-panel .ae-trending-meta{
+  color:#596875!important;
+}
+html:not(.dark) body aside .editorial-community.rcm-panel #communityLeaders .rcm-leader-link strong{
+  color:#85593f!important;
+}
+html:not(.dark) body aside .editorial-community.rcm-panel .rcm-leader-link:hover blockquote,
+html:not(.dark) body aside .editorial-trending.rcm-panel .ae-trending-link:hover .ae-trending-title{
+  color:#945e3d!important;
+}
+html:not(.dark) body aside .editorial-community.rcm-panel .rcm-leader-link:focus-visible,
+html:not(.dark) body aside .editorial-trending.rcm-panel .ae-trending-link:focus-visible{
+  outline-color:#855b43!important;
+}
+@media(max-width:610px){
+  html body aside .editorial-community.rcm-panel>.ae-section-heading,
+  html body aside .editorial-trending.rcm-panel>.ae-section-heading{
+    min-height:77px!important;padding:12px 15px!important;
+  }
+  html body aside .editorial-community.rcm-panel #communityLeaders,
+  html body aside .editorial-trending.rcm-panel #trendingList{
+    padding:8px 14px 11px!important;
+  }
+}
