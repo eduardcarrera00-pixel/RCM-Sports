@@ -331,8 +331,12 @@
    const imageUrl=newest.image && typeof safeImageURL==='function'?safeImageURL(newest.image):'';
    if(imageUrl){
      const img=make('img');img.loading='lazy';img.decoding='async';img.alt='';img.src=imageUrl;
-     img.style.setProperty('--ae-image-focus',(Number.isFinite(Number(newest.image_focus_x))?Math.max(0,Math.min(100,Number(newest.image_focus_x))):50)+'% '+(Number.isFinite(Number(newest.image_focus_y))?Math.max(0,Math.min(100,Number(newest.image_focus_y))):50)+'%');
-     img.style.setProperty('object-fit',newest.image_zoom===false?'contain':'cover','important');
+     const focus=(Number.isFinite(Number(newest.image_focus_x))?Math.max(0,Math.min(100,Number(newest.image_focus_x))):50)+'% '+(Number.isFinite(Number(newest.image_focus_y))?Math.max(0,Math.min(100,Number(newest.image_focus_y))):50)+'%';
+     const zoom=Number(newest.image_zoom_pct);
+     const zoomPct=Number.isFinite(zoom)?Math.max(1,Math.min(300,Math.round(zoom))):100;
+     img.style.setProperty('--ae-image-focus',focus);
+     img.style.transformOrigin=focus;
+     img.style.transform='scale('+(zoomPct/100)+')';
      card.classList.add('has-photo');
      img.addEventListener('error',()=>{
        img.remove();
