@@ -1,0 +1,78 @@
+/* AE SPORTS · Fondo editorial global · 2026-10-16
+   Extiende al lienzo completo la calma, textura y profundidad visual aprobadas
+   en Takes, sin convertir el fondo en protagonista ni alterar funcionalidad. */
+:root{
+  --ae-page-paper:#f2ece2;
+  --ae-page-ink:#0a1b27;
+  --ae-page-bronze:#9b7458;
+  --ae-page-blue:#536f7e;
+}
+
+/* Modo día: marfil cálido, papel editorial y veladuras azul/bronce. */
+html:not(.dark) body{
+  background-color:var(--ae-page-paper)!important;
+  background-image:
+    radial-gradient(ellipse 78% 34% at 14% 2%,rgba(120,145,154,.18),transparent 70%),
+    radial-gradient(ellipse 58% 30% at 92% 28%,rgba(164,120,86,.11),transparent 73%),
+    radial-gradient(ellipse 72% 42% at 48% 94%,rgba(82,111,125,.08),transparent 76%),
+    linear-gradient(180deg,rgba(255,253,248,.86),rgba(244,238,228,.92)),
+    url("atmospheres/ae-community-editorial-paper.svg")!important;
+  background-size:auto,auto,auto,auto,760px auto!important;
+  background-position:center top,center top,center bottom,center,center top!important;
+  background-repeat:no-repeat,no-repeat,no-repeat,no-repeat,repeat!important;
+  background-attachment:fixed!important;
+}
+
+/* Modo noche: conserva la profundidad azul, pero con textura pictórica más serena. */
+html.dark body{
+  background-color:#071722!important;
+  background-image:
+    radial-gradient(ellipse 84% 42% at 17% -8%,rgba(70,105,121,.34),transparent 72%),
+    radial-gradient(ellipse 52% 38% at 95% 33%,rgba(137,101,78,.13),transparent 74%),
+    radial-gradient(ellipse 64% 44% at 50% 104%,rgba(46,76,94,.18),transparent 78%),
+    linear-gradient(158deg,#081925 0%,#0c2230 50%,#081824 100%),
+    url("atmospheres/ae-reference-brush.svg")!important;
+  background-size:auto,auto,auto,auto,920px auto!important;
+  background-position:center top,center top,center bottom,center,center 18%!important;
+  background-repeat:no-repeat,no-repeat,no-repeat,no-repeat,repeat!important;
+  background-attachment:fixed!important;
+}
+
+/* El contenido permanece por encima; las superficies existentes mantienen su propia jerarquía. */
+html body>header,
+html body>#mainContent,
+html body>main,
+html body>footer{
+  position:relative;
+  z-index:1;
+}
+
+/* Una línea de luz casi imperceptible une visualmente las secciones largas. */
+html body #mainContent{
+  background-image:
+    linear-gradient(90deg,transparent,rgba(151,116,88,.10) 50%,transparent);
+  background-size:min(1180px,88vw) 1px;
+  background-position:center top;
+  background-repeat:no-repeat;
+}
+
+/* Tipografía de títulos: la misma voz editorial clásica, sin tocar controles o datos. */
+html body #mainContent :is(h1,h2,h3).ae-page-title,
+html body #mainContent .ae-section-title{
+  font-family:Newsreader,Georgia,"Times New Roman",serif!important;
+  letter-spacing:-.018em;
+}
+
+/* En móvil evitamos el coste de fondos fijos y bajamos todavía más la textura. */
+@media(max-width:760px){
+  html:not(.dark) body,
+  html.dark body{
+    background-attachment:scroll!important;
+    background-size:auto,auto,auto,auto,620px auto!important;
+  }
+}
+
+/* Accesibilidad: el acabado del lienzo nunca depende de animación. */
+@media(prefers-reduced-motion:reduce){
+  html body{background-attachment:scroll!important}
+}
