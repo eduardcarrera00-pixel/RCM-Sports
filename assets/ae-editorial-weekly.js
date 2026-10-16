@@ -18,6 +18,8 @@
    }catch{return '';}
  };
  let refreshing=false,active=null,submitting=false,editing=null,uncertainSave=null;
+ // Mobile home and Picks render the same native expandable card.
+ const weeklyMobile=window.matchMedia('(max-width: 760px)');
  function createCard(p,isPreview){
    const box=make('article',undefined,isPreview?'ae-weekly-card ae-weekly-preview':'ae-weekly-card');
    if(isPreview){
@@ -88,7 +90,7 @@
    for(const [id,preview] of [['cpWeekly',true],['picksFeaturedCard',false]]){
      const area=$(id);if(!area)continue;
      area.replaceChildren();
-     if(active)area.append(createCard(active,preview));
+     if(active)area.append(createCard(active,preview && !weeklyMobile.matches));
      else area.append(make('p','AE SPORTS todavía no ha publicado un Pick editorial para esta semana.','ae-weekly-empty'));
    }
  }
@@ -354,6 +356,9 @@
  window.renderAePicksNews=renderNews;
  window.refreshEditorialWeeklyPick=load;
  window.updateAeWeeklyAdmin=adminVisibility;
+ // Keep the original desktop preview when the viewport changes.
+ if(weeklyMobile.addEventListener)weeklyMobile.addEventListener('change',render);
+ else if(weeklyMobile.addListener)weeklyMobile.addListener(render);
  document.addEventListener('DOMContentLoaded',()=>{
    $('aeWeeklyPickForm')?.addEventListener('submit',publish);
    $('aeWeeklyEditButton')?.addEventListener('click',startEdit);
