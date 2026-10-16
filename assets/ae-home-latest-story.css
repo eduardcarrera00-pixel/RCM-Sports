@@ -60,15 +60,9 @@ html body.ae-is-home #mainContent #heroSection .editorial-hero::after{
   background:linear-gradient(90deg,#091d2b 0%,#091d2bfa 24%,#0b2231ed 39%,rgba(11,34,49,.65) 52%,rgba(11,34,49,.20) 67%,transparent 84%)!important;
 }
 html body.ae-is-home #mainContent #heroSection .editorial-hero::before{
-  content:""!important;
-  position:absolute!important;
-  inset:0!important;
-  z-index:3!important;
-  pointer-events:none!important;
-  opacity:.46!important;
-  background:
-    linear-gradient(118deg,transparent 0 46%,rgba(216,163,120,.18) 46.1% 46.22%,transparent 46.32% 49%,rgba(216,163,120,.07) 49.1% 49.18%,transparent 49.28%),
-    radial-gradient(ellipse at 39% 84%,rgba(199,145,103,.09),transparent 33%)!important;
+  content:none!important;
+  display:none!important;
+  background:none!important;
 }
 html body.ae-is-home #mainContent #heroSection .editorial-hero-copy{
   position:relative!important;
@@ -193,9 +187,6 @@ html body.ae-is-home #mainContent #heroSection .ae-action-title{
   }
   html body.ae-is-home #mainContent #heroSection .editorial-hero::after{
     background:linear-gradient(90deg,#091d2bfa 0%,#091d2bea 55%,rgba(9,29,43,.66) 82%,rgba(9,29,43,.45) 100%)!important;
-  }
-  html body.ae-is-home #mainContent #heroSection .editorial-hero::before{
-    opacity:.27!important;
   }
   html body.ae-is-home #mainContent #heroSection .editorial-hero-copy{
     width:100%!important;
