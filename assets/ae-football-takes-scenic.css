@@ -490,3 +490,81 @@ html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesFeed>.ae-fr
     min-height:34px!important;
   }
 }
+
+
+/* AE SPORTS · cuatro Takes iguales por fila, independientemente del contenido. */
+/* Sólo Fútbol: los Takes completos se abren tocando la tarjeta o el título. */
+@media(min-width:761px){
+  html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesFeed{
+    display:grid!important;
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    grid-auto-rows:206px!important;
+    align-content:start!important;
+    align-items:stretch!important;
+    gap:6px!important;
+    margin:0!important;
+    padding:0!important;
+  }
+  html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesFeed>.ae-free-take-card{
+    box-sizing:border-box!important;
+    align-self:stretch!important;
+    min-width:0!important;
+    width:100%!important;
+    height:206px!important;
+    min-height:206px!important;
+    max-height:206px!important;
+    padding:9px!important;
+    overflow:hidden!important;
+    display:flex!important;
+    flex-direction:column!important;
+    justify-content:flex-start!important;
+  }
+  html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesFeed>.ae-free-take-card .ae-take-overline{
+    flex:0 0 auto!important;
+    max-height:36px!important;
+    margin:0 0 3px!important;
+    overflow:hidden!important;
+  }
+  html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesFeed>.ae-free-take-card .ae-feed-take-title{
+    flex:0 0 auto!important;
+    min-width:0!important;
+    max-height:40px!important;
+    margin:2px 0 4px!important;
+    overflow:hidden!important;
+  }
+  html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesFeed>.ae-free-take-card .ae-feed-take-open{
+    display:-webkit-box!important;
+    -webkit-box-orient:vertical!important;
+    -webkit-line-clamp:2!important;
+    overflow:hidden!important;
+    max-width:100%!important;
+    text-align:left!important;
+    font:inherit!important;
+    overflow-wrap:anywhere!important;
+  }
+  html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesFeed>.ae-free-take-card .ae-free-take-body{
+    display:-webkit-box!important;
+    -webkit-box-orient:vertical!important;
+    -webkit-line-clamp:3!important;
+    flex:1 1 auto!important;
+    min-height:0!important;
+    max-height:54px!important;
+    overflow:hidden!important;
+    margin:0 0 4px!important;
+    overflow-wrap:anywhere!important;
+  }
+  html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesFeed>.ae-free-take-card .ae-free-vote-row{
+    flex:0 0 auto!important;
+    margin-top:auto!important;
+    padding-top:4px!important;
+    max-height:66px!important;
+    overflow:hidden!important;
+    align-content:end!important;
+    gap:3px!important;
+  }
+  html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesFeed>.ae-free-take-card .ae-free-vote-row button{
+    width:auto!important;
+    white-space:nowrap!important;
+    padding:4px 5px!important;
+  }
+}
