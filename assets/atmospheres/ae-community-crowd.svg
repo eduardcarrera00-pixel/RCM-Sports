@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 360" role="img" aria-label="Público deportivo abstracto">
+<defs>
+  <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+    <stop offset="0" stop-color="#071e2b"/>
+    <stop offset=".55" stop-color="#0d3041"/>
+    <stop offset="1" stop-color="#173d4c"/>
+  </linearGradient>
+  <radialGradient id="warm" cx=".78" cy=".2" r=".58">
+    <stop offset="0" stop-color="#e5b16f" stop-opacity=".55"/>
+    <stop offset=".35" stop-color="#c78b4f" stop-opacity=".2"/>
+    <stop offset="1" stop-color="#c78b4f" stop-opacity="0"/>
+  </radialGradient>
+  <linearGradient id="crowd" x1="0" x2="0" y1="0" y2="1">
+    <stop offset="0" stop-color="#d5a46d" stop-opacity=".50"/>
+    <stop offset=".36" stop-color="#668291" stop-opacity=".48"/>
+    <stop offset="1" stop-color="#071720" stop-opacity=".98"/>
+  </linearGradient>
+  <filter id="blur20"><feGaussianBlur stdDeviation="20"/></filter>
+  <filter id="blur8"><feGaussianBlur stdDeviation="8"/></filter>
+</defs>
+<rect width="1200" height="360" fill="url(#bg)"/>
+<rect width="1200" height="360" fill="url(#warm)"/>
+<g opacity=".18" fill="none" stroke="#e8c28f">
+  <path d="M-80 210 Q600 -40 1280 210" stroke-width="3"/>
+  <path d="M-70 235 Q600 10 1270 235" stroke-width="1.5"/>
+</g>
+<g opacity=".38" filter="url(#blur20)">
+  <ellipse cx="905" cy="68" rx="210" ry="78" fill="#e7b676"/>
+  <ellipse cx="1070" cy="110" rx="110" ry="54" fill="#d79b58"/>
+</g>
+<g fill="#efd1a2" opacity=".24" filter="url(#blur8)">
+  <circle cx="860" cy="50" r="9"/><circle cx="905" cy="40" r="7"/><circle cx="950" cy="48" r="10"/>
+  <circle cx="995" cy="60" r="8"/><circle cx="1040" cy="52" r="9"/><circle cx="1090" cy="69" r="7"/>
+</g>
+<g opacity=".74" fill="url(#crowd)">
+  <circle cx="95" cy="236" r="25"/><path d="M52 332q6-72 43-72t43 72z"/>
+  <circle cx="166" cy="224" r="21"/><path d="M130 330q4-67 36-67t36 67z"/>
+  <circle cx="230" cy="242" r="27"/><path d="M183 338q7-73 47-73t47 73z"/>
+  <circle cx="314" cy="218" r="23"/><path d="M274 332q6-69 40-69t40 69z"/>
+  <circle cx="390" cy="236" r="26"/><path d="M345 338q5-73 45-73t45 73z"/>
+  <circle cx="474" cy="214" r="22"/><path d="M435 332q5-66 39-66t39 66z"/>
+  <circle cx="548" cy="241" r="27"/><path d="M500 340q7-74 48-74t48 74z"/>
+  <circle cx="636" cy="222" r="24"/><path d="M594 335q6-70 42-70t42 70z"/>
+  <circle cx="714" cy="239" r="26"/><path d="M668 338q6-72 46-72t46 72z"/>
+  <circle cx="800" cy="216" r="22"/><path d="M761 332q5-66 39-66t39 66z"/>
+  <circle cx="875" cy="239" r="27"/><path d="M828 340q6-74 47-74t47 74z"/>
+  <circle cx="960" cy="222" r="23"/><path d="M920 335q5-69 40-69t40 69z"/>
+  <circle cx="1038" cy="240" r="26"/><path d="M992 340q6-73 46-73t46 73z"/>
+  <circle cx="1122" cy="216" r="23"/><path d="M1081 334q6-68 41-68t41 68z"/>
+</g>
+<g opacity=".25" fill="#f1c98c">
+  <path d="M58 236l-22-52 9-4 23 49z"/><path d="M190 220l16-61 10 3-13 62z"/>
+  <path d="M423 226l-8-58 10-1 11 58z"/><path d="M663 218l24-55 9 4-20 58z"/>
+  <path d="M899 225l-13-62 10-2 16 60z"/><path d="M1100 218l20-58 10 4-18 59z"/>
+</g>
+<rect y="314" width="1200" height="46" fill="#06151d" opacity=".92"/>
+</svg>
