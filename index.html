@@ -319,6 +319,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/ae-admin-header-final.css?v=20261016-5">
 <link rel="stylesheet" href="assets/ae-nfl-mobile-ranking-compact.css?v=20261016-tight-ranking-v1">
 <link rel="stylesheet" href="assets/ae-champions-mobile-ranking-compact.css?v=20261016-desktop-unified-v2">
+<link rel="stylesheet" href="assets/ae-take-category-edit.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-home-weekly-match-picks-mobile.css?v=20261016-picks-match-mobile-1">
 <link rel="stylesheet" href="assets/ae-mobile-home-takes-swipe-and-football-news.css?v=20261016-top3-swipe-v1">
 <link rel="stylesheet" href="assets/ae-article-floating-close.css?v=20261016-1">
@@ -719,7 +720,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 
         <!-- Los Takes son una función editorial al final de NFL y Fútbol, no una categoría de navegación. -->
         <section id="freeTakes" class="ae-takes ae-free-takes" hidden aria-labelledby="freeTakesTitle">
-          <div class="ae-takes-head"><span class="ae-takes-eyebrow">TU OPINIÓN CUENTA</span><h2 id="freeTakesTitle">Takes de la comunidad</h2><p>Escribe tu pronóstico para la historia. Una vez publicado, no podrás editarlo ni borrarlo.</p><button id="aeSportTakePublish" onclick="event.stopImmediatePropagation(); if(typeof window.aeOpenTakeComposer==='function'){window.aeOpenTakeComposer();}else{const modal=document.getElementById('aeTakeComposerDialog');if(modal&&!modal.open)modal.showModal();}" type="button" class="ae-participate-cta ae-sport-take-publish" aria-controls="aeTakeComposerDialog">Publicar mi Take <span aria-hidden="true">→</span></button></div>
+          <div class="ae-takes-head"><span class="ae-takes-eyebrow">TU OPINIÓN CUENTA</span><h2 id="freeTakesTitle">Takes de la comunidad</h2><p>Escribe tu pronóstico para la historia. Después de publicar, no podrás editar el texto ni borrarlo; solo podrás moverlo entre NFL y Fútbol.</p><button id="aeSportTakePublish" onclick="event.stopImmediatePropagation(); if(typeof window.aeOpenTakeComposer==='function'){window.aeOpenTakeComposer();}else{const modal=document.getElementById('aeTakeComposerDialog');if(modal&&!modal.open)modal.showModal();}" type="button" class="ae-participate-cta ae-sport-take-publish" aria-controls="aeTakeComposerDialog">Publicar mi Take <span aria-hidden="true">→</span></button></div>
 
           <h3 id="aeTakesFeedHeading" class="ae-takes-history-heading">Historial de Takes</h3>
           <div class="ae-free-controls"><label id="aeNflFeedFilterWrap" hidden>División NFL<select id="aeNflFeedDivision"><option value="">Todas las divisiones</option></select></label><label id="freeTakesFilterWrap">Mostrar<select id="freeTakesSportFilter"><option value="all">Todos los deportes</option><option value="general">General</option><option value="laliga">LaLiga</option><option value="premier">Premier League</option><option value="ligamx">Liga MX</option><option value="champions">Champions League</option><option value="nfl">NFL</option><option value="colegial">Fútbol colegial</option></select></label><label>Ordenar<select id="freeTakesSort"><option value="new">Más recientes</option><option value="top">Más apoyados</option></select></label></div>
@@ -2312,13 +2313,14 @@ updateThemeButton();
 <script src="assets/username-auth.js?v=20261015-2"></script>
 <script src="assets/ae-category-visibility.js?v=20261015-3"></script>
 <script src="assets/ae-nfl-takes.js?v=20261015-3"></script>
-<script src="assets/free-takes.js?v=20261016-latest-eight-1"></script>
+<script src="assets/free-takes.js?v=20261016-take-sport-edit-1"></script>
 <script src="assets/ae-editorial-weekly.js?v=20261016-framing-zoom-3"></script>
-<script src="assets/ae-profile.js?v=20261016-admin-header-1"></script>
+<script src="assets/ae-profile.js?v=20261016-take-sport-edit-1"></script>
 <script src="assets/ae-home-takes.js?v=20261016-unified-composer-1"></script>
 <script src="assets/ae-nfl-latest-comments.js?v=20261016-football-2"></script>
 <script src="assets/ae-sport-top-takes.js?v=20261016-unified-composer-1"></script>
-<script src="assets/ae-take-replies.js?v=20261016-mis-takes-1"></script>
+<script src="assets/ae-take-replies.js?v=20261016-sport-edit-1"></script>
+<script src="assets/ae-take-category-edit.js?v=20261016-1"></script>
 <script src="assets/ae-picks-premium.js?v=20261015-1"></script>
 <script src="assets/ae-image-framing.js?v=20261016-framing-zoom-2"></script>
 <script src="assets/ae-news-editor.js?v=20261016-1"></script>
