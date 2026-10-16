@@ -1,0 +1,245 @@
+/* AE SPORTS · Unified Take composer for homepage, NFL and Fútbol. */
+html body .ae-take-composer-dialog{
+  width:min(560px,calc(100vw - 24px))!important;
+  max-width:560px!important;
+  max-height:min(88vh,760px)!important;
+  margin:auto!important;
+  padding:0!important;
+  overflow:hidden!important;
+  border:1px solid rgba(222,172,108,.55)!important;
+  border-radius:0!important;
+  background:#0b2636!important;
+  color:#f3e7d8!important;
+  box-shadow:0 24px 70px rgba(0,8,16,.62)!important;
+}
+html body .ae-take-composer-dialog::backdrop{
+  background:rgba(3,14,23,.76)!important;
+  backdrop-filter:blur(3px)!important;
+}
+html body .ae-take-composer-shell{
+  display:flex!important;
+  flex-direction:column!important;
+  max-height:min(88vh,760px)!important;
+  overflow-y:auto!important;
+  background:
+    radial-gradient(ellipse at 88% 0,rgba(206,151,88,.15),transparent 34%),
+    linear-gradient(160deg,#0b2a3a,#081f2d 76%)!important;
+}
+html body .ae-take-composer-head{
+  display:flex!important;
+  align-items:flex-start!important;
+  justify-content:space-between!important;
+  gap:18px!important;
+  padding:18px 20px 14px!important;
+  border-bottom:1px solid rgba(222,172,108,.25)!important;
+}
+html body .ae-take-composer-head>div>span{
+  display:block!important;
+  margin-bottom:5px!important;
+  color:#dca86f!important;
+  font:800 9px/1.2 Inter,system-ui,sans-serif!important;
+  letter-spacing:.18em!important;
+}
+html body .ae-take-composer-head h2{
+  margin:0!important;
+  color:#f6e9d9!important;
+  font:600 30px/1 Newsreader,Georgia,serif!important;
+  letter-spacing:-.028em!important;
+}
+html body #aeTakeComposerClose{
+  display:grid!important;
+  place-items:center!important;
+  flex:0 0 34px!important;
+  width:34px!important;
+  height:34px!important;
+  margin:0!important;
+  padding:0!important;
+  border:1px solid rgba(220,173,115,.32)!important;
+  border-radius:0!important;
+  background:rgba(255,255,255,.025)!important;
+  color:#ead9c7!important;
+  font:400 24px/1 Inter,system-ui,sans-serif!important;
+  cursor:pointer!important;
+}
+html body #aeTakeComposerIntro{
+  margin:0!important;
+  padding:13px 20px 0!important;
+  color:#bfc9cb!important;
+  font:400 12px/1.45 Inter,system-ui,sans-serif!important;
+}
+html body .ae-take-composer-form{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  gap:13px!important;
+  padding:16px 20px 20px!important;
+  margin:0!important;
+}
+html body .ae-take-kind{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:8px!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+}
+html body .ae-take-kind legend{
+  grid-column:1/-1!important;
+  margin:0 0 2px!important;
+  color:#eadac8!important;
+  font:700 11px/1.2 Inter,system-ui,sans-serif!important;
+}
+html body .ae-take-kind label{
+  position:relative!important;
+  display:block!important;
+  margin:0!important;
+  cursor:pointer!important;
+}
+html body .ae-take-kind input{
+  position:absolute!important;
+  opacity:0!important;
+  pointer-events:none!important;
+}
+html body .ae-take-kind span{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  min-height:42px!important;
+  padding:8px 12px!important;
+  border:1px solid rgba(191,210,216,.18)!important;
+  border-radius:0!important;
+  background:rgba(255,255,255,.025)!important;
+  color:#dce3e2!important;
+  font:750 12px/1.2 Inter,system-ui,sans-serif!important;
+  transition:border-color .16s ease,background .16s ease,color .16s ease!important;
+}
+html body .ae-take-kind input:checked+span{
+  border-color:#dda96f!important;
+  background:linear-gradient(105deg,rgba(220,169,111,.19),rgba(255,255,255,.025))!important;
+  color:#f4dfc8!important;
+  box-shadow:inset 0 0 0 1px rgba(236,190,136,.08)!important;
+}
+html body .ae-take-kind input:focus-visible+span{
+  outline:2px solid #e5b77d!important;
+  outline-offset:2px!important;
+}
+html body .ae-take-field{
+  display:grid!important;
+  gap:6px!important;
+  margin:0!important;
+  color:#e8dac9!important;
+  font:700 11px/1.2 Inter,system-ui,sans-serif!important;
+}
+html body .ae-take-field input,
+html body .ae-take-field textarea{
+  box-sizing:border-box!important;
+  width:100%!important;
+  margin:0!important;
+  padding:10px 11px!important;
+  border:1px solid rgba(188,207,214,.18)!important;
+  border-radius:0!important;
+  background:rgba(2,18,27,.46)!important;
+  color:#f5eee5!important;
+  box-shadow:none!important;
+  font:400 13px/1.45 Inter,system-ui,sans-serif!important;
+  resize:vertical!important;
+}
+html body .ae-take-field textarea{min-height:112px!important}
+html body .ae-take-field input::placeholder,
+html body .ae-take-field textarea::placeholder{color:#82949d!important}
+html body .ae-take-field input:focus,
+html body .ae-take-field textarea:focus{
+  outline:0!important;
+  border-color:#d9a56d!important;
+  box-shadow:0 0 0 2px rgba(217,165,109,.09)!important;
+}
+html body .ae-take-composer-status{
+  min-height:16px!important;
+  margin:0!important;
+  color:#e5b28b!important;
+  font:600 10.5px/1.35 Inter,system-ui,sans-serif!important;
+}
+html body .ae-take-composer-status:empty{display:none!important}
+html body .ae-take-composer-submit{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  justify-self:start!important;
+  min-width:150px!important;
+  min-height:40px!important;
+  margin:0!important;
+  padding:9px 15px!important;
+  border:1px solid #e4ba82!important;
+  border-radius:0!important;
+  background:linear-gradient(105deg,#e2b57d,#c98c55)!important;
+  color:#082637!important;
+  box-shadow:0 0 14px rgba(221,158,86,.17)!important;
+  font:800 12px/1.15 Inter,system-ui,sans-serif!important;
+  cursor:pointer!important;
+}
+html body .ae-take-composer-submit:hover{
+  background:linear-gradient(105deg,#ebc18a,#d4975e)!important;
+}
+html body .ae-take-composer-submit:disabled{
+  opacity:.58!important;
+  cursor:wait!important;
+}
+
+/* Day mode */
+html:not(.dark) body .ae-take-composer-dialog{
+  border-color:rgba(166,113,63,.42)!important;
+  background:#fff9ef!important;
+  color:#142d40!important;
+  box-shadow:0 24px 64px rgba(75,48,24,.24)!important;
+}
+html:not(.dark) body .ae-take-composer-shell{
+  background:
+    radial-gradient(ellipse at 88% 0,rgba(211,151,83,.13),transparent 34%),
+    linear-gradient(160deg,#fffaf1,#f6ecde 78%)!important;
+}
+html:not(.dark) body .ae-take-composer-head{
+  border-bottom-color:rgba(158,108,64,.18)!important;
+}
+html:not(.dark) body .ae-take-composer-head>div>span{color:#9c612f!important}
+html:not(.dark) body .ae-take-composer-head h2{color:#102a42!important}
+html:not(.dark) body #aeTakeComposerClose{
+  border-color:rgba(151,105,66,.25)!important;
+  background:rgba(126,89,54,.04)!important;
+  color:#5c3b20!important;
+}
+html:not(.dark) body #aeTakeComposerIntro{color:#66727a!important}
+html:not(.dark) body .ae-take-kind legend,
+html:not(.dark) body .ae-take-field{color:#25394a!important}
+html:not(.dark) body .ae-take-kind span{
+  border-color:rgba(143,105,71,.22)!important;
+  background:rgba(255,255,255,.42)!important;
+  color:#21384b!important;
+}
+html:not(.dark) body .ae-take-kind input:checked+span{
+  border-color:#b87842!important;
+  background:linear-gradient(105deg,rgba(205,145,83,.18),rgba(255,255,255,.56))!important;
+  color:#6f3e1c!important;
+}
+html:not(.dark) body .ae-take-field input,
+html:not(.dark) body .ae-take-field textarea{
+  border-color:rgba(141,106,76,.22)!important;
+  background:rgba(255,255,255,.60)!important;
+  color:#162f42!important;
+}
+html:not(.dark) body .ae-take-field input::placeholder,
+html:not(.dark) body .ae-take-field textarea::placeholder{color:#8d9497!important}
+html:not(.dark) body .ae-take-composer-status{color:#9a4f35!important}
+
+@media(max-width:560px){
+  html body .ae-take-composer-dialog{
+    width:calc(100vw - 16px)!important;
+    max-height:92vh!important;
+  }
+  html body .ae-take-composer-shell{max-height:92vh!important}
+  html body .ae-take-composer-head{padding:15px 15px 12px!important}
+  html body .ae-take-composer-head h2{font-size:27px!important}
+  html body #aeTakeComposerIntro{padding:11px 15px 0!important}
+  html body .ae-take-composer-form{padding:14px 15px 16px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  html body .ae-take-kind span{transition:none!important}
+}
