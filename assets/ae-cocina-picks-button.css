@@ -1,7 +1,7 @@
 /* Original user-supplied Cocina Picks artwork; the existing action stays intact. */
 html body #footballTakes #communityPicks button#cpPublishCta.ae-participate-cta.ae-picks-publish-cta.ae-cocina-art {
   display:block!important;
-  width:clamp(210px,28vw,320px)!important;
+  width:clamp(208px,22vw,240px)!important;
   min-width:0!important;
   max-width:100%!important;
   height:auto!important;
@@ -23,8 +23,12 @@ html body #footballTakes #communityPicks button#cpPublishCta.ae-participate-cta.
   aspect-ratio:4/1;
   object-fit:contain;
   pointer-events:none;
+  filter:saturate(.78) brightness(.92);
+  transition:filter .18s ease;
 }
-#cpPublishCta.ae-cocina-art:hover {filter:brightness(1.06);}
+#cpPublishCta.ae-cocina-art:hover img {filter:saturate(.86) brightness(1);}
+html:not(.dark) #cpPublishCta.ae-cocina-art img {filter:saturate(.72) brightness(.88);}
+html:not(.dark) #cpPublishCta.ae-cocina-art:hover img {filter:saturate(.8) brightness(.96);}
 @media(max-width:640px) {
   html body #footballTakes #communityPicks .ae-picks-heading-cta-row {
     display:flex!important;
@@ -33,10 +37,10 @@ html body #footballTakes #communityPicks button#cpPublishCta.ae-participate-cta.
     gap:10px!important;
   }
   html body #footballTakes #communityPicks button#cpPublishCta.ae-participate-cta.ae-picks-publish-cta.ae-cocina-art {
-    width:min(280px,100%)!important;
-    flex:0 1 280px!important;
+    width:min(224px,100%)!important;
+    flex:0 1 224px!important;
   }
 }
 @media(prefers-reduced-motion:reduce) {
-  #cpPublishCta.ae-cocina-art {transition:none!important;}
+  #cpPublishCta.ae-cocina-art,#cpPublishCta.ae-cocina-art img {transition:none!important;}
 }
