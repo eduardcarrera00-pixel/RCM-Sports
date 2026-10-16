@@ -496,9 +496,21 @@ html body aside .editorial-trending.rcm-panel .ae-trending-meta i{
   font-size:16px!important;
 }
 html body aside .editorial-trending.rcm-panel .ae-trending-arrow{
-  display:inline-block!important;
+  display:inline-flex!important;
+  align-items:center!important;justify-content:center!important;
   color:var(--ae-ref-heading)!important;
   font:500 22px/1 Inter,system-ui,sans-serif!important;
+  background:transparent!important;
+  border:0!important;box-shadow:none!important;
+  padding:4px!important;margin:0!important;
+  min-width:24px!important;min-height:30px!important;
+  cursor:pointer!important;
+}
+html body aside .editorial-trending.rcm-panel .ae-trending-arrow:hover{
+  color:var(--ae-ref-count)!important;
+}
+html body aside .editorial-trending.rcm-panel .ae-trending-arrow:focus-visible{
+  outline:2px solid var(--ae-ref-line)!important;outline-offset:2px!important;
 }
 html body aside .editorial-trending.rcm-panel .ae-trending-link:hover .ae-trending-title,
 html body aside .editorial-community.rcm-panel .rcm-leader-link:hover blockquote{
