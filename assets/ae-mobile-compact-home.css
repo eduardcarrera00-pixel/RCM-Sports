@@ -1,0 +1,686 @@
+/* AE SPORTS — portada móvil compacta, inspirada en las dos referencias.
+   Solo se aplica hasta 760px. Escritorio, vistas completas y lógica intactos. */
+.ae-mobile-expand-button { display:none; }
+@media(max-width:760px){
+  html body { overflow-x:clip; }
+  html body>header { position:relative!important; }
+  html body>header .max-w-7xl { padding-inline:12px!important; }
+  /* Identidad y cuenta en una sola línea, deportes como segunda línea. */
+  html body>header .ae-mobile-header-grid{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) minmax(0,auto)!important;
+    grid-template-areas:"brand account" "sports sports"!important;
+    justify-items:stretch!important;
+    align-items:center!important;
+    gap:0 8px!important;
+    padding:6px 0 7px!important;
+    height:auto!important;
+    min-height:0!important;
+    width:100%!important;
+  }
+  html body>header .ae-mobile-header-grid>a.ae-brand.ae-brand-runner-clean {
+    grid-area:brand!important;
+    justify-self:start!important;
+    display:flex!important;
+    width:min(49vw,230px)!important;
+    max-width:100%!important;
+    min-width:0!important;
+    height:auto!important;
+    margin:0!important;
+    padding:0!important;
+    gap:5px!important;
+  }
+  html body>header .ae-mobile-header-grid>a.ae-brand-runner-clean .ae-runner-symbol{
+    flex:0 0 26%!important;width:26%!important;max-width:26%!important;
+  }
+  html body>header .ae-mobile-header-grid>a.ae-brand-runner-clean .ae-runner-wordmark{
+    flex:1 1 auto!important;max-width:74%!important;min-width:0!important;
+  }
+  html body>header .ae-mobile-header-grid>.ae-header-actions{
+    grid-area:account!important;
+    justify-self:end!important;
+    display:flex!important;
+    justify-content:flex-end!important;
+    align-content:center!important;
+    align-items:center!important;
+    flex-wrap:nowrap!important;
+    width:auto!important;min-width:0!important;max-width:100%!important;
+    margin:0!important;padding:0!important;
+    gap:3px!important;
+    border:0!important;
+  }
+  html body>header .ae-mobile-header-grid>.ae-header-actions #themeToggle{
+    box-sizing:border-box!important;
+    display:grid!important;place-items:center!important;
+    width:35px!important;height:38px!important;
+    min-width:35px!important;min-height:38px!important;
+    flex:0 0 35px!important;
+    padding:0!important;margin:0!important;
+    border:1px solid rgba(177,135,91,.22)!important;
+    border-radius:20px!important;
+    background:rgba(196,154,102,.05)!important;
+  }
+  html body>header .ae-mobile-header-grid #themeToggle .ae-mobile-theme-caption{
+    display:none!important;
+  }
+  html body>header .ae-mobile-header-grid #themeToggle img.ae-custom-theme-icon{
+    width:19px!important;height:19px!important;
+    min-width:19px!important;min-height:19px!important;
+    max-width:19px!important;max-height:19px!important;
+  }
+  html body>header .ae-mobile-header-grid>.ae-header-actions #aeMyTakesButton,
+  html body>header .ae-mobile-header-grid>.ae-header-actions #readerSession button.ae-classical-auth-button,
+  html body>header .ae-mobile-header-grid>.ae-header-actions #loggedAdminContainer .ae-signout-action{
+    display:flex!important;
+    align-items:center!important;justify-content:center!important;
+    box-sizing:border-box!important;
+    flex-direction:column!important;
+    gap:2px!important;
+    flex:0 0 auto!important;
+    width:49px!important;max-width:49px!important;
+    min-width:0!important;
+    height:45px!important;min-height:45px!important;
+    padding:2px 0!important;
+    margin:0!important;
+    border:0!important;background:transparent!important;box-shadow:none!important;
+  }
+  html body>header .ae-mobile-header-grid>.ae-header-actions #aeMyTakesButton[hidden]{
+    display:none!important;
+  }
+  html body>header .ae-mobile-header-grid>.ae-header-actions #readerSession{
+    display:flex!important;flex:0 0 auto!important;
+    padding:0!important;margin:0!important;width:auto!important;
+  }
+  html body>header .ae-mobile-header-grid>.ae-header-actions #readerSession.hidden{
+    display:none!important;
+  }
+  html body>header .ae-mobile-header-grid>.ae-header-actions .ae-classical-auth-art{
+    width:20px!important;height:20px!important;
+    min-width:20px!important;min-height:20px!important;
+    max-width:20px!important;max-height:20px!important;
+  }
+  html body>header .ae-mobile-header-grid>.ae-header-actions .ae-auth-caption{
+    display:block!important;max-width:49px!important;
+    color:inherit!important;
+    font:700 8px/1.12 Inter,system-ui,sans-serif!important;
+    overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;
+    letter-spacing:0!important;
+    text-align:center!important;
+  }
+  html body>header .ae-mobile-header-grid>.ae-header-actions #guestAdminContainer>button {
+    box-sizing:border-box!important;
+    max-width:100px!important;
+    min-height:38px!important;
+    padding:5px 7px!important;
+    font-size:10px!important;
+  }
+  html body>header .ae-mobile-header-grid>.ae-header-actions #loggedAdminContainer{
+    display:flex!important;flex-wrap:nowrap!important;
+    justify-content:flex-end!important;gap:3px!important;
+    margin:0!important;padding:0!important;
+    width:auto!important;
+  }
+  html body>header .ae-mobile-header-grid>.ae-header-actions #loggedAdminContainer.hidden{
+    display:none!important;
+  }
+  html body>header .ae-mobile-header-grid>.ae-header-actions #loggedAdminContainer .ae-admin-profile {
+    display:none!important;
+  }
+  html body>header .ae-mobile-header-grid>.ae-header-actions #loggedAdminContainer .ae-publish-action{
+    min-width:34px!important;min-height:38px!important;
+    padding:5px!important;margin:0!important;
+  }
+  html body>header .ae-mobile-header-grid>.ae-header-actions #aeCategoryAdmin summary{
+    min-height:37px!important;padding:5px 8px!important;font-size:11px!important;
+  }
+  html body>header .ae-mobile-header-grid>nav.ae-sport-nav{
+    grid-area:sports!important;
+    display:grid!important;
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    gap:3px!important;
+    align-items:center!important;
+    width:100%!important;max-width:none!important;
+    margin:7px 0 0!important;
+    padding:6px 0 0!important;
+    border-top:1px solid rgba(169,147,119,.22)!important;
+  }
+  html body>header .ae-mobile-header-grid>nav.ae-sport-nav .category-btn:not([hidden]){
+    display:flex!important;
+    flex-direction:row!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:5px!important;
+    box-sizing:border-box!important;
+    min-width:0!important;
+    min-height:39px!important;height:39px!important;
+    padding:4px 1px 6px!important;
+    margin:0!important;
+    font:800 clamp(8px,2.1vw,11px)/1.1 Inter,system-ui,sans-serif!important;
+    white-space:nowrap!important;
+    letter-spacing:0!important;
+    border-bottom-width:2px!important;
+  }
+  html body>header .ae-mobile-header-grid>nav.ae-sport-nav .category-btn[hidden]{
+    display:none!important;
+  }
+  html body>header .ae-mobile-header-grid>nav.ae-sport-nav .category-btn .ae-nav-icon{
+    display:grid!important;place-items:center!important;
+    flex:0 0 23px!important;
+    width:23px!important;height:23px!important;
+    min-width:23px!important;min-height:23px!important;
+    padding:0!important;margin:0!important;
+    background:transparent!important;border:0!important;
+  }
+  html body>header .ae-mobile-header-grid>nav.ae-sport-nav .category-btn img.ae-custom-sport-icon{
+    width:19px!important;height:19px!important;
+    min-width:19px!important;min-height:19px!important;
+    max-width:19px!important;max-height:19px!important;
+    filter:brightness(.8) saturate(.77)!important;
+  }
+
+  /* Solo portada: distancias verticales editoriales, sin grandes huecos. */
+  html body.ae-is-home #mainContent{
+    padding-top:8px!important;
+  }
+  html body.ae-is-home #heroSection{
+    margin:0!important;padding:0!important;
+  }
+  html body.ae-is-home #heroSection .editorial-hero,
+  html.dark body.ae-is-home #heroSection .editorial-hero{
+    height:clamp(235px,64vw,275px)!important;
+    min-height:0!important;max-height:275px!important;
+    margin:0 0 12px!important;
+    border-radius:7px!important;
+    overflow:hidden!important;
+    position:relative!important;
+  }
+  html body.ae-is-home #heroSection .editorial-hero-image {
+    position:absolute!important;
+    inset:0 0 0 auto!important;
+    width:76%!important;height:100%!important;
+    opacity:.85!important;object-fit:cover!important;
+    object-position:var(--ae-image-focus,center center)!important;
+  }
+  html.dark body.ae-is-home #heroSection .editorial-hero:after{
+    content:""!important;position:absolute!important;inset:0!important;
+    background:linear-gradient(90deg,rgba(5,26,39,.97) 0%,rgba(5,26,39,.93) 35%,rgba(5,26,39,.50) 73%,rgba(5,26,39,.16) 100%)!important;
+    pointer-events:none!important;
+  }
+  html:not(.dark) body.ae-is-home #heroSection .editorial-hero:after{
+    content:""!important;position:absolute!important;inset:0!important;
+    background:linear-gradient(90deg,rgba(255,251,244,.97) 0%,rgba(255,250,242,.91) 36%,rgba(255,250,241,.45) 75%,rgba(255,250,241,.10) 100%)!important;
+    pointer-events:none!important;
+  }
+  html body.ae-is-home #heroSection .editorial-hero-copy{
+    position:relative!important;z-index:2!important;
+    display:flex!important;flex-direction:column!important;
+    align-items:flex-start!important;justify-content:center!important;
+    width:100%!important;max-width:100%!important;
+    min-height:0!important;height:100%!important;
+    padding:17px 15px!important;
+    gap:0!important;
+  }
+  html body.ae-is-home #heroSection .editorial-hero h1{
+    display:-webkit-box!important;
+    -webkit-box-orient:vertical!important;
+    -webkit-line-clamp:4!important;
+    line-clamp:4!important;
+    overflow:hidden!important;
+    max-width:72%!important;
+    margin:0 0 8px!important;
+    font:650 clamp(19px,5.7vw,29px)/1.04 Newsreader,Georgia,serif!important;
+    letter-spacing:-.025em!important;
+  }
+  html body.ae-is-home #heroSection .editorial-hero-copy>p:not(.editorial-eyebrow){
+    display:-webkit-box!important;-webkit-box-orient:vertical!important;
+    -webkit-line-clamp:3!important;line-clamp:3!important;
+    overflow:hidden!important;
+    max-width:68%!important;
+    margin:0 0 9px!important;
+    font:400 11px/1.35 Inter,system-ui,sans-serif!important;
+  }
+  html body.ae-is-home #heroSection .editorial-actions{
+    display:flex!important;flex-wrap:nowrap!important;gap:6px!important;
+    margin:0!important;padding:0!important;max-width:100%!important;
+  }
+  html body.ae-is-home #heroSection .editorial-actions button{
+    display:flex!important;align-items:center!important;justify-content:center!important;
+    min-width:0!important;min-height:36px!important;height:auto!important;
+    max-width:none!important;
+    padding:7px 10px!important;margin:0!important;
+    font:700 clamp(10px,2.8vw,12px)/1.1 Newsreader,Georgia,serif!important;
+    white-space:nowrap!important;
+    border-radius:3px!important;
+  }
+  html body.ae-is-home #heroSection .editorial-actions button i{
+    font-size:10px!important;
+  }
+  /* Noticias compactas, fotografía a la izquierda y texto a la derecha. */
+  html body.ae-is-home .editorial-layout {
+    gap:12px!important;
+    margin-top:0!important;
+  }
+  html body.ae-is-home .editorial-layout>div:first-child{
+    min-width:0!important;
+  }
+  html body.ae-is-home .editorial-layout>div:first-child.space-y-8>*+*{
+    margin-top:12px!important;
+  }
+  html body.ae-is-home .editorial-layout>div:first-child>div:first-of-type{
+    display:flex!important;align-items:center!important;
+    margin:0!important;padding:0 0 4px!important;
+    border:0!important;
+  }
+  html body.ae-is-home .editorial-layout>div:first-child>div:first-of-type h2{
+    margin:0!important;
+    font:600 clamp(25px,7vw,31px)/1.06 Newsreader,Georgia,serif!important;
+    text-transform:none!important;letter-spacing:-.025em!important;
+  }
+  html body.ae-is-home #articlesCount{
+    display:none!important;
+  }
+  html body.ae-is-home #aeMobileNewsMore{
+    display:inline-flex!important;align-items:center!important;gap:4px!important;
+  }
+  html body .ae-mobile-expand-button{
+    min-height:34px!important;
+    padding:4px 3px!important;margin:0!important;
+    border:0!important;background:transparent!important;
+    color:var(--ae-action,#bc9169)!important;
+    font:700 12px/1.1 Inter,system-ui,sans-serif!important;
+    cursor:pointer!important;white-space:nowrap!important;
+  }
+  html body.ae-is-home #articlesGrid{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:9px!important;
+    margin:0!important;
+  }
+  html body.ae-is-home #articlesGrid>article:nth-child(n+2){
+    display:none!important;
+  }
+  html body.ae-is-home #articlesGrid.ae-mobile-expanded>article:nth-child(n+2){
+    display:flex!important;
+  }
+  html body.ae-is-home #articlesGrid>article{
+    display:flex!important;
+    flex-direction:column!important;
+    position:relative!important;
+    min-height:146px!important;height:auto!important;
+    margin:0!important;
+    padding:0!important;
+    border-radius:7px!important;
+    overflow:hidden!important;
+    transform:none!important;
+  }
+  html body.ae-is-home #articlesGrid>article>div:first-child{
+    display:grid!important;
+    grid-template-columns:44% 56%!important;
+    align-items:stretch!important;
+    min-width:0!important;
+    min-height:146px!important;
+    height:100%!important;
+  }
+  html body.ae-is-home #articlesGrid>article>div:first-child>div:first-child{
+    display:block!important;
+    position:relative!important;
+    min-width:0!important;
+    width:100%!important;
+    height:100%!important;min-height:146px!important;
+    overflow:hidden!important;
+  }
+  html body.ae-is-home #articlesGrid>article>div:first-child>div:first-child>img{
+    display:block!important;
+    width:100%!important;height:100%!important;
+    object-fit:cover!important;
+  }
+  html body.ae-is-home #articlesGrid>article>div:first-child>.p-5{
+    min-width:0!important;
+    margin:0!important;
+    padding:9px 9px 32px!important;
+  }
+  html body.ae-is-home #articlesGrid>article .p-5>div:first-child{
+    display:flex!important;align-items:center!important;
+    flex-wrap:wrap!important;gap:3px!important;
+    margin-bottom:5px!important;
+    font-size:9px!important;
+  }
+  html body.ae-is-home #articlesGrid>article h3{
+    font:600 clamp(14px,3.75vw,17px)/1.14 Newsreader,Georgia,serif!important;
+    margin:0 0 6px!important;
+    display:-webkit-box!important;-webkit-box-orient:vertical!important;
+    -webkit-line-clamp:3!important;line-clamp:3!important;
+    overflow:hidden!important;
+  }
+  html body.ae-is-home #articlesGrid>article p.line-clamp-2{
+    font-size:10px!important;line-height:1.3!important;
+    display:-webkit-box!important;-webkit-box-orient:vertical!important;
+    -webkit-line-clamp:2!important;line-clamp:2!important;
+    overflow:hidden!important;
+    margin:0!important;
+  }
+  html body.ae-is-home #articlesGrid>article>div:last-child{
+    display:flex!important;align-items:center!important;
+    justify-content:flex-end!important;
+    position:absolute!important;
+    right:0!important;bottom:0!important;
+    width:56%!important;
+    margin:0!important;
+    padding:5px 10px!important;
+    min-height:30px!important;
+    border:0!important;
+    background:transparent!important;
+  }
+  html body.ae-is-home #articlesGrid>article>div:last-child>div:first-child{
+    display:none!important;
+  }
+  html body.ae-is-home #articlesGrid>article>div:last-child button{
+    min-height:27px!important;
+    padding:4px!important;
+    font-size:10px!important;
+  }
+  /* Rankings NFL y Champions juntos y legibles. */
+  html body.ae-is-home #editorialBottom {
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    align-items:stretch!important;
+    gap:9px!important;
+    margin:0!important;
+    padding:0!important;
+  }
+  html body.ae-is-home #editorialBottom>.editorial-ranking {
+    display:flex!important;
+    flex-direction:column!important;
+    box-sizing:border-box!important;
+    min-height:0!important;height:auto!important;
+    width:100%!important;min-width:0!important;
+    margin:0!important;padding:0!important;
+    border-radius:7px!important;
+    overflow:hidden!important;
+  }
+  html body.ae-is-home #editorialBottom>.editorial-ranking>a.ae-ranking-card-link{
+    display:flex!important;flex-direction:column!important;
+    box-sizing:border-box!important;
+    flex:1 1 auto!important;
+    width:100%!important;min-width:0!important;
+    min-height:0!important;height:100%!important;
+    margin:0!important;padding:10px 9px 7px!important;
+    border-radius:7px!important;
+  }
+  html body.ae-is-home #editorialBottom .editorial-module-heading{
+    display:flex!important;align-items:center!important;
+    justify-content:space-between!important;
+    gap:4px!important;
+    min-height:40px!important;
+    padding:0 0 7px!important;
+    margin:0 0 3px!important;
+  }
+  html body.ae-is-home #editorialBottom .editorial-module-heading h2{
+    display:block!important;flex:1 1 0!important;min-width:0!important;
+    padding:0!important;margin:0!important;
+    font:600 clamp(13px,3.6vw,18px)/1.07 Newsreader,Georgia,serif!important;
+    overflow-wrap:anywhere!important;
+  }
+  html body.ae-is-home #editorialBottom .editorial-module-heading h2>span{
+    display:block!important;
+    font:400 9px/1.2 Inter,system-ui,sans-serif!important;
+    margin-top:3px!important;
+    opacity:.83!important;
+  }
+  html body.ae-is-home #editorialBottom .ae-ranking-card-link .ae-ranking-link-arrow{
+    width:29px!important;height:29px!important;
+    min-width:29px!important;min-height:29px!important;
+    flex:0 0 29px!important;
+    margin:0!important;
+  }
+  html body.ae-is-home #editorialBottom .ae-ranking-card-link .ae-ranking-link-arrow svg{
+    width:15px!important;height:15px!important;
+  }
+  html body.ae-is-home #editorialBottom .editorial-ranking-list{
+    display:flex!important;flex-direction:column!important;
+    gap:0!important;
+    width:100%!important;
+    min-width:0!important;
+    padding:0!important;
+    margin:0!important;
+  }
+  html body.ae-is-home #editorialBottom .editorial-ranking-list .rcm-team{
+    display:grid!important;
+    grid-template-columns:12px 23px minmax(0,1fr) auto!important;
+    gap:4px!important;align-items:center!important;
+    width:100%!important;min-width:0!important;
+    min-height:41px!important;
+    padding:4px 0!important;margin:0!important;
+    font-size:9px!important;line-height:1.15!important;
+  }
+  html body.ae-is-home #editorialBottom .editorial-ranking-list .rcm-team img{
+    width:23px!important;height:23px!important;
+    max-width:23px!important;max-height:23px!important;
+    object-fit:contain!important;
+  }
+  html body.ae-is-home #editorialBottom .editorial-ranking-list .rcm-team span{
+    min-width:0!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+    font-size:9px!important;
+  }
+  html body.ae-is-home #editorialBottom .editorial-ranking-list .rcm-team strong{
+    font-size:12px!important;
+  }
+  html body.ae-is-home #editorialBottom .editorial-ranking-list .rcm-team .rcm-rank-change,
+  html body.ae-is-home #editorialBottom .editorial-ranking-list .rcm-team :is(.ae-rank-change,.rcm-movement,.ae-movement){
+    max-width:34px!important;
+    min-width:21px!important;
+    font-size:9px!important;
+    padding:3px!important;
+  }
+  html body.ae-is-home #editorialBottom .ae-ranking-hint{
+    display:flex!important;
+    align-items:center!important;justify-content:center!important;
+    text-align:center!important;
+    margin:auto 0 0!important;
+    padding:8px 0 1px!important;
+    min-height:29px!important;
+    font:600 9px/1.2 Inter,system-ui,sans-serif!important;
+    white-space:normal!important;
+    color:var(--ae-action,#c39463)!important;
+  }
+  /* Comunidad: banner de altura corta y un Take de muestra por columna.
+     Ver más recupera todos los Takes reales. */
+  html body.ae-is-home #aeHomeTopTakes{
+    grid-column:1/-1!important;
+    min-width:0!important;
+    margin:2px 0 0!important;
+    padding:0!important;
+  }
+  html body.ae-is-home #aeHomeTopTakes .ae-top-takes-heading.ae-takes-banner{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto!important;
+    align-items:center!important;
+    gap:9px!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    min-height:82px!important;height:auto!important;
+    margin:0 0 9px!important;
+    padding:13px 12px!important;
+    aspect-ratio:auto!important;
+    border-radius:6px!important;
+    background:linear-gradient(115deg,rgba(12,44,61,.96),rgba(23,62,77,.90)),
+      url('atmospheres/ae-reference-brush.svg') right center/cover no-repeat!important;
+  }
+  html body.ae-is-home #aeHomeTopTakes .ae-takes-banner #aeHomeTopTakesTitle{
+    display:block!important;
+    position:static!important;
+    width:auto!important;height:auto!important;
+    min-width:0!important;
+    max-width:none!important;
+    margin:0!important;padding:0!important;
+    overflow:visible!important;
+    clip-path:none!important;
+    white-space:normal!important;
+    font:600 clamp(20px,5.6vw,27px)/1.1 Newsreader,Georgia,serif!important;
+  }
+  html body.ae-is-home #aeHomeTopTakes .ae-takes-banner .ae-top-takes-heading-side{
+    display:block!important;
+    position:relative!important;
+    inset:auto!important;
+    width:auto!important;height:auto!important;
+    min-width:0!important;
+    margin:0!important;padding:0!important;
+  }
+  html body.ae-is-home #aeHomeTopTakes .ae-takes-banner .ae-home-take-cta-line{
+    display:flex!important;
+    width:auto!important;height:auto!important;
+    margin:0!important;padding:0!important;
+  }
+  html body.ae-is-home #aeHomeTopTakes .ae-takes-banner button#aeHomeTakePublish.ae-home-take-publish{
+    box-sizing:border-box!important;
+    display:inline-flex!important;align-items:center!important;
+    justify-content:center!important;
+    width:auto!important;max-width:155px!important;
+    height:auto!important;min-height:39px!important;
+    margin:0!important;padding:8px 10px!important;
+    color:#0c2939!important;
+    background:linear-gradient(130deg,#e4ba88,#c38b57)!important;
+    border:1px solid #e2bf91!important;
+    border-radius:3px!important;
+    box-shadow:none!important;
+    font:700 12px/1.15 Newsreader,Georgia,serif!important;
+    white-space:normal!important;
+    font-size:12px!important;
+    cursor:pointer!important;
+  }
+  html body.ae-is-home #aeHomeTopTakes .ae-takes-banner button#aeHomeTakePublish:before{
+    content:'✎'!important;display:inline-block!important;margin-right:6px!important;
+    font-size:14px!important;line-height:1!important;color:inherit!important;
+  }
+  html:not(.dark) body.ae-is-home #aeHomeTopTakes .ae-top-takes-heading.ae-takes-banner{
+    background:linear-gradient(115deg,rgba(255,251,243,.97),rgba(246,236,221,.86)),
+      url('atmospheres/ae-reference-brush.svg') right center/cover no-repeat!important;
+  }
+  html:not(.dark) body.ae-is-home #aeHomeTopTakes .ae-takes-banner #aeHomeTopTakesTitle{
+    color:#173348!important;
+  }
+  html body.ae-is-home #aeHomeTopTakes .ae-top-takes-grid{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:9px!important;
+    width:100%!important;
+    min-width:0!important;
+    margin:0!important;padding:0!important;
+  }
+  html body.ae-is-home #aeHomeTopTakes .ae-top-takes-card{
+    border-radius:6px!important;
+    padding:0!important;
+    overflow:hidden!important;
+  }
+  html body.ae-is-home #aeHomeTopTakes .ae-top-takes-card-head{
+    display:flex!important;align-items:center!important;
+    justify-content:space-between!important;
+    gap:8px!important;
+    box-sizing:border-box!important;
+    min-height:45px!important;
+    padding:9px 13px!important;
+    border-radius:0!important;
+    background-size:cover,cover!important;
+  }
+  html body.ae-is-home #aeHomeTopTakes .ae-top-takes-card-head h3{
+    font:600 24px/1.08 Newsreader,Georgia,serif!important;
+    margin:0!important;
+  }
+  html body.ae-is-home #aeHomeTopTakes .ae-top-takes-card-head .ae-mobile-takes-more{
+    display:inline-flex!important;
+    flex:0 0 auto!important;
+    align-items:center!important;
+    color:var(--ae-ref-count,#ca9562)!important;
+  }
+  html body.ae-is-home #aeHomeTopTakes .ae-top-takes-list{
+    margin:0!important;padding:0 12px 7px!important;
+  }
+  html body.ae-is-home #aeHomeTopTakes .ae-top-takes-list>.ae-top-take:nth-child(n+2){
+    display:none!important;
+  }
+  html body.ae-is-home #aeHomeTopTakes .ae-top-takes-list.ae-mobile-expanded>.ae-top-take:nth-child(n+2){
+    display:block!important;
+  }
+  html body.ae-is-home #aeHomeTopTakes .ae-top-take{
+    padding:9px 0 11px!important;
+    margin:0!important;
+  }
+  html body.ae-is-home #aeHomeTopTakes .ae-home-take-title-row{
+    grid-template-columns:30px minmax(0,1fr)!important;
+    gap:8px!important;
+  }
+  html body.ae-is-home #aeHomeTopTakes .ae-top-take-number{
+    font-size:27px!important;
+  }
+  html body.ae-is-home #aeHomeTopTakes .ae-top-take-title{
+    font-size:16px!important;
+  }
+  html body.ae-is-home #aeHomeTopTakes .ae-top-take-summary{
+    margin:2px 0 5px 38px!important;
+    font-size:11px!important;
+    line-height:1.3!important;
+    display:-webkit-box!important;-webkit-box-orient:vertical!important;
+    -webkit-line-clamp:2!important;line-clamp:2!important;overflow:hidden!important;
+  }
+  html body.ae-is-home #aeHomeTopTakes .ae-take-reference-footer{
+    margin:0 0 0 38px!important;
+    gap:5px!important;
+  }
+  html body.ae-is-home #aeHomeTopTakes .ae-take-reference-avatar{
+    width:22px!important;height:22px!important;
+    flex-basis:22px!important;
+  }
+  html body.ae-is-home #aeHomeTopTakes .ae-top-take-author,
+  html body.ae-is-home #aeHomeTopTakes .ae-take-reference-date{
+    font-size:10px!important;
+  }
+  html body.ae-is-home #aeHomeTopTakes .ae-top-take-up,
+  html body.ae-is-home #aeHomeTopTakes .ae-top-take-down{
+    min-height:27px!important;padding:3px 6px!important;font-size:11px!important;
+  }
+  html body.ae-is-home #aeHomeTopTakes .ae-top-take-reply{
+    min-height:28px!important;padding:5px 9px!important;
+    font-size:10px!important;
+  }
+  /* Ninguna columna fuerza desplazamiento horizontal. */
+  html body.ae-is-home :is(#articlesGrid,#editorialBottom,#aeHomeTopTakes) * {
+    min-width:0;
+  }
+}
+@media(max-width:380px){
+  html body>header .ae-mobile-header-grid>a.ae-brand.ae-brand-runner-clean{
+    width:min(45vw,174px)!important;
+  }
+  html body>header .ae-mobile-header-grid>.ae-header-actions{
+    gap:1px!important;
+  }
+  html body>header .ae-mobile-header-grid>.ae-header-actions #themeToggle{
+    width:31px!important;min-width:31px!important;flex-basis:31px!important;
+  }
+  html body>header .ae-mobile-header-grid>.ae-header-actions #aeMyTakesButton,
+  html body>header .ae-mobile-header-grid>.ae-header-actions #readerSession button.ae-classical-auth-button{
+    width:43px!important;max-width:43px!important;
+  }
+  html body>header .ae-mobile-header-grid>nav.ae-sport-nav .category-btn:not([hidden]){
+    font-size:8px!important;gap:3px!important;
+  }
+  html body.ae-is-home #heroSection .editorial-hero{
+    height:244px!important;
+  }
+  html body.ae-is-home #heroSection .editorial-hero h1{
+    font-size:19px!important;max-width:76%!important;
+  }
+  html body.ae-is-home #editorialBottom .editorial-ranking-list .rcm-team{
+    grid-template-columns:11px 19px minmax(0,1fr) auto!important;
+    gap:3px!important;
+  }
+  html body.ae-is-home #editorialBottom .editorial-ranking-list .rcm-team img{
+    width:19px!important;height:19px!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  html body .ae-mobile-expand-button { transition:none!important; }
+}
