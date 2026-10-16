@@ -316,6 +316,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/ae-chef-compact-sport-authors.css?v=20261015-2">
 <link rel="stylesheet" href="assets/ae-chef-leaderboards.css?v=20261015-1">
 <link rel="stylesheet" href="assets/ae-news-archive-cta.css?v=20261015-1">
+<link rel="stylesheet" href="assets/ae-picks-news-visual-finish.css?v=20261015-1">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 
@@ -460,7 +461,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
           </section>
           <div class="ae-picks-overview">
           <section id="picksNews" class="ae-picks-news" aria-labelledby="picksNewsTitle">
-            <div class="ae-picks-news-heading"><span>ACTUALIDAD Y ANÁLISIS</span><div class="ae-news-heading-row"><h3 id="picksNewsTitle">Noticias de Picks</h3><button class="ae-news-all-button" type="button" data-ae-news-category="Picks">Todas las noticias <span aria-hidden="true">→</span></button></div><p>Nuestras últimas noticias y análisis de pronósticos.</p></div>
+            <div class="ae-picks-news-heading"><span>ACTUALIDAD Y ANÁLISIS</span><div class="ae-news-heading-row"><h3 id="picksNewsTitle">Noticias de Picks</h3><button class="ae-news-all-button" type="button" data-ae-news-category="Picks">Todas las noticias <span aria-hidden="true">→</span></button></div><p id="picksNewsLead" class="ae-picks-news-lead" hidden></p></div>
             <div id="picksNewsList" class="ae-picks-news-list" aria-live="polite"></div>
           </section>
 
@@ -469,8 +470,8 @@ html.dark [data-reading-size][aria-pressed="true"] {
             <section class="ae-picks-feed" id="communityPicks" hidden aria-labelledby="cpTitle">
               <div class="ae-picks-feed-heading">
                  <div class="ae-picks-heading-cta-row">
-                   <button id="cpPublishCta" type="button" class="ae-participate-cta ae-picks-publish-cta" aria-label="Cocina Picks: publicar un nuevo pronóstico" aria-controls="cpComposePanel" aria-expanded="false"><span aria-hidden="true">＋</span> Cocina Picks</button>
                    <span class="ae-picks-nudge">¿Eres Chef?</span>
+                   <button id="cpPublishCta" type="button" class="ae-participate-cta ae-picks-publish-cta" aria-label="Cocina Picks: publicar un nuevo pronóstico" aria-controls="cpComposePanel" aria-expanded="false"><span aria-hidden="true">＋</span> Cocina Picks</button>
                  </div>
                  <h3 id="cpTitle" class="sr-only">Picks de la comunidad</h3>
                  
@@ -482,11 +483,11 @@ html.dark [data-reading-size][aria-pressed="true"] {
             </section>
             <aside class="ae-picks-rail">
               <section class="ae-picks-top-three ae-picks-small-top ae-chef-board ae-chef-best" aria-labelledby="picksPopularTitle">
-                <div class="ae-picks-rail-heading"><span>LOS MÁS APOYADOS</span><h3 id="picksPopularTitle">Mejores Chefs</h3><p>Picks con más votos netos esta semana.</p></div>
+                <div class="ae-picks-rail-heading"><span>LOS MÁS APOYADOS</span><h3 id="picksPopularTitle">Mejores Chefs</h3></div>
                 <ol id="picksPopular" aria-live="polite"><li class="ae-chef-empty">Cargando clasificación…</li></ol>
               </section>
               <section class="ae-picks-top-three ae-picks-small-top ae-chef-board ae-chef-worst" aria-labelledby="picksQuestionedTitle">
-                <div class="ae-picks-rail-heading"><span>LOS MÁS CUESTIONADOS</span><h3 id="picksQuestionedTitle">Peores Chefs</h3><p>Picks con más votos netos negativos esta semana.</p></div>
+                <div class="ae-picks-rail-heading"><span>LOS MÁS CUESTIONADOS</span><h3 id="picksQuestionedTitle">Peores Chefs</h3></div>
                 <ol id="picksQuestioned" aria-live="polite"><li class="ae-chef-empty">Cargando clasificación…</li></ol>
               </section>
 
@@ -2149,7 +2150,7 @@ updateThemeButton();
 <script src="assets/ae-category-visibility.js?v=20261015-3"></script>
 <script src="assets/ae-nfl-takes.js?v=20261015-3"></script>
 <script src="assets/free-takes.js?v=20261015-10"></script>
-<script src="assets/ae-editorial-weekly.js?v=20261015-5"></script>
+<script src="assets/ae-editorial-weekly.js?v=20261015-6"></script>
 <script src="assets/ae-profile.js?v=20261015-4"></script>
 <script src="assets/ae-home-takes.js?v=20261015-5"></script>
 <script src="assets/ae-sport-top-takes.js?v=20261015-6"></script>
