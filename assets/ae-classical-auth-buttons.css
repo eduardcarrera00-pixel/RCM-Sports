@@ -95,7 +95,7 @@ html body>header #readerSession .rcm-username{
     height:42px!important;
     max-height:42px!important;
     object-fit:cover!important;
-    object-position:15% center!important;
+    object-position:left center!important;
   }
   html body>header #readerSession .rcm-username{
     max-width:55px!important;
