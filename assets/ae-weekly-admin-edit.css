@@ -18,3 +18,19 @@
 #aeWeeklyCancelEdit{padding:11px 15px;border:1px solid #c19a79;background:transparent;color:inherit;font:700 12px/1.35 Inter,system-ui,sans-serif;cursor:pointer}
 #aeWeeklyCancelEdit:hover{background:rgba(183,134,96,.13)}
 @media(max-width:550px){#aeWeeklyEditButton.ae-weekly-edit-trigger{max-width:100%}#aeWeeklyPickForm .ae-weekly-admin-actions{flex-direction:column;align-items:stretch}#aeWeeklyPickForm .ae-weekly-admin-actions button{width:100%}}
+
+/* Verification is only offered if the response to an edit cannot be confirmed. */
+#aeWeeklyCheckSave[hidden]{display:none!important}
+#aeWeeklyCheckSave.ae-weekly-check-save{
+ display:inline-flex!important;align-items:center;justify-content:center;
+ min-height:42px;margin:9px 0 0;padding:10px 14px;
+ font:700 13px/1.3 Inter,system-ui,sans-serif;
+ color:#fff2e4;background:#355a6c;border:1px solid #b5cbd3;
+ cursor:pointer;border-radius:0;text-align:center;
+}
+#aeWeeklyCheckSave:hover{background:#476e82}
+#aeWeeklyCheckSave:disabled{cursor:wait;opacity:.65}
+#aeWeeklyCheckSave:focus-visible{outline:2px solid #e8c295;outline-offset:3px}
+@media(max-width:580px){#aeWeeklyCheckSave.ae-weekly-check-save{width:100%}}
+
+#aeWeeklyCheckSave.ae-weekly-check-save[hidden]{display:none!important}
