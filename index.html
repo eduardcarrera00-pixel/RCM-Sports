@@ -319,6 +319,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/ae-picks-news-visual-finish.css?v=20261016-3">
 <link rel="stylesheet" href="assets/ae-picks-takes-history.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-all-square-corners.css?v=20261016-1">
+<link rel="stylesheet" href="assets/ae-header-gold-and-picks-centering.css?v=20261016-1">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 
@@ -326,10 +327,9 @@ html.dark [data-reading-size][aria-pressed="true"] {
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-20">
 
-                <!-- Marca AE SPORTS: monograma A + pluma, sin círculo. -->
-                <a href="#" onclick="filterByCategory('Todos')" class="ae-brand group" aria-label="AE SPORTS — inicio">
-                    <img class="ae-brand-mark" src="assets/ae-feather.svg" alt="" width="52" height="52">
-                    <span class="ae-brand-words"><strong>AE <span>SPORTS</span></strong><small>TU BLOG DE DEPORTE</small></span>
+                <!-- Identidad oficial: monograma y logotipo dorados de AE SPORTS. -->
+                <a href="#" onclick="filterByCategory('Todos'); return false;" class="ae-brand ae-brand-gold group" aria-label="AE SPORTS — ir al inicio">
+                    <img class="ae-brand-art" src="assets/ae-brand-gold-header.webp?v=20261016-1" alt="AE SPORTS — TU BLOG DE DEPORTE" width="400" height="109" decoding="async">
                 </a>
                 <!-- Este input conserva compatibilidad con los filtros y pruebas, pero no se muestra en la interfaz. -->
                 <input id="searchInput" type="search" hidden aria-hidden="true" tabindex="-1" oninput="handleSearch()">
