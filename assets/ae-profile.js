@@ -401,6 +401,8 @@ async function showPublic(id,push=true){
   if(!dialog.open)dialog.showModal();
 
   $('aeProfileTabs').hidden=true;
+  $('aeProfileTakeHighlights').hidden=false;
+  $('aeProfileTakes').hidden=false;
   $('aeProfilePickHighlights').hidden=true;
   $('aeProfilePicks').hidden=true;
   $('aeProfileAccuracy').hidden=true;
