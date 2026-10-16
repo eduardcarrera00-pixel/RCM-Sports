@@ -526,30 +526,30 @@ html.dark [data-reading-size][aria-pressed="true"] {
               <label>Cierre de la recomendación<input name="expires_at" type="datetime-local" required></label>
               <label class="ae-full">Análisis del Pick<textarea name="analysis" minlength="12" maxlength="2400" required placeholder="Explica los motivos de la recomendación."></textarea></label>
               <div class="ae-weekly-media-fields">
-                <label class="ae-upload-field">Banner del Pick de la Semana
+                <div class="ae-upload-field"><label for="aeWeeklyBannerInput">Banner del Pick de la Semana</label>
                   <small>Imagen horizontal para el encabezado (recomendado 1600 × 600). JPG, PNG o WEBP; máximo 5 MB.</small>
                   <input id="aeWeeklyBannerInput" type="file" name="banner_file" accept="image/jpeg,image/png,image/webp">
                   <span id="aeWeeklyBannerPreview" class="ae-upload-preview">Vista previa del banner</span>
                   <span class="ae-framing-note">También puedes pegar un enlace directo HTTPS.</span>
-                  <input type="url" name="banner_url" id="aeWeeklyBannerUrl" placeholder="https://ejemplo.com/banner.jpg" inputmode="url">
+                  <input type="url" name="banner_url" id="aeWeeklyBannerUrl" aria-label="Enlace directo HTTPS del banner" placeholder="https://ejemplo.com/banner.jpg" inputmode="url">
                   <div class="ae-framing-controls" data-ae-frame="banner">
                     <label>Encuadre horizontal <input id="aeWeeklyBannerX" type="range" min="0" max="100" value="50"></label>
                     <label>Encuadre vertical <input id="aeWeeklyBannerY" type="range" min="0" max="100" value="50"></label>
                     <button type="button" data-ae-center="banner">Centrar imagen</button>
                   </div>
-                </label>
-                <label class="ae-upload-field">Imagen de la publicación
+                </div>
+                <div class="ae-upload-field"><label for="aeWeeklyImageInput">Imagen de la publicación</label>
                   <small>Imagen para la tarjeta y el análisis (recomendado 800 × 450). Opcional.</small>
                   <input id="aeWeeklyImageInput" type="file" name="image_file" accept="image/jpeg,image/png,image/webp">
                   <span id="aeWeeklyImagePreview" class="ae-upload-preview">Vista previa de publicación</span>
                   <span class="ae-framing-note">O pega el enlace HTTPS de una imagen.</span>
-                  <input type="url" name="image_url" id="aeWeeklyImageUrl" placeholder="https://ejemplo.com/imagen.jpg" inputmode="url">
+                  <input type="url" name="image_url" id="aeWeeklyImageUrl" aria-label="Enlace directo HTTPS de la imagen editorial" placeholder="https://ejemplo.com/imagen.jpg" inputmode="url">
                   <div class="ae-framing-controls" data-ae-frame="weekly">
                     <label>Encuadre horizontal <input id="aeWeeklyImageX" type="range" min="0" max="100" value="50"></label>
                     <label>Encuadre vertical <input id="aeWeeklyImageY" type="range" min="0" max="100" value="50"></label>
                     <button type="button" data-ae-center="weekly">Centrar imagen</button>
                   </div>
-                </label>
+                </div>
               </div>
               <div class="ae-full"><button type="submit">Publicar Pick de la Semana</button></div>
               <p id="aeWeeklyPickAdminStatus" class="ae-full ae-takes-status" role="status"></p>
@@ -1407,6 +1407,14 @@ currentUser = {
             return escapeHTML(JSON.stringify(id));
         }
 
+        function imagePosition(article) {
+            const focus = key => {
+                const value = Number(article?.[key]);
+                return Number.isFinite(value) ? Math.min(100,Math.max(0,value)) : 50;
+            };
+            return focus('image_focus_x')+'% '+focus('image_focus_y')+'%';
+        }
+
         function safeImageURL(value) {
             try {
                 const url = new URL(value);
@@ -1619,7 +1627,7 @@ currentUser = {
                 <article class="bg-white rounded-2xl border border-slate-200 overflow-hidden flex flex-col justify-between shadow-sm hover:shadow-xl hover:border-pitch-300 transition-all duration-300 hover:-translate-y-1 relative">
                     <div>
                         <div class="relative h-48 overflow-hidden group">
-                            <img src="${escapeHTML(safeImageURL(art.image))}" alt="${escapeHTML(art.title)}" style="object-position:${Math.min(100,Math.max(0,Number(art.image_focus_x)||50))}% ${Math.min(100,Math.max(0,Number(art.image_focus_y)||50))}%" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <img src="${escapeHTML(safeImageURL(art.image))}" alt="${escapeHTML(art.title)}" style="object-position:${imagePosition(art)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                             <div class="absolute top-3 left-3 bg-white/90 backdrop-blur-md border border-slate-200 text-pitch-800 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md shadow-sm">
                                 ${escapeHTML(art.category)}
                             </div>
@@ -1671,7 +1679,7 @@ currentUser = {
             const container = document.getElementById('heroSection');
             container.innerHTML = `
                 <div class="editorial-hero">
-                    <img class="editorial-hero-image" src="${escapeHTML(safeImageURL(hero.image))}" style="object-position:${Math.min(100,Math.max(0,Number(hero.image_focus_x)??50))}% ${Math.min(100,Math.max(0,Number(hero.image_focus_y)??50))}%" alt="" onerror="this.hidden=true">
+                    <img class="editorial-hero-image" src="${escapeHTML(safeImageURL(hero.image))}" style="object-position:${imagePosition(hero)}" alt="" onerror="this.hidden=true">
                     <div class="editorial-hero-copy">
                                                 <h1>${escapeHTML(hero.title)}</h1>
                         <p>${escapeHTML(hero.summary || 'La historia completa, desde otra perspectiva.')}</p>
@@ -1901,8 +1909,7 @@ currentUser = {
             document.getElementById('modalAuthor').innerText = article.author || 'AE SPORTS';
             document.getElementById('modalDate').innerText = article.date || '';
             document.getElementById('modalImage').src = safeImageURL(article.image);
-            document.getElementById('modalImage').style.objectPosition =
-                `${Math.min(100,Math.max(0,Number(article.image_focus_x) || 50))}% ${Math.min(100,Math.max(0,Number(article.image_focus_y) || 50))}%`;
+            document.getElementById('modalImage').style.objectPosition = imagePosition(article);
             document.getElementById('modalBody').innerHTML = cleanBody(article.body);
             restoreReadingSize();
 renderRelatedStories(article);
