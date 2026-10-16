@@ -18,7 +18,7 @@
     dialog.innerHTML = `
       <div class="ae-take-discussion-inner">
         <header class="ae-discussion-header">
-          <div class="ae-discussion-titleblock"><span>LA COMUNIDAD DEBATE</span><h2 id="aeTakeDiscussionTitle">MIS TAKES</h2></div>
+          <div class="ae-discussion-titleblock"><span>LA COMUNIDAD DEBATE</span><h2 id="aeTakeDiscussionTitle">Mis Takes</h2></div>
           <button type="button" id="aeDiscussionClose" aria-label="Cerrar comentarios"><span aria-hidden="true"></span></button>
         </header>
         <section class="ae-discussion-subject">
