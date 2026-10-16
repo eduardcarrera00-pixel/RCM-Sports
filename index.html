@@ -288,7 +288,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
     </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
-<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261016-sport-take-titles-1">
+<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261016-nfl-comments-1">
     <link rel="stylesheet" href="assets/ae-muted-navigation-icons.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-custom-nav-icons.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-classical-auth-buttons.css?v=20261016-3">
@@ -745,6 +745,12 @@ html.dark [data-reading-size][aria-pressed="true"] {
             <button type="submit">Publicar mi Take</button>
           </form>
           </details>
+        </section>
+
+        <section id="aeNflLatestComments" hidden aria-labelledby="aeNflLatestCommentsTitle">
+          <h2 id="aeNflLatestCommentsTitle">Últimos comentarios</h2>
+          <p id="aeNflLatestCommentsStatus" role="status" aria-live="polite"></p>
+          <div id="aeNflLatestCommentsList"></div>
         </section>
 
 
@@ -1588,6 +1594,7 @@ currentUser = {
             document.getElementById('footballTakes').hidden = currentCategory !== 'Picks';
             if (typeof renderCommunityPicksVisibility === 'function') renderCommunityPicksVisibility();
             if (typeof renderFreeTakesVisibility === 'function') renderFreeTakesVisibility();
+            window.refreshAeNflLatestComments?.();
             const isPicksPage = currentCategory === 'Picks';
             document.getElementById('heroSection').hidden = isPicksPage;
             document.getElementById('noResults').hidden = isPicksPage;
@@ -2275,7 +2282,7 @@ function toggleDarkMode() {
 updateThemeButton();
     </script>
 <script src="assets/nfl-teams.js"></script>
-<script src="assets/community.js?v=20261016-header-layout-1"></script>
+<script src="assets/community.js?v=20261016-nfl-comments-1"></script>
 <script src="assets/ae-home-community-spotlight.js?v=20261016-1"></script>
 <script src="assets/champions.js?v=qa1-20261015-6"></script>
 <script src="assets/community-picks.js?v=20261016-platos-odds-1"></script>
@@ -2287,6 +2294,7 @@ updateThemeButton();
 <script src="assets/ae-editorial-weekly.js?v=20261016-framing-zoom-3"></script>
 <script src="assets/ae-profile.js?v=20261016-1"></script>
 <script src="assets/ae-home-takes.js?v=20261016-reference-1"></script>
+<script src="assets/ae-nfl-latest-comments.js?v=20261016-1"></script>
 <script src="assets/ae-sport-top-takes.js?v=20261016-sport-take-titles-1"></script>
 <script src="assets/ae-take-replies.js?v=20261016-mis-takes-1"></script>
 <script src="assets/ae-picks-premium.js?v=20261015-1"></script>
