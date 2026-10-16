@@ -2,7 +2,7 @@
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
-  const labels = {general:'General',laliga:'LaLiga',premier:'Premier League',ligamx:'Liga MX',champions:'Champions League',nfl:'NFL',colegial:'Colegial'};
+  const labels = {general:'General',football:'Fútbol',laliga:'LaLiga',premier:'Premier League',ligamx:'Liga MX',champions:'Champions League',nfl:'NFL',colegial:'Colegial'};
   let loading = false, lastLoad = 0, pending = false;
   const element = (tag, text, className) => {
     const node = document.createElement(tag);
@@ -34,7 +34,7 @@
     open.addEventListener('click',()=>window.aeTakeReplies?.open(t));
     title.append(open);
     titleRow.append(rank,title);
-    const badge=element('span',labels[t.sport]||'Deportes','ae-top-take-sport');
+    const badge=element('span',t.competition||labels[t.sport]||'Deportes','ae-top-take-sport');
     header.append(titleRow,badge);
     content.append(header);
     const excerpt=String(t.body||'').replace(/^NFL[^\n]*\n\n/,'').trim();
@@ -76,7 +76,7 @@
   function paint(data) {
     const positive = $('aeTopTakesPositive'), negative = $('aeTopTakesNegative');
     if (!positive || !negative) return;
-    const eligibleSports = new Set(['nfl','laliga','premier','ligamx','champions']);
+    const eligibleSports = new Set(['nfl','football','laliga','premier','ligamx','champions']);
     const takes = (Array.isArray(data) ? data : []).filter(t=>eligibleSports.has(t.sport));
     const up = takes.filter(t => Number(t.upvotes) > 0)
       .sort((a,b)=>Number(b.upvotes)-Number(a.upvotes) || Number(a.downvotes)-Number(b.downvotes) || new Date(b.created_at)-new Date(a.created_at)).slice(0,3);
@@ -113,21 +113,7 @@
   window.refreshAeHomeTopTakes = refresh;
   document.addEventListener('DOMContentLoaded',()=>{
     refresh(true);
-    const publish=$('aeHomeTakePublish'),choices=$('aeHomeTakeChoice');
-    publish?.addEventListener('click',()=>{
-      if(!choices)return;
-      choices.hidden=!choices.hidden;
-      publish.setAttribute('aria-expanded',String(!choices.hidden));
-      if(!choices.hidden)choices.querySelector('button')?.focus();
-    });
-    choices?.querySelectorAll('button[data-ae-take-sport]').forEach(btn=>btn.addEventListener('click',()=>{
-      choices.hidden=true;
-      publish?.setAttribute('aria-expanded','false');
-      window.aeOpenTakeComposer?.(btn.dataset.aeTakeSport);
-    }));
-    choices?.addEventListener('keydown',e=>{
-      if(e.key==='Escape'){choices.hidden=true;publish?.setAttribute('aria-expanded','false');publish?.focus();}
-    });
+    $('aeHomeTakePublish')?.addEventListener('click',()=>window.aeOpenTakeComposer?.());
   });
   document.addEventListener('ae:takes-updated',()=>refresh(true));
   document.addEventListener('visibilitychange',()=>{if (!document.hidden) refresh();});
