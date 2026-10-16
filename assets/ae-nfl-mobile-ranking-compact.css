@@ -1,0 +1,93 @@
+/* AE SPORTS · NFL Power Rankings, ajuste preciso para teléfonos.
+   Sólo composición vertical; se conserva ticker, escudos, ranking y controles. */
+@media (max-width:760px){
+  /* El diseño global exige 218px de altura mínima: genera espacio vacío
+     después de un carrusel de 52px. Ajustar la altura al contenido real. */
+  html body.ae-is-nfl #mainContent > #nflRankings.rcm-panel,
+  html body.ae-is-nfl #mainContent #nflRankings.rcm-panel{
+    box-sizing:border-box!important;
+    min-height:0!important;
+    height:auto!important;
+    padding:0 0 5px!important;
+    margin-top:0!important;
+    margin-bottom:9px!important;
+    border-radius:0!important;
+  }
+  html body.ae-is-nfl #nflRankings .ae-rank-overline{
+    display:none!important; /* NFL · LA ÉLITE DE LA LIGA */
+    margin:0!important;
+    padding:0!important;
+  }
+  /* Subir "NFL Power Rankings" y el #1; no reducir logos a ilegibles. */
+  html body.ae-is-nfl #nflRankings.rcm-panel > .ae-rank-hero-head.rcm-row{
+    display:grid!important;
+    grid-template-columns:minmax(0,51%) minmax(0,49%)!important;
+    align-items:center!important;
+    gap:0!important;
+    box-sizing:border-box!important;
+    min-height:92px!important;
+    height:auto!important;
+    margin:0!important;
+    padding:7px 10px 5px!important;
+    overflow:visible!important;
+  }
+  html body.ae-is-nfl #nflRankings .ae-rank-title-wrap{
+    align-self:center!important;
+    justify-content:center!important;
+    min-width:0!important;
+    padding:0 7px 0 0!important;
+    margin:0!important;
+  }
+  html body.ae-is-nfl #nflRankings #rankingTitle,
+  html body.ae-is-nfl #nflRankings #rankingTitle span{
+    margin:0!important;
+    padding:0!important;
+    font-size:clamp(22px,6vw,29px)!important;
+    line-height:1.02!important;
+  }
+  html body.ae-is-nfl #nflRankings #rankingEdition.ae-rank-edition{
+    margin:4px 0 0!important;
+    padding:0!important;
+    line-height:1.15!important;
+  }
+  html body.ae-is-nfl #nflRankings #nflRankOne.ae-ranking-leader:not([hidden]){
+    align-self:center!important;
+    min-height:62px!important;
+    height:auto!important;
+    margin:0!important;
+    padding:5px 4px 5px 9px!important;
+  }
+  html body.ae-is-nfl #nflRankings .ae-leader-overline{
+    margin:0 0 4px!important;
+    padding:0!important;
+  }
+  /* El movimiento termina casi en el borde del panel (5px de respiro). */
+  html body.ae-is-nfl #nflRankings #rankingViewport.rcm-ticker{
+    display:block!important;
+    height:52px!important;
+    min-height:52px!important;
+    max-height:52px!important;
+    margin:0!important;
+    padding:0!important;
+    border-bottom:0!important;
+    box-shadow:none!important;
+  }
+  html body.ae-is-nfl #nflRankings #rankingTrack.rcm-track,
+  html body.ae-is-nfl #nflRankings #rankingTrack .rcm-track-group{
+    min-height:52px!important;
+    height:52px!important;
+  }
+}
+@media (max-width:385px){
+  html body.ae-is-nfl #nflRankings.rcm-panel > .ae-rank-hero-head.rcm-row{
+    min-height:88px!important;
+    padding:6px 8px 4px!important;
+  }
+  html body.ae-is-nfl #nflRankings #rankingTitle,
+  html body.ae-is-nfl #nflRankings #rankingTitle span{
+    font-size:clamp(21px,6vw,23px)!important;
+  }
+  html body.ae-is-nfl #nflRankings #nflRankOne.ae-ranking-leader:not([hidden]){
+    padding:4px 2px 4px 7px!important;
+  }
+}
