@@ -8,7 +8,7 @@
     news:{
       file:'pubImageFile',url:'pubImage',preview:'pubImagePreview',
       x:'pubImageFocusX',y:'pubImageFocusY',
-      zoomRange:'pubImageZoomRange',zoomInput:'pubImageZoomPct'
+      zoom:'pubImageZoomRange',zoomOutput:'pubImageZoomValue'
     }
   };
   const blobUrls={};
@@ -21,7 +21,7 @@
     return {
       x:limit($(c.x)?.value),
       y:limit($(c.y)?.value),
-      zoom:c.zoomInput ? zoomLimit($(c.zoomInput)?.value) : 100
+      zoom:c.zoom ? zoomLimit($(c.zoom)?.value) : 100
     };
   };
   const safeUrl = v => {
@@ -48,12 +48,16 @@
   }
   function syncZoom(key,source){
     const c=configs[key];
-    if(!c?.zoomInput)return 100;
-    const input=$(c.zoomInput),range=$(c.zoomRange);
-    const value=zoomLimit(source?.value ?? input?.value ?? range?.value ?? 100);
-    if(input)input.value=String(value);
-    if(range)range.value=String(value);
-    input?.setAttribute('aria-label','Zoom de imagen '+value+'%');
+    if(!c?.zoom)return 100;
+    const control=$(c.zoom);
+    const value=zoomLimit(source?.value ?? control?.value ?? 100);
+    if(control)control.value=String(value);
+    const output=$(c.zoomOutput);
+    if(output){
+      output.value=String(value);
+      output.textContent=value+'%';
+    }
+    control?.setAttribute('aria-valuetext',value+'% de zoom');
     return value;
   }
   function updateReadout(key){
@@ -66,8 +70,8 @@
     if(!img)return;
     const state=get(key);
     img.style.objectPosition=state.x+'% '+state.y+'%';
-    img.style.transformOrigin=state.x+'% '+state.y+'%';
-    img.style.transform='scale('+(state.zoom/100)+')';
+    img.style.setProperty('--ae-image-focus',state.x+'% '+state.y+'%');
+    img.style.setProperty('--ae-image-zoom',String(state.zoom/100));
     updateReadout(key);
   }
   function repaint(key){
@@ -103,10 +107,10 @@
     const c=configs[key];if(!c)return;
     if($(c.x))$(c.x).value=String(limit(x));
     if($(c.y))$(c.y).value=String(limit(y));
-    if(c.zoomInput){
+    if(c.zoom){
       const value=zoomLimit(zoom);
-      if($(c.zoomInput))$(c.zoomInput).value=String(value);
-      if($(c.zoomRange))$(c.zoomRange).value=String(value);
+      if($(c.zoom))$(c.zoom).value=String(value);
+      syncZoom(key,$(c.zoom));
     }
     repaint(key);
   }
@@ -133,9 +137,18 @@
         $(id)?.addEventListener('input',()=>move(key));
         $(id)?.addEventListener('change',()=>move(key));
       }
-      for(const id of [c.zoomRange,c.zoomInput].filter(Boolean)){
-        $(id)?.addEventListener('input',event=>{syncZoom(key,event.currentTarget);move(key);});
-        $(id)?.addEventListener('change',event=>{syncZoom(key,event.currentTarget);move(key);});
+      if(c.zoom){
+        $(c.zoom)?.addEventListener('input',event=>{syncZoom(key,event.currentTarget);move(key);});
+        $(c.zoom)?.addEventListener('change',event=>{syncZoom(key,event.currentTarget);move(key);});
+        document.querySelectorAll('[data-ae-zoom-step="'+key+'"]').forEach(button=>{
+          button.addEventListener('click',()=>{
+            const control=$(c.zoom);
+            if(!control)return;
+            control.value=String(zoomLimit(Number(control.value)+(Number(button.dataset.aeZoomDelta)||0)));
+            syncZoom(key,control);
+            move(key);
+          });
+        });
       }
       document.querySelector('[data-ae-center="'+key+'"]')?.addEventListener('click',()=>set(key,50,50,get(key).zoom));
       repaint(key);
