@@ -1,0 +1,365 @@
+/* AE SPORTS · Portada 2026-10-16 · Clasificaciones por puntos y votos.
+   Solo presentación: responsive, cuadrada, bronce y azul petróleo. */
+html body.ae-is-home #aeHomeTopTakes .ae-points-period{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:7px;
+  padding:0 0 10px;
+}
+html body.ae-is-home #aeHomeTopTakes .ae-points-period button {
+  padding:6px 12px!important;
+  min-height:31px!important;
+  background:rgba(18,48,62,.75)!important;
+  color:#dfd4c5!important;
+  border:1px solid rgba(209,162,115,.46)!important;
+  border-radius:2px!important;
+  font:700 11px/1 Inter,system-ui,sans-serif!important;
+  cursor:pointer;
+}
+html body.ae-is-home #aeHomeTopTakes .ae-points-period button[aria-pressed="true"]{
+  color:#162c38!important;
+  background:#d9aa78!important;
+  border-color:#d9aa78!important;
+}
+html:not(.dark) body.ae-is-home #aeHomeTopTakes .ae-points-period button{
+  color:#624a38!important;
+  background:#f4ebdd!important;
+}
+html:not(.dark) body.ae-is-home #aeHomeTopTakes .ae-points-period button[aria-pressed="true"]{
+  color:#fff9f0!important;
+  background:#84573d!important;
+  border-color:#84573d!important;
+}
+html body.ae-is-home #aeHomeTopTakes .ae-points-period button:focus-visible{
+  outline:2px solid #d9aa78!important;
+  outline-offset:2px!important;
+}
+html body.ae-is-home #aeHomeTopTakes .ae-top-takes-list >li.ae-points-take{
+  display:block!important;
+  min-width:0!important;
+  padding:13px 12px!important;
+  margin:0!important;
+  border-bottom:1px solid rgba(208,163,115,.2)!important;
+  background:none!important;
+}
+html body.ae-is-home #aeHomeTopTakes .ae-points-take .ae-top-take-content{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:9px!important;
+  height:auto;
+}
+html body.ae-is-home #aeHomeTopTakes .ae-points-headline{
+  display:grid;
+  grid-template-columns:29px minmax(0,1fr) auto;
+  align-items:center;
+  gap:9px;
+  min-width:0;
+}
+html body.ae-is-home #aeHomeTopTakes .ae-points-position{
+  font:600 24px/1 Newsreader,Georgia,serif!important;
+  color:#d9aa78!important;
+  font-variant-numeric:tabular-nums;
+}
+html body.ae-is-home #aeHomeTopTakes .ae-points-user{
+  text-align:left!important;
+  min-width:0!important;
+  max-width:100%;
+  padding:0!important;
+  border:0!important;
+  background:transparent!important;
+  color:#f0e7da!important;
+  font:750 13px/1.3 Inter,system-ui,sans-serif!important;
+  overflow-wrap:anywhere;
+  cursor:pointer;
+}
+html body.ae-is-home #aeHomeTopTakes .ae-points-user:hover{
+  color:#e4b584!important;
+  text-decoration:underline;
+}
+html body.ae-is-home #aeHomeTopTakes .ae-points-total{
+  color:#edc892!important;
+  font:800 15px/1.2 Inter,system-ui,sans-serif!important;
+  white-space:nowrap;
+  font-variant-numeric:tabular-nums;
+}
+html body.ae-is-home #aeHomeTopTakes .ae-points-best{
+  display:grid;
+  gap:3px;
+  padding:8px 10px;
+  border-left:2px solid rgba(217,170,120,.75);
+  background:rgba(9,35,49,.34);
+}
+html body.ae-is-home #aeHomeTopTakes .ae-points-best-kicker{
+  font:750 10px/1.35 Inter,system-ui,sans-serif;
+  color:#e2b57f;
+}
+html body.ae-is-home #aeHomeTopTakes .ae-points-best-title{
+  margin:0!important;
+  font:650 14px/1.25 Newsreader,Georgia,serif!important;
+  color:#f6eadb!important;
+  overflow-wrap:anywhere;
+}
+html body.ae-is-home #aeHomeTopTakes .ae-points-best-excerpt{
+  margin:0!important;
+  font:500 11.5px/1.36 Inter,system-ui,sans-serif!important;
+  color:#bfcbd1!important;
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+  overflow-wrap:anywhere;
+}
+html body.ae-is-home #aeHomeTopTakes .ae-points-count{
+  font:650 10px/1.3 Inter,system-ui,sans-serif;
+  color:#b9c5c8;
+}
+html body.ae-is-home #aeHomeTopTakes #aeTopTakesNegative {
+  max-height:520px!important;
+  overflow-y:auto!important;
+  overscroll-behavior-y:contain;
+  scrollbar-width:thin;
+  scrollbar-color:#9c795e transparent;
+}
+html body.ae-is-home #aeHomeTopTakes #aeTopTakesPositive{
+  max-height:520px!important;
+  overflow-y:auto!important;
+  scrollbar-width:thin;
+  scrollbar-color:#9c795e transparent;
+}
+html:not(.dark) body.ae-is-home #aeHomeTopTakes .ae-points-user,
+html:not(.dark) body.ae-is-home #aeHomeTopTakes .ae-points-best-title{
+  color:#253e4a!important;
+}
+html:not(.dark) body.ae-is-home #aeHomeTopTakes .ae-points-best{
+  background:rgba(143,105,64,.06);
+  border-left-color:#aa794c;
+}
+html:not(.dark) body.ae-is-home #aeHomeTopTakes .ae-points-position,
+html:not(.dark) body.ae-is-home #aeHomeTopTakes .ae-points-total,
+html:not(.dark) body.ae-is-home #aeHomeTopTakes .ae-points-best-kicker{
+  color:#895636!important;
+}
+html:not(.dark) body.ae-is-home #aeHomeTopTakes .ae-points-count,
+html:not(.dark) body.ae-is-home #aeHomeTopTakes .ae-points-best-excerpt{
+  color:#667077!important;
+}
+
+/* La tabla duplicada desaparece de la portada; el récord histórico se conserva. */
+html body #aeHomeTakeHighlights{
+  display:block!important;
+  grid-column:1 / -1!important;
+  min-width:0;
+  margin:16px 0 8px;
+}
+html body #aeHomeTakeHighlights .ae-home-take-extras{
+  display:grid!important;
+  grid-template-columns:minmax(0,2fr) minmax(245px,.8fr)!important;
+  gap:14px!important;
+  min-width:0;
+  align-items:start;
+}
+html body #aeHomeTakeHighlights .ae-vote-duel {
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  align-items:start;
+  gap:12px!important;
+}
+html body #aeHomeTakeHighlights .ae-vote-column{
+  min-width:0;
+}
+html body #aeHomeTakeHighlights .ae-vote-column .ae-discovery-list{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:0!important;
+  max-height:465px!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  overscroll-behavior:contain;
+  scrollbar-color:#9d765e transparent;
+  scrollbar-width:thin;
+  scroll-behavior:smooth;
+  padding:0 7px 0 0!important;
+  margin:0!important;
+  list-style:none!important;
+}
+html body #aeHomeTakeHighlights li.ae-community-popular-take{
+  display:block!important;
+  width:100%;
+  min-width:0;
+  box-sizing:border-box;
+  padding:13px 3px 12px!important;
+  margin:0!important;
+  border:0!important;
+  border-bottom:1px solid var(--ae-discovery-line)!important;
+  border-radius:0!important;
+  background:transparent!important;
+  cursor:pointer;
+}
+html body #aeHomeTakeHighlights .ae-community-popular-take:last-child{border-bottom:0!important;}
+html body #aeHomeTakeHighlights .ae-community-popular-take .ae-top-take-content{
+  display:flex!important;
+  flex-direction:column!important;
+  min-width:0;
+  gap:0!important;
+}
+html body #aeHomeTakeHighlights .ae-community-popular-take .ae-home-take-head{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:8px;
+  align-items:start;
+  min-width:0;
+}
+html body #aeHomeTakeHighlights .ae-community-popular-take .ae-home-take-title-row{
+  display:grid!important;
+  grid-template-columns:26px minmax(0,1fr);
+  gap:6px;
+  min-width:0;
+}
+html body #aeHomeTakeHighlights .ae-community-popular-take .ae-top-take-number{
+  font:600 21px/1 Newsreader,Georgia,serif!important;
+  color:var(--ae-vote-emphasis)!important;
+}
+html body #aeHomeTakeHighlights .ae-community-popular-take .ae-top-take-title{
+  margin:0!important;
+  font:600 16px/1.15 Newsreader,Georgia,serif!important;
+  color:var(--ae-discovery-ink)!important;
+  min-width:0;
+}
+html body #aeHomeTakeHighlights .ae-community-popular-take .ae-top-take-open{
+  display:block!important;
+  box-shadow:none!important;
+  border:0!important;
+  padding:0!important;
+  margin:0!important;
+  width:100%;
+  min-height:0!important;
+  background:none!important;
+  color:var(--ae-discovery-ink)!important;
+  font:inherit!important;
+  text-align:left!important;
+  overflow-wrap:anywhere;
+  cursor:pointer;
+}
+html body #aeHomeTakeHighlights .ae-community-popular-take .ae-top-take-open:hover{
+  color:var(--ae-vote-emphasis)!important;
+}
+html body #aeHomeTakeHighlights .ae-community-popular-take .ae-top-take-sport{
+  max-width:105px;
+  padding:4px 6px;
+  border:1px solid var(--ae-discovery-line);
+  color:var(--ae-discovery-gold);
+  font:750 9px/1.1 Inter,system-ui,sans-serif;
+  text-align:center;
+}
+html body #aeHomeTakeHighlights .ae-community-popular-take .ae-top-take-summary{
+  margin:6px 0 9px 32px!important;
+  font:500 12px/1.4 Inter,system-ui,sans-serif!important;
+  color:var(--ae-discovery-muted)!important;
+  display:-webkit-box!important;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:2;
+  overflow:hidden;
+  overflow-wrap:anywhere;
+}
+html body #aeHomeTakeHighlights .ae-community-popular-take .ae-take-reference-footer{
+  display:grid!important;
+  gap:7px;
+  margin-left:32px;
+}
+html body #aeHomeTakeHighlights .ae-community-popular-take .ae-take-reference-identity{
+  display:flex!important;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:7px;
+}
+html body #aeHomeTakeHighlights .ae-community-popular-take .ae-take-reference-avatar{
+  display:none!important;
+}
+html body #aeHomeTakeHighlights .ae-community-popular-take .ae-top-take-author{
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  background:none!important;
+  min-height:0!important;
+  font:700 11px/1.2 Inter,system-ui,sans-serif!important;
+  color:var(--ae-discovery-ink)!important;
+  cursor:pointer;
+}
+html body #aeHomeTakeHighlights .ae-community-popular-take .ae-top-take-author:hover{
+  text-decoration:underline!important;
+}
+html body #aeHomeTakeHighlights .ae-community-popular-take .ae-take-reference-date{
+  font:500 10px/1.3 Inter,system-ui,sans-serif;
+  color:var(--ae-discovery-muted);
+}
+html body #aeHomeTakeHighlights .ae-community-popular-take .ae-top-take-votes{
+  display:flex!important;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:6px;
+}
+html body #aeHomeTakeHighlights .ae-community-popular-take .ae-top-take-votes button {
+  display:inline-flex!important;
+  align-items:center;
+  justify-content:center;
+  width:auto!important;
+  min-width:39px;
+  min-height:29px;
+  padding:4px 8px!important;
+  border-radius:2px!important;
+  font:750 11px/1 Inter,system-ui,sans-serif!important;
+  cursor:pointer;
+}
+html body #aeHomeTakeHighlights .ae-community-popular-take button.ae-top-take-up{
+  background:rgba(99,169,162,.14)!important;
+  color:#99d9c8!important;
+  border:1px solid rgba(99,169,162,.47)!important;
+}
+html body #aeHomeTakeHighlights .ae-community-popular-take button.ae-top-take-down{
+  background:rgba(192,112,124,.13)!important;
+  color:#edb6b9!important;
+  border:1px solid rgba(192,112,124,.38)!important;
+}
+html body #aeHomeTakeHighlights .ae-community-popular-take button.ae-top-take-reply{
+  margin-left:auto!important;
+  background:transparent!important;
+  color:var(--ae-discovery-ink)!important;
+  border:1px solid var(--ae-discovery-line)!important;
+  font-weight:650!important;
+}
+html body #aeHomeTakeHighlights .ae-community-popular-take button:focus-visible {
+  outline:2px solid var(--ae-vote-emphasis)!important;
+  outline-offset:2px;
+}
+html:not(.dark) body #aeHomeTakeHighlights .ae-community-popular-take button.ae-top-take-up{
+  background:rgba(37,105,95,.09)!important;
+  color:#215b55!important;
+}
+html:not(.dark) body #aeHomeTakeHighlights .ae-community-popular-take button.ae-top-take-down{
+  background:rgba(157,74,98,.08)!important;
+  color:#8c4456!important;
+}
+@media(max-width:1180px){
+  html body #aeHomeTakeHighlights .ae-home-take-extras{
+    grid-template-columns:1fr!important;
+  }
+}
+@media(max-width:760px){
+  html body #aeHomeTakeHighlights .ae-vote-duel{
+    grid-template-columns:1fr!important;
+  }
+  html body #aeHomeTakeHighlights .ae-vote-column .ae-discovery-list{
+    max-height:390px!important;
+  }
+  html body.ae-is-home #aeHomeTopTakes .ae-top-takes-list{
+    touch-action:pan-y!important;
+  }
+  html body.ae-is-home #aeHomeTopTakes #aeTopTakesNegative,
+  html body.ae-is-home #aeHomeTopTakes #aeTopTakesPositive{
+    max-height:none!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  html body #aeHomeTakeHighlights .ae-vote-column .ae-discovery-list{scroll-behavior:auto;}
+}
