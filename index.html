@@ -312,6 +312,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/ae-home-takes-compact-reference.css?v=20261016-2">
 <link rel="stylesheet" href="assets/ae-home-cta-icons.css?v=20261016-classic-1">
 <link rel="stylesheet" href="assets/ae-home-focus-hierarchy.css?v=20261016-2">
+<link rel="stylesheet" href="assets/ae-take-composer-modal.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-picks-platos-odds.css?v=20261016-odds-right-2">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
@@ -615,13 +616,9 @@ html.dark [data-reading-size][aria-pressed="true"] {
                 <div class="ae-top-takes-heading-side">
                   <div class="ae-home-take-cta-line">
                     <span class="ae-home-take-nudge">TÚ DECIDES <span aria-hidden="true">→</span></span>
-                    <button id="aeHomeTakePublish" type="button" class="ae-participate-cta ae-home-take-publish" aria-expanded="false" aria-controls="aeHomeTakeChoice">Publicar mi Take</button>
+                    <button id="aeHomeTakePublish" type="button" class="ae-participate-cta ae-home-take-publish" aria-controls="aeTakeComposerDialog">Publicar mi Take</button>
                   </div>
                   <p id="aeTopTakesStatus" class="sr-only" role="status" aria-live="polite">Cargando los Takes destacados…</p>
-                  <div id="aeHomeTakeChoice" class="ae-home-take-choice" role="group" aria-label="Elige dónde publicar tu Take" hidden>
-                    <button type="button" data-ae-take-sport="NFL">NFL</button>
-                    <button type="button" data-ae-take-sport="Fútbol">Fútbol</button>
-                  </div>
                 </div>
               </div>
               <div class="ae-top-takes-grid">
@@ -720,7 +717,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 
         <!-- Los Takes son una función editorial al final de NFL y Fútbol, no una categoría de navegación. -->
         <section id="freeTakes" class="ae-takes ae-free-takes" hidden aria-labelledby="freeTakesTitle">
-          <div class="ae-takes-head"><span class="ae-takes-eyebrow">TU OPINIÓN CUENTA</span><h2 id="freeTakesTitle">Takes de la comunidad</h2><p>Escribe tu pronóstico para la historia. Una vez publicado, no podrás editarlo ni borrarlo.</p><button id="aeSportTakePublish" type="button" class="ae-participate-cta ae-sport-take-publish" aria-controls="aeTakeComposePanel" aria-expanded="false">Publicar mi Take <span aria-hidden="true">→</span></button></div>
+          <div class="ae-takes-head"><span class="ae-takes-eyebrow">TU OPINIÓN CUENTA</span><h2 id="freeTakesTitle">Takes de la comunidad</h2><p>Escribe tu pronóstico para la historia. Una vez publicado, no podrás editarlo ni borrarlo.</p><button id="aeSportTakePublish" type="button" class="ae-participate-cta ae-sport-take-publish" aria-controls="aeTakeComposerDialog">Publicar mi Take <span aria-hidden="true">→</span></button></div>
 
           <h3 id="aeTakesFeedHeading" class="ae-takes-history-heading">Historial de Takes</h3>
           <div class="ae-free-controls"><label id="aeNflFeedFilterWrap" hidden>División NFL<select id="aeNflFeedDivision"><option value="">Todas las divisiones</option></select></label><label id="freeTakesFilterWrap">Mostrar<select id="freeTakesSportFilter"><option value="all">Todos los deportes</option><option value="general">General</option><option value="laliga">LaLiga</option><option value="premier">Premier League</option><option value="ligamx">Liga MX</option><option value="champions">Champions League</option><option value="nfl">NFL</option><option value="colegial">Fútbol colegial</option></select></label><label>Ordenar<select id="freeTakesSort"><option value="new">Más recientes</option><option value="top">Más apoyados</option></select></label></div>
@@ -729,22 +726,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
           <button id="aeFootballMoreTakes" type="button" class="ae-football-mobile-cta" aria-controls="freeTakesFeed" aria-expanded="false">Ver todos los Takes <span aria-hidden="true">→</span></button>
           <button id="freeTakesMore" type="button" class="ae-history-more" hidden>Ver todos los Takes <span aria-hidden="true">→</span></button>
           
-          <details id="aeTakeComposePanel" class="ae-compose-disclosure"><summary>Publicar mi Take</summary>
-          <form id="freeTakesForm" class="ae-free-compose">
-            <label id="freeTakeSportLabel">Deporte o competición<select name="sport" required><option value="general">General</option><option value="laliga">LaLiga</option><option value="premier">Premier League</option><option value="ligamx">Liga MX</option><option value="champions">Champions League</option><option value="nfl">NFL</option><option value="colegial">Fútbol colegial</option></select></label>
-            <div id="aeNflTakeOptions" class="ae-nfl-take-options ae-wide" hidden>
-              <div class="ae-nfl-fields">
-                <label>División <small>(opcional)</small><select id="aeNflDivision" name="nfl_division"><option value="">Toda la NFL</option></select></label>
-                <label>Equipo <small>(opcional)</small><input id="aeNflTeam" name="nfl_team" type="text" maxlength="80" placeholder="Escribe el equipo…"></label>
-                <label>Tema <small>(opcional)</small><input id="aeNflTopic" name="nfl_topic" type="text" maxlength="80" placeholder="Escribe tu tema libremente…"></label>
-              </div>
-              <button id="aeNflTitleSuggest" type="button">Sugerir título</button>
-            </div>
-            <label>Título de tu Take<input name="title" required minlength="5" maxlength="160" placeholder="Mi opinión sobre el equipo…"></label>
-            <label class="ae-wide">Desarrolla tu Take<textarea name="body" required minlength="15" maxlength="1800" placeholder="Explica tu predicción o argumento, sin limitarte a opciones predefinidas."></textarea></label>
-            <button type="submit">Publicar mi Take</button>
-          </form>
-          </details>
+          
         </section>
 
         <section id="aeNflLatestComments" hidden aria-labelledby="aeNflLatestCommentsTitle">
@@ -755,6 +737,34 @@ html.dark [data-reading-size][aria-pressed="true"] {
 
 
     </main>
+
+<dialog id="aeTakeComposerDialog" class="ae-take-composer-dialog" aria-labelledby="aeTakeComposerTitle" aria-describedby="aeTakeComposerIntro">
+  <div class="ae-take-composer-shell">
+    <header class="ae-take-composer-head">
+      <div><span>LA COMUNIDAD OPINA</span><h2 id="aeTakeComposerTitle">Publicar mi Take</h2></div>
+      <button id="aeTakeComposerClose" type="button" aria-label="Cerrar formulario">×</button>
+    </header>
+    <p id="aeTakeComposerIntro">Elige Fútbol o NFL, escribe la competición con tus palabras y publica tu opinión.</p>
+    <form id="freeTakesForm" class="ae-free-compose ae-take-composer-form">
+      <fieldset class="ae-take-kind">
+        <legend>¿Sobre qué quieres hablar?</legend>
+        <label><input type="radio" name="sport" value="football" required><span>Fútbol</span></label>
+        <label><input type="radio" name="sport" value="nfl" required><span>NFL</span></label>
+      </fieldset>
+      <label class="ae-take-field">Deporte o competición
+        <input name="competition" type="text" required minlength="2" maxlength="80" autocomplete="off" placeholder="Ej: Champions League, LaLiga, AFC East, Super Bowl…">
+      </label>
+      <label class="ae-take-field">Título de tu Take
+        <input name="title" required minlength="5" maxlength="160" placeholder="Resume tu opinión en una frase">
+      </label>
+      <label class="ae-take-field ae-wide">Tu Take
+        <textarea name="body" required minlength="15" maxlength="1800" rows="5" placeholder="Explica tu opinión, predicción o argumento…"></textarea>
+      </label>
+      <p id="aeTakeComposerStatus" class="ae-take-composer-status" role="status" aria-live="polite"></p>
+      <button type="submit" class="ae-take-composer-submit">Publicar mi Take</button>
+    </form>
+  </div>
+</dialog>
 
 <dialog id="cpComposePanel" class="ae-pick-compose-dialog" aria-labelledby="cpComposeTitle" aria-describedby="cpComposeIntro">
  <header class="ae-pick-compose-head"><div><span>COCINA PICKS</span><h2 id="cpComposeTitle">Prepara tu Pick</h2></div><button id="cpComposeClose" type="button" aria-label="Cerrar formulario de Pick">×</button></header>
@@ -2290,12 +2300,12 @@ updateThemeButton();
 <script src="assets/username-auth.js?v=20261015-2"></script>
 <script src="assets/ae-category-visibility.js?v=20261015-3"></script>
 <script src="assets/ae-nfl-takes.js?v=20261015-3"></script>
-<script src="assets/free-takes.js?v=20261016-four-column-1"></script>
+<script src="assets/free-takes.js?v=20261016-unified-composer-1"></script>
 <script src="assets/ae-editorial-weekly.js?v=20261016-framing-zoom-3"></script>
 <script src="assets/ae-profile.js?v=20261016-1"></script>
-<script src="assets/ae-home-takes.js?v=20261016-reference-1"></script>
+<script src="assets/ae-home-takes.js?v=20261016-unified-composer-1"></script>
 <script src="assets/ae-nfl-latest-comments.js?v=20261016-1"></script>
-<script src="assets/ae-sport-top-takes.js?v=20261016-sport-take-titles-1"></script>
+<script src="assets/ae-sport-top-takes.js?v=20261016-unified-composer-1"></script>
 <script src="assets/ae-take-replies.js?v=20261016-mis-takes-1"></script>
 <script src="assets/ae-picks-premium.js?v=20261015-1"></script>
 <script src="assets/ae-image-framing.js?v=20261016-framing-zoom-2"></script>
