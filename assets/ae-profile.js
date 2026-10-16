@@ -39,6 +39,15 @@ function display(entries,owner,canVote){
   box.append(el('small',(labels[entry.sport]||'Deportes')+' · '+new Date(entry.created_at).toLocaleDateString('es')+(entry.hidden?' · Oculto por moderación':''),'ae-profile-item-meta'),el('h3',entry.title),el('p',entry.body));
   const actions=el('div',undefined,'ae-profile-item-stats');
   actions.append(el('span','▲ '+entry.upvotes+' apoyos'),el('span','▼ '+entry.downvotes+' cuestionamientos'));
+  if(privateView && ['nfl','football','laliga','premier','ligamx','champions'].includes(entry.sport)){
+    const change=el('button','Cambiar comunidad','ae-profile-change-sport');
+    change.type='button';
+    change.setAttribute('aria-label','Cambiar entre NFL y Fútbol el Take: '+entry.title);
+    change.addEventListener('click',()=>window.aeTakeCategoryEdit?.open({
+      id:entry.id,sport:entry.sport,title:entry.title,author_id:owner
+    }));
+    actions.append(change);
+  }
   if(canVote&&!entry.hidden){
    for(const [value,label] of [[1,'▲ Apoyar'],[-1,'▼ Cuestionar']]){
     const b=el('button',label,'ae-take-button');b.type='button';b.disabled=working;b.setAttribute('aria-pressed',String(Number(entry.my_vote)===value));
@@ -77,7 +86,7 @@ async function showPublic(id,push=true){
  privateView=false;activeAuthor=id;const ticket=++request;
  const dialog=$('aeProfileDialog');if(!dialog.open)dialog.showModal();
  $('aeProfileTitle').textContent='Perfil de aficionado';
- $('aeProfileDialog').querySelector('.ae-profile-overview p').textContent='Historial público de Takes. Ningún usuario puede editar o borrar sus publicaciones; las personas pueden votarlas a favor o en contra.';
+ $('aeProfileDialog').querySelector('.ae-profile-overview p').textContent='Historial público de Takes. El contenido no puede editarse ni borrarse; solo el autor puede cambiar un Take entre NFL y Fútbol.';
  $('aeProfileUsername').textContent='Takes publicados y votaciones';
  $('aeProfileStatus').textContent='Cargando historial público…';$('aeProfileTakes').replaceChildren();
  if(push){const u=new URL(location.href);u.searchParams.set('perfil',id);history.pushState({},'',u);}
@@ -97,6 +106,10 @@ document.addEventListener('DOMContentLoaded',()=>{
  if(typeof db!=='undefined'&&db)db.auth.onAuthStateChange(()=>setTimeout(updateButton,150));
  $('aeProfileDialog')?.addEventListener('click',e=>{if(e.target===$('aeProfileDialog'))close();});
  $('aeProfileDialog')?.addEventListener('close',()=>{++request;});
+ window.addEventListener('ae:take-category-changed',()=>{
+   if($('aeProfileDialog')?.open && privateView)showOwn();
+   else if($('aeProfileDialog')?.open && activeAuthor)showPublic(activeAuthor,false);
+ });
  const id=new URL(location.href).searchParams.get('perfil');if(id&&UUID.test(id))showPublic(id,false);
  window.addEventListener('popstate',()=>{
   const newId=new URL(location.href).searchParams.get('perfil');
