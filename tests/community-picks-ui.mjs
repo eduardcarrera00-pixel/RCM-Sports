@@ -126,10 +126,13 @@ const cancellation=new w.Event('cancel',{cancelable:true});modal.dispatchEvent(c
 await form.onsubmit({preventDefault(){}});releaseAuth();await first;await settle();
 assert.equal(records.length,3,'Double submit must only save one record');assert.equal(modal.open,false);
 w.db.auth.getUser=getUser;
-// A signed-out user must authenticate before the composer becomes visible.
-user=null;w.authOpened=false;cta.click();await settle();
+// "¿Eres Chef? Cocina Picks" must never navigate away before authentication.
+user=null;w.authOpened=false;w.filterByCategory('Todos');cta.click();await settle();
 assert.equal(w.authOpened,true);assert.equal(modal.open,false,'Guests cannot open the Pick composer');
-user={id:'reader'};w.pendingPublication();assert.equal(modal.open,true,'Authentication resumes the Pick composer');
+assert.equal(w.currentCategory,'Todos','A guest remains on their original page for login');
+user={id:'reader'};w.pendingPublication();
+assert.equal(w.currentCategory,'Picks','After login, return to Picks to publish');
+assert.equal(modal.open,true,'Authentication resumes the Pick composer');
 // If the session expires during editing, retain the draft and reopen after login.
 fill('Borrador sin sesión','Equipo G vs H');user=null;w.authOpened=false;
 await form.onsubmit({preventDefault(){}});await settle();assert.equal(w.authOpened,true);assert.equal(modal.open,false);

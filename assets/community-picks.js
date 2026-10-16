@@ -320,6 +320,9 @@ function closePickComposer(force=false){
 }
 function showPickComposer(){
  const dialog=$('cpComposePanel');if(!dialog)return;
+ // A publication CTA can originate outside Picks; return to the correct
+ // section only AFTER authentication has been completed.
+ if(typeof currentCategory!=='undefined'&&currentCategory!=='Picks'&&typeof filterByCategory==='function')filterByCategory('Picks');
  if(!dialog.open)dialog.showModal();
  syncPickComposer();
  dialog.querySelector('input')?.focus({preventScroll:true});
@@ -327,9 +330,11 @@ function showPickComposer(){
 function openPickComposer(){
  if(typeof aeRequestPublication==='function')return aeRequestPublication('pick',showPickComposer);
 }
+// Public entry point for "¿Eres Chef? Cocina Picks" from any section.
+window.aeOpenPickComposer=openPickComposer;
 document.addEventListener('DOMContentLoaded',()=>{
  buildComposer();
- $('cpPublishCta')?.addEventListener('click',openPickComposer);
+ $('cpPublishCta')?.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();void openPickComposer();});
  $('cpComposeClose')?.addEventListener('click',()=>closePickComposer());
  $('cpComposePanel')?.addEventListener('close',syncPickComposer);
  $('cpComposePanel')?.addEventListener('cancel',e=>{if(posting)e.preventDefault();});
