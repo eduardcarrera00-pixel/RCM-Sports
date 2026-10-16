@@ -18,7 +18,7 @@
     dialog.innerHTML = `
       <div class="ae-take-discussion-inner">
         <header class="ae-discussion-header">
-          <div class="ae-discussion-titleblock"><span>LA COMUNIDAD DEBATE</span><h2 id="aeTakeDiscussionTitle">Mis Takes</h2></div>
+          <div class="ae-discussion-titleblock"><span>LA COMUNIDAD DEBATE</span><h2 id="aeTakeDiscussionTitle">Takes</h2></div>
           <button type="button" id="aeDiscussionClose" aria-label="Cerrar comentarios"><span aria-hidden="true"></span></button>
         </header>
         <section class="ae-discussion-subject">
@@ -173,6 +173,10 @@
     current=take;
     setParent(null);
     displaySport(take);
+    // El título de cada conversación pertenece al autor del Take abierto.
+    // La etiqueta "Mis Takes" queda reservada al perfil personal.
+    const authorName=String(take.author||'').trim().replace(/^@+/, '').trim() || 'Aficionado';
+    $('aeTakeDiscussionTitle').textContent=authorName+' — Takes';
     $('aeDiscussionSubject').textContent=take.title||'Take de la comunidad';
     $('aeDiscussionBody').textContent=take.body||'';
     $('aeDiscussionText').value='';
