@@ -271,6 +271,7 @@ function pickTone(p){
 }
 
 function pickOdds(p){
+  if(p.american_odds===null||p.american_odds===undefined||p.american_odds==='')return '—';
   const n=Number(p.american_odds);
   return Number.isFinite(n)?(n>0?'+':'')+n:'—';
 }
@@ -297,37 +298,56 @@ function openPick(id){
 }
 
 function renderPickCard(p,feature=false){
-  const box=el('article',null,'ae-profile-pick '+(feature?'ae-profile-pick-feature ':'')+'is-'+pickTone(p));
+  const recent=!feature;
+  const box=el('article',null,'ae-profile-pick '+(feature?'ae-profile-pick-feature ':'ae-profile-pick-recent ')+'is-'+pickTone(p));
   const meta=el('div',null,'ae-profile-pick-meta');
-  meta.append(el('span',pickOutcomeLabel(p)),el('span','Cuota '+pickOdds(p)));
+  meta.append(
+    el('span',pickOutcomeLabel(p),'ae-profile-pick-state'),
+    el('span','Cuota '+pickOdds(p),recent?'ae-profile-pick-odds ae-profile-pick-odds-highlight':'ae-profile-pick-odds')
+  );
   if(p.created_at)meta.append(el('time',dateText(p.created_at)));
   box.append(meta,el('h4',p.title||'Pick'));
 
-  const legs=Array.isArray(p.legs)?p.legs:[];
-  if(legs.length){
-    const list=el('div',null,'ae-profile-pick-legs');
-    for(const leg of legs.slice(0,2)){
-      const row=el('p');
-      row.append(el('span',String(leg.event||leg.sport||'Evento')));
-      if(leg.selection)row.append(el('strong',String(leg.selection)));
-      list.append(row);
+  // Highlights retain their current preview. Recent Picks stay concise:
+  // matchups, selections and explanations remain in the full Pick detail.
+  if(feature){
+    const legs=Array.isArray(p.legs)?p.legs:[];
+    if(legs.length){
+      const list=el('div',null,'ae-profile-pick-legs');
+      for(const leg of legs.slice(0,2)){
+        const row=el('p');
+        row.append(el('span',String(leg.event||leg.sport||'Evento')));
+        if(leg.selection)row.append(el('strong',String(leg.selection)));
+        list.append(row);
+      }
+      box.append(list);
     }
-    box.append(list);
-  }
-  if(p.explanation){
-    const text=String(p.explanation);
-    box.append(el('p',text.length>170?text.slice(0,170).trimEnd()+'…':text,'ae-profile-pick-explanation'));
+    if(p.explanation){
+      const text=String(p.explanation);
+      box.append(el('p',text.length>170?text.slice(0,170).trimEnd()+'…':text,'ae-profile-pick-explanation'));
+    }
   }
 
   const foot=el('div',null,'ae-profile-pick-footer');
   const points=pickPoints(p);
   if(points)foot.append(el('strong',points));
   foot.append(el('span','▲ '+numeric(p.upvotes)),el('span','▼ '+numeric(p.downvotes)));
-  const open=el('button','Ver Pick','ae-profile-pick-open');
-  open.type='button';
-  open.addEventListener('click',()=>openPick(p.id));
-  foot.append(open);
-  box.append(foot);
+  if(feature){
+    const open=el('button','Ver Pick','ae-profile-pick-open');
+    open.type='button';
+    open.addEventListener('click',()=>openPick(p.id));
+    foot.append(open);
+    box.append(foot);
+  }else{
+    foot.append(el('span','VER PICK ›','ae-profile-pick-view-hint'));
+    box.append(foot);
+    // One accessible hit target covers the whole summary on touch and desktop.
+    const hit=el('button',null,'ae-profile-pick-hit');
+    hit.type='button';
+    hit.setAttribute('aria-label','Ver el Pick completo: '+(p.title||'Pick'));
+    hit.addEventListener('click',()=>openPick(p.id));
+    box.append(hit);
+  }
   return box;
 }
 
