@@ -55,7 +55,7 @@
      score.setAttribute('aria-label',up+' votos positivos, '+down+' negativos, balance '+net);
      meta.append(author);
      const title=el('strong',undefined,'ae-sport-take-title');
-     const takeText=football?String(t.body||t.title||'Ver Take').trim():String(t.title||'Ver Take');
+     const takeText=String(t.body||t.title||'Ver Take').trim();
      const openTake=el('button',takeText,'ae-sport-take-open');
      openTake.type='button';
      openTake.setAttribute('aria-label','Leer Take y ver su conversación: '+(t.title||'Publicación'));
@@ -66,12 +66,8 @@
      reply.type='button';
      reply.setAttribute('aria-label','Responder al Take: '+(t.title||'Publicación'));
      reply.addEventListener('click',()=>window.aeTakeReplies?.open(t,{focusComposer:true}));
-     if(football){
-       meta.append(score);
-       stats.append(reply);
-     }else{
-       stats.append(score,reply);
-     }
+     meta.append(score);
+     stats.append(reply);
      content.append(meta,title,stats);
      li.append(number,content);
      li.addEventListener('click',event=>{
