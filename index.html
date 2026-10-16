@@ -904,18 +904,17 @@ html.dark [data-reading-size][aria-pressed="true"] {
                     <div class="ae-framing-controls" data-ae-frame="news">
                       <label>Encuadre horizontal <input id="pubImageFocusX" type="range" min="0" max="100" value="50"></label>
                       <label>Encuadre vertical <input id="pubImageFocusY" type="range" min="0" max="100" value="50"></label>
-                      <label>Zoom de imagen
-                        <div class="flex items-center gap-2">
-                          <input id="pubImageZoomRange" type="range" min="1" max="300" value="100" aria-label="Zoom de imagen">
-                          <div class="flex items-center gap-1">
-                            <input id="pubImageZoomPct" type="number" min="1" max="300" value="100" inputmode="numeric" aria-label="Porcentaje de zoom" class="w-20 bg-slate-50 border border-slate-200 text-sm text-slate-800 px-2 py-1.5">
-                            <span aria-hidden="true">%</span>
-                          </div>
+                      <label>Encuadre zoom
+                        <div class="ae-zoom-frame-row">
+                          <button type="button" data-ae-zoom-step="news" data-ae-zoom-delta="-10" aria-label="Alejar imagen">−</button>
+                          <input id="pubImageZoomRange" type="range" min="1" max="300" step="1" value="100" aria-label="Encuadre zoom">
+                          <button type="button" data-ae-zoom-step="news" data-ae-zoom-delta="10" aria-label="Acercar imagen">+</button>
+                          <output id="pubImageZoomValue" for="pubImageZoomRange">100%</output>
                         </div>
                       </label>
                       <button type="button" data-ae-center="news">Centrar imagen</button>
                     </div>
-                    <small class="ae-framing-note">Arrastra los controles para colocar la parte importante de la foto. La elección se guarda también al editar.</small>
+                    <small class="ae-framing-note">Horizontal y vertical mueven el punto de enfoque. Zoom acerca o aleja la foto. Lo que ves aquí se guarda y se publica con el mismo encuadre.</small>
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Resumen Breve *</label>
@@ -1657,7 +1656,7 @@ currentUser = {
                 <article class="bg-white rounded-2xl border border-slate-200 overflow-hidden flex flex-col justify-between shadow-sm hover:shadow-xl hover:border-pitch-300 transition-all duration-300 hover:-translate-y-1 relative">
                     <div>
                         <div class="relative h-48 overflow-hidden group">
-                            <img src="${escapeHTML(safeImageURL(art.image))}" alt="${escapeHTML(art.title)}" loading="lazy" decoding="async" width="640" height="360" style="--ae-image-focus:${imagePosition(art)};transform-origin:${imagePosition(art)};transform:scale(${imageScale(art)})" class="w-full h-full object-cover transition-transform duration-500">
+                            <img src="${escapeHTML(safeImageURL(art.image))}" alt="${escapeHTML(art.title)}" loading="lazy" decoding="async" width="640" height="360" style="--ae-image-focus:${imagePosition(art)};--ae-image-zoom:${imageScale(art)}" class="w-full h-full object-cover transition-transform duration-500">
                             <div class="absolute top-3 left-3 bg-white/90 backdrop-blur-md border border-slate-200 text-pitch-800 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md shadow-sm">
                                 ${escapeHTML(art.category)}
                             </div>
@@ -1709,7 +1708,7 @@ currentUser = {
             const container = document.getElementById('heroSection');
             container.innerHTML = `
                 <div class="editorial-hero">
-                    <img class="editorial-hero-image" src="${escapeHTML(safeImageURL(hero.image))}" style="--ae-image-focus:${imagePosition(hero)};transform-origin:${imagePosition(hero)};transform:scale(${imageScale(hero)})" alt="" onerror="this.hidden=true">
+                    <img class="editorial-hero-image" src="${escapeHTML(safeImageURL(hero.image))}" style="--ae-image-focus:${imagePosition(hero)};--ae-image-zoom:${imageScale(hero)}" alt="" onerror="this.hidden=true">
                     <div class="editorial-hero-copy">
                                                 <h1>${escapeHTML(hero.title)}</h1>
                         <p>${escapeHTML(hero.summary || 'La historia completa, desde otra perspectiva.')}</p>
@@ -1949,8 +1948,7 @@ currentUser = {
             document.getElementById('modalDate').innerText = article.date || '';
             document.getElementById('modalImage').src = safeImageURL(article.image);
             document.getElementById('modalImage').style.setProperty('--ae-image-focus', imagePosition(article));
-            document.getElementById('modalImage').style.transformOrigin = imagePosition(article);
-            document.getElementById('modalImage').style.transform = 'scale(' + imageScale(article) + ')';
+            document.getElementById('modalImage').style.setProperty('--ae-image-zoom', String(imageScale(article)));
             document.getElementById('modalBody').innerHTML = cleanBody(article.body);
             restoreReadingSize();
 renderRelatedStories(article);
@@ -2266,7 +2264,7 @@ updateThemeButton();
 <script src="assets/ae-sport-top-takes.js?v=20261016-football-debate-art-2"></script>
 <script src="assets/ae-take-replies.js?v=20261016-mis-takes-1"></script>
 <script src="assets/ae-picks-premium.js?v=20261015-1"></script>
-<script src="assets/ae-image-framing.js?v=20261016-zoom-percent-1"></script>
+<script src="assets/ae-image-framing.js?v=20261016-framing-zoom-2"></script>
 <script src="assets/ae-news-editor.js?v=20261016-1"></script>
 <script src="assets/ae-news-archive.js?v=20261016-zoom-percent-1"></script>
 <script src="assets/ae-mobile-compact-home.js?v=20261016-1"></script>
