@@ -1618,8 +1618,10 @@ currentUser = {
             let gridArticles = isHome ? filtered.slice(1, 4) : isSportNewsPreview ? filtered.slice(0, 3) : filtered;
 
             if (currentCategory !== 'Todos' || currentSearchQuery !== '') {
-                heroSection.classList.add('hidden');
-                gridArticles = isSportNewsPreview ? filtered.slice(0,3) : filtered;
+                const footballMobile = currentCategory === 'Fútbol' && !currentSearchQuery && !currentTeam && window.matchMedia('(max-width:760px)').matches;
+                heroSection.classList.toggle('hidden', !footballMobile);
+                if (footballMobile) renderHeroCard(heroArticle);
+                gridArticles = footballMobile ? filtered.slice(1,4) : isSportNewsPreview ? filtered.slice(0,3) : filtered;
             } else {
                 heroSection.classList.remove('hidden');
                 renderHeroCard(heroArticle);
