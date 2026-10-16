@@ -1,0 +1,105 @@
+/* AE SPORTS · Final header baseline + brand optical alignment.
+   Keeps structure intact; only aligns labels/colors and lowers the wordmark. */
+
+/* Desktop/tablet: sports labels and login share one exact baseline. */
+@media (min-width:761px){
+  html body>header .ae-sport-nav .category-btn:not([hidden]),
+  html body>header #guestAdminContainer>button.ae-login-art-control{
+    display:grid!important;
+    grid-template-rows:35px 12px!important;
+    align-items:center!important;
+    justify-items:center!important;
+    align-content:center!important;
+    box-sizing:border-box!important;
+    height:58px!important;
+    min-height:58px!important;
+    max-height:58px!important;
+    padding:4px 2px!important;
+    margin:0!important;
+    row-gap:3px!important;
+  }
+
+  html body>header .ae-sport-nav .category-btn:not([hidden]){
+    width:auto!important;
+    min-width:62px!important;
+  }
+
+  html body>header .ae-sport-nav .category-btn .ae-nav-icon{
+    grid-row:1!important;
+    align-self:center!important;
+    justify-self:center!important;
+    width:35px!important;
+    height:35px!important;
+    min-width:35px!important;
+    min-height:35px!important;
+    max-width:35px!important;
+    max-height:35px!important;
+    margin:0!important;
+  }
+
+  html body>header .ae-sport-nav .category-btn>span:not(.ae-nav-icon),
+  html body>header #guestAdminContainer .ae-login-label{
+    grid-row:2!important;
+    align-self:center!important;
+    justify-self:center!important;
+    margin:0!important;
+    padding:0!important;
+    color:#f1dfc7!important;
+    font:800 9px/12px Inter,system-ui,sans-serif!important;
+    letter-spacing:.025em!important;
+    text-align:center!important;
+    text-transform:uppercase!important;
+    white-space:nowrap!important;
+  }
+
+  html body>header #guestAdminContainer .ae-login-emblem{
+    grid-row:1!important;
+    align-self:center!important;
+    justify-self:center!important;
+    width:35px!important;
+    height:29px!important;
+    min-width:35px!important;
+    min-height:29px!important;
+    max-width:35px!important;
+    max-height:29px!important;
+    margin:0!important;
+  }
+
+  html body>header #guestAdminContainer>button.ae-login-art-control{
+    width:76px!important;
+    min-width:76px!important;
+    max-width:76px!important;
+  }
+}
+
+/* Cream stays consistent in both themes instead of turning stark white. */
+html body>header .ae-sport-nav .category-btn>span:not(.ae-nav-icon),
+html.dark body>header .ae-sport-nav .category-btn>span:not(.ae-nav-icon),
+html:not(.dark) body>header .ae-sport-nav .category-btn>span:not(.ae-nav-icon),
+html body>header #guestAdminContainer .ae-login-label,
+html.dark body>header #guestAdminContainer .ae-login-label,
+html:not(.dark) body>header #guestAdminContainer .ae-login-label{
+  color:#f1dfc7!important;
+}
+
+/* Optical centering: lower only the AE SPORTS wordmark, never the athlete. */
+html body header a.ae-brand-runner-clean .ae-runner-wordmark{
+  transform:translateY(15px)!important;
+}
+html body footer a.ae-brand-runner-clean .ae-runner-wordmark{
+  transform:translateY(12px)!important;
+}
+
+@media(max-width:760px){
+  html body header a.ae-brand-runner-clean .ae-runner-wordmark{
+    transform:translateY(9px)!important;
+  }
+  html body footer a.ae-brand-runner-clean .ae-runner-wordmark{
+    transform:translateY(8px)!important;
+  }
+
+  html body>header .ae-sport-nav .category-btn>span:not(.ae-nav-icon),
+  html body>header #guestAdminContainer .ae-login-label{
+    color:#f1dfc7!important;
+  }
+}
