@@ -36,12 +36,14 @@
      const number=el('span',String(i+1).padStart(2,'0'),'ae-top-take-number');
      const content=el('div',undefined,'ae-top-take-content');
      const meta=el('div',undefined,'ae-sport-take-meta');
-     const author=el('button',(football?'':'@')+(t.author||'Aficionado'),'ae-top-take-author');
-     author.type='button';
-     author.setAttribute('aria-label','Ver perfil de '+(t.author||'Aficionado'));
-     author.addEventListener('click',()=>{
-       if(t.author_id && typeof openAePublicProfile==='function')openAePublicProfile(t.author_id);
-     });
+     const author=el(football?'span':'button',(football?'':'@')+(t.author||'Aficionado'),'ae-top-take-author');
+     if(!football){
+       author.type='button';
+       author.setAttribute('aria-label','Ver perfil de '+(t.author||'Aficionado'));
+       author.addEventListener('click',()=>{
+         if(t.author_id && typeof openAePublicProfile==='function')openAePublicProfile(t.author_id);
+       });
+     }
      const up=Number(t.upvotes||0),down=Number(t.downvotes||0);
      const net=up-down;
      const score=el('span',(net>0?'+':'')+net+' votos netos','ae-sport-take-net');
