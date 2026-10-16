@@ -1,0 +1,142 @@
+/* AE SPORTS · Home visual hierarchy
+   Only Pick de la Semana + Publicar mi Take carry the warm luminous accent. */
+
+/* PRIMARY FOCUS — Pick de la Semana */
+html body.ae-is-home .editorial-pick{
+  position:relative!important;
+  border:1px solid rgba(230,178,111,.82)!important;
+  box-shadow:
+    0 0 0 1px rgba(232,180,113,.12),
+    0 0 18px rgba(222,158,87,.20),
+    0 10px 25px rgba(3,15,23,.12)!important;
+}
+html body.ae-is-home .editorial-pick::after{
+  content:""!important;
+  position:absolute!important;
+  inset:0!important;
+  z-index:5!important;
+  pointer-events:none!important;
+  border:1px solid rgba(249,207,145,.18)!important;
+  box-shadow:inset 0 0 13px rgba(230,174,104,.08)!important;
+}
+html.dark body.ae-is-home .editorial-pick{
+  border-color:rgba(230,178,111,.88)!important;
+  box-shadow:
+    0 0 0 1px rgba(236,190,127,.12),
+    0 0 21px rgba(219,151,79,.24),
+    0 10px 27px rgba(2,12,20,.16)!important;
+}
+html:not(.dark) body.ae-is-home .editorial-pick{
+  border-color:rgba(190,131,73,.64)!important;
+  box-shadow:
+    0 0 0 1px rgba(201,142,78,.08),
+    0 0 14px rgba(191,128,65,.13),
+    0 8px 20px rgba(80,53,28,.07)!important;
+}
+
+/* SECONDARY FOCUS — Publicar mi Take only, not the whole Takes banner. */
+html body.ae-is-home #aeHomeTopTakes .ae-top-takes-heading.ae-takes-banner{
+  border:1px solid rgba(169,145,114,.24)!important;
+  box-shadow:none!important;
+}
+html body.ae-is-home #aeHomeTopTakes button#aeHomeTakePublish.ae-home-take-publish{
+  border:1px solid rgba(246,201,139,.94)!important;
+  box-shadow:
+    0 0 0 1px rgba(247,204,145,.14),
+    0 0 14px rgba(226,158,86,.26),
+    inset 0 1px rgba(255,255,255,.24)!important;
+}
+html body.ae-is-home #aeHomeTopTakes button#aeHomeTakePublish.ae-home-take-publish:hover{
+  box-shadow:
+    0 0 0 1px rgba(255,217,158,.20),
+    0 0 18px rgba(232,166,93,.34),
+    inset 0 1px rgba(255,255,255,.28)!important;
+}
+
+/* DE-EMPHASIZE — Genios / Anoetos */
+html body.ae-is-home #aeHomeTopTakes .ae-top-takes-card,
+html.dark body.ae-is-home #aeHomeTopTakes .ae-top-takes-card{
+  border:1px solid rgba(175,190,197,.12)!important;
+  box-shadow:none!important;
+}
+html body.ae-is-home #aeHomeTopTakes .ae-top-takes-card-head,
+html body.ae-is-home #aeHomeTopTakes .ae-top-takes-card.is-questioned .ae-top-takes-card-head{
+  border-bottom:1px solid rgba(180,196,202,.10)!important;
+}
+html:not(.dark) body.ae-is-home #aeHomeTopTakes .ae-top-takes-card,
+html:not(.dark) body.ae-is-home #aeHomeTopTakes .ae-top-takes-card.is-questioned{
+  border-color:rgba(144,112,80,.20)!important;
+  box-shadow:none!important;
+}
+html:not(.dark) body.ae-is-home #aeHomeTopTakes .ae-top-takes-card-head,
+html:not(.dark) body.ae-is-home #aeHomeTopTakes .ae-top-takes-card.is-questioned .ae-top-takes-card-head{
+  border-bottom-color:rgba(151,117,83,.18)!important;
+}
+
+/* DE-EMPHASIZE — Community spotlight */
+html body.ae-is-home aside .editorial-community.rcm-panel{
+  border:1px solid rgba(163,181,189,.13)!important;
+  box-shadow:none!important;
+}
+html.dark body.ae-is-home aside .editorial-community.rcm-panel{
+  border-color:rgba(177,197,205,.12)!important;
+  box-shadow:none!important;
+}
+html:not(.dark) body.ae-is-home aside .editorial-community.rcm-panel{
+  border-color:rgba(143,110,78,.18)!important;
+  box-shadow:none!important;
+}
+html body.ae-is-home aside .editorial-community.rcm-panel>.ae-section-heading{
+  min-height:82px!important;
+  padding:15px 18px!important;
+  border-bottom:1px solid rgba(176,190,195,.10)!important;
+}
+html body.ae-is-home aside .editorial-community.rcm-panel>.ae-section-heading h2{
+  width:auto!important;
+  max-width:100%!important;
+  font:600 clamp(23px,2.05vw,30px)/1 Newsreader,Georgia,serif!important;
+  letter-spacing:-.025em!important;
+}
+html body.ae-is-home aside .editorial-community.rcm-panel>.ae-section-heading::after{
+  opacity:.28!important;
+}
+html:not(.dark) body.ae-is-home aside .editorial-community.rcm-panel>.ae-section-heading{
+  border-bottom-color:rgba(143,110,78,.15)!important;
+}
+
+/* DE-EMPHASIZE — Lo más leído, when present. */
+html body.ae-is-home aside .editorial-trending.rcm-panel{
+  border:1px solid rgba(164,181,188,.12)!important;
+  box-shadow:none!important;
+}
+html.dark body.ae-is-home aside .editorial-trending.rcm-panel{
+  border-color:rgba(177,197,205,.11)!important;
+  box-shadow:none!important;
+}
+html:not(.dark) body.ae-is-home aside .editorial-trending.rcm-panel{
+  border-color:rgba(143,110,78,.17)!important;
+  box-shadow:none!important;
+}
+html body.ae-is-home aside .editorial-trending.rcm-panel>.ae-section-heading{
+  border-bottom:1px solid rgba(176,190,195,.10)!important;
+}
+html:not(.dark) body.ae-is-home aside .editorial-trending.rcm-panel>.ae-section-heading{
+  border-bottom-color:rgba(143,110,78,.15)!important;
+}
+
+/* Keep focus rings functional without adding permanent visual noise. */
+html body.ae-is-home #aeHomeTopTakes button#aeHomeTakePublish:focus-visible,
+html body.ae-is-home .editorial-pick button:focus-visible{
+  outline:2px solid rgba(244,197,135,.96)!important;
+  outline-offset:3px!important;
+}
+
+@media(max-width:640px){
+  html body.ae-is-home aside .editorial-community.rcm-panel>.ae-section-heading{
+    min-height:70px!important;
+    padding:12px 14px!important;
+  }
+  html body.ae-is-home aside .editorial-community.rcm-panel>.ae-section-heading h2{
+    font-size:24px!important;
+  }
+}
