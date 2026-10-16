@@ -157,8 +157,8 @@
  #aeFootballTop3Ticker{display:none}
  @media(max-width:760px){
   body.ae-is-football #aeFootballMobileComposition{display:flex;flex-direction:column;gap:10px;width:100%;min-width:0}
-  body.ae-is-football #heroSection{display:block!important;margin:0!important}
-  body.ae-is-football #heroSection.hidden{display:none!important}
+  html body.ae-is-football #heroSection{display:block!important;margin:0!important}
+  html body.ae-is-football #heroSection.hidden{display:none!important}
   body.ae-is-football #heroSection .editorial-hero{min-height:245px!important;border-radius:0!important;overflow:hidden!important;border:1px solid #b58d67!important;position:relative!important}
   body.ae-is-football #heroSection .editorial-hero-copy{position:relative!important;z-index:1!important}
   body.ae-is-football #heroSection .editorial-hero h1{font:600 clamp(25px,7vw,35px)/1.04 Georgia,serif!important;max-width:70%!important}
@@ -171,7 +171,7 @@
   body.ae-is-football #championsRankings .ae-rank-title-wrap h2 span{font-size:26px!important}
   body.ae-is-football #championsRankings #championsRankOne{display:none!important}
   body.ae-is-football #championsRankings #championsList{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip-path:inset(50%)!important;opacity:0!important}
-  body.ae-is-football #championsRankings #championsViewport{display:none!important}
+  html body.ae-is-football #championsRankings #championsViewport{display:none!important}
   body.ae-is-football #aeFootballTop3Ticker{display:block;overflow:hidden;width:100%;border-top:1px solid rgba(194,151,106,.4);padding:0}
   body.ae-is-football #aeFootballTop3Track{display:flex;width:max-content;max-width:none;gap:0;align-items:stretch}
   body.ae-is-football #aeFootballTop3Track.ae-football-animate{animation:aeFootballScroll 16s linear infinite}
