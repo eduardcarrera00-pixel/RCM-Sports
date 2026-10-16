@@ -3,7 +3,6 @@
  'use strict';
  const $=id=>document.getElementById(id);
  const footballSports=new Set(['laliga','premier','ligamx','champions']);
- const names={nfl:'NFL',laliga:'LaLiga',premier:'Premier League',ligamx:'Liga MX',champions:'Champions League'};
  let request=0,current='',lastRun=0;
  const el=(tag,text,cls)=>{
    const n=document.createElement(tag);
