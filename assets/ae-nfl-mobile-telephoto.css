@@ -55,6 +55,7 @@
     animation-play-state:paused!important;
   }
   html body.ae-is-nfl #nflRankings #rankingTrack .rcm-track-group{
+    list-style:none!important;
     display:flex!important;
     align-items:stretch!important;
     height:52px!important;
@@ -368,6 +369,13 @@
   }
   html body.ae-is-nfl #freeTakes #aeTakeComposePanel[open]{
     padding:7px!important;
+  }
+
+  html body.ae-is-nfl #aeSportTakeLeaders .ae-sport-takes-list.ae-nfl-expanded>li:nth-child(n+2){
+    display:grid!important;
+  }
+  html body.ae-is-nfl #freeTakes #freeTakesFeed.ae-nfl-expanded>article:nth-child(n+3){
+    display:flex!important;
   }
 
   /* ---------- FOOTER COMPACTO ---------- */
