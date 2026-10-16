@@ -96,4 +96,7 @@ WHERE NOT p.hidden
        OR p.user_id = auth.uid()
        OR public.rcm_is_editor());
 
+-- Enforce underlying RLS even when the feed is queried through its view.
+ALTER VIEW public.ae_pick_feed SET (security_invoker = true);
+
 COMMIT;
