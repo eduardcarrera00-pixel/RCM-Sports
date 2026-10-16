@@ -19,7 +19,8 @@
     btn.setAttribute('aria-label','Leer Take y su conversación: '+(t.title||'Publicación'));
     btn.addEventListener('click',()=>openTake(t));
 
-    btn.append(node('span',t.competition|| (t.sport==='nfl'?'NFL':'Fútbol'),'ae-discovery-sport'));
+    const placement=historic?'Récord histórico':String(t.rank_number||'').padStart(2,'0')+' · '+(t.competition|| (t.sport==='nfl'?'NFL':'Fútbol'));
+    btn.append(node('span',placement,'ae-discovery-sport'));
     btn.append(node('strong',t.title||'Take de la comunidad','ae-discovery-title'));
 
     const excerpt=String(t.body||'').trim();
