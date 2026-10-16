@@ -1,0 +1,44 @@
+/* AE SPORTS — Arte deportivo suave para Power Rankings en modo claro.
+   El modo oscuro, la tarjeta #1, los escudos y la animación no se alteran. */
+html:not(.dark) body #nflRankings.rcm-panel {
+  background-color:#f7efe1!important;
+  background-image:
+    linear-gradient(105deg,
+      rgba(255,251,243,.88) 0%,
+      rgba(255,249,237,.83) 32%,
+      rgba(253,244,226,.64) 54%,
+      rgba(249,237,216,.30) 78%,
+      rgba(247,232,208,.15) 100%),
+    url("atmospheres/ae-nfl-ranking-light.svg")!important;
+  background-repeat:no-repeat,no-repeat!important;
+  background-size:cover,cover!important;
+  background-position:center,center 45%!important;
+}
+html:not(.dark) body #championsRankings.rcm-panel {
+  background-color:#f8efe2!important;
+  background-image:
+    linear-gradient(105deg,
+      rgba(255,251,243,.87) 0%,
+      rgba(254,248,237,.82) 32%,
+      rgba(252,243,228,.61) 55%,
+      rgba(246,234,212,.28) 79%,
+      rgba(242,225,198,.13) 100%),
+    url("atmospheres/ae-football-ranking-light.svg")!important;
+  background-repeat:no-repeat,no-repeat!important;
+  background-size:cover,cover!important;
+  background-position:center,center 45%!important;
+}
+/* Keep the type and #1 badge above the illustration and in normal contrast. */
+html:not(.dark) body #nflRankings .ae-rank-hero-head,
+html:not(.dark) body #championsRankings .ae-rank-hero-head{
+  position:relative;
+  isolation:isolate;
+}
+/* Small screens crop from the right so the title remains readable. */
+@media(max-width:700px){
+  html:not(.dark) body #nflRankings.rcm-panel,
+  html:not(.dark) body #championsRankings.rcm-panel{
+    background-size:cover,auto 100%!important;
+    background-position:center,right center!important;
+  }
+}
