@@ -1,0 +1,105 @@
+/* AE SPORTS · Cabecera dorada y centrado verdadero del botón Cocina Picks.
+   Versión 2026-10-16. Se carga después del resto para suprimir estilos heredados. */
+
+/* Logotipo completo entregado por el usuario: sustituye tanto el monograma
+   antiguo como el bloque tipográfico separado. PNG original preparado con
+   fondo transparente y optimizado a WebP para mantener el header ligero. */
+html body header .ae-brand.ae-brand-gold{
+  display:flex!important;
+  flex:0 0 auto!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  box-sizing:border-box!important;
+  min-width:0!important;
+  width:clamp(190px,18.3vw,259px)!important;
+  max-width:259px!important;
+  min-height:58px!important;
+  padding:0!important;
+  margin:0!important;
+  overflow:visible!important;
+  text-decoration:none!important;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+}
+html body header .ae-brand.ae-brand-gold .ae-brand-art{
+  display:block!important;
+  box-sizing:border-box!important;
+  flex:0 0 auto!important;
+  width:100%!important;
+  max-width:100%!important;
+  height:auto!important;
+  max-height:69px!important;
+  aspect-ratio:400/109!important;
+  object-fit:contain!important;
+  object-position:left center!important;
+  padding:0!important;
+  margin:0!important;
+  border:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  filter:drop-shadow(0 1px 3px rgba(8,24,35,.20));
+}
+/* Legibilidad de la marca dorada sobre el fondo claro sin crear un parche
+   rectangular: el propio header ofrece contraste moderado. */
+html:not(.dark) body header .ae-brand.ae-brand-gold .ae-brand-art{
+  filter:drop-shadow(0 1px 1px rgba(27,47,57,.30)) drop-shadow(0 0 1px rgba(24,47,61,.25))!important;
+}
+
+/* El botón contiene exactamente una cadena de texto, sin iconos añadidos,
+   seudoelementos ni espacios de CSS. Grid centra su caja de texto tanto
+   horizontal como verticalmente incluso con estilos previos !important. */
+html body #footballTakes #communityPicks button#cpPublishCta.ae-participate-cta.ae-picks-publish-cta,
+html.dark body #footballTakes #communityPicks button#cpPublishCta.ae-participate-cta.ae-picks-publish-cta,
+html:not(.dark) body #footballTakes #communityPicks button#cpPublishCta.ae-participate-cta.ae-picks-publish-cta{
+  display:grid!important;
+  place-items:center!important;
+  justify-content:center!important;
+  align-content:center!important;
+  align-items:center!important;
+  justify-items:center!important;
+  box-sizing:border-box!important;
+  flex:0 0 auto!important;
+  width:144px!important;
+  min-width:144px!important;
+  max-width:144px!important;
+  height:40px!important;
+  min-height:40px!important;
+  max-height:40px!important;
+  margin:0!important;
+  padding:0!important;
+  gap:0!important;
+  border-radius:0!important;
+  text-align:center!important;
+  text-indent:0!important;
+  font:800 12px/1 Inter,system-ui,sans-serif!important;
+  letter-spacing:0!important;
+  white-space:nowrap!important;
+  vertical-align:middle!important;
+  transform:none!important;
+}
+html body #footballTakes #communityPicks button#cpPublishCta::before,
+html body #footballTakes #communityPicks button#cpPublishCta::after{
+  content:none!important;
+  display:none!important;
+  position:static!important;
+  background:none!important;
+  width:0!important;
+  height:0!important;
+  margin:0!important;
+  padding:0!important;
+}
+@media(max-width:1050px){
+  html body header .ae-brand.ae-brand-gold{width:clamp(185px,22vw,240px)!important;}
+}
+@media(max-width:640px){
+  html body header .ae-brand.ae-brand-gold{width:clamp(152px,47vw,216px)!important;min-height:46px!important;}
+  html body header .ae-brand.ae-brand-gold .ae-brand-art{max-height:58px!important;}
+}
+@media(max-width:395px){
+  html body header .ae-brand.ae-brand-gold{width:154px!important;}
+  html body #footballTakes #communityPicks button#cpPublishCta.ae-participate-cta.ae-picks-publish-cta{
+    width:135px!important;min-width:135px!important;max-width:135px!important;
+    height:39px!important;min-height:39px!important;max-height:39px!important;
+  }
+}
