@@ -441,6 +441,57 @@ html.dark [data-reading-size][aria-pressed="true"] {
   }
 }
 </style>
+<style id="ae-football-ranking-mobile-frame-fix">
+/* Fútbol mobile only: bring Power Rankings up like NFL and close the gold frame.
+   No changes to the published rankings, ticker, sport pages or desktop. */
+@media (max-width:760px) {
+  html body.ae-is-football #aeFootballMobileStage > #championsRankings.rcm-panel.ae-football-ranking-feature:not(.hidden) {
+    box-sizing:border-box!important;
+    height:auto!important;
+    min-height:0!important;
+    padding:4px 0 5px!important;
+    border:1px solid rgba(185,139,91,.78)!important;
+    border-bottom:1px solid rgba(185,139,91,.9)!important;
+    border-radius:0!important;
+    overflow:hidden!important;
+  }
+  /* Visible closing line above the animated track, so the outline cannot appear open. */
+  html body.ae-is-football #aeFootballMobileStage > #championsRankings.rcm-panel.ae-football-ranking-feature:not(.hidden)::after {
+    content:""!important;
+    display:block!important;
+    position:absolute!important;
+    inset:auto 0 0!important;
+    width:100%!important;
+    height:1px!important;
+    background:rgba(185,139,91,.9)!important;
+    border:0!important;
+    box-shadow:none!important;
+    z-index:9!important;
+    pointer-events:none!important;
+  }
+  html body.ae-is-football #aeFootballMobileStage #championsRankings.ae-football-ranking-feature .ae-rank-title-wrap > .ae-rank-overline {
+    display:none!important;
+    height:0!important;
+    margin:0!important;
+    padding:0!important;
+  }
+  html body.ae-is-football #aeFootballMobileStage #championsRankings.ae-football-ranking-feature > .ae-rank-hero-head.rcm-row {
+    min-height:85px!important;
+    height:auto!important;
+    padding:4px 10px 5px!important;
+    margin:0!important;
+  }
+  html body.ae-is-football #aeFootballMobileStage #championsRankings.ae-football-ranking-feature .ae-rank-title-wrap {
+    gap:0!important;
+    margin:0!important;
+    justify-content:center!important;
+  }
+  html body.ae-is-football #aeFootballMobileStage #championsRankings.ae-football-ranking-feature #championsViewport.rcm-ticker:not([hidden]) {
+    margin:0!important;
+    border-bottom:0!important;
+  }
+}
+</style>
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 <a class="ae-skip-link" href="#mainContent">Ir al contenido</a>
