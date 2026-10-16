@@ -1,0 +1,41 @@
+/* AE SPORTS · Cuotas reales en Mejores/Peores platos.
+   Las etiquetas no alteran la votación ni los filtros de clasificación. */
+html body #footballTakes .ae-picks-rail>.ae-chef-board .ae-chef-pick-stats{
+  display:flex!important;
+  align-items:center!important;
+  align-content:center!important;
+  flex-wrap:wrap!important;
+  gap:5px 9px!important;
+  width:100%!important;
+  min-width:0!important;
+  margin:3px 0 0!important;
+}
+html body #footballTakes .ae-picks-rail>.ae-chef-board .ae-chef-odds{
+  display:inline-flex!important;
+  align-items:center!important;
+  min-height:20px!important;
+  padding:3px 7px!important;
+  border:1px solid rgba(208,170,123,.53)!important;
+  border-radius:0!important;
+  background:rgba(184,132,84,.15)!important;
+  color:#f6d3a8!important;
+  font:750 10.5px/1.15 Inter,system-ui,sans-serif!important;
+  letter-spacing:.01em!important;
+  font-variant-numeric:tabular-nums!important;
+  white-space:nowrap!important;
+}
+html body #footballTakes .ae-chef-worst .ae-chef-odds{
+  border-color:rgba(194,160,180,.52)!important;
+  background:rgba(158,128,155,.13)!important;
+  color:#eed7e0!important;
+}
+html:not(.dark) body #footballTakes .ae-picks-rail>.ae-chef-board .ae-chef-odds{
+  border-color:rgba(151,104,58,.46)!important;
+  background:rgba(186,136,86,.11)!important;
+  color:#79502e!important;
+}
+html:not(.dark) body #footballTakes .ae-chef-worst .ae-chef-odds{
+  border-color:rgba(138,104,136,.42)!important;
+  background:rgba(146,122,151,.10)!important;
+  color:#72506c!important;
+}

@@ -134,14 +134,21 @@ function paintChefList(id,result,kind){
    };
    const score=Number(p.score||0);
    const votes=el('span',(score>0?'+':'')+score+' votos netos','ae-chef-votes');
-   info.append(chef,pick,votes);
+   const stats=el('div',null,'ae-chef-pick-stats');
+   stats.append(votes);
+   const americanOdds=Number(p.american_odds);
+   if(p.american_odds!==null && p.american_odds!==undefined &&
+      p.american_odds!=='' && Number.isFinite(americanOdds) && americanOdds!==0){
+     stats.append(el('span','Cuota '+(americanOdds>0?'+':'')+americanOdds,'ae-chef-odds'));
+   }
+   info.append(chef,pick,stats);
    item.append(rank,info);
    target.append(item);
  }
 }
 async function loadChefLists(){
  const seq=++chefRequest;
- const cols='id,user_id,author,title,score,upvotes,downvotes,created_at';
+ const cols='id,user_id,author,title,american_odds,score,upvotes,downvotes,created_at';
  const query=()=>db.from('ae_pick_feed').select(cols)
    .in('moderation_status',['pending','approved']).eq('is_current_week',true).gte('event_date',todayToronto()).eq('outcome','pending');
  try{
