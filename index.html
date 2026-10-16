@@ -1623,7 +1623,7 @@ currentUser = {
                 const footballMobile = currentCategory === 'Fútbol' && !currentSearchQuery && !currentTeam && window.matchMedia('(max-width:760px)').matches;
                 heroSection.classList.toggle('hidden', !footballMobile);
                 if (footballMobile) renderHeroCard(heroArticle);
-                gridArticles = footballMobile ? filtered.slice(1,4) : isSportNewsPreview ? filtered.slice(0,3) : filtered;
+                gridArticles = footballMobile ? filtered.slice(0,3) : isSportNewsPreview ? filtered.slice(0,3) : filtered;
             } else {
                 heroSection.classList.remove('hidden');
                 renderHeroCard(heroArticle);
