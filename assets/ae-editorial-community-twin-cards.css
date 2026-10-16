@@ -100,9 +100,18 @@ html body aside .editorial-community.rcm-panel #communityLeaders .rcm-leader-lin
   font:700 11px/1.4 Inter,system-ui,sans-serif!important;
 }
 html body aside .editorial-trending.rcm-panel .ae-trending-item{
+  display:grid!important;
   grid-template-columns:20px minmax(0,1fr) auto!important;
   gap:8px!important;
   align-items:start!important;
+}
+html body aside .editorial-trending.rcm-panel .ae-trending-link{
+  display:flex!important;flex-direction:column!important;gap:3px!important;
+  border:0!important;padding:0!important;margin:0!important;
+  cursor:pointer!important;
+}
+html body aside .editorial-trending.rcm-panel .ae-trending-meta{
+  white-space:nowrap!important;justify-self:end!important;
 }
 html body aside .editorial-trending.rcm-panel .ae-trending-rank{
   color:#cea17b!important;
