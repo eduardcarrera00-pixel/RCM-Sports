@@ -904,6 +904,12 @@ html.dark [data-reading-size][aria-pressed="true"] {
                     <div class="ae-framing-controls" data-ae-frame="news">
                       <label>Encuadre horizontal <input id="pubImageFocusX" type="range" min="0" max="100" value="50"></label>
                       <label>Encuadre vertical <input id="pubImageFocusY" type="range" min="0" max="100" value="50"></label>
+                      <label>Zoom de imagen
+                        <select id="pubImageZoom" class="w-full bg-slate-50 border border-slate-200 text-sm text-slate-800 px-3 py-2">
+                          <option value="zoom">Zoom</option>
+                          <option value="nozoom">Sin zoom</option>
+                        </select>
+                      </label>
                       <button type="button" data-ae-center="news">Centrar imagen</button>
                     </div>
                     <small class="ae-framing-note">Arrastra los controles para colocar la parte importante de la foto. La elección se guarda también al editar.</small>
@@ -1404,6 +1410,10 @@ currentUser = {
             return focus('image_focus_x')+'% '+focus('image_focus_y')+'%';
         }
 
+        function imageFit(article) {
+            return article?.image_zoom === false ? 'contain' : 'cover';
+        }
+
         function safeImageURL(value) {
             try {
                 const url = new URL(value);
@@ -1463,6 +1473,7 @@ currentUser = {
                 author: row.author, image: safeImageURL(row.image),
                 image_focus_x: Number.isInteger(Number(row.image_focus_x)) ? Number(row.image_focus_x) : 50,
                 image_focus_y: Number.isInteger(Number(row.image_focus_y)) ? Number(row.image_focus_y) : 50,
+                image_zoom: row.image_zoom !== false,
                 authorAvatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=' + encodeURIComponent(row.author),
                 summary: row.summary, body: row.body, featured: row.featured,
                 date: new Date(row.created_at).toLocaleDateString('es', {year:'numeric', month:'short', day:'numeric'}),
@@ -1638,7 +1649,7 @@ currentUser = {
                 <article class="bg-white rounded-2xl border border-slate-200 overflow-hidden flex flex-col justify-between shadow-sm hover:shadow-xl hover:border-pitch-300 transition-all duration-300 hover:-translate-y-1 relative">
                     <div>
                         <div class="relative h-48 overflow-hidden group">
-                            <img src="${escapeHTML(safeImageURL(art.image))}" alt="${escapeHTML(art.title)}" loading="lazy" decoding="async" width="640" height="360" style="--ae-image-focus:${imagePosition(art)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <img src="${escapeHTML(safeImageURL(art.image))}" alt="${escapeHTML(art.title)}" loading="lazy" decoding="async" width="640" height="360" style="--ae-image-focus:${imagePosition(art)};object-fit:${imageFit(art)}!important" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                             <div class="absolute top-3 left-3 bg-white/90 backdrop-blur-md border border-slate-200 text-pitch-800 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md shadow-sm">
                                 ${escapeHTML(art.category)}
                             </div>
@@ -1690,7 +1701,7 @@ currentUser = {
             const container = document.getElementById('heroSection');
             container.innerHTML = `
                 <div class="editorial-hero">
-                    <img class="editorial-hero-image" src="${escapeHTML(safeImageURL(hero.image))}" style="--ae-image-focus:${imagePosition(hero)}" alt="" onerror="this.hidden=true">
+                    <img class="editorial-hero-image" src="${escapeHTML(safeImageURL(hero.image))}" style="--ae-image-focus:${imagePosition(hero)};object-fit:${imageFit(hero)}!important" alt="" onerror="this.hidden=true">
                     <div class="editorial-hero-copy">
                                                 <h1>${escapeHTML(hero.title)}</h1>
                         <p>${escapeHTML(hero.summary || 'La historia completa, desde otra perspectiva.')}</p>
@@ -1851,6 +1862,7 @@ currentUser = {
                     image: safeImageURL(uploadedUrl || document.getElementById('pubImage').value.trim() || categoryFallbackImages[category]),
                     image_focus_x: window.aeImageFraming?.get('news').x ?? 50,
                     image_focus_y: window.aeImageFraming?.get('news').y ?? 50,
+                    image_zoom: window.aeImageFraming?.get('news').zoom ?? true,
                     summary: document.getElementById('pubSummary').value.trim(),
                     body: window.aeNewsEditor ? window.aeNewsEditor.html() : bodyText.split(/\n/).map(p => '<p>' + escapeHTML(p) + '</p>').join(''),
                     featured: false, created_by: currentAdmin.id
@@ -1929,6 +1941,7 @@ currentUser = {
             document.getElementById('modalDate').innerText = article.date || '';
             document.getElementById('modalImage').src = safeImageURL(article.image);
             document.getElementById('modalImage').style.setProperty('--ae-image-focus', imagePosition(article));
+            document.getElementById('modalImage').style.setProperty('object-fit', imageFit(article), 'important');
             document.getElementById('modalBody').innerHTML = cleanBody(article.body);
             restoreReadingSize();
 renderRelatedStories(article);
@@ -2244,7 +2257,7 @@ updateThemeButton();
 <script src="assets/ae-sport-top-takes.js?v=20261016-football-debate-art-2"></script>
 <script src="assets/ae-take-replies.js?v=20261016-mis-takes-1"></script>
 <script src="assets/ae-picks-premium.js?v=20261015-1"></script>
-<script src="assets/ae-image-framing.js?v=20261016-admin-edit-1"></script>
+<script src="assets/ae-image-framing.js?v=20261016-framing-zoom-1"></script>
 <script src="assets/ae-news-editor.js?v=20261016-1"></script>
 <script src="assets/ae-news-archive.js?v=20261016-focus-1"></script>
 <script src="assets/ae-mobile-compact-home.js?v=20261016-1"></script>
