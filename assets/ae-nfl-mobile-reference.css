@@ -586,6 +586,10 @@
    font:700 10px/1.15 Inter,system-ui,sans-serif!important;
    cursor:pointer!important
  }
+ /* No mostrar «Ver todos» si solo existen uno o dos Takes. */
+ html body.ae-is-nfl #freeTakes #freeTakesFeed:not(:has(>article:nth-child(3))) ~ #aeFootballMoreTakes{
+   display:none!important
+ }
  html body.ae-is-nfl #freeTakes #freeTakesMore{
    margin:0 9px 6px!important;
    padding:5px!important;min-height:30px!important;
