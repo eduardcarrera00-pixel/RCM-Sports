@@ -12,3 +12,16 @@
 #publishModal .ae-framing-controls label{color:#374d5a!important}
 @media(max-width:600px){.ae-framing-controls{gap:10px}.ae-framing-controls label{flex-basis:42%}}
 @media(prefers-reduced-motion:reduce){.ae-image-framing-preview img{transition:none}}
+
+/* Overrides legacy centered-object rules: saved focus drives every photo size. */
+html body .ae-picks-news-feature img,
+html body .editorial-hero-image,
+html body #articlesGrid img,
+html body #modalImage,
+html body .ae-news-archive-card img,
+html body .ae-weekly-home-banner,
+html body .ae-weekly-banner,
+html body .ae-weekly-inline-photo,
+html body .ae-weekly-home-thumbnail{
+  object-position:var(--ae-image-focus,50% 50%)!important;
+}
