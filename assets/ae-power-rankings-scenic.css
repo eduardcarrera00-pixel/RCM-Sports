@@ -1,0 +1,147 @@
+/* AE SPORTS · panoramas originales de Power Rankings · 16 oct 2026
+   Sólo presentación. Mantener intactos datos, posiciones, escudos y animaciones. */
+html body #nflRankings.rcm-panel,
+html body #championsRankings.rcm-panel,
+html.dark body #nflRankings.rcm-panel,
+html.dark body #championsRankings.rcm-panel{
+  background-repeat:no-repeat!important;
+  background-size:cover,cover,cover!important;
+  background-position:center,center,center 43%!important;
+  border:1px solid rgba(185,139,91,.59)!important;
+  border-radius:0!important;
+  overflow:hidden!important;
+  isolation:isolate;
+}
+/* Atmósferas nocturnas: transparencia suficiente para ver la ciudad/estadio. */
+html.dark body #nflRankings.rcm-panel{
+  background-color:#071b2b!important;
+  background-image:
+    linear-gradient(102deg,rgba(3,16,30,.86) 0%,rgba(5,20,34,.62) 43%,rgba(7,22,35,.28) 100%),
+    linear-gradient(0deg,rgba(4,17,30,.49) 0%,transparent 61%),
+    url("rankings/ae-nfl-stadium-night.webp")!important;
+  color:#fff0df!important;
+}
+html.dark body #championsRankings.rcm-panel{
+  background-color:#071b2b!important;
+  background-image:
+    linear-gradient(102deg,rgba(4,16,30,.82) 0%,rgba(8,22,38,.49) 43%,rgba(8,21,37,.32) 100%),
+    linear-gradient(0deg,rgba(4,17,31,.49) 0%,transparent 63%),
+    url("rankings/ae-champions-stadium-night.webp")!important;
+  color:#fff0df!important;
+}
+/* Modo día: brillo crema editorial sin perder la imagen de fondo. */
+html:not(.dark) body #nflRankings.rcm-panel{
+  background-color:#faf3e6!important;
+  background-image:
+    linear-gradient(100deg,rgba(255,250,241,.96) 0%,rgba(255,250,241,.78) 37%,rgba(255,249,238,.28) 75%,rgba(255,249,238,.14) 100%),
+    linear-gradient(0deg,rgba(255,247,234,.43),transparent 60%),
+    url("rankings/ae-nfl-stadium-day.webp")!important;
+  color:#10243a!important;
+}
+html:not(.dark) body #championsRankings.rcm-panel{
+  background-color:#faf3e6!important;
+  background-image:
+    linear-gradient(100deg,rgba(255,250,241,.95) 0%,rgba(255,250,241,.78) 37%,rgba(255,249,238,.25) 75%,rgba(255,249,238,.12) 100%),
+    linear-gradient(0deg,rgba(255,247,234,.44),transparent 60%),
+    url("rankings/ae-champions-stadium-day.webp")!important;
+  color:#10243a!important;
+}
+/* El encabezado debe dejar respirar el paisaje, no taparlo con una caja opaca. */
+html body #nflRankings.rcm-panel > .ae-rank-hero-head.rcm-row,
+html body #championsRankings.rcm-panel > .ae-rank-hero-head.rcm-row{
+  background:transparent!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  padding:8px 2px 4px!important;
+}
+html.dark body #nflRankings .ae-rank-title-wrap h2,
+html.dark body #championsRankings .ae-rank-title-wrap h2,
+html.dark body #nflRankings .ae-rank-title-wrap h2 span,
+html.dark body #championsRankings .ae-rank-title-wrap h2 span{
+  color:#fff3e5!important;
+  text-shadow:0 2px 16px rgba(1,13,25,.56)!important;
+}
+html.dark body #nflRankings .ae-rank-overline,
+html.dark body #championsRankings .ae-rank-overline,
+html.dark body #rankingEdition.ae-rank-edition,
+html.dark body #championsEdition.ae-rank-edition{
+  color:#e6bd8a!important;
+  text-shadow:0 1px 8px rgba(0,0,0,.36)!important;
+}
+html:not(.dark) body #nflRankings .ae-rank-title-wrap h2,
+html:not(.dark) body #championsRankings .ae-rank-title-wrap h2,
+html:not(.dark) body #nflRankings .ae-rank-title-wrap h2 span,
+html:not(.dark) body #championsRankings .ae-rank-title-wrap h2 span{
+  color:#10263d!important;
+  text-shadow:0 1px 9px rgba(255,249,237,.53)!important;
+}
+html:not(.dark) body #nflRankings .ae-rank-overline,
+html:not(.dark) body #championsRankings .ae-rank-overline,
+html:not(.dark) body #rankingEdition.ae-rank-edition,
+html:not(.dark) body #championsEdition.ae-rank-edition{
+  color:#865c36!important;
+  text-shadow:0 1px 8px rgba(255,249,237,.78)!important;
+}
+/* El primer puesto conserva escudos y layout; sólo se redefine su marco. */
+html.dark body #nflRankings .ae-ranking-leader,
+html.dark body #championsRankings .ae-ranking-leader{
+  background:linear-gradient(120deg,rgba(4,21,37,.95),rgba(7,29,47,.87))!important;
+  border:1px solid rgba(228,184,128,.67)!important;
+  border-left:3px solid #d9a771!important;
+  border-radius:0!important;
+  box-shadow:0 12px 30px rgba(0,0,0,.28)!important;
+}
+html:not(.dark) body #nflRankings .ae-ranking-leader,
+html:not(.dark) body #championsRankings .ae-ranking-leader{
+  background:linear-gradient(110deg,rgba(255,253,246,.98),rgba(255,248,232,.93))!important;
+  border:1px solid rgba(151,106,63,.62)!important;
+  border-left:3px solid #ab7b4f!important;
+  border-radius:0!important;
+  box-shadow:0 11px 28px rgba(70,53,34,.12)!important;
+}
+/* Franja de posiciones: deja ver un velo del paisaje, sin duplicar la fotografía.
+   NO modificar track, keyframes ni atributos de ranking. */
+html.dark body #nflRankings #rankingViewport.rcm-ticker,
+html.dark body #championsRankings #championsViewport.rcm-ticker{
+  background-color:transparent!important;
+  background-image:linear-gradient(90deg,rgba(3,20,34,.89),rgba(3,20,34,.68) 50%,rgba(3,20,34,.87))!important;
+  border-color:rgba(218,169,119,.47)!important;
+  border-radius:0!important;
+  box-shadow:inset 0 5px 20px rgba(1,11,21,.27)!important;
+}
+html:not(.dark) body #nflRankings #rankingViewport.rcm-ticker,
+html:not(.dark) body #championsRankings #championsViewport.rcm-ticker{
+  background-color:transparent!important;
+  background-image:linear-gradient(90deg,rgba(255,251,242,.88),rgba(255,251,242,.70) 50%,rgba(255,251,242,.90))!important;
+  border-color:rgba(153,111,64,.42)!important;
+  border-radius:0!important;
+  box-shadow:inset 0 3px 16px rgba(119,91,58,.06)!important;
+}
+/* Portada: miniaturas Power Rankings también heredan sus nuevos panoramas.
+   Conservamos allí el contraste nocturno de la tipografía ya existente. */
+html body #homeRankingLink.ae-ranking-card-link,
+html.dark body #homeRankingLink.ae-ranking-card-link{
+  background-image:linear-gradient(100deg,rgba(5,21,35,.93),rgba(7,25,39,.76) 58%,rgba(8,27,42,.40)),
+    url("rankings/ae-nfl-stadium-night.webp")!important;
+  background-position:center 49%!important;
+}
+html body #homeChampionsLink.ae-ranking-card-link,
+html.dark body #homeChampionsLink.ae-ranking-card-link{
+  background-image:linear-gradient(100deg,rgba(5,21,35,.93),rgba(7,25,39,.74) 58%,rgba(8,27,42,.38)),
+    url("rankings/ae-champions-stadium-night.webp")!important;
+  background-position:center 48%!important;
+}
+@media(max-width:700px){
+  html.dark body #nflRankings.rcm-panel,
+  html.dark body #championsRankings.rcm-panel,
+  html:not(.dark) body #nflRankings.rcm-panel,
+  html:not(.dark) body #championsRankings.rcm-panel{
+    background-position:center,center,62% center!important;
+    background-size:cover,cover,auto 100%!important;
+  }
+  html body #nflRankings.rcm-panel > .ae-rank-hero-head.rcm-row,
+  html body #championsRankings.rcm-panel > .ae-rank-hero-head.rcm-row{
+    padding:4px 0 3px!important;
+  }
+}
