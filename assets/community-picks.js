@@ -1,8 +1,17 @@
 /* Community Picks: real persistence, server-enforced rules, no wagering/payments. */
 (() => {
 'use strict';
-let loaded=false,request=0,limit=20,posting=false;
+let loaded=false,request=0,limit=20,posting=false,archiveLimit=30;
 const $=id=>document.getElementById(id);
+function todayToronto(){
+ const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Toronto',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
+ const v=key=>parts.find(p=>p.type===key).value;
+ return v('year')+'-'+v('month')+'-'+v('day');
+}
+const isActive=p=>p.event_date&&p.event_date>=todayToronto()&&p.outcome==='pending';
+const resultLabel=p=>p.outcome==='won'?'Acertado · +'+Math.abs(Number(p.result_points||0)).toFixed(2)+' pts':
+ p.outcome==='lost'?'Fallado · −'+Math.abs(Number(p.result_points||0)).toFixed(2)+' pts':
+ p.outcome==='void'?'Anulado · 0 pts':(isActive(p)?'Activo':'Archivado');
 function el(tag,text,cls){const n=document.createElement(tag);if(text!=null)n.textContent=text;if(cls)n.className=cls;return n;}
 function button(text,fn){const b=el('button',text);b.type='button';b.onclick=fn;return b;}
 function message(error){return error?.code==='23505'?'Ya publicaste tu Pick de hoy. Podrás publicar otro mañana (hora de Toronto).':error?.message||'No pudimos completar la operación. Inténtalo de nuevo.';}
@@ -21,6 +30,8 @@ function card(p,compact=false){
  const date=new Date(p.created_at);
  if(!Number.isNaN(date.getTime()))header.append(el('time',date.toLocaleDateString('es',{day:'numeric',month:'short',year:'numeric'})));
  if(first?.sport)header.append(el('span',String(first.sport),'cp-card-sport'));
+  if(p.event_date)header.append(el('span','Evento '+p.event_date,'cp-event-date'));
+  if(!isActive(p))header.append(el('strong',resultLabel(p),'cp-result-badge'));
  n.append(header);
  const title=el('h3',null,'cp-card-title');
  const a=el('a',p.title);
@@ -41,7 +52,7 @@ function card(p,compact=false){
  n.append(odds);
  if(p.explanation)n.append(el('p',p.explanation,'cp-explanation'));
  const controls=el('div',null,'cp-actions');
- if(p.moderation_status==='approved'){
+ if(p.moderation_status==='approved'&&isActive(p)){
   for(const [value,label,count] of [[1,'▲',p.upvotes],[-1,'▼',p.downvotes]]){
     const b=button(label+' '+Number(count||0),()=>vote(p,value,b));
     b.setAttribute('aria-label',(value===1?'Apoyar':'Cuestionar')+' Pick de '+(p.author||'la comunidad'));
@@ -62,7 +73,7 @@ function card(p,compact=false){
  }
  return n;
 }
-async function vote(p,value,b){if(p.moderation_status!=='approved')return;b.disabled=true;try{const user=await account();if(!user)return;if(user.id===p.user_id)throw Error('No puedes votar tu propio Pick.');
+async function vote(p,value,b){if(p.moderation_status!=='approved'||!isActive(p))return;b.disabled=true;try{const user=await account();if(!user)return;if(user.id===p.user_id)throw Error('No puedes votar tu propio Pick.');
  let q;if(Number(p.my_vote)===value)q=db.from('ae_pick_votes').delete().eq('pick_id',p.id).eq('user_id',user.id);
  else if(Number(p.my_vote))q=db.from('ae_pick_votes').update({value}).eq('pick_id',p.id).eq('user_id',user.id);
  else q=db.from('ae_pick_votes').insert({pick_id:p.id,value});
@@ -71,27 +82,29 @@ async function vote(p,value,b){if(p.moderation_status!=='approved')return;b.disa
 async function load(){
  if(!db)return;const seq=++request;
  try{
-   const feed=await db.from('ae_pick_feed').select('*').order('created_at',{ascending:false}).order('id',{ascending:false}).range(0,limit-1);
+   const feed=await db.from('ae_pick_feed').select('*').gte('event_date',todayToronto()).eq('outcome','pending').order('created_at',{ascending:false}).order('id',{ascending:false}).range(0,limit-1);
    if(seq!==request)return;if(feed.error)throw feed.error;
    $('cpFeed').replaceChildren(...(feed.data||[]).map(p=>card(p)));
    $('cpStatus').textContent=feed.data?.length?'':'Todavía no hay Picks. Comparte el primero.';
    $('cpMore').hidden=(feed.data?.length||0)<limit;
    loaded=true;
-   await Promise.all([loadRanking(),loadModeration(),loadChefLists()]);
+   await Promise.all([loadRanking(),loadModeration(),loadChefLists(),loadSettlement()]);
  }catch(e){if(seq!==request)return;$('cpFeed').replaceChildren();$('cpMore').hidden=true;$('cpStatus').textContent='No pudimos cargar los Picks. '+message(e);}
 }
-let currentRank='weekly';
+let currentRank='month';
 function row(label,cls){const li=el('li',null,cls||'ae-cp-leader');li.append(el('span',label));return li;}
 async function loadRanking(){
  const list=$('cpLeaderboard');if(!list)return;
- const r=currentRank==='weekly'?await db.rpc('ae_community_pick_week_top'):await db.rpc('ae_community_pick_totals');
- if(r.error){list.replaceChildren(row('No fue posible cargar la clasificación.'));return;}
+ const r=await db.rpc('ae_pick_result_ranking',{p_period:currentRank});
+ if(r.error){list.replaceChildren(row('No fue posible cargar el ranking de resultados.'));return;}
  list.replaceChildren();
- if(!r.data?.length)list.append(row('Aún no hay posiciones con puntos.'));
+ if(!r.data?.length)list.append(row('Aún no hay pronósticos con resultados confirmados.'));
  for(const [i,x] of (r.data||[]).entries()){
-  const li=el('li',null,'ae-cp-leader');
-  li.append(el('span',String(x.rank_position||i+1).padStart(2,'0'),'ae-take-number'),el('span',x.author||x.username||'Aficionado','ae-take-name'),el('strong',String(x.points)+' pts'));
-  list.append(li);
+   const li=el('li',null,'ae-cp-leader');
+   li.append(el('span',String(i+1).padStart(2,'0'),'ae-take-number'),
+     el('span',x.username||'Aficionado','ae-take-name'),
+     el('strong',Number(x.points||0).toFixed(2)+' pts · '+Number(x.correct_picks||0)+' aciertos'));
+   list.append(li);
  }
 }
 /* Clasificación editorial basada en votos netos reales, separada de los
@@ -136,7 +149,7 @@ async function loadChefLists(){
  const seq=++chefRequest;
  const cols='id,user_id,author,title,score,upvotes,downvotes,created_at';
  const query=()=>db.from('ae_pick_feed').select(cols)
-   .eq('moderation_status','approved').eq('is_current_week',true);
+   .eq('moderation_status','approved').eq('is_current_week',true).gte('event_date',todayToronto()).eq('outcome','pending');
  try{
    const [best,worst]=await Promise.all([
      query().gt('score',0).order('score',{ascending:false})
