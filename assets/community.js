@@ -229,29 +229,49 @@ async function refreshCommunity() {
     const request = ++communityRequest;
     const target = document.getElementById('communityLeaders');
     try {
-        const {data, error} = await db.rpc('rcm_community_leaders'); if (error) throw error;
+        const {data,error} = await db.rpc('rcm_community_leaders');
+        if (error) throw error;
         if (request !== communityRequest) return;
         target.replaceChildren();
-        for (const [key, title] of [['supported','Más apoyado'], ['questioned','Más cuestionado']]) {
-            const panel = node('div', null, 'rcm-leader'); panel.append(node('h3', title));
-            const row = data?.[key];
-            if (!row) { panel.append(node('p', 'Todavía no hay comentarios con votos de este tipo.')); }
-            else {
-                const link = node('a', null, 'rcm-leader-link');
-                const url = articleURL(row.article_id, row.id); link.href = url;
-                link.append(node('blockquote', row.body.length > 190 ? row.body.slice(0,190) + '…' : row.body),
-                    node('p', row.author || 'Usuario'), node('p', `▲ ${row.upvotes} · ▼ ${row.downvotes}`), node('strong', row.article_title));
-                link.onclick = async event => {
-                    if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
-                    event.preventDefault(); history.pushState({}, '', url);
+        for (const [key,title] of [['supported','Más apoyado'],['questioned','Más cuestionado']]) {
+            const panel=node('div',null,'rcm-leader ae-reference-leader '+(key==='questioned'?'is-questioned':'is-supported'));
+            panel.append(node('h3',title));
+            const row=data?.[key];
+            if (!row) {
+                panel.append(node('p','Todavía no hay comentarios con votos de este tipo.'));
+            } else {
+                const link=node('a',null,'rcm-leader-link');
+                const url=articleURL(row.article_id,row.id);
+                link.href=url;
+                link.append(node('blockquote',row.body.length>190?row.body.slice(0,190)+'…':row.body));
+                const meta=node('div',null,'ae-reference-leader-meta');
+                meta.append(node('span',row.author||'Usuario','ae-reference-leader-author'));
+                if(row.created_at) {
+                    const d=new Date(row.created_at);
+                    if(Number.isFinite(d.getTime()))meta.append(node('span','· '+new Intl.DateTimeFormat('es-ES',{day:'numeric',month:'short',year:'numeric'}).format(d).replace(/\./g,''),'ae-reference-leader-date'));
+                }
+                link.append(meta);
+                const foot=node('div',null,'ae-reference-leader-footer');
+                const counts=node('div',null,'ae-reference-leader-counts');
+                counts.append(node('span','▲ '+Number(row.upvotes||0),'ae-reference-count-up'),
+                    node('span','▼ '+Number(row.downvotes||0),'ae-reference-count-down'));
+                foot.append(counts);
+                const article=node('span',null,'ae-reference-leader-article');
+                article.append(node('strong',row.article_title||'Ver artículo'),node('span','→','ae-reference-link-arrow'));
+                foot.append(article);
+                link.append(foot);
+                link.onclick=async event=>{
+                    if(event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;
+                    event.preventDefault();
+                    history.pushState({},'',url);
                     await openArticleFromShareLink();
                 };
                 panel.append(link);
             }
             target.append(panel);
         }
-    } catch {
-        if (request === communityRequest) target.replaceChildren(node('p', 'No pudimos cargar los comentarios destacados. Volveremos a intentarlo.'));
+    }catch{
+        if(request===communityRequest)target.replaceChildren(node('p','No pudimos cargar los comentarios destacados. Volveremos a intentarlo.'));
     }
 }
 function articleURL(articleId, commentId = null) {
