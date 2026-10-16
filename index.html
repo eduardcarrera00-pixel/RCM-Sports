@@ -954,7 +954,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
         </div>
     </div>
 
-    <div id="articleModal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6">
+    <div id="articleModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" tabindex="-1" class="fixed inset-0 z-50 hidden overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6">
         <div class="relative bg-white border border-slate-200 w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden max-h-[92vh] flex flex-col my-auto">
 
             <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50 sticky top-0 z-10">
@@ -1094,13 +1094,10 @@ html.dark [data-reading-size][aria-pressed="true"] {
                 <div>
                     <h4 class="font-bold text-white uppercase tracking-wider mb-3">Redes Sociales</h4>
                    <div class="flex flex-wrap gap-3 text-base">
-    <!-- Email: add your email address before publishing -->
-    <a href="mailto:YOUR_EMAIL_HERE"
-       aria-label="Enviar un correo"
-       title="Correo electrónico"
-       class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 hover:text-pitch-400 hover:border-pitch-500 transition-colors">
+    <span aria-label="Correo electrónico — próximamente" title="Correo electrónico — próximamente"
+       class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 opacity-50">
         <i class="fa-solid fa-envelope" aria-hidden="true"></i>
-    </a>
+    </span>
 
     <!-- Instagram -->
     <a href="https://www.instagram.com/ae_sports/"
@@ -1436,9 +1433,25 @@ currentUser = {
             return categoryFallbackImages['Fútbol'];
         }
 
+        function formatArticleText(value) {
+            const container = document.createElement('div');
+            container.innerHTML = String(value ?? '');
+            // Only format text paragraphs; existing editorial HTML stays intact.
+            for (const paragraph of container.querySelectorAll('p')) {
+                if (paragraph.children.length) continue;
+                let text = paragraph.textContent;
+                const heading = text.match(/^(#{1,3})\s+(.+)$/);
+                const element = document.createElement(heading ? (heading[1].length < 3 ? 'h2' : 'h3') : 'p');
+                if (heading) text = heading[2];
+                element.innerHTML = escapeHTML(text).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+                paragraph.replaceWith(element);
+            }
+            return container.innerHTML;
+        }
+
         function cleanBody(value) {
             if (!window.DOMPurify) return escapeHTML(value);
-            return DOMPurify.sanitize(String(value ?? ''), {
+            return DOMPurify.sanitize(formatArticleText(value), {
                 ALLOWED_TAGS: ['p','br','strong','em','b','i','h2','h3','ul','ol','li','blockquote','a','img'],
                 ALLOWED_ATTR: ['href','src','alt','title'],
                 ALLOW_DATA_ATTR: false
@@ -1903,11 +1916,13 @@ currentUser = {
         }
 
 
+        let articlePreviousFocus = null;
         function openArticleModal(articleId, options = {}) {
             document.getElementById('articleMissing').classList.add('hidden');
             const article = articles.find(a => String(a.id) === String(articleId));
             if (!article) return;
 
+            if (document.getElementById('articleModal').classList.contains('hidden')) articlePreviousFocus = document.activeElement;
             activeModalArticleId = article.id;
             if (options.updateUrl !== false) updateArticleShareUrl(article.id);
 
@@ -1934,6 +1949,7 @@ loadCommentsFromSupabase(article.id);
 
             const articleModal = document.getElementById('articleModal');
             articleModal.classList.remove('hidden');
+            articleModal.focus({preventScroll:true});
             // Cada artículo comienza en el título, incluso después de haber
             // recorrido otra noticia en este mismo lector.
             articleModal.scrollTop = 0;
@@ -1948,8 +1964,21 @@ loadCommentsFromSupabase(article.id);
             document.getElementById('articleModal').classList.add('hidden');
             syncModalScrollLock();
             activeModalArticleId = null;
+            articlePreviousFocus?.focus({preventScroll:true});
             updateArticleShareUrl(null);
         }
+
+        document.addEventListener('keydown', event => {
+            const modal = document.getElementById('articleModal');
+            if (modal.classList.contains('hidden') || !document.getElementById('userAuthModal').classList.contains('hidden') || !document.getElementById('publishModal').classList.contains('hidden') || document.querySelector('dialog[open]')) return;
+            if (event.key === 'Escape') { event.preventDefault(); closeModal(); return; }
+            if (event.key !== 'Tab') return;
+            const controls = [...modal.querySelectorAll('button:not(:disabled),a[href],input:not(:disabled),textarea:not(:disabled),select:not(:disabled)')].filter(el => el.getClientRects().length);
+            const first = controls[0], last = controls.at(-1);
+            if (!first) { event.preventDefault(); return; }
+            if (event.shiftKey && (document.activeElement === first || document.activeElement === modal)) { event.preventDefault(); last.focus(); }
+            else if (!event.shiftKey && (document.activeElement === last || document.activeElement === modal)) { event.preventDefault(); first.focus(); }
+        });
 
         function updateArticleShareUrl(articleId) {
             const url = new URL(window.location.href);
