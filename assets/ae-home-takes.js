@@ -14,7 +14,30 @@
   function empty(list,text){
     if(list)list.replaceChildren(el('li',text,'ae-top-takes-empty ae-points-empty'));
   }
-  function leader(r,side){
+  function movementBadge(m){
+    const change=el('span',null,'ae-rank-change');
+    const previous=m?.previous_position;
+    const moved=Number(m?.movement);
+    if(!m?.baseline_exists){
+      change.dataset.move='pending';change.textContent='—';
+      change.setAttribute('aria-label','Aún no hay comparación anterior');
+    }else if(previous==null){
+      change.dataset.move='new';change.textContent='Nuevo';
+      change.setAttribute('aria-label','Nuevo en el ranking');
+    }else if(moved>0){
+      change.dataset.move='up';change.textContent='▲ '+moved;
+      change.setAttribute('aria-label','Subió '+moved+' '+(moved===1?'posición':'posiciones'));
+    }else if(moved<0){
+      change.dataset.move='down';change.textContent='▼ '+Math.abs(moved);
+      change.setAttribute('aria-label','Bajó '+Math.abs(moved)+' '+(moved===-1?'posición':'posiciones'));
+    }else{
+      change.dataset.move='same';change.textContent='–';
+      change.setAttribute('aria-label','Sin cambios de posición');
+    }
+    change.title=change.getAttribute('aria-label');
+    return change;
+  }
+  function leader(r,side,movement){
     const item=el('li',null,'ae-top-take ae-points-take');
     item.dataset.side=side;
     const content=el('div',null,'ae-top-take-content');
@@ -25,7 +48,10 @@
     user.setAttribute('aria-label','Ver perfil y Takes de '+(r.username||'Aficionado'));
     user.addEventListener('click',()=>window.openAePublicProfile?.(r.user_id));
     headline.append(user);
-    headline.append(el('strong',Number(r.points||0)+' pts','ae-points-total'));
+    const badges=el('span',null,'ae-points-badges');
+    badges.append(el('strong',Number(r.points||0)+' pts','ae-points-total'));
+    badges.append(movementBadge(movement));
+    headline.append(badges);
     content.append(headline);
 
     if(r.best_take_title){
@@ -42,14 +68,15 @@
     item.append(content);
     return item;
   }
-  function paint(data){
+  function paint(data,movements){
+    const byUser=new Map((Array.isArray(movements)?movements:[]).map(m=>[m.user_id,m]));
     const best=$('aeTopTakesPositive'),worst=$('aeTopTakesNegative');
     const rows=Array.isArray(data)?data:[];
     const top=rows.filter(x=>x?.side==='genios').sort((a,b)=>Number(a.rank_number)-Number(b.rank_number)).slice(0,3);
     const tail=rows.filter(x=>x?.side==='anoetos').sort((a,b)=>Number(a.rank_number)-Number(b.rank_number)).slice(0,10);
-    if(top.length)best.replaceChildren(...top.map(r=>leader(r,'genios')));
+    if(top.length)best.replaceChildren(...top.map(r=>leader(r,'genios',byUser.get(r.user_id))));
     else empty(best,'Todavía no hay Takes puntuados en este periodo.');
-    if(tail.length)worst.replaceChildren(...tail.map(r=>leader(r,'anoetos')));
+    if(tail.length)worst.replaceChildren(...tail.map(r=>leader(r,'anoetos',byUser.get(r.user_id))));
     else empty(worst,'No hay más participantes puntuados fuera del Top 3.');
     const status=$('aeTopTakesStatus');
     if(status)status.textContent='';
@@ -69,10 +96,14 @@
     const request=++sequence,selected=period;
     loading=true;
     try{
-      const result=await db.rpc('ae_home_take_point_extremes',{p_period:selected});
+      const [result,movementResult]=await Promise.all([
+        db.rpc('ae_home_take_point_extremes',{p_period:selected}),
+        db.rpc('ae_home_take_rank_movements',{p_period:selected})
+      ]);
       if(result.error)throw result.error;
+      if(movementResult.error)throw movementResult.error;
       if(sequence!==request||selected!==period)return;
-      paint(result.data||[]);
+      paint(result.data||[],movementResult.data||[]);
       lastLoad=Date.now();
     }catch(error){
       if(sequence===request){
