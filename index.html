@@ -937,15 +937,10 @@ html.dark [data-reading-size][aria-pressed="true"] {
 
                 <div class="ae-article-intro"><div class="ae-article-eyebrow">AE SPORTS <span> / </span> HISTORIAS QUE IMPORTAN</div>
                     <h1 id="modalTitle" class="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-tight mb-3"></h1>
-                    <div class="flex flex-wrap items-center gap-4 text-xs text-slate-500 pb-4 border-b border-slate-100">
-                        <div class="flex items-center space-x-2">
-                            <img id="modalAuthorImg" src="" alt="Autor" class="w-7 h-7 rounded-full object-cover">
-                            <span id="modalAuthor" class="font-semibold text-slate-800"></span>
-                        </div>
-                        <span>•</span>
-                        <span id="modalDate"></span>
-                        <span>•</span>
-                        <span id="modalReadTime"></span>
+                    <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-500 pb-4 border-b border-slate-100" aria-label="Autor y fecha de publicación">
+                        <span id="modalAuthor" class="font-semibold text-slate-800"></span>
+                        <span aria-hidden="true">·</span>
+                        <time id="modalDate"></time>
                     </div>
                 </div>
 
@@ -1871,10 +1866,8 @@ currentUser = {
 
             document.getElementById('modalCategory').innerText = article.category;
             document.getElementById('modalTitle').innerText = article.title;
-            document.getElementById('modalAuthor').innerText = article.author;
-            document.getElementById('modalAuthorImg').src = safeImageURL(article.authorAvatar);
-            document.getElementById('modalDate').innerText = article.date;
-            document.getElementById('modalReadTime').innerText = article.readTime;
+            document.getElementById('modalAuthor').innerText = article.author || 'AE SPORTS';
+            document.getElementById('modalDate').innerText = article.date || '';
             document.getElementById('modalImage').src = safeImageURL(article.image);
             document.getElementById('modalBody').innerHTML = cleanBody(article.body);
             restoreReadingSize();
@@ -1885,7 +1878,13 @@ renderRelatedStories(article);
             document.getElementById('modalCommentsList').textContent = 'Cargando comentarios…';
 loadCommentsFromSupabase(article.id);
 
-            document.getElementById('articleModal').classList.remove('hidden');
+            const articleModal = document.getElementById('articleModal');
+            articleModal.classList.remove('hidden');
+            // Cada artículo comienza en el título, incluso después de haber
+            // recorrido otra noticia en este mismo lector.
+            articleModal.scrollTop = 0;
+            const articleScroll = articleModal.querySelector('.ae-article-scroll');
+            if (articleScroll) articleScroll.scrollTop = 0;
             syncModalScrollLock();
             void recordArticleRead(article);
         }
