@@ -134,7 +134,7 @@ GRANT EXECUTE ON FUNCTION public.ae_pick_result_ranking(text) TO anon, authentic
 -- Explicit admin recovery for pre-migration Picks (historical records had
 -- no event date). Never invent an event date from publication timestamps.
 CREATE OR REPLACE FUNCTION public.ae_pick_set_legacy_event_date(p_pick_id uuid,p_event_date date)
-RETURNS date LANGUAGE plpgsql SECURITY DEFINER SET search_path='' AS $
+RETURNS date LANGUAGE plpgsql SECURITY DEFINER SET search_path='' AS $$
 DECLARE day date;
 BEGIN
  IF auth.uid() IS NULL OR NOT public.rcm_is_editor() THEN
@@ -149,7 +149,7 @@ BEGIN
  RETURNING p.event_date INTO day;
  IF day IS NULL THEN RAISE EXCEPTION 'La fecha no es válida o el Pick ya tiene una fecha'; END IF;
  RETURN day;
-END $;
+END $$;
 REVOKE ALL ON FUNCTION public.ae_pick_set_legacy_event_date(uuid,date) FROM PUBLIC;
 REVOKE ALL ON FUNCTION public.ae_pick_set_legacy_event_date(uuid,date) FROM anon;
 GRANT EXECUTE ON FUNCTION public.ae_pick_set_legacy_event_date(uuid,date) TO authenticated;
