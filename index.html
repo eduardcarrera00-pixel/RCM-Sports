@@ -1767,7 +1767,7 @@ currentUser = {
             container.innerHTML = ranked.map((article, index) => {
                 const likes = Number(article.likes)||0;
                 const day = article.createdAt && !Number.isNaN(new Date(article.createdAt).getTime())
-                  ? new Intl.DateTimeFormat('es-ES',{day:'numeric',month:'short',year:'numeric'}).format(new Date(article.createdAt)).replace(/\\./g,'')
+                  ? new Intl.DateTimeFormat('es-ES',{day:'numeric',month:'short',year:'numeric'}).format(new Date(article.createdAt)).replace(/\./g,'')
                   : '';
                 const byline = [day,article.author?'por '+article.author:''].filter(Boolean).join(' · ');
                 return '<li class="ae-trending-item">'
