@@ -44,15 +44,8 @@ html body.ae-is-home aside .editorial-community.rcm-panel>.ae-section-heading{
     url('atmospheres/ae-community-editorial-paper.svg') center/cover no-repeat!important;
 }
 html body.ae-is-home aside .editorial-community.rcm-panel>.ae-section-heading::before{
-  content:'COMUNIDAD AE SPORTS'!important;
-  display:block!important;
-  position:relative!important;
-  z-index:2!important;
-  margin:0 0 10px!important;
-  color:var(--ae-community-bronze)!important;
-  font:800 10px/1.2 Inter,system-ui,sans-serif!important;
-  letter-spacing:.22em!important;
-  text-transform:uppercase!important;
+  content:none!important;
+  display:none!important;
 }
 html body.ae-is-home aside .editorial-community.rcm-panel>.ae-section-heading::after{
   content:''!important;
