@@ -23,6 +23,13 @@ function close(){
 }
 function display(entries,owner,canVote){
  const target=$('aeProfileTakes');target.replaceChildren();
+ const featured=$('aeProfileHistoricTake');if(featured){featured.replaceChildren();featured.hidden=true;}
+ const published=entries.filter(t=>!t.hidden);
+ const best=published.slice().sort((a,b)=>Number(b.upvotes||0)-Number(a.upvotes||0)||Number(a.downvotes||0)-Number(b.downvotes||0)||new Date(b.created_at)-new Date(a.created_at))[0];
+ if(featured&&best){
+   featured.append(el('span',privateView?'TU TAKE HISTÓRICO':'SU TAKE HISTÓRICO','ae-profile-historic-label'),el('h3',best.title),el('p',best.body),el('strong','▲ '+Number(best.upvotes||0)+' apoyos · ▼ '+Number(best.downvotes||0)+' cuestionamientos'));
+   featured.hidden=false;
+ }
  $('aeProfileCount').textContent=entries.length+' '+(entries.length===1?'Take histórico':'Takes históricos');
  if(!entries.length){target.append(el('p',privateView?'Aún no has publicado Takes. Puedes escribirlos en Fútbol o NFL.':'Todavía no hay Takes públicos en este perfil.','ae-profile-empty'));return;}
  for(const entry of entries){

@@ -1,0 +1,186 @@
+/* AE SPORTS · Historial de Takes/Picks, puntuación y geometría editorial.
+   Deliberadamente se preservan las esquinas curvas de Power Rankings,
+   noticias recientes y Lo más leído. */
+
+/* Texto de clasificación disponible para lector de pantalla, no visualmente. */
+html body #aeSportTakeStatus.sr-only{
+  position:absolute!important;width:1px!important;height:1px!important;
+  padding:0!important;margin:-1px!important;
+  overflow:hidden!important;clip:rect(0,0,0,0)!important;
+  white-space:nowrap!important;border:0!important;
+}
+html body #aeSportTakeLeaders>.ae-section-heading{min-height:92px!important;}
+html body #aeSportTakeLeaders>.ae-section-heading h2{
+  margin:0!important;font:600 clamp(26px,2.6vw,37px)/1.12 Newsreader,Georgia,serif!important;
+}
+
+/* Botones de archivo: visibles al final de sus respectivas secciones. */
+html body .ae-history-more{
+  display:flex!important;
+  justify-content:center!important;
+  align-items:center!important;
+  gap:8px!important;
+  width:fit-content!important;
+  max-width:100%!important;
+  min-height:40px!important;
+  margin:17px auto 3px!important;
+  padding:9px 18px!important;
+  border:1px solid #bd9475!important;
+  border-radius:2px!important;
+  color:#f7e7d5!important;
+  background:#275065!important;
+  font:800 12px/1.3 Inter,system-ui,sans-serif!important;
+  text-align:center!important;
+  cursor:pointer!important;
+}
+html body .ae-history-more[hidden]{display:none!important;}
+html body .ae-history-more:hover{background:#375f73!important;}
+html body .ae-history-more:focus-visible{outline:2px solid #e7ba8c!important;outline-offset:3px!important;}
+html:not(.dark) body .ae-history-more{background:#f3e7d7!important;color:#304b59!important;border-color:#ad8e75!important;}
+html:not(.dark) body .ae-history-more:hover{background:#e9d9c3!important;}
+html body #footballTakes #communityPicks #cpViewAll{margin:15px auto 0!important;}
+html body #freeTakes #freeTakesMore{margin:18px auto 4px!important;}
+html body #freeTakes .ae-takes-head>p{max-width:730px!important;line-height:1.55!important;}
+
+/* Publicación de Picks: fecha del partido, archivo y resultado. */
+html body #footballTakes #communityPicks .cp-event-date{
+  color:#d4ac87!important;
+  font:700 11px/1.35 Inter,system-ui,sans-serif!important;
+}
+html body .cp-result-badge{
+  display:inline-block!important;
+  color:#e5c2a0!important;
+  font:700 11px/1.4 Inter,system-ui,sans-serif!important;
+}
+html:not(.dark) body .cp-result-badge,
+html:not(.dark) body #footballTakes #communityPicks .cp-event-date{color:#825b40!important;}
+
+/* Admin: resultados comprobados (sin automatismo inventado). */
+html body .ae-admin-settlement-title{
+  margin:15px 0 5px!important;
+  font:600 20px/1.16 Newsreader,Georgia,serif!important;
+}
+html body .ae-admin-settlement-hint{
+  font:400 11px/1.5 Inter,system-ui,sans-serif!important;
+}
+html body .ae-pick-settle-entry{
+  display:flex;flex-wrap:wrap;gap:7px;align-items:center;
+  margin:10px 0!important;padding:12px!important;
+  border:1px solid rgba(186,156,126,.35)!important;border-radius:0!important;
+}
+html body .ae-pick-settle-entry>strong,
+html body .ae-pick-settle-entry>small,
+html body .ae-pick-settle-entry>p{flex-basis:100%;}
+html body .ae-pick-settle-entry button{
+  padding:6px 10px!important;
+  border:1px solid rgba(206,161,117,.7)!important;border-radius:0!important;
+  background:#2d5062!important;color:#f5e7da!important;
+  font:700 11px Inter,system-ui,sans-serif!important;
+}
+html:not(.dark) body .ae-pick-settle-entry button{background:#ede3d5!important;color:#354b57!important;}
+
+/* Archivo permanente, contiene Picks activos y vencidos; no borra información. */
+html body #cpArchiveDialog.ae-picks-archive-dialog{
+  position:fixed!important;
+  inset:0!important;
+  width:min(900px,calc(100vw - 24px))!important;
+  max-width:900px!important;max-height:90dvh!important;
+  box-sizing:border-box!important;
+  margin:auto!important;
+  padding:clamp(16px,3vw,29px)!important;
+  border:1px solid #c49a79!important;border-radius:0!important;
+  background:#112d3e!important;
+  color:#f5e7d7!important;
+  box-shadow:0 24px 70px #071521aa!important;
+  overflow-y:auto!important;
+  z-index:9998!important;
+}
+html body #cpArchiveDialog:not([open]){display:none!important;}
+html body #cpArchiveDialog::backdrop{background:#051724c7;backdrop-filter:blur(4px);}
+html body .ae-picks-archive-head{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  margin-bottom:8px;
+}
+html body .ae-picks-archive-head h2{margin:0!important;font:600 30px Newsreader,Georgia,serif!important;color:#f7e9d9!important;}
+html body .ae-picks-archive-head button{
+  flex:0 0 36px;width:36px;height:36px;
+  border:1px solid #b49075;border-radius:0;
+  background:#244b60;color:#f7e7d5;
+  font:500 25px Inter,system-ui;cursor:pointer;
+}
+html body #cpArchiveDialog>p{font:400 12px/1.55 Inter,system-ui,sans-serif;color:#c9d4d3;}
+html body #cpArchiveFeed{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:12px!important;
+}
+html body #cpArchiveFeed>.cp-card{
+  box-sizing:border-box;
+  margin:0!important;
+  width:100%!important;
+  min-width:0!important;
+  padding:13px!important;
+  border:1px solid #c3a07f50!important;border-radius:0!important;
+  background:#1b3a4c!important;
+  color:#f3e8db!important;
+}
+html:not(.dark) body #cpArchiveDialog.ae-picks-archive-dialog{background:#f8f5ee!important;color:#304957!important;border-color:#bca995!important;}
+html:not(.dark) body .ae-picks-archive-head h2{color:#304957!important;}
+html:not(.dark) body #cpArchiveDialog>p{color:#5b6c77!important;}
+html:not(.dark) body #cpArchiveFeed>.cp-card{background:#fffdfa!important;color:#304957!important;border-color:#d4d4cc!important;}
+html:not(.dark) body .ae-picks-archive-head button{background:#eae7df;color:#304957;}
+
+/* El Take Histórico es el Take público con más votos positivos del autor. */
+html body #aeProfileHistoricTake.ae-profile-historic{
+  display:block;
+  margin:14px 0 18px!important;
+  padding:17px 18px!important;
+  border:1px solid rgba(204,166,129,.48)!important;
+  border-left:3px solid #c39468!important;
+  border-radius:0!important;
+  background:linear-gradient(130deg,#214357,#153549)!important;
+}
+html body #aeProfileHistoricTake[hidden]{display:none!important;}
+html body #aeProfileHistoricTake .ae-profile-historic-label{
+  font:800 10px Inter,system-ui,sans-serif!important;
+  letter-spacing:.1em!important;color:#ddb48d!important;
+}
+html body #aeProfileHistoricTake h3{margin:8px 0!important;color:#fff0df!important;font:600 23px/1.2 Newsreader,Georgia,serif!important;}
+html body #aeProfileHistoricTake p{color:#d2dbda!important;font:400 13px/1.5 Inter,system-ui,sans-serif!important;}
+html body #aeProfileHistoricTake strong{color:#e7bf9c!important;font:700 11px/1.3 Inter,system-ui,sans-serif!important;}
+html:not(.dark) body #aeProfileHistoricTake.ae-profile-historic{background:linear-gradient(130deg,#f7eee3,#eef3ee)!important;border-color:#d2bfa8!important;}
+html:not(.dark) body #aeProfileHistoricTake h3{color:#29495a!important;}
+html:not(.dark) body #aeProfileHistoricTake p{color:#526973!important;}
+html:not(.dark) body #aeProfileHistoricTake strong{color:#795439!important;}
+
+/* Geometría de marca: tarjetas y controles cuadrados, EXCEPTO power rankings,
+   últimas noticias, Lo más leído y avatares/logos redondos. */
+html body :is(
+  .ae-top-takes-card,.ae-top-takes-card-head,.ae-sport-takes-group,
+  .ae-sport-take-item,.ae-free-take-card,.ae-take-card,
+  .ae-takes-head,.ae-free-compose,.ae-compose-disclosure,
+  .ae-picks-feed,.ae-picks-layout,.ae-picks-feature,.ae-picks-small-top,
+  .ae-chef-board,.ae-picks-rail>.ae-takes-side,
+  .cp-card,.cp-dialog,.ae-take-button,
+  .ae-participate-cta,.ae-picks-publish-cta,.ae-home-take-publish,
+  .ae-profile-dialog,.ae-profile-item,
+  .ae-news-archive-dialog,.ae-news-archive-close,
+  .ae-picks-jump a,.ae-picks-rail .ae-takes-tabs button
+){border-radius:0!important;}
+html body :is(#footballTakes,#freeTakes,#aeSportTakeLeaders) :is(button,select,input,textarea,summary){
+  border-radius:0!important;
+}
+html body .editorial-ranking,html body #homeRankingLink,html body #homeChampionsLink,
+html body #nflRankings,html body #championsRankings{
+  /* Deliberately retain their original radius and original team emblems. */
+}
+@media(max-width:670px){
+ html body #cpArchiveFeed{grid-template-columns:1fr!important;}
+ html body #cpArchiveDialog.ae-picks-archive-dialog{max-height:93dvh!important;}
+}
+
+/* Excepciones visuales que el proyecto conserva curvas: última noticia, Lo más leído y Power Rankings. */
+html body #footballTakes #picksNews .ae-picks-news-feature,
+html body #footballTakes #picksNews .ae-picks-news-feature .ae-picks-news-open{
+ border-radius:9px!important;
+}

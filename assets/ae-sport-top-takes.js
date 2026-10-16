@@ -66,7 +66,7 @@
    // (#aeTopTakesPositiveTitle / #aeTopTakesNegativeTitle) no se modifican.
    $('aeSportGeniosTitle').textContent=sport==='nfl'?'NFL Savant':'Respira fútbol';
    $('aeSportAnoetosTitle').textContent=sport==='nfl'?'NFL Rookie':'Vende Humos';
-   $('aeSportTakeTitle').textContent='Takes destacados · '+(sport==='nfl'?'NFL':'Fútbol');
+   $('aeSportTakeTitle').textContent='Takes históricos';
    if(!force&&sport===current&&Date.now()-lastRun<15000)return;
    current=sport;
    const seq=++request;const status=$('aeSportTakeStatus');
