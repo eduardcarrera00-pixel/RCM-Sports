@@ -332,6 +332,7 @@
    if(imageUrl){
      const img=make('img');img.loading='lazy';img.decoding='async';img.alt='';img.src=imageUrl;
      img.style.setProperty('--ae-image-focus',(Number.isFinite(Number(newest.image_focus_x))?Math.max(0,Math.min(100,Number(newest.image_focus_x))):50)+'% '+(Number.isFinite(Number(newest.image_focus_y))?Math.max(0,Math.min(100,Number(newest.image_focus_y))):50)+'%');
+     img.style.setProperty('object-fit',newest.image_zoom===false?'contain':'cover','important');
      card.classList.add('has-photo');
      img.addEventListener('error',()=>{
        img.remove();
