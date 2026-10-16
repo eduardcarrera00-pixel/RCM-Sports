@@ -411,3 +411,289 @@
     object-fit:contain!important;
   }
 }
+
+
+/* v2 · Consumer-style admin profile + compact publish + dropdown stacking fix */
+html body>header{
+  z-index:10000!important;
+  overflow:visible!important;
+  isolation:isolate!important;
+}
+html body>header>div,
+html body>header .ae-mobile-header-grid,
+html body>header .ae-header-actions{
+  overflow:visible!important;
+}
+
+/* Keep the sport manager dropdown above every hero/card/article layer. */
+html body>header #aeCategoryAdmin{
+  z-index:10020!important;
+  overflow:visible!important;
+}
+html body>header #aeCategoryAdmin[open]{
+  z-index:10030!important;
+}
+html body>header #aeCategoryAdmin .ae-category-admin-menu{
+  z-index:10040!important;
+  isolation:isolate!important;
+  overflow:auto!important;
+  border:1px solid rgba(218,169,108,.38)!important;
+  background:#0a2535!important;
+  box-shadow:0 18px 46px rgba(0,7,13,.48)!important;
+}
+html:not(.dark) body>header #aeCategoryAdmin .ae-category-admin-menu{
+  background:#fff8ed!important;
+  border-color:rgba(148,102,62,.30)!important;
+  box-shadow:0 16px 38px rgba(76,48,22,.18)!important;
+}
+
+@media (min-width:980px){
+  html body>header .ae-mobile-header-grid{
+    grid-template-columns:minmax(235px,1fr) auto minmax(300px,1fr)!important;
+    column-gap:14px!important;
+  }
+
+  html body>header .ae-mobile-header-grid>.ae-header-actions{
+    gap:4px!important;
+  }
+
+  /* Deportes stays subtle and consumer-sized. */
+  html body>header #aeCategoryAdmin,
+  html body>header #aeCategoryAdmin>summary{
+    flex-basis:50px!important;
+    width:50px!important;
+    min-width:50px!important;
+    max-width:50px!important;
+    height:52px!important;
+    min-height:52px!important;
+    max-height:52px!important;
+  }
+  html body>header #aeCategoryAdmin>summary{
+    grid-template-rows:25px 10px!important;
+    gap:2px!important;
+    padding:4px 0!important;
+  }
+  html body>header #aeCategoryAdmin .ae-admin-manage-icon{
+    width:22px!important;
+    height:22px!important;
+    font-size:15px!important;
+  }
+  html body>header #aeCategoryAdmin .ae-admin-manage-label{
+    width:50px!important;
+    max-width:50px!important;
+    font:800 7px/10px Inter,system-ui,sans-serif!important;
+  }
+  html body>header #aeCategoryAdmin .ae-category-admin-menu{
+    top:calc(100% + 8px)!important;
+    right:0!important;
+    width:min(292px,calc(100vw - 24px))!important;
+    max-height:min(70vh,460px)!important;
+  }
+
+  /* Admin controls now read: Publicar · salir · perfil/nombre. */
+  html body>header #loggedAdminContainer{
+    gap:4px!important;
+    height:52px!important;
+  }
+
+  /* Publish is deliberately compact; its label always stays inside the rectangle. */
+  html body>header #loggedAdminContainer .ae-publish-action{
+    flex:0 0 92px!important;
+    width:92px!important;
+    min-width:92px!important;
+    max-width:92px!important;
+    height:34px!important;
+    min-height:34px!important;
+    max-height:34px!important;
+    padding:6px 8px!important;
+    gap:5px!important;
+    overflow:hidden!important;
+    border-radius:0!important;
+    font:800 10px/1 Inter,system-ui,sans-serif!important;
+    letter-spacing:.035em!important;
+    white-space:nowrap!important;
+    text-overflow:clip!important;
+    transform:none!important;
+    box-shadow:0 3px 10px rgba(184,126,68,.12)!important;
+  }
+  html body>header #loggedAdminContainer .ae-publish-action i{
+    flex:0 0 auto!important;
+    font-size:10px!important;
+    line-height:1!important;
+  }
+  html body>header #loggedAdminContainer .ae-publish-action span{
+    display:block!important;
+    min-width:0!important;
+    max-width:68px!important;
+    overflow:hidden!important;
+    font:inherit!important;
+    line-height:1!important;
+    text-overflow:clip!important;
+    white-space:nowrap!important;
+  }
+
+  /* Logout immediately precedes the profile, like the consumer reference. */
+  html body>header #loggedAdminContainer .ae-signout-action{
+    flex:0 0 27px!important;
+    width:27px!important;
+    min-width:27px!important;
+    max-width:27px!important;
+    height:32px!important;
+    min-height:32px!important;
+    max-height:32px!important;
+    margin:0 1px 0 0!important;
+  }
+  html body>header #loggedAdminContainer .ae-signout-action .ae-classical-auth-art{
+    width:17px!important;
+    min-width:17px!important;
+    max-width:17px!important;
+    height:17px!important;
+    min-height:17px!important;
+    max-height:17px!important;
+  }
+
+  /* Profile mirrors normal users: tiny icon + small username on one line, no card. */
+  html body>header #loggedAdminContainer .ae-admin-profile{
+    display:inline-flex!important;
+    flex-direction:row!important;
+    align-items:center!important;
+    justify-content:flex-start!important;
+    flex:0 1 auto!important;
+    width:auto!important;
+    min-width:0!important;
+    max-width:104px!important;
+    height:34px!important;
+    min-height:34px!important;
+    max-height:34px!important;
+    gap:5px!important;
+    margin:0!important;
+    padding:2px 0!important;
+    overflow:hidden!important;
+    border:0!important;
+    border-radius:0!important;
+    outline-offset:2px!important;
+    background:transparent!important;
+    background-image:none!important;
+    box-shadow:none!important;
+    color:#f1dfc7!important;
+  }
+  html body>header #loggedAdminContainer .ae-admin-profile::before,
+  html body>header #loggedAdminContainer .ae-admin-profile::after{
+    display:none!important;
+    content:none!important;
+  }
+  html body>header #loggedAdminContainer .ae-admin-profile-art{
+    position:static!important;
+    flex:0 0 18px!important;
+    width:18px!important;
+    min-width:18px!important;
+    max-width:18px!important;
+    height:18px!important;
+    min-height:18px!important;
+    max-height:18px!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    object-fit:contain!important;
+    opacity:.82!important;
+    filter:brightness(.84) saturate(.80) contrast(.98)!important;
+    mix-blend-mode:screen!important;
+  }
+  html body>header #loggedAdminContainer #adminNameDisplay{
+    position:static!important;
+    display:block!important;
+    flex:0 1 auto!important;
+    width:auto!important;
+    min-width:0!important;
+    max-width:78px!important;
+    height:auto!important;
+    margin:0!important;
+    padding:0!important;
+    overflow:hidden!important;
+    color:#f1dfc7!important;
+    font:800 8px/1 Inter,system-ui,sans-serif!important;
+    letter-spacing:.01em!important;
+    text-align:left!important;
+    text-overflow:ellipsis!important;
+    text-transform:uppercase!important;
+    white-space:nowrap!important;
+  }
+}
+
+/* Medium desktop: shrink the admin rail instead of touching the sport nav. */
+@media (min-width:980px) and (max-width:1180px){
+  html body>header .ae-mobile-header-grid{
+    grid-template-columns:minmax(205px,.92fr) auto minmax(276px,1.08fr)!important;
+    column-gap:8px!important;
+  }
+  html body>header #loggedAdminContainer .ae-publish-action{
+    flex-basis:84px!important;
+    width:84px!important;
+    min-width:84px!important;
+    max-width:84px!important;
+    padding-inline:6px!important;
+    font-size:9px!important;
+  }
+  html body>header #loggedAdminContainer .ae-publish-action span{
+    max-width:61px!important;
+  }
+  html body>header #loggedAdminContainer .ae-admin-profile{
+    max-width:88px!important;
+  }
+  html body>header #loggedAdminContainer #adminNameDisplay{
+    max-width:64px!important;
+    font-size:7.5px!important;
+  }
+}
+
+/* Mobile/tablet: keep the same semantic order and prevent profile artwork from becoming a tile. */
+@media (max-width:979px){
+  html body>header,
+  html body>header>div,
+  html body>header .ae-mobile-header-grid,
+  html body>header .ae-header-actions{
+    overflow:visible!important;
+  }
+  html body>header #aeCategoryAdmin,
+  html body>header #aeCategoryAdmin[open],
+  html body>header #aeCategoryAdmin .ae-category-admin-menu{
+    z-index:10030!important;
+  }
+  html body>header #loggedAdminContainer .ae-admin-profile{
+    display:inline-flex!important;
+    flex-direction:row!important;
+    align-items:center!important;
+    gap:4px!important;
+    width:auto!important;
+    min-width:0!important;
+    max-width:88px!important;
+    height:32px!important;
+    min-height:32px!important;
+    padding:2px 0!important;
+    border:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+  }
+  html body>header #loggedAdminContainer .ae-admin-profile-art{
+    flex:0 0 17px!important;
+    width:17px!important;
+    min-width:17px!important;
+    max-width:17px!important;
+    height:17px!important;
+    min-height:17px!important;
+    max-height:17px!important;
+    mix-blend-mode:screen!important;
+  }
+  html body>header #loggedAdminContainer #adminNameDisplay{
+    display:block!important;
+    max-width:65px!important;
+    overflow:hidden!important;
+    font:800 7.5px/1 Inter,system-ui,sans-serif!important;
+    text-overflow:ellipsis!important;
+    text-transform:uppercase!important;
+    white-space:nowrap!important;
+  }
+}
