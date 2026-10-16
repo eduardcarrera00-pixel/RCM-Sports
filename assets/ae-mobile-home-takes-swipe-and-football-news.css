@@ -1,0 +1,73 @@
+/* AE SPORTS: Top 3 Genios/Anoetos desplazable por dedo y Fútbol sin hero repetido. */
+@media(max-width:760px){
+  html body.ae-is-football #mainContent #heroSection,
+  html body.ae-is-football #aeFootballMobileStage > #heroSection{
+    display:none!important;
+    height:0!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:0!important;
+  }
+  html body.ae-is-home #aeHomeTopTakes .ae-top-takes-list{
+    box-sizing:border-box!important;
+    display:block!important;
+    width:100%!important;
+    min-width:0!important;
+    height:var(--ae-takes-swipe-height,196px)!important;
+    min-height:0!important;
+    max-height:none!important;
+    margin:0!important;
+    padding:0 11px!important;
+    overflow-x:hidden!important;
+    overflow-y:auto!important;
+    scroll-snap-type:y mandatory!important;
+    scroll-padding-top:0!important;
+    scroll-behavior:smooth!important;
+    overscroll-behavior-y:contain!important;
+    -webkit-overflow-scrolling:touch;
+    touch-action:pan-y!important;
+    scrollbar-width:none!important;
+  }
+  html body.ae-is-home #aeHomeTopTakes .ae-top-takes-list::-webkit-scrollbar{display:none!important;width:0!important;}
+  html body.ae-is-home #aeHomeTopTakes .ae-top-takes-list > li.ae-top-take,
+  html body.ae-is-home #aeHomeTopTakes .ae-top-takes-list > li.ae-top-take:nth-child(n+2),
+  html body.ae-is-home #aeHomeTopTakes .ae-top-takes-list.ae-mobile-expanded > li.ae-top-take{
+    box-sizing:border-box!important;
+    display:block!important;
+    width:100%!important;
+    min-width:0!important;
+    height:var(--ae-takes-swipe-height,196px)!important;
+    min-height:0!important;
+    max-height:none!important;
+    margin:0!important;
+    padding:10px 0 12px!important;
+    overflow:hidden!important;
+    scroll-snap-align:start!important;
+    scroll-snap-stop:always!important;
+  }
+  html body.ae-is-home #aeHomeTopTakes .ae-top-takes-list > li.ae-top-take:not(:last-child){
+    border-bottom:1px solid rgba(212,172,126,.33)!important;
+  }
+  html body.ae-is-home #aeHomeTopTakes .ae-top-takes-list:not(:has(>li.ae-top-take)){
+    height:auto!important;
+    overflow:visible!important;
+  }
+  html body.ae-is-home #aeHomeTopTakes .ae-mobile-takes-more{
+    display:inline-flex!important;
+    align-items:center!important;
+    min-height:32px!important;
+    cursor:pointer!important;
+    white-space:nowrap!important;
+    touch-action:manipulation!important;
+    color:#e2b885!important;
+    font:700 10px/1.3 Inter,system-ui,sans-serif!important;
+  }
+  html body.ae-is-home #aeHomeTopTakes .ae-mobile-takes-more[hidden]{display:none!important;}
+  html body.ae-is-home #aeHomeTopTakes .ae-top-takes-list:focus-visible{
+    outline:2px solid #eac18e!important;
+    outline-offset:-2px!important;
+  }
+}
+@media(max-width:760px) and (prefers-reduced-motion:reduce){
+  html body.ae-is-home #aeHomeTopTakes .ae-top-takes-list{scroll-behavior:auto!important;}
+}
