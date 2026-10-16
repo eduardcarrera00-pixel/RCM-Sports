@@ -32,3 +32,5 @@
 #aeWeeklyCheckSave:disabled{cursor:wait;opacity:.65}
 #aeWeeklyCheckSave:focus-visible{outline:2px solid #e8c295;outline-offset:3px}
 @media(max-width:580px){#aeWeeklyCheckSave.ae-weekly-check-save{width:100%}}
+
+#aeWeeklyCheckSave.ae-weekly-check-save[hidden]{display:none!important}
