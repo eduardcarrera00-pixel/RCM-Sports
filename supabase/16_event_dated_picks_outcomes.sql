@@ -102,6 +102,7 @@ BEGIN
   RETURN points;
 END $$;
 REVOKE ALL ON FUNCTION public.ae_pick_settle_result(uuid,text) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.ae_pick_settle_result(uuid,text) FROM anon;
 GRANT EXECUTE ON FUNCTION public.ae_pick_settle_result(uuid,text) TO authenticated;
 
 -- Current month or historical totals. Score +abs(odds)/100 for successes,
