@@ -81,3 +81,153 @@ html body :is(#aeHomeTakeRanking, #aeSportTakeRanking) .ae-take-ranking-author:f
   outline: 2px solid var(--ae-tr-bronze) !important;
   outline-offset: 3px !important;
 }
+
+
+/* Portada: Top 10 + dos espacios de descubrimiento, en la misma familia visual. */
+html body #aeHomeTakeHighlights {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr);
+  gap: 14px;
+  margin: 14px 0 8px;
+  align-items: stretch;
+  min-width: 0;
+}
+html body #aeHomeTakeHighlights #aeHomeTakeRanking {
+  min-width: 0;
+  margin: 0 !important;
+  padding: clamp(14px, 2vw, 22px);
+}
+html body #aeHomeTakeHighlights .ae-home-take-extras {
+  display: grid;
+  grid-template-columns: minmax(0,1fr);
+  gap: 14px;
+  min-width: 0;
+}
+html body #aeHomeTakeHighlights .ae-home-take-feature {
+  --ae-discovery-ink: #f7ecdc;
+  --ae-discovery-muted: #bdc7c8;
+  --ae-discovery-gold: #e1b783;
+  --ae-discovery-line: rgba(208,163,115,.4);
+  --ae-discovery-surface: rgba(12,36,49,.57);
+  box-sizing: border-box;
+  min-width: 0;
+  padding: clamp(15px,1.8vw,22px);
+  background: linear-gradient(145deg,#132f40 0%,#0a2231 66%,#172d38 100%);
+  color: var(--ae-discovery-ink);
+  border: 1px solid var(--ae-discovery-line);
+  border-radius: 2px;
+  box-shadow: 0 12px 30px rgba(5,17,25,.18);
+}
+html:not(.dark) body #aeHomeTakeHighlights .ae-home-take-feature {
+  --ae-discovery-ink: #382e29;
+  --ae-discovery-muted: #685a51;
+  --ae-discovery-gold: #8b593e;
+  --ae-discovery-line: rgba(137,92,61,.43);
+  --ae-discovery-surface: rgba(255,250,243,.8);
+  background: linear-gradient(145deg,#f8f2e8,#eee4d6);
+  box-shadow: 0 9px 24px rgba(90,64,48,.09);
+}
+html body #aeHomeTakeHighlights .ae-home-take-feature-kicker {
+  color: var(--ae-discovery-gold);
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  font: 800 10px/1.3 Inter,system-ui,sans-serif;
+  margin: 0 0 8px;
+}
+html body #aeHomeTakeHighlights .ae-home-take-feature h3 {
+  font: 600 clamp(22px,2vw,28px)/1.1 Newsreader,Georgia,serif !important;
+  color: var(--ae-discovery-ink) !important;
+  margin: 0 0 7px !important;
+}
+html body #aeHomeTakeHighlights .ae-home-take-feature-intro {
+  font: 500 12px/1.4 Inter,system-ui,sans-serif;
+  color: var(--ae-discovery-muted);
+  margin: 0 0 11px;
+}
+html body #aeHomeTakeHighlights .ae-discovery-list {
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 7px;
+  list-style: none;
+}
+html body #aeHomeTakeHighlights .ae-discovery-list li {min-width:0;}
+html body #aeHomeTakeHighlights .ae-discovery-take {
+  display: grid;
+  gap: 5px;
+  width: 100%;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--ae-discovery-line);
+  border-radius: 2px;
+  background: var(--ae-discovery-surface);
+  color: var(--ae-discovery-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color .2s, background-color .2s;
+}
+html body #aeHomeTakeHighlights .ae-discovery-take:hover,
+html body #aeHomeTakeHighlights .ae-discovery-take:focus-visible {
+  border-color: var(--ae-discovery-gold);
+  background: color-mix(in srgb,var(--ae-discovery-surface) 84%,var(--ae-discovery-gold) 16%);
+}
+html body #aeHomeTakeHighlights .ae-discovery-take:focus-visible {
+  outline: 2px solid var(--ae-discovery-gold);
+  outline-offset: 2px;
+}
+html body #aeHomeTakeHighlights .ae-discovery-sport {
+  color: var(--ae-discovery-gold);
+  font: 800 10px/1.3 Inter,system-ui,sans-serif;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+html body #aeHomeTakeHighlights .ae-discovery-title {
+  color: var(--ae-discovery-ink);
+  font: 700 13px/1.35 Inter,system-ui,sans-serif;
+  overflow-wrap: anywhere;
+}
+html body #aeHomeTakeHighlights .ae-discovery-excerpt {
+  color: var(--ae-discovery-muted);
+  font: 450 11.5px/1.45 Inter,system-ui,sans-serif;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+html body #aeHomeTakeHighlights .ae-discovery-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px 10px;
+  flex-wrap: wrap;
+  color: var(--ae-discovery-muted);
+  font: 650 11px/1.45 Inter,system-ui,sans-serif;
+  overflow-wrap: anywhere;
+}
+html body #aeHomeTakeHighlights .ae-discovery-score {
+  color: var(--ae-discovery-gold);
+  white-space: nowrap;
+}
+html body #aeHomeTakeHighlights .ae-discovery-empty {
+  color: var(--ae-discovery-muted);
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 12px 0 2px;
+}
+@media (max-width: 1240px) {
+  html body #aeHomeTakeHighlights {grid-template-columns:minmax(0,1fr);}
+  html body #aeHomeTakeHighlights .ae-home-take-extras {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+@media (max-width: 760px) {
+  html body #aeHomeTakeHighlights .ae-home-take-extras {
+    grid-template-columns:minmax(0,1fr);
+  }
+  html body #aeHomeTakeHighlights #aeHomeTakeRanking,
+  html body #aeHomeTakeHighlights .ae-home-take-feature {padding:16px;}
+  html body #aeHomeTakeHighlights .ae-discovery-take {padding:12px;}
+}
