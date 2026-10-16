@@ -99,7 +99,7 @@
     if (!byId('aeFootballTicker')) {
       const viewport = document.createElement('div');
       viewport.id = 'aeFootballTicker';
-      viewport.setAttribute('aria-label', 'Los tres primeros equipos del ranking en movimiento');
+      viewport.setAttribute('aria-label', 'Las diez posiciones publicadas del ranking en movimiento');
       const track = document.createElement('div');
       track.id = 'aeFootballTickerTrack';
       viewport.appendChild(track);
@@ -138,8 +138,9 @@
     const source = byId('championsList');
     const target = byId('aeFootballTickerTrack');
     if (!source || !target) return;
-    const topThree = [...source.children].slice(0,3);
-    const signature = topThree.map(el =>
+    // Igual que NFL: las diez posiciones publicadas, repetidas para un bucle continuo.
+    const topTen = [...source.children].slice(0,10);
+    const signature = topTen.map(el =>
       el.textContent + '|' + [...el.querySelectorAll('img')].map(img => img.getAttribute('src')).join('|')
     ).join('::');
     if (signature === tickerFingerprint) return;
@@ -147,7 +148,7 @@
 
     target.replaceChildren();
     for (let copy = 0; copy < 2; copy++) {
-      topThree.forEach((row, index) => {
+      topTen.forEach((row, index) => {
         const duplicate = row.cloneNode(true);
         duplicate.removeAttribute('id');
         duplicate.classList.add('ae-football-rank-item');
@@ -156,11 +157,11 @@
         target.appendChild(duplicate);
       });
     }
-    target.classList.toggle('is-moving', topThree.length > 1);
+    target.classList.toggle('is-moving', topTen.length > 1);
     const motion = byId('aeFootballRankingMotion');
     const all = byId('aeFootballRankingAll');
-    if (motion) motion.hidden = topThree.length < 2;
-    if (all) all.disabled = topThree.length === 0;
+    if (motion) motion.hidden = topTen.length < 2;
+    if (all) all.disabled = topTen.length === 0;
     syncMotion();
   }
 
