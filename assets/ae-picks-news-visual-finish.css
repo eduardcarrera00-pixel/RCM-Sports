@@ -1,0 +1,194 @@
+/* AE SPORTS · Ajuste editorial de Picks: octubre 2026.
+   Prioridad al titular y fotografía de la última noticia, sin redundancias. */
+
+/* ¿Eres Chef? precede a la acción de publicar. */
+html body #footballTakes #communityPicks .ae-picks-heading-cta-row{
+  display:flex!important;
+  flex-wrap:wrap!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:10px 14px!important;
+}
+html body #footballTakes #communityPicks .ae-picks-nudge{
+  order:0!important;
+  margin:0!important;
+  flex:0 1 auto!important;
+}
+html body #footballTakes #communityPicks #cpPublishCta.ae-picks-publish-cta{
+  order:1!important;
+  margin:0!important;
+  flex:0 0 auto!important;
+}
+
+/* Subtítulos redundantes eliminados del HTML; reducir la altura de cabecera
+   para dejar más espacio a los Picks y a los nombres de los Chefs. */
+html body #footballTakes .ae-picks-rail>.ae-chef-board .ae-picks-rail-heading{
+  padding-bottom:9px!important;
+  margin-bottom:3px!important;
+}
+html body #footballTakes .ae-picks-rail>.ae-chef-board .ae-picks-rail-heading h3{
+  margin-bottom:0!important;
+}
+
+/* El título de la noticia MÁS RECIENTE reemplaza al texto genérico.
+   Evitar el espacio reservado a una descripción que ya no existe. */
+html body #footballTakes .ae-picks-rail #picksNews .ae-picks-news-heading{
+  padding-bottom:12px!important;
+  margin:0 0 12px!important;
+}
+html body #footballTakes .ae-picks-rail #picksNews #picksNewsLead.ae-picks-news-lead{
+  display:block!important;
+  margin:8px 0 0!important;
+  max-width:100%!important;
+  color:#e8c5a3!important;
+  font:600 clamp(14px,1.25vw,17px)/1.35 Newsreader,Georgia,serif!important;
+  letter-spacing:0!important;
+  overflow-wrap:anywhere;
+}
+html body #footballTakes .ae-picks-rail #picksNews #picksNewsLead[hidden]{
+  display:none!important;
+}
+html:not(.dark) body #footballTakes .ae-picks-rail #picksNews #picksNewsLead.ae-picks-news-lead{
+  color:#76513b!important;
+}
+
+/* Fotografía de portada de la última noticia: cubre TODA la tarjeta.
+   Una sola imagen protagonista en vez de miniatura y un gran hueco vacío. */
+html body #footballTakes .ae-picks-rail #picksNews #picksNewsList{
+  display:block!important;
+  width:100%!important;
+  min-width:0;
+}
+html body #footballTakes .ae-picks-rail #picksNews .ae-picks-news-card.ae-picks-news-feature{
+  display:block!important;
+  position:relative!important;
+  isolation:isolate;
+  width:100%!important;
+  box-sizing:border-box;
+  /* Altura definida: el botón y la foto heredan el 100% sin espacios vacíos. */
+  height:clamp(205px,23vw,280px)!important;
+  aspect-ratio:auto!important;
+  min-height:190px;
+  margin:0!important;
+  padding:0!important;
+  overflow:hidden!important;
+  border:1px solid rgba(203,173,137,.35)!important;
+  border-radius:2px!important;
+  background:linear-gradient(135deg,#284e64,#102e40)!important;
+  box-shadow:none!important;
+}
+html body #footballTakes .ae-picks-rail #picksNews .ae-picks-news-card.ae-picks-news-feature .ae-picks-news-open{
+  display:block!important;
+  position:relative!important;
+  width:100%!important;
+  height:100%!important;
+  min-height:190px!important;
+  margin:0!important;
+  padding:0!important;
+  overflow:hidden!important;
+  border:0!important;
+  border-radius:0!important;
+  color:#fff6e9!important;
+  background:transparent!important;
+  text-align:left!important;
+  cursor:pointer!important;
+}
+html body #footballTakes .ae-picks-rail #picksNews .ae-picks-news-feature .ae-picks-news-open img{
+  position:absolute!important;
+  inset:0!important;
+  display:block!important;
+  width:100%!important;
+  max-width:none!important;
+  height:100%!important;
+  max-height:none!important;
+  min-height:0!important;
+  object-fit:cover!important;
+  object-position:center center!important;
+  flex:none!important;
+  border:0!important;
+  border-radius:0!important;
+  transform:scale(1);
+  transition:transform .28s ease;
+  z-index:0;
+}
+html body #footballTakes .ae-picks-rail #picksNews .ae-picks-news-feature.has-photo .ae-picks-news-open::after{
+  content:"";
+  display:block;
+  position:absolute;
+  inset:0;
+  z-index:1;
+  background:linear-gradient(to top,rgba(5,23,35,.82) 0%,rgba(7,25,37,.28) 45%,transparent 75%);
+  pointer-events:none;
+}
+html body #footballTakes .ae-picks-rail #picksNews .ae-picks-news-feature .ae-picks-news-open:hover img{
+  transform:scale(1.035);
+}
+html body #footballTakes .ae-picks-rail #picksNews .ae-picks-news-feature .ae-picks-news-copy{
+  box-sizing:border-box;
+  position:absolute!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:flex-start!important;
+  gap:7px!important;
+  bottom:0!important;
+  left:0!important;
+  right:0!important;
+  z-index:2;
+  max-width:100%!important;
+  margin:0!important;
+  padding:16px 17px!important;
+  background:transparent!important;
+}
+html body #footballTakes .ae-picks-rail #picksNews .ae-picks-news-feature .ae-picks-news-label{
+  color:#e6bc94!important;
+  font:800 10px/1.25 Inter,system-ui,sans-serif!important;
+  letter-spacing:.09em!important;
+}
+html body #footballTakes .ae-picks-rail #picksNews .ae-picks-news-feature .ae-picks-news-read{
+  display:inline-block!important;
+  color:#fff4e9!important;
+  font:750 12px/1.35 Inter,system-ui,sans-serif!important;
+  text-decoration:underline;
+  text-decoration-color:rgba(255,244,233,.55);
+  text-underline-offset:3px;
+}
+html body #footballTakes .ae-picks-rail #picksNews .ae-picks-news-feature .ae-picks-news-in-card-title{
+  display:block;
+  font:600 18px/1.22 Newsreader,Georgia,serif!important;
+  color:#fff4e9!important;
+  margin:0!important;
+  overflow-wrap:anywhere;
+}
+/* El titular ya aparece sobre la tarjeta, no duplicarlo cuando hay foto. */
+html body #footballTakes .ae-picks-rail #picksNews .ae-picks-news-feature.has-photo .ae-picks-news-in-card-title{
+  display:none!important;
+}
+html body #footballTakes .ae-picks-rail #picksNews .ae-picks-news-feature .ae-picks-news-open:focus-visible{
+  outline:3px solid #e5b787!important;
+  outline-offset:-3px!important;
+}
+html:not(.dark) body #footballTakes .ae-picks-rail #picksNews .ae-picks-news-feature{
+  border-color:#d2c2b0!important;
+  background:linear-gradient(130deg,#e3d9ca,#b5cbd0)!important;
+}
+html:not(.dark) body #footballTakes .ae-picks-rail #picksNews .ae-picks-news-feature:not(.has-photo) .ae-picks-news-copy{
+  background:linear-gradient(135deg,rgba(28,59,76,.92),rgba(26,67,80,.85))!important;
+}
+@media(max-width:670px){
+  html body #footballTakes .ae-picks-rail #picksNews .ae-picks-news-feature{
+    min-height:185px;
+    height:clamp(200px,52vw,260px)!important;
+    aspect-ratio:auto!important;
+  }
+  html body #footballTakes .ae-picks-rail #picksNews .ae-picks-news-feature .ae-picks-news-open{
+    min-height:185px!important;
+  }
+  html body #footballTakes #communityPicks .ae-picks-heading-cta-row{
+    gap:8px 12px!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  html body #footballTakes .ae-picks-rail #picksNews .ae-picks-news-feature .ae-picks-news-open img{
+    transition:none!important;
+  }
+}
