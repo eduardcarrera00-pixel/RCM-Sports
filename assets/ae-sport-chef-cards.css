@@ -170,3 +170,54 @@ html:not(.dark) body #aeSportTakeLeaders.ae-sport-chefs button:focus-visible{out
   html body #aeSportTakeLeaders.ae-sport-chefs .ae-sport-takes-grid>.ae-sport-chef-card{padding:13px 14px 10px!important}
   html body #aeSportTakeLeaders.ae-sport-chefs .ae-sport-chef-heading>h3{font-size:21px!important}
 }
+
+/* 2026-10-16: Encabezados deportivos sin subtítulos redundantes.
+   Los nombres dinámicos NFL Savant / Rookie / Respira fútbol / Vende Humos
+   se encuadran en una banda editorial, no dependen del deporte actual. */
+html body #aeSportTakeLeaders.ae-sport-chefs .ae-sport-chef-heading {
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  box-sizing:border-box!important;
+  min-height:64px!important;
+  padding:7px 0 12px!important;
+  margin:0 0 5px!important;
+  border-bottom:1px solid rgba(198,181,159,.21)!important;
+}
+html body #aeSportTakeLeaders.ae-sport-chefs .ae-sport-chef-heading>h3,
+html.dark body #aeSportTakeLeaders.ae-sport-chefs .ae-sport-chef-heading>h3{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  box-sizing:border-box!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:44px!important;
+  margin:0!important;
+  padding:7px 12px!important;
+  border:1px solid rgba(205,166,132,.25)!important;
+  border-left:3px solid var(--ae-take-accent)!important;
+  background:rgba(222,180,145,.045)!important;
+  color:#f7e8d7!important;
+  font:600 clamp(20px,2.1vw,25px)/1.15 Newsreader,Georgia,serif!important;
+  text-align:center!important;
+  overflow-wrap:break-word!important;
+  letter-spacing:-.01em!important;
+}
+html:not(.dark) body #aeSportTakeLeaders.ae-sport-chefs .ae-sport-chef-heading>h3{
+  color:#304b59!important;
+  border-color:rgba(149,111,83,.25)!important;
+  border-left-color:var(--ae-take-accent)!important;
+  background:rgba(190,154,112,.065)!important;
+}
+@media(max-width:610px){
+  html body #aeSportTakeLeaders.ae-sport-chefs .ae-sport-chef-heading{
+    min-height:56px!important;
+    padding:4px 0 10px!important;
+  }
+  html body #aeSportTakeLeaders.ae-sport-chefs .ae-sport-chef-heading>h3{
+    min-height:41px!important;
+    padding:6px 8px!important;
+    font-size:clamp(19px,5vw,22px)!important;
+  }
+}

@@ -218,3 +218,29 @@ html:not(.dark) body aside .editorial-trending.rcm-panel .ae-trending-link:focus
     padding:8px 14px 11px!important;
   }
 }
+
+/* Traen la exclusiva: el título ocupa la cabecera sin la antigua sobrelínea.
+   Lo más leído conserva su propia jerarquía y etiqueta. */
+html body aside .editorial-community.rcm-panel>.ae-section-heading,
+html.dark body aside .editorial-community.rcm-panel>.ae-section-heading,
+html:not(.dark) body aside .editorial-community.rcm-panel>.ae-section-heading{
+  min-height:74px!important;
+  padding:14px 19px!important;
+  justify-content:center!important;
+  align-items:flex-start!important;
+}
+html body aside .editorial-community.rcm-panel>.ae-section-heading h2{
+  width:100%!important;
+  min-width:0!important;
+  max-width:100%!important;
+  margin:0!important;
+  font-size:clamp(22px,2.1vw,28px)!important;
+  line-height:1.18!important;
+  overflow-wrap:break-word!important;
+}
+@media(max-width:610px){
+  html body aside .editorial-community.rcm-panel>.ae-section-heading{
+    min-height:66px!important;
+    padding:11px 15px!important;
+  }
+}
