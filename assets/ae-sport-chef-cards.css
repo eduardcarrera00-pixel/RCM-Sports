@@ -1,0 +1,172 @@
+/* AE SPORTS · Takes NFL/Fútbol con la misma jerarquía editorial que los Chefs.
+   Mantener el componente de Picks intacto; solo afectamos a estos Takes. */
+html body #aeSportTakeLeaders.ae-sport-chefs,
+html.dark body #aeSportTakeLeaders.ae-sport-chefs,
+html:not(.dark) body #aeSportTakeLeaders.ae-sport-chefs {
+  display:block!important;
+  box-sizing:border-box!important;
+  width:100%!important;min-width:0!important;
+  margin:0!important;padding:0!important;
+  border:0!important;border-radius:0!important;
+  box-shadow:none!important;overflow:visible!important;
+  background:transparent!important;background-image:none!important;
+}
+html body #aeSportTakeLeaders.ae-sport-chefs[hidden]{display:none!important}
+html body #aeSportTakeLeaders.ae-sport-chefs .ae-sport-takes-grid {
+  display:flex!important;flex-direction:column!important;
+  grid-template-columns:none!important;
+  width:100%!important;min-width:0!important;
+  gap:15px!important;margin:0!important;padding:0!important;
+}
+html body #aeSportTakeLeaders.ae-sport-chefs .ae-sport-takes-grid>.ae-sport-chef-card,
+html.dark body #aeSportTakeLeaders.ae-sport-chefs .ae-sport-takes-grid>.ae-sport-chef-card {
+  --ae-take-accent:#cca17d;
+  --ae-take-glow:rgba(196,146,105,.12);
+  display:block!important;
+  box-sizing:border-box!important;
+  width:100%!important;min-width:0!important;
+  margin:0!important;padding:15px 17px 12px!important;
+  border:1px solid rgba(208,174,142,.30)!important;
+  border-left:3px solid var(--ae-take-accent)!important;
+  border-radius:0!important;overflow:hidden!important;
+  background:radial-gradient(ellipse at 105% -20%,var(--ae-take-glow),transparent 67%),
+             linear-gradient(145deg,#163747,#102b3e)!important;
+  box-shadow:0 6px 17px rgba(7,20,31,.12)!important;
+  color:#f7e8d7!important;
+}
+html body #aeSportTakeLeaders.ae-sport-chefs .ae-sport-takes-grid>.ae-sport-chef-card.is-questioned {
+  --ae-take-accent:#ad9bb8;--ae-take-glow:rgba(165,131,162,.14);
+}
+html body #aeSportTakeLeaders.ae-sport-chefs .ae-sport-chef-heading {
+  display:block!important;
+  margin:0 0 5px!important;
+  padding:0 0 9px!important;
+  border:0!important;
+  border-bottom:1px solid rgba(198,181,159,.17)!important;
+  background:transparent!important;
+}
+html body #aeSportTakeLeaders.ae-sport-chefs .ae-sport-chef-heading>span {
+  display:block!important;
+  color:var(--ae-take-accent)!important;
+  font:800 10px/1.3 Inter,system-ui,sans-serif!important;
+  letter-spacing:.095em!important;text-transform:uppercase!important;
+}
+html body #aeSportTakeLeaders.ae-sport-chefs .ae-sport-chef-heading>h3 {
+  margin:3px 0 4px!important;padding:0!important;
+  border:0!important;background:transparent!important;
+  color:#f7e8d7!important;
+  font:600 23px/1.1 Newsreader,Georgia,serif!important;
+  letter-spacing:normal!important;
+}
+html body #aeSportTakeLeaders.ae-sport-chefs .ae-sport-takes-list {
+  display:flex!important;flex-direction:column!important;
+  gap:0!important;
+  list-style:none!important;margin:0!important;padding:0!important;
+  min-width:0!important;width:100%!important;
+}
+html body #aeSportTakeLeaders.ae-sport-chefs .ae-sport-take-item.ae-sport-chef-entry {
+  display:grid!important;grid-template-columns:24px minmax(0,1fr)!important;
+  gap:9px!important;align-items:start!important;
+  box-sizing:border-box!important;min-width:0!important;width:100%!important;
+  padding:10px 0!important;margin:0!important;
+  border:0!important;border-bottom:1px solid rgba(187,174,162,.14)!important;
+  background:transparent!important;box-shadow:none!important;
+  cursor:pointer;
+}
+html body #aeSportTakeLeaders.ae-sport-chefs .ae-sport-chef-entry:last-child {
+  border-bottom:0!important;padding-bottom:3px!important;
+}
+html body #aeSportTakeLeaders.ae-sport-chefs .ae-top-take-number {
+  color:var(--ae-take-accent)!important;
+  font:600 21px/1.1 Newsreader,Georgia,serif!important;
+}
+html body #aeSportTakeLeaders.ae-sport-chefs .ae-top-take-content {
+  display:flex!important;flex-direction:column!important;align-items:flex-start!important;
+  gap:3px!important;min-width:0!important;overflow-wrap:anywhere!important;
+}
+html body #aeSportTakeLeaders.ae-sport-chefs .ae-sport-take-meta {
+  display:block!important;width:100%!important;min-width:0!important;
+  margin:0!important;padding:0!important;
+}
+html body #aeSportTakeLeaders.ae-sport-chefs .ae-sport-take-meta .ae-top-take-author,
+html.dark body #aeSportTakeLeaders.ae-sport-chefs .ae-sport-take-meta .ae-top-take-author {
+  display:inline-block!important;width:auto!important;max-width:100%!important;
+  margin:0!important;padding:0!important;min-height:0!important;
+  border:0!important;background:transparent!important;box-shadow:none!important;
+  color:#f0d1b4!important;
+  font:700 13px/1.25 Inter,system-ui,sans-serif!important;
+  text-align:left!important;text-decoration:none!important;cursor:pointer!important;
+}
+html body #aeSportTakeLeaders.ae-sport-chefs .ae-sport-take-title {
+  display:block!important;min-width:0!important;max-width:100%!important;
+  margin:0!important;padding:0!important;
+  color:#e0e5e3!important;
+  font:500 12px/1.35 Inter,system-ui,sans-serif!important;
+  overflow-wrap:anywhere!important;
+}
+html body #aeSportTakeLeaders.ae-sport-chefs .ae-sport-take-open {
+  display:block!important;max-width:100%!important;
+  padding:0!important;margin:0!important;
+  border:0!important;background:transparent!important;box-shadow:none!important;
+  color:inherit!important;font:inherit!important;text-align:left!important;
+  white-space:normal!important;overflow-wrap:anywhere!important;cursor:pointer!important;
+}
+html body #aeSportTakeLeaders.ae-sport-chefs .ae-sport-take-statline {
+  display:flex!important;flex-wrap:wrap!important;align-items:center!important;
+  gap:5px 12px!important;justify-content:space-between!important;
+  width:100%!important;min-width:0!important;margin:1px 0 0!important;
+}
+html body #aeSportTakeLeaders.ae-sport-chefs .ae-sport-take-net {
+  color:#afd3bc!important;
+  font:700 10.5px/1.4 Inter,system-ui,sans-serif!important;
+  font-variant-numeric:tabular-nums!important;
+}
+html body #aeSportTakeLeaders.ae-sport-chefs .is-questioned .ae-sport-take-net {
+  color:#e1b9c4!important;
+}
+html body #aeSportTakeLeaders.ae-sport-chefs .ae-top-take-reply {
+  display:inline-flex!important;align-items:center!important;justify-content:flex-start!important;
+  min-height:25px!important;margin:0!important;padding:1px 0!important;
+  border:0!important;background:transparent!important;box-shadow:none!important;
+  color:#e9b68e!important;font:700 11px/1.2 Inter,system-ui,sans-serif!important;
+  text-decoration:underline!important;text-underline-offset:3px!important;cursor:pointer!important;
+}
+html body #aeSportTakeLeaders.ae-sport-chefs .ae-top-takes-empty {
+  display:block!important;box-sizing:border-box!important;
+  padding:14px 0 8px!important;border:0!important;
+  color:#b8cbd0!important;font:400 11px/1.5 Inter,system-ui,sans-serif!important;
+}
+html body #aeSportTakeLeaders.ae-sport-chefs button:hover {color:#fff!important;text-decoration:underline!important}
+html body #aeSportTakeLeaders.ae-sport-chefs button:focus-visible {
+  outline:2px solid #ecc097!important;outline-offset:3px!important;
+}
+/* Modo diurno: idéntico ambiente marfil/bronce que Mejores y Peores Chefs. */
+html:not(.dark) body #aeSportTakeLeaders.ae-sport-chefs .ae-sport-takes-grid>.ae-sport-chef-card {
+  --ae-take-accent:#99704d;--ae-take-glow:rgba(185,148,108,.15);
+  border-color:#d8cabb!important;
+  border-left:3px solid var(--ae-take-accent)!important;
+  background:radial-gradient(ellipse at 105% -20%,var(--ae-take-glow),transparent 68%),
+             linear-gradient(145deg,#fffefa,#f1f3ed)!important;
+  box-shadow:0 7px 17px rgba(45,63,65,.06)!important;
+  color:#304b59!important;
+}
+html:not(.dark) body #aeSportTakeLeaders.ae-sport-chefs .ae-sport-takes-grid>.ae-sport-chef-card.is-questioned {
+  --ae-take-accent:#8b718b;--ae-take-glow:rgba(158,130,152,.14);
+}
+html:not(.dark) body #aeSportTakeLeaders.ae-sport-chefs .ae-sport-chef-heading{border-bottom-color:#ddd9d0!important}
+html:not(.dark) body #aeSportTakeLeaders.ae-sport-chefs .ae-sport-chef-heading>h3{color:#2f4857!important}
+html:not(.dark) body #aeSportTakeLeaders.ae-sport-chefs .ae-sport-chef-entry{border-bottom-color:#dbe0d9!important}
+html:not(.dark) body #aeSportTakeLeaders.ae-sport-chefs .ae-sport-take-meta .ae-top-take-author{color:#7c5037!important}
+html:not(.dark) body #aeSportTakeLeaders.ae-sport-chefs .ae-sport-take-title,
+html:not(.dark) body #aeSportTakeLeaders.ae-sport-chefs .ae-sport-take-open{color:#304b5b!important}
+html:not(.dark) body #aeSportTakeLeaders.ae-sport-chefs .ae-sport-take-net{color:#246c51!important}
+html:not(.dark) body #aeSportTakeLeaders.ae-sport-chefs .is-questioned .ae-sport-take-net{color:#865167!important}
+html:not(.dark) body #aeSportTakeLeaders.ae-sport-chefs .ae-top-takes-empty{color:#596d78!important}
+html:not(.dark) body #aeSportTakeLeaders.ae-sport-chefs .ae-top-take-reply{color:#81563f!important}
+html:not(.dark) body #aeSportTakeLeaders.ae-sport-chefs button:hover{color:#1b5c77!important}
+html:not(.dark) body #aeSportTakeLeaders.ae-sport-chefs button:focus-visible{outline-color:#366779!important}
+@media(max-width:610px){
+  html body #aeSportTakeLeaders.ae-sport-chefs .ae-sport-takes-grid{gap:13px!important}
+  html body #aeSportTakeLeaders.ae-sport-chefs .ae-sport-takes-grid>.ae-sport-chef-card{padding:13px 14px 10px!important}
+  html body #aeSportTakeLeaders.ae-sport-chefs .ae-sport-chef-heading>h3{font-size:21px!important}
+}
