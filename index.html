@@ -2448,6 +2448,10 @@ currentUser = {
                 renderHeroCard(heroArticle);
             }
 
+            // Conservar la posición si se actualiza una noticia (por ejemplo, al votar).
+            // Al cambiar de deporte, empezar siempre por la primera tarjeta.
+            const previousSportCategory = articlesGrid.dataset.aeSportCarouselCategory;
+            const previousSportScroll = articlesGrid.scrollLeft;
             articlesGrid.innerHTML = gridArticles.map(art => `
                 <article class="bg-white rounded-2xl border border-slate-200 overflow-hidden flex flex-col justify-between shadow-sm hover:shadow-xl hover:border-pitch-300 transition-all duration-300 hover:-translate-y-1 relative">
                     <div>
@@ -2517,7 +2521,12 @@ currentUser = {
                 articlesGrid.removeAttribute('aria-roledescription');
                 articlesGrid.removeAttribute('tabindex');
             }
-            if (sportCarousel) articlesGrid.scrollLeft = 0;
+            if (sportCarousel) {
+                articlesGrid.scrollLeft = previousSportCategory === currentCategory ? previousSportScroll : 0;
+                articlesGrid.dataset.aeSportCarouselCategory = currentCategory;
+            } else {
+                delete articlesGrid.dataset.aeSportCarouselCategory;
+            }
             // Portada: hasta siete noticias recientes. El resto permanece en cada deporte.
         }
 
