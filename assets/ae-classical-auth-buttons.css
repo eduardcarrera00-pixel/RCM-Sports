@@ -701,3 +701,296 @@ html body #aeNotificationsDialog .ae-notifications-group .ae-notification-text>*
     font-size:17px!important;
   }
 }
+
+/* 2026-10-17 · Avisos: bandeja editorial compacta, cerca del borde superior.
+   Conserva dos listas independientes y los estados de lectura reales. */
+html body #aeNotificationsDialog.ae-notifications-dialog{
+  top:clamp(22px,5.5dvh,56px)!important;
+  bottom:auto!important;
+  left:0!important;
+  right:0!important;
+  width:min(740px,calc(100vw - 28px))!important;
+  max-width:740px!important;
+  max-height:calc(100dvh - clamp(22px,5.5dvh,56px) - 16px)!important;
+  margin:0 auto!important;
+  overflow:hidden!important;
+  box-shadow:0 18px 48px rgba(1,12,20,.38)!important;
+}
+html body #aeNotificationsDialog .ae-notifications-shell{
+  display:flex!important;
+  flex-direction:column!important;
+  min-height:0!important;
+  max-height:inherit!important;
+}
+html body #aeNotificationsDialog .ae-notifications-heading{
+  flex:0 0 auto!important;
+  padding:13px 17px 11px!important;
+  background:radial-gradient(ellipse at 5% 0%,rgba(194,153,101,.19),transparent 55%),
+    linear-gradient(120deg,#17384a,#203b4b)!important;
+}
+html body #aeNotificationsDialog .ae-notifications-eyebrow{
+  font-size:9px!important;
+  letter-spacing:.13em!important;
+}
+html body #aeNotificationsDialog .ae-notifications-heading h2{
+  margin-top:4px!important;
+  font-size:25px!important;
+}
+html body #aeNotificationsDialog #aeNotificationsClose{
+  width:40px!important;
+  height:40px!important;
+  font-size:24px!important;
+}
+html body #aeNotificationsDialog .ae-notifications-groups{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  align-items:start!important;
+  gap:10px!important;
+  padding:11px 12px 9px!important;
+}
+html body #aeNotificationsDialog .ae-notifications-group{
+  border:1px solid rgba(195,163,132,.32)!important;
+  border-top:2px solid rgba(199,155,106,.66)!important;
+  background:linear-gradient(160deg,rgba(25,57,70,.74),rgba(9,31,43,.56))!important;
+  box-shadow:0 6px 14px rgba(2,13,21,.10)!important;
+}
+html body #aeNotificationsDialog .ae-notifications-group-heading{
+  min-height:57px!important;
+  padding:9px 12px 8px!important;
+  gap:2px!important;
+  border-bottom:1px solid rgba(206,169,135,.22)!important;
+  background:linear-gradient(115deg,rgba(193,149,100,.13),rgba(36,71,82,.16))!important;
+}
+html body #aeNotificationsDialog .ae-notifications-group-heading h3{
+  font-size:20px!important;
+  letter-spacing:-.015em!important;
+}
+html body #aeNotificationsDialog .ae-notifications-group-heading p{
+  font-size:10px!important;
+  line-height:1.35!important;
+}
+html body #aeNotificationsDialog .ae-notifications-group .ae-notifications-list{
+  flex:0 1 auto!important;
+  height:clamp(140px,32dvh,282px)!important;
+  max-height:clamp(140px,32dvh,282px)!important;
+  scrollbar-gutter:stable;
+}
+html body #aeNotificationsDialog .ae-notifications-group .ae-notification-entry{
+  position:relative!important;
+  grid-template-columns:24px minmax(0,1fr) 7px!important;
+  align-items:start!important;
+  gap:8px!important;
+  min-height:68px!important;
+  padding:10px 11px!important;
+  border-bottom:1px solid rgba(173,190,190,.10)!important;
+  transition:background-color .18s ease,box-shadow .18s ease!important;
+}
+html body #aeNotificationsDialog .ae-notifications-group .ae-notification-event-icon{
+  width:23px!important;
+  height:23px!important;
+  font-size:12px!important;
+  border-color:rgba(208,170,130,.30)!important;
+  background:rgba(197,160,117,.07)!important;
+}
+html body #aeNotificationsDialog .ae-notifications-group .ae-notification-text{
+  gap:3px!important;
+}
+html body #aeNotificationsDialog .ae-notifications-group .ae-notification-text strong{
+  font-weight:600!important;
+  font-size:11.5px!important;
+  line-height:1.36!important;
+}
+html body #aeNotificationsDialog .ae-notifications-group .ae-notification-text small{
+  display:-webkit-box!important;
+  -webkit-box-orient:vertical!important;
+  -webkit-line-clamp:2!important;
+  overflow:hidden!important;
+  font-size:10px!important;
+  line-height:1.35!important;
+}
+html body #aeNotificationsDialog .ae-notifications-group .ae-notification-text time{
+  font-size:10px!important;
+}
+html body #aeNotificationsDialog .ae-notifications-group .ae-notification-entry.is-unread{
+  background:linear-gradient(100deg,rgba(193,140,81,.25),rgba(179,125,74,.085))!important;
+  box-shadow:inset 3px 0 0 #d8aa71!important;
+}
+html body #aeNotificationsDialog .ae-notifications-group .ae-notification-entry.is-unread .ae-notification-text strong{
+  color:#fff3df!important;
+  font-weight:800!important;
+}
+html body #aeNotificationsDialog .ae-notifications-group .ae-notification-entry.is-unread .ae-notification-event-icon{
+  border-color:rgba(233,191,140,.68)!important;
+  background:rgba(208,153,89,.20)!important;
+}
+html body #aeNotificationsDialog .ae-notifications-group .ae-notification-entry.is-unread .ae-notification-dot{
+  width:8px!important;
+  height:8px!important;
+  background:#efd09a!important;
+  box-shadow:0 0 0 3px rgba(230,181,114,.15)!important;
+}
+html body #aeNotificationsDialog .ae-notifications-group .ae-notification-entry:hover,
+html body #aeNotificationsDialog .ae-notifications-group .ae-notification-entry:focus-visible{
+  background:rgba(202,170,132,.19)!important;
+}
+html body #aeNotificationsDialog .ae-notifications-group .ae-notifications-empty{
+  padding:18px 12px!important;
+  font-size:11px!important;
+}
+html body #aeNotificationsDialog .ae-notifications-footer{
+  display:flex!important;
+  flex:0 0 auto!important;
+  justify-content:space-between!important;
+  align-items:center!important;
+  gap:12px!important;
+  padding:10px 15px 12px!important;
+  border-top:1px solid rgba(195,163,132,.18)!important;
+  background:linear-gradient(180deg,rgba(17,46,60,.30),rgba(17,40,54,.80))!important;
+}
+html body #aeNotificationsDialog #aeNotificationsStatus:empty{display:none!important;}
+html body #aeNotificationsDialog #aeNotificationsReadAll{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:7px!important;
+  width:auto!important;
+  min-height:36px!important;
+  padding:7px 11px!important;
+  margin:0 0 0 auto!important;
+  border:1px solid rgba(216,176,134,.48)!important;
+  border-radius:0!important;
+  background:rgba(202,154,102,.10)!important;
+  color:#efd0aa!important;
+  text-decoration:none!important;
+  font:700 11px/1.2 Inter,system-ui,sans-serif!important;
+}
+html body #aeNotificationsDialog #aeNotificationsReadAll::before{
+  content:"✓";
+  font:800 13px/1 Inter,system-ui,sans-serif;
+}
+html body #aeNotificationsDialog #aeNotificationsReadAll:hover{
+  background:rgba(202,154,102,.20)!important;
+}
+html body #aeNotificationsDialog #aeNotificationsReadAll[hidden]{display:none!important;}
+html:not(.dark) body #aeNotificationsDialog .ae-notifications-heading{
+  background:radial-gradient(ellipse at 5% 0%,rgba(216,179,130,.23),transparent 55%),
+    linear-gradient(120deg,#f3e8dc,#eadac9)!important;
+}
+html:not(.dark) body #aeNotificationsDialog .ae-notifications-heading h2{color:#304751!important;}
+html:not(.dark) body #aeNotificationsDialog .ae-notifications-eyebrow{color:#855b43!important;}
+html:not(.dark) body #aeNotificationsDialog #aeNotificationsClose{
+  color:#405760!important;
+  border-color:#d3bca5!important;
+  background:#fff9f0!important;
+}
+html:not(.dark) body #aeNotificationsDialog .ae-notifications-group{
+  border-color:#d9c5b2!important;
+  border-top-color:#b68562!important;
+  background:#fffaf5!important;
+  box-shadow:0 5px 15px rgba(75,48,29,.07)!important;
+}
+html:not(.dark) body #aeNotificationsDialog .ae-notifications-group-heading{
+  border-bottom-color:#e4d7c9!important;
+  background:linear-gradient(115deg,#f8eee3,#fffaf5)!important;
+}
+html:not(.dark) body #aeNotificationsDialog .ae-notification-entry.is-unread{
+  background:linear-gradient(105deg,#f7e6d0,#fff2e4)!important;
+  box-shadow:inset 3px 0 0 #a36b43!important;
+}
+html:not(.dark) body #aeNotificationsDialog .ae-notification-entry.is-unread .ae-notification-text strong{
+  color:#243c48!important;
+}
+html:not(.dark) body #aeNotificationsDialog .ae-notification-entry.is-unread .ae-notification-dot{
+  background:#9b6239!important;
+  box-shadow:0 0 0 3px rgba(163,107,67,.13)!important;
+}
+html:not(.dark) body #aeNotificationsDialog .ae-notification-entry:hover,
+html:not(.dark) body #aeNotificationsDialog .ae-notification-entry:focus-visible{
+  background:#f2e5d7!important;
+}
+html:not(.dark) body #aeNotificationsDialog .ae-notifications-footer{
+  border-top-color:#e4d3c0!important;
+  background:linear-gradient(180deg,#fff9f2,#f4eadf)!important;
+}
+html:not(.dark) body #aeNotificationsDialog #aeNotificationsReadAll{
+  color:#79523b!important;
+  background:#fff9f1!important;
+  border-color:#c8a88d!important;
+}
+html:not(.dark) body #aeNotificationsDialog #aeNotificationsReadAll:hover{
+  background:#f2e3d2!important;
+}
+@media(max-width:760px){
+  html body #aeNotificationsDialog.ae-notifications-dialog{
+    top:max(12px,env(safe-area-inset-top))!important;
+    width:calc(100vw - 20px)!important;
+    max-width:calc(100vw - 20px)!important;
+    max-height:calc(100dvh - max(12px,env(safe-area-inset-top)) - 12px)!important;
+  }
+  html body #aeNotificationsDialog .ae-notifications-heading{
+    padding:10px 12px!important;
+  }
+  html body #aeNotificationsDialog .ae-notifications-heading h2{
+    font-size:23px!important;
+  }
+  html body #aeNotificationsDialog .ae-notifications-groups{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:8px!important;
+    padding:9px 9px 7px!important;
+  }
+  html body #aeNotificationsDialog .ae-notifications-group-heading{
+    flex-direction:column!important;
+    align-items:flex-start!important;
+    min-height:53px!important;
+    gap:1px!important;
+    padding:8px 9px!important;
+  }
+  html body #aeNotificationsDialog .ae-notifications-group-heading h3{
+    font-size:clamp(17px,4.5vw,20px)!important;
+  }
+  html body #aeNotificationsDialog .ae-notifications-group-heading p{
+    font-size:9px!important;
+  }
+  html body #aeNotificationsDialog .ae-notifications-group .ae-notifications-list{
+    height:clamp(144px,32dvh,252px)!important;
+    max-height:clamp(144px,32dvh,252px)!important;
+  }
+  html body #aeNotificationsDialog .ae-notifications-group .ae-notification-entry{
+    display:block!important;
+    position:relative!important;
+    min-height:0!important;
+    padding:10px 10px 10px 12px!important;
+  }
+  html body #aeNotificationsDialog .ae-notifications-group .ae-notification-event-icon{
+    display:none!important;
+  }
+  html body #aeNotificationsDialog .ae-notifications-group .ae-notification-text{
+    display:flex!important;
+    flex-direction:column!important;
+    width:100%!important;
+    gap:4px!important;
+    padding-right:9px!important;
+  }
+  html body #aeNotificationsDialog .ae-notifications-group .ae-notification-text strong{
+    font-size:11px!important;
+    line-height:1.32!important;
+  }
+  html body #aeNotificationsDialog .ae-notifications-group .ae-notification-text small,
+  html body #aeNotificationsDialog .ae-notifications-group .ae-notification-text time{
+    font-size:9.5px!important;
+  }
+  html body #aeNotificationsDialog .ae-notifications-group .ae-notification-dot{
+    top:12px!important;
+    right:8px!important;
+  }
+  html body #aeNotificationsDialog .ae-notifications-footer{
+    padding:9px 10px 10px!important;
+  }
+  html body #aeNotificationsDialog #aeNotificationsReadAll{
+    min-height:40px!important;
+    padding:8px 10px!important;
+    font-size:10px!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  html body #aeNotificationsDialog .ae-notification-entry{transition:none!important;}
+}
