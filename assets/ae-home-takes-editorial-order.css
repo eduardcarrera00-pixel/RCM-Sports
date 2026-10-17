@@ -205,7 +205,8 @@ html body #aeHomeTakeHighlights #aeHomeTakeHistoricTake .ae-discovery-empty{
 }
 
 /* AE SPORTS · Portada: Pick → NFL → Champions → Lo más leído. */
-html body #aeHomeSidebarFeatures[hidden]{display:none!important;}
+html body #aeHomeSidebarFeatures[hidden],html body.ae-is-home #aeHomeSidebarFeatures[hidden]{display:none!important;}
+html body.ae-is-home .editorial-layout>aside>*+*{margin-top:0!important;}
 html body.ae-is-home .editorial-layout>aside{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:18px!important;min-width:0!important;}
 html body.ae-is-home #aeHomeSidebarFeatures{display:flex!important;flex-direction:column!important;gap:16px!important;width:100%;min-width:0;}
 html body.ae-is-home #aeHomeSidebarFeatures>.editorial-ranking{display:block!important;box-sizing:border-box;width:100%;min-width:0;margin:0!important;}
