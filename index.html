@@ -548,6 +548,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/ae-home-rankings-vivid.css?v=20261016-1">
     <link rel="stylesheet" href="assets/ae-home-takes-editorial-order.css?v=20261016-takes-after-title-4">
     <link rel="stylesheet" href="assets/ae-take-rankings-best-take.css?v=20261016-1">
+    <link rel="stylesheet" href="assets/ae-weekly-odds-highlight.css?v=20261016-1">
 
 <style id="ae-home-news-carousel-styles">
 /* Noticias de portada: carrusel de desplazamiento nativo, sin duplicar publicaciones. */
@@ -776,7 +777,7 @@ html body.ae-is-home #aeHomeAllNewsButton.ae-news-all-button {
         </section>
         <section id="footballTakes" class="ae-takes ae-picks-editorial" hidden aria-labelledby="takesTitle">
           <section id="picksFeatured" class="ae-picks-feature" aria-labelledby="picksFeaturedTitle">
-            <div class="ae-picks-feature-label"><h3 id="picksFeaturedTitle">Pick de la Semana</h3>
+            <div class="ae-picks-feature-label"><div class="ae-weekly-heading-inline"><h3 id="picksFeaturedTitle">Pick de la Semana</h3><span id="aeWeeklyOddsHighlight" class="ae-weekly-odds-highlight" hidden></span></div>
               <button type="button" id="aeWeeklyEditButton" class="ae-weekly-edit-trigger" hidden aria-controls="aeWeeklyPickAdmin">Editar Pick de la Semana</button></div>
             <div id="picksFeaturedCard" aria-live="polite"><p>Cargando Pick editorial…</p></div>
           </section>
@@ -1378,9 +1379,6 @@ html:not(.dark) #aeAuthIntroNotice small{color:#5b6d76}
                     <button id="modalDeleteArticleBtn" type="button" onclick="deleteArticle(activeModalArticleId, event)" title="Eliminar publicación" aria-label="Eliminar publicación" class="hidden px-3 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-bold items-center gap-2 transition-colors">
                         <i class="fa-solid fa-trash-can"></i>
                         <span class="hidden sm:inline">Eliminar</span>
-                    </button>
-                    <button type="button" onclick="closeModal()" aria-label="Cerrar publicación" class="w-8 h-8 rounded-full bg-slate-200/60 text-slate-600 hover:text-slate-900 flex items-center justify-center transition-colors">
-                        <i class="fa-solid fa-xmark"></i>
                     </button>
                 </div>
             </div>
@@ -2744,7 +2742,7 @@ updateThemeButton();
 <script src="assets/ae-nfl-takes.js?v=20261015-3"></script>
 <script src="assets/free-takes.js?v=20261016-publication-gate-1"></script>
 <script src="assets/ae-take-rankings.js?v=20261016-best-take-1"></script>
-<script src="assets/ae-editorial-weekly.js?v=20261016-native-picks-final-1"></script>
+<script src="assets/ae-editorial-weekly.js?v=20261016-odds-heading-1"></script>
 <script src="assets/ae-profile.js?v=20261016-recent-odds-compact-1"></script>
 <script src="assets/ae-home-takes.js?v=20261016-movement-2"></script>
 <script src="assets/ae-home-take-discoveries.js?v=20261016-top10-community-1"></script>
