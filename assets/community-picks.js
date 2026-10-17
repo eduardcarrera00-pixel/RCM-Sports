@@ -175,7 +175,9 @@ function paintChefList(id,result,kind){
    return;
  }
  const scrollable=picks.length>1;
- target.classList.toggle('ae-chef-scroll',scrollable);
+ // Mantiene el mismo diseño fotográfico con una o varias posiciones.
+ // Solo habilitamos interacción de desplazamiento cuando hay más de un Pick.
+ target.classList.add('ae-chef-scroll');
  target.tabIndex=scrollable?0:-1;
  target.scrollTop=0;
  const heading=target.closest('.ae-chef-board')?.querySelector('.ae-picks-rail-heading');
