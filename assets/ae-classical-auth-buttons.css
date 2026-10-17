@@ -1304,7 +1304,8 @@ html:not(.dark) body #cpDialog .ae-cp-detail-conversation .cp-login-to-reply{
   min-height:171px!important;
   padding:18px 62px 19px 17px!important;
   background-size:cover,auto 100%!important;
-  background-position:center,right center!important;
+  /* En móviles se mantiene el chef visible, en vez de recortar solo el lado derecho. */
+  background-position:center,58% center!important;
  }
  html body #cpDialog .ae-cp-detail-hero-copy{max-width:265px!important;}
  html body #cpDialog .ae-cp-detail-hero-title{font-size:29px!important;}
