@@ -1,0 +1,55 @@
+/* AE SPORTS | Weekly Pick: quotation as information, not a call to action.
+   The ONLY odds label in the Picks hero sits beside the section heading. */
+html body #picksFeatured .ae-weekly-heading-inline {
+  display:flex!important;
+  align-items:baseline!important;
+  flex-wrap:wrap!important;
+  gap:7px 12px!important;
+  min-width:0;
+}
+html body #picksFeatured .ae-weekly-heading-inline #picksFeaturedTitle {
+  margin:0!important;
+  min-width:0;
+}
+html body #picksFeatured #aeWeeklyOddsHighlight[hidden] {
+  display:none!important;
+}
+html body #picksFeatured #aeWeeklyOddsHighlight {
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  flex:0 0 auto;
+  box-sizing:border-box;
+  min-height:27px;
+  padding:5px 9px!important;
+  margin:0!important;
+  border:1px solid rgba(220,176,117,.65)!important;
+  border-radius:0!important;
+  background:rgba(19,43,52,.72)!important;
+  box-shadow:none!important;
+  color:#f2d8b4!important;
+  font:700 11px/1.3 Inter,system-ui,sans-serif!important;
+  font-variant-numeric:tabular-nums;
+  letter-spacing:.035em;
+  white-space:nowrap;
+  text-decoration:none!important;
+  cursor:default!important;
+  pointer-events:none!important;
+}
+html:not(.dark) body #picksFeatured:not(:has(.ae-weekly-banner)) #aeWeeklyOddsHighlight {
+  background:#eee1cf!important;
+  border-color:#bd986e!important;
+  color:#543b2a!important;
+}
+@media(max-width:480px){
+  html body #picksFeatured .ae-weekly-heading-inline { gap:6px 9px!important; }
+  html body #picksFeatured #aeWeeklyOddsHighlight {
+    min-height:24px;
+    padding:4px 7px!important;
+    font-size:10px!important;
+  }
+}
+/* After relocating the badge, let the card title and selection use all of the hero width. */
+html body #picksFeaturedCard .ae-weekly-expand-summary {
+  grid-template-columns:minmax(0,1fr)!important;
+}
