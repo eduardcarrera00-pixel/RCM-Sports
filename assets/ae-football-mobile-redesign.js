@@ -100,7 +100,7 @@
       moveTo(trending, stage);
       if (trending) trending.hidden = false;
 
-      if (newsHeading?.querySelector('h2')) newsHeading.querySelector('h2').textContent = 'Noticias de Fútbol';
+      // El título interactivo lo actualiza renderArticlesFeed; no reemplazar su botón.
       if (byId('aeSportGeniosTitle')) byId('aeSportGeniosTitle').textContent = 'Respira fútbol';
       if (byId('aeSportAnoetosTitle')) byId('aeSportAnoetosTitle').textContent = 'Vende Humos';
 
