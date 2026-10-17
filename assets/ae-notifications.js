@@ -56,6 +56,11 @@
           : 'Notificaciones, ' + total + ' sin leer');
     const panel = $('aeNotificationsList');
     if (!panel || !dialog()?.open) return;
+    // Preserve the two readers' scroll positions when Realtime refreshes alerts.
+    const scrollPositions = new Map(
+      [...panel.querySelectorAll('[data-ae-notification-group]')]
+        .map(list=>[list.dataset.aeNotificationGroup,list.scrollTop])
+    );
     panel.replaceChildren();
     const reactionTypes = new Set(['take_vote','pick_vote','comment_vote','article_like']);
     const groups = [
@@ -96,6 +101,9 @@
       section.append(heading);
       const list = create('div',null,'ae-notifications-list');
       list.setAttribute('role','list');
+      list.dataset.aeNotificationGroup = group.id;
+      list.setAttribute('aria-label','Lista de '+group.title.toLowerCase());
+      list.tabIndex = 0;
       if (!group.items.length) {
         const empty = create('p',group.empty,'ae-notifications-empty');
         empty.setAttribute('role','listitem');
@@ -121,6 +129,7 @@
       }
       section.append(list);
       panel.append(section);
+      list.scrollTop = scrollPositions.get(group.id) || 0;
     }
     const all = $('aeNotificationsReadAll');
     all.disabled = total === 0;
