@@ -291,7 +291,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261016-mobile-photo-parity-2">
     <link rel="stylesheet" href="assets/ae-muted-navigation-icons.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-custom-nav-icons.css?v=20261016-1">
-<link rel="stylesheet" href="assets/ae-classical-auth-buttons.css?v=20261016-3">
+<link rel="stylesheet" href="assets/ae-classical-auth-buttons.css?v=20261017-alert-bell-1">
 <link rel="stylesheet" href="assets/ae-reference-community-design.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-mobile-header-ranking-polish.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-desktop-header-layout.css?v=20261016-1">
@@ -1229,6 +1229,17 @@ html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeRanking{
 
                     <!-- Guest State: User sign-in and registration -->
                     
+                    <button type="button" id="aeNotificationsButton" hidden
+                      aria-label="Notificaciones" aria-controls="aeNotificationsDialog" aria-haspopup="dialog"
+                      aria-expanded="false" title="Mis notificaciones">
+                      <svg class="ae-notifications-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                        <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/>
+                        <path d="M10 21h4"/>
+                      </svg>
+                      <span class="ae-notifications-caption" aria-hidden="true">Avisos</span>
+                      <span id="aeNotificationsBadge" class="ae-notifications-badge" hidden></span>
+                    </button>
                     <div id="readerSession" class="hidden rcm-row"></div>
                     <button id="aeMyTakesButton" type="button" hidden class="ae-profile-open ae-classical-auth-button ae-classical-profile" onclick="openAeProfile()" aria-label="Mi perfil: consultar mis Takes" title="Mi perfil"><img class="ae-classical-auth-art" src="assets/ui/ae-profile-mark.png?v=20261016-3" width="96" height="96" alt="" aria-hidden="true" decoding="async"><span class="ae-auth-caption" aria-hidden="true">Mi perfil</span></button>
                     <div id="guestAdminContainer">
@@ -1640,6 +1651,19 @@ html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeRanking{
 
 
     </main>
+
+<dialog id="aeNotificationsDialog" class="ae-notifications-dialog" aria-labelledby="aeNotificationsTitle">
+  <div class="ae-notifications-shell">
+    <header class="ae-notifications-heading">
+      <div><span class="ae-notifications-eyebrow">AE SPORTS · TU COMUNIDAD</span><h2 id="aeNotificationsTitle">Notificaciones</h2></div>
+      <button type="button" id="aeNotificationsClose" aria-label="Cerrar notificaciones">×</button>
+    </header>
+    <div class="ae-notifications-toolbar"><p id="aeNotificationsStatus" role="status" aria-live="polite"></p>
+      <button type="button" id="aeNotificationsReadAll">Marcar todas como leídas</button>
+    </div>
+    <div id="aeNotificationsList" class="ae-notifications-list" aria-live="polite"></div>
+  </div>
+</dialog>
 
 <dialog id="aeTakeComposerDialog" class="ae-take-composer-dialog" aria-labelledby="aeTakeComposerTitle" aria-describedby="aeTakeComposerIntro">
   <div class="ae-take-composer-shell">
@@ -3328,7 +3352,7 @@ updateThemeButton();
 <script src="assets/community.js?v=20261016-admin-header-1"></script>
 <script src="assets/ae-home-community-spotlight.js?v=20261016-1"></script>
 <script src="assets/champions.js?v=qa1-20261015-6"></script>
-<script src="assets/community-picks.js?v=20261016-direct-reply-and-layout-2"></script>
+<script src="assets/community-picks.js?v=20261017-notification-links-1"></script>
 <script src="assets/weekly-picks.js?v=20261015-1"></script>
 <script src="assets/username-auth.js?v=20261016-reply-login-1"></script>
 <script src="assets/ae-category-visibility.js?v=20261016-dynamic-nav-1"></script>
@@ -3350,6 +3374,7 @@ updateThemeButton();
 <script src="assets/ae-mobile-compact-home.js?v=20261016-top3-swipe-v1"></script>
 <script src="assets/ae-football-mobile-redesign.js?v=20261016-news-footer-1"></script>
 <script src="assets/ae-home-weekly-layout.js?v=20261017-trending-bottom-mobile-1"></script>
+<script src="assets/ae-notifications.js?v=20261017-1"></script>
 
 <script id="ae-home-news-carousel-motion">
 /* Movimiento ligero y reversible: sin clones, sin alterar enlaces, votos o artículos. */
