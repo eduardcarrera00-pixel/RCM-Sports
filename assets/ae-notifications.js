@@ -54,26 +54,73 @@
       total === 0 ? 'Notificaciones, ninguna sin leer'
         : total === 1 ? 'Notificaciones, 1 sin leer'
           : 'Notificaciones, ' + total + ' sin leer');
-    const list = $('aeNotificationsList');
-    if (!list || !dialog()?.open) return;
-    list.replaceChildren();
-    if (!alerts.length) {
-      list.append(create('p','Todavía no tienes notificaciones.','ae-notifications-empty'));
-    }
-    for (const item of alerts) {
-      const action = create('button',null,'ae-notification-entry'+(item.read_at?'':' is-unread'));
-      action.type = 'button';
-      const icon = create('span',item.event_key.includes('vote') ? (item.vote_value === -1 ? '▼' : '▲') :
-        item.event_key === 'article_like' ? '♥' : '↩','ae-notification-event-icon');
-      icon.setAttribute('aria-hidden','true');
-      const content = create('span',null,'ae-notification-text');
-      content.append(create('strong',label(item)),create('small',item.context_title || 'Publicación de AE SPORTS'));
-      content.append(create('time',dateLabel(item.created_at)));
-      const dot = create('span',null,'ae-notification-dot');
-      dot.setAttribute('aria-hidden','true');
-      action.append(icon,content,dot);
-      action.addEventListener('click',()=>void openItem(item));
-      list.append(action);
+    const panel = $('aeNotificationsList');
+    if (!panel || !dialog()?.open) return;
+    panel.replaceChildren();
+    const reactionTypes = new Set(['take_vote','pick_vote','comment_vote','article_like']);
+    const groups = [
+      {
+        id:'aeNotificationsReactionsTitle',
+        title:'Reacciones',
+        subtitle:'Votos y me gusta',
+        items:alerts.filter(item=>reactionTypes.has(item.event_key)),
+        empty:'Todavía no has recibido reacciones.'
+      },
+      {
+        id:'aeNotificationsCommentsTitle',
+        title:'Comentarios',
+        subtitle:'Respuestas a tus publicaciones',
+        items:alerts.filter(item=>!reactionTypes.has(item.event_key)),
+        empty:'Todavía no has recibido comentarios.'
+      }
+    ];
+    // Two independent editorial lists, with the same global unread counter.
+    for (const group of groups) {
+      const section = create('section',null,'ae-notifications-group');
+      section.setAttribute('aria-labelledby',group.id);
+      const heading = create('header',null,'ae-notifications-group-heading');
+      const headingText = create('div',null,'ae-notifications-group-titles');
+      const title = create('h3',group.title);
+      title.id = group.id;
+      headingText.append(title,create('p',group.subtitle));
+      heading.append(headingText);
+      const pending = group.items.filter(item=>!item.read_at).length;
+      if (pending) {
+        const count = create('span',
+          pending === 1 ? '1 nuevo' : pending+' nuevos',
+          'ae-notifications-group-pending');
+        count.setAttribute('aria-label',
+          pending === 1 ? '1 aviso sin leer' : pending+' avisos sin leer');
+        heading.append(count);
+      }
+      section.append(heading);
+      const list = create('div',null,'ae-notifications-list');
+      list.setAttribute('role','list');
+      if (!group.items.length) {
+        const empty = create('p',group.empty,'ae-notifications-empty');
+        empty.setAttribute('role','listitem');
+        list.append(empty);
+      }
+      for (const item of group.items) {
+        const row = create('div',null,'ae-notification-row');
+        row.setAttribute('role','listitem');
+        const action = create('button',null,'ae-notification-entry'+(item.read_at?'':' is-unread'));
+        action.type = 'button';
+        const icon = create('span',item.event_key.includes('vote') ? (item.vote_value === -1 ? '▼' : '▲') :
+          item.event_key === 'article_like' ? '♥' : '↩','ae-notification-event-icon');
+        icon.setAttribute('aria-hidden','true');
+        const content = create('span',null,'ae-notification-text');
+        content.append(create('strong',label(item)),create('small',item.context_title || 'Publicación de AE SPORTS'));
+        content.append(create('time',dateLabel(item.created_at)));
+        const dot = create('span',null,'ae-notification-dot');
+        dot.setAttribute('aria-hidden','true');
+        action.append(icon,content,dot);
+        action.addEventListener('click',()=>void openItem(item));
+        row.append(action);
+        list.append(row);
+      }
+      section.append(list);
+      panel.append(section);
     }
     const all = $('aeNotificationsReadAll');
     all.disabled = total === 0;
