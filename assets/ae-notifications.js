@@ -89,15 +89,7 @@
       title.id = group.id;
       headingText.append(title,create('p',group.subtitle));
       heading.append(headingText);
-      const pending = group.items.filter(item=>!item.read_at).length;
-      if (pending) {
-        const count = create('span',
-          pending === 1 ? '1 nuevo' : pending+' nuevos',
-          'ae-notifications-group-pending');
-        count.setAttribute('aria-label',
-          pending === 1 ? '1 aviso sin leer' : pending+' avisos sin leer');
-        heading.append(count);
-      }
+      // El encabezado solo nombra la lista; los avisos sin leer resaltan individualmente.
       section.append(heading);
       const list = create('div',null,'ae-notifications-list');
       list.setAttribute('role','list');
