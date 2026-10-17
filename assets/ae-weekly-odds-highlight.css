@@ -2,7 +2,7 @@
    The ONLY odds label in the Picks hero sits beside the section heading. */
 html body #picksFeatured .ae-weekly-heading-inline {
   display:flex!important;
-  align-items:baseline!important;
+  align-items:center!important;
   flex-wrap:wrap!important;
   gap:7px 12px!important;
   min-width:0;
