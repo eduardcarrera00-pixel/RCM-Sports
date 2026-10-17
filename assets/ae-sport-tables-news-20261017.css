@@ -3,6 +3,11 @@
    la cabecera, con la misma jerarquía en NFL y Fútbol. */
 
 /* El encabezado es el único CTA del archivo en las páginas deportivas. */
+/* Otras categorías siguen enseñando su título convencional. */
+html body:not(.ae-is-nfl):not(.ae-is-football) #mainContent #aeNewsPlainTitle:not([hidden]) {
+  display:inline!important;
+}
+
 html body #aeSportNewsHeadingLink[hidden],
 html body #aeNewsPlainTitle[hidden],
 html body #aeSportAllNewsFooter[hidden] {display:none!important;}
