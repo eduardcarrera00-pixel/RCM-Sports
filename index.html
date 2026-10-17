@@ -325,7 +325,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/ae-home-weekly-match-picks-mobile.css?v=20261016-mobile-photo-parity-2">
 <link rel="stylesheet" href="assets/ae-mobile-home-takes-swipe-and-football-news.css?v=20261016-top3-swipe-v1">
 <link rel="stylesheet" href="assets/ae-article-floating-close.css?v=20261016-1">
-<link rel="stylesheet" href="assets/ae-sport-news-headings.css?v=20261016-nfl-restored-footer-3">
+<link rel="stylesheet" href="assets/ae-sport-news-headings.css?v=20261016-nfl-news-corrected-4">
 <link rel="stylesheet" href="assets/ae-visible-sports-responsive-nav.css?v=20261016-reflow-1">
 <style id="ae-home-weekly-reference-mobile">
 /* Mobile home now hosts the ORIGINAL #picksFeatured element from Picks.
@@ -1119,11 +1119,7 @@ html body.ae-is-home #aeHomeAllNewsButton.ae-news-all-button {
           
         </section>
 
-        <section id="aeNflLatestComments" hidden aria-labelledby="aeNflLatestCommentsTitle">
-          <h2 id="aeNflLatestCommentsTitle">Últimos comentarios</h2>
-          <p id="aeNflLatestCommentsStatus" role="status" aria-live="polite"></p>
-          <div id="aeNflLatestCommentsList"></div>
-        </section>
+        <!-- Se retira el listado agregado de últimos comentarios; los comentarios de las noticias siguen disponibles. -->
 
 
     </main>
@@ -1498,6 +1494,11 @@ html:not(.dark) #aeAuthIntroNotice small{color:#5b6d76}
                     <div id="modalCommentsList" class="space-y-3">
                         <!-- Comments JS Injected -->
                     </div>
+                </div>
+                <div class="ae-article-all-news-footer">
+                    <button id="aeArticleAllNewsCta" type="button" class="ae-news-all-button" onclick="closeModal(); window.aeOpenNewsArchive?.('Todas', document.activeElement)">
+                        Todas las noticias <span aria-hidden="true">→</span>
+                    </button>
                 </div>
 
             </div>
@@ -2066,7 +2067,6 @@ currentUser = {
             document.getElementById('footballTakes').hidden = currentCategory !== 'Picks';
             if (typeof renderCommunityPicksVisibility === 'function') renderCommunityPicksVisibility();
             if (typeof renderFreeTakesVisibility === 'function') renderFreeTakesVisibility();
-            window.refreshAeNflLatestComments?.();
             // Un único botón de publicación debajo del feed en NFL y Fútbol.
             const sportTakeCta = document.getElementById('aeSportTakePublish');
             const sportTakeHeader = document.querySelector('#freeTakes > .ae-takes-head');
@@ -2802,7 +2802,7 @@ updateThemeButton();
 <script src="assets/ae-profile.js?v=20261016-recent-odds-compact-1"></script>
 <script src="assets/ae-home-takes.js?v=20261016-movement-2"></script>
 <script src="assets/ae-home-take-discoveries.js?v=20261016-top10-community-1"></script>
-<script src="assets/ae-nfl-latest-comments.js?v=20261016-football-2"></script>
+
 <script src="assets/ae-sport-top-takes.js?v=20261016-top-two-debates-1"></script>
 <script src="assets/ae-take-replies.js?v=20261016-reply-login-1"></script>
 <script src="assets/ae-take-category-edit.js?v=20261016-1"></script>
