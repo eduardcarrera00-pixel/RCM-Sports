@@ -1,4 +1,4 @@
-/* AE SPORTS · Portada: Genios (tres líderes) y Anoetos (cola del ranking).
+/* AE SPORTS · Portada: tablas Top 10 Genios y Anoetos (fuera del podio).
    Puntos de Takes combinados NFL + Fútbol, revisados por administradores. */
 (() => {
   'use strict';
@@ -12,7 +12,12 @@
   let period='all',loading=false,pending=false,sequence=0,lastLoad=0;
 
   function empty(list,text){
-    if(list)list.replaceChildren(el('li',text,'ae-top-takes-empty ae-points-empty'));
+    if(!list)return;
+    const row=el('tr');
+    const cell=el('td',text,'ae-points-table-empty');
+    cell.colSpan=3;
+    row.append(cell);
+    list.replaceChildren(row);
   }
   function movementBadge(m){
     const change=el('span',null,'ae-rank-change');
@@ -37,47 +42,47 @@
     change.title=change.getAttribute('aria-label');
     return change;
   }
+  // Fila de tabla: se conservan el perfil, los movimientos, el mejor Take
+  // y el historial de aciertos; sólo cambia la presentación.
   function leader(r,side,movement){
-    const item=el('li',null,'ae-top-take ae-points-take');
-    item.dataset.side=side;
-    const content=el('div',null,'ae-top-take-content');
-    const headline=el('div',null,'ae-points-headline');
-    headline.append(el('span',String(r.rank_number||'').padStart(2,'0'),'ae-points-position'));
+    const row=el('tr',null,'ae-points-table-row');
+    row.dataset.side=side;
+    const place=el('td');
+    place.append(el('span',String(r.rank_number||'').padStart(2,'0'),'ae-points-rank'));
+
+    const player=el('td');
     const user=el('button','@'+(r.username||'Aficionado'),'ae-points-user');
     user.type='button';
     user.setAttribute('aria-label','Ver perfil y Takes de '+(r.username||'Aficionado'));
     user.addEventListener('click',()=>window.openAePublicProfile?.(r.user_id));
-    headline.append(user);
-    const badges=el('span',null,'ae-points-badges');
-    badges.append(el('strong',Number(r.points||0)+' pts','ae-points-total'));
-    badges.append(movementBadge(movement));
-    headline.append(badges);
-    content.append(headline);
-
+    player.append(user);
     if(r.best_take_title){
-      const best=el('div',null,'ae-points-best');
-      best.append(el('span','Mejor Take · +'+Number(r.best_take_points||0)+' pts','ae-points-best-kicker'));
-      best.append(el('p',r.best_take_title,'ae-points-best-title'));
-      if(r.best_take_excerpt)best.append(el('p',r.best_take_excerpt,'ae-points-best-excerpt'));
-      content.append(best);
+      const best=el('span',null,'ae-points-best-mini');
+      const kicker=el('strong','Mejor Take · +'+Number(r.best_take_points||0)+' pts · ');
+      best.append(kicker,document.createTextNode(r.best_take_title));
+      if(r.best_take_excerpt)best.title=r.best_take_excerpt;
+      player.append(best);
     }else{
-      content.append(el('p','Todavía no tiene Takes acertados en este periodo.','ae-points-best-excerpt'));
+      player.append(el('span','Sin Take acertado todavía','ae-points-best-mini'));
     }
-    const count=Number(r.correct_takes||0)+' aciertos · '+Number(r.total_resolved||0)+' resueltos';
-    content.append(el('span',count,'ae-points-count'));
-    item.append(content);
-    return item;
+    player.append(el('span',Number(r.correct_takes||0)+' aciertos · '+Number(r.total_resolved||0)+' resueltos','ae-points-resolved'));
+
+    const score=el('td');
+    score.append(el('strong',Number(r.points||0)+' pts','ae-points-total'));
+    score.append(movementBadge(movement));
+    row.append(place,player,score);
+    return row;
   }
   function paint(data,movements){
     const byUser=new Map((Array.isArray(movements)?movements:[]).map(m=>[m.user_id,m]));
     const best=$('aeTopTakesPositive'),worst=$('aeTopTakesNegative');
     const rows=Array.isArray(data)?data:[];
-    const top=rows.filter(x=>x?.side==='genios').sort((a,b)=>Number(a.rank_number)-Number(b.rank_number)).slice(0,3);
+    const top=rows.filter(x=>x?.side==='genios').sort((a,b)=>Number(a.rank_number)-Number(b.rank_number)).slice(0,10);
     const tail=rows.filter(x=>x?.side==='anoetos').sort((a,b)=>Number(a.rank_number)-Number(b.rank_number)).slice(0,10);
     if(top.length)best.replaceChildren(...top.map(r=>leader(r,'genios',byUser.get(r.user_id))));
     else empty(best,'Todavía no hay Takes puntuados en este periodo.');
     if(tail.length)worst.replaceChildren(...tail.map(r=>leader(r,'anoetos',byUser.get(r.user_id))));
-    else empty(worst,'No hay más participantes puntuados fuera del Top 3.');
+    else empty(worst,'No hay participantes puntuados fuera del podio todavía.');
     const status=$('aeTopTakesStatus');
     if(status)status.textContent='';
   }
