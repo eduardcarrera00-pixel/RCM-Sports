@@ -435,8 +435,8 @@ html.dark [data-reading-size][aria-pressed="true"] {
    Published Top 10, ranking editors, sport sections and desktop stay unchanged.
    Specific selectors override older mobile display:grid !important rules. */
 @media (max-width:760px) {
-  html body.ae-is-home #editorialBottom #homeRankingList > li:nth-child(n+4),
-  html body.ae-is-home #editorialBottom #homeChampionsList > li:nth-child(n+4) {
+  html body.ae-is-home #aeHomeSidebarFeatures #homeRankingList > li:nth-child(n+4),
+  html body.ae-is-home #aeHomeSidebarFeatures #homeChampionsList > li:nth-child(n+4) {
     display:none!important;
   }
 }
@@ -546,7 +546,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/ae-take-rankings-palette.css?v=20261016-duel-3">
 <link rel="stylesheet" href="assets/ae-home-takes-restructure.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-home-rankings-vivid.css?v=20261016-1">
-    <link rel="stylesheet" href="assets/ae-home-takes-editorial-order.css?v=20261016-1">
+    <link rel="stylesheet" href="assets/ae-home-takes-editorial-order.css?v=20261016-home-order-2">
     <link rel="stylesheet" href="assets/ae-take-rankings-best-take.css?v=20261016-1">
 
 <style id="ae-home-news-carousel-styles">
@@ -890,22 +890,6 @@ html body.ae-is-home #mainContent #articlesGrid.ae-home-news-carousel:focus-visi
                 </div>
 
                 <div id="editorialBottom" class="editorial-bottom">
-            <section class="rcm-panel editorial-ranking" aria-labelledby="homeRankingTitle">
-                <a href="#nflRankings" id="homeRankingLink" class="ae-ranking-card-link" onclick="event.preventDefault(); openNflTopTen();" aria-label="Abrir clasificación completa NFL Power Rankings, Top 10">
-                    <div class="editorial-module-heading"><h2 id="homeRankingTitle">NFL Power Rankings <span id="homeRankingEdition"></span></h2><span class="ae-ranking-link-arrow" aria-hidden="true"><svg class="ae-ranking-open-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M7 17 17 7M8 7h9v9"/></svg></span></div>
-                    <p id="homeRankingStatus" role="status">Cargando ranking…</p>
-                    <ol id="homeRankingList" class="editorial-ranking-list"></ol>
-                    <span class="ae-ranking-hint">Selecciona para ver el Top 10 <span aria-hidden="true">→</span></span>
-                </a>
-            </section>
-            <section class="rcm-panel editorial-ranking" aria-labelledby="homeChampionsTitle">
-                <a href="#championsRankings" id="homeChampionsLink" class="ae-ranking-card-link" onclick="event.preventDefault(); openChampionsTopTen();" aria-label="Abrir clasificación completa Champions League, Top 10">
-                    <div class="editorial-module-heading"><h2 id="homeChampionsTitle">Champions League <span id="homeChampionsEdition"></span></h2><span class="ae-ranking-link-arrow" aria-hidden="true"><svg class="ae-ranking-open-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M7 17 17 7M8 7h9v9"/></svg></span></div>
-                    <p id="homeChampionsStatus" role="status">Comprobando ediciones publicadas…</p>
-                    <ol id="homeChampionsList" class="editorial-ranking-list"></ol>
-                    <span class="ae-ranking-hint">Selecciona para ver el Top 10 <span aria-hidden="true">→</span></span>
-                </a>
-            </section>
             <div id="aeHomeTakeHighlights" class="ae-home-take-highlights">
             <div class="ae-home-take-extras" aria-label="Destacados de Takes">
                 <section id="aeHomeTakesPopular" class="ae-home-take-feature ae-vote-column is-positive" aria-labelledby="aeHomeTakesPositiveTitle">
@@ -917,16 +901,10 @@ html body.ae-is-home #mainContent #articlesGrid.ae-home-news-carousel:focus-visi
                   <ol id="aeHomeTakesNegativeList" class="ae-discovery-list" aria-live="polite"><li class="ae-discovery-empty">Cargando Takes…</li></ol>
                 </section>
             <section id="aeHomeTopTakes" aria-labelledby="aeHomeTopTakesTitle">
-              <div class="ae-top-takes-heading ae-takes-banner">
-                <div><h2 id="aeHomeTopTakesTitle">Demuestra tu conocimiento</h2></div>
-                <div class="ae-top-takes-heading-side">
-                  <div class="ae-home-take-cta-line">
-                    <span class="ae-home-take-nudge">TÚ DECIDES <span aria-hidden="true">→</span></span>
-                    <button id="aeHomeTakePublish" onclick="event.stopImmediatePropagation(); if(typeof window.aeOpenTakeComposer==='function'){window.aeOpenTakeComposer();}else{const modal=document.getElementById('aeTakeComposerDialog');if(modal&&!modal.open)modal.showModal();}" type="button" class="ae-participate-cta ae-home-take-publish" aria-controls="aeTakeComposerDialog">Publicar mi Take</button>
-                  </div>
-                  <p id="aeTopTakesStatus" class="sr-only" role="status" aria-live="polite">Cargando los Takes destacados…</p>
-                </div>
-              </div>
+              <header class="ae-top-takes-heading ae-takes-section-title">
+                <h2 id="aeHomeTopTakesTitle">Demuestra tu conocimiento</h2>
+                <p id="aeTopTakesStatus" class="sr-only" role="status" aria-live="polite">Cargando los Takes destacados…</p>
+              </header>
               <div class="ae-points-period" role="group" aria-label="Periodo de la clasificación por puntos de Takes">
                 <button type="button" data-home-take-period="month" aria-pressed="false">Mensual</button>
                 <button type="button" data-home-take-period="all" aria-pressed="true">Histórico</button>
@@ -950,6 +928,7 @@ html body.ae-is-home #mainContent #articlesGrid.ae-home-news-carousel:focus-visi
                   </div>
                   <div id="aeHomeTakeHistoricTake" aria-live="polite"><p class="ae-discovery-empty">Cargando Take…</p></div>
                 </section>
+                <div class="ae-home-take-bottom-cta"><button id="aeHomeTakePublish" onclick="event.stopImmediatePropagation(); if(typeof window.aeOpenTakeComposer==='function'){window.aeOpenTakeComposer();}else{const modal=document.getElementById('aeTakeComposerDialog');if(modal&&!modal.open)modal.showModal();}" type="button" class="ae-participate-cta ae-home-take-publish" aria-controls="aeTakeComposerDialog">Publicar mi Take</button></div>
               </div>
             </div>
         </div>
@@ -964,6 +943,28 @@ html body.ae-is-home #mainContent #articlesGrid.ae-home-news-carousel:focus-visi
                     <div id="cpWeekly" aria-live="polite"><p>Cargando nuestra selección…</p></div></div>
                 </section>
 
+                <div id="aeHomeSidebarFeatures" class="ae-home-sidebar-features" hidden>
+            <section class="rcm-panel editorial-ranking" aria-labelledby="homeRankingTitle">
+                <a href="#nflRankings" id="homeRankingLink" class="ae-ranking-card-link" onclick="event.preventDefault(); openNflTopTen();" aria-label="Abrir clasificación completa NFL Power Rankings, Top 10">
+                    <div class="editorial-module-heading"><h2 id="homeRankingTitle">NFL Power Rankings <span id="homeRankingEdition"></span></h2><span class="ae-ranking-link-arrow" aria-hidden="true"><svg class="ae-ranking-open-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M7 17 17 7M8 7h9v9"/></svg></span></div>
+                    <p id="homeRankingStatus" role="status">Cargando ranking…</p>
+                    <ol id="homeRankingList" class="editorial-ranking-list"></ol>
+                    <span class="ae-ranking-hint">Selecciona para ver el Top 10 <span aria-hidden="true">→</span></span>
+                </a>
+            </section>
+            <section class="rcm-panel editorial-ranking" aria-labelledby="homeChampionsTitle">
+                <a href="#championsRankings" id="homeChampionsLink" class="ae-ranking-card-link" onclick="event.preventDefault(); openChampionsTopTen();" aria-label="Abrir clasificación completa Champions League, Top 10">
+                    <div class="editorial-module-heading"><h2 id="homeChampionsTitle">Champions League <span id="homeChampionsEdition"></span></h2><span class="ae-ranking-link-arrow" aria-hidden="true"><svg class="ae-ranking-open-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M7 17 17 7M8 7h9v9"/></svg></span></div>
+                    <p id="homeChampionsStatus" role="status">Comprobando ediciones publicadas…</p>
+                    <ol id="homeChampionsList" class="editorial-ranking-list"></ol>
+                    <span class="ae-ranking-hint">Selecciona para ver el Top 10 <span aria-hidden="true">→</span></span>
+                </a>
+            </section>
+        <section class="rcm-panel editorial-trending" aria-labelledby="trendingTitle" hidden>
+    <div class="ae-section-heading"><span class="ae-overline">LA COMUNIDAD LEE</span><h2 id="trendingTitle">Lo más leído</h2></div>
+    <ol id="trendingList" class="ae-trending-list" aria-live="polite"></ol>
+</section>
+                </div>
         <section class="rcm-panel editorial-community" aria-labelledby="communityTitle"><div class="ae-section-heading"><h2 id="communityTitle">Opinadores distinguidos</h2></div><div id="communityLeaders" aria-live="polite">Cargando comentarios destacados…</div></section>
         <section id="aeSportTakeLeaders" class="ae-sport-voice ae-sport-chefs" hidden aria-label="Takes más apoyados y más cuestionados de la comunidad">
           <p id="aeSportTakeStatus" class="sr-only" role="status" aria-live="polite">Cargando Takes…</p>
@@ -978,10 +979,6 @@ html body.ae-is-home #mainContent #articlesGrid.ae-home-news-carousel:focus-visi
             </section>
           </div>
         </section>
-        <section class="rcm-panel editorial-trending" aria-labelledby="trendingTitle" hidden>
-    <div class="ae-section-heading"><span class="ae-overline">LA COMUNIDAD LEE</span><h2 id="trendingTitle">Lo más leído</h2></div>
-    <ol id="trendingList" class="ae-trending-list" aria-live="polite"></ol>
-</section>
                 <!-- Interactive Daily Poll Widget -->
                 <div hidden class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm grass-glow relative overflow-hidden">
                     <div class="flex items-center space-x-2 text-pitch-600 text-xs font-bold uppercase tracking-widest mb-3">
@@ -2007,6 +2004,7 @@ currentUser = {
             if (typeof renderFreeTakesVisibility === 'function') renderFreeTakesVisibility();
             window.refreshAeNflLatestComments?.();
             const isPicksPage = currentCategory === 'Picks';
+            document.getElementById('aeHomeSidebarFeatures').hidden = currentCategory !== 'Todos' || Boolean(currentSearchQuery);
             document.getElementById('heroSection').hidden = isPicksPage;
             document.getElementById('noResults').hidden = isPicksPage;
             document.getElementById('articlesGrid').hidden = isPicksPage;
@@ -2730,7 +2728,7 @@ updateThemeButton();
 <script src="assets/ae-news-archive.js?v=20261016-framing-zoom-3"></script>
 <script src="assets/ae-mobile-compact-home.js?v=20261016-top3-swipe-v1"></script>
 <script src="assets/ae-football-mobile-redesign.js?v=20261016-nfl-savant-rookie-restored-1"></script>
-<script src="assets/ae-home-weekly-layout.js?v=20261016-native-picks-final-1"></script>
+<script src="assets/ae-home-weekly-layout.js?v=20261016-home-sidebar-2"></script>
 
 <script id="ae-home-news-carousel-motion">
 /* Movimiento ligero y reversible: sin clones, sin alterar enlaces, votos o artículos. */
