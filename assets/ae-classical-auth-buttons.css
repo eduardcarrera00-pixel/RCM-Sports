@@ -994,3 +994,329 @@ html:not(.dark) body #aeNotificationsDialog #aeNotificationsReadAll:hover{
 @media(prefers-reduced-motion:reduce){
   html body #aeNotificationsDialog .ae-notification-entry{transition:none!important;}
 }
+
+/* AE SPORTS · Detalle de un Pick, una receta deportiva.
+   Fondos originales de un solo chef; ningún dato gastronómico o apuesta de ejemplo.
+   Aislado al diálogo real de community-picks.js para no alterar el feed. */
+html body dialog#cpDialog.ae-cp-detail-dialog{
+ --ae-chef-surface:#102b3d;
+ --ae-chef-paper:#183647;
+ --ae-chef-ink:#f5eadd;
+ --ae-chef-muted:#c3d1d2;
+ --ae-chef-border:rgba(203,171,136,.35);
+ --ae-chef-bronze:#d6a778;
+ box-sizing:border-box!important;
+ position:fixed!important;inset:0!important;
+ width:min(840px,calc(100vw - 26px))!important;
+ max-width:840px!important;
+ height:auto!important;max-height:min(90dvh,920px)!important;
+ margin:auto!important;padding:0!important;
+ overflow-x:hidden!important;overflow-y:auto!important;
+ overscroll-behavior:contain!important;
+ border:1px solid #b78b67!important;border-radius:0!important;
+ background:var(--ae-chef-surface)!important;
+ color:var(--ae-chef-ink)!important;
+ box-shadow:0 25px 85px rgba(2,12,21,.59)!important;
+ z-index:99999!important;
+}
+html body dialog#cpDialog:not([open]){display:none!important;}
+html body dialog#cpDialog::backdrop{background:rgba(5,17,27,.77);backdrop-filter:blur(5px);}
+html body #cpDialog>.ae-cp-detail-close{
+ position:sticky!important;top:12px!important;z-index:8!important;
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ float:right!important;
+ width:44px!important;height:44px!important;min-height:44px!important;
+ padding:0!important;margin:12px 12px -56px 0!important;
+ border:1px solid rgba(231,192,148,.74)!important;border-radius:0!important;
+ background:rgba(8,30,42,.88)!important;color:#fff0db!important;
+ box-shadow:0 5px 15px #04172269!important;
+ font:400 26px/1 Inter,system-ui,sans-serif!important;
+ cursor:pointer!important;
+}
+html body #cpDialog>.ae-cp-detail-close:focus-visible,
+html body #cpDialog button:focus-visible,
+html body #cpDialog a:focus-visible,
+html body #cpDialog textarea:focus-visible{
+ outline:2px solid #dcb385!important;outline-offset:3px!important;
+}
+html body #cpDialog .ae-cp-detail-hero{
+ position:relative!important;
+ display:flex!important;align-items:end!important;
+ min-height:200px!important;
+ padding:26px clamp(18px,4vw,35px)!important;
+ box-sizing:border-box!important;
+ border-bottom:2px solid #bb8c67!important;
+ background-color:#142c3a!important;
+ background-image:linear-gradient(90deg,rgba(8,25,37,.96) 0%,rgba(9,27,39,.91) 34%,rgba(11,31,41,.34) 77%,rgba(11,31,41,.14) 100%),url("./ae-pick-chef-night.webp")!important;
+ background-position:center,right center!important;
+ background-repeat:no-repeat!important;
+ background-size:cover,cover!important;
+ overflow:hidden!important;
+}
+html body #cpDialog .ae-cp-detail-hero::after{
+ content:"";position:absolute;inset:0;pointer-events:none;
+ background:linear-gradient(0deg,rgba(4,21,33,.32),transparent 65%);
+}
+html body #cpDialog .ae-cp-detail-hero-copy{position:relative;z-index:1;max-width:390px;}
+html body #cpDialog .ae-cp-detail-kicker,
+html body #cpDialog .ae-cp-detail-overline{
+ display:block;color:#e4b787!important;
+ font:800 10px/1.4 Inter,system-ui,sans-serif!important;
+ letter-spacing:.16em!important;text-transform:uppercase!important;
+}
+html body #cpDialog .ae-cp-detail-hero-title{
+ margin:7px 0!important;
+ color:#fff1df!important;
+ font:600 clamp(30px,5vw,47px)/1.08 Newsreader,Georgia,serif!important;
+ letter-spacing:-.025em!important;
+}
+html body #cpDialog .ae-cp-detail-hero-note{
+ margin:0!important;
+ color:#f1ddd0!important;
+ font:500 12px/1.5 Inter,system-ui,sans-serif!important;
+}
+html body #cpDialog .ae-cp-detail-content{
+ display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+ gap:22px!important;
+ padding:23px clamp(17px,3.8vw,32px) 30px!important;
+ background:
+ radial-gradient(ellipse at 98% 0%,rgba(173,118,78,.14),transparent 55%),
+ var(--ae-chef-surface)!important;
+ color:var(--ae-chef-ink)!important;
+}
+html body #cpDialog .ae-cp-detail-forecast{min-width:0!important;}
+html body #cpDialog .ae-cp-detail-overline{margin:0 0 10px 1px!important;}
+html body #cpDialog .cp-card.cp-card-detail{
+ margin:0!important;
+ padding:clamp(16px,3vw,24px)!important;
+ overflow:visible!important;
+ border:1px solid var(--ae-chef-border)!important;
+ border-top:3px solid #bf8e66!important;
+ border-radius:0!important;
+ background:linear-gradient(135deg,rgba(39,75,88,.48),rgba(15,45,60,.81))!important;
+ box-shadow:0 10px 27px #06182528!important;
+ color:var(--ae-chef-ink)!important;
+}
+html body #cpDialog .cp-card-detail .cp-card-header{
+ display:flex!important;flex-wrap:wrap!important;align-items:center!important;
+ gap:7px 13px!important;
+ margin:0 0 13px!important;
+ color:var(--ae-chef-muted)!important;
+ font:600 11px/1.4 Inter,system-ui,sans-serif!important;
+}
+html body #cpDialog .cp-detail-author{
+ min-height:36px!important;margin:0!important;padding:7px 10px!important;
+ border:1px solid var(--ae-chef-border)!important;
+ border-radius:0!important;background:rgba(188,145,107,.10)!important;
+ color:var(--ae-chef-ink)!important;
+ font-weight:750!important;font-size:12px!important;
+ cursor:pointer!important;
+}
+html body #cpDialog .cp-event-date,
+html body #cpDialog .cp-result-badge{
+ color:var(--ae-chef-muted)!important;
+ font:700 11px/1.4 Inter,system-ui,sans-serif!important;
+}
+html body #cpDialog .cp-card-detail .cp-card-title{
+ margin:8px 0 16px!important;
+ font:600 clamp(25px,4vw,37px)/1.16 Newsreader,Georgia,serif!important;
+}
+html body #cpDialog .cp-card-detail .cp-card-title a{
+ color:var(--ae-chef-ink)!important;
+ text-decoration:none!important;
+ pointer-events:none!important;
+}
+html body #cpDialog .cp-card-detail .cp-card-legs{
+ display:grid!important;
+ grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr))!important;
+ gap:10px!important;margin:0 0 15px!important;
+}
+html body #cpDialog .cp-card-detail .cp-card-legs p{
+ display:flex!important;flex-direction:column!important;gap:8px!important;
+ margin:0!important;padding:13px 15px!important;
+ border:1px solid var(--ae-chef-border)!important;
+ border-left:3px solid #c8956b!important;
+ background:rgba(7,29,41,.25)!important;
+ color:var(--ae-chef-ink)!important;
+}
+html body #cpDialog .cp-card-detail .cp-leg-event{
+ color:var(--ae-chef-muted)!important;
+ font:600 11px/1.4 Inter,system-ui,sans-serif!important;
+}
+html body #cpDialog .cp-card-detail .cp-leg-selection{
+ color:var(--ae-chef-ink)!important;
+ font:700 16px/1.4 Inter,system-ui,sans-serif!important;
+}
+html body #cpDialog .cp-card-detail .cp-card-odds{
+ display:flex!important;flex-wrap:wrap!important;gap:8px 15px!important;
+ align-items:center!important;margin:13px 0!important;
+}
+html body #cpDialog .cp-card-detail .cp-odds{
+ display:inline-flex!important;align-items:center!important;justify-content:center!important;
+ margin:0!important;padding:9px 13px!important;
+ border:1px solid #b38b68!important;
+ background:#ac7d56!important;
+ color:#fff8ed!important;
+ font:800 14px/1.2 Inter,system-ui,sans-serif!important;
+ letter-spacing:.01em!important;
+}
+html body #cpDialog .cp-card-detail .cp-card-state{
+ margin:0!important;color:var(--ae-chef-muted)!important;
+ font:500 11px/1.5 Inter,system-ui,sans-serif!important;
+}
+html body #cpDialog .cp-card-detail .cp-explanation{
+ margin:14px 0!important;padding:13px 15px!important;
+ background:rgba(149,128,107,.09)!important;
+ border-left:2px solid rgba(212,165,117,.7)!important;
+ color:var(--ae-chef-ink)!important;
+ font:400 14px/1.65 Inter,system-ui,sans-serif!important;
+}
+html body #cpDialog .cp-card-detail .cp-actions{
+ display:flex!important;align-items:center!important;flex-wrap:wrap!important;
+ gap:10px!important;
+ margin-top:17px!important;padding-top:14px!important;
+ border-top:1px solid var(--ae-chef-border)!important;
+}
+html body #cpDialog .cp-card-detail .cp-actions button,
+html body #cpDialog .ae-cp-detail-conversation button{
+ display:inline-flex!important;align-items:center!important;justify-content:center!important;
+ min-height:42px!important;padding:9px 13px!important;
+ border:1px solid var(--ae-chef-border)!important;
+ border-radius:0!important;
+ background:rgba(177,144,110,.12)!important;
+ color:var(--ae-chef-ink)!important;
+ font:700 12px/1.3 Inter,system-ui,sans-serif!important;
+ cursor:pointer!important;
+}
+html body #cpDialog .cp-card-detail .cp-actions button[aria-pressed="true"]{
+ background:#a97b55!important;color:white!important;border-color:#dbad85!important;
+}
+html body #cpDialog .cp-card-detail .cp-actions button:disabled{opacity:.52!important;cursor:not-allowed!important;}
+html body #cpDialog .ae-cp-detail-conversation{
+ min-width:0!important;
+ padding:4px 0 0!important;
+ border-top:1px solid var(--ae-chef-border)!important;
+}
+html body #cpDialog .cp-detail-replies-heading{
+ margin:13px 0 16px!important;padding:0!important;border:0!important;
+ font:600 clamp(25px,4vw,31px)/1.2 Newsreader,Georgia,serif!important;
+ color:var(--ae-chef-ink)!important;
+}
+html body #cpDialog .cp-comment{
+ display:grid!important;
+ gap:9px!important;
+ margin:0 0 10px!important;
+ padding:16px!important;
+ border:1px solid var(--ae-chef-border)!important;
+ border-left:2px solid rgba(210,161,109,.75)!important;
+ background:rgba(29,61,75,.40)!important;
+ color:var(--ae-chef-ink)!important;
+}
+html body #cpDialog .cp-comment strong{font:800 12px/1.3 Inter,system-ui,sans-serif!important;color:var(--ae-chef-bronze)!important;}
+html body #cpDialog .cp-comment p{margin:0!important;color:var(--ae-chef-ink)!important;font:400 13px/1.58 Inter,system-ui,sans-serif!important;}
+html body #cpDialog .cp-comment small{color:var(--ae-chef-muted)!important;font:500 11px/1.4 Inter,system-ui,sans-serif!important;}
+html body #cpDialog .cp-comment button{justify-self:start!important;}
+html body #cpDialog .ae-cp-detail-empty{
+ padding:15px!important;
+ border:1px dashed var(--ae-chef-border)!important;
+ color:var(--ae-chef-muted)!important;
+ font:500 12px/1.5 Inter,system-ui,sans-serif!important;
+}
+html body #cpDialog .ae-cp-detail-conversation form{
+ display:grid!important;gap:11px!important;margin:16px 0 0!important;
+ padding:16px!important;border:1px solid var(--ae-chef-border)!important;
+ background:rgba(23,50,63,.42)!important;
+}
+html body #cpDialog .ae-cp-detail-conversation form label{
+ display:block!important;margin:0!important;
+ color:var(--ae-chef-ink)!important;
+ font:700 12px/1.4 Inter,system-ui,sans-serif!important;
+}
+html body #cpDialog .ae-cp-detail-conversation textarea{
+ width:100%!important;min-height:98px!important;
+ box-sizing:border-box!important;
+ margin:9px 0 0!important;padding:12px!important;
+ border:1px solid var(--ae-chef-border)!important;border-radius:0!important;
+ background:rgba(9,30,42,.90)!important;
+ color:var(--ae-chef-ink)!important;
+ font:400 13px/1.5 Inter,system-ui,sans-serif!important;
+}
+html body #cpDialog .ae-cp-detail-conversation .cp-login-to-reply{
+ margin:3px 0 0!important;
+ background:#ac7d56!important;color:#fff8ec!important;
+}
+html body #cpDialog .ae-cp-detail-loading{
+ margin:22px!important;padding:20px!important;
+ color:var(--ae-chef-ink)!important;
+ font:600 13px/1.5 Inter,system-ui,sans-serif!important;
+}
+html:not(.dark) body dialog#cpDialog.ae-cp-detail-dialog{
+ --ae-chef-surface:#f5eee4;
+ --ae-chef-paper:#fffaf3;
+ --ae-chef-ink:#293f4b;
+ --ae-chef-muted:#536873;
+ --ae-chef-border:#dccbbb;
+ --ae-chef-bronze:#80553a;
+ background:#f5eee4!important;
+ border-color:#bc9474!important;
+}
+html:not(.dark) body #cpDialog .ae-cp-detail-hero{
+ background-color:#f5eadd!important;
+ background-image:linear-gradient(90deg,rgba(249,241,231,.98) 0%,rgba(250,242,232,.88) 36%,rgba(250,242,232,.15) 78%,rgba(250,242,232,.04) 100%),url("./ae-pick-chef-day.webp")!important;
+}
+html:not(.dark) body #cpDialog .ae-cp-detail-hero::after{
+ background:linear-gradient(0deg,rgba(244,229,212,.23),transparent 65%);
+}
+html:not(.dark) body #cpDialog .ae-cp-detail-kicker{color:#80553a!important;}
+html:not(.dark) body #cpDialog .ae-cp-detail-hero-title{color:#293f4b!important;}
+html:not(.dark) body #cpDialog .ae-cp-detail-hero-note{color:#49616b!important;}
+html:not(.dark) body #cpDialog .ae-cp-detail-content{
+ background:radial-gradient(ellipse at 97% 0%,rgba(180,140,102,.13),transparent 58%),#f5eee4!important;
+}
+html:not(.dark) body #cpDialog .cp-card.cp-card-detail{
+ background:linear-gradient(150deg,#fffbf6,#f7f1e8)!important;
+ box-shadow:0 9px 24px rgba(72,44,25,.06)!important;
+}
+html:not(.dark) body #cpDialog .cp-card-detail .cp-card-legs p{background:#f7efe4!important;}
+html:not(.dark) body #cpDialog .cp-card-detail .cp-explanation{background:#f7ece0!important;}
+html:not(.dark) body #cpDialog .cp-comment{background:#fffbf6!important;}
+html:not(.dark) body #cpDialog .ae-cp-detail-conversation form{background:#fffaf3!important;}
+html:not(.dark) body #cpDialog .ae-cp-detail-conversation textarea{
+ background:white!important;color:#293f4b!important;
+}
+html:not(.dark) body #cpDialog .cp-detail-author,
+html:not(.dark) body #cpDialog .ae-cp-detail-conversation button,
+html:not(.dark) body #cpDialog .cp-card-detail .cp-actions button{
+ background:#f5e9db!important;color:#334b56!important;
+}
+html:not(.dark) body #cpDialog .cp-card-detail .cp-actions button[aria-pressed="true"]{
+ background:#a97b55!important;color:white!important;
+}
+html:not(.dark) body #cpDialog .ae-cp-detail-conversation .cp-login-to-reply{
+ background:#a97b55!important;color:#fff!important;
+}
+@media(max-width:600px){
+ html body dialog#cpDialog.ae-cp-detail-dialog{
+  width:calc(100vw - 16px)!important;max-width:calc(100vw - 16px)!important;
+  max-height:calc(100dvh - max(16px,env(safe-area-inset-top)) - max(12px,env(safe-area-inset-bottom)))!important;
+ }
+ html body #cpDialog .ae-cp-detail-hero{
+  min-height:171px!important;
+  padding:18px 62px 19px 17px!important;
+  background-size:cover,auto 100%!important;
+  background-position:center,right center!important;
+ }
+ html body #cpDialog .ae-cp-detail-hero-copy{max-width:265px!important;}
+ html body #cpDialog .ae-cp-detail-hero-title{font-size:29px!important;}
+ html body #cpDialog .ae-cp-detail-hero-note{font-size:11px!important;}
+ html body #cpDialog .ae-cp-detail-content{padding:16px 12px 24px!important;gap:19px!important;}
+ html body #cpDialog .cp-card.cp-card-detail{padding:14px!important;}
+ html body #cpDialog .cp-card-detail .cp-card-title{font-size:26px!important;}
+ html body #cpDialog .cp-card-detail .cp-card-legs{grid-template-columns:minmax(0,1fr)!important;}
+ html body #cpDialog .cp-card-detail .cp-odds{font-size:13px!important;}
+ html body #cpDialog .cp-comment{padding:13px!important;}
+ html body #cpDialog>.ae-cp-detail-close{margin:9px 9px -53px 0!important;}
+}
+@media(prefers-reduced-motion:reduce){
+ html body #cpDialog button{transition:none!important;animation:none!important;}
+}
