@@ -9,13 +9,26 @@
     const homePreview = document.querySelector('.editorial-layout aside .editorial-pick');
     const hero = document.getElementById('heroSection');
     const sidebarFeatures = document.getElementById('aeHomeSidebarFeatures');
-    if(!featured || !homePreview || !hero || !sidebarFeatures || !featured.parentNode || !sidebarFeatures.parentNode) return;
+    const main = document.getElementById('mainContent');
+    const trending = document.querySelector('.editorial-trending');
+    if(!featured || !homePreview || !hero || !sidebarFeatures || !main || !trending || !featured.parentNode || !sidebarFeatures.parentNode) return;
 
     // Mark the native Picks component's permanent location without cloning it.
     const picksAnchor = document.createComment('Pick de la Semana · posición original en Picks');
     featured.parentNode.insertBefore(picksAnchor, featured);
     const sidebarAnchor = document.createComment('Rankings de portada · posición original en la columna derecha');
     sidebarFeatures.parentNode.insertBefore(sidebarAnchor, sidebarFeatures);
+    // Same Lo más leído element and article buttons on phone and desktop.
+    const trendingAnchor = document.createComment('Lo más leído · ubicación original de escritorio');
+    if(sidebarFeatures.contains(trending)) trending.parentNode.insertBefore(trendingAnchor,trending);
+    else sidebarFeatures.appendChild(trendingAnchor);
+    // Keep the <aside> ancestor used by desktop-specific editorial styling.
+    const trendingMobileFooter = document.createElement('aside');
+    trendingMobileFooter.id = 'aeHomeTrendingMobileFooter';
+    trendingMobileFooter.className = 'ae-home-trending-mobile-footer';
+    trendingMobileFooter.setAttribute('aria-label','Lo más leído');
+    trendingMobileFooter.hidden = true;
+    main.appendChild(trendingMobileFooter);
     const mobile = window.matchMedia('(max-width: 760px)');
     const onMobileHome = () => mobile.matches && document.body.classList.contains('ae-is-home');
 
@@ -23,6 +36,9 @@
       if(onMobileHome()){
         if(featured.previousElementSibling !== hero) hero.insertAdjacentElement('afterend',featured);
         if(sidebarFeatures.previousElementSibling !== featured) featured.insertAdjacentElement('afterend',sidebarFeatures);
+        // Relocate the REAL module after all mobile Home content, never copy it.
+        if(trending.parentElement !== trendingMobileFooter) trendingMobileFooter.appendChild(trending);
+        trendingMobileFooter.hidden = false;
         featured.classList.add('ae-home-native-picks');
         featured.setAttribute('role','link');
         featured.setAttribute('tabindex','0');
@@ -35,6 +51,11 @@
         if(sidebarAnchor.parentNode && sidebarAnchor.nextSibling !== sidebarFeatures){
           sidebarAnchor.parentNode.insertBefore(sidebarFeatures,sidebarAnchor.nextSibling);
         }
+        // All other tabs and desktop restore the original sidebar order.
+        if(trendingAnchor.parentNode && trendingAnchor.nextSibling !== trending){
+          trendingAnchor.parentNode.insertBefore(trending,trendingAnchor.nextSibling);
+        }
+        trendingMobileFooter.hidden = true;
         featured.classList.remove('ae-home-native-picks');
         featured.removeAttribute('role');
         featured.removeAttribute('tabindex');
@@ -65,7 +86,12 @@
     },true);
 
     sync();
-    const observer = new MutationObserver(sync);
+    const observer = new MutationObserver(() => {
+      sync();
+      // Football's mobile page restores shared nodes on an animation frame.
+      // Apply Home placement after that work so switching tabs stays reliable.
+      requestAnimationFrame(sync);
+    });
     observer.observe(document.body,{attributes:true,attributeFilter:['class']});
     if(mobile.addEventListener) mobile.addEventListener('change',sync);
     else if(mobile.addListener) mobile.addListener(sync);
