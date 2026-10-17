@@ -388,6 +388,15 @@ async function showDetail(id,options={}){
  }
  }catch(e){dialog.replaceChildren(button('Cerrar',closeDetail),el('p',message(e)));}
 }
+// Route an alert directly into its Pick without reloading or creating another dialog.
+window.aeOpenPickDetail=(id)=>{
+  if(!/^[0-9a-f-]{36}$/i.test(String(id)))return;
+  const url=new URL(location.href);
+  url.searchParams.delete('article');
+  url.searchParams.set('pick',String(id));
+  history.pushState({pick:id},'',url.toString());
+  void showDetail(String(id));
+};
 window.renderCommunityPicksVisibility=()=>{const root=$('communityPicks');if(!root)return;root.hidden=currentCategory!=='Picks';if(!root.hidden&&!loaded)load();};
 function syncPickComposer(){
  const open=Boolean($('cpComposePanel')?.open);
