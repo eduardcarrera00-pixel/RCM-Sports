@@ -335,20 +335,53 @@ async function loadArchive(){
 }
 function closeArchive(){const dialog=$('cpArchiveDialog');if(dialog?.open)dialog.close();}
 function closeDetail(){const d=$('cpDialog');if(d?.open)d.close();}
+function pickDetailClose(){
+ const close=button('×',closeDetail);
+ close.className='ae-cp-detail-close';
+ close.setAttribute('aria-label','Cerrar Pick');
+ close.setAttribute('title','Cerrar publicación');
+ return close;
+}
+function pickDetailHero(p){
+ const hero=el('header',null,'ae-cp-detail-hero');
+ hero.dataset.pickSport=(p.legs||[]).some(l=>/nfl|americano/i.test(l.sport||''))?'nfl':'football';
+ const copy=el('div',null,'ae-cp-detail-hero-copy');
+ copy.append(
+   el('span','AE SPORTS · LA COCINA DE PICKS','ae-cp-detail-kicker'),
+   el('h2','La receta del Chef','ae-cp-detail-hero-title'),
+   el('p','Un pronóstico deportivo. Tu lectura del partido.','ae-cp-detail-hero-note')
+ );
+ hero.append(copy);
+ return hero;
+}
 async function showDetail(id,options={}){
  if(!/^[0-9a-f-]{36}$/i.test(id))return;
- let dialog=$('cpDialog');if(!dialog){dialog=el('dialog',null,'rcm-dialog cp-dialog');dialog.id='cpDialog';dialog.setAttribute('aria-label','Pick y respuestas');document.body.append(dialog);dialog.addEventListener('close',()=>{dialog.remove();const u=new URL(location.href);u.searchParams.delete('pick');history.replaceState({},'',u);});}
- dialog.replaceChildren(button('Cerrar',closeDetail),el('p','Cargando Pick…'));if(!dialog.open)dialog.showModal();
+ let dialog=$('cpDialog');if(!dialog){dialog=el('dialog',null,'rcm-dialog cp-dialog ae-cp-detail-dialog');dialog.id='cpDialog';dialog.setAttribute('aria-label','Pick y respuestas');document.body.append(dialog);dialog.addEventListener('close',()=>{dialog.remove();const u=new URL(location.href);u.searchParams.delete('pick');history.replaceState({},'',u);});}
+ dialog.classList.add('ae-cp-detail-dialog');
+ dialog.replaceChildren(pickDetailClose(),el('p','Cargando Pick…','ae-cp-detail-loading'));if(!dialog.open)dialog.showModal();
  try{const [pick,comments,session]=await Promise.all([db.from('ae_pick_feed').select('*').eq('id',id).maybeSingle(),db.from('ae_pick_comments').select('*').eq('pick_id',id).eq('hidden',false).order('created_at').limit(200),db.auth.getUser().catch(()=>({data:{user:null}}))]);
  if(!dialog.isConnected||new URL(location.href).searchParams.get('pick')!==id)return;
- if(pick.error||comments.error)throw pick.error||comments.error;dialog.replaceChildren(button('Cerrar',closeDetail));if(!pick.data){dialog.append(el('p','Este Pick no está disponible.'));return;}dialog.append(card(pick.data,false,true));
- const heading=el('h3','Respuestas · '+Number(pick.data.comments_count||comments.data.length),'cp-detail-replies-heading');dialog.append(heading);
+ if(pick.error||comments.error)throw pick.error||comments.error;
+ dialog.replaceChildren(pickDetailClose());
+ if(!pick.data){dialog.append(el('p','Este Pick no está disponible.','ae-cp-detail-loading'));return;}
+ const hero=pickDetailHero(pick.data);
+ const content=el('div',null,'ae-cp-detail-content');
+ const forecast=el('section',null,'ae-cp-detail-forecast');
+ forecast.setAttribute('aria-label','Pronóstico del chef');
+ forecast.append(el('span','EL PRONÓSTICO','ae-cp-detail-overline'),card(pick.data,false,true));
+ content.append(forecast);
+ const conversation=el('section',null,'ae-cp-detail-conversation');
+ conversation.setAttribute('aria-label','Conversación del Pick');
+ const heading=el('h3','La conversación · '+Number(pick.data.comments_count||comments.data.length),'cp-detail-replies-heading');
+ conversation.append(heading);
+ content.append(conversation);
+ dialog.append(hero,content);
  const replyStatus=el('p',''),form=el('form'),body=field('Tu comentario','textarea');body.input.maxLength=2000;let parent=null;
  const cancel=button('Cancelar respuesta',()=>{parent=null;replyStatus.textContent='';cancel.hidden=true;});cancel.hidden=true;
  const names=new Map(comments.data.map(c=>[c.id,c.author]));
- for(const c of comments.data){const item=el('article',null,'cp-comment');item.append(el('strong',c.author));if(c.parent_id)item.append(el('small','En respuesta a '+(names.get(c.parent_id)||'un comentario anterior')));item.append(el('p',c.body));item.append(button('Responder',()=>{void requestPickReply(id,c.id,closeDetail,body.input.value);}));if(currentAdmin)item.append(button('Ocultar comentario',async()=>{const r=await db.from('ae_pick_comments').update({hidden:true}).eq('id',c.id);if(r.error)notifyCommunity(message(r.error),true);else showDetail(id);}));dialog.append(item);}
- if(!comments.data.length)dialog.append(el('p','Abre la conversación.'));
- if(comments.data.length===200)dialog.append(el('p','Se muestran los primeros 200 comentarios.'));
+ for(const c of comments.data){const item=el('article',null,'cp-comment');item.append(el('strong',c.author));if(c.parent_id)item.append(el('small','En respuesta a '+(names.get(c.parent_id)||'un comentario anterior')));item.append(el('p',c.body));const replyAction=button('Responder',()=>{void requestPickReply(id,c.id,closeDetail,body.input.value);});replyAction.classList.add('ae-cp-comment-reply');item.append(replyAction);if(currentAdmin)item.append(button('Ocultar comentario',async()=>{const r=await db.from('ae_pick_comments').update({hidden:true}).eq('id',c.id);if(r.error)notifyCommunity(message(r.error),true);else showDetail(id);}));conversation.append(item);}
+ if(!comments.data.length)conversation.append(el('p','Todavía no hay respuestas. Puedes abrir la conversación.','ae-cp-detail-empty'));
+ if(comments.data.length===200)conversation.append(el('p','Se muestran los primeros 200 comentarios.'));
  const send=el('button','Enviar respuesta');
  send.type='submit';
  form.append(replyStatus,cancel,body.wrap,send);
@@ -368,7 +401,7 @@ async function showDetail(id,options={}){
   }catch(e){notifyCommunity(message(e),true);}finally{send.disabled=false;}
  };
  if(session.data?.user){
-  dialog.append(form);
+  conversation.append(form);
   if(options.focusComposer){
    if(options.parentId&&names.has(options.parentId)){
     parent=options.parentId;
@@ -384,9 +417,9 @@ async function showDetail(id,options={}){
   const reply=button('Responder',()=>{void requestPickReply(id,null,closeDetail);});
   reply.className='cp-login-to-reply';
   reply.setAttribute('aria-label','Responder a este Pick');
-  dialog.append(reply);
+  conversation.append(reply);
  }
- }catch(e){dialog.replaceChildren(button('Cerrar',closeDetail),el('p',message(e)));}
+ }catch(e){dialog.replaceChildren(pickDetailClose(),el('p',message(e),'ae-cp-detail-loading'));}
 }
 // Route an alert directly into its Pick without reloading or creating another dialog.
 window.aeOpenPickDetail=(id)=>{
