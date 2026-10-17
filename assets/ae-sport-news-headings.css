@@ -124,6 +124,7 @@ html body.ae-is-nfl #freeTakes.ae-free-takes[data-sport="nfl"] #aeNflTakeFooterC
   justify-content:center!important;
   align-items:center!important;
   min-width:min(245px,100%)!important;
+  max-width:none!important;
   min-height:44px!important;
   width:auto!important;
   margin:0!important;
@@ -168,7 +169,7 @@ html:not(.dark) body.ae-is-nfl #aeSportTakeRanking.ae-nfl-standalone-ranking .ae
 html:not(.dark) body.ae-is-nfl #aeSportTakeRanking.ae-nfl-standalone-ranking .ae-take-ranking-count{color:#536575!important;}
 
 /* NFL Power Rankings ya muestra movimientos; no añadir una etiqueta de semana redundante. */
-html body.ae-is-nfl #nflRankings #rankingEdition{display:none!important;}
+html body.ae-is-nfl #nflRankings #rankingEdition.ae-rank-edition{display:none!important;}
 
 /* Acceso a todas las noticias tras los comentarios y la barra de compartir, en cualquier artículo. */
 html body #articleModal .ae-article-all-news-footer{
