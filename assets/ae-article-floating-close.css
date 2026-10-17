@@ -323,3 +323,32 @@ html body #articleModal .ae-article-floating-close .ae-article-close-label{
     padding-right:91px!important;
   }
 }
+
+/* ae-article-modal-layer-fix-20261017
+   The mobile site header uses z-index:10000; the Tailwind article reader
+   previously remained at z-50. On Safari the header obscured the story's
+   toolbar and close button, especially after opening from a scrolled feed.
+   Elevate the entire dialog, not merely its child close button (a child
+   cannot escape an ancestor stacking context). */
+html body #articleModal:not(.hidden) {
+  position:fixed!important;
+  z-index:20000!important;
+  isolation:isolate!important;
+}
+/* Authentication and editor overlays must still appear ABOVE the reader
+   when invoked from comments or editorial controls. */
+html body:has(#articleModal:not(.hidden)) #userAuthModal:not(.hidden),
+html body:has(#articleModal:not(.hidden)) #publishModal:not(.hidden) {
+  z-index:21000!important;
+}
+@media(max-width:760px) {
+  html body #articleModal:not(.hidden) {
+    top:0!important;
+    inset:0!important;
+    max-height:100dvh!important;
+    z-index:20000!important;
+  }
+  html body #articleModal:not(.hidden)>button.ae-article-floating-close {
+    z-index:21!important;
+  }
+}
