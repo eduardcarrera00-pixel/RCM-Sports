@@ -8,17 +8,21 @@
     const featured = document.getElementById('picksFeatured');
     const homePreview = document.querySelector('.editorial-layout aside .editorial-pick');
     const hero = document.getElementById('heroSection');
-    if(!featured || !homePreview || !hero || !featured.parentNode) return;
+    const sidebarFeatures = document.getElementById('aeHomeSidebarFeatures');
+    if(!featured || !homePreview || !hero || !sidebarFeatures || !featured.parentNode || !sidebarFeatures.parentNode) return;
 
     // Mark the native Picks component's permanent location without cloning it.
     const picksAnchor = document.createComment('Pick de la Semana · posición original en Picks');
     featured.parentNode.insertBefore(picksAnchor, featured);
+    const sidebarAnchor = document.createComment('Rankings de portada · posición original en la columna derecha');
+    sidebarFeatures.parentNode.insertBefore(sidebarAnchor, sidebarFeatures);
     const mobile = window.matchMedia('(max-width: 760px)');
     const onMobileHome = () => mobile.matches && document.body.classList.contains('ae-is-home');
 
     function sync(){
       if(onMobileHome()){
         if(featured.previousElementSibling !== hero) hero.insertAdjacentElement('afterend',featured);
+        if(sidebarFeatures.previousElementSibling !== featured) featured.insertAdjacentElement('afterend',sidebarFeatures);
         featured.classList.add('ae-home-native-picks');
         featured.setAttribute('role','link');
         featured.setAttribute('tabindex','0');
@@ -27,6 +31,9 @@
         // Restore the SAME node (and its real contents/events) to the Picks tab.
         if(picksAnchor.parentNode && picksAnchor.nextSibling !== featured){
           picksAnchor.parentNode.insertBefore(featured,picksAnchor.nextSibling);
+        }
+        if(sidebarAnchor.parentNode && sidebarAnchor.nextSibling !== sidebarFeatures){
+          sidebarAnchor.parentNode.insertBefore(sidebarFeatures,sidebarAnchor.nextSibling);
         }
         featured.classList.remove('ae-home-native-picks');
         featured.removeAttribute('role');
