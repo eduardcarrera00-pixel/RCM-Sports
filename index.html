@@ -690,6 +690,33 @@ html body.ae-is-home #aeHomeAllNewsButton.ae-news-all-button {
   }
 }
 </style>
+
+<style id="ae-cocina-day-variant">
+/* Cocina Picks: arte original en noche, nueva versión marfil/bronce en día.
+   Ambos son imágenes decorativas dentro del mismo botón; no altera su JS. */
+html body #footballTakes #communityPicks #cpPublishCta.ae-cocina-art img.ae-cocina-day {
+  display:none!important;
+}
+html:not(.dark) body #footballTakes #communityPicks #cpPublishCta.ae-cocina-art img.ae-cocina-night {
+  display:none!important;
+}
+html:not(.dark) body #footballTakes #communityPicks #cpPublishCta.ae-cocina-art img.ae-cocina-day {
+  display:block!important;
+  filter:none!important;
+  mix-blend-mode:normal!important;
+  clip-path:none!important;
+  border:0!important;
+  box-shadow:none!important;
+}
+html:not(.dark) body #footballTakes #communityPicks #cpPublishCta.ae-cocina-art:hover img.ae-cocina-day {
+  filter:brightness(1.035) saturate(1.03)!important;
+}
+html:not(.dark) body #footballTakes #communityPicks #cpPublishCta.ae-cocina-art:focus-visible {
+  outline:2px solid #93663f!important;
+  outline-offset:3px!important;
+  border-radius:3px!important;
+}
+</style>
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 <a class="ae-skip-link" href="#mainContent">Ir al contenido</a>
@@ -839,7 +866,7 @@ html body.ae-is-home #aeHomeAllNewsButton.ae-news-all-button {
               <div class="ae-picks-feed-heading">
                  <div class="ae-picks-heading-cta-row">
                    <span class="ae-picks-nudge">¿Eres Chef?</span>
-                   <button id="cpPublishCta" type="button" class="ae-participate-cta ae-picks-publish-cta ae-cocina-art" aria-label="Cocina Picks: inicia sesión o crea una cuenta para publicar tu pronóstico" aria-controls="cpComposePanel" aria-haspopup="dialog" aria-expanded="false"><img src="assets/ae-cocina-picks-button.webp" alt="" width="2048" height="512" decoding="async"></button>
+                   <button id="cpPublishCta" type="button" class="ae-participate-cta ae-picks-publish-cta ae-cocina-art" aria-label="Cocina Picks: inicia sesión o crea una cuenta para publicar tu pronóstico" aria-controls="cpComposePanel" aria-haspopup="dialog" aria-expanded="false"><img class="ae-cocina-night" src="assets/ae-cocina-picks-button.webp" alt="" width="2048" height="512" decoding="async"><img class="ae-cocina-day" src="assets/ae-cocina-picks-button-day.webp" alt="" width="400" height="100" decoding="async"></button>
                  </div>
                  <h3 id="cpTitle" class="sr-only">Picks de la comunidad</h3>
                  
