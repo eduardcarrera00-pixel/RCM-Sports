@@ -1,5 +1,5 @@
 /* AE SPORTS · Refinamiento editorial de Takes: 16 oct 2026.
- * La portada se lee: Popular / Unpopular → Demuestra tu conocimiento → Récord.
+ * La portada se lee: Demuestra tu conocimiento → Genios / Anoetos → Popular / Unpopular → Récord.
  * Reutiliza las imágenes de la identidad AE SPORTS ya guardadas en assets/. */
 
 /* Quitar la línea vertical antes de ambos encabezados; mantener módulos separados. */
@@ -16,8 +16,8 @@ html body #aeHomeTakeHighlights > .ae-home-take-extras > :is(#aeHomeTakesPopular
   content:none!important;
 }
 
-/* Reubicar toda la sección de Genios/Anoetos entre las dos tablas de votos
-   y el destacado histórico, sin tocar votaciones ni las clasificaciones. */
+/* Genios/Anoetos aparecen antes de los dos paneles de votos,
+   sin tocar las votaciones ni las clasificaciones. */
 html body #aeHomeTakeHighlights > .ae-home-take-extras > #aeHomeTopTakes {
   display:block!important;
   grid-column:1/-1!important;
@@ -233,7 +233,7 @@ html body.ae-is-home #aeHomeTakeHighlights .ae-home-take-bottom-cta #aeHomeTakeP
 }
 @media(prefers-reduced-motion:reduce){html body.ae-is-home #aeHomeTakeHighlights .ae-home-take-bottom-cta #aeHomeTakePublish{transition:none!important;}}
 
-/* Sección editorial: título, dos Takes populares, clasificaciones por puntos. */
+/* Sección editorial: título, clasificaciones por puntos, Takes populares. */
 html body.ae-is-home #aeHomeTakeHighlights>.ae-home-take-extras>#aeHomeTakesSectionHeading{
   grid-column:1/-1!important;
   grid-row:auto!important;
