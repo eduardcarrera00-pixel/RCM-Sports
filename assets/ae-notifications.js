@@ -45,11 +45,15 @@
     return new Intl.DateTimeFormat('es',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}).format(date);
   }
   function paint(unread) {
+    // Display absolutely nothing around the bell if there are no unread alerts.
+    const total = Math.max(0, Number(unread) || 0);
     const badge = $('aeNotificationsBadge');
-    badge.hidden = unread === 0;
-    badge.textContent = unread > 99 ? '99+' : String(unread);
+    badge.hidden = total === 0;
+    badge.textContent = total === 0 ? '' : total > 99 ? '99+' : String(total);
     $('aeNotificationsButton').setAttribute('aria-label',
-      unread === 1 ? 'Notificaciones, 1 sin leer' : 'Notificaciones, ' + unread + ' sin leer');
+      total === 0 ? 'Notificaciones, ninguna sin leer'
+        : total === 1 ? 'Notificaciones, 1 sin leer'
+          : 'Notificaciones, ' + total + ' sin leer');
     const list = $('aeNotificationsList');
     if (!list || !dialog()?.open) return;
     list.replaceChildren();
@@ -72,8 +76,8 @@
       list.append(action);
     }
     const all = $('aeNotificationsReadAll');
-    all.disabled = unread === 0;
-    all.hidden = unread === 0;
+    all.disabled = total === 0;
+    all.hidden = total === 0;
   }
 
   async function refresh() {
