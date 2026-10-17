@@ -1186,6 +1186,7 @@ html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeRanking{
   }
 }
 </style>
+<link rel="stylesheet" href="assets/ae-article-actions-conversation.css?v=20261017-1">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 <a class="ae-skip-link" href="#mainContent">Ir al contenido</a>
@@ -1961,27 +1962,32 @@ html:not(.dark) #aeAuthIntroNotice small{color:#5b6d76}
     </div>
 </section>
 
-                <div class="flex items-center justify-between py-4 border-y border-slate-100">
-                    <button id="modalLikeBtn" onclick="toggleLikeModal()" class="flex items-center space-x-2 px-5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 hover:text-red-500 hover:border-red-200 transition-all">
-                        <i id="modalLikeIcon" class="fa-regular fa-heart text-base"></i>
-                        <span id="modalLikeCount" class="font-bold text-xs">0</span>
-                        <span class="text-xs">Me gusta</span>
+                <div class="ae-article-actions" role="group" aria-label="Acciones de la noticia">
+                    <button id="modalLikeBtn" type="button" onclick="toggleLikeModal()" class="ae-article-action ae-article-like" aria-label="Me gusta">
+                        <i id="modalLikeIcon" class="fa-regular fa-heart" aria-hidden="true"></i>
+                        <span id="modalLikeCount" class="ae-like-count">0</span>
+                        <span class="ae-action-label">Me gusta</span>
                     </button>
-
-                    <div class="flex flex-wrap gap-2 items-center">
-                        <span class="text-xs text-slate-400 mr-1">Compartir:</span>
-                        <button type="button" onclick="shareArticle(this)" class="px-3 h-9 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 hover:text-pitch-600 transition-colors" title="Compartir publicación" aria-label="Compartir publicación">
-                            <i class="fa-solid fa-link text-xs" aria-hidden="true"></i><span class="ml-1">Compartir</span>
-                        </button><button type="button" onclick="copyShareLink(this)" class="rcm-button">Copiar enlace</button><button id="editArticleButton" type="button" onclick="openArticleEditor()" class="rcm-button hidden">Editar publicación</button>
-                    </div>
+                    <button type="button" onclick="shareArticle(this)" class="ae-article-action ae-article-share" title="Compartir noticia" aria-label="Compartir noticia">
+                        <i class="fa-solid fa-share-nodes" aria-hidden="true"></i>
+                        <span class="ae-action-label">Compartir</span>
+                    </button>
+                    <button type="button" onclick="copyShareLink(this)" class="ae-article-action ae-article-copy" aria-label="Copiar enlace de la noticia">
+                        <i class="fa-solid fa-link" aria-hidden="true"></i>
+                        <span class="ae-action-label">Copiar enlace</span>
+                    </button>
+                    <button id="editArticleButton" type="button" onclick="openArticleEditor()" class="rcm-button ae-article-edit-action hidden">Editar publicación</button>
                 </div>
 
-                <div class="ae-conversation space-y-6 pt-2">
-                    <p class="ae-overline">EL DEBATE CONTINÚA</p>
-                    <h3 class="text-lg font-bold text-slate-900 flex items-center">
-                        <i class="fa-solid fa-comments text-pitch-600 mr-2"></i>
-                        Comentarios (<span id="modalCommentCount">0</span>)
-                    </h3>
+                <section class="ae-conversation" aria-labelledby="aeConversationTitle">
+                    <div class="ae-conversation-hero">
+                        <p class="ae-overline">EL DEBATE CONTINÚA</p>
+                        <h3 id="aeConversationTitle">
+                            <i class="fa-solid fa-comments" aria-hidden="true"></i>
+                            Comentarios <span id="modalCommentCount" aria-label="Número de comentarios">0</span>
+                        </h3>
+                        <p class="ae-conversation-invite">Tu opinión también cuenta. Comparte lo que piensas, responde y vota los comentarios de la comunidad.</p>
+                    </div>
 
                     <div id="commentAuthStatus"
      class="text-xs text-slate-500 bg-slate-50 border border-slate-200 rounded-xl p-3">
@@ -2010,7 +2016,7 @@ html:not(.dark) #aeAuthIntroNotice small{color:#5b6d76}
                     <div id="modalCommentsList" class="space-y-3">
                         <!-- Comments JS Injected -->
                     </div>
-                </div>
+                </section>
                 <div class="ae-article-all-news-footer">
                     <button id="aeArticleAllNewsCta" type="button" class="ae-news-all-button" onclick="closeModal(); window.aeOpenNewsArchive?.('Todas', document.activeElement)">
                         Todas las noticias <span aria-hidden="true">→</span>
