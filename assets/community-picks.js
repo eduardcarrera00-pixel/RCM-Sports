@@ -58,15 +58,20 @@ function card(p,compact=false,detail=false){
  }
  const date=new Date(p.created_at);
  if(!detail&&!Number.isNaN(date.getTime()))header.append(el('time',date.toLocaleDateString('es',{day:'numeric',month:'short',year:'numeric'})));
- if(!detail&&first?.sport)header.append(el('span',String(first.sport),'cp-card-sport'));
-  if(!detail&&p.event_date)header.append(el('span','Evento '+p.event_date,'cp-event-date'));
-  if(!detail&&!isActive(p))header.append(el('strong',resultLabel(p),'cp-result-badge'));
+ if(first?.sport)header.append(el('span',String(first.sport),'cp-card-sport'));
+  if(p.event_date)header.append(el('span','Evento '+p.event_date,'cp-event-date'));
+  if(!isActive(p))header.append(el('strong',resultLabel(p),'cp-result-badge'));
  n.append(header);
  const title=el('h3',null,'cp-card-title');
- const a=el('a',p.title);
- a.href=link(p.id);
- a.onclick=e=>{if(e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;e.preventDefault();open(p.id);};
- title.append(a);n.append(title);
+ if(detail){
+   title.append(el('span',p.title));
+ }else{
+   const a=el('a',p.title);
+   a.href=link(p.id);
+   a.onclick=e=>{if(e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;e.preventDefault();open(p.id);};
+   title.append(a);
+ }
+ n.append(title);
  const legs=el('div',null,'cp-card-legs');
  for(const leg of p.legs||[]){
    const row=el('p');
