@@ -122,10 +122,10 @@ html body #articleModal .ae-conversation {
   box-sizing:border-box!important;
   display:flex!important;
   flex-direction:column!important;
-  gap:13px!important;
+  gap:8px!important;
   min-width:0!important;
-  margin:9px 0 0!important;
-  padding:0 0 15px!important;
+  margin:3px 0 0!important;
+  padding:0 0 9px!important;
   border:0!important;
   border-radius:0!important;
   background:transparent!important;
@@ -135,7 +135,7 @@ html body #articleModal .ae-conversation-hero {
   isolation:isolate;
   min-width:0!important;
   margin:0 0 2px!important;
-  padding:21px clamp(15px,3vw,25px) 22px!important;
+  padding:12px clamp(12px,2vw,18px) 13px!important;
   border:1px solid rgba(216,162,104,.62)!important;
   border-left:3px solid #e2b17b!important;
   border-radius:0!important;
@@ -155,50 +155,44 @@ html body #articleModal .ae-conversation-hero:after {
 }
 html body #articleModal .ae-conversation-hero .ae-overline {
   display:block!important;
-  margin:0 0 10px!important;
+  margin:0 0 5px!important;
   padding:0!important;
   color:#eac094!important;
-  font:800 10px/1.4 Inter,system-ui,sans-serif!important;
-  letter-spacing:.17em!important;
+  font:800 9px/1.35 Inter,system-ui,sans-serif!important;
+  letter-spacing:.16em!important;
 }
 html body #articleModal .ae-conversation-hero h3 {
   display:flex!important;
   flex-wrap:wrap!important;
   align-items:center!important;
-  gap:10px!important;
+  gap:7px!important;
   min-width:0!important;
   margin:0!important;
   color:#fff1e1!important;
-  font:600 clamp(25px,3vw,34px)/1.1 Newsreader,Georgia,serif!important;
+  font:600 clamp(22px,2.5vw,28px)/1.1 Newsreader,Georgia,serif!important;
   letter-spacing:-.015em!important;
 }
 html body #articleModal .ae-conversation-hero h3 i {
   margin:0!important;
   color:#e6ad80!important;
-  font-size:21px!important;
+  font-size:18px!important;
 }
 html body #articleModal #modalCommentCount {
   display:inline-grid!important;
   place-items:center!important;
-  min-width:30px;
-  height:30px;
-  padding:0 7px;
+  min-width:25px;
+  height:25px;
+  padding:0 6px;
   border:1px solid rgba(227,172,121,.7);
   background:rgba(221,162,102,.17);
   color:#f6d5b4!important;
-  font:800 13px/1 Inter,system-ui,sans-serif!important;
+  font:800 11px/1 Inter,system-ui,sans-serif!important;
   font-variant-numeric:tabular-nums;
-}
-html body #articleModal .ae-conversation-invite {
-  margin:12px 0 0!important;
-  color:#c8d7df!important;
-  font:500 12.5px/1.55 Inter,system-ui,sans-serif!important;
-  max-width:55ch;
 }
 html body #articleModal #commentAuthStatus {
   display:block!important;
   margin:0!important;
-  padding:11px 14px!important;
+  padding:8px 11px!important;
   border:1px solid var(--ae-talk-border)!important;
   border-left:3px solid #78a5b5!important;
   border-radius:0!important;
@@ -225,9 +219,9 @@ html body #articleModal #commentAuthStatus button:focus-visible {outline:2px sol
 html body #articleModal #commentForm:not(.hidden) {
   display:flex!important;
   flex-direction:column!important;
-  gap:12px!important;
+  gap:8px!important;
   margin:0!important;
-  padding:15px!important;
+  padding:10px!important;
   border:1px solid var(--ae-talk-border)!important;
   border-radius:0!important;
   background:linear-gradient(155deg,#193b50,#102e41)!important;
@@ -238,14 +232,14 @@ html body #articleModal #commentText {
   box-sizing:border-box!important;
   display:block!important;
   width:100%!important;
-  min-height:106px!important;
+  min-height:74px!important;
   margin:0!important;
-  padding:14px!important;
+  padding:10px 12px!important;
   border:1px solid rgba(161,187,201,.42)!important;
   border-radius:0!important;
   background:#0b2637!important;
   color:#f6ede3!important;
-  font:500 14px/1.6 Inter,system-ui,sans-serif!important;
+  font:500 13px/1.5 Inter,system-ui,sans-serif!important;
   resize:vertical;
 }
 html body #articleModal #commentText::placeholder {color:#a8bfcc!important;opacity:1;}
@@ -256,8 +250,8 @@ html body #articleModal #commentText:focus {
 }
 html body #articleModal #commentForm button[type="submit"] {
   align-self:flex-end!important;
-  min-height:43px!important;
-  padding:11px 23px!important;
+  min-height:38px!important;
+  padding:8px 17px!important;
   border:1px solid #f1cb9a!important;
   border-radius:0!important;
   background:linear-gradient(105deg,#f0cb98,#d8a66f)!important;
@@ -271,7 +265,7 @@ html body #articleModal #commentForm button[type="submit"]:focus-visible {outlin
 html body #articleModal #modalCommentsList {min-width:0!important;margin:5px 0 0!important;}
 html body #articleModal #modalCommentsList > p {
   margin:0!important;
-  padding:19px 16px!important;
+  padding:12px 14px!important;
   border:1px dashed rgba(216,165,117,.53);
   border-radius:0!important;
   background:rgba(48,88,106,.19);
@@ -387,7 +381,6 @@ html:not(.dark) body #articleModal #modalCommentCount {
   background:rgba(169,112,66,.13)!important;
   border-color:rgba(157,106,68,.5)!important;
 }
-html:not(.dark) body #articleModal .ae-conversation-invite {color:#536573!important;}
 html:not(.dark) body #articleModal #commentAuthStatus {
   background:#ebf0f0!important;
   color:#445766!important;
@@ -438,18 +431,18 @@ html:not(.dark) body #articleModal #modalCommentsList .rcm-comment textarea {bac
   html body #articleModal .ae-article-action {min-height:68px!important;gap:6px!important;padding:10px 4px!important;}
   html body #articleModal .ae-article-action i {font-size:17px!important;}
   html body #articleModal .ae-article-action .ae-action-label {font-size:10.5px!important;}
-  html body #articleModal .ae-conversation {gap:11px!important;}
-  html body #articleModal .ae-conversation-hero {padding:18px 15px!important;}
-  html body #articleModal .ae-conversation-hero h3 {font-size:27px!important;}
-  html body #articleModal #commentAuthStatus {padding:10px 12px!important;}
-  html body #articleModal #commentForm:not(.hidden) {padding:12px!important;}
+  html body #articleModal .ae-conversation {gap:7px!important;}
+  html body #articleModal .ae-conversation-hero {padding:10px 12px!important;}
+  html body #articleModal .ae-conversation-hero h3 {font-size:23px!important;}
+  html body #articleModal #commentAuthStatus {padding:7px 10px!important;}
+  html body #articleModal #commentForm:not(.hidden) {padding:9px!important;}
   html body #articleModal #modalCommentsList .rcm-comment-columns {grid-template-columns:minmax(0,1fr)!important;}
 }
 @media(max-width:390px) {
   html body #articleModal .ae-article-actions {gap:5px!important;}
   html body #articleModal .ae-article-action .ae-action-label {font-size:10px!important;}
   html body #articleModal #modalCommentsList .rcm-comment {padding:11px!important;}
-  html body #articleModal .ae-conversation-hero h3 {font-size:24px!important;}
+  html body #articleModal .ae-conversation-hero h3 {font-size:21px!important;}
 }
 @media(prefers-reduced-motion:reduce) {
   html body #articleModal .ae-article-action,
