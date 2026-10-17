@@ -37,7 +37,7 @@ html body #aeHomeTakeHighlights > .ae-home-take-extras > #aeHomeTakeHistoric {
 }
 
 /* El mejor Take histórico ahora tiene un tratamiento de portada:
-   atmósfera fotográfica de la comunidad, escudo de trofeo en transparencia,
+   fotografía panorámica de estadio, escudo de trofeo en transparencia,
    y un bloque de lectura muy nítido para el récord real. */
 html body #aeHomeTakeHighlights > .ae-home-take-extras > #aeHomeTakeHistoric,
 html:not(.dark) body #aeHomeTakeHighlights > .ae-home-take-extras > #aeHomeTakeHistoric {
@@ -62,7 +62,7 @@ html:not(.dark) body #aeHomeTakeHighlights > .ae-home-take-extras > #aeHomeTakeH
   background-color:#0e293a!important;
   background-image:
     linear-gradient(95deg,rgba(5,22,34,.96) 0%,rgba(6,28,40,.89) 44%,rgba(8,31,44,.61) 100%),
-    url("ae-takes-community-banner.webp")!important;
+    url("rankings/ae-nfl-stadium-night.webp")!important;
   background-position:center,center!important;
   background-size:cover,cover!important;
   background-repeat:no-repeat!important;
