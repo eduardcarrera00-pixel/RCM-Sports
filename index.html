@@ -692,29 +692,32 @@ html body.ae-is-home #aeHomeAllNewsButton.ae-news-all-button {
 </style>
 
 <style id="ae-cocina-day-variant">
-/* Cocina Picks: arte original en noche, nueva versión marfil/bronce en día.
-   Ambos son imágenes decorativas dentro del mismo botón; no altera su JS. */
+/* Sólo teléfono: versión marfil y bronce para el modo día.
+   Escritorio mantiene la ilustración original en ambos modos.
+   Sin cambios en la acción de publicar Picks ni en la autenticación. */
 html body #footballTakes #communityPicks #cpPublishCta.ae-cocina-art img.ae-cocina-day {
   display:none!important;
 }
-html:not(.dark) body #footballTakes #communityPicks #cpPublishCta.ae-cocina-art img.ae-cocina-night {
-  display:none!important;
-}
-html:not(.dark) body #footballTakes #communityPicks #cpPublishCta.ae-cocina-art img.ae-cocina-day {
-  display:block!important;
-  filter:none!important;
-  mix-blend-mode:normal!important;
-  clip-path:none!important;
-  border:0!important;
-  box-shadow:none!important;
-}
-html:not(.dark) body #footballTakes #communityPicks #cpPublishCta.ae-cocina-art:hover img.ae-cocina-day {
-  filter:brightness(1.035) saturate(1.03)!important;
-}
-html:not(.dark) body #footballTakes #communityPicks #cpPublishCta.ae-cocina-art:focus-visible {
-  outline:2px solid #93663f!important;
-  outline-offset:3px!important;
-  border-radius:3px!important;
+@media (max-width:760px) {
+  html:not(.dark) body #footballTakes #communityPicks #cpPublishCta.ae-cocina-art img.ae-cocina-night {
+    display:none!important;
+  }
+  html:not(.dark) body #footballTakes #communityPicks #cpPublishCta.ae-cocina-art img.ae-cocina-day {
+    display:block!important;
+    filter:none!important;
+    mix-blend-mode:normal!important;
+    clip-path:none!important;
+    border:0!important;
+    box-shadow:none!important;
+  }
+  html:not(.dark) body #footballTakes #communityPicks #cpPublishCta.ae-cocina-art:hover img.ae-cocina-day {
+    filter:brightness(1.035) saturate(1.03)!important;
+  }
+  html:not(.dark) body #footballTakes #communityPicks #cpPublishCta.ae-cocina-art:focus-visible {
+    outline:2px solid #93663f!important;
+    outline-offset:3px!important;
+    border-radius:3px!important;
+  }
 }
 </style>
 </head>
