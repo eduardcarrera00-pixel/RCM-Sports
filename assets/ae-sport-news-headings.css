@@ -6,3 +6,188 @@ html body.ae-is-football #mainContent #aeNewsSectionTitle::before {
   content:none!important;
   display:none!important;
 }
+
+
+/* NFL: mismo encabezado editorial de sección que "Demuestra tu conocimiento" en la portada.
+   Sin estadio, cintillo, contadores ni CTA dentro del título. */
+html body.ae-is-nfl #mainContent #aeNewsHeadingRow,
+html body.ae-is-nfl #mainContent #aeFootballMobileStage>#aeNewsHeadingRow{
+  display:block!important;
+  position:static!important;
+  isolation:auto!important;
+  box-sizing:border-box!important;
+  min-height:0!important;
+  height:auto!important;
+  width:100%!important;
+  margin:0 0 14px!important;
+  padding:0 0 11px!important;
+  border:0!important;
+  border-bottom:1px solid rgba(190,155,117,.36)!important;
+  border-radius:0!important;
+  background:none!important;
+  background-color:transparent!important;
+  background-image:none!important;
+  box-shadow:none!important;
+  overflow:visible!important;
+}
+html body.ae-is-nfl #mainContent #aeNewsHeadingRow::before,
+html body.ae-is-nfl #mainContent #aeNewsHeadingRow::after{content:none!important;display:none!important;}
+html body.ae-is-nfl #mainContent #aeNewsHeadingRow #aeNewsSectionTitle{
+  display:block!important;
+  width:100%!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:0!important;
+  color:#f4e2ce!important;
+  background:none!important;
+  font:600 clamp(24px,2.35vw,34px)/1.12 Newsreader,Georgia,serif!important;
+  letter-spacing:-.02em!important;
+  text-transform:none!important;
+  text-shadow:none!important;
+}
+html body.ae-is-nfl #mainContent #aeNewsSectionTitle::before,
+html body.ae-is-nfl #mainContent #aeNewsHeadingRow #aeNewsSectionTitle>span{content:none!important;display:none!important;}
+html:not(.dark) body.ae-is-nfl #mainContent #aeNewsHeadingRow{border-bottom-color:rgba(120,91,68,.32)!important;}
+html:not(.dark) body.ae-is-nfl #mainContent #aeNewsHeadingRow #aeNewsSectionTitle{color:#3b4a52!important;}
+html body.ae-is-nfl #mainContent #aeNewsHeadingRow .ae-news-inline-tools,
+html body.ae-is-nfl #mainContent #articlesCount,
+html body.ae-is-nfl #mainContent #aeMobileNewsMore{display:none!important;}
+
+/* La opción de noticias de NFL se muestra al terminar sus tarjetas. */
+html body #aeNflAllNewsActions[hidden],
+html body #aeNflTakeFooterCta[hidden]{display:none!important;}
+html body.ae-is-nfl #mainContent #aeNflAllNewsActions{
+  display:flex!important;
+  justify-content:flex-end!important;
+  align-items:center!important;
+  margin:14px 0 5px!important;
+  padding:0!important;
+  width:100%!important;
+  min-width:0!important;
+}
+html body.ae-is-nfl #aeNflAllNewsButton.ae-news-all-button{display:inline-flex!important;min-height:40px!important;padding:9px 15px!important;font-size:12px!important;}
+
+/* También los Takes comienzan con un título simple, no un banner ilustrado. */
+html body.ae-is-nfl #freeTakes.ae-free-takes[data-sport="nfl"]>.ae-takes-head{
+  display:block!important;
+  position:static!important;
+  isolation:auto!important;
+  box-sizing:border-box!important;
+  width:100%!important;
+  height:auto!important;
+  min-height:0!important;
+  margin:0 0 16px!important;
+  padding:0 0 11px!important;
+  border:0!important;
+  border-bottom:1px solid rgba(190,155,117,.36)!important;
+  border-radius:0!important;
+  background:none!important;
+  background-color:transparent!important;
+  background-image:none!important;
+  box-shadow:none!important;
+  overflow:visible!important;
+}
+html body.ae-is-nfl #freeTakes.ae-free-takes[data-sport="nfl"]>.ae-takes-head::before,
+html body.ae-is-nfl #freeTakes.ae-free-takes[data-sport="nfl"]>.ae-takes-head::after{content:none!important;display:none!important;}
+html body.ae-is-nfl #freeTakes.ae-free-takes[data-sport="nfl"]>.ae-takes-head>.ae-takes-eyebrow{display:none!important;}
+html body.ae-is-nfl #freeTakes.ae-free-takes[data-sport="nfl"]>.ae-takes-head>#freeTakesTitle{
+  display:block!important;
+  margin:0!important;
+  padding:0!important;
+  color:#f4e2ce!important;
+  font:600 clamp(24px,2.35vw,34px)/1.12 Newsreader,Georgia,serif!important;
+  letter-spacing:-.02em!important;
+  text-shadow:none!important;
+}
+html body.ae-is-nfl #freeTakes.ae-free-takes[data-sport="nfl"]>.ae-takes-head>p{
+  display:block!important;
+  margin:9px 0 0!important;
+  font:400 12px/1.5 Inter,system-ui,sans-serif!important;
+  color:#c4cdd1!important;
+  max-width:72ch!important;
+}
+html:not(.dark) body.ae-is-nfl #freeTakes.ae-free-takes[data-sport="nfl"]>.ae-takes-head{border-bottom-color:rgba(120,91,68,.32)!important;}
+html:not(.dark) body.ae-is-nfl #freeTakes.ae-free-takes[data-sport="nfl"]>.ae-takes-head>#freeTakesTitle{color:#3b4a52!important;}
+html:not(.dark) body.ae-is-nfl #freeTakes.ae-free-takes[data-sport="nfl"]>.ae-takes-head>p{color:#536575!important;}
+
+/* El mismo botón real se reubica después del feed NFL; en Fútbol conserva su lugar. */
+html body.ae-is-nfl #freeTakes.ae-free-takes[data-sport="nfl"]>#aeNflTakeFooterCta{
+  display:flex!important;
+  justify-content:center!important;
+  align-items:center!important;
+  width:100%!important;
+  margin:17px 0 7px!important;
+  padding:0!important;
+}
+html body.ae-is-nfl #freeTakes.ae-free-takes[data-sport="nfl"] #aeNflTakeFooterCta>#aeSportTakePublish{
+  display:inline-flex!important;
+  justify-content:center!important;
+  align-items:center!important;
+  min-width:min(245px,100%)!important;
+  min-height:44px!important;
+  width:auto!important;
+  margin:0!important;
+  padding:11px 23px!important;
+  border:1px solid #dcb184!important;
+  border-radius:2px!important;
+  background:linear-gradient(105deg,#e4bb86,#c98e57)!important;
+  color:#092838!important;
+  font:750 13px/1.2 Inter,system-ui,sans-serif!important;
+  text-shadow:none!important;
+  box-shadow:0 5px 15px rgba(5,18,27,.16)!important;
+  cursor:pointer;
+}
+html body.ae-is-nfl #aeNflTakeFooterCta>#aeSportTakePublish:hover{filter:brightness(1.08);}
+html body.ae-is-nfl #aeNflTakeFooterCta>#aeSportTakePublish:focus-visible{outline:2px solid #f5c789!important;outline-offset:3px!important;}
+
+/* El Top 10 es una tarjeta independiente dentro de la sección de Takes. */
+html body.ae-is-nfl #freeTakes.ae-free-takes[data-sport="nfl"]>#aeSportTakeRanking.ae-nfl-standalone-ranking{
+  display:block!important;
+  position:relative!important;
+  box-sizing:border-box!important;
+  clear:both!important;
+  width:100%!important;
+  min-width:0!important;
+  margin:28px 0 16px!important;
+  padding:clamp(16px,2.4vw,26px)!important;
+  border:1px solid rgba(194,156,112,.65)!important;
+  border-top:3px solid #c99c66!important;
+  border-radius:0!important;
+  background:linear-gradient(145deg,#19394b,#0d293b 85%)!important;
+  box-shadow:0 12px 28px rgba(3,18,28,.17)!important;
+  color:#f4e7d6!important;
+}
+html:not(.dark) body.ae-is-nfl #freeTakes.ae-free-takes[data-sport="nfl"]>#aeSportTakeRanking.ae-nfl-standalone-ranking{
+  background:linear-gradient(145deg,#fffaf3,#f2ece4)!important;
+  color:#283f4b!important;
+  box-shadow:0 8px 22px rgba(47,43,35,.10)!important;
+}
+html:not(.dark) body.ae-is-nfl #aeSportTakeRanking.ae-nfl-standalone-ranking .ae-take-ranking-head h2{color:#283f4b!important;}
+html:not(.dark) body.ae-is-nfl #aeSportTakeRanking.ae-nfl-standalone-ranking .ae-take-ranking-head p{color:#536575!important;}
+html:not(.dark) body.ae-is-nfl #aeSportTakeRanking.ae-nfl-standalone-ranking .ae-take-ranking-author{color:#243d4b!important;}
+html:not(.dark) body.ae-is-nfl #aeSportTakeRanking.ae-nfl-standalone-ranking .ae-take-ranking-count{color:#536575!important;}
+
+/* NFL Power Rankings ya muestra movimientos; no añadir una etiqueta de semana redundante. */
+html body.ae-is-nfl #nflRankings #rankingEdition{display:none!important;}
+
+/* Acceso a todas las noticias tras los comentarios y la barra de compartir, en cualquier artículo. */
+html body #articleModal .ae-article-all-news-footer{
+  display:flex!important;
+  justify-content:center!important;
+  align-items:center!important;
+  margin:20px 0 8px!important;
+  padding:19px 0 0!important;
+  border-top:1px solid rgba(190,155,117,.32)!important;
+}
+html body #articleModal #aeArticleAllNewsCta.ae-news-all-button{
+  display:inline-flex!important;
+  min-height:43px!important;
+  padding:11px 20px!important;
+  font-size:12px!important;
+}
+@media(max-width:760px){
+  html body.ae-is-nfl #freeTakes.ae-free-takes[data-sport="nfl"] #aeNflTakeFooterCta>#aeSportTakePublish{width:100%!important;min-width:0!important;}
+  html body.ae-is-nfl #freeTakes.ae-free-takes[data-sport="nfl"]>#aeSportTakeRanking.ae-nfl-standalone-ranking{margin-top:22px!important;padding:16px 12px!important;}
+  html body.ae-is-nfl #mainContent #aeNewsHeadingRow,
+  html body.ae-is-nfl #mainContent #aeFootballMobileStage>#aeNewsHeadingRow{margin-top:4px!important;}
+}
