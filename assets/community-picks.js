@@ -64,14 +64,7 @@ function card(p,compact=false,detail=false){
  if(!isActive(p))header.append(el('strong',resultLabel(p),'cp-result-badge'));
  n.append(header);
  const title=el('h3',null,'cp-card-title');
- if(detail){
-   title.append(el('span',p.title));
- }else{
-   const a=el('a',p.title);
-   a.href=link(p.id);
-   a.onclick=e=>{if(e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;e.preventDefault();open(p.id);};
-   title.append(a);
- }
+ title.append(el('span',p.title));
  n.append(title);
  if(!detail){
    const readLink=el('a',null,'cp-card-read-link');
@@ -97,6 +90,8 @@ function card(p,compact=false,detail=false){
    // "Burnley vs Wolves" no debe aparecer dos veces en la misma tarjeta.
    if(detail||!matchupKey||!titleKey.includes(matchupKey)){
      row.append(el('span',matchup,'cp-leg-event'));
+   }else{
+     row.classList.add('cp-leg-no-event');
    }
    if(leg.selection)row.append(el('strong',leg.selection,'cp-leg-selection'));
    if(row.childNodes.length)legs.append(row);
@@ -194,7 +189,9 @@ function paintChefList(id,result,kind){
  };
  target.onscroll=updateHint;
  for(const [index,p] of picks.entries()){
-   const item=el('li',null,'ae-popular-item ae-chef-entry');
+   const item=el('li',null,'ae-popular-item ae-chef-entry ae-chef-plate');
+   item.dataset.rank=String(index+1);
+   item.dataset.plate=good?'best':'worst';
    // Full-plate click target; preserve the existing li grid and its direct children.
    const entryLink=el('a',null,'ae-chef-entry-link');
    item.style.position='relative';
@@ -225,7 +222,10 @@ function paintChefList(id,result,kind){
       p.american_odds!=='' && Number.isFinite(americanOdds) && americanOdds!==0){
      authorRow.append(el('span','Cuota '+(americanOdds>0?'+':'')+americanOdds,'ae-chef-odds'));
    }
-   info.append(authorRow,pick,votes);
+   info.append(
+     el('span',good?'EL PLATO APLAUDIDO':'EL PLATO EN DEBATE','ae-chef-plate-kicker'),
+     authorRow,pick,votes
+   );
    item.append(rank,info,entryLink);
    target.append(item);
    updateHint();
