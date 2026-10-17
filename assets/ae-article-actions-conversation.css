@@ -1,0 +1,457 @@
+/* AE SPORTS · Lector de noticias | Acciones y conversación
+   17-10-2026. Exclusivo al modal de artículos de cualquier deporte. */
+#articleModal {
+  --ae-article-accent:#e6b687;
+  --ae-article-tint:#b9c9d3;
+  --ae-article-rule:rgba(207,163,118,.33);
+}
+/* Tres acciones claras; no más encabezado redundante "Compartir:". */
+html body #articleModal .ae-article-actions {
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  align-items:stretch!important;
+  gap:9px!important;
+  width:100%!important;
+  min-width:0!important;
+  padding:14px 0!important;
+  margin:0!important;
+  border-top:1px solid var(--ae-article-rule)!important;
+  border-bottom:1px solid var(--ae-article-rule)!important;
+  border-radius:0!important;
+}
+html body #articleModal .ae-article-action {
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:7px!important;
+  box-sizing:border-box!important;
+  position:relative!important;
+  min-width:0!important;
+  width:100%!important;
+  min-height:75px!important;
+  height:auto!important;
+  margin:0!important;
+  padding:12px 8px!important;
+  border:1px solid rgba(181,142,106,.42)!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  color:#f6e7d9!important;
+  background:linear-gradient(145deg,#1d3c4e,#142d3d)!important;
+  text-align:center!important;
+  cursor:pointer!important;
+  transition:background .16s ease,border-color .16s ease,transform .16s ease!important;
+}
+html body #articleModal .ae-article-action:hover {
+  background:linear-gradient(145deg,#294b60,#1b3b4e)!important;
+  border-color:#dfac77!important;
+  transform:translateY(-1px);
+}
+html body #articleModal .ae-article-action:focus-visible {
+  outline:2px solid #e7bc8a!important;outline-offset:3px!important;
+}
+html body #articleModal .ae-article-action i {
+  display:block!important;
+  margin:0!important;
+  color:#e5b383!important;
+  font-size:19px!important;
+  line-height:1!important;
+}
+html body #articleModal .ae-article-action .ae-action-label {
+  display:block!important;
+  font:700 11px/1.25 Inter,system-ui,sans-serif!important;
+  letter-spacing:.01em!important;
+  color:inherit!important;
+  white-space:normal!important;
+}
+html body #articleModal #modalLikeBtn .ae-like-count {
+  display:inline-grid!important;
+  place-items:center!important;
+  position:absolute!important;
+  top:8px!important;
+  right:9px!important;
+  min-width:19px!important;
+  height:19px!important;
+  padding:0 3px!important;
+  border:1px solid rgba(229,178,127,.45)!important;
+  background:rgba(234,184,129,.13)!important;
+  color:#f3d3b0!important;
+  font:800 10px/1 Inter,system-ui,sans-serif!important;
+  font-variant-numeric:tabular-nums;
+}
+html body #articleModal #modalLikeBtn:has(#modalLikeIcon.fa-solid) {
+  border-color:rgba(224,143,128,.84)!important;
+  background:linear-gradient(145deg,#563c49,#2e3347)!important;
+}
+html body #articleModal #modalLikeBtn:has(#modalLikeIcon.fa-solid) i {color:#f0a7a0!important;}
+html body #articleModal .ae-article-edit-action:not(.hidden) {
+  display:inline-flex!important;
+  grid-column:1/-1!important;
+  justify-self:end!important;
+  border-radius:0!important;
+  margin:0!important;
+}
+html:not(.dark) body #articleModal .ae-article-action {
+  color:#2f4350!important;
+  background:linear-gradient(145deg,#fff9f0,#eee5d8)!important;
+  border-color:rgba(135,95,61,.35)!important;
+}
+html:not(.dark) body #articleModal .ae-article-action:hover {
+  background:#f3e4d0!important;
+  border-color:#9b6642!important;
+}
+html:not(.dark) body #articleModal .ae-article-action i {color:#86563c!important;}
+html:not(.dark) body #articleModal #modalLikeBtn .ae-like-count {
+  color:#86563c!important;
+  border-color:rgba(139,93,59,.3)!important;
+  background:rgba(139,93,59,.08)!important;
+}
+html:not(.dark) body #articleModal #modalLikeBtn:has(#modalLikeIcon.fa-solid) {
+  background:#fbece5!important;
+  border-color:#bb7d70!important;
+}
+html:not(.dark) body #articleModal #modalLikeBtn:has(#modalLikeIcon.fa-solid) i {color:#ae554b!important;}
+
+/* Cabecera de conversación: editorial, más visible, sin cambiar el flujo. */
+html body #articleModal .ae-conversation {
+  --ae-talk-ink:#f5eadd;
+  --ae-talk-muted:#bfd0db;
+  --ae-talk-border:rgba(219,169,116,.38);
+  --ae-talk-panel:#17354a;
+  --ae-talk-input:#0c2637;
+  box-sizing:border-box!important;
+  display:flex!important;
+  flex-direction:column!important;
+  gap:13px!important;
+  min-width:0!important;
+  margin:9px 0 0!important;
+  padding:0 0 15px!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+}
+html body #articleModal .ae-conversation-hero {
+  position:relative!important;
+  isolation:isolate;
+  min-width:0!important;
+  margin:0 0 2px!important;
+  padding:21px clamp(15px,3vw,25px) 22px!important;
+  border:1px solid rgba(216,162,104,.62)!important;
+  border-left:3px solid #e2b17b!important;
+  border-radius:0!important;
+  background:
+    radial-gradient(ellipse at 96% 0%,rgba(210,151,94,.19),transparent 52%),
+    linear-gradient(115deg,#153649 0%,#0e293c 58%,#102b3c 100%)!important;
+  box-shadow:0 8px 23px rgba(6,17,29,.1)!important;
+  overflow:hidden;
+}
+html body #articleModal .ae-conversation-hero:after {
+  content:"";
+  position:absolute;
+  pointer-events:none;
+  inset:auto 0 0 0;
+  height:2px;
+  background:linear-gradient(90deg,#e8bd8a,rgba(232,189,138,.08));
+}
+html body #articleModal .ae-conversation-hero .ae-overline {
+  display:block!important;
+  margin:0 0 10px!important;
+  padding:0!important;
+  color:#eac094!important;
+  font:800 10px/1.4 Inter,system-ui,sans-serif!important;
+  letter-spacing:.17em!important;
+}
+html body #articleModal .ae-conversation-hero h3 {
+  display:flex!important;
+  flex-wrap:wrap!important;
+  align-items:center!important;
+  gap:10px!important;
+  min-width:0!important;
+  margin:0!important;
+  color:#fff1e1!important;
+  font:600 clamp(25px,3vw,34px)/1.1 Newsreader,Georgia,serif!important;
+  letter-spacing:-.015em!important;
+}
+html body #articleModal .ae-conversation-hero h3 i {
+  margin:0!important;
+  color:#e6ad80!important;
+  font-size:21px!important;
+}
+html body #articleModal #modalCommentCount {
+  display:inline-grid!important;
+  place-items:center!important;
+  min-width:30px;
+  height:30px;
+  padding:0 7px;
+  border:1px solid rgba(227,172,121,.7);
+  background:rgba(221,162,102,.17);
+  color:#f6d5b4!important;
+  font:800 13px/1 Inter,system-ui,sans-serif!important;
+  font-variant-numeric:tabular-nums;
+}
+html body #articleModal .ae-conversation-invite {
+  margin:12px 0 0!important;
+  color:#c8d7df!important;
+  font:500 12.5px/1.55 Inter,system-ui,sans-serif!important;
+  max-width:55ch;
+}
+html body #articleModal #commentAuthStatus {
+  display:block!important;
+  margin:0!important;
+  padding:11px 14px!important;
+  border:1px solid var(--ae-talk-border)!important;
+  border-left:3px solid #78a5b5!important;
+  border-radius:0!important;
+  background:#173347!important;
+  color:#d5e1e8!important;
+  font:500 12px/1.55 Inter,system-ui,sans-serif!important;
+  overflow-wrap:anywhere;
+}
+html body #articleModal #commentAuthStatus strong {color:#fff1df!important;font-weight:800!important;}
+html body #articleModal #commentAuthStatus button {
+  display:inline!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  color:#e6b480!important;
+  font:800 12px/1.5 Inter,system-ui,sans-serif!important;
+  text-decoration:underline;
+  text-underline-offset:3px;
+}
+html body #articleModal #commentAuthStatus button:focus-visible {outline:2px solid #e5b784!important;}
+html body #articleModal #commentForm:not(.hidden) {
+  display:flex!important;
+  flex-direction:column!important;
+  gap:12px!important;
+  margin:0!important;
+  padding:15px!important;
+  border:1px solid var(--ae-talk-border)!important;
+  border-radius:0!important;
+  background:linear-gradient(155deg,#193b50,#102e41)!important;
+  box-shadow:0 5px 17px rgba(3,16,25,.1)!important;
+}
+html body #articleModal #commentForm.hidden {display:none!important;}
+html body #articleModal #commentText {
+  box-sizing:border-box!important;
+  display:block!important;
+  width:100%!important;
+  min-height:106px!important;
+  margin:0!important;
+  padding:14px!important;
+  border:1px solid rgba(161,187,201,.42)!important;
+  border-radius:0!important;
+  background:#0b2637!important;
+  color:#f6ede3!important;
+  font:500 14px/1.6 Inter,system-ui,sans-serif!important;
+  resize:vertical;
+}
+html body #articleModal #commentText::placeholder {color:#a8bfcc!important;opacity:1;}
+html body #articleModal #commentText:focus {
+  border-color:#e6b480!important;
+  outline:2px solid rgba(230,180,128,.33)!important;
+  outline-offset:0!important;
+}
+html body #articleModal #commentForm button[type="submit"] {
+  align-self:flex-end!important;
+  min-height:43px!important;
+  padding:11px 23px!important;
+  border:1px solid #f1cb9a!important;
+  border-radius:0!important;
+  background:linear-gradient(105deg,#f0cb98,#d8a66f)!important;
+  color:#1a2e3d!important;
+  font:800 12px/1.25 Inter,system-ui,sans-serif!important;
+  letter-spacing:.03em!important;
+  box-shadow:none!important;
+}
+html body #articleModal #commentForm button[type="submit"]:hover {filter:brightness(1.07);}
+html body #articleModal #commentForm button[type="submit"]:focus-visible {outline:2px solid #e5bc83!important;outline-offset:3px!important;}
+html body #articleModal #modalCommentsList {min-width:0!important;margin:5px 0 0!important;}
+html body #articleModal #modalCommentsList > p {
+  margin:0!important;
+  padding:19px 16px!important;
+  border:1px dashed rgba(216,165,117,.53);
+  border-radius:0!important;
+  background:rgba(48,88,106,.19);
+  color:var(--ae-talk-muted)!important;
+  font:500 13px/1.5 Inter,system-ui,sans-serif!important;
+}
+html body #articleModal #modalCommentsList .rcm-comment-columns {gap:14px!important;}
+html body #articleModal #modalCommentsList .rcm-comment-columns > section {min-width:0!important;}
+html body #articleModal #modalCommentsList .rcm-comment-columns > section > h3 {
+  margin:0 0 10px!important;
+  padding:9px 11px!important;
+  background:#1b4051!important;
+  color:#ecc495!important;
+  border:1px solid var(--ae-talk-border)!important;
+  border-radius:0!important;
+  font:800 10px/1.45 Inter,system-ui,sans-serif!important;
+  letter-spacing:.07em!important;
+}
+html body #articleModal #modalCommentsList .rcm-comment {
+  min-width:0!important;
+  margin:8px 0!important;
+  padding:13px!important;
+  border:1px solid rgba(159,186,200,.28)!important;
+  border-left:3px solid #b88962!important;
+  border-radius:0!important;
+  background:#173447!important;
+  color:#f3e9e0!important;
+  box-shadow:none!important;
+  overflow-wrap:anywhere;
+}
+html body #articleModal #modalCommentsList .rcm-comment > .rcm-row:first-child {
+  gap:6px!important;
+  align-items:baseline!important;
+}
+html body #articleModal #modalCommentsList .rcm-comment > .rcm-row:first-child strong {color:#f1c18c!important;}
+html body #articleModal #modalCommentsList .rcm-comment time {color:#adc0cb!important;}
+html body #articleModal #modalCommentsList .rcm-comment-body {
+  margin:10px 0 12px!important;
+  color:#f0e7de!important;
+  font:500 13px/1.65 Inter,system-ui,sans-serif!important;
+}
+html body #articleModal #modalCommentsList .rcm-comment > .rcm-row:has(>button[data-vote-comment]){
+  gap:7px!important;
+  flex-wrap:wrap!important;
+}
+html body #articleModal #modalCommentsList button[data-vote-comment],
+html body #articleModal #modalCommentsList .rcm-comment > .rcm-row > button:not([data-vote-comment]) {
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  min-width:46px!important;
+  min-height:34px!important;
+  padding:7px 11px!important;
+  margin:0!important;
+  border:1px solid rgba(171,192,199,.42)!important;
+  border-radius:0!important;
+  background:rgba(18,52,71,.85)!important;
+  color:#e5edf1!important;
+  font:750 11px/1.25 Inter,system-ui,sans-serif!important;
+  transition:background .16s,border-color .16s!important;
+}
+html body #articleModal #modalCommentsList button[data-vote-comment]:first-child {color:#a8ddc8!important;}
+html body #articleModal #modalCommentsList button[data-vote-comment]:nth-child(2) {color:#f0bcb7!important;}
+html body #articleModal #modalCommentsList button[data-vote-comment]:hover,
+html body #articleModal #modalCommentsList .rcm-comment > .rcm-row > button:not([data-vote-comment]):hover {
+  background:rgba(113,155,171,.2)!important;
+  border-color:#e2b17e!important;
+}
+html body #articleModal #modalCommentsList button[data-vote-comment][aria-pressed="true"] {
+  background:#ddac77!important;
+  border-color:#edc597!important;
+  color:#152d3d!important;
+}
+html body #articleModal #modalCommentsList button[data-vote-comment]:first-child[aria-pressed="true"],
+html body #articleModal #modalCommentsList button[data-vote-comment]:nth-child(2)[aria-pressed="true"] {color:#122b3a!important;}
+html body #articleModal #modalCommentsList .rcm-comment > .rcm-row > button:not([data-vote-comment]) {margin-left:auto!important;color:#f4ce9f!important;}
+html body #articleModal #modalCommentsList .rcm-comment textarea {
+  background:#0b2637!important;
+  color:#f5ede3!important;
+  border:1px solid rgba(207,163,118,.43)!important;
+  border-radius:0!important;
+  font-size:13px!important;
+}
+html body #articleModal #modalCommentsList .rcm-comment textarea::placeholder {color:#b4c7d1!important;}
+html body #articleModal #modalCommentsList .rcm-comment form button[type="submit"] {
+  background:#e5b984!important;
+  border:1px solid #e5b984!important;
+  border-radius:0!important;
+  color:#173047!important;
+}
+html body #articleModal #modalCommentsList .rcm-reply {
+  margin:12px 0 0 8px!important;
+  border-left-color:#5c8da4!important;
+}
+/* Día: contraste cálido, manteniendo las mismas zonas de atención. */
+html:not(.dark) body #articleModal .ae-conversation {
+  --ae-talk-ink:#243948;
+  --ae-talk-muted:#69584d;
+  --ae-talk-border:rgba(146,101,65,.35);
+}
+html:not(.dark) body #articleModal .ae-conversation-hero {
+  background:
+    radial-gradient(ellipse at 96% 0%,rgba(210,153,97,.24),transparent 53%),
+    linear-gradient(115deg,#e5edf0,#f7efe3)!important;
+  border-color:rgba(148,104,68,.5)!important;
+  border-left-color:#ab7650!important;
+}
+html:not(.dark) body #articleModal .ae-conversation-hero .ae-overline {color:#895e40!important;}
+html:not(.dark) body #articleModal .ae-conversation-hero h3 {color:#243c4c!important;}
+html:not(.dark) body #articleModal .ae-conversation-hero h3 i {color:#aa7354!important;}
+html:not(.dark) body #articleModal #modalCommentCount {
+  color:#6d442d!important;
+  background:rgba(169,112,66,.13)!important;
+  border-color:rgba(157,106,68,.5)!important;
+}
+html:not(.dark) body #articleModal .ae-conversation-invite {color:#536573!important;}
+html:not(.dark) body #articleModal #commentAuthStatus {
+  background:#ebf0f0!important;
+  color:#445766!important;
+  border-left-color:#618a9e!important;
+}
+html:not(.dark) body #articleModal #commentAuthStatus strong {color:#364550!important;}
+html:not(.dark) body #articleModal #commentAuthStatus button {color:#805038!important;}
+html:not(.dark) body #articleModal #commentForm:not(.hidden) {
+  background:linear-gradient(155deg,#f2f4f1,#f5ece1)!important;
+}
+html:not(.dark) body #articleModal #commentText {
+  background:#fffdfa!important;
+  color:#263a47!important;
+  border-color:rgba(141,114,87,.46)!important;
+}
+html:not(.dark) body #articleModal #commentText::placeholder {color:#6d7d86!important;}
+html:not(.dark) body #articleModal #modalCommentsList > p {
+  background:#eff2f0!important;
+  color:#576674!important;
+}
+html:not(.dark) body #articleModal #modalCommentsList .rcm-comment-columns > section > h3 {
+  background:#e2e9e9!important;
+  color:#73513c!important;
+}
+html:not(.dark) body #articleModal #modalCommentsList .rcm-comment {
+  background:#f5f4ef!important;
+  border-color:rgba(147,110,77,.29)!important;
+  border-left-color:#a87450!important;
+  color:#304351!important;
+}
+html:not(.dark) body #articleModal #modalCommentsList .rcm-comment > .rcm-row:first-child strong {color:#835335!important;}
+html:not(.dark) body #articleModal #modalCommentsList .rcm-comment time {color:#647584!important;}
+html:not(.dark) body #articleModal #modalCommentsList .rcm-comment-body {color:#304351!important;}
+html:not(.dark) body #articleModal #modalCommentsList button[data-vote-comment],
+html:not(.dark) body #articleModal #modalCommentsList .rcm-comment > .rcm-row > button:not([data-vote-comment]) {
+  background:#fffaf3!important;
+  color:#4d6472!important;
+  border-color:rgba(141,108,81,.34)!important;
+}
+html:not(.dark) body #articleModal #modalCommentsList button[data-vote-comment]:first-child {color:#246951!important;}
+html:not(.dark) body #articleModal #modalCommentsList button[data-vote-comment]:nth-child(2) {color:#ab5860!important;}
+html:not(.dark) body #articleModal #modalCommentsList button[data-vote-comment]:hover {background:#f1e5d6!important;border-color:#a36e47!important;}
+html:not(.dark) body #articleModal #modalCommentsList button[data-vote-comment][aria-pressed="true"] {background:#d8ab75!important;color:#283946!important;border-color:#aa764f!important;}
+html:not(.dark) body #articleModal #modalCommentsList .rcm-comment > .rcm-row > button:not([data-vote-comment]) {color:#80573d!important;}
+html:not(.dark) body #articleModal #modalCommentsList .rcm-comment textarea {background:#fffdf9!important;color:#293e4d!important;}
+@media(max-width:760px) {
+  html body #articleModal .ae-article-actions {gap:7px!important;padding:12px 0!important;}
+  html body #articleModal .ae-article-action {min-height:68px!important;gap:6px!important;padding:10px 4px!important;}
+  html body #articleModal .ae-article-action i {font-size:17px!important;}
+  html body #articleModal .ae-article-action .ae-action-label {font-size:10.5px!important;}
+  html body #articleModal .ae-conversation {gap:11px!important;}
+  html body #articleModal .ae-conversation-hero {padding:18px 15px!important;}
+  html body #articleModal .ae-conversation-hero h3 {font-size:27px!important;}
+  html body #articleModal #commentAuthStatus {padding:10px 12px!important;}
+  html body #articleModal #commentForm:not(.hidden) {padding:12px!important;}
+  html body #articleModal #modalCommentsList .rcm-comment-columns {grid-template-columns:minmax(0,1fr)!important;}
+}
+@media(max-width:390px) {
+  html body #articleModal .ae-article-actions {gap:5px!important;}
+  html body #articleModal .ae-article-action .ae-action-label {font-size:10px!important;}
+  html body #articleModal #modalCommentsList .rcm-comment {padding:11px!important;}
+  html body #articleModal .ae-conversation-hero h3 {font-size:24px!important;}
+}
+@media(prefers-reduced-motion:reduce) {
+  html body #articleModal .ae-article-action,
+  html body #articleModal #modalCommentsList button[data-vote-comment] {transition:none!important;transform:none!important;}
+}
