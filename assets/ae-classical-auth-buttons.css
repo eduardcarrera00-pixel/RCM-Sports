@@ -523,3 +523,181 @@ html:not(.dark) body #aeNotificationsDialog .ae-notifications-group-pending{
     padding:11px!important;
   }
 }
+
+/* 2026-10-17 · Dos columnas, cada una con su propio desplazamiento. */
+html body>header #aeNotificationsButton .ae-notifications-badge{
+  top:-1px!important;
+  right:0!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  box-sizing:border-box!important;
+  min-width:20px!important;
+  min-height:20px!important;
+  height:auto!important;
+  padding:3px 5px!important;
+  border:1px solid rgba(188,211,155,.74)!important;
+  border-radius:2px!important;
+  background:rgba(71,97,62,.70)!important;
+  background-image:none!important;
+  color:#d0e2b0!important;
+  font:800 11px/1 Inter,system-ui,sans-serif!important;
+  font-variant-numeric:tabular-nums!important;
+  letter-spacing:-.01em!important;
+  box-shadow:0 2px 6px rgba(2,17,15,.14)!important;
+  text-shadow:none!important;
+}
+html:not(.dark) body>header #aeNotificationsButton .ae-notifications-badge{
+  background:rgba(224,235,203,.94)!important;
+  border-color:#9db785!important;
+  color:#526b3e!important;
+  box-shadow:0 1px 4px rgba(48,69,32,.10)!important;
+}
+/* Keep the bell completely free of a badge when unread is zero. */
+html body>header #aeNotificationsButton #aeNotificationsBadge[hidden]{
+  display:none!important;
+}
+html body #aeNotificationsDialog.ae-notifications-dialog{
+  width:min(840px,calc(100vw - 24px))!important;
+  max-width:840px!important;
+  max-height:90dvh!important;
+}
+html body #aeNotificationsDialog .ae-notifications-groups{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  align-items:stretch!important;
+  gap:13px!important;
+  width:100%!important;
+  min-width:0!important;
+}
+html body #aeNotificationsDialog .ae-notifications-group{
+  display:flex!important;
+  flex-direction:column!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:0!important;
+  overflow:hidden!important;
+}
+html body #aeNotificationsDialog .ae-notifications-group-heading{
+  flex:0 0 auto!important;
+  min-height:78px!important;
+}
+html body #aeNotificationsDialog .ae-notifications-group .ae-notifications-list{
+  display:block!important;
+  box-sizing:border-box!important;
+  flex:1 1 auto!important;
+  width:100%!important;
+  min-width:0!important;
+  height:clamp(150px,48dvh,420px)!important;
+  max-height:clamp(150px,48dvh,420px)!important;
+  padding:0!important;
+  margin:0!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  overscroll-behavior-y:contain!important;
+  scrollbar-width:thin!important;
+  scrollbar-color:rgba(179,159,131,.65) transparent!important;
+  -webkit-overflow-scrolling:touch;
+}
+html body #aeNotificationsDialog .ae-notifications-group .ae-notifications-list:focus-visible{
+  outline:2px solid #b7c995!important;
+  outline-offset:-2px!important;
+}
+html body #aeNotificationsDialog .ae-notifications-group .ae-notification-entry{
+  grid-template-columns:27px minmax(0,1fr) 7px!important;
+  gap:10px!important;
+}
+html body #aeNotificationsDialog .ae-notifications-group .ae-notification-text,
+html body #aeNotificationsDialog .ae-notifications-group .ae-notification-text>*{
+  min-width:0!important;
+  overflow-wrap:anywhere!important;
+}
+@media(max-width:760px){
+  html body #aeNotificationsDialog.ae-notifications-dialog{
+    width:calc(100vw - 16px)!important;
+    max-width:calc(100vw - 16px)!important;
+    max-height:90dvh!important;
+  }
+  html body #aeNotificationsDialog .ae-notifications-groups{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:8px!important;
+    padding:9px 8px 12px!important;
+  }
+  html body #aeNotificationsDialog .ae-notifications-group-heading{
+    flex-direction:column!important;
+    align-items:flex-start!important;
+    justify-content:flex-start!important;
+    gap:7px!important;
+    min-height:91px!important;
+    padding:11px 9px!important;
+  }
+  html body #aeNotificationsDialog .ae-notifications-group-heading h3{
+    font-size:clamp(17px,4.8vw,21px)!important;
+    overflow-wrap:anywhere!important;
+  }
+  html body #aeNotificationsDialog .ae-notifications-group-heading p{
+    font-size:9px!important;
+    overflow-wrap:anywhere!important;
+  }
+  html body #aeNotificationsDialog .ae-notifications-group-pending{
+    font-size:9px!important;
+  }
+  html body #aeNotificationsDialog .ae-notifications-group .ae-notifications-list{
+    height:clamp(155px,46dvh,360px)!important;
+    max-height:clamp(155px,46dvh,360px)!important;
+  }
+  /* Narrow cards: indicator above text, no squeezed central column. */
+  html body #aeNotificationsDialog .ae-notifications-group .ae-notification-entry{
+    display:flex!important;
+    position:relative!important;
+    flex-direction:column!important;
+    align-items:flex-start!important;
+    justify-content:flex-start!important;
+    gap:6px!important;
+    min-height:94px!important;
+    padding:10px 9px!important;
+  }
+  html body #aeNotificationsDialog .ae-notifications-group .ae-notification-event-icon{
+    flex:0 0 auto!important;
+    width:22px!important;
+    height:22px!important;
+    font-size:12px!important;
+  }
+  html body #aeNotificationsDialog .ae-notifications-group .ae-notification-text{
+    width:100%!important;
+    min-width:0!important;
+  }
+  html body #aeNotificationsDialog .ae-notifications-group .ae-notification-text strong{
+    font-size:11px!important;
+    line-height:1.35!important;
+    white-space:normal!important;
+  }
+  html body #aeNotificationsDialog .ae-notifications-group .ae-notification-text small,
+  html body #aeNotificationsDialog .ae-notifications-group .ae-notification-text time{
+    font-size:9.5px!important;
+    line-height:1.35!important;
+    white-space:normal!important;
+  }
+  html body #aeNotificationsDialog .ae-notifications-group .ae-notification-dot{
+    position:absolute!important;
+    top:16px!important;
+    right:10px!important;
+  }
+  html body #aeNotificationsDialog .ae-notifications-group .ae-notifications-empty{
+    font-size:11px!important;
+    line-height:1.5!important;
+    padding:17px 9px!important;
+  }
+}
+@media(max-width:360px){
+  html body #aeNotificationsDialog .ae-notifications-groups{
+    gap:6px!important;
+    padding:8px 6px 11px!important;
+  }
+  html body #aeNotificationsDialog .ae-notifications-group-heading{
+    padding:10px 7px!important;
+  }
+  html body #aeNotificationsDialog .ae-notifications-group-heading h3{
+    font-size:17px!important;
+  }
+}
