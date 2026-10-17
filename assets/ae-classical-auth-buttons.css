@@ -196,24 +196,35 @@ html body>header #aeNotificationsButton .ae-notifications-caption{
   letter-spacing:.02em!important;
   white-space:nowrap!important;
 }
+/* Discrete warm sage number, never a red badge or a painted background. */
 html body>header #aeNotificationsButton .ae-notifications-badge{
   position:absolute!important;
   top:0!important;
-  right:4px!important;
-  display:flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  min-width:17px!important;
-  height:17px!important;
+  right:5px!important;
+  display:block!important;
+  width:auto!important;
+  min-width:0!important;
+  max-width:none!important;
+  height:auto!important;
+  min-height:0!important;
   margin:0!important;
-  padding:1px 4px!important;
-  border:1px solid #f9e3c0!important;
-  border-radius:15px!important;
-  background:#b75242!important;
-  color:#fff!important;
-  font:800 10px/1 Inter,system-ui,sans-serif!important;
-  letter-spacing:0!important;
-  box-shadow:0 1px 7px rgba(0,0,0,.2)!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  background-image:none!important;
+  color:#b7c995!important;
+  font:800 12px/1 Inter,system-ui,sans-serif!important;
+  font-variant-numeric:tabular-nums!important;
+  letter-spacing:-.015em!important;
+  white-space:nowrap!important;
+  text-shadow:0 1px 6px rgba(88,105,65,.2)!important;
+  box-shadow:none!important;
+  pointer-events:none!important;
+}
+html:not(.dark) body>header #aeNotificationsButton .ae-notifications-badge{
+  color:#607c47!important;
+  text-shadow:none!important;
 }
 html:not(.dark) body>header #aeNotificationsButton{color:#735035!important;}
 html:not(.dark) body>header #aeNotificationsButton:hover{color:#a26740!important;}
