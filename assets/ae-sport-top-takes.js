@@ -21,11 +21,17 @@
      desktopHomeMarker=document.createComment('AE Sports: posición original de Takes deportivos');
      sidebar.insertBefore(desktopHomeMarker,root.parentElement===sidebar?root:null);
    }
-   // En Fútbol, ambos destacados van a la derecha junto a las noticias.
-   // NFL regresa a su ubicación original, sin alterar su diseño.
+   // Fútbol mantiene sus destacados en la columna derecha.
+   // NFL comparte la misma secuencia en ordenador y móvil:
+   // Demuestra tu conocimiento → Savant/Rookie → Top 10 NFL.
    if(typeof currentCategory!=='undefined' && currentCategory==='Fútbol'){
      if(root.parentElement!==sidebar || sidebar.firstElementChild!==root){
        sidebar.insertBefore(root, sidebar.firstChild);
+     }
+   } else if(typeof currentCategory!=='undefined' && currentCategory==='NFL'){
+     const feed=$('freeTakes'), ranking=$('aeSportTakeRanking');
+     if(feed && ranking?.parentElement===feed && (root.parentElement!==feed || root.nextElementSibling!==ranking)){
+       feed.insertBefore(root,ranking);
      }
    } else if(root.parentElement!==sidebar || desktopHomeMarker.nextSibling!==root){
      desktopHomeMarker.after(root);
