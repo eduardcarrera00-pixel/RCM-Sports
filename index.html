@@ -486,6 +486,19 @@ html.dark [data-reading-size][aria-pressed="true"] {
     margin:0!important;
     justify-content:center!important;
   }
+  /* El líder de Champions comparte el paisaje de Power Rankings como el #1 de NFL.
+     Sólo presentación: conservamos el club, su puesto, escudo y animación. */
+  html body.ae-is-football #aeFootballMobileStage #championsRankings.ae-football-ranking-feature #championsRankOne.ae-ranking-leader:not([hidden]),
+  html:not(.dark) body.ae-is-football #aeFootballMobileStage #championsRankings.ae-football-ranking-feature #championsRankOne.ae-ranking-leader:not([hidden]) {
+    background:transparent!important;
+    border:0!important;
+    border-left:1px solid #d7ad7c!important;
+    box-shadow:none!important;
+    backdrop-filter:none!important;
+  }
+  html:not(.dark) body.ae-is-football #aeFootballMobileStage #championsRankings.ae-football-ranking-feature #championsRankOne.ae-ranking-leader:not([hidden]) {
+    border-left-color:#c59463!important;
+  }
   html body.ae-is-football #aeFootballMobileStage #championsRankings.ae-football-ranking-feature #championsViewport.rcm-ticker:not([hidden]) {
     margin:0!important;
     border-bottom:0!important;
@@ -782,7 +795,6 @@ html body.ae-is-home #aeHomeAllNewsButton.ae-news-all-button {
                     <p id="rankingEdition" class="ae-rank-edition"></p>
                 </div>
                 <aside id="nflRankOne" class="ae-ranking-leader" aria-label="Equipo número uno de NFL" hidden>
-                    <span class="ae-leader-overline">EL NÚMERO UNO</span>
                     <ol id="nflRankOneList" class="ae-rank-leader-list" aria-live="polite"></ol>
                 </aside>
                 <button id="rankingEditButton" class="hidden" onclick="openRankingEditor()">Editar ranking</button>
@@ -801,7 +813,6 @@ html body.ae-is-home #aeHomeAllNewsButton.ae-news-all-button {
                     <span class="ae-edition ae-rank-edition" id="championsEdition"></span>
                 </div>
                 <aside id="championsRankOne" class="ae-ranking-leader" aria-label="Club número uno de Champions League" hidden>
-                    <span class="ae-leader-overline">EL NÚMERO UNO</span>
                     <ol id="championsRankOneList" class="ae-rank-leader-list" aria-live="polite"></ol>
                 </aside>
                 <button type="button" id="championsEditButton" class="hidden" onclick="openChampionsEditor()">Editar ranking</button>
