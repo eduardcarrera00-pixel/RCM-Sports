@@ -46,21 +46,22 @@ function card(p,compact=false,detail=false){
  n.dataset.sport=hasNfl&&hasFootball?'mixed':hasNfl?'nfl':hasFootball?'football':'general';
  const first=Array.isArray(p.legs)&&p.legs.length?p.legs[0]:null;
  const header=el('div',null,'cp-card-header');
- if(detail&&p.user_id){
-   const profileButton=button('@'+(p.author||'Aficionado'),()=>{
+ if(p.user_id){
+   const profileButton=button('@'+(p.author||'Aficionado'),event=>{
+     event?.stopPropagation?.();
      if(typeof window.openAePublicProfile==='function')window.openAePublicProfile(p.user_id);
    });
-   profileButton.className='cp-detail-author';
+   profileButton.className=detail?'cp-detail-author':'cp-feed-author';
    profileButton.setAttribute('aria-label','Ver perfil de '+(p.author||'Aficionado'));
+   profileButton.title='Ver perfil de '+(p.author||'Aficionado');
    header.append(profileButton);
  }else{
-   header.append(el('span','@'+(p.author||'Aficionado')));
+   header.append(el('strong','@'+(p.author||'Aficionado'),'cp-feed-author-label'));
  }
- const date=new Date(p.created_at);
- if(!detail&&!Number.isNaN(date.getTime()))header.append(el('time',date.toLocaleDateString('es',{day:'numeric',month:'short',year:'numeric'})));
+ // No repetimos la fecha de publicación ni la del evento en la vista previa.
  if(first?.sport)header.append(el('span',String(first.sport),'cp-card-sport'));
-  if(p.event_date)header.append(el('span','Evento '+p.event_date,'cp-event-date'));
-  if(!isActive(p))header.append(el('strong',resultLabel(p),'cp-result-badge'));
+ if(detail&&p.event_date)header.append(el('span','Evento '+p.event_date,'cp-event-date'));
+ if(!isActive(p))header.append(el('strong',resultLabel(p),'cp-result-badge'));
  n.append(header);
  const title=el('h3',null,'cp-card-title');
  if(detail){
@@ -72,14 +73,35 @@ function card(p,compact=false,detail=false){
    title.append(a);
  }
  n.append(title);
+ if(!detail){
+   const readLink=el('a',null,'cp-card-read-link');
+   readLink.href=link(p.id);
+   readLink.setAttribute('aria-label','Leer Pick completo: '+(p.title||'Pronóstico deportivo'));
+   readLink.onclick=event=>{
+     if(event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;
+     event.preventDefault();
+     open(p.id);
+   };
+   n.append(readLink);
+ }
  const legs=el('div',null,'cp-card-legs');
+ const simplify=text=>String(text||'').toLocaleLowerCase('es')
+   .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+   .replace(/[^a-z0-9]+/g,' ').trim();
+ const titleKey=simplify(p.title);
  for(const leg of p.legs||[]){
    const row=el('p');
-   row.append(el('span',String(leg.event||leg.sport||'Evento'),'cp-leg-event'));
+   const matchup=String(leg.event||leg.sport||'Evento');
+   const matchupKey=simplify(matchup);
+   // Si el título ya presenta el partido, damos prioridad al pronóstico:
+   // "Burnley vs Wolves" no debe aparecer dos veces en la misma tarjeta.
+   if(detail||!matchupKey||!titleKey.includes(matchupKey)){
+     row.append(el('span',matchup,'cp-leg-event'));
+   }
    if(leg.selection)row.append(el('strong',leg.selection,'cp-leg-selection'));
-   legs.append(row);
+   if(row.childNodes.length)legs.append(row);
  }
- n.append(legs);
+ if(legs.childNodes.length)n.append(legs);
  const odds=el('div',null,'cp-card-odds');
  odds.append(el('strong','Cuota '+(Number(p.american_odds)>0?'+':'')+p.american_odds,'cp-odds'));
  odds.append(el('small',p.moderation_status==='approved'?'Cuota aprobada':p.moderation_status==='rejected'?'Cuota rechazada':'Cuota en revisión · votos abiertos','cp-card-state'));
