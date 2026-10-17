@@ -9,7 +9,7 @@
   let working = false;
   let pending = false;
   // The community's NFL Savant / NFL Rookie module is a single live node.
-  // On NFL mobile it belongs between news and recent Takes, not in the sidebar.
+  // On NFL it belongs immediately before the Top 10 inside the Takes section.
   let nflTakeAnchor = null;
   const nflMobileActive = () => mobile.matches && document.body.classList.contains('ae-is-nfl');
 
@@ -20,11 +20,14 @@
       nflTakeAnchor = document.createComment('AE: posición original de NFL Savant / NFL Rookie');
       root.parentNode?.insertBefore(nflTakeAnchor,root);
     }
-    const beforeFeed = byId('freeTakes');
-    if(onNfl && beforeFeed && beforeFeed.parentNode){
-      // Move the existing lists, events and votes; never clone their DOM.
-      if(root.nextElementSibling !== beforeFeed || root.parentElement !== beforeFeed.parentElement){
-        beforeFeed.parentNode.insertBefore(root,beforeFeed);
+    const takeFeed = byId('freeTakes');
+    const standing = byId('aeSportTakeRanking');
+    const nflSection = document.body.classList.contains('ae-is-nfl');
+    // NFL: Demuestra tu conocimiento, Savant/Rookie y después Top 10.
+    // Se mueve el nodo real; votos, respuestas y usuarios mantienen sus eventos.
+    if(nflSection && takeFeed && standing?.parentElement === takeFeed){
+      if(root.parentElement !== takeFeed || root.nextElementSibling !== standing){
+        takeFeed.insertBefore(root,standing);
       }
     } else if(nflTakeAnchor.parentNode && (root.parentElement !== nflTakeAnchor.parentElement || nflTakeAnchor.nextSibling !== root)){
       nflTakeAnchor.parentNode.insertBefore(root,nflTakeAnchor.nextSibling);
