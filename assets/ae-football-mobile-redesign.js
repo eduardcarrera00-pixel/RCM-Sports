@@ -90,6 +90,8 @@
       moveTo(byId('heroSection'), stage);
       moveTo(newsHeading, stage);
       moveTo(grid, stage);
+      // The same footer follows the mobile news grid.
+      moveTo(byId('aeSportAllNewsFooter'), stage);
       moveTo(byId('freeTakes'), stage);
       moveTo(byId('aeNflLatestComments'), stage);
       moveTo(byId('aeSportTakeLeaders'), stage);
