@@ -1035,6 +1035,13 @@ html body.ae-is-home #aeHomeTopTakes .ae-points-table{
 html body.ae-is-home #aeHomeTopTakes .ae-points-table thead{
  position:sticky;top:0;z-index:2;background:#16384c!important;
 }
+/* Anular el scroll aplicado antiguamente a las listas: ahora la región externa
+   controla el desplazamiento y tbody mantiene semántica de tabla. */
+html body.ae-is-home #aeHomeTopTakes .ae-points-table tbody{
+ display:table-row-group!important;max-height:none!important;overflow:visible!important;
+}
+html body.ae-is-home #aeHomeTopTakes .ae-points-table tbody tr{display:table-row!important;}
+html body.ae-is-home #aeHomeTopTakes .ae-points-table tbody td{display:table-cell!important;}
 html body.ae-is-home #aeHomeTopTakes .is-questioned .ae-points-table thead{background:#35334b!important;}
 html body.ae-is-home #aeHomeTopTakes .ae-points-table th{
  padding:9px 8px!important;border-bottom:1px solid var(--ae-rank-rule)!important;
