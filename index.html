@@ -546,7 +546,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/ae-take-rankings-palette.css?v=20261016-duel-3">
 <link rel="stylesheet" href="assets/ae-home-takes-restructure.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-home-rankings-vivid.css?v=20261016-1">
-    <link rel="stylesheet" href="assets/ae-home-takes-editorial-order.css?v=20261016-home-order-3">
+    <link rel="stylesheet" href="assets/ae-home-takes-editorial-order.css?v=20261016-takes-after-title-4">
     <link rel="stylesheet" href="assets/ae-take-rankings-best-take.css?v=20261016-1">
 
 <style id="ae-home-news-carousel-styles">
@@ -613,6 +613,31 @@ html body.ae-is-home #mainContent #articlesGrid.ae-home-news-carousel:focus-visi
   html body.ae-is-home #mainContent > .editorial-pick > h2#weeklyPickTitle::before {
     content:none!important;
     display:none!important;
+  }
+}
+
+/* Acceso al archivo completo justo bajo el carrusel de portada. */
+html body #aeHomeAllNewsActions[hidden] {display:none!important;}
+html body.ae-is-home #mainContent #aeHomeAllNewsActions {
+  display:flex!important;
+  justify-content:flex-end!important;
+  align-items:center!important;
+  width:100%!important;
+  max-width:100%!important;
+  margin:10px 0 12px!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+}
+html body.ae-is-home #aeHomeAllNewsButton.ae-news-all-button {
+  display:inline-flex!important;
+  min-height:40px!important;
+  padding:9px 15px!important;
+  font-size:12px!important;
+}
+@media(max-width:760px) {
+  html body.ae-is-home #mainContent #aeHomeAllNewsActions {
+    margin-top:10px!important;
+    margin-bottom:15px!important;
   }
 }
 </style>
@@ -880,6 +905,11 @@ html body.ae-is-home #mainContent #articlesGrid.ae-home-news-carousel:focus-visi
                 <section id="articlesGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Cards JS Injected -->
                 </section>
+                <div id="aeHomeAllNewsActions" class="ae-home-news-actions" hidden>
+                  <button id="aeHomeAllNewsButton" type="button" class="ae-news-all-button" data-ae-news-category="Todas" aria-label="Abrir todas las noticias de AE SPORTS">
+                    Todas las noticias <span aria-hidden="true">→</span>
+                  </button>
+                </div>
 
                 <!-- Empty State View -->
                 <div id="noResults" class="hidden text-center py-16 bg-white rounded-2xl border border-slate-200 shadow-sm">
@@ -892,6 +922,10 @@ html body.ae-is-home #mainContent #articlesGrid.ae-home-news-carousel:focus-visi
                 <div id="editorialBottom" class="editorial-bottom">
             <div id="aeHomeTakeHighlights" class="ae-home-take-highlights">
             <div class="ae-home-take-extras" aria-label="Destacados de Takes">
+              <header id="aeHomeTakesSectionHeading" class="ae-top-takes-heading ae-takes-section-title">
+                <h2 id="aeHomeTopTakesTitle">Demuestra tu conocimiento</h2>
+                <p id="aeTopTakesStatus" class="sr-only" role="status" aria-live="polite">Cargando los Takes destacados…</p>
+              </header>
                 <section id="aeHomeTakesPopular" class="ae-home-take-feature ae-vote-column is-positive" aria-labelledby="aeHomeTakesPositiveTitle">
                   <header class="ae-vote-column-heading"><h3 id="aeHomeTakesPositiveTitle">Popular Takes</h3></header>
                   <ol id="aeHomeTakesPositiveList" class="ae-discovery-list" aria-live="polite"><li class="ae-discovery-empty">Cargando Takes…</li></ol>
@@ -901,10 +935,6 @@ html body.ae-is-home #mainContent #articlesGrid.ae-home-news-carousel:focus-visi
                   <ol id="aeHomeTakesNegativeList" class="ae-discovery-list" aria-live="polite"><li class="ae-discovery-empty">Cargando Takes…</li></ol>
                 </section>
             <section id="aeHomeTopTakes" aria-labelledby="aeHomeTopTakesTitle">
-              <header class="ae-top-takes-heading ae-takes-section-title">
-                <h2 id="aeHomeTopTakesTitle">Demuestra tu conocimiento</h2>
-                <p id="aeTopTakesStatus" class="sr-only" role="status" aria-live="polite">Cargando los Takes destacados…</p>
-              </header>
               <div class="ae-points-period" role="group" aria-label="Periodo de la clasificación por puntos de Takes">
                 <button type="button" data-home-take-period="month" aria-pressed="false">Mensual</button>
                 <button type="button" data-home-take-period="all" aria-pressed="true">Histórico</button>
@@ -2040,6 +2070,7 @@ currentUser = {
             const articlesCount = document.getElementById('articlesCount');
 
             const isHome = currentCategory === 'Todos' && !currentSearchQuery;
+            document.getElementById('aeHomeAllNewsActions').hidden = !isHome || filtered.length === 0;
             const isSportNewsPreview = ['NFL','Fútbol'].includes(currentCategory) && !currentSearchQuery;
             const newsHeading = document.getElementById('aeNewsSectionTitle');
             if(newsHeading) newsHeading.lastChild.textContent = currentCategory === 'Fútbol' ? ' Noticias de Fútbol' : currentCategory === 'NFL' ? ' Noticias de NFL' : ' Últimas noticias';
@@ -2132,7 +2163,7 @@ currentUser = {
                     </div>
                 </article>
             `).join('');
-            // La portada presenta las mismas tres noticias en movimiento horizontal.
+            // La portada presenta hasta siete noticias recientes en movimiento horizontal.
             // Los feeds de NFL, Fútbol y las búsquedas conservan su estructura previa.
             const homeCarousel = isHome && gridArticles.length > 1;
             articlesGrid.classList.toggle('ae-home-news-carousel', homeCarousel);
