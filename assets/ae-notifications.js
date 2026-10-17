@@ -82,7 +82,7 @@
     const seq = ++loadToken;
     try {
       const [recent,count] = await Promise.all([
-        db.from('ae_notifications').select('id,recipient_id,event_key,target_kind,target_id,actor_name,context_title,vote_value,created_at,read_at')
+        db.from('ae_notifications').select('id,recipient_id,event_key,target_kind,target_id,source_id,actor_name,context_title,vote_value,created_at,read_at')
           .eq('recipient_id',uid).order('created_at',{ascending:false}).limit(70),
         db.from('ae_notifications').select('id',{count:'exact',head:true})
           .eq('recipient_id',uid).is('read_at',null)
@@ -110,7 +110,12 @@
     if (item.target_kind === 'article') {
       const url = new URL(location.href);
       url.searchParams.set('article',item.target_id);
-      url.searchParams.delete('comment');
+      // Replies and comment votes lead directly to the comment in the article.
+      if ((item.event_key === 'article_reply' || item.event_key === 'comment_vote') && item.source_id) {
+        url.searchParams.set('comment',item.source_id);
+      } else {
+        url.searchParams.delete('comment');
+      }
       history.pushState({article:item.target_id},'',url);
       if (typeof openArticleFromShareLink === 'function') await openArticleFromShareLink();
       return;
@@ -174,7 +179,8 @@
     try {
       const {data} = await db.auth.getUser();
       if (seq !== authCheck) return;
-      const id = data?.user?.id || null;
+      // Anonymous Supabase sessions are not registered AE SPORTS accounts.
+      const id = data?.user && !data.user.is_anonymous ? data.user.id : null;
       if (id === userId) return;
       userId = id;
       loadToken++;
