@@ -1162,6 +1162,29 @@ html body:is(.ae-is-nfl,.ae-is-football) #mainContent #aeNewsSectionTitle #aeSpo
     min-width:0!important;
   }
 }
+html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeLeaders.ae-sport-chefs:not([hidden]){
+  display:block!important;
+  width:100%!important;
+  margin:17px 0 14px!important;
+  padding:0!important;
+}
+html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-takes-grid{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  align-items:stretch!important;
+  gap:13px!important;
+}
+html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeRanking{
+  margin-top:13px!important;
+}
+@media(max-width:760px){
+  html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeLeaders.ae-sport-chefs:not([hidden]){
+    margin:13px 0 12px!important;
+  }
+  html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-takes-grid{
+    gap:9px!important;
+  }
+}
 </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
