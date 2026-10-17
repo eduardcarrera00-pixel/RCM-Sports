@@ -29,19 +29,48 @@
     item.append(element('small',Number(r.correct_takes||0)+' aciertos · '+Number(r.total_resolved||0)+' resueltos','ae-take-ranking-count'));
     return item;
   }
+  // Tabla semántica sólo en páginas deportivas. La portada mantiene su formato.
+  function standingRow(r,i){
+    const row=element('tr',null,'ae-take-standing-row');
+    const position=element('td',null,'ae-take-standing-position');
+    position.append(element('strong',String(i+1).padStart(2,'0')));
+    const user=element('td',null,'ae-take-standing-user');
+    const author=element('button','@'+(r.username||'Aficionado'),'ae-take-ranking-author');
+    author.type='button';
+    author.onclick=()=>window.openAePublicProfile?.(r.user_id);
+    user.append(author);
+    const bestName=r.best_take_id?(r.best_take_title||'Take acertado'):'Sin Takes acertados';
+    const bestPoints=r.best_take_id?(' · +'+Number(r.best_take_points||0)+' pts'):'';
+    user.append(element('small',bestName+bestPoints,'ae-take-standing-mobile-best'));
+    const best=element('td',null,'ae-take-standing-best');
+    best.append(element('strong',bestName,'ae-take-standing-best-title'));
+    if(r.best_take_id)best.append(element('small','+'+Number(r.best_take_points||0)+' pts','ae-take-standing-best-score'));
+    const record=element('td',null,'ae-take-standing-record');
+    record.append(element('span',Number(r.correct_takes||0)+' / '+Number(r.total_resolved||0)));
+    const points=element('td',null,'ae-take-standing-points');
+    points.append(element('strong',Number(r.points||0).toLocaleString('es-ES',{maximumFractionDigits:2})+' pts'));
+    row.append(position,user,best,record,points);
+    return row;
+  }
+  function standingMessage(message){
+    const tr=element('tr',null,'ae-take-standing-message');
+    const cell=element('td',message);cell.colSpan=5;tr.append(cell);
+    return tr;
+  }
   async function loadRanking(where){
     const isHome=where==='home', list=$(isHome?'aeHomeTakeRankingList':'aeSportTakeRankingList');
     if(!list || !db || (!isHome&&!sport))return;
     const seq=++rankRequest[where], selectedSport=isHome?'all':sport,period=rankState[where];
-    list.replaceChildren(element('li','Cargando clasificación…'));
+    list.replaceChildren(isHome ? element('li','Cargando clasificación…') : standingMessage('Cargando clasificación…'));
     try{
       const result=await db.rpc('ae_take_result_ranking_details',{p_sport:selectedSport,p_period:period});
       if(result.error)throw result.error;
       if(seq!==rankRequest[where])return;
       if(!isHome&&selectedSport!==sport)return;
       const rows=(result.data||[]).slice(0,10);
-      list.replaceChildren(...(rows.length?rows.map(rankRow):[element('li',period==='month'?'Este mes aún no hay Takes puntuados.':'Todavía no hay Takes puntuados.','ae-take-ranking-empty')]));
-    }catch(e){if(seq===rankRequest[where])list.replaceChildren(element('li','No se pudo cargar la clasificación.','ae-take-ranking-empty'));}
+      const emptyMessage=period==='month'?'Este mes aún no hay Takes puntuados.':'Todavía no hay Takes puntuados.';
+      list.replaceChildren(...(rows.length?rows.map(isHome?rankRow:standingRow):[isHome?element('li',emptyMessage,'ae-take-ranking-empty'):standingMessage(emptyMessage)]));
+    }catch(e){if(seq===rankRequest[where])list.replaceChildren(isHome?element('li','No se pudo cargar la clasificación.','ae-take-ranking-empty'):standingMessage('No se pudo cargar la clasificación.'));}
   }
   function reviewEntry(t){
     const form=element('form',null,'ae-take-review-entry');
