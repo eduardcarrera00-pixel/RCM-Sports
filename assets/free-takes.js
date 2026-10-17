@@ -69,7 +69,7 @@
      const reply=button('Responder',()=>window.aeTakeReplies?.open(t,{focusComposer:true}),'ae-take-reply-link');
      reply.setAttribute('aria-label','Responder al Take: '+t.title);
      row.append(reply);
-     if(viewerId && t.author_id === viewerId){
+     if(activeSection !== 'NFL' && viewerId && t.author_id === viewerId){
        const edit=button('Cambiar comunidad',()=>window.aeTakeCategoryEdit?.open(t),'ae-take-minor ae-take-category-link');
        edit.setAttribute('aria-label','Cambiar entre NFL y Fútbol el Take: '+t.title);
        row.append(edit);
