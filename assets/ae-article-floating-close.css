@@ -73,3 +73,118 @@ html:not(.dark) body #articleModal .ae-article-floating-close:hover{
 @media(prefers-reduced-motion:reduce){
   html body #articleModal .ae-article-floating-close{transition:none!important}
 }
+
+/* 2026-10-17 · Mobile: pin the close action to the reader's own toolbar.
+   iOS dynamic browser chrome can make a centered 92vh dialog start off-screen.
+   The frame now occupies the visible viewport; only its body scrolls. */
+html body #articleModal .ae-article-mobile-close{display:none!important}
+@media(max-width:760px){
+  html body #articleModal:not(.hidden){
+    position:fixed!important;
+    inset:0!important;
+    box-sizing:border-box!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:stretch!important;
+    justify-content:center!important;
+    width:100%!important;
+    height:100vh!important;
+    height:100dvh!important;
+    min-height:0!important;
+    max-height:100dvh!important;
+    margin:0!important;
+    padding:10px 9px!important;
+    padding-top:max(10px,env(safe-area-inset-top,0px))!important;
+    padding-bottom:max(10px,env(safe-area-inset-bottom,0px))!important;
+    overflow:hidden!important;
+  }
+  html body #articleModal>.ae-article-panel{
+    position:relative!important;
+    box-sizing:border-box!important;
+    display:flex!important;
+    flex-direction:column!important;
+    flex:1 1 auto!important;
+    align-self:stretch!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    height:100%!important;
+    min-height:0!important;
+    max-height:100%!important;
+    margin:0!important;
+    padding:0!important;
+    overflow:hidden!important;
+    border-radius:0!important;
+  }
+  html body #articleModal .ae-article-toolbar{
+    position:relative!important;
+    inset:auto!important;
+    z-index:11!important;
+    box-sizing:border-box!important;
+    display:flex!important;
+    flex:0 0 auto!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+    min-height:56px!important;
+    padding:9px 12px!important;
+    gap:8px!important;
+  }
+  html body #articleModal .ae-article-toolbar>div{flex:0 0 auto!important}
+  html body #articleModal #modalCategory{
+    flex:0 1 auto!important;
+    min-width:0!important;
+    max-width:calc(100% - 106px)!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+  }
+  html body #articleModal .ae-article-scroll{
+    box-sizing:border-box!important;
+    flex:1 1 auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    overflow-x:hidden!important;
+    overflow-y:auto!important;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior-y:contain;
+    padding:18px 16px 22px!important;
+  }
+  html body #articleModal .ae-article-floating-close{display:none!important}
+  html body #articleModal .ae-article-mobile-close{
+    display:inline-flex!important;
+    flex-shrink:0!important;
+    justify-content:center!important;
+    align-items:center!important;
+    gap:7px!important;
+    box-sizing:border-box!important;
+    min-width:80px!important;
+    min-height:38px!important;
+    padding:8px 11px!important;
+    margin:0!important;
+    border:1px solid #c89a6a!important;
+    border-radius:0!important;
+    background:#18384a!important;
+    color:#fff0dc!important;
+    font:750 12px/1.2 Inter,system-ui,sans-serif!important;
+    cursor:pointer!important;
+    touch-action:manipulation;
+  }
+  html body #articleModal .ae-article-mobile-close i{
+    font-size:14px!important;
+    color:inherit!important;
+  }
+  html body #articleModal .ae-article-mobile-close:focus-visible{
+    outline:2px solid #e9b883!important;
+    outline-offset:2px!important;
+  }
+  html:not(.dark) body #articleModal .ae-article-mobile-close{
+    border-color:#ab7949!important;
+    background:#fff3e2!important;
+    color:#493421!important;
+  }
+}
+@media(max-width:360px){
+  html body #articleModal .ae-article-toolbar{padding:8px 10px!important}
+  html body #articleModal .ae-article-scroll{padding:14px 12px 18px!important}
+  html body #articleModal .ae-article-mobile-close{min-width:72px!important;padding:7px 9px!important}
+}
