@@ -297,3 +297,41 @@ html body.ae-is-home #homeChampionsList>li:nth-child(n+5){
     font-size:14px!important;
   }
 }
+/* Lo más leído on mobile Home: same card as desktop, now the last content block.
+   Wrapping it in an <aside> preserves all of the desktop's theme-specific styles. */
+html body #aeHomeTrendingMobileFooter[hidden]{display:none!important;}
+@media(max-width:760px){
+  html body.ae-is-home #mainContent>#aeHomeTrendingMobileFooter:not([hidden]){
+    display:block!important;box-sizing:border-box!important;
+    width:100%!important;max-width:100%!important;min-width:0!important;
+    height:auto!important;clear:both!important;
+    margin:24px 0 5px!important;padding:0!important;
+  }
+  html body.ae-is-home #mainContent>#aeHomeTrendingMobileFooter>.editorial-trending.rcm-panel{
+    box-sizing:border-box!important;width:100%!important;min-width:0!important;
+    max-width:100%!important;margin:0!important;padding:0!important;
+    border-radius:0!important;overflow:hidden!important;
+  }
+  html body.ae-is-home #mainContent>#aeHomeTrendingMobileFooter>.editorial-trending[hidden]{
+    display:none!important;
+  }
+  html body.ae-is-home #mainContent>#aeHomeTrendingMobileFooter #trendingList{
+    box-sizing:border-box!important;width:100%!important;min-width:0!important;
+  }
+  html body.ae-is-home #mainContent>#aeHomeTrendingMobileFooter #trendingList>.ae-trending-item{
+    display:grid!important;grid-template-columns:20px minmax(0,1fr) auto!important;
+    align-items:start!important;gap:9px!important;
+  }
+  html body.ae-is-home #mainContent>#aeHomeTrendingMobileFooter .ae-trending-link{
+    min-width:0!important;width:100%!important;
+    white-space:normal!important;overflow-wrap:anywhere!important;
+  }
+  html body.ae-is-home #mainContent>#aeHomeTrendingMobileFooter .ae-trending-title{
+    display:-webkit-box!important;-webkit-box-orient:vertical!important;
+    -webkit-line-clamp:2!important;max-width:100%!important;
+    overflow:hidden!important;white-space:normal!important;
+  }
+  html body.ae-is-home #mainContent>#aeHomeTrendingMobileFooter .ae-trending-meta{
+    white-space:nowrap!important;justify-self:end!important;flex-shrink:0!important;
+  }
+}
