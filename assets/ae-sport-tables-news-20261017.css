@@ -587,7 +587,7 @@ html body.ae-is-nfl #mainContent #articlesGrid.ae-sport-news-carousel {
 }
 
 
-/* ae-mobile-news-spacing-parity-v4 · 17 Oct 2026
+/* ae-mobile-news-spacing-parity-v5 · 17 Oct 2026
    Misma distancia visual para NFL y Fútbol en teléfono.
    Fútbol mueve ranking/encabezado/tarjetas a un flex column (gap:6px).
    NFL conserva el ranking fuera del grid: normalizamos los huecos.
@@ -608,13 +608,14 @@ html body.ae-is-nfl #mainContent #articlesGrid.ae-sport-news-carousel {
     margin:12px 0 0!important;
   }
 
-  /* Noticias → carrusel: 20px en ambos deportes.
-     Fútbol suma los 6px del gap del contenedor; NFL no.
+  /* Noticias → carrusel: 10px en ambos deportes (antes 20px).
+     Fútbol suma 6px del gap del contenedor + 4px de margen;
+     NFL mantiene 10px de margen. El ranking conserva su distancia.
      :not() contrarresta el margin:0 del carrusel original. */
   html body.ae-is-nfl #mainContent .editorial-layout > .space-y-8 > #articlesGrid.ae-sport-news-carousel:not(.hidden):not([hidden]) {
-    margin-top:20px!important;
+    margin-top:10px!important;
   }
   html body.ae-is-football #mainContent #aeFootballMobileStage > #articlesGrid.ae-sport-news-carousel:not(.hidden):not([hidden]) {
-    margin-top:14px!important;
+    margin-top:4px!important;
   }
 }
