@@ -427,3 +427,161 @@ html body.ae-is-nfl #mainContent #articlesGrid.ae-sport-news-carousel {
     margin-top:23px!important;
   }
 }
+
+/* ae-mobile-news-nfl-football-parity-v3 · Solo teléfonos.
+   NFL copia la geometría editorial de Noticias de Fútbol, incluida la
+   línea bronce del contorno. Power Rankings queda sin modificaciones. */
+@media (max-width:760px) {
+  html body.ae-is-nfl #mainContent #aeNewsHeadingRow,
+  html body.ae-is-football #mainContent #aeFootballMobileStage #aeNewsHeadingRow {
+    box-sizing:border-box!important;
+    position:relative!important;
+    isolation:isolate!important;
+    display:flex!important;
+    align-items:stretch!important;
+    justify-content:flex-start!important;
+    width:100%!important;
+    min-width:0!important;
+    min-height:58px!important;
+    height:auto!important;
+    padding:0!important;
+    border:1px solid rgba(200,157,111,.67)!important;
+    border-radius:0!important;
+    background-color:#081c2b!important;
+    background-position:center,center 43%!important;
+    background-size:cover,cover!important;
+    background-repeat:no-repeat!important;
+    box-shadow:0 7px 22px rgba(0,15,25,.15),inset 0 1px rgba(255,242,215,.07)!important;
+    overflow:hidden!important;
+  }
+  html body.ae-is-nfl #mainContent #aeNewsHeadingRow {
+    margin:6px 0 0!important;
+    background-image:
+      linear-gradient(96deg,rgba(4,19,31,.96) 0%,rgba(6,26,42,.84) 44%,rgba(10,29,44,.43) 100%),
+      url("rankings/ae-nfl-stadium-night.webp")!important;
+  }
+  html body.ae-is-football #mainContent #aeFootballMobileStage #aeNewsHeadingRow {
+    margin:0!important;
+    background-image:
+      linear-gradient(96deg,rgba(4,19,31,.96) 0%,rgba(6,26,42,.84) 44%,rgba(10,29,44,.43) 100%),
+      url("rankings/ae-champions-stadium-night.webp")!important;
+  }
+  html body.ae-is-nfl #mainContent #aeNewsHeadingRow::before,
+  html body.ae-is-football #mainContent #aeFootballMobileStage #aeNewsHeadingRow::before {
+    content:none!important;
+    display:none!important;
+  }
+  html body.ae-is-nfl #mainContent #aeNewsHeadingRow::after,
+  html body.ae-is-football #mainContent #aeFootballMobileStage #aeNewsHeadingRow::after {
+    content:""!important;
+    pointer-events:none!important;
+    position:absolute!important;
+    z-index:1!important;
+    display:block!important;
+    inset:auto 0 0 0!important;
+    width:100%!important;
+    height:2px!important;
+    background:linear-gradient(90deg,#b88957,rgba(233,185,126,.85) 40%,transparent 94%)!important;
+  }
+  html body.ae-is-nfl #mainContent #aeNewsHeadingRow #aeNewsSectionTitle,
+  html body.ae-is-football #mainContent #aeFootballMobileStage #aeNewsHeadingRow #aeNewsSectionTitle {
+    display:flex!important;
+    flex:1 1 auto!important;
+    align-items:stretch!important;
+    justify-content:flex-start!important;
+    width:100%!important;
+    min-width:0!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    background:none!important;
+    color:#fff2e4!important;
+    font:600 clamp(21px,5.6vw,26px)/1.12 Newsreader,Georgia,serif!important;
+    letter-spacing:-.025em!important;
+    text-transform:none!important;
+    text-shadow:0 2px 9px rgba(0,9,17,.35)!important;
+  }
+  html body.ae-is-nfl #mainContent #aeNewsHeadingRow #aeSportNewsHeadingLink:not([hidden]),
+  html body.ae-is-football #mainContent #aeFootballMobileStage #aeNewsHeadingRow #aeSportNewsHeadingLink:not([hidden]) {
+    display:flex!important;
+    flex:1 1 auto!important;
+    align-items:center!important;
+    justify-content:flex-start!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    min-width:0!important;
+    min-height:56px!important;
+    height:auto!important;
+    margin:0!important;
+    padding:8px 12px!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    color:inherit!important;
+    font:inherit!important;
+    text-align:left!important;
+    box-shadow:none!important;
+    cursor:pointer!important;
+  }
+  html body.ae-is-nfl #mainContent #aeNewsHeadingRow #aeSportNewsHeadingLink .ae-sport-news-title-label,
+  html body.ae-is-football #mainContent #aeFootballMobileStage #aeNewsHeadingRow #aeSportNewsHeadingLink .ae-sport-news-title-label {
+    display:block!important;
+    color:inherit!important;
+    font:inherit!important;
+  }
+  /* Fútbol usa una pista movida a #aeFootballMobileStage; sumamos su gap
+     a la separación en NFL para que el aire entre título y tarjetas coincida. */
+  html body.ae-is-football #mainContent #aeFootballMobileStage {
+    gap:6px!important;
+  }
+  html body.ae-is-football #mainContent #aeFootballMobileStage #articlesGrid.ae-sport-news-carousel {
+    margin-top:18px!important;
+  }
+  html body.ae-is-nfl #mainContent #articlesGrid.ae-sport-news-carousel {
+    margin-top:26px!important;
+  }
+  html body.ae-is-nfl #mainContent #articlesGrid.ae-sport-news-carousel > article,
+  html body.ae-is-football #mainContent #articlesGrid.ae-sport-news-carousel > article {
+    flex:0 0 min(77%,278px)!important;
+    width:min(77%,278px)!important;
+    height:207px!important;
+    min-height:0!important;
+    max-height:none!important;
+    border-radius:0!important;
+  }
+  html body.ae-is-nfl #mainContent #articlesGrid.ae-sport-news-carousel > article > div:first-child > .relative.h-48,
+  html body.ae-is-football #mainContent #articlesGrid.ae-sport-news-carousel > article > div:first-child > .relative.h-48 {
+    flex:0 0 92px!important;
+    height:92px!important;
+    min-height:0!important;
+    max-height:92px!important;
+  }
+  html body.ae-is-nfl #mainContent #articlesGrid.ae-sport-news-carousel > article .p-5 h3,
+  html body.ae-is-football #mainContent #articlesGrid.ae-sport-news-carousel > article .p-5 h3 {
+    font-size:15.5px!important;
+    line-height:1.17!important;
+  }
+  html:not(.dark) body.ae-is-nfl #mainContent #aeNewsHeadingRow,
+  html:not(.dark) body.ae-is-football #mainContent #aeFootballMobileStage #aeNewsHeadingRow {
+    border-color:rgba(146,102,69,.50)!important;
+    background-color:#f8f0e7!important;
+    background-position:center,center 43%!important;
+    background-size:cover,cover!important;
+  }
+  html:not(.dark) body.ae-is-nfl #mainContent #aeNewsHeadingRow {
+    background-image:
+      linear-gradient(96deg,rgba(255,250,241,.98) 0%,rgba(255,246,233,.86) 44%,rgba(255,246,233,.51) 100%),
+      url("rankings/ae-nfl-stadium-day.webp")!important;
+  }
+  html:not(.dark) body.ae-is-football #mainContent #aeFootballMobileStage #aeNewsHeadingRow {
+    background-image:
+      linear-gradient(96deg,rgba(255,250,241,.98) 0%,rgba(255,246,233,.86) 44%,rgba(255,246,233,.51) 100%),
+      url("rankings/ae-champions-stadium-day.webp")!important;
+  }
+  html:not(.dark) body.ae-is-nfl #mainContent #aeNewsHeadingRow #aeNewsSectionTitle,
+  html:not(.dark) body.ae-is-football #mainContent #aeFootballMobileStage #aeNewsHeadingRow #aeNewsSectionTitle {
+    color:#354c59!important;
+    text-shadow:none!important;
+  }
+}
