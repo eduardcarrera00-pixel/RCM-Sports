@@ -49,7 +49,6 @@
    const summary=make('summary',undefined,'ae-weekly-expand-summary');
    summary.append(make('strong',p.title,'ae-weekly-title'));
    summary.append(make('span',p.selection,'ae-weekly-compact-selection'));
-   summary.append(make('span','Cuota '+odds(p.american_odds),'ae-weekly-odds'));
    summary.append(make('span','Ver análisis y detalles ↓','ae-weekly-expand-hint'));
    const expanded=make('div',undefined,'ae-weekly-expanded-content');
    const photoUrl=editorialUrl(p.image_path,p.image_url);
@@ -81,6 +80,12 @@
  }
  function render(){
    renderHomeBanner();
+   // One non-interactive odds badge beside the heading, sourced from the same published Pick.
+   const oddsHighlight=$('aeWeeklyOddsHighlight');
+   if(oddsHighlight){
+     oddsHighlight.hidden=!active;
+     oddsHighlight.textContent=active?'Cuota '+odds(active.american_odds):'';
+   }
    const featured=$('picksFeatured');
    if(featured){
      featured.querySelector('.ae-weekly-banner')?.remove();
@@ -106,6 +111,8 @@
      render();
    }catch(e){
      active=null;
+     const oddsHighlight=$('aeWeeklyOddsHighlight');
+     if(oddsHighlight){oddsHighlight.hidden=true;oddsHighlight.textContent='';}
      renderHomeBanner();
      $('picksFeatured')?.querySelector('.ae-weekly-banner')?.remove();
      for(const id of ['cpWeekly','picksFeaturedCard']){$(id)?.replaceChildren(make('p','No se pudo cargar el Pick editorial.','ae-weekly-empty'));}
