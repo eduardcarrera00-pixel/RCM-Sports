@@ -215,11 +215,11 @@ html body.ae-is-home #aeHomeSidebarFeatures>.editorial-trending:not([hidden]){di
 html body.ae-is-home #editorialBottom{display:block!important;min-width:0;}
 html body.ae-is-home #editorialBottom[hidden]{display:none!important;}
 /* Título sencillo, en lugar de un banner. */
-html body.ae-is-home #aeHomeTopTakes>.ae-takes-section-title{display:block!important;position:static!important;box-sizing:border-box;width:100%!important;height:auto!important;min-height:0!important;margin:0 0 13px!important;padding:0 0 11px!important;border:0!important;border-bottom:1px solid rgba(190,155,117,.36)!important;border-radius:0!important;background:none!important;box-shadow:none!important;isolation:auto!important;}
-html body.ae-is-home #aeHomeTopTakes>.ae-takes-section-title::before,html body.ae-is-home #aeHomeTopTakes>.ae-takes-section-title::after{content:none!important;}
-html body.ae-is-home #aeHomeTopTakes>.ae-takes-section-title #aeHomeTopTakesTitle{display:block!important;margin:0!important;padding:0!important;color:#f4e2ce!important;font:600 clamp(24px,2.35vw,34px)/1.12 Newsreader,Georgia,serif!important;letter-spacing:-.02em!important;text-transform:none!important;text-shadow:none!important;}
-html:not(.dark) body.ae-is-home #aeHomeTopTakes>.ae-takes-section-title{border-bottom-color:rgba(120,91,68,.32)!important;}
-html:not(.dark) body.ae-is-home #aeHomeTopTakes>.ae-takes-section-title #aeHomeTopTakesTitle{color:#3b4a52!important;}
+html body.ae-is-home #aeHomeTakeHighlights>.ae-home-take-extras>#aeHomeTakesSectionHeading{display:block!important;position:static!important;box-sizing:border-box;width:100%!important;height:auto!important;min-height:0!important;margin:0 0 13px!important;padding:0 0 11px!important;border:0!important;border-bottom:1px solid rgba(190,155,117,.36)!important;border-radius:0!important;background:none!important;box-shadow:none!important;isolation:auto!important;}
+html body.ae-is-home #aeHomeTakeHighlights>.ae-home-take-extras>#aeHomeTakesSectionHeading::before,html body.ae-is-home #aeHomeTakeHighlights>.ae-home-take-extras>#aeHomeTakesSectionHeading::after{content:none!important;}
+html body.ae-is-home #aeHomeTakeHighlights>.ae-home-take-extras>#aeHomeTakesSectionHeading #aeHomeTopTakesTitle{display:block!important;margin:0!important;padding:0!important;color:#f4e2ce!important;font:600 clamp(24px,2.35vw,34px)/1.12 Newsreader,Georgia,serif!important;letter-spacing:-.02em!important;text-transform:none!important;text-shadow:none!important;}
+html:not(.dark) body.ae-is-home #aeHomeTakeHighlights>.ae-home-take-extras>#aeHomeTakesSectionHeading{border-bottom-color:rgba(120,91,68,.32)!important;}
+html:not(.dark) body.ae-is-home #aeHomeTakeHighlights>.ae-home-take-extras>#aeHomeTakesSectionHeading #aeHomeTopTakesTitle{color:#3b4a52!important;}
 /* CTA después de Mejor take histórico; se conserva el diálogo y su ID. */
 html body.ae-is-home #aeHomeTakeHighlights>.ae-home-take-extras>.ae-home-take-bottom-cta{grid-column:1/-1!important;display:flex!important;justify-content:center!important;align-items:center!important;min-width:0;margin:0!important;padding:7px 0 0!important;}
 html body.ae-is-home #aeHomeTakeHighlights .ae-home-take-bottom-cta #aeHomeTakePublish{display:inline-flex!important;align-items:center!important;justify-content:center!important;min-height:44px!important;min-width:min(245px,100%)!important;width:auto!important;margin:0!important;padding:11px 23px!important;border:1px solid #dcb184!important;border-radius:2px!important;background:linear-gradient(105deg,#e4bb86,#c98e57)!important;color:#092838!important;font:750 13px/1.2 Inter,system-ui,sans-serif!important;box-shadow:0 5px 15px rgba(5,18,27,.16)!important;text-shadow:none!important;cursor:pointer;}
@@ -232,3 +232,18 @@ html body.ae-is-home #aeHomeTakeHighlights .ae-home-take-bottom-cta #aeHomeTakeP
  html body.ae-is-home #aeHomeTakeHighlights .ae-home-take-bottom-cta #aeHomeTakePublish{width:100%!important;min-width:0!important;}
 }
 @media(prefers-reduced-motion:reduce){html body.ae-is-home #aeHomeTakeHighlights .ae-home-take-bottom-cta #aeHomeTakePublish{transition:none!important;}}
+
+/* Sección editorial: título, dos Takes populares, clasificaciones por puntos. */
+html body.ae-is-home #aeHomeTakeHighlights>.ae-home-take-extras>#aeHomeTakesSectionHeading{
+  grid-column:1/-1!important;
+  grid-row:auto!important;
+  min-width:0!important;
+  align-self:start!important;
+}
+html body.ae-is-home #aeHomeTakeHighlights>.ae-home-take-extras>:is(#aeHomeTakesPopular,#aeHomeTakesUnpopular){
+  grid-row:auto!important;
+  min-width:0!important;
+}
+html body.ae-is-home #aeHomeTakeHighlights>.ae-home-take-extras>#aeHomeTopTakes{
+  grid-row:auto!important;
+}
