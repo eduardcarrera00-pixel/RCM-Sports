@@ -18,7 +18,11 @@
     if(!root)return;
     if(!nflTakeAnchor){
       nflTakeAnchor = document.createComment('AE: posición original de NFL Savant / NFL Rookie');
-      root.parentNode?.insertBefore(nflTakeAnchor,root);
+      // Punto de retorno estable, aunque se abra directamente la página NFL.
+      const sidebar=document.querySelector('#mainContent .editorial-layout > aside');
+      const community=sidebar?.querySelector('.editorial-community');
+      if(community?.parentElement===sidebar) sidebar.insertBefore(nflTakeAnchor,community.nextSibling);
+      else root.parentNode?.insertBefore(nflTakeAnchor,root);
     }
     const takeFeed = byId('freeTakes');
     const standing = byId('aeSportTakeRanking');
@@ -29,7 +33,9 @@
       if(root.parentElement !== takeFeed || root.nextElementSibling !== standing){
         takeFeed.insertBefore(root,standing);
       }
-    } else if(nflTakeAnchor.parentNode && (root.parentElement !== nflTakeAnchor.parentElement || nflTakeAnchor.nextSibling !== root)){
+    } else if(mobile.matches && nflTakeAnchor.parentNode &&
+              (root.parentElement !== nflTakeAnchor.parentElement || nflTakeAnchor.nextSibling !== root)){
+      // En desktop deja que ae-sport-top-takes coloque Fútbol en su columna.
       nflTakeAnchor.parentNode.insertBefore(root,nflTakeAnchor.nextSibling);
     }
   }
