@@ -54,3 +54,95 @@ html body.ae-is-nfl #aeNflTakeFooterCta>#aeSportTakePublish:focus-visible{outlin
     min-width:0!important;
   }
 }
+
+/* NFL vuelve a tener un encabezado de sección normal, como la portada.
+   El panel de Takes conserva expresamente su banner anterior. */
+html body.ae-is-nfl #mainContent #aeNewsHeadingRow{
+  display:block!important;
+  position:static!important;
+  isolation:auto!important;
+  box-sizing:border-box!important;
+  width:100%!important;
+  min-width:0!important;
+  height:auto!important;
+  min-height:0!important;
+  margin:0 0 14px!important;
+  padding:0 0 11px!important;
+  border:0!important;
+  border-bottom:1px solid rgba(190,155,117,.36)!important;
+  border-radius:0!important;
+  background:none!important;
+  background-image:none!important;
+  box-shadow:none!important;
+  overflow:visible!important;
+}
+html body.ae-is-nfl #mainContent #aeNewsHeadingRow::before,
+html body.ae-is-nfl #mainContent #aeNewsHeadingRow::after{
+  content:none!important;
+  display:none!important;
+}
+html body.ae-is-nfl #mainContent #aeNewsHeadingRow #aeNewsSectionTitle{
+  display:block!important;
+  box-sizing:border-box!important;
+  width:100%!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  background:none!important;
+  color:#f4e2ce!important;
+  font:600 clamp(24px,2.35vw,34px)/1.12 Newsreader,Georgia,serif!important;
+  letter-spacing:-.02em!important;
+  text-transform:none!important;
+  text-shadow:none!important;
+}
+html body.ae-is-nfl #mainContent #aeNewsSectionTitle::before,
+html body.ae-is-nfl #mainContent #aeNewsSectionTitle>span{
+  content:none!important;
+  display:none!important;
+}
+html body.ae-is-nfl #mainContent #aeNewsHeadingRow .ae-news-inline-tools,
+html body.ae-is-nfl #mainContent #articlesCount,
+html body.ae-is-nfl #mainContent #articlesCount[hidden]{
+  display:none!important;
+}
+html:not(.dark) body.ae-is-nfl #mainContent #aeNewsHeadingRow{
+  border-bottom-color:rgba(120,91,68,.32)!important;
+}
+html:not(.dark) body.ae-is-nfl #mainContent #aeNewsSectionTitle{
+  color:#3b4a52!important;
+}
+@media(max-width:760px){
+  html body.ae-is-nfl #mainContent #aeNewsHeadingRow{
+    min-height:0!important;
+    margin:4px 0 12px!important;
+    padding:0 0 9px!important;
+    display:block!important;
+  }
+  html body.ae-is-nfl #mainContent #aeNewsHeadingRow #aeNewsSectionTitle{
+    font-size:clamp(22px,5.6vw,29px)!important;
+    line-height:1.1!important;
+  }
+}
+/* Los movimientos del ranking NFL hacen redundante la etiqueta "Week 5". */
+html body.ae-is-nfl #nflRankings #rankingEdition.ae-rank-edition{
+  display:none!important;
+}
+/* CTA del archivo después de la interacción y los comentarios de cada noticia. */
+html body #articleModal .ae-article-all-news-footer{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:100%!important;
+  margin:20px 0 8px!important;
+  padding:19px 0 0!important;
+  border-top:1px solid rgba(190,155,117,.32)!important;
+}
+html body #articleModal #aeArticleAllNewsCta.ae-news-all-button{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  min-height:43px!important;
+  padding:11px 20px!important;
+  font-size:12px!important;
+}
