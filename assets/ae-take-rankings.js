@@ -71,25 +71,33 @@
     const value=rookie?Number(r.lost_takes||0):Number(r.points||0);
     const scoreText=rookie?(value===1?'1 fallo':value+' fallos'):
       value.toLocaleString('es-ES',{maximumFractionDigits:2})+' pts';
-    // On phones retain the original stacked information; on desktop put
-    // the score in a dedicated standings column, as in a sports league.
-    details.append(element('strong',scoreText,'ae-nfl-ranking-score-mobile'));
+    const evaluated=Number(r.total_resolved||0);
+    const correct=Number(r.correct_takes||0);
+    const accuracy=evaluated>0?Math.round(100*correct/evaluated)+'%':'—';
+    // Mobile: success percentage immediately to the left of points or misses.
+    const mobileMetrics=element('div',null,'ae-nfl-ranking-mobile-metrics');
+    mobileMetrics.append(
+      element('span',accuracy,'ae-nfl-ranking-mobile-percent'),
+      element('strong',scoreText,'ae-nfl-ranking-score-mobile')
+    );
+    details.append(mobileMetrics);
     const takeName=rookie?r.worst_take_title:r.best_take_title;
     const note=rookie?'Último Take fallado':'Mejor Take';
     details.append(element('small',takeName?note+' · '+takeName:
       (rookie?'Take fallado sin título':'Sin Takes acertados'),'ae-nfl-ranking-take'));
-    details.append(element('small',
-      Number(r.correct_takes||0)+' aciertos · '+Number(r.total_resolved||0)+' evaluados',
-      'ae-nfl-ranking-record'));
+    const accuracyCell=element('td',null,'ae-nfl-ranking-accuracy');
+    const accuracyValue=element('strong',accuracy);
+    accuracyValue.setAttribute('aria-label',accuracy==='—'?'Porcentaje de aciertos no disponible':'Porcentaje de aciertos: '+accuracy);
+    accuracyCell.append(accuracyValue);
     const score=element('td',null,'ae-nfl-ranking-value');
     const displayedScore=element('strong',scoreText,'ae-nfl-ranking-score');
     score.append(displayedScore);
-    row.append(position,details,score);
+    row.append(position,details,accuracyCell,score);
     return row;
   }
   function nflStandingMessage(message){
     const row=element('tr',null,'ae-nfl-ranking-message');
-    const cell=element('td',message);cell.colSpan=3;row.append(cell);
+    const cell=element('td',message);cell.colSpan=4;row.append(cell);
     return row;
   }
   async function loadNflTwinRankings(seq,period){
