@@ -42,6 +42,8 @@
         window.aeTakeCategoryEdit.open(current, sport=>{
           current.sport=sport;
           displaySport(current);
+          // Si el Take pasa a Fútbol, no mostrar la acción de cambiar comunidad.
+          showEditIfOwner(current);
         });
       }
     });
@@ -176,10 +178,12 @@
   async function showEditIfOwner(take) {
     const edit=$('aeDiscussionEditSport');
     edit.hidden=true;
+    // En Fútbol no se ofrece cambiar de comunidad al abrir un Take.
+    if(dialog?.dataset.sport==='football')return;
     if(!take?.author_id || typeof db==='undefined'||!db)return;
     try {
       const response=await db.auth.getUser();
-      if(current?.id===take.id && dialog.open && response.data?.user?.id===take.author_id){
+      if(current?.id===take.id && dialog.open && dialog.dataset.sport!=='football' && response.data?.user?.id===take.author_id){
         edit.hidden=false;
       }
     } catch(_) {}
