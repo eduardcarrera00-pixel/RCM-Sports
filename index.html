@@ -1227,6 +1227,13 @@ html body.ae-is-home #editorialBottom #aeHomeTakeHighlights .ae-home-take-bottom
   transform:translateY(-2px)!important;
   box-shadow:0 8px 24px rgba(195,126,61,.32),inset 0 1px rgba(255,255,255,.40)!important;
 }
+/* The global square-corner rule is a layered !important declaration.
+   Override within that SAME layer so this is the sole rounded exception. */
+@layer ae-editorial-square-corners {
+  html body.ae-is-home #editorialBottom #aeHomeTakeHighlights .ae-home-take-bottom-cta #aeHomeTakePublish{
+    border-radius:11px!important;
+  }
+}
 /* Most-read: a single actionable row, clear direction and aligned affordance. */
 html body.ae-is-home #mainContent #trendingList>.ae-trending-item{
   display:grid!important;
