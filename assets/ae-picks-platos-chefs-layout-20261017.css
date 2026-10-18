@@ -409,3 +409,33 @@ html:not(.dark) body #footballTakes.ae-picks-editorial .ae-picks-rail>section.ae
 html:not(.dark) body #footballTakes.ae-picks-editorial .ae-picks-rail>section.ae-chef-worst ol.ae-chef-scroll{
   background:rgba(253,249,253,.70)!important;
 }
+
+
+/* Picks news: single latest-article preview, no decorative header. */
+html body #footballTakes.ae-picks-editorial #aePicksTopPair .ae-picks-overview #picksNews #picksNewsList{
+  display:flex!important;
+  flex:1 1 auto!important;
+  width:100%!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:0!important;
+}
+html body #footballTakes.ae-picks-editorial #aePicksTopPair .ae-picks-overview #picksNews .ae-picks-news-feature{
+  flex:1 1 auto!important;
+  min-height:368px!important;
+}
+html body #footballTakes.ae-picks-editorial #aePicksTopPair .ae-picks-overview #picksNews .ae-picks-news-feature.has-photo .ae-picks-news-in-card-title{
+  display:block!important;
+  color:#fff4e8!important;
+  font:600 clamp(20px,2.3vw,28px)/1.17 Newsreader,Georgia,serif!important;
+  text-shadow:0 2px 10px rgba(4,14,21,.8)!important;
+  overflow-wrap:anywhere;
+}
+html body #footballTakes.ae-picks-editorial #aePicksTopPair .ae-picks-overview #picksNews .ae-picks-news-feature .ae-picks-news-copy{
+  padding:clamp(15px,2.1vw,24px)!important;
+}
+@media(max-width:910px){
+  html body #footballTakes.ae-picks-editorial #aePicksTopPair .ae-picks-overview #picksNews .ae-picks-news-feature{
+    min-height:clamp(225px,51vw,330px)!important;
+  }
+}
