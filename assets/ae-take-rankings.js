@@ -57,10 +57,70 @@
     const cell=element('td',message);cell.colSpan=5;tr.append(cell);
     return tr;
   }
+
+  function nflStandingRow(r,i,rookie){
+    const row=element('tr',null,'ae-nfl-ranking-row');
+    const position=element('td',null,'ae-nfl-ranking-place');
+    position.append(element('strong',String(i+1).padStart(2,'0')));
+    const details=element('td',null,'ae-nfl-ranking-details');
+    const username=element('button','@'+(r.username||'Aficionado'),'ae-nfl-ranking-user');
+    username.type='button';
+    username.setAttribute('aria-label','Ver perfil de '+(r.username||'Aficionado'));
+    username.onclick=()=>window.openAePublicProfile?.(r.user_id);
+    details.append(username);
+    const value=rookie?Number(r.lost_takes||0):Number(r.points||0);
+    details.append(element('strong',
+      rookie?(value===1?'1 fallo':value+' fallos'):
+        value.toLocaleString('es-ES',{maximumFractionDigits:2})+' pts',
+      'ae-nfl-ranking-score'));
+    const takeName=rookie?r.worst_take_title:r.best_take_title;
+    const note=rookie?'Último Take fallado':'Mejor Take';
+    details.append(element('small',takeName?note+' · '+takeName:
+      (rookie?'Take fallado sin título':'Sin Takes acertados'),'ae-nfl-ranking-take'));
+    details.append(element('small',
+      Number(r.correct_takes||0)+' aciertos · '+Number(r.total_resolved||0)+' evaluados',
+      'ae-nfl-ranking-record'));
+    row.append(position,details);
+    return row;
+  }
+  function nflStandingMessage(message){
+    const row=element('tr',null,'ae-nfl-ranking-message');
+    const cell=element('td',message);cell.colSpan=2;row.append(cell);
+    return row;
+  }
+  async function loadNflTwinRankings(seq,period){
+    const savant=$('aeNflSavantList'),rookie=$('aeNflRookieList');
+    if(!savant||!rookie)return;
+    savant.replaceChildren(nflStandingMessage('Cargando clasificación…'));
+    rookie.replaceChildren(nflStandingMessage('Cargando clasificación…'));
+    const args={p_sport:'nfl',p_period:period};
+    // Keep the two rankings independent: a problem loading Rookie must not
+    // erase Savant's valid standings. Both use the same monthly/history tabs.
+    const [winners,losers]=await Promise.allSettled([
+      db.rpc('ae_take_result_ranking_details',args),
+      db.rpc('ae_take_result_ranking_rookies',args)
+    ]);
+    if(seq!==rankRequest.sport||sport!=='nfl'||rankState.sport!==period)return;
+    for(const [outcome,list,isRookie] of [[winners,savant,false],[losers,rookie,true]]){
+      if(outcome.status!=='fulfilled'||outcome.value.error){
+        list.replaceChildren(nflStandingMessage('No se pudo cargar la clasificación.'));
+        continue;
+      }
+      const rows=(outcome.value.data||[]).slice(0,10);
+      const empty=isRookie?
+        (period==='month'?'Este mes aún no hay Takes fallados.':'Todavía no hay Takes fallados.') :
+        (period==='month'?'Este mes aún no hay Takes puntuados.':'Todavía no hay Takes puntuados.');
+      list.replaceChildren(...(rows.length?rows.map((r,i)=>nflStandingRow(r,i,isRookie)):[nflStandingMessage(empty)]));
+    }
+  }
   async function loadRanking(where){
     const isHome=where==='home', list=$(isHome?'aeHomeTakeRankingList':'aeSportTakeRankingList');
     if(!list || !db || (!isHome&&!sport))return;
     const seq=++rankRequest[where], selectedSport=isHome?'all':sport,period=rankState[where];
+    if(!isHome&&selectedSport==='nfl'){
+      await loadNflTwinRankings(seq,period);
+      return;
+    }
     list.replaceChildren(isHome ? element('li','Cargando clasificación…') : standingMessage('Cargando clasificación…'));
     try{
       const result=await db.rpc('ae_take_result_ranking_details',{p_sport:selectedSport,p_period:period});
@@ -134,6 +194,13 @@
     if(next===sport)return;
     sport=next;
     if(next)$('aeSportTakeRankingTitle').textContent='Top 10 · '+(next==='nfl'?'NFL':'Fútbol');
+    const twin=$('aeNflTwinRankings'),solo=$('aeSportTakeRankingSolo');
+    if(twin)twin.hidden=next!=='nfl';
+    if(solo)solo.hidden=next==='nfl';
+    const description=$('aeSportTakeRankingDescription');
+    if(description)description.textContent=next==='nfl'
+      ? 'Dos clasificaciones por resultados confirmados: puntos para Savant y fallos para Rookie.'
+      : 'Los admins confirman cada acierto y asignan de 1 a 100 puntos. Un fallo vale 0.';
     refresh();
   },refresh};
   document.addEventListener('DOMContentLoaded',()=>{
