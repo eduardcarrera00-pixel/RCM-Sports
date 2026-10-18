@@ -181,3 +181,82 @@ html:not(.dark) body #footballTakes.ae-picks-editorial #communityPicks .ae-chefs
 html:not(.dark) body #footballTakes.ae-picks-editorial #communityPicks .ae-chefs-dual-standings .ae-take-leaderboard-list .ae-chef-accuracy:is(.is-neutral,.is-unknown){
   color:#677785!important;
 }
+
+
+/* AE SPORTS · ranking Chef profile and Pick links 2026-10-18 */
+/* Both actions are independent and keyboard-accessible, without
+   changing standings, result points or the four-visible-rows scroller. */
+html body #footballTakes #communityPicks .ae-chefs-dual-standings .ae-chef-ranking-person {
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:center!important;
+  align-items:flex-start!important;
+  gap:2px!important;
+  min-width:0!important;
+  max-width:100%!important;
+  overflow:hidden!important;
+}
+html body #footballTakes #communityPicks .ae-chefs-dual-standings button.ae-chef-profile-link {
+  display:block!important;
+  box-sizing:border-box!important;
+  width:auto!important;
+  max-width:100%!important;
+  min-width:0!important;
+  min-height:29px!important;
+  margin:0!important;
+  padding:4px 0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  color:inherit!important;
+  font:750 11px/1.25 Inter,system-ui,sans-serif!important;
+  text-align:left!important;
+  white-space:nowrap!important;
+  text-overflow:ellipsis!important;
+  overflow:hidden!important;
+  cursor:pointer!important;
+}
+html body #footballTakes #communityPicks .ae-chefs-dual-standings a.ae-chef-ranked-pick-link {
+  display:inline-flex!important;
+  align-items:center!important;
+  max-width:100%!important;
+  min-height:23px!important;
+  padding:2px 0!important;
+  border:0!important;
+  border-bottom:1px solid rgba(221,172,119,.47)!important;
+  border-radius:0!important;
+  color:#e6b886!important;
+  font:750 10px/1.25 Inter,system-ui,sans-serif!important;
+  text-decoration:none!important;
+  white-space:nowrap!important;
+  cursor:pointer!important;
+}
+html body #footballTakes #communityPicks .ae-chefs-dual-standings .ae-worst-chefs-board a.ae-chef-ranked-pick-link{
+  color:#eebbd7!important;
+  border-bottom-color:rgba(238,187,215,.45)!important;
+}
+html body #footballTakes #communityPicks .ae-chefs-dual-standings :is(.ae-chef-profile-link,.ae-chef-ranked-pick-link):hover {
+  text-decoration:underline!important;
+  text-underline-offset:3px!important;
+}
+html body #footballTakes #communityPicks .ae-chefs-dual-standings :is(.ae-chef-profile-link,.ae-chef-ranked-pick-link):focus-visible {
+  outline:2px solid #ebc28c!important;
+  outline-offset:2px!important;
+}
+html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings a.ae-chef-ranked-pick-link{
+  color:#8a5b37!important;
+  border-bottom-color:rgba(138,91,55,.43)!important;
+}
+html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings .ae-worst-chefs-board a.ae-chef-ranked-pick-link{
+  color:#905679!important;
+  border-bottom-color:rgba(144,86,121,.42)!important;
+}
+@media(max-width:760px){
+  html body #footballTakes #communityPicks .ae-chefs-dual-standings button.ae-chef-profile-link{
+    font-size:10.5px!important;
+  }
+  html body #footballTakes #communityPicks .ae-chefs-dual-standings a.ae-chef-ranked-pick-link{
+    font-size:9.5px!important;
+  }
+}
