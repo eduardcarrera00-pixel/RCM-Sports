@@ -11,6 +11,38 @@
    return n;
  };
  let desktopHomeMarker=null;
+ let nflAlignFrame=0;
+ function alignNflOpinions(){
+   if(nflAlignFrame)return;
+   nflAlignFrame=requestAnimationFrame(()=>{
+     nflAlignFrame=0;
+     const root=$('aeSportTakeLeaders'),cards=$('articlesGrid');
+     if(!root)return;
+     if(!window.matchMedia('(min-width:961px)').matches||
+       !document.body.classList.contains('ae-is-nfl')||root.hidden||
+       !root.parentElement?.matches('#mainContent .editorial-layout > aside')||
+       !cards||cards.hidden||cards.classList.contains('hidden')){
+       root.style.removeProperty('--ae-nfl-opinions-height');
+       return;
+     }
+     const height=Math.round(cards.getBoundingClientRect().bottom-root.getBoundingClientRect().top);
+     if(height>=250&&height<=4000)root.style.setProperty('--ae-nfl-opinions-height',height+'px');
+     else root.style.removeProperty('--ae-nfl-opinions-height');
+   });
+ }
+ function watchNflNews(){
+   const grid=$('articlesGrid');
+   if('ResizeObserver' in window){
+     const observer=new ResizeObserver(alignNflOpinions);
+     if(grid)observer.observe(grid);
+     const heading=$('aeNewsHeadingRow');if(heading)observer.observe(heading);
+   }
+   if(grid&&'MutationObserver' in window){
+     new MutationObserver(alignNflOpinions).observe(grid,{childList:true});
+   }
+   window.addEventListener('resize',alignNflOpinions,{passive:true});
+   alignNflOpinions();
+ }
  function syncFootballDesktopPlacement(){
    const root=$('aeSportTakeLeaders');
    const layout=document.querySelector('#mainContent .editorial-layout');
@@ -92,6 +124,13 @@
      });
      list.append(li);
    }
+   if(list.closest('#aeSportTakeLeaders')?.dataset.sport==='nfl'){
+     list.tabIndex=0;
+     list.setAttribute('role','region');
+     list.setAttribute('aria-label',mode==='up'?'Opiniones apoyadas de NFL, desplazar hacia abajo':'Opiniones hateadas de NFL, desplazar hacia abajo');
+   }else{
+     list.removeAttribute('tabindex'); list.removeAttribute('role'); list.removeAttribute('aria-label');
+   }
    if(!items.length)list.append(el('li',mode==='up'?
      'Aún no hay Takes con votos netos positivos.':
      'Aún no hay Takes con votos netos negativos.','ae-top-takes-empty'));
@@ -104,6 +143,7 @@
    root.hidden=!sport;voices.hidden=!!sport;
    root.dataset.sport=sport;
    syncFootballDesktopPlacement();
+   alignNflOpinions();
    if(!sport){current='';request++;return;}
    // Los destacados deportivos tienen nombres propios; los de portada
    // (#aeTopTakesPositiveTitle / #aeTopTakesNegativeTitle) no se modifican.
@@ -121,9 +161,9 @@
      const data=(r.data||[]).filter(t=>sport==='nfl'?t.sport==='nfl':footballSports.has(t.sport));
      const net=t=>Number(t.upvotes||0)-Number(t.downvotes||0);
      const positive=data.filter(t=>net(t)>0)
-       .sort((a,b)=>net(b)-net(a)||Number(b.upvotes||0)-Number(a.upvotes||0)||new Date(b.created_at)-new Date(a.created_at)).slice(0,2);
+       .sort((a,b)=>net(b)-net(a)||Number(b.upvotes||0)-Number(a.upvotes||0)||new Date(b.created_at)-new Date(a.created_at)).slice(0,sport==='nfl'?10:2);
      const negative=data.filter(t=>net(t)<0)
-       .sort((a,b)=>net(a)-net(b)||Number(b.downvotes||0)-Number(a.downvotes||0)||new Date(b.created_at)-new Date(a.created_at)).slice(0,2);
+       .sort((a,b)=>net(a)-net(b)||Number(b.downvotes||0)-Number(a.downvotes||0)||new Date(b.created_at)-new Date(a.created_at)).slice(0,sport==='nfl'?10:2);
      renderList('aeSportTakePositive',positive,'up');
      renderList('aeSportTakeNegative',negative,'down');
      status.textContent='Clasificación según los votos de Takes de '+(sport==='nfl'?'NFL.':'Fútbol.');
@@ -139,10 +179,11 @@
    }
  }
  window.refreshAeSportTopTakes=refresh;
- document.addEventListener('DOMContentLoaded',()=>refresh(true));
+ document.addEventListener('DOMContentLoaded',()=>{watchNflNews();refresh(true);});
  window.matchMedia('(min-width:761px)').addEventListener('change',()=>{
    syncFootballDesktopPlacement();
    if(window.matchMedia('(min-width:761px)').matches)refresh(true);
+   alignNflOpinions();
  });
  document.addEventListener('ae:takes-updated',()=>refresh(true));
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh();});
