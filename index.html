@@ -1333,6 +1333,25 @@ html:not(.dark) body.ae-is-home #mainContent #trendingList .ae-trending-arrow{
     transition:none!important;transform:none!important;
   }
 }
+
+/* Lo más leído: omit the number column and cover the full panel width. */
+html body.ae-is-home #mainContent #aeTrendingPortada.ae-trending-portada #trendingList .ae-trending-link{
+  grid-template-columns:68px minmax(0,1fr)!important;
+}
+html body.ae-is-home #mainContent #aeTrendingPortada.ae-trending-portada #trendingList > .is-featured{
+  box-sizing:border-box!important;
+  width:calc(100% + 32px)!important;
+  max-width:none!important;
+  margin:0 -16px!important;
+}
+html body.ae-is-home #mainContent #aeTrendingPortada.ae-trending-portada #trendingList > .is-featured .ae-trending-image{
+  inset:0!important;width:100%!important;height:100%!important;
+}
+@media(max-width:760px){
+  html body.ae-is-home #mainContent #aeTrendingPortada.ae-trending-portada #trendingList .ae-trending-link{
+    grid-template-columns:64px minmax(0,1fr)!important;
+  }
+}
 </style>
 <style id="ae-header-moon-sport-icons-and-classic-avisos">
 /* AE SPORTS · desktop navigation polish; transient feedback, never a permanent frame. */
@@ -3247,8 +3266,7 @@ currentUser = {
                 const byline = [day,article.author?'por '+article.author:''].filter(Boolean).join(' · ');
                 return '<li class="ae-trending-item' + (index===0?' is-featured':'') + '">'
                     + '<button type="button" class="ae-trending-link" onclick="openArticleModal(' + articleIdArgument(article.id) + ')" aria-label="Leer noticia: ' + escapeHTML(article.title) + '">'
-                    + '<span class="ae-trending-image"><img src="' + escapeHTML(safeImageURL(article.image)) + '" alt="" loading="lazy" decoding="async" style="object-position:' + imagePosition(article) + ';--ae-trending-zoom:' + imageScale(article) + '" onerror="this.hidden=true"></span>'
-                    + '<span class="ae-trending-rank" aria-hidden="true">' + String(index+1).padStart(2,'0') + '</span>'
+                    + '<span class="ae-trending-image"><img src="' + escapeHTML(safeImageURL(article.image)) + '" alt="" loading="lazy" decoding="async" style="object-position:' + imagePosition(article) + ';--ae-trending-zoom:' + Math.max(1, imageScale(article)) + '" onerror="this.hidden=true"></span>'
                     + '<span class="ae-trending-story">'
                     + '<span class="ae-trending-category">' + escapeHTML(article.category) + '</span>'
                     + '<span class="ae-trending-title">' + escapeHTML(article.title) + '</span>'
