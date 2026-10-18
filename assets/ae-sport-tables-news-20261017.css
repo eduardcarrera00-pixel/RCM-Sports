@@ -1173,7 +1173,7 @@ html body.ae-is-nfl #aeSportTakeRanking .ae-nfl-ranking-table th.ae-nfl-rank-acc
   text-align:center!important;
   letter-spacing:0!important;
 }
-html body.ae-is-nfl #aeSportTakeRanking .ae-nfl-ranking-table td.ae-nfl-ranking-accuracy{
+html body.ae-is-nfl #aeSportTakeRanking .ae-nfl-ranking-table td.ae-nfl-ranking-percent{
   width:90px!important;
   text-align:center!important;
   white-space:nowrap!important;
@@ -1181,13 +1181,13 @@ html body.ae-is-nfl #aeSportTakeRanking .ae-nfl-ranking-table td.ae-nfl-ranking-
   font:800 12px/1.25 Inter,system-ui,sans-serif!important;
   font-variant-numeric:tabular-nums!important;
 }
-html body.ae-is-nfl #aeSportTakeRanking .is-rookie td.ae-nfl-ranking-accuracy{
+html body.ae-is-nfl #aeSportTakeRanking .is-rookie td.ae-nfl-ranking-percent{
   color:#e1baab!important;
 }
-html:not(.dark) body.ae-is-nfl #aeSportTakeRanking .ae-nfl-ranking-table td.ae-nfl-ranking-accuracy{
+html:not(.dark) body.ae-is-nfl #aeSportTakeRanking .ae-nfl-ranking-table td.ae-nfl-ranking-percent{
   color:#547345!important;
 }
-html:not(.dark) body.ae-is-nfl #aeSportTakeRanking .is-rookie td.ae-nfl-ranking-accuracy{
+html:not(.dark) body.ae-is-nfl #aeSportTakeRanking .is-rookie td.ae-nfl-ranking-percent{
   color:#966b5e!important;
 }
 html body.ae-is-nfl #aeSportTakeRanking .ae-nfl-ranking-mobile-metrics{
@@ -1195,7 +1195,7 @@ html body.ae-is-nfl #aeSportTakeRanking .ae-nfl-ranking-mobile-metrics{
 }
 @media(max-width:760px){
   html body.ae-is-nfl #aeSportTakeRanking .ae-nfl-ranking-table th.ae-nfl-rank-accuracy-head,
-  html body.ae-is-nfl #aeSportTakeRanking .ae-nfl-ranking-table td.ae-nfl-ranking-accuracy{
+  html body.ae-is-nfl #aeSportTakeRanking .ae-nfl-ranking-table td.ae-nfl-ranking-percent{
     display:none!important;
   }
   html body.ae-is-nfl #aeSportTakeRanking .ae-nfl-ranking-mobile-metrics{
@@ -1378,5 +1378,47 @@ html body.ae-is-football #aeSportTakeLeaders[data-sport="football"] .ae-sport-ta
   html body.ae-is-football #aeSportTakeLeaders[data-sport="football"] .ae-sport-takes-list.ae-football-cyclic {
     scroll-behavior:auto!important;
     scroll-snap-type:none!important;
+  }
+}
+
+/* Actual five-column sports table: percentage before points/fallos.
+   NFL mobile keeps the percent/value pair inside the user cell. */
+@media(min-width:761px){
+  html body.ae-is-nfl #aeSportTakeRanking .ae-nfl-ranking-table{
+    table-layout:fixed!important;
+    width:100%!important;
+  }
+  html body.ae-is-nfl #aeSportTakeRanking .ae-nfl-ranking-table th.ae-nfl-rank-best-head{
+    width:23%!important;
+  }
+  html body.ae-is-nfl #aeSportTakeRanking .ae-nfl-ranking-table th.ae-nfl-rank-accuracy-head{
+    width:90px!important;
+  }
+  html body.ae-is-nfl #aeSportTakeRanking .ae-nfl-ranking-table td.ae-nfl-ranking-best{
+    max-width:0!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+  html body.ae-is-nfl #aeSportTakeRanking .ae-nfl-ranking-table .ae-nfl-ranking-best-title{
+    display:block!important;
+    overflow:hidden!important;
+    white-space:nowrap!important;
+    text-overflow:ellipsis!important;
+  }
+}
+@media(max-width:760px){
+  html body.ae-is-nfl #aeSportTakeRanking .ae-nfl-ranking-table th.ae-nfl-rank-best-head,
+  html body.ae-is-nfl #aeSportTakeRanking .ae-nfl-ranking-table td.ae-nfl-ranking-best{
+    display:none!important;
+  }
+  html body.ae-is-nfl #aeSportTakeRanking .ae-nfl-ranking-table th.ae-nfl-rank-accuracy-head,
+  html body.ae-is-nfl #aeSportTakeRanking .ae-nfl-ranking-table td.ae-nfl-ranking-percent{
+    display:none!important;
+  }
+  html body.ae-is-nfl #aeSportTakeRanking .ae-nfl-ranking-mobile-metrics{
+    display:flex!important;
+    flex-direction:row!important;
+    flex-wrap:wrap!important;
+    align-items:baseline!important;
   }
 }
