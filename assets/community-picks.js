@@ -39,7 +39,8 @@ function requestPickReply(id,parentId=null,onAuthRequired=null,replyDraft=''){
 window.openAeCommunityPick=open;
 function card(p,compact=false,detail=false){
 
- const n=el('article',null,detail?'cp-card cp-card-detail':'cp-card');
+ const editorial=!compact&&!detail;
+ const n=el('article',null,detail?'cp-card cp-card-detail':editorial?'cp-card cp-feed-editorial':'cp-card');
  const pickSports=Array.isArray(p.legs)?p.legs.map(l=>String(l?.sport||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')):[];
  const hasNfl=pickSports.some(t=>/nfl|americano|american football|gridiron/.test(t));
  const hasFootball=pickSports.some(t=>!/nfl|americano|american football|gridiron/.test(t)&&/futbol|football|soccer|champions|liga|premier|barca|madrid|uefa|bundesliga|serie a/.test(t));
@@ -52,6 +53,11 @@ function card(p,compact=false,detail=false){
      if(typeof window.openAePublicProfile==='function')window.openAePublicProfile(p.user_id);
    });
    profileButton.className=detail?'cp-detail-author':'cp-feed-author';
+   if(editorial){
+     const avatar=el('span',String(p.author||'A').replace(/^@/,'').charAt(0).toLocaleUpperCase('es'),'cp-feed-initial');
+     avatar.setAttribute('aria-hidden','true');
+     profileButton.replaceChildren(avatar,el('span','@'+(p.author||'Aficionado'),'cp-feed-username'));
+   }
    profileButton.setAttribute('aria-label','Ver perfil de '+(p.author||'Aficionado'));
    profileButton.title='Ver perfil de '+(p.author||'Aficionado');
    header.append(profileButton);
@@ -64,7 +70,9 @@ function card(p,compact=false,detail=false){
  if(!isActive(p))header.append(el('strong',resultLabel(p),'cp-result-badge'));
  n.append(header);
  const title=el('h3',null,'cp-card-title');
- title.append(el('span',p.title));
+ const normalize=value=>String(value||'').toLocaleLowerCase('es').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
+ const duplicateSelection=editorial&&p.legs?.length===1&&first?.event&&first?.selection&&normalize(p.title).includes(normalize(first.event))&&normalize(p.title).includes(normalize(first.selection));
+ title.append(el('span',duplicateSelection?first.event:p.title));
  n.append(title);
  if(!detail){
    const readLink=el('a',null,'cp-card-read-link');
@@ -105,7 +113,7 @@ function card(p,compact=false,detail=false){
  const controls=el('div',null,'cp-actions');
  const canVote=['pending','approved'].includes(p.moderation_status)&&isActive(p);
  for(const [value,label,count] of [[1,'▲',p.upvotes],[-1,'▼',p.downvotes]]){
-   const b=button(label+' '+Number(count||0),()=>vote(p,value,b));
+   const b=button((editorial?(value===1?'↑':'↓'):label)+' '+Number(count||0),()=>vote(p,value,b));
    b.classList.add(value===1?'cp-upvote':'cp-downvote');
    b.setAttribute('aria-label',(value===1?'Voto positivo':'Voto negativo')+' para el Pick de '+(p.author||'la comunidad'));
    b.setAttribute('aria-pressed',String(Number(p.my_vote)===value));
@@ -113,7 +121,7 @@ function card(p,compact=false,detail=false){
    if(!canVote)b.title='La votación de este Pick está cerrada';
    controls.append(b);
  }
- if(!detail){const replies=button('Respuestas · '+Number(p.comments_count||0),()=>requestPickReply(p.id));replies.classList.add('cp-replies-button');controls.append(replies);}
+ if(!detail){const replies=button('Respuestas '+Number(p.comments_count||0)+(editorial?' ›':''),()=>requestPickReply(p.id));replies.classList.add('cp-replies-button');if(editorial){const icon=document.createElementNS('http://www.w3.org/2000/svg','svg');icon.setAttribute('viewBox','0 0 24 24');icon.setAttribute('aria-hidden','true');const path=document.createElementNS('http://www.w3.org/2000/svg','path');path.setAttribute('d','M5 4h14v11H10l-5 5V4Z');path.setAttribute('fill','none');path.setAttribute('stroke','currentColor');path.setAttribute('stroke-width','1.6');icon.append(path);replies.prepend(icon);}replies.setAttribute('aria-label','Abrir respuestas del Pick: '+p.title+' ('+Number(p.comments_count||0)+')');controls.append(replies);}
  n.append(controls);
  return n;
 }
