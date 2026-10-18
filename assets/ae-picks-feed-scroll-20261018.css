@@ -1,0 +1,59 @@
+/* AE SPORTS | Picks community feed: one-and-a-half cards high.
+   This is ONLY the scrolling list below "¿Eres Chef?". Rankings and the
+   Mejor/Peor Plato modules stay in their original document flow. */
+html body #footballTakes.ae-picks-editorial #communityPicks #cpFeed.ae-picks-feed-scrollable{
+  display:block!important;
+  box-sizing:border-box!important;
+  width:100%!important;
+  max-width:none!important;
+  height:auto!important;
+  max-height:var(--ae-picks-feed-window-height,440px)!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:0 5px 0 0!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  overscroll-behavior-y:auto;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(197,155,105,.82) rgba(94,115,124,.13);
+}
+html body #footballTakes.ae-picks-editorial #communityPicks #cpFeed.ae-picks-feed-scrollable::-webkit-scrollbar{
+  width:5px;
+}
+html body #footballTakes.ae-picks-editorial #communityPicks #cpFeed.ae-picks-feed-scrollable::-webkit-scrollbar-thumb{
+  background:rgba(197,155,105,.8);
+}
+html body #footballTakes.ae-picks-editorial #communityPicks #cpFeed.ae-picks-feed-scrollable:focus-visible{
+  outline:2px solid #d4ad80!important;
+  outline-offset:2px!important;
+}
+/* Keep each prediction complete; only the viewing window scrolls. */
+html body #footballTakes.ae-picks-editorial #communityPicks #cpFeed > .cp-card{
+  break-inside:avoid!important;
+}
+html body #footballTakes.ae-picks-editorial #communityPicks #cpFeedScrollHint{
+  display:block;
+  box-sizing:border-box;
+  margin:5px 0 13px!important;
+  padding:0 3px!important;
+  color:#c9af92!important;
+  font:600 11px/1.3 Inter,system-ui,sans-serif!important;
+  letter-spacing:.025em!important;
+  text-align:right!important;
+}
+html body #footballTakes.ae-picks-editorial #communityPicks #cpFeedScrollHint[hidden]{
+  display:none!important;
+}
+html:not(.dark) body #footballTakes.ae-picks-editorial #communityPicks #cpFeedScrollHint{
+  color:#85694e!important;
+}
+@media(max-width:760px){
+  html body #footballTakes.ae-picks-editorial #communityPicks #cpFeed.ae-picks-feed-scrollable{
+    padding-right:4px!important;
+  }
+  html body #footballTakes.ae-picks-editorial #communityPicks #cpFeedScrollHint{
+    margin:5px 0 10px!important;
+    font-size:10px!important;
+  }
+}
