@@ -328,3 +328,84 @@ html:not(.dark) body #footballTakes.ae-picks-editorial #aePicksTopPair .ae-picks
     grid-template-columns:minmax(0,1fr)!important;
   }
 }
+
+
+/* AE SPORTS · Artistic backgrounds for both Top 15 Platos panels.
+   The same approved large illustrated atlases have night/day halves.
+   Artwork remains legible beneath a stronger lower-panel overlay. */
+html body #footballTakes.ae-picks-editorial .ae-picks-rail>section.ae-chef-board.ae-chef-best{
+  background-color:#102938!important;
+  background-image:
+    linear-gradient(110deg,rgba(8,27,39,.97),rgba(9,31,43,.91) 54%,rgba(12,33,44,.76)),
+    url("ae-picks-best-plate-atlas.webp")!important;
+  background-size:100% 100%,auto 200%!important;
+  background-position:center,right top!important;
+  background-repeat:no-repeat!important;
+}
+html body #footballTakes.ae-picks-editorial .ae-picks-rail>section.ae-chef-board.ae-chef-worst{
+  background-color:#222739!important;
+  background-image:
+    linear-gradient(110deg,rgba(20,27,42,.97),rgba(26,30,46,.92) 54%,rgba(38,32,48,.78)),
+    url("ae-picks-worst-plate-atlas.webp")!important;
+  background-size:100% 100%,auto 200%!important;
+  background-position:center,right top!important;
+  background-repeat:no-repeat!important;
+}
+html body #footballTakes.ae-picks-editorial .ae-picks-rail>section.ae-chef-best .ae-picks-rail-heading{
+  background-color:#102938!important;
+  background-image:
+    linear-gradient(90deg,rgba(9,29,41,.96),rgba(9,30,42,.74) 47%,rgba(9,31,44,.08)),
+    url("ae-picks-best-plate-atlas.webp")!important;
+  background-size:100% 100%,auto 200%!important;
+  background-position:center,right top!important;
+  background-repeat:no-repeat!important;
+}
+html body #footballTakes.ae-picks-editorial .ae-picks-rail>section.ae-chef-worst .ae-picks-rail-heading{
+  background-color:#222739!important;
+  background-image:
+    linear-gradient(90deg,rgba(24,29,43,.96),rgba(31,31,47,.76) 47%,rgba(38,31,48,.09)),
+    url("ae-picks-worst-plate-atlas.webp")!important;
+  background-size:100% 100%,auto 200%!important;
+  background-position:center,right top!important;
+  background-repeat:no-repeat!important;
+}
+html body #footballTakes.ae-picks-editorial .ae-picks-rail>section.ae-chef-best ol.ae-chef-scroll{
+  background:rgba(6,27,39,.58)!important;
+}
+html body #footballTakes.ae-picks-editorial .ae-picks-rail>section.ae-chef-worst ol.ae-chef-scroll{
+  background:rgba(23,27,42,.58)!important;
+}
+html:not(.dark) body #footballTakes.ae-picks-editorial .ae-picks-rail>section.ae-chef-best{
+  background-color:#fcf6ec!important;
+  background-image:
+    linear-gradient(110deg,rgba(253,248,240,.96),rgba(250,243,232,.90) 54%,rgba(243,229,211,.73)),
+    url("ae-picks-best-plate-atlas.webp")!important;
+  background-position:center,right bottom!important;
+}
+html:not(.dark) body #footballTakes.ae-picks-editorial .ae-picks-rail>section.ae-chef-worst{
+  background-color:#fcf7f9!important;
+  background-image:
+    linear-gradient(110deg,rgba(252,249,251,.96),rgba(248,241,246,.90) 54%,rgba(236,225,236,.73)),
+    url("ae-picks-worst-plate-atlas.webp")!important;
+  background-position:center,right bottom!important;
+}
+html:not(.dark) body #footballTakes.ae-picks-editorial .ae-picks-rail>section.ae-chef-best .ae-picks-rail-heading{
+  background-color:#fcf6ec!important;
+  background-image:
+    linear-gradient(90deg,rgba(253,249,242,.96),rgba(249,243,232,.76) 47%,rgba(247,232,212,.08)),
+    url("ae-picks-best-plate-atlas.webp")!important;
+  background-position:center,right bottom!important;
+}
+html:not(.dark) body #footballTakes.ae-picks-editorial .ae-picks-rail>section.ae-chef-worst .ae-picks-rail-heading{
+  background-color:#fcf7f9!important;
+  background-image:
+    linear-gradient(90deg,rgba(252,249,250,.96),rgba(249,243,248,.77) 47%,rgba(237,225,237,.09)),
+    url("ae-picks-worst-plate-atlas.webp")!important;
+  background-position:center,right bottom!important;
+}
+html:not(.dark) body #footballTakes.ae-picks-editorial .ae-picks-rail>section.ae-chef-best ol.ae-chef-scroll{
+  background:rgba(255,252,246,.69)!important;
+}
+html:not(.dark) body #footballTakes.ae-picks-editorial .ae-picks-rail>section.ae-chef-worst ol.ae-chef-scroll{
+  background:rgba(253,249,253,.70)!important;
+}
