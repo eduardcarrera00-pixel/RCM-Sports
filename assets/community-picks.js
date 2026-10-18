@@ -123,17 +123,57 @@ async function vote(p,value,b){if(!['pending','approved'].includes(p.moderation_
  else q=db.from('ae_pick_votes').insert({pick_id:p.id,value});
  const r=await q;if(r.error)throw r.error;await load();if($('cpDialog')?.open)await showDetail(p.id);
  }catch(e){notifyCommunity(message(e),true);}finally{b.disabled=false;}}
+// Show one entire community Pick plus half of the next one. Card content
+// varies by author, so measure the real card heights instead of clipping text
+// with a fixed pixel height. This only changes the feed window, not the cards.
+let feedWindowFrame=0;
+let feedCardObserver=null;
+function sizeFeedWindow(){
+ const feed=$('cpFeed'),hint=$('cpFeedScrollHint');if(!feed)return;
+ if(feedCardObserver){feedCardObserver.disconnect();feedCardObserver=null;}
+ const cards=Array.from(feed.children).filter(node=>node.classList?.contains('cp-card'));
+ const scrollable=cards.length>1;
+ feed.classList.toggle('ae-picks-feed-scrollable',scrollable);
+ if(hint)hint.hidden=!scrollable;
+ if(!scrollable){
+   feed.style.removeProperty('--ae-picks-feed-window-height');
+   feed.removeAttribute('tabindex');
+   return;
+ }
+ feed.setAttribute('tabindex','0');
+ const measure=()=>{
+   const first=cards[0].getBoundingClientRect().height;
+   const second=cards[1].getBoundingClientRect().height;
+   if(!first||!second)return;
+   const gap=parseFloat(getComputedStyle(cards[0]).marginBottom)||0;
+   feed.style.setProperty('--ae-picks-feed-window-height',
+     Math.ceil(first+gap+second/2)+'px');
+ };
+ measure();
+ if(typeof ResizeObserver!=='undefined'){
+   feedCardObserver=new ResizeObserver(()=>{
+     if(feedWindowFrame)return;
+     feedWindowFrame=requestAnimationFrame(()=>{feedWindowFrame=0;measure();});
+   });
+   feedCardObserver.observe(cards[0]);
+   feedCardObserver.observe(cards[1]);
+ }
+}
 async function load(){
  if(!db)return;const seq=++request;
  try{
    const feed=await db.from('ae_pick_feed').select('*').gte('event_date',todayToronto()).eq('outcome','pending').order('created_at',{ascending:false}).order('id',{ascending:false}).range(0,limit-1);
    if(seq!==request)return;if(feed.error)throw feed.error;
-   $('cpFeed').replaceChildren(...(feed.data||[]).map(p=>card(p)));
+   const feedEl=$('cpFeed'),previousScroll=feedEl.scrollTop;
+   feedEl.replaceChildren(...(feed.data||[]).map(p=>card(p)));
+   sizeFeedWindow();
+   // Voting refreshes the feed; don't throw readers back to the top.
+   feedEl.scrollTop=previousScroll;
    $('cpStatus').textContent=feed.data?.length?'':'Todavía no hay Picks. Comparte el primero.';
    $('cpMore').hidden=(feed.data?.length||0)<limit;
    loaded=true;
    await Promise.all([loadRanking(),loadWorstRanking(),loadModeration(),loadChefLists(),loadSettlement()]);
- }catch(e){if(seq!==request)return;$('cpFeed').replaceChildren();$('cpMore').hidden=true;$('cpStatus').textContent='No pudimos cargar los Picks. '+message(e);}
+ }catch(e){if(seq!==request)return;$('cpFeed').replaceChildren();sizeFeedWindow();$('cpMore').hidden=true;$('cpStatus').textContent='No pudimos cargar los Picks. '+message(e);}
 }
 let currentRank='month';
 let currentWorstRank='month';
@@ -488,7 +528,7 @@ window.aeOpenPickDetail=(id)=>{
   history.pushState({pick:id},'',url.toString());
   void showDetail(String(id));
 };
-window.renderCommunityPicksVisibility=()=>{const root=$('communityPicks');if(!root)return;root.hidden=currentCategory!=='Picks';if(!root.hidden&&!loaded)load();};
+window.renderCommunityPicksVisibility=()=>{const root=$('communityPicks');if(!root)return;root.hidden=currentCategory!=='Picks';if(!root.hidden){if(!loaded)load();else requestAnimationFrame(sizeFeedWindow);}};
 function syncPickComposer(){
  const open=Boolean($('cpComposePanel')?.open);
  $('cpPublishCta')?.setAttribute('aria-expanded',String(open));
@@ -520,7 +560,7 @@ document.addEventListener('DOMContentLoaded',()=>{
  $('cpComposeClose')?.addEventListener('click',()=>closePickComposer());
  $('cpComposePanel')?.addEventListener('close',syncPickComposer);
  $('cpComposePanel')?.addEventListener('cancel',e=>{if(posting)e.preventDefault();});
- renderCommunityPicksVisibility();load();$('cpReload')?.addEventListener('click',load);$('cpWorstReload')?.addEventListener('click',loadWorstRanking);$('cpViewAll')?.addEventListener('click',()=>{const dlg=$('cpArchiveDialog');if(dlg&&!dlg.open)dlg.showModal();archiveLimit=30;loadArchive();});$('cpArchiveClose')?.addEventListener('click',closeArchive);$('cpArchiveMore')?.addEventListener('click',()=>{archiveLimit+=30;loadArchive();});for(const [id,mode] of [['cpRankMonth','month'],['cpRankHistory','all']]){$(id)?.addEventListener('click',()=>{currentRank=mode;for(const [i,m] of [['cpRankMonth','month'],['cpRankHistory','all']])$(i)?.setAttribute('aria-pressed',String(currentRank===m));loadRanking();});}for(const [id,mode] of [['cpWorstRankMonth','month'],['cpWorstRankHistory','all']]){
+ renderCommunityPicksVisibility();load();window.addEventListener('resize',sizeFeedWindow,{passive:true});$('cpReload')?.addEventListener('click',load);$('cpWorstReload')?.addEventListener('click',loadWorstRanking);$('cpViewAll')?.addEventListener('click',()=>{const dlg=$('cpArchiveDialog');if(dlg&&!dlg.open)dlg.showModal();archiveLimit=30;loadArchive();});$('cpArchiveClose')?.addEventListener('click',closeArchive);$('cpArchiveMore')?.addEventListener('click',()=>{archiveLimit+=30;loadArchive();});for(const [id,mode] of [['cpRankMonth','month'],['cpRankHistory','all']]){$(id)?.addEventListener('click',()=>{currentRank=mode;for(const [i,m] of [['cpRankMonth','month'],['cpRankHistory','all']])$(i)?.setAttribute('aria-pressed',String(currentRank===m));loadRanking();});}for(const [id,mode] of [['cpWorstRankMonth','month'],['cpWorstRankHistory','all']]){
  $(id)?.addEventListener('click',()=>{
    currentWorstRank=mode;
    for(const [buttonId,buttonMode] of [['cpWorstRankMonth','month'],['cpWorstRankHistory','all']]){
