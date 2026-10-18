@@ -97,16 +97,67 @@
     footer.append(left,votes);panel.append(footer);return panel;
   }
 
+  // Use the same publicly visible, vote-aggregated comments as the old
+  // single-leader RPC. Keep its ordering and show at most ten real entries.
+  async function loadLeadersByVote(column){
+    const {data,error}=await db.from('rcm_comment_totals')
+      .select('id,article_id,parent_id,author,body,created_at,article_title,upvotes,downvotes,my_vote')
+      .gt(column,0)
+      .order(column,{ascending:false})
+      .order('created_at',{ascending:false})
+      .order('id',{ascending:false})
+      .limit(10);
+    if(error)throw error;
+    return data||[];
+  }
+  function scrollingLeaders(kind,rows){
+    const questioned=kind==='questioned';
+    const group=node('section',null,'ae-community-spotlight ae-community-scroll-group '+(questioned?'is-questioned':'is-supported'));
+    const viewport=node('div',null,'ae-community-scroll-viewport');
+    viewport.dataset.communityScroll=kind;
+    viewport.tabIndex=0;
+    viewport.setAttribute('role','list');
+    viewport.setAttribute('aria-label',questioned?
+      'Hasta 10 comentarios más cuestionados. Desplaza hacia abajo para verlos.':
+      'Hasta 10 comentarios más apoyados. Desplaza hacia abajo para verlos.');
+    for(const row of rows){
+      // Reuse the existing card unchanged: article links, votes, author and
+      // reply actions still point to the original comment and publication.
+      const entry=card(kind,row);
+      entry.className='ae-community-scroll-entry';
+      entry.setAttribute('role','listitem');
+      viewport.append(entry);
+    }
+    if(!rows.length){
+      const empty=card(kind,null);
+      empty.className='ae-community-scroll-entry';
+      empty.setAttribute('role','listitem');
+      viewport.append(empty);
+    }
+    group.append(viewport);
+    return group;
+  }
   refreshCommunity=async function(){
     if(!db)return;
     const request=++communityRequest;
     const target=document.getElementById('communityLeaders');
     if(!target)return;
+    // Votes and new comments reload this section. Keep both lists at the
+    // positions readers were using, rather than jumping back to the top.
+    const positions=new Map([...target.querySelectorAll('[data-community-scroll]')]
+      .map(list=>[list.dataset.communityScroll,list.scrollTop]));
     try{
-      const {data,error}=await db.rpc('rcm_community_leaders');
-      if(error)throw error;
+      const [supported,questioned]=await Promise.all([
+        loadLeadersByVote('upvotes'),loadLeadersByVote('downvotes')
+      ]);
       if(request!==communityRequest)return;
-      target.replaceChildren(card('supported',data?.supported),card('questioned',data?.questioned));
+      target.replaceChildren(
+        scrollingLeaders('supported',supported),
+        scrollingLeaders('questioned',questioned)
+      );
+      for(const list of target.querySelectorAll('[data-community-scroll]')){
+        list.scrollTop=positions.get(list.dataset.communityScroll)||0;
+      }
     }catch{
       if(request===communityRequest)target.replaceChildren(node('p','No pudimos cargar los comentarios destacados. Volveremos a intentarlo.','ae-community-empty'));
     }
