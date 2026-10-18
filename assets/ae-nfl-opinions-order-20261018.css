@@ -1,0 +1,208 @@
+/* AE SPORTS · NFL: opiniones en un mismo tablero bajo "Demuestra tu conocimiento".
+   Sólo presentación: mantienen sus datos, votos, respuestas y clasificaciones. */
+
+/* El bloque de portada NFL ya no necesita la columna lateral vacía:
+   al igual que Fútbol, las noticias y el debate ocupan el ancho disponible. */
+@media (min-width:961px){
+  html body.ae-is-nfl #mainContent .editorial-layout{
+    display:block!important;
+    width:100%!important;
+    min-width:0!important;
+  }
+  html body.ae-is-nfl #mainContent .editorial-layout > div:first-child{
+    display:block!important;
+    width:100%!important;
+    max-width:none!important;
+    min-width:0!important;
+    margin:0!important;
+  }
+}
+html body.ae-is-nfl #mainContent .editorial-layout > aside{
+  display:none!important;
+}
+
+/* Los últimos Takes y sus controles siguen disponibles en el código,
+   pero no forman parte de esta vista NFL. El Top 10 sí permanece visible. */
+html body.ae-is-nfl #mainContent #freeTakes > #aeTakesFeedHeading,
+html body.ae-is-nfl #mainContent #freeTakes > .ae-free-controls,
+html body.ae-is-nfl #mainContent #freeTakes > #freeTakesStatus,
+html body.ae-is-nfl #mainContent #freeTakes > #freeTakesFeed,
+html body.ae-is-nfl #mainContent #freeTakes > #aeFootballMoreTakes,
+html body.ae-is-nfl #mainContent #freeTakes > #freeTakesMore{
+  display:none!important;
+}
+
+/* Un solo contorno cuadrado y un separador central, sin espacios entre tablas. */
+html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeLeaders.ae-sport-chefs:not([hidden]){
+  display:block!important;
+  box-sizing:border-box!important;
+  width:100%!important;
+  min-width:0!important;
+  margin:13px 0 16px!important;
+  padding:0!important;
+  border:1px solid rgba(190,149,107,.65)!important;
+  border-radius:0!important;
+  overflow:hidden!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeLeaders[hidden]{
+  display:none!important;
+}
+html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-takes-grid{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  align-items:stretch!important;
+  gap:0!important;
+  width:100%!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:0!important;
+}
+html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-takes-grid > .ae-sport-chef-card{
+  display:flex!important;
+  flex-direction:column!important;
+  box-sizing:border-box!important;
+  width:100%!important;
+  height:auto!important;
+  min-width:0!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+}
+html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-takes-grid > .ae-sport-chef-card + .ae-sport-chef-card{
+  border-left:1px solid rgba(190,149,107,.65)!important;
+}
+html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-chef-heading{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  box-sizing:border-box!important;
+  width:100%!important;
+  min-width:0!important;
+  padding:14px 15px!important;
+  margin:0!important;
+  gap:9px!important;
+  border-bottom:1px solid rgba(190,149,107,.38)!important;
+}
+html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-chef-heading h3{
+  flex:1 1 auto!important;
+  min-width:0!important;
+  max-width:100%!important;
+  margin:0!important;
+  font:600 clamp(20px,2.25vw,29px)/1.12 Newsreader,Georgia,serif!important;
+  overflow-wrap:anywhere!important;
+}
+html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeLeaders .ae-football-leaders-more{
+  display:none!important; /* Las 10 opiniones ya son visibles en una tabla con scroll. */
+}
+html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-takes-list{
+  display:block!important;
+  flex:1 1 auto!important;
+  box-sizing:border-box!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:185px!important;
+  max-height:355px!important;
+  margin:0!important;
+  padding:5px 14px 12px!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  overscroll-behavior-y:contain;
+  scrollbar-width:thin;
+}
+html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-takes-list > li.ae-sport-take-item{
+  display:grid!important;
+  min-width:0!important;
+  grid-template-columns:25px minmax(0,1fr)!important;
+  gap:6px!important;
+  padding:10px 0!important;
+  border-bottom:1px solid rgba(190,149,107,.20)!important;
+}
+html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-takes-list > li:last-child{
+  border-bottom:0!important;
+}
+html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeLeaders .ae-top-take-content{
+  min-width:0!important;
+}
+html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-take-title,
+html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-take-open{
+  white-space:normal!important;
+  overflow-wrap:anywhere!important;
+  min-width:0!important;
+  max-width:100%!important;
+}
+html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-take-meta{
+  min-width:0!important;
+  flex-wrap:wrap!important;
+}
+html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeLeaders .ae-top-take-author{
+  overflow-wrap:anywhere!important;
+}
+html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeLeaders .ae-top-take-reply{
+  display:inline-flex!important;
+  align-items:center!important;
+  min-height:26px!important;
+}
+
+/* Teléfono: las DOS tablas siguen lado a lado dentro del mismo cuadro. */
+@media (max-width:760px){
+  html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeLeaders.ae-sport-chefs:not([hidden]){
+    margin:10px 0 13px!important;
+  }
+  html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-takes-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:0!important;
+  }
+  html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-chef-heading{
+    min-height:61px!important;
+    padding:11px 8px!important;
+    align-items:flex-start!important;
+  }
+  html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-chef-heading h3{
+    font-size:clamp(15px,4.2vw,21px)!important;
+    line-height:1.08!important;
+  }
+  html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-takes-list{
+    min-height:0!important;
+    max-height:320px!important;
+    padding:4px 7px 8px!important;
+  }
+  html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-takes-list > li.ae-sport-take-item{
+    grid-template-columns:18px minmax(0,1fr)!important;
+    gap:3px!important;
+    padding:8px 0!important;
+  }
+  html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeLeaders .ae-top-take-number{
+    font-size:18px!important;
+    line-height:1!important;
+  }
+  html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-take-meta{
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:flex-start!important;
+    gap:4px!important;
+    padding:0!important;
+    min-height:0!important;
+    font-size:10px!important;
+  }
+  html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeLeaders .ae-top-take-author{
+    font-size:10px!important;
+  }
+  html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-take-title,
+  html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-take-open{
+    font-size:12px!important;
+    line-height:1.2!important;
+  }
+  html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-take-excerpt{
+    display:none!important;
+  }
+  html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeLeaders .ae-top-take-reply{
+    font-size:10px!important;
+    white-space:normal!important;
+    min-height:26px!important;
+  }
+}
