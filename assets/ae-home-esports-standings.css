@@ -1,0 +1,349 @@
+/* AE SPORTS · Genios y Anoetos — clasificaciones de liga, no tarjetas de opiniones.
+   Inspiración: tablas de fútbol/F1 y rankings de esports. Scoped to home only. */
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings{
+  --ae-stand-font:Inter,system-ui,sans-serif;
+  --ae-stand-number:tabular-nums;
+  min-width:0!important;
+}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-standings-explainer{
+  display:flex!important;align-items:center!important;gap:7px!important;
+  margin:0 0 12px!important;padding:0 2px!important;
+  color:#afc1ca!important;font:500 11px/1.5 var(--ae-stand-font)!important;
+}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-standings-explainer::before{
+  content:"";display:block;flex:0 0 17px;width:17px;height:1px;background:#b88a63;
+}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-top-takes-grid{
+  align-items:stretch!important;gap:15px!important;
+}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-top-takes-card{
+  --ae-rank-ink:#edf2ef;
+  --ae-rank-muted:#adbfca;
+  --ae-rank-gold:#d5b28e;
+  --ae-rank-rule:rgba(195,167,143,.18);
+  box-sizing:border-box!important;min-width:0!important;
+  padding:0!important;
+  border:1px solid rgba(174,151,128,.38)!important;
+  border-top:2px solid #bd9671!important;
+  border-radius:0!important;
+  background:#112e3e!important;
+  background-image:linear-gradient(160deg,#18384b,#102b3c 64%,#102938)!important;
+  box-shadow:0 5px 15px rgba(3,19,31,.12)!important;
+  color:var(--ae-rank-ink)!important;
+  overflow:hidden!important;
+}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-top-takes-card.is-questioned{
+  --ae-rank-gold:#d5b7c4;
+  --ae-rank-rule:rgba(194,166,187,.19);
+  border-color:rgba(179,145,166,.41)!important;
+  border-top-color:#b88eaa!important;
+  background:#172e40!important;
+  background-image:linear-gradient(160deg,#27394c,#162f40 65%,#142d3b)!important;
+}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-top-takes-card-head,
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-top-takes-card.is-questioned .ae-top-takes-card-head{
+  display:flex!important;
+  align-items:center!important;justify-content:space-between!important;
+  gap:10px!important;
+  min-height:73px!important;height:auto!important;
+  padding:14px 16px 12px!important;
+  border-bottom:1px solid var(--ae-rank-rule)!important;
+  background:rgba(6,21,30,.12)!important;
+}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-standings-heading-wrap{
+  min-width:0!important;
+}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-standings-kicker{
+  display:block!important;margin:0 0 4px!important;
+  color:#c7a37e!important;
+  font:800 9px/1.2 var(--ae-stand-font)!important;
+  text-transform:uppercase!important;letter-spacing:.12em!important;
+}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .is-questioned .ae-standings-kicker{color:#c9a0b5!important;}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-top-takes-card-head h3,
+html:not(.dark) body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-top-takes-card-head h3{
+  display:block!important;
+  color:#f6e9da!important;
+  font:650 clamp(21px,2vw,25px)/1.12 'Cinzel',Georgia,serif!important;
+  letter-spacing:.045em!important;text-transform:uppercase!important;
+  margin:0!important;text-shadow:none!important;
+}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .is-questioned .ae-top-takes-card-head h3{color:#efdfeb!important;}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-standings-header-desc{
+  display:block!important;
+  margin:0!important;
+  text-align:right!important;
+  max-width:126px!important;
+  color:#bdcbd0!important;
+  font:600 10px/1.4 var(--ae-stand-font)!important;
+}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-points-table-scroll{
+  display:block!important;
+  width:100%!important;
+  max-height:390px!important;
+  overflow-x:hidden!important;overflow-y:auto!important;
+  overscroll-behavior-y:contain!important;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(191,156,125,.62) transparent;
+}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-points-table{
+  display:table!important;
+  border-collapse:collapse!important;
+  table-layout:fixed!important;
+  width:100%!important;
+  min-width:0!important;
+  font-variant-numeric:tabular-nums!important;
+}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-points-table>thead.ae-points-head-accessible{
+  display:table-header-group!important;
+  position:sticky!important;top:0!important;
+  z-index:3!important;
+  width:auto!important;height:auto!important;min-height:0!important;
+  padding:0!important;margin:0!important;
+  overflow:visible!important;clip:auto!important;clip-path:none!important;
+  white-space:normal!important;
+  background:#203d4e!important;
+}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .is-questioned .ae-points-table>thead.ae-points-head-accessible{
+  background:#303b4e!important;
+}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-points-table th{
+  padding:10px 7px!important;
+  border-bottom:1px solid var(--ae-rank-rule)!important;
+  color:#d8c7b4!important;
+  font:750 9px/1.25 var(--ae-stand-font)!important;
+  text-transform:uppercase!important;
+  letter-spacing:.065em!important;
+  text-align:left!important;
+  white-space:nowrap!important;
+}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-points-table th:first-child,
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-points-table td:first-child{
+  width:45px!important;text-align:center!important;
+}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-points-table th:nth-child(3),
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-points-table td:nth-child(3){
+  width:78px!important;text-align:center!important;
+}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-points-table th:last-child,
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-points-table td:last-child{
+  width:72px!important;text-align:right!important;
+}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-points-table tbody tr.ae-sports-standing-row{
+  display:table-row!important;
+  transition:background .15s ease!important;
+}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-points-table tbody tr.ae-sports-standing-row:nth-child(even){
+  background:rgba(212,226,226,.035)!important;
+}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-points-table tbody tr.ae-sports-standing-row:hover{
+  background:rgba(207,163,118,.11)!important;
+}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-points-table tbody tr.ae-sports-standing-first{
+  background:rgba(185,143,96,.09)!important;
+  box-shadow:inset 3px 0 var(--ae-rank-gold)!important;
+}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-points-table td{
+  box-sizing:border-box!important;
+  padding:12px 7px!important;
+  min-width:0!important;
+  vertical-align:middle!important;
+  background:transparent!important;
+  border-bottom:1px solid var(--ae-rank-rule)!important;
+}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-points-table tbody tr:last-child td{border-bottom:0!important;}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-sports-stand-pos .ae-points-rank{
+  display:block!important;margin:0!important;
+  color:var(--ae-rank-gold)!important;
+  font:700 16px/1.3 'Cinzel',Georgia,serif!important;
+  font-variant-numeric:tabular-nums!important;
+}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-sports-stand-pos .ae-rank-change{
+  display:inline-flex!important;justify-content:center!important;
+  min-height:16px!important;height:auto!important;
+  min-width:18px!important;max-width:42px!important;
+  padding:1px 3px!important;margin:3px auto 0!important;
+  border:0!important;border-radius:0!important;
+  background:transparent!important;box-shadow:none!important;
+  font:750 9px/1 var(--ae-stand-font)!important;
+  white-space:nowrap!important;
+}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-sports-stand-player{
+  min-width:0!important;
+}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings button.ae-points-user{
+  display:flex!important;align-items:center!important;
+  justify-content:flex-start!important;gap:8px!important;
+  width:100%!important;max-width:100%!important;
+  min-height:28px!important;padding:0!important;margin:0!important;
+  border:0!important;background:none!important;
+  cursor:pointer!important;min-width:0!important;
+  text-align:left!important;
+  color:#ecf0e9!important;
+  font:800 12px/1.2 var(--ae-stand-font)!important;
+  white-space:nowrap!important;
+}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings button.ae-points-user:hover .ae-sports-stand-name{
+  text-decoration:underline!important;text-underline-offset:3px!important;
+}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings button.ae-points-user:focus-visible{
+  outline:2px solid #d9b58e!important;outline-offset:2px!important;
+}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-points-avatar{
+  display:inline-grid!important;place-items:center!important;
+  flex:0 0 24px!important;
+  width:24px!important;height:24px!important;
+  border:1px solid rgba(215,181,143,.35)!important;border-radius:0!important;
+  background:rgba(192,150,103,.14)!important;
+  color:#e9d2b6!important;
+  font:800 10px/1 var(--ae-stand-font)!important;
+}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-sports-stand-name{
+  display:block!important;
+  overflow:hidden!important;text-overflow:ellipsis!important;
+  white-space:nowrap!important;max-width:100%!important;min-width:0!important;
+}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-sports-stand-best{
+  display:flex!important;align-items:baseline!important;
+  flex-wrap:wrap!important;gap:2px 5px!important;
+  min-width:0!important;
+  margin:5px 0 0 32px!important;
+  overflow:hidden!important;
+}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-sports-stand-best-label{
+  color:var(--ae-rank-gold)!important;
+  font:800 8px/1.25 var(--ae-stand-font)!important;letter-spacing:.055em!important;
+  white-space:nowrap!important;
+}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-sports-stand-best-title{
+  display:-webkit-box!important;
+  -webkit-box-orient:vertical!important;
+  -webkit-line-clamp:2!important;line-clamp:2!important;
+  overflow:hidden!important;
+  min-width:0!important;max-width:100%!important;
+  color:#c9d6d6!important;
+  font:500 10px/1.35 var(--ae-stand-font)!important;
+  overflow-wrap:anywhere!important;
+}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-sports-stand-best-score{
+  color:#b5c4cc!important;
+  font:650 9px/1.25 var(--ae-stand-font)!important;
+  white-space:nowrap!important;
+}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-sports-stand-no-best{
+  color:#98adb9!important;font:500 10px/1.35 var(--ae-stand-font)!important;
+}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-sports-stand-accuracy .ae-sports-stand-rate{
+  display:block!important;
+  color:#e3c7a4!important;
+  font:850 13px/1.2 var(--ae-stand-font)!important;
+  font-variant-numeric:tabular-nums!important;
+  white-space:nowrap!important;
+}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .is-questioned .ae-sports-stand-rate{color:#e4c5d2!important;}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-sports-stand-resolved{
+  display:block!important;margin:4px 0 0!important;
+  color:#aebec5!important;font:500 9px/1.1 var(--ae-stand-font)!important;
+  white-space:nowrap!important;
+}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-sports-stand-points .ae-points-total{
+  display:block!important;
+  color:#f3d4aa!important;
+  font:850 16px/1.1 var(--ae-stand-font)!important;
+  font-variant-numeric:tabular-nums!important;
+  white-space:nowrap!important;
+}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .is-questioned .ae-sports-stand-points .ae-points-total{
+  color:#ead0dd!important;
+}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-sports-stand-points-label{
+  display:block!important;margin:3px 0 0!important;
+  color:#aebec5!important;
+  font:800 8px/1 var(--ae-stand-font)!important;letter-spacing:.08em!important;
+}
+html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-points-table .ae-points-table-empty{
+  text-align:center!important;padding:22px 13px!important;
+  color:var(--ae-rank-muted)!important;font:500 12px/1.5 var(--ae-stand-font)!important;
+}
+/* Modo día: tinta azul y marfil suave sin alterar orden ni números. */
+html:not(.dark) body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-top-takes-card{
+  --ae-rank-ink:#294451;
+  --ae-rank-muted:#667987;
+  --ae-rank-gold:#8a603f;
+  --ae-rank-rule:rgba(149,115,82,.16);
+  background:#faf6f0!important;
+  background-image:linear-gradient(150deg,#fffaf3,#f2eee6)!important;
+  border-color:#c8af93!important;
+  border-top-color:#ad855e!important;
+}
+html:not(.dark) body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-top-takes-card.is-questioned{
+  --ae-rank-gold:#815d76;
+  --ae-rank-rule:rgba(142,100,132,.17);
+  background:#f8f3f5!important;
+  background-image:linear-gradient(150deg,#fffbf9,#f3ecf1)!important;
+  border-color:#c5abc1!important;border-top-color:#a885a0!important;
+}
+html:not(.dark) body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-top-takes-card-head,
+html:not(.dark) body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-top-takes-card.is-questioned .ae-top-takes-card-head{
+  background:rgba(212,187,161,.14)!important;
+}
+html:not(.dark) body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-top-takes-card-head h3{color:#6e4d33!important;}
+html:not(.dark) body.ae-is-home #aeHomeTopTakes.ae-esports-standings .is-questioned .ae-top-takes-card-head h3{color:#704e68!important;}
+html:not(.dark) body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-standings-header-desc{color:#647783!important;}
+html:not(.dark) body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-standings-kicker{color:#815b3e!important;}
+html:not(.dark) body.ae-is-home #aeHomeTopTakes.ae-esports-standings .is-questioned .ae-standings-kicker{color:#806078!important;}
+html:not(.dark) body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-standings-explainer{color:#68747b!important;}
+html:not(.dark) body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-points-table>thead.ae-points-head-accessible{background:#ebe1d3!important;}
+html:not(.dark) body.ae-is-home #aeHomeTopTakes.ae-esports-standings .is-questioned .ae-points-table>thead.ae-points-head-accessible{background:#eee4eb!important;}
+html:not(.dark) body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-points-table th{color:#765b46!important;}
+html:not(.dark) body.ae-is-home #aeHomeTopTakes.ae-esports-standings button.ae-points-user{color:#274354!important;}
+html:not(.dark) body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-points-avatar{
+  color:#805c40!important;background:rgba(178,128,87,.12)!important;border-color:rgba(143,111,86,.32)!important;
+}
+html:not(.dark) body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-sports-stand-best-title{color:#526776!important;}
+html:not(.dark) body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-sports-stand-best-score,
+html:not(.dark) body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-sports-stand-resolved{color:#60737d!important;}
+html:not(.dark) body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-sports-stand-rate{color:#745436!important;}
+html:not(.dark) body.ae-is-home #aeHomeTopTakes.ae-esports-standings .is-questioned .ae-sports-stand-rate{color:#805d76!important;}
+html:not(.dark) body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-sports-stand-points .ae-points-total{color:#75533a!important;}
+html:not(.dark) body.ae-is-home #aeHomeTopTakes.ae-esports-standings .is-questioned .ae-sports-stand-points .ae-points-total{color:#73526b!important;}
+html:not(.dark) body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-sports-stand-points-label{color:#647783!important;}
+html:not(.dark) body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-sports-stand-no-best{color:#657986!important;}
+html:not(.dark) body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-sports-standing-first{
+  background:rgba(192,147,94,.07)!important;
+}
+/* Mobile: four columns remain explicit without horizontal clipping. */
+@media(max-width:760px){
+  html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-top-takes-card-head{min-height:64px!important;padding:12px 13px!important;}
+  html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-standings-explainer{font-size:10px!important;margin-bottom:8px!important;}
+  html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-points-table-scroll{max-height:360px!important;}
+  html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-points-table th:first-child,
+  html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-points-table td:first-child{width:36px!important;}
+  html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-points-table th:nth-child(3),
+  html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-points-table td:nth-child(3){width:61px!important;}
+  html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-points-table th:last-child,
+  html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-points-table td:last-child{width:57px!important;}
+  html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-points-table th{font-size:8px!important;padding:9px 4px!important;letter-spacing:0!important;}
+  html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-points-table td{padding:11px 4px!important;}
+  html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-sports-stand-pos .ae-points-rank{font-size:14px!important;}
+  html body.ae-is-home #aeHomeTopTakes.ae-esports-standings button.ae-points-user{gap:5px!important;font-size:11px!important;}
+  html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-points-avatar{flex-basis:20px!important;width:20px!important;height:20px!important;}
+  html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-sports-stand-best{margin-left:25px!important;}
+  html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-sports-stand-best-label{font-size:7.5px!important;}
+  html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-sports-stand-best-title{font-size:9.5px!important;}
+  html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-sports-stand-accuracy .ae-sports-stand-rate{font-size:11.5px!important;}
+  html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-sports-stand-resolved{font-size:8px!important;}
+  html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-sports-stand-points .ae-points-total{font-size:14px!important;}
+}
+@media(max-width:375px){
+  html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-points-table th:first-child,
+  html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-points-table td:first-child{width:31px!important;}
+  html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-points-table th:nth-child(3),
+  html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-points-table td:nth-child(3){width:56px!important;}
+  html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-points-table th:last-child,
+  html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-points-table td:last-child{width:50px!important;}
+  html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-standings-header-desc{max-width:104px!important;font-size:9px!important;}
+}
+@media(prefers-reduced-motion:reduce){
+  html body.ae-is-home #aeHomeTopTakes.ae-esports-standings .ae-sports-standing-row{transition:none!important;}
+}
