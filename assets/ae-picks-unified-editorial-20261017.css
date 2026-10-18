@@ -524,3 +524,7 @@ html body #footballTakes.ae-picks-editorial .ae-picks-rail > section.ae-chef-boa
     transition:none!important;
   }
 }
+
+/* Preserve category switching: the community feed is hidden off the Picks tab. */
+html body #footballTakes.ae-picks-editorial #communityPicks[hidden],
+html body #footballTakes.ae-picks-editorial[hidden]{display:none!important;}
