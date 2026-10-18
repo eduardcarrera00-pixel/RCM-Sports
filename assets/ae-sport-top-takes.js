@@ -141,24 +141,28 @@
      sidebar.insertBefore(desktopHomeMarker,root.parentElement===sidebar?root:null);
    }
    const section=typeof currentCategory==='undefined'?'':currentCategory;
-   const mobile=window.matchMedia('(max-width:760px)').matches;
-   if(mobile){
-     // Preserve the previously approved phone flow: NFL opinions between
-     // the feed and Top 10; Football opinions remain in their original rail.
-     if(section==='NFL'){
-       const feed=$('freeTakes'),ranking=$('aeSportTakeRanking');
-       if(feed&&ranking?.parentElement===feed&&
-          (root.parentElement!==feed||root.nextElementSibling!==ranking)){
-         feed.insertBefore(root,ranking);
-       }
-     }else if(root.parentElement!==sidebar){
-       desktopHomeMarker.after(root);
+   // Fútbol: ambas clasificaciones van dentro de la sección editorial,
+   // justo debajo del encabezado y antes del historial, a cualquier ancho.
+   if(section==='Fútbol'){
+     const feed=$('freeTakes'),history=$('aeTakesFeedHeading');
+     if(feed&&history?.parentElement===feed&&
+        (root.parentElement!==feed||root.nextElementSibling!==history)){
+       feed.insertBefore(root,history);
      }
      return;
    }
-   // On desktop, NFL and Football both use the right-hand editorial rail
-   // alongside their news; the empty column is no longer left unused.
-   if(section==='Fútbol'||section==='NFL'){
+   const mobile=window.matchMedia('(max-width:760px)').matches;
+   if(mobile&&section==='NFL'){
+     const feed=$('freeTakes'),ranking=$('aeSportTakeRanking');
+     if(feed&&ranking?.parentElement===feed&&
+        (root.parentElement!==feed||root.nextElementSibling!==ranking)){
+       feed.insertBefore(root,ranking);
+     }
+     return;
+   }
+   // NFL conserva su colocación editorial original. Fuera de los deportes,
+   // devolver el mismo nodo: no se duplican votos ni escuchas de eventos.
+   if(section==='NFL'){
      if(root.parentElement!==sidebar||sidebar.firstElementChild!==root){
        sidebar.insertBefore(root,sidebar.firstChild);
      }
