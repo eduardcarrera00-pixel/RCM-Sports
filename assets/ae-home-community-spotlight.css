@@ -465,13 +465,14 @@ html:not(.dark) body.ae-is-home aside .editorial-community.rcm-panel #communityL
   }
 }
 
-/* 2026-10-17 · Opinadores distinguidos: one compact card visible per
-   independently scrollable top-ten list. The reply/vote links stay intact. */
+/* 2026-10-17 · Opinadores distinguidos: show a window 25% shorter than
+   each full-size entry, without changing the original cards or their controls.
+   Both top-ten classifications remain independently scrollable. */
 html body.ae-is-home aside .editorial-community.rcm-panel #communityLeaders .ae-community-scroll-viewport{
   box-sizing:border-box!important;
-  height:244px!important;
-  min-height:244px!important;
-  max-height:244px!important;
+  height:183px!important;
+  min-height:183px!important;
+  max-height:183px!important;
   overflow-y:auto!important;
   overflow-x:hidden!important;
   overscroll-behavior-y:contain!important;
@@ -541,9 +542,9 @@ html body.ae-is-home aside .editorial-community.rcm-panel #communityLeaders .ae-
 }
 @media(max-width:640px){
   html body.ae-is-home aside .editorial-community.rcm-panel #communityLeaders .ae-community-scroll-viewport{
-    height:255px!important;
-    min-height:255px!important;
-    max-height:255px!important;
+    height:191px!important;
+    min-height:191px!important;
+    max-height:191px!important;
   }
   html body.ae-is-home aside .editorial-community.rcm-panel #communityLeaders .ae-community-scroll-entry{
     flex-basis:255px!important;
