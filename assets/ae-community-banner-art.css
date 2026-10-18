@@ -69,6 +69,7 @@ html body.ae-is-home #aeHomeTakeHighlights.ae-community-calm #aeHomeTopTakes .ae
    The two equal image bands provide night and day art without baked-in lettering. */
 html body.ae-is-home #mainContent #aeTrendingPortada.ae-trending-portada > .ae-section-heading {
   display: flex !important;
+  flex-direction: row !important;
   justify-content: flex-start !important;
   align-items: center !important;
   box-sizing: border-box !important;
