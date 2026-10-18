@@ -80,15 +80,27 @@
       value.toLocaleString('es-ES',{maximumFractionDigits:2})+' pts';
     const takeName=rookie?r.worst_take_title:r.best_take_title;
     const takeLabel=rookie?'Último fallo':'Mejor Take';
-    // In compact/mobile layouts the score and title remain attached to user.
-    details.append(element('strong',scoreText,'ae-nfl-ranking-score-mobile'));
+    // Compact NFL rankings show the accuracy immediately to the left of
+    // points/fallos. Football retains its existing summary.
+    const accuracy=takeAccuracy(r);
+    if(sport==='nfl'){
+      const mobileMetrics=element('div',null,'ae-nfl-ranking-mobile-metrics');
+      mobileMetrics.append(
+        element('span',accuracy,'ae-nfl-ranking-mobile-percent'),
+        element('strong',scoreText,'ae-nfl-ranking-score-mobile')
+      );
+      details.append(mobileMetrics);
+    }else{
+      details.append(element('strong',scoreText,'ae-nfl-ranking-score-mobile'));
+    }
     details.append(element('small',takeName?takeLabel+' · '+takeName:
       (rookie?'Sin Take fallado':'Sin Takes acertados'),'ae-nfl-ranking-take'));
-    const accuracy=takeAccuracy(r);
-    const record=element('small',
-      accuracy+' de aciertos · '+Number(r.correct_takes||0)+' / '+Number(r.total_resolved||0)+' evaluados',
-      'ae-nfl-ranking-record');
-    details.append(record);
+    if(sport!=='nfl'){
+      const record=element('small',
+        accuracy+' de aciertos · '+Number(r.correct_takes||0)+' / '+Number(r.total_resolved||0)+' evaluados',
+        'ae-nfl-ranking-record');
+      details.append(record);
+    }
     const takeCell=element('td',null,'ae-nfl-ranking-best');
     takeCell.append(element('span',takeLabel,'ae-nfl-ranking-best-label'));
     const takeTitle=element('strong',takeName||'—','ae-nfl-ranking-best-title');
