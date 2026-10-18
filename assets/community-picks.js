@@ -538,44 +538,72 @@ window.updateAePicksAdmin=()=>{loadModeration();loadSettlement();};
 
 function field(label,type='text'){const wrap=el('label',label);const input=el(type==='textarea'?'textarea':'input');if(type!=='textarea')input.type=type;input.required=true;wrap.append(input);return {wrap,input};}
 function buildComposer(){
- const form=$('cpForm'),title=field('Título del Pick'),explanation=field('Tu explicación (opcional)','textarea'),eventDay=field('Día del evento (sin hora)','date');eventDay.input.min=todayToronto();eventDay.input.max=new Date(Date.parse(todayToronto()+'T12:00:00Z')+180*86400000).toISOString().slice(0,10);title.input.maxLength=160;title.input.minLength=3;explanation.input.required=false;explanation.input.maxLength=2000;form.append(title.wrap,eventDay.wrap,explanation.wrap);
- const legs=el('div',null,'cp-legs'),rows=[];const output=el('output',''),status=el('p','', 'cp-status');status.setAttribute('role','status');
+ const form=$('cpForm'),rows=[];
+ const eventDay=field('Fecha del partido','date'),explanation=field('Tu análisis','textarea');
+ eventDay.input.name='event_date';eventDay.input.min=todayToronto();eventDay.input.defaultValue=todayToronto();
+ eventDay.input.max=new Date(Date.parse(todayToronto()+'T12:00:00Z')+180*86400000).toISOString().slice(0,10);
+ explanation.input.name='explanation';explanation.input.required=false;explanation.input.maxLength=2000;
+ explanation.input.placeholder='¿Por qué eliges este pronóstico?';
+ const modes=el('div',null,'cp-compose-modes');modes.setAttribute('role','group');modes.setAttribute('aria-label','Tipo de Pick');
+ const simple=button('Simple',()=>{if(rows.length>1)removeSecond();});
+ const combined=button('Combinada',()=>addRow());modes.append(simple,combined);
+ const legs=el('div',null,'cp-legs'),output=el('output','Completa tu pronóstico','cp-compose-summary');
+ output.setAttribute('aria-live','polite');
+ const status=el('p','','cp-status');status.setAttribute('role','status');
  function values(){return rows.map(r=>({sport:r.sport.input.value.trim(),event:r.event.input.value.trim(),selection:r.selection.input.value.trim(),odds:Number(r.odds.input.value)}));}
  function calculate(){
-   const picks=values();
-   const valid=picks.every(l=>Number.isInteger(l.odds)&&Math.abs(l.odds)>=100&&Math.abs(l.odds)<=100000);
-   const decimal=picks.reduce((v,l)=>v*(l.odds>0?1+l.odds/100:1+100/Math.abs(l.odds)),1);
-   const american=decimal>=2?Math.round((decimal-1)*100):-Math.round(100/(decimal-1));
-   output.textContent=valid?'Cuota combinada: '+(american>0?'+':'')+american+' · '+decimal.toFixed(2)+' decimal':'Introduce cuotas americanas, por ejemplo +150 o -110.';
-   return valid&&decimal>1;
+  const picks=values(),valid=picks.every(l=>Number.isInteger(l.odds)&&Math.abs(l.odds)>=100&&Math.abs(l.odds)<=100000);
+  const decimal=picks.reduce((v,l)=>v*(l.odds>0?1+l.odds/100:1+100/Math.abs(l.odds)),1);
+  const american=decimal>=2?Math.round((decimal-1)*100):-Math.round(100/(decimal-1));
+  output.textContent=valid?(picks.length===1?(picks[0].selection||'Tu Pick')+' · ':'Cuota total · ')+(american>0?'+':'')+american:'Completa el pronóstico y su cuota';
+  simple.setAttribute('aria-pressed',String(rows.length===1));combined.setAttribute('aria-pressed',String(rows.length===2));
+  return valid&&decimal>=2;
  }
- const add=button('Añadir segunda selección',()=>addRow());
- function addRow(){if(rows.length>=2)return;const box=el('fieldset');box.append(el('legend','Selección '+(rows.length+1)));const row={box};for(const [key,label] of [['sport','Deporte'],['event','Partido (equipos)'],['selection','Pronóstico'],['odds','Cuota americana (+150, -110)']]){row[key]=field(label);row[key].input.maxLength=key==='odds'?7:key==='selection'?200:key==='sport'?40:160;if(key==='odds')row[key].input.pattern='[+-]?[0-9]{3,6}';box.append(row[key].wrap);}rows.push(row);if(rows.length===2)box.append(button('Quitar segunda selección',()=>{rows.pop();box.remove();add.hidden=false;calculate();}));legs.append(box);add.hidden=rows.length===2;}
- addRow();form.append(legs,add,output,el('p','Publica tantos Picks como quieras. Los votos y comentarios están abiertos desde el primer momento, mientras AE SPORTS revisa la cuota. Al finalizar el evento, el Pick seguirá disponible en el historial. No podrás editarlo.','cp-meta'));
- const confirm=el('label','He revisado las selecciones y la cuota.');const checkbox=el('input');checkbox.type='checkbox';checkbox.required=true;confirm.prepend(checkbox);form.append(confirm);
- const submit=el('button','Guardar Pick');submit.type='submit';form.append(submit,status);form.addEventListener('input',calculate);
+ const add=button('+ Añadir otra selección',()=>addRow());add.className='cp-compose-add';
+ function removeSecond(){rows.pop().box.remove();add.hidden=false;calculate();}
+ function addRow(){
+  if(rows.length>=2)return;
+  const box=el('fieldset',null,'cp-compose-selection');box.append(el('legend','Selección '+(rows.length+1)));
+  const row={box};
+  for(const [key,label,placeholder] of [['sport','Deporte','Ej. NFL, fútbol, NBA…'],['event','Partido','Ej. Bengals vs Browns'],['selection','Tu pronóstico','Ej. Bengals gana'],['odds','Cuota americana','Ej. +150']]){
+   row[key]=field(label);const input=row[key].input;
+   input.name=key+'_'+rows.length;input.placeholder=placeholder;input.autocomplete='off';
+   input.maxLength=key==='odds'?7:key==='selection'?200:key==='sport'?40:160;
+   row[key].wrap.className='cp-compose-'+key;
+   if(key==='odds'){input.pattern='[+-]?[0-9]{3,6}';row[key].wrap.append(el('small','Ej. +150 o −110 · cuota total mínima +100','cp-compose-hint'));}
+   box.append(row[key].wrap);
+  }
+  rows.push(row);if(rows.length===2){const remove=button('Quitar segunda selección',removeSecond);remove.className='cp-compose-remove';box.append(remove);}
+  legs.append(box);add.hidden=rows.length===2;calculate();
+ }
+ const analysis=el('details',null,'cp-compose-analysis');analysis.append(el('summary','Añadir análisis (opcional)'),explanation.wrap);
+ const footer=el('footer',null,'cp-compose-footer');
+ const submit=el('button','Publicar Pick');submit.type='submit';
+ footer.append(output,submit,el('small','Revisa tu selección: no podrás editarla después de publicar.','cp-compose-hint'),status);
+ form.append(modes,legs,eventDay.wrap,add,analysis,footer);addRow();
+ form.addEventListener('input',calculate);
  form.onsubmit=async e=>{
   e.preventDefault();if(posting)return;
+  if(!form.reportValidity())return;
+  if(!calculate()){status.textContent='Revisa las cuotas: la cuota total debe ser al menos +100.';return;}
   posting=true;submit.disabled=true;
   const closer=$('cpComposeClose');if(closer)closer.disabled=true;
   status.textContent='';
   try{
    const user=await account(true);if(!user)return;
-   if(!calculate())throw Error('Revisa la cuota americana y las selecciones.');
-   submit.textContent='Guardando…';
-   const r=await db.from('ae_community_picks').insert({title:title.input.value.trim(),explanation:explanation.input.value.trim(),legs:values(),event_date:eventDay.input.value}).select('id').single();
+   submit.textContent='Publicando…';
+   const picks=values(),title=picks.map(p=>p.event).join(' / ').slice(0,160);
+   const r=await db.from('ae_community_picks').insert({title,explanation:explanation.input.value.trim(),legs:picks,event_date:eventDay.input.value}).select('id').single();
    if(r.error)throw r.error;
-   form.reset();
-   while(rows.length>1){rows.pop().box.remove();}
-   add.hidden=false;calculate();
-   closePickComposer(true);
-   void load();
-   notifyCommunity('Pick guardado. Ya puedes recibir votos y comentarios mientras revisamos la cuota.');
+   form.reset();while(rows.length>1)rows.pop().box.remove();
+   analysis.open=false;eventDay.input.defaultValue=todayToronto();eventDay.input.value=todayToronto();add.hidden=false;calculate();
+   closePickComposer(true);void load();
+   notifyCommunity('Pick publicado. Ya puedes recibir votos y comentarios mientras revisamos la cuota.');
   }catch(e){status.textContent=message(e);}
-  finally{posting=false;submit.disabled=false;submit.textContent='Guardar Pick';if(closer)closer.disabled=false;}
+  finally{posting=false;submit.disabled=false;submit.textContent='Publicar Pick';if(closer)closer.disabled=false;}
  };
- calculate();
 }
+
 async function loadArchive(){
  const target=$('cpArchiveFeed'),status=$('cpArchiveStatus'),more=$('cpArchiveMore');
  if(!target||!db)return;
