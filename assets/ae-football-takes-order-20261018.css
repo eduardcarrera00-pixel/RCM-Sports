@@ -48,8 +48,8 @@
   }
   html body.ae-is-football #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-takes-grid{
     display:grid!important;
-    grid-template-columns:minmax(0,1fr)!important;
-    gap:11px!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:0!important;
   }
   html body.ae-is-football #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-chef-card{
     border-radius:0!important;
@@ -71,29 +71,124 @@
   html body.ae-is-football #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-takes-list > li:nth-child(n+2){
     display:grid!important;
   }
-  html body.ae-is-football #mainContent #freeTakes #aeTakesFeedHeading{
-    display:block!important;
-    margin:15px 0 9px!important;
-    font:600 22px/1.12 Newsreader,Georgia,serif!important;
-  }
-  html body.ae-is-football #mainContent #freeTakes .ae-free-controls{
-    display:flex!important;
-    flex-wrap:wrap!important;
-    margin-bottom:10px!important;
-  }
-  html body.ae-is-football #mainContent #freeTakes #freeTakesFeed{
-    display:grid!important;
-    grid-template-columns:minmax(0,1fr)!important;
-    gap:9px!important;
-  }
-  html body.ae-is-football #mainContent #freeTakes #freeTakesFeed > article:nth-child(n+3){
-    display:flex!important;
-  }
-  html body.ae-is-football #mainContent #freeTakes #freeTakesStatus{
-    display:block!important;
-  }
   html body.ae-is-football #mainContent .editorial-community,
   html body.ae-is-football #mainContent #aeFootballMobileStage .editorial-community{
+    display:none!important;
+  }
+}
+
+/* Fútbol: sólo el editor + opiniones populares/impopulares, nunca el
+   feed de los últimos Takes ni sus divisiones/filtros (NFL intacta). */
+html body.ae-is-football #mainContent #freeTakes > #aeTakesFeedHeading,
+html body.ae-is-football #mainContent #freeTakes > .ae-free-controls,
+html body.ae-is-football #mainContent #freeTakes > #freeTakesStatus,
+html body.ae-is-football #mainContent #freeTakes > #freeTakesFeed,
+html body.ae-is-football #mainContent #freeTakes > #aeFootballMoreTakes,
+html body.ae-is-football #mainContent #freeTakes > #freeTakesMore{
+  display:none!important;
+}
+html body.ae-is-football #mainContent #freeTakes > #aeSportTakeLeaders.ae-sport-chefs:not([hidden]){
+  box-sizing:border-box!important;
+  display:block!important;
+  width:100%!important;
+  margin:12px 0 15px!important;
+  padding:0!important;
+  border:1px solid rgba(198,153,111,.65)!important;
+  border-radius:0!important;
+  background:transparent!important;
+  overflow:hidden!important;
+}
+html body.ae-is-football #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-takes-grid{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:0!important;
+  align-items:stretch!important;
+  width:100%!important;
+  margin:0!important;
+  padding:0!important;
+}
+html body.ae-is-football #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-takes-grid > .ae-sport-chef-card{
+  box-sizing:border-box!important;
+  height:100%!important;
+  min-width:0!important;
+  margin:0!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+}
+html body.ae-is-football #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-takes-grid > .ae-sport-chef-card + .ae-sport-chef-card{
+  border-left:1px solid rgba(198,153,111,.65)!important;
+}
+@media (max-width:760px){
+  html body.ae-is-football #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-chef-heading{
+    min-width:0!important;
+    padding:11px 8px!important;
+    min-height:66px!important;
+    align-items:flex-start!important;
+    flex-direction:column!important;
+    gap:5px!important;
+  }
+  html body.ae-is-football #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-chef-heading h3{
+    font-size:clamp(16px,4.2vw,22px)!important;
+    overflow-wrap:anywhere!important;
+    max-width:100%!important;
+    line-height:1.08!important;
+  }
+  html body.ae-is-football #mainContent #freeTakes > #aeSportTakeLeaders .ae-football-leaders-more{
+    align-self:flex-start!important;
+    font-size:9px!important;
+  }
+  html body.ae-is-football #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-takes-list{
+    min-height:0!important;
+    max-height:330px!important;
+    padding:3px 7px 7px!important;
+    overflow-y:auto!important;
+  }
+  html body.ae-is-football #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-take-item.ae-sport-chef-entry{
+    display:grid!important;
+    grid-template-columns:17px minmax(0,1fr)!important;
+    gap:3px!important;
+    padding:8px 0!important;
+    min-width:0!important;
+  }
+  html body.ae-is-football #mainContent #freeTakes > #aeSportTakeLeaders .ae-top-take-number{
+    font-size:16px!important;
+  }
+  html body.ae-is-football #mainContent #freeTakes > #aeSportTakeLeaders .ae-top-take-content{
+    display:flex!important;
+    flex-direction:column!important;
+    gap:5px!important;
+    min-width:0!important;
+  }
+  html body.ae-is-football #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-take-meta{
+    display:flex!important;
+    flex-wrap:wrap!important;
+    flex-direction:column!important;
+    gap:2px!important;
+    padding:0!important;
+    border:0!important;
+    min-height:0!important;
+    font-size:10px!important;
+  }
+  html body.ae-is-football #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-take-meta .ae-top-take-author{
+    font-size:10px!important;
+    word-break:break-word!important;
+  }
+  html body.ae-is-football #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-take-title{
+    display:block!important;
+    max-width:100%!important;
+    font-size:12px!important;
+  }
+  html body.ae-is-football #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-take-open{
+    display:-webkit-box!important;
+    -webkit-line-clamp:3!important;
+    -webkit-box-orient:vertical!important;
+    font-size:12px!important;
+    line-height:1.24!important;
+    overflow-wrap:anywhere!important;
+    width:100%!important;
+  }
+  html body.ae-is-football #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-take-excerpt{
     display:none!important;
   }
 }
