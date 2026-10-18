@@ -1909,9 +1909,9 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
  }
 }
 </style><link rel="stylesheet" href="assets/ae-picks-platos-chefs-layout-20261017.css?v=20261017-picks-news-preview-only-1">
-<link rel="stylesheet" href="assets/ae-football-takes-order-20261018.css?v=20261018-football-boards-v2">
+<link rel="stylesheet" href="assets/ae-football-takes-order-20261018.css?v=20261018-mobile-two-takes-v1">
 <link rel="stylesheet" href="assets/ae-nfl-opinions-order-20261018.css?v=20261018-nfl-boards-v1">
-<link rel="stylesheet" href="assets/ae-nfl-takes-opinions-order-20261018.css?v=20261018-nfl-head-opinions-feed-1">
+<link rel="stylesheet" href="assets/ae-nfl-takes-opinions-order-20261018.css?v=20261018-mobile-opinions-scroll-v1">
 <link rel="stylesheet" href="assets/ae-picks-feed-scroll-20261018.css?v=20261018-picks-feed-scroll-1">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
@@ -2376,7 +2376,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
           <h3 id="aeTakesFeedHeading" class="ae-takes-history-heading">Historial de Takes</h3>
           <div class="ae-free-controls"><label id="aeNflFeedFilterWrap" hidden>División NFL<select id="aeNflFeedDivision"><option value="">Todas las divisiones</option></select></label><label id="freeTakesFilterWrap">Mostrar<select id="freeTakesSportFilter"><option value="all">Todos los deportes</option><option value="general">General</option><option value="laliga">LaLiga</option><option value="premier">Premier League</option><option value="ligamx">Liga MX</option><option value="champions">Champions League</option><option value="nfl">NFL</option><option value="colegial">Fútbol colegial</option></select></label><label>Ordenar<select id="freeTakesSort"><option value="new">Más recientes</option><option value="top">Más apoyados</option></select></label></div>
           <p id="freeTakesStatus" class="ae-takes-status" role="status" aria-live="polite"></p>
-          <div id="freeTakesFeed" aria-live="polite"></div>
+          <div id="freeTakesFeed" aria-live="polite" role="region" tabindex="0" aria-label="Últimos Takes: desliza para leer más publicaciones"></div>
           <button id="aeFootballMoreTakes" type="button" class="ae-football-mobile-cta" aria-controls="freeTakesFeed" aria-expanded="false">Ver todos los Takes <span aria-hidden="true">→</span></button>
           <button id="freeTakesMore" type="button" class="ae-history-more" hidden>Ver todos los Takes <span aria-hidden="true">→</span></button>
           <div id="aeNflTakeFooterCta" class="ae-nfl-take-footer" hidden></div>
