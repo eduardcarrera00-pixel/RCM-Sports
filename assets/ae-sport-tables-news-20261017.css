@@ -1344,8 +1344,8 @@ html body.ae-is-football #aeSportTakeLeaders[data-sport="football"] .ae-sport-ta
   overscroll-behavior-y:contain!important;
   scrollbar-width:thin!important;
   scrollbar-color:rgba(184,137,83,.64) transparent!important;
-  height:188px!important;
-  max-height:188px!important;
+  height:calc(var(--ae-cycle-count,3) * 94px)!important;
+  max-height:calc(var(--ae-cycle-count,3) * 94px)!important;
   scroll-behavior:smooth;
   scroll-snap-type:y proximity;
   -webkit-overflow-scrolling:touch;
@@ -1367,8 +1367,8 @@ html body.ae-is-football #aeSportTakeLeaders[data-sport="football"] .ae-sport-ta
 }
 @media (max-width:760px) {
   html body.ae-is-football #aeSportTakeLeaders[data-sport="football"] .ae-sport-takes-list.ae-football-cyclic {
-    height:180px!important;
-    max-height:180px!important;
+    height:calc(var(--ae-cycle-count,3) * 90px)!important;
+    max-height:calc(var(--ae-cycle-count,3) * 90px)!important;
   }
   html body.ae-is-football #aeSportTakeLeaders[data-sport="football"] .ae-sport-takes-list.ae-football-cyclic > .ae-sport-chef-entry {
     height:90px!important;
