@@ -15,7 +15,7 @@
     if(!list)return;
     const row=el('tr');
     const cell=el('td',text,'ae-points-table-empty');
-    cell.colSpan=3;
+    cell.colSpan=4;
     row.append(cell);
     list.replaceChildren(row);
   }
@@ -42,38 +42,57 @@
     change.title=change.getAttribute('aria-label');
     return change;
   }
-  // Fila de tabla: se conservan el perfil, los movimientos, el mejor Take
-  // y el historial de aciertos; sólo cambia la presentación.
+  // Clasificaciones deportivas: posición, participante, acierto y puntos.
+  // El mejor Take es un detalle de rendimiento, no otra tarjeta de comentario.
+  function accurateRate(r){
+    const won=Number(r.correct_takes),resolved=Number(r.total_resolved);
+    if(!Number.isFinite(won)||!Number.isFinite(resolved)||resolved<=0)return '—';
+    return (100*won/resolved).toLocaleString('es-ES',{maximumFractionDigits:1})+'%';
+  }
   function leader(r,side,movement){
-    const row=el('tr',null,'ae-points-table-row');
+    const row=el('tr',null,'ae-points-table-row ae-sports-standing-row');
     row.dataset.side=side;
-    const place=el('td');
-    place.append(el('span',String(r.rank_number||'').padStart(2,'0'),'ae-points-rank'));
+    if(Number(r.rank_number)===1)row.classList.add('ae-sports-standing-first');
 
-    const player=el('td');
-    const user=el('button','@'+(r.username||'Aficionado'),'ae-points-user');
+    const place=el('td',null,'ae-sports-stand-pos');
+    place.append(el('strong',String(r.rank_number||'').padStart(2,'0'),'ae-points-rank'));
+    place.append(movementBadge(movement));
+
+    const player=el('td',null,'ae-sports-stand-player');
+    const user=el('button',null,'ae-points-user');
     user.type='button';
-    const avatar=el('span',String(r.username||'A').replace(/^@+/,'').slice(0,1).toUpperCase(),'ae-points-avatar');
+    const nickname=(r.username||'Aficionado').replace(/^@+/,'');
+    const avatar=el('span',nickname.slice(0,1).toUpperCase()||'A','ae-points-avatar');
     avatar.setAttribute('aria-hidden','true');
-    user.prepend(avatar);
-    user.setAttribute('aria-label','Ver perfil y Takes de '+(r.username||'Aficionado'));
+    const name=el('span','@'+nickname,'ae-sports-stand-name');
+    user.append(avatar,name);
+    user.setAttribute('aria-label','Ver perfil y Takes de '+nickname);
     user.addEventListener('click',()=>window.openAePublicProfile?.(r.user_id));
     player.append(user);
-    if(r.best_take_title){
-      const best=el('span',null,'ae-points-best-mini');
-      const kicker=el('strong','Mejor Take · +'+Number(r.best_take_points||0)+' pts · ');
-      best.append(kicker,document.createTextNode(r.best_take_title));
-      if(r.best_take_excerpt)best.title=r.best_take_excerpt;
-      player.append(best);
-    }else{
-      player.append(el('span','Sin Take acertado todavía','ae-points-best-mini'));
-    }
-    player.append(el('span',Number(r.correct_takes||0)+' aciertos · '+Number(r.total_resolved||0)+' resueltos','ae-points-resolved'));
 
-    const score=el('td');
-    score.append(el('strong',Number(r.points||0)+' pts','ae-points-total'));
-    score.append(movementBadge(movement));
-    row.append(place,player,score);
+    const best=el('div',null,'ae-sports-stand-best');
+    if(r.best_take_id&&r.best_take_title){
+      best.append(el('span','MEJOR TAKE','ae-sports-stand-best-label'));
+      const title=el('span',r.best_take_title,'ae-sports-stand-best-title');
+      title.title=r.best_take_title;
+      best.append(title);
+      best.append(el('small','+'+Number(r.best_take_points||0).toLocaleString('es-ES',{maximumFractionDigits:2})+' pts','ae-sports-stand-best-score'));
+    }else{
+      best.append(el('span','Aún sin Take acertado','ae-sports-stand-no-best'));
+    }
+    player.append(best);
+
+    const accuracy=el('td',null,'ae-sports-stand-accuracy');
+    const resolved=Number(r.total_resolved||0),correct=Number(r.correct_takes||0);
+    const rate=el('strong',accurateRate(r),'ae-sports-stand-rate');
+    rate.title=resolved>0?correct+' aciertos entre '+resolved+' Takes evaluados':'Todavía sin Takes evaluados';
+    accuracy.append(rate,el('small',resolved>0?correct+'/'+resolved+' Takes':'Sin evaluar','ae-sports-stand-resolved'));
+
+    const score=el('td',null,'ae-sports-stand-points');
+    const amount=Number(r.points||0);
+    score.append(el('strong',amount.toLocaleString('es-ES',{maximumFractionDigits:2}),'ae-points-total'));
+    score.append(el('small','PTS','ae-sports-stand-points-label'));
+    row.append(place,player,accuracy,score);
     return row;
   }
   function paint(data,movements){
