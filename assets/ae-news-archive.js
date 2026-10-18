@@ -5,6 +5,7 @@
   'use strict';
   const $ = id => document.getElementById(id);
   const categories = new Set(['Todas','Picks','NFL','Fútbol']);
+  const mobile = window.matchMedia('(max-width:760px)');
   let category = 'Todas', term = '', shown = 18, opener = null;
   const simplify = value => String(value || '').normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
@@ -76,6 +77,20 @@
       b.setAttribute('aria-pressed',String(b.dataset.aeArchiveFilter===category));
     });
   }
+  // El archivo de cada deporte en el teléfono es una lista directa de noticias:
+  // la categoría ya está definida, por lo que no necesita buscar ni filtrar.
+  function updateArchivePresentation(){
+    const sportMobile = mobile.matches && (category === 'NFL' || category === 'Fútbol');
+    const filters = modal()?.querySelector('.ae-news-archive-filters');
+    if(filters) filters.style.display = sportMobile ? 'none' : '';
+    const title = $('aeNewsArchiveTitle');
+    if(title) title.textContent = sportMobile ? 'Noticias de '+category : 'Todas las noticias';
+    const description = $('aeNewsArchiveDescription');
+    if(description) description.textContent = sportMobile
+      ? 'Todas las noticias de '+category+', de las más recientes a las más antiguas.'
+      : 'Todas nuestras publicaciones, de las más recientes a las más antiguas.';
+    return sportMobile;
+  }
   function openArchive(requested='Todas',trigger=null){
     const dialog=modal();
     if(!dialog)return;
@@ -84,16 +99,19 @@
     term='';shown=18;
     const input=$('aeNewsArchiveSearch');
     if(input)input.value='';
+    const sportMobile = updateArchivePresentation();
     render();
     if(!dialog.open){
       if(typeof dialog.showModal==='function')dialog.showModal();
       else dialog.setAttribute('open','');
     }
-    input?.focus({preventScroll:true});
+    if(sportMobile) $('aeNewsArchiveClose')?.focus({preventScroll:true});
+    else input?.focus({preventScroll:true});
   }
   window.aeOpenNewsArchive=openArchive;
   window.aeRefreshNewsArchive=()=>{if(modal()?.open)render();};
   document.addEventListener('DOMContentLoaded',()=>{
+    mobile.addEventListener('change',()=>{if(modal()?.open)updateArchivePresentation();});
     document.addEventListener('click',event=>{
       const trigger=event.target.closest('[data-ae-news-category]');
       if(!trigger)return;
