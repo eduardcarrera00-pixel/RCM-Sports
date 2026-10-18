@@ -1,0 +1,19 @@
+/* Picks: eliminar los contornos dobles que rodean cada publicación.
+   Conservar un único borde discreto en la tarjeta y el scroll. */
+html body #footballTakes.ae-picks-editorial #communityPicks #cpFeed,
+html body #footballTakes.ae-picks-editorial #communityPicks #cpFeed.ae-picks-feed-scrollable{
+ border:0!important;outline:0!important;box-shadow:none!important;
+ padding-left:0!important;padding-right:0!important;
+}
+html body #footballTakes.ae-picks-editorial #communityPicks #cpFeed > .cp-card{
+ border:1px solid rgba(199,159,113,.38)!important;
+ outline:0!important;box-shadow:none!important;
+ border-radius:0!important;
+}
+html body #footballTakes.ae-picks-editorial #communityPicks #cpFeed > .cp-card::before,
+html body #footballTakes.ae-picks-editorial #communityPicks #cpFeed > .cp-card::after{
+ box-shadow:none!important;
+}
+html body #footballTakes.ae-picks-editorial #communityPicks #cpFeedScrollHint{
+ border-bottom:0!important;
+}
