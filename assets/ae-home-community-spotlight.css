@@ -403,3 +403,64 @@ html:not(.dark) body.ae-is-home aside .editorial-community.rcm-panel .ae-communi
     transition:none!important;
   }
 }
+
+/* AE SPORTS · 17 Oct 2026 · Opinadores distinguidos.
+   Preserve the approved two spotlight cards and their content styling;
+   only the comments inside each card scroll independently (top 10 each). */
+html body.ae-is-home aside .editorial-community.rcm-panel #communityLeaders>.ae-community-spotlight.ae-community-scroll-group{
+  padding:0!important;
+  min-width:0!important;
+  overflow:hidden!important;
+}
+html body.ae-is-home aside .editorial-community.rcm-panel #communityLeaders .ae-community-scroll-viewport{
+  box-sizing:border-box!important;
+  display:block!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:0!important;
+  max-height:355px!important;
+  margin:0!important;
+  padding:0!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  overscroll-behavior-y:contain!important;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:thin!important;
+  scrollbar-color:rgba(212,164,112,.72) transparent!important;
+}
+html body.ae-is-home aside .editorial-community.rcm-panel #communityLeaders .ae-community-scroll-viewport:focus-visible{
+  outline:2px solid var(--ae-community-bronze,#e1aa6e)!important;
+  outline-offset:-3px!important;
+}
+html body.ae-is-home aside .editorial-community.rcm-panel #communityLeaders .ae-community-scroll-entry{
+  position:relative!important;
+  box-sizing:border-box!important;
+  display:block!important;
+  width:100%!important;
+  min-width:0!important;
+  height:auto!important;
+  margin:0!important;
+  padding:16px 16px 13px 18px!important;
+  border:0!important;
+  border-bottom:1px solid rgba(212,164,112,.23)!important;
+  border-radius:0!important;
+  background:transparent!important;
+  overflow-wrap:anywhere!important;
+}
+html body.ae-is-home aside .editorial-community.rcm-panel #communityLeaders .ae-community-scroll-entry:last-child{
+  border-bottom:0!important;
+}
+html:not(.dark) body.ae-is-home aside .editorial-community.rcm-panel #communityLeaders .ae-community-scroll-entry{
+  border-bottom-color:rgba(140,106,72,.19)!important;
+}
+html:not(.dark) body.ae-is-home aside .editorial-community.rcm-panel #communityLeaders .ae-community-scroll-viewport{
+  scrollbar-color:rgba(142,110,79,.56) transparent!important;
+}
+@media(max-width:640px){
+  html body.ae-is-home aside .editorial-community.rcm-panel #communityLeaders .ae-community-scroll-viewport{
+    max-height:330px!important;
+  }
+  html body.ae-is-home aside .editorial-community.rcm-panel #communityLeaders .ae-community-scroll-entry{
+    padding:14px 12px 11px 14px!important;
+  }
+}
