@@ -20,3 +20,29 @@ publication workflow and reads this repository's main branch on a five-minute
 schedule. Keep application changes here; do not create a divergent second site.
 The previous project Pages address remains available. When changing browser
 origin allowlists, preserve both controlled public origins.
+
+## Immediately publish source changes to the AE SPORTS address
+
+After completing and committing any application change to this repository's `main`
+branch, also request an immediate branded-site publication. The source checkout
+remains the single source of truth; never edit or replicate application code in
+the branded repository.
+
+1. Read the **current** `main` commit SHA of `eduardcarrera00-pixel/RCM-Sports`
+   after all source commits are finished.
+2. With authorized GitHub write access, create or update
+   `.github/source-revision-request.txt` in
+   `aesportsclub/aesportsclub.github.io` on `main` to contain that full SHA and a
+   final newline. Its `push` event triggers the existing `Publish AE SPORTS`
+   workflow immediately, avoiding reliance on GitHub's occasionally delayed
+   five-minute schedule. Do not write if that request already contains the
+   current SHA and a deployment of that SHA has been confirmed.
+3. Check that the resulting Pages workflow completes successfully and checked
+   out the requested source SHA; check the published `source-revision.txt` when
+   reachable. Do not claim the public site updated solely because a commit or
+   deployment request was created.
+
+If an immediate trigger is unavailable, retain the scheduled publisher and say
+that publication may lag. Never add credentials, change database endpoints,
+replace the website with an iframe or redirect, or reset published changes to
+accomplish this synchronization.
