@@ -65,10 +65,26 @@
     if(!Number.isFinite(won)||!Number.isFinite(resolved)||resolved<=0)return '—';
     return (100*won/resolved).toLocaleString('es-ES',{maximumFractionDigits:1})+'%';
   }
-  function sportStandingRow(r,i,rookie){
+  // Comparar sólo posiciones previamente vistas del mismo deporte y periodo.
+  // La primera visita no inventa ascensos ni descensos.
+  const previousPositions=new Map();
+  function sportStandingRow(r,i,rookie,previous){
     const row=element('tr',null,'ae-nfl-ranking-row');
     const position=element('td',null,'ae-nfl-ranking-place');
     position.append(element('strong',String(i+1).padStart(2,'0')));
+    const key=String(r.user_id||r.username||'');
+    const last=key?previous.get(key):undefined;
+    if(Number.isInteger(last)){
+      const difference=last-(i+1);
+      const change=element('span',difference>0?'▲'+difference:difference<0?'▼'+Math.abs(difference):'—',
+        'ae-esport-rank-change '+(difference>0?'is-up':difference<0?'is-down':'is-flat'));
+      change.title=difference>0?'Subió '+difference+' puestos':difference<0?'Bajó '+Math.abs(difference)+' puestos':'Sin cambios';
+      position.append(change);
+    }else{
+      const change=element('span','·','ae-esport-rank-change is-new');
+      change.title='Sin comparación anterior';
+      position.append(change);
+    }
     const details=element('td',null,'ae-nfl-ranking-details');
     const username=element('button','@'+(r.username||'Aficionado'),'ae-nfl-ranking-user');
     username.type='button';
@@ -141,9 +157,13 @@
       const empty=isRookie?
         (period==='month'?'Este mes aún no hay Takes fallados.':'Todavía no hay Takes fallados.'):
         (period==='month'?'Este mes aún no hay Takes puntuados.':'Todavía no hay Takes puntuados.');
+      const snapshotKey=selectedSport+':'+period+':'+(isRookie?'rookie':'savant');
+      const previous=previousPositions.get(snapshotKey)||new Map();
       list.replaceChildren(...(rows.length?
-        rows.map((r,i)=>sportStandingRow(r,i,isRookie)):
+        rows.map((r,i)=>sportStandingRow(r,i,isRookie,previous)):
         [sportStandingMessage(empty)]));
+      // Guardar la posición sólo tras una respuesta válida.
+      previousPositions.set(snapshotKey,new Map(rows.map((r,i)=>[String(r.user_id||r.username||''),i+1])));
     }
   }
   async function loadRanking(where){
