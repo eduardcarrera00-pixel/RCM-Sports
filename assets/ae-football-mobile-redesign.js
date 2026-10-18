@@ -27,13 +27,14 @@
       else root.parentNode?.insertBefore(nflTakeAnchor,root);
     }
     const takeFeed = byId('freeTakes');
-    const standing = byId('aeSportTakeRanking');
+    const header = takeFeed?.querySelector(':scope > .ae-takes-head');
     const nflSection = document.body.classList.contains('ae-is-nfl');
-    // NFL: Demuestra tu conocimiento, Savant/Rookie y después Top 10.
-    // Se mueve el nodo real; votos, respuestas y usuarios mantienen sus eventos.
-    if(onNfl && nflSection && takeFeed && standing?.parentElement === takeFeed){
-      if(root.parentElement !== takeFeed || root.nextElementSibling !== standing){
-        takeFeed.insertBefore(root,standing);
+    // Teléfono NFL: justo después de "Demuestra tu conocimiento" van
+    // las dos opiniones; siguen los Takes recientes y después Savant/Rookie.
+    // Reordenar el nodo real conserva votos, eventos y datos publicados.
+    if(onNfl && nflSection && takeFeed && header?.parentElement === takeFeed){
+      if(root.parentElement !== takeFeed || root.previousElementSibling !== header){
+        takeFeed.insertBefore(root,header.nextSibling);
       }
     } else if(mobile.matches && nflTakeAnchor.parentNode &&
               (root.parentElement !== nflTakeAnchor.parentElement || nflTakeAnchor.nextSibling !== root)){
