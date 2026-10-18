@@ -69,10 +69,11 @@
     username.onclick=()=>window.openAePublicProfile?.(r.user_id);
     details.append(username);
     const value=rookie?Number(r.lost_takes||0):Number(r.points||0);
-    details.append(element('strong',
-      rookie?(value===1?'1 fallo':value+' fallos'):
-        value.toLocaleString('es-ES',{maximumFractionDigits:2})+' pts',
-      'ae-nfl-ranking-score'));
+    const scoreText=rookie?(value===1?'1 fallo':value+' fallos'):
+      value.toLocaleString('es-ES',{maximumFractionDigits:2})+' pts';
+    // On phones retain the original stacked information; on desktop put
+    // the score in a dedicated standings column, as in a sports league.
+    details.append(element('strong',scoreText,'ae-nfl-ranking-score-mobile'));
     const takeName=rookie?r.worst_take_title:r.best_take_title;
     const note=rookie?'Último Take fallado':'Mejor Take';
     details.append(element('small',takeName?note+' · '+takeName:
@@ -80,12 +81,15 @@
     details.append(element('small',
       Number(r.correct_takes||0)+' aciertos · '+Number(r.total_resolved||0)+' evaluados',
       'ae-nfl-ranking-record'));
-    row.append(position,details);
+    const score=element('td',null,'ae-nfl-ranking-value');
+    const displayedScore=element('strong',scoreText,'ae-nfl-ranking-score');
+    score.append(displayedScore);
+    row.append(position,details,score);
     return row;
   }
   function nflStandingMessage(message){
     const row=element('tr',null,'ae-nfl-ranking-message');
-    const cell=element('td',message);cell.colSpan=2;row.append(cell);
+    const cell=element('td',message);cell.colSpan=3;row.append(cell);
     return row;
   }
   async function loadNflTwinRankings(seq,period){
@@ -199,7 +203,7 @@
     if(solo)solo.hidden=next==='nfl';
     const description=$('aeSportTakeRankingDescription');
     if(description)description.textContent=next==='nfl'
-      ? 'Dos clasificaciones por resultados confirmados: puntos para Savant y fallos para Rookie.'
+      ? ''
       : 'Los admins confirman cada acierto y asignan de 1 a 100 puntos. Un fallo vale 0.';
     refresh();
   },refresh};
