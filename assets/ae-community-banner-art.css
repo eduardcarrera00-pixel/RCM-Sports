@@ -64,3 +64,35 @@ html body.ae-is-home #aeHomeTakeHighlights.ae-community-calm #aeHomeTopTakes .ae
     padding: 18px !important;
   }
 }
+
+/* Lo más leído shares the classical banner family, with a community of readers.
+   The two equal image bands provide night and day art without baked-in lettering. */
+html body.ae-is-home #mainContent #aeTrendingPortada.ae-trending-portada > .ae-section-heading {
+  display: flex !important;
+  align-items: center !important;
+  box-sizing: border-box !important;
+  min-height: 100px !important;
+  padding: 20px !important;
+  margin: 0 !important;
+  background-color: var(--calm-head) !important;
+  background-image: url("ae-readers-community-atlas.webp") !important;
+  background-size: 100% 200% !important;
+  background-position: center top !important;
+  background-repeat: no-repeat !important;
+  overflow: hidden !important;
+}
+html:not(.dark) body.ae-is-home #mainContent #aeTrendingPortada.ae-trending-portada > .ae-section-heading {
+  background-position: center bottom !important;
+}
+html body.ae-is-home #mainContent #aeTrendingPortada.ae-trending-portada #trendingTitle {
+  max-width: 62% !important;
+  font-size: clamp(26px,2.15vw,30px) !important;
+  line-height: 1.12 !important;
+  color: var(--calm-ink) !important;
+}
+@media(max-width:760px) {
+  html body.ae-is-home #mainContent #aeTrendingPortada.ae-trending-portada > .ae-section-heading {
+    min-height: 96px !important;
+    padding: 18px !important;
+  }
+}
