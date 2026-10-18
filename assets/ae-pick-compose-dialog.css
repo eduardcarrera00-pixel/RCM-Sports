@@ -47,3 +47,6 @@ html body #cpComposePanel #cpForm .cp-compose-modes button[aria-pressed=true]{ba
 html body #cpComposePanel #cpForm :is(.cp-compose-add,.cp-compose-remove){background:transparent!important;color:var(--cp-dialog-action)!important;border-color:var(--cp-dialog-line)!important}
 html body #cpComposePanel #cpForm button[type=submit]{background:#d4ae83!important;color:#102938!important;border-color:#d4ae83!important}
 html:not(.dark) body #cpComposePanel #cpForm button[type=submit]{background:#855b43!important;color:#fff!important;border-color:#855b43!important}
+html body #cpComposePanel #cpForm .cp-compose-footer{background:var(--cp-dialog-bg)!important;color:var(--cp-dialog-ink)!important}
+html body #cpComposePanel #cpForm .cp-compose-footer output,html body #cpComposePanel #cpForm .cp-compose-footer .cp-status{color:var(--cp-dialog-ink)!important}
+html body #cpComposePanel #cpForm .cp-compose-footer .cp-compose-hint{color:var(--cp-dialog-muted)!important}
