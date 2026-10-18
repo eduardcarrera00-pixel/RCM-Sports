@@ -733,3 +733,109 @@ html:not(.dark) body #footballTakes #communityPicks>section.ae-inline-chefs-boar
    padding:13px!important;margin:17px 0 0!important;
  }
 }
+
+
+/* AE SPORTS · Finish: complete, sharp frames for both Platos panels. */
+html body #footballTakes .ae-picks-rail > section.ae-chef-board.ae-chef-best,
+html body #footballTakes .ae-picks-rail > section.ae-chef-board.ae-chef-worst{
+  /* The border is a single uninterrupted four-sided frame, not a soft glow. */
+  --ae-plates-frame:#e6dacd;
+  display:block!important;
+  position:relative!important;
+  isolation:isolate!important;
+  box-sizing:border-box!important;
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  height:auto!important;
+  border:1px solid var(--ae-plates-frame)!important;
+  border-width:1px!important;
+  border-style:solid!important;
+  border-color:var(--ae-plates-frame)!important;
+  border-radius:0!important;
+  background-clip:padding-box!important;
+  outline:0!important;
+  box-shadow:none!important;
+  filter:none!important;
+  -webkit-mask-image:none!important;
+  mask-image:none!important;
+  overflow:hidden!important;
+}
+/* Guaranteed right and bottom continuity over the photograph and scroll area,
+   without covering text, blocking Pick links, or rounding the corners. */
+html body #footballTakes .ae-picks-rail > section.ae-chef-board.ae-chef-best::after,
+html body #footballTakes .ae-picks-rail > section.ae-chef-board.ae-chef-worst::after{
+  content:""!important;
+  display:block!important;
+  position:absolute!important;
+  inset:0!important;
+  z-index:5!important;
+  box-sizing:border-box!important;
+  border:1px solid var(--ae-plates-frame)!important;
+  border-radius:0!important;
+  pointer-events:none!important;
+  background:none!important;
+  box-shadow:none!important;
+  opacity:1!important;
+  filter:none!important;
+}
+/* An ivory frame in night mode and an equally defined warm frame in day mode. */
+html:not(.dark) body #footballTakes .ae-picks-rail > section.ae-chef-board.ae-chef-best,
+html:not(.dark) body #footballTakes .ae-picks-rail > section.ae-chef-board.ae-chef-worst{
+  --ae-plates-frame:#b89c80;
+  border-color:var(--ae-plates-frame)!important;
+  box-shadow:none!important;
+}
+/* Title left; El recetario pinned to the inner right edge on all widths. */
+html body #footballTakes .ae-picks-rail > section.ae-chef-board .ae-picks-rail-heading{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) max-content!important;
+  grid-auto-rows:min-content!important;
+  align-items:center!important;
+  justify-content:stretch!important;
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  gap:3px 9px!important;
+  box-sizing:border-box!important;
+  margin:0 0 7px!important;
+  padding:0 0 9px!important;
+  border:0!important;
+  border-bottom:1px solid rgba(230,217,200,.44)!important;
+  background:none!important;
+  overflow:visible!important;
+}
+html body #footballTakes .ae-picks-rail > section.ae-chef-board .ae-picks-rail-heading h3{
+  grid-column:1!important;
+  grid-row:1!important;
+  margin:0!important;
+  min-width:0!important;
+  text-align:left!important;
+}
+html body #footballTakes .ae-picks-rail > section.ae-chef-board .ae-picks-rail-heading .ae-chef-recetario{
+  display:block!important;
+  grid-column:2!important;
+  grid-row:1!important;
+  justify-self:end!important;
+  align-self:center!important;
+  width:max-content!important;
+  min-width:0!important;
+  max-width:100%!important;
+  margin:0!important;
+  padding:0!important;
+  text-align:right!important;
+  white-space:nowrap!important;
+}
+html:not(.dark) body #footballTakes .ae-picks-rail > section.ae-chef-board .ae-picks-rail-heading{
+  border-bottom-color:rgba(148,121,98,.38)!important;
+}
+@media(max-width:560px){
+  html body #footballTakes .ae-picks-rail > section.ae-chef-board .ae-picks-rail-heading{
+    grid-template-columns:minmax(0,1fr) max-content!important;
+    column-gap:5px!important;
+  }
+  html body #footballTakes .ae-picks-rail > section.ae-chef-board .ae-picks-rail-heading .ae-chef-recetario{
+    font-size:8px!important;
+    letter-spacing:0!important;
+  }
+}
