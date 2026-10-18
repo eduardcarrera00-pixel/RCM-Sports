@@ -1425,3 +1425,28 @@ html body.ae-is-football #aeSportTakeLeaders[data-sport="football"] .ae-sport-ta
     align-items:baseline!important;
   }
 }
+
+
+/* Fútbol · Hide only the redundant general Top 10 heading.
+   Pull the period controls and both leaderboards up into the released space. */
+html body.ae-is-football #mainContent #aeSportTakeRanking > .ae-take-ranking-head{
+  display:none!important;
+}
+html body.ae-is-football #mainContent #aeSportTakeRanking{
+  padding-top:14px!important;
+}
+html body.ae-is-football #mainContent #aeSportTakeRanking > .ae-take-ranking-tabs{
+  margin:0 0 10px!important;
+  padding:0!important;
+}
+html body.ae-is-football #mainContent #aeSportTakeRanking #aeNflTwinRankings:not([hidden]){
+  margin-top:0!important;
+}
+@media(max-width:760px){
+  html body.ae-is-football #mainContent #aeSportTakeRanking{
+    padding-top:11px!important;
+  }
+  html body.ae-is-football #mainContent #aeSportTakeRanking > .ae-take-ranking-tabs{
+    margin-bottom:8px!important;
+  }
+}
