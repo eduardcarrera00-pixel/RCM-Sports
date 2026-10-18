@@ -1610,6 +1610,30 @@ html body.ae-is-home #aeHomeTopTakes .ae-points-table .ae-points-rank{
   }
 }
 </style>
+<style id="ae-desktop-sport-nav-hover-no-squares-20261017">
+/* Picks · NFL · Fútbol: remove the old white hover square while keeping
+   the navigation's bottom underline and keyboard focus indicator. */
+@media (min-width:761px) and (hover:hover){
+  html body>header nav.ae-sport-nav>button.category-btn:is([data-category="Picks"],[data-category="NFL"],[data-category="Fútbol"]):is(:hover,:focus-visible,.active){
+    background:transparent!important;
+    background-image:none!important;
+    box-shadow:none!important;
+    border-top-color:transparent!important;
+    border-left-color:transparent!important;
+    border-right-color:transparent!important;
+    /* Intentionally do not change border-bottom: the underline stays. */
+  }
+  html body>header nav.ae-sport-nav>button.category-btn:is([data-category="Picks"],[data-category="NFL"],[data-category="Fútbol"]) .ae-nav-icon,
+  html body>header nav.ae-sport-nav>button.category-btn:is([data-category="Picks"],[data-category="NFL"],[data-category="Fútbol"]):is(:hover,:focus-visible,.active) .ae-nav-icon{
+    border:0!important;
+    border-color:transparent!important;
+    background:transparent!important;
+    background-image:none!important;
+    box-shadow:none!important;
+    outline:none!important;
+  }
+}
+</style>
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 <a class="ae-skip-link" href="#mainContent">Ir al contenido</a>
