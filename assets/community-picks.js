@@ -554,69 +554,194 @@ function pickDetailHero(p){
 }
 async function showDetail(id,options={}){
  if(!/^[0-9a-f-]{36}$/i.test(id))return;
- let dialog=$('cpDialog');if(!dialog){dialog=el('dialog',null,'rcm-dialog cp-dialog ae-cp-detail-dialog');dialog.id='cpDialog';dialog.setAttribute('aria-label','Pick y respuestas');document.body.append(dialog);dialog.addEventListener('close',()=>{dialog.remove();const u=new URL(location.href);u.searchParams.delete('pick');history.replaceState({},'',u);});}
+ let dialog=$('cpDialog');
+ if(!dialog){
+  dialog=el('dialog',null,'rcm-dialog cp-dialog ae-cp-detail-dialog');
+  dialog.id='cpDialog';
+  dialog.setAttribute('aria-label','Pick y respuestas');
+  document.body.append(dialog);
+  dialog.addEventListener('close',()=>{
+   dialog.remove();
+   const u=new URL(location.href);
+   u.searchParams.delete('pick');
+   history.replaceState({},'',u);
+  });
+ }
  dialog.classList.add('ae-cp-detail-dialog');
- dialog.replaceChildren(pickDetailClose(),el('p','Cargando Pick…','ae-cp-detail-loading'));if(!dialog.open)dialog.showModal();
- try{const [pick,comments,session]=await Promise.all([db.from('ae_pick_feed').select('*').eq('id',id).maybeSingle(),db.from('ae_pick_comments').select('*').eq('pick_id',id).eq('hidden',false).order('created_at').limit(200),db.auth.getUser().catch(()=>({data:{user:null}}))]);
- if(!dialog.isConnected||new URL(location.href).searchParams.get('pick')!==id)return;
- if(pick.error||comments.error)throw pick.error||comments.error;
- dialog.replaceChildren(pickDetailClose());
- if(!pick.data){dialog.append(el('p','Este Pick no está disponible.','ae-cp-detail-loading'));return;}
- const hero=pickDetailHero(pick.data);
- const content=el('div',null,'ae-cp-detail-content');
- const forecast=el('section',null,'ae-cp-detail-forecast');
- forecast.setAttribute('aria-label','Pronóstico del chef');
- forecast.append(el('span','EL PRONÓSTICO','ae-cp-detail-overline'),card(pick.data,false,true));
- content.append(forecast);
- const conversation=el('section',null,'ae-cp-detail-conversation');
- conversation.setAttribute('aria-label','Conversación del Pick');
- const heading=el('h3','La conversación · '+Number(pick.data.comments_count||comments.data.length),'cp-detail-replies-heading');
- conversation.append(heading);
- content.append(conversation);
- dialog.append(hero,content);
- const replyStatus=el('p',''),form=el('form'),body=field('Tu comentario','textarea');body.input.maxLength=2000;let parent=null;
- const cancel=button('Cancelar respuesta',()=>{parent=null;replyStatus.textContent='';cancel.hidden=true;});cancel.hidden=true;
- const names=new Map(comments.data.map(c=>[c.id,c.author]));
- for(const c of comments.data){const item=el('article',null,'cp-comment');item.append(el('strong',c.author));if(c.parent_id)item.append(el('small','En respuesta a '+(names.get(c.parent_id)||'un comentario anterior')));item.append(el('p',c.body));const replyAction=button('Responder',()=>{void requestPickReply(id,c.id,closeDetail,body.input.value);});replyAction.classList.add('ae-cp-comment-reply');item.append(replyAction);if(currentAdmin)item.append(button('Ocultar comentario',async()=>{const r=await db.from('ae_pick_comments').update({hidden:true}).eq('id',c.id);if(r.error)notifyCommunity(message(r.error),true);else showDetail(id);}));conversation.append(item);}
- if(!comments.data.length)conversation.append(el('p','Todavía no hay respuestas. Puedes abrir la conversación.','ae-cp-detail-empty'));
- if(comments.data.length===200)conversation.append(el('p','Se muestran los primeros 200 comentarios.'));
- const send=el('button','Enviar respuesta');
- send.type='submit';
- form.append(replyStatus,cancel,body.wrap,send);
- form.onsubmit=async e=>{
-  e.preventDefault();if(send.disabled)return;
-  send.disabled=true;
-  try{
-   const response=await db.auth.getUser();
-   if(response.error&&response.error.name!=='AuthSessionMissingError'&&response.error.code!=='session_not_found')throw response.error;
-   if(!response.data?.user){
-    await requestPickReply(id,parent,closeDetail,body.input.value);
+ dialog.replaceChildren(pickDetailClose(),el('p','Cargando Pick…','ae-cp-detail-loading'));
+ if(!dialog.open)dialog.showModal();
+ try{
+  const [pick,comments,session,votes]=await Promise.all([
+   db.from('ae_pick_feed').select('*').eq('id',id).maybeSingle(),
+   db.from('ae_pick_comments').select('*').eq('pick_id',id).eq('hidden',false).order('created_at').limit(200),
+   db.auth.getUser().catch(()=>({data:{user:null}})),
+   db.rpc('ae_pick_comment_vote_totals',{p_pick_id:id})
+  ]);
+  if(!dialog.isConnected||new URL(location.href).searchParams.get('pick')!==id)return;
+  if(pick.error||comments.error||votes.error)throw pick.error||comments.error||votes.error;
+  dialog.replaceChildren(pickDetailClose());
+  if(!pick.data){
+   dialog.append(el('p','Este Pick no está disponible.','ae-cp-detail-loading'));
+   return;
+  }
+  const hero=pickDetailHero(pick.data);
+  const content=el('div',null,'ae-cp-detail-content');
+  const forecast=el('section',null,'ae-cp-detail-forecast');
+  forecast.setAttribute('aria-label','Pronóstico del chef');
+  forecast.append(el('span','EL PRONÓSTICO','ae-cp-detail-overline'),card(pick.data,false,true));
+  content.append(forecast);
+  const conversation=el('section',null,'ae-cp-detail-conversation');
+  conversation.setAttribute('aria-label','Conversación del Pick');
+  const heading=el('h3','La conversación · '+Number(pick.data.comments_count||comments.data.length),'cp-detail-replies-heading');
+  conversation.append(heading);
+  content.append(conversation);
+  dialog.append(hero,content);
+  const names=new Map(comments.data.map(c=>[c.id,c.author]));
+  const voteStats=new Map((votes.data||[]).map(v=>[v.comment_id,v]));
+  const voteControls=new Map();
+  const viewer=session.data?.user||null;
+  const replyStatus=el('span','', 'ae-cp-reply-status');
+  const form=el('form',null,'ae-cp-comment-composer');
+  form.id='aeCpCommentComposer';
+  const body=field('Tu comentario','textarea');
+  body.input.maxLength=2000;
+  let parent=null;
+  const resetReply=button('×',()=>{
+   parent=null;
+   replyStatus.textContent='';
+   resetReply.hidden=true;
+  });
+  resetReply.className='ae-cp-reply-reset';
+  resetReply.setAttribute('aria-label','Dejar de responder a este comentario');
+  resetReply.title='Escribir comentario general';
+  resetReply.hidden=true;
+  const replyContext=el('div',null,'ae-cp-reply-context');
+  replyContext.append(replyStatus,resetReply);
+  const send=el('button','Enviar comentario');
+  send.type='submit';
+  form.append(replyContext,body.wrap,send);
+  // El compositor va ARRIBA de la conversación; no hay botón grande
+  // «Cancelar respuesta» al final de todos los comentarios.
+  if(viewer)conversation.append(form);
+  function replyTo(comment){
+   if(!viewer){
+    void requestPickReply(id,comment.id,closeDetail);
     return;
    }
-   const r=await db.from('ae_pick_comments').insert({pick_id:id,parent_id:parent,body:body.input.value.trim()});
-   if(r.error)throw r.error;
-   await load();await showDetail(id);
-  }catch(e){notifyCommunity(message(e),true);}finally{send.disabled=false;}
- };
- if(session.data?.user){
-  conversation.append(form);
-  if(options.focusComposer){
-   if(options.parentId&&names.has(options.parentId)){
-    parent=options.parentId;
-    replyStatus.textContent='Respondiendo a '+names.get(parent);
-    cancel.hidden=false;
-   }
-   if(options.replyDraft)body.input.value=options.replyDraft;
-   body.input.focus();
+   parent=comment.id;
+   replyStatus.textContent='Respondiendo a @'+(comment.author||'usuario');
+   resetReply.hidden=false;
+   body.input.focus({preventScroll:true});
+   form.scrollIntoView({block:'nearest',behavior:'smooth'});
   }
- }else{
-  // Invitación directa a responder: una sola pulsación abre el acceso si falta sesión.
-  // aeRequestPublication retoma este mismo Pick y enfoca el comentario tras acceder.
-  const reply=button('Responder',()=>{void requestPickReply(id,null,closeDetail);});
-  reply.className='cp-login-to-reply';
-  reply.setAttribute('aria-label','Responder a este Pick');
-  conversation.append(reply);
- }
+  function updateVotes(commentId){
+   const controls=voteControls.get(commentId);
+   if(!controls)return;
+   const data=voteStats.get(commentId)||{};
+   const up=Number(data.upvotes||0),down=Number(data.downvotes||0);
+   const mine=Number(data.my_vote||0);
+   controls.up.textContent='▲ '+up;
+   controls.down.textContent='▼ '+down;
+   controls.up.setAttribute('aria-pressed',String(mine===1));
+   controls.down.setAttribute('aria-pressed',String(mine===-1));
+   const people=Number(data.reply_people||0),replies=Number(data.reply_count||0);
+   controls.replies.textContent=people===1?'1 persona respondió':people>1?people+' personas respondieron':'0 respuestas';
+   controls.replies.title=replies+' '+(replies===1?'respuesta':'respuestas');
+  }
+  let voteBusy=false;
+  async function voteComment(comment,value){
+   if(voteBusy)return;
+   if(!viewer){
+    if(typeof openUserAuthModal==='function')openUserAuthModal();
+    else notifyCommunity('Inicia sesión para votar comentarios.',true);
+    return;
+   }
+   if(viewer.id===comment.user_id){
+    notifyCommunity('No puedes votar tu propio comentario.',true);
+    return;
+   }
+   const prev=Number(voteStats.get(comment.id)?.my_vote||0);
+   const next=prev===value?0:value;
+   voteBusy=true;
+   const controls=voteControls.get(comment.id);
+   if(controls){controls.up.disabled=true;controls.down.disabled=true;}
+   try{
+    const result=await db.rpc('ae_set_pick_comment_vote',{p_comment_id:comment.id,p_vote:next});
+    if(result.error)throw result.error;
+    const fresh=await db.rpc('ae_pick_comment_vote_totals',{p_pick_id:id});
+    if(fresh.error)throw fresh.error;
+    if(!dialog.isConnected)return;
+    voteStats.clear();
+    for(const v of fresh.data||[])voteStats.set(v.comment_id,v);
+    for(const key of voteControls.keys())updateVotes(key);
+   }catch(error){
+    notifyCommunity(message(error),true);
+   }finally{
+    voteBusy=false;
+    if(controls){controls.up.disabled=false;controls.down.disabled=false;}
+   }
+  }
+  for(const c of comments.data){
+   const item=el('article',null,'cp-comment');
+   item.append(el('strong',c.author));
+   if(c.parent_id)item.append(el('small','En respuesta a '+(names.get(c.parent_id)||'un comentario anterior')));
+   item.append(el('p',c.body));
+   const actions=el('div',null,'ae-cp-comment-actions');
+   const up=button('▲ 0',()=>void voteComment(c,1));
+   const down=button('▼ 0',()=>void voteComment(c,-1));
+   up.className='ae-cp-comment-vote ae-cp-comment-upvote';
+   down.className='ae-cp-comment-vote ae-cp-comment-downvote';
+   up.setAttribute('aria-label','Apoyar comentario de '+c.author);
+   down.setAttribute('aria-label','Cuestionar comentario de '+c.author);
+   const replyAction=button('Responder',()=>replyTo(c));
+   replyAction.className='ae-cp-comment-reply';
+   const replies=el('span','', 'ae-cp-comment-replies-count');
+   replies.setAttribute('aria-label','Cantidad de personas que respondieron a este comentario');
+   actions.append(up,down,replyAction,replies);
+   item.append(actions);
+   conversation.append(item);
+   voteControls.set(c.id,{up,down,replies});
+   updateVotes(c.id);
+  }
+  if(!comments.data.length)conversation.append(el('p','Todavía no hay respuestas. Puedes abrir la conversación.','ae-cp-detail-empty'));
+  if(comments.data.length===200)conversation.append(el('p','Se muestran los primeros 200 comentarios.'));
+  form.onsubmit=async e=>{
+   e.preventDefault();
+   if(send.disabled)return;
+   const text=body.input.value.trim();
+   if(!text)return;
+   send.disabled=true;
+   try{
+    const response=await db.auth.getUser();
+    if(response.error&&response.error.name!=='AuthSessionMissingError'&&response.error.code!=='session_not_found')throw response.error;
+    if(!response.data?.user){
+     await requestPickReply(id,parent,closeDetail,text);
+     return;
+    }
+    const result=await db.from('ae_pick_comments').insert({pick_id:id,parent_id:parent,body:text});
+    if(result.error)throw result.error;
+    await load();
+    await showDetail(id);
+   }catch(error){
+    notifyCommunity(message(error),true);
+   }finally{send.disabled=false;}
+  };
+  if(viewer){
+   if(options.focusComposer){
+    if(options.parentId&&names.has(options.parentId)){
+     parent=options.parentId;
+     replyStatus.textContent='Respondiendo a @'+names.get(parent);
+     resetReply.hidden=false;
+    }
+    if(options.replyDraft)body.input.value=options.replyDraft;
+    body.input.focus({preventScroll:true});
+   }
+  }else{
+   const reply=button('Escribir comentario',()=>{void requestPickReply(id,null,closeDetail);});
+   reply.className='cp-login-to-reply';
+   reply.setAttribute('aria-label','Iniciar sesión para comentar este Pick');
+   conversation.insertBefore(reply,conversation.children[1]||null);
+  }
  }catch(e){dialog.replaceChildren(pickDetailClose(),el('p',message(e),'ae-cp-detail-loading'));}
 }
 // Route an alert directly into its Pick without reloading or creating another dialog.
