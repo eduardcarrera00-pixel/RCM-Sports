@@ -1,0 +1,20 @@
+/* Botón + de admins: igual de compacto que los iconos vecinos, sólo móvil. */
+@media(max-width:760px){
+ html body>header #loggedAdminContainer .ae-publish-action{
+  box-sizing:border-box!important;
+  flex:0 0 28px!important;
+  width:28px!important;min-width:28px!important;max-width:28px!important;
+  height:28px!important;min-height:28px!important;max-height:28px!important;
+  padding:0!important;margin:0!important;
+  display:grid!important;place-items:center!important;
+  transform:none!important;box-shadow:none!important;
+ }
+ html body>header #loggedAdminContainer .ae-publish-action i{
+  font-size:14px!important;line-height:1!important;margin:0!important;
+ }
+ html body>header #loggedAdminContainer .ae-publish-action span{display:none!important}
+ html body>header #loggedAdminContainer .ae-publish-action::before,
+ html body>header #loggedAdminContainer .ae-publish-action::after{
+  box-shadow:none!important;
+ }
+}
