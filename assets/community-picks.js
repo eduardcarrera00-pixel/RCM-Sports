@@ -271,9 +271,9 @@ async function loadChefLists(){
  try{
    const [best,worst]=await Promise.all([
      query().gt('score',0).order('score',{ascending:false})
-       .order('upvotes',{ascending:false}).order('created_at',{ascending:true}).order('id',{ascending:true}).limit(10),
+       .order('upvotes',{ascending:false}).order('created_at',{ascending:true}).order('id',{ascending:true}).limit(15),
      query().lt('score',0).order('score',{ascending:true})
-       .order('downvotes',{ascending:false}).order('created_at',{ascending:true}).order('id',{ascending:true}).limit(10)
+       .order('downvotes',{ascending:false}).order('created_at',{ascending:true}).order('id',{ascending:true}).limit(15)
    ]);
    if(seq!==chefRequest)return;
    paintChefList('picksPopular',best,'best');
@@ -407,8 +407,7 @@ function pickDetailHero(p){
  const copy=el('div',null,'ae-cp-detail-hero-copy');
  copy.append(
    el('span','AE SPORTS · LA COCINA DE PICKS','ae-cp-detail-kicker'),
-   el('h2','La receta del Chef','ae-cp-detail-hero-title'),
-   el('p','Un pronóstico deportivo. Tu lectura del partido.','ae-cp-detail-hero-note')
+   el('h2','La receta del Chef','ae-cp-detail-hero-title')
  );
  hero.append(copy);
  return hero;
