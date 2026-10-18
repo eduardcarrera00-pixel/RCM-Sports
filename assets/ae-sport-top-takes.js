@@ -13,27 +13,36 @@
  let desktopHomeMarker=null;
  function syncFootballDesktopPlacement(){
    const root=$('aeSportTakeLeaders');
-   if(!root || window.matchMedia('(max-width:760px)').matches)return;
    const layout=document.querySelector('#mainContent .editorial-layout');
    const sidebar=layout?.querySelector('aside');
-   if(!layout||!sidebar)return;
+   if(!root||!layout||!sidebar)return;
    if(!desktopHomeMarker){
      desktopHomeMarker=document.createComment('AE Sports: posición original de Takes deportivos');
      sidebar.insertBefore(desktopHomeMarker,root.parentElement===sidebar?root:null);
    }
-   // Fútbol mantiene sus destacados en la columna derecha.
-   // NFL comparte la misma secuencia en ordenador y móvil:
-   // Demuestra tu conocimiento → Savant/Rookie → Top 10 NFL.
-   if(typeof currentCategory!=='undefined' && currentCategory==='Fútbol'){
-     if(root.parentElement!==sidebar || sidebar.firstElementChild!==root){
-       sidebar.insertBefore(root, sidebar.firstChild);
+   const section=typeof currentCategory==='undefined'?'':currentCategory;
+   const mobile=window.matchMedia('(max-width:760px)').matches;
+   if(mobile){
+     // Preserve the previously approved phone flow: NFL opinions between
+     // the feed and Top 10; Football opinions remain in their original rail.
+     if(section==='NFL'){
+       const feed=$('freeTakes'),ranking=$('aeSportTakeRanking');
+       if(feed&&ranking?.parentElement===feed&&
+          (root.parentElement!==feed||root.nextElementSibling!==ranking)){
+         feed.insertBefore(root,ranking);
+       }
+     }else if(root.parentElement!==sidebar){
+       desktopHomeMarker.after(root);
      }
-   } else if(typeof currentCategory!=='undefined' && currentCategory==='NFL'){
-     const feed=$('freeTakes'), ranking=$('aeSportTakeRanking');
-     if(feed && ranking?.parentElement===feed && (root.parentElement!==feed || root.nextElementSibling!==ranking)){
-       feed.insertBefore(root,ranking);
+     return;
+   }
+   // On desktop, NFL and Football both use the right-hand editorial rail
+   // alongside their news; the empty column is no longer left unused.
+   if(section==='Fútbol'||section==='NFL'){
+     if(root.parentElement!==sidebar||sidebar.firstElementChild!==root){
+       sidebar.insertBefore(root,sidebar.firstChild);
      }
-   } else if(root.parentElement!==sidebar || desktopHomeMarker.nextSibling!==root){
+   }else if(root.parentElement!==sidebar||desktopHomeMarker.nextSibling!==root){
      desktopHomeMarker.after(root);
    }
  }
