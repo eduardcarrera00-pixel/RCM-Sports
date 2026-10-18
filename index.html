@@ -316,7 +316,7 @@ html body.ae-is-football #mainContent #aeSportTakeLeaders.ae-sport-chefs[data-sp
 <link rel="stylesheet" href="assets/ae-login-art-button.css?v=20261016-3">
 <link rel="stylesheet" href="assets/ae-header-alignment-polish.css?v=20261017-login-icon-smaller-2">
 <link rel="stylesheet" href="assets/ae-admin-header-compact.css?v=20261016-1">
-<link rel="stylesheet" href="assets/ae-home-community-spotlight.css?v=20261017-community-scroll-top10-1">
+<link rel="stylesheet" href="assets/ae-home-community-spotlight.css?v=20261017-single-card-scroll-2">
 <link rel="stylesheet" href="assets/ae-home-takes-compact-reference.css?v=20261016-2">
 <link rel="stylesheet" href="assets/ae-home-cta-icons.css?v=20261016-read-cta-2">
 <link rel="stylesheet" href="assets/ae-home-focus-hierarchy.css?v=20261016-2">
@@ -1635,6 +1635,40 @@ html body.ae-is-home #aeHomeTopTakes .ae-points-table .ae-points-rank{
 }
 </style>
 <link rel="stylesheet" href="assets/ae-picks-unified-editorial-20261017.css?v=20261017-picks-integrated-1">
+<style id="ae-home-trending-read-count-bottom-right">
+/* Lo más leído: the readership counter belongs at the lower right
+   of each text column, not in the middle of the article summary. */
+html body.ae-is-home #mainContent #aeTrendingPortada #trendingList .ae-trending-link .ae-trending-story{
+  box-sizing:border-box!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:stretch!important;
+  justify-content:flex-start!important;
+  width:100%!important;
+  min-width:0!important;
+  height:100%!important;
+}
+html body.ae-is-home #mainContent #aeTrendingPortada #trendingList .ae-trending-link .ae-trending-meta{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  align-self:flex-end!important;
+  flex:0 0 auto!important;
+  width:auto!important;
+  max-width:100%!important;
+  min-width:0!important;
+  margin:9px 0 0 auto!important;
+  padding:3px 0 0!important;
+  text-align:right!important;
+  font-size:10px!important;
+  line-height:1.25!important;
+  white-space:nowrap!important;
+  gap:5px!important;
+}
+html body.ae-is-home #mainContent #aeTrendingPortada #trendingList .ae-trending-link .ae-trending-meta i{
+  flex-shrink:0!important;
+}
+</style>
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 <a class="ae-skip-link" href="#mainContent">Ir al contenido</a>
