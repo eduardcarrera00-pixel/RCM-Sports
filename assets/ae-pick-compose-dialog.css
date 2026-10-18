@@ -50,3 +50,7 @@ html:not(.dark) body #cpComposePanel #cpForm button[type=submit]{background:#855
 html body #cpComposePanel #cpForm .cp-compose-footer{background:var(--cp-dialog-bg)!important;color:var(--cp-dialog-ink)!important}
 html body #cpComposePanel #cpForm .cp-compose-footer output,html body #cpComposePanel #cpForm .cp-compose-footer .cp-status{color:var(--cp-dialog-ink)!important}
 html body #cpComposePanel #cpForm .cp-compose-footer .cp-compose-hint{color:var(--cp-dialog-muted)!important}
+
+html body #cpComposePanel #cpForm .cp-compose-footer{margin:0 -24px!important}
+html body #cpComposePanel #cpForm .cp-compose-modes button[aria-pressed=true]{border-bottom:2px solid var(--cp-dialog-action)!important}
+@media(max-width:520px){html body #cpComposePanel #cpForm .cp-compose-footer{margin:0 -16px!important}}
