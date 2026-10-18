@@ -224,3 +224,107 @@ html:not(.dark) body #footballTakes.ae-picks-editorial .ae-picks-rail>section.ae
     font-size:22px!important;
   }
 }
+
+
+/* AE SPORTS · Picks columns aligned with Eres Chef and Mejores Platos (Oct 17). */
+/* La misma pareja de columnas rige ambas filas:
+   Pick semanal / Eres Chef a la izquierda y Noticias / Platos a la derecha. */
+html body #footballTakes.ae-picks-editorial{
+  --ae-picks-aligned-gutter:clamp(15px,2.9vw,29px);
+  --ae-picks-aligned-gap:22px;
+}
+html body #footballTakes.ae-picks-editorial #aePicksTopPair{
+  display:grid!important;
+  box-sizing:border-box!important;
+  grid-template-columns:minmax(0,1.74fr) minmax(0,.86fr)!important;
+  align-items:stretch!important;
+  column-gap:var(--ae-picks-aligned-gap)!important;
+  width:calc(100% - 2 * var(--ae-picks-aligned-gutter))!important;
+  min-width:0!important;
+  margin:20px var(--ae-picks-aligned-gutter) 0!important;
+}
+html body #footballTakes.ae-picks-editorial > .ae-picks-layout{
+  display:grid!important;
+  box-sizing:border-box!important;
+  grid-template-columns:minmax(0,1.74fr) minmax(0,.86fr)!important;
+  column-gap:var(--ae-picks-aligned-gap)!important;
+  align-items:start!important;
+  width:100%!important;
+  min-width:0!important;
+  margin:clamp(24px,2.8vw,34px) 0 0!important;
+  padding:0 var(--ae-picks-aligned-gutter)!important;
+}
+/* Noticias reside en un wrapper dentro de la fila superior. Igualar
+   el ancho y la altura de su tarjeta, no solo el contenido interior. */
+html body #footballTakes.ae-picks-editorial #aePicksTopPair > .ae-picks-overview{
+  display:flex!important;
+  flex-direction:column!important;
+  align-self:stretch!important;
+  box-sizing:border-box!important;
+  width:100%!important;
+  min-width:0!important;
+  height:100%!important;
+  margin:0!important;
+  padding:0!important;
+}
+html body #footballTakes.ae-picks-editorial #aePicksTopPair > .ae-picks-overview > #picksNews{
+  display:flex!important;
+  flex-direction:column!important;
+  flex:1 1 auto!important;
+  box-sizing:border-box!important;
+  align-self:stretch!important;
+  width:100%!important;
+  min-width:0!important;
+  height:100%!important;
+  min-height:368px!important;
+  max-width:none!important;
+  margin:0!important;
+  padding:0!important;
+  overflow:hidden!important;
+  border:1px solid #bd9b78!important;
+  border-radius:0!important;
+  background:linear-gradient(135deg,#173d51,#0b2535)!important;
+  box-shadow:0 8px 20px rgba(5,20,33,.13)!important;
+}
+html body #footballTakes.ae-picks-editorial #aePicksTopPair .ae-picks-overview #picksNews #picksNewsList{
+  flex:1 1 auto!important;
+  min-height:0!important;
+}
+/* Quitar la ilustración decorativa que competía con las noticias:
+   mantener la foto real y el enlace de la última noticia. */
+html body #footballTakes.ae-picks-editorial #aePicksTopPair .ae-picks-overview #picksNews .ae-picks-news-heading{
+  background:linear-gradient(120deg,#17364a,#254254)!important;
+}
+html:not(.dark) body #footballTakes.ae-picks-editorial #aePicksTopPair .ae-picks-overview #picksNews{
+  background:#fbf7ef!important;
+}
+html:not(.dark) body #footballTakes.ae-picks-editorial #aePicksTopPair .ae-picks-overview #picksNews .ae-picks-news-heading{
+  background:linear-gradient(120deg,#f9f0e3,#e7ded3)!important;
+}
+/* Tableta y móvil: todas las tarjetas al ancho disponible, conservando
+   la misma sangría, una separación clara y el orden de lectura. */
+@media(max-width:910px){
+  html body #footballTakes.ae-picks-editorial{
+    --ae-picks-aligned-gutter:14px;
+    --ae-picks-aligned-gap:16px;
+  }
+  html body #footballTakes.ae-picks-editorial #aePicksTopPair{
+    grid-template-columns:minmax(0,1fr)!important;
+    width:calc(100% - 2 * var(--ae-picks-aligned-gutter))!important;
+    margin:14px var(--ae-picks-aligned-gutter) 0!important;
+    gap:var(--ae-picks-aligned-gap)!important;
+  }
+  html body #footballTakes.ae-picks-editorial #aePicksTopPair > #picksFeatured,
+  html body #footballTakes.ae-picks-editorial #aePicksTopPair > .ae-picks-overview > #picksNews{
+    min-height:0!important;
+    height:auto!important;
+  }
+  html body #footballTakes.ae-picks-editorial > .ae-picks-layout{
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:18px!important;
+    margin-top:24px!important;
+  }
+  html body #footballTakes.ae-picks-editorial > .ae-picks-layout > .ae-picks-rail{
+    grid-template-columns:minmax(0,1fr)!important;
+  }
+}
