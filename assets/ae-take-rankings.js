@@ -231,8 +231,8 @@
     if(twin)twin.hidden=!next;
     if(solo)solo.hidden=!!next;
     const bestHeading=$('aeNflSavantHeading'),worstHeading=$('aeNflRookieHeading');
-    if(bestHeading)bestHeading.textContent=next==='football'?'Top 10 mejores':'NFL Savant';
-    if(worstHeading)worstHeading.textContent=next==='football'?'Top 10 peores':'NFL Rookie';
+    if(bestHeading)bestHeading.textContent=next==='football'?'Respira Fútbol':'NFL Savant';
+    if(worstHeading)worstHeading.textContent=next==='football'?'Vendehumos':'NFL Rookie';
     const bestOverline=bestHeading?.parentElement?.querySelector('.ae-nfl-ranking-overline');
     const worstOverline=worstHeading?.parentElement?.querySelector('.ae-nfl-ranking-overline');
     if(bestOverline)bestOverline.textContent=next==='football'?'LOS MEJORES · FÚTBOL':'LOS MEJORES · ACIERTOS';
