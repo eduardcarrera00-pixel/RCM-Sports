@@ -871,7 +871,7 @@ html:not(.dark) body:is(.ae-is-nfl,.ae-is-football) #aeSportTakeRanking .ae-nfl-
   }
 }
 
-html body.ae-is-nfl #aeSportTakeRanking .ae-nfl-th-mobile {display:none!important;}
+html body:is(.ae-is-nfl,.ae-is-football) #aeSportTakeRanking .ae-nfl-th-mobile {display:none!important;}
 @media (min-width:761px) {
 /* NFL standings are league tables, not narrative cards.
  This leaves the
@@ -1336,13 +1336,16 @@ html:not(.dark) body:is(.ae-is-nfl,.ae-is-football) #aeSportTakeRanking .is-rook
 }
 /* Fútbol opinions: only three real best/worst items, cyclic vertical browsing. */
 html body.ae-is-football #aeSportTakeLeaders[data-sport="football"] .ae-sport-takes-list.ae-football-cyclic {
+  display:flex!important;
+  flex-direction:column!important;
+  gap:0!important;
   overflow-y:auto!important;
   overflow-x:hidden!important;
   overscroll-behavior-y:contain!important;
   scrollbar-width:thin!important;
   scrollbar-color:rgba(184,137,83,.64) transparent!important;
-  height:196px!important;
-  max-height:196px!important;
+  height:188px!important;
+  max-height:188px!important;
   scroll-behavior:smooth;
   scroll-snap-type:y proximity;
   -webkit-overflow-scrolling:touch;
