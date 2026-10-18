@@ -1500,6 +1500,67 @@ html:not(.dark) body>header #aeNotificationsButton .ae-avisos-crown{fill:#a57244
   html body>header #aeNotificationsButton .ae-notifications-classic-icon{transition:none!important}
 }
 </style>
+<style id="ae-avisos-harmonized-icon">
+/* AE SPORTS: mismo peso visual que sol/luna y acceso, sin palabra ni marco.
+   El botón y su indicador de avisos conservan los IDs y eventos existentes. */
+html body>header .ae-header-actions #aeNotificationsButton:not([hidden]){
+  position:relative!important;
+  display:flex!important;
+  flex:0 0 36px!important;
+  width:36px!important;min-width:36px!important;max-width:36px!important;
+  height:36px!important;min-height:36px!important;max-height:36px!important;
+  align-items:center!important;justify-content:center!important;
+  align-self:center!important;
+  margin:0!important;padding:0!important;gap:0!important;
+  border:0!important;border-radius:0!important;
+  background:transparent!important;box-shadow:none!important;
+  box-sizing:border-box!important;cursor:pointer!important;
+}
+html body>header #aeNotificationsButton .ae-avisos-icon{
+  display:block!important;flex:0 0 23px!important;
+  width:23px!important;height:23px!important;
+  min-width:23px!important;min-height:23px!important;
+  max-width:23px!important;max-height:23px!important;
+  object-fit:contain!important;object-position:center!important;
+  margin:0!important;padding:0!important;border:0!important;
+  opacity:.84!important;
+  filter:brightness(.80) saturate(.77) contrast(.96)!important;
+  pointer-events:none!important;
+  transition:filter .16s ease,opacity .16s ease;
+}
+html body>header #aeNotificationsButton .ae-avisos-icon-white{display:none!important}
+html:not(.dark) body>header #aeNotificationsButton .ae-avisos-icon-gold{display:none!important}
+html:not(.dark) body>header #aeNotificationsButton .ae-avisos-icon-white{
+  display:block!important;opacity:.87!important;
+  filter:drop-shadow(0 1px 1px rgba(86,61,44,.56))!important;
+}
+html body>header #aeNotificationsButton .ae-notifications-caption{display:none!important}
+html body>header #aeNotificationsButton #aeNotificationsBadge:not([hidden]){
+  top:-4px!important;right:-4px!important;
+}
+html.dark body>header #aeNotificationsButton:is(:hover,:focus-visible) .ae-avisos-icon-gold{
+  opacity:.95!important;filter:brightness(.91) saturate(.88) contrast(.98)!important;
+}
+html:not(.dark) body>header #aeNotificationsButton:is(:hover,:focus-visible) .ae-avisos-icon-white{
+  opacity:.95!important;filter:drop-shadow(0 1px 1px rgba(86,61,44,.65))!important;
+}
+@media(max-width:760px){
+  html body>header .ae-header-actions #aeNotificationsButton:not([hidden]){
+    flex:0 0 36px!important;
+    width:36px!important;min-width:36px!important;max-width:36px!important;
+    height:36px!important;min-height:36px!important;max-height:36px!important;
+  }
+  html body>header #aeNotificationsButton .ae-avisos-icon{
+    width:21px!important;height:21px!important;
+    min-width:21px!important;min-height:21px!important;
+    max-width:21px!important;max-height:21px!important;
+    flex-basis:21px!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  html body>header #aeNotificationsButton .ae-avisos-icon{transition:none!important}
+}
+</style>
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 <a class="ae-skip-link" href="#mainContent">Ir al contenido</a>
@@ -1545,24 +1606,9 @@ html:not(.dark) body>header #aeNotificationsButton .ae-avisos-crown{fill:#a57244
                     <button type="button" id="aeNotificationsButton" hidden
                       aria-label="Notificaciones" aria-controls="aeNotificationsDialog" aria-haspopup="dialog"
                       aria-expanded="false" title="Mis notificaciones">
-                      <svg class="ae-notifications-classic-icon" viewBox="0 0 64 64"
-                        xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
-                        <defs>
-                          <linearGradient id="aeAvisosBronze" x1="0" y1="0" x2="1" y2="1">
-                            <stop offset="0" class="ae-avisos-gold-light"/>
-                            <stop offset=".48" class="ae-avisos-gold-mid"/>
-                            <stop offset="1" class="ae-avisos-gold-deep"/>
-                          </linearGradient>
-                        </defs>
-                        <!-- A small classical bronze bell, open silhouette without a frame. -->
-                        <path class="ae-avisos-engraving" d="M15 18c-4 4-6 9-6 14M49 18c4 4 6 9 6 14" fill="none" stroke-width="2.5" stroke-linecap="round"/>
-                        <path class="ae-avisos-bell-metal" d="M32 11c5.1 0 8.5 3.7 8.5 8.5v3.1c4.8 3.4 6.7 8.6 6.7 15.6 0 4.5 1.8 7.9 4.7 10.9l1.5 1.5H11.6l1.5-1.5c2.9-3 4.7-6.4 4.7-10.9 0-7 1.9-12.2 6.7-15.6v-3.1C24.5 14.7 27 11 32 11Z" fill="url(#aeAvisosBronze)" stroke-width="1.25"/>
-                        <path class="ae-avisos-highlight" d="M27 25c-3.4 4.6-3.7 8.8-3.7 13.4M24.2 44.6h15.6" fill="none" stroke-width="1.7" stroke-linecap="round"/>
-                        <path class="ae-avisos-rim" d="M12.5 49.4c11.3 4.4 27.7 4.4 39 0" fill="none" stroke-width="2.6" stroke-linecap="round"/>
-                        <path class="ae-avisos-clapper" d="M26.7 53c.7 8.4 9.9 8.4 10.6 0" fill="none" stroke-width="3.4" stroke-linecap="round"/>
-                        <circle class="ae-avisos-crown" cx="32" cy="8.6" r="3.5"/>
-                      </svg>
-                      <span class="ae-notifications-caption" aria-hidden="true">Avisos</span>
+                      <img class="ae-avisos-icon ae-avisos-icon-gold" src="assets/icons/ae-avisos-six-gold.webp?v=20261017-1" width="64" height="64" alt="" aria-hidden="true" decoding="async">
+                      <img class="ae-avisos-icon ae-avisos-icon-white" src="assets/icons/ae-avisos-six-white.webp?v=20261017-1" width="64" height="64" alt="" aria-hidden="true" decoding="async">
+                      
                       <span id="aeNotificationsBadge" class="ae-notifications-badge" hidden></span>
                     </button>
                     <div id="readerSession" class="hidden rcm-row"></div>
