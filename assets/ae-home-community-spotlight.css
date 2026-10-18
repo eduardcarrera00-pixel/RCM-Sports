@@ -465,8 +465,8 @@ html:not(.dark) body.ae-is-home aside .editorial-community.rcm-panel #communityL
   }
 }
 
-/* 2026-10-17 · Opinadores distinguidos: show a window 25% shorter than
-   each full-size entry, without changing the original cards or their controls.
+/* 2026-10-17 · Opinadores distinguidos: compact scroll viewports and
+   content-sized comment rows (38px ≈ 1cm below reply/vote controls).
    Both top-ten classifications remain independently scrollable. */
 html body.ae-is-home aside .editorial-community.rcm-panel #communityLeaders .ae-community-scroll-viewport{
   box-sizing:border-box!important;
@@ -486,11 +486,11 @@ html body.ae-is-home aside .editorial-community.rcm-panel #communityLeaders .ae-
   display:flex!important;
   flex-direction:column!important;
   justify-content:flex-start!important;
-  flex:0 0 244px!important;
-  height:244px!important;
-  min-height:244px!important;
-  max-height:244px!important;
-  padding:10px 12px 9px!important;
+  flex:0 0 auto!important;
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  padding:10px 12px 38px!important;
   margin:0!important;
   overflow:hidden!important;
   scroll-snap-align:start;
@@ -547,11 +547,11 @@ html body.ae-is-home aside .editorial-community.rcm-panel #communityLeaders .ae-
     max-height:191px!important;
   }
   html body.ae-is-home aside .editorial-community.rcm-panel #communityLeaders .ae-community-scroll-entry{
-    flex-basis:255px!important;
-    height:255px!important;
-    min-height:255px!important;
-    max-height:255px!important;
-    padding:10px 11px 9px!important;
+    flex-basis:auto!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    padding:10px 11px 38px!important;
   }
   html body.ae-is-home aside .editorial-community.rcm-panel #communityLeaders .ae-community-card-footer{
     gap:4px!important;
