@@ -1910,6 +1910,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
 }
 </style><link rel="stylesheet" href="assets/ae-picks-platos-chefs-layout-20261017.css?v=20261017-picks-news-preview-only-1">
 <link rel="stylesheet" href="assets/ae-football-takes-order-20261018.css?v=20261018-football-boards-v2">
+<link rel="stylesheet" href="assets/ae-nfl-takes-opinions-order-20261018.css?v=20261018-nfl-head-opinions-feed-1">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 <a class="ae-skip-link" href="#mainContent">Ir al contenido</a>
@@ -3381,15 +3382,14 @@ currentUser = {
             document.getElementById('footballTakes').hidden = currentCategory !== 'Picks';
             if (typeof renderCommunityPicksVisibility === 'function') renderCommunityPicksVisibility();
             if (typeof renderFreeTakesVisibility === 'function') renderFreeTakesVisibility();
-            // Un único botón de publicación debajo del feed en NFL y Fútbol.
+            // Un solo botón en la cabecera; NFL lo presenta como medallón circular.
+            // No duplicar la acción ni modificar el flujo de publicación en Fútbol.
             const sportTakeCta = document.getElementById('aeSportTakePublish');
             const sportTakeHeader = document.querySelector('#freeTakes > .ae-takes-head');
             const sportTakeFooter = document.getElementById('aeNflTakeFooterCta');
             if (sportTakeCta && sportTakeHeader && sportTakeFooter) {
-                const showAfterSportTakes = currentCategory === 'NFL' && !currentSearchQuery;
-                const container = showAfterSportTakes ? sportTakeFooter : sportTakeHeader;
-                if (sportTakeCta.parentElement !== container) container.appendChild(sportTakeCta);
-                sportTakeFooter.hidden = !showAfterSportTakes;
+                if (sportTakeCta.parentElement !== sportTakeHeader) sportTakeHeader.appendChild(sportTakeCta);
+                sportTakeFooter.hidden = true;
             }
             const isPicksPage = currentCategory === 'Picks';
             document.getElementById('aeHomeSidebarFeatures').hidden = currentCategory !== 'Todos' || Boolean(currentSearchQuery);
