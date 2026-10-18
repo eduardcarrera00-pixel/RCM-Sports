@@ -841,6 +841,7 @@ function syncPickComposer(){
  const open=Boolean($('cpComposePanel')?.open);
  $('cpPublishCta')?.setAttribute('aria-expanded',String(open));
  document.body.classList.toggle('ae-pick-composing',open);
+ document.documentElement.classList.toggle('ae-pick-composing',open);
 }
 function closePickComposer(force=false){
  if(posting&&!force)return;
@@ -855,7 +856,8 @@ function showPickComposer(){
  if(typeof currentCategory!=='undefined'&&currentCategory!=='Picks'&&typeof filterByCategory==='function')filterByCategory('Picks');
  if(!dialog.open)dialog.showModal();
  syncPickComposer();
- dialog.querySelector('input')?.focus({preventScroll:true});
+ // Start on the heading: opening the composer must not summon the mobile keyboard.
+ $('cpComposeTitle')?.focus({preventScroll:true});
 }
 function openPickComposer(){
  if(typeof aeRequestPublication==='function')return aeRequestPublication('pick',showPickComposer);

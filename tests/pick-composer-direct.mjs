@@ -69,6 +69,8 @@ const input=name=>form.elements.namedItem(name);
 const fill=()=>{input('sport_0').value='Baloncesto';input('event_0').value='Toronto vs Boston';input('selection_0').value='Toronto gana';input('odds_0').value='+150';};
 d.getElementById('cpPublishCta').click();await settle();
 assert.equal(modal.open,true);
+assert.equal(d.activeElement,d.getElementById('cpComposeTitle'),'Opening does not focus an input or summon the keyboard');
+assert.equal(d.documentElement.classList.contains('ae-pick-composing'),true);
 assert.equal(input('sport_0').tagName,'INPUT');assert.equal(input('event_0').tagName,'INPUT');
 assert.equal(form.querySelector('select'),null);
 assert.equal(input('event_date').value,today());
@@ -78,6 +80,7 @@ input('odds_0').value='+150';failPublish=true;await form.onsubmit({preventDefaul
 assert.equal(modal.open,true);assert.equal(input('event_0').value,'Toronto vs Boston');assert.match(form.querySelector('.cp-status').textContent,/Fallo/);
 failPublish=false;await form.onsubmit({preventDefault(){}});await settle();
 assert.equal(records.length,1);assert.equal(records[0].title,'Toronto vs Boston');assert.equal(records[0].legs[0].sport,'Baloncesto');assert.equal(modal.open,false);
+assert.equal(d.documentElement.classList.contains('ae-pick-composing'),false,'Closing releases the page scroll lock');
 d.getElementById('cpPublishCta').click();await settle();fill();
 [...form.querySelectorAll('button')].find(b=>b.textContent==='Combinada').click();
 assert.equal(form.querySelectorAll('fieldset').length,2);

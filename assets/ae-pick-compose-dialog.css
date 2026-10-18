@@ -54,3 +54,16 @@ html body #cpComposePanel #cpForm .cp-compose-footer .cp-compose-hint{color:var(
 html body #cpComposePanel #cpForm .cp-compose-footer{margin:0 -24px!important}
 html body #cpComposePanel #cpForm .cp-compose-modes button[aria-pressed=true]{border-bottom:2px solid var(--cp-dialog-action)!important}
 @media(max-width:520px){html body #cpComposePanel #cpForm .cp-compose-footer{margin:0 -16px!important}}
+
+/* The dialog follows the viewport, never the width of an overflowing page. */
+html.ae-pick-composing,html body.ae-pick-composing{overflow:hidden!important;overscroll-behavior:none}
+html body dialog#cpComposePanel{box-sizing:border-box!important;position:fixed!important;inset:0!important;min-width:0!important;width:min(540px,calc(100vw - 24px))!important;max-width:calc(100vw - 24px)!important;overflow-x:hidden!important;overflow-y:auto!important;touch-action:pan-y pinch-zoom;overscroll-behavior-x:none;overflow-wrap:anywhere}
+html body #cpComposePanel *,html body #cpComposePanel *::before,html body #cpComposePanel *::after{box-sizing:border-box}
+html body #cpComposePanel :is(form,fieldset,label,.cp-legs,.cp-compose-modes,details,.ae-pick-compose-head>div){min-width:0!important;min-inline-size:0!important}
+html body #cpComposePanel #cpForm :is(input,textarea){min-width:0!important;min-inline-size:0!important;max-width:100%!important;max-inline-size:100%!important;font-size:16px!important}
+@media(max-width:760px){
+ html body dialog#cpComposePanel{width:calc(100vw - 16px)!important;max-width:calc(100vw - 16px)!important;max-height:calc(100dvh - max(8px,env(safe-area-inset-top)) - max(8px,env(safe-area-inset-bottom)))!important;margin:auto!important}
+ html body #cpComposePanel #cpForm fieldset{grid-template-columns:minmax(0,1fr)!important}
+ html body #cpComposePanel #cpForm .cp-compose-modes button{flex:1 1 0;min-width:0!important;white-space:normal}
+ html body #cpComposePanel #cpForm .cp-compose-footer{width:auto!important;max-width:none!important;min-width:0!important}
+}
