@@ -62,8 +62,8 @@
     display:block!important;
     width:100%!important;
     min-width:0!important;
-    height:calc(var(--ae-rank-colhead-height) + 3 * var(--ae-rank-row-height) + 3px)!important;
-    max-height:calc(var(--ae-rank-colhead-height) + 3 * var(--ae-rank-row-height) + 3px)!important;
+    height:317px!important;
+    max-height:317px!important;
     min-height:0!important;
     margin:0!important;
     padding:0!important;
