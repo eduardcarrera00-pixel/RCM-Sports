@@ -665,11 +665,11 @@ html body #footballTakes .ae-chef-board .ae-chef-entry .ae-chef-card-open{
 html:not(.dark) body #footballTakes .ae-chef-board .ae-chef-entry .ae-chef-card-footer .ae-chef-votes{color:#596a76!important}
 html:not(.dark) body #footballTakes .ae-chef-board .ae-chef-entry .ae-chef-card-open{color:#835236!important}
 html:not(.dark) body #footballTakes .ae-picks-rail>section.ae-chef-board ol.ae-chef-scroll>li.ae-chef-entry{background:rgba(255,253,245,.10)!important}
-/* Mejores Chefs, below the Cocina Picks invitation and before recent Picks. */
+/* Mejores Chefs lives beneath Ver todos los Picks, closing the community feed. */
 html body #footballTakes #communityPicks>section.ae-inline-chefs-board{
  box-sizing:border-box!important;display:block!important;
  width:100%!important;max-width:100%!important;min-width:0!important;
- margin:0 0 17px!important;padding:15px 17px!important;
+ margin:21px 0 0!important;padding:15px 17px!important;
  border:1px solid rgba(214,175,135,.37)!important;border-top:2px solid #d5a276!important;
  border-radius:0!important;background:linear-gradient(145deg,#1a3a4c,#102c3e)!important;
  box-shadow:0 6px 16px rgba(6,19,29,.11)!important;
@@ -730,6 +730,6 @@ html:not(.dark) body #footballTakes #communityPicks>section.ae-inline-chefs-boar
    flex:0 0 85px!important;height:85px!important;min-height:85px!important;max-height:85px!important;
  }
  html body #footballTakes #communityPicks>section.ae-inline-chefs-board{
-   padding:13px!important;margin-bottom:14px!important;
+   padding:13px!important;margin:17px 0 0!important;
  }
 }
