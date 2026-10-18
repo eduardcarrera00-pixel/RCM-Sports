@@ -408,3 +408,304 @@ html body.ae-is-nfl #mainContent #freeTakes > .ae-free-controls{
     text-align:center!important;
   }
 }
+
+
+/* AE SPORTS · NFL + Fútbol | opiniones legibles en móvil · 2026-10-18
+   Conserva las dos clasificaciones y sus 10 Takes reales; cada sección
+   ocupa el ancho completo y sus opiniones se recorren hacia la derecha.
+   Sólo presentación móvil: los datos, votos, perfiles y diálogos no cambian. */
+@media (max-width:760px) {
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > #aeSportTakeLeaders.ae-sport-chefs[data-sport]:not([hidden]) {
+    display:block!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    height:auto!important;
+    min-width:0!important;
+    min-height:0!important;
+    max-height:none!important;
+    margin:12px 0 18px!important;
+    padding:0!important;
+    overflow:hidden!important;
+    border:1px solid rgba(190,149,107,.65)!important;
+    border-radius:0!important;
+  }
+
+  /* Antes: dos columnas diminutas. Ahora: apoyadas/populares y debajo
+     hateadas/impopulares, manteniendo el paisaje y sus cabeceras. */
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > #aeSportTakeLeaders[data-sport] > .ae-sport-takes-grid {
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    grid-auto-rows:auto!important;
+    align-items:stretch!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    margin:0!important;
+    padding:0!important;
+    gap:0!important;
+  }
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > #aeSportTakeLeaders[data-sport] .ae-sport-takes-grid > .ae-sport-chef-card {
+    display:flex!important;
+    flex-direction:column!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    min-width:0!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    border-radius:0!important;
+    box-shadow:none!important;
+    overflow:hidden!important;
+  }
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > #aeSportTakeLeaders[data-sport] .ae-sport-takes-grid > .is-questioned {
+    border-left:0!important;
+    border-top:1px solid rgba(190,149,107,.6)!important;
+  }
+
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > #aeSportTakeLeaders[data-sport] .ae-sport-chef-heading {
+    position:relative!important;
+    display:flex!important;
+    flex-direction:row!important;
+    align-items:center!important;
+    justify-content:center!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:66px!important;
+    max-height:none!important;
+    margin:0!important;
+    padding:13px 74px 13px 17px!important;
+    text-align:center!important;
+    gap:0!important;
+  }
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > #aeSportTakeLeaders[data-sport] .ae-sport-chef-heading > h3 {
+    display:block!important;
+    flex:1 1 auto!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    margin:0!important;
+    font:600 clamp(21px,5.6vw,26px)/1.14 Newsreader,Georgia,serif!important;
+    text-align:center!important;
+    text-wrap:balance!important;
+  }
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > #aeSportTakeLeaders[data-sport] .ae-sport-chef-heading::after {
+    content:"DESLIZA  →";
+    position:absolute;
+    right:13px;
+    bottom:11px;
+    color:#e1c09c;
+    font:700 9px/1.2 Inter,system-ui,sans-serif;
+    letter-spacing:.055em;
+    white-space:nowrap;
+    pointer-events:none;
+  }
+  html:not(.dark) body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > #aeSportTakeLeaders[data-sport] .ae-sport-chef-heading::after {
+    color:#784f32;
+  }
+
+  /* Cada Top 10 es un carrusel independiente, manual y de desplazamiento natural.
+     Se asoma el siguiente Take para comunicar el movimiento lateral. */
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > #aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list {
+    display:flex!important;
+    flex-direction:row!important;
+    align-items:stretch!important;
+    gap:11px!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    margin:0!important;
+    padding:10px 13px 16px!important;
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+    overscroll-behavior-x:contain!important;
+    overscroll-behavior-y:auto!important;
+    -webkit-overflow-scrolling:touch;
+    scroll-behavior:auto!important;
+    scroll-padding-inline:13px;
+    scroll-snap-type:x proximity!important;
+    scrollbar-width:none!important;
+    scrollbar-color:transparent transparent!important;
+    touch-action:pan-x pan-y;
+  }
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > #aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list::-webkit-scrollbar {
+    display:none!important;
+  }
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > #aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list:focus-visible {
+    outline:2px solid #d3a678!important;
+    outline-offset:-4px!important;
+  }
+
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > #aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li.ae-sport-take-item:nth-child(n) {
+    display:grid!important;
+    box-sizing:border-box!important;
+    flex:0 0 min(84%,355px)!important;
+    grid-template-columns:28px minmax(0,1fr)!important;
+    grid-template-rows:auto!important;
+    align-items:start!important;
+    align-self:stretch!important;
+    column-gap:9px!important;
+    row-gap:0!important;
+    width:min(84%,355px)!important;
+    min-width:0!important;
+    min-height:185px!important;
+    height:auto!important;
+    max-height:none!important;
+    margin:0!important;
+    padding:12px 12px 13px!important;
+    border:1px solid rgba(194,155,111,.38)!important;
+    border-radius:0!important;
+    background:rgba(8,28,42,.30)!important;
+    box-shadow:none!important;
+    overflow:visible!important;
+    scroll-snap-align:start!important;
+    scroll-snap-stop:normal!important;
+  }
+  html:not(.dark) body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > #aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li.ae-sport-take-item:nth-child(n) {
+    background:rgba(255,252,246,.75)!important;
+    border-color:rgba(140,105,72,.32)!important;
+  }
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > #aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li.ae-top-takes-empty {
+    flex:1 1 100%!important;
+    width:100%!important;
+    min-height:100px!important;
+    padding:19px!important;
+    border:0!important;
+    background:transparent!important;
+    scroll-snap-align:none!important;
+  }
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > #aeSportTakeLeaders[data-sport] .ae-sport-chef-entry > .ae-top-take-number {
+    grid-column:1!important;
+    grid-row:1!important;
+    margin:0!important;
+    font-size:23px!important;
+    line-height:1!important;
+  }
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > #aeSportTakeLeaders[data-sport] .ae-sport-chef-entry > .ae-top-take-content {
+    display:flex!important;
+    flex-direction:column!important;
+    grid-column:2!important;
+    grid-row:1!important;
+    align-items:stretch!important;
+    gap:8px!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    min-width:0!important;
+    min-height:0!important;
+    height:auto!important;
+    overflow:visible!important;
+  }
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > #aeSportTakeLeaders[data-sport] .ae-sport-chef-entry .ae-sport-take-meta {
+    display:flex!important;
+    flex-direction:row!important;
+    flex-wrap:wrap!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+    box-sizing:border-box!important;
+    gap:5px 9px!important;
+    width:100%!important;
+    min-width:0!important;
+    min-height:0!important;
+    height:auto!important;
+    padding:0!important;
+    margin:0!important;
+  }
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > #aeSportTakeLeaders[data-sport] .ae-sport-chef-entry .ae-top-take-author {
+    flex:1 1 auto!important;
+    min-width:0!important;
+    max-width:100%!important;
+    font-size:12px!important;
+    line-height:1.25!important;
+    overflow-wrap:anywhere!important;
+  }
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > #aeSportTakeLeaders[data-sport] .ae-sport-chef-entry .ae-sport-take-net {
+    flex:0 0 auto!important;
+    margin:0!important;
+    font-size:11px!important;
+    line-height:1.25!important;
+    white-space:nowrap!important;
+  }
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > #aeSportTakeLeaders[data-sport] .ae-sport-chef-entry .ae-sport-take-title {
+    display:block!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    height:auto!important;
+    margin:0!important;
+    font-size:clamp(16px,4.6vw,19px)!important;
+    line-height:1.22!important;
+    overflow-wrap:anywhere!important;
+  }
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > #aeSportTakeLeaders[data-sport] .ae-sport-chef-entry .ae-sport-take-open {
+    display:-webkit-box!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    height:auto!important;
+    max-height:none!important;
+    margin:0!important;
+    padding:0!important;
+    -webkit-box-orient:vertical!important;
+    -webkit-line-clamp:3!important;
+    line-clamp:3!important;
+    white-space:normal!important;
+    overflow:hidden!important;
+    overflow-wrap:anywhere!important;
+    text-align:left!important;
+    font:inherit!important;
+  }
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > #aeSportTakeLeaders[data-sport] .ae-sport-chef-entry .ae-sport-take-excerpt:not(:empty) {
+    display:-webkit-box!important;
+    width:100%!important;
+    min-width:0!important;
+    height:auto!important;
+    max-height:none!important;
+    margin:0!important;
+    -webkit-box-orient:vertical!important;
+    -webkit-line-clamp:2!important;
+    line-clamp:2!important;
+    overflow:hidden!important;
+    overflow-wrap:anywhere!important;
+    white-space:normal!important;
+    font-size:12px!important;
+    line-height:1.4!important;
+  }
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > #aeSportTakeLeaders[data-sport] .ae-sport-chef-entry .ae-top-take-reply {
+    display:inline-flex!important;
+    align-self:flex-start!important;
+    flex:0 0 auto!important;
+    width:auto!important;
+    min-height:30px!important;
+    margin:0!important;
+    padding:5px 2px!important;
+    font-size:12px!important;
+    line-height:1.2!important;
+    white-space:nowrap!important;
+  }
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > #aeSportTakeLeaders[data-sport] .ae-football-leaders-more {
+    display:none!important;
+  }
+}
+@media (max-width:360px) {
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > #aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list {
+    gap:9px!important;
+    padding-inline:10px!important;
+  }
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > #aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li.ae-sport-take-item:nth-child(n) {
+    flex-basis:89%!important;
+    width:89%!important;
+    padding:11px 10px!important;
+  }
+}
+@media (prefers-reduced-motion:reduce) {
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > #aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list {
+    scroll-snap-type:none!important;
+    scroll-behavior:auto!important;
+  }
+}
