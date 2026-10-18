@@ -312,7 +312,7 @@ function chefRankingEntry(record,index,voids,kind,picks){
    });
    person.append(pick);
  }
- li.append(el('span',String(index+1).padStart(2,'0'),'ae-take-number'),
+ li.append(el('span',String(index+1),'ae-take-number'),
    person,chefRankingScore(record,voids));
  return li;
 }
