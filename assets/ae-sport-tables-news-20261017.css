@@ -622,6 +622,7 @@ html body.ae-is-nfl #mainContent #articlesGrid.ae-sport-news-carousel {
 
 /* 2026-10-17 · NFL Top 10: two independently scrolling vertical rankings. */
 html body #aeSportTakeRanking #aeNflTwinRankings[hidden],
+html body.ae-is-nfl #aeSportTakeRanking #aeNflTwinRankings.ae-nfl-rankings-grid[hidden],
 html body #aeSportTakeRanking #aeSportTakeRankingSolo[hidden]{display:none!important;}
 html body.ae-is-nfl #aeSportTakeRanking #aeNflTwinRankings.ae-nfl-rankings-grid{
   display:grid!important;
