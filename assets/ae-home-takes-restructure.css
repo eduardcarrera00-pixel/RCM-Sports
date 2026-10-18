@@ -363,3 +363,42 @@ html:not(.dark) body #aeHomeTakeHighlights .ae-community-popular-take button.ae-
 @media(prefers-reduced-motion:reduce){
   html body #aeHomeTakeHighlights .ae-vote-column .ae-discovery-list{scroll-behavior:auto;}
 }
+
+
+/* Popular + Unpopular Takes · non-interactive real replies beside votes. */
+html body #aeHomeTakeHighlights .ae-community-popular-take .ae-top-take-votes .ae-top-take-reply-count{
+  display:inline-flex!important;
+  box-sizing:border-box!important;
+  flex:0 0 auto!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:5px!important;
+  min-width:39px!important;
+  min-height:29px!important;
+  margin:0!important;
+  padding:4px 8px!important;
+  border:1px solid var(--ae-discovery-line)!important;
+  border-radius:0!important;
+  background:rgba(170,156,138,.07)!important;
+  color:var(--ae-discovery-muted)!important;
+  font:750 11px/1 Inter,system-ui,sans-serif!important;
+  font-variant-numeric:tabular-nums!important;
+  white-space:nowrap!important;
+}
+html body #aeHomeTakeHighlights .ae-community-popular-take .ae-top-take-reply-count i{
+  font-size:11px!important;
+}
+html body #aeHomeTakeHighlights .ae-community-popular-take .ae-top-take-reply-count strong{
+  font:inherit!important;
+  color:inherit!important;
+}
+@media(max-width:450px){
+  html body #aeHomeTakeHighlights .ae-community-popular-take .ae-top-take-votes{
+    gap:5px!important;
+  }
+  html body #aeHomeTakeHighlights .ae-community-popular-take .ae-top-take-votes .ae-top-take-reply-count{
+    min-width:35px!important;
+    padding:4px 6px!important;
+    gap:4px!important;
+  }
+}
