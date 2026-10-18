@@ -230,3 +230,202 @@ html body #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-rail > s
     margin:26px 0 0!important;
   }
 }
+
+
+/* AE SPORTS · Desktop Picks editorial density and fine scrollbars · 18 Oct 2026.
+   Desktop only: keep the existing <=910px mobile design, live content, votes
+   and the original weekly-details expansion intact. */
+@media (min-width:911px) {
+  /* The former 368px top cards dominated the screen. Approximately half-height
+     editorial modules, retaining their original aligned column widths. */
+  html body #footballTakes.ae-picks-editorial #aePicksTopPair > #picksFeatured,
+  html body #footballTakes.ae-picks-editorial #aePicksTopPair > .ae-picks-overview,
+  html body #footballTakes.ae-picks-editorial #aePicksTopPair > .ae-picks-overview > #picksNews {
+    box-sizing:border-box!important;
+    height:192px!important;
+    min-height:192px!important;
+    max-height:none!important;
+    margin-bottom:0!important;
+  }
+  html body #footballTakes.ae-picks-editorial #aePicksTopPair > #picksFeatured {
+    flex:0 1 auto!important;
+  }
+  html body #footballTakes.ae-picks-editorial #aePicksTopPair #picksFeatured .ae-picks-feature-label {
+    padding:10px 15px 4px!important;
+    gap:7px!important;
+  }
+  html body #footballTakes.ae-picks-editorial #aePicksTopPair #picksFeatured .ae-picks-feature-label #picksFeaturedTitle {
+    font-size:clamp(19px,1.9vw,25px)!important;
+    line-height:1.08!important;
+  }
+  html body #footballTakes.ae-picks-editorial #aePicksTopPair #picksFeatured #picksFeaturedCard {
+    box-sizing:border-box!important;
+    flex:1 1 auto!important;
+    min-height:0!important;
+    padding:3px 15px 0!important;
+  }
+  html body #footballTakes.ae-picks-editorial #aePicksTopPair #picksFeatured #picksFeaturedCard .ae-weekly-card {
+    padding:0!important;
+  }
+  html body #footballTakes.ae-picks-editorial #aePicksTopPair #picksFeatured #picksFeaturedCard .ae-weekly-title {
+    display:-webkit-box!important;
+    -webkit-box-orient:vertical!important;
+    -webkit-line-clamp:2!important;
+    line-clamp:2!important;
+    overflow:hidden!important;
+    margin:3px 0 6px!important;
+    font-size:clamp(20px,2vw,25px)!important;
+    line-height:1.12!important;
+  }
+  html body #footballTakes.ae-picks-editorial #aePicksTopPair #picksFeatured #picksFeaturedCard .ae-weekly-compact-selection,
+  html body #footballTakes.ae-picks-editorial #aePicksTopPair #picksFeatured #picksFeaturedCard .ae-weekly-expand-hint {
+    font-size:11px!important;
+    line-height:1.25!important;
+  }
+  html body #footballTakes.ae-picks-editorial #aePicksTopPair #picksFeatured .ae-weekly-odds-footer {
+    flex:0 0 auto!important;
+    padding:0 14px 10px!important;
+  }
+  /* Clicking through to the full analysis, or showing an admin/share notice,
+     must never clip the original article or its controls. */
+  html body #footballTakes.ae-picks-editorial #aePicksTopPair > #picksFeatured:has(details[open]),
+  html body #footballTakes.ae-picks-editorial #aePicksTopPair > #picksFeatured:has(#aeWeeklyEditButton:not([hidden])),
+  html body #footballTakes.ae-picks-editorial #aePicksTopPair > #picksFeatured:has(.ae-weekly-shared-notice) {
+    height:auto!important;
+    min-height:192px!important;
+    overflow:visible!important;
+  }
+  html body #footballTakes.ae-picks-editorial #aePicksTopPair #picksFeatured details[open] .ae-weekly-title {
+    display:block!important;
+    -webkit-line-clamp:unset!important;
+    line-clamp:unset!important;
+    overflow:visible!important;
+  }
+
+  /* The news tile contains one real full-cover image and editorial caption,
+     so it does not need the old 368px fixed illustration window. */
+  html body #footballTakes.ae-picks-editorial #aePicksTopPair .ae-picks-overview #picksNews #picksNewsList {
+    box-sizing:border-box!important;
+    flex:1 1 auto!important;
+    min-height:0!important;
+    height:100%!important;
+    overflow:hidden!important;
+  }
+  html body #footballTakes.ae-picks-editorial #aePicksTopPair .ae-picks-overview #picksNews .ae-picks-news-feature {
+    box-sizing:border-box!important;
+    flex:1 1 auto!important;
+    min-height:0!important;
+    height:100%!important;
+    max-height:192px!important;
+    overflow:hidden!important;
+  }
+  html body #footballTakes.ae-picks-editorial #aePicksTopPair .ae-picks-overview #picksNews .ae-picks-news-feature .ae-picks-news-copy {
+    gap:3px!important;
+    padding:10px 14px!important;
+  }
+  html body #footballTakes.ae-picks-editorial #aePicksTopPair .ae-picks-overview #picksNews .ae-picks-news-feature .ae-picks-news-in-card-title {
+    display:-webkit-box!important;
+    -webkit-line-clamp:2!important;
+    line-clamp:2!important;
+    -webkit-box-orient:vertical!important;
+    overflow:hidden!important;
+    font-size:clamp(17px,1.65vw,22px)!important;
+    line-height:1.12!important;
+  }
+  /* Let the content below the two modules begin closer to them. */
+  html body #footballTakes.ae-picks-editorial > .ae-picks-layout {
+    margin-top:15px!important;
+  }
+
+  /* The latest Pick begins directly below the Eres Chef banner. Empty status
+     messages no longer reserve an invisible strip in the desktop grid. */
+  html body #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-feed-heading {
+    margin:0!important;
+    padding:0!important;
+  }
+  html body #footballTakes.ae-picks-editorial #communityPicks .ae-picks-heading-cta-row {
+    margin:-11px -11px 0!important;
+  }
+  html body #footballTakes.ae-picks-editorial #communityPicks > #cpStatus:empty {
+    display:none!important;
+    height:0!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:0!important;
+  }
+  html body #footballTakes.ae-picks-editorial #communityPicks > #cpStatus:not(:empty) {
+    margin:3px 0!important;
+  }
+  html body #footballTakes.ae-picks-editorial #communityPicks > #cpFeed {
+    margin-top:0!important;
+    padding-top:0!important;
+  }
+  html body #footballTakes.ae-picks-editorial #communityPicks #cpFeed > .cp-card:first-of-type {
+    margin-top:0!important;
+  }
+
+  /* Five genuine vertical scroll regions: recent Picks, Mejor/Peor Plato and
+     Mejor/Peor Chef. Thin elegant track, no up/down arrow buttons.
+     Scrolling, click/touch targets and keyboard navigation remain native. */
+  html body #footballTakes.ae-picks-editorial #communityPicks :is(
+    #cpFeed.ae-picks-feed-scrollable,
+    #picksPopular.ae-chef-scroll,
+    #picksQuestioned.ae-chef-scroll,
+    #cpLeaderboard.ae-take-leaderboard-list,
+    #cpWorstLeaderboard.ae-take-leaderboard-list
+  ) {
+    scrollbar-width:thin!important;
+    scrollbar-color:rgba(184,142,96,.65) transparent!important;
+  }
+  html body #footballTakes.ae-picks-editorial #communityPicks :is(
+    #cpFeed.ae-picks-feed-scrollable,
+    #picksPopular.ae-chef-scroll,
+    #picksQuestioned.ae-chef-scroll,
+    #cpLeaderboard.ae-take-leaderboard-list,
+    #cpWorstLeaderboard.ae-take-leaderboard-list
+  )::-webkit-scrollbar {
+    width:3px!important;
+    height:3px!important;
+  }
+  html body #footballTakes.ae-picks-editorial #communityPicks :is(
+    #cpFeed.ae-picks-feed-scrollable,
+    #picksPopular.ae-chef-scroll,
+    #picksQuestioned.ae-chef-scroll,
+    #cpLeaderboard.ae-take-leaderboard-list,
+    #cpWorstLeaderboard.ae-take-leaderboard-list
+  )::-webkit-scrollbar-button {
+    display:none!important;
+    width:0!important;
+    height:0!important;
+  }
+  html body #footballTakes.ae-picks-editorial #communityPicks :is(
+    #cpFeed.ae-picks-feed-scrollable,
+    #picksPopular.ae-chef-scroll,
+    #picksQuestioned.ae-chef-scroll,
+    #cpLeaderboard.ae-take-leaderboard-list,
+    #cpWorstLeaderboard.ae-take-leaderboard-list
+  )::-webkit-scrollbar-track {
+    background:transparent!important;
+    border:0!important;
+  }
+  html body #footballTakes.ae-picks-editorial #communityPicks :is(
+    #cpFeed.ae-picks-feed-scrollable,
+    #picksPopular.ae-chef-scroll,
+    #picksQuestioned.ae-chef-scroll,
+    #cpLeaderboard.ae-take-leaderboard-list,
+    #cpWorstLeaderboard.ae-take-leaderboard-list
+  )::-webkit-scrollbar-thumb {
+    background:rgba(184,142,96,.68)!important;
+    border:0!important;
+    border-radius:2px!important;
+  }
+  html:not(.dark) body #footballTakes.ae-picks-editorial #communityPicks :is(
+    #cpFeed.ae-picks-feed-scrollable,
+    #picksPopular.ae-chef-scroll,
+    #picksQuestioned.ae-chef-scroll,
+    #cpLeaderboard.ae-take-leaderboard-list,
+    #cpWorstLeaderboard.ae-take-leaderboard-list
+  ) {
+    scrollbar-color:rgba(120,91,67,.52) transparent!important;
+  }
+}
