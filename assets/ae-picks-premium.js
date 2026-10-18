@@ -42,11 +42,12 @@
  }
  function arrange(){
    const root=$('footballTakes'),layout=root?.querySelector('.ae-picks-layout'),aside=layout?.querySelector('.ae-picks-rail');
-   const overview=root?.querySelector('.ae-picks-overview');
-   if(!layout||!aside||!overview)return;
+   const overview=root?.querySelector('.ae-picks-overview'),pair=$('aePicksTopPair');
+   if(!layout||!aside||!overview||!pair)return;
    const news=$('picksNews'),top=overview.querySelector('.ae-picks-small-top');
-   if(news)aside.insertBefore(news,aside.firstChild);
-   if(top)aside.insertBefore(top,aside.querySelector('.ae-takes-side'));
+   // Preserve the real weekly Pick and the original news modal link.
+   if(news&&news.parentElement!==pair)pair.appendChild(news);
+   if(top)aside.insertBefore(top,aside.firstChild);
    overview.remove();
    layout.classList.add('ae-premium-picks-grid');
  }
