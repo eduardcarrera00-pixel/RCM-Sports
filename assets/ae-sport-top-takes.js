@@ -30,8 +30,8 @@
    list.tabIndex=0;
    list.setAttribute('role','region');
    list.setAttribute('aria-label',mode==='up'?
-     'Top 3 Respira fútbol; desplaza las opiniones en bucle':
-     'Top 3 Vende Humos; desplaza las opiniones en bucle');
+     'Top 3 opiniones populares; desplaza las opiniones en bucle':
+     'Top 3 opiniones impopulares; desplaza las opiniones en bucle');
    if(items.length<2)return;
    list.classList.add('ae-football-cyclic');
    list.style.setProperty('--ae-cycle-count',String(Math.min(3,items.length)));
@@ -238,8 +238,8 @@
    if(!sport){current='';request++;return;}
    // Los destacados deportivos tienen nombres propios; los de portada
    // (#aeTopTakesPositiveTitle / #aeTopTakesNegativeTitle) no se modifican.
-   $('aeSportGeniosTitle').textContent=sport==='nfl'?'Opiniones apoyadas':'Respira fútbol';
-   $('aeSportAnoetosTitle').textContent=sport==='nfl'?'Opiniones hateadas':'Vende Humos';
+   $('aeSportGeniosTitle').textContent=sport==='nfl'?'Opiniones apoyadas':'Opiniones populares';
+   $('aeSportAnoetosTitle').textContent=sport==='nfl'?'Opiniones hateadas':'Opiniones impopulares';
    if(!force&&sport===current&&Date.now()-lastRun<15000)return;
    current=sport;
    const seq=++request;const status=$('aeSportTakeStatus');
