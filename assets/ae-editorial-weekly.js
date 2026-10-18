@@ -152,7 +152,7 @@
  function render(){
    syncShareButtons();
    renderHomeBanner();
-   // One non-interactive odds badge beside the heading, sourced from the same published Pick.
+   // Single non-interactive odds badge in the lower-right footer, from the published Pick.
    const oddsHighlight=$('aeWeeklyOddsHighlight');
    if(oddsHighlight){
      oddsHighlight.hidden=!active;
