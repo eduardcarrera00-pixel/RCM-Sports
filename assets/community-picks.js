@@ -247,7 +247,8 @@ function chefAccuracy(record,voids){
 // unavailable data remain neutral. The points figure is unchanged.
 function chefRankingScore(record,voids){
  const label=el('strong',null,'ae-chef-score');
- label.append(el('span',Number(record.points||0).toFixed(2)+' pts','ae-chef-score-points'));
+ const points=Number(record.points||0);
+ label.append(el('span',(points>0?'+':'')+points.toFixed(2).replace('-','−'),'ae-chef-score-points '+(points>0?'is-positive':points<0?'is-negative':'is-neutral')));
  const accuracy=chefAccuracy(record,voids);
  const tone=accuracy===null?'is-unknown':accuracy>50?'is-positive':accuracy<50?'is-negative':'is-neutral';
  label.append(el('span',' · ','ae-chef-score-separator'));
