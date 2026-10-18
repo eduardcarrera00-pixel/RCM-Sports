@@ -10,6 +10,91 @@
    if(cls)n.className=cls;
    return n;
  };
+
+ const footballCycles=new WeakMap();
+ function clearFootballCycle(list){
+   const current=footballCycles.get(list);
+   if(current){
+     clearInterval(current.interval);
+     clearTimeout(current.reset);
+     clearTimeout(current.resume);
+     current.events.abort();
+     footballCycles.delete(list);
+   }
+   list.classList.remove('ae-football-cyclic');
+ }
+ function startFootballCycle(list,items,mode){
+   if(!items.length)return;
+   list.tabIndex=0;
+   list.setAttribute('role','region');
+   list.setAttribute('aria-label',mode==='up'?
+     'Top 3 Respira fútbol; desplaza las opiniones en bucle':
+     'Top 3 Vende Humos; desplaza las opiniones en bucle');
+   if(items.length<2)return;
+   list.classList.add('ae-football-cyclic');
+   // Two copies let the final item transition back to the first one
+   // without a visual jump, and never duplicate votes or database records.
+   for(let i=0;i<items.length;i++){
+     const copy=list.children[i].cloneNode(true);
+     copy.classList.add('ae-football-cycle-copy');
+     copy.setAttribute('aria-hidden','true');
+     copy.querySelectorAll('button').forEach(button=>{
+       button.tabIndex=-1;
+       button.disabled=true;
+     });
+     list.append(copy);
+   }
+   const events=new AbortController();
+   const settings={events,interval:0,reset:0,resume:0,paused:false,index:0,automatic:false};
+   footballCycles.set(list,settings);
+   const step=()=>list.firstElementChild?.getBoundingClientRect().height||94;
+   const position=()=>Math.round(items.length*step());
+   const snapToFirst=()=>{
+     if(footballCycles.get(list)!==settings)return;
+     list.style.scrollBehavior='auto';
+     list.scrollTop=0;
+     settings.index=0;
+     requestAnimationFrame(()=>{
+       if(footballCycles.get(list)===settings)list.style.removeProperty('scroll-behavior');
+     });
+   };
+   const pause=()=>{
+     settings.paused=true;
+     clearTimeout(settings.resume);
+     settings.resume=setTimeout(()=>{settings.paused=false;},8000);
+   };
+   list.addEventListener('wheel',pause,{passive:true,signal:events.signal});
+   list.addEventListener('touchstart',pause,{passive:true,signal:events.signal});
+   list.addEventListener('focusin',pause,{signal:events.signal});
+   list.addEventListener('pointerenter',()=>{settings.paused=true;clearTimeout(settings.resume);},{signal:events.signal});
+   list.addEventListener('pointerleave',()=>{clearTimeout(settings.resume);settings.resume=setTimeout(()=>settings.paused=false,1200);},{signal:events.signal});
+   list.addEventListener('scroll',()=>{
+     if(settings.automatic)return;
+     const target=position();
+     if(list.scrollTop>=target-3){
+       clearTimeout(settings.reset);
+       settings.reset=setTimeout(snapToFirst,550);
+     }else{
+       settings.index=Math.min(items.length-1,Math.round(list.scrollTop/step()));
+     }
+   },{passive:true,signal:events.signal});
+   if(!window.matchMedia('(prefers-reduced-motion:reduce)').matches){
+     settings.interval=setInterval(()=>{
+       if(footballCycles.get(list)!==settings||document.hidden||
+          !document.body.classList.contains('ae-is-football')||settings.paused)return;
+       settings.automatic=true;
+       const next=settings.index+1;
+       list.scrollTo({top:next*step(),behavior:'smooth'});
+       settings.index=next%items.length;
+       clearTimeout(settings.reset);
+       settings.reset=setTimeout(()=>{
+         if(next>=items.length)snapToFirst();
+         settings.automatic=false;
+       },740);
+     },4300);
+   }
+ }
+
  let desktopHomeMarker=null;
  let nflAlignFrame=0;
  function alignNflOpinions(){
@@ -80,6 +165,7 @@
  }
  function renderList(id,items,mode){
    const list=$(id);if(!list)return;
+   clearFootballCycle(list);
    list.replaceChildren();
    const football=list.closest('#aeSportTakeLeaders')?.dataset.sport==='football';
    for(const [i,t] of items.entries()){
@@ -124,7 +210,9 @@
      });
      list.append(li);
    }
-   if(list.closest('#aeSportTakeLeaders')?.dataset.sport==='nfl'){
+   if(football){
+     startFootballCycle(list,items,mode);
+   }else if(list.closest('#aeSportTakeLeaders')?.dataset.sport==='nfl'){
      list.tabIndex=0;
      list.setAttribute('role','region');
      list.setAttribute('aria-label',mode==='up'?'Opiniones apoyadas de NFL, desplazar hacia abajo':'Opiniones hateadas de NFL, desplazar hacia abajo');
@@ -161,9 +249,9 @@
      const data=(r.data||[]).filter(t=>sport==='nfl'?t.sport==='nfl':footballSports.has(t.sport));
      const net=t=>Number(t.upvotes||0)-Number(t.downvotes||0);
      const positive=data.filter(t=>net(t)>0)
-       .sort((a,b)=>net(b)-net(a)||Number(b.upvotes||0)-Number(a.upvotes||0)||new Date(b.created_at)-new Date(a.created_at)).slice(0,sport==='nfl'?10:2);
+       .sort((a,b)=>net(b)-net(a)||Number(b.upvotes||0)-Number(a.upvotes||0)||new Date(b.created_at)-new Date(a.created_at)).slice(0,sport==='nfl'?10:3);
      const negative=data.filter(t=>net(t)<0)
-       .sort((a,b)=>net(a)-net(b)||Number(b.downvotes||0)-Number(a.downvotes||0)||new Date(b.created_at)-new Date(a.created_at)).slice(0,sport==='nfl'?10:2);
+       .sort((a,b)=>net(a)-net(b)||Number(b.downvotes||0)-Number(a.downvotes||0)||new Date(b.created_at)-new Date(a.created_at)).slice(0,sport==='nfl'?10:3);
      renderList('aeSportTakePositive',positive,'up');
      renderList('aeSportTakeNegative',negative,'down');
      status.textContent='Clasificación según los votos de Takes de '+(sport==='nfl'?'NFL.':'Fútbol.');
