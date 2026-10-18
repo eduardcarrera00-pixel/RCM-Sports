@@ -112,6 +112,9 @@ html:not(.dark) body .editorial-pick > .ae-weekly-share {
   background:rgba(255,249,238,.76)!important;
   border-color:rgba(128,94,67,.58)!important;
 }
+html:not(.dark) body #picksFeatured .ae-weekly-share span {
+  color:#493625!important;
+}
 html:not(.dark) body #picksFeatured .ae-weekly-share:hover,
 html:not(.dark) body .editorial-pick > .ae-weekly-share:hover {
   background:#efe0cd!important;
