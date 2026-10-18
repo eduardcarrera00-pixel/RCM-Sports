@@ -18,3 +18,16 @@
   box-shadow:none!important;
  }
 }
+
+/* Reducir específicamente el marco dorado del botón +. */
+@media(max-width:760px){
+ html body>header #loggedAdminContainer .ae-publish-action{
+  border:1px solid rgba(209,163,102,.72)!important;
+  outline:0!important;
+  width:24px!important;min-width:24px!important;max-width:24px!important;
+  height:24px!important;min-height:24px!important;max-height:24px!important;
+  flex:0 0 24px!important;
+  background-size:100% 100%!important;
+ }
+ html body>header #loggedAdminContainer .ae-publish-action i{font-size:13px!important}
+}
