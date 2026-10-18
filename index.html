@@ -603,7 +603,7 @@ html body:is(.ae-is-nfl,.ae-is-football) #freeTakes #aeNflTakeFooterCta #aeSport
 <link rel="stylesheet" href="assets/ae-home-rankings-vivid.css?v=20261016-1">
     <link rel="stylesheet" href="assets/ae-home-takes-editorial-order.css?v=20261016-genios-first-5">
     <link rel="stylesheet" href="assets/ae-take-rankings-best-take.css?v=20261016-1">
-    <link rel="stylesheet" href="assets/ae-weekly-odds-highlight.css?v=20261016-vertical-center-2">
+    <link rel="stylesheet" href="assets/ae-weekly-odds-highlight.css?v=20261018-weekly-share-1">
 
 <style id="ae-home-news-carousel-styles">
 /* Noticias de portada: carrusel de desplazamiento nativo, sin duplicar publicaciones. */
@@ -2061,6 +2061,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
           <div id="aePicksTopPair" class="ae-picks-top-pair" aria-label="Pick de la semana y noticias de Picks">
           <section id="picksFeatured" class="ae-picks-feature" aria-labelledby="picksFeaturedTitle">
             <div class="ae-picks-feature-label"><div class="ae-weekly-heading-inline"><h3 id="picksFeaturedTitle">Pick de la Semana</h3><span id="aeWeeklyOddsHighlight" class="ae-weekly-odds-highlight" hidden></span></div>
+              <button type="button" id="aeWeeklyShareButton" class="ae-weekly-share ae-weekly-share-picks" hidden aria-label="Compartir el Pick de la Semana" title="Compartir Pick de la Semana"><i class="fa-solid fa-share-nodes" aria-hidden="true"></i><span>Compartir</span></button>
               <button type="button" id="aeWeeklyEditButton" class="ae-weekly-edit-trigger" hidden aria-controls="aeWeeklyPickAdmin">Editar Pick de la Semana</button></div>
             <div id="picksFeaturedCard" aria-live="polite"><p>Cargando Pick editorial…</p></div>
           </section>
@@ -2278,6 +2279,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
             <aside class="lg:col-span-4 space-y-8">
                 <section class="editorial-pick" aria-labelledby="weeklyPickTitle">
                     <h2 id="weeklyPickTitle">Pick de la Semana</h2>
+                    <button type="button" id="aeHomeWeeklyShareButton" class="ae-weekly-share ae-home-weekly-share" hidden aria-label="Compartir el Pick de la Semana" title="Compartir Pick de la Semana"><i class="fa-solid fa-share-nodes" aria-hidden="true"></i><span>Compartir</span></button>
                     <button type="button" class="ae-home-weekly-more" onclick="filterByCategory('Picks')" aria-label="Abrir Pick de la Semana y todos sus detalles">Ver más <span aria-hidden="true">→</span></button>
                     <div class="editorial-pick-body">
                     <div id="cpWeekly" aria-live="polite"><p>Cargando nuestra selección…</p></div></div>
@@ -4153,7 +4155,7 @@ updateThemeButton();
 <script src="assets/ae-nfl-takes.js?v=20261015-3"></script>
 <script src="assets/free-takes.js?v=20261018-football-no-change-community-1"></script>
 <script src="assets/ae-take-rankings.js?v=20261018-savant-rookie-names-2"></script>
-<script src="assets/ae-editorial-weekly.js?v=20261016-odds-heading-1"></script>
+<script src="assets/ae-editorial-weekly.js?v=20261018-weekly-share-1"></script>
 <script src="assets/ae-profile.js?v=20261018-chef-profile-pick-links-1"></script>
 <script src="assets/ae-home-takes.js?v=20261017-esports-league-v1"></script>
 <script src="assets/ae-home-take-discoveries.js?v=20261016-top10-community-1"></script>
@@ -4167,7 +4169,7 @@ updateThemeButton();
 <script src="assets/ae-news-archive.js?v=20261018-sport-mobile-direct-1"></script>
 <script src="assets/ae-mobile-compact-home.js?v=20261016-top3-swipe-v1"></script>
 <script src="assets/ae-football-mobile-redesign.js?v=20261018-football-boards-v2"></script>
-<script src="assets/ae-home-weekly-layout.js?v=20261017-trending-bottom-mobile-1"></script>
+<script src="assets/ae-home-weekly-layout.js?v=20261018-weekly-share-1"></script>
 <script src="assets/ae-notifications.js?v=20261017-compact-inbox-1"></script>
 
 <script id="ae-home-news-carousel-motion">
