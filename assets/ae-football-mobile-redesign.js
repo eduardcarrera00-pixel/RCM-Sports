@@ -16,6 +16,8 @@
   function placeNflTakes(onNfl){
     const root = byId('aeSportTakeLeaders');
     if(!root)return;
+    // Fútbol ya tiene sus dos tablas dentro de #freeTakes en ambos tamaños.
+    if(mobile.matches && document.body.classList.contains('ae-is-football'))return;
     if(!nflTakeAnchor){
       nflTakeAnchor = document.createComment('AE: posición original de NFL Savant / NFL Rookie');
       // Punto de retorno estable, aunque se abra directamente la página NFL.
@@ -102,9 +104,17 @@
       // The same footer follows the mobile news grid.
       moveTo(byId('aeSportAllNewsFooter'), stage);
       moveTo(byId('freeTakes'), stage);
+      // El bloque real de opiniones se muestra debajo de "Demuestra tu
+      // conocimiento" y antes de los últimos Takes; nunca en la barra lateral.
+      const footballFeed=byId('freeTakes');
+      const history=byId('aeTakesFeedHeading');
+      const leaders=byId('aeSportTakeLeaders');
+      if(footballFeed&&history?.parentElement===footballFeed&&leaders&&
+         (leaders.parentElement!==footballFeed||leaders.nextElementSibling!==history)){
+        footballFeed.insertBefore(leaders,history);
+      }
       moveTo(byId('aeNflLatestComments'), stage);
-      moveTo(byId('aeSportTakeLeaders'), stage);
-      moveTo(byId('communityLeaders')?.closest('.editorial-community'), stage);
+      // Opinadores distinguidos pertenece a la portada, no a Fútbol móvil.
       const trending = document.querySelector('.editorial-trending');
       moveTo(trending, stage);
       if (trending) trending.hidden = false;
