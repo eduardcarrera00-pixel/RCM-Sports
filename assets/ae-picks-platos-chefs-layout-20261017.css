@@ -439,3 +439,147 @@ html body #footballTakes.ae-picks-editorial #aePicksTopPair .ae-picks-overview #
     min-height:clamp(225px,51vw,330px)!important;
   }
 }
+
+
+/* AE SPORTS · Votos y respuestas en la conversación de La receta del Chef.
+   Sólo afecta el diálogo de Picks; identidad cuadrada y controles compactos. */
+.ae-cp-detail-dialog .ae-cp-detail-conversation .cp-detail-replies-heading{
+  margin:16px 0 10px!important;
+}
+.ae-cp-detail-dialog .ae-cp-detail-conversation .ae-cp-comment-composer{
+  box-sizing:border-box;
+  width:100%;
+  margin:6px 0 15px;
+  padding:13px 14px;
+  border:1px solid rgba(194,151,103,.54);
+  border-radius:0;
+  background:rgba(15,39,54,.65);
+}
+.ae-cp-detail-dialog .ae-cp-comment-composer .ae-cp-reply-context{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+.ae-cp-detail-dialog .ae-cp-comment-composer .ae-cp-reply-context:has(.ae-cp-reply-reset[hidden]){
+  display:none;
+}
+.ae-cp-detail-dialog .ae-cp-comment-composer .ae-cp-reply-status{
+  flex:1 1 auto;
+  min-width:0;
+  color:#dfb581;
+  font:600 11px/1.35 Inter,system-ui,sans-serif;
+  overflow-wrap:anywhere;
+}
+.ae-cp-detail-dialog .ae-cp-comment-composer button.ae-cp-reply-reset:not([hidden]){
+  flex:0 0 auto;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:30px;
+  width:30px;
+  min-height:30px;
+  height:30px;
+  padding:0!important;
+  font:700 19px/1 Inter,system-ui,sans-serif;
+  background:transparent;
+  border:1px solid rgba(211,170,121,.5);
+  border-radius:0;
+}
+.ae-cp-detail-dialog .ae-cp-comment-composer label{
+  margin:4px 0 7px!important;
+  font:700 12px/1.35 Inter,system-ui,sans-serif!important;
+}
+.ae-cp-detail-dialog .ae-cp-comment-composer textarea{
+  box-sizing:border-box!important;
+  min-height:82px!important;
+  max-height:190px!important;
+  margin-top:5px!important;
+  resize:vertical;
+  border-radius:0!important;
+}
+.ae-cp-detail-dialog .ae-cp-comment-composer button[type="submit"]{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:35px!important;
+  margin-top:8px!important;
+  padding:7px 12px!important;
+  border-radius:0!important;
+  font:700 12px/1.2 Inter,system-ui,sans-serif!important;
+}
+.ae-cp-detail-dialog .ae-cp-detail-conversation article.cp-comment{
+  box-sizing:border-box!important;
+  height:auto!important;
+  min-height:0!important;
+  margin:9px 0!important;
+  padding:12px 14px!important;
+  border-radius:0!important;
+}
+.ae-cp-detail-dialog .ae-cp-detail-conversation article.cp-comment > strong{
+  display:block;
+  font:700 12px/1.35 Inter,system-ui,sans-serif;
+}
+.ae-cp-detail-dialog .ae-cp-detail-conversation article.cp-comment > p{
+  margin:7px 0 8px!important;
+  font:400 13px/1.48 Inter,system-ui,sans-serif!important;
+}
+.ae-cp-detail-dialog .ae-cp-comment-actions{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:5px 7px;
+  margin-top:9px;
+}
+.ae-cp-detail-dialog .ae-cp-comment-actions button.ae-cp-comment-vote{
+  min-height:32px!important;
+  padding:5px 9px!important;
+  font:700 11px/1.2 Inter,system-ui,sans-serif!important;
+  border-radius:0!important;
+  white-space:nowrap;
+}
+.ae-cp-detail-dialog .ae-cp-comment-actions button.ae-cp-comment-vote[aria-pressed="true"]{
+  color:#0a2435!important;
+  background:#e5bb87!important;
+  border-color:#e5bb87!important;
+}
+.ae-cp-detail-dialog .ae-cp-comment-actions button.ae-cp-comment-reply{
+  min-height:32px!important;
+  padding:5px 8px!important;
+  font:700 11px/1.2 Inter,system-ui,sans-serif!important;
+  border-radius:0!important;
+}
+.ae-cp-detail-dialog .ae-cp-comment-replies-count{
+  margin-left:auto;
+  font:500 10px/1.3 Inter,system-ui,sans-serif;
+  color:#dcb58a;
+  text-align:right;
+}
+@media(max-width:600px){
+  .ae-cp-detail-dialog .ae-cp-detail-conversation article.cp-comment{
+    padding:10px 11px!important;
+    margin:8px 0!important;
+  }
+  .ae-cp-detail-dialog .ae-cp-comment-actions{
+    gap:5px!important;
+  }
+  .ae-cp-detail-dialog .ae-cp-comment-replies-count{
+    margin-left:0;
+    flex-basis:100%;
+    text-align:left;
+  }
+  .ae-cp-detail-dialog .ae-cp-comment-composer .ae-cp-reply-status{
+    font-size:11px;
+  }
+  .ae-cp-detail-dialog .ae-cp-detail-conversation .ae-cp-comment-composer{
+    padding:10px 11px!important;
+    margin-bottom:13px!important;
+  }
+}
+html:not(.dark) .ae-cp-detail-dialog .ae-cp-detail-conversation .ae-cp-comment-composer{
+  background:rgba(245,235,218,.94);
+}
+html:not(.dark) .ae-cp-detail-dialog .ae-cp-comment-composer .ae-cp-reply-status,
+html:not(.dark) .ae-cp-detail-dialog .ae-cp-comment-replies-count{
+  color:#85542c;
+}
