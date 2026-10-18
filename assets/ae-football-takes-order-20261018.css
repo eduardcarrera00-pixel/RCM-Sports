@@ -192,3 +192,57 @@ html body.ae-is-football #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport
     display:none!important;
   }
 }
+
+/* Fútbol móvil: últimas publicaciones en una ventana de dos Takes;
+   las siguientes se consultan deslizando, sin ocultar votos ni respuestas. */
+@media(max-width:760px){
+  html body.ae-is-football #mainContent #aeFootballMobileStage #freeTakes > #freeTakesFeed{
+    --ae-visible-take-height:210px;
+    display:grid!important;
+    box-sizing:border-box!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    grid-auto-rows:var(--ae-visible-take-height)!important;
+    align-content:start!important;
+    gap:8px!important;
+    width:100%!important;
+    height:calc(2 * var(--ae-visible-take-height) + 8px)!important;
+    max-height:calc(2 * var(--ae-visible-take-height) + 8px)!important;
+    min-height:0!important;
+    margin:4px 0 10px!important;
+    padding:0!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    overscroll-behavior-y:contain;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:thin;
+  }
+  html body.ae-is-football #mainContent #aeFootballMobileStage #freeTakes > #freeTakesFeed > article.ae-free-take-card:nth-child(n){
+    display:flex!important;
+    box-sizing:border-box!important;
+    height:var(--ae-visible-take-height)!important;
+    min-height:var(--ae-visible-take-height)!important;
+    max-height:var(--ae-visible-take-height)!important;
+    overflow:hidden!important;
+  }
+  html body.ae-is-football #mainContent #aeFootballMobileStage #freeTakes > #freeTakesFeed > .ae-free-take-card .ae-free-take-body{
+    display:-webkit-box!important;
+    -webkit-box-orient:vertical!important;
+    -webkit-line-clamp:3!important;
+    max-height:none!important;
+    overflow:hidden!important;
+  }
+  html body.ae-is-football #mainContent #aeFootballMobileStage #freeTakes > #freeTakesStatus:empty,
+  html body.ae-is-football #mainContent #aeFootballMobileStage #freeTakes > #aeFootballMoreTakes,
+  html body.ae-is-football #mainContent #aeFootballMobileStage #freeTakes > #freeTakesMore{
+    display:none!important;
+  }
+  html body.ae-is-football #mainContent #aeFootballMobileStage #freeTakes > #freeTakesFeed:focus-visible{
+    outline:2px solid #e4b785!important;
+    outline-offset:2px!important;
+  }
+}
+@media(max-width:370px){
+  html body.ae-is-football #mainContent #aeFootballMobileStage #freeTakes > #freeTakesFeed{
+    --ae-visible-take-height:228px;
+  }
+}
