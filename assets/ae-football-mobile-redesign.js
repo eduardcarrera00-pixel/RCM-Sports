@@ -110,8 +110,8 @@
       if (trending) trending.hidden = false;
 
       // El título interactivo lo actualiza renderArticlesFeed; no reemplazar su botón.
-      if (byId('aeSportGeniosTitle')) byId('aeSportGeniosTitle').textContent = 'Respira fútbol';
-      if (byId('aeSportAnoetosTitle')) byId('aeSportAnoetosTitle').textContent = 'Vende Humos';
+      if (byId('aeSportGeniosTitle')) byId('aeSportGeniosTitle').textContent = 'Opiniones populares';
+      if (byId('aeSportAnoetosTitle')) byId('aeSportAnoetosTitle').textContent = 'Opiniones impopulares';
 
       if (ranking) {
         ranking.classList.add('ae-football-ranking-feature');
