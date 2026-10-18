@@ -1536,8 +1536,8 @@ html body:is(.ae-is-nfl,.ae-is-football) #aeSportTakeRanking #aeNflTwinRankings 
 html body:is(.ae-is-nfl,.ae-is-football) #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-header{
   position:relative!important;isolation:isolate!important;display:flex!important;
   flex-direction:column!important;justify-content:center!important;align-items:flex-start!important;
-  min-height:150px!important;box-sizing:border-box!important;
-  padding:17px 21px 19px!important;
+  min-height:102px!important;box-sizing:border-box!important;
+  padding:12px 18px!important;
   border-bottom:1px solid rgba(205,158,104,.73)!important;border-radius:0!important;
   background-image:linear-gradient(90deg,rgba(2,20,31,.65),rgba(2,20,31,.06)),
      url("rankings/ae-classical-twin-ranking-atlas.webp")!important;
@@ -1555,13 +1555,11 @@ html:not(.dark) body.ae-is-nfl #aeSportTakeRanking .is-rookie .ae-nfl-ranking-he
 html:not(.dark) body.ae-is-football #aeSportTakeRanking .is-savant .ae-nfl-ranking-header{--ae-twin-art-position:0% 100%}
 html:not(.dark) body.ae-is-football #aeSportTakeRanking .is-rookie .ae-nfl-ranking-header{--ae-twin-art-position:100% 100%}
 html body:is(.ae-is-nfl,.ae-is-football) #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-header::after{
-  content:"";position:absolute;left:21px;bottom:16px;width:35%;height:1px;
-  background:linear-gradient(90deg,rgba(229,181,114,.88),rgba(229,181,114,0));
-  pointer-events:none;z-index:-1;
+  content:none!important;display:none!important;
 }
 html body:is(.ae-is-nfl,.ae-is-football) #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-header h3{
   order:0!important;display:block!important;
-  max-width:84%!important;margin:0 0 8px!important;
+  max-width:88%!important;margin:0!important;
   color:#fff0dd!important;
   font:600 clamp(25px,2.5vw,36px)/1.08 Newsreader,Georgia,serif!important;
   letter-spacing:-.025em!important;text-shadow:0 2px 4px rgba(0,0,0,.65)!important;
@@ -1572,7 +1570,7 @@ html body:is(.ae-is-nfl,.ae-is-football) #aeSportTakeRanking #aeNflTwinRankings 
   color:#f2d2bc!important;
 }
 html body:is(.ae-is-nfl,.ae-is-football) #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-overline{
-  order:1!important;display:block!important;max-width:88%!important;
+  order:1!important;display:none!important;max-width:88%!important;
   font:600 9px/1.45 Inter,system-ui,sans-serif!important;
   letter-spacing:.155em!important;color:#e6c5a0!important;
   text-shadow:0 1px 3px rgba(0,0,0,.58)!important;
@@ -1635,16 +1633,13 @@ html body:is(.ae-is-nfl,.ae-is-football) #aeSportTakeRanking #aeNflTwinRankings 
     gap:8px!important;
   }
   html body:is(.ae-is-nfl,.ae-is-football) #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-header{
-    min-height:113px!important;max-height:none!important;
-    padding:12px 10px 14px!important;
-  }
-  html body:is(.ae-is-nfl,.ae-is-football) #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-header::after{
-    left:10px;bottom:10px;
+    min-height:78px!important;max-height:none!important;
+    padding:11px 10px!important;
   }
   html body:is(.ae-is-nfl,.ae-is-football) #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-header h3{
     font-size:clamp(16px,4.2vw,22px)!important;
     max-width:95%!important;line-height:1.1!important;
-    margin-bottom:5px!important;
+    margin-bottom:0!important;
   }
   html body:is(.ae-is-nfl,.ae-is-football) #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-overline{
     display:none!important;
