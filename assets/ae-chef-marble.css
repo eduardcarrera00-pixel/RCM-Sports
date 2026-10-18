@@ -1,0 +1,89 @@
+/* Approved marble-toque invitation. Decorative WebP backgrounds; live text and
+   the existing publication control remain accessible in both themes. */
+html body #footballTakes.ae-picks-editorial #communityPicks .ae-picks-heading-cta-row.ae-chef-marble {
+ --chef-invite-art:url('ae-chef-marble-night.webp');
+ --chef-invite-ink:#fff0d9;
+ display:flex!important;
+ flex-direction:column!important;
+ flex-wrap:nowrap!important;
+ align-items:flex-start!important;
+ justify-content:center!important;
+ gap:14px!important;
+ min-height:190px!important;
+ height:auto!important;
+ max-height:none!important;
+ padding:28px 40% 28px 7%!important;
+ background:#102331 var(--chef-invite-art) center right / cover no-repeat!important;
+ border-radius:0!important;
+ box-shadow:none!important;
+}
+html:not(.dark) body #footballTakes.ae-picks-editorial #communityPicks .ae-picks-heading-cta-row.ae-chef-marble {
+ --chef-invite-art:url('ae-chef-marble-day.webp');
+ --chef-invite-ink:#392817;
+ background-color:#f0e4cf!important;
+}
+html body #footballTakes.ae-picks-editorial #communityPicks .ae-picks-heading-cta-row.ae-chef-marble .ae-picks-nudge {
+ display:block!important;
+ width:100%!important;
+ max-width:none!important;
+ margin:0!important;
+ padding:0!important;
+ color:var(--chef-invite-ink)!important;
+ font:500 clamp(30px,3.5vw,48px)/1.12 Newsreader,Georgia,serif!important;
+ letter-spacing:-.025em!important;
+ text-transform:none!important;
+ text-align:center!important;
+ text-shadow:none!important;
+ white-space:normal!important;
+}
+html body #footballTakes.ae-picks-editorial #communityPicks .ae-picks-heading-cta-row.ae-chef-marble button#cpPublishCta.ae-chef-marble-button {
+ display:inline-flex!important;
+ position:static!important;
+ align-self:center!important;
+ align-items:center!important;
+ justify-content:center!important;
+ flex:0 0 auto!important;
+ box-sizing:border-box!important;
+ width:auto!important;
+ min-width:0!important;
+ max-width:100%!important;
+ height:auto!important;
+ min-height:44px!important;
+ max-height:none!important;
+ margin:0!important;
+ padding:9px 22px!important;
+ border:1px solid #ab8351!important;
+ border-radius:0!important;
+ background:#765128!important;
+ color:#fff4df!important;
+ font:500 21px/1.2 Newsreader,Georgia,serif!important;
+ letter-spacing:0!important;
+ text-transform:none!important;
+ text-shadow:none!important;
+ white-space:normal!important;
+ box-shadow:none!important;
+ filter:none!important;
+ transform:none!important;
+ cursor:pointer!important;
+}
+html body #footballTakes.ae-picks-editorial #communityPicks .ae-picks-heading-cta-row.ae-chef-marble button#cpPublishCta.ae-chef-marble-button:hover {
+ background:#60401f!important;
+}
+html body #footballTakes.ae-picks-editorial #communityPicks .ae-chef-marble button#cpPublishCta:focus-visible {
+ outline:3px solid var(--chef-invite-ink)!important;
+ outline-offset:3px!important;
+}
+@media(max-width:760px) {
+ html body #footballTakes.ae-picks-editorial #communityPicks .ae-picks-heading-cta-row.ae-chef-marble {
+  min-height:136px!important;
+  gap:9px!important;
+  padding:20px 39% 20px 5%!important;
+ }
+ html body #footballTakes.ae-picks-editorial #communityPicks .ae-picks-heading-cta-row.ae-chef-marble .ae-picks-nudge {
+  font-size:clamp(27px,6.7vw,38px)!important;
+ }
+ html body #footballTakes.ae-picks-editorial #communityPicks .ae-picks-heading-cta-row.ae-chef-marble button#cpPublishCta.ae-chef-marble-button {
+  padding:8px 14px!important;
+  font-size:18px!important;
+ }
+}
