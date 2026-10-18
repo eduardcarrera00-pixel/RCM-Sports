@@ -40,3 +40,10 @@ html:not(.dark) #cpComposePanel #cpForm button[type=submit]{background:#855b43;b
 #cpComposePanel button:disabled{opacity:.6;cursor:wait}
 #cpComposePanel :is(button,input,textarea,summary):focus-visible{outline:2px solid var(--cp-dialog-action,#d4ae83);outline-offset:3px}
 @media(max-width:520px){html body dialog#cpComposePanel{width:calc(100% - 16px);max-height:calc(100dvh - 16px)}#cpComposePanel .ae-pick-compose-head{padding:18px 16px;min-height:112px}#cpComposePanel #cpComposeTitle{font-size:29px}#cpComposePanel #cpComposeIntro{padding:12px 16px 0}#cpComposePanel #cpForm{padding:12px 16px 0!important;gap:12px!important}#cpComposePanel #cpForm .cp-compose-footer{margin:0 -16px;padding:10px 16px max(12px,env(safe-area-inset-bottom))}}
+
+/* Isolate composer actions from legacy global Pick button colors. */
+html body #cpComposePanel #cpForm .cp-compose-modes button{background:transparent!important;border-color:transparent!important;color:var(--cp-dialog-muted)!important}
+html body #cpComposePanel #cpForm .cp-compose-modes button[aria-pressed=true]{background:var(--cp-dialog-field)!important;border-bottom-color:var(--cp-dialog-action)!important;color:var(--cp-dialog-ink)!important}
+html body #cpComposePanel #cpForm :is(.cp-compose-add,.cp-compose-remove){background:transparent!important;color:var(--cp-dialog-action)!important;border-color:var(--cp-dialog-line)!important}
+html body #cpComposePanel #cpForm button[type=submit]{background:#d4ae83!important;color:#102938!important;border-color:#d4ae83!important}
+html:not(.dark) body #cpComposePanel #cpForm button[type=submit]{background:#855b43!important;color:#fff!important;border-color:#855b43!important}
