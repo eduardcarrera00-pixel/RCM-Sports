@@ -304,7 +304,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/ae-take-discussion-reference.css?v=20261018-modal-hd-stadium-1">
 <link rel="stylesheet" href="assets/ae-power-rankings-scenic.css?v=20261016-restored-2">
 <link rel="stylesheet" href="assets/ae-football-takes-scenic.css?v=20261016-uniform-grid-1">
-<link rel="stylesheet" href="assets/ae-football-news-debate.css?v=20261016-city-art-v2">
+<link rel="stylesheet" href="assets/ae-football-news-debate.css?v=20261018-football-boards-v2">
 <style id="ae-football-opinions-heading-labels-20261017">
 /* Football opinions have only their respective editorial title, no kicker. */
 html body.ae-is-football #mainContent #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-chef-heading::before{
@@ -1909,7 +1909,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
  }
 }
 </style><link rel="stylesheet" href="assets/ae-picks-platos-chefs-layout-20261017.css?v=20261017-picks-news-preview-only-1">
-<link rel="stylesheet" href="assets/ae-football-takes-order-20261018.css?v=20261018-football-fullwidth-1">
+<link rel="stylesheet" href="assets/ae-football-takes-order-20261018.css?v=20261018-football-boards-v2">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 <a class="ae-skip-link" href="#mainContent">Ir al contenido</a>
@@ -2298,19 +2298,6 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
 </section>
                 </div>
         <section class="rcm-panel editorial-community" aria-labelledby="communityTitle"><div class="ae-section-heading"><h2 id="communityTitle">Opinadores distinguidos</h2></div><div id="communityLeaders" aria-live="polite">Cargando comentarios destacados…</div></section>
-        <section id="aeSportTakeLeaders" class="ae-sport-voice ae-sport-chefs" hidden aria-label="Takes más apoyados y más cuestionados de la comunidad">
-          <p id="aeSportTakeStatus" class="sr-only" role="status" aria-live="polite">Cargando Takes…</p>
-          <div class="ae-sport-takes-grid">
-            <section class="ae-sport-takes-group ae-sport-chef-card is-supported" aria-labelledby="aeSportGeniosTitle">
-              <header class="ae-sport-chef-heading"><h3 id="aeSportGeniosTitle">Opiniones apoyadas</h3><button type="button" class="ae-football-leaders-more" aria-controls="aeSportTakePositive" aria-expanded="false">Ver todos <span aria-hidden="true">→</span></button></header>
-              <ol id="aeSportTakePositive" class="ae-sport-takes-list" aria-live="polite"></ol>
-            </section>
-            <section class="ae-sport-takes-group ae-sport-chef-card is-questioned" aria-labelledby="aeSportAnoetosTitle">
-              <header class="ae-sport-chef-heading"><h3 id="aeSportAnoetosTitle">Opiniones hateadas</h3><button type="button" class="ae-football-leaders-more" aria-controls="aeSportTakeNegative" aria-expanded="false">Ver todos <span aria-hidden="true">→</span></button></header>
-              <ol id="aeSportTakeNegative" class="ae-sport-takes-list" aria-live="polite"></ol>
-            </section>
-          </div>
-        </section>
                 <!-- Interactive Daily Poll Widget -->
                 <div hidden class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm grass-glow relative overflow-hidden">
                     <div class="flex items-center space-x-2 text-pitch-600 text-xs font-bold uppercase tracking-widest mb-3">
@@ -2367,6 +2354,20 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
         <!-- Los Takes son una función editorial al final de NFL y Fútbol, no una categoría de navegación. -->
         <section id="freeTakes" class="ae-takes ae-free-takes" hidden aria-labelledby="freeTakesTitle">
           <div class="ae-takes-head"><h2 id="freeTakesTitle">Demuestra tu conocimiento</h2><p>Escribe tu pronóstico para la historia. Después de publicar, no podrás editar el texto ni borrarlo; solo podrás moverlo entre NFL y Fútbol.</p><button id="aeSportTakePublish" onclick="event.stopImmediatePropagation(); if(typeof window.aeOpenTakeComposer==='function'){window.aeOpenTakeComposer();}else{const modal=document.getElementById('aeTakeComposerDialog');if(modal&&!modal.open)modal.showModal();}" type="button" class="ae-participate-cta ae-sport-take-publish" aria-controls="aeTakeComposerDialog">Publicar mi Take</button></div>
+          <!-- Dos columnas de opiniones: dentro del módulo, inmediatamente después del título. -->
+        <section id="aeSportTakeLeaders" class="ae-sport-voice ae-sport-chefs" hidden aria-label="Takes más apoyados y más cuestionados de la comunidad">
+          <p id="aeSportTakeStatus" class="sr-only" role="status" aria-live="polite">Cargando Takes…</p>
+          <div class="ae-sport-takes-grid">
+            <section class="ae-sport-takes-group ae-sport-chef-card is-supported" aria-labelledby="aeSportGeniosTitle">
+              <header class="ae-sport-chef-heading"><h3 id="aeSportGeniosTitle">Opiniones apoyadas</h3><button type="button" class="ae-football-leaders-more" aria-controls="aeSportTakePositive" aria-expanded="false">Ver todos <span aria-hidden="true">→</span></button></header>
+              <ol id="aeSportTakePositive" class="ae-sport-takes-list" aria-live="polite"></ol>
+            </section>
+            <section class="ae-sport-takes-group ae-sport-chef-card is-questioned" aria-labelledby="aeSportAnoetosTitle">
+              <header class="ae-sport-chef-heading"><h3 id="aeSportAnoetosTitle">Opiniones hateadas</h3><button type="button" class="ae-football-leaders-more" aria-controls="aeSportTakeNegative" aria-expanded="false">Ver todos <span aria-hidden="true">→</span></button></header>
+              <ol id="aeSportTakeNegative" class="ae-sport-takes-list" aria-live="polite"></ol>
+            </section>
+          </div>
+        </section>
 
           <h3 id="aeTakesFeedHeading" class="ae-takes-history-heading">Historial de Takes</h3>
           <div class="ae-free-controls"><label id="aeNflFeedFilterWrap" hidden>División NFL<select id="aeNflFeedDivision"><option value="">Todas las divisiones</option></select></label><label id="freeTakesFilterWrap">Mostrar<select id="freeTakesSportFilter"><option value="all">Todos los deportes</option><option value="general">General</option><option value="laliga">LaLiga</option><option value="premier">Premier League</option><option value="ligamx">Liga MX</option><option value="champions">Champions League</option><option value="nfl">NFL</option><option value="colegial">Fútbol colegial</option></select></label><label>Ordenar<select id="freeTakesSort"><option value="new">Más recientes</option><option value="top">Más apoyados</option></select></label></div>
@@ -3385,7 +3386,7 @@ currentUser = {
             const sportTakeHeader = document.querySelector('#freeTakes > .ae-takes-head');
             const sportTakeFooter = document.getElementById('aeNflTakeFooterCta');
             if (sportTakeCta && sportTakeHeader && sportTakeFooter) {
-                const showAfterSportTakes = ['NFL','Fútbol'].includes(currentCategory) && !currentSearchQuery;
+                const showAfterSportTakes = currentCategory === 'NFL' && !currentSearchQuery;
                 const container = showAfterSportTakes ? sportTakeFooter : sportTakeHeader;
                 if (sportTakeCta.parentElement !== container) container.appendChild(sportTakeCta);
                 sportTakeFooter.hidden = !showAfterSportTakes;
@@ -4150,7 +4151,7 @@ updateThemeButton();
 <script src="assets/ae-home-takes.js?v=20261017-esports-league-v1"></script>
 <script src="assets/ae-home-take-discoveries.js?v=20261016-top10-community-1"></script>
 
-<script src="assets/ae-sport-top-takes.js?v=20261017-football-opiniones-8"></script>
+<script src="assets/ae-sport-top-takes.js?v=20261018-football-boards-v2"></script>
 <script src="assets/ae-take-replies.js?v=20261018-football-no-change-community-1"></script>
 <script src="assets/ae-take-category-edit.js?v=20261016-1"></script>
 <script src="assets/ae-picks-premium.js?v=20261017-paired-1"></script>
@@ -4158,7 +4159,7 @@ updateThemeButton();
 <script src="assets/ae-news-editor.js?v=20261016-1"></script>
 <script src="assets/ae-news-archive.js?v=20261016-framing-zoom-3"></script>
 <script src="assets/ae-mobile-compact-home.js?v=20261016-top3-swipe-v1"></script>
-<script src="assets/ae-football-mobile-redesign.js?v=20261017-football-title-swap-3"></script>
+<script src="assets/ae-football-mobile-redesign.js?v=20261018-football-boards-v2"></script>
 <script src="assets/ae-home-weekly-layout.js?v=20261017-trending-bottom-mobile-1"></script>
 <script src="assets/ae-notifications.js?v=20261017-compact-inbox-1"></script>
 
