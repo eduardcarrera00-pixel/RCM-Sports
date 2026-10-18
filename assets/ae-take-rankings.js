@@ -58,7 +58,14 @@
     return tr;
   }
 
-  function nflStandingRow(r,i,rookie){
+  // The same real, confirmed-result statistics power NFL and Fútbol.
+  // A missing denominator must never be presented as a 0% performance.
+  function takeAccuracy(record){
+    const won=Number(record.correct_takes),resolved=Number(record.total_resolved);
+    if(!Number.isFinite(won)||!Number.isFinite(resolved)||resolved<=0)return '—';
+    return (100*won/resolved).toLocaleString('es-ES',{maximumFractionDigits:1})+'%';
+  }
+  function sportStandingRow(r,i,rookie){
     const row=element('tr',null,'ae-nfl-ranking-row');
     const position=element('td',null,'ae-nfl-ranking-place');
     position.append(element('strong',String(i+1).padStart(2,'0')));
@@ -71,66 +78,68 @@
     const value=rookie?Number(r.lost_takes||0):Number(r.points||0);
     const scoreText=rookie?(value===1?'1 fallo':value+' fallos'):
       value.toLocaleString('es-ES',{maximumFractionDigits:2})+' pts';
-    const evaluated=Number(r.total_resolved||0);
-    const correct=Number(r.correct_takes||0);
-    const accuracy=evaluated>0?Math.round(100*correct/evaluated)+'%':'—';
-    // Mobile: success percentage immediately to the left of points or misses.
-    const mobileMetrics=element('div',null,'ae-nfl-ranking-mobile-metrics');
-    mobileMetrics.append(
-      element('span',accuracy,'ae-nfl-ranking-mobile-percent'),
-      element('strong',scoreText,'ae-nfl-ranking-score-mobile')
-    );
-    details.append(mobileMetrics);
     const takeName=rookie?r.worst_take_title:r.best_take_title;
-    const note=rookie?'Último Take fallado':'Mejor Take';
-    details.append(element('small',takeName?note+' · '+takeName:
-      (rookie?'Take fallado sin título':'Sin Takes acertados'),'ae-nfl-ranking-take'));
-    const accuracyCell=element('td',null,'ae-nfl-ranking-accuracy');
-    const accuracyValue=element('strong',accuracy);
-    accuracyValue.setAttribute('aria-label',accuracy==='—'?'Porcentaje de aciertos no disponible':'Porcentaje de aciertos: '+accuracy);
-    accuracyCell.append(accuracyValue);
+    const takeLabel=rookie?'Último fallo':'Mejor Take';
+    // In compact/mobile layouts the score and title remain attached to user.
+    details.append(element('strong',scoreText,'ae-nfl-ranking-score-mobile'));
+    details.append(element('small',takeName?takeLabel+' · '+takeName:
+      (rookie?'Sin Take fallado':'Sin Takes acertados'),'ae-nfl-ranking-take'));
+    const accuracy=takeAccuracy(r);
+    const record=element('small',
+      accuracy+' de aciertos · '+Number(r.correct_takes||0)+' / '+Number(r.total_resolved||0)+' evaluados',
+      'ae-nfl-ranking-record');
+    details.append(record);
+    const takeCell=element('td',null,'ae-nfl-ranking-best');
+    takeCell.append(element('span',takeLabel,'ae-nfl-ranking-best-label'));
+    const takeTitle=element('strong',takeName||'—','ae-nfl-ranking-best-title');
+    takeTitle.title=takeName||'No hay Take registrado';
+    takeCell.append(takeTitle);
+    const accuracyCell=element('td',null,'ae-nfl-ranking-percent');
+    const percentage=element('strong',accuracy,'ae-nfl-ranking-percentage');
+    percentage.title=Number(r.correct_takes||0)+' acertados de '+Number(r.total_resolved||0)+' evaluados';
+    accuracyCell.append(percentage);
     const score=element('td',null,'ae-nfl-ranking-value');
-    const displayedScore=element('strong',scoreText,'ae-nfl-ranking-score');
-    score.append(displayedScore);
-    row.append(position,details,accuracyCell,score);
+    score.append(element('strong',scoreText,'ae-nfl-ranking-score'));
+    row.append(position,details,takeCell,accuracyCell,score);
     return row;
   }
-  function nflStandingMessage(message){
+  function sportStandingMessage(message){
     const row=element('tr',null,'ae-nfl-ranking-message');
-    const cell=element('td',message);cell.colSpan=4;row.append(cell);
+    const cell=element('td',message);cell.colSpan=5;row.append(cell);
     return row;
   }
-  async function loadNflTwinRankings(seq,period){
-    const savant=$('aeNflSavantList'),rookie=$('aeNflRookieList');
-    if(!savant||!rookie)return;
-    savant.replaceChildren(nflStandingMessage('Cargando clasificación…'));
-    rookie.replaceChildren(nflStandingMessage('Cargando clasificación…'));
-    const args={p_sport:'nfl',p_period:period};
-    // Keep the two rankings independent: a problem loading Rookie must not
-    // erase Savant's valid standings. Both use the same monthly/history tabs.
+  async function loadSportTwinRankings(seq,period,selectedSport){
+    const best=$('aeNflSavantList'),worst=$('aeNflRookieList');
+    if(!best||!worst)return;
+    best.replaceChildren(sportStandingMessage('Cargando clasificación…'));
+    worst.replaceChildren(sportStandingMessage('Cargando clasificación…'));
+    const args={p_sport:selectedSport,p_period:period};
+    // Both independent public RPCs already support NFL and Fútbol.
     const [winners,losers]=await Promise.allSettled([
       db.rpc('ae_take_result_ranking_details',args),
       db.rpc('ae_take_result_ranking_rookies',args)
     ]);
-    if(seq!==rankRequest.sport||sport!=='nfl'||rankState.sport!==period)return;
-    for(const [outcome,list,isRookie] of [[winners,savant,false],[losers,rookie,true]]){
+    if(seq!==rankRequest.sport||sport!==selectedSport||rankState.sport!==period)return;
+    for(const [outcome,list,isRookie] of [[winners,best,false],[losers,worst,true]]){
       if(outcome.status!=='fulfilled'||outcome.value.error){
-        list.replaceChildren(nflStandingMessage('No se pudo cargar la clasificación.'));
+        list.replaceChildren(sportStandingMessage('No se pudo cargar la clasificación.'));
         continue;
       }
       const rows=(outcome.value.data||[]).slice(0,10);
       const empty=isRookie?
-        (period==='month'?'Este mes aún no hay Takes fallados.':'Todavía no hay Takes fallados.') :
+        (period==='month'?'Este mes aún no hay Takes fallados.':'Todavía no hay Takes fallados.'):
         (period==='month'?'Este mes aún no hay Takes puntuados.':'Todavía no hay Takes puntuados.');
-      list.replaceChildren(...(rows.length?rows.map((r,i)=>nflStandingRow(r,i,isRookie)):[nflStandingMessage(empty)]));
+      list.replaceChildren(...(rows.length?
+        rows.map((r,i)=>sportStandingRow(r,i,isRookie)):
+        [sportStandingMessage(empty)]));
     }
   }
   async function loadRanking(where){
     const isHome=where==='home', list=$(isHome?'aeHomeTakeRankingList':'aeSportTakeRankingList');
     if(!list || !db || (!isHome&&!sport))return;
     const seq=++rankRequest[where], selectedSport=isHome?'all':sport,period=rankState[where];
-    if(!isHome&&selectedSport==='nfl'){
-      await loadNflTwinRankings(seq,period);
+    if(!isHome&&(selectedSport==='nfl'||selectedSport==='football')){
+      await loadSportTwinRankings(seq,period,selectedSport);
       return;
     }
     list.replaceChildren(isHome ? element('li','Cargando clasificación…') : standingMessage('Cargando clasificación…'));
@@ -207,12 +216,17 @@
     sport=next;
     if(next)$('aeSportTakeRankingTitle').textContent='Top 10 · '+(next==='nfl'?'NFL':'Fútbol');
     const twin=$('aeNflTwinRankings'),solo=$('aeSportTakeRankingSolo');
-    if(twin)twin.hidden=next!=='nfl';
-    if(solo)solo.hidden=next==='nfl';
+    if(twin)twin.hidden=!next;
+    if(solo)solo.hidden=!!next;
+    const bestHeading=$('aeNflSavantHeading'),worstHeading=$('aeNflRookieHeading');
+    if(bestHeading)bestHeading.textContent=next==='football'?'Top 10 mejores':'NFL Savant';
+    if(worstHeading)worstHeading.textContent=next==='football'?'Top 10 peores':'NFL Rookie';
+    const bestOverline=bestHeading?.parentElement?.querySelector('.ae-nfl-ranking-overline');
+    const worstOverline=worstHeading?.parentElement?.querySelector('.ae-nfl-ranking-overline');
+    if(bestOverline)bestOverline.textContent=next==='football'?'LOS MEJORES · FÚTBOL':'LOS MEJORES · ACIERTOS';
+    if(worstOverline)worstOverline.textContent=next==='football'?'LOS PEORES · FÚTBOL':'LOS PEORES · FALLOS';
     const description=$('aeSportTakeRankingDescription');
-    if(description)description.textContent=next==='nfl'
-      ? ''
-      : 'Los admins confirman cada acierto y asignan de 1 a 100 puntos. Un fallo vale 0.';
+    if(description)description.textContent='';
     refresh();
   },refresh};
   document.addEventListener('DOMContentLoaded',()=>{
