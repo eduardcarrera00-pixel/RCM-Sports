@@ -18,6 +18,77 @@
    }catch{return '';}
  };
  let refreshing=false,active=null,submitting=false,editing=null,uncertainSave=null;
+
+ // The id avoids accidentally displaying a different weekly selection on an old link.
+ // Supabase exposes only the currently published weekly Pick; expired/replaced IDs
+ // must show an unavailable message rather than silently substituting a new Pick.
+ const sharedId=(()=>{
+   const value=new URLSearchParams(window.location.search).get('weeklyPick')||'';
+   return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value)?value.toLowerCase():null;
+ })();
+ let sharedLinkHandled=false;
+ const shareUrl=p=>{
+   const url=new URL('https://aesportsclub.github.io/');
+   url.searchParams.set('weeklyPick',String(p.id));
+   return url.href;
+ };
+ function syncShareButtons(){
+   for(const id of ['aeWeeklyShareButton','aeHomeWeeklyShareButton']){
+     const button=$(id);
+     if(button)button.hidden=!active;
+   }
+ }
+ async function shareWeeklyPick(event){
+   event?.preventDefault();
+   event?.stopPropagation();
+   if(!active)return;
+   const url=shareUrl(active);
+   const payload={title:'Pick de la Semana · AE SPORTS',
+     text:active.title+' · '+active.event_name+' · '+active.selection,
+     url};
+   if(typeof navigator.share==='function'){
+     try{await navigator.share(payload);return;}
+     catch(error){if(error?.name==='AbortError')return;}
+   }
+   try{
+     if(navigator.clipboard?.writeText){
+       await navigator.clipboard.writeText(url);
+     }else{
+       const input=make('textarea');
+       input.value=url;
+       input.readOnly=true;
+       input.style.cssText='position:fixed;opacity:0;pointer-events:none';
+       document.body.append(input);input.select();
+       const copied=document.execCommand?.('copy');
+       input.remove();
+       if(!copied)throw Error('Copy not supported');
+     }
+     if(typeof notifyCommunity==='function')notifyCommunity('Enlace del Pick de la Semana copiado.');
+   }catch{
+     // Browsers that deny clipboard access still expose the exact URL to copy.
+     window.prompt('Copia el enlace del Pick de la Semana:',url);
+   }
+ }
+ function revealSharedPick(){
+   if(sharedLinkHandled||!sharedId)return;
+   sharedLinkHandled=true;
+   if(typeof filterByCategory==='function')filterByCategory('Picks');
+   const featured=$('picksFeatured');
+   if(!featured)return;
+   if(active&&String(active.id).toLowerCase()===sharedId){
+     const details=$('picksFeaturedCard')?.querySelector('details');
+     if(details)details.open=true;
+   }else{
+     featured.querySelector('.ae-weekly-shared-notice')?.remove();
+     const notice=make('p','El Pick compartido ya no está publicado o ha vencido. Debajo puedes consultar el Pick de la Semana vigente.','ae-weekly-shared-notice');
+     $('picksFeaturedCard')?.before(notice);
+   }
+   // Mobile Home relocates the actual Picks panel. Allow the category layout
+   // and its observer to restore the panel before bringing it into view.
+   window.requestAnimationFrame(()=>window.requestAnimationFrame(()=>{
+     featured.scrollIntoView?.({behavior:'auto',block:'start'});
+   }));
+ }
  // Mobile home and Picks render the same native expandable card.
  const weeklyMobile=window.matchMedia('(max-width: 760px)');
  function createCard(p,isPreview){
@@ -79,6 +150,7 @@
    panel.classList.add('ae-home-weekly-banner');
  }
  function render(){
+   syncShareButtons();
    renderHomeBanner();
    // One non-interactive odds badge beside the heading, sourced from the same published Pick.
    const oddsHighlight=$('aeWeeklyOddsHighlight');
@@ -109,13 +181,16 @@
      if(error)throw error;
      active=data?.[0]&&new Date(data[0].expires_at).getTime()>Date.now()?data[0]:null;
      render();
+     revealSharedPick();
    }catch(e){
      active=null;
+     syncShareButtons();
      const oddsHighlight=$('aeWeeklyOddsHighlight');
      if(oddsHighlight){oddsHighlight.hidden=true;oddsHighlight.textContent='';}
      renderHomeBanner();
      $('picksFeatured')?.querySelector('.ae-weekly-banner')?.remove();
      for(const id of ['cpWeekly','picksFeaturedCard']){$(id)?.replaceChildren(make('p','No se pudo cargar el Pick editorial.','ae-weekly-empty'));}
+     revealSharedPick();
    }finally{refreshing=false;adminVisibility();}
  }
  const localDatetime=iso=>{
@@ -369,6 +444,8 @@
  document.addEventListener('DOMContentLoaded',()=>{
    $('aeWeeklyPickForm')?.addEventListener('submit',publish);
    $('aeWeeklyEditButton')?.addEventListener('click',startEdit);
+   $('aeWeeklyShareButton')?.addEventListener('click',shareWeeklyPick);
+   $('aeHomeWeeklyShareButton')?.addEventListener('click',shareWeeklyPick);
    $('aeWeeklyCancelEdit')?.addEventListener('click',cancelEdit);
    $('aeWeeklyCheckSave')?.addEventListener('click',manuallyCheckSave);
    updateEditorLabels();
