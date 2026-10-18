@@ -289,9 +289,33 @@ async function loadWorstRanking(){
 /* Clasificación editorial basada en votos netos reales, separada de los
    puntos de la liga semanal. Sólo pronósticos aprobados de esta semana. */
 let chefRequest=0;
+// The old Platos viewport was 255px tall with 85px rows. It cropped longer
+// predictions and their votes. Fit precisely two COMPLETE variable-height rows.
+const plateWindowObservers=new Map();
+function sizePlateWindow(target){
+ if(!target)return;
+ plateWindowObservers.get(target)?.disconnect();
+ plateWindowObservers.delete(target);
+ const cards=Array.from(target.children).filter(card=>card.classList?.contains('ae-chef-entry'));
+ target.style.removeProperty('--ae-plates-window-height');
+ if(cards.length<=2)return;
+ const measure=()=>{
+   const height=cards.slice(0,2).reduce((sum,card)=>sum+card.getBoundingClientRect().height,0);
+   if(height>0)target.style.setProperty('--ae-plates-window-height',Math.ceil(height)+'px');
+ };
+ measure();
+ if(typeof ResizeObserver!=='undefined'){
+   const observer=new ResizeObserver(()=>requestAnimationFrame(measure));
+   cards.slice(0,2).forEach(card=>observer.observe(card));
+   plateWindowObservers.set(target,observer);
+ }
+}
 function paintChefList(id,result,kind){
  const target=$(id);
  if(!target)return;
+ plateWindowObservers.get(target)?.disconnect();
+ plateWindowObservers.delete(target);
+ target.style.removeProperty('--ae-plates-window-height');
  target.replaceChildren();
  // Reset de carrusel si la lista queda vacía o falla la carga.
  target.classList.remove('ae-chef-scroll');
@@ -309,7 +333,7 @@ function paintChefList(id,result,kind){
    target.append(row(good?'Aún no hay Picks con votos netos positivos esta semana.':'Aún no hay Picks con votos netos negativos esta semana.','ae-chef-empty'));
    return;
  }
- const scrollable=picks.length>3;
+ const scrollable=picks.length>2;
  // Mantiene el mismo diseño fotográfico con una o varias posiciones.
  // Solo habilitamos interacción de desplazamiento cuando hay más de un Pick.
  target.classList.add('ae-chef-scroll');
@@ -365,6 +389,7 @@ function paintChefList(id,result,kind){
    target.append(item);
    updateHint();
  }
+ sizePlateWindow(target);
 }
 async function loadChefLists(){
  const seq=++chefRequest;
@@ -591,7 +616,7 @@ window.aeOpenPickDetail=(id)=>{
   history.pushState({pick:id},'',url.toString());
   void showDetail(String(id));
 };
-window.renderCommunityPicksVisibility=()=>{const root=$('communityPicks');if(!root)return;root.hidden=currentCategory!=='Picks';if(!root.hidden){if(!loaded)load();else requestAnimationFrame(()=>{sizeFeedWindow();sizeChefRankingWindows();});}};
+window.renderCommunityPicksVisibility=()=>{const root=$('communityPicks');if(!root)return;root.hidden=currentCategory!=='Picks';if(!root.hidden){if(!loaded)load();else requestAnimationFrame(()=>{sizeFeedWindow();sizeChefRankingWindows();sizePlateWindow($('picksPopular'));sizePlateWindow($('picksQuestioned'));});}};
 function syncPickComposer(){
  const open=Boolean($('cpComposePanel')?.open);
  $('cpPublishCta')?.setAttribute('aria-expanded',String(open));
@@ -623,7 +648,7 @@ document.addEventListener('DOMContentLoaded',()=>{
  $('cpComposeClose')?.addEventListener('click',()=>closePickComposer());
  $('cpComposePanel')?.addEventListener('close',syncPickComposer);
  $('cpComposePanel')?.addEventListener('cancel',e=>{if(posting)e.preventDefault();});
- renderCommunityPicksVisibility();load();window.addEventListener('resize',()=>{sizeFeedWindow();sizeChefRankingWindows();},{passive:true});if(document.fonts?.ready)document.fonts.ready.then(sizeChefRankingWindows);$('cpReload')?.addEventListener('click',load);$('cpWorstReload')?.addEventListener('click',loadWorstRanking);$('cpViewAll')?.addEventListener('click',()=>{const dlg=$('cpArchiveDialog');if(dlg&&!dlg.open)dlg.showModal();archiveLimit=30;loadArchive();});$('cpArchiveClose')?.addEventListener('click',closeArchive);$('cpArchiveMore')?.addEventListener('click',()=>{archiveLimit+=30;loadArchive();});for(const [id,mode] of [['cpRankMonth','month'],['cpRankHistory','all']]){$(id)?.addEventListener('click',()=>{currentRank=mode;for(const [i,m] of [['cpRankMonth','month'],['cpRankHistory','all']])$(i)?.setAttribute('aria-pressed',String(currentRank===m));loadRanking();});}for(const [id,mode] of [['cpWorstRankMonth','month'],['cpWorstRankHistory','all']]){
+ renderCommunityPicksVisibility();load();window.addEventListener('resize',()=>{sizeFeedWindow();sizeChefRankingWindows();sizePlateWindow($('picksPopular'));sizePlateWindow($('picksQuestioned'));},{passive:true});if(document.fonts?.ready)document.fonts.ready.then(()=>{sizeChefRankingWindows();sizePlateWindow($('picksPopular'));sizePlateWindow($('picksQuestioned'));});$('cpReload')?.addEventListener('click',load);$('cpWorstReload')?.addEventListener('click',loadWorstRanking);$('cpViewAll')?.addEventListener('click',()=>{const dlg=$('cpArchiveDialog');if(dlg&&!dlg.open)dlg.showModal();archiveLimit=30;loadArchive();});$('cpArchiveClose')?.addEventListener('click',closeArchive);$('cpArchiveMore')?.addEventListener('click',()=>{archiveLimit+=30;loadArchive();});for(const [id,mode] of [['cpRankMonth','month'],['cpRankHistory','all']]){$(id)?.addEventListener('click',()=>{currentRank=mode;for(const [i,m] of [['cpRankMonth','month'],['cpRankHistory','all']])$(i)?.setAttribute('aria-pressed',String(currentRank===m));loadRanking();});}for(const [id,mode] of [['cpWorstRankMonth','month'],['cpWorstRankHistory','all']]){
  $(id)?.addEventListener('click',()=>{
    currentWorstRank=mode;
    for(const [buttonId,buttonMode] of [['cpWorstRankMonth','month'],['cpWorstRankHistory','all']]){
