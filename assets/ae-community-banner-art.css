@@ -1,0 +1,66 @@
+/* Approved classical artwork: eight equal cells, night/day columns and four section rows.
+   Keep titles as live text; decoration never intercepts community controls. */
+html body.ae-is-home #aeHomeTakeHighlights.ae-community-calm {
+  --ae-banner-column: 0%;
+  --ae-banner-ink: #f4e8db;
+}
+html:not(.dark) body.ae-is-home #aeHomeTakeHighlights.ae-community-calm {
+  --ae-banner-column: 100%;
+  --ae-banner-ink: #352c25;
+}
+html body.ae-is-home #aeHomeTakeHighlights.ae-community-calm #aeHomeTakesPopular { --ae-banner-row: 0%; }
+html body.ae-is-home #aeHomeTakeHighlights.ae-community-calm #aeHomeTakesUnpopular { --ae-banner-row: 33.333333%; }
+html body.ae-is-home #aeHomeTakeHighlights.ae-community-calm #aeHomeTopTakes .ae-top-takes-card { --ae-banner-row: 66.666667%; }
+html body.ae-is-home #aeHomeTakeHighlights.ae-community-calm #aeHomeTopTakes .ae-top-takes-card.is-questioned { --ae-banner-row: 100%; }
+html body.ae-is-home #aeHomeTakeHighlights.ae-community-calm :is(#aeHomeTakesPopular,#aeHomeTakesUnpopular) .ae-vote-column-heading,
+html body.ae-is-home #aeHomeTakeHighlights.ae-community-calm #aeHomeTopTakes .ae-top-takes-card .ae-top-takes-card-head {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  box-sizing: border-box !important;
+  min-height: 100px !important;
+  padding: 20px !important;
+  gap: 0 !important;
+  isolation: isolate;
+  overflow: hidden !important;
+  background-color: var(--calm-head) !important;
+  background-image: url("ae-community-banner-atlas.webp") !important;
+  background-size: 200% 400% !important;
+  background-position: var(--ae-banner-column) var(--ae-banner-row) !important;
+  background-repeat: no-repeat !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--calm-rule) !important;
+}
+html body.ae-is-home #aeHomeTakeHighlights.ae-community-calm :is(#aeHomeTakesPopular,#aeHomeTakesUnpopular) .ae-vote-column-heading {
+  width: calc(100% + 40px) !important;
+  margin: -20px -20px 4px !important;
+}
+html body.ae-is-home #aeHomeTakeHighlights.ae-community-calm :is(#aeHomeTakesPopular,#aeHomeTakesUnpopular) .ae-vote-column-heading h3,
+html body.ae-is-home #aeHomeTakeHighlights.ae-community-calm #aeHomeTopTakes .ae-top-takes-card .ae-top-takes-card-head h3 {
+  position: relative !important;
+  z-index: 1;
+  max-width: 66% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  color: var(--ae-banner-ink) !important;
+  font: 600 clamp(23px,2.15vw,29px)/1.12 Newsreader,Georgia,serif !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  text-shadow: none !important;
+  overflow-wrap: normal !important;
+}
+html body.ae-is-home #aeHomeTakeHighlights.ae-community-calm #aeHomeTopTakes .ae-top-takes-card-head::after {
+  display: none !important;
+  content: none !important;
+}
+@media(max-width:760px) {
+  html body.ae-is-home #aeHomeTakeHighlights.ae-community-calm :is(#aeHomeTakesPopular,#aeHomeTakesUnpopular) .ae-vote-column-heading {
+    width: calc(100% + 36px) !important;
+    margin: -18px -18px 4px !important;
+  }
+  html body.ae-is-home #aeHomeTakeHighlights.ae-community-calm :is(#aeHomeTakesPopular,#aeHomeTakesUnpopular) .ae-vote-column-heading,
+  html body.ae-is-home #aeHomeTakeHighlights.ae-community-calm #aeHomeTopTakes .ae-top-takes-card .ae-top-takes-card-head {
+    min-height: 96px !important;
+    padding: 18px !important;
+  }
+}
