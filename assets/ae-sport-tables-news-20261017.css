@@ -1714,3 +1714,20 @@ html:not(.dark) body.ae-is-football #aeSportTakeRanking #aeNflTwinRankings .is-r
     background-size:100% 100%,cover!important;
   }
 }
+
+/* AE SPORTS · NFL Savant / Rookie: ilustración completa en la cabecera, sin recortes.
+   La imagen se ajusta proporcionalmente dentro del encabezado y NO se aplica
+   al viewport ni a las filas de la tabla. Conservar los banners compactos. */
+html body.ae-is-nfl #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-header {
+  background-size:100% 100%,contain!important;
+  background-position:center,right center!important;
+  background-repeat:no-repeat,no-repeat!important;
+  min-height:108px!important;
+}
+@media (max-width:760px) {
+  html body.ae-is-nfl #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-header {
+    background-size:100% 100%,contain!important;
+    background-position:center,right center!important;
+    min-height:86px!important;
+  }
+}
