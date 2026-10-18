@@ -1441,3 +1441,11 @@
   }
 }
 
+
+
+/* Fútbol móvil: ocultar exclusivamente Lo más leído (2026-10-18). */
+@media (max-width:760px) {
+  html body.ae-is-football #mainContent #aeTrendingPortada.editorial-trending {
+    display: none !important;
+  }
+}
