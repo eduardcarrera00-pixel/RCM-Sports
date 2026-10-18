@@ -98,8 +98,8 @@
    if(!sport){current='';request++;return;}
    // Los destacados deportivos tienen nombres propios; los de portada
    // (#aeTopTakesPositiveTitle / #aeTopTakesNegativeTitle) no se modifican.
-   $('aeSportGeniosTitle').textContent=sport==='nfl'?'NFL Savant':'Respira fútbol';
-   $('aeSportAnoetosTitle').textContent=sport==='nfl'?'NFL Rookie':'Vende Humos';
+   $('aeSportGeniosTitle').textContent=sport==='nfl'?'Opiniones apoyadas':'Respira fútbol';
+   $('aeSportAnoetosTitle').textContent=sport==='nfl'?'Opiniones hateadas':'Vende Humos';
    if(!force&&sport===current&&Date.now()-lastRun<15000)return;
    current=sport;
    const seq=++request;const status=$('aeSportTakeStatus');
