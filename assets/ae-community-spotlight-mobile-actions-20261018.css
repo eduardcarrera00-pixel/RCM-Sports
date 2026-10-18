@@ -1,0 +1,166 @@
+/* AE SPORTS · Opinadores distinguidos: perfil y acciones legibles.
+   Cada comentario es real; sólo cambia su presentación en portada. */
+html body.ae-is-home #mainContent .editorial-community #communityLeaders .ae-community-scroll-viewport{
+  box-sizing:border-box!important;
+  height:var(--ae-community-visible-card-height, 310px)!important;
+  min-height:var(--ae-community-visible-card-height, 310px)!important;
+  max-height:var(--ae-community-visible-card-height, 310px)!important;
+  width:100%!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  scroll-snap-type:y proximity!important;
+  scroll-padding-top:0!important;
+  overscroll-behavior-y:contain!important;
+  -webkit-overflow-scrolling:touch;
+}
+html body.ae-is-home #mainContent .editorial-community #communityLeaders .ae-community-scroll-entry{
+  box-sizing:border-box!important;
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:flex-start!important;
+  width:100%!important;
+  min-width:0!important;
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  margin:0!important;
+  padding:13px 14px 18px!important;
+  overflow:visible!important;
+  scroll-snap-align:start;
+}
+html body.ae-is-home #mainContent .editorial-community #communityLeaders .ae-community-story-link{
+  max-height:none!important;
+  height:auto!important;
+  overflow:visible!important;
+  flex-shrink:0!important;
+  overflow-wrap:anywhere!important;
+}
+html body.ae-is-home #mainContent .editorial-community #communityLeaders .ae-community-quote{
+  box-sizing:border-box!important;
+  display:block!important;
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  margin:6px 0 9px!important;
+  overflow:visible!important;
+  -webkit-line-clamp:unset!important;
+  line-clamp:unset!important;
+  overflow-wrap:anywhere!important;
+}
+html body.ae-is-home #mainContent .editorial-community #communityLeaders .ae-community-card-footer{
+  box-sizing:border-box!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:stretch!important;
+  justify-content:flex-start!important;
+  width:100%!important;
+  min-width:0!important;
+  height:auto!important;
+  overflow:visible!important;
+  gap:8px!important;
+  margin:0!important;
+  padding:0!important;
+}
+html body.ae-is-home #mainContent .editorial-community #communityLeaders .ae-community-user-actions{
+  display:block!important;
+  width:100%!important;
+  min-width:0!important;
+  margin:0!important;
+}
+html body.ae-is-home #mainContent .editorial-community #communityLeaders .ae-community-author{
+  display:block!important;
+  max-width:100%!important;
+  width:100%!important;
+  min-width:0!important;
+  margin:0!important;
+  white-space:normal!important;
+  text-overflow:clip!important;
+  overflow:visible!important;
+  overflow-wrap:anywhere!important;
+  font-size:12px!important;
+}
+html body.ae-is-home #mainContent .editorial-community #communityLeaders .ae-community-controls{
+  display:flex!important;
+  flex-flow:row nowrap!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:8px!important;
+  width:100%!important;
+  min-width:0!important;
+  margin:0!important;
+}
+html body.ae-is-home #mainContent .editorial-community #communityLeaders .ae-community-votes{
+  display:flex!important;
+  flex-flow:row nowrap!important;
+  flex:0 0 auto!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:6px!important;
+  min-width:0!important;
+  margin:0!important;
+}
+html body.ae-is-home #mainContent .editorial-community #communityLeaders .ae-community-vote{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  flex:0 0 auto!important;
+  box-sizing:border-box!important;
+  min-width:46px!important;
+  min-height:35px!important;
+  margin:0!important;
+  padding:7px 8px!important;
+  gap:4px!important;
+  font-size:12px!important;
+  white-space:nowrap!important;
+}
+html body.ae-is-home #mainContent .editorial-community #communityLeaders .ae-community-reply{
+  display:inline-flex!important;
+  flex:0 0 auto!important;
+  align-items:center!important;
+  justify-content:center!important;
+  box-sizing:border-box!important;
+  min-height:35px!important;
+  margin:0 0 0 auto!important;
+  padding:7px 11px!important;
+  gap:6px!important;
+  font-size:11px!important;
+  white-space:nowrap!important;
+}
+@media(max-width:640px){
+  html body.ae-is-home #mainContent .editorial-community #communityLeaders .ae-community-scroll-entry{
+    padding:12px 10px 16px!important;
+  }
+  html body.ae-is-home #mainContent .editorial-community #communityLeaders .ae-community-card-footer{
+    gap:8px!important;
+  }
+  html body.ae-is-home #mainContent .editorial-community #communityLeaders .ae-community-controls{
+    gap:6px!important;
+  }
+  html body.ae-is-home #mainContent .editorial-community #communityLeaders .ae-community-votes{
+    gap:5px!important;
+  }
+  html body.ae-is-home #mainContent .editorial-community #communityLeaders .ae-community-vote{
+    min-width:43px!important;
+    min-height:36px!important;
+    padding:6px 7px!important;
+  }
+  html body.ae-is-home #mainContent .editorial-community #communityLeaders .ae-community-reply{
+    min-height:36px!important;
+    padding:6px 9px!important;
+    font-size:10px!important;
+  }
+}
+@media(max-width:340px){
+  html body.ae-is-home #mainContent .editorial-community #communityLeaders .ae-community-controls{
+    gap:4px!important;
+  }
+  html body.ae-is-home #mainContent .editorial-community #communityLeaders .ae-community-vote{
+    min-width:39px!important;
+    padding:6px 5px!important;
+    font-size:11px!important;
+  }
+  html body.ae-is-home #mainContent .editorial-community #communityLeaders .ae-community-reply{
+    padding:6px!important;
+    font-size:9px!important;
+  }
+}
