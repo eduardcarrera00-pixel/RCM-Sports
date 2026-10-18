@@ -1,5 +1,5 @@
-/* AE SPORTS | Weekly Pick: quotation as information, not a call to action.
-   The ONLY odds label in the Picks hero sits beside the section heading. */
+/* AE SPORTS | Weekly Pick: the published odds sit at the bottom right,
+   separate from the sharing control in the header. */
 html body #picksFeatured .ae-weekly-heading-inline {
   display:flex!important;
   align-items:center!important;
@@ -10,6 +10,25 @@ html body #picksFeatured .ae-weekly-heading-inline {
 html body #picksFeatured .ae-weekly-heading-inline #picksFeaturedTitle {
   margin:0!important;
   min-width:0;
+}
+
+/* A real footer in the card flow: no overlay, even with long text or expanded analysis. */
+html body #picksFeatured .ae-weekly-odds-footer {
+  display:flex!important;
+  box-sizing:border-box!important;
+  width:100%;
+  min-width:0;
+  flex:0 0 auto!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  margin:0!important;
+  padding:0 18px 14px!important;
+  position:relative;
+  z-index:3;
+  pointer-events:none;
+}
+html body #picksFeatured .ae-weekly-odds-footer:has(#aeWeeklyOddsHighlight[hidden]) {
+  display:none!important;
 }
 html body #picksFeatured #aeWeeklyOddsHighlight[hidden] {
   display:none!important;
@@ -43,6 +62,9 @@ html:not(.dark) body #picksFeatured:not(:has(.ae-weekly-banner)) #aeWeeklyOddsHi
 }
 @media(max-width:480px){
   html body #picksFeatured .ae-weekly-heading-inline { gap:6px 9px!important; }
+  html body #picksFeatured .ae-weekly-odds-footer {
+    padding:0 12px 12px!important;
+  }
   html body #picksFeatured #aeWeeklyOddsHighlight {
     min-height:24px;
     padding:4px 7px!important;
