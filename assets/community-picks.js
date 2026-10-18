@@ -132,10 +132,12 @@ async function load(){
    $('cpStatus').textContent=feed.data?.length?'':'Todavía no hay Picks. Comparte el primero.';
    $('cpMore').hidden=(feed.data?.length||0)<limit;
    loaded=true;
-   await Promise.all([loadRanking(),loadModeration(),loadChefLists(),loadSettlement()]);
+   await Promise.all([loadRanking(),loadWorstRanking(),loadModeration(),loadChefLists(),loadSettlement()]);
  }catch(e){if(seq!==request)return;$('cpFeed').replaceChildren();$('cpMore').hidden=true;$('cpStatus').textContent='No pudimos cargar los Picks. '+message(e);}
 }
 let currentRank='month';
+let currentWorstRank='month';
+let worstRankingRequest=0;
 function row(label,cls){const li=el('li',null,cls||'ae-cp-leader');li.append(el('span',label));return li;}
 async function loadRanking(){
  const list=$('cpLeaderboard');if(!list)return;
@@ -148,6 +150,36 @@ async function loadRanking(){
    li.append(el('span',String(i+1).padStart(2,'0'),'ae-take-number'),
      el('span',x.username||'Aficionado','ae-take-name'),
      el('strong',Number(x.points||0).toFixed(2)+' pts · '+Number(x.correct_picks||0)+' aciertos'));
+   list.append(li);
+ }
+}
+/* Worst Chefs uses its own SQL order (ASC) and period.
+   Never reverse the Best Chefs top ten; that would omit real bottom scorers. */
+async function loadWorstRanking(){
+ const list=$('cpWorstLeaderboard');if(!list||!db)return;
+ const seq=++worstRankingRequest;
+ const period=currentWorstRank;
+ const r=await db.rpc('ae_pick_result_ranking_worst',{p_period:period});
+ if(seq!==worstRankingRequest)return;
+ if(r.error){
+   list.replaceChildren(row('No fue posible cargar la clasificación de Peores Chefs.','ae-cp-leader ae-cp-leader-empty'));
+   return;
+ }
+ list.replaceChildren();
+ if(!r.data?.length){
+   list.append(row(period==='month'
+     ?'Este mes todavía no hay resultados confirmados.'
+     :'Aún no hay pronósticos con resultados confirmados.',
+     'ae-cp-leader ae-cp-leader-empty'));
+   return;
+ }
+ for(const [i,x] of (r.data||[]).slice(0,10).entries()){
+   const li=el('li',null,'ae-cp-leader ae-worst-chef-row');
+   li.append(
+     el('span',String(i+1).padStart(2,'0'),'ae-take-number'),
+     el('span',x.username||'Aficionado','ae-take-name'),
+     el('strong',Number(x.points||0).toFixed(2)+' pts · '+Number(x.correct_picks||0)+' aciertos')
+   );
    list.append(li);
  }
 }
@@ -489,7 +521,16 @@ document.addEventListener('DOMContentLoaded',()=>{
  $('cpComposeClose')?.addEventListener('click',()=>closePickComposer());
  $('cpComposePanel')?.addEventListener('close',syncPickComposer);
  $('cpComposePanel')?.addEventListener('cancel',e=>{if(posting)e.preventDefault();});
- renderCommunityPicksVisibility();load();$('cpReload')?.addEventListener('click',load);$('cpViewAll')?.addEventListener('click',()=>{const dlg=$('cpArchiveDialog');if(dlg&&!dlg.open)dlg.showModal();archiveLimit=30;loadArchive();});$('cpArchiveClose')?.addEventListener('click',closeArchive);$('cpArchiveMore')?.addEventListener('click',()=>{archiveLimit+=30;loadArchive();});for(const [id,mode] of [['cpRankMonth','month'],['cpRankHistory','all']]){$(id)?.addEventListener('click',()=>{currentRank=mode;for(const [i,m] of [['cpRankMonth','month'],['cpRankHistory','all']])$(i)?.setAttribute('aria-pressed',String(currentRank===m));loadRanking();});}const id=new URL(location.href).searchParams.get('pick');if(id)showDetail(id);$('cpMore').onclick=()=>{limit+=20;load();};if(db)db.auth.onAuthStateChange(()=>setTimeout(()=>{load();const id=new URL(location.href).searchParams.get('pick');if(id)showDetail(id);},0));});
+ renderCommunityPicksVisibility();load();$('cpReload')?.addEventListener('click',load);$('cpWorstReload')?.addEventListener('click',loadWorstRanking);$('cpViewAll')?.addEventListener('click',()=>{const dlg=$('cpArchiveDialog');if(dlg&&!dlg.open)dlg.showModal();archiveLimit=30;loadArchive();});$('cpArchiveClose')?.addEventListener('click',closeArchive);$('cpArchiveMore')?.addEventListener('click',()=>{archiveLimit+=30;loadArchive();});for(const [id,mode] of [['cpRankMonth','month'],['cpRankHistory','all']]){$(id)?.addEventListener('click',()=>{currentRank=mode;for(const [i,m] of [['cpRankMonth','month'],['cpRankHistory','all']])$(i)?.setAttribute('aria-pressed',String(currentRank===m));loadRanking();});}for(const [id,mode] of [['cpWorstRankMonth','month'],['cpWorstRankHistory','all']]){
+ $(id)?.addEventListener('click',()=>{
+   currentWorstRank=mode;
+   for(const [buttonId,buttonMode] of [['cpWorstRankMonth','month'],['cpWorstRankHistory','all']]){
+     $(buttonId)?.setAttribute('aria-pressed',String(currentWorstRank===buttonMode));
+   }
+   void loadWorstRanking();
+ });
+}
+const id=new URL(location.href).searchParams.get('pick');if(id)showDetail(id);$('cpMore').onclick=()=>{limit+=20;load();};if(db)db.auth.onAuthStateChange(()=>setTimeout(()=>{load();const id=new URL(location.href).searchParams.get('pick');if(id)showDetail(id);},0));});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)load();});
 window.addEventListener('popstate',()=>{const id=new URL(location.href).searchParams.get('pick');if(id)showDetail(id);else closeDetail();});
 })();
