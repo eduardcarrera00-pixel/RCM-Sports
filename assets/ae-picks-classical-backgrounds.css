@@ -236,6 +236,12 @@ html body #footballTakes.ae-picks-editorial .ae-picks-rail #picksNews #picksNews
 }
 
 
+
+/* El texto compacto sólo existe visualmente en móvil: escritorio conserva su arte. */
+html body #footballTakes.ae-picks-editorial #communityPicks button#cpPublishCta.ae-cocina-art .ae-cocina-mobile-label {
+ display:none!important;
+}
+
 /* AE SPORTS · Picks móvil: Chef compacto y feed ancho · 2026-10-18 */
 @media (max-width:760px) {
  /* La anchura del contenido se dedica a pronósticos, no a márgenes redundantes. */
