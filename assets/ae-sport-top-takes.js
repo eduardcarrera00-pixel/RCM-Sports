@@ -151,22 +151,20 @@
      }
      return;
    }
-   const mobile=window.matchMedia('(max-width:760px)').matches;
-   if(mobile&&section==='NFL'){
-     const feed=$('freeTakes'),ranking=$('aeSportTakeRanking');
-     if(feed&&ranking?.parentElement===feed&&
-        (root.parentElement!==feed||root.nextElementSibling!==ranking)){
-       feed.insertBefore(root,ranking);
+   // NFL: las opiniones destacadas van justo debajo de "Demuestra tu conocimiento"
+   // y antes de los Takes publicados, tanto en escritorio como en teléfono.
+   // Mover el nodo existente conserva votos, comentarios y escuchas.
+   if(section==='NFL'){
+     const feed=$('freeTakes'),header=feed?.querySelector(':scope > .ae-takes-head');
+     if(feed&&header&&
+        (root.parentElement!==feed||root.previousElementSibling!==header)){
+       header.after(root);
      }
+     root.style.removeProperty('--ae-nfl-opinions-height');
      return;
    }
-   // NFL conserva su colocación editorial original. Fuera de los deportes,
-   // devolver el mismo nodo: no se duplican votos ni escuchas de eventos.
-   if(section==='NFL'){
-     if(root.parentElement!==sidebar||sidebar.firstElementChild!==root){
-       sidebar.insertBefore(root,sidebar.firstChild);
-     }
-   }else if(root.parentElement!==sidebar||desktopHomeMarker.nextSibling!==root){
+   // Al volver a la portada, restaurar el nodo en su sitio original.
+   if(root.parentElement!==sidebar||desktopHomeMarker.nextSibling!==root){
      desktopHomeMarker.after(root);
    }
  }
