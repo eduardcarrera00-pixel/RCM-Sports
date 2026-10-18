@@ -1525,21 +1525,13 @@ html body>header #aeNotificationsButton .ae-avisos-icon{
   pointer-events:none!important;
   transition:filter .16s ease,opacity .16s ease;
 }
-html body>header #aeNotificationsButton .ae-avisos-icon-white{display:none!important}
-html:not(.dark) body>header #aeNotificationsButton .ae-avisos-icon-gold{display:none!important}
-html:not(.dark) body>header #aeNotificationsButton .ae-avisos-icon-white{
-  display:block!important;opacity:.87!important;
-  filter:drop-shadow(0 1px 1px rgba(86,61,44,.56))!important;
-}
+html body>header #aeNotificationsButton .ae-avisos-icon-gold{display:block!important}
 html body>header #aeNotificationsButton .ae-notifications-caption{display:none!important}
 html body>header #aeNotificationsButton #aeNotificationsBadge:not([hidden]){
   top:-4px!important;right:-4px!important;
 }
-html.dark body>header #aeNotificationsButton:is(:hover,:focus-visible) .ae-avisos-icon-gold{
+html body>header #aeNotificationsButton:is(:hover,:focus-visible) .ae-avisos-icon-gold{
   opacity:.95!important;filter:brightness(.91) saturate(.88) contrast(.98)!important;
-}
-html:not(.dark) body>header #aeNotificationsButton:is(:hover,:focus-visible) .ae-avisos-icon-white{
-  opacity:.95!important;filter:drop-shadow(0 1px 1px rgba(86,61,44,.65))!important;
 }
 @media(max-width:760px){
   html body>header .ae-header-actions #aeNotificationsButton:not([hidden]){
@@ -1559,6 +1551,65 @@ html:not(.dark) body>header #aeNotificationsButton:is(:hover,:focus-visible) .ae
 }
 </style>
 <link rel="stylesheet" href="assets/ae-home-esports-standings.css?v=20261017-league-v1">
+<style id="ae-home-standings-simplified-20261017">
+/* Genios / Anoetos: compact title, no decorative stripe or secondary legend.
+   The two real tables, period controls and scrollable rankings remain intact. */
+html body.ae-is-home #aeHomeTopTakes .ae-top-takes-card,
+html.dark body.ae-is-home #aeHomeTopTakes .ae-top-takes-card{
+  border-top-width:1px!important;
+  border-top-color:rgba(215,169,123,.27)!important;
+}
+html:not(.dark) body.ae-is-home #aeHomeTopTakes .ae-top-takes-card{
+  border-top-width:1px!important;
+  border-top-color:rgba(155,120,91,.27)!important;
+}
+html body.ae-is-home #aeHomeTopTakes .ae-top-takes-card-head,
+html body.ae-is-home #aeHomeTopTakes .ae-top-takes-card.is-questioned .ae-top-takes-card-head,
+html.dark body.ae-is-home #aeHomeTopTakes .ae-top-takes-card-head{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  box-sizing:border-box!important;
+  min-height:39px!important;
+  height:auto!important;
+  margin:0!important;
+  padding:9px 13px 6px!important;
+  gap:0!important;
+  border:0!important;
+  border-bottom:0!important;
+  background:transparent!important;
+  background-image:none!important;
+  box-shadow:none!important;
+}
+html body.ae-is-home #aeHomeTopTakes .ae-top-takes-card-head h3{
+  margin:0!important;
+  padding:0!important;
+  line-height:1.12!important;
+}
+html body.ae-is-home #aeHomeTopTakes .ae-top-takes-grid{
+  margin-top:0!important;
+  padding-top:0!important;
+}
+/* Row separators can remain under user and points, but not below ranks. */
+html body.ae-is-home #aeHomeTopTakes .ae-points-table tbody td:first-child,
+html:not(.dark) body.ae-is-home #aeHomeTopTakes .ae-points-table tbody td:first-child{
+  border-bottom:0!important;
+  text-decoration:none!important;
+  box-shadow:none!important;
+}
+html body.ae-is-home #aeHomeTopTakes .ae-points-table .ae-points-rank{
+  border:0!important;
+  text-decoration:none!important;
+  box-shadow:none!important;
+}
+@media(max-width:760px){
+  html body.ae-is-home #aeHomeTopTakes .ae-top-takes-card-head,
+  html body.ae-is-home #aeHomeTopTakes .ae-top-takes-card.is-questioned .ae-top-takes-card-head{
+    min-height:35px!important;
+    padding:8px 12px 5px!important;
+  }
+}
+</style>
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 <a class="ae-skip-link" href="#mainContent">Ir al contenido</a>
@@ -1605,7 +1656,6 @@ html:not(.dark) body>header #aeNotificationsButton:is(:hover,:focus-visible) .ae
                       aria-label="Notificaciones" aria-controls="aeNotificationsDialog" aria-haspopup="dialog"
                       aria-expanded="false" title="Mis notificaciones">
                       <img class="ae-avisos-icon ae-avisos-icon-gold" src="assets/icons/ae-avisos-six-gold.webp?v=20261017-1" width="64" height="64" alt="" aria-hidden="true" decoding="async">
-                      <img class="ae-avisos-icon ae-avisos-icon-white" src="assets/icons/ae-avisos-six-white.webp?v=20261017-1" width="64" height="64" alt="" aria-hidden="true" decoding="async">
                       
                       <span id="aeNotificationsBadge" class="ae-notifications-badge" hidden></span>
                     </button>
@@ -1869,17 +1919,16 @@ html:not(.dark) body>header #aeNotificationsButton:is(:hover,:focus-visible) .ae
                 <button type="button" data-home-take-period="month" aria-pressed="false">Mensual</button>
                 <button type="button" data-home-take-period="all" aria-pressed="true">Histórico</button>
               </div>
-              <p class="ae-standings-explainer">Acierto = Takes acertados / Takes evaluados. Solo cuentan resultados confirmados, no votos.</p>
               <div class="ae-top-takes-grid">
                 <section class="ae-top-takes-card" aria-labelledby="aeTopTakesPositiveTitle">
-                  <header class="ae-top-takes-card-head"><div class="ae-standings-heading-wrap"><span class="ae-standings-kicker">Tabla de líderes</span><h3 id="aeTopTakesPositiveTitle">Genios</h3></div><p class="ae-standings-header-desc">Mayor puntuación · Top 10</p></header>
+                  <header class="ae-top-takes-card-head"><h3 id="aeTopTakesPositiveTitle">Genios</h3></header>
                   <div class="ae-points-table-scroll" tabindex="0" role="region" aria-label="Genios: clasificación por puntos, acierto y mejor Take, desplazable verticalmente">
                     <table class="ae-points-table"><colgroup><col class="ae-points-col-rank"><col class="ae-points-col-person"><col class="ae-points-col-rate"><col class="ae-points-col-score"></colgroup><thead class="ae-points-head-accessible"><tr><th scope="col">Pos.</th><th scope="col">Aficionado · Mejor Take</th><th scope="col">Acierto</th><th scope="col">Pts</th></tr></thead>
                     <tbody id="aeTopTakesPositive" aria-live="polite"><tr><td colspan="4" class="ae-points-table-empty">Cargando clasificación…</td></tr></tbody></table>
                   </div>
                 </section>
                 <section class="ae-top-takes-card is-questioned" aria-labelledby="aeTopTakesNegativeTitle">
-                  <header class="ae-top-takes-card-head"><div class="ae-standings-heading-wrap"><span class="ae-standings-kicker">Zona baja</span><h3 id="aeTopTakesNegativeTitle">Anoetos</h3></div><p class="ae-standings-header-desc">Menos puntos · Fuera del podio</p></header>
+                  <header class="ae-top-takes-card-head"><h3 id="aeTopTakesNegativeTitle">Anoetos</h3></header>
                   <div class="ae-points-table-scroll" tabindex="0" role="region" aria-label="Anoetos: clasificación de puntuaciones más bajas fuera del podio, desplazable verticalmente">
                     <table class="ae-points-table"><colgroup><col class="ae-points-col-rank"><col class="ae-points-col-person"><col class="ae-points-col-rate"><col class="ae-points-col-score"></colgroup><thead class="ae-points-head-accessible"><tr><th scope="col">Pos.</th><th scope="col">Aficionado · Mejor Take</th><th scope="col">Acierto</th><th scope="col">Pts</th></tr></thead>
                     <tbody id="aeTopTakesNegative" aria-live="polite"><tr><td colspan="4" class="ae-points-table-empty">Cargando clasificación…</td></tr></tbody></table>
