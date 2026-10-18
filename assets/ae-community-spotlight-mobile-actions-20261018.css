@@ -164,3 +164,52 @@ html body.ae-is-home #mainContent .editorial-community #communityLeaders .ae-com
     font-size:9px!important;
   }
 }
+
+
+/* Real reply totals beside ▲ / ▼. Neutral visual weight keeps voting primary. */
+html body.ae-is-home #mainContent .editorial-community #communityLeaders .ae-community-replies-count{
+  display:inline-flex!important;
+  box-sizing:border-box!important;
+  flex:0 0 auto!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:5px!important;
+  min-width:42px!important;
+  min-height:35px!important;
+  padding:7px 8px!important;
+  margin:0!important;
+  border:1px solid rgba(195,175,150,.46)!important;
+  border-radius:0!important;
+  background:rgba(8,29,42,.25)!important;
+  color:#e2d4c5!important;
+  font:700 11px/1 Inter,system-ui,sans-serif!important;
+  font-variant-numeric:tabular-nums!important;
+  white-space:nowrap!important;
+}
+html body.ae-is-home #mainContent .editorial-community #communityLeaders .ae-community-replies-count i{
+  font-size:12px!important;
+}
+html body.ae-is-home #mainContent .editorial-community #communityLeaders .ae-community-replies-count strong{
+  color:inherit!important;
+  font:inherit!important;
+}
+html:not(.dark) body.ae-is-home #mainContent .editorial-community #communityLeaders .ae-community-replies-count{
+  background:rgba(145,112,77,.06)!important;
+  border-color:rgba(119,95,70,.40)!important;
+  color:#67503c!important;
+}
+@media(max-width:640px){
+  html body.ae-is-home #mainContent .editorial-community #communityLeaders .ae-community-replies-count{
+    min-width:38px!important;
+    min-height:36px!important;
+    padding:6px 7px!important;
+    gap:4px!important;
+  }
+}
+@media(max-width:340px){
+  html body.ae-is-home #mainContent .editorial-community #communityLeaders .ae-community-replies-count{
+    min-width:34px!important;
+    padding:6px 5px!important;
+    font-size:10px!important;
+  }
+}
