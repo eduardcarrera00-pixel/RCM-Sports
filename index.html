@@ -1912,7 +1912,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
 <link rel="stylesheet" href="assets/ae-football-takes-order-20261018.css?v=20261018-mobile-two-takes-v1">
 <link rel="stylesheet" href="assets/ae-nfl-opinions-order-20261018.css?v=20261018-nfl-boards-v1">
 <link rel="stylesheet" href="assets/ae-nfl-takes-opinions-order-20261018.css?v=20261018-mobile-opinions-scroll-v1">
-<link rel="stylesheet" href="assets/ae-picks-feed-scroll-20261018.css?v=20261018-picks-feed-scroll-1">
+<link rel="stylesheet" href="assets/ae-picks-feed-scroll-20261018.css?v=20261018-picks-chefs-four-accuracy-2">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 <a class="ae-skip-link" href="#mainContent">Ir al contenido</a>
@@ -2077,10 +2077,10 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
                </div>
 
               <p id="cpStatus" role="status" aria-live="polite"></p>
-              <div id="cpFeed" role="region" aria-label="Picks activos de la comunidad; desplázate hacia abajo para ver más pronósticos" aria-live="polite"></div>
+              <div id="cpFeed" role="region" aria-label="Últimos Picks de la comunidad; desplázate para ver las publicaciones y el archivo" aria-live="polite">
+                <div id="cpFeedFooter" class="ae-picks-feed-footer"><button id="cpViewAll" class="ae-history-more" type="button">Ver todos los Picks <span aria-hidden="true">→</span></button></div>
+              </div>
               <p id="cpFeedScrollHint" hidden>Desliza hacia abajo para ver más Picks ↓</p>
-              <button id="cpMore" class="ae-take-button" type="button" hidden>Ver más Picks activos</button>
-              <button id="cpViewAll" class="ae-history-more" type="button">Ver todos los Picks <span aria-hidden="true">→</span></button>
               <!-- Dos tablas enfrentadas para la liga de Picks -->
               <div class="ae-chefs-dual-standings" role="group" aria-label="Clasificaciones de Mejores y Peores Chefs">
               <section class="ae-takes-side ae-inline-chefs-board" aria-labelledby="picksRankingTitle">
@@ -2093,8 +2093,8 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
                 <details class="ae-chefs-scoring-info"><summary>¿Cómo se calculan los puntos?</summary>
                 <p class="ae-picks-ranking-intro"><strong>¡Atención: fallar resta puntos!</strong> Publicar más Picks no da puntos por sí solo. Cada acierto suma el valor absoluto de la cuota americana ÷ 100; cada fallo resta esa misma cantidad; si se anula, 0 puntos. Ejemplo: una cuota +250 suma 2,50 puntos al acertar y resta 2,50 al fallar. <strong>Ranking mensual:</strong> empieza de cero el día 1 de cada mes (hora de Toronto, según la fecha de confirmación). <strong>Ranking histórico:</strong> conserva todos los resultados.</p>
                 </details>
-                <div class="ae-chefs-table-cols" aria-hidden="true"><span>POS.</span><span>AFICIONADO</span><span>PUNTOS / ACIERTOS</span></div>
-                <ol id="cpLeaderboard" class="ae-take-leaderboard-list" aria-live="polite"></ol>
+                <div class="ae-chefs-table-cols" aria-hidden="true"><span>POS.</span><span>AFICIONADO</span><span>PUNTOS / % ACIERTOS</span></div>
+                <ol id="cpLeaderboard" class="ae-take-leaderboard-list" role="region" aria-label="Ranking de Mejores Chefs; desplázate para consultar más puestos" aria-live="polite"></ol>
                 <button id="cpReload" type="button" class="ae-take-button">Actualizar</button>
               </section>
               <section class="ae-takes-side ae-inline-chefs-board ae-worst-chefs-board" aria-labelledby="cpWorstRankingTitle">
@@ -2105,8 +2105,8 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
                   <button id="cpWorstRankHistory" type="button" aria-pressed="false">Histórico</button>
                 </div>
                 <p class="ae-worst-chefs-intro">Los diez Chefs con menor puntuación por Picks confirmados.</p>
-                <div class="ae-chefs-table-cols" aria-hidden="true"><span>POS.</span><span>AFICIONADO</span><span>PUNTOS / ACIERTOS</span></div>
-                <ol id="cpWorstLeaderboard" class="ae-take-leaderboard-list" aria-live="polite"></ol>
+                <div class="ae-chefs-table-cols" aria-hidden="true"><span>POS.</span><span>AFICIONADO</span><span>PUNTOS / % ACIERTOS</span></div>
+                <ol id="cpWorstLeaderboard" class="ae-take-leaderboard-list" role="region" aria-label="Ranking de Peores Chefs; desplázate para consultar más puestos" aria-live="polite"></ol>
                 <button id="cpWorstReload" type="button" class="ae-take-button">Actualizar</button>
               </section>
               </div>
@@ -4142,7 +4142,7 @@ updateThemeButton();
 <script src="assets/community.js?v=20261016-admin-header-1"></script>
 <script src="assets/ae-home-community-spotlight.js?v=20261017-community-scroll-top10-1"></script>
 <script src="assets/champions.js?v=qa1-20261015-6"></script>
-<script src="assets/community-picks.js?v=20261018-scroll-one-and-half-1"></script>
+<script src="assets/community-picks.js?v=20261018-picks-footer-chefs-accuracy-2"></script>
 <script src="assets/weekly-picks.js?v=20261015-1"></script>
 <script src="assets/username-auth.js?v=20261016-reply-login-1"></script>
 <script src="assets/ae-category-visibility.js?v=20261016-dynamic-nav-1"></script>
