@@ -1730,7 +1730,12 @@ html:not(.dark) body>header #aeNotificationsButton:is(:hover,:focus-visible) .ae
                  <h3 id="cpTitle" class="sr-only">Picks de la comunidad</h3>
                  
                </div>
-              <!-- Clasificación debajo de ¿Eres Chef? -->
+
+              <p id="cpStatus" role="status" aria-live="polite"></p>
+              <div id="cpFeed" aria-live="polite"></div>
+              <button id="cpMore" class="ae-take-button" type="button" hidden>Ver más Picks activos</button>
+              <button id="cpViewAll" class="ae-history-more" type="button">Ver todos los Picks <span aria-hidden="true">→</span></button>
+              <!-- Clasificación al final, después de todos los Picks de la comunidad -->
               <section class="ae-takes-side ae-inline-chefs-board" aria-labelledby="picksRankingTitle">
                 <h3 id="picksRankingTitle">Mejores chefs</h3>
                 <div class="ae-takes-tabs" role="group" aria-label="Clasificación">
@@ -1743,10 +1748,6 @@ html:not(.dark) body>header #aeNotificationsButton:is(:hover,:focus-visible) .ae
                 <ol id="cpLeaderboard" class="ae-take-leaderboard-list" aria-live="polite"></ol>
                 <button id="cpReload" type="button" class="ae-take-button">Actualizar</button>
               </section>
-              <p id="cpStatus" role="status" aria-live="polite"></p>
-              <div id="cpFeed" aria-live="polite"></div>
-              <button id="cpMore" class="ae-take-button" type="button" hidden>Ver más Picks activos</button>
-              <button id="cpViewAll" class="ae-history-more" type="button">Ver todos los Picks <span aria-hidden="true">→</span></button>
             </section>
             <aside class="ae-picks-rail">
               <section class="ae-picks-top-three ae-picks-small-top ae-chef-board ae-chef-best" aria-labelledby="picksPopularTitle">
