@@ -206,3 +206,22 @@ html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeLeaders .ae-top-take-r
     min-height:26px!important;
   }
 }
+
+/* Títulos centrados en sus respectivos paneles de opiniones. */
+html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-chef-heading{
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ text-align:center!important;
+}
+html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-chef-heading h3{
+ flex:0 1 auto!important;width:100%!important;
+ text-align:center!important;margin:0!important;text-wrap:balance!important;
+}
+@media(max-width:760px){
+ html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-chef-heading{
+  min-height:86px!important;padding:10px 6px!important;
+  align-items:center!important;justify-content:center!important;
+ }
+ html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-chef-heading h3{
+  font-size:clamp(16px,4.1vw,21px)!important;line-height:1.13!important;
+ }
+}
