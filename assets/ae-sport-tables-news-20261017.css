@@ -1023,3 +1023,46 @@ html:not(.dark) body.ae-is-nfl #aeSportTakeRanking .is-rookie .ae-nfl-ranking-ta
     max-height:315px!important;
   }
 }
+
+
+/* Narrow desktop NFL rail: opinion entries read naturally beside news. */
+@media (min-width:961px) {
+  html body.ae-is-nfl #mainContent .editorial-layout > aside #aeSportTakeLeaders[data-sport="nfl"] .ae-sport-take-item.ae-sport-chef-entry {
+    grid-template-columns:26px minmax(0,1fr)!important;
+    gap:7px!important;
+    min-height:0!important;
+    padding:11px 0!important;
+  }
+  html body.ae-is-nfl #mainContent .editorial-layout > aside #aeSportTakeLeaders[data-sport="nfl"] .ae-top-take-number {
+    font-size:25px!important;
+  }
+  html body.ae-is-nfl #mainContent .editorial-layout > aside #aeSportTakeLeaders[data-sport="nfl"] .ae-top-take-content {
+    grid-template-columns:minmax(0,1fr)!important;
+    grid-template-rows:auto auto auto!important;
+    gap:5px!important;
+  }
+  html body.ae-is-nfl #mainContent .editorial-layout > aside #aeSportTakeLeaders[data-sport="nfl"] .ae-sport-take-meta {
+    grid-column:1!important;
+    grid-row:1!important;
+    display:flex!important;
+    flex-direction:row!important;
+    align-items:center!important;
+    flex-wrap:wrap!important;
+    gap:6px 11px!important;
+    width:100%!important;
+    height:auto!important;
+    margin:0!important;
+    padding:0!important;
+    border-right:0!important;
+  }
+  html body.ae-is-nfl #mainContent .editorial-layout > aside #aeSportTakeLeaders[data-sport="nfl"] .ae-sport-take-title {
+    grid-column:1!important;
+    grid-row:2!important;
+    min-width:0!important;
+    font-size:15px!important;
+  }
+  html body.ae-is-nfl #mainContent .editorial-layout > aside #aeSportTakeLeaders[data-sport="nfl"] .ae-sport-take-excerpt {
+    grid-column:1!important;
+    grid-row:3!important;
+  }
+}
