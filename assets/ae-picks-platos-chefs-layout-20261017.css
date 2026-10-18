@@ -1,0 +1,226 @@
+/* AE SPORTS · Ajustes puntuales de Picks: paneles de Platos y clasificaciones de Chefs.
+   La comunidad conserva todas sus publicaciones y acciones.
+   Se carga después de los estilos clásicos para resolver sus colisiones. */
+
+/* El encabezado de publicación queda como única cabecera; no existe ya un
+   segundo cartel fotográfico entre ¿Eres Chef? y los Picks publicados. */
+html body #footballTakes.ae-picks-editorial #communityPicks>.ae-picks-feed-heading{
+  box-sizing:border-box!important;
+  margin:0 0 13px!important;
+  padding:0!important;
+  border:0!important;
+  border-bottom:0!important;
+  background:none!important;
+}
+html body #footballTakes.ae-picks-editorial #communityPicks .ae-picks-heading-cta-row{
+  margin-bottom:0!important;
+}
+/* Paneles Platos: borde continuo en las 4 caras, sin brillos ni capas
+   recortadas. La cabecera cubre todo el ancho interior hasta el marco. */
+html body #footballTakes.ae-picks-editorial .ae-picks-rail>section.ae-chef-board.ae-chef-best,
+html body #footballTakes.ae-picks-editorial .ae-picks-rail>section.ae-chef-board.ae-chef-worst{
+  --ae-plates-frame:#e3d4c2;
+  display:block!important;
+  position:relative!important;
+  isolation:isolate!important;
+  box-sizing:border-box!important;
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  height:auto!important;
+  margin:0!important;
+  padding:0!important;
+  border:2px solid var(--ae-plates-frame)!important;
+  border-width:2px!important;
+  border-style:solid!important;
+  border-color:var(--ae-plates-frame)!important;
+  border-radius:0!important;
+  background:var(--picks-art-panel,#102938)!important;
+  background-image:none!important;
+  box-shadow:none!important;
+  outline:0!important;
+  filter:none!important;
+  overflow:hidden!important;
+}
+html body #footballTakes.ae-picks-editorial .ae-picks-rail>section.ae-chef-board::before,
+html body #footballTakes.ae-picks-editorial .ae-picks-rail>section.ae-chef-board::after{
+  content:none!important;
+  display:none!important;
+  background:none!important;
+  box-shadow:none!important;
+}
+/* Mejor Plato conserva su imagen artística, de lado a lado dentro del marco.
+   Peor Plato prescinde de la fotografía posterior a petición del usuario. */
+html body #footballTakes.ae-picks-editorial .ae-picks-rail>section.ae-chef-board .ae-picks-rail-heading{
+  display:grid!important;
+  position:relative!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  grid-template-rows:auto!important;
+  align-items:start!important;
+  justify-content:stretch!important;
+  gap:6px!important;
+  box-sizing:border-box!important;
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  min-height:112px!important;
+  margin:0!important;
+  padding:17px 15px!important;
+  border:0!important;
+  border-bottom:1px solid rgba(224,205,179,.35)!important;
+  border-radius:0!important;
+  background-color:var(--picks-art-panel,#102938)!important;
+  box-shadow:none!important;
+  overflow:hidden!important;
+}
+html body #footballTakes.ae-picks-editorial .ae-picks-rail>section.ae-chef-best .ae-picks-rail-heading{
+  background-image:url("ae-picks-best-plate-atlas.webp")!important;
+  background-size:auto 200%!important;
+  background-position:right top!important;
+  background-repeat:no-repeat!important;
+}
+html body #footballTakes.ae-picks-editorial .ae-picks-rail>section.ae-chef-worst .ae-picks-rail-heading{
+  background-image:none!important;
+  background:linear-gradient(135deg,#182e41,#2b3548)!important;
+}
+html body #footballTakes.ae-picks-editorial .ae-picks-rail>section.ae-chef-board .ae-picks-rail-heading h3{
+  position:relative!important;
+  grid-column:1!important;
+  grid-row:1!important;
+  align-self:start!important;
+  box-sizing:border-box!important;
+  min-width:0!important;
+  max-width:100%!important;
+  margin:0!important;
+  padding:0!important;
+  text-align:left!important;
+  color:var(--picks-art-ink,#f4e8db)!important;
+  font:600 clamp(22px,2.05vw,27px)/1.15 Newsreader,Georgia,serif!important;
+  text-shadow:none!important;
+}
+html body #footballTakes.ae-picks-editorial .ae-picks-rail>section.ae-chef-board .ae-picks-rail-heading .ae-chef-recetario{
+  position:static!important;
+  display:block!important;
+  grid-column:2!important;
+  grid-row:1!important;
+  justify-self:end!important;
+  align-self:start!important;
+  box-sizing:border-box!important;
+  width:max-content!important;
+  min-width:0!important;
+  max-width:100%!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  background:transparent!important;
+  text-align:right!important;
+  white-space:nowrap!important;
+  color:var(--picks-art-bronze,#d4ae83)!important;
+  font:750 9px/1.4 Inter,system-ui,sans-serif!important;
+  letter-spacing:.03em!important;
+}
+/* Scroll y estados vacíos no deben dejar blancos abiertos bajo el marco. */
+html body #footballTakes.ae-picks-editorial .ae-picks-rail>section.ae-chef-board ol.ae-chef-scroll{
+  box-sizing:border-box!important;
+  width:100%!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:0 12px!important;
+  background:var(--picks-art-panel,#102938)!important;
+  border:0!important;
+  border-radius:0!important;
+  scrollbar-width:thin!important;
+  scrollbar-color:rgba(203,160,119,.7) transparent!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+}
+html body #footballTakes.ae-picks-editorial .ae-picks-rail>section.ae-chef-board ol:not(.ae-chef-scroll){
+  box-sizing:border-box!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:115px!important;
+  margin:0!important;
+  padding:12px 14px!important;
+  background:var(--picks-art-panel,#102938)!important;
+  border:0!important;
+}
+/* Mejores y Peores Chefs: usar dos cabeceras ilustradas separadas, con la
+   clasificación intacta y los filtros Mensual / Histórico debajo. */
+html body #footballTakes.ae-picks-editorial #communityPicks>section.ae-inline-chefs-board{
+  box-sizing:border-box!important;
+  max-width:100%!important;
+  overflow:hidden!important;
+  border-radius:0!important;
+}
+html body #footballTakes.ae-picks-editorial #communityPicks>section.ae-inline-chefs-board h3#picksRankingTitle,
+html body #footballTakes.ae-picks-editorial #communityPicks>section.ae-inline-chefs-board h3#cpWorstRankingTitle{
+  box-sizing:border-box!important;
+  display:flex!important;
+  align-items:center!important;
+  width:calc(100% + 34px)!important;
+  max-width:none!important;
+  min-height:105px!important;
+  margin:-15px -17px 14px!important;
+  padding:18px 17px!important;
+  border:0!important;
+  border-bottom:1px solid rgba(202,173,144,.33)!important;
+  border-radius:0!important;
+  background-color:#132e3f!important;
+  background-size:auto 200%!important;
+  background-position:right top!important;
+  background-repeat:no-repeat!important;
+  color:#f4e8dd!important;
+  font:600 clamp(22px,2vw,27px)/1.14 Newsreader,Georgia,serif!important;
+  text-shadow:none!important;
+}
+html body #footballTakes.ae-picks-editorial #communityPicks>section.ae-inline-chefs-board h3#picksRankingTitle{
+  background-image:url("ae-picks-community-table-atlas.webp")!important;
+}
+html body #footballTakes.ae-picks-editorial #communityPicks>section.ae-worst-chefs-board h3#cpWorstRankingTitle{
+  background-image:url("ae-picks-worst-plate-atlas.webp")!important;
+  background-color:#243040!important;
+}
+html:not(.dark) body #footballTakes.ae-picks-editorial .ae-picks-rail>section.ae-chef-board.ae-chef-best,
+html:not(.dark) body #footballTakes.ae-picks-editorial .ae-picks-rail>section.ae-chef-board.ae-chef-worst{
+  --ae-plates-frame:#b59d81;
+  border-color:var(--ae-plates-frame)!important;
+  background:var(--picks-art-panel,#fffcf8)!important;
+}
+html:not(.dark) body #footballTakes.ae-picks-editorial .ae-picks-rail>section.ae-chef-best .ae-picks-rail-heading{
+  background-position:right bottom!important;
+}
+html:not(.dark) body #footballTakes.ae-picks-editorial .ae-picks-rail>section.ae-chef-worst .ae-picks-rail-heading{
+  background:linear-gradient(125deg,#fbf7f3,#ede5eb)!important;
+  border-bottom-color:rgba(163,130,140,.3)!important;
+}
+html:not(.dark) body #footballTakes.ae-picks-editorial #communityPicks>section.ae-inline-chefs-board h3#picksRankingTitle,
+html:not(.dark) body #footballTakes.ae-picks-editorial #communityPicks>section.ae-inline-chefs-board h3#cpWorstRankingTitle{
+  background-position:right bottom!important;
+  background-color:#fff9f2!important;
+  color:#3a4653!important;
+  border-bottom-color:rgba(126,104,94,.26)!important;
+}
+html:not(.dark) body #footballTakes.ae-picks-editorial .ae-picks-rail>section.ae-chef-board .ae-picks-rail-heading{
+  border-bottom-color:rgba(169,142,114,.35)!important;
+}
+@media(max-width:560px){
+  html body #footballTakes.ae-picks-editorial .ae-picks-rail>section.ae-chef-board .ae-picks-rail-heading{
+    min-height:99px!important;
+    padding:14px 12px!important;
+    grid-template-columns:minmax(0,1fr) auto!important;
+  }
+  html body #footballTakes.ae-picks-editorial .ae-picks-rail>section.ae-chef-board .ae-picks-rail-heading h3{
+    font-size:21px!important;
+  }
+  html body #footballTakes.ae-picks-editorial .ae-picks-rail>section.ae-chef-board .ae-picks-rail-heading .ae-chef-recetario{
+    font-size:8px!important;
+  }
+  html body #footballTakes.ae-picks-editorial #communityPicks>section.ae-inline-chefs-board h3#picksRankingTitle,
+  html body #footballTakes.ae-picks-editorial #communityPicks>section.ae-inline-chefs-board h3#cpWorstRankingTitle{
+    min-height:95px!important;
+    width:calc(100% + 26px)!important;
+    margin:-13px -13px 12px!important;
+    padding:15px 13px!important;
+    font-size:22px!important;
+  }
+}
