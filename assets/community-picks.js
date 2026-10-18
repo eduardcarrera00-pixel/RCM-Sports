@@ -246,30 +246,90 @@ function chefRankingScore(record,voids){
  label.append(el('span',accuracy===null?'—':accuracy+'%','ae-chef-accuracy '+tone));
  return label;
 }
-async function loadRanking(){
- const list=$('cpLeaderboard');if(!list)return;
- const [r,voids]=await Promise.all([
-   db.rpc('ae_pick_result_ranking',{p_period:currentRank}),
-   voidCountsForPeriod(currentRank).catch(()=>null)
- ]);
- if(r.error){list.replaceChildren(row('No fue posible cargar el ranking de resultados.','ae-cp-leader ae-cp-leader-empty'));return;}
- list.replaceChildren();
- if(!r.data?.length)list.append(row(currentRank==='month'?'Este mes todavía no hay resultados confirmados.':'Aún no hay pronósticos con resultados confirmados.','ae-cp-leader ae-cp-leader-empty'));
- for(const [i,x] of (r.data||[]).slice(0,10).entries()){
-   const li=el('li',null,'ae-cp-leader');
-   li.append(el('span',String(i+1).padStart(2,'0'),'ae-take-number'),
-     el('span',x.username||'Aficionado','ae-take-name'),
-     chefRankingScore(x,voids));
-   list.append(li);
+// Link every Chef to a public profile and to an actual settled Pick
+// from the selected period. Rankings aggregate Picks, so the Pick link
+// selects a representative result without inventing a 1:1 relationship.
+async function rankingRepresentativePicks(records,period,kind){
+ const ids=[...new Set(records.map(x=>x.user_id).filter(Boolean))];
+ const chosen=new Map();
+ if(!ids.length)return chosen;
+ const {data,error}=await db.from('ae_pick_feed')
+   .select('id,user_id,title,outcome,result_points,settled_at,created_at')
+   .in('user_id',ids).in('outcome',['won','lost'])
+   .order('settled_at',{ascending:false}).limit(1000);
+ if(error)return chosen;
+ const month=torontoMonth(new Date());
+ for(const p of data||[]){
+   if(!p.id||!p.user_id||period==='month'&&(!p.settled_at||torontoMonth(p.settled_at)!==month))continue;
+   const previous=chosen.get(p.user_id);
+   const preferred=kind==='best'?'won':'lost';
+   const relevance=q=>[
+     q.outcome===preferred?1:0,
+     kind==='best'?Number(q.result_points||0):-Number(q.result_points||0),
+     new Date(q.settled_at||q.created_at).getTime()||0
+   ];
+   if(!previous){chosen.set(p.user_id,p);continue;}
+   const now=relevance(p),old=relevance(previous);
+   if(now[0]>old[0]||now[0]===old[0]&&
+      (now[1]>old[1]||now[1]===old[1]&&now[2]>old[2]))chosen.set(p.user_id,p);
  }
+ return chosen;
+}
+function chefRankingEntry(record,index,voids,kind,picks){
+ const li=el('li',null,'ae-cp-leader'+(kind==='worst'?' ae-worst-chef-row':''));
+ const name=record.username||'Aficionado';
+ const person=el('div',null,'ae-chef-ranking-person');
+ if(record.user_id){
+   const profile=button(name,()=>{
+     if(typeof window.openAePublicProfile==='function')window.openAePublicProfile(record.user_id,true,'picks');
+   });
+   profile.className='ae-take-name ae-chef-profile-link';
+   profile.setAttribute('aria-label','Ver perfil y Picks de '+name);
+   profile.title='Perfil de '+name;
+   person.append(profile);
+ }else{
+   person.append(el('span',name,'ae-take-name'));
+ }
+ const selected=picks.get(record.user_id);
+ if(selected){
+   const pick=el('a','Ver Pick ↗','ae-chef-ranked-pick-link');
+   pick.href=link(selected.id);
+   pick.title=selected.title||'Abrir Pick del aficionado';
+   pick.setAttribute('aria-label','Abrir Pick de '+name+': '+(selected.title||'Pronóstico'));
+   pick.addEventListener('click',event=>{
+     if(event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;
+     event.preventDefault();
+     open(selected.id);
+   });
+   person.append(pick);
+ }
+ li.append(el('span',String(index+1).padStart(2,'0'),'ae-take-number'),
+   person,chefRankingScore(record,voids));
+ return li;
+}
+let bestRankingRequest=0;
+async function loadRanking(){
+ const list=$('cpLeaderboard');if(!list||!db)return;
+ const seq=++bestRankingRequest,period=currentRank;
+ const [r,voids]=await Promise.all([
+   db.rpc('ae_pick_result_ranking',{p_period:period}),
+   voidCountsForPeriod(period).catch(()=>null)
+ ]);
+ if(seq!==bestRankingRequest)return;
+ if(r.error){list.replaceChildren(row('No fue posible cargar el ranking de resultados.','ae-cp-leader ae-cp-leader-empty'));return;}
+ const records=(r.data||[]).slice(0,10);
+ const picks=await rankingRepresentativePicks(records,period,'best').catch(()=>new Map());
+ if(seq!==bestRankingRequest)return;
+ list.replaceChildren();
+ if(!records.length)list.append(row(period==='month'?'Este mes todavía no hay resultados confirmados.':'Aún no hay pronósticos con resultados confirmados.','ae-cp-leader ae-cp-leader-empty'));
+ records.forEach((record,index)=>list.append(chefRankingEntry(record,index,voids,'best',picks)));
  sizeChefRankingWindows();
 }
 /* Worst Chefs uses its own SQL order (ASC) and period.
    Never reverse the Best Chefs top ten; that would omit real bottom scorers. */
 async function loadWorstRanking(){
  const list=$('cpWorstLeaderboard');if(!list||!db)return;
- const seq=++worstRankingRequest;
- const period=currentWorstRank;
+ const seq=++worstRankingRequest,period=currentWorstRank;
  const [r,voids]=await Promise.all([
    db.rpc('ae_pick_result_ranking_worst',{p_period:period}),
    voidCountsForPeriod(period).catch(()=>null)
@@ -279,23 +339,18 @@ async function loadWorstRanking(){
    list.replaceChildren(row('No fue posible cargar la clasificación de Peores Chefs.','ae-cp-leader ae-cp-leader-empty'));
    return;
  }
+ const records=(r.data||[]).slice(0,10);
+ const picks=await rankingRepresentativePicks(records,period,'worst').catch(()=>new Map());
+ if(seq!==worstRankingRequest)return;
  list.replaceChildren();
- if(!r.data?.length){
+ if(!records.length){
    list.append(row(period==='month'
      ?'Este mes todavía no hay resultados confirmados.'
      :'Aún no hay pronósticos con resultados confirmados.',
      'ae-cp-leader ae-cp-leader-empty'));
    return;
  }
- for(const [i,x] of (r.data||[]).slice(0,10).entries()){
-   const li=el('li',null,'ae-cp-leader ae-worst-chef-row');
-   li.append(
-     el('span',String(i+1).padStart(2,'0'),'ae-take-number'),
-     el('span',x.username||'Aficionado','ae-take-name'),
-     chefRankingScore(x,voids)
-   );
-   list.append(li);
- }
+ records.forEach((record,index)=>list.append(chefRankingEntry(record,index,voids,'worst',picks)));
  sizeChefRankingWindows();
 }
 /* Clasificación editorial basada en votos netos reales, separada de los
