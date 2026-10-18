@@ -1659,3 +1659,63 @@ html body:is(.ae-is-nfl,.ae-is-football) #aeSportTakeRanking #aeNflTwinRankings 
   }
 }
 
+
+
+/* AE SPORTS · Corrección de nitidez: arte HD por panel, sin atlas (2026-10-18) */
+/* Antes: atlas 480x192, cada recorte 240x48, ampliado por 3x.
+   Ahora: cuatro fondos originales independientes >1200px con arte dinámico.
+   Mantener las tablas HTML, el scroll, los votos y los botones sin cambios. */
+html body:is(.ae-is-nfl,.ae-is-football) #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-header {
+  background-color:#0b2430!important;
+  background-repeat:no-repeat!important;
+  background-size:100% 100%,cover!important;
+  background-position:center,center 33%!important;
+  image-rendering:auto!important;
+}
+/* NFL Savant */
+html.dark body.ae-is-nfl #aeSportTakeRanking #aeNflTwinRankings .is-savant .ae-nfl-ranking-header {
+  background-image:linear-gradient(90deg,rgba(3,21,32,.96),rgba(5,28,41,.73) 57%,rgba(6,32,44,.16)),
+    url("atmospheres/ae-nfl-savant-reference.webp")!important;
+}
+/* NFL Rookie */
+html.dark body.ae-is-nfl #aeSportTakeRanking #aeNflTwinRankings .is-rookie .ae-nfl-ranking-header {
+  background-image:linear-gradient(90deg,rgba(27,24,29,.97),rgba(33,26,30,.78) 57%,rgba(30,21,26,.13)),
+    url("atmospheres/ae-nfl-rookie-reference.webp")!important;
+}
+/* Fútbol Respira */
+html.dark body.ae-is-football #aeSportTakeRanking #aeNflTwinRankings .is-savant .ae-nfl-ranking-header {
+  background-image:linear-gradient(90deg,rgba(3,22,33,.97),rgba(7,27,39,.80) 52%,rgba(7,25,38,.17)),
+    url("atmospheres/ae-respira-futbol-reference.webp")!important;
+}
+/* Fútbol Vende Humos */
+html.dark body.ae-is-football #aeSportTakeRanking #aeNflTwinRankings .is-rookie .ae-nfl-ranking-header {
+  background-image:linear-gradient(90deg,rgba(28,22,27,.97),rgba(35,25,30,.78) 52%,rgba(34,20,25,.19)),
+    url("atmospheres/ae-vende-humos-reference.webp")!important;
+}
+/* Modo claro: conservación de la ilustración HD con papel cálido, sin filtros de blur. */
+html:not(.dark) body:is(.ae-is-nfl,.ae-is-football) #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-header {
+  background-color:#f9f4e9!important;
+}
+html:not(.dark) body.ae-is-nfl #aeSportTakeRanking #aeNflTwinRankings .is-savant .ae-nfl-ranking-header {
+  background-image:linear-gradient(90deg,rgba(255,252,246,.96),rgba(255,250,242,.84) 53%,rgba(252,239,217,.42)),
+    url("atmospheres/ae-nfl-savant-reference.webp")!important;
+}
+html:not(.dark) body.ae-is-nfl #aeSportTakeRanking #aeNflTwinRankings .is-rookie .ae-nfl-ranking-header {
+  background-image:linear-gradient(90deg,rgba(255,252,246,.96),rgba(255,248,240,.85) 53%,rgba(248,227,209,.39)),
+    url("atmospheres/ae-nfl-rookie-reference.webp")!important;
+}
+html:not(.dark) body.ae-is-football #aeSportTakeRanking #aeNflTwinRankings .is-savant .ae-nfl-ranking-header {
+  background-image:linear-gradient(90deg,rgba(255,252,246,.96),rgba(255,250,242,.83) 53%,rgba(253,241,222,.35)),
+    url("atmospheres/ae-respira-futbol-reference.webp")!important;
+}
+html:not(.dark) body.ae-is-football #aeSportTakeRanking #aeNflTwinRankings .is-rookie .ae-nfl-ranking-header {
+  background-image:linear-gradient(90deg,rgba(255,252,246,.97),rgba(255,247,240,.87) 53%,rgba(255,231,211,.46)),
+    url("atmospheres/ae-vende-humos-reference.webp")!important;
+}
+/* Vista móvil: mantiene el motivo a la derecha y los títulos legibles. */
+@media(max-width:760px) {
+  html body:is(.ae-is-nfl,.ae-is-football) #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-header {
+    background-position:center,75% center!important;
+    background-size:100% 100%,cover!important;
+  }
+}
