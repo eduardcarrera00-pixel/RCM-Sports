@@ -53,7 +53,7 @@
   function icon(name){
     const i=node('i',null,'fa-solid '+name);i.setAttribute('aria-hidden','true');return i;
   }
-  function card(kind,row){
+  function card(kind,row,replyCounts){
     const questioned=kind==='questioned';
     const panel=node('article',null,'ae-community-spotlight '+(questioned?'is-questioned':'is-supported'));
     if(!row){
@@ -91,6 +91,17 @@
       b.append(node('span',direction===1?'▲':'▼'),node('strong',String(count)));
       b.onclick=()=>vote(row,direction);b.disabled=votePending.has(String(row.id));votes.append(b);
     }
+    // Replies to this exact comment, loaded from the public article discussion.
+    const replyCount=replyCounts?.get(String(row.id));
+    if(Number.isFinite(replyCount)){
+      const badge=node('span',null,'ae-community-replies-count');
+      badge.setAttribute('aria-label',replyCount===1?'1 respuesta':replyCount+' respuestas');
+      badge.title=replyCount===1?'1 respuesta':replyCount+' respuestas';
+      const symbol=node('i',null,'fa-regular fa-comment');
+      symbol.setAttribute('aria-hidden','true');
+      badge.append(symbol,node('strong',String(replyCount)));
+      votes.append(badge);
+    }
     const reply=node('button',null,'ae-community-reply');reply.type='button';
     reply.setAttribute('aria-label','Responder al comentario de '+(row.author||'Usuario'));
     const bubble=node('i',null,'fa-regular fa-comment');bubble.setAttribute('aria-hidden','true');
@@ -112,7 +123,26 @@
     if(error)throw error;
     return data||[];
   }
-  function scrollingLeaders(kind,rows){
+
+  // One batched read instead of one network request per displayed comment.
+  async function loadReplyCounts(positive,negative){
+    const ids=[...new Set([...positive,...negative].map(row=>String(row?.id||'')).filter(Boolean))];
+    if(!ids.length)return new Map();
+    try{
+      const {data,error}=await db.from('comments').select('parent_id').in('parent_id',ids);
+      if(error)throw error;
+      const counts=new Map(ids.map(id=>[id,0]));
+      for(const reply of data||[]){
+        const parent=String(reply.parent_id||'');
+        if(counts.has(parent))counts.set(parent,counts.get(parent)+1);
+      }
+      return counts;
+    }catch(error){
+      console.warn('No se pudo consultar el número de respuestas destacadas.',error);
+      return null; // Do not display invented zeroes if the read failed.
+    }
+  }
+  function scrollingLeaders(kind,rows,replyCounts){
     const questioned=kind==='questioned';
     const group=node('section',null,'ae-community-spotlight ae-community-scroll-group '+(questioned?'is-questioned':'is-supported'));
     const viewport=node('div',null,'ae-community-scroll-viewport');
@@ -125,7 +155,7 @@
     for(const row of rows){
       // Reuse the existing card unchanged: article links, votes, author and
       // reply actions still point to the original comment and publication.
-      const entry=card(kind,row);
+      const entry=card(kind,row,replyCounts);
       entry.className='ae-community-scroll-entry';
       entry.setAttribute('role','listitem');
       viewport.append(entry);
@@ -174,9 +204,11 @@
         loadLeadersByVote('upvotes'),loadLeadersByVote('downvotes')
       ]);
       if(request!==communityRequest)return;
+      const replyCounts=await loadReplyCounts(supported,questioned);
+      if(request!==communityRequest)return;
       target.replaceChildren(
-        scrollingLeaders('supported',supported),
-        scrollingLeaders('questioned',questioned)
+        scrollingLeaders('supported',supported,replyCounts),
+        scrollingLeaders('questioned',questioned,replyCounts)
       );
       for(const list of target.querySelectorAll('[data-community-scroll]')){
         list.scrollTop=positions.get(list.dataset.communityScroll)||0;
