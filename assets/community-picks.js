@@ -165,23 +165,81 @@ async function load(){
    const feed=await db.from('ae_pick_feed').select('*').gte('event_date',todayToronto()).eq('outcome','pending').order('created_at',{ascending:false}).order('id',{ascending:false}).range(0,limit-1);
    if(seq!==request)return;if(feed.error)throw feed.error;
    const feedEl=$('cpFeed'),previousScroll=feedEl.scrollTop;
-   feedEl.replaceChildren(...(feed.data||[]).map(p=>card(p)));
+   // The archive action is the final item INSIDE the scrolling list.
+   const footer=$('cpFeedFooter');
+   feedEl.replaceChildren(...(feed.data||[]).map(p=>card(p)),footer);
    sizeFeedWindow();
    // Voting refreshes the feed; don't throw readers back to the top.
    feedEl.scrollTop=previousScroll;
    $('cpStatus').textContent=feed.data?.length?'':'Todavía no hay Picks. Comparte el primero.';
-   $('cpMore').hidden=(feed.data?.length||0)<limit;
    loaded=true;
    await Promise.all([loadRanking(),loadWorstRanking(),loadModeration(),loadChefLists(),loadSettlement()]);
- }catch(e){if(seq!==request)return;$('cpFeed').replaceChildren();sizeFeedWindow();$('cpMore').hidden=true;$('cpStatus').textContent='No pudimos cargar los Picks. '+message(e);}
+ }catch(e){if(seq!==request)return;const footer=$('cpFeedFooter');$('cpFeed').replaceChildren(footer);sizeFeedWindow();$('cpStatus').textContent='No pudimos cargar los Picks. '+message(e);}
 }
 let currentRank='month';
 let currentWorstRank='month';
 let worstRankingRequest=0;
 function row(label,cls){const li=el('li',null,cls||'ae-cp-leader');li.append(el('span',label));return li;}
+// Show exactly four ranking entries inside each scroll viewport, while retaining
+// the full top ten. Actual row heights vary with screen width and font loading.
+function sizeChefRankingWindows(){
+ for(const id of ['cpLeaderboard','cpWorstLeaderboard']){
+   const list=$(id);if(!list)return;
+   const entries=Array.from(list.children).filter(e=>e.classList?.contains('ae-cp-leader')&&!e.classList?.contains('ae-cp-leader-empty'));
+   const height=entries.slice(0,4).reduce((sum,item)=>sum+item.getBoundingClientRect().height,0);
+   if(height>0)list.style.setProperty('--ae-four-chefs-height',Math.ceil(height)+'px');
+   else list.style.removeProperty('--ae-four-chefs-height');
+   list.tabIndex=entries.length>4?0:-1;
+ }
+}
+const torontoMonth=date=>{
+ const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Toronto',year:'numeric',month:'2-digit'}).formatToParts(new Date(date));
+ const find=type=>parts.find(p=>p.type===type)?.value||'';
+ return find('year')+'-'+find('month');
+};
+let voidResultCache=null;
+// Ranking RPCs include voided Picks in total_resolved; a void must NOT count
+// as a failed prediction when calculating win percentage. The public Picks
+// feed exposes settled outcomes already, so no database permissions change.
+async function voidCountsForPeriod(period){
+ if(!voidResultCache||Date.now()-voidResultCache.at>30000){
+   const pending=(async()=>{
+     const results=[];
+     for(let start=0;start<10000;start+=1000){
+       const {data,error}=await db.from('ae_pick_feed').select('user_id,settled_at')
+         .eq('moderation_status','approved').eq('outcome','void')
+         .not('settled_at','is',null).order('settled_at',{ascending:false})
+         .range(start,start+999);
+       if(error)throw error;
+       results.push(...(data||[]));
+       if((data||[]).length<1000)break;
+     }
+     return results;
+   })();
+   voidResultCache={at:Date.now(),pending};
+ }
+ let voids;
+ try{voids=await voidResultCache.pending;}
+ catch(error){voidResultCache=null;throw error;}
+ const counts=new Map(),thisMonth=torontoMonth(new Date());
+ for(const pick of voids){
+   if(period==='month'&&torontoMonth(pick.settled_at)!==thisMonth)continue;
+   counts.set(pick.user_id,(counts.get(pick.user_id)||0)+1);
+ }
+ return counts;
+}
+function chefAccuracy(record,voids){
+ if(!voids)return '—';
+ const decided=Math.max(0,Number(record.total_resolved||0)-(voids.get(record.user_id)||0));
+ const correct=Math.max(0,Number(record.correct_picks||0));
+ return decided>0?Math.round(100*correct/decided)+'% aciertos':'—';
+}
 async function loadRanking(){
  const list=$('cpLeaderboard');if(!list)return;
- const r=await db.rpc('ae_pick_result_ranking',{p_period:currentRank});
+ const [r,voids]=await Promise.all([
+   db.rpc('ae_pick_result_ranking',{p_period:currentRank}),
+   voidCountsForPeriod(currentRank).catch(()=>null)
+ ]);
  if(r.error){list.replaceChildren(row('No fue posible cargar el ranking de resultados.','ae-cp-leader ae-cp-leader-empty'));return;}
  list.replaceChildren();
  if(!r.data?.length)list.append(row(currentRank==='month'?'Este mes todavía no hay resultados confirmados.':'Aún no hay pronósticos con resultados confirmados.','ae-cp-leader ae-cp-leader-empty'));
@@ -189,9 +247,10 @@ async function loadRanking(){
    const li=el('li',null,'ae-cp-leader');
    li.append(el('span',String(i+1).padStart(2,'0'),'ae-take-number'),
      el('span',x.username||'Aficionado','ae-take-name'),
-     el('strong',Number(x.points||0).toFixed(2)+' pts · '+Number(x.correct_picks||0)+' aciertos'));
+     el('strong',Number(x.points||0).toFixed(2)+' pts · '+chefAccuracy(x,voids)));
    list.append(li);
  }
+ sizeChefRankingWindows();
 }
 /* Worst Chefs uses its own SQL order (ASC) and period.
    Never reverse the Best Chefs top ten; that would omit real bottom scorers. */
@@ -199,7 +258,10 @@ async function loadWorstRanking(){
  const list=$('cpWorstLeaderboard');if(!list||!db)return;
  const seq=++worstRankingRequest;
  const period=currentWorstRank;
- const r=await db.rpc('ae_pick_result_ranking_worst',{p_period:period});
+ const [r,voids]=await Promise.all([
+   db.rpc('ae_pick_result_ranking_worst',{p_period:period}),
+   voidCountsForPeriod(period).catch(()=>null)
+ ]);
  if(seq!==worstRankingRequest)return;
  if(r.error){
    list.replaceChildren(row('No fue posible cargar la clasificación de Peores Chefs.','ae-cp-leader ae-cp-leader-empty'));
@@ -218,10 +280,11 @@ async function loadWorstRanking(){
    li.append(
      el('span',String(i+1).padStart(2,'0'),'ae-take-number'),
      el('span',x.username||'Aficionado','ae-take-name'),
-     el('strong',Number(x.points||0).toFixed(2)+' pts · '+Number(x.correct_picks||0)+' aciertos')
+     el('strong',Number(x.points||0).toFixed(2)+' pts · '+chefAccuracy(x,voids))
    );
    list.append(li);
  }
+ sizeChefRankingWindows();
 }
 /* Clasificación editorial basada en votos netos reales, separada de los
    puntos de la liga semanal. Sólo pronósticos aprobados de esta semana. */
@@ -528,7 +591,7 @@ window.aeOpenPickDetail=(id)=>{
   history.pushState({pick:id},'',url.toString());
   void showDetail(String(id));
 };
-window.renderCommunityPicksVisibility=()=>{const root=$('communityPicks');if(!root)return;root.hidden=currentCategory!=='Picks';if(!root.hidden){if(!loaded)load();else requestAnimationFrame(sizeFeedWindow);}};
+window.renderCommunityPicksVisibility=()=>{const root=$('communityPicks');if(!root)return;root.hidden=currentCategory!=='Picks';if(!root.hidden){if(!loaded)load();else requestAnimationFrame(()=>{sizeFeedWindow();sizeChefRankingWindows();});}};
 function syncPickComposer(){
  const open=Boolean($('cpComposePanel')?.open);
  $('cpPublishCta')?.setAttribute('aria-expanded',String(open));
@@ -560,7 +623,7 @@ document.addEventListener('DOMContentLoaded',()=>{
  $('cpComposeClose')?.addEventListener('click',()=>closePickComposer());
  $('cpComposePanel')?.addEventListener('close',syncPickComposer);
  $('cpComposePanel')?.addEventListener('cancel',e=>{if(posting)e.preventDefault();});
- renderCommunityPicksVisibility();load();window.addEventListener('resize',sizeFeedWindow,{passive:true});$('cpReload')?.addEventListener('click',load);$('cpWorstReload')?.addEventListener('click',loadWorstRanking);$('cpViewAll')?.addEventListener('click',()=>{const dlg=$('cpArchiveDialog');if(dlg&&!dlg.open)dlg.showModal();archiveLimit=30;loadArchive();});$('cpArchiveClose')?.addEventListener('click',closeArchive);$('cpArchiveMore')?.addEventListener('click',()=>{archiveLimit+=30;loadArchive();});for(const [id,mode] of [['cpRankMonth','month'],['cpRankHistory','all']]){$(id)?.addEventListener('click',()=>{currentRank=mode;for(const [i,m] of [['cpRankMonth','month'],['cpRankHistory','all']])$(i)?.setAttribute('aria-pressed',String(currentRank===m));loadRanking();});}for(const [id,mode] of [['cpWorstRankMonth','month'],['cpWorstRankHistory','all']]){
+ renderCommunityPicksVisibility();load();window.addEventListener('resize',()=>{sizeFeedWindow();sizeChefRankingWindows();},{passive:true});if(document.fonts?.ready)document.fonts.ready.then(sizeChefRankingWindows);$('cpReload')?.addEventListener('click',load);$('cpWorstReload')?.addEventListener('click',loadWorstRanking);$('cpViewAll')?.addEventListener('click',()=>{const dlg=$('cpArchiveDialog');if(dlg&&!dlg.open)dlg.showModal();archiveLimit=30;loadArchive();});$('cpArchiveClose')?.addEventListener('click',closeArchive);$('cpArchiveMore')?.addEventListener('click',()=>{archiveLimit+=30;loadArchive();});for(const [id,mode] of [['cpRankMonth','month'],['cpRankHistory','all']]){$(id)?.addEventListener('click',()=>{currentRank=mode;for(const [i,m] of [['cpRankMonth','month'],['cpRankHistory','all']])$(i)?.setAttribute('aria-pressed',String(currentRank===m));loadRanking();});}for(const [id,mode] of [['cpWorstRankMonth','month'],['cpWorstRankHistory','all']]){
  $(id)?.addEventListener('click',()=>{
    currentWorstRank=mode;
    for(const [buttonId,buttonMode] of [['cpWorstRankMonth','month'],['cpWorstRankHistory','all']]){
@@ -569,7 +632,7 @@ document.addEventListener('DOMContentLoaded',()=>{
    void loadWorstRanking();
  });
 }
-const id=new URL(location.href).searchParams.get('pick');if(id)showDetail(id);$('cpMore').onclick=()=>{limit+=20;load();};if(db)db.auth.onAuthStateChange(()=>setTimeout(()=>{load();const id=new URL(location.href).searchParams.get('pick');if(id)showDetail(id);},0));});
+const id=new URL(location.href).searchParams.get('pick');if(id)showDetail(id);if(db)db.auth.onAuthStateChange(()=>setTimeout(()=>{load();const id=new URL(location.href).searchParams.get('pick');if(id)showDetail(id);},0));});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)load();});
 window.addEventListener('popstate',()=>{const id=new URL(location.href).searchParams.get('pick');if(id)showDetail(id);else closeDetail();});
 })();
