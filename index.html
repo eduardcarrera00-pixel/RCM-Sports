@@ -1668,72 +1668,7 @@ html body.ae-is-home #mainContent #aeTrendingPortada #trendingList .ae-trending-
   flex-shrink:0!important;
 }
 </style>
-<style id="ae-home-popular-hd-native-art">
-/* 2026-10-18 · Popular / Unpopular Takes · nítido, sin distorsionar el atlas.
-   Arte original 1774×887 (ocho sectores ~887×222). Anteriormente
-   background-size:200% 400% forzaba cada imagen a la relación de aspecto
-   de la cabecera. Ahora se recorta a la proporción original, sin estirarla.
-   Los títulos, votos y listados siguen siendo HTML dinámico. */
-@supports (width:1cqw) {
-  html body.ae-is-home #aeHomeTakeHighlights.ae-community-calm #aeHomeTakesPopular{
-    --ae-hd-pop-row:0;
-  }
-  html body.ae-is-home #aeHomeTakeHighlights.ae-community-calm #aeHomeTakesUnpopular{
-    --ae-hd-pop-row:1;
-  }
-  html body.ae-is-home #aeHomeTakeHighlights.ae-community-calm{
-    --ae-hd-pop-col:0;
-  }
-  html:not(.dark) body.ae-is-home #aeHomeTakeHighlights.ae-community-calm{
-    --ae-hd-pop-col:1;
-  }
-  html body.ae-is-home #aeHomeTakeHighlights.ae-community-calm
-    :is(#aeHomeTakesPopular,#aeHomeTakesUnpopular) .ae-vote-column-heading{
-    container-type:inline-size!important;
-    position:relative!important;
-    isolation:isolate!important;
-    overflow:hidden!important;
-    background-image:none!important;
-    background-color:var(--calm-head)!important;
-  }
-  html body.ae-is-home #aeHomeTakeHighlights.ae-community-calm
-    :is(#aeHomeTakesPopular,#aeHomeTakesUnpopular) .ae-vote-column-heading::before{
-    content:""!important;
-    display:block!important;
-    position:absolute!important;
-    z-index:0!important;
-    width:200cqw!important;
-    height:100cqw!important;
-    left:calc(var(--ae-hd-pop-col,0) * -100cqw)!important;
-    top:calc(50% - 12.5cqw - var(--ae-hd-pop-row,0) * 25cqw)!important;
-    background-image:url("assets/ae-community-banner-atlas.webp?v=20261018-native-crop")!important;
-    background-position:0 0!important;
-    background-size:100% 100%!important;
-    background-repeat:no-repeat!important;
-    filter:contrast(1.045) saturate(1.04)!important;
-    transform:none!important;
-    opacity:1!important;
-    pointer-events:none!important;
-    border:0!important;
-    box-shadow:none!important;
-  }
-  html body.ae-is-home #aeHomeTakeHighlights.ae-community-calm
-    :is(#aeHomeTakesPopular,#aeHomeTakesUnpopular) .ae-vote-column-heading h3{
-    position:relative!important;
-    z-index:1!important;
-  }
-  @media(max-width:440px){
-    /* Mantener un sector >=384×96 para llenar la cabecera en móviles estrechos. */
-    html body.ae-is-home #aeHomeTakeHighlights.ae-community-calm
-      :is(#aeHomeTakesPopular,#aeHomeTakesUnpopular) .ae-vote-column-heading::before{
-      width:768px!important;
-      height:384px!important;
-      left:calc(50% - 192px - var(--ae-hd-pop-col,0) * 384px)!important;
-      top:calc(50% - 48px - var(--ae-hd-pop-row,0) * 96px)!important;
-    }
-  }
-}
-</style>
+
 <style id="ae-picks-editorial-twins-league-20261017">
 /* Two equal editorial modules on the Picks page. */
 html body #footballTakes.ae-picks-editorial #aePicksTopPair{
