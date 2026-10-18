@@ -53,6 +53,9 @@
     const player=el('td');
     const user=el('button','@'+(r.username||'Aficionado'),'ae-points-user');
     user.type='button';
+    const avatar=el('span',String(r.username||'A').replace(/^@+/,'').slice(0,1).toUpperCase(),'ae-points-avatar');
+    avatar.setAttribute('aria-hidden','true');
+    user.prepend(avatar);
     user.setAttribute('aria-label','Ver perfil y Takes de '+(r.username||'Aficionado'));
     user.addEventListener('click',()=>window.openAePublicProfile?.(r.user_id));
     player.append(user);

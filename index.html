@@ -288,7 +288,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
     </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
-<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261016-mobile-photo-parity-2">
+<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261018-calm-portada-1">
     <link rel="stylesheet" href="assets/ae-muted-navigation-icons.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-custom-nav-icons.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-classical-auth-buttons.css?v=20261017-plates-phone-1">
@@ -1783,7 +1783,7 @@ html:not(.dark) body>header #aeNotificationsButton .ae-avisos-crown{fill:#a57244
                 </div>
 
                 <div id="editorialBottom" class="editorial-bottom">
-            <div id="aeHomeTakeHighlights" class="ae-home-take-highlights">
+            <div id="aeHomeTakeHighlights" class="ae-home-take-highlights ae-community-calm">
             <div class="ae-home-take-extras" aria-label="Destacados de Takes">
               <header id="aeHomeTakesSectionHeading" class="ae-top-takes-heading ae-takes-section-title">
                 <h2 id="aeHomeTopTakesTitle">Demuestra tu conocimiento</h2>
@@ -1804,14 +1804,14 @@ html:not(.dark) body>header #aeNotificationsButton .ae-avisos-crown{fill:#a57244
               </div>
               <div class="ae-top-takes-grid">
                 <section class="ae-top-takes-card" aria-labelledby="aeTopTakesPositiveTitle">
-                  <header class="ae-top-takes-card-head"><h3 id="aeTopTakesPositiveTitle">Genios</h3><span class="ae-points-top10-label">Top 10 · Más puntos</span></header>
+                  <header class="ae-top-takes-card-head"><h3 id="aeTopTakesPositiveTitle">Genios</h3></header>
                   <div class="ae-points-table-scroll" tabindex="0" role="region" aria-label="Genios: tabla de puestos por puntos, desplazable verticalmente">
                     <table class="ae-points-table"><colgroup><col class="ae-points-col-rank"><col class="ae-points-col-person"><col class="ae-points-col-score"></colgroup><thead class="ae-points-head-accessible"><tr><th scope="col">#</th><th scope="col">Aficionado · Mejor Take</th><th scope="col">Puntos</th></tr></thead>
                     <tbody id="aeTopTakesPositive" aria-live="polite"><tr><td colspan="3" class="ae-points-table-empty">Cargando clasificación…</td></tr></tbody></table>
                   </div>
                 </section>
                 <section class="ae-top-takes-card is-questioned" aria-labelledby="aeTopTakesNegativeTitle">
-                  <header class="ae-top-takes-card-head"><h3 id="aeTopTakesNegativeTitle">Anoetos</h3><span class="ae-points-top10-label">Top 10 · Menos puntos</span></header>
+                  <header class="ae-top-takes-card-head"><h3 id="aeTopTakesNegativeTitle">Anoetos</h3></header>
                   <div class="ae-points-table-scroll" tabindex="0" role="region" aria-label="Anoetos: tabla de puestos más bajos fuera del podio, desplazable verticalmente">
                     <table class="ae-points-table"><colgroup><col class="ae-points-col-rank"><col class="ae-points-col-person"><col class="ae-points-col-score"></colgroup><thead class="ae-points-head-accessible"><tr><th scope="col">#</th><th scope="col">Aficionado · Mejor Take</th><th scope="col">Puntos</th></tr></thead>
                     <tbody id="aeTopTakesNegative" aria-live="polite"><tr><td colspan="3" class="ae-points-table-empty">Cargando clasificación…</td></tr></tbody></table>
@@ -1858,8 +1858,8 @@ html:not(.dark) body>header #aeNotificationsButton .ae-avisos-crown{fill:#a57244
                     <span class="ae-ranking-hint">Selecciona para ver el Top 10 <span aria-hidden="true">→</span></span>
                 </a>
             </section>
-        <section class="rcm-panel editorial-trending" aria-labelledby="trendingTitle" hidden>
-    <div class="ae-section-heading"><span class="ae-overline">LA COMUNIDAD LEE</span><h2 id="trendingTitle">Lo más leído</h2></div>
+        <section id="aeTrendingPortada" class="rcm-panel editorial-trending ae-trending-portada" aria-labelledby="trendingTitle" hidden>
+    <div class="ae-section-heading"><h2 id="trendingTitle">Lo más leído</h2></div>
     <ol id="trendingList" class="ae-trending-list" aria-live="polite"></ol>
 </section>
                 </div>
@@ -3233,17 +3233,16 @@ currentUser = {
                   ? new Intl.DateTimeFormat('es-ES',{day:'numeric',month:'short',year:'numeric'}).format(new Date(article.createdAt)).replace(/\./g,'')
                   : '';
                 const byline = [day,article.author?'por '+article.author:''].filter(Boolean).join(' · ');
-                return '<li class="ae-trending-item">'
-                    + '<span class="ae-trending-rank" aria-hidden="true">' + String(index+1).padStart(2,'0') + '</span>'
+                return '<li class="ae-trending-item' + (index===0?' is-featured':'') + '">'
                     + '<button type="button" class="ae-trending-link" onclick="openArticleModal(' + articleIdArgument(article.id) + ')" aria-label="Leer noticia: ' + escapeHTML(article.title) + '">'
+                    + '<span class="ae-trending-image"><img src="' + escapeHTML(safeImageURL(article.image)) + '" alt="" loading="lazy" decoding="async" style="object-position:' + imagePosition(article) + ';--ae-trending-zoom:' + imageScale(article) + '" onerror="this.hidden=true"></span>'
+                    + '<span class="ae-trending-rank" aria-hidden="true">' + String(index+1).padStart(2,'0') + '</span>'
                     + '<span class="ae-trending-story">'
                     + '<span class="ae-trending-category">' + escapeHTML(article.category) + '</span>'
                     + '<span class="ae-trending-title">' + escapeHTML(article.title) + '</span>'
                     + (byline?'<span class="ae-trending-byline">'+escapeHTML(byline)+'</span>':'')
                     + '<span class="ae-trending-meta"><i class="fa-regular fa-eye" aria-hidden="true"></i> ' + reads.toLocaleString('es-ES') + ' ' + (reads===1?'lectura':'lecturas') + '</span>'
-                    + '</span>'
-                    + '<span class="ae-trending-open" aria-hidden="true"><span>Leer</span><span class="ae-trending-arrow">↗</span></span>'
-                    + '</button></li>';
+                    + '</span></button></li>';
             }).join('');
         }
 
@@ -3703,7 +3702,7 @@ updateThemeButton();
 <script src="assets/ae-take-rankings.js?v=20261017-football-dual-rankings-4"></script>
 <script src="assets/ae-editorial-weekly.js?v=20261016-odds-heading-1"></script>
 <script src="assets/ae-profile.js?v=20261016-recent-odds-compact-1"></script>
-<script src="assets/ae-home-takes.js?v=20261016-movement-2"></script>
+<script src="assets/ae-home-takes.js?v=20261018-calm-1"></script>
 <script src="assets/ae-home-take-discoveries.js?v=20261016-top10-community-1"></script>
 
 <script src="assets/ae-sport-top-takes.js?v=20261017-nfl-scroll-bottom-3"></script>
