@@ -35,7 +35,7 @@
       window.alert(e.message||'No se pudo guardar tu voto.');
     }finally{button.disabled=false;}
   }
-  function communityCard(t,kind){
+  function communityCard(t,kind,replyCounts){
     const item=make('li',null,'ae-top-take ae-community-popular-take');
     item.dataset.kind=kind;
     const content=make('div',null,'ae-top-take-content');
@@ -76,6 +76,16 @@
       b.addEventListener('click',()=>vote(t,dir,b));
       stats.append(b);
     }
+    const replyCount=replyCounts?.get(String(t.id));
+    if(Number.isFinite(replyCount)){
+      const indicator=make('span',null,'ae-top-take-reply-count');
+      indicator.setAttribute('aria-label',replyCount===1?'1 respuesta':replyCount+' respuestas');
+      indicator.title=replyCount===1?'1 respuesta':replyCount+' respuestas';
+      const bubble=make('i',null,'fa-regular fa-comment');
+      bubble.setAttribute('aria-hidden','true');
+      indicator.append(bubble,make('strong',String(replyCount)));
+      stats.append(indicator);
+    }
     const reply=make('button','Responder','ae-top-take-reply');
     reply.type='button';
     reply.setAttribute('aria-label','Responder al Take: '+(t.title||'Publicación'));
@@ -106,7 +116,7 @@
   function empty(target,message,isList=false){
     if(target)target.replaceChildren(make(isList?'li':'p',message,'ae-discovery-empty'));
   }
-  function render(data){
+  function render(data,replyCounts){
     const positive=$('aeHomeTakesPositiveList'),negative=$('aeHomeTakesNegativeList'),historic=$('aeHomeTakeHistoricTake');
     if(!positive||!negative||!historic)return;
     const rows=Array.isArray(data)?data:[];
@@ -114,7 +124,7 @@
       const list=rows.filter(r=>r?.kind===kind&&r.id)
         .sort((a,b)=>Number(a.rank_number)-Number(b.rank_number)).slice(0,10);
       if(!list.length){empty(target,message,true);return;}
-      target.replaceChildren(...list.map(t=>communityCard(t,kind)));
+      target.replaceChildren(...list.map(t=>communityCard(t,kind,replyCounts)));
     }
     ranked('positive',positive,'Todavía no hay Takes con votos positivos.');
     ranked('negative',negative,'Todavía no hay Takes con votos negativos.');
@@ -133,7 +143,21 @@
       const result=await db.rpc('ae_home_take_showcase');
       if(result.error)throw result.error;
       if(request!==sequence)return;
-      render(result.data);
+      const rows=Array.isArray(result.data)?result.data:[];
+      const takeIds=[...new Set(rows.filter(t=>t?.id && (t.kind==='positive'||t.kind==='negative')).map(t=>String(t.id)))];
+      let replyCounts=new Map();
+      if(takeIds.length){
+        const countsResult=await db.rpc('ae_public_take_reply_counts',{p_take_ids:takeIds});
+        if(countsResult.error){
+          // Rankings still work if the count endpoint is temporarily unavailable.
+          console.warn('No se pudo consultar el número de respuestas de los Takes.',countsResult.error);
+          replyCounts=null;
+        }else{
+          replyCounts=new Map((countsResult.data||[]).map(r=>[String(r.take_id),Math.max(0,Number(r.reply_count)||0)]));
+        }
+      }
+      if(request!==sequence)return;
+      render(rows,replyCounts);
       lastFetch=Date.now();
     }catch(error){
       empty($('aeHomeTakesPositiveList'),'No se pudieron cargar los Popular Takes.',true);
