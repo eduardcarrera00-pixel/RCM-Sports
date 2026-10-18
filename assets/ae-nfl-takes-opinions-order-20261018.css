@@ -291,3 +291,23 @@ html body.ae-is-nfl #mainContent #freeTakes > .ae-free-controls{
     --ae-visible-take-height:228px;
   }
 }
+/* Móvil NFL: el medallón Mi Take permanece pequeño y a la derecha. */
+@media(max-width:760px){
+  html body.ae-is-nfl #mainContent #freeTakes > .ae-takes-head{
+    grid-template-columns:minmax(0,1fr) 74px!important;
+  }
+  html body.ae-is-nfl #mainContent #freeTakes > .ae-takes-head > #aeSportTakePublish{
+    grid-column:2!important;
+    grid-row:1 / 4!important;
+    justify-self:end!important;
+    align-self:center!important;
+    width:72px!important;
+    height:72px!important;
+    min-width:72px!important;
+    min-height:72px!important;
+    max-width:72px!important;
+    max-height:72px!important;
+    font-size:11px!important;
+    white-space:nowrap!important;
+  }
+}
