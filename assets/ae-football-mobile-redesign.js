@@ -29,7 +29,7 @@
     const nflSection = document.body.classList.contains('ae-is-nfl');
     // NFL: Demuestra tu conocimiento, Savant/Rookie y después Top 10.
     // Se mueve el nodo real; votos, respuestas y usuarios mantienen sus eventos.
-    if(nflSection && takeFeed && standing?.parentElement === takeFeed){
+    if(onNfl && nflSection && takeFeed && standing?.parentElement === takeFeed){
       if(root.parentElement !== takeFeed || root.nextElementSibling !== standing){
         takeFeed.insertBefore(root,standing);
       }
