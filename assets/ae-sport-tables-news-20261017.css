@@ -871,9 +871,15 @@ html:not(.dark) body.ae-is-nfl #aeSportTakeRanking .ae-nfl-ranking-message td{co
   }
 }
 
+html body.ae-is-nfl #aeSportTakeRanking .ae-nfl-th-mobile {display:none!important;}
 @media (min-width:761px) {
-/* NFL standings are league tables, not narrative cards. This leaves the
+/* NFL standings are league tables, not narrative cards.
+ This leaves the
    single-table Football ranking and the existing monthly/history flow alone. */
+html body.ae-is-nfl #aeSportTakeRanking .ae-nfl-ranking-overline,
+html body.ae-is-nfl #aeSportTakeRanking .ae-nfl-ranking-header p {
+  display:none!important;
+}
 html body.ae-is-nfl #aeSportTakeRanking .ae-take-ranking-kicker,
 html body.ae-is-nfl #aeSportTakeRanking #aeSportTakeRankingDescription {
   display:none!important;
@@ -981,6 +987,12 @@ html:not(.dark) body.ae-is-nfl #aeSportTakeRanking .is-rookie .ae-nfl-ranking-ta
 }
 @media (max-width:760px) {
   /* Phone retains the former two-column ranking and stacked points. */
+  html body.ae-is-nfl #aeSportTakeRanking .ae-nfl-th-desktop {
+    display:none!important;
+  }
+  html body.ae-is-nfl #aeSportTakeRanking .ae-nfl-th-mobile {
+    display:inline!important;
+  }
   html body.ae-is-nfl #aeSportTakeRanking .ae-nfl-ranking-value,
   html body.ae-is-nfl #aeSportTakeRanking .ae-nfl-ranking-table th:last-child {
     display:none!important;
