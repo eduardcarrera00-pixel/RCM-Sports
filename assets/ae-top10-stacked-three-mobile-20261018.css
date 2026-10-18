@@ -1,0 +1,223 @@
+/* AE SPORTS | Rankings NFL y Fútbol (móvil): top 3 visibles por panel.
+   Orden natural Savant/Respira primero, Rookie/Vende Humos después.
+   Se preservan las diez filas reales de las tablas, el acceso al perfil,
+   variación de puestos, modo claro/oscuro y selección Mensual/Histórico.
+   No altera Picks ni la presentación de escritorio. */
+@media (max-width: 760px) {
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #aeSportTakeRanking #aeNflTwinRankings.ae-nfl-rankings-grid:not([hidden]) {
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    grid-template-rows:auto auto!important;
+    grid-auto-flow:row!important;
+    gap:16px!important;
+    align-items:start!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    overflow:visible!important;
+  }
+  /* Paneles a todo el ancho, uno debajo del otro. */
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #aeSportTakeRanking #aeNflTwinRankings > section.ae-nfl-ranking-panel {
+    display:flex!important;
+    flex-direction:column!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    height:auto!important;
+    max-height:none!important;
+    min-height:0!important;
+    padding:0!important;
+    margin:0!important;
+    overflow:hidden!important;
+    border-radius:0!important;
+  }
+  /* Encabezados escénicos de mayor tamaño, ilustraciones HD originales. */
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-header {
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:flex-start!important;
+    justify-content:center!important;
+    box-sizing:border-box!important;
+    min-height:108px!important;
+    height:108px!important;
+    max-height:108px!important;
+    padding:15px 19px!important;
+    text-align:left!important;
+    background-size:100% 100%,cover!important;
+  }
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-header h3 {
+    font-size:clamp(23px,6.1vw,29px)!important;
+    line-height:1.12!important;
+    max-width:80%!important;
+    margin:0!important;
+    text-align:left!important;
+    overflow-wrap:normal!important;
+  }
+  /* Tabla vertical con tres filas a la vista y siete accesibles con scroll. */
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-viewport {
+    --ae-rank-row-height:94px;
+    --ae-rank-colhead-height:32px;
+    box-sizing:border-box!important;
+    display:block!important;
+    width:100%!important;
+    min-width:0!important;
+    height:calc(var(--ae-rank-colhead-height) + 3 * var(--ae-rank-row-height) + 3px)!important;
+    max-height:calc(var(--ae-rank-colhead-height) + 3 * var(--ae-rank-row-height) + 3px)!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:0!important;
+    overflow-x:hidden!important;
+    overflow-y:auto!important;
+    scrollbar-width:thin!important;
+    scrollbar-color:rgba(199,155,112,.72) transparent!important;
+    overscroll-behavior-y:contain!important;
+    -webkit-overflow-scrolling:touch;
+    touch-action:pan-y!important;
+  }
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-table {
+    display:table!important;
+    table-layout:fixed!important;
+    border-collapse:collapse!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    height:auto!important;
+  }
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-table thead {
+    display:table-header-group!important;
+    position:sticky!important;
+    top:0!important;
+    z-index:2!important;
+    height:32px!important;
+  }
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-table thead tr {
+    display:table-row!important;
+  }
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-table th {
+    box-sizing:border-box!important;
+    height:32px!important;
+    padding:7px 12px!important;
+    text-align:left!important;
+    font-size:10px!important;
+    line-height:1.4!important;
+  }
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-table th:first-child {
+    width:54px!important;
+    text-align:center!important;
+  }
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-table th:nth-child(2) {
+    width:auto!important;
+  }
+  /* Ocultar columnas redundantes: porcentaje/puntos siguen visibles junto al usuario. */
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-table :is(th,td):nth-child(n+3) {
+    display:none!important;
+  }
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-table tbody {
+    display:table-row-group!important;
+  }
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-table tbody > tr.ae-nfl-ranking-row {
+    display:table-row!important;
+    width:100%!important;
+    height:94px!important;
+    min-height:94px!important;
+    max-height:94px!important;
+    background:transparent!important;
+  }
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-table tbody > tr.ae-nfl-ranking-row > td {
+    display:table-cell!important;
+    box-sizing:border-box!important;
+    height:94px!important;
+    min-height:94px!important;
+    max-height:94px!important;
+    padding:9px 12px!important;
+    vertical-align:middle!important;
+    border-bottom:1px solid rgba(199,158,116,.25)!important;
+  }
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-table tbody > tr.ae-nfl-ranking-row > td:nth-child(n+3) {
+    display:none!important;
+  }
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-table tbody > tr.ae-nfl-ranking-row > td:first-child {
+    width:54px!important;
+    text-align:center!important;
+  }
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-place strong {
+    font-size:21px!important;
+    line-height:1.1!important;
+  }
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #aeSportTakeRanking #aeNflTwinRankings .ae-esport-rank-change {
+    display:block!important;
+    margin-top:3px!important;
+    font-size:10px!important;
+    line-height:1.1!important;
+  }
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-user {
+    display:block!important;
+    width:100%!important;
+    max-width:100%!important;
+    margin:0!important;
+    font-size:14px!important;
+    line-height:1.2!important;
+    text-overflow:ellipsis!important;
+    overflow:hidden!important;
+    overflow-wrap:normal!important;
+    white-space:nowrap!important;
+  }
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-mobile-metrics {
+    display:flex!important;
+    align-items:baseline!important;
+    flex-wrap:wrap!important;
+    gap:3px 12px!important;
+    margin-top:5px!important;
+  }
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-score-mobile {
+    display:block!important;
+    margin-top:4px!important;
+    font-size:12px!important;
+    line-height:1.2!important;
+  }
+  html body.ae-is-nfl #mainContent #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-mobile-metrics .ae-nfl-ranking-score-mobile {
+    display:inline!important;
+    margin-top:0!important;
+  }
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-take {
+    display:block!important;
+    max-width:100%!important;
+    margin-top:4px!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+    font-size:11px!important;
+    line-height:1.25!important;
+  }
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-record {
+    display:block!important;
+    max-width:100%!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+    font-size:10px!important;
+    line-height:1.25!important;
+    margin-top:4px!important;
+  }
+  /* Destacar la primera posición sin convertirla en un botón. */
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-table tbody > tr.ae-nfl-ranking-row:first-child > td {
+    background:rgba(209,167,97,.12)!important;
+    border-bottom-color:rgba(216,176,115,.48)!important;
+  }
+  html:not(.dark) body:is(.ae-is-nfl,.ae-is-football) #mainContent #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-table tbody > tr.ae-nfl-ranking-row:first-child > td {
+    background:rgba(218,183,130,.25)!important;
+  }
+  /* Estados vacíos: evitar grandes huecos si no hay tres participantes. */
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-viewport:has(tbody > tr.ae-nfl-ranking-message) {
+    height:auto!important;
+    min-height:90px!important;
+    max-height:none!important;
+    overflow-y:hidden!important;
+  }
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #aeSportTakeRanking #aeNflTwinRankings tbody > tr.ae-nfl-ranking-message > td {
+    display:table-cell!important;
+    height:auto!important;
+    padding:22px 16px!important;
+  }
+}
