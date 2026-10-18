@@ -22,6 +22,8 @@
      footballCycles.delete(list);
    }
    list.classList.remove('ae-football-cyclic');
+   list.style.removeProperty('--ae-cycle-count');
+   list.style.removeProperty('scroll-behavior');
  }
  function startFootballCycle(list,items,mode){
    if(!items.length)return;
@@ -32,6 +34,7 @@
      'Top 3 Vende Humos; desplaza las opiniones en bucle');
    if(items.length<2)return;
    list.classList.add('ae-football-cyclic');
+   list.style.setProperty('--ae-cycle-count',String(Math.min(3,items.length)));
    // Two copies let the final item transition back to the first one
    // without a visual jump, and never duplicate votes or database records.
    for(let i=0;i<items.length;i++){
