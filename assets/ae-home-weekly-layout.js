@@ -65,6 +65,8 @@
 
     function openPicks(event){
       if(!onMobileHome() || !featured.contains(event.target))return;
+      // Share is a real action: never let the parent card steal the tap.
+      if(event.target.closest?.('.ae-weekly-share'))return;
       if(event.type === 'keydown' && !['Enter',' '].includes(event.key))return;
       event.preventDefault();
       event.stopImmediatePropagation();
