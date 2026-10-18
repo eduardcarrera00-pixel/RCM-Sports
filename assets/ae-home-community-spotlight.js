@@ -78,13 +78,10 @@
     panel.append(node('blockquote',body.length>185?body.slice(0,185).trimEnd()+'…':body,'ae-community-quote'));
 
     const footer=node('div',null,'ae-community-card-footer');
+    // Fila 1: perfil; fila 2: ▲ y ▼ a la izquierda, Responder a la derecha.
     const left=node('div',null,'ae-community-user-actions');
     left.append(node('span',row.author||'Usuario','ae-community-author'));
-    const reply=node('button',null,'ae-community-reply');reply.type='button';
-    reply.setAttribute('aria-label','Responder al comentario de '+(row.author||'Usuario'));
-    const bubble=node('i',null,'fa-regular fa-comment');bubble.setAttribute('aria-hidden','true');
-    reply.append(bubble,node('span','Responder'));reply.onclick=()=>openStory(row,true);left.append(reply);
-
+    const actions=node('div',null,'ae-community-controls');
     const votes=node('div',null,'ae-community-votes');
     for(const direction of [1,-1]){
       const b=node('button',null,'ae-community-vote '+(direction===1?'is-up':'is-down'));b.type='button';
@@ -94,7 +91,12 @@
       b.append(node('span',direction===1?'▲':'▼'),node('strong',String(count)));
       b.onclick=()=>vote(row,direction);b.disabled=votePending.has(String(row.id));votes.append(b);
     }
-    footer.append(left,votes);panel.append(footer);return panel;
+    const reply=node('button',null,'ae-community-reply');reply.type='button';
+    reply.setAttribute('aria-label','Responder al comentario de '+(row.author||'Usuario'));
+    const bubble=node('i',null,'fa-regular fa-comment');bubble.setAttribute('aria-hidden','true');
+    reply.append(bubble,node('span','Responder'));reply.onclick=()=>openStory(row,true);
+    actions.append(votes,reply);
+    footer.append(left,actions);panel.append(footer);return panel;
   }
 
   // Use the same publicly visible, vote-aggregated comments as the old
@@ -137,6 +139,27 @@
     group.append(viewport);
     return group;
   }
+  // Una entrada completa debe caber en cada ventana con scroll vertical.
+  // La altura se calcula usando el comentario más alto, no un recorte fijo.
+  function fitCommunityViewports(){
+    const target=document.getElementById('communityLeaders');
+    if(!target)return;
+    for(const viewport of target.querySelectorAll('[data-community-scroll]')){
+      const cards=[...viewport.querySelectorAll(':scope > .ae-community-scroll-entry')];
+      if(!cards.length)continue;
+      const required=Math.max(260,...cards.map(card=>Math.ceil(card.getBoundingClientRect().height)))+5;
+      viewport.style.setProperty('--ae-community-visible-card-height',required+'px');
+    }
+  }
+  let fitQueued=false;
+  function scheduleCommunityFit(){
+    if(fitQueued)return;
+    fitQueued=true;
+    requestAnimationFrame(()=>{fitQueued=false;fitCommunityViewports();});
+  }
+  window.addEventListener('resize',scheduleCommunityFit,{passive:true});
+  if(document.fonts?.ready)document.fonts.ready.then(scheduleCommunityFit);
+
   refreshCommunity=async function(){
     if(!db)return;
     const request=++communityRequest;
@@ -158,6 +181,7 @@
       for(const list of target.querySelectorAll('[data-community-scroll]')){
         list.scrollTop=positions.get(list.dataset.communityScroll)||0;
       }
+      scheduleCommunityFit();
     }catch{
       if(request===communityRequest)target.replaceChildren(node('p','No pudimos cargar los comentarios destacados. Volveremos a intentarlo.','ae-community-empty'));
     }
