@@ -597,7 +597,7 @@ html body:is(.ae-is-nfl,.ae-is-football) #freeTakes #aeNflTakeFooterCta #aeSport
   }
 }
 </style>
-    <link rel="stylesheet" href="assets/ae-chef-platos-scroll.css?v=20261017-best-worst-plates-photo-restore-2">
+    <link rel="stylesheet" href="assets/ae-chef-platos-scroll.css?v=20261017-feed-scroll-chefs-below-3">
 <link rel="stylesheet" href="assets/ae-take-rankings-palette.css?v=20261016-duel-3">
 <link rel="stylesheet" href="assets/ae-home-takes-restructure.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-home-rankings-vivid.css?v=20261016-1">
@@ -1730,6 +1730,19 @@ html:not(.dark) body>header #aeNotificationsButton:is(:hover,:focus-visible) .ae
                  <h3 id="cpTitle" class="sr-only">Picks de la comunidad</h3>
                  
                </div>
+              <!-- Clasificación debajo de ¿Eres Chef? -->
+              <section class="ae-takes-side ae-inline-chefs-board" aria-labelledby="picksRankingTitle">
+                <h3 id="picksRankingTitle">Mejores chefs</h3>
+                <div class="ae-takes-tabs" role="group" aria-label="Clasificación">
+                  <button id="cpRankMonth" type="button" aria-pressed="true">Mensual</button>
+                  <button id="cpRankHistory" type="button" aria-pressed="false">Histórico</button>
+                </div>
+                <details class="ae-chefs-scoring-info"><summary>¿Cómo se calculan los puntos?</summary>
+                <p class="ae-picks-ranking-intro"><strong>¡Atención: fallar resta puntos!</strong> Publicar más Picks no da puntos por sí solo. Cada acierto suma el valor absoluto de la cuota americana ÷ 100; cada fallo resta esa misma cantidad; si se anula, 0 puntos. Ejemplo: una cuota +250 suma 2,50 puntos al acertar y resta 2,50 al fallar. <strong>Ranking mensual:</strong> empieza de cero el día 1 de cada mes (hora de Toronto, según la fecha de confirmación). <strong>Ranking histórico:</strong> conserva todos los resultados.</p>
+                </details>
+                <ol id="cpLeaderboard" class="ae-take-leaderboard-list" aria-live="polite"></ol>
+                <button id="cpReload" type="button" class="ae-take-button">Actualizar</button>
+              </section>
               <p id="cpStatus" role="status" aria-live="polite"></p>
               <div id="cpFeed" aria-live="polite"></div>
               <button id="cpMore" class="ae-take-button" type="button" hidden>Ver más Picks activos</button>
@@ -1745,16 +1758,6 @@ html:not(.dark) body>header #aeNotificationsButton:is(:hover,:focus-visible) .ae
                 <ol id="picksQuestioned" aria-live="polite"><li class="ae-chef-empty">Cargando clasificación…</li></ol>
               </section>
 
-              <section class="ae-takes-side" aria-labelledby="picksRankingTitle">
-                <h3 id="picksRankingTitle">Mejores chefs</h3>
-                <div class="ae-takes-tabs" role="group" aria-label="Clasificación">
-                  <button id="cpRankMonth" type="button" aria-pressed="true">Mensual</button>
-                  <button id="cpRankHistory" type="button" aria-pressed="false">Histórico</button>
-                </div>
-                <p class="ae-picks-ranking-intro"><strong>¡Atención: fallar resta puntos!</strong> Publicar más Picks no da puntos por sí solo. Cada acierto suma el valor absoluto de la cuota americana ÷ 100; cada fallo resta esa misma cantidad; si se anula, 0 puntos. Ejemplo: una cuota +250 suma 2,50 puntos al acertar y resta 2,50 al fallar. <strong>Ranking mensual:</strong> empieza de cero el día 1 de cada mes (hora de Toronto, según la fecha de confirmación). <strong>Ranking histórico:</strong> conserva todos los resultados.</p>
-                <ol id="cpLeaderboard" class="ae-take-leaderboard-list" aria-live="polite"></ol>
-                <button id="cpReload" type="button" class="ae-take-button">Actualizar</button>
-              </section>
               <section id="cpModeration" class="ae-picks-top-three" hidden aria-labelledby="cpModerationTitle">
                 <h3 id="cpModerationTitle">Administrar cuotas</h3><p>Revisa las cuotas cuando corresponda; la comunidad puede votar y comentar mientras tanto.</p>
                 <div id="cpPending"></div>
@@ -3776,7 +3779,7 @@ updateThemeButton();
 <script src="assets/community.js?v=20261016-admin-header-1"></script>
 <script src="assets/ae-home-community-spotlight.js?v=20261017-community-scroll-top10-1"></script>
 <script src="assets/champions.js?v=qa1-20261015-6"></script>
-<script src="assets/community-picks.js?v=20261017-plates-top10-empty-1"></script>
+<script src="assets/community-picks.js?v=20261017-feed-scroll-chefs-below-3"></script>
 <script src="assets/weekly-picks.js?v=20261015-1"></script>
 <script src="assets/username-auth.js?v=20261016-reply-login-1"></script>
 <script src="assets/ae-category-visibility.js?v=20261016-dynamic-nav-1"></script>

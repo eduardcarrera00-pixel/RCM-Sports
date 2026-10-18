@@ -174,7 +174,7 @@ function paintChefList(id,result,kind){
    target.append(row(good?'Aún no hay Picks con votos netos positivos esta semana.':'Aún no hay Picks con votos netos negativos esta semana.','ae-chef-empty'));
    return;
  }
- const scrollable=picks.length>1;
+ const scrollable=picks.length>3;
  // Mantiene el mismo diseño fotográfico con una o varias posiciones.
  // Solo habilitamos interacción de desplazamiento cuando hay más de un Pick.
  target.classList.add('ae-chef-scroll');
@@ -187,8 +187,7 @@ function paintChefList(id,result,kind){
  const updateHint=()=>{
    if(!hint)return;
    hint.hidden=!scrollable;
-   const index=Math.min(picks.length,1+Math.round(target.scrollTop/Math.max(1,target.clientHeight)));
-   hint.textContent=String(index).padStart(2,'0')+' / '+String(picks.length).padStart(2,'0')+' · Desliza ↑↓';
+   hint.textContent='Desliza para ver más ↓';
  };
  target.onscroll=updateHint;
  for(const [index,p] of picks.entries()){
@@ -211,7 +210,6 @@ function paintChefList(id,result,kind){
      e.preventDefault();
      open(p.id);
    };
-   const rank=el('span',String(index+1).padStart(2,'0'),'ae-popular-position');
    const info=el('div',null,'ae-popular-copy');
    // Aquí el nombre es informativo; el acceso al perfil queda dentro del detalle.
    const chef=el('span','@'+(p.author||'Aficionado'),'ae-chef-author');
@@ -225,11 +223,10 @@ function paintChefList(id,result,kind){
       p.american_odds!=='' && Number.isFinite(americanOdds) && americanOdds!==0){
      authorRow.append(el('span','Cuota '+(americanOdds>0?'+':'')+americanOdds,'ae-chef-odds'));
    }
-   info.append(
-     el('span',good?'EL PLATO APLAUDIDO':'EL PLATO EN DEBATE','ae-chef-plate-kicker'),
-     authorRow,pick,votes
-   );
-   item.append(rank,info,entryLink);
+   const meta=el('div',null,'ae-chef-card-footer');
+   meta.append(votes,el('span','Ver Pick ↗','ae-chef-card-open'));
+   info.append(authorRow,pick,meta);
+   item.append(info,entryLink);
    target.append(item);
    updateHint();
  }
