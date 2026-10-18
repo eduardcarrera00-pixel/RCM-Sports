@@ -19,8 +19,9 @@
    list.style.removeProperty('scroll-behavior');
    list.tabIndex=0;
    list.setAttribute('role','region');
+   const phone=window.matchMedia('(max-width:760px)').matches;
    list.setAttribute('aria-label',(mode==='up'?'Opiniones populares':'Opiniones impopulares')+
-     ' de Fútbol; '+items.length+' entradas. Desliza para consultar las demás.');
+     ' de Fútbol; '+items.length+' entradas. Desliza hacia la '+(phone?'derecha':'parte inferior')+' para consultar las demás.');
  }
  let desktopHomeMarker=null;
  let nflAlignFrame=0;
@@ -97,6 +98,7 @@
    const football=list.closest('#aeSportTakeLeaders')?.dataset.sport==='football';
    const sport=football?'football':'nfl';
    const savedTop=list.dataset.renderSport===sport?list.scrollTop:0;
+   const savedLeft=list.dataset.renderSport===sport?list.scrollLeft:0;
    list.classList.remove('ae-football-cyclic');
    list.style.removeProperty('--ae-cycle-count');
    list.style.removeProperty('scroll-behavior');
@@ -156,11 +158,14 @@
    }else if(list.closest('#aeSportTakeLeaders')?.dataset.sport==='nfl'){
      list.tabIndex=0;
      list.setAttribute('role','region');
-     list.setAttribute('aria-label',mode==='up'?'Opiniones apoyadas de NFL, desplazar hacia abajo':'Opiniones hateadas de NFL, desplazar hacia abajo');
+     const phone=window.matchMedia('(max-width:760px)').matches;
+     list.setAttribute('aria-label',(mode==='up'?'Opiniones apoyadas':'Opiniones hateadas')+
+       ' de NFL; '+items.length+' entradas. Desliza hacia '+(phone?'la derecha':'abajo')+' para consultar las demás.');
    }else{
      list.removeAttribute('tabindex'); list.removeAttribute('role'); list.removeAttribute('aria-label');
    }
-   if(football && savedTop>0)list.scrollTop=savedTop;
+   if(football && savedTop>0 && !window.matchMedia('(max-width:760px)').matches)list.scrollTop=savedTop;
+   if(savedLeft>0 && window.matchMedia('(max-width:760px)').matches)list.scrollLeft=savedLeft;
    if(!items.length)list.append(el('li',mode==='up'?
      'Aún no hay Takes con votos netos positivos.':
      'Aún no hay Takes con votos netos negativos.','ae-top-takes-empty'));
