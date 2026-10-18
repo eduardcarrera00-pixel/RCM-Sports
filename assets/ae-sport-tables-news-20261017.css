@@ -1729,3 +1729,57 @@ html body.ae-is-nfl #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-heade
     background-position:center,center center!important;
   }
 }
+
+
+/* ae-mobile-takes-order-v5 · 2026-10-18
+   Solo teléfono. La cabecera Demuestra tu conocimiento va primero,
+   opiniones apoyadas/hateadas (o populares/impopulares) después, a continuación
+   los Takes recientes y finalmente las clasificaciones. Ocultar sólo los
+   filtros redundantes, NO ocultar las publicaciones de la comunidad. */
+@media (max-width:760px) {
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > .ae-free-controls,
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > #aeTakesFeedHeading {
+    display:none!important;
+  }
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > #aeSportTakeLeaders.ae-sport-chefs:not([hidden]) {
+    margin:4px 0 9px!important;
+    width:100%!important;
+  }
+
+  /* NFL: las dos opiniones crecen de 207px a 274px y siguen con scroll. */
+  html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeLeaders[data-sport="nfl"] .ae-sport-takes-grid {
+    height:274px!important;
+    min-height:274px!important;
+    align-items:stretch!important;
+  }
+  html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeLeaders[data-sport="nfl"] .ae-sport-takes-grid > .ae-sport-chef-card {
+    height:274px!important;
+    min-height:274px!important;
+    max-height:274px!important;
+  }
+  html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeLeaders[data-sport="nfl"] ol.ae-sport-takes-list {
+    flex:1 1 auto!important;
+    min-height:0!important;
+    height:0!important;
+    overflow-y:auto!important;
+  }
+
+  /* Takes recientes en el medio, antes de Savant/Rookie o Respira/Vende Humos. */
+  html body.ae-is-nfl #mainContent #freeTakes > #freeTakesFeed,
+  html body.ae-is-football #mainContent #aeFootballMobileStage #freeTakes > #freeTakesFeed {
+    box-sizing:border-box!important;
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    margin:10px auto 12px!important;
+    row-gap:8px!important;
+  }
+  html body.ae-is-football #mainContent #aeFootballMobileStage #freeTakes > #freeTakesFeed > article:nth-child(-n+2) {
+    display:flex!important;
+  }
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > #aeSportTakeRanking {
+    margin-top:12px!important;
+  }
+}
