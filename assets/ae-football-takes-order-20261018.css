@@ -1,0 +1,99 @@
+/* AE SPORTS · Fútbol: clasificaciones bajo el editor de Takes, antes del historial.
+   Los componentes son los originales: sus votos, respuestas y datos siguen vivos. */
+@media (min-width:761px) {
+  html body.ae-is-football #mainContent .editorial-layout {
+    display:block!important;
+    width:100%!important;
+    min-width:0!important;
+  }
+  html body.ae-is-football #mainContent .editorial-layout>div:first-child {
+    display:block!important;
+    width:100%!important;
+    max-width:none!important;
+    min-width:0!important;
+    margin:0!important;
+  }
+  html body.ae-is-football #mainContent .editorial-layout>aside {
+    display:none!important;
+  }
+  html body.ae-is-football #mainContent #freeTakes > #aeSportTakeLeaders.ae-sport-chefs:not([hidden]){
+    display:block!important;
+    width:100%!important;
+    margin:15px 0 22px!important;
+  }
+  html body.ae-is-football #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-takes-grid{
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    align-items:stretch!important;
+    gap:14px!important;
+  }
+  html body.ae-is-football #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-chef-card{
+    min-width:0!important;
+    height:100%!important;
+  }
+  html body.ae-is-football #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-takes-list{
+    max-height:300px!important;
+    min-height:205px!important;
+    overflow-y:auto!important;
+    overscroll-behavior:contain;
+  }
+}
+@media (max-width:760px) {
+  html body.ae-is-football #mainContent #freeTakes > #aeSportTakeLeaders.ae-sport-chefs:not([hidden]){
+    display:block!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    margin:12px 0 17px!important;
+    padding:0!important;
+  }
+  html body.ae-is-football #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-takes-grid{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:11px!important;
+  }
+  html body.ae-is-football #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-chef-card{
+    border-radius:0!important;
+    min-width:0!important;
+    padding:0!important;
+  }
+  html body.ae-is-football #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-chef-heading{
+    padding:13px 14px!important;
+    min-height:61px!important;
+  }
+  html body.ae-is-football #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-takes-list{
+    display:block!important;
+    max-height:260px!important;
+    min-height:0!important;
+    overflow-y:auto!important;
+    overscroll-behavior:contain;
+    padding:2px 12px 8px!important;
+  }
+  html body.ae-is-football #mainContent #freeTakes > #aeSportTakeLeaders .ae-sport-takes-list > li:nth-child(n+2){
+    display:grid!important;
+  }
+  html body.ae-is-football #mainContent #freeTakes #aeTakesFeedHeading{
+    display:block!important;
+    margin:15px 0 9px!important;
+    font:600 22px/1.12 Newsreader,Georgia,serif!important;
+  }
+  html body.ae-is-football #mainContent #freeTakes .ae-free-controls{
+    display:flex!important;
+    flex-wrap:wrap!important;
+    margin-bottom:10px!important;
+  }
+  html body.ae-is-football #mainContent #freeTakes #freeTakesFeed{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:9px!important;
+  }
+  html body.ae-is-football #mainContent #freeTakes #freeTakesFeed > article:nth-child(n+3){
+    display:flex!important;
+  }
+  html body.ae-is-football #mainContent #freeTakes #freeTakesStatus{
+    display:block!important;
+  }
+  html body.ae-is-football #mainContent .editorial-community,
+  html body.ae-is-football #mainContent #aeFootballMobileStage .editorial-community{
+    display:none!important;
+  }
+}
