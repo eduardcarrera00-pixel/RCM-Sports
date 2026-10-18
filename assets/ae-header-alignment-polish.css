@@ -103,3 +103,27 @@ html body footer a.ae-brand-runner-clean .ae-runner-wordmark{
     color:#f1dfc7!important;
   }
 }
+
+
+/* 2026-10-17 · Login emblem slightly smaller, without shrinking the tap target.
+   The current label, spacing, and header alignment stay unchanged. */
+@media (min-width:761px){
+  html body>header #guestAdminContainer>button.ae-login-art-control .ae-login-emblem{
+    width:30px!important;
+    min-width:30px!important;
+    max-width:30px!important;
+    height:25px!important;
+    min-height:25px!important;
+    max-height:25px!important;
+  }
+}
+@media (max-width:760px){
+  html body>header #guestAdminContainer>button.ae-login-art-control .ae-login-emblem{
+    width:29px!important;
+    min-width:29px!important;
+    max-width:29px!important;
+    height:24px!important;
+    min-height:24px!important;
+    max-height:24px!important;
+  }
+}
