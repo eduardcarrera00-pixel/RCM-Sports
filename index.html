@@ -1912,6 +1912,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
 <link rel="stylesheet" href="assets/ae-football-takes-order-20261018.css?v=20261018-football-boards-v2">
 <link rel="stylesheet" href="assets/ae-nfl-opinions-order-20261018.css?v=20261018-nfl-boards-v1">
 <link rel="stylesheet" href="assets/ae-nfl-takes-opinions-order-20261018.css?v=20261018-nfl-head-opinions-feed-1">
+<link rel="stylesheet" href="assets/ae-picks-feed-scroll-20261018.css?v=20261018-picks-feed-scroll-1">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 <a class="ae-skip-link" href="#mainContent">Ir al contenido</a>
@@ -2076,7 +2077,8 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
                </div>
 
               <p id="cpStatus" role="status" aria-live="polite"></p>
-              <div id="cpFeed" aria-live="polite"></div>
+              <div id="cpFeed" role="region" aria-label="Picks activos de la comunidad; desplázate hacia abajo para ver más pronósticos" aria-live="polite"></div>
+              <p id="cpFeedScrollHint" hidden>Desliza hacia abajo para ver más Picks ↓</p>
               <button id="cpMore" class="ae-take-button" type="button" hidden>Ver más Picks activos</button>
               <button id="cpViewAll" class="ae-history-more" type="button">Ver todos los Picks <span aria-hidden="true">→</span></button>
               <!-- Dos tablas enfrentadas para la liga de Picks -->
@@ -4140,7 +4142,7 @@ updateThemeButton();
 <script src="assets/community.js?v=20261016-admin-header-1"></script>
 <script src="assets/ae-home-community-spotlight.js?v=20261017-community-scroll-top10-1"></script>
 <script src="assets/champions.js?v=qa1-20261015-6"></script>
-<script src="assets/community-picks.js?v=20261017-plates-top15-recipe-copy-1"></script>
+<script src="assets/community-picks.js?v=20261018-scroll-one-and-half-1"></script>
 <script src="assets/weekly-picks.js?v=20261015-1"></script>
 <script src="assets/username-auth.js?v=20261016-reply-login-1"></script>
 <script src="assets/ae-category-visibility.js?v=20261016-dynamic-nav-1"></script>
