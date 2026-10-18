@@ -1187,6 +1187,146 @@ html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeRanking{
 </style>
 <link rel="stylesheet" href="assets/ae-sport-tables-news-20261017.css?v=20261017-nfl-twin-top10-1">
 <link rel="stylesheet" href="assets/ae-article-actions-conversation.css?v=20261017-compact-2">
+<style id="ae-home-sun-takes-trending-polish">
+/* Sun artwork: the mode toggle itself should not frame the sun. */
+html body>header #themeToggle.ae-theme-sun-unframed,
+html body>header #themeToggle:has(#themeIcon[src*="ae-sol-gold"]){
+  border:0!important;border-color:transparent!important;border-radius:0!important;
+  background:transparent!important;box-shadow:none!important;
+  outline:none!important;
+}
+html body>header #themeToggle.ae-theme-sun-unframed #themeIcon,
+html body>header #themeToggle:has(#themeIcon[src*="ae-sol-gold"]) #themeIcon{
+  border:0!important;background:transparent!important;box-shadow:none!important;
+}
+html body>header #themeToggle.ae-theme-sun-unframed:focus-visible,
+html body>header #themeToggle:has(#themeIcon[src*="ae-sol-gold"]):focus-visible{
+  outline:2px solid #eac18e!important;outline-offset:3px!important;
+}
+/* Genios / Anoetos: visually remove the column legend but preserve
+   screen-reader table headers and the original 3-column alignment. */
+html body.ae-is-home #aeHomeTopTakes .ae-points-table>thead.ae-points-head-accessible{
+  position:absolute!important;width:1px!important;height:1px!important;
+  overflow:hidden!important;clip:rect(0,0,0,0)!important;clip-path:inset(50%)!important;
+  white-space:nowrap!important;margin:-1px!important;padding:0!important;
+  border:0!important;background:transparent!important;
+}
+html body.ae-is-home #aeHomeTopTakes .ae-points-table>colgroup>.ae-points-col-rank{width:39px!important}
+html body.ae-is-home #aeHomeTopTakes .ae-points-table>colgroup>.ae-points-col-score{width:89px!important}
+/* Only this invitation is gently rounded; site cards stay square. */
+html body.ae-is-home #editorialBottom #aeHomeTakeHighlights .ae-home-take-bottom-cta #aeHomeTakePublish{
+  border-radius:11px!important;
+  min-height:47px!important;
+  border-color:#e8bc82!important;
+  background:linear-gradient(105deg,#efc991,#d5a06b)!important;
+  color:#1b3241!important;
+  box-shadow:0 6px 18px rgba(195,126,61,.23),inset 0 1px rgba(255,255,255,.32)!important;
+  transition:transform .18s ease,box-shadow .18s ease,filter .18s ease!important;
+}
+html body.ae-is-home #editorialBottom #aeHomeTakeHighlights .ae-home-take-bottom-cta #aeHomeTakePublish:hover{
+  transform:translateY(-2px)!important;
+  box-shadow:0 8px 24px rgba(195,126,61,.32),inset 0 1px rgba(255,255,255,.40)!important;
+}
+/* Most-read: a single actionable row, clear direction and aligned affordance. */
+html body.ae-is-home #mainContent #trendingList>.ae-trending-item{
+  display:grid!important;
+  grid-template-columns:25px minmax(0,1fr)!important;
+  align-items:stretch!important;
+  gap:10px!important;
+  margin:0!important;
+  padding:9px 0!important;
+}
+html body.ae-is-home #mainContent #trendingList .ae-trending-rank{
+  display:flex!important;align-items:flex-start!important;justify-content:center!important;
+  padding-top:11px!important;
+  font:650 19px/1 Newsreader,Georgia,serif!important;
+  color:#d5a06d!important;
+}
+html body.ae-is-home #mainContent #trendingList button.ae-trending-link{
+  box-sizing:border-box!important;
+  display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;
+  align-items:center!important;column-gap:12px!important;
+  width:100%!important;min-width:0!important;
+  min-height:72px!important;padding:10px 12px!important;
+  border:1px solid rgba(198,159,119,.29)!important;border-radius:0!important;
+  background:rgba(24,51,68,.43)!important;
+  text-align:left!important;cursor:pointer!important;
+  transition:background .16s ease,border-color .16s ease!important;
+}
+html body.ae-is-home #mainContent #trendingList button.ae-trending-link:hover,
+html body.ae-is-home #mainContent #trendingList button.ae-trending-link:focus-visible{
+  background:rgba(50,82,96,.54)!important;
+  border-color:#d2a679!important;outline-offset:2px!important;
+}
+html body.ae-is-home #mainContent #trendingList .ae-trending-story{
+  display:grid!important;gap:3px!important;min-width:0!important;
+}
+html body.ae-is-home #mainContent #trendingList .ae-trending-title{
+  display:-webkit-box!important;-webkit-box-orient:vertical!important;
+  -webkit-line-clamp:2!important;overflow:hidden!important;
+  margin:0!important;max-width:100%!important;
+  font:600 16px/1.18 Newsreader,Georgia,serif!important;
+  white-space:normal!important;overflow-wrap:anywhere!important;
+}
+html body.ae-is-home #mainContent #trendingList .ae-trending-byline{
+  color:#c2cbd0!important;font:400 10px/1.35 Inter,system-ui,sans-serif!important;
+}
+html body.ae-is-home #mainContent #trendingList .ae-trending-meta{
+  margin-top:3px!important;color:#dbb78f!important;
+  font:600 10px/1.2 Inter,system-ui,sans-serif!important;
+}
+html body.ae-is-home #mainContent #trendingList .ae-trending-open{
+  display:flex!important;flex-direction:column!important;
+  align-items:center!important;justify-content:center!important;
+  gap:5px!important;min-width:39px!important;min-height:42px!important;
+  margin-left:2px!important;padding-left:10px!important;
+  border-left:1px solid rgba(204,163,123,.27)!important;
+  color:#eac18f!important;font:750 10px/1 Inter,system-ui,sans-serif!important;
+}
+html body.ae-is-home #mainContent #trendingList .ae-trending-arrow{
+  display:grid!important;place-items:center!important;
+  width:30px!important;height:30px!important;min-height:30px!important;
+  border:1px solid rgba(229,179,123,.67)!important;border-radius:0!important;
+  color:#f1c99b!important;background:rgba(146,94,51,.22)!important;
+  font:750 18px/1 Inter,system-ui,sans-serif!important;
+}
+html:not(.dark) body.ae-is-home #mainContent #trendingList .ae-trending-rank{color:#8c613f!important}
+html:not(.dark) body.ae-is-home #mainContent #trendingList button.ae-trending-link{
+  background:#fff9f0!important;border-color:#ddc3a6!important;
+}
+html:not(.dark) body.ae-is-home #mainContent #trendingList button.ae-trending-link:hover,
+html:not(.dark) body.ae-is-home #mainContent #trendingList button.ae-trending-link:focus-visible{
+  background:#f2e8d9!important;border-color:#bb8554!important;
+}
+html:not(.dark) body.ae-is-home #mainContent #trendingList .ae-trending-byline{color:#63717b!important}
+html:not(.dark) body.ae-is-home #mainContent #trendingList .ae-trending-meta{color:#906440!important}
+html:not(.dark) body.ae-is-home #mainContent #trendingList .ae-trending-open{color:#805332!important;border-left-color:#ddc3a6!important}
+html:not(.dark) body.ae-is-home #mainContent #trendingList .ae-trending-arrow{
+  color:#6f482a!important;background:#f6eadb!important;border-color:#cda47b!important;
+}
+@media(max-width:760px){
+  html body.ae-is-home #aeHomeTopTakes .ae-points-table>colgroup>.ae-points-col-rank{width:33px!important}
+  html body.ae-is-home #aeHomeTopTakes .ae-points-table>colgroup>.ae-points-col-score{width:79px!important}
+  html body.ae-is-home #mainContent #trendingList>.ae-trending-item,
+  html body.ae-is-home #mainContent>#aeHomeTrendingMobileFooter #trendingList>.ae-trending-item{
+    grid-template-columns:20px minmax(0,1fr)!important;gap:8px!important;
+  }
+  html body.ae-is-home #mainContent #trendingList button.ae-trending-link{
+    padding:10px!important;column-gap:8px!important;
+  }
+  html body.ae-is-home #mainContent #trendingList .ae-trending-title{font-size:15px!important}
+  html body.ae-is-home #mainContent #trendingList .ae-trending-open{
+    min-width:31px!important;padding-left:7px!important;
+  }
+  html body.ae-is-home #mainContent #trendingList .ae-trending-arrow{width:27px!important;height:27px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  html body.ae-is-home #mainContent #trendingList button.ae-trending-link,
+  html body.ae-is-home #editorialBottom #aeHomeTakeHighlights .ae-home-take-bottom-cta #aeHomeTakePublish{
+    transition:none!important;transform:none!important;
+  }
+}
+</style>
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 <a class="ae-skip-link" href="#mainContent">Ir al contenido</a>
@@ -1500,14 +1640,14 @@ html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeRanking{
                 <section class="ae-top-takes-card" aria-labelledby="aeTopTakesPositiveTitle">
                   <header class="ae-top-takes-card-head"><h3 id="aeTopTakesPositiveTitle">Genios</h3><span class="ae-points-top10-label">Top 10 · Más puntos</span></header>
                   <div class="ae-points-table-scroll" tabindex="0" role="region" aria-label="Genios: tabla de puestos por puntos, desplazable verticalmente">
-                    <table class="ae-points-table"><thead><tr><th scope="col">#</th><th scope="col">Aficionado · Mejor Take</th><th scope="col">Puntos</th></tr></thead>
+                    <table class="ae-points-table"><colgroup><col class="ae-points-col-rank"><col class="ae-points-col-person"><col class="ae-points-col-score"></colgroup><thead class="ae-points-head-accessible"><tr><th scope="col">#</th><th scope="col">Aficionado · Mejor Take</th><th scope="col">Puntos</th></tr></thead>
                     <tbody id="aeTopTakesPositive" aria-live="polite"><tr><td colspan="3" class="ae-points-table-empty">Cargando clasificación…</td></tr></tbody></table>
                   </div>
                 </section>
                 <section class="ae-top-takes-card is-questioned" aria-labelledby="aeTopTakesNegativeTitle">
                   <header class="ae-top-takes-card-head"><h3 id="aeTopTakesNegativeTitle">Anoetos</h3><span class="ae-points-top10-label">Top 10 · Menos puntos</span></header>
                   <div class="ae-points-table-scroll" tabindex="0" role="region" aria-label="Anoetos: tabla de puestos más bajos fuera del podio, desplazable verticalmente">
-                    <table class="ae-points-table"><thead><tr><th scope="col">#</th><th scope="col">Aficionado · Mejor Take</th><th scope="col">Puntos</th></tr></thead>
+                    <table class="ae-points-table"><colgroup><col class="ae-points-col-rank"><col class="ae-points-col-person"><col class="ae-points-col-score"></colgroup><thead class="ae-points-head-accessible"><tr><th scope="col">#</th><th scope="col">Aficionado · Mejor Take</th><th scope="col">Puntos</th></tr></thead>
                     <tbody id="aeTopTakesNegative" aria-live="polite"><tr><td colspan="3" class="ae-points-table-empty">Cargando clasificación…</td></tr></tbody></table>
                   </div>
                 </section>
@@ -2917,8 +3057,10 @@ currentUser = {
         function renderTrending() {
             const container = document.getElementById('trendingList');
             if (!container) return;
+            // "Lo más leído" is based on recorded opens, not reactions.
+            // A tie is resolved by the publication date.
             const ranked = articles.filter(article => article.remote && article.title)
-                .sort((a,b) => (Number(b.likes)||0) - (Number(a.likes)||0)
+                .sort((a,b) => (Number(b.views)||0) - (Number(a.views)||0)
                     || new Date(b.createdAt) - new Date(a.createdAt))
                 .slice(0,5);
             if (!ranked.length) {
@@ -2926,20 +3068,22 @@ currentUser = {
                 return;
             }
             container.innerHTML = ranked.map((article, index) => {
-                const likes = Number(article.likes)||0;
+                const reads = Math.max(0, Number(article.views)||0);
                 const day = article.createdAt && !Number.isNaN(new Date(article.createdAt).getTime())
                   ? new Intl.DateTimeFormat('es-ES',{day:'numeric',month:'short',year:'numeric'}).format(new Date(article.createdAt)).replace(/\./g,'')
                   : '';
                 const byline = [day,article.author?'por '+article.author:''].filter(Boolean).join(' · ');
                 return '<li class="ae-trending-item">'
-                    + '<span class="ae-trending-rank">' + (index+1) + '</span>'
-                    + '<button type="button" class="ae-trending-link" onclick="openArticleModal(' + articleIdArgument(article.id) + ')">'
+                    + '<span class="ae-trending-rank" aria-hidden="true">' + String(index+1).padStart(2,'0') + '</span>'
+                    + '<button type="button" class="ae-trending-link" onclick="openArticleModal(' + articleIdArgument(article.id) + ')" aria-label="Leer noticia: ' + escapeHTML(article.title) + '">'
+                    + '<span class="ae-trending-story">'
                     + '<span class="ae-trending-category">' + escapeHTML(article.category) + '</span>'
                     + '<span class="ae-trending-title">' + escapeHTML(article.title) + '</span>'
-                    + (byline?'<span class="ae-trending-byline">'+escapeHTML(byline)+'</span>':'')+'</button>'
-                    + '<span class="ae-trending-meta" aria-label="' + likes + ' me gusta">'
-                    + '<i class="fa-regular fa-heart" aria-hidden="true"></i> ' + likes + '</span>'
-                    + '<button type="button" class="ae-trending-arrow" onclick="openArticleModal(' + articleIdArgument(article.id) + ')" aria-label="Leer artículo: ' + escapeHTML(article.title) + '">→</button></li>';
+                    + (byline?'<span class="ae-trending-byline">'+escapeHTML(byline)+'</span>':'')
+                    + '<span class="ae-trending-meta"><i class="fa-regular fa-eye" aria-hidden="true"></i> ' + reads.toLocaleString('es-ES') + ' ' + (reads===1?'lectura':'lecturas') + '</span>'
+                    + '</span>'
+                    + '<span class="ae-trending-open" aria-hidden="true"><span>Leer</span><span class="ae-trending-arrow">↗</span></span>'
+                    + '</button></li>';
             }).join('');
         }
 
@@ -3368,6 +3512,7 @@ function renderRelatedStories(article) {
     const label = isDark ? 'Activar modo claro' : 'Activar modo oscuro';
 
     icon.src = isDark ? 'assets/icons/ae-sol-gold.webp?v=20261016-1' : 'assets/icons/ae-luna-gold.webp?v=20261016-1';
+    button.classList.toggle('ae-theme-sun-unframed', isDark);
     button.setAttribute('aria-label', label);
     button.setAttribute('aria-pressed', String(isDark));
     button.title = label;
