@@ -229,10 +229,22 @@ async function voidCountsForPeriod(period){
  return counts;
 }
 function chefAccuracy(record,voids){
- if(!voids)return '—';
+ if(!voids)return null;
  const decided=Math.max(0,Number(record.total_resolved||0)-(voids.get(record.user_id)||0));
  const correct=Math.max(0,Number(record.correct_picks||0));
- return decided>0?Math.round(100*correct/decided)+'% aciertos':'—';
+ return decided>0?Math.round(100*correct/decided):null;
+}
+// Both Chef rankings show only the numeric accuracy percentage.
+// Above 50% is a winning rate, below 50% is a losing rate; 50% and
+// unavailable data remain neutral. The points figure is unchanged.
+function chefRankingScore(record,voids){
+ const label=el('strong',null,'ae-chef-score');
+ label.append(el('span',Number(record.points||0).toFixed(2)+' pts','ae-chef-score-points'));
+ const accuracy=chefAccuracy(record,voids);
+ const tone=accuracy===null?'is-unknown':accuracy>50?'is-positive':accuracy<50?'is-negative':'is-neutral';
+ label.append(el('span',' · ','ae-chef-score-separator'));
+ label.append(el('span',accuracy===null?'—':accuracy+'%','ae-chef-accuracy '+tone));
+ return label;
 }
 async function loadRanking(){
  const list=$('cpLeaderboard');if(!list)return;
@@ -247,7 +259,7 @@ async function loadRanking(){
    const li=el('li',null,'ae-cp-leader');
    li.append(el('span',String(i+1).padStart(2,'0'),'ae-take-number'),
      el('span',x.username||'Aficionado','ae-take-name'),
-     el('strong',Number(x.points||0).toFixed(2)+' pts · '+chefAccuracy(x,voids)));
+     chefRankingScore(x,voids));
    list.append(li);
  }
  sizeChefRankingWindows();
@@ -280,7 +292,7 @@ async function loadWorstRanking(){
    li.append(
      el('span',String(i+1).padStart(2,'0'),'ae-take-number'),
      el('span',x.username||'Aficionado','ae-take-name'),
-     el('strong',Number(x.points||0).toFixed(2)+' pts · '+chefAccuracy(x,voids))
+     chefRankingScore(x,voids)
    );
    list.append(li);
  }
