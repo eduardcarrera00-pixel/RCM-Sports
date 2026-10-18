@@ -140,9 +140,9 @@ function row(label,cls){const li=el('li',null,cls||'ae-cp-leader');li.append(el(
 async function loadRanking(){
  const list=$('cpLeaderboard');if(!list)return;
  const r=await db.rpc('ae_pick_result_ranking',{p_period:currentRank});
- if(r.error){list.replaceChildren(row('No fue posible cargar el ranking de resultados.'));return;}
+ if(r.error){list.replaceChildren(row('No fue posible cargar el ranking de resultados.','ae-cp-leader ae-cp-leader-empty'));return;}
  list.replaceChildren();
- if(!r.data?.length)list.append(row(currentRank==='month'?'Este mes todavía no hay resultados confirmados.':'Aún no hay pronósticos con resultados confirmados.'));
+ if(!r.data?.length)list.append(row(currentRank==='month'?'Este mes todavía no hay resultados confirmados.':'Aún no hay pronósticos con resultados confirmados.','ae-cp-leader ae-cp-leader-empty'));
  for(const [i,x] of (r.data||[]).slice(0,10).entries()){
    const li=el('li',null,'ae-cp-leader');
    li.append(el('span',String(i+1).padStart(2,'0'),'ae-take-number'),
@@ -178,6 +178,7 @@ function paintChefList(id,result,kind){
  // Mantiene el mismo diseño fotográfico con una o varias posiciones.
  // Solo habilitamos interacción de desplazamiento cuando hay más de un Pick.
  target.classList.add('ae-chef-scroll');
+ target.setAttribute('aria-label',(good?'Mejores platos':'Peores platos')+', '+picks.length+' Picks. Desliza verticalmente para recorrer la clasificación.');
  target.tabIndex=scrollable?0:-1;
  target.scrollTop=0;
  const heading=target.closest('.ae-chef-board')?.querySelector('.ae-picks-rail-heading');
@@ -241,9 +242,9 @@ async function loadChefLists(){
  try{
    const [best,worst]=await Promise.all([
      query().gt('score',0).order('score',{ascending:false})
-       .order('upvotes',{ascending:false}).order('created_at',{ascending:true}).order('id',{ascending:true}).limit(3),
+       .order('upvotes',{ascending:false}).order('created_at',{ascending:true}).order('id',{ascending:true}).limit(10),
      query().lt('score',0).order('score',{ascending:true})
-       .order('downvotes',{ascending:false}).order('created_at',{ascending:true}).order('id',{ascending:true}).limit(3)
+       .order('downvotes',{ascending:false}).order('created_at',{ascending:true}).order('id',{ascending:true}).limit(10)
    ]);
    if(seq!==chefRequest)return;
    paintChefList('picksPopular',best,'best');
