@@ -88,3 +88,4 @@ end;
 $$;
 revoke all on function public.ae_set_pick_comment_vote(uuid,integer) from public;
 grant execute on function public.ae_set_pick_comment_vote(uuid,integer) to authenticated;
+revoke execute on function public.ae_set_pick_comment_vote(uuid,integer) from anon;
