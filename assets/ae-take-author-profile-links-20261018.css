@@ -1,0 +1,72 @@
+/* AE SPORTS · Enlaces a perfiles de autores de Takes (NFL, Fútbol y comentarios).
+   Colores accesibles con identidad editorial tanto en modo noche como día. */
+
+#aeSportTakeLeaders button.ae-top-take-author,
+#freeTakesFeed button.ae-take-author-link,
+.ae-community-popular-take button.ae-top-take-author,
+#aeTakeDiscussion button.ae-discussion-author-link,
+#aeTakeDiscussion button#aeDiscussionAuthor {
+  color: #a5dbc0 !important;
+  cursor: pointer;
+  text-decoration: none;
+  text-underline-offset: 3px;
+}
+
+html:not(.dark) #aeSportTakeLeaders button.ae-top-take-author,
+html:not(.dark) #freeTakesFeed button.ae-take-author-link,
+html:not(.dark) .ae-community-popular-take button.ae-top-take-author,
+html:not(.dark) #aeTakeDiscussion button.ae-discussion-author-link,
+html:not(.dark) #aeTakeDiscussion button#aeDiscussionAuthor {
+  color: #176745 !important;
+}
+
+#aeSportTakeLeaders button.ae-top-take-author {
+  appearance: none;
+  border: 0;
+  background: none;
+  padding: 0;
+  text-align: left;
+  font: inherit;
+  max-width: 100%;
+}
+
+#aeTakeDiscussion button.ae-discussion-author-link {
+  appearance: none;
+  display: inline-block;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#aeTakeDiscussion button#aeDiscussionAuthor {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  text-align: left;
+}
+
+#aeSportTakeLeaders button.ae-top-take-author:not(:disabled):is(:hover,:focus-visible),
+#freeTakesFeed button.ae-take-author-link:is(:hover,:focus-visible),
+.ae-community-popular-take button.ae-top-take-author:is(:hover,:focus-visible),
+#aeTakeDiscussion button.ae-discussion-author-link:is(:hover,:focus-visible),
+#aeTakeDiscussion button#aeDiscussionAuthor:not(:disabled):is(:hover,:focus-visible) {
+  text-decoration: underline;
+}
+
+#aeSportTakeLeaders button.ae-top-take-author:disabled,
+#aeTakeDiscussion button#aeDiscussionAuthor:disabled {
+  cursor: default;
+  opacity: .75;
+}
