@@ -740,9 +740,23 @@ html body #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-rail > s
     height:var(--ae-plates-window-height,auto)!important;
     max-height:var(--ae-plates-window-height,none)!important;
   }
-  html body #footballTakes.ae-picks-editorial #communityPicks > .ae-chefs-dual-standings {
+  /* Moderation is an independent full-width admin row; it does not
+     stretch or overlap either public Platos panel. */
+  html body #footballTakes.ae-picks-editorial #communityPicks > #cpModeration:not([hidden]) {
+    display:block!important;
+    box-sizing:border-box!important;
     grid-column:1/-1!important;
     grid-row:2!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    height:auto!important;
+    margin:20px 0 0!important;
+    overflow:visible!important;
+  }
+  html body #footballTakes.ae-picks-editorial #communityPicks > .ae-chefs-dual-standings {
+    grid-column:1/-1!important;
+    grid-row:3!important;
     width:100%!important;
     margin-top:20px!important;
   }
