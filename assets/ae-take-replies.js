@@ -1,7 +1,7 @@
 /* AE SPORTS · Conversaciones persistentes para Takes, sin comentarios simulados. */
 (() => {
   'use strict';
-  let dialog, current = null, parentId = null, sequence = 0, sending = false;
+  let dialog, current = null, parentId = null, sequence = 0, sending = false, voting = false;
   const $ = (id) => document.getElementById(id);
   const el = (tag, text, className) => {
     const node = document.createElement(tag);
@@ -26,6 +26,10 @@
           <span id="aeDiscussionSport" class="ae-discussion-sport"></span>
           <button type="button" id="aeDiscussionEditSport" hidden>Cambiar comunidad</button>
           <p id="aeDiscussionBody"></p>
+          <div id="aeDiscussionVotes" class="ae-discussion-votes" aria-label="Votos del Take">
+            <button type="button" id="aeDiscussionUp" aria-pressed="false">▲ Apoyar 0</button>
+            <button type="button" id="aeDiscussionDown" aria-pressed="false">▼ Cuestionar 0</button>
+          </div>
         </section>
         <section class="ae-discussion-thread" aria-labelledby="aeDiscussionCount">
           <h3 class="ae-discussion-counter" id="aeDiscussionCount">Comentarios</h3>
@@ -48,6 +52,8 @@
       }
     });
     $('aeDiscussionCancel').addEventListener('click',()=>setParent(null));
+    $('aeDiscussionUp').addEventListener('click',()=>vote(1));
+    $('aeDiscussionDown').addEventListener('click',()=>vote(-1));
     dialog.addEventListener('click',(event)=>{if(event.target===dialog)dialog.close();});
     dialog.addEventListener('close',()=>{current=null;sequence++;setParent(null);});
     $('aeDiscussionForm').addEventListener('submit',post);
@@ -167,6 +173,50 @@
       sending=false;$('aeDiscussionSubmit').disabled=false;
     }
   }
+  function showVotes(take){
+    for(const [value,id,name,count] of [[1,'aeDiscussionUp','▲ Apoyar',take.upvotes],[-1,'aeDiscussionDown','▼ Cuestionar',take.downvotes]]){
+      const button=$(id);
+      button.textContent=name+' '+(Number(count)||0);
+      button.setAttribute('aria-pressed',String(Number(take.my_vote)===value));
+      button.disabled=voting;
+    }
+  }
+  async function vote(value){
+    if(!current||voting)return;
+    const take=current;
+    try{
+      if(typeof db==='undefined'||!db)throw Error('No hay conexión.');
+      const session=await db.auth.getUser();
+      const user=session.data?.user;
+      if(!user){
+        if(typeof openUserAuthModal==='function')openUserAuthModal();
+        return;
+      }
+      if(user.id===take.author_id){
+        $('aeDiscussionStatus').textContent='No puedes votar tu propio Take.';
+        return;
+      }
+      voting=true;
+      showVotes(take);
+      const result=await db.rpc('ae_vote_free_take',{p_take_id:take.id,p_value:value});
+      if(result.error)throw result.error;
+      // El servidor es la fuente de verdad para votos y estado del usuario.
+      if(take.author_id){
+        const refreshed=await db.rpc('ae_public_take_profile',{p_author_id:take.author_id});
+        const updated=!refreshed.error&&(refreshed.data||[]).find(item=>String(item.id)===String(take.id));
+        if(updated&&current?.id===take.id)current={...take,...updated};
+      }
+      if(current?.id===take.id){
+        $('aeDiscussionStatus').textContent='';
+        document.dispatchEvent(new Event('ae:takes-updated'));
+      }
+    }catch(e){
+      if(current?.id===take.id)$('aeDiscussionStatus').textContent='No se pudo registrar el voto. '+(e.message||'');
+    }finally{
+      voting=false;
+      if(current?.id===take.id)showVotes(current);
+    }
+  }
   function displaySport(take) {
     const footballSports=new Set(['laliga','premier','ligamx','champions','football','futbol','fútbol']);
     const sport=String(take.sport||'').toLowerCase();
@@ -207,6 +257,7 @@
     $('aeTakeDiscussionTitle').textContent=authorName+' — Takes';
     $('aeDiscussionSubject').textContent=take.title||'Take de la comunidad';
     $('aeDiscussionBody').textContent=take.body||'';
+    showVotes(take);
     $('aeDiscussionText').value='';
     $('aeDiscussionCount').textContent='Comentarios';
     $('aeDiscussionList').replaceChildren();
