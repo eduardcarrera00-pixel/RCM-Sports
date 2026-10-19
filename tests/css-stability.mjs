@@ -37,6 +37,20 @@ for(const file of existingDuplicateSources){
     file+' must remain linked exactly once, in its approved final position');
 }
 
+// Third phase: component styles stay in adjacent source order, loaded once.
+const groups=JSON.parse(fs.readFileSync('assets/component-css-groups.json','utf8')).groups;
+assert.equal(groups.length,4,'Four component groups are expected in phase 3');
+for(const group of groups){
+  assert.equal(htmlLinks.filter(file=>file===group.output).length,1,
+    'The generated group must be linked exactly once: '+group.output);
+  for(const source of group.sources){
+    assert.equal(htmlLinks.includes(source),false,
+      'A grouped original CSS file must not still be linked independently: '+source);
+    assert.equal(manifest.includes(source),false,
+      'Grouped CSS sources must not also be inside the editorial bundle: '+source);
+  }
+}
+
 // First safe cleanup: two identical, unconditional badge visibility rules
 // were in the same standalone CSS. Preserve the later authoritative rule.
 const auth=fs.readFileSync('assets/ae-classical-auth-buttons.css','utf8');
