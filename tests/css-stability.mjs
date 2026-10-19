@@ -98,4 +98,33 @@ for(const group of extracted){
 assert.equal([...html.matchAll(/<style\b/gi)].length,4,
   'Only four high-risk inline style elements should remain after phase 4');
 
+
+const safeDeduplications=[
+  {file:'assets/ae-mobile-compact-home.css',
+   selector:'html body>header .ae-mobile-header-grid #themeToggle .ae-mobile-theme-caption',
+   declaration:'display:none!important;'},
+  {file:'assets/ae-take-rankings-palette.css',
+   selector:'html body #aeHomeTakeHighlights .ae-discovery-list li',
+   declaration:'min-width:0;'},
+  {file:'assets/ae-admin-publish-plus-small-mobile.css',
+   selector:'html body>header .ae-header-actions:has(#loggedAdminContainer:not(.hidden)) #aeCategoryAdmin .ae-admin-manage-label',
+   declaration:'display:none!important;'}
+];
+for(const {file,selector,declaration} of safeDeduplications){
+  const body=fs.readFileSync(file,'utf8');
+  let count=0;
+  let pos=0;
+  while((pos=body.indexOf(selector,pos))>=0){
+    const start=pos+selector.length;
+    const open=body.indexOf('{',start);
+    if(!body.slice(start,open).trim()){
+      const close=body.indexOf('}',open+1);
+      const declared=body.slice(open+1,close).replace(/\s+/g,'');
+      if(declared===declaration)count++;
+    }
+    pos=start;
+  }
+  assert.equal(count,1,'The verified late CSS rule must be retained exactly once: '+file);
+}
+
 console.log('PASS: CSS referenced assets, existing cascade order and safe duplicate-rule cleanup.');
