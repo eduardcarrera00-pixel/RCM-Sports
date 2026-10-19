@@ -1,0 +1,221 @@
+{
+  "note": "Corpus público histórico; no es prueba beta con usuarios. Abstenciones no cuentan como aciertos. Reservas por casa sin ajuste de su OCR.",
+  "cases": [
+    {
+      "id": "MOM-001",
+      "house": "Bovada",
+      "split": "desarrollo",
+      "complete": false,
+      "supportedPickSize": true,
+      "accepted": false,
+      "reason": "No pude identificar el partido completo. Escríbelo como aparece en la captura o añade otra."
+    },
+    {
+      "id": "MOM-002",
+      "house": "Bovada",
+      "split": "desarrollo",
+      "complete": false,
+      "supportedPickSize": false,
+      "accepted": false,
+      "reason": "No pude identificar el partido completo. Escríbelo como aparece en la captura o añade otra."
+    },
+    {
+      "id": "MOM-003",
+      "house": "Bovada",
+      "split": "desarrollo",
+      "complete": true,
+      "supportedPickSize": true,
+      "accepted": false,
+      "reason": "Necesitamos la captura completa del boleto, con partido, pronóstico y cuota."
+    },
+    {
+      "id": "MOM-004",
+      "house": "Bovada",
+      "split": "desarrollo",
+      "complete": false,
+      "supportedPickSize": false,
+      "accepted": false,
+      "reason": "Necesitamos la captura completa del boleto, con partido, pronóstico y cuota."
+    },
+    {
+      "id": "MOM-005",
+      "house": "Bovada",
+      "split": "desarrollo",
+      "complete": false,
+      "supportedPickSize": false,
+      "accepted": false,
+      "reason": "No pude identificar el partido completo. Escríbelo como aparece en la captura o añade otra."
+    },
+    {
+      "id": "MOM-006",
+      "house": "Bovada",
+      "split": "desarrollo",
+      "complete": false,
+      "supportedPickSize": false,
+      "accepted": false,
+      "reason": "El número de selecciones del boleto no coincide con tu Pick."
+    },
+    {
+      "id": "MOM-007",
+      "house": "Bovada",
+      "split": "desarrollo",
+      "complete": false,
+      "supportedPickSize": false,
+      "accepted": false,
+      "reason": "No pude identificar el partido completo. Escríbelo como aparece en la captura o añade otra."
+    },
+    {
+      "id": "MOM-008",
+      "house": "Bovada",
+      "split": "desarrollo",
+      "complete": true,
+      "supportedPickSize": true,
+      "accepted": false,
+      "reason": "Necesitamos la captura completa del boleto, con partido, pronóstico y cuota."
+    },
+    {
+      "id": "MOM-009",
+      "house": "Bovada",
+      "split": "desarrollo",
+      "complete": true,
+      "supportedPickSize": true,
+      "accepted": false,
+      "reason": "No pude asociar una única cuota a la selección 1. Prueba una captura más completa o más clara."
+    },
+    {
+      "id": "MOM-010",
+      "house": "Cannonbet",
+      "split": "desarrollo",
+      "complete": true,
+      "supportedPickSize": false,
+      "accepted": false,
+      "reason": "Completa una o dos selecciones antes de añadir la captura."
+    },
+    {
+      "id": "MOM-011",
+      "house": "Sky Bet",
+      "split": "reserva_por_casa",
+      "complete": true,
+      "supportedPickSize": true,
+      "accepted": false,
+      "reason": "La selección 1 no se distingue o no coincide. Incluye el mercado y la línea tal como aparecen en el boleto."
+    },
+    {
+      "id": "MOM-012",
+      "house": "Sky Bet",
+      "split": "reserva_por_casa",
+      "complete": true,
+      "supportedPickSize": false,
+      "accepted": false,
+      "reason": "Completa una o dos selecciones antes de añadir la captura."
+    },
+    {
+      "id": "MOM-013",
+      "house": "Smarkets",
+      "split": "reserva_por_casa",
+      "complete": false,
+      "supportedPickSize": true,
+      "accepted": false,
+      "reason": "No pude asociar una única cuota a la selección 1. Prueba una captura más completa o más clara."
+    },
+    {
+      "id": "MOM-014",
+      "house": "Smarkets",
+      "split": "reserva_por_casa",
+      "complete": true,
+      "supportedPickSize": true,
+      "accepted": false,
+      "reason": "No pude asociar una única cuota a la selección 1. Prueba una captura más completa o más clara."
+    },
+    {
+      "id": "MOM-015",
+      "house": "Sportsbet",
+      "split": "desarrollo",
+      "complete": false,
+      "supportedPickSize": false,
+      "accepted": false,
+      "reason": "Necesitamos la captura completa del boleto, con partido, pronóstico y cuota."
+    },
+    {
+      "id": "MOM-016",
+      "house": "Sportsbet",
+      "split": "desarrollo",
+      "complete": false,
+      "supportedPickSize": false,
+      "accepted": false,
+      "reason": "Necesitamos la captura completa del boleto, con partido, pronóstico y cuota."
+    },
+    {
+      "id": "MOM-017",
+      "house": "Sportsbet",
+      "split": "desarrollo",
+      "complete": true,
+      "supportedPickSize": true,
+      "accepted": true,
+      "reason": "El partido, la selección y el momio coinciden con la captura."
+    },
+    {
+      "id": "MOM-018",
+      "house": "Sportsbet",
+      "split": "desarrollo",
+      "complete": true,
+      "supportedPickSize": true,
+      "accepted": true,
+      "reason": "El partido, la selección y el momio coinciden con la captura."
+    },
+    {
+      "id": "MOM-019",
+      "house": "Sportsbet",
+      "split": "desarrollo",
+      "complete": true,
+      "supportedPickSize": true,
+      "accepted": true,
+      "reason": "El partido, la selección y el momio coinciden con la captura."
+    },
+    {
+      "id": "MOM-020",
+      "house": "Sportsbet",
+      "split": "desarrollo",
+      "complete": false,
+      "supportedPickSize": false,
+      "accepted": false,
+      "reason": "Completa una o dos selecciones antes de añadir la captura."
+    },
+    {
+      "id": "MOM-021",
+      "house": "Sportsbet",
+      "split": "desarrollo",
+      "complete": true,
+      "supportedPickSize": false,
+      "accepted": false,
+      "reason": "Completa una o dos selecciones antes de añadir la captura."
+    },
+    {
+      "id": "MOM-022",
+      "house": "Sportsbet",
+      "split": "desarrollo",
+      "complete": true,
+      "supportedPickSize": true,
+      "accepted": true,
+      "reason": "El partido, la selección y el momio coinciden con la captura."
+    },
+    {
+      "id": "MOM-023",
+      "house": "Sportsbet",
+      "split": "desarrollo",
+      "complete": true,
+      "supportedPickSize": false,
+      "accepted": false,
+      "reason": "Completa una o dos selecciones antes de añadir la captura."
+    },
+    {
+      "id": "MOM-024",
+      "house": "Sportsbet",
+      "split": "desarrollo",
+      "complete": true,
+      "supportedPickSize": false,
+      "accepted": false,
+      "reason": "Completa una o dos selecciones antes de añadir la captura."
+    }
+  ]
+}

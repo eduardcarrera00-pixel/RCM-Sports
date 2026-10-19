@@ -107,7 +107,7 @@ function card(p,compact=false,detail=false){
  if(legs.childNodes.length)n.append(legs);
  const odds=el('div',null,'cp-card-odds');
  odds.append(el('strong','Cuota '+(Number(p.american_odds)>0?'+':'')+p.american_odds,'cp-odds'));
- odds.append(el('small',p.moderation_status==='approved'?'Cuota aprobada':p.moderation_status==='rejected'?'Cuota rechazada':'Cuota en revisión · votos abiertos','cp-card-state'));
+ odds.append(el('small',p.moderation_status==='approved'?(p.capture_check?.method==='on_device_ocr'?'Momio cotejado con captura':'Cuota aprobada'):p.moderation_status==='rejected'?'Cuota rechazada':'Cuota en revisión · votos abiertos','cp-card-state'));
  n.append(odds);
  if(p.explanation)n.append(el('p',p.explanation,'cp-explanation'));
  const controls=el('div',null,'cp-actions');
@@ -548,6 +548,7 @@ window.updateAePicksAdmin=()=>{loadModeration();loadSettlement();};
 function field(label,type='text'){const wrap=el('label',label);const input=el(type==='textarea'?'textarea':'input');if(type!=='textarea')input.type=type;input.required=true;wrap.append(input);return {wrap,input};}
 function buildComposer(){
  const form=$('cpForm'),rows=[];
+ let capture=null;
  const eventDay=field('Fecha del partido','date'),explanation=field('Tu análisis','textarea');
  eventDay.input.name='event_date';eventDay.input.min=todayToronto();eventDay.input.defaultValue=todayToronto();
  eventDay.input.max=new Date(Date.parse(todayToronto()+'T12:00:00Z')+180*86400000).toISOString().slice(0,10);
@@ -563,8 +564,9 @@ function buildComposer(){
  function calculate(){
   const picks=values(),valid=picks.every(l=>Number.isInteger(l.odds)&&Math.abs(l.odds)>=100&&Math.abs(l.odds)<=100000);
   const decimal=picks.reduce((v,l)=>v*(l.odds>0?1+l.odds/100:1+100/Math.abs(l.odds)),1);
-  const american=decimal>=2?Math.round((decimal-1)*100):-Math.round(100/(decimal-1));
-  output.textContent=valid?(picks.length===1?(picks[0].selection||'Tu Pick')+' · ':'Cuota total · ')+(american>0?'+':'')+american:'Completa el pronóstico y su cuota';
+  const total=capture?.getTotal();
+  const american=total?.american??(decimal>=2?Math.round((decimal-1)*100):-Math.round(100/(decimal-1)));
+  output.textContent=valid?(picks.length===1?(picks[0].selection||'Tu Pick')+' · ':total?'Cuota total del boleto · ':'Cuota total · ')+(american>0?'+':'')+american:'Completa el pronóstico y su cuota';
   simple.setAttribute('aria-pressed',String(rows.length===1));combined.setAttribute('aria-pressed',String(rows.length===2));
   return valid&&decimal>=2;
  }
@@ -590,6 +592,7 @@ function buildComposer(){
  const submit=el('button','Publicar Pick');submit.type='submit';
  footer.append(output,submit,el('small','Revisa tu selección: no podrás editarla después de publicar.','cp-compose-hint'),status);
  form.append(modes,legs,eventDay.wrap,add,analysis,footer);addRow();
+ capture=window.aePickCapture?.mount({form,getPicks:values,onChange:calculate});
  form.addEventListener('input',calculate);
  form.onsubmit=async e=>{
   e.preventDefault();if(posting)return;
@@ -600,15 +603,17 @@ function buildComposer(){
   status.textContent='';
   try{
    const user=await account(true);if(!user)return;
+   if(!capture)throw Error('No se pudo iniciar el lector de capturas. Actualiza la página e inténtalo otra vez.');
+   const captureCheck=capture.proof();
    submit.textContent='Publicando…';
    const picks=values(),title=picks.map(p=>p.event).join(' / ').slice(0,160);
-   const r=await db.from('ae_community_picks').insert({title,explanation:explanation.input.value.trim(),legs:picks,event_date:eventDay.input.value}).select('id').single();
+   const r=await db.from('ae_community_picks').insert({title,explanation:explanation.input.value.trim(),legs:picks,event_date:eventDay.input.value,capture_check:captureCheck}).select('id').single();
    if(r.error)throw r.error;
    window.aeDraftGuard?.clear('pick');
    form.reset();while(rows.length>1)rows.pop().box.remove();
    analysis.open=false;eventDay.input.defaultValue=todayToronto();eventDay.input.value=todayToronto();add.hidden=false;calculate();
    closePickComposer(true);void load();
-   notifyCommunity('Pick publicado. Ya puedes recibir votos y comentarios mientras revisamos la cuota.');
+   notifyCommunity('Pick publicado con el momio cotejado. Ya puedes recibir votos y comentarios.');
   }catch(e){status.textContent=message(e);}
   finally{posting=false;submit.disabled=false;submit.textContent='Publicar Pick';if(closer)closer.disabled=false;}
  };

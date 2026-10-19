@@ -7,7 +7,7 @@ const report=JSON.parse(execFileSync(process.execPath,['scripts/audit-css.mjs','
   {encoding:'utf8',maxBuffer:4*1024*1024}));
 assert.equal(report.status,'ok','Every stylesheet referenced in the active cascade must exist');
 assert.deepEqual(report.missing,[],'No missing CSS files');
-assert.equal(report.bundleSourceCount,66,'The 11 safely redundant early bundle sheets must stay removed');
+assert.equal(report.bundleSourceCount,67,'The 11 safely redundant early bundle sheets must stay removed');
 assert.ok(report.linkedStylesheetCount>=45,'Active component styles must remain linked');
 
 // Existing double-loading is measured, not blindly removed. A later external

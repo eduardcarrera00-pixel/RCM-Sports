@@ -14,7 +14,8 @@
     "test:drafts": "node tests/draft-guard.mjs",
     "css:audit": "node scripts/audit-css.mjs",
     "test:css": "node scripts/build-component-css.mjs --check && node tests/css-stability.mjs",
-    "css:conflicts": "node scripts/css-conflict-inventory.mjs"
+    "css:conflicts": "node scripts/css-conflict-inventory.mjs",
+    "test:capture": "node tests/pick-capture-parser.cjs && node tests/pick-capture-ui.mjs && node tests/pick-capture-database.mjs && node tests/pick-composer-direct.mjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.9",

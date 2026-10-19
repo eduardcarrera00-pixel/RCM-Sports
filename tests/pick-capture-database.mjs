@@ -1,0 +1,41 @@
+import fs from 'node:fs';import assert from 'node:assert/strict';
+import {PGlite} from '@electric-sql/pglite';
+const db=new PGlite();
+await db.exec(`create role anon;create role authenticated;create schema auth;create table auth.users(id uuid primary key);
+create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
+create function auth.jwt() returns jsonb language sql stable as $$select jsonb_build_object('is_anonymous',coalesce(nullif(current_setting('test.anonymous',true),''),'false')::boolean,'user_metadata',jsonb_build_object('username','Lector'))$$;
+create function public.rcm_is_editor() returns boolean language sql stable as $$select auth.uid()='00000000-0000-0000-0000-000000000003'::uuid$$;
+grant usage on schema public,auth to anon,authenticated;
+insert into auth.users values('00000000-0000-0000-0000-000000000001'),('00000000-0000-0000-0000-000000000002'),('00000000-0000-0000-0000-000000000003');`);
+await db.exec(fs.readFileSync('supabase/migrations/20261015060954_community_picks.sql','utf8'));
+await db.exec(fs.readFileSync('supabase/11_ae_moderated_picks_category_switches.sql','utf8').split('create table if not exists public.ae_pick_week_awards')[0]);
+await db.exec(fs.readFileSync('supabase/16_event_dated_picks_outcomes.sql','utf8'));
+await db.exec(fs.readFileSync('supabase/17_fix_pick_event_date_insert_grant.sql','utf8'));
+await db.exec(fs.readFileSync('supabase/migrations/20261016021000_unlimited_picks_immediate_community_votes.sql','utf8'));
+const migration=fs.readFileSync('supabase/migrations/20261019184704_pick_capture_consistency.sql','utf8');
+await db.exec(migration);await db.exec(migration);
+async function user(n){await db.exec(`reset role;set role ${n?'authenticated':'anon'};select set_config('request.jwt.claim.sub','${n?'00000000-0000-0000-0000-00000000000'+n:''}',false)`);}
+const legs=[{sport:'NBA',event:'Toronto Raptors vs Boston Celtics',selection:'Toronto Raptors gana',odds:150}];
+const proof=(rows=legs)=>({version:1,method:'on_device_ocr',confirmed:true,readings:rows.map(p=>({event:p.event,selection:p.selection,odds:p.odds,confidence:95})),total:null});
+const insert=(rows,check)=>db.query("insert into public.ae_community_picks(title,legs,event_date,capture_check) values('Captura de prueba',$1,(now() at time zone 'America/Toronto')::date,$2) returning *",[JSON.stringify(rows),check===null?null:JSON.stringify(check)]);
+await user(0);await assert.rejects(()=>insert(legs,proof()),/permission/);
+await user(1);const row=(await insert(legs,proof())).rows[0];
+assert.equal(row.moderation_status,'approved');assert.equal(row.american_odds,150);assert.equal(row.reviewed_by,null);
+assert.deepEqual(Object.keys(row.capture_check).sort(),['checked_at','method','version']);
+const extra=proof();extra.image='private-image-must-not-survive';extra.raw_text='personal data must not survive';
+assert.equal(JSON.stringify((await insert(legs,extra)).rows[0].capture_check).includes('private'),false);
+for(const mutate of [p=>{p.confirmed=false;},p=>{p.readings[0].odds=160;},p=>{p.readings[0].confidence=64;},p=>{p.readings[0].event='Otro partido';},p=>{p.readings=[];},p=>{p.image='x'.repeat(3000);}]){
+ const invalid=proof();mutate(invalid);await assert.rejects(()=>insert(legs,invalid));
+}
+const multi=[{sport:'NBA',event:'Los Angeles Lakers At Philadelphia 76ers',selection:'Los Angeles Lakers',odds:167},{sport:'NBA',event:'Washington Wizards At Detroit Pistons',selection:'Detroit Pistons',odds:-164}];
+const combined=proof(multi);combined.total={american:329,decimal:4.29};
+const combo=(await insert(multi,combined)).rows[0];assert.equal(combo.american_odds,329);assert.equal(Number(combo.decimal_odds),4.29);
+combined.total={american:431,decimal:5.31};await assert.rejects(()=>insert(multi,combined),/total/);
+await assert.rejects(()=>insert([{...legs[0],odds:-110}],proof([{...legs[0],odds:-110}])),/al menos/);
+await assert.rejects(()=>db.query('update public.ae_community_picks set capture_check=$1 where id=$2',[JSON.stringify(proof()),row.id]),/permission/);
+await assert.rejects(()=>db.query('update public.ae_community_picks set legs=$1 where id=$2',[JSON.stringify(legs),row.id]),/permission/);
+const legacy=(await insert(legs,null)).rows[0];assert.equal(legacy.moderation_status,'pending');assert.equal(legacy.capture_check,null);
+await db.exec("select set_config('test.anonymous','true',false)");await assert.rejects(()=>insert(legs,proof()),/sesión|sesion/);await db.exec("select set_config('test.anonymous','false',false)");
+await user(0);const visible=(await db.query('select * from public.ae_pick_feed where id=$1',[row.id])).rows[0];assert.equal(visible.capture_check.method,'on_device_ocr');
+assert.equal((await db.query('select count(*)::int n from public.ae_community_picks')).rows[0].n,4);
+await db.close();console.log('PASS: capture approval without admin, strict metadata/odds binding, no retained evidence, total rounding, RLS, immutable Picks, legacy compatibility and idempotent migration.');

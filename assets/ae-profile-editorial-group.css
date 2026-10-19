@@ -1096,3 +1096,41 @@ html:not(.dark) body #aeProfileDialog .ae-profile-take-actions button[aria-press
   #aeProfileDialog .ae-profile-take-actions button{min-height:34px;padding:8px 10px}
 }
 
+
+/* Profile recent activity: three cards visible, older activity scrolls inside.
+   The exact height of three cards is measured by ae-profile.js because Takes
+   may wrap differently from Picks and between phone and desktop. */
+#aeProfileDialog .ae-profile-recent-scroll{
+  position:relative;
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  gap:10px;
+  min-width:0;
+  max-height:570px;
+  overflow-y:auto;
+  overflow-x:hidden;
+  overscroll-behavior:contain;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(195,153,107,.65) transparent;
+  scrollbar-gutter:stable;
+  padding:2px 8px 3px 2px;
+}
+#aeProfileDialog .ae-profile-recent-picks{max-height:420px}
+#aeProfileDialog .ae-profile-recent-scroll:focus-visible{
+  outline:2px solid #d8aa7e;
+  outline-offset:2px;
+}
+#aeProfileDialog .ae-profile-recent-takes .ae-profile-item > p{
+  display:-webkit-box;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:3;
+  overflow:hidden;
+}
+html:not(.dark) body #aeProfileDialog .ae-profile-recent-scroll{
+  scrollbar-color:rgba(146,102,62,.65) transparent;
+}
+@media(max-width:760px){
+  #aeProfileDialog .ae-profile-recent-scroll{max-height:610px}
+  #aeProfileDialog .ae-profile-recent-picks{max-height:445px}
+}
+
