@@ -78,7 +78,9 @@
      const firstPick=leftColumn.querySelector('#cpFeed > .cp-card');
      // With no published predictions, preserve natural ranking heights.
      if(!firstPick){clearHeight();return;}
-     const mainHeight=Math.ceil(leftColumn.getBoundingClientRect().height);
+     // Keep the right-hand Platos column at 75% of the community frame.
+     // Lists retain their own vertical scrolling; phone layout stays natural.
+     const mainHeight=Math.ceil(leftColumn.getBoundingClientRect().height*.75);
      if(mainHeight>0&&Number.isFinite(mainHeight)){
        const height=mainHeight+'px';
        if(rail.style.getPropertyValue('--ae-picks-desktop-plates-height')!==height){

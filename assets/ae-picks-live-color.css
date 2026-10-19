@@ -1,0 +1,134 @@
+/* Picks: livelier community cards and distinct Platos accents.
+   Artwork remains confined to its header; the page geometry is unchanged. */
+html body #mainContent #footballTakes.ae-picks-editorial{
+  --picks-live-ink:#f4e8db;
+  --picks-live-muted:#ccd9de;
+  --picks-live-accent:#82cece;
+  --picks-live-tint:#234d61;
+  --picks-live-base:#153449;
+  --picks-live-line:#4d7887;
+  --picks-best-ink:#99ddcd;
+  --picks-best-tint:#244d4e;
+  --picks-best-base:#14343d;
+  --picks-worst-ink:#f0b59e;
+  --picks-worst-tint:#513f45;
+  --picks-worst-base:#302d3a;
+}
+html:not(.dark) body #mainContent #footballTakes.ae-picks-editorial{
+  --picks-live-ink:#243f4d;
+  --picks-live-muted:#4e6672;
+  --picks-live-accent:#246f82;
+  --picks-live-tint:#dceef3;
+  --picks-live-base:#f4fafb;
+  --picks-live-line:#9ebfc8;
+  --picks-best-ink:#276b60;
+  --picks-best-tint:#dcece2;
+  --picks-best-base:#f4f8ee;
+  --picks-worst-ink:#9a4e38;
+  --picks-worst-tint:#f1dcd0;
+  --picks-worst-base:#fcf3e8;
+}
+html body #mainContent #footballTakes.ae-picks-editorial #communityPicks #cpFeed > .cp-card.cp-feed-editorial{
+  --pick-feed-ink:var(--picks-live-ink);
+  --pick-feed-muted:var(--picks-live-muted);
+  --pick-feed-action:var(--picks-live-accent);
+  --pick-feed-line:var(--picks-live-line);
+  --pick-feed-soft:var(--picks-live-tint);
+  margin:10px 0!important;
+  padding:14px 16px!important;
+  border:1px solid var(--picks-live-line)!important;
+  border-left:3px solid var(--picks-live-accent)!important;
+  background:linear-gradient(115deg,var(--picks-live-tint),var(--picks-live-base) 72%)!important;
+}
+html body #mainContent #footballTakes.ae-picks-editorial #communityPicks #cpFeed > .cp-card.cp-feed-editorial[data-sport="nfl"]{
+  --picks-live-accent:#eab68c;
+  --picks-live-tint:#4a4145;
+  --picks-live-base:#233747;
+  --picks-live-line:#8e7566;
+}
+html:not(.dark) body #mainContent #footballTakes.ae-picks-editorial #communityPicks #cpFeed > .cp-card.cp-feed-editorial[data-sport="nfl"]{
+  --picks-live-accent:#95532d;
+  --picks-live-tint:#f3e1c9;
+  --picks-live-base:#fff8ee;
+  --picks-live-line:#c7a47e;
+}
+html body #mainContent #footballTakes.ae-picks-editorial #communityPicks #cpFeed > .cp-card.cp-feed-editorial .cp-feed-initial{
+  background:var(--picks-live-accent)!important;
+  border-color:var(--picks-live-accent)!important;
+  color:#102b3e!important;
+}
+html:not(.dark) body #mainContent #footballTakes.ae-picks-editorial #communityPicks #cpFeed > .cp-card.cp-feed-editorial .cp-feed-initial{
+  color:#fffaf2!important;
+}
+html body #mainContent #footballTakes.ae-picks-editorial #communityPicks #cpFeed > .cp-card.cp-feed-editorial .cp-card-sport{
+  padding:4px 8px!important;
+  border:1px solid var(--picks-live-line)!important;
+  background:var(--picks-live-tint)!important;
+  color:var(--picks-live-accent)!important;
+  font-weight:700!important;
+}
+html body #mainContent #footballTakes.ae-picks-editorial #communityPicks #cpFeed > .cp-card.cp-feed-editorial .cp-odds{
+  border-color:var(--picks-live-accent)!important;
+  background:var(--picks-live-accent)!important;
+  color:#102b3e!important;
+}
+html:not(.dark) body #mainContent #footballTakes.ae-picks-editorial #communityPicks #cpFeed > .cp-card.cp-feed-editorial .cp-odds{
+  color:#fffaf2!important;
+}
+html body #mainContent #footballTakes.ae-picks-editorial #communityPicks #cpFeed > .cp-card.cp-feed-editorial .cp-actions button:not(.cp-replies-button){
+  background:var(--picks-live-tint)!important;
+  border-color:var(--picks-live-line)!important;
+}
+html body #mainContent #footballTakes.ae-picks-editorial #communityPicks #cpFeed > .cp-card.cp-feed-editorial .cp-actions button[aria-pressed="true"]{
+  outline:2px solid var(--picks-live-accent)!important;
+  outline-offset:-2px!important;
+}
+html body #mainContent #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-rail > section.ae-chef-board{
+  --plate-ink:var(--picks-best-ink);
+  --plate-tint:var(--picks-best-tint);
+  --plate-base:var(--picks-best-base);
+  border-color:var(--plate-ink)!important;
+  background-color:var(--plate-base)!important;
+}
+html body #mainContent #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-rail > section.ae-chef-worst{
+  --plate-ink:var(--picks-worst-ink);
+  --plate-tint:var(--picks-worst-tint);
+  --plate-base:var(--picks-worst-base);
+}
+html body #mainContent #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-rail > section.ae-chef-board > .ae-picks-rail-heading{
+  border-bottom:3px solid var(--plate-ink)!important;
+}
+html body #mainContent #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-rail > section.ae-chef-board > .ae-picks-rail-heading h3{
+  color:var(--plate-ink)!important;
+}
+html body #mainContent #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-rail > section.ae-chef-board > ol.ae-chef-scroll{
+  background:var(--plate-base)!important;
+  scrollbar-color:var(--plate-ink) var(--plate-base)!important;
+}
+html body #mainContent #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-rail > section.ae-chef-board > ol.ae-chef-scroll > li.ae-chef-entry{
+  background:linear-gradient(110deg,var(--plate-tint),var(--plate-base) 90%)!important;
+  border-bottom-color:var(--ae-picks-clean-line)!important;
+}
+html body #mainContent #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-rail > section.ae-chef-board .ae-chef-odds{
+  background:var(--plate-ink)!important;
+  border-color:var(--plate-ink)!important;
+  color:#102b3e!important;
+}
+html:not(.dark) body #mainContent #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-rail > section.ae-chef-board .ae-chef-odds{
+  color:#fffaf2!important;
+}
+html body #mainContent #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-rail > section.ae-chef-board :is(.ae-chef-votes,.ae-chef-card-open){
+  color:var(--plate-ink)!important;
+}
+@media(min-width:911px){
+  html body #mainContent #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-rail > section.ae-chef-board > .ae-picks-rail-heading{
+    height:84px!important;
+    min-height:84px!important;
+    padding:12px 15px!important;
+  }
+}
+@media(max-width:760px){
+  html body #mainContent #footballTakes.ae-picks-editorial #communityPicks #cpFeed > .cp-card.cp-feed-editorial{
+    padding:14px 12px!important;
+  }
+}
