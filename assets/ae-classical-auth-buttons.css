@@ -226,10 +226,6 @@ html:not(.dark) body>header #aeNotificationsButton .ae-notifications-badge{
   color:#607c47!important;
   text-shadow:none!important;
 }
-/* More specific than the colored-number rule, including when the count is zero. */
-html body>header #aeNotificationsButton #aeNotificationsBadge[hidden]{
-  display:none!important;
-}
 html:not(.dark) body>header #aeNotificationsButton{color:#735035!important;}
 html:not(.dark) body>header #aeNotificationsButton:hover{color:#a26740!important;}
 /* Top-layer modal, not a popup beneath a sticky header. */
