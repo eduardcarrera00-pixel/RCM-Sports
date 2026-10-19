@@ -10,6 +10,8 @@ on:
     paths:
       - 'assets/**/*.css'
       - 'assets/style-sources.json'
+      - 'assets/component-css-groups.json'
+      - 'scripts/build-component-css.mjs'
       - 'scripts/audit-css.mjs'
       - 'tests/css-stability.mjs'
       - 'index.html'
