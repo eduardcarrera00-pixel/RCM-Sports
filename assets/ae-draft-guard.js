@@ -140,7 +140,8 @@
     if(!configs[kind])return;
     const id=await accountId();
     const form=$(configs[kind].form),st=state[kind];
-    if(!form||!id)return;
+    if(!form)return;
+    if(!id){notice(kind,'No se pudo verificar la cuenta para recuperar el borrador. Comprueba tu sesión.');return;}
     cancelTimer(kind);
     if(st.owner&&st.owner!==id)reset(kind);
     st.owner=id;
@@ -161,6 +162,8 @@
     const st=state[kind],store=getStore();
     if(store&&st.owner)try{store.removeItem(key(kind,st.owner));}catch{}
     notice(kind,'Publicado. Se ha eliminado el borrador guardado.');
+    const discard=$(configs[kind].form)?.querySelector('[data-ae-draft-discard]');
+    if(discard)discard.hidden=true;
   }
   function addControls(kind) {
     const form=$(configs[kind].form),close=$(configs[kind].close),dialog=$(configs[kind].dialog);
@@ -211,8 +214,12 @@
     document.addEventListener('visibilitychange',()=>{
       if(document.hidden){save('take');save('pick');}
     });
-    window.addEventListener('beforeunload',()=>{
-      save('take');save('pick');
+    window.addEventListener('beforeunload',event=>{
+      const unsafe=['take','pick'].some(kind=>{
+        const dialog=$(configs[kind].dialog);
+        return !!dialog?.open && meaningful(kind,snapshot(kind)) && !save(kind);
+      });
+      if(unsafe){event.preventDefault();event.returnValue='';}
     });
   }
   window.aeDraftGuard={restore,save,clear};
