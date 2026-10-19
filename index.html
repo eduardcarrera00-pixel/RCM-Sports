@@ -288,7 +288,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
     </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
-<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261018-marble-chef-1">
+<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261019-news-by-sport-takes20-1">
     <link rel="stylesheet" href="assets/ae-muted-navigation-icons.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-custom-nav-icons.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-classical-auth-buttons.css?v=20261017-chef-recipe-hires-1">
@@ -3439,6 +3439,7 @@ currentUser = {
             const articlesCount = document.getElementById('articlesCount');
 
             const isHome = currentCategory === 'Todos' && !currentSearchQuery;
+            articlesGrid.classList.toggle('ae-news-by-sport',isHome && filtered.length > 0);
             document.getElementById('aeHomeAllNewsActions').hidden = !isHome || filtered.length === 0;
             const isSportNewsPreview = ['NFL','Fútbol'].includes(currentCategory) && !currentSearchQuery;
             const newsHeading = document.getElementById('aeNewsSectionTitle');
@@ -3497,7 +3498,8 @@ currentUser = {
             // Al cambiar de deporte, empezar siempre por la primera tarjeta.
             const previousSportCategory = articlesGrid.dataset.aeSportCarouselCategory;
             const previousSportScroll = articlesGrid.scrollLeft;
-            articlesGrid.innerHTML = gridArticles.map(art => `
+            const laneScrolls = Object.fromEntries(Array.from(articlesGrid.querySelectorAll('.ae-news-sport-track'), lane => [lane.dataset.sport, lane.scrollLeft]));
+            const renderNewsCard = art => `
                 <article class="bg-white rounded-2xl border border-slate-200 overflow-hidden flex flex-col justify-between shadow-sm hover:shadow-xl hover:border-pitch-300 transition-all duration-300 hover:-translate-y-1 relative">
                     <div>
                         <div class="relative h-48 overflow-hidden group">
@@ -3545,19 +3547,35 @@ currentUser = {
                         </div>
                     </div>
                 </article>
-            `).join('');
-            // Portada: carrusel actual. NFL y Fútbol: carrusel táctil únicamente
+            `;
+            if (isHome) {
+                articlesGrid.innerHTML = ['NFL','Fútbol'].map((sport,index) => {
+                    const stories = filtered.filter(article => categoryKey(article.category) === sport).slice(0,10);
+                    const trackId = 'aeNewsSportTrack' + index;
+                    return `<section class="ae-news-sport-lane" aria-labelledby="aeNewsSportTitle${index}">
+                      <header class="ae-news-sport-head"><h2 id="aeNewsSportTitle${index}">${sport}</h2>
+                        <div class="ae-news-sport-controls"><button type="button" data-news-scroll="-1" aria-controls="${trackId}" aria-label="Noticias anteriores de ${sport}" ${stories.length < 2 ? 'disabled' : ''}>‹</button><button type="button" data-news-scroll="1" aria-controls="${trackId}" aria-label="Noticias siguientes de ${sport}" ${stories.length < 2 ? 'disabled' : ''}>›</button></div>
+                      </header>
+                      <div id="${trackId}" class="ae-news-sport-track" data-sport="${sport}" role="region" aria-roledescription="carrusel" aria-label="Últimas noticias de ${sport}" tabindex="0">${stories.length ? stories.map(renderNewsCard).join('') : '<p class="ae-news-sport-empty">Todavía no hay noticias de este deporte.</p>'}</div>
+                    </section>`;
+                }).join('');
+                articlesGrid.querySelectorAll('.ae-news-sport-track').forEach(lane => {lane.scrollLeft = laneScrolls[lane.dataset.sport] || 0;});
+                articlesGrid.querySelectorAll('[data-news-scroll]').forEach(button => button.addEventListener('click', () => {
+                    const lane = document.getElementById(button.getAttribute('aria-controls'));
+                    lane.scrollBy({left:Number(button.dataset.newsScroll) * lane.clientWidth, behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'});
+                }));
+            } else {
+                articlesGrid.innerHTML = gridArticles.map(renderNewsCard).join('');
+            }
+            // Portada: dos carruseles independientes. NFL y Fútbol: carrusel táctil únicamente
             // en teléfonos, con las mismas noticias, votos, enlaces y CTA del archivo.
-            const homeCarousel = isHome && gridArticles.length > 1;
             const sportCarousel = isSportNewsPreview && gridArticles.length > 1;
             const isMobileNews = window.matchMedia('(max-width:760px)').matches;
-            articlesGrid.classList.toggle('ae-home-news-carousel', homeCarousel);
+            articlesGrid.classList.remove('ae-home-news-carousel');
             articlesGrid.classList.toggle('ae-sport-news-carousel', sportCarousel);
-            if (homeCarousel || (sportCarousel && isMobileNews)) {
+            if (sportCarousel && isMobileNews) {
                 articlesGrid.setAttribute('role', 'region');
-                articlesGrid.setAttribute('aria-label', homeCarousel
-                    ? 'Últimas noticias. Desliza horizontalmente para explorar las noticias.'
-                    : 'Noticias de ' + (currentCategory === 'NFL' ? 'NFL' : 'Fútbol') + '. Desliza a izquierda o derecha para explorar.');
+                articlesGrid.setAttribute('aria-label', 'Noticias de ' + (currentCategory === 'NFL' ? 'NFL' : 'Fútbol') + '. Desliza a izquierda o derecha para explorar.');
                 articlesGrid.setAttribute('aria-roledescription', 'carrusel');
                 articlesGrid.tabIndex = 0;
             } else {
@@ -3572,7 +3590,7 @@ currentUser = {
             } else {
                 delete articlesGrid.dataset.aeSportCarouselCategory;
             }
-            // Portada: hasta siete noticias recientes. El resto permanece en cada deporte.
+            // Cada carrusel de portada contiene las diez noticias más recientes de su deporte.
         }
 
         function renderHeroCard(hero) {
@@ -4154,7 +4172,7 @@ updateThemeButton();
 <script src="assets/username-auth.js?v=20261016-reply-login-1"></script>
 <script src="assets/ae-category-visibility.js?v=20261016-dynamic-nav-1"></script>
 <script src="assets/ae-nfl-takes.js?v=20261015-3"></script>
-<script src="assets/free-takes.js?v=20261019-persistent-composer-1"></script>
+<script src="assets/free-takes.js?v=20261019-takes20-scroll-1"></script>
 <script src="assets/ae-take-rankings.js?v=20261018-savant-rookie-names-2"></script>
 <script src="assets/ae-editorial-weekly.js?v=20261018-weekly-share-1"></script>
 <script src="assets/ae-profile.js?v=20261019-profile-publish-1"></script>
@@ -4184,8 +4202,7 @@ updateThemeButton();
   let hovering = false;
   let focused = false;
   let heldUntil = 0;
-  let pauseAtEdge = 0;
-  let direction = 1;
+  const motion = new WeakMap();
   let lastFrame = 0;
 
   if ('IntersectionObserver' in window) {
@@ -4207,18 +4224,20 @@ updateThemeButton();
   function frame(now) {
     const elapsed = lastFrame ? Math.min(now - lastFrame, 64) : 0;
     lastFrame = now;
-    if (track.classList.contains('ae-home-news-carousel')
+    if ((track.classList.contains('ae-home-news-carousel') || track.classList.contains('ae-news-by-sport'))
       && document.body.classList.contains('ae-is-home')
       && inViewport && !document.hidden && !reduced.matches
-      && !hovering && !focused && now > heldUntil && now > pauseAtEdge) {
-      const end = track.scrollWidth - track.clientWidth;
-      if (end > 2) {
-        const next = track.scrollLeft + direction * elapsed * .021;
-        track.scrollLeft = Math.max(0, Math.min(end, next));
-        if ((direction > 0 && track.scrollLeft >= end - 1)
-          || (direction < 0 && track.scrollLeft <= 1)) {
-          direction *= -1;
-          pauseAtEdge = now + 1600;
+      && !hovering && !focused && now > heldUntil) {
+      const lanes = track.classList.contains('ae-news-by-sport') ? track.querySelectorAll('.ae-news-sport-track') : [track];
+      for (const lane of lanes) {
+        if (!motion.has(lane)) motion.set(lane,{direction:1,pauseUntil:0});
+        const state = motion.get(lane);
+        const end = lane.scrollWidth - lane.clientWidth;
+        if (end <= 2 || now < state.pauseUntil) continue;
+        lane.scrollLeft = Math.max(0,Math.min(end,lane.scrollLeft + state.direction * elapsed * .021));
+        if ((state.direction > 0 && lane.scrollLeft >= end - 1) || (state.direction < 0 && lane.scrollLeft <= 1)) {
+          state.direction *= -1;
+          state.pauseUntil = now + 1600;
         }
       }
     }

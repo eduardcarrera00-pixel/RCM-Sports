@@ -1,0 +1,78 @@
+/* Portada: dos carruseles por deporte. Historial: 20 Takes, dos visibles. */
+html body.ae-is-home #mainContent #articlesGrid.ae-news-by-sport{
+  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:18px!important;width:100%!important;min-width:0!important;max-width:100%!important;
+  overflow:visible!important;margin:0!important;padding:0!important;
+}
+html body.ae-is-home #articlesGrid.ae-news-by-sport .ae-news-sport-lane{min-width:0;width:100%;}
+.ae-news-sport-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;padding-bottom:9px;border-bottom:1px solid rgba(175,137,95,.5);}
+.ae-news-sport-head h2{margin:0;font:600 25px/1.1 Newsreader,Georgia,serif;color:inherit;}
+.ae-news-sport-controls{display:flex;gap:6px;}
+.ae-news-sport-controls button{display:grid;place-items:center;width:36px;height:36px;border:1px solid #9d7755;background:transparent;color:inherit;font:24px/1 Georgia,serif;cursor:pointer;}
+.ae-news-sport-controls button:disabled{opacity:.35;cursor:default;}
+html body.ae-is-home #mainContent #articlesGrid .ae-news-sport-track{
+  display:flex!important;gap:10px;min-width:0;width:100%;overflow-x:auto;overflow-y:hidden;
+  scroll-snap-type:x proximity;overscroll-behavior-inline:contain;scrollbar-width:thin;
+  scrollbar-color:#a3815e transparent;-webkit-overflow-scrolling:touch;padding:0 0 8px;
+}
+html body.ae-is-home #mainContent #articlesGrid .ae-news-sport-track > article:nth-child(n){
+  display:flex!important;flex:0 0 100%!important;flex-direction:column!important;
+  width:100%!important;min-width:0!important;max-width:100%!important;margin:0!important;
+  transform:none!important;scroll-snap-align:start;border-radius:0!important;
+}
+html body.ae-is-home #articlesGrid .ae-news-sport-track > article > div:first-child > div:first-child{height:160px!important;}
+html body.ae-is-home #articlesGrid .ae-news-sport-track > article h3{font:600 19px/1.25 Newsreader,Georgia,serif!important;}
+html body.ae-is-home #articlesGrid .ae-news-sport-track > article .p-5{padding:13px!important;}
+html body.ae-is-home #articlesGrid .ae-news-sport-track > article > div:last-child{padding:10px 13px!important;}
+.ae-news-sport-track:focus-visible,.ae-news-sport-controls button:focus-visible{outline:2px solid #b88c5b;outline-offset:2px;}
+.ae-news-sport-empty{padding:24px 12px;font:13px/1.5 Inter,system-ui,sans-serif;}
+
+/* Explicitly restore the feed hidden by previous sport layouts. */
+html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes.ae-free-takes[data-sport] > #aeTakesFeedHeading{
+  display:block!important;width:100%!important;margin:14px 0 10px!important;padding:0 0 8px!important;
+  font:600 24px/1.2 Newsreader,Georgia,serif!important;border-bottom:1px solid rgba(175,137,95,.4)!important;color:inherit!important;
+}
+html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes.ae-free-takes[data-sport] > #freeTakesFeed,
+html body.ae-is-football #mainContent #aeFootballMobileStage #freeTakes.ae-free-takes[data-sport] > #freeTakesFeed{
+  --ae-visible-take-height:230px;
+  box-sizing:border-box!important;display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+  grid-auto-rows:var(--ae-visible-take-height)!important;align-content:start!important;gap:10px!important;
+  width:100%!important;min-width:0!important;height:calc(2 * var(--ae-visible-take-height) + 10px)!important;
+  min-height:0!important;max-height:calc(2 * var(--ae-visible-take-height) + 10px)!important;
+  margin:0 0 18px!important;padding:0 3px 0 0!important;overflow-x:hidden!important;overflow-y:auto!important;
+  overscroll-behavior-y:contain;touch-action:pan-y;-webkit-overflow-scrolling:touch;
+  scroll-snap-type:y proximity;scrollbar-width:thin;scrollbar-color:#a3815e transparent;
+}
+html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes.ae-free-takes[data-sport] > #freeTakesFeed > article.ae-free-take-card:nth-child(n),
+html body.ae-is-football #mainContent #aeFootballMobileStage #freeTakes.ae-free-takes[data-sport] > #freeTakesFeed > article.ae-free-take-card:nth-child(n){
+  box-sizing:border-box!important;display:flex!important;flex-direction:column!important;justify-content:flex-start!important;
+  height:var(--ae-visible-take-height)!important;min-height:var(--ae-visible-take-height)!important;max-height:var(--ae-visible-take-height)!important;
+  width:100%!important;min-width:0!important;margin:0!important;padding:13px!important;
+  border:1px solid rgba(175,137,95,.5)!important;border-radius:0!important;overflow:hidden!important;scroll-snap-align:start;
+}
+html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes.ae-free-takes[data-sport] > #freeTakesFeed > article .ae-feed-take-title{
+  margin:6px 0!important;display:-webkit-box!important;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden!important;
+  font:600 20px/1.2 Newsreader,Georgia,serif!important;
+}
+html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes.ae-free-takes[data-sport] > #freeTakesFeed > article .ae-free-take-body{
+  display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:3!important;
+  font:13px/1.5 Inter,system-ui,sans-serif!important;overflow:hidden!important;max-height:none!important;margin:4px 0!important;
+}
+html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes.ae-free-takes[data-sport] > #freeTakesFeed > article .ae-free-vote-row{margin-top:auto!important;flex-shrink:0!important;}
+html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes.ae-free-takes[data-sport] > #freeTakesFeed:focus-visible{outline:2px solid #b88c5b;outline-offset:2px;}
+html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes.ae-free-takes[data-sport] > #freeTakesFeed:not(:has(> article)){
+  height:auto!important;max-height:none!important;grid-auto-rows:auto!important;
+}
+html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > .ae-free-controls,
+html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > #aeFootballMoreTakes,
+html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > #freeTakesMore{display:none!important;}
+html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > #freeTakesStatus:not(:empty){display:block!important;}
+@media(max-width:760px){
+  html body.ae-is-home #mainContent #articlesGrid.ae-news-by-sport{grid-template-columns:minmax(0,1fr)!important;gap:20px!important;}
+  html body.ae-is-home #mainContent #articlesGrid .ae-news-sport-track > article:nth-child(n){flex-basis:90%!important;width:90%!important;}
+  .ae-news-sport-controls button{width:40px;height:40px;}
+}
+@media(max-width:370px){
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes.ae-free-takes[data-sport] > #freeTakesFeed,
+  html body.ae-is-football #mainContent #aeFootballMobileStage #freeTakes.ae-free-takes[data-sport] > #freeTakesFeed{--ae-visible-take-height:250px;}
+}

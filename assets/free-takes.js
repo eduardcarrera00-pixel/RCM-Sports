@@ -29,9 +29,10 @@
    const area=$('freeTakesFeed');if(!area)return;
    area.replaceChildren();
    const sorted=items.filter(t=>activeSection==='NFL'?(t.sport==='nfl'&&(!window.aeNflTakes||window.aeNflTakes.matches(t))):footballSports.has(t.sport));
+   area.setAttribute('aria-label','Últimos 20 Takes de '+(activeSection==='NFL'?'NFL':'Fútbol')+'. Desplázate hacia abajo para leer más.');
    sorted.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)||String(b.id||'').localeCompare(String(a.id||'')));
    const heading=$('aeTakesFeedHeading');
-   if(heading)heading.textContent='Últimos Takes'+(sorted.length?' · '+Math.min(sorted.length,8):'');
+   if(heading)heading.textContent='Últimos Takes'+(sorted.length?' · '+Math.min(sorted.length,20):'');
    if(!sorted.length){
      const more=$('freeTakesMore');if(more)more.hidden=true;
      const text=activeSection==='NFL'
@@ -42,8 +43,8 @@
    }
    const more=$('freeTakesMore');
    if(more)more.hidden=true;
-   // Both sport sections show the latest eight, before the recent article comments.
-   for(const t of sorted.slice(0,8)){
+   // Both sports keep their 20 latest posts in a two-card scroll viewport.
+   for(const t of sorted.slice(0,20)){
      const card=el('article',null,'ae-take-card ae-free-take-card');
      // Acento basado exclusivamente en el deporte real; no altera contenido ni votos.
      card.dataset.sport=Object.prototype.hasOwnProperty.call(sports,t.sport)?t.sport:'general';
