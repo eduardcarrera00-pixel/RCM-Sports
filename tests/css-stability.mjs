@@ -29,7 +29,7 @@ const repeated=report.doubleLoaded.map(row=>row.file);
 assert.deepEqual(repeated,[],
   'No stylesheet should be loaded both inside the editorial bundle and standalone');
 const manifest=JSON.parse(fs.readFileSync('assets/style-sources.json','utf8'));
-const htmlLinks=[...fs.readFileSync('index.html','utf8').matchAll(/<link\\b[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']+)["']/g)]
+const htmlLinks=[...fs.readFileSync('index.html','utf8').matchAll(/<link\b[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']+)["']/g)]
   .map(match=>match[1].split('?')[0]);
 for(const file of existingDuplicateSources){
   assert.equal(manifest.includes(file),false, file+' must be omitted from the initial bundle');
