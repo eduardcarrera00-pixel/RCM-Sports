@@ -60,4 +60,42 @@ assert.equal([...auth.matchAll(hidden)].length,1,'Keep exactly one hidden notifi
 const html=fs.readFileSync('index.html','utf8');
 assert.match(html,/ae-editorial-bundle\.css/);
 assert.match(html,/ae-classical-auth-buttons\.css/);
+
+// Phase 4: 17 adjacent inline <style> elements were moved into four
+// stylesheets at precisely the same positions. Keep each original rule intact.
+const extracted=[
+  {file:'assets/ae-inline-mobile-layout.css',ids:[
+    'ae-home-weekly-reference-mobile','ae-mobile-home-rankings-top-three',
+    'ae-football-ranking-mobile-frame-fix','ae-sport-bottom-ctas-style',
+    'ae-nfl-savant-rookie-mobile-visible']},
+  {file:'assets/ae-inline-news-rankings.css',ids:[
+    'ae-home-news-carousel-styles','ae-cocina-day-variant',
+    'ae-sport-news-mobile-carousel','ae-home-rankings-edge-to-edge',
+    'ae-home-points-tables','ae-news-headings-20261017-fine-tune']},
+  {file:'assets/ae-inline-brand-header.css',ids:[
+    'ae-home-sun-takes-trending-polish','ae-header-moon-sport-icons-and-classic-avisos',
+    'ae-avisos-harmonized-icon']},
+  {file:'assets/ae-inline-standings-trending.css',ids:[
+    'ae-home-standings-simplified-20261017',
+    'ae-desktop-sport-nav-hover-no-squares-20261017',
+    'ae-home-trending-read-count-bottom-right']}
+];
+let lastLinkPosition=-1;
+for(const group of extracted){
+  const pos=html.indexOf('href="'+group.file+'?');
+  assert.ok(pos>lastLinkPosition,'Extracted CSS must maintain original cascade order: '+group.file);
+  lastLinkPosition=pos;
+  assert.equal(htmlLinks.filter(file=>file===group.file).length,1);
+  const stylesheet=fs.readFileSync(group.file,'utf8');
+  const origins=[...stylesheet.matchAll(/\/\* Original <style id="([^"]+)"> \*\//g)]
+    .map(match=>match[1]);
+  assert.deepEqual(origins,group.ids,'Original inline declaration order must be retained');
+  for(const origin of group.ids){
+    assert.ok(!html.includes('<style id="'+origin+'"'),
+      'Extracted CSS should not remain duplicated inside index.html: '+origin);
+  }
+}
+assert.equal([...html.matchAll(/<style\b/gi)].length,4,
+  'Only four high-risk inline style elements should remain after phase 4');
+
 console.log('PASS: CSS referenced assets, existing cascade order and safe duplicate-rule cleanup.');
