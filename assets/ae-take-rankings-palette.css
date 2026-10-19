@@ -152,7 +152,7 @@ html body #aeHomeTakeHighlights .ae-discovery-list {
   gap: 7px;
   list-style: none;
 }
-html body #aeHomeTakeHighlights .ae-discovery-list li {min-width:0;}
+
 html body #aeHomeTakeHighlights .ae-discovery-take {
   display: grid;
   gap: 5px;

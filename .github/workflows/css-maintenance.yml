@@ -1,0 +1,85 @@
+name: CSS maintenance checks
+
+on:
+  push:
+    branches:
+      - maintenance/css-safe-phase1-20261018
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'assets/**/*.css'
+      - 'assets/style-sources.json'
+      - 'assets/component-css-groups.json'
+      - 'scripts/build-component-css.mjs'
+      - 'scripts/audit-css.mjs'
+      - 'scripts/css-conflict-inventory.mjs'
+      - 'tests/css-stability.mjs'
+      - 'index.html'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/css-maintenance.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  css-stability:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Check CSS references and cascade
+        run: npm run test:css
+      - name: Inventory CSS duplicates and competing declarations
+        run: npm run css:conflicts
+      - name: Verify compiled CSS matches its source manifest
+        run: |
+          node scripts/build-editorial-css.mjs
+          git diff --exit-code -- assets/ae-editorial-bundle.css
+      - name: Check community picks database rules
+        run: node tests/community-picks.mjs
+      - name: Check current Picks composer UI
+        run: node tests/pick-composer-direct.mjs
+      - name: Check screenshot capture, odds recognition and database rules
+        run: npm run test:capture
+      - name: Check profile Takes and Picks rendering
+        run: node tests/profile-compose.mjs
+      - name: Check updated NFL and Fútbol Takes, reply counts and news
+        run: node tests/news-sports-takes.mjs
+      - name: Check account login and session recovery
+        run: npm run test:auth
+      - name: Check Take and Pick drafts
+        run: npm run test:drafts
+
+  css-visual-equivalence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Checkout published-source main as baseline
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: baseline
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Compare four sections, desktop/mobile, day/night
+        run: node tests/css-visual-equivalence.cjs
+      - name: Upload screenshot differences, if any
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: css-visual-differences
+          path: css-visual-diffs/
+          if-no-files-found: ignore

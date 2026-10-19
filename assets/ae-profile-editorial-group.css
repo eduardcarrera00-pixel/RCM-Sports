@@ -1,0 +1,1136 @@
+/* AE SPORTS component source: assets/ae-profile-city-editorial.css */
+/* AE SPORTS · Mis Takes / perfiles públicos — escena editorial clásica.
+   Conservar listas, votos, cambio de comunidad y navegación actuales.
+   Imagen panorámica propia ya utilizada en AE SPORTS; no se duplica ningún asset. */
+
+/* Ventana centrada. Una sola zona de scroll: evita el doble desplazamiento en móvil. */
+#aeProfileDialog.ae-profile-dialog {
+  --ae-profile-bg:#0b2231;
+  --ae-profile-ink:#f4eadc;
+  --ae-profile-muted:#c3ccd0;
+  --ae-profile-gold:#d3a77b;
+  --ae-profile-line:rgba(204,166,126,.35);
+  box-sizing:border-box;
+  color-scheme:dark;
+  position:fixed;
+  inset:50% auto auto 50%;
+  transform:translate(-50%,-50%);
+  width:min(850px,calc(100vw - 32px));
+  max-width:850px;
+  max-height:min(90dvh,900px);
+  margin:0;
+  padding:0;
+  overflow-y:auto;
+  overflow-x:hidden;
+  overscroll-behavior:contain;
+  scrollbar-color:rgba(186,142,100,.58) transparent;
+  border:1px solid rgba(204,161,111,.7);
+  border-radius:0!important;
+  background:linear-gradient(145deg,#122e40 0%,var(--ae-profile-bg) 48%,#081b2a 100%);
+  color:var(--ae-profile-ink);
+  box-shadow:0 28px 100px rgba(0,9,19,.57), 0 0 0 1px rgba(246,212,165,.08) inset;
+}
+#aeProfileDialog.ae-profile-dialog::backdrop {
+  background:rgba(2,12,21,.78);
+  -webkit-backdrop-filter:blur(5px);
+  backdrop-filter:blur(5px);
+}
+
+/* Cabecera con la misma ciudad / arquitectura monumental que AE SPORTS.
+   El degradado protege la lectura del título y deja respirar la imagen. */
+#aeProfileDialog .ae-profile-top {
+  position:relative;
+  isolation:isolate;
+  box-sizing:border-box;
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:18px;
+  min-height:182px;
+  margin:0;
+  padding:31px 34px 34px;
+  border-bottom:1px solid rgba(224,181,131,.56);
+  border-radius:0;
+  background-color:#092234;
+  background-image:
+    linear-gradient(90deg,rgba(6,23,37,.98) 0%,rgba(8,28,42,.91) 39%,rgba(9,32,47,.4) 79%,rgba(7,23,37,.26) 100%),
+    url("takes/ae-football-takes-hero-night.webp");
+  background-size:cover,cover;
+  background-position:center,center 45%;
+  background-repeat:no-repeat;
+  box-shadow:inset 0 -60px 60px -58px rgba(1,9,19,.66);
+}
+#aeProfileDialog .ae-profile-top::after {
+  content:"";
+  position:absolute;
+  z-index:-1;
+  inset:auto 0 0;
+  height:56px;
+  pointer-events:none;
+  background:linear-gradient(0deg,rgba(10,32,47,.56),transparent);
+}
+#aeProfileDialog .ae-profile-top > div {
+  position:relative;
+  z-index:1;
+  min-width:0;
+  max-width:580px;
+  padding-top:8px;
+}
+#aeProfileDialog .ae-profile-top span {
+  display:block;
+  margin:0 0 9px;
+  font:750 10px/1.35 Inter,system-ui,sans-serif;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:#e6bd90;
+  text-shadow:0 1px 4px rgba(0,0,0,.5);
+}
+#aeProfileDialog .ae-profile-top h2 {
+  margin:0;
+  padding:0;
+  max-width:100%;
+  font:600 clamp(36px,4.8vw,55px)/.98 Newsreader,Georgia,serif;
+  letter-spacing:-.035em;
+  color:#fff1df;
+  overflow-wrap:anywhere;
+  text-shadow:0 3px 24px rgba(0,5,15,.58);
+}
+#aeProfileDialog .ae-profile-top p {
+  margin:10px 0 0;
+  max-width:540px;
+  font:500 12px/1.5 Inter,system-ui,sans-serif;
+  color:#dfd8d0;
+  overflow-wrap:anywhere;
+  text-shadow:0 1px 8px rgba(0,0,0,.58);
+}
+#aeProfileDialog .ae-profile-close {
+  position:relative;
+  z-index:2;
+  flex:0 0 37px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:37px;
+  height:37px;
+  margin:0;
+  padding:0;
+  border:1px solid rgba(238,199,154,.62);
+  border-radius:0;
+  background:rgba(6,22,34,.52);
+  color:#fff2df;
+  font:400 19px/1 Inter,system-ui,sans-serif;
+  cursor:pointer;
+  transition:background .15s ease,border-color .15s ease;
+}
+#aeProfileDialog .ae-profile-close:hover {
+  background:rgba(20,54,72,.9);
+  border-color:#f0c69d;
+}
+
+/* Resumen editorial y jerarquía de lectura. */
+#aeProfileDialog .ae-profile-overview {
+  position:relative;
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr);
+  align-items:center;
+  gap:12px 22px;
+  margin:0;
+  padding:22px 32px 18px;
+  border-bottom:1px solid rgba(202,168,132,.21);
+  background:linear-gradient(105deg,rgba(25,57,73,.54),rgba(7,27,40,.06) 72%);
+}
+#aeProfileDialog .ae-profile-overview strong {
+  display:block;
+  font:600 27px/1.05 Newsreader,Georgia,serif;
+  color:#f1d1a8;
+  white-space:normal;
+}
+#aeProfileDialog .ae-profile-overview p {
+  margin:0;
+  max-width:535px;
+  font:400 12px/1.6 Inter,system-ui,sans-serif;
+  color:var(--ae-profile-muted);
+}
+#aeProfileDialog #aeProfileStatus {
+  margin:0;
+  padding:0 32px;
+  min-height:0;
+  font:500 12px/1.55 Inter,system-ui,sans-serif;
+  color:#f4cfa7;
+}
+#aeProfileDialog #aeProfileStatus:not(:empty) {
+  padding-top:11px;
+  padding-bottom:8px;
+}
+
+/* Tu Take histórico: remate visual con luz cálida y la ciudad difuminada. */
+html body #aeProfileDialog #aeProfileHistoricTake.ae-profile-historic {
+  position:relative;
+  isolation:isolate;
+  box-sizing:border-box;
+  display:block;
+  margin:20px 32px 20px!important;
+  padding:20px 24px!important;
+  border:1px solid rgba(208,165,116,.52)!important;
+  border-left:3px solid #cc9f6f!important;
+  border-radius:0!important;
+  background-color:#0d2b3e!important;
+  background-image:
+    linear-gradient(105deg,rgba(5,24,38,.96) 0%,rgba(10,33,49,.91) 49%,rgba(10,34,48,.6) 100%),
+    url("takes/ae-football-takes-hero-night.webp")!important;
+  background-size:cover,cover!important;
+  background-position:center,center 65%!important;
+  box-shadow:none!important;
+  overflow:hidden;
+}
+html body #aeProfileDialog #aeProfileHistoricTake[hidden] {display:none!important}
+html body #aeProfileDialog #aeProfileHistoricTake .ae-profile-historic-label {
+  display:block;
+  color:#e2b98c!important;
+  letter-spacing:.15em!important;
+  font:750 10px/1.4 Inter,system-ui,sans-serif!important;
+}
+html body #aeProfileDialog #aeProfileHistoricTake h3 {
+  max-width:640px;
+  margin:8px 0 7px!important;
+  color:#fff1dd!important;
+  font:600 clamp(23px,3.6vw,31px)/1.1 Newsreader,Georgia,serif!important;
+  letter-spacing:-.015em;
+  overflow-wrap:anywhere;
+}
+html body #aeProfileDialog #aeProfileHistoricTake p {
+  display:-webkit-box;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:3;
+  overflow:hidden;
+  max-width:640px;
+  margin:0 0 12px;
+  color:#d9e0df!important;
+  font:400 13px/1.55 Inter,system-ui,sans-serif!important;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+}
+html body #aeProfileDialog #aeProfileHistoricTake strong {
+  color:#edc59b!important;
+  font:700 11px/1.4 Inter,system-ui,sans-serif!important;
+}
+
+/* Histórico completo: tarjetas cuadradas, sin texto truncado. */
+#aeProfileDialog #aeProfileTakes.ae-profile-takes {
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  gap:10px;
+  box-sizing:border-box;
+  max-height:none!important;
+  margin:0;
+  padding:5px 32px 30px;
+  overflow:visible!important;
+}
+#aeProfileDialog #aeProfileTakes .ae-profile-item {
+  position:relative;
+  box-sizing:border-box;
+  min-width:0;
+  margin:0;
+  padding:18px 20px;
+  border:1px solid rgba(186,155,127,.33);
+  border-left:2px solid rgba(196,150,105,.79);
+  border-radius:0!important;
+  background:linear-gradient(115deg,rgba(25,52,67,.94),rgba(13,38,53,.75));
+  box-shadow:none;
+}
+#aeProfileDialog #aeProfileTakes .ae-profile-item-meta {
+  display:block;
+  margin:0 0 9px;
+  font:750 10px/1.4 Inter,system-ui,sans-serif;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+  color:#ddb187;
+}
+#aeProfileDialog #aeProfileTakes .ae-profile-item h3 {
+  margin:0 0 7px;
+  padding:0;
+  color:#fff1e2;
+  font:600 clamp(21px,3vw,26px)/1.12 Newsreader,Georgia,serif;
+  letter-spacing:-.01em;
+  overflow-wrap:anywhere;
+}
+#aeProfileDialog #aeProfileTakes .ae-profile-item p {
+  margin:0;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  color:#d7dfe0;
+  font:400 13px/1.62 Inter,system-ui,sans-serif;
+}
+#aeProfileDialog #aeProfileTakes .ae-profile-item-stats {
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:8px 12px;
+  margin:15px 0 0;
+  padding:12px 0 0;
+  border-top:1px solid rgba(198,166,129,.21);
+  color:#e1bd92;
+  font:700 11px/1.4 Inter,system-ui,sans-serif;
+}
+#aeProfileDialog #aeProfileTakes .ae-profile-item-stats span {
+  display:inline-flex;
+  align-items:center;
+  min-height:26px;
+  padding:4px 7px;
+  border:1px solid rgba(212,166,121,.2);
+  color:#e0c2a3;
+  background:rgba(5,24,38,.26);
+}
+#aeProfileDialog #aeProfileTakes .ae-profile-item-stats button {
+  min-height:31px;
+  margin:0;
+  padding:6px 10px;
+  border:1px solid rgba(202,155,111,.68);
+  border-radius:0!important;
+  background:rgba(190,134,83,.12);
+  color:#f3ddc5;
+  font:650 11px/1.3 Inter,system-ui,sans-serif;
+  cursor:pointer;
+}
+#aeProfileDialog #aeProfileTakes .ae-profile-item-stats button:hover {
+  background:rgba(211,156,102,.23);
+  border-color:#e5b585;
+}
+#aeProfileDialog #aeProfileTakes .ae-profile-item-stats button:disabled {
+  opacity:.55;
+  cursor:not-allowed;
+}
+#aeProfileDialog .ae-profile-empty {
+  margin:2px 0 0;
+  padding:22px;
+  border:1px solid var(--ae-profile-line);
+  background:rgba(23,52,66,.48);
+  color:var(--ae-profile-muted);
+  font:400 13px/1.6 Inter,system-ui,sans-serif;
+}
+#aeProfileDialog button:focus-visible {
+  outline:2px solid #e7bc88!important;
+  outline-offset:3px;
+}
+#aeProfileDialog .ae-profile-item-stats button[aria-pressed="true"] {
+  border-color:#e8bd88;
+  background:rgba(195,143,93,.36);
+  color:#fff4e3;
+}
+
+/* Modo día: papel marfil, azul apagado y bronce; la misma vista urbana. */
+html:not(.dark) body #aeProfileDialog.ae-profile-dialog {
+  --ae-profile-bg:#f9f5ed;
+  --ae-profile-ink:#213849;
+  --ae-profile-muted:#596875;
+  --ae-profile-gold:#8e603b;
+  --ae-profile-line:rgba(150,105,67,.32);
+  color-scheme:light;
+  border-color:#bea07e;
+  background:linear-gradient(155deg,#fffbf2 0%,#f8f3e8 65%,#eff2ee 100%);
+  color:var(--ae-profile-ink);
+  box-shadow:0 25px 78px rgba(66,48,33,.32);
+}
+html:not(.dark) body #aeProfileDialog.ae-profile-dialog::backdrop {
+  background:rgba(43,37,33,.5);
+}
+html:not(.dark) body #aeProfileDialog .ae-profile-top {
+  background-color:#f7f0e4;
+  background-image:
+    linear-gradient(90deg,rgba(255,251,244,.98) 0%,rgba(255,250,240,.92) 39%,rgba(255,251,243,.40) 77%,rgba(255,250,241,.19) 100%),
+    url("takes/ae-football-takes-hero-day.webp");
+  box-shadow:inset 0 -45px 50px -55px rgba(81,58,35,.26);
+  border-bottom-color:rgba(150,103,60,.4);
+}
+html:not(.dark) body #aeProfileDialog .ae-profile-top::after {
+  background:linear-gradient(0deg,rgba(255,250,243,.25),transparent);
+}
+html:not(.dark) body #aeProfileDialog .ae-profile-top span {
+  color:#95633e;
+  text-shadow:none;
+}
+html:not(.dark) body #aeProfileDialog .ae-profile-top h2 {
+  color:#1c3546;
+  text-shadow:0 1px 10px rgba(255,255,255,.65);
+}
+html:not(.dark) body #aeProfileDialog .ae-profile-top p {
+  color:#495a64;
+  text-shadow:none;
+}
+html:not(.dark) body #aeProfileDialog .ae-profile-close {
+  border-color:#b68a60;
+  background:rgba(255,250,242,.77);
+  color:#273c49;
+}
+html:not(.dark) body #aeProfileDialog .ae-profile-close:hover {
+  background:#fffaf1;
+}
+html:not(.dark) body #aeProfileDialog .ae-profile-overview {
+  background:linear-gradient(105deg,rgba(241,232,218,.89),rgba(255,251,243,.25) 72%);
+  border-bottom-color:rgba(155,122,90,.22);
+}
+html:not(.dark) body #aeProfileDialog .ae-profile-overview strong {color:#875d3e}
+html:not(.dark) body #aeProfileDialog .ae-profile-overview p {color:#53636d}
+html:not(.dark) body #aeProfileDialog #aeProfileStatus {color:#8d4d35}
+html:not(.dark) body #aeProfileDialog #aeProfileHistoricTake.ae-profile-historic {
+  background-color:#f8f0e3!important;
+  background-image:
+    linear-gradient(105deg,rgba(255,251,243,.96) 0%,rgba(255,250,241,.87) 48%,rgba(255,248,235,.38) 100%),
+    url("takes/ae-football-takes-hero-day.webp")!important;
+  border-color:rgba(157,112,66,.48)!important;
+  border-left-color:#a67649!important;
+}
+html:not(.dark) body #aeProfileDialog #aeProfileHistoricTake .ae-profile-historic-label {color:#835735!important}
+html:not(.dark) body #aeProfileDialog #aeProfileHistoricTake h3 {color:#264255!important}
+html:not(.dark) body #aeProfileDialog #aeProfileHistoricTake p {color:#495f6c!important}
+html:not(.dark) body #aeProfileDialog #aeProfileHistoricTake strong {color:#84583b!important}
+html:not(.dark) body #aeProfileDialog #aeProfileTakes .ae-profile-item {
+  border-color:#d8c3ab;
+  border-left-color:#b98d63;
+  background:linear-gradient(110deg,rgba(255,253,249,.99),rgba(244,240,230,.87));
+}
+html:not(.dark) body #aeProfileDialog #aeProfileTakes .ae-profile-item-meta {color:#875d3e}
+html:not(.dark) body #aeProfileDialog #aeProfileTakes .ae-profile-item h3 {color:#1c3749}
+html:not(.dark) body #aeProfileDialog #aeProfileTakes .ae-profile-item p {color:#495e6b}
+html:not(.dark) body #aeProfileDialog #aeProfileTakes .ae-profile-item-stats {
+  color:#815a3b;
+  border-top-color:rgba(150,113,77,.25);
+}
+html:not(.dark) body #aeProfileDialog #aeProfileTakes .ae-profile-item-stats span {
+  color:#7e593c;
+  border-color:#e0cdb5;
+  background:#f4ecdf;
+}
+html:not(.dark) body #aeProfileDialog #aeProfileTakes .ae-profile-item-stats button {
+  color:#55402f;
+  border-color:#b58d66;
+  background:#f0e2d2;
+}
+html:not(.dark) body #aeProfileDialog #aeProfileTakes .ae-profile-item-stats button:hover {
+  background:#e8d3ba;
+}
+html:not(.dark) body #aeProfileDialog #aeProfileTakes .ae-profile-item-stats button[aria-pressed="true"] {
+  color:#4d392c;
+  background:#ead0af;
+}
+html:not(.dark) body #aeProfileDialog .ae-profile-empty {
+  background:#f7eee0;
+  color:#59636b;
+}
+
+@media (max-width:760px) {
+  #aeProfileDialog.ae-profile-dialog {
+    inset:50% auto auto 50%;
+    width:calc(100vw - 16px);
+    max-width:none;
+    max-height:92dvh;
+  }
+  #aeProfileDialog .ae-profile-top {
+    min-height:166px;
+    padding:21px 18px 24px;
+    gap:10px;
+    background-position:center,62% center;
+  }
+  #aeProfileDialog .ae-profile-top > div {max-width:calc(100% - 42px)}
+  #aeProfileDialog .ae-profile-top span {font-size:9px;letter-spacing:.12em}
+  #aeProfileDialog .ae-profile-top h2 {font-size:clamp(31px,8.3vw,41px)}
+  #aeProfileDialog .ae-profile-top p {font-size:11px;line-height:1.4}
+  #aeProfileDialog .ae-profile-close {flex-basis:34px;width:34px;height:34px;font-size:17px}
+  #aeProfileDialog .ae-profile-overview {
+    grid-template-columns:minmax(0,1fr);
+    gap:8px;
+    padding:17px 18px 15px;
+  }
+  #aeProfileDialog .ae-profile-overview strong {font-size:24px}
+  #aeProfileDialog .ae-profile-overview p {font-size:11px;line-height:1.5}
+  #aeProfileDialog #aeProfileStatus {padding-inline:18px}
+  html body #aeProfileDialog #aeProfileHistoricTake.ae-profile-historic {
+    margin:14px 18px 16px!important;
+    padding:16px 17px!important;
+  }
+  html body #aeProfileDialog #aeProfileHistoricTake h3 {font-size:24px!important}
+  html body #aeProfileDialog #aeProfileHistoricTake p {font-size:12px!important;line-height:1.46!important}
+  #aeProfileDialog #aeProfileTakes.ae-profile-takes {gap:9px;padding:0 18px 22px}
+  #aeProfileDialog #aeProfileTakes .ae-profile-item {padding:15px 14px}
+  #aeProfileDialog #aeProfileTakes .ae-profile-item h3 {font-size:22px}
+  #aeProfileDialog #aeProfileTakes .ae-profile-item p {font-size:12px;line-height:1.48}
+  #aeProfileDialog #aeProfileTakes .ae-profile-item-stats {gap:8px;margin-top:12px}
+  #aeProfileDialog #aeProfileTakes .ae-profile-item-stats span {font-size:10px}
+  #aeProfileDialog .ae-profile-empty {margin:0 18px 22px}
+}
+@media (max-width:380px) {
+  #aeProfileDialog .ae-profile-top {padding:18px 14px 20px;min-height:153px}
+  #aeProfileDialog .ae-profile-top h2 {font-size:29px}
+  #aeProfileDialog .ae-profile-overview {padding-inline:14px}
+  html body #aeProfileDialog #aeProfileHistoricTake.ae-profile-historic {margin-inline:14px!important}
+  #aeProfileDialog #aeProfileTakes.ae-profile-takes {padding-inline:14px}
+}
+@media (prefers-reduced-motion:reduce) {
+  #aeProfileDialog .ae-profile-close {transition:none}
+}
+/* AE SPORTS component source: assets/ae-profile-tabs-picks.css */
+/* AE SPORTS · Mi perfil: Takes + Picks tabs and performance summary. */
+
+#aeProfileDialog .ae-profile-tabs{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin:0;
+  padding:14px 32px 0;
+}
+#aeProfileDialog .ae-profile-tabs[hidden]{display:none!important}
+#aeProfileDialog .ae-profile-tabs button{
+  min-width:112px;
+  min-height:34px;
+  padding:7px 13px;
+  border:1px solid rgba(205,166,123,.28);
+  border-radius:0;
+  background:rgba(8,29,42,.26);
+  color:#cbd5d8;
+  font:750 10px/1 Inter,system-ui,sans-serif;
+  letter-spacing:.035em;
+  text-transform:uppercase;
+  cursor:pointer;
+}
+#aeProfileDialog .ae-profile-tabs button:hover{
+  border-color:rgba(225,180,130,.54);
+  color:#f2dfca;
+}
+#aeProfileDialog .ae-profile-tabs button.is-active,
+#aeProfileDialog .ae-profile-tabs button[aria-selected="true"]{
+  border-color:#d4a36f;
+  background:linear-gradient(110deg,rgba(196,138,82,.24),rgba(16,47,63,.26));
+  color:#fff0df;
+  box-shadow:inset 0 -2px 0 #d4a36f;
+}
+
+#aeProfileDialog .ae-profile-highlights{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+  margin:18px 32px 18px;
+}
+#aeProfileDialog .ae-profile-highlights[hidden]{display:none!important}
+#aeProfileDialog .ae-profile-feature{
+  position:relative;
+  min-width:0;
+  padding:15px 16px;
+  overflow:hidden;
+  border:1px solid rgba(190,155,120,.27);
+  border-left:3px solid #b98b5d;
+  background:linear-gradient(135deg,rgba(23,53,69,.95),rgba(10,34,49,.82));
+}
+#aeProfileDialog .ae-profile-feature-best{border-left-color:#6daba2}
+#aeProfileDialog .ae-profile-feature-worst{border-left-color:#b96c75}
+#aeProfileDialog .ae-profile-feature-popular{border-left-color:#d2a16c}
+#aeProfileDialog .ae-profile-feature-label{
+  display:block;
+  margin:0 0 7px;
+  color:#d9ae82;
+  font:800 9px/1.2 Inter,system-ui,sans-serif;
+  letter-spacing:.10em;
+  text-transform:uppercase;
+}
+#aeProfileDialog .ae-profile-feature-best .ae-profile-feature-label{color:#8fc0b9}
+#aeProfileDialog .ae-profile-feature-worst .ae-profile-feature-label{color:#d4939b}
+#aeProfileDialog .ae-profile-feature h3{
+  margin:0 0 7px;
+  color:#fff0df;
+  font:600 20px/1.12 Newsreader,Georgia,serif;
+  letter-spacing:-.012em;
+  overflow-wrap:anywhere;
+}
+#aeProfileDialog .ae-profile-feature p{
+  display:-webkit-box;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:3;
+  margin:0 0 10px;
+  overflow:hidden;
+  color:#d3dcdd;
+  font:400 11.5px/1.45 Inter,system-ui,sans-serif;
+}
+#aeProfileDialog .ae-profile-feature-stats{
+  display:flex;
+  gap:9px;
+  align-items:center;
+  color:#dfbd99;
+  font:700 10px/1.2 Inter,system-ui,sans-serif;
+}
+#aeProfileDialog .ae-profile-feature-stats strong{color:#86b9b0}
+#aeProfileDialog .ae-profile-feature-worst .ae-profile-feature-stats strong{color:#d08a93}
+
+#aeProfileDialog .ae-profile-list-heading{
+  margin:10px 0 3px;
+  padding:0 0 8px;
+  border-bottom:1px solid rgba(197,163,128,.22);
+  color:#f1d5b3;
+  font:600 24px/1.05 Newsreader,Georgia,serif;
+  letter-spacing:-.02em;
+}
+#aeProfileDialog #aeProfileTakes.ae-profile-takes,
+#aeProfileDialog #aeProfilePicks.ae-profile-picks{
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  gap:10px;
+  box-sizing:border-box;
+  margin:0;
+  padding:0 32px 28px;
+}
+#aeProfileDialog #aeProfileTakes[hidden],
+#aeProfileDialog #aeProfilePicks[hidden]{display:none!important}
+
+/* Picks summary */
+#aeProfileDialog .ae-profile-pick-highlights{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+  margin:18px 32px;
+}
+#aeProfileDialog .ae-profile-pick-highlights[hidden]{display:none!important}
+#aeProfileDialog .ae-profile-pick-group{
+  min-width:0;
+  padding:15px;
+  border:1px solid rgba(187,154,121,.28);
+  background:linear-gradient(135deg,rgba(23,52,68,.78),rgba(11,34,48,.58));
+}
+#aeProfileDialog .ae-profile-pick-group-best{border-top:2px solid #6daba2}
+#aeProfileDialog .ae-profile-pick-group-worst{border-top:2px solid #b96c75}
+#aeProfileDialog .ae-profile-pick-group>h3{
+  margin:0 0 10px;
+  color:#f2d7b7;
+  font:600 22px/1.05 Newsreader,Georgia,serif;
+}
+#aeProfileDialog .ae-profile-pick-grid{
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  gap:7px;
+}
+
+#aeProfileDialog .ae-profile-pick{
+  min-width:0;
+  padding:14px 15px;
+  border:1px solid rgba(189,158,126,.25);
+  border-left:2px solid rgba(195,153,111,.72);
+  background:linear-gradient(112deg,rgba(24,52,67,.91),rgba(11,35,50,.72));
+}
+#aeProfileDialog .ae-profile-pick.is-won{border-left-color:#6daba2}
+#aeProfileDialog .ae-profile-pick.is-lost{border-left-color:#b96c75}
+#aeProfileDialog .ae-profile-pick.is-void{border-left-color:#9ba8ad}
+#aeProfileDialog .ae-profile-pick.is-pending{border-left-color:#c59662}
+#aeProfileDialog .ae-profile-pick-feature{padding:11px 12px}
+#aeProfileDialog .ae-profile-pick-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:5px 9px;
+  margin:0 0 6px;
+  color:#caa47c;
+  font:750 8.5px/1.2 Inter,system-ui,sans-serif;
+  letter-spacing:.035em;
+  text-transform:uppercase;
+}
+#aeProfileDialog .ae-profile-pick.is-won .ae-profile-pick-meta span:first-child{color:#8fc0b9}
+#aeProfileDialog .ae-profile-pick.is-lost .ae-profile-pick-meta span:first-child{color:#d4939b}
+#aeProfileDialog .ae-profile-pick h4{
+  margin:0 0 8px;
+  color:#fff0df;
+  font:600 19px/1.14 Newsreader,Georgia,serif;
+  letter-spacing:-.01em;
+  overflow-wrap:anywhere;
+}
+#aeProfileDialog .ae-profile-pick-legs{
+  display:grid;
+  gap:5px;
+}
+#aeProfileDialog .ae-profile-pick-legs p{
+  display:flex;
+  flex-wrap:wrap;
+  gap:3px 7px;
+  margin:0;
+  color:#bcc9ce;
+  font:400 10.5px/1.35 Inter,system-ui,sans-serif;
+}
+#aeProfileDialog .ae-profile-pick-legs strong{
+  color:#e6d7c7;
+  font-weight:650;
+}
+#aeProfileDialog .ae-profile-pick-explanation{
+  display:-webkit-box;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:2;
+  margin:8px 0 0;
+  overflow:hidden;
+  color:#cad4d7;
+  font:400 11px/1.45 Inter,system-ui,sans-serif;
+}
+#aeProfileDialog .ae-profile-pick-footer{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:6px 9px;
+  margin:10px 0 0;
+  padding:8px 0 0;
+  border-top:1px solid rgba(195,161,126,.16);
+  color:#c9aa89;
+  font:700 9.5px/1.2 Inter,system-ui,sans-serif;
+}
+#aeProfileDialog .ae-profile-pick-footer strong{
+  color:#ecc59a;
+}
+#aeProfileDialog .ae-profile-pick.is-won .ae-profile-pick-footer strong{color:#93c5bd}
+#aeProfileDialog .ae-profile-pick.is-lost .ae-profile-pick-footer strong{color:#d6949b}
+#aeProfileDialog .ae-profile-pick-open{
+  margin-left:auto;
+  min-height:26px;
+  padding:4px 8px;
+  border:1px solid rgba(205,164,122,.52);
+  border-radius:0;
+  background:rgba(197,141,88,.09);
+  color:#ead6c0;
+  font:700 9px/1 Inter,system-ui,sans-serif;
+  cursor:pointer;
+}
+#aeProfileDialog .ae-profile-pick-open:hover{
+  border-color:#d9aa77;
+  background:rgba(198,142,88,.18);
+}
+
+#aeProfileDialog .ae-profile-accuracy{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr);
+  align-items:center;
+  gap:15px 22px;
+  margin:0 32px 30px;
+  padding:19px 21px;
+  border:1px solid rgba(207,165,117,.44);
+  background:
+    radial-gradient(circle at 10% 10%,rgba(213,158,94,.13),transparent 42%),
+    linear-gradient(110deg,rgba(22,52,67,.88),rgba(9,32,46,.68));
+}
+#aeProfileDialog .ae-profile-accuracy[hidden]{display:none!important}
+#aeProfileDialog .ae-profile-accuracy-copy{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  min-width:125px;
+}
+#aeProfileDialog .ae-profile-accuracy-copy span{
+  color:#d2ab82;
+  font:800 8.5px/1.2 Inter,system-ui,sans-serif;
+  letter-spacing:.12em;
+}
+#aeProfileDialog .ae-profile-accuracy-copy strong{
+  color:#fff0dd;
+  font:600 40px/.95 Newsreader,Georgia,serif;
+  letter-spacing:-.04em;
+}
+#aeProfileDialog .ae-profile-accuracy>p{
+  margin:0;
+  color:#c8d2d4;
+  font:400 11.5px/1.5 Inter,system-ui,sans-serif;
+}
+
+/* Day mode */
+html:not(.dark) body #aeProfileDialog .ae-profile-tabs button{
+  border-color:rgba(148,107,72,.25);
+  background:rgba(255,255,255,.40);
+  color:#53636d;
+}
+html:not(.dark) body #aeProfileDialog .ae-profile-tabs button.is-active,
+html:not(.dark) body #aeProfileDialog .ae-profile-tabs button[aria-selected="true"]{
+  border-color:#a97548;
+  background:#f0e2d0;
+  color:#603d23;
+  box-shadow:inset 0 -2px 0 #a97548;
+}
+html:not(.dark) body #aeProfileDialog .ae-profile-feature,
+html:not(.dark) body #aeProfileDialog .ae-profile-pick,
+html:not(.dark) body #aeProfileDialog .ae-profile-pick-group{
+  border-color:#dbc5ac;
+  background:linear-gradient(115deg,rgba(255,253,248,.98),rgba(244,239,229,.90));
+}
+html:not(.dark) body #aeProfileDialog .ae-profile-feature h3,
+html:not(.dark) body #aeProfileDialog .ae-profile-pick h4,
+html:not(.dark) body #aeProfileDialog .ae-profile-pick-group>h3,
+html:not(.dark) body #aeProfileDialog .ae-profile-list-heading{color:#213d50}
+html:not(.dark) body #aeProfileDialog .ae-profile-feature p,
+html:not(.dark) body #aeProfileDialog .ae-profile-pick-legs p,
+html:not(.dark) body #aeProfileDialog .ae-profile-pick-explanation{color:#536570}
+html:not(.dark) body #aeProfileDialog .ae-profile-pick-legs strong{color:#314b5b}
+html:not(.dark) body #aeProfileDialog .ae-profile-feature-label,
+html:not(.dark) body #aeProfileDialog .ae-profile-pick-meta{color:#855b3a}
+html:not(.dark) body #aeProfileDialog .ae-profile-pick-footer{color:#7b5b42;border-top-color:#dfcdb9}
+html:not(.dark) body #aeProfileDialog .ae-profile-pick-open{
+  border-color:#b48a63;
+  background:#f1e4d3;
+  color:#593e29;
+}
+html:not(.dark) body #aeProfileDialog .ae-profile-accuracy{
+  border-color:#cfb291;
+  background:
+    radial-gradient(circle at 10% 10%,rgba(193,127,59,.10),transparent 42%),
+    linear-gradient(110deg,#fffaf1,#f3eadc);
+}
+html:not(.dark) body #aeProfileDialog .ae-profile-accuracy-copy span{color:#855a38}
+html:not(.dark) body #aeProfileDialog .ae-profile-accuracy-copy strong{color:#213c4e}
+html:not(.dark) body #aeProfileDialog .ae-profile-accuracy>p{color:#586975}
+
+@media(max-width:760px){
+  #aeProfileDialog .ae-profile-tabs{padding:11px 18px 0}
+  #aeProfileDialog .ae-profile-tabs button{flex:1 1 0;min-width:0}
+  #aeProfileDialog .ae-profile-highlights{
+    grid-template-columns:minmax(0,1fr);
+    gap:8px;
+    margin:14px 18px;
+  }
+  #aeProfileDialog .ae-profile-pick-highlights{
+    grid-template-columns:minmax(0,1fr);
+    gap:8px;
+    margin:14px 18px;
+  }
+  #aeProfileDialog #aeProfileTakes.ae-profile-takes,
+  #aeProfileDialog #aeProfilePicks.ae-profile-picks{
+    padding:0 18px 20px;
+  }
+  #aeProfileDialog .ae-profile-list-heading{font-size:22px}
+  #aeProfileDialog .ae-profile-pick{padding:12px}
+  #aeProfileDialog .ae-profile-pick h4{font-size:18px}
+  #aeProfileDialog .ae-profile-accuracy{
+    grid-template-columns:minmax(0,1fr);
+    gap:9px;
+    margin:0 18px 22px;
+    padding:16px;
+  }
+  #aeProfileDialog .ae-profile-accuracy-copy strong{font-size:36px}
+}
+@media(max-width:380px){
+  #aeProfileDialog .ae-profile-tabs{padding-inline:14px}
+  #aeProfileDialog .ae-profile-highlights,
+  #aeProfileDialog .ae-profile-pick-highlights{margin-inline:14px}
+  #aeProfileDialog #aeProfileTakes.ae-profile-takes,
+  #aeProfileDialog #aeProfilePicks.ae-profile-picks{padding-inline:14px}
+  #aeProfileDialog .ae-profile-accuracy{margin-inline:14px}
+}
+
+
+/* Unpopular Take: user-selected third profile highlight. */
+#aeProfileDialog .ae-profile-feature-unpopular{
+  border-left-color:#b08a72;
+  background:
+    radial-gradient(circle at 92% 10%,rgba(188,139,103,.12),transparent 42%),
+    linear-gradient(135deg,rgba(24,52,68,.95),rgba(12,35,49,.82));
+}
+#aeProfileDialog .ae-profile-feature-unpopular .ae-profile-feature-label{
+  color:#d4b29a;
+}
+#aeProfileDialog .ae-profile-feature-unpopular.is-empty{
+  border-style:dashed;
+  border-left-style:solid;
+}
+#aeProfileDialog .ae-profile-feature-action{
+  margin-left:auto;
+  min-height:24px;
+  padding:4px 8px;
+  border:1px solid rgba(208,169,127,.52);
+  border-radius:0;
+  background:rgba(199,146,94,.08);
+  color:#ead7c3;
+  font:750 8.5px/1 Inter,system-ui,sans-serif;
+  letter-spacing:.025em;
+  cursor:pointer;
+}
+#aeProfileDialog .ae-profile-feature-action:hover{
+  border-color:#dfb07c;
+  background:rgba(199,146,94,.17);
+}
+#aeProfileDialog .ae-profile-feature-action:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+}
+#aeProfileDialog .ae-profile-unpopular-chooser{
+  grid-column:1/-1;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(220px,1.4fr) auto;
+  align-items:center;
+  gap:10px 14px;
+  margin:0;
+  padding:13px 14px;
+  border:1px solid rgba(194,156,119,.30);
+  background:linear-gradient(110deg,rgba(16,43,58,.93),rgba(9,31,45,.77));
+}
+#aeProfileDialog .ae-profile-unpopular-copy{
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  min-width:0;
+}
+#aeProfileDialog .ae-profile-unpopular-copy strong{
+  color:#f0d7bd;
+  font:650 13px/1.2 Newsreader,Georgia,serif;
+}
+#aeProfileDialog .ae-profile-unpopular-copy span{
+  color:#aebdc2;
+  font:400 9.5px/1.35 Inter,system-ui,sans-serif;
+}
+#aeProfileDialog .ae-profile-unpopular-select{
+  width:100%;
+  min-width:0;
+  height:32px;
+  padding:5px 8px;
+  border:1px solid rgba(191,158,125,.33);
+  border-radius:0;
+  background:#0b293a;
+  color:#eee2d4;
+  font:500 10px/1 Inter,system-ui,sans-serif;
+}
+#aeProfileDialog .ae-profile-unpopular-actions{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+#aeProfileDialog .ae-profile-unpopular-actions button{
+  min-height:30px;
+  padding:5px 9px;
+  border-radius:0;
+  font:750 9px/1 Inter,system-ui,sans-serif;
+  cursor:pointer;
+}
+#aeProfileDialog .ae-profile-unpopular-save{
+  border:1px solid #d2a06b;
+  background:#a96f43;
+  color:#fff0df;
+}
+#aeProfileDialog .ae-profile-unpopular-cancel{
+  border:1px solid rgba(183,158,133,.32);
+  background:transparent;
+  color:#c6d0d2;
+}
+
+html:not(.dark) body #aeProfileDialog .ae-profile-feature-unpopular{
+  border-color:#d9c2aa;
+  border-left-color:#a6795a;
+  background:
+    radial-gradient(circle at 92% 10%,rgba(174,112,63,.08),transparent 42%),
+    linear-gradient(115deg,rgba(255,253,248,.98),rgba(244,239,229,.90));
+}
+html:not(.dark) body #aeProfileDialog .ae-profile-feature-unpopular .ae-profile-feature-label{color:#7e563e}
+html:not(.dark) body #aeProfileDialog .ae-profile-feature-action{
+  border-color:#b68c66;
+  background:#f2e5d7;
+  color:#5b402d;
+}
+html:not(.dark) body #aeProfileDialog .ae-profile-unpopular-chooser{
+  border-color:#d7c2ad;
+  background:linear-gradient(110deg,#fffaf2,#f2e9dd);
+}
+html:not(.dark) body #aeProfileDialog .ae-profile-unpopular-copy strong{color:#284253}
+html:not(.dark) body #aeProfileDialog .ae-profile-unpopular-copy span{color:#62717a}
+html:not(.dark) body #aeProfileDialog .ae-profile-unpopular-select{
+  border-color:#ccb499;
+  background:#fffdf8;
+  color:#213b4c;
+}
+html:not(.dark) body #aeProfileDialog .ae-profile-unpopular-save{
+  border-color:#a87348;
+  background:#b77d4c;
+  color:#fffaf1;
+}
+html:not(.dark) body #aeProfileDialog .ae-profile-unpopular-cancel{
+  border-color:#cbb39a;
+  color:#5f6c73;
+}
+
+@media(max-width:760px){
+  #aeProfileDialog .ae-profile-unpopular-chooser{
+    grid-template-columns:minmax(0,1fr);
+    gap:8px;
+  }
+  #aeProfileDialog .ae-profile-unpopular-actions{
+    justify-content:flex-start;
+  }
+}
+
+/* Compact last-ten Picks: vivid odds and full-card link, details only on opening. */
+#aeProfileDialog #aeProfilePicks .ae-profile-pick-recent{
+  position:relative;
+  cursor:pointer;
+  isolation:isolate;
+  transition:background-color .16s ease,border-color .16s ease,box-shadow .16s ease;
+}
+#aeProfileDialog #aeProfilePicks .ae-profile-pick-recent:hover,
+#aeProfileDialog #aeProfilePicks .ae-profile-pick-recent:focus-within{
+  border-color:rgba(232,184,127,.67);
+  background:linear-gradient(110deg,rgba(35,65,76,.98),rgba(15,41,55,.86));
+  box-shadow:inset 0 0 0 1px rgba(229,173,103,.11);
+}
+#aeProfileDialog #aeProfilePicks .ae-profile-pick-recent .ae-profile-pick-meta{
+  align-items:center;
+  column-gap:10px;
+  row-gap:6px;
+  margin-bottom:8px;
+}
+#aeProfileDialog #aeProfilePicks .ae-profile-pick-recent .ae-profile-pick-meta time{
+  margin-left:auto;
+  color:#bfcbd0;
+}
+#aeProfileDialog #aeProfilePicks .ae-profile-pick-odds-highlight{
+  display:inline-flex;
+  justify-content:center;
+  align-items:center;
+  min-height:27px;
+  box-sizing:border-box;
+  padding:6px 11px;
+  border:1px solid #edca93;
+  background:linear-gradient(110deg,#e8b975,#d99b59);
+  color:#182d3b;
+  font:850 11px/1.15 Inter,system-ui,sans-serif;
+  letter-spacing:.045em;
+  text-transform:uppercase;
+  white-space:nowrap;
+  box-shadow:0 0 12px rgba(226,162,88,.22),inset 0 1px rgba(255,255,255,.24);
+}
+#aeProfileDialog #aeProfilePicks .ae-profile-pick-recent .ae-profile-pick-footer{
+  margin-top:8px;
+}
+#aeProfileDialog #aeProfilePicks .ae-profile-pick-view-hint{
+  margin-left:auto;
+  color:#eec18d;
+  font:800 10px/1.3 Inter,system-ui,sans-serif;
+  letter-spacing:.08em;
+}
+#aeProfileDialog #aeProfilePicks .ae-profile-pick-hit{
+  position:absolute;
+  inset:0;
+  z-index:2;
+  display:block;
+  width:100%;
+  height:100%;
+  padding:0;
+  margin:0;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  color:transparent;
+  cursor:pointer;
+}
+#aeProfileDialog #aeProfilePicks .ae-profile-pick-hit:focus-visible{
+  outline:2px solid #f5c987!important;
+  outline-offset:-4px!important;
+}
+html:not(.dark) body #aeProfileDialog #aeProfilePicks .ae-profile-pick-recent:hover,
+html:not(.dark) body #aeProfileDialog #aeProfilePicks .ae-profile-pick-recent:focus-within{
+  border-color:#bb814d;
+  background:linear-gradient(110deg,#fffaf0,#f2e8d7);
+}
+html:not(.dark) body #aeProfileDialog #aeProfilePicks .ae-profile-pick-odds-highlight{
+  border-color:#9e683b;
+  background:linear-gradient(110deg,#ad6d39,#975a2f);
+  color:#fff8eb;
+  box-shadow:0 2px 10px rgba(118,70,34,.16),inset 0 1px rgba(255,255,255,.12);
+}
+html:not(.dark) body #aeProfileDialog #aeProfilePicks .ae-profile-pick-view-hint{color:#79502f}
+html:not(.dark) body #aeProfileDialog #aeProfilePicks .ae-profile-pick-meta time{color:#586874}
+@media(max-width:480px){
+  #aeProfileDialog #aeProfilePicks .ae-profile-pick-odds-highlight{font-size:10.5px;min-height:26px;padding:5px 9px}
+  #aeProfileDialog #aeProfilePicks .ae-profile-pick-recent .ae-profile-pick-meta{column-gap:7px}
+}
+@media(prefers-reduced-motion:reduce){
+  #aeProfileDialog #aeProfilePicks .ae-profile-pick-recent{transition:none}
+}
+
+/* Acciones de Takes en perfil propio y perfiles públicos: abrir, responder y votar. */
+#aeProfileDialog .ae-profile-take-actions{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:12px;
+}
+#aeProfileDialog .ae-profile-take-actions button{
+  min-height:30px;
+  margin:0;
+  padding:6px 9px;
+  border:1px solid rgba(207,166,122,.55);
+  border-radius:0!important;
+  background:rgba(192,143,91,.10);
+  color:#f0dcc8;
+  font:700 10px/1.2 Inter,system-ui,sans-serif;
+  cursor:pointer;
+}
+#aeProfileDialog .ae-profile-take-actions .ae-profile-take-open{
+  background:rgba(198,153,102,.25);
+  border-color:rgba(224,183,138,.8);
+}
+#aeProfileDialog .ae-profile-take-actions button:hover{
+  background:rgba(213,164,111,.27);
+  border-color:#e5b987;
+}
+#aeProfileDialog .ae-profile-take-actions button[aria-pressed="true"]{
+  background:rgba(204,163,116,.33);
+  border-color:#f1c593;
+}
+#aeProfileDialog .ae-profile-take-actions button:disabled{opacity:.55;cursor:not-allowed}
+#aeProfileDialog .ae-profile-take-title-link{
+  display:inline;
+  padding:0;
+  margin:0;
+  border:0;
+  background:none;
+  color:inherit;
+  font:inherit;
+  letter-spacing:inherit;
+  text-align:left;
+  cursor:pointer;
+}
+#aeProfileDialog .ae-profile-take-title-link:hover{text-decoration:underline;text-underline-offset:3px}
+#aeProfileDialog .ae-profile-take-title-link:disabled{cursor:default}
+html:not(.dark) body #aeProfileDialog .ae-profile-take-actions button{
+  border-color:#b99773;
+  background:#f3e8da;
+  color:#533c2b;
+}
+html:not(.dark) body #aeProfileDialog .ae-profile-take-actions .ae-profile-take-open{background:#e9d4b9}
+html:not(.dark) body #aeProfileDialog .ae-profile-take-actions button:hover{background:#e6d0b2}
+html:not(.dark) body #aeProfileDialog .ae-profile-take-actions button[aria-pressed="true"]{background:#dfc19b;border-color:#98663f}
+@media(max-width:760px){
+  #aeProfileDialog .ae-profile-take-actions{gap:6px;margin-top:10px}
+  #aeProfileDialog .ae-profile-take-actions button{min-height:34px;padding:8px 10px}
+}
+
+
+/* Profile recent activity: three cards visible, older activity scrolls inside.
+   The exact height of three cards is measured by ae-profile.js because Takes
+   may wrap differently from Picks and between phone and desktop. */
+#aeProfileDialog .ae-profile-recent-scroll{
+  position:relative;
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  gap:10px;
+  min-width:0;
+  max-height:570px;
+  overflow-y:auto;
+  overflow-x:hidden;
+  overscroll-behavior:contain;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(195,153,107,.65) transparent;
+  scrollbar-gutter:stable;
+  padding:2px 8px 3px 2px;
+}
+#aeProfileDialog .ae-profile-recent-picks{max-height:420px}
+#aeProfileDialog .ae-profile-recent-scroll:focus-visible{
+  outline:2px solid #d8aa7e;
+  outline-offset:2px;
+}
+#aeProfileDialog .ae-profile-recent-takes .ae-profile-item > p{
+  display:-webkit-box;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:3;
+  overflow:hidden;
+}
+html:not(.dark) body #aeProfileDialog .ae-profile-recent-scroll{
+  scrollbar-color:rgba(146,102,62,.65) transparent;
+}
+@media(max-width:760px){
+  #aeProfileDialog .ae-profile-recent-scroll{max-height:610px}
+  #aeProfileDialog .ae-profile-recent-picks{max-height:445px}
+}
+

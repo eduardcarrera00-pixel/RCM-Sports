@@ -117,9 +117,7 @@
     outline-offset:1px!important;
   }
   /* Hide only the text, not the manage-sports feature or its accessible label. */
-  html body>header .ae-header-actions:has(#loggedAdminContainer:not(.hidden)) #aeCategoryAdmin .ae-admin-manage-label {
-    display:none!important;
-  }
+  
   html body>header .ae-header-actions:has(#loggedAdminContainer:not(.hidden)) #aeCategoryAdmin .ae-admin-manage-icon {
     display:grid!important;
     place-items:center!important;

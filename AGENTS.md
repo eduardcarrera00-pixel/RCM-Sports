@@ -9,6 +9,34 @@ The latter combines the source stylesheets listed in `assets/style-sources.json`
 
 After changing any listed stylesheet, run `node scripts/build-editorial-css.mjs` and commit the regenerated bundle. Add new editorial stylesheets at the appropriate position in `assets/style-sources.json` rather than adding more stylesheet requests to the page. Do not edit the generated bundle directly.
 
+## CSS source ownership and visual maintenance
+
+The HTML cascade intentionally contains standalone CSS links after the editorial
+bundle. Never add a stylesheet already bundled by `assets/style-sources.json`
+as a separate link without checking cascade order: use `npm run css:audit`
+to see actual loads and duplicate selectors.
+
+Four component stylesheets are generated from **editable originals** via
+`assets/component-css-groups.json` and `scripts/build-component-css.mjs`.
+Edit their listed source CSS, then run `npm run build:css`, and commit generated
+files. Do **not** edit `*-group.css` outputs directly.
+
+Four inline-style migrations are maintained directly in:
+`assets/ae-inline-mobile-layout.css`,
+`assets/ae-inline-news-rankings.css`,
+`assets/ae-inline-brand-header.css` and
+`assets/ae-inline-standings-trending.css`.
+Their provenance markers indicate the former `<style id="...">` blocks.
+Keep these external stylesheets in their current link positions; do not
+re-introduce their rules as inline CSS or concatenate them with unrelated
+files, as doing so may alter media-query or cascade precedence.
+
+After CSS changes run `npm run test:css`. For any visual changes or cleanup,
+run the CI comparison of desktop/mobile/day/night across responsive
+breakpoints and the community regression suites. The static screenshot
+comparison does not replace interactive QA of cards, modals, takes, picks,
+rankings, account states or dynamic content.
+
 Run `npm run test:editor` when changing news editing or publication. Preserve the textarea fallback and the existing HTML of unchanged articles.
 
 ## Public address and publication

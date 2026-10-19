@@ -1,0 +1,275 @@
+/* AE SPORTS · Extraído de index.html sin modificar declaraciones ni orden de cascada.
+   Editar esta fuente directamente. No duplicar estilos en index.html. */
+
+/* Original <style id="ae-home-weekly-reference-mobile"> */
+
+/* Mobile home now hosts the ORIGINAL #picksFeatured element from Picks.
+   Only transplant the few selectors normally scoped under #footballTakes.
+   No preview card, extra footer height, duplicate component or visual facsimile. */
+@media (max-width:760px) {
+  html body.ae-is-home .editorial-layout aside > .editorial-pick {
+    display:none!important;
+  }
+  html body.ae-is-home #mainContent > #picksFeatured.ae-home-native-picks {
+    position:relative!important;
+    display:block!important;
+    isolation:isolate!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    height:auto!important;
+    min-height:174px!important;
+    padding:0!important;
+    margin:0 0 18px!important;
+    overflow:hidden!important;
+    background:linear-gradient(105deg,#112c3edb,#0a1e2de4)!important;
+    border:1px solid #bd8e6866!important;
+    border-radius:0!important;
+    box-shadow:0 12px 30px #050f1b45!important;
+    cursor:pointer;
+  }
+  /* Picks' scoped editorial header is display:block, not the generic flex layout. */
+  html body.ae-is-home #mainContent > #picksFeatured.ae-home-native-picks .ae-picks-feature-label {
+    display:block!important;
+    padding:20px clamp(20px,3vw,40px) 4px!important;
+  }
+  html body.ae-is-home #mainContent > #picksFeatured.ae-home-native-picks .ae-picks-feature-label > span {
+    display:block!important;
+    width:auto!important;
+    background:transparent!important;
+    border:0!important;
+    border-radius:0!important;
+    padding:0!important;
+    color:#dcb58e!important;
+    font-size:9px!important;
+    letter-spacing:.14em!important;
+  }
+  html body.ae-is-home #mainContent > #picksFeatured.ae-home-native-picks .ae-picks-feature-label h3 {
+    font:600 clamp(25px,2.8vw,37px)/1.1 Newsreader,Georgia,serif!important;
+    color:#fff1e3!important;
+    letter-spacing:-.025em!important;
+    margin:6px 0 0!important;
+  }
+  /* Same title size and vertical spacing as #footballTakes #picksFeaturedCard. */
+  html body.ae-is-home #mainContent > #picksFeatured.ae-home-native-picks #picksFeaturedCard .ae-weekly-title {
+    font-size:clamp(21px,2.45vw,32px)!important;
+    margin-top:4px!important;
+  }
+  html body.ae-is-home #mainContent > #picksFeatured.ae-home-native-picks #picksFeaturedCard {
+    padding:10px clamp(20px,3vw,40px) 24px!important;
+  }
+  /* In day mode Picks keeps white lettering when a banner is present. */
+  html:not(.dark) body.ae-is-home #mainContent > #picksFeatured.ae-home-native-picks:has(.ae-weekly-banner) {
+    background-color:#172e3d!important;
+  }
+  html:not(.dark) body.ae-is-home #mainContent > #picksFeatured.ae-home-native-picks:has(.ae-weekly-banner) .ae-picks-feature-label > span,
+  html:not(.dark) body.ae-is-home #mainContent > #picksFeatured.ae-home-native-picks:has(.ae-weekly-banner) .ae-picks-feature-label h3,
+  html:not(.dark) body.ae-is-home #mainContent > #picksFeatured.ae-home-native-picks:has(.ae-weekly-banner) .ae-weekly-title,
+  html:not(.dark) body.ae-is-home #mainContent > #picksFeatured.ae-home-native-picks:has(.ae-weekly-banner) .ae-weekly-compact-selection,
+  html:not(.dark) body.ae-is-home #mainContent > #picksFeatured.ae-home-native-picks:has(.ae-weekly-banner) .ae-weekly-expand-hint {
+    color:#fff4e8!important;
+  }
+  html:not(.dark) body.ae-is-home #mainContent > #picksFeatured.ae-home-native-picks:has(.ae-weekly-banner) .ae-weekly-analysis,
+  html:not(.dark) body.ae-is-home #mainContent > #picksFeatured.ae-home-native-picks:has(.ae-weekly-banner) .ae-weekly-disclaimer {
+    color:#e3e6e3!important;
+  }
+  html:not(.dark) body.ae-is-home #mainContent > #picksFeatured.ae-home-native-picks:not(:has(.ae-weekly-banner)) {
+    background:linear-gradient(120deg,#f7f2eb,#e8eee9)!important;
+    border-color:#d6d9d1!important;
+  }
+  html:not(.dark) body.ae-is-home #mainContent > #picksFeatured.ae-home-native-picks:not(:has(.ae-weekly-banner))::before {
+    display:none!important;
+  }
+  html:not(.dark) body.ae-is-home #mainContent > #picksFeatured.ae-home-native-picks:not(:has(.ae-weekly-banner)) .ae-picks-feature-label h3,
+  html:not(.dark) body.ae-is-home #mainContent > #picksFeatured.ae-home-native-picks:not(:has(.ae-weekly-banner)) .ae-weekly-title {
+    color:#334b58!important;
+  }
+  html body.ae-is-home #mainContent > #picksFeatured.ae-home-native-picks #aeWeeklyEditButton {
+    display:none!important;
+  }
+  html body.ae-is-home #mainContent > #picksFeatured.ae-home-native-picks:focus-visible {
+    outline:2px solid #e7b88a!important;
+    outline-offset:3px!important;
+  }
+}
+@media (max-width:450px) {
+  html body.ae-is-home #mainContent > #picksFeatured.ae-home-native-picks {
+    min-height:195px!important;
+  }
+  html body.ae-is-home #mainContent > #picksFeatured.ae-home-native-picks .ae-picks-feature-label {
+    padding:19px 17px 8px!important;
+  }
+  html body.ae-is-home #mainContent > #picksFeatured.ae-home-native-picks #picksFeaturedCard {
+    padding:12px 17px 21px!important;
+  }
+}
+
+
+/* Original <style id="ae-mobile-home-rankings-top-three"> */
+
+/* AE SPORTS: mobile HOME preview only. NFL and Champions show positions 1–3.
+   Published Top 10, ranking editors, sport sections and desktop stay unchanged.
+   Specific selectors override older mobile display:grid !important rules. */
+@media (max-width:760px) {
+  html body.ae-is-home #aeHomeSidebarFeatures #homeRankingList > li:nth-child(n+4),
+  html body.ae-is-home #aeHomeSidebarFeatures #homeChampionsList > li:nth-child(n+4) {
+    display:none!important;
+  }
+}
+
+
+/* Original <style id="ae-football-ranking-mobile-frame-fix"> */
+
+/* Fútbol mobile only: bring Power Rankings up like NFL and close the gold frame.
+   No changes to the published rankings, ticker, sport pages or desktop. */
+@media (max-width:760px) {
+  html body.ae-is-football #aeFootballMobileStage > #championsRankings.rcm-panel.ae-football-ranking-feature:not(.hidden) {
+    box-sizing:border-box!important;
+    height:auto!important;
+    min-height:0!important;
+    padding:4px 0 5px!important;
+    border:1px solid rgba(185,139,91,.78)!important;
+    border-bottom:1px solid rgba(185,139,91,.9)!important;
+    border-radius:0!important;
+    overflow:hidden!important;
+  }
+  /* Visible closing line above the animated track, so the outline cannot appear open. */
+  html body.ae-is-football #aeFootballMobileStage > #championsRankings.rcm-panel.ae-football-ranking-feature:not(.hidden)::after {
+    content:""!important;
+    display:block!important;
+    position:absolute!important;
+    inset:auto 0 0!important;
+    width:100%!important;
+    height:1px!important;
+    background:rgba(185,139,91,.9)!important;
+    border:0!important;
+    box-shadow:none!important;
+    z-index:9!important;
+    pointer-events:none!important;
+  }
+  html body.ae-is-football #aeFootballMobileStage #championsRankings.ae-football-ranking-feature .ae-rank-title-wrap > .ae-rank-overline {
+    display:none!important;
+    height:0!important;
+    margin:0!important;
+    padding:0!important;
+  }
+  html body.ae-is-football #aeFootballMobileStage #championsRankings.ae-football-ranking-feature > .ae-rank-hero-head.rcm-row {
+    min-height:85px!important;
+    height:auto!important;
+    padding:4px 10px 5px!important;
+    margin:0!important;
+  }
+  html body.ae-is-football #aeFootballMobileStage #championsRankings.ae-football-ranking-feature .ae-rank-title-wrap {
+    gap:0!important;
+    margin:0!important;
+    justify-content:center!important;
+  }
+  /* El líder de Champions comparte el paisaje de Power Rankings como el #1 de NFL.
+     Sólo presentación: conservamos el club, su puesto, escudo y animación. */
+  html body.ae-is-football #aeFootballMobileStage #championsRankings.ae-football-ranking-feature #championsRankOne.ae-ranking-leader:not([hidden]),
+  html:not(.dark) body.ae-is-football #aeFootballMobileStage #championsRankings.ae-football-ranking-feature #championsRankOne.ae-ranking-leader:not([hidden]) {
+    background:transparent!important;
+    border:0!important;
+    border-left:1px solid #d7ad7c!important;
+    box-shadow:none!important;
+    backdrop-filter:none!important;
+  }
+  html:not(.dark) body.ae-is-football #aeFootballMobileStage #championsRankings.ae-football-ranking-feature #championsRankOne.ae-ranking-leader:not([hidden]) {
+    border-left-color:#c59463!important;
+  }
+  html body.ae-is-football #aeFootballMobileStage #championsRankings.ae-football-ranking-feature #championsViewport.rcm-ticker:not([hidden]) {
+    margin:0!important;
+    border-bottom:0!important;
+  }
+}
+
+
+/* Original <style id="ae-sport-bottom-ctas-style"> */
+
+/* Consistent bottom actions for NFL + Fútbol, without duplicating controls. */
+html body #aeSportAllNewsFooter[hidden],
+html body #freeTakes #aeNflTakeFooterCta[hidden]{display:none!important}
+html body:is(.ae-is-nfl,.ae-is-football) #aeSportAllNewsFooter:not([hidden]){
+  display:flex!important;align-items:center!important;justify-content:flex-end!important;
+  box-sizing:border-box!important;width:100%!important;min-width:0!important;
+  margin:13px 0 0!important;padding:0!important;
+}
+html body:is(.ae-is-nfl,.ae-is-football) #aeSportAllNewsFooter #aeAllNewsSport:not([hidden]){
+  display:inline-flex!important;min-height:37px!important;padding:9px 15px!important;
+  border:1px solid #c19a70!important;border-radius:0!important;
+  font:750 11px/1.3 Inter,system-ui,sans-serif!important;letter-spacing:.035em!important;
+}
+html body:is(.ae-is-nfl,.ae-is-football) #freeTakes #aeNflTakeFooterCta:not([hidden]){
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  box-sizing:border-box!important;width:100%!important;min-width:0!important;
+  margin:14px 0 16px!important;padding:5px 0!important;
+}
+html body:is(.ae-is-nfl,.ae-is-football) #freeTakes #aeNflTakeFooterCta #aeSportTakePublish{
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;
+  min-height:41px!important;min-width:0!important;margin:0!important;padding:10px 20px!important;
+  border:1px solid #e7b985!important;border-radius:0!important;
+  background:linear-gradient(115deg,#efc991,#c8945d)!important;color:#142b3c!important;
+  font:750 12.5px/1.2 Inter,system-ui,sans-serif!important;letter-spacing:.03em!important;
+  box-shadow:0 3px 14px rgba(6,21,33,.16)!important;cursor:pointer!important;
+}
+html body:is(.ae-is-nfl,.ae-is-football) #freeTakes #aeNflTakeFooterCta #aeSportTakePublish:hover{
+  background:linear-gradient(115deg,#f5d6aa,#d7a673)!important;border-color:#f1c995!important;
+}
+@media(max-width:760px){
+  html body:is(.ae-is-nfl,.ae-is-football) #aeSportAllNewsFooter:not([hidden]){margin:10px 0 14px!important}
+  html body:is(.ae-is-nfl,.ae-is-football) #freeTakes #aeNflTakeFooterCta:not([hidden]){margin:11px 0 12px!important}
+}
+
+
+/* Original <style id="ae-nfl-savant-rookie-mobile-visible"> */
+
+/* NFL on phones: visible original Savant/Rookie ranking between news and Takes.
+   Do not affect Fútbol, Picks, desktop or any live vote/reply interaction. */
+@media(max-width:760px){
+  html body.ae-is-nfl #mainContent > #aeSportTakeLeaders.ae-sport-chefs[data-sport="nfl"]:not([hidden]){
+    display:block!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    min-width:0!important;
+    height:auto!important;
+    margin:12px 0!important;
+    padding:0!important;
+    border:0!important;
+    background:transparent!important;
+    overflow:visible!important;
+  }
+  html body.ae-is-nfl #mainContent > #aeSportTakeLeaders[hidden]{display:none!important}
+  html body.ae-is-nfl #mainContent > #aeSportTakeLeaders.ae-sport-chefs[data-sport="nfl"] .ae-sport-takes-grid{
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    flex-direction:unset!important;
+    align-items:stretch!important;
+    gap:9px!important;
+    width:100%!important;
+  }
+  html body.ae-is-nfl #mainContent > #aeSportTakeLeaders.ae-sport-chefs[data-sport="nfl"] .ae-sport-takes-grid > .ae-sport-chef-card{
+    display:flex!important;
+    flex-direction:column!important;
+    min-width:0!important;
+    width:100%!important;
+    height:auto!important;
+    margin:0!important;
+  }
+  html body.ae-is-nfl #mainContent > #aeSportTakeLeaders.ae-sport-chefs[data-sport="nfl"] .ae-sport-chef-heading{
+    flex-shrink:0!important;
+  }
+  html body.ae-is-nfl #mainContent > #aeSportTakeLeaders.ae-sport-chefs[data-sport="nfl"] .ae-sport-takes-list{
+    flex:1 1 auto!important;
+    min-width:0!important;
+  }
+  html body.ae-is-nfl #mainContent > #aeSportTakeLeaders.ae-sport-chefs[data-sport="nfl"] .ae-sport-takes-list .ae-top-take-reply{
+    display:inline-flex!important;
+    min-height:28px!important;
+  }
+  html body.ae-is-nfl #mainContent > #aeSportTakeLeaders.ae-sport-chefs[data-sport="nfl"] .ae-sport-takes-list .ae-top-take-author{
+    max-width:100%!important;
+    overflow-wrap:anywhere!important;
+  }
+}
+

@@ -1,0 +1,125 @@
+/* AE SPORTS · Extraído de index.html sin modificar declaraciones ni orden de cascada.
+   Editar esta fuente directamente. No duplicar estilos en index.html. */
+
+/* Original <style id="ae-home-standings-simplified-20261017"> */
+
+/* Genios / Anoetos: compact title, no decorative stripe or secondary legend.
+   The two real tables, period controls and scrollable rankings remain intact. */
+html body.ae-is-home #aeHomeTopTakes .ae-top-takes-card,
+html.dark body.ae-is-home #aeHomeTopTakes .ae-top-takes-card{
+  border-top-width:1px!important;
+  border-top-color:rgba(215,169,123,.27)!important;
+}
+html:not(.dark) body.ae-is-home #aeHomeTopTakes .ae-top-takes-card{
+  border-top-width:1px!important;
+  border-top-color:rgba(155,120,91,.27)!important;
+}
+html body.ae-is-home #aeHomeTopTakes .ae-top-takes-card-head,
+html body.ae-is-home #aeHomeTopTakes .ae-top-takes-card.is-questioned .ae-top-takes-card-head,
+html.dark body.ae-is-home #aeHomeTopTakes .ae-top-takes-card-head{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  box-sizing:border-box!important;
+  min-height:39px!important;
+  height:auto!important;
+  margin:0!important;
+  padding:9px 13px 6px!important;
+  gap:0!important;
+  border:0!important;
+  border-bottom:0!important;
+  background:transparent!important;
+  background-image:none!important;
+  box-shadow:none!important;
+}
+html body.ae-is-home #aeHomeTopTakes .ae-top-takes-card-head h3{
+  margin:0!important;
+  padding:0!important;
+  line-height:1.12!important;
+}
+html body.ae-is-home #aeHomeTopTakes .ae-top-takes-grid{
+  margin-top:0!important;
+  padding-top:0!important;
+}
+/* Row separators can remain under user and points, but not below ranks. */
+html body.ae-is-home #aeHomeTopTakes .ae-points-table tbody td:first-child,
+html:not(.dark) body.ae-is-home #aeHomeTopTakes .ae-points-table tbody td:first-child{
+  border-bottom:0!important;
+  text-decoration:none!important;
+  box-shadow:none!important;
+}
+html body.ae-is-home #aeHomeTopTakes .ae-points-table .ae-points-rank{
+  border:0!important;
+  text-decoration:none!important;
+  box-shadow:none!important;
+}
+@media(max-width:760px){
+  html body.ae-is-home #aeHomeTopTakes .ae-top-takes-card-head,
+  html body.ae-is-home #aeHomeTopTakes .ae-top-takes-card.is-questioned .ae-top-takes-card-head{
+    min-height:35px!important;
+    padding:8px 12px 5px!important;
+  }
+}
+
+
+/* Original <style id="ae-desktop-sport-nav-hover-no-squares-20261017"> */
+
+/* Picks · NFL · Fútbol: remove the old white hover square while keeping
+   the navigation's bottom underline and keyboard focus indicator. */
+@media (min-width:761px) and (hover:hover){
+  html body>header nav.ae-sport-nav>button.category-btn:is([data-category="Picks"],[data-category="NFL"],[data-category="Fútbol"]):is(:hover,:focus-visible,.active){
+    background:transparent!important;
+    background-image:none!important;
+    box-shadow:none!important;
+    border-top-color:transparent!important;
+    border-left-color:transparent!important;
+    border-right-color:transparent!important;
+    /* Intentionally do not change border-bottom: the underline stays. */
+  }
+  html body>header nav.ae-sport-nav>button.category-btn:is([data-category="Picks"],[data-category="NFL"],[data-category="Fútbol"]) .ae-nav-icon,
+  html body>header nav.ae-sport-nav>button.category-btn:is([data-category="Picks"],[data-category="NFL"],[data-category="Fútbol"]):is(:hover,:focus-visible,.active) .ae-nav-icon{
+    border:0!important;
+    border-color:transparent!important;
+    background:transparent!important;
+    background-image:none!important;
+    box-shadow:none!important;
+    outline:none!important;
+  }
+}
+
+
+/* Original <style id="ae-home-trending-read-count-bottom-right"> */
+
+/* Lo más leído: the readership counter belongs at the lower right
+   of each text column, not in the middle of the article summary. */
+html body.ae-is-home #mainContent #aeTrendingPortada #trendingList .ae-trending-link .ae-trending-story{
+  box-sizing:border-box!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:stretch!important;
+  justify-content:flex-start!important;
+  width:100%!important;
+  min-width:0!important;
+  height:100%!important;
+}
+html body.ae-is-home #mainContent #aeTrendingPortada #trendingList .ae-trending-link .ae-trending-meta{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  align-self:flex-end!important;
+  flex:0 0 auto!important;
+  width:auto!important;
+  max-width:100%!important;
+  min-width:0!important;
+  margin:9px 0 0 auto!important;
+  padding:3px 0 0!important;
+  text-align:right!important;
+  font-size:10px!important;
+  line-height:1.25!important;
+  white-space:nowrap!important;
+  gap:5px!important;
+}
+html body.ae-is-home #mainContent #aeTrendingPortada #trendingList .ae-trending-link .ae-trending-meta i{
+  flex-shrink:0!important;
+}
+
