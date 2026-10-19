@@ -42,7 +42,7 @@ for(const group of manifest.groups){
   }
   // The index can reference the source pair (initial migration) or generated
   // output, but must not reorder sources in the HTML.
-  const links=[...html.matchAll(/<link\\b[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']+)["'][^>]*>/g)]
+  const links=[...html.matchAll(/<link\b[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']+)["'][^>]*>/g)]
     .map(match=>match[1].split('?')[0]);
   const indexes=sources.map(p=>links.indexOf(p));
   const destination=links.indexOf(output);
