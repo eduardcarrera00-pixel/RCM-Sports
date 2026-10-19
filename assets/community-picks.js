@@ -604,6 +604,7 @@ function buildComposer(){
    const picks=values(),title=picks.map(p=>p.event).join(' / ').slice(0,160);
    const r=await db.from('ae_community_picks').insert({title,explanation:explanation.input.value.trim(),legs:picks,event_date:eventDay.input.value}).select('id').single();
    if(r.error)throw r.error;
+   window.aeDraftGuard?.clear('pick');
    form.reset();while(rows.length>1)rows.pop().box.remove();
    analysis.open=false;eventDay.input.defaultValue=todayToronto();eventDay.input.value=todayToronto();add.hidden=false;calculate();
    closePickComposer(true);void load();
@@ -858,8 +859,9 @@ function closePickComposer(force=false){
  if(dialog?.open)dialog.close();
  syncPickComposer();
 }
-function showPickComposer(){
+async function showPickComposer(){
  const dialog=$('cpComposePanel');if(!dialog)return;
+ await window.aeDraftGuard?.restore('pick');
  // A publication CTA can originate outside Picks; return to the correct
  // section only AFTER authentication has been completed.
  if(typeof currentCategory!=='undefined'&&currentCategory!=='Picks'&&typeof filterByCategory==='function')filterByCategory('Picks');
