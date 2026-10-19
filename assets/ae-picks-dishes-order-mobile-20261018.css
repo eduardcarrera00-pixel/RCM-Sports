@@ -429,3 +429,155 @@ html body #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-rail > s
     scrollbar-color:rgba(120,91,67,.52) transparent!important;
   }
 }
+
+
+/* AE SPORTS · Approved desktop Picks layout: match visual reference (Oct 19).
+   This deliberately overrides the older, stretched five-row desktop grid.
+   Mobile (<=910px) keeps the original nodes, layout and card appearance. */
+@media (min-width:911px) {
+  /* The earlier Platos panel spanned four auto-sized tracks and pushed the
+     recent Picks hundreds of pixels below Eres Chef. A grouped real left
+     column keeps its contents together while the rail owns column two. */
+  html body #footballTakes.ae-picks-editorial > .ae-picks-layout > #communityPicks:not([hidden]) {
+    grid-template-columns:minmax(0,1.74fr) minmax(0,.86fr)!important;
+    grid-template-rows:auto auto!important;
+    align-content:start!important;
+    align-items:start!important;
+    gap:0 var(--ae-picks-aligned-gap,22px)!important;
+  }
+  html body #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-community-main {
+    display:flex!important;
+    flex-direction:column!important;
+    grid-column:1!important;
+    grid-row:1!important;
+    box-sizing:border-box!important;
+    min-width:0!important;
+    width:100%!important;
+    height:auto!important;
+    align-self:start!important;
+    gap:0!important;
+    margin:0!important;
+    padding:0!important;
+  }
+  html body #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-community-main > .ae-picks-feed-heading {
+    box-sizing:border-box!important;
+    flex:0 0 auto!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    background:transparent!important;
+    min-width:0!important;
+  }
+  html body #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-community-main > #cpStatus:empty {
+    display:none!important;
+  }
+  html body #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-community-main > #cpStatus:not(:empty) {
+    flex:0 0 auto!important;
+    min-height:0!important;
+    margin:3px 0!important;
+    padding:0!important;
+  }
+  html body #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-community-main > #cpFeed {
+    flex:0 1 auto!important;
+    align-self:stretch!important;
+    box-sizing:border-box!important;
+    min-width:0!important;
+    margin:0!important;
+    padding-top:0!important;
+  }
+  html body #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-community-main > #cpFeedScrollHint {
+    flex:0 0 auto!important;
+    min-height:0!important;
+  }
+  html body #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-rail {
+    grid-column:2!important;
+    grid-row:1!important;
+    align-self:start!important;
+    margin:0!important;
+  }
+  html body #footballTakes.ae-picks-editorial #communityPicks > .ae-chefs-dual-standings {
+    grid-column:1 / -1!important;
+    grid-row:2!important;
+    margin-top:22px!important;
+  }
+
+  /* The news panel is moved directly under aePicksTopPair by the existing
+     ae-picks-premium.js arrangement. Target its real rendered position. */
+  html body #footballTakes.ae-picks-editorial #aePicksTopPair > #picksNews {
+    box-sizing:border-box!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-self:stretch!important;
+    min-width:0!important;
+    width:100%!important;
+    height:192px!important;
+    min-height:192px!important;
+    max-height:192px!important;
+    margin:0!important;
+    padding:0!important;
+    border-radius:0!important;
+    overflow:hidden!important;
+  }
+  html body #footballTakes.ae-picks-editorial #aePicksTopPair > #picksNews > #picksNewsList {
+    display:flex!important;
+    flex:1 1 auto!important;
+    box-sizing:border-box!important;
+    min-height:0!important;
+    width:100%!important;
+    height:100%!important;
+    margin:0!important;
+    padding:0!important;
+    overflow:hidden!important;
+  }
+  html body #footballTakes.ae-picks-editorial #aePicksTopPair > #picksNews .ae-picks-news-feature {
+    flex:1 1 auto!important;
+    min-height:0!important;
+    max-height:192px!important;
+    height:100%!important;
+    margin:0!important;
+    overflow:hidden!important;
+  }
+  html body #footballTakes.ae-picks-editorial #aePicksTopPair > #picksNews .ae-picks-news-copy {
+    padding:10px 14px!important;
+    gap:3px!important;
+  }
+
+  /* Desktop administrators keep the Edit action, but it no longer creates a
+     full-width 50px second row that defeats the requested compact height. */
+  html body #footballTakes.ae-picks-editorial #aePicksTopPair > #picksFeatured .ae-picks-feature-label {
+    display:flex!important;
+    flex-flow:row wrap!important;
+    align-items:center!important;
+    justify-content:flex-start!important;
+    gap:5px 8px!important;
+    padding:10px 14px 5px!important;
+  }
+  html body #footballTakes.ae-picks-editorial #aePicksTopPair > #picksFeatured .ae-weekly-heading-inline {
+    flex:0 1 auto!important;
+    margin-right:auto!important;
+  }
+  html body #footballTakes.ae-picks-editorial #aePicksTopPair > #picksFeatured #aeWeeklyShareButton:not([hidden]) {
+    flex:0 0 auto!important;
+    margin:0!important;
+  }
+  html body #footballTakes.ae-picks-editorial #aePicksTopPair > #picksFeatured #aeWeeklyEditButton:not([hidden]) {
+    order:3!important;
+    grid-column:auto!important;
+    flex:0 0 auto!important;
+    box-sizing:border-box!important;
+    width:auto!important;
+    max-width:100%!important;
+    height:28px!important;
+    min-height:28px!important;
+    margin:0!important;
+    padding:5px 10px!important;
+    font:700 11px/1.25 Inter,system-ui,sans-serif!important;
+    border-radius:0!important;
+    white-space:nowrap!important;
+  }
+  html body #footballTakes.ae-picks-editorial #aePicksTopPair > #picksFeatured:has(#aeWeeklyEditButton:not([hidden])):not(:has(details[open])):not(:has(.ae-weekly-shared-notice)) {
+    height:192px!important;
+    min-height:192px!important;
+    overflow:hidden!important;
+  }
+}
