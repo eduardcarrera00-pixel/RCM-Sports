@@ -60,9 +60,7 @@
     border-radius:20px!important;
     background:rgba(196,154,102,.05)!important;
   }
-  html body>header .ae-mobile-header-grid #themeToggle .ae-mobile-theme-caption{
-    display:none!important;
-  }
+  
   html body>header .ae-mobile-header-grid #themeToggle img.ae-custom-theme-icon{
     width:19px!important;height:19px!important;
     min-width:19px!important;min-height:19px!important;
