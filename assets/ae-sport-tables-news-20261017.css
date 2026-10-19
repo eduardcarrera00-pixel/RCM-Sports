@@ -396,9 +396,7 @@ html body.ae-is-nfl #mainContent #articlesGrid.ae-sport-news-carousel {
   margin-top:21px!important;
 }
 @media(max-width:760px) {
-  html body.ae-is-football #mainContent #aeFootballMobileStage {
-    gap:6px!important;
-  }
+  
   html body:is(.ae-is-nfl,.ae-is-football) #mainContent #aeNewsHeadingRow {
     min-height:58px!important;
   }
