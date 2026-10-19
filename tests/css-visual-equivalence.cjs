@@ -74,10 +74,24 @@ async function main(){
           document.documentElement.classList.toggle('dark',theme==='dark');
           document.body.classList.remove('ae-is-home','ae-is-picks','ae-is-nfl','ae-is-football');
           document.body.classList.add('ae-is-'+section);
+          const visible={
+            home:[],
+            picks:['footballTakes'],
+            nfl:['nflRankings','freeTakes','aeSportTakeLeaders'],
+            football:['championsRankings','freeTakes','aeSportTakeLeaders']
+          }[section]||[];
+          for(const id of visible){
+            const node=document.getElementById(id);
+            if(!node)throw Error('Missing static section fixture: '+id);
+            node.hidden=false;
+            node.classList.remove('hidden');
+          }
           document.querySelectorAll('dialog[open]').forEach(dialog=>dialog.removeAttribute('open'));
         },{section,theme});
         await page.evaluate(()=>document.fonts.ready);
-        const buffer=await page.screenshot({animations:'disabled',caret:'hide'});
+        // Full-page comparison includes the exposed section panels and their
+        // mobile/responsive rules; avoids the earlier header-only screenshots.
+        const buffer=await page.screenshot({fullPage:true,animations:'disabled',caret:'hide'});
         screenshots.push(buffer);
         await context.close();
       }
