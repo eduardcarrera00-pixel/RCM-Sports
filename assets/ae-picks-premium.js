@@ -61,6 +61,7 @@
    if(!community)return;
    const desktop=window.matchMedia('(min-width: 911px)');
    let leftColumn=null;
+   let moderationMoved=false;
    let observer=null;
    let frame=0;
    const rail=community.querySelector(':scope > .ae-picks-rail');
@@ -110,6 +111,14 @@
        community.insertBefore(column,nodes[0]);
        nodes.forEach(node=>column.appendChild(node));
        leftColumn=column;
+       // Admin moderation is a separate full-width tool, not part of the
+       // Platos height calculation; keep the real panel and its handlers.
+       const moderation=rail?.querySelector(':scope > #cpModeration');
+       const chefRankings=community.querySelector(':scope > .ae-chefs-dual-standings');
+       if(moderation&&chefRankings){
+         community.insertBefore(moderation,chefRankings);
+         moderationMoved=true;
+       }
        if(typeof ResizeObserver!=='undefined'){
          observer=new ResizeObserver(schedule);
          observer.observe(leftColumn);
@@ -122,6 +131,11 @@
        [...leftColumn.children].forEach(node=>community.insertBefore(node,leftColumn));
        leftColumn.remove();
        leftColumn=null;
+       if(moderationMoved){
+         const moderation=community.querySelector(':scope > #cpModeration');
+         if(moderation&&rail)rail.appendChild(moderation);
+         moderationMoved=false;
+       }
      }
    };
    sync();
