@@ -29,6 +29,7 @@ html body #mainContent #footballTakes.ae-picks-editorial #communityPicks > .ae-p
   width:100%!important;max-width:100%!important;margin:0!important;transform:none!important;
   border:0!important;border-bottom:1px solid var(--ae-picks-clean-line)!important;
   border-radius:0!important;overflow:hidden!important;
+  background-size:100% 100%,auto 200%!important;background-repeat:no-repeat!important;
 }
 html body #mainContent #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-rail > section.ae-chef-board > ol.ae-chef-scroll,
 html body #mainContent #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-rail > section.ae-chef-board > ol.ae-chef-scroll > li{
