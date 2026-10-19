@@ -14,6 +14,8 @@ await db.exec(fs.readFileSync('supabase/17_fix_pick_event_date_insert_grant.sql'
 await db.exec(fs.readFileSync('supabase/migrations/20261016021000_unlimited_picks_immediate_community_votes.sql','utf8'));
 const migration=fs.readFileSync('supabase/migrations/20261019184704_pick_capture_consistency.sql','utf8');
 await db.exec(migration);await db.exec(migration);
+const wholeTicket=fs.readFileSync('supabase/migrations/20261019233749_whole_ticket_capture_text.sql','utf8');
+await db.exec(wholeTicket);await db.exec(wholeTicket);
 async function user(n){await db.exec(`reset role;set role ${n?'authenticated':'anon'};select set_config('request.jwt.claim.sub','${n?'00000000-0000-0000-0000-00000000000'+n:''}',false)`);}
 const legs=[{sport:'NBA',event:'Toronto Raptors vs Boston Celtics',selection:'Toronto Raptors gana',odds:150}];
 const proof=(rows=legs)=>({version:1,method:'on_device_ocr',confirmed:true,readings:rows.map(p=>({event:p.event,selection:p.selection,odds:p.odds,confidence:95})),total:null});
@@ -24,7 +26,7 @@ assert.equal(row.moderation_status,'approved');assert.equal(row.american_odds,15
 assert.deepEqual(Object.keys(row.capture_check).sort(),['checked_at','method','version']);
 const extra=proof();extra.image='private-image-must-not-survive';extra.raw_text='personal data must not survive';
 assert.equal(JSON.stringify((await insert(legs,extra)).rows[0].capture_check).includes('private'),false);
-for(const mutate of [p=>{p.confirmed=false;},p=>{p.readings[0].odds=160;},p=>{p.readings[0].confidence=64;},p=>{p.readings[0].event='Otro partido';},p=>{p.readings=[];},p=>{p.image='x'.repeat(3000);}]){
+for(const mutate of [p=>{p.confirmed=false;},p=>{p.readings[0].odds=160;},p=>{p.readings[0].confidence=64;},p=>{p.readings[0].event='Otro partido';},p=>{p.readings=[];},p=>{p.image='x'.repeat(20000);}]){
  const invalid=proof();mutate(invalid);await assert.rejects(()=>insert(legs,invalid));
 }
 const multi=[{sport:'NBA',event:'Los Angeles Lakers At Philadelphia 76ers',selection:'Los Angeles Lakers',odds:167},{sport:'NBA',event:'Washington Wizards At Detroit Pistons',selection:'Detroit Pistons',odds:-164}];
@@ -37,5 +39,9 @@ await assert.rejects(()=>db.query('update public.ae_community_picks set legs=$1 
 const legacy=(await insert(legs,null)).rows[0];assert.equal(legacy.moderation_status,'pending');assert.equal(legacy.capture_check,null);
 await db.exec("select set_config('test.anonymous','true',false)");await assert.rejects(()=>insert(legs,proof()),/sesión|sesion/);await db.exec("select set_config('test.anonymous','false',false)");
 await user(0);const visible=(await db.query('select * from public.ae_pick_feed where id=$1',[row.id])).rows[0];assert.equal(visible.capture_check.method,'on_device_ocr');
-assert.equal((await db.query('select count(*)::int n from public.ae_community_picks')).rows[0].n,4);
+await user(1);
+const long=[{sport:'Fútbol',event:'Galatasaray v Barcelona / Viking v Bayern Munich',selection:'Galatasaray v Barcelona: Barcelona · MONEYLINE (3-WAY) + Lamine Yamal · ANYTIME GOALSCORER + Over 5.5 Goals · OVER/UNDER 5.5 GOALS + Lamine Yamal · ANYTIME ASSIST / Viking v Bayern Munich: Harry Kane · ANYTIME GOALSCORER',odds:737}];
+const ticket=(await insert(long,proof(long))).rows[0];assert.equal(ticket.american_odds,737);assert.equal(ticket.legs[0].selection,long[0].selection);
+for(const rows of [[{...long[0],selection:'x'.repeat(2001)}],[{...long[0],event:'x'.repeat(641)}]])await assert.rejects(()=>insert(rows,proof(rows)));
+assert.equal((await db.query('select count(*)::int n from public.ae_community_picks')).rows[0].n,5);
 await db.close();console.log('PASS: capture approval without admin, strict metadata/odds binding, no retained evidence, total rounding, RLS, immutable Picks, legacy compatibility and idempotent migration.');

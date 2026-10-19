@@ -37,6 +37,66 @@
    if(url){URL.revokeObjectURL(url);job.urls.delete(url);}
   }
  }
+ // A struck original quote may disappear from full-screen OCR. Read that small
+ // region again; yellow highlighting + a horizontal strike distinguish it from
+ // the increased quote. Never reverse a boost percentage or derive odds from cash.
+ async function originalTicketPrice(canvas,data,job,aborted){
+  const lines=window.aePickCaptureParser.linesFrom(data);
+  const header=lines.find(l=>/\b\d+\s*leg\s+same game parlay/i.test(l.text));
+  if(!header?.bbox||!header.words?.length)return;
+  const context=canvas.getContext('2d',{willReadFrequently:true});
+  const yellow=box=>{
+   const x=Math.max(0,box.x0-3),y=Math.max(0,box.y0-3),w=Math.min(canvas.width-x,box.x1-box.x0+6),h=Math.min(canvas.height-y,box.y1-box.y0+6);
+   const pixels=context.getImageData(x,y,w,h).data;let n=0;
+   for(let i=0;i<pixels.length;i+=4)if(pixels[i]>150&&pixels[i+1]>120&&pixels[i+2]<110)n++;
+   return n/(pixels.length/4)>.32;
+  };
+  const boosted=header.words.find(w=>/^[+-]\d{3,6}$/.test(w.text.trim())&&w.bbox&&yellow(w.bbox));
+  if(!boosted)return;
+  data.hasBoostedTicketPrice=true;
+  const b=boosted.bbox,height=b.y1-b.y0;
+  const labelEnd=header.words.filter(w=>/parlay/i.test(w.text)&&w.bbox).at(-1)?.bbox.x1??0;
+  const left=Math.max(labelEnd+2,b.x0-(b.x1-b.x0)*1.4);
+  const original=header.words.filter(w=>w.bbox&&w.bbox.x1<b.x0&&w.bbox.x0>labelEnd+2&&w.bbox.x0>left).at(-1);
+  // OCR can omit the struck word entirely: the visible gap after the ticket
+  // label and before the yellow quote is still a bounded region to re-read.
+  const box=original?.bbox??{x0:left,x1:b.x0-4,y0:b.y0,y1:b.y1},pad=Math.max(3,Math.round(height*.18));
+  const x=Math.round(Math.max(0,left,box.x0-pad)),y=Math.max(0,box.y0-pad),width=Math.round(Math.min(canvas.width,b.x0-3,box.x1+pad)-x),h=Math.min(canvas.height-y,box.y1-box.y0+pad*2);
+  if(width<12)return;
+  const pixels=context.getImageData(x,y,width,h),rows=[],corners=[0,width-1,(h-1)*width,h*width-1].map(p=>(pixels.data[p*4]+pixels.data[p*4+1]+pixels.data[p*4+2])/3).sort((a,b)=>a-b),background=(corners[1]+corners[2])/2;
+  for(let r=0;r<h;r++){
+   let count=0;for(let c=0;c<width;c++){const i=(r*width+c)*4;if(Math.abs((pixels.data[i]+pixels.data[i+1]+pixels.data[i+2])/3-background)>40)count++;}
+   if(count>width*.65&&r>h*.25&&r<h*.75)rows.push(r);
+  }
+  if(!rows.length)return;
+  const crop=document.createElement('canvas');job.canvases.add(crop);crop.width=width*4;crop.height=h*4;
+  const ctx=crop.getContext('2d',{alpha:false});ctx.drawImage(canvas,x,y,width,h,0,0,crop.width,crop.height);
+  const small=document.createElement('canvas');job.canvases.add(small);small.width=width;small.height=h;const s=small.getContext('2d',{alpha:false});
+  const seen=[];
+  try{
+   for(const [pass,mode] of ['13','13','7'].entries()){
+    await job.worker.setParameters({tessedit_pageseg_mode:mode,tessedit_char_whitelist:'+-0123456789'});
+    const scan=await Promise.race([job.worker.recognize(crop,{}, {text:true}),aborted]);
+    const text=scan.data.text.trim(),value=window.aePickCaptureParser.odds(text);
+    if(value&&/^[+-]\d{3,6}$/.test(text)&&scan.data.confidence>=85)seen.push({text,value,confidence:scan.data.confidence});
+    if(pass===0){
+     // Normalise contrast for both light and dark screenshots.
+     for(let i=0;i<pixels.data.length;i+=4){const value=Math.abs((pixels.data[i]+pixels.data[i+1]+pixels.data[i+2])/3-background)>40?255:0;pixels.data[i]=pixels.data[i+1]=pixels.data[i+2]=value;}
+     s.putImageData(pixels,0,0);ctx.drawImage(small,0,0,width,h,0,0,crop.width,crop.height);
+    }else if(pass===1){
+     // Erase only the long strike rows; retain surrounding glyph pixels.
+     s.fillStyle='#000';for(const row of rows)s.fillRect(0,row,width,1);
+     ctx.drawImage(small,0,0,width,h,0,0,crop.width,crop.height);
+    }
+   }
+   if(seen.length&&Math.max(...seen.map(s=>s.confidence))>=92&&new Set(seen.map(s=>s.value.american)).size===1&&seen[0].value.decimal<window.aePickCaptureParser.odds(boosted.text).decimal)
+    data.ticketPriceEvidence={visible:seen[0].text,confidence:Math.floor(Math.min(...seen.map(s=>s.confidence))),headerY:header.bbox.y0};
+  }finally{
+   crop.width=crop.height=1;job.canvases.delete(crop);
+   small.width=small.height=1;job.canvases.delete(small);
+   if(job.worker)await job.worker.setParameters({tessedit_char_whitelist:''});
+  }
+ }
  function mount({form,getPicks,applyImport,onChange=()=>{}}){
   let result=null,signature='',active=null,sequence=0;
   const fingerprint=()=>JSON.stringify({picks:getPicks().map(p=>({sport:p.sport,event:p.event,selection:p.selection,odds:Number(p.odds)})),date:result?.eventDate?form.elements.namedItem('event_date')?.value:''});
@@ -106,17 +166,26 @@
     const readings=[];let total=null,eventDate='';
     for(let i=0;i<job.files.length;i++){
      const canvas=await Promise.race([imageCanvas(job.files[i],job),aborted]);
-     let compared;
+     let compared,bestPartial;
      for(const mode of ['6','11']){
       await job.worker.setParameters({tessedit_pageseg_mode:mode,preserve_interword_spaces:'1'});
       let scanned=await Promise.race([job.worker.recognize(canvas,{}, {text:true,blocks:true}),aborted]);
       if(!isCurrent(job))return;
+      await originalTicketPrice(canvas,scanned.data,job,aborted);
       compared=window.aePickCaptureParser.extract(scanned.data);scanned=null;
+      if(compared.partial&&(!bestPartial||compared.partial.event.length>bestPartial.partial.event.length))bestPartial=compared;
       if(compared.ok)break;
      }
+     if(!compared.ok&&bestPartial)compared=bestPartial;
      canvas.width=1;canvas.height=1;job.canvases.delete(canvas);job.files[i]=null;
-     if(!compared.ok)throw Error(compared.reason);
+     if(!compared.ok){
+      if(compared.partial){
+       const item=node('li');item.append(node('small',compared.partial.selectionCount+' selecciones recuperadas'),node('strong',compared.partial.event),node('span',compared.partial.selection));summary.replaceChildren(item);summary.hidden=false;
+      }
+      throw Error(compared.reason);
+     }
      if(job.files.length>1&&compared.readings.length!==1)throw Error('Para dos imágenes, usa una captura de cada selección, sin otras apuestas.');
+     if(job.files.length>1&&compared.readings.some(r=>r.selectionCount))throw Error('Usa una sola captura de la combinada completa. No combinamos boletos distintos.');
      if(eventDate&&compared.eventDate&&eventDate!==compared.eventDate)throw Error('Las capturas tienen fechas distintas. Usa el boleto de la misma combinada.');
      readings.push(...compared.readings);if(compared.total)total=compared.total;if(compared.eventDate)eventDate=compared.eventDate;
     }
@@ -125,7 +194,7 @@
     panel.dataset.state='matched';status.textContent='Tu pick está preparado. Revisa los datos y confirma la fecha del evento para publicar.';picker.textContent='Cambiar captura';updateDateConfirmation();
     summary.replaceChildren(...readings.map((r,i)=>{
      const item=node('li');
-     item.append(node('small',(readings.length>1?'Selección '+(i+1)+' · ':'')+(r.sport||'Otros')),node('strong',r.event),node('span',r.selection),node('span','Momio automático · '+(r.odds>0?'+':'')+r.odds,'cp-capture-odds'));
+     item.append(node('small',(r.selectionCount?r.selectionCount+' selecciones · ':readings.length>1?'Selección '+(i+1)+' · ':'')+(r.sport||'Otros')),node('strong',r.event),node('span',r.selection),node('span',(r.originalBeforeBoost?'Momio original, sin boost · ':'Momio automático · ')+(r.odds>0?'+':'')+r.odds,'cp-capture-odds'));
      return item;
     }));
     summary.hidden=false;confirmation.hidden=false;onChange();

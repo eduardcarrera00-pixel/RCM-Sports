@@ -580,7 +580,7 @@ function buildComposer(){
   for(const [key,label,placeholder] of [['sport','Deporte','Ej. NFL, fútbol, NBA…'],['event','Partido','Ej. Bengals vs Browns'],['selection','Tu pronóstico','Ej. Bengals gana'],['odds','Cuota americana','Ej. +150']]){
    row[key]=field(label);const input=row[key].input;
    input.name=key+'_'+rows.length;input.type='hidden';input.autocomplete='off';
-   input.maxLength=key==='odds'?7:key==='selection'?200:key==='sport'?40:160;
+   input.maxLength=key==='odds'?7:key==='selection'?2000:key==='sport'?40:640;
    row[key].wrap.className='cp-compose-'+key;
    input.readOnly=true;input.setAttribute('aria-readonly','true');
    box.append(row[key].wrap);

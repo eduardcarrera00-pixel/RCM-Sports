@@ -22,6 +22,8 @@ const receipt=await context.newPage();await receipt.setViewportSize({width:900,h
 async function fixture(file,lines){await receipt.setContent('<html><body style="margin:0;padding:32px;background:white;color:black;font:28px/1.8 Arial">'+lines.map(line=>'<div>'+line+'</div>').join('')+'</body></html>');await receipt.screenshot({path:fixtures+'/'+file});}
 await fixture('simple.png',['BETSLIP','NBA','Toronto Raptors vs Boston Celtics','Toronto Raptors Moneyline +150','Stake $10.00','Potential Returns $25.00']);
 await fixture('combined.png',['BETSLIP','NBA','Multi 2 Legs 4.29','Los Angeles Lakers At Philadelphia 76ers','Los Angeles Lakers','Match Betting 2.67','Washington Wizards At Detroit Pistons','Detroit Pistons','Match Betting 1.61','Total Stake $1.00']);
+await receipt.setViewportSize({width:1200,height:1500});
+await fixture('boost.png',['My Bets','<span>5 leg Same Game Parlay+ </span><s style="color:#999">+737</s> <span style="background:#ffe032;color:#111">+1104</span>','PROFIT BOOST 50%','Includes: 1 Same Game Parlay + 1 selection','Same Game Parlay +504','Galatasaray v Barcelona','Barcelona','MONEYLINE (3-WAY)','Lamine Yamal','ANYTIME GOALSCORER','Over 5.5 Goals','OVER/UNDER 5.5 GOALS','Lamine Yamal','ANYTIME ASSIST','Harry Kane -205','ANYTIME GOALSCORER','Viking v Bayern Munich','TOTAL WAGER','TOTAL PAYOUT']);
 await receipt.close();
 await page.goto('http://127.0.0.1:8767/',{waitUntil:'domcontentloaded'});await page.evaluate(()=>{filterByCategory('Picks');window.aeOpenPickComposer();});await page.locator('#cpComposePanel').waitFor({state:'visible'});
 assert.equal(requests.some(r=>r.url.includes('/vendor/ocr/')),false,'Heavy OCR must not load before choosing a file');
@@ -50,6 +52,41 @@ assert.match(await page.locator('#cpFeed').innerText(),/Momio cotejado con captu
 await page.evaluate(()=>window.aeOpenPickComposer());await page.locator('#cpComposePanel').waitFor({state:'visible'});await page.evaluate(()=>{window.testOcrReadings=[];const create=window.Tesseract.createWorker;window.Tesseract.createWorker=async(...args)=>{const worker=await create(...args),recognize=worker.recognize;worker.recognize=async(...parameters)=>{const value=await recognize(...parameters);window.testOcrReadings.push(value.data);return value;};return worker;};});
 
 await scan('combined.png');assert.match(await page.locator('[name=selection_0]').inputValue(),/Lakers/);assert.match(await page.locator('[name=selection_1]').inputValue(),/Pistons/);await page.locator('[name=event_date]').fill(new Date().toISOString().slice(0,10));assert.match(await page.locator('.cp-compose-summary').innerText(),/329/);await page.locator('#cpCaptureConfirm').check();await page.locator('#cpForm button[type=submit]').click();await page.waitForFunction(()=>!document.getElementById('cpComposePanel').open);assert.equal(payloads.length,2);assert.equal(payloads[1].capture_check.total.american,329);
+await page.evaluate(()=>window.aeOpenPickComposer());await page.locator('#cpCaptureFile').setInputFiles(fixtures+'/boost.png');
+await page.waitForFunction(()=>['matched','error'].includes(document.querySelector('.cp-capture')?.dataset.state),null,{timeout:90000});
+// Small struck type can remain unreadable. Both outcomes must be safe: read
+// the original correctly, or abstain; never accept the highlighted boost.
+if(await page.locator('.cp-capture').getAttribute('data-state')==='matched'){
+ assert.equal(await page.locator('[name=odds_0]').inputValue(),'+737');
+ assert.match(await page.locator('[name=selection_0]').inputValue(),/ANYTIME ASSIST/);
+}else{
+ assert.match(await page.locator('#cpCaptureStatus').innerText(),/momio total original/);
+ assert.equal(await page.locator('#cpForm button[type=submit]').isDisabled(),true);
+}
+await page.locator('#cpComposeClose').click();
+if(process.env.AE_CAPTURE_USER_FIXTURES){
+ await page.evaluate(()=>window.aeOpenPickComposer());
+ await page.locator('#cpCaptureFile').setInputFiles(process.env.AE_CAPTURE_USER_FIXTURES+'/boost.jpg');
+ await page.waitForFunction(()=>['matched','error'].includes(document.querySelector('.cp-capture')?.dataset.state),null,{timeout:90000});
+ console.log('User boost:',await page.locator('#cpCaptureStatus').innerText());
+ if(await page.locator('.cp-capture').getAttribute('data-state')!=='matched')fs.writeFileSync(process.env.AE_CAPTURE_USER_FIXTURES+'/failure-ocr.json',JSON.stringify(await page.evaluate(()=>window.testOcrReadings)));
+ assert.equal(await page.locator('.cp-capture').getAttribute('data-state'),'matched');
+ assert.equal(await page.locator('[name=odds_0]').inputValue(),'+737','Use the original struck quote, never +1104');
+ const selection=await page.locator('[name=selection_0]').inputValue();for(const text of ['Barcelona','GOALSCORER','5.5','ASSIST','Harry Kane'])assert.ok(selection.includes(text),text);
+ assert.match(await page.locator('.cp-capture-readings').innerText(),/sin boost/);
+ if(process.env.AE_CAPTURE_QA_DIR)await page.screenshot({path:process.env.AE_CAPTURE_QA_DIR+'/user-boost-imported.png'});
+ await page.locator('[name=event_date]').fill(new Date().toISOString().slice(0,10));await page.locator('#cpCaptureConfirm').check();
+ await page.locator('#cpForm button[type=submit]').click();await page.waitForFunction(()=>!document.getElementById('cpComposePanel').open);
+ assert.equal(payloads.at(-1).legs[0].odds,737);assert.equal(payloads.at(-1).legs.length,1,'One whole ticket, not separate player bets');
+ await page.evaluate(()=>window.aeOpenPickComposer());await page.locator('#cpCaptureFile').setInputFiles(process.env.AE_CAPTURE_USER_FIXTURES+'/cropped.jpg');
+ await page.waitForFunction(()=>document.querySelector('.cp-capture')?.dataset.state==='error',null,{timeout:90000});
+ assert.match(await page.locator('.cp-capture-readings').innerText(),/6 selecciones recuperadas/);
+ for(const text of ['Isaiah Likely','Terry McLaurin','Christian Watson','Rome Odunze','Matthew Golden','Chase Brown','Cincinnati Bengals'])assert.ok((await page.locator('.cp-capture-readings').innerText()).includes(text),text);
+ assert.match(await page.locator('#cpCaptureStatus').innerText(),/momio total original/);
+ if(process.env.AE_CAPTURE_QA_DIR)await page.screenshot({path:process.env.AE_CAPTURE_QA_DIR+'/user-cropped-partial.png'});
+ assert.equal(await page.locator('#cpForm button[type=submit]').isDisabled(),true);assert.equal(await page.locator('#cpCaptureFile').evaluate(e=>e.files.length),0);
+ console.log('PASS: user receipts, original +737 without boost, all five conditions, complete ticket publication; six recovered NFL selections with cropped total kept unpublishable.');
+}
 assert.equal(requests.filter(r=>r.method!=='GET').length,0,'Image bytes must not produce network uploads');
 assert.equal(requests.some(r=>r.url.includes('data:image')),false);assert.deepEqual(errors,[]);console.log('PASS: screenshot-first real browser OCR on generated single and two-leg receipts, per-leg/total values, confirmation and publication, cleared files/workers, only GET assets and 8 responsive/theme layouts.');await context.close();fs.rmSync(fixtures,{recursive:true,force:true});
 }finally{await browser.close();server.close();}})().catch(e=>{console.error(e);server.close();process.exit(1);});

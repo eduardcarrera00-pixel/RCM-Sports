@@ -24,7 +24,8 @@ pueden seguir enviando Picks por el flujo pendiente para mantener compatibilidad
 
 ## Alcance y límites
 
-Primera versión en pruebas, con una o dos selecciones y cuota total mínima +100.
+El formato simple continúa en pruebas, con una o dos selecciones y cuota total
+mínima +100. Los boletos Same Game Parlay+ completos se describen al final.
 Reconoce cuotas americanas con signo, decimales y fraccionarias; no interpreta
 cifras enteras sin signo como cuotas americanas. Rechaza datos incompletos,
 alternativas ambiguas, cuotas de baja confianza y totales incompatibles. Puede
@@ -110,3 +111,32 @@ Chromium, ocho combinaciones de tamaño y tema, y pruebas de perfiles, noticias 
 borradores. En la base pública, una transacción revertida comprobó publicación
 simple +150, combinada +329 y rechazo al cambiar la selección sin cambiar su
 lectura. No quedaron Picks temporales; la imagen no formó parte de las peticiones.
+
+## Boletos con Same Game Parlay y promociones
+
+La importación de boletos con «Includes: … Same Game Parlay … + … selection»
+conserva la combinada completa como un único Pick con su cuota total. Une cada
+jugador/selección con su mercado y partido; no asigna la cuota del grupo a cada
+jugador ni multiplica las cuotas internas para sustituir el total del boleto.
+Las etiquetas Bonus Bet, Profit Boost y Super Sub no son selecciones.
+
+Cuando se detectan el precio amarillo aumentado y el precio anterior tachado,
+se vuelve a leer solo la zona del original. Requiere una lectura de alta confianza,
+sin discrepancia con otra lectura clara. La cuota se mantiene automática: ni los
+porcentajes de boost ni el stake, pago o saldo se usan para reconstruirla.
+No se mezclan dos boletos completos como si fueran una sola apuesta.
+
+Se permiten decoraciones y partes de una tarjeta previa recortadas. Si falta el
+total original se muestra un resumen parcial, se pide una captura donde se lea
+ese total y no se habilita publicar. No se presenta una recuperación parcial como
+una importación completa. Se siguen admitiendo una o dos selecciones del formato
+anterior; los boletos anidados admiten hasta veinte condiciones leídas dentro de
+una única apuesta. Esta es compatibilidad con esa estructura, no con cualquier
+captura o casa.
+
+Las pruebas con las dos capturas aportadas por el usuario recuperaron las cinco
+condiciones del boleto de fútbol a +737, excluyendo +1104, y las seis condiciones
+del boleto NFL cuyo total está recortado. Las imágenes y su OCR completo se usan
+solo en las pruebas locales y no forman parte del repositorio ni de la base.
+`AE_CAPTURE_USER_FIXTURES` permite comprobar de nuevo esas capturas localmente;
+las pruebas habituales incluyen ejemplos generados y texto de regresión.
