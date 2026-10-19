@@ -1,0 +1,71 @@
+/* Picks shares the same page edges as Home, NFL and Football.
+   Each editorial image belongs to its own header, never the list below it. */
+html body #mainContent > #footballTakes.ae-picks-editorial{
+  box-sizing:border-box!important;width:100%!important;max-width:none!important;
+  margin-left:0!important;margin-right:0!important;
+  --ae-picks-clean-panel:#102b3e;
+  --ae-picks-clean-line:rgba(189,155,120,.7);
+}
+html:not(.dark) body #mainContent > #footballTakes.ae-picks-editorial{
+  --ae-picks-clean-panel:#fffcf8;
+  --ae-picks-clean-line:#c4aa8b;
+}
+html body #mainContent #footballTakes.ae-picks-editorial > #aePicksTopPair{
+  box-sizing:border-box!important;width:100%!important;max-width:100%!important;
+  margin-left:0!important;margin-right:0!important;padding-left:0!important;padding-right:0!important;
+}
+html body #mainContent #footballTakes.ae-picks-editorial > .ae-picks-layout{
+  box-sizing:border-box!important;width:100%!important;max-width:100%!important;
+  margin-left:0!important;margin-right:0!important;padding-left:0!important;padding-right:0!important;
+}
+html body #mainContent #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-rail > section.ae-chef-board{
+  box-sizing:border-box!important;min-width:0!important;margin:0!important;padding:0!important;
+  position:relative!important;isolation:isolate;overflow:hidden!important;
+  border:1px solid var(--ae-picks-clean-line)!important;
+  background:var(--ae-picks-clean-panel)!important;background-image:none!important;box-shadow:none!important;
+}
+html body #mainContent #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-rail > section.ae-chef-board > .ae-picks-rail-heading{
+  box-sizing:border-box!important;position:relative!important;inset:auto!important;
+  width:100%!important;max-width:100%!important;margin:0!important;transform:none!important;
+  border:0!important;border-bottom:1px solid var(--ae-picks-clean-line)!important;
+  border-radius:0!important;overflow:hidden!important;
+}
+html body #mainContent #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-rail > section.ae-chef-board > ol.ae-chef-scroll,
+html body #mainContent #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-rail > section.ae-chef-board > ol.ae-chef-scroll > li{
+  background:var(--ae-picks-clean-panel)!important;
+}
+/* This live wrapper only exists on desktop; mobile restores its original nodes. */
+  html body #mainContent #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-community-main{
+    min-width:0!important;padding:0!important;position:relative!important;isolation:isolate;
+    border:1px solid var(--ae-picks-clean-line)!important;
+    background:var(--ae-picks-clean-panel)!important;overflow:hidden!important;
+  }
+  html body #mainContent #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-community-main > .ae-picks-feed-heading{
+    box-sizing:border-box!important;width:100%!important;margin:0!important;padding:0!important;
+    position:relative!important;overflow:hidden!important;
+  }
+  html body #mainContent #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-community-main .ae-picks-heading-cta-row.ae-chef-marble{
+    box-sizing:border-box!important;width:100%!important;max-width:100%!important;
+    margin:0!important;position:relative!important;transform:none!important;
+  }
+  html body #mainContent #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-community-main > #cpFeed{
+    box-sizing:border-box!important;width:100%!important;margin:0!important;padding:0 18px!important;
+    background:var(--ae-picks-clean-panel)!important;
+  }
+  html body #mainContent #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-community-main > #cpStatus:not(:empty){margin:8px 18px!important;}
+  html body #mainContent #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-community-main > #cpFeedScrollHint{
+    margin:0!important;padding:8px 18px!important;background:var(--ae-picks-clean-panel)!important;
+  }
+@media(max-width:910px){
+  html body #mainContent #footballTakes.ae-picks-editorial #communityPicks{
+    box-sizing:border-box!important;width:100%!important;min-width:0!important;
+    margin-left:0!important;margin-right:0!important;padding:0!important;
+    border:0!important;background:transparent!important;
+  }
+  html body #mainContent #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-feed-heading{
+    width:100%!important;margin:0!important;padding:0!important;overflow:hidden!important;
+  }
+  html body #mainContent #footballTakes.ae-picks-editorial #communityPicks .ae-picks-heading-cta-row.ae-chef-marble{
+    box-sizing:border-box!important;width:100%!important;max-width:100%!important;margin:0!important;
+  }
+}
