@@ -41,20 +41,26 @@
   let result=null,signature='',active=null,sequence=0;
   const fingerprint=()=>JSON.stringify({picks:getPicks().map(p=>({sport:p.sport,event:p.event,selection:p.selection,odds:Number(p.odds)})),date:result?.eventDate?form.elements.namedItem('event_date')?.value:''});
   const panel=node('section',null,'cp-capture');panel.setAttribute('aria-labelledby','cpCaptureTitle');
-  const title=node('h3','Importa tu Pick','cp-capture-title');title.id='cpCaptureTitle';
-  const intro=node('p','Sube tu boleto para rellenar la apuesta. Partido, pronóstico y momio quedan unidos a la captura; puedes añadir tu análisis.','cp-capture-intro');
-  const picker=node('button','Elegir captura','cp-capture-picker'),input=document.createElement('input');picker.type='button';picker.setAttribute('aria-describedby','cpCaptureHelp cpCaptureStatus');
+  const title=node('h3','Sube la captura de tu apuesta','cp-capture-title');title.id='cpCaptureTitle';
+  const intro=node('p','El deporte, el partido, el pronóstico y el momio se rellenan automáticamente. Después revisas la fecha y, si quieres, nos cuentas por qué elegiste ese pick.','cp-capture-intro');
+  const picker=node('button','Subir captura','cp-capture-picker'),input=document.createElement('input');picker.type='button';picker.setAttribute('aria-describedby','cpCaptureHelp cpCaptureStatus');
   input.type='file';input.id='cpCaptureFile';input.accept='image/png,image/jpeg,image/webp';input.multiple=true;input.hidden=true;picker.addEventListener('click',()=>input.click());
-  const help=node('p','Una captura completa o una por selección. PNG, JPG o WebP · máximo 8 MB por imagen. Lector en pruebas: algunas capturas todavía no se reconocen. La lectura se hace en tu dispositivo; la imagen no se envía ni se guarda.','cp-capture-help');help.id='cpCaptureHelp';
-  const status=node('p','Empieza eligiendo una captura. No tienes que escribir la apuesta.','cp-capture-status');status.id='cpCaptureStatus';status.setAttribute('role','status');status.setAttribute('aria-live','polite');
+  const help=node('p','Incluye el partido, el pronóstico, el momio y la fecha del evento si aparece. Una captura completa o una por selección · PNG, JPG o WebP · hasta 8 MB por imagen. La imagen no se guarda.','cp-capture-help');help.id='cpCaptureHelp';
+  const status=node('p','','cp-capture-status');status.id='cpCaptureStatus';status.setAttribute('role','status');status.setAttribute('aria-live','polite');
   const summary=node('ul',null,'cp-capture-readings');summary.hidden=true;
   const confirmation=node('label',null,'cp-capture-confirm'),check=document.createElement('input');check.type='checkbox';check.id='cpCaptureConfirm';
-  confirmation.append(check,node('span','He revisado el partido, el pronóstico y la fecha.'));confirmation.hidden=true;
+  const confirmationText=node('span','Confirmo que hice esta apuesta, revisé el partido y el pronóstico y comprobé la fecha del evento.');
+  confirmation.append(check,confirmationText);confirmation.hidden=true;
   const cancel=node('button','Cancelar lectura','cp-capture-cancel');cancel.type='button';cancel.hidden=true;
   panel.append(title,intro,picker,input,help,status,summary,cancel);
   form.prepend(panel);form.classList.add('cp-capture-first');
   form.querySelector('.cp-compose-footer').before(confirmation);
   const isCurrent=job=>active===job&&!job.cancelled;
+  function updateDateConfirmation(){
+   const value=form.elements.namedItem('event_date')?.value,stamp=Date.parse(value+'T12:00:00Z');
+   const date=Number.isFinite(stamp)?new Intl.DateTimeFormat('es',{dateStyle:'long',timeZone:'UTC'}).format(new Date(stamp)):'';
+   confirmationText.textContent='Confirmo que hice esta apuesta, revisé el partido y el pronóstico y comprobé la fecha del evento'+(date?': '+date+'.':'.');
+  }
   function dispose(job){
    if(!job)return;
    clearTimeout(job.timer);job.files=[];
@@ -69,7 +75,7 @@
   }
   function clear(message='Elige una captura para importar tu apuesta y su momio.'){
    stop();sequence++;result=null;signature='';check.checked=false;confirmation.hidden=true;summary.hidden=true;summary.replaceChildren();
-   input.value='';panel.dataset.state='empty';status.textContent=message;applyImport(null);onChange();
+   input.value='';picker.textContent='Subir captura';panel.dataset.state='empty';status.textContent=message;applyImport(null);onChange();
   }
   function invalidate(){
    if(result&&signature!==fingerprint())clear('La apuesta cambió. Importa otra captura para mantener unidos partido, pronóstico y momio.');
@@ -116,8 +122,12 @@
     }
     if(!isCurrent(job))return;
     result={readings,total,eventDate};applyImport(result);signature=fingerprint();
-    panel.dataset.state='matched';status.textContent='Apuesta importada. Los datos de la captura están bloqueados. Revisa partido y pronóstico, completa la fecha si falta y añade tu análisis. La imagen ya se ha descartado.';
-    summary.replaceChildren(...readings.map((r,i)=>node('li',(readings.length>1?'Selección '+(i+1)+' · ':'')+(r.odds>0?'+':'')+r.odds+' · Momio automático ('+r.format+')')));
+    panel.dataset.state='matched';status.textContent='Tu pick está preparado. Revisa los datos y confirma la fecha del evento para publicar.';picker.textContent='Cambiar captura';updateDateConfirmation();
+    summary.replaceChildren(...readings.map((r,i)=>{
+     const item=node('li');
+     item.append(node('small',(readings.length>1?'Selección '+(i+1)+' · ':'')+(r.sport||'Otros')),node('strong',r.event),node('span',r.selection),node('span','Momio automático · '+(r.odds>0?'+':'')+r.odds,'cp-capture-odds'));
+     return item;
+    }));
     summary.hidden=false;confirmation.hidden=false;onChange();
    }catch(error){
     if(isCurrent(job)){result=null;panel.dataset.state='error';status.textContent=(error?.message||'No pudimos leer la captura. Prueba otra.')+' La imagen se ha descartado.';}
@@ -128,7 +138,7 @@
   }
   input.addEventListener('change',()=>void read());
   cancel.addEventListener('click',()=>clear('Lectura cancelada. La imagen se ha descartado.'));
-  form.addEventListener('input',event=>{if(event.target!==check){invalidate();if(event.target.name==='event_date')check.checked=false;}});
+  form.addEventListener('input',event=>{if(event.target!==check){invalidate();if(event.target.name==='event_date'){check.checked=false;updateDateConfirmation();}}onChange();});
   form.addEventListener('click',event=>{if(event.target.closest('.cp-compose-modes,.cp-compose-remove,.cp-compose-add'))invalidate();});
   form.addEventListener('reset',()=>clear());
   form.closest('dialog')?.addEventListener('close',()=>{if(active)clear('Lectura cancelada al cerrar. Añade otra captura para continuar.');});
@@ -136,6 +146,7 @@
   return {
    clear,invalidate,
    hasImport(){return !!result&&signature===fingerprint();},
+   isConfirmed(){return !!result&&signature===fingerprint()&&check.checked;},
    getTotal(){return result&&signature===fingerprint()?result.total:null;},
    proof(){
     invalidate();

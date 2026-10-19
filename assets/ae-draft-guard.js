@@ -176,6 +176,7 @@
     discard.dataset.aeDraftDiscard='';discard.hidden=true;discard.textContent='Descartar borrador';
     toolbar.append(message,discard);
     if(kind==='take')form.insertBefore(toolbar,$('aeTakeComposerStatus'));
+    else if(form.querySelector('.cp-capture'))form.querySelector('.cp-compose-footer').before(toolbar);
     else form.prepend(toolbar);
     form.addEventListener('input',()=>schedule(kind));
     form.addEventListener('change',()=>schedule(kind));

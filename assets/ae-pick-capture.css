@@ -27,6 +27,14 @@ html:not(.dark) body #cpComposePanel #cpForm .cp-capture[data-state="error"] .cp
 @media(max-width:760px){html body #cpComposePanel #cpForm .cp-capture {padding:13px;}html body #cpComposePanel #cpForm .cp-capture-title {font-size:21px;}}
 /* La captura define las selecciones: no hay controles manuales para reasignar cuotas. */
 html body #cpComposePanel #cpForm.cp-capture-first :is(.cp-compose-modes,.cp-compose-add,.cp-compose-remove){display:none!important;}
-html body #cpComposePanel #cpForm.cp-capture-first:not([data-imported="true"]) :is(.cp-legs,.cp-compose-date,.cp-compose-analysis){display:none!important;}
+html body #cpComposePanel #cpForm .cp-legs[hidden]{display:none!important;}
+html body #cpComposePanel #cpForm.cp-capture-first:not([data-imported="true"]) :is(.cp-compose-date,.cp-compose-analysis,.cp-compose-footer,.ae-draft-tools){display:none!important;}
+html body #cpComposePanel #cpForm .cp-capture-readings{list-style:none;padding:12px 0;}
+html body #cpComposePanel #cpForm .cp-capture-readings li{display:grid;gap:5px;}
+html body #cpComposePanel #cpForm .cp-capture-readings li+li{margin-top:14px;padding-top:14px;border-top:1px solid var(--cp-dialog-line);}
+html body #cpComposePanel #cpForm .cp-capture-readings strong{font-size:16px;line-height:1.4;}
+html body #cpComposePanel #cpForm .cp-capture-readings small{color:var(--cp-dialog-muted);}
+html body #cpComposePanel #cpForm .cp-capture-odds{font-weight:700;}
+html body #cpComposePanel #cpForm .cp-capture-status:empty{display:none;}
 html body #cpComposePanel #cpForm input[readonly]{background:var(--cp-dialog-field);border-style:dashed;cursor:default;opacity:1;}
 html body #cpComposePanel #cpForm button[type="submit"]:disabled{opacity:.5;cursor:default;}

@@ -62,7 +62,8 @@ w.db={
 const settle=()=>new Promise(resolve=>setTimeout(resolve,40));
 await settle();
 // El lector real y la limpieza se prueban en pick-capture-ui; aquí se aísla el compositor.
-w.aePickCapture={mount:({getPicks})=>({hasImport:()=>true,getTotal:()=>null,proof:()=>({version:1,method:'on_device_ocr',confirmed:true,readings:getPicks().map(p=>({...p,confidence:95}))})})};
+let importPick;
+w.aePickCapture={mount:({getPicks,applyImport})=>{importPick=applyImport;return {hasImport:()=>true,getTotal:()=>null,proof:()=>({version:1,method:'on_device_ocr',confirmed:true,readings:getPicks().map(p=>({...p,confidence:95}))})};}};
 w.eval(fs.readFileSync('assets/community-picks.js','utf8'));
 d.dispatchEvent(new w.Event('DOMContentLoaded'));
 await settle();
@@ -76,20 +77,26 @@ assert.equal(d.documentElement.classList.contains('ae-pick-composing'),true);
 for(const key of ['sport','event','selection','odds'])assert.equal(input(key+'_0').readOnly,true);
 assert.equal(input('sport_0').tagName,'INPUT');assert.equal(input('event_0').tagName,'INPUT');
 assert.equal(form.querySelector('select'),null);
+assert.equal(form.querySelector('.cp-compose-modes'),null,'No manual simple/combined choice');
+assert.equal(form.querySelector('.cp-compose-add'),null,'The capture controls the number of selections');
+assert.equal(form.querySelector('.cp-legs').hidden,true,'Imported betting fields remain data, not an editable form');
 assert.equal(input('event_date').value,'');
 assert.equal(form.querySelector('details').open,false);
 fill();input('odds_0').value='+50';await form.onsubmit({preventDefault(){}});assert.equal(records.length,0);
+input('odds_0').value='+150';
+for(const date of ['',dayOffset(-1),dayOffset(181)]){input('event_date').value=date;await form.onsubmit({preventDefault(){}});assert.equal(records.length,0,'An event date must be present and within the publication window');}
+input('event_date').value=today();
 input('odds_0').value='+150';failPublish=true;await form.onsubmit({preventDefault(){}});
 assert.equal(modal.open,true);assert.equal(input('event_0').value,'Toronto vs Boston');assert.match(form.querySelector('.cp-status').textContent,/Fallo/);
 failPublish=false;await form.onsubmit({preventDefault(){}});await settle();
 assert.equal(records.length,1);assert.equal(records[0].title,'Toronto vs Boston');assert.equal(records[0].legs[0].sport,'Baloncesto');assert.equal(modal.open,false);
 assert.equal(d.documentElement.classList.contains('ae-pick-composing'),false,'Closing releases the page scroll lock');
 d.getElementById('cpPublishCta').click();await settle();fill();
-[...form.querySelectorAll('button')].find(b=>b.textContent==='Combinada').click();
+importPick({readings:[{sport:'Baloncesto',event:'Toronto vs Boston',selection:'Toronto gana',odds:-110},{sport:'Fútbol',event:'Madrid vs Barça',selection:'Ambos anotan',odds:-110}]});input('event_date').value=today();
 assert.equal(form.querySelectorAll('fieldset').length,2);
 input('sport_1').value='Fútbol';input('event_1').value='Madrid vs Barça';input('selection_1').value='Ambos anotan';input('odds_0').value='-110';input('odds_1').value='-110';
 await form.onsubmit({preventDefault(){}});await settle();
 assert.equal(records.length,2);assert.equal(records[1].legs.length,2);assert.match(records[1].title,/Toronto vs Boston \/ Madrid vs Barça/);
 assert.equal(form.querySelectorAll('fieldset').length,1);assert.equal(input('event_date').value,'');
-console.log('Direct composer: typed sport/match, validation, draft recovery, simple and combined publishing passed.');
+console.log('Direct composer: capture-only betting data, event date validation, draft recovery, simple and combined publishing passed.');
 process.exit(0);

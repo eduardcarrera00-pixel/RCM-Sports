@@ -549,67 +549,64 @@ function field(label,type='text'){const wrap=el('label',label);const input=el(ty
 function buildComposer(){
  const form=$('cpForm'),rows=[];
  let capture=null;
- const eventDay=field('Fecha del partido','date'),explanation=field('Tu análisis','textarea');
+ const eventDay=field('Fecha del evento','date'),explanation=field('Descripción','textarea');
  eventDay.input.name='event_date';eventDay.input.min=todayToronto();eventDay.input.defaultValue='';
  eventDay.wrap.className='cp-compose-date';
- eventDay.wrap.append(el('small','Si no aparece en la captura, indica cuándo se juega.','cp-compose-hint'));
+ const dateHint=el('small','Indica la fecha del evento, no la fecha en que hiciste la apuesta.','cp-compose-hint');eventDay.wrap.append(dateHint);
  eventDay.input.max=new Date(Date.parse(todayToronto()+'T12:00:00Z')+180*86400000).toISOString().slice(0,10);
  explanation.input.name='explanation';explanation.input.required=false;explanation.input.maxLength=2000;
- explanation.input.placeholder='¿Por qué eliges este pronóstico?';
- const modes=el('div',null,'cp-compose-modes');modes.setAttribute('role','group');modes.setAttribute('aria-label','Tipo de Pick');
- const simple=button('Simple',()=>{if(rows.length>1)removeSecond();});
- const combined=button('Combinada',()=>addRow());modes.append(simple,combined);
- const legs=el('div',null,'cp-legs'),output=el('output','Completa tu pronóstico','cp-compose-summary');
+ explanation.input.placeholder='Cuéntanos por qué confías en este pick (opcional).';
+ const legs=el('div',null,'cp-legs'),output=el('output','','cp-compose-summary');legs.hidden=true;
  output.setAttribute('aria-live','polite');
  const status=el('p','','cp-status');status.setAttribute('role','status');
  function values(){return rows.map(r=>({sport:r.sport.input.value.trim(),event:r.event.input.value.trim(),selection:r.selection.input.value.trim(),odds:Number(r.odds.input.value)}));}
+ function validEventDate(){
+  const value=eventDay.input.value,stamp=Date.parse(value+'T12:00:00Z');
+  return /^\d{4}-\d{2}-\d{2}$/.test(value)&&Number.isFinite(stamp)&&new Date(stamp).toISOString().slice(0,10)===value&&value>=todayToronto()&&value<=eventDay.input.max;
+ }
  function calculate(){
   const picks=values(),valid=picks.every(l=>Number.isInteger(l.odds)&&Math.abs(l.odds)>=100&&Math.abs(l.odds)<=100000);
   const decimal=picks.reduce((v,l)=>v*(l.odds>0?1+l.odds/100:1+100/Math.abs(l.odds)),1);
   const total=capture?.getTotal();
   const american=total?.american??(decimal>=2?Math.round((decimal-1)*100):-Math.round(100/(decimal-1)));
   output.textContent=valid?(picks.length===1?(picks[0].selection||'Tu Pick')+' · ':total?'Cuota total del boleto · ':'Cuota total · ')+(american>0?'+':'')+american:'Importa una captura para leer el momio';
-  simple.setAttribute('aria-pressed',String(rows.length===1));combined.setAttribute('aria-pressed',String(rows.length===2));
-  submit.disabled=!valid||!capture?.hasImport();
+  submit.disabled=!valid||!capture?.hasImport()||!validEventDate()||(capture.isConfirmed&&!capture.isConfirmed());
   return valid&&decimal>=2;
  }
- const add=button('+ Añadir otra selección',()=>addRow());add.className='cp-compose-add';
- function removeSecond(){rows.pop().box.remove();add.hidden=false;calculate();}
  function addRow(){
   if(rows.length>=2)return;
   const box=el('fieldset',null,'cp-compose-selection');box.append(el('legend','Selección '+(rows.length+1)));
   const row={box};
   for(const [key,label,placeholder] of [['sport','Deporte','Ej. NFL, fútbol, NBA…'],['event','Partido','Ej. Bengals vs Browns'],['selection','Tu pronóstico','Ej. Bengals gana'],['odds','Cuota americana','Ej. +150']]){
    row[key]=field(label);const input=row[key].input;
-   input.name=key+'_'+rows.length;input.placeholder=placeholder;input.autocomplete='off';
+   input.name=key+'_'+rows.length;input.type='hidden';input.autocomplete='off';
    input.maxLength=key==='odds'?7:key==='selection'?200:key==='sport'?40:160;
    row[key].wrap.className='cp-compose-'+key;
    input.readOnly=true;input.setAttribute('aria-readonly','true');
-   input.placeholder=key==='odds'?'Se lee de la captura':'Se importa de la captura';
-   if(key==='odds'){input.pattern='[+-]?[0-9]{3,6}';row[key].wrap.append(el('small','Momio automático · solo cambia con otra captura · total mínimo +100','cp-compose-hint'));}
    box.append(row[key].wrap);
   }
-  rows.push(row);if(rows.length===2){const remove=button('Quitar segunda selección',removeSecond);remove.className='cp-compose-remove';box.append(remove);}
-  legs.append(box);add.hidden=rows.length===2;calculate();
+  rows.push(row);legs.append(box);calculate();
  }
- const analysis=el('details',null,'cp-compose-analysis');analysis.append(el('summary','Añadir análisis (opcional)'),explanation.wrap);
+ const analysis=el('details',null,'cp-compose-analysis');analysis.append(el('summary','Añadir descripción (opcional)'),explanation.wrap);
  const footer=el('footer',null,'cp-compose-footer');
  const submit=el('button','Publicar Pick');submit.type='submit';
  footer.append(output,submit,el('small','Revisa tu selección: no podrás editarla después de publicar.','cp-compose-hint'),status);
- form.append(modes,legs,eventDay.wrap,add,analysis,footer);addRow();
+ form.append(legs,eventDay.wrap,analysis,footer);addRow();
  function applyImport(imported){
   const data=imported?.readings||[];
   while(rows.length>Math.max(1,data.length))rows.pop().box.remove();
   while(rows.length<data.length)addRow();
   rows.forEach((row,i)=>{for(const key of ['sport','event','selection','odds'])row[key].input.value=data[i]?(key==='sport'?(data[i][key]||'Otros'):key==='odds'?(data[i].odds>0?'+':'')+data[i].odds:data[i][key]):'';});
   eventDay.input.readOnly=!!imported?.eventDate;eventDay.input.value=imported?.eventDate||'';
-  form.dataset.imported=String(!!imported);add.hidden=true;
+  dateHint.textContent=imported?.eventDate?'Fecha leída en la captura. Comprueba que corresponde al evento; si no coincide, usa otra captura.':'Indica la fecha del evento, no la fecha en que hiciste la apuesta.';
+  form.dataset.imported=String(!!imported);
  }
  capture=window.aePickCapture?.mount({form,getPicks:values,applyImport,onChange:calculate});
  form.addEventListener('input',calculate);
  form.onsubmit=async e=>{
   e.preventDefault();if(posting)return;
   if(!form.reportValidity())return;
+  if(!validEventDate()){status.textContent='Indica una fecha válida para el evento, desde hoy y dentro de los próximos 180 días.';return;}
   if(!calculate()){status.textContent='Revisa las cuotas: la cuota total debe ser al menos +100.';return;}
   posting=true;submit.disabled=true;
   const closer=$('cpComposeClose');if(closer)closer.disabled=true;
@@ -624,7 +621,7 @@ function buildComposer(){
    if(r.error)throw r.error;
    window.aeDraftGuard?.clear('pick');
    form.reset();while(rows.length>1)rows.pop().box.remove();
-   analysis.open=false;eventDay.input.defaultValue='';eventDay.input.value='';add.hidden=true;calculate();
+   analysis.open=false;eventDay.input.defaultValue='';eventDay.input.value='';calculate();
    closePickComposer(true);void load();
    notifyCommunity('Pick publicado con el momio cotejado. Ya puedes recibir votos y comentarios.');
   }catch(e){status.textContent=message(e);}

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';import fs from 'node:fs';import {Window} from 'happy-dom';
 const w=new Window({url:'https://example.test/RCM-Sports/'}),d=w.document;
-d.body.innerHTML='<dialog open><form><input name="odds_0"><input name="explanation"><footer class="cp-compose-footer"></footer></form></dialog>';
+d.body.innerHTML='<dialog open><form><input name="odds_0"><input name="event_date" type="date"><input name="explanation"><footer class="cp-compose-footer"></footer></form></dialog>';
 const form=d.querySelector('form');let picks=[];
 const valid={text:'BETSLIP\nNBA\nToronto Raptors vs Boston Celtics\nToronto Raptors Moneyline +150\nStake $10.00',confidence:95};
 let nextData=valid,terminated=0,closed=0,workers=0,delayRead=null,delayInit=null;const canvases=[];
@@ -18,6 +18,13 @@ assert.equal(form.firstElementChild,panel,'Screenshot comes before the form fiel
 upload();await settle();assert.equal(panel.dataset.state,'matched');assert.equal(input.files.length,0);assert.ok(canvases.every(c=>c.width===1&&c.height===1));assert.equal(terminated,1);assert.equal(closed,1);
 assert.equal(picks[0].odds,150,'Odds were imported without any typed inputs');assert.equal(picks[0].sport,'NBA');assert.equal(controller.hasImport(),true);
 assert.throws(()=>controller.proof(),/Confirma/);confirm.checked=true;
+assert.equal(controller.isConfirmed(),true);
+const eventDate=form.elements.namedItem('event_date');eventDate.value='2026-11-01';eventDate.dispatchEvent(new w.Event('input',{bubbles:true}));
+assert.equal(confirm.checked,false,'Changing a manually supplied event date requires a new confirmation');assert.equal(controller.hasImport(),true,'The undated capture remains valid');
+assert.match(confirm.parentElement.textContent,/1 de noviembre de 2026/);assert.equal(controller.isConfirmed(),false);confirm.checked=true;
+assert.match(confirm.parentElement.textContent,/hice esta apuesta/);
+assert.match(d.querySelector('.cp-capture-readings').textContent,/Toronto Raptors vs Boston Celtics/);
+assert.match(d.querySelector('.cp-capture-readings').textContent,/Moneyline/);
 assert.equal(controller.proof().readings[0].odds,150);assert.equal(JSON.stringify(controller.proof()).includes('Stake'),false);
 assert.doesNotMatch(confirm.parentElement.textContent,/momio|cuota/i,'The user never has to confirm the odds');
 form.querySelector('[name=explanation]').value='My own analysis';form.querySelector('[name=explanation]').dispatchEvent(new w.Event('input',{bubbles:true}));assert.equal(controller.proof().confirmed,true,'Analysis stays free');
