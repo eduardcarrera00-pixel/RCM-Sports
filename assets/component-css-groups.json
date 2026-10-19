@@ -1,0 +1,36 @@
+{
+  "groups": [
+    {
+      "output": "assets/ae-navigation-icons-group.css",
+      "sources": [
+        "assets/ae-muted-navigation-icons.css",
+        "assets/ae-custom-nav-icons.css"
+      ],
+      "component": "Navegación · iconos"
+    },
+    {
+      "output": "assets/ae-header-alignment-group.css",
+      "sources": [
+        "assets/ae-header-alignment-polish.css",
+        "assets/ae-admin-header-compact.css"
+      ],
+      "component": "Cabecera · alineación y acciones admin"
+    },
+    {
+      "output": "assets/ae-nfl-mobile-group.css",
+      "sources": [
+        "assets/ae-nfl-mobile-reference.css",
+        "assets/ae-nfl-mobile-telephoto.css"
+      ],
+      "component": "NFL · composición móvil"
+    },
+    {
+      "output": "assets/ae-profile-editorial-group.css",
+      "sources": [
+        "assets/ae-profile-city-editorial.css",
+        "assets/ae-profile-tabs-picks.css"
+      ],
+      "component": "Perfiles · Takes y Picks"
+    }
+  ]
+}
