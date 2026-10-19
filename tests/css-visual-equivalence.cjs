@@ -44,7 +44,7 @@ function serve(dir,port){
   return new Promise(resolve=>server.listen(port,'127.0.0.1',()=>resolve(server)));
 }
 const ports=[18760,18761],sections=['home','picks','nfl','football'];
-const themes=['dark','light'],widths=[390,1366];
+const themes=['dark','light'],widths=[390,760,761,768,1366];
 async function main(){
   const servers=await Promise.all([serve(baselineRoot,ports[0]),serve(candidateRoot,ports[1])]);
   const browser=await chromium.launch({headless:true});
@@ -109,6 +109,6 @@ async function main(){
     await browser.close();
     await Promise.all(servers.map(server=>new Promise(resolve=>server.close(resolve))));
   }
-  console.log('PASS: static desktop/mobile light/dark layouts identical (16 captures).');
+  console.log('PASS: static desktop/mobile light/dark layouts identical (40 captures).');
 }
 main().catch(error=>{console.error(error);process.exitCode=1;});
