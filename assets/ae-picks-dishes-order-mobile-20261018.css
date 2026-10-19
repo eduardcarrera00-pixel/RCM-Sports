@@ -581,3 +581,169 @@ html body #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-rail > s
     overflow:hidden!important;
   }
 }
+
+
+/* AE SPORTS · Desktop Picks: aligned frames and matching rail bottom (Oct 19).
+   Only >=911px. The existing mobile arrangement, card design and vote actions
+   are untouched. The left column sets the shared row height; JS updates the
+   rail's height when live picks arrive or their text size changes. */
+@media (min-width:911px) {
+  /* Match the outer edges of the upper Pick/News pair. Padding belonged to
+     the old full-width wrapper and made both panels appear inset. */
+  html body #footballTakes.ae-picks-editorial > .ae-picks-layout > #communityPicks:not([hidden]) {
+    display:grid!important;
+    box-sizing:border-box!important;
+    grid-template-columns:minmax(0,1.74fr) minmax(0,.86fr)!important;
+    grid-template-rows:auto auto!important;
+    column-gap:var(--ae-picks-aligned-gap,22px)!important;
+    row-gap:0!important;
+    align-items:start!important;
+    align-content:start!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    overflow:visible!important;
+  }
+
+  /* Turn the real Eres Chef + real community feed into a single left frame.
+     No fake copy or duplicated Picks are created. */
+  html body #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-community-main {
+    display:flex!important;
+    flex-direction:column!important;
+    box-sizing:border-box!important;
+    grid-column:1!important;
+    grid-row:1!important;
+    align-self:start!important;
+    gap:0!important;
+    width:100%!important;
+    min-width:0!important;
+    height:auto!important;
+    margin:0!important;
+    padding:20px!important;
+    border:1px solid #bd9b78!important;
+    border-radius:0!important;
+    background:var(--picks-art-panel,#102938)!important;
+    overflow:hidden!important;
+  }
+
+  /* The decorative Chef header extends to the INSIDE of the shared border,
+     exactly like the full-bleed upper Weekly Pick. */
+  html body #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-community-main > .ae-picks-feed-heading {
+    flex:0 0 auto!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    min-width:0!important;
+    margin:0!important;
+    padding:0!important;
+    background:none!important;
+    border:0!important;
+  }
+  html body #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-community-main .ae-picks-heading-cta-row.ae-chef-marble {
+    box-sizing:border-box!important;
+    width:calc(100% + 40px)!important;
+    max-width:none!important;
+    min-width:0!important;
+    margin:-20px -20px 0!important;
+    border-radius:0!important;
+  }
+  html body #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-community-main > #cpStatus:empty {
+    display:none!important;
+    height:0!important;
+    margin:0!important;
+    padding:0!important;
+  }
+  html body #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-community-main > #cpFeed {
+    display:block!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    min-width:0!important;
+    margin:0!important;
+    padding-top:0!important;
+  }
+  html body #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-community-main > #cpFeed > .cp-card:first-child {
+    margin-top:0!important;
+  }
+
+  /* Right side starts flush with Eres Chef; its outside edge is the same as
+     Ultima Noticia. The bottom matches the visible community feed frame. */
+  html body #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-rail {
+    display:flex!important;
+    flex-direction:column!important;
+    justify-content:stretch!important;
+    box-sizing:border-box!important;
+    grid-column:2!important;
+    grid-row:1!important;
+    align-self:start!important;
+    gap:14px!important;
+    width:100%!important;
+    min-width:0!important;
+    height:var(--ae-picks-desktop-plates-height,auto)!important;
+    min-height:0!important;
+    max-height:none!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+  }
+  html body #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-rail > section.ae-chef-board {
+    display:flex!important;
+    flex-direction:column!important;
+    box-sizing:border-box!important;
+    flex:1 1 0!important;
+    width:100%!important;
+    min-width:0!important;
+    min-height:0!important;
+    height:auto!important;
+    margin:0!important;
+    border-radius:0!important;
+    overflow:hidden!important;
+  }
+  html body #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-rail > section.ae-chef-board > .ae-picks-rail-heading {
+    flex:0 0 auto!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    margin:0!important;
+  }
+  html body #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-rail > section.ae-chef-board > ol.ae-chef-scroll {
+    box-sizing:border-box!important;
+    flex:1 1 auto!important;
+    min-height:0!important;
+    height:auto!important;
+    max-height:none!important;
+    overflow-x:hidden!important;
+    overflow-y:auto!important;
+    scrollbar-width:thin!important;
+  }
+  html body #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-rail > #cpModeration:not([hidden]) {
+    display:block!important;
+    flex:0 0 auto!important;
+    min-height:0!important;
+    height:auto!important;
+    overflow:visible!important;
+  }
+  /* Admin's moderation workspace must not be clipped for visual symmetry. */
+  html body #footballTakes.ae-picks-editorial #communityPicks:has(#cpModeration:not([hidden])) > .ae-picks-rail {
+    height:auto!important;
+  }
+  html body #footballTakes.ae-picks-editorial #communityPicks:has(#cpModeration:not([hidden])) > .ae-picks-rail > section.ae-chef-board {
+    flex:0 0 auto!important;
+    height:auto!important;
+  }
+  html body #footballTakes.ae-picks-editorial #communityPicks:has(#cpModeration:not([hidden])) > .ae-picks-rail > section.ae-chef-board > ol.ae-chef-scroll {
+    flex:0 1 auto!important;
+    height:var(--ae-plates-window-height,auto)!important;
+    max-height:var(--ae-plates-window-height,none)!important;
+  }
+  html body #footballTakes.ae-picks-editorial #communityPicks > .ae-chefs-dual-standings {
+    grid-column:1/-1!important;
+    grid-row:2!important;
+    width:100%!important;
+    margin-top:20px!important;
+  }
+}
