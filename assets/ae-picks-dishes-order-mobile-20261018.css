@@ -728,14 +728,14 @@ html body #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-rail > s
     overflow:visible!important;
   }
   /* Admin's moderation workspace must not be clipped for visual symmetry. */
-  html body #footballTakes.ae-picks-editorial #communityPicks:has(#cpModeration:not([hidden])) > .ae-picks-rail {
+  html body #footballTakes.ae-picks-editorial #communityPicks:has(> .ae-picks-rail > #cpModeration:not([hidden])) > .ae-picks-rail {
     height:auto!important;
   }
-  html body #footballTakes.ae-picks-editorial #communityPicks:has(#cpModeration:not([hidden])) > .ae-picks-rail > section.ae-chef-board {
+  html body #footballTakes.ae-picks-editorial #communityPicks:has(> .ae-picks-rail > #cpModeration:not([hidden])) > .ae-picks-rail > section.ae-chef-board {
     flex:0 0 auto!important;
     height:auto!important;
   }
-  html body #footballTakes.ae-picks-editorial #communityPicks:has(#cpModeration:not([hidden])) > .ae-picks-rail > section.ae-chef-board > ol.ae-chef-scroll {
+  html body #footballTakes.ae-picks-editorial #communityPicks:has(> .ae-picks-rail > #cpModeration:not([hidden])) > .ae-picks-rail > section.ae-chef-board > ol.ae-chef-scroll {
     flex:0 1 auto!important;
     height:var(--ae-plates-window-height,auto)!important;
     max-height:var(--ae-plates-window-height,none)!important;
