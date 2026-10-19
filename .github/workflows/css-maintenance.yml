@@ -35,6 +35,8 @@ jobs:
       - run: npm ci
       - name: Check CSS references and cascade
         run: npm run test:css
+      - name: Inventory CSS duplicates and competing declarations
+        run: npm run css:conflicts
       - name: Verify compiled CSS matches its source manifest
         run: |
           node scripts/build-editorial-css.mjs
