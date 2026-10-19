@@ -27,6 +27,7 @@ let ownTakes=[];
 let ownPicks=[];
 let publicAuthorLabel='Aficionado';
 let ownUnpopularTakeId=null;
+let recentScrollObserver=null;
 
 function openProfileTake(t,owner,reply=false){
   if(t.hidden)return;
@@ -104,6 +105,7 @@ async function updateButton(){
 }
 
 function close(){
+  if(recentScrollObserver){recentScrollObserver.disconnect();recentScrollObserver=null;}
   ++request;
   activeAuthor=null;
   privateView=false;
@@ -129,6 +131,49 @@ function dateText(value){
 function numeric(value){const n=Number(value);return Number.isFinite(n)?n:0;}
 function takeNet(t){return numeric(t.upvotes)-numeric(t.downvotes);}
 function takeActivity(t){return numeric(t.upvotes)+numeric(t.downvotes);}
+
+// The list remains complete, but its viewport ends after the third visible card.
+function appendRecentScroll(target,entries,kind,renderItem){
+  if(recentScrollObserver){recentScrollObserver.disconnect();recentScrollObserver=null;}
+  const region=el('div',null,'ae-profile-recent-scroll ae-profile-recent-'+kind);
+  region.setAttribute('role','region');
+  region.setAttribute('aria-label',kind==='takes'?'Últimos Takes. Desplázate para ver más.':'Últimos Picks. Desplázate para ver más.');
+  if(entries.length>3)region.tabIndex=0;
+  for(const entry of entries)region.append(renderItem(entry));
+  target.append(region);
+  if(entries.length<=3){region.style.maxHeight='none';return;}
+  const visible=[...region.children].slice(0,3);
+  const measure=()=>{
+    if(!region.isConnected)return;
+    const top=visible[0].getBoundingClientRect().top;
+    const bottom=visible[2].getBoundingClientRect().bottom;
+    if(bottom>top)region.style.maxHeight=Math.ceil(bottom-top)+'px';
+  };
+  if(typeof ResizeObserver!=='undefined'){
+    recentScrollObserver=new ResizeObserver(measure);
+    for(const card of visible)recentScrollObserver.observe(card);
+  }
+  if(typeof requestAnimationFrame==='function')requestAnimationFrame(measure);
+  else measure();
+}
+
+function renderTakeSupport(entries){
+  const target=$('aeProfileTakeAccuracy');
+  if(!target)return;
+  target.replaceChildren();
+  const shown=entries.filter(t=>!t.hidden);
+  const up=shown.reduce((sum,t)=>sum+Math.max(0,numeric(t.upvotes)),0);
+  const down=shown.reduce((sum,t)=>sum+Math.max(0,numeric(t.downvotes)),0);
+  const total=up+down;
+  const percent=total?Math.round(up/total*100):null;
+  const copy=el('div',null,'ae-profile-accuracy-copy');
+  copy.append(el('span','PORCENTAJE DE APOYO'),el('strong',percent===null?'—':percent+'%'));
+  const detail=el('p',total
+    ?up+' apoyos · '+down+' cuestionamientos. Calculado con los votos de la comunidad.'
+    :'Todavía no hay votos para calcular el porcentaje de apoyo.');
+  target.append(copy,detail);
+  target.hidden=activeTab!=='takes';
+}
 
 function uniqueChoice(sorted,used){
   return sorted.find(item=>!used.has(String(item.id)))||sorted[0]||null;
@@ -280,6 +325,7 @@ function renderTakes(entries,owner,canVote){
   const target=$('aeProfileTakes');
   highlights.replaceChildren();
   target.replaceChildren();
+  renderTakeSupport(entries);
 
   const featured=featuredTakes(entries);
   if(privateView){
@@ -311,7 +357,7 @@ function renderTakes(entries,owner,canVote){
 
   const heading=el('h3',privateView?'Últimos Takes':'Takes recientes','ae-profile-list-heading');
   target.append(heading);
-  for(const entry of entries.slice(0,privateView?12:30))target.append(renderTakeItem(entry,owner,canVote));
+  appendRecentScroll(target,entries,'takes',entry=>renderTakeItem(entry,owner,canVote));
 }
 
 function pickOutcomeLabel(p){
@@ -456,7 +502,7 @@ function renderPicks(entries,isPublic=false){
 
   if(entries.length){
     target.append(el('h3','Últimos Picks','ae-profile-list-heading'));
-    for(const p of entries.slice(0,10))target.append(renderPickCard(p,false));
+    appendRecentScroll(target,entries,'picks',p=>renderPickCard(p,false));
   }else{
     target.append(el('p',isPublic?'Este aficionado no tiene Picks públicos disponibles.':'Aún no has publicado Picks.','ae-profile-empty'));
   }
@@ -498,6 +544,7 @@ function setPrivateTab(tab){
   const pickHighlights=$('aeProfilePickHighlights');
   const pickList=$('aeProfilePicks');
   const accuracy=$('aeProfileAccuracy');
+  const takeAccuracy=$('aeProfileTakeAccuracy');
 
   if(activeTab==='takes'){
     takeHighlights.hidden=false;
@@ -505,6 +552,7 @@ function setPrivateTab(tab){
     pickHighlights.hidden=true;
     pickList.hidden=true;
     accuracy.hidden=true;
+    takeAccuracy.hidden=false;
     $('aeProfileTitle').textContent=privateView?'Mis Takes':publicAuthorLabel+' · Takes';
     renderTakes(ownTakes,activeAuthor,!privateView);
   }else{
@@ -512,6 +560,7 @@ function setPrivateTab(tab){
     takeList.hidden=true;
     pickHighlights.hidden=false;
     pickList.hidden=false;
+    takeAccuracy.hidden=true;
     $('aeProfileTitle').textContent=privateView?'Mis Picks':publicAuthorLabel+' · Picks';
     renderPicks(ownPicks,!privateView);
   }
@@ -548,6 +597,8 @@ async function showOwn(){
   $('aeProfilePicks').replaceChildren();
   $('aeProfileAccuracy').replaceChildren();
   $('aeProfileAccuracy').hidden=true;
+  $('aeProfileTakeAccuracy').replaceChildren();
+  $('aeProfileTakeAccuracy').hidden=true;
 
   const [takesResult,picksResult,unpopularResult]=await Promise.allSettled([
     db.rpc('ae_my_free_takes'),
@@ -594,6 +645,7 @@ async function showPublic(id,push=true,tab='takes'){
   $('aeProfilePickHighlights').hidden=true;
   $('aeProfilePicks').hidden=true;
   $('aeProfileAccuracy').hidden=true;
+  $('aeProfileTakeAccuracy').hidden=true;
   $('aeProfileTitle').textContent='Perfil de aficionado';
   $('aeProfileUsername').textContent='Takes y Picks públicos';
   $('aeProfileStatus').textContent='Cargando perfil público…';
@@ -602,6 +654,7 @@ async function showPublic(id,push=true,tab='takes'){
   $('aeProfilePickHighlights').replaceChildren();
   $('aeProfilePicks').replaceChildren();
   $('aeProfileAccuracy').replaceChildren();
+  $('aeProfileTakeAccuracy').replaceChildren();
 
   if(push){
     const u=new URL(location.href);
