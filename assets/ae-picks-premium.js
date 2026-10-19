@@ -61,9 +61,43 @@
    if(!community)return;
    const desktop=window.matchMedia('(min-width: 911px)');
    let leftColumn=null;
+   let observer=null;
+   let frame=0;
+   const rail=community.querySelector(':scope > .ae-picks-rail');
+   const clearHeight=()=>rail?.style.removeProperty('--ae-picks-desktop-plates-height');
+   const alignBottom=()=>{
+     frame=0;
+     if(!desktop.matches||!leftColumn||!rail||community.hidden||!community.isConnected)return;
+     // Moderation may add additional full-size editor controls. Do not
+     // compress or clip that admin-only panel.
+     if(rail.querySelector('#cpModeration:not([hidden])')){
+       clearHeight();
+       return;
+     }
+     const firstPick=leftColumn.querySelector('#cpFeed > .cp-card');
+     // With no published predictions, preserve natural ranking heights.
+     if(!firstPick){clearHeight();return;}
+     const mainHeight=Math.ceil(leftColumn.getBoundingClientRect().height);
+     if(mainHeight>0&&Number.isFinite(mainHeight)){
+       const height=mainHeight+'px';
+       if(rail.style.getPropertyValue('--ae-picks-desktop-plates-height')!==height){
+         rail.style.setProperty('--ae-picks-desktop-plates-height',height);
+       }
+     }
+   };
+   const schedule=()=>{
+     if(frame)return;
+     frame=requestAnimationFrame(alignBottom);
+   };
+   const stop=()=>{
+     if(frame){cancelAnimationFrame(frame);frame=0;}
+     observer?.disconnect();
+     observer=null;
+     clearHeight();
+   };
    const sync=()=>{
      if(desktop.matches){
-       if(leftColumn)return;
+       if(leftColumn){schedule();return;}
        const nodes=[
          community.querySelector(':scope > .ae-picks-feed-heading'),
          community.querySelector(':scope > #cpStatus'),
@@ -76,9 +110,15 @@
        community.insertBefore(column,nodes[0]);
        nodes.forEach(node=>column.appendChild(node));
        leftColumn=column;
+       if(typeof ResizeObserver!=='undefined'){
+         observer=new ResizeObserver(schedule);
+         observer.observe(leftColumn);
+       }
+       schedule();
      }else if(leftColumn){
-       // Return the original child order before the existing mobile
-       // direct-child selectors are needed.
+       stop();
+       // Restore the same real nodes and handlers for the approved mobile
+       // direct-child layout. No votes, drafts or cards are reconstructed.
        [...leftColumn.children].forEach(node=>community.insertBefore(node,leftColumn));
        leftColumn.remove();
        leftColumn=null;
@@ -87,6 +127,13 @@
    sync();
    if(desktop.addEventListener)desktop.addEventListener('change',sync);
    else if(desktop.addListener)desktop.addListener(sync);
+   window.addEventListener('resize',schedule,{passive:true});
+   // The feed is populated asynchronously, so a status update can occur
+   // without changing the parent height. Re-align after child mutations.
+   if(typeof MutationObserver!=='undefined'){
+     const mutations=new MutationObserver(schedule);
+     mutations.observe(community,{subtree:true,childList:true,attributes:true,attributeFilter:['hidden']});
+   }
  }
  function initPreview(){
    for(const [id,target] of [['aeWeeklyBannerInput','aeWeeklyBannerPreview'],['aeWeeklyImageInput','aeWeeklyImagePreview'],['pubImageFile','pubImagePreview']]){
