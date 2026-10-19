@@ -33,8 +33,11 @@ jobs:
       - run: npm ci
       - name: Check CSS references and cascade
         run: npm run test:css
-      - name: Check picks, auth and draft regressions
-        run: |
-          npm run test:picks
-          npm run test:auth
-          npm run test:drafts
+      - name: Check community picks database rules
+        run: node tests/community-picks.mjs
+      - name: Check current Picks composer UI
+        run: node tests/pick-composer-direct.mjs
+      - name: Check account login and session recovery
+        run: npm run test:auth
+      - name: Check Take and Pick drafts
+        run: npm run test:drafts
