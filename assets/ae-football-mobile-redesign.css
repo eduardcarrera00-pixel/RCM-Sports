@@ -186,9 +186,7 @@
     font-size:11px!important;
   }
   /* El ticker original no se destruye, solo se oculta en móvil. */
-  html body.ae-is-football #championsRankings #championsViewport{
-    display:none!important;
-  }
+  
   /* La lista sigue conteniendo 10 equipos reales en el DOM.
      Visualmente se usan los puestos 2 y 3: el #1 está en la cabecera. */
   html body.ae-is-football #championsRankings #championsList.ae-full-ranking-list{
