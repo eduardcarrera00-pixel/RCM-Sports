@@ -640,3 +640,24 @@ html:not(.dark) #aeTakeDiscussion #aeDiscussionSubmit{
     justify-self:start;
   }
 }
+
+/* Votos visibles dentro del Take abierto, en modo día y noche. */
+#aeTakeDiscussion .ae-discussion-votes{
+  grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:3px;
+}
+#aeTakeDiscussion .ae-discussion-votes button{
+  min-height:34px;padding:7px 12px;margin:0;border:1px solid rgba(215,169,117,.66);
+  border-radius:0;background:rgba(9,34,48,.66);color:#f0ce9f;
+  font:700 11px/1.2 Inter,system-ui,sans-serif;cursor:pointer;
+}
+#aeTakeDiscussion .ae-discussion-votes button:hover{border-color:#ebc08a;background:rgba(131,92,57,.35)}
+#aeTakeDiscussion .ae-discussion-votes button[aria-pressed="true"]{border-color:#eac48e;background:rgba(175,124,68,.38);color:#fff1df}
+#aeTakeDiscussion .ae-discussion-votes button:disabled{opacity:.6;cursor:wait}
+#aeTakeDiscussion .ae-discussion-votes button:focus-visible{outline:2px solid #e9b877;outline-offset:2px}
+html:not(.dark) #aeTakeDiscussion .ae-discussion-votes button{border-color:#ab8056;background:rgba(255,249,239,.83);color:#583b29}
+html:not(.dark) #aeTakeDiscussion .ae-discussion-votes button:hover{background:#f0dfcb}
+html:not(.dark) #aeTakeDiscussion .ae-discussion-votes button[aria-pressed="true"]{background:#e7c9a3;color:#49311e}
+@media(max-width:760px){
+  #aeTakeDiscussion .ae-discussion-votes{gap:6px}
+  #aeTakeDiscussion .ae-discussion-votes button{min-height:34px;padding:7px 10px}
+}

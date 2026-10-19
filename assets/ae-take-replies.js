@@ -1,7 +1,7 @@
 /* AE SPORTS · Conversaciones persistentes para Takes, sin comentarios simulados. */
 (() => {
   'use strict';
-  let dialog, current = null, parentId = null, sequence = 0, sending = false;
+  let dialog, current = null, parentId = null, sequence = 0, sending = false, voting = false;
   const $ = (id) => document.getElementById(id);
   const el = (tag, text, className) => {
     const node = document.createElement(tag);
@@ -18,7 +18,7 @@
     dialog.innerHTML = `
       <div class="ae-take-discussion-inner">
         <header class="ae-discussion-header">
-          <div class="ae-discussion-titleblock"><span>LA COMUNIDAD DEBATE</span><h2 id="aeTakeDiscussionTitle">Takes</h2></div>
+          <div class="ae-discussion-titleblock"><h2 id="aeTakeDiscussionTitle"><button type="button" id="aeDiscussionAuthor">Aficionado</button> — Takes</h2></div>
           <button type="button" id="aeDiscussionClose" aria-label="Cerrar comentarios"><span aria-hidden="true"></span></button>
         </header>
         <section class="ae-discussion-subject">
@@ -26,6 +26,10 @@
           <span id="aeDiscussionSport" class="ae-discussion-sport"></span>
           <button type="button" id="aeDiscussionEditSport" hidden>Cambiar comunidad</button>
           <p id="aeDiscussionBody"></p>
+          <div id="aeDiscussionVotes" class="ae-discussion-votes" aria-label="Votos del Take">
+            <button type="button" id="aeDiscussionUp" aria-pressed="false">▲ Apoyar 0</button>
+            <button type="button" id="aeDiscussionDown" aria-pressed="false">▼ Cuestionar 0</button>
+          </div>
         </section>
         <section class="ae-discussion-thread" aria-labelledby="aeDiscussionCount">
           <h3 class="ae-discussion-counter" id="aeDiscussionCount">Comentarios</h3>
@@ -37,6 +41,9 @@
       </div>`;
     document.body.append(dialog);
     $('aeDiscussionClose').addEventListener('click',()=>dialog.close());
+    $('aeDiscussionAuthor').addEventListener('click',()=>{
+      if(current?.author_id)window.openAePublicProfile?.(current.author_id);
+    });
     $('aeDiscussionEditSport').addEventListener('click',()=>{
       if (current && window.aeTakeCategoryEdit) {
         window.aeTakeCategoryEdit.open(current, sport=>{
@@ -48,6 +55,8 @@
       }
     });
     $('aeDiscussionCancel').addEventListener('click',()=>setParent(null));
+    $('aeDiscussionUp').addEventListener('click',()=>vote(1));
+    $('aeDiscussionDown').addEventListener('click',()=>vote(-1));
     dialog.addEventListener('click',(event)=>{if(event.target===dialog)dialog.close();});
     dialog.addEventListener('close',()=>{current=null;sequence++;setParent(null);});
     $('aeDiscussionForm').addEventListener('submit',post);
@@ -76,7 +85,13 @@
       avatar.setAttribute('aria-hidden','true');
       const content=el('div',undefined,'ae-discussion-comment-content');
       const meta=el('div',undefined,'ae-discussion-meta');
-      const author=el('strong','@'+(r.author||'Aficionado'));
+      const authorId=r.author_id||r.user_id||null;
+      const author=el(authorId?'button':'strong','@'+(r.author||'Aficionado'),authorId?'ae-discussion-author-link':undefined);
+      if(authorId){
+        author.type='button';
+        author.setAttribute('aria-label','Ver perfil y Takes de '+(r.author||'Aficionado'));
+        author.addEventListener('click',()=>window.openAePublicProfile?.(authorId));
+      }
       const time=el('time',new Date(r.created_at).toLocaleDateString('es',{day:'numeric',month:'short',year:'numeric'}));
       try{time.dateTime=new Date(r.created_at).toISOString();}catch(_){}
       meta.append(author,time);
@@ -94,17 +109,6 @@
         }else if(typeof openUserAuthModal==='function')openUserAuthModal();
       });
       actions.append(reply);
-      if(typeof currentAdmin!=='undefined' && currentAdmin){
-        const hide=el('button','Ocultar');
-        hide.type='button';hide.className='ae-discussion-hide';
-        hide.addEventListener('click',async()=>{
-          if(!confirm('¿Ocultar este comentario?'))return;
-          const result=await db.rpc('ae_hide_take_reply',{p_reply_id:r.id});
-          if(result.error){$('aeDiscussionStatus').textContent=result.error.message;return;}
-          await load();
-        });
-        actions.append(hide);
-      }
       content.append(actions);
       card.append(avatar,content);
       nodes.set(r.id,{card,data:r});
@@ -167,6 +171,50 @@
       sending=false;$('aeDiscussionSubmit').disabled=false;
     }
   }
+  function showVotes(take){
+    for(const [value,id,name,count] of [[1,'aeDiscussionUp','▲ Apoyar',take.upvotes],[-1,'aeDiscussionDown','▼ Cuestionar',take.downvotes]]){
+      const button=$(id);
+      button.textContent=name+' '+(Number(count)||0);
+      button.setAttribute('aria-pressed',String(Number(take.my_vote)===value));
+      button.disabled=voting;
+    }
+  }
+  async function vote(value){
+    if(!current||voting)return;
+    const take=current;
+    try{
+      if(typeof db==='undefined'||!db)throw Error('No hay conexión.');
+      const session=await db.auth.getUser();
+      const user=session.data?.user;
+      if(!user){
+        if(typeof openUserAuthModal==='function')openUserAuthModal();
+        return;
+      }
+      if(user.id===take.author_id){
+        $('aeDiscussionStatus').textContent='No puedes votar tu propio Take.';
+        return;
+      }
+      voting=true;
+      showVotes(take);
+      const result=await db.rpc('ae_vote_free_take',{p_take_id:take.id,p_value:value});
+      if(result.error)throw result.error;
+      // El servidor es la fuente de verdad para votos y estado del usuario.
+      if(take.author_id){
+        const refreshed=await db.rpc('ae_public_take_profile',{p_author_id:take.author_id});
+        const updated=!refreshed.error&&(refreshed.data||[]).find(item=>String(item.id)===String(take.id));
+        if(updated&&current?.id===take.id)current={...take,...updated};
+      }
+      if(current?.id===take.id){
+        $('aeDiscussionStatus').textContent='';
+        document.dispatchEvent(new Event('ae:takes-updated'));
+      }
+    }catch(e){
+      if(current?.id===take.id)$('aeDiscussionStatus').textContent='No se pudo registrar el voto. '+(e.message||'');
+    }finally{
+      voting=false;
+      if(current?.id===take.id)showVotes(current);
+    }
+  }
   function displaySport(take) {
     const footballSports=new Set(['laliga','premier','ligamx','champions','football','futbol','fútbol']);
     const sport=String(take.sport||'').toLowerCase();
@@ -204,9 +252,11 @@
     // El título de cada conversación pertenece al autor del Take abierto.
     // La etiqueta "Mis Takes" queda reservada al perfil personal.
     const authorName=String(take.author||'').trim().replace(/^@+/, '').trim() || 'Aficionado';
-    $('aeTakeDiscussionTitle').textContent=authorName+' — Takes';
+    $('aeDiscussionAuthor').textContent='@'+authorName;
+    $('aeDiscussionAuthor').disabled=!take.author_id;
     $('aeDiscussionSubject').textContent=take.title||'Take de la comunidad';
     $('aeDiscussionBody').textContent=take.body||'';
+    showVotes(take);
     $('aeDiscussionText').value='';
     $('aeDiscussionCount').textContent='Comentarios';
     $('aeDiscussionList').replaceChildren();
