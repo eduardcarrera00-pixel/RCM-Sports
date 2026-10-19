@@ -288,7 +288,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
     </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
-<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261019-sport-news-headers-2">
+<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261019-compact-sport-links-3">
     <link rel="stylesheet" href="assets/ae-muted-navigation-icons.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-custom-nav-icons.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-classical-auth-buttons.css?v=20261017-chef-recipe-hires-1">
@@ -3556,13 +3556,15 @@ currentUser = {
                     const sportIcon = sport === 'NFL' ? 'nfl' : 'futbol';
                     return `<section class="ae-news-sport-lane" data-sport="${sportKey}" aria-labelledby="aeNewsSportTitle${index}">
                       <header class="ae-news-sport-head">
-                        <img class="ae-news-sport-emblem" src="assets/icons/ae-${sportIcon}-gold.webp" alt="" aria-hidden="true" width="52" height="52" decoding="async">
-                        <h2 id="aeNewsSportTitle${index}">${sport}</h2>
+                        <h2 id="aeNewsSportTitle${index}"><button type="button" class="ae-news-sport-link" data-ae-sport-section="${sport}" aria-label="Ir a la sección ${sport}">
+                          <img class="ae-news-sport-emblem" src="assets/icons/ae-${sportIcon}-gold.webp" alt="" aria-hidden="true" width="32" height="32" decoding="async"><span>${sport}</span>
+                        </button></h2>
                       </header>
                       <div id="${trackId}" class="ae-news-sport-track" data-sport="${sport}" role="region" aria-roledescription="carrusel" aria-label="Últimas noticias de ${sport}" tabindex="0">${stories.length ? stories.map(renderNewsCard).join('') : '<p class="ae-news-sport-empty">Todavía no hay noticias de este deporte.</p>'}</div>
                     </section>`;
                 }).join('');
                 articlesGrid.querySelectorAll('.ae-news-sport-track').forEach(lane => {lane.scrollLeft = laneScrolls[lane.dataset.sport] || 0;});
+                articlesGrid.querySelectorAll('[data-ae-sport-section]').forEach(button => button.addEventListener('click', () => filterByCategory(button.dataset.aeSportSection)));
             } else {
                 articlesGrid.innerHTML = gridArticles.map(renderNewsCard).join('');
             }
