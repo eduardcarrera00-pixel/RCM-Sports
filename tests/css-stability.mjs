@@ -127,4 +127,25 @@ for(const {file,selector,declaration} of safeDeduplications){
   assert.equal(count,1,'The verified late CSS rule must be retained exactly once: '+file);
 }
 
+const phase5LateCopies=[
+  {file:'assets/ae-football-mobile-redesign.css',
+   selector:'html body.ae-is-football #championsRankings #championsViewport',
+   declaration:'display:none!important'},
+  {file:'assets/ae-sport-tables-news-20261017.css',
+   selector:'html body.ae-is-football #mainContent #aeFootballMobileStage',
+   declaration:'gap:6px!important'}
+];
+for(const {file,selector,declaration} of phase5LateCopies){
+  const data=fs.readFileSync(file,'utf8');
+  let matches=0;
+  for(let i=data.indexOf(selector);i>=0;i=data.indexOf(selector,i+selector.length)){
+    const opening=data.indexOf('{',i+selector.length);
+    if(data.slice(i+selector.length,opening).trim())continue;
+    const end=data.indexOf('}',opening+1);
+    const value=data.slice(opening+1,end).replace(/\s+/g,'').replace(/;$/,'');
+    if(value===declaration)matches++;
+  }
+  assert.equal(matches,1,'Keep the final effective rule once in '+file);
+}
+
 console.log('PASS: CSS referenced assets, existing cascade order and safe duplicate-rule cleanup.');
