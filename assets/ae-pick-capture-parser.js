@@ -37,7 +37,7 @@
    const word=line.words.find(w=>clean(w.text).replace(/\s/g,'').includes(m[2].replace(/\s/g,'')));
    const confidence=word?Number(word.confidence):line.confidence;
    if(!Number.isFinite(confidence)||confidence<65)continue;
-   found.push({...value,index,total,confidence});
+   found.push({...value,index,total,confidence,raw:m[2]});
   }
   return found;
  }
@@ -114,5 +114,73 @@
   }
   return {ok:true,reason:'El partido, la selección y el momio coinciden con la captura.',readings,total};
  }
- return {odds,compare,linesFrom,selectionMatches};
+ // Importar sin datos escritos: abstenerse si no hay una cuota única por selección.
+ // Evento, mercado, selección y cuota se importan como una unidad inmutable.
+ function extract(data){
+  const fail=reason=>({ok:false,reason,readings:[]});
+  const lines=linesFrom(data),plain=clean(lines.map(l=>l.text).join('\n'));
+  if(!lines.length||Number(data.confidence)<50)return fail('No se lee con suficiente claridad. Prueba una captura más nítida.');
+  if(!/\b(bet\s?slip|bet receipt|bet placed|bets successfully|review.*confirm|singles|place bet|apuesta|boleto|recibo|combinada|parlay|total odds|multi\s*\d)/.test(plain))return fail('Añade una captura del boleto donde se vea la cuota de cada selección.');
+  const count=plain.match(/\bmulti\s*(\d+)\s*legs?|\bparlay\s*\((\d+)\s*picks?|\b(\d+)\s*selecciones/);
+  const declared=count?Number(count[1]||count[2]||count[3]):null;
+  if(declared>2)return fail('Por ahora puedes importar boletos de una o dos selecciones.');
+  const all=lines.flatMap((line,i)=>{
+   const raw=clean(line.text),previous=clean(lines[i-1]?.text||'');
+   if(/\b\d{1,4}\/\d{1,2}\/\d{1,4}\b/.test(raw))return [];
+   if(/\b(risk|stake|importe|saldo|balance|potential returns?|possible winnings?|to win)\b/.test(previous)&&!/[a-z]{3,}/.test(raw))return [];
+   const found=candidates(line,i).filter(c=>{
+    if(c.confidence<85)return false;
+    // «Over 220.5 points» es una línea del mercado, no una cuota decimal.
+    const before=raw.slice(0,raw.indexOf(clean(c.raw))),after=raw.slice(raw.indexOf(clean(c.raw))+c.raw.length);
+    return !(/\b(over|under|mas de|menos de)\s*$/.test(before)||/^\s*(points?|puntos?|goals?|goles?|rebounds?|rebotes?|corners?|yards?|yardas?)\b/.test(after));
+   });
+   const before=clean(lines.slice(Math.max(0,i-2),i).map(l=>l.text).join(' '));
+   if(found.length===1&&odds(line.text.trim())&&/\b(total odds|cuota total|momio total|multi\s*\d+\s*legs?|accumulator|acumulada)\s*[:=]?\s*$/.test(before))found[0].total=true;
+   return found;
+  });
+  const quotes=all.filter(c=>!c.total),totals=all.filter(c=>c.total);
+  if(!quotes.length||quotes.length>2||totals.length>1||lines.some((_,i)=>quotes.filter(c=>c.index===i).length>1))return fail('No pude distinguir una cuota única por selección. Añade otra captura más clara, sin cuotas alternativas.');
+  if(declared!==null&&declared!==quotes.length)return fail('No se leen todas las cuotas del boleto. Usa una captura completa o una por selección.');
+  if(quotes.length===2&&!declared&&!/\b(combinada|parlay|accumulator|acumulada|multi)\b/.test(plain))return fail('Aparece más de una apuesta. Usa una captura de un solo Pick o de su combinada.');
+  const tidy=s=>String(s||'').replace(/^[^\p{L}\p{N}+-]+/u,'').replace(/\s+/g,' ').trim();
+  const noise=s=>money.test(clean(s))||offer.test(clean(s))||/\b(betslip|bet slip|singles|multi|parlay|receipt|recibo|cuota total|total odds|first name|last name|share|place bet|clear bets|deposit|imagine what|saldo|balance)\b/.test(clean(s))||/^\W*\d[\d\W]*(?:am|pm)?\W*$/i.test(s);
+  const eventLike=s=>/\s+(?:vs?\.?|versus|contra|at)\s+|\s*@\s*|\bR\d{1,2}\b/i.test(s);
+  function sport(s){
+   const t=clean(s),matches=[];
+   if(/\b(nfl|american football|futbol americano|bengals|browns|packers|chiefs|49ers|patriots|cowboys|steelers|ravens|seahawks|buccaneers)\b/.test(t))matches.push('NFL');
+   if(/\b(nba|basketball|baloncesto|basquetbol|lakers|celtics|raptors|76ers|wizards|pistons|pacers|trail blazers)\b/.test(t))matches.push('NBA');
+   if(/\b(soccer|futbol(?! americano)|barcelona|real madrid|manchester united|ambos anotan|both teams to score|btts)\b/.test(t))matches.push('Fútbol');
+   if(/\b(mlb|baseball|beisbol)\b/.test(t))matches.push('Béisbol');
+   if(/\b(nhl|ice hockey|hockey)\b/.test(t))matches.push('Hockey');
+   if(/\b(tennis|tenis)\b/.test(t))matches.push('Tenis');
+   if(/\b(horse racing|hipica|sandown)\b/.test(t))matches.push('Hípica');
+   return matches.length===1?matches[0]:'';
+  }
+  const readings=quotes.map((c,n)=>{
+   const lo=n?quotes[n-1].index+1:0,hi=n+1<quotes.length?quotes[n+1].index:lines.length;
+   const context=lines.slice(lo,hi).map((l,offset)=>({text:tidy(l.text),index:lo+offset,confidence:l.confidence}));
+   const events=context.filter(l=>eventLike(l.text)&&!noise(l.text)&&l.confidence>=65);
+   const event=events.filter(e=>e.index<=c.index).at(-1)||events[0];
+   const own=tidy(lines[c.index].text.replace(c.raw,'')).replace(/^(?:ml|[oO])\s+/,'').replace(/\s*[<©].*$/,'').trim(),generic=/^(?:odds|cuota|momio|price|match betting|moneyline|win or place|fixed|ganador|resultado final)\s*[:=]?$/i;
+   const nearby=context.filter(l=>l.index!==event?.index&&l.index>=(event?.index??lo)&&l.index<=c.index&&Math.abs(l.index-c.index)<=3&&l.confidence>=65&&!noise(l.text)&&!all.some(v=>v.index===l.index)&&!generic.test(l.text)&&/[\p{L}]{2}/u.test(l.text));
+   let selection=own&&!generic.test(own)&&!eventLike(own)?own:'';
+   if(!selection){const near=nearby.sort((a,b)=>Math.abs(a.index-c.index)-Math.abs(b.index-c.index))[0];selection=near?.text||'';if(selection&&generic.test(own)&&own)selection+=' · '+own;}
+   else if(/^(?:over|under|ambos|both|mas de|menos de)/i.test(own)===false&&/win or place/i.test(own)){selection=(nearby.at(-1)?.text||'')+' · '+own;}
+   const markets=context.filter(l=>l.index!==c.index&&l.index!==event?.index&&Math.abs(l.index-c.index)<=2&&!noise(l.text)&&/\b(moneyline|match betting|spread|handicap|total|resultado final|ganador|first half|second half|1st half|2nd half|quarter|period|mitad|primer tiempo|segundo tiempo|cuarto)\b/i.test(l.text)&&!all.some(v=>v.index===l.index));
+   for(const market of markets)if(selection&&!selection.includes(market.text))selection+=' · '+market.text;
+   const eventText=event?.text||'';
+   return {sport:sport(eventText+' '+selection)||sport(plain),event:eventText,selection,odds:c.american,format:c.format,visible:c.visible,confidence:Math.floor(c.confidence)};
+  });
+  const marketKnown=s=>/\b(moneyline|match betting|ganador|gana|winner|wins?|resultado final|over|under|mas de|menos de|spread|handicap|ambos anotan|both teams|btts|doble oportunidad|double chance|draw no bet|win or place|to score|anota|goals?|goles?|points?|puntos?|touchdowns?|sets?|rebounds?|rebotes?|cards?|tarjetas?|corners?)\b|[+-]\d+(?:[.,]\d+)?/i.test(clean(s));
+  if(readings.some(r=>r.event.length<3||r.event.length>160||r.selection.length<2||r.selection.length>200||!marketKnown(r.selection)))return fail('No pude identificar el partido y el pronóstico completos, con su mercado y línea. Añade otra captura donde aparezcan junto al momio.');
+  let total=null;
+  if(readings.length===2&&totals.length){
+   const computed=american(quotes.reduce((d,c)=>d*c.decimal,1)),rounded=american(readings.reduce((d,r)=>d*(r.odds>0?1+r.odds/100:1+100/Math.abs(r.odds)),1));
+   if(Math.abs(totals[0].american-computed)>1||Math.abs(totals[0].american-rounded)>1)return fail('La cuota total no coincide con las selecciones. Usa otra captura sin bonos o selecciones adicionales.');
+   total={american:totals[0].american,decimal:totals[0].decimal};
+  }else if(totals.length&&Math.abs(totals[0].american-readings[0].odds)>1)return fail('El total y la cuota de la selección son distintos. Usa otra captura.');
+  const date=plain.match(/\b(20\d{2}-\d{2}-\d{2})\b/),eventDate=date&&!Number.isNaN(Date.parse(date[1]))?date[1]:'';
+  return {ok:true,readings,total,eventDate};
+ }
+ return {odds,compare,extract,linesFrom,selectionMatches};
 });

@@ -10,6 +10,7 @@
     "test:database:observed": "node -e \"process.env.RCM_OBSERVED_SCHEMA='1';import('./tests/database.mjs')\"",
     "test:picks": "node tests/community-picks.mjs && node tests/community-picks-ui.mjs",
     "test:capture": "node tests/pick-capture-parser.cjs && node tests/pick-capture-ui.mjs && node tests/pick-capture-database.mjs && node tests/pick-composer-direct.mjs",
+    "test:capture:browser": "node tests/pick-capture-browser.cjs",
     "test:auth": "node tests/username-auth-ui.mjs",
     "test:editor": "node tests/news-editor.mjs",
     "test:drafts": "node tests/draft-guard.mjs"

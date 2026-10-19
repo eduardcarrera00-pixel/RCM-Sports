@@ -12,10 +12,10 @@ let user={id:'reader'},records=[],comments=[],votes=new Map(),pickCounter=0,fail
 w.currentCategory='Picks';w.currentAdmin=null;
 w.notifyCommunity=()=>{};
 w.openUserAuthModal=()=>{w.authOpened=true;};
-w.aeRequestPublication=async(kind,continueToComposer)=>{
+w.aeRequestPublication=async(kind,continueToComposer,onAuthRequired)=>{
  const response=await w.db.auth.getUser();
  if(response.data?.user)continueToComposer();
- else{w.authOpened=true;w.pendingPublication=continueToComposer;}
+ else{onAuthRequired?.();w.authOpened=true;w.pendingPublication=continueToComposer;}
 };
 w.filterByCategory=category=>{w.currentCategory=category;w.renderCommunityPicksVisibility();};
 w.db={
@@ -61,17 +61,17 @@ w.db={
 };
 const settle=()=>new Promise(resolve=>setTimeout(resolve,40));
 await settle();
+// Isolate the feed/auth interactions; real import/OCR binding is exercised by test:capture.
+w.aePickCapture={mount:({getPicks})=>({hasImport:()=>true,getTotal:()=>null,proof:()=>({version:1,method:'on_device_ocr',confirmed:true,readings:getPicks().map(p=>({...p,confidence:95}))})})};
 w.eval(fs.readFileSync('assets/community-picks.js','utf8'));
 d.dispatchEvent(new w.Event('DOMContentLoaded'));
 await settle();
 assert.match(d.getElementById('cpStatus').textContent,/Todavía/);
 const form=d.getElementById('cpForm');
-const fields=()=>[...form.querySelectorAll('input:not([type=checkbox]),textarea')];
+const field=name=>form.elements.namedItem(name);
 const fill=(title,eventName)=>{
-  const f=fields();
-  f[0].value=title;f[1].value=dayOffset(2);f[2].value='Explicación';
-  f[3].value='NFL';f[4].value=eventName;f[5].value='Gana un equipo';f[6].value='+150';
-  form.querySelector('[type=checkbox]').checked=true;
+  field('event_date').value=dayOffset(2);field('explanation').value=title;
+  field('sport_0').value='NFL';field('event_0').value=eventName;field('selection_0').value='Gana un equipo';field('odds_0').value='+150';
 };
 const modal=d.getElementById('cpComposePanel'),cta=d.getElementById('cpPublishCta');
 assert.equal(modal.tagName,'DIALOG');
@@ -81,11 +81,11 @@ cta.click();await settle();assert.equal(modal.open,true);assert.equal(cta.getAtt
 assert.ok(d.body.classList.contains('ae-pick-composing'));
 fill('Mi primer Pick','Equipo A vs B');
 d.getElementById('cpComposeClose').click();await settle();assert.equal(modal.open,false);
-assert.equal(fields()[0].value,'Mi primer Pick','Closing preserves the draft');
+assert.equal(field('explanation').value,'Mi primer Pick','Closing preserves the draft');
 cta.click();await settle();
 failPublish=true;await form.onsubmit({preventDefault(){}});await settle();
 assert.equal(records.length,0);assert.equal(modal.open,true);
-assert.equal(fields()[0].value,'Mi primer Pick');assert.match(form.querySelector('.cp-status').textContent,/Fallo de conexión/);
+assert.equal(field('explanation').value,'Mi primer Pick');assert.match(form.querySelector('.cp-status').textContent,/Fallo de conexión/);
 assert.equal(form.querySelector('button[type=submit]').disabled,false);
 failPublish=false;
 await form.onsubmit({preventDefault(){}});
@@ -100,7 +100,7 @@ await w.renderCommunityPicksVisibility();await settle();
 d.querySelector('#cpFeed .cp-upvote').click();
 await settle();
 assert.equal(votes.size,1,'Another account can vote while Pick is pending');
-d.querySelector('#cpFeed .cp-card-title a').click();await settle();
+d.querySelector('#cpFeed .cp-card-read-link').click();await settle();
 assert.equal(d.querySelector('#cpDialog .cp-card-detail')!==null,true);
 const reply=d.querySelector('#cpDialog form');
 reply.querySelector('textarea').value='Comentario antes de la aprobación';
@@ -108,14 +108,17 @@ await reply.onsubmit({preventDefault(){}});await settle();
 assert.equal(comments.length,1);
 assert.match(d.querySelector('#cpDialog').textContent,/Comentario antes de la aprobación/);
 d.querySelector('#cpDialog button').click();await settle();
-// The "Mejores platos" Pick title must ask the guest to log in BEFORE
-// showing its conversation; after login resume at the same Pick and focus reply.
+// The "Mejores platos" Pick remains readable by guests; writing a reply
+// requires login and then resumes at the same Pick with the reply field focused.
 const bestPick=d.querySelector('#picksPopular .ae-chef-entry-link');
 assert.ok(bestPick,'A positively voted Pick must appear in Mejores platos');
 assert.equal(bestPick.parentElement.classList.contains('ae-chef-entry'),true);
 assert.equal(bestPick.style.position,'absolute','Whole Mejores platos square must be clickable');
 assert.ok(bestPick.getAttribute('aria-label').includes('Abrir Pick'));
 user=null;w.authOpened=false;bestPick.click();await settle();
+assert.equal(w.authOpened,false,'Reading Mejores platos is public');
+assert.ok(d.querySelector('#cpDialog .cp-login-to-reply'),'Guest has an authenticated reply action');
+d.querySelector('#cpDialog .cp-login-to-reply').click();await settle();
 assert.equal(w.authOpened,true,'Mejores platos requests account access');
 assert.equal(d.querySelector('#cpDialog')?.open||false,false,'Guest cannot open the reply composer');
 user={id:'voter'};w.pendingPublication();await settle();
@@ -136,7 +139,7 @@ d.querySelector('#cpDialog button').click();await settle();
 d.getElementById('cpArchiveClose').click();await settle();
 // Reading a Pick remains public, but its reply form stays behind login.
 user=null;w.authOpened=false;
-d.querySelector('#cpFeed .cp-card-title a').click();await settle();
+d.querySelector('#cpFeed .cp-card-read-link').click();await settle();
 assert.ok(d.querySelector('#cpDialog .cp-login-to-reply'),'Guests receive a sign-in CTA instead of the reply form');
 assert.equal(d.querySelector('#cpDialog form'),null);
 d.querySelector('#cpDialog .cp-login-to-reply').click();await settle();
@@ -166,13 +169,13 @@ w.db.auth.getUser=getUser;
 user=null;w.authOpened=false;w.filterByCategory('Todos');cta.click();await settle();
 assert.equal(w.authOpened,true);assert.equal(modal.open,false,'Guests cannot open the Pick composer');
 assert.equal(w.currentCategory,'Todos','A guest remains on their original page for login');
-user={id:'reader'};w.pendingPublication();
+user={id:'reader'};await w.pendingPublication();await settle();
 assert.equal(w.currentCategory,'Picks','After login, return to Picks to publish');
 assert.equal(modal.open,true,'Authentication resumes the Pick composer');
 // If the session expires during editing, retain the draft and reopen after login.
 fill('Borrador sin sesión','Equipo G vs H');user=null;w.authOpened=false;
 await form.onsubmit({preventDefault(){}});await settle();assert.equal(w.authOpened,true);assert.equal(modal.open,false);
-assert.equal(fields()[0].value,'Borrador sin sesión');assert.equal(records.length,3);
+assert.equal(field('explanation').value,'Borrador sin sesión');assert.equal(records.length,3);
 assert.equal(d.body.classList.contains('ae-pick-composing'),false);
 console.log('PASS: auth before Mejores platos replies, public reading, resume, publishing, voting and drafts.');
 await w.happyDOM.close();

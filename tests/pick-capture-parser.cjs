@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict');
-const {odds,compare}=require('../assets/ae-pick-capture-parser.js');
+const {odds,compare,extract}=require('../assets/ae-pick-capture-parser.js');
 const pick={sport:'NBA',event:'Toronto Raptors vs Boston Celtics',selection:'Toronto Raptors gana',odds:150};
 const scan=text=>({text,confidence:95});
 const slip=(selection='Toronto Raptors Moneyline',price='+150')=>scan('BETSLIP\nToronto Raptors vs Boston Celtics\n'+selection+' '+price+'\nStake $10.00\nPotential Returns $25.00');
@@ -28,3 +28,14 @@ assert.equal(compare(scan(multi.replace('4.29','5.31')),picks).ok,false,'A boost
 assert.equal(compare(scan(multi.replace('2.67','1.61').replace('Betting 1.61\nTotal','Betting 2.67\nTotal')),picks).ok,false,'Swapped leg odds must fail');
 assert.equal(compare(scan(multi),picks.slice(0,1)).ok,false,'A multi is not proof of a simple Pick');
 console.log('PASS: American, decimal/fractional conversion, selected team binding, amount/line separation, mismatch/ambiguity rejection, two-leg association, total and leg count.');
+
+let imported=extract(slip());assert.equal(imported.ok,true);assert.equal(imported.readings[0].odds,150);assert.match(imported.readings[0].selection,/Toronto Raptors Moneyline/);
+for(const value of ['2.50','3/2','+150'])assert.equal(extract(slip(undefined,value)).readings[0].odds,150);
+for(const text of ['BETSLIP\n+150','BETSLIP\nToronto Raptors vs Boston Celtics\nStake +150', 'BETSLIP\nToronto Raptors vs Boston Celtics\nToronto Raptors +150 +160'])assert.equal(extract(scan(text)).ok,false);
+assert.equal(extract({...slip(),confidence:64}).ok,false,'An automatic quote needs high confidence');
+imported=extract(scan(multi));assert.equal(imported.ok,true);assert.equal(imported.readings.length,2);assert.match(imported.readings[0].event,/Lakers/);assert.match(imported.readings[0].selection,/Lakers/);assert.match(imported.readings[1].selection,/Pistons/);assert.equal(imported.total.american,329);
+assert.equal(extract(scan(multi.replace('4.29','5.31'))).ok,false);
+assert.equal(extract(scan(multi.replace('2 Legs','3 Legs'))).ok,false);
+imported=extract(scan('BETSLIP\nNFL\nBengals vs Browns\nBengals -3.5 +150'));assert.equal(imported.ok,true);assert.match(imported.readings[0].selection,/-3.5/);assert.equal(imported.readings[0].odds,150);
+imported=extract(scan('BETSLIP\nNBA\nRaptors vs Celtics\nOver 220.5 points +150'));assert.equal(imported.ok,true);assert.equal(imported.readings[0].odds,150);assert.match(imported.readings[0].selection,/220.5/);
+console.log('PASS: automatic imports preserve selected side, market and handicap; no amount/line confusion, ambiguous prices or incomplete bets.');
