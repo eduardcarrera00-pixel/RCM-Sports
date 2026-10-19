@@ -1,0 +1,175 @@
+/* AE SPORTS component source: assets/ae-muted-navigation-icons.css */
+/* AE SPORTS — Iconografía dorada y azul a escala editorial.
+   Solo afecta a los seis iconos personalizados de navegación y tema:
+   Picks, NFL, Fútbol, Colegial, sol y luna. No modifica el atleta ni la marca. */
+html body>header .ae-sport-nav .category-btn .ae-nav-icon img.ae-custom-sport-icon{
+  display:block!important;
+  width:22px!important;
+  height:22px!important;
+  min-width:0!important;
+  min-height:0!important;
+  max-width:22px!important;
+  max-height:22px!important;
+  margin:0!important;
+  padding:0!important;
+  flex:0 0 auto!important;
+  object-fit:contain!important;
+  object-position:center!important;
+  opacity:.84!important;
+  filter:brightness(.80) saturate(.77) contrast(.96)!important;
+  box-shadow:none!important;
+  transition:filter .16s ease,opacity .16s ease!important;
+}
+html body>header #themeToggle img.ae-custom-theme-icon{
+  display:block!important;
+  width:23px!important;
+  height:23px!important;
+  min-width:0!important;
+  min-height:0!important;
+  max-width:23px!important;
+  max-height:23px!important;
+  margin:0!important;
+  padding:0!important;
+  object-fit:contain!important;
+  object-position:center!important;
+  opacity:.84!important;
+  filter:brightness(.80) saturate(.77) contrast(.96)!important;
+  box-shadow:none!important;
+  transition:filter .16s ease,opacity .16s ease!important;
+}
+/* Recupera un poco de presencia al pasar el cursor o seleccionar la sección,
+   sin llegar al brillo anterior. */
+html body>header .ae-sport-nav .category-btn:is(:hover,.active,:focus-visible) .ae-nav-icon img.ae-custom-sport-icon,
+html body>header #themeToggle:is(:hover,:focus-visible) img.ae-custom-theme-icon{
+  opacity:.95!important;
+  filter:brightness(.91) saturate(.88) contrast(.98)!important;
+}
+@media(max-width:640px){
+  html body>header .ae-sport-nav .category-btn .ae-nav-icon img.ae-custom-sport-icon{
+    width:19px!important;
+    height:19px!important;
+    max-width:19px!important;
+    max-height:19px!important;
+  }
+  html body>header #themeToggle img.ae-custom-theme-icon{
+    width:21px!important;
+    height:21px!important;
+    max-width:21px!important;
+    max-height:21px!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  html body>header .ae-sport-nav .category-btn .ae-nav-icon img.ae-custom-sport-icon,
+  html body>header #themeToggle img.ae-custom-theme-icon{
+    transition:none!important;
+  }
+}
+
+/* AE SPORTS component source: assets/ae-custom-nav-icons.css */
+/* AE SPORTS · iconografía dorada y azul entregada por el propietario.
+   Se carga DESPUÉS del bundle para conservar navegación y temas. */
+html body header .ae-sport-nav .category-btn .ae-nav-icon{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  flex:0 0 auto!important;
+  width:clamp(33px,2.75vw,43px)!important;
+  height:clamp(33px,2.75vw,43px)!important;
+  min-width:33px!important;
+  min-height:33px!important;
+  padding:0!important;
+  overflow:visible!important;
+  border:1px solid transparent!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  transition:border-color .16s ease,background-color .16s ease!important;
+}
+html body header .ae-sport-nav .category-btn .ae-nav-icon .ae-custom-sport-icon{
+  display:block!important;
+  width:100%!important;height:100%!important;
+  max-width:100%!important;max-height:100%!important;
+  aspect-ratio:1!important;
+  object-fit:contain!important;
+  padding:0!important;margin:0!important;
+  border:0!important;
+  background:none!important;
+  opacity:1!important;
+  filter:drop-shadow(0 2px 2px rgba(4,19,31,.22));
+  pointer-events:none!important;
+}
+html body header .ae-sport-nav .category-btn:hover .ae-nav-icon,
+html body header .ae-sport-nav .category-btn:focus-visible .ae-nav-icon{
+  border-color:rgba(255,250,238,.88)!important;
+  background:rgba(255,245,223,.065)!important;
+}
+html body header .ae-sport-nav .category-btn.active .ae-nav-icon{
+  background:transparent!important;
+  border-color:rgba(204,165,116,.44)!important;
+}
+html:not(.dark) body header .ae-sport-nav .category-btn .ae-nav-icon{
+  background:transparent!important;
+  border-color:transparent!important;
+}
+html:not(.dark) body header .ae-sport-nav .category-btn:hover .ae-nav-icon,
+html:not(.dark) body header .ae-sport-nav .category-btn:focus-visible .ae-nav-icon{
+  border-color:#8a664b!important;
+}
+html body header #themeToggle{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  flex:0 0 auto!important;
+  overflow:visible!important;
+}
+html body header #themeIcon.ae-custom-theme-icon{
+  display:block!important;
+  width:28px!important;height:28px!important;
+  min-width:28px!important;min-height:28px!important;
+  max-width:28px!important;max-height:28px!important;
+  object-fit:contain!important;
+  border:0!important;padding:0!important;margin:0!important;
+  background:transparent!important;
+  filter:drop-shadow(0 1px 2px rgba(3,21,32,.20));
+  pointer-events:none!important;
+}
+html body header #themeToggle:hover,
+html body header #themeToggle:focus-visible{
+  outline-color:#ecd1a0!important;
+}
+/* Ajuste solicitado: mover solo el wordmark hacia abajo, sin modificar el atleta.
+   El bloque se desplaza sin afectar alturas ni distancias de los otros controles. */
+html body header a.ae-brand-runner-clean .ae-runner-wordmark{
+  transform:translateY(11px)!important;
+}
+html body footer a.ae-brand-runner-clean .ae-runner-wordmark{
+  transform:translateY(7px)!important;
+}
+@media(max-width:760px){
+  html body header a.ae-brand-runner-clean .ae-runner-wordmark{
+    transform:translateY(6px)!important;
+  }
+  html body footer a.ae-brand-runner-clean .ae-runner-wordmark{
+    transform:translateY(5px)!important;
+  }
+  html body header .ae-sport-nav .category-btn .ae-nav-icon{
+    width:34px!important;height:34px!important;
+    min-width:34px!important;min-height:34px!important;
+  }
+  html body header #themeIcon.ae-custom-theme-icon{
+    width:26px!important;height:26px!important;
+    min-width:26px!important;min-height:26px!important;
+    max-width:26px!important;max-height:26px!important;
+  }
+}
+@media(hover:none){
+  html body header .ae-sport-nav .category-btn:not(:focus-visible) .ae-nav-icon{
+    border-color:transparent!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  html body header .ae-sport-nav .category-btn .ae-nav-icon{
+    transition:none!important;
+  }
+}
+
