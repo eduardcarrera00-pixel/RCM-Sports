@@ -6,12 +6,14 @@
     "build:css": "tailwindcss -i assets/styles-input.css -o assets/site.css --minify && node scripts/build-editorial-css.mjs",
     "test:database": "node tests/database.mjs",
     "test:browser": "node tests/browser.cjs",
-    "test": "npm run test:database && npm run test:picks && npm run test:auth && npm run test:drafts && npm run test:editor && npm run test:browser",
+    "test": "npm run test:css && npm run test:database && npm run test:picks && npm run test:auth && npm run test:drafts && npm run test:editor && npm run test:browser",
     "test:database:observed": "node -e \"process.env.RCM_OBSERVED_SCHEMA='1';import('./tests/database.mjs')\"",
     "test:picks": "node tests/community-picks.mjs && node tests/community-picks-ui.mjs",
     "test:auth": "node tests/username-auth-ui.mjs",
     "test:editor": "node tests/news-editor.mjs",
-    "test:drafts": "node tests/draft-guard.mjs"
+    "test:drafts": "node tests/draft-guard.mjs",
+    "css:audit": "node scripts/audit-css.mjs",
+    "test:css": "node tests/css-stability.mjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.9",
