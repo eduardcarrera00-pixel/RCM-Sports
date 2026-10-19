@@ -13,6 +13,7 @@ on:
       - 'assets/component-css-groups.json'
       - 'scripts/build-component-css.mjs'
       - 'scripts/audit-css.mjs'
+      - 'scripts/css-conflict-inventory.mjs'
       - 'tests/css-stability.mjs'
       - 'index.html'
       - 'package.json'
