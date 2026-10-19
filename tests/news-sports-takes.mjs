@@ -24,6 +24,10 @@ d.dispatchEvent(new w.Event('DOMContentLoaded'));
 w.renderArticlesFeed();
 let tracks=[...d.querySelectorAll('.ae-news-sport-track')];
 assert.equal(tracks.length,2);
+// Los títulos de Últimas noticias deben mostrar únicamente NFL y Fútbol, sin emblemas.
+const sportHeadings=[...d.querySelectorAll('.ae-news-sport-link')];
+assert.deepEqual(sportHeadings.map(h=>h.textContent.trim()),['NFL','Fútbol']);
+assert.equal(d.querySelectorAll('.ae-news-sport-head img, .ae-news-sport-emblem').length,0);
 for(const track of tracks){assert.equal(track.querySelectorAll('article').length,10);for(const card of track.children)assert.match(card.querySelector('h3').textContent,new RegExp(track.dataset.sport));}
 assert.equal(d.querySelectorAll('#articlesGrid>article').length,0);
 assert.equal(d.querySelectorAll('[data-news-scroll]').length,0);
