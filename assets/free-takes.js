@@ -4,6 +4,7 @@
  const $ = id => document.getElementById(id);
  const sports = {all:'Todos',general:'Deporte en general',football:'Fútbol',laliga:'LaLiga',premier:'Premier League',ligamx:'Liga MX',champions:'Champions League',nfl:'NFL',colegial:'Fútbol colegial'};
  let items = [], filter = 'all', busy = false, request = 0, activeSection = '', viewerId = null;
+ let replyCounts = null;
  const footballSports=new Set(['football','laliga','premier','ligamx','champions']);
  function el(tag,text,cls){const n=document.createElement(tag);if(text!==undefined&&text!==null)n.textContent=String(text);if(cls)n.className=cls;return n;}
  function button(label,fn,cls='ae-take-button'){const n=el('button',label,cls);n.type='button';n.onclick=fn;return n;}
@@ -25,14 +26,41 @@
   }
   return r.data.user;
 }
+ function latestTakes(){
+   return items.filter(t=>activeSection==='NFL'?(t.sport==='nfl'&&(!window.aeNflTakes||window.aeNflTakes.matches(t))):footballSports.has(t.sport))
+     .sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)||String(b.id||'').localeCompare(String(a.id||'')))
+     .slice(0,20);
+ }
+ function showReplyCount(reply,t){
+   const count=replyCounts?.get(String(t.id))??(replyCounts?0:null);
+   const badge=reply.querySelector('.ae-take-reply-count');
+   badge.textContent=count===null?'—':String(count);
+   reply.setAttribute('aria-label','Responder al Take: '+t.title+'. '+(count===null?'Número de respuestas no disponible':count+' '+(count===1?'respuesta':'respuestas')));
+ }
+ async function loadReplyCounts(seq){
+   const takes=latestTakes();
+   if(!takes.length)return;
+   try{
+     const result=await db.rpc('ae_public_take_reply_counts',{p_take_ids:takes.map(t=>t.id)});
+     if(seq!==request)return;
+     if(result.error)throw result.error;
+     replyCounts=new Map((result.data||[]).map(r=>[String(r.take_id),Math.max(0,Number(r.reply_count)||0)]));
+     const byId=new Map(takes.map(t=>[String(t.id),t]));
+     $('freeTakesFeed')?.querySelectorAll('article[data-take-id]').forEach(card=>{
+       const take=byId.get(card.dataset.takeId);
+       if(take)showReplyCount(card.querySelector('.ae-take-reply-link'),take);
+     });
+   }catch(_){
+     // El fallo de los contadores no debe ocultar los Takes ni inventar ceros.
+   }
+ }
  function render(){
    const area=$('freeTakesFeed');if(!area)return;
    area.replaceChildren();
-   const sorted=items.filter(t=>activeSection==='NFL'?(t.sport==='nfl'&&(!window.aeNflTakes||window.aeNflTakes.matches(t))):footballSports.has(t.sport));
-   area.setAttribute('aria-label','Últimos 20 Takes de '+(activeSection==='NFL'?'NFL':'Fútbol')+'. Desplázate hacia abajo para leer más.');
-   sorted.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)||String(b.id||'').localeCompare(String(a.id||'')));
+   const sorted=latestTakes();
+   area.setAttribute('aria-label','Últimos Takes de '+(activeSection==='NFL'?'NFL':'Fútbol')+'. Desplázate hacia abajo para leer más.');
    const heading=$('aeTakesFeedHeading');
-   if(heading)heading.textContent='Últimos Takes'+(sorted.length?' · '+Math.min(sorted.length,20):'');
+   if(heading)heading.textContent='Últimos Takes';
    if(!sorted.length){
      const more=$('freeTakesMore');if(more)more.hidden=true;
      const text=activeSection==='NFL'
@@ -44,8 +72,9 @@
    const more=$('freeTakesMore');
    if(more)more.hidden=true;
    // Both sports keep their 20 latest posts in a two-card scroll viewport.
-   for(const t of sorted.slice(0,20)){
+   for(const t of sorted){
      const card=el('article',null,'ae-take-card ae-free-take-card');
+     card.dataset.takeId=String(t.id);
      // Acento basado exclusivamente en el deporte real; no altera contenido ni votos.
      card.dataset.sport=Object.prototype.hasOwnProperty.call(sports,t.sport)?t.sport:'general';
      const meta=el('div',null,'ae-take-overline');
@@ -54,7 +83,9 @@
        if(typeof openAePublicProfile==='function')openAePublicProfile(t.author_id);
      },'ae-take-author-link');
      author.setAttribute('aria-label','Ver perfil y Takes de '+t.author);
-     meta.append(author,el('span',' · '+new Date(t.created_at).toLocaleDateString('es')));
+     const date=el('time',new Date(t.created_at).toLocaleDateString('es',{day:'numeric',month:'short'}),'ae-take-date');
+     date.dateTime=t.created_at;
+     meta.append(author,date);
      const heading=el('h3',undefined,'ae-feed-take-title');
      const openTake=button(t.title,()=>window.aeTakeReplies?.open(t),'ae-feed-take-open');
      openTake.setAttribute('aria-label','Leer Take y abrir conversación: '+t.title);
@@ -68,7 +99,8 @@
        const b=button(label+' '+count,()=>vote(t,val,b));b.disabled=busy;b.setAttribute('aria-pressed',String(Number(t.my_vote)===val));row.append(b);
      }
      const reply=button('Responder',()=>window.aeTakeReplies?.open(t,{focusComposer:true}),'ae-take-reply-link');
-     reply.setAttribute('aria-label','Responder al Take: '+t.title);
+     reply.append(el('span',null,'ae-take-reply-count'));
+     showReplyCount(reply,t);
      row.append(reply);
      if(typeof currentAdmin!=='undefined'&&currentAdmin)row.append(button('Ocultar',async()=>{
        if(!confirm('¿Ocultar este Take?'))return;try{const r=await db.rpc('ae_hide_free_take',{p_take_id:t.id});if(r.error)throw r.error;await load();}catch(e){status(e.message||'No se pudo ocultar.');}
@@ -78,6 +110,7 @@
  }
  async function load(){
    const seq=++request;
+   replyCounts=null;
    const area=$('freeTakesFeed');
    if(typeof db==='undefined'||!db){
      if(area)area.replaceChildren(el('p','No hay conexión con los Takes.','ae-take-empty'));
@@ -95,6 +128,7 @@
      viewerId=viewer.data?.user?.id||null;
      items=r.data||[];
      render();
+     await loadReplyCounts(seq);
    } catch(e) {
      if(seq!==request)return;
      items=[];
