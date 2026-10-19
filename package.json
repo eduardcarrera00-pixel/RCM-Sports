@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
-    "build:css": "tailwindcss -i assets/styles-input.css -o assets/site.css --minify && node scripts/build-editorial-css.mjs",
+    "build:css": "tailwindcss -i assets/styles-input.css -o assets/site.css --minify && node scripts/build-editorial-css.mjs && node scripts/build-component-css.mjs",
     "test:database": "node tests/database.mjs",
     "test:browser": "node tests/browser.cjs",
     "test": "npm run test:css && npm run test:database && npm run test:picks && npm run test:auth && npm run test:drafts && npm run test:editor && npm run test:browser",
@@ -13,7 +13,7 @@
     "test:editor": "node tests/news-editor.mjs",
     "test:drafts": "node tests/draft-guard.mjs",
     "css:audit": "node scripts/audit-css.mjs",
-    "test:css": "node tests/css-stability.mjs"
+    "test:css": "node scripts/build-component-css.mjs --check && node tests/css-stability.mjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.9",
