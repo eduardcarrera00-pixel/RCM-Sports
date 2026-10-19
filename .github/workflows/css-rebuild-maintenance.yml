@@ -1,0 +1,46 @@
+name: Compile maintenance CSS bundle
+
+on:
+  push:
+    branches:
+      - maintenance/css-safe-phase1-20261018
+    paths:
+      - assets/style-sources.json
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ae-css-bundle-maintenance
+  cancel-in-progress: false
+
+jobs:
+  rebuild:
+    if: github.ref == 'refs/heads/maintenance/css-safe-phase1-20261018'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout isolated maintenance branch
+        uses: actions/checkout@v4
+        with:
+          ref: maintenance/css-safe-phase1-20261018
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Regenerate minified CSS from manifest
+        run: node scripts/build-editorial-css.mjs
+      - name: Commit generated CSS only to the maintenance branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- assets/ae-editorial-bundle.css
+          if git diff --cached --quiet; then
+            echo 'No compiled CSS changes required'
+          else
+            git commit -m 'Build: remove duplicate early CSS copies from editorial bundle'
+            git push origin HEAD:maintenance/css-safe-phase1-20261018
+          fi
