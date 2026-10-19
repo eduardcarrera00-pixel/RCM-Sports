@@ -46,8 +46,8 @@ carecían de URL CSS relativas que necesitaran reescritura.
 - Tests CSS, compilación reproducible y verificación de ausencia de dobles
   cargas CSS.
 - Validaciones de Picks, acceso y borradores.
-- Capturas Chromium de AE SPORTS, Picks, NFL y Fútbol, 390 y 1366 px,
-  tema día/noche, comparadas visualmente con `main`.
+- Capturas Chromium de AE SPORTS, Picks, NFL y Fútbol, 390, 760, 761, 768 y 1366 px,
+  tema día/noche (40 capturas, cubriendo el límite de los media queries), comparadas visualmente con `main`.
 - Revisión manual con contenido real (usuarios, comentarios, rankings,
   formularios y transiciones), además de 768px y Safari/iOS si se dispone
   del navegador. Las capturas estáticas no garantizan todas las interacciones.
