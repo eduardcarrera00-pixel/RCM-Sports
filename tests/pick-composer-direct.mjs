@@ -61,6 +61,8 @@ w.db={
 };
 const settle=()=>new Promise(resolve=>setTimeout(resolve,40));
 await settle();
+// El lector real y la limpieza se prueban en pick-capture-ui; aquí se aísla el compositor.
+w.aePickCapture={mount:({getPicks})=>({getTotal:()=>null,proof:()=>({version:1,method:'on_device_ocr',confirmed:true,readings:getPicks().map(p=>({...p,confidence:95}))})})};
 w.eval(fs.readFileSync('assets/community-picks.js','utf8'));
 d.dispatchEvent(new w.Event('DOMContentLoaded'));
 await settle();

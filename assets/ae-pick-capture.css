@@ -1,0 +1,26 @@
+/* Cotejo de capturas, limitado al compositor de Cocina Picks. */
+html body #cpComposePanel #cpForm .cp-capture {
+ grid-column:1/-1;display:block;min-width:0;margin:4px 0;padding:17px;
+ border:1px solid #55707c;border-left:3px solid #be926c;background:#102b3e;color:#f4e8db;
+}
+html body #cpComposePanel #cpForm .cp-capture-title {margin:0 0 8px;font:600 23px/1.15 Newsreader,Georgia,serif;color:inherit;}
+html body #cpComposePanel #cpForm .cp-capture-intro {margin:0 0 12px;font:13px/1.5 Inter,system-ui,sans-serif;color:#d1d9dd;}
+html body #cpComposePanel #cpForm .cp-capture-picker {display:block;box-sizing:border-box;max-width:100%;min-height:44px;margin:0 0 5px;padding:9px 15px;border:1px solid #be926c;background:#274250;font:600 12px/1.4 Inter,system-ui,sans-serif;color:#f4e8db;cursor:pointer;}
+html body #cpComposePanel #cpForm .cp-capture-picker:disabled {opacity:.6;cursor:wait;}
+html body #cpComposePanel #cpForm .cp-capture-help {margin:9px 0;font:11px/1.5 Inter,system-ui,sans-serif;color:#c5cdd2;}
+html body #cpComposePanel #cpForm .cp-capture-status {margin:11px 0 0;font:500 13px/1.5 Inter,system-ui,sans-serif;color:#e5c6a5;overflow-wrap:anywhere;}
+html body #cpComposePanel #cpForm .cp-capture-readings {margin:12px 0;padding:10px 10px 10px 26px;border-top:1px solid #55707c;border-bottom:1px solid #55707c;font:12px/1.6 Inter,system-ui,sans-serif;color:inherit;overflow-wrap:anywhere;}
+html body #cpComposePanel #cpForm .cp-capture-confirm {display:flex;align-items:flex-start;gap:10px;margin:12px 0 0;min-height:44px;font:500 12px/1.5 Inter,system-ui,sans-serif;color:inherit;cursor:pointer;}
+html body #cpComposePanel #cpForm #cpCaptureConfirm {appearance:auto;flex:0 0 18px;width:18px;height:18px;min-height:18px;margin:1px 0 0;padding:0;accent-color:#be926c;}
+html body #cpComposePanel #cpForm .cp-capture-cancel {display:block;min-height:40px;margin-top:12px;padding:7px 12px;border:1px solid #be926c;background:transparent;color:#e5c6a5;font:600 12px/1.3 Inter,system-ui,sans-serif;cursor:pointer;}
+html body #cpComposePanel #cpForm .cp-capture :is(input,button):focus-visible {outline:2px solid #e5b981;outline-offset:3px;}
+html body #cpComposePanel #cpForm .cp-capture [hidden] {display:none!important;}
+html body #cpComposePanel #cpForm .cp-capture[data-state="matched"] {border-left-color:#97bcb2;}
+html body #cpComposePanel #cpForm .cp-capture[data-state="error"] .cp-capture-status {color:#ffc8ad;}
+html:not(.dark) body #cpComposePanel #cpForm .cp-capture {border-color:#c9b49c;border-left-color:#855b43;background:#f7f2e9;color:#273b49;}
+html:not(.dark) body #cpComposePanel #cpForm .cp-capture :is(.cp-capture-intro,.cp-capture-help) {color:#566876;}
+html:not(.dark) body #cpComposePanel #cpForm .cp-capture-picker {border-color:#855b43;background:#efe1cf;color:#273b49;}
+html:not(.dark) body #cpComposePanel #cpForm .cp-capture :is(.cp-capture-status,.cp-capture-cancel) {color:#855b43;}
+html:not(.dark) body #cpComposePanel #cpForm .cp-capture-readings {border-color:#c9b49c;}
+html:not(.dark) body #cpComposePanel #cpForm .cp-capture[data-state="error"] .cp-capture-status {color:#8f3e24;}
+@media(max-width:760px){html body #cpComposePanel #cpForm .cp-capture {padding:13px;}html body #cpComposePanel #cpForm .cp-capture-title {font-size:21px;}}
