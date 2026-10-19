@@ -565,3 +565,62 @@ html:not(.dark) body #aeProfileDialog #aeProfilePicks .ae-profile-pick-meta time
 @media(prefers-reduced-motion:reduce){
   #aeProfileDialog #aeProfilePicks .ae-profile-pick-recent{transition:none}
 }
+
+/* Acciones de Takes en perfil propio y perfiles públicos: abrir, responder y votar. */
+#aeProfileDialog .ae-profile-take-actions{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:12px;
+}
+#aeProfileDialog .ae-profile-take-actions button{
+  min-height:30px;
+  margin:0;
+  padding:6px 9px;
+  border:1px solid rgba(207,166,122,.55);
+  border-radius:0!important;
+  background:rgba(192,143,91,.10);
+  color:#f0dcc8;
+  font:700 10px/1.2 Inter,system-ui,sans-serif;
+  cursor:pointer;
+}
+#aeProfileDialog .ae-profile-take-actions .ae-profile-take-open{
+  background:rgba(198,153,102,.25);
+  border-color:rgba(224,183,138,.8);
+}
+#aeProfileDialog .ae-profile-take-actions button:hover{
+  background:rgba(213,164,111,.27);
+  border-color:#e5b987;
+}
+#aeProfileDialog .ae-profile-take-actions button[aria-pressed="true"]{
+  background:rgba(204,163,116,.33);
+  border-color:#f1c593;
+}
+#aeProfileDialog .ae-profile-take-actions button:disabled{opacity:.55;cursor:not-allowed}
+#aeProfileDialog .ae-profile-take-title-link{
+  display:inline;
+  padding:0;
+  margin:0;
+  border:0;
+  background:none;
+  color:inherit;
+  font:inherit;
+  letter-spacing:inherit;
+  text-align:left;
+  cursor:pointer;
+}
+#aeProfileDialog .ae-profile-take-title-link:hover{text-decoration:underline;text-underline-offset:3px}
+#aeProfileDialog .ae-profile-take-title-link:disabled{cursor:default}
+html:not(.dark) body #aeProfileDialog .ae-profile-take-actions button{
+  border-color:#b99773;
+  background:#f3e8da;
+  color:#533c2b;
+}
+html:not(.dark) body #aeProfileDialog .ae-profile-take-actions .ae-profile-take-open{background:#e9d4b9}
+html:not(.dark) body #aeProfileDialog .ae-profile-take-actions button:hover{background:#e6d0b2}
+html:not(.dark) body #aeProfileDialog .ae-profile-take-actions button[aria-pressed="true"]{background:#dfc19b;border-color:#98663f}
+@media(max-width:760px){
+  #aeProfileDialog .ae-profile-take-actions{gap:6px;margin-top:10px}
+  #aeProfileDialog .ae-profile-take-actions button{min-height:34px;padding:8px 10px}
+}
