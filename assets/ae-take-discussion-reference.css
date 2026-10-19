@@ -661,3 +661,106 @@ html:not(.dark) #aeTakeDiscussion .ae-discussion-votes button[aria-pressed="true
   #aeTakeDiscussion .ae-discussion-votes{gap:6px}
   #aeTakeDiscussion .ae-discussion-votes button{min-height:34px;padding:7px 10px}
 }
+
+/* Perfil del autor y comentarios interactivos dentro de cada Take. */
+#aeTakeDiscussion .ae-discussion-titleblock #aeDiscussionAuthor{
+  display:inline;
+  margin:0;
+  padding:0 1px;
+  border:0;
+  border-bottom:1px solid rgba(231,184,127,.7);
+  border-radius:0;
+  background:transparent;
+  color:inherit;
+  font:inherit;
+  letter-spacing:inherit;
+  text-align:left;
+  text-transform:none;
+  cursor:pointer;
+  overflow-wrap:anywhere;
+}
+#aeTakeDiscussion .ae-discussion-titleblock #aeDiscussionAuthor::after{
+  content:" ↗";
+  font:700 .43em/1 Inter,system-ui,sans-serif;
+  vertical-align:middle;
+  color:#e3bc85;
+}
+#aeTakeDiscussion .ae-discussion-titleblock #aeDiscussionAuthor:hover{color:#f9cc92;border-bottom-color:currentColor}
+#aeTakeDiscussion .ae-discussion-titleblock #aeDiscussionAuthor:disabled{cursor:default;border-bottom:0;opacity:.75}
+#aeTakeDiscussion .ae-discussion-titleblock #aeDiscussionAuthor:disabled::after{display:none}
+#aeTakeDiscussion .ae-discussion-meta .ae-discussion-author-link{
+  padding:0;
+  margin:0;
+  border:0;
+  border-bottom:1px solid rgba(214,166,112,.52);
+  border-radius:0;
+  background:transparent;
+  color:#f5debb;
+  font:inherit;
+  font-weight:750;
+  text-align:left;
+  overflow-wrap:anywhere;
+  cursor:pointer;
+}
+#aeTakeDiscussion .ae-discussion-meta .ae-discussion-author-link:hover{color:#fbcf99;border-bottom-color:currentColor}
+#aeTakeDiscussion .ae-discussion-comment-controls{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+#aeTakeDiscussion .ae-discussion-comment-controls .ae-discussion-comment-vote{
+  flex:0 0 auto;
+  min-height:29px;
+  padding:5px 9px;
+  border:1px solid rgba(213,170,127,.46);
+  border-radius:0;
+  background:rgba(8,37,52,.53);
+  color:#efd2aa;
+  font:700 11px/1.2 Inter,system-ui,sans-serif;
+  text-decoration:none;
+  cursor:pointer;
+}
+#aeTakeDiscussion .ae-discussion-comment-controls .ae-discussion-comment-vote:hover{
+  background:rgba(177,133,87,.25);
+  border-color:#e0b47e;
+}
+#aeTakeDiscussion .ae-discussion-comment-controls .ae-discussion-comment-vote[aria-pressed="true"]{
+  border-color:#eac391;
+  background:rgba(196,148,94,.32);
+  color:#fff1dd;
+}
+#aeTakeDiscussion .ae-discussion-comment-controls .ae-discussion-comment-vote:disabled{
+  cursor:not-allowed;
+  opacity:.55;
+}
+#aeTakeDiscussion .ae-discussion-comment-controls .ae-discussion-reply{
+  flex:0 0 auto;
+  min-height:29px;
+  padding:5px 0;
+  border:0;
+  color:#edc69b;
+  text-decoration:underline;
+  text-underline-offset:3px;
+}
+#aeTakeDiscussion .ae-discussion-comment-controls .ae-discussion-reply-count{
+  color:#c0cbd0;
+  font:650 10.5px/1.2 Inter,system-ui,sans-serif;
+}
+html:not(.dark) #aeTakeDiscussion .ae-discussion-titleblock #aeDiscussionAuthor{
+  border-bottom-color:#9a714d;
+  color:#213c4c;
+}
+html:not(.dark) #aeTakeDiscussion .ae-discussion-titleblock #aeDiscussionAuthor:hover{color:#8a5634}
+html:not(.dark) #aeTakeDiscussion .ae-discussion-titleblock #aeDiscussionAuthor::after{color:#946a45}
+html:not(.dark) #aeTakeDiscussion .ae-discussion-meta .ae-discussion-author-link{color:#744624;border-bottom-color:#aa8668}
+html:not(.dark) #aeTakeDiscussion .ae-discussion-meta .ae-discussion-author-link:hover{color:#9c5e37}
+html:not(.dark) #aeTakeDiscussion .ae-discussion-comment-controls .ae-discussion-comment-vote{
+  border-color:#c5a88a;
+  background:#f6ede2;
+  color:#5a4432;
+}
+html:not(.dark) #aeTakeDiscussion .ae-discussion-comment-controls .ae-discussion-comment-vote:hover{background:#e9d6bd}
+html:not(.dark) #aeTakeDiscussion .ae-discussion-comment-controls .ae-discussion-comment-vote[aria-pressed="true"]{background:#dfc29f;border-color:#a87547}
+html:not(.dark) #aeTakeDiscussion .ae-discussion-comment-controls .ae-discussion-reply{color:#9b542e}
+html:not(.dark) #aeTakeDiscussion .ae-discussion-comment-controls .ae-discussion-reply-count{color:#64717a}
+@media(max-width:760px){
+  #aeTakeDiscussion .ae-discussion-comment-controls{gap:6px 8px}
+  #aeTakeDiscussion .ae-discussion-comment-controls .ae-discussion-comment-vote{min-height:31px;padding:6px 9px}
+  #aeTakeDiscussion .ae-discussion-comment-controls .ae-discussion-reply{min-height:31px}
+}
