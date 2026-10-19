@@ -288,7 +288,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
     </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
-<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261019-news-by-sport-takes20-1">
+<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261019-sport-news-headers-2">
     <link rel="stylesheet" href="assets/ae-muted-navigation-icons.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-custom-nav-icons.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-classical-auth-buttons.css?v=20261017-chef-recipe-hires-1">
@@ -3552,18 +3552,17 @@ currentUser = {
                 articlesGrid.innerHTML = ['NFL','Fútbol'].map((sport,index) => {
                     const stories = filtered.filter(article => categoryKey(article.category) === sport).slice(0,10);
                     const trackId = 'aeNewsSportTrack' + index;
-                    return `<section class="ae-news-sport-lane" aria-labelledby="aeNewsSportTitle${index}">
-                      <header class="ae-news-sport-head"><h2 id="aeNewsSportTitle${index}">${sport}</h2>
-                        <div class="ae-news-sport-controls"><button type="button" data-news-scroll="-1" aria-controls="${trackId}" aria-label="Noticias anteriores de ${sport}" ${stories.length < 2 ? 'disabled' : ''}>‹</button><button type="button" data-news-scroll="1" aria-controls="${trackId}" aria-label="Noticias siguientes de ${sport}" ${stories.length < 2 ? 'disabled' : ''}>›</button></div>
+                    const sportKey = sport === 'NFL' ? 'nfl' : 'football';
+                    const sportIcon = sport === 'NFL' ? 'nfl' : 'futbol';
+                    return `<section class="ae-news-sport-lane" data-sport="${sportKey}" aria-labelledby="aeNewsSportTitle${index}">
+                      <header class="ae-news-sport-head">
+                        <img class="ae-news-sport-emblem" src="assets/icons/ae-${sportIcon}-gold.webp" alt="" aria-hidden="true" width="52" height="52" decoding="async">
+                        <h2 id="aeNewsSportTitle${index}">${sport}</h2>
                       </header>
                       <div id="${trackId}" class="ae-news-sport-track" data-sport="${sport}" role="region" aria-roledescription="carrusel" aria-label="Últimas noticias de ${sport}" tabindex="0">${stories.length ? stories.map(renderNewsCard).join('') : '<p class="ae-news-sport-empty">Todavía no hay noticias de este deporte.</p>'}</div>
                     </section>`;
                 }).join('');
                 articlesGrid.querySelectorAll('.ae-news-sport-track').forEach(lane => {lane.scrollLeft = laneScrolls[lane.dataset.sport] || 0;});
-                articlesGrid.querySelectorAll('[data-news-scroll]').forEach(button => button.addEventListener('click', () => {
-                    const lane = document.getElementById(button.getAttribute('aria-controls'));
-                    lane.scrollBy({left:Number(button.dataset.newsScroll) * lane.clientWidth, behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'});
-                }));
             } else {
                 articlesGrid.innerHTML = gridArticles.map(renderNewsCard).join('');
             }

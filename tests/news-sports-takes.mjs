@@ -24,7 +24,7 @@ let tracks=[...d.querySelectorAll('.ae-news-sport-track')];
 assert.equal(tracks.length,2);
 for(const track of tracks){assert.equal(track.querySelectorAll('article').length,10);for(const card of track.children)assert.match(card.querySelector('h3').textContent,new RegExp(track.dataset.sport));}
 assert.equal(d.querySelectorAll('#articlesGrid>article').length,0);
-assert.equal(d.querySelectorAll('[data-news-scroll]').length,4);
+assert.equal(d.querySelectorAll('[data-news-scroll]').length,0);
 tracks[0].scrollLeft=123;w.renderArticlesFeed();assert.equal(d.querySelector('.ae-news-sport-track').scrollLeft,123);
 for(const [category,sport] of [['NFL','nfl'],['Fútbol','football']]){
  w.filterByCategory(category);await new Promise(r=>setTimeout(r,40));
