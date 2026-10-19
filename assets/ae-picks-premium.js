@@ -51,6 +51,43 @@
    overview.remove();
    layout.classList.add('ae-premium-picks-grid');
  }
+ /* Desktop-only community column:
+    The Platos sidebar must not stretch the independent Eres Chef / latest
+    Picks rows. Temporarily group those four *same* DOM nodes on desktop.
+    On tablet/phone restore the original direct children (and mobile CSS).
+    No publication data, event listeners or cards are recreated. */
+ function arrangeCommunityDesktop(){
+   const community=$('communityPicks');
+   if(!community)return;
+   const desktop=window.matchMedia('(min-width: 911px)');
+   let leftColumn=null;
+   const sync=()=>{
+     if(desktop.matches){
+       if(leftColumn)return;
+       const nodes=[
+         community.querySelector(':scope > .ae-picks-feed-heading'),
+         community.querySelector(':scope > #cpStatus'),
+         community.querySelector(':scope > #cpFeed'),
+         community.querySelector(':scope > #cpFeedScrollHint')
+       ];
+       if(nodes.some(node=>!node))return;
+       const column=document.createElement('div');
+       column.className='ae-picks-community-main';
+       community.insertBefore(column,nodes[0]);
+       nodes.forEach(node=>column.appendChild(node));
+       leftColumn=column;
+     }else if(leftColumn){
+       // Return the original child order before the existing mobile
+       // direct-child selectors are needed.
+       [...leftColumn.children].forEach(node=>community.insertBefore(node,leftColumn));
+       leftColumn.remove();
+       leftColumn=null;
+     }
+   };
+   sync();
+   if(desktop.addEventListener)desktop.addEventListener('change',sync);
+   else if(desktop.addListener)desktop.addListener(sync);
+ }
  function initPreview(){
    for(const [id,target] of [['aeWeeklyBannerInput','aeWeeklyBannerPreview'],['aeWeeklyImageInput','aeWeeklyImagePreview'],['pubImageFile','pubImagePreview']]){
      $(id)?.addEventListener('change',event=>preview(event.target,target));
@@ -60,5 +97,5 @@
    });
  }
  window.aeEditorialMedia={upload,publicUrl};
- document.addEventListener('DOMContentLoaded',()=>{arrange();initPreview();});
+ document.addEventListener('DOMContentLoaded',()=>{arrange();arrangeCommunityDesktop();initPreview();});
 })();
