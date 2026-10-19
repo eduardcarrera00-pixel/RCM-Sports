@@ -28,6 +28,66 @@ let ownPicks=[];
 let publicAuthorLabel='Aficionado';
 let ownUnpopularTakeId=null;
 
+function openProfileTake(t,owner,reply=false){
+  if(t.hidden)return;
+  const name=String(t.author||(privateView?$('aeProfileUsername')?.textContent:publicAuthorLabel)||'Aficionado')
+    .replace(/^@+/,'').split(' · ')[0].trim();
+  window.aeTakeReplies?.open({...t,author_id:t.author_id||owner,author:name},
+    reply?{focusComposer:true}:{});
+}
+
+async function refreshProfileTakes(){
+  const dialog=$('aeProfileDialog'),author=activeAuthor,isOwn=privateView,token=request;
+  if(!dialog?.open||!author)return;
+  try{
+    const r=isOwn?await db.rpc('ae_my_free_takes'):await db.rpc('ae_public_take_profile',{p_author_id:author});
+    if(r.error)throw r.error;
+    if(token!==request||!dialog.open||activeAuthor!==author||privateView!==isOwn)return;
+    ownTakes=r.data||[];
+    if(activeTab==='takes')renderTakes(ownTakes,author,!isOwn);
+  }catch(e){
+    if(token===request&&dialog?.open)$('aeProfileStatus').textContent='No se pudieron actualizar los Takes. '+(e.message||'');
+  }
+}
+
+async function voteProfileTake(t,owner,value){
+  if(working||t.hidden)return;
+  try{
+    const viewer=await me();
+    if(!viewer){window.openUserAuthModal?.();return;}
+    if(viewer.id===(t.author_id||owner))return;
+    working=true;
+    const r=await db.rpc('ae_vote_free_take',{p_take_id:t.id,p_value:value});
+    if(r.error)throw r.error;
+    document.dispatchEvent(new Event('ae:takes-updated'));
+  }catch(e){
+    $('aeProfileStatus').textContent=e.message||'No se pudo votar.';
+  }finally{working=false;}
+}
+
+function profileTakeActions(t,owner,canVote){
+  if(t.hidden)return null;
+  const bar=el('div',null,'ae-profile-take-actions');
+  for(const [label,reply] of [['Ver Take',false],['Responder',true]]){
+    const b=el('button',label,reply?'ae-profile-take-reply':'ae-profile-take-open');
+    b.type='button';
+    b.setAttribute('aria-label',(reply?'Responder al Take: ':'Abrir Take: ')+(t.title||'Take'));
+    b.addEventListener('click',()=>openProfileTake(t,owner,reply));
+    bar.append(b);
+  }
+  if(canVote){
+    for(const [value,label] of [[1,'▲ Apoyar'],[-1,'▼ Cuestionar']]){
+      const b=el('button',label,'ae-profile-take-vote');
+      b.type='button';b.disabled=working;
+      b.setAttribute('aria-pressed',String(Number(t.my_vote)===value));
+      b.setAttribute('aria-label',label+': '+(t.title||'Take'));
+      b.addEventListener('click',()=>voteProfileTake(t,owner,value));
+      bar.append(b);
+    }
+  }
+  return bar;
+}
+
 async function me(){
   if(typeof db==='undefined'||!db)return null;
   const r=await db.auth.getUser();
@@ -91,7 +151,7 @@ function featuredTakes(entries){
   ].filter(([,item])=>item);
 }
 
-function makeTakeFeature(label,tone,entry,actionLabel,actionFn){
+function makeTakeFeature(label,tone,entry,owner,canVote,actionLabel,actionFn){
   const card=el('article',null,'ae-profile-feature ae-profile-feature-'+tone);
   card.append(el('span',label,'ae-profile-feature-label'));
   card.append(el('h3',entry.title||'Take'));
@@ -106,6 +166,11 @@ function makeTakeFeature(label,tone,entry,actionLabel,actionFn){
     stats.append(action);
   }
   card.append(stats);
+  const buttons=profileTakeActions(entry,owner,canVote);
+  if(buttons)card.append(buttons);
+  card.addEventListener('click',event=>{
+    if(!entry.hidden&&!event.target.closest('button,a,input,select'))openProfileTake(entry,owner);
+  });
   return card;
 }
 
@@ -178,14 +243,20 @@ function openUnpopularChooser(entries){
 function renderTakeItem(entry,owner,canVote){
   const box=el('article',null,'ae-profile-item');
   const competition=entry.competition||labels[entry.sport]||'Deportes';
+  const title=el('h3');
+  const open=el('button',entry.title||'Take','ae-profile-take-title-link');
+  open.type='button';
+  open.disabled=Boolean(entry.hidden);
+  open.setAttribute('aria-label','Abrir Take completo: '+(entry.title||'Take'));
+  open.addEventListener('click',()=>openProfileTake(entry,owner));
+  title.append(open);
   box.append(
     el('small',competition+' · '+dateText(entry.created_at)+(entry.hidden?' · Oculto por moderación':''),'ae-profile-item-meta'),
-    el('h3',entry.title),
+    title,
     el('p',entry.body)
   );
-  const actions=el('div',null,'ae-profile-item-stats');
-  actions.append(el('span','▲ '+numeric(entry.upvotes)+' apoyos'),el('span','▼ '+numeric(entry.downvotes)+' cuestionamientos'));
-
+  const stats=el('div',null,'ae-profile-item-stats');
+  stats.append(el('span','▲ '+numeric(entry.upvotes)+' apoyos'),el('span','▼ '+numeric(entry.downvotes)+' cuestionamientos'));
   if(privateView&&['nfl','football','laliga','premier','ligamx','champions'].includes(entry.sport)){
     const change=el('button','Cambiar comunidad','ae-profile-change-sport');
     change.type='button';
@@ -193,32 +264,14 @@ function renderTakeItem(entry,owner,canVote){
     change.addEventListener('click',()=>window.aeTakeCategoryEdit?.open({
       id:entry.id,sport:entry.sport,title:entry.title,author_id:owner
     }));
-    actions.append(change);
+    stats.append(change);
   }
-
-  if(canVote&&!entry.hidden){
-    for(const [value,label] of [[1,'▲ Apoyar'],[-1,'▼ Cuestionar']]){
-      const b=el('button',label,'ae-take-button');
-      b.type='button';
-      b.disabled=working;
-      b.setAttribute('aria-pressed',String(Number(entry.my_vote)===value));
-      b.addEventListener('click',async()=>{
-        const viewer=await me();
-        if(!viewer){if(typeof openUserAuthModal==='function')openUserAuthModal();return;}
-        if(viewer.id===entry.author_id||working)return;
-        working=true;b.disabled=true;
-        const result=await db.rpc('ae_vote_free_take',{p_take_id:entry.id,p_value:value});
-        if(result.error){
-          $('aeProfileStatus').textContent=result.error.message;
-          working=false;b.disabled=false;return;
-        }
-        working=false;
-        await showPublic(owner,false);
-      });
-      actions.append(b);
-    }
-  }
-  box.append(actions);
+  box.append(stats);
+  const bar=profileTakeActions(entry,owner,canVote);
+  if(bar)box.append(bar);
+  box.addEventListener('click',event=>{
+    if(!entry.hidden&&!event.target.closest('button,a,input,select'))openProfileTake(entry,owner);
+  });
   return box;
 }
 
@@ -230,16 +283,16 @@ function renderTakes(entries,owner,canVote){
 
   const featured=featuredTakes(entries);
   if(privateView){
-    for(const [label,item,tone] of featured.slice(0,2))highlights.append(makeTakeFeature(label,tone,item));
+    for(const [label,item,tone] of featured.slice(0,2))highlights.append(makeTakeFeature(label,tone,item,owner,canVote));
     const chosen=entries.find(t=>!t.hidden&&String(t.id)===String(ownUnpopularTakeId));
     if(chosen){
-      highlights.append(makeTakeFeature('Unpopular Take','unpopular',chosen,'Cambiar',()=>openUnpopularChooser(entries)));
+      highlights.append(makeTakeFeature('Unpopular Take','unpopular',chosen,owner,canVote,'Cambiar',()=>openUnpopularChooser(entries)));
     }else if(entries.some(t=>!t.hidden)){
       highlights.append(makeUnpopularPlaceholder(entries));
     }
     highlights.hidden=!entries.some(t=>!t.hidden);
   }else if(featured.length){
-    for(const [label,item,tone] of featured)highlights.append(makeTakeFeature(label,tone,item));
+    for(const [label,item,tone] of featured)highlights.append(makeTakeFeature(label,tone,item,owner,canVote));
     highlights.hidden=false;
   }else{
     highlights.hidden=true;
@@ -588,6 +641,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   $('aeProfileDialog')?.addEventListener('click',e=>{if(e.target===$('aeProfileDialog'))close();});
   $('aeProfileDialog')?.addEventListener('close',()=>{++request;});
 
+  document.addEventListener('ae:takes-updated',refreshProfileTakes);
   window.addEventListener('ae:take-category-changed',()=>{
     if($('aeProfileDialog')?.open&&privateView)showOwn();
     else if($('aeProfileDialog')?.open&&activeAuthor)showPublic(activeAuthor,false);
