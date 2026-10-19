@@ -1,0 +1,40 @@
+name: CSS maintenance checks
+
+on:
+  push:
+    branches:
+      - maintenance/css-safe-phase1-20261018
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'assets/**/*.css'
+      - 'assets/style-sources.json'
+      - 'scripts/audit-css.mjs'
+      - 'tests/css-stability.mjs'
+      - 'index.html'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/css-maintenance.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  css-stability:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Check CSS references and cascade
+        run: npm run test:css
+      - name: Check picks, auth and draft regressions
+        run: |
+          npm run test:picks
+          npm run test:auth
+          npm run test:drafts
