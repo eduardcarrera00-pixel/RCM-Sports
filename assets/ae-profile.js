@@ -410,6 +410,25 @@ function renderPicks(entries,isPublic=false){
   renderAccuracy(entries);
 }
 
+function renderPublishAction(){
+  let action=$('aeProfilePublish');
+  if(!action){
+    action=el('button',null,'ae-participate-cta ae-take-button');
+    action.id='aeProfilePublish';
+    action.type='button';
+    action.addEventListener('click',()=>{
+      const publish=activeTab==='picks'?window.aeOpenPickComposer:window.aeOpenTakeComposer;
+      if(typeof publish!=='function')return;
+      close();
+      publish();
+    });
+    $('aeProfileDialog').append(action);
+  }
+  action.hidden=!privateView;
+  action.textContent=activeTab==='picks'?'Publicar mi Pick':'Publicar mi Take';
+  action.setAttribute('aria-controls',activeTab==='picks'?'cpComposePanel':'aeTakeComposerDialog');
+}
+
 function setPrivateTab(tab){
   if(!activeAuthor)return;
   activeTab=tab==='picks'?'picks':'takes';
@@ -420,6 +439,7 @@ function setPrivateTab(tab){
   takesButton?.classList.toggle('is-active',activeTab==='takes');
   picksButton?.classList.toggle('is-active',activeTab==='picks');
 
+  renderPublishAction();
   const takeHighlights=$('aeProfileTakeHighlights');
   const takeList=$('aeProfileTakes');
   const pickHighlights=$('aeProfilePickHighlights');
@@ -504,6 +524,7 @@ async function showPublic(id,push=true,tab='takes'){
   if(user?.id===id){await showOwn();if(tab==='picks')setPrivateTab('picks');return;}
 
   privateView=false;
+  if($('aeProfilePublish'))$('aeProfilePublish').hidden=true;
   activeAuthor=id;
   activeTab=tab==='picks'?'picks':'takes';
   ownTakes=[];

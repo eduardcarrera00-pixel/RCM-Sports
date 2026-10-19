@@ -136,12 +136,7 @@
      if(activeSection)await load();
      document.dispatchEvent(new Event('ae:takes-updated'));
      send.textContent='Publicado ✓';
-     window.setTimeout(()=>{
-       const dialog=$('aeTakeComposerDialog');
-       if(dialog?.open)dialog.close();
-       send.textContent='Publicar mi Take';
-       status('');
-     },420);
+     status('Take publicado. Puedes escribir otro o cerrar con la cruz.');
    }catch(err){status(err.message||'No se pudo publicar.');}
    finally{busy=false;send.disabled=false;}
  }
@@ -173,12 +168,14 @@
    const dialog=$('aeTakeComposerDialog');
    const form=$('freeTakesForm');
    if(!dialog||!form)return;
-   form.reset();
+   if(dialog.open)return;
    status('');
+   form.querySelector('button[type="submit"]').textContent='Publicar mi Take';
+   const hasDraft=Boolean(form.elements.competition.value||form.elements.title.value||form.elements.body.value);
    const section=requestedSport==='NFL'||requestedSport==='Fútbol'
      ?requestedSport:(activeSection==='NFL'||activeSection==='Fútbol'?activeSection:'');
    const value=section==='NFL'?'nfl':section==='Fútbol'?'football':'';
-   if(value){
+   if(value&&!hasDraft){
      const radio=form.querySelector('input[name="sport"][value="'+value+'"]');
      if(radio)radio.checked=true;
    }
@@ -191,11 +188,13 @@
  };
  document.addEventListener('DOMContentLoaded',()=>{
    $('freeTakesForm')?.addEventListener('submit',create);
+   $('freeTakesForm')?.addEventListener('input',()=>{
+     if(!busy)$('freeTakesForm').querySelector('button[type="submit"]').textContent='Publicar mi Take';
+   });
    $('aeSportTakePublish')?.addEventListener('click',()=>window.aeOpenTakeComposer());
    $('aeTakeComposerClose')?.addEventListener('click',()=>$('aeTakeComposerDialog')?.close());
-   $('aeTakeComposerDialog')?.addEventListener('click',event=>{
-     if(event.target===event.currentTarget)event.currentTarget.close();
-   });
+   // Keep drafts open during backdrop taps, Escape and mobile back gestures.
+   $('aeTakeComposerDialog')?.addEventListener('cancel',event=>event.preventDefault());
    $('freeTakesSportFilter')?.addEventListener('change',e=>{filter=e.target.value;load();});
    db?.auth.onAuthStateChange(()=>setTimeout(()=>{if(typeof currentCategory!=='undefined'&&(currentCategory==='Fútbol'||currentCategory==='NFL'))load();},150));
    document.addEventListener('ae:takes-updated',()=>{
