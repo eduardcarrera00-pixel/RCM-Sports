@@ -54,7 +54,8 @@
   }
   async function accountId() {
     try {
-      const r=await window.db?.auth?.getUser();
+      const client=typeof db!=='undefined'?db:window.db;
+      const r=await client?.auth?.getUser();
       return !r?.error && typeof r.data?.user?.id==='string' ? r.data.user.id : null;
     } catch {return null;}
   }
