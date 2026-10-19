@@ -1,0 +1,364 @@
+/* AE SPORTS · Extraído de index.html sin modificar declaraciones ni orden de cascada.
+   Editar esta fuente directamente. No duplicar estilos en index.html. */
+
+/* Original <style id="ae-home-sun-takes-trending-polish"> */
+
+/* Sun artwork: the mode toggle itself should not frame the sun. */
+html body>header #themeToggle.ae-theme-sun-unframed,
+html body>header #themeToggle:has(#themeIcon[src*="ae-sol-gold"]){
+  border:0!important;border-color:transparent!important;border-radius:0!important;
+  background:transparent!important;box-shadow:none!important;
+  outline:none!important;
+}
+html body>header #themeToggle.ae-theme-sun-unframed #themeIcon,
+html body>header #themeToggle:has(#themeIcon[src*="ae-sol-gold"]) #themeIcon{
+  border:0!important;background:transparent!important;box-shadow:none!important;
+}
+html body>header #themeToggle.ae-theme-sun-unframed:focus-visible,
+html body>header #themeToggle:has(#themeIcon[src*="ae-sol-gold"]):focus-visible{
+  outline:2px solid #eac18e!important;outline-offset:3px!important;
+}
+/* Las cabeceras de Genios y Anoetos ahora son visibles: clasificación deportiva. */
+/* Only this invitation is gently rounded; site cards stay square. */
+html body.ae-is-home #editorialBottom #aeHomeTakeHighlights .ae-home-take-bottom-cta #aeHomeTakePublish{
+  border-radius:11px!important;
+  min-height:47px!important;
+  border-color:#e8bc82!important;
+  background:linear-gradient(105deg,#efc991,#d5a06b)!important;
+  color:#1b3241!important;
+  box-shadow:0 6px 18px rgba(195,126,61,.23),inset 0 1px rgba(255,255,255,.32)!important;
+  transition:transform .18s ease,box-shadow .18s ease,filter .18s ease!important;
+}
+html body.ae-is-home #editorialBottom #aeHomeTakeHighlights .ae-home-take-bottom-cta #aeHomeTakePublish:hover{
+  transform:translateY(-2px)!important;
+  box-shadow:0 8px 24px rgba(195,126,61,.32),inset 0 1px rgba(255,255,255,.40)!important;
+}
+/* The global square-corner rule is a layered !important declaration.
+   Override within that SAME layer so this is the sole rounded exception. */
+@layer ae-editorial-square-corners {
+  html body.ae-is-home #editorialBottom #aeHomeTakeHighlights .ae-home-take-bottom-cta #aeHomeTakePublish{
+    border-radius:11px!important;
+  }
+}
+/* Most-read: a single actionable row, clear direction and aligned affordance. */
+html body.ae-is-home #mainContent #trendingList>.ae-trending-item{
+  display:grid!important;
+  grid-template-columns:25px minmax(0,1fr)!important;
+  align-items:stretch!important;
+  gap:10px!important;
+  margin:0!important;
+  padding:9px 0!important;
+}
+html body.ae-is-home #mainContent #trendingList .ae-trending-rank{
+  display:flex!important;align-items:flex-start!important;justify-content:center!important;
+  padding-top:11px!important;
+  font:650 19px/1 Newsreader,Georgia,serif!important;
+  color:#d5a06d!important;
+}
+html body.ae-is-home #mainContent #trendingList button.ae-trending-link{
+  box-sizing:border-box!important;
+  display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;
+  align-items:center!important;column-gap:12px!important;
+  width:100%!important;min-width:0!important;
+  min-height:72px!important;padding:10px 12px!important;
+  border:1px solid rgba(198,159,119,.29)!important;border-radius:0!important;
+  background:rgba(24,51,68,.43)!important;
+  text-align:left!important;cursor:pointer!important;
+  transition:background .16s ease,border-color .16s ease!important;
+}
+html body.ae-is-home #mainContent #trendingList button.ae-trending-link:hover,
+html body.ae-is-home #mainContent #trendingList button.ae-trending-link:focus-visible{
+  background:rgba(50,82,96,.54)!important;
+  border-color:#d2a679!important;outline-offset:2px!important;
+}
+html body.ae-is-home #mainContent #trendingList .ae-trending-story{
+  display:grid!important;gap:3px!important;min-width:0!important;
+}
+html body.ae-is-home #mainContent #trendingList .ae-trending-title{
+  display:-webkit-box!important;-webkit-box-orient:vertical!important;
+  -webkit-line-clamp:2!important;overflow:hidden!important;
+  margin:0!important;max-width:100%!important;
+  font:600 16px/1.18 Newsreader,Georgia,serif!important;
+  white-space:normal!important;overflow-wrap:anywhere!important;
+}
+html body.ae-is-home #mainContent #trendingList .ae-trending-byline{
+  color:#c2cbd0!important;font:400 10px/1.35 Inter,system-ui,sans-serif!important;
+}
+html body.ae-is-home #mainContent #trendingList .ae-trending-meta{
+  margin-top:3px!important;color:#dbb78f!important;
+  font:600 10px/1.2 Inter,system-ui,sans-serif!important;
+}
+html body.ae-is-home #mainContent #trendingList .ae-trending-open{
+  display:flex!important;flex-direction:column!important;
+  align-items:center!important;justify-content:center!important;
+  gap:5px!important;min-width:39px!important;min-height:42px!important;
+  margin-left:2px!important;padding-left:10px!important;
+  border-left:1px solid rgba(204,163,123,.27)!important;
+  color:#eac18f!important;font:750 10px/1 Inter,system-ui,sans-serif!important;
+}
+html body.ae-is-home #mainContent #trendingList .ae-trending-arrow{
+  display:grid!important;place-items:center!important;
+  width:30px!important;height:30px!important;min-height:30px!important;
+  border:1px solid rgba(229,179,123,.67)!important;border-radius:0!important;
+  color:#f1c99b!important;background:rgba(146,94,51,.22)!important;
+  font:750 18px/1 Inter,system-ui,sans-serif!important;
+}
+html:not(.dark) body.ae-is-home #mainContent #trendingList .ae-trending-rank{color:#8c613f!important}
+html:not(.dark) body.ae-is-home #mainContent #trendingList button.ae-trending-link{
+  background:#fff9f0!important;border-color:#ddc3a6!important;
+}
+html:not(.dark) body.ae-is-home #mainContent #trendingList button.ae-trending-link:hover,
+html:not(.dark) body.ae-is-home #mainContent #trendingList button.ae-trending-link:focus-visible{
+  background:#f2e8d9!important;border-color:#bb8554!important;
+}
+html:not(.dark) body.ae-is-home #mainContent #trendingList .ae-trending-byline{color:#63717b!important}
+html:not(.dark) body.ae-is-home #mainContent #trendingList .ae-trending-meta{color:#906440!important}
+html:not(.dark) body.ae-is-home #mainContent #trendingList .ae-trending-open{color:#805332!important;border-left-color:#ddc3a6!important}
+html:not(.dark) body.ae-is-home #mainContent #trendingList .ae-trending-arrow{
+  color:#6f482a!important;background:#f6eadb!important;border-color:#cda47b!important;
+}
+@media(max-width:760px){
+  /* Los anchos de cuatro columnas se ajustan en ae-home-esports-standings.css. */
+  html body.ae-is-home #mainContent #trendingList>.ae-trending-item,
+  html body.ae-is-home #mainContent>#aeHomeTrendingMobileFooter #trendingList>.ae-trending-item{
+    grid-template-columns:20px minmax(0,1fr)!important;gap:8px!important;
+  }
+  html body.ae-is-home #mainContent #trendingList button.ae-trending-link{
+    padding:10px!important;column-gap:8px!important;
+  }
+  html body.ae-is-home #mainContent #trendingList .ae-trending-title{font-size:15px!important}
+  html body.ae-is-home #mainContent #trendingList .ae-trending-open{
+    min-width:31px!important;padding-left:7px!important;
+  }
+  html body.ae-is-home #mainContent #trendingList .ae-trending-arrow{width:27px!important;height:27px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  html body.ae-is-home #mainContent #trendingList button.ae-trending-link,
+  html body.ae-is-home #editorialBottom #aeHomeTakeHighlights .ae-home-take-bottom-cta #aeHomeTakePublish{
+    transition:none!important;transform:none!important;
+  }
+}
+
+/* Lo más leído: omit the number column and cover the full panel width. */
+html body.ae-is-home #mainContent #aeTrendingPortada.ae-trending-portada #trendingList .ae-trending-link{
+  grid-template-columns:68px minmax(0,1fr)!important;
+}
+html body.ae-is-home #mainContent #aeTrendingPortada.ae-trending-portada #trendingList > .is-featured{
+  box-sizing:border-box!important;
+  width:calc(100% + 32px)!important;
+  max-width:none!important;
+  margin:0 -16px!important;
+}
+html body.ae-is-home #mainContent #aeTrendingPortada.ae-trending-portada #trendingList > .is-featured .ae-trending-image{
+  inset:0!important;width:100%!important;height:100%!important;
+}
+@media(max-width:760px){
+  html body.ae-is-home #mainContent #aeTrendingPortada.ae-trending-portada #trendingList .ae-trending-link{
+    grid-template-columns:64px minmax(0,1fr)!important;
+  }
+}
+
+
+/* Original <style id="ae-header-moon-sport-icons-and-classic-avisos"> */
+
+/* AE SPORTS · desktop navigation polish; transient feedback, never a permanent frame. */
+@media(min-width:761px){
+  html body>header .ae-header-actions #themeToggle{
+    position:relative!important;
+    margin-right:11px!important;
+    transform:translateX(-4px)!important;
+  }
+}
+/* Both sun and moon are unframed. Hover darkens the artwork, never outlines it. */
+html body>header .ae-header-actions #themeToggle{
+  border:0!important;border-color:transparent!important;
+  outline:0!important;border-radius:0!important;
+  background:transparent!important;background-image:none!important;
+  box-shadow:none!important;
+}
+html body>header .ae-header-actions #themeToggle:hover,
+html body>header .ae-header-actions #themeToggle:active{
+  border:0!important;border-color:transparent!important;
+  outline:none!important;background:transparent!important;box-shadow:none!important;
+}
+html body>header .ae-header-actions #themeToggle:hover #themeIcon{
+  opacity:.82!important;
+  filter:brightness(.72) saturate(.82) contrast(1.04)!important;
+}
+html body>header .ae-header-actions #themeToggle:focus-visible{
+  outline:2px solid #e5bc83!important;outline-offset:3px!important;
+}
+/* Remove white/brass squares around sport artwork on hover and selection. */
+html body>header nav.ae-sport-nav .category-btn .ae-nav-icon,
+html body>header nav.ae-sport-nav .category-btn:hover .ae-nav-icon,
+html body>header nav.ae-sport-nav .category-btn.active .ae-nav-icon,
+html body>header nav.ae-sport-nav .category-btn:focus-visible .ae-nav-icon,
+html:not(.dark) body>header nav.ae-sport-nav .category-btn:hover .ae-nav-icon,
+html:not(.dark) body>header nav.ae-sport-nav .category-btn.active .ae-nav-icon{
+  border:0!important;border-color:transparent!important;
+  outline:none!important;background:transparent!important;
+  background-image:none!important;box-shadow:none!important;
+}
+html body>header nav.ae-sport-nav .category-btn:hover .ae-nav-icon .ae-custom-sport-icon{
+  opacity:.92!important;
+  filter:brightness(.85) saturate(.88) contrast(1.02)!important;
+}
+html body>header nav.ae-sport-nav .category-btn:focus-visible{
+  outline:2px solid #e2b786!important;outline-offset:2px!important;
+}
+/* A unique notification emblem aligned with the sport buttons' 35px/12px grid.
+   Preserve #aeNotificationsButton / #aeNotificationsBadge and their listeners. */
+html body>header #aeNotificationsButton[hidden],
+html body>header #aeNotificationsBadge[hidden]{display:none!important}
+html body>header .ae-header-actions #aeNotificationsButton:not([hidden]){
+  position:relative!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  grid-template-rows:35px 12px!important;
+  place-items:center!important;
+  align-content:center!important;
+  flex:0 0 59px!important;
+  box-sizing:border-box!important;
+  width:59px!important;min-width:59px!important;max-width:59px!important;
+  height:58px!important;min-height:58px!important;max-height:58px!important;
+  margin:0!important;padding:4px 1px!important;gap:3px!important;
+  border:0!important;border-radius:0!important;
+  background:transparent!important;box-shadow:none!important;
+  cursor:pointer!important;
+}
+html body>header #aeNotificationsButton .ae-notifications-classic-icon{
+  display:block!important;
+  grid-column:1!important;grid-row:1!important;
+  align-self:center!important;justify-self:center!important;
+  width:35px!important;height:35px!important;
+  max-width:35px!important;max-height:35px!important;
+  margin:0!important;padding:2px!important;box-sizing:border-box!important;
+  border:0!important;background:transparent!important;
+  overflow:visible!important;
+  opacity:.87;transition:filter .16s ease,opacity .16s ease;
+  pointer-events:none!important;
+  --avisos-outline:#a36b3d;
+  --avisos-detail:#ffe0a8;
+}
+html body>header #aeNotificationsButton .ae-avisos-gold-light{stop-color:#f3dcab}
+html body>header #aeNotificationsButton .ae-avisos-gold-mid{stop-color:#d4a76a}
+html body>header #aeNotificationsButton .ae-avisos-gold-deep{stop-color:#9c6337}
+html body>header #aeNotificationsButton .ae-avisos-bell-metal{stroke:var(--avisos-outline)}
+html body>header #aeNotificationsButton .ae-avisos-engraving{stroke:#c99b67;opacity:.73}
+html body>header #aeNotificationsButton .ae-avisos-highlight{stroke:var(--avisos-detail);opacity:.7}
+html body>header #aeNotificationsButton .ae-avisos-rim{stroke:#edc994}
+html body>header #aeNotificationsButton .ae-avisos-clapper{stroke:#c79759}
+html body>header #aeNotificationsButton .ae-avisos-crown{fill:#d6a872}
+html body>header #aeNotificationsButton .ae-notifications-caption{
+  display:block!important;
+  grid-column:1!important;grid-row:2!important;
+  align-self:center!important;justify-self:center!important;
+  width:100%!important;min-width:0!important;max-width:100%!important;
+  margin:0!important;padding:0!important;
+  color:#f1dfc7!important;
+  font:800 9px/12px Inter,system-ui,sans-serif!important;
+  letter-spacing:.025em!important;line-height:12px!important;
+  text-align:center!important;text-transform:uppercase!important;
+  white-space:nowrap!important;
+}
+html body>header #aeNotificationsButton #aeNotificationsBadge:not([hidden]){
+  position:absolute!important;top:3px!important;right:4px!important;
+  z-index:2!important;display:grid!important;place-items:center!important;
+  box-sizing:border-box!important;min-width:16px!important;height:16px!important;
+  padding:0 3px!important;border:1px solid #f1d2ab!important;
+  border-radius:50%!important;background:#8d4b39!important;color:#fff7ef!important;
+  font:800 9px/1 Inter,system-ui,sans-serif!important;
+}
+html body>header #aeNotificationsButton:hover .ae-notifications-classic-icon{
+  opacity:1!important;filter:brightness(.8) saturate(.95)!important;
+}
+html body>header #aeNotificationsButton:focus-visible{
+  outline:2px solid #e6bc83!important;outline-offset:2px!important;
+}
+html:not(.dark) body>header #aeNotificationsButton .ae-avisos-gold-light{stop-color:#d5ae7b}
+html:not(.dark) body>header #aeNotificationsButton .ae-avisos-gold-mid{stop-color:#aa703f}
+html:not(.dark) body>header #aeNotificationsButton .ae-avisos-gold-deep{stop-color:#663d25}
+html:not(.dark) body>header #aeNotificationsButton .ae-notifications-classic-icon{--avisos-outline:#593c28;--avisos-detail:#f6d4a0}
+html:not(.dark) body>header #aeNotificationsButton .ae-avisos-engraving{stroke:#a06a45}
+html:not(.dark) body>header #aeNotificationsButton .ae-avisos-rim{stroke:#b88758}
+html:not(.dark) body>header #aeNotificationsButton .ae-avisos-clapper{stroke:#966537}
+html:not(.dark) body>header #aeNotificationsButton .ae-avisos-crown{fill:#a57244}
+@media(min-width:761px) and (max-width:1180px){
+  html body>header .ae-header-actions #themeToggle{margin-right:6px!important;transform:translateX(-3px)!important;}
+  html body>header .ae-header-actions #aeNotificationsButton:not([hidden]){
+    flex-basis:53px!important;width:53px!important;min-width:53px!important;max-width:53px!important;
+  }
+}
+@media(max-width:760px){
+  html body>header .ae-header-actions #themeToggle{margin-right:0!important;transform:none!important;}
+  html body>header .ae-header-actions #aeNotificationsButton:not([hidden]){
+    flex:0 0 57px!important;width:57px!important;min-width:57px!important;max-width:57px!important;
+    height:60px!important;min-height:60px!important;max-height:60px!important;
+    grid-template-rows:29px 12px!important;gap:5px!important;padding:5px 2px!important;
+  }
+  html body>header #aeNotificationsButton .ae-notifications-classic-icon{
+    width:30px!important;height:30px!important;max-width:30px!important;max-height:30px!important;
+  }
+  html body>header #aeNotificationsButton .ae-notifications-caption{
+    font-size:9px!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  html body>header #aeNotificationsButton .ae-notifications-classic-icon{transition:none!important}
+}
+
+
+/* Original <style id="ae-avisos-harmonized-icon"> */
+
+/* AE SPORTS: mismo peso visual que sol/luna y acceso, sin palabra ni marco.
+   El botón y su indicador de avisos conservan los IDs y eventos existentes. */
+html body>header .ae-header-actions #aeNotificationsButton:not([hidden]){
+  position:relative!important;
+  display:flex!important;
+  flex:0 0 36px!important;
+  width:36px!important;min-width:36px!important;max-width:36px!important;
+  height:36px!important;min-height:36px!important;max-height:36px!important;
+  align-items:center!important;justify-content:center!important;
+  align-self:center!important;
+  margin:0!important;padding:0!important;gap:0!important;
+  border:0!important;border-radius:0!important;
+  background:transparent!important;box-shadow:none!important;
+  box-sizing:border-box!important;cursor:pointer!important;
+}
+html body>header #aeNotificationsButton .ae-avisos-icon{
+  display:block!important;flex:0 0 23px!important;
+  width:23px!important;height:23px!important;
+  min-width:23px!important;min-height:23px!important;
+  max-width:23px!important;max-height:23px!important;
+  object-fit:contain!important;object-position:center!important;
+  margin:0!important;padding:0!important;border:0!important;
+  opacity:.84!important;
+  filter:brightness(.80) saturate(.77) contrast(.96)!important;
+  pointer-events:none!important;
+  transition:filter .16s ease,opacity .16s ease;
+}
+html body>header #aeNotificationsButton .ae-avisos-icon-gold{display:block!important}
+html body>header #aeNotificationsButton .ae-notifications-caption{display:none!important}
+html body>header #aeNotificationsButton #aeNotificationsBadge:not([hidden]){
+  top:-4px!important;right:-4px!important;
+}
+html body>header #aeNotificationsButton:is(:hover,:focus-visible) .ae-avisos-icon-gold{
+  opacity:.95!important;filter:brightness(.91) saturate(.88) contrast(.98)!important;
+}
+@media(max-width:760px){
+  html body>header .ae-header-actions #aeNotificationsButton:not([hidden]){
+    flex:0 0 36px!important;
+    width:36px!important;min-width:36px!important;max-width:36px!important;
+    height:36px!important;min-height:36px!important;max-height:36px!important;
+  }
+  html body>header #aeNotificationsButton .ae-avisos-icon{
+    width:21px!important;height:21px!important;
+    min-width:21px!important;min-height:21px!important;
+    max-width:21px!important;max-height:21px!important;
+    flex-basis:21px!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  html body>header #aeNotificationsButton .ae-avisos-icon{transition:none!important}
+}
+
