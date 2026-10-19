@@ -3555,11 +3555,10 @@ currentUser = {
                     const stories = filtered.filter(article => categoryKey(article.category) === sport).slice(0,10);
                     const trackId = 'aeNewsSportTrack' + index;
                     const sportKey = sport === 'NFL' ? 'nfl' : 'football';
-                    const sportIcon = sport === 'NFL' ? 'nfl' : 'futbol';
                     return `<section class="ae-news-sport-lane" data-sport="${sportKey}" aria-labelledby="aeNewsSportTitle${index}">
                       <header class="ae-news-sport-head">
                         <h2 id="aeNewsSportTitle${index}"><button type="button" class="ae-news-sport-link" data-ae-sport-section="${sport}" aria-label="Ir a la sección ${sport}">
-                          <img class="ae-news-sport-emblem" src="assets/icons/ae-${sportIcon}-gold.webp" alt="" aria-hidden="true" width="32" height="32" decoding="async"><span>${sport}</span>
+                          <span>${sport}</span>
                         </button></h2>
                       </header>
                       <div id="${trackId}" class="ae-news-sport-track" data-sport="${sport}" role="region" aria-roledescription="carrusel" aria-label="Últimas noticias de ${sport}" tabindex="0">${stories.length ? stories.map(renderNewsCard).join('') : '<p class="ae-news-sport-empty">Todavía no hay noticias de este deporte.</p>'}</div>
