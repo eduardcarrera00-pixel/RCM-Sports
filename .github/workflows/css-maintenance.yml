@@ -43,6 +43,8 @@ jobs:
         run: node tests/community-picks.mjs
       - name: Check current Picks composer UI
         run: node tests/pick-composer-direct.mjs
+      - name: Check updated NFL and Fútbol Takes, reply counts and news
+        run: node tests/news-sports-takes.mjs
       - name: Check account login and session recovery
         run: npm run test:auth
       - name: Check Take and Pick drafts
