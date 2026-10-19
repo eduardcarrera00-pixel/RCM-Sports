@@ -18,7 +18,7 @@
     dialog.innerHTML = `
       <div class="ae-take-discussion-inner">
         <header class="ae-discussion-header">
-          <div class="ae-discussion-titleblock"><span>LA COMUNIDAD DEBATE</span><h2 id="aeTakeDiscussionTitle">Takes</h2></div>
+          <div class="ae-discussion-titleblock"><h2 id="aeTakeDiscussionTitle"><button type="button" id="aeDiscussionAuthor">Aficionado</button> — Takes</h2></div>
           <button type="button" id="aeDiscussionClose" aria-label="Cerrar comentarios"><span aria-hidden="true"></span></button>
         </header>
         <section class="ae-discussion-subject">
@@ -41,6 +41,9 @@
       </div>`;
     document.body.append(dialog);
     $('aeDiscussionClose').addEventListener('click',()=>dialog.close());
+    $('aeDiscussionAuthor').addEventListener('click',()=>{
+      if(current?.author_id)window.openAePublicProfile?.(current.author_id);
+    });
     $('aeDiscussionEditSport').addEventListener('click',()=>{
       if (current && window.aeTakeCategoryEdit) {
         window.aeTakeCategoryEdit.open(current, sport=>{
@@ -82,7 +85,13 @@
       avatar.setAttribute('aria-hidden','true');
       const content=el('div',undefined,'ae-discussion-comment-content');
       const meta=el('div',undefined,'ae-discussion-meta');
-      const author=el('strong','@'+(r.author||'Aficionado'));
+      const authorId=r.author_id||r.user_id||null;
+      const author=el(authorId?'button':'strong','@'+(r.author||'Aficionado'),authorId?'ae-discussion-author-link':undefined);
+      if(authorId){
+        author.type='button';
+        author.setAttribute('aria-label','Ver perfil y Takes de '+(r.author||'Aficionado'));
+        author.addEventListener('click',()=>window.openAePublicProfile?.(authorId));
+      }
       const time=el('time',new Date(r.created_at).toLocaleDateString('es',{day:'numeric',month:'short',year:'numeric'}));
       try{time.dateTime=new Date(r.created_at).toISOString();}catch(_){}
       meta.append(author,time);
@@ -100,17 +109,6 @@
         }else if(typeof openUserAuthModal==='function')openUserAuthModal();
       });
       actions.append(reply);
-      if(typeof currentAdmin!=='undefined' && currentAdmin){
-        const hide=el('button','Ocultar');
-        hide.type='button';hide.className='ae-discussion-hide';
-        hide.addEventListener('click',async()=>{
-          if(!confirm('¿Ocultar este comentario?'))return;
-          const result=await db.rpc('ae_hide_take_reply',{p_reply_id:r.id});
-          if(result.error){$('aeDiscussionStatus').textContent=result.error.message;return;}
-          await load();
-        });
-        actions.append(hide);
-      }
       content.append(actions);
       card.append(avatar,content);
       nodes.set(r.id,{card,data:r});
@@ -254,7 +252,8 @@
     // El título de cada conversación pertenece al autor del Take abierto.
     // La etiqueta "Mis Takes" queda reservada al perfil personal.
     const authorName=String(take.author||'').trim().replace(/^@+/, '').trim() || 'Aficionado';
-    $('aeTakeDiscussionTitle').textContent=authorName+' — Takes';
+    $('aeDiscussionAuthor').textContent='@'+authorName;
+    $('aeDiscussionAuthor').disabled=!take.author_id;
     $('aeDiscussionSubject').textContent=take.title||'Take de la comunidad';
     $('aeDiscussionBody').textContent=take.body||'';
     showVotes(take);
