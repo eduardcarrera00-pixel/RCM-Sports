@@ -7,7 +7,7 @@ const report=JSON.parse(execFileSync(process.execPath,['scripts/audit-css.mjs','
   {encoding:'utf8',maxBuffer:4*1024*1024}));
 assert.equal(report.status,'ok','Every stylesheet referenced in the active cascade must exist');
 assert.deepEqual(report.missing,[],'No missing CSS files');
-assert.ok(report.bundleSourceCount>=70,'Editorial bundle sources must not disappear accidentally');
+assert.equal(report.bundleSourceCount,65,'The 11 safely redundant early bundle sheets must stay removed');
 assert.ok(report.linkedStylesheetCount>=45,'Active component styles must remain linked');
 
 // Existing double-loading is measured, not blindly removed. A later external
@@ -26,8 +26,16 @@ const existingDuplicateSources=[
   'assets/ae-mobile-home-takes-swipe-and-football-news.css'
 ];
 const repeated=report.doubleLoaded.map(row=>row.file);
-assert.deepEqual(repeated.sort(),existingDuplicateSources.sort(),
-  'Review every change to the order or number of double-loaded stylesheets');
+assert.deepEqual(repeated,[],
+  'No stylesheet should be loaded both inside the editorial bundle and standalone');
+const manifest=JSON.parse(fs.readFileSync('assets/style-sources.json','utf8'));
+const htmlLinks=[...fs.readFileSync('index.html','utf8').matchAll(/<link\\b[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']+)["']/g)]
+  .map(match=>match[1].split('?')[0]);
+for(const file of existingDuplicateSources){
+  assert.equal(manifest.includes(file),false, file+' must be omitted from the initial bundle');
+  assert.equal(htmlLinks.filter(url=>url===file).length,1,
+    file+' must remain linked exactly once, in its approved final position');
+}
 
 // First safe cleanup: two identical, unconditional badge visibility rules
 // were in the same standalone CSS. Preserve the later authoritative rule.
