@@ -133,6 +133,7 @@
        p_body:body
      });
      if(r.error)throw r.error;
+     window.aeDraftGuard?.clear('take');
      form.reset();
      if(activeSection)await load();
      document.dispatchEvent(new Event('ae:takes-updated'));
@@ -165,7 +166,8 @@
  window.renderFreeTakesVisibility=visibility;
  window.aeOpenTakeComposer=(requestedSport)=>{
   if(typeof aeRequestPublication!=='function')return;
-  return aeRequestPublication('take',()=>{
+  return aeRequestPublication('take',async()=>{
+   await window.aeDraftGuard?.restore('take');
    const dialog=$('aeTakeComposerDialog');
    const form=$('freeTakesForm');
    if(!dialog||!form)return;
