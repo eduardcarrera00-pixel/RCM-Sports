@@ -31,3 +31,202 @@
  }
  html body>header #loggedAdminContainer .ae-publish-action i{font-size:13px!important}
 }
+
+
+/* AE SPORTS · perfil administrador siempre visible en móvil (2026-10-18). */
+@media (max-width:760px) {
+  /* Three bounded account rails: theme | profile/actions | compact sports manager.
+     Do not change the guest/reader header or desktop navigation. */
+  html body>header .ae-mobile-header-grid>.ae-header-actions:has(#loggedAdminContainer:not(.hidden)) {
+    position:relative!important;
+    inset:auto!important;
+    display:grid!important;
+    grid-template-columns:40px minmax(0,1fr) 40px!important;
+    grid-template-rows:44px!important;
+    align-items:center!important;
+    justify-items:center!important;
+    column-gap:6px!important;
+    row-gap:0!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    max-width:440px!important;
+    min-width:0!important;
+    margin:0 auto!important;
+    padding:6px 8px 8px!important;
+    flex-wrap:nowrap!important;
+    overflow:visible!important;
+  }
+  html body>header .ae-header-actions:has(#loggedAdminContainer:not(.hidden)) #themeToggle {
+    grid-column:1!important;
+    grid-row:1!important;
+    position:static!important;
+    box-sizing:border-box!important;
+    width:40px!important;
+    min-width:40px!important;
+    max-width:40px!important;
+    height:44px!important;
+    min-height:44px!important;
+    max-height:44px!important;
+    padding:4px!important;
+    margin:0!important;
+    transform:none!important;
+  }
+  html body>header .ae-header-actions:has(#loggedAdminContainer:not(.hidden)) #aeCategoryAdmin:not([hidden]) {
+    grid-column:3!important;
+    grid-row:1!important;
+    justify-self:center!important;
+    position:relative!important;
+    inset:auto!important;
+    box-sizing:border-box!important;
+    display:block!important;
+    flex:none!important;
+    width:40px!important;
+    min-width:40px!important;
+    max-width:40px!important;
+    height:44px!important;
+    min-height:44px!important;
+    max-height:44px!important;
+    margin:0!important;
+    padding:0!important;
+    transform:none!important;
+    z-index:5!important;
+  }
+  html body>header .ae-header-actions:has(#loggedAdminContainer:not(.hidden)) #aeCategoryAdmin>summary {
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    box-sizing:border-box!important;
+    width:40px!important;
+    min-width:40px!important;
+    max-width:40px!important;
+    height:44px!important;
+    min-height:44px!important;
+    max-height:44px!important;
+    margin:0!important;
+    padding:0!important;
+    border:1px solid transparent!important;
+    border-radius:0!important;
+    background:transparent!important;
+    overflow:hidden!important;
+    font-size:14px!important;
+    list-style:none!important;
+    cursor:pointer!important;
+  }
+  html body>header .ae-header-actions:has(#loggedAdminContainer:not(.hidden)) #aeCategoryAdmin>summary:focus-visible {
+    outline:2px solid #d3a669!important;
+    outline-offset:1px!important;
+  }
+  /* Hide only the text, not the manage-sports feature or its accessible label. */
+  html body>header .ae-header-actions:has(#loggedAdminContainer:not(.hidden)) #aeCategoryAdmin .ae-admin-manage-label {
+    display:none!important;
+  }
+  html body>header .ae-header-actions:has(#loggedAdminContainer:not(.hidden)) #aeCategoryAdmin .ae-admin-manage-icon {
+    display:grid!important;
+    place-items:center!important;
+    grid-row:auto!important;
+    box-sizing:border-box!important;
+    width:18px!important;
+    height:18px!important;
+    min-width:18px!important;
+    min-height:18px!important;
+    font-size:14px!important;
+    line-height:1!important;
+    margin:0!important;
+    padding:0!important;
+  }
+  html body>header .ae-header-actions:has(#loggedAdminContainer:not(.hidden)) #aeCategoryAdmin .ae-category-admin-menu {
+    position:absolute!important;
+    top:calc(100% + 6px)!important;
+    right:0!important;
+    left:auto!important;
+    width:min(288px,calc(100vw - 20px))!important;
+    z-index:10050!important;
+  }
+  html body>header .ae-header-actions:has(#loggedAdminContainer:not(.hidden)) #loggedAdminContainer {
+    grid-column:2!important;
+    grid-row:1!important;
+    position:relative!important;
+    inset:auto!important;
+    display:flex!important;
+    flex-wrap:nowrap!important;
+    align-items:center!important;
+    justify-content:center!important;
+    box-sizing:border-box!important;
+    gap:clamp(3px,1.6vw,8px)!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    height:44px!important;
+    min-height:44px!important;
+    margin:0!important;
+    padding:0!important;
+    transform:none!important;
+    z-index:4!important;
+  }
+  html body>header .ae-header-actions #loggedAdminContainer.hidden {display:none!important}
+  html body>header .ae-header-actions:has(#loggedAdminContainer:not(.hidden)) #loggedAdminContainer .ae-admin-profile {
+    order:0!important;
+    position:relative!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:center!important;
+    box-sizing:border-box!important;
+    flex:0 1 82px!important;
+    width:82px!important;
+    min-width:52px!important;
+    max-width:82px!important;
+    height:44px!important;
+    min-height:44px!important;
+    max-height:44px!important;
+    margin:0!important;
+    padding:2px 0!important;
+    gap:2px!important;
+    overflow:hidden!important;
+    border:0!important;
+    background:transparent!important;
+    z-index:4!important;
+  }
+  html body>header .ae-header-actions:has(#loggedAdminContainer:not(.hidden)) #loggedAdminContainer .ae-admin-profile-art {
+    display:block!important;
+    flex:0 0 18px!important;
+    width:18px!important;
+    min-width:18px!important;
+    max-width:18px!important;
+    height:18px!important;
+    min-height:18px!important;
+    max-height:18px!important;
+  }
+  html body>header .ae-header-actions:has(#loggedAdminContainer:not(.hidden)) #loggedAdminContainer #adminNameDisplay {
+    display:block!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    max-width:100%!important;
+    margin:0!important;
+    font-size:9px!important;
+    line-height:12px!important;
+    text-align:center!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+  html body>header .ae-header-actions:has(#loggedAdminContainer:not(.hidden)) #loggedAdminContainer .ae-publish-action {
+    order:1!important;
+    flex-shrink:0!important;
+    margin:0!important;
+    z-index:4!important;
+  }
+  html body>header .ae-header-actions:has(#loggedAdminContainer:not(.hidden)) #loggedAdminContainer .ae-signout-action {
+    order:2!important;
+    flex:0 0 36px!important;
+    box-sizing:border-box!important;
+    width:36px!important;
+    min-width:36px!important;
+    max-width:36px!important;
+    height:44px!important;
+    min-height:44px!important;
+    margin:0!important;
+    padding:4px!important;
+    z-index:4!important;
+  }
+}
