@@ -150,3 +150,25 @@ assert.equal(extract(scan(multiEvent3.map(l=>l.replace('+1475','')))).ok,false,
 assert.equal(extract(scan(['My Bets','Straight Bet','Chiefs vs Bills',
  'Chiefs Moneyline +150 +165','Stake $10.00'])).ok,false,'Conflicting odds must not be chosen');
 console.log('PASS: single bets in English and Spanish, and 3-leg parlays with explicit total, no amounts imported or incomplete bets.');
+
+
+const {receiptEventDate}=require('../assets/ae-pick-capture-parser.js');
+const dateScan=lines=>({text:lines.join('\n'),confidence:95});
+const eventExample=['My Bets','Same Game Parlay +240',
+ 'Paris St-G Moneyline (3-way), Over 3.5 Goals Over/Under 3.5 Goals, Yes Both Teams To Score',
+ 'Paris St-G v Barcelona TUE 3:00PM ET',
+ 'Paris St-G','MONEYLINE (3-WAY)','Over 3.5 Goals','OVER/UNDER 3.5 GOALS','Yes','BOTH TEAMS TO SCORE',
+ '$10.00 $34.08','TOTAL WAGER TOTAL PAYOUT','PLACED: 10/19/2026 8:54PM ET'];
+assert.equal(extract(dateScan(eventExample)).eventDate,'2026-10-20','Event weekday after Monday placement auto-fills Tuesday');
+assert.equal(extract(dateScan(eventExample)).dateSource,'weekday_placed');
+assert.deepEqual(receiptEventDate(dateScan(['BETSLIP','Raptors vs Celtics','TUE 7:30PM ET']), '2026-10-19'),
+ {eventDate:'2026-10-20',dateSource:'weekday_estimated'},'Weekday only can estimate upcoming game');
+assert.deepEqual(receiptEventDate(dateScan(['BETSLIP','Lakers vs Celtics 2026-11-12','PLACED: 10/19/2026']), '2026-10-19'),
+ {eventDate:'2026-11-12',dateSource:'exact'},'Explicit event date overrides placement date');
+assert.equal(receiptEventDate(dateScan(['BETSLIP','Lakers vs Celtics','PLACED: 10/19/2026']), '2026-10-19').eventDate,'',
+ 'A wager placement date must never impersonate the event date');
+assert.deepEqual(receiptEventDate(dateScan(['Parlay 2 Legs','Bears vs Packers TUE 4PM ET','Boston vs Toronto FRI 7PM ET','PLACED: 10/19/2026']), '2026-10-19'),
+ {eventDate:'2026-10-23',dateSource:'last_event'},'For multi-day parlays use the final event');
+assert.equal(receiptEventDate(dateScan(['BETSLIP','Lakers vs Celtics 2026-02-30']), '2026-10-19').eventDate,'',
+ 'Invalid calendar dates may not be auto-filled');
+console.log('PASS: instant date from exact match, English weekday, ticket placement anchor, multi-event last date, invalid dates and no blind placement date.');
