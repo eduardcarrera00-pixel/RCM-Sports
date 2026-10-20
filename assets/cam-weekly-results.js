@@ -61,8 +61,28 @@
      const surface=host.closest('#picksFeatured')||host;
      surface.classList.add('cam-weekly-result-surface');
      const image=surface.querySelector('.ae-weekly-banner,.ae-weekly-home-thumbnail,.ae-weekly-mobile-banner-thumb,.ae-weekly-inline-photo');
-     const badge=el('p',outcome(result),'cam-weekly-result-badge');
+     // Badge editorial: icono vectorial propio, sin emojis ni texto superpuesto.
+     const badge=el('p',null,'cam-weekly-result-badge');
+     const state=result.outcome==='won'?'won':result.outcome==='lost'?'lost':'pending';
+     const label=outcome(result).replace(/^✅\\s*/,'');
+     badge.dataset.outcome=state;
      badge.setAttribute('role','status');
+     badge.setAttribute('aria-label',label);
+     const mark=el('span',null,'cam-weekly-result-mark');
+     mark.setAttribute('aria-hidden','true');
+     const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+     svg.setAttribute('viewBox','0 0 24 24');
+     svg.setAttribute('fill','none');
+     svg.setAttribute('stroke','currentColor');
+     svg.setAttribute('stroke-width','2.7');
+     svg.setAttribute('stroke-linecap','round');
+     svg.setAttribute('stroke-linejoin','round');
+     svg.setAttribute('aria-hidden','true');
+     const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+     path.setAttribute('d',state==='won'?'M5 12.5l4.4 4.2L19 7':state==='lost'?'M6 6l12 12M18 6L6 18':'M12 6v6l4 2');
+     svg.append(path);
+     mark.append(svg);
+     badge.append(mark,el('span',label,'cam-weekly-result-label'));
      if(image){
        badge.classList.add('cam-weekly-result-on-photo');
        const position=()=>{
