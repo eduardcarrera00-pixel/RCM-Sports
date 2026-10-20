@@ -569,7 +569,7 @@ function buildComposer(){
  const previewNote=el('p','Revisa estos datos antes de publicar.','cp-compose-hint');
  const previewLegs=el('div',null,'cp-compose-preview-legs'),previewTotal=el('p','','cp-compose-preview-total');
  preview.append(previewTitle,previewPrivacy,changeCapture,previewNote,previewLegs,previewTotal);
- let previewKey='',originalBeforeBoost=false;
+ let previewKey='',originalBeforeBoost=false,captureReadings=[];
  output.setAttribute('aria-live','polite');
  const status=el('p','','cp-status');status.setAttribute('role','status');
  function values(){return rows.map(r=>({sport:r.sport.input.value.trim(),event:r.event.input.value.trim(),selection:r.selection.input.value.trim(),odds:Number(r.odds.input.value)}));}
@@ -584,16 +584,31 @@ function buildComposer(){
   const american=total?.american??(decimal>=2?Math.round((decimal-1)*100):-Math.round(100/(decimal-1)));
   output.textContent=valid?'Momio total · '+(american>0?'+':'')+american:'Importa una captura para leer el momio';
   preview.hidden=form.dataset.imported!=='true';
-  const key=JSON.stringify({picks,american,originalBeforeBoost});
+  const key=JSON.stringify({picks,american,originalBeforeBoost,captureReadings});
   if(!preview.hidden&&key!==previewKey){
    previewKey=key;
    previewNote.textContent=originalBeforeBoost?'Partido, pronóstico y momio original, sin profit boost, leídos de tu captura.':'Partido, pronóstico y momio leídos de tu captura.';
    previewLegs.replaceChildren(...picks.map((pick,index)=>{
     const entry=el('div',null,'cp-compose-preview-leg');
     if(picks.length>1)entry.append(el('h4','Selección '+(index+1)));
+    const receipt=captureReadings[index];
+    const glance=el('div',null,'cp-compose-ticket-head');
+    glance.append(el('span',pick.sport+(receipt?.selectionCount?' · '+receipt.selectionCount+' pronósticos':''),'cp-compose-ticket-sport'),el('strong',pick.event,'cp-compose-ticket-match'));
+    entry.append(glance);
+    if(receipt?.selectionCount>1){
+     const choices=el('ul',null,'cp-compose-ticket-choices');
+     choices.append(...pick.selection.split(' + ').map(text=>el('li',text)));
+     entry.append(choices);
+    }
     const details=el('dl');
     for(const [label,value] of [['Deporte',pick.sport],['Partido',pick.event],['Pronóstico',pick.selection],['Momio',(pick.odds>0?'+':'')+pick.odds]]){
      const item=el('div');item.append(el('dt',label),el('dd',value));details.append(item);
+    }
+    if(Number.isFinite(receipt?.wager)||Number.isFinite(receipt?.payout)){
+     for(const [label,value] of [['Apuesta',receipt?.wager],['Pago potencial',receipt?.payout]]){
+      if(!Number.isFinite(value))continue;
+      const item=el('div',null,'cp-compose-ticket-amount');item.append(el('dt',label),el('dd','$'+Number(value).toFixed(2)));details.append(item);
+     }
     }
     entry.append(details);return entry;
    }));
@@ -629,7 +644,7 @@ function buildComposer(){
  form.append(legs,preview,footer);addRow();
  function applyImport(imported){
   const data=imported?.readings||[];
-  originalBeforeBoost=data.some(reading=>reading.originalBeforeBoost);
+  originalBeforeBoost=data.some(reading=>reading.originalBeforeBoost);captureReadings=data;
   while(rows.length>Math.max(1,data.length))rows.pop().box.remove();
   while(rows.length<data.length)addRow();
   rows.forEach((row,i)=>{for(const key of ['sport','event','selection','odds'])row[key].input.value=data[i]?(key==='sport'?(data[i][key]||'Otros'):key==='odds'?(data[i].odds>0?'+':'')+data[i].odds:data[i][key]):'';});
