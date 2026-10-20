@@ -1,0 +1,48 @@
+/* AE SPORTS · Cabecera editorial de los Takes más recientes (NFL y Fútbol).
+   Solo presentación; se conservan los 20 Takes de la lista y su scroll. */
+html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes.ae-free-takes[data-sport] > #aeTakesFeedHeading {
+  box-sizing: border-box !important;
+  display: flex !important;
+  align-items: center !important;
+  width: 100% !important;
+  min-height: 48px !important;
+  margin: 9px 0 5px !important;
+  padding: 10px 15px !important;
+  border: 1px solid rgba(202, 164, 117, .43) !important;
+  border-left: 3px solid #d0a46f !important;
+  border-radius: 0 !important;
+  background: linear-gradient(95deg, rgba(191, 141, 92, .18), rgba(15, 43, 60, .94) 54%, rgba(13, 37, 54, .96)) !important;
+  color: #f4e6d5 !important;
+  font: 600 clamp(24px, 2.2vw, 29px)/1.13 Newsreader, Georgia, serif !important;
+  letter-spacing: -.018em !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+}
+/* Sin cifra ni adornos innecesarios: el título es únicamente "Últimos Takes". */
+html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes.ae-free-takes[data-sport] > #aeTakesFeedHeading::before,
+html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes.ae-free-takes[data-sport] > #aeTakesFeedHeading::after {
+  content: none !important;
+  display: none !important;
+}
+/* Acercar el encabezado a las tarjetas sin alterar la cuadrícula ni el desplazamiento. */
+html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes.ae-free-takes[data-sport] > #freeTakesFeed {
+  margin-top: 4px !important;
+}
+html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes.ae-free-takes[data-sport] > #freeTakesStatus:empty {
+  display: none !important;
+}
+html:not(.dark) body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes.ae-free-takes[data-sport] > #aeTakesFeedHeading {
+  border-color: rgba(154, 112, 72, .39) !important;
+  border-left-color: #aa7948 !important;
+  background: linear-gradient(95deg, rgba(213, 184, 140, .27), rgba(248, 242, 230, .97) 64%, rgba(238, 229, 215, .98)) !important;
+  color: #283d4a !important;
+}
+@media (max-width: 760px) {
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes.ae-free-takes[data-sport] > #aeTakesFeedHeading {
+    min-height: 43px !important;
+    margin: 7px 0 4px !important;
+    padding: 8px 11px !important;
+    font-size: 24px !important;
+  }
+}
