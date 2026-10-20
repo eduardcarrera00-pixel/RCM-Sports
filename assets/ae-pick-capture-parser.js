@@ -221,6 +221,7 @@
   const summary=part.slice(0,eventIndex).map(l=>l.text).join(' ');
   const expected=new Set(['moneyline','total','btts'].filter(k=>marketKind(k==='moneyline'?'moneyline':k==='total'?'over/under':'both teams to score')&&
    (k==='moneyline'?/\bmoneyline\b/i.test(summary):k==='total'?/over\s*\/\s*under/i.test(summary):/both teams to score/i.test(summary))));
+  if(expected.size<2)return fail('La imagen debe incluir el resumen de los mercados y las selecciones completas para cotejar tu combinada.');
   const conditions=[],seen=new Set();
   const details=part.slice(eventIndex+1);
   for(let i=0;i<details.length;i++){
@@ -236,7 +237,7 @@
    if(kind==='btts'&&!/\b(yes|no|si|sí)\b/i.test(name))return fail('No pude distinguir la selección de ambos anotan.');
    conditions.push(name+' · '+tidy(label.text));seen.add(kind);
   }
-  if(conditions.length<2||conditions.length>12||[...expected].some(k=>!seen.has(k)))
+  if(conditions.length!==expected.size||conditions.length>12||[...expected].some(k=>!seen.has(k)))
    return fail('Falta una de las selecciones de la combinada. Incluye sus mercados completos.');
   const selection=conditions.join(' + ');
   if(selection.length>2000)return fail('La combinada es demasiado extensa para publicarla completa.');
