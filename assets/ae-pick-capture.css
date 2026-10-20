@@ -36,5 +36,31 @@ html body #cpComposePanel #cpForm .cp-capture-readings strong{font-size:16px;lin
 html body #cpComposePanel #cpForm .cp-capture-readings small{color:var(--cp-dialog-muted);}
 html body #cpComposePanel #cpForm .cp-capture-odds{font-weight:700;}
 html body #cpComposePanel #cpForm .cp-capture-status:empty{display:none;}
+/* Las etapas reflejan la lectura y el cierre real del lector, sin porcentajes de borrado simulados. */
+html body #cpComposePanel #cpForm .cp-capture-privacy{display:grid;grid-template-columns:32px minmax(0,1fr);gap:10px 12px;margin:16px 0 0;padding:14px 0;border-top:1px solid #55707c;color:#c5cdd2;}
+html body #cpComposePanel #cpForm .cp-capture-privacy-icon{display:block;width:32px;height:32px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
+html body #cpComposePanel #cpForm .cp-capture-privacy-check{display:none;}
+html body #cpComposePanel #cpForm .cp-capture-privacy-copy{min-width:0;font:12px/1.5 Inter,system-ui,sans-serif;}
+html body #cpComposePanel #cpForm .cp-capture-privacy-copy strong{display:block;margin:0 0 3px;font-size:14px;color:#f4e8db;}
+html body #cpComposePanel #cpForm .cp-capture-privacy-copy p{margin:0;overflow-wrap:anywhere;}
+html body #cpComposePanel #cpForm .cp-capture-privacy-steps{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:2px 0 0;padding:0;list-style:none;font:500 10px/1.5 Inter,system-ui,sans-serif;}
+html body #cpComposePanel #cpForm .cp-capture-privacy-steps li{min-width:0;padding-top:7px;border-top:3px solid #55707c;overflow-wrap:anywhere;}
+html body #cpComposePanel #cpForm .cp-capture-privacy-steps li[data-state="active"]{border-color:#be926c;color:#e5c6a5;animation:cp-capture-cleanup-pulse 1.2s ease-in-out infinite;}
+html body #cpComposePanel #cpForm .cp-capture-privacy-steps li[data-state="complete"]{border-color:#97bcb2;}
+html body #cpComposePanel #cpForm .cp-capture-privacy[data-state="discarding"] .cp-capture-privacy-file{animation:cp-capture-cleanup-pulse 1.2s ease-in-out infinite;}
+html body #cpComposePanel #cpForm .cp-capture-privacy[data-state="complete"] .cp-capture-privacy-file{display:none;}
+html body #cpComposePanel #cpForm .cp-capture-privacy[data-state="complete"] .cp-capture-privacy-check{display:block;stroke:#97bcb2;stroke-dasharray:30;animation:cp-capture-cleanup-check .35s ease-out;}
+html body #cpComposePanel #cpForm .cp-capture-privacy[data-state="complete"] .cp-capture-privacy-copy strong{color:#b6d8cd;}
+html body #cpComposePanel #cpForm .cp-capture-privacy[data-state="unconfirmed"] li{animation:none;}
+html:not(.dark) body #cpComposePanel #cpForm .cp-capture-privacy{border-color:#c9b49c;color:#566876;}
+html:not(.dark) body #cpComposePanel #cpForm .cp-capture-privacy-copy strong{color:#273b49;}
+html:not(.dark) body #cpComposePanel #cpForm .cp-capture-privacy-steps li{border-color:#d5d8d6;}
+html:not(.dark) body #cpComposePanel #cpForm .cp-capture-privacy-steps li[data-state="active"]{border-color:#855b43;color:#855b43;}
+html:not(.dark) body #cpComposePanel #cpForm .cp-capture-privacy-steps li[data-state="complete"]{border-color:#397562;}
+html:not(.dark) body #cpComposePanel #cpForm .cp-capture-privacy[data-state="complete"] .cp-capture-privacy-check{stroke:#397562;}
+html:not(.dark) body #cpComposePanel #cpForm .cp-capture-privacy[data-state="complete"] .cp-capture-privacy-copy strong{color:#2e6656;}
+@keyframes cp-capture-cleanup-pulse{50%{opacity:.4;}}
+@keyframes cp-capture-cleanup-check{from{stroke-dashoffset:30;}to{stroke-dashoffset:0;}}
+@media(prefers-reduced-motion:reduce){html body #cpComposePanel #cpForm .cp-capture-privacy *{animation:none!important;}}
 html body #cpComposePanel #cpForm input[readonly]{background:var(--cp-dialog-field);border-style:dashed;cursor:default;opacity:1;}
 html body #cpComposePanel #cpForm button[type="submit"]:disabled{opacity:.5;cursor:default;}

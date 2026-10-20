@@ -29,6 +29,7 @@ await page.goto('http://127.0.0.1:8767/',{waitUntil:'domcontentloaded'});await p
 assert.equal(requests.some(r=>r.url.includes('/vendor/ocr/')),false,'Heavy OCR must not load before choosing a file');
 assert.equal(await page.locator('#cpForm button[type=submit]').isDisabled(),true);
 assert.equal(await page.locator('.cp-capture').isVisible(),true);
+assert.equal(await page.locator('.cp-capture-privacy').isVisible(),false,'The deletion indicator starts only after choosing an image');
 assert.equal(await page.locator('.cp-compose-modes').count(),0,'No simple/combined controls');
 assert.equal(await page.locator('.cp-legs').isVisible(),false,'The user never types betting details');
 for(const cls of ['.cp-compose-date','.cp-compose-analysis','.cp-compose-footer','.ae-draft-tools'])assert.equal(await page.locator('#cpForm '+cls).isVisible(),false,'Before upload only the capture task appears: '+cls);
@@ -36,6 +37,10 @@ assert.match(await page.locator('#cpComposeIntro').innerText(),/apuestas ya hech
 if(process.env.AE_CAPTURE_QA_DIR){fs.mkdirSync(process.env.AE_CAPTURE_QA_DIR,{recursive:true});await page.screenshot({path:process.env.AE_CAPTURE_QA_DIR+'/capture-first-mobile.png'});await page.setViewportSize({width:1366,height:940});await page.screenshot({path:process.env.AE_CAPTURE_QA_DIR+'/capture-first-desktop.png'});await page.setViewportSize({width:390,height:940});}
 async function scan(filename){await page.locator('#cpCaptureFile').setInputFiles(fixtures+'/'+filename);await page.waitForFunction(()=>['matched','error'].includes(document.querySelector('.cp-capture')?.dataset.state),null,{timeout:90000});const state=await page.locator('.cp-capture').getAttribute('data-state'),status=await page.locator('#cpCaptureStatus').innerText();console.log(filename,state,status);if(state!=='matched')fs.writeFileSync(fixtures+'/browser-ocr-failure.json',JSON.stringify(await page.evaluate(()=>window.testOcrReadings)));assert.equal(state,'matched');await page.waitForFunction(()=>document.querySelector('#cpCaptureFile').files.length===0);}
 await scan('simple.png');await page.waitForTimeout(100);assert.equal(activeWorkers,0);
+assert.equal(await page.locator('.cp-capture-privacy').getAttribute('data-state'),'complete');
+assert.match(await page.locator('.cp-capture-privacy').innerText(),/Captura descartada/);
+assert.match(await page.locator('.cp-capture-privacy').innerText(),/solo guardamos los datos de tu pick/);
+assert.equal(await page.locator('.cp-capture-privacy-steps li[data-state=complete]').count(),3);
 assert.equal(await page.locator('[name=odds_0]').inputValue(),'+150');for(const name of ['sport','event','selection','odds'])assert.equal(await page.locator('[name='+name+'_0]').evaluate(el=>el.readOnly),true);await page.locator('[name=event_date]').fill(new Date().toISOString().slice(0,10));
 assert.equal(payloads.length,0);assert.equal(await page.locator('#cpForm button[type=submit]').isDisabled(),true,'Confirmation is mandatory');
 await page.locator('#cpCaptureConfirm').check();
@@ -45,6 +50,7 @@ assert.equal(await page.locator('#cpCaptureConfirm').isChecked(),false,'Editing 
 assert.equal(await page.locator('#cpForm button[type=submit]').isDisabled(),true);
 await page.locator('#cpCaptureConfirm').check();
 for(const width of [360,390,768,1366])for(const dark of [false,true]){await page.setViewportSize({width,height:940});await page.evaluate(dark=>document.documentElement.classList.toggle('dark',dark),dark);const fit=await page.locator('#cpComposePanel').evaluate(el=>el.scrollWidth<=el.clientWidth+1);assert.equal(fit,true,'Composer must fit '+width);}
+await page.emulateMedia({reducedMotion:'reduce'});assert.equal(await page.locator('.cp-capture-privacy-check').evaluate(el=>getComputedStyle(el).animationName),'none','Respect reduced motion');await page.emulateMedia({reducedMotion:'no-preference'});
 await page.setViewportSize({width:390,height:940});if(process.env.AE_CAPTURE_QA_DIR)fs.mkdirSync(process.env.AE_CAPTURE_QA_DIR,{recursive:true});await page.locator('.cp-capture').screenshot({path:process.env.AE_CAPTURE_QA_DIR?process.env.AE_CAPTURE_QA_DIR+'/capture-import-mobile.png':fixtures+'/capture-import-mobile.png'});
 if(process.env.AE_CAPTURE_QA_DIR)await page.screenshot({path:process.env.AE_CAPTURE_QA_DIR+'/capture-import-dialog.png'});
 await page.locator('#cpForm button[type=submit]').click();await page.waitForFunction(()=>!document.getElementById('cpComposePanel').open);assert.equal(payloads.length,1);assert.equal(payloads[0].capture_check.readings[0].odds,150);assert.equal(JSON.stringify(payloads).includes('data:image'),false);assert.equal(JSON.stringify(payloads).includes('Balance'),false);

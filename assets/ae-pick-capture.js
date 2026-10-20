@@ -107,35 +107,58 @@
   input.type='file';input.id='cpCaptureFile';input.accept='image/png,image/jpeg,image/webp';input.multiple=true;input.hidden=true;picker.addEventListener('click',()=>input.click());
   const help=node('p','Incluye el partido, el pronóstico, el momio y la fecha del evento si aparece. Una captura completa o una por selección · PNG, JPG o WebP · hasta 8 MB por imagen. La imagen no se guarda.','cp-capture-help');help.id='cpCaptureHelp';
   const status=node('p','','cp-capture-status');status.id='cpCaptureStatus';status.setAttribute('role','status');status.setAttribute('aria-live','polite');
+  const privacy=node('div',null,'cp-capture-privacy');privacy.hidden=true;privacy.setAttribute('role','status');privacy.setAttribute('aria-live','polite');privacy.setAttribute('aria-atomic','true');
+  const privacyIcon=document.createElementNS('http://www.w3.org/2000/svg','svg');privacyIcon.setAttribute('viewBox','0 0 32 32');privacyIcon.setAttribute('aria-hidden','true');privacyIcon.classList.add('cp-capture-privacy-icon');
+  privacyIcon.innerHTML='<g class="cp-capture-privacy-file"><path d="M9 3h10l6 6v20H7V3h2ZM19 3v7h6M11 15h10M11 20h7"/></g><path class="cp-capture-privacy-check" d="m8 16 5 5L24 10"/>';
+  const privacyCopy=node('div',null,'cp-capture-privacy-copy'),privacyTitle=node('strong'),privacyText=node('p');privacyCopy.append(privacyTitle,privacyText);
+  const privacySteps=node('ol',null,'cp-capture-privacy-steps');privacySteps.setAttribute('aria-hidden','true');
+  privacySteps.append(...['Lectura','Descarte','Completado'].map(text=>node('li',text)));
+  privacy.append(privacyIcon,privacyCopy,privacySteps);
   const summary=node('ul',null,'cp-capture-readings');summary.hidden=true;
   const confirmation=node('label',null,'cp-capture-confirm'),check=document.createElement('input');check.type='checkbox';check.id='cpCaptureConfirm';
   const confirmationText=node('span','Confirmo que hice esta apuesta, revisé el partido y el pronóstico y comprobé la fecha del evento.');
   confirmation.append(check,confirmationText);confirmation.hidden=true;
   const cancel=node('button','Cancelar lectura','cp-capture-cancel');cancel.type='button';cancel.hidden=true;
-  panel.append(title,intro,picker,input,help,status,summary,cancel);
+  panel.append(title,intro,picker,input,help,privacy,status,summary,cancel);
   form.prepend(panel);form.classList.add('cp-capture-first');
   form.querySelector('.cp-compose-footer').before(confirmation);
   const isCurrent=job=>active===job&&!job.cancelled;
+  function showPrivacy(state){
+   const copy={reading:['Leyendo en tu dispositivo','La captura se procesa aquí, sin subir la imagen.'],discarding:['Descartando captura…','Liberando la imagen y cerrando el lector.'],complete:['Captura descartada','La imagen no se ha subido ni guardado. Al publicar, solo guardamos los datos de tu pick.'],unconfirmed:['No se pudo confirmar el descarte','Recarga esta página para cerrar el lector antes de volver a intentarlo.']};
+   privacy.hidden=false;privacy.dataset.state=state;privacyTitle.textContent=copy[state][0];privacyText.textContent=copy[state][1];
+   const current={reading:0,discarding:1,complete:3,unconfirmed:1}[state];
+   Array.from(privacySteps.children).forEach((step,index)=>{step.dataset.state=index<current?'complete':index===current?'active':'pending';});
+  }
   function updateDateConfirmation(){
    const value=form.elements.namedItem('event_date')?.value,stamp=Date.parse(value+'T12:00:00Z');
    const date=Number.isFinite(stamp)?new Intl.DateTimeFormat('es',{dateStyle:'long',timeZone:'UTC'}).format(new Date(stamp)):'';
    confirmationText.textContent='Confirmo que hice esta apuesta, revisé el partido y el pronóstico y comprobé la fecha del evento'+(date?': '+date+'.':'.');
   }
   function dispose(job){
-   if(!job)return;
+   if(!job)return Promise.resolve(true);
+   if(job.disposal)return job.disposal;
    clearTimeout(job.timer);job.files=[];
    for(const canvas of job.canvases){canvas.width=1;canvas.height=1;}job.canvases.clear();
    for(const url of job.urls)URL.revokeObjectURL(url);job.urls.clear();
-   if(job.worker){void job.worker.terminate().catch(()=>{});job.worker=null;}
+   const worker=job.worker;job.worker=null;
+   let closed=Promise.resolve(true);
+   try{if(worker)closed=Promise.resolve(worker.terminate()).then(()=>true,()=>false);}catch{closed=Promise.resolve(false);}
+   job.disposal=Promise.all([closed,job.imageTask]).then(([discarded])=>discarded);
+   return job.disposal;
   }
   function stop(){
    const job=active;if(!job)return;
    job.cancelled=true;active=null;job.abort?.(Error('Lectura cancelada.'));dispose(job);
-   input.value='';input.disabled=false;picker.disabled=false;cancel.hidden=true;panel.removeAttribute('aria-busy');
+   input.value='';input.disabled=false;picker.disabled=false;cancel.hidden=true;cancel.disabled=false;panel.removeAttribute('aria-busy');
+   return job;
   }
-  function clear(message='Elige una captura para importar tu apuesta y su momio.'){
-   stop();sequence++;result=null;signature='';check.checked=false;confirmation.hidden=true;summary.hidden=true;summary.replaceChildren();
+  function clear(message='Elige una captura para importar tu apuesta y su momio.',showDiscard=false){
+   const job=stop(),revision=++sequence;result=null;signature='';check.checked=false;confirmation.hidden=true;summary.hidden=true;summary.replaceChildren();privacy.hidden=true;
    input.value='';picker.textContent='Subir captura';panel.dataset.state='empty';status.textContent=message;applyImport(null);onChange();
+   if(showDiscard&&job){
+    showPrivacy('discarding');
+    void dispose(job).then(discarded=>{if(sequence===revision&&!active)showPrivacy(discarded?'complete':'unconfirmed');});
+   }
   }
   function invalidate(){
    if(result&&signature!==fingerprint())clear('La apuesta cambió. Importa otra captura para mantener unidos partido, pronóstico y momio.');
@@ -151,10 +174,11 @@
    }
    const job={id:++sequence,files,worker:null,canvases:new Set(),urls:new Set(),cancelled:false,abort:null,timer:null};files=[];active=job;
    const aborted=new Promise((_,reject)=>{job.abort=reject;});
-   input.disabled=true;picker.disabled=true;cancel.hidden=false;panel.setAttribute('aria-busy','true');panel.dataset.state='reading';status.textContent='Preparando el lector en tu dispositivo…';
+   input.disabled=true;picker.disabled=true;cancel.hidden=false;cancel.disabled=false;panel.setAttribute('aria-busy','true');panel.dataset.state='reading';showPrivacy('reading');status.textContent='Preparando el lector en tu dispositivo…';
    job.timer=setTimeout(()=>{
-    if(!isCurrent(job))return;clear('La lectura tardó demasiado. Prueba una captura más pequeña o más nítida.');
+    if(!isCurrent(job))return;clear('La lectura tardó demasiado. Prueba una captura más pequeña o más nítida.',true);
    },90000);
+   let prepared=null,failure='';
    try{
     const T=await Promise.race([engine(),aborted]);
     if(!isCurrent(job))return;
@@ -165,7 +189,8 @@
     job.worker=await Promise.race([pending,aborted]);if(!isCurrent(job))return;
     const readings=[];let total=null,eventDate='';
     for(let i=0;i<job.files.length;i++){
-     const canvas=await Promise.race([imageCanvas(job.files[i],job),aborted]);
+     const rendering=imageCanvas(job.files[i],job);job.imageTask=rendering.catch(()=>{});
+     const canvas=await Promise.race([rendering,aborted]);
      let compared,bestPartial;
      for(const mode of ['6','11']){
       await job.worker.setParameters({tessedit_pageseg_mode:mode,preserve_interword_spaces:'1'});
@@ -190,23 +215,32 @@
      readings.push(...compared.readings);if(compared.total)total=compared.total;if(compared.eventDate)eventDate=compared.eventDate;
     }
     if(!isCurrent(job))return;
-    result={readings,total,eventDate};applyImport(result);signature=fingerprint();
-    panel.dataset.state='matched';status.textContent='Tu pick está preparado. Revisa los datos y confirma la fecha del evento para publicar.';picker.textContent='Cambiar captura';updateDateConfirmation();
-    summary.replaceChildren(...readings.map((r,i)=>{
-     const item=node('li');
-     item.append(node('small',(r.selectionCount?r.selectionCount+' selecciones · ':readings.length>1?'Selección '+(i+1)+' · ':'')+(r.sport||'Otros')),node('strong',r.event),node('span',r.selection),node('span',(r.originalBeforeBoost?'Momio original, sin boost · ':'Momio automático · ')+(r.odds>0?'+':'')+r.odds,'cp-capture-odds'));
-     return item;
-    }));
-    summary.hidden=false;confirmation.hidden=false;onChange();
+    prepared={readings,total,eventDate};
    }catch(error){
-    if(isCurrent(job)){result=null;panel.dataset.state='error';status.textContent=(error?.message||'No pudimos leer la captura. Prueba otra.')+' La imagen se ha descartado.';}
+    if(isCurrent(job))failure=error?.message||'No pudimos leer la captura. Prueba otra.';
    }finally{
-    dispose(job);
-    if(active===job){active=null;input.value='';input.disabled=false;picker.disabled=false;cancel.hidden=true;panel.removeAttribute('aria-busy');}
+    if(isCurrent(job)){panel.dataset.state='discarding';showPrivacy('discarding');cancel.disabled=true;status.textContent=failure||'Lectura terminada. Descartando la captura…';}
+    const discarded=await dispose(job);
+    if(isCurrent(job)){
+     active=null;input.value='';input.disabled=false;picker.disabled=false;cancel.hidden=true;cancel.disabled=false;panel.removeAttribute('aria-busy');showPrivacy(discarded?'complete':'unconfirmed');
+     if(discarded&&prepared){
+      result=prepared;applyImport(result);signature=fingerprint();
+      panel.dataset.state='matched';status.textContent='Tu pick está preparado. Revisa los datos y confirma la fecha del evento para publicar.';picker.textContent='Cambiar captura';updateDateConfirmation();
+      summary.replaceChildren(...prepared.readings.map((r,i)=>{
+       const item=node('li');
+       item.append(node('small',(r.selectionCount?r.selectionCount+' selecciones · ':prepared.readings.length>1?'Selección '+(i+1)+' · ':'')+(r.sport||'Otros')),node('strong',r.event),node('span',r.selection),node('span',(r.originalBeforeBoost?'Momio original, sin boost · ':'Momio automático · ')+(r.odds>0?'+':'')+r.odds,'cp-capture-odds'));
+       return item;
+      }));
+      summary.hidden=false;confirmation.hidden=false;
+     }else{
+      result=null;panel.dataset.state='error';status.textContent=discarded?failure:'No pudimos cerrar el lector. Recarga la página antes de volver a intentarlo.';
+     }
+     onChange();
+    }
    }
   }
   input.addEventListener('change',()=>void read());
-  cancel.addEventListener('click',()=>clear('Lectura cancelada. La imagen se ha descartado.'));
+  cancel.addEventListener('click',()=>clear('Lectura cancelada.',true));
   form.addEventListener('input',event=>{if(event.target!==check){invalidate();if(event.target.name==='event_date'){check.checked=false;updateDateConfirmation();}}onChange();});
   form.addEventListener('click',event=>{if(event.target.closest('.cp-compose-modes,.cp-compose-remove,.cp-compose-add'))invalidate();});
   form.addEventListener('reset',()=>clear());
