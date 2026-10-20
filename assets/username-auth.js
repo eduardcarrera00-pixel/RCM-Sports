@@ -19,7 +19,7 @@ async function aeRequestPublication(kind,continueToComposer,onAuthRequired){
  if(typeof continueToComposer!=='function')return;
  const request=++aePublicationRequest;
  try{
-  if(!db?.auth?.getUser)throw Error('No se pudo conectar con AE SPORTS.');
+  if(!db?.auth?.getUser)throw Error('No se pudo conectar con CAM SPORTS.');
   const result=await db.auth.getUser();
   if(request!==aePublicationRequest)return;
   if(result.error&&result.error.name!=='AuthSessionMissingError'&&result.error.code!=='session_not_found')throw result.error;
@@ -48,7 +48,7 @@ async function aeRequestPublication(kind,continueToComposer,onAuthRequired){
 /* El login es repetible, pero registrar y recuperar contraseñas NO: no se
    reintentan automáticamente para evitar cuentas o códigos duplicados. */
 async function aeAuthRequest(payload){
- if(!db?.supabaseUrl||!db?.supabaseKey)throw Error('No se pudo inicializar la conexión con AE SPORTS. Recarga la página.');
+ if(!db?.supabaseUrl||!db?.supabaseKey)throw Error('No se pudo inicializar la conexión con CAM SPORTS. Recarga la página.');
  const endpoint=db.supabaseUrl+'/functions/v1/username-auth';
  const maxAttempts=payload.action==='login'?2:1;
  for(let attempt=0;attempt<maxAttempts;attempt++){

@@ -90,7 +90,7 @@
    target.append(ol);
  }
  async function load(){
-   if(!db)return message('No se pudo conectar con AE SPORTS.');
+   if(!db)return message('No se pudo conectar con CAM SPORTS.');
    const seq=++request;
    try{
      const q=await db.from('ae_take_questions').select('*').neq('status','void').order('closes_at',{ascending:true}).limit(300);

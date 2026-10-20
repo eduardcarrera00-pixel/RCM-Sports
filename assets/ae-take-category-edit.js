@@ -36,7 +36,7 @@
       dialog.setAttribute('aria-labelledby','aeTakeCategoryTitle');
       dialog.setAttribute('aria-describedby','aeTakeCategoryHelp');
       const header = make('div', null, 'ae-take-category-header');
-      header.append(make('span','AE SPORTS · MIS TAKES','ae-take-category-kicker'));
+      header.append(make('span','CAM SPORTS · MIS TAKES','ae-take-category-kicker'));
       header.append(make('h2','Cambiar comunidad'));
       header.querySelector('h2').id = 'aeTakeCategoryTitle';
       const description = make('p','Solo puedes mover este Take entre NFL y Fútbol. El título, el contenido, los votos y los comentarios no se modificarán.');

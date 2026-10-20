@@ -110,7 +110,7 @@
           item.event_key === 'article_like' ? '♥' : '↩','ae-notification-event-icon');
         icon.setAttribute('aria-hidden','true');
         const content = create('span',null,'ae-notification-text');
-        content.append(create('strong',label(item)),create('small',item.context_title || 'Publicación de AE SPORTS'));
+        content.append(create('strong',label(item)),create('small',item.context_title || 'Publicación de CAM SPORTS'));
         content.append(create('time',dateLabel(item.created_at)));
         const dot = create('span',null,'ae-notification-dot');
         dot.setAttribute('aria-hidden','true');

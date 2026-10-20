@@ -43,7 +43,7 @@
    event?.stopPropagation();
    if(!active)return;
    const url=shareUrl(active);
-   const payload={title:'Pick de la Semana · AE SPORTS',
+   const payload={title:'Pick de la Semana · CAM SPORTS',
      text:active.title+' · '+active.event_name+' · '+active.selection,
      url};
    if(typeof navigator.share==='function'){
@@ -125,7 +125,7 @@
    const photoUrl=editorialUrl(p.image_path,p.image_url);
    if(photoUrl){const photo=make('img',undefined,'ae-weekly-inline-photo');photo.src=photoUrl;photo.style.setProperty('--ae-image-focus',framedPosition(p,'image'));photo.alt='Imagen del Pick de la Semana';photo.loading='lazy';expanded.append(photo);}
    expanded.append(make('p',p.event_name,'ae-weekly-event'),make('p',p.analysis,'ae-weekly-analysis'));
-   expanded.append(make('small','Cuota publicada por AE SPORTS; no verificada en tiempo real. Sin apuestas en esta página.','ae-weekly-disclaimer'));
+   expanded.append(make('small','Cuota publicada por CAM SPORTS; no verificada en tiempo real. Sin apuestas en esta página.','ae-weekly-disclaimer'));
    details.append(summary,expanded);box.append(details);
    return box;
  }
@@ -168,7 +168,7 @@
      const area=$(id);if(!area)continue;
      area.replaceChildren();
      if(active)area.append(createCard(active,preview && !weeklyMobile.matches));
-     else area.append(make('p','AE SPORTS todavía no ha publicado un Pick editorial para esta semana.','ae-weekly-empty'));
+     else area.append(make('p','CAM SPORTS todavía no ha publicado un Pick editorial para esta semana.','ae-weekly-empty'));
    }
  }
  async function load(){

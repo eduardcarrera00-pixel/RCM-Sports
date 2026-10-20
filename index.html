@@ -15,7 +15,7 @@
 
     document.documentElement.classList.toggle('dark', useDarkMode);
 </script>
-    <title>AE SPORTS | Tu blog deportivo</title>
+    <title>CAM SPORTS | Tu blog deportivo</title>
 
     <link rel="stylesheet" href="assets/site.css">
 
@@ -1929,10 +1929,9 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="ae-mobile-header-grid flex items-center justify-between h-20">
 
-                <!-- Emblema original separado de un wordmark textual sin recortes del logo antiguo. -->
-                <a href="#" onclick="filterByCategory('Todos'); return false;" class="ae-brand ae-brand-gold ae-brand-runner ae-brand-runner-clean group" aria-label="AE SPORTS — TU BLOG DE DEPORTE, ir al inicio">
-                    <img class="ae-runner-symbol" src="assets/ae-runner-emblem.png?v=20261016-1" alt="" width="128" height="128" decoding="async" fetchpriority="high">
-                    <span class="ae-runner-wordmark" aria-hidden="true"><img class="ae-original-gold-wordmark" src="assets/ae-sports-original-wordmark.webp?v=20261016-2" alt="" width="500" height="100" decoding="async"></span>
+                <!-- Marca CAM SPORTS recortada de forma responsiva desde el arte original. -->
+                <a href="#" onclick="filterByCategory('Todos'); return false;" class="ae-brand ae-brand-gold ae-brand-runner ae-brand-runner-clean cam-brand group" aria-label="CAM SPORTS, ir al inicio">
+                    <span class="cam-brand-crop"><img class="cam-brand-art" src="assets/cam-sports-logo.jpeg?v=20261020-1" alt="CAM Sports" width="1536" height="1024" decoding="async" fetchpriority="high"></span>
                 </a>
                 <!-- Este input conserva compatibilidad con los filtros y pruebas, pero no se muestra en la interfaz. -->
                 <input id="searchInput" type="search" hidden aria-hidden="true" tabindex="-1" oninput="handleSearch()">
@@ -2215,7 +2214,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
                 </section>
                 <div id="aeSportAllNewsFooter" class="ae-sport-news-footer" hidden></div>
                 <div id="aeHomeAllNewsActions" class="ae-home-news-actions" hidden>
-                  <button id="aeHomeAllNewsButton" type="button" class="ae-news-all-button" data-ae-news-category="Todas" aria-label="Abrir todas las noticias de AE SPORTS">
+                  <button id="aeHomeAllNewsButton" type="button" class="ae-news-all-button" data-ae-news-category="Todas" aria-label="Abrir todas las noticias de CAM SPORTS">
                     Todas las noticias <span aria-hidden="true">→</span>
                   </button>
                 </div>
@@ -2360,7 +2359,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
             </aside>
         </div>
                 <section id="aeMoreNews" class="ae-more-news" hidden aria-labelledby="aeMoreNewsTitle">
-            <div class="ae-more-heading"><h2 id="aeMoreNewsTitle">Más noticias</h2><span>Historias de AE SPORTS</span></div>
+            <div class="ae-more-heading"><h2 id="aeMoreNewsTitle">Más noticias</h2><span>Historias de CAM SPORTS</span></div>
             <div id="moreArticlesGrid" class="ae-more-grid"></div>
         </section>
 
@@ -2390,7 +2389,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
           <button id="freeTakesMore" type="button" class="ae-history-more" hidden>Ver todos los Takes <span aria-hidden="true">→</span></button>
           <div id="aeNflTakeFooterCta" class="ae-nfl-take-footer" hidden></div>
           <section id="aeSportTakeRanking" class="ae-take-ranking" aria-labelledby="aeSportTakeRankingTitle">
-            <div class="ae-take-ranking-head"><div><span class="ae-take-ranking-kicker">AE SPORTS · COMUNIDAD</span><h2 id="aeSportTakeRankingTitle">Top 10 · NFL</h2></div><p id="aeSportTakeRankingDescription">Los admins confirman cada acierto y asignan de 1 a 100 puntos. Un fallo vale 0.</p></div>
+            <div class="ae-take-ranking-head"><div><span class="ae-take-ranking-kicker">CAM SPORTS · COMUNIDAD</span><h2 id="aeSportTakeRankingTitle">Top 10 · NFL</h2></div><p id="aeSportTakeRankingDescription">Los admins confirman cada acierto y asignan de 1 a 100 puntos. Un fallo vale 0.</p></div>
             <div class="ae-take-ranking-tabs" role="group" aria-label="Periodo del ranking de Takes"><button type="button" data-take-rank="month" aria-pressed="true">Mensual</button><button type="button" data-take-rank="all" aria-pressed="false">Histórico</button></div>
             <div id="aeSportTakeRankingSolo">
               <div class="ae-take-standing-viewport" role="region" aria-label="Clasificación Top 10 de Takes" tabindex="0">
@@ -2431,7 +2430,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
 <dialog id="aeNotificationsDialog" class="ae-notifications-dialog" aria-labelledby="aeNotificationsTitle">
   <div class="ae-notifications-shell">
     <header class="ae-notifications-heading">
-      <div><span class="ae-notifications-eyebrow">AE SPORTS · TU COMUNIDAD</span><h2 id="aeNotificationsTitle">Notificaciones</h2></div>
+      <div><span class="ae-notifications-eyebrow">CAM SPORTS · TU COMUNIDAD</span><h2 id="aeNotificationsTitle">Notificaciones</h2></div>
       <button type="button" id="aeNotificationsClose" aria-label="Cerrar notificaciones">×</button>
     </header>
     <div id="aeNotificationsList" class="ae-notifications-groups" aria-live="polite"></div>
@@ -2472,7 +2471,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
 
 <dialog id="cpComposePanel" class="ae-pick-compose-dialog" aria-labelledby="cpComposeTitle" aria-describedby="cpComposeIntro">
  <header class="ae-pick-compose-head"><div><span>COCINA PICKS</span><h2 id="cpComposeTitle" tabindex="-1" autofocus>Prepara tu Pick</h2></div><button id="cpComposeClose" type="button" aria-label="Cerrar formulario de Pick">×</button></header>
- <p id="cpComposeIntro">En AE SPORTS compartimos picks de apuestas ya hechas. Si ya la hiciste y confías en tu decisión, sube la captura del comprobante para preparar tu pick.</p>
+ <p id="cpComposeIntro">En CAM SPORTS compartimos picks de apuestas ya hechas. Si ya la hiciste y confías en tu decisión, sube la captura del comprobante para preparar tu pick.</p>
  <form id="cpForm"></form>
 </dialog>
 <dialog id="cpArchiveDialog" class="ae-picks-archive-dialog" aria-labelledby="cpArchiveTitle">
@@ -2482,12 +2481,12 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
  <button id="cpArchiveMore" type="button" class="ae-history-more" hidden>Ver más Picks</button>
 </dialog>
 <dialog id="aeProfileDialog" class="ae-profile-dialog" aria-labelledby="aeProfileTitle">
- <div class="ae-profile-top"><div><span>MI CUENTA · AE SPORTS</span><h2 id="aeProfileTitle">Mi perfil</h2><p id="aeProfileUsername">Tu historial deportivo</p></div><button type="button" class="ae-profile-close" onclick="closeAeProfile()" aria-label="Cerrar perfil">✕</button></div>
+ <div class="ae-profile-top"><div><span>MI CUENTA · CAM SPORTS</span><h2 id="aeProfileTitle">Mi perfil</h2><p id="aeProfileUsername">Tu historial deportivo</p></div><button type="button" class="ae-profile-close" onclick="closeAeProfile()" aria-label="Cerrar perfil">✕</button></div>
  <nav id="aeProfileTabs" class="ae-profile-tabs" aria-label="Secciones de mi perfil" hidden>
    <button id="aeProfileTabTakes" type="button" role="tab" aria-selected="true" class="is-active">Mis Takes</button>
    <button id="aeProfileTabPicks" type="button" role="tab" aria-selected="false">Mis Picks</button>
  </nav>
- <div class="ae-profile-overview"><strong id="aeProfileCount">0 Takes</strong><p id="aeProfileOverviewText">Tu historial deportivo en AE SPORTS.</p></div>
+ <div class="ae-profile-overview"><strong id="aeProfileCount">0 Takes</strong><p id="aeProfileOverviewText">Tu historial deportivo en CAM SPORTS.</p></div>
  <p id="aeProfileStatus" role="status" aria-live="polite"></p>
  <section id="aeProfileTakeHighlights" class="ae-profile-highlights" aria-label="Takes destacados" hidden></section>
  <div id="aeProfileTakes" class="ae-profile-takes"></div>
@@ -2531,7 +2530,7 @@ html:not(.dark) #aeAuthIntroNotice small{color:#5b6d76}
         <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50">
             <div class="flex items-center space-x-2 text-pitch-700 font-bold">
                 <i class="fa-solid fa-user"></i>
-                <span class="text-base text-slate-900">Cuenta AE SPORTS</span>
+                <span class="text-base text-slate-900">Cuenta CAM SPORTS</span>
             </div>
 
             <button type="button"
@@ -2742,7 +2741,7 @@ html:not(.dark) #aeAuthIntroNotice small{color:#5b6d76}
 
             <div class="ae-article-scroll p-6 overflow-y-auto space-y-6 flex-1">
 
-                <div class="ae-article-intro"><div class="ae-article-eyebrow">AE SPORTS <span> / </span> HISTORIAS QUE IMPORTAN</div>
+                <div class="ae-article-intro"><div class="ae-article-eyebrow">CAM SPORTS <span> / </span> HISTORIAS QUE IMPORTAN</div>
                     <h1 id="modalTitle" class="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-tight mb-3"></h1>
                     <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-500 pb-4 border-b border-slate-100" aria-label="Autor y fecha de publicación">
                         <span id="modalAuthor" class="font-semibold text-slate-800"></span>
@@ -2838,10 +2837,9 @@ html:not(.dark) #aeAuthIntroNotice small{color:#5b6d76}
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
 
                 <div class="space-y-3">
-                    <!-- Mismo emblema transparente y palabra-marca limpia de la cabecera. -->
-                    <a href="#" onclick="filterByCategory('Todos'); return false;" class="ae-footer-gold-brand ae-brand-runner ae-brand-runner-clean" aria-label="AE SPORTS — TU BLOG DE DEPORTE, ir al inicio">
-                        <img class="ae-runner-symbol" src="assets/ae-runner-emblem.png?v=20261016-1" alt="" width="128" height="128" decoding="async" loading="lazy">
-                        <span class="ae-runner-wordmark" aria-hidden="true"><img class="ae-original-gold-wordmark" src="assets/ae-sports-original-wordmark.webp?v=20261016-2" alt="" width="500" height="100" decoding="async"></span>
+                    <!-- La misma marca CAM SPORTS de la cabecera, adaptada al pie. -->
+                    <a href="#" onclick="filterByCategory('Todos'); return false;" class="ae-footer-gold-brand ae-brand-runner ae-brand-runner-clean cam-brand" aria-label="CAM SPORTS, ir al inicio">
+                        <span class="cam-brand-crop"><img class="cam-brand-art" src="assets/cam-sports-logo.jpeg?v=20261020-1" alt="CAM Sports" width="1536" height="1024" decoding="async" loading="lazy"></span>
                     </a>
                     <p class="text-slate-400 leading-relaxed text-xs">
                         Periodismo deportivo de alto nivel. Cobertura, estrategia y pasión en la cancha.
@@ -2880,7 +2878,7 @@ html:not(.dark) #aeAuthIntroNotice small{color:#5b6d76}
     <a href="https://www.instagram.com/ae_sports/"
        target="_blank"
        rel="noopener noreferrer"
-       aria-label="AE Sports en Instagram"
+       aria-label="CAM Sports en Instagram"
        title="Instagram"
        class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 hover:text-pitch-400 hover:border-pitch-500 transition-colors">
         <i class="fa-brands fa-instagram" aria-hidden="true"></i>
@@ -2905,7 +2903,7 @@ html:not(.dark) #aeAuthIntroNotice small{color:#5b6d76}
             </div>
 
             <div class="pt-8 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between text-slate-500 space-y-4 sm:space-y-0">
-                <p>&copy; 2026 AE SPORTS. Todos los derechos reservados.</p>
+                <p>&copy; 2026 CAM SPORTS. Todos los derechos reservados.</p>
                 <button id="accountRecoveryButton" type="button" class="hidden ae-footer-recovery" onclick="openUserAuthModal(); setAuthMode('code');">Recuperación de cuenta</button>
             </div>
         </div>
@@ -2914,7 +2912,7 @@ html:not(.dark) #aeAuthIntroNotice small{color:#5b6d76}
     <dialog id="aeNewsArchiveDialog" class="ae-news-archive-dialog" aria-labelledby="aeNewsArchiveTitle" aria-describedby="aeNewsArchiveDescription">
       <div class="ae-news-archive">
         <div class="ae-news-archive-head">
-          <div><span class="ae-news-archive-kicker">ARCHIVO EDITORIAL DE AE SPORTS</span><h2 id="aeNewsArchiveTitle">Todas las noticias</h2><p id="aeNewsArchiveDescription">Todas nuestras publicaciones, de las más recientes a las más antiguas.</p></div>
+          <div><span class="ae-news-archive-kicker">ARCHIVO EDITORIAL DE CAM SPORTS</span><h2 id="aeNewsArchiveTitle">Todas las noticias</h2><p id="aeNewsArchiveDescription">Todas nuestras publicaciones, de las más recientes a las más antiguas.</p></div>
           <button id="aeNewsArchiveClose" type="button" class="ae-news-archive-close" aria-label="Cerrar todas las noticias">×</button>
         </div>
         <div class="ae-news-archive-filters">
@@ -3845,7 +3843,7 @@ currentUser = {
 
             document.getElementById('modalCategory').innerText = article.category;
             document.getElementById('modalTitle').innerText = article.title;
-            document.getElementById('modalAuthor').innerText = article.author || 'AE SPORTS';
+            document.getElementById('modalAuthor').innerText = article.author || 'CAM SPORTS';
             document.getElementById('modalDate').innerText = article.date || '';
             document.getElementById('modalImage').src = safeImageURL(article.image);
             document.getElementById('modalImage').style.setProperty('--ae-image-focus', imagePosition(article));

@@ -1,6 +1,6 @@
-# AE SPORTS
+# CAM SPORTS
 
-Dirección pública con la marca: **https://aesportsclub.github.io/**
+Dirección pública actual: **https://aesportsclub.github.io/**
 
 El código se mantiene en este repositorio. La publicación con la marca se configura
 en [aesportsclub/aesportsclub.github.io](https://github.com/aesportsclub/aesportsclub.github.io)

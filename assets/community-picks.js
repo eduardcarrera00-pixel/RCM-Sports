@@ -732,7 +732,7 @@ function pickDetailHero(p){
  hero.dataset.pickSport=(p.legs||[]).some(l=>/nfl|americano/i.test(l.sport||''))?'nfl':'football';
  const copy=el('div',null,'ae-cp-detail-hero-copy');
  copy.append(
-   el('span','AE SPORTS · LA COCINA DE PICKS','ae-cp-detail-kicker'),
+   el('span','CAM SPORTS · LA COCINA DE PICKS','ae-cp-detail-kicker'),
    el('h2','La receta del Chef','ae-cp-detail-hero-title')
  );
  hero.append(copy);

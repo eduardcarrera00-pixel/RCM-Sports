@@ -85,3 +85,100 @@ html:not(.dark) body header a.ae-brand-runner-clean .ae-original-gold-wordmark{
     gap:8px!important;
   }
 }
+
+/* CAM SPORTS · Rebranding 20 Oct 2026.
+   El arte entregado conserva su geometría exacta. El recorte responsivo elimina
+   el aire exterior del screenshot sin deformar las letras ni duplicar el logo. */
+:root{
+  --cam-brand-blue:#023787;
+  --cam-brand-cream:#f5ecdf;
+}
+html body>header{
+  background:var(--cam-brand-blue)!important;
+  border-bottom-color:rgba(245,236,223,.22)!important;
+}
+html body>footer{
+  background:var(--cam-brand-blue)!important;
+  border-top-color:rgba(245,236,223,.18)!important;
+}
+html body>header .ae-mobile-header-grid>a.cam-brand.ae-brand,
+html body>footer a.cam-brand.ae-footer-gold-brand{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  flex-direction:row!important;
+  gap:0!important;
+  min-width:0!important;
+  padding:0!important;
+  margin:0!important;
+  overflow:visible!important;
+  background:transparent!important;
+  line-height:0!important;
+}
+html body>header .ae-mobile-header-grid>a.cam-brand.ae-brand{
+  flex:0 0 170px!important;
+  width:170px!important;
+  min-width:170px!important;
+  max-width:170px!important;
+  height:auto!important;
+}
+html body>footer a.cam-brand.ae-footer-gold-brand{
+  width:min(236px,100%)!important;
+  max-width:236px!important;
+}
+html body .cam-brand .cam-brand-crop{
+  position:relative!important;
+  display:block!important;
+  flex:0 0 100%!important;
+  width:100%!important;
+  max-width:100%!important;
+  aspect-ratio:2.05 / 1!important;
+  overflow:hidden!important;
+  background:var(--cam-brand-blue)!important;
+}
+html body .cam-brand .cam-brand-art{
+  position:absolute!important;
+  display:block!important;
+  width:163%!important;
+  max-width:none!important;
+  height:auto!important;
+  left:-31.5%!important;
+  top:-66%!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  object-fit:contain!important;
+  filter:none!important;
+  transform:none!important;
+}
+html body .cam-brand:hover .cam-brand-art{
+  filter:brightness(1.035)!important;
+}
+html body .cam-brand:focus-visible{
+  outline:2px solid var(--cam-brand-cream)!important;
+  outline-offset:4px!important;
+}
+@media(max-width:760px){
+  html body>header .ae-mobile-header-grid>a.cam-brand.ae-brand.ae-brand-runner-clean{
+    flex:0 0 clamp(116px,35vw,142px)!important;
+    width:clamp(116px,35vw,142px)!important;
+    min-width:116px!important;
+    max-width:142px!important;
+    margin:0!important;
+    padding:0!important;
+    justify-self:start!important;
+  }
+  html body>footer a.cam-brand.ae-footer-gold-brand{
+    width:min(210px,76vw)!important;
+    max-width:210px!important;
+  }
+}
+@media(max-width:365px){
+  html body>header .ae-mobile-header-grid>a.cam-brand.ae-brand.ae-brand-runner-clean{
+    flex-basis:112px!important;
+    width:112px!important;
+    min-width:112px!important;
+    max-width:112px!important;
+  }
+}

@@ -1490,7 +1490,7 @@ html body #footballTakes .ae-picks-rail>.ae-chef-board .ae-picks-rail-heading{
   border-bottom:1px solid var(--plate-separator)!important;
 }
 html body #footballTakes .ae-picks-rail>.ae-chef-board .ae-picks-rail-heading::before{
-  content:"AE SPORTS · EL RECETARIO";
+  content:"CAM SPORTS · EL RECETARIO";
   display:block;
   margin-bottom:7px;
   color:var(--plate-accent)!important;
