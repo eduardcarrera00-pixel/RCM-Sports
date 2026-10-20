@@ -7,7 +7,7 @@
  const odds=n=>(Number(n)>0?'+':'')+String(n);
  const outcome=r=>r?.outcome==='won'?'✅ Pick acertado':r?.outcome==='lost'?'Pick no acertado':'Pendiente de confirmar';
  const validId=id=>/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id||'');
- let panel,list,status,previous,next,offset=0,loading=false,busy=false,sessionEpoch=0;
+ let panel,list,status,previous,next,quick,quickStatus,quickRow=null,offset=0,loading=false,busy=false,sessionEpoch=0;
  const results=new Map();
  const originalX=url=>/^https:\/\/(?:twitter\.com|x\.com)\/[A-Za-z0-9_]+\/status\/([0-9]+)$/.exec(url||'');
  function replyUrl(result){
@@ -26,6 +26,30 @@
    const labels={queued:'en cola',submitting:'enviando',accepted:'procesando',published:'publicado',failed:'error: revisar Buffer',uncertain:'pendiente de revisión en Buffer',cancelled:'envío cancelado'};
    return row.social.map(d=>(d.network==='twitter'?'X':'TikTok')+': '+(labels[d.status]||d.status)).join(' · ');
  }
+
+ function quickMessage(message){if(quickStatus)quickStatus.textContent=message;}
+ function renderQuick(){
+   if(!quick)return;
+   quick.hidden=!admin();quick.replaceChildren();
+   if(!admin())return;
+   quick.append(el('strong','¿Acertó el Pick de la Semana?'));
+   quickStatus=el('p');quickStatus.setAttribute('role','status');quickStatus.setAttribute('aria-live','polite');
+   if(!quickRow){quick.append(quickStatus);quickMessage(loading?'Cargando Pick…':'No hay un Pick disponible para revisar.');return;}
+   quick.append(el('small',quickRow.event_name+' · '+quickRow.selection));
+   const saved=results.get(quickRow.id);
+   if(saved?.outcome||quickRow.outcome){
+     quick.append(el('strong',outcome(saved||quickRow)));quick.append(quickStatus);
+     quickMessage(socialSummary({...quickRow,outcome:saved?.outcome||quickRow.outcome}));return;
+   }
+   const actions=el('div',null,'cam-weekly-review-actions');
+   for(const [value,label,color] of [['won','Sí, acertó','green'],['lost','No acertó','red']]){
+     const button=el('button',label,'cam-weekly-result-'+color);button.type='button';button.disabled=busy;
+     button.id=value==='won'?'camWeeklyYes':'camWeeklyNo';
+     button.onclick=event=>{event.stopPropagation();resolve(quickRow,value);};actions.append(button);
+   }
+   quick.append(actions,quickStatus);
+ }
+
  function decorate(){
    document.querySelectorAll('.cam-weekly-result-badge').forEach(n=>n.remove());
    for(const host of document.querySelectorAll('[data-cam-weekly-id]')){
@@ -75,11 +99,17 @@
      const rows=data||[];
      await Promise.all(rows.filter(r=>r.outcome).map(r=>readPublic(r.id)));
      if(epoch!==sessionEpoch||!admin())return;
-     list.replaceChildren(...rows.map(renderRow));
+     if(offset===0){
+       const currentId=document.querySelector('[data-cam-weekly-id]')?.dataset.camWeeklyId;
+       quickRow=rows.find(r=>r.id===currentId)||rows.find(r=>r.is_published)||rows[0]||null;
+     }
+     list.replaceChildren(...rows.map(renderRow));renderQuick();
      status.textContent=rows.length?'Confirma el resultado solo después de comprobar el partido. La decisión no se puede cambiar desde estos botones.':'No hay Picks en esta página.';
      previous.disabled=offset===0;next.disabled=rows.length<30;decorate();
    }catch(error){
-     if(epoch===sessionEpoch&&admin())status.textContent='No se pudo cargar: '+(error.message||'Error de conexión');
+     if(epoch===sessionEpoch&&admin()){
+       status.textContent='No se pudo cargar: '+(error.message||'Error de conexión');quickMessage(status.textContent);
+     }
    }finally{loading=false;}
  }
  async function resolve(row,value){
@@ -89,7 +119,7 @@
      '¿Confirmas que «'+row.selection+'» no acertó? Se guardará como fallado y no se compartirá. No se puede deshacer desde estos botones.';
    if(!confirm(message))return;
    let messageAfter='';
-   busy=true;panel.querySelectorAll('button').forEach(b=>b.disabled=true);status.textContent='Guardando resultado…';
+   busy=true;panel.querySelectorAll('button').forEach(b=>b.disabled=true);renderQuick();quickMessage('Guardando resultado…');status.textContent='Guardando resultado…';
    try{
      const {data,error}=await db.rpc('cam_resolve_weekly_pick',{p_pick_id:row.id,p_outcome:value});
      if(error)throw error;
@@ -104,14 +134,14 @@
      messageAfter='No se pudo confirmar: '+(error.message||'Error de conexión')+'. Actualiza el estado antes de reintentar.';
    }finally{
      busy=false;panel.querySelectorAll('button').forEach(b=>b.disabled=false);
-     await refreshAdmin();decorate();if(messageAfter&&admin())status.textContent=messageAfter;
+     await refreshAdmin();decorate();renderQuick();if(messageAfter&&admin()){status.textContent=messageAfter;quickMessage(messageAfter);}
    }
  }
  function syncAdmin(){
    if(!panel)return;panel.hidden=!admin();
    if(!admin()){
-     sessionEpoch++;list.replaceChildren();offset=0;status.textContent='';
-   }else if(panel.open)refreshAdmin();
+     sessionEpoch++;list.replaceChildren();offset=0;quickRow=null;status.textContent='';renderQuick();
+   }else {renderQuick();refreshAdmin();}
  }
  async function showShared(){
    const id=new URLSearchParams(location.search).get('weeklyResult');if(!validId(id))return;
@@ -143,7 +173,12 @@
    previous=el('button','Más recientes');next=el('button','Anteriores');previous.type=next.type='button';previous.disabled=true;
    previous.onclick=()=>{offset=Math.max(0,offset-30);refreshAdmin();};next.onclick=()=>{offset+=30;refreshAdmin();};pages.append(previous,next);
    panel.append(summary,intro,reload,list,pages,status);adminHost.after(panel);
-   panel.addEventListener('toggle',()=>{if(panel.open)refreshAdmin();});
+   quick=el('div',null,'cam-weekly-quick-result');quick.id='camWeeklyQuickResult';quick.hidden=true;
+   quick.setAttribute('aria-label','Confirmar manualmente el resultado del Pick de la Semana');
+   quick.addEventListener('click',event=>event.stopPropagation());
+   const edit=$('aeWeeklyEditButton');
+   if(edit?.parentElement)edit.parentElement.after(quick);else $('picksFeaturedCard')?.before(quick);
+   panel.addEventListener('toggle',()=>{if(admin())refreshAdmin();});
    const result=el('section',null,'ae-weekly-card cam-weekly-shared-result');result.id='camWeeklySharedResult';result.hidden=true;
    result.setAttribute('aria-label','Resultado del Pick de la Semana');$('picksFeaturedCard')?.before(result);
    document.addEventListener('cam:weekly-render',()=>{decorate();refreshPublic();if(panel.open)refreshAdmin();});
