@@ -114,14 +114,13 @@
   const privacySteps=node('ol',null,'cp-capture-privacy-steps');privacySteps.setAttribute('aria-hidden','true');
   privacySteps.append(...['Lectura','Descarte','Completado'].map(text=>node('li',text)));
   privacy.append(privacyIcon,privacyCopy,privacySteps);
+  const shot=node('div',null,'cp-capture-shot');shot.hidden=true;const shotImage=node('img');shotImage.alt='Captura temporal durante la lectura';shot.append(shotImage);
+  const progress=node('div',null,'cp-capture-progress');progress.hidden=true;progress.setAttribute('role','progressbar');progress.setAttribute('aria-label','Lectura de captura');progress.setAttribute('aria-valuemin','0');progress.setAttribute('aria-valuemax','100');
+  const progressBar=node('span',null,'cp-capture-progress-bar');progress.append(progressBar);
   const summary=node('ul',null,'cp-capture-readings');summary.hidden=true;
-  const confirmation=node('label',null,'cp-capture-confirm'),check=document.createElement('input');check.type='checkbox';check.id='cpCaptureConfirm';
-  const confirmationText=node('span','Confirmo que hice esta apuesta, revisé el partido y el pronóstico y comprobé la fecha del evento.');
-  confirmation.append(check,confirmationText);confirmation.hidden=true;
   const cancel=node('button','Cancelar lectura','cp-capture-cancel');cancel.type='button';cancel.hidden=true;
-  panel.append(title,intro,picker,input,help,privacy,status,summary,cancel);
+  panel.append(title,intro,picker,input,shot,help,progress,privacy,status,summary,cancel);
   form.prepend(panel);form.classList.add('cp-capture-first');
-  form.querySelector('.cp-compose-footer').before(confirmation);
   const isCurrent=job=>active===job&&!job.cancelled;
   function showPrivacy(state,readFailed=false){
    const copy={reading:['Leyendo en tu dispositivo','La captura se procesa aquí, sin subir la imagen.'],discarding:['Descartando captura…','Liberando la imagen y cerrando el lector.'],complete:['Captura descartada','La imagen no se ha subido ni guardado. Al publicar, solo guardamos los datos de tu pick.'],unconfirmed:['No se pudo confirmar el descarte','Recarga esta página para cerrar el lector antes de volver a intentarlo.']};
@@ -133,15 +132,12 @@
     privacyText.textContent='La imagen no se ha subido ni guardado. Prueba con otra captura para preparar tu pick.';
    }
   }
-  function updateDateConfirmation(){
-   const value=form.elements.namedItem('event_date')?.value,stamp=Date.parse(value+'T12:00:00Z');
-   const date=Number.isFinite(stamp)?new Intl.DateTimeFormat('es',{dateStyle:'long',timeZone:'UTC'}).format(new Date(stamp)):'';
-   confirmationText.textContent='Confirmo que hice esta apuesta, revisé el partido y el pronóstico y comprobé la fecha del evento'+(date?': '+date+'.':'.');
-  }
   function dispose(job){
    if(!job)return Promise.resolve(true);
    if(job.disposal)return job.disposal;
    clearTimeout(job.timer);job.files=[];
+   if(shot.dataset.job===String(job.id)){shotImage.removeAttribute('src');shot.hidden=true;delete shot.dataset.job;}
+   progress.hidden=true;progressBar.style.width='0%';progress.removeAttribute('aria-valuenow');
    for(const canvas of job.canvases){canvas.width=1;canvas.height=1;}job.canvases.clear();
    for(const url of job.urls)URL.revokeObjectURL(url);job.urls.clear();
    const worker=job.worker;job.worker=null;
@@ -157,8 +153,8 @@
    return job;
   }
   function clear(message='Elige una captura para importar tu apuesta y su momio.',showDiscard=false){
-   const job=stop(),revision=++sequence;result=null;signature='';check.checked=false;confirmation.hidden=true;summary.hidden=true;summary.replaceChildren();privacy.hidden=true;
-   input.value='';picker.textContent='Subir captura';title.textContent='Sube la captura de tu apuesta';panel.dataset.state='empty';status.textContent=message;applyImport(null);onChange();
+   const job=stop(),revision=++sequence;result=null;signature='';summary.hidden=true;summary.replaceChildren();privacy.hidden=true;
+   input.value='';picker.textContent='Subir captura';title.textContent='Sube la captura de tu apuesta';panel.dataset.state='empty';status.textContent=message;shotImage.removeAttribute('src');shot.hidden=true;progress.hidden=true;progressBar.style.width='0%';applyImport(null);onChange();
    if(showDiscard&&job){
     showPrivacy('discarding');
     void dispose(job).then(discarded=>{if(sequence===revision&&!active)showPrivacy(discarded?'complete':'unconfirmed');});
@@ -177,6 +173,10 @@
     files=[];status.textContent='Usa imágenes PNG, JPG o WebP de hasta 8 MB cada una.';return;
    }
    const job={id:++sequence,files,worker:null,canvases:new Set(),urls:new Set(),cancelled:false,abort:null,timer:null};files=[];active=job;
+   if(job.files.length===1&&typeof URL.createObjectURL==='function'){
+    try{const previewUrl=URL.createObjectURL(job.files[0]);job.urls.add(previewUrl);shotImage.src=previewUrl;shot.dataset.job=String(job.id);shot.hidden=false;}catch{shot.hidden=true;}
+   }
+   progress.hidden=false;progressBar.style.width='0%';
    const aborted=new Promise((_,reject)=>{job.abort=reject;});
    input.disabled=true;picker.disabled=true;cancel.hidden=false;cancel.disabled=false;panel.setAttribute('aria-busy','true');panel.dataset.state='reading';showPrivacy('reading');status.textContent='Preparando el lector en tu dispositivo…';
    job.timer=setTimeout(()=>{
@@ -187,7 +187,10 @@
     const T=await Promise.race([engine(),aborted]);
     if(!isCurrent(job))return;
     const pending=T.createWorker('eng+spa',1,{workerPath:vendor+'worker.min.js',corePath:vendor+'tesseract-core-lstm.wasm.js',langPath:vendor.replace(/\/$/,''),workerBlobURL:false,cacheMethod:'none',logger:m=>{
-     if(isCurrent(job)&&m.status==='recognizing text')status.textContent='Leyendo la captura… '+Math.round((Number(m.progress)||0)*100)+'%';
+     if(isCurrent(job)&&m.status==='recognizing text'){
+     const percent=Math.max(0,Math.min(100,Math.round((Number(m.progress)||0)*100)));
+     status.textContent='Leyendo tu captura… '+percent+'%';progressBar.style.width=percent+'%';progress.setAttribute('aria-valuenow',String(percent));
+    }
     },errorHandler:()=>{}});
     pending.then(worker=>{if(!isCurrent(job))void worker.terminate().catch(()=>{});}).catch(()=>{});
     job.worker=await Promise.race([pending,aborted]);if(!isCurrent(job))return;
@@ -229,13 +232,13 @@
      active=null;input.value='';input.disabled=false;picker.disabled=false;cancel.hidden=true;cancel.disabled=false;panel.removeAttribute('aria-busy');showPrivacy(discarded?'complete':'unconfirmed',!prepared);
      if(discarded&&prepared){
       result=prepared;applyImport(result);signature=fingerprint();
-      panel.dataset.state='matched';title.textContent='Captura leída';status.textContent='Revisa la vista previa y confirma la fecha del evento para publicar.';picker.textContent='Cambiar captura';updateDateConfirmation();
+      panel.dataset.state='matched';title.textContent='Captura leída';status.textContent='Revisa tu pick y completa la fecha del evento para publicar.';picker.textContent='Cambiar captura';
       summary.replaceChildren(...prepared.readings.map((r,i)=>{
        const item=node('li');
        item.append(node('small',(r.selectionCount?r.selectionCount+' selecciones · ':prepared.readings.length>1?'Selección '+(i+1)+' · ':'')+(r.sport||'Otros')),node('strong',r.event),node('span',r.selection),node('span',(r.originalBeforeBoost?'Momio original, sin boost · ':'Momio automático · ')+(r.odds>0?'+':'')+r.odds,'cp-capture-odds'));
        return item;
       }));
-      const preview=form.querySelector('.cp-compose-preview');summary.hidden=!!preview;confirmation.hidden=false;
+      const preview=form.querySelector('.cp-compose-preview');summary.hidden=!!preview;
       if(preview)requestAnimationFrame(()=>{
        const dialog=form.closest('dialog');
        if(panel.dataset.state==='matched'&&!preview.hidden&&dialog?.open){dialog.scrollTop=0;preview.querySelector('h3')?.focus({preventScroll:true});}
@@ -249,7 +252,7 @@
   }
   input.addEventListener('change',()=>void read());
   cancel.addEventListener('click',()=>clear('Lectura cancelada.',true));
-  form.addEventListener('input',event=>{if(event.target!==check){invalidate();if(event.target.name==='event_date'){check.checked=false;updateDateConfirmation();}}onChange();});
+  form.addEventListener('input',()=>{invalidate();onChange();});
   form.addEventListener('click',event=>{if(event.target.closest('.cp-compose-modes,.cp-compose-remove,.cp-compose-add'))invalidate();});
   form.addEventListener('reset',()=>clear());
   form.closest('dialog')?.addEventListener('close',()=>{if(active)clear('Lectura cancelada al cerrar. Añade otra captura para continuar.');});
@@ -257,13 +260,12 @@
   return {
    clear,invalidate,
    hasImport(){return !!result&&signature===fingerprint();},
-   isConfirmed(){return !!result&&signature===fingerprint()&&check.checked;},
+   isConfirmed(){return !!result&&signature===fingerprint();},
    getTotal(){return result&&signature===fingerprint()?result.total:null;},
    proof(){
     invalidate();
     if(active)throw Error('Espera a que termine la lectura de la captura.');
     if(!result)throw Error('Añade una captura legible para comprobar el momio antes de publicar.');
-    if(!check.checked)throw Error('Confirma que has revisado el partido, el pronóstico y la fecha. El momio es automático.');
     return {version:1,method:'on_device_ocr',confirmed:true,readings:result.readings.map(({event,selection,odds,confidence})=>({event,selection,odds,confidence})),total:result.total};
    }
   };
