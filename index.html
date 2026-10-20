@@ -289,6 +289,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
 <link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261020-armonia-1">
+<link rel="stylesheet" href="assets/cam-analytics.css?v=20261020-1">
     <link rel="stylesheet" href="assets/ae-muted-navigation-icons.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-custom-nav-icons.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-classical-auth-buttons.css?v=20261020-cam-welcome-v2">
@@ -2541,6 +2542,9 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
 </dialog>
 <dialog id="aeProfileDialog" class="ae-profile-dialog" aria-labelledby="aeProfileTitle">
  <div class="ae-profile-top"><div><span>MI CUENTA · CAM SPORTS</span><h2 id="aeProfileTitle">Mi perfil</h2><p id="aeProfileUsername">Tu historial deportivo</p></div><button type="button" class="ae-profile-close" onclick="closeAeProfile()" aria-label="Cerrar perfil">✕</button></div>
+ <section id="camAnalyticsEntry" hidden aria-label="Herramientas de administración">
+  <button type="button" id="camAnalyticsOpen"><i class="fa-solid fa-chart-column" aria-hidden="true"></i> Estadísticas de CAM SPORTS <span aria-hidden="true">↗</span></button>
+ </section>
  <nav id="aeProfileTabs" class="ae-profile-tabs" aria-label="Secciones de mi perfil" hidden>
    <button id="aeProfileTabTakes" type="button" role="tab" aria-selected="true" class="is-active">Mis Takes</button>
    <button id="aeProfileTabPicks" type="button" role="tab" aria-selected="false">Mis Picks</button>
@@ -2554,6 +2558,26 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
  <section id="aeProfilePickHighlights" class="ae-profile-pick-highlights" aria-label="Picks destacados" hidden></section>
  <div id="aeProfilePicks" class="ae-profile-picks" hidden></div>
  <section id="aeProfileAccuracy" class="ae-profile-accuracy" aria-label="Porcentaje de acierto" hidden></section>
+</dialog>
+<dialog id="camAnalyticsDialog" class="cam-analytics-dialog" aria-labelledby="camAnalyticsTitle">
+ <div class="cam-analytics-shell">
+  <header class="cam-analytics-heading">
+    <div><span>CAM SPORTS · SOLO ADMINISTRADORES</span><h2 id="camAnalyticsTitle">Visitas y procedencia</h2></div>
+    <button type="button" id="camAnalyticsClose" class="cam-analytics-close" aria-label="Cerrar estadísticas">×</button>
+  </header>
+  <p id="camAnalyticsStatus" class="cam-analytics-status" role="status" aria-live="polite"></p>
+  <div id="camAnalyticsStats" class="cam-analytics-stats"></div>
+  <div class="cam-analytics-grid">
+   <section class="cam-analytics-box cam-analytics-box-wide" aria-label="Evolución de las visitas"><h3>Últimos 14 días</h3><div id="camAnalyticsDays" class="cam-analytics-days" role="img" aria-label="Gráfica de las visitas diarias"></div></section>
+   <section class="cam-analytics-box"><h3>¿De dónde vienen?</h3><ol id="camAnalyticsSources" class="cam-analytics-ranks"></ol><p class="cam-analytics-hint">Origen detectado por enlaces UTM o sitio de procedencia. Si la app no lo envía, aparecerá «Desconocido».</p></section>
+   <section class="cam-analytics-box"><h3>Secciones que exploran</h3><ol id="camAnalyticsSections" class="cam-analytics-ranks"></ol><p class="cam-analytics-hint">Cada sección cuenta una sola vez por visita.</p></section>
+   <section class="cam-analytics-box cam-analytics-box-wide"><h3>Campañas compartidas</h3><ol id="camAnalyticsCampaigns" class="cam-analytics-ranks"></ol><p class="cam-analytics-hint">Se registran mediante el parámetro utm_campaign de los enlaces compartidos.</p></section>
+  </div>
+  <footer class="cam-analytics-footer">
+   <p>Visitas históricas registradas: <strong id="camAnalyticsTotal">0</strong>. Los visitantes son una estimación por navegador; el identificador aleatorio caduca a los 30 días. No se guardan IP, correo, nombres ni rutas visitadas. Las cifras pueden incluir tráfico automatizado.</p>
+   <button id="camAnalyticsRefresh" type="button">Actualizar datos</button>
+  </footer>
+ </div>
 </dialog>
 
 <style id="ae-login-intro-css">
@@ -3324,6 +3348,7 @@ currentUser = {
                 loggedContainer.classList.add('hidden');
             }
             renderSessionHeader();
+            if(window.camAnalytics?.syncAdmin) window.camAnalytics.syncAdmin();
             if(typeof updateAeWeeklyAdmin==='function') updateAeWeeklyAdmin();
             if(typeof updateAeCategoryAdmin==='function') updateAeCategoryAdmin();
             if(typeof updateAePicksAdmin==='function') updateAePicksAdmin();
@@ -4409,6 +4434,7 @@ html .cam-weekly-result-surface .cam-weekly-result-on-photo{
 <script src="assets/ae-home-weekly-layout.js?v=20261018-weekly-share-1"></script>
 <script src="assets/ae-notifications.js?v=20261020-cam-welcome-v1"></script>
 <script src="assets/cam-welcome.js?v=20261020-welcome-links-1"></script>
+<script src="assets/cam-analytics.js?v=20261020-1"></script>
 
 <script id="ae-home-news-carousel-motion">
 /* Movimiento ligero y reversible: sin clones, sin alterar enlaces, votos o artículos. */
