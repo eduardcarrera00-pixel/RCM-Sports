@@ -10,7 +10,7 @@ const makeWorker=()=>({setParameters:async()=>{},recognize:async()=>{if(delayRea
 w.Tesseract={createWorker:async(_language,_oem,options)=>{workers++;assert.equal(options.cacheMethod,'none');assert.match(options.workerPath,/example.test\/RCM-Sports\/assets\/vendor\/ocr\/worker.min.js$/);if(delayInit)return delayInit;return makeWorker();}};
 w.eval(fs.readFileSync('assets/ae-pick-capture-parser.js','utf8'));w.eval(fs.readFileSync('assets/ae-pick-capture.js','utf8'));
 const controller=w.aePickCapture.mount({form,getPicks:()=>picks,applyImport:result=>{picks=result?structuredClone(result.readings):[];}});
-const input=d.getElementById('cpCaptureFile'),confirm=d.getElementById('cpCaptureConfirm'),panel=d.querySelector('.cp-capture'),privacy=d.querySelector('.cp-capture-privacy');
+const input=d.getElementById('cpCaptureFile'),panel=d.querySelector('.cp-capture'),privacy=d.querySelector('.cp-capture-privacy');
 const settle=()=>new Promise(r=>setTimeout(r,35));
 function upload(type='image/png',size=10){const transfer=new w.DataTransfer();transfer.items.add(new w.File([new Uint8Array(size)],'capture.png',{type}));input.files=transfer.files;input.dispatchEvent(new w.Event('change'));}
 assert.throws(()=>controller.proof(),/captura/);assert.equal(workers,0,'OCR is lazy');
@@ -19,22 +19,22 @@ assert.equal(privacy.hidden,true,'No cleanup claim before an image is selected')
 upload();await settle();assert.equal(panel.dataset.state,'matched');assert.equal(input.files.length,0);assert.ok(canvases.every(c=>c.width===1&&c.height===1));assert.equal(terminated,1);assert.equal(closed,1);
 assert.equal(privacy.dataset.state,'complete');assert.match(privacy.textContent,/Captura descartada/);assert.match(privacy.textContent,/solo guardamos los datos de tu pick/);assert.ok(Array.from(privacy.querySelectorAll('li')).every(step=>step.dataset.state==='complete'));
 assert.equal(picks[0].odds,150,'Odds were imported without any typed inputs');assert.equal(picks[0].sport,'NBA');assert.equal(controller.hasImport(),true);
-assert.throws(()=>controller.proof(),/Confirma/);confirm.checked=true;
+assert.equal(d.querySelector('#cpCaptureConfirm'),null,'Publishing a reviewed ticket needs no separate confirmation checkbox');
 assert.equal(controller.isConfirmed(),true);
 const eventDate=form.elements.namedItem('event_date');eventDate.value='2026-11-01';eventDate.dispatchEvent(new w.Event('input',{bubbles:true}));
-assert.equal(confirm.checked,false,'Changing a manually supplied event date requires a new confirmation');assert.equal(controller.hasImport(),true,'The undated capture remains valid');
-assert.match(confirm.parentElement.textContent,/1 de noviembre de 2026/);assert.equal(controller.isConfirmed(),false);confirm.checked=true;
-assert.match(confirm.parentElement.textContent,/hice esta apuesta/);
+assert.equal(controller.hasImport(),true,'The undated capture remains valid when the event date changes');
+assert.equal(eventDate.value,'2026-11-01');assert.equal(controller.isConfirmed(),true);
+assert.equal(controller.isConfirmed(),true,'Clicking Publish will explicitly confirm the review');
 assert.match(d.querySelector('.cp-capture-readings').textContent,/Toronto Raptors vs Boston Celtics/);
 assert.match(d.querySelector('.cp-capture-readings').textContent,/Moneyline/);
 assert.equal(controller.proof().readings[0].odds,150);assert.equal(JSON.stringify(controller.proof()).includes('Stake'),false);
-assert.doesNotMatch(confirm.parentElement.textContent,/momio|cuota/i,'The user never has to confirm the odds');
+assert.equal(d.querySelector('.cp-capture-shot').hidden,true,'The screenshot thumbnail was discarded after OCR');
 form.querySelector('[name=explanation]').value='My own analysis';form.querySelector('[name=explanation]').dispatchEvent(new w.Event('input',{bubbles:true}));assert.equal(controller.proof().confirmed,true,'Analysis stays free');
 for(const [key,value] of [['odds',160],['event','Different match'],['selection','Other team wins'],['sport','NFL']]){
- picks[0][key]=value;form.querySelector('input').dispatchEvent(new w.Event('input',{bubbles:true}));assert.throws(()=>controller.proof(),/captura/);assert.equal(confirm.checked,false);assert.equal(controller.hasImport(),false);
- upload();await settle();confirm.checked=true;
+ picks[0][key]=value;form.querySelector('input').dispatchEvent(new w.Event('input',{bubbles:true}));assert.throws(()=>controller.proof(),/captura/);assert.equal(controller.hasImport(),false);
+ upload();await settle();
 }
-nextData={...valid,text:valid.text.replace('+150','+160')};upload();await settle();confirm.checked=true;assert.equal(controller.proof().readings[0].odds,160,'Only a new capture changes the quote');
+nextData={...valid,text:valid.text.replace('+150','+160')};upload();await settle();assert.equal(controller.proof().readings[0].odds,160,'Only a new capture changes the quote');
 nextData={...valid,text:'BETSLIP\nToronto Raptors vs Boston Celtics\nToronto Raptors Moneyline +150 +160'};upload();await settle();assert.equal(panel.dataset.state,'error');assert.throws(()=>controller.proof(),/captura/);
 assert.equal(privacy.dataset.state,'complete','An unreadable receipt is still discarded');
 assert.match(panel.querySelector('.cp-capture-title').textContent,/No pudimos preparar/);assert.match(privacy.textContent,/Sin lectura/);assert.doesNotMatch(privacy.textContent,/Completado/);
@@ -43,7 +43,7 @@ let releaseInit;delayInit=new Promise(r=>{releaseInit=r;});const before=terminat
 const beforeInvalid=workers;upload('image/gif');await settle();assert.equal(workers,beforeInvalid);assert.match(d.getElementById('cpCaptureStatus').textContent,/PNG/);
 assert.equal(privacy.hidden,true,'An invalid file does not pretend to have completed OCR cleanup');
 let releaseTerminate;delayTerminate=new Promise(r=>{releaseTerminate=r;});upload();await settle();
-assert.equal(panel.dataset.state,'discarding');assert.equal(privacy.dataset.state,'discarding');assert.doesNotMatch(privacy.textContent,/Captura descartada/);assert.equal(controller.hasImport(),false);assert.throws(()=>controller.proof(),/Espera/);assert.equal(confirm.parentElement.hidden,true);
+assert.equal(panel.dataset.state,'discarding');assert.equal(privacy.dataset.state,'discarding');assert.doesNotMatch(privacy.textContent,/Captura descartada/);assert.equal(controller.hasImport(),false);assert.throws(()=>controller.proof(),/Espera/);assert.equal(d.querySelector('#cpCaptureConfirm'),null);
 assert.equal(input.files.length,0);assert.ok(canvases.every(c=>c.width===1&&c.height===1));
 releaseTerminate();delayTerminate=null;await settle();assert.equal(panel.dataset.state,'matched');assert.equal(privacy.dataset.state,'complete');
 failTerminate=true;upload();await settle();assert.equal(panel.dataset.state,'error');assert.equal(privacy.dataset.state,'unconfirmed');assert.equal(controller.hasImport(),false);assert.doesNotMatch(privacy.textContent,/Captura descartada/);failTerminate=false;
@@ -52,7 +52,7 @@ releaseBitmap();delayBitmap=null;await settle();assert.equal(privacy.dataset.sta
 delayTerminate=new Promise(r=>{releaseTerminate=r;});delayRead=new Promise(r=>{releaseRead=r;});upload();await settle();d.querySelector('.cp-capture-cancel').click();await settle();assert.equal(privacy.dataset.state,'discarding');
 delayTerminate=null;upload();await settle();assert.equal(privacy.dataset.state,'reading');releaseTerminate();await settle();assert.equal(privacy.dataset.state,'reading','An old cleanup completion cannot overwrite a newer scan');
 releaseRead();delayRead=null;await settle();assert.equal(privacy.dataset.state,'complete');assert.equal(panel.dataset.state,'matched');
-upload();await settle();confirm.checked=true;form.reset();assert.throws(()=>controller.proof(),/captura/);assert.equal(confirm.checked,false);
+upload();await settle();form.reset();assert.throws(()=>controller.proof(),/captura/);
 assert.equal(privacy.hidden,true);
-upload();await settle();confirm.checked=true;w.dispatchEvent(new w.Event('pagehide'));assert.throws(()=>controller.proof(),/captura/);
-await w.happyDOM.close();console.log('PASS: screenshot-first import, automatic odds, immutable bet binding, confirmation, real disposal progress, termination failure, decoder cleanup, cancellation and stale-job isolation.');
+upload();await settle();w.dispatchEvent(new w.Event('pagehide'));assert.throws(()=>controller.proof(),/captura/);
+await w.happyDOM.close();console.log('PASS: screenshot-first import, automatic odds, immutable bet binding, publish-as-confirmation, real disposal progress, termination failure, decoder cleanup, cancellation and stale-job isolation.');
