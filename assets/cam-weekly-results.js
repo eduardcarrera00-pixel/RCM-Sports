@@ -64,7 +64,7 @@
      // Badge editorial: icono vectorial propio, sin emojis ni texto superpuesto.
      const badge=el('p',null,'cam-weekly-result-badge');
      const state=result.outcome==='won'?'won':result.outcome==='lost'?'lost':'pending';
-     const label=outcome(result).replace(/^✅\\s*/,'');
+     const label=outcome(result).replace('✅ ','');
      badge.dataset.outcome=state;
      badge.setAttribute('role','status');
      badge.setAttribute('aria-label',label);
