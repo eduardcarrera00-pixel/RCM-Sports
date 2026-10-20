@@ -227,8 +227,8 @@ html:not(.dark) body #footballTakes.ae-picks-editorial .ae-picks-rail>section.ae
 
 
 /* AE SPORTS · Picks columns aligned with Eres Chef and Mejores Platos (Oct 17). */
-/* La misma pareja de columnas rige ambas filas:
-   Pick semanal / Eres Chef a la izquierda y Noticias / Platos a la derecha. */
+/* El Pick semanal ocupa todo el ancho superior.
+   La fila de Eres Chef y Platos conserva sus dos columnas en escritorio. */
 html body #footballTakes.ae-picks-editorial{
   --ae-picks-aligned-gutter:clamp(15px,2.9vw,29px);
   --ae-picks-aligned-gap:22px;
@@ -236,7 +236,7 @@ html body #footballTakes.ae-picks-editorial{
 html body #footballTakes.ae-picks-editorial #aePicksTopPair{
   display:grid!important;
   box-sizing:border-box!important;
-  grid-template-columns:minmax(0,1.74fr) minmax(0,.86fr)!important;
+  grid-template-columns:minmax(0,1fr)!important;
   align-items:stretch!important;
   column-gap:var(--ae-picks-aligned-gap)!important;
   width:calc(100% - 2 * var(--ae-picks-aligned-gutter))!important;
