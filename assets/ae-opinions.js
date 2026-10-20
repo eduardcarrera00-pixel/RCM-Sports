@@ -64,14 +64,11 @@
     const root = $('aeOpinionsTabs'); if (!root) return;
     root.replaceChildren();
     for (const [key, label] of [['todas', 'Todas'], ...SPORTS]) {
-      const count = key === 'todas' ? items.length : items.filter(o => o.sport === key).length;
       const b = el('button', null, 'ae-opinions-tab');
       b.type = 'button'; b.setAttribute('role', 'tab'); b.dataset.sport = key;
       b.setAttribute('aria-selected', String(active === key));
       b.tabIndex = active === key ? 0 : -1;
       b.append(el('span', label));
-      if (loaded) b.append(el('span', count, 'ae-opinions-tab-count'));
-      b.setAttribute('aria-label', label + ', ' + count + (count === 1 ? ' opinión' : ' opiniones'));
       b.addEventListener('click', () => { active = key; render(); });
       b.addEventListener('keydown', e => {
         if (!['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(e.key)) return;

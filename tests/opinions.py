@@ -81,6 +81,9 @@ def run():
                 assert page.locator('.ae-opinion-card').first.locator('.ae-opinion-title').inner_text().startswith('Los Chiefs')
                 tabs = page.locator('#aeOpinionsTabs [role=tab] > span:first-child').all_inner_texts()
                 assert tabs == ['Todas', 'NFL', 'Fútbol', 'Colegial', 'Ciclismo', 'Tenis'], tabs
+                assert page.locator('.ae-opinions-tab-count').count() == 0, 'sin contadores en las pestañas'
+                bar = page.evaluate("(()=>{const n=document.getElementById('aeOpinionsTabs');n.scrollTop=40;return [n.scrollTop,n.scrollHeight-n.clientHeight,getComputedStyle(n).overflowY]})()")
+                assert bar[0] == 0 and bar[1] <= 0 and bar[2] == 'hidden', ('la barra no se mueve en vertical', bar)
                 assert page.evaluate('document.documentElement.scrollWidth') <= width, 'sin scroll horizontal'
                 if SHOTS:
                     page.screenshot(path=f'{SHOTS}/opiniones-{width}-{"dark" if dark else "light"}.png', full_page=True)

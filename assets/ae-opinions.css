@@ -108,25 +108,24 @@ html.dark .ae-opinions-button.is-danger { color:#f0a08e; }
   outline-offset:2px;
 }
 
-/* Pestañas por deporte */
+/* Pestañas por deporte: solo se desplazan en horizontal, sin moverse en vertical. */
 .ae-opinions-tabs {
   display:flex;
   gap:4px;
   overflow-x:auto;
+  overflow-y:hidden;
+  overscroll-behavior-x:contain;
   scrollbar-width:none;
-  border-bottom:1px solid var(--op-line);
+  box-shadow:inset 0 -1px 0 var(--op-line);
 }
 .ae-opinions-tabs::-webkit-scrollbar { display:none; }
 .ae-opinions-tab {
   flex:0 0 auto;
   display:inline-flex;
   align-items:center;
-  gap:8px;
   min-height:44px;
   padding:0 16px;
-  margin-bottom:-1px;
   border:0;
-  border-bottom:2px solid transparent;
   background:none;
   color:var(--op-muted);
   font:600 14px/1 var(--op-sans);
@@ -135,16 +134,7 @@ html.dark .ae-opinions-button.is-danger { color:#f0a08e; }
 .ae-opinions-tab:hover { color:var(--op-text); }
 .ae-opinions-tab[aria-selected="true"] {
   color:var(--op-text);
-  border-bottom-color:var(--op-action);
-}
-.ae-opinions-tab-count {
-  min-width:22px;
-  padding:3px 6px;
-  border:1px solid var(--op-line);
-  font-size:11px;
-  font-weight:600;
-  color:var(--op-muted);
-  text-align:center;
+  box-shadow:inset 0 -2px 0 var(--op-action);
 }
 .ae-opinions-status { margin:0; min-height:0; font-size:13px; color:var(--op-muted); }
 .ae-opinions-status:empty { display:none; }
