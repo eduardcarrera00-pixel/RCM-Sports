@@ -28,7 +28,7 @@ html:not(.dark) body #cpComposePanel #cpForm .cp-capture[data-state="error"] .cp
 /* La captura define las selecciones: no hay controles manuales para reasignar cuotas. */
 html body #cpComposePanel #cpForm.cp-capture-first :is(.cp-compose-modes,.cp-compose-add,.cp-compose-remove){display:none!important;}
 html body #cpComposePanel #cpForm .cp-legs[hidden]{display:none!important;}
-html body #cpComposePanel #cpForm.cp-capture-first:not([data-imported="true"]) :is(.cp-compose-date,.cp-compose-analysis,.cp-compose-footer,.ae-draft-tools){display:none!important;}
+html body #cpComposePanel #cpForm.cp-capture-first:not([data-imported="true"]) :is(.cp-compose-date,.cp-compose-analysis,.ae-draft-tools){display:none!important;}
 html body #cpComposePanel #cpForm .cp-capture-readings{list-style:none;padding:12px 0;}
 html body #cpComposePanel #cpForm .cp-capture-readings li{display:grid;gap:5px;}
 html body #cpComposePanel #cpForm .cp-capture-readings li+li{margin-top:14px;padding-top:14px;border-top:1px solid var(--cp-dialog-line);}
@@ -117,3 +117,34 @@ html body #cpComposePanel #cpForm[data-capture-step="capture"] .cp-capture{max-h
  html body #cpComposePanel #cpForm .cp-compose-footer button[type="submit"]{min-height:54px}
 }
 @media(prefers-reduced-motion:reduce){html body #cpComposePanel #cpForm .cp-capture-progress-bar,html body #cpComposePanel #cpForm .cp-compose-footer button[type="submit"]{transition:none!important}}
+
+
+/* Cocina Picks: two-screen proof workflow. Publication remains visible on both screens. */
+html body #cpComposePanel #cpForm.cp-capture-first:not([data-imported="true"]) .cp-compose-footer{display:block!important;}
+html body #cpComposePanel #cpForm.cp-capture-first:not([data-imported="true"]) .cp-compose-footer output{display:none!important;}
+html body #cpComposePanel #cpForm .cp-compose-footer button[type="submit"]{min-height:52px;font-weight:750;transition:background .2s ease,border-color .2s ease,color .2s ease;}
+html body #cpComposePanel #cpForm .cp-compose-footer button[type="submit"]:disabled{background:#49515b!important;border:1px solid #69717b!important;color:#b8bdc4!important;opacity:1!important;cursor:not-allowed!important;}
+html body #cpComposePanel #cpForm .cp-compose-footer button[type="submit"]:not(:disabled){background:#f29343!important;border:1px solid #f29343!important;color:#152332!important;opacity:1!important;cursor:pointer!important;}
+html:not(.dark) body #cpComposePanel #cpForm .cp-compose-footer button[type="submit"]:disabled{background:#d5d5d5!important;border-color:#bbb!important;color:#555!important;}
+html:not(.dark) body #cpComposePanel #cpForm .cp-compose-footer button[type="submit"]:not(:disabled){background:#ee8835!important;border-color:#ee8835!important;color:#142434!important;}
+html body #cpComposePanel #cpForm .cp-compose-footer #cpPublishHint{text-align:center;font-size:11px;line-height:1.5;}
+html body #cpComposePanel #cpForm .cp-compose-preview .cp-compose-description{display:block!important;margin-top:15px!important;}
+html body #cpComposePanel #cpForm .cp-compose-description-count{display:block;text-align:right;margin-top:4px;color:var(--cp-dialog-muted);font-size:11px;font-weight:400;}
+html body #cpComposePanel #cpForm .cp-capture-shot{margin:12px 0;padding:10px;border:1px solid #506b7b;background:#071b2a;text-align:center;}
+html body #cpComposePanel #cpForm .cp-capture-shot[hidden]{display:none!important;}
+html body #cpComposePanel #cpForm .cp-capture-shot img{display:block;margin:auto;max-width:100%;max-height:270px;object-fit:contain;}
+html body #cpComposePanel #cpForm .cp-capture-progress{overflow:hidden;height:6px;margin:10px 0;background:#334955;}
+html body #cpComposePanel #cpForm .cp-capture-progress[hidden]{display:none!important;}
+html body #cpComposePanel #cpForm .cp-capture-progress-bar{display:block;height:100%;width:0%;background:#edae79;transition:width .15s linear;}
+html body #cpComposePanel #cpForm .cp-compose-ticket-head{display:grid;gap:3px;margin:6px 0 12px;}
+html body #cpComposePanel #cpForm .cp-compose-ticket-sport{text-transform:uppercase;letter-spacing:.1em;font:700 11px/1.4 Inter,system-ui,sans-serif;color:var(--cp-dialog-action);}
+html body #cpComposePanel #cpForm .cp-compose-ticket-match{font:600 22px/1.25 Newsreader,Georgia,serif;color:var(--cp-dialog-ink);}
+html body #cpComposePanel #cpForm .cp-compose-ticket-choices{list-style:none;display:grid;gap:0;margin:12px 0 16px;padding:0 0 0 14px;border-left:1px solid var(--cp-dialog-action);}
+html body #cpComposePanel #cpForm .cp-compose-ticket-choices li{position:relative;padding:8px 0 8px 14px;font:500 13px/1.45 Inter,system-ui,sans-serif;overflow-wrap:anywhere;}
+html body #cpComposePanel #cpForm .cp-compose-ticket-choices li::before{content:'';position:absolute;left:-19px;top:15px;width:8px;height:8px;border:1px solid var(--cp-dialog-action);background:var(--cp-dialog-field);border-radius:50%;}
+html body #cpComposePanel #cpForm .cp-compose-ticket-amount{padding-top:7px;border-top:1px solid var(--cp-dialog-line);}
+html body #cpComposePanel #cpForm .cp-compose-ticket-amount dd{font-size:14px!important;font-weight:600!important;color:var(--cp-dialog-ink)!important;}
+html body #cpComposePanel #cpForm .cp-compose-preview dd{font-size:14px;}
+html body #cpComposePanel #cpForm .cp-compose-preview dl>div:last-child:not(.cp-compose-ticket-amount) dd{font-size:22px;}
+@media(max-width:520px){html body #cpComposePanel #cpForm .cp-compose-ticket-match{font-size:20px;}html body #cpComposePanel #cpForm .cp-compose-ticket-choices li{font-size:12px;}}
+@media(prefers-reduced-motion:reduce){html body #cpComposePanel #cpForm .cp-compose-footer button[type="submit"],html body #cpComposePanel #cpForm .cp-capture-progress-bar{transition:none;}}
