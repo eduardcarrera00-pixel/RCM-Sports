@@ -5,7 +5,7 @@
    assets/ae-tokens.css (prefijo --ds-). Documentación: docs/tokens.md.
    Fases: 1) marca, cabecera, pie y títulos · 2) componentes · 3) ritmo.
    Especificidad: la página carga ~50 hojas sueltas DESPUÉS del bundle, así que
-   cada selector de esta capa empieza por html:not(#ds):not(#ds):not(#ds) (dos niveles
+   cada selector de esta capa empieza por html:not(#ds):not(#ds):not(#ds) (tres niveles
    de id extra) para ganar sin tocar el HTML ni el orden de carga.
    ===================================================================== */
 
