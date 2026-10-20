@@ -20,8 +20,11 @@ publication workflow and reads this repository's main branch on a five-minute
 schedule. Keep application changes here; do not create a divergent second site.
 The previous project Pages address and https://aesportsclub.github.io/ remain
 available. When changing browser origin allowlists, preserve all three
-controlled public origins. The legacy AE publisher also reads the same source;
-do not remove its scheduled publication.
+controlled public origins. Since 20 Oct 2026 the legacy AE publisher
+(`aesportsclub/aesportsclub.github.io`, workflow `Publish AE SPORTS`) is
+disabled at the owner's request: that address keeps its last published version
+and no longer updates. Do not re-enable it or write publication requests there;
+publish only to CAM Sports.
 
 ## Immediately publish source changes to the CAM SPORTS address
 
