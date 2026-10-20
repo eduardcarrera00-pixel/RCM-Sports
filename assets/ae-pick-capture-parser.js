@@ -192,7 +192,10 @@
  // total and several unpriced markets. They form ONE Pick, not separate legs.
  function extractOpenSameGameParlay(data){
   const lines=linesFrom(data),plain=clean(lines.map(l=>l.text).join('\n'));
-  if(!/\bmy bets\b/.test(plain)||!/\bsame game parlay\b/.test(plain))return null;
+  // Tickets shared from My Bets often crop away the application header. The
+  // visible, uniquely priced SGP heading and complete market summary prove the
+  // receipt's structure; an unrelated screenshot still fails below.
+  if(!/\bsame game parlay\b/.test(plain))return null;
   // The multi-event "N leg Same Game Parlay+" parser handles its own headers.
   if(/\b\d+\s*leg\s+same game parlay/.test(plain)||/\bincludes?\s*:?\s*\d+\s*same game parlay/.test(plain))return null;
   const fail=reason=>({ok:false,reason,readings:[]});
@@ -232,9 +235,19 @@
    if(!kind||label.confidence<65)continue;
    if(seen.has(kind))return fail('Hay mercados repetidos o no se pudieron separar. Prueba otra captura.');
    const previous=details[i-1];let name=previous?tidy(previous.text):'';
-   // Discard OCR navigation glyphs preceding the selected team's name.
-   const home=event.split(/\s+(?:vs?\.?|versus|at)\s+|\s*@\s+/i)[0];
-   if(kind==='moneyline'&&home&&clean(name).endsWith(clean(home)))name=home;
+   if(kind==='moneyline'){
+    // The receipt summary states the chosen team next to MONEYLINE. When OCR
+    // garbles the small detailed row, recover that team only if it is an
+    // actual participant, and never override a clearly different opponent.
+    const teams=event.split(/\s+(?:vs?\.?|versus|at)\s+|\s*@\s+/i).map(t=>t.trim());
+    const firstMarket=tidy(summary.split(/\b(?:moneyline|match betting)\b/i)[0]);
+    const chosen=teams.find(t=>t&&clean(firstMarket).endsWith(clean(t)));
+    if(chosen){
+     const other=teams.find(t=>t!==chosen&&clean(name)===clean(t));
+     if(other)return fail('El resumen y la selección del equipo no coinciden. Sube otra captura más clara.');
+     name=chosen;
+    }
+   }
    if(!previous||previous.confidence<65||name.length<2||name.length>120||
     eventPattern.test(name)||marketKind(name)||
     /^(?:my bets|open|settled|same game parlay|total wager|total payout)$/i.test(name))
@@ -251,6 +264,15 @@
    const index=lines.findIndex((l,i)=>i>h&&new RegExp('\\b'+label+'\\b','i').test(l.text));
    if(index<0)return null;
    const preceding=lines[index-1]?.text.trim()||'';
+   // PSM 11 often puts stake and payout on consecutive lines, then their
+   // labels on consecutive lines. Respect the column order, not proximity.
+   const wagerLine=lines.findIndex((l,i)=>i>h&&/^\s*total wager\s*$/i.test(l.text));
+   const payoutLine=lines.findIndex((l,i)=>i>h&&/^\s*total payout\s*$/i.test(l.text));
+   if(wagerLine>1&&payoutLine===wagerLine+1){
+    const first=lines[wagerLine-2]?.text.match(/^\s*\$\s*(\d+[.,]\d{2})\s*$/);
+    const second=lines[wagerLine-1]?.text.match(/^\s*\$\s*(\d+[.,]\d{2})\s*$/);
+    if(first&&second)return Number((label==='total wager'?first[1]:second[1]).replace(',','.'));
+   }
    const match=preceding.match(/^\$?\s*(\d+(?:[.,]\d{2}))$/);
    if(match)return Number(match[1].replace(',','.'));
    // On phones, both amount columns and their labels may share adjacent lines.
