@@ -218,8 +218,12 @@
      }
      if(job.files.length>1&&compared.readings.length!==1)throw Error('Para dos imágenes, usa una captura de cada selección, sin otras apuestas.');
      if(job.files.length>1&&compared.readings.some(r=>r.selectionCount))throw Error('Usa una sola captura de la combinada completa. No combinamos boletos distintos.');
-     if(eventDate&&compared.eventDate&&eventDate!==compared.eventDate)throw Error('Las capturas tienen fechas distintas. Usa el boleto de la misma combinada.');
-     readings.push(...compared.readings);if(compared.total)total=compared.total;if(compared.eventDate){eventDate=compared.eventDate;dateSource=compared.dateSource||'';}
+     if(eventDate&&compared.eventDate&&eventDate!==compared.eventDate&&readings.some(r=>compared.readings.some(other=>other.event===r.event)))throw Error('Las capturas muestran fechas distintas para el mismo partido.');
+     readings.push(...compared.readings);if(compared.total)total=compared.total;
+     if(compared.eventDate){
+      if(eventDate&&eventDate!==compared.eventDate){eventDate=[eventDate,compared.eventDate].sort().at(-1);dateSource='last_event';}
+      else if(!eventDate){eventDate=compared.eventDate;dateSource=compared.dateSource||'';}
+     }
     }
     if(!isCurrent(job))return;
     prepared={readings,total,eventDate,dateSource};
@@ -232,7 +236,7 @@
      active=null;input.value='';input.disabled=false;picker.disabled=false;cancel.hidden=true;cancel.disabled=false;panel.removeAttribute('aria-busy');showPrivacy(discarded?'complete':'unconfirmed',!prepared);
      if(discarded&&prepared){
       result=prepared;applyImport(result);signature=fingerprint();
-      panel.dataset.state='matched';title.textContent='Captura leída';status.textContent='Revisa tu pick y completa la fecha del evento para publicar.';picker.textContent='Cambiar captura';
+      panel.dataset.state='matched';title.textContent='Captura leída';status.textContent=prepared.eventDate?'Fecha del evento completada automáticamente. Revisa los datos y publica tu Pick.':'Revisa tu pick e indica la fecha del evento para publicar.';picker.textContent='Cambiar captura';
       summary.replaceChildren(...prepared.readings.map((r,i)=>{
        const item=node('li');
        item.append(node('small',(r.selectionCount?r.selectionCount+' selecciones · ':prepared.readings.length>1?'Selección '+(i+1)+' · ':'')+(r.sport||'Otros')),node('strong',r.event),node('span',r.selection),node('span',(r.originalBeforeBoost?'Momio original, sin boost · ':'Momio automático · ')+(r.odds>0?'+':'')+r.odds,'cp-capture-odds'));
