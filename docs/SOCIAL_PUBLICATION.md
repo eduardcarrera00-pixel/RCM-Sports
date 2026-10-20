@@ -19,25 +19,30 @@ Se usa la API GraphQL oficial de Buffer, `schedulingType: automatic` y
 texto breve y enlace. No se generan vídeos en esta fase. Cuando una imagen no
 es un archivo HTTPS JPG/PNG utilizable, se usa el logo actual de CAM Sports.
 
-## Activación pendiente de la cuenta
+## Estado verificado el 20 de octubre de 2026
 
-El 20 de octubre de 2026 Buffer mostró **Get started by verifying your email**
-en su página API. Se reenvió la verificación y después Buffer habilitó el botón
-**New Key**. No se creó ni se guardó ninguna clave de Buffer durante la
-preparación: esa creación requiere la confirmación del propietario.
+La integración está **activada**. El propietario autorizó crear la clave,
+guardarla en Supabase y publicar la propuesta #72 en `main`.
+La clave se transfirió directamente de Buffer a Supabase Vault, sin archivos
+intermedios ni exposición del valor en el código o los mensajes.
 
-Para activar:
+- Nombre en Vault: `cam_buffer_api_key`.
+- Permisos: `account:read`, `posts:read`, `posts:write`.
+- Vencimiento: **19 de noviembre de 2026** (30 días predeterminados).
+  Debe sustituirse antes de esa fecha para mantener los envíos.
+- Ambos canales se verificaron por API: conectados, colas sin pausar y TikTok
+  con publicación automática, sin recordatorios manuales.
+- Cron operativo; integración habilitada y sin importación de contenido antiguo.
 
-1. Crear la clave personal en Buffer con la aprobación exigida por el navegador.
-2. Guardarla exclusivamente en Supabase Vault con nombre `cam_buffer_api_key`.
-   No ponerla en GitHub, archivos de la web ni mensajes de diagnóstico.
-3. Comprobar mediante la API los dos canales observados en Buffer y su capacidad
-   de publicación automática. Configurar `cam_social.channels` con esos IDs.
-4. Activar `cam_social.settings.enabled=true, activated_at=now()`.
-   No cambiar `activated_at` en una pausa/reanudación normal: ese campo es el
-   inicio de la integración. No hay importación de publicaciones antiguas.
-5. Publicar una prueba explícita y verificar **Sent** y el enlace real en cada
-   red. Crear un objeto en Buffer no demuestra que se publicó en la red.
+La prueba con el logo actual se envió una sola vez a cada red y se verificó
+como `sent`, con enlaces reales:
+
+- [X](https://twitter.com/CAM_SPORTS__/status/2112624067589112058)
+- [TikTok](https://tiktok.com/@cam.sports.club/video/7698831081914617106)
+
+No cambiar `activated_at` en una pausa/reanudación normal: ese campo marca el
+inicio de la integración. La instalación del esquema nunca contiene la clave.
+Las fotos de perfil de las cuentas no se modifican con esta integración.
 
 ## Controles y límites
 
@@ -74,3 +79,4 @@ desactivada. El asesor de seguridad marca las tablas privadas sin políticas
 Fuentes de implementación: [API de Buffer](https://developers.buffer.com/reference.html),
 [publicación](https://developers.buffer.com/guides/posts-and-scheduling.html),
 [pg_net](https://supabase.com/docs/guides/database/extensions/pg_net).
+
