@@ -57,4 +57,20 @@ assert.equal(extract(scan(opened.filter(x=>x!=='BOTH TEAMS TO SCORE'))).ok,false
 assert.equal(extract(scan(opened.filter(x=>!x.includes('Paris St-G Moneyline (3-way), Over 3.5 Goals')))).ok,false,'A cropped market summary cannot authenticate an incomplete compact ticket');
 assert.equal(extract(scan(opened.concat(opened))).ok,false,'Multiple tickets must not merge');
 assert.equal(extract(scan(opened.map(x=>x==='Same Game Parlay +240'?'Same Game Parlay':x))).ok,false,'Do not derive a quote from monetary returns');
+
+const phoneOcr=[
+ 'My Bets @so00 B','Open Settled','Same Game Parlay” +240',
+ 'Paris St-G Moneyline (3-way), Over 3.5 Goals Over/Under 3.5 A',
+ 'Goals, Yes Both Teams To Score','Paris St-G v Barcelona TUE 3:00PM ET',
+ 'ni Is Paris St-G','MONEYLINE (3-WAY)','Over 3.5 Goals',
+ 'OVER/UNDER 3.5 GOALS','Yes','BOTH TEAMS TO SCORE',
+ '$10.00 $34.08','TOTAL WAGER TOTAL PAYOUT'];
+const phoneResult=extract(scan(phoneOcr));
+assert.equal(phoneResult.ok,true,'The real phone screenshot OCR should read as one SGP');
+assert.equal(phoneResult.readings[0].odds,240);
+assert.equal(phoneResult.readings[0].wager,10);
+assert.equal(phoneResult.readings[0].payout,34.08);
+assert.match(phoneResult.readings[0].selection,/^Paris St-G · MONEYLINE/);
+console.log('PASS: real mobile OCR lines preserve the three markets, +240, wager and payout.');
+
 console.log('PASS: three-market Same Game Parlay +240, complete selection list, and guarded currency metadata.');
