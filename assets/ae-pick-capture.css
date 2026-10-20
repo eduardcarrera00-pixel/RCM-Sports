@@ -64,3 +64,19 @@ html:not(.dark) body #cpComposePanel #cpForm .cp-capture-privacy[data-state="com
 @media(prefers-reduced-motion:reduce){html body #cpComposePanel #cpForm .cp-capture-privacy *{animation:none!important;}}
 html body #cpComposePanel #cpForm input[readonly]{background:var(--cp-dialog-field);border-style:dashed;cursor:default;opacity:1;}
 html body #cpComposePanel #cpForm button[type="submit"]:disabled{opacity:.5;cursor:default;}
+/* Tras la lectura, una vista previa reúne todos los datos antes de publicar. */
+html body #cpComposePanel #cpForm .cp-capture[data-state="matched"] :is(.cp-capture-intro,.cp-capture-help){display:none;}
+html body #cpComposePanel #cpForm .cp-compose-preview{padding:18px;border:1px solid var(--cp-dialog-line);border-top:3px solid var(--cp-dialog-action);background:var(--cp-dialog-field);color:var(--cp-dialog-ink);min-width:0;}
+html body #cpComposePanel #cpForm .cp-compose-preview[hidden]{display:none!important;}
+html body #cpComposePanel #cpForm .cp-compose-preview h3{margin:0 0 6px;font:600 25px/1.2 Newsreader,Georgia,serif;color:inherit;}
+html body #cpComposePanel #cpForm .cp-compose-preview h4{margin:0 0 12px;font:600 13px/1.5 Inter,system-ui,sans-serif;color:var(--cp-dialog-action);}
+html body #cpComposePanel #cpForm .cp-compose-preview-legs{margin-top:18px;}
+html body #cpComposePanel #cpForm .cp-compose-preview-leg+ .cp-compose-preview-leg{border-top:1px solid var(--cp-dialog-line);margin-top:18px;padding-top:18px;}
+html body #cpComposePanel #cpForm .cp-compose-preview dl{display:grid;gap:14px;margin:0;font:400 14px/1.6 Inter,system-ui,sans-serif;}
+html body #cpComposePanel #cpForm .cp-compose-preview dt{margin:0 0 3px;font-size:11px;font-weight:600;color:var(--cp-dialog-muted);}
+html body #cpComposePanel #cpForm .cp-compose-preview dd{margin:0;color:inherit;overflow-wrap:anywhere;white-space:pre-line;}
+html body #cpComposePanel #cpForm .cp-compose-preview dl>div:last-child dd{font-size:22px;font-weight:700;color:var(--cp-dialog-action);}
+html body #cpComposePanel #cpForm .cp-compose-preview-total{margin:18px 0 0;padding:12px 0;border-block:1px solid var(--cp-dialog-line);font:700 15px/1.5 Inter,system-ui,sans-serif;}
+html body #cpComposePanel #cpForm .cp-compose-preview .cp-compose-date{margin:20px 0 0!important;padding-top:16px;border-top:1px solid var(--cp-dialog-line);}
+html body #cpComposePanel #cpForm .cp-compose-preview .cp-compose-analysis{margin-top:16px;}
+@media(max-width:520px){html body #cpComposePanel #cpForm .cp-compose-preview{padding:14px;}}

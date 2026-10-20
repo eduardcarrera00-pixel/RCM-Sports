@@ -3,10 +3,11 @@ const root=path.resolve(__dirname,'..'),fixtures=fs.mkdtempSync(path.join(requir
 const {chromium}=require(root+'/node_modules/playwright');
 const raw=fs.readFileSync(root+'/tests/browser.cjs','utf8'),sandbox={require,__filename:root+'/tests/browser.cjs',process,console};vm.createContext(sandbox);vm.runInContext(raw.slice(0,raw.indexOf('\n(async()=>{'))+'\nglobalThis.client=mockClient;',sandbox);
 const client=sandbox.client.replace('order:()=>b,range:','order:()=>b,gte:()=>b,lte:()=>b,gt:()=>b,lt:()=>b,in:()=>b,is:()=>b,limit:()=>b,range:');
-let records=[],payloads=[];
+let records=[],payloads=[],failPublish=false;
 async function backend(q){
  if(q.rpc)return {data:[],error:null};
  if(q.table==='ae_community_picks'&&q.op==='insert'){
+  if(failPublish)return {data:null,error:{message:'No se pudo publicar: conexión de prueba interrumpida.'}};
   payloads.push(q.payload);const p={...q.payload,id:'pick-'+(records.length+1),user_id:'reader',author:'Lector',capture_check:{version:1,method:'on_device_ocr',checked_at:new Date().toISOString()},moderation_status:'approved',outcome:'pending',upvotes:0,downvotes:0,comments_count:0,created_at:new Date().toISOString()};
   p.american_odds=q.payload.capture_check.total?.american||p.legs[0].odds;records.push(p);return {data:p,error:null};
  }
@@ -30,6 +31,7 @@ assert.equal(requests.some(r=>r.url.includes('/vendor/ocr/')),false,'Heavy OCR m
 assert.equal(await page.locator('#cpForm button[type=submit]').isDisabled(),true);
 assert.equal(await page.locator('.cp-capture').isVisible(),true);
 assert.equal(await page.locator('.cp-capture-privacy').isVisible(),false,'The deletion indicator starts only after choosing an image');
+assert.equal(await page.locator('.cp-compose-preview').isVisible(),false,'No preview or publication before reading the screenshot');
 assert.equal(await page.locator('.cp-compose-modes').count(),0,'No simple/combined controls');
 assert.equal(await page.locator('.cp-legs').isVisible(),false,'The user never types betting details');
 for(const cls of ['.cp-compose-date','.cp-compose-analysis','.cp-compose-footer','.ae-draft-tools'])assert.equal(await page.locator('#cpForm '+cls).isVisible(),false,'Before upload only the capture task appears: '+cls);
@@ -41,6 +43,9 @@ assert.equal(await page.locator('.cp-capture-privacy').getAttribute('data-state'
 assert.match(await page.locator('.cp-capture-privacy').innerText(),/Captura descartada/);
 assert.match(await page.locator('.cp-capture-privacy').innerText(),/solo guardamos los datos de tu pick/);
 assert.equal(await page.locator('.cp-capture-privacy-steps li[data-state=complete]').count(),3);
+assert.equal(await page.locator('.cp-compose-preview').isVisible(),true);
+assert.equal(await page.locator('.cp-capture-readings').isVisible(),false,'Only one complete preview, without duplicated selections');
+for(const text of ['Deporte','NBA','Partido','Toronto Raptors vs Boston Celtics','Pronóstico','Toronto Raptors Moneyline','Momio','+150','Fecha del evento'])assert.ok((await page.locator('.cp-compose-preview').innerText()).includes(text),text);
 assert.equal(await page.locator('[name=odds_0]').inputValue(),'+150');for(const name of ['sport','event','selection','odds'])assert.equal(await page.locator('[name='+name+'_0]').evaluate(el=>el.readOnly),true);await page.locator('[name=event_date]').fill(new Date().toISOString().slice(0,10));
 assert.equal(payloads.length,0);assert.equal(await page.locator('#cpForm button[type=submit]').isDisabled(),true,'Confirmation is mandatory');
 await page.locator('#cpCaptureConfirm').check();
@@ -52,8 +57,12 @@ await page.locator('#cpCaptureConfirm').check();
 for(const width of [360,390,768,1366])for(const dark of [false,true]){await page.setViewportSize({width,height:940});await page.evaluate(dark=>document.documentElement.classList.toggle('dark',dark),dark);const fit=await page.locator('#cpComposePanel').evaluate(el=>el.scrollWidth<=el.clientWidth+1);assert.equal(fit,true,'Composer must fit '+width);}
 await page.emulateMedia({reducedMotion:'reduce'});assert.equal(await page.locator('.cp-capture-privacy-check').evaluate(el=>getComputedStyle(el).animationName),'none','Respect reduced motion');await page.emulateMedia({reducedMotion:'no-preference'});
 await page.setViewportSize({width:390,height:940});if(process.env.AE_CAPTURE_QA_DIR)fs.mkdirSync(process.env.AE_CAPTURE_QA_DIR,{recursive:true});await page.locator('.cp-capture').screenshot({path:process.env.AE_CAPTURE_QA_DIR?process.env.AE_CAPTURE_QA_DIR+'/capture-import-mobile.png':fixtures+'/capture-import-mobile.png'});
+if(process.env.AE_CAPTURE_QA_DIR)await page.locator('.cp-compose-preview').screenshot({path:process.env.AE_CAPTURE_QA_DIR+'/pick-preview-mobile.png'});
 if(process.env.AE_CAPTURE_QA_DIR)await page.screenshot({path:process.env.AE_CAPTURE_QA_DIR+'/capture-import-dialog.png'});
-await page.locator('#cpForm button[type=submit]').click();await page.waitForFunction(()=>!document.getElementById('cpComposePanel').open);assert.equal(payloads.length,1);assert.equal(payloads[0].capture_check.readings[0].odds,150);assert.equal(JSON.stringify(payloads).includes('data:image'),false);assert.equal(JSON.stringify(payloads).includes('Balance'),false);
+failPublish=true;await page.locator('#cpForm button[type=submit]').click();await page.locator('#cpForm .cp-status').filter({hasText:'conexión de prueba'}).waitFor();
+assert.equal(await page.locator('#cpComposePanel').evaluate(el=>el.open),true,'A failed publication keeps the composer open');assert.equal(await page.locator('.cp-compose-preview').isVisible(),true);assert.equal(payloads.length,0);
+failPublish=false;await page.locator('#cpForm button[type=submit]').click();await page.waitForFunction(()=>!document.getElementById('cpComposePanel').open);assert.equal(payloads.length,1);assert.equal(payloads[0].capture_check.readings[0].odds,150);assert.equal(JSON.stringify(payloads).includes('data:image'),false);assert.equal(JSON.stringify(payloads).includes('Balance'),false);
+assert.equal(await page.locator('html').evaluate(el=>el.classList.contains('ae-pick-composing')),false,'Successful publication closes the composer and releases page scrolling');
 assert.match(await page.locator('#cpFeed').innerText(),/Momio cotejado con captura/);
 await page.evaluate(()=>window.aeOpenPickComposer());await page.locator('#cpComposePanel').waitFor({state:'visible'});await page.evaluate(()=>{window.testOcrReadings=[];const create=window.Tesseract.createWorker;window.Tesseract.createWorker=async(...args)=>{const worker=await create(...args),recognize=worker.recognize;worker.recognize=async(...parameters)=>{const value=await recognize(...parameters);window.testOcrReadings.push(value.data);return value;};return worker;};});
 
@@ -79,7 +88,7 @@ if(process.env.AE_CAPTURE_USER_FIXTURES){
  assert.equal(await page.locator('.cp-capture').getAttribute('data-state'),'matched');
  assert.equal(await page.locator('[name=odds_0]').inputValue(),'+737','Use the original struck quote, never +1104');
  const selection=await page.locator('[name=selection_0]').inputValue();for(const text of ['Barcelona','GOALSCORER','5.5','ASSIST','Harry Kane'])assert.ok(selection.includes(text),text);
- assert.match(await page.locator('.cp-capture-readings').innerText(),/sin boost/);
+ assert.match(await page.locator('.cp-compose-preview').innerText(),/sin profit boost/);
  if(process.env.AE_CAPTURE_QA_DIR)await page.screenshot({path:process.env.AE_CAPTURE_QA_DIR+'/user-boost-imported.png'});
  await page.locator('[name=event_date]').fill(new Date().toISOString().slice(0,10));await page.locator('#cpCaptureConfirm').check();
  await page.locator('#cpForm button[type=submit]').click();await page.waitForFunction(()=>!document.getElementById('cpComposePanel').open);

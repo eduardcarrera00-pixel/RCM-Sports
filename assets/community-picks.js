@@ -557,6 +557,12 @@ function buildComposer(){
  explanation.input.name='explanation';explanation.input.required=false;explanation.input.maxLength=2000;
  explanation.input.placeholder='Cuéntanos por qué confías en este pick (opcional).';
  const legs=el('div',null,'cp-legs'),output=el('output','','cp-compose-summary');legs.hidden=true;
+ const preview=el('section',null,'cp-compose-preview');preview.hidden=true;preview.setAttribute('aria-labelledby','cpPreviewTitle');
+ const previewTitle=el('h3','Vista previa de tu pick');previewTitle.id='cpPreviewTitle';
+ const previewNote=el('p','Revisa estos datos antes de publicar.','cp-compose-hint');
+ const previewLegs=el('div',null,'cp-compose-preview-legs'),previewTotal=el('p','','cp-compose-preview-total');
+ preview.append(previewTitle,previewNote,previewLegs,previewTotal);
+ let previewKey='',originalBeforeBoost=false;
  output.setAttribute('aria-live','polite');
  const status=el('p','','cp-status');status.setAttribute('role','status');
  function values(){return rows.map(r=>({sport:r.sport.input.value.trim(),event:r.event.input.value.trim(),selection:r.selection.input.value.trim(),odds:Number(r.odds.input.value)}));}
@@ -569,7 +575,24 @@ function buildComposer(){
   const decimal=picks.reduce((v,l)=>v*(l.odds>0?1+l.odds/100:1+100/Math.abs(l.odds)),1);
   const total=capture?.getTotal();
   const american=total?.american??(decimal>=2?Math.round((decimal-1)*100):-Math.round(100/(decimal-1)));
-  output.textContent=valid?(picks.length===1?(picks[0].selection||'Tu Pick')+' · ':total?'Cuota total del boleto · ':'Cuota total · ')+(american>0?'+':'')+american:'Importa una captura para leer el momio';
+  output.textContent=valid?'Momio total · '+(american>0?'+':'')+american:'Importa una captura para leer el momio';
+  preview.hidden=form.dataset.imported!=='true';
+  const key=JSON.stringify({picks,american,originalBeforeBoost});
+  if(!preview.hidden&&key!==previewKey){
+   previewKey=key;
+   previewNote.textContent=originalBeforeBoost?'Partido, pronóstico y momio original, sin profit boost, leídos de tu captura.':'Partido, pronóstico y momio leídos de tu captura.';
+   previewLegs.replaceChildren(...picks.map((pick,index)=>{
+    const entry=el('div',null,'cp-compose-preview-leg');
+    if(picks.length>1)entry.append(el('h4','Selección '+(index+1)));
+    const details=el('dl');
+    for(const [label,value] of [['Deporte',pick.sport],['Partido',pick.event],['Pronóstico',pick.selection],['Momio',(pick.odds>0?'+':'')+pick.odds]]){
+     const item=el('div');item.append(el('dt',label),el('dd',value));details.append(item);
+    }
+    entry.append(details);return entry;
+   }));
+   previewTotal.hidden=picks.length<2;
+   previewTotal.textContent='Momio total de la combinada · '+(american>0?'+':'')+american;
+  }
   submit.disabled=!valid||!capture?.hasImport()||!validEventDate()||(capture.isConfirmed&&!capture.isConfirmed());
   return valid&&decimal>=2;
  }
@@ -591,15 +614,20 @@ function buildComposer(){
  const footer=el('footer',null,'cp-compose-footer');
  const submit=el('button','Publicar Pick');submit.type='submit';
  footer.append(output,submit,el('small','Revisa tu selección: no podrás editarla después de publicar.','cp-compose-hint'),status);
- form.append(legs,eventDay.wrap,analysis,footer);addRow();
+ preview.append(eventDay.wrap,analysis);
+ form.append(legs,preview,footer);addRow();
  function applyImport(imported){
   const data=imported?.readings||[];
+  originalBeforeBoost=data.some(reading=>reading.originalBeforeBoost);
   while(rows.length>Math.max(1,data.length))rows.pop().box.remove();
   while(rows.length<data.length)addRow();
   rows.forEach((row,i)=>{for(const key of ['sport','event','selection','odds'])row[key].input.value=data[i]?(key==='sport'?(data[i][key]||'Otros'):key==='odds'?(data[i].odds>0?'+':'')+data[i].odds:data[i][key]):'';});
   eventDay.input.readOnly=!!imported?.eventDate;eventDay.input.value=imported?.eventDate||'';
   dateHint.textContent=imported?.eventDate?'Fecha leída en la captura. Comprueba que corresponde al evento; si no coincide, usa otra captura.':'Indica la fecha del evento, no la fecha en que hiciste la apuesta.';
   form.dataset.imported=String(!!imported);
+  preview.hidden=!imported;
+  if(!imported){previewKey='';previewLegs.replaceChildren();}
+  calculate();
  }
  capture=window.aePickCapture?.mount({form,getPicks:values,applyImport,onChange:calculate});
  form.addEventListener('input',calculate);

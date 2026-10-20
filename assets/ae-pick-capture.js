@@ -154,7 +154,7 @@
   }
   function clear(message='Elige una captura para importar tu apuesta y su momio.',showDiscard=false){
    const job=stop(),revision=++sequence;result=null;signature='';check.checked=false;confirmation.hidden=true;summary.hidden=true;summary.replaceChildren();privacy.hidden=true;
-   input.value='';picker.textContent='Subir captura';panel.dataset.state='empty';status.textContent=message;applyImport(null);onChange();
+   input.value='';picker.textContent='Subir captura';title.textContent='Sube la captura de tu apuesta';panel.dataset.state='empty';status.textContent=message;applyImport(null);onChange();
    if(showDiscard&&job){
     showPrivacy('discarding');
     void dispose(job).then(discarded=>{if(sequence===revision&&!active)showPrivacy(discarded?'complete':'unconfirmed');});
@@ -225,13 +225,17 @@
      active=null;input.value='';input.disabled=false;picker.disabled=false;cancel.hidden=true;cancel.disabled=false;panel.removeAttribute('aria-busy');showPrivacy(discarded?'complete':'unconfirmed');
      if(discarded&&prepared){
       result=prepared;applyImport(result);signature=fingerprint();
-      panel.dataset.state='matched';status.textContent='Tu pick está preparado. Revisa los datos y confirma la fecha del evento para publicar.';picker.textContent='Cambiar captura';updateDateConfirmation();
+      panel.dataset.state='matched';title.textContent='Captura leída';status.textContent='Revisa la vista previa y confirma la fecha del evento para publicar.';picker.textContent='Cambiar captura';updateDateConfirmation();
       summary.replaceChildren(...prepared.readings.map((r,i)=>{
        const item=node('li');
        item.append(node('small',(r.selectionCount?r.selectionCount+' selecciones · ':prepared.readings.length>1?'Selección '+(i+1)+' · ':'')+(r.sport||'Otros')),node('strong',r.event),node('span',r.selection),node('span',(r.originalBeforeBoost?'Momio original, sin boost · ':'Momio automático · ')+(r.odds>0?'+':'')+r.odds,'cp-capture-odds'));
        return item;
       }));
-      summary.hidden=false;confirmation.hidden=false;
+      const preview=form.querySelector('.cp-compose-preview');summary.hidden=!!preview;confirmation.hidden=false;
+      if(preview)requestAnimationFrame(()=>{
+       if(panel.dataset.state==='matched'&&!preview.hidden&&form.closest('dialog')?.open)
+        preview.scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+      });
      }else{
       result=null;panel.dataset.state='error';status.textContent=discarded?failure:'No pudimos cerrar el lector. Recarga la página antes de volver a intentarlo.';
      }
