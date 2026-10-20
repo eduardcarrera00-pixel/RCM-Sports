@@ -88,7 +88,8 @@
         empty:'Todavía no has recibido comentarios.'
       }
     ];
-    // Two independent editorial lists, with the same global unread counter.
+    // Only new members see a welcome section; keep the usual inbox uncluttered.
+    if (!groups[0].items.length) groups.shift();
     for (const group of groups) {
       const section = create('section',null,'ae-notifications-group');
       section.setAttribute('aria-labelledby',group.id);
