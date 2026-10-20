@@ -2075,17 +2075,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
 
           </div>
           </div>
-          <section id="aeSeasonPredictions" class="ae-season-predictions" aria-labelledby="aeSeasonTitle" hidden>
-            <header class="ae-season-head">
-              <span class="ae-season-overline">PREDICCIONES · CAM SPORTS</span>
-              <h2 id="aeSeasonTitle">¿Quién será campeón?</h2>
-              <p>Una predicción por pregunta, antes del cierre. Cada opción paga según lo difícil que es: lo obvio vale poco y la sorpresa, hasta 20 pts.</p>
-            </header>
-            <nav id="aeSeasonTabs" class="ae-season-tabs" role="tablist" aria-label="Competiciones"></nav>
-            <div id="aeSeasonList" class="ae-season-list"></div>
-            <p id="aeSeasonStatus" class="ae-season-status" role="status" aria-live="polite"></p>
-          </section>
-          <div class="ae-picks-layout">
+<div class="ae-picks-layout">
             <section class="ae-picks-feed" id="communityPicks" hidden aria-label="Picks de la comunidad">
               <div class="ae-picks-feed-heading">
                  <div class="ae-picks-heading-cta-row ae-chef-marble">
@@ -2147,7 +2137,18 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
               </div>
             </section>
           </div>
-          <details id="aeWeeklyPickAdmin" class="ae-takes-admin ae-weekly-admin" hidden><summary id="aeWeeklyAdminSummary">Administrar · Publicar Pick de la Semana</summary>
+          <!-- Predicciones de temporada después de Eres Chef, últimos Picks y sus rankings. -->
+          <section id="aeSeasonPredictions" class="ae-season-predictions" aria-labelledby="aeSeasonTitle" hidden>
+            <header class="ae-season-head">
+              <span class="ae-season-overline">PREDICCIONES · CAM SPORTS</span>
+              <h2 id="aeSeasonTitle">¿Quién será campeón?</h2>
+              <p>Una predicción por pregunta, antes del cierre. Cada opción paga según lo difícil que es: lo obvio vale poco y la sorpresa, hasta 20 pts.</p>
+            </header>
+            <nav id="aeSeasonTabs" class="ae-season-tabs" role="tablist" aria-label="Competiciones"></nav>
+            <div id="aeSeasonList" class="ae-season-list"></div>
+            <p id="aeSeasonStatus" class="ae-season-status" role="status" aria-live="polite"></p>
+          </section>
+                    <details id="aeWeeklyPickAdmin" class="ae-takes-admin ae-weekly-admin" hidden><summary id="aeWeeklyAdminSummary">Administrar · Publicar Pick de la Semana</summary>
             <form id="aeWeeklyPickForm">
                <p id="aeWeeklyEditorMode" class="ae-weekly-edit-status" hidden role="status">Editando el Pick de la Semana. Los archivos originales se conservarán mientras no los sustituyas.</p>
               <label class="ae-full">Título del Pick<input name="title" minlength="5" maxlength="160" required placeholder="Nuestra selección de la semana"></label>
