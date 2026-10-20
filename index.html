@@ -291,7 +291,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261020-cam-season-1">
     <link rel="stylesheet" href="assets/ae-muted-navigation-icons.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-custom-nav-icons.css?v=20261016-1">
-<link rel="stylesheet" href="assets/ae-classical-auth-buttons.css?v=20261017-chef-recipe-hires-1">
+<link rel="stylesheet" href="assets/ae-classical-auth-buttons.css?v=20261020-cam-welcome-v1">
 <link rel="stylesheet" href="assets/ae-reference-community-design.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-mobile-header-ranking-polish.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-desktop-header-layout.css?v=20261016-1">
@@ -2460,8 +2460,32 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
     <div id="aeNotificationsList" class="ae-notifications-groups" aria-live="polite"></div>
     <footer class="ae-notifications-footer">
       <p id="aeNotificationsStatus" role="status" aria-live="polite"></p>
+      <button type="button" id="camWelcomeAdminPreview" hidden>Ver bienvenida · Vista previa admin</button>
       <button type="button" id="aeNotificationsReadAll">Marcar todas como leídas</button>
     </footer>
+  </div>
+</dialog>
+
+<dialog id="camWelcomeDialog" class="cam-welcome-dialog" aria-labelledby="camWelcomeTitle" aria-describedby="camWelcomeIntro">
+  <div class="cam-welcome-frame">
+    <header class="cam-welcome-top">
+      <span class="cam-welcome-eyebrow">CAM SPORTS · TU COMUNIDAD DEPORTIVA</span>
+      <button id="camWelcomeClose" type="button" aria-label="Cerrar bienvenida">×</button>
+    </header>
+    <div class="cam-welcome-content">
+      <img src="assets/cam-sports-logo.jpeg" alt="CAM SPORTS" class="cam-welcome-logo">
+      <span id="camWelcomePreviewLabel" class="cam-welcome-preview" hidden>VISTA PREVIA PARA ADMINISTRADORES · NO SE ENVIARÁ NINGUNA NOTIFICACIÓN</span>
+      <p class="cam-welcome-overline">HAY SITIO PARA TI</p>
+      <h2 id="camWelcomeTitle">¡Bienvenido a CAM SPORTS!</h2>
+      <p id="camWelcomeIntro" class="cam-welcome-intro">Qué gusto tenerte por aquí. Este espacio también es tuyo: vive el deporte, comparte lo que piensas y disfruta cada partido a tu manera.</p>
+      <div class="cam-welcome-features">
+        <div><strong>Descubre las noticias</strong><span>Sigue fútbol, NFL y otros deportes con nuestras noticias y análisis.</span></div>
+        <div><strong>Cocina tus Picks</strong><span>Publica tus pronósticos, conoce los de la comunidad y participa en los rankings.</span></div>
+        <div><strong>Haz oír tus Takes</strong><span>Comparte tus opiniones, responde, vota y debate con otros aficionados.</span></div>
+      </div>
+      <p class="cam-welcome-outro">Explora sin prisa, respeta las opiniones de los demás y, sobre todo, ¡pásatelo bien!</p>
+      <button type="button" id="camWelcomeExplore" class="cam-welcome-explore">Comenzar a explorar <span aria-hidden="true">→</span></button>
+    </div>
   </div>
 </dialog>
 
@@ -4295,7 +4319,8 @@ updateThemeButton();
 <script src="assets/ae-mobile-compact-home.js?v=20261016-top3-swipe-v1"></script>
 <script src="assets/ae-football-mobile-redesign.js?v=20261018-football-boards-v2"></script>
 <script src="assets/ae-home-weekly-layout.js?v=20261018-weekly-share-1"></script>
-<script src="assets/ae-notifications.js?v=20261017-compact-inbox-1"></script>
+<script src="assets/ae-notifications.js?v=20261020-cam-welcome-v1"></script>
+<script src="assets/cam-welcome.js?v=20261020-cam-welcome-v1"></script>
 
 <script id="ae-home-news-carousel-motion">
 /* Movimiento ligero y reversible: sin clones, sin alterar enlaces, votos o artículos. */
