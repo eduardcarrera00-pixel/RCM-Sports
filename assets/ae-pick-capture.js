@@ -99,7 +99,7 @@
  }
  function mount({form,getPicks,applyImport,onChange=()=>{}}){
   let result=null,signature='',active=null,sequence=0;
-  const fingerprint=()=>JSON.stringify({picks:getPicks().map(p=>({sport:p.sport,event:p.event,selection:p.selection,odds:Number(p.odds)})),date:result?.eventDate?form.elements.namedItem('event_date')?.value:''});
+  const fingerprint=()=>JSON.stringify({picks:getPicks().map(p=>({sport:p.sport,event:p.event,selection:p.selection,odds:Number(p.odds)}))});
   const panel=node('section',null,'cp-capture');panel.setAttribute('aria-labelledby','cpCaptureTitle');
   const title=node('h3','Sube la captura de tu apuesta','cp-capture-title');title.id='cpCaptureTitle';
   const intro=node('p','El deporte, el partido, el pronóstico y el momio se rellenan automáticamente. Después revisas la fecha y, si quieres, nos cuentas por qué elegiste ese pick.','cp-capture-intro');
@@ -194,7 +194,7 @@
     },errorHandler:()=>{}});
     pending.then(worker=>{if(!isCurrent(job))void worker.terminate().catch(()=>{});}).catch(()=>{});
     job.worker=await Promise.race([pending,aborted]);if(!isCurrent(job))return;
-    const readings=[];let total=null,eventDate='';
+    const readings=[];let total=null,eventDate='',dateSource='';
     for(let i=0;i<job.files.length;i++){
      const rendering=imageCanvas(job.files[i],job);job.imageTask=rendering.catch(()=>{});
      const canvas=await Promise.race([rendering,aborted]);
@@ -219,10 +219,10 @@
      if(job.files.length>1&&compared.readings.length!==1)throw Error('Para dos imágenes, usa una captura de cada selección, sin otras apuestas.');
      if(job.files.length>1&&compared.readings.some(r=>r.selectionCount))throw Error('Usa una sola captura de la combinada completa. No combinamos boletos distintos.');
      if(eventDate&&compared.eventDate&&eventDate!==compared.eventDate)throw Error('Las capturas tienen fechas distintas. Usa el boleto de la misma combinada.');
-     readings.push(...compared.readings);if(compared.total)total=compared.total;if(compared.eventDate)eventDate=compared.eventDate;
+     readings.push(...compared.readings);if(compared.total)total=compared.total;if(compared.eventDate){eventDate=compared.eventDate;dateSource=compared.dateSource||'';}
     }
     if(!isCurrent(job))return;
-    prepared={readings,total,eventDate};
+    prepared={readings,total,eventDate,dateSource};
    }catch(error){
     if(isCurrent(job))failure=error?.message||'No pudimos leer la captura. Prueba otra.';
    }finally{
