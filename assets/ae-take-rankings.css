@@ -18,3 +18,16 @@
 .ae-take-review-heading{display:flex;justify-content:space-between;gap:.6rem;flex-wrap:wrap}.ae-take-review-heading strong{overflow-wrap:anywhere}.ae-take-review-meta{font-size:.75rem;color:#626157}
 .ae-take-review-fields{display:flex;align-items:end;gap:.65rem;flex-wrap:wrap}.ae-take-review-fields label{display:grid;gap:.25rem;font-size:.78rem;font-weight:700}.ae-take-review-fields select,.ae-take-review-fields input{border:1px solid #8b8069;border-radius:3px;padding:.5rem;min-height:2.3rem;background:white;color:#222}.ae-take-review-fields input{width:5.5rem}.ae-take-review-fields button{background:#1d3a2d;color:#fff;border:0;border-radius:3px;padding:.55rem .9rem;font-weight:700;cursor:pointer}.ae-take-review-fields button:disabled{opacity:.5;cursor:wait}
 @media(max-width:600px){.ae-take-ranking{padding:1rem}.ae-take-ranking-row{grid-template-columns:1.7rem minmax(5rem,1fr) auto;padding:.65rem .25rem}.ae-take-ranking-count{font-size:.7rem}}
+
+/* Revisión por dificultad (20 oct 2026) */
+.ae-take-review-step{border:1px solid #e3d8bd;border-radius:4px;margin:0;padding:.55rem .7rem .7rem;min-width:0}
+.ae-take-review-step legend{font-size:.72rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#6b5a32;padding:0 .3rem}
+.ae-take-review-step label[hidden]{display:none}
+.ae-take-review-fields select[name=team]{min-width:11rem}
+.ae-take-review-fields select[name=condition]{max-width:16rem}
+.ae-take-review-fields input[name=odds]{width:7.5rem}
+.ae-take-review-difficulty{font-size:.74rem;font-weight:800;padding:.18rem .5rem;border-radius:999px;background:#efe6cf;color:#5a4a22;white-space:nowrap}
+.ae-take-review-difficulty[data-state=ready]{background:#1d3a2d;color:#fff}
+.ae-take-review-difficulty[data-state=trivial]{background:#e8e4da;color:#6d6a60}
+.ae-take-review-preview{font-size:.82rem;font-weight:700;color:#1d3a2d;align-self:center;min-height:1.2em}
+@media (max-width:560px){.ae-take-review-fields label{flex:1 1 100%}.ae-take-review-fields select,.ae-take-review-fields input,.ae-take-review-fields select[name=team],.ae-take-review-fields select[name=condition]{width:100%;max-width:none}.ae-take-review-heading{align-items:flex-start}}

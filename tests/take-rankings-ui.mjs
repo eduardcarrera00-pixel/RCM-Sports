@@ -8,12 +8,18 @@ d.body.innerHTML=fs.readFileSync('index.html','utf8').replace(/<script\b[^>]*>[\
 w.currentAdmin=null;
 const calls=[];
 const take={id:'take-1',title:'Pronóstico NFL',author:'Aficionado',sport:'nfl',created_at:new Date().toISOString(),outcome:null,points:null};
-w.db={rpc:async(name,args)=>{
+const classes={};
+const ranking=args=>take.outcome&&['all',take.sport].includes(args.p_sport)?[
+  {user_id:'author-1',username:'Aficionado',points:take.points,correct_takes:1,total_resolved:1}]:[];
+const query=table=>{const q={select:()=>q,in:()=>q,then:(ok,ko)=>Promise.resolve({data:table==='ae_take_classifications'?Object.values(classes):[],error:null}).then(ok,ko)};return q;};
+w.db={from:query,rpc:async(name,args)=>{
   calls.push({name,args});
   if(name==='ae_take_review_queue')return {data:args.p_sport==='nfl'?[take]:[],error:null};
-  if(name==='ae_take_result_ranking')return {data:take.outcome&&['all',take.sport].includes(args.p_sport)?[
-    {user_id:'author-1',username:'Aficionado',points:take.points,correct_takes:1,total_resolved:1}]:[],error:null};
-  if(name==='ae_score_free_take'){take.outcome=args.p_outcome;take.points=args.p_points;return {data:take.points,error:null};}
+  if(name==='ae_take_result_ranking'||name==='ae_take_result_ranking_details')return {data:ranking(args),error:null};
+  if(name==='ae_take_result_ranking_rookies')return {data:[],error:null};
+  if(name==='ae_classify_free_take'){classes[args.p_take_id]={take_id:args.p_take_id,method:args.p_method,tier:args.p_tier,probability:0.07,difficulty_points:12,trivial:false};
+    return {data:[{probability:0.07,points:12,trivial:false,snapshot_id:null}],error:null};}
+  if(name==='ae_score_free_take_auto'){take.outcome=args.p_outcome;take.points=args.p_outcome==='won'?12:0;return {data:take.points,error:null};}
   throw Error(name);
 }};
 const settle=()=>new Promise(resolve=>setTimeout(resolve,45));
@@ -31,20 +37,25 @@ await settle();
 assert.equal(d.querySelector('#aeTakeReview').hidden,false);
 const form=d.querySelector('.ae-take-review-entry');
 assert.ok(form,'The existing Take is available for admin scoring');
+assert.equal(form.querySelector('[name=method]').value,'tier','NFL Takes default to the surprise level');
+assert.ok(form.querySelector('button[type=submit]').disabled,'A result cannot be saved before the difficulty is calculated');
+form.querySelector('[name=tier]').value='bombazo';
+form.querySelector('[name=classify]').click();
+await settle();
+assert.deepEqual(JSON.parse(JSON.stringify(calls.find(c=>c.name==='ae_classify_free_take').args)),{p_take_id:'take-1',p_method:'tier',p_rescore:false,p_tier:'bombazo'});
+assert.match(form.querySelector('.ae-take-review-difficulty').textContent,/12 pts/);
 form.querySelector('[name=outcome]').value='won';
 form.querySelector('[name=outcome]').dispatchEvent(new w.Event('change'));
-form.querySelector('[name=points]').value='86';
 form.dispatchEvent(new w.Event('submit',{cancelable:true}));
 await settle();
-assert.deepEqual(JSON.parse(JSON.stringify(calls.find(c=>c.name==='ae_score_free_take').args)),{p_take_id:'take-1',p_outcome:'won',p_points:86});
-assert.match(d.querySelector('#aeSportTakeRankingList').textContent,/86 pts/);
-assert.match(d.querySelector('#aeHomeTakeRankingList').textContent,/86 pts/);
+assert.deepEqual(JSON.parse(JSON.stringify(calls.find(c=>c.name==='ae_score_free_take_auto').args)),{p_take_id:'take-1',p_outcome:'won'});
+assert.ok(!calls.some(c=>c.name==='ae_score_free_take'),'Manual point entry is no longer used');
 await d.querySelector('#aeSportTakeRanking [data-take-rank=all]').click();
 await settle();
 assert.equal(d.querySelector('#aeSportTakeRanking [data-take-rank=all]').getAttribute('aria-pressed'),'true');
 w.aeTakeRankings.setSport('Fútbol');
 await settle();
 assert.match(d.querySelector('#aeSportTakeRankingTitle').textContent,/Fútbol/);
-assert.doesNotMatch(d.querySelector('#aeSportTakeRankingList').textContent,/86 pts/);
-console.log('PASS: home/individual tabs, admin-only form, score submission and isolated sport rankings.');
+assert.doesNotMatch(d.querySelector('#aeSportTakeRankingList').textContent,/12 pts/);
+console.log('PASS: home/individual tabs, admin-only form, difficulty classification, result submission and isolated sport rankings.');
 await w.happyDOM.close();
