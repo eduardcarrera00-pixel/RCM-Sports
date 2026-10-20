@@ -9,6 +9,7 @@
  const validId=id=>/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id||'');
  let panel,list,status,previous,next,quick,quickStatus,quickRow=null,offset=0,loading=false,busy=false,sessionEpoch=0;
  const results=new Map();
+ const photoObservers=[];
  const originalX=url=>/^https:\/\/(?:twitter\.com|x\.com)\/[A-Za-z0-9_]+\/status\/([0-9]+)$/.exec(url||'');
  function replyUrl(result){
    const match=originalX(result.original_x_url);if(!match)return null;
@@ -38,24 +39,46 @@
    quick.append(el('small',quickRow.event_name+' · '+quickRow.selection));
    const saved=results.get(quickRow.id);
    if(saved?.outcome||quickRow.outcome){
+     quick.hidden=true;
      quick.append(el('strong',outcome(saved||quickRow)));quick.append(quickStatus);
      quickMessage(socialSummary({...quickRow,outcome:saved?.outcome||quickRow.outcome}));return;
    }
    const actions=el('div',null,'cam-weekly-review-actions');
-   for(const [value,label,color] of [['won','Sí, acertó','green'],['lost','No acertó','red']]){
+   for(const [value,label,color] of [['won','Sí','green'],['lost','No','red']]){
      const button=el('button',label,'cam-weekly-result-'+color);button.type='button';button.disabled=busy;
      button.id=value==='won'?'camWeeklyYes':'camWeeklyNo';
+     button.setAttribute('aria-label',value==='won'?'Sí, el Pick acertó':'No, el Pick no acertó');
      button.onclick=event=>{event.stopPropagation();resolve(quickRow,value);};actions.append(button);
    }
    quick.append(actions,quickStatus);
  }
 
  function decorate(){
+   photoObservers.splice(0).forEach(observer=>observer.disconnect());
    document.querySelectorAll('.cam-weekly-result-badge').forEach(n=>n.remove());
    for(const host of document.querySelectorAll('[data-cam-weekly-id]')){
      const result=results.get(host.dataset.camWeeklyId);
      if(!result)continue;
-     const badge=el('p',outcome(result),'cam-weekly-result-badge');badge.setAttribute('role','status');host.prepend(badge);
+     const surface=host.closest('#picksFeatured')||host;
+     surface.classList.add('cam-weekly-result-surface');
+     const image=surface.querySelector('.ae-weekly-banner,.ae-weekly-home-thumbnail,.ae-weekly-mobile-banner-thumb,.ae-weekly-inline-photo');
+     const badge=el('p',outcome(result),'cam-weekly-result-badge');
+     badge.setAttribute('role','status');
+     if(image){
+       badge.classList.add('cam-weekly-result-on-photo');
+       const position=()=>{
+         const photo=image.getBoundingClientRect(),base=surface.getBoundingClientRect();
+         if(photo.height>0){
+           badge.style.top=Math.max(0,photo.bottom-base.top-10)+'px';
+           badge.style.bottom='auto';badge.style.transform='translateY(-100%)';
+         }
+       };
+       image.addEventListener('load',position,{once:true});
+       if(typeof ResizeObserver!=='undefined'){
+         const observer=new ResizeObserver(position);observer.observe(image);photoObservers.push(observer);
+       }
+       surface.append(badge);position();
+     }else surface.append(badge);
    }
  }
  async function readPublic(id){
@@ -177,7 +200,9 @@
    quick.setAttribute('aria-label','Confirmar manualmente el resultado del Pick de la Semana');
    quick.addEventListener('click',event=>event.stopPropagation());
    const edit=$('aeWeeklyEditButton');
-   if(edit?.parentElement)edit.parentElement.after(quick);else $('picksFeaturedCard')?.before(quick);
+   const surface=$('picksFeatured');
+   if(surface){surface.classList.add('cam-weekly-result-surface');surface.append(quick);}
+   else if(edit?.parentElement)edit.parentElement.after(quick);
    panel.addEventListener('toggle',()=>{if(admin())refreshAdmin();});
    const result=el('section',null,'ae-weekly-card cam-weekly-shared-result');result.id='camWeeklySharedResult';result.hidden=true;
    result.setAttribute('aria-label','Resultado del Pick de la Semana');$('picksFeaturedCard')?.before(result);
