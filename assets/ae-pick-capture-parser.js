@@ -24,6 +24,52 @@
   }
   return lines.length?lines:String(data.text||'').split(/\n/).filter(s=>s.trim()).map(text=>({text,confidence:Number(data.confidence)||0,words:[]}));
  }
+
+ // Read the EVENT date, never accidentally the date the wager was placed.
+ function receiptEventDate(data,todayOverride=''){
+  const lines=linesFrom(data),eventRe=/\s+(?:vs?\.?|versus|contra|at)\s+|\s*@\s+/i;
+  const dayNames={sun:0,sunday:0,dom:0,domingo:0,mon:1,monday:1,lun:1,lunes:1,tue:2,tues:2,tuesday:2,mar:2,martes:2,wed:3,wednesday:3,mie:3,miercoles:3,thu:4,thur:4,thurs:4,thursday:4,jue:4,jueves:4,fri:5,friday:5,vie:5,viernes:5,sat:6,saturday:6,sab:6,sabado:6};
+  const pad=n=>String(n).padStart(2,'0');
+  function iso(y,m,d){
+   const date=new Date(Date.UTC(y,m-1,d));
+   return date.getUTCFullYear()===y&&date.getUTCMonth()===m-1&&date.getUTCDate()===d&&y>=2020&&y<=2100?[y,pad(m),pad(d)].join('-'):'';
+  }
+  function explicit(value){
+   const a=value.match(/\b(20\d{2})[-/](\d{1,2})[-/](\d{1,2})\b/);
+   if(a)return iso(+a[1],+a[2],+a[3]);
+   const b=value.match(/\b(\d{1,2})[/-](\d{1,2})[/-](20\d{2})\b/);
+   if(b)return +b[1]>12?iso(+b[3],+b[2],+b[1]):iso(+b[3],+b[1],+b[2]);
+   const c=value.match(/\b(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\.?\s+(\d{1,2})(?:,)?\s+(20\d{2})\b/i);
+   if(c){const month=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'].indexOf(c[1].slice(0,3).toLowerCase())+1;return iso(+c[3],month,+c[2]);}
+   return '';
+  }
+  const localParts=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Toronto',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
+  const today=todayOverride||['year','month','day'].map(k=>localParts.find(p=>p.type===k)?.value).join('-');
+  const placed=lines.filter(l=>/\b(placed|bet placed|apuesta realizada|apostado)\s*:/i.test(l.text)).map(l=>explicit(l.text)).find(Boolean);
+  const anchor=placed||today;
+  const at=new Date(anchor+'T12:00:00Z');
+  if(!Number.isFinite(at.getTime()))return {eventDate:'',dateSource:''};
+  const dates=[],sources=[];
+  for(let i=0;i<lines.length;i++){
+   if(!eventRe.test(lines[i].text)||lines[i].confidence<65)continue;
+   // OCR can split "TUE 3:00 PM" onto the line directly below the matchup.
+   const scope=lines.slice(i,Math.min(lines.length,i+3)).filter(l=>!/\b(placed|bet id|total wager|total payout|stake|balance)\b/i.test(l.text)).map(l=>l.text).join(' ');
+   const date=explicit(scope);
+   if(date){dates.push(date);sources.push('exact');continue;}
+   const match=scope.match(/\b(sunday|saturday|tuesday|thursday|wednesday|monday|friday|domingo|lunes|martes|miercoles|jueves|viernes|sabado|sun|mon|tue|tues|wed|thu|thur|thurs|fri|sat|dom|lun|mar|mie|jue|vie|sab)\b/i);
+   if(!match)continue;
+   const target=dayNames[match[1].toLowerCase()];
+   const delta=(target-at.getUTCDay()+7)%7;
+   const next=new Date(at.getTime()+delta*86400000);
+   const resolved=iso(next.getUTCFullYear(),next.getUTCMonth()+1,next.getUTCDate());
+   if(resolved){dates.push(resolved);sources.push(placed?'weekday_placed':'weekday_estimated');}
+  }
+  if(!dates.length)return {eventDate:'',dateSource:''};
+  // For one Pick spanning several games, choose the last event day.
+  const unique=[...new Set(dates)].sort();
+  return {eventDate:unique.at(-1),dateSource:unique.length>1?'last_event':sources.every(v=>v==='exact')?'exact':sources.includes('weekday_estimated')?'weekday_estimated':'weekday_placed'};
+ }
+
  const money=/\b(balance|saldo|stake|risk|importe|potential returns?|possible winnings?|possible winning|total bets?|total stake|to win|retorno|ganancias?|premio|bet id|ref\.)\b/;
  const offer=/\b(power play|boost|bonus|bono|mejora|cash out|cashout)\b/;
  function candidates(line,index){
@@ -202,8 +248,9 @@
  // Importar sin datos escritos: abstenerse si no hay una cuota única por selección.
  // Evento, mercado, selección y cuota se importan como una unidad inmutable.
  function extract(data){
+  const dated=read=>read?.ok?{...read,...receiptEventDate(data)}:read;
   const ticket=extractOpenSameGameParlay(data)||extractGameParlay(data)||extractDirectTicket(data);
-  if(ticket)return ticket;
+  if(ticket)return dated(ticket);
   const fail=reason=>({ok:false,reason,readings:[]});
   const lines=linesFrom(data),plain=clean(lines.map(l=>l.text).join('\n'));
   if(!lines.length||Number(data.confidence)<50)return fail('No se lee con suficiente claridad. Prueba una captura más nítida.');
@@ -266,8 +313,7 @@
    if(Math.abs(totals[0].american-computed)>1||Math.abs(totals[0].american-rounded)>1)return fail('La cuota total no coincide con las selecciones. Usa otra captura sin bonos o selecciones adicionales.');
    total={american:totals[0].american,decimal:totals[0].decimal};
   }else if(totals.length&&Math.abs(totals[0].american-readings[0].odds)>1)return fail('El total y la cuota de la selección son distintos. Usa otra captura.');
-  const date=plain.match(/\b(20\d{2}-\d{2}-\d{2})\b/),eventDate=date&&!Number.isNaN(Date.parse(date[1]))?date[1]:'';
-  return {ok:true,readings,total,eventDate};
+  return dated({ok:true,readings,total});
  }
  // A Same Game Parlay+ is one ticket, with a quoted price for the whole ticket.
  // Its internal groups are NOT independently priced player props. Keep every
@@ -446,5 +492,5 @@
   if(!price||!Number.isFinite(price.american))return {...fail('Se recuperaron '+picks.length+' selecciones, pero no se lee el momio total original. Sube otra captura que incluya la parte superior y los partidos; no usamos el bonus ni el importe para calcularlo.'),partial:preview};
   return {ok:true,readings:[{...preview,odds:price.american,visible:price.visible,format:'americana',confidence:Math.floor(price.confidence),originalBeforeBoost}],total:null,eventDate:''};
  }
- return {odds,compare,extract,linesFrom,selectionMatches,extractGameParlay,extractOpenSameGameParlay,extractDirectTicket};
+ return {odds,compare,extract,linesFrom,selectionMatches,extractGameParlay,extractOpenSameGameParlay,extractDirectTicket,receiptEventDate};
 });
