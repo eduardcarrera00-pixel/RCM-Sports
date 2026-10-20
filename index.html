@@ -4329,9 +4329,47 @@ html:not(.dark) .cam-weekly-review-row{border-color:#d9d9d0}
 @media(max-width:480px){.cam-weekly-review-actions{display:grid}.cam-weekly-review-actions button{width:100%}}
 
 .cam-weekly-result-surface{position:relative}
-.cam-weekly-result-surface .cam-weekly-result-badge{position:absolute;right:12px;bottom:12px;z-index:5;display:block;width:auto;max-width:calc(100% - 24px);margin:0;padding:0;border:0;background:none!important;box-shadow:none;border-radius:0;color:#273b49;font:700 12px/1.4 Inter,system-ui,sans-serif;pointer-events:none;letter-spacing:.01em}
-html.dark .cam-weekly-result-surface .cam-weekly-result-badge{color:#f4e8db}
-html .cam-weekly-result-surface .cam-weekly-result-on-photo{color:#fff;text-shadow:0 1px 3px #000,0 0 8px #000b}
+/* Resultado del Pick de la Semana: a la izquierda, sobre la foto, sin tapar la cuota. */
+.cam-weekly-result-surface .cam-weekly-result-badge{
+  position:absolute;left:12px;right:auto;bottom:12px;z-index:5;
+  box-sizing:border-box;display:inline-flex;align-items:center;gap:7px;
+  width:max-content;max-width:calc(100% - 24px);min-height:40px;
+  margin:0;padding:5px 10px 5px 5px;
+  border:1px solid rgba(206,170,125,.84);border-radius:0;
+  background:rgba(14,37,46,.96)!important;box-shadow:0 2px 8px rgba(2,14,22,.25);
+  color:#fff2e4!important;text-align:left;text-shadow:none!important;
+  font:750 12px/1.2 Inter,system-ui,sans-serif;letter-spacing:.01em;
+  pointer-events:none;
+}
+.cam-weekly-result-surface .cam-weekly-result-mark{
+  box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;
+  flex:none;width:28px;height:28px;
+  border:1px solid #8cc3a0;background:rgba(65,125,91,.22);
+  color:#b9ecc4;
+}
+.cam-weekly-result-surface .cam-weekly-result-mark svg{
+  display:block;width:19px;height:19px;
+}
+.cam-weekly-result-surface .cam-weekly-result-label{
+  display:block;max-width:155px;overflow-wrap:normal;
+}
+.cam-weekly-result-surface .cam-weekly-result-badge[data-outcome="lost"] .cam-weekly-result-mark{
+  color:#f1bbbb;border-color:#d69e9e;background:rgba(147,69,69,.20);
+}
+.cam-weekly-result-surface .cam-weekly-result-badge[data-outcome="pending"] .cam-weekly-result-mark{
+  color:#f1d5a5;border-color:#c5a675;background:rgba(148,110,59,.20);
+}
+html.dark .cam-weekly-result-surface .cam-weekly-result-badge,
+html:not(.dark) .cam-weekly-result-surface .cam-weekly-result-badge,
+html .cam-weekly-result-surface .cam-weekly-result-on-photo{
+  color:#fff2e4!important;text-shadow:none!important;
+}
+@media(max-width:480px){
+  .cam-weekly-result-surface .cam-weekly-result-badge{
+    left:10px;min-height:38px;gap:6px;padding:4px 8px 4px 4px;font-size:11px;
+  }
+  .cam-weekly-result-surface .cam-weekly-result-mark{width:27px;height:27px}
+}
 .cam-weekly-quick-result{position:absolute;right:10px;bottom:8px;z-index:6;display:flex;align-items:center;gap:4px;max-width:calc(100% - 20px);padding:0;margin:0;border:0!important;background:none!important;box-shadow:none!important;color:#fff;text-align:right;text-shadow:0 1px 3px #000}
 .cam-weekly-quick-result>strong{font:600 11px/1.4 Inter,system-ui,sans-serif}
 .cam-weekly-quick-result>small{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
@@ -4345,7 +4383,7 @@ html .cam-weekly-result-surface .cam-weekly-result-on-photo{color:#fff;text-shad
 .cam-weekly-quick-result[hidden]{display:none!important}
 @media(max-width:480px){.cam-weekly-quick-result .cam-weekly-review-actions{display:flex}.cam-weekly-quick-result .cam-weekly-review-actions button{width:auto}}
 </style>
-<script src="assets/cam-weekly-results.js?v=20261020-weekly-quote-5"></script>
+<script src="assets/cam-weekly-results.js?v=20261020-weekly-badge-left-1"></script>
 <script src="assets/ae-profile.js?v=20261020-prestige-1"></script>
 <script src="assets/ae-season-predictions.js?v=20261020-season-1"></script>
 <script src="assets/ae-opinions.js?v=20261020-opinions-1"></script>
