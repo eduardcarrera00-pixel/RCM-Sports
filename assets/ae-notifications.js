@@ -1,4 +1,4 @@
-/* AE SPORTS · Private in-app alerts for replies and votes, never public profile data. */
+/* CAM SPORTS · Private in-app alerts, including a one-time new-member welcome. */
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
@@ -24,9 +24,11 @@
     $('aeNotificationsButton').setAttribute('aria-label', 'Notificaciones');
     if (dialog()?.open) dialog().close();
     $('aeNotificationsList').replaceChildren();
+    if ($('camWelcomeAdminPreview')) $('camWelcomeAdminPreview').hidden = true;
   }
 
   function label(notification) {
+    if (notification.event_key === 'welcome') return '¡Bienvenido a CAM SPORTS!';
     const who = '@' + (notification.actor_name || 'Usuario');
     const entry = {
       take_reply: 'respondió en tu Take',
@@ -65,6 +67,13 @@
     const reactionTypes = new Set(['take_vote','pick_vote','comment_vote','article_like']);
     const groups = [
       {
+        id:'aeNotificationsWelcomeTitle',
+        title:'Bienvenida',
+        subtitle:'Tu inicio en CAM SPORTS',
+        items:alerts.filter(item=>item.event_key==='welcome'),
+        empty:'Tu comunidad te espera.'
+      },
+      {
         id:'aeNotificationsReactionsTitle',
         title:'Reacciones',
         subtitle:'Votos y me gusta',
@@ -75,7 +84,7 @@
         id:'aeNotificationsCommentsTitle',
         title:'Comentarios',
         subtitle:'Respuestas a tus publicaciones',
-        items:alerts.filter(item=>!reactionTypes.has(item.event_key)),
+        items:alerts.filter(item=>!reactionTypes.has(item.event_key) && item.event_key!=='welcome'),
         empty:'Todavía no has recibido comentarios.'
       }
     ];
@@ -106,7 +115,8 @@
         row.setAttribute('role','listitem');
         const action = create('button',null,'ae-notification-entry'+(item.read_at?'':' is-unread'));
         action.type = 'button';
-        const icon = create('span',item.event_key.includes('vote') ? (item.vote_value === -1 ? '▼' : '▲') :
+        const icon = create('span',item.event_key === 'welcome' ? '✦' :
+          item.event_key.includes('vote') ? (item.vote_value === -1 ? '▼' : '▲') :
           item.event_key === 'article_like' ? '♥' : '↩','ae-notification-event-icon');
         icon.setAttribute('aria-hidden','true');
         const content = create('span',null,'ae-notification-text');
@@ -133,11 +143,12 @@
     const uid = userId;
     const seq = ++loadToken;
     try {
+      const availableAt = new Date().toISOString();
       const [recent,count] = await Promise.all([
         db.from('ae_notifications').select('id,recipient_id,event_key,target_kind,target_id,source_id,actor_name,context_title,vote_value,created_at,read_at')
-          .eq('recipient_id',uid).order('created_at',{ascending:false}).limit(70),
+          .eq('recipient_id',uid).lte('created_at',availableAt).order('created_at',{ascending:false}).limit(70),
         db.from('ae_notifications').select('id',{count:'exact',head:true})
-          .eq('recipient_id',uid).is('read_at',null)
+          .eq('recipient_id',uid).is('read_at',null).lte('created_at',availableAt)
       ]);
       if (seq !== loadToken || userId !== uid) return;
       if (recent.error || count.error) throw recent.error || count.error;
@@ -159,6 +170,10 @@
   }
 
   async function openTarget(item) {
+    if (item.event_key === 'welcome') {
+      window.camWelcome?.showFromInbox();
+      return;
+    }
     if (item.target_kind === 'article') {
       const url = new URL(location.href);
       url.searchParams.set('article',item.target_id);
@@ -240,9 +255,19 @@
       if (id) {
         $('aeNotificationsButton').hidden = false;
         void refresh();
+        void verifyAdminPreview(id);
       }
       void watch(id);
     } catch (_) {}
+  }
+  async function verifyAdminPreview(id) {
+    const button = $('camWelcomeAdminPreview');
+    if (!button || userId !== id) return;
+    button.hidden = true;
+    try {
+      const permission = await db.from('editors').select('user_id').eq('user_id',id).maybeSingle();
+      if (userId === id && !permission.error && permission.data) button.hidden = false;
+    } catch (_) { /* Only verified editors see the preview button. */ }
   }
   function init() {
     $('aeNotificationsButton')?.addEventListener('click',()=>{
@@ -255,6 +280,12 @@
       void refresh();
     });
     $('aeNotificationsClose')?.addEventListener('click',()=>dialog()?.close());
+    $('camWelcomeAdminPreview')?.addEventListener('click',()=>{
+      if ($('camWelcomeAdminPreview').hidden) return;
+      dialog()?.close();
+      window.camWelcome?.showPreview();
+    });
+    window.addEventListener('cam-welcome-claimed',()=>void refresh());
     dialog()?.addEventListener('close',()=>{
       $('aeNotificationsButton').setAttribute('aria-expanded','false');
       $('aeNotificationsButton').focus({preventScroll:true});
