@@ -199,7 +199,10 @@
   if(Number(data.confidence)<50)return fail('No se lee con suficiente claridad. Prueba una captura más nítida.');
   const headers=lines.map((l,i)=>({i,text:clean(l.text)})).filter(l=>/\bsame game parlay\b/.test(l.text));
   if(headers.length!==1)return fail('El comprobante contiene varias apuestas o un encabezado ambiguo. Captura un solo Pick completo.');
-  const h=headers[0].i,quotes=candidates(lines[h],h).filter(c=>/^[+]\s*\d{3,6}$/.test(c.raw)&&c.confidence>=85);
+  const h=headers[0].i,headerQuotes=candidates(lines[h],h).filter(c=>/^[+]\s*\d{3,6}$/.test(c.raw)&&c.confidence>=85);
+   // On narrow phones OCR sometimes places the large +240 on the next line.
+   const next=lines[h+1],followingQuotes=next&&/^\+\s*\d{3,6}$/.test(next.text.trim())?candidates(next,h+1).filter(c=>c.confidence>=85):[];
+   const quotes=headerQuotes.length?headerQuotes:followingQuotes;
   if(quotes.length!==1||data.hasBoostedTicketPrice||/\bprofit boost\b/.test(plain))
    return fail('No pude leer un momio total original único de la combinada. Incluye su encabezado sin bonos.');
   const price=quotes[0];
