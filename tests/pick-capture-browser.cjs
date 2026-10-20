@@ -37,7 +37,7 @@ assert.equal(await page.locator('.cp-legs').isVisible(),false,'The user never ty
 for(const cls of ['.cp-compose-date','.cp-compose-analysis','.ae-draft-tools'])assert.equal(await page.locator('#cpForm '+cls).isVisible(),false,'Before upload only the capture task appears: '+cls);
 assert.equal(await page.locator('#cpForm .cp-compose-footer').isVisible(),true,'The disabled publishing button is always displayed');
 assert.equal(await page.locator('#cpForm button[type=submit]').isVisible(),true);
-assert.match(await page.locator('#cpForm button[type=submit]').evaluate(e=>getComputedStyle(e).backgroundColor),/rgb\(\s*(?:57|208),/);
+assert.match(await page.locator('#cpForm button[type=submit]').evaluate(e=>getComputedStyle(e).backgroundColor),/rgb\(\s*(?:73|213),/);
 assert.match(await page.locator('#cpComposeIntro').innerText(),/apuestas ya hechas/);
 if(process.env.AE_CAPTURE_QA_DIR){fs.mkdirSync(process.env.AE_CAPTURE_QA_DIR,{recursive:true});await page.screenshot({path:process.env.AE_CAPTURE_QA_DIR+'/capture-first-mobile.png'});await page.setViewportSize({width:1366,height:940});await page.screenshot({path:process.env.AE_CAPTURE_QA_DIR+'/capture-first-desktop.png'});await page.setViewportSize({width:390,height:940});}
 async function scan(filename){await page.locator('#cpCaptureFile').setInputFiles(fixtures+'/'+filename);await page.waitForFunction(()=>['matched','error'].includes(document.querySelector('.cp-capture')?.dataset.state),null,{timeout:90000});const state=await page.locator('.cp-capture').getAttribute('data-state'),status=await page.locator('#cpCaptureStatus').innerText();console.log(filename,state,status);if(state!=='matched')fs.writeFileSync(fixtures+'/browser-ocr-failure.json',JSON.stringify(await page.evaluate(()=>window.testOcrReadings)));assert.equal(state,'matched');await page.waitForFunction(()=>document.querySelector('#cpCaptureFile').files.length===0);}
@@ -58,7 +58,7 @@ await page.locator('.cp-compose-change-capture').click();assert.equal(await page
 await scan('simple.png');
 assert.equal(await page.locator('[name=odds_0]').inputValue(),'+150');for(const name of ['sport','event','selection','odds'])assert.equal(await page.locator('[name='+name+'_0]').evaluate(el=>el.readOnly),true);await page.locator('[name=event_date]').fill(new Date().toISOString().slice(0,10));
 assert.equal(payloads.length,0);assert.equal(await page.locator('#cpForm button[type=submit]').isDisabled(),false,'A valid date and scanned ticket enable publishing');
-assert.match(await page.locator('#cpForm button[type=submit]').evaluate(e=>getComputedStyle(e).backgroundColor),/rgb\(\s*(?:246|217),/);
+assert.match(await page.locator('#cpForm button[type=submit]').evaluate(e=>getComputedStyle(e).backgroundColor),/rgb\(\s*(?:242|238),/);
 assert.equal(await page.locator('#cpCaptureConfirm').count(),0,'The publish click confirms the reviewed pick');
 await page.locator('.cp-compose-description textarea').fill('Pronóstico de prueba sin guardar la imagen.');
 assert.match(await page.locator('.cp-compose-description-count').innerText(),/\d+\/300/);
