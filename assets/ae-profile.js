@@ -28,6 +28,84 @@ let ownPicks=[];
 let publicAuthorLabel='Aficionado';
 let ownUnpopularTakeId=null;
 let recentScrollObserver=null;
+let prestigeRequest=0;
+
+/* Perfil de prestigio: aciertos medidos por dificultad (escala 1–20). */
+const RISK_TEXT={
+  'Conservador':'Suele ir con lo lógico.',
+  'Equilibrado':'Mezcla apuestas seguras con alguna sorpresa.',
+  'Atrevido':'Se la juega a menudo por sorpresas.',
+  'Visionario':'Vive de las predicciones más locas.'
+};
+function percentText(p){const v=Number(p)*100;if(!Number.isFinite(v))return '';return (v<1?v.toFixed(1).replace('.',','):String(Math.round(v)))+'%';}
+function prestigeStat(label,value,detail){
+  const box=el('div',null,'ae-profile-prestige-stat');
+  box.append(el('span',label),el('strong',value));
+  if(detail)box.append(el('small',detail));
+  return box;
+}
+function renderPrestige(summary,legendary){
+  const target=$('aeProfilePrestige');
+  if(!target)return;
+  target.replaceChildren();
+  const head=el('div',null,'ae-profile-prestige-head');
+  head.append(el('span','PERFIL DE PRESTIGIO'),el('p','Cada acierto vale según lo difícil que era: lo obvio suma poco y las hazañas quedan grabadas.'));
+  target.append(head);
+  const resolved=numeric(summary?.resolved);
+  if(!summary||!resolved){
+    target.append(el('p',privateView?'Cuando se puntúen tus primeros Takes por dificultad, aquí verás tu perfil de riesgo y tus medallas.':'Este aficionado todavía no tiene Takes puntuados por dificultad.','ae-profile-empty'));
+    target.hidden=activeTab!=='takes';
+    return;
+  }
+  const stats=el('div',null,'ae-profile-prestige-stats');
+  const risk=summary.risk_label||'—';
+  stats.append(prestigeStat('Riesgo',risk,(summary.risk_score!=null?'Dificultad media '+String(summary.risk_score).replace('.',',')+' / 20. ':'')+(RISK_TEXT[risk]||'')));
+  const attempts=numeric(summary.bold_attempts),hits=numeric(summary.bold_hits);
+  const rate=summary.bold_rate!=null?String(Math.round(Number(summary.bold_rate)))+'%':'—';
+  stats.append(prestigeStat('Hazañas',rate,attempts
+    ?hits+' de '+attempts+' apuestas de 10+ pts'+(summary.bold_rate==null?' · se muestra desde 5 intentos':'')
+    :'Aún sin apuestas de 10+ pts'));
+  stats.append(prestigeStat('Legendarios',String(numeric(summary.legendary_count)),'Aciertos de 15 a 20 pts'));
+  target.append(stats);
+  if(legendary.length){
+    const list=el('ol',null,'ae-profile-medals');
+    for(const item of legendary){
+      const li=el('li',null,'ae-profile-medal');
+      const badge=el('span',null,'ae-profile-medal-badge');badge.setAttribute('aria-hidden','true');
+      const copy=el('div',null,'ae-profile-medal-copy');
+      copy.append(el('small','Epic Prediction '+(item.season_label||'')),el('strong',item.title||'Take'));
+      const meta=[];
+      if(item.points!=null)meta.push('+'+item.points+' pts');
+      const pct=percentText(item.probability);if(pct)meta.push('probabilidad '+pct);
+      if(item.competition)meta.push(item.competition);
+      copy.append(el('span',meta.join(' · ')));
+      li.append(badge,copy);
+      list.append(li);
+    }
+    target.append(el('h3','Salón de la fama','ae-profile-list-heading'),list);
+  }
+  target.hidden=activeTab!=='takes';
+}
+async function loadPrestige(userId){
+  const target=$('aeProfilePrestige');
+  if(!target||!userId)return;
+  const ticket=++prestigeRequest;
+  try{
+    const [summary,legendary]=await Promise.all([
+      db.rpc('ae_take_prestige',{p_user_id:userId}),
+      db.rpc('ae_take_legendary',{p_user_id:userId})
+    ]);
+    if(ticket!==prestigeRequest||activeAuthor!==userId)return;
+    if(summary.error)throw summary.error;
+    if(legendary.error)throw legendary.error;
+    const row=Array.isArray(summary.data)?summary.data[0]:summary.data;
+    renderPrestige(row||null,legendary.data||[]);
+  }catch(e){
+    if(ticket!==prestigeRequest)return;
+    target.replaceChildren(el('p','El perfil de prestigio no está disponible ahora mismo.','ae-profile-empty'));
+    target.hidden=activeTab!=='takes';
+  }
+}
 
 function openProfileTake(t,owner,reply=false){
   if(t.hidden)return;
@@ -46,6 +124,7 @@ async function refreshProfileTakes(){
     if(token!==request||!dialog.open||activeAuthor!==author||privateView!==isOwn)return;
     ownTakes=r.data||[];
     if(activeTab==='takes')renderTakes(ownTakes,author,!isOwn);
+    loadPrestige(author);
   }catch(e){
     if(token===request&&dialog?.open)$('aeProfileStatus').textContent='No se pudieron actualizar los Takes. '+(e.message||'');
   }
@@ -545,6 +624,7 @@ function setPrivateTab(tab){
   const pickList=$('aeProfilePicks');
   const accuracy=$('aeProfileAccuracy');
   const takeAccuracy=$('aeProfileTakeAccuracy');
+  const prestige=$('aeProfilePrestige');
 
   if(activeTab==='takes'){
     takeHighlights.hidden=false;
@@ -553,6 +633,7 @@ function setPrivateTab(tab){
     pickList.hidden=true;
     accuracy.hidden=true;
     takeAccuracy.hidden=false;
+    if(prestige)prestige.hidden=!prestige.childElementCount;
     $('aeProfileTitle').textContent=privateView?'Mis Takes':publicAuthorLabel+' · Takes';
     renderTakes(ownTakes,activeAuthor,!privateView);
   }else{
@@ -561,6 +642,7 @@ function setPrivateTab(tab){
     pickHighlights.hidden=false;
     pickList.hidden=false;
     takeAccuracy.hidden=true;
+    if(prestige)prestige.hidden=true;
     $('aeProfileTitle').textContent=privateView?'Mis Picks':publicAuthorLabel+' · Picks';
     renderPicks(ownPicks,!privateView);
   }
@@ -599,6 +681,8 @@ async function showOwn(){
   $('aeProfileAccuracy').hidden=true;
   $('aeProfileTakeAccuracy').replaceChildren();
   $('aeProfileTakeAccuracy').hidden=true;
+  if($('aeProfilePrestige')){$('aeProfilePrestige').replaceChildren();$('aeProfilePrestige').hidden=true;}
+  loadPrestige(user.id);
 
   const [takesResult,picksResult,unpopularResult]=await Promise.allSettled([
     db.rpc('ae_my_free_takes'),
@@ -655,6 +739,8 @@ async function showPublic(id,push=true,tab='takes'){
   $('aeProfilePicks').replaceChildren();
   $('aeProfileAccuracy').replaceChildren();
   $('aeProfileTakeAccuracy').replaceChildren();
+  if($('aeProfilePrestige')){$('aeProfilePrestige').replaceChildren();$('aeProfilePrestige').hidden=true;}
+  loadPrestige(id);
 
   if(push){
     const u=new URL(location.href);

@@ -1,0 +1,42 @@
+/* CAM SPORTS · Perfil de prestigio de Takes (dificultad 1–20). Mismo lenguaje que la caja de porcentaje de apoyo. */
+#aeProfileDialog .ae-profile-prestige{margin:0 18px 22px;padding:16px;border:1px solid #cfb291;
+  background:radial-gradient(circle at 10% 10%,rgba(193,127,59,.1),transparent 42%),linear-gradient(110deg,#fffaf1,#f3eadc);color:#213849}
+#aeProfileDialog .ae-profile-prestige[hidden]{display:none!important}
+#aeProfileDialog .ae-profile-prestige-head span{display:block;font:800 8.5px/1.2 Inter,system-ui,sans-serif;letter-spacing:.12em;color:#855a38}
+#aeProfileDialog .ae-profile-prestige-head p{margin:6px 0 0;font:11.5px/1.5 Inter,system-ui,sans-serif;color:#586975}
+#aeProfileDialog .ae-profile-prestige>.ae-profile-empty{margin:12px 0 0;font:11.5px/1.5 Inter,system-ui,sans-serif;color:#586975}
+#aeProfileDialog .ae-profile-prestige-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;margin-top:14px;background:rgba(197,163,128,.35);border:1px solid rgba(197,163,128,.35)}
+#aeProfileDialog .ae-profile-prestige-stat{display:flex;flex-direction:column;gap:4px;min-width:0;padding:11px 10px;background:#fffaf1}
+#aeProfileDialog .ae-profile-prestige-stat span{font:800 8.5px/1.2 Inter,system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#855a38}
+#aeProfileDialog .ae-profile-prestige-stat strong{font:600 22px/1.05 Newsreader,Georgia,serif;color:#213c4e;overflow-wrap:anywhere}
+#aeProfileDialog .ae-profile-prestige-stat small{font:10.5px/1.4 Inter,system-ui,sans-serif;color:#586975}
+#aeProfileDialog .ae-profile-prestige .ae-profile-list-heading{margin:18px 0 8px;padding-bottom:6px;font:600 20px/1.1 Newsreader,Georgia,serif;color:#213d50;border-bottom:1px solid rgba(197,163,128,.3)}
+#aeProfileDialog .ae-profile-medals{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+#aeProfileDialog .ae-profile-medal{display:grid;grid-template-columns:34px minmax(0,1fr);gap:11px;align-items:center;padding:10px 11px;border:1px solid rgba(197,163,128,.45);background:rgba(255,250,241,.75)}
+#aeProfileDialog .ae-profile-medal-badge{width:34px;height:34px;border-radius:50%;position:relative;
+  background:radial-gradient(circle at 35% 30%,#fff1c9 0 18%,#e2b65d 40%,#a8732d 100%);box-shadow:inset 0 0 0 2px rgba(255,241,201,.65),0 0 0 1px #a8732d}
+#aeProfileDialog .ae-profile-medal-badge::after{content:"★";position:absolute;inset:0;display:grid;place-items:center;font:700 15px/1 Georgia,serif;color:#6b4518}
+#aeProfileDialog .ae-profile-medal-copy{display:flex;flex-direction:column;gap:2px;min-width:0}
+#aeProfileDialog .ae-profile-medal-copy small{font:800 8.5px/1.2 Inter,system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#8a6420}
+#aeProfileDialog .ae-profile-medal-copy strong{font:600 16px/1.2 Newsreader,Georgia,serif;color:#213c4e;overflow-wrap:anywhere}
+#aeProfileDialog .ae-profile-medal-copy span{font:10.5px/1.4 Inter,system-ui,sans-serif;color:#586975}
+
+html.dark #aeProfileDialog .ae-profile-prestige{border-color:rgba(207,165,117,.44);color:#f4eadc;
+  background:radial-gradient(circle at 10% 10%,rgba(213,158,94,.13),transparent 42%),linear-gradient(110deg,rgba(22,52,67,.88),rgba(9,32,46,.68))}
+html.dark #aeProfileDialog .ae-profile-prestige-head span,html.dark #aeProfileDialog .ae-profile-prestige-stat span{color:#d2ab82}
+html.dark #aeProfileDialog .ae-profile-prestige-head p,html.dark #aeProfileDialog .ae-profile-prestige>.ae-profile-empty,
+html.dark #aeProfileDialog .ae-profile-prestige-stat small,html.dark #aeProfileDialog .ae-profile-medal-copy span{color:#c8d2d4}
+html.dark #aeProfileDialog .ae-profile-prestige-stats{background:rgba(207,165,117,.25);border-color:rgba(207,165,117,.25)}
+html.dark #aeProfileDialog .ae-profile-prestige-stat{background:rgba(9,32,46,.85)}
+html.dark #aeProfileDialog .ae-profile-prestige-stat strong,html.dark #aeProfileDialog .ae-profile-medal-copy strong{color:#fff0dd}
+html.dark #aeProfileDialog .ae-profile-prestige .ae-profile-list-heading{color:#f1d5b3;border-bottom-color:rgba(197,163,128,.22)}
+html.dark #aeProfileDialog .ae-profile-medal{border-color:rgba(207,165,117,.35);background:rgba(9,32,46,.55)}
+html.dark #aeProfileDialog .ae-profile-medal-copy small{color:#e2b65d}
+
+@media (max-width:420px){
+  #aeProfileDialog .ae-profile-prestige-stats{grid-template-columns:1fr}
+  #aeProfileDialog .ae-profile-prestige-stat{display:grid;grid-template-columns:5.5rem minmax(0,1fr);grid-template-areas:"label value" "label detail";column-gap:10px;row-gap:2px;align-items:baseline}
+  #aeProfileDialog .ae-profile-prestige-stat span{grid-area:label;align-self:center}
+  #aeProfileDialog .ae-profile-prestige-stat strong{grid-area:value}
+  #aeProfileDialog .ae-profile-prestige-stat small{grid-area:detail}
+}
