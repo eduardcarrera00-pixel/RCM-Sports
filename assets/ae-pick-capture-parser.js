@@ -121,8 +121,8 @@
  function extractDirectTicket(data){
   const lines=linesFrom(data),plain=clean(lines.map(l=>l.text).join('\n'));
   if(!lines.length||Number(data.confidence)<50||/\bsame game parlay\b/.test(plain))return null;
-  const single=/\b(single(?:\s+bet)?|straight(?:\s+bet)?)\b/;
-  const multi=/\b(parlay|multi\s*\d+\s*legs?|accumulator|combinada|acumulada)\b/;
+  const single=/\b(single(?:\s+bet)?|straight(?:\s+bet)?|apuesta\s+simple|apuesta\s+sencilla)\b/;
+  const multi=/\b(parlay|multi\s*\d+\s*legs?|multiple\s+bet|accumulator|combinada|acumulada)\b/;
   const eventRe=/\s+(?:vs?\.?|versus|contra|at)\s+|\s*@\s+/i;
   const events=lines.map((l,i)=>({...l,index:i})).filter(l=>eventRe.test(l.text)&&l.confidence>=65
    &&!/\b(share bet|cash out|potential|total payout)\b/i.test(l.text));
@@ -165,7 +165,7 @@
    const spot=choices.length?choices[0].index-event.index-1:-1;
    const own=spot<0?'':tidy(section[spot].text.replace(chosen.raw,''));
    const before=spot<0?[]:section.slice(Math.max(0,spot-2),spot).map(l=>tidy(l.text)).filter(t=>t&&!stop.test(t));
-   const after=spot>=0?[]:section.slice(0,3).map(l=>tidy(l.text)).filter(t=>t&&!stop.test(t));
+   const after=spot>=0?[]:section.slice(0,3).map(l=>tidy(l.text)).filter(t=>t&&!stop.test(t)&&!/^[$€£]?\s*\d+(?:[.,]\d{2})\s*[$€£]?$/.test(t));
    const selection=tidy(before.concat(own?[own]:[],after).join(' · '));
    if(!market.test(selection)||selection.length<4||selection.length>500)
     return fail('No se leyó el pronóstico completo junto con su mercado.');
