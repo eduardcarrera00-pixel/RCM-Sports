@@ -554,14 +554,18 @@ function buildComposer(){
  eventDay.wrap.className='cp-compose-date';
  const dateHint=el('small','Indica la fecha del evento, no la fecha en que hiciste la apuesta.','cp-compose-hint');eventDay.wrap.append(dateHint);
  eventDay.input.max=new Date(Date.parse(todayToronto()+'T12:00:00Z')+180*86400000).toISOString().slice(0,10);
- explanation.input.name='explanation';explanation.input.required=false;explanation.input.maxLength=2000;
- explanation.input.placeholder='Cuéntanos por qué confías en este pick (opcional).';
+ explanation.input.name='explanation';explanation.input.required=false;explanation.input.maxLength=300;
+ explanation.input.placeholder='¿Por qué te gusta este pick? (opcional)';
+ explanation.wrap.className='cp-compose-description';
+ explanation.wrap.firstChild.textContent='Añade un comentario (opcional)';
+ const descriptionCount=el('small','0/300','cp-compose-description-count');explanation.wrap.append(descriptionCount);
+ explanation.input.addEventListener('input',()=>{descriptionCount.textContent=explanation.input.value.length+'/300';});
  const legs=el('div',null,'cp-legs'),output=el('output','','cp-compose-summary');legs.hidden=true;
  const preview=el('section',null,'cp-compose-preview');preview.hidden=true;preview.setAttribute('aria-labelledby','cpPreviewTitle');
- const previewTitle=el('h3','Vista previa de tu pick');previewTitle.id='cpPreviewTitle';
+ const previewTitle=el('h3','Tu apuesta, lista para revisar');previewTitle.id='cpPreviewTitle';
  previewTitle.tabIndex=-1;
  const changeCapture=button('Cambiar captura',()=>capture?.clear());changeCapture.className='cp-compose-change-capture';
- const previewPrivacy=el('p','Captura descartada · La imagen no se ha subido ni guardado.','cp-compose-hint');
+ const previewPrivacy=el('p','Captura descartada de la memoria del lector. No se envía ni guarda la imagen.','cp-compose-hint');
  const previewNote=el('p','Revisa estos datos antes de publicar.','cp-compose-hint');
  const previewLegs=el('div',null,'cp-compose-preview-legs'),previewTotal=el('p','','cp-compose-preview-total');
  preview.append(previewTitle,previewPrivacy,changeCapture,previewNote,previewLegs,previewTotal);
@@ -596,7 +600,10 @@ function buildComposer(){
    previewTotal.hidden=picks.length<2;
    previewTotal.textContent='Momio total de la combinada · '+(american>0?'+':'')+american;
   }
-  submit.disabled=!valid||!capture?.hasImport()||!validEventDate()||(capture.isConfirmed&&!capture.isConfirmed());
+  const ready=valid&&decimal>=2&&!!capture?.hasImport()&&validEventDate();
+  submit.disabled=!ready||posting;
+  submit.dataset.ready=String(ready&&!posting);
+  footerHint.textContent=ready?'Al publicar confirmas que hiciste esta apuesta y revisaste la fecha y el pronóstico.':form.dataset.imported==='true'?'Indica la fecha del evento para activar «Publicar Pick».':'Disponible cuando termine de leerse una captura válida.';
   return valid&&decimal>=2;
  }
  function addRow(){
@@ -613,10 +620,11 @@ function buildComposer(){
   }
   rows.push(row);legs.append(box);calculate();
  }
- const analysis=el('details',null,'cp-compose-analysis');analysis.append(el('summary','Añadir descripción (opcional)'),explanation.wrap);
+ const analysis=el('div',null,'cp-compose-analysis');analysis.append(explanation.wrap);
  const footer=el('footer',null,'cp-compose-footer');
- const submit=el('button','Publicar Pick');submit.type='submit';
- footer.append(output,submit,el('small','Revisa tu selección: no podrás editarla después de publicar.','cp-compose-hint'),status);
+ const submit=el('button','Publicar Pick');submit.type='submit';submit.disabled=true;
+ const footerHint=el('small','Disponible cuando termine de leerse una captura válida.','cp-compose-hint');footerHint.id='cpPublishHint';submit.setAttribute('aria-describedby','cpPublishHint');
+ footer.append(output,submit,footerHint,status);
  preview.append(eventDay.wrap,analysis);
  form.append(legs,preview,footer);addRow();
  function applyImport(imported){
@@ -641,6 +649,7 @@ function buildComposer(){
   e.preventDefault();if(posting)return;
   if(!form.reportValidity())return;
   if(!validEventDate()){status.textContent='Indica una fecha válida para el evento, desde hoy y dentro de los próximos 180 días.';return;}
+  if(!capture?.hasImport()){status.textContent='Primero sube una captura y espera a que termine la lectura.';return;}
   if(!calculate()){status.textContent='Revisa las cuotas: la cuota total debe ser al menos +100.';return;}
   posting=true;submit.disabled=true;
   const closer=$('cpComposeClose');if(closer)closer.disabled=true;
@@ -655,7 +664,7 @@ function buildComposer(){
    if(r.error)throw r.error;
    window.aeDraftGuard?.clear('pick');
    form.reset();while(rows.length>1)rows.pop().box.remove();
-   analysis.open=false;eventDay.input.defaultValue='';eventDay.input.value='';calculate();
+   explanation.input.value='';descriptionCount.textContent='0/300';eventDay.input.defaultValue='';eventDay.input.value='';calculate();
    closePickComposer(true);void load();
    notifyCommunity('Pick publicado con el momio cotejado. Ya puedes recibir votos y comentarios.');
   }catch(e){status.textContent=message(e);}
