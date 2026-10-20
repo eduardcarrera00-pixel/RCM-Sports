@@ -1940,6 +1940,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
                     <button onclick="filterByCategory('Picks')" class="category-btn" data-category="Picks"><span class="ae-nav-icon"><img class="ae-custom-sport-icon" src="assets/icons/ae-picks-gold.webp?v=20261016-1" width="40" height="40" loading="eager" decoding="async" alt="" aria-hidden="true"></span><span>Picks</span></button>
                     <button onclick="filterByCategory('NFL')" class="category-btn" data-category="NFL"><span class="ae-nav-icon"><img class="ae-custom-sport-icon" src="assets/icons/ae-nfl-gold.webp?v=20261016-1" width="40" height="40" loading="eager" decoding="async" alt="" aria-hidden="true"></span><span>NFL</span></button>
                     <button onclick="filterByCategory('Fútbol')" class="category-btn" data-category="Fútbol"><span class="ae-nav-icon"><img class="ae-custom-sport-icon" src="assets/icons/ae-futbol-gold.webp?v=20261016-1" width="40" height="40" loading="eager" decoding="async" alt="" aria-hidden="true"></span><span>Fútbol</span></button>
+                    <button onclick="filterByCategory('Opiniones')" class="category-btn" data-category="Opiniones"><span class="ae-nav-icon"><img class="ae-custom-sport-icon" src="assets/icons/ae-opiniones-gold.webp?v=20261020-1" width="40" height="40" loading="eager" decoding="async" alt="" aria-hidden="true"></span><span>Opiniones</span></button>
                     <button onclick="filterByCategory('Fútbol Americano Colegial')" class="category-btn" data-category="Fútbol Americano Colegial"><span class="ae-nav-icon"><img class="ae-custom-sport-icon" src="assets/icons/ae-colegial-gold.webp?v=20261016-1" width="40" height="40" loading="eager" decoding="async" alt="" aria-hidden="true"></span><span>Colegial</span></button>
                     <button onclick="filterByCategory('NBA')" class="category-btn" data-category="NBA"><span class="ae-nav-icon"><i class="fa-solid fa-basketball" aria-hidden="true"></i></span><span>NBA</span></button>
                     <button onclick="filterByCategory('Tenis')" class="category-btn" data-category="Tenis"><span class="ae-nav-icon"><i class="fa-solid fa-table-tennis-paddle-ball" aria-hidden="true"></i></span><span>Tenis</span></button>
@@ -2199,6 +2200,19 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
             <button onclick="resetFilters()" class="text-xs font-semibold text-pitch-700 hover:text-pitch-900 underline">Limpiar filtros</button>
         </div>
 
+        <section id="aeOpinions" class="ae-opinions" hidden aria-labelledby="aeOpinionsHeading">
+          <header class="ae-opinions-head">
+            <div class="ae-opinions-head-text">
+              <p class="ae-opinions-eyebrow">Opinión · La voz de la redacción</p>
+              <h2 id="aeOpinionsHeading">Opiniones</h2>
+              <p class="ae-opinions-lede">Columnas, análisis y noticias comentadas por nuestro equipo, ordenadas por deporte.</p>
+            </div>
+            <button type="button" id="aeOpinionsWrite" class="ae-opinions-button" hidden><i class="fa-solid fa-feather-pointed" aria-hidden="true"></i><span>Escribir opinión</span></button>
+          </header>
+          <div id="aeOpinionsTabs" class="ae-opinions-tabs" role="tablist" aria-label="Opiniones por deporte"></div>
+          <p id="aeOpinionsStatus" class="ae-opinions-status" role="status" aria-live="polite"></p>
+          <div id="aeOpinionsList" class="ae-opinions-list" role="tabpanel" aria-labelledby="aeOpinionsHeading"></div>
+        </section>
         <section id="heroSection" aria-label="Portada editorial"></section>
         <div class="editorial-layout grid grid-cols-1 lg:grid-cols-12 gap-8">
 
@@ -2625,6 +2639,61 @@ html:not(.dark) #aeAuthIntroNotice small{color:#5b6d76}
         </section>
     </div>
 </div>
+    <dialog id="aeOpinionReader" class="ae-opinion-dialog ae-opinion-reader" aria-labelledby="aeOpinionReaderLabel">
+      <div class="ae-opinion-dialog-bar">
+        <span id="aeOpinionReaderLabel" class="ae-opinion-dialog-label">Opinión</span>
+        <div class="ae-opinion-dialog-actions">
+          <span id="aeOpinionReaderNote" class="ae-opinion-reader-note" role="status" aria-live="polite"></span>
+          <button type="button" id="aeOpinionReaderShare" class="ae-opinions-button is-quiet"><i class="fa-solid fa-share-nodes" aria-hidden="true"></i><span>Compartir</span></button>
+          <span id="aeOpinionReaderAdmin" class="ae-opinion-reader-admin" hidden>
+            <button type="button" id="aeOpinionReaderEdit" class="ae-opinions-button is-quiet"><i class="fa-solid fa-pen" aria-hidden="true"></i><span>Editar</span></button>
+            <button type="button" id="aeOpinionReaderDelete" class="ae-opinions-button is-quiet is-danger"><i class="fa-solid fa-trash-can" aria-hidden="true"></i><span>Borrar</span></button>
+          </span>
+          <button type="button" id="aeOpinionReaderClose" class="ae-opinion-close" aria-label="Cerrar opinión"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+        </div>
+      </div>
+      <div id="aeOpinionReaderBody" class="ae-opinion-reader-body"></div>
+    </dialog>
+
+    <dialog id="aeOpinionEditor" class="ae-opinion-dialog ae-opinion-editor" aria-labelledby="aeOpinionEditorTitle">
+      <form id="aeOpinionForm" class="ae-opinion-form" novalidate>
+        <div class="ae-opinion-dialog-bar">
+          <h2 id="aeOpinionEditorTitle" class="ae-opinion-dialog-label">Escribir opinión</h2>
+          <button type="button" id="aeOpinionEditorClose" class="ae-opinion-close" aria-label="Cerrar sin guardar"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+        </div>
+        <div class="ae-opinion-form-body">
+          <div class="ae-opinion-field-row">
+            <label class="ae-opinion-field"><span>Deporte</span><select id="aeOpinionSport" required></select></label>
+            <label class="ae-opinion-field"><span>Autor</span><input id="aeOpinionAuthor" type="text" maxlength="80" autocomplete="off"></label>
+          </div>
+          <label class="ae-opinion-field"><span>Título <small id="aeOpinionTitleCount"></small></span><input id="aeOpinionTitle" type="text" minlength="5" maxlength="160" required autocomplete="off"></label>
+          <label class="ae-opinion-field"><span>Resumen <em>(opcional, aparece en la tarjeta)</em> <small id="aeOpinionSummaryCount"></small></span><textarea id="aeOpinionSummary" rows="2" maxlength="300"></textarea></label>
+          <label class="ae-opinion-field"><span>Texto <em>(deja una línea en blanco entre párrafos)</em> <small id="aeOpinionBodyCount"></small></span><textarea id="aeOpinionBody" rows="12" minlength="20" maxlength="8000" required></textarea></label>
+          <fieldset class="ae-opinion-image">
+            <legend>Imagen <em>(opcional)</em></legend>
+            <div class="ae-opinion-field-row">
+              <label class="ae-opinion-field"><span>Subir archivo</span><input id="aeOpinionFile" type="file" accept="image/jpeg,image/png,image/webp"></label>
+              <label class="ae-opinion-field"><span>o pegar enlace</span><input id="aeOpinionImage" type="url" inputmode="url" placeholder="https://…" maxlength="2048"></label>
+            </div>
+            <div id="aeOpinionImagePreview" class="ae-opinion-image-preview" hidden><img alt="Vista previa de la imagen"></div>
+            <div id="aeOpinionFocusFields" class="ae-opinion-field-row" hidden>
+              <label class="ae-opinion-field"><span>Encuadre horizontal</span><input id="aeOpinionFocusX" type="range" min="0" max="100" value="50"></label>
+              <label class="ae-opinion-field"><span>Encuadre vertical</span><input id="aeOpinionFocusY" type="range" min="0" max="100" value="50"></label>
+            </div>
+          </fieldset>
+          <div class="ae-opinion-checks">
+            <label><input id="aeOpinionPublished" type="checkbox" checked> Publicada (si la desmarcas, queda como borrador visible solo para administradores)</label>
+            <label><input id="aeOpinionFeatured" type="checkbox"> Destacada (aparece primero)</label>
+          </div>
+          <p id="aeOpinionFormError" class="ae-opinion-form-error" role="alert"></p>
+        </div>
+        <div class="ae-opinion-form-actions">
+          <button type="button" id="aeOpinionCancel" class="ae-opinions-button is-secondary">Cancelar</button>
+          <button type="submit" id="aeOpinionSave" class="ae-opinions-button">Publicar</button>
+        </div>
+      </form>
+    </dialog>
+
     <div id="publishModal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="relative bg-white border border-slate-200 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden my-auto">
 
@@ -2861,6 +2930,7 @@ html:not(.dark) #aeAuthIntroNotice small{color:#5b6d76}
                     <h4 class="font-bold text-white uppercase tracking-wider mb-3">Categorías</h4>
                     <ul class="space-y-2">
                         <li><a href="#" onclick="filterByCategory('Fútbol')" class="hover:text-pitch-400 transition-colors">Fútbol</a></li>
+                        <li><a href="#" onclick="filterByCategory('Opiniones'); return false;" class="hover:text-pitch-400 transition-colors">Opiniones</a></li>
                         <li><a href="#" onclick="filterByCategory('Fútbol Americano Colegial')" class="hover:text-pitch-400 transition-colors">Fútbol Colegial</a></li>
                         <li><a href="#" onclick="filterByCategory('NFL')" class="hover:text-pitch-400 transition-colors">NFL</a></li>
                         <li><a href="#" onclick="filterByCategory('NBA')" class="hover:text-pitch-400 transition-colors">NBA</a></li>
@@ -3147,6 +3217,7 @@ async function handleUserLogout() {
             renderArticlesFeed();
             window.aeTakeRankings?.refresh();
             window.aeSeasonPredictions?.rerender();
+            window.aeOpinions?.rerender();
         }
 async function loadUserSession() {
     try {
@@ -3413,6 +3484,23 @@ currentUser = {
             if (sportTakeCta && sportTakeHeader && sportTakeFooter) {
                 if (sportTakeCta.parentElement !== sportTakeHeader) sportTakeHeader.appendChild(sportTakeCta);
                 sportTakeFooter.hidden = true;
+            }
+            const isOpinionsPage = currentCategory === 'Opiniones';
+            document.getElementById('aeOpinions').hidden = !isOpinionsPage;
+            document.body.classList.toggle('ae-is-opinions', isOpinionsPage);
+            if (isOpinionsPage) {
+                document.getElementById('aeHomeSidebarFeatures').hidden = true;
+                document.getElementById('heroSection').hidden = true;
+                document.getElementById('noResults').hidden = true;
+                document.getElementById('articlesGrid').hidden = true;
+                document.getElementById('aeMoreNews').hidden = true;
+                document.querySelector('.editorial-layout').hidden = true;
+                document.getElementById('nflRankings').classList.add('hidden');
+                if (typeof renderChampionsVisibility === 'function') renderChampionsVisibility();
+                document.getElementById('footballTeams').classList.add('hidden');
+                document.body.classList.remove('ae-is-home');
+                window.aeOpinions?.show();
+                return;
             }
             const isPicksPage = currentCategory === 'Picks';
             document.getElementById('aeHomeSidebarFeatures').hidden = currentCategory !== 'Todos' || Boolean(currentSearchQuery);
@@ -4192,6 +4280,7 @@ updateThemeButton();
 <script src="assets/ae-editorial-weekly.js?v=20261018-weekly-share-1"></script>
 <script src="assets/ae-profile.js?v=20261020-prestige-1"></script>
 <script src="assets/ae-season-predictions.js?v=20261020-season-1"></script>
+<script src="assets/ae-opinions.js?v=20261020-opinions-1"></script>
 <script src="assets/ae-home-takes.js?v=20261017-esports-league-v1"></script>
 <script src="assets/ae-home-take-discoveries.js?v=20261018-reply-totals-1"></script>
 
