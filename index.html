@@ -1671,9 +1671,9 @@ html body.ae-is-home #mainContent #aeTrendingPortada #trendingList .ae-trending-
 </style>
 
 <style id="ae-picks-editorial-twins-league-20261017">
-/* Two equal editorial modules on the Picks page. */
+/* El Pick de la Semana ocupa la fila completa en Picks. */
 html body #footballTakes.ae-picks-editorial #aePicksTopPair{
- display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ display:grid!important;grid-template-columns:minmax(0,1fr)!important;
  align-items:stretch!important;box-sizing:border-box!important;min-width:0!important;
  width:calc(100% - 2 * clamp(15px,2.9vw,29px))!important;
  margin:20px clamp(15px,2.9vw,29px) 0!important;gap:16px!important;
@@ -2061,7 +2061,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
             <ol id="championsList" class="ae-full-ranking-list ae-ranking-accessible" aria-label="Clasificación publicada de Champions League"></ol>
         </section>
         <section id="footballTakes" class="ae-takes ae-picks-editorial" hidden aria-labelledby="takesTitle">
-          <div id="aePicksTopPair" class="ae-picks-top-pair" aria-label="Pick de la semana y noticias de Picks">
+          <div id="aePicksTopPair" class="ae-picks-top-pair" aria-label="Pick de la Semana">
           <section id="picksFeatured" class="ae-picks-feature" aria-labelledby="picksFeaturedTitle">
             <div class="ae-picks-feature-label"><div class="ae-weekly-heading-inline"><h3 id="picksFeaturedTitle">Pick de la Semana</h3></div>
               <button type="button" id="aeWeeklyShareButton" class="ae-weekly-share ae-weekly-share-picks" hidden aria-label="Compartir el Pick de la Semana" title="Compartir Pick de la Semana"><i class="fa-solid fa-share-nodes" aria-hidden="true"></i><span>Compartir</span></button>
@@ -2069,12 +2069,6 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
             <div id="picksFeaturedCard" aria-live="polite"><p>Cargando Pick editorial…</p></div>
             <div class="ae-weekly-odds-footer"><span id="aeWeeklyOddsHighlight" class="ae-weekly-odds-highlight" hidden></span></div>
           </section>
-          <div class="ae-picks-overview">
-          <section id="picksNews" class="ae-picks-news" aria-label="Última noticia de Picks">
-             <div id="picksNewsList" class="ae-picks-news-list" aria-live="polite"></div>
-           </section>
-
-          </div>
           </div>
           <div class="ae-picks-layout">
             <section class="ae-picks-feed" id="communityPicks" hidden aria-label="Picks de la comunidad">
@@ -3573,7 +3567,6 @@ currentUser = {
                 document.getElementById('nflRankings').classList.add('hidden');
                 if (typeof renderChampionsVisibility === 'function') renderChampionsVisibility();
                 document.getElementById('footballTeams').classList.add('hidden');
-                if(typeof renderAePicksNews === 'function') renderAePicksNews();
                 document.body.classList.remove('ae-is-home');
                 return;
             }
