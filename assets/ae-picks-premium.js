@@ -40,17 +40,6 @@
    const result=db.storage.from('article-images').getPublicUrl(path);
    return result.data?.publicUrl||'';
  }
- function arrange(){
-   const root=$('footballTakes'),layout=root?.querySelector('.ae-picks-layout'),aside=layout?.querySelector('.ae-picks-rail');
-   const overview=root?.querySelector('.ae-picks-overview'),pair=$('aePicksTopPair');
-   if(!layout||!aside||!overview||!pair)return;
-   const news=$('picksNews'),top=overview.querySelector('.ae-picks-small-top');
-   // Preserve the real weekly Pick and the original news modal link.
-   if(news&&news.parentElement!==pair)pair.appendChild(news);
-   if(top)aside.insertBefore(top,aside.firstChild);
-   overview.remove();
-   layout.classList.add('ae-premium-picks-grid');
- }
  /* Desktop-only community column:
     The Platos sidebar must not stretch the independent Eres Chef / latest
     Picks rows. Temporarily group those four *same* DOM nodes on desktop.
@@ -160,5 +149,5 @@
    });
  }
  window.aeEditorialMedia={upload,publicUrl};
- document.addEventListener('DOMContentLoaded',()=>{arrange();arrangeCommunityDesktop();initPreview();});
+ document.addEventListener('DOMContentLoaded',()=>{arrangeCommunityDesktop();initPreview();});
 })();
