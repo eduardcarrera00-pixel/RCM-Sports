@@ -100,6 +100,14 @@ await w.renderCommunityPicksVisibility();await settle();
 d.querySelector('#cpFeed .cp-upvote').click();
 await settle();
 assert.equal(votes.size,1,'Another account can vote while Pick is pending');
+/* A capture-based combination displays each market as its own numbered item. */
+records[0].legs[0].selection='Paris St-G · MONEYLINE (3-WAY) + Over 3.5 Goals · OVER/UNDER 3.5 GOALS + Yes · BOTH TEAMS TO SCORE';
+d.querySelector('#cpFeed .cp-downvote').click();await settle();
+assert.equal(d.querySelectorAll('#cpFeed .cp-pick-line').length,3,'Combined Picks display three individually separated markets');
+assert.match(d.querySelector('#cpFeed .cp-picks-count').textContent,/3 SELECCIONES/);
+assert.match(d.querySelectorAll('#cpFeed .cp-pick-line')[1].textContent,/Más de 3.5 goles/);
+assert.match(d.querySelectorAll('#cpFeed .cp-pick-line')[2].textContent,/Ambos equipos marcan/);
+
 d.querySelector('#cpFeed .cp-card-read-link').click();await settle();
 assert.equal(d.querySelector('#cpDialog .cp-card-detail')!==null,true);
 const reply=d.querySelector('#cpDialog form');

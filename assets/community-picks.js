@@ -37,6 +37,27 @@ function requestPickReply(id,parentId=null,onAuthRequired=null,replyDraft=''){
  if(typeof openUserAuthModal==='function')openUserAuthModal();
 }
 window.openAeCommunityPick=open;
+
+/* Feed-only readable market labels for captured multi-selection Picks. */
+function splitPickSelections(input){
+ const text=String(input||'').trim();
+ if(!text)return [];
+ return text.split(/(?:\s+\+\s+|\s+\/\s+(?=\d+[.)]\s))/)
+  .map(part=>part.trim().replace(/^\d+[.)]\s*/,'')).filter(Boolean);
+}
+function pickSelectionDisplay(input){
+ const parts=String(input||'').split(/\s*[·•]\s*/);
+ const prediction=(parts.shift()||'').trim();
+ const market=parts.join(' · ').trim();
+ if(/MONEYLINE\s*\(?(?:3[- ]WAY|3 VIAS)\)?/i.test(market))return {choice:prediction+' gana',market:'Ganador · 3 vías'};
+ if(/^MONEYLINE$/i.test(market))return {choice:prediction+' gana',market:'Ganador del partido'};
+ if(/OVER\/UNDER/i.test(market)&&/\bOVER\s+\d+(?:[.,]\d+)?\s+GOALS?\b/i.test(prediction))return {choice:prediction.replace(/\bOver\s+(\d+(?:[.,]\d+)?)\s+Goals?\b/i,'Más de $1 goles'),market:'Total de goles'};
+ if(/OVER\/UNDER/i.test(market)&&/\bUNDER\s+\d+(?:[.,]\d+)?\s+GOALS?\b/i.test(prediction))return {choice:prediction.replace(/\bUnder\s+(\d+(?:[.,]\d+)?)\s+Goals?\b/i,'Menos de $1 goles'),market:'Total de goles'};
+ if(/BOTH TEAMS TO SCORE/i.test(market)&&/^(YES|SI|SÍ)$/i.test(prediction))return {choice:'Ambos equipos marcan · Sí',market:''};
+ if(/BOTH TEAMS TO SCORE/i.test(market)&&/^NO$/i.test(prediction))return {choice:'Ambos equipos marcan · No',market:''};
+ return {choice:prediction||market,market:prediction?market:''};
+}
+
 function card(p,compact=false,detail=false){
 
  const editorial=!compact&&!detail;
@@ -86,25 +107,46 @@ function card(p,compact=false,detail=false){
    n.append(readLink);
  }
  const legs=el('div',null,'cp-card-legs');
- const simplify=text=>String(text||'').toLocaleLowerCase('es')
-   .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-   .replace(/[^a-z0-9]+/g,' ').trim();
- const titleKey=simplify(p.title);
- for(const leg of p.legs||[]){
-   const row=el('p');
-   const matchup=String(leg.event||leg.sport||'Evento');
-   const matchupKey=simplify(matchup);
-   // Si el título ya presenta el partido, damos prioridad al pronóstico:
-   // "Burnley vs Wolves" no debe aparecer dos veces en la misma tarjeta.
-   if(detail||!matchupKey||!titleKey.includes(matchupKey)){
-     row.append(el('span',matchup,'cp-leg-event'));
-   }else{
-     row.classList.add('cp-leg-no-event');
-   }
-   if(leg.selection)row.append(el('strong',leg.selection,'cp-leg-selection'));
-   if(row.childNodes.length)legs.append(row);
- }
- if(legs.childNodes.length)n.append(legs);
+  const simplify=text=>String(text||'').toLocaleLowerCase('es')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-z0-9]+/g,' ').trim();
+  const titleKey=simplify(p.title);
+  if(editorial){
+    // Each receipt may store several markets in one database leg.
+    const choices=[];
+    for(const leg of p.legs||[]){
+      const selections=splitPickSelections(leg.selection);
+      for(const selection of selections)choices.push({leg,selection});
+      if(!selections.length&&leg.event)choices.push({leg,selection:''});
+    }
+    if(choices.length){
+      const label=choices.length===1?'UNA SELECCIÓN':choices.length+' SELECCIONES';
+      legs.append(el('div',(choices.length>1?'COMBINADA · ':'EL PICK · ')+label,'cp-picks-count'));
+      choices.forEach(({leg,selection},i)=>{
+        const row=el('div',null,'cp-pick-line');
+        row.append(el('span',String(i+1).padStart(2,'0'),'cp-pick-line-number'));
+        const body=el('div',null,'cp-pick-line-body');
+        const matchup=String(leg.event||'').trim();
+        if(matchup&&!titleKey.includes(simplify(matchup)))body.append(el('span',matchup,'cp-pick-line-event'));
+        const display=pickSelectionDisplay(selection);
+        body.append(el('strong',display.choice||matchup||'Pronóstico','cp-pick-line-choice'));
+        if(display.market)body.append(el('small',display.market,'cp-pick-line-market'));
+        row.append(body);legs.append(row);
+      });
+    }
+  }else{
+    // Keep the existing full detail and compact cards unchanged.
+    for(const leg of p.legs||[]){
+      const row=el('p');
+      const matchup=String(leg.event||leg.sport||'Evento');
+      const matchupKey=simplify(matchup);
+      if(detail||!matchupKey||!titleKey.includes(matchupKey))row.append(el('span',matchup,'cp-leg-event'));
+      else row.classList.add('cp-leg-no-event');
+      if(leg.selection)row.append(el('strong',leg.selection,'cp-leg-selection'));
+      if(row.childNodes.length)legs.append(row);
+    }
+  }
+  if(legs.childNodes.length)n.append(legs);
  const odds=el('div',null,'cp-card-odds');
  odds.append(el('strong','Cuota '+(Number(p.american_odds)>0?'+':'')+p.american_odds,'cp-odds'));
  odds.append(el('small',p.moderation_status==='approved'?(['on_device_ocr','ai_vision'].includes(p.capture_check?.method)?'Momio cotejado con captura':'Cuota aprobada'):p.moderation_status==='rejected'?'Cuota rechazada':'Cuota en revisión · votos abiertos','cp-card-state'));
