@@ -591,3 +591,122 @@ html:not(#ds):not(#ds):not(#ds) body [id^="aeNewsSportTrack"] h3.text-base{
   min-height:2lh!important;
   max-height:2lh!important;
 }
+
+/* CAM SPORTS · Portada: «Demuestra tu conocimiento» es una sola acción cuadrada.
+   Conserva el ID del botón anterior para abrir el compositor de Takes con el
+   manejador existente, sin duplicar controles ni alterar NFL/Fútbol. */
+html body.ae-is-home #aeHomeTakeHighlights > .ae-home-take-extras > #aeHomeTakesSectionHeading {
+  display:flex!important;
+  justify-content:flex-start!important;
+  align-items:flex-start!important;
+  width:100%!important;
+  margin:0 0 12px!important;
+  padding:0!important;
+  border:0!important;
+  background:none!important;
+  box-shadow:none!important;
+}
+html body.ae-is-home #aeHomeTakeHighlights > .ae-home-take-extras > #aeHomeTakesSectionHeading #aeHomeTopTakesTitle {
+  margin:0!important;
+  padding:0!important;
+  width:auto!important;
+  max-width:100%!important;
+  line-height:1!important;
+}
+html:not(#ds):not(#ds):not(#ds) body.ae-is-home #aeHomeTakeHighlights #aeHomeTakesSectionHeading button#aeHomeTakePublish.cam-home-take-square {
+  box-sizing:border-box!important;
+  position:relative!important;
+  display:grid!important;
+  grid-template-rows:auto 1fr auto!important;
+  justify-items:start!important;
+  align-items:center!important;
+  flex:none!important;
+  width:198px!important;
+  height:198px!important;
+  min-width:0!important;
+  min-height:198px!important;
+  max-width:100%!important;
+  margin:0!important;
+  padding:18px!important;
+  overflow:hidden!important;
+  aspect-ratio:1!important;
+  border:1px solid rgba(210,167,115,.67)!important;
+  border-radius:0!important;
+  background:linear-gradient(145deg,#253e50 0%,#142b3c 58%,#0d2232 100%)!important;
+  color:#f4e8db!important;
+  text-align:left!important;
+  text-decoration:none!important;
+  text-shadow:none!important;
+  box-shadow:0 6px 18px rgba(4,17,27,.13)!important;
+  cursor:pointer!important;
+  transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease!important;
+}
+html body.ae-is-home #aeHomeTakeHighlights #aeHomeTakePublish .cam-home-take-square-icon {
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:34px!important;
+  height:34px!important;
+  border:1px solid rgba(218,179,132,.46)!important;
+  border-radius:0!important;
+  color:#e9c6a1!important;
+  font:19px/1 Inter,system-ui,sans-serif!important;
+}
+html body.ae-is-home #aeHomeTakeHighlights #aeHomeTakePublish .cam-home-take-square-label {
+  display:block!important;
+  max-width:100%!important;
+  align-self:center!important;
+  color:inherit!important;
+  font:600 25px/1.13 Newsreader,Georgia,serif!important;
+  letter-spacing:-.02em!important;
+  text-transform:none!important;
+  overflow-wrap:break-word!important;
+}
+html body.ae-is-home #aeHomeTakeHighlights #aeHomeTakePublish .cam-home-take-square-arrow {
+  display:block!important;
+  justify-self:end!important;
+  color:#eac8a0!important;
+  font:600 21px/1 Inter,system-ui,sans-serif!important;
+}
+html body.ae-is-home #aeHomeTakeHighlights #aeHomeTakePublish:hover {
+  transform:translateY(-2px)!important;
+  border-color:#efc997!important;
+  box-shadow:0 10px 25px rgba(3,15,24,.23)!important;
+}
+html body.ae-is-home #aeHomeTakeHighlights #aeHomeTakePublish:focus-visible {
+  outline:3px solid #edbc84!important;
+  outline-offset:4px!important;
+}
+html:not(.dark) body.ae-is-home #aeHomeTakeHighlights #aeHomeTakesSectionHeading #aeHomeTakePublish {
+  background:linear-gradient(145deg,#fffcf8 0%,#ede3d7 100%)!important;
+  color:#273b49!important;
+  border-color:#b68b68!important;
+  box-shadow:0 6px 18px rgba(50,61,67,.1)!important;
+}
+html:not(.dark) body.ae-is-home #aeHomeTakeHighlights #aeHomeTakePublish .cam-home-take-square-icon {
+  color:#82573b!important;
+  border-color:rgba(130,87,59,.34)!important;
+}
+html:not(.dark) body.ae-is-home #aeHomeTakeHighlights #aeHomeTakePublish .cam-home-take-square-arrow {
+  color:#82573b!important;
+}
+@media(max-width:760px){
+  html:not(#ds):not(#ds):not(#ds) body.ae-is-home #aeHomeTakeHighlights #aeHomeTakesSectionHeading button#aeHomeTakePublish.cam-home-take-square {
+    width:166px!important;
+    height:166px!important;
+    min-height:166px!important;
+    padding:14px!important;
+  }
+  html body.ae-is-home #aeHomeTakeHighlights #aeHomeTakePublish .cam-home-take-square-label {
+    font-size:21px!important;
+  }
+  html body.ae-is-home #aeHomeTakeHighlights #aeHomeTakePublish .cam-home-take-square-icon {
+    width:30px!important;
+    height:30px!important;
+    font-size:16px!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  html body.ae-is-home #aeHomeTakeHighlights #aeHomeTakePublish {transition:none!important}
+  html body.ae-is-home #aeHomeTakeHighlights #aeHomeTakePublish:hover {transform:none!important}
+}
