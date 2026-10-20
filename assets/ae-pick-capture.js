@@ -123,11 +123,15 @@
   form.prepend(panel);form.classList.add('cp-capture-first');
   form.querySelector('.cp-compose-footer').before(confirmation);
   const isCurrent=job=>active===job&&!job.cancelled;
-  function showPrivacy(state){
+  function showPrivacy(state,readFailed=false){
    const copy={reading:['Leyendo en tu dispositivo','La captura se procesa aquí, sin subir la imagen.'],discarding:['Descartando captura…','Liberando la imagen y cerrando el lector.'],complete:['Captura descartada','La imagen no se ha subido ni guardado. Al publicar, solo guardamos los datos de tu pick.'],unconfirmed:['No se pudo confirmar el descarte','Recarga esta página para cerrar el lector antes de volver a intentarlo.']};
    privacy.hidden=false;privacy.dataset.state=state;privacyTitle.textContent=copy[state][0];privacyText.textContent=copy[state][1];
    const current={reading:0,discarding:1,complete:3,unconfirmed:1}[state];
-   Array.from(privacySteps.children).forEach((step,index)=>{step.dataset.state=index<current?'complete':index===current?'active':'pending';});
+   Array.from(privacySteps.children).forEach((step,index)=>{step.textContent=['Lectura','Descarte','Completado'][index];step.dataset.state=index<current?'complete':index===current?'active':'pending';});
+   if(readFailed&&state==='complete'){
+    privacySteps.children[0].textContent='Sin lectura';privacySteps.children[0].dataset.state='error';privacySteps.children[2].textContent='Descartada';
+    privacyText.textContent='La imagen no se ha subido ni guardado. Prueba con otra captura para preparar tu pick.';
+   }
   }
   function updateDateConfirmation(){
    const value=form.elements.namedItem('event_date')?.value,stamp=Date.parse(value+'T12:00:00Z');
@@ -222,7 +226,7 @@
     if(isCurrent(job)){panel.dataset.state='discarding';showPrivacy('discarding');cancel.disabled=true;status.textContent=failure||'Lectura terminada. Descartando la captura…';}
     const discarded=await dispose(job);
     if(isCurrent(job)){
-     active=null;input.value='';input.disabled=false;picker.disabled=false;cancel.hidden=true;cancel.disabled=false;panel.removeAttribute('aria-busy');showPrivacy(discarded?'complete':'unconfirmed');
+     active=null;input.value='';input.disabled=false;picker.disabled=false;cancel.hidden=true;cancel.disabled=false;panel.removeAttribute('aria-busy');showPrivacy(discarded?'complete':'unconfirmed',!prepared);
      if(discarded&&prepared){
       result=prepared;applyImport(result);signature=fingerprint();
       panel.dataset.state='matched';title.textContent='Captura leída';status.textContent='Revisa la vista previa y confirma la fecha del evento para publicar.';picker.textContent='Cambiar captura';updateDateConfirmation();
@@ -233,11 +237,11 @@
       }));
       const preview=form.querySelector('.cp-compose-preview');summary.hidden=!!preview;confirmation.hidden=false;
       if(preview)requestAnimationFrame(()=>{
-       if(panel.dataset.state==='matched'&&!preview.hidden&&form.closest('dialog')?.open)
-        preview.scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+       const dialog=form.closest('dialog');
+       if(panel.dataset.state==='matched'&&!preview.hidden&&dialog?.open){dialog.scrollTop=0;preview.querySelector('h3')?.focus({preventScroll:true});}
       });
      }else{
-      result=null;panel.dataset.state='error';status.textContent=discarded?failure:'No pudimos cerrar el lector. Recarga la página antes de volver a intentarlo.';
+      result=null;panel.dataset.state='error';title.textContent='No pudimos preparar tu pick';picker.textContent='Intentar otra captura';status.textContent=discarded?'Lectura incompleta. '+failure:'No pudimos cerrar el lector. Recarga la página antes de volver a intentarlo.';
      }
      onChange();
     }

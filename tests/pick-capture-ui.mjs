@@ -37,6 +37,7 @@ for(const [key,value] of [['odds',160],['event','Different match'],['selection',
 nextData={...valid,text:valid.text.replace('+150','+160')};upload();await settle();confirm.checked=true;assert.equal(controller.proof().readings[0].odds,160,'Only a new capture changes the quote');
 nextData={...valid,text:'BETSLIP\nToronto Raptors vs Boston Celtics\nToronto Raptors Moneyline +150 +160'};upload();await settle();assert.equal(panel.dataset.state,'error');assert.throws(()=>controller.proof(),/captura/);
 assert.equal(privacy.dataset.state,'complete','An unreadable receipt is still discarded');
+assert.match(panel.querySelector('.cp-capture-title').textContent,/No pudimos preparar/);assert.match(privacy.textContent,/Sin lectura/);assert.doesNotMatch(privacy.textContent,/Completado/);
 nextData=valid;let releaseRead;delayRead=new Promise(r=>{releaseRead=r;});upload();await settle();d.querySelector('.cp-capture-cancel').click();releaseRead();delayRead=null;await settle();assert.equal(panel.dataset.state,'empty');assert.throws(()=>controller.proof(),/captura/);
 let releaseInit;delayInit=new Promise(r=>{releaseInit=r;});const before=terminated;upload();await settle();d.querySelector('.cp-capture-cancel').click();releaseInit(makeWorker());delayInit=null;await settle();assert.equal(terminated,before+1,'Late workers must terminate');assert.equal(input.files.length,0);
 const beforeInvalid=workers;upload('image/gif');await settle();assert.equal(workers,beforeInvalid);assert.match(d.getElementById('cpCaptureStatus').textContent,/PNG/);

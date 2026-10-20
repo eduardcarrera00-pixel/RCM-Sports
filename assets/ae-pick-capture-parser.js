@@ -192,16 +192,25 @@
   if(!/same game parlay/.test(plain))return null;
   const fail=reason=>({ok:false,reason,readings:[]});
   if(Number(data.confidence)<50)return fail('No se lee con suficiente claridad. Prueba otra captura.');
-  const includes=lines.map((l,i)=>({i,match:clean(l.text).match(/includes?\s*:\s*(\d+)\s*same game parlay.*?\+\s*(\d+)\s*selection/)})).filter(l=>l.match);
-  if(includes.length!==1)return fail('Incluye el detalle de una sola combinada, con sus selecciones y su momio total original.');
-  const start=includes[0].i;
-  const header=lines.slice(0,start).map((l,i)=>({i,match:clean(l.text).match(/\b(\d+)\s*leg\s+same game parlay/)})).filter(l=>l.match).at(-1);
+  // Mobile OCR may split the Includes summary across several lines. That
+  // decoration is optional when a single full header proves the leg count.
+  const includes=[];
+  for(let i=0;i<lines.length;i++)if(/\bincludes?\b/.test(clean(lines[i].text))){
+   for(let end=i;end<Math.min(lines.length,i+4);end++){
+    const match=clean(lines.slice(i,end+1).map(l=>l.text).join(' ')).match(/\bincludes?\s*:?\s*(\d+)\s*same game parlay.*?\+\s*(\d+)\s*selections?\b/);
+    if(match){includes.push({i,end,match});break;}
+   }
+  }
+  const headers=lines.map((l,i)=>({i,match:clean(l.text).match(/\b(\d+)\s*leg\s+same game parlay/)})).filter(l=>l.match);
+  if(includes.length>1||(!includes.length&&headers.length!==1))return fail('No pude identificar una combinada completa. Sube el boleto original con todos los partidos, las selecciones y su momio total.');
+  const start=includes[0]?.i??headers[0].i;
+  const header=includes.length?headers.filter(h=>h.i<start).at(-1):headers[0];
   const nextHeader=lines.findIndex((l,i)=>i>start&&/\b\d+\s*leg\s+same game parlay/.test(clean(l.text)));
   const end=lines.findIndex((l,i)=>i>start&&/\b(total wager|total payout|cash out|total stake|total returns)\b/.test(clean(l.text)));
   const stopAt=Math.min(end<0?lines.length:end,nextHeader<0?lines.length:nextHeader);
-  const part=lines.slice(start+1,stopAt);
+  const part=lines.slice((includes[0]?.end??start)+1,stopAt);
   const groups=part.filter(l=>/same game parlay/.test(clean(l.text)));
-  if(groups.length!==Number(includes[0].match[1]))return fail('Falta un bloque de la combinada. Incluye sus partidos y selecciones completos.');
+  if(!groups.length||(includes.length&&groups.length!==Number(includes[0].match[1])))return fail('Falta un bloque de la combinada. Incluye sus partidos y selecciones completos.');
   const isEvent=s=>/\s+(?:vs?\.?|versus|contra|at)\s+|\s*@\s*/i.test(s);
   const tidy=s=>String(s||'').replace(/\b\d{1,2}:\d{2}\s*(?:AM|PM)?\s*(?:ET|EST|EDT|CT|PT)?\b/gi,'').replace(/\s+/g,' ').trim();
   const events=[...new Set(part.filter(l=>isEvent(l.text)&&!money.test(clean(l.text))&&!offer.test(clean(l.text))).map(l=>tidy(l.text)))];

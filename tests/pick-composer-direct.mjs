@@ -85,6 +85,7 @@ assert.equal(input('event_date').value,'');
 assert.equal(form.querySelector('details').open,false);
 importPick({readings:[{sport:'Baloncesto',event:'Toronto vs Boston',selection:'Toronto gana',odds:150}]});
 assert.equal(preview.hidden,false);assert.match(preview.textContent,/Vista previa de tu pick/);
+assert.equal(form.dataset.captureStep,'review');assert.equal(d.getElementById('cpComposeTitle').textContent,'Revisa tu Pick');assert.equal(d.getElementById('cpComposeIntro').hidden,true);
 for(const text of ['Deporte','Partido','Pronóstico','Momio','Baloncesto','Toronto vs Boston','Toronto gana','+150'])assert.ok(preview.textContent.includes(text),text);
 assert.equal(preview.contains(input('event_date')),true,'The date belongs to the preview');
 fill();input('odds_0').value='+50';await form.onsubmit({preventDefault(){}});assert.equal(records.length,0);

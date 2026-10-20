@@ -44,8 +44,15 @@ assert.match(await page.locator('.cp-capture-privacy').innerText(),/Captura desc
 assert.match(await page.locator('.cp-capture-privacy').innerText(),/solo guardamos los datos de tu pick/);
 assert.equal(await page.locator('.cp-capture-privacy-steps li[data-state=complete]').count(),3);
 assert.equal(await page.locator('.cp-compose-preview').isVisible(),true);
+assert.equal(await page.locator('.cp-capture').isVisible(),false,'A successful scan switches screens instead of leaving the uploader above the preview');
+assert.equal(await page.locator('#cpComposeIntro').isVisible(),false);
+assert.equal(await page.locator('#cpComposeTitle').innerText(),'Revisa tu Pick');
+await page.waitForFunction(()=>document.activeElement?.id==='cpPreviewTitle');
+assert.equal(await page.locator('#cpComposePanel').evaluate(el=>el.scrollTop),0,'The review screen starts at the top on mobile');
 assert.equal(await page.locator('.cp-capture-readings').isVisible(),false,'Only one complete preview, without duplicated selections');
 for(const text of ['Deporte','NBA','Partido','Toronto Raptors vs Boston Celtics','Pronóstico','Toronto Raptors Moneyline','Momio','+150','Fecha del evento'])assert.ok((await page.locator('.cp-compose-preview').innerText()).includes(text),text);
+await page.locator('.cp-compose-change-capture').click();assert.equal(await page.locator('.cp-capture').isVisible(),true);assert.equal(await page.locator('.cp-compose-preview').isVisible(),false);assert.equal(await page.locator('#cpComposeTitle').innerText(),'Prepara tu Pick');assert.equal(await page.locator('#cpForm button[type=submit]').isVisible(),false);
+await scan('simple.png');
 assert.equal(await page.locator('[name=odds_0]').inputValue(),'+150');for(const name of ['sport','event','selection','odds'])assert.equal(await page.locator('[name='+name+'_0]').evaluate(el=>el.readOnly),true);await page.locator('[name=event_date]').fill(new Date().toISOString().slice(0,10));
 assert.equal(payloads.length,0);assert.equal(await page.locator('#cpForm button[type=submit]').isDisabled(),true,'Confirmation is mandatory');
 await page.locator('#cpCaptureConfirm').check();
@@ -56,7 +63,7 @@ assert.equal(await page.locator('#cpForm button[type=submit]').isDisabled(),true
 await page.locator('#cpCaptureConfirm').check();
 for(const width of [360,390,768,1366])for(const dark of [false,true]){await page.setViewportSize({width,height:940});await page.evaluate(dark=>document.documentElement.classList.toggle('dark',dark),dark);const fit=await page.locator('#cpComposePanel').evaluate(el=>el.scrollWidth<=el.clientWidth+1);assert.equal(fit,true,'Composer must fit '+width);}
 await page.emulateMedia({reducedMotion:'reduce'});assert.equal(await page.locator('.cp-capture-privacy-check').evaluate(el=>getComputedStyle(el).animationName),'none','Respect reduced motion');await page.emulateMedia({reducedMotion:'no-preference'});
-await page.setViewportSize({width:390,height:940});if(process.env.AE_CAPTURE_QA_DIR)fs.mkdirSync(process.env.AE_CAPTURE_QA_DIR,{recursive:true});await page.locator('.cp-capture').screenshot({path:process.env.AE_CAPTURE_QA_DIR?process.env.AE_CAPTURE_QA_DIR+'/capture-import-mobile.png':fixtures+'/capture-import-mobile.png'});
+await page.setViewportSize({width:390,height:940});if(process.env.AE_CAPTURE_QA_DIR)fs.mkdirSync(process.env.AE_CAPTURE_QA_DIR,{recursive:true});
 if(process.env.AE_CAPTURE_QA_DIR)await page.locator('.cp-compose-preview').screenshot({path:process.env.AE_CAPTURE_QA_DIR+'/pick-preview-mobile.png'});
 if(process.env.AE_CAPTURE_QA_DIR)await page.screenshot({path:process.env.AE_CAPTURE_QA_DIR+'/capture-import-dialog.png'});
 failPublish=true;await page.locator('#cpForm button[type=submit]').click();await page.locator('#cpForm .cp-status').filter({hasText:'conexión de prueba'}).waitFor();

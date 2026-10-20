@@ -15,6 +15,13 @@ assert.equal(extract({...data,ticketPriceEvidence:null}).ok,false,'Never silentl
 assert.equal(extract({...data,ticketPriceEvidence:{...data.ticketPriceEvidence,confidence:64}}).ok,false);
 assert.equal(extract({...data,text:football.filter(l=>l!=='Harry Kane -205'&&l!=='Viking v Bayern Munich 3:00PM ET').join('\n')}).ok,false,'Do not drop a leg');
 assert.equal(extract({...data,text:football.concat(football).join('\n')}).ok,false,'Two tickets must not merge');
+for(const summary of [['Includes:', '1 Same Game Parlay', '+ 1 selection'],['Includes 1 Same Game Parlay + 1 selection'],['v Includes: 1 Same Game Parlaybets + 1 selection'],[]]){
+ const wrapped={...data,text:football.flatMap(line=>line.startsWith('Includes:')?summary:[line]).join('\n')};
+ const recovered=extract(wrapped);assert.equal(recovered.ok,true,'A wrapped or absent summary must not hide a complete, priced five-leg ticket');assert.equal(recovered.readings[0].selectionCount,5);assert.equal(recovered.readings[0].odds,737);
+ assert.equal(extract({...wrapped,ticketPriceEvidence:null}).ok,false,'Summary recovery still requires the original pre-boost odds');
+ assert.equal(extract({...wrapped,text:wrapped.text.replace('Harry Kane -205\nANYTIME GOALSCORER\n','')}).ok,false,'Header count must still reject missing selections');
+}
+assert.equal(extract({...data,text:football.filter(line=>!line.startsWith('Includes:')).concat(football.filter(line=>!line.startsWith('Includes:'))).join('\n')}).ok,false,'Missing summaries cannot merge two ticket headers');
 const nfl=['My Bets','...cropped prior card...','BONUS BET','Includes: 2 Same Game Parlay bets + 1 selection',
  'Same Game Parlay +455','New York Giants @ Washington Commanders 1:01PM ET','Isaiah Likely Over 41.5','ISAIAH LIKELY - RECEIVING YDS','Terry McLaurin','ANY TIME TOUCHDOWN SCORER',
  'Same Game Parlay -118','Chicago Bears @ Green Bay Packers 1:01PM ET','Christian Watson 30+ Yards','CHRISTIAN WATSON - ALT RECEIVING YDS',

@@ -559,9 +559,12 @@ function buildComposer(){
  const legs=el('div',null,'cp-legs'),output=el('output','','cp-compose-summary');legs.hidden=true;
  const preview=el('section',null,'cp-compose-preview');preview.hidden=true;preview.setAttribute('aria-labelledby','cpPreviewTitle');
  const previewTitle=el('h3','Vista previa de tu pick');previewTitle.id='cpPreviewTitle';
+ previewTitle.tabIndex=-1;
+ const changeCapture=button('Cambiar captura',()=>capture?.clear());changeCapture.className='cp-compose-change-capture';
+ const previewPrivacy=el('p','Captura descartada · La imagen no se ha subido ni guardado.','cp-compose-hint');
  const previewNote=el('p','Revisa estos datos antes de publicar.','cp-compose-hint');
  const previewLegs=el('div',null,'cp-compose-preview-legs'),previewTotal=el('p','','cp-compose-preview-total');
- preview.append(previewTitle,previewNote,previewLegs,previewTotal);
+ preview.append(previewTitle,previewPrivacy,changeCapture,previewNote,previewLegs,previewTotal);
  let previewKey='',originalBeforeBoost=false;
  output.setAttribute('aria-live','polite');
  const status=el('p','','cp-status');status.setAttribute('role','status');
@@ -625,6 +628,9 @@ function buildComposer(){
   eventDay.input.readOnly=!!imported?.eventDate;eventDay.input.value=imported?.eventDate||'';
   dateHint.textContent=imported?.eventDate?'Fecha leída en la captura. Comprueba que corresponde al evento; si no coincide, usa otra captura.':'Indica la fecha del evento, no la fecha en que hiciste la apuesta.';
   form.dataset.imported=String(!!imported);
+  form.dataset.captureStep=imported?'review':'capture';
+  $('cpComposeTitle').textContent=imported?'Revisa tu Pick':'Prepara tu Pick';
+  $('cpComposeIntro').hidden=!!imported;
   preview.hidden=!imported;
   if(!imported){previewKey='';previewLegs.replaceChildren();}
   calculate();

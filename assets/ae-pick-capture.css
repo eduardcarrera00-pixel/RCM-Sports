@@ -68,6 +68,12 @@ html body #cpComposePanel #cpForm button[type="submit"]:disabled{opacity:.5;curs
 html body #cpComposePanel #cpForm .cp-capture[data-state="matched"] :is(.cp-capture-intro,.cp-capture-help){display:none;}
 html body #cpComposePanel #cpForm .cp-compose-preview{padding:18px;border:1px solid var(--cp-dialog-line);border-top:3px solid var(--cp-dialog-action);background:var(--cp-dialog-field);color:var(--cp-dialog-ink);min-width:0;}
 html body #cpComposePanel #cpForm .cp-compose-preview[hidden]{display:none!important;}
+html body #cpComposePanel #cpForm[data-capture-step="review"] .cp-capture{display:none!important;}
+html body #cpComposePanel #cpComposeIntro[hidden]{display:none!important;}
+html body #cpComposePanel #cpForm .cp-compose-change-capture{margin:12px 0;background:transparent!important;color:var(--cp-dialog-action)!important;border-color:var(--cp-dialog-line)!important;}
+html body #cpComposePanel #cpForm .cp-capture[data-state="error"] .cp-capture-intro{display:none;}
+html body #cpComposePanel #cpForm .cp-capture-privacy-steps li[data-state="error"]{border-color:#dfad90;}
+html:not(.dark) body #cpComposePanel #cpForm .cp-capture-privacy-steps li[data-state="error"]{border-color:#8f3e24;}
 html body #cpComposePanel #cpForm .cp-compose-preview h3{margin:0 0 6px;font:600 25px/1.2 Newsreader,Georgia,serif;color:inherit;}
 html body #cpComposePanel #cpForm .cp-compose-preview h4{margin:0 0 12px;font:600 13px/1.5 Inter,system-ui,sans-serif;color:var(--cp-dialog-action);}
 html body #cpComposePanel #cpForm .cp-compose-preview-legs{margin-top:18px;}
