@@ -8,7 +8,7 @@ const settled={...base,outcome:'won',image_url:'https://example.test/photo.jpg',
 const tick=async()=>{for(let i=0;i<12;i++)await new Promise(r=>setTimeout(r,0));};
 async function setup(isAdmin=true,shared=false){
  const w=new Window({url:'https://example.test/'+(shared?'?weeklyResult='+id:'')});
- w.document.body.innerHTML='<section id="picksFeatured"><div id="picksFeaturedCard"><article data-cam-weekly-id="'+id+'"></article></div></section><details id="aeWeeklyPickAdmin"></details>';
+ w.document.body.innerHTML='<section id="picksFeatured"><div><button id="aeWeeklyEditButton">Editar Pick</button></div><div id="picksFeaturedCard"><article data-cam-weekly-id="'+id+'"></article></div></section><details id="aeWeeklyPickAdmin"></details>';
  w.currentAdmin=isAdmin?{id:'editor'}:null;w.confirm=()=>true;
  let row={...base},result=shared?{...settled}:null;
  const calls=[];let throwAfterSave=false;
@@ -28,16 +28,23 @@ async function setup(isAdmin=true,shared=false){
 }
 const a=await setup();
 assert.equal(a.calls.filter(c=>c.name==='cam_resolve_weekly_pick').length,0,'Opening page never settles a Pick');
+const quick=a.w.document.getElementById('camWeeklyQuickResult');
+assert.equal(quick.hidden,false,'Admin sees result controls without opening details');
+assert.ok(quick.querySelector('#camWeeklyYes').classList.contains('cam-weekly-result-green'));
+assert.ok(quick.querySelector('#camWeeklyNo').classList.contains('cam-weekly-result-red'));
+assert.equal(a.w.document.getElementById('aeWeeklyEditButton').parentElement.nextElementSibling,quick,'Controls sit directly under Edit Pick');
 const panel=a.w.document.getElementById('camWeeklyResultsAdmin');
 assert.equal(panel.hidden,false);
 panel.open=true;panel.dispatchEvent(new a.w.Event('toggle'));await tick();
-let approve=[...panel.querySelectorAll('button')].find(b=>b.textContent.startsWith('Aprobar'));
+let approve=a.w.document.getElementById('camWeeklyYes');
 assert.ok(approve,'An expired archived Pick can be settled from admin history');
 a.w.confirm=()=>false;approve.click();await tick();
 assert.equal(a.calls.filter(c=>c.name==='cam_resolve_weekly_pick').length,0,'Cancel confirmation must not resolve');
 a.w.confirm=()=>true;a.loseResponse();approve.click();approve.click();await tick();
 assert.equal(a.calls.filter(c=>c.name==='cam_resolve_weekly_pick').length,1,'Double click and lost response cannot submit twice');
 assert.ok(panel.textContent.includes('✅ Pick acertado'));
+assert.ok(quick.textContent.includes('✅ Pick acertado'));
+assert.equal(quick.querySelectorAll('button').length,0,'Inline controls cannot repeat a confirmed result');
 assert.ok(panel.textContent.includes('X: en cola'));
 assert.ok(panel.textContent.includes('TikTok: procesando'));
 assert.ok(![...panel.querySelectorAll('button')].some(b=>b.textContent.startsWith('Aprobar')),'Resolved Picks have no repeat controls');
@@ -50,7 +57,7 @@ await a.w.happyDOM.close();
 
 const loss=await setup();const lossPanel=loss.w.document.getElementById('camWeeklyResultsAdmin');
 lossPanel.open=true;lossPanel.dispatchEvent(new loss.w.Event('toggle'));await tick();
-[...lossPanel.querySelectorAll('button')].find(b=>b.textContent.startsWith('Denegar')).click();await tick();
+loss.w.document.getElementById('camWeeklyNo').click();await tick();
 assert.equal(loss.calls.find(c=>c.name==='cam_resolve_weekly_pick').args.p_outcome,'lost');
 assert.ok(lossPanel.textContent.includes('No se publica un aviso en redes.'));
 assert.ok(!lossPanel.querySelector('a'),'Loss has no social or reply link');
@@ -58,6 +65,7 @@ await loss.w.happyDOM.close();
 
 const reader=await setup(false,true);
 assert.equal(reader.w.document.getElementById('camWeeklyResultsAdmin').hidden,true);
+assert.equal(reader.w.document.getElementById('camWeeklyQuickResult').hidden,true,'Readers cannot see inline result controls');
 assert.equal(reader.calls.filter(c=>c.name==='cam_admin_weekly_results'||c.name==='cam_resolve_weekly_pick').length,0,'Readers never access admin RPCs');
 assert.ok(reader.w.document.getElementById('camWeeklySharedResult').textContent.includes('✅ Pick acertado'),'Archived result has a stable public link');
 assert.equal(reader.w.camWeeklyResults.socialSummary({outcome:'won',social:[{network:'twitter',status:'accepted'}]}),'X: procesando');
