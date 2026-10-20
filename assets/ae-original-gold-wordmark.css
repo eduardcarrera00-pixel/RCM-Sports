@@ -93,11 +93,11 @@ html:not(.dark) body header a.ae-brand-runner-clean .ae-original-gold-wordmark{
   --cam-brand-blue:#023787;
   --cam-brand-cream:#f5ecdf;
 }
-html body>header{
+html body>header.sticky.top-0.z-40{
   background:var(--cam-brand-blue)!important;
   border-bottom-color:rgba(245,236,223,.22)!important;
 }
-html body>footer{
+html body>footer.bg-slate-900.border-t{
   background:var(--cam-brand-blue)!important;
   border-top-color:rgba(245,236,223,.18)!important;
 }
