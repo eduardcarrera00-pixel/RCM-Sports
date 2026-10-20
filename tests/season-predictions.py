@@ -36,7 +36,9 @@ def fake(user=None, admin=False, predictions=()):
     return ("try{sessionStorage.setItem('cam_sports_home_welcome_seen_session_v1','1')}catch(e){};"
             'window.__fake.tables=' + json.dumps(tables) + ';'
             'window.__fake.user=' + json.dumps(user) + ';'
-            + ('window.__fake.tables.editors=[{user_id:' + json.dumps(user['id']) + '}];' if admin else '')
+            + ('window.__fake.tables.editors=[{user_id:' + json.dumps(user['id']) + '}];'
+               # Los admins ven una vez la vista previa de la bienvenida; aquí ya se vio.
+               "try{localStorage.setItem('cam_sports_admin_welcome_preview_'+" + json.dumps(user['id']) + ",'1')}catch(e){}" if admin else '')
             + """window.__fake.rpc=window.__fake.rpc||{};window.__fake.calls=window.__fake.calls||[];
                  window.__fake.rpc.ae_submit_take=a=>{window.__fake.tables.ae_take_predictions.push({question_id:a.p_question_id,option_id:a.p_option_id,awarded_points:0,user_id:window.__fake.user.id});return {data:true,error:null};};
                  window.__fake.rpc.ae_settle_take=a=>({data:1,error:null});

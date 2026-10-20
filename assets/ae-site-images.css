@@ -1,0 +1,187 @@
+/* CAM SPORTS · Imágenes del sitio editables (solo administradores).
+   Un lápiz diminuto por imagen, en una capa propia por encima de la página:
+   no se inserta dentro de las tarjetas, así no mueve el diseño ni abre lo que hay debajo. */
+
+cam-site-image-layer {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  overflow: visible;
+  z-index: 2147483000;
+  pointer-events: none;
+  display: block;
+}
+
+cam-site-image-layer > button.cam-site-image-pencil {
+  all: unset;
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  box-sizing: border-box !important;
+  display: grid !important;
+  place-items: center !important;
+  width: 18px !important;
+  height: 18px !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 1px solid rgba(255, 250, 242, .38) !important;
+  border-radius: 50% !important;
+  background: rgba(14, 28, 40, .58) !important;
+  color: #fffaf2 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .28) !important;
+  opacity: .5;
+  cursor: pointer !important;
+  pointer-events: auto !important;
+  transition: opacity .15s ease, background-color .15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+/* Área táctil algo mayor, invisible. */
+cam-site-image-layer > button.cam-site-image-pencil::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+}
+cam-site-image-layer > button.cam-site-image-pencil[hidden] { display: none !important; }
+cam-site-image-layer > button.cam-site-image-pencil svg {
+  display: block !important;
+  width: 11px !important;
+  height: 11px !important;
+}
+cam-site-image-layer > button.cam-site-image-pencil.is-mini {
+  width: 14px !important;
+  height: 14px !important;
+}
+cam-site-image-layer > button.cam-site-image-pencil.is-mini svg {
+  width: 8px !important;
+  height: 8px !important;
+}
+cam-site-image-layer > button.cam-site-image-pencil:hover,
+cam-site-image-layer > button.cam-site-image-pencil:focus-visible {
+  opacity: 1;
+  background: rgba(133, 91, 67, .92) !important;
+}
+cam-site-image-layer > button.cam-site-image-pencil:focus-visible {
+  outline: 2px solid #d4ae83 !important;
+  outline-offset: 2px !important;
+}
+@media (hover: none) {
+  cam-site-image-layer > button.cam-site-image-pencil { opacity: .62; }
+}
+
+/* Diálogo (usa la base de .ae-opinion-dialog) */
+.cam-site-image-dialog { width: min(560px, calc(100vw - 24px)); }
+.cam-site-image-where {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: var(--ds-text-muted, #566876);
+}
+.cam-site-image-where strong {
+  flex-basis: 100%;
+  font: 600 19px/1.2 var(--ds-font-serif, Newsreader, Georgia, serif);
+  color: var(--ds-text, #273b49);
+}
+.cam-site-image-where code {
+  font: 500 11px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+  padding: 1px 6px;
+  border: 1px solid var(--ds-line, #d9d9d0);
+  background: var(--ds-surface-soft, #f4f0e9);
+}
+.cam-site-image-variants {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  margin: 0 0 12px;
+}
+.cam-site-image-variants[hidden] { display: none; }
+.cam-site-image-variants button {
+  min-height: 34px;
+  padding: 6px 14px;
+  border: 1px solid var(--ds-line-strong, #8a7a6a);
+  margin-left: -1px;
+  background: transparent;
+  color: var(--ds-text, #273b49);
+  font: 600 13px/1 var(--ds-font-sans, Inter, system-ui, sans-serif);
+  cursor: pointer;
+}
+.cam-site-image-variants button:first-child { margin-left: 0; }
+.cam-site-image-variants button[aria-pressed="true"] {
+  background: var(--ds-action, #855b43);
+  border-color: var(--ds-action, #855b43);
+  color: var(--ds-on-action, #fff);
+}
+.cam-site-image-note {
+  margin: 0 0 12px;
+  padding: 9px 12px;
+  border-left: 2px solid var(--ds-action, #855b43);
+  background: var(--ds-action-soft, #f3e6da);
+  color: var(--ds-text, #273b49);
+  font-size: 13px;
+  line-height: 1.45;
+}
+.cam-site-image-preview {
+  position: relative;
+  width: 100%;
+  max-height: 260px;
+  min-height: 72px;
+  margin: 0 0 6px;
+  border: 1px solid var(--ds-line, #d9d9d0);
+  background-color: var(--ds-surface-sunken, #e7e2d9);
+  background-repeat: no-repeat;
+}
+.cam-site-image-preview.is-contain {
+  max-width: 260px;
+  margin-inline: auto;
+  background-color: #1c2d40;
+  background-origin: content-box;
+  padding: 12px;
+  box-sizing: border-box;
+}
+.cam-site-image-badge {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  padding: 2px 8px;
+  background: rgba(14, 28, 40, .72);
+  color: #fffaf2;
+  font: 600 11px/1.6 var(--ds-font-sans, Inter, system-ui, sans-serif);
+  letter-spacing: .02em;
+}
+.cam-site-image-meta {
+  min-height: 1.4em;
+  margin: 0 0 12px;
+  font-size: 12px;
+  color: var(--ds-text-muted, #566876);
+}
+.cam-site-image-focus { margin: 4px 0 8px; }
+.cam-site-image-focus[hidden] { display: none; }
+.cam-site-image-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  font-size: 14px;
+  color: var(--ds-text, #273b49);
+  cursor: pointer;
+}
+.cam-site-image-actions { display: flex; align-items: center; gap: 8px; }
+.cam-site-image-spacer { flex: 1 1 auto; }
+
+html.dark .cam-site-image-where { color: #c5cdd2; }
+html.dark .cam-site-image-where strong,
+html.dark .cam-site-image-check,
+html.dark .cam-site-image-variants button { color: #f4e8db; }
+html.dark .cam-site-image-where code { background: #0a202e; border-color: #49606c; }
+html.dark .cam-site-image-variants button { border-color: #49606c; }
+html.dark .cam-site-image-variants button[aria-pressed="true"] { background: #d4ae83; border-color: #d4ae83; color: #102938; }
+html.dark .cam-site-image-note { background: #0a202e; color: #f4e8db; border-left-color: #d4ae83; }
+html.dark .cam-site-image-preview { background-color: #0a202e; border-color: #49606c; }
+html.dark .cam-site-image-meta { color: #c5cdd2; }
