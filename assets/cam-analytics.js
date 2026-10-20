@@ -41,7 +41,7 @@
       [/instagram|instagr|ig\.me/,'Instagram'],[/tiktok/,'TikTok'],
       [/facebook|fb\.com|fb\.me|m\.facebook/,'Facebook'],
       [/whatsapp|wa\.me/,'WhatsApp'],
-      [/^(?:x|twitter|twitter\.com|(?:[a-z0-9.-]*\.)?x\.com|t\.co)$/,'X'],
+      [/^(?:x|twitter|(?:[a-z0-9.-]*\.)?twitter\.com|(?:[a-z0-9.-]*\.)?x\.com|t\.co)$/,'X'],
       [/youtube|youtu\.be/,'YouTube'],
       [/linkedin|lnkd\.in/,'LinkedIn'],
       [/reddit/,'Reddit'],[/google/,'Google'],[/bing/,'Bing'],
