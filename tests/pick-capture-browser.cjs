@@ -20,11 +20,13 @@ page.on('pageerror',e=>errors.push(e.message));page.on('worker',worker=>{activeW
 await page.exposeFunction('mockDb',backend);await page.addInitScript(()=>localStorage.setItem('testSession',JSON.stringify({id:'reader',user_metadata:{username:'Lector'}})));
 await page.route('**/*',route=>{const url=route.request().url();if(url.includes('/supabase-js@2'))return route.fulfill({contentType:'text/javascript',body:client});if(url.startsWith('http://127.0.0.1'))return route.continue();return route.abort();});
 const receipt=await context.newPage();await receipt.setViewportSize({width:900,height:900});
+const dateParts=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Toronto',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
+const dateToday=['year','month','day'].map(k=>dateParts.find(p=>p.type===k)?.value).join('-');
 async function fixture(file,lines){await receipt.setContent('<html><body style="margin:0;padding:32px;background:white;color:black;font:28px/1.8 Arial">'+lines.map(line=>'<div>'+line+'</div>').join('')+'</body></html>');await receipt.screenshot({path:fixtures+'/'+file});}
-await fixture('simple.png',['BETSLIP','NBA','Toronto Raptors vs Boston Celtics','Toronto Raptors Moneyline +150','Stake $10.00','Potential Returns $25.00']);
-await fixture('combined.png',['BETSLIP','NBA','Multi 2 Legs 4.29','Los Angeles Lakers At Philadelphia 76ers','Los Angeles Lakers','Match Betting 2.67','Washington Wizards At Detroit Pistons','Detroit Pistons','Match Betting 1.61','Total Stake $1.00']);
+await fixture('simple.png',['BETSLIP','NBA','Toronto Raptors vs Boston Celtics '+dateToday,'Toronto Raptors Moneyline +150','Stake $10.00','Potential Returns $25.00']);
+await fixture('combined.png',['BETSLIP','NBA','Multi 2 Legs 4.29','Los Angeles Lakers At Philadelphia 76ers '+dateToday,'Los Angeles Lakers','Match Betting 2.67','Washington Wizards At Detroit Pistons '+dateToday,'Detroit Pistons','Match Betting 1.61','Total Stake $1.00']);
 await receipt.setViewportSize({width:1200,height:1500});
-await fixture('boost.png',['My Bets','<span>5 leg Same Game Parlay+ </span><s style="color:#999">+737</s> <span style="background:#ffe032;color:#111">+1104</span>','PROFIT BOOST 50%','Includes: 1 Same Game Parlay + 1 selection','Same Game Parlay +504','Galatasaray v Barcelona','Barcelona','MONEYLINE (3-WAY)','Lamine Yamal','ANYTIME GOALSCORER','Over 5.5 Goals','OVER/UNDER 5.5 GOALS','Lamine Yamal','ANYTIME ASSIST','Harry Kane -205','ANYTIME GOALSCORER','Viking v Bayern Munich','TOTAL WAGER','TOTAL PAYOUT']);
+await fixture('boost.png',['My Bets','<span>5 leg Same Game Parlay+ </span><s style="color:#999">+737</s> <span style="background:#ffe032;color:#111">+1104</span>','PROFIT BOOST 50%','Includes: 1 Same Game Parlay + 1 selection','Same Game Parlay +504','Galatasaray v Barcelona '+dateToday,'Barcelona','MONEYLINE (3-WAY)','Lamine Yamal','ANYTIME GOALSCORER','Over 5.5 Goals','OVER/UNDER 5.5 GOALS','Lamine Yamal','ANYTIME ASSIST','Harry Kane -205','ANYTIME GOALSCORER','Viking v Bayern Munich '+dateToday,'TOTAL WAGER','TOTAL PAYOUT']);
 await receipt.close();
 await page.goto('http://127.0.0.1:8767/',{waitUntil:'domcontentloaded'});await page.evaluate(()=>{filterByCategory('Picks');window.aeOpenPickComposer();});await page.locator('#cpComposePanel').waitFor({state:'visible'});
 assert.equal(requests.some(r=>r.url.includes('/vendor/ocr/')),false,'Heavy OCR must not load before choosing a file');
@@ -56,14 +58,14 @@ assert.equal(await page.locator('.cp-capture-readings').isVisible(),false,'Only 
 for(const text of ['Deporte','NBA','Partido','Toronto Raptors vs Boston Celtics','Pronóstico','Toronto Raptors Moneyline','Momio','+150','Fecha del evento'])assert.ok((await page.locator('.cp-compose-preview').innerText()).includes(text),text);
 await page.locator('.cp-compose-change-capture').click();assert.equal(await page.locator('.cp-capture').isVisible(),true);assert.equal(await page.locator('.cp-compose-preview').isVisible(),false);assert.equal(await page.locator('#cpComposeTitle').innerText(),'Prepara tu Pick');assert.equal(await page.locator('#cpForm button[type=submit]').isVisible(),true);assert.equal(await page.locator('#cpForm button[type=submit]').isDisabled(),true);
 await scan('simple.png');
-assert.equal(await page.locator('[name=odds_0]').inputValue(),'+150');for(const name of ['sport','event','selection','odds'])assert.equal(await page.locator('[name='+name+'_0]').evaluate(el=>el.readOnly),true);await page.locator('[name=event_date]').fill(new Date().toISOString().slice(0,10));
-assert.equal(payloads.length,0);assert.equal(await page.locator('#cpForm button[type=submit]').isDisabled(),false,'A valid date and scanned ticket enable publishing');
+assert.equal(await page.locator('[name=odds_0]').inputValue(),'+150');for(const name of ['sport','event','selection','odds'])assert.equal(await page.locator('[name='+name+'_0]').evaluate(el=>el.readOnly),true);assert.equal(await page.locator('[name=event_date]').inputValue(),dateToday,'Screenshot must determine the event date');assert.equal(await page.locator('[name=event_date]').isEditable(),false,'Date must be locked');
+assert.equal(payloads.length,0);assert.equal(await page.locator('#cpForm button[type=submit]').isDisabled(),false,'A scanned ticket with automatically assigned date enables publishing');
 assert.match(await page.locator('#cpForm button[type=submit]').evaluate(e=>getComputedStyle(e).backgroundColor),/rgb\(\s*(?:242|238),/);
 assert.equal(await page.locator('#cpCaptureConfirm').count(),0,'The publish click confirms the reviewed pick');
 await page.locator('.cp-compose-description textarea').fill('Pronóstico de prueba sin guardar la imagen.');
 assert.match(await page.locator('.cp-compose-description-count').innerText(),/\d+\/300/);
-await page.locator('[name=event_date]').fill(new Date(Date.now()+86400000).toISOString().slice(0,10));
-assert.equal(await page.locator('#cpForm button[type=submit]').isDisabled(),false,'Editing a valid event date does not require a second checkbox');
+assert.equal(await page.locator('[name=event_date]').inputValue(),dateToday,'Date does not change while editing the description');
+assert.equal(await page.locator('#cpForm button[type=submit]').isDisabled(),false,'Automatic event date keeps publication enabled without a manual picker');
 for(const width of [360,390,768,1366])for(const dark of [false,true]){await page.setViewportSize({width,height:940});await page.evaluate(dark=>document.documentElement.classList.toggle('dark',dark),dark);const fit=await page.locator('#cpComposePanel').evaluate(el=>el.scrollWidth<=el.clientWidth+1);assert.equal(fit,true,'Composer must fit '+width);}
 await page.emulateMedia({reducedMotion:'reduce'});assert.equal(await page.locator('.cp-capture-privacy-check').evaluate(el=>getComputedStyle(el).animationName),'none','Respect reduced motion');await page.emulateMedia({reducedMotion:'no-preference'});
 await page.setViewportSize({width:390,height:940});if(process.env.AE_CAPTURE_QA_DIR)fs.mkdirSync(process.env.AE_CAPTURE_QA_DIR,{recursive:true});
@@ -76,7 +78,7 @@ assert.equal(await page.locator('html').evaluate(el=>el.classList.contains('ae-p
 assert.match(await page.locator('#cpFeed').innerText(),/Momio cotejado con captura/);
 await page.evaluate(()=>window.aeOpenPickComposer());await page.locator('#cpComposePanel').waitFor({state:'visible'});await page.evaluate(()=>{window.testOcrReadings=[];const create=window.Tesseract.createWorker;window.Tesseract.createWorker=async(...args)=>{const worker=await create(...args),recognize=worker.recognize;worker.recognize=async(...parameters)=>{const value=await recognize(...parameters);window.testOcrReadings.push(value.data);return value;};return worker;};});
 
-await scan('combined.png');assert.match(await page.locator('[name=selection_0]').inputValue(),/Lakers/);assert.match(await page.locator('[name=selection_1]').inputValue(),/Pistons/);await page.locator('[name=event_date]').fill(new Date().toISOString().slice(0,10));assert.match(await page.locator('.cp-compose-summary').innerText(),/329/);await page.locator('#cpForm button[type=submit]').click();await page.waitForFunction(()=>!document.getElementById('cpComposePanel').open);assert.equal(payloads.length,2);assert.equal(payloads[1].capture_check.total.american,329);
+await scan('combined.png');assert.match(await page.locator('[name=selection_0]').inputValue(),/Lakers/);assert.match(await page.locator('[name=selection_1]').inputValue(),/Pistons/);assert.equal(await page.locator('[name=event_date]').inputValue(),dateToday,'Screenshot must determine the event date');assert.equal(await page.locator('[name=event_date]').isEditable(),false,'Date must be locked');assert.match(await page.locator('.cp-compose-summary').innerText(),/329/);await page.locator('#cpForm button[type=submit]').click();await page.waitForFunction(()=>!document.getElementById('cpComposePanel').open);assert.equal(payloads.length,2);assert.equal(payloads[1].capture_check.total.american,329);
 await page.evaluate(()=>window.aeOpenPickComposer());await page.locator('#cpCaptureFile').setInputFiles(fixtures+'/boost.png');
 await page.waitForFunction(()=>['matched','error'].includes(document.querySelector('.cp-capture')?.dataset.state),null,{timeout:90000});
 // Small struck type can remain unreadable. Both outcomes must be safe: read
@@ -100,7 +102,7 @@ if(process.env.AE_CAPTURE_USER_FIXTURES){
  const selection=await page.locator('[name=selection_0]').inputValue();for(const text of ['Barcelona','GOALSCORER','5.5','ASSIST','Harry Kane'])assert.ok(selection.includes(text),text);
  assert.match(await page.locator('.cp-compose-preview').innerText(),/sin profit boost/);
  if(process.env.AE_CAPTURE_QA_DIR)await page.screenshot({path:process.env.AE_CAPTURE_QA_DIR+'/user-boost-imported.png'});
- await page.locator('[name=event_date]').fill(new Date().toISOString().slice(0,10));
+ assert.equal(await page.locator('[name=event_date]').inputValue(),dateToday,'Screenshot must determine the event date');assert.equal(await page.locator('[name=event_date]').isEditable(),false,'Date must be locked');
  await page.locator('#cpForm button[type=submit]').click();await page.waitForFunction(()=>!document.getElementById('cpComposePanel').open);
  assert.equal(payloads.at(-1).legs[0].odds,737);assert.equal(payloads.at(-1).legs.length,1,'One whole ticket, not separate player bets');
  await page.evaluate(()=>window.aeOpenPickComposer());await page.locator('#cpCaptureFile').setInputFiles(process.env.AE_CAPTURE_USER_FIXTURES+'/cropped.jpg');
