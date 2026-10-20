@@ -1865,3 +1865,7 @@ html:not(.dark) body #camWelcomeDialog .cam-welcome-preview:not([hidden]){color:
  html body #camWelcomeDialog .cam-welcome-intro{margin:10px auto 13px;}
  html body #camWelcomeDialog .cam-welcome-features>div{padding:9px 11px;}
 }
+
+/* Keep the editor preview and the ordinary unread controls usable on phones. */
+html body #aeNotificationsDialog .ae-notifications-footer{flex-wrap:wrap!important;row-gap:5px!important;}
+html body #camWelcomeAdminPreview:not([hidden]){margin:4px 0!important;min-height:36px!important;}
