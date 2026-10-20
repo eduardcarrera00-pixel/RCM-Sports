@@ -99,7 +99,7 @@ async function handleUserLogin(event){
   if(!db)throw Error('No se pudo conectar.');
   const result=await aeAuthRequest({action:authMode,username,password,recovery_code:document.getElementById('authRecoveryCode').value});
   let sessionError=false;
-  if(result.session){const saved=await db.auth.setSession({access_token:result.session.access_token,refresh_token:result.session.refresh_token});if(saved.error)sessionError=true;else{currentUser={id:saved.data.user.id,username:result.username};await loadAdminSession();updateCommentAuthUI();}}
+  if(result.session){const saved=await db.auth.setSession({access_token:result.session.access_token,refresh_token:result.session.refresh_token});if(saved.error)sessionError=true;else{currentUser={id:saved.data.user.id,username:result.username};await loadAdminSession();updateCommentAuthUI();if(authMode==='register')window.camWelcome?.startNewAccount(saved.data.user.id);}}
   if(result.recovery_code){authRecoveryNeedsLogin=!!result.recovered||!result.session||sessionError;document.getElementById('userAuthForm').hidden=true;document.getElementById('authRecoveryResult').hidden=false;document.getElementById('authRecoveryOutput').value=result.recovery_code;document.getElementById('authRecoveryMessage').textContent=result.recovered?'Contraseña actualizada. Guarda este código e inicia sesión.':authRecoveryNeedsLogin?'Cuenta preparada. Guarda este código y vuelve a iniciar sesión.':'Tu cuenta está lista y la sesión está abierta.';document.getElementById('authRecoveryOutput').focus();}
   else{if(sessionError)throw Error('No se pudo guardar la sesión. Vuelve a iniciar sesión.');closeUserAuthModal(true);}
   for(const id of ['userAuthPassword','authPasswordConfirm','authRecoveryCode'])document.getElementById(id).value='';
