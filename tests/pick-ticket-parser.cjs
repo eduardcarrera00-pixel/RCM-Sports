@@ -36,3 +36,23 @@ result=extract(scan(['Previous card BONUS BET', '6 leg Same Game Parlay+ +1688',
 assert.equal(result.ok,true);assert.equal(result.readings[0].odds,1688);assert.equal(result.readings[0].selectionCount,6);
 assert.equal(extract(scan(nfl.filter(l=>!l.includes('Chicago Bears')))).ok,false);
 console.log('PASS: whole nested tickets, original boost odds only, all player conditions and event binding, cropped decorations, partial recovery, missing totals and ticket separation.');
+
+const opened=['My Bets','Open','Settled','Same Game Parlay +240',
+ 'Paris St-G Moneyline (3-way), Over 3.5 Goals Over/Under 3.5 Goals, Yes Both Teams To Score',
+ 'Paris St-G v Barcelona TUE 3:00PM ET','Paris St-G','MONEYLINE (3-WAY)',
+ 'Over 3.5 Goals','OVER/UNDER 3.5 GOALS','Yes','BOTH TEAMS TO SCORE',
+ '$10.00','TOTAL WAGER','$34.08','TOTAL PAYOUT'];
+const openedResult=extract(scan(opened));
+assert.equal(openedResult.ok,true,'An open ticket with one total and three unpriced markets is one Pick');
+assert.equal(openedResult.readings.length,1);
+assert.equal(openedResult.readings[0].odds,240);
+assert.equal(openedResult.readings[0].selectionCount,3);
+assert.equal(openedResult.readings[0].sport,'Fútbol');
+assert.equal(openedResult.readings[0].event,'Paris St-G v Barcelona');
+assert.equal(openedResult.readings[0].wager,10);
+assert.equal(openedResult.readings[0].payout,34.08);
+assert.ok(['Paris St-G','Over 3.5 Goals','Yes'].every(t=>openedResult.readings[0].selection.includes(t)));
+assert.equal(extract(scan(opened.filter(x=>x!=='BOTH TEAMS TO SCORE'))).ok,false,'Missing market must fail');
+assert.equal(extract(scan(opened.concat(opened))).ok,false,'Multiple tickets must not merge');
+assert.equal(extract(scan(opened.map(x=>x==='Same Game Parlay +240'?'Same Game Parlay':x))).ok,false,'Do not derive a quote from monetary returns');
+console.log('PASS: three-market Same Game Parlay +240, complete selection list, and guarded currency metadata.');
