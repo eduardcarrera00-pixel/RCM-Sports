@@ -2256,7 +2256,13 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
             <div id="aeHomeTakeHighlights" class="ae-home-take-highlights ae-community-calm">
             <div class="ae-home-take-extras" aria-label="Destacados de Takes">
               <header id="aeHomeTakesSectionHeading" class="ae-top-takes-heading ae-takes-section-title">
-                <h2 id="aeHomeTopTakesTitle">Demuestra tu conocimiento</h2>
+                <h2 id="aeHomeTopTakesTitle">
+                  <button id="aeHomeTakePublish" class="cam-home-take-square" type="button" aria-controls="aeTakeComposerDialog" aria-haspopup="dialog" aria-label="Demuestra tu conocimiento. Publica tu opinión deportiva.">
+                    <span class="cam-home-take-square-icon" aria-hidden="true"><i class="fa-solid fa-feather-pointed"></i></span>
+                    <span class="cam-home-take-square-label">Demuestra tu conocimiento</span>
+                    <span class="cam-home-take-square-arrow" aria-hidden="true">↗</span>
+                  </button>
+                </h2>
                 <p id="aeTopTakesStatus" class="sr-only" role="status" aria-live="polite">Cargando los Takes destacados…</p>
               </header>
                 <section id="aeHomeTakesPopular" class="ae-home-take-feature ae-vote-column is-positive" aria-labelledby="aeHomeTakesPositiveTitle">
@@ -2296,7 +2302,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
                   </div>
                   <div id="aeHomeTakeHistoricTake" aria-live="polite"><p class="ae-discovery-empty">Cargando Take…</p></div>
                 </section>
-                <div class="ae-home-take-bottom-cta"><button id="aeHomeTakePublish" onclick="event.stopImmediatePropagation(); if(typeof window.aeOpenTakeComposer==='function'){window.aeOpenTakeComposer();}else{const modal=document.getElementById('aeTakeComposerDialog');if(modal&&!modal.open)modal.showModal();}" type="button" class="ae-participate-cta ae-home-take-publish" aria-controls="aeTakeComposerDialog">Publicar mi Take</button></div>
+                
               </div>
             </div>
         </div>
