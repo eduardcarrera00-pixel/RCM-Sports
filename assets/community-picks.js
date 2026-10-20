@@ -597,7 +597,8 @@ function buildComposer(){
     entry.append(glance);
     if(receipt?.selectionCount>1){
      const choices=el('ul',null,'cp-compose-ticket-choices');
-     choices.append(...pick.selection.split(' + ').map(text=>el('li',text)));
+     const selections=/^\d+\./.test(pick.selection)?pick.selection.split(/\s+\/\s+(?=\d+\.\s)/):pick.selection.split(' + ');
+     choices.append(...selections.map(text=>el('li',text)));
      entry.append(choices);
     }
     const details=el('dl');
@@ -648,8 +649,9 @@ function buildComposer(){
   while(rows.length>Math.max(1,data.length))rows.pop().box.remove();
   while(rows.length<data.length)addRow();
   rows.forEach((row,i)=>{for(const key of ['sport','event','selection','odds'])row[key].input.value=data[i]?(key==='sport'?(data[i][key]||'Otros'):key==='odds'?(data[i].odds>0?'+':'')+data[i].odds:data[i][key]):'';});
-  eventDay.input.readOnly=!!imported?.eventDate;eventDay.input.value=imported?.eventDate||'';
-  dateHint.textContent=imported?.eventDate?'Fecha leída en la captura. Comprueba que corresponde al evento; si no coincide, usa otra captura.':'Indica la fecha del evento, no la fecha en que hiciste la apuesta.';
+  eventDay.input.readOnly=false;eventDay.input.value=imported?.eventDate||'';
+  const dateMessages={exact:'Fecha del evento leída automáticamente en el comprobante. Puedes corregirla si hace falta.',weekday_placed:'Fecha estimada a partir del día del partido y la fecha de la apuesta. Confírmala antes de publicar.',weekday_estimated:'Fecha estimada a partir del día de la semana visible. Revisa que sea correcta.',last_event:'Combinada: fecha del último partido detectado. Revisa que corresponda al evento final.'};
+  dateHint.textContent=imported?.eventDate?(dateMessages[imported.dateSource]||'Fecha detectada automáticamente. Revísala antes de publicar.'):'No pudimos leer la fecha del evento. Selecciónala antes de publicar; no usamos la fecha de la apuesta.';
   form.dataset.imported=String(!!imported);
   form.dataset.captureStep=imported?'review':'capture';
   $('cpComposeTitle').textContent=imported?'Revisa tu Pick':'Prepara tu Pick';
