@@ -117,7 +117,7 @@
  // Importar sin datos escritos: abstenerse si no hay una cuota única por selección.
  // Evento, mercado, selección y cuota se importan como una unidad inmutable.
  function extract(data){
-  const ticket=extractGameParlay(data);
+  const ticket=extractOpenSameGameParlay(data)||extractGameParlay(data);
   if(ticket)return ticket;
   const fail=reason=>({ok:false,reason,readings:[]});
   const lines=linesFrom(data),plain=clean(lines.map(l=>l.text).join('\n'));
@@ -187,6 +187,73 @@
  // A Same Game Parlay+ is one ticket, with a quoted price for the whole ticket.
  // Its internal groups are NOT independently priced player props. Keep every
  // condition, including repeated players in different markets, in one reading.
+
+ // An already-placed My Bets card may show a Same Game Parlay with one quoted
+ // total and several unpriced markets. They form ONE Pick, not separate legs.
+ function extractOpenSameGameParlay(data){
+  const lines=linesFrom(data),plain=clean(lines.map(l=>l.text).join('\n'));
+  if(!/\bmy bets\b/.test(plain)||!/\bsame game parlay\b/.test(plain))return null;
+  // The multi-event "N leg Same Game Parlay+" parser handles its own headers.
+  if(/\b\d+\s*leg\s+same game parlay/.test(plain)||/\bincludes?\s*:?\s*\d+\s*same game parlay/.test(plain))return null;
+  const fail=reason=>({ok:false,reason,readings:[]});
+  if(Number(data.confidence)<50)return fail('No se lee con suficiente claridad. Prueba una captura más nítida.');
+  const headers=lines.map((l,i)=>({i,text:clean(l.text)})).filter(l=>/\bsame game parlay\b/.test(l.text));
+  if(headers.length!==1)return fail('El comprobante contiene varias apuestas o un encabezado ambiguo. Captura un solo Pick completo.');
+  const h=headers[0].i,quotes=candidates(lines[h],h).filter(c=>/^[+]\s*\d{3,6}$/.test(c.raw)&&c.confidence>=85);
+  if(quotes.length!==1||data.hasBoostedTicketPrice||/\bprofit boost\b/.test(plain))
+   return fail('No pude leer un momio total original único de la combinada. Incluye su encabezado sin bonos.');
+  const price=quotes[0];
+  const stop=lines.findIndex((l,i)=>i>h&&/\b(total wager|total payout|total stake|cash out|cashout|reuse|share bet|pin bet|bet id|placed:)\b/i.test(l.text));
+  const part=lines.slice(h+1,stop<0?lines.length:stop);
+  const eventPattern=/\s+(?:vs?\.?|versus|contra|at)\s+|\s*@\s+/i;
+  const eventIndex=part.findIndex(l=>eventPattern.test(l.text)&&l.confidence>=65);
+  if(eventIndex<0)return fail('No pude identificar el partido completo de la combinada.');
+  const tidy=s=>String(s||'').replace(/\s+(?:MON|TUE|WED|THU|FRI|SAT|SUN)(?:DAY)?\b.*$/i,'').replace(/\s+/g,' ').trim();
+  const event=tidy(part[eventIndex].text);
+  if(event.length<6||event.length>160)return fail('El nombre del partido está incompleto.');
+  const marketKind=s=>{
+   const t=clean(s);
+   if(/\bmoneyline\b|\bmatch betting\b/.test(t))return 'moneyline';
+   if(/\bover\s*\/\s*under\b|\bover under\b/.test(t))return 'total';
+   if(/\bboth teams to score\b|\bambos anotan\b/.test(t))return 'btts';
+   return '';
+  };
+  const summary=part.slice(0,eventIndex).map(l=>l.text).join(' ');
+  const expected=new Set(['moneyline','total','btts'].filter(k=>marketKind(k==='moneyline'?'moneyline':k==='total'?'over/under':'both teams to score')&&
+   (k==='moneyline'?/\bmoneyline\b/i.test(summary):k==='total'?/over\s*\/\s*under/i.test(summary):/both teams to score/i.test(summary))));
+  const conditions=[],seen=new Set();
+  const details=part.slice(eventIndex+1);
+  for(let i=0;i<details.length;i++){
+   const label=details[i],kind=marketKind(label.text);
+   if(!kind||label.confidence<65)continue;
+   if(seen.has(kind))return fail('Hay mercados repetidos o no se pudieron separar. Prueba otra captura.');
+   const previous=details[i-1],name=previous?tidy(previous.text):'';
+   if(!previous||previous.confidence<65||name.length<2||name.length>120||
+    eventPattern.test(name)||marketKind(name)||
+    /^(?:my bets|open|settled|same game parlay|total wager|total payout)$/i.test(name))
+    return fail('Falta una selección junto a su mercado. Sube una captura más completa.');
+   if(kind==='total'&&!/\b(over|under|mas de|menos de)\b/i.test(name))return fail('No pude leer el más/menos de goles completo.');
+   if(kind==='btts'&&!/\b(yes|no|si|sí)\b/i.test(name))return fail('No pude distinguir la selección de ambos anotan.');
+   conditions.push(name+' · '+tidy(label.text));seen.add(kind);
+  }
+  if(conditions.length<2||conditions.length>12||[...expected].some(k=>!seen.has(k)))
+   return fail('Falta una de las selecciones de la combinada. Incluye sus mercados completos.');
+  const selection=conditions.join(' + ');
+  if(selection.length>2000)return fail('La combinada es demasiado extensa para publicarla completa.');
+  const amountFor=label=>{
+   const index=lines.findIndex((l,i)=>i>h&&new RegExp('\\b'+label+'\\b','i').test(l.text));
+   if(index<0)return null;
+   const preceding=lines[index-1]?.text.trim()||'';
+   const match=preceding.match(/^\$?\s*(\d+(?:[.,]\d{2}))$/);
+   return match?Number(match[1].replace(',','.')):null;
+  };
+  return {ok:true,readings:[{
+   sport:/\b(goals?|barcelona|st-g|soccer|futbol)\b/i.test(event+' '+selection)?'Fútbol':'Otros',
+   event,selection,selectionCount:conditions.length,odds:price.american,
+   format:'americana',visible:price.visible,confidence:Math.floor(price.confidence),
+   wager:amountFor('total wager'),payout:amountFor('total payout')
+  }],total:null,eventDate:''};
+ }
  function extractGameParlay(data){
   const lines=linesFrom(data),plain=clean(lines.map(l=>l.text).join('\n'));
   if(!/same game parlay/.test(plain))return null;
@@ -260,5 +327,5 @@
   if(!price||!Number.isFinite(price.american))return {...fail('Se recuperaron '+picks.length+' selecciones, pero no se lee el momio total original. Sube otra captura que incluya la parte superior y los partidos; no usamos el bonus ni el importe para calcularlo.'),partial:preview};
   return {ok:true,readings:[{...preview,odds:price.american,visible:price.visible,format:'americana',confidence:Math.floor(price.confidence),originalBeforeBoost}],total:null,eventDate:''};
  }
- return {odds,compare,extract,linesFrom,selectionMatches,extractGameParlay};
+ return {odds,compare,extract,linesFrom,selectionMatches,extractGameParlay,extractOpenSameGameParlay};
 });
