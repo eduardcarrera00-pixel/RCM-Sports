@@ -630,7 +630,7 @@ function buildComposer(){
   const ready=valid&&decimal>=2&&!!capture?.hasImport()&&validEventDate();
   submit.disabled=!ready||posting;
   submit.dataset.ready=String(ready&&!posting);
-  footerHint.textContent=ready?'Al publicar confirmas que hiciste esta apuesta y revisaste la fecha y el pronóstico.':form.dataset.imported==='true'?'La fecha debe detectarse automáticamente en la captura para publicar. Si falta, cambia la captura.':'Disponible cuando termine de leerse una captura válida.';
+  footerHint.textContent=ready?'Al publicar confirmas que hiciste esta apuesta y revisaste la fecha y el pronóstico.':form.dataset.imported==='true'?'Elige la fecha del partido para poder publicar.':'Disponible cuando termine de leerse una captura válida.';
   return valid&&decimal>=2;
  }
  function addRow(){
@@ -660,9 +660,16 @@ function buildComposer(){
   while(rows.length>Math.max(1,data.length))rows.pop().box.remove();
   while(rows.length<data.length)addRow();
   rows.forEach((row,i)=>{for(const key of ['sport','event','selection','odds'])row[key].input.value=data[i]?(key==='sport'?(data[i][key]||'Otros'):key==='odds'?(data[i].odds>0?'+':'')+data[i].odds:data[i][key]):'';});
-  eventDay.input.readOnly=true;eventDay.input.value=imported?.eventDate||'';
+  // Si la captura no muestra la fecha, la persona la elige; si se detectó, queda bloqueada.
+  const manualDate=!!imported&&!imported.eventDate;
+  eventDay.input.readOnly=!manualDate;eventDay.input.type=manualDate?'date':'text';
+  eventDay.input.min=manualDate?todayToronto():'';
+  if(manualDate)eventDay.input.removeAttribute('aria-readonly');else eventDay.input.setAttribute('aria-readonly','true');
+  eventDay.input.placeholder=manualDate?'Elige la fecha del partido':'Se detectará al leer el boleto';
+  eventDay.wrap.dataset.manual=String(manualDate);
+  eventDay.input.value=imported?.eventDate||'';
   const dateMessages={exact:'Fecha del evento detectada automáticamente en la captura.',weekday_placed:'Fecha calculada a partir del día del evento y de la apuesta. Si no coincide, sube una captura con la fecha completa.',weekday_estimated:'Fecha estimada a partir del día de la semana. Si no coincide, sube una captura que muestre el día exacto.',last_event:'Combinada: fecha del último partido detectado automáticamente.'};
-  dateHint.textContent=imported?.eventDate?(dateMessages[imported.dateSource]||'Fecha del evento detectada automáticamente.'):'No se detectó una fecha fiable. Sube otra captura que muestre la fecha del partido para poder publicar.';
+  dateHint.textContent=imported?.eventDate?(dateMessages[imported.dateSource]||'Fecha del evento detectada automáticamente.'):'No pudimos leer la fecha en la captura. Elige la fecha del partido (hoy o hasta 180 días).';
   form.dataset.imported=String(!!imported);
   form.dataset.captureStep=imported?'review':'capture';
   $('cpComposeTitle').textContent=imported?'Revisa tu Pick':'Prepara tu Pick';
@@ -676,7 +683,7 @@ function buildComposer(){
  form.onsubmit=async e=>{
   e.preventDefault();if(posting)return;
   if(!form.reportValidity())return;
-  if(!validEventDate()){status.textContent='No se detectó una fecha de evento válida. Sube otra captura donde se vea la fecha del partido (entre hoy y los próximos 180 días).';return;}
+  if(!validEventDate()){status.textContent='Elige una fecha de partido válida: entre hoy y los próximos 180 días.';return;}
   if(!capture?.hasImport()){status.textContent='Primero sube una captura y espera a que termine la lectura.';return;}
   if(!calculate()){status.textContent='Revisa las cuotas: la cuota total debe ser al menos +100.';return;}
   posting=true;submit.disabled=true;

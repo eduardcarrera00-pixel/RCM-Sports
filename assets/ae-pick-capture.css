@@ -212,3 +212,7 @@ html:not(.dark) .cp-capture-overlay-cancel{border-color:#c9b49c;color:#855b43;}
 .ae-pick-settle-entry .ae-pick-settle-auto[data-state="needs_review"]{border-left-color:#edae79;}
 html:not(.dark) .ae-pick-settle-entry .ae-pick-settle-auto{border-left-color:#d9d9d0;}
 html:not(.dark) .ae-pick-settle-entry .ae-pick-settle-auto[data-state="needs_review"]{border-left-color:#b0672c;}
+/* Fecha manual cuando la captura no la muestra. */
+html body #cpComposePanel #cpForm .cp-compose-date[data-manual="true"] input{min-height:44px;border:1px solid var(--cp-dialog-action);border-style:solid;cursor:pointer;}
+html.dark body #cpComposePanel #cpForm .cp-compose-date[data-manual="true"] input{color-scheme:dark;}
+html body #cpComposePanel #cpForm .cp-compose-date[data-manual="true"] input:focus-visible{outline:2px solid var(--cp-dialog-action);outline-offset:2px;}
