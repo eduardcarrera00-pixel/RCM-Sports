@@ -1822,6 +1822,33 @@ html body #camWelcomeDialog .cam-welcome-features>div {
   display:grid;gap:4px;padding:12px 14px;
   background:rgba(218,191,156,.06);border:1px solid rgba(222,187,144,.24);
 }
+/* Las tarjetas de la bienvenida son botones que llevan a cada sección. */
+html body #camWelcomeDialog button.cam-welcome-feature {
+  display:grid;gap:4px;width:100%;padding:12px 14px;margin:0;text-align:left;
+  background:rgba(218,191,156,.06);border:1px solid rgba(222,187,144,.24);border-radius:0;
+  color:inherit;cursor:pointer;transition:background-color .15s ease,border-color .15s ease;
+}
+html body #camWelcomeDialog button.cam-welcome-feature:hover,
+html body #camWelcomeDialog button.cam-welcome-feature[aria-expanded="true"] {
+  background:rgba(218,191,156,.14);border-color:rgba(222,187,144,.6);
+}
+html body #camWelcomeDialog .cam-welcome-feature strong { display:flex;justify-content:space-between;gap:8px; }
+html body #camWelcomeDialog .cam-welcome-take-choice[hidden] { display:none!important; }
+html body #camWelcomeDialog .cam-welcome-take-choice {
+  display:grid;gap:8px;margin-top:-9px;padding:12px 14px;
+  border:1px solid rgba(222,187,144,.6);border-top:0;background:rgba(218,191,156,.1);
+}
+html body #camWelcomeDialog .cam-welcome-take-choice p { margin:0;color:#e7e1da;font:600 12px/1.4 Inter,sans-serif; }
+html body #camWelcomeDialog .cam-welcome-take-choice div { display:grid;grid-template-columns:1fr 1fr;gap:8px; }
+html body #camWelcomeDialog .cam-welcome-take-choice button {
+  min-height:44px;border:1px solid #d4aa72;border-radius:0;background:transparent;color:#e8be8b;
+  font:750 13px/1 Inter,sans-serif;cursor:pointer;
+}
+html body #camWelcomeDialog .cam-welcome-take-choice button:hover { background:#d4aa72;color:#142e3b; }
+html:not(.dark) body #camWelcomeDialog .cam-welcome-take-choice p { color:#5c4a3b; }
+html:not(.dark) body #camWelcomeDialog .cam-welcome-take-choice button { color:#7a4d2b;border-color:#b98352; }
+html:not(.dark) body #camWelcomeDialog .cam-welcome-take-choice button:hover { background:#b98352;color:#fff; }
+@media (prefers-reduced-motion:reduce) { html body #camWelcomeDialog button.cam-welcome-feature { transition:none; } }
 html body #camWelcomeDialog .cam-welcome-features strong {
   color:#e8be8b;font:750 12px/1.35 Inter,sans-serif;
 }
@@ -1850,9 +1877,15 @@ html:not(.dark) body #camWelcomeDialog #camWelcomeTitle{color:#593822!important;
 html:not(.dark) body #camWelcomeDialog .cam-welcome-intro,
 html:not(.dark) body #camWelcomeDialog .cam-welcome-outro,
 html:not(.dark) body #camWelcomeDialog .cam-welcome-features span{color:#544b40;}
-html:not(.dark) body #camWelcomeDialog .cam-welcome-features>div{
+html:not(.dark) body #camWelcomeDialog .cam-welcome-features>div,
+html:not(.dark) body #camWelcomeDialog button.cam-welcome-feature{
   background:rgba(170,120,73,.07);border-color:rgba(136,93,56,.26);
 }
+html:not(.dark) body #camWelcomeDialog button.cam-welcome-feature:hover,
+html:not(.dark) body #camWelcomeDialog button.cam-welcome-feature[aria-expanded="true"]{
+  background:rgba(170,120,73,.15);border-color:rgba(136,93,56,.55);
+}
+html:not(.dark) body #camWelcomeDialog .cam-welcome-take-choice{border-color:rgba(136,93,56,.55);}
 html:not(.dark) body #camWelcomeDialog .cam-welcome-features strong,
 html:not(.dark) body #camWelcomeDialog .cam-welcome-overline,
 html:not(.dark) body #camWelcomeDialog .cam-welcome-eyebrow{color:#92623b;}

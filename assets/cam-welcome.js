@@ -85,6 +85,31 @@
     firstAccount = readFirstAccount();
     $('camWelcomeClose')?.addEventListener('click',()=>$('camWelcomeDialog')?.close());
     $('camWelcomeExplore')?.addEventListener('click',()=>$('camWelcomeDialog')?.close());
+    // Cada tarjeta lleva a su sección. Takes pide antes elegir Fútbol o NFL.
+    const go = fn => { $('camWelcomeDialog')?.close(); window.scrollTo({top:0}); fn(); };
+    const nav = category => { if (typeof filterByCategory === 'function') filterByCategory(category); };
+    document.querySelector('[data-cam-welcome="news"]')?.addEventListener('click',()=>go(()=>{
+      nav('Todos');
+      if (typeof window.aeOpenNewsArchive === 'function') window.aeOpenNewsArchive('Todas');
+    }));
+    document.querySelector('[data-cam-welcome="picks"]')?.addEventListener('click',()=>go(()=>nav('Picks')));
+    const takes = document.querySelector('[data-cam-welcome="takes"]');
+    takes?.addEventListener('click',()=>{
+      const choice = $('camWelcomeTakeChoice');
+      const open = choice.hidden;
+      choice.hidden = !open;
+      takes.setAttribute('aria-expanded',String(open));
+      if (open) choice.querySelector('button')?.focus();
+    });
+    document.querySelectorAll('[data-cam-welcome-take]').forEach(button=>button.addEventListener('click',()=>{
+      const sport = button.dataset.camWelcomeTake;
+      go(()=>{ nav(sport); window.aeOpenTakeComposer?.(sport); });
+    }));
+    $('camWelcomeDialog')?.addEventListener('close',()=>{
+      const choice = $('camWelcomeTakeChoice');
+      if (choice) choice.hidden = true;
+      takes?.setAttribute('aria-expanded','false');
+    });
     $('camWelcomeDialog')?.addEventListener('click',e=>{
       if(e.target === $('camWelcomeDialog')) $('camWelcomeDialog').close();
     });

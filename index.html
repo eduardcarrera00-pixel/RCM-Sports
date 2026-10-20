@@ -291,7 +291,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261020-armonia-1">
     <link rel="stylesheet" href="assets/ae-muted-navigation-icons.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-custom-nav-icons.css?v=20261016-1">
-<link rel="stylesheet" href="assets/ae-classical-auth-buttons.css?v=20261020-cam-welcome-v1">
+<link rel="stylesheet" href="assets/ae-classical-auth-buttons.css?v=20261020-cam-welcome-v2">
 <link rel="stylesheet" href="assets/ae-reference-community-design.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-mobile-header-ranking-polish.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-desktop-header-layout.css?v=20261016-1">
@@ -2480,9 +2480,13 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
       <h2 id="camWelcomeTitle">¡Bienvenido a CAM SPORTS!</h2>
       <p id="camWelcomeIntro" class="cam-welcome-intro">Qué gusto tenerte por aquí. Este espacio también es tuyo: vive el deporte, comparte lo que piensas y disfruta cada partido a tu manera.</p>
       <div class="cam-welcome-features">
-        <div><strong>Descubre las noticias</strong><span>Sigue fútbol, NFL y otros deportes con nuestras noticias y análisis.</span></div>
-        <div><strong>Cocina tus Picks</strong><span>Publica tus pronósticos, conoce los de la comunidad y participa en los rankings.</span></div>
-        <div><strong>Haz oír tus Takes</strong><span>Comparte tus opiniones, responde, vota y debate con otros aficionados.</span></div>
+        <button type="button" class="cam-welcome-feature" data-cam-welcome="news"><strong>Descubre las noticias <span aria-hidden="true">→</span></strong><span>Sigue fútbol, NFL y otros deportes con nuestras noticias y análisis.</span></button>
+        <button type="button" class="cam-welcome-feature" data-cam-welcome="picks"><strong>Cocina tus Picks <span aria-hidden="true">→</span></strong><span>Publica tus pronósticos, conoce los de la comunidad y participa en los rankings.</span></button>
+        <button type="button" class="cam-welcome-feature" data-cam-welcome="takes" aria-expanded="false" aria-controls="camWelcomeTakeChoice"><strong>Haz oír tus Takes <span aria-hidden="true">→</span></strong><span>Comparte tus opiniones, responde, vota y debate con otros aficionados.</span></button>
+        <div id="camWelcomeTakeChoice" class="cam-welcome-take-choice" role="group" aria-label="¿Sobre qué quieres publicar tu Take?" hidden>
+          <p>¿Sobre qué quieres publicar tu Take?</p>
+          <div><button type="button" data-cam-welcome-take="Fútbol">Fútbol</button><button type="button" data-cam-welcome-take="NFL">NFL</button></div>
+        </div>
       </div>
       <p class="cam-welcome-outro">Explora sin prisa, respeta las opiniones de los demás y, sobre todo, ¡pásatelo bien!</p>
       <button type="button" id="camWelcomeExplore" class="cam-welcome-explore">Comenzar a explorar <span aria-hidden="true">→</span></button>
@@ -4321,7 +4325,7 @@ updateThemeButton();
 <script src="assets/ae-football-mobile-redesign.js?v=20261018-football-boards-v2"></script>
 <script src="assets/ae-home-weekly-layout.js?v=20261018-weekly-share-1"></script>
 <script src="assets/ae-notifications.js?v=20261020-cam-welcome-v1"></script>
-<script src="assets/cam-welcome.js?v=20261020-cam-welcome-v1"></script>
+<script src="assets/cam-welcome.js?v=20261020-welcome-links-1"></script>
 
 <script id="ae-home-news-carousel-motion">
 /* Movimiento ligero y reversible: sin clones, sin alterar enlaces, votos o artículos. */
