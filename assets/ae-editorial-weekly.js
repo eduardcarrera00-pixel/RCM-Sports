@@ -392,52 +392,6 @@
      }
    }finally{submitting=false;send.disabled=false;}
  }
- function renderNews(){
-   const list=$('picksNewsList'),lead=$('picksNewsLead');
-   if(!list)return;
-   list.replaceChildren();
-   // "articles" es el listado real de index.html, no window.articles.
-   const source=typeof articles==='undefined'?[]:articles;
-   const newest=source.filter(a=>a && typeof categoryKey==='function' && categoryKey(a.category)==='Picks')
-     .sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)||String(a.id).localeCompare(String(b.id)))[0];
-   if(lead){
-     lead.textContent=newest?.title||'';
-     lead.hidden=!newest;
-   }
-   if(!newest){
-     list.append(make('p','Todavía no hay noticias de Picks. Las próximas publicaciones aparecerán aquí.','ae-picks-news-empty'));
-     return;
-   }
-   // Titular arriba; fotografía en toda la tarjeta. Si falla, se muestra
-   // el titular dentro de la tarjeta como alternativa legible.
-   const card=make('article',undefined,'ae-picks-news-card ae-picks-news-feature');
-   const btn=make('button',undefined,'ae-picks-news-open');
-   btn.type='button';
-   btn.setAttribute('aria-label','Leer noticia: '+newest.title);
-   const imageUrl=newest.image && typeof safeImageURL==='function'?safeImageURL(newest.image):'';
-   if(imageUrl){
-     const img=make('img');img.loading='lazy';img.decoding='async';img.alt='';img.src=imageUrl;
-     const focus=(Number.isFinite(Number(newest.image_focus_x))?Math.max(0,Math.min(100,Number(newest.image_focus_x))):50)+'% '+(Number.isFinite(Number(newest.image_focus_y))?Math.max(0,Math.min(100,Number(newest.image_focus_y))):50)+'%';
-     const zoom=Number(newest.image_zoom_pct);
-     const zoomPct=Number.isFinite(zoom)?Math.max(1,Math.min(300,Math.round(zoom))):100;
-     img.style.setProperty('--ae-image-focus',focus);
-     img.style.setProperty('--ae-image-zoom',String(zoomPct/100));
-     card.classList.add('has-photo');
-     img.addEventListener('error',()=>{
-       img.remove();
-       card.classList.remove('has-photo');
-     });
-     btn.append(img);
-   }
-   const copy=make('div',undefined,'ae-picks-news-copy');
-   copy.append(make('span','PICKS · ANÁLISIS','ae-picks-news-label'));
-   copy.append(make('h4',newest.title,'ae-picks-news-in-card-title'));
-   copy.append(make('span','Leer noticia →','ae-picks-news-read'));
-   btn.append(copy);
-   btn.addEventListener('click',()=>{if(typeof openArticleModal==='function')openArticleModal(newest.id);});
-   card.append(btn);list.append(card);
- }
- window.renderAePicksNews=renderNews;
  window.refreshEditorialWeeklyPick=load;
  window.updateAeWeeklyAdmin=adminVisibility;
  // Keep the original desktop preview when the viewport changes.
