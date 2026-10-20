@@ -4166,6 +4166,7 @@ function prepareComments(article) {
     currentCategory = categoryKey(category);
     if(typeof aeSportIsVisible==='function' && !aeSportIsVisible(currentCategory)) currentCategory='Todos';
     category = currentCategory;
+    if(window.camAnalytics?.trackSection) window.camAnalytics.trackSection(category);
     currentTeam = '';
     if (category === 'NFL') loadRanking();
             document.querySelectorAll('.category-btn').forEach(btn => {
@@ -4434,7 +4435,7 @@ html .cam-weekly-result-surface .cam-weekly-result-on-photo{
 <script src="assets/ae-home-weekly-layout.js?v=20261018-weekly-share-1"></script>
 <script src="assets/ae-notifications.js?v=20261020-cam-welcome-v1"></script>
 <script src="assets/cam-welcome.js?v=20261020-welcome-links-1"></script>
-<script src="assets/cam-analytics.js?v=20261020-1"></script>
+<script src="assets/cam-analytics.js?v=20261020-navigation-2"></script>
 
 <script id="ae-home-news-carousel-motion">
 /* Movimiento ligero y reversible: sin clones, sin alterar enlaces, votos o artículos. */
