@@ -1,4 +1,4 @@
-/* AE SPORTS · Human-reviewed Take scores and separate sport/home leaderboards. */
+/* AE SPORTS · Take scores by difficulty (1–20, admin classifies + marks result) and separate sport/home leaderboards. */
 (() => {
   'use strict';
   const $=id=>document.getElementById(id);
@@ -185,40 +185,130 @@
       list.replaceChildren(...(rows.length?rows.map(isHome?rankRow:standingRow):[isHome?element('li',emptyMessage,'ae-take-ranking-empty'):standingMessage(emptyMessage)]));
     }catch(e){if(seq===rankRequest[where])list.replaceChildren(isHome?element('li','No se pudo cargar la clasificación.','ae-take-ranking-empty'):standingMessage('No se pudo cargar la clasificación.'));}
   }
-  function reviewEntry(t){
+  /* Revisión admin: dificultad por probabilidad (motor 1–20) y resultado. */
+  const TIERS=[['casi_seguro','Casi seguro · no puntúa'],['muy_probable','Muy probable · 1 pt'],['probable','Probable · 3 pts'],
+    ['parejo','Parejo · 4 pts'],['sorpresa','Sorpresa · 7 pts'],['bombazo','Bombazo · 12 pts'],['locura','Locura · 17 pts'],['historica','Histórica · 20 pts']];
+  const LEAGUES=[['laliga','LaLiga'],['premier','Premier League'],['ligamx','Liga MX']];
+  const CONDITIONS=[['at_or_above','Termina en ese puesto o mejor'],['exact','Termina exactamente en ese puesto'],['at_or_below','Termina en ese puesto o peor']];
+  let outlookTeams=null;
+  const seasonOf=date=>{const d=new Date(date),y=d.getUTCMonth()>=6?d.getUTCFullYear():d.getUTCFullYear()-1;return y+'/'+String((y+1)%100).padStart(2,'0');};
+  const percent=p=>{const v=Number(p)*100;return (v<1?v.toFixed(1):Math.round(v))+'%';};
+  const status=text=>{const node=$('aeTakeReviewStatus');if(node)node.textContent=text;};
+  function selectOf(name,options,value){
+    const select=element('select');select.name=name;
+    for(const [v,label] of options){const o=element('option',label);o.value=v;select.append(o);}
+    if(value!=null)select.value=value;return select;
+  }
+  function field(label,control){const l=element('label',label+' ');l.append(control);return l;}
+  async function loadOutlookTeams(){
+    if(outlookTeams)return outlookTeams;
+    const [snaps,teams]=await Promise.all([
+      db.from('ae_outlook_snapshots').select('id,competition,season'),
+      db.from('ae_outlook_teams').select('snapshot_id,team')
+    ]);
+    if(snaps.error)throw snaps.error;if(teams.error)throw teams.error;
+    const bySnap=new Map((snaps.data||[]).map(s=>[s.id,s.competition+'|'+s.season]));
+    const map={};
+    for(const row of teams.data||[]){const key=bySnap.get(row.snapshot_id);if(!key)continue;(map[key]||=new Set()).add(row.team);}
+    outlookTeams=Object.fromEntries(Object.entries(map).map(([k,v])=>[k,[...v].sort((a,b)=>a.localeCompare(b,'es'))]));
+    return outlookTeams;
+  }
+  function describe(c){
+    if(!c)return 'Sin clasificar';
+    if(c.trivial)return 'Trivial ('+percent(c.probability)+'): no puntúa';
+    return c.difficulty_points+' pts · probabilidad '+percent(c.probability);
+  }
+  function reviewEntry(t,classification,teams){
     const form=element('form',null,'ae-take-review-entry');
+    let current=classification||null;
     const heading=element('div',null,'ae-take-review-heading');
     heading.append(element('strong',t.title));
     heading.append(element('span','@'+(t.author||'Aficionado')+' · '+new Date(t.created_at).toLocaleDateString('es'),'ae-take-review-meta'));
+    const badge=element('span',describe(current),'ae-take-review-difficulty');badge.dataset.state=current?(current.trivial?'trivial':'ready'):'pending';
+    heading.append(badge);
     form.append(heading);
-    const fields=element('div',null,'ae-take-review-fields');
-    const resultLabel=element('label','Resultado ');
-    const result=element('select');result.name='outcome';
-    for(const [value,label] of [['','Pendiente'],['won','Acertado'],['lost','Fallado']]){
-      const option=element('option',label);option.value=value;result.append(option);
-    }
-    result.value=t.outcome||'';
-    const pointsLabel=element('label','Puntos ');
-    const points=element('input');points.name='points';points.type='number';points.min='1';points.max='100';points.step='1';points.value=t.outcome==='won'?String(t.points):'';
-    const toggle=()=>{points.disabled=result.value!=='won';if(result.value==='lost')points.value='0';else if(result.value==='won'&&Number(points.value)<1)points.value='1';};
-    result.addEventListener('change',toggle);toggle();
-    resultLabel.append(result);pointsLabel.append(points);
-    const save=element('button',t.outcome?'Corregir':'Asignar puntos');save.type='submit';
-    fields.append(resultLabel,pointsLabel,save);form.append(fields);
+
+    const football=t.sport!=='nfl';
+    const methods=[...(football?[['table','Tabla de la liga']]:[]),['tier','Nivel de sorpresa'],['odds','Cuota de apuesta']];
+    const method=selectOf('method',methods,current?.method&&methods.some(([v])=>v===current.method)?current.method:(football?'table':'tier'));
+    const season=seasonOf(t.created_at);
+    const league=selectOf('competition',LEAGUES,current?.competition||'laliga');
+    const team=element('select');team.name='team';
+    const condition=selectOf('condition',CONDITIONS,current?.condition||'at_or_above');
+    const position=element('input');position.name='position';position.type='number';position.min='1';position.max='24';position.step='1';position.value=String(current?.target_position||1);
+    const tier=selectOf('tier',TIERS,current?.tier||'sorpresa');
+    const odds=element('input');odds.name='odds';odds.type='number';odds.step='1';odds.placeholder='+600 o -150';if(current?.american_odds)odds.value=String(current.american_odds);
+    const fillTeams=()=>{
+      const list=teams?.[league.value+'|'+season]||[];
+      team.replaceChildren(...(list.length?list:['Sin matriz para '+season]).map(name=>{const o=element('option',name);o.value=list.length?name:'';return o;}));
+      if(current?.team&&list.includes(current.team))team.value=current.team;
+    };
+    league.addEventListener('change',fillTeams);fillTeams();
+
+    const difficulty=element('fieldset',null,'ae-take-review-fields ae-take-review-step');
+    difficulty.append(element('legend','1 · Dificultad'));
+    const tableFields=[field('Liga',league),field('Equipo',team),field('Condición',condition),field('Puesto',position)];
+    const tierField=field('Nivel',tier),oddsField=field('Cuota',odds);
+    const classify=element('button','Calcular dificultad');classify.type='button';classify.name='classify';
+    difficulty.append(field('Método',method),...tableFields,tierField,oddsField,classify);
+    const showMethod=()=>{
+      for(const node of tableFields)node.hidden=method.value!=='table';
+      tierField.hidden=method.value!=='tier';oddsField.hidden=method.value!=='odds';
+    };
+    method.addEventListener('change',showMethod);showMethod();
+
+    const resultStep=element('fieldset',null,'ae-take-review-fields ae-take-review-step');
+    resultStep.append(element('legend','2 · Resultado'));
+    const result=selectOf('outcome',[['','Pendiente'],['won','Acertado'],['lost','Fallado']],t.outcome||'');
+    const preview=element('span','','ae-take-review-preview');
+    const save=element('button',t.outcome?'Corregir resultado':'Guardar resultado');save.type='submit';
+    resultStep.append(field('Resultado',result),preview,save);
+    const sync=()=>{
+      const ready=Boolean(current)&&!current.trivial;
+      save.disabled=!ready||!result.value;
+      preview.textContent=!current?'Primero calcula la dificultad.':current.trivial?'Take trivial: no se puntúa.':
+        result.value==='won'?'+'+current.difficulty_points+' pts':result.value==='lost'?'0 pts':'';
+    };
+    result.addEventListener('change',sync);sync();
+    form.append(difficulty,resultStep);
+
+    classify.addEventListener('click',async()=>{
+      const args={p_take_id:t.id,p_method:method.value,p_rescore:Boolean(t.outcome)};
+      if(method.value==='table'){
+        if(!team.value){status('No hay matriz cargada para '+season+' en esa liga.');return;}
+        Object.assign(args,{p_competition:league.value,p_season:season,p_team:team.value,p_condition:condition.value,p_position:Number(position.value)});
+      }else if(method.value==='tier')args.p_tier=tier.value;
+      else{
+        const value=Number(odds.value);
+        if(!Number.isInteger(value)||Math.abs(value)<100){status('Escribe una cuota americana válida (por ejemplo +600 o -150).');return;}
+        args.p_american_odds=value;
+      }
+      classify.disabled=true;status('Calculando dificultad…');
+      try{
+        const response=await db.rpc('ae_classify_free_take',args);
+        if(response.error)throw response.error;
+        const row=Array.isArray(response.data)?response.data[0]:response.data;
+        current={method:method.value,probability:row.probability,difficulty_points:row.points,trivial:row.trivial,
+          competition:args.p_competition,team:args.p_team,condition:args.p_condition,target_position:args.p_position,tier:args.p_tier,american_odds:args.p_american_odds};
+        badge.textContent=describe(current);badge.dataset.state=current.trivial?'trivial':'ready';
+        status(t.outcome?'Dificultad recalculada; la puntuación se actualizó.':'Dificultad guardada: '+describe(current)+'.');
+        sync();
+        if(t.outcome){await Promise.all([loadRanking('sport'),loadRanking('home')]);document.dispatchEvent(new Event('ae:takes-updated'));}
+      }catch(e){status('No se pudo calcular. '+(e.message||'Inténtalo de nuevo.'));}
+      finally{classify.disabled=false;}
+    });
+
     form.addEventListener('submit',async event=>{
       event.preventDefault();
-      const outcome=result.value,value=outcome==='lost'?0:Number(points.value);
-      if(!['won','lost'].includes(outcome)||!Number.isInteger(value)||value<0||value>100||(outcome==='won'&&value<1)){
-        $('aeTakeReviewStatus').textContent='Elige acertado (1–100) o fallado (0).';return;
-      }
-      save.disabled=true;$('aeTakeReviewStatus').textContent='Guardando puntuación…';
+      if(!current||current.trivial||!['won','lost'].includes(result.value))return;
+      save.disabled=true;status('Guardando resultado…');
       try{
-        const response=await db.rpc('ae_score_free_take',{p_take_id:t.id,p_outcome:outcome,p_points:value});
+        const response=await db.rpc('ae_score_free_take_auto',{p_take_id:t.id,p_outcome:result.value});
         if(response.error)throw response.error;
-        $('aeTakeReviewStatus').textContent='Puntuación guardada.';
+        status(result.value==='won'?'Acierto guardado: +'+response.data+' pts.':'Fallo guardado.');
         await Promise.all([loadRanking('sport'),loadRanking('home'),loadReview()]);
         document.dispatchEvent(new Event('ae:takes-updated'));
-      }catch(e){$('aeTakeReviewStatus').textContent='No se pudo puntuar. '+(e.message||'Inténtalo de nuevo.');save.disabled=false;}
+      }catch(e){status('No se pudo guardar. '+(e.message||'Inténtalo de nuevo.'));save.disabled=false;}
     });
     return form;
   }
@@ -233,9 +323,18 @@
     try{
       const response=await db.rpc('ae_take_review_queue',{p_sport:selectedSport});
       if(response.error)throw response.error;
-      if(seq!==reviewRequest||sport!==selectedSport)return;
       const rows=response.data||[];
-      list.replaceChildren(...(rows.length?rows.map(reviewEntry):[element('p','No hay Takes para revisar.')]))
+      let classes=new Map(),teams={};
+      if(rows.length){
+        const [found,loadedTeams]=await Promise.all([
+          db.from('ae_take_classifications').select('take_id,method,competition,season,team,condition,target_position,tier,american_odds,probability,difficulty_points,trivial').in('take_id',rows.map(r=>r.id)),
+          loadOutlookTeams().catch(()=>({}))
+        ]);
+        if(found.error)throw found.error;
+        classes=new Map((found.data||[]).map(c=>[c.take_id,c]));teams=loadedTeams;
+      }
+      if(seq!==reviewRequest||sport!==selectedSport)return;
+      list.replaceChildren(...(rows.length?rows.map(r=>reviewEntry(r,classes.get(r.id),teams)):[element('p','No hay Takes para revisar.')]));
     }catch(e){if(seq===reviewRequest)list.replaceChildren(element('p','No se pudo cargar la revisión. '+(e.message||'')));}
   }
   function refresh(){
