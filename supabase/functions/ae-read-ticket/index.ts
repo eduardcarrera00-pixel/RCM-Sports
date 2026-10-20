@@ -3,7 +3,7 @@
 // guardan los datos de la apuesta (partido, pronóstico, momio, fecha) para poder publicar.
 import {createClient} from 'npm:@supabase/supabase-js@2.117.3';
 
-const allowedOrigins = new Set(['https://eduardcarrera00-pixel.github.io', 'https://aesportsclub.github.io', 'http://127.0.0.1:5500', 'http://localhost:5500']);
+const allowedOrigins = new Set(['https://eduardcarrera00-pixel.github.io', 'https://aesportsclub.github.io', 'https://camsports.github.io', 'http://127.0.0.1:5500', 'http://localhost:5500']);
 const MODEL = Deno.env.get('AE_TICKET_MODEL') || 'gemini-2.5-flash';
 const DAILY_LIMIT = 25;
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;

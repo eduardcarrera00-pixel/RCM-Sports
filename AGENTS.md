@@ -1,4 +1,4 @@
-# AE SPORTS maintenance
+# CAM SPORTS maintenance
 
 Visual reference: `docs/visual-guide.md` and the illustrated `guia-visual.html`.
 Preserve the current brand assets and approved mobile sport layouts. Use the
@@ -13,15 +13,17 @@ Run `npm run test:editor` when changing news editing or publication. Preserve th
 
 ## Public address and publication
 
-The free branded public address is https://aesportsclub.github.io/.
+The free branded public address is https://camsports.github.io/.
 This repository remains the canonical application source. The repository
-https://github.com/aesportsclub/aesportsclub.github.io owns the GitHub Pages
+https://github.com/camsports/camsports.github.io owns the GitHub Pages
 publication workflow and reads this repository's main branch on a five-minute
 schedule. Keep application changes here; do not create a divergent second site.
-The previous project Pages address remains available. When changing browser
-origin allowlists, preserve both controlled public origins.
+The previous project Pages address and https://aesportsclub.github.io/ remain
+available. When changing browser origin allowlists, preserve all three
+controlled public origins. The legacy AE publisher also reads the same source;
+do not remove its scheduled publication.
 
-## Immediately publish source changes to the AE SPORTS address
+## Immediately publish source changes to the CAM SPORTS address
 
 After completing and committing any application change to this repository's `main`
 branch, also request an immediate branded-site publication. The source checkout
@@ -32,8 +34,8 @@ the branded repository.
    after all source commits are finished.
 2. With authorized GitHub write access, create or update
    `.github/source-revision-request.txt` in
-   `aesportsclub/aesportsclub.github.io` on `main` to contain that full SHA and a
-   final newline. Its `push` event triggers the existing `Publish AE SPORTS`
+   `camsports/camsports.github.io` on `main` to contain that full SHA and a
+   final newline. Its `push` event triggers the existing `Publish CAM Sports`
    workflow immediately, avoiding reliance on GitHub's occasionally delayed
    five-minute schedule. Do not write if that request already contains the
    current SHA and a deployment of that SHA has been confirmed.

@@ -1,11 +1,12 @@
 # CAM SPORTS
 
-Dirección pública actual: **https://aesportsclub.github.io/**
+Dirección pública gratuita de CAM SPORTS: **https://camsports.github.io/**
 
 El código se mantiene en este repositorio. La publicación con la marca se configura
-en [aesportsclub/aesportsclub.github.io](https://github.com/aesportsclub/aesportsclub.github.io)
+en [camsports/camsports.github.io](https://github.com/camsports/camsports.github.io)
 y comprueba los cambios cada cinco minutos mediante GitHub Actions. GitHub puede
-retrasar esas ejecuciones. La dirección anterior de GitHub Pages sigue disponible.
+retrasar esas ejecuciones. Las direcciones anteriores de GitHub Pages, incluida
+https://aesportsclub.github.io/, siguen disponibles con la misma fuente y datos.
 
 Noticias deportivas y una comunidad de lectores que comentan, responden y votan.
 

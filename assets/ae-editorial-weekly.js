@@ -28,7 +28,7 @@
  })();
  let sharedLinkHandled=false;
  const shareUrl=p=>{
-   const url=new URL('https://aesportsclub.github.io/');
+   const url=new URL('https://camsports.github.io/');
    url.searchParams.set('weeklyPick',String(p.id));
    return url.href;
  };

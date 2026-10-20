@@ -1,4 +1,4 @@
-const allowedOrigins=new Set(['https://eduardcarrera00-pixel.github.io','https://aesportsclub.github.io','http://127.0.0.1:5500','http://localhost:5500']);
+const allowedOrigins=new Set(['https://eduardcarrera00-pixel.github.io','https://aesportsclub.github.io','https://camsports.github.io','http://127.0.0.1:5500','http://localhost:5500']);
 const reserved=/^(admin|administrator|administrador|moderator|moderador|support|soporte|system|sistema|aesports|ae_sports|root)$/;
 const randomCode=()=>Array.from(crypto.getRandomValues(new Uint8Array(32)),b=>b.toString(16).padStart(2,'0')).join('');
 const hash=async text=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(text))),b=>b.toString(16).padStart(2,'0')).join('');
