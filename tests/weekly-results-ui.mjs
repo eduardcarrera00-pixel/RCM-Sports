@@ -17,7 +17,7 @@ async function setup(isAdmin=true,shared=false){
    if(name==='cam_admin_weekly_results')return {data:[row]};
    if(name==='cam_weekly_pick_result')return {data:result};
    if(name==='cam_resolve_weekly_pick'){
-     result={...settled,outcome:args.p_outcome};row={...row,outcome:args.p_outcome,social:args.p_outcome==='won'?[{network:'twitter',status:'manual_reply'},{network:'tiktok',status:'accepted'}]:[]};
+     result={...settled,outcome:args.p_outcome};row={...row,outcome:args.p_outcome,social:args.p_outcome==='won'?[{network:'twitter',status:'queued'},{network:'tiktok',status:'accepted'}]:[]};
      if(throwAfterSave)throw Error('Failed to fetch');
      return {data:result};
    }
@@ -51,14 +51,13 @@ const badge=a.w.document.querySelector('.cam-weekly-result-badge');
 assert.ok(badge);
 assert.equal(badge.parentElement,a.w.document.getElementById('picksFeatured'),'Result sits on the photo surface');
 assert.equal(quick.querySelectorAll('button').length,0,'Inline controls cannot repeat a confirmed result');
-assert.ok(panel.textContent.includes('X: respuesta preparada: publicar en X'));
+assert.ok(panel.textContent.includes('X: en cola'));
 assert.ok(panel.textContent.includes('TikTok: procesando'));
 assert.ok(![...panel.querySelectorAll('button')].some(b=>b.textContent.startsWith('Aprobar')),'Resolved Picks have no repeat controls');
-const reply=[...panel.querySelectorAll('a')].find(n=>n.textContent.includes('Responder en X'));
-assert.ok(reply);
-assert.equal(new URL(reply.href).searchParams.get('in_reply_to'),'2112625753602859163');
-assert.equal(new URL(reply.href).searchParams.get('text'),'✅ Pick acertado · Pick de la Semana','X reply must contain only the requested text');
-assert.deepEqual([...new URL(reply.href).searchParams.keys()].sort(),['in_reply_to','text'],'No photo, article details or link is attached');
+assert.ok(![...panel.querySelectorAll('a')].some(n=>n.textContent.includes('Citar el Pick')),'No manual duplicate is offered while automatic publication is queued');
+const quoteUrl=a.w.camWeeklyResults.replyUrl(settled);
+assert.equal(new URL(quoteUrl).searchParams.get('text'),'✅ Pick acertado · Pick de la Semana\n'+settled.original_x_url);
+assert.deepEqual([...new URL(quoteUrl).searchParams.keys()],['text'],'Quote has no in_reply_to or media upload');
 assert.equal(a.w.camWeeklyResults.replyUrl({...settled,original_x_url:'https://evil.test/status/123'}),null);
 await a.w.happyDOM.close();
 
