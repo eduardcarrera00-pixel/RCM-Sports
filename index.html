@@ -4328,18 +4328,24 @@ html:not(.dark) .cam-weekly-result-badge{background:#fffcf8;color:#273b49}
 html:not(.dark) .cam-weekly-review-row{border-color:#d9d9d0}
 @media(max-width:480px){.cam-weekly-review-actions{display:grid}.cam-weekly-review-actions button{width:100%}}
 
-.cam-weekly-quick-result{position:relative;z-index:4;display:grid;gap:8px;padding:14px 16px;margin:8px 12px;border:1px solid #49606c;background:#102b3e;color:#f4e8db;text-align:left}
-.cam-weekly-quick-result small,.cam-weekly-quick-result p{display:block;margin:0;overflow-wrap:anywhere;font:400 13px/1.5 Inter,system-ui,sans-serif}
-.cam-weekly-quick-result .cam-weekly-review-actions{margin:0;display:flex;flex-wrap:wrap;gap:10px}
-.cam-weekly-quick-result button{min-height:44px;padding:10px 16px;border:0!important;border-radius:0;font:700 14px/1.4 Inter,system-ui,sans-serif;color:#fff!important;cursor:pointer}
-.cam-weekly-quick-result .cam-weekly-result-green{background:#176534!important}
-.cam-weekly-quick-result .cam-weekly-result-red{background:#a52828!important}
+.cam-weekly-result-surface{position:relative}
+.cam-weekly-result-surface .cam-weekly-result-badge{position:absolute;right:12px;bottom:12px;z-index:5;display:block;width:auto;max-width:calc(100% - 24px);margin:0;padding:0;border:0;background:none!important;box-shadow:none;border-radius:0;color:#273b49;font:700 12px/1.4 Inter,system-ui,sans-serif;pointer-events:none;letter-spacing:.01em}
+html.dark .cam-weekly-result-surface .cam-weekly-result-badge{color:#f4e8db}
+html .cam-weekly-result-surface .cam-weekly-result-on-photo{color:#fff;text-shadow:0 1px 3px #000,0 0 8px #000b}
+.cam-weekly-quick-result{position:absolute;right:10px;bottom:8px;z-index:6;display:flex;align-items:center;gap:4px;max-width:calc(100% - 20px);padding:0;margin:0;border:0!important;background:none!important;box-shadow:none!important;color:#fff;text-align:right;text-shadow:0 1px 3px #000}
+.cam-weekly-quick-result>strong{font:600 11px/1.4 Inter,system-ui,sans-serif}
+.cam-weekly-quick-result>small{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.cam-weekly-quick-result>p{position:absolute;right:0;bottom:100%;max-width:260px;font:400 12px/1.4 Inter,system-ui,sans-serif}
+.cam-weekly-quick-result .cam-weekly-review-actions{display:flex;flex-wrap:nowrap;gap:0;margin:0}
+.cam-weekly-quick-result button{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;padding:4px 8px;border:0!important;border-radius:0;background:none!important;box-shadow:none!important;font:800 13px/1.4 Inter,system-ui,sans-serif;text-shadow:0 1px 3px #000;cursor:pointer}
+.cam-weekly-quick-result .cam-weekly-result-green{color:#a7f3b9!important}
+.cam-weekly-quick-result .cam-weekly-result-red{color:#ffb4b4!important}
 .cam-weekly-quick-result button:disabled{opacity:.55;cursor:wait}
-.cam-weekly-quick-result button:focus-visible{outline:2px solid #bd8d6b;outline-offset:3px}
+.cam-weekly-quick-result button:focus-visible{outline:2px solid #bd8d6b;outline-offset:-2px}
 .cam-weekly-quick-result[hidden]{display:none!important}
-html:not(.dark) .cam-weekly-quick-result{background:#fffcf8;color:#273b49;border-color:#d9d9d0}
+@media(max-width:480px){.cam-weekly-quick-result .cam-weekly-review-actions{display:flex}.cam-weekly-quick-result .cam-weekly-review-actions button{width:auto}}
 </style>
-<script src="assets/cam-weekly-results.js?v=20261020-weekly-simple-2"></script>
+<script src="assets/cam-weekly-results.js?v=20261020-weekly-photo-3"></script>
 <script src="assets/ae-profile.js?v=20261020-prestige-1"></script>
 <script src="assets/ae-season-predictions.js?v=20261020-season-1"></script>
 <script src="assets/ae-opinions.js?v=20261020-opinions-1"></script>
