@@ -231,7 +231,10 @@
    const label=details[i],kind=marketKind(label.text);
    if(!kind||label.confidence<65)continue;
    if(seen.has(kind))return fail('Hay mercados repetidos o no se pudieron separar. Prueba otra captura.');
-   const previous=details[i-1],name=previous?tidy(previous.text):'';
+   const previous=details[i-1];let name=previous?tidy(previous.text):'';
+   // Discard OCR navigation glyphs preceding the selected team's name.
+   const home=event.split(/\s+(?:vs?\.?|versus|at)\s+|\s*@\s+/i)[0];
+   if(kind==='moneyline'&&home&&clean(name).endsWith(clean(home)))name=home;
    if(!previous||previous.confidence<65||name.length<2||name.length>120||
     eventPattern.test(name)||marketKind(name)||
     /^(?:my bets|open|settled|same game parlay|total wager|total payout)$/i.test(name))
@@ -249,7 +252,12 @@
    if(index<0)return null;
    const preceding=lines[index-1]?.text.trim()||'';
    const match=preceding.match(/^\$?\s*(\d+(?:[.,]\d{2}))$/);
-   return match?Number(match[1].replace(',','.')):null;
+   if(match)return Number(match[1].replace(',','.'));
+   // On phones, both amount columns and their labels may share adjacent lines.
+   const pair=preceding.match(/^\s*\$\s*(\d+[.,]\d{2})\s+\$\s*(\d+[.,]\d{2})\s*$/);
+   if(pair&&/total wager.*total payout/i.test(lines[index].text))
+    return Number((label==='total wager'?pair[1]:pair[2]).replace(',','.'));
+   return null;
   };
   return {ok:true,readings:[{
    sport:/\b(goals?|barcelona|st-g|soccer|futbol)\b/i.test(event+' '+selection)?'Fútbol':'Otros',
