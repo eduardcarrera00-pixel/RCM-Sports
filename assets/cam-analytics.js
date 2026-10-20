@@ -41,7 +41,7 @@
       [/instagram|instagr|ig\.me/,'Instagram'],[/tiktok/,'TikTok'],
       [/facebook|fb\.com|fb\.me|m\.facebook/,'Facebook'],
       [/whatsapp|wa\.me/,'WhatsApp'],
-      [/twitter|x\.com|t\.co/,'X'],
+      [/^(?:x|twitter|twitter\.com|(?:[a-z0-9.-]*\.)?x\.com|t\.co)$/,'X'],
       [/youtube|youtu\.be/,'YouTube'],
       [/linkedin|lnkd\.in/,'LinkedIn'],
       [/reddit/,'Reddit'],[/google/,'Google'],[/bing/,'Bing'],
@@ -163,14 +163,10 @@
     if(entry)entry.hidden=!isAdmin;
     if(!isAdmin&&$('camAnalyticsDialog')?.open)$('camAnalyticsDialog').close();
   }
-  window.camAnalytics={syncAdmin};
+  window.camAnalytics={syncAdmin,trackSection:track};
 
   document.addEventListener('DOMContentLoaded',()=>{
     track('Inicio');
-    document.querySelectorAll('nav.ae-sport-nav button[data-category]').forEach(btn=>{
-      btn.addEventListener('click',()=>track(btn.dataset.category));
-    });
-    document.querySelector('a.ae-brand')?.addEventListener('click',()=>track('Todos'));
     $('camAnalyticsOpen')?.addEventListener('click',open);
     $('camAnalyticsClose')?.addEventListener('click',()=>$('camAnalyticsDialog')?.close());
     $('camAnalyticsRefresh')?.addEventListener('click',open);
