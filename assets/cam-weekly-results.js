@@ -58,7 +58,11 @@
    for(const host of document.querySelectorAll('[data-cam-weekly-id]')){
      const result=results.get(host.dataset.camWeeklyId);
      if(!result)continue;
-     const surface=host.closest('#picksFeatured')||host;
+     const mobile=window.matchMedia('(max-width: 760px)').matches;
+     // En móvil, el resultado de portada vive dentro de la tarjeta principal
+     // (no dentro de un <details> o una foto recortados por overflow:hidden).
+     const homePanel=mobile?host.closest('.editorial-pick'):null;
+     const surface=homePanel||host.closest('#picksFeatured')||host;
      surface.classList.add('cam-weekly-result-surface');
      const image=surface.querySelector('.ae-weekly-banner,.ae-weekly-home-thumbnail,.ae-weekly-mobile-banner-thumb,.ae-weekly-inline-photo');
      // Badge editorial: icono vectorial propio, sin emojis ni texto superpuesto.
@@ -83,6 +87,13 @@
      svg.append(path);
      mark.append(svg);
      badge.append(mark,el('span',label,'cam-weekly-result-label'));
+     if(mobile){
+       // Un renglón real en la plantilla: el fondo y el contorno nunca quedan
+       // cortados por la imagen, tampoco con texto largo o zoom del teléfono.
+       badge.classList.add('cam-weekly-result-mobile-inline');
+       surface.append(badge);
+       continue;
+     }
      if(image){
        badge.classList.add('cam-weekly-result-on-photo');
        const position=()=>{
