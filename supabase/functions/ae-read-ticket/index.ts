@@ -1,45 +1,42 @@
-// AE SPORTS · Lee una captura de apuesta con IA cuando el lector del teléfono no puede.
+// AE SPORTS · Lee una captura de apuesta con IA (Gemini, plan gratuito) cuando el lector del teléfono no puede.
 // La imagen se reenvía una sola vez a la IA y no se guarda en ningún sitio; solo se
 // guardan los datos de la apuesta (partido, pronóstico, momio, fecha) para poder publicar.
-import {createClient} from '@supabase/supabase-js';
+import {createClient} from 'npm:@supabase/supabase-js@2.117.3';
 
 const allowedOrigins = new Set(['https://eduardcarrera00-pixel.github.io', 'https://aesportsclub.github.io', 'http://127.0.0.1:5500', 'http://localhost:5500']);
-const MODEL = Deno.env.get('AE_TICKET_MODEL') || 'claude-haiku-5-5';
+const MODEL = Deno.env.get('AE_TICKET_MODEL') || 'gemini-2.5-flash';
 const DAILY_LIMIT = 25;
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 
-const tool = {
-  name: 'ticket',
-  description: 'Datos de la apuesta deportiva leída en la captura.',
-  input_schema: {
-    type: 'object',
-    properties: {
-      is_bet_slip: {type: 'boolean', description: 'true solo si la imagen es un boleto o apuesta de una casa de apuestas.'},
-      problem: {type: 'string', description: 'Si no se puede leer con seguridad, explica en español qué falta (máx. 140 caracteres). Vacío si todo está claro.'},
-      selections: {
-        type: 'array',
-        items: {
-          type: 'object',
-          properties: {
-            sport: {type: 'string', enum: ['Fútbol', 'NFL', 'NBA', 'MLB', 'NHL', 'Tenis', 'UFC', 'Otros']},
-            league: {type: 'string', description: 'Liga o competición si aparece o se deduce sin duda (p. ej. Liga MX, Premier League, NFL).'},
-            event: {type: 'string', description: 'Partido como "Equipo A vs Equipo B", nombres como aparecen.'},
-            selection: {type: 'string', description: 'Pronóstico completo con mercado, línea y periodo, en español. Ej: "Más de 2.5 goles", "Lakers -4.5", "Patrick Mahomes más de 1.5 pases de touchdown".'},
-            american_odds: {type: ['integer', 'null'], description: 'Momio americano de esta selección si se ve (ej. 150 o -120). null si solo hay total.'},
-            event_date: {type: ['string', 'null'], description: 'Fecha del partido YYYY-MM-DD si aparece en la captura. null si no aparece.'}
-          },
-          required: ['sport', 'event', 'selection', 'american_odds', 'event_date']
-        }
-      },
-      total_american_odds: {type: ['integer', 'null'], description: 'Momio americano total del boleto (combinada) o de la selección única. Si la casa muestra momio decimal o fraccionario, conviértelo. Si hay boost, usa el momio ORIGINAL tachado.'},
-      total_decimal_odds: {type: ['number', 'null'], description: 'Momio decimal total si aparece.'}
+// Esquema de respuesta (formato OpenAPI que entiende Gemini).
+const schema = {
+  type: 'OBJECT',
+  properties: {
+    is_bet_slip: {type: 'BOOLEAN', description: 'true solo si la imagen es un boleto o apuesta de una casa de apuestas.'},
+    problem: {type: 'STRING', description: 'Si no se puede leer con seguridad, explica en español qué falta (máx. 140 caracteres). Vacío si todo está claro.'},
+    selections: {
+      type: 'ARRAY',
+      items: {
+        type: 'OBJECT',
+        properties: {
+          sport: {type: 'STRING', enum: ['Fútbol', 'NFL', 'NBA', 'MLB', 'NHL', 'Tenis', 'UFC', 'Otros']},
+          league: {type: 'STRING', description: 'Liga o competición si aparece o se deduce sin duda (p. ej. Liga MX, Premier League, NFL).'},
+          event: {type: 'STRING', description: 'Partido como "Equipo A vs Equipo B", nombres como aparecen.'},
+          selection: {type: 'STRING', description: 'Pronóstico completo con mercado, línea y periodo, en español. Ej: "Más de 2.5 goles", "Lakers -4.5", "Patrick Mahomes más de 1.5 pases de touchdown".'},
+          american_odds: {type: 'INTEGER', nullable: true, description: 'Momio americano de esta selección si se ve (ej. 150 o -120). null si solo hay total.'},
+          event_date: {type: 'STRING', nullable: true, description: 'Fecha del partido YYYY-MM-DD si aparece en la captura. null si no aparece.'}
+        },
+        required: ['sport', 'event', 'selection']
+      }
     },
-    required: ['is_bet_slip', 'problem', 'selections', 'total_american_odds']
-  }
+    total_american_odds: {type: 'INTEGER', nullable: true, description: 'Momio americano total del boleto (combinada) o de la selección única. Si la casa muestra momio decimal o fraccionario, conviértelo. Si hay boost, usa el momio ORIGINAL tachado.'},
+    total_decimal_odds: {type: 'NUMBER', nullable: true, description: 'Momio decimal total si aparece.'}
+  },
+  required: ['is_bet_slip', 'problem', 'selections']
 };
 
 const prompt = (today: string) => `Eres el lector de boletos de AE SPORTS. Hoy es ${today} (America/Toronto).
-Lee la(s) captura(s) de una casa de apuestas y devuelve los datos con la herramienta "ticket".
+Lee la(s) captura(s) de una casa de apuestas y devuelve los datos en el JSON pedido.
 Reglas:
 - Copia equipos y pronósticos tal como aparecen; traduce el mercado al español natural (Over → Más de, Under → Menos de, Moneyline → Gana, Both teams to score → Ambos anotan).
 - No inventes nada. Si falta el partido, el pronóstico o el momio, explícalo en "problem".
@@ -62,7 +59,7 @@ Deno.serve(async req => {
   if (req.method === 'OPTIONS') return new Response(null, {status: 204, headers});
   if (req.method !== 'POST') return respond({error: 'Método no permitido.'}, 405);
 
-  const apiKey = Deno.env.get('ANTHROPIC_API_KEY');
+  const apiKey = Deno.env.get('GEMINI_API_KEY');
   if (!apiKey) return respond({error: 'El lector con IA todavía no está configurado.'}, 503);
   const url = Deno.env.get('SUPABASE_URL')!, serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
   const admin = createClient(url, serviceKey, {auth: {persistSession: false, autoRefreshToken: false}});
@@ -84,22 +81,24 @@ Deno.serve(async req => {
     for (const image of images) {
       const m = typeof image === 'string' && image.match(/^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/);
       if (!m || m[2].length * 0.75 > MAX_IMAGE_BYTES) return respond({error: 'Usa capturas PNG, JPG o WebP más pequeñas.'}, 400);
-      content.push({type: 'image', source: {type: 'base64', media_type: m[1], data: m[2]}});
+      content.push({inline_data: {mime_type: m[1], data: m[2]}});
     }
     const today = new Intl.DateTimeFormat('en-CA', {timeZone: 'America/Toronto'}).format(new Date());
-    content.push({type: 'text', text: prompt(today)});
+    content.push({text: prompt(today)});
 
-    const ai = await fetch('https://api.anthropic.com/v1/messages', {
+    const ai = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`, {
       method: 'POST',
-      headers: {'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json'},
-      body: JSON.stringify({model: MODEL, max_tokens: 1500, tools: [tool], tool_choice: {type: 'tool', name: 'ticket'}, messages: [{role: 'user', content}]})
+      headers: {'x-goog-api-key': apiKey, 'content-type': 'application/json'},
+      body: JSON.stringify({contents: [{role: 'user', parts: content}], generationConfig: {temperature: 0, responseMimeType: 'application/json', responseSchema: schema}})
     });
+    if (ai.status === 429) return respond({error: 'La lectura avanzada está muy solicitada ahora. Inténtalo en un minuto.'}, 429);
     if (!ai.ok) {
-      console.error('anthropic', ai.status, (await ai.text()).slice(0, 300));
-      return respond({error: 'El lector con IA no está disponible ahora. Inténtalo en unos minutos.'}, 502);
+      console.error('gemini', ai.status, (await ai.text()).slice(0, 300));
+      return respond({error: 'La lectura avanzada no está disponible ahora. Inténtalo en unos minutos.'}, 502);
     }
     const out = await ai.json();
-    const data = out?.content?.find((c: {type: string}) => c.type === 'tool_use')?.input;
+    let data: any = null;
+    try {data = JSON.parse(out?.candidates?.[0]?.content?.parts?.map((p: {text?: string}) => p.text || '').join('') || 'null');} catch {data = null;}
 
     const fail = async (message: string) => {
       await admin.from('ae_pick_capture_reads').insert({user_id: user.id, status: 'failed', model: MODEL});

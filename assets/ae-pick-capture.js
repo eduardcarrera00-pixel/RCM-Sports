@@ -36,7 +36,7 @@
   const copy={
    reading:['Leyendo tu apuesta','Buscamos el partido, tu pronóstico y el momio en la captura.'],
    discarding:['Borrando tu captura','Eliminamos la imagen de esta página. Solo nos quedamos con los datos de tu pick.'],
-   complete:['Captura eliminada','La imagen no se ha guardado en ningún sitio. Tu foto original sigue solo en tu dispositivo.'],
+   complete:['Captura eliminada','No guardamos la imagen. Tu foto original sigue solo en tu dispositivo.'],
    failed:['Captura eliminada','No pudimos leer todos los datos, pero la imagen ya no está en la página. Prueba con otra captura más nítida.'],
    unconfirmed:['No pudimos confirmar el borrado','Recarga la página antes de volver a intentarlo para cerrar el lector por completo.']
   };
@@ -205,7 +205,7 @@
   }
   function showPrivacy(state,readFailed=false){
    const copy={reading:['Leyendo en tu dispositivo','La captura se procesa aquí, sin subir la imagen.'],discarding:['Descartando captura…','Liberando la imagen y cerrando el lector.'],complete:['Captura descartada','La imagen no se ha subido ni guardado. Al publicar, solo guardamos los datos de tu pick.'],unconfirmed:['No se pudo confirmar el descarte','Recarga esta página para cerrar el lector antes de volver a intentarlo.']};
-   if(usedAi){copy.reading=['Lectura avanzada','La imagen se envía un momento para leerla y no se guarda.'];copy.complete=['Captura descartada','La imagen se leyó y no se guardó en ningún sitio. Al publicar, solo guardamos los datos de tu pick.'];}
+   if(usedAi){copy.reading=['Lectura avanzada','La imagen se envía un momento al lector de Google para leerla. Nosotros no la guardamos.'];copy.complete=['Captura descartada','La imagen ya no está en la página y nosotros no la guardamos. Al publicar, solo guardamos los datos de tu pick.'];}
    privacy.hidden=false;privacy.dataset.state=state;privacyTitle.textContent=copy[state][0];privacyText.textContent=copy[state][1];
    const current={reading:0,discarding:1,complete:3,unconfirmed:1}[state];
    Array.from(privacySteps.children).forEach((step,index)=>{step.textContent=['Lectura','Descarte','Completado'][index];step.dataset.state=index<current?'complete':index===current?'active':'pending';});
@@ -317,7 +317,7 @@
    if(!prepared&&isCurrent(job)&&aiClient()&&!/cancelad/i.test(failure)){
     try{
      try{await job.worker?.terminate();}catch{}job.worker=null;usedAi=true;showPrivacy('reading');
-     overlay.show('reading',{note:'Probamos con la lectura avanzada. La imagen se envía un momento para leerla y no se guarda.'});
+     overlay.show('reading',{note:'Probamos con la lectura avanzada: la imagen se envía un momento al lector de Google. Nosotros no la guardamos.'});
      status.textContent='Usando la lectura avanzada…';progressBar.style.width='0%';
      const ai=await Promise.race([readWithAi(job),new Promise((_,reject)=>{const prev=job.abort;job.abort=e=>{prev?.(e);reject(e);};})]);
      if(isCurrent(job)){prepared=ai;failure='';}
