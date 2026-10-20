@@ -15,6 +15,53 @@
   return enginePromise;
  }
  function node(tag,text,cls){const n=document.createElement(tag);if(text)n.textContent=text;if(cls)n.className=cls;return n;}
+ const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+ /* Pantalla de carga en dos fases: leer la captura y después borrarla. Refleja el trabajo real;
+    solo garantiza un tiempo mínimo en pantalla para que cada fase se pueda leer con calma. */
+ function makeOverlay(host,onCancel){
+  const root=node('div',null,'cp-capture-overlay');root.hidden=true;root.setAttribute('role','dialog');root.setAttribute('aria-modal','true');root.setAttribute('aria-labelledby','cpCaptureOverlayTitle');root.setAttribute('aria-describedby','cpCaptureOverlayText');
+  const card=node('div',null,'cp-capture-overlay-card');
+  const art=document.createElementNS('http://www.w3.org/2000/svg','svg');art.setAttribute('viewBox','0 0 96 112');art.setAttribute('aria-hidden','true');art.classList.add('cp-capture-overlay-art');
+  art.innerHTML='<g class="cp-ov-ticket"><path class="cp-ov-paper" d="M18 6h60v94l-7.5-6-7.5 6-7.5-6-7.5 6-7.5-6-7.5 6-7.5-6-7.5 6Z"/><path class="cp-ov-line" d="M30 26h36"/><path class="cp-ov-line" d="M30 40h26"/><path class="cp-ov-line" d="M30 54h36"/><path class="cp-ov-line" d="M30 68h18"/><path class="cp-ov-odds" d="M56 68h10"/></g><rect class="cp-ov-scan" x="12" y="6" width="72" height="3" rx="1.5"/><path class="cp-ov-check" d="m30 56 13 13 24-28"/>';
+  const title=node('h2','','cp-capture-overlay-title');title.id='cpCaptureOverlayTitle';
+  const text=node('p','','cp-capture-overlay-text');text.id='cpCaptureOverlayText';
+  const meter=node('div',null,'cp-capture-overlay-meter');meter.setAttribute('role','progressbar');meter.setAttribute('aria-label','Progreso de lectura');meter.setAttribute('aria-valuemin','0');meter.setAttribute('aria-valuemax','100');
+  const meterBar=node('span');meter.append(meterBar);
+  const steps=node('ol',null,'cp-capture-overlay-steps');
+  const labels=['Leer datos','Borrar captura','Listo'];steps.append(...labels.map(label=>node('li',label)));
+  const live=node('p','','cp-capture-overlay-live');live.setAttribute('aria-live','polite');
+  const cancel=node('button','Cancelar','cp-capture-overlay-cancel');cancel.type='button';cancel.addEventListener('click',()=>onCancel());
+  const close=node('button','Entendido','cp-capture-overlay-cancel');close.type='button';close.hidden=true;close.addEventListener('click',()=>hide());
+  card.append(art,title,text,meter,steps,live,cancel,close);root.append(card);host.append(root);
+  const copy={
+   reading:['Leyendo tu apuesta','Buscamos el partido, tu pronóstico y el momio en la captura.'],
+   discarding:['Borrando tu captura','Eliminamos la imagen de esta página. Solo nos quedamos con los datos de tu pick.'],
+   complete:['Captura eliminada','La imagen no se ha guardado en ningún sitio. Tu foto original sigue solo en tu dispositivo.'],
+   failed:['Captura eliminada','No pudimos leer todos los datos, pero la imagen ya no está en la página. Prueba con otra captura más nítida.'],
+   unconfirmed:['No pudimos confirmar el borrado','Recarga la página antes de volver a intentarlo para cerrar el lector por completo.']
+  };
+  let hideTimer=null;
+  function show(state,{percent=null,note=''}={}){
+   clearTimeout(hideTimer);root.hidden=false;root.dataset.state=state;
+   if(title.textContent!==copy[state][0])live.textContent=copy[state][0];
+   title.textContent=copy[state][0];text.textContent=note||copy[state][1];
+   const index={reading:0,discarding:1,complete:2,failed:2,unconfirmed:1}[state];
+   Array.from(steps.children).forEach((step,i)=>{step.dataset.state=i<index||((state==='complete'||state==='failed')&&i===index)?'complete':i===index?'active':'pending';});
+   meter.hidden=state!=='reading';cancel.hidden=state!=='reading';close.hidden=state!=='unconfirmed';
+   if(state==='reading')progress(percent);
+   if(state==='unconfirmed')close.focus({preventScroll:true});
+  }
+  function progress(percent){
+   if(percent==null){meter.dataset.mode='waiting';meterBar.style.width='';meter.removeAttribute('aria-valuenow');return;}
+   const value=Math.max(0,Math.min(100,Math.round(percent)));meter.dataset.mode='value';meterBar.style.width=value+'%';meter.setAttribute('aria-valuenow',String(value));
+  }
+  function hide(after=0){
+   clearTimeout(hideTimer);
+   const run=()=>{root.hidden=true;delete root.dataset.state;meterBar.style.width='0%';};
+   if(after>0)hideTimer=setTimeout(run,after);else run();
+  }
+  return {show,progress,hide,setNote(note){text.textContent=note;},get visible(){return !root.hidden;}};
+ }
  async function imageCanvas(file,job){
   let bitmap,url,img;
   try{
@@ -121,12 +168,14 @@
   const cancel=node('button','Cancelar lectura','cp-capture-cancel');cancel.type='button';cancel.hidden=true;
   panel.append(title,intro,picker,input,shot,help,progress,privacy,status,summary,cancel);
   form.prepend(panel);form.classList.add('cp-capture-first');
+  const overlay=makeOverlay(form.closest('dialog')||document.body,()=>clear('Lectura cancelada.',true));
   const isCurrent=job=>active===job&&!job.cancelled;
   function showPrivacy(state,readFailed=false){
    const copy={reading:['Leyendo en tu dispositivo','La captura se procesa aquí, sin subir la imagen.'],discarding:['Descartando captura…','Liberando la imagen y cerrando el lector.'],complete:['Captura descartada','La imagen no se ha subido ni guardado. Al publicar, solo guardamos los datos de tu pick.'],unconfirmed:['No se pudo confirmar el descarte','Recarga esta página para cerrar el lector antes de volver a intentarlo.']};
    privacy.hidden=false;privacy.dataset.state=state;privacyTitle.textContent=copy[state][0];privacyText.textContent=copy[state][1];
    const current={reading:0,discarding:1,complete:3,unconfirmed:1}[state];
    Array.from(privacySteps.children).forEach((step,index)=>{step.textContent=['Lectura','Descarte','Completado'][index];step.dataset.state=index<current?'complete':index===current?'active':'pending';});
+   if(state==='complete'){overlay.show(readFailed?'failed':'complete');overlay.hide(readFailed?2600:1700);}else overlay.show(state);
    if(readFailed&&state==='complete'){
     privacySteps.children[0].textContent='Sin lectura';privacySteps.children[0].dataset.state='error';privacySteps.children[2].textContent='Descartada';
     privacyText.textContent='La imagen no se ha subido ni guardado. Prueba con otra captura para preparar tu pick.';
@@ -153,7 +202,7 @@
    return job;
   }
   function clear(message='Elige una captura para importar tu apuesta y su momio.',showDiscard=false){
-   const job=stop(),revision=++sequence;result=null;signature='';summary.hidden=true;summary.replaceChildren();privacy.hidden=true;
+   const job=stop(),revision=++sequence;if(!(showDiscard&&job))overlay.hide();result=null;signature='';summary.hidden=true;summary.replaceChildren();privacy.hidden=true;
    input.value='';picker.textContent='Subir captura';title.textContent='Sube la captura de tu apuesta';panel.dataset.state='empty';status.textContent=message;shotImage.removeAttribute('src');shot.hidden=true;progress.hidden=true;progressBar.style.width='0%';applyImport(null);onChange();
    if(showDiscard&&job){
     showPrivacy('discarding');
@@ -172,7 +221,7 @@
    if(files.some(f=>!['image/png','image/jpeg','image/webp'].includes(f.type)||f.size>8*1024*1024||!f.size)){
     files=[];status.textContent='Usa imágenes PNG, JPG o WebP de hasta 8 MB cada una.';return;
    }
-   const job={id:++sequence,files,worker:null,canvases:new Set(),urls:new Set(),cancelled:false,abort:null,timer:null};files=[];active=job;
+   const job={started:Date.now(),id:++sequence,files,worker:null,canvases:new Set(),urls:new Set(),cancelled:false,abort:null,timer:null};files=[];active=job;
    if(job.files.length===1&&typeof URL.createObjectURL==='function'){
     try{const previewUrl=URL.createObjectURL(job.files[0]);job.urls.add(previewUrl);shotImage.src=previewUrl;shot.dataset.job=String(job.id);shot.hidden=false;}catch{shot.hidden=true;}
    }
@@ -189,7 +238,7 @@
     const pending=T.createWorker('eng+spa',1,{workerPath:vendor+'worker.min.js',corePath:vendor+'tesseract-core-lstm.wasm.js',langPath:vendor.replace(/\/$/,''),workerBlobURL:false,cacheMethod:'none',logger:m=>{
      if(isCurrent(job)&&m.status==='recognizing text'){
      const percent=Math.max(0,Math.min(100,Math.round((Number(m.progress)||0)*100)));
-     status.textContent='Leyendo tu captura… '+percent+'%';progressBar.style.width=percent+'%';progress.setAttribute('aria-valuenow',String(percent));
+     status.textContent='Leyendo tu captura… '+percent+'%';overlay.progress(percent);progressBar.style.width=percent+'%';progress.setAttribute('aria-valuenow',String(percent));
     }
     },errorHandler:()=>{}});
     pending.then(worker=>{if(!isCurrent(job))void worker.terminate().catch(()=>{});}).catch(()=>{});
@@ -230,8 +279,10 @@
    }catch(error){
     if(isCurrent(job))failure=error?.message||'No pudimos leer la captura. Prueba otra.';
    }finally{
+    const elapsed=Date.now()-job.started;
+    if(isCurrent(job)&&elapsed<900)await wait(900-elapsed);
     if(isCurrent(job)){panel.dataset.state='discarding';showPrivacy('discarding');cancel.disabled=true;status.textContent=failure||'Lectura terminada. Descartando la captura…';}
-    const discarded=await dispose(job);
+    const [discarded]=await Promise.all([dispose(job),isCurrent(job)?wait(1100):null]);
     if(isCurrent(job)){
      active=null;input.value='';input.disabled=false;picker.disabled=false;cancel.hidden=true;cancel.disabled=false;panel.removeAttribute('aria-busy');showPrivacy(discarded?'complete':'unconfirmed',!prepared);
      if(discarded&&prepared){
