@@ -145,7 +145,7 @@
   }
  }
  function mount({form,getPicks,applyImport,onChange=()=>{}}){
-  let result=null,signature='',active=null,sequence=0;
+  let result=null,signature='',active=null,sequence=0,usedAi=false;
   const fingerprint=()=>JSON.stringify({picks:getPicks().map(p=>({sport:p.sport,event:p.event,selection:p.selection,odds:Number(p.odds)}))});
   const panel=node('section',null,'cp-capture');panel.setAttribute('aria-labelledby','cpCaptureTitle');
   const title=node('h3','Sube la captura de tu apuesta','cp-capture-title');title.id='cpCaptureTitle';
@@ -170,8 +170,42 @@
   form.prepend(panel);form.classList.add('cp-capture-first');
   const overlay=makeOverlay(form.closest('dialog')||document.body,()=>clear('Lectura cancelada.',true));
   const isCurrent=job=>active===job&&!job.cancelled;
+  const aiClient=()=>{try{const c=typeof db!=='undefined'?db:window.db;return c?.functions?.invoke?c:null;}catch{return null;}};
+  async function jpeg(file,job){
+   const bitmap=await createImageBitmap(file);
+   try{
+    const scale=Math.min(1,1800/Math.max(bitmap.width,bitmap.height));
+    const canvas=document.createElement('canvas');job.canvases.add(canvas);
+    canvas.width=Math.max(1,Math.round(bitmap.width*scale));canvas.height=Math.max(1,Math.round(bitmap.height*scale));
+    canvas.getContext('2d').drawImage(bitmap,0,0,canvas.width,canvas.height);
+    const data=canvas.toDataURL('image/jpeg',.86);canvas.width=1;canvas.height=1;job.canvases.delete(canvas);
+    return data;
+   }finally{bitmap.close?.();}
+  }
+  async function readWithAi(job){
+   const client=aiClient();
+   const session=await client.auth?.getSession?.();
+   if(!session?.data?.session)throw Error('Inicia sesión para usar la lectura avanzada de capturas.');
+   let images=[];
+   for(const file of job.originals||[])images.push(await jpeg(file,job));
+   overlay.progress(35);
+   const tick=setInterval(()=>{if(isCurrent(job)){const now=Number(progress.getAttribute('aria-valuenow')||35);const next=Math.min(92,now+4);overlay.progress(next);progress.setAttribute('aria-valuenow',String(next));progressBar.style.width=next+'%';}},700);
+   let response;
+   try{response=await client.functions.invoke('ae-read-ticket',{body:{images}});}
+   finally{clearInterval(tick);images=null;}
+   let data=response.data;
+   if(response.error){
+    try{data=await response.error.context?.json?.();}catch{}
+    throw Error(data?.error||'La lectura avanzada no está disponible ahora. Inténtalo en unos minutos.');
+   }
+   if(!data?.ok)throw Error(data?.reason||'No pudimos leer la captura. Prueba con otra más nítida.');
+   overlay.progress(100);
+   const readings=data.readings.map(r=>({...r,confidence:95}));
+   return {readings,total:data.total||null,eventDate:data.eventDate||'',dateSource:data.dateSource||'',aiReadId:data.readId};
+  }
   function showPrivacy(state,readFailed=false){
    const copy={reading:['Leyendo en tu dispositivo','La captura se procesa aquí, sin subir la imagen.'],discarding:['Descartando captura…','Liberando la imagen y cerrando el lector.'],complete:['Captura descartada','La imagen no se ha subido ni guardado. Al publicar, solo guardamos los datos de tu pick.'],unconfirmed:['No se pudo confirmar el descarte','Recarga esta página para cerrar el lector antes de volver a intentarlo.']};
+   if(usedAi){copy.reading=['Lectura avanzada','La imagen se envía un momento para leerla y no se guarda.'];copy.complete=['Captura descartada','La imagen se leyó y no se guardó en ningún sitio. Al publicar, solo guardamos los datos de tu pick.'];}
    privacy.hidden=false;privacy.dataset.state=state;privacyTitle.textContent=copy[state][0];privacyText.textContent=copy[state][1];
    const current={reading:0,discarding:1,complete:3,unconfirmed:1}[state];
    Array.from(privacySteps.children).forEach((step,index)=>{step.textContent=['Lectura','Descarte','Completado'][index];step.dataset.state=index<current?'complete':index===current?'active':'pending';});
@@ -184,7 +218,7 @@
   function dispose(job){
    if(!job)return Promise.resolve(true);
    if(job.disposal)return job.disposal;
-   clearTimeout(job.timer);job.files=[];
+   clearTimeout(job.timer);job.files=[];job.originals=[];
    if(shot.dataset.job===String(job.id)){shotImage.removeAttribute('src');shot.hidden=true;delete shot.dataset.job;}
    progress.hidden=true;progressBar.style.width='0%';progress.removeAttribute('aria-valuenow');
    for(const canvas of job.canvases){canvas.width=1;canvas.height=1;}job.canvases.clear();
@@ -221,7 +255,7 @@
    if(files.some(f=>!['image/png','image/jpeg','image/webp'].includes(f.type)||f.size>8*1024*1024||!f.size)){
     files=[];status.textContent='Usa imágenes PNG, JPG o WebP de hasta 8 MB cada una.';return;
    }
-   const job={started:Date.now(),id:++sequence,files,worker:null,canvases:new Set(),urls:new Set(),cancelled:false,abort:null,timer:null};files=[];active=job;
+   usedAi=false;const job={started:Date.now(),originals:files.slice(),id:++sequence,files,worker:null,canvases:new Set(),urls:new Set(),cancelled:false,abort:null,timer:null};files=[];active=job;
    if(job.files.length===1&&typeof URL.createObjectURL==='function'){
     try{const previewUrl=URL.createObjectURL(job.files[0]);job.urls.add(previewUrl);shotImage.src=previewUrl;shot.dataset.job=String(job.id);shot.hidden=false;}catch{shot.hidden=true;}
    }
@@ -279,6 +313,18 @@
    }catch(error){
     if(isCurrent(job))failure=error?.message||'No pudimos leer la captura. Prueba otra.';
    }finally{
+   // Lector mixto: si el lector del teléfono no puede, se intenta la lectura avanzada con IA.
+   if(!prepared&&isCurrent(job)&&aiClient()&&!/cancelad/i.test(failure)){
+    try{
+     try{await job.worker?.terminate();}catch{}job.worker=null;usedAi=true;showPrivacy('reading');
+     overlay.show('reading',{note:'Probamos con la lectura avanzada. La imagen se envía un momento para leerla y no se guarda.'});
+     status.textContent='Usando la lectura avanzada…';progressBar.style.width='0%';
+     const ai=await Promise.race([readWithAi(job),new Promise((_,reject)=>{const prev=job.abort;job.abort=e=>{prev?.(e);reject(e);};})]);
+     if(isCurrent(job)){prepared=ai;failure='';}
+    }catch(error){
+     if(isCurrent(job))failure=error?.message||failure;
+    }
+   }
     const elapsed=Date.now()-job.started;
     if(isCurrent(job)&&elapsed<900)await wait(900-elapsed);
     if(isCurrent(job)){panel.dataset.state='discarding';showPrivacy('discarding');cancel.disabled=true;status.textContent=failure||'Lectura terminada. Descartando la captura…';}
@@ -321,6 +367,7 @@
     invalidate();
     if(active)throw Error('Espera a que termine la lectura de la captura.');
     if(!result)throw Error('Añade una captura legible para comprobar el momio antes de publicar.');
+    if(result.aiReadId)return {version:1,method:'ai_vision',read_id:result.aiReadId};
     return {version:1,method:'on_device_ocr',confirmed:true,readings:result.readings.map(({event,selection,odds,confidence})=>({event,selection,odds,confidence})),total:result.total};
    }
   };

@@ -107,7 +107,7 @@ function card(p,compact=false,detail=false){
  if(legs.childNodes.length)n.append(legs);
  const odds=el('div',null,'cp-card-odds');
  odds.append(el('strong','Cuota '+(Number(p.american_odds)>0?'+':'')+p.american_odds,'cp-odds'));
- odds.append(el('small',p.moderation_status==='approved'?(p.capture_check?.method==='on_device_ocr'?'Momio cotejado con captura':'Cuota aprobada'):p.moderation_status==='rejected'?'Cuota rechazada':'Cuota en revisión · votos abiertos','cp-card-state'));
+ odds.append(el('small',p.moderation_status==='approved'?(['on_device_ocr','ai_vision'].includes(p.capture_check?.method)?'Momio cotejado con captura':'Cuota aprobada'):p.moderation_status==='rejected'?'Cuota rechazada':'Cuota en revisión · votos abiertos','cp-card-state'));
  n.append(odds);
  if(p.explanation)n.append(el('p',p.explanation,'cp-explanation'));
  const controls=el('div',null,'cp-actions');
@@ -523,10 +523,21 @@ async function loadSettlement(){
    .order('created_at',{ascending:true}).limit(100);
  if(r.error){area.append(el('p','No pudimos cargar los resultados pendientes. '+message(r.error)));return;}
  if(!r.data?.length){area.append(el('p','No hay eventos pendientes de verificación.'));return;}
- for(const p of r.data){
+ // La verificación automática liquida lo claro; aquí quedan los Picks en espera o que necesitan revisión.
+ const checks=new Map();
+ try{
+  const c=await db.from('ae_pick_settlement_checks').select('pick_id,status,suggested_outcome,reason,last_checked_at').in('pick_id',r.data.map(p=>p.id));
+  for(const row of c.data||[])checks.set(row.pick_id,row);
+ }catch{}
+ const labels={won:'Acertó',lost:'Falló',void:'Anulado'};
+ const rank=p=>checks.get(p.id)?.status==='needs_review'?0:1;
+ for(const p of [...r.data].sort((a,b)=>rank(a)-rank(b))){
   const entry=el('article',null,'ae-pick-settle-entry');
+  const check=checks.get(p.id);
   entry.append(el('strong',p.title),el('small',p.author+' · '+(p.event_date?'Evento '+p.event_date:'Pick antiguo sin fecha · verifica que terminó')+' · '+p.american_odds));
   for(const leg of p.legs||[])entry.append(el('p',leg.event+' · '+leg.selection));
+  const auto=el('p',check?.status==='needs_review'?'Necesita tu revisión: '+(check.reason||'resultado no concluyente.')+(check.suggested_outcome?' Sugerencia: '+labels[check.suggested_outcome]+'.':''):check?.status==='waiting'?'Verificación automática: '+(check.reason||'esperando el resultado oficial.'):'Verificación automática pendiente: se revisará en las próximas horas.','ae-pick-settle-auto');
+  auto.dataset.state=check?.status||'queued';entry.append(auto);
   for(const [outcome,label] of [['won','Acertó'],['lost','Falló'],['void','Anulado']]){
    const b=button(label,async()=>{
     if(!confirm('¿Verificaste el resultado oficial '+(p.event_date?'del evento '+p.event_date:'de este Pick antiguo sin fecha')+'? Confirmar '+label+' para '+p.title+'. Los puntos afectarán el ranking del mes actual. Esta acción es definitiva.'))return;

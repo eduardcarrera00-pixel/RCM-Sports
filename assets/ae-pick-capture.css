@@ -207,3 +207,8 @@ html:not(.dark) .cp-capture-overlay-cancel{border-color:#c9b49c;color:#855b43;}
 @keyframes cp-ov-wait{0%{transform:translateX(-100%);}100%{transform:translateX(300%);}}
 @media(max-width:400px){.cp-capture-overlay-card{padding:26px 18px 20px;}.cp-capture-overlay-title{font-size:23px;}}
 @media(prefers-reduced-motion:reduce){.cp-capture-overlay,.cp-capture-overlay *{animation:none!important;transition:none!important;}.cp-capture-overlay[data-state="reading"] .cp-ov-scan{opacity:0;}.cp-capture-overlay[data-state="discarding"] .cp-ov-ticket{opacity:.35;}.cp-capture-overlay:is([data-state="complete"],[data-state="failed"]) .cp-ov-check{stroke-dashoffset:0;}}
+/* Estado de la verificación automática en la lista de administración. */
+.ae-pick-settle-entry .ae-pick-settle-auto{margin:8px 0;padding:8px 10px;border-left:3px solid #49606c;font:500 12px/1.5 Inter,system-ui,sans-serif;color:inherit;overflow-wrap:anywhere;}
+.ae-pick-settle-entry .ae-pick-settle-auto[data-state="needs_review"]{border-left-color:#edae79;}
+html:not(.dark) .ae-pick-settle-entry .ae-pick-settle-auto{border-left-color:#d9d9d0;}
+html:not(.dark) .ae-pick-settle-entry .ae-pick-settle-auto[data-state="needs_review"]{border-left-color:#b0672c;}
