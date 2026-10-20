@@ -51,6 +51,7 @@ assert.equal(openedResult.readings[0].sport,'Fútbol');
 assert.equal(openedResult.readings[0].event,'Paris St-G v Barcelona');
 assert.equal(openedResult.readings[0].wager,10);
 assert.equal(openedResult.readings[0].payout,34.08);
+assert.equal(extract(scan(opened.flatMap(x=>x==='Same Game Parlay +240'?['Same Game Parlay','+240']:[x]))).readings[0].odds,240,'Split-line header price from mobile OCR');
 assert.ok(['Paris St-G','Over 3.5 Goals','Yes'].every(t=>openedResult.readings[0].selection.includes(t)));
 assert.equal(extract(scan(opened.filter(x=>x!=='BOTH TEAMS TO SCORE'))).ok,false,'Missing market must fail');
 assert.equal(extract(scan(opened.filter(x=>!x.includes('Paris St-G Moneyline (3-way), Over 3.5 Goals')))).ok,false,'A cropped market summary cannot authenticate an incomplete compact ticket');
