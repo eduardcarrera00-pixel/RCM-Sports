@@ -266,7 +266,25 @@
     button.hidden = true;
     try {
       const permission = await db.from('editors').select('user_id').eq('user_id',id).maybeSingle();
-      if (userId === id && !permission.error && permission.data) button.hidden = false;
+      if (userId === id && !permission.error && permission.data) {
+        button.hidden = false;
+        // Give existing admins an immediate one-time look without altering their inbox.
+        let previewFirstTime = false;
+        try {
+          const key = 'cam_sports_admin_welcome_preview_' + id;
+          if (!localStorage.getItem(key)) {
+            localStorage.setItem(key,'1');
+            previewFirstTime = true;
+          }
+        } catch (_) { /* Manual preview remains available. */ }
+        if (previewFirstTime) setTimeout(()=>{
+          if (userId === id && !document.hidden &&
+              !document.querySelector('dialog[open]') &&
+              ($('userAuthModal')?.classList.contains('hidden') ?? true)) {
+            window.camWelcome?.showPreview();
+          }
+        },1800);
+      }
     } catch (_) { /* Only verified editors see the preview button. */ }
   }
   function init() {
