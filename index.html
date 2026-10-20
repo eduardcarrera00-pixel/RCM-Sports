@@ -2031,6 +2031,7 @@ html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > .ae-takes-hea
 </style>
 <link rel="stylesheet" href="assets/cam-home-power-rankings-75.css?v=20261021-home-rankings-75-1">
 <link rel="stylesheet" href="assets/cam-football-last-takes-feed.css?v=20261021-football-compact-1">
+<script src="assets/ae-site-images.js?v=20261021-site-images-2"></script>
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 <a class="ae-skip-link" href="#mainContent">Ir al contenido</a>
@@ -3498,6 +3499,7 @@ async function handleUserLogout() {
             window.aeTakeRankings?.refresh();
             window.aeSeasonPredictions?.rerender();
             window.aeOpinions?.rerender();
+            window.camSiteImages?.refresh();
         }
 async function loadUserSession() {
     try {
@@ -3541,6 +3543,7 @@ currentUser = {
 
         function renderAdminUI() {
             renderSessionHeader();
+            window.camSiteImages?.refresh();
             document.getElementById('legacyTools').classList.toggle('hidden', !currentAdmin || !readLegacyArticles().length);
             const modalDeleteButton = document.getElementById('modalDeleteArticleBtn');
             const modalArticle = articles.find(a => String(a.id) === String(activeModalArticleId));
