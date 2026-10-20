@@ -15,7 +15,7 @@
    const match=originalX(result.original_x_url);if(!match)return null;
    const u=new URL('https://twitter.com/intent/tweet');
    u.searchParams.set('in_reply_to',match[1]);
-   u.searchParams.set('text',['✅ Pick acertado',result.event_name,result.selection+' · Cuota '+odds(result.american_odds),result.link].join('\n'));
+   u.searchParams.set('text','✅ Pick acertado · Pick de la Semana');
    return u.href;
  }
  function link(url,text){
@@ -24,7 +24,7 @@
  function socialSummary(row){
    if(row.outcome!=='won')return row.outcome==='lost'?'No se publica un aviso en redes.':'';
    if(!row.social?.length)return 'Resultado guardado; no hay canales de redes habilitados.';
-   const labels={queued:'en cola',submitting:'enviando',accepted:'procesando',published:'publicado',failed:'error: revisar Buffer',uncertain:'pendiente de revisión en Buffer',cancelled:'envío cancelado'};
+   const labels={manual_reply:'respuesta preparada: publicar en X',queued:'en cola',submitting:'enviando',accepted:'procesando',published:'publicado',failed:'error: revisar Buffer',uncertain:'pendiente de revisión en Buffer',cancelled:'envío cancelado'};
    return row.social.map(d=>(d.network==='twitter'?'X':'TikTok')+': '+(labels[d.status]||d.status)).join(' · ');
  }
 
@@ -101,7 +101,7 @@
      const prepared=result&&replyUrl(result);
      if(row.outcome==='won'&&prepared){
        card.append(link(prepared,'Responder en X (manual)'));
-       card.append(el('small','Abre una respuesta preparada al tuit original. El aviso automático de X es una publicación separada; publica esta respuesta solo si también quieres añadirla al hilo.'));
+       card.append(el('small','Abre una respuesta al Pick original con solo «✅ Pick acertado · Pick de la Semana», sin foto ni detalles. Pulsa publicar en X para enviarla.'));
      }
    }else{
      const actions=el('div',null,'cam-weekly-review-actions');
@@ -138,7 +138,7 @@
  async function resolve(row,value){
    if(busy||!admin())return;
    const message=value==='won'?
-     '¿Confirmas que «'+row.selection+'» acertó? Se compartirá “✅ Pick acertado” en X y TikTok. En X será un aviso separado con enlace al tuit original. No se puede deshacer desde estos botones.':
+     '¿Confirmas que «'+row.selection+'» acertó? En X quedará preparada una respuesta al Pick original: “✅ Pick acertado · Pick de la Semana”, sin foto ni detalles. Debes enviarla con Responder en X. TikTok mantiene su publicación automática. No se puede deshacer desde estos botones.':
      '¿Confirmas que «'+row.selection+'» no acertó? Se guardará como fallado y no se compartirá. No se puede deshacer desde estos botones.';
    if(!confirm(message))return;
    let messageAfter='';
@@ -147,7 +147,7 @@
      const {data,error}=await db.rpc('cam_resolve_weekly_pick',{p_pick_id:row.id,p_outcome:value});
      if(error)throw error;
      if(data)results.set(row.id,data);
-     messageAfter=value==='won'?'Acierto confirmado. Consulta el estado de envío de X y TikTok en este panel.':'Pick marcado como no acertado.';
+     messageAfter=value==='won'?'Acierto confirmado. Usa Responder en X para publicar el texto preparado sin foto. Consulta el estado de TikTok en el panel.':'Pick marcado como no acertado.';
    }catch(error){
      // Read back the immutable result before offering any retry after a lost response.
      try{
@@ -188,7 +188,7 @@
    const adminHost=$('aeWeeklyPickAdmin');if(!adminHost||typeof db==='undefined'||!db)return;
    panel=el('details',null,'ae-takes-admin ae-weekly-admin cam-weekly-review');panel.id='camWeeklyResultsAdmin';panel.hidden=!admin();
    const summary=el('summary','Administrar · Resultados del Pick de la Semana');
-   const intro=el('p','Aprobar confirma un acierto y lo comparte en X y TikTok. Denegar registra un fallo sin compartirlo.','cam-weekly-review-note');
+   const intro=el('p','Aprobar confirma un acierto y prepara la respuesta sin foto para X. Envíala con Responder en X. TikTok mantiene su publicación automática. Denegar registra un fallo sin compartirlo.','cam-weekly-review-note');
    const reload=el('button','Actualizar resultados y envíos');reload.type='button';reload.onclick=()=>refreshAdmin();
    list=el('div');list.id='camWeeklyResultsList';
    status=el('p');status.setAttribute('role','status');status.setAttribute('aria-live','polite');

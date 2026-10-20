@@ -26,7 +26,8 @@ begin
  if n<>1 then raise exception 'Winner event missing'; end if;
  select count(*) into n from cam_social.deliveries where event_key='weekly-won:'||w::text;
  if n<>(select count(*) from cam_social.channels where enabled) then raise exception 'Missing channel delivery'; end if;
- if not exists(select 1 from cam_social.events where event_key='weekly-won:'||w::text and payload->>'x_text' like '✅ Pick acertado%' and position(chr(10) in payload->>'x_text')>0 and payload->>'x_text' like '%1234567890123456789%') then raise exception 'Winner text/original URL incorrect'; end if;
+ if not exists(select 1 from cam_social.events where event_key='weekly-won:'||w::text and payload->>'x_text'='✅ Pick acertado · Pick de la Semana' and payload->>'x_reply_to' like '%1234567890123456789%' and payload->'x_assets'='[]'::jsonb) then raise exception 'Winner text/original URL incorrect'; end if;
+ if not exists(select 1 from cam_social.deliveries where event_key='weekly-won:'||w::text and network='twitter' and status='manual_reply' and attempts=0) then raise exception 'X must require text reply, not publish a new photo'; end if;
  perform public.cam_resolve_weekly_pick(w,'won');
  select count(*) into n from cam_social.events where event_key='weekly-won:'||w::text;
  if n<>1 then raise exception 'Duplicate winner event'; end if;
