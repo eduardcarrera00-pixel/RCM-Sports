@@ -93,6 +93,7 @@
  const weeklyMobile=window.matchMedia('(max-width: 760px)');
  function createCard(p,isPreview){
    const box=make('article',undefined,isPreview?'ae-weekly-card ae-weekly-preview':'ae-weekly-card');
+   box.dataset.camWeeklyId=String(p.id);
    if(isPreview){
      const photoUrl=editorialUrl(p.image_path,p.image_url);
      const bannerUrl=editorialUrl(p.banner_path,p.banner_url);
@@ -170,6 +171,7 @@
      if(active)area.append(createCard(active,preview && !weeklyMobile.matches));
      else area.append(make('p','CAM SPORTS todavía no ha publicado un Pick editorial para esta semana.','ae-weekly-empty'));
    }
+   document.dispatchEvent(new Event('cam:weekly-render'));
  }
  async function load(){
    if(refreshing||!(typeof db!=='undefined' && db))return;

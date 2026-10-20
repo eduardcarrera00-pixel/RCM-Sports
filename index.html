@@ -4306,7 +4306,29 @@ updateThemeButton();
 <script src="assets/ae-nfl-takes.js?v=20261015-3"></script>
 <script src="assets/free-takes.js?v=20261019-take-reply-counts-1"></script>
 <script src="assets/ae-take-rankings.js?v=20261020-difficulty-2"></script>
-<script src="assets/ae-editorial-weekly.js?v=20261018-weekly-share-1"></script>
+<script src="assets/ae-editorial-weekly.js?v=20261020-weekly-results-1"></script>
+
+<style id="cam-weekly-results-style">
+.cam-weekly-review{margin-top:16px;clear:both}
+.cam-weekly-review summary{cursor:pointer;font-weight:700}
+.cam-weekly-review-row{display:grid;gap:8px;padding:16px 0;border-bottom:1px solid #49606c;overflow-wrap:anywhere}
+.cam-weekly-review-row h4{font:600 21px/1.3 Georgia,serif;margin:0}
+.cam-weekly-review-row p{margin:0}
+.cam-weekly-review-actions{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+.cam-weekly-review button,.cam-weekly-review-row a{display:inline-block;min-height:44px;box-sizing:border-box;padding:10px 14px;border:1px solid #bd8d6b;color:inherit;background:transparent;border-radius:0;font:600 14px/1.5 Inter,system-ui,sans-serif;cursor:pointer;text-decoration:none}
+.cam-weekly-review button:disabled{opacity:.5;cursor:default}
+.cam-weekly-review button:focus-visible,.cam-weekly-review a:focus-visible{outline:2px solid #bd8d6b;outline-offset:3px}
+.cam-weekly-review-note,.cam-weekly-review-row small{font:400 13px/1.5 Inter,system-ui,sans-serif;opacity:.85}
+.cam-weekly-result-badge{display:block;margin:8px 0;padding:8px 12px;background:#102b3e;color:#f4e8db;border-left:3px solid #bd8d6b;font-weight:700}
+.cam-weekly-shared-result{padding:20px;margin:16px 0;overflow-wrap:anywhere}
+.cam-weekly-shared-result img{display:block;width:100%;max-height:400px;object-fit:contain}
+.cam-weekly-shared-result a{display:block;margin-top:12px;text-decoration:underline}
+.cam-weekly-review[hidden],.cam-weekly-shared-result[hidden]{display:none!important}
+html:not(.dark) .cam-weekly-result-badge{background:#fffcf8;color:#273b49}
+html:not(.dark) .cam-weekly-review-row{border-color:#d9d9d0}
+@media(max-width:480px){.cam-weekly-review-actions{display:grid}.cam-weekly-review-actions button{width:100%}}
+</style>
+<script src="assets/cam-weekly-results.js?v=20261020-weekly-results-1"></script>
 <script src="assets/ae-profile.js?v=20261020-prestige-1"></script>
 <script src="assets/ae-season-predictions.js?v=20261020-season-1"></script>
 <script src="assets/ae-opinions.js?v=20261020-opinions-1"></script>
