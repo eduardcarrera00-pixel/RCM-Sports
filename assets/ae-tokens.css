@@ -1,0 +1,163 @@
+/* =====================================================================
+   CAM SPORTS · Tokens de diseño (única fuente de verdad)
+   ---------------------------------------------------------------------
+   Documentación: docs/tokens.md. Cada token tiene valor de día (:root) y
+   de noche (html.dark). Lo nuevo debe usar estas variables, nunca hex sueltos.
+   Prefijo --ds- para no chocar con las variables heredadas de cada módulo.
+   ===================================================================== */
+:root{
+  /* ---- Azul de marca (tono 212°, saturación contenida) ---------------- */
+  --ds-blue-50:#f1f5f9;
+  --ds-blue-100:#dfe7f1;
+  --ds-blue-200:#c1d0e2;
+  --ds-blue-300:#97b1ce;
+  --ds-blue-400:#688fbb;
+  --ds-blue-500:#416d9f;
+  --ds-blue-600:#325986;
+  --ds-blue-700:#284a71;
+  --ds-blue-800:#213750;
+  --ds-blue-900:#1c2d40;
+  --ds-blue-950:#121e2b;
+
+  /* ---- Marca: cabecera y pie ("chrome") ------------------------------ */
+  --ds-chrome:var(--ds-blue-700);            /* fondo de cabecera y pie */
+  --ds-chrome-line:rgba(245,236,223,.20);     /* separadores dentro del chrome */
+  --ds-on-chrome:#f5ecdf;                    /* texto sobre chrome (7.8:1) */
+  --ds-on-chrome-muted:#c9d3de;              /* texto secundario sobre chrome (6.0:1) */
+  --ds-chrome-control:rgba(245,236,223,.10); /* relleno de botón sobre chrome */
+  --ds-chrome-control-line:rgba(245,236,223,.34);
+
+  /* ---- Fondos y superficies ----------------------------------------- */
+  --ds-bg:#eeeae3;
+  --ds-surface:#fffcf8;
+  --ds-surface-soft:#f4f0e9;
+  --ds-surface-sunken:#e7e2d9;
+
+  /* ---- Bordes -------------------------------------------------------- */
+  --ds-line:#d9d9d0;          /* decorativo (separadores, contorno de tarjeta) */
+  --ds-line-strong:#8a7a6a;   /* contorno de controles (3.4:1 sobre bg) */
+
+  /* ---- Texto --------------------------------------------------------- */
+  --ds-text:#273b49;          /* principal (9.7:1 sobre bg) */
+  --ds-text-muted:#566876;    /* secundario (4.8:1 sobre bg) */
+  --ds-text-subtle:#5a6873;   /* atenuado (4.6:1 sobre bg) */
+  --ds-text-on-media:#fffaf2; /* texto sobre foto con velo */
+
+  /* ---- Acción (bronce de día) ---------------------------------------- */
+  --ds-action:#855b43;        /* 4.9:1 sobre bg */
+  --ds-action-hover:#6f4a36;
+  --ds-action-soft:#f3e6da;   /* fondo de pestaña/etiqueta activa suave */
+  --ds-on-action:#ffffff;     /* 5.9:1 sobre action */
+  --ds-gold:#d4ae83;          /* dorado de marca: solo decorativo/iconos */
+
+  /* ---- Estados ------------------------------------------------------- */
+  --ds-success:#2e6a4c;  --ds-success-bg:#e4f0e8;
+  --ds-error:#a23b2f;    --ds-error-bg:#f7e3df;
+  --ds-warning:#83561a;  --ds-warning-bg:#f6ead6;
+  --ds-info:var(--ds-blue-600); --ds-info-bg:var(--ds-blue-50);
+
+  /* ---- Acento azul (Picks de la comunidad y piezas informativas) ------ */
+  --ds-accent:var(--ds-blue-600);        /* texto/iconos: 6.0:1 sobre accent-soft */
+  --ds-accent-soft:var(--ds-blue-100);   /* fondo de tarjeta */
+  --ds-accent-softer:var(--ds-blue-50);
+  --ds-accent-line:var(--ds-blue-200);
+  --ds-on-accent:#ffffff;
+
+  /* ---- Foco y estados de interacción --------------------------------- */
+  --ds-focus:#855b43;
+  --ds-focus-on-chrome:#f5ecdf;
+  --ds-focus-width:3px;
+  --ds-focus-offset:3px;
+  --ds-disabled-opacity:.55;
+  --ds-target-min:44px;
+
+  /* ---- Tipografía ---------------------------------------------------- */
+  --ds-font-serif:Newsreader, Georgia, "Times New Roman", serif;
+  --ds-font-sans:Inter, system-ui, sans-serif;
+  /* Escala única. Los títulos son fluidos: escalan solos de 320 a 1366 px. */
+  --ds-text-2xs:11px;                                    /* mínimo absoluto */
+  --ds-text-xs:12px;                                     /* metadatos, chips */
+  --ds-text-sm:13px;                                     /* extractos, controles compactos */
+  --ds-text-base:15px;                                   /* lectura en UI */
+  --ds-text-md:17px;                                     /* lectura larga, entradilla */
+  --ds-text-lg:clamp(18px, 16.4px + .45vw, 23px);        /* tarjeta */
+  --ds-text-xl:clamp(20px, 17.4px + .75vw, 27px);        /* módulo */
+  --ds-text-2xl:clamp(23px, 18.6px + 1.25vw, 32px);      /* sección */
+  --ds-text-3xl:clamp(26px, 19.4px + 1.9vw, 39px);       /* portada */
+  --ds-text-4xl:clamp(30px, 18.5px + 3.3vw, 56px);       /* display */
+  --ds-leading-title:1.18;    /* títulos: nunca por debajo de 1.12 */
+  --ds-leading-snug:1.3;      /* títulos pequeños, nombres */
+  --ds-leading-ui:1.4;        /* controles y metadatos */
+  --ds-leading-body:1.65;     /* lectura */
+  --ds-weight-title:600;
+  --ds-tracking-caps:.08em;   /* MAYÚSCULAS de etiquetas */
+
+  /* ---- Espaciado (4 · 8 · 12 · 16 · 24 · 32 · 48 · 64) ----------------- */
+  --ds-space-1:4px;
+  --ds-space-2:8px;
+  --ds-space-3:12px;
+  --ds-space-4:16px;
+  --ds-space-6:24px;
+  --ds-space-8:32px;
+  --ds-space-12:48px;
+  --ds-space-16:64px;
+  --ds-gutter:16px;                         /* margen lateral de página en móvil */
+  --ds-section-gap:clamp(24px, 20px + 1vw, 32px); /* ritmo vertical entre secciones */
+
+  /* ---- Forma y profundidad ------------------------------------------- */
+  --ds-radius:0;              /* geometría recta en toda la web */
+  --ds-radius-round:999px;    /* solo avatares y puntos */
+  --ds-border:1px;
+  --ds-shadow-soft:0 12px 32px rgba(20,35,48,.07);
+  --ds-shadow-raised:0 18px 40px rgba(20,35,48,.12);
+  --ds-overlay:rgba(8,23,36,.62);  /* velo sobre fotos */
+}
+
+html.dark{
+  --ds-chrome:var(--ds-blue-900);
+  --ds-chrome-line:rgba(245,236,223,.14);
+  --ds-on-chrome:#f5ecdf;           /* 12.0:1 */
+  --ds-on-chrome-muted:#c5cdd2;
+  --ds-chrome-control:rgba(245,236,223,.07);
+  --ds-chrome-control-line:rgba(245,236,223,.26);
+
+  --ds-bg:#081724;
+  --ds-surface:#102b3e;
+  --ds-surface-soft:#0b2030;
+  --ds-surface-sunken:#061420;
+
+  --ds-line:#49606c;
+  --ds-line-strong:#6f8796;
+
+  --ds-text:#f4e8db;
+  --ds-text-muted:#c5cdd2;
+  --ds-text-subtle:#a7b4bd;
+  --ds-text-on-media:#fffaf2;
+
+  --ds-action:#bd8d6b;
+  --ds-action-hover:#d2a582;
+  --ds-action-soft:rgba(189,141,107,.16);
+  --ds-on-action:#081724;
+  --ds-gold:#d4ae83;
+
+  --ds-success:#86c9a5;  --ds-success-bg:rgba(134,201,165,.14);
+  --ds-error:#f2a196;    --ds-error-bg:rgba(242,161,150,.14);
+  --ds-warning:#e6b873;  --ds-warning-bg:rgba(230,184,115,.14);
+  --ds-info:var(--ds-blue-300); --ds-info-bg:rgba(151,177,206,.14);
+
+  --ds-accent:var(--ds-blue-300);
+  --ds-accent-soft:var(--ds-blue-800);
+  --ds-accent-softer:var(--ds-blue-900);
+  --ds-accent-line:#3b5675;
+  --ds-on-accent:var(--ds-blue-950);
+
+  --ds-focus:#d2a582;
+  --ds-focus-on-chrome:#f5ecdf;
+
+  --ds-shadow-soft:0 14px 36px rgba(2,13,23,.19);
+  --ds-shadow-raised:0 20px 44px rgba(2,13,23,.32);
+  --ds-overlay:rgba(4,12,20,.66);
+}
+
+/* La variable de marca existente pasa a depender de los tokens. */
+:root{--cam-brand-blue:var(--ds-chrome);--cam-brand-cream:var(--ds-on-chrome)}

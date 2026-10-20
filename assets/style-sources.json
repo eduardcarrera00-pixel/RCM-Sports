@@ -1,4 +1,5 @@
 [
+  "assets/ae-tokens.css",
   "assets/community.css",
   "assets/editorial.css",
   "assets/unified-editorial.css",
@@ -79,5 +80,6 @@
   "assets/ae-pick-capture.css",
   "assets/ae-take-prestige.css",
   "assets/ae-season-predictions.css",
-  "assets/ae-opinions.css"
+  "assets/ae-opinions.css",
+  "assets/ae-armonia.css"
 ]

@@ -378,68 +378,8 @@
     display:flex!important;
   }
 
-  /* ---------- FOOTER COMPACTO ---------- */
-  html body.ae-is-nfl footer{
-    margin-top:14px!important;
-  }
-  html body.ae-is-nfl footer>.max-w-7xl{
-    padding:16px 12px 12px!important;
-  }
-  html body.ae-is-nfl footer .grid.grid-cols-1.md\:grid-cols-4{
-    display:grid!important;
-    grid-template-columns:1.2fr .9fr .9fr 1fr!important;
-    gap:8px!important;
-    margin-bottom:10px!important;
-  }
-  html body.ae-is-nfl footer .ae-footer-gold-brand{
-    display:flex!important;
-    width:100%!important;
-    max-width:160px!important;
-    gap:4px!important;
-    margin:0!important;
-  }
-  html body.ae-is-nfl footer .ae-footer-gold-brand .ae-runner-symbol{
-    width:33px!important;height:33px!important;
-    min-width:33px!important;max-width:33px!important;
-  }
-  html body.ae-is-nfl footer .ae-footer-gold-brand .ae-runner-wordmark{
-    min-width:0!important;
-  }
-  html body.ae-is-nfl footer .space-y-3>p{
-    display:none!important;
-  }
-  html body.ae-is-nfl footer h4{
-    margin:0 0 4px!important;
-    font-size:8px!important;
-    line-height:1.1!important;
-  }
-  html body.ae-is-nfl footer ul{
-    display:block!important;
-    margin:0!important;padding:0!important;
-  }
-  html body.ae-is-nfl footer li{
-    margin:0 0 2px!important;
-    font-size:8px!important;
-    line-height:1.15!important;
-  }
-  html body.ae-is-nfl footer .flex.flex-wrap.gap-3{
-    gap:3px!important;
-  }
-  html body.ae-is-nfl footer .flex.flex-wrap.gap-3>*{
-    width:27px!important;height:27px!important;
-    border-radius:1px!important;
-    font-size:11px!important;
-  }
-  html body.ae-is-nfl footer .pt-8.border-t{
-    padding-top:8px!important;
-    gap:5px!important;
-    font-size:8px!important;
-  }
-  html body.ae-is-nfl footer .ae-footer-recovery:not(.hidden){
-    min-height:28px!important;
-    padding:4px 7px!important;
-    font-size:8px!important;
-  }
+  /* Armonía 20 oct: el pie compacto exclusivo de NFL (texto de 8 px, 4 columnas
+     que se salían de la pantalla) se retira; NFL usa el mismo pie que el resto. */
 
   /* ---------- MODO DÍA ---------- */
   html:not(.dark) body.ae-is-nfl #nflRankings #rankingViewport.rcm-ticker{
@@ -466,15 +406,6 @@
   html:not(.dark) body.ae-is-nfl #freeTakes #freeTakesFeed>.ae-free-take-card{
     background:transparent!important;
   }
-  html:not(.dark) body.ae-is-nfl footer{
-    background:#fbf7f0!important;
-    border-color:#dfcdb9!important;
-  }
-  html:not(.dark) body.ae-is-nfl footer h4,
-  html:not(.dark) body.ae-is-nfl footer a,
-  html:not(.dark) body.ae-is-nfl footer p{
-    color:#284354!important;
-  }
 }
 @media(max-width:385px){
   html body.ae-is-nfl #nflRankings #rankingTrack .rcm-team{
@@ -498,9 +429,6 @@
   html body.ae-is-nfl #freeTakes #aeSportTakePublish{
     max-width:105px!important;
     padding-inline:5px!important;
-  }
-  html body.ae-is-nfl footer .grid.grid-cols-1.md\:grid-cols-4{
-    grid-template-columns:1.1fr 1fr!important;
   }
 }
 @media(max-width:640px) and (prefers-reduced-motion:reduce){

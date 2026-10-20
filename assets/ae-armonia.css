@@ -1,0 +1,593 @@
+/* =====================================================================
+   CAM SPORTS · Capa de armonía (va la última en el bundle)
+   ---------------------------------------------------------------------
+   Pulido visual sin cambiar estructura ni contenido. Todo valor sale de
+   assets/ae-tokens.css (prefijo --ds-). Documentación: docs/tokens.md.
+   Fases: 1) marca, cabecera, pie y títulos · 2) componentes · 3) ritmo.
+   Especificidad: la página carga ~50 hojas sueltas DESPUÉS del bundle, así que
+   cada selector de esta capa empieza por html:not(#ds):not(#ds):not(#ds) (dos niveles
+   de id extra) para ganar sin tocar el HTML ni el orden de carga.
+   ===================================================================== */
+
+/* ---------------------------------------------------------------------
+   FASE 1 · Cabecera y pie (chrome)
+   --------------------------------------------------------------------- */
+
+/* Separador inferior de la cabecera y superior del pie, en el tono del azul. */
+html:not(#ds):not(#ds):not(#ds) body > header.sticky.top-0.z-40{
+  border-bottom-color:var(--ds-chrome-line)!important;
+}
+html:not(#ds):not(#ds):not(#ds) body > footer.bg-slate-900.border-t{
+  border-top-color:var(--ds-chrome-line)!important;
+}
+
+/* Botón de tema: el mismo marco en día y en noche (antes solo de día). */
+html:not(#ds):not(#ds):not(#ds) body > header #themeToggle,
+html.dark:not(#ds):not(#ds):not(#ds) body > header #themeToggle{
+  background:var(--ds-chrome-control)!important;
+  border:var(--ds-border) solid var(--ds-chrome-control-line)!important;
+  border-radius:var(--ds-radius)!important;
+  box-shadow:none!important;
+}
+
+/* Controles de la cabecera: un único marco para todos (antes unos con caja y otros sin ella).
+   «Publicar» (+) conserva su relleno dorado: es la acción dominante. */
+html:not(#ds):not(#ds):not(#ds) body > header :is(#aeNotificationsButton,.ae-signout-action,#aeCategoryAdmin > summary){
+  background:var(--ds-chrome-control)!important;
+  border:var(--ds-border) solid var(--ds-chrome-control-line)!important;
+  border-radius:var(--ds-radius)!important;
+  box-shadow:none!important;
+  color:var(--ds-on-chrome)!important;
+}
+html:not(#ds):not(#ds):not(#ds) body > header #aeCategoryAdmin .ae-admin-manage-icon{
+  color:var(--ds-on-chrome)!important;
+}
+html:not(#ds):not(#ds):not(#ds) body > header :is(#themeToggle,#aeNotificationsButton,.ae-signout-action,#aeCategoryAdmin > summary,.ae-admin-profile):hover{
+  background:var(--ds-chrome-control-line)!important;
+}
+
+/* Escritorio: todos los controles de la cabecera a 44 px de alto; los de solo icono, cuadrados. */
+@media (min-width:768px){
+  html:not(#ds):not(#ds):not(#ds) body > header .ae-header-actions,
+  html:not(#ds):not(#ds):not(#ds) body > header #loggedAdminContainer{
+    gap:var(--ds-space-2)!important;
+    column-gap:var(--ds-space-2)!important;
+  }
+  html:not(#ds):not(#ds):not(#ds) body > header .ae-header-actions > *,
+  html:not(#ds):not(#ds):not(#ds) body > header #loggedAdminContainer > *{
+    margin-left:0!important;
+    margin-right:0!important;
+  }
+  html:not(#ds):not(#ds):not(#ds) body > header :is(#themeToggle,#aeNotificationsButton,.ae-signout-action,#loggedAdminContainer .ae-publish-action){
+    width:var(--ds-target-min)!important;
+    min-width:var(--ds-target-min)!important;
+    height:var(--ds-target-min)!important;
+    min-height:var(--ds-target-min)!important;
+    padding:0!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    flex:0 0 auto!important;
+  }
+  html:not(#ds):not(#ds):not(#ds) body > header :is(#aeCategoryAdmin > summary,#loggedAdminContainer .ae-admin-profile){
+    height:var(--ds-target-min)!important;
+    min-height:var(--ds-target-min)!important;
+    flex:0 0 auto!important;
+  }
+}
+
+/* Nombre del administrador: legible sobre el azul en los dos temas (antes 1.2:1). */
+html:not(#ds):not(#ds):not(#ds) body > header #loggedAdminContainer .ae-admin-profile,
+html.dark:not(#ds):not(#ds):not(#ds) body > header #loggedAdminContainer .ae-admin-profile{
+  color:var(--ds-on-chrome)!important;
+  background:var(--ds-chrome-control)!important;
+  border:var(--ds-border) solid var(--ds-chrome-control-line)!important;
+  border-radius:var(--ds-radius)!important;
+  box-shadow:none!important;
+}
+html:not(#ds):not(#ds):not(#ds) body > header #loggedAdminContainer .ae-admin-profile #adminNameDisplay,
+html.dark:not(#ds):not(#ds):not(#ds) body > header #loggedAdminContainer .ae-admin-profile #adminNameDisplay{
+  color:var(--ds-on-chrome)!important;
+  text-shadow:none!important;
+}
+html:not(#ds):not(#ds):not(#ds) body > header #loggedAdminContainer .ae-admin-profile::before,
+html:not(#ds):not(#ds):not(#ds) body > header #loggedAdminContainer .ae-admin-profile::after{
+  opacity:0!important;
+}
+
+/* Botón «+» de publicar: área táctil completa. */
+html:not(#ds):not(#ds):not(#ds) body > header #loggedAdminContainer .ae-publish-action{
+  min-width:var(--ds-target-min)!important;
+  min-height:var(--ds-target-min)!important;
+  justify-content:center!important;
+  border-radius:var(--ds-radius)!important;
+}
+
+/* Cabecera móvil con sesión de admin: el logo ya no queda tapado.
+   La columna de la marca toma el ancho real del logo y las acciones se
+   reparten en filas a la derecha, cada una de 44 × 44 px. */
+@media (max-width:767px){
+  html:not(#ds):not(#ds):not(#ds) body > header .ae-mobile-header-grid:has(#loggedAdminContainer:not(.hidden)){
+    grid-template-columns:auto minmax(0,1fr)!important;
+    align-items:center!important;
+  }
+  html:not(#ds):not(#ds):not(#ds) body > header .ae-mobile-header-grid:has(#loggedAdminContainer:not(.hidden)) .ae-header-actions{
+    flex-wrap:wrap!important;
+    justify-content:flex-end!important;
+    align-content:center!important;
+    gap:var(--ds-space-1)!important;
+    height:auto!important;
+    min-width:0!important;
+    width:auto!important;
+    padding:var(--ds-space-1) 0!important;
+  }
+  html:not(#ds):not(#ds):not(#ds) body > header .ae-mobile-header-grid:has(#loggedAdminContainer:not(.hidden)) .ae-header-actions > *{
+    margin:0!important;
+  }
+  html:not(#ds):not(#ds):not(#ds) body > header .ae-mobile-header-grid:has(#loggedAdminContainer:not(.hidden)) #loggedAdminContainer{
+    display:contents!important;
+  }
+  html:not(#ds):not(#ds):not(#ds) body > header .ae-mobile-header-grid:has(#loggedAdminContainer:not(.hidden)) .ae-header-actions :is(#themeToggle,#aeNotificationsButton,#aeCategoryAdmin > summary,.ae-publish-action,.ae-signout-action,.ae-admin-profile){
+    width:var(--ds-target-min)!important;
+    min-width:var(--ds-target-min)!important;
+    height:var(--ds-target-min)!important;
+    min-height:var(--ds-target-min)!important;
+    padding:0!important;
+    margin:0!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    flex:0 0 auto!important;
+  }
+  /* Orden estable en dos filas de tres: tema · avisos · perfil / publicar · salir · deportes. */
+  html:not(#ds):not(#ds):not(#ds) body > header .ae-mobile-header-grid:has(#loggedAdminContainer:not(.hidden)) .ae-header-actions{
+    width:calc(3 * var(--ds-target-min) + 2 * var(--ds-space-1))!important;
+    justify-self:end!important;
+  }
+  html:not(#ds):not(#ds):not(#ds) body > header .ae-mobile-header-grid:has(#loggedAdminContainer:not(.hidden)) #themeToggle{order:1!important}
+  html:not(#ds):not(#ds):not(#ds) body > header .ae-mobile-header-grid:has(#loggedAdminContainer:not(.hidden)) #aeNotificationsButton{order:2!important}
+  html:not(#ds):not(#ds):not(#ds) body > header .ae-mobile-header-grid:has(#loggedAdminContainer:not(.hidden)) .ae-admin-profile{order:3!important}
+  html:not(#ds):not(#ds):not(#ds) body > header .ae-mobile-header-grid:has(#loggedAdminContainer:not(.hidden)) .ae-publish-action{order:4!important}
+  html:not(#ds):not(#ds):not(#ds) body > header .ae-mobile-header-grid:has(#loggedAdminContainer:not(.hidden)) .ae-signout-action{order:5!important}
+  html:not(#ds):not(#ds):not(#ds) body > header .ae-mobile-header-grid:has(#loggedAdminContainer:not(.hidden)) #aeCategoryAdmin{order:6!important}
+  html:not(#ds):not(#ds):not(#ds) body > header .ae-mobile-header-grid:has(#loggedAdminContainer:not(.hidden)) #aeCategoryAdmin > summary::before{
+    display:none!important;
+  }
+  html:not(#ds):not(#ds):not(#ds) body > header .ae-mobile-header-grid:has(#loggedAdminContainer:not(.hidden)) #aeCategoryAdmin{
+    flex:0 0 var(--ds-target-min)!important;
+    min-width:var(--ds-target-min)!important;
+    width:var(--ds-target-min)!important;
+    height:var(--ds-target-min)!important;
+    margin:0!important;
+  }
+  /* En móvil el perfil muestra solo su icono; el nombre sigue disponible para lectores de pantalla. */
+  html:not(#ds):not(#ds):not(#ds) body > header .ae-mobile-header-grid:has(#loggedAdminContainer:not(.hidden)) #adminNameDisplay{
+    position:absolute!important;
+    width:1px!important;height:1px!important;
+    overflow:hidden!important;
+    clip:rect(0 0 0 0)!important;
+    white-space:nowrap!important;
+  }
+}
+
+/* Pie: redes sociales con el mismo lenguaje que los controles de la cabecera,
+   44 × 44 px y enlaces de texto con altura táctil. */
+html:not(#ds):not(#ds):not(#ds) body > footer .flex.flex-wrap.gap-3 > *{
+  width:var(--ds-target-min)!important;
+  height:var(--ds-target-min)!important;
+  background:var(--ds-chrome-control)!important;
+  border:var(--ds-border) solid var(--ds-chrome-control-line)!important;
+  border-radius:var(--ds-radius)!important;
+  color:var(--ds-on-chrome)!important;
+}
+html:not(#ds):not(#ds):not(#ds) body > footer .flex.flex-wrap.gap-3 > :hover{
+  background:var(--ds-chrome-control-line)!important;
+}
+html:not(#ds):not(#ds):not(#ds) body > footer ul a{
+  display:inline-flex!important;
+  align-items:center!important;
+  min-height:32px!important;
+}
+html:not(#ds):not(#ds):not(#ds) body > footer :is(p,li,a,span):not(.ae-footer-all-news){
+  color:var(--ds-on-chrome-muted);
+}
+html:not(#ds):not(#ds):not(#ds) body > footer h4{
+  color:var(--ds-on-chrome)!important;
+}
+
+/* ---------------------------------------------------------------------
+   FASE 1 · Títulos que no se montan
+   --------------------------------------------------------------------- */
+
+/* Interlineado mínimo de títulos (antes 0.98–1.06 en varios módulos). */
+html:not(#ds):not(#ds):not(#ds) body #rankingTitle,
+html:not(#ds):not(#ds):not(#ds) body #freeTakesTitle,
+html:not(#ds):not(#ds):not(#ds) body #picksRankingTitle,
+html:not(#ds):not(#ds):not(#ds) body #aeSportGeniosTitle,
+html:not(#ds):not(#ds):not(#ds) body #aeSportAnoetosTitle,
+html:not(#ds):not(#ds):not(#ds) body #aeHomeTakeHighlights #aeHomeTakeHistoric #aeHomeTakeHistoricTitle,
+html:not(#ds):not(#ds):not(#ds) body #heroSection .editorial-hero h1{
+  line-height:var(--ds-leading-title)!important;
+}
+
+/* Cortes de línea más limpios en títulos (sin palabras sueltas al final). */
+html:not(#ds):not(#ds):not(#ds) body :is(h1,h2,h3,h4){
+  text-wrap:balance;
+  overflow-wrap:break-word;
+}
+
+/* Portada en escritorio: el titular se ve completo y el extracto ya no se le
+   monta encima. La altura la decide el contenido (mínimo el de antes). */
+@media (min-width:768px){
+  html:not(#ds):not(#ds):not(#ds) body.ae-is-home #mainContent #heroSection .editorial-hero{
+    max-height:none!important;
+    height:auto!important;
+  }
+  html:not(#ds):not(#ds):not(#ds) body.ae-is-home #mainContent #heroSection .editorial-hero-copy > *{
+    flex-shrink:0!important;
+  }
+  html:not(#ds):not(#ds):not(#ds) body.ae-is-home #mainContent #heroSection .editorial-hero h1{
+    -webkit-line-clamp:unset!important;
+    display:block!important;
+    overflow:visible!important;
+    margin-bottom:var(--ds-space-2)!important;
+  }
+}
+
+/* ---------------------------------------------------------------------
+   FASE 1 · Contrastes que no llegaban al mínimo
+   --------------------------------------------------------------------- */
+
+/* Pick de la Semana: el partido era marrón sobre azul noche (1.67:1). */
+html:not(.dark):not(#ds):not(#ds):not(#ds) body .ae-weekly-expandable .ae-weekly-expanded-content .ae-weekly-event{
+  color:var(--ds-on-chrome-muted)!important;
+}
+/* Ranking NFL de día: números de puesto en bronce legible (antes 1.99:1). */
+html:not(.dark):not(#ds):not(#ds):not(#ds) body #nflRankings #rankingTrack .rcm-team strong{
+  color:var(--ds-action)!important;
+}
+
+/* Salvaguarda: lo que la página oculta con el atributo hidden sigue oculto
+   aunque esta capa le dé tamaño o display (p. ej. los avisos sin sesión). */
+html:not(#ds):not(#ds):not(#ds):not(#ds):not(#ds) body [hidden]{
+  display:none!important;
+}
+
+/* ---------------------------------------------------------------------
+   FASE 2 · Componentes: un solo diseño por tipo
+   --------------------------------------------------------------------- */
+
+/* Pestañas. Antes había cinco estilos (caja marrón, dorado con degradado,
+   caja marfil, subrayado fino y subrayado con contador). Ahora todas son
+   texto con indicador inferior de 2 px en el color de acción. */
+html:not(#ds):not(#ds):not(#ds) body :is(.ae-points-period,#aeSeasonTabs,.ae-takes-tabs,.ae-take-ranking-tabs,#aeOpinionsTabs){
+  display:flex!important;
+  flex-wrap:nowrap!important;
+  gap:var(--ds-space-1)!important;
+  background:transparent!important;
+  border:0!important;
+  border-radius:var(--ds-radius)!important;
+  box-shadow:inset 0 calc(-1 * var(--ds-border)) 0 var(--ds-line)!important;
+  padding:0!important;
+  overflow-x:auto;
+  overflow-y:hidden;
+  overscroll-behavior-x:contain;
+  scrollbar-width:none;
+}
+html:not(#ds):not(#ds):not(#ds) body :is(.ae-points-period,#aeSeasonTabs,.ae-takes-tabs,.ae-take-ranking-tabs,#aeOpinionsTabs) > button{
+  flex:0 0 auto;
+  min-height:var(--ds-target-min)!important;
+  padding:0 var(--ds-space-4)!important;
+  margin:0!important;
+  background:transparent!important;
+  background-image:none!important;
+  border:0!important;
+  border-radius:var(--ds-radius)!important;
+  box-shadow:none!important;
+  color:var(--ds-text-muted)!important;
+  font:600 var(--ds-text-sm)/var(--ds-leading-ui) var(--ds-font-sans)!important;
+  letter-spacing:0!important;
+  text-transform:none!important;
+  text-shadow:none!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  gap:var(--ds-space-2)!important;
+  cursor:pointer;
+}
+html:not(#ds):not(#ds):not(#ds) body :is(.ae-points-period,#aeSeasonTabs,.ae-takes-tabs,.ae-take-ranking-tabs,#aeOpinionsTabs) > button:hover{
+  color:var(--ds-text)!important;
+}
+html:not(#ds):not(#ds):not(#ds) body :is(.ae-points-period,#aeSeasonTabs,.ae-takes-tabs,.ae-take-ranking-tabs,#aeOpinionsTabs) > button:is([aria-selected="true"],[aria-pressed="true"],.active,.is-active){
+  color:var(--ds-text)!important;
+  box-shadow:inset 0 -2px 0 var(--ds-action)!important;
+}
+/* Sobre los encabezados con ilustración (Takes por deporte) las pestañas
+   necesitan su propio fondo para leerse. */
+html:not(#ds):not(#ds):not(#ds) body .ae-take-ranking-tabs{
+  background:var(--ds-surface)!important;
+}
+
+/* Botón principal dorado («Publicar mi Take», «Mi Take»): un tamaño, recto. */
+html:not(#ds):not(#ds):not(#ds) body :is(#aeHomeTakePublish,#aeSportTakePublish){
+  min-height:var(--ds-target-min)!important;
+  height:auto!important;
+  padding:0 var(--ds-space-6)!important;
+  border-radius:var(--ds-radius)!important;
+  font:600 14px/1.3 var(--ds-font-sans)!important;
+  letter-spacing:0!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  box-shadow:var(--ds-shadow-soft)!important;
+}
+/* «Publicar mi Take» era la única pieza redondeada (excepción declarada dentro de
+   la capa ae-editorial-square-corners); se vuelve recta como el resto, en esa misma capa. */
+@layer ae-editorial-square-corners {
+  html:not(#ds):not(#ds):not(#ds) body #aeHomeTakePublish{
+    border-radius:0!important;
+  }
+}
+html:not(#ds):not(#ds):not(#ds) body #aeSportTakePublish{
+  width:auto!important;
+  min-width:96px!important;
+}
+
+/* Botones secundarios de contorno («Todas las noticias», «Ver todos los Picks»…). */
+html:not(#ds):not(#ds):not(#ds) body :is(.ae-news-all-button,.ae-history-more){
+  min-height:var(--ds-target-min)!important;
+  padding:0 var(--ds-space-4)!important;
+  background:var(--ds-surface)!important;
+  background-image:none!important;
+  border:var(--ds-border) solid var(--ds-action)!important;
+  border-radius:var(--ds-radius)!important;
+  box-shadow:none!important;
+  color:var(--ds-action)!important;
+  font:600 14px/1.3 var(--ds-font-sans)!important;
+  letter-spacing:0!important;
+  text-transform:none!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:var(--ds-space-2)!important;
+}
+html:not(#ds):not(#ds):not(#ds) body :is(.ae-news-all-button,.ae-history-more):hover{
+  background:var(--ds-action-soft)!important;
+}
+
+/* Estados vacíos: misma letra, tamaño, color y alineación en toda la web. */
+html:not(#ds):not(#ds):not(#ds) body :is(.ae-discovery-empty,.ae-points-table-empty,.ae-community-empty,.ae-top-takes-empty,.ae-take-empty,.ae-nfl-ranking-message,.ae-cp-leader > p,.ae-chef-empty):not(#aeHomeTakeHistoricTake *){
+  font:400 var(--ds-text-sm)/1.55 var(--ds-font-sans)!important;
+  font-style:normal!important;
+  color:var(--ds-text-muted)!important;
+  text-align:start!important;
+  letter-spacing:0!important;
+}
+html:not(#ds):not(#ds):not(#ds) body :is(.ae-discovery-empty,.ae-top-takes-empty,.ae-points-table-empty,.ae-community-empty,.ae-nfl-ranking-message):not(#aeHomeTakeHistoricTake *){
+  padding:var(--ds-space-4)!important;
+}
+
+/* Etiquetas de cuota: misma forma en todas partes (cada sección conserva su color). */
+html:not(#ds):not(#ds):not(#ds) body :is(.cp-odds,.ae-chef-odds,.ae-weekly-odds,.ae-season-option-points){
+  border-radius:var(--ds-radius)!important;
+  font-family:var(--ds-font-sans)!important;
+  font-size:var(--ds-text-xs)!important;
+  font-weight:700!important;
+  line-height:1.4!important;
+  letter-spacing:.02em!important;
+  padding:2px var(--ds-space-2)!important;
+}
+
+/* Foco de teclado: uno solo (antes 12 estilos y 17 sitios sin foco visible). */
+html:not(#ds):not(#ds):not(#ds) body :is(a,button,input,select,textarea,summary,[tabindex]):focus-visible{
+  outline:var(--ds-focus-width) solid var(--ds-focus)!important;
+  outline-offset:var(--ds-focus-offset)!important;
+  box-shadow:none!important;
+}
+html:not(#ds):not(#ds):not(#ds) body :is(header,footer) :is(a,button,input,select,textarea,summary,[tabindex]):focus-visible{
+  outline-color:var(--ds-focus-on-chrome)!important;
+}
+
+/* Deshabilitado: una sola opacidad y cursor. */
+html:not(#ds):not(#ds):not(#ds) body :is(button,input,select,textarea):disabled,
+html:not(#ds):not(#ds):not(#ds) body [aria-disabled="true"]{
+  opacity:var(--ds-disabled-opacity)!important;
+  cursor:not-allowed!important;
+}
+
+/* Picks de la comunidad: el turquesa pasa a la escala del azul de marca
+   (variables --picks-live-* en ae-picks-live-color.css → tokens --ds-accent*). */
+
+/* ---------------------------------------------------------------------
+   FASE 3 · Escala tipográfica, márgenes y ritmo
+   --------------------------------------------------------------------- */
+
+/* Tamaño mínimo legible: nada por debajo de 11 px (antes había textos de 7–10 px). */
+html:not(#ds):not(#ds):not(#ds) body :is(
+  .category-btn > span,
+  .ae-login-label,
+  #adminNameDisplay,
+  .ae-admin-manage-label,
+  .ae-weekly-expand-hint,
+  .ae-weekly-disclaimer,
+  .ae-weekly-odds-highlight,
+  .ae-weekly-card > .ae-weekly-event,
+  .ae-weekly-card > .ae-weekly-link,
+  #aeWeeklyShareButton > span,
+  th,
+  .ae-trending-category,
+  .ae-trending-meta,
+  .ae-picks-news-label,
+  .ae-season-overline,
+  .ae-season-meta > span,
+  #cpFeedScrollHint,
+  .ae-chef-recetario,
+  .ae-chef-scroll-note,
+  .ae-chefs-table-cols > span,
+  .ae-upload-field > small,
+  .rcm-team > .ae-rank-trend,
+  .ae-nfl-th-mobile,
+  .ae-nfl-th-desktop,
+  .ae-rank-overline
+){
+  font-size:var(--ds-text-2xs)!important;
+}
+@media (max-width:767px){
+  html:not(#ds):not(#ds):not(#ds) body :is(.rcm-team > .ae-team-name,#rankingEditButton,#championsEditButton){
+    font-size:var(--ds-text-2xs)!important;
+  }
+}
+/* Tarjetas de noticia compactas (Fútbol, NFL y carriles de portada): etiqueta,
+   fecha, lectura y «Leer» suben a 11 px. */
+html:not(#ds):not(#ds):not(#ds) body :is(#articlesGrid,[id^="aeNewsSportTrack"]) .relative > .absolute.top-3,
+html:not(#ds):not(#ds):not(#ds) body #articlesGrid article .flex > :is(span,button,p){
+  font-size:var(--ds-text-2xs)!important;
+}
+/* Entradilla bajo «Demuestra tu conocimiento» (antes 10 px). */
+html:not(#ds):not(#ds):not(#ds) body .ae-takes-head > p{
+  font-size:var(--ds-text-xs)!important;
+  line-height:1.5!important;
+}
+
+/* Margen lateral único en móvil (antes 15 px en unas vistas, 12 px en Fútbol y en la cabecera). */
+@media (max-width:767px){
+  html:not(#ds):not(#ds):not(#ds) body #mainContent{
+    padding-left:var(--ds-gutter)!important;
+    padding-right:var(--ds-gutter)!important;
+  }
+  html:not(#ds):not(#ds):not(#ds) body > :is(header,footer) > .max-w-7xl{
+    padding-left:var(--ds-gutter)!important;
+    padding-right:var(--ds-gutter)!important;
+  }
+}
+
+/* Ritmo vertical: el mismo hueco entre secciones en todas las vistas
+   (antes 0, 8, 11, 12, 16, 18, 24 o 32 px según la sección). */
+html:not(#ds):not(#ds):not(#ds) body #mainContent > *{
+  margin-top:0!important;
+  margin-bottom:var(--ds-section-gap)!important;
+}
+html:not(#ds):not(#ds):not(#ds) body #mainContent > :is(.editorial-layout,#editorialBottom){
+  row-gap:var(--ds-space-4)!important;
+}
+@media (min-width:768px){
+  html:not(#ds):not(#ds):not(#ds) body #mainContent > :is(.editorial-layout,#editorialBottom){
+    row-gap:var(--ds-space-6)!important;
+  }
+}
+
+/* Áreas táctiles de 44 × 44 px. Donde el control es visualmente pequeño
+   (iconos dentro de tarjetas) se amplía solo el área que recibe el toque,
+   sin cambiar su aspecto. */
+html:not(#ds):not(#ds):not(#ds) body :is(
+  .category-btn,
+  .ae-season-option,
+  #rankingEditButton,
+  #championsEditButton,
+  #aeWeeklyEditButton,
+  .is-minor,
+  #mainContent summary,
+  #mainContent input[type="range"],
+  .rcm-dialog button,
+  .rcm-panel button,
+  #aeWeeklyPickForm :is(button,input:not([type="range"]):not([type="checkbox"]):not([type="radio"]),select),
+  .ae-news-sport-link,
+  .ae-hero-read-cta
+){
+  min-height:var(--ds-target-min)!important;
+}
+html:not(#ds):not(#ds):not(#ds) body > footer ul a{
+  min-width:var(--ds-target-min)!important;
+}
+html:not(#ds):not(#ds):not(#ds) body > header #themeToggle{
+  width:var(--ds-target-min)!important;
+  min-width:var(--ds-target-min)!important;
+  height:var(--ds-target-min)!important;
+  min-height:var(--ds-target-min)!important;
+}
+html:not(#ds):not(#ds):not(#ds) body > footer :is(ul a,.ae-footer-all-news){
+  min-height:var(--ds-target-min)!important;
+}
+html:not(#ds):not(#ds):not(#ds) body :is(#aeWeeklyShareButton,#aeHomeWeeklyShareButton,article .flex > button,article button.absolute){
+  overflow:visible!important;
+}
+html:not(#ds):not(#ds):not(#ds) body #aeWeeklyShareButton,
+html:not(#ds):not(#ds):not(#ds) body article .flex > button:not(.absolute){
+  position:relative!important;
+}
+html:not(#ds):not(#ds):not(#ds) body :is(#aeWeeklyShareButton,#aeHomeWeeklyShareButton,article .flex > button,article button.absolute)::after{
+  content:""!important;
+  position:absolute!important;
+  left:50%!important;
+  top:50%!important;
+  width:max(100%, var(--ds-target-min))!important;
+  height:max(100%, var(--ds-target-min))!important;
+  transform:translate(-50%,-50%)!important;
+  background:none!important;
+  border:0!important;
+}
+
+/* Títulos de sección que no escalaban: ahora fluidos, como el resto. */
+html:not(#ds):not(#ds):not(#ds) body :is(#picksFeaturedTitle,#aeSeasonTitle){
+  font-size:var(--ds-text-2xl)!important;
+  line-height:var(--ds-leading-title)!important;
+}
+
+/* «Lo más leído»: el mismo interlineado de títulos que el resto. */
+html:not(#ds):not(#ds):not(#ds):not(#ds) body #mainContent #trendingList .ae-trending-title{
+  line-height:var(--ds-leading-title)!important;
+}
+
+/* Móvil: con las etiquetas a 11 px, icono encima y texto debajo en el menú de
+   deportes (como ya ocurre en tablet), para que nada se pise ni a 320 px. */
+@media (max-width:767px){
+  html:not(#ds):not(#ds):not(#ds) body > header nav.ae-sport-nav .category-btn{
+    flex-direction:column!important;
+    justify-content:center!important;
+    gap:2px!important;
+    padding:var(--ds-space-1) 0!important;
+    min-width:0!important;
+  }
+  html:not(#ds):not(#ds):not(#ds) body > header nav.ae-sport-nav .category-btn > span:last-child{
+    letter-spacing:.02em!important;
+    line-height:1.2!important;
+  }
+  html:not(#ds):not(#ds):not(#ds) body > header .ae-login-label{
+    white-space:normal!important;
+    max-width:84px!important;
+    line-height:1.2!important;
+  }
+}
+
+/* «Demuestra tu conocimiento»: título y botón «Mi Take» en la misma fila sin
+   pisarse; el texto debajo ocupa todo el ancho (igual en NFL y en Fútbol). */
+html:not(#ds):not(#ds):not(#ds) body #freeTakes > .ae-takes-head{
+  grid-template-columns:minmax(0,1fr) auto!important;
+  column-gap:var(--ds-space-4)!important;
+  align-items:start!important;
+}
+html:not(#ds):not(#ds):not(#ds) body #freeTakes > .ae-takes-head > #freeTakesTitle{
+  grid-column:1!important;
+  grid-row:1!important;
+}
+html:not(#ds):not(#ds):not(#ds) body #freeTakes > .ae-takes-head > #aeSportTakePublish{
+  position:relative!important;
+  inset:auto!important;
+  grid-column:2!important;
+  grid-row:1!important;
+  align-self:start!important;
+}
+html:not(#ds):not(#ds):not(#ds) body #freeTakes > .ae-takes-head > p{
+  grid-column:1 / -1!important;
+}
+
+/* Carriles de noticias de portada: el título se cortaba con un alto fijo que
+   dejaba asomar media tercera línea. Ahora son dos líneas exactas con «…». */
+html:not(#ds):not(#ds):not(#ds) body [id^="aeNewsSportTrack"] h3.text-base{
+  display:-webkit-box!important;
+  -webkit-box-orient:vertical!important;
+  -webkit-line-clamp:2!important;
+  overflow:hidden!important;
+  height:auto!important;
+  min-height:2lh!important;
+  max-height:2lh!important;
+}

@@ -84,3 +84,11 @@ datos, los votos, las clasificaciones ni la composición de las secciones deport
 Añadir estilos al manifiesto y regenerar con `node scripts/build-editorial-css.mjs`.
 No editar el bundle directamente. Mantener cambios visuales acotados; la guía no
 autoriza eliminar funciones ni rediseñar una sección ya aprobada.
+
+## Tokens y capa de armonía (20 oct 2026)
+Los valores de color, tipografía, espaciado, forma y estados están en
+`assets/ae-tokens.css` y se documentan en `docs/tokens.md`. La cabecera y el pie
+usan el azul de marca #284A71 (día) / #1C2D40 (noche). `assets/ae-armonia.css`
+unifica pestañas, botones, etiquetas, estados vacíos, foco, áreas táctiles y
+ritmo vertical. El build (`node scripts/build-editorial-css.mjs`) ya no necesita
+Tailwind.

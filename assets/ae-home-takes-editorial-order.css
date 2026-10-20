@@ -117,7 +117,7 @@ html body #aeHomeTakeHighlights #aeHomeTakeHistoric #aeHomeTakeHistoricTitle {
   margin:0!important;
   max-width:14ch;
   color:#fff1df!important;
-  font:650 clamp(31px,4vw,55px)/.98 Newsreader,Georgia,serif!important;
+  font:650 clamp(31px,4vw,55px)/1.1 Newsreader,Georgia,serif!important;
   letter-spacing:-.025em!important;
   text-shadow:0 3px 15px rgba(0,0,0,.26)!important;
 }
@@ -172,7 +172,9 @@ html body #aeHomeTakeHighlights #aeHomeTakeHistoricTake .ae-discovery-empty{
   color:#e5d8c8!important;
 }
 @media(max-width:900px){
-  html body #aeHomeTakeHighlights > .ae-home-take-extras > #aeHomeTakeHistoric {
+  /* Armonía: el mismo apilado en día y en noche (antes el día quedaba en dos columnas). */
+  html body #aeHomeTakeHighlights > .ae-home-take-extras > #aeHomeTakeHistoric,
+  html:not(.dark) body #aeHomeTakeHighlights > .ae-home-take-extras > #aeHomeTakeHistoric {
     grid-template-columns:minmax(0,1fr)!important;
     gap:19px!important;
     min-height:0!important;
@@ -194,7 +196,8 @@ html body #aeHomeTakeHighlights #aeHomeTakeHistoricTake .ae-discovery-empty{
   }
 }
 @media(max-width:600px){
-  html body #aeHomeTakeHighlights > .ae-home-take-extras > #aeHomeTakeHistoric{
+  html body #aeHomeTakeHighlights > .ae-home-take-extras > #aeHomeTakeHistoric,
+  html:not(.dark) body #aeHomeTakeHighlights > .ae-home-take-extras > #aeHomeTakeHistoric{
     padding:21px 17px!important;
   }
   html body #aeHomeTakeHighlights #aeHomeTakeHistoric .ae-historic-copy{gap:8px;}

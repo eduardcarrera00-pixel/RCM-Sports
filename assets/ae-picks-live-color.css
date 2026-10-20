@@ -1,12 +1,13 @@
 /* Picks: livelier community cards and distinct Platos accents.
    Artwork remains confined to its header; the page geometry is unchanged. */
 html body #mainContent #footballTakes.ae-picks-editorial{
-  --picks-live-ink:#f4e8db;
-  --picks-live-muted:#ccd9de;
-  --picks-live-accent:#82cece;
-  --picks-live-tint:#234d61;
-  --picks-live-base:#153449;
-  --picks-live-line:#4d7887;
+  /* Armonía 20 oct: el turquesa propio pasa a la escala del azul de marca (tokens). */
+  --picks-live-ink:var(--ds-text);
+  --picks-live-muted:var(--ds-text-muted);
+  --picks-live-accent:var(--ds-accent);
+  --picks-live-tint:var(--ds-accent-soft);
+  --picks-live-base:var(--ds-accent-softer);
+  --picks-live-line:var(--ds-accent-line);
   --picks-best-ink:#99ddcd;
   --picks-best-tint:#244d4e;
   --picks-best-base:#14343d;
@@ -15,12 +16,12 @@ html body #mainContent #footballTakes.ae-picks-editorial{
   --picks-worst-base:#302d3a;
 }
 html:not(.dark) body #mainContent #footballTakes.ae-picks-editorial{
-  --picks-live-ink:#243f4d;
-  --picks-live-muted:#4e6672;
-  --picks-live-accent:#246f82;
-  --picks-live-tint:#dceef3;
-  --picks-live-base:#f4fafb;
-  --picks-live-line:#9ebfc8;
+  --picks-live-ink:var(--ds-text);
+  --picks-live-muted:var(--ds-text-muted);
+  --picks-live-accent:var(--ds-accent);
+  --picks-live-tint:var(--ds-accent-soft);
+  --picks-live-base:var(--ds-accent-softer);
+  --picks-live-line:var(--ds-accent-line);
   --picks-best-ink:#276b60;
   --picks-best-tint:#dcece2;
   --picks-best-base:#f4f8ee;

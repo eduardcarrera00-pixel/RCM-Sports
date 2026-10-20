@@ -90,8 +90,9 @@ html:not(.dark) body header a.ae-brand-runner-clean .ae-original-gold-wordmark{
    El arte entregado conserva su geometría exacta. El recorte responsivo elimina
    el aire exterior del screenshot sin deformar las letras ni duplicar el logo. */
 :root{
-  --cam-brand-blue:#023787;
-  --cam-brand-cream:#f5ecdf;
+  /* Armonía 20 oct: el azul sale de los tokens (ae-tokens.css), con valor propio de noche. */
+  --cam-brand-blue:var(--ds-chrome);
+  --cam-brand-cream:var(--ds-on-chrome);
 }
 html body>header.sticky.top-0.z-40{
   background:var(--cam-brand-blue)!important;
@@ -134,7 +135,9 @@ html body .cam-brand .cam-brand-crop{
   max-width:100%!important;
   aspect-ratio:2.05 / 1!important;
   overflow:hidden!important;
-  background:var(--cam-brand-blue)!important;
+  /* El arte (cam-sports-logo.webp) tiene fondo transparente: toma el azul de la
+     cabecera o del pie en cada tema, sin rectángulo alrededor. */
+  background:transparent!important;
 }
 html body .cam-brand .cam-brand-art{
   position:absolute!important;
