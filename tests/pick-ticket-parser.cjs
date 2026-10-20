@@ -109,3 +109,44 @@ assert.equal(extract(scan(croppedScreenshotPsm6.map(x=>x.replace('+240','+240 +3
 console.log('PASS: exact cropped uploaded receipt OCR at on-device scale, PSM 6/11, no My Bets header, full SGP and safety cases.');
 
 console.log('PASS: three-market Same Game Parlay +240, complete selection list, and guarded currency metadata.');
+
+
+// English and Spanish simple receipts, two-leg and three-leg multi-event parlays.
+const straightTicketEnglish=scan(['My Bets','Single Bet +150','Toronto Raptors vs Boston Celtics',
+ 'Toronto Raptors','Moneyline','$10.00','Total Wager']);
+const english=extract(straightTicketEnglish);
+assert.equal(english.ok,true,'English single must be recognized without a leg quote');
+assert.equal(english.readings.length,1);
+assert.equal(english.readings[0].odds,150);
+assert.equal(english.readings[0].selection,'Toronto Raptors · Moneyline','Never import wager into selection');
+
+const straightTicketSpanish=scan(['Apuesta simple +150','Barcelona vs Real Madrid',
+ 'Barcelona','Gana','$10.00','Importe']);
+const spanish=extract(straightTicketSpanish);
+assert.equal(spanish.ok,true,'Spanish single must be recognized');
+assert.equal(spanish.readings[0].odds,150);
+assert.equal(spanish.readings[0].selection,'Barcelona · Gana');
+const sameWithLegQuote=scan(['My Bets','Straight Bet','Chiefs vs Bills',
+ 'Chiefs Moneyline +150','Stake $10.00']);
+assert.equal(extract(sameWithLegQuote).readings[0].odds,150);
+
+const multiEvent3=['My Bets','Parlay 3 Legs +1475',
+ 'LA Lakers v Boston Celtics','Lakers','Moneyline +150',
+ 'Packers v Bears','Packers','Moneyline +110',
+ 'Barcelona v Madrid','Barcelona','Moneyline +200','Total Wager $10.00'];
+const triple=extract(scan(multiEvent3));
+assert.equal(triple.ok,true,'A three-leg multi-event parlay imports all three as ONE pick');
+assert.equal(triple.readings.length,1);
+assert.equal(triple.readings[0].selectionCount,3);
+assert.equal(triple.readings[0].odds,1475,'Original total price, not a leg quote');
+assert.match(triple.readings[0].selection,/Packers/);
+assert.match(triple.readings[0].selection,/Barcelona/);
+assert.equal(extract(scan(multiEvent3.map(l=>l.replace('+1475','+1275')))).ok,false,
+ 'Never use an inconsistent total');
+assert.equal(extract(scan(multiEvent3.filter(l=>l!=='Barcelona v Madrid'))).ok,false,
+ 'Never omit a game');
+assert.equal(extract(scan(multiEvent3.map(l=>l.replace('+1475','')))).ok,false,
+ 'Three-leg parlay must show original total');
+assert.equal(extract(scan(['My Bets','Straight Bet','Chiefs vs Bills',
+ 'Chiefs Moneyline +150 +165','Stake $10.00'])).ok,false,'Conflicting odds must not be chosen');
+console.log('PASS: single bets in English and Spanish, and 3-leg parlays with explicit total, no amounts imported or incomplete bets.');
