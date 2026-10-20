@@ -1,10 +1,25 @@
-// AE SPORTS · Lee una captura de apuesta con IA (Gemini, plan gratuito) cuando el lector del teléfono no puede.
+// CAM SPORTS · Lee una captura de apuesta con IA (Gemini, plan gratuito) cuando el lector del teléfono no puede.
 // La imagen se reenvía una sola vez a la IA y no se guarda en ningún sitio; solo se
 // guardan los datos de la apuesta (partido, pronóstico, momio, fecha) para poder publicar.
 import {createClient} from 'npm:@supabase/supabase-js@2.117.3';
 
 const allowedOrigins = new Set(['https://eduardcarrera00-pixel.github.io', 'https://aesportsclub.github.io', 'https://camsports.github.io', 'http://127.0.0.1:5500', 'http://localhost:5500']);
-const MODEL = Deno.env.get('AE_TICKET_MODEL') || 'gemini-2.5-flash';
+// Modelo: AE_TICKET_MODEL si está definido; si no, el alias «último Flash».
+// Si Google retira un modelo (404), se pide la lista de modelos y se usa el Flash
+// más reciente que admita generateContent. Se recuerda mientras la función esté activa.
+const PREFERRED_MODEL = Deno.env.get('AE_TICKET_MODEL') || 'gemini-flash-latest';
+let activeModel: string | null = null;
+const API = 'https://generativelanguage.googleapis.com/v1beta';
+async function flashModels(apiKey: string): Promise<string[]> {
+  const res = await fetch(`${API}/models?pageSize=1000`, {headers: {'x-goog-api-key': apiKey}});
+  if (!res.ok) return [];
+  const list = (await res.json())?.models || [];
+  const version = (n: string) => (n.match(/gemini-(\d+(?:\.\d+)?)-flash$/) || [])[1];
+  return list
+    .filter((m: {name?: string, supportedGenerationMethods?: string[]}) => m.name && version(m.name) && (m.supportedGenerationMethods || []).includes('generateContent'))
+    .map((m: {name: string}) => m.name.replace(/^models\//, ''))
+    .sort((a: string, b: string) => Number(version(b)) - Number(version(a)));
+}
 const DAILY_LIMIT = 25;
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 
@@ -35,7 +50,7 @@ const schema = {
   required: ['is_bet_slip', 'problem', 'selections']
 };
 
-const prompt = (today: string) => `Eres el lector de boletos de AE SPORTS. Hoy es ${today} (America/Toronto).
+const prompt = (today: string) => `Eres el lector de boletos de CAM SPORTS. Hoy es ${today} (America/Toronto).
 Lee la(s) captura(s) de una casa de apuestas y devuelve los datos en el JSON pedido.
 Reglas:
 - Copia equipos y pronósticos tal como aparecen; traduce el mercado al español natural (Over → Más de, Under → Menos de, Moneyline → Gana, Both teams to score → Ambos anotan).
@@ -43,6 +58,9 @@ Reglas:
 - Ignora saldo, importe apostado, pago potencial, promociones y apuestas que aparezcan como perdidas o canceladas.
 - Si hay varias selecciones de un mismo boleto (combinada/parlay), devuelve cada una y el momio total del boleto.
 - Las fechas tipo "Hoy", "Mañana" o "Dom 26 oct" conviértelas a YYYY-MM-DD respecto a hoy. Si no hay fecha, usa null.
+- En casas de México y España las fechas numéricas son día/mes: "20/10 • 14:00" es el 20 de octubre. "Momios" es la cuota total; si es decimal (2.75) conviértela a americana (+175).
+- En apuestas de mercado Sí/No, escribe el mercado y la respuesta: "Penalti en el encuentro: Sí".
+- Si el boleto aparece debajo de otra pantalla de la casa (filas de cuotas de mercados), lee solo el boleto o historial, no esas filas.
 - Si la imagen no es un boleto de apuestas, marca is_bet_slip=false.`;
 
 const toAmerican = (d: number) => d >= 2 ? Math.round((d - 1) * 100) : Math.round(-100 / (d - 1));
@@ -86,11 +104,20 @@ Deno.serve(async req => {
     const today = new Intl.DateTimeFormat('en-CA', {timeZone: 'America/Toronto'}).format(new Date());
     content.push({text: prompt(today)});
 
-    const ai = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`, {
-      method: 'POST',
-      headers: {'x-goog-api-key': apiKey, 'content-type': 'application/json'},
-      body: JSON.stringify({contents: [{role: 'user', parts: content}], generationConfig: {temperature: 0, responseMimeType: 'application/json', responseSchema: schema}})
+    const request = JSON.stringify({contents: [{role: 'user', parts: content}], generationConfig: {temperature: 0, responseMimeType: 'application/json', responseSchema: schema}});
+    const call = (model: string) => fetch(`${API}/models/${model}:generateContent`, {
+      method: 'POST', headers: {'x-goog-api-key': apiKey, 'content-type': 'application/json'}, body: request
     });
+    let MODEL = activeModel || PREFERRED_MODEL;
+    let ai = await call(MODEL);
+    if (ai.status === 404) {
+      console.error('gemini model unavailable', MODEL);
+      for (const candidate of (await flashModels(apiKey)).filter(m => m !== MODEL).slice(0, 4)) {
+        ai = await call(candidate);
+        if (ai.status !== 404) { MODEL = candidate; break; }
+      }
+    }
+    if (ai.ok) activeModel = MODEL;
     if (ai.status === 429) return respond({error: 'La lectura avanzada está muy solicitada ahora. Inténtalo en un minuto.'}, 429);
     if (!ai.ok) {
       console.error('gemini', ai.status, (await ai.text()).slice(0, 300));

@@ -140,3 +140,24 @@ del boleto NFL cuyo total está recortado. Las imágenes y su OCR completo se us
 solo en las pruebas locales y no forman parte del repositorio ni de la base.
 `AE_CAPTURE_USER_FIXTURES` permite comprobar de nuevo esas capturas localmente;
 las pruebas habituales incluyen ejemplos generados y texto de regresión.
+
+## Boletos «Momios / Apuesta total» (Playdoit y casas similares) · 20 oct 2026
+
+El historial de Playdoit muestra cada selección como «Selección … momio», debajo el
+mercado («Penalti en el encuentro») y después «Partido … 20/10 • 14:00», seguido de
+«Momios», «Apuesta total» y «Ganancia Total». `extractMomiosTicket` lee ese bloque
+de abajo arriba desde «Momios», de modo que las filas de mercado visibles encima del
+boleto («Sí 2.75 · No 1.40») no se toman como la apuesta. Une las filas que el OCR
+separa (selección/momio, partido/fecha), exige confianza ≥ 85 en los momios,
+comprueba que el producto de las selecciones coincide con «Momios» y rechaza los
+boletos ya resueltos (ganada, perdida, cancelada…). La fecha DD/MM sin año toma el
+año más cercano a hoy. Una selección Sí/No se publica como «Mercado: Sí».
+Prueba: `node tests/pick-momios-parser.cjs` (datos inventados con esa estructura).
+
+## Lectura avanzada con IA: modelo
+
+Google retiró `gemini-2.5-flash` y la lectura avanzada devolvía 404 desde el 20 oct.
+`ae-read-ticket` usa ahora `AE_TICKET_MODEL` o el alias `gemini-flash-latest`; si el
+modelo responde 404, consulta la lista de modelos y usa el Flash más reciente que
+admita `generateContent`, y lo recuerda mientras la función siga activa. El modelo
+usado se guarda en `ae_pick_capture_reads.model`.
