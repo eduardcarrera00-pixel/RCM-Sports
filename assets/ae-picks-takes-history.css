@@ -269,3 +269,72 @@ html:not(.dark) body .ae-pick-history-badge,html:not(.dark) body .ae-pick-histor
 html:not(.dark) body .ae-pick-history-meta{color:#825b40!important;}
 html:not(.dark) body .ae-pick-history-entry{border-bottom-color:rgba(130,91,64,.16)!important;}
 html:not(.dark) body .ae-pick-history-frame::after{background:linear-gradient(to bottom,rgba(248,241,231,0),#f8f1e7)!important;}
+
+/* CAM SPORTS: Historial de Picks público bajo Peores Platos. */
+html body #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-rail > section#cpSettleHistorySection{
+ grid-column:1/-1!important;box-sizing:border-box!important;min-width:0!important;width:100%!important;
+ margin:0!important;padding:clamp(15px,2.4vw,25px)!important;border-radius:0!important;
+ border:1px solid rgba(207,177,143,.48)!important;background:linear-gradient(150deg,#172e3e,#223c4b)!important;
+ color:#f1e5d7!important;box-shadow:0 10px 26px rgba(12,28,38,.12)!important;
+}
+html body #footballTakes.ae-picks-editorial #communityPicks #cpSettleHistorySection .ae-pick-history-heading{
+ display:flex!important;flex-wrap:wrap!important;align-items:end!important;justify-content:space-between!important;gap:7px 24px!important;
+ margin:0 0 14px!important;padding:0 0 12px!important;border-bottom:1px solid rgba(211,181,147,.32)!important;background:none!important;
+}
+html body #footballTakes.ae-picks-editorial #communityPicks #cpSettleHistorySection .ae-pick-history-kicker{
+ display:block!important;margin-bottom:4px!important;color:#d8bb97!important;
+ font:700 10px/1.45 Inter,system-ui,sans-serif!important;letter-spacing:.12em!important;
+}
+html body #footballTakes.ae-picks-editorial #communityPicks #cpSettleHistorySection h3#cpSettleHistoryTitle{
+ margin:0!important;padding:0!important;border:0!important;background:none!important;
+ color:#fff1df!important;font:600 clamp(25px,3vw,33px)/1.15 Newsreader,Georgia,serif!important;
+ letter-spacing:0!important;text-shadow:none!important;
+}
+html body #footballTakes.ae-picks-editorial #communityPicks #cpSettleHistorySection .ae-pick-history-heading p{
+ flex:1 1 220px!important;max-width:335px!important;margin:0!important;
+ font:500 12px/1.5 Inter,system-ui,sans-serif!important;color:#cad9df!important;
+}
+html body #footballTakes.ae-picks-editorial #communityPicks #cpSettleHistorySection #cpSettleHistory{
+ margin:0!important;padding:13px!important;min-width:0!important;border-radius:0!important;
+ border:1px solid rgba(207,177,143,.25)!important;background:rgba(10,27,39,.25)!important;
+ color:#f1e5d7!important;
+}
+html body #footballTakes.ae-picks-editorial #communityPicks #cpSettleHistorySection .ae-pick-history-empty{
+ color:#cad9df!important;
+}
+html:not(.dark) body #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-rail > section#cpSettleHistorySection{
+ border-color:#c8ad90!important;background:linear-gradient(145deg,#fffaf2,#f3e7d8)!important;
+ color:#273b49!important;box-shadow:0 8px 24px rgba(99,73,47,.08)!important;
+}
+html:not(.dark) body #footballTakes.ae-picks-editorial #communityPicks #cpSettleHistorySection .ae-pick-history-heading{
+ border-bottom-color:#cbb69e!important;
+}
+html:not(.dark) body #footballTakes.ae-picks-editorial #communityPicks #cpSettleHistorySection .ae-pick-history-kicker{color:#745239!important;}
+html:not(.dark) body #footballTakes.ae-picks-editorial #communityPicks #cpSettleHistorySection h3#cpSettleHistoryTitle{color:#263d4a!important;}
+html:not(.dark) body #footballTakes.ae-picks-editorial #communityPicks #cpSettleHistorySection .ae-pick-history-heading p{color:#526673!important;}
+html:not(.dark) body #footballTakes.ae-picks-editorial #communityPicks #cpSettleHistorySection #cpSettleHistory{
+ border-color:#d5c1a9!important;background:#fffcf6!important;color:#263d4a!important;
+}
+html:not(.dark) body #footballTakes.ae-picks-editorial #communityPicks #cpSettleHistorySection .ae-pick-history-stat{background:#f5ede1!important;border-color:#dac8b4!important;}
+html:not(.dark) body #footballTakes.ae-picks-editorial #communityPicks #cpSettleHistorySection .ae-pick-history-head strong{color:#263d4a!important;}
+html:not(.dark) body #footballTakes.ae-picks-editorial #communityPicks #cpSettleHistorySection .ae-pick-history-meta{color:#77563b!important;}
+html:not(.dark) body #footballTakes.ae-picks-editorial #communityPicks #cpSettleHistorySection :is(.ae-pick-history-note,.ae-pick-history-source,.ae-pick-history-stat span,.ae-pick-history-empty){
+ color:#566772!important;opacity:1!important;
+}
+html:not(.dark) body #footballTakes.ae-picks-editorial #communityPicks #cpSettleHistorySection .ae-pick-history-frame::after{
+ background:linear-gradient(to bottom,rgba(255,252,246,0),#fffcf6)!important;
+}
+html:not(.dark) body #footballTakes.ae-picks-editorial #communityPicks #cpSettleHistorySection .ae-pick-history-entry[data-outcome="won"] :is(.ae-pick-history-badge,.ae-pick-history-mark),
+html:not(.dark) body #footballTakes.ae-picks-editorial #communityPicks #cpSettleHistorySection .ae-pick-history-stat[data-outcome="won"] strong,
+html:not(.dark) body #footballTakes.ae-picks-editorial #communityPicks #cpSettleHistorySection .ae-pick-history-points{color:#286744!important;}
+html:not(.dark) body #footballTakes.ae-picks-editorial #communityPicks #cpSettleHistorySection .ae-pick-history-entry[data-outcome="lost"] :is(.ae-pick-history-badge,.ae-pick-history-mark),
+html:not(.dark) body #footballTakes.ae-picks-editorial #communityPicks #cpSettleHistorySection .ae-pick-history-stat[data-outcome="lost"] strong{color:#983f31!important;}
+@media(max-width:600px){
+ html body #footballTakes.ae-picks-editorial #communityPicks > .ae-picks-rail > section#cpSettleHistorySection{grid-column:1/-1!important;padding:14px 11px!important;}
+ html body #footballTakes.ae-picks-editorial #communityPicks #cpSettleHistorySection .ae-pick-history-heading{align-items:start!important;gap:5px!important;}
+ html body #footballTakes.ae-picks-editorial #communityPicks #cpSettleHistorySection .ae-pick-history-heading p{flex:1 1 100%!important;max-width:none!important;font-size:11px!important;}
+ html body #footballTakes.ae-picks-editorial #communityPicks #cpSettleHistorySection #cpSettleHistory{padding:10px 8px!important;}
+ html body #footballTakes.ae-picks-editorial #communityPicks #cpSettleHistorySection .ae-pick-history-head{flex-wrap:wrap!important;gap:5px 8px!important;}
+ html body #footballTakes.ae-picks-editorial #communityPicks #cpSettleHistorySection .ae-pick-history-head strong{flex:1 1 170px!important;}
+ html body #footballTakes.ae-picks-editorial #communityPicks #cpSettleHistorySection .ae-pick-history-badge{margin-left:auto!important;}
+}

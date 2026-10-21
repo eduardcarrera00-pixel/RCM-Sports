@@ -630,9 +630,7 @@ async function loadSettlement(){
 function shiftDay(day,days){return new Date(Date.parse(day+'T12:00:00Z')+days*86400000).toISOString().slice(0,10);}
 async function loadSettleHistory(){
  const area=$('cpSettleHistory');if(!area)return;
- const admin=typeof currentAdmin!=='undefined'&&Boolean(currentAdmin);
  area.replaceChildren();
- if(!admin)return;
  const r=await db.from('ae_pick_feed').select('id,title,author,event_date,american_odds,outcome,settled_at,result_points')
    .in('outcome',['won','lost','void']).order('settled_at',{ascending:false,nullsFirst:false}).limit(20);
  if(r.error){area.append(el('p','No pudimos cargar el historial. '+message(r.error),'ae-pick-history-empty'));return;}
