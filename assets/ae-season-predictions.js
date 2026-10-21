@@ -51,6 +51,22 @@
   const sortOptions = (q, list) => list.slice().sort((a, b) =>
     (/^otro/i.test(a.label) ? 1 : 0) - (/^otro/i.test(b.label) ? 1 : 0) || pointsOf(q, a) - pointsOf(q, b) || a.label.localeCompare(b.label, 'es'));
 
+
+  // Escudos compartidos entre la elección inicial y el comprobante ya guardado.
+  function crestOf(q, o) {
+    const crest = el('span', null, 'ae-season-crest');
+    crest.append(el('span', initials(o.label), 'ae-season-crest-fallback'));
+    const logo = logoOf(q, o);
+    if (logo) {
+      const img = el('img'); img.src = logo; img.alt = ''; img.width = 64; img.height = 64;
+      img.loading = 'lazy'; img.decoding = 'async';
+      img.addEventListener('load', () => crest.classList.add('is-loaded'));
+      img.addEventListener('error', () => img.remove());
+      crest.append(img);
+    }
+    return crest;
+  }
+
   function visibleQuestions() {
     const since = Date.now() - RECENT_DAYS * 864e5;
     return questions.filter(q => {
@@ -78,42 +94,45 @@
       el('span', q.status === 'settled' ? 'Resultado confirmado' : open ? 'Cierra el ' + closeText(q.closes_at) : 'Cerrada · pendiente de resultado'));
     card.append(meta, el('h3', q.prompt));
 
-    const grid = el('div', null, 'ae-season-options');
-    for (const o of sortOptions(q, optionsOf(q))) {
-      const value = pointsOf(q, o);
-      const chosen = existing?.option_id === o.id;
-      const winner = q.status === 'settled' && q.correct_option_id === o.id;
-      const b = el('button', null, 'ae-season-option');
-      b.type = 'button'; b.title = o.label; b.dataset.team = o.label;
-      const crest = el('span', null, 'ae-season-crest');
-      crest.append(el('span', initials(o.label), 'ae-season-crest-fallback'));
-      const logo = logoOf(q, o);
-      if (logo) {
-        const img = el('img'); img.src = logo; img.alt = ''; img.width = 64; img.height = 64;
-        img.loading = 'lazy'; img.decoding = 'async';
-        img.addEventListener('load', () => crest.classList.add('is-loaded'));
-        img.addEventListener('error', () => img.remove());
-        crest.append(img);
-      }
-      b.append(crest, el('span', o.label, 'sr-only'), el('strong', '+' + value, 'ae-season-option-points'));
-      b.setAttribute('aria-label', o.label + ', ' + value + ' puntos si aciertas' + (chosen ? ', tu elección' : '') + (winner ? ', resultado correcto' : ''));
-      b.disabled = busy || !open || Boolean(existing);
-      if (chosen) b.classList.add('is-chosen');
-      if (winner) b.classList.add('is-winner');
-      b.addEventListener('click', () => submit(q, o));
-      grid.append(b);
-    }
-    card.append(grid);
-
     if (existing) {
+      // La elección se conserva en Supabase: una vez hecha, los demás escudos
+      // desaparecen y solo se muestra el pick propio, incluso al volver a entrar.
+      card.classList.add('has-pick');
       const picked = optionsOf(q).find(o => o.id === existing.option_id);
-      const note = q.status === 'settled'
-        ? (existing.awarded_points > 0 ? '¡Acertaste! +' + existing.awarded_points + ' pts en tu clasificación de Takes' : 'Esta vez no fue. Tu elección: ' + (picked?.label || '—'))
-        : 'Tu elección: ' + (picked?.label || '—') + ' · +' + (picked ? pointsOf(q, picked) : 0) + ' pts si aciertas · elección definitiva';
-      card.append(el('p', note, 'ae-season-note' + (q.status === 'settled' && existing.awarded_points > 0 ? ' is-won' : '')));
+      const selected = picked || { label: 'Selección registrada' };
+      const settled = q.status === 'settled';
+      const won = settled && Number(existing.awarded_points) > 0;
+      const receipt = el('div', null, 'ae-season-receipt');
+      const copy = el('div', null, 'ae-season-receipt-copy');
+      copy.append(el('span', 'ESTA ES TU ELECCIÓN', 'ae-season-receipt-kicker'),
+        el('strong', selected.label, 'ae-season-receipt-team'));
+      copy.append(el('span', settled
+        ? (won ? '+' + existing.awarded_points + ' puntos sumados a tus Takes' : 'Resultado confirmado · 0 puntos')
+        : (picked ? '+' + pointsOf(q, picked) + ' puntos si aciertas · elección definitiva' : 'Elección definitiva'),
+        'ae-season-receipt-detail'));
+      const state = el('span', settled ? (won ? 'Acertaste' : 'No acertaste') : '✓ Pick guardado',
+        'ae-season-receipt-state' + (settled ? (won ? ' is-won' : ' is-lost') : ''));
+      receipt.append(crestOf(q, selected), copy, state);
+      card.append(receipt);
+    } else {
+      // Sin pick guardado: se mantiene disponible la selección normal de equipos.
+      const grid = el('div', null, 'ae-season-options');
+      for (const o of sortOptions(q, optionsOf(q))) {
+        const value = pointsOf(q, o);
+        const winner = q.status === 'settled' && q.correct_option_id === o.id;
+        const b = el('button', null, 'ae-season-option');
+        b.type = 'button'; b.title = o.label; b.dataset.team = o.label;
+        b.append(crestOf(q, o), el('span', o.label, 'sr-only'), el('strong', '+' + value, 'ae-season-option-points'));
+        b.setAttribute('aria-label', o.label + ', ' + value + ' puntos si aciertas' + (winner ? ', resultado correcto' : ''));
+        b.disabled = busy || !open;
+        if (winner) b.classList.add('is-winner');
+        b.addEventListener('click', () => submit(q, o));
+        grid.append(b);
+      }
+      card.append(grid);
     }
-    // Mientras la pregunta está abierta no hay botones: la elección es definitiva.
-    // Al cerrar, el admin valida el resultado (o anula una pregunta caducada sin respuestas).
+
+    // El cierre y la validación administrativa mantienen su funcionamiento.
     if (isAdmin() && q.status === 'open' && !open) card.append(adminTools(q));
     return card;
   }
@@ -155,6 +174,11 @@
     tabs.replaceChildren(...leagues.map(c => {
       const b = el('button', LEAGUES[c] || c); b.type = 'button'; b.setAttribute('role', 'tab');
       b.setAttribute('aria-selected', String(c === active));
+      if (list.some(q => q.competition === c && mine.some(m => m.question_id === q.id))) {
+        b.classList.add('has-pick');
+        b.append(el('span', '✓', 'ae-season-tab-saved'));
+        b.setAttribute('aria-label', (LEAGUES[c] || c) + ', pick guardado');
+      }
       b.addEventListener('click', () => { active = c; render(); });
       return b;
     }));
