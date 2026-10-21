@@ -1,4 +1,4 @@
-name: TikTok original music checks
+name: Social original music checks
 
 on:
   pull_request:
@@ -7,6 +7,8 @@ on:
       - 'supabase/20_cam_social_tiktok_music.sql'
       - 'supabase/21_cam_social_tiktok_mime_fallback.sql'
       - 'tests/social-video-publication.mjs'
+      - 'tests/social-instagram-publication.mjs'
+      - 'supabase/migrations/*cam_instagram_music_publication.sql'
       - '.github/workflows/cam-social-video*.yml'
   workflow_dispatch:
 
@@ -32,7 +34,7 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg fonts-dejavu-core
           python -m pip install --disable-pip-version-check 'Pillow==11.3.0'
-      - name: Verify TikTok job routing, photo X channel, and retries
-        run: node tests/social-video-publication.mjs
+      - name: Verify video routing, photo X channel, and retries
+        run: node tests/social-video-publication.mjs && node tests/social-instagram-publication.mjs
       - name: Verify original audio is embedded in MP4
         run: python scripts/cam_social_make_video.py --smoke-test

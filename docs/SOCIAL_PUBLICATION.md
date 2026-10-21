@@ -110,3 +110,37 @@ Validación: `node tests/social-video-publication.mjs` y
 `python scripts/cam_social_make_video.py --smoke-test` (FFmpeg, Pillow).
 La música es una secuencia instrumental original sintetizada sin samples
 ajenos; no equivale a utilizar música del catálogo de TikTok.
+
+
+## Instagram automático con música original (21 de octubre de 2026)
+
+Migración: `supabase/migrations/20261021154636_cam_instagram_music_publication.sql`,
+después de la instalación social y del MP4 de TikTok. Amplía los canales admitidos
+con `instagram`; no inventa un ID de canal ni importa publicaciones antiguas.
+Tras conectar y verificar **cam_sports_club** en Buffer, se configura su ID real
+en `cam_social.channels`. Solo se comparten los nuevos eventos desde entonces.
+
+El usuario eligió **Todo automático**: Instagram recibe el mismo MP4 vertical
+con instrumental original incorporada que TikTok, con
+`metadata.instagram: {type: "reel", shouldShareToFeed: true}`. Aparece como Reel
+y en el feed. Usa el texto del evento (o `instagram_text` cuando exista). X
+conserva su flujo vigente. No hay canciones comerciales ni selección automática
+de música del catálogo de Instagram en este modo.
+
+La documentación y la introspección de la API pública de Buffer consultadas
+el 21 de octubre permiten consultar audio de Instagram, pero
+`InstagramPostMetadataInput` no admite adjuntar el audio a `createPost`.
+`stickerFields.music` es una indicación para publicación con recordatorio,
+no una canción adjunta. El selector nativo de canciones que ofrece el composer
+de Buffer es distinto de esta integración por API.
+
+El worker devuelve un solo trabajo por evento aunque las dos redes esperen
+el vídeo. Funciona también con Instagram como único canal de vídeo activo.
+Antes de enviar cada Reel, se verifica el MP4 público; nunca se sustituye
+por una foto silenciosa. Se conservan deduplicación, visibilidad, límites,
+tratamiento de errores inciertos y permisos privados.
+
+Validación: `node tests/social-instagram-publication.mjs`, regresiones sociales
+existentes, `npm run test:editor` y el smoke test H.264/AAC del renderer.
+La conexión OAuth de Instagram debe completarse antes de activar el canal.
+Una prueba local o una respuesta `accepted` no demuestra publicación real.

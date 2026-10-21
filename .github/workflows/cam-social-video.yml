@@ -1,4 +1,4 @@
-name: CAM Sports TikTok audio videos
+name: CAM Sports Instagram and TikTok audio videos
 
 on:
   schedule:
@@ -22,7 +22,7 @@ jobs:
         with:
           ref: main
           persist-credentials: true
-      - name: Check whether any TikTok videos are pending
+      - name: Check whether any social videos are pending
         id: waiting
         run: |
           response=$(curl --fail-with-body --silent --show-error --retry 3 \
@@ -32,7 +32,7 @@ jobs:
           echo "$response" | jq -e 'type == "array"' >/dev/null
           count=$(echo "$response" | jq 'length')
           echo "pending=$count" >> "$GITHUB_OUTPUT"
-          echo "Waiting TikTok videos: $count"
+          echo "Waiting Instagram/TikTok videos: $count"
       - uses: actions/setup-python@v5
         if: steps.waiting.outputs.pending != '0'
         with:
@@ -46,7 +46,7 @@ jobs:
       - name: Verify audio and MP4 generation
         if: steps.waiting.outputs.pending != '0'
         run: python scripts/cam_social_make_video.py --smoke-test
-      - name: Render public editorial jobs waiting for TikTok
+      - name: Render public editorial jobs waiting for Instagram or TikTok
         if: steps.waiting.outputs.pending != '0'
         run: python scripts/cam_social_make_video.py
       - name: Save MP4s for the CAM Sports publisher
@@ -59,6 +59,6 @@ jobs:
           git config user.name "CAM Sports media bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add assets/social-videos/
-          git commit -m "media: generate licensed-original TikTok music videos [skip ci]"
+          git commit -m "media: generate original music videos for Instagram and TikTok [skip ci]"
           git pull --rebase origin main
           git push origin HEAD:main
