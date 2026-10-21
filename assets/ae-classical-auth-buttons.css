@@ -1904,6 +1904,7 @@ html body #aeNotificationsDialog .ae-notifications-footer{flex-wrap:wrap!importa
 html body #camWelcomeAdminPreview:not([hidden]){margin:4px 0!important;min-height:36px!important;}
 
 
+/* High-resolution marble paintings replace the tiny preview backdrops that pixelated when stretched across the welcome dialog.  Keep live HTML, interaction and typography unchanged. */
 /* CAM SPORTS · bienvenida pictórica · edición día/noche (2026-10-20)
  * Visual only: do not change first-registration, notification or navigation logic.
  * Art assets are atmosphere only; readable text and actions remain real HTML. */
@@ -1923,7 +1924,7 @@ html body #camWelcomeDialog::backdrop{background:rgba(4,14,24,.72);backdrop-filt
 html body #camWelcomeDialog .cam-welcome-frame{
   position:relative;min-height:0;border:0!important;overflow:hidden;
   background-color:#102431!important;
-  background-image:linear-gradient(180deg,rgba(3,15,25,.25) 0%,rgba(4,16,27,.48) 30%,rgba(6,19,28,.56) 72%,rgba(3,13,20,.66) 100%),url('cam-welcome-noche.webp')!important;
+  background-image:linear-gradient(180deg,rgba(3,15,25,.25) 0%,rgba(4,16,27,.48) 30%,rgba(6,19,28,.56) 72%,rgba(3,13,20,.66) 100%),url('ae-chef-marble-night.webp')!important;
   background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important;
 }
 html body #camWelcomeDialog .cam-welcome-top{
@@ -2049,7 +2050,7 @@ html:not(.dark) body dialog#camWelcomeDialog[open]{
 }
 html:not(.dark) body #camWelcomeDialog .cam-welcome-frame{
   background-color:#e9d9bd!important;
-  background-image:linear-gradient(180deg,rgba(255,245,222,.62) 0%,rgba(255,248,229,.72) 30%,rgba(252,238,209,.53) 67%,rgba(244,221,183,.46) 100%),url('cam-welcome-dia.webp')!important;
+  background-image:linear-gradient(180deg,rgba(255,245,222,.62) 0%,rgba(255,248,229,.72) 30%,rgba(252,238,209,.53) 67%,rgba(244,221,183,.46) 100%),url('ae-chef-marble-day.webp')!important;
 }
 html:not(.dark) body #camWelcomeDialog #camWelcomeTitle{
   color:#172a32!important;text-shadow:0 2px 10px rgba(255,255,255,.75)!important;
