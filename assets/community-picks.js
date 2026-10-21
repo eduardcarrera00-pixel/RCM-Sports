@@ -188,6 +188,7 @@ function card(p,compact=false,detail=false){
    if(!canVote)b.title='La votación de este Pick está cerrada';
    controls.append(b);
  }
+ if(window.CamPickShare)controls.append(window.CamPickShare.button(p));
  if(!detail){const replies=button('Respuestas '+Number(p.comments_count||0)+(editorial?' ›':''),()=>requestPickReply(p.id));replies.classList.add('cp-replies-button');if(editorial){const icon=document.createElementNS('http://www.w3.org/2000/svg','svg');icon.setAttribute('viewBox','0 0 24 24');icon.setAttribute('aria-hidden','true');const path=document.createElementNS('http://www.w3.org/2000/svg','path');path.setAttribute('d','M5 4h14v11H10l-5 5V4Z');path.setAttribute('fill','none');path.setAttribute('stroke','currentColor');path.setAttribute('stroke-width','1.6');icon.append(path);replies.prepend(icon);}replies.setAttribute('aria-label','Abrir respuestas del Pick: '+p.title+' ('+Number(p.comments_count||0)+')');controls.append(replies);}
  n.append(controls);
  return n;
@@ -883,7 +884,7 @@ function buildComposer(){
    form.reset();while(rows.length>1)rows.pop().box.remove();
    explanation.input.value='';descriptionCount.textContent='0/300';eventDay.input.defaultValue='';eventDay.input.value='';calculate();
    closePickComposer(true);void load();
-   notifyCommunity('Pick publicado con el momio cotejado. Ya puedes recibir votos y comentarios.');
+   notifyCommunity('Pick publicado con el momio cotejado. Ya puedes recibir votos, comentarios y compartirlo desde su tarjeta.');
   }catch(e){status.textContent=message(e);}
   finally{posting=false;calculate();submit.textContent='Publicar Pick';if(closer)closer.disabled=false;}
  };

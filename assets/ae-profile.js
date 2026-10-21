@@ -579,6 +579,7 @@ function renderPickCard(p,feature=false){
   const points=pickPoints(p);
   if(points)foot.append(el('strong',points));
   foot.append(el('span','▲ '+numeric(p.upvotes)),el('span','▼ '+numeric(p.downvotes)));
+  if(window.CamPickShare)foot.append(window.CamPickShare.button(p));
   if(feature){
     const open=el('button','Ver Pick','ae-profile-pick-open');
     open.type='button';

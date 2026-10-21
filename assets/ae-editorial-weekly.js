@@ -42,6 +42,7 @@
    event?.preventDefault();
    event?.stopPropagation();
    if(!active)return;
+   if(window.CamPickShare){window.CamPickShare.open(active,{kind:'weekly',opener:event?.currentTarget});return;}
    const url=shareUrl(active);
    const payload={title:'Pick del día · CAM SPORTS',
      text:active.title+' · '+active.event_name+' · '+active.selection,
