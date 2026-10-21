@@ -71,7 +71,11 @@ const card=d.querySelector('#cpFeed .cp-card');assert.ok(card.classList.contains
 assert.equal(card.querySelector('.cp-card-title').textContent,'Monterrey vs Tigres');
 assert.equal(card.querySelector('.cp-pick-line-choice').textContent,'Tigres gana');
 assert.equal(card.querySelector('.cp-card-legs').tagName,'OL');
-assert.equal(card.querySelector('.cp-picks-count').textContent,'PICK SIMPLE');
+assert.equal(card.querySelector('.cp-picks-count'),null,'Single/combo labels are removed');
+assert.equal(card.querySelector('.cp-feed-meta .cp-card-sport').textContent,'Fútbol');
+assert.equal(card.querySelector('.cp-feed-meta .cp-odds').textContent,'Cuota +200');
+assert.equal(card.querySelector('.cp-feed-meta .cp-card-odds').parentElement.className,'cp-feed-meta');
+
 assert.equal(card.querySelector('.cp-pick-line-number'),null);
 assert.equal(card.querySelector('.cp-feed-initial').textContent,'S');
 card.querySelector('.cp-feed-author').click();assert.equal(openedProfile,'author-1');
@@ -82,4 +86,8 @@ card.querySelector('.cp-upvote').click();await settle();assert.equal(votes.size,
 d.getElementById('cpViewAll').click();await settle();
 assert.equal(d.querySelector('#cpArchiveFeed .cp-feed-editorial'),null,'Archive presentation remains separate');
 assert.match(d.querySelector('#cpArchiveFeed .cp-card-title').textContent,/Tigres gana/);
+records[0].moderation_status='approved';
+records[0].capture_check={method:'on_device_ocr'};
+d.dispatchEvent(new w.Event('visibilitychange'));await settle();
+assert.equal(d.querySelector('#cpFeed .cp-card-state'),null,'Approved OCR source note is not displayed on feed');
 console.log('Editorial Pick cards: readable title, profile, replies, pending votes, and original archive/detail passed.');process.exit(0);

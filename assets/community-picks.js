@@ -86,7 +86,14 @@ function card(p,compact=false,detail=false){
    header.append(el('strong','@'+(p.author||'Aficionado'),'cp-feed-author-label'));
  }
  // No repetimos la fecha de publicación ni la del evento en la vista previa.
- if(first?.sport)header.append(el('span',String(first.sport),'cp-card-sport'));
+ let feedMeta=null;
+ if(editorial){
+  feedMeta=el('div',null,'cp-feed-meta');
+  if(first?.sport)feedMeta.append(el('span',String(first.sport),'cp-card-sport'));
+  header.append(feedMeta);
+ }else if(first?.sport){
+  header.append(el('span',String(first.sport),'cp-card-sport'));
+ }
  if(detail&&p.event_date)header.append(el('span','Evento '+p.event_date,'cp-event-date'));
  if(!isActive(p))header.append(el('strong',resultLabel(p),'cp-result-badge'));
  n.append(header);
@@ -111,7 +118,7 @@ function card(p,compact=false,detail=false){
     .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
     .replace(/[^a-z0-9]+/g,' ').trim();
   const titleKey=simplify(p.title);
-  let selectionCount=0;
+  
   if(editorial){
     // Each receipt may store several markets in one database leg.
     const choices=[];
@@ -121,7 +128,7 @@ function card(p,compact=false,detail=false){
       if(!selections.length&&leg.event)choices.push({leg,selection:''});
     }
     if(choices.length){
-      selectionCount=choices.length;
+      
       
       
       choices.forEach(({leg,selection},i)=>{
@@ -150,11 +157,16 @@ function card(p,compact=false,detail=false){
   }
   if(legs.childNodes.length)n.append(legs);
  const odds=el('div',null,'cp-card-odds');
- if(editorial)odds.append(el('span',selectionCount===1?'PICK SIMPLE':'COMBINADA · '+selectionCount+' SELECCIONES','cp-picks-count'));
+ 
  odds.append(el('strong','Cuota '+(Number(p.american_odds)>0?'+':'')+p.american_odds,'cp-odds'));
- const status=el('small',p.moderation_status==='approved'?(['on_device_ocr','ai_vision'].includes(p.capture_check?.method)?'Momio cotejado con captura':'Cuota aprobada'):p.moderation_status==='rejected'?'Cuota rechazada':'Cuota en revisión · votos abiertos','cp-card-state');
- if(editorial)n.append(status);else odds.append(status);
- n.append(odds);
+ const statusText=p.moderation_status==='approved'
+   ?(editorial?'':(['on_device_ocr','ai_vision'].includes(p.capture_check?.method)?'Momio cotejado con captura':'Cuota aprobada'))
+   :p.moderation_status==='rejected'?'Cuota rechazada':'Cuota en revisión · votos abiertos';
+ if(statusText){
+  const status=el('small',statusText,'cp-card-state');
+  if(editorial)n.append(status);else odds.append(status);
+ }
+ if(editorial)feedMeta.append(odds);else n.append(odds);
  if(p.explanation)n.append(el('p',p.explanation,'cp-explanation'));
  const controls=el('div',null,'cp-actions');
  const canVote=['pending','approved'].includes(p.moderation_status)&&isActive(p);

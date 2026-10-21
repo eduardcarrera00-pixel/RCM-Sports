@@ -104,10 +104,12 @@ assert.equal(votes.size,1,'Another account can vote while Pick is pending');
 records[0].legs[0].selection='Paris St-G · MONEYLINE (3-WAY) + Over 3.5 Goals · OVER/UNDER 3.5 GOALS + Yes · BOTH TEAMS TO SCORE';
 d.querySelector('#cpFeed .cp-downvote').click();await settle();
 assert.equal(d.querySelectorAll('#cpFeed .cp-pick-line').length,3,'Combined Picks display three individually separated markets');
-assert.match(d.querySelector('#cpFeed .cp-picks-count').textContent,/3 SELECCIONES/);
+assert.equal(d.querySelector('#cpFeed .cp-picks-count'),null,'No count labels appear in Picks');
 assert.equal(d.querySelector('#cpFeed .cp-card-legs').tagName,'OL','Picks use one ordered, accessible list');
 assert.equal(d.querySelector('#cpFeed .cp-pick-line-number'),null,'Connecting circles replace numbered boxes');
-assert.match(d.querySelector('#cpFeed .cp-card-odds').textContent,/COMBINADA.*Cuota/s);
+assert.equal(d.querySelector('#cpFeed .cp-feed-meta .cp-card-sport').textContent,'NFL');
+assert.equal(d.querySelector('#cpFeed .cp-feed-meta .cp-odds').textContent,'Cuota +150');
+assert.equal(d.querySelector('#cpFeed .cp-feed-meta .cp-card-odds').parentElement.className,'cp-feed-meta','Odds are located below the sport, within the header');
 
 assert.match(d.querySelectorAll('#cpFeed .cp-pick-line')[1].textContent,/Más de 3.5 goles/);
 assert.match(d.querySelectorAll('#cpFeed .cp-pick-line')[2].textContent,/Ambos equipos marcan/);
