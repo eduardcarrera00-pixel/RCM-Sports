@@ -202,5 +202,14 @@ fill('Borrador sin sesión','Equipo G vs H');user=null;w.authOpened=false;
 await form.onsubmit({preventDefault(){}});await settle();assert.equal(w.authOpened,true);assert.equal(modal.open,false);
 assert.equal(field('explanation').value,'Borrador sin sesión');assert.equal(records.length,3);
 assert.equal(d.body.classList.contains('ae-pick-composing'),false);
+// Mobile Chef recipe: review responsive structure without opening a browser viewport.
+const chefMobileCss=fs.readFileSync('assets/ae-chef-parchment-mobile.css','utf8');
+assert.ok(chefMobileCss.includes('@media screen and (max-width:780px)'), 'Phone-specific styles must exist');
+assert.match(chefMobileCss,/height:100dvh!important/,'Mobile modal uses the dynamic viewport');
+assert.match(chefMobileCss,/safe-area-inset-bottom/,'Composer stays inside the mobile safe area');
+assert.match(chefMobileCss,/min-height:44px!important/,'Close and vote controls preserve touch targets');
+assert.ok(chefMobileCss.includes('grid-column:1/-1!important'), 'Author and metadata can use the full phone width');
+assert.match(chefMobileCss,/cp-pick-line-choice/,'Pick selections remain visible in the mobile layout');
+assert.equal(JSON.parse(fs.readFileSync('assets/style-sources.json','utf8')).at(-1),'assets/ae-chef-parchment-mobile.css','Mobile overrides compile after the desktop parchment design');
 console.log('PASS: auth before Mejores platos replies, public reading, resume, publishing, voting and drafts.');
 await w.happyDOM.close();
