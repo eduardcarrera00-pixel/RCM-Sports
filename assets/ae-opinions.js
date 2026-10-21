@@ -55,8 +55,31 @@
   }
 
   // ---------- Listado ----------
+  // Las noticias son referencias a los artículos originales: no se copian a
+  // ae_opinions, no cambian la fecha de publicación ni pierden sus comentarios.
+  function sportNews() {
+    const source = typeof articles !== 'undefined' && Array.isArray(articles) ? articles : [];
+    return source.filter(a => a && ['NFL', 'Fútbol'].includes(a.category))
+      .map(a => ({
+        id: a.id,
+        sport: a.category === 'NFL' ? 'nfl' : 'futbol',
+        title: a.title || 'Sin título',
+        summary: a.summary || '',
+        body: a.body || '',
+        image: a.image || '',
+        image_focus_x: a.image_focus_x,
+        image_focus_y: a.image_focus_y,
+        author: a.author || 'CAM Sports',
+        created_at: a.createdAt,
+        readTime: a.readTime,
+        is_published: true,
+        featured: false,
+        is_news: true
+      }));
+  }
+
   function visible() {
-    const list = items.filter(o => active === 'todas' || o.sport === active);
+    const list = [...items, ...sportNews()].filter(o => active === 'todas' || o.sport === active);
     return list.sort((a, b) => (b.featured === true) - (a.featured === true) || new Date(b.created_at) - new Date(a.created_at));
   }
 
@@ -101,8 +124,9 @@
     const m = el('p', null, 'ae-opinion-meta');
     m.append(el('span', SPORT_NAME[o.sport] || '', 'ae-opinion-sport'));
     m.append(el('span', shortDate(o.created_at)));
-    m.append(el('span', readMinutes(o.body) + ' min de lectura'));
-    if (!o.is_published) m.append(el('span', 'Borrador', 'ae-opinion-flag'));
+    m.append(el('span', o.readTime || readMinutes(o.body) + ' min de lectura'));
+    if (o.is_news) m.append(el('span', 'Noticia', 'ae-opinion-flag'));
+    else if (!o.is_published) m.append(el('span', 'Borrador', 'ae-opinion-flag'));
     else if (o.featured) m.append(el('span', 'Destacada', 'ae-opinion-flag is-featured'));
     return m;
   }
@@ -111,8 +135,15 @@
     const a = el('article', null, 'ae-opinion-card' + (lead ? ' is-lead' : '') + (o.is_published ? '' : ' is-draft'));
     const b = el('button', null, 'ae-opinion-open');
     b.type = 'button';
-    b.setAttribute('aria-label', 'Leer opinión: ' + o.title);
-    b.addEventListener('click', () => openReader(o.id, b));
+    b.setAttribute('aria-label', (o.is_news ? 'Leer noticia: ' : 'Leer opinión: ') + o.title);
+    b.addEventListener('click', () => {
+      if (o.is_news) {
+        // Abrir la noticia original con sus votos, comentarios y enlace.
+        if (typeof openArticleModal === 'function') openArticleModal(o.id);
+      } else {
+        openReader(o.id, b);
+      }
+    });
     const text = el('div', null, 'ae-opinion-text');
     text.append(meta(o), el('h3', o.title, 'ae-opinion-title'), el('p', excerpt(o), 'ae-opinion-excerpt'), el('p', 'Por ' + o.author, 'ae-opinion-author'));
     b.append(media(o, 'ae-opinion-media'), text);
@@ -127,15 +158,15 @@
     renderTabs();
     const list = $('aeOpinionsList'); list.replaceChildren();
     list.setAttribute('aria-busy', String(!loaded));
-    if (!loaded) { list.append(el('p', 'Cargando opiniones…', 'ae-opinions-empty')); return; }
+    const shown = visible();
+    if (!loaded && !shown.length) { list.append(el('p', 'Cargando opiniones…', 'ae-opinions-empty')); return; }
     if (failed) {
       const box = el('div', null, 'ae-opinions-empty');
       const retry = el('button', 'Reintentar', 'ae-opinions-button is-secondary'); retry.type = 'button';
       retry.addEventListener('click', () => { loaded = false; render(); load(true); });
-      box.append(el('h3', 'No se pudieron cargar las opiniones'), el('p', 'Revisa tu conexión e inténtalo de nuevo.'), retry);
-      list.append(box); return;
+      box.append(el('p', 'No se pudieron cargar las columnas editoriales. Las noticias siguen disponibles.'), retry);
+      list.append(box);
     }
-    const shown = visible();
     if (!shown.length) {
       const empty = el('div', null, 'ae-opinions-empty');
       const name = active === 'todas' ? '' : ' de ' + SPORT_NAME[active];
@@ -387,5 +418,10 @@
     } catch {}
   });
 
-  window.aeOpinions = { show, rerender: () => { if (!$('aeOpinions')?.hidden) { loaded ? load(true) : show(); } }, reload: () => load(true) };
+  window.aeOpinions = {
+    show,
+    rerender: () => { if (!$('aeOpinions')?.hidden) { loaded ? load(true) : show(); } },
+    reload: () => load(true),
+    refreshNews: () => { if (!$('aeOpinions')?.hidden) render(); }
+  };
 })();
