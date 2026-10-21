@@ -44,7 +44,7 @@
    if(!active)return;
    if(window.CamPickShare){window.CamPickShare.open(active,{kind:'weekly',opener:event?.currentTarget});return;}
    const url=shareUrl(active);
-   const payload={title:'Pick del día · CAM SPORTS',
+   const payload={title:'Pick del editor · CAM SPORTS',
      text:active.title+' · '+active.event_name+' · '+active.selection,
      url};
    if(typeof navigator.share==='function'){
@@ -64,10 +64,10 @@
        input.remove();
        if(!copied)throw Error('Copy not supported');
      }
-     if(typeof notifyCommunity==='function')notifyCommunity('Enlace del Pick del día copiado.');
+     if(typeof notifyCommunity==='function')notifyCommunity('Enlace del Pick del editor copiado.');
    }catch{
      // Browsers that deny clipboard access still expose the exact URL to copy.
-     window.prompt('Copia el enlace del Pick del día:',url);
+     window.prompt('Copia el enlace del Pick del editor:',url);
    }
  }
  function revealSharedPick(){
@@ -81,7 +81,7 @@
      if(details)details.open=true;
    }else{
      featured.querySelector('.ae-weekly-shared-notice')?.remove();
-     const notice=make('p','El Pick compartido ya no está publicado o ha vencido. Debajo puedes consultar el Pick del día vigente.','ae-weekly-shared-notice');
+     const notice=make('p','El Pick compartido ya no está publicado o ha vencido. Debajo puedes consultar el Pick del editor vigente.','ae-weekly-shared-notice');
      $('picksFeaturedCard')?.before(notice);
    }
    // Mobile Home relocates the actual Picks panel. Allow the category layout
@@ -101,7 +101,7 @@
      if(photoUrl&&!bannerUrl){const photo=make('img',undefined,'ae-weekly-home-thumbnail');photo.src=photoUrl;photo.style.setProperty('--ae-image-focus',framedPosition(p,'image'));photo.alt='Imagen del Pick editorial';photo.loading='lazy';box.append(photo);}
      // El banner sigue intacto en escritorio; en el diseño móvil usamos
      // una miniatura auténtica del Pick sin duplicar sus datos.
-     if(bannerUrl){const thumb=make('img',undefined,'ae-weekly-mobile-banner-thumb');thumb.src=photoUrl||bannerUrl;thumb.style.setProperty('--ae-image-focus',framedPosition(p,photoUrl?'image':'banner'));thumb.alt='Imagen del Pick del día';thumb.loading='lazy';box.append(thumb);}
+     if(bannerUrl){const thumb=make('img',undefined,'ae-weekly-mobile-banner-thumb');thumb.src=photoUrl||bannerUrl;thumb.style.setProperty('--ae-image-focus',framedPosition(p,photoUrl?'image':'banner'));thumb.alt='Imagen del Pick del editor';thumb.loading='lazy';box.append(thumb);}
      const go=()=>{
        if(typeof filterByCategory==='function')filterByCategory('Picks');
        const detail=$('picksFeaturedCard')?.querySelector('details');
@@ -109,7 +109,7 @@
        $('picksFeatured')?.scrollIntoView({behavior:'smooth',block:'start'});
      };
      box.setAttribute('role','button');box.tabIndex=0;
-     box.setAttribute('aria-label','Leer Pick del día: '+p.title);
+     box.setAttribute('aria-label','Leer Pick del editor: '+p.title);
      box.addEventListener('click',go);
      box.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();go();}});
      box.append(make('h3',p.title,'ae-weekly-title'),make('p',p.event_name,'ae-weekly-event'));
@@ -125,7 +125,7 @@
    summary.append(make('span','Ver análisis y detalles ↓','ae-weekly-expand-hint'));
    const expanded=make('div',undefined,'ae-weekly-expanded-content');
    const photoUrl=editorialUrl(p.image_path,p.image_url);
-   if(photoUrl){const photo=make('img',undefined,'ae-weekly-inline-photo');photo.src=photoUrl;photo.style.setProperty('--ae-image-focus',framedPosition(p,'image'));photo.alt='Imagen del Pick del día';photo.loading='lazy';expanded.append(photo);}
+   if(photoUrl){const photo=make('img',undefined,'ae-weekly-inline-photo');photo.src=photoUrl;photo.style.setProperty('--ae-image-focus',framedPosition(p,'image'));photo.alt='Imagen del Pick del editor';photo.loading='lazy';expanded.append(photo);}
    expanded.append(make('p',p.event_name,'ae-weekly-event'),make('p',p.analysis,'ae-weekly-analysis'));
    expanded.append(make('small','Cuota publicada por CAM SPORTS; no verificada en tiempo real. Sin apuestas en esta página.','ae-weekly-disclaimer'));
    details.append(summary,expanded);box.append(details);
@@ -170,7 +170,7 @@
      const area=$(id);if(!area)continue;
      area.replaceChildren();
      if(active)area.append(createCard(active,preview && !weeklyMobile.matches));
-     else area.append(make('p','CAM SPORTS todavía no ha publicado un Pick del día.','ae-weekly-empty'));
+     else area.append(make('p','CAM SPORTS todavía no ha publicado un Pick del editor.','ae-weekly-empty'));
    }
    document.dispatchEvent(new Event('cam:weekly-render'));
  }
@@ -238,8 +238,8 @@
    updateEditorLabels();
    const status=$('aeWeeklyPickAdminStatus');
    if(status)status.textContent=recovered?
-     'Confirmado en Supabase: los cambios sí se habían guardado. Ya están aplicados al Pick del día.':
-     isEditing?'Cambios guardados correctamente en el Pick del día.':'Pick del día publicado correctamente.';
+     'Confirmado en Supabase: los cambios sí se habían guardado. Ya están aplicados al Pick del editor.':
+     isEditing?'Cambios guardados correctamente en el Pick del editor.':'Pick del editor publicado correctamente.';
    await load();
  }
  async function manuallyCheckSave(){
@@ -269,11 +269,11 @@
  function updateEditorLabels(){
    const isEditing=Boolean(editing);
    const save=$('aeWeeklySaveButton');
-   if(save)save.textContent=isEditing?'Guardar cambios':'Publicar Pick del día';
+   if(save)save.textContent=isEditing?'Guardar cambios':'Publicar Pick del editor';
    const cancel=$('aeWeeklyCancelEdit');if(cancel)cancel.hidden=!isEditing;
    const note=$('aeWeeklyEditorMode');if(note)note.hidden=!isEditing;
    const summary=$('aeWeeklyAdminSummary');
-   if(summary)summary.textContent=isEditing?'Administrar · Editando Pick del día':'Administrar · Publicar Pick del día';
+   if(summary)summary.textContent=isEditing?'Administrar · Editando Pick del editor':'Administrar · Publicar Pick del editor';
  }
  function cancelEdit(){
    if(submitting)return;
@@ -327,7 +327,7 @@
    const expires=new Date(form.elements.expires_at.value);
    if(!Number.isFinite(expires.getTime())||expires.getTime()<=Date.now()){status.textContent='Elige un cierre futuro.';return;}
    const isEditing=Boolean(editing), editSnapshot=editing?{...editing}:null;
-   if(!confirm(isEditing?'¿Guardar los cambios en este Pick del día? La publicación conservará su identidad.':'¿Publicar el Pick editorial y sustituir el anterior?'))return;
+   if(!confirm(isEditing?'¿Guardar los cambios en este Pick del editor? La publicación conservará su identidad.':'¿Publicar el Pick editorial y sustituir el anterior?'))return;
    submitting=true;send.disabled=true;uncertainSave=null;setCheckVisible(false);
    let stage='banner',rpcAttempted=false,attemptedParams=null;
    status.textContent='Preparando imágenes…';
