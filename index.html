@@ -2116,7 +2116,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
                 <div class="ae-chefs-table-cols" aria-hidden="true"><span>#</span><span>AFICIONADO</span><span>%</span><span>PTS</span></div>
                 <ol id="cpLeaderboard" class="ae-take-leaderboard-list" role="region" aria-label="Ranking de Mejores Chefs; desplázate para consultar más puestos" aria-live="polite"></ol>
                 <details class="ae-chefs-scoring-info"><summary>¿Cómo se calculan los puntos?</summary>
-                <p class="ae-picks-ranking-intro"><strong>¡Atención: fallar resta puntos!</strong> Publicar más Picks no da puntos por sí solo. Cada acierto suma el valor absoluto de la cuota americana ÷ 100; cada fallo resta esa misma cantidad; si se anula, 0 puntos. Ejemplo: una cuota +250 suma 2,50 puntos al acertar y resta 2,50 al fallar. <strong>Ranking mensual:</strong> empieza de cero el día 1 de cada mes (hora de Toronto, según la fecha de confirmación). <strong>Ranking histórico:</strong> conserva todos los resultados.</p>
+                <p class="ae-picks-ranking-intro"><strong>¡Atención: fallar resta puntos!</strong> Publicar más Picks no da puntos por sí solo. Cada acierto suma el valor absoluto de la cuota americana ÷ 100; cada fallo resta esa misma cantidad; si se anula, 0 puntos. Ejemplo: una cuota +250 suma 2,50 puntos al acertar y resta 2,50 al fallar. Las selecciones de <strong>¿Quién será campeón?</strong> también cuentan: al acertar sumas los puntos indicados junto al escudo; si fallas, sumas 0. <strong>Ranking mensual:</strong> empieza de cero el día 1 de cada mes (hora de Toronto, según la fecha de confirmación). <strong>Ranking histórico:</strong> conserva todos los resultados.</p>
                 </details>
               </section>
               <section class="ae-takes-side ae-inline-chefs-board ae-worst-chefs-board" aria-labelledby="cpWorstRankingTitle">
@@ -2132,17 +2132,6 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
               </div>
             </section>
           </div>
-          <!-- Predicciones de temporada después de Eres Chef, últimos Picks y sus rankings. -->
-          <section id="aeSeasonPredictions" class="ae-season-predictions" aria-labelledby="aeSeasonTitle" hidden>
-            <header class="ae-season-head">
-              <span class="ae-season-overline">PREDICCIONES · CAM SPORTS</span>
-              <h2 id="aeSeasonTitle">¿Quién será campeón?</h2>
-              <p>Una predicción por pregunta, antes del cierre. Cada opción paga según lo difícil que es: lo obvio vale poco y la sorpresa, hasta 20 pts.</p>
-            </header>
-            <nav id="aeSeasonTabs" class="ae-season-tabs" role="tablist" aria-label="Competiciones"></nav>
-            <div id="aeSeasonList" class="ae-season-list"></div>
-            <p id="aeSeasonStatus" class="ae-season-status" role="status" aria-live="polite"></p>
-          </section>
           <details id="aeWeeklyPickAdmin" class="ae-takes-admin ae-weekly-admin" hidden><summary id="aeWeeklyAdminSummary">Administrar · Publicar Pick de la Semana</summary>
             <form id="aeWeeklyPickForm">
                <p id="aeWeeklyEditorMode" class="ae-weekly-edit-status" hidden role="status">Editando el Pick de la Semana. Los archivos originales se conservarán mientras no los sustituyas.</p>
@@ -2414,6 +2403,17 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
           <button id="aeFootballMoreTakes" type="button" class="ae-football-mobile-cta" aria-controls="freeTakesFeed" aria-expanded="false">Ver todos los Takes <span aria-hidden="true">→</span></button>
           <button id="freeTakesMore" type="button" class="ae-history-more" hidden>Ver todos los Takes <span aria-hidden="true">→</span></button>
           <div id="aeNflTakeFooterCta" class="ae-nfl-take-footer" hidden></div>
+          <!-- Pick de campeón: entre los últimos Takes y Respira/Vende Humos o Savant/Rookie. -->
+          <section id="aeSeasonPredictions" class="ae-season-predictions" aria-labelledby="aeSeasonTitle" hidden>
+            <header class="ae-season-head">
+              <span id="aeSeasonOverline" class="ae-season-overline">PICKS · CAM SPORTS</span>
+              <h2 id="aeSeasonTitle">¿Quién será campeón?</h2>
+              <p>Elige un escudo antes del cierre. Los puntos indicados se suman a tu clasificación de Picks cuando se confirma al campeón.</p>
+            </header>
+            <nav id="aeSeasonTabs" class="ae-season-tabs" role="tablist" aria-label="Competiciones"></nav>
+            <div id="aeSeasonList" class="ae-season-list"></div>
+            <p id="aeSeasonStatus" class="ae-season-status" role="status" aria-live="polite"></p>
+          </section>
           <section id="aeSportTakeRanking" class="ae-take-ranking" aria-labelledby="aeSportTakeRankingTitle">
             <div class="ae-take-ranking-head"><div><span class="ae-take-ranking-kicker">CAM SPORTS · COMUNIDAD</span><h2 id="aeSportTakeRankingTitle">Top 10 · NFL</h2></div><p id="aeSportTakeRankingDescription">Los admins confirman cada acierto y asignan de 1 a 100 puntos. Un fallo vale 0.</p></div>
             <div class="ae-take-ranking-tabs" role="group" aria-label="Periodo del ranking de Takes"><button type="button" data-take-rank="month" aria-pressed="true">Mensual</button><button type="button" data-take-rank="all" aria-pressed="false">Histórico</button></div>
@@ -4464,7 +4464,7 @@ html .cam-weekly-result-surface .cam-weekly-result-on-photo{
 </style>
 <script src="assets/cam-weekly-results.js?v=20261020-weekly-badge-mobile-fit-1"></script>
 <script src="assets/ae-profile.js?v=20261020-prestige-1"></script>
-<script src="assets/ae-season-predictions.js?v=20261020-season-1"></script>
+<script src="assets/ae-season-predictions.js?v=20261020-sports-logos-1"></script>
 <script src="assets/ae-opinions.js?v=20261020-opinions-1"></script>
 <script src="assets/ae-home-takes.js?v=20261017-esports-league-v1"></script>
 <script src="assets/ae-home-take-discoveries.js?v=20261018-reply-totals-1"></script>

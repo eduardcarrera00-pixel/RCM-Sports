@@ -1,61 +1,59 @@
-/* CAM SPORTS · Predicciones de temporada en Picks. Mismo lenguaje que "Pick de la Semana". */
-#footballTakes .ae-season-predictions{margin:24px 0 0;padding:20px 18px 18px;border:1px solid #bd9b78;
-  background:linear-gradient(120deg,#f7f2eb,#e8eee9);box-shadow:0 8px 20px rgba(5,20,33,.13);color:#334b58}
-#footballTakes .ae-season-predictions[hidden]{display:none!important}
-#footballTakes .ae-season-overline{display:block;font:800 9px/1.2 Inter,system-ui,sans-serif;letter-spacing:.14em;color:#855a38}
-#footballTakes .ae-season-head h2{margin:6px 0 0;font:600 25px/1.1 Newsreader,Georgia,serif;color:#334b58}
-#footballTakes .ae-season-head p{margin:8px 0 0;font:13px/1.55 system-ui,sans-serif;color:#5b5047;max-width:60ch}
-#footballTakes .ae-season-tabs{display:flex;gap:6px;margin:16px 0 0;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
-#footballTakes .ae-season-tabs::-webkit-scrollbar{display:none}
-#footballTakes .ae-season-tabs[hidden]{display:none}
-#footballTakes .ae-season-tabs button{flex:0 0 auto;padding:8px 12px;border:1px solid #b9946d;background:#e9e3da;color:#4e483f;
-  font:750 11.5px/1.2 Inter,system-ui,sans-serif;letter-spacing:.02em;cursor:pointer}
-#footballTakes .ae-season-tabs button[aria-selected=true]{background:#765128;border-color:#ab8351;color:#fff4df}
-#footballTakes .ae-season-list{display:grid;gap:14px;margin-top:14px}
-#footballTakes .ae-season-card{padding:14px;border:1px solid rgba(189,155,120,.6);background:rgba(255,252,246,.72)}
-#footballTakes .ae-season-meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 12px;margin:0;
-  font:800 9px/1.3 Inter,system-ui,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#855a38}
-#footballTakes .ae-season-card h3{margin:6px 0 12px;font:600 19px/1.2 Newsreader,Georgia,serif;color:#213c4e}
-#footballTakes .ae-season-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
-#footballTakes .ae-season-option{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:42px;padding:8px 10px;
-  border:1px solid rgba(185,148,109,.55);background:#fffaf1;color:#2b3f4b;text-align:left;cursor:pointer;
-  font:600 12.5px/1.25 Inter,system-ui,sans-serif}
-#footballTakes .ae-season-option:hover:not(:disabled){border-color:#765128;background:#f4ead9}
-#footballTakes .ae-season-option:focus-visible{outline:2px solid #765128;outline-offset:2px}
-#footballTakes .ae-season-option:disabled{cursor:default}
-#footballTakes .ae-season-option-label{min-width:0;overflow-wrap:anywhere}
-#footballTakes .ae-season-option-points{flex:0 0 auto;min-width:2.4em;padding:3px 6px;text-align:center;background:#efe4d1;color:#765128;
-  font:800 11.5px/1 Inter,system-ui,sans-serif}
-#footballTakes .ae-season-option.is-chosen{border-color:#765128;background:#765128;color:#fff4df}
-#footballTakes .ae-season-option.is-chosen .ae-season-option-points{background:rgba(255,244,223,.18);color:#fff4df}
-#footballTakes .ae-season-option.is-winner{border-color:#245544;background:#245544;color:#e4fff0}
-#footballTakes .ae-season-option.is-winner .ae-season-option-points{background:rgba(228,255,240,.16);color:#e4fff0}
-#footballTakes .ae-season-option:disabled:not(.is-chosen):not(.is-winner){opacity:.55}
-#footballTakes .ae-season-option.is-chosen:disabled,#footballTakes .ae-season-option.is-winner:disabled{opacity:1!important}
-#footballTakes .ae-season-note{margin:12px 0 0;padding-top:10px;border-top:1px solid rgba(189,155,120,.4);font:600 12.5px/1.4 Inter,system-ui,sans-serif;color:#5b5047}
-#footballTakes .ae-season-note.is-won{color:#245544}
-#footballTakes .ae-season-admin{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;padding-top:10px;border-top:1px dashed rgba(189,155,120,.6)}
-#footballTakes .ae-season-admin select{flex:1 1 12rem;min-height:36px;padding:6px 8px;border:1px solid #8b8069;background:#fff;color:#222;font:13px system-ui}
-#footballTakes .ae-season-admin button{min-height:36px;padding:7px 12px;border:0;background:#1d3a2d;color:#fff;font:700 12px Inter,system-ui,sans-serif;cursor:pointer}
-#footballTakes .ae-season-admin button.is-minor{background:transparent;border:1px solid #9a8a72;color:#5b5047}
-#footballTakes .ae-season-status{margin:10px 0 0;font:12.5px/1.4 Inter,system-ui,sans-serif;color:#5b5047}
-#footballTakes .ae-season-status:empty{display:none}
-
-html.dark #footballTakes .ae-season-predictions{background:linear-gradient(105deg,rgba(17,44,62,.86),rgba(10,30,45,.894));color:#fff1e3}
-html.dark #footballTakes .ae-season-overline,html.dark #footballTakes .ae-season-meta{color:#d2ab82}
-html.dark #footballTakes .ae-season-head h2,html.dark #footballTakes .ae-season-card h3{color:#fff1e3}
-html.dark #footballTakes .ae-season-head p,html.dark #footballTakes .ae-season-note,html.dark #footballTakes .ae-season-status{color:#decbb9}
-html.dark #footballTakes .ae-season-tabs button{background:rgba(47,89,110,.55);color:#f1e1d0}
-html.dark #footballTakes .ae-season-tabs button[aria-selected=true]{background:#765128;color:#fff4df}
-html.dark #footballTakes .ae-season-card{background:rgba(9,32,46,.55);border-color:rgba(207,165,117,.4)}
-html.dark #footballTakes .ae-season-option{background:rgba(14,35,50,.7);border-color:rgba(209,175,144,.35);color:#fff2e4}
-html.dark #footballTakes .ae-season-option:hover:not(:disabled){background:#875e48;border-color:#d1af90}
-html.dark #footballTakes .ae-season-option-points{background:rgba(209,175,144,.16);color:#f1c99a}
-html.dark #footballTakes .ae-season-option.is-chosen{background:#79563f;border-color:#d1af90}
-html.dark #footballTakes .ae-season-option.is-winner{background:#245544;border-color:#7fd1a8}
-html.dark #footballTakes .ae-season-note.is-won{color:#9ce3bd}
-html.dark #footballTakes .ae-season-admin select{background:#0e2332;color:#fff2e4;border-color:rgba(209,175,144,.5)}
-html.dark #footballTakes .ae-season-admin button.is-minor{color:#decbb9;border-color:rgba(209,175,144,.5)}
-
-@media (max-width:360px){#footballTakes .ae-season-options{grid-template-columns:1fr}}
-@media (min-width:900px){#footballTakes .ae-season-predictions{padding:24px 26px 22px}#footballTakes .ae-season-options{grid-template-columns:repeat(4,minmax(0,1fr))}}
+/* CAM SPORTS · Pick de campeón dentro de las páginas Fútbol y NFL. */
+#freeTakes .ae-season-predictions{margin:26px 0 22px;padding:20px 18px 18px;border:1px solid #bd9b78;background:linear-gradient(105deg,rgba(255,252,246,.96),rgba(235,226,214,.92));color:#273b49;box-shadow:0 10px 28px rgba(39,59,73,.08)}
+#freeTakes .ae-season-predictions[hidden]{display:none!important}
+#freeTakes .ae-season-overline{display:block;font:800 9px/1.2 Inter,system-ui,sans-serif;letter-spacing:.14em;color:#855a38}
+#freeTakes .ae-season-head h2{margin:6px 0 0;font:600 25px/1.1 Newsreader,Georgia,serif;color:#334b58}
+#freeTakes .ae-season-head p{margin:8px 0 0;font:13px/1.55 Inter,system-ui,sans-serif;color:#5b5047;max-width:68ch}
+#freeTakes .ae-season-tabs{display:flex;gap:6px;margin:16px 0 0;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+#freeTakes .ae-season-tabs::-webkit-scrollbar{display:none}
+#freeTakes .ae-season-tabs[hidden]{display:none!important}
+#freeTakes .ae-season-tabs button{flex:0 0 auto;padding:8px 12px;border:1px solid #b9946d;background:#e9e3da;color:#4e483f;font:700 12px/1 Inter,system-ui,sans-serif;cursor:pointer}
+#freeTakes .ae-season-tabs button[aria-selected=true]{background:#765128;border-color:#ab8351;color:#fff4df}
+#freeTakes .ae-season-list{display:grid;gap:14px;margin-top:14px}
+#freeTakes .ae-season-card{padding:14px;border:1px solid rgba(189,155,120,.6);background:rgba(255,252,246,.72)}
+#freeTakes .ae-season-meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 12px;margin:0;font:700 10px/1.35 Inter,system-ui,sans-serif;letter-spacing:.04em;text-transform:uppercase;color:#855a38}
+#freeTakes .ae-season-card h3{margin:6px 0 12px;font:600 19px/1.2 Newsreader,Georgia,serif;color:#213c4e}
+#freeTakes .ae-season-options{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+#freeTakes .ae-season-option{position:relative;display:grid;place-items:center;min-width:0;min-height:76px;padding:8px 6px 20px;border:1px solid rgba(151,119,85,.42);background:rgba(255,255,255,.72);color:#354c58;cursor:pointer;transition:transform .16s ease,border-color .16s ease,background .16s ease}
+#freeTakes .ae-season-option:hover:not(:disabled){transform:translateY(-2px);border-color:#765128;background:#f7eddf}
+#freeTakes .ae-season-option:focus-visible{outline:3px solid #765128;outline-offset:2px}
+#freeTakes .ae-season-option:disabled{cursor:default}
+#freeTakes .ae-season-crest{position:relative;display:grid;place-items:center;width:48px;height:48px}
+#freeTakes .ae-season-crest img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 2px 2px rgba(24,37,45,.14))}
+#freeTakes .ae-season-crest-fallback{display:grid;place-items:center;width:42px;height:42px;border:1px solid rgba(133,90,56,.46);background:#efe4d1;color:#765128;font:800 9px/1 Inter,system-ui,sans-serif;letter-spacing:.04em}
+#freeTakes .ae-season-crest.is-loaded .ae-season-crest-fallback{visibility:hidden}
+#freeTakes .ae-season-option-points{position:absolute;right:5px;bottom:5px;min-width:31px;padding:2px 5px;text-align:center;background:#efe4d1;color:#765128;font:800 10px/1.35 Inter,system-ui,sans-serif}
+#freeTakes .ae-season-option.is-chosen{border-color:#765128;background:#765128;color:#fff4df;box-shadow:inset 0 0 0 1px #d7b486}
+#freeTakes .ae-season-option.is-chosen::after{content:'✓';position:absolute;left:5px;top:5px;display:grid;place-items:center;width:18px;height:18px;background:#fff4df;color:#765128;font:900 11px/1 Inter,system-ui,sans-serif}
+#freeTakes .ae-season-option.is-chosen .ae-season-option-points{background:rgba(255,244,223,.18);color:#fff4df}
+#freeTakes .ae-season-option.is-winner{border-color:#245544;background:#245544;color:#e4fff0}
+#freeTakes .ae-season-option.is-winner .ae-season-option-points{background:rgba(228,255,240,.16);color:#e4fff0}
+#freeTakes .ae-season-option:disabled:not(.is-chosen):not(.is-winner){opacity:.55}
+#freeTakes .ae-season-option.is-chosen:disabled,#freeTakes .ae-season-option.is-winner:disabled{opacity:1!important}
+#freeTakes .ae-season-note{margin:12px 0 0;padding-top:10px;border-top:1px solid rgba(189,155,120,.4);font:600 12.5px/1.4 Inter,system-ui,sans-serif;color:#5b5047}
+#freeTakes .ae-season-note.is-won{color:#245544}
+#freeTakes .ae-season-admin{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;padding-top:10px;border-top:1px dashed rgba(189,155,120,.6)}
+#freeTakes .ae-season-admin select{flex:1 1 12rem;min-height:44px;padding:6px 8px;border:1px solid #8b8069;background:#fff;color:#222;font:13px Inter,system-ui,sans-serif}
+#freeTakes .ae-season-admin button{min-height:44px;padding:7px 12px;border:0;background:#1d3a2d;color:#fff;font:700 12px Inter,system-ui,sans-serif;cursor:pointer}
+#freeTakes .ae-season-admin button.is-minor{background:transparent;border:1px solid #9a8a72;color:#5b5047}
+#freeTakes .ae-season-status{margin:10px 0 0;font:12.5px/1.4 Inter,system-ui,sans-serif;color:#5b5047}
+#freeTakes .ae-season-status:empty{display:none}
+html.dark #freeTakes .ae-season-predictions{background:linear-gradient(105deg,rgba(17,44,62,.92),rgba(10,30,45,.94));color:#fff1e3;box-shadow:0 12px 32px rgba(0,0,0,.2)}
+html.dark #freeTakes .ae-season-overline,html.dark #freeTakes .ae-season-meta{color:#d2ab82}
+html.dark #freeTakes .ae-season-head h2,html.dark #freeTakes .ae-season-card h3{color:#fff1e3}
+html.dark #freeTakes .ae-season-head p,html.dark #freeTakes .ae-season-note,html.dark #freeTakes .ae-season-status{color:#decbb9}
+html.dark #freeTakes .ae-season-tabs button{background:rgba(47,89,110,.55);color:#f1e1d0}
+html.dark #freeTakes .ae-season-tabs button[aria-selected=true]{background:#765128;color:#fff4df}
+html.dark #freeTakes .ae-season-card{background:rgba(9,32,46,.55);border-color:rgba(207,165,117,.4)}
+html.dark #freeTakes .ae-season-option{background:rgba(14,35,50,.7);border-color:rgba(209,175,144,.35);color:#fff2e4}
+html.dark #freeTakes .ae-season-option:hover:not(:disabled){background:#875e48;border-color:#d1af90}
+html.dark #freeTakes .ae-season-crest-fallback{background:rgba(209,175,144,.16);border-color:rgba(209,175,144,.42);color:#f1c99a}
+html.dark #freeTakes .ae-season-option-points{background:rgba(209,175,144,.16);color:#f1c99a}
+html.dark #freeTakes .ae-season-option.is-chosen{background:#79563f;border-color:#d1af90}
+html.dark #freeTakes .ae-season-option.is-winner{background:#245544;border-color:#7fd1a8}
+html.dark #freeTakes .ae-season-note.is-won{color:#9ce3bd}
+html.dark #freeTakes .ae-season-admin select{background:#0e2332;color:#fff2e4;border-color:rgba(209,175,144,.5)}
+html.dark #freeTakes .ae-season-admin button.is-minor{color:#decbb9;border-color:rgba(209,175,144,.5)}
+@media (min-width:700px){#freeTakes .ae-season-predictions{padding:24px 26px 22px}#freeTakes .ae-season-options{grid-template-columns:repeat(8,minmax(0,1fr))}#freeTakes .ae-season-option{min-height:86px}#freeTakes .ae-season-crest{width:56px;height:56px}}
+@media (max-width:360px){#freeTakes .ae-season-options{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (prefers-reduced-motion:reduce){#freeTakes .ae-season-option{transition:none}#freeTakes .ae-season-option:hover:not(:disabled){transform:none}}
