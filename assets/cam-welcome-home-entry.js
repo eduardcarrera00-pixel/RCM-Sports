@@ -7,6 +7,17 @@
   let locallyShown = false;
   let pending = null;
   let retries = 0;
+  // Warm only the image used by the current theme before the first welcome opens.
+  // Using the same URL as CSS lets the browser reuse the downloaded bytes.
+  function preloadWelcomeBackground() {
+    const theme = document.documentElement.classList.contains('dark') ? 'noche' : 'dia';
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.as = 'image';
+    link.href = 'assets/cam-welcome-' + theme + '-fast.webp';
+    link.fetchPriority = 'high';
+    document.head.appendChild(link);
+  }
   function hasSeen() {
     if (locallyShown) return true;
     try { return sessionStorage.getItem(KEY) === '1'; }
@@ -57,7 +68,10 @@
         return startOriginal.call(this, id);
       };
     }
-    if (!hasSeen() && onHome()) pending = setTimeout(tryOpen, 100);
+    if (!hasSeen() && onHome()) {
+      preloadWelcomeBackground();
+      pending = setTimeout(tryOpen, 100);
+    }
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden && !hasSeen() && onHome()) {
         clearTimeout(pending);
