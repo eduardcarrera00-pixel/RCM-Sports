@@ -288,7 +288,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
     </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
-<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261020-picks-compact-3">
+<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261020-chronicle-marble-1">
 <link rel="stylesheet" href="assets/cam-analytics.css?v=20261020-1">
     <link rel="stylesheet" href="assets/ae-muted-navigation-icons.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-custom-nav-icons.css?v=20261016-1">
@@ -332,7 +332,7 @@ html body.ae-is-football #mainContent #aeSportTakeLeaders.ae-sport-chefs[data-sp
 <link rel="stylesheet" href="assets/ae-profile-tabs-picks.css?v=20261019-profile-scroll-1">
 <link rel="stylesheet" href="assets/ae-home-weekly-match-picks-mobile.css?v=20261016-mobile-photo-parity-2">
 <link rel="stylesheet" href="assets/ae-mobile-home-takes-swipe-and-football-news.css?v=20261016-top3-swipe-v1">
-<link rel="stylesheet" href="assets/ae-article-floating-close.css?v=20261017-modal-layer-over-header-v3">
+<link rel="stylesheet" href="assets/ae-article-floating-close.css?v=20261020-chronicle-marble-1">
 <link rel="stylesheet" href="assets/ae-sport-news-headings.css?v=20261016-nfl-news-corrected-4">
 <link rel="stylesheet" href="assets/ae-visible-sports-responsive-nav.css?v=20261016-reflow-1">
 <style id="ae-home-weekly-reference-mobile">
@@ -2892,11 +2892,24 @@ html:not(.dark) #aeAuthIntroNotice small{color:#5b6d76}
                     </div>
                 </div>
 
-                <div class="relative rounded-xl overflow-hidden h-64 sm:h-96 shadow-md">
-                    <img id="modalImage" src="" alt="Portada" class="w-full h-full object-cover">
-                </div>
-                <div id="modalBody" class="text-slate-700 text-sm sm:text-base leading-relaxed space-y-4">
-                    <!-- Article HTML Body -->
+                <div class="cam-chronicle-layout">
+                    <div class="cam-chronicle-story">
+                        <figure class="cam-chronicle-figure relative overflow-hidden">
+                            <img id="modalImage" src="" alt="Portada" class="w-full h-full object-cover">
+                        </figure>
+                        <div id="modalBody" class="text-slate-700 text-sm sm:text-base leading-relaxed space-y-4">
+                            <!-- Article HTML Body -->
+                        </div>
+                    </div>
+                    <aside class="cam-chronicle-aside" aria-label="Datos de la noticia">
+                        <span class="cam-chronicle-aside-kicker">CAM SPORTS</span>
+                        <span class="cam-chronicle-aside-rule" aria-hidden="true"></span>
+                        <span class="cam-chronicle-aside-label">La crónica</span>
+                        <span id="camChronicleCategory" class="cam-chronicle-aside-category"></span>
+                        <span class="cam-chronicle-aside-label">Tiempo de lectura</span>
+                        <span id="camChronicleReadTime" class="cam-chronicle-aside-time"></span>
+                        <span class="cam-chronicle-aside-signature">El juego también se piensa.</span>
+                    </aside>
                 </div>
                 <section id="relatedStoriesSection" class="hidden space-y-4"
          aria-labelledby="relatedStoriesHeading">
@@ -4011,6 +4024,9 @@ currentUser = {
             document.getElementById('modalImage').style.setProperty('--ae-image-focus', imagePosition(article));
             document.getElementById('modalImage').style.setProperty('--ae-image-zoom', String(imageScale(article)));
             document.getElementById('modalBody').innerHTML = cleanBody(article.body);
+            document.getElementById('camChronicleCategory').textContent = article.category || 'Deporte';
+            const readingWords = document.getElementById('modalBody').textContent.trim().split(/\s+/).filter(Boolean).length;
+            document.getElementById('camChronicleReadTime').textContent = `${Math.max(1, Math.ceil(readingWords / 220))} min`;
             restoreReadingSize();
 renderRelatedStories(article);
 

@@ -5,7 +5,7 @@ html body #articleModal{
 html body #articleModal .ae-article-floating-close{
   position:fixed!important;
   top:var(--ae-article-close-top)!important;
-  right:max(16px,calc((100vw - min(896px,calc(100vw - 48px)))/2 + 14px))!important;
+  right:max(16px,calc((100vw - min(1050px,calc(100vw - 48px)))/2 + 14px))!important;
   z-index:2147483000!important;
   display:grid!important;
   place-items:center!important;
