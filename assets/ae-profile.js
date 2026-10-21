@@ -44,7 +44,7 @@ function prestigeStat(label,value,detail){
   if(detail)box.append(el('small',detail));
   return box;
 }
-function renderPrestige(summary,legendary){
+function renderPrestige(summary,legendary,champions=[]){
   const target=$('aeProfilePrestige');
   if(!target)return;
   target.replaceChildren();
@@ -54,6 +54,7 @@ function renderPrestige(summary,legendary){
   const resolved=numeric(summary?.resolved);
   if(!summary||!resolved){
     target.append(el('p',privateView?'Cuando se puntúen tus primeros Takes por dificultad, aquí verás tu perfil de riesgo y tus medallas.':'Este aficionado todavía no tiene Takes puntuados por dificultad.','ae-profile-empty'));
+    appendChampionPicks(target,champions);
     target.hidden=activeTab!=='takes';
     return;
   }
@@ -84,22 +85,56 @@ function renderPrestige(summary,legendary){
     }
     target.append(el('h3','Salón de la fama','ae-profile-list-heading'),list);
   }
+  appendChampionPicks(target,champions);
   target.hidden=activeTab!=='takes';
+}
+/* Campeones elegidos en «¿Quién será campeón?» (suman a la clasificación de Takes). */
+const CHAMPION_LEAGUES={laliga:'LaLiga',premier:'Premier League',ligamx:'Liga MX',champions:'Champions',nfl:'NFL',colegial:'Colegial'};
+function championInitials(label){return /^otro\b/i.test(label)?'OTRO':String(label||'').split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase();}
+function appendChampionPicks(target,champions){
+  if(!Array.isArray(champions)||!champions.length)return;
+  const list=el('ul',null,'ae-profile-champions');
+  for(const c of champions){
+    const li=el('li',null,'ae-profile-champion is-'+(c.state||'open'));
+    const crest=el('span',null,'ae-profile-champion-crest');
+    crest.setAttribute('aria-hidden','true');
+    crest.append(el('span',championInitials(c.team)));
+    const logo=window.aeSeasonPredictions?.crest?.(c.competition,c.team);
+    if(logo){
+      const img=el('img');img.src=logo;img.alt='';img.width=40;img.height=40;img.loading='lazy';img.decoding='async';
+      img.addEventListener('load',()=>crest.classList.add('is-loaded'));
+      img.addEventListener('error',()=>img.remove());
+      crest.append(img);
+    }
+    const copy=el('div',null,'ae-profile-champion-copy');
+    copy.append(el('small',(CHAMPION_LEAGUES[c.competition]||c.competition||'')+(c.season?' '+c.season:'')),el('strong',c.team||'—'));
+    const pts=numeric(c.points);
+    const result=c.state==='won'?'Acertó · +'+numeric(c.awarded_points)+' pts en Takes'
+      :c.state==='lost'?'No fue'+(c.winner?' · campeón: '+c.winner:'')
+      :c.state==='pending'?'Cerrada · +'+pts+' pts si acierta'
+      :'+'+pts+' pts si acierta';
+    copy.append(el('span',result));
+    li.append(crest,copy);
+    if(c.state==='won'||c.state==='lost')li.append(el('em',c.state==='won'?'Acierto':'Fallo','ae-profile-champion-badge'));
+    list.append(li);
+  }
+  target.append(el('h3',privateView?'Mis campeones':'Campeones elegidos','ae-profile-list-heading'),list);
 }
 async function loadPrestige(userId){
   const target=$('aeProfilePrestige');
   if(!target||!userId)return;
   const ticket=++prestigeRequest;
   try{
-    const [summary,legendary]=await Promise.all([
+    const [summary,legendary,champions]=await Promise.all([
       db.rpc('ae_take_prestige',{p_user_id:userId}),
-      db.rpc('ae_take_legendary',{p_user_id:userId})
+      db.rpc('ae_take_legendary',{p_user_id:userId}),
+      Promise.resolve(db.rpc('ae_user_champion_picks',{p_user_id:userId})).catch(()=>({data:[],error:true}))
     ]);
     if(ticket!==prestigeRequest||activeAuthor!==userId)return;
     if(summary.error)throw summary.error;
     if(legendary.error)throw legendary.error;
     const row=Array.isArray(summary.data)?summary.data[0]:summary.data;
-    renderPrestige(row||null,legendary.data||[]);
+    renderPrestige(row||null,legendary.data||[],champions.error?[]:(champions.data||[]));
   }catch(e){
     if(ticket!==prestigeRequest)return;
     target.replaceChildren(el('p','El perfil de prestigio no está disponible ahora mismo.','ae-profile-empty'));

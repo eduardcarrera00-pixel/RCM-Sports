@@ -33,7 +33,8 @@ def fake(user=None, admin=False, predictions=()):
             {'name': 'Buffalo Bills', 'logo': 'https://a.espncdn.com/i/teamlogos/nfl/500/buf.png'},
             {'name': 'Dallas Cowboys', 'logo': 'https://a.espncdn.com/i/teamlogos/nfl/500/dal.png'}],
     }
-    return ('window.__fake.tables=' + json.dumps(tables) + ';'
+    return ("try{sessionStorage.setItem('cam_sports_home_welcome_seen_session_v1','1')}catch(e){};"
+            'window.__fake.tables=' + json.dumps(tables) + ';'
             'window.__fake.user=' + json.dumps(user) + ';'
             + ('window.__fake.tables.editors=[{user_id:' + json.dumps(user['id']) + '}];' if admin else '')
             + """window.__fake.rpc=window.__fake.rpc||{};window.__fake.calls=window.__fake.calls||[];
@@ -56,10 +57,11 @@ def run():
         card = page.locator('#aeSeasonList .ae-season-card')
         assert card.count() == 1
         assert 'De 3 a 20 pts' in card.locator('.ae-season-meta').text_content()
-        labels = card.locator('.ae-season-option-label').all_inner_texts()
+        labels = card.locator('.ae-season-option .sr-only').all_text_contents()
         assert labels == ['FC Barcelona', 'Real Madrid', 'Atlético de Madrid', 'Sevilla', 'Elche', 'Otro club'], labels
         assert card.locator('.ae-season-option-points').all_inner_texts()[:2] == ['+3', '+6']
-        assert card.locator('.ae-season-option img').count() >= 5, 'deben verse escudos en lugar de nombres'
+        # Sin red los escudos de ESPN fallan y se quitan; se comprueba que cada club tiene escudo asignado.
+        assert page.evaluate("['FC Barcelona','Real Madrid','Atlético de Madrid','Sevilla','Elche'].every(t=>window.aeSeasonPredictions.crest('laliga',t))"), 'deben verse escudos en lugar de nombres'
         assert page.locator('#aeSeasonPredictions').evaluate("n=>n.previousElementSibling.id") == 'aeNflTakeFooterCta'
         assert page.locator('#aeSeasonPredictions').evaluate("n=>n.nextElementSibling.id") == 'aeSportTakeRanking'
         page.locator('#aeSeasonTabs button', has_text='Premier League').click()
@@ -83,14 +85,18 @@ def run():
         call = [c for c in page.evaluate('window.__fake.calls') if c.get('rpc') == 'ae_submit_take'][0]
         assert call['args'] == {'p_question_id': 'qL', 'p_option_id': 'qL-8'}, call
         assert 'Tu elección: Elche · +20 pts si aciertas' in page.locator('#aeSeasonList .ae-season-note').inner_text()
+        assert 'Takes' in page.locator('#aeSeasonStatus').inner_text(), 'los puntos van a Takes'
+        assert page.locator('#aeSeasonList button', has_text='Anular').count() == 0, 'la elección es definitiva'
         assert page.locator('#aeSeasonList .ae-season-option:not([disabled])').count() == 0
         if SHOTS:
             page.locator('#aeSeasonPredictions').screenshot(path=f'{SHOTS}/season-dark-chosen.png')
         assert not page.errors, page.errors
 
-    # 3) Admin: ve la semanal cerrada para validarla
-    with fp.full_page(fake_js=fake(user=user, admin=True)) as page:
+    # 3) Admin: en la pregunta abierta ya elegida no hay botones; ve la semanal cerrada para validarla
+    with fp.full_page(fake_js=fake(user=user, admin=True, predictions=[{'question_id': 'qL', 'option_id': 'qL-0', 'awarded_points': 0}])) as page:
         open_sport(page)
+        assert page.locator('#aeSeasonList .ae-season-card').first.locator('button', has_text='Anular').count() == 0
+        assert page.locator('#aeSeasonList .ae-season-admin').count() == 0
         page.locator('#aeSeasonTabs button', has_text='Premier League').click()
         weekly = page.locator('#aeSeasonList .ae-season-card', has_text='Everton')
         assert weekly.count() == 1
@@ -107,7 +113,7 @@ def run():
         open_sport(page, 'NFL')
         assert 'NFL 2026/27' in page.locator('#aeSeasonList .ae-season-card h3').inner_text()
         assert page.locator('#aeSeasonList .ae-season-option').count() == 4
-        assert page.locator('#aeSeasonList .ae-season-option img').count() == 4
+        assert page.evaluate("['San Francisco 49ers','Dallas Cowboys'].every(t=>window.aeSeasonPredictions.crest('nfl',t))")
         page.evaluate("filterByCategory('Picks')")
         assert page.locator('#aeSeasonPredictions').is_hidden()
         assert not page.errors, page.errors

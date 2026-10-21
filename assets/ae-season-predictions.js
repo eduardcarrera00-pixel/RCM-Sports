@@ -1,6 +1,7 @@
 /* CAM SPORTS · ¿Quién será campeón? dentro de Fútbol y NFL.
  * Usa las mismas preguntas cerradas de ae_take_questions y suma sus premios
- * a la clasificación de Picks cuando el resultado se confirma.
+ * a la clasificación de Takes cuando el resultado se confirma. La elección es
+ * definitiva: no hay forma de cambiarla ni de retirarla.
  */
 (() => {
   'use strict';
@@ -107,31 +108,31 @@
     if (existing) {
       const picked = optionsOf(q).find(o => o.id === existing.option_id);
       const note = q.status === 'settled'
-        ? (existing.awarded_points > 0 ? '¡Acertaste! +' + existing.awarded_points + ' pts en tu clasificación de Picks' : 'Esta vez no fue. Tu elección: ' + (picked?.label || '—'))
-        : 'Tu elección: ' + (picked?.label || '—') + ' · +' + (picked ? pointsOf(q, picked) : 0) + ' pts si aciertas';
+        ? (existing.awarded_points > 0 ? '¡Acertaste! +' + existing.awarded_points + ' pts en tu clasificación de Takes' : 'Esta vez no fue. Tu elección: ' + (picked?.label || '—'))
+        : 'Tu elección: ' + (picked?.label || '—') + ' · +' + (picked ? pointsOf(q, picked) : 0) + ' pts si aciertas · elección definitiva';
       card.append(el('p', note, 'ae-season-note' + (q.status === 'settled' && existing.awarded_points > 0 ? ' is-won' : '')));
     }
-    if (isAdmin() && q.status === 'open') card.append(adminTools(q, open));
+    // Mientras la pregunta está abierta no hay botones: la elección es definitiva.
+    // Al cerrar, el admin valida el resultado (o anula una pregunta caducada sin respuestas).
+    if (isAdmin() && q.status === 'open' && !open) card.append(adminTools(q));
     return card;
   }
 
-  function adminTools(q, open) {
+  function adminTools(q) {
     const box = el('div', null, 'ae-season-admin');
-    if (!open) {
-      const select = el('select');
-      select.setAttribute('aria-label', 'Resultado oficial de ' + q.prompt);
-      const empty = el('option', 'Resultado oficial…'); empty.value = ''; select.append(empty);
-      for (const o of sortOptions(q, optionsOf(q))) { const n = el('option', o.label + ' · ' + pointsOf(q, o) + ' pts'); n.value = o.id; select.append(n); }
-      const settle = el('button', 'Validar resultado'); settle.type = 'button';
-      settle.addEventListener('click', async () => {
-        if (!select.value || busy || !confirm('¿Confirmar el resultado oficial y repartir los puntos?')) return;
-        await adminAction('ae_settle_take', { p_question_id: q.id, p_option_id: select.value }, 'Resultado confirmado. Los puntos ya cuentan en Picks.');
-      });
-      box.append(select, settle);
-    }
-    const cancel = el('button', 'Anular', 'is-minor'); cancel.type = 'button';
+    const select = el('select');
+    select.setAttribute('aria-label', 'Resultado oficial de ' + q.prompt);
+    const empty = el('option', 'Resultado oficial…'); empty.value = ''; select.append(empty);
+    for (const o of sortOptions(q, optionsOf(q))) { const n = el('option', o.label + ' · ' + pointsOf(q, o) + ' pts'); n.value = o.id; select.append(n); }
+    const settle = el('button', 'Validar resultado'); settle.type = 'button';
+    settle.addEventListener('click', async () => {
+      if (!select.value || busy || !confirm('¿Confirmar el resultado oficial y repartir los puntos?')) return;
+      await adminAction('ae_settle_take', { p_question_id: q.id, p_option_id: select.value }, 'Resultado confirmado. Los puntos ya cuentan en Takes.');
+    });
+    box.append(select, settle);
+    const cancel = el('button', 'Anular pregunta', 'is-minor'); cancel.type = 'button';
     cancel.addEventListener('click', async () => {
-      if (busy || !confirm('¿Anular esta pregunta sin repartir puntos?')) return;
+      if (busy || !confirm('¿Anular esta pregunta para todos, sin repartir puntos?')) return;
       await adminAction('ae_void_take', { p_question_id: q.id }, 'Pregunta anulada.');
     });
     box.append(cancel);
@@ -143,7 +144,7 @@
     if (!root) return;
     root.dataset.sport = section;
     const overline = $('aeSeasonOverline');
-    if (overline) overline.textContent = section === 'nfl' ? 'NFL · PICKS CAM SPORTS' : 'FÚTBOL · PICKS CAM SPORTS';
+    if (overline) overline.textContent = section === 'nfl' ? 'NFL · TAKES CAM SPORTS' : 'FÚTBOL · TAKES CAM SPORTS';
     const list = visibleQuestions();
     const leagues = ORDER.filter(c => list.some(q => q.competition === c));
     root.hidden = !section || !leagues.length;
@@ -175,7 +176,7 @@
     try {
       const r = await api.rpc('ae_submit_take', { p_question_id: q.id, p_option_id: o.id });
       if (r.error) throw r.error;
-      status('¡Predicción guardada! Los puntos se sumarán a Picks si aciertas.');
+      status('¡Predicción guardada! Los puntos se sumarán a Takes si aciertas.');
       busy = false;
       await load(true);
     } catch (e) { status(e.message || 'No se pudo guardar la predicción.'); }
@@ -236,5 +237,6 @@
     try { client()?.auth?.onAuthStateChange?.(() => setTimeout(() => { if (section) load(true); else loaded = false; }, 200)); } catch {}
     setSection(sportRoot?.dataset.sport || (typeof currentCategory === 'undefined' ? '' : currentCategory));
   });
-  window.aeSeasonPredictions = { refresh: () => load(true), rerender: () => { if (loaded) render(); }, setSection };
+  window.aeSeasonPredictions = { refresh: () => load(true), rerender: () => { if (loaded) render(); }, setSection,
+    crest: (competition, label) => logoOf({ competition }, { label }) };
 })();

@@ -33,6 +33,28 @@ html.dark #aeProfileDialog .ae-profile-prestige .ae-profile-list-heading{color:#
 html.dark #aeProfileDialog .ae-profile-medal{border-color:rgba(207,165,117,.35);background:rgba(9,32,46,.55)}
 html.dark #aeProfileDialog .ae-profile-medal-copy small{color:#e2b65d}
 
+/* Campeones elegidos («¿Quién será campeón?») dentro del perfil de prestigio. */
+#aeProfileDialog .ae-profile-champions{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
+#aeProfileDialog .ae-profile-champion{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:11px;align-items:center;padding:10px 11px;border:1px solid rgba(197,163,128,.45);background:rgba(255,250,241,.75)}
+#aeProfileDialog .ae-profile-champion-crest{position:relative;width:40px;height:40px;display:grid;place-items:center}
+#aeProfileDialog .ae-profile-champion-crest>span{font:800 10px/1 Inter,system-ui,sans-serif;letter-spacing:.06em;color:#855a38}
+#aeProfileDialog .ae-profile-champion-crest img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+#aeProfileDialog .ae-profile-champion-crest.is-loaded>span{visibility:hidden}
+#aeProfileDialog .ae-profile-champion-copy{display:flex;flex-direction:column;gap:2px;min-width:0}
+#aeProfileDialog .ae-profile-champion-copy small{font:800 8.5px/1.2 Inter,system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#855a38}
+#aeProfileDialog .ae-profile-champion-copy strong{font:600 16px/1.2 Newsreader,Georgia,serif;color:#213c4e;overflow-wrap:anywhere}
+#aeProfileDialog .ae-profile-champion-copy span{font:10.5px/1.4 Inter,system-ui,sans-serif;color:#586975}
+#aeProfileDialog .ae-profile-champion-badge{font:800 8.5px/1 Inter,system-ui,sans-serif;font-style:normal;letter-spacing:.1em;text-transform:uppercase;padding:5px 7px;border:1px solid currentColor}
+#aeProfileDialog .ae-profile-champion.is-won .ae-profile-champion-badge{color:#2f6b4a}
+#aeProfileDialog .ae-profile-champion.is-lost{opacity:.78}
+#aeProfileDialog .ae-profile-champion.is-lost .ae-profile-champion-badge{color:#8a4b3b}
+html.dark #aeProfileDialog .ae-profile-champion{border-color:rgba(207,165,117,.35);background:rgba(9,32,46,.55)}
+html.dark #aeProfileDialog .ae-profile-champion-copy small,html.dark #aeProfileDialog .ae-profile-champion-crest>span{color:#d2ab82}
+html.dark #aeProfileDialog .ae-profile-champion-copy strong{color:#fff0dd}
+html.dark #aeProfileDialog .ae-profile-champion-copy span{color:#c8d2d4}
+html.dark #aeProfileDialog .ae-profile-champion.is-won .ae-profile-champion-badge{color:#8fd3ab}
+html.dark #aeProfileDialog .ae-profile-champion.is-lost .ae-profile-champion-badge{color:#e6a08d}
+
 @media (max-width:420px){
   #aeProfileDialog .ae-profile-prestige-stats{grid-template-columns:1fr}
   #aeProfileDialog .ae-profile-prestige-stat{display:grid;grid-template-columns:5.5rem minmax(0,1fr);grid-template-areas:"label value" "label detail";column-gap:10px;row-gap:2px;align-items:baseline}
