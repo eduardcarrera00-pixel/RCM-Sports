@@ -49,7 +49,7 @@ const server=http.createServer((req,res)=>{
  await page.evaluate(()=>{const p=document.createElement('dialog');p.id='aeProfileDialog';p.innerHTML='<div id="aeProfilePicks"><article class="ae-profile-pick ae-profile-pick-recent"><h4>Mi Pick</h4><div class="ae-profile-pick-footer"></div><button class="ae-profile-pick-hit" aria-label="Ver Pick completo"></button></article></div>';p.querySelector('.ae-profile-pick-footer').append(CamPickShare.button(window.pick));document.body.append(p);p.showModal();});
  await page.locator('#aeProfilePicks .cam-pick-share-button').click();await page.locator('#camPickShareDialog[open]').waitFor();await page.getByRole('button',{name:'Cerrar',exact:true}).click();
  await page.evaluate(()=>document.getElementById('aeProfileDialog').close());
- await page.evaluate(()=>CamPickShare.open({...window.pick,event_name:'Toronto vs Boston',selection:'Toronto gana'},{kind:'weekly'}));assert.match(await page.locator('#camPickShareTitle').innerText(),/Pick del día/);assert.match(await page.locator('.cam-pick-share-networks a').getAttribute('href'),/weeklyPick/);
+ await page.evaluate(()=>CamPickShare.open({...window.pick,event_name:'Toronto vs Boston',selection:'Toronto gana'},{kind:'weekly'}));assert.match(await page.locator('#camPickShareTitle').innerText(),/Pick del editor/);assert.match(await page.locator('.cam-pick-share-networks a').getAttribute('href'),/weeklyPick/);
  assert.deepEqual(errors,[]);console.log('PASS: real PNG download, responsive day/night 360–1366px, native activation, cancellation/fallback, profile overlay and weekly share. QA: '+qa);
  await context.close();
  }finally{await browser.close();server.close();}
