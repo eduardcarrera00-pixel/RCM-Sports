@@ -2765,7 +2765,7 @@ html:not(.dark) #aeAuthIntroNotice small{color:#5b6d76}
             <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50">
                 <div class="flex items-center space-x-2 text-pitch-700 font-bold">
                     <i class="fa-solid fa-pen-to-square text-lg"></i>
-                    <span class="text-base text-slate-900">Publicar Nuevo Artículo</span>
+                    <span id="pubModalTitle" class="text-base text-slate-900">Publicar Nuevo Artículo</span>
                 </div>
                 <button onclick="closePublishModal()" class="w-8 h-8 rounded-full bg-slate-200/60 text-slate-500 hover:text-slate-800 flex items-center justify-center transition-colors">
                     <i class="fa-solid fa-xmark"></i>
@@ -2852,7 +2852,7 @@ html:not(.dark) #aeAuthIntroNotice small{color:#5b6d76}
                     <button type="button" onclick="closePublishModal()" class="px-5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-100">
                         Cancelar
                     </button>
-                    <button type="submit" class="px-6 py-2.5 rounded-xl bg-pitch-600 hover:bg-pitch-700 text-white text-xs font-bold uppercase tracking-wider shadow-md">
+                    <button id="pubSubmitButton" type="submit" class="px-6 py-2.5 rounded-xl bg-pitch-600 hover:bg-pitch-700 text-white text-xs font-bold uppercase tracking-wider shadow-md">
                         <i class="fa-solid fa-paper-plane mr-1.5"></i> Publicar Ahora
                     </button>
                 </div>
@@ -2948,6 +2948,7 @@ html:not(.dark) #aeAuthIntroNotice small{color:#5b6d76}
                         <span class="ae-action-label">Copiar enlace</span>
                     </button>
                     <button id="editArticleButton" type="button" onclick="openArticleEditor()" class="rcm-button ae-article-edit-action hidden">Editar publicación</button>
+                    <button id="editArticlePhotoButton" type="button" onclick="openArticlePhotoEditor()" class="rcm-button ae-article-edit-action hidden" aria-controls="aeArticlePhotoModal">Editar foto</button>
                 </div>
 
                 <section class="ae-conversation" aria-labelledby="aeConversationTitle">
@@ -2995,6 +2996,48 @@ html:not(.dark) #aeAuthIntroNotice small{color:#5b6d76}
 
             </div>
         </div>
+    </div>
+
+
+    <!-- Edición independiente de la portada. Nunca crea una publicación nueva. -->
+    <div id="aeArticlePhotoModal" role="dialog" aria-modal="true" aria-labelledby="aeArticlePhotoTitle" aria-describedby="aePhotoEditIntro" tabindex="-1" class="fixed inset-0 z-50 hidden overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="relative bg-white border border-slate-200 w-full max-w-2xl rounded-2xl shadow-2xl overflow-y-auto my-auto" style="max-height:calc(100dvh - 32px)">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50">
+          <h2 id="aeArticlePhotoTitle" class="text-base font-bold text-slate-900">Editar foto de la noticia</h2>
+          <button type="button" onclick="closeArticlePhotoEditor()" aria-label="Cancelar edición de foto" class="w-8 h-8 rounded-full bg-slate-200/60 text-slate-600 hover:text-slate-900">✕</button>
+        </div>
+        <form id="aeArticlePhotoForm" onsubmit="handleArticlePhotoEditSubmit(event)" class="p-6 space-y-4">
+          <p id="aePhotoEditIntro" class="text-sm text-slate-600">Cambia la foto o ajusta su encuadre. El título, el texto, la fecha original, los comentarios y el orden de las noticias permanecerán iguales.</p>
+          <p id="aePhotoEditError" role="alert" aria-live="assertive" class="hidden p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl"></p>
+          <div>
+            <label for="aePhotoImageFile" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Subir foto nueva (JPG, PNG o WEBP · máximo 5 MB)</label>
+            <input id="aePhotoImageFile" type="file" accept="image/jpeg,image/png,image/webp" class="w-full text-sm">
+          </div>
+          <div>
+            <label for="aePhotoImageUrl" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">O utilizar una URL HTTPS</label>
+            <input id="aePhotoImageUrl" type="url" placeholder="https://..." class="w-full bg-slate-50 border border-slate-200 text-sm text-slate-800 rounded-xl px-4 py-2.5">
+          </div>
+          <div id="aePhotoImagePreview" class="ae-upload-preview" aria-label="Vista previa de la portada actual">Vista previa de la imagen</div>
+          <div class="ae-framing-controls" data-ae-frame="article-photo">
+            <label>Encuadre horizontal <input id="aePhotoFocusX" type="range" min="0" max="100" value="50"></label>
+            <label>Encuadre vertical <input id="aePhotoFocusY" type="range" min="0" max="100" value="50"></label>
+            <label>Zoom
+              <div class="ae-zoom-frame-row">
+                <button type="button" data-ae-zoom-step="photo" data-ae-zoom-delta="-10" aria-label="Alejar imagen">−</button>
+                <input id="aePhotoZoomRange" type="range" min="1" max="300" step="1" value="100" aria-label="Zoom de la foto">
+                <button type="button" data-ae-zoom-step="photo" data-ae-zoom-delta="10" aria-label="Acercar imagen">+</button>
+                <output id="aePhotoZoomValue" for="aePhotoZoomRange">100%</output>
+              </div>
+            </label>
+            <button type="button" data-ae-center="photo">Centrar imagen</button>
+          </div>
+          <p class="text-xs text-slate-600">Puedes guardar únicamente un encuadre nuevo, sin sustituir el archivo.</p>
+          <div class="flex justify-end gap-3 pt-3 border-t border-slate-100">
+            <button id="aePhotoCancelButton" type="button" onclick="closeArticlePhotoEditor()" class="px-5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-100">Cancelar</button>
+            <button id="aePhotoSaveButton" type="submit" class="px-6 py-2.5 rounded-xl bg-pitch-600 text-white text-xs font-bold uppercase tracking-wider">Guardar foto</button>
+          </div>
+        </form>
+      </div>
     </div>
 
     <footer class="bg-slate-900 border-t border-slate-800 text-slate-400 text-xs mt-16">
@@ -3151,7 +3194,7 @@ function validateUsername(username) {
 }
 
 function syncModalScrollLock() {
-    const modalIds = ['userAuthModal', 'publishModal', 'articleModal'];
+    const modalIds = ['userAuthModal', 'publishModal', 'articleModal', 'aeArticlePhotoModal'];
     const hasOpenModal = modalIds.some(id => {
         const modal = document.getElementById(id);
         return modal && !modal.classList.contains('hidden');
@@ -3912,9 +3955,139 @@ currentUser = {
             }).join('');
         }
 
+        /* Photo-only update: do not create a news record or touch article metadata. */
+        let photoEditArticleId = null;
+        let photoEditPreviousFocus = null;
+        let photoEditSaving = false;
+
+        function openArticlePhotoEditor() {
+            const article = articles.find(a => String(a.id) === String(activeModalArticleId));
+            if (!currentAdmin || !db || !article?.remote || photoEditSaving) return;
+            photoEditArticleId = article.id;
+            photoEditPreviousFocus = document.activeElement;
+            const form = document.getElementById('aeArticlePhotoForm');
+            form.reset();
+            document.getElementById('aePhotoImageFile').value = '';
+            document.getElementById('aePhotoImageUrl').value = article.image || '';
+            const errorBox = document.getElementById('aePhotoEditError');
+            errorBox.textContent = '';
+            errorBox.classList.add('hidden');
+            window.aeImageFraming?.setExisting('photo', article.image);
+            window.aeImageFraming?.set('photo', article.image_focus_x ?? 50,
+                article.image_focus_y ?? 50, article.image_zoom_pct ?? 100);
+            document.getElementById('aeArticlePhotoModal').classList.remove('hidden');
+            syncModalScrollLock();
+            document.getElementById('aePhotoImageFile').focus();
+        }
+
+        function closeArticlePhotoEditor() {
+            if (photoEditSaving) return;
+            const dialog = document.getElementById('aeArticlePhotoModal');
+            if (dialog.classList.contains('hidden')) return;
+            dialog.classList.add('hidden');
+            document.getElementById('aeArticlePhotoForm').reset();
+            window.aeImageFraming?.reset('photo');
+            photoEditArticleId = null;
+            syncModalScrollLock();
+            if (photoEditPreviousFocus?.isConnected) photoEditPreviousFocus.focus({preventScroll:true});
+            photoEditPreviousFocus = null;
+        }
+
+        async function handleArticlePhotoEditSubmit(event) {
+            event.preventDefault();
+            if (photoEditSaving || !currentAdmin || !db || !photoEditArticleId) return;
+            const articleId = photoEditArticleId;
+            const article = articles.find(a => String(a.id) === String(articleId));
+            if (!article?.remote) return;
+            const save = document.getElementById('aePhotoSaveButton');
+            const cancel = document.getElementById('aePhotoCancelButton');
+            const errorBox = document.getElementById('aePhotoEditError');
+            errorBox.classList.add('hidden');
+            errorBox.textContent = '';
+            const file = document.getElementById('aePhotoImageFile').files?.[0];
+            const typed = document.getElementById('aePhotoImageUrl').value.trim();
+            photoEditSaving = true;
+            save.disabled = true;
+            cancel.disabled = true;
+            save.textContent = 'Guardando…';
+            try {
+                if (file && (!['image/jpeg','image/png','image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024)) {
+                    throw new Error('La foto debe ser JPG, PNG o WEBP, de máximo 5 MB.');
+                }
+                const validUrl = typed ? window.aeImageFraming?.safeUrl(typed) : '';
+                if (typed && !file && !validUrl) throw new Error('Introduce una URL HTTPS válida.');
+                let url = validUrl || article.image;
+                if (file) {
+                    const path = await window.aeEditorialMedia.upload(file, 'articles');
+                    if (!path) throw new Error('No se pudo subir la nueva imagen.');
+                    url = window.aeEditorialMedia.publicUrl(path);
+                }
+                if (!url) throw new Error('La publicación necesita una foto válida.');
+                const frame = window.aeImageFraming?.get('photo') || {x:50,y:50,zoom:100};
+                // Intentionally exclude title, body, id, author, featured and created_at.
+                const changes = {
+                    image: safeImageURL(url),
+                    image_focus_x: frame.x,
+                    image_focus_y: frame.y,
+                    image_zoom_pct: frame.zoom
+                };
+                const {data,error} = await db.from('articles').update(changes)
+                    .eq('id',articleId).select().single();
+                if (error || !data) throw new Error('No se pudo guardar la foto: ' + (error?.message || 'comprueba tu conexión') + '.');
+                const updated = fromDatabase(data);
+                articles = articles.map(a => String(a.id) === String(articleId)
+                    ? {...updated, likes:a.likes, userLiked:a.userLiked, views:a.views, comments:a.comments} : a);
+                // Update visible image only: preserve the open story, comments and reading position.
+                if (String(activeModalArticleId) === String(articleId)) {
+                    const image = document.getElementById('modalImage');
+                    image.src = safeImageURL(updated.image);
+                    image.style.setProperty('--ae-image-focus', imagePosition(updated));
+                    image.style.setProperty('--ae-image-zoom', String(imageScale(updated)));
+                }
+                renderArticlesFeed();
+                window.aeRefreshNewsArchive?.();
+                renderTrending();
+                photoEditSaving = false;
+                closeArticlePhotoEditor();
+                setDataStatus('Foto actualizada. La fecha, los comentarios y el orden de la noticia siguen iguales.');
+            } catch (error) {
+                errorBox.textContent = error?.message || 'No se pudo actualizar la foto. Inténtalo de nuevo.';
+                errorBox.classList.remove('hidden');
+            } finally {
+                photoEditSaving = false;
+                save.disabled = false;
+                cancel.disabled = false;
+                save.textContent = 'Guardar foto';
+            }
+        }
+
+        // Escape closes the photo editor only; it must not also close the article.
+        document.addEventListener('keydown', event => {
+            const modal = document.getElementById('aeArticlePhotoModal');
+            if (!modal || modal.classList.contains('hidden')) return;
+            if (event.key === 'Escape') {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                closeArticlePhotoEditor();
+                return;
+            }
+            if (event.key !== 'Tab') return;
+            const controls = [...modal.querySelectorAll('input:not(:disabled),button:not(:disabled)')]
+                .filter(el => !el.closest('[hidden]'));
+            if (!controls.length) return;
+            const first = controls[0], last = controls[controls.length-1];
+            if (event.shiftKey && (document.activeElement === first || document.activeElement === modal)) {
+                event.preventDefault(); last.focus();
+            } else if (!event.shiftKey && document.activeElement === last) {
+                event.preventDefault(); first.focus();
+            }
+        }, true);
+
         function openPublishModal() {
             editingArticleId = null;
             publishDraftId = null;
+            document.getElementById('pubModalTitle').textContent = 'Publicar Nuevo Artículo';
+            document.getElementById('pubSubmitButton').innerHTML = '<i class="fa-solid fa-paper-plane mr-1.5"></i> Publicar ahora';
             if (!currentAdmin) {
                 openLoginModal();
                 return;
@@ -3943,7 +4116,7 @@ currentUser = {
             errorBox.classList.add('hidden');
             errorBox.textContent = '';
             const label = button.textContent;
-            button.textContent = 'Publicando…';
+            button.textContent = editingArticleId ? 'Guardando cambios…' : 'Publicando…';
             const category = document.getElementById('pubCategory').value;
             const bodyText = document.getElementById('pubBody').value.trim();
             const title = document.getElementById('pubTitle').value.trim();
@@ -3971,7 +4144,12 @@ currentUser = {
                 const request = editingArticleId ? db.from('articles').update(payload).eq('id', editingArticleId) : db.from('articles').insert(payload);
                 const {data, error} = await request.select().single();
                 if (error) throw new Error('No se pudo guardar en línea: ' + error.message + '. El formulario conserva tu texto.');
-                articles = [fromDatabase(data), ...articles.filter(a => a.id !== data.id)];
+                const savedArticle = fromDatabase(data);
+                // Updating a news item must replace its existing entry, not prepend it.
+                articles = editingArticleId
+                    ? articles.map(a => String(a.id) === String(data.id)
+                        ? {...savedArticle, likes:a.likes, userLiked:a.userLiked, views:a.views, comments:a.comments} : a)
+                    : [savedArticle, ...articles.filter(a => String(a.id) !== String(data.id))];
                 publishDraftId = null;
                 editingArticleId = null;
                 if (String(activeModalArticleId) === String(data.id)) openArticleModal(data.id, {updateUrl: false});
@@ -4393,7 +4571,7 @@ function toggleDarkMode() {
 updateThemeButton();
     </script>
 <script src="assets/nfl-teams.js"></script>
-<script src="assets/community.js?v=20261016-admin-header-1"></script>
+<script src="assets/community.js?v=20261020-photo-edit-1"></script>
 <script src="assets/ae-home-community-spotlight.js?v=20261018-reply-totals-1"></script>
 <script src="assets/champions.js?v=qa1-20261015-6"></script>
 <script src="assets/ae-pick-capture-parser.js?v=20261020-playdoit-momios-1"></script>
@@ -4539,7 +4717,7 @@ html .cam-weekly-result-surface .cam-weekly-result-on-photo{
 <script src="assets/ae-draft-guard.js?v=20261019-photo-date-1"></script>
 <script src="assets/ae-take-category-edit.js?v=20261016-1"></script>
 <script src="assets/ae-picks-premium.js?v=20261019-plates-height-75"></script>
-<script src="assets/ae-image-framing.js?v=20261016-framing-zoom-2"></script>
+<script src="assets/ae-image-framing.js?v=20261020-photo-edit-1"></script>
 <script src="assets/ae-news-editor.js?v=20261016-1"></script>
 <script src="assets/ae-news-archive.js?v=20261018-sport-mobile-direct-1"></script>
 <script src="assets/ae-mobile-compact-home.js?v=20261016-top3-swipe-v1"></script>

@@ -69,12 +69,16 @@ function renderSessionHeader() {
 }
 function updateArticleEditorButton(article) {
     article ||= articles.find(a => String(a.id) === String(activeModalArticleId));
-    document.getElementById('editArticleButton')?.classList.toggle('hidden', !(currentAdmin && article?.remote));
+    for (const id of ['editArticleButton','editArticlePhotoButton']) {
+        document.getElementById(id)?.classList.toggle('hidden', !(currentAdmin && article?.remote));
+    }
 }
 function openArticleEditor() {
     const article = articles.find(a => String(a.id) === String(activeModalArticleId));
     if (!currentAdmin || !article?.remote) return;
     openPublishModal(); editingArticleId = article.id;
+    document.getElementById('pubModalTitle').textContent = 'Editar publicación';
+    document.getElementById('pubSubmitButton').textContent = 'Guardar cambios';
     for (const [id, value] of Object.entries({pubTitle: article.title, pubAuthor: article.author,
         pubCategory: article.category, pubImage: article.image, pubSummary: article.summary})) {
         document.getElementById(id).value = value || '';

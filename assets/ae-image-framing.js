@@ -9,6 +9,11 @@
       file:'pubImageFile',url:'pubImage',preview:'pubImagePreview',
       x:'pubImageFocusX',y:'pubImageFocusY',
       zoom:'pubImageZoomRange',zoomOutput:'pubImageZoomValue'
+    },
+    photo:{
+      file:'aePhotoImageFile',url:'aePhotoImageUrl',preview:'aePhotoImagePreview',
+      x:'aePhotoFocusX',y:'aePhotoFocusY',
+      zoom:'aePhotoZoomRange',zoomOutput:'aePhotoZoomValue'
     }
   };
   const blobUrls={};
