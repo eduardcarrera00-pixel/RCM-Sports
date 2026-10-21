@@ -16,13 +16,13 @@ await db.exec(`insert into cam_social.channels values('twitter','test-x',true),(
 insert into vault.secrets values('cam_buffer_api_key','TEST_ONLY');
 update cam_social.settings set enabled=true,activated_at=now();`);
 await db.query("insert into cam_social.weekly_results(pick_id,outcome) values($1,'won')",[id]);
-await db.query("insert into cam_social.events(event_key,source_table,source_id,payload) values($1,'ae_editorial_weekly_pick_results',$2,$3)",['weekly-won:'+id,id,{title:'Pick acertado',x_text:'✅ Pick acertado · Pick de la Semana\nhttps://x.com/test/status/123',tiktok_text:'Pick acertado',image_url:'https://example.com/original.jpg'}]);
+await db.query("insert into cam_social.events(event_key,source_table,source_id,payload) values($1,'ae_editorial_weekly_pick_results',$2,$3)",['weekly-won:'+id,id,{title:'Pick acertado',x_text:'✅ Pick acertado · Pick del editor\nhttps://x.com/test/status/123',tiktok_text:'Pick acertado',image_url:'https://example.com/original.jpg'}]);
 await db.query("insert into cam_social.deliveries(event_key,network) values($1,'twitter'),($1,'tiktok')",['weekly-won:'+id]);
 await db.exec('select cam_social.dispatch();');
 const calls=(await db.query('select body from net.calls')).rows.map(r=>r.body.variables.input);
 assert.equal(calls.length,2);
 assert.deepEqual(calls.find(c=>c.channelId==='test-x').assets,[],'X quote must not upload the original photo again');
-assert.equal(calls.find(c=>c.channelId==='test-x').text,'✅ Pick acertado · Pick de la Semana\nhttps://x.com/test/status/123');
+assert.equal(calls.find(c=>c.channelId==='test-x').text,'✅ Pick acertado · Pick del editor\nhttps://x.com/test/status/123');
 assert.equal(calls.find(c=>c.channelId==='test-tiktok').assets[0].image.url,'https://example.com/original.jpg');
 await db.exec('select cam_social.dispatch();');
 assert.equal((await db.query('select count(*)::int as n from net.calls')).rows[0].n,2,'Cron never duplicates the quote');
