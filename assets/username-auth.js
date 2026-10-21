@@ -79,7 +79,11 @@ async function aeAuthRequest(payload){
  throw Error('No pudimos conectar con el servicio de cuentas.');
 }
 function setAuthMode(mode){
- authMode=mode;const extra=mode==='register'||mode==='recover';
+ authMode=mode;
+ document.getElementById('userAuthForm').dataset.camAuthMode=mode;
+ const title=document.getElementById('camAuthTitle');
+ if(title)title.textContent={login:'Entra a la comunidad',register:'Únete a CAM SPORTS',recover:'Recupera tu acceso',code:'Renueva tu código'}[mode]||'Tu cuenta';
+ const extra=mode==='register'||mode==='recover';
  document.getElementById('authConfirmWrap').hidden=!extra;document.getElementById('authPasswordConfirm').required=extra;
  document.getElementById('authCodeWrap').hidden=mode!=='recover';document.getElementById('authRecoveryCode').required=mode==='recover';
  const password=document.getElementById('userAuthPassword');password.minLength=extra?8:1;password.maxLength=128;password.autocomplete=extra?'new-password':'current-password';

@@ -292,7 +292,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/cam-analytics.css?v=20261020-1">
     <link rel="stylesheet" href="assets/ae-muted-navigation-icons.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-custom-nav-icons.css?v=20261016-1">
-<link rel="stylesheet" href="assets/ae-classical-auth-buttons.css?v=20261020-cam-olympus-welcome-1">
+<link rel="stylesheet" href="assets/ae-classical-auth-buttons.css?v=20261020-classical-auth-panel-1">
 <link rel="stylesheet" href="assets/ae-reference-community-design.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-mobile-header-ranking-polish.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-desktop-header-layout.css?v=20261016-1">
@@ -2599,21 +2599,30 @@ html:not(.dark) #aeAuthIntroNotice small{color:#5b6d76}
 @media(max-width:480px){#aeAuthIntroNotice{top:63px;max-width:300px;padding:12px}}
 </style>
 <!-- User Account Modal -->
-<div id="userAuthModal" role="dialog" aria-modal="true" aria-label="Iniciar sesión o crear una cuenta"
+<div id="userAuthModal" role="dialog" aria-modal="true" aria-labelledby="camAuthTitle"
      class="fixed inset-0 z-[60] hidden overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4"
      style="z-index: 10000;">
 
-    <div class="relative bg-white border border-slate-200 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden my-auto">
-
-        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50">
-            <div class="flex items-center space-x-2 text-pitch-700 font-bold">
-                <i class="fa-solid fa-user"></i>
-                <span class="text-base text-slate-900">Cuenta CAM SPORTS</span>
+    <div class="cam-auth-shell relative bg-white border border-slate-200 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden my-auto">
+        <aside class="cam-auth-story" aria-hidden="true">
+            <div class="cam-auth-story-brand"><span>CAM</span> SPORTS</div>
+            <div class="cam-auth-story-message">
+                <p class="cam-auth-story-overline">HAY SITIO PARA TI</p>
+                <h2>El deporte nos reúne.</h2>
+                <p>Comparte tus Picks. Defiende tus Takes. Aquí cada voz cuenta.</p>
+            </div>
+            <div class="cam-auth-story-foot">UNA COMUNIDAD. MIL HISTORIAS.</div>
+        </aside>
+        <div class="cam-auth-work">
+        <div class="cam-auth-heading flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50">
+            <div class="cam-auth-heading-text">
+                <p class="cam-auth-kicker">CAM SPORTS · TU CUENTA</p>
+                <h2 id="camAuthTitle">Entra a la comunidad</h2>
             </div>
 
             <button type="button"
                     onclick="closeUserAuthModal()" aria-label="Cerrar ventana de acceso"
-                    class="w-8 h-8 rounded-full bg-slate-200/60 text-slate-500 hover:text-slate-800 flex items-center justify-center">
+                    class="cam-auth-close w-8 h-8 rounded-full bg-slate-200/60 text-slate-500 hover:text-slate-800 flex items-center justify-center">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
@@ -2627,13 +2636,12 @@ html:not(.dark) #aeAuthIntroNotice small{color:#5b6d76}
             </div>
         </div>
 
-        <form id="userAuthForm" onsubmit="handleUserLogin(event)" class="p-6 space-y-4">
+        <form id="userAuthForm" data-cam-auth-mode="login" onsubmit="handleUserLogin(event)" class="p-6 space-y-4">
 
             <p id="aeAuthPublishHint" hidden class="text-sm font-semibold text-pitch-700" role="status"></p>
-            <p class="text-sm text-slate-600">Inicia sesión o crea una cuenta para comentar, responder, votar y publicar Takes o Picks.</p>
+            <p class="cam-auth-intro text-sm text-slate-600">Tu cancha está aquí. Entra, opina y vive cada partido.</p>
             <p id="aeAuthPrivacyNote" class="text-xs text-slate-500 leading-relaxed">
-                No necesitas correo para registrarte. Tu sesión y lo que publiques
-                se guardan para que puedas participar.
+                Sin correo para registrarte. Guardamos tu sesión y tus publicaciones.
             </p>
 
             <div id="userAuthError"
@@ -2675,10 +2683,10 @@ html:not(.dark) #aeAuthIntroNotice small{color:#5b6d76}
             <p id="authModeHelp">Inicia sesión con tu usuario. Las cuentas anteriores también pueden usar su correo.</p>
             <div class="space-y-2 pt-2">
                 <button id="authSubmit" type="submit" class="w-full bg-pitch-600 text-white font-bold px-5 py-3 rounded-xl">Iniciar sesión</button>
-                <button type="button" onclick="setAuthMode('register')">Crear cuenta</button>
-                <button type="button" onclick="setAuthMode('login')">Ya tengo cuenta</button>
-                <button type="button" onclick="setAuthMode('recover')">Recuperar con mi código</button>
-                <button type="button" onclick="setAuthMode('code')">Generar un código nuevo</button>
+                <button type="button" class="cam-auth-nav-register" onclick="setAuthMode('register')">Crear una cuenta <span aria-hidden="true">↗</span></button>
+                <button type="button" class="cam-auth-nav-login" onclick="setAuthMode('login')">Volver a iniciar sesión</button>
+                <button type="button" class="cam-auth-nav-recover" onclick="setAuthMode('recover')">Recuperar con mi código</button>
+                <button type="button" class="cam-auth-nav-code" onclick="setAuthMode('code')">Generar un código nuevo</button>
             </div>
 
         </form>
@@ -2690,6 +2698,7 @@ html:not(.dark) #aeAuthIntroNotice small{color:#5b6d76}
             <button type="button" onclick="copyRecoveryCode()">Copiar código</button>
             <button type="button" onclick="finishRecoveryCode()">Ya lo guardé</button>
         </section>
+        </div>
     </div>
 </div>
     <dialog id="aeOpinionReader" class="ae-opinion-dialog ae-opinion-reader" aria-labelledby="aeOpinionReaderLabel">
@@ -4326,7 +4335,7 @@ updateThemeButton();
 <script src="assets/ae-pick-capture.js?v=20261020-auto-settle-1"></script>
 <script src="assets/community-picks.js?v=20261020-picks-compact-3"></script>
 <script src="assets/weekly-picks.js?v=20261015-1"></script>
-<script src="assets/username-auth.js?v=20261016-reply-login-1"></script>
+<script src="assets/username-auth.js?v=20261020-classical-auth-panel-1"></script>
 <script src="assets/ae-category-visibility.js?v=20261016-dynamic-nav-1"></script>
 <script src="assets/ae-nfl-takes.js?v=20261015-3"></script>
 <script src="assets/free-takes.js?v=20261019-take-reply-counts-1"></script>
