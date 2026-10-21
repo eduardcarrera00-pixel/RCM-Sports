@@ -20,6 +20,9 @@ USER = {'id': 'u1', 'email': 'eduard@example.com', 'is_anonymous': False,
 
 def fake(admin=False, rows=None):
     js = 'window.__fake.tables=' + json.dumps({'ae_site_images': rows or []}) + ';'
+    # La bienvenida de la portada se abre en la primera visita de cada sesión; aquí ya se vio.
+    js += "try{sessionStorage.setItem('cam_sports_home_welcome_seen_session_v1','1')}catch(e){}"
+
     if admin:
         js += ('window.__fake.user=' + json.dumps(USER) + ';window.__fake.tables.editors=[{user_id:"u1"}];'
                "try{localStorage.setItem('cam_sports_admin_welcome_preview_u1','1')}catch(e){}")
@@ -166,6 +169,26 @@ def run():
             page.evaluate('currentAdmin=null;renderAdminUI()')
             assert page.locator('cam-site-image-layer').count() == 0
             assert not page.errors, page.errors
+
+    # 3b) Imágenes dentro de diálogos: bienvenida (modal nativo) y acceso
+    with fp.full_page(fake_js=fake(admin=True), width=1366) as page:
+        images(page)
+        page.wait_for_timeout(800)
+        page.evaluate("for(const d of document.querySelectorAll('dialog[open]'))d.close()")
+        page.evaluate("document.getElementById('camWelcomeDialog').showModal()")
+        page.wait_for_timeout(900)
+        keys = {p['key'] for p in visible_pencils(page)}
+        assert 'bienvenida.fondo-dia' in keys, sorted(keys)
+        page.locator('#camWelcomeDialog cam-site-image-layer > .cam-site-image-pencil[data-key="bienvenida.fondo-dia"]').click()
+        page.wait_for_selector('#camSiteImageDialog[open]')
+        assert page.locator('#camSiteImageDialog [data-ui=variants] button').count() == 2
+        page.locator('#camSiteImageDialog [data-act=cancel]').click()
+        page.evaluate("document.getElementById('camWelcomeDialog').close()")
+        page.evaluate("document.getElementById('userAuthModal').classList.remove('hidden')")
+        page.wait_for_timeout(900)
+        keys = {p['key'] for p in visible_pencils(page)}
+        assert 'acceso.portico-dia' in keys, sorted(keys)
+        assert not page.errors, page.errors
 
     # 4) Un fallo de la base (migración sin aplicar) se explica en el diálogo.
     js = fake(admin=True) + "window.__fake.rpc.ae_set_site_image=()=>{throw Error('Could not find the function public.ae_set_site_image in the schema cache')};"
