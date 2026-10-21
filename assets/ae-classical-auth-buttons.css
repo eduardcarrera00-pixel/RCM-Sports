@@ -2714,3 +2714,28 @@ html:not(.dark) body #userAuthModal #userAuthForm .space-y-2::before{border-colo
   html body #userAuthModal .cam-auth-heading {padding:9px 16px!important;}
   html body #userAuthModal #userAuthForm {padding:12px 16px 16px!important;}
 }
+
+/* CAM SPORTS · «Siempre serás bienvenido»: reabre la bienvenida desde el acceso.
+   Placa discreta bajo la marca, con el mismo filete dorado del pórtico. */
+html body #userAuthModal .cam-auth-welcome-again{
+  position:relative;align-self:flex-start;display:inline-flex;align-items:center;gap:7px;
+  min-height:30px;margin:12px 0 0;padding:6px 12px;
+  border:1px solid rgba(228,183,122,.62)!important;border-radius:0!important;
+  background:rgba(6,22,34,.46);color:#f2d4a7;
+  font:800 9.5px/1.2 Inter,system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;
+  cursor:pointer;transition:background .15s ease,border-color .15s ease,color .15s ease;
+}
+html body #userAuthModal .cam-auth-welcome-again::before{content:'';position:absolute;inset:-7px -4px;}
+html body #userAuthModal .cam-auth-welcome-again::after{content:'→';font-size:11px;letter-spacing:0;}
+html body #userAuthModal .cam-auth-welcome-again:hover{background:rgba(228,183,122,.18);border-color:#e4b77a!important;color:#fff1df;}
+html body #userAuthModal .cam-auth-welcome-again:focus-visible{outline:2px solid #e4b77a;outline-offset:3px;}
+html:not(.dark) body #userAuthModal .cam-auth-welcome-again{
+  border-color:rgba(126,94,59,.58)!important;background:rgba(255,250,242,.74);color:#5e3f27;
+}
+html:not(.dark) body #userAuthModal .cam-auth-welcome-again:hover{background:#fffaf1;border-color:#90643d!important;color:#3f2a1c;}
+html:not(.dark) body #userAuthModal .cam-auth-welcome-again:focus-visible{outline-color:#855b43;}
+@media(max-width:690px){
+  html body #userAuthModal .cam-auth-welcome-again{min-height:27px;margin-top:9px;padding:5px 10px;font-size:9px;}
+  /* La marca y el botón arriba; el titular sigue al pie de la imagen. */
+  html body #userAuthModal .cam-auth-welcome-again + .cam-auth-story-message{margin-top:auto!important;}
+}
