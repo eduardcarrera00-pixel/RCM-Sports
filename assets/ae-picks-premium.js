@@ -4,17 +4,19 @@
  const $=id=>document.getElementById(id);
  const allowed={'image/jpeg':'jpg','image/png':'png','image/webp':'webp'};
  const maxSize=5*1024*1024;
- const fileChecks=file=>{
+ // Original permitido antes de comprimir en el navegador (fotos de móvil).
+ const maxOriginal=25*1024*1024;
+ const fileChecks=(file,limit=maxSize)=>{
    if(!file)return;
    if(!Object.prototype.hasOwnProperty.call(allowed,file.type))throw Error('Solo se permiten imágenes JPG, PNG o WEBP.');
-   if(file.size===0||file.size>maxSize)throw Error('La imagen debe pesar menos de 5 MB.');
+   if(file.size===0||file.size>limit)throw Error('La imagen debe pesar menos de '+Math.round(limit/1048576)+' MB.');
  };
  function preview(input,targetId){
    const target=$(targetId);if(!target)return;
    const file=input?.files?.[0];
    target.replaceChildren();
    if(!file)return;
-   try { fileChecks(file); }catch(err){input.value='';target.textContent=err.message;return;}
+   try { fileChecks(file,maxOriginal); }catch(err){input.value='';target.textContent=err.message;return;}
    const url=URL.createObjectURL(file);
    const img=document.createElement('img');img.src=url;img.alt='Vista previa de imagen seleccionada';img.loading='lazy';
    img.addEventListener('load',()=>URL.revokeObjectURL(url),{once:true});
@@ -23,6 +25,8 @@
  }
  async function upload(file,folder){
    if(!file)return null;
+   fileChecks(file,maxOriginal);
+   if(window.camCompressImage)file=await window.camCompressImage(file);
    fileChecks(file);
    if(!['weekly/banner','weekly/article','articles'].includes(folder))throw Error('Destino de imagen inválido.');
    if(typeof db==='undefined'||!db?.storage)throw Error('La conexión de imágenes no está disponible.');

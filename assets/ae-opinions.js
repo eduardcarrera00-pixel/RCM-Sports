@@ -15,6 +15,7 @@
   const SPORT_NAME = Object.fromEntries(SPORTS);
   const IMAGE_TYPES = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
   const MAX_IMAGE = 8 * 1024 * 1024;
+  const MAX_ORIGINAL = 25 * 1024 * 1024; // antes de comprimir en el navegador
 
   let failed = false, items = [], views = new Map(), active = 'todas', loaded = false, loading = null, editing = null, reading = null, pendingDeepLink = null;
 
@@ -303,6 +304,8 @@
 
   async function uploadImage(file) {
     if (!IMAGE_TYPES[file.type]) throw Error('La imagen debe ser JPG, PNG o WebP.');
+    if (file.size > MAX_ORIGINAL) throw Error('La imagen supera 25 MB.');
+    if (window.camCompressImage) file = await window.camCompressImage(file);
     if (file.size > MAX_IMAGE) throw Error('La imagen supera 8 MB.');
     const sb = client();
     if (!sb?.storage) throw Error('La subida de imágenes no está disponible. Pega un enlace HTTPS.');
@@ -400,7 +403,7 @@
       if (prev.dataset.localUrl) { URL.revokeObjectURL(prev.dataset.localUrl); delete prev.dataset.localUrl; }
       $('aeOpinionFormError').textContent = '';
       if (f) {
-        if (!IMAGE_TYPES[f.type] || f.size > MAX_IMAGE) { $('aeOpinionFormError').textContent = 'La imagen debe ser JPG, PNG o WebP de hasta 8 MB.'; $('aeOpinionFile').value = ''; }
+        if (!IMAGE_TYPES[f.type] || f.size > MAX_ORIGINAL) { $('aeOpinionFormError').textContent = 'La imagen debe ser JPG, PNG o WebP de hasta 25 MB.'; $('aeOpinionFile').value = ''; }
         else { prev.dataset.localUrl = URL.createObjectURL(f); $('aeOpinionImage').value = ''; }
       }
       updatePreview();
