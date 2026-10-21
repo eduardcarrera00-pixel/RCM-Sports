@@ -122,6 +122,10 @@ assert.equal(d.querySelectorAll('#cpDialog .cp-recipe-card .cp-pick-line').lengt
 assert.match(d.querySelectorAll('#cpDialog .cp-recipe-card .cp-pick-line-choice')[1].textContent,/Más de 3.5 goles/);
 assert.match(d.querySelectorAll('#cpDialog .cp-recipe-card .cp-pick-line-choice')[2].textContent,/Ambos equipos marcan/);
 assert.equal(d.querySelector('#cpDialog .cp-recipe-card .cp-feed-meta .cp-odds').textContent,'Cuota +150');
+assert.match(d.querySelector('#cpDialog .cp-recipe-card .cp-pick-line-market').textContent,/Ganador · 3 vías/,'Chef recipe includes a readable market label');
+assert.match(d.querySelectorAll('#cpDialog .cp-recipe-card .cp-pick-line-market')[1].textContent,/Total de goles/);
+assert.match(d.querySelectorAll('#cpDialog .cp-recipe-card .cp-pick-line-market')[2].textContent,/Ambos equipos marcan/);
+
 
 const reply=d.querySelector('#cpDialog form');
 reply.querySelector('textarea').value='Comentario antes de la aprobación';

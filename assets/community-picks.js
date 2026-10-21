@@ -140,7 +140,15 @@ function card(p,compact=false,detail=false){
         if(matchup&&!titleKey.includes(simplify(matchup)))body.append(el('span',matchup,'cp-pick-line-event'));
         const display=pickSelectionDisplay(selection);
         body.append(el('strong',display.choice||matchup||'Pronóstico','cp-pick-line-choice'));
-        if(display.market)body.append(el('small',display.market,'cp-pick-line-market'));
+        // On the full Chef recipe, secondary labels clarify each market without
+        // making the compact public feed any taller.
+        let marketLabel=display.market;
+        if(detail){
+          if(/MONEYLINE/i.test(selection))marketLabel=/3[- ]WAY|3 VIAS/i.test(selection)?'Ganador · 3 vías':'Ganador del partido';
+          else if(/OVER\/UNDER/i.test(selection))marketLabel='Total de goles';
+          else if(/BOTH TEAMS TO SCORE/i.test(selection))marketLabel='Ambos equipos marcan';
+        }
+        if(marketLabel)body.append(el('small',marketLabel,'cp-pick-line-market'));
         row.append(body);legs.append(row);
       });
     }
