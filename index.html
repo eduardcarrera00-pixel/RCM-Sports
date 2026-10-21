@@ -288,7 +288,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
     </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
-<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261021-sencillos-1">
+<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261021-composer-brief-1">
 <link rel="stylesheet" href="assets/cam-pick-points-rules.css?v=20261021-rules-1">
 <link rel="stylesheet" href="assets/cam-analytics.css?v=20261020-1">
     <link rel="stylesheet" href="assets/ae-muted-navigation-icons.css?v=20261016-1">
@@ -322,7 +322,7 @@ html body.ae-is-football #mainContent #aeSportTakeLeaders.ae-sport-chefs[data-sp
 <link rel="stylesheet" href="assets/ae-home-takes-compact-reference.css?v=20261016-2">
 <link rel="stylesheet" href="assets/ae-home-cta-icons.css?v=20261016-read-cta-2">
 <link rel="stylesheet" href="assets/ae-home-focus-hierarchy.css?v=20261016-2">
-<link rel="stylesheet" href="assets/ae-take-composer-modal.css?v=20261019-draftguard-1">
+<link rel="stylesheet" href="assets/ae-take-composer-modal.css?v=20261021-composer-brief-1">
 <link rel="stylesheet" href="assets/ae-picks-platos-odds.css?v=20261016-odds-right-2">
 <link rel="stylesheet" href="assets/ae-mobile-polish-weekly-pick.css?v=20261016-first-pick-blur-center-takes-3">
 <link rel="stylesheet" href="assets/ae-admin-header-final.css?v=20261016-5">
@@ -2384,7 +2384,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
 
         <!-- Los Takes son una función editorial al final de NFL y Fútbol, no una categoría de navegación. -->
         <section id="freeTakes" class="ae-takes ae-free-takes" hidden aria-labelledby="freeTakesTitle">
-          <div class="ae-takes-head"><h2 id="freeTakesTitle">Demuestra tu conocimiento</h2><p>Escribe tu pronóstico para la historia. Después de publicar, no podrás editar el texto ni borrarlo; solo podrás moverlo entre NFL y Fútbol.</p><button id="aeSportTakePublish" onclick="event.stopImmediatePropagation(); if(typeof window.aeOpenTakeComposer==='function'){window.aeOpenTakeComposer();}else{const modal=document.getElementById('aeTakeComposerDialog');if(modal&&!modal.open)modal.showModal();}" type="button" class="ae-participate-cta ae-sport-take-publish" aria-controls="aeTakeComposerDialog">Mi Take</button></div>
+          <div class="ae-takes-head"><h2 id="freeTakesTitle">Demuestra tu conocimiento</h2><p>La comunidad vota y debate tus Takes. Los aciertos pueden sumar puntos; tu historial queda en tu perfil. Lo publicado no se borra.</p><button id="aeSportTakePublish" onclick="event.stopImmediatePropagation(); if(typeof window.aeOpenTakeComposer==='function'){window.aeOpenTakeComposer();}else{const modal=document.getElementById('aeTakeComposerDialog');if(modal&&!modal.open)modal.showModal();}" type="button" class="ae-participate-cta ae-sport-take-publish" aria-controls="aeTakeComposerDialog">Mi Take</button></div>
           <!-- Dos columnas de opiniones: dentro del módulo, inmediatamente después del título. -->
         <section id="aeSportTakeLeaders" class="ae-sport-voice ae-sport-chefs" hidden aria-label="Takes más apoyados y más cuestionados de la comunidad">
           <p id="aeSportTakeStatus" class="sr-only" role="status" aria-live="polite">Cargando Takes…</p>
@@ -2505,7 +2505,11 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
       <div><span>LA COMUNIDAD OPINA</span><h2 id="aeTakeComposerTitle">Publicar mi Take</h2></div>
       <button id="aeTakeComposerClose" type="button" aria-label="Cerrar formulario">×</button>
     </header>
-    <p id="aeTakeComposerIntro">Elige Fútbol o NFL, escribe la competición con tus palabras y publica tu opinión.</p>
+    <div id="aeTakeComposerIntro" class="cam-take-disclaimer" role="note">
+      <strong class="cam-take-disclaimer__title">¡Que tu Take haga historia!</strong>
+      <p>La comunidad vota y responde. Los aciertos evaluados pueden sumar puntos según su dificultad.</p>
+      <p class="cam-take-disclaimer__details">Sigue tus Takes en <strong>Mi perfil</strong>. <strong>Lo publicado no se edita ni se borra.</strong></p>
+    </div>
     <form id="freeTakesForm" class="ae-free-compose ae-take-composer-form">
       <fieldset class="ae-take-kind">
         <legend>¿Sobre qué quieres hablar?</legend>
@@ -2529,7 +2533,13 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
 
 <dialog id="cpComposePanel" class="ae-pick-compose-dialog" aria-labelledby="cpComposeTitle" aria-describedby="cpComposeIntro">
  <header class="ae-pick-compose-head"><div><span>COCINA PICKS</span><h2 id="cpComposeTitle" tabindex="-1" autofocus>Prepara tu Pick</h2></div><button id="cpComposeClose" type="button" aria-label="Cerrar formulario de Pick">×</button></header>
- <p id="cpComposeIntro"><strong>¡Compite por el número 1!</strong> Demuestra quién es el mejor pickster de CAM SPORTS. Sube tu captura: preparamos el pick y descartamos la foto para no conservar datos personales. Tú decides si lo publicas.</p>
+ <div id="cpComposeIntro" class="cam-pick-hero" role="note">
+  <strong class="cam-pick-hero__title">¡A por el número 1, pickster!</strong>
+  <div class="cam-pick-hero__flow" aria-label="Sube la captura, preparamos tu Pick y borramos la foto">
+   <span>Sube captura</span><span aria-hidden="true">→</span><span>Preparamos tu Pick</span><span aria-hidden="true">→</span><span>Borramos la foto</span>
+  </div>
+  <small>Revisa el resultado. <strong>Tú decides si publicarlo.</strong></small>
+ </div>
  <details id="camPickPointsRules" class="cam-pick-rules">
   <summary>
    <svg class="cam-pick-rules__trophy" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 4h8v4c0 3.5-1.6 6-4 6s-4-2.5-4-6V4Zm0 2H5v2c0 2 1.2 3 3.7 3.2M16 6h3v2c0 2-1.2 3-3.7 3.2M12 14v4M8 20h8"/></svg>
@@ -4595,7 +4605,7 @@ updateThemeButton();
 <script src="assets/ae-home-community-spotlight.js?v=20261018-reply-totals-1"></script>
 <script src="assets/champions.js?v=qa1-20261015-6"></script>
 <script src="assets/ae-pick-capture-parser.js?v=20261021-sencillos-1"></script>
-<script src="assets/ae-pick-capture.js?v=20261021-sencillos-1"></script>
+<script src="assets/ae-pick-capture.js?v=20261021-composer-brief-1"></script>
 <script src="assets/community-picks.js?v=20261021-sencillos-1"></script>
 <script src="assets/weekly-picks.js?v=20261015-1"></script>
 <script src="assets/username-auth.js?v=20261020-classical-auth-panel-1"></script>
