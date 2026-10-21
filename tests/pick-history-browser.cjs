@@ -43,7 +43,10 @@ const server=http.createServer((req,res)=>{
  for(const admin of [false,true]){
   await page.evaluate(async admin=>{window.currentAdmin=admin?{id:'editor'}:null;await Promise.all(Array.from({length:12},()=>window.updateAePicksAdmin()));},admin);
   assert.equal(await page.locator('#cpSettleHistory .ae-pick-history-entry').count(),1);
-  assert.equal(await page.locator('#cpSettleHistory .ae-pick-history-summary').count(),1);
+  assert.equal(await page.locator('#cpSettleHistory .ae-pick-history-summary').count(),0);
+  assert.equal(await page.locator('#cpSettleHistory .cp-history-card').count(),1);
+  assert.equal(await page.locator('#cpSettleHistory .cp-pick-line-choice').count(),1);
+  assert.equal(await page.locator('#cpSettleHistory .cp-upvote, #cpSettleHistory .cp-downvote').count(),0);
   for(const width of [360,390,768,910,911,1366])for(const dark of [false,true]){
    await page.setViewportSize({width,height:1000});await page.evaluate(dark=>document.documentElement.classList.toggle('dark',dark),dark);
    await page.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))));
