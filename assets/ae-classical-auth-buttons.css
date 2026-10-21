@@ -2431,9 +2431,9 @@ html body #userAuthModal .cam-auth-shell {
 }
 html body #userAuthModal .cam-auth-story {
   background-color:#141e26!important;
-  background-image:linear-gradient(90deg,rgba(4,12,20,.48) 0%,rgba(4,12,20,.17) 55%,rgba(4,12,20,.02) 100%),url('cam-login-background-night.webp')!important;
-  background-position:center,center!important;
-  background-size:cover,cover!important;
+  background-image:linear-gradient(90deg,rgba(4,12,20,.26) 0%,rgba(4,12,20,.12) 55%,rgba(4,12,20,.01) 100%),url('cam-login-background-night-HD.webp'),url('cam-login-background-night.webp')!important;
+  background-position:center,center,center!important;
+  background-size:cover,cover,cover!important;
   background-repeat:no-repeat!important;
   padding:33px 30px 27px!important;
 }
@@ -2497,7 +2497,7 @@ html:not(.dark) body #userAuthModal .cam-auth-shell{
 }
 html:not(.dark) body #userAuthModal .cam-auth-story{
   background-color:#d9c5a7!important;
-  background-image:linear-gradient(90deg,rgba(255,249,237,.43) 0%,rgba(255,249,237,.16) 55%,rgba(255,249,237,.02) 100%),url('cam-login-background-day.webp')!important;
+  background-image:linear-gradient(90deg,rgba(255,249,237,.23) 0%,rgba(255,249,237,.09) 55%,rgba(255,249,237,.01) 100%),url('cam-login-background-day-HD.webp'),url('cam-login-background-day.webp')!important;
 }
 html:not(.dark) body #userAuthModal .cam-auth-story::before{border-color:rgba(126,94,59,.48)!important;}
 html:not(.dark) body #userAuthModal .cam-auth-story-brand{color:#4c3425!important;text-shadow:none!important;}
