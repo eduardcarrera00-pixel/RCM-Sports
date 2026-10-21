@@ -105,6 +105,10 @@ records[0].legs[0].selection='Paris St-G · MONEYLINE (3-WAY) + Over 3.5 Goals �
 d.querySelector('#cpFeed .cp-downvote').click();await settle();
 assert.equal(d.querySelectorAll('#cpFeed .cp-pick-line').length,3,'Combined Picks display three individually separated markets');
 assert.match(d.querySelector('#cpFeed .cp-picks-count').textContent,/3 SELECCIONES/);
+assert.equal(d.querySelector('#cpFeed .cp-card-legs').tagName,'OL','Picks use one ordered, accessible list');
+assert.equal(d.querySelector('#cpFeed .cp-pick-line-number'),null,'Connecting circles replace numbered boxes');
+assert.match(d.querySelector('#cpFeed .cp-card-odds').textContent,/COMBINADA.*Cuota/s);
+
 assert.match(d.querySelectorAll('#cpFeed .cp-pick-line')[1].textContent,/Más de 3.5 goles/);
 assert.match(d.querySelectorAll('#cpFeed .cp-pick-line')[2].textContent,/Ambos equipos marcan/);
 

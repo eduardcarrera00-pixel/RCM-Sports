@@ -49,10 +49,10 @@ function pickSelectionDisplay(input){
  const parts=String(input||'').split(/\s*[·•]\s*/);
  const prediction=(parts.shift()||'').trim();
  const market=parts.join(' · ').trim();
- if(/MONEYLINE\s*\(?(?:3[- ]WAY|3 VIAS)\)?/i.test(market))return {choice:prediction+' gana',market:'Ganador · 3 vías'};
- if(/^MONEYLINE$/i.test(market))return {choice:prediction+' gana',market:'Ganador del partido'};
- if(/OVER\/UNDER/i.test(market)&&/\bOVER\s+\d+(?:[.,]\d+)?\s+GOALS?\b/i.test(prediction))return {choice:prediction.replace(/\bOver\s+(\d+(?:[.,]\d+)?)\s+Goals?\b/i,'Más de $1 goles'),market:'Total de goles'};
- if(/OVER\/UNDER/i.test(market)&&/\bUNDER\s+\d+(?:[.,]\d+)?\s+GOALS?\b/i.test(prediction))return {choice:prediction.replace(/\bUnder\s+(\d+(?:[.,]\d+)?)\s+Goals?\b/i,'Menos de $1 goles'),market:'Total de goles'};
+ if(/MONEYLINE\s*\(?(?:3[- ]WAY|3 VIAS)\)?/i.test(market))return {choice:prediction+' gana',market:'3 vías'};
+ if(/^MONEYLINE$/i.test(market))return {choice:prediction+' gana',market:''};
+ if(/OVER\/UNDER/i.test(market)&&/\bOVER\s+\d+(?:[.,]\d+)?\s+GOALS?\b/i.test(prediction))return {choice:prediction.replace(/\bOver\s+(\d+(?:[.,]\d+)?)\s+Goals?\b/i,'Más de $1 goles'),market:''};
+ if(/OVER\/UNDER/i.test(market)&&/\bUNDER\s+\d+(?:[.,]\d+)?\s+GOALS?\b/i.test(prediction))return {choice:prediction.replace(/\bUnder\s+(\d+(?:[.,]\d+)?)\s+Goals?\b/i,'Menos de $1 goles'),market:''};
  if(/BOTH TEAMS TO SCORE/i.test(market)&&/^(YES|SI|SÍ)$/i.test(prediction))return {choice:'Ambos equipos marcan · Sí',market:''};
  if(/BOTH TEAMS TO SCORE/i.test(market)&&/^NO$/i.test(prediction))return {choice:'Ambos equipos marcan · No',market:''};
  return {choice:prediction||market,market:prediction?market:''};
@@ -106,11 +106,12 @@ function card(p,compact=false,detail=false){
    };
    n.append(readLink);
  }
- const legs=el('div',null,'cp-card-legs');
+ const legs=el(editorial?'ol':'div',null,'cp-card-legs');
   const simplify=text=>String(text||'').toLocaleLowerCase('es')
     .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
     .replace(/[^a-z0-9]+/g,' ').trim();
   const titleKey=simplify(p.title);
+  let selectionCount=0;
   if(editorial){
     // Each receipt may store several markets in one database leg.
     const choices=[];
@@ -120,11 +121,12 @@ function card(p,compact=false,detail=false){
       if(!selections.length&&leg.event)choices.push({leg,selection:''});
     }
     if(choices.length){
-      const label=choices.length===1?'UNA SELECCIÓN':choices.length+' SELECCIONES';
-      legs.append(el('div',(choices.length>1?'COMBINADA · ':'EL PICK · ')+label,'cp-picks-count'));
+      selectionCount=choices.length;
+      
+      
       choices.forEach(({leg,selection},i)=>{
-        const row=el('div',null,'cp-pick-line');
-        row.append(el('span',String(i+1).padStart(2,'0'),'cp-pick-line-number'));
+        const row=el('li',null,'cp-pick-line');
+        
         const body=el('div',null,'cp-pick-line-body');
         const matchup=String(leg.event||'').trim();
         if(matchup&&!titleKey.includes(simplify(matchup)))body.append(el('span',matchup,'cp-pick-line-event'));
@@ -148,8 +150,10 @@ function card(p,compact=false,detail=false){
   }
   if(legs.childNodes.length)n.append(legs);
  const odds=el('div',null,'cp-card-odds');
+ if(editorial)odds.append(el('span',selectionCount===1?'PICK SIMPLE':'COMBINADA · '+selectionCount+' SELECCIONES','cp-picks-count'));
  odds.append(el('strong','Cuota '+(Number(p.american_odds)>0?'+':'')+p.american_odds,'cp-odds'));
- odds.append(el('small',p.moderation_status==='approved'?(['on_device_ocr','ai_vision'].includes(p.capture_check?.method)?'Momio cotejado con captura':'Cuota aprobada'):p.moderation_status==='rejected'?'Cuota rechazada':'Cuota en revisión · votos abiertos','cp-card-state'));
+ const status=el('small',p.moderation_status==='approved'?(['on_device_ocr','ai_vision'].includes(p.capture_check?.method)?'Momio cotejado con captura':'Cuota aprobada'):p.moderation_status==='rejected'?'Cuota rechazada':'Cuota en revisión · votos abiertos','cp-card-state');
+ if(editorial)n.append(status);else odds.append(status);
  n.append(odds);
  if(p.explanation)n.append(el('p',p.explanation,'cp-explanation'));
  const controls=el('div',null,'cp-actions');
