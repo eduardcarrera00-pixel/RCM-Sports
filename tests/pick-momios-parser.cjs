@@ -70,8 +70,11 @@ assert.equal(r.eventDate, '2027-01-03');
 // 8) Otros formatos no se ven afectados: sin «Momios» no aplica.
 assert.equal(read(['Bet Slip', 'Lakers vs Celtics', 'Lakers -4.5  -110']), null);
 
-// 9) Vía extract(): el formato se reconoce de principio a fin.
-r = p.extract(data(['— PSG vs. FC Barcelona   ABIERTO', 'Sí   2.75', 'Penalti en el encuentro', 'PSG vs. FC Barcelona   20/10 • 14:00', 'Momios   2.75', 'Apuesta total   $25.00']));
+// 9) Vía extract(): el formato se reconoce de principio a fin (partido de mañana:
+//    los partidos ya jugados se rechazan).
+const tomorrow = new Date(Date.now() + 36 * 3600 * 1000);
+const dm = String(tomorrow.getUTCDate()).padStart(2, '0') + '/' + String(tomorrow.getUTCMonth() + 1).padStart(2, '0');
+r = p.extract(data(['— PSG vs. FC Barcelona   ABIERTO', 'Sí   2.75', 'Penalti en el encuentro', 'PSG vs. FC Barcelona   ' + dm + ' • 14:00', 'Momios   2.75', 'Apuesta total   $25.00']));
 assert.equal(r.ok, true, r.reason);
 
 console.log('PASS: boletos «Momios / Apuesta total» (simple, filas separadas, combinada, total incoherente, resuelto, baja confianza, cambio de año).');

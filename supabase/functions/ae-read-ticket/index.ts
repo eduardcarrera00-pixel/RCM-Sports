@@ -28,6 +28,8 @@ const schema = {
   type: 'OBJECT',
   properties: {
     is_bet_slip: {type: 'BOOLEAN', description: 'true solo si la imagen es un boleto o apuesta de una casa de apuestas.'},
+    bet_type: {type: 'STRING', enum: ['combinada', 'sencillas'], description: '"sencillas" si son apuestas individuales independientes, cada una con su propia cuota y sin cuota total (p. ej. pestaña "Sencillos", "Simples" o "Singles"). "combinada" para una sola apuesta o un parlay/múltiple.'},
+    already_started: {type: 'BOOLEAN', description: 'true si algún partido del boleto aparece EN VIVO, con marcador, minuto o entrada en juego, o ya resuelto (palomita verde o tache rojo).'},
     problem: {type: 'STRING', description: 'Si no se puede leer con seguridad, explica en español qué falta (máx. 140 caracteres). Vacío si todo está claro.'},
     selections: {
       type: 'ARRAY',
@@ -61,6 +63,8 @@ Reglas:
 - En casas de México y España las fechas numéricas son día/mes: "20/10 • 14:00" es el 20 de octubre. "Momios" es la cuota total; si es decimal (2.75) conviértela a americana (+175).
 - En apuestas de mercado Sí/No, escribe el mercado y la respuesta: "Penalti en el encuentro: Sí".
 - Si el boleto aparece debajo de otra pantalla de la casa (filas de cuotas de mercados), lee solo el boleto o historial, no esas filas.
+- Si son apuestas sencillas (varias apuestas individuales, cada una con su cuota y sin cuota total), marca bet_type="sencillas" y devuelve cada una con su momio. En "Equipo - Mercado" el pronóstico es "Mercado: Equipo" (p. ej. "Resultado Final (Tiempo Regular): Como").
+- Ignora etiquetas como "PA", "Pago Anticipado", "Cuota de oro" o "EN VIVO" dentro del pronóstico. Si algún partido ya está en juego o terminado (marcador, minuto, "EN VIVO", palomita o tache), marca already_started=true.
 - Si la imagen no es un boleto de apuestas, marca is_bet_slip=false.`;
 
 const toAmerican = (d: number) => d >= 2 ? Math.round((d - 1) * 100) : Math.round(-100 / (d - 1));
@@ -139,6 +143,22 @@ Deno.serve(async req => {
     })).filter((s: {event: string, selection: string}) => s.event.length >= 3 && s.selection.length >= 2);
     if (data.problem && String(data.problem).trim()) return await fail(clean(data.problem, 160));
     if (!selections.length) return await fail('No encontramos el partido y el pronóstico en la captura.');
+    if (data.already_started) return await fail('Uno o más partidos de este boleto ya empezaron o terminaron. Publica tus Picks antes del partido.');
+
+    // Apuestas sencillas: cada una se publica como un Pick propio, con su momio.
+    if (data.bet_type === 'sencillas' && selections.length > 1) {
+      if (selections.some((s: {odds: number | null}) => !s.odds)) return await fail('No se lee el momio de cada apuesta sencilla.');
+      const singles = selections.map((s: {sport: string, event: string, selection: string, odds: number, eventDate: string | null}) =>
+        ({sport: s.sport, event: s.event, selection: s.selection, odds: s.odds, eventDate: s.eventDate}));
+      if (!singles.some((s: {odds: number}) => s.odds >= 100)) return await fail('Ninguna apuesta sencilla tiene momio de al menos +100.');
+      const days = singles.map((s: {eventDate: string | null}) => s.eventDate).filter(Boolean).sort();
+      const saved = await admin.from('ae_pick_capture_reads').insert({
+        user_id: user.id, status: 'read', model: MODEL, event_date: days.at(-1) || null, total: null, singles: true,
+        readings: singles.map(({event, selection, odds}: {event: string, selection: string, odds: number}) => ({event, selection, odds}))
+      }).select('id').single();
+      if (saved.error) throw saved.error;
+      return respond({ok: true, readId: saved.data.id, singles: true, readings: singles, total: null, eventDate: days.length === singles.length && new Set(days).size === 1 ? days[0] : null, dateSource: 'exact', leagues: selections.map((s: {league: string}) => s.league)});
+    }
 
     let total = Number.isInteger(data.total_american_odds) && Math.abs(data.total_american_odds) >= 100 ? data.total_american_odds : null;
     if (!total && typeof data.total_decimal_odds === 'number' && data.total_decimal_odds > 1) total = toAmerican(data.total_decimal_odds);

@@ -200,8 +200,8 @@
    }
    if(!data?.ok)throw Error(data?.reason||'No pudimos leer la captura. Prueba con otra más nítida.');
    overlay.progress(100);
-   const readings=data.readings.map(r=>({...r,confidence:95}));
-   return {readings,total:data.total||null,eventDate:data.eventDate||'',dateSource:data.dateSource||'',aiReadId:data.readId};
+   const readings=data.readings.map(r=>({...r,eventDate:r.eventDate||'',confidence:95}));
+   return {readings,total:data.total||null,eventDate:data.eventDate||'',dateSource:data.dateSource||'',aiReadId:data.readId,singles:!!data.singles};
   }
   function showPrivacy(state,readFailed=false){
    const copy={reading:['Leyendo en tu dispositivo','La captura se procesa aquí, sin subir la imagen.'],discarding:['Descartando captura…','Liberando la imagen y cerrando el lector.'],complete:['Captura descartada','La imagen no se ha subido ni guardado. Al publicar, solo guardamos los datos de tu pick.'],unconfirmed:['No se pudo confirmar el descarte','Recarga esta página para cerrar el lector antes de volver a intentarlo.']};
@@ -277,7 +277,7 @@
     },errorHandler:()=>{}});
     pending.then(worker=>{if(!isCurrent(job))void worker.terminate().catch(()=>{});}).catch(()=>{});
     job.worker=await Promise.race([pending,aborted]);if(!isCurrent(job))return;
-    const readings=[];let total=null,eventDate='',dateSource='';
+    const readings=[];let total=null,eventDate='',dateSource='',singles=false;
     for(let i=0;i<job.files.length;i++){
      const rendering=imageCanvas(job.files[i],job);job.imageTask=rendering.catch(()=>{});
      const canvas=await Promise.race([rendering,aborted]);
@@ -299,6 +299,7 @@
       }
       throw Error(compared.reason);
      }
+     if(compared.singles){if(job.files.length>1)throw Error('Sube la captura de apuestas sencillas sola: publicaremos un Pick por cada apuesta.');singles=true;}
      if(job.files.length>1&&compared.readings.length!==1)throw Error('Para dos imágenes, usa una captura de cada selección, sin otras apuestas.');
      if(job.files.length>1&&compared.readings.some(r=>r.selectionCount))throw Error('Usa una sola captura de la combinada completa. No combinamos boletos distintos.');
      if(eventDate&&compared.eventDate&&eventDate!==compared.eventDate&&readings.some(r=>compared.readings.some(other=>other.event===r.event)))throw Error('Las capturas muestran fechas distintas para el mismo partido.');
@@ -309,7 +310,7 @@
      }
     }
     if(!isCurrent(job))return;
-    prepared={readings,total,eventDate,dateSource};
+    prepared={readings,total,eventDate,dateSource,singles};
    }catch(error){
     if(isCurrent(job))failure=error?.message||'No pudimos leer la captura. Prueba otra.';
    }finally{
@@ -333,10 +334,10 @@
      active=null;input.value='';input.disabled=false;picker.disabled=false;cancel.hidden=true;cancel.disabled=false;panel.removeAttribute('aria-busy');showPrivacy(discarded?'complete':'unconfirmed',!prepared);
      if(discarded&&prepared){
       result=prepared;applyImport(result);signature=fingerprint();
-      panel.dataset.state='matched';title.textContent='Captura leída';status.textContent=prepared.eventDate?'Fecha del evento completada automáticamente. Revisa los datos y publica tu Pick.':'Revisa tu pick e indica la fecha del evento para publicar.';picker.textContent='Cambiar captura';
+      panel.dataset.state='matched';title.textContent='Captura leída';status.textContent=prepared.singles?prepared.readings.length+' apuestas sencillas leídas: se publicará un Pick por cada una.':prepared.eventDate?'Fecha del evento completada automáticamente. Revisa los datos y publica tu Pick.':'Revisa tu pick e indica la fecha del evento para publicar.';picker.textContent='Cambiar captura';
       summary.replaceChildren(...prepared.readings.map((r,i)=>{
        const item=node('li');
-       item.append(node('small',(r.selectionCount?r.selectionCount+' selecciones · ':prepared.readings.length>1?'Selección '+(i+1)+' · ':'')+(r.sport||'Otros')),node('strong',r.event),node('span',r.selection),node('span',(r.originalBeforeBoost?'Momio original, sin boost · ':'Momio automático · ')+(r.odds>0?'+':'')+r.odds,'cp-capture-odds'));
+       item.append(node('small',(r.selectionCount?r.selectionCount+' selecciones · ':prepared.singles?'Apuesta '+(i+1)+' · ':prepared.readings.length>1?'Selección '+(i+1)+' · ':'')+(r.sport||'Otros')),node('strong',r.event),node('span',r.selection),node('span',(r.originalBeforeBoost?'Momio original, sin boost · ':'Momio automático · ')+(r.odds>0?'+':'')+r.odds,'cp-capture-odds'));
        return item;
       }));
       const preview=form.querySelector('.cp-compose-preview');summary.hidden=!!preview;
@@ -369,6 +370,15 @@
     if(!result)throw Error('Añade una captura legible para comprobar el momio antes de publicar.');
     if(result.aiReadId)return {version:1,method:'ai_vision',read_id:result.aiReadId};
     return {version:1,method:'on_device_ocr',confirmed:true,readings:result.readings.map(({event,selection,odds,confidence})=>({event,selection,odds,confidence})),total:result.total};
+   },
+   // Comprobante de una sola apuesta sencilla (cada una se publica como su propio Pick).
+   proofFor(index){
+    invalidate();
+    if(active)throw Error('Espera a que termine la lectura de la captura.');
+    const r=result?.singles&&result.readings[index];
+    if(!r)throw Error('Añade una captura legible para comprobar el momio antes de publicar.');
+    if(result.aiReadId)return {version:1,method:'ai_vision',read_id:result.aiReadId};
+    return {version:1,method:'on_device_ocr',confirmed:true,readings:[{event:r.event,selection:r.selection,odds:r.odds,confidence:r.confidence}],total:null};
    }
   };
  }

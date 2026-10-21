@@ -695,8 +695,30 @@ function buildComposer(){
  const previewPrivacy=el('p','Captura descartada de la memoria del lector. No se envía ni guarda la imagen.','cp-compose-hint');
  const previewNote=el('p','Revisa estos datos antes de publicar.','cp-compose-hint');
  const previewLegs=el('div',null,'cp-compose-preview-legs'),previewTotal=el('p','','cp-compose-preview-total');
- preview.append(previewTitle,previewPrivacy,changeCapture,previewNote,previewLegs,previewTotal);
- let previewKey='',originalBeforeBoost=false,captureReadings=[];
+ // Apuestas sencillas: cada una se revisa en una línea y se publica como un Pick propio.
+ const singlesList=el('ol',null,'cp-singles');
+ preview.append(previewTitle,previewPrivacy,changeCapture,previewNote,singlesList,previewLegs,previewTotal);singlesList.hidden=true;
+ let previewKey='',originalBeforeBoost=false,captureReadings=[],singles=null;
+ const validDay=value=>{const stamp=Date.parse(value+'T12:00:00Z');return /^\d{4}-\d{2}-\d{2}$/.test(value)&&Number.isFinite(stamp)&&new Date(stamp).toISOString().slice(0,10)===value&&value>=todayToronto()&&value<=eventDay.input.max;};
+ const signed=n=>(n>0?'+':'')+n;
+ function renderSingles(){
+  singlesList.replaceChildren(...singles.map(item=>{
+   const r=item.reading,li=el('li',null,'cp-single');li.dataset.state=item.done?'done':item.include?'on':'off';
+   const pick=el('input');pick.type='checkbox';pick.checked=item.include;pick.disabled=item.done||r.odds<100;
+   pick.setAttribute('aria-label','Publicar '+r.event+' · '+r.selection);
+   pick.addEventListener('change',()=>{item.include=pick.checked;li.dataset.state=item.include?'on':'off';day.required=item.include;day.disabled=!item.include;calculate();});
+   const copy=el('div',null,'cp-single-copy');
+   copy.append(el('strong',r.event,'cp-single-match'),el('small',r.selection,'cp-single-choice'));
+   if(item.done)copy.append(el('small','Publicado','cp-single-note'));
+   else if(r.odds<100)copy.append(el('small','Momio menor a +100: no puntúa como Pick.','cp-single-note'));
+   const day=el('input');day.type='date';day.className='cp-single-date';day.min=todayToronto();day.max=eventDay.input.max;day.value=item.date;day.required=item.include&&!item.done;day.disabled=item.done||r.odds<100||!item.include;
+   day.setAttribute('aria-label','Fecha del partido '+r.event);
+   day.addEventListener('input',()=>{item.date=day.value;calculate();});
+   const when=el('label',null,'cp-single-when');when.append(el('span',r.sport||'Otros'),day);
+   const label=el('label',null,'cp-single-row');label.append(pick,copy);
+   li.append(label,el('span',signed(r.odds),'cp-single-odds'),when);return li;
+  }));
+ }
  output.setAttribute('aria-live','polite');
  const status=el('p','','cp-status');status.setAttribute('role','status');
  function values(){return rows.map(r=>({sport:r.sport.input.value.trim(),event:r.event.input.value.trim(),selection:r.selection.input.value.trim(),odds:Number(r.odds.input.value)}));}
@@ -705,6 +727,16 @@ function buildComposer(){
   return /^\d{4}-\d{2}-\d{2}$/.test(value)&&Number.isFinite(stamp)&&new Date(stamp).toISOString().slice(0,10)===value&&value>=todayToronto()&&value<=eventDay.input.max;
  }
  function calculate(){
+  if(singles){
+   preview.hidden=form.dataset.imported!=='true';previewTotal.hidden=true;
+   const chosen=singles.filter(s=>s.include&&!s.done);
+   const ready=chosen.length>0&&chosen.every(s=>s.reading.odds>=100&&validDay(s.date))&&!!capture?.hasImport();
+   output.textContent=chosen.length===1?'1 Pick seleccionado':chosen.length+' Picks seleccionados';
+   if(!posting)submit.textContent=chosen.length>1?'Publicar '+chosen.length+' Picks':'Publicar Pick';
+   submit.disabled=!ready||posting;submit.dataset.ready=String(ready&&!posting);
+   footerHint.textContent=ready?'Se publicará un Pick por cada apuesta marcada. Al publicar confirmas que hiciste estas apuestas.':chosen.length?'Elige la fecha del partido de cada apuesta marcada.':'Marca al menos una apuesta para publicar.';
+   return ready;
+  }
   const picks=values(),valid=picks.every(l=>Number.isInteger(l.odds)&&Math.abs(l.odds)>=100&&Math.abs(l.odds)<=100000);
   const decimal=picks.reduce((v,l)=>v*(l.odds>0?1+l.odds/100:1+100/Math.abs(l.odds)),1);
   const total=capture?.getTotal();
@@ -771,8 +803,13 @@ function buildComposer(){
  preview.append(eventDay.wrap,analysis);
  form.append(legs,preview,footer);addRow();
  function applyImport(imported){
-  const data=imported?.readings||[];
+  const all=imported?.readings||[];
+  singles=imported?.singles?all.map((reading,index)=>({reading,index,include:reading.odds>=100,done:false,date:reading.eventDate||imported.eventDate||''})):null;
+  // En modo sencillos las filas ocultas guardan solo la primera apuesta (huella de la captura).
+  const data=singles?all.slice(0,1):all;
   originalBeforeBoost=data.some(reading=>reading.originalBeforeBoost);captureReadings=data;
+  form.dataset.singles=String(!!singles);eventDay.wrap.hidden=!!singles;eventDay.input.required=!singles;
+  previewLegs.hidden=!!singles;singlesList.hidden=!singles;if(singles)renderSingles();else singlesList.replaceChildren();
   while(rows.length>Math.max(1,data.length))rows.pop().box.remove();
   while(rows.length<data.length)addRow();
   rows.forEach((row,i)=>{for(const key of ['sport','event','selection','odds'])row[key].input.value=data[i]?(key==='sport'?(data[i][key]||'Otros'):key==='odds'?(data[i].odds>0?'+':'')+data[i].odds:data[i][key]):'';});
@@ -788,17 +825,46 @@ function buildComposer(){
   dateHint.textContent=imported?.eventDate?(dateMessages[imported.dateSource]||'Fecha del evento detectada automáticamente.'):'No pudimos leer la fecha en la captura. Elige la fecha del partido (hoy o hasta 180 días).';
   form.dataset.imported=String(!!imported);
   form.dataset.captureStep=imported?'review':'capture';
-  $('cpComposeTitle').textContent=imported?'Revisa tu Pick':'Prepara tu Pick';
+  $('cpComposeTitle').textContent=singles?'Revisa tus Picks':imported?'Revisa tu Pick':'Prepara tu Pick';
+  previewTitle.textContent=singles?singles.length+' apuestas sencillas':'Tu apuesta, lista para revisar';
+  if(singles)previewNote.textContent='Cada apuesta se publica como un Pick propio. Desmarca las que no quieras publicar y revisa la fecha de cada partido.';
   $('cpComposeIntro').hidden=!!imported;
   preview.hidden=!imported;
   if(!imported){previewKey='';previewLegs.replaceChildren();}
   calculate();
+ }
+ async function publishSingles(){
+  if(!capture?.hasImport()){status.textContent='Primero sube una captura y espera a que termine la lectura.';return;}
+  const chosen=singles.filter(s=>s.include&&!s.done);
+  if(!chosen.length){status.textContent='Marca al menos una apuesta para publicar.';return;}
+  if(chosen.some(s=>!validDay(s.date))){status.textContent='Elige la fecha de cada partido: entre hoy y los próximos 180 días.';return;}
+  posting=true;submit.disabled=true;
+  const closer=$('cpComposeClose');if(closer)closer.disabled=true;
+  status.textContent='';let published=0;
+  try{
+   const user=await account(true);if(!user)return;
+   for(const item of chosen){
+    submit.textContent='Publicando '+(published+1)+' de '+chosen.length+'…';
+    const r=item.reading,leg={sport:r.sport||'Otros',event:r.event,selection:r.selection,odds:r.odds};
+    const result=await db.from('ae_community_picks').insert({title:r.event.slice(0,160),explanation:explanation.input.value.trim(),legs:[leg],event_date:item.date,capture_check:capture.proofFor(item.index)}).select('id').single();
+    if(result.error)throw Object.assign(result.error,{failedOn:r.event});
+    item.done=true;published++;
+   }
+   window.aeDraftGuard?.clear('pick');
+   form.reset();explanation.input.value='';descriptionCount.textContent='0/300';
+   closePickComposer(true);void load();
+   notifyCommunity(published===1?'Pick publicado con el momio cotejado.':published+' Picks publicados, uno por cada apuesta sencilla.');
+  }catch(e){
+   renderSingles();
+   status.textContent=(published?published+' publicado'+(published>1?'s':'')+'. ':'')+'No se pudo publicar '+(e.failedOn||'una apuesta')+': '+message(e);
+  }finally{posting=false;if(closer)closer.disabled=false;calculate();}
  }
  capture=window.aePickCapture?.mount({form,getPicks:values,applyImport,onChange:calculate});
  form.addEventListener('input',calculate);
  form.onsubmit=async e=>{
   e.preventDefault();if(posting)return;
   if(!form.reportValidity())return;
+  if(singles)return publishSingles();
   if(!validEventDate()){status.textContent='Elige una fecha de partido válida: entre hoy y los próximos 180 días.';return;}
   if(!capture?.hasImport()){status.textContent='Primero sube una captura y espera a que termine la lectura.';return;}
   if(!calculate()){status.textContent='Revisa las cuotas: la cuota total debe ser al menos +100.';return;}
