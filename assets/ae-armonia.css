@@ -592,7 +592,7 @@ html:not(#ds):not(#ds):not(#ds) body [id^="aeNewsSportTrack"] h3.text-base{
   max-height:2lh!important;
 }
 
-/* CAM SPORTS · Portada: «Demuestra tu conocimiento» es una sola acción cuadrada.
+/* CAM SPORTS · Portada: «Demuestra tu conocimiento» es una sola acción horizontal.
    Conserva el ID del botón anterior para abrir el compositor de Takes con el
    manejador existente, sin duplicar controles ni alterar NFL/Fútbol. */
 html body.ae-is-home #aeHomeTakeHighlights > .ae-home-take-extras > #aeHomeTakesSectionHeading {
@@ -686,19 +686,31 @@ html body.ae-is-home #aeHomeTakeHighlights #aeHomeTakePublish:focus-visible {
   outline:3px solid #edbc84!important;
   outline-offset:4px!important;
 }
-html:not(.dark) body.ae-is-home #aeHomeTakeHighlights #aeHomeTakesSectionHeading #aeHomeTakePublish {
-  background:linear-gradient(145deg,#fffcf8 0%,#ede3d7 100%)!important;
+/* El mismo botón horizontal en modo día: marfil luminoso, texto azul tinta y detalles bronce.
+   Superar la especificidad de la regla base nocturna para que el color claro sí se aplique. */
+html:not(#ds):not(#ds):not(#ds):not(.dark) body.ae-is-home #aeHomeTakeHighlights #aeHomeTakesSectionHeading button#aeHomeTakePublish.cam-home-take-square {
+  background:linear-gradient(110deg,#fffdf9 0%,#f4ece2 59%,#ead9c6 100%)!important;
   color:#273b49!important;
-  border-color:#b68b68!important;
-  box-shadow:0 6px 18px rgba(50,61,67,.1)!important;
+  border-color:#a87855!important;
+  box-shadow:0 5px 17px rgba(69,60,48,.11)!important;
 }
 html:not(.dark) body.ae-is-home #aeHomeTakeHighlights #aeHomeTakePublish .cam-home-take-square-icon {
-  color:#82573b!important;
-  border-color:rgba(130,87,59,.34)!important;
+  color:#765039!important;
+  border-color:rgba(118,80,57,.43)!important;
+  background:rgba(142,98,65,.07)!important;
 }
 html:not(.dark) body.ae-is-home #aeHomeTakeHighlights #aeHomeTakePublish .cam-home-take-square-arrow {
-  color:#82573b!important;
+  color:#765039!important;
 }
+html:not(#ds):not(#ds):not(#ds):not(.dark) body.ae-is-home #aeHomeTakeHighlights #aeHomeTakesSectionHeading button#aeHomeTakePublish.cam-home-take-square:hover {
+  background:linear-gradient(110deg,#fffaf1 0%,#efe0cc 100%)!important;
+  border-color:#815839!important;
+  box-shadow:0 9px 22px rgba(69,60,48,.16)!important;
+}
+html:not(.dark) body.ae-is-home #aeHomeTakeHighlights #aeHomeTakePublish:focus-visible {
+  outline-color:#765039!important;
+}
+
 @media(max-width:760px){
   html:not(#ds):not(#ds):not(#ds) body.ae-is-home #aeHomeTakeHighlights #aeHomeTakesSectionHeading button#aeHomeTakePublish.cam-home-take-square {
     width:100%!important;
