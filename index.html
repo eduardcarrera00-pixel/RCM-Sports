@@ -1672,7 +1672,7 @@ html body.ae-is-home #mainContent #aeTrendingPortada #trendingList .ae-trending-
 </style>
 
 <style id="ae-picks-editorial-twins-league-20261017">
-/* El Pick del día ocupa la fila completa en Picks. */
+/* El Pick del editor ocupa la fila completa en Picks. */
 html body #footballTakes.ae-picks-editorial #aePicksTopPair{
  display:grid!important;grid-template-columns:minmax(0,1fr)!important;
  align-items:stretch!important;box-sizing:border-box!important;min-width:0!important;
@@ -2064,11 +2064,11 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
             <ol id="championsList" class="ae-full-ranking-list ae-ranking-accessible" aria-label="Clasificación publicada de Champions League"></ol>
         </section>
         <section id="footballTakes" class="ae-takes ae-picks-editorial" hidden aria-labelledby="takesTitle">
-          <div id="aePicksTopPair" class="ae-picks-top-pair" aria-label="Pick del día">
+          <div id="aePicksTopPair" class="ae-picks-top-pair" aria-label="Pick del editor">
           <section id="picksFeatured" class="ae-picks-feature" aria-labelledby="picksFeaturedTitle">
-            <div class="ae-picks-feature-label"><div class="ae-weekly-heading-inline"><h3 id="picksFeaturedTitle">Pick del día</h3></div>
-              <button type="button" id="aeWeeklyShareButton" class="ae-weekly-share ae-weekly-share-picks" hidden aria-label="Compartir el Pick del día" title="Compartir Pick del día"><i class="fa-solid fa-share-nodes" aria-hidden="true"></i><span>Compartir</span></button>
-              <button type="button" id="aeWeeklyEditButton" class="ae-weekly-edit-trigger" hidden aria-controls="aeWeeklyPickAdmin">Editar Pick del día</button></div>
+            <div class="ae-picks-feature-label"><div class="ae-weekly-heading-inline"><h3 id="picksFeaturedTitle">Pick del editor</h3></div>
+              <button type="button" id="aeWeeklyShareButton" class="ae-weekly-share ae-weekly-share-picks" hidden aria-label="Compartir el Pick del editor" title="Compartir Pick del editor"><i class="fa-solid fa-share-nodes" aria-hidden="true"></i><span>Compartir</span></button>
+              <button type="button" id="aeWeeklyEditButton" class="ae-weekly-edit-trigger" hidden aria-controls="aeWeeklyPickAdmin">Editar Pick del editor</button></div>
             <div id="picksFeaturedCard" aria-live="polite"><p>Cargando Pick editorial…</p></div>
             <div class="ae-weekly-odds-footer"><span id="aeWeeklyOddsHighlight" class="ae-weekly-odds-highlight" hidden></span></div>
           </section>
@@ -2136,9 +2136,9 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
               </div>
             </section>
           </div>
-          <details id="aeWeeklyPickAdmin" class="ae-takes-admin ae-weekly-admin" hidden><summary id="aeWeeklyAdminSummary">Administrar · Publicar Pick del día</summary>
+          <details id="aeWeeklyPickAdmin" class="ae-takes-admin ae-weekly-admin" hidden><summary id="aeWeeklyAdminSummary">Administrar · Publicar Pick del editor</summary>
             <form id="aeWeeklyPickForm">
-               <p id="aeWeeklyEditorMode" class="ae-weekly-edit-status" hidden role="status">Editando el Pick del día. Los archivos originales se conservarán mientras no los sustituyas.</p>
+               <p id="aeWeeklyEditorMode" class="ae-weekly-edit-status" hidden role="status">Editando el Pick del editor. Los archivos originales se conservarán mientras no los sustituyas.</p>
               <label class="ae-full">Título del Pick<input name="title" minlength="5" maxlength="160" required placeholder="Nuestra selección del día"></label>
               <label>Evento o partido<input name="event_name" minlength="3" maxlength="160" required placeholder="Equipo A vs Equipo B"></label>
               <label>Selección<input name="selection" minlength="2" maxlength="180" required placeholder="Ganador, hándicap, más de…"></label>
@@ -2146,7 +2146,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
               <label>Cierre de la recomendación<input name="expires_at" type="datetime-local" required></label>
               <label class="ae-full">Análisis del Pick<textarea name="analysis" minlength="12" maxlength="2400" required placeholder="Explica los motivos de la recomendación."></textarea></label>
               <div class="ae-weekly-media-fields">
-                <div class="ae-upload-field"><label for="aeWeeklyBannerInput">Banner del Pick del día</label>
+                <div class="ae-upload-field"><label for="aeWeeklyBannerInput">Banner del Pick del editor</label>
                   <small>Imagen horizontal para el encabezado (recomendado 1600 × 600). JPG, PNG o WEBP; máximo 5 MB.</small>
                   <input id="aeWeeklyBannerInput" type="file" name="banner_file" accept="image/jpeg,image/png,image/webp">
                   <span id="aeWeeklyBannerPreview" class="ae-upload-preview">Vista previa del banner</span>
@@ -2172,7 +2172,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
                 </div>
               </div>
               <div class="ae-full ae-weekly-admin-actions">
-                <button type="submit" id="aeWeeklySaveButton">Publicar Pick del día</button>
+                <button type="submit" id="aeWeeklySaveButton">Publicar Pick del editor</button>
                 <button type="button" id="aeWeeklyCancelEdit" hidden>Cancelar edición</button>
               </div>
               <p id="aeWeeklyPickAdminStatus" class="ae-full ae-takes-status" role="status" aria-live="polite"></p>
@@ -2299,9 +2299,9 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
 
             <aside class="lg:col-span-4 space-y-8">
                 <section class="editorial-pick" aria-labelledby="weeklyPickTitle">
-                    <h2 id="weeklyPickTitle">Pick del día</h2>
-                    <button type="button" id="aeHomeWeeklyShareButton" class="ae-weekly-share ae-home-weekly-share" hidden aria-label="Compartir el Pick del día" title="Compartir Pick del día"><i class="fa-solid fa-share-nodes" aria-hidden="true"></i><span>Compartir</span></button>
-                    <button type="button" class="ae-home-weekly-more" onclick="filterByCategory('Picks')" aria-label="Abrir Pick del día y todos sus detalles">Ver más <span aria-hidden="true">→</span></button>
+                    <h2 id="weeklyPickTitle">Pick del editor</h2>
+                    <button type="button" id="aeHomeWeeklyShareButton" class="ae-weekly-share ae-home-weekly-share" hidden aria-label="Compartir el Pick del editor" title="Compartir Pick del editor"><i class="fa-solid fa-share-nodes" aria-hidden="true"></i><span>Compartir</span></button>
+                    <button type="button" class="ae-home-weekly-more" onclick="filterByCategory('Picks')" aria-label="Abrir Pick del editor y todos sus detalles">Ver más <span aria-hidden="true">→</span></button>
                     <div class="editorial-pick-body">
                     <div id="cpWeekly" aria-live="polite"><p>Cargando nuestra selección…</p></div></div>
                 </section>
@@ -4644,7 +4644,7 @@ html:not(.dark) .cam-weekly-review-row{border-color:#d9d9d0}
 @media(max-width:480px){.cam-weekly-review-actions{display:grid}.cam-weekly-review-actions button{width:100%}}
 
 .cam-weekly-result-surface{position:relative}
-/* Pick del día: escritorio abajo a la derecha, móvil abajo a la izquierda. */
+/* Pick del editor: escritorio abajo a la derecha, móvil abajo a la izquierda. */
 .cam-weekly-result-surface .cam-weekly-result-badge{
   position:absolute;left:auto;right:12px;bottom:12px;z-index:5;
   box-sizing:border-box;display:inline-flex;align-items:center;gap:7px;
