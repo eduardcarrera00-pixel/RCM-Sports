@@ -5,6 +5,7 @@ on:
     paths:
       - 'scripts/cam_social_make_video.py'
       - 'supabase/20_cam_social_tiktok_music.sql'
+      - 'supabase/21_cam_social_tiktok_mime_fallback.sql'
       - 'tests/social-video-publication.mjs'
       - '.github/workflows/cam-social-video*.yml'
   workflow_dispatch:
