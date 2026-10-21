@@ -21,14 +21,36 @@ async function flashModels(apiKey: string): Promise<string[]> {
     .sort((a: string, b: string) => Number(version(b)) - Number(version(a)));
 }
 const DAILY_LIMIT = 25;
+
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+// Cache de reglas y ejemplos anonimizados en Supabase; jamás contiene imágenes privadas.
+let referenceCache: {until:number, text:string} | null = null;
+async function referenceText(admin:any):Promise<string>{
+  if(referenceCache && Date.now()<referenceCache.until)return referenceCache.text;
+  let text='';
+  try{
+    const {data,error}=await admin.from('cam_pick_ocr_layouts')
+      .select('source_name,layout_type,fingerprint_terms,extraction_guide,example')
+      .eq('enabled',true).order('id').limit(8);
+    if(error)throw error;
+    text=(data||[]).map((x:any)=>
+      '\nFormato: '+String(x.source_name).slice(0,80)+' ('+x.layout_type+')'+
+      '\nSeñales: '+(x.fingerprint_terms||[]).join(', ').slice(0,300)+
+      '\nRegla: '+String(x.extraction_guide||'').slice(0,2500)+
+      '\nEjemplo SOLO de estructura, NO de contenido real: '+JSON.stringify(x.example||{}).slice(0,2200)
+    ).join('\n');
+  }catch(e){console.error('Referencia OCR no disponible',e);}
+  referenceCache={until:Date.now()+(text?600000:30000),text:text?'\n\nREFERENCIAS DE FORMATO: \n'+text:''};
+  return referenceCache.text;
+}
+
 
 // Esquema de respuesta (formato OpenAPI que entiende Gemini).
-const schema = {
+const schema: any = {
   type: 'OBJECT',
   properties: {
     is_bet_slip: {type: 'BOOLEAN', description: 'true solo si la imagen es un boleto o apuesta de una casa de apuestas.'},
-    bet_type: {type: 'STRING', enum: ['combinada', 'sencillas'], description: '"sencillas" si son apuestas individuales independientes, cada una con su propia cuota y sin cuota total (p. ej. pestaña "Sencillos", "Simples" o "Singles"). "combinada" para una sola apuesta o un parlay/múltiple.'},
+    bet_type: {type: 'STRING', enum: ['combinada', 'sencillas', 'separadas'], description: '"sencillas" si son apuestas individuales independientes, cada una con su propia cuota y sin cuota total (p. ej. pestaña "Sencillos", "Simples" o "Singles"). "combinada" para una sola apuesta o un parlay/múltiple.'},
     already_started: {type: 'BOOLEAN', description: 'true si algún partido del boleto aparece EN VIVO, con marcador, minuto o entrada en juego, o ya resuelto (palomita verde o tache rojo).'},
     problem: {type: 'STRING', description: 'Si no se puede leer con seguridad, explica en español qué falta (máx. 140 caracteres). Vacío si todo está claro.'},
     selections: {
@@ -52,6 +74,19 @@ const schema = {
   required: ['is_bet_slip', 'problem', 'selections']
 };
 
+
+// Estructura por boleto: una combinada es un boleto; cada CREAR APUESTA es un boleto independiente.
+schema.properties.bets={
+  type:'ARRAY',
+  description:'Una entrada por boleto independiente. Para un Parlay, UNA entrada con varias selecciones.',
+  items:{type:'OBJECT',properties:{
+    selections:schema.properties.selections,
+    total_american_odds:{type:'INTEGER',nullable:true,description:'Cuota americana TOTAL de este boleto, no importe de dinero'},
+    total_decimal_odds:{type:'NUMBER',nullable:true,description:'Cuota decimal TOTAL de este boleto si se ve (ej. 2.05)'}
+  },required:['selections']}
+};
+schema.required=['is_bet_slip','problem','bets'];
+
 const prompt = (today: string) => `Eres el lector de boletos de CAM SPORTS. Hoy es ${today} (America/Toronto).
 Lee la(s) captura(s) de una casa de apuestas y devuelve los datos en el JSON pedido.
 Reglas:
@@ -65,6 +100,9 @@ Reglas:
 - Si el boleto aparece debajo de otra pantalla de la casa (filas de cuotas de mercados), lee solo el boleto o historial, no esas filas.
 - Si son apuestas sencillas (varias apuestas individuales, cada una con su cuota y sin cuota total), marca bet_type="sencillas" y devuelve cada una con su momio. En "Equipo - Mercado" el pronóstico es "Mercado: Equipo" (p. ej. "Resultado Final (Tiempo Regular): Como").
 - Ignora etiquetas como "PA", "Pago Anticipado", "Cuota de oro" o "EN VIVO" dentro del pronóstico. Si algún partido ya está en juego o terminado (marcador, minuto, "EN VIVO", palomita o tache), marca already_started=true.
+- Devuelve bets[] agrupando POR BOLETO. Cada bloque CREAR APUESTA con su propio decimal es un boleto separado; no mezcles sus jugadores ni sus cuotas. Las cifras 1+ remates/faltas son líneas, no cuotas.
+- En Playdoit, Parlay ABIERTO contiene varias tarjetas en UN boleto. Usa Momios para el total, nunca Apuesta total/Ganancia Total. La fecha al pie es la de creación y no la del encuentro.
+- Extrae todos los grupos y selecciones; no uses los ejemplos como si fueran el contenido del boleto actual.
 - Si la imagen no es un boleto de apuestas, marca is_bet_slip=false.`;
 
 const toAmerican = (d: number) => d >= 2 ? Math.round((d - 1) * 100) : Math.round(-100 / (d - 1));
@@ -106,7 +144,7 @@ Deno.serve(async req => {
       content.push({inline_data: {mime_type: m[1], data: m[2]}});
     }
     const today = new Intl.DateTimeFormat('en-CA', {timeZone: 'America/Toronto'}).format(new Date());
-    content.push({text: prompt(today)});
+    content.push({text: prompt(today) + await referenceText(admin)});
 
     const request = JSON.stringify({contents: [{role: 'user', parts: content}], generationConfig: {temperature: 0, responseMimeType: 'application/json', responseSchema: schema}});
     const call = (model: string) => fetch(`${API}/models/${model}:generateContent`, {
@@ -136,6 +174,54 @@ Deno.serve(async req => {
       return respond({ok: false, reason: message});
     };
     if (!data || !data.is_bet_slip) return await fail('La imagen no parece un boleto de apuestas.');
+
+    // Cada CREAR APUESTA representa un Pick independiente, aunque tenga varias condiciones.
+    const bets:any[]=Array.isArray(data.bets)?data.bets:[];
+    if(bets.length>20)return await fail('Hay demasiadas apuestas en la captura.');
+    const betPrice=(b:any):number|null=>{
+      if(Number.isInteger(b?.total_american_odds)&&Math.abs(b.total_american_odds)>=100&&Math.abs(b.total_american_odds)<=100000)return b.total_american_odds;
+      if(typeof b?.total_decimal_odds==='number'&&b.total_decimal_odds>1&&b.total_decimal_odds<=1001)return toAmerican(b.total_decimal_odds);
+      return null;
+    };
+    if(bets.length>1){
+      if(data.problem&&String(data.problem).trim())return await fail(clean(data.problem,160));
+      if(data.already_started)return await fail('Uno o más partidos ya empezaron o terminaron. Publica antes del inicio.');
+      const independent:any[]=[];
+      for(const [index,bet] of bets.entries()){
+        const raw:Array<any>=Array.isArray(bet?.selections)?bet.selections:[];
+        if(!raw.length||raw.length>20)return await fail('Faltan selecciones de la apuesta '+(index+1)+'.');
+        const legs=raw.map((v:any)=>({
+          sport:clean(v.sport,20)||'Otros',event:clean(v.event,160),
+          selection:clean(v.selection,200),eventDate:isoDay(v.event_date)
+        }));
+        if(legs.some((v:any)=>v.event.length<3||v.selection.length<2))
+          return await fail('Falta partido o mercado de la apuesta '+(index+1)+'.');
+        const odds=betPrice(bet);
+        if(odds===null)return await fail('No se lee la cuota total de la apuesta '+(index+1)+'.');
+        const event=[...new Set(legs.map((v:any)=>v.event))].join(' / ');
+        const selection=legs.length===1?legs[0].selection:
+          legs.map((v:any,i:number)=>(i+1)+'. '+v.event+': '+v.selection).join(' / ');
+        if(event.length>640||selection.length>2000)return await fail('La apuesta '+(index+1)+' es demasiado extensa.');
+        const sports=[...new Set(legs.map((v:any)=>v.sport))];
+        const dates=legs.map((v:any)=>v.eventDate).filter(Boolean).sort();
+        independent.push({sport:sports.length===1?sports[0]:'Otros',event,selection,odds,
+          eventDate:dates.at(-1)||null,selectionCount:legs.length});
+      }
+      if(!independent.some((v:any)=>v.odds>=100))
+        return await fail('Ninguna apuesta tiene momio mínimo +100.');
+      const saved=await admin.from('ae_pick_capture_reads').insert({
+        user_id:user.id,status:'read',model:MODEL,singles:true,
+        readings:independent.map(({event,selection,odds}:any)=>({event,selection,odds}))
+      }).select('id').single();
+      if(saved.error)throw saved.error;
+      return respond({ok:true,readId:saved.data.id,singles:true,readings:independent,
+        total:null,eventDate:null,dateSource:'',leagues:[]});
+    }
+    if(bets.length===1){
+      data.selections=bets[0].selections;
+      data.total_american_odds=bets[0].total_american_odds??data.total_american_odds;
+      data.total_decimal_odds=bets[0].total_decimal_odds??data.total_decimal_odds;
+    }
     const selections = (Array.isArray(data.selections) ? data.selections : []).slice(0, 20).map((s: Record<string, unknown>) => ({
       sport: clean(s.sport, 20) || 'Otros', league: clean(s.league, 60), event: clean(s.event, 160), selection: clean(s.selection, 200),
       odds: Number.isInteger(s.american_odds) && Math.abs(Number(s.american_odds)) >= 100 ? Number(s.american_odds) : null,
