@@ -2,6 +2,7 @@
 (() => {
 'use strict';
 let loaded=false,request=0,limit=20,posting=false,archiveLimit=30;
+let currentViewerId=null;
 const $=id=>document.getElementById(id);
 function todayToronto(){
  const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Toronto',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
@@ -58,7 +59,7 @@ function pickSelectionDisplay(input){
  return {choice:prediction||market,market:prediction?market:''};
 }
 
-function card(p,compact=false,detail=false){
+function card(p,compact=false,detail=false,viewerId=currentViewerId){
 
  const editorial=!compact&&!detail;
  const publication=editorial||detail;
@@ -179,6 +180,8 @@ function card(p,compact=false,detail=false){
  if(p.explanation)n.append(el('p',p.explanation,'cp-explanation'));
  const controls=el('div',null,'cp-actions');
  const canVote=['pending','approved'].includes(p.moderation_status)&&isActive(p);
+ const isOwnPick=Boolean(viewerId&&p.user_id&&String(viewerId)===String(p.user_id));
+ if(!isOwnPick){
  for(const [value,label,count] of [[1,'▲',p.upvotes],[-1,'▼',p.downvotes]]){
    const b=button((editorial?(value===1?'↑':'↓'):label)+' '+Number(count||0),()=>vote(p,value,b));
    b.classList.add(value===1?'cp-upvote':'cp-downvote');
@@ -187,6 +190,7 @@ function card(p,compact=false,detail=false){
    b.disabled=!canVote;
    if(!canVote)b.title='La votación de este Pick está cerrada';
    controls.append(b);
+ }
  }
  if(window.CamPickShare)controls.append(window.CamPickShare.button(p));
  if(!detail){const replies=button('Respuestas '+Number(p.comments_count||0)+(editorial?' ›':''),()=>requestPickReply(p.id));replies.classList.add('cp-replies-button');if(editorial){const icon=document.createElementNS('http://www.w3.org/2000/svg','svg');icon.setAttribute('viewBox','0 0 24 24');icon.setAttribute('aria-hidden','true');const path=document.createElementNS('http://www.w3.org/2000/svg','path');path.setAttribute('d','M5 4h14v11H10l-5 5V4Z');path.setAttribute('fill','none');path.setAttribute('stroke','currentColor');path.setAttribute('stroke-width','1.6');icon.append(path);replies.prepend(icon);}replies.setAttribute('aria-label','Abrir respuestas del Pick: '+p.title+' ('+Number(p.comments_count||0)+')');controls.append(replies);}
@@ -238,8 +242,12 @@ function sizeFeedWindow(){
 async function load(){
  if(!db)return;const seq=++request;
  try{
-   const feed=await db.from('ae_pick_feed').select('*').gte('event_date',todayToronto()).eq('outcome','pending').order('created_at',{ascending:false}).order('id',{ascending:false}).range(0,limit-1);
+   const [feed,session]=await Promise.all([
+     db.from('ae_pick_feed').select('*').gte('event_date',todayToronto()).eq('outcome','pending').order('created_at',{ascending:false}).order('id',{ascending:false}).range(0,limit-1),
+     db.auth.getUser().catch(()=>({data:{user:null}}))
+   ]);
    if(seq!==request)return;if(feed.error)throw feed.error;
+   currentViewerId=session.data?.user?.id||null;
    const feedEl=$('cpFeed'),previousScroll=feedEl.scrollTop;
    // The archive action is the final item INSIDE the scrolling list.
    const footer=$('cpFeedFooter');
@@ -969,7 +977,7 @@ async function showDetail(id,options={}){
   const content=el('div',null,'ae-cp-detail-content');
   const forecast=el('section',null,'ae-cp-detail-forecast');
   forecast.setAttribute('aria-label','Pronóstico del chef');
-  forecast.append(el('span','EL PRONÓSTICO','ae-cp-detail-overline'),card(pick.data,false,true));
+  forecast.append(el('span','EL PRONÓSTICO','ae-cp-detail-overline'),card(pick.data,false,true,session.data?.user?.id||null));
   content.append(forecast);
   const conversation=el('section',null,'ae-cp-detail-conversation');
   conversation.setAttribute('aria-label','Conversación del Pick');

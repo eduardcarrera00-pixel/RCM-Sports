@@ -1,7 +1,7 @@
 /* AE SPORTS · Conversaciones persistentes para Takes, sin comentarios simulados. */
 (() => {
   'use strict';
-  let dialog, current = null, parentId = null, sequence = 0, sending = false, voting = false, replyVoting = false, viewerId = null;
+  let dialog, current = null, parentId = null, sequence = 0, sending = false, voting = false, replyVoting = false, viewerId = null, viewerReady = false;
   const $ = (id) => document.getElementById(id);
   const el = (tag, text, className) => {
     const node = document.createElement(tag);
@@ -190,6 +190,8 @@
       if(counts.error)throw counts.error;
       if(token!==sequence||current?.id!==takeId)return;
       viewerId=session.data?.user?.id||null;
+      viewerReady=true;
+      showVotes(current);
       render(result.data||[],counts.data||[]);
       $('aeDiscussionStatus').textContent='';
     } catch(err) {
@@ -231,6 +233,8 @@
     }
   }
   function showVotes(take){
+    // Oculta ambos controles al autor; nunca muestra votos antes de comprobar la sesión.
+    $('aeDiscussionVotes').style.display=!viewerReady||(viewerId&&take.author_id&&String(viewerId)===String(take.author_id))?'none':'';
     for(const [value,id,name,count] of [[1,'aeDiscussionUp','▲ Apoyar',take.upvotes],[-1,'aeDiscussionDown','▼ Cuestionar',take.downvotes]]){
       const button=$(id);
       button.textContent=name+' '+(Number(count)||0);
@@ -317,6 +321,8 @@
     $('aeDiscussionAuthor').setAttribute('aria-label','Ver perfil de '+authorName);
     $('aeDiscussionSubject').textContent=take.title||'Take de la comunidad';
     $('aeDiscussionBody').textContent=take.body||'';
+    viewerReady=false;
+    viewerId=null;
     showVotes(take);
     $('aeDiscussionText').value='';
     $('aeDiscussionCount').textContent='Comentarios';

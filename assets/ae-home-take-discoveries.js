@@ -27,6 +27,7 @@
         if(typeof openUserAuthModal==='function')openUserAuthModal();
         return;
       }
+      if(auth.data.user.id===t.author_id)return;
       button.disabled=true;
       const response=await db.rpc('ae_vote_free_take',{p_take_id:t.id,p_value:direction});
       if(response.error)throw response.error;
@@ -35,7 +36,7 @@
       window.alert(e.message||'No se pudo guardar tu voto.');
     }finally{button.disabled=false;}
   }
-  function communityCard(t,kind,replyCounts){
+  function communityCard(t,kind,replyCounts,viewerId){
     const item=make('li',null,'ae-top-take ae-community-popular-take');
     item.dataset.kind=kind;
     const content=make('div',null,'ae-top-take-content');
@@ -66,15 +67,17 @@
     if(when)identity.append(make('span','· '+when,'ae-take-reference-date'));
     bottom.append(identity);
     const stats=make('div',null,'ae-top-take-votes');
-    for(const [dir,label,value,cls] of [
-      [1,'▲',count(t,'upvotes'),'ae-top-take-up'],
-      [-1,'▼',count(t,'downvotes'),'ae-top-take-down']
-    ]){
-      const b=make('button',label+' '+value,cls);
-      b.type='button';
-      b.setAttribute('aria-label',(dir===1?'Apoyar':'Cuestionar')+' este Take. Votos actuales: '+value);
-      b.addEventListener('click',()=>vote(t,dir,b));
-      stats.append(b);
+    if(!(viewerId&&t.author_id&&String(viewerId)===String(t.author_id))){
+      for(const [dir,label,value,cls] of [
+        [1,'▲',count(t,'upvotes'),'ae-top-take-up'],
+        [-1,'▼',count(t,'downvotes'),'ae-top-take-down']
+      ]){
+        const b=make('button',label+' '+value,cls);
+        b.type='button';
+        b.setAttribute('aria-label',(dir===1?'Apoyar':'Cuestionar')+' este Take. Votos actuales: '+value);
+        b.addEventListener('click',()=>vote(t,dir,b));
+        stats.append(b);
+      }
     }
     const replyCount=replyCounts?.get(String(t.id));
     if(Number.isFinite(replyCount)){
@@ -116,7 +119,7 @@
   function empty(target,message,isList=false){
     if(target)target.replaceChildren(make(isList?'li':'p',message,'ae-discovery-empty'));
   }
-  function render(data,replyCounts){
+  function render(data,replyCounts,viewerId){
     const positive=$('aeHomeTakesPositiveList'),negative=$('aeHomeTakesNegativeList'),historic=$('aeHomeTakeHistoricTake');
     if(!positive||!negative||!historic)return;
     const rows=Array.isArray(data)?data:[];
@@ -124,7 +127,7 @@
       const list=rows.filter(r=>r?.kind===kind&&r.id)
         .sort((a,b)=>Number(a.rank_number)-Number(b.rank_number)).slice(0,10);
       if(!list.length){empty(target,message,true);return;}
-      target.replaceChildren(...list.map(t=>communityCard(t,kind,replyCounts)));
+      target.replaceChildren(...list.map(t=>communityCard(t,kind,replyCounts,viewerId)));
     }
     ranked('positive',positive,'Todavía no hay Takes con votos positivos.');
     ranked('negative',negative,'Todavía no hay Takes con votos negativos.');
@@ -140,7 +143,10 @@
     const request=++sequence;
     loading=true;
     try{
-      const result=await db.rpc('ae_home_take_showcase');
+      const [result,session]=await Promise.all([
+        db.rpc('ae_home_take_showcase'),
+        db.auth.getUser().catch(()=>({data:{user:null}}))
+      ]);
       if(result.error)throw result.error;
       if(request!==sequence)return;
       const rows=Array.isArray(result.data)?result.data:[];
@@ -157,7 +163,7 @@
         }
       }
       if(request!==sequence)return;
-      render(rows,replyCounts);
+      render(rows,replyCounts,session.data?.user?.id||null);
       lastFetch=Date.now();
     }catch(error){
       empty($('aeHomeTakesPositiveList'),'No se pudieron cargar los Popular Takes.',true);
@@ -171,5 +177,6 @@
   window.refreshAeHomeTakeDiscoveries=refresh;
   document.addEventListener('DOMContentLoaded',()=>void refresh(true));
   document.addEventListener('ae:takes-updated',()=>void refresh(true));
+  if(typeof db!=='undefined'&&db)db.auth.onAuthStateChange(()=>setTimeout(()=>void refresh(true),0));
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)void refresh();});
 })();
