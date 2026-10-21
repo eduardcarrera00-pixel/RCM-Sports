@@ -69,6 +69,7 @@ def run():
         {'key': 'portada.ranking-nfl', 'url': 'https://img.test/nfl.webp', 'focus_x': 30, 'focus_y': 70, 'alt': None},
         {'key': 'marca.logo', 'url': 'https://img.test/logo.webp', 'focus_x': None, 'focus_y': None, 'alt': 'CAM Sports nuevo'},
         {'key': 'portada.populares-dia', 'url': 'https://img.test/pop.webp', 'focus_x': None, 'focus_y': None, 'alt': None},
+        {'key': 'portada.opinadores-dia', 'url': 'https://img.test/opin.webp', 'focus_x': None, 'focus_y': None, 'alt': None},
     ]
     with fp.full_page(fake_js=fake(rows=rows), width=1366) as page:
         images(page)
@@ -81,6 +82,8 @@ def run():
         assert 'img.test/pop.webp' in pop and 'atlas' not in pop, pop
         unpop = bg(page, '#aeHomeTakesUnpopular .ae-vote-column-heading')
         assert 'ae-community-banner-atlas' in unpop, 'el resto del mosaico sigue igual'
+        opin = bg(page, 'aside .editorial-community.rcm-panel>.ae-section-heading')
+        assert 'img.test/opin.webp' in opin and 'data:image' not in opin, opin[:120]
         assert page.locator('cam-site-image-layer').count() == 0
         # Caché: la siguiente visita aplica el reemplazo antes de consultar la base
         cached = page.evaluate("JSON.parse(localStorage.getItem('cam_site_images_v1')).map(r=>r.key).sort()")
@@ -90,6 +93,7 @@ def run():
         images(page)
         page.wait_for_timeout(600)
         assert 'ae-community-banner-atlas' in bg(page, '#aeHomeTakesPopular .ae-vote-column-heading'), 'la variante de día no toca la de noche'
+        assert 'data:image/avif' in bg(page, 'aside .editorial-community.rcm-panel>.ae-section-heading'), 'Opinadores de noche conserva su imagen incrustada'
 
     # 3) Admin: lápices, diálogo, guardar, restaurar.
     for width in (390, 1366):
@@ -100,14 +104,19 @@ def run():
             page.evaluate("document.querySelector('#aeHomeTakesPopular .ae-vote-column-heading').scrollIntoView({block:'center'})")
             page.wait_for_timeout(400)
             pencils += visible_pencils(page)
+            page.evaluate("document.querySelector('aside .editorial-community.rcm-panel>.ae-section-heading').scrollIntoView({block:'center'})")
+            page.wait_for_timeout(1200)
+            pencils += visible_pencils(page)
             keys = {p['key'] for p in pencils}
             # En móvil «Impopulares» queda fuera de pantalla (carrusel): su lápiz se oculta.
-            for k in ['marca.logo', 'portada.populares-dia'] + (['portada.impopulares-dia'] if width > 800 else []):
-                assert k in keys, (k, sorted(keys))
+            for k in ['marca.logo', 'portada.populares-dia', 'portada.opinadores-dia'] + (['portada.impopulares-dia'] if width > 800 else []):
+                assert k in keys, (width, k, sorted(keys))
             assert all(p['w'] <= 18.5 and p['h'] <= 18.5 for p in pencils), 'lápiz diminuto'
             if SHOTS:
                 page.screenshot(path=f'{SHOTS}/site-images-admin-{width}.png')
             # Abrir el diálogo desde el lápiz de «Populares»
+            page.evaluate("document.querySelector('#aeHomeTakesPopular .ae-vote-column-heading').scrollIntoView({block:'center'})")
+            page.wait_for_timeout(800)
             page.locator('cam-site-image-layer > .cam-site-image-pencil[data-key="portada.populares-dia"]').first.click()
             page.wait_for_selector('#camSiteImageDialog[open]')
             assert 'Populares' in page.locator('#camSiteImageDialog [data-ui=label]').inner_text()

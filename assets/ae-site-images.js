@@ -42,6 +42,8 @@
     f(base + '-dia', label, section, day, Object.assign({ group: base, variant: DAY }, extra));
   };
   const atlas = (key, label, section, path, cells, note) => f(key, label, section, path, { kind: 'atlas', cells, note });
+  // Imagen incrustada en una hoja de estilos (url("data:…")): se identifica por la hoja.
+  const embedded = (key, label, section, sheet, extra) => f(key, label, section, [], Object.assign({ embedded: sheet }, extra));
 
   // Marca y cabecera
   img('marca.logo', 'Logotipo CAM Sports', 'Cabecera, pie y bienvenida', ['assets/cam-sports-logo.webp', 'assets/cam-sports-logo.jpeg']);
@@ -59,6 +61,9 @@
   img('nav.futbol', 'Icono de Fútbol', 'Navegación', 'assets/icons/ae-futbol-gold.webp');
   img('nav.opiniones', 'Icono de Opiniones', 'Navegación', 'assets/icons/ae-opiniones-gold.webp');
   img('nav.colegial', 'Icono de Colegial', 'Navegación', 'assets/icons/ae-colegial-gold.webp');
+  // Portada · Opinadores distinguidos (imágenes incrustadas en sus hojas)
+  embedded('portada.opinadores-noche', 'Banner de «Opinadores distinguidos»', 'Portada', 'ae-opinadores-classical-night.css', { group: 'portada.opinadores', variant: NIGHT });
+  embedded('portada.opinadores-dia', 'Banner de «Opinadores distinguidos»', 'Portada', 'ae-opinadores-classical-day.css', { group: 'portada.opinadores', variant: DAY });
   // Portada
   pair('portada.boton-lectura', 'Icono del botón de lectura', 'Portada', 'assets/icons/ae-hero-book-night.svg', 'assets/icons/ae-hero-book-day.svg');
   pair('portada.boton-picks', 'Icono del botón de Picks', 'Portada', 'assets/icons/ae-hero-picks-night.svg', 'assets/icons/ae-hero-picks-day.svg');
@@ -178,8 +183,19 @@
     return u.pathname === '/' + path || u.pathname.endsWith('/' + path);
   }
   // Clave de archivo para una URL (original del código), o null.
+  const embeddedBySheet = new Map(FILES.filter(e => e.embedded).map(e => [e.embedded.toLowerCase(), e.key]));
+  const dataKey = new Map(), dataByKey = new Map();
+  function embeddedKeyFor(raw, base) {
+    if (dataKey.has(raw)) return dataKey.get(raw);
+    if (!base) return null;
+    let sheet; try { sheet = new URL(base).pathname.split('/').pop().toLowerCase(); } catch { return null; }
+    const key = embeddedBySheet.get(sheet);
+    if (key && !dataByKey.has(key)) { dataKey.set(raw, key); dataByKey.set(key, raw); }
+    return key && dataByKey.get(key) === raw ? key : null;
+  }
   const keyMemo = new Map();
   function fileKeyFor(raw, base) {
+    if (typeof raw === 'string' && raw.startsWith('data:')) return embeddedKeyFor(raw, base);
     const memo = (base || '') + '\u0000' + raw;
     if (keyMemo.has(memo)) return keyMemo.get(memo);
     const key = resolveKey(raw, base);
@@ -680,6 +696,7 @@
 
   function originalSrc(entry) {
     const e = entry.kind === 'slot' ? ENTRIES.get(entry.atlas) : entry;
+    if (e.embedded) return dataByKey.get(e.key) || '';
     return toURL(e.paths[0]).href;
   }
   function measure(src) {
@@ -740,7 +757,7 @@
     const src = originalSrc(entry);
     const [w, h] = await measure(src);
     if (!editing || editing.key !== key) return;
-    const vector = /\.svg$/i.test(new URL(src).pathname);
+    const vector = /\.svg$/i.test(toURL(src)?.pathname || '');
     let text;
     if (entry.kind === 'slot') {
       const cells = ENTRIES.get(entry.atlas).cells || [1, 1];
@@ -865,7 +882,7 @@
   window.camSiteImages = {
     refresh, reload: load, open: openEditor,
     keys: () => [...ENTRIES.keys()],
-    inventory: () => [...ENTRIES.values()].map(e => ({ key: e.key, label: e.label, section: e.section, kind: e.kind, paths: e.paths || [ENTRIES.get(e.atlas).paths[0]] })),
+    inventory: () => [...ENTRIES.values()].map(e => ({ key: e.key, label: e.label, section: e.section, kind: e.kind, paths: e.embedded ? ['assets/' + e.embedded + ' (incrustada)'] : (e.paths || [ENTRIES.get(e.atlas).paths[0]]) })),
     _state: () => ({ rows: [...rows.keys()], decls: decls.length, pencils: [...admin.pencils.values()].flat().map(p => p.key), admin: admin.on, tableReady })
   };
 })();
