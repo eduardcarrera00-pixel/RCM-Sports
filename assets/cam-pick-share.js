@@ -1,4 +1,4 @@
-/* Public Pick sharing. No credentials, screenshot uploads or automatic social posts. */
+/* Public Pick/Take sharing. No credentials, screenshot uploads or automatic social posts. */
 (() => {
  'use strict';
  const BASE='https://camsports.github.io/';
@@ -9,6 +9,15 @@
  let dialog=null,restoreFocus=null,resource=null,request=0;
  function model(p,kind='community'){
   if(!p||!UUID.test(String(p.id)))throw Error('No se puede compartir este Pick.');
+  if(kind==='take'){
+   if(p.hidden||!UUID.test(String(p.author_id)))throw Error('No se puede compartir este Take.');
+   const sports={nfl:'NFL',football:'Fútbol',laliga:'LaLiga',premier:'Premier League',ligamx:'Liga MX',champions:'Champions League',colegial:'Fútbol colegial'};
+   const date=String(p.created_at||'').slice(0,10);
+   return {id:String(p.id).toLowerCase(),kind:'take',author_id:String(p.author_id).toLowerCase(),
+    author:'@'+clean(p.author||'Aficionado',60).replace(/^@/,''),title:clean(p.title||'Take',160),body:clean(p.body,2000),
+    competition:clean(p.competition||sports[p.sport]||'Deportes',60),date:/^\d{4}-\d{2}-\d{2}$/.test(date)?date:'',
+    up:Math.max(0,Math.trunc(Number(p.upvotes)||0)),down:Math.max(0,Math.trunc(Number(p.downvotes)||0))};
+  }
   const weekly=kind==='weekly';
   const legs=weekly?[{event:p.event_name,selection:p.selection}]:Array.isArray(p.legs)?p.legs.slice(0,50):[];
   const outcome={won:'Acertado',lost:'Fallado',void:'Anulado'}[p.outcome]||'Pendiente';
@@ -19,12 +28,12 @@
    review:!weekly&&p.moderation_status!=='approved'?'Cuota en revisión':'',
    legs:legs.map(l=>({event:clean(l?.event||l?.sport||'Evento',160),selection:clean(l?.selection||'Consulta el pronóstico completo',280)}))};
  }
- function urlFor(p,source){const u=new URL(BASE);u.searchParams.set(p.kind==='weekly'?'weeklyPick':'pick',p.id);if(source){u.searchParams.set('utm_source',source);u.searchParams.set('utm_medium','share');u.searchParams.set('utm_campaign',p.kind==='weekly'?'pick-del-dia':'pick-comunidad');}return u.href;}
- function caption(p,source){return [(p.kind==='weekly'?'Pick del editor':'Pick de '+p.author)+' · CAM SPORTS',p.title,...p.legs.map(l=>l.event+' · '+l.selection),'Cuota '+p.odds+(p.review?' · '+p.review:''),p.result,urlFor(p,source)].filter(Boolean).join('\n');}
- function xUrl(p){const u=new URL('https://twitter.com/intent/tweet');u.searchParams.set('text',clean((p.kind==='weekly'?'Pick del editor':p.author+' comparte su Pick')+' · '+p.title+' · Cuota '+p.odds+(p.review?' (en revisión)':''),170));u.searchParams.set('url',urlFor(p,'x'));return u.href;}
+ function urlFor(p,source){const u=new URL(BASE);if(p.kind==='take'){u.searchParams.set('perfil',p.author_id);u.searchParams.set('take',p.id);}else u.searchParams.set(p.kind==='weekly'?'weeklyPick':'pick',p.id);if(source){u.searchParams.set('utm_source',source);u.searchParams.set('utm_medium','share');u.searchParams.set('utm_campaign',p.kind==='take'?'take-comunidad':p.kind==='weekly'?'pick-del-dia':'pick-comunidad');}return u.href;}
+ function caption(p,source){if(p.kind==='take')return ['Take de '+p.author+' · CAM SPORTS',p.competition,p.title,p.body,urlFor(p,source)].filter(Boolean).join('\n');return [(p.kind==='weekly'?'Pick del editor':'Pick de '+p.author)+' · CAM SPORTS',p.title,...p.legs.map(l=>l.event+' · '+l.selection),'Cuota '+p.odds+(p.review?' · '+p.review:''),p.result,urlFor(p,source)].filter(Boolean).join('\n');}
+ function xUrl(p){const u=new URL('https://twitter.com/intent/tweet');u.searchParams.set('text',clean(p.kind==='take'?p.author+' comparte su Take · '+p.title:(p.kind==='weekly'?'Pick del editor':p.author+' comparte su Pick')+' · '+p.title+' · Cuota '+p.odds+(p.review?' (en revisión)':''),170));u.searchParams.set('url',urlFor(p,'x'));return u.href;}
  function wrap(ctx,value,width,maxLines){
   const lines=[];let line='';
-  for(const word of clean(value,1000).split(' ')){
+  for(const word of clean(value,10000).split(' ')){
    // Split long, unbroken words too; user content must stay inside the image.
    let pieces=[''];for(const char of word){const i=pieces.length-1;if(ctx.measureText(pieces[i]+char).width>width&&pieces[i])pieces.push(char);else pieces[i]+=char;}
    for(const piece of pieces){const next=line?line+' '+piece:piece;if(ctx.measureText(next).width>width&&line){lines.push(line);line=piece;}else line=next;}
@@ -46,6 +55,14 @@
   c.fillStyle=bronze;c.font='600 24px Arial,sans-serif';c.fillText(clean(p.author,48),90,276);
   c.fillStyle=ink;c.font='bold 46px Georgia,serif';wrap(c,p.title,900,2).forEach((l,i)=>c.fillText(l,90,341+i*55));
   c.strokeStyle='#d9d9d0';c.lineWidth=2;c.beginPath();c.moveTo(90,427);c.lineTo(990,427);c.stroke();
+  if(p.kind==='take'){
+   c.fillStyle=bronze;c.font='600 25px Arial,sans-serif';c.fillText(p.competition,90,479);
+   c.fillStyle=ink;c.font='34px Georgia,serif';
+   const lines=wrap(c,p.body,900,11);lines.forEach((line,i)=>c.fillText(line,90,550+i*43));
+   c.fillStyle=muted;c.font='22px Arial,sans-serif';c.fillText('Lee el Take completo y responde en CAM SPORTS',90,1038);
+   c.fillStyle='#102b3e';c.fillRect(90,1071,900,122);c.fillStyle='#f4e8db';c.font='22px Arial,sans-serif';c.fillText('LA COMUNIDAD OPINA',118,1110);
+   c.font='bold 30px Georgia,serif';c.fillText(p.up+' apoyos · '+p.down+' cuestionamientos',118,1167);
+  }else{
   let y=479;
   for(const [i,l] of p.legs.slice(0,3).entries()){
    c.fillStyle=bronze;c.font='600 22px Arial,sans-serif';c.fillText(String(i+1).padStart(2,'0'),90,y);
@@ -58,7 +75,8 @@
   c.fillText(more,90,1038);
   c.fillStyle='#102b3e';c.fillRect(90,1071,900,122);c.fillStyle='#f4e8db';c.font='22px Arial,sans-serif';c.fillText('CUOTA TOTAL',118,1110);c.font='bold 52px Georgia,serif';c.fillText(p.odds,118,1167);
   c.font='600 25px Arial,sans-serif';c.textAlign='right';c.fillText(p.review||p.result,960,1140);c.textAlign='left';
-  c.fillStyle=muted;c.font='22px Arial,sans-serif';c.fillText(p.date?'Evento · '+p.date:'El deporte también se debate.',90,1241);
+  }
+  c.fillStyle=muted;c.font='22px Arial,sans-serif';c.fillText(p.date?(p.kind==='take'?'Publicado':'Evento')+' · '+p.date:'El deporte también se debate.',90,1241);
   c.fillStyle=bronze;c.font='600 22px Arial,sans-serif';c.textAlign='right';c.fillText('camsports.github.io',990,1241);c.textAlign='left';
   return canvas;
  }
@@ -75,7 +93,7 @@
   let p;try{p=model(pick,kind);}catch(error){if(typeof notifyCommunity==='function')notifyCommunity(error.message,true);return;}
   restoreFocus=opener;release();const ticket=++request;
   if(!dialog){dialog=make('dialog',null,'cam-pick-share-dialog');dialog.id='camPickShareDialog';dialog.setAttribute('aria-labelledby','camPickShareTitle');document.body.append(dialog);dialog.addEventListener('close',()=>{request++;release();restoreFocus?.focus?.({preventScroll:true});});dialog.addEventListener('click',e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)close();}});}
-  const top=make('div',null,'cam-pick-share-heading');const heading=make('h2',p.kind==='weekly'?'Comparte el Pick del editor':'Comparte este Pick');heading.id='camPickShareTitle';top.append(heading);
+  const top=make('div',null,'cam-pick-share-heading');const heading=make('h2',p.kind==='take'?'Comparte este Take':p.kind==='weekly'?'Comparte el Pick del editor':'Comparte este Pick');heading.id='camPickShareTitle';top.append(heading);
   const exit=make('button','Cerrar','cam-pick-share-close');exit.type='button';exit.onclick=close;top.append(exit);
   const intro=make('p','Llévalo a tus redes y que empiece el debate.','cam-pick-share-intro');
   const layout=make('div',null,'cam-pick-share-layout');const preview=make('div',null,'cam-pick-share-preview');preview.setAttribute('aria-busy','true');preview.append(make('p','Preparando tarjeta…'));
@@ -84,7 +102,7 @@
   const ig=make('button','Instagram','cam-pick-share-network'),tk=make('button','TikTok','cam-pick-share-network');ig.type=tk.type='button';ig.disabled=tk.disabled=true;actions.append(x,ig,tk);
   const hint=make('p','En Instagram y TikTok eliges la app desde el menú de tu teléfono. Si no aparece, descarga la tarjeta y súbela allí.','cam-pick-share-hint');
   const status=make('p','', 'cam-pick-share-status');status.setAttribute('role','status');status.setAttribute('aria-live','polite');
-  const download=make('a','Descargar tarjeta','cam-pick-share-download');download.hidden=true;download.download=`cam-sports-${p.kind==='weekly'?'pick-del-dia':'pick'}-${p.id}.png`;
+  const download=make('a','Descargar tarjeta','cam-pick-share-download');download.hidden=true;download.download=`cam-sports-${p.kind==='take'?'take':p.kind==='weekly'?'pick-del-dia':'pick'}-${p.id}.png`;
   const linkButton=make('button','Copiar enlace'),textButton=make('button','Copiar texto');linkButton.type=textButton.type='button';
   linkButton.onclick=()=>copy(urlFor(p),status,'Enlace copiado.');textButton.onclick=()=>copy(caption(p),status,'Texto y enlace copiados.');
   const utilities=make('div',null,'cam-pick-share-utilities');utilities.append(download,linkButton,textButton);
@@ -106,13 +124,14 @@
    canvas.toBlob(blob=>{
     if(ticket!==request||!dialog.open)return;
     if(!blob){preview.replaceChildren(make('p','No se pudo preparar la imagen. Puedes copiar el texto o el enlace.'));preview.setAttribute('aria-busy','false');return;}
-    resource=URL.createObjectURL(blob);const img=make('img');img.src=resource;img.alt='Tarjeta para compartir: '+p.title+' · Cuota '+p.odds;img.width=1080;img.height=1350;preview.replaceChildren(img);preview.setAttribute('aria-busy','false');
+    resource=URL.createObjectURL(blob);const img=make('img');img.src=resource;img.alt='Tarjeta para compartir: '+p.title+(p.kind==='take'?' · '+p.author:' · Cuota '+p.odds);img.width=1080;img.height=1350;preview.replaceChildren(img);preview.setAttribute('aria-busy','false');
     file=new File([blob],download.download,{type:'image/png'});download.href=resource;download.hidden=false;ig.disabled=tk.disabled=false;
    },'image/png');
   }catch(error){preview.replaceChildren(make('p',error.message));preview.setAttribute('aria-busy','false');}
  }
  function button(p,options={}){
-  const b=make('button','Compartir','cam-pick-share-button');b.type='button';b.setAttribute('aria-label','Compartir Pick: '+clean(p.title||p.event_name||'Pick',160));
+  const type=options.kind==='take'?'Take':'Pick';
+  const b=make('button','Compartir','cam-pick-share-button');b.type='button';b.setAttribute('aria-label','Compartir '+type+': '+clean(p.title||p.event_name||type,160));
   const icon=document.createElementNS('http://www.w3.org/2000/svg','svg');icon.setAttribute('viewBox','0 0 24 24');icon.setAttribute('aria-hidden','true');
   const path=document.createElementNS('http://www.w3.org/2000/svg','path');path.setAttribute('d','M15 3h6v6M21 3 10 14M10 5H4v16h16v-6');path.setAttribute('fill','none');path.setAttribute('stroke','currentColor');path.setAttribute('stroke-width','1.7');icon.append(path);b.prepend(icon);
   b.onclick=e=>{e.preventDefault();e.stopPropagation();show(p,{...options,opener:b});};return b;

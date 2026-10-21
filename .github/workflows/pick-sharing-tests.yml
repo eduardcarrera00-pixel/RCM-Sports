@@ -10,6 +10,7 @@ on:
       - 'assets/style-sources.json'
       - 'index.html'
       - 'tests/pick-sharing*'
+      - 'tests/profile-sharing.mjs'
       - 'package*.json'
       - '.github/workflows/pick-sharing-tests.yml'
   workflow_dispatch:
