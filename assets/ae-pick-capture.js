@@ -149,10 +149,10 @@
   const fingerprint=()=>JSON.stringify({picks:getPicks().map(p=>({sport:p.sport,event:p.event,selection:p.selection,odds:Number(p.odds)}))});
   const panel=node('section',null,'cp-capture');panel.setAttribute('aria-labelledby','cpCaptureTitle');
   const title=node('h3','Sube la captura de tu apuesta','cp-capture-title');title.id='cpCaptureTitle';
-  const intro=node('p','El deporte, el partido, el pronóstico y el momio se rellenan automáticamente. Después revisas la fecha y, si quieres, nos cuentas por qué elegiste ese pick.','cp-capture-intro');
+  const intro=node('p','1. Sube una captura de tu apuesta ya hecha.\n2. Leemos el partido, pronóstico y momio; después descartamos la imagen.\n3. Revisas los datos y la fecha, y decides si publicas.','cp-capture-intro');intro.style.whiteSpace='pre-line';
   const picker=node('button','Subir captura','cp-capture-picker'),input=document.createElement('input');picker.type='button';picker.setAttribute('aria-describedby','cpCaptureHelp cpCaptureStatus');
   input.type='file';input.id='cpCaptureFile';input.accept='image/png,image/jpeg,image/webp';input.multiple=true;input.hidden=true;picker.addEventListener('click',()=>input.click());
-  const help=node('p','Incluye el partido, el pronóstico, el momio y la fecha del evento si aparece. Una captura completa o una por selección · PNG, JPG o WebP · hasta 8 MB por imagen. La imagen no se guarda.','cp-capture-help');help.id='cpCaptureHelp';
+  const help=node('p','Para leerla mejor, incluye partido, pronóstico, momio y fecha (si aparece). Una captura completa o una por selección · PNG, JPG o WebP · hasta 8 MB por imagen. CAM SPORTS no guarda ni publica la foto. Primero intentamos leerla en tu dispositivo; si falla, puede enviarse a Google para la lectura avanzada. Te avisamos si ocurre.','cp-capture-help');help.id='cpCaptureHelp';
   const status=node('p','','cp-capture-status');status.id='cpCaptureStatus';status.setAttribute('role','status');status.setAttribute('aria-live','polite');
   const privacy=node('div',null,'cp-capture-privacy');privacy.hidden=true;privacy.setAttribute('role','status');privacy.setAttribute('aria-live','polite');privacy.setAttribute('aria-atomic','true');
   const privacyIcon=document.createElementNS('http://www.w3.org/2000/svg','svg');privacyIcon.setAttribute('viewBox','0 0 32 32');privacyIcon.setAttribute('aria-hidden','true');privacyIcon.classList.add('cp-capture-privacy-icon');
