@@ -35,7 +35,7 @@ click('Cerrar');assert.equal(dlg.open,false);assert.equal(d.activeElement,opener
 // A Blob prepared after closing cannot restore a stale preview or leak its URL.
 opener.click();const oldCallback=pendingBlob;click('Cerrar');oldCallback(new w.Blob(['old']));assert.equal(dlg.open,false);assert.equal(dlg.querySelector('img'),null);
 const weekly={...pick,id:'00000000-0000-0000-0000-000000000922',event_name:'Toronto vs Boston',selection:'Toronto gana',title:'Pick de hoy'};
-w.CamPickShare.open(weekly,{kind:'weekly'});assert.match(dlg.textContent,/Comparte el Pick del día/);assert.match(dlg.querySelector('a').href,/weeklyPick/);assert.match(dlg.querySelector('textarea').value,/Toronto gana/);assert.doesNotMatch(dlg.querySelector('textarea').value,/@Sofia/);
+w.CamPickShare.open(weekly,{kind:'weekly'});assert.match(dlg.textContent,/Comparte el Pick del editor/);assert.match(dlg.querySelector('a').href,/weeklyPick/);assert.match(dlg.querySelector('textarea').value,/Toronto gana/);assert.doesNotMatch(dlg.querySelector('textarea').value,/@Sofia/);
 const longPick={...pick,title:'X'.repeat(500),legs:Array.from({length:6},(_,i)=>({event:'Evento '+i,selection:'L'.repeat(500)}))};
 w.CamPickShare.open(longPick);assert.ok(drawn.includes('3 de 6 selecciones · Pick completo en el enlace'));assert.equal(dlg.querySelector('textarea').value.split('Evento ').length-1,6,'The full caption retains every selection');
 w.CamPickShare.open({...pick,id:'invalid'});assert.match(w.lastNotification,/No se puede compartir/);
