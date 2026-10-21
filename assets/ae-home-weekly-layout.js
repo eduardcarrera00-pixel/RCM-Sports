@@ -14,7 +14,7 @@
     if(!featured || !homePreview || !hero || !sidebarFeatures || !main || !trending || !featured.parentNode || !sidebarFeatures.parentNode) return;
 
     // Mark the native Picks component's permanent location without cloning it.
-    const picksAnchor = document.createComment('Pick de la Semana · posición original en Picks');
+    const picksAnchor = document.createComment('Pick del día · posición original en Picks');
     featured.parentNode.insertBefore(picksAnchor, featured);
     const sidebarAnchor = document.createComment('Rankings de portada · posición original en la columna derecha');
     sidebarFeatures.parentNode.insertBefore(sidebarAnchor, sidebarFeatures);
@@ -42,7 +42,7 @@
         featured.classList.add('ae-home-native-picks');
         featured.setAttribute('role','link');
         featured.setAttribute('tabindex','0');
-        featured.setAttribute('aria-label','Ir a Picks para ver el Pick de la Semana');
+        featured.setAttribute('aria-label','Ir a Picks para ver el Pick del día');
       } else {
         // Restore the SAME node (and its real contents/events) to the Picks tab.
         if(picksAnchor.parentNode && picksAnchor.nextSibling !== featured){
