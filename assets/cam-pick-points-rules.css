@@ -1,0 +1,126 @@
+/* CAM SPORTS · Reglas de puntuación en "Prepara tu Pick".
+   Disclosure nativo: sin JS, compatible con teclado y móviles. */
+html body dialog#cpComposePanel .cam-pick-rules {
+  margin: 12px 24px 0;
+  border: 0;
+  padding: 0;
+  color: var(--cp-dialog-ink);
+  font-family: Inter,system-ui,sans-serif;
+}
+html body dialog#cpComposePanel .cam-pick-rules > summary {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 9px;
+  min-height: 40px;
+  max-width: 100%;
+  padding: 9px 13px;
+  border: 1px solid var(--cp-dialog-line);
+  border-radius: 0;
+  background: rgba(133,91,67,.065);
+  color: var(--cp-dialog-action);
+  list-style: none;
+  font: 650 12px/1.35 Inter,system-ui,sans-serif;
+  letter-spacing: .005em;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color .16s ease,border-color .16s ease;
+}
+html body dialog#cpComposePanel .cam-pick-rules > summary::-webkit-details-marker {display:none}
+html body dialog#cpComposePanel .cam-pick-rules > summary::marker {content:""}
+html body dialog#cpComposePanel .cam-pick-rules > summary:hover,
+html body dialog#cpComposePanel .cam-pick-rules[open] > summary {
+  border-color: var(--cp-dialog-action);
+  background: rgba(133,91,67,.10);
+}
+html body dialog#cpComposePanel .cam-pick-rules__trophy {
+  display:block;
+  width:17px;
+  height:17px;
+  flex:0 0 17px;
+  stroke: currentColor;
+  fill:none;
+  stroke-width:1.7;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+html body dialog#cpComposePanel .cam-pick-rules__chevron {
+  display:block;
+  width:14px;
+  height:14px;
+  flex:0 0 14px;
+  margin-left:3px;
+  stroke: currentColor;
+  stroke-width:2;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  fill:none;
+  transition: transform .18s ease;
+}
+html body dialog#cpComposePanel .cam-pick-rules[open] .cam-pick-rules__chevron {transform:rotate(180deg)}
+html body dialog#cpComposePanel .cam-pick-rules__panel {
+  box-sizing:border-box;
+  width:100%;
+  min-width:0;
+  padding:16px;
+  margin:9px 0 0;
+  border:1px solid var(--cp-dialog-line);
+  border-left:3px solid var(--cp-dialog-action);
+  background: var(--cp-dialog-field);
+}
+html body dialog#cpComposePanel .cam-pick-rules__lead {
+  margin:0 0 12px;
+  color:var(--cp-dialog-ink);
+  font:400 12px/1.55 Inter,system-ui,sans-serif;
+}
+html body dialog#cpComposePanel .cam-pick-rules__list {
+  list-style:none;
+  padding:0;
+  margin:0;
+  display:grid;
+  gap:0;
+  border-block:1px solid var(--cp-dialog-line);
+}
+html body dialog#cpComposePanel .cam-pick-rules__list li {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:5px 12px;
+  min-height:42px;
+  padding:9px 1px;
+  border-bottom:1px solid var(--cp-dialog-line);
+  font:600 12px/1.35 Inter,system-ui,sans-serif;
+}
+html body dialog#cpComposePanel .cam-pick-rules__list li:last-child {border-bottom:0}
+html body dialog#cpComposePanel .cam-pick-rules__name {display:flex;align-items:center;gap:9px;color:var(--cp-dialog-ink)}
+html body dialog#cpComposePanel .cam-pick-rules__dot {height:7px;width:7px;flex:0 0 7px;border-radius:50%;background:#bd946c}
+html body dialog#cpComposePanel .cam-pick-rules__result {font-weight:750;font-variant-numeric:tabular-nums;white-space:nowrap}
+html:not(.dark) body dialog#cpComposePanel .cam-pick-rules__result--won {color:#286b46}
+html:not(.dark) body dialog#cpComposePanel .cam-pick-rules__result--lost {color:#a24438}
+html:not(.dark) body dialog#cpComposePanel .cam-pick-rules__result--void {color:#576775}
+html.dark body dialog#cpComposePanel .cam-pick-rules__result--won {color:#a5d8b9}
+html.dark body dialog#cpComposePanel .cam-pick-rules__result--lost {color:#f0b0a6}
+html.dark body dialog#cpComposePanel .cam-pick-rules__result--void {color:#c2cdd2}
+html.dark body dialog#cpComposePanel .cam-pick-rules > summary {
+  background:rgba(212,174,131,.07);
+}
+html.dark body dialog#cpComposePanel .cam-pick-rules > summary:hover,
+html.dark body dialog#cpComposePanel .cam-pick-rules[open] > summary {
+  background:rgba(212,174,131,.12);
+}
+html body dialog#cpComposePanel .cam-pick-rules__example {
+  margin:11px 0 0;
+  color:var(--cp-dialog-muted);
+  font:400 11px/1.55 Inter,system-ui,sans-serif;
+}
+html body dialog#cpComposePanel .cam-pick-rules__example strong {color:var(--cp-dialog-ink);font-weight:700}
+@media(max-width:520px) {
+  html body dialog#cpComposePanel .cam-pick-rules {margin:10px 16px 0}
+  html body dialog#cpComposePanel .cam-pick-rules > summary {min-height:42px;padding:9px 11px;font-size:12px}
+  html body dialog#cpComposePanel .cam-pick-rules__panel {padding:12px}
+}
+@media(prefers-reduced-motion:reduce) {
+  html body dialog#cpComposePanel .cam-pick-rules :is(summary,.cam-pick-rules__chevron) {transition:none}
+}
