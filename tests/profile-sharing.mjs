@@ -7,8 +7,8 @@ const takeId=i=>'00000000-0000-0000-0000-'+String(960+i).padStart(12,'0');
 const takes=Array.from({length:4},(_,i)=>({id:takeId(i),title:'Opinión '+i,body:('El deporte se debate con argumentos '+i+'. ').repeat(40),sport:'nfl',created_at:'2026-10-21T13:00:00Z',upvotes:10-i,downvotes:i,hidden:i===3,email:'PRIVATE_EMAIL',draft:'PRIVATE_DRAFT'}));
 const picks=[{id:takeId(8),title:'Mi Pick acertado',outcome:'won',moderation_status:'approved',american_odds:150,legs:[{event:'Barcelona vs PSG',selection:'Barcelona gana'}],created_at:'2026-10-21T13:00:00Z',result_points:1.5}];
 const html=fs.readFileSync('index.html','utf8').replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,'');
-async function setup({own=false,shared='',rows=takes}={}){
- const w=new Window({url:'https://example.test/'+(shared?'?perfil='+owner+'&take='+shared+'&token=PRIVATE_TOKEN':'')}),d=w.document;
+async function setup({own=false,shared='',rows=takes,compactQuery=''}={}){
+ const w=new Window({url:'https://example.test/'+(compactQuery||(shared?'?perfil='+owner+'&take='+shared+'&token=PRIVATE_TOKEN':''))}),d=w.document;
  d.body.innerHTML=html;w.currentAdmin=null;
  const calls=[],opened=[],drawn=[];
  w.HTMLCanvasElement.prototype.getContext=()=>({fillRect(){},beginPath(){},moveTo(){},lineTo(){},stroke(){},fillText:t=>drawn.push(t),measureText:t=>({width:String(t).length*17})});
@@ -39,8 +39,8 @@ for(const selector of ['#aeProfileTakeHighlights .ae-profile-feature','#aeProfil
   assert.equal(a.opened.length,0,'Sharing must not also open the Take discussion');
   assert.match(dialog.querySelector('h2').textContent,/Comparte este Take/);
   const caption=dialog.querySelector('textarea').value;assert.match(caption,/Take de @Lector/);assert.doesNotMatch(caption,/PRIVATE|Cuota|Pendiente/);
-  const href=new URL(new URL(dialog.querySelector('a').href).searchParams.get('url'));
-  assert.equal(href.origin,'https://camsports.github.io');assert.equal(href.searchParams.get('perfil'),owner);assert.ok(href.searchParams.has('take'));
+  const compact=new URL(dialog.querySelector('a').href).searchParams.get('url');assert.ok(compact.length<80);const visitor=new Window({url:compact});visitor.eval(fs.readFileSync('assets/cam-pick-share.js','utf8'));const href=new URL(visitor.location.href);await visitor.happyDOM.close();
+  assert.match(caption,/¿De acuerdo o tienes otra lectura/);assert.equal(href.origin,'https://camsports.github.io');assert.equal(href.searchParams.get('perfil'),owner);assert.ok(href.searchParams.has('take'));
   const row=takes.find(t=>t.id===href.searchParams.get('take'));assert.ok(caption.includes(row.body.trim()),'Copy text retains the full published Take');
   assert.equal(dialog.querySelector('.cam-pick-share-download').download,'cam-sports-take-'+row.id+'.png');
   dialog.querySelector('.cam-pick-share-close').click();assert.equal(a.d.activeElement,button);
@@ -54,7 +54,8 @@ for(const selector of ['#aeProfilePickHighlights','#aeProfilePicks']){
 }
 assert.equal(a.calls.some(c=>/post_|vote_/.test(c.name)),false,'Sharing must not write to the database');await a.w.happyDOM.close();
 
-const b=await setup({shared:takeId(1)});assert.equal(b.opened.length,1,'A signed-out visitor opens the exact shared Take');assert.equal(b.opened[0].take.id,takeId(1));assert.equal(b.opened[0].take.author,'Lector');
+const compactWindow=new Window({url:'https://example.test/'});compactWindow.eval(fs.readFileSync('assets/cam-pick-share.js','utf8'));compactWindow.CamPickShare.open({...takes[1],author:'Lector',author_id:owner},{kind:'take'});const compactTakeUrl=new URL(compactWindow.document.querySelector('#camPickShareDialog a').href).searchParams.get('url');const compactQuery=new URL(compactTakeUrl).search;await compactWindow.happyDOM.close();
+const b=await setup({shared:takeId(1),compactQuery});assert.equal(b.opened.length,1,'A signed-out visitor opens the exact shared Take');assert.equal(b.opened[0].take.id,takeId(1));assert.equal(b.opened[0].take.author,'Lector');
 assert.ok(b.d.querySelector('#aeProfileTakeHighlights .cam-pick-share-button'),'Public profiles have share controls');
 assert.equal(b.calls.some(c=>c.name==='ae_my_free_takes'),false,'Visitors only load public Takes');
 b.d.querySelector('#aeProfileTakeHighlights .cam-pick-share-button').click();assert.ok(!b.d.querySelector('#camPickShareDialog textarea').value.includes('PRIVATE_TOKEN'));

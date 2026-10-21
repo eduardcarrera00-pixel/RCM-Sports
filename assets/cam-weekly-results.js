@@ -238,6 +238,6 @@
    document.addEventListener('visibilitychange',()=>{if(!document.hidden){syncAdmin();refreshPublic();}});
    syncAdmin();refreshPublic();showShared();
  }
- window.camWeeklyResults={replyUrl,socialSummary};
+ window.camWeeklyResults={replyUrl,socialSummary,getResult:id=>results.get(id)||null};
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
