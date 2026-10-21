@@ -138,6 +138,34 @@ def cover(image, title):
     return back.convert("RGB")
 
 
+def promo_cover(image, title, kicker):
+    """Daily promo post: full-bleed scene, gold kicker and a large headline."""
+    back = ImageOps.fit(image, (WIDTH, HEIGHT), method=Image.Resampling.LANCZOS).convert("RGBA")
+    # Navy veil, stronger at the bottom so the headline always reads.
+    veil = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    vd = ImageDraw.Draw(veil)
+    for y in range(HEIGHT):
+        alpha = int(70 + 165 * max(0, (y - HEIGHT * .25) / (HEIGHT * .75)) ** 1.2)
+        vd.line((0, y, WIDTH, y), fill=(9, 22, 34, min(235, alpha)))
+    back.alpha_composite(veil)
+    draw = ImageDraw.Draw(back)
+    gold = (214, 177, 121, 255)
+    cream = (250, 245, 235, 255)
+    draw.text((44, 85), "CAM SPORTS", font=font(43, True), fill=(247, 237, 219, 255))
+    draw.rectangle((44, 152, 156, 155), fill=gold)
+
+    heading = font(58, True)
+    lines = wrap(draw, title, heading, max_width=630, limit=5)
+    top = 1080 - 74 * len(lines)
+    kicker_font = font(25, True)
+    draw.text((44, top - 62), str(kicker or "CAM SPORTS")[:40].upper(), font=kicker_font, fill=gold)
+    for i, line in enumerate(lines):
+        draw.text((44, top + 74 * i), line, font=heading, fill=cream)
+    draw.rectangle((44, 1165, 675, 1167), fill=(120, 117, 105, 255))
+    draw.text((44, 1190), "CAMSPORTS.GITHUB.IO", font=font(23, True), fill=gold)
+    return back.convert("RGB")
+
+
 def compose_original_music(path):
     """Synthesized original four-chord arpeggio; no samples or licensed songs."""
     # Am, F, C and G. Quiet plucked notes leave room for the news image.
@@ -168,12 +196,13 @@ def compose_original_music(path):
         wav.writeframes(samples.tobytes())
 
 
-def make_video(image, title, output):
+def make_video(image, title, output, style="news", kicker=None):
     output.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory() as tmp:
         still = Path(tmp) / "frame.png"
         audio = Path(tmp) / "original-music.wav"
-        cover(image, title).save(still)
+        frame = promo_cover(image, title, kicker) if style == "promo" else cover(image, title)
+        frame.save(still)
         compose_original_music(audio)
         subprocess.run([
             "ffmpeg", "-nostdin", "-hide_banner", "-loglevel", "error", "-y",
@@ -201,6 +230,7 @@ def main():
         with tempfile.TemporaryDirectory() as tmp:
             image = Image.new("RGB", (1100, 650), "#285781")
             make_video(image, "Prueba de CAM Sports con música original", Path(tmp) / "check.mp4")
+            make_video(image, "¿Ya pusiste tu Pick de hoy?", Path(tmp) / "promo.mp4", "promo", "Cocina Picks")
         print("Smoke test: MP4 contains H.264 video and AAC audio.")
         return
 
@@ -213,7 +243,8 @@ def main():
         output = OUTPUT / (hashlib.md5(key.encode("utf-8")).hexdigest() + ".mp4")
         if output.exists() and output.stat().st_size > 30000:
             continue
-        make_video(read_image(job.get("image_url")), job.get("title"), output)
+        style = "promo" if job.get("style") == "promo" else "news"
+        make_video(read_image(job.get("image_url")), job.get("title"), output, style, job.get("kicker"))
         print("Generated:", output.relative_to(ROOT))
 
 

@@ -144,3 +144,40 @@ Validación: `node tests/social-instagram-publication.mjs`, regresiones sociales
 existentes, `npm run test:editor` y el smoke test H.264/AAC del renderer.
 La conexión OAuth de Instagram debe completarse antes de activar el canal.
 Una prueba local o una respuesta `accepted` no demuestra publicación real.
+
+
+## Publicaciones promocionales diarias (21 de octubre de 2026)
+
+Migración: `supabase/migrations/20261021170000_cam_social_daily_promos.sql`
+(aplicada en producción el 21 oct). Todos los días, a las **8:00 y a las 18:00
+hora de Toronto**, sale una publicación sobre cómo funciona la página en todos
+los canales activos de `cam_social.channels` (hoy X, TikTok e Instagram).
+
+- `cam_social.promos`: biblioteca de mensajes (23 al iniciar) por tema: Picks,
+  Takes, ¿Quién será campeón?, noticias, opiniones, Power Rankings, perfil de
+  prestigio y comunidad. Cada uno tiene antetítulo y titular del vídeo, texto de
+  X (≤ 230 caracteres, el enlace se añade aparte), texto de TikTok/Instagram y
+  hashtags. `active=false` lo pausa; `active_until` lo retira solo (los de
+  campeón se retiran tras el cierre del 30 de octubre).
+- Rotación: el mensaje menos usado y nunca el mismo tema dos veces seguidas.
+- Mensajes con `needs_news`: usan `{noticia}`, que se sustituye por el titular
+  de la última noticia pública de los últimos 5 días (con más de 6 horas, para
+  no repetir la publicación automática de la propia noticia), con su foto y su
+  enlace `?article=`. Si no hay noticia reciente, no se eligen.
+- `cam_social.promo_slots`: horas locales e imágenes de fondo (de día por la
+  mañana, de noche por la tarde).
+- `cam_social.queue_promos()`: pg_cron `cam-social-promos` la ejecuta cada 5
+  minutos en las horas UTC que cubren el horario de verano y de invierno. Crea el
+  evento entre 45 minutos antes y 30 minutos después de la hora, una sola vez por
+  franja y día (`promo:AAAA-MM-DD:manana|tarde`). Las entregas quedan con
+  `available_at` = hora exacta: el vídeo se genera antes y nada sale antes de
+  las 8:00 / 18:00.
+- El renderer usa el estilo `promo` (escena a pantalla completa, antetítulo
+  dorado, titular grande y `CAMSPORTS.GITHUB.IO`) cuando el trabajo lo indica.
+- Consumo: 2 publicaciones × 3 redes = 6 llamadas de Buffer al día, dentro del
+  límite local de 90.
+
+Validado en producción dentro de una transacción revertida: 7:00 no crea nada,
+7:20 crea la de las 8:00 (12:00 UTC en EDT), repetir no duplica, 17:20 crea la
+de las 18:00, tras el cambio de hora sale a las 13:00 / 23:00 UTC, 18:31 ya no
+crea nada, cada publicación tiene 3 entregas y los temas rotan.
