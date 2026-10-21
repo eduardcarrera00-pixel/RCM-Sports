@@ -3542,6 +3542,7 @@ currentUser = {
                 articles = [...rows.map(fromDatabase), ...defaultArticles.map(a => withLocalInteractions({...a, remote: false}))];
                 renderArticlesFeed();
                 window.aeRefreshNewsArchive?.();
+                window.aeOpinions?.refreshNews?.();
                 renderTrending();
                 refreshCommunity();
                 await refreshArticleStats();
@@ -4047,6 +4048,7 @@ currentUser = {
                 }
                 renderArticlesFeed();
                 window.aeRefreshNewsArchive?.();
+                window.aeOpinions?.refreshNews?.();
                 renderTrending();
                 photoEditSaving = false;
                 closeArticlePhotoEditor();
@@ -4709,7 +4711,7 @@ html .cam-weekly-result-surface .cam-weekly-result-on-photo{
 <script src="assets/cam-weekly-results.js?v=20261020-weekly-badge-mobile-fit-1"></script>
 <script src="assets/ae-profile.js?v=20261021-welcome-again-1"></script>
 <script src="assets/ae-season-predictions.js?v=20261020-sports-logos-1"></script>
-<script src="assets/ae-opinions.js?v=20261020-opinions-1"></script>
+<script src="assets/ae-opinions.js?v=20261021-news-in-opinions-1"></script>
 <script src="assets/ae-home-takes.js?v=20261017-esports-league-v1"></script>
 <script src="assets/ae-home-take-discoveries.js?v=20261018-reply-totals-1"></script>
 
