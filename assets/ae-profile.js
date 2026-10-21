@@ -174,12 +174,25 @@ async function loadPrestige(userId){
   }
 }
 
-function openProfileTake(t,owner,reply=false){
-  if(t.hidden)return;
+function publicProfileEntry(t,owner){
   const name=String(t.author||(privateView?$('aeProfileUsername')?.textContent:publicAuthorLabel)||'Aficionado')
     .replace(/^@+/,'').split(' · ')[0].trim();
-  window.aeTakeReplies?.open({...t,author_id:t.author_id||owner,author:name},
+  return {...t,author_id:t.author_id||owner,author:name};
+}
+
+function openProfileTake(t,owner,reply=false){
+  if(t.hidden)return;
+  window.aeTakeReplies?.open(publicProfileEntry(t,owner),
     reply?{focusComposer:true}:{});
+}
+
+function openSharedProfileTake(owner){
+  const params=new URL(location.href).searchParams;
+  const id=params.get('take');
+  if(params.get('perfil')!==String(owner)||!UUID.test(id||''))return;
+  const take=ownTakes.find(t=>!t.hidden&&String(t.id).toLowerCase()===id.toLowerCase());
+  if(take)openProfileTake(take,owner);
+  else $('aeProfileStatus').textContent='Este Take no está disponible públicamente.';
 }
 
 async function refreshProfileTakes(){
@@ -232,6 +245,7 @@ function profileTakeActions(t,owner,canVote){
       bar.append(b);
     }
   }
+  if(window.CamPickShare)bar.append(window.CamPickShare.button(publicProfileEntry(t,owner),{kind:'take'}));
   return bar;
 }
 
@@ -265,6 +279,7 @@ function close(){
   if(new URL(location.href).searchParams.has('perfil')){
     const url=new URL(location.href);
     url.searchParams.delete('perfil');
+    url.searchParams.delete('take');
     history.replaceState({},'',url);
   }
 }
@@ -579,7 +594,7 @@ function renderPickCard(p,feature=false){
   const points=pickPoints(p);
   if(points)foot.append(el('strong',points));
   foot.append(el('span','▲ '+numeric(p.upvotes)),el('span','▼ '+numeric(p.downvotes)));
-  if(window.CamPickShare)foot.append(window.CamPickShare.button(p));
+  if(window.CamPickShare)foot.append(window.CamPickShare.button(publicProfileEntry(p,activeAuthor)));
   if(feature){
     const open=el('button','Ver Pick','ae-profile-pick-open');
     open.type='button';
@@ -773,6 +788,7 @@ async function showOwn(){
   if(unpopularError)errors.push('Unpopular Take: '+(unpopularError.message||'no disponible'));
   $('aeProfileStatus').textContent=errors.length?'No se pudo cargar todo el perfil. '+errors.join(' · '):'';
   setPrivateTab('takes');
+  if(!takeError)openSharedProfileTake(user.id);
 }
 
 async function showPublic(id,push=true,tab='takes'){
@@ -815,6 +831,7 @@ async function showPublic(id,push=true,tab='takes'){
   if(push){
     const u=new URL(location.href);
     u.searchParams.set('perfil',id);
+    u.searchParams.delete('take');
     history.pushState({},'',u);
   }
 
@@ -834,6 +851,7 @@ async function showPublic(id,push=true,tab='takes'){
   if(pickError)errors.push('Picks no disponibles');
   $('aeProfileStatus').textContent=errors.join(' · ');
   setPrivateTab(tab);
+  if(!takeError)openSharedProfileTake(id);
 }
 
 window.openAeProfile=showOwn;

@@ -6,6 +6,7 @@ const root=process.cwd(),qa=process.env.CAM_SHARE_QA_DIR||fs.mkdtempSync(path.jo
 fs.mkdirSync(qa,{recursive:true});
 const server=http.createServer((req,res)=>{
  const pathname=new URL(req.url,'http://127.0.0.1').pathname;
+ if(pathname==='/profile'){res.setHeader('Content-Type','text/html; charset=utf-8');return res.end(fs.readFileSync('index.html','utf8').replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,'').replace('</body>','<script src="/assets/cam-pick-share.js"></script><script src="/assets/ae-profile.js"></script></body>'));}
  if(pathname==='/') {res.setHeader('Content-Type','text/html; charset=utf-8');return res.end('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="/assets/site.css"><link rel="stylesheet" href="/assets/ae-editorial-bundle.css"></head><body><main id="mainContent"><section id="footballTakes" class="ae-picks-editorial"><section id="communityPicks"><div id="cpFeed"><article class="cp-card cp-feed-editorial"><h3>Barça vs PSG</h3><div class="cp-actions" id="actions"></div></article></div></section></section></main><script src="/assets/cam-pick-share.js"></script></body></html>');}
  const file=path.resolve(root,'.'+pathname);if(!file.startsWith(root+path.sep)){res.writeHead(403);return res.end();}
  try{res.setHeader('Content-Type',file.endsWith('.css')?'text/css; charset=utf-8':'text/javascript; charset=utf-8');res.end(fs.readFileSync(file));}catch{res.writeHead(404);res.end();}
@@ -50,7 +51,29 @@ const server=http.createServer((req,res)=>{
  await page.locator('#aeProfilePicks .cam-pick-share-button').click();await page.locator('#camPickShareDialog[open]').waitFor();await page.getByRole('button',{name:'Cerrar',exact:true}).click();
  await page.evaluate(()=>document.getElementById('aeProfileDialog').close());
  await page.evaluate(()=>CamPickShare.open({...window.pick,event_name:'Toronto vs Boston',selection:'Toronto gana'},{kind:'weekly'}));assert.match(await page.locator('#camPickShareTitle').innerText(),/Pick del editor/);assert.match(await page.locator('.cam-pick-share-networks a').getAttribute('href'),/weeklyPick/);
- assert.deepEqual(errors,[]);console.log('PASS: real PNG download, responsive day/night 360–1366px, native activation, cancellation/fallback, profile overlay and weekly share. QA: '+qa);
+ // Exercise the real profile markup/renderers, rather than only an isolated card.
+ await page.addInitScript(()=>{
+  const owner='00000000-0000-0000-0000-000000000951';
+  window.profileTakes=Array.from({length:4},(_,i)=>({id:'00000000-0000-0000-0000-'+String(960+i).padStart(12,'0'),author_id:owner,title:i===0?'Los Bills tienen equipo para llegar a la final':'Mi opinión deportiva '+i,body:('Una defensa sólida y la capacidad de decidir los partidos igualados marcarán la diferencia. ').repeat(8),sport:'nfl',upvotes:12-i,downvotes:i,created_at:'2026-10-21T13:00:00Z'}));
+  window.db={auth:{getUser:async()=>({data:{user:{id:owner,user_metadata:{username:'Lector'}}}}),onAuthStateChange(){}},rpc:async name=>({data:name==='ae_my_free_takes'?profileTakes:name==='ae_my_profile_unpopular_take'?profileTakes[2].id:[]}),from:()=>({select(){return this;},eq(){return this;},order(){return this;},limit:async()=>({data:[{id:'00000000-0000-0000-0000-000000000969',author:'Lector',title:'Mi Pick de fútbol',outcome:'won',moderation_status:'approved',american_odds:150,result_points:1.5,legs:[{event:'Barcelona vs PSG',selection:'Barcelona gana'}]}]})})};
+  window.openedTakes=[];window.aeTakeReplies={open:take=>openedTakes.push(take)};
+  window.shares=[];Object.defineProperty(navigator,'canShare',{configurable:true,value:()=>true});Object.defineProperty(navigator,'share',{configurable:true,value:data=>{shares.push({active:navigator.userActivation.isActive,filename:data.files[0].name});return Promise.resolve();}});
+ });
+ await page.goto('http://127.0.0.1:'+server.address().port+'/profile',{waitUntil:'load'});await page.evaluate(()=>openAeProfile());
+ for(const width of [360,390,768,1366])for(const dark of [false,true]){
+  await page.setViewportSize({width,height:880});await page.evaluate(d=>document.documentElement.classList.toggle('dark',d),dark);
+  const buttons=page.locator('#aeProfileDialog .ae-profile-take-actions .cam-pick-share-button');assert.equal(await buttons.count(),7,'Featured and recent Takes all have sharing');
+  assert.equal(await buttons.evaluateAll(items=>items.every(button=>{const b=button.getBoundingClientRect(),card=button.closest('article').getBoundingClientRect();return b.left>=card.left&&b.right<=card.right+1;})),true,'Profile share buttons fit at '+width);
+  if(width===390)await page.screenshot({path:path.join(qa,'profile-takes-'+(dark?'night':'day')+'.png')});
+ }
+ await page.setViewportSize({width:390,height:880});await page.locator('#aeProfileTakeHighlights .cam-pick-share-button').first().click();await page.locator('.cam-pick-share-preview img').waitFor();
+ assert.equal(await page.evaluate(()=>openedTakes.length),0);assert.match(await page.locator('#camPickShareTitle').innerText(),/Comparte este Take/);assert.match(await page.locator('.cam-pick-share-caption-label textarea').inputValue(),/Take de @Lector/);
+ const takeDownload=page.waitForEvent('download');await page.getByRole('link',{name:'Descargar tarjeta',exact:true}).click();await (await takeDownload).saveAs(path.join(qa,'take-card.png'));
+ await page.getByRole('button',{name:'TikTok',exact:true}).click();assert.deepEqual(await page.evaluate(()=>({active:shares[0].active,take:shares[0].filename.includes('-take-')})),{active:true,take:true});
+ await page.getByRole('button',{name:'Cerrar',exact:true}).click();assert.ok(await page.locator('#aeProfileTakeHighlights .cam-pick-share-button').first().evaluate(e=>document.activeElement===e));
+ await page.locator('#aeProfileTakes .cam-pick-share-button').last().click();await page.getByRole('button',{name:'Cerrar',exact:true}).click();
+ await page.locator('#aeProfileTabPicks').click();assert.equal(await page.locator('#aeProfilePickHighlights .cam-pick-share-button').count(),1);await page.locator('#aeProfilePicks .cam-pick-share-button').click();assert.match(await page.locator('#camPickShareTitle').innerText(),/Comparte este Pick/);
+ assert.deepEqual(errors,[]);console.log('PASS: real Pick/Take PNG, responsive day/night 360–1366px, native activation, cancellation/fallback, actual profile featured/recent sharing and weekly share. QA: '+qa);
  await context.close();
  }finally{await browser.close();server.close();}
 })().catch(e=>{console.error(e);server.close();process.exitCode=1;});

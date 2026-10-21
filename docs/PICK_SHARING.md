@@ -1,9 +1,17 @@
-# Compartir Picks en redes
+# Compartir Picks y Takes en redes
 
 Los Picks públicos de la comunidad tienen un botón **Compartir** en el feed,
 el detalle, el historial y las tarjetas del perfil. Los botones existentes del
-Pick del día, en Inicio y en Picks, abren el mismo panel. Tras publicar un Pick,
+Pick del editor, en Inicio y en Picks, abren el mismo panel. Tras publicar un Pick,
 el usuario puede compartirlo desde su tarjeta; nunca se envía automáticamente.
+
+Los perfiles propios y públicos también incluyen **Compartir** en Mejor Take,
+Peor Take, Unpopular Take/Más popular y Takes recientes. Los Takes ocultos por
+moderación no se comparten. Se conservan título, texto, deporte y atribución
+al autor. La tarjeta muestra una vista previa; «Copiar texto» conserva todo el
+Take. Su enlace `?perfil=AUTOR&take=ID` abre la conversación de ese Take desde
+el perfil, también sin iniciar sesión. Si ya no está público, se muestra un
+aviso de indisponibilidad. Nunca se publican borradores ni datos de la cuenta.
 
 La opción elegida por el propietario es compartir desde un botón, sin conectar
 cuentas ni solicitar credenciales. X abre su compositor oficial con texto y un
