@@ -14,7 +14,9 @@
     const link = document.createElement('link');
     link.rel = 'preload';
     link.as = 'image';
-    link.href = 'assets/cam-welcome-' + theme + '-sharp.webp';
+    // Misma selección que image-set() en CSS: 960 px en pantallas 1x, 1600 px en pantallas nítidas.
+    link.href = 'assets/cam-welcome-' + theme + '-oleo-960.webp';
+    link.imageSrcset = 'assets/cam-welcome-' + theme + '-oleo-960.webp 1x, assets/cam-welcome-' + theme + '-oleo-1600.webp 2x';
     link.fetchPriority = 'high';
     document.head.appendChild(link);
   }
