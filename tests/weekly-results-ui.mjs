@@ -56,7 +56,7 @@ assert.ok(panel.textContent.includes('TikTok: procesando'));
 assert.ok(![...panel.querySelectorAll('button')].some(b=>b.textContent.startsWith('Aprobar')),'Resolved Picks have no repeat controls');
 assert.ok(![...panel.querySelectorAll('a')].some(n=>n.textContent.includes('Citar el Pick')),'No manual duplicate is offered while automatic publication is queued');
 const quoteUrl=a.w.camWeeklyResults.replyUrl(settled);
-assert.equal(new URL(quoteUrl).searchParams.get('text'),'✅ Pick acertado · Pick de la Semana\n'+settled.original_x_url);
+assert.equal(new URL(quoteUrl).searchParams.get('text'),'✅ Pick acertado · Pick del día\n'+settled.original_x_url);
 assert.deepEqual([...new URL(quoteUrl).searchParams.keys()],['text'],'Quote has no in_reply_to or media upload');
 assert.equal(a.w.camWeeklyResults.replyUrl({...settled,original_x_url:'https://evil.test/status/123'}),null);
 await a.w.happyDOM.close();
