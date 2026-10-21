@@ -175,22 +175,24 @@
   const isCurrent=job=>active===job&&!job.cancelled;
   const aiClient=()=>{try{const c=typeof db!=='undefined'?db:window.db;return c?.functions?.invoke?c:null;}catch{return null;}};
   async function jpeg(file,job){
-   const bitmap=await createImageBitmap(file);
-   try{
-    const scale=Math.min(1,1800/Math.max(bitmap.width,bitmap.height));
-    const canvas=document.createElement('canvas');job.canvases.add(canvas);
-    canvas.width=Math.max(1,Math.round(bitmap.width*scale));canvas.height=Math.max(1,Math.round(bitmap.height*scale));
-    canvas.getContext('2d').drawImage(bitmap,0,0,canvas.width,canvas.height);
-    const data=canvas.toDataURL('image/jpeg',.86);canvas.width=1;canvas.height=1;job.canvases.delete(canvas);
-    return data;
-   }finally{bitmap.close?.();}
+   // Preserve the width of long receipts: a 1800px longest-side limit made
+   // player markets and prices too small. Use the same bounded decoder as OCR.
+   const rendering=imageCanvas(file,job);job.imageTask=rendering.catch(()=>{});
+   const canvas=await rendering;
+   try{return canvas.toDataURL('image/jpeg',.92);}
+   finally{canvas.width=canvas.height=1;job.canvases.delete(canvas);}
   }
+
   async function readWithAi(job){
    const client=aiClient();
    const session=await client.auth?.getSession?.();
    if(!session?.data?.session)throw Error('Inicia sesión para usar la lectura avanzada de capturas.');
    let images=[];
-   for(const file of job.originals||[])images.push(await jpeg(file,job));
+   for(const file of job.originals||[]){
+    if(!isCurrent(job))throw Error('Lectura cancelada.');
+    images.push(await jpeg(file,job));
+   }
+   if(!isCurrent(job))throw Error('Lectura cancelada.');
    overlay.progress(35);
    const tick=setInterval(()=>{if(isCurrent(job)){const now=Number(progress.getAttribute('aria-valuenow')||35);const next=Math.min(92,now+4);overlay.progress(next);progress.setAttribute('aria-valuenow',String(next));progressBar.style.width=next+'%';}},700);
    let response;
@@ -268,9 +270,10 @@
    job.timer=setTimeout(()=>{
     if(!isCurrent(job))return;clear('La lectura tardó demasiado. Prueba una captura más pequeña o más nítida.',true);
    },90000);
-   let prepared=null,failure='';
+   let prepared=null,failure='',terminalFailure=false,localExpired=false,localTimer;
+   const localAbort=Promise.race([aborted,new Promise((_,reject)=>{localTimer=setTimeout(()=>{localExpired=true;reject(Error('La lectura local tardó demasiado. Probamos la lectura avanzada.'));},35000);})]);
    try{
-    const T=await Promise.race([engine(),aborted]);
+    const T=await Promise.race([engine(),localAbort]);
     if(!isCurrent(job))return;
     const pending=T.createWorker('eng+spa',1,{workerPath:vendor+'worker.min.js',corePath:vendor+'tesseract-core-lstm.wasm.js',langPath:vendor.replace(/\/$/,''),workerBlobURL:false,cacheMethod:'none',logger:m=>{
      if(isCurrent(job)&&m.status==='recognizing text'){
@@ -278,23 +281,24 @@
      status.textContent='Leyendo tu captura… '+percent+'%';overlay.progress(percent);progressBar.style.width=percent+'%';progress.setAttribute('aria-valuenow',String(percent));
     }
     },errorHandler:()=>{}});
-    pending.then(worker=>{if(!isCurrent(job))void worker.terminate().catch(()=>{});}).catch(()=>{});
-    job.worker=await Promise.race([pending,aborted]);if(!isCurrent(job))return;
+    pending.then(worker=>{if(!isCurrent(job)||localExpired)void worker.terminate().catch(()=>{});}).catch(()=>{});
+    job.worker=await Promise.race([pending,localAbort]);if(!isCurrent(job))return;
     const readings=[];let total=null,eventDate='',dateSource='',singles=false;
     for(let i=0;i<job.files.length;i++){
      const rendering=imageCanvas(job.files[i],job);job.imageTask=rendering.catch(()=>{});
-     const canvas=await Promise.race([rendering,aborted]);
+     const canvas=await Promise.race([rendering,localAbort]);
      let compared,bestPartial;
      for(const mode of ['6','11']){
       await job.worker.setParameters({tessedit_pageseg_mode:mode,preserve_interword_spaces:'1'});
-      let scanned=await Promise.race([job.worker.recognize(canvas,{}, {text:true,blocks:true}),aborted]);
+      let scanned=await Promise.race([job.worker.recognize(canvas,{}, {text:true,blocks:true}),localAbort]);
       if(!isCurrent(job))return;
-      await originalTicketPrice(canvas,scanned.data,job,aborted);
+      await originalTicketPrice(canvas,scanned.data,job,localAbort);
       compared=window.aePickCaptureParser.extract(scanned.data);scanned=null;
       if(compared.partial&&(!bestPartial||compared.partial.event.length>bestPartial.partial.event.length))bestPartial=compared;
+      if(compared.terminal){terminalFailure=true;break;}
       if(compared.ok)break;
      }
-     if(!compared.ok&&bestPartial)compared=bestPartial;
+     if(!compared.ok&&!compared.terminal&&bestPartial)compared=bestPartial;
      canvas.width=1;canvas.height=1;job.canvases.delete(canvas);job.files[i]=null;
      if(!compared.ok){
       if(compared.partial){
@@ -317,9 +321,11 @@
    }catch(error){
     if(isCurrent(job))failure=error?.message||'No pudimos leer la captura. Prueba otra.';
    }finally{
+   clearTimeout(localTimer);
    // Lector mixto: si el lector del teléfono no puede, se intenta la lectura avanzada con IA.
-   if(!prepared&&isCurrent(job)&&aiClient()&&!/cancelad/i.test(failure)){
+   if(!prepared&&!terminalFailure&&isCurrent(job)&&aiClient()&&!/cancelad/i.test(failure)){
     try{
+     clearTimeout(job.timer);job.timer=setTimeout(()=>{if(isCurrent(job))clear('La lectura avanzada tardó demasiado. Vuelve a intentarlo.',true);},110000);
      try{await job.worker?.terminate();}catch{}job.worker=null;usedAi=true;showPrivacy('reading');
      overlay.show('reading',{note:'Probamos con la lectura avanzada: la imagen se envía un momento al lector de Google. Nosotros no la guardamos.'});
      status.textContent='Usando la lectura avanzada…';progressBar.style.width='0%';
@@ -335,6 +341,7 @@
     const [discarded]=await Promise.all([dispose(job),isCurrent(job)?wait(1100):null]);
     if(isCurrent(job)){
      active=null;input.value='';input.disabled=false;picker.disabled=false;cancel.hidden=true;cancel.disabled=false;panel.removeAttribute('aria-busy');showPrivacy(discarded?'complete':'unconfirmed',!prepared);
+     if(discarded&&!prepared&&failure)overlay.setNote(failure);
      if(discarded&&prepared){
       result=prepared;applyImport(result);signature=fingerprint();
       panel.dataset.state='matched';title.textContent='Captura leída';status.textContent=prepared.singles?prepared.readings.length+' apuestas sencillas leídas: se publicará un Pick por cada una.':prepared.eventDate?'Fecha del evento completada automáticamente. Revisa los datos y publica tu Pick.':'Revisa tu pick e indica la fecha del evento para publicar.';picker.textContent='Cambiar captura';

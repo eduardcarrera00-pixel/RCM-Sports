@@ -1,7 +1,8 @@
 // CAM SPORTS · Lee una captura de apuesta con IA (Gemini, plan gratuito) cuando el lector del teléfono no puede.
-// La imagen se reenvía una sola vez a la IA y no se guarda en ningún sitio; solo se
+// La imagen se reenvía temporalmente a la IA y no se guarda en ningún sitio; solo se
 // guardan los datos de la apuesta (partido, pronóstico, momio, fecha) para poder publicar.
 import {createClient} from 'npm:@supabase/supabase-js@2.117.3';
+import {readTicketModel} from './retry-model.ts';
 
 const allowedOrigins = new Set(['https://eduardcarrera00-pixel.github.io', 'https://aesportsclub.github.io', 'https://camsports.github.io', 'http://127.0.0.1:5500', 'http://localhost:5500']);
 // Modelo: AE_TICKET_MODEL si está definido; si no, el alias «último Flash».
@@ -11,7 +12,7 @@ const PREFERRED_MODEL = Deno.env.get('AE_TICKET_MODEL') || 'gemini-flash-latest'
 let activeModel: string | null = null;
 const API = 'https://generativelanguage.googleapis.com/v1beta';
 async function flashModels(apiKey: string): Promise<string[]> {
-  const res = await fetch(`${API}/models?pageSize=1000`, {headers: {'x-goog-api-key': apiKey}});
+  const res = await fetch(`${API}/models?pageSize=1000`, {headers: {'x-goog-api-key': apiKey}, signal: AbortSignal.timeout(5000)});
   if (!res.ok) return [];
   const list = (await res.json())?.models || [];
   const version = (n: string) => (n.match(/gemini-(\d+(?:\.\d+)?)-flash$/) || [])[1];
@@ -62,6 +63,7 @@ const schema: any = {
           league: {type: 'STRING', description: 'Liga o competición si aparece o se deduce sin duda (p. ej. Liga MX, Premier League, NFL).'},
           event: {type: 'STRING', description: 'Partido como "Equipo A vs Equipo B", nombres como aparecen.'},
           selection: {type: 'STRING', description: 'Pronóstico completo con mercado, línea y periodo, en español. Ej: "Más de 2.5 goles", "Lakers -4.5", "Patrick Mahomes más de 1.5 pases de touchdown".'},
+          decimal_odds: {type: 'NUMBER', nullable: true, description: 'Cuota decimal exacta visible de esta selección o grupo CREAR APUESTA (p. ej. 1.95); conserva sus decimales para calcular la combinada.'},
           american_odds: {type: 'INTEGER', nullable: true, description: 'Momio americano de esta selección si se ve (ej. 150 o -120). null si solo hay total.'},
           event_date: {type: 'STRING', nullable: true, description: 'Fecha del partido YYYY-MM-DD si aparece en la captura. null si no aparece.'}
         },
@@ -75,10 +77,10 @@ const schema: any = {
 };
 
 
-// Estructura por boleto: una combinada es un boleto; cada CREAR APUESTA es un boleto independiente.
+// Estructura por boleto: una combinada es un boleto; CREAR APUESTA puede ser una selección de una combinada.
 schema.properties.bets={
   type:'ARRAY',
-  description:'Una entrada por boleto independiente. Para un Parlay, UNA entrada con varias selecciones.',
+  description:'Una entrada por boleto independiente. Un solo importe, ganancias y botón de cerrar apuesta al pie indican UN boleto combinado, aunque contenga varios CREAR APUESTA.',
   items:{type:'OBJECT',properties:{
     selections:schema.properties.selections,
     total_american_odds:{type:'INTEGER',nullable:true,description:'Cuota americana TOTAL de este boleto, no importe de dinero'},
@@ -100,7 +102,7 @@ Reglas:
 - Si el boleto aparece debajo de otra pantalla de la casa (filas de cuotas de mercados), lee solo el boleto o historial, no esas filas.
 - Si son apuestas sencillas (varias apuestas individuales, cada una con su cuota y sin cuota total), marca bet_type="sencillas" y devuelve cada una con su momio. En "Equipo - Mercado" el pronóstico es "Mercado: Equipo" (p. ej. "Resultado Final (Tiempo Regular): Como").
 - Ignora etiquetas como "PA", "Pago Anticipado", "Cuota de oro" o "EN VIVO" dentro del pronóstico. Si algún partido ya está en juego o terminado (marcador, minuto, "EN VIVO", palomita o tache), marca already_started=true.
-- Devuelve bets[] agrupando POR BOLETO. Cada bloque CREAR APUESTA con su propio decimal es un boleto separado; no mezcles sus jugadores ni sus cuotas. Las cifras 1+ remates/faltas son líneas, no cuotas.
+- Devuelve bets[] agrupando POR BOLETO. Varios CREAR APUESTA con UN solo Importe/Ganancias y UN botón Cerrar apuesta al pie son UNA combinada: cada grupo es una selección con su partido, TODOS sus jugadores/condiciones y su decimal exacto. No los publiques como apuestas independientes. Solo separa boletos si cada uno tiene su propio importe y cierre/resumen. Las cifras 1+ remates/faltas son líneas, no cuotas. Si no se ve total pero están todos los grupos de partidos distintos, deja total null: calcularemos su producto sin usar importes de dinero.
 - En Playdoit, Parlay ABIERTO contiene varias tarjetas en UN boleto. Usa Momios para el total, nunca Apuesta total/Ganancia Total. La fecha al pie es la de creación y no la del encuentro.
 - Extrae todos los grupos y selecciones; no uses los ejemplos como si fueran el contenido del boleto actual.
 - Si la imagen no es un boleto de apuestas, marca is_bet_slip=false.`;
@@ -147,18 +149,22 @@ Deno.serve(async req => {
     content.push({text: prompt(today) + await referenceText(admin)});
 
     const request = JSON.stringify({contents: [{role: 'user', parts: content}], generationConfig: {temperature: 0, responseMimeType: 'application/json', responseSchema: schema}});
+    const deadline = Date.now() + 90000;
     const call = (model: string) => fetch(`${API}/models/${model}:generateContent`, {
-      method: 'POST', headers: {'x-goog-api-key': apiKey, 'content-type': 'application/json'}, body: request
+      method: 'POST', headers: {'x-goog-api-key': apiKey, 'content-type': 'application/json'}, body: request, signal: AbortSignal.timeout(Math.max(1, Math.min(35000, deadline - Date.now())))
     });
-    let MODEL = activeModel || PREFERRED_MODEL;
-    let ai = await call(MODEL);
-    if (ai.status === 404) {
-      console.error('gemini model unavailable', MODEL);
-      for (const candidate of (await flashModels(apiKey)).filter(m => m !== MODEL).slice(0, 4)) {
-        ai = await call(candidate);
-        if (ai.status !== 404) { MODEL = candidate; break; }
-      }
-    }
+    const {response: ai, model: MODEL} = await readTicketModel({
+      preferred: activeModel || PREFERRED_MODEL,
+      call: async (model: string) => {
+        try { return await call(model); }
+        catch (error) {
+          if (error instanceof Error && ['TimeoutError', 'AbortError', 'TypeError'].includes(error.name))
+            return new Response(null, {status: 503});
+          throw error;
+        }
+      },
+      listModels: () => flashModels(apiKey).catch(() => [])
+    });
     if (ai.ok) activeModel = MODEL;
     if (ai.status === 429) return respond({error: 'La lectura avanzada está muy solicitada ahora. Inténtalo en un minuto.'}, 429);
     if (!ai.ok) {
@@ -175,7 +181,7 @@ Deno.serve(async req => {
     };
     if (!data || !data.is_bet_slip) return await fail('La imagen no parece un boleto de apuestas.');
 
-    // Cada CREAR APUESTA representa un Pick independiente, aunque tenga varias condiciones.
+    // Respetar los límites del boleto: los grupos de un mismo parlay permanecen juntos.
     const bets:any[]=Array.isArray(data.bets)?data.bets:[];
     if(bets.length>20)return await fail('Hay demasiadas apuestas en la captura.');
     const betPrice=(b:any):number|null=>{
@@ -225,6 +231,7 @@ Deno.serve(async req => {
     const selections = (Array.isArray(data.selections) ? data.selections : []).slice(0, 20).map((s: Record<string, unknown>) => ({
       sport: clean(s.sport, 20) || 'Otros', league: clean(s.league, 60), event: clean(s.event, 160), selection: clean(s.selection, 200),
       odds: Number.isInteger(s.american_odds) && Math.abs(Number(s.american_odds)) >= 100 ? Number(s.american_odds) : null,
+      decimal: typeof s.decimal_odds === 'number' && s.decimal_odds > 1 && s.decimal_odds <= 1001 ? s.decimal_odds : null,
       eventDate: isoDay(s.event_date)
     })).filter((s: {event: string, selection: string}) => s.event.length >= 3 && s.selection.length >= 2);
     if (data.problem && String(data.problem).trim()) return await fail(clean(data.problem, 160));
@@ -249,8 +256,9 @@ Deno.serve(async req => {
     let total = Number.isInteger(data.total_american_odds) && Math.abs(data.total_american_odds) >= 100 ? data.total_american_odds : null;
     if (!total && typeof data.total_decimal_odds === 'number' && data.total_decimal_odds > 1) total = toAmerican(data.total_decimal_odds);
     if (!total && selections.length === 1) total = selections[0].odds;
-    if (!total && selections.length === 2 && selections.every((s: {odds: number | null}) => s.odds)) {
-      total = toAmerican(selections.reduce((p: number, s: {odds: number}) => p * toDecimal(s.odds), 1));
+    if (!total && selections.length > 1 && new Set(selections.map((s: {event: string}) => s.event.toLowerCase())).size === selections.length
+      && selections.every((s: {decimal: number | null, odds: number | null}) => s.decimal || s.odds)) {
+      total = toAmerican(selections.reduce((p: number, s: {decimal: number | null, odds: number}) => p * (s.decimal || toDecimal(s.odds)), 1));
     }
     if (!total) return await fail('No pudimos leer el momio total del boleto.');
     if (total < 100) return await fail('El momio total debe ser al menos +100 para publicar un Pick.');

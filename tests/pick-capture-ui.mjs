@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';import fs from 'node:fs';import {Window} from 'happy-dom';
 const w=new Window({url:'https://example.test/RCM-Sports/'}),d=w.document;
+// Skip presentation-only delays; retain real cancellation and OCR deadlines.
+const timeout=w.setTimeout.bind(w);w.setTimeout=(fn,ms,...args)=>timeout(fn,ms<=2600?1:ms,...args);
 d.body.innerHTML='<dialog open><form><input name="odds_0"><input name="event_date" type="date"><input name="explanation"><footer class="cp-compose-footer"></footer></form></dialog>';
 const form=d.querySelector('form');let picks=[];
 const valid={text:'BETSLIP\nNBA\nToronto Raptors vs Boston Celtics\nToronto Raptors Moneyline +150\nStake $10.00',confidence:95};
@@ -11,7 +13,7 @@ w.Tesseract={createWorker:async(_language,_oem,options)=>{workers++;assert.equal
 w.eval(fs.readFileSync('assets/ae-pick-capture-parser.js','utf8'));w.eval(fs.readFileSync('assets/ae-pick-capture.js','utf8'));
 const controller=w.aePickCapture.mount({form,getPicks:()=>picks,applyImport:result=>{picks=result?structuredClone(result.readings):[];}});
 const input=d.getElementById('cpCaptureFile'),panel=d.querySelector('.cp-capture'),privacy=d.querySelector('.cp-capture-privacy');
-const settle=()=>new Promise(r=>setTimeout(r,35));
+const settle=()=>new Promise(r=>setTimeout(r,120));
 function upload(type='image/png',size=10){const transfer=new w.DataTransfer();transfer.items.add(new w.File([new Uint8Array(size)],'capture.png',{type}));input.files=transfer.files;input.dispatchEvent(new w.Event('change'));}
 assert.throws(()=>controller.proof(),/captura/);assert.equal(workers,0,'OCR is lazy');
 assert.equal(form.firstElementChild,panel,'Screenshot comes before the form fields');
@@ -55,4 +57,18 @@ releaseRead();delayRead=null;await settle();assert.equal(privacy.dataset.state,'
 upload();await settle();form.reset();assert.throws(()=>controller.proof(),/captura/);
 assert.equal(privacy.hidden,true);
 upload();await settle();w.dispatchEvent(new w.Event('pagehide'));assert.throws(()=>controller.proof(),/captura/);
+// Advanced fallback keeps tall receipts legible and returns a server proof.
+let aiCalls=0,jpegSize;
+w.HTMLCanvasElement.prototype.toDataURL=function(){jpegSize=[this.width,this.height];return 'data:image/jpeg;base64,AA==';};
+w.db={auth:{getSession:async()=>({data:{session:{}}})},functions:{invoke:async(_name,{body})=>{
+ aiCalls++;assert.equal(body.images.length,1);return {data:{ok:true,readId:'verified-read',readings:[{sport:'NBA',event:'Toronto vs Boston',selection:'Toronto gana',odds:150}],eventDate:'2026-10-21'}};
+}}};
+nextData={text:'unreadable receipt',confidence:95};upload();await settle();
+assert.equal(panel.dataset.state,'matched');assert.equal(aiCalls,1);assert.ok(jpegSize[1]>1800,'Long screenshots are no longer squeezed to 1800px');
+assert.deepEqual(JSON.parse(JSON.stringify(controller.proof())),{version:1,method:'ai_vision',read_id:'verified-read'});
+assert.equal(privacy.dataset.state,'complete');assert.ok(canvases.every(c=>c.width===1&&c.height===1));
+nextData={text:'Parlay GANADO\nMomios +590',confidence:95};upload();await settle();
+assert.equal(panel.dataset.state,'error');assert.equal(aiCalls,1,'Do not send an already resolved ticket to the provider again');
+assert.match(d.getElementById('cpCaptureStatus').textContent,/resuelto/);
+assert.match(d.querySelector('.cp-capture-overlay-text').textContent,/resuelto/);
 await w.happyDOM.close();console.log('PASS: screenshot-first import, automatic odds, immutable bet binding, publish-as-confirmation, real disposal progress, termination failure, decoder cleanup, cancellation and stale-job isolation.');

@@ -508,11 +508,18 @@
  // Importar sin datos escritos: abstenerse si no hay una cuota única por selección.
  // Evento, mercado, selección y cuota se importan como una unidad inmutable.
  function extract(data){
+  // Settled status is a business rejection, not an OCR outage. Keep its reason
+  // even when a cropped image has no header, stake summary or readable prices.
+  const statusText=clean(linesFrom(data).filter(l=>l.confidence>=65).map(l=>l.text).join('\n'));
+  if(/\b(?:ganado|ganada|perdido|perdida|liquidado|liquidada)\b/.test(statusText))
+   return {ok:false,terminal:true,reason:'Este boleto ya está resuelto. Publica tus Picks antes de que empiece el partido.',readings:[]};
+  if(/\bmomios?\b/.test(statusText)&&statusText.split('\n').some(t=>EVENT_IN_LINE.test(t)&&!DATE_IN_LINE.test(t)&&/\s\d{1,2}\s*:\s*\d{1,2}\s*$/.test(t)))
+   return {ok:false,terminal:true,reason:'Uno o más partidos de este boleto ya empezaron o terminaron. Publica tus Picks antes del partido.',readings:[]};
   const dated=read=>read?.ok?{...read,...receiptEventDate(data)}:read;
   const singles=extractSinglesSlip(data);
   if(singles)return dated(singles);
   const card=extractCardTicket(data);
-  if(card&&(card.ok||/empezaron|jugaron|resuelto/.test(card.reason)))return card;
+  if(card&&(card.ok||/empezaron|jugaron|resuelto/.test(card.reason)))return card.ok?card:{...card,terminal:true};
   const momios=extractMomiosTicket(data);
   if(momios&&(momios.ok||!card))return momios;
   if(card)return card;
