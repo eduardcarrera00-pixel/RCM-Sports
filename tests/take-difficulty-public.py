@@ -33,6 +33,9 @@ const tables={
 };
 const query=t=>{const q={select:()=>q,neq:()=>q,order:()=>q,limit:()=>q,in:()=>q,eq:()=>q,
   then:(ok,ko)=>Promise.resolve({data:tables[t]||[],error:null}).then(ok,ko)};return q;};
+const CREST=c=>'data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 46"><path d="M3 3h34v20c0 11-8 18-17 21C11 41 3 34 3 23z" fill="'+c+'" stroke="#1d2b36" stroke-width="2"/><path d="M20 3v41" stroke="#fff" stroke-width="5"/></svg>');
+window.aeSeasonPredictions={crest:(c,t)=>({'Elche':CREST('#0f7a3d'),'Paris Saint-Germain':CREST('#14315f'),'Arsenal':CREST('#c8102e')})[t]||''};
+tables.nfl_teams=[{name:'Kansas City Chiefs',logo:CREST('#e31837')}];
 window.currentCategory='Picks';
 window.confirm=()=>false;
 window.db={from:query,auth:{getUser:async()=>({data:{user:null}}),onAuthStateChange(){}},
@@ -42,6 +45,11 @@ window.db={from:query,auth:{getUser:async()=>({data:{user:null}}),onAuthStateCha
     if(name==='ae_public_take_profile')return {data:[{id:'t1',author_id:USER,author:'nostradamus',sport:'football',title:'Elche termina en Champions',body:'Lo veo claro.',created_at:'2026-08-10T10:00:00Z',upvotes:4,downvotes:9,my_vote:null}],error:null};
     if(name==='ae_take_prestige')return {data:[{resolved:7,risk_score:10.7,risk_label:'Atrevido',bold_attempts:5,bold_hits:2,bold_rate:40,legendary_count:1,rated_points:41}],error:null};
     if(name==='ae_take_legendary')return {data:[{take_id:'t1',title:'Elche termina en Champions',competition:'LaLiga',season_label:'2026/27',points:20,probability:0.0043,scored_at:'2027-05-30T10:00:00Z'}],error:null};
+    if(name==='ae_user_champion_picks')return {data:[
+      {question_id:QID,competition:'laliga',season:'2026/27',prompt:'¿Quién será campeón de LaLiga 2026/27?',team:'Elche',points:20,state:'open',awarded_points:0,winner:null,closes_at:'2099-10-30T23:59:00Z'},
+      {question_id:'qC',competition:'champions',season:'2026/27',prompt:'¿Quién será campeón de la Champions 2026/27?',team:'Paris Saint-Germain',points:8,state:'pending',awarded_points:0,winner:null,closes_at:'2026-10-30T23:59:00Z'},
+      {question_id:'qN',competition:'nfl',season:'2025/26',prompt:'¿Quién será campeón de la NFL 2025/26?',team:'Kansas City Chiefs',points:5,state:'won',awarded_points:5,winner:'Kansas City Chiefs'},
+      {question_id:'qP',competition:'premier',season:'2025/26',prompt:'¿Quién será campeón de la Premier 2025/26?',team:'Arsenal',points:5,state:'lost',awarded_points:0,winner:'Liverpool'}],error:null};
     throw Error('rpc inesperado '+name);
   }};
 """
@@ -67,8 +75,12 @@ def run():
         assert prestige.is_visible()
         text = prestige.text_content()
         for expected in ['PERFIL DE PRESTIGIO', 'Atrevido', '10,7', '40%', '2 de 5', 'Legendarios',
-                         'Epic Prediction 2026/27', 'Elche termina en Champions', '+20 pts', '0,4%']:
+                         'Epic Prediction 2026/27', 'Elche termina en Champions', '+20 pts', '0,4%',
+                         'Campeones elegidos', 'LaLiga 2026/27', 'pts si acierta', 'Kansas City Chiefs', 'pts ganados',
+                         'Campeón confirmado', 'Campeón: Liverpool', '2 en juego', '1 acierto, +5 pts']:
             assert expected in text, (expected, text)
+        assert page.locator('#aeProfilePrestige .ae-champ').count() == 4
+        page.wait_for_function("document.querySelectorAll('#aeProfilePrestige .ae-champ-medal img').length===4")
         # Se oculta en la pestaña de Picks y vuelve en Takes
         page.evaluate("document.getElementById('aeProfileTabPicks').click()")
         assert prestige.is_hidden()
@@ -76,17 +88,26 @@ def run():
         assert prestige.is_visible()
         if SHOTS:
             prestige.screenshot(path=f'{SHOTS}/prestigio.png')
+            cab = page.locator('#aeProfilePrestige .ae-champ-cabinet')
+            cab.screenshot(path=f'{SHOTS}/campeones-movil.png')
+            page.evaluate("document.documentElement.classList.add('dark')")
+            cab.screenshot(path=f'{SHOTS}/campeones-noche.png')
+            page.evaluate("document.documentElement.classList.remove('dark')")
+            page.set_viewport_size({'width': 900, 'height': 1000})
+            cab.screenshot(path=f'{SHOTS}/campeones-escritorio.png')
+            page.set_viewport_size({'width': 390, 'height': 1000})
 
         # 3) Perfil sin Takes puntuados: mensaje, sin estadísticas
         page.evaluate("""() => {
           const old = db.rpc;
           db.rpc = async (n, a) => n === 'ae_take_prestige' ? {data:[{resolved:0,risk_score:null,risk_label:null,bold_attempts:0,bold_hits:0,bold_rate:null,legendary_count:0,rated_points:0}],error:null}
-            : n === 'ae_take_legendary' ? {data:[],error:null} : old(n, a);
+            : n === 'ae_take_legendary' || n === 'ae_user_champion_picks' ? {data:[],error:null} : old(n, a);
           window.closeAeProfile && window.closeAeProfile();
           window.openAePublicProfile('33333333-3333-4333-8333-333333333333', false);
         }""")
         page.wait_for_function("/todavía no tiene Takes puntuados/i.test(document.getElementById('aeProfilePrestige').textContent)")
         assert page.locator('#aeProfilePrestige .ae-profile-prestige-stat').count() == 0
+        assert page.locator('#aeProfilePrestige .ae-champ').count() == 0
         assert not errors, errors
         browser.close()
     print('PASS: perfil de prestigio (stats, medallas, pestañas y estado vacío).')
