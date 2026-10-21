@@ -637,19 +637,27 @@ async function loadSettlement(){
  }
 }
 function shiftDay(day,days){return new Date(Date.parse(day+'T12:00:00Z')+days*86400000).toISOString().slice(0,10);}
+let settleHistoryRequest=0;
 async function loadSettleHistory(){
  const area=$('cpSettleHistory');if(!area)return;
- area.replaceChildren();
+ const seq=++settleHistoryRequest;
+ const current=()=>seq===settleHistoryRequest&&area.isConnected&&$('cpSettleHistory')===area;
+ const failure=error=>{if(current())area.replaceChildren(el('p','No pudimos cargar el historial. '+message(error),'ae-pick-history-empty'));};
+ area.setAttribute('aria-busy','true');
+ try{
  const r=await db.from('ae_pick_feed').select('id,title,author,event_date,american_odds,outcome,settled_at,result_points')
    .in('outcome',['won','lost','void']).order('settled_at',{ascending:false,nullsFirst:false}).limit(20);
- if(r.error){area.append(el('p','No pudimos cargar el historial. '+message(r.error),'ae-pick-history-empty'));return;}
- const rows=r.data||[];
- if(!rows.length){area.append(el('p','Todavía no hay Picks resueltos.','ae-pick-history-empty'));return;}
+ if(!current())return;
+ if(r.error){failure(r.error);return;}
+ const seen=new Set();
+ const rows=(r.data||[]).filter(p=>{if(!p.id||seen.has(p.id))return false;seen.add(p.id);return true;});
+ if(!rows.length){area.replaceChildren(el('p','Todavía no hay Picks resueltos.','ae-pick-history-empty'));return;}
  const auto=new Set();
  try{
   const c=await db.from('ae_pick_settlement_checks').select('pick_id').eq('status','settled').in('pick_id',rows.map(p=>p.id));
   for(const row of c.data||[])auto.add(row.pick_id);
  }catch{}
+ if(!current())return;
  const labels={won:'Acertó',lost:'Falló',void:'Anulado'},marks={won:'✓',lost:'✕',void:'—'};
  const count=o=>rows.filter(p=>p.outcome===o).length;
  const summary=el('div',null,'ae-pick-history-summary');
@@ -657,12 +665,12 @@ async function loadSettleHistory(){
   const box=el('div',null,'ae-pick-history-stat');box.dataset.outcome=o;
   box.append(el('strong',String(count(o))),el('span',text));summary.append(box);
  }
- const note=el('p',rows.length>3?'Últimos '+rows.length+' resultados · desliza para ver más':'Últimos '+rows.length+' resultados','ae-pick-history-note');
+ const note=el('p',rows.length===1?'Último resultado':rows.length>3?'Últimos '+rows.length+' resultados · desliza para ver más':'Últimos '+rows.length+' resultados','ae-pick-history-note');
  const list=el('ol',null,'ae-pick-history-list');list.tabIndex=0;list.setAttribute('aria-label','Últimos Picks resueltos');
  const when=t=>t?new Date(t).toLocaleDateString('es-MX',{day:'numeric',month:'short',timeZone:'America/Toronto'}).replace('.',''):'';
  const odds=v=>v==null?'':(Number(v)>0?'+':'')+v;
  for(const p of rows){
-  const li=el('li',null,'ae-pick-history-entry');li.dataset.outcome=p.outcome;
+  const li=el('li',null,'ae-pick-history-entry');li.dataset.outcome=p.outcome;li.dataset.pickId=p.id;
   const mark=el('span',marks[p.outcome],'ae-pick-history-mark');mark.setAttribute('aria-hidden','true');
   const copy=el('div',null,'ae-pick-history-copy');
   const head=el('div',null,'ae-pick-history-head');
@@ -677,9 +685,13 @@ async function loadSettleHistory(){
  const frame=el('div',null,'ae-pick-history-frame');frame.append(list);
  const sync=()=>frame.classList.toggle('is-end',list.scrollTop+list.clientHeight>=list.scrollHeight-4);
  list.addEventListener('scroll',sync,{passive:true});
- area.append(summary,note,frame);requestAnimationFrame(sync);
+ // Replace the complete snapshot only after it is ready. Authentication,
+ // visibility and feed refreshes can request this history at the same time.
+ area.replaceChildren(summary,note,frame);requestAnimationFrame(sync);
+ }catch(error){failure(error);}
+ finally{if(current())area.setAttribute('aria-busy','false');}
 }
-window.updateAePicksAdmin=()=>{loadModeration();loadSettlement();loadSettleHistory();};
+window.updateAePicksAdmin=()=>Promise.all([loadModeration(),loadSettlement(),loadSettleHistory()]);
 
 function field(label,type='text'){const wrap=el('label',label);const input=el(type==='textarea'?'textarea':'input');if(type!=='textarea')input.type=type;input.required=true;wrap.append(input);return {wrap,input};}
 function buildComposer(){

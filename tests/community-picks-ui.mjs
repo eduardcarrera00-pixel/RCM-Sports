@@ -8,7 +8,7 @@ w.HTMLElement.prototype.scrollIntoView=()=>{};
 w.matchMedia=()=>({matches:false});
 const today=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'America/Toronto',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
 const dayOffset=n=>new Date(Date.parse(today()+'T12:00:00Z')+n*86400000).toISOString().slice(0,10);
-let user={id:'reader'},records=[],comments=[],votes=new Map(),pickCounter=0,failPublish=false;
+let user={id:'reader'},records=[],comments=[],votes=new Map(),pickCounter=0,failPublish=false,authChanged=null;
 w.currentCategory='Picks';w.currentAdmin=null;
 w.notifyCommunity=()=>{};
 w.openUserAuthModal=()=>{w.authOpened=true;};
@@ -19,7 +19,7 @@ w.aeRequestPublication=async(kind,continueToComposer,onAuthRequired)=>{
 };
 w.filterByCategory=category=>{w.currentCategory=category;w.renderCommunityPicksVisibility();};
 w.db={
-  auth:{getUser:async()=>({data:{user},error:null}),onAuthStateChange:()=>{}},
+  auth:{getUser:async()=>({data:{user},error:null}),onAuthStateChange:callback=>{authChanged=callback;}},
   rpc:async()=>({data:[],error:null}),
   from(table){
     let operation='select',payload={},filters=[],limit=1000,single=false;
@@ -92,11 +92,13 @@ await form.onsubmit({preventDefault(){}});
 await settle();
 assert.equal(records.length,1,'The first Pick must be saved');
 assert.equal(d.querySelectorAll('#cpFeed .cp-card').length,1,'Pending Picks must appear in public feed');
-assert.equal(d.querySelector('#cpFeed .cp-upvote').disabled,false,'Voting is available before moderation');
+assert.equal(d.querySelector('#cpFeed .cp-upvote'),null,'Authors do not see voting controls on their own Pick');
 assert.equal(d.getElementById('cpComposePanel').open,false,'Publish form closes after success');
 assert.doesNotMatch(form.textContent,/Una publicación al día/);
 user={id:'voter'};
+authChanged();await settle();
 await w.renderCommunityPicksVisibility();await settle();
+assert.equal(d.querySelector('#cpFeed .cp-upvote').disabled,false,'Other readers can vote before moderation');
 d.querySelector('#cpFeed .cp-upvote').click();
 await settle();
 assert.equal(votes.size,1,'Another account can vote while Pick is pending');
