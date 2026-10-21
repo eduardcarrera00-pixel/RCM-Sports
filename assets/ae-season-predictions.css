@@ -22,6 +22,8 @@
 #freeTakes .ae-season-crest img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 2px 2px rgba(24,37,45,.14))}
 #freeTakes .ae-season-crest-fallback{display:grid;place-items:center;width:42px;height:42px;border:1px solid rgba(133,90,56,.46);background:#efe4d1;color:#765128;font:800 9px/1 Inter,system-ui,sans-serif;letter-spacing:.04em}
 #freeTakes .ae-season-crest.is-loaded .ae-season-crest-fallback{visibility:hidden}
+/* El nombre del club queda solo para lectores de pantalla: el escudo es la opción visible. */
+#freeTakes .ae-season-option .sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
 #freeTakes .ae-season-option-points{position:absolute;right:5px;bottom:5px;min-width:31px;padding:2px 5px;text-align:center;background:#efe4d1;color:#765128;font:800 10px/1.35 Inter,system-ui,sans-serif}
 #freeTakes .ae-season-option.is-chosen{border-color:#765128;background:#765128;color:#fff4df;box-shadow:inset 0 0 0 1px #d7b486}
 #freeTakes .ae-season-option.is-chosen::after{content:'✓';position:absolute;left:5px;top:5px;display:grid;place-items:center;width:18px;height:18px;background:#fff4df;color:#765128;font:900 11px/1 Inter,system-ui,sans-serif}
