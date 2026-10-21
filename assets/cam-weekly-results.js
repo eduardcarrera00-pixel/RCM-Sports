@@ -9,7 +9,6 @@
  const validId=id=>/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id||'');
  let panel,list,status,previous,next,quick,quickStatus,quickRow=null,offset=0,loading=false,busy=false,sessionEpoch=0;
  const results=new Map();
- const photoObservers=[];
  const originalX=url=>/^https:\/\/(?:twitter\.com|x\.com)\/[A-Za-z0-9_]+\/status\/([0-9]+)$/.exec(url||'');
  function replyUrl(result){
    const match=originalX(result.original_x_url);if(!match)return null;
@@ -53,7 +52,6 @@
  }
 
  function decorate(){
-   photoObservers.splice(0).forEach(observer=>observer.disconnect());
    document.querySelectorAll('.cam-weekly-result-badge').forEach(n=>n.remove());
    for(const host of document.querySelectorAll('[data-cam-weekly-id]')){
      const result=results.get(host.dataset.camWeeklyId);
@@ -64,7 +62,6 @@
      const homePanel=mobile?host.closest('.editorial-pick'):null;
      const surface=homePanel||host.closest('#picksFeatured')||host;
      surface.classList.add('cam-weekly-result-surface');
-     const image=surface.querySelector('.ae-weekly-banner,.ae-weekly-home-thumbnail,.ae-weekly-mobile-banner-thumb,.ae-weekly-inline-photo');
      // Badge editorial: icono vectorial propio, sin emojis ni texto superpuesto.
      const badge=el('p',null,'cam-weekly-result-badge');
      const state=result.outcome==='won'?'won':result.outcome==='lost'?'lost':'pending';
@@ -94,21 +91,17 @@
        surface.append(badge);
        continue;
      }
-     if(image){
+     // En escritorio el estado comparte la fila de la cuota en la portada,
+     // en vez de flotar sobre la fotografía o tapar el análisis.
+     const footer=surface.id==='picksFeatured'?surface.querySelector('.ae-weekly-odds-footer'):null;
+     if(footer){
+       badge.classList.add('cam-weekly-result-in-footer');
+       footer.append(badge);
+     }else{
+       // Vista de inicio: esquina inferior derecha de su propia tarjeta.
        badge.classList.add('cam-weekly-result-on-photo');
-       const position=()=>{
-         const photo=image.getBoundingClientRect(),base=surface.getBoundingClientRect();
-         if(photo.height>0){
-           badge.style.top=Math.max(0,photo.bottom-base.top-10)+'px';
-           badge.style.bottom='auto';badge.style.transform='translateY(-100%)';
-         }
-       };
-       image.addEventListener('load',position,{once:true});
-       if(typeof ResizeObserver!=='undefined'){
-         const observer=new ResizeObserver(position);observer.observe(image);photoObservers.push(observer);
-       }
-       surface.append(badge);position();
-     }else surface.append(badge);
+       surface.append(badge);
+     }
    }
  }
  async function readPublic(id){
