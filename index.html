@@ -292,7 +292,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <link rel="stylesheet" href="assets/cam-analytics.css?v=20261020-1">
     <link rel="stylesheet" href="assets/ae-muted-navigation-icons.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-custom-nav-icons.css?v=20261016-1">
-<link rel="stylesheet" href="assets/ae-classical-auth-buttons.css?v=20261020-login-mobile-art-3">
+<link rel="stylesheet" href="assets/ae-classical-auth-buttons.css?v=20261021-welcome-again-1">
 <link rel="stylesheet" href="assets/ae-reference-community-design.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-mobile-header-ranking-polish.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-desktop-header-layout.css?v=20261016-1">
@@ -328,7 +328,7 @@ html body.ae-is-football #mainContent #aeSportTakeLeaders.ae-sport-chefs[data-sp
 <link rel="stylesheet" href="assets/ae-nfl-mobile-ranking-compact.css?v=20261016-tight-ranking-v1">
 <link rel="stylesheet" href="assets/ae-champions-mobile-ranking-compact.css?v=20261016-desktop-unified-v2">
 <link rel="stylesheet" href="assets/ae-take-category-edit.css?v=20261016-1">
-<link rel="stylesheet" href="assets/ae-profile-city-editorial.css?v=20261016-profile-city-1">
+<link rel="stylesheet" href="assets/ae-profile-city-editorial.css?v=20261021-welcome-again-1">
 <link rel="stylesheet" href="assets/ae-profile-tabs-picks.css?v=20261019-profile-scroll-1">
 <link rel="stylesheet" href="assets/ae-home-weekly-match-picks-mobile.css?v=20261016-mobile-photo-parity-2">
 <link rel="stylesheet" href="assets/ae-mobile-home-takes-swipe-and-football-news.css?v=20261016-top3-swipe-v1">
@@ -2537,7 +2537,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
  <button id="cpArchiveMore" type="button" class="ae-history-more" hidden>Ver más Picks</button>
 </dialog>
 <dialog id="aeProfileDialog" class="ae-profile-dialog" aria-labelledby="aeProfileTitle">
- <div class="ae-profile-top"><div><span>MI CUENTA · CAM SPORTS</span><h2 id="aeProfileTitle">Mi perfil</h2><p id="aeProfileUsername">Tu historial deportivo</p></div><button type="button" class="ae-profile-close" onclick="closeAeProfile()" aria-label="Cerrar perfil">✕</button></div>
+ <div class="ae-profile-top"><div><span>MI CUENTA · CAM SPORTS</span><h2 id="aeProfileTitle">Mi perfil</h2><p id="aeProfileUsername">Tu historial deportivo</p></div><button type="button" id="aeProfileWelcomeAgain" class="cam-welcome-again ae-profile-welcome-again" data-cam-welcome-again hidden>Siempre serás bienvenido</button><button type="button" class="ae-profile-close" onclick="closeAeProfile()" aria-label="Cerrar perfil" autofocus>✕</button></div>
  <section id="camAnalyticsEntry" hidden aria-label="Herramientas de administración">
   <button type="button" id="camAnalyticsOpen"><i class="fa-solid fa-chart-column" aria-hidden="true"></i> Estadísticas de CAM SPORTS <span aria-hidden="true">↗</span></button>
  </section>
@@ -2606,14 +2606,15 @@ html:not(.dark) #aeAuthIntroNotice small{color:#5b6d76}
      style="z-index: 10000;">
 
     <div class="cam-auth-shell relative bg-white border border-slate-200 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden my-auto">
-        <aside class="cam-auth-story" aria-hidden="true">
-            <div class="cam-auth-story-brand"><span>CAM</span> SPORTS</div>
-            <div class="cam-auth-story-message">
+        <aside class="cam-auth-story">
+            <div class="cam-auth-story-brand" aria-hidden="true"><span>CAM</span> SPORTS</div>
+            <button type="button" id="camAuthWelcomeAgain" class="cam-welcome-again cam-auth-welcome-again" data-cam-welcome-again>Siempre serás bienvenido</button>
+            <div class="cam-auth-story-message" aria-hidden="true">
                 <p class="cam-auth-story-overline">HAY SITIO PARA TI</p>
                 <h2>El deporte nos reúne.</h2>
                 <p>Comparte tus Picks. Defiende tus Takes. Aquí cada voz cuenta.</p>
             </div>
-            <div class="cam-auth-story-foot">UNA COMUNIDAD. MIL HISTORIAS.</div>
+            <div class="cam-auth-story-foot" aria-hidden="true">UNA COMUNIDAD. MIL HISTORIAS.</div>
         </aside>
         <div class="cam-auth-work">
         <div class="cam-auth-heading flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50">
@@ -4521,7 +4522,7 @@ html .cam-weekly-result-surface .cam-weekly-result-on-photo{
 @media(max-width:480px){.cam-weekly-quick-result .cam-weekly-review-actions{display:flex}.cam-weekly-quick-result .cam-weekly-review-actions button{width:auto}}
 </style>
 <script src="assets/cam-weekly-results.js?v=20261020-weekly-badge-mobile-fit-1"></script>
-<script src="assets/ae-profile.js?v=20261020-prestige-1"></script>
+<script src="assets/ae-profile.js?v=20261021-welcome-again-1"></script>
 <script src="assets/ae-season-predictions.js?v=20261020-sports-logos-1"></script>
 <script src="assets/ae-opinions.js?v=20261020-opinions-1"></script>
 <script src="assets/ae-home-takes.js?v=20261017-esports-league-v1"></script>
@@ -4539,7 +4540,7 @@ html .cam-weekly-result-surface .cam-weekly-result-on-photo{
 <script src="assets/ae-football-mobile-redesign.js?v=20261018-football-boards-v2"></script>
 <script src="assets/ae-home-weekly-layout.js?v=20261018-weekly-share-1"></script>
 <script src="assets/ae-notifications.js?v=20261020-cam-welcome-v1"></script>
-<script src="assets/cam-welcome.js?v=20261020-welcome-links-1"></script>
+<script src="assets/cam-welcome.js?v=20261021-welcome-again-1"></script>
 <script defer src="assets/cam-welcome-home-entry.js?v=20261021-welcome-fast-1"></script>
 <script src="assets/cam-analytics.js?v=20261020-navigation-2"></script>
 

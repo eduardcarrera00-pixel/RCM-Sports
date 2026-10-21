@@ -86,7 +86,15 @@
     $('camWelcomeClose')?.addEventListener('click',()=>$('camWelcomeDialog')?.close());
     $('camWelcomeExplore')?.addEventListener('click',()=>$('camWelcomeDialog')?.close());
     // Cada tarjeta lleva a su sección. Takes pide antes elegir Fútbol o NFL.
-    const go = fn => { $('camWelcomeDialog')?.close(); window.scrollTo({top:0}); fn(); };
+    // «Siempre serás bienvenido» reabre la bienvenida encima del acceso o del perfil.
+    // Si desde ahí se elige una sección, se cierra también la ventana de debajo.
+    const closeOpeners = () => {
+      const auth = $('userAuthModal');
+      if (auth && !auth.classList.contains('hidden') && typeof closeUserAuthModal === 'function') closeUserAuthModal();
+      if ($('aeProfileDialog')?.open) window.closeAeProfile?.();
+    };
+    document.querySelectorAll('[data-cam-welcome-again]').forEach(button=>button.addEventListener('click',()=>show(false)));
+    const go = fn => { $('camWelcomeDialog')?.close(); closeOpeners(); window.scrollTo({top:0}); fn(); };
     const nav = category => { if (typeof filterByCategory === 'function') filterByCategory(category); };
     document.querySelector('[data-cam-welcome="news"]')?.addEventListener('click',()=>go(()=>{
       nav('Todos');
@@ -128,7 +136,7 @@
       });
     }
   }
-  window.camWelcome = {startNewAccount,showFromInbox,showPreview:()=>show(true)};
+  window.camWelcome = {startNewAccount,showFromInbox,showPreview:()=>show(true),showAgain:()=>show(false)};
   if(document.readyState === 'loading')document.addEventListener('DOMContentLoaded',init,{once:true});
   else init();
 })();

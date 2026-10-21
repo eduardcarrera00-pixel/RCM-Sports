@@ -467,3 +467,35 @@ html:not(.dark) body #aeProfileDialog .ae-profile-empty {
 @media (prefers-reduced-motion:reduce) {
   #aeProfileDialog .ae-profile-close {transition:none}
 }
+/* «Siempre serás bienvenido» junto a la X del perfil propio: reabre la bienvenida. */
+#aeProfileDialog .ae-profile-welcome-again {
+  position:relative;
+  z-index:2;
+  flex:0 0 auto;
+  display:inline-flex;
+  align-items:center;
+  height:37px;
+  margin:0 -8px 0 auto;
+  padding:0 12px;
+  border:1px solid rgba(238,199,154,.62);
+  border-radius:0;
+  background:rgba(6,22,34,.52);
+  color:#f2d4a7;
+  font:800 9.5px/1.15 Inter,system-ui,sans-serif;
+  letter-spacing:.13em;
+  text-transform:uppercase;
+  white-space:nowrap;
+  cursor:pointer;
+  transition:background .15s ease,border-color .15s ease,color .15s ease;
+}
+#aeProfileDialog .ae-profile-welcome-again[hidden] {display:none}
+#aeProfileDialog .ae-profile-welcome-again:hover {background:rgba(20,54,72,.9);border-color:#f0c69d;color:#fff2df}
+html:not(.dark) body #aeProfileDialog .ae-profile-welcome-again {border-color:#b68a60;background:rgba(255,250,242,.77);color:#6a4630}
+html:not(.dark) body #aeProfileDialog .ae-profile-welcome-again:hover {background:#fffaf1;color:#3f2a1c}
+@media (max-width:560px) {
+  #aeProfileDialog .ae-profile-welcome-again {height:34px;max-width:112px;padding:0 9px;font-size:8.5px;letter-spacing:.09em;white-space:normal;text-align:center}
+  #aeProfileDialog .ae-profile-top > div {max-width:none}
+}
+@media (prefers-reduced-motion:reduce) {
+  #aeProfileDialog .ae-profile-welcome-again {transition:none}
+}

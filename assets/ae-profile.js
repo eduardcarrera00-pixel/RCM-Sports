@@ -730,6 +730,7 @@ async function showOwn(){
   if(!user){if(typeof openUserAuthModal==='function')openUserAuthModal();return;}
 
   privateView=true;
+  if($('aeProfileWelcomeAgain'))$('aeProfileWelcomeAgain').hidden=false;
   publicAuthorLabel='Aficionado';
   activeAuthor=user.id;
   activeTab='takes';
@@ -780,6 +781,7 @@ async function showPublic(id,push=true,tab='takes'){
 
   privateView=false;
   if($('aeProfilePublish'))$('aeProfilePublish').hidden=true;
+  if($('aeProfileWelcomeAgain'))$('aeProfileWelcomeAgain').hidden=true;
   activeAuthor=id;
   activeTab=tab==='picks'?'picks':'takes';
   ownTakes=[];
