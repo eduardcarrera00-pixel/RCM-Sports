@@ -80,3 +80,33 @@ Fuentes de implementación: [API de Buffer](https://developers.buffer.com/refere
 [publicación](https://developers.buffer.com/guides/posts-and-scheduling.html),
 [pg_net](https://supabase.com/docs/guides/database/extensions/pg_net).
 
+
+
+## Vídeos de TikTok con música original (octubre 2026)
+
+Migración: `supabase/20_cam_social_tiktok_music.sql`. El canal X no cambia:
+continúa recibiendo fotografía + enlace. Para TikTok, la misma noticia, Pick
+editorial o edición de Power Rankings genera un MP4 vertical (8 segundos,
+720 × 1280, H.264/AAC) con música instrumental sintetizada por CAM Sports.
+No se extraen canciones de TikTok ni se incorporan obras comerciales.
+
+`cam_social_video_jobs()` publica únicamente los metadatos ya públicos de
+eventos que esperan un vídeo; no expone credenciales ni concede escritura. Un
+GitHub Action programado (`cam-social-video.yml`) toma los trabajos, compone
+los vídeos con FFmpeg y los guarda en `assets/social-videos/<md5(event_key)>.mp4`.
+El publicador de `camsports.github.io` sincroniza estos archivos desde
+el repositorio fuente. Buffer recibe su URL HTTPS cuando el servidor verifica
+con una petición HTTP Range que el MP4 público está disponible.
+
+**TikTok no publica silenciosamente fotos sin música:** si el vídeo todavía
+no está disponible, conserva su entrega en `queued` y vuelve a comprobar.
+GitHub Actions y el publicador web pueden tardar varios minutos; no es
+publicación instantánea. Cuando hay un error de generación, conviene revisar
+el workflow, el archivo MP4 y la cola antes de intervenir. No reintentar
+solicitudes inciertas de Buffer porque se podrían duplicar. La cola anterior
+`accepted` / `published` no se modifica ni vuelve a enviarse.
+
+Validación: `node tests/social-video-publication.mjs` y
+`python scripts/cam_social_make_video.py --smoke-test` (FFmpeg, Pillow).
+La música es una secuencia instrumental original sintetizada sin samples
+ajenos; no equivale a utilizar música del catálogo de TikTok.
