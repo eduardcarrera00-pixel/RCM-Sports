@@ -107,3 +107,64 @@ html.dark body dialog#cpComposePanel #cpComposeIntro.cam-pick-hero{
  html body dialog#cpComposePanel #cpComposeIntro.cam-pick-hero .cam-pick-hero__flow{font-size:10.5px!important;gap:4px 5px!important;}
  html body dialog#cpComposePanel #cpComposeIntro.cam-pick-hero .cam-pick-hero__flow span:nth-child(odd){padding:5px 6px!important;}
 }
+
+/* CAM SPORTS · Tres pasos siempre en una sola fila, más un reto a la comunidad. */
+html body dialog#cpComposePanel #cpComposeTitle:focus{outline:none!important;box-shadow:none!important}
+html body dialog#cpComposePanel #cpComposeIntro.cam-pick-hero{gap:10px!important;background:linear-gradient(145deg,rgba(187,149,103,.10),rgba(187,149,103,.03))!important}
+html body dialog#cpComposePanel #cpComposeIntro.cam-pick-hero .cam-pick-hero__flow{
+ display:grid!important;grid-template-columns:minmax(0,1fr) 11px minmax(0,1.16fr) 11px minmax(0,1fr)!important;
+ grid-template-rows:1fr!important;align-items:stretch!important;column-gap:4px!important;row-gap:0!important;
+ flex-wrap:nowrap!important;width:100%!important;min-width:0!important;font:750 10.5px/1.2 Inter,system-ui,sans-serif!important
+}
+html body dialog#cpComposePanel #cpComposeIntro.cam-pick-hero .cam-pick-hero__flow > span:nth-child(odd){
+ box-sizing:border-box!important;display:flex!important;flex-direction:column!important;align-items:center!important;
+ justify-content:center!important;width:100%!important;min-width:0!important;min-height:56px!important;
+ padding:6px 3px!important;text-align:center!important;white-space:normal!important;
+ border:1px solid var(--cp-dialog-line)!important;background:var(--cp-dialog-bg)!important;
+ color:var(--cp-dialog-ink)!important;box-shadow:0 2px 7px rgba(22,32,37,.05)!important
+}
+html body dialog#cpComposePanel #cpComposeIntro.cam-pick-hero .cam-pick-hero__flow > span:nth-child(odd)::before{
+ display:block!important;margin:0 0 4px!important;color:var(--cp-dialog-action)!important;
+ font:800 9px/1 Inter,system-ui,sans-serif!important;letter-spacing:.08em!important
+}
+html body dialog#cpComposePanel #cpComposeIntro.cam-pick-hero .cam-pick-hero__flow > span:nth-child(1)::before{content:"01"!important}
+html body dialog#cpComposePanel #cpComposeIntro.cam-pick-hero .cam-pick-hero__flow > span:nth-child(3)::before{content:"02"!important}
+html body dialog#cpComposePanel #cpComposeIntro.cam-pick-hero .cam-pick-hero__flow > span:nth-child(5)::before{content:"03"!important}
+html body dialog#cpComposePanel #cpComposeIntro.cam-pick-hero .cam-pick-hero__flow > span:nth-child(even){
+ display:grid!important;place-items:center!important;min-width:0!important;padding:0!important;
+ color:var(--cp-dialog-action)!important;font:750 14px/1 Inter,system-ui,sans-serif!important
+}
+html.dark body dialog#cpComposePanel #cpComposeIntro.cam-pick-hero .cam-pick-hero__flow > span:nth-child(odd){
+ background:#1b3544!important;border-color:rgba(212,174,131,.37)!important;box-shadow:none!important
+}
+html body dialog#cpComposePanel #cpComposeIntro.cam-pick-hero .cam-pick-hero__challenge{
+ display:flex!important;align-items:center!important;justify-content:space-between!important;flex-wrap:wrap!important;
+ gap:6px 12px!important;border-top:1px solid var(--cp-dialog-line)!important;
+ margin:1px 0 0!important;padding:9px 0 0!important;min-width:0!important
+}
+html body dialog#cpComposePanel #cpComposeIntro.cam-pick-hero .cam-pick-hero__challenge p{
+ flex:1 1 185px!important;min-width:0!important;margin:0!important;
+ color:var(--cp-dialog-muted)!important;font:500 11px/1.42 Inter,system-ui,sans-serif!important
+}
+html body dialog#cpComposePanel #cpComposeIntro.cam-pick-hero .cam-pick-hero__challenge p strong{
+ color:var(--cp-dialog-ink)!important;font-weight:800!important
+}
+html body dialog#cpComposePanel #cpComposeIntro.cam-pick-hero button.cam-pick-hero__browse{
+ display:inline-flex!important;align-items:center!important;gap:5px!important;min-height:34px!important;
+ padding:6px 0!important;margin:0!important;border:0!important;border-bottom:1px solid currentColor!important;
+ border-radius:0!important;background:transparent!important;color:var(--cp-dialog-action)!important;
+ white-space:nowrap!important;cursor:pointer!important;font:800 11px/1.2 Inter,system-ui,sans-serif!important
+}
+html body dialog#cpComposePanel #cpComposeIntro.cam-pick-hero button.cam-pick-hero__browse:focus-visible{
+ outline:2px solid var(--cp-dialog-action)!important;outline-offset:3px!important
+}
+@media(max-width:560px){
+ html body dialog#cpComposePanel #cpComposeIntro.cam-pick-hero{gap:8px!important;padding:12px 10px!important}
+ html body dialog#cpComposePanel #cpComposeIntro.cam-pick-hero .cam-pick-hero__flow{
+  grid-template-columns:minmax(0,1fr) 9px minmax(0,1.16fr) 9px minmax(0,1fr)!important;
+  column-gap:2px!important;font-size:9.5px!important;line-height:1.2!important
+ }
+ html body dialog#cpComposePanel #cpComposeIntro.cam-pick-hero .cam-pick-hero__flow > span:nth-child(odd){min-height:56px!important;padding:6px 2px!important}
+ html body dialog#cpComposePanel #cpComposeIntro.cam-pick-hero .cam-pick-hero__flow > span:nth-child(even){font-size:12px!important}
+ html body dialog#cpComposePanel #cpComposeIntro.cam-pick-hero .cam-pick-hero__challenge p{flex-basis:100%!important}
+}

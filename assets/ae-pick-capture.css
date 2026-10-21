@@ -235,3 +235,22 @@ html body #cpComposePanel #cpForm .cp-single-date{width:auto!important;min-heigh
 html body #cpComposePanel #cpForm .cp-single-date:invalid:not(:disabled){border-color:#c9805f!important;}
 html body #cpComposePanel #cpForm[data-singles="true"] .cp-compose-preview dl,
 html body #cpComposePanel #cpForm[data-singles="true"] .cp-compose-date{display:none!important;}
+
+/* CAM SPORTS · Evidencia justo debajo del botón de subir. */
+html body dialog#cpComposePanel #cpForm .cp-capture .cp-capture-proof{
+ display:flex!important;flex-wrap:wrap!important;gap:3px 6px!important;align-items:baseline!important;
+ box-sizing:border-box!important;margin:8px 0 2px!important;padding:9px 10px!important;
+ background:rgba(223,179,125,.065)!important;border-left:2px solid #d2ad7d!important;
+ font:500 11px/1.5 Inter,system-ui,sans-serif!important;color:#d2dee0!important
+}
+html body dialog#cpComposePanel #cpForm .cp-capture .cp-capture-proof strong{
+ font:800 11px/1.45 Inter,system-ui,sans-serif!important;color:#f0cca2!important
+}
+html body dialog#cpComposePanel #cpForm .cp-capture .cp-capture-proof span{color:inherit!important}
+html:not(.dark) body dialog#cpComposePanel #cpForm .cp-capture .cp-capture-proof{
+ background:rgba(145,102,62,.085)!important;border-left-color:#855b43!important;color:#546370!important
+}
+html:not(.dark) body dialog#cpComposePanel #cpForm .cp-capture .cp-capture-proof strong{color:#734b30!important}
+@media(max-width:560px){
+ html body dialog#cpComposePanel #cpForm .cp-capture .cp-capture-proof{padding:8px 9px!important}
+}

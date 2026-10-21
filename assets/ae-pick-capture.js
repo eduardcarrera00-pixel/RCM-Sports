@@ -166,7 +166,10 @@
   const progressBar=node('span',null,'cp-capture-progress-bar');progress.append(progressBar);
   const summary=node('ul',null,'cp-capture-readings');summary.hidden=true;
   const cancel=node('button','Cancelar lectura','cp-capture-cancel');cancel.type='button';cancel.hidden=true;
-  panel.append(title,intro,picker,input,shot,help,progress,privacy,status,summary,cancel);
+  // El comprobante es temporal; este aviso acompaña al botón sin alterar el proceso.
+  const proof=node('p',null,'cp-capture-proof');
+  proof.append(node('strong','Aquí lo que se canta se baila.'),node('span','Pedimos tu captura como evidencia del Pick. La leemos y después la descartamos.'));
+  panel.append(title,intro,picker,proof,input,shot,help,progress,privacy,status,summary,cancel);
   form.prepend(panel);form.classList.add('cp-capture-first');
   const overlay=makeOverlay(form.closest('dialog')||document.body,()=>clear('Lectura cancelada.',true));
   const isCurrent=job=>active===job&&!job.cancelled;
