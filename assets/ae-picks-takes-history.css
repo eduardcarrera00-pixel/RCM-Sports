@@ -185,32 +185,87 @@ html body #footballTakes #picksNews .ae-picks-news-feature .ae-picks-news-open{
  border-radius:9px!important;
 }
 
-/* Admin: aviso de Picks en espera e historial de resultados. */
+/* Admin: aviso de Picks en espera e historial de resultados (últimos 20, con scroll
+   como los tableros de Mejores/Peores platos). */
 html body .ae-pick-settle-waiting{
-  margin:6px 0 10px!important;
-  font:500 12px/1.5 Inter,system-ui,sans-serif!important;
-  opacity:.82!important;
-}
-html body .ae-pick-history-list{list-style:none!important;margin:8px 0 0!important;padding:0!important;}
-html body .ae-pick-history-entry{
-  display:flex!important;flex-direction:column!important;gap:3px!important;
-  padding:11px 0 11px 12px!important;
-  border-bottom:1px solid rgba(189,148,117,.28)!important;
+  margin:6px 0 10px!important;padding:8px 10px!important;
   border-left:3px solid #49606c!important;
+  font:500 12px/1.5 Inter,system-ui,sans-serif!important;opacity:.85!important;
 }
-html body .ae-pick-history-entry[data-outcome="won"]{border-left-color:#7fae8a!important;}
-html body .ae-pick-history-entry[data-outcome="lost"]{border-left-color:#c97f6b!important;}
-html body .ae-pick-history-head{display:flex!important;justify-content:space-between!important;align-items:baseline!important;gap:10px!important;}
-html body .ae-pick-history-head strong{font:700 14px/1.35 Inter,system-ui,sans-serif!important;overflow-wrap:anywhere!important;}
+html body #cpSettleHistory{
+  margin-top:8px!important;padding:14px!important;
+  border:1px solid rgba(205,174,143,.2)!important;border-radius:11px!important;
+  background:linear-gradient(160deg,rgba(38,63,79,.85),rgba(25,47,61,.85))!important;
+}
+html body .ae-pick-history-summary{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:8px!important;}
+html body .ae-pick-history-stat{
+  display:flex!important;flex-direction:column!important;align-items:center!important;gap:2px!important;
+  padding:9px 4px 8px!important;border:1px solid rgba(205,174,143,.18)!important;border-radius:8px!important;
+  background:rgba(12,29,40,.35)!important;
+}
+html body .ae-pick-history-stat strong{font:600 26px/1 Newsreader,Georgia,serif!important;color:#e5c2a0!important;}
+html body .ae-pick-history-stat span{font:700 10px/1.3 Inter,system-ui,sans-serif!important;letter-spacing:.06em!important;text-transform:uppercase!important;color:#b6c8ca!important;}
+html body .ae-pick-history-stat[data-outcome="won"] strong{color:#a6d3b0!important;}
+html body .ae-pick-history-stat[data-outcome="lost"] strong{color:#eea894!important;}
+html body .ae-pick-history-note{margin:12px 0 6px!important;color:#b6c8ca!important;font:600 10px/1.2 Inter,system-ui,sans-serif!important;letter-spacing:.055em!important;}
+html body .ae-pick-history-frame{position:relative!important;}
+html body .ae-pick-history-frame::after{
+  content:""!important;position:absolute!important;left:0!important;right:4px!important;bottom:0!important;height:44px!important;
+  pointer-events:none!important;transition:opacity .2s ease!important;
+  background:linear-gradient(to bottom,rgba(25,47,61,0),rgba(25,47,61,.95))!important;
+}
+html body .ae-pick-history-frame.is-end::after{opacity:0!important;}
+html body .ae-pick-history-list{
+  list-style:none!important;margin:0!important;padding:0 6px 0 0!important;
+  max-height:330px!important;overflow-y:auto!important;overflow-x:hidden!important;
+  scroll-snap-type:y proximity;scroll-behavior:smooth;overscroll-behavior-y:contain;
+  scrollbar-width:thin;scrollbar-color:rgba(182,146,108,.6) transparent;
+}
+html body .ae-pick-history-list::-webkit-scrollbar{width:3px;}
+html body .ae-pick-history-list::-webkit-scrollbar-thumb{background:rgba(182,146,108,.6);}
+html body .ae-pick-history-list:focus-visible{outline:2px solid #e7ba8c!important;outline-offset:3px!important;}
+html body .ae-pick-history-entry{
+  display:grid!important;grid-template-columns:24px minmax(0,1fr)!important;gap:9px!important;align-items:start!important;
+  padding:12px 4px 11px 2px!important;scroll-snap-align:start;
+  border-bottom:1px solid rgba(205,174,143,.14)!important;
+}
+html body .ae-pick-history-entry:last-child{border-bottom:0!important;}
+html body .ae-pick-history-mark{font:600 21px/1.1 Newsreader,Georgia,serif!important;color:#9fb0b7!important;text-align:center!important;}
+html body .ae-pick-history-entry[data-outcome="won"] .ae-pick-history-mark{color:#a6d3b0!important;}
+html body .ae-pick-history-entry[data-outcome="lost"] .ae-pick-history-mark{color:#eea894!important;}
+html body .ae-pick-history-copy{display:flex!important;flex-direction:column!important;gap:4px!important;min-width:0!important;}
+html body .ae-pick-history-head{display:flex!important;justify-content:space-between!important;align-items:flex-start!important;gap:10px!important;}
+html body .ae-pick-history-head strong{
+  min-width:0!important;font:600 16px/1.25 Newsreader,Georgia,serif!important;color:#f7e7d5!important;
+  display:-webkit-box!important;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden!important;overflow-wrap:anywhere!important;
+}
 html body .ae-pick-history-badge{
-  flex:none!important;padding:2px 8px!important;border:1px solid currentColor!important;border-radius:2px!important;
-  font:800 11px/1.4 Inter,system-ui,sans-serif!important;color:#c5cdd1!important;
+  flex:none!important;margin-top:1px!important;padding:2px 7px!important;border:1px solid currentColor!important;border-radius:2px!important;
+  font:800 10px/1.4 Inter,system-ui,sans-serif!important;letter-spacing:.04em!important;text-transform:uppercase!important;color:#c5cdd1!important;
 }
-html body .ae-pick-history-entry[data-outcome="won"] .ae-pick-history-badge{color:#9fd0aa!important;}
+html body .ae-pick-history-entry[data-outcome="won"] .ae-pick-history-badge{color:#a6d3b0!important;}
 html body .ae-pick-history-entry[data-outcome="lost"] .ae-pick-history-badge{color:#eea894!important;}
-html body .ae-pick-history-entry small{font:500 12px/1.45 Inter,system-ui,sans-serif!important;opacity:.85!important;}
-html body .ae-pick-history-source{opacity:.65!important;}
-html:not(.dark) body .ae-pick-history-entry[data-outcome="won"] .ae-pick-history-badge{color:#2f6b3d!important;}
+html body .ae-pick-history-meta{display:flex!important;flex-wrap:wrap!important;gap:4px 10px!important;margin:0!important;font:600 12px/1.4 Inter,system-ui,sans-serif!important;color:#d4ac87!important;}
+html body .ae-pick-history-meta span+span::before{content:"·"!important;margin-right:10px!important;opacity:.6!important;}
+html body .ae-pick-history-points{color:#a6d3b0!important;}
+html body .ae-pick-history-source{margin:0!important;font:500 11px/1.4 Inter,system-ui,sans-serif!important;color:#b6c8ca!important;opacity:.8!important;}
+html body .ae-pick-history-empty{margin:0!important;font:500 12px/1.5 Inter,system-ui,sans-serif!important;}
+
+html:not(.dark) body #cpSettleHistory{background:#f8f1e7!important;border-color:rgba(130,91,64,.22)!important;}
+html:not(.dark) body .ae-pick-history-stat{background:#fffaf2!important;border-color:rgba(130,91,64,.2)!important;}
+html:not(.dark) body .ae-pick-history-stat strong{color:#825b40!important;}
+html:not(.dark) body .ae-pick-history-stat[data-outcome="won"] strong,
+html:not(.dark) body .ae-pick-history-entry[data-outcome="won"] .ae-pick-history-mark,
+html:not(.dark) body .ae-pick-history-entry[data-outcome="won"] .ae-pick-history-badge,
+html:not(.dark) body .ae-pick-history-points{color:#2f6b3d!important;}
+html:not(.dark) body .ae-pick-history-stat[data-outcome="lost"] strong,
+html:not(.dark) body .ae-pick-history-entry[data-outcome="lost"] .ae-pick-history-mark,
 html:not(.dark) body .ae-pick-history-entry[data-outcome="lost"] .ae-pick-history-badge{color:#9a3f2a!important;}
-html:not(.dark) body .ae-pick-history-badge{color:#4b5d66!important;}
-html:not(.dark) body .ae-pick-history-entry{border-bottom-color:rgba(130,91,64,.22)!important;}
+html:not(.dark) body .ae-pick-history-stat span,
+html:not(.dark) body .ae-pick-history-note,
+html:not(.dark) body .ae-pick-history-source{color:#61717b!important;}
+html:not(.dark) body .ae-pick-history-head strong{color:#243b48!important;}
+html:not(.dark) body .ae-pick-history-badge,html:not(.dark) body .ae-pick-history-mark{color:#4b5d66!important;}
+html:not(.dark) body .ae-pick-history-meta{color:#825b40!important;}
+html:not(.dark) body .ae-pick-history-entry{border-bottom-color:rgba(130,91,64,.16)!important;}
+html:not(.dark) body .ae-pick-history-frame::after{background:linear-gradient(to bottom,rgba(248,241,231,0),#f8f1e7)!important;}

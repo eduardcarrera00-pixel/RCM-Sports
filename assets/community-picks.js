@@ -628,42 +628,49 @@ async function loadSettlement(){
  }
 }
 function shiftDay(day,days){return new Date(Date.parse(day+'T12:00:00Z')+days*86400000).toISOString().slice(0,10);}
-var settleHistoryPage=0;
-async function loadSettleHistory(more=false){
+async function loadSettleHistory(){
  const area=$('cpSettleHistory');if(!area)return;
  const admin=typeof currentAdmin!=='undefined'&&Boolean(currentAdmin);
- if(!admin){area.replaceChildren();return;}
- const size=20;settleHistoryPage=more?settleHistoryPage+1:0;
+ area.replaceChildren();
+ if(!admin)return;
  const r=await db.from('ae_pick_feed').select('id,title,author,event_date,american_odds,outcome,settled_at,result_points')
-   .in('outcome',['won','lost','void']).order('settled_at',{ascending:false,nullsFirst:false})
-   .range(settleHistoryPage*size,settleHistoryPage*size+size);
- if(!more)area.replaceChildren();
- area.querySelector('.ae-history-more')?.remove();
- if(r.error){area.append(el('p','No pudimos cargar el historial. '+message(r.error)));return;}
- const rows=(r.data||[]).slice(0,size);
- if(!rows.length&&!more){area.append(el('p','Todavía no hay Picks resueltos.'));return;}
+   .in('outcome',['won','lost','void']).order('settled_at',{ascending:false,nullsFirst:false}).limit(20);
+ if(r.error){area.append(el('p','No pudimos cargar el historial. '+message(r.error),'ae-pick-history-empty'));return;}
+ const rows=r.data||[];
+ if(!rows.length){area.append(el('p','Todavía no hay Picks resueltos.','ae-pick-history-empty'));return;}
  const auto=new Set();
  try{
   const c=await db.from('ae_pick_settlement_checks').select('pick_id').eq('status','settled').in('pick_id',rows.map(p=>p.id));
   for(const row of c.data||[])auto.add(row.pick_id);
  }catch{}
- let list=area.querySelector('ol');
- if(!list){list=el('ol',null,'ae-pick-history-list');area.append(list);}
- const labels={won:'Acertó',lost:'Falló',void:'Anulado'};
- const when=t=>t?new Date(t).toLocaleDateString('es-MX',{day:'numeric',month:'short',timeZone:'America/Toronto'}):'';
+ const labels={won:'Acertó',lost:'Falló',void:'Anulado'},marks={won:'✓',lost:'✕',void:'—'};
+ const count=o=>rows.filter(p=>p.outcome===o).length;
+ const summary=el('div',null,'ae-pick-history-summary');
+ for(const [o,text] of [['won','Acertados'],['lost','Fallados'],['void','Anulados']]){
+  const box=el('div',null,'ae-pick-history-stat');box.dataset.outcome=o;
+  box.append(el('strong',String(count(o))),el('span',text));summary.append(box);
+ }
+ const note=el('p',rows.length>3?'Últimos '+rows.length+' resultados · desliza para ver más':'Últimos '+rows.length+' resultados','ae-pick-history-note');
+ const list=el('ol',null,'ae-pick-history-list');list.tabIndex=0;list.setAttribute('aria-label','Últimos Picks resueltos');
+ const when=t=>t?new Date(t).toLocaleDateString('es-MX',{day:'numeric',month:'short',timeZone:'America/Toronto'}).replace('.',''):'';
+ const odds=v=>v==null?'':(Number(v)>0?'+':'')+v;
  for(const p of rows){
   const li=el('li',null,'ae-pick-history-entry');li.dataset.outcome=p.outcome;
+  const mark=el('span',marks[p.outcome],'ae-pick-history-mark');mark.setAttribute('aria-hidden','true');
+  const copy=el('div',null,'ae-pick-history-copy');
   const head=el('div',null,'ae-pick-history-head');
   head.append(el('strong',p.title),el('span',labels[p.outcome],'ae-pick-history-badge'));
-  const pts=p.outcome==='won'&&p.result_points!=null?' · +'+Number(p.result_points).toFixed(2)+' pts':'';
-  li.append(head,el('small',p.author+' · '+(p.event_date?'Evento '+p.event_date:'Sin fecha')+' · '+p.american_odds+pts),
-   el('small',(auto.has(p.id)?'Verificado automáticamente':'Confirmado por un admin')+(p.settled_at?' · '+when(p.settled_at):''),'ae-pick-history-source'));
-  list.append(li);
+  const meta=el('p',null,'ae-pick-history-meta');
+  meta.append(el('span',p.author),el('span',odds(p.american_odds)));
+  if(p.event_date)meta.append(el('span',when(p.event_date+'T16:00:00Z')));
+  if(p.outcome==='won'&&p.result_points!=null)meta.append(el('span','+'+Number(p.result_points).toFixed(2)+' pts','ae-pick-history-points'));
+  const source=el('p',(auto.has(p.id)?'Verificado automáticamente':'Confirmado por un admin')+(p.settled_at?' · '+when(p.settled_at):''),'ae-pick-history-source');
+  copy.append(head,meta,source);li.append(mark,copy);list.append(li);
  }
- if((r.data||[]).length>size){
-  const b=button('Ver más resultados',()=>{b.disabled=true;loadSettleHistory(true);});
-  b.className='ae-history-more';area.append(b);
- }
+ const frame=el('div',null,'ae-pick-history-frame');frame.append(list);
+ const sync=()=>frame.classList.toggle('is-end',list.scrollTop+list.clientHeight>=list.scrollHeight-4);
+ list.addEventListener('scroll',sync,{passive:true});
+ area.append(summary,note,frame);requestAnimationFrame(sync);
 }
 window.updateAePicksAdmin=()=>{loadModeration();loadSettlement();loadSettleHistory();};
 
