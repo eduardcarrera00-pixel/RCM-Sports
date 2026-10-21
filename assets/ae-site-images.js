@@ -50,6 +50,9 @@
   img('cabecera.avisos', 'Icono de avisos', 'Cabecera', 'assets/icons/ae-avisos-six-gold.webp');
   img('cabecera.perfil', 'Icono de perfil', 'Cabecera', 'assets/ui/ae-profile-mark.png');
   img('cabecera.cerrar-sesion', 'Icono de cerrar sesión', 'Cabecera', 'assets/ui/ae-logout-mark.png');
+  // Bienvenida y acceso
+  pair('bienvenida.fondo', 'Fondo de la bienvenida', 'Bienvenida', 'assets/cam-welcome-noche.webp', 'assets/cam-welcome-dia.webp');
+  pair('acceso.portico', 'Pórtico del acceso (iniciar sesión / registrarse)', 'Acceso', 'assets/cam-auth-architecture-night.svg', 'assets/cam-auth-architecture-day.svg');
   // Navegación
   img('nav.picks', 'Icono de Picks', 'Navegación', 'assets/icons/ae-picks-gold.webp');
   img('nav.nfl', 'Icono de NFL', 'Navegación', 'assets/icons/ae-nfl-gold.webp');
