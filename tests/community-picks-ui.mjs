@@ -116,6 +116,13 @@ assert.match(d.querySelectorAll('#cpFeed .cp-pick-line')[2].textContent,/Ambos e
 
 d.querySelector('#cpFeed .cp-card-read-link').click();await settle();
 assert.equal(d.querySelector('#cpDialog .cp-card-detail')!==null,true);
+assert.ok(d.querySelector('#cpDialog .cp-recipe-card'),'Chef recipe uses unified design');
+assert.equal(d.querySelector('#cpDialog .cp-recipe-card .cp-card-legs').tagName,'OL');
+assert.equal(d.querySelectorAll('#cpDialog .cp-recipe-card .cp-pick-line').length,3,'Combo keeps every selection when opened');
+assert.match(d.querySelectorAll('#cpDialog .cp-recipe-card .cp-pick-line-choice')[1].textContent,/Más de 3.5 goles/);
+assert.match(d.querySelectorAll('#cpDialog .cp-recipe-card .cp-pick-line-choice')[2].textContent,/Ambos equipos marcan/);
+assert.equal(d.querySelector('#cpDialog .cp-recipe-card .cp-feed-meta .cp-odds').textContent,'Cuota +150');
+
 const reply=d.querySelector('#cpDialog form');
 reply.querySelector('textarea').value='Comentario antes de la aprobación';
 await reply.onsubmit({preventDefault(){}});await settle();

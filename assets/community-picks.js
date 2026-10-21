@@ -61,7 +61,8 @@ function pickSelectionDisplay(input){
 function card(p,compact=false,detail=false){
 
  const editorial=!compact&&!detail;
- const n=el('article',null,detail?'cp-card cp-card-detail':editorial?'cp-card cp-feed-editorial':'cp-card');
+ const publication=editorial||detail;
+ const n=el('article',null,detail?'cp-card cp-card-detail cp-recipe-card':editorial?'cp-card cp-feed-editorial':'cp-card');
  const pickSports=Array.isArray(p.legs)?p.legs.map(l=>String(l?.sport||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')):[];
  const hasNfl=pickSports.some(t=>/nfl|americano|american football|gridiron/.test(t));
  const hasFootball=pickSports.some(t=>!/nfl|americano|american football|gridiron/.test(t)&&/futbol|football|soccer|champions|liga|premier|barca|madrid|uefa|bundesliga|serie a/.test(t));
@@ -74,7 +75,7 @@ function card(p,compact=false,detail=false){
      if(typeof window.openAePublicProfile==='function')window.openAePublicProfile(p.user_id);
    });
    profileButton.className=detail?'cp-detail-author':'cp-feed-author';
-   if(editorial){
+   if(publication){
      const avatar=el('span',String(p.author||'A').replace(/^@/,'').charAt(0).toLocaleUpperCase('es'),'cp-feed-initial');
      avatar.setAttribute('aria-hidden','true');
      profileButton.replaceChildren(avatar,el('span','@'+(p.author||'Aficionado'),'cp-feed-username'));
@@ -87,7 +88,7 @@ function card(p,compact=false,detail=false){
  }
  // No repetimos la fecha de publicación ni la del evento en la vista previa.
  let feedMeta=null;
- if(editorial){
+ if(publication){
   feedMeta=el('div',null,'cp-feed-meta');
   if(first?.sport)feedMeta.append(el('span',String(first.sport),'cp-card-sport'));
   header.append(feedMeta);
@@ -113,14 +114,14 @@ function card(p,compact=false,detail=false){
    };
    n.append(readLink);
  }
- const legs=el(editorial?'ol':'div',null,'cp-card-legs');
+ const legs=el(publication?'ol':'div',null,'cp-card-legs');
   const simplify=text=>String(text||'').toLocaleLowerCase('es')
     .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
     .replace(/[^a-z0-9]+/g,' ').trim();
   const titleKey=simplify(p.title);
   
-  if(editorial){
-    // Each receipt may store several markets in one database leg.
+  if(publication){
+    // Feed and full recipe share individual ordered markets.
     const choices=[];
     for(const leg of p.legs||[]){
       const selections=splitPickSelections(leg.selection);
@@ -144,7 +145,7 @@ function card(p,compact=false,detail=false){
       });
     }
   }else{
-    // Keep the existing full detail and compact cards unchanged.
+    // Keep the compact archive cards unchanged.
     for(const leg of p.legs||[]){
       const row=el('p');
       const matchup=String(leg.event||leg.sport||'Evento');
@@ -160,13 +161,13 @@ function card(p,compact=false,detail=false){
  
  odds.append(el('strong','Cuota '+(Number(p.american_odds)>0?'+':'')+p.american_odds,'cp-odds'));
  const statusText=p.moderation_status==='approved'
-   ?(editorial?'':(['on_device_ocr','ai_vision'].includes(p.capture_check?.method)?'Momio cotejado con captura':'Cuota aprobada'))
+   ?(publication?'':(['on_device_ocr','ai_vision'].includes(p.capture_check?.method)?'Momio cotejado con captura':'Cuota aprobada'))
    :p.moderation_status==='rejected'?'Cuota rechazada':'Cuota en revisión · votos abiertos';
  if(statusText){
   const status=el('small',statusText,'cp-card-state');
-  if(editorial)n.append(status);else odds.append(status);
+  if(publication)n.append(status);else odds.append(status);
  }
- if(editorial)feedMeta.append(odds);else n.append(odds);
+ if(publication)feedMeta.append(odds);else n.append(odds);
  if(p.explanation)n.append(el('p',p.explanation,'cp-explanation'));
  const controls=el('div',null,'cp-actions');
  const canVote=['pending','approved'].includes(p.moderation_status)&&isActive(p);
