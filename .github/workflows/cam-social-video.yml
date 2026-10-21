@@ -22,19 +22,35 @@ jobs:
         with:
           ref: main
           persist-credentials: true
+      - name: Check whether any TikTok videos are pending
+        id: waiting
+        run: |
+          response=$(curl --fail-with-body --silent --show-error --retry 3 \
+            -X POST 'https://zahuhmvmqvxaunqebqaa.supabase.co/rest/v1/rpc/cam_social_video_jobs' \
+            -H 'apikey: sb_publishable_QK4qV6totowE4KjolNANrQ_O46olHYg' \
+            -H 'Content-Type: application/json' -d '{"max_jobs":1}')
+          echo "$response" | jq -e 'type == "array"' >/dev/null
+          count=$(echo "$response" | jq 'length')
+          echo "pending=$count" >> "$GITHUB_OUTPUT"
+          echo "Waiting TikTok videos: $count"
       - uses: actions/setup-python@v5
+        if: steps.waiting.outputs.pending != '0'
         with:
           python-version: '3.12'
       - name: Install renderer
+        if: steps.waiting.outputs.pending != '0'
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg fonts-dejavu-core
           python -m pip install --disable-pip-version-check 'Pillow==11.3.0'
       - name: Verify audio and MP4 generation
+        if: steps.waiting.outputs.pending != '0'
         run: python scripts/cam_social_make_video.py --smoke-test
       - name: Render public editorial jobs waiting for TikTok
+        if: steps.waiting.outputs.pending != '0'
         run: python scripts/cam_social_make_video.py
       - name: Save MP4s for the CAM Sports publisher
+        if: steps.waiting.outputs.pending != '0'
         run: |
           if [[ -z "$(git status --porcelain -- assets/social-videos/)" ]]; then
             echo "No new videos."
