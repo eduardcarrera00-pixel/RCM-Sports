@@ -95,8 +95,11 @@
        if(!event.target.closest('button'))window.aeTakeReplies?.open(t);
      });
      const row=el('div',null,'ae-free-vote-row');
-     for(const [val,label,count] of [[1,'▲ Apoyar',t.upvotes],[-1,'▼ Cuestionar',t.downvotes]]){
-       const b=button(label+' '+count,()=>vote(t,val,b));b.disabled=busy;b.setAttribute('aria-pressed',String(Number(t.my_vote)===val));row.append(b);
+     // El autor conserva respuestas y estadísticas, pero no ve botones para votarse.
+     if(!(viewerId&&t.author_id&&String(viewerId)===String(t.author_id))){
+       for(const [val,label,count] of [[1,'▲ Apoyar',t.upvotes],[-1,'▼ Cuestionar',t.downvotes]]){
+         const b=button(label+' '+count,()=>vote(t,val,b));b.disabled=busy;b.setAttribute('aria-pressed',String(Number(t.my_vote)===val));row.append(b);
+       }
      }
      const reply=button('Responder',()=>window.aeTakeReplies?.open(t,{focusComposer:true}),'ae-take-reply-link');
      reply.append(el('span',null,'ae-take-reply-count'));
@@ -140,6 +143,7 @@
    if(busy)return;
    try{
      const user=await requireLogin();if(!user)return;
+     if(user.id===t.author_id)return;
      busy=true;render();
      const r=await db.rpc('ae_vote_free_take',{p_take_id:t.id,p_value:value});
      if(r.error)throw r.error;
