@@ -14,7 +14,7 @@
     const link = document.createElement('link');
     link.rel = 'preload';
     link.as = 'image';
-    link.href = 'assets/cam-welcome-' + theme + '-fast.webp';
+    link.href = 'assets/cam-welcome-' + theme + '-sharp.webp';
     link.fetchPriority = 'high';
     document.head.appendChild(link);
   }
