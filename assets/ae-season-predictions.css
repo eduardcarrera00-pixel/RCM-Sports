@@ -59,3 +59,28 @@ html.dark #freeTakes .ae-season-admin button.is-minor{color:#decbb9;border-color
 @media (min-width:700px){#freeTakes .ae-season-predictions{padding:24px 26px 22px}#freeTakes .ae-season-options{grid-template-columns:repeat(8,minmax(0,1fr))}#freeTakes .ae-season-option{min-height:86px}#freeTakes .ae-season-crest{width:56px;height:56px}}
 @media (max-width:360px){#freeTakes .ae-season-options{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (prefers-reduced-motion:reduce){#freeTakes .ae-season-option{transition:none}#freeTakes .ae-season-option:hover:not(:disabled){transform:none}}
+
+/* Tras guardar, una ficha pequeña sustituye la parrilla de escudos. */
+#freeTakes .ae-season-card.has-pick{padding:14px 16px}
+#freeTakes .ae-season-card.has-pick h3{margin-bottom:10px}
+#freeTakes .ae-season-receipt{display:grid;grid-template-columns:60px minmax(0,1fr) auto;align-items:center;column-gap:13px;row-gap:6px;padding:13px 15px;border:1px solid rgba(146,112,75,.35);background:linear-gradient(110deg,#fffbf4,#f0e6da);min-width:0}
+#freeTakes .ae-season-receipt>.ae-season-crest{width:58px;height:58px}
+#freeTakes .ae-season-receipt>.ae-season-crest .ae-season-crest-fallback{width:52px;height:52px;font-size:11px}
+#freeTakes .ae-season-receipt-copy{display:grid;gap:4px;min-width:0}
+#freeTakes .ae-season-receipt-kicker{font:800 10px/1.2 Inter,system-ui,sans-serif;letter-spacing:.1em;color:#855a38}
+#freeTakes .ae-season-receipt-team{font:600 21px/1.15 Newsreader,Georgia,serif;color:#273b49;overflow-wrap:anywhere}
+#freeTakes .ae-season-receipt-detail{font:600 12px/1.45 Inter,system-ui,sans-serif;color:#596773}
+#freeTakes .ae-season-receipt-state{justify-self:end;padding:7px 10px;border:1px solid rgba(124,86,47,.4);background:#ece1d1;color:#684826;font:800 10px/1.3 Inter,system-ui,sans-serif;white-space:nowrap}
+#freeTakes .ae-season-receipt-state.is-won{background:#e1efe5;border-color:#91b49c;color:#245544}
+#freeTakes .ae-season-receipt-state.is-lost{background:#e8e4df;border-color:#b7ada3;color:#605249}
+#freeTakes .ae-season-tabs button.has-pick{display:inline-flex;align-items:center;gap:8px}
+#freeTakes .ae-season-tab-saved{display:inline-grid;place-items:center;width:17px;height:17px;flex:0 0 17px;background:rgba(133,90,56,.13);border:1px solid currentColor;font:900 10px/1 Inter,system-ui,sans-serif}
+#freeTakes .ae-season-tabs button[aria-selected=true] .ae-season-tab-saved{background:rgba(255,244,223,.17)}
+html.dark #freeTakes .ae-season-receipt{background:linear-gradient(110deg,rgba(31,62,76,.84),rgba(15,38,53,.92));border-color:rgba(211,169,127,.35)}
+html.dark #freeTakes .ae-season-receipt-kicker{color:#d3aa81}
+html.dark #freeTakes .ae-season-receipt-team{color:#fff1e3}
+html.dark #freeTakes .ae-season-receipt-detail{color:#decebf}
+html.dark #freeTakes .ae-season-receipt-state{background:#634832;color:#ffecda;border-color:#c29a74}
+html.dark #freeTakes .ae-season-receipt-state.is-won{background:#234b3c;border-color:#85bea0;color:#b5efce}
+html.dark #freeTakes .ae-season-receipt-state.is-lost{background:#384955;border-color:#83909a;color:#e6d6c7}
+@media(max-width:600px){#freeTakes .ae-season-card.has-pick{padding:12px}#freeTakes .ae-season-receipt{grid-template-columns:52px minmax(0,1fr);gap:6px 11px;padding:11px}#freeTakes .ae-season-receipt>.ae-season-crest{width:50px;height:50px;grid-row:1/3}#freeTakes .ae-season-receipt>.ae-season-crest .ae-season-crest-fallback{width:45px;height:45px}#freeTakes .ae-season-receipt-team{font-size:19px}#freeTakes .ae-season-receipt-state{grid-column:2;justify-self:start;padding:5px 9px}}
