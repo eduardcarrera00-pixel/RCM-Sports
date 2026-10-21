@@ -2140,7 +2140,10 @@ html body #userAuthModal .cam-auth-story{
   position:relative;display:flex;min-width:0;flex-direction:column;
   justify-content:space-between;min-height:100%;padding:31px 26px 28px;
   color:#ffeed9;isolation:isolate;overflow:hidden;
-  background:#0b1b29 linear-gradient(160deg,rgba(3,15,24,.32),rgba(5,20,29,.56) 40%,rgba(3,15,24,.90)),url('ae-chef-marble-night.webp') center/cover no-repeat!important;
+  background-color:#0b1b29!important;
+  background-image:linear-gradient(160deg,rgba(3,15,24,.32),rgba(5,20,29,.56) 40%,rgba(3,15,24,.90)),url('ae-chef-marble-night.webp')!important;
+  background-position:center,center!important;background-size:cover,cover!important;
+  background-repeat:no-repeat!important;
 }
 html body #userAuthModal .cam-auth-story::before{
   content:'';position:absolute;inset:15px;z-index:-1;pointer-events:none;
@@ -2332,8 +2335,11 @@ html:not(.dark) body #userAuthModal .cam-auth-shell{
   border-color:#b18c62!important;box-shadow:0 26px 70px rgba(32,37,38,.33)!important;
 }
 html:not(.dark) body #userAuthModal .cam-auth-story{
-  background:#d9c4a3 linear-gradient(165deg,rgba(30,39,39,.35),rgba(24,35,41,.60) 50%,rgba(12,29,39,.83)),
-    url('ae-chef-marble-day.webp') center/cover no-repeat!important;
+  background-color:#d9c4a3!important;
+  background-image:linear-gradient(165deg,rgba(30,39,39,.35),rgba(24,35,41,.60) 50%,rgba(12,29,39,.83)),
+    url('ae-chef-marble-day.webp')!important;
+  background-position:center,center!important;background-size:cover,cover!important;
+  background-repeat:no-repeat!important;
 }
 html:not(.dark) body #userAuthModal .cam-auth-work{
   background:linear-gradient(155deg,#fffaf2,#f2e9db)!important;
