@@ -13,7 +13,7 @@ create schema vault; create table vault.secrets(name text,decrypted_secret text)
 create view vault.decrypted_secrets as select * from vault.secrets;
 create schema net;
 create table net.calls(id bigint generated always as identity primary key,body jsonb);
-create table net.checks(id bigint generated always as identity primary key,url text,headers jsonb);
+create table net.checks(id bigint generated always as identity (start with 1000) primary key,url text,headers jsonb);
 create table net._http_response(id bigint,status_code int,timed_out boolean,error_msg text,content text,headers jsonb);
 create function net.http_post(url text,body jsonb,headers jsonb,timeout_milliseconds int) returns bigint language plpgsql as $$
 declare n bigint; begin insert into net.calls(body) values(body) returning id into n; return n; end $$;
