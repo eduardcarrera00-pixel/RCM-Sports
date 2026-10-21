@@ -239,7 +239,45 @@ function sizeFeedWindow(){
    feedCardObserver.observe(cards[1]);
  }
 }
+let historicRequest=0;
+async function loadHistoricPick(){
+ const target=$('aeHomePickHistoricPick');
+ if(!target||!db)return;
+ const seq=++historicRequest;
+ target.setAttribute('aria-busy','true');
+ try{
+  // Rank individual settled Picks across all time, independently of votes,
+  // the active feed, monthly rankings and each author's accumulated score.
+  const result=await db.from('ae_pick_feed').select('*')
+   .eq('outcome','won').gt('result_points',0)
+   .order('result_points',{ascending:false})
+   .order('settled_at',{ascending:true}).order('created_at',{ascending:true})
+   .order('id',{ascending:true}).limit(1);
+  if(seq!==historicRequest)return;
+  if(result.error)throw result.error;
+  const pick=result.data?.[0];
+  if(!pick){target.replaceChildren(el('p','Aún no hay un Pick acertado con puntos confirmados.','ae-discovery-empty'));return;}
+  const winner=button(null,()=>open(pick.id));
+  winner.className='ae-discovery-take';
+  winner.setAttribute('aria-label','Leer el Pick histórico: '+(pick.title||'Publicación'));
+  const sports=[...new Set((Array.isArray(pick.legs)?pick.legs:[]).map(leg=>leg.sport).filter(Boolean))];
+  winner.append(el('span','RÉCORD HISTÓRICO · '+(sports.join(' / ')||'Deportes'),'ae-discovery-sport'));
+  winner.append(el('strong',pick.title||'Pick de la comunidad','ae-discovery-title'));
+  const excerpt=(Array.isArray(pick.legs)?pick.legs:[]).map(leg=>leg.selection).filter(Boolean).join(' + ')||String(pick.explanation||'').trim();
+  if(excerpt)winner.append(el('span',excerpt.length>170?excerpt.slice(0,167).trimEnd()+'…':excerpt,'ae-discovery-excerpt'));
+  const meta=el('span',null,'ae-discovery-meta');
+  meta.append(el('span','@'+String(pick.author||'Aficionado').replace(/^@+/,'')),
+   el('span','+'+Number(pick.result_points).toLocaleString('es-ES',{maximumFractionDigits:2})+' puntos','ae-discovery-score'));
+  winner.append(meta);
+  target.replaceChildren(winner);
+ }catch(error){
+  if(seq!==historicRequest)return;
+  const retry=button('Reintentar',()=>void loadHistoricPick());
+  target.replaceChildren(el('p','No se pudo cargar el Pick histórico.','ae-discovery-empty'),retry);
+ }finally{if(seq===historicRequest)target.setAttribute('aria-busy','false');}
+}
 async function load(){
+ void loadHistoricPick();
  if(!db)return;const seq=++request;
  try{
    const [feed,session]=await Promise.all([
@@ -1195,3 +1233,4 @@ const id=new URL(location.href).searchParams.get('pick');if(id)showDetail(id);if
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)load();});
 window.addEventListener('popstate',()=>{const id=new URL(location.href).searchParams.get('pick');if(id)showDetail(id);else closeDetail();});
 })();
+
