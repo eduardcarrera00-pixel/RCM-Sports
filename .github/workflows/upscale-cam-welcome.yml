@@ -1,4 +1,4 @@
-name: Preserve CAM Sports welcome art in HD
+name: Fast-loading CAM Sports welcome art
 
 on:
   push:
@@ -26,32 +26,33 @@ jobs:
           python-version: '3.12'
       - name: Install local image-processing library
         run: python -m pip install --disable-pip-version-check Pillow==11.3.0
-      - name: Upscale the approved original artwork (no re-generation or replacement)
+      - name: Compress approved original welcome artwork for fast loading
         run: |
           python - <<'PY'
           from pathlib import Path
           from PIL import Image, ImageFilter
           for tone in ("noche", "dia"):
               source = Path(f"assets/cam-welcome-{tone}.webp")
-              target = Path(f"assets/cam-welcome-{tone}-hd.webp")
+              target = Path(f"assets/cam-welcome-{tone}-fast.webp")
               with Image.open(source) as original:
                   image = original.convert("RGB")
                   scale = 4
                   image = image.resize((image.width * scale, image.height * scale), Image.Resampling.LANCZOS)
-                  image = image.filter(ImageFilter.UnsharpMask(radius=1.5, percent=90, threshold=2))
-                  image.save(target, "WEBP", quality=94, method=6)
+                  image = image.filter(ImageFilter.UnsharpMask(radius=1.3, percent=75, threshold=2))
+                  image.save(target, "WEBP", quality=77, method=6)
                   with Image.open(target) as verified:
                       assert verified.size == (original.width * scale, original.height * scale)
+                  assert target.stat().st_size < 120_000, f"{target} exceeds size budget"
                   print(f"{source}: {original.size} -> {target}: {image.size}, {target.stat().st_size} bytes")
           PY
-      - name: Save sharp same-scene backgrounds to source main
+      - name: Save lightweight same-scene backgrounds to source main
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add assets/cam-welcome-noche-hd.webp assets/cam-welcome-dia-hd.webp
+          git add assets/cam-welcome-noche-fast.webp assets/cam-welcome-dia-fast.webp
           if git diff --cached --quiet; then
             echo "Assets already up to date."
           else
-            git commit -m "Upscale original CAM Sports welcome scenes without changing art"
+            git commit -m "Optimize original CAM Sports welcome scenes for fast page loading"
             git push origin HEAD:main
           fi
