@@ -20,8 +20,8 @@
    legs:legs.map(l=>({event:clean(l?.event||l?.sport||'Evento',160),selection:clean(l?.selection||'Consulta el pronóstico completo',280)}))};
  }
  function urlFor(p,source){const u=new URL(BASE);u.searchParams.set(p.kind==='weekly'?'weeklyPick':'pick',p.id);if(source){u.searchParams.set('utm_source',source);u.searchParams.set('utm_medium','share');u.searchParams.set('utm_campaign',p.kind==='weekly'?'pick-del-dia':'pick-comunidad');}return u.href;}
- function caption(p,source){return [(p.kind==='weekly'?'Pick del día':'Pick de '+p.author)+' · CAM SPORTS',p.title,...p.legs.map(l=>l.event+' · '+l.selection),'Cuota '+p.odds+(p.review?' · '+p.review:''),p.result,urlFor(p,source)].filter(Boolean).join('\n');}
- function xUrl(p){const u=new URL('https://twitter.com/intent/tweet');u.searchParams.set('text',clean((p.kind==='weekly'?'Pick del día':p.author+' comparte su Pick')+' · '+p.title+' · Cuota '+p.odds+(p.review?' (en revisión)':''),170));u.searchParams.set('url',urlFor(p,'x'));return u.href;}
+ function caption(p,source){return [(p.kind==='weekly'?'Pick del editor':'Pick de '+p.author)+' · CAM SPORTS',p.title,...p.legs.map(l=>l.event+' · '+l.selection),'Cuota '+p.odds+(p.review?' · '+p.review:''),p.result,urlFor(p,source)].filter(Boolean).join('\n');}
+ function xUrl(p){const u=new URL('https://twitter.com/intent/tweet');u.searchParams.set('text',clean((p.kind==='weekly'?'Pick del editor':p.author+' comparte su Pick')+' · '+p.title+' · Cuota '+p.odds+(p.review?' (en revisión)':''),170));u.searchParams.set('url',urlFor(p,'x'));return u.href;}
  function wrap(ctx,value,width,maxLines){
   const lines=[];let line='';
   for(const word of clean(value,1000).split(' ')){
@@ -42,7 +42,7 @@
   c.fillStyle='#fffcf8';c.fillRect(40,40,1000,1270);
   c.fillStyle='#102b3e';c.fillRect(40,40,1000,178);
   c.fillStyle='#f4e8db';c.font='bold 53px Georgia,serif';c.fillText('CAM SPORTS',88,123);
-  c.fillStyle='#d6b179';c.font='600 22px Arial,sans-serif';c.fillText(p.kind==='weekly'?'PICK DEL DÍA':'AQUÍ LO QUE SE CANTA, SE BAILA.',90,177);
+  c.fillStyle='#d6b179';c.font='600 22px Arial,sans-serif';c.fillText(p.kind==='weekly'?'PICK DEL EDITOR':'AQUÍ LO QUE SE CANTA, SE BAILA.',90,177);
   c.fillStyle=bronze;c.font='600 24px Arial,sans-serif';c.fillText(clean(p.author,48),90,276);
   c.fillStyle=ink;c.font='bold 46px Georgia,serif';wrap(c,p.title,900,2).forEach((l,i)=>c.fillText(l,90,341+i*55));
   c.strokeStyle='#d9d9d0';c.lineWidth=2;c.beginPath();c.moveTo(90,427);c.lineTo(990,427);c.stroke();
@@ -75,7 +75,7 @@
   let p;try{p=model(pick,kind);}catch(error){if(typeof notifyCommunity==='function')notifyCommunity(error.message,true);return;}
   restoreFocus=opener;release();const ticket=++request;
   if(!dialog){dialog=make('dialog',null,'cam-pick-share-dialog');dialog.id='camPickShareDialog';dialog.setAttribute('aria-labelledby','camPickShareTitle');document.body.append(dialog);dialog.addEventListener('close',()=>{request++;release();restoreFocus?.focus?.({preventScroll:true});});dialog.addEventListener('click',e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)close();}});}
-  const top=make('div',null,'cam-pick-share-heading');const heading=make('h2',p.kind==='weekly'?'Comparte el Pick del día':'Comparte este Pick');heading.id='camPickShareTitle';top.append(heading);
+  const top=make('div',null,'cam-pick-share-heading');const heading=make('h2',p.kind==='weekly'?'Comparte el Pick del editor':'Comparte este Pick');heading.id='camPickShareTitle';top.append(heading);
   const exit=make('button','Cerrar','cam-pick-share-close');exit.type='button';exit.onclick=close;top.append(exit);
   const intro=make('p','Llévalo a tus redes y que empiece el debate.','cam-pick-share-intro');
   const layout=make('div',null,'cam-pick-share-layout');const preview=make('div',null,'cam-pick-share-preview');preview.setAttribute('aria-busy','true');preview.append(make('p','Preparando tarjeta…'));
