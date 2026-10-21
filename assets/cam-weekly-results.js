@@ -13,7 +13,7 @@
  function replyUrl(result){
    const match=originalX(result.original_x_url);if(!match)return null;
    const u=new URL('https://twitter.com/intent/tweet');
-   u.searchParams.set('text','✅ Pick acertado · Pick del día\n'+result.original_x_url);
+   u.searchParams.set('text','✅ Pick acertado · Pick del editor\n'+result.original_x_url);
    return u.href;
  }
  function link(url,text){
@@ -31,7 +31,7 @@
    if(!quick)return;
    quick.hidden=!admin();quick.replaceChildren();
    if(!admin())return;
-   quick.append(el('strong','¿Acertó el Pick del día?'));
+   quick.append(el('strong','¿Acertó el Pick del editor?'));
    quickStatus=el('p');quickStatus.setAttribute('role','status');quickStatus.setAttribute('aria-live','polite');
    if(!quickRow){quick.append(quickStatus);quickMessage(loading?'Cargando Pick…':'No hay un Pick disponible para revisar.');return;}
    quick.append(el('small',quickRow.event_name+' · '+quickRow.selection));
@@ -161,7 +161,7 @@
  async function resolve(row,value){
    if(busy||!admin())return;
    const message=value==='won'?
-     '¿Confirmas que «'+row.selection+'» acertó? Se publicará “✅ Pick acertado · Pick del día” citando el tuit original en X, sin adjuntar otra foto. TikTok mantiene su publicación automática. No se puede deshacer desde estos botones.':
+     '¿Confirmas que «'+row.selection+'» acertó? Se publicará “✅ Pick acertado · Pick del editor” citando el tuit original en X, sin adjuntar otra foto. TikTok mantiene su publicación automática. No se puede deshacer desde estos botones.':
      '¿Confirmas que «'+row.selection+'» no acertó? Se guardará como fallado y no se compartirá. No se puede deshacer desde estos botones.';
    if(!confirm(message))return;
    let messageAfter='';
@@ -197,7 +197,7 @@
      const result=await readPublic(id);
      if(!result){host.replaceChildren(el('p','Este Pick todavía no tiene un resultado confirmado.'));return;}
      host.replaceChildren(el('h3',outcome(result)),el('h4',result.title),el('p',result.event_name),el('p',result.selection+' · Cuota '+odds(result.american_odds)));
-     if(/^https:\/\//.test(result.image_url||'')){const image=el('img');image.src=result.image_url;image.alt='Imagen original del Pick del día';image.loading='lazy';host.prepend(image);}
+     if(/^https:\/\//.test(result.image_url||'')){const image=el('img');image.src=result.image_url;image.alt='Imagen original del Pick del editor';image.loading='lazy';host.prepend(image);}
      host.append(el('small','Resultado confirmado por el equipo editorial de CAM Sports.'));
      if(originalX(result.original_x_url))host.append(link(result.original_x_url,'Ver el Pick original en X'));
    }catch{host.replaceChildren(el('p','No se pudo cargar el resultado. Recarga la página para comprobarlo.'));}
@@ -210,7 +210,7 @@
  function init(){
    const adminHost=$('aeWeeklyPickAdmin');if(!adminHost||typeof db==='undefined'||!db)return;
    panel=el('details',null,'ae-takes-admin ae-weekly-admin cam-weekly-review');panel.id='camWeeklyResultsAdmin';panel.hidden=!admin();
-   const summary=el('summary','Administrar · Resultados del Pick del día');
+   const summary=el('summary','Administrar · Resultados del Pick del editor');
    const intro=el('p','Aprobar confirma un acierto y lo publica en X citando el Pick original, sin adjuntar otra foto. TikTok mantiene su publicación automática. Denegar registra un fallo sin compartirlo.','cam-weekly-review-note');
    const reload=el('button','Actualizar resultados y envíos');reload.type='button';reload.onclick=()=>refreshAdmin();
    list=el('div');list.id='camWeeklyResultsList';
@@ -220,7 +220,7 @@
    previous.onclick=()=>{offset=Math.max(0,offset-30);refreshAdmin();};next.onclick=()=>{offset+=30;refreshAdmin();};pages.append(previous,next);
    panel.append(summary,intro,reload,list,pages,status);adminHost.after(panel);
    quick=el('div',null,'cam-weekly-quick-result');quick.id='camWeeklyQuickResult';quick.hidden=true;
-   quick.setAttribute('aria-label','Confirmar manualmente el resultado del Pick del día');
+   quick.setAttribute('aria-label','Confirmar manualmente el resultado del Pick del editor');
    quick.addEventListener('click',event=>event.stopPropagation());
    const edit=$('aeWeeklyEditButton');
    const surface=$('picksFeatured');
@@ -228,7 +228,7 @@
    else if(edit?.parentElement)edit.parentElement.after(quick);
    panel.addEventListener('toggle',()=>{if(admin())refreshAdmin();});
    const result=el('section',null,'ae-weekly-card cam-weekly-shared-result');result.id='camWeeklySharedResult';result.hidden=true;
-   result.setAttribute('aria-label','Resultado del Pick del día');$('picksFeaturedCard')?.before(result);
+   result.setAttribute('aria-label','Resultado del Pick del editor');$('picksFeaturedCard')?.before(result);
    document.addEventListener('cam:weekly-render',()=>{decorate();refreshPublic();if(panel.open)refreshAdmin();});
    if(typeof window.updateAeWeeklyAdmin==='function'){
      const original=window.updateAeWeeklyAdmin;
