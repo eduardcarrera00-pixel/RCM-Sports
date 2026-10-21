@@ -405,7 +405,7 @@
    $('aeWeeklyCancelEdit')?.addEventListener('click',cancelEdit);
    $('aeWeeklyCheckSave')?.addEventListener('click',manuallyCheckSave);
    updateEditorLabels();
-   adminVisibility();load();renderNews();
+   adminVisibility();load();
    if((typeof db!=='undefined' && db))db.auth.onAuthStateChange(()=>setTimeout(adminVisibility,100));
    document.addEventListener('visibilitychange',()=>{if(!document.hidden)load();});
  });

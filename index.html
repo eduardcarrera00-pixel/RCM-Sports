@@ -288,7 +288,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
     </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
-<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261020-picks-height-trim-4">
+<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261020-chronicle-marble-2">
 <link rel="stylesheet" href="assets/cam-analytics.css?v=20261020-1">
     <link rel="stylesheet" href="assets/ae-muted-navigation-icons.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-custom-nav-icons.css?v=20261016-1">
@@ -2868,10 +2868,12 @@ html:not(.dark) #aeAuthIntroNotice small{color:#5b6d76}
         <div class="ae-article-panel relative bg-white border border-slate-200 w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden max-h-[92vh] flex flex-col my-auto">
 
             <div class="ae-article-toolbar flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50 sticky top-0 z-10">
-                <span id="modalCategory" class="text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full bg-pitch-100 text-pitch-800 border border-pitch-200">
-                    CATEGORÍA
-                </span>
-                <div class="flex items-center gap-2">
+                <span class="cam-chronicle-brand" aria-hidden="true">CAM<small>SPORTS</small></span>
+                <div class="cam-chronicle-toolbar-end flex items-center gap-2">
+                    <span id="modalCategory" class="text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full bg-pitch-100 text-pitch-800 border border-pitch-200">
+                        CATEGORÍA
+                    </span>
+                    <span id="camChronicleToolbarDate" class="cam-chronicle-toolbar-date"></span>
                     <button id="modalDeleteArticleBtn" type="button" onclick="deleteArticle(activeModalArticleId, event)" title="Eliminar publicación" aria-label="Eliminar publicación" class="hidden px-3 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-bold items-center gap-2 transition-colors">
                         <i class="fa-solid fa-trash-can"></i>
                         <span class="hidden sm:inline">Eliminar</span>
@@ -2887,6 +2889,7 @@ html:not(.dark) #aeAuthIntroNotice small{color:#5b6d76}
 
                 <div class="ae-article-intro"><div class="ae-article-eyebrow">CAM SPORTS <span> / </span> HISTORIAS QUE IMPORTAN</div>
                     <h1 id="modalTitle" class="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-tight mb-3"></h1>
+                    <p id="camChronicleDek" class="cam-chronicle-dek hidden"></p>
                     <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-500 pb-4 border-b border-slate-100" aria-label="Autor y fecha de publicación">
                         <span id="modalAuthor" class="font-semibold text-slate-800"></span>
                         <span aria-hidden="true">·</span>
@@ -2906,6 +2909,10 @@ html:not(.dark) #aeAuthIntroNotice small{color:#5b6d76}
                     <aside class="cam-chronicle-aside" aria-label="Datos de la noticia">
                         <span class="cam-chronicle-aside-kicker">CAM SPORTS</span>
                         <span class="cam-chronicle-aside-rule" aria-hidden="true"></span>
+                        <div id="camChronicleIndexBlock" class="cam-chronicle-aside-block hidden">
+                            <span class="cam-chronicle-aside-label">En esta historia</span>
+                            <nav id="camChronicleIndex" class="cam-chronicle-aside-index" aria-label="Secciones de la noticia"></nav>
+                        </div>
                         <span class="cam-chronicle-aside-label">La crónica</span>
                         <span id="camChronicleCategory" class="cam-chronicle-aside-category"></span>
                         <span class="cam-chronicle-aside-label">Tiempo de lectura</span>
@@ -4029,6 +4036,13 @@ currentUser = {
             document.getElementById('camChronicleCategory').textContent = article.category || 'Deporte';
             const readingWords = document.getElementById('modalBody').textContent.trim().split(/\s+/).filter(Boolean).length;
             document.getElementById('camChronicleReadTime').textContent = `${Math.max(1, Math.ceil(readingWords / 220))} min`;
+            const chronicleDek = document.getElementById('camChronicleDek');
+            const chronicleSummary = String(article.summary || '').trim();
+            chronicleDek.textContent = chronicleSummary;
+            chronicleDek.classList.toggle('hidden', !chronicleSummary);
+            const chronicleToolbarDate = document.getElementById('camChronicleToolbarDate');
+            if (chronicleToolbarDate) chronicleToolbarDate.textContent = article.date || '';
+            buildChronicleIndex();
             restoreReadingSize();
 renderRelatedStories(article);
 
@@ -4263,6 +4277,32 @@ function restoreReadingSize() {
     } catch {}
 
     setReadingSize(size);
+}
+
+// Columna lateral · "En esta historia": un índice solo cuando la noticia
+// tiene subtítulos propios; si no, el bloque permanece oculto.
+function buildChronicleIndex() {
+    const block = document.getElementById('camChronicleIndexBlock');
+    const nav = document.getElementById('camChronicleIndex');
+    const body = document.getElementById('modalBody');
+    if (!block || !nav || !body) return;
+
+    nav.replaceChildren();
+    const headings = [...body.querySelectorAll('h2, h3')]
+        .filter(heading => heading.textContent.trim())
+        .slice(0, 6);
+    block.classList.toggle('hidden', headings.length < 2);
+    if (headings.length < 2) return;
+
+    headings.forEach((heading, position) => {
+        heading.id = heading.id || `cam-chronicle-section-${position + 1}`;
+        const link = document.createElement('button');
+        link.type = 'button';
+        link.className = 'cam-chronicle-aside-link';
+        link.textContent = heading.textContent.trim();
+        link.onclick = () => heading.scrollIntoView({block: 'start', behavior: 'smooth'});
+        nav.appendChild(link);
+    });
 }
 
 function renderRelatedStories(article) {
