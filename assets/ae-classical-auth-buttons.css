@@ -2418,3 +2418,116 @@ html:not(.dark) body #userAuthModal #authRecoveryResult button:last-child{color:
   html body #userAuthModal input:not([type=hidden]),
   html body #userAuthModal button{transition:none!important;}
 }
+
+
+/* CAM SPORTS · Variante D: pórtico griego, laureles y calidez editorial.
+   Estética inspirada en la arquitectura clásica; no modifica las rutinas de acceso. */
+html body #userAuthModal .cam-auth-shell {
+  width:min(930px,100%)!important;max-width:930px!important;
+  grid-template-columns:minmax(0,.91fr) minmax(0,1.09fr)!important;
+  border-radius:3px!important;
+  border-color:#b39265!important;
+}
+html body #userAuthModal .cam-auth-story {
+  background-color:#141e26!important;
+  background-image:linear-gradient(90deg,rgba(7,16,24,.79) 0%,rgba(7,16,24,.48) 55%,rgba(7,16,24,.11) 100%),url('cam-auth-architecture-night.svg')!important;
+  background-position:center,center!important;
+  background-size:cover,cover!important;
+  background-repeat:no-repeat!important;
+  padding:33px 30px 27px!important;
+}
+html body #userAuthModal .cam-auth-story::after{display:none!important;}
+html body #userAuthModal .cam-auth-story::before{
+  inset:16px!important;
+  border:1px solid rgba(216,176,113,.5)!important;
+}
+html body #userAuthModal .cam-auth-story-brand{
+  font:600 25px/1 Newsreader,Georgia,serif!important;
+  letter-spacing:.03em!important;
+  text-transform:uppercase;
+}
+html body #userAuthModal .cam-auth-story-message{padding:58px 0 38px!important;}
+html body #userAuthModal .cam-auth-story-message h2{
+  font-size:clamp(38px,4.5vw,55px)!important;
+  line-height:1.03!important;
+  text-shadow:0 2px 19px rgba(0,0,0,.35);
+}
+html body #userAuthModal .cam-auth-story-message>p:last-child{max-width:250px!important;}
+html body #userAuthModal .cam-auth-work{
+  background:#081b28!important;
+  border-left:1px solid rgba(192,148,94,.55);
+}
+html body #userAuthModal .cam-auth-heading{
+  min-height:93px!important;
+  padding:24px 28px 14px!important;
+}
+html body #userAuthModal #camAuthTitle{font-size:clamp(28px,3.35vw,38px)!important;}
+html body #userAuthModal #userAuthForm,
+html body #userAuthModal #authRecoveryResult{padding:22px 28px 29px!important;}
+html body #userAuthModal #userAuthForm .space-y-2{
+  position:relative;gap:9px!important;
+  padding-top:6px!important;
+}
+html body #userAuthModal #userAuthForm .space-y-2>#authSubmit{
+  position:relative;min-height:50px!important;
+}
+html body #userAuthModal #userAuthForm .space-y-2 .cam-auth-nav-register{
+  margin-top:17px!important;
+}
+html body #userAuthModal #userAuthForm .space-y-2 .cam-auth-nav-register::before{
+  content:'o';display:flex;justify-content:center;align-items:center;
+  position:absolute;left:50%;transform:translateX(-50%);
+  top:61px;width:30px;height:24px;
+  color:#bd9567;background:#081b28;
+  font:600 11px Newsreader,Georgia,serif;
+  pointer-events:none;
+}
+html body #userAuthModal #userAuthForm .space-y-2::before{
+  content:'';position:absolute;left:0;right:0;top:92px;
+  border-top:1px solid rgba(210,174,127,.30);
+  pointer-events:none;
+}
+html body #userAuthModal #userAuthForm:not([data-cam-auth-mode="login"]) .space-y-2::before,
+html body #userAuthModal #userAuthForm:not([data-cam-auth-mode="login"]) .cam-auth-nav-register::before{display:none!important;}
+html body #userAuthModal #userAuthForm:not([data-cam-auth-mode="login"]) .cam-auth-nav-login{margin-top:4px!important;}
+html body #userAuthModal #userAuthForm .space-y-2>button{border-radius:1px!important;}
+html:not(.dark) body #userAuthModal .cam-auth-shell{
+  background:#fbf4e9!important;
+}
+html:not(.dark) body #userAuthModal .cam-auth-story{
+  background-color:#d9c5a7!important;
+  background-image:linear-gradient(90deg,rgba(255,248,230,.84) 0%,rgba(255,247,229,.57) 53%,rgba(255,247,229,.08) 100%),url('cam-auth-architecture-day.svg')!important;
+}
+html:not(.dark) body #userAuthModal .cam-auth-story::before{border-color:rgba(126,94,59,.48)!important;}
+html:not(.dark) body #userAuthModal .cam-auth-story-brand{color:#4c3425!important;text-shadow:none!important;}
+html:not(.dark) body #userAuthModal .cam-auth-story-brand span{color:#90643d!important;}
+html:not(.dark) body #userAuthModal .cam-auth-story-overline{color:#68462c!important;}
+html:not(.dark) body #userAuthModal .cam-auth-story-message h2{
+  color:#302a29!important;text-shadow:0 2px 14px rgba(255,248,224,.62)!important;
+}
+html:not(.dark) body #userAuthModal .cam-auth-story-message>p:last-child,
+html:not(.dark) body #userAuthModal .cam-auth-story-foot{color:#4b4137!important;}
+html:not(.dark) body #userAuthModal .cam-auth-work{
+  background:#fffaf3!important;
+  border-left-color:#dcc7ab!important;
+}
+html:not(.dark) body #userAuthModal #userAuthForm .space-y-2 .cam-auth-nav-register::before{background:#fffaf3;color:#8d6541;}
+html:not(.dark) body #userAuthModal #userAuthForm .space-y-2::before{border-color:#d7c1a2;}
+@media(max-width:690px){
+ html body #userAuthModal .cam-auth-shell{grid-template-columns:1fr!important;max-width:450px!important;}
+ html body #userAuthModal .cam-auth-story{
+   min-height:142px!important;max-height:158px!important;
+   padding:18px 22px!important;background-position:center 45%,center 45%!important;
+ }
+ html body #userAuthModal .cam-auth-story-message{padding:13px 0 0!important;}
+ html body #userAuthModal .cam-auth-story-message h2{font-size:29px!important;}
+ html body #userAuthModal .cam-auth-work{border-left:0!important;border-top:1px solid rgba(202,160,111,.55);}
+ html body #userAuthModal .cam-auth-heading{min-height:72px!important;padding:15px 21px 12px!important;}
+ html body #userAuthModal #camAuthTitle{font-size:27px!important;}
+ html body #userAuthModal #userAuthForm,
+ html body #userAuthModal #authRecoveryResult{padding:17px 21px 22px!important;}
+}
+@media(max-height:640px){
+ html body #userAuthModal .cam-auth-story-message{padding-top:18px!important;padding-bottom:14px!important;}
+ html body #userAuthModal .cam-auth-heading{min-height:70px!important;}
+}
