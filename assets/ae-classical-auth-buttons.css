@@ -2532,3 +2532,185 @@ html:not(.dark) body #userAuthModal #userAuthForm .space-y-2::before{border-colo
  html body #userAuthModal .cam-auth-story-message{padding-top:18px!important;padding-bottom:14px!important;}
  html body #userAuthModal .cam-auth-heading{min-height:70px!important;}
 }
+
+
+/* CAM SPORTS · Inicio de sesión móvil · 2026-10-20 */
+/* Preserve existing form elements, handlers and day/night themes. */
+@media (max-width:860px) {
+  html body #userAuthModal:not(.hidden) {
+    align-items:center!important;justify-content:center!important;
+    padding:8px!important;
+    padding-top:max(8px,env(safe-area-inset-top))!important;
+    padding-bottom:max(8px,env(safe-area-inset-bottom))!important;
+    overflow-y:auto!important;
+  }
+  html body #userAuthModal .cam-auth-shell {
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    grid-template-rows:auto auto!important;
+    width:min(100%,480px)!important;max-width:480px!important;
+    max-height:calc(100vh - 16px)!important;
+    max-height:calc(100dvh - 16px)!important;
+    margin:auto!important;border-radius:5px!important;
+    overflow-x:hidden!important;overflow-y:auto!important;
+    overscroll-behavior:contain!important;
+    scrollbar-width:thin;
+  }
+  /* Portrait artwork, intentionally reframed as a panoramic sports header. */
+  html body #userAuthModal .cam-auth-story {
+    display:flex!important;flex-direction:column!important;
+    justify-content:space-between!important;
+    width:100%!important;height:168px!important;
+    min-height:168px!important;max-height:168px!important;
+    padding:17px 20px 15px!important;overflow:hidden!important;
+    background-color:#0b1e2a!important;
+    background-image:
+      linear-gradient(90deg,rgba(4,14,23,.9) 0%,rgba(4,14,23,.72) 44%,rgba(4,14,23,.06) 88%),
+      url('cam-login-background-night-HD.webp'),
+      url('cam-login-background-night.webp')!important;
+    background-position:center,center 62%,center 62%!important;
+    background-size:cover,cover,cover!important;
+    background-repeat:no-repeat!important;
+    border:0!important;
+  }
+  html:not(.dark) body #userAuthModal .cam-auth-story {
+    background-color:#e9d3b2!important;
+    background-image:
+      linear-gradient(90deg,rgba(255,249,234,.97) 0%,rgba(255,249,234,.84) 44%,rgba(255,249,234,.06) 88%),
+      url('cam-login-background-day-HD.webp'),
+      url('cam-login-background-day.webp')!important;
+  }
+  html body #userAuthModal .cam-auth-story::before {
+    inset:9px!important;z-index:0!important;
+    border:1px solid rgba(214,175,122,.49)!important;
+    pointer-events:none!important;
+  }
+  html body #userAuthModal .cam-auth-story-brand {
+    position:relative;z-index:1;margin:0!important;
+    color:#fff1dc;font-size:19px!important;line-height:1.1!important;
+    letter-spacing:.06em!important;
+    text-shadow:0 1px 7px rgba(0,0,0,.18);
+  }
+  html body #userAuthModal .cam-auth-story-message {
+    position:relative;z-index:1;
+    padding:0!important;margin:0!important;
+  }
+  html body #userAuthModal .cam-auth-story-message h2 {
+    max-width:245px!important;margin:0!important;
+    font-size:clamp(25px,6.6vw,33px)!important;
+    line-height:1.05!important;letter-spacing:-.03em!important;
+    text-wrap:balance;
+  }
+  html body #userAuthModal .cam-auth-story-overline,
+  html body #userAuthModal .cam-auth-story-message>p:last-child,
+  html body #userAuthModal .cam-auth-story-foot {display:none!important;}
+  html body #userAuthModal .cam-auth-work {
+    min-width:0!important;
+    border-left:0!important;
+    border-top:1px solid rgba(203,160,106,.57)!important;
+  }
+  html body #userAuthModal .cam-auth-heading {
+    min-height:0!important;padding:16px 20px 13px!important;
+    align-items:center!important;gap:12px!important;
+  }
+  html body #userAuthModal #camAuthTitle {
+    font-size:clamp(25px,6.5vw,31px)!important;
+    line-height:1.1!important;text-wrap:balance;
+  }
+  html body #userAuthModal .cam-auth-close {
+    flex:0 0 44px!important;width:44px!important;
+    height:44px!important;min-height:44px!important;
+  }
+  html body #userAuthModal #userAuthForm,
+  html body #userAuthModal #authRecoveryResult {
+    min-width:0!important;
+    padding:16px 20px 22px!important;
+  }
+  html body #userAuthModal .cam-auth-intro {
+    font-size:12.5px!important;line-height:1.55!important;
+  }
+  html body #userAuthModal #aeAuthPrivacyNote {
+    font-size:11px!important;line-height:1.5!important;
+  }
+  html body #userAuthModal #userAuthForm label {
+    margin-bottom:6px!important;font-size:11px!important;
+  }
+  html body #userAuthModal input:not([type=hidden]) {
+    width:100%!important;min-height:48px!important;
+    font-size:16px!important;padding:12px 13px!important;
+  }
+  html body #userAuthModal #authShowPassword {
+    min-height:44px!important;padding:9px 0!important;
+    font-size:12px!important;
+  }
+  html body #userAuthModal #authModeHelp {
+    margin:4px 0 10px!important;
+    font-size:11px!important;line-height:1.55!important;
+  }
+  html body #userAuthModal #userAuthForm .space-y-2 {
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:8px!important;padding-top:3px!important;
+    margin-top:9px!important;
+  }
+  html body #userAuthModal #userAuthForm .space-y-2>button {
+    min-width:0!important;min-height:46px!important;
+    padding:10px 8px!important;
+    font-size:12px!important;line-height:1.35!important;
+    overflow-wrap:break-word!important;
+  }
+  html body #userAuthModal #userAuthForm .space-y-2>#authSubmit {
+    min-height:50px!important;font-size:14px!important;
+  }
+  html body #userAuthModal #userAuthForm .space-y-2 .cam-auth-nav-register {
+    margin-top:10px!important;
+  }
+  html body #userAuthModal #userAuthForm .space-y-2::before,
+  html body #userAuthModal #userAuthForm .cam-auth-nav-register::before {
+    display:none!important;
+  }
+  html body #userAuthModal #aeAuthIntroNotice {
+    top:64px!important;max-width:calc(100% - 32px)!important;
+  }
+}
+@media(max-width:370px) {
+  html body #userAuthModal .cam-auth-story {
+    height:145px!important;min-height:145px!important;
+    max-height:145px!important;padding:15px 17px 13px!important;
+    background-position:center,center 65%,center 65%!important;
+  }
+  html body #userAuthModal .cam-auth-story-brand {font-size:17px!important;}
+  html body #userAuthModal .cam-auth-story-message h2 {
+    font-size:25px!important;max-width:205px!important;
+  }
+  html body #userAuthModal .cam-auth-heading {padding:13px 15px 11px!important;}
+  html body #userAuthModal #camAuthTitle {font-size:24px!important;}
+  html body #userAuthModal #userAuthForm,
+  html body #userAuthModal #authRecoveryResult {
+    padding:15px 15px 20px!important;
+  }
+  html body #userAuthModal #userAuthForm .space-y-2>button {
+    font-size:11px!important;padding:9px 5px!important;
+  }
+}
+@media(max-width:860px) and (max-height:690px) {
+  html body #userAuthModal .cam-auth-story {
+    height:115px!important;min-height:115px!important;
+    max-height:115px!important;padding:13px 20px 11px!important;
+  }
+  html body #userAuthModal .cam-auth-story-message h2 {font-size:24px!important;}
+  html body #userAuthModal .cam-auth-heading {
+    padding-top:12px!important;padding-bottom:10px!important;
+  }
+  html body #userAuthModal #userAuthForm {
+    padding-top:13px!important;padding-bottom:15px!important;
+  }
+}
+@media(max-width:860px) and (orientation:landscape) and (max-height:480px) {
+  html body #userAuthModal .cam-auth-story {
+    height:68px!important;min-height:68px!important;
+    max-height:68px!important;padding:12px 18px!important;
+  }
+  html body #userAuthModal .cam-auth-story-message {display:none!important;}
+  html body #userAuthModal .cam-auth-heading {padding:9px 16px!important;}
+  html body #userAuthModal #userAuthForm {padding:12px 16px 16px!important;}
+}
