@@ -1,7 +1,7 @@
 /* CAM SPORTS - banner editorial del compositor de Takes.
    Pluma a la izquierda, escena clásica a la derecha y texto HTML accesible.
    Escenas recortadas del diseño aprobado, distintas para cada tema. */
-html body.ae-is-home #aeHomeTakeHighlights #aeHomeTakesSectionHeading button#aeHomeTakePublish.cam-home-take-square {
+html:not(#ds):not(#ds):not(#ds) body.ae-is-home #aeHomeTakeHighlights #aeHomeTakesSectionHeading button#aeHomeTakePublish.cam-home-take-square {
   box-sizing:border-box!important;
   position:relative!important;
   isolation:isolate!important;
@@ -90,25 +90,53 @@ html:not(.dark) body.ae-is-home #aeHomeTakeHighlights #aeHomeTakesSectionHeading
   background:linear-gradient(100deg,#fff8eb 0%,#edddc6 100%)!important;
 }
 @media(max-width:760px){
-  html body.ae-is-home #aeHomeTakeHighlights #aeHomeTakesSectionHeading button#aeHomeTakePublish.cam-home-take-square{
-    grid-template-columns:52px minmax(0,1fr) 20px!important;
-    gap:10px!important;
-    height:83px!important;
-    min-height:83px!important;
-    padding:7px 12px!important;
+  html:not(#ds):not(#ds):not(#ds) body.ae-is-home #aeHomeTakeHighlights #aeHomeTakesSectionHeading button#aeHomeTakePublish.cam-home-take-square {
+    grid-template-columns:44px minmax(0,1fr) 18px!important;
+    gap:11px!important;
+    height:70px!important;
+    min-height:70px!important;
+    padding:6px 11px!important;
   }
   html body.ae-is-home #aeHomeTakeHighlights #aeHomeTakesSectionHeading #aeHomeTakePublish .cam-home-take-square-icon {
-    width:52px!important;
-    min-width:52px!important;
-    height:58px!important;
-    min-height:58px!important;
+    width:44px!important;
+    min-width:44px!important;
+    height:48px!important;
+    min-height:48px!important;
   }
   html body.ae-is-home #aeHomeTakeHighlights #aeHomeTakePublish .cam-home-take-square-label{
-    font-size:clamp(15px,4vw,20px)!important;
+    font-size:clamp(14px,4.35vw,17px)!important;
+    line-height:1.13!important;
+    text-align:center!important;
+    justify-self:stretch!important;
+    align-self:center!important;
+    overflow-wrap:normal!important;
+  }
+  html body.ae-is-home #aeHomeTakeHighlights #aeHomeTakePublish .cam-home-take-square-arrow{
+    align-self:center!important;
+    justify-self:end!important;
+    font-size:20px!important;
   }
   html body.ae-is-home #aeHomeTakeHighlights #aeHomeTakesSectionHeading button#aeHomeTakePublish.cam-home-take-square::before{
     width:44%!important;
     opacity:.3!important;
+  }
+}
+@media(max-width:380px){
+  html:not(#ds):not(#ds):not(#ds) body.ae-is-home #aeHomeTakeHighlights #aeHomeTakesSectionHeading button#aeHomeTakePublish.cam-home-take-square{
+    grid-template-columns:40px minmax(0,1fr) 16px!important;
+    gap:8px!important;
+    height:68px!important;
+    min-height:68px!important;
+    padding:5px 9px!important;
+  }
+  html body.ae-is-home #aeHomeTakeHighlights #aeHomeTakesSectionHeading #aeHomeTakePublish .cam-home-take-square-icon{
+    width:40px!important;
+    min-width:40px!important;
+    height:44px!important;
+    min-height:44px!important;
+  }
+  html body.ae-is-home #aeHomeTakeHighlights #aeHomeTakePublish .cam-home-take-square-label{
+    font-size:clamp(13.5px,4.2vw,16px)!important;
   }
 }
 @media(prefers-reduced-motion:reduce){
