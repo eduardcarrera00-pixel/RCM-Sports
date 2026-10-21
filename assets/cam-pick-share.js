@@ -3,6 +3,31 @@
  'use strict';
  const BASE='https://camsports.github.io/';
  const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+ // Lossless UUID encoding: no shortening service, database writes or expiring links.
+ const pack=id=>btoa(String.fromCharCode(...id.replace(/-/g,'').match(/../g).map(h=>parseInt(h,16)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+ function unpack(value){
+  if(!/^[A-Za-z0-9_-]{22}$/.test(value||''))return null;
+  try{const bytes=atob(value.replace(/-/g,'+').replace(/_/g,'/')+'==');
+   const hex=Array.from(bytes,c=>c.charCodeAt(0).toString(16).padStart(2,'0')).join('');
+   const id=hex.replace(/^(.{8})(.{4})(.{4})(.{4})(.{12})$/,'$1-$2-$3-$4-$5');
+   return UUID.test(id)&&pack(id)===value?id:null;
+  }catch{return null;}
+ }
+ // This script loads first so existing Pick, profile and welcome handlers see
+ // their normal routes. Previously shared full-length URLs continue to work.
+ function expandLink(){
+  const u=new URL(location.href);let route=null,key=null;
+  for(const [short,full] of [['p','pick'],['e','weeklyPick'],['r','weeklyResult']]){
+   const id=unpack(u.searchParams.get(short));if(id){key=short;route={[full]:id};break;}
+  }
+  if(!route){const parts=(u.searchParams.get('t')||'').split('.');
+   if(parts.length===2){const owner=unpack(parts[0]),id=unpack(parts[1]);if(owner&&id){key='t';route={perfil:owner,take:id};}}
+  }
+  if(!route)return;
+  u.searchParams.delete(key);for(const [name,value] of Object.entries(route))u.searchParams.set(name,value);
+  history.replaceState(history.state,'',u.href);
+ }
+ expandLink();
  const make=(tag,text,cls)=>{const n=document.createElement(tag);if(text!=null)n.textContent=text;if(cls)n.className=cls;return n;};
  const clean=(value,max=240)=>String(value??'').replace(/[\u0000-\u001f\u007f]/g,' ').replace(/\s+/g,' ').trim().slice(0,max);
  const odds=value=>{if(value==null||value==='')return '—';const n=Number(value);return Number.isFinite(n)?(n>0?'+':'')+n:'—';};
@@ -20,17 +45,32 @@
   }
   const weekly=kind==='weekly';
   const legs=weekly?[{event:p.event_name,selection:p.selection}]:Array.isArray(p.legs)?p.legs.slice(0,50):[];
-  const outcome={won:'Acertado',lost:'Fallado',void:'Anulado'}[p.outcome]||'Pendiente';
+  const settled=weekly?window.camWeeklyResults?.getResult?.(p.id):null;
+  const state=settled?.outcome||p.outcome;
+  const outcome={won:'Pick acertado',lost:'Pick no acertado',void:'Pick anulado'}[state]||'Pendiente de resultado';
   return {id:String(p.id).toLowerCase(),kind:weekly?'weekly':'community',
    title:clean(p.title||p.event_name||'Pick',160),author:weekly?'CAM SPORTS':'@'+clean(p.author||'Aficionado',60).replace(/^@/,''),
    odds:odds(p.american_odds),date:/^\d{4}-\d{2}-\d{2}$/.test(p.event_date||'')?p.event_date:'',
-   result:weekly?'Pick editorial':outcome,
+   result:outcome,state:['won','lost','void'].includes(state)?state:'pending',
+   verified:!weekly&&p.moderation_status==='approved'&&odds(p.american_odds)!=='—',
    review:!weekly&&p.moderation_status!=='approved'?'Cuota en revisión':'',
    legs:legs.map(l=>({event:clean(l?.event||l?.sport||'Evento',160),selection:clean(l?.selection||'Consulta el pronóstico completo',280)}))};
  }
- function urlFor(p,source){const u=new URL(BASE);if(p.kind==='take'){u.searchParams.set('perfil',p.author_id);u.searchParams.set('take',p.id);}else u.searchParams.set(p.kind==='weekly'?'weeklyPick':'pick',p.id);if(source){u.searchParams.set('utm_source',source);u.searchParams.set('utm_medium','share');u.searchParams.set('utm_campaign',p.kind==='take'?'take-comunidad':p.kind==='weekly'?'pick-del-dia':'pick-comunidad');}return u.href;}
- function caption(p,source){if(p.kind==='take')return ['Take de '+p.author+' · CAM SPORTS',p.competition,p.title,p.body,urlFor(p,source)].filter(Boolean).join('\n');return [(p.kind==='weekly'?'Pick del editor':'Pick de '+p.author)+' · CAM SPORTS',p.title,...p.legs.map(l=>l.event+' · '+l.selection),'Cuota '+p.odds+(p.review?' · '+p.review:''),p.result,urlFor(p,source)].filter(Boolean).join('\n');}
- function xUrl(p){const u=new URL('https://twitter.com/intent/tweet');u.searchParams.set('text',clean(p.kind==='take'?p.author+' comparte su Take · '+p.title:(p.kind==='weekly'?'Pick del editor':p.author+' comparte su Pick')+' · '+p.title+' · Cuota '+p.odds+(p.review?' (en revisión)':''),170));u.searchParams.set('url',urlFor(p,'x'));return u.href;}
+ function urlFor(p){const u=new URL(BASE);if(p.kind==='take')u.searchParams.set('t',pack(p.author_id)+'.'+pack(p.id));else u.searchParams.set(p.kind==='weekly'?(p.state==='pending'?'e':'r'):'p',pack(p.id));return u.href;}
+ const headline=p=>(p.kind==='take'?'Take de '+p.author:p.kind==='weekly'?'Pick del editor':'Pick de '+p.author)+' · CAM SPORTS';
+ const quota=p=>p.verified?'Cuota verificada · '+p.odds:'Cuota '+p.odds+(p.review?' · '+p.review:p.kind==='weekly'?' · Editorial':'');
+ const invitation=p=>p.kind==='take'?'¿De acuerdo o tienes otra lectura?':p.state==='won'?'Aquí lo que se canta, se baila.':p.state==='lost'?'También se da la cara cuando no sale.':p.state==='void'?'Este no cuenta en el marcador.':'Sobre la mesa. ¿Lo sigues o lo debates?';
+ function caption(p){if(p.kind==='take')return [headline(p),p.competition,p.title,p.body,invitation(p),urlFor(p)].filter(Boolean).join('\n\n');return [headline(p),p.result,p.title,...p.legs.map(l=>l.event+' · '+l.selection),quota(p),invitation(p),urlFor(p)].filter(Boolean).join('\n\n');}
+ // Reserve the URL's 23 X characters and keep the result/verification/CTA intact
+ // even when a title, author or selection is long (including wide characters).
+ const weight=s=>Array.from(s).reduce((n,c)=>n+(c.codePointAt(0)>0x10ff?2:1),0);
+ function fit(s,budget){if(weight(s)<=budget)return s;let out='';for(const c of s){if(weight(out+c+'…')>budget)break;out+=c;}return out.trimEnd()+'…';}
+ function xUrl(p){
+  const title=fit(headline(p),85),tail=p.kind==='take'?invitation(p):p.result+' · '+quota(p)+'\n'+invitation(p);
+  const detail=p.kind==='take'?p.title:(p.legs[0]?p.legs[0].event+' · '+p.legs[0].selection:p.title)+(p.legs.length>1?' · '+p.legs.length+' selecciones':'');
+  const text=title+'\n'+fit(detail,256-weight(title+'\n\n'+tail))+'\n'+tail;
+  const u=new URL('https://twitter.com/intent/tweet');u.searchParams.set('text',text);u.searchParams.set('url',urlFor(p));return u.href;
+ }
  function wrap(ctx,value,width,maxLines){
   const lines=[];let line='';
   for(const word of clean(value,10000).split(' ')){
@@ -73,8 +113,8 @@
   c.fillStyle=muted;c.font='22px Arial,sans-serif';
   const more=p.legs.length>3?`3 de ${p.legs.length} selecciones · Pick completo en el enlace`:'Pronóstico completo y conversación en el enlace';
   c.fillText(more,90,1038);
-  c.fillStyle='#102b3e';c.fillRect(90,1071,900,122);c.fillStyle='#f4e8db';c.font='22px Arial,sans-serif';c.fillText('CUOTA TOTAL',118,1110);c.font='bold 52px Georgia,serif';c.fillText(p.odds,118,1167);
-  c.font='600 25px Arial,sans-serif';c.textAlign='right';c.fillText(p.review||p.result,960,1140);c.textAlign='left';
+  c.fillStyle='#102b3e';c.fillRect(90,1071,900,122);c.fillStyle='#f4e8db';c.font='22px Arial,sans-serif';c.fillText(p.verified?'CUOTA VERIFICADA':'CUOTA TOTAL',118,1110);c.font='bold 52px Georgia,serif';c.fillText(p.odds,118,1167);
+  c.font='600 25px Arial,sans-serif';c.textAlign='right';c.fillText(p.result,960,1140);if(p.review){c.font='20px Arial,sans-serif';c.fillText(p.review,960,1175);}c.textAlign='left';
   }
   c.fillStyle=muted;c.font='22px Arial,sans-serif';c.fillText(p.date?(p.kind==='take'?'Publicado':'Evento')+' · '+p.date:'El deporte también se debate.',90,1241);
   c.fillStyle=bronze;c.font='600 22px Arial,sans-serif';c.textAlign='right';c.fillText('camsports.github.io',990,1241);c.textAlign='left';
@@ -100,7 +140,7 @@
   const content=make('div',null,'cam-pick-share-content');const actions=make('div',null,'cam-pick-share-networks');actions.setAttribute('aria-label','Opciones para compartir');
   const x=make('a','X','cam-pick-share-network');x.href=xUrl(p);x.target='_blank';x.rel='noopener noreferrer';x.setAttribute('aria-label','Abrir publicación preparada en X');
   const ig=make('button','Instagram','cam-pick-share-network'),tk=make('button','TikTok','cam-pick-share-network');ig.type=tk.type='button';ig.disabled=tk.disabled=true;actions.append(x,ig,tk);
-  const hint=make('p','En Instagram y TikTok eliges la app desde el menú de tu teléfono. Si no aparece, descarga la tarjeta y súbela allí.','cam-pick-share-hint');
+  const hint=make('p','Elige Instagram o TikTok desde el menú de tu teléfono. Si la app solo recibe la imagen, usa «Copiar texto» para añadir el mensaje y el enlace. También puedes descargar la tarjeta.','cam-pick-share-hint');
   const status=make('p','', 'cam-pick-share-status');status.setAttribute('role','status');status.setAttribute('aria-live','polite');
   const download=make('a','Descargar tarjeta','cam-pick-share-download');download.hidden=true;download.download=`cam-sports-${p.kind==='take'?'take':p.kind==='weekly'?'pick-del-dia':'pick'}-${p.id}.png`;
   const linkButton=make('button','Copiar enlace'),textButton=make('button','Copiar texto');linkButton.type=textButton.type='button';
@@ -115,7 +155,7 @@
    if(!file)return;
    let fileSharing=false;try{fileSharing=typeof navigator.share==='function'&&Boolean(navigator.canShare?.({files:[file]}));}catch{}
    if(fileSharing){
-    let sharing;try{sharing=navigator.share({files:[file]});}catch{status.textContent='Descarga la tarjeta y súbela a '+network+'.';return;}
+    let sharing;try{sharing=navigator.share({files:[file],title:headline(p),text:caption(p)});}catch{status.textContent='Descarga la tarjeta y súbela a '+network+'.';return;}
     Promise.resolve(sharing).then(()=>{if(ticket===request)status.textContent='La tarjeta se entregó al menú de compartir. Termina la publicación en la app que elijas.';}).catch(e=>{if(ticket===request)status.textContent=e?.name==='AbortError'?'Puedes volver a compartir cuando quieras.':'Descarga la tarjeta y súbela a '+network+'.';});
    }else status.textContent='Descarga la tarjeta, abre '+network+' y elígela desde tu galería. Puedes copiar el texto con el botón de arriba.';
   };

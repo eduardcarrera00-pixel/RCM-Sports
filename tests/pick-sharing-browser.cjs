@@ -39,7 +39,7 @@ const server=http.createServer((req,res)=>{
   if(width===390)await page.screenshot({path:path.join(qa,'sharing-mobile-'+(dark?'night':'day')+'.png')});
  }
  await page.setViewportSize({width:390,height:880});
- const x=new URL(await page.locator('.cam-pick-share-networks a').getAttribute('href'));assert.equal(x.hostname,'twitter.com');assert.ok(x.searchParams.get('url').startsWith('https://camsports.github.io/?pick='));
+ const x=new URL(await page.locator('.cam-pick-share-networks a').getAttribute('href'));assert.equal(x.hostname,'twitter.com');assert.ok(x.searchParams.get('url').startsWith('https://camsports.github.io/?p='));
  const downloadPromise=page.waitForEvent('download');await page.getByRole('link',{name:'Descargar tarjeta',exact:true}).click();const download=await downloadPromise;await download.saveAs(path.join(qa,'pick-card.png'));
  const png=fs.readFileSync(path.join(qa,'pick-card.png'));assert.equal(png.readUInt32BE(16),1080);assert.equal(png.readUInt32BE(20),1350);
  await page.getByRole('button',{name:'Instagram',exact:true}).click();assert.deepEqual(await page.evaluate(()=>({active:shares[0].active,type:shares[0].type})),{active:true,type:'image/png'});
@@ -50,7 +50,7 @@ const server=http.createServer((req,res)=>{
  await page.evaluate(()=>{const p=document.createElement('dialog');p.id='aeProfileDialog';p.innerHTML='<div id="aeProfilePicks"><article class="ae-profile-pick ae-profile-pick-recent"><h4>Mi Pick</h4><div class="ae-profile-pick-footer"></div><button class="ae-profile-pick-hit" aria-label="Ver Pick completo"></button></article></div>';p.querySelector('.ae-profile-pick-footer').append(CamPickShare.button(window.pick));document.body.append(p);p.showModal();});
  await page.locator('#aeProfilePicks .cam-pick-share-button').click();await page.locator('#camPickShareDialog[open]').waitFor();await page.getByRole('button',{name:'Cerrar',exact:true}).click();
  await page.evaluate(()=>document.getElementById('aeProfileDialog').close());
- await page.evaluate(()=>CamPickShare.open({...window.pick,event_name:'Toronto vs Boston',selection:'Toronto gana'},{kind:'weekly'}));assert.match(await page.locator('#camPickShareTitle').innerText(),/Pick del editor/);assert.match(await page.locator('.cam-pick-share-networks a').getAttribute('href'),/weeklyPick/);
+ await page.evaluate(()=>CamPickShare.open({...window.pick,event_name:'Toronto vs Boston',selection:'Toronto gana'},{kind:'weekly'}));assert.match(await page.locator('#camPickShareTitle').innerText(),/Pick del editor/);assert.ok(new URL(new URL(await page.locator('.cam-pick-share-networks a').getAttribute('href')).searchParams.get('url')).searchParams.has('e'));
  // Exercise the real profile markup/renderers, rather than only an isolated card.
  await page.addInitScript(()=>{
   const owner='00000000-0000-0000-0000-000000000951';
