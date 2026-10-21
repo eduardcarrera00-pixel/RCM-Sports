@@ -88,37 +88,69 @@ function renderPrestige(summary,legendary,champions=[]){
   appendChampionPicks(target,champions);
   target.hidden=activeTab!=='takes';
 }
-/* Campeones elegidos en «¿Quién será campeón?» (suman a la clasificación de Takes). */
+/* Vitrina de campeones: las elecciones de «¿Quién será campeón?» (suman a Takes). */
 const CHAMPION_LEAGUES={laliga:'LaLiga',premier:'Premier League',ligamx:'Liga MX',champions:'Champions',nfl:'NFL',colegial:'Colegial'};
-function championInitials(label){return /^otro\b/i.test(label)?'OTRO':String(label||'').split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase();}
+let nflCrests=null;
+function championInitials(label){return /^otro\b/i.test(label)?'Otro':String(label||'').split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase();}
+function championNorm(v){return String(v||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();}
+function championDay(v){try{return new Intl.DateTimeFormat('es',{day:'numeric',month:'short'}).format(new Date(v)).replace('.','');}catch{return '';}}
+async function loadNflCrests(){
+  if(nflCrests)return nflCrests;
+  try{const r=await db.from('nfl_teams').select('name,logo');nflCrests=new Map((r.error?[]:r.data||[]).map(t=>[championNorm(t.name),t.logo]));}
+  catch{nflCrests=new Map();}
+  return nflCrests;
+}
+function championCrest(c){
+  if(c.competition==='nfl')return nflCrests?.get(championNorm(c.team))||'';
+  return window.aeSeasonPredictions?.crest?.(c.competition,c.team)||'';
+}
 function appendChampionPicks(target,champions){
   if(!Array.isArray(champions)||!champions.length)return;
-  const list=el('ul',null,'ae-profile-champions');
+  const box=el('section',null,'ae-champ-cabinet');
+  box.setAttribute('aria-label',privateView?'Mis campeones':'Campeones elegidos');
+  const head=el('header',null,'ae-champ-head');
+  const won=champions.filter(c=>c.state==='won'),live=champions.filter(c=>c.state==='open'||c.state==='pending');
+  const earned=won.reduce((n,c)=>n+numeric(c.awarded_points),0);
+  const tally=el('p',null,'ae-champ-tally');
+  if(live.length)tally.append(el('span',live.length===1?'1 en juego':live.length+' en juego'));
+  if(won.length)tally.append(el('span',(won.length===1?'1 acierto':won.length+' aciertos')+', +'+earned+' pts','is-won'));
+  head.append(el('h3',privateView?'Mis campeones':'Campeones elegidos'),tally);
+  box.append(head);
+  const list=el('ul',null,'ae-champ-shelf');
+  const crests=[];
   for(const c of champions){
-    const li=el('li',null,'ae-profile-champion is-'+(c.state||'open'));
-    const crest=el('span',null,'ae-profile-champion-crest');
-    crest.setAttribute('aria-hidden','true');
-    crest.append(el('span',championInitials(c.team)));
-    const logo=window.aeSeasonPredictions?.crest?.(c.competition,c.team);
-    if(logo){
-      const img=el('img');img.src=logo;img.alt='';img.width=40;img.height=40;img.loading='lazy';img.decoding='async';
-      img.addEventListener('load',()=>crest.classList.add('is-loaded'));
-      img.addEventListener('error',()=>img.remove());
-      crest.append(img);
-    }
-    const copy=el('div',null,'ae-profile-champion-copy');
-    copy.append(el('small',(CHAMPION_LEAGUES[c.competition]||c.competition||'')+(c.season?' '+c.season:'')),el('strong',c.team||'—'));
-    const pts=numeric(c.points);
-    const result=c.state==='won'?'Acertó · +'+numeric(c.awarded_points)+' pts en Takes'
-      :c.state==='lost'?'No fue'+(c.winner?' · campeón: '+c.winner:'')
-      :c.state==='pending'?'Cerrada · +'+pts+' pts si acierta'
-      :'+'+pts+' pts si acierta';
-    copy.append(el('span',result));
-    li.append(crest,copy);
-    if(c.state==='won'||c.state==='lost')li.append(el('em',c.state==='won'?'Acierto':'Fallo','ae-profile-champion-badge'));
+    const state=c.state||'open';
+    const li=el('li',null,'ae-champ is-'+state);
+    const medal=el('div',null,'ae-champ-medal');
+    medal.append(el('span',championInitials(c.team),'ae-champ-initials'));
+    if(state==='won'){const seal=el('span','✓','ae-champ-seal');seal.setAttribute('aria-hidden','true');medal.append(seal);}
+    crests.push([medal,c]);
+    const league=el('p',(CHAMPION_LEAGUES[c.competition]||c.competition||'')+(c.season?' '+c.season:''),'ae-champ-league');
+    const team=el('strong',c.team||'—','ae-champ-team');
+    const pts=numeric(state==='won'?c.awarded_points:c.points);
+    const score=el('p',null,'ae-champ-score');
+    score.append(el('b','+'+pts),el('span',state==='won'?'pts ganados':state==='lost'?'pts en juego':'pts si acierta'));
+    const foot=el('p',
+      state==='won'?'Campeón confirmado':
+      state==='lost'?(c.winner?'Campeón: '+c.winner:'No fue esta vez'):
+      state==='pending'?'Esperando al campeón':
+      'Se cierra el '+championDay(c.closes_at),'ae-champ-foot');
+    li.append(medal,league,team,score,foot);
+    li.setAttribute('aria-label',(CHAMPION_LEAGUES[c.competition]||'')+': '+(c.team||'')+'. '+foot.textContent+'.');
     list.append(li);
   }
-  target.append(el('h3',privateView?'Mis campeones':'Campeones elegidos','ae-profile-list-heading'),list);
+  box.append(list);
+  target.append(box);
+  const paint=()=>{for(const [medal,c] of crests){
+    if(medal.querySelector('img'))continue;
+    const src=championCrest(c);if(!src)continue;
+    const img=el('img');img.src=src;img.alt='';img.width=56;img.height=56;img.loading='lazy';img.decoding='async';
+    img.addEventListener('load',()=>medal.classList.add('is-loaded'));
+    img.addEventListener('error',()=>img.remove());
+    medal.append(img);
+  }};
+  paint();
+  if(champions.some(c=>c.competition==='nfl')&&!nflCrests)loadNflCrests().then(paint);
 }
 async function loadPrestige(userId){
   const target=$('aeProfilePrestige');

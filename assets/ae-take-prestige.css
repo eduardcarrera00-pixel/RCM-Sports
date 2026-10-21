@@ -33,29 +33,63 @@ html.dark #aeProfileDialog .ae-profile-prestige .ae-profile-list-heading{color:#
 html.dark #aeProfileDialog .ae-profile-medal{border-color:rgba(207,165,117,.35);background:rgba(9,32,46,.55)}
 html.dark #aeProfileDialog .ae-profile-medal-copy small{color:#e2b65d}
 
-/* Campeones elegidos («¿Quién será campeón?») dentro del perfil de prestigio. */
-#aeProfileDialog .ae-profile-champions{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
-#aeProfileDialog .ae-profile-champion{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:11px;align-items:center;padding:10px 11px;border:1px solid rgba(197,163,128,.45);background:rgba(255,250,241,.75)}
-#aeProfileDialog .ae-profile-champion-crest{position:relative;width:40px;height:40px;display:grid;place-items:center}
-#aeProfileDialog .ae-profile-champion-crest>span{font:800 10px/1 Inter,system-ui,sans-serif;letter-spacing:.06em;color:#855a38}
-#aeProfileDialog .ae-profile-champion-crest img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
-#aeProfileDialog .ae-profile-champion-crest.is-loaded>span{visibility:hidden}
-#aeProfileDialog .ae-profile-champion-copy{display:flex;flex-direction:column;gap:2px;min-width:0}
-#aeProfileDialog .ae-profile-champion-copy small{font:800 8.5px/1.2 Inter,system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#855a38}
-#aeProfileDialog .ae-profile-champion-copy strong{font:600 16px/1.2 Newsreader,Georgia,serif;color:#213c4e;overflow-wrap:anywhere}
-#aeProfileDialog .ae-profile-champion-copy span{font:10.5px/1.4 Inter,system-ui,sans-serif;color:#586975}
-#aeProfileDialog .ae-profile-champion-badge{font:800 8.5px/1 Inter,system-ui,sans-serif;font-style:normal;letter-spacing:.1em;text-transform:uppercase;padding:5px 7px;border:1px solid currentColor}
-#aeProfileDialog .ae-profile-champion.is-won .ae-profile-champion-badge{color:#2f6b4a}
-#aeProfileDialog .ae-profile-champion.is-lost{opacity:.78}
-#aeProfileDialog .ae-profile-champion.is-lost .ae-profile-champion-badge{color:#8a4b3b}
-html.dark #aeProfileDialog .ae-profile-champion{border-color:rgba(207,165,117,.35);background:rgba(9,32,46,.55)}
-html.dark #aeProfileDialog .ae-profile-champion-copy small,html.dark #aeProfileDialog .ae-profile-champion-crest>span{color:#d2ab82}
-html.dark #aeProfileDialog .ae-profile-champion-copy strong{color:#fff0dd}
-html.dark #aeProfileDialog .ae-profile-champion-copy span{color:#c8d2d4}
-html.dark #aeProfileDialog .ae-profile-champion.is-won .ae-profile-champion-badge{color:#8fd3ab}
-html.dark #aeProfileDialog .ae-profile-champion.is-lost .ae-profile-champion-badge{color:#e6a08d}
+/* Vitrina de campeones: cada elección es un escudo sobre su pedestal, con su placa debajo. */
+/* Geometría recta como el resto del sitio (ae-all-square-corners.css): escudo enmarcado sobre una peana de bronce. */
+#aeProfileDialog .ae-champ-cabinet{margin-top:20px;padding-top:16px;border-top:1px solid rgba(197,163,128,.35)}
+#aeProfileDialog .ae-champ-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 14px;margin-bottom:14px}
+#aeProfileDialog .ae-champ-head h3{margin:0;font:600 21px/1.1 Newsreader,Georgia,serif;color:#213d50}
+#aeProfileDialog .ae-champ-tally{display:flex;gap:6px;margin:0}
+#aeProfileDialog .ae-champ-tally span{padding:4px 9px;font:600 11px/1.2 Inter,system-ui,sans-serif;color:#7a5333;background:rgba(193,127,59,.12)}
+#aeProfileDialog .ae-champ-tally span.is-won{color:#2d5f43;background:rgba(61,128,90,.13)}
+#aeProfileDialog .ae-champ-shelf{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:12px}
+#aeProfileDialog .ae-champ{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;padding:16px 12px 13px;
+  background:linear-gradient(180deg,#fffdf8 0%,#fbf3e6 62%,#f3e6d2 100%);border:1px solid rgba(197,163,128,.5);box-shadow:0 1px 0 #fff inset,0 6px 14px -10px rgba(85,58,30,.45)}
+#aeProfileDialog .ae-champ-medal{position:relative;width:78px;height:78px;display:grid;place-items:center;margin-bottom:19px;
+  background:radial-gradient(circle at 50% 38%,#fff 0 52%,#f5ead9 74%);box-shadow:0 0 0 1px rgba(168,115,45,.35),0 0 0 5px #fbf3e6,0 0 0 6px rgba(168,115,45,.28)}
+#aeProfileDialog .ae-champ-medal::after{content:"";position:absolute;left:50%;bottom:-11px;width:50px;height:4px;transform:translateX(-50%);background:linear-gradient(90deg,#b98a52,#e2c08f 50%,#b98a52);box-shadow:0 3px 6px -2px rgba(85,58,30,.4)}
+#aeProfileDialog .ae-champ-medal img{position:absolute;inset:11px;width:56px;height:56px;object-fit:contain}
+#aeProfileDialog .ae-champ-initials{font:600 17px/1 Newsreader,Georgia,serif;color:#855a38}
+#aeProfileDialog .ae-champ-medal.is-loaded .ae-champ-initials{visibility:hidden}
+#aeProfileDialog .ae-champ-seal{position:absolute;top:-6px;right:-6px;width:22px;height:22px;display:grid;place-items:center;font:700 12px/1 Inter,system-ui,sans-serif;color:#fff;
+  background:radial-gradient(circle at 35% 30%,#f3d58c,#c08a35 70%);box-shadow:0 0 0 2px #fffdf8}
+#aeProfileDialog .ae-champ-league{margin:0;font:600 10.5px/1.3 Inter,system-ui,sans-serif;letter-spacing:.02em;color:#8a6240}
+#aeProfileDialog .ae-champ-team{margin:3px 0 10px;font:600 17px/1.15 Newsreader,Georgia,serif;color:#213c4e;overflow-wrap:anywhere}
+#aeProfileDialog .ae-champ-score{display:flex;align-items:baseline;gap:5px;margin:auto 0 0;padding-top:9px;width:100%;justify-content:center;border-top:1px dashed rgba(168,115,45,.35)}
+#aeProfileDialog .ae-champ-score b{font:600 24px/1 Newsreader,Georgia,serif;color:#9a6a30;font-variant-numeric:lining-nums}
+#aeProfileDialog .ae-champ-score span{font:500 11px/1.2 Inter,system-ui,sans-serif;color:#6a7680}
+#aeProfileDialog .ae-champ-foot{margin:6px 0 0;font:11px/1.35 Inter,system-ui,sans-serif;color:#6a7680}
+#aeProfileDialog .ae-champ.is-won{border-color:rgba(192,138,53,.75);background:linear-gradient(180deg,#fffaf0 0%,#f8ebcf 70%,#f1dcb1 100%)}
+#aeProfileDialog .ae-champ.is-won .ae-champ-medal{box-shadow:0 0 0 1px rgba(168,115,45,.6),0 0 0 5px #f8ebcf,0 0 0 7px #d4a54e}
+#aeProfileDialog .ae-champ.is-won .ae-champ-score b{color:#2f6b4a}
+#aeProfileDialog .ae-champ.is-won .ae-champ-foot{color:#2f6b4a;font-weight:600}
+#aeProfileDialog .ae-champ.is-lost .ae-champ-medal img,#aeProfileDialog .ae-champ.is-lost .ae-champ-initials{filter:grayscale(1);opacity:.5}
+#aeProfileDialog .ae-champ.is-lost .ae-champ-team{color:#6a7680}
+#aeProfileDialog .ae-champ.is-lost .ae-champ-score b{color:#9aa3a9;text-decoration:line-through;text-decoration-thickness:1px}
+
+html.dark #aeProfileDialog .ae-champ-cabinet{border-top-color:rgba(207,165,117,.22)}
+html.dark #aeProfileDialog .ae-champ-head h3{color:#f1d5b3}
+html.dark #aeProfileDialog .ae-champ-tally span{color:#e3c29c;background:rgba(213,158,94,.14)}
+html.dark #aeProfileDialog .ae-champ-tally span.is-won{color:#9fdcb8;background:rgba(95,180,130,.14)}
+html.dark #aeProfileDialog .ae-champ{background:linear-gradient(180deg,rgba(28,62,80,.9) 0%,rgba(13,40,56,.92) 100%);border-color:rgba(207,165,117,.3);box-shadow:0 1px 0 rgba(255,255,255,.05) inset,0 8px 16px -12px rgba(0,0,0,.7)}
+html.dark #aeProfileDialog .ae-champ-medal{background:radial-gradient(circle at 50% 38%,#fbf6ee 0 52%,#e7dccb 76%);box-shadow:0 0 0 1px rgba(207,165,117,.5),0 0 0 5px #143447,0 0 0 6px rgba(207,165,117,.35)}
+html.dark #aeProfileDialog .ae-champ-medal::after{background:linear-gradient(90deg,#9c7442,#e2c08f 50%,#9c7442);box-shadow:0 3px 6px -2px rgba(0,0,0,.6)}
+html.dark #aeProfileDialog .ae-champ-seal{box-shadow:0 0 0 2px #143447}
+html.dark #aeProfileDialog .ae-champ-league{color:#d2ab82}
+html.dark #aeProfileDialog .ae-champ-team{color:#fff0dd}
+html.dark #aeProfileDialog .ae-champ-score{border-top-color:rgba(207,165,117,.28)}
+html.dark #aeProfileDialog .ae-champ-score b{color:#e2b65d}
+html.dark #aeProfileDialog .ae-champ-score span,html.dark #aeProfileDialog .ae-champ-foot{color:#b9c6c9}
+html.dark #aeProfileDialog .ae-champ.is-won{border-color:rgba(226,182,93,.6);background:linear-gradient(180deg,rgba(60,62,46,.9),rgba(30,44,40,.92))}
+html.dark #aeProfileDialog .ae-champ.is-won .ae-champ-medal{box-shadow:0 0 0 1px rgba(226,182,93,.7),0 0 0 5px #24372f,0 0 0 7px #d4a54e}
+html.dark #aeProfileDialog .ae-champ.is-won .ae-champ-score b,html.dark #aeProfileDialog .ae-champ.is-won .ae-champ-foot{color:#9fdcb8}
+html.dark #aeProfileDialog .ae-champ.is-lost .ae-champ-team{color:#93a3a8}
+html.dark #aeProfileDialog .ae-champ.is-lost .ae-champ-score b{color:#7f8f94}
 
 @media (max-width:420px){
+  #aeProfileDialog .ae-champ-shelf{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+  #aeProfileDialog .ae-champ{padding:14px 9px 11px}
+  #aeProfileDialog .ae-champ-medal{width:66px;height:66px}
+  #aeProfileDialog .ae-champ-medal img{inset:9px;width:48px;height:48px}
   #aeProfileDialog .ae-profile-prestige-stats{grid-template-columns:1fr}
   #aeProfileDialog .ae-profile-prestige-stat{display:grid;grid-template-columns:5.5rem minmax(0,1fr);grid-template-areas:"label value" "label detail";column-gap:10px;row-gap:2px;align-items:baseline}
   #aeProfileDialog .ae-profile-prestige-stat span{grid-area:label;align-self:center}
