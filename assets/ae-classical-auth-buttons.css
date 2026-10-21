@@ -1924,7 +1924,7 @@ html body #camWelcomeDialog::backdrop{background:rgba(4,14,24,.72);backdrop-filt
 html body #camWelcomeDialog .cam-welcome-frame{
   position:relative;min-height:0;border:0!important;overflow:hidden;
   background-color:#102431!important;
-  background-image:linear-gradient(180deg,rgba(3,15,25,.25) 0%,rgba(4,16,27,.48) 30%,rgba(6,19,28,.56) 72%,rgba(3,13,20,.66) 100%),url('cam-welcome-noche-fast.webp')!important;
+  background-image:linear-gradient(180deg,rgba(3,15,25,.25) 0%,rgba(4,16,27,.48) 30%,rgba(6,19,28,.56) 72%,rgba(3,13,20,.66) 100%),url('cam-welcome-noche-sharp.webp')!important;
   background-size:cover,cover!important;background-position:center,center!important;background-repeat:no-repeat!important;
 }
 html body #camWelcomeDialog .cam-welcome-top{
@@ -2050,7 +2050,7 @@ html:not(.dark) body dialog#camWelcomeDialog[open]{
 }
 html:not(.dark) body #camWelcomeDialog .cam-welcome-frame{
   background-color:#e9d9bd!important;
-  background-image:linear-gradient(180deg,rgba(255,245,222,.62) 0%,rgba(255,248,229,.72) 30%,rgba(252,238,209,.53) 67%,rgba(244,221,183,.46) 100%),url('cam-welcome-dia-fast.webp')!important;
+  background-image:linear-gradient(180deg,rgba(255,245,222,.62) 0%,rgba(255,248,229,.72) 30%,rgba(252,238,209,.53) 67%,rgba(244,221,183,.46) 100%),url('cam-welcome-dia-sharp.webp')!important;
 }
 html:not(.dark) body #camWelcomeDialog #camWelcomeTitle{
   color:#172a32!important;text-shadow:0 2px 10px rgba(255,255,255,.75)!important;
@@ -2738,4 +2738,15 @@ html:not(.dark) body #userAuthModal .cam-auth-welcome-again:focus-visible{outlin
   html body #userAuthModal .cam-auth-welcome-again{min-height:27px;margin-top:9px;padding:5px 10px;font-size:9px;}
   /* La marca y el botón arriba; el titular sigue al pie de la imagen. */
   html body #userAuthModal .cam-auth-welcome-again + .cam-auth-story-message{margin-top:auto!important;}
+}
+
+/* CAM SPORTS · Fondos nítidos: la frase del pórtico cae sobre la ciudad pintada.
+   Un halo suave del color del cielo la mantiene legible sin tapar la ilustración. */
+html body #userAuthModal .cam-auth-story-message>p:last-child{
+  font-weight:600!important;
+  text-shadow:0 0 2px rgba(3,13,22,.95),0 1px 10px rgba(3,13,22,.9),0 0 22px rgba(3,13,22,.7)!important;
+}
+html:not(.dark) body #userAuthModal .cam-auth-story-message>p:last-child{
+  color:#2f2620!important;
+  text-shadow:0 0 2px rgba(255,249,236,.98),0 1px 10px rgba(255,248,232,.95),0 0 22px rgba(255,246,226,.85)!important;
 }
