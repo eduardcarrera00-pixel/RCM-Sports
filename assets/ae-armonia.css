@@ -598,7 +598,9 @@ html:not(#ds):not(#ds):not(#ds) body [id^="aeNewsSportTrack"] h3.text-base{
 html body.ae-is-home #aeHomeTakeHighlights > .ae-home-take-extras > #aeHomeTakesSectionHeading {
   display:flex!important;
   justify-content:flex-start!important;
-  align-items:flex-start!important;
+  align-items:stretch!important;
+  grid-column:1 / -1!important;
+  min-width:0!important;
   width:100%!important;
   margin:0 0 12px!important;
   padding:0!important;
@@ -609,7 +611,10 @@ html body.ae-is-home #aeHomeTakeHighlights > .ae-home-take-extras > #aeHomeTakes
 html body.ae-is-home #aeHomeTakeHighlights > .ae-home-take-extras > #aeHomeTakesSectionHeading #aeHomeTopTakesTitle {
   margin:0!important;
   padding:0!important;
-  width:auto!important;
+  display:block!important;
+  flex:1 1 100%!important;
+  min-width:0!important;
+  width:100%!important;
   max-width:100%!important;
   line-height:1!important;
 }
@@ -617,19 +622,21 @@ html:not(#ds):not(#ds):not(#ds) body.ae-is-home #aeHomeTakeHighlights #aeHomeTak
   box-sizing:border-box!important;
   position:relative!important;
   display:grid!important;
-  grid-template-rows:auto 1fr auto!important;
-  justify-items:start!important;
+  grid-template-columns:34px minmax(0,1fr) 24px!important;
+  grid-template-rows:minmax(0,1fr)!important;
+  gap:16px!important;
+  justify-items:stretch!important;
   align-items:center!important;
   flex:none!important;
-  width:198px!important;
-  height:198px!important;
+  width:100%!important;
+  height:99px!important;
   min-width:0!important;
-  min-height:198px!important;
+  min-height:99px!important;
   max-width:100%!important;
   margin:0!important;
-  padding:18px!important;
+  padding:16px 20px!important;
   overflow:hidden!important;
-  aspect-ratio:1!important;
+  aspect-ratio:auto!important;
   border:1px solid rgba(210,167,115,.67)!important;
   border-radius:0!important;
   background:linear-gradient(145deg,#253e50 0%,#142b3c 58%,#0d2232 100%)!important;
@@ -654,13 +661,15 @@ html body.ae-is-home #aeHomeTakeHighlights #aeHomeTakePublish .cam-home-take-squ
 }
 html body.ae-is-home #aeHomeTakeHighlights #aeHomeTakePublish .cam-home-take-square-label {
   display:block!important;
+  min-width:0!important;
   max-width:100%!important;
   align-self:center!important;
   color:inherit!important;
   font:600 25px/1.13 Newsreader,Georgia,serif!important;
   letter-spacing:-.02em!important;
   text-transform:none!important;
-  overflow-wrap:break-word!important;
+  overflow-wrap:normal!important;
+  word-break:normal!important;
 }
 html body.ae-is-home #aeHomeTakeHighlights #aeHomeTakePublish .cam-home-take-square-arrow {
   display:block!important;
@@ -692,13 +701,15 @@ html:not(.dark) body.ae-is-home #aeHomeTakeHighlights #aeHomeTakePublish .cam-ho
 }
 @media(max-width:760px){
   html:not(#ds):not(#ds):not(#ds) body.ae-is-home #aeHomeTakeHighlights #aeHomeTakesSectionHeading button#aeHomeTakePublish.cam-home-take-square {
-    width:166px!important;
-    height:166px!important;
-    min-height:166px!important;
-    padding:14px!important;
+    width:100%!important;
+    height:83px!important;
+    min-height:83px!important;
+    grid-template-columns:30px minmax(0,1fr) 18px!important;
+    gap:10px!important;
+    padding:12px 14px!important;
   }
   html body.ae-is-home #aeHomeTakeHighlights #aeHomeTakePublish .cam-home-take-square-label {
-    font-size:21px!important;
+    font-size:19px!important;
   }
   html body.ae-is-home #aeHomeTakeHighlights #aeHomeTakePublish .cam-home-take-square-icon {
     width:30px!important;
