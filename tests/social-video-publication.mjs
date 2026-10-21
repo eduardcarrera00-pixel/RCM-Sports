@@ -14,7 +14,7 @@ create view vault.decrypted_secrets as select * from vault.secrets;
 create schema net;
 create table net.calls(id bigint generated always as identity primary key,body jsonb);
 create table net.checks(id bigint generated always as identity (start with 1000) primary key,url text,headers jsonb);
-create table net._http_response(id bigint,status_code int,timed_out boolean,error_msg text,content text,headers jsonb);
+create table net._http_response(id bigint,status_code int,timed_out boolean,error_msg text,content text,headers jsonb,content_type text);
 create function net.http_post(url text,body jsonb,headers jsonb,timeout_milliseconds int) returns bigint language plpgsql as $$
 declare n bigint; begin insert into net.calls(body) values(body) returning id into n; return n; end $$;
 create function net.http_get(url text,headers jsonb,timeout_milliseconds int) returns bigint language plpgsql as $$
@@ -30,6 +30,7 @@ create table public.champions_clubs(id text,season text,name text);
 `);
 await db.exec(fs.readFileSync('supabase/19_cam_social_publication.sql', 'utf8'));
 await db.exec(fs.readFileSync('supabase/20_cam_social_tiktok_music.sql', 'utf8'));
+await db.exec(fs.readFileSync('supabase/21_cam_social_tiktok_mime_fallback.sql', 'utf8'));
 await db.exec("insert into cam_social.channels(network,channel_id) values('twitter','test-x'),('tiktok','test-tiktok')");
 await db.exec("insert into vault.secrets values('cam_buffer_api_key','TEST_ONLY'); update cam_social.settings set enabled=true,activated_at=now()-interval '1 minute';");
 const id = '00000000-0000-0000-0000-000000000991';
@@ -55,7 +56,7 @@ assert.equal(jobs[0].event_key, 'article:' + id);
 assert.equal(jobs[0].title, 'Victoria del Barça');
 
 // A missing MP4 must never be posted as a TikTok photo.
-await db.query('insert into net._http_response values($1,404,false,null,$2,$3)', [
+await db.query('insert into net._http_response(id,status_code,timed_out,error_msg,content,headers) values($1,404,false,null,$2,$3)', [
   check.id, 'Not found', { 'content-type': 'text/html' }
 ]);
 await db.exec("update cam_social.deliveries set available_at=now() where network='tiktok'; select cam_social.dispatch();");
@@ -64,8 +65,8 @@ assert.equal(await scalar('select count(*)::int from net.calls'), 1);
 await db.exec("update cam_social.deliveries set available_at=now() where network='tiktok'; select cam_social.dispatch();");
 const second = (await one('select * from net.checks order by id desc limit 1'))[0];
 assert.notEqual(second.id, check.id);
-await db.query('insert into net._http_response values($1,206,false,null,$2,$3)', [
-  second.id, '', { 'content-type': 'video/mp4' }
+await db.query('insert into net._http_response(id,status_code,timed_out,error_msg,content,headers) values($1,206,false,null,$2,$3)', [
+  second.id, '', { 'Content-Type': 'video/mp4' }
 ]);
 await db.exec("update cam_social.deliveries set available_at=now() where network='tiktok'; select cam_social.dispatch();");
 const calls = await one('select * from net.calls order by id');
