@@ -288,7 +288,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
     </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
-<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261020-chef-parchment-mobile-1">
+<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261021-settle-history-1">
 <link rel="stylesheet" href="assets/cam-analytics.css?v=20261020-1">
     <link rel="stylesheet" href="assets/ae-muted-navigation-icons.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-custom-nav-icons.css?v=20261016-1">
@@ -2102,8 +2102,9 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
               <section id="cpModeration" class="ae-picks-top-three" hidden aria-labelledby="cpModerationTitle">
                 <h3 id="cpModerationTitle">Administrar cuotas</h3><p>Revisa las cuotas cuando corresponda; la comunidad puede votar y comentar mientras tanto.</p>
                 <div id="cpPending"></div>
-                <h4 class="ae-admin-settlement-title">Confirmar resultados terminados</h4><p class="ae-admin-settlement-hint">Los resultados claros se verifican solos cada pocas horas con los marcadores oficiales. Aquí quedan los que siguen en espera y los que necesitan tu revisión; los puntos se actualizan en el ranking al confirmar.</p><div id="cpSettleList" role="region" aria-label="Picks pendientes de resultado"></div>
+                <h4 class="ae-admin-settlement-title">Confirmar resultados terminados</h4><p class="ae-admin-settlement-hint">Los resultados se verifican solos cada pocas horas con los marcadores oficiales. Aquí solo aparecen los que el sistema no pudo confirmar; los puntos se actualizan en el ranking al confirmar.</p><div id="cpSettleList" role="region" aria-label="Picks pendientes de resultado"></div>
                 <p id="cpAdminStatus" role="status"></p>
+                <h4 class="ae-admin-settlement-title">Historial de resultados</h4><p class="ae-admin-settlement-hint">Picks ya resueltos, del más reciente al más antiguo.</p><div id="cpSettleHistory" role="region" aria-label="Historial de Picks resueltos"></div>
               </section>
             </aside>
               <div class="ae-chefs-dual-standings ae-chefs-classical" role="group" aria-label="Clasificaciones de Mejores y Peores Chefs">
@@ -4576,7 +4577,7 @@ updateThemeButton();
 <script src="assets/champions.js?v=qa1-20261015-6"></script>
 <script src="assets/ae-pick-capture-parser.js?v=20261020-playdoit-momios-1"></script>
 <script src="assets/ae-pick-capture.js?v=20261020-auto-settle-1"></script>
-<script src="assets/community-picks.js?v=20261020-chef-parchment-b-1"></script>
+<script src="assets/community-picks.js?v=20261021-settle-history-1"></script>
 <script src="assets/weekly-picks.js?v=20261015-1"></script>
 <script src="assets/username-auth.js?v=20261020-classical-auth-panel-1"></script>
 <script src="assets/ae-category-visibility.js?v=20261016-dynamic-nav-1"></script>

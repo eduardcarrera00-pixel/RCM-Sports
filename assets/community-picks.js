@@ -248,7 +248,7 @@ async function load(){
    feedEl.scrollTop=previousScroll;
    $('cpStatus').textContent=feed.data?.length?'':'Todavía no hay Picks. Comparte el primero.';
    loaded=true;
-   await Promise.all([loadRanking(),loadWorstRanking(),loadModeration(),loadChefLists(),loadSettlement()]);
+   await Promise.all([loadRanking(),loadWorstRanking(),loadModeration(),loadChefLists(),loadSettlement(),loadSettleHistory()]);
  }catch(e){if(seq!==request)return;const footer=$('cpFeedFooter');$('cpFeed').replaceChildren(footer);sizeFeedWindow();$('cpStatus').textContent='No pudimos cargar los Picks. '+message(e);}
 }
 let currentRank='month';
@@ -589,16 +589,22 @@ async function loadSettlement(){
    .eq('outcome','pending').or('event_date.lte.'+todayToronto()+',event_date.is.null')
    .order('created_at',{ascending:true}).limit(100);
  if(r.error){area.append(el('p','No pudimos cargar los resultados pendientes. '+message(r.error)));return;}
- if(!r.data?.length){area.append(el('p','No hay eventos pendientes de verificación.'));return;}
- // La verificación automática liquida lo claro; aquí quedan los Picks en espera o que necesitan revisión.
+ if(!r.data?.length){area.append(el('p','No hay resultados que necesiten tu revisión.'));return;}
  const checks=new Map();
  try{
   const c=await db.from('ae_pick_settlement_checks').select('pick_id,status,suggested_outcome,reason,last_checked_at').in('pick_id',r.data.map(p=>p.id));
   for(const row of c.data||[])checks.set(row.pick_id,row);
  }catch{}
  const labels={won:'Acertó',lost:'Falló',void:'Anulado'};
- const rank=p=>checks.get(p.id)?.status==='needs_review'?0:1;
- for(const p of [...r.data].sort((a,b)=>rank(a)-rank(b))){
+ // Lo que la verificación automática todavía puede confirmar no se muestra al admin.
+ // Solo quedan: los que necesitan revisión, los antiguos sin fecha y, como red de
+ // seguridad si la verificación se detiene, los que llevan más de 3 días esperando.
+ const stale=shiftDay(todayToronto(),-3);
+ const needsAdmin=p=>!p.event_date||checks.get(p.id)?.status==='needs_review'||p.event_date<=stale;
+ const review=r.data.filter(needsAdmin),waiting=r.data.length-review.length;
+ if(!review.length)area.append(el('p','No hay resultados que necesiten tu revisión.'));
+ if(waiting)area.append(el('p',waiting===1?'1 Pick en espera: la verificación automática lo confirmará cuando termine el partido.':waiting+' Picks en espera: la verificación automática los confirmará cuando terminen los partidos.','ae-pick-settle-waiting'));
+ for(const p of review){
   const entry=el('article',null,'ae-pick-settle-entry');
   const check=checks.get(p.id);
   entry.append(el('strong',p.title),el('small',p.author+' · '+(p.event_date?'Evento '+p.event_date:'Pick antiguo sin fecha · verifica que terminó')+' · '+p.american_odds));
@@ -621,7 +627,45 @@ async function loadSettlement(){
   area.append(entry);
  }
 }
-window.updateAePicksAdmin=()=>{loadModeration();loadSettlement();};
+function shiftDay(day,days){return new Date(Date.parse(day+'T12:00:00Z')+days*86400000).toISOString().slice(0,10);}
+var settleHistoryPage=0;
+async function loadSettleHistory(more=false){
+ const area=$('cpSettleHistory');if(!area)return;
+ const admin=typeof currentAdmin!=='undefined'&&Boolean(currentAdmin);
+ if(!admin){area.replaceChildren();return;}
+ const size=20;settleHistoryPage=more?settleHistoryPage+1:0;
+ const r=await db.from('ae_pick_feed').select('id,title,author,event_date,american_odds,outcome,settled_at,result_points')
+   .in('outcome',['won','lost','void']).order('settled_at',{ascending:false,nullsFirst:false})
+   .range(settleHistoryPage*size,settleHistoryPage*size+size);
+ if(!more)area.replaceChildren();
+ area.querySelector('.ae-history-more')?.remove();
+ if(r.error){area.append(el('p','No pudimos cargar el historial. '+message(r.error)));return;}
+ const rows=(r.data||[]).slice(0,size);
+ if(!rows.length&&!more){area.append(el('p','Todavía no hay Picks resueltos.'));return;}
+ const auto=new Set();
+ try{
+  const c=await db.from('ae_pick_settlement_checks').select('pick_id').eq('status','settled').in('pick_id',rows.map(p=>p.id));
+  for(const row of c.data||[])auto.add(row.pick_id);
+ }catch{}
+ let list=area.querySelector('ol');
+ if(!list){list=el('ol',null,'ae-pick-history-list');area.append(list);}
+ const labels={won:'Acertó',lost:'Falló',void:'Anulado'};
+ const when=t=>t?new Date(t).toLocaleDateString('es-MX',{day:'numeric',month:'short',timeZone:'America/Toronto'}):'';
+ for(const p of rows){
+  const li=el('li',null,'ae-pick-history-entry');li.dataset.outcome=p.outcome;
+  const head=el('div',null,'ae-pick-history-head');
+  head.append(el('strong',p.title),el('span',labels[p.outcome],'ae-pick-history-badge'));
+  const pts=p.outcome==='won'&&p.result_points!=null?' · +'+Number(p.result_points).toFixed(2)+' pts':'';
+  li.append(head,el('small',p.author+' · '+(p.event_date?'Evento '+p.event_date:'Sin fecha')+' · '+p.american_odds+pts),
+   el('small',(auto.has(p.id)?'Verificado automáticamente':'Confirmado por un admin')+(p.settled_at?' · '+when(p.settled_at):''),'ae-pick-history-source'));
+  list.append(li);
+ }
+ if((r.data||[]).length>size){
+  const b=button('Ver más resultados',()=>{b.disabled=true;loadSettleHistory(true);});
+  b.className='ae-history-more';area.append(b);
+ }
+}
+window.updateAePicksAdmin=()=>{loadModeration();loadSettlement();loadSettleHistory();};
 
 function field(label,type='text'){const wrap=el('label',label);const input=el(type==='textarea'?'textarea':'input');if(type!=='textarea')input.type=type;input.required=true;wrap.append(input);return {wrap,input};}
 function buildComposer(){

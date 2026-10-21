@@ -184,3 +184,33 @@ html body #footballTakes #picksNews .ae-picks-news-feature,
 html body #footballTakes #picksNews .ae-picks-news-feature .ae-picks-news-open{
  border-radius:9px!important;
 }
+
+/* Admin: aviso de Picks en espera e historial de resultados. */
+html body .ae-pick-settle-waiting{
+  margin:6px 0 10px!important;
+  font:500 12px/1.5 Inter,system-ui,sans-serif!important;
+  opacity:.82!important;
+}
+html body .ae-pick-history-list{list-style:none!important;margin:8px 0 0!important;padding:0!important;}
+html body .ae-pick-history-entry{
+  display:flex!important;flex-direction:column!important;gap:3px!important;
+  padding:11px 0 11px 12px!important;
+  border-bottom:1px solid rgba(189,148,117,.28)!important;
+  border-left:3px solid #49606c!important;
+}
+html body .ae-pick-history-entry[data-outcome="won"]{border-left-color:#7fae8a!important;}
+html body .ae-pick-history-entry[data-outcome="lost"]{border-left-color:#c97f6b!important;}
+html body .ae-pick-history-head{display:flex!important;justify-content:space-between!important;align-items:baseline!important;gap:10px!important;}
+html body .ae-pick-history-head strong{font:700 14px/1.35 Inter,system-ui,sans-serif!important;overflow-wrap:anywhere!important;}
+html body .ae-pick-history-badge{
+  flex:none!important;padding:2px 8px!important;border:1px solid currentColor!important;border-radius:2px!important;
+  font:800 11px/1.4 Inter,system-ui,sans-serif!important;color:#c5cdd1!important;
+}
+html body .ae-pick-history-entry[data-outcome="won"] .ae-pick-history-badge{color:#9fd0aa!important;}
+html body .ae-pick-history-entry[data-outcome="lost"] .ae-pick-history-badge{color:#eea894!important;}
+html body .ae-pick-history-entry small{font:500 12px/1.45 Inter,system-ui,sans-serif!important;opacity:.85!important;}
+html body .ae-pick-history-source{opacity:.65!important;}
+html:not(.dark) body .ae-pick-history-entry[data-outcome="won"] .ae-pick-history-badge{color:#2f6b3d!important;}
+html:not(.dark) body .ae-pick-history-entry[data-outcome="lost"] .ae-pick-history-badge{color:#9a3f2a!important;}
+html:not(.dark) body .ae-pick-history-badge{color:#4b5d66!important;}
+html:not(.dark) body .ae-pick-history-entry{border-bottom-color:rgba(130,91,64,.22)!important;}
