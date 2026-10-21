@@ -1,0 +1,48 @@
+name: CAM Sports TikTok audio videos
+
+on:
+  schedule:
+    # GitHub cron has a five-minute minimum and may run late.
+    - cron: '2/5 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cam-tiktok-original-music
+  cancel-in-progress: false
+
+jobs:
+  make-public-videos:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install renderer
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fonts-dejavu-core
+          python -m pip install --disable-pip-version-check 'Pillow==11.3.0'
+      - name: Verify audio and MP4 generation
+        run: python scripts/cam_social_make_video.py --smoke-test
+      - name: Render public editorial jobs waiting for TikTok
+        run: python scripts/cam_social_make_video.py
+      - name: Save MP4s for the CAM Sports publisher
+        run: |
+          if [[ -z "$(git status --porcelain -- assets/social-videos/)" ]]; then
+            echo "No new videos."
+            exit 0
+          fi
+          git config user.name "CAM Sports media bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/social-videos/
+          git commit -m "media: generate licensed-original TikTok music videos [skip ci]"
+          git pull --rebase origin main
+          git push origin HEAD:main
