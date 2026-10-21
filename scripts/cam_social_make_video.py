@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Create CAM Sports TikTok MP4s with original instrumental audio.
+"""Create CAM Sports Instagram/TikTok MP4s with original instrumental audio.
 
 Only reads already-public editor events through an anonymous read-only RPC.
 Runs in GitHub Actions; the GITHUB_TOKEN commits public MP4s, never app secrets.
@@ -205,7 +205,7 @@ def main():
         return
 
     jobs = pending_jobs()
-    print("Public TikTok jobs awaiting videos:", len(jobs))
+    print("Public Instagram/TikTok jobs awaiting videos:", len(jobs))
     for job in jobs:
         key = job.get("event_key")
         if not isinstance(key, str) or not key or len(key) > 400:
