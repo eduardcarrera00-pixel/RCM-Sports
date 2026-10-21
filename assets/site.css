@@ -39,3 +39,49 @@ html:not(.dark):not(#camTerrace):not(#camTerrace):not(#camTerrace):not(#camTerra
     background-position:center center,60% 46%!important;
   }
 }
+
+
+/* CAM SPORTS · Pueblo griego en el pie de página · 2026-10-20 */
+/* Decoración del footer exclusivamente. El logo original, los menús,
+   los enlaces de administración y las redes sociales mantienen sus HTML
+   y funcionalidades existentes. Modo día: atardecer sobre el pueblo. */
+html:not(.dark):not(#camVillage):not(#camVillage):not(#camVillage):not(#camVillage) body > footer.bg-slate-900.border-t{
+  background-color:#1e3343!important;
+  background-image:
+    linear-gradient(90deg,rgba(13,28,42,.83) 0%,rgba(26,38,47,.63) 33%,rgba(35,42,47,.47) 63%,rgba(13,29,42,.64) 100%),
+    url('cam-footer-village-day.jpg')!important;
+  background-position:center center,center 53%!important;
+  background-size:cover,cover!important;
+  background-repeat:no-repeat,no-repeat!important;
+  border-top-color:rgba(189,151,108,.58)!important;
+}
+/* Modo noche: las casas iluminadas y la luna son visibles sin competir
+   con la marca y los textos del footer. */
+html.dark:not(#camVillage):not(#camVillage):not(#camVillage):not(#camVillage) body > footer.bg-slate-900.border-t{
+  background-color:#111f30!important;
+  background-image:
+    linear-gradient(90deg,rgba(8,19,33,.82) 0%,rgba(8,21,37,.66) 35%,rgba(8,21,38,.44) 65%,rgba(8,19,34,.66) 100%),
+    url('cam-footer-village-night.jpg')!important;
+  background-position:center center,center 53%!important;
+  background-size:cover,cover!important;
+  background-repeat:no-repeat,no-repeat!important;
+  border-top-color:rgba(185,141,95,.50)!important;
+}
+/* Texto legible en ambos temas, sin cambiar los estilos de marca. */
+html:not(#camVillage):not(#camVillage):not(#camVillage):not(#camVillage) body > footer.bg-slate-900.border-t :is(h4,p,li,a){
+  text-shadow:0 1px 3px rgba(4,13,25,.4);
+}
+@media(max-width:760px){
+  html:not(.dark):not(#camVillage):not(#camVillage):not(#camVillage):not(#camVillage) body > footer.bg-slate-900.border-t{
+    background-image:
+      linear-gradient(180deg,rgba(14,28,42,.78),rgba(17,32,46,.74) 45%,rgba(16,31,43,.86) 100%),
+      url('cam-footer-village-day-mobile.jpg')!important;
+    background-position:center center,77% center!important;
+  }
+  html.dark:not(#camVillage):not(#camVillage):not(#camVillage):not(#camVillage) body > footer.bg-slate-900.border-t{
+    background-image:
+      linear-gradient(180deg,rgba(6,18,32,.74),rgba(9,22,39,.73) 45%,rgba(8,20,35,.87) 100%),
+      url('cam-footer-village-night-mobile.jpg')!important;
+    background-position:center center,78% center!important;
+  }
+}
