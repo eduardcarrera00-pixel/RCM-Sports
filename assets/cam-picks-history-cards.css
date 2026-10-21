@@ -1,0 +1,124 @@
+/* CAM Sports: resolved Picks mirror the original community Pick cards. */
+html body #footballTakes.ae-picks-editorial #communityPicks > #cpSettleHistorySection {
+ --cam-h-ink:#f4e8db;--cam-h-muted:#c5cdd2;--cam-h-line:#49606c;--cam-h-accent:#d4ae83;--cam-h-surface:#172e3e;--cam-h-tint:#213f4d;
+ background:var(--cam-h-surface)!important;border:1px solid #526477!important;border-radius:0!important;box-shadow:none!important;min-width:0!important;
+}
+html:not(.dark) body #footballTakes.ae-picks-editorial #communityPicks > #cpSettleHistorySection {
+ --cam-h-ink:#293d49;--cam-h-muted:#5a6b75;--cam-h-line:#d5c3af;--cam-h-accent:#8c6043;--cam-h-surface:#faf5ec;--cam-h-tint:#f0e6d8;
+ border-color:#d5c3af!important;
+}
+html body #footballTakes #communityPicks #cpSettleHistorySection .ae-pick-history-heading {margin-bottom:8px!important;padding-bottom:13px!important;border-color:var(--cam-h-line)!important}
+html body #footballTakes #communityPicks #cpSettleHistorySection .ae-pick-history-heading p {color:var(--cam-h-muted)!important}
+html body #footballTakes #communityPicks #cpSettleHistorySection h3#cpSettleHistoryTitle {color:var(--cam-h-ink)!important}
+html body #footballTakes #communityPicks #cpSettleHistorySection .ae-pick-history-kicker {color:var(--cam-h-accent)!important}
+html body #footballTakes #communityPicks #cpSettleHistorySection #cpSettleHistory {margin:0!important;padding:0!important;border:0!important;background:transparent!important;color:var(--cam-h-ink)!important;min-width:0!important}
+html body #cpSettleHistory .ae-pick-history-frame {position:relative!important;min-width:0!important}
+html body #cpSettleHistory .ae-pick-history-frame::after {display:none!important;content:none!important}
+html body #cpSettleHistory .ae-pick-history-list {
+ display:block!important;list-style:none!important;max-height:610px!important;overflow:auto!important;
+ margin:0!important;padding:0 5px 0 0!important;scrollbar-width:thin;scrollbar-color:var(--cam-h-line) transparent;scroll-behavior:auto!important;scroll-snap-type:none!important;
+}
+html body #cpSettleHistory .ae-pick-history-entry {
+ display:block!important;list-style:none!important;grid-template-columns:none!important;padding:0!important;margin:0!important;
+ border:0!important;min-width:0!important;background:transparent!important;
+}
+html body #cpSettleHistory .cp-history-card {
+ --pick-feed-ink:var(--cam-h-ink);--pick-feed-muted:var(--cam-h-muted);--pick-feed-action:var(--cam-h-accent);--pick-feed-line:var(--cam-h-line);
+ display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:8px!important;position:relative!important;
+ box-sizing:border-box!important;width:100%!important;height:auto!important;min-height:0!important;max-width:none!important;
+ margin:0!important;padding:18px 6px!important;border:0!important;border-bottom:1px solid var(--cam-h-line)!important;
+ border-radius:0!important;background:transparent!important;box-shadow:none!important;color:var(--cam-h-ink)!important;
+}
+html body #cpSettleHistory .ae-pick-history-entry:last-child .cp-history-card {border-bottom:0!important}
+html body #cpSettleHistory .cp-history-card::before,html body #cpSettleHistory .cp-history-card::after {content:none!important;display:none!important}
+html body #cpSettleHistory .cp-history-card .cp-card-header {
+ display:flex!important;flex-wrap:wrap!important;align-items:center!important;justify-content:space-between!important;
+ gap:7px 12px!important;margin:0!important;padding:0!important;border:0!important;min-width:0!important;
+}
+html body #cpSettleHistory .cp-history-card .cp-feed-author,
+html body #cpSettleHistory .cp-history-card .cp-feed-author-label {
+ display:inline-flex!important;align-items:center!important;gap:8px!important;padding:0!important;margin:0!important;border:0!important;
+ background:transparent!important;box-shadow:none!important;color:var(--cam-h-accent)!important;
+ font:700 12px/1.3 Inter,system-ui,sans-serif!important;max-width:100%!important;overflow-wrap:anywhere!important;
+}
+html body #cpSettleHistory .cp-history-card .cp-feed-initial {
+ display:grid!important;place-items:center!important;width:29px!important;height:29px!important;flex:0 0 29px!important;
+ border:1px solid var(--cam-h-line)!important;border-radius:50%!important;background:var(--cam-h-tint)!important;
+ color:var(--cam-h-accent)!important;font:700 13px/1 Inter,system-ui,sans-serif!important;
+}
+html body #cpSettleHistory .cp-history-card .cp-feed-meta {
+ display:flex!important;flex-wrap:wrap!important;align-items:center!important;justify-content:flex-end!important;
+ gap:6px 9px!important;min-width:0!important;margin:0 0 0 auto!important;padding:0!important;
+}
+html body #cpSettleHistory .cp-history-card .cp-card-sport {
+ display:inline-block!important;padding:0!important;margin:0!important;border:0!important;background:none!important;
+ font:600 11px/1.3 Inter,system-ui,sans-serif!important;color:var(--cam-h-muted)!important;
+}
+html body #cpSettleHistory .cp-history-card .cp-card-odds {
+ display:inline-flex!important;width:auto!important;max-width:none!important;margin:0!important;padding:0!important;
+ background:none!important;border:0!important;box-shadow:none!important;
+}
+html body #cpSettleHistory .cp-history-card .cp-odds {
+ display:inline-block!important;padding:5px 9px!important;white-space:nowrap!important;
+ font:750 12px/1.25 Inter,system-ui,sans-serif!important;border:1px solid var(--cam-h-accent)!important;
+ border-radius:0!important;color:var(--cam-h-accent)!important;background:transparent!important;
+}
+html body #cpSettleHistory .cp-history-card .cp-result-badge {
+ display:inline-flex!important;align-items:center!important;padding:5px 9px!important;margin:0!important;border-radius:0!important;
+ border:1px solid var(--cam-h-line)!important;background:var(--cam-h-tint)!important;color:var(--cam-h-ink)!important;
+ font:750 11px/1.2 Inter,system-ui,sans-serif!important;letter-spacing:.015em!important;
+}
+html body #cpSettleHistory .cp-history-card .cp-result-badge[data-outcome="won"] {color:#a8dbc0!important;border-color:#537b69!important;background:#174334!important}
+html body #cpSettleHistory .cp-history-card .cp-result-badge[data-outcome="lost"] {color:#f3b6a6!important;border-color:#7d514c!important;background:#492f30!important}
+html:not(.dark) body #cpSettleHistory .cp-history-card .cp-result-badge[data-outcome="won"] {color:#236647!important;border-color:#b8d5bd!important;background:#e8f3e7!important}
+html:not(.dark) body #cpSettleHistory .cp-history-card .cp-result-badge[data-outcome="lost"] {color:#994636!important;border-color:#e1bbae!important;background:#f9e9e3!important}
+html body #cpSettleHistory .cp-history-card .cp-card-title {
+ display:block!important;min-width:0!important;max-width:100%!important;padding:0!important;margin:0!important;
+ overflow-wrap:anywhere!important;font:600 clamp(20px,2.2vw,25px)/1.18 Newsreader,Georgia,serif!important;
+ color:var(--cam-h-ink)!important;-webkit-line-clamp:unset!important;
+}
+html body #cpSettleHistory .cp-history-card .cp-card-legs {
+ display:grid!important;list-style:none!important;gap:6px!important;padding:1px 0 2px 13px!important;
+ margin:0!important;border:0!important;color:var(--cam-h-ink)!important;
+}
+html body #cpSettleHistory .cp-history-card .cp-card-legs::before {content:none!important;display:none!important}
+html body #cpSettleHistory .cp-history-card .cp-pick-line {
+ display:block!important;list-style:none!important;margin:0!important;padding:0 0 0 11px!important;
+ min-width:0!important;border-left:2px solid var(--cam-h-accent)!important;background:transparent!important;
+}
+html body #cpSettleHistory .cp-history-card .cp-pick-line::before,
+html body #cpSettleHistory .cp-history-card .cp-pick-line::after {display:none!important;content:none!important}
+html body #cpSettleHistory .cp-history-card .cp-pick-line-body {
+ display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:2px!important;
+ margin:0!important;padding:0!important;min-width:0!important;
+}
+html body #cpSettleHistory .cp-history-card .cp-pick-line-event {display:block!important;color:var(--cam-h-muted)!important;font:500 11px/1.4 Inter,system-ui,sans-serif!important}
+html body #cpSettleHistory .cp-history-card .cp-pick-line-choice {display:block!important;overflow-wrap:anywhere!important;color:var(--cam-h-ink)!important;font:650 14px/1.36 Inter,system-ui,sans-serif!important}
+html body #cpSettleHistory .cp-history-card .cp-pick-line-market {color:var(--cam-h-muted)!important;font:500 10px/1.35 Inter,system-ui,sans-serif!important}
+html body #cpSettleHistory .cp-history-card .cp-card-read-link {
+ position:absolute!important;inset:0!important;z-index:1!important;display:block!important;opacity:0!important;cursor:pointer!important;
+}
+html body #cpSettleHistory .cp-history-card .cp-actions {
+ display:flex!important;flex-wrap:wrap!important;align-items:center!important;gap:7px!important;
+ padding:3px 0 0!important;margin:0!important;border:0!important;min-width:0!important;
+}
+html body #cpSettleHistory .cp-history-card .cp-actions button {
+ position:relative!important;z-index:3!important;min-height:30px!important;width:auto!important;
+ border:1px solid var(--cam-h-line)!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;
+ color:var(--cam-h-muted)!important;font:650 11px/1.2 Inter,system-ui,sans-serif!important;
+}
+html body #cpSettleHistory .cp-history-card .cp-card-header button {position:relative!important;z-index:3!important}
+html body #cpSettleHistory .cp-history-card .cp-actions button:hover {color:var(--cam-h-ink)!important;border-color:var(--cam-h-accent)!important}
+html body #cpSettleHistory .cp-history-settled {margin-left:auto!important;color:var(--cam-h-muted)!important;font:500 11px/1.3 Inter,system-ui,sans-serif!important}
+html body #cpSettleHistory .ae-pick-history-empty {color:var(--cam-h-muted)!important}
+@media(max-width:600px){
+ html body #footballTakes.ae-picks-editorial #communityPicks > #cpSettleHistorySection {padding:14px 12px!important}
+ html body #cpSettleHistory .ae-pick-history-list {max-height:530px!important}
+ html body #cpSettleHistory .cp-history-card {padding:15px 0!important;gap:8px!important}
+ html body #cpSettleHistory .cp-history-card .cp-card-header {gap:6px 9px!important}
+ html body #cpSettleHistory .cp-history-card .cp-feed-meta {gap:5px!important}
+ html body #cpSettleHistory .cp-history-card .cp-card-title {font-size:21px!important}
+ html body #cpSettleHistory .cp-history-card .cp-odds {padding:4px 7px!important}
+ html body #cpSettleHistory .cp-history-card .cp-actions button {min-height:34px!important}
+}
+@media(prefers-reduced-motion:reduce){html body #cpSettleHistory .ae-pick-history-list {scroll-behavior:auto!important}}
