@@ -39,7 +39,9 @@
     ['picks.table.label','.ae-pick-history-kicker','Picks · Resultados · Etiqueta'],
     ['news.title','#aeNewsPlainTitle','Noticias · Últimas noticias'],
     ['news.more','#aeMoreNewsTitle','Noticias · Más noticias'],
-    ['news.all','#aeHomeAllNewsButton','Noticias · Todas las noticias · Botón'],
+    ['footer.news.all','footer.bg-slate-900 .ae-footer-all-news','Footer · Todas las noticias'],
+    ['footer.tagline','footer.bg-slate-900 .space-y-3 > p','Footer · Descripción de CAM SPORTS'],
+    ['footer.categories','footer.bg-slate-900 h4','Footer · Categorías'],
     ['opiniones.title','#aeOpinionsHeading','Opiniones · Título'],
     ['opiniones.subtitle','.ae-opinions-lede','Opiniones · Introducción'],
     ['opiniones.eyebrow','.ae-opinions-eyebrow','Opiniones · Etiqueta'],
@@ -77,6 +79,7 @@
     ['notifications.title','#aeNotificationsTitle','Notificaciones · Título']
   ].map(([key, selector, location]) => ({key, selector:selector.trim(), location}));
   const rows = new Map(), originals = new Map(), originalsByElement = new WeakMap();
+  const previewed = new Set();
   const originalStyles = new WeakMap(), pencils = new Map();
   const PROPS = ['font-size','text-align','font-weight','font-style','letter-spacing','line-height','color','max-width','position','left','top','padding','margin-bottom','white-space','overflow-wrap'];
   const PALETTE = {
@@ -125,14 +128,14 @@
     }
     return {el,node,base};
   }
-  function resetStyle(el) {
+  function resetStyle(el, clearClass=true) {
     const saved = originalStyles.get(el);
     if (!saved) return;
     for (const p of PROPS) {
       if (saved[p][0]) el.style.setProperty(p,saved[p][0],saved[p][1]);
       else el.style.removeProperty(p);
     }
-    el.classList.remove('cam-site-text-custom');
+    if (clearClass) el.classList.remove('cam-site-text-custom');
   }
   const number = (settings, key) => Number.isFinite(settings[key]) ? settings[key] : null;
   function apply(descriptor, override=null) {
@@ -142,13 +145,17 @@
     const row = override || rows.get(descriptor.key);
     const original = originals.get(descriptor.key) || base.clean;
     // Si no hay personalización, respetar las modificaciones del motor de la página.
-    if (!row) { resetStyle(el); return; }
+    if (!row) {
+      if (previewed.has(descriptor.key)) { node.data=base.raw; previewed.delete(descriptor.key); }
+      if (el.classList.contains('cam-site-text-custom')) resetStyle(el);
+      return;
+    }
     const content = typeof row.content === 'string' ? row.content : original;
     const leading = (base.raw.match(/^\s*/) || [''])[0];
     const trailing = (base.raw.match(/\s*$/) || [''])[0];
     const wanted = leading + content + trailing;
     if (node.data !== wanted) node.data = wanted;
-    resetStyle(el);
+    resetStyle(el,false);
     const s = row.settings || {}, narrow = mobile(), prefix = narrow ? 'mobile' : 'desktop';
     const set = (prop,v) => { if (v != null) el.style.setProperty(prop,String(v),'important'); };
     set('font-size',number(s,prefix+'Size') == null ? null : s[prefix+'Size']+'px');
@@ -210,7 +217,8 @@
       if (!pencil) {
         pencil=document.createElement('button');
         pencil.type='button';pencil.className='cam-site-text-pencil';
-        pencil.textContent='✎';pencil.title='Editar texto: '+d.location;
+        pencil.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L9 17l-4 1 1-4L16.5 3.5Z"/></svg>';
+        pencil.title='Editar texto: '+d.location;
         pencil.setAttribute('aria-label','Editar texto: '+d.location);
         pencil.addEventListener('click',()=>openEditor(d));
         layer.appendChild(pencil);pencils.set(d.key,pencil);
@@ -321,6 +329,7 @@
   function preview() {
     if (!editing || savePending) return;
     editing.draft=getDraft();
+    previewed.add(editing.key);
     const d=ITEMS.find(t=>t.key===editing.key);
     if (d) apply(d,editing.draft);
     schedule();
@@ -366,6 +375,7 @@
       });
       if (result.error) throw result.error;
       rows.set(draft.key,{key:draft.key,content:content===original?null:content,settings:draft.settings});
+      previewed.delete(draft.key);
       writeCache();editing.draft=null;applyAll();dialog.close();
     } catch(err) {showError('No se guardó: '+(err?.message||'error de permisos o conexión'));}
     finally {savePending=false;$('[data-save]',dialog).disabled=false;}
@@ -379,7 +389,7 @@
     try {
       const {error}=await sb.rpc('cam_reset_site_text',{p_key:editing.key});
       if (error) throw error;
-      const key=editing.key;rows.delete(key);writeCache();
+      const key=editing.key;rows.delete(key);previewed.delete(key);writeCache();
       const d=ITEMS.find(t=>t.key===key);
       // Los textos originales se guardan en la interfaz, no en Supabase.
       const f=d&&find(d),original=originals.get(key);
