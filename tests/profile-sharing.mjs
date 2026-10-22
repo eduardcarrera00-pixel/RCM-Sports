@@ -20,7 +20,7 @@ async function setup({own=false,shared='',rows=takes,compactQuery=''}={}){
   if(name==='ae_my_profile_unpopular_take')return {data:takeId(2)};
   if(name==='ae_public_take_profile')return {data:rows.filter(t=>!t.hidden).map(t=>({...t,author_id:owner,author:'Lector'}))};
   return {data:[]};
- },from:()=>({select(){return this;},eq(){return this;},order(){return this;},limit:async()=>({data:picks.map(p=>({...p,author:'Lector'}))})})};
+ },from:()=>({select(){return this;},eq(){return this;},in(){return this;},order(){return this;},limit:async()=>({data:picks.map(p=>({...p,author:'Lector'}))})})};
  w.aeTakeReplies={open:(take,options)=>opened.push({take,options})};
  for(const file of ['assets/cam-pick-share.js','assets/ae-profile.js'])w.eval(fs.readFileSync(file,'utf8'));
  d.dispatchEvent(new w.Event('DOMContentLoaded'));

@@ -22,7 +22,7 @@ await w.aeRequestPublication('take',()=>publicationOpens++);assert.equal(publica
 // not a separate full-screen dialog, and must require OK before form access.
 const loginNotice=d.getElementById('aeAuthIntroNotice');
 assert.ok(loginNotice,'The login has the compact OK notice');
-assert.equal(loginNotice.parentElement.parentElement.id,'userAuthModal');
+assert.equal(loginNotice.closest('#userAuthModal')?.id,'userAuthModal');
 assert.equal(loginNotice.hidden,true);
 assert.equal(d.getElementById('aeAuthMiniOk').textContent.trim(),'OK');
 assert.equal(d.getElementById('aeAuthIntroModal'),null,'The old separate modal is removed');
