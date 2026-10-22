@@ -35,6 +35,15 @@ Los rankings usan solo resultados finales con ganador, y agrupan cada mes por fe
 - Las selecciones temporales se conservan localmente por identificador de usuario y partido hasta guardarse; el sistema definitivo sigue siendo Supabase.
 - La puesta en producción requiere migración, despliegue de Edge Function y configuración del cron/secreto. Abrir solo la rama o fusionar el frontend no activa por sí mismo la automatización.
 
+
+## Sincronización totalmente automática (22 octubre 2026)
+
+Se confirmó en Staging una sincronización HTTP 200 de **42 partidos oficiales** de 2026 (semanas 6–8), con **28 partidos futuros con cuotas reales congeladas** para semanas 7 y 8. La fuente principal ahora es el calendario de `nflverse/nfldata` (`data/games.csv`), que contiene IDs, equipos, kickoff, marcadores y moneylines; ESPN queda como alternativa si falla la descarga de nflverse. Los resultados solo se consideran definitivos al existir ambos marcadores y pasar el margen de duración definido; los resultados preliminares no puntúan.
+
+Ya no hace falta una clave de The Odds API para abrir partidos cuando nflverse entrega ambas moneylines. La clave `THE_ODDS_API_KEY` sigue siendo **opcional** para cobertura de cuotas adicional; nunca se inventarán probabilidades. Fuente de datos: nflverse/nfldata, sujeto a la atribución CC BY 4.0.
+
+Para activar el cron en producción: aplicar `supabase/migrations/20261022180000_cam_nfl_cron_vault.sql`, desplegar la Edge Function y aplicar `supabase/production/enable_cam_nfl_sync_cron.sql`. La migración genera el token con `gen_random_bytes` directamente en Supabase Vault. La Edge Function lo valida con una RPC privada exclusiva de `service_role`; nadie debe copiarlo a Github. Supabase Cron usa `pg_cron` y `pg_net` y funciona aun sin administradores conectados. El flujo de GitHub Actions es solo manual y no necesario para esta automatización.
+
 ## Pruebas
 
 `node tests/nfl-quiniela-browser.cjs` comprueba con fixtures **solo de prueba** el diseño día/noche, móvil/escritorio, guardar selecciones y estadísticas del perfil en Chromium. Se ejecuta automáticamente en el Pull Request por `nfl-quiniela-tests.yml`.
