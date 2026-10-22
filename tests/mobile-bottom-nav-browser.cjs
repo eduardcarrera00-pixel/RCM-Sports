@@ -76,7 +76,7 @@ const server = http.createServer((req, res) => {
             });
             assert.equal(icon.svgCount,1,key+' vector icon exists');
             assert.equal(icon.svgDisplay,'block',key+' vector icon is visible');
-            assert.ok(icon.svgWidth>=24,key+' vector icon is legible');
+            assert.ok(icon.svgWidth>=21 && icon.svgWidth<=23,key+' vector icon is legible inside circle');
             assert.equal(icon.svgStroke,'currentColor',key+' icon follows theme/active state');
             assert.equal(icon.imageDisplay,'none',key+' old WebP is hidden only on phone');
             assert.equal(icon.imageExists,true,key+' original desktop image remains');
