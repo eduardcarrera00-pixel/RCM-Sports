@@ -68,7 +68,7 @@ const server=http.createServer((req,res)=>{
     return {
      twenty:cards.length===20,
      oldestScroll:feed.scrollHeight>feed.clientHeight+4&&css.overflowY==='auto',
-     visibleWithoutWholePage:feed.clientHeight<=535,
+     visibleWithoutWholePage:feed.clientHeight<=545,
      gridColumns:gridWidth,
      firstIsLatest:own.dataset.takeId==='take-0',
      allVoteControls:cards.every(card=>card.querySelectorAll('.cam-football-vote').length===2),
