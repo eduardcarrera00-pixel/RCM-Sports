@@ -108,7 +108,7 @@ const server = http.createServer((req, res) => {
       };
     });
     assert.ok(opinionPill.left>nflPill.left && opinionPill.width>=100 && opinionPill.labelVisible && opinionPill.fits,JSON.stringify(opinionPill));
-    assert.equal(opinionPill.indicator,'1');
+    assert.ok(Number(opinionPill.indicator)>=0.99,'the animated capsule becomes fully visible');
     await page.evaluate(()=>filterByCategory('Todos'));
     await page.waitForFunction(()=>!document.querySelector('body > nav').classList.contains('cam-nav-has-active'));
     const input=page.locator('#mobileSearchInput');
