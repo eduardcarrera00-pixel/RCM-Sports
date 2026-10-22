@@ -545,6 +545,14 @@
       for (const k of keysOnElement(el, pseudos)) add(el, k);
     }
     for (const n of document.querySelectorAll('img[data-site-image]')) if (!own(n)) add(n, n.dataset.siteImage);
+    // Escudos de rankings y logos ajenos al inventario: mismo sistema de lápices.
+    for (const item of window.camVisualSizes?.allTargets?.() || []) {
+      if (own(item.el) || !item.el.getClientRects().length || ENTRIES.has(item.el.dataset.siteImage)) continue;
+      const virtualKey = 'size.' + item.key;
+      if (!ENTRIES.has(virtualKey)) ENTRIES.set(virtualKey,
+        { key: virtualKey, label: item.label, section: 'Tamaño de logos', kind: 'size-only', paths: [] });
+      add(item.el, virtualKey);
+    }
     // Lápices nuevos y retirados
     const live = new Set();
     for (const [el, keys] of targets) keys.forEach((key, i) => {
@@ -642,6 +650,7 @@
   // ---------------------------------------------------------------------------
   const ui = {};
   let editing = null; // { key, aspect, contain, decorative }
+  let sizing = null; // { key, device, theme, max }
   function buildDialog() {
     if (ui.dialog) return ui.dialog;
     const d = document.createElement('dialog');
@@ -660,6 +669,28 @@
           <p class="cam-site-image-note" data-ui="note" hidden></p>
           <div class="cam-site-image-preview" data-ui="preview" role="img" aria-label="Vista previa"><span class="cam-site-image-badge" data-ui="badge"></span></div>
           <p class="cam-site-image-meta" data-ui="meta"></p>
+          <section class="cam-logo-size-panel" data-ui="sizePanel" aria-label="Tamaño del logo" hidden>
+            <div class="cam-logo-size-head"><strong>Tamaño</strong><span>100 % = tamaño original</span></div>
+            <div class="cam-logo-size-tabs" data-ui="sizeDevices" role="group" aria-label="Dispositivo">
+              <button type="button" data-size-device="desktop">Ordenador</button>
+              <button type="button" data-size-device="mobile">Teléfono</button>
+            </div>
+            <div class="cam-logo-size-tabs is-themes" data-ui="sizeThemes" role="group" aria-label="Modo visual">
+              <button type="button" data-size-theme="all">Ambos</button>
+              <button type="button" data-size-theme="light">Día</button>
+              <button type="button" data-size-theme="dark">Noche</button>
+            </div>
+            <div class="cam-logo-size-controls">
+              <button type="button" data-size-step="-5" aria-label="Reducir tamaño">−</button>
+              <input type="range" data-ui="sizeRange" min="50" max="200" step="5" value="100" aria-label="Tamaño del logo">
+              <output data-ui="sizeValue">100 %</output>
+              <button type="button" data-size-step="5" aria-label="Aumentar tamaño">+</button>
+            </div>
+            <div class="cam-logo-size-foot">
+              <button type="button" data-act="resetSize">Restablecer tamaño original</button>
+              <span class="cam-logo-size-thumb"><img data-ui="sizeThumb" alt="Vista previa del tamaño" decoding="async"></span>
+            </div>
+          </section>
           <div class="ae-opinion-field-row">
             <label class="ae-opinion-field"><span>Subir archivo <em>(JPG, PNG o WebP; se optimiza al subirla)</em></span><input data-ui="file" type="file" accept="image/jpeg,image/png,image/webp"></label>
             <label class="ae-opinion-field"><span>o pegar enlace</span><input data-ui="url" type="url" inputmode="url" placeholder="https://…" maxlength="2048" autocomplete="off"></label>
@@ -690,9 +721,26 @@
     d.querySelector('[data-act=close]').addEventListener('click', () => d.close());
     d.querySelector('[data-act=cancel]').addEventListener('click', () => d.close());
     ui.reset.addEventListener('click', resetImage);
+    ui.sizeRange.addEventListener('input', () => changeSize(ui.sizeRange.value));
+    d.querySelectorAll('[data-size-step]').forEach(button => button.addEventListener('click', () =>
+      changeSize(Number(ui.sizeRange.value) + Number(button.dataset.sizeStep))));
+    d.querySelector('[data-act=resetSize]').addEventListener('click', () => changeSize(100));
+    d.querySelectorAll('[data-size-device]').forEach(button => button.addEventListener('click', () => {
+      if (!sizing) return;
+      window.camVisualSizes.cancelPreview();
+      sizing.device = button.dataset.sizeDevice; refreshSizeControls();
+    }));
+    d.querySelectorAll('[data-size-theme]').forEach(button => button.addEventListener('click', () => {
+      if (!sizing) return;
+      window.camVisualSizes.cancelPreview();
+      sizing.theme = button.dataset.sizeTheme; refreshSizeControls();
+    }));
     ui.form.addEventListener('submit', saveImage);
     d.addEventListener('click', e => { if (e.target === d) d.close(); });
-    d.addEventListener('close', () => { dropLocal(); editing = null; scheduleScan(); });
+    d.addEventListener('close', () => {
+      window.camVisualSizes?.cancelPreview?.();
+      dropLocal(); editing = null; sizing = null; scheduleScan();
+    });
     for (const n of [ui.url, ui.fx, ui.fy]) n.addEventListener('input', updatePreview);
     ui.focusOn.addEventListener('change', () => { ui.focusFields.hidden = !ui.focusOn.checked; updatePreview(); });
     ui.file.addEventListener('change', () => {
@@ -730,6 +778,45 @@
     if (!ui.dialog.open) ui.dialog.showModal();
   }
 
+  function refreshSizeControls() {
+    if (!sizing) return;
+    const pct = window.camVisualSizes.get(sizing.key, sizing.device, sizing.theme);
+    ui.sizeRange.min = '50'; ui.sizeRange.max = String(sizing.max);
+    ui.sizeRange.value = String(pct);
+    ui.sizeValue.textContent = pct + ' %';
+    ui.sizeRange.setAttribute('aria-valuetext', pct + ' por ciento');
+    ui.sizeDevices.querySelectorAll('button').forEach(b =>
+      b.setAttribute('aria-pressed', String(b.dataset.sizeDevice === sizing.device)));
+    ui.sizeThemes.querySelectorAll('button').forEach(b =>
+      b.setAttribute('aria-pressed', String(b.dataset.sizeTheme === sizing.theme)));
+    ui.sizeThumb.style.scale = String(pct / 100);
+  }
+  function changeSize(value) {
+    if (!sizing || !editing) return;
+    const pct = Math.min(sizing.max, Math.max(50, Math.round(Number(value) / 5) * 5));
+    ui.sizeRange.value = String(pct);
+    ui.sizeValue.textContent = pct + ' %';
+    ui.sizeThumb.style.scale = String(pct / 100);
+    window.camVisualSizes.preview(sizing.key, sizing.device, sizing.theme, pct);
+  }
+  function setupSize(entry) {
+    window.camVisualSizes?.cancelPreview?.();
+    const item = window.camVisualSizes?.identify?.(editing?.el);
+    sizing = item ? {
+      key:item.key, device:window.camVisualSizes.deviceNow(),
+      theme:entry.variant === NIGHT ? 'dark' : entry.variant === DAY ? 'light' : 'all',
+      max:item.max || 200
+    } : null;
+    ui.sizePanel.hidden = !sizing;
+    if (!sizing) return;
+    ui.sizeThumb.src = editing.el?.currentSrc || editing.el?.src || '';
+    refreshSizeControls();
+  }
+  async function saveSize() {
+    if (!sizing) return;
+    const { key, device, theme } = sizing;
+    await window.camVisualSizes.save(key, device, theme, Number(ui.sizeRange.value));
+  }
   async function fill() {
     const { key, aspect, contain, decorative } = editing;
     const entry = ENTRIES.get(key), row = rows.get(key);
@@ -761,6 +848,20 @@
     ui.altBox.hidden = decorative;
     ui.alt.value = row?.alt || (editing.el?.getAttribute('alt') || '');
     ui.error.textContent = '';
+    ui.dialog.classList.toggle('is-size-only', entry.kind === 'size-only');
+    setupSize(entry);
+    if (entry.kind === 'size-only') {
+      ui.reset.hidden = true; ui.variants.hidden = true; ui.note.hidden = true;
+      ui.meta.textContent = '';
+      ui.save.disabled = false; ui.save.textContent = 'Guardar';
+      ui.preview.style.aspectRatio = '3';
+      ui.preview.classList.add('is-contain');
+      ui.preview.style.backgroundImage = cssUrl(editing.el?.currentSrc || editing.el?.src || '');
+      ui.preview.style.backgroundPosition = 'center';
+      ui.preview.style.backgroundSize = 'contain';
+      ui.badge.textContent = 'Logo';
+      return;
+    }
     ui.reset.hidden = !row;
     ui.save.disabled = false; ui.save.textContent = 'Guardar';
     ui.preview.style.aspectRatio = String(entry.kind === 'atlas' ? 2 : aspect);
@@ -784,7 +885,7 @@
   }
 
   function updatePreview() {
-    if (!editing) return;
+    if (!editing || ENTRIES.get(editing.key)?.kind === 'size-only') return;
     const entry = ENTRIES.get(editing.key), row = rows.get(editing.key);
     const typed = safeUrl(ui.url.value.trim());
     const fresh = ui.localUrl || typed;
@@ -833,6 +934,13 @@
     if (!editModeOn() || !editing) return;
     const { key } = editing; const entry = ENTRIES.get(key); const row = rows.get(key);
     ui.error.textContent = '';
+    if (entry.kind === 'size-only') {
+      ui.save.disabled = true;
+      try { await saveSize(); ui.dialog.close(); notify('Tamaño actualizado.'); }
+      catch (err) { ui.error.textContent = friendly(err); }
+      finally { ui.save.disabled = false; }
+      return;
+    }
     const typed = ui.url.value.trim();
     if (typed && !safeUrl(typed)) { ui.error.textContent = 'El enlace de la imagen debe empezar por https://'; ui.url.focus(); return; }
     const file = ui.file.files?.[0];
@@ -849,10 +957,11 @@
         p_alt: editing.decorative ? null : (ui.alt.value.trim() || null)
       };
       if (!args.p_url && args.p_focus_x == null && !args.p_alt) {
-        if (!row) { ui.dialog.close(); return; }
+        if (!row) { await saveSize(); ui.dialog.close(); notify('Tamaño actualizado.'); return; }
       }
       const r = await sb.rpc('ae_set_site_image', args);
       if (r.error) throw r.error;
+      await saveSize();
       if (!args.p_url && args.p_focus_x == null && !args.p_alt) rows.delete(key);
       else rows.set(key, { url: args.p_url, focus_x: args.p_focus_x, focus_y: args.p_focus_y, alt: args.p_alt });
       writeCache(); applyAll();
