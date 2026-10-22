@@ -1,4 +1,4 @@
-/* CAM SPORTS — premium capsule dock on phones only; reuse the original buttons. */
+/* CAM SPORTS — editorial night/day polish for the existing phone-only capsule; original DOM and icons. */
 @media (max-width: 760px), (orientation: landscape) and (max-height: 500px) and (hover: none) and (pointer: coarse) {
   html body {
     --cam-bottom-nav-height: 62px;
@@ -35,10 +35,11 @@
     margin: 0 !important;
     padding: 6px 7px !important;
     gap: 0 !important;
-    border: 1px solid rgba(194, 148, 98, .36) !important;
-    border-radius: 23px !important;
-    box-shadow: 0 3px 14px rgba(6, 22, 36, .13) !important;
-    background: #102535 !important;
+    border: 0 !important;
+    border-top: 1px solid rgba(189, 141, 107, .42) !important;
+    border-radius: 18px !important;
+    box-shadow: 0 2px 9px rgba(6, 22, 36, .11) !important;
+    background: #102b3e !important;
     overflow: hidden !important;
     white-space: nowrap !important;
     flex: none !important;
@@ -56,7 +57,7 @@
     left: 0;
     width: var(--cam-pill-width, 0px);
     border-radius: 999px;
-    background: #a45d31;
+    background: #855b43;
     opacity: 0;
     pointer-events: none;
     transform: translate3d(var(--cam-pill-left, 0px), 0, 0);
@@ -78,7 +79,7 @@
     z-index: 1;
     display: flex !important;
     flex: 1 1 0% !important;
-    flex-direction: row !important;
+    flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
     box-sizing: border-box !important;
@@ -88,15 +89,15 @@
     min-height: 44px !important;
     height: 100% !important;
     margin: 0 !important;
-    padding: 5px 3px !important;
-    gap: 5px !important;
+    padding: 3px 2px !important;
+    gap: 2px !important;
     border: 0 !important;
     border-radius: 999px !important;
     box-shadow: none !important;
     outline-offset: -3px !important;
     background: transparent !important;
-    color: #c1a482 !important;
-    font: 700 12px/1.1 Inter, system-ui, sans-serif !important;
+    color: #e1e5e5 !important;
+    font: 600 11px/1.15 Inter, system-ui, sans-serif !important;
     letter-spacing: 0 !important;
     text-align: center !important;
     text-transform: none !important;
@@ -105,19 +106,26 @@
     touch-action: manipulation;
   }
 
-  /* Icon-only inactive buttons; their aria-labels are retained by the script. */
+  /* Keep the four ORIGINAL names visible, whether active or not. */
   html body > nav.cam-mobile-bottom-nav > button.category-btn > span:not(.ae-nav-icon) {
-    display: none !important;
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    text-align: center !important;
+    line-height: 1.15 !important;
+    overflow: visible !important;
+    white-space: nowrap !important;
   }
   html body > nav.cam-mobile-bottom-nav > button.category-btn.active,
   html body > nav.cam-mobile-bottom-nav > button.category-btn[aria-current="page"] {
-    flex: 2 1 0% !important;
-    min-width: 104px !important;
+    flex: 1 1 0% !important;
+    min-width: 44px !important;
     color: #fff6e9 !important;
     background: transparent !important;
   }
   html body > nav.cam-mobile-bottom-nav > button.category-btn:is(.active,[aria-current="page"]) > span:not(.ae-nav-icon) {
-    display: inline-block !important;
+    display: block !important;
     max-width: 100% !important;
     overflow: visible !important;
     white-space: nowrap !important;
@@ -160,15 +168,15 @@
 
   /* Day theme changes palette only, never dimensions. */
   html:not(.dark) body > nav.ae-sport-nav.cam-mobile-bottom-nav {
-    background: #f8f2e8 !important;
-    border-color: rgba(143, 104, 72, .28) !important;
-    box-shadow: 0 3px 12px rgba(57, 40, 26, .09) !important;
+    background: #eeeae3 !important;
+    border-top-color: #d9d9d0 !important;
+    box-shadow: 0 2px 9px rgba(57, 40, 26, .07) !important;
   }
   html:not(.dark) body > nav.ae-sport-nav.cam-mobile-bottom-nav::before {
-    background: #99562c;
+    background: #855b43;
   }
   html:not(.dark) body > nav.cam-mobile-bottom-nav > button.category-btn:not(.active):not([aria-current="page"]) {
-    color: #183343 !important;
+    color: #273b49 !important;
   }
   html:not(.dark) body > nav.cam-mobile-bottom-nav > button.category-btn:not(.active):not([aria-current="page"]) .ae-custom-sport-icon {
     filter: brightness(0) saturate(100%) invert(17%) sepia(23%) saturate(967%) hue-rotate(155deg) brightness(91%) contrast(96%);
@@ -197,8 +205,11 @@
 }
 @media (max-width: 360px) {
   html body > nav.cam-mobile-bottom-nav > button.category-btn:is(.active,[aria-current="page"]) {
-    font-size: 11px !important;
-    gap: 4px !important;
+    font-size: 10.5px !important;
+    gap: 2px !important;
+  }
+  html body > nav.cam-mobile-bottom-nav > button.category-btn {
+    font-size: 10.5px !important;
   }
   html body > nav.cam-mobile-bottom-nav > button.category-btn .ae-nav-icon {
     width: 25px !important;
