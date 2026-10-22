@@ -25,6 +25,7 @@ const server=http.createServer((req,res)=>{
  await page.addInitScript(()=>{
   window.currentCategory='Picks';window.currentAdmin=null;
   const pick={id:'00000000-0000-0000-0000-000000000001',user_id:'reader',author:'eduardcarrera00',title:'Paris St-G v Barcelona',american_odds:240,event_date:new Date().toISOString().slice(0,10),created_at:new Date().toISOString(),settled_at:new Date().toISOString(),outcome:'won',moderation_status:'approved',result_points:2.4,legs:[{sport:'Fútbol',event:'Paris St-G v Barcelona',selection:'Barcelona gana',odds:240}]};
+  const settled=Array.from({length:20},(_,i)=>({...pick,id:'00000000-0000-0000-0000-'+String(i+1).padStart(12,'0'),title:'Paris St-G v Barcelona #'+i,settled_at:new Date(Date.now()-i*3600000).toISOString(),outcome:['won','lost','void'][i%3]}));
   let requests=0;
   window.db={auth:{getUser:async()=>({data:{user:null}}),onAuthStateChange(){}},rpc:async()=>({data:[],error:null}),from(table){
    const filters={};
@@ -32,7 +33,7 @@ const server=http.createServer((req,res)=>{
     async then(resolve,reject){
      const history=table==='ae_pick_feed'&&Array.isArray(filters.outcome)&&filters.outcome.includes('void');
      if(history)await new Promise(r=>setTimeout(r,(++requests%4)*15));
-     const data=table==='ae_pick_feed'?(history?[pick]:filters.outcome==='pending'?[{...pick,id:'00000000-0000-0000-0000-000000000002',outcome:'pending',settled_at:null,result_points:0}]:[pick]):[];
+     const data=table==='ae_pick_feed'?(history?settled:filters.outcome==='pending'?[{...pick,id:'00000000-0000-0000-0000-000000000002',outcome:'pending',settled_at:null,result_points:0}]:[pick]):[];
      return Promise.resolve({data,error:null}).then(resolve,reject);
     }};return q;
   }};
@@ -42,8 +43,10 @@ const server=http.createServer((req,res)=>{
  await page.waitForSelector('#cpSettleHistory .ae-pick-history-entry');
  for(const admin of [false,true]){
   await page.evaluate(async admin=>{window.currentAdmin=admin?{id:'editor'}:null;await Promise.all(Array.from({length:12},()=>window.updateAePicksAdmin()));},admin);
-  assert.equal(await page.locator('#cpSettleHistory .ae-pick-history-entry').count(),1);
-  assert.equal(await page.locator('#cpSettleHistory .ae-pick-history-summary').count(),1);
+  assert.equal(await page.locator('#cpSettleHistory .ae-pick-history-entry').count(),20);
+  assert.equal(await page.locator('#cpSettleHistory .ae-pick-history-summary').count(),0);
+  assert.equal(await page.locator('#cpSettleHistory .ae-pick-history-card').count(),20);
+  assert.equal(await page.locator('#cpSettleHistory .ae-pick-history-prediction').count(),20);
   for(const width of [360,390,768,910,911,1366])for(const dark of [false,true]){
    await page.setViewportSize({width,height:1000});await page.evaluate(dark=>document.documentElement.classList.toggle('dark',dark),dark);
    await page.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))));
@@ -53,6 +56,14 @@ const server=http.createServer((req,res)=>{
     return {separate:history.parentElement.id==='communityPicks',afterPlates:h.top>=r.bottom-1,beforeChefs:c.top>=h.bottom-1,fits:h.left>=-1&&h.right<=innerWidth+1,noOverflow:history.scrollWidth<=history.clientWidth+1};
    });
    assert.deepEqual(layout,{separate:true,afterPlates:true,beforeChefs:true,fits:true,noOverflow:true},JSON.stringify({width,dark,admin,layout}));
+   const grid=await page.evaluate(()=>{
+    const list=document.querySelector('#cpSettleHistory .ae-pick-history-grid');
+    const cards=[...list.querySelectorAll('.ae-pick-history-card')];
+    return {columns:getComputedStyle(list).gridTemplateColumns.split(' ').filter(Boolean).length,scrolls:list.scrollHeight>list.clientHeight+10,hasLinks:cards.every(card=>card.href.includes('pick=')),hasOdds:cards.every(card=>card.querySelector('.ae-pick-history-odds')),noOverflow:list.scrollWidth<=list.clientWidth+1,visible:cards[0].getBoundingClientRect().width>0};
+   });
+   const expectedColumns=width<=720?2:width<=1050?3:4;
+   assert.equal(grid.columns,expectedColumns,JSON.stringify({width,dark,admin,grid}));
+   assert(grid.scrolls&&grid.hasLinks&&grid.hasOdds&&grid.noOverflow&&grid.visible,JSON.stringify({width,dark,admin,grid}));
    const record=await page.evaluate(()=>{
     const el=document.getElementById('aeHomePickHistoric'),r=el.getBoundingClientRect(),c=document.querySelector('.ae-chefs-dual-standings').getBoundingClientRect();
     const card=document.querySelector('#cpFeed > .cp-card'),b=card.getBoundingClientRect();
@@ -67,6 +78,6 @@ const server=http.createServer((req,res)=>{
   }
  }
  assert.deepEqual(errors,[]);
- console.log('PASS: concurrent admin/reader refreshes render one Pick; full-width history stays between Platos and Chefs, without overlap/overflow, at 360–1366px in day/night. QA: '+qa);
+ console.log('PASS: twenty deduplicated historic cards, internal grid scroll, 2–4 columns, linked selections, no overflow at 360–1366px in day/night. QA: '+qa);
  }finally{await browser.close();server.close();}
 })().catch(error=>{console.error(error);server.close();process.exitCode=1;});
