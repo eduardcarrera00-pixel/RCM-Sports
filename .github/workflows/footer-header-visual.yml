@@ -1,0 +1,24 @@
+name: Footer and header visual unity
+on:
+  pull_request:
+    paths:
+      - 'assets/site.css'
+      - 'tests/footer-header-visual-unity.cjs'
+      - '.github/workflows/footer-header-visual.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  visual:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: node --check tests/footer-header-visual-unity.cjs
+      - run: npx playwright install chromium
+      - run: node tests/footer-header-visual-unity.cjs
