@@ -139,11 +139,12 @@
       .eq('user_id', auth.user.id).maybeSingle();
     if (accessError || access?.user_id !== auth.user.id) throw Error('No tienes permisos para editar tamaños.');
     const size = percent(value), id = cacheKey(key, device, theme);
-    const result = size === 100
-      ? await sb.from(TABLE).delete().eq('key', key).eq('device', device).eq('theme', theme)
-      : await sb.from(TABLE).upsert({ key, device, theme, size_percent:size }, { onConflict:'key,device,theme' });
+    // El 100 % es una anulación explícita: permite volver al tamaño original
+    // en modo noche aunque «Ambos» tenga, por ejemplo, un 125 %.
+    const result = await sb.from(TABLE).upsert(
+      { key, device, theme, size_percent:size }, { onConflict:'key,device,theme' });
     if (result.error) throw Error(result.error.message || 'No se pudo guardar el tamaño.');
-    if (size === 100) rows.delete(id); else rows.set(id, size);
+    rows.set(id, size);
     pending.delete(id); store(); render();
   }
   readCache();
