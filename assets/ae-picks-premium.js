@@ -98,7 +98,8 @@
          community.querySelector(':scope > .ae-picks-feed-heading'),
          community.querySelector(':scope > #cpStatus'),
          community.querySelector(':scope > #cpFeed'),
-         community.querySelector(':scope > #cpFeedScrollHint')
+         community.querySelector(':scope > #cpFeedScrollHint'),
+         community.querySelector(':scope > #cpFeedFooter')
        ];
        if(nodes.some(node=>!node))return;
        const column=document.createElement('div');
