@@ -730,9 +730,18 @@
   const groups=part.filter(l=>/same game parlay/.test(clean(l.text)));
   if(!groups.length||(includes.length&&groups.length!==Number(includes[0].match[1])))return fail('Falta un bloque de la combinada. Incluye sus partidos y selecciones completos.');
   const isEvent=s=>/\s+(?:vs?\.?|versus|contra|at)\s+|\s*@\s*/i.test(s);
-  const tidy=s=>String(s||'').replace(/\b\d{1,2}:\d{2}\s*(?:AM|PM)?\s*(?:ET|EST|EDT|CT|PT)?\b/gi,'').replace(/\s+/g,' ').trim();
+  const tidy=s=>String(s||'').replace(/\b(?:MON|TUE|WED|THU|FRI|SAT|SUN)\s+(?=\d{1,2}:\d{2})/gi,'').replace(/\b\d{1,2}:\d{2}\s*(?:AM|PM)?\s*(?:ET|EST|EDT|CT|PT)?\b/gi,'').replace(/\s+/g,' ').trim();
   const events=[...new Set(part.filter(l=>isEvent(l.text)&&!money.test(clean(l.text))&&!offer.test(clean(l.text))).map(l=>tidy(l.text)))];
-  const market=s=>/\b(moneyline|any\s*time\s+(?:goal\s*scorer|touchdown\s*scorer|assist)|(?:alt\s+)?(?:receiving|rushing|passing)\s+(?:yds|yards)|over\s*\/\s*under|both teams to score|total (?:points|goals)|spread|handicap)\b/i.test(s);
+  // FanDuel escribe cada condición en MAYÚSCULAS bajo el nombre de la selección
+  // («RESULT & BOTH TO SCORE», «DOUBLE CHANCE», «PLAYER TO HAVE 2 OR MORE SHOTS ON TARGET»…).
+  const capsCondition=s=>{
+   const t=String(s||'').replace(/[^\p{L}\p{N}&/().,+ -]/gu,' ').replace(/\s+/g,' ').trim();
+   const letters=t.replace(/[^\p{L}]/gu,'');
+   return letters.length>=6&&letters===letters.toUpperCase()&&/\p{Lu}{3}/u.test(t)
+    &&!isEvent(t)&&!/\b\d{1,2}:\d{2}\s*(?:AM|PM)\b|\b(?:MON|TUE|WED|THU|FRI|SAT|SUN)\b/.test(t)
+    &&!/SAME GAME PARLAY|TOTAL (?:WAGER|PAYOUT|STAKE)|REWARDS|PTS PENDING|SUPER SUB|PROFIT BOOST|BONUS|CASH ?OUT|INCLUDES/.test(t);
+  };
+  const market=s=>capsCondition(s)||/\b(moneyline|any\s*time\s+(?:goal\s*scorer|touchdown\s*scorer|assist)|(?:alt\s+)?(?:receiving|rushing|passing)\s+(?:yds|yards)|over\s*\/\s*under|both teams to score|total (?:points|goals)|spread|handicap)\b/i.test(s);
   const picks=[];
   for(let i=0;i<part.length;i++){
    const label=part[i];if(!market(label.text)||label.confidence<65)continue;
@@ -748,11 +757,11 @@
    const left=labelWords[0]?.bbox?.x0;
    const nameWords=(name.words||[]).filter(w=>!Number.isFinite(left)||!w.bbox||w.bbox.x1>=left-10);
    const title=tidy(nameWords.length?nameWords.map(w=>w.text).join(' '):name.text)
-    .replace(/\s+[+-]\d{3,6}\s*$/,'').replace(/^[^\p{L}\p{N}]+/u,'');
+    .replace(/\s+[+-]?\d{3,6}\s*$/,'').replace(/^[^\p{L}\p{N}]+/u,'');
    const conditionWords=(label.words||[]).filter(w=>!Number.isFinite(left)||!w.bbox||w.bbox.x1>=left-10);
    const condition=tidy(conditionWords.length?conditionWords.map(w=>w.text).join(' '):label.text).replace(/^[^\p{L}\p{N}]+/u,'');
    if(title.length<2||title.length>180)return fail('Uno de los nombres no se lee con claridad. Prueba otra captura.');
-   const single=part.slice(nameIndex,i).some(l=>candidates(l,0).some(c=>!c.total&&/^[+-]\d{3,6}$/.test(c.raw)));
+   const single=part.slice(nameIndex,i).some(l=>candidates(l,0).some(c=>!c.total&&/^[+-]\d{3,6}$/.test(c.raw))||/\s{2,}[+-]?\d{3,4}\s*$/.test(l.text));
    const groupStart=part.slice(0,nameIndex).map((l,j)=>({j,l})).filter(e=>/same game parlay/.test(clean(e.l.text))).at(-1)?.j??0;
    const eventLine=single?part.slice(i+1,i+5).find(l=>isEvent(l.text)):part.slice(groupStart,nameIndex).find(l=>isEvent(l.text));
    if(!eventLine)return fail('No pude leer el partido de una de las selecciones. Inclúyelo junto al pronóstico.');

@@ -15,17 +15,22 @@ async function flashModels(apiKey: string): Promise<string[]> {
   const res = await fetch(`${API}/models?pageSize=1000`, {headers: {'x-goog-api-key': apiKey}, signal: AbortSignal.timeout(5000)});
   if (!res.ok) return [];
   const list = (await res.json())?.models || [];
-  // Primero los Flash (más recientes antes) y después los Flash-Lite, que suelen
-  // seguir respondiendo cuando Google marca «high demand» en los Flash.
-  const parse = (n: string) => n.match(/gemini-(\d+(?:\.\d+)?)-flash(-lite)?$/);
-  const names = list
+  // Flash y Flash-Lite estables (sin «preview»), del más reciente al más antiguo, alternados:
+  // en el plan gratuito cada modelo falla por su cuenta (503 «high demand», 404 retirado,
+  // 429 sin cuota) y conviene saltar pronto a uno distinto.
+  const parse = (n: string) => n.match(/^gemini-(\d+(?:\.\d+)?)-flash(-lite)?$/);
+  const names: string[] = list
     .filter((m: {name?: string, supportedGenerationMethods?: string[]}) => m.name && parse(m.name.replace(/^models\//, '')) && (m.supportedGenerationMethods || []).includes('generateContent'))
     .map((m: {name: string}) => m.name.replace(/^models\//, ''));
-  const rank = (n: string) => { const m = parse(n)!; return (m[2] ? 0 : 1000) + Number(m[1]); };
-  return names.sort((a: string, b: string) => rank(b) - rank(a));
+  const byVersion = (a: string, b: string) => Number(parse(b)![1]) - Number(parse(a)![1]);
+  const flash = names.filter(n => !parse(n)![2]).sort(byVersion);
+  const lite = ['gemini-flash-lite-latest', ...names.filter(n => parse(n)![2]).sort(byVersion)];
+  const out: string[] = [];
+  for (let i = 0; i < Math.max(flash.length, lite.length); i++) { if (flash[i]) out.push(flash[i]); if (lite[i]) out.push(lite[i]); }
+  return out;
 }
 // Si la lista de modelos no responde, se prueba con estos alias.
-const FALLBACK_MODELS = ['gemini-2.5-flash', 'gemini-flash-lite-latest', 'gemini-2.5-flash-lite'];
+const FALLBACK_MODELS = ['gemini-flash-lite-latest', 'gemini-3-flash-preview'];
 const DAILY_LIMIT = 25;
 
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
@@ -154,26 +159,25 @@ Deno.serve(async req => {
     content.push({text: prompt(today) + await referenceText(admin)});
 
     const request = JSON.stringify({contents: [{role: 'user', parts: content}], generationConfig: {temperature: 0, responseMimeType: 'application/json', responseSchema: schema}});
-    const deadline = Date.now() + 90000;
-    const call = (model: string) => fetch(`${API}/models/${model}:generateContent`, {
-      method: 'POST', headers: {'x-goog-api-key': apiKey, 'content-type': 'application/json'}, body: request, signal: AbortSignal.timeout(Math.max(1, Math.min(35000, deadline - Date.now())))
+    const call = (model: string, remaining: number) => fetch(`${API}/models/${model}:generateContent`, {
+      method: 'POST', headers: {'x-goog-api-key': apiKey, 'content-type': 'application/json'}, body: request, signal: AbortSignal.timeout(Math.min(30000, remaining))
     });
-    const {response: ai, model: MODEL} = await readTicketModel({
+    const {response: ai, model: MODEL, tried} = await readTicketModel({
       preferred: activeModel || PREFERRED_MODEL,
-      call: async (model: string) => {
-        try { return await call(model); }
+      call: async (model: string, remaining: number) => {
+        try { return await call(model, remaining); }
         catch (error) {
           if (error instanceof Error && ['TimeoutError', 'AbortError', 'TypeError'].includes(error.name))
             return new Response(null, {status: 503});
           throw error;
         }
       },
-      listModels: async () => { const found = await flashModels(apiKey).catch(() => []); return [...found, ...FALLBACK_MODELS.filter(m => !found.includes(m))]; }
+      listModels: async () => { const found = await flashModels(apiKey).catch(() => []); return found.length ? found : FALLBACK_MODELS; }
     });
     if (ai.ok) activeModel = MODEL;
     if (ai.status === 429) return respond({error: 'La lectura avanzada está muy solicitada ahora. Inténtalo en un minuto.'}, 429);
     if (!ai.ok) {
-      console.error('gemini', ai.status, (await ai.text()).slice(0, 300));
+      console.error('gemini', ai.status, tried.join(','), (await ai.text()).slice(0, 300));
       return respond({error: 'La lectura avanzada no está disponible ahora. Inténtalo en unos minutos.'}, 502);
     }
     const out = await ai.json();

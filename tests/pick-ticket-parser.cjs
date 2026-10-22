@@ -172,3 +172,19 @@ assert.deepEqual(receiptEventDate(dateScan(['Parlay 2 Legs','Bears vs Packers TU
 assert.equal(receiptEventDate(dateScan(['BETSLIP','Lakers vs Celtics 2026-02-30']), '2026-10-19').eventDate,'',
  'Invalid calendar dates may not be auto-filled');
 console.log('PASS: instant date from exact match, English weekday, ticket placement anchor, multi-event last date, invalid dates and no blind placement date.');
+
+// FanDuel «9 leg Same Game Parlay+» con condiciones en MAYÚSCULAS (OCR real, 21 oct): RESULT & BOTH TO SCORE,
+// DOUBLE CHANCE, HOME TEAM OVER/UNDER… y una cuota sin signo («Bayern Munich 130»).
+{
+ const rows=["9 leg Same Game Parlay+                        +4956", "666 PTS PENDING 777 SUPER SUB", "Includes: 1 Same Game Parlay™ + 7 selections                                      A", "Same Game Parlay”                                -161", "Real Madrid v Sevilla                                      SUN 3:00PM ET", "Kylian Mbappe", "ANYTIME GOALSCORER", "Kylian Mbappe", "PLAYER TO HAVE 2 OR MORE SHOTS ON TARGET", "Over                                                       -178", "HOME TEAM OVER/UNDER 2.5 GOALS", "Al-Quadisiya (KSA) v Abha                           FRI 9:15AM ET", "Yes                                                         -270", "BOTH TEAMS TO SCORE", "Hamburger SV v Stuttgart                                      SAT 9:30AM ET", "* Barcelona                            +110", "RESULT & BOTH TO SCORE", "Betis v Barcelona                                           SAT 12:30PM ET", "© Bayern Munich                              130", "RESULT & BOTH TO SCORE", "Bayern Munich v RB Leipzig                                  SAT 12:30PM ET", "Leeds And Draw                                           -260", "DOUBLE CHANCE", "Leeds v Man Utd                                 SUN 9:00AM ET", "Yes                                                         -138", "BOTH TEAMS TO SCORE", "Fluminense v Santos                                      SUN 3:00PM ET", "Yes                                                         -156", "BOTH TEAMS TO SCORE", "Monterrey v Pachuca                                      SUN 9:00PM ET", "$111.11                                                        $5,618.24", "TOTAL WAGER                                                      TOTAL PAYOUT"];
+ const r=extract({text:rows.join('\n'),confidence:90});
+ assert.equal(r.ok,true,r.reason);const x=r.readings[0];
+ assert.equal(x.odds,4956);assert.equal(x.selectionCount,9);
+ assert.match(x.selection,/Real Madrid v Sevilla: Kylian Mbappe · ANYTIME GOALSCORER \+ Kylian Mbappe · PLAYER TO HAVE 2 OR MORE SHOTS ON TARGET/);
+ assert.match(x.selection,/Bayern Munich v RB Leipzig: Bayern Munich · RESULT & BOTH TO SCORE/);
+ assert.match(x.selection,/Leeds v Man Utd: Leeds And Draw · DOUBLE CHANCE/);
+ assert.doesNotMatch(x.event,/\bSUN\b|\bSAT\b|PM ET/);
+ assert.equal(extract({text:rows.filter(l=>!l.startsWith('Leeds')).join('\n'),confidence:90}).ok,false,'Falta un partido: no se publica');
+ console.log('PASS: FanDuel SGP+ de 9 selecciones con condiciones en mayúsculas.');
+}
+

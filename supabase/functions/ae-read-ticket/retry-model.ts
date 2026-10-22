@@ -1,29 +1,31 @@
-// Bounded recovery for transient provider failures; never retry invalid requests.
-// Under "high demand" (503) Google often overloads one model while others answer, so after one
-// retry on the same model we fail over to up to two different models (newest Flash, then Flash-Lite).
-export async function readTicketModel({preferred, call, listModels, pause = ms => new Promise(resolve => setTimeout(resolve, ms))}) {
-  let model = preferred;
-  const tried = new Set([model]);
-  let response = await call(model);
-  if (response.status === 404) {
-    const alternatives = await listModels();
-    for (const candidate of alternatives.filter(name => !tried.has(name)).slice(0, 3)) {
-      model = candidate; tried.add(model);
-      response = await call(model);
-      if (response.status !== 404) break;
+// Bounded recovery for provider failures; never retry invalid or unauthorized requests.
+// Google's free tier is flaky per model: at the same moment one Flash answers 503 "high demand"
+// or hangs, another returns 404 (retired for new users) or 429 (no free quota), while others work.
+// So we walk a list of different models, one call each, until one answers or the time budget ends.
+export async function readTicketModel({preferred, call, listModels, maxCalls = 6, budgetMs = 85000,
+  now = () => Date.now(), pause = ms => new Promise(resolve => setTimeout(resolve, ms))}) {
+  const start = now();
+  const tried = new Set<string>();
+  let queue: string[] = [preferred], discovered = false;
+  let response: Response | null = null, model = preferred;
+  while (tried.size < maxCalls) {
+    if (!queue.length) {
+      if (discovered) break;
+      discovered = true;
+      queue = (await listModels()).filter((name: string) => !tried.has(name));
+      if (!queue.length) break;
     }
-  }
-  let alternatives: string[] | null = null;
-  for (let attempt = 0; attempt < 3 && [408, 429, 500, 502, 503, 504].includes(response.status); attempt++) {
-    // Release the failed response before sending the same ephemeral image again.
-    await response.body?.cancel();
-    await pause(1000 * 2 ** attempt + Math.floor(Math.random() * 250));
-    if (attempt >= 1) {
-      alternatives ??= await listModels();
-      model = alternatives.find(name => !tried.has(name)) || model;
-      tried.add(model);
+    const next = queue.shift()!;
+    if (tried.has(next)) continue;
+    if (response) {
+      await response.body?.cancel();
+      // Same model retried? never: a short breath before the next model is enough.
+      if ([500, 502, 503, 504].includes(response.status)) await pause(400 + Math.floor(Math.random() * 200));
     }
-    response = await call(model);
+    if (now() - start > budgetMs) break;
+    model = next; tried.add(model);
+    response = await call(model, Math.max(1000, budgetMs - (now() - start)));
+    if (response.ok || [400, 401, 403].includes(response.status)) break;
   }
-  return {response, model};
+  return {response: response!, model, tried: [...tried]};
 }
