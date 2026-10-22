@@ -17,7 +17,8 @@
     "test:editor": "node tests/news-editor.mjs && node tests/article-photo-edit.mjs",
     "test:drafts": "node tests/draft-guard.mjs",
     "test:capture:recovery": "node tests/pick-reader-retry.mjs && node tests/pick-reader-function.mjs && node tests/pick-capture-ui.mjs",
-    "test:picks:browser": "node tests/picks-feed-scroll-browser.cjs"
+    "test:picks:browser": "node tests/picks-feed-scroll-browser.cjs",
+    "test:home:rankings:browser": "node tests/home-power-rankings-75.cjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.9",
