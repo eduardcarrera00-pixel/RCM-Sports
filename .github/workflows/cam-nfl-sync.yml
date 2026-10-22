@@ -1,0 +1,31 @@
+name: Synchronize NFL Quiniela
+on:
+  schedule:
+    # Hourly during the NFL calendar; UTC. Secret configuration is required.
+    - cron: '17 * * 9-12,1-2 *'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  synchronize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Request secure Supabase synchronization
+        env:
+          ENDPOINT: ${{ vars.CAM_NFL_SYNC_URL }}
+          SYNC_SECRET: ${{ secrets.CAM_NFL_CRON_SECRET }}
+        shell: bash
+        run: |
+          if [ -z "$ENDPOINT" ] || [ -z "$SYNC_SECRET" ]; then
+            echo "CAM_NFL_SYNC_URL or CAM_NFL_CRON_SECRET not configured; skipped safely."
+            exit 0
+          fi
+          case "$ENDPOINT" in
+            https://*.supabase.co/functions/v1/cam-nfl-sync) ;;
+            *) echo "Unexpected endpoint"; exit 1 ;;
+          esac
+          curl --fail-with-body --silent --show-error --retry 2 --max-time 90 \
+            -X POST "$ENDPOINT" \
+            -H 'Content-Type: application/json' \
+            -H "x-cam-cron: $SYNC_SECRET" \
+            --data '{"action":"sync"}'
