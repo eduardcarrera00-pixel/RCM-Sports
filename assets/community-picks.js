@@ -254,7 +254,7 @@ async function loadHistoricPick(){
   // Rank individual settled Picks across all time, independently of votes,
   // the active feed, monthly rankings and each author's accumulated score.
   const result=await db.from('ae_pick_feed').select('*')
-   .eq('outcome','won').gt('result_points',0)
+   .eq('moderation_status','approved').eq('outcome','won').gt('result_points',0)
    .order('result_points',{ascending:false})
    .order('settled_at',{ascending:true}).order('created_at',{ascending:true})
    .order('id',{ascending:true}).limit(1);
@@ -286,7 +286,7 @@ async function load(){
  if(!db)return;const seq=++request;
  try{
    const [feed,session]=await Promise.all([
-     db.from('ae_pick_feed').select('*').gte('event_date',todayToronto()).eq('outcome','pending').order('created_at',{ascending:false}).order('id',{ascending:false}).range(0,limit-1),
+     db.from('ae_pick_feed').select('*').in('moderation_status',['pending','approved']).gte('event_date',todayToronto()).eq('outcome','pending').order('created_at',{ascending:false}).order('id',{ascending:false}).range(0,limit-1),
      db.auth.getUser().catch(()=>({data:{user:null}}))
    ]);
    if(seq!==request)return;if(feed.error)throw feed.error;
@@ -382,7 +382,7 @@ async function rankingRepresentativePicks(records,period,kind){
  if(!ids.length)return chosen;
  const {data,error}=await db.from('ae_pick_feed')
    .select('id,user_id,title,outcome,result_points,settled_at,created_at')
-   .in('user_id',ids).in('outcome',['won','lost'])
+   .in('user_id',ids).eq('moderation_status','approved').in('outcome',['won','lost'])
    .order('settled_at',{ascending:false}).limit(1000);
  if(error)return chosen;
  const month=torontoMonth(new Date());
@@ -667,7 +667,7 @@ async function loadSettleHistory(){
  area.setAttribute('aria-busy','true');
  try{
  const r=await db.from('ae_pick_feed').select('id,title,author,event_date,american_odds,outcome,settled_at,result_points,legs')
-   .in('outcome',['won','lost','void']).order('settled_at',{ascending:false,nullsFirst:false}).limit(40);
+    .eq('moderation_status','approved').in('outcome',['won','lost','void']).order('settled_at',{ascending:false,nullsFirst:false}).limit(40);
  if(!current())return;
  if(r.error){failure(r.error);return;}
  const seen=new Set();
@@ -956,7 +956,7 @@ async function loadArchive(){
  const target=$('cpArchiveFeed'),status=$('cpArchiveStatus'),more=$('cpArchiveMore');
  if(!target||!db)return;
  target.replaceChildren(el('p','Cargando historial…'));status.textContent='';
- const r=await db.from('ae_pick_feed').select('*').order('created_at',{ascending:false}).order('id',{ascending:false}).range(0,archiveLimit-1);
+ const r=await db.from('ae_pick_feed').select('*').in('moderation_status',['pending','approved']).order('created_at',{ascending:false}).order('id',{ascending:false}).range(0,archiveLimit-1);
  if(r.error){target.replaceChildren(el('p','No se pudo cargar el historial. '+message(r.error)));more.hidden=true;return;}
  const records=r.data||[];
  target.replaceChildren(...records.map(p=>card(p,true)));
@@ -1003,7 +1003,7 @@ async function showDetail(id,options={}){
  if(!dialog.open)dialog.showModal();
  try{
   const [pick,comments,session,votes]=await Promise.all([
-   db.from('ae_pick_feed').select('*').eq('id',id).maybeSingle(),
+   db.from('ae_pick_feed').select('*').in('moderation_status',['pending','approved']).eq('id',id).maybeSingle(),
    db.from('ae_pick_comments').select('*').eq('pick_id',id).eq('hidden',false).order('created_at').limit(200),
    db.auth.getUser().catch(()=>({data:{user:null}})),
    db.rpc('ae_pick_comment_vote_totals',{p_pick_id:id})
