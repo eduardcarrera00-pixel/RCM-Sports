@@ -272,6 +272,10 @@ Deno.serve(async req => {
   try {
     const identity = await authenticate(req);
     const input = await req.json().catch(()=>({}));
+    const autopilot = await db.from("cam_nfl_automation_control")
+      .select("enabled").eq("singleton",true).maybeSingle();
+    if (autopilot.data?.enabled) throw Error("La automatización SportsDataIO está activa; no mezclar proveedores");
+
     const year = Number(input.season), selected = Number(input.week);
     if (!identity.cron && input.action !== "sync") throw Error("Acción inválida");
     if (identity.cron && (input.action && input.action !== "sync")) throw Error("Acción inválida");
