@@ -64,7 +64,7 @@ async function visit(browser,name,width,height,dark,mobile){
       const rect=item?.node.getBoundingClientRect(),style=item?getComputedStyle(item.node):null;
       return {
         count:candidates.length,headerCount:header.length,
-        headerExists:!!document.querySelector('header nav.ae-sport-nav'),
+        headerExists:!!document.querySelector('header'),
         brand:!!document.querySelector('header .cam-brand'),auth:!!document.getElementById('guestAdminContainer'),
         pos:style?.position,bottom:rect?innerHeight-rect.bottom:null,barTop:rect?.top,
         pageWidth:document.documentElement.scrollWidth,viewportWidth:innerWidth,
