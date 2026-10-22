@@ -3212,10 +3212,15 @@ html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > .ae-takes-hea
           <div id="camNflNav" class="cam-nfl-nav" aria-label="Temporada y jornada"></div>
           <p id="camNflWeekInfo" class="cam-nfl-status" aria-live="polite"></p>
           <p id="camNflStatus" class="cam-nfl-status" role="status" aria-live="polite"></p>
+          <section id="camNflWeekSummary" class="cam-nfl-week-summary" aria-label="Resumen de toda la jornada"></section>
+          <div id="camNflDayNav" class="cam-nfl-day-nav" aria-label="Seleccionar día de partido"></div>
           <p id="camNflProgress" class="cam-nfl-progress" aria-live="polite"></p>
           <div id="camNflGames" class="cam-nfl-games"></div>
           <div id="camNflSummary" class="cam-nfl-summary" aria-live="polite"></div>
-          <div class="cam-nfl-save-row"><button id="camNflSave" type="button" class="cam-nfl-action">Guardar mi quiniela</button></div>
+          <div class="cam-nfl-save-row">
+            <button id="camNflSaveDay" type="button" class="cam-nfl-action">Guardar picks del día</button>
+            <button id="camNflSave" type="button" class="cam-nfl-action cam-nfl-action-secondary">Guardar toda la jornada</button>
+          </div>
           <details class="cam-nfl-rules">
             <summary>¿Cómo funcionan los puntos?</summary>
             <p>Antes de abrir cada partido congelamos las probabilidades reales, sin el margen de la casa. La fórmula es <strong>máximo de 2, mínimo de 12 y redondear 2 dividido entre la probabilidad</strong>.</p>
@@ -5738,6 +5743,41 @@ html.dark .cam-quiniela-matchup[data-pick-result="incorrect"] .cam-quiniela-stat
 #camNflProfile .cam-nfl-profile-history-item{margin:10px 0}
 @media(max-width:720px){.cam-nfl-history-fixtures{grid-template-columns:1fr}.cam-nfl-history-ranking ol{columns:1}
 .cam-nfl-ranking-picks{min-width:0}.cam-nfl-history-game{padding:8px}}
+/* CAM SPORTS · Navegación editorial por fecha oficial NFL (America/Toronto). */
+#camNflQuiniela .cam-nfl-week-summary{padding:12px 0 9px;border-block:1px solid var(--nfl-edge);margin:15px 0 12px}
+#camNflQuiniela .cam-nfl-week-summary h3{font:700 16px Cinzel,serif;color:var(--nfl-ink);margin:0 0 10px}
+#camNflQuiniela .cam-nfl-week-stats{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+#camNflQuiniela .cam-nfl-week-stat{min-width:0;border:1px solid color-mix(in srgb,var(--nfl-edge) 60%,transparent);background:var(--nfl-card);padding:9px 7px;text-align:center}
+#camNflQuiniela .cam-nfl-week-stat strong{display:block;color:var(--nfl-ink);font:700 19px/1.2 Cinzel,serif}
+#camNflQuiniela .cam-nfl-week-stat span{display:block;margin-top:3px;color:var(--nfl-muted);font-size:10px;line-height:1.3}
+#camNflQuiniela .cam-nfl-week-note{font-size:11px;line-height:1.5;color:var(--nfl-muted);margin:8px 0 0}
+#camNflQuiniela .cam-nfl-day-nav{min-width:0;margin:11px 0 9px}
+#camNflQuiniela .cam-nfl-days{display:flex;gap:7px;align-items:stretch;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;scrollbar-width:thin;scrollbar-color:var(--nfl-edge) transparent;padding:0 0 7px;min-width:0}
+#camNflQuiniela .cam-nfl-day{flex:1 0 125px;min-width:118px;max-width:215px;scroll-snap-align:start;padding:9px 12px;border:1px solid var(--nfl-edge);background:var(--nfl-card);color:var(--nfl-ink);text-align:left;cursor:pointer;transition:background-color .18s ease,border-color .18s ease}
+#camNflQuiniela .cam-nfl-day strong{display:block;font-size:13px;line-height:1.2;text-transform:capitalize;font-weight:700}
+#camNflQuiniela .cam-nfl-day span{display:block;margin:3px 0;color:var(--nfl-muted);font-size:12px}
+#camNflQuiniela .cam-nfl-day small{display:block;color:var(--nfl-muted);font-size:10px;line-height:1.3;white-space:normal}
+#camNflQuiniela .cam-nfl-day[aria-pressed="true"]{background:color-mix(in srgb,var(--nfl-accent) 16%,var(--nfl-card));border:2px solid var(--nfl-accent);padding:8px 11px}
+#camNflQuiniela .cam-nfl-day[aria-pressed="true"] strong{color:var(--nfl-accent)}
+#camNflQuiniela .cam-nfl-day-timezone{font-size:11px;color:var(--nfl-muted);margin:2px 0 7px}
+#camNflQuiniela .cam-nfl-action-secondary{background:transparent;color:var(--nfl-accent);border-color:var(--nfl-edge)}
+#camNflQuiniela .cam-nfl-action-secondary:disabled{opacity:.55}
+#camNflQuiniela .cam-nfl-day:focus-visible{outline:2px solid var(--nfl-accent);outline-offset:2px}
+@media(max-width:900px){
+ #camNflQuiniela .cam-nfl-week-stats{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:720px){
+ #camNflQuiniela .cam-nfl-days{gap:6px}
+ #camNflQuiniela .cam-nfl-day{flex:0 0 119px;min-width:119px;max-width:none;padding:9px 8px}
+ #camNflQuiniela .cam-nfl-day[aria-pressed="true"]{padding:8px 7px}
+ #camNflQuiniela .cam-nfl-week-stat{padding:8px 4px}
+ #camNflQuiniela .cam-nfl-week-stat strong{font-size:17px}
+ #camNflQuiniela .cam-nfl-save-row{align-items:stretch}
+ #camNflQuiniela .cam-nfl-save-row button{flex:1 1 150px;font-size:12px;padding:10px 8px}
+}
+@media(prefers-reduced-motion:reduce){
+ #camNflQuiniela .cam-nfl-day{transition:none}
+}
 </style>
 
 <script src="assets/cam-nfl-quiniela.js?v=20261022-quiniela-1"></script>
