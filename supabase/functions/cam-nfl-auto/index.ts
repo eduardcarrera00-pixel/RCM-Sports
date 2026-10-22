@@ -173,6 +173,9 @@ async function scheduleWeek(w:Week,rows:any[],teams:Map<string,any>){
    .eq("season",w.season).eq("phase",w.phase).eq("week",w.week).maybeSingle());
   if(old && Number(old.expected_games)>games.length)
     throw Error("Provider returned fewer fixtures than previous verified snapshot");
+  if(old && ["open","in_progress","closed"].includes(old.status) &&
+    Number(old.expected_games)!==games.length)
+    throw Error("Official fixture count changed after round opened: administrator review required");
   for(const row of games)await updateFixture(row,w,teams);
   const existing=requireData(await db.from("cam_nfl_week_state").select("*")
     .eq("season",w.season).eq("phase",w.phase).eq("week",w.week).maybeSingle());
@@ -202,10 +205,11 @@ async function syncSchedules(weeks:Week[],teams:Map<string,any>){
 }
 async function currentStoredWeeks():Promise<Week[]>{
   const rows=requireData(await db.from("cam_nfl_week_state")
-    .select("season,phase,week,status,last_success_at").in("status",["open","in_progress","sync_pending","pending","ready"])
+    .select("season,phase,week,status,last_success_at,closed_at").in("status",["open","in_progress","sync_pending","pending","ready","closed"])
     .order("season",{ascending:false}).limit(30));
-  return (rows||[]).filter((w:any)=>w.last_success_at ||
-    ["open","in_progress"].includes(w.status))
+  return (rows||[]).filter((w:any)=>w.status!=="closed" ||
+      (w.closed_at && Date.now()-Date.parse(w.closed_at)<14*86400000))
+    .filter((w:any)=>w.last_success_at || ["open","in_progress"].includes(w.status))
     .map((w:any)=>({season:w.season,phase:w.phase,week:w.week}));
 }
 async function syncResults(weeks:Week[],teams:Map<string,any>){
