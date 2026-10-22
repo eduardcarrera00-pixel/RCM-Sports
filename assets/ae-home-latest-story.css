@@ -240,3 +240,79 @@ html body.ae-is-home #mainContent #heroSection .ae-action-title{
     transition:none!important;
   }
 }
+
+
+/* CAM SPORTS · La noticia destacada adopta una superficie de piedra cálida
+   solamente en modo claro. El modo oscuro conserva su arte y contraste. */
+html:not(.dark) body.ae-is-home #mainContent #heroSection .editorial-hero{
+  color:#283b49!important;
+  border-color:#baa68e!important;
+  background:
+    radial-gradient(ellipse at 18% 6%,rgba(255,252,244,.52),transparent 56%),
+    linear-gradient(112deg,#d7c5af 0%,#e2d2bf 52%,#eee4d6 100%)!important;
+  box-shadow:0 9px 25px rgba(80,62,43,.12)!important;
+}
+html:not(.dark) body.ae-is-home #mainContent #heroSection .ae-hero-image-backdrop{
+  filter:blur(9px) saturate(.85) brightness(1.06)!important;
+  opacity:.32!important;
+}
+html:not(.dark) body.ae-is-home #mainContent #heroSection .editorial-hero-image{
+  filter:saturate(.96) contrast(1.01) brightness(1.04)!important;
+}
+html:not(.dark) body.ae-is-home #mainContent #heroSection .editorial-hero::after{
+  background:linear-gradient(104deg,
+    #dfd0bd 0%,
+    rgba(223,208,189,.99) 24%,
+    rgba(223,208,189,.94) 39%,
+    rgba(223,208,189,.68) 50%,
+    rgba(223,208,189,.24) 62%,
+    rgba(223,208,189,.04) 74%,
+    transparent 84%)!important;
+}
+html:not(.dark) body.ae-is-home #mainContent #heroSection .editorial-hero h1{
+  color:#283b49!important;
+  text-shadow:none!important;
+}
+html:not(.dark) body.ae-is-home #mainContent #heroSection .editorial-hero-copy>p:not(.editorial-eyebrow){
+  color:#4c5c65!important;
+}
+html:not(.dark) body.ae-is-home #mainContent #heroSection .editorial-actions .editorial-featured{
+  color:#fffaf3!important;
+  border-color:#775039!important;
+  background:#855b43!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.12)!important;
+}
+html:not(.dark) body.ae-is-home #mainContent #heroSection .editorial-actions .editorial-featured:hover{
+  border-color:#65432f!important;
+  background:#6d4936!important;
+}
+html:not(.dark) body.ae-is-home #mainContent #heroSection .editorial-actions .ae-quiet-cta{
+  color:#6d4936!important;
+  border-color:rgba(113,79,56,.6)!important;
+  background:rgba(255,250,241,.62)!important;
+}
+html:not(.dark) body.ae-is-home #mainContent #heroSection .editorial-actions .ae-quiet-cta:hover{
+  color:#533723!important;
+  border-color:#855b43!important;
+  background:#f3e7d8!important;
+}
+html:not(.dark) body.ae-is-home #mainContent #heroSection .editorial-actions button:focus-visible{
+  outline-color:#6d4936!important;
+}
+@media(max-width:760px){
+  html:not(.dark) body.ae-is-home #mainContent #heroSection .ae-hero-image-backdrop{
+    opacity:.22!important;
+    filter:blur(7px) saturate(.8) brightness(1.1)!important;
+  }
+  html:not(.dark) body.ae-is-home #mainContent #heroSection .editorial-hero-image{
+    opacity:.26!important;
+    filter:saturate(.9) brightness(1.12)!important;
+  }
+  html:not(.dark) body.ae-is-home #mainContent #heroSection .editorial-hero::after{
+    background:linear-gradient(100deg,
+      rgba(223,208,189,.99) 0%,
+      rgba(223,208,189,.97) 54%,
+      rgba(223,208,189,.90) 80%,
+      rgba(223,208,189,.78) 100%)!important;
+  }
+}
