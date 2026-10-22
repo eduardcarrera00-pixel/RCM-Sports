@@ -7,10 +7,12 @@ Esta pieza es **independiente del desarrollo de La Quiniela**. No reemplaza
 
 1. Cargar `assets/nfl-teams.js` **antes de**
    `assets/cam-nfl-quiniela-logos.js` en el HTML.
-2. Agregar `assets/cam-nfl-quiniela-logos.css` a
-   `assets/style-sources.json` en el orden adecuado y ejecutar
-   `node scripts/build-editorial-css.mjs`. Guardar también el bundle
-   resultante. No modificar el bundle a mano.
+2. Los estilos de La Quiniela se integraron en el bloque existente
+   `<style id="cam-nfl-quiniela-theme">` de `index.html`, sin añadir una
+   petición CSS nueva ni modificar el bundle editorial. La hoja
+   `assets/cam-nfl-quiniela-logos.css` queda como fuente aislada de referencia
+   para mantenimiento. No duplicarla en `style-sources.json` sin retirar
+   primero la copia integrada en la página.
 3. Renderizar **el mismo componente** en jornadas, resumen, historial,
    resultados y desglose de clasificación, con ambas imágenes siempre
    presentes y `selectedTeamId` para mostrar la elección.
