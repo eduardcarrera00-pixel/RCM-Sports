@@ -67,7 +67,11 @@ const server = http.createServer((req, res) => {
                 svgWidth:svg ? svg.getBoundingClientRect().width : 0,
                 svgStroke:svg?.getAttribute('stroke'),
                 imageDisplay:image ? getComputedStyle(image).display : null,
-                imageExists:!!image
+                imageExists:!!image,
+                circleSize:button.querySelector('.ae-nav-icon')?.getBoundingClientRect().width,
+                circleRadius:getComputedStyle(button.querySelector('.ae-nav-icon')).borderRadius,
+                caption:getComputedStyle(button.querySelector('span:last-child')).display,
+                iconColor:getComputedStyle(svg).color
               };
             });
             assert.equal(icon.svgCount,1,key+' vector icon exists');
@@ -76,10 +80,16 @@ const server = http.createServer((req, res) => {
             assert.equal(icon.svgStroke,'currentColor',key+' icon follows theme/active state');
             assert.equal(icon.imageDisplay,'none',key+' old WebP is hidden only on phone');
             assert.equal(icon.imageExists,true,key+' original desktop image remains');
+            assert.ok(icon.circleSize>=35 && icon.circleSize<=37,key+' same small circle frame');
+            assert.equal(icon.circleRadius,'50%',key+' circular stroke');
+            assert.notEqual(icon.caption,'none',key+' caption remains visible');
+            assert.equal(icon.iconColor,dark?'rgb(210, 192, 166)':'rgb(24, 51, 67)',key+' inactive theme color');
           }
           assert.deepEqual(layout.buttons.map(b=>b.key),['Picks','NFL','Fútbol','Opiniones']);
-          assert.ok(layout.bottom<=772 && layout.bottom>=750,JSON.stringify({width,dark,layout}));
-          assert.equal(layout.display,'flex','capsule dock should use flexible icon spacing');
+          assert.ok(Math.abs(layout.bottom-780)<=1,JSON.stringify({width,dark,layout}));
+          assert.ok(Math.abs(layout.width-width)<=1,JSON.stringify({width,dark,layout}));
+          assert.equal(layout.display,'flex','mobile dock should use flexible icon spacing');
+          assert.equal(layout.background,dark?'rgb(16, 37, 53)':'rgb(248, 242, 232)','theme-matched edge-to-edge background');
           assert.ok(layout.height>=60 && layout.height<=110,JSON.stringify({width,dark,layout}));
           for(const b of layout.buttons){
             assert.ok(b.rect.height>=44 && b.rect.width>=44,JSON.stringify({width,dark,b}));
@@ -109,34 +119,51 @@ const server = http.createServer((req, res) => {
     await page.locator('body > nav [data-category="NFL"]').click();
     await page.waitForFunction(()=>document.querySelector('body > nav [data-category="NFL"]').getAttribute('aria-current')==='page');
     assert.equal(await page.evaluate(()=>document.body.dataset.section),'NFL');
-    const nflPill=await nav.evaluate(el=>({
-      active:el.classList.contains('cam-nav-has-active'),
-      left:parseFloat(el.style.getPropertyValue('--cam-pill-left')),
-      width:parseFloat(el.style.getPropertyValue('--cam-pill-width')),
-      text:getComputedStyle(el.querySelector('[data-category="NFL"] span:last-child')).display,
-      inactiveText:getComputedStyle(el.querySelector('[data-category="Picks"] span:last-child')).display,
-      accessible:el.querySelector('[data-category="Picks"]').getAttribute('aria-label')
-    }));
-    assert.ok(nflPill.active && nflPill.width>=90 && nflPill.left>=0,JSON.stringify(nflPill));
-    assert.notEqual(nflPill.text,'none');
-    assert.equal(nflPill.inactiveText,'none');
-    assert.equal(nflPill.accessible,'Picks');
+    const nflSelected=await nav.evaluate(el=>{
+      const active=el.querySelector('[data-category="NFL"]');
+      const normal=el.querySelector('[data-category="Picks"]');
+      const a=active.querySelector('.ae-nav-icon');
+      const b=normal.querySelector('.ae-nav-icon');
+      return {
+        active:el.classList.contains('cam-nav-has-active'),
+        activeColor:getComputedStyle(active.querySelector('svg.cam-mobile-nav-symbol')).color,
+        selectedBorder:getComputedStyle(a).borderTopColor,
+        selectedFill:getComputedStyle(a).backgroundColor,
+        normalFill:getComputedStyle(b).backgroundColor,
+        selectedCircle:a.getBoundingClientRect().toJSON(),
+        normalCircle:b.getBoundingClientRect().toJSON(),
+        text:getComputedStyle(active.querySelector('span:last-child')).display,
+        inactiveText:getComputedStyle(normal.querySelector('span:last-child')).display,
+        accessible:normal.getAttribute('aria-label')
+      };
+    });
+    assert.ok(nflSelected.active,JSON.stringify(nflSelected));
+    assert.equal(nflSelected.activeColor,'rgb(136, 98, 55)','day selected icon is muted gold, not white');
+    assert.notEqual(nflSelected.selectedBorder,'rgb(255, 255, 255)');
+    assert.notEqual(nflSelected.selectedFill,nflSelected.normalFill,'active circle receives subtle fill');
+    assert.equal(nflSelected.selectedCircle.width,nflSelected.normalCircle.width,'active circle does not grow');
+    assert.notEqual(nflSelected.text,'none');
+    assert.notEqual(nflSelected.inactiveText,'none');
+    assert.equal(nflSelected.accessible,'Picks');
     await page.evaluate(()=>filterByCategory('Opiniones'));
     await page.waitForFunction(()=>document.querySelector('body > nav [data-category="Opiniones"]').getAttribute('aria-current')==='page');
-    await page.waitForFunction(()=>parseFloat(getComputedStyle(document.querySelector('body > nav.ae-sport-nav'),'::before').opacity)>=0.99);
-    const opinionPill=await nav.evaluate(el=>{
+    const opinionSelected=await nav.evaluate(el=>{
       const button=el.querySelector('[data-category="Opiniones"]');
       const label=button.querySelector('span:last-child');
       return {
-        left:parseFloat(el.style.getPropertyValue('--cam-pill-left')),
-        width:parseFloat(el.style.getPropertyValue('--cam-pill-width')),
+        iconColor:getComputedStyle(button.querySelector('svg.cam-mobile-nav-symbol')).color,
+        circleSize:button.querySelector('.ae-nav-icon').getBoundingClientRect().width,
         labelVisible:getComputedStyle(label).display!=='none',
         fits:label.scrollWidth<=label.clientWidth+1,
-        indicator:getComputedStyle(el,'::before').opacity
+        indicator:getComputedStyle(el,'::before').content
       };
     });
-    assert.ok(opinionPill.left>nflPill.left && opinionPill.width>=100 && opinionPill.labelVisible && opinionPill.fits,JSON.stringify(opinionPill));
-    assert.ok(Number(opinionPill.indicator)>=0.99,'the animated capsule becomes fully visible');
+    assert.equal(opinionSelected.iconColor,'rgb(136, 98, 55)');
+    assert.equal(opinionSelected.circleSize,nflSelected.selectedCircle.width);
+    assert.ok(opinionSelected.labelVisible && opinionSelected.fits,JSON.stringify(opinionSelected));
+    assert.equal(opinionSelected.indicator,'none','old moving pill is removed');
+    await page.evaluate(()=>document.documentElement.classList.add('dark'));
+    assert.equal(await page.locator('body > nav [data-category="Opiniones"] svg.cam-mobile-nav-symbol').evaluate(svg=>getComputedStyle(svg).color),'rgb(217, 171, 112)','night selected icon is gold, never white');
     await page.evaluate(()=>filterByCategory('Todos'));
     await page.waitForFunction(()=>!document.querySelector('body > nav').classList.contains('cam-nav-has-active'));
     const input=page.locator('#mobileSearchInput');
