@@ -53,7 +53,7 @@ async function visit(browser,name,width,height,dark,mobile){
   const label=name+'-'+(dark?'noche':'dia');
   try{
     await page.addInitScript({content:'window.__camAuditNav='+navInfo.toString()+';'});
-    await page.addInitScript(mode=>{try{localStorage.setItem('rcm_sports_theme',mode);}catch{}},dark?'dark':'light');
+    await page.addInitScript(mode=>{try{localStorage.setItem('rcm_sports_theme',mode);sessionStorage.setItem('cam_sports_home_welcome_seen_session_v1','1');}catch{}},dark?'dark':'light');
     await page.goto(global.url,{waitUntil:'domcontentloaded',timeout:45000});
     await page.waitForTimeout(700);
     const status=await page.evaluate(()=>{
