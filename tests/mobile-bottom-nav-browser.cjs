@@ -95,6 +95,7 @@ const server = http.createServer((req, res) => {
     assert.equal(nflPill.accessible,'Picks');
     await page.evaluate(()=>filterByCategory('Opiniones'));
     await page.waitForFunction(()=>document.querySelector('body > nav [data-category="Opiniones"]').getAttribute('aria-current')==='page');
+    await page.waitForFunction(()=>parseFloat(getComputedStyle(document.querySelector('body > nav.ae-sport-nav'),'::before').opacity)>=0.99);
     const opinionPill=await nav.evaluate(el=>{
       const button=el.querySelector('[data-category="Opiniones"]');
       const label=button.querySelector('span:last-child');
