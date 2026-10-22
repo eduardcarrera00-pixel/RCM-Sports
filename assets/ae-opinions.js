@@ -86,16 +86,18 @@
   const publishedDate = o => Number.isFinite(Date.parse(o.created_at)) ? Date.parse(o.created_at) : 0;
   const latestFirst = (a,b) => publishedDate(b)-publishedDate(a) || String(b.id).localeCompare(String(a.id));
   function visible() {
-    const unique = new Set();
-    return [...items, ...sportNews()]
-      .filter(o => active === 'todas' || o.sport === active)
-      .sort(latestFirst)
-      .filter(o => {
-        const key=storyKey(o);
-        if(unique.has(key))return false;
-        unique.add(key);
-        return true;
-      });
+    const unique=new Map();
+    // Una columna original conserva su portada y fecha si la noticia se enlaza
+    // también en Opiniones. Nunca sustituir una pieza destacada por un duplicado.
+    for(const o of [...items,...sportNews()].filter(o=>active==='todas'||o.sport===active)){
+      const key=storyKey(o);
+      const previous=unique.get(key);
+      if(!previous||(
+        (previous.is_news&&!o.is_news)||
+        (Boolean(previous.is_news)===Boolean(o.is_news)&&latestFirst(o,previous)<0)
+      ))unique.set(key,o);
+    }
+    return [...unique.values()].sort(latestFirst);
   }
 
   function renderTabs() {
