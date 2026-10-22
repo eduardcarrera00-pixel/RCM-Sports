@@ -181,3 +181,47 @@ html.dark #camSiteImageDialog .cam-logo-size-foot [data-act=resetSize] {color:#e
 @media(prefers-reduced-motion:reduce) {
   #camSiteImageDialog .cam-logo-size-thumb img {transition:none}
 }
+
+
+/* Textos de interfaz: mismos lápices globales, sin afectar diseño público. */
+html:not(.cam-global-edit-active) .cam-site-text-layer{display:none!important;pointer-events:none!important}
+.cam-site-text-layer{position:fixed;inset:0;z-index:75;pointer-events:none}
+.cam-site-text-pencil{position:absolute;display:grid;place-items:center;width:20px;height:20px;padding:2px;background:#192f40;color:#f3d9ae;border:1px solid #d2a365;border-radius:2px;box-shadow:0 2px 8px #0004;pointer-events:auto;cursor:pointer}
+.cam-site-text-pencil svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.cam-site-text-pencil:hover,.cam-site-text-pencil:focus-visible{background:#31536b;color:#fff;outline:2px solid #dfb57e;outline-offset:2px}
+.cam-site-text-dialog{width:min(530px,calc(100vw - 20px));max-width:530px;max-height:90dvh;box-sizing:border-box;margin:auto;padding:0;border:1px solid #bc9a6d;border-radius:3px;background:#f6f0e6;color:#24333e;box-shadow:0 22px 70px #0007;overflow:auto;font:14px/1.45 Inter,system-ui,sans-serif}
+.cam-site-text-dialog::backdrop{background:rgba(9,22,32,.70)}
+.cam-site-text-form{display:block}
+.cam-site-text-form>header{position:sticky;top:0;z-index:2;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:17px 18px 11px;background:#f6f0e6;border-bottom:1px solid #ddcdb7}
+.cam-site-text-form header small{display:block;font-size:10px;letter-spacing:.15em;color:#84633d}
+.cam-site-text-form header h2{margin:2px 0 3px;font-size:20px;line-height:1.2;font-weight:750}
+.cam-site-text-form [data-location]{margin:0;color:#637079;font-size:12px}
+.cam-site-text-form [data-close]{font-size:26px;line-height:25px;width:29px;height:29px;cursor:pointer;border:0;color:inherit;background:transparent}
+.cam-site-text-body{padding:14px 18px;display:grid;gap:13px}
+.cam-site-text-body section{padding-top:11px;border-top:1px solid #dfd1c0}
+.cam-site-text-body h3{margin:0 0 9px;font-size:12px;font-weight:750;letter-spacing:.03em}
+.cam-site-text-body h3 small{font-weight:400;color:#66737f}
+.cam-site-text-body label{display:grid;gap:5px;font-size:12px;font-weight:650}
+.cam-site-text-body textarea,.cam-site-text-body select,.cam-site-text-body input[type="number"]{width:100%;box-sizing:border-box;border:1px solid #bcb2a4;border-radius:2px;background:#fffdfa;color:#1d2b35;min-height:34px;padding:6px 8px;font:13px Inter,system-ui,sans-serif}
+.cam-site-text-body textarea{min-height:78px;resize:vertical}
+.cam-site-text-two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cam-site-text-size label{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:6px 0 10px}
+.cam-site-text-size label span{display:flex;align-items:center;gap:5px;min-width:0}
+.cam-site-text-size input[type="range"]{max-width:130px;width:18vw;accent-color:#866137}
+.cam-site-text-size button{width:25px;height:25px;border:1px solid #c1a37e;background:#fff8ed;color:#24333e;cursor:pointer}
+.cam-site-text-size output{font-variant-numeric:tabular-nums;min-width:42px;font-size:11px;text-align:right}
+.cam-site-text-form [data-text-error]{min-height:18px;color:#9c2e24;margin:0;padding:0 18px;font-size:12px}
+.cam-site-text-form>footer{position:sticky;bottom:0;display:flex;gap:8px;align-items:center;padding:13px 18px;background:#f6f0e6;border-top:1px solid #ddcdb7}
+.cam-site-text-form>footer span{flex:1}
+.cam-site-text-form>footer button{padding:8px 11px;min-height:35px;border:1px solid #bcb2a4;background:transparent;color:inherit;font-size:12px;font-weight:700;cursor:pointer}
+.cam-site-text-form>footer [data-save]{background:#213f54;color:#fff;border-color:#213f54}
+.cam-site-text-form>footer [data-reset]{color:#855331}
+.cam-site-text-form button[disabled]{opacity:.5;cursor:wait}
+html.dark .cam-site-text-dialog{background:#152a38;color:#eee3d1;border-color:#755f45}
+html.dark .cam-site-text-form>header,html.dark .cam-site-text-form>footer{background:#152a38;border-color:#46515a}
+html.dark .cam-site-text-body section{border-color:#46515a}
+html.dark .cam-site-text-body textarea,html.dark .cam-site-text-body select,html.dark .cam-site-text-body input[type="number"]{background:#1e3647;color:#eee3d1;border-color:#697480}
+html.dark .cam-site-text-form [data-location]{color:#c0cad1}
+html.dark .cam-site-text-size button{background:#28435a;color:#fff}
+html.dark .cam-site-text-form>footer [data-save]{background:#bc9968;color:#132939;border-color:#bc9968}
+@media(max-width:540px){.cam-site-text-two{grid-template-columns:1fr 1fr;gap:7px}.cam-site-text-dialog{max-height:93dvh}.cam-site-text-body{padding:12px}.cam-site-text-form>header,.cam-site-text-form>footer{padding:12px}.cam-site-text-size input[type="range"]{width:24vw}.cam-site-text-form>footer button{padding:8px;font-size:11px}}
