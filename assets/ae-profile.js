@@ -560,6 +560,14 @@ function openPick(id){
 }
 
 function renderPickCard(p,feature=false){
+  // The same public Pick component supplies author, prediction, odds and controls.
+  // Retain legacy markup solely as a safe fallback when community code is unavailable.
+  if(typeof window.renderCamPickCard==='function'){
+    const node=window.renderCamPickCard(p,{compact:!feature,variant:'profile'});
+    node.classList.add('ae-profile-pick',feature?'ae-profile-pick-feature':'ae-profile-pick-recent','is-'+pickTone(p));
+    if(p.created_at)node.append(el('small',dateText(p.created_at),'cam-pick-profile-date'));
+    return node;
+  }
   const recent=!feature;
   const box=el('article',null,'ae-profile-pick '+(feature?'ae-profile-pick-feature ':'ae-profile-pick-recent ')+'is-'+pickTone(p));
   const meta=el('div',null,'ae-profile-pick-meta');
