@@ -320,10 +320,12 @@ Deno.serve(async(req:Request)=>{
     if(!mode)return json({error:"Invalid mode"},400);
     const control=requireData(await db.from("cam_nfl_automation_control")
        .select("enabled,provider").eq("singleton",true).single());
-    if(!control.enabled)return json({ok:false,state:"disabled"},503);
+    if(!control||!control.enabled)return json({ok:false,state:"disabled"},503);
     if(control.provider!=="sportsdataio"||!SPORTS_KEY)throw Error("SportsDataIO subscription is not configured");
     const run=requireData(await db.from("cam_nfl_sync_runs")
-      .insert({mode}).select("id").single());runId=run.id;
+      .insert({mode}).select("id").single());
+    if(!run)throw Error("Failed to persist synchronization run");
+    runId=run.id;
     const teams=await catalog();
     let schedule:any[]=[],odds:any={frozen:0},published:any[]=[];
     let weeks:Week[];
