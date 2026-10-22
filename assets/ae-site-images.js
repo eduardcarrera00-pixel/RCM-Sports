@@ -877,7 +877,7 @@
     ui.error.textContent = '';
     ui.dialog.classList.toggle('is-size-only', entry.kind === 'size-only');
     setupSize(entry);
-    window.camImageVisual?.open(key, entry.kind === 'size-only' ? 'img' : entry.kind, row?.visual, editing.el);
+    window.camImageVisual?.open(key, entry.kind === 'size-only' ? 'img' : entry.kind, row?.visual, editing.el, {x:row?.focus_x,y:row?.focus_y});
     if (entry.kind === 'size-only') {
       ui.reset.hidden = true; ui.variants.hidden = true; ui.note.hidden = true;
       ui.meta.textContent = '';
