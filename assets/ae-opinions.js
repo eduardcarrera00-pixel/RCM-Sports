@@ -317,8 +317,6 @@
   }
   function render(){
     const root=$('aeOpinions');if(!root)return;
-    const admin=isAdmin(),write=$('aeOpinionsWrite');
-    if(write)write.hidden=!admin;
     renderTabs();
     const list=$('aeOpinionsList');if(!list)return;
     list.replaceChildren();
@@ -560,7 +558,12 @@
   }
 
   function bind() {
-    $('aeOpinionsWrite')?.addEventListener('click', () => openEditor(null));
+    // La acción de crear opinión vive ahora en Publicar (+), no en la cabecera de Opiniones.
+    $('aeOpinionsWrite')?.addEventListener('click', () => {
+      if (!isAdmin()) return;
+      if (typeof window.closePublishModal === 'function') window.closePublishModal();
+      openEditor(null);
+    });
     document.addEventListener('ae:takes-updated',()=>{
       if(!$('aeOpinions')?.hidden)void loadTakes(true);
     });
