@@ -103,3 +103,81 @@ html:not(.cam-global-edit-active) cam-site-image-layer {display:none!important;p
   html body>header #camGlobalEditToggle .cam-global-edit-label {width:48px!important;max-width:48px!important;font-size:7px!important;}
   html body>header #camGlobalEditToggle svg {width:18px!important;height:18px!important;}
 }
+
+
+/* Edición visual de tamaño: mismo diálogo, sin afectar disposición ni archivos. */
+#camSiteImageDialog .cam-logo-size-panel {
+  box-sizing:border-box;
+  margin:12px 0 16px;
+  padding:12px 14px;
+  border:1px solid var(--ds-line,#b8a894);
+  color:var(--ds-text,#263949);
+  background:var(--ds-surface-soft,#f5efe6);
+  font:500 13px/1.45 Inter,system-ui,sans-serif;
+}
+#camSiteImageDialog .cam-logo-size-panel[hidden] {display:none!important}
+#camSiteImageDialog .cam-logo-size-head,
+#camSiteImageDialog .cam-logo-size-foot {
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+}
+#camSiteImageDialog .cam-logo-size-head strong {font-size:14px;font-weight:750}
+#camSiteImageDialog .cam-logo-size-head span {font-size:11px;opacity:.75}
+#camSiteImageDialog .cam-logo-size-tabs {display:flex;flex-wrap:wrap;gap:0;margin-top:10px}
+#camSiteImageDialog .cam-logo-size-tabs button {
+  appearance:none;min-height:30px;padding:6px 12px;margin:0 -1px 0 0;
+  border:1px solid var(--ds-line-strong,#887967);background:transparent;
+  color:inherit;font:650 12px/1 Inter,system-ui,sans-serif;cursor:pointer;
+}
+#camSiteImageDialog .cam-logo-size-tabs button[aria-pressed=true] {
+  color:var(--ds-on-action,#fff);background:var(--ds-action,#855b43);
+  border-color:var(--ds-action,#855b43);
+}
+#camSiteImageDialog .cam-logo-size-tabs.is-themes {margin-top:7px}
+#camSiteImageDialog .cam-logo-size-controls {
+  display:grid;grid-template-columns:32px minmax(70px,1fr) 55px 32px;
+  align-items:center;gap:9px;margin-top:14px;
+}
+#camSiteImageDialog .cam-logo-size-controls button {
+  appearance:none;display:grid;place-items:center;width:32px;height:32px;
+  border:1px solid var(--ds-line-strong,#887967);border-radius:0;
+  background:transparent;color:inherit;font:700 21px/1 Georgia,serif;cursor:pointer;
+}
+#camSiteImageDialog .cam-logo-size-controls input[type=range] {
+  display:block;width:100%;min-width:0;height:24px;accent-color:var(--ds-action,#855b43);
+}
+#camSiteImageDialog .cam-logo-size-controls output {
+  text-align:center;font:750 13px/1 Inter,system-ui,sans-serif;font-variant-numeric:tabular-nums;
+}
+#camSiteImageDialog .cam-logo-size-foot {margin-top:10px}
+#camSiteImageDialog .cam-logo-size-foot [data-act=resetSize] {
+  padding:5px 0;border:0;background:none;color:var(--ds-action,#855b43);
+  text-decoration:underline;text-underline-offset:3px;cursor:pointer;
+  font:650 11px/1.4 Inter,system-ui,sans-serif;text-align:left;
+}
+#camSiteImageDialog .cam-logo-size-thumb {
+  width:70px;height:55px;display:grid;place-items:center;overflow:visible;flex:none;
+  border:1px solid var(--ds-line,#b8a894);background:rgba(120,120,120,.10);
+}
+#camSiteImageDialog .cam-logo-size-thumb img {
+  width:62px!important;height:45px!important;max-width:62px!important;max-height:45px!important;
+  object-fit:contain!important;display:block!important;transform:none!important;
+  transition:scale .1s ease;
+}
+#camSiteImageDialog.is-size-only .ae-opinion-field-row,
+#camSiteImageDialog.is-size-only .cam-site-image-focus,
+#camSiteImageDialog.is-size-only [data-ui=altBox],
+#camSiteImageDialog.is-size-only [data-ui=meta],
+#camSiteImageDialog.is-size-only [data-act=reset] {display:none!important}
+html.dark #camSiteImageDialog .cam-logo-size-panel {background:#0d2637;border-color:#53616e;color:#f3e9dc}
+html.dark #camSiteImageDialog .cam-logo-size-tabs button {border-color:#53616e;color:#f3e9dc}
+html.dark #camSiteImageDialog .cam-logo-size-tabs button[aria-pressed=true] {background:#c6a077;color:#12283a}
+html.dark #camSiteImageDialog .cam-logo-size-foot [data-act=resetSize] {color:#e9c39c}
+#camSiteImageDialog .cam-logo-size-panel button:focus-visible,
+#camSiteImageDialog .cam-logo-size-panel input:focus-visible {outline:2px solid #d6a775;outline-offset:2px}
+@media(max-width:500px) {
+  #camSiteImageDialog .cam-logo-size-panel{padding:10px}
+  #camSiteImageDialog .cam-logo-size-controls{grid-template-columns:30px minmax(60px,1fr) 51px 30px;gap:6px}
+}
+@media(prefers-reduced-motion:reduce) {
+  #camSiteImageDialog .cam-logo-size-thumb img {transition:none}
+}
