@@ -304,6 +304,8 @@
       });
     }
     dialog.addEventListener('close',()=>{
+      // Un evento close retrasado no debe destruir una edición nueva.
+      if (dialog.open) return;
       const key=editing?.key;
       editing=null;savePending=false;
       if (key) {const d=ITEMS.find(t=>t.key===key);if(d)apply(d);}
@@ -385,14 +387,15 @@
   }
   async function reset() {
     if (!editOn() || !editing || savePending) return;
+    const key=editing.key;
     if (!confirm('¿Restaurar el texto original y todos sus estilos?')) return;
     const sb=client();
     if (!sb?.rpc) {showError('No hay conexión con Supabase.');return;}
     savePending=true;showError('');
     try {
-      const {error}=await sb.rpc('cam_reset_site_text',{p_key:editing.key});
+      const {error}=await sb.rpc('cam_reset_site_text',{p_key:key});
       if (error) throw error;
-      const key=editing.key;rows.delete(key);previewed.delete(key);writeCache();
+      rows.delete(key);previewed.delete(key);writeCache();
       const d=ITEMS.find(t=>t.key===key);
       // Los textos originales se guardan en la interfaz, no en Supabase.
       const f=d&&find(d),original=originals.get(key);
