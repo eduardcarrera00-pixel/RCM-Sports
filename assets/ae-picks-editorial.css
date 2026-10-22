@@ -46,8 +46,8 @@
 .ae-picks-rail h3{font:600 clamp(20px,1.9vw,25px)/1.16 Georgia,serif!important;color:#f8e9da!important;margin:4px 0 6px!important}
 .ae-picks-rail-heading p{color:#bfcbd2;font:400 12px/1.5 system-ui;margin:0}
 #picksPopular{list-style:none;padding:0;margin:0}
-#picksPopular li{display:grid;grid-template-columns:24px minmax(0,1fr);gap:10px;align-items:start;padding:13px 0;border-bottom:1px solid rgba(204,183,153,.12)}
-#picksPopular li:last-child{border-bottom:0;padding-bottom:2px}
+#picksPopular > li.ae-popular-item{display:grid;grid-template-columns:24px minmax(0,1fr);gap:10px;align-items:start;padding:13px 0;border-bottom:1px solid rgba(204,183,153,.12)}
+#picksPopular > li.ae-popular-item:last-child{border-bottom:0;padding-bottom:2px}
 #picksPopular .ae-popular-position{font:600 22px Georgia,serif;color:#d9aa83}
 #picksPopular .ae-popular-copy{display:grid;gap:4px;overflow-wrap:anywhere}
 #picksPopular .ae-popular-copy small{font:700 10px system-ui;letter-spacing:.055em;color:#c0a48c}
