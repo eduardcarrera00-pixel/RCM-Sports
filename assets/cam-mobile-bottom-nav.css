@@ -123,6 +123,7 @@ html body nav.ae-sport-nav svg.cam-mobile-nav-symbol {
     border: 1px solid rgba(223, 194, 151, .42) !important;
     border-radius: 50% !important;
     background: #102535 !important;
+    color: inherit !important; /* The editorial bundle otherwise forces gold on every .ae-nav-icon. */
     box-shadow: none !important;
     transition: border-color 160ms ease, background-color 160ms ease !important;
   }
