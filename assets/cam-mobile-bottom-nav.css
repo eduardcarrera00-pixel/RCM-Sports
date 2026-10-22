@@ -226,3 +226,14 @@ html body nav.ae-sport-nav svg.cam-mobile-nav-symbol {
     transition: none !important;
   }
 }
+
+/* The site-wide editorial square-corners reset is an IMPORTANT declaration
+   inside this named cascade layer. Restore circles *in that same layer*,
+   only while the nav is docked on phones; unlayered !important cannot beat it. */
+@layer ae-editorial-square-corners {
+  @media (max-width: 760px), (orientation: landscape) and (max-height: 500px) and (hover: none) and (pointer: coarse) {
+    html body > nav.cam-mobile-bottom-nav > button.category-btn .ae-nav-icon {
+      border-radius: 50% !important;
+    }
+  }
+}
