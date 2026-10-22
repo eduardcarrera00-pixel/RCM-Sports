@@ -181,6 +181,7 @@
   // ---------------------------------------------------------------------------
   const client = () => { try { return typeof db !== 'undefined' ? db : window.db; } catch { return window.db; } };
   const isAdmin = () => { try { return typeof currentAdmin !== 'undefined' && Boolean(currentAdmin); } catch { return false; } };
+  const editModeOn = () => isAdmin() && window.camGlobalEditMode?.isActive() === true;
   const safeUrl = url => (typeof url === 'string' && /^https:\/\/[A-Za-z0-9.-]+(:[0-9]{1,5})?\/\S*$/.test(url) && url.length <= 2048) ? url : '';
   const cssUrl = url => 'url("' + String(url).replace(/["\\\n]/g, encodeURIComponent) + '")';
   const isDark = () => document.documentElement.classList.contains('dark');
@@ -634,7 +635,7 @@
     admin.layers.clear(); admin.pencils.clear();
     const d = document.getElementById('camSiteImageDialog'); if (d?.open) d.close();
   }
-  function refresh() { if (isAdmin()) enableAdmin(); else disableAdmin(); }
+  function refresh() { if (editModeOn()) enableAdmin(); else disableAdmin(); }
 
   // ---------------------------------------------------------------------------
   // Diálogo de edición
@@ -717,7 +718,7 @@
   }
 
   async function openEditor(key, el) {
-    if (!isAdmin()) return;
+    if (!editModeOn()) return;
     buildDialog();
     const entry = ENTRIES.get(key); if (!entry) return;
     const r = el?.getBoundingClientRect?.();
@@ -829,7 +830,7 @@
 
   async function saveImage(e) {
     e.preventDefault();
-    if (!isAdmin() || !editing) return;
+    if (!editModeOn() || !editing) return;
     const { key } = editing; const entry = ENTRIES.get(key); const row = rows.get(key);
     ui.error.textContent = '';
     const typed = ui.url.value.trim();
@@ -863,7 +864,7 @@
   }
 
   async function resetImage() {
-    if (!isAdmin() || !editing) return;
+    if (!editModeOn() || !editing) return;
     const { key } = editing;
     if (!window.confirm('¿Volver a la imagen original del diseño?')) return;
     const sb = client(); if (!sb?.rpc) { ui.error.textContent = 'La conexión no está disponible.'; return; }
