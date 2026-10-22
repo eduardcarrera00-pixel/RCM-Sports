@@ -900,6 +900,8 @@
     const typed = safeUrl(ui.url.value.trim());
     const fresh = ui.localUrl || typed;
     const src = fresh || row?.url || '';
+    if (sizing && editing.el?.localName === 'img' && ui.sizeThumb)
+      ui.sizeThumb.src = src || originalSrc(entry);
     const box = ui.preview;
     box.style.backgroundRepeat = 'no-repeat';
     if (src) {
