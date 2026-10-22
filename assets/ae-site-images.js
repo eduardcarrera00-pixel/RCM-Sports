@@ -781,7 +781,10 @@
 
   function refreshSizeControls() {
     if (!sizing) return;
-    const pct = window.camVisualSizes.get(sizing.key, sizing.device, sizing.theme);
+    const draftId = sizing.device + '|' + sizing.theme;
+    const pct = sizing.drafts.get(draftId) ?? window.camVisualSizes.get(sizing.key, sizing.device, sizing.theme);
+    if (sizing.drafts.has(draftId))
+      window.camVisualSizes.preview(sizing.key, sizing.device, sizing.theme, pct);
     ui.sizeRange.min = '50'; ui.sizeRange.max = String(sizing.max);
     ui.sizeRange.value = String(pct);
     ui.sizeValue.textContent = pct + ' %';
@@ -798,6 +801,7 @@
     ui.sizeRange.value = String(pct);
     ui.sizeValue.textContent = pct + ' %';
     ui.sizeThumb.style.scale = String(pct / 100);
+    sizing.drafts.set(sizing.device + '|' + sizing.theme, pct);
     window.camVisualSizes.preview(sizing.key, sizing.device, sizing.theme, pct);
   }
   function setupSize(entry) {
@@ -806,7 +810,7 @@
     sizing = item ? {
       key:item.key, device:window.camVisualSizes.deviceNow(),
       theme:entry.variant === NIGHT ? 'dark' : entry.variant === DAY ? 'light' : 'all',
-      max:item.max || 200
+      max:item.max || 200, drafts:new Map()
     } : null;
     ui.sizePanel.hidden = !sizing;
     if (!sizing) return;
@@ -814,9 +818,14 @@
     refreshSizeControls();
   }
   async function saveSize() {
-    if (!sizing) return;
-    const { key, device, theme } = sizing;
-    await window.camVisualSizes.save(key, device, theme, Number(ui.sizeRange.value));
+    if (!sizing || !sizing.drafts.size) return;
+    const { key } = sizing;
+    // Guardar los ajustes de varios dispositivos o temas en el mismo diálogo.
+    for (const [id, pct] of sizing.drafts) {
+      const [device, theme] = id.split('|');
+      await window.camVisualSizes.save(key, device, theme, pct);
+    }
+    sizing.drafts.clear();
   }
   async function fill() {
     const { key, aspect, contain, decorative } = editing;
