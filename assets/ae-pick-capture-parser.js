@@ -177,8 +177,8 @@
   const fail=reason=>({ok:false,reason,readings:[]});
   if(events.length>12)return fail('Hay demasiados partidos en el comprobante.');
   if(events.length>1&&!multi.test(plain))return fail('La imagen contiene varios boletos, no un Pick.');
-  const m=plain.match(/\b(?:parlay|multi)\s*(\d+)\s*legs?|\b(\d+)\s*selecciones\b/);
-  const expected=m?Number(m[1]||m[2]):null;
+  const m=plain.match(/\b(?:parlay|multi)\s*(\d+)\s*legs?|\b(\d+)\s*selecciones\b|\b(\d+)\s*legs?\s+parlay\b/);
+  const expected=m?Number(m[1]||m[2]||m[3]):null;
   if(expected!==null&&(expected!==events.length||expected>12))return fail('No se ven todas las selecciones que anuncia el boleto.');
   const headerIndex=lines.findIndex(l=>single.test(clean(l.text))||multi.test(clean(l.text)));
   const firstEvent=events[0].index;
@@ -186,13 +186,59 @@
    const found=candidates(l,headerIndex+j).filter(c=>c.confidence>=78);
    return j===0?found:odds(l.text.trim())?found:[];
   });
-  if(headerPrice.length>1)return fail('Aparecen varias cuotas totales en el encabezado.');
-  const price=headerPrice[0]||null;
+  // Con boost (PROFIT BOOST, Odds Boost) la cuota visible está aumentada: solo vale el momio
+  // original tachado, leído aparte (ticketPriceEvidence), y debe cuadrar con el % del boost.
+  const boost=data.hasBoostedTicketPrice||/\b(profit boost|odds boost|boosted)\b/.test(plain);
+  let price=null,originalBeforeBoost=false;
+  if(boost){
+   const evidence=data.ticketPriceEvidence,row=lines[headerIndex];
+   if(!evidence||evidence.confidence<85||!row||Math.abs((row.bbox?.y0??0)-evidence.headerY)>=12)
+    return fail('El boleto tiene boost y no se lee el momio original tachado. Sube una captura más nítida de la parte superior.');
+   price={...odds(evidence.visible),confidence:evidence.confidence,visible:evidence.visible};originalBeforeBoost=true;
+   if(!Number.isFinite(price.american))return fail('No se lee el momio original del boleto.');
+   const pct=Number((plain.match(/\b(?:profit|odds) boost\s*(\d{1,3})\s*%/)||[])[1]);
+   const shown=headerPrice.filter(c=>c.american!==price.american).map(c=>c.american);
+   if(pct&&price.american>0&&shown.length===1&&Math.abs(shown[0]-Math.round(price.american*(1+pct/100)))>2)
+    return fail('El momio original no cuadra con el boost del boleto. Prueba una captura más nítida.');
+  }else{
+   if(headerPrice.length>1)return fail('Aparecen varias cuotas totales en el encabezado.');
+   price=headerPrice[0]||null;
+  }
   const market=/\b(moneyline|match betting|winner|wins?|gana|ganador|spread|handicap|over|under|mas de|menos de|ambos anotan|both teams to score|btts|double chance|doble oportunidad|draw no bet|resultado final|anytime|goal\s*scorer|goalscorer|to score|touchdown|receiving|rushing|passing|rebounds?|assists?|cards?|tarjetas?|corners?|puntos?|points?|sets?|goles?|yards?|yardas?)\b/i;
   const stop=/\b(total wager|total stake|total payout|potential returns|stake|balance|cash out|share bet|reuse|pin bet|bet id|placed:|profit boost)\b/i;
   const tidy=x=>String(x||'').replace(/^[^\p{L}\p{N}+-]+/u,'').replace(/\s+/g,' ').trim();
   const readings=[];
-  for(let n=0;n<events.length;n++){
+  // FanDuel y similares ponen la selección ANTES de su partido:
+  //   Atlanta Hawks +137 / MONEYLINE / Atlanta Hawks @ Orlando Magic 7:10PM ET
+  const lastEvent=events.at(-1).index;
+  const selectionFirst=events.length>1&&market.test(lines[events[0].index-1]?.text||'')
+   &&!lines.slice(lastEvent+1).some(l=>market.test(l.text)&&!stop.test(l.text));
+  const eventLabel=t=>tidy(String(t).replace(/\s+(?:MON|TUE|WED|THU|FRI|SAT|SUN)(?:DAY)?\b.*$/i,'').replace(/\s+\d{1,2}:\d{2}\s*(?:AM|PM)?\s*(?:ET|EST|EDT|CT|PT)?\s*$/i,''));
+  if(selectionFirst){
+   for(let n=0;n<events.length;n++){
+    const event=events[n],from=n===0?headerIndex+1:events[n-1].index+1;
+    const sec=lines.slice(Math.max(0,from),event.index);
+    const cond=sec.map((l,k)=>({l,k})).filter(x=>market.test(x.l.text)&&!stop.test(x.l.text)).at(-1);
+    if(!cond||cond.k<1)return fail('No se leyó el pronóstico completo junto con su mercado.');
+    const nameLine=sec[cond.k-1];
+    const priced=candidates(nameLine,from+cond.k-1).filter(c=>c.confidence>=78&&/^[+-]\d{3,6}$/.test(c.raw));
+    let name=nameLine.text;for(const c of priced)name=name.replace(c.raw,' ');
+    name=tidy(name.replace(/\s[+-]?\d{3,6}\s*$/,'').replace(/^(?:(?![A-Z]{2}\b)[^\s]{1,2}\s+)+/,''));
+    const condition=tidy(sec.slice(cond.k).map(l=>l.text).join(' '));
+    const selection=tidy(name+' · '+condition);
+    if(name.length<2||!/\p{L}{2}/u.test(name)||selection.length>500)return fail('No se leyó el pronóstico completo junto con su mercado.');
+    const eventName=eventLabel(event.text);
+    if(eventName.length<6||eventName.length>160)return fail('No se pudo leer el partido completo.');
+    const teams=eventName.split(/\s+(?:vs?\.?|versus|contra|at)\s+|\s*@\s+/i);
+    if(/\b(moneyline|match betting|winner)\b/i.test(selection)&&teams.length===2&&
+      !teams.some(team=>tokens(team).filter(w=>w.length>3).some(w=>tokens(name).includes(w))))
+     return fail('El pronóstico no se puede relacionar con un equipo del partido.');
+    const chosen=priced.length===1?priced[0]:null;
+    if(!chosen&&!originalBeforeBoost)return fail('No se identifica una única cuota para cada selección.');
+    readings.push({event:eventName,selection,odds:chosen?chosen.american:null,confidence:Math.floor(chosen?chosen.confidence:price?.confidence||0)});
+   }
+  }
+  for(let n=0;!selectionFirst&&n<events.length;n++){
    const event=events[n],next=n+1<events.length?events[n+1].index:lines.length;
    const stopAt=lines.findIndex((l,i)=>i>event.index&&i<next&&stop.test(l.text));
    const section=lines.slice(event.index+1,stopAt>=0?stopAt:next);
@@ -225,12 +271,15 @@
    readings.push({event:eventName,selection,odds:chosen.american,confidence:Math.floor(chosen.confidence)});
   }
   const decimal=readings.reduce((v,r)=>v*(r.odds>0?1+r.odds/100:1+100/Math.abs(r.odds)),1);
-  if(price&&readings.length>1&&Math.abs(price.american-american(decimal))>2)
+  if(originalBeforeBoost){
+   // Con boost el total lo da el momio original tachado (ya cotejado con el % del boost).
+   if(readings.length<3&&readings.some(r=>!r.odds))return fail('No se identifica una única cuota para cada selección.');
+  }else if(price&&readings.length>1&&Math.abs(price.american-american(decimal))>2)
    return fail('El total del boleto no coincide con las cuotas de sus selecciones.');
   const sport=x=>{
    const t=clean(x);
    if(/\b(nfl|packers|bengals|chiefs|touchdown|rushing|receiving)\b/.test(t))return 'NFL';
-   if(/\b(nba|lakers|celtics|raptors|pistons|rebounds)\b/.test(t))return 'NBA';
+   if(/\b(nba|rebounds|lakers|celtics|raptors|pistons|hawks|nets|hornets|bulls|cavaliers|mavericks|nuggets|warriors|rockets|pacers|clippers|grizzlies|heat|bucks|timberwolves|pelicans|knicks|thunder|magic|76ers|sixers|suns|trail blazers|blazers|kings|spurs|jazz|wizards)\b/.test(t))return 'NBA';
    if(/\b(futbol|soccer|barcelona|madrid|manchester|goals|goles|ambos anotan)\b/.test(t))return 'Fútbol';
    return 'Otros';
   };
@@ -239,8 +288,9 @@
    const event=readings.map(r=>r.event).join(' / ');
    const selection=readings.map((r,i)=>(i+1)+'. '+r.event+': '+r.selection).join(' / ');
    if(event.length>640||selection.length>2000)return fail('El boleto contiene demasiado texto para un Pick.');
-   return {ok:true,readings:[{event,selection,sport:sport(selection),odds:price.american,confidence:Math.floor(price.confidence),selectionCount:readings.length}],total:null,eventDate:''};
+   return {ok:true,readings:[{event,selection,sport:sport(selection),odds:price.american,confidence:Math.floor(price.confidence),selectionCount:readings.length,...(originalBeforeBoost?{originalBeforeBoost:true,visible:price.visible,format:'americana'}:{})}],total:null,eventDate:''};
   }
+  if(originalBeforeBoost&&readings.length===1)return {ok:true,readings:[{...readings[0],odds:price.american,originalBeforeBoost:true,visible:price.visible,format:'americana',sport:sport(readings[0].event+' '+readings[0].selection)}],total:null,eventDate:''};
   return {ok:true,readings:readings.map(r=>({...r,sport:sport(r.event+' '+r.selection)})),
    total:readings.length===2&&price?{american:price.american,decimal:price.decimal}:null,eventDate:''};
  }

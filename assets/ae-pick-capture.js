@@ -89,7 +89,7 @@
  // the increased quote. Never reverse a boost percentage or derive odds from cash.
  async function originalTicketPrice(canvas,data,job,aborted){
   const lines=window.aePickCaptureParser.linesFrom(data);
-  const header=lines.find(l=>/\b\d+\s*leg\s+same game parlay/i.test(l.text));
+  const header=lines.find(l=>/\b\d+\s*legs?\s+(?:same game\s+)?parlay/i.test(l.text));
   if(!header?.bbox||!header.words?.length)return;
   const context=canvas.getContext('2d',{willReadFrequently:true});
   const yellow=box=>{
@@ -128,16 +128,29 @@
     if(value&&/^[+-]\d{3,6}$/.test(text)&&scan.data.confidence>=85)seen.push({text,value,confidence:scan.data.confidence});
     if(pass===0){
      // Normalise contrast for both light and dark screenshots.
-     for(let i=0;i<pixels.data.length;i+=4){const value=Math.abs((pixels.data[i]+pixels.data[i+1]+pixels.data[i+2])/3-background)>40?255:0;pixels.data[i]=pixels.data[i+1]=pixels.data[i+2]=value;}
+     // Dark glyphs on white: Tesseract reads that polarity best.
+     for(let i=0;i<pixels.data.length;i+=4){const value=Math.abs((pixels.data[i]+pixels.data[i+1]+pixels.data[i+2])/3-background)>40?0:255;pixels.data[i]=pixels.data[i+1]=pixels.data[i+2]=value;}
      s.putImageData(pixels,0,0);ctx.drawImage(small,0,0,width,h,0,0,crop.width,crop.height);
     }else if(pass===1){
      // Erase only the long strike rows; retain surrounding glyph pixels.
-     s.fillStyle='#000';for(const row of rows)s.fillRect(0,row,width,1);
+     s.fillStyle='#fff';for(const row of rows)s.fillRect(0,row,width,1);
      ctx.drawImage(small,0,0,width,h,0,0,crop.width,crop.height);
     }
    }
-   if(seen.length&&Math.max(...seen.map(s=>s.confidence))>=92&&new Set(seen.map(s=>s.value.american)).size===1&&seen[0].value.decimal<window.aePickCaptureParser.odds(boosted.text).decimal)
-    data.ticketPriceEvidence={visible:seen[0].text,confidence:Math.floor(Math.min(...seen.map(s=>s.confidence))),headerY:header.bbox.y0};
+   // Accept the struck quote when every clear reading agrees and either one reading is very
+   // clear (≥92) or the boost arithmetic proves it: a profit boost multiplies the original
+   // profit by a whole 5% step (+1479 at 50% → +2219). A misread digit almost never fits.
+   const boostedValue=window.aePickCaptureParser.odds(boosted.text);
+   const agree=seen.length&&new Set(seen.map(s=>s.value.american)).size===1&&seen[0].value.decimal<boostedValue.decimal;
+   let boostPct=0;
+   if(agree){
+    const ratio=(boostedValue.decimal-1)/(seen[0].value.decimal-1),pct=Math.round((ratio-1)*20)*5;
+    const d=1+(seen[0].value.decimal-1)*(1+pct/100),expected=d>=2?Math.round((d-1)*100):Math.round(-100/(d-1));
+    if(pct>=5&&pct<=200&&Math.abs(expected-boostedValue.american)<=1)boostPct=pct;
+   }
+   const best=agree?Math.max(...seen.map(s=>s.confidence)):0;
+   if(agree&&(best>=92||(best>=85&&boostPct)))
+    data.ticketPriceEvidence={visible:seen[0].text,confidence:Math.floor(Math.min(...seen.map(s=>s.confidence))),headerY:header.bbox.y0,boostPct};
   }finally{
    crop.width=crop.height=1;job.canvases.delete(crop);
    small.width=small.height=1;job.canvases.delete(small);

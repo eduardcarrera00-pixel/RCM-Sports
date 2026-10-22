@@ -188,3 +188,21 @@ console.log('PASS: instant date from exact match, English weekday, ticket placem
  console.log('PASS: FanDuel SGP+ de 9 selecciones con condiciones en mayúsculas.');
 }
 
+// FanDuel «5 leg parlay» con PROFIT BOOST 50% (OCR real, 21 oct): selección ANTES de su partido,
+// cuotas sin signo y la cuota visible aumentada. Solo vale el momio original tachado leído aparte.
+{
+ const rows=["5 leg parlay                                            [RR +2219", "Atlanta Hawks Moneyline, Utah Jazz Moneyline, Indiana Pacers      te", "Moneyline, Houston Rockets Moneyline, Portland Trail Blazers...", "Atlanta Hawks                               +137", "MONEYLINE", "Atlanta Hawks @ Orlando Magic                              7:10PM ET", "af Utah Jazz                                  +115", "MONEYLINE", "Utah Jazz @ Memphis Grizzlies                               8:10PM ET", "2 Indiana Pacers                            127", "MONEYLINE", "Indiana Pacers @ New Orleans Pelicans                   8:10PM ET", "Houston Rockets                            -264", "MONEYLINE", "Dallas Mavericks @ Houston Rockets                    8:40PM ET", "©   Portland Trail Blazers                           121", "» MONEYLINE", "Phoenix Suns @ Portland Trail Blazers                     10:10PM ET", "o —;—]—;.—];];—\"——;]o]——;]]D;——];;—o—]]——_—"];
+ const base={text:rows.join('\n'),confidence:90,hasBoostedTicketPrice:true};
+ const r=extract({...base,ticketPriceEvidence:{visible:'+1479',confidence:89,headerY:0,boostPct:50}});
+ assert.equal(r.ok,true,r.reason);const x=r.readings[0];
+ assert.equal(x.odds,1479,'Momio original, nunca +2219');assert.equal(x.originalBeforeBoost,true);
+ assert.equal(x.selectionCount,5);assert.equal(x.sport,'NBA');
+ assert.match(x.selection,/1\. Atlanta Hawks @ Orlando Magic: Atlanta Hawks · MONEYLINE \/ 2\. Utah Jazz @ Memphis Grizzlies: Utah Jazz · MONEYLINE/);
+ assert.match(x.selection,/4\. Dallas Mavericks @ Houston Rockets: Houston Rockets · MONEYLINE \/ 5\. Phoenix Suns @ Portland Trail Blazers: Portland Trail Blazers · MONEYLINE$/);
+ assert.doesNotMatch(x.event,/PM ET/);
+ assert.equal(extract(base).ok,false,'Sin el momio original no se publica');
+ assert.equal(extract({...base,ticketPriceEvidence:{visible:'+1479',confidence:70,headerY:0}}).ok,false,'Lectura dudosa del tachado');
+ assert.equal(extract({...base,text:base.text+'\nPROFIT BOOST 50%',ticketPriceEvidence:{visible:'+1473',confidence:89,headerY:0}}).ok,false,'El original debe cuadrar con el boost');
+ assert.equal(extract({...base,text:rows.filter(l=>!l.startsWith('Utah Jazz @')).join('\n'),ticketPriceEvidence:{visible:'+1479',confidence:89,headerY:0}}).ok,false,'Faltan partidos');
+ console.log('PASS: FanDuel parlay con boost: momio original tachado, selección antes del partido.');
+}
