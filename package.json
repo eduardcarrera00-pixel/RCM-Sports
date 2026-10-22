@@ -18,7 +18,9 @@
     "test:drafts": "node tests/draft-guard.mjs",
     "test:capture:recovery": "node tests/pick-reader-retry.mjs && node tests/pick-reader-function.mjs && node tests/pick-capture-ui.mjs",
     "test:picks:browser": "node tests/picks-feed-scroll-browser.cjs",
-    "test:home:rankings:browser": "node tests/home-power-rankings-75.cjs"
+    "test:home:rankings:browser": "node tests/home-power-rankings-75.cjs",
+    "test:takes:football": "node tests/football-latest-takes-ui.mjs",
+    "test:takes:football:browser": "node tests/football-latest-takes-browser.cjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.9",
