@@ -148,11 +148,12 @@
   let result=null,signature='',active=null,sequence=0,usedAi=false;
   const fingerprint=()=>JSON.stringify({picks:getPicks().map(p=>({sport:p.sport,event:p.event,selection:p.selection,odds:Number(p.odds)}))});
   const panel=node('section',null,'cp-capture');panel.setAttribute('aria-labelledby','cpCaptureTitle');
-  const title=node('h3','Sube la captura de tu apuesta','cp-capture-title');title.id='cpCaptureTitle';
-  const intro=node('p','Leemos el partido, el pronóstico y el momio. Confirma los datos antes de publicar.','cp-capture-intro');
+  const title=node('h3','Sube tu captura','cp-capture-title');title.id='cpCaptureTitle';
+  const intro=node('p',null,'cp-capture-intro');
+  intro.append(node('strong','Lideratos en disputa.'),document.createTextNode(' Compite en las tablas mensuales e históricas.'));
   const picker=node('button','Subir captura','cp-capture-picker'),input=document.createElement('input');picker.type='button';picker.setAttribute('aria-describedby','cpCaptureHelp cpCaptureStatus');
   input.type='file';input.id='cpCaptureFile';input.accept='image/png,image/jpeg,image/webp';input.multiple=true;input.hidden=true;picker.addEventListener('click',()=>input.click());
-  const help=node('p','PNG, JPG o WebP · máx. 8 MB por imagen. No guardamos ni publicamos la captura. Si falla la lectura local, podemos usar Google temporalmente y te avisaremos.','cp-capture-help');help.id='cpCaptureHelp';
+  const help=node('p','No guardamos ni publicamos la captura.','cp-capture-help');help.id='cpCaptureHelp';
   const status=node('p','','cp-capture-status');status.id='cpCaptureStatus';status.setAttribute('role','status');status.setAttribute('aria-live','polite');
   const privacy=node('div',null,'cp-capture-privacy');privacy.hidden=true;privacy.setAttribute('role','status');privacy.setAttribute('aria-live','polite');privacy.setAttribute('aria-atomic','true');
   const privacyIcon=document.createElementNS('http://www.w3.org/2000/svg','svg');privacyIcon.setAttribute('viewBox','0 0 32 32');privacyIcon.setAttribute('aria-hidden','true');privacyIcon.classList.add('cp-capture-privacy-icon');
@@ -169,7 +170,10 @@
   // El comprobante es temporal; este aviso acompaña al botón sin alterar el proceso.
   const proof=node('p',null,'cp-capture-proof');
   proof.append(node('strong','Aquí lo que se canta se baila.'),node('span','Pedimos tu captura como evidencia del Pick. La leemos y después la descartamos.'));
-  panel.append(title,intro,picker,proof,input,shot,help,progress,privacy,status,summary,cancel);
+  const challenge=node('div',null,'cam-pick-hero__challenge');
+  const browse=node('button',null,'cam-pick-hero__browse');browse.type='button';browse.id='camPickBrowseLatest';browse.setAttribute('aria-label','Ver últimos Picks y debates de la comunidad');browse.append(document.createTextNode('Ver últimos Picks '),node('span','↗'));browse.lastChild.setAttribute('aria-hidden','true');
+  challenge.append(browse);
+  panel.append(title,picker,intro,challenge,input,shot,help,progress,privacy,status,summary,cancel,proof);
   form.prepend(panel);form.classList.add('cp-capture-first');
   const overlay=makeOverlay(form.closest('dialog')||document.body,()=>clear('Lectura cancelada.',true));
   const isCurrent=job=>active===job&&!job.cancelled;
@@ -242,7 +246,7 @@
   }
   function clear(message='Elige una captura para importar tu apuesta y su momio.',showDiscard=false){
    const job=stop(),revision=++sequence;if(!(showDiscard&&job))overlay.hide();result=null;signature='';summary.hidden=true;summary.replaceChildren();privacy.hidden=true;
-   input.value='';picker.textContent='Subir captura';title.textContent='Sube la captura de tu apuesta';panel.dataset.state='empty';status.textContent=message;shotImage.removeAttribute('src');shot.hidden=true;progress.hidden=true;progressBar.style.width='0%';applyImport(null);onChange();
+   input.value='';picker.textContent='Subir captura';title.textContent='Sube tu captura';panel.dataset.state='empty';status.textContent=message;shotImage.removeAttribute('src');shot.hidden=true;progress.hidden=true;progressBar.style.width='0%';applyImport(null);onChange();
    if(showDiscard&&job){
     showPrivacy('discarding');
     void dispose(job).then(discarded=>{if(sequence===revision&&!active)showPrivacy(discarded?'complete':'unconfirmed');});

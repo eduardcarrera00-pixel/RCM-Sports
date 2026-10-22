@@ -289,7 +289,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
     </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
-<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261021-picks-ticket-2">
+<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261021-compact-pick-compose-1">
 <link rel="stylesheet" href="assets/cam-season-guide.css?v=20261021-champion-guide-1">
 <link rel="stylesheet" href="assets/cam-pick-points-rules.css?v=20261021-rules-1">
 <link rel="stylesheet" href="assets/cam-analytics.css?v=20261020-1">
@@ -2544,32 +2544,31 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
 <dialog id="cpComposePanel" class="ae-pick-compose-dialog" aria-labelledby="cpComposeTitle" aria-describedby="cpComposeIntro">
  <header class="ae-pick-compose-head"><div><span>COCINA PICKS</span><h2 id="cpComposeTitle" tabindex="-1" autofocus>Prepara tu Pick</h2></div><button id="cpComposeClose" type="button" aria-label="Cerrar formulario de Pick">×</button></header>
  <div id="cpComposeIntro" class="cam-pick-hero" role="note">
-  <strong class="cam-pick-hero__title">¡A por el número 1, pickster!</strong>
-  <div class="cam-pick-hero__flow" aria-label="Sube la captura, preparamos tu Pick y borramos la foto">
-   <span>Sube captura</span><span aria-hidden="true">→</span><span>Preparamos tu Pick</span><span aria-hidden="true">→</span><span>Borramos la foto</span>
-  </div>
-  <small>Revisa el resultado. <strong>Tú decides si publicarlo.</strong></small>
-  <div class="cam-pick-hero__challenge">
-   <p><strong>¡El liderato se disputa!</strong> Compite en las tablas mensual e histórica.</p>
-   <button type="button" id="camPickBrowseLatest" class="cam-pick-hero__browse" aria-label="Ver últimos Picks y debates de la comunidad">Ver últimos Picks <span aria-hidden="true">↗</span></button>
+  <strong class="cam-pick-hero__title">¡A por el #1, Pickster!</strong>
+  <div class="cam-pick-how">
+   <strong class="cam-pick-how__title">Cómo funcionan los Picks</strong>
+   <div class="cam-pick-hero__flow" aria-label="Sube la captura, preparamos tu Pick y borramos la foto">
+    <span>Sube captura</span><span aria-hidden="true">→</span><span>Preparamos tu Pick</span><span aria-hidden="true">→</span><span>Borramos la foto</span>
+   </div>
+   <small>Revisa los datos. <strong>Tú decides si publicarlo.</strong></small>
+   <details id="camPickPointsRules" class="cam-pick-rules">
+    <summary>
+     <svg class="cam-pick-rules__trophy" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 4h8v4c0 3.5-1.6 6-4 6s-4-2.5-4-6V4Zm0 2H5v2c0 2 1.2 3 3.7 3.2M16 6h3v2c0 2-1.2 3-3.7 3.2M12 14v4M8 20h8"/></svg>
+     <span>Cómo funcionan los puntos</span>
+     <svg class="cam-pick-rules__chevron" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6"/></svg>
+    </summary>
+    <div class="cam-pick-rules__panel">
+     <p class="cam-pick-rules__lead">El momio marca los puntos cuando se confirma el resultado.</p>
+     <ul class="cam-pick-rules__list" aria-label="Puntuación con un momio de más 250">
+      <li><span class="cam-pick-rules__name"><span class="cam-pick-rules__dot" aria-hidden="true"></span>Acierto</span><strong class="cam-pick-rules__result cam-pick-rules__result--won">+2,50 pts</strong></li>
+      <li><span class="cam-pick-rules__name"><span class="cam-pick-rules__dot" aria-hidden="true"></span>Fallo</span><strong class="cam-pick-rules__result cam-pick-rules__result--lost">−2,50 pts</strong></li>
+      <li><span class="cam-pick-rules__name"><span class="cam-pick-rules__dot" aria-hidden="true"></span>Anulado</span><strong class="cam-pick-rules__result cam-pick-rules__result--void">0 pts</strong></li>
+     </ul>
+     <p class="cam-pick-rules__example"><strong>Momio +250:</strong> suma 2,50 si aciertas, resta 2,50 si fallas y queda en 0 si se anula.</p>
+    </div>
+   </details>
   </div>
  </div>
- <details id="camPickPointsRules" class="cam-pick-rules">
-  <summary>
-   <svg class="cam-pick-rules__trophy" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 4h8v4c0 3.5-1.6 6-4 6s-4-2.5-4-6V4Zm0 2H5v2c0 2 1.2 3 3.7 3.2M16 6h3v2c0 2-1.2 3-3.7 3.2M12 14v4M8 20h8"/></svg>
-   <span>¿Cómo funcionan los puntos?</span>
-   <svg class="cam-pick-rules__chevron" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6"/></svg>
-  </summary>
-  <div class="cam-pick-rules__panel">
-   <p class="cam-pick-rules__lead">Cuando se confirma el resultado de tu pick, ganas o pierdes puntos según su momio.</p>
-   <ul class="cam-pick-rules__list" aria-label="Puntuación con un momio de más 250">
-    <li><span class="cam-pick-rules__name"><span class="cam-pick-rules__dot" aria-hidden="true"></span>Acierto</span><strong class="cam-pick-rules__result cam-pick-rules__result--won">+2,50 pts</strong></li>
-    <li><span class="cam-pick-rules__name"><span class="cam-pick-rules__dot" aria-hidden="true"></span>Fallo</span><strong class="cam-pick-rules__result cam-pick-rules__result--lost">−2,50 pts</strong></li>
-    <li><span class="cam-pick-rules__name"><span class="cam-pick-rules__dot" aria-hidden="true"></span>Anulado</span><strong class="cam-pick-rules__result cam-pick-rules__result--void">0 pts</strong></li>
-   </ul>
-   <p class="cam-pick-rules__example"><strong>Ejemplo con momio +250:</strong> vale 2,50 puntos (momio ÷ 100). Si aciertas, sumas; si fallas, restas; si se anula, no cambia tu puntuación.</p>
-  </div>
- </details>
  <form id="cpForm"></form>
 </dialog>
 <dialog id="cpArchiveDialog" class="ae-picks-archive-dialog" aria-labelledby="cpArchiveTitle">
@@ -4622,7 +4621,7 @@ updateThemeButton();
 <script src="assets/ae-home-community-spotlight.js?v=20261018-reply-totals-1"></script>
 <script src="assets/champions.js?v=qa1-20261015-6"></script>
 <script src="assets/ae-pick-capture-parser.js?v=20261021-capture-recovery-1"></script>
-<script src="assets/ae-pick-capture.js?v=20261021-capture-recovery-1"></script>
+<script src="assets/ae-pick-capture.js?v=20261021-compact-pick-compose-1"></script>
 <script src="assets/community-picks.js?v=20261021-card-history-1"></script>
 <script src="assets/weekly-picks.js?v=20261015-1"></script>
 <script src="assets/username-auth.js?v=20261020-classical-auth-panel-1"></script>

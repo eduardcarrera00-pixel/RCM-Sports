@@ -40,7 +40,16 @@ for(const cls of ['.cp-compose-date','.cp-compose-analysis','.ae-draft-tools'])a
 assert.equal(await page.locator('#cpForm .cp-compose-footer').isVisible(),true,'The disabled publishing button is always displayed');
 assert.equal(await page.locator('#cpForm button[type=submit]').isVisible(),true);
 assert.match(await page.locator('#cpForm button[type=submit]').evaluate(e=>getComputedStyle(e).backgroundColor),/rgb\(\s*(?:73|213),/);
-assert.match(await page.locator('#cpComposeIntro').innerText(),/apuestas ya hechas/);
+assert.equal(await page.locator('.cam-pick-hero__title').innerText(),'¡A por el #1, Pickster!');
+assert.equal(await page.locator('.cam-pick-how__title').innerText(),'Cómo funcionan los Picks');
+assert.match(await page.locator('.cam-pick-hero__flow').innerText(),/Sube captura[\s\S]*Preparamos tu Pick[\s\S]*Borramos la foto/);
+assert.equal(await page.locator('.cam-pick-how > #camPickPointsRules').count(),1,'Capture and points explanations share one compact block');
+assert.match(await page.locator('.cp-capture-intro').innerText(),/Lideratos en disputa[\s\S]*tablas mensuales e históricas/);
+assert.equal(await page.locator('.cp-capture-help').innerText(),'No guardamos ni publicamos la captura.');
+assert.doesNotMatch(await page.locator('.cp-capture').innerText(),/máx\. 8 MB/);
+assert.equal(await page.locator('.cp-capture > #camPickBrowseLatest').count(),0);
+assert.equal(await page.locator('.cp-capture .cam-pick-hero__challenge > #camPickBrowseLatest').count(),1);
+assert.equal(await page.locator('.cp-capture').evaluate(el=>el.lastElementChild?.classList.contains('cp-capture-proof')),true,'The evidence promise closes the capture block');
 if(process.env.AE_CAPTURE_QA_DIR){fs.mkdirSync(process.env.AE_CAPTURE_QA_DIR,{recursive:true});await page.screenshot({path:process.env.AE_CAPTURE_QA_DIR+'/capture-first-mobile.png'});await page.setViewportSize({width:1366,height:940});await page.screenshot({path:process.env.AE_CAPTURE_QA_DIR+'/capture-first-desktop.png'});await page.setViewportSize({width:390,height:940});}
 async function scan(filename){await page.locator('#cpCaptureFile').setInputFiles(fixtures+'/'+filename);await page.waitForFunction(()=>['matched','error'].includes(document.querySelector('.cp-capture')?.dataset.state),null,{timeout:90000});const state=await page.locator('.cp-capture').getAttribute('data-state'),status=await page.locator('#cpCaptureStatus').innerText();console.log(filename,state,status);if(state!=='matched')fs.writeFileSync(fixtures+'/browser-ocr-failure.json',JSON.stringify(await page.evaluate(()=>window.testOcrReadings)));assert.equal(state,'matched');await page.waitForFunction(()=>document.querySelector('#cpCaptureFile').files.length===0);}
 await scan('simple.png');await page.waitForTimeout(100);assert.equal(activeWorkers,0);
