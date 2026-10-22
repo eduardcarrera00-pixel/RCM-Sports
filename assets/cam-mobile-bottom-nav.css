@@ -1,13 +1,13 @@
-/* CAM SPORTS — bottom navigation for phones ONLY (the real category buttons). */
+/* CAM SPORTS — premium capsule dock on phones only; reuse the original buttons. */
 @media (max-width: 760px), (orientation: landscape) and (max-height: 500px) and (hover: none) and (pointer: coarse) {
   html body {
-    --cam-bottom-nav-height: 68px;
-    padding-bottom: calc(var(--cam-bottom-nav-height) + env(safe-area-inset-bottom, 0px)) !important;
+    --cam-bottom-nav-height: 62px;
+    --cam-bottom-nav-gap: 10px;
+    padding-bottom: calc(var(--cam-bottom-nav-height) + 2 * var(--cam-bottom-nav-gap) + env(safe-area-inset-bottom, 0px)) !important;
   }
 
-  /* Hide the original header row while the script relocates this same DOM node. */
+  /* The same sport navigation node is relocated by the existing script. */
   html body > header nav.ae-sport-nav { display: none !important; }
-
   html body > header .ae-mobile-header-grid {
     height: auto !important;
     min-height: 64px !important;
@@ -18,36 +18,56 @@
   html body > nav.ae-sport-nav.cam-mobile-bottom-nav {
     position: fixed !important;
     top: auto !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
+    bottom: calc(var(--cam-bottom-nav-gap) + env(safe-area-inset-bottom, 0px)) !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
     z-index: 35 !important;
-    display: grid !important;
-    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    display: flex !important;
     align-items: stretch !important;
-    justify-content: stretch !important;
+    justify-content: space-between !important;
     box-sizing: border-box !important;
-    width: 100% !important;
-    max-width: 100% !important;
+    width: min(480px, calc(100vw - 24px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px))) !important;
+    max-width: 480px !important;
     min-width: 0 !important;
-    height: calc(var(--cam-bottom-nav-height) + env(safe-area-inset-bottom, 0px)) !important;
+    height: var(--cam-bottom-nav-height) !important;
     min-height: 0 !important;
     margin: 0 !important;
-    padding: 0 env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px) !important;
+    padding: 6px 7px !important;
     gap: 0 !important;
-    border: 0 !important;
-    border-top: 1px solid rgba(206, 169, 126, .34) !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
+    border: 1px solid rgba(194, 148, 98, .36) !important;
+    border-radius: 23px !important;
+    box-shadow: 0 3px 14px rgba(6, 22, 36, .13) !important;
     background: #102535 !important;
-    overflow: visible !important;
-    white-space: normal !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
     flex: none !important;
+    isolation: isolate;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
   }
 
-  /* Hide optional sports here; the existing Categories footer remains their secondary navigation. */
+  /* One shared copper pill travels between the four buttons, rather than blinking four backgrounds. */
+  html body > nav.ae-sport-nav.cam-mobile-bottom-nav::before {
+    content: "";
+    position: absolute;
+    top: 6px;
+    bottom: 6px;
+    left: 0;
+    width: var(--cam-pill-width, 0px);
+    border-radius: 999px;
+    background: #a45d31;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate3d(var(--cam-pill-left, 0px), 0, 0);
+    transition: transform 220ms cubic-bezier(.2,.7,.25,1), width 220ms cubic-bezier(.2,.7,.25,1), opacity 140ms ease;
+    z-index: 0;
+  }
+  html body > nav.ae-sport-nav.cam-mobile-bottom-nav.cam-nav-has-active::before {
+    opacity: 1;
+  }
+
+  /* Other categories remain available in the existing footer. */
   html body > nav.cam-mobile-bottom-nav > .category-btn:not([data-category="Picks"]):not([data-category="NFL"]):not([data-category="Fútbol"]):not([data-category="Opiniones"]),
   html body > nav.cam-mobile-bottom-nav > .category-btn[hidden] {
     display: none !important;
@@ -55,26 +75,29 @@
 
   html body > nav.cam-mobile-bottom-nav > button.category-btn:is([data-category="Picks"],[data-category="NFL"],[data-category="Fútbol"],[data-category="Opiniones"]) {
     position: relative !important;
+    z-index: 1;
     display: flex !important;
-    flex-direction: column !important;
+    flex: 1 1 0% !important;
+    flex-direction: row !important;
     align-items: center !important;
     justify-content: center !important;
     box-sizing: border-box !important;
-    width: 100% !important;
-    min-width: 0 !important;
+    width: auto !important;
+    max-width: none !important;
+    min-width: 44px !important;
     min-height: 44px !important;
     height: 100% !important;
     margin: 0 !important;
-    padding: 5px 2px 6px !important;
-    gap: 3px !important;
+    padding: 5px 3px !important;
+    gap: 5px !important;
     border: 0 !important;
-    border-radius: 0 !important;
+    border-radius: 999px !important;
     box-shadow: none !important;
     outline-offset: -3px !important;
     background: transparent !important;
-    color: #d4d9db !important;
-    font: 600 10px/1.1 Inter, system-ui, sans-serif !important;
-    letter-spacing: .035em !important;
+    color: #c1a482 !important;
+    font: 700 12px/1.1 Inter, system-ui, sans-serif !important;
+    letter-spacing: 0 !important;
     text-align: center !important;
     text-transform: none !important;
     white-space: nowrap !important;
@@ -82,13 +105,31 @@
     touch-action: manipulation;
   }
 
+  /* Icon-only inactive buttons; their aria-labels are retained by the script. */
+  html body > nav.cam-mobile-bottom-nav > button.category-btn > span:not(.ae-nav-icon) {
+    display: none !important;
+  }
+  html body > nav.cam-mobile-bottom-nav > button.category-btn.active,
+  html body > nav.cam-mobile-bottom-nav > button.category-btn[aria-current="page"] {
+    flex: 2 1 0% !important;
+    min-width: 104px !important;
+    color: #fff6e9 !important;
+    background: transparent !important;
+  }
+  html body > nav.cam-mobile-bottom-nav > button.category-btn:is(.active,[aria-current="page"]) > span:not(.ae-nav-icon) {
+    display: inline-block !important;
+    max-width: 100% !important;
+    overflow: visible !important;
+    white-space: nowrap !important;
+  }
+
   html body > nav.cam-mobile-bottom-nav > button.category-btn .ae-nav-icon {
     display: grid !important;
     place-items: center !important;
-    width: 30px !important;
-    height: 30px !important;
-    min-width: 30px !important;
-    min-height: 30px !important;
+    width: 27px !important;
+    height: 27px !important;
+    min-width: 27px !important;
+    min-height: 27px !important;
     padding: 0 !important;
     margin: 0 !important;
     border: 0 !important;
@@ -96,68 +137,55 @@
     background: transparent !important;
     box-shadow: none !important;
   }
-
   html body > nav.cam-mobile-bottom-nav > button.category-btn .ae-custom-sport-icon {
     display: block !important;
-    width: 30px !important;
-    height: 30px !important;
-    max-width: 30px !important;
-    max-height: 30px !important;
+    width: 27px !important;
+    height: 27px !important;
+    max-width: 27px !important;
+    max-height: 27px !important;
     object-fit: contain !important;
     border: 0 !important;
     background: transparent !important;
     box-shadow: none !important;
-    opacity: .80;
+    opacity: .82;
   }
-
-  html body > nav.cam-mobile-bottom-nav > button.category-btn.active,
-  html body > nav.cam-mobile-bottom-nav > button.category-btn[aria-current="page"] {
-    color: #efc795 !important;
-    border: 0 !important;
-    background: transparent !important;
-  }
-
-  html body > nav.cam-mobile-bottom-nav > button.category-btn.active::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 50%;
-    width: 38px;
-    height: 2px;
-    transform: translateX(-50%);
-    background: #c99a70;
-  }
-
-  html body > nav.cam-mobile-bottom-nav > button.category-btn.active .ae-custom-sport-icon {
+  html body > nav.cam-mobile-bottom-nav > button.category-btn:is(.active,[aria-current="page"]) .ae-custom-sport-icon {
     opacity: 1;
-    filter: brightness(1.10) saturate(1.06);
+    filter: brightness(0) invert(.97) sepia(.10);
   }
-
   html body > nav.cam-mobile-bottom-nav > button.category-btn:focus-visible {
-    outline: 2px solid #d6ac80 !important;
+    outline: 2px solid #f1c794 !important;
     outline-offset: -3px !important;
   }
 
+  /* Day theme changes palette only, never dimensions. */
   html:not(.dark) body > nav.ae-sport-nav.cam-mobile-bottom-nav {
-    background: #f6f1e9 !important;
-    border-top-color: rgba(132, 101, 76, .33) !important;
+    background: #f8f2e8 !important;
+    border-color: rgba(143, 104, 72, .28) !important;
+    box-shadow: 0 3px 12px rgba(57, 40, 26, .09) !important;
   }
-  html:not(.dark) body > nav.cam-mobile-bottom-nav > button.category-btn {
-    color: #616875 !important;
+  html:not(.dark) body > nav.ae-sport-nav.cam-mobile-bottom-nav::before {
+    background: #99562c;
   }
-  html:not(.dark) body > nav.cam-mobile-bottom-nav > button.category-btn.active,
-  html:not(.dark) body > nav.cam-mobile-bottom-nav > button.category-btn[aria-current="page"] {
-    color: #80573b !important;
+  html:not(.dark) body > nav.cam-mobile-bottom-nav > button.category-btn:not(.active):not([aria-current="page"]) {
+    color: #183343 !important;
   }
-  html:not(.dark) body > nav.cam-mobile-bottom-nav > button.category-btn.active::before {
-    background: #a47650;
+  html:not(.dark) body > nav.cam-mobile-bottom-nav > button.category-btn:not(.active):not([aria-current="page"]) .ae-custom-sport-icon {
+    filter: brightness(0) saturate(100%) invert(17%) sepia(23%) saturate(967%) hue-rotate(155deg) brightness(91%) contrast(96%);
+    opacity: .87;
   }
+  html:not(.dark) body > nav.cam-mobile-bottom-nav > button.category-btn:is(.active,[aria-current="page"]) {
+    color: #fff6e9 !important;
+  }
+  html:not(.dark) body > nav.cam-mobile-bottom-nav > button.category-btn:focus-visible {
+    outline-color: #153449 !important;
+  }
+
+  /* Respect keyboard editing and modal overlay behavior from the existing dock. */
   html body.cam-mobile-input-focus > nav.cam-mobile-bottom-nav {
     visibility: hidden !important;
     pointer-events: none !important;
   }
-
-  /* Fullscreen dialogs must never be obscured by the fixed navigation. */
   html body:has(> dialog[open]) > nav.cam-mobile-bottom-nav,
   html body:has(> #articleModal:not(.hidden)) > nav.cam-mobile-bottom-nav,
   html body:has(> #userAuthModal:not(.hidden)) > nav.cam-mobile-bottom-nav,
@@ -168,8 +196,25 @@
   }
 }
 @media (max-width: 360px) {
-  html body > nav.cam-mobile-bottom-nav > button.category-btn {
-    font-size: 9px !important;
-    letter-spacing: 0 !important;
+  html body > nav.cam-mobile-bottom-nav > button.category-btn:is(.active,[aria-current="page"]) {
+    font-size: 11px !important;
+    gap: 4px !important;
+  }
+  html body > nav.cam-mobile-bottom-nav > button.category-btn .ae-nav-icon {
+    width: 25px !important;
+    height: 25px !important;
+    min-width: 25px !important;
+    min-height: 25px !important;
+  }
+  html body > nav.cam-mobile-bottom-nav > button.category-btn .ae-custom-sport-icon {
+    width: 25px !important;
+    height: 25px !important;
+    max-width: 25px !important;
+    max-height: 25px !important;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html body > nav.ae-sport-nav.cam-mobile-bottom-nav::before {
+    transition: none !important;
   }
 }

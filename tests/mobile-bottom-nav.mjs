@@ -16,7 +16,9 @@ assert.match(index, /cam-mobile-bottom-nav\.css/);
 assert.match(css, /@media \(max-width: 760px\)/);
 assert.match(css, /position: fixed !important/);
 assert.match(css, /env\(safe-area-inset-bottom/);
-assert.match(css, /grid-template-columns: repeat\(4, minmax\(0, 1fr\)\)/);
+assert.match(css, /display: flex !important/);
+assert.match(css, /cam-nav-has-active/);
+assert.match(css, /prefers-reduced-motion: reduce/);
 assert.doesNotMatch(css, /@media\s*\(min-width:/);
 assert.match(visibility, /querySelector\('nav\.ae-sport-nav'\)/);
 
@@ -71,12 +73,21 @@ originalButtons.get('NFL').classList.add('active');
 await new Promise(resolve => setTimeout(resolve, 0));
 assert.equal(originalButtons.get('NFL').getAttribute('aria-current'), 'page');
 assert.equal(originalButtons.get('NFL').getAttribute('aria-pressed'), 'true');
+assert.equal(originalButtons.get('NFL').getAttribute('aria-label'), 'NFL');
+assert.equal(originalButtons.get('Opiniones').getAttribute('aria-label'), 'Opiniones');
+assert.equal(nav.classList.contains('cam-nav-has-active'), true);
 assert.equal(originalButtons.get('Picks').getAttribute('aria-pressed'), 'false');
 originalButtons.get('Fútbol').classList.add('active');
 originalButtons.get('NFL').classList.remove('active');
 await new Promise(resolve => setTimeout(resolve, 0));
 assert.equal(originalButtons.get('Fútbol').getAttribute('aria-current'), 'page');
 assert.equal(originalButtons.get('NFL').hasAttribute('aria-current'), false);
+// Home uses the hidden Todos filter: there must be no stale capsule.
+allButtons.forEach(button => button.classList.remove('active'));
+originalButtons.get('Todos').classList.add('active');
+await new Promise(resolve => setTimeout(resolve, 0));
+assert.equal(nav.classList.contains('cam-nav-has-active'), false);
+assert.equal(primary.every(key => originalButtons.get(key).getAttribute('aria-pressed') === 'false'), true);
 
 // A mobile keyboard/editor should hide the dock until input focus ends.
 const input = document.getElementById('composerInput');
@@ -95,6 +106,8 @@ mobileListeners.forEach(listener => listener({ matches: false }));
 assert.equal(nav.parentElement, document.querySelector('header .ae-mobile-header-grid'));
 assert.equal(nav.classList.contains('cam-mobile-bottom-nav'), false);
 assert.equal(nav.getAttribute('aria-label'), 'Explorar deportes');
+assert.equal(originalButtons.get('NFL').hasAttribute('aria-label'), false);
+assert.equal(nav.classList.contains('cam-nav-has-active'), false);
 assert.equal(allButtons.every(button => originalButtons.get(button.dataset.category) === button), true);
 
 // Orientation/resize back to phone cannot duplicate buttons.

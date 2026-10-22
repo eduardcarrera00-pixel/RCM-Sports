@@ -86,7 +86,7 @@ async function visit(browser,name,width,height,dark,mobile){
       assert.equal(status.count,1,label+': la nueva barra no existe o está duplicada');
       assert.equal(status.headerCount,0,label+': botones duplicados en encabezado');
       assert.equal(status.pos,'fixed',label+': posición no es fija');
-      assert.ok(Math.abs(status.bottom)<=3,label+': barra sin anclaje inferior');
+      assert.ok(status.bottom>=8 && status.bottom<=32,label+': barra flotante fuera del área segura');
       assert.deepEqual(status.buttons.map(b=>b.name),ITEMS,label+': orden o etiquetas incorrectos');
       assert.ok(Math.max(...status.buttons.map(b=>b.y))-Math.min(...status.buttons.map(b=>b.y))<=3,
         label+': accesos desalineados');
@@ -109,25 +109,41 @@ async function visit(browser,name,width,height,dark,mobile){
           dialogs:[...document.querySelectorAll('dialog[open]')].map(d=>d.id),
           nav:cs(n),button:cs(b),label:cs(label)};
       });
-      assert.equal(dockDebug.label.visibility,'visible',label+': etiqueta no visible: '+JSON.stringify(dockDebug));
+      assert.equal(dockDebug.label.display,'none',label+': en Home las etiquetas inactivas deben ocultarse: '+JSON.stringify(dockDebug));
       for(const sport of ITEMS){
         // A real touch event detects obstructed or non-interactive menu controls.
-        await page.locator('[data-cam-audit-nav]').getByText(sport,{exact:true}).first().tap({timeout:4000});
+        await page.locator('[data-cam-audit-nav] [data-category="'+sport+'"]').tap({timeout:4000});
         await page.waitForTimeout(125);
         const state=await page.evaluate(()=>{
           const n=window.__camAuditNav().options[0];
+          const current=n.node.querySelector('[data-category="'+n.items.find(b=>b.classList.contains('active'))?.dataset.category+'"]');
+          const labels=n.items.map(b=>({
+            category:b.dataset.category,
+            display:getComputedStyle(b.querySelector('span:last-child')).display,
+            ariaLabel:b.getAttribute('aria-label')
+          }));
           return {live:window.__camAuditMarker?.stable===true,
+            capsule:n.node.classList.contains('cam-nav-has-active'),
+            pillWidth:parseFloat(n.node.style.getPropertyValue('--cam-pill-width')),
+            labels, selectedFits:!current||current.querySelector('span:last-child').scrollWidth<=current.querySelector('span:last-child').clientWidth+1,
             active:n.items.filter(b=>b.classList.contains('active')||
               b.getAttribute('aria-current')==='page'||b.getAttribute('aria-selected')==='true'||
               b.getAttribute('aria-pressed')==='true').map(b=>window.__camAuditNav().label(b))};
         });
         assert.ok(state.live,label+': recarga innecesaria en '+sport);
         assert.deepEqual(state.active,[sport],label+': selección activa errónea en '+sport);
+        assert.ok(state.capsule && state.pillWidth>=95 && state.selectedFits,label+': cápsula incorrecta '+sport+' '+JSON.stringify(state));
+        for(const tab of state.labels){
+          assert.equal(tab.ariaLabel,tab.category,label+': botón sin nombre accesible');
+          assert.equal(tab.display==='none',tab.category!==sport,label+': texto inactivo/activo incorrecto');
+        }
       }
       await page.locator('header .cam-brand').click();
       await page.waitForTimeout(120);
       assert.ok(await page.evaluate(()=>document.querySelector('nav.ae-sport-nav [data-category="Todos"]')?.classList.contains('active')),
         label+': el logo no abre Home');
+      assert.equal(await page.evaluate(()=>document.querySelector('body > nav.ae-sport-nav').classList.contains('cam-nav-has-active')),false,
+        label+': Home deja la cápsula seleccionada por error');
       await page.evaluate(()=>window.scrollTo(0,document.documentElement.scrollHeight));
       await page.waitForTimeout(125);
       const bottom=await page.evaluate(()=>{
@@ -136,7 +152,7 @@ async function visit(browser,name,width,height,dark,mobile){
         const r=last?.getBoundingClientRect();
         return {navBottom:nav.bottom,footerVisible:!r||r.bottom<=nav.top+1};
       });
-      assert.ok(Math.abs(bottom.navBottom-height)<3,label+': barra se mueve al hacer scroll');
+      assert.ok(bottom.navBottom<=height-8 && bottom.navBottom>=height-32,label+': barra se mueve al hacer scroll');
       assert.ok(bottom.footerVisible,label+': el contenido final queda debajo de la barra');
       const layers=await page.evaluate(()=>{
         const nav=window.__camAuditNav().options[0].node.getBoundingClientRect();
