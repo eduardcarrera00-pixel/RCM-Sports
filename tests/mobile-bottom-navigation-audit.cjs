@@ -113,7 +113,7 @@ async function visit(browser,name,width,height,dark,mobile){
       for(const sport of ITEMS){
         // A real touch event detects obstructed or non-interactive menu controls.
         await page.locator('[data-cam-audit-nav] [data-category="'+sport+'"]').tap({timeout:4000});
-        await page.waitForTimeout(125);
+        await page.waitForTimeout(240); // Account for intentional 160ms icon/color transitions.
         const state=await page.evaluate(()=>{
           const n=window.__camAuditNav().options[0];
           const current=n.node.querySelector('[data-category="'+n.items.find(b=>b.classList.contains('active'))?.dataset.category+'"]');
