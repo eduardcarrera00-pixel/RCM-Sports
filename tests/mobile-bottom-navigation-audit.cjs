@@ -99,6 +99,17 @@ async function visit(browser,name,width,height,dark,mobile){
         window.__camAuditMarker={stable:true};
         window.__camAuditNav().options[0].node.setAttribute('data-cam-audit-nav','');
       });
+      const dockDebug=await page.evaluate(()=>{
+        const n=window.__camAuditNav().options[0].node;
+        const b=n.querySelector('[data-category="Picks"]');
+        const label=b.querySelector('span:last-child');
+        const cs=e=>({visibility:getComputedStyle(e).visibility,display:getComputedStyle(e).display,
+          opacity:getComputedStyle(e).opacity,rect:Math.round(e.getBoundingClientRect().height)});
+        return {body:document.body.className,focus:document.activeElement?.outerHTML.slice(0,140),
+          dialogs:[...document.querySelectorAll('dialog[open]')].map(d=>d.id),
+          nav:cs(n),button:cs(b),label:cs(label)};
+      });
+      assert.equal(dockDebug.label.visibility,'visible',label+': etiqueta no visible: '+JSON.stringify(dockDebug));
       for(const sport of ITEMS){
         // A real touch event detects obstructed or non-interactive menu controls.
         await page.locator('[data-cam-audit-nav]').getByText(sport,{exact:true}).first().tap({timeout:4000});
