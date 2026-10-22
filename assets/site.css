@@ -41,47 +41,50 @@ html:not(.dark):not(#camTerrace):not(#camTerrace):not(#camTerrace):not(#camTerra
 }
 
 
-/* CAM SPORTS · Pueblo griego en el pie de página · 2026-10-20 */
-/* Decoración del footer exclusivamente. El logo original, los menús,
-   los enlaces de administración y las redes sociales mantienen sus HTML
-   y funcionalidades existentes. Modo día: atardecer sobre el pueblo. */
+/* CAM SPORTS · Footer visual continuity with the Greek mountain header · 2026-10-22
+   Background only. Reuse the EXISTING matching header artwork, so the footer
+   shares its mountains, Greek silhouettes and navy palette instead of the
+   elaborate illuminated-village scene. No footer content/layout is touched.
+   The blue veil deliberately subdues scenic details behind links and logo. */
 html:not(.dark):not(#camVillage):not(#camVillage):not(#camVillage):not(#camVillage) body > footer.bg-slate-900.border-t{
-  background-color:#1e3343!important;
+  background-color:#26394b!important; /* Identical to the day header base. */
   background-image:
-    linear-gradient(90deg,rgba(13,28,42,.83) 0%,rgba(26,38,47,.63) 33%,rgba(35,42,47,.47) 63%,rgba(13,29,42,.64) 100%),
-    url('cam-footer-village-day.jpg')!important;
-  background-position:center center,center 53%!important;
+    linear-gradient(90deg,rgba(13,33,52,.88) 0%,rgba(19,41,63,.80) 46%,rgba(13,33,52,.89) 100%),
+    url('cam-header-terrace-day.jpg')!important;
+  background-position:center center,center 48%!important;
   background-size:cover,cover!important;
   background-repeat:no-repeat,no-repeat!important;
-  border-top-color:rgba(189,151,108,.58)!important;
+  border-top-color:rgba(174,140,101,.39)!important;
 }
-/* Modo noche: las casas iluminadas y la luna son visibles sin competir
-   con la marca y los textos del footer. */
 html.dark:not(#camVillage):not(#camVillage):not(#camVillage):not(#camVillage) body > footer.bg-slate-900.border-t{
-  background-color:#111f30!important;
+  background-color:#152536!important; /* Identical to the night header base. */
   background-image:
-    linear-gradient(90deg,rgba(8,19,33,.82) 0%,rgba(8,21,37,.66) 35%,rgba(8,21,38,.44) 65%,rgba(8,19,34,.66) 100%),
-    url('cam-footer-village-night.jpg')!important;
-  background-position:center center,center 53%!important;
+    linear-gradient(90deg,rgba(7,21,38,.90) 0%,rgba(12,30,50,.80) 46%,rgba(7,21,38,.91) 100%),
+    url('cam-header-terrace-night.jpg')!important;
+  background-position:center center,center 48%!important;
   background-size:cover,cover!important;
   background-repeat:no-repeat,no-repeat!important;
-  border-top-color:rgba(185,141,95,.50)!important;
+  border-top-color:rgba(190,148,94,.39)!important;
 }
-/* Texto legible en ambos temas, sin cambiar los estilos de marca. */
+/* Keep the compact legal line clear over the image, with no new boxes. */
 html:not(#camVillage):not(#camVillage):not(#camVillage):not(#camVillage) body > footer.bg-slate-900.border-t :is(h4,p,li,a){
-  text-shadow:0 1px 3px rgba(4,13,25,.4);
+  text-shadow:0 1px 2px rgba(4,13,25,.35);
+}
+html:not(#camVillage):not(#camVillage):not(#camVillage):not(#camVillage) body > footer.bg-slate-900.border-t .text-slate-500{
+  color:#c3cbd1!important;
 }
 @media(max-width:760px){
+  /* Use the same optimized phone artwork as the header, not a photo crop. */
   html:not(.dark):not(#camVillage):not(#camVillage):not(#camVillage):not(#camVillage) body > footer.bg-slate-900.border-t{
     background-image:
-      linear-gradient(180deg,rgba(14,28,42,.78),rgba(17,32,46,.74) 45%,rgba(16,31,43,.86) 100%),
-      url('cam-footer-village-day-mobile.jpg')!important;
-    background-position:center center,77% center!important;
+      linear-gradient(180deg,rgba(13,33,52,.86),rgba(15,36,57,.83) 48%,rgba(10,29,48,.91) 100%),
+      url('cam-header-terrace-day-mobile.jpg')!important;
+    background-position:center center,60% 46%!important;
   }
   html.dark:not(#camVillage):not(#camVillage):not(#camVillage):not(#camVillage) body > footer.bg-slate-900.border-t{
     background-image:
-      linear-gradient(180deg,rgba(6,18,32,.74),rgba(9,22,39,.73) 45%,rgba(8,20,35,.87) 100%),
-      url('cam-footer-village-night-mobile.jpg')!important;
-    background-position:center center,78% center!important;
+      linear-gradient(180deg,rgba(7,21,38,.88),rgba(10,28,47,.85) 48%,rgba(7,21,38,.93) 100%),
+      url('cam-header-terrace-night-mobile.jpg')!important;
+    background-position:center center,60% 46%!important;
   }
 }
