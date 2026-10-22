@@ -421,7 +421,7 @@
   }
   window.camSiteTexts=Object.freeze({
     refresh:schedule, reload:load,
-    _state:()=>({keys:[...rows.keys()],available:ITEMS.filter(d=>!!find(d)).map(d=>d.key),editing:editing?.key||null,active:editOn(),loaded})
+    _state:()=>({keys:[...rows.keys()],available:ITEMS.filter(d=>!!find(d)).map(d=>d.key),originals:[...originals.entries()],editing:editing?.key||null,active:editOn(),loaded})
   });
   if (document.readyState==='loading') document.addEventListener('DOMContentLoaded',init);
   else init();
