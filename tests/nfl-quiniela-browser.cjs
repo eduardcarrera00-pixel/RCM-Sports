@@ -32,9 +32,14 @@ const {chromium}=require('playwright');
           {id:'900000002',season:2026,week:7,home_id:'DAL',away_id:'SEA',kickoff:tomorrow,status:'scheduled',odds_locked_at:tomorrow,
            picks_open:true,points_home:4,points_away:4,probability_home:.5,probability_away:.5},
           {id:'900000003',season:2026,week:6,home_id:'NE',away_id:'CHI',
-           kickoff:new Date(Date.now()-864000000).toISOString(),status:'final',
-           away_score:20,home_score:7,winner_id:'CHI',odds_locked_at:new Date(Date.now()-900000000).toISOString(),
-           picks_open:false,points_home:4,points_away:4,probability_home:.5,probability_away:.5}
+           // Two days ago: the old 4-day lookback incorrectly selected week 6.
+           kickoff:new Date(Date.now()-2*86400000).toISOString(),status:'final',
+           away_score:20,home_score:7,winner_id:'CHI',odds_locked_at:new Date(Date.now()-3*86400000).toISOString(),
+           picks_open:false,points_home:4,points_away:4,probability_home:.5,probability_away:.5},
+          {id:'900000004',season:2026,week:8,home_id:'BAL',away_id:'PIT',
+           kickoff:new Date(Date.now()+8*86400000).toISOString(),status:'scheduled',
+           odds_locked_at:tomorrow,picks_open:true,
+           points_home:3,points_away:8,probability_home:.8,probability_away:.2}
         ];
         const teams=['BUF','KC','DAL','SEA'].map(id=>({id,name:'Equipo '+id,logo:'https://a.espncdn.com/i/teamlogos/nfl/500/'+id.toLowerCase()+'.png'}));
         const picks=[];
@@ -67,7 +72,23 @@ const {chromium}=require('playwright');
       await page.addScriptTag({content:code});
       await page.evaluate(()=>document.dispatchEvent(new Event('DOMContentLoaded')));
       await page.waitForSelector('.cam-nfl-game');
+      const weekPicker=page.locator('#camNflNav select[aria-label="Jornada NFL"]');
+      assert.equal(await weekPicker.inputValue(),'7',
+        'The current week is selected by default, even when last week played two days ago');
       assert.equal(await page.locator('.cam-nfl-game').count(),2);
+      for(const text of await page.locator('#camNflGames .cam-nfl-team small').allTextContents()){
+        assert.match(text,/^\\d+ pts$/,'Show only points, never a team win probability');
+        assert.doesNotMatch(text,/%/);
+      }
+      await weekPicker.selectOption('6');
+      assert.equal(await page.locator('#camNflNav select[aria-label="Jornada NFL"]').inputValue(),'6');
+      assert.equal(await page.locator('.cam-nfl-game').count(),1,
+        'Previous rounds must remain accessible in the selector');
+      assert.match(await page.locator('#camNflGames').innerText(),/Finalizado/);
+      await page.locator('#camNflNav select[aria-label="Jornada NFL"]').selectOption('7');
+      assert.equal(await page.locator('.cam-nfl-game').count(),2,
+        'Returning to the current week restores its matchups');
+      assert.equal(await page.locator('#camNflNav select[aria-label="Jornada NFL"]').inputValue(),'7');
       assert.equal(await page.locator('#camNflGames .cam-nfl-team').count(),4);
       assert.equal(await page.locator('#camNflGames .cam-nfl-team img').count(),4);
       assert.ok((await page.locator('#camNflGames .cam-nfl-team img').first().getAttribute('src')).includes('espncdn.com'));
