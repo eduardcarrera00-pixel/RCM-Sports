@@ -92,6 +92,10 @@ function card(p,compact=false,detail=false,viewerId=currentViewerId,historyCard=
  if(publication){
   feedMeta=el('div',null,'cp-feed-meta');
   if(first?.sport)feedMeta.append(el('span',String(first.sport),'cp-card-sport'));
+  if(editorial){
+   const count=(p.legs||[]).reduce((total,leg)=>total+Math.max(1,splitPickSelections(leg.selection).length),0);
+   feedMeta.append(el('span',count>1?'Combinada · '+count+' selecciones':'Simple','cp-ticket-type'));
+  }
   header.append(feedMeta);
  }else if(first?.sport){
   header.append(el('span',String(first.sport),'cp-card-sport'));

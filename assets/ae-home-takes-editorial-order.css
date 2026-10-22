@@ -31,7 +31,7 @@ html body #aeHomeTakeHighlights > .ae-home-take-extras > #aeHomeTopTakes .ae-top
   width:100%!important;
   min-width:0!important;
 }
-html body #aeHomeTakeHighlights > .ae-home-take-extras > :is(#aeHomeTakeHistoric,#aeHomePickHistoric) {
+html body :is(#aeHomeTakeHighlights > .ae-home-take-extras, #communityPicks) > :is(#aeHomeTakeHistoric,#aeHomePickHistoric) {
   grid-column:1/-1!important;
   grid-row:auto!important;
 }
@@ -39,8 +39,8 @@ html body #aeHomeTakeHighlights > .ae-home-take-extras > :is(#aeHomeTakeHistoric
 /* El mejor Take histórico ahora tiene un tratamiento de portada:
    fotografía panorámica de estadio, escudo de trofeo en transparencia,
    y un bloque de lectura muy nítido para el récord real. */
-html body #aeHomeTakeHighlights > .ae-home-take-extras > :is(#aeHomeTakeHistoric,#aeHomePickHistoric),
-html:not(.dark) body #aeHomeTakeHighlights > .ae-home-take-extras > :is(#aeHomeTakeHistoric,#aeHomePickHistoric) {
+html body :is(#aeHomeTakeHighlights > .ae-home-take-extras, #communityPicks) > :is(#aeHomeTakeHistoric,#aeHomePickHistoric),
+html:not(.dark) body :is(#aeHomeTakeHighlights > .ae-home-take-extras, #communityPicks) > :is(#aeHomeTakeHistoric,#aeHomePickHistoric) {
   --ae-discovery-ink:#f9ebd9;
   --ae-discovery-muted:#c4cdd1;
   --ae-discovery-gold:#f1bc80;
@@ -69,7 +69,7 @@ html:not(.dark) body #aeHomeTakeHighlights > .ae-home-take-extras > :is(#aeHomeT
   color:#f9ebd9!important;
   box-shadow:0 13px 32px rgba(4,17,25,.22)!important;
 }
-html body #aeHomeTakeHighlights :is(#aeHomeTakeHistoric,#aeHomePickHistoric)::before {
+html body :is(#aeHomeTakeHighlights,#communityPicks) :is(#aeHomeTakeHistoric,#aeHomePickHistoric)::before {
   content:"";
   position:absolute;
   inset:0;
@@ -79,7 +79,7 @@ html body #aeHomeTakeHighlights :is(#aeHomeTakeHistoric,#aeHomePickHistoric)::be
     radial-gradient(ellipse at 79% 12%,rgba(235,181,112,.19),transparent 53%),
     linear-gradient(0deg,rgba(3,16,25,.4),transparent 54%);
 }
-html body #aeHomeTakeHighlights :is(#aeHomeTakeHistoric,#aeHomePickHistoric)::after {
+html body :is(#aeHomeTakeHighlights,#communityPicks) :is(#aeHomeTakeHistoric,#aeHomePickHistoric)::after {
   content:"";
   position:absolute;
   right:clamp(12px,5%,65px);
@@ -93,19 +93,19 @@ html body #aeHomeTakeHighlights :is(#aeHomeTakeHistoric,#aeHomePickHistoric)::af
   transform:translateY(-50%);
   filter:drop-shadow(0 8px 18px rgba(3,14,22,.3));
 }
-html body #aeHomeTakeHighlights :is(#aeHomeTakeHistoric,#aeHomePickHistoric) > * {
+html body :is(#aeHomeTakeHighlights,#communityPicks) :is(#aeHomeTakeHistoric,#aeHomePickHistoric) > * {
   position:relative!important;
   z-index:1!important;
   min-width:0!important;
 }
-html body #aeHomeTakeHighlights :is(#aeHomeTakeHistoric,#aeHomePickHistoric) .ae-historic-copy {
+html body :is(#aeHomeTakeHighlights,#communityPicks) :is(#aeHomeTakeHistoric,#aeHomePickHistoric) .ae-historic-copy {
   display:flex;
   flex-direction:column;
   align-items:flex-start;
   justify-content:center;
   gap:11px;
 }
-html body #aeHomeTakeHighlights :is(#aeHomeTakeHistoric,#aeHomePickHistoric) .ae-home-take-feature-kicker {
+html body :is(#aeHomeTakeHighlights,#communityPicks) :is(#aeHomeTakeHistoric,#aeHomePickHistoric) .ae-home-take-feature-kicker {
   display:inline-block;
   margin:0!important;
   color:#efba80!important;
@@ -113,7 +113,7 @@ html body #aeHomeTakeHighlights :is(#aeHomeTakeHistoric,#aeHomePickHistoric) .ae
   letter-spacing:.22em!important;
   text-transform:uppercase!important;
 }
-html body #aeHomeTakeHighlights :is(#aeHomeTakeHistoric,#aeHomePickHistoric) :is(#aeHomeTakeHistoricTitle,#aeHomePickHistoricTitle) {
+html body :is(#aeHomeTakeHighlights,#communityPicks) :is(#aeHomeTakeHistoric,#aeHomePickHistoric) :is(#aeHomeTakeHistoricTitle,#aeHomePickHistoricTitle) {
   margin:0!important;
   max-width:14ch;
   color:#fff1df!important;
@@ -121,18 +121,18 @@ html body #aeHomeTakeHighlights :is(#aeHomeTakeHistoric,#aeHomePickHistoric) :is
   letter-spacing:-.025em!important;
   text-shadow:0 3px 15px rgba(0,0,0,.26)!important;
 }
-html body #aeHomeTakeHighlights :is(#aeHomeTakeHistoric,#aeHomePickHistoric) .ae-home-take-feature-intro {
+html body :is(#aeHomeTakeHighlights,#communityPicks) :is(#aeHomeTakeHistoric,#aeHomePickHistoric) .ae-home-take-feature-intro {
   max-width:310px;
   margin:0!important;
   color:#d1d8d6!important;
   font:500 clamp(12px,1.2vw,14px)/1.5 Inter,system-ui,sans-serif!important;
 }
-html body #aeHomeTakeHighlights :is(#aeHomeTakeHistoricTake,#aeHomePickHistoricPick) {
+html body :is(#aeHomeTakeHighlights,#communityPicks) :is(#aeHomeTakeHistoricTake,#aeHomePickHistoricPick) {
   width:100%;
   max-width:520px;
   margin-left:auto;
 }
-html body #aeHomeTakeHighlights :is(#aeHomeTakeHistoricTake,#aeHomePickHistoricPick) .ae-discovery-take {
+html body :is(#aeHomeTakeHighlights,#communityPicks) :is(#aeHomeTakeHistoricTake,#aeHomePickHistoricPick) .ae-discovery-take {
   display:grid!important;
   gap:9px!important;
   width:100%;
@@ -147,61 +147,61 @@ html body #aeHomeTakeHighlights :is(#aeHomeTakeHistoricTake,#aeHomePickHistoricP
   color:#fff1df!important;
   text-align:left!important;
 }
-html body #aeHomeTakeHighlights :is(#aeHomeTakeHistoricTake,#aeHomePickHistoricPick) .ae-discovery-take:hover,
-html body #aeHomeTakeHighlights :is(#aeHomeTakeHistoricTake,#aeHomePickHistoricPick) .ae-discovery-take:focus-visible {
+html body :is(#aeHomeTakeHighlights,#communityPicks) :is(#aeHomeTakeHistoricTake,#aeHomePickHistoricPick) .ae-discovery-take:hover,
+html body :is(#aeHomeTakeHighlights,#communityPicks) :is(#aeHomeTakeHistoricTake,#aeHomePickHistoricPick) .ae-discovery-take:focus-visible {
   border-color:#ecc18f!important;
   background:rgba(18,45,57,.94)!important;
 }
-html body #aeHomeTakeHighlights :is(#aeHomeTakeHistoricTake,#aeHomePickHistoricPick) .ae-discovery-sport{
+html body :is(#aeHomeTakeHighlights,#communityPicks) :is(#aeHomeTakeHistoricTake,#aeHomePickHistoricPick) .ae-discovery-sport{
   color:#e7ba82!important;
   letter-spacing:.13em!important;
 }
-html body #aeHomeTakeHighlights :is(#aeHomeTakeHistoricTake,#aeHomePickHistoricPick) .ae-discovery-title{
+html body :is(#aeHomeTakeHighlights,#communityPicks) :is(#aeHomeTakeHistoricTake,#aeHomePickHistoricPick) .ae-discovery-title{
   color:#fff2df!important;
   font:650 clamp(18px,2vw,24px)/1.15 Newsreader,Georgia,serif!important;
 }
-html body #aeHomeTakeHighlights :is(#aeHomeTakeHistoricTake,#aeHomePickHistoricPick) .ae-discovery-excerpt,
-html body #aeHomeTakeHighlights :is(#aeHomeTakeHistoricTake,#aeHomePickHistoricPick) .ae-discovery-meta {
+html body :is(#aeHomeTakeHighlights,#communityPicks) :is(#aeHomeTakeHistoricTake,#aeHomePickHistoricPick) .ae-discovery-excerpt,
+html body :is(#aeHomeTakeHighlights,#communityPicks) :is(#aeHomeTakeHistoricTake,#aeHomePickHistoricPick) .ae-discovery-meta {
   color:#d2d9db!important;
 }
-html body #aeHomeTakeHighlights :is(#aeHomeTakeHistoricTake,#aeHomePickHistoricPick) .ae-discovery-score{
+html body :is(#aeHomeTakeHighlights,#communityPicks) :is(#aeHomeTakeHistoricTake,#aeHomePickHistoricPick) .ae-discovery-score{
   color:#efbe83!important;
   font-size:13px!important;
 }
-html body #aeHomeTakeHighlights :is(#aeHomeTakeHistoricTake,#aeHomePickHistoricPick) .ae-discovery-empty{
+html body :is(#aeHomeTakeHighlights,#communityPicks) :is(#aeHomeTakeHistoricTake,#aeHomePickHistoricPick) .ae-discovery-empty{
   color:#e5d8c8!important;
 }
 @media(max-width:900px){
   /* Armonía: el mismo apilado en día y en noche (antes el día quedaba en dos columnas). */
-  html body #aeHomeTakeHighlights > .ae-home-take-extras > :is(#aeHomeTakeHistoric,#aeHomePickHistoric),
-  html:not(.dark) body #aeHomeTakeHighlights > .ae-home-take-extras > :is(#aeHomeTakeHistoric,#aeHomePickHistoric) {
+  html body :is(#aeHomeTakeHighlights > .ae-home-take-extras, #communityPicks) > :is(#aeHomeTakeHistoric,#aeHomePickHistoric),
+  html:not(.dark) body :is(#aeHomeTakeHighlights > .ae-home-take-extras, #communityPicks) > :is(#aeHomeTakeHistoric,#aeHomePickHistoric) {
     grid-template-columns:minmax(0,1fr)!important;
     gap:19px!important;
     min-height:0!important;
     padding:24px 20px!important;
     background-position:center,right center!important;
   }
-  html body #aeHomeTakeHighlights :is(#aeHomeTakeHistoric,#aeHomePickHistoric)::after{
+  html body :is(#aeHomeTakeHighlights,#communityPicks) :is(#aeHomeTakeHistoric,#aeHomePickHistoric)::after{
     width:min(58%,290px);
     top:30%;
     right:10px;
     opacity:.22;
   }
-  html body #aeHomeTakeHighlights :is(#aeHomeTakeHistoric,#aeHomePickHistoric) :is(#aeHomeTakeHistoricTitle,#aeHomePickHistoricTitle) {
+  html body :is(#aeHomeTakeHighlights,#communityPicks) :is(#aeHomeTakeHistoric,#aeHomePickHistoric) :is(#aeHomeTakeHistoricTitle,#aeHomePickHistoricTitle) {
     max-width:100%;
     font-size:clamp(30px,6vw,43px)!important;
   }
-  html body #aeHomeTakeHighlights :is(#aeHomeTakeHistoricTake,#aeHomePickHistoricPick) {
+  html body :is(#aeHomeTakeHighlights,#communityPicks) :is(#aeHomeTakeHistoricTake,#aeHomePickHistoricPick) {
     max-width:none!important;
   }
 }
 @media(max-width:600px){
-  html body #aeHomeTakeHighlights > .ae-home-take-extras > :is(#aeHomeTakeHistoric,#aeHomePickHistoric),
-  html:not(.dark) body #aeHomeTakeHighlights > .ae-home-take-extras > :is(#aeHomeTakeHistoric,#aeHomePickHistoric){
+  html body :is(#aeHomeTakeHighlights > .ae-home-take-extras, #communityPicks) > :is(#aeHomeTakeHistoric,#aeHomePickHistoric),
+  html:not(.dark) body :is(#aeHomeTakeHighlights > .ae-home-take-extras, #communityPicks) > :is(#aeHomeTakeHistoric,#aeHomePickHistoric){
     padding:21px 17px!important;
   }
-  html body #aeHomeTakeHighlights :is(#aeHomeTakeHistoric,#aeHomePickHistoric) .ae-historic-copy{gap:8px;}
-  html body #aeHomeTakeHighlights :is(#aeHomeTakeHistoricTake,#aeHomePickHistoricPick) .ae-discovery-take{
+  html body :is(#aeHomeTakeHighlights,#communityPicks) :is(#aeHomeTakeHistoric,#aeHomePickHistoric) .ae-historic-copy{gap:8px;}
+  html body :is(#aeHomeTakeHighlights,#communityPicks) :is(#aeHomeTakeHistoricTake,#aeHomePickHistoricPick) .ae-discovery-take{
     min-height:0!important;
     padding:15px!important;
   }

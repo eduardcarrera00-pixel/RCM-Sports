@@ -32,7 +32,7 @@ const server=http.createServer((req,res)=>{
     async then(resolve,reject){
      const history=table==='ae_pick_feed'&&Array.isArray(filters.outcome)&&filters.outcome.includes('void');
      if(history)await new Promise(r=>setTimeout(r,(++requests%4)*15));
-     const data=table==='ae_pick_feed'?(history?[pick]:filters.outcome==='pending'?[{...pick,id:'00000000-0000-0000-0000-000000000002',outcome:'pending',settled_at:null,result_points:0}]:[]):[];
+     const data=table==='ae_pick_feed'?(history?[pick]:filters.outcome==='pending'?[{...pick,id:'00000000-0000-0000-0000-000000000002',outcome:'pending',settled_at:null,result_points:0}]:[pick]):[];
      return Promise.resolve({data,error:null}).then(resolve,reject);
     }};return q;
   }};
@@ -56,6 +56,17 @@ const server=http.createServer((req,res)=>{
     return {separate:history.parentElement.id==='communityPicks',afterPlates:h.top>=r.bottom-1,beforeChefs:c.top>=h.bottom-1,fits:h.left>=-1&&h.right<=innerWidth+1,noOverflow:history.scrollWidth<=history.clientWidth+1};
    });
    assert.deepEqual(layout,{separate:true,afterPlates:true,beforeChefs:true,fits:true,noOverflow:true},JSON.stringify({width,dark,admin,layout}));
+   const record=await page.evaluate(()=>{
+    const el=document.getElementById('aeHomePickHistoric'),r=el.getBoundingClientRect(),c=document.querySelector('.ae-chefs-dual-standings').getBoundingClientRect();
+    const card=document.querySelector('#cpFeed > .cp-card'),b=card.getBoundingClientRect();
+    return {inPicks:el.parentElement.id==='communityPicks',last:el===el.parentElement.lastElementChild,afterChefs:r.top>=c.bottom-1,visible:r.height>0,fits:r.left>=0&&r.right<=innerWidth+1,noOverflow:el.scrollWidth<=el.clientWidth+1,feedFits:b.left>=0&&b.right<=innerWidth+1,feedNoOverflow:card.scrollWidth<=card.clientWidth+1,type:!!card.querySelector('.cp-ticket-type'),winner:!!el.querySelector('.ae-discovery-take')};
+   });
+   assert(Object.values(record).every(Boolean),JSON.stringify({width,dark,record}));
+   if(!admin&&[390,1366].includes(width)){
+    await page.locator('#aeHomePickHistoric').screenshot({path:path.join(qa,'record-'+width+'-'+(dark?'night':'day')+'.png')});
+    await page.locator('#cpFeed > .cp-card').first().screenshot({path:path.join(qa,'ticket-'+width+'-'+(dark?'night':'day')+'.png')});
+   }
+
    if(!admin&&[390,1366].includes(width))await page.locator('#cpSettleHistorySection').screenshot({path:path.join(qa,'history-'+width+'-'+(dark?'night':'day')+'.png')});
   }
  }

@@ -289,7 +289,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
     </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
-<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261021-champion-receipt-1">
+<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261021-picks-ticket-2">
 <link rel="stylesheet" href="assets/cam-pick-points-rules.css?v=20261021-rules-1">
 <link rel="stylesheet" href="assets/cam-analytics.css?v=20261020-1">
     <link rel="stylesheet" href="assets/ae-muted-navigation-icons.css?v=20261016-1">
@@ -604,7 +604,7 @@ html body:is(.ae-is-nfl,.ae-is-football) #freeTakes #aeNflTakeFooterCta #aeSport
 <link rel="stylesheet" href="assets/ae-take-rankings-palette.css?v=20261016-duel-3">
 <link rel="stylesheet" href="assets/ae-home-takes-restructure.css?v=20261018-reply-totals-1">
 <link rel="stylesheet" href="assets/ae-home-rankings-vivid.css?v=20261016-1">
-    <link rel="stylesheet" href="assets/ae-home-takes-editorial-order.css?v=20261021-historic-pick-1">
+    <link rel="stylesheet" href="assets/ae-home-takes-editorial-order.css?v=20261021-picks-ticket-2">
     <link rel="stylesheet" href="assets/ae-take-rankings-best-take.css?v=20261016-1">
     <link rel="stylesheet" href="assets/ae-weekly-odds-highlight.css?v=20261018-compact-share-topright-2">
 
@@ -2136,6 +2136,13 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
                 <ol id="cpWorstLeaderboard" class="ae-take-leaderboard-list" role="region" aria-label="Ranking de Peores Chefs; desplázate para consultar más puestos" aria-live="polite"></ol>
               </section>
               </div>
+                <section id="aeHomePickHistoric" class="ae-home-take-feature" aria-labelledby="aeHomePickHistoricTitle">
+                  <div class="ae-historic-copy">
+                    <h3 id="aeHomePickHistoricTitle">Pick histórico</h3>
+                    <p class="ae-home-take-feature-intro">El Pick individual acertado con más puntos de todo el historial.</p>
+                  </div>
+                  <div id="aeHomePickHistoricPick" aria-live="polite"><p class="ae-discovery-empty">Cargando Pick…</p></div>
+                </section>
             </section>
           </div>
           <details id="aeWeeklyPickAdmin" class="ae-takes-admin ae-weekly-admin" hidden><summary id="aeWeeklyAdminSummary">Administrar · Publicar Pick del editor</summary>
@@ -2285,13 +2292,6 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
                 </section>
               </div>
             </section>
-                <section id="aeHomePickHistoric" class="ae-home-take-feature" aria-labelledby="aeHomePickHistoricTitle">
-                  <div class="ae-historic-copy">
-                    <h3 id="aeHomePickHistoricTitle">Pick histórico</h3>
-                    <p class="ae-home-take-feature-intro">El Pick individual acertado con más puntos de todo el historial.</p>
-                  </div>
-                  <div id="aeHomePickHistoricPick" aria-live="polite"><p class="ae-discovery-empty">Cargando Pick…</p></div>
-                </section>
                 <section id="aeHomeTakeHistoric" class="ae-home-take-feature" aria-labelledby="aeHomeTakeHistoricTitle">
                   <div class="ae-historic-copy">
                     <h3 id="aeHomeTakeHistoricTitle">Take histórico</h3>
