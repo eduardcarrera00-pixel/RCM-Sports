@@ -192,7 +192,7 @@ revoke all on function public.cam_nfl_admin_result(text,text,integer,integer,tex
 grant execute on function public.cam_nfl_admin_result(text,text,integer,integer,text) to authenticated;
 
 create or replace function public.cam_nfl_leaderboard(p_scope text,p_season integer,p_week integer default null,p_month text default null)
-returns table(position bigint,user_id uuid,username text,points bigint,hits bigint,resolved bigint,accuracy numeric)
+returns table(rank_position bigint,user_id uuid,username text,points bigint,hits bigint,resolved bigint,accuracy numeric)
 language plpgsql stable security definer set search_path='' as $$
 begin
  if p_scope not in ('week','month','season') or p_season not between 2020 and 2100
@@ -232,7 +232,7 @@ language sql stable security definer set search_path='' as $$
  where p.user_id=p_user_id and g.season=p_season and g.status='final' and g.winner_id is not null
  group by g.week order by g.week desc limit 1)
  select coalesce(r.points,0),coalesce(r.hits,0),coalesce(r.resolved,0),
- coalesce(r.accuracy,0),r.position,last.week,coalesce(last.pts,0) from (select 1) singleton
+ coalesce(r.accuracy,0),r.rank_position,last.week,coalesce(last.pts,0) from (select 1) singleton
  left join r on true left join last on true;
 $$;
 revoke all on function public.cam_nfl_profile_summary(uuid,integer) from public,anon,authenticated;
