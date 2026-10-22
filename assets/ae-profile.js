@@ -741,7 +741,7 @@ function setPrivateTab(tab){
 
 async function loadOwnPicks(userId){
   const result=await db.from('ae_pick_feed').select('*')
-    .eq('user_id',userId)
+    .eq('user_id',userId).in('moderation_status',['pending','approved'])
     .order('created_at',{ascending:false})
     .order('id',{ascending:false})
     .limit(200);
