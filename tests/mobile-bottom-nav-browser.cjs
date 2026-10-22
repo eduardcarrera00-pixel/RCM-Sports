@@ -57,6 +57,26 @@ const server = http.createServer((req, res) => {
         assert.equal(layout.position,phone?'fixed':layout.position,JSON.stringify({width,dark,layout}));
         if(phone){
           assert.equal(layout.buttons.length,4,JSON.stringify({width,dark,layout}));
+          for(const key of ['Picks','NFL','Fútbol','Opiniones']){
+            const icon=await page.locator('body > nav.ae-sport-nav > button[data-category="'+key+'"]').evaluate(button=>{
+              const svg=button.querySelector('svg.cam-mobile-nav-symbol');
+              const image=button.querySelector('img.ae-custom-sport-icon');
+              return {
+                svgCount:button.querySelectorAll('svg.cam-mobile-nav-symbol').length,
+                svgDisplay:svg ? getComputedStyle(svg).display : null,
+                svgWidth:svg ? svg.getBoundingClientRect().width : 0,
+                svgStroke:svg?.getAttribute('stroke'),
+                imageDisplay:image ? getComputedStyle(image).display : null,
+                imageExists:!!image
+              };
+            });
+            assert.equal(icon.svgCount,1,key+' vector icon exists');
+            assert.equal(icon.svgDisplay,'block',key+' vector icon is visible');
+            assert.ok(icon.svgWidth>=24,key+' vector icon is legible');
+            assert.equal(icon.svgStroke,'currentColor',key+' icon follows theme/active state');
+            assert.equal(icon.imageDisplay,'none',key+' old WebP is hidden only on phone');
+            assert.equal(icon.imageExists,true,key+' original desktop image remains');
+          }
           assert.deepEqual(layout.buttons.map(b=>b.key),['Picks','NFL','Fútbol','Opiniones']);
           assert.ok(layout.bottom<=772 && layout.bottom>=750,JSON.stringify({width,dark,layout}));
           assert.equal(layout.display,'flex','capsule dock should use flexible icon spacing');
@@ -73,6 +93,14 @@ const server = http.createServer((req, res) => {
             JSON.stringify({width,dark,end,layoutHeight:layout.height}));
         }else{
           assert.notEqual(layout.position,'fixed',JSON.stringify({width,dark,layout}));
+          for(const key of ['Picks','NFL','Fútbol','Opiniones']){
+            const restored=await page.locator('header nav.ae-sport-nav > button[data-category="'+key+'"]').evaluate(button=>({
+              vector:getComputedStyle(button.querySelector('svg.cam-mobile-nav-symbol')).display,
+              image:getComputedStyle(button.querySelector('img.ae-custom-sport-icon')).display
+            }));
+            assert.equal(restored.vector,'none',key+' mobile SVG is hidden on desktop');
+            assert.notEqual(restored.image,'none',key+' original desktop WebP remains visible');
+          }
           assert.equal(await nav.evaluate(el=>el.parentElement.closest('header')!==null),true);
         }
       }
