@@ -1,4 +1,4 @@
-/* CAM SPORTS — bottom navigation for phones ONLY (the real category buttons). */
+/* CAM SPORTS — editorial polish for the existing phone-only navigation. */
 @media (max-width: 760px), (orientation: landscape) and (max-height: 500px) and (hover: none) and (pointer: coarse) {
   html body {
     --cam-bottom-nav-height: 68px;
@@ -36,10 +36,14 @@
     padding: 0 env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px) !important;
     gap: 0 !important;
     border: 0 !important;
-    border-top: 1px solid rgba(206, 169, 126, .34) !important;
+    border-top: 1px solid rgba(189, 141, 107, .38) !important;
     border-radius: 0 !important;
     box-shadow: none !important;
-    background: #102535 !important;
+    /* Brand surface: solid navy, no blur, translucent panel or white rim. */
+    --cam-dock-label: #dce1e0;
+    --cam-dock-active: #e7c29a;
+    --cam-dock-rule: #bd8d6b;
+    background: #102b3e !important;
     overflow: visible !important;
     white-space: normal !important;
     flex: none !important;
@@ -65,21 +69,22 @@
     min-height: 44px !important;
     height: 100% !important;
     margin: 0 !important;
-    padding: 5px 2px 6px !important;
-    gap: 3px !important;
+    padding: 6px 2px 7px !important;
+    gap: 4px !important;
     border: 0 !important;
     border-radius: 0 !important;
     box-shadow: none !important;
     outline-offset: -3px !important;
     background: transparent !important;
-    color: #d4d9db !important;
-    font: 600 10px/1.1 Inter, system-ui, sans-serif !important;
-    letter-spacing: .035em !important;
+    color: var(--cam-dock-label) !important;
+    font: 600 11px/1.15 Inter, system-ui, sans-serif !important;
+    letter-spacing: .015em !important;
     text-align: center !important;
     text-transform: none !important;
     white-space: nowrap !important;
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
+    transition: color .16s ease !important;
   }
 
   html body > nav.cam-mobile-bottom-nav > button.category-btn .ae-nav-icon {
@@ -95,6 +100,8 @@
     border-radius: 0 !important;
     background: transparent !important;
     box-shadow: none !important;
+    flex: 0 0 30px !important;
+    overflow: visible !important;
   }
 
   html body > nav.cam-mobile-bottom-nav > button.category-btn .ae-custom-sport-icon {
@@ -104,53 +111,87 @@
     max-width: 30px !important;
     max-height: 30px !important;
     object-fit: contain !important;
+    object-position: center !important;
+    flex: 0 0 30px !important;
+    padding: 0 !important;
+    margin: 0 !important;
     border: 0 !important;
     background: transparent !important;
     box-shadow: none !important;
-    opacity: .80;
+    opacity: .86 !important;
+    filter: none !important;
+    pointer-events: none !important;
+    transition: opacity .16s ease, filter .16s ease !important;
   }
 
-  html body > nav.cam-mobile-bottom-nav > button.category-btn.active,
-  html body > nav.cam-mobile-bottom-nav > button.category-btn[aria-current="page"] {
-    color: #efc795 !important;
-    border: 0 !important;
-    background: transparent !important;
+  /* Label boxes remain aligned even when the artwork has different proportions. */
+  html body > nav.cam-mobile-bottom-nav > button.category-btn > span:last-child {
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    line-height: 1.15 !important;
+    text-align: center !important;
+    overflow: visible !important;
   }
 
-  html body > nav.cam-mobile-bottom-nav > button.category-btn.active::before {
+  html body > nav.cam-mobile-bottom-nav > button.category-btn::before {
     content: "";
     position: absolute;
     top: 0;
     left: 50%;
-    width: 38px;
+    width: 36px;
     height: 2px;
     transform: translateX(-50%);
-    background: #c99a70;
+    background: var(--cam-dock-rule);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .16s ease;
+  }
+
+  html body > nav.cam-mobile-bottom-nav > button.category-btn.active,
+  html body > nav.cam-mobile-bottom-nav > button.category-btn[aria-current="page"] {
+    color: var(--cam-dock-active) !important;
+    border: 0 !important;
+    background: transparent !important;
+  }
+
+  html body > nav.cam-mobile-bottom-nav > button.category-btn.active::before,
+  html body > nav.cam-mobile-bottom-nav > button.category-btn[aria-current="page"]::before {
+    opacity: 1;
   }
 
   html body > nav.cam-mobile-bottom-nav > button.category-btn.active .ae-custom-sport-icon {
-    opacity: 1;
-    filter: brightness(1.10) saturate(1.06);
+    opacity: 1 !important;
+    filter: none !important;
   }
 
   html body > nav.cam-mobile-bottom-nav > button.category-btn:focus-visible {
-    outline: 2px solid #d6ac80 !important;
+    outline: 2px solid #e7c29a !important;
     outline-offset: -3px !important;
   }
 
   html:not(.dark) body > nav.ae-sport-nav.cam-mobile-bottom-nav {
-    background: #f6f1e9 !important;
-    border-top-color: rgba(132, 101, 76, .33) !important;
+    --cam-dock-label: #273b49;
+    --cam-dock-active: #855b43;
+    --cam-dock-rule: #855b43;
+    background: #eeeae3 !important;
+    border-top-color: #d9d9d0 !important;
   }
-  html:not(.dark) body > nav.cam-mobile-bottom-nav > button.category-btn {
-    color: #616875 !important;
+  /* The four ORIGINAL gold assets are visually tinted navy only in daylight. */
+  html:not(.dark) body > nav.cam-mobile-bottom-nav > button.category-btn .ae-custom-sport-icon {
+    filter: brightness(0) saturate(100%) invert(20%) sepia(24%) saturate(733%) hue-rotate(162deg) brightness(91%) contrast(93%) !important;
+    opacity: .94 !important;
   }
   html:not(.dark) body > nav.cam-mobile-bottom-nav > button.category-btn.active,
   html:not(.dark) body > nav.cam-mobile-bottom-nav > button.category-btn[aria-current="page"] {
-    color: #80573b !important;
+    color: var(--cam-dock-active) !important;
   }
-  html:not(.dark) body > nav.cam-mobile-bottom-nav > button.category-btn.active::before {
-    background: #a47650;
+  html:not(.dark) body > nav.cam-mobile-bottom-nav > button.category-btn:is(.active,[aria-current="page"]) .ae-custom-sport-icon {
+    filter: brightness(0) saturate(100%) invert(36%) sepia(14%) saturate(1474%) hue-rotate(337deg) brightness(94%) contrast(90%) !important;
+    opacity: 1 !important;
+  }
+  html:not(.dark) body > nav.cam-mobile-bottom-nav > button.category-btn:focus-visible {
+    outline-color: #855b43 !important;
   }
   html body.cam-mobile-input-focus > nav.cam-mobile-bottom-nav {
     visibility: hidden !important;
@@ -169,7 +210,16 @@
 }
 @media (max-width: 360px) {
   html body > nav.cam-mobile-bottom-nav > button.category-btn {
-    font-size: 9px !important;
+    font-size: 10.5px !important;
     letter-spacing: 0 !important;
+  }
+}
+
+/* No animation is required to understand the active section. */
+@media (prefers-reduced-motion: reduce) {
+  html body > nav.cam-mobile-bottom-nav > button.category-btn,
+  html body > nav.cam-mobile-bottom-nav > button.category-btn::before,
+  html body > nav.cam-mobile-bottom-nav > button.category-btn .ae-custom-sport-icon {
+    transition: none !important;
   }
 }
