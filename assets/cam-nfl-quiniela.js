@@ -131,7 +131,7 @@
     const prob=id===g.home_id?g.probability_home:g.probability_away;
     const points=id===g.home_id?g.points_home:g.points_away;
     b.append(el('small',prob==null?'Sin probabilidades':Math.round(Number(prob)*100)+' % · '+points+' pts'));
-    b.addEventListener('click',()=>{if(!isOpen(g)||!user)return;draft.set(g.id,id);saveDraft();paintGames();});
+    b.addEventListener('click',()=>{if(!isOpen(g))return;if(!user){window.openUserAuthModal?.();return;}draft.set(g.id,id);saveDraft();paintGames();});
     if(disabled)b.title='Este partido está cerrado';
     return b;
   }
