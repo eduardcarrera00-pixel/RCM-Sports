@@ -20,7 +20,7 @@ const server = http.createServer((req, res) => {
           );
           document.body.dataset.section=category;
         };
-        document.querySelector('footer').insertAdjacentHTML('beforeend',
+        document.body.insertAdjacentHTML('beforeend',
           '<div id="camQaEnd" style="height:60px;padding:10px">FINAL DE CAM SPORTS</div>');
       </script><script src="assets/cam-mobile-bottom-nav.js"></script></body>`);
     res.setHeader('content-type', 'text/html;charset=utf-8');
