@@ -161,7 +161,7 @@
         byId('homeChampionsEdition').textContent = hasPublished ? latest.edition : '';
         byId('championsEdition').textContent = hasPublished ? latest.edition : '';
         if (hasPublished) {
-            latest.team_ids.slice(0, 6).forEach((id,i) => preview.append(row(id,i)));
+            latest.team_ids.slice(0, 3).forEach((id,i) => preview.append(row(id,i)));
             latest.team_ids.forEach((id,i) => full.append(row(id,i)));
             // Two identical groups make a seamless visual loop. The canonical,
             // screen-reader-accessible Top 10 above is never duplicated.
