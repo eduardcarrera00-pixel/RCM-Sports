@@ -264,6 +264,15 @@
     if(target.hidden)return;
     target.replaceChildren();
     target.append(el('h3','Administración · Quiniela NFL'));
+    const warnings=el('div',null,'cam-nfl-admin-alerts');
+    target.append(warnings);
+    client().from('cam_nfl_admin_alerts').select('message,created_at')
+      .is('acknowledged_at',null).order('created_at',{ascending:false}).limit(3)
+      .then(({data,error})=>{
+        if(error||!warnings.isConnected)return;
+        warnings.replaceChildren();
+        for(const alert of data||[])warnings.append(el('p','⚠ '+alert.message));
+      });
     const controls=el('div',null,'cam-nfl-admin-controls');
     const sea=el('input'),wk=el('input');sea.type=wk.type='number';sea.value=String(season);sea.min='2020';wk.value=String(week);wk.min='1';wk.max='18';
     const sync=button('Sincronizar NFL',async()=>{
