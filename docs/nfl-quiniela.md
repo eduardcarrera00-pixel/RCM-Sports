@@ -6,14 +6,14 @@ Frontend, tablas y funciones de puntuación independientes de Takes, autenticaci
 
 La integración importa calendario y resultados reales desde la API de marcadores ESPN (no oficial ni garantizada por contrato) y cuotas moneyline verificadas desde The Odds API (si está configurada). Al faltar cuotas, la quiniela de ese partido **permanece cerrada** hasta que un administrador aporte dos cuotas reales. No hay resultados, probabilidades ni usuarios ficticios en producción.
 
-Los partidos de temporada regular utilizan las semanas 1–18; no se mezclan semanas de playoffs. Para ampliar el torneo a playoffs deberá modelarse `seasontype=3` con clasificación independiente.
+Temporada regular: jornadas 1–18, con nflverse como fuente principal. Los playoffs se sincronizan a partir del calendario ESPN confirmado: 19 = Wild Card (postemporada 1), 20 = Divisional (2), 21 = Conferencias (3), 22 = Super Bowl (5); se excluye el Pro Bowl. La validación evita crear partidos cuando el proveedor no los confirma.
 
 ## Preparar producción
 
-1. Revisar y aplicar `supabase/migrations/20261022170000_cam_nfl_quiniela.sql` en el proyecto CAM SPORTS de producción, después de verificar su esquema. **No** ejecutarlo de nuevo en Staging, donde ya se probó.
+1. Revisar y aplicar en producción `supabase/migrations/20261022170000_cam_nfl_quiniela.sql`, `supabase/migrations/20261022180000_cam_nfl_cron_vault.sql` y `supabase/migrations/20261022190000_cam_nfl_public_pick_breakdown.sql`, en este orden. **No** ejecutarlas otra vez en Staging; allí ya se probaron los cambios correspondientes.
 2. Desplegar `supabase/functions/cam-nfl-sync/index.ts` como `cam-nfl-sync`, con verificación JWT desactivada **solo porque** el código verifica la sesión, permisos de `editors` y el secreto propio de cron antes de utilizar `service_role`.
-3. En los secretos de Supabase Edge Functions, configurar `THE_ODDS_API_KEY` (si se dispone de acceso a The Odds API) y `CAM_NFL_CRON_SECRET` (cadena aleatoria de alta entropía). `SUPABASE_URL`, `SUPABASE_ANON_KEY` y `SUPABASE_SERVICE_ROLE_KEY` deben existir como secretos internos de la plataforma. Nunca añadir estas claves al repositorio ni al navegador.
-4. En GitHub Actions del repositorio fuente, configurar la **variable** `CAM_NFL_SYNC_URL` con `https://<project-ref>.supabase.co/functions/v1/cam-nfl-sync` y el **secreto** `CAM_NFL_CRON_SECRET` con exactamente el mismo valor que en Supabase. `.github/workflows/cam-nfl-sync.yml` ejecuta la sincronización cada hora durante septiembre–febrero. Sin los dos parámetros, el trabajo se omite sin publicar datos falsos.
+3. Utilizar el token generado de forma privada por `cam_nfl_cron_vault.sql` y validado por `cam_nfl_validate_cron` (solo service_role); no copiarlo en GitHub. `THE_ODDS_API_KEY` es opcional si nflverse facilita cuotas moneyline reales. Supabase proporciona internamente `SUPABASE_URL`, `SUPABASE_ANON_KEY` y `SUPABASE_SERVICE_ROLE_KEY`. Nunca publicar claves privadas.
+4. Instalar `supabase/production/enable_cam_nfl_sync_cron.sql` después de desplegar la función y las migraciones. Programa una consulta cada hora, más comprobaciones cada 10 minutos en ventanas de partidos; se omiten duplicados cuando ya existe el automatizador `cam-nfl-auto-*`. El workflow de GitHub queda únicamente como disparo manual opcional, no como programador paralelo.
 5. Desde una cuenta administradora, abrir la sección NFL y usar **Sincronizar NFL** para revisar los partidos de la semana. La función normaliza las abreviaturas de los equipos y descarta datos que no puede verificar. Si hay cuotas verificadas, congela probabilidades y puntos antes de abrir cada encuentro. Como opción alternativa, introducir ambas cuotas americanas reales en los controles del partido.
 6. Comprobar manualmente una semana importada, probar el guardado con una cuenta registrada y verificar en la base de datos el resultado, los puntos y la clasificación después de un evento oficialmente finalizado.
 
@@ -49,3 +49,15 @@ Para activar el cron en producción: aplicar `supabase/migrations/20261022180000
 `node tests/nfl-quiniela-browser.cjs` comprueba con fixtures **solo de prueba** el diseño día/noche, móvil/escritorio, guardar selecciones y estadísticas del perfil en Chromium. Se ejecuta automáticamente en el Pull Request por `nfl-quiniela-tests.yml`.
 
 En Supabase Staging se aplicó la migración y se comprobó en una transacción revertida que repetir una liquidación no suma doble, corregir el ganador recalcula el resultado y empatar lo anula. Aún deben verificarse con usuarios reales autorizados los RPC administrativos, el proveedor externo, errores de API y la sincronización programada antes de activar producción.
+
+## Logos, resúmenes y estadísticas públicas
+
+La Quiniela reutiliza los 32 logos ya catalogados en `assets/nfl-teams.js`. `assets/cam-nfl-quiniela-logos.js` reconoce variaciones de abreviaturas y muestra ambos escudos en las tarjetas, el resumen seleccionado, los resultados, el historial y el desglose de rankings. Los picks rivales solo se hacen públicos **tras liquidarse** mediante `cam_nfl_public_pick_breakdown`; no se muestran selecciones pendientes.
+
+Las vistas incluyen apertura de jornada, calendario, progreso y puntos potenciales, rankings independientes y detalles semanales, en escritorio y móvil con modo día/noche. Las reglas son totalmente independientes de Takes y Picks.
+
+El script de producción usa Supabase Cron a minuto 7 de cada hora y cada 10 minutos mientras hay partidos cercanos o en juego. Deben verificarse los resultados de `cron.job_run_details` en el proyecto de producción.
+
+**Staging (verificado):** 42 partidos reales, 28 abiertos con cuotas congeladas y 14 finalizados. La producción permanece pendiente de migración, aprobación del Pull Request y prueba integral de proveedor y jobs.
+
+**Pruebas propuestas:** `node tests/cam-nfl-quiniela-logos.mjs` y `node tests/nfl-quiniela-browser.cjs`. El segundo incluye las insignias en enfrentamientos, resumen e historial y las cuatro combinaciones móvil/escritorio y día/noche. Los resultados de CI deben revisarse antes de la fusión.
