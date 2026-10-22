@@ -95,12 +95,13 @@ async function visit(browser,name,width,height,dark,mobile){
         assert.ok(button.w>=40&&button.h>=40,label+': objetivo táctil menor de 40px '+button.name);
         assert.ok(!button.clipped,label+': texto truncado '+button.name);
       }
-      await page.evaluate(()=>window.__camAuditMarker={stable:true});
+      await page.evaluate(()=>{
+        window.__camAuditMarker={stable:true};
+        window.__camAuditNav().options[0].node.setAttribute('data-cam-audit-nav','');
+      });
       for(const sport of ITEMS){
-        await page.evaluate(category=>{
-          const n=window.__camAuditNav().options[0];
-          n.items.find(b=>window.__camAuditNav().label(b)===category).click();
-        },sport);
+        // A real touch event detects obstructed or non-interactive menu controls.
+        await page.locator('[data-cam-audit-nav]').getByText(sport,{exact:true}).first().tap({timeout:4000});
         await page.waitForTimeout(125);
         const state=await page.evaluate(()=>{
           const n=window.__camAuditNav().options[0];
