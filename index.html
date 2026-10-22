@@ -944,6 +944,224 @@ html body.ae-is-opinions aside .editorial-community.rcm-panel #communityLeaders 
   }
 }
 
+
+/* CAM SPORTS / Opiniones: portada editorial. No modifica Home, Picks ni deportes. */
+html body.ae-is-opinions #mainContent #aeOpinions{
+  max-width:1280px;min-width:0;margin-inline:auto;gap:clamp(17px,2.5vw,28px);
+}
+html body.ae-is-opinions #mainContent #aeOpinions .ae-opinions-head{
+  box-shadow:none;border-top:1px solid var(--op-line);border-inline:0;border-bottom:2px solid var(--op-action);
+  padding:22px clamp(14px,2.4vw,30px);border-radius:0;background:var(--op-panel);
+}
+html body.ae-is-opinions #mainContent #aeOpinions .ae-opinions-head h2{
+  font:600 clamp(38px,5vw,60px)/1.03 Newsreader,Georgia,serif;letter-spacing:-.026em;
+}
+html body.ae-is-opinions #aeOpinionsList{
+  display:block!important;grid-template-columns:none!important;min-width:0;margin:0;padding:0;
+}
+html body.ae-is-opinions #aeOpinionsList>section{min-width:0;margin:0 0 clamp(20px,3vw,38px)}
+html body.ae-is-opinions #aeOpinions :is(.ae-opinions-section-head){
+  display:flex;align-items:baseline;gap:8px 20px;justify-content:space-between;flex-wrap:wrap;
+  border-bottom:1px solid var(--op-line);margin:0 0 14px;padding:0 0 11px;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-section-head h3{
+  color:var(--op-text);font:600 clamp(23px,2.6vw,30px)/1.15 Newsreader,Georgia,serif;margin:0;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-section-head p{
+  color:var(--op-muted);font:400 12px/1.5 Inter,system-ui,sans-serif;margin:0;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-front-grid{
+  display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,.95fr);grid-template-rows:repeat(2,minmax(0,1fr));
+  align-items:stretch;gap:14px;min-width:0;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-front-grid>.ae-opinion-card.is-lead{
+  grid-column:1;grid-row:1/span 2;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-front-grid>.ae-opinion-card:not(.is-lead){
+  grid-column:2;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinion-card{
+  border:0;border-bottom:1px solid var(--op-line);border-radius:0;box-shadow:none!important;
+  background:var(--op-panel);transition:none;min-width:0;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinion-card:hover{transform:none;border-color:var(--op-action)}
+html body.ae-is-opinions #aeOpinions .ae-opinions-front-grid .ae-opinion-open{
+  display:flex!important;flex-direction:column!important;grid-template-columns:none!important;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-front-grid>.ae-opinion-card.is-lead .ae-opinion-media{
+  width:100%;height:auto;min-height:0;aspect-ratio:16/9;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-front-grid .ae-opinion-text{
+  padding:13px 5px 17px;gap:8px;justify-content:flex-start;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-front-grid>.ae-opinion-card.is-lead .ae-opinion-title{
+  font:600 clamp(28px,3.4vw,45px)/1.06 Newsreader,Georgia,serif;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-front-grid:not(:has(>.ae-opinion-card:nth-child(2))){
+  grid-template-columns:minmax(0,1fr);grid-template-rows:auto;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-front-grid:not(:has(>.ae-opinion-card:nth-child(2)))>.ae-opinion-card.is-lead{
+  grid-column:auto;grid-row:auto;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-front-grid>.ae-opinion-card:not(.is-lead){
+  display:block;align-self:stretch;min-height:0;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-front-grid>.ae-opinion-card:not(.is-lead) .ae-opinion-open{
+  flex-direction:row!important;gap:13px;align-items:flex-start;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-front-grid>.ae-opinion-card:not(.is-lead) .ae-opinion-media{
+  flex:0 0 38%;aspect-ratio:4/3;min-height:0;height:auto;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-front-grid>.ae-opinion-card:not(.is-lead) .ae-opinion-text{
+  padding:4px 2px;min-width:0;gap:7px;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-front-grid>.ae-opinion-card:not(.is-lead) .ae-opinion-title{
+  font:600 clamp(17px,1.7vw,24px)/1.19 Newsreader,Georgia,serif;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-front-grid>.ae-opinion-card:not(.is-lead) .ae-opinion-excerpt{
+  -webkit-line-clamp:2;font-size:12px;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-recent-list{
+  display:flex;flex-direction:column;gap:0;min-width:0;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-recent-list>.ae-opinion-card{
+  padding:12px 0;min-width:0;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-recent-list .ae-opinion-open{
+  display:grid;grid-template-columns:minmax(100px,190px) minmax(0,1fr);gap:17px;align-items:start;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-recent-list .ae-opinion-media{
+  min-height:0;aspect-ratio:4/3;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-recent-list .ae-opinion-text{
+  gap:6px;padding:0;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-recent-list .ae-opinion-title{
+  font:600 clamp(20px,2.3vw,28px)/1.14 Newsreader,Georgia,serif;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-recent-list .ae-opinion-excerpt{
+  font-size:13px;-webkit-line-clamp:2;
+}
+html body.ae-is-opinions #aeOpinionsHighlights{
+  display:block!important;grid-template-columns:none!important;margin:0 0 25px;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-highlight-grid{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start;min-width:0;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-highlight-slot{min-width:0}
+html body.ae-is-opinions #aeOpinions .ae-opinions-highlight-slot :is(.editorial-community,.editorial-trending){
+  max-width:100%!important;width:100%!important;min-width:0!important;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-debated-list{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 22px;min-width:0;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-take{
+  display:flex;justify-content:space-between;gap:14px;align-items:flex-start;min-width:0;
+  border-bottom:1px solid var(--op-line);padding:14px 0;background:transparent;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-take-content{flex:1 1 auto;min-width:0}
+html body.ae-is-opinions #aeOpinions .ae-opinions-take :is(h4,p){margin:0}
+html body.ae-is-opinions #aeOpinions .ae-opinions-take-tag{
+  font:700 10px/1.5 Inter,system-ui,sans-serif;letter-spacing:.09em;text-transform:uppercase;color:var(--op-action);
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-take h4{
+  margin:6px 0 8px!important;font:600 clamp(18px,1.8vw,24px)/1.2 Newsreader,Georgia,serif;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-take-open{
+  color:var(--op-text);font:inherit;text-align:left;border:0;background:transparent;cursor:pointer;padding:0;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-take-open:hover{color:var(--op-action)}
+html body.ae-is-opinions #aeOpinions .ae-opinions-take-by{
+  display:flex;gap:10px;flex-wrap:wrap;color:var(--op-muted);font-size:11px;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-take-author{
+  font:600 12px Inter,system-ui,sans-serif;background:transparent;border:0;padding:0;cursor:pointer;color:var(--op-action);
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-take-excerpt{
+  margin:8px 0 0!important;color:var(--op-muted);font:400 12px/1.55 Inter,system-ui,sans-serif;
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-take-actions{
+  flex:0 0 auto;display:flex;flex-direction:column;align-items:end;gap:5px;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-take-actions button{
+  border:1px solid transparent;color:var(--op-muted);font:600 11px/1.4 Inter,system-ui,sans-serif;
+  cursor:pointer;background:none;min-height:27px;padding:3px 5px;white-space:nowrap;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-take-actions button[aria-pressed="true"]{
+  border-color:var(--op-action);color:var(--op-action);
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-take-actions button:hover{color:var(--op-action)}
+html body.ae-is-opinions #aeOpinions .ae-opinions-sport-grid{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;min-width:0;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-sport-block{
+  min-width:0;border-top:2px solid var(--op-action);padding:13px 0 2px;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-sport-block>h4{
+  margin:0 0 12px;font:600 25px/1.1 Newsreader,Georgia,serif;color:var(--op-text);
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-sport-block>.ae-opinion-card{
+  margin:0 0 8px;border-bottom:1px solid var(--op-line);
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-sport-block .ae-opinion-open{
+  display:grid!important;grid-template-columns:100px minmax(0,1fr)!important;gap:11px;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-sport-block .ae-opinion-media{
+  min-height:0;aspect-ratio:4/3;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-sport-block .ae-opinion-text{
+  padding:0;gap:4px;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-sport-block .ae-opinion-title{
+  font:600 19px/1.2 Newsreader,Georgia,serif;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-sport-block .ae-opinion-excerpt{display:none}
+html body.ae-is-opinions #aeOpinions .ae-opinions-sport-block>.ae-opinions-take{
+  padding:11px 0;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-sport-link{
+  border:0;border-bottom:1px solid var(--op-action);font:600 12px Inter,system-ui,sans-serif;
+  color:var(--op-action);background:none;cursor:pointer;padding:7px 2px;margin-top:8px;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-sports:empty{display:none}
+html body.ae-is-opinions #aeOpinionReader .ae-opinion-reader-title{
+  font-size:clamp(31px,4vw,47px);line-height:1.1;
+}
+html body.ae-is-opinions #aeOpinionReader .ae-opinion-reader-text{max-width:64ch}
+html body.ae-is-opinions #aeOpinionReader .ae-opinion-reader-text p{margin-bottom:1.4em}
+@media(max-width:850px){
+ html body.ae-is-opinions #aeOpinions .ae-opinions-front-grid{grid-template-columns:minmax(0,1fr);grid-template-rows:auto;gap:14px}
+ html body.ae-is-opinions #aeOpinions .ae-opinions-front-grid>.ae-opinion-card.is-lead{grid-column:auto;grid-row:auto}
+ html body.ae-is-opinions #aeOpinions .ae-opinions-front-grid>.ae-opinion-card:not(.is-lead){grid-column:auto}
+ html body.ae-is-opinions #aeOpinions .ae-opinions-highlight-grid{grid-template-columns:minmax(0,1fr)}
+}
+@media(max-width:760px){
+ html body.ae-is-opinions #mainContent #aeOpinions{max-width:100%;min-width:0;padding-bottom:calc(68px + env(safe-area-inset-bottom,0px))}
+ html body.ae-is-opinions #aeOpinions .ae-opinions-head{padding:15px 12px}
+ html body.ae-is-opinions #aeOpinions .ae-opinions-section-head{display:block}
+ html body.ae-is-opinions #aeOpinions .ae-opinions-section-head p{margin-top:4px}
+ html body.ae-is-opinions #aeOpinions .ae-opinions-front-grid>.ae-opinion-card.is-lead .ae-opinion-title{
+   font-size:clamp(27px,8vw,34px);
+ }
+ html body.ae-is-opinions #aeOpinions .ae-opinions-front-grid>.ae-opinion-card:not(.is-lead) .ae-opinion-media{
+   flex:0 0 110px;width:110px;aspect-ratio:4/3;
+ }
+ html body.ae-is-opinions #aeOpinions .ae-opinions-front-grid>.ae-opinion-card:not(.is-lead) .ae-opinion-title{
+   font-size:clamp(18px,4.9vw,21px);
+ }
+ html body.ae-is-opinions #aeOpinions .ae-opinions-front-grid>.ae-opinion-card:not(.is-lead) .ae-opinion-excerpt{display:none}
+ html body.ae-is-opinions #aeOpinions .ae-opinions-recent-list .ae-opinion-open{
+   grid-template-columns:minmax(0,112px) minmax(0,1fr);gap:11px;
+ }
+ html body.ae-is-opinions #aeOpinions .ae-opinions-recent-list .ae-opinion-title{font-size:20px}
+ html body.ae-is-opinions #aeOpinions .ae-opinions-recent-list .ae-opinion-excerpt{display:none}
+ html body.ae-is-opinions #aeOpinions .ae-opinions-debated-list,
+ html body.ae-is-opinions #aeOpinions .ae-opinions-sport-grid{grid-template-columns:minmax(0,1fr)}
+ html body.ae-is-opinions #aeOpinions .ae-opinions-take{gap:8px}
+ html body.ae-is-opinions #aeOpinions .ae-opinions-take-actions button{min-height:29px}
+}
+
 </style>
 <link rel="stylesheet" href="assets/ae-home-takes-compact-reference.css?v=20261016-2">
 <link rel="stylesheet" href="assets/ae-home-cta-icons.css?v=20261016-read-cta-2">
@@ -2945,11 +3163,25 @@ html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > .ae-takes-hea
           <div id="aeOpinionsTabs" class="ae-opinions-tabs" role="tablist" aria-label="Opiniones por deporte"></div>
           <p id="aeOpinionsStatus" class="ae-opinions-status" role="status" aria-live="polite"></p>
           <div id="aeOpinionsList" class="ae-opinions-list" role="tabpanel" aria-labelledby="aeOpinionsHeading"></div>
-          <!-- Only reposition existing Home panels: never duplicate rankings or articles. -->
-          <div id="aeOpinionsHighlights" class="ae-opinions-highlights" aria-label="Lecturas y opinadores destacados">
-            <aside id="aeOpinionsTrendingSlot" class="ae-opinions-highlight-slot"></aside>
-            <aside id="aeOpinionsCommunitySlot" class="ae-opinions-highlight-slot"></aside>
-          </div>
+          <!-- Reutilizar los paneles originales de Home (no crear rankings alternativos). -->
+          <section id="aeOpinionsHighlights" class="ae-opinions-highlights" aria-labelledby="aeOpinionsDistinguishedHeading">
+            <header class="ae-opinions-section-head">
+              <h3 id="aeOpinionsDistinguishedHeading">Opinadores distinguidos</h3>
+              <p>Las voces más apoyadas y cuestionadas, con sus votos, respuestas y perfiles originales.</p>
+            </header>
+            <div class="ae-opinions-highlight-grid">
+              <aside id="aeOpinionsCommunitySlot" class="ae-opinions-highlight-slot" aria-label="Opinadores distinguidos"></aside>
+              <aside id="aeOpinionsTrendingSlot" class="ae-opinions-highlight-slot" aria-label="Lo más leído"></aside>
+            </div>
+          </section>
+          <section id="aeOpinionsDebated" class="ae-opinions-debated" aria-labelledby="aeOpinionsDebatedHeading">
+            <header class="ae-opinions-section-head">
+              <h3 id="aeOpinionsDebatedHeading">Lo más debatido</h3>
+              <p>Takes públicos con respuestas verificadas. Abre cada conversación para participar.</p>
+            </header>
+            <div id="aeOpinionsDebatedContent" class="ae-opinions-debated-list" aria-live="polite"></div>
+          </section>
+          <section id="aeOpinionsSports" class="ae-opinions-sports" aria-label="Opiniones por deporte"></section>
         </section>
         <section id="heroSection" aria-label="Portada editorial"></section>
         <div class="editorial-layout grid grid-cols-1 lg:grid-cols-12 gap-8">
