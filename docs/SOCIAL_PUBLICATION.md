@@ -184,3 +184,21 @@ Validado en producción dentro de una transacción revertida: 7:00 no crea nada,
 7:20 crea la de las 8:00 (12:00 UTC en EDT), repetir no duplica, 17:20 crea la
 de las 18:00, tras el cambio de hora sale a las 13:00 / 23:00 UTC, 18:31 ya no
 crea nada, cada publicación tiene 3 entregas y los temas rotan.
+
+## Biblioteca visual de marca (22 de octubre de 2026)
+
+Las publicaciones automáticas nuevas eligen una ilustración de
+`assets/social-brand/` según su tema. La tabla privada `cam_social.brand_images`
+mantiene el conjunto permitido para cada tema. El trigger de `cam_social.events`
+guarda la imagen elegida junto con `brand_theme`, `brand_image_key` y la URL
+original. La selección toma la imagen menos usada recientemente dentro del
+tema, para alternar las piezas. Noticias NFL y Fútbol usan sus familias
+respectivas; Picks, rankings y promociones usan su temática. Los eventos ya
+creados no se reescriben.
+
+X recibe el JPG ilustrado. Instagram y TikTok usan el mismo JPG como base de
+un video 9:16 con titular y música original, sin el marco fotográfico de la
+plantilla anterior. El resultado acertado de Pick conserva en X su formato
+especial de cita a la publicación original. Para ampliar la biblioteca, añadir
+los JPG y las filas correspondientes de `cam_social.brand_images` en una nueva
+migración.

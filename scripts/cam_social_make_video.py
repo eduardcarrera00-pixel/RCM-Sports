@@ -30,6 +30,7 @@ WIDTH, HEIGHT, DURATION, SAMPLE_RATE = 720, 1280, 8, 44100
 FPS = 30
 FONT_PATH = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
 BOLD_FONT_PATH = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+BRAND_FONT_PATH = "/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf"
 ALLOWED_IMAGE_HOSTS = {
     "zahuhmvmqvxaunqebqaa.supabase.co",
     "camsports.github.io",
@@ -168,6 +169,28 @@ def promo_cover(image, title, kicker):
     return back.convert("RGB")
 
 
+def brand_cover(image, title, kicker):
+    """Preserve the curated blue illustration and add the changing editorial copy."""
+    blue = image.getpixel((0, 0))
+    back = Image.new("RGB", (WIDTH, HEIGHT), blue)
+    art = ImageOps.fit(image, (WIDTH, 850), method=Image.Resampling.LANCZOS)
+    back.paste(art, (0, 180))
+    draw = ImageDraw.Draw(back)
+    cream, gold = (250, 245, 235), (214, 177, 121)
+    # Solid bands protect the changing text without blurring or obscuring the art.
+    draw.rectangle((0, 0, WIDTH, 180), fill=blue)
+    draw.rectangle((0, 930, WIDTH, HEIGHT), fill=blue)
+    draw.text((42, 47), "CAM SPORTS", font=ImageFont.truetype(BRAND_FONT_PATH, 42), fill=cream)
+    draw.rectangle((42, 113, 150, 116), fill=gold)
+    draw.text((42, 947), str(kicker or "CAM SPORTS")[:36].upper(),
+              font=font(22, True), fill=gold)
+    heading = font(42, True)
+    for i, line in enumerate(wrap(draw, title, heading, max_width=634, limit=4)):
+        draw.text((42, 993 + 53 * i), line, font=heading, fill=cream)
+    draw.text((42, 1218), "CAMSPORTS.GITHUB.IO", font=font(19, True), fill=gold)
+    return back
+
+
 def compose_original_music(path):
     """Synthesized original four-chord arpeggio; no samples or licensed songs."""
     # Am, F, C and G. Quiet plucked notes leave room for the news image.
@@ -203,7 +226,9 @@ def make_video(image, title, output, style="news", kicker=None):
     with tempfile.TemporaryDirectory() as tmp:
         still = Path(tmp) / "frame.png"
         audio = Path(tmp) / "original-music.wav"
-        frame = promo_cover(image, title, kicker) if style == "promo" else cover(image, title)
+        frame = (brand_cover(image, title, kicker) if style == "brand"
+                 else promo_cover(image, title, kicker) if style == "promo"
+                 else cover(image, title))
         frame.save(still)
         compose_original_music(audio)
         subprocess.run([
@@ -233,7 +258,15 @@ def make_video(image, title, output, style="news", kicker=None):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--smoke-test", action="store_true")
+    parser.add_argument("--brand-preview", type=Path,
+                        help="Write a still preview of the new social layout")
     args = parser.parse_args()
+    if args.brand_preview:
+        args.brand_preview.parent.mkdir(parents=True, exist_ok=True)
+        brand_cover(Image.open(ROOT / "assets/social-brand/takes.jpg").convert("RGB"),
+                    "Tu opinión también cuenta", "Takes · debate").save(args.brand_preview)
+        print("Brand preview:", args.brand_preview)
+        return
     if args.smoke_test:
         with tempfile.TemporaryDirectory() as tmp:
             image = Image.new("RGB", (1100, 650), "#285781")
@@ -251,7 +284,8 @@ def main():
         output = OUTPUT / (hashlib.md5(key.encode("utf-8")).hexdigest() + ".mp4")
         if output.exists() and output.stat().st_size > 30000:
             continue
-        style = "promo" if job.get("style") == "promo" else "news"
+        style = ("brand" if "/assets/social-brand/" in (job.get("image_url") or "")
+                 else "promo" if job.get("style") == "promo" else "news")
         make_video(read_image(job.get("image_url")), job.get("title"), output, style, job.get("kicker"))
         print("Generated:", output.relative_to(ROOT))
 
