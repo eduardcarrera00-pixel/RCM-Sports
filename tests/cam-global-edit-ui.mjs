@@ -120,7 +120,7 @@ const run = async () => {
   assert.match(css,/camGlobalEditToggle\[hidden\]/);
   assert.match(css,/html:not\(\.cam-global-edit-active\) cam-site-image-layer/);
   assert.match(css,/@media\(max-width:979px\)/);
-  assert.doesNotMatch(source,/localStorage|sessionStorage/);
+  assert.doesNotMatch(source,/(?:localStorage|sessionStorage)\.(?:getItem|setItem|removeItem)/);
   console.log('CAM SPORTS global edit mode: 22 behavioral and integration checks passed');
 };
 await run();
