@@ -1,0 +1,24 @@
+name: Site image editor tests
+on:
+  pull_request:
+    paths:
+      - 'assets/ae-site-images.js'
+      - 'assets/cam-image-visual.js'
+      - 'tests/cam-image-visual.mjs'
+      - 'supabase/migrations/20261022013000_site_image_visual_controls.sql'
+      - 'index.html'
+  workflow_dispatch:
+jobs:
+  node-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: node --check assets/ae-site-images.js
+      - run: node --check assets/cam-image-visual.js
+      - run: node tests/cam-image-visual.mjs
+      - run: npm run test:editor
