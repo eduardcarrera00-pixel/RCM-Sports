@@ -1,0 +1,28 @@
+name: NFL Quiniela quality checks
+on:
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'assets/cam-nfl-quiniela.js'
+      - 'assets/ae-profile.js'
+      - 'tests/nfl-quiniela-browser.cjs'
+      - 'supabase/migrations/*cam_nfl_quiniela*'
+      - 'supabase/functions/cam-nfl-sync/**'
+      - '.github/workflows/nfl-quiniela-tests.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: node --check assets/cam-nfl-quiniela.js && node --check tests/nfl-quiniela-browser.cjs
+      - run: npx playwright install --with-deps chromium
+      - run: node tests/nfl-quiniela-browser.cjs
+      - run: npm run test:auth
