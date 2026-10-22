@@ -165,6 +165,14 @@ html body nav.ae-sport-nav svg.cam-mobile-nav-symbol {
     outline-offset: -2px !important;
   }
 
+  /* Explicit dark specificity beats the site's .dark category-button palette. */
+  html.dark body > nav.cam-mobile-bottom-nav > button.category-btn {
+    color: #d2c0a6 !important;
+  }
+  html.dark body > nav.cam-mobile-bottom-nav > button.category-btn:is(.active,[aria-current="page"]) {
+    color: #d9ab70 !important;
+  }
+
   /* Identical geometry in day mode: palette only. */
   html:not(.dark) body > nav.ae-sport-nav.cam-mobile-bottom-nav {
     background: #f8f2e8 !important;
