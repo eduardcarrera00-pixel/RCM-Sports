@@ -5,7 +5,7 @@
   const nav = document.querySelector('body > header nav.ae-sport-nav');
   if (!nav || !document.body || !window.matchMedia) return;
 
-  const mobile = window.matchMedia('(max-width: 760px)');
+  const mobile = window.matchMedia('(max-width: 760px), (orientation: landscape) and (max-height: 500px) and (hover: none) and (pointer: coarse)');
   const originalParent = nav.parentNode;
   const originalNextSibling = nav.nextSibling;
   const originalLabel = nav.getAttribute('aria-label') || 'Explorar deportes';

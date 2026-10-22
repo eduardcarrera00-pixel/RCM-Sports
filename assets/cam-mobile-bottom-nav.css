@@ -1,5 +1,5 @@
 /* CAM SPORTS — bottom navigation for phones ONLY (the real category buttons). */
-@media (max-width: 760px) {
+@media (max-width: 760px), (orientation: landscape) and (max-height: 500px) and (hover: none) and (pointer: coarse) {
   html body {
     --cam-bottom-nav-height: 68px;
     padding-bottom: calc(var(--cam-bottom-nav-height) + env(safe-area-inset-bottom, 0px)) !important;
