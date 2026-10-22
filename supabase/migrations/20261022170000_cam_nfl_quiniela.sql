@@ -164,7 +164,7 @@ begin
  'old_home_score',old.home_score,'new_home_score',new.home_score,'old_away_score',old.away_score,'new_away_score',new.away_score));
  return new;
 end $$;
-create trigger cam_nfl_settle on public.cam_nfl_games after update of status,home_score,away_score,winner_id
+create trigger cam_nfl_settle after update of status,home_score,away_score,winner_id on public.cam_nfl_games
 for each row execute function public.cam_nfl_settlement_trigger();
 revoke all on function public.cam_nfl_settlement_trigger() from public,anon,authenticated;
 
