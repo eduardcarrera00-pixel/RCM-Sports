@@ -26,6 +26,8 @@ SUPABASE_URL = "https://zahuhmvmqvxaunqebqaa.supabase.co"
 PUBLIC_KEY = "sb_publishable_QK4qV6totowE4KjolNANrQ_O46olHYg"
 FALLBACK = ROOT / "assets" / "cam-sports-logo.jpeg"
 WIDTH, HEIGHT, DURATION, SAMPLE_RATE = 720, 1280, 8, 44100
+# Instagram Reels rejects videos under 23 fps; 30 is accepted by Reels and TikTok.
+FPS = 30
 FONT_PATH = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
 BOLD_FONT_PATH = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
 ALLOWED_IMAGE_HOSTS = {
@@ -206,17 +208,23 @@ def make_video(image, title, output, style="news", kicker=None):
         compose_original_music(audio)
         subprocess.run([
             "ffmpeg", "-nostdin", "-hide_banner", "-loglevel", "error", "-y",
-            "-loop", "1", "-framerate", "20", "-i", str(still),
-            "-i", str(audio), "-t", str(DURATION), "-r", "20",
+            "-loop", "1", "-framerate", str(FPS), "-i", str(still),
+            "-i", str(audio), "-t", str(DURATION), "-r", str(FPS),
             "-c:v", "libx264", "-preset", "veryfast", "-crf", "26",
             "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "112k",
             "-movflags", "+faststart", "-shortest", str(output)
         ], check=True, timeout=120)
         tracks = subprocess.check_output([
-            "ffprobe", "-v", "error", "-show_entries", "stream=codec_type",
+            "ffprobe", "-v", "error", "-show_entries", "stream=codec_type,avg_frame_rate",
             "-of", "json", str(output)
         ], timeout=20)
         kinds = {track.get("codec_type") for track in json.loads(tracks)["streams"]}
+        rates = [track.get("avg_frame_rate", "0/1") for track in json.loads(tracks)["streams"]
+                 if track.get("codec_type") == "video"]
+        num, _, den = (rates[0] if rates else "0/1").partition("/")
+        if float(num or 0) / float(den or 1) < 23:
+            output.unlink(missing_ok=True)
+            raise ValueError("MP4 frame rate is below Instagram's 23 fps minimum")
         if kinds != {"video", "audio"} or output.stat().st_size < 30000:
             output.unlink(missing_ok=True)
             raise ValueError("MP4 lacks audio/video streams")
