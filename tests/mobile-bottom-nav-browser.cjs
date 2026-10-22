@@ -45,6 +45,7 @@ const server = http.createServer((req, res) => {
       for(const dark of [false,true]){
         await page.setViewportSize({width,height:780});
         await page.evaluate(dark=>document.documentElement.classList.toggle('dark',dark),dark);
+        await page.waitForTimeout(210); // Let the 160ms theme-color transition settle.
         const phone=width<=760;
         const layout=await nav.evaluate((element)=>{
           const r=element.getBoundingClientRect(),s=getComputedStyle(element);
@@ -116,9 +117,12 @@ const server = http.createServer((req, res) => {
       }
     }
     await page.setViewportSize({width:390,height:780});
+    await page.evaluate(()=>document.documentElement.classList.remove('dark'));
+    await page.waitForTimeout(210);
     await page.locator('body > nav [data-category="NFL"]').click();
     await page.waitForFunction(()=>document.querySelector('body > nav [data-category="NFL"]').getAttribute('aria-current')==='page');
     assert.equal(await page.evaluate(()=>document.body.dataset.section),'NFL');
+    await page.waitForTimeout(210); // Selected icon/ring transition is intentionally animated.
     const nflSelected=await nav.evaluate(el=>{
       const active=el.querySelector('[data-category="NFL"]');
       const normal=el.querySelector('[data-category="Picks"]');
@@ -147,6 +151,7 @@ const server = http.createServer((req, res) => {
     assert.equal(nflSelected.accessible,'Picks');
     await page.evaluate(()=>filterByCategory('Opiniones'));
     await page.waitForFunction(()=>document.querySelector('body > nav [data-category="Opiniones"]').getAttribute('aria-current')==='page');
+    await page.waitForTimeout(210);
     const opinionSelected=await nav.evaluate(el=>{
       const button=el.querySelector('[data-category="Opiniones"]');
       const label=button.querySelector('span:last-child');
@@ -163,6 +168,7 @@ const server = http.createServer((req, res) => {
     assert.ok(opinionSelected.labelVisible && opinionSelected.fits,JSON.stringify(opinionSelected));
     assert.equal(opinionSelected.indicator,'none','old moving pill is removed');
     await page.evaluate(()=>document.documentElement.classList.add('dark'));
+    await page.waitForTimeout(210);
     assert.equal(await page.locator('body > nav [data-category="Opiniones"] svg.cam-mobile-nav-symbol').evaluate(svg=>getComputedStyle(svg).color),'rgb(217, 171, 112)','night selected icon is gold, never white');
     await page.evaluate(()=>filterByCategory('Todos'));
     await page.waitForFunction(()=>!document.querySelector('body > nav').classList.contains('cam-nav-has-active'));
