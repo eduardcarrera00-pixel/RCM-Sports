@@ -1,0 +1,147 @@
+/* CAM SPORTS · Pick card visual reference shared across all previews.
+   Uses the existing community card rules; never styles #cpDialog / the Chef recipe. */
+/* Editorial direction 1: only community Pick publications, never section banners or standings. */
+html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks,#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog #aeProfilePicks,#aeProfileDialog #aeProfilePickHighlights) .cam-pick-unified{
+ --pick-feed-ink:#f4e8db;--pick-feed-muted:#c5cdd2;--pick-feed-action:#d4ae83;--pick-feed-line:#49606c;--pick-feed-soft:#1b3746;
+ display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:8px 12px!important;position:relative!important;box-sizing:border-box!important;width:100%!important;min-width:0!important;height:auto!important;min-height:0!important;max-height:none!important;margin:0!important;padding:18px 4px!important;border:0!important;border-bottom:1px solid var(--pick-feed-line)!important;border-radius:0!important;box-shadow:none!important;background:transparent!important;color:var(--pick-feed-ink)!important;overflow-wrap:anywhere!important
+}
+html:not(.dark) body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks,#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog #aeProfilePicks,#aeProfileDialog #aeProfilePickHighlights) .cam-pick-unified{--pick-feed-ink:#273b49;--pick-feed-muted:#566876;--pick-feed-action:#855b43;--pick-feed-line:#c9b9a6;--pick-feed-soft:#f3eade}
+html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks,#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog #aeProfilePicks,#aeProfileDialog #aeProfilePickHighlights) .cam-pick-unified::before,
+html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks,#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog #aeProfilePicks,#aeProfileDialog #aeProfilePickHighlights) .cam-pick-unified::after{display:none!important;content:none!important}
+html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks,#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog #aeProfilePicks,#aeProfileDialog #aeProfilePickHighlights) .cam-pick-unified .cp-card-header{order:1;grid-column:1/-1;display:flex!important;align-items:center!important;justify-content:space-between!important;flex-wrap:wrap!important;gap:4px 10px!important;min-width:0!important;margin:0!important;padding:0!important;border:0!important}
+html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks,#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog #aeProfilePicks,#aeProfileDialog #aeProfilePickHighlights) .cam-pick-unified .cp-feed-author{display:inline-flex!important;align-items:center!important;gap:8px!important;min-width:0!important;max-width:100%!important;min-height:44px!important;width:auto!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;color:var(--pick-feed-ink)!important;font:700 14px/1.3 Inter,system-ui,sans-serif!important;text-align:left!important;white-space:normal!important;position:relative!important;z-index:4!important}
+html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks,#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog #aeProfilePicks,#aeProfileDialog #aeProfilePickHighlights) .cam-pick-unified .cp-feed-author::before,
+html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks,#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog #aeProfilePicks,#aeProfileDialog #aeProfilePickHighlights) .cam-pick-unified .cp-feed-author::after{display:none!important;content:none!important}
+html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks,#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog #aeProfilePicks,#aeProfileDialog #aeProfilePickHighlights) .cam-pick-unified .cp-feed-initial{display:inline-flex;align-items:center;justify-content:center;flex:0 0 30px;width:30px;height:30px;background:var(--pick-feed-soft);border:1px solid var(--pick-feed-line);font:600 17px/1 Newsreader,Georgia,serif;color:var(--pick-feed-action)}
+html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks,#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog #aeProfilePicks,#aeProfileDialog #aeProfilePickHighlights) .cam-pick-unified .cp-feed-username{min-width:0;overflow-wrap:anywhere}
+html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks,#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog #aeProfilePicks,#aeProfileDialog #aeProfilePickHighlights) .cam-pick-unified .cp-card-sport{margin:0!important;padding:0!important;border:0!important;background:transparent!important;color:var(--pick-feed-muted)!important;font:500 12px/1.4 Inter,system-ui,sans-serif!important}
+html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks,#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog #aeProfilePicks,#aeProfileDialog #aeProfilePickHighlights) .cam-pick-unified .cp-card-title{order:2;grid-column:1/-1;min-width:0!important;max-width:100%!important;margin:0!important;padding:0!important;color:var(--pick-feed-ink)!important;font:600 clamp(21px,2vw,26px)/1.18 Newsreader,Georgia,serif!important;line-clamp:unset!important;-webkit-line-clamp:unset!important;overflow:visible!important;display:block!important}
+html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks,#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog #aeProfilePicks,#aeProfileDialog #aeProfilePickHighlights) .cam-pick-unified .cp-card-legs{order:3;grid-column:1;display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:8px!important;min-width:0!important;margin:0!important;padding:0!important}
+html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks,#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog #aeProfilePicks,#aeProfileDialog #aeProfilePickHighlights) .cam-pick-unified .cp-card-legs p{display:flex!important;flex-direction:column!important;gap:3px!important;min-width:0!important;margin:0!important;padding:0!important}
+html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks,#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog #aeProfilePicks,#aeProfileDialog #aeProfilePickHighlights) .cam-pick-unified .cp-leg-selection{display:block!important;margin:0!important;padding:0!important;color:var(--pick-feed-action)!important;font:600 20px/1.25 Newsreader,Georgia,serif!important;overflow-wrap:anywhere!important}
+html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks,#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog #aeProfilePicks,#aeProfileDialog #aeProfilePickHighlights) .cam-pick-unified .cp-leg-selection::before{content:none!important;display:none!important}
+html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks,#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog #aeProfilePicks,#aeProfileDialog #aeProfilePickHighlights) .cam-pick-unified .cp-leg-event{font:500 12px/1.4 Inter,system-ui,sans-serif!important;color:var(--pick-feed-muted)!important}
+html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks,#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog #aeProfilePicks,#aeProfileDialog #aeProfilePickHighlights) .cam-pick-unified .cp-card-odds{display:contents!important}
+html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks,#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog #aeProfilePicks,#aeProfileDialog #aeProfilePickHighlights) .cam-pick-unified .cp-odds{order:3;grid-column:2;align-self:start!important;justify-self:end!important;display:block!important;position:static!important;margin:0!important;padding:6px 9px!important;min-width:0!important;width:auto!important;max-width:108px!important;border:1px solid var(--pick-feed-action)!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;color:var(--pick-feed-action)!important;font:700 13px/1.3 Inter,system-ui,sans-serif!important;white-space:normal!important;text-align:center!important}
+html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks,#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog #aeProfilePicks,#aeProfileDialog #aeProfilePickHighlights) .cam-pick-unified .cp-card-state{order:4;grid-column:1/-1;display:block!important;margin:0!important;padding:0!important;text-align:left!important;color:var(--pick-feed-muted)!important;font:400 11px/1.4 Inter,system-ui,sans-serif!important}
+html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks,#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog #aeProfilePicks,#aeProfileDialog #aeProfilePickHighlights) .cam-pick-unified .cp-explanation{order:5;grid-column:1/-1;margin:0!important;padding:0!important;color:var(--pick-feed-muted)!important;font:400 12px/1.5 Inter,system-ui,sans-serif!important;white-space:pre-wrap!important;display:block!important;max-height:none!important;overflow:visible!important;-webkit-line-clamp:unset!important}
+html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks,#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog #aeProfilePicks,#aeProfileDialog #aeProfilePickHighlights) .cam-pick-unified .cp-actions{order:6;grid-column:1/-1;display:flex!important;align-items:center!important;flex-wrap:wrap!important;gap:6px!important;margin:4px 0 0!important;padding:0!important;border:0!important;min-width:0!important;position:relative!important;z-index:4!important}
+html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks,#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog #aeProfilePicks,#aeProfileDialog #aeProfilePickHighlights) .cam-pick-unified .cp-actions button{flex:0 0 auto!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;min-height:44px!important;min-width:48px!important;width:auto!important;max-width:100%!important;margin:0!important;padding:8px 10px!important;border:1px solid var(--pick-feed-line)!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;color:var(--pick-feed-action)!important;font:600 12px/1.3 Inter,system-ui,sans-serif!important;white-space:normal!important}
+html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks,#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog #aeProfilePicks,#aeProfileDialog #aeProfilePickHighlights) .cam-pick-unified .cp-actions button[aria-pressed=true]{background:var(--pick-feed-soft)!important;border-color:var(--pick-feed-action)!important;color:var(--pick-feed-ink)!important}
+html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks,#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog #aeProfilePicks,#aeProfileDialog #aeProfilePickHighlights) .cam-pick-unified .cp-actions button.cp-replies-button{margin-left:auto!important;padding:8px 0 8px 8px!important;border:0!important;background:transparent!important;text-align:right!important}
+html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks,#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog #aeProfilePicks,#aeProfileDialog #aeProfilePickHighlights) .cam-pick-unified :is(button,a):focus-visible{outline:2px solid var(--pick-feed-action)!important;outline-offset:2px!important}
+@media(max-width:760px){html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks,#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog #aeProfilePicks,#aeProfileDialog #aeProfilePickHighlights) .cam-pick-unified{padding:14px 2px!important;gap:7px 10px!important}html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks,#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog #aeProfilePicks,#aeProfileDialog #aeProfilePickHighlights) .cam-pick-unified .cp-card-title{font-size:22px!important}html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks,#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog #aeProfilePicks,#aeProfileDialog #aeProfilePickHighlights) .cam-pick-unified .cp-leg-selection{font-size:19px!important}}
+
+html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks,#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog #aeProfilePicks,#aeProfileDialog #aeProfilePickHighlights) .cam-pick-unified .cp-replies-button svg{display:block;width:16px;height:16px;flex:0 0 16px;margin-right:5px}
+html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks,#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog #aeProfilePicks,#aeProfileDialog #aeProfilePickHighlights) .cam-pick-unified .cp-card-header::before{display:none!important;content:none!important}
+
+/* The shared renderer uses identical content and interactions; density is contextual. */
+html body #mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#picksPopular,#picksQuestioned){
+ display:block!important;height:auto!important;min-height:0!important;
+ max-height:var(--ae-plates-window-height,620px)!important;
+ overflow-y:auto!important;overflow-x:hidden!important;
+ padding:0 4px 0 0!important;overscroll-behavior-y:contain!important;scrollbar-width:thin!important;
+}
+html body #mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#picksPopular,#picksQuestioned)>.cam-pick-unified{
+ display:grid!important;box-sizing:border-box!important;list-style:none!important;
+ width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;
+ flex:none!important;overflow:visible!important;margin:0!important;padding:13px 5px!important;
+ border:0!important;border-bottom:1px solid var(--pick-feed-line)!important;
+ background:transparent!important;
+}
+html body #mainContent #footballTakes.ae-picks-editorial #communityPicks #picksPopular>.cam-pick-unified{
+ --pick-feed-ink:#e6f2e8;--pick-feed-muted:#c1d8c8;
+ --pick-feed-action:#b3d7ba;--pick-feed-line:#83a18a;--pick-feed-soft:#294b39;
+ background:linear-gradient(115deg,rgba(48,91,65,.43),rgba(36,72,51,.27))!important;
+ border:1px solid #62876c!important;margin:8px 0!important;padding:13px 11px!important;
+}
+html:not(.dark) body #mainContent #footballTakes.ae-picks-editorial #communityPicks #picksPopular>.cam-pick-unified{
+ --pick-feed-ink:#284c3b;--pick-feed-muted:#587061;
+ --pick-feed-action:#306048;--pick-feed-line:#a6c2aa;--pick-feed-soft:#dfece2;
+ background:linear-gradient(110deg,#e8f2e9,#f3f7ef)!important;
+ border-color:#a6c2aa!important;
+}
+html body #mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#picksPopular,#picksQuestioned)>.cam-pick-unified .cp-card-title{
+ font-size:clamp(18px,1.55vw,22px)!important;
+}
+html body #mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#picksPopular,#picksQuestioned)>.cam-pick-unified .cp-actions button{
+ min-height:34px!important;padding:5px 7px!important;
+}
+html body #mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#picksPopular,#picksQuestioned)>.cam-pick-unified .cp-explanation{
+ display:-webkit-box!important;-webkit-box-orient:vertical!important;
+ -webkit-line-clamp:2!important;line-clamp:2!important;overflow:hidden!important;
+}
+/* View All maintains a multi-column archive using the same visual elements. */
+html body #cpArchiveDialog #cpArchiveFeed{
+ grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr))!important;
+ gap:12px!important;
+}
+html body #cpArchiveDialog #cpArchiveFeed>.cam-pick-unified{
+ background:#193849!important;border:1px solid var(--pick-feed-line)!important;
+ padding:14px!important;
+}
+html:not(.dark) body #cpArchiveDialog #cpArchiveFeed>.cam-pick-unified{background:#fffdf8!important}
+html body #cpArchiveDialog #cpArchiveFeed>.cam-pick-unified .cp-card-title{font-size:20px!important}
+html body #cpArchiveDialog #cpArchiveFeed>.cam-pick-unified .cp-actions button{
+ min-height:36px!important;padding:6px 8px!important;
+}
+/* Profiles retain their own grid spacing and compact previews. */
+html body #aeProfileDialog :is(#aeProfilePicks,#aeProfilePickHighlights) .cam-pick-unified{
+ background:rgba(19,46,59,.6)!important;
+ border:1px solid var(--pick-feed-line)!important;padding:13px!important;
+}
+html:not(.dark) body #aeProfileDialog :is(#aeProfilePicks,#aeProfilePickHighlights) .cam-pick-unified{
+ background:#fffaf2!important;
+}
+html body #aeProfileDialog :is(#aeProfilePicks,#aeProfilePickHighlights) .cam-pick-unified .cp-card-title{font-size:19px!important}
+html body #aeProfileDialog :is(#aeProfilePicks,#aeProfilePickHighlights) .cam-pick-unified .cp-actions button{
+ min-height:34px!important;padding:6px 8px!important;
+}
+html body #aeProfileDialog .cam-pick-profile-date{
+ grid-column:1/-1!important;display:block!important;
+ color:var(--pick-feed-muted)!important;font:500 10px/1.35 Inter,system-ui,sans-serif!important;
+}
+html body #aeProfileDialog .cam-pick-unified.is-won{border-left:2px solid #79ab8d!important}
+html body #aeProfileDialog .cam-pick-unified.is-lost{border-left:2px solid #b98685!important}
+/* Historical results remain SMALL GRID CARDS; only shared palette and type tokens change. */
+html body #mainContent #footballTakes.ae-picks-editorial #communityPicks #cpSettleHistory{
+ --cam-h-card:#193746;--cam-h-ink:#f4e8db;--cam-h-muted:#c5cdd2;
+ --cam-h-edge:#49606c;--cam-h-action:#d4ae83;--cam-h-hover:#234656;
+}
+html:not(.dark) body #mainContent #footballTakes.ae-picks-editorial #communityPicks #cpSettleHistory{
+ --cam-h-card:#fffcf8;--cam-h-ink:#273b49;--cam-h-muted:#566876;
+ --cam-h-edge:#c9b9a6;--cam-h-action:#855b43;--cam-h-hover:#f3eade;
+}
+/* Shared single/combo forecast rows and controls outside the recipe modal. */
+html body :is(#mainContent,#cpArchiveDialog,#aeProfileDialog) .cam-pick-unified .cp-pick-line{
+ list-style:none!important;min-width:0!important;margin:0!important;
+ padding:2px 0!important;overflow-wrap:anywhere!important;
+}
+html body :is(#mainContent,#cpArchiveDialog,#aeProfileDialog) .cam-pick-unified .cp-pick-line-body{
+ display:flex!important;flex-direction:column!important;gap:3px!important;
+ min-width:0!important;padding:0!important;
+}
+html body :is(#mainContent,#cpArchiveDialog,#aeProfileDialog) .cam-pick-unified .cp-pick-line-event{
+ font:500 12px/1.4 Inter,system-ui,sans-serif!important;color:var(--pick-feed-muted)!important;
+}
+html body :is(#mainContent,#cpArchiveDialog,#aeProfileDialog) .cam-pick-unified .cp-pick-line-choice{
+ color:var(--pick-feed-action)!important;
+ font:600 19px/1.2 Newsreader,Georgia,serif!important;
+ overflow-wrap:anywhere!important;
+}
+html body :is(#mainContent,#cpArchiveDialog,#aeProfileDialog) .cam-pick-unified .cp-pick-line-market{
+ color:var(--pick-feed-muted)!important;font:500 10px/1.3 Inter,system-ui,sans-serif!important;
+}
+html body :is(#mainContent,#cpArchiveDialog,#aeProfileDialog) .cam-pick-unified .cp-card-legs{list-style:none!important}
+html body :is(#mainContent,#cpArchiveDialog,#aeProfileDialog) .cam-pick-unified .cp-replies-button svg{
+ display:block;width:16px;height:16px;flex:none;margin-right:5px;
+}
+@media(max-width:760px){
+ html body #cpArchiveDialog #cpArchiveFeed{grid-template-columns:minmax(0,1fr)!important}
+ html body #aeProfileDialog :is(#aeProfilePicks,#aeProfilePickHighlights) .cam-pick-unified{
+  padding:12px 10px!important;
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ html body .cam-pick-unified :is(button,a){transition:none!important}
+}
