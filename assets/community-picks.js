@@ -59,11 +59,11 @@ function pickSelectionDisplay(input){
  return {choice:prediction||market,market:prediction?market:''};
 }
 
-function card(p,compact=false,detail=false,viewerId=currentViewerId,historyCard=false){
+function card(p,compact=false,detail=false,viewerId=currentViewerId){
 
  const editorial=!compact&&!detail;
  const publication=editorial||detail;
- const n=el('article',null,detail?'cp-card cp-card-detail cp-recipe-card':editorial?'cp-card cp-feed-editorial'+(historyCard?' cp-history-card':''):'cp-card');
+ const n=el('article',null,detail?'cp-card cp-card-detail cp-recipe-card':editorial?'cp-card cp-feed-editorial':'cp-card');
  const pickSports=Array.isArray(p.legs)?p.legs.map(l=>String(l?.sport||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')):[];
  const hasNfl=pickSports.some(t=>/nfl|americano|american football|gridiron/.test(t));
  const hasFootball=pickSports.some(t=>!/nfl|americano|american football|gridiron/.test(t)&&/futbol|football|soccer|champions|liga|premier|barca|madrid|uefa|bundesliga|serie a/.test(t));
@@ -92,16 +92,12 @@ function card(p,compact=false,detail=false,viewerId=currentViewerId,historyCard=
  if(publication){
   feedMeta=el('div',null,'cp-feed-meta');
   if(first?.sport)feedMeta.append(el('span',String(first.sport),'cp-card-sport'));
-  if(editorial){
-   const count=(p.legs||[]).reduce((total,leg)=>total+Math.max(1,splitPickSelections(leg.selection).length),0);
-   feedMeta.append(el('span',count>1?'Combinada · '+count+' selecciones':'Simple','cp-ticket-type'));
-  }
   header.append(feedMeta);
  }else if(first?.sport){
   header.append(el('span',String(first.sport),'cp-card-sport'));
  }
  if(detail&&p.event_date)header.append(el('span','Evento '+p.event_date,'cp-event-date'));
- if(!isActive(p)){const status=el('strong',historyCard?({won:'Acertado',lost:'Fallado',void:'Anulado'}[p.outcome]||'Pendiente'):resultLabel(p),'cp-result-badge');status.dataset.outcome=p.outcome||'pending';header.append(status);}
+ if(!isActive(p))header.append(el('strong',resultLabel(p),'cp-result-badge'));
  n.append(header);
  const title=el('h3',null,'cp-card-title');
  const normalize=value=>String(value||'').toLocaleLowerCase('es').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
@@ -176,16 +172,16 @@ function card(p,compact=false,detail=false,viewerId=currentViewerId,historyCard=
  const statusText=p.moderation_status==='approved'
    ?(publication?'':(['on_device_ocr','ai_vision'].includes(p.capture_check?.method)?'Momio cotejado con captura':'Cuota aprobada'))
    :p.moderation_status==='rejected'?'Cuota rechazada':'Cuota en revisión · votos abiertos';
- if(statusText&&!historyCard){
+ if(statusText){
   const status=el('small',statusText,'cp-card-state');
   if(publication)n.append(status);else odds.append(status);
  }
  if(publication)feedMeta.append(odds);else n.append(odds);
- if(p.explanation&&!historyCard)n.append(el('p',p.explanation,'cp-explanation'));
+ if(p.explanation)n.append(el('p',p.explanation,'cp-explanation'));
  const controls=el('div',null,'cp-actions');
  const canVote=['pending','approved'].includes(p.moderation_status)&&isActive(p);
  const isOwnPick=Boolean(viewerId&&p.user_id&&String(viewerId)===String(p.user_id));
- if(!isOwnPick&&!historyCard){
+ if(!isOwnPick){
  for(const [value,label,count] of [[1,'▲',p.upvotes],[-1,'▼',p.downvotes]]){
    const b=button((editorial?(value===1?'↑':'↓'):label)+' '+Number(count||0),()=>vote(p,value,b));
    b.classList.add(value===1?'cp-upvote':'cp-downvote');
@@ -684,28 +680,52 @@ async function loadSettleHistory(){
  const area=$('cpSettleHistory');if(!area)return;
  const seq=++settleHistoryRequest;
  const current=()=>seq===settleHistoryRequest&&area.isConnected&&$('cpSettleHistory')===area;
- const failure=error=>{if(current())area.replaceChildren(el('p','No pudimos cargar los últimos Picks. '+message(error),'ae-pick-history-empty'));};
+ const failure=error=>{if(current())area.replaceChildren(el('p','No pudimos cargar el historial. '+message(error),'ae-pick-history-empty'));};
  area.setAttribute('aria-busy','true');
  try{
-  const r=await db.from('ae_pick_feed').select('*')
-   .in('outcome',['won','lost','void']).order('settled_at',{ascending:false,nullsFirst:false}).limit(25);
-  if(!current())return;
-  if(r.error){failure(r.error);return;}
-  const seen=new Set();
-  const rows=(r.data||[]).filter(p=>{if(!p.id||seen.has(String(p.id)))return false;seen.add(String(p.id));return true;});
-  if(!rows.length){area.replaceChildren(el('p','Todavía no hay Picks con resultado.','ae-pick-history-empty'));return;}
-  const list=el('ol',null,'ae-pick-history-list');
-  list.tabIndex=rows.length>2?0:-1;
-  list.setAttribute('aria-label','Últimos Picks con resultado, del más reciente al más antiguo');
-  const when=t=>new Date(t).toLocaleDateString('es-MX',{day:'numeric',month:'short',timeZone:'America/Toronto'}).replace('.','');
-  for(const p of rows){
-   const li=el('li',null,'ae-pick-history-entry');li.dataset.outcome=p.outcome;li.dataset.pickId=p.id;
-   const pick=card(p,false,false,currentViewerId,true);
-   if(p.settled_at){const footer=pick.querySelector('.cp-actions');if(footer)footer.append(el('small','Resultado · '+when(p.settled_at),'cp-history-settled'));}
-   li.append(pick);list.append(li);
-  }
-  const frame=el('div',null,'ae-pick-history-frame');frame.append(list);
-  area.replaceChildren(frame);
+ const r=await db.from('ae_pick_feed').select('id,title,author,event_date,american_odds,outcome,settled_at,result_points')
+   .in('outcome',['won','lost','void']).order('settled_at',{ascending:false,nullsFirst:false}).limit(20);
+ if(!current())return;
+ if(r.error){failure(r.error);return;}
+ const seen=new Set();
+ const rows=(r.data||[]).filter(p=>{if(!p.id||seen.has(p.id))return false;seen.add(p.id);return true;});
+ if(!rows.length){area.replaceChildren(el('p','Todavía no hay Picks resueltos.','ae-pick-history-empty'));return;}
+ const auto=new Set();
+ try{
+  const c=await db.from('ae_pick_settlement_checks').select('pick_id').eq('status','settled').in('pick_id',rows.map(p=>p.id));
+  for(const row of c.data||[])auto.add(row.pick_id);
+ }catch{}
+ if(!current())return;
+ const labels={won:'Acertó',lost:'Falló',void:'Anulado'},marks={won:'✓',lost:'✕',void:'—'};
+ const count=o=>rows.filter(p=>p.outcome===o).length;
+ const summary=el('div',null,'ae-pick-history-summary');
+ for(const [o,text] of [['won','Acertados'],['lost','Fallados'],['void','Anulados']]){
+  const box=el('div',null,'ae-pick-history-stat');box.dataset.outcome=o;
+  box.append(el('strong',String(count(o))),el('span',text));summary.append(box);
+ }
+ const note=el('p',rows.length===1?'Último resultado':rows.length>3?'Últimos '+rows.length+' resultados · desliza para ver más':'Últimos '+rows.length+' resultados','ae-pick-history-note');
+ const list=el('ol',null,'ae-pick-history-list');list.tabIndex=0;list.setAttribute('aria-label','Últimos Picks resueltos');
+ const when=t=>t?new Date(t).toLocaleDateString('es-MX',{day:'numeric',month:'short',timeZone:'America/Toronto'}).replace('.',''):'';
+ const odds=v=>v==null?'':(Number(v)>0?'+':'')+v;
+ for(const p of rows){
+  const li=el('li',null,'ae-pick-history-entry');li.dataset.outcome=p.outcome;li.dataset.pickId=p.id;
+  const mark=el('span',marks[p.outcome],'ae-pick-history-mark');mark.setAttribute('aria-hidden','true');
+  const copy=el('div',null,'ae-pick-history-copy');
+  const head=el('div',null,'ae-pick-history-head');
+  head.append(el('strong',p.title),el('span',labels[p.outcome],'ae-pick-history-badge'));
+  const meta=el('p',null,'ae-pick-history-meta');
+  meta.append(el('span',p.author),el('span',odds(p.american_odds)));
+  if(p.event_date)meta.append(el('span',when(p.event_date+'T16:00:00Z')));
+  if(p.outcome==='won'&&p.result_points!=null)meta.append(el('span','+'+Number(p.result_points).toFixed(2)+' pts','ae-pick-history-points'));
+  const source=el('p',(auto.has(p.id)?'Verificado automáticamente':'Confirmado por un admin')+(p.settled_at?' · '+when(p.settled_at):''),'ae-pick-history-source');
+  copy.append(head,meta,source);li.append(mark,copy);list.append(li);
+ }
+ const frame=el('div',null,'ae-pick-history-frame');frame.append(list);
+ const sync=()=>frame.classList.toggle('is-end',list.scrollTop+list.clientHeight>=list.scrollHeight-4);
+ list.addEventListener('scroll',sync,{passive:true});
+ // Replace the complete snapshot only after it is ready. Authentication,
+ // visibility and feed refreshes can request this history at the same time.
+ area.replaceChildren(summary,note,frame);requestAnimationFrame(sync);
  }catch(error){failure(error);}
  finally{if(current())area.setAttribute('aria-busy','false');}
 }
