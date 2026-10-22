@@ -82,8 +82,10 @@ assert.equal(document.querySelector('.cam-site-text-layer'),null,'pencils disapp
 enabled=true;browser.camSiteTexts.refresh();flush();
 const reopen=[...document.querySelectorAll('.cam-site-text-pencil')].find(p=>p.title.includes('Demuestra tu conocimiento'));
 reopen.click();
+console.log('BEFORE_RESET',browser.camSiteTexts._state(),calls.length);
 dialog.querySelector('[data-reset]').click();
 await new Promise(resolve=>setTimeout(resolve,20));flush();
+console.log('AFTER_RESET',browser.camSiteTexts._state(),dialog.open,dialog.querySelector('[data-text-error]').textContent,document.querySelector('.cam-home-take-square-label').textContent);
 assert.equal(calls.at(-1)?.[0],'cam_reset_site_text','reset also checks permissions in RPC');
 assert.equal(document.querySelector('.cam-home-take-square-label').textContent,'Demuestra tu conocimiento');
 assert.equal(stored.size,0);
