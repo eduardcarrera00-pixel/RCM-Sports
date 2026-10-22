@@ -434,9 +434,24 @@
       const was=user?.id;await loadSession();
       if(was!==user?.id){await loadMine();recover();if(loaded)paint();}
     },150));
+    let wasVisible=document.body.classList.contains('ae-is-nfl');
     const observer=new MutationObserver(()=>{
       const visible=document.body.classList.contains('ae-is-nfl');
       root.hidden=!visible;
+      // Al regresar a NFL, abrir la jornada vigente; consultar el pasado sigue siendo libre.
+      if(visible&&!wasVisible&&loaded){
+        const latestSeason=seasons()[0]||season;
+        if(latestSeason!==season){
+          season=latestSeason;
+          week=chooseWeek();
+          loadMine().then(()=>{recover();paint();})
+            .catch(error=>st('camNflStatus','No se pudieron actualizar tus picks: '+error.message));
+        }else{
+          week=chooseWeek();
+          paint();
+        }
+      }
+      wasVisible=visible;
       if(visible&&!loaded&&!loading)hydrate();
     });
     observer.observe(document.body,{attributes:true,attributeFilter:['class']});
