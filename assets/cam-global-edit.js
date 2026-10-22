@@ -95,9 +95,27 @@
     sync();
     // No revivir el modo al cerrar sesión ni al iniciar otra cuenta.
     const sb = client();
-    sb?.auth?.onAuthStateChange?.((event) => {
-      if (event === 'SIGNED_OUT' || event === 'SIGNED_IN' || event === 'USER_DELETED') deactivate();
+    sb?.auth?.onAuthStateChange?.((event, session) => {
+      if (event === 'SIGNED_OUT' || event === 'USER_DELETED' ||
+          (event === 'SIGNED_IN' && verifiedUserId && session?.user?.id !== verifiedUserId)) {
+        deactivate();
+      }
     });
+    // Si se revoca el permiso mientras la pestaña sigue abierta, apagar
+    // los controles al volver. Los RPC de guardado verifican el rol igualmente.
+    const revalidate = async () => {
+      if (!isActive() || pending || document.hidden) return;
+      const id = verifiedUserId, api = client();
+      try {
+        const { data: session, error: sessionError } = await api.auth.getUser();
+        if (sessionError || session?.user?.id !== id) { deactivate(); return; }
+        const { data: permission, error: roleError } = await api.from('editors')
+          .select('user_id').eq('user_id', id).maybeSingle();
+        if (roleError || permission?.user_id !== id) deactivate();
+      } catch { deactivate(); }
+    };
+    window.addEventListener('focus', revalidate);
+    document.addEventListener('visibilitychange', revalidate);
   }
 
   window.camGlobalEditMode = Object.freeze({ isActive, sync, toggle, deactivate });
