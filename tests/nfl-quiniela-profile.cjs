@@ -92,7 +92,7 @@ async function run(){
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+2),false,
       'Profile cannot overflow horizontally at '+width);
     await page.evaluate(()=>window.camNflProfile.open('22222222-2222-4222-8222-222222222222',false));
-    await page.waitForFunction(()=>document.querySelector('#camNflProfileGeneral')?.textContent.includes('Pronósticos'));
+    await page.waitForFunction(()=>document.querySelector('#camNflProfileCurrent')?.textContent.includes('Por privacidad'));
     const generalPublic=await page.locator('#camNflProfileGeneral .cam-profile-quiniela-stat strong').allTextContents();
     assert.deepEqual(generalPublic,['2','4','2','1','—','67 %','9']);
     const publicCurrent=await page.locator('#camNflProfileCurrent').innerText();
