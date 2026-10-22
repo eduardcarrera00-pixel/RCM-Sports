@@ -146,7 +146,7 @@
     if (current) chunks.push(current);
     return chunks;
   };
-  const metricPattern = /\b(?:\d{1,3}(?:[.,]\d+)?\s?(?:%|goles|puntos|victorias|derrotas|partidos|touchdowns|yards|asistencias|intercepciones|sacks|títulos)|\d{1,2}[-–]\d{1,2})\b/gi;
+  const metricPattern = /(?:\b\d{1,3}(?:[.,]\d+)?\s?(?:goles|puntos|victorias|derrotas|partidos|touchdowns|yards|asistencias|intercepciones|sacks|títulos)\b|\b\d{1,3}(?:[.,]\d+)?\s?%(?!\w)|\b\d{1,2}[-–]\d{1,2}\b)/gi;
   const metricsIn = blocks => {
     const seen = new Set(), values = [];
     for (const source of blocks) {
