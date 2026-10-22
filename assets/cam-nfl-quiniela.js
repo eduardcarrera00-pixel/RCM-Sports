@@ -149,11 +149,44 @@
     if(!g.picks_open)return 'Quiniela cerrada';
     return mine.has(g.id)?'Pronóstico guardado':draft.has(g.id)?'Selección sin guardar':'Abierto para pronosticar';
   }
+  function renderSummary(chosen){
+    const target=$('camNflSummary');if(!target)return;
+    target.replaceChildren();
+    const picks=chosen.filter(g=>active(g));
+    if(!picks.length){
+      target.append(el('p','Tus selecciones aparecerán aquí antes de guardarlas.','cam-nfl-empty'));return;
+    }
+    target.append(el('h3','Resumen de mi quiniela'));
+    const list=el('div',null,'cam-nfl-summary-items');
+    for(const game of picks){
+      const row=el('div',null,'cam-nfl-summary-item');
+      row.append(el('small',weekName(game.week)+' · '+(mine.has(game.id)?'Guardado':'Pendiente de guardar')));
+      const ui=window.CamNFLQuinielaTeams;
+      if(ui)row.append(ui.createMatchup(game,{
+        selectedTeamId:active(game),locked:!isOpen(game),
+        pickResult:pickResultFor(game,mine.get(game.id))
+      }));
+      else row.append(logo(game.away_id),el('span',' @ '),logo(game.home_id));
+      list.append(row);
+    }
+    target.append(list);
+  }
   function paintGames(){
     const target=$('camNflGames');if(!target)return;
     target.replaceChildren();
     const chosen=games.filter(g=>g.season===season&&g.week===week).sort((a,b)=>Date.parse(a.kickoff)-Date.parse(b.kickoff));
-    if(!chosen.length){target.append(el('p','No hay partidos oficiales cargados para esta jornada.','cam-nfl-empty'));st('camNflProgress','0 pronósticos');if($('camNflSave'))$('camNflSave').disabled=true;return;}
+    if(!chosen.length){
+      target.append(el('p','No hay partidos oficiales cargados para esta jornada.','cam-nfl-empty'));
+      st('camNflProgress','0 pronósticos');st('camNflWeekInfo',weekName(week)+' · Temporada '+season);
+      $('camNflSummary')?.replaceChildren();
+      if($('camNflSave'))$('camNflSave').disabled=true;
+      return;
+    }
+    const next=chosen.filter(g=>Date.parse(g.kickoff)>now()).sort((a,b)=>Date.parse(a.kickoff)-Date.parse(b.kickoff))[0];
+    const opened=chosen.filter(g=>g.odds_locked_at).sort((a,b)=>Date.parse(a.odds_locked_at)-Date.parse(b.odds_locked_at))[0];
+    st('camNflWeekInfo','Temporada '+season+' · '+weekName(week)+
+      (opened?' · Apertura: '+clock(opened.odds_locked_at):' · Apertura pendiente de cuotas')+
+      (next?' · Próximo: '+clock(next.kickoff):' · No quedan partidos por disputar'));
     let progress=0,potential=0;
     for(const g of chosen){
       const selected=active(g);
@@ -169,7 +202,9 @@
       if(editor())box.append(adminGame(g));
       target.append(box);
     }
-    st('camNflProgress',progress+' de '+chosen.length+' seleccionados · '+potential+' pts potenciales pendientes');
+    const stored=chosen.filter(g=>mine.has(g.id)).length;
+    st('camNflProgress',progress+' de '+chosen.length+' seleccionados · '+stored+' guardados · '+potential+' pts potenciales pendientes');
+    renderSummary(chosen);
     const save=$('camNflSave');
     if(save){save.disabled=user?!chosen.some(g=>draft.has(g.id)&&isOpen(g)):false;save.textContent=user?'Guardar mi quiniela':'Inicia sesión para participar';}
   }
