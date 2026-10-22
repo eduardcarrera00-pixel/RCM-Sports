@@ -163,12 +163,12 @@
     if (number(s,prefix+'Width') > 0) set('max-width',s[prefix+'Width']+'px');
     const x = number(s,prefix+'X'), y = number(s,prefix+'Y');
     if (x || y) {set('position','relative');set('left',(x || 0)+'px');set('top',(y || 0)+'px');}
-    if (number(s.weight) != null) set('font-weight',s.weight);
+    if (number(s,'weight') != null) set('font-weight',s.weight);
     if (typeof s.italic === 'boolean') set('font-style',s.italic ? 'italic' : 'normal');
-    if (number(s.letterSpacing) != null) set('letter-spacing',s.letterSpacing+'px');
-    if (number(s.lineHeight) != null) set('line-height',s.lineHeight);
-    if (number(s.padding) != null) set('padding',s.padding+'px');
-    if (number(s.gap) != null) set('margin-bottom',s.gap+'px');
+    if (number(s,'letterSpacing') != null) set('letter-spacing',s.letterSpacing+'px');
+    if (number(s,'lineHeight') != null) set('line-height',s.lineHeight);
+    if (number(s,'padding') != null) set('padding',s.padding+'px');
+    if (number(s,'gap') != null) set('margin-bottom',s.gap+'px');
     if (content.includes('\n')) set('white-space','pre-line');
     set('overflow-wrap','anywhere');
     const colorName = s[dark()?'colorNight':'colorDay'];
