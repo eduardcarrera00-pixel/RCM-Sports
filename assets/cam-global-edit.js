@@ -37,6 +37,7 @@
     }
     document.documentElement.classList.toggle('cam-global-edit-active', enabled);
     window.camSiteImages?.refresh();
+    window.camSiteTexts?.refresh();
   }
 
   function deactivate() {

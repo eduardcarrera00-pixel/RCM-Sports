@@ -1,0 +1,33 @@
+name: CAM SPORTS text editor tests
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'assets/cam-site-texts.js'
+      - 'assets/cam-global-edit.js'
+      - 'assets/cam-global-edit.css'
+      - 'index.html'
+      - 'tests/cam-site-texts-ui.mjs'
+      - 'supabase/migrations/20261022065000_cam_site_texts.sql'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  text-editor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - run: npm ci
+      - name: Syntax and global edit regression
+        run: |
+          node --check assets/cam-site-texts.js
+          node tests/cam-global-edit-ui.mjs
+          node tests/cam-site-texts-ui.mjs
