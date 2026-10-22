@@ -131,8 +131,8 @@ async function readNflverse(): Promise<NflRow[]> {
   const res = await fetch(address, { headers: { "Accept":"text/csv" } });
   if (!res.ok) throw Error("nflverse no disponible (HTTP " + res.status + ")");
   const raw = await res.text();
-  const lines = raw.trim().split(/\\r?\\n/);
-  const columns = lines.shift()?.replace(/^\\uFEFF/, "").split(",") || [];
+  const lines = raw.trim().split(/\r?\n/);
+  const columns = lines.shift()?.replace(/^\uFEFF/, "").split(",") || [];
   for (const name of ["season","game_type","week","gameday","gametime","home_team","away_team","home_score","away_score","espn","home_moneyline","away_moneyline"]) {
     if (!columns.includes(name)) throw Error("El esquema de nflverse ha cambiado: " + name);
   }
@@ -151,7 +151,7 @@ async function readNflverse(): Promise<NflRow[]> {
   return result;
 }
 function easternKickoff(date:string,time:string) {
-  if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(date)||!/^\\d{1,2}:\\d{2}$/.test(time)) throw Error("Horario NFL desconocido");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)||!/^\d{1,2}:\d{2}$/.test(time)) throw Error("Horario NFL desconocido");
   const [year,month,day]=date.split("-").map(Number),[hour,minute]=time.split(":").map(Number);
   const base=Date.UTC(year,month-1,day,hour,minute);
   const parts=new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).formatToParts(new Date(base));
