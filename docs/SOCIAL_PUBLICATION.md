@@ -28,8 +28,11 @@ intermedios ni exposición del valor en el código o los mensajes.
 
 - Nombre en Vault: `cam_buffer_api_key`.
 - Permisos: `account:read`, `posts:read`, `posts:write`.
-- Vencimiento: **19 de noviembre de 2026** (30 días predeterminados).
-  Debe sustituirse antes de esa fecha para mantener los envíos.
+- Renovada el 21 de octubre de 2026 (23:23, Toronto) con vencimiento de 1 año
+  (≈ octubre de 2027). La primera clave vencía el 19 de noviembre de 2026.
+  En el plan gratuito solo hay una clave: regenerarla revoca la anterior al instante.
+  Para cambiarla: `select vault.update_secret((select id from vault.secrets where
+  name='cam_buffer_api_key'), '<clave>');` en el SQL Editor de Supabase.
 - Ambos canales se verificaron por API: conectados, colas sin pausar y TikTok
   con publicación automática, sin recordatorios manuales.
 - Cron operativo; integración habilitada y sin importación de contenido antiguo.
