@@ -1,0 +1,175 @@
+/* CAM SPORTS — bottom navigation for phones ONLY (the real category buttons). */
+@media (max-width: 760px) {
+  html body {
+    --cam-bottom-nav-height: 68px;
+    padding-bottom: calc(var(--cam-bottom-nav-height) + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  /* Hide the original header row while the script relocates this same DOM node. */
+  html body > header nav.ae-sport-nav { display: none !important; }
+
+  html body > header .ae-mobile-header-grid {
+    height: auto !important;
+    min-height: 64px !important;
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+  }
+
+  html body > nav.ae-sport-nav.cam-mobile-bottom-nav {
+    position: fixed !important;
+    top: auto !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 35 !important;
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    align-items: stretch !important;
+    justify-content: stretch !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    height: calc(var(--cam-bottom-nav-height) + env(safe-area-inset-bottom, 0px)) !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px) !important;
+    gap: 0 !important;
+    border: 0 !important;
+    border-top: 1px solid rgba(206, 169, 126, .34) !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: #102535 !important;
+    overflow: visible !important;
+    white-space: normal !important;
+    flex: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  /* Hide optional sports here; the existing Categories footer remains their secondary navigation. */
+  html body > nav.cam-mobile-bottom-nav > .category-btn:not([data-category="Picks"]):not([data-category="NFL"]):not([data-category="Fútbol"]):not([data-category="Opiniones"]),
+  html body > nav.cam-mobile-bottom-nav > .category-btn[hidden] {
+    display: none !important;
+  }
+
+  html body > nav.cam-mobile-bottom-nav > button.category-btn:is([data-category="Picks"],[data-category="NFL"],[data-category="Fútbol"],[data-category="Opiniones"]) {
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 44px !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 5px 2px 6px !important;
+    gap: 3px !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    outline-offset: -3px !important;
+    background: transparent !important;
+    color: #d4d9db !important;
+    font: 600 10px/1.1 Inter, system-ui, sans-serif !important;
+    letter-spacing: .035em !important;
+    text-align: center !important;
+    text-transform: none !important;
+    white-space: nowrap !important;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  html body > nav.cam-mobile-bottom-nav > button.category-btn .ae-nav-icon {
+    display: grid !important;
+    place-items: center !important;
+    width: 30px !important;
+    height: 30px !important;
+    min-width: 30px !important;
+    min-height: 30px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  html body > nav.cam-mobile-bottom-nav > button.category-btn .ae-custom-sport-icon {
+    display: block !important;
+    width: 30px !important;
+    height: 30px !important;
+    max-width: 30px !important;
+    max-height: 30px !important;
+    object-fit: contain !important;
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    opacity: .80;
+  }
+
+  html body > nav.cam-mobile-bottom-nav > button.category-btn.active,
+  html body > nav.cam-mobile-bottom-nav > button.category-btn[aria-current="page"] {
+    color: #efc795 !important;
+    border: 0 !important;
+    background: transparent !important;
+  }
+
+  html body > nav.cam-mobile-bottom-nav > button.category-btn.active::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 38px;
+    height: 2px;
+    transform: translateX(-50%);
+    background: #c99a70;
+  }
+
+  html body > nav.cam-mobile-bottom-nav > button.category-btn.active .ae-custom-sport-icon {
+    opacity: 1;
+    filter: brightness(1.10) saturate(1.06);
+  }
+
+  html body > nav.cam-mobile-bottom-nav > button.category-btn:focus-visible {
+    outline: 2px solid #d6ac80 !important;
+    outline-offset: -3px !important;
+  }
+
+  html:not(.dark) body > nav.ae-sport-nav.cam-mobile-bottom-nav {
+    background: #f6f1e9 !important;
+    border-top-color: rgba(132, 101, 76, .33) !important;
+  }
+  html:not(.dark) body > nav.cam-mobile-bottom-nav > button.category-btn {
+    color: #616875 !important;
+  }
+  html:not(.dark) body > nav.cam-mobile-bottom-nav > button.category-btn.active,
+  html:not(.dark) body > nav.cam-mobile-bottom-nav > button.category-btn[aria-current="page"] {
+    color: #80573b !important;
+  }
+  html:not(.dark) body > nav.cam-mobile-bottom-nav > button.category-btn.active::before {
+    background: #a47650;
+  }
+  html body.cam-mobile-input-focus > nav.cam-mobile-bottom-nav {
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+
+  /* Fullscreen dialogs must never be obscured by the fixed navigation. */
+  html body:has(> dialog[open]) > nav.cam-mobile-bottom-nav,
+  html body:has(> #articleModal:not(.hidden)) > nav.cam-mobile-bottom-nav,
+  html body:has(> #userAuthModal:not(.hidden)) > nav.cam-mobile-bottom-nav,
+  html body:has(> #publishModal:not(.hidden)) > nav.cam-mobile-bottom-nav,
+  html body:has(> #aeArticlePhotoModal:not(.hidden)) > nav.cam-mobile-bottom-nav {
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+}
+@media (max-width: 360px) {
+  html body > nav.cam-mobile-bottom-nav > button.category-btn {
+    font-size: 9px !important;
+    letter-spacing: 0 !important;
+  }
+}
