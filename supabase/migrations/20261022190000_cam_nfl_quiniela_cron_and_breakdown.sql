@@ -58,8 +58,22 @@ begin
 end $$;
 revoke all on function public.cam_nfl_cron_dispatch(text) from public,anon,authenticated;
 
-select cron.schedule('cam-nfl-weekly-hourly','7 * * * *',
-  'select public.cam_nfl_cron_dispatch(''hourly'')');
-select cron.schedule('cam-nfl-results-ten-minutes','*/10 * * * *',
-  'select public.cam_nfl_cron_dispatch(''live'')');
+-- Reuse any existing NFL Cron integration: never create duplicate dispatches.
+do $cron$
+begin
+ if not exists (
+   select 1 from cron.job where jobname in
+   ('cam-nfl-auto-hourly','cam-nfl-weekly-hourly')
+ ) then
+   perform cron.schedule('cam-nfl-weekly-hourly','7 * * * *',
+     'select public.cam_nfl_cron_dispatch(''hourly'')');
+ end if;
+ if not exists (
+   select 1 from cron.job where jobname in
+   ('cam-nfl-auto-results','cam-nfl-results-ten-minutes')
+ ) then
+   perform cron.schedule('cam-nfl-results-ten-minutes','*/10 * * * *',
+     'select public.cam_nfl_cron_dispatch(''live'')');
+ end if;
+end $cron$;
 notify pgrst,'reload schema';
