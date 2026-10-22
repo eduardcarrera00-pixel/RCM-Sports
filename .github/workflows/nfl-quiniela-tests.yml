@@ -26,7 +26,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: node --check assets/cam-nfl-quiniela.js && node --check assets/cam-nfl-profile.js && node --check tests/nfl-quiniela-browser.cjs && node --check tests/nfl-quiniela-profile.cjs
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install chromium
       - run: node tests/nfl-quiniela-browser.cjs
       - run: node tests/nfl-quiniela-profile.cjs
       - run: npm run test:auth
