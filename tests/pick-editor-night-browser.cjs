@@ -99,9 +99,9 @@ const previewHTML=['<article class="ae-weekly-card ae-weekly-preview" data-cam-w
      assert.notEqual(night.titleColor,'rgb(0, 0, 0)','Dark theme title remains legible');
      assert.equal(night.title,day.title,'Published content unchanged');
      if(banner)assert(await page.locator(view==='home-desktop'?'.editorial-pick .ae-weekly-home-banner':'#picksFeatured .ae-weekly-banner').count()>0,'Real banner preserved');
+     if(width===390&&banner)await page.locator(view==='home-desktop'?'.editorial-pick':'#picksFeatured').screenshot({path:path.join(qa,view+'-'+width+'-night.png')});
      await page.evaluate(()=>document.documentElement.classList.remove('dark'));
      assert.deepEqual(await read(),original,'Switching back restores exact light styling');
-     if(width===390&&banner)await page.locator(view==='home-desktop'?'.editorial-pick':'#picksFeatured').screenshot({path:path.join(qa,view+'-'+width+'-night.png')});
     }
    }
   }
