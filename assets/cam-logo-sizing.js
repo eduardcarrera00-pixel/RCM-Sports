@@ -68,6 +68,10 @@
       const item = identify(img);
       if (item && valid(item.key)) {
         if (img.dataset.camSizeKey !== item.key) img.dataset.camSizeKey = item.key;
+        // El wordmark vive dentro de un recorte intencionado (sin márgenes
+        // transparentes). Escalar el recorte completo evita cortar letras.
+        const crop = img.classList.contains('cam-brand-art') && img.closest('.cam-brand-crop');
+        if (crop && crop.dataset.camSizeKey !== item.key) crop.dataset.camSizeKey = item.key;
       } else if (img.dataset.camSizeKey) delete img.dataset.camSizeKey;
     }
   }
@@ -96,8 +100,10 @@
       for (const device of ['desktop','mobile']) for (const theme of ['light','dark']) {
         const pct = effective(key, device, theme);
         if (pct === 100) continue;
+        const surface = /^brand\.(header|footer|other)$/.test(key)
+          ? '.cam-brand-crop' : 'img';
         const selector = 'html' + (theme === 'dark' ? '.dark' : ':not(.dark)') +
-          ' img[data-cam-size-key="' + key + '"]';
+          ' ' + surface + '[data-cam-size-key="' + key + '"]';
         const size = 'scale:' + (pct / 100) + ' !important; transform-origin:center center !important;';
         rules.push('@media ' + (device === 'mobile' ? '(max-width:979px)' : '(min-width:980px)') +
           '{' + selector + '{' + size + '}}');
