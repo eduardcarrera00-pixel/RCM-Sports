@@ -1,0 +1,25 @@
+name: CAM SPORTS mobile bottom navigation
+
+on:
+  pull_request:
+    paths:
+      - 'assets/cam-mobile-bottom-nav.js'
+      - 'assets/cam-mobile-bottom-nav.css'
+      - 'assets/ae-category-visibility.js'
+      - 'index.html'
+      - 'tests/mobile-bottom-nav.mjs'
+      - 'package.json'
+      - '.github/workflows/mobile-bottom-nav.yml'
+
+jobs:
+  mobile-nav:
+    name: Check phone navigation and desktop restoration
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run test:mobile-nav

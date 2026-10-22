@@ -19,7 +19,8 @@
   // Recalcular el espacio de navegación únicamente con los deportes visibles.
   // 3/4: una fila, 5/6: filas centradas 3+2 o 3+3, 7: filas 4+3.
   // Nunca se reserva el hueco del deporte que un editor ha ocultado.
-  const nav=document.querySelector('header nav.ae-sport-nav');
+  // The same nav moves to <body> on phones; preserve visible-sport counts on both layouts.
+  const nav=document.querySelector('nav.ae-sport-nav');
   if(nav){
    const count=Array.from(nav.querySelectorAll('.category-btn[data-category]'))
     .filter(button=>!button.hidden && button.getAttribute('aria-hidden')!=='true').length;
