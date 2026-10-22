@@ -45,7 +45,13 @@ async function readJSON(url: string, headers: HeadersInit = {}) {
   } finally { clearTimeout(timeout); }
 }
 async function authenticate(req: Request) {
-  if (compare(req.headers.get("x-cam-cron") || "", secret)) return { cron: true, userId: null };
+  const cronHeader = req.headers.get("x-cam-cron") || "";
+  if (cronHeader) {
+    // The token lives in Supabase Vault; neither the browser nor GitHub stores it.
+    const validation = await db.rpc("cam_nfl_validate_cron", { p_secret: cronHeader });
+    if (!validation.error && validation.data === true) return { cron: true, userId: null };
+    if (secret && compare(cronHeader, secret)) return { cron: true, userId: null };
+  }
   const token = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
   if (!token) throw Error("Autenticación requerida");
   const client = createClient(URL, ANON, { auth: { persistSession: false } });
@@ -119,8 +125,8 @@ async function syncWeek(season: number, week: number, catalog: Set<string>) {
 }
 async function freezeOdds() {
   if (!oddsKey) return { provider: "Sin THE_ODDS_API_KEY", frozen: 0 };
-  const params = new URLSearchParams({sport_key:"americanfootball_nfl",markets:"h2h",regions:"us",oddsFormat:"american"});
-  const odds = await readJSON("https://api.theoddsapi.com/odds/?" + params, { "x-api-key": oddsKey });
+  const params = new URLSearchParams({apiKey:oddsKey,markets:"h2h",regions:"us",oddsFormat:"american"});
+  const odds = await readJSON("https://api.the-odds-api.com/v4/sports/americanfootball_nfl/odds/?" + params);
   if (!Array.isArray(odds)) throw Error("Respuesta inesperada de The Odds API");
   const games = await db.from("cam_nfl_games")
     .select("id,home_id,away_id,kickoff,odds_locked_at,status,opening_mode")
