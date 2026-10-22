@@ -56,6 +56,7 @@ const row=(k,label,min,max,step)=>'<label>'+label+'<span class="cam-visual-row">
 function display(){
   if(!context)return;
   const p=settings(context.draft,context.device);
+  if(!context.draft?.[context.device] && context.legacyFocus?.x != null && context.legacyFocus?.y != null){p.x=context.legacyFocus.x;p.y=context.legacyFocus.y;}
   for(const k of Object.keys(base))fields[k].value=p[k];
   panel.querySelectorAll('[data-device]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.device===context.device)));
   fields.size.closest('label').hidden=context.hasExternalSize;
@@ -101,7 +102,7 @@ function attach(editUI,change){
   }
   panel.addEventListener('click',e=>{
     const b=e.target.closest('button');if(!b||!context)return;
-    if(b.dataset.device){persist();context.device=b.dataset.device;display();notify();return}
+    if(b.dataset.device){context.device=b.dataset.device;display();notify();return}
     if(b.dataset.step){const [k,d]=b.dataset.step.split(':');fields[k].value=limit(+fields[k].value + +d,+fields[k].min,+fields[k].max)}
     else if(b.dataset.preset){const [k,v]=b.dataset.preset.split(':');fields[k].value=v}
     else if(b.dataset.reset){
@@ -125,7 +126,7 @@ function attach(editUI,change){
   });
   for(const ev of ['pointerup','pointercancel'])ui.preview.addEventListener(ev,e=>{if(drag?.id===e.pointerId)drag=null});
 }
-function open(key,kind,visual,element){context={key,kind,device:mode(),hasExternalSize:Boolean(window.camVisualSizes?.identify?.(element)),draft:visual?JSON.parse(JSON.stringify(visual)):{}};display()}
+function open(key,kind,visual,element,legacyFocus){context={key,kind,device:mode(),hasExternalSize:Boolean(window.camVisualSizes?.identify?.(element)),legacyFocus,draft:visual?JSON.parse(JSON.stringify(visual)):{}};display()}
 function preview(box,editing){
   if(!context)return;
   const p=settings(context.draft,context.device), sizing=bg(p);
