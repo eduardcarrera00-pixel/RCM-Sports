@@ -21,5 +21,5 @@ jobs:
           cache: npm
       - run: npm ci
       - run: node --check assets/ae-opinions.js && node --check tests/opinions-editorial-browser.cjs
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install chromium
       - run: node tests/opinions-editorial-browser.cjs
