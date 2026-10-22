@@ -59,11 +59,15 @@ function pickSelectionDisplay(input){
  return {choice:prediction||market,market:prediction?market:''};
 }
 
-function card(p,compact=false,detail=false,viewerId=currentViewerId){
-
- const editorial=!compact&&!detail;
+function card(p,compact=false,detail=false,viewerId=currentViewerId,variant='feed'){
+ // Shared public Pick markup; the Chef recipe remains a separate detail view.
+ const editorial=!detail;
  const publication=editorial||detail;
- const n=el('article',null,detail?'cp-card cp-card-detail cp-recipe-card':editorial?'cp-card cp-feed-editorial':'cp-card');
+ const plate=variant==='best'||variant==='worst';
+ const classes=detail?'cp-card cp-card-detail cp-recipe-card':
+  'cp-card cp-feed-editorial cam-pick-unified'+(compact?' cam-pick-compact':'')+
+  (variant!=='feed'?' cam-pick--'+variant:'');
+ const n=el(plate?'li':'article',null,classes);
  const pickSports=Array.isArray(p.legs)?p.legs.map(l=>String(l?.sport||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')):[];
  const hasNfl=pickSports.some(t=>/nfl|americano|american football|gridiron/.test(t));
  const hasFootball=pickSports.some(t=>!/nfl|americano|american football|gridiron/.test(t)&&/futbol|football|soccer|champions|liga|premier|barca|madrid|uefa|bundesliga|serie a/.test(t));
@@ -197,6 +201,8 @@ function card(p,compact=false,detail=false,viewerId=currentViewerId){
  n.append(controls);
  return n;
 }
+window.renderCamPickCard=(pick,options={})=>card(pick,Boolean(options.compact),false,
+ options.viewerId===undefined?currentViewerId:options.viewerId,options.variant||'feed');
 async function vote(p,value,b){if(!['pending','approved'].includes(p.moderation_status)||!isActive(p))return;b.disabled=true;try{const user=await account();if(!user)return;if(user.id===p.user_id)throw Error('No puedes votar tu propio Pick.');
  let q;if(Number(p.my_vote)===value)q=db.from('ae_pick_votes').delete().eq('pick_id',p.id).eq('user_id',user.id);
  else if(Number(p.my_vote))q=db.from('ae_pick_votes').update({value}).eq('pick_id',p.id).eq('user_id',user.id);
@@ -502,7 +508,7 @@ function sizePlateWindow(target){
  if(!target)return;
  plateWindowObservers.get(target)?.disconnect();
  plateWindowObservers.delete(target);
- const cards=Array.from(target.children).filter(card=>card.classList?.contains('ae-chef-entry'));
+ const cards=Array.from(target.children).filter(card=>card.classList?.contains('cam-pick-unified'));
  target.style.removeProperty('--ae-plates-window-height');
  if(cards.length<=2)return;
  const measure=()=>{
@@ -555,52 +561,13 @@ function paintChefList(id,result,kind){
    hint.textContent='Desliza para ver más ↓';
  };
  target.onscroll=updateHint;
- for(const [index,p] of picks.entries()){
-   const item=el('li',null,'ae-popular-item ae-chef-entry ae-chef-plate');
-   item.dataset.rank=String(index+1);
-   item.dataset.plate=good?'best':'worst';
-   // Full-plate click target; preserve the existing li grid and its direct children.
-   const entryLink=el('a',null,'ae-chef-entry-link');
-   item.style.position='relative';
-   entryLink.style.position='absolute';
-   entryLink.style.inset='0';
-   entryLink.style.zIndex='2';
-   entryLink.style.display='block';
-   entryLink.style.cursor='pointer';
-   entryLink.style.outlineOffset='-2px';
-   entryLink.href=link(p.id);
-   entryLink.setAttribute('aria-label','Abrir Pick '+(index+1)+' de '+(p.author||'Aficionado')+': '+(p.title||'Ver pronóstico'));
-   entryLink.onclick=e=>{
-     if(e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;
-     e.preventDefault();
-     open(p.id);
-   };
-   const info=el('div',null,'ae-popular-copy');
-   // Aquí el nombre es informativo; el acceso al perfil queda dentro del detalle.
-   const chef=el('span','@'+(p.author||'Aficionado'),'ae-chef-author');
-   const pick=el('span',p.title||'Ver pronóstico','ae-chef-pick-link');
-   const score=Number(p.score||0);
-   const votes=el('span',(score>0?'+':'')+score+' votos netos','ae-chef-votes');
-   const authorRow=el('div',null,'ae-chef-author-row');
-   authorRow.append(chef);
-   const americanOdds=Number(p.american_odds);
-   if(p.american_odds!==null && p.american_odds!==undefined &&
-      p.american_odds!=='' && Number.isFinite(americanOdds) && americanOdds!==0){
-     authorRow.append(el('span','Cuota '+(americanOdds>0?'+':'')+americanOdds,'ae-chef-odds'));
-   }
-   const meta=el('div',null,'ae-chef-card-footer');
-   meta.append(votes,el('span','Ver Pick ↗','ae-chef-card-open'));
-   info.append(authorRow,pick,meta);
-   item.append(info,entryLink);
-   target.append(item);
-   updateHint();
- }
+ // Keep the server's score order; only replace the visual renderer.
+ for(const p of picks)target.append(card(p,false,false,currentViewerId,good?'best':'worst'));
  sizePlateWindow(target);
 }
 async function loadChefLists(){
  const seq=++chefRequest;
- const cols='id,user_id,author,title,american_odds,score,upvotes,downvotes,created_at';
- const query=()=>db.from('ae_pick_feed').select(cols)
+ const query=()=>db.from('ae_pick_feed').select('*')
    .in('moderation_status',['pending','approved']).eq('is_current_week',true).gte('event_date',todayToronto()).eq('outcome','pending');
  try{
    const [best,worst]=await Promise.all([
