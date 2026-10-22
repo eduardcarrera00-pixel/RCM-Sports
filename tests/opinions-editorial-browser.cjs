@@ -98,8 +98,16 @@ const {chromium}=require('playwright');
       const articleButton=page.locator('.ae-opinion-card').filter({hasText:'Noticia NFL enlazada'}).locator('.ae-opinion-open');
       await articleButton.click();
       assert.deepEqual(await page.evaluate(()=>window.__openedArticles),[700],'News opens its original reader');
-      await page.locator('.ae-opinions-front-grid .ae-opinion-open').first().click();
-      assert.equal(await page.locator('#aeOpinionReader[open]').count(),1,'Original editorial reader still opens');
+      const hero=page.locator('.ae-opinions-front-grid .ae-opinion-open').first();
+      const heroTitle=await hero.innerText();
+      await hero.click();
+      const readerDebug=await page.evaluate(()=>({
+        open:document.getElementById('aeOpinionReader')?.open,
+        text:document.getElementById('aeOpinionReaderBody')?.textContent?.slice(0,100),
+        readerCount:document.querySelectorAll('#aeOpinionReader').length
+      }));
+      assert.equal(await page.locator('#aeOpinionReader[open]').count(),1,
+        'Original editorial reader still opens: '+heroTitle+' '+JSON.stringify(readerDebug)+' errors: '+JSON.stringify(errors));
       assert.match(await page.locator('.ae-opinion-reader-text').innerText(),/Segundo párrafo/,'Original article body is unchanged');
       await page.locator('#aeOpinionReaderClose').click();
       await page.locator('#aeOpinionsTabs [data-sport="tenis"]').click();
