@@ -1,4 +1,9 @@
 /* CAM SPORTS — premium capsule dock on phones only; reuse the original buttons. */
+/* The four phone-only vectors never alter the original desktop sport artwork. */
+html body nav.ae-sport-nav svg.cam-mobile-nav-symbol {
+  display: none !important;
+}
+
 @media (max-width: 760px), (orientation: landscape) and (max-height: 500px) and (hover: none) and (pointer: coarse) {
   html body {
     --cam-bottom-nav-height: 62px;
@@ -153,6 +158,29 @@
     opacity: 1;
     filter: brightness(0) invert(.97) sepia(.10);
   }
+  /* WebP + brightness(0) erased the icon details (solid square/oval/circle).
+     In this mobile dock alone, use transparent line-art with currentColor instead.
+     Preserve the original WebP icons on the desktop header. */
+  html body > nav.cam-mobile-bottom-nav > button.category-btn .ae-nav-icon > img.ae-custom-sport-icon {
+    display: none !important;
+  }
+  html body > nav.cam-mobile-bottom-nav > button.category-btn .ae-nav-icon > svg.cam-mobile-nav-symbol {
+    display: block !important;
+    width: 27px !important;
+    height: 27px !important;
+    min-width: 27px !important;
+    min-height: 27px !important;
+    flex: 0 0 27px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    filter: none !important;
+    color: inherit !important;
+    opacity: 1 !important;
+    pointer-events: none !important;
+  }
   html body > nav.cam-mobile-bottom-nav > button.category-btn:focus-visible {
     outline: 2px solid #f1c794 !important;
     outline-offset: -3px !important;
@@ -205,6 +233,13 @@
     height: 25px !important;
     min-width: 25px !important;
     min-height: 25px !important;
+  }
+  html body > nav.cam-mobile-bottom-nav > button.category-btn svg.cam-mobile-nav-symbol {
+    width: 25px !important;
+    height: 25px !important;
+    min-width: 25px !important;
+    min-height: 25px !important;
+    flex-basis: 25px !important;
   }
   html body > nav.cam-mobile-bottom-nav > button.category-btn .ae-custom-sport-icon {
     width: 25px !important;
