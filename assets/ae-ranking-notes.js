@@ -117,6 +117,96 @@
   let card = null, anchor = null, pinned = false, hideTimer = 0, showTimer = 0;
   const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
 
+  // El titular y los destacados se derivan literalmente del análisis publicado.
+  // Nunca se crean datos deportivos ni se elimina el texto original del artículo.
+  const noteSentences = value => {
+    const source = String(value || '').trim();
+    if (!source) return [];
+    const result = [], boundary = /[.!?;][”"»’']?\s+(?=[A-ZÁÉÍÓÚÑ¿¡0-9])/g;
+    let from = 0, match;
+    while ((match = boundary.exec(source))) {
+      const cut = match.index + match[0].trimEnd().length;
+      const fragment = source.slice(from, cut).trim();
+      // «vs.» y otras abreviaturas no delimitan una idea independiente.
+      if (/(?:\bvs|\bSr|\bSra|\bDr|\bDra|\betc|\bNo)\.$/i.test(fragment)) continue;
+      if (fragment) result.push(fragment);
+      from = match.index + match[0].length;
+    }
+    if (source.slice(from).trim()) result.push(source.slice(from).trim());
+    return result.length ? result : [source];
+  };
+  const analysisChunks = value => {
+    const sentences = noteSentences(value), chunks = [];
+    let current = '';
+    for (const sentence of sentences) {
+      if (current && current.length + sentence.length + 1 > 225) {
+        chunks.push(current); current = sentence;
+      } else current += (current ? ' ' : '') + sentence;
+    }
+    if (current) chunks.push(current);
+    return chunks;
+  };
+  const metricPattern = /\b(?:\d{1,3}(?:[.,]\d+)?\s?(?:%|goles|puntos|victorias|derrotas|partidos|touchdowns|yards|asistencias|intercepciones|sacks|títulos)|\d{1,2}[-–]\d{1,2})\b/gi;
+  const metricsIn = blocks => {
+    const seen = new Set(), values = [];
+    for (const source of blocks) {
+      for (const match of source.matchAll(metricPattern)) {
+        const exact = match[0], key = exact.toLocaleLowerCase('es');
+        if (!seen.has(key)) { seen.add(key); values.push(exact); }
+        if (values.length === 3) return values;
+      }
+    }
+    return values;
+  };
+  const emphasized = (target, source) => {
+    // Conserva cada carácter en su orden; únicamente cambia el peso tipográfico.
+    const rx = new RegExp(metricPattern.source, 'gi');
+    let from = 0, match;
+    while ((match = rx.exec(source))) {
+      target.append(document.createTextNode(source.slice(from, match.index)));
+      target.append(el('strong', 'ae-rank-note-figure', match[0]));
+      from = rx.lastIndex;
+    }
+    target.append(document.createTextNode(source.slice(from)));
+  };
+  function editorialBody(blocks) {
+    const body = el('div', 'ae-rank-note-body');
+    const first = blocks.find(Boolean) || '';
+    const headline = noteSentences(first)[0] || '';
+    if (headline) {
+      const lead = el('div', 'ae-rank-note-lead');
+      lead.setAttribute('aria-hidden', 'true'); // El texto completo figura debajo.
+      lead.append(el('span', 'ae-rank-note-eyebrow', 'LA CLAVE'));
+      lead.append(el('h3', 'ae-rank-note-headline', headline));
+      body.append(lead);
+    }
+    const metrics = metricsIn(blocks);
+    if (metrics.length) {
+      const facts = el('div', 'ae-rank-note-facts');
+      facts.setAttribute('aria-hidden', 'true'); // Cifras repetidas literalmente en el análisis.
+      metrics.forEach(value => facts.append(el('span', 'ae-rank-note-fact', value)));
+      body.append(facts);
+    }
+    const analysis = el('div', 'ae-rank-note-analysis');
+    analysis.append(el('span', 'ae-rank-note-section-title', 'ANÁLISIS'));
+    for (const paragraph of blocks) {
+      const section = el('section', 'ae-rank-note-section');
+      for (const chunk of analysisChunks(paragraph)) {
+        const p = el('p', 'ae-rank-note-paragraph');
+        const labelled = /^([^:]{3,36}):(\s+[\s\S]+)$/.exec(chunk);
+        // Subtítulo solo si esas mismas palabras preceden a «:» en el original.
+        if (labelled && labelled[1].trim().split(/\s+/).length <= 4) {
+          p.append(el('strong', 'ae-rank-note-inline-label', labelled[1] + ':'));
+          emphasized(p, labelled[2]);
+        } else emphasized(p, chunk);
+        section.append(p);
+      }
+      analysis.append(section);
+    }
+    body.append(analysis);
+    return body;
+  }
+
   function build(li) {
     const scope = li.dataset.rankSport, cfg = SCOPES[scope];
     const {article, notes} = notesFor(scope);
@@ -139,9 +229,8 @@
     }
     titles.append(meta);
     head.append(logo, titles);
-    const body = el('div', 'ae-rank-note-body');
-    if (text) text.forEach(p => body.append(el('p', null, p)));
-    else body.append(el('p', 'ae-rank-note-empty', article
+    const body = text ? editorialBody(text) : el('div', 'ae-rank-note-body');
+    if (!text) body.append(el('p', 'ae-rank-note-empty', article
       ? 'La última publicación de Power Rankings aún no explica esta posición.'
       : 'El análisis de esta posición llegará con la próxima publicación de Power Rankings.'));
     box.append(head, body);
