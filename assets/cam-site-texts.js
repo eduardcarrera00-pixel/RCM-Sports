@@ -284,8 +284,8 @@
     ].join('');
     document.body.appendChild(dialog);
     const form=$('form',dialog);
-    $('[data-close]',dialog).addEventListener('click',()=>dialog.close());
-    $('[data-cancel]',dialog).addEventListener('click',()=>dialog.close());
+    $('[data-close]',dialog).addEventListener('click',()=>{if(!savePending)dialog.close();});
+    $('[data-cancel]',dialog).addEventListener('click',()=>{if(!savePending)dialog.close();});
     $('[data-reset]',dialog).addEventListener('click',reset);
     form.addEventListener('submit',save);
     for (const el of dialog.querySelectorAll('[data-field],[data-content]')) {
@@ -309,7 +309,8 @@
       if (key) {const d=ITEMS.find(t=>t.key===key);if(d)apply(d);}
       schedule();
     });
-    dialog.addEventListener('click',e=>{if(e.target===dialog)dialog.close();});
+    dialog.addEventListener('cancel',e=>{if(savePending)e.preventDefault();});
+    dialog.addEventListener('click',e=>{if(e.target===dialog && !savePending)dialog.close();});
     return dialog;
   }
   const NUMERIC=new Set(['desktopSize','mobileSize','desktopWidth','mobileWidth','desktopX','desktopY','mobileX','mobileY','weight','letterSpacing','lineHeight','padding','gap']);
@@ -376,7 +377,9 @@
       if (result.error) throw result.error;
       rows.set(draft.key,{key:draft.key,content:content===original?null:content,settings:draft.settings});
       previewed.delete(draft.key);
-      writeCache();editing.draft=null;applyAll();dialog.close();
+      writeCache();
+      if (editing?.key===draft.key) { editing.draft=null;dialog.close(); }
+      applyAll();
     } catch(err) {showError('No se guardó: '+(err?.message||'error de permisos o conexión'));}
     finally {savePending=false;$('[data-save]',dialog).disabled=false;}
   }
@@ -398,7 +401,8 @@
         const trailing=(f.base.raw.match(/\s*$/) || [''])[0];
         f.node.data=leading+original+trailing;
       }
-      editing.draft=null;dialog.close();applyAll();
+      if (editing?.key===key) {editing.draft=null;dialog.close();}
+      applyAll();
     } catch(err) {showError('No se pudo restaurar: '+(err?.message||'error de conexión'));}
     finally {savePending=false;}
   }
