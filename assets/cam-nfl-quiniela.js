@@ -216,7 +216,43 @@
         r.append(el('td',line.rank_position));
         const c=el('td');const a=el('button','@'+line.username,'cam-nfl-link');a.type='button';
         a.addEventListener('click',()=>window.openAePublicProfile?.(line.user_id));
-        c.append(a);r.append(c,el('td',line.hits+'/'+line.resolved),el('td',line.accuracy+' %'),el('td',line.points));
+        c.append(a);
+        const details=el('details',null,'cam-nfl-ranking-details');
+        details.append(el('summary','Ver pronósticos finalizados'));
+        const content=el('div',null,'cam-nfl-ranking-picks');
+        details.append(content);
+        details.addEventListener('toggle',async()=>{
+          if(!details.open||content.dataset.loaded)return;
+          content.dataset.loaded='loading';
+          content.replaceChildren(el('p','Consultando resultados…'));
+          try{
+            const picks=await run(client().rpc('cam_nfl_public_pick_breakdown',{
+              p_user_id:line.user_id,p_season:season,p_week:scope==='week'?week:null
+            }));
+            if(!details.isConnected)return;
+            content.replaceChildren();
+            const relevant=(picks||[]).filter(p=>{
+              const game=games.find(g=>g.id===p.game_id);
+              return game&&(scope!=='month'||monthOf(game)===month);
+            });
+            if(!relevant.length)content.append(el('p','Aún no hay pronósticos resueltos.'));
+            for(const pick of relevant.slice(0,60)){
+              const game=games.find(g=>g.id===pick.game_id);
+              const row=el('div',null,'cam-nfl-ranking-pick');
+              row.append(el('p',weekName(game.week)+' · '+pick.awarded_points+' pts'));
+              if(window.CamNFLQuinielaTeams)row.append(window.CamNFLQuinielaTeams.createMatchup(game,{
+                selectedTeamId:pick.team_id,locked:true,pickResult:pickResultFor(game,pick)
+              }));
+              content.append(row);
+            }
+            content.dataset.loaded='yes';
+          }catch(err){
+            content.replaceChildren(el('p','No se pudo cargar el desglose: '+err.message));
+            delete content.dataset.loaded;
+          }
+        });
+        c.append(details);
+        r.append(c,el('td',line.hits+'/'+line.resolved),el('td',line.accuracy+' %'),el('td',line.points));
         body.append(r);
       }
       table.append(body);target.append(table);
