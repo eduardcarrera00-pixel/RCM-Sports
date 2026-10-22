@@ -177,7 +177,7 @@
     loading=true;root.replaceChildren(el('p','Cargando Mi Quiniela…','cam-profile-quiniela-note'));
     try{
       // Project only the existing game fields; do not request unpublished other-user rows.
-      if(!allGames.length||force&&season!==allGames[0]?.season){
+      if(!allGames.length||force||Date.now()-loadedAt>=15000){
         allGames=await read(c.from('cam_nfl_games')
           .select('id,season,week,home_id,away_id,kickoff,status,home_score,away_score,winner_id')
           .order('kickoff',{ascending:false}).limit(850));
@@ -217,5 +217,7 @@
     ++token;root.hidden=true;root.replaceChildren();author=null;picks=[];loadedKey='';allGames=[];loading=false;
   }
   document.addEventListener('cam:nfl-picks-updated',()=>{loadedKey='';if(isVisible()&&author)load(true);});
+  window.addEventListener('focus',()=>{if(isVisible()&&author)load(true);});
+  window.setInterval(()=>{if(isVisible()&&author&&!document.hidden&&!loading)load(true);},60000);
   window.camNflProfile={open,close};
 })();
