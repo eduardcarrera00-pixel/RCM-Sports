@@ -1,15 +1,23 @@
 # CAM SPORTS — Auditoría final de la barra inferior móvil
 
-**Estado: BLOQUEADA POR DEPENDENCIA. No constituye aprobación ni despliegue.**
+**Estado actualizado (22 oct 2026): IMPLEMENTACIÓN INTEGRADA EN PR #100; QA FINAL INCOMPLETA. No constituye aprobación ni despliegue.**
 
-Al preparar esta auditoría (22 oct 2026), main todavía contenía los accesos Picks / NFL / Fútbol / Opiniones dentro de header nav.ae-sport-nav. No existía la barra inferior móvil integrada ni un PR específico que implementase primero la barra y después su refinamiento. Esta PR añade **solo comprobaciones**, no cambia HTML, CSS, JS funcional ni la experiencia de producción.
+La primera revisión encontró que la barra todavía no estaba en main. Ahora el PR #100 combina la implementación del PR #101 (navegación inferior móvil) con la auditoría Chromium y los últimos cambios de main. Se reutilizan los botones reales, sin clonar navegación. Las mejoras de orientación y las pruebas se han incorporado solo a la rama del PR; producción continúa sin cambios.
+
+## Evidencia disponible
+
+- La nueva navegación pasó sus pruebas dedicadas de DOM e interacción básica con Happy DOM.
+- Chromium: 4/4 escenarios de escritorio (1024/1366 px, claro/oscuro) correctos en ejecuciones previas.
+- Tras evitar el diálogo inicial de bienvenida durante la prueba, Chromium comprobó con éxito pulsaciones táctiles de las cuatro categorías y su estado activo; el siguiente check del logo falló por un selector del test que apuntaba al header antiguo, ya corregido. La última ejecución completa continúa pendiente.
+- La prueba de Picks/compartir presenta un error heredado que también se observó en el PR #101 original, no provocado por la barra; no alterar Picks sin un diagnóstico aislado.
+- Verificación física de iOS/Android, safe areas, teclado y sesiones autenticadas: **pendiente**. Cero regresiones en producción todavía no certificado.
 
 ## Orden obligatorio
 
-1. Integrar la barra inferior exclusiva de teléfonos; retirar de la vista móvil los cuatro botones del encabezado, manteniendo la navegación de escritorio.
-2. Integrar **después** el perfeccionamiento visual día/noche; no rehacer la barra.
-3. Actualizar esta rama sobre la implementación final; revisar los selectores semánticos reales si fuese necesario, sin reducir las exigencias.
-4. Ejecutar el workflow, revisar las capturas y el informe, verificar manualmente las interacciones protegidas que exigen credenciales. **No fusionar esta PR ni declarar producción lista con verificaciones fallidas o incompletas.**
+1. [Hecho en la rama] Integrar barra inferior exclusiva de teléfonos; conservar navegación escritorio sin clones.
+2. [Hecho en la rama] Aplicar compatibilidad día/noche, rotación de teléfonos y safe-area CSS.
+3. [Hecho] Combinar PR #101 y main; corregir selectores desactualizados del propio test sin bajar exigencias.
+4. [Pendiente] Confirmar workflow verde, revisar capturas, validar físicamente safe areas y flujos protegidos. **No fusionar sin completar y documentar la verificación.**
 
 ## Puertas automáticas
 
@@ -42,4 +50,4 @@ Ejecutar: node tests/mobile-bottom-navigation-audit.cjs. Usa Chromium, sirve los
 
 Todos los checks automatizados verdes, capturas revisadas (día/noche, retrato/paisaje, escritorio), pruebas manuales marcadas como hechas por la persona que las ejecute, cero regresiones conocidas. Los errores se corrigen en código fuente existente, sin apilar reglas CSS aisladas ni cambiar otros módulos.
 
-**Resultados reales en la fecha de preparación:** estructura de main inspeccionada; falta la dependencia de navegación inferior. No se han ejecutado pruebas de navegador reales sobre la nueva barra ni se ha podido validar el teclado/safe area físicos. Ninguna afirmación de «aprobado» procede hasta ejecutar los pasos anteriores.
+**Estado real:** se integró el código de la nueva barra en esta rama de QA, no en producción. Pruebas Chromium y de lógica ejecutadas parcialmente, con última auditoría completa pendiente. Las validaciones físicas/credenciales siguen abiertas. No declarar aprobado hasta comprobarlas.
