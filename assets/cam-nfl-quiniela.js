@@ -34,10 +34,15 @@
   function isOpen(g){return g.status==='scheduled'&&g.picks_open&&new Date(g.kickoff).getTime()>now()&&g.odds_locked_at!=null;}
   function active(g){return draft.get(g.id)||mine.get(g.id)?.team_id||null;}
   function chooseWeek(){
-    const weeks=[...new Set(games.filter(g=>g.season===season).map(g=>Number(g.week)))].sort((a,b)=>a-b);
+    // La jornada vigente se decide por sus partidos, nunca por los de la semana pasada.
+    // Un partido en curso conserva su jornada hasta terminar (margen de 6 h tras el kickoff).
+    const inSeason=games.filter(g=>Number(g.season)===season);
+    const weeks=[...new Set(inSeason.map(g=>Number(g.week)))].sort((a,b)=>a-b);
     if(!weeks.length)return 1;
-    const ref=now()-4*86400000;
-    return weeks.find(w=>games.some(g=>g.season===season&&g.week===w&&Date.parse(g.kickoff)>=ref))||weeks[weeks.length-1];
+    const currentTime=now(),gameWindow=6*60*60*1000;
+    return weeks.find(w=>inSeason.some(g=>Number(g.week)===w&&(
+      Date.parse(g.kickoff)+gameWindow>=currentTime
+    )))||weeks[weeks.length-1];
   }
   const button=(text,action,cls='cam-nfl-action')=>{
     const b=el('button',text,cls);b.type='button';b.addEventListener('click',action);return b;
@@ -128,9 +133,9 @@
     const team=window.CamNFLQuinielaTeams?.getTeam(id)||teams.get(id);
     summary.append(el('strong',team?.name||id),el('span',team?.id||id));
     b.append(logo(id),summary);
-    const prob=id===g.home_id?g.probability_home:g.probability_away;
     const points=id===g.home_id?g.points_home:g.points_away;
-    b.append(el('small',prob==null?'Sin probabilidades':Math.round(Number(prob)*100)+' % · '+points+' pts'));
+    // Sin probabilidad visible: el usuario ve solo los puntos del acierto.
+    b.append(el('small',points==null?'Puntos pendientes':points+' pts'));
     b.addEventListener('click',()=>{if(!isOpen(g))return;if(!user){window.openUserAuthModal?.();return;}draft.set(g.id,id);saveDraft();paintGames();});
     if(disabled)b.title='Este partido está cerrado';
     return b;
