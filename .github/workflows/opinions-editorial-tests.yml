@@ -1,0 +1,25 @@
+name: CAM SPORTS Opiniones editorial
+on:
+  pull_request:
+    paths:
+      - 'assets/ae-opinions.js'
+      - 'index.html'
+      - 'tests/opinions-editorial-browser.cjs'
+      - '.github/workflows/opinions-editorial-tests.yml'
+  workflow_dispatch:
+
+jobs:
+  opinions:
+    name: Editorial, takes, readers and mobile
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: node --check assets/ae-opinions.js && node --check tests/opinions-editorial-browser.cjs
+      - run: npx playwright install --with-deps chromium
+      - run: node tests/opinions-editorial-browser.cjs
