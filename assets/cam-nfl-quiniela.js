@@ -31,7 +31,7 @@
       if(team&&[g.home_id,g.away_id].includes(team)&&!mine.has(g.id))draft.set(g.id,team);
     }catch{}}
   }
-  function isOpen(g){return g.status==='scheduled'&&g.picks_open&&new Date(g.kickoff).getTime()>now()&&g.odds_locked_at!=null;}
+  function isOpen(g){return g.status==='scheduled'&&g.picks_open&&new Date(g.pick_lock_at||g.kickoff).getTime()>now()&&g.odds_locked_at!=null;}
   function active(g){return draft.get(g.id)||mine.get(g.id)?.team_id||null;}
   function chooseRound(){
     const rounds=[...new Map(games.filter(g=>g.season===season).map(g=>[
@@ -142,7 +142,7 @@
     }
     if(g.status==='live')return 'En vivo · resultado pendiente';
     if(g.status==='postponed')return 'Pospuesto · pronósticos suspendidos';
-    if(new Date(g.kickoff).getTime()<=now())return 'Partido bloqueado';
+    if(new Date(g.pick_lock_at||g.kickoff).getTime()<=now())return 'Partido bloqueado';
     if(!g.odds_locked_at)return 'Pendiente de probabilidades verificadas';
     if(!g.picks_open)return 'Quiniela cerrada';
     return mine.has(g.id)?'Pronóstico guardado':draft.has(g.id)?'Selección sin guardar':'Abierto para pronosticar';
@@ -271,7 +271,7 @@
       .then(({data,error})=>{
         if(error||!warnings.isConnected)return;
         warnings.replaceChildren();
-        for(const alert of data||[])warnings.append(el('p','⚠ '+alert.message));
+        for(const alert of data||[])warnings.append(el('p','Aviso · '+alert.message));
       });
     const controls=el('div',null,'cam-nfl-admin-controls');
     const sea=el('input'),wk=el('input');sea.type=wk.type='number';sea.value=String(season);sea.min='2020';wk.value=String(week);wk.min='1';wk.max='18';
@@ -343,7 +343,7 @@
         const names=new Map(games.map(g=>[g.id,g]));
         const history=(rows||[]).map(p=>({...p,game:names.get(p.game_id)})).filter(x=>x.game).sort((a,b)=>Date.parse(b.game.kickoff)-Date.parse(a.game.kickoff));
         const details=el('details',null,'cam-nfl-profile-history');details.append(el('summary','Ver mis pronósticos anteriores'));
-        for(const p of history.slice(0,40))details.append(el('p','Jornada '+p.game.week+' · '+(teams.get(p.team_id)?.name||p.team_id)+' · '+p.awarded_points+' pts'));
+        for(const p of history.slice(0,40))details.append(el('p',(p.game.phase==='POST'?'Playoffs':p.game.phase==='PRE'?'Pretemporada':'Regular')+' · Jornada '+p.game.week+' · '+(teams.get(p.team_id)?.name||p.team_id)+' · '+p.awarded_points+' pts'));
         if(!history.length)details.append(el('p','Aún no hay pronósticos guardados.'));
         profile.append(details);
       }
