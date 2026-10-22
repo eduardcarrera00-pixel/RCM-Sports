@@ -3212,6 +3212,7 @@ html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > .ae-takes-hea
           <p id="camNflStatus" class="cam-nfl-status" role="status" aria-live="polite"></p>
           <p id="camNflProgress" class="cam-nfl-progress" aria-live="polite"></p>
           <div id="camNflGames" class="cam-nfl-games"></div>
+          <div id="camNflSummary" class="cam-nfl-summary" aria-live="polite"></div>
           <div class="cam-nfl-save-row"><button id="camNflSave" type="button" class="cam-nfl-action">Guardar mi quiniela</button></div>
           <details class="cam-nfl-rules">
             <summary>¿Cómo funcionan los puntos?</summary>
@@ -5715,6 +5716,12 @@ html.dark .cam-quiniela-matchup[data-pick-result="incorrect"] .cam-quiniela-stat
     .cam-quiniela-team-name { font-size: .72rem; }
 }
 
+.cam-nfl-summary{padding:10px 0 22px;border-bottom:1px solid var(--nfl-edge)}
+.cam-nfl-summary h3{margin:5px 0 12px;font:700 17px Cinzel,serif;color:var(--nfl-ink)}
+.cam-nfl-summary-items{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.cam-nfl-summary-item{border:1px solid var(--nfl-edge);background:var(--nfl-card);padding:9px;min-width:0}
+.cam-nfl-summary-item>small{color:var(--nfl-muted);font-size:11px;display:block;margin-bottom:6px}
+@media(max-width:720px){.cam-nfl-summary-items{grid-template-columns:1fr}}
 .cam-nfl-history{margin:22px 0;padding:13px 0;border-top:1px solid var(--nfl-edge);border-bottom:1px solid var(--nfl-edge)}
 .cam-nfl-history>summary,.cam-nfl-history-week>summary{cursor:pointer;color:var(--nfl-accent);font-weight:750}
 .cam-nfl-history-week{padding:13px 5px;border-bottom:1px solid var(--nfl-edge)}
