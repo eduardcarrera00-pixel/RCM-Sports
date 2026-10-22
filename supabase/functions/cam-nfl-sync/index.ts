@@ -16,7 +16,7 @@ const allowedOrigins = new Set([
 ]);
 const teamsFix: Record<string, string> = { WSH: "WAS", JAC: "JAX", LA: "LAR", OAK: "LV", SD: "LAC", STL: "LAR" };
 const safe = (s: string) => String(s || "").normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
-const number = (n: unknown) => Number.isFinite(Number(n)) && String(n).trim() !== "" ? Number(n) : null;
+const number = (n: unknown) => n !== null && n !== undefined && typeof n !== "boolean" && String(n).trim() !== "" && Number.isFinite(Number(n)) ? Number(n) : null;
 const validOdd = (n: unknown) => Number.isInteger(n) && Math.abs(Number(n)) >= 100 && Math.abs(Number(n)) < 100000;
 const implied = (odd: number) => odd > 0 ? 100 / (odd + 100) : -odd / (-odd + 100);
 const compare = (a: string, b: string) => {
@@ -105,7 +105,7 @@ async function syncWeek(season: number, week: number, catalog: Set<string>) {
     const previous = await db.from("cam_nfl_games").select("id,season,week,home_id,away_id,odds_locked_at,status").eq("id",row.id).maybeSingle();
     if (previous.error) throw previous.error;
     if (previous.data) {
-      if (previous.data.odds_locked_at && (previous.data.home_id !== row.home_id || previous.data.away_id !== row.away_id)) {
+      if (previous.data.odds_locked_at && (previous.data.home_id !== row.home_id || previous.data.away_id !== row.away_id || previous.data.season !== row.season || previous.data.week !== row.week)) {
         throw Error("Cambio de equipos en partido congelado: requiere revisión " + row.id);
       }
       // Never roll back a final result merely because a provider cache is stale.
