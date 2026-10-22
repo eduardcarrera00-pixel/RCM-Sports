@@ -170,3 +170,160 @@ html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-sourc
 @media(prefers-reduced-motion:reduce){
   html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-card{transition:none!important}
 }
+
+/* CAM SPORTS · Pick Histórico: ficha compacta con filas editoriales.
+   ÚNICAMENTE la ficha destacada #aeHomePickHistoricPick.
+   Conserva el marco existente y el elemento .ae-discovery-score sin alteraciones. */
+html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-record{
+  position:relative!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:stretch!important;
+  justify-content:flex-start!important;
+  gap:0!important;
+  min-width:0!important;
+  min-height:0!important;
+  padding:clamp(13px,1.8vw,18px)!important;
+  overflow-wrap:anywhere!important;
+}
+html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-open{
+  position:absolute!important;
+  inset:0!important;
+  z-index:1!important;
+  display:block!important;
+  cursor:pointer!important;
+  text-decoration:none!important;
+}
+html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-open:focus-visible{
+  outline:2px solid var(--ae-discovery-gold,#f1bc80)!important;
+  outline-offset:-3px!important;
+}
+html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-head{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) max-content!important;
+  align-items:start!important;
+  gap:6px 12px!important;
+  width:100%!important;
+  min-width:0!important;
+  margin:0 0 9px!important;
+}
+html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-match.ae-discovery-title{
+  display:block!important;
+  min-width:0!important;
+  max-width:100%!important;
+  margin:0!important;
+  color:var(--ae-discovery-ink,#f9ebd9)!important;
+  font:650 clamp(19px,2.25vw,26px)/1.17 Newsreader,Georgia,serif!important;
+  letter-spacing:-.015em!important;
+  overflow-wrap:anywhere!important;
+  word-break:normal!important;
+  text-wrap:pretty;
+}
+html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-author{
+  display:block!important;
+  justify-self:end!important;
+  align-self:start!important;
+  box-sizing:border-box!important;
+  min-width:0!important;
+  max-width:145px!important;
+  margin:3px 0 0!important;
+  padding:0!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+  color:var(--ae-discovery-gold,#f1bc80)!important;
+  font:700 11px/1.4 Inter,system-ui,sans-serif!important;
+  letter-spacing:0!important;
+  text-align:right!important;
+}
+html body #footballTakes #communityPicks #aeHomePickHistoricPick button.cam-historic-profile{
+  position:relative!important;
+  z-index:2!important;
+  pointer-events:auto!important;
+  appearance:none!important;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  border-radius:0!important;
+  cursor:pointer!important;
+}
+html body #footballTakes #communityPicks #aeHomePickHistoricPick button.cam-historic-profile:hover{
+  text-decoration:underline!important;
+  text-underline-offset:3px!important;
+}
+html body #footballTakes #communityPicks #aeHomePickHistoricPick button.cam-historic-profile:focus-visible{
+  outline:2px solid var(--ae-discovery-gold,#f1bc80)!important;
+  outline-offset:3px!important;
+}
+html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-rows{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  gap:0!important;
+  width:100%!important;
+  min-width:0!important;
+  margin:0!important;
+  border-top:1px solid var(--ae-discovery-line,rgba(223,176,120,.47))!important;
+}
+html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-row{
+  display:grid!important;
+  grid-template-columns:minmax(88px,29%) minmax(0,1fr)!important;
+  gap:8px!important;
+  align-items:baseline!important;
+  width:100%!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:7px 0!important;
+  border-bottom:1px solid var(--ae-discovery-line,rgba(223,176,120,.47))!important;
+  background:transparent!important;
+}
+html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-row-label{
+  min-width:0!important;
+  color:var(--ae-discovery-muted,#c4cdd1)!important;
+  font:600 11px/1.35 Inter,system-ui,sans-serif!important;
+}
+html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-row-value{
+  display:block!important;
+  min-width:0!important;
+  color:var(--ae-discovery-ink,#f9ebd9)!important;
+  font:650 12px/1.4 Inter,system-ui,sans-serif!important;
+  overflow-wrap:anywhere!important;
+  word-break:normal!important;
+  white-space:normal!important;
+}
+html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-record > .ae-discovery-meta{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  margin:10px 0 0!important;
+  min-width:0!important;
+  /* No styling overrides on the pre-existing points box. */
+}
+@media(max-width:550px){
+  html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-head{
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:5px!important;
+  }
+  html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-author{
+    grid-column:1!important;
+    grid-row:1!important;
+    justify-self:end!important;
+    max-width:100%!important;
+    margin:0!important;
+  }
+  html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-match{
+    grid-column:1!important;
+    grid-row:2!important;
+    font-size:clamp(18px,5vw,23px)!important;
+  }
+  html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-row{
+    grid-template-columns:minmax(75px,30%) minmax(0,1fr)!important;
+    gap:7px!important;
+    padding:6px 0!important;
+  }
+}
+@media(max-width:360px){
+  html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-row{
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:2px!important;
+  }
+}
