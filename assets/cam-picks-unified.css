@@ -50,6 +50,7 @@ html body #mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#pi
  background:transparent!important;
 }
 html body #mainContent #footballTakes.ae-picks-editorial #communityPicks #picksPopular>.cam-pick-unified{
+ grid-template-columns:minmax(0,1fr)!important;
  --pick-feed-ink:#e6f2e8;--pick-feed-muted:#c1d8c8;
  --pick-feed-action:#b3d7ba;--pick-feed-line:#83a18a;--pick-feed-soft:#294b39;
  background:linear-gradient(115deg,rgba(48,91,65,.43),rgba(36,72,51,.27))!important;
@@ -60,6 +61,56 @@ html:not(.dark) body #mainContent #footballTakes.ae-picks-editorial #communityPi
  --pick-feed-action:#306048;--pick-feed-line:#a6c2aa;--pick-feed-soft:#dfece2;
  background:linear-gradient(110deg,#e8f2e9,#f3f7ef)!important;
  border-color:#a6c2aa!important;
+}
+/* The legacy #picksPopular li and board ol selectors were for old rankings.
+   Pick previews have their own nested ordered selections: they must not inherit
+   those legacy two-column 24px grids or the theme's opaque ol surface. */
+html body #mainContent #footballTakes.ae-picks-editorial #communityPicks #picksPopular>.cam-pick-unified :is(.cp-card-header,.cp-card-title,.cp-card-legs,.cp-actions,.cp-explanation,.cp-card-state){
+ grid-column:1/-1!important;min-width:0!important;max-width:100%!important;
+}
+html body #mainContent #footballTakes.ae-picks-editorial #communityPicks #picksPopular>.cam-pick-unified .cp-card-header{
+ display:flex!important;flex-wrap:wrap!important;align-items:center!important;justify-content:space-between!important;
+ gap:7px 12px!important;width:100%!important;
+}
+html body #mainContent #footballTakes.ae-picks-editorial #communityPicks #picksPopular>.cam-pick-unified .cp-feed-meta{
+ display:flex!important;flex:0 1 auto!important;flex-wrap:wrap!important;align-items:center!important;
+ justify-content:flex-end!important;gap:5px 9px!important;min-width:0!important;max-width:100%!important;
+ background:transparent!important;
+}
+html body #mainContent #footballTakes.ae-picks-editorial #communityPicks #picksPopular>.cam-pick-unified .cp-card-legs{
+ display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+ width:100%!important;height:auto!important;min-height:0!important;
+ gap:8px!important;padding:0!important;margin:0!important;
+ border:0!important;background:transparent!important;background-image:none!important;box-shadow:none!important;
+}
+html body #mainContent #footballTakes.ae-picks-editorial #communityPicks #picksPopular>.cam-pick-unified .cp-card-legs>.cp-pick-line{
+ display:block!important;grid-template-columns:none!important;
+ width:100%!important;max-width:100%!important;min-width:0!important;
+ margin:0!important;padding:2px 0!important;border:0!important;
+ background:transparent!important;box-shadow:none!important;list-style:none!important;
+}
+html body #mainContent #footballTakes.ae-picks-editorial #communityPicks #picksPopular>.cam-pick-unified .cp-pick-line-body{
+ display:flex!important;flex-direction:column!important;align-items:flex-start!important;
+ width:100%!important;min-width:0!important;max-width:100%!important;
+ padding:0!important;margin:0!important;border:0!important;background:transparent!important;
+}
+html body #mainContent #footballTakes.ae-picks-editorial #communityPicks #picksPopular>.cam-pick-unified :is(.cp-card-title,.cp-feed-username,.cp-pick-line-event,.cp-pick-line-choice,.cp-pick-line-market,.cp-explanation){
+ word-break:normal!important;overflow-wrap:break-word!important;white-space:normal!important;
+ min-width:0!important;max-width:100%!important;
+}
+html body #mainContent #footballTakes.ae-picks-editorial #communityPicks #picksPopular>.cam-pick-unified .cp-actions{
+ display:flex!important;flex-wrap:wrap!important;align-items:center!important;gap:6px!important;width:100%!important;
+}
+html body #mainContent #footballTakes.ae-picks-editorial #communityPicks #picksPopular>.cam-pick-unified .cp-card-read-link{
+ position:absolute!important;inset:0!important;display:block!important;
+ margin:0!important;padding:0!important;
+ border:0!important;background:transparent!important;box-shadow:none!important;z-index:1!important;
+}
+html body #mainContent #footballTakes.ae-picks-editorial #communityPicks #picksPopular>.cam-pick-unified :is(.cp-feed-author,.cp-actions,.cp-actions button){
+ position:relative!important;z-index:2!important;
+}
+html body #mainContent #footballTakes.ae-picks-editorial #communityPicks #picksPopular>.cam-pick-unified .cp-card-read-link:focus-visible{
+ outline:2px solid var(--pick-feed-action)!important;outline-offset:-2px!important;
 }
 html body #mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#picksPopular,#picksQuestioned)>.cam-pick-unified .cp-card-title{
  font-size:clamp(18px,1.55vw,22px)!important;
