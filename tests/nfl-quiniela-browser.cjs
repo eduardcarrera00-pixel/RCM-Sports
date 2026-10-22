@@ -89,8 +89,9 @@ const {chromium}=require('playwright');
       assert.equal(await page.locator('#camNflDayNav .cam-nfl-day').count(),2,'Show exactly the two days with matches');
       assert.equal(await page.locator('#camNflDayNav .cam-nfl-day[aria-pressed="true"]').count(),1);
       assert.match(await page.locator('#camNflDayNav').innerText(),/Este · America\/Toronto/);
-      assert.match(await page.locator('#camNflWeekSummary').innerText(),/Partidos/);
-      assert.match(await page.locator('#camNflWeekSummary').innerText(),/3/);
+      for(const id of ['camNflWeekSummary','camNflProgress','camNflSummary','camNflHistory']){
+        assert.equal(await page.locator('#'+id).count(),0,'Personal summary belongs only in Mi Quiniela: '+id);
+      }
       for(const text of await page.locator('#camNflGames .cam-nfl-team small').allTextContents()){
         assert.match(text,/^\d+ pts$/,'Show only points, never a team win probability');
         assert.doesNotMatch(text,/%/);
@@ -109,26 +110,20 @@ const {chromium}=require('playwright');
       assert.equal(await page.locator('#camNflGames .cam-nfl-team').count(),2);
       assert.equal(await page.locator('#camNflGames .cam-nfl-team img').count(),2);
       assert.ok((await page.locator('#camNflGames .cam-nfl-team img').first().getAttribute('src')).includes('espncdn.com'));
-      await page.locator('#camNflHistory').evaluate(node=>node.open=true);
-      assert.ok(await page.locator('#camNflHistory .cam-quiniela-team-logo').count()>=2,
-        'Previous rounds must display both logos');
       await page.locator('.cam-nfl-game').first().locator('.cam-nfl-team').first().click();
-      assert.match(await page.locator('#camNflProgress').innerText(),/1 de 3 seleccionados/);
-      assert.equal(await page.locator('#camNflSummary .cam-quiniela-team-logo').count(),2,
-        'The selection summary needs both logos');
+      assert.equal(await page.locator('.cam-nfl-team.is-selected').count(),1);
       await page.locator('#camNflSaveDay').click();
       await page.waitForFunction(()=>document.querySelector('#camNflStatus')?.textContent.includes('guardado'));
       assert.match(await page.locator('#camNflGames').innerText(),/Pronóstico guardado/);
-      assert.match(await page.locator('#camNflWeekSummary').innerText(),/1/);
+
       await page.locator('#camNflDayNav .cam-nfl-day').nth(1).click();
       assert.equal(await page.locator('.cam-nfl-game').count(),2,'A day with two fixtures shows both');
       assert.equal(await page.locator('#camNflDayNav .cam-nfl-day').count(),2,'No invented weekdays');
-      assert.match(await page.locator('#camNflProgress').innerText(),/1 de 3 seleccionados/);
+
       await page.locator('.cam-nfl-game').first().locator('.cam-nfl-team').first().click();
-      assert.match(await page.locator('#camNflProgress').innerText(),/2 de 3 seleccionados/);
+      assert.equal(await page.locator('.cam-nfl-team.is-selected').count(),1);
       await page.locator('#camNflSave').click();
-      await page.waitForFunction(()=>document.querySelector('#camNflProgress')?.textContent.includes('2 guardados'));
-      assert.match(await page.locator('#camNflWeekSummary').innerText(),/2/);
+      await page.waitForFunction(()=>document.querySelector('#camNflStatus')?.textContent.includes('guardado'));
       await page.locator('#camNflDayNav .cam-nfl-day').first().click();
       assert.equal(await page.locator('.cam-nfl-game').count(),1,'Switching days keeps the list compact');
       assert.match(await page.locator('#camNflGames').innerText(),/Pronóstico guardado/,'First-day pick persists');
@@ -146,9 +141,7 @@ const {chromium}=require('playwright');
         'Postponed games must remain locked');
       await page.locator('#camNflNav select[aria-label="Jornada NFL"]').selectOption('7');
       assert.equal(await page.locator('#camNflDayNav .cam-nfl-day[aria-pressed="true"]').count(),1);
-      await page.evaluate(()=>window.dispatchEvent(new CustomEvent('cam:nfl-profile',{detail:{userId:'11111111-1111-4111-8111-111111111111'}})));
-      await page.waitForFunction(()=>document.querySelector('#camNflProfile')?.textContent.includes('Efectividad'));
-      assert.ok(await page.locator('#camNflProfile').isVisible());
+
       const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
       assert.ok(overflow<4,'Horizontal overflow '+overflow+' at viewport '+width);
       assert.ok((await page.locator('#camNflQuiniela').evaluate(e=>getComputedStyle(e).backgroundColor)).startsWith('rgb('));

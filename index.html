@@ -3444,11 +3444,8 @@ html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > .ae-takes-hea
           <div id="camNflNav" class="cam-nfl-nav" aria-label="Temporada y jornada"></div>
           <p id="camNflWeekInfo" class="cam-nfl-status" aria-live="polite"></p>
           <p id="camNflStatus" class="cam-nfl-status" role="status" aria-live="polite"></p>
-          <section id="camNflWeekSummary" class="cam-nfl-week-summary" aria-label="Resumen de toda la jornada"></section>
           <div id="camNflDayNav" class="cam-nfl-day-nav" aria-label="Seleccionar día de partido"></div>
-          <p id="camNflProgress" class="cam-nfl-progress" aria-live="polite"></p>
           <div id="camNflGames" class="cam-nfl-games"></div>
-          <div id="camNflSummary" class="cam-nfl-summary" aria-live="polite"></div>
           <div class="cam-nfl-save-row">
             <button id="camNflSaveDay" type="button" class="cam-nfl-action">Guardar picks del día</button>
             <button id="camNflSave" type="button" class="cam-nfl-action cam-nfl-action-secondary">Guardar toda la jornada</button>
@@ -3458,10 +3455,6 @@ html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > .ae-takes-hea
             <p>Antes de abrir cada partido congelamos las probabilidades reales, sin el margen de la casa. La fórmula es <strong>máximo de 2, mínimo de 12 y redondear 2 dividido entre la probabilidad</strong>.</p>
             <p>Favorito al 80 %: 3 puntos. Partido equilibrado al 50 %: 4 puntos. Sorpresa al 25 %: 8 puntos.</p>
             <p>Acertar suma los puntos mostrados; fallar, empatar o anular suma 0. Puedes editar hasta el inicio de cada partido. Las quinielas no modifican los puntos de Takes o Picks.</p>
-          </details>
-          <details id="camNflHistory" class="cam-nfl-history">
-            <summary>Historial de jornadas</summary>
-            <div id="camNflHistoryContent"></div>
           </details>
           <section class="cam-nfl-standings" aria-labelledby="camNflStandingTitle">
             <h3 id="camNflStandingTitle">Clasificación de La Quiniela</h3>
@@ -3598,6 +3591,7 @@ html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > .ae-takes-hea
  <nav id="aeProfileTabs" class="ae-profile-tabs" aria-label="Secciones de mi perfil" hidden>
    <button id="aeProfileTabTakes" type="button" role="tab" aria-selected="true" class="is-active">Mis Takes</button>
    <button id="aeProfileTabPicks" type="button" role="tab" aria-selected="false">Mis Picks</button>
+   <button id="aeProfileTabQuiniela" type="button" role="tab" aria-selected="false">Mi Quiniela</button>
  </nav>
  <div class="ae-profile-overview"><strong id="aeProfileCount">0 Takes</strong><p id="aeProfileOverviewText">Tu historial deportivo en CAM SPORTS.</p></div>
  <p id="aeProfileStatus" role="status" aria-live="polite"></p>
@@ -3608,7 +3602,7 @@ html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > .ae-takes-hea
  <section id="aeProfilePickHighlights" class="ae-profile-pick-highlights" aria-label="Picks destacados" hidden></section>
  <div id="aeProfilePicks" class="ae-profile-picks" hidden></div>
  <section id="aeProfileAccuracy" class="ae-profile-accuracy" aria-label="Porcentaje de acierto" hidden></section>
- <section id="camNflProfile" aria-label="Estadísticas de la Quiniela NFL" hidden></section>
+ <section id="camNflProfile" role="tabpanel" aria-labelledby="aeProfileTabQuiniela" aria-label="Mi Quiniela NFL" hidden></section>
 </dialog>
 <dialog id="camAnalyticsDialog" class="cam-analytics-dialog" aria-labelledby="camAnalyticsTitle">
  <div class="cam-analytics-shell">
@@ -6012,7 +6006,9 @@ html.dark .cam-quiniela-matchup[data-pick-result="incorrect"] .cam-quiniela-stat
 }
 </style>
 
-<script src="assets/cam-nfl-quiniela.js?v=20261022-quiniela-1"></script>
+<link rel="stylesheet" href="assets/cam-nfl-profile.css?v=20261022-3tab-1">
+<script src="assets/cam-nfl-quiniela.js?v=20261022-profile-split-2"></script>
+<script src="assets/cam-nfl-profile.js?v=20261022-3tab-1"></script>
 <script src="assets/ae-season-predictions.js?v=20261021-champion-guide-1"></script>
 <script src="assets/ae-opinions.js?v=20261021-compress-1"></script>
 <script src="assets/ae-home-takes.js?v=20261017-esports-league-v1"></script>
