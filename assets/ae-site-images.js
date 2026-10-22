@@ -252,11 +252,11 @@
   function toRows(list) {
     const m = new Map();
     for (const r of Array.isArray(list) ? list : []) {
-      if (!r || !ENTRIES.has(r.key)) continue;
+      if (!r || (!ENTRIES.has(r.key) && !/^size\.[a-z0-9._-]+$/.test(r.key))) continue;
       const url = safeUrl(r.url) || null;
       const fx = Number.isInteger(r.focus_x) ? r.focus_x : null, fy = Number.isInteger(r.focus_y) ? r.focus_y : null;
-      if (!url && fx == null && !r.alt) continue;
-      m.set(r.key, { url, focus_x: fx, focus_y: fy, alt: typeof r.alt === 'string' ? r.alt : null });
+      if (!url && fx == null && !r.alt && !r.visual) continue;
+      m.set(r.key, { url, focus_x: fx, focus_y: fy, alt: typeof r.alt === 'string' ? r.alt : null, visual: r.visual && typeof r.visual === 'object' ? r.visual : null });
     }
     return m;
   }
@@ -293,6 +293,8 @@
           st, name, base, keys, original: value, priority: st.getPropertyPriority(name),
           pos: name === 'background-image' ? st.getPropertyValue('background-position') : '',
           posPriority: name === 'background-image' ? st.getPropertyPriority('background-position') : '',
+          bgSize: name === 'background-image' ? st.getPropertyValue('background-size') : '',
+          bgSizePriority: name === 'background-image' ? st.getPropertyPriority('background-size') : '',
           selector: rule.selectorText || ''
         });
       }
@@ -301,11 +303,12 @@
   }
   function applyDecls() {
     for (const d of decls) {
-      let focusLayer = -1, focus = '';
+      let focusLayer = -1, focus = '', frameLayer = -1, frame = null;
       const layers = splitLayers(d.original).map((layer, idx) => layer.replace(URL_RE, (m, q, u) => {
         const key = fileKeyFor(u, d.base); const r = key && rows.get(key);
         const entry = key && ENTRIES.get(key);
         if (r && focusOf(r) && entry.kind !== 'atlas') { focusLayer = idx; focus = focusOf(r); }
+        if (r?.visual && entry?.kind !== 'atlas') { frameLayer = idx; frame = window.camImageVisual?.bg(window.camImageVisual.settings(r.visual)) || null; if (frame) { focusLayer = idx; focus = frame.pos; } }
         return r && r.url ? cssUrl(r.url) : m;
       }));
       const changed = layers.some((l, i) => l !== splitLayers(d.original)[i]);
@@ -317,6 +320,16 @@
         const list = splitLayers(d.pos);
         if (!d.pos && layers.length === 1) pos = focus;
         else if (list.length === layers.length) { list[focusLayer] = focus; pos = list.join(', '); }
+      }
+      if (frame && frameLayer >= 0) {
+        const original = splitLayers(d.bgSize);
+        const sizes = Array.from({length:layers.length}, (_, i) => original[i] || original[original.length-1] || 'auto');
+        if (frame.size) sizes[frameLayer] = frame.size;
+        const desired = frame.size ? sizes.join(', ') : d.bgSize;
+        if (d.st.getPropertyValue('background-size') !== desired) d.st.setProperty('background-size',desired,d.bgSizePriority||d.priority);
+      } else if (d.st.getPropertyValue('background-size') !== d.bgSize) {
+        if (d.bgSize) d.st.setProperty('background-size', d.bgSize, d.bgSizePriority || d.priority);
+        else d.st.removeProperty('background-size');
       }
       const curPos = d.st.getPropertyValue('background-position');
       if (curPos !== pos) {
@@ -344,6 +357,8 @@
     const focus = focusOf(r);
     if (focus) { node.style.setProperty('object-position', focus); ds.siteImageFocus = '1'; }
     else if (ds.siteImageFocus) { node.style.removeProperty('object-position'); delete ds.siteImageFocus; }
+    const virtual = window.camVisualSizes?.identify?.(node);
+    window.camImageVisual?.img(node, r || (virtual && rows.get('size.' + virtual.key)) || null);
     // Texto alternativo (solo imágenes con significado)
     if (r && r.alt && node.getAttribute('aria-hidden') !== 'true') {
       if (ds.siteImageAlt == null) ds.siteImageAlt = node.getAttribute('alt') ?? '';
@@ -386,8 +401,9 @@
           const hit = layerIndexOf(el, s.atlas); if (!hit) continue;
           const r = rows.get(s.key), cs = getComputedStyle(el), n = hit.layers.length;
           const imgs = hit.layers.slice(); imgs[hit.i] = cssUrl(r.url);
-          const size = expand(splitLayers(cs.backgroundSize), n); size[hit.i] = 'cover';
-          const pos = expand(splitLayers(cs.backgroundPosition), n); pos[hit.i] = focusOf(r) || '50% 50%';
+          const styleFrame = r.visual && window.camImageVisual?.bg(window.camImageVisual.settings(r.visual));
+          const size = expand(splitLayers(cs.backgroundSize), n); size[hit.i] = styleFrame?.size || 'cover';
+          const pos = expand(splitLayers(cs.backgroundPosition), n); pos[hit.i] = styleFrame?.pos || focusOf(r) || '50% 50%';
           const rep = expand(splitLayers(cs.backgroundRepeat), n); rep[hit.i] = 'no-repeat';
           el.style.setProperty('background-image', imgs.join(', '), 'important');
           el.style.setProperty('background-size', size.join(', '), 'important');
@@ -414,7 +430,7 @@
   async function load() {
     const sb = client(); if (!sb?.from) return;
     try {
-      const r = await sb.from('ae_site_images').select('key,url,focus_x,focus_y,alt');
+      const r = await sb.from('ae_site_images').select('key,url,focus_x,focus_y,alt,visual');
       if (r.error) { tableReady = false; return; }
       tableReady = true;
       rows = toRows(r.data);
@@ -737,6 +753,7 @@
       sizing.theme = button.dataset.sizeTheme; refreshSizeControls();
     }));
     ui.form.addEventListener('submit', saveImage);
+    window.camImageVisual?.attach(ui, updatePreview);
     d.addEventListener('click', e => { if (e.target === d) d.close(); });
     d.addEventListener('close', () => {
       window.camVisualSizes?.cancelPreview?.();
@@ -860,6 +877,7 @@
     ui.error.textContent = '';
     ui.dialog.classList.toggle('is-size-only', entry.kind === 'size-only');
     setupSize(entry);
+    window.camImageVisual?.open(key, entry.kind === 'size-only' ? 'img' : entry.kind, row?.visual, editing.el);
     if (entry.kind === 'size-only') {
       ui.reset.hidden = true; ui.variants.hidden = true; ui.note.hidden = true;
       ui.meta.textContent = '';
@@ -870,6 +888,7 @@
       ui.preview.style.backgroundPosition = 'center';
       ui.preview.style.backgroundSize = 'contain';
       ui.badge.textContent = 'Logo';
+      window.camImageVisual?.preview(ui.preview, editing);
       return;
     }
     ui.reset.hidden = !row;
@@ -903,6 +922,8 @@
     if (sizing && editing.el?.localName === 'img' && ui.sizeThumb)
       ui.sizeThumb.src = src || originalSrc(entry);
     const box = ui.preview;
+    box.style.aspectRatio = String(entry.kind === 'atlas' ? 2 : editing.aspect);
+    box.classList.toggle('is-contain', editing.contain);
     box.style.backgroundRepeat = 'no-repeat';
     if (src) {
       box.style.backgroundImage = cssUrl(src);
@@ -918,6 +939,7 @@
       }
       ui.badge.textContent = 'Original';
     }
+    window.camImageVisual?.preview(box, editing);
   }
 
   function friendly(err) {
@@ -948,7 +970,17 @@
     ui.error.textContent = '';
     if (entry.kind === 'size-only') {
       ui.save.disabled = true;
-      try { await saveSize(); ui.dialog.close(); notify('Tamaño actualizado.'); }
+      try {
+        const visual = window.camImageVisual?.get() || null;
+        const sb = client(); if (!sb?.rpc) throw Error('Sin conexión a la base de datos');
+        const current = rows.get(key);
+        const payload = {p_key:key,p_url:current?.url||null,p_focus_x:current?.focus_x??null,p_focus_y:current?.focus_y??null,p_alt:current?.alt||null,p_visual:visual};
+        const saved = await sb.rpc('ae_set_site_image_visual',payload);
+        if (saved.error) throw saved.error;
+        if (!payload.p_url && payload.p_focus_x==null && !payload.p_alt && !visual) rows.delete(key);
+        else rows.set(key,{url:payload.p_url,focus_x:payload.p_focus_x,focus_y:payload.p_focus_y,alt:payload.p_alt,visual});
+        writeCache(); applyAll(); await saveSize(); ui.dialog.close(); notify('Tamaño y encuadre actualizados.');
+      }
       catch (err) { ui.error.textContent = friendly(err); }
       finally { ui.save.disabled = false; }
       return;
@@ -966,16 +998,17 @@
         p_key: key, p_url: url,
         p_focus_x: focus ? Math.round(Number(ui.fx.value)) : null,
         p_focus_y: focus ? Math.round(Number(ui.fy.value)) : null,
-        p_alt: editing.decorative ? null : (ui.alt.value.trim() || null)
+        p_alt: editing.decorative ? null : (ui.alt.value.trim() || null),
+        p_visual: window.camImageVisual?.get() || null
       };
-      if (!args.p_url && args.p_focus_x == null && !args.p_alt) {
+      if (!args.p_url && args.p_focus_x == null && !args.p_alt && !args.p_visual) {
         if (!row) { await saveSize(); ui.dialog.close(); notify('Tamaño actualizado.'); return; }
       }
-      const r = await sb.rpc('ae_set_site_image', args);
+      const r = await sb.rpc('ae_set_site_image_visual', args);
       if (r.error) throw r.error;
       await saveSize();
-      if (!args.p_url && args.p_focus_x == null && !args.p_alt) rows.delete(key);
-      else rows.set(key, { url: args.p_url, focus_x: args.p_focus_x, focus_y: args.p_focus_y, alt: args.p_alt });
+      if (!args.p_url && args.p_focus_x == null && !args.p_alt && !args.p_visual) rows.delete(key);
+      else rows.set(key, { url: args.p_url, focus_x: args.p_focus_x, focus_y: args.p_focus_y, alt: args.p_alt, visual: args.p_visual });
       writeCache(); applyAll();
       ui.dialog.close();
       notify('Imagen actualizada.');
