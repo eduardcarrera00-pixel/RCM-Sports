@@ -18,6 +18,7 @@
   const MAX_ORIGINAL = 25 * 1024 * 1024; // antes de comprimir en el navegador
 
   let failed = false, items = [], views = new Map(), active = 'todas', loaded = false, loading = null, editing = null, reading = null, pendingDeepLink = null;
+  let communityTakes = [], takeReplies = new Map(), takesLoaded = false, takesLoading = null, voteBusy = false, takeRequest = 0;
 
   const client = () => { try { return typeof db !== 'undefined' ? db : window.db; } catch { return window.db; } };
   const isAdmin = () => { try { return typeof currentAdmin !== 'undefined' && Boolean(currentAdmin); } catch { return false; } };
@@ -79,9 +80,22 @@
       }));
   }
 
+  // Única lista editorial: misma noticia y misma columna nunca aparecen dos veces.
+  const storyKey = o => (o.sport || '') + ':' + String(o.title || '').normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const publishedDate = o => Number.isFinite(Date.parse(o.created_at)) ? Date.parse(o.created_at) : 0;
+  const latestFirst = (a,b) => publishedDate(b)-publishedDate(a) || String(b.id).localeCompare(String(a.id));
   function visible() {
-    const list = [...items, ...sportNews()].filter(o => active === 'todas' || o.sport === active);
-    return list.sort((a, b) => (b.featured === true) - (a.featured === true) || new Date(b.created_at) - new Date(a.created_at));
+    const unique = new Set();
+    return [...items, ...sportNews()]
+      .filter(o => active === 'todas' || o.sport === active)
+      .sort(latestFirst)
+      .filter(o => {
+        const key=storyKey(o);
+        if(unique.has(key))return false;
+        unique.add(key);
+        return true;
+      });
   }
 
   function renderTabs() {
@@ -132,8 +146,8 @@
     return m;
   }
 
-  function card(o, lead) {
-    const a = el('article', null, 'ae-opinion-card' + (lead ? ' is-lead' : '') + (o.is_published ? '' : ' is-draft'));
+  function card(o, lead, compact = false) {
+    const a = el('article', null, 'ae-opinion-card' + (lead ? ' is-lead' : '') + (compact ? ' is-compact' : '') + (o.is_published ? '' : ' is-draft'));
     const b = el('button', null, 'ae-opinion-open');
     b.type = 'button';
     b.setAttribute('aria-label', (o.is_news ? 'Leer noticia: ' : 'Leer opinión: ') + o.title);
@@ -152,29 +166,194 @@
     return a;
   }
 
-  function render() {
-    const root = $('aeOpinions'); if (!root) return;
-    const admin = isAdmin();
-    const write = $('aeOpinionsWrite'); if (write) write.hidden = !admin;
+  const sectionHeader=(title,caption)=>{
+    const header=el('header',null,'ae-opinions-section-head');
+    header.append(el('h3',title));
+    if(caption)header.append(el('p',caption));
+    return header;
+  };
+  const sportLabel=s=>SPORT_NAME[s]||({football:'Fútbol',laliga:'LaLiga',premier:'Premier League',
+    ligamx:'Liga MX',champions:'Champions League',general:'General'})[s]||s||'Deporte';
+  const takeSport=t=>['football','laliga','premier','ligamx','champions'].includes(t.sport)?'futbol':
+    t.sport==='nfl'?'nfl':t.sport==='colegial'?'colegial':'general';
+  const takeVotes=t=>[Math.max(0,Number(t.upvotes)||0),Math.max(0,Number(t.downvotes)||0)];
+  function takeRow(t, compact=false){
+    const wrap=el('article',null,'ae-opinions-take'+(compact?' is-compact':''));
+    wrap.dataset.takeId=String(t.id);
+    const body=el('div',null,'ae-opinions-take-content');
+    const tag=el('p',sportLabel(t.sport)+' · Debate de la comunidad','ae-opinions-take-tag');
+    const title=el('button',t.title||'Leer opinión','ae-opinions-take-open');
+    title.type='button';
+    title.addEventListener('click',()=>window.aeTakeReplies?.open(t));
+    const heading=el('h4');heading.append(title);
+    const by=el('div',null,'ae-opinions-take-by');
+    const author=el('button','@'+(t.author||'Aficionado'),'ae-opinions-take-author');
+    author.type='button';
+    author.addEventListener('click',()=>window.openAePublicProfile?.(t.author_id));
+    by.append(author);
+    if(t.created_at&&Number.isFinite(Date.parse(t.created_at)))by.append(el('time',shortDate(t.created_at)));
+    body.append(tag,heading,by);
+    if(!compact&&t.body)body.append(el('p',String(t.body).slice(0,170)+(String(t.body).length>170?'…':''),'ae-opinions-take-excerpt'));
+    wrap.append(body);
+    const actions=el('div',null,'ae-opinions-take-actions');
+    const [up,down]=takeVotes(t);
+    for(const [value,glyph,count] of [[1,'▲',up],[-1,'▼',down]]){
+      const b=el('button',glyph+' '+count,'ae-opinions-take-vote');
+      b.type='button';b.setAttribute('aria-pressed',String(Number(t.my_vote)===value));
+      b.setAttribute('aria-label',(value===1?'Votos favorables: ':'Votos contrarios: ')+count+'. Votar.');
+      b.disabled=voteBusy;
+      b.addEventListener('click',()=>voteTake(t,value));
+      actions.append(b);
+    }
+    const replies=takeReplies.get(String(t.id));
+    const reply=el('button',replies===undefined?'Respuestas —':replies+' '+(replies===1?'respuesta':'respuestas'),'ae-opinions-take-reply');
+    reply.type='button';reply.setAttribute('aria-label','Abrir conversación: '+(t.title||'Take'));
+    reply.addEventListener('click',()=>window.aeTakeReplies?.open(t));
+    actions.append(reply);
+    wrap.append(actions);
+    return wrap;
+  }
+  async function voteTake(t,value){
+    if(voteBusy)return;
+    const sb=client();if(!sb)return;
+    try{
+      const session=await sb.auth.getUser();
+      const user=session.data?.user;
+      if(!user){window.openUserAuthModal?.();return;}
+      if(String(user.id)===String(t.author_id))return;
+      voteBusy=true;
+      const r=await sb.rpc('ae_vote_free_take',{p_take_id:t.id,p_value:value});
+      if(r.error)throw r.error;
+      await loadTakes(true);
+      document.dispatchEvent(new Event('ae:takes-updated'));
+    }catch(e){status('No se pudo registrar el voto: '+(e.message||'Error'),true);}
+    finally{voteBusy=false;renderTakes();}
+  }
+  async function loadTakes(force=false){
+    if(takesLoading)return takesLoading;
+    if(takesLoaded&&!force)return;
+    const sb=client();if(!sb)return;
+    const seq=++takeRequest;
+    takesLoading=(async()=>{
+      try{
+        const feed=await sb.rpc('ae_public_take_feed',{p_sport:'all'});
+        if(feed.error)throw feed.error;
+        const all=(feed.data||[]).filter(t=>t?.id&&t?.title);
+        // La RPC de conteos admite hasta 30 identificadores por llamada.
+        const chunks=[];
+        for(let i=0;i<all.length;i+=30)chunks.push(all.slice(i,i+30).map(t=>t.id));
+        const counts=await Promise.all(chunks.map(ids=>sb.rpc('ae_public_take_reply_counts',{p_take_ids:ids})));
+        if(seq!==takeRequest)return;
+        const nextReplies=new Map();
+        counts.forEach((res,i)=>{
+          if(res.error)return;
+          for(const id of chunks[i])nextReplies.set(String(id),0);
+          for(const row of res.data||[])nextReplies.set(String(row.take_id),Math.max(0,Number(row.reply_count)||0));
+        });
+        communityTakes=all;
+        takeReplies=nextReplies;
+        takesLoaded=true;
+        renderTakes();
+      }catch(error){
+        if(seq!==takeRequest)return;
+        const block=$('aeOpinionsDebatedContent');
+        if(block&&!takesLoaded)block.replaceChildren(el('p','Los debates no están disponibles por ahora. Las columnas siguen accesibles.','ae-opinions-empty'));
+      }
+    })();
+    try{await takesLoading;}finally{takesLoading=null;}
+  }
+  function renderTakes(){
+    const target=$('aeOpinionsDebatedContent'),sportTarget=$('aeOpinionsSports');
+    if(!target||!sportTarget)return;
+    target.replaceChildren();
+    const known=communityTakes.filter(t=>takeReplies.has(String(t.id)));
+    const candidates=known.filter(t=>active==='todas'||takeSport(t)===active);
+    const sorted=[...candidates].sort((a,b)=>
+      (takeReplies.get(String(b.id))-takeReplies.get(String(a.id)))||
+      ((Number(b.upvotes)||0)+(Number(b.downvotes)||0))-((Number(a.upvotes)||0)+(Number(a.downvotes)||0))||
+      latestFirst(a,b));
+    const debated=sorted.filter(t=>takeReplies.get(String(t.id))>0).slice(0,5);
+    if(debated.length){
+      for(const t of debated)target.append(takeRow(t));
+    }else if(takesLoaded){
+      target.append(el('p',known.length?'Aún no hay discusiones con respuestas en este deporte.':'Todavía no hay debates publicados con respuestas verificadas.','ae-opinions-empty'));
+    }else target.append(el('p','Consultando los debates de la comunidad…','ae-opinions-empty'));
+    const leftovers=communityTakes.filter(t=>!debated.some(d=>String(d.id)===String(t.id)));
+    const latest=visible();
+    const front=pickCover(latest),remaining=latest.filter(o=>!front.includes(o));
+    const editorialRemainder=remaining.slice(6);
+    sportTarget.replaceChildren();
+    if(active!=='todas')return;
+    const bySport=new Map();
+    for(const [key,label] of SPORTS){
+      const story=editorialRemainder.filter(o=>o.sport===key);
+      const sportTakes=leftovers.filter(t=>takeSport(t)===key).sort(latestFirst).slice(0,3);
+      if(story.length||sportTakes.length)bySport.set(key,{key,label,story,sportTakes});
+    }
+    if(!bySport.size)return;
+    sportTarget.append(sectionHeader('Opiniones por deporte','Columnas y conversaciones reunidas por tema, sin duplicar la portada.'));
+    const grid=el('div',null,'ae-opinions-sport-grid');
+    for(const entry of bySport.values()){
+      const section=el('section',null,'ae-opinions-sport-block');
+      section.dataset.sport=entry.key;
+      const title=el('h4',entry.label);
+      section.append(title);
+      for(const o of entry.story) section.append(card(o,false,true));
+      for(const t of entry.sportTakes)section.append(takeRow(t,true));
+      const see=el('button','Ver '+entry.label,'ae-opinions-sport-link');
+      see.type='button';
+      see.addEventListener('click',()=>{
+        active=entry.key;render();$('aeOpinionsTabs')?.querySelector('[aria-selected=true]')?.focus();
+      });
+      section.append(see);grid.append(section);
+    }
+    sportTarget.append(grid);
+  }
+  function pickCover(stories){
+    const publicStories=stories.filter(o=>o.is_published);
+    return [...publicStories].sort((a,b)=>(Number(Boolean(b.featured))-Number(Boolean(a.featured)))||latestFirst(a,b)).slice(0,3);
+  }
+  function render(){
+    const root=$('aeOpinions');if(!root)return;
+    const admin=isAdmin(),write=$('aeOpinionsWrite');
+    if(write)write.hidden=!admin;
     renderTabs();
-    const list = $('aeOpinionsList'); list.replaceChildren();
-    list.setAttribute('aria-busy', String(!loaded));
-    const shown = visible();
-    if (!loaded && !shown.length) { list.append(el('p', 'Cargando opiniones…', 'ae-opinions-empty')); return; }
-    if (failed) {
-      const box = el('div', null, 'ae-opinions-empty');
-      const retry = el('button', 'Reintentar', 'ae-opinions-button is-secondary'); retry.type = 'button';
-      retry.addEventListener('click', () => { loaded = false; render(); load(true); });
-      box.append(el('p', 'No se pudieron cargar las columnas editoriales. Las noticias siguen disponibles.'), retry);
+    const list=$('aeOpinionsList');if(!list)return;
+    list.replaceChildren();
+    list.setAttribute('aria-busy',String(!loaded));
+    const shown=visible();
+    if(!loaded&&!shown.length){list.append(el('p','Cargando opiniones…','ae-opinions-empty'));return;}
+    if(failed){
+      const box=el('div',null,'ae-opinions-empty');
+      const retry=el('button','Reintentar','ae-opinions-button is-secondary');retry.type='button';
+      retry.addEventListener('click',()=>{loaded=false;render();load(true);});
+      box.append(el('p','No se pudieron cargar las columnas editoriales. Las noticias siguen disponibles.'),retry);
       list.append(box);
     }
-    if (!shown.length) {
-      const empty = el('div', null, 'ae-opinions-empty');
-      const name = active === 'todas' ? '' : ' de ' + SPORT_NAME[active];
-      empty.append(el('h3', 'Todavía no hay opiniones' + name), el('p', admin ? 'Pulsa «Escribir opinión» para publicar la primera.' : 'La redacción publicará aquí sus próximas columnas.'));
-      list.append(empty); return;
+    if(!shown.length){
+      const empty=el('div',null,'ae-opinions-empty');
+      empty.append(el('h3','Todavía no hay opiniones'+(active==='todas'?'':' de '+SPORT_NAME[active])),
+        el('p',admin?'Pulsa «Escribir opinión» para publicar la primera.':'La redacción publicará aquí sus próximas columnas.'));
+      list.append(empty);
+    }else{
+      const cover=pickCover(shown);
+      if(cover.length){
+        const section=el('section',null,'ae-opinions-front');
+        section.append(sectionHeader('En portada','El análisis que marca la conversación.'));
+        const grid=el('div',null,'ae-opinions-front-grid');
+        cover.forEach((o,i)=>grid.append(card(o,i===0,i>0)));
+        section.append(grid);list.append(section);
+      }
+      const recent=shown.filter(o=>!cover.includes(o)).slice(0,6);
+      if(recent.length){
+        const section=el('section',null,'ae-opinions-recent');
+        section.append(sectionHeader('Últimas opiniones','Publicaciones en orden de fecha, de más recientes a más antiguas.'));
+        const rows=el('div',null,'ae-opinions-recent-list');
+        for(const o of recent)rows.append(card(o,false,true));
+        section.append(rows);list.append(section);
+      }
     }
-    shown.forEach((o, i) => list.append(card(o, i === 0)));
+    renderTakes();
   }
 
   // ---------- Lectura ----------
@@ -374,11 +553,15 @@
   // ---------- Integración con la navegación ----------
   function show() {
     render();
-    if (!loaded) load();
+    if(!loaded)load();
+    void loadTakes();
   }
 
   function bind() {
     $('aeOpinionsWrite')?.addEventListener('click', () => openEditor(null));
+    document.addEventListener('ae:takes-updated',()=>{
+      if(!$('aeOpinions')?.hidden)void loadTakes(true);
+    });
     $('aeOpinionReaderClose')?.addEventListener('click', closeReader);
     $('aeOpinionReaderShare')?.addEventListener('click', share);
     $('aeOpinionReaderEdit')?.addEventListener('click', () => { const o = reading; closeReader(); openEditor(o); });
