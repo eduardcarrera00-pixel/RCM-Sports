@@ -683,8 +683,8 @@ async function loadSettleHistory(){
  const failure=error=>{if(current())area.replaceChildren(el('p','No pudimos cargar el historial. '+message(error),'ae-pick-history-empty'));};
  area.setAttribute('aria-busy','true');
  try{
- const r=await db.from('ae_pick_feed').select('id,title,author,event_date,american_odds,outcome,settled_at,result_points')
-   .in('outcome',['won','lost','void']).order('settled_at',{ascending:false,nullsFirst:false}).limit(20);
+ const r=await db.from('ae_pick_feed').select('id,title,author,event_date,american_odds,outcome,settled_at,result_points,legs')
+   .in('outcome',['won','lost','void']).order('settled_at',{ascending:false,nullsFirst:false}).limit(40);
  if(!current())return;
  if(r.error){failure(r.error);return;}
  const seen=new Set();
@@ -696,36 +696,57 @@ async function loadSettleHistory(){
   for(const row of c.data||[])auto.add(row.pick_id);
  }catch{}
  if(!current())return;
- const labels={won:'Acertó',lost:'Falló',void:'Anulado'},marks={won:'✓',lost:'✕',void:'—'};
- const count=o=>rows.filter(p=>p.outcome===o).length;
- const summary=el('div',null,'ae-pick-history-summary');
- for(const [o,text] of [['won','Acertados'],['lost','Fallados'],['void','Anulados']]){
-  const box=el('div',null,'ae-pick-history-stat');box.dataset.outcome=o;
-  box.append(el('strong',String(count(o))),el('span',text));summary.append(box);
- }
- const note=el('p',rows.length===1?'Último resultado':rows.length>3?'Últimos '+rows.length+' resultados · desliza para ver más':'Últimos '+rows.length+' resultados','ae-pick-history-note');
- const list=el('ol',null,'ae-pick-history-list');list.tabIndex=0;list.setAttribute('aria-label','Últimos Picks resueltos');
+ const labels={won:'Acertado',lost:'Fallado',void:'Anulado'};
+ const note=el('p',rows.length===1?'1 Pick resuelto':'Últimos '+rows.length+' Picks resueltos · desliza para ver más','ae-pick-history-note');
+ const list=el('ol',null,'ae-pick-history-list ae-pick-history-grid');
+ list.tabIndex=0;
+ list.setAttribute('aria-label','Historial de Picks, ordenado por fecha de resolución de más reciente a más antiguo');
  const when=t=>t?new Date(t).toLocaleDateString('es-MX',{day:'numeric',month:'short',timeZone:'America/Toronto'}).replace('.',''):'';
- const odds=v=>v==null?'':(Number(v)>0?'+':'')+v;
+ const odds=v=>v==null?'—':(Number(v)>0?'+':'')+v;
  for(const p of rows){
-  const li=el('li',null,'ae-pick-history-entry');li.dataset.outcome=p.outcome;li.dataset.pickId=p.id;
-  const mark=el('span',marks[p.outcome],'ae-pick-history-mark');mark.setAttribute('aria-hidden','true');
-  const copy=el('div',null,'ae-pick-history-copy');
-  const head=el('div',null,'ae-pick-history-head');
-  head.append(el('strong',p.title),el('span',labels[p.outcome],'ae-pick-history-badge'));
-  const meta=el('p',null,'ae-pick-history-meta');
-  meta.append(el('span',p.author),el('span',odds(p.american_odds)));
-  if(p.event_date)meta.append(el('span',when(p.event_date+'T16:00:00Z')));
-  if(p.outcome==='won'&&p.result_points!=null)meta.append(el('span','+'+Number(p.result_points).toFixed(2)+' pts','ae-pick-history-points'));
-  const source=el('p',(auto.has(p.id)?'Verificado automáticamente':'Confirmado por un admin')+(p.settled_at?' · '+when(p.settled_at):''),'ae-pick-history-source');
-  copy.append(head,meta,source);li.append(mark,copy);list.append(li);
+  const li=el('li',null,'ae-pick-history-entry');
+  li.dataset.outcome=p.outcome;
+  li.dataset.pickId=p.id;
+  const legs=Array.isArray(p.legs)?p.legs:[];
+  const first=legs[0]||{};
+  const match=String(first.event||p.title||'Partido sin especificar').trim();
+  const selection=splitPickSelections(first.selection||'').map(s=>pickSelectionDisplay(s).choice).filter(Boolean);
+  const prediction=selection[0]||String(first.selection||'').trim()||(legs.length?'Consultar pronóstico':'Ver pronóstico completo');
+  const selections=legs.reduce((total,leg)=>total+Math.max(1,splitPickSelections(leg.selection).length),0);
+  const entry=el('a',null,'ae-pick-history-card');
+  entry.href=link(p.id);
+  entry.setAttribute('aria-label','Abrir Pick de '+(p.author||'Aficionado')+': '+match+'. '+prediction+'. '+labels[p.outcome]);
+  entry.addEventListener('click',event=>{
+   if(event.ctrlKey||event.metaKey||event.shiftKey||event.altKey||event.button!==0)return;
+   event.preventDefault();
+   open(p.id);
+  });
+  const top=el('div',null,'ae-pick-history-card-top');
+  top.append(
+   el('span','@'+String(p.author||'Aficionado').replace(/^@+/,''),'ae-pick-history-user'),
+   el('span',labels[p.outcome],'ae-pick-history-badge')
+  );
+  const content=el('div',null,'ae-pick-history-card-content');
+  content.append(el('strong',match,'ae-pick-history-match'));
+  content.append(el('span',prediction,'ae-pick-history-prediction'));
+  if(selections>1)content.append(el('small','Combinada · '+selections+' selecciones','ae-pick-history-multiple'));
+  const bottom=el('div',null,'ae-pick-history-card-bottom');
+  bottom.append(el('span','Cuota '+odds(p.american_odds),'ae-pick-history-odds'));
+  bottom.append(el('span',when(p.settled_at)||'Sin fecha','ae-pick-history-date'));
+  if(p.outcome==='won'&&p.result_points!=null)
+   bottom.append(el('span','+'+Number(p.result_points).toFixed(2)+' pts','ae-pick-history-points'));
+  const source=el('small',auto.has(p.id)?'Verificado automáticamente':'Resultado confirmado','ae-pick-history-source');
+  entry.append(top,content,bottom,source);
+  li.append(entry);
+  list.append(li);
  }
- const frame=el('div',null,'ae-pick-history-frame');frame.append(list);
+ const frame=el('div',null,'ae-pick-history-frame');
+ frame.append(list);
  const sync=()=>frame.classList.toggle('is-end',list.scrollTop+list.clientHeight>=list.scrollHeight-4);
  list.addEventListener('scroll',sync,{passive:true});
- // Replace the complete snapshot only after it is ready. Authentication,
- // visibility and feed refreshes can request this history at the same time.
- area.replaceChildren(summary,note,frame);requestAnimationFrame(sync);
+ // Reemplazar de una vez evita duplicados al concurrir las actualizaciones.
+ area.replaceChildren(note,frame);
+ requestAnimationFrame(sync);
  }catch(error){failure(error);}
  finally{if(current())area.setAttribute('aria-busy','false');}
 }
