@@ -1,0 +1,105 @@
+/* CAM SPORTS · Botón compacto de edición global (admin).
+   Ocupa el mismo espacio de cabecera que el antiguo control «Deportes».
+   Nunca altera las tarjetas, sus fondos ni los editores individuales. */
+
+html body>header #camGlobalEditToggle {
+  appearance:none!important;
+  -webkit-appearance:none!important;
+  position:relative!important;
+  inset:auto!important;
+  display:grid!important;
+  grid-template-rows:25px 10px!important;
+  place-items:center!important;
+  align-content:center!important;
+  flex:0 0 50px!important;
+  box-sizing:border-box!important;
+  width:50px!important;
+  min-width:50px!important;
+  max-width:50px!important;
+  height:52px!important;
+  min-height:52px!important;
+  max-height:52px!important;
+  margin:0!important;
+  padding:4px 0!important;
+  gap:2px!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  background:transparent!important;
+  color:#f1dfc7!important;
+  transform:none!important;
+  cursor:pointer!important;
+  -webkit-tap-highlight-color:transparent;
+}
+html body>header #camGlobalEditToggle[hidden] { display:none!important; }
+html body>header #camGlobalEditToggle[disabled] { opacity:.62!important;cursor:wait!important; }
+html body>header #camGlobalEditToggle .cam-global-edit-icon {
+  display:grid!important;
+  grid-row:1!important;
+  place-items:center!important;
+  width:22px!important;
+  height:22px!important;
+  margin:0!important;
+  color:#c9a165!important;
+  opacity:.86!important;
+}
+html body>header #camGlobalEditToggle svg {
+  display:block!important;
+  width:19px!important;
+  height:19px!important;
+  fill:none!important;
+  stroke:currentColor!important;
+  stroke-width:1.65!important;
+  stroke-linecap:round!important;
+  stroke-linejoin:round!important;
+}
+html body>header #camGlobalEditToggle .cam-global-edit-label {
+  display:block!important;
+  grid-row:2!important;
+  width:50px!important;
+  max-width:50px!important;
+  overflow:hidden!important;
+  color:#f1dfc7!important;
+  font:800 7px/10px Inter,system-ui,sans-serif!important;
+  text-transform:uppercase!important;
+  white-space:nowrap!important;
+  text-overflow:ellipsis!important;
+  letter-spacing:0!important;
+  text-align:center!important;
+}
+html body>header #camGlobalEditToggle:hover .cam-global-edit-icon,
+html body>header #camGlobalEditToggle:focus-visible .cam-global-edit-icon { color:#f3ebdd!important;opacity:1!important; }
+html body>header #camGlobalEditToggle:focus-visible {outline:2px solid #f3ebdd!important;outline-offset:2px!important; }
+html body>header #camGlobalEditToggle.is-active {
+  background:rgba(7,59,131,.38)!important;
+  box-shadow:inset 0 -2px 0 #e2c7a2!important;
+}
+html body>header #camGlobalEditToggle.is-active .cam-global-edit-icon {color:#fff!important;opacity:1!important;}
+
+/* También cubre los botones secundarios «Editar» ya existentes.
+   Su visibilidad administrativa original sigue controlada por los scripts;
+   esta regla únicamente requiere además el interruptor global activado. */
+html:not(.cam-global-edit-active) #rankingEditButton,
+html:not(.cam-global-edit-active) #championsEditButton,
+html:not(.cam-global-edit-active) #aeWeeklyEditButton,
+html:not(.cam-global-edit-active) #editArticleButton,
+html:not(.cam-global-edit-active) #editArticlePhotoButton,
+html:not(.cam-global-edit-active) #aeOpinionReaderEdit {display:none!important;}
+
+/* Capa de seguridad visual: no crear los lápices es la regla principal.
+   Si CSS retrasa la actualización, nunca dejarlos interactivos en modo normal. */
+html:not(.cam-global-edit-active) cam-site-image-layer {display:none!important;pointer-events:none!important;}
+
+@media(min-width:980px) and (max-width:1180px) {
+  html body>header #camGlobalEditToggle {flex-basis:49px!important;width:49px!important;min-width:49px!important;max-width:49px!important;}
+  html body>header #camGlobalEditToggle .cam-global-edit-label {width:49px!important;max-width:49px!important;}
+}
+@media(max-width:979px) {
+  html body>header #camGlobalEditToggle {
+    flex:0 0 48px!important;width:48px!important;min-width:48px!important;max-width:48px!important;
+    height:46px!important;min-height:46px!important;max-height:46px!important;
+    grid-template-rows:23px 10px!important;gap:1px!important;padding:3px 0!important;
+  }
+  html body>header #camGlobalEditToggle .cam-global-edit-label {width:48px!important;max-width:48px!important;font-size:7px!important;}
+  html body>header #camGlobalEditToggle svg {width:18px!important;height:18px!important;}
+}
