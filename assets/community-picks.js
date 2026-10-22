@@ -293,7 +293,7 @@ async function load(){
    feedEl.scrollTop=previousScroll;
    $('cpStatus').textContent=feed.data?.length?'':'Todavía no hay Picks. Comparte el primero.';
    loaded=true;
-   await Promise.all([loadRanking(),loadWorstRanking(),loadModeration(),loadChefLists(),loadSettlement(),loadSettleHistory()]);
+   await Promise.all([loadRanking(),loadModeration(),loadChefLists(),loadSettlement(),loadSettleHistory()]);
  }catch(e){if(seq!==request)return;$('cpFeed').replaceChildren();sizeFeedWindow();$('cpStatus').textContent='No pudimos cargar los Picks. '+message(e);}
 }
 let currentRank='month';
@@ -428,53 +428,71 @@ function chefRankingEntry(record,index,voids,kind,picks){
    person,chefRankingScore(record,voids));
  return li;
 }
-let bestRankingRequest=0;
-async function loadRanking(){
- const list=$('cpLeaderboard');if(!list||!db)return;
- const seq=++bestRankingRequest,period=currentRank;
- const [r,voids]=await Promise.all([
-   db.rpc('ae_pick_result_ranking',{p_period:period}),
-   voidCountsForPeriod(period).catch(()=>null)
- ]);
- if(seq!==bestRankingRequest)return;
- if(r.error){list.replaceChildren(row('No fue posible cargar el ranking de resultados.','ae-cp-leader ae-cp-leader-empty'));return;}
- const records=(r.data||[]).slice(0,10);
- const picks=await rankingRepresentativePicks(records,period,'best').catch(()=>new Map());
- if(seq!==bestRankingRequest)return;
- list.replaceChildren();
- if(!records.length)list.append(row(period==='month'?'Este mes todavía no hay resultados confirmados.':'Aún no hay pronósticos con resultados confirmados.','ae-cp-leader ae-cp-leader-empty'));
- records.forEach((record,index)=>list.append(chefRankingEntry(record,index,voids,'best',picks)));
- sizeChefRankingWindows();
-}
-/* Worst Chefs uses its own SQL order (ASC) and period.
-   Never reverse the Best Chefs top ten; that would omit real bottom scorers. */
-async function loadWorstRanking(){
- const list=$('cpWorstLeaderboard');if(!list||!db)return;
- const seq=++worstRankingRequest,period=currentWorstRank;
- const [r,voids]=await Promise.all([
-   db.rpc('ae_pick_result_ranking_worst',{p_period:period}),
-   voidCountsForPeriod(period).catch(()=>null)
- ]);
- if(seq!==worstRankingRequest)return;
- if(r.error){
-   list.replaceChildren(row('No fue posible cargar la clasificación de Peores Chefs.','ae-cp-leader ae-cp-leader-empty'));
-   return;
+// Las dos tablas comparten la misma actualización para evitar resultados
+ // mezclados cuando cambian los puntos o el periodo seleccionado.
+ let chefRankingRequest=0;
+ async function loadRanking(){
+  const bestList=$('cpLeaderboard'),worstList=$('cpWorstLeaderboard');
+  if(!bestList||!worstList||!db)return;
+  const seq=++chefRankingRequest,bestPeriod=currentRank,worstPeriod=currentWorstRank;
+  const [best, bestVoids, worstVoids]=await Promise.all([
+    db.rpc('ae_pick_result_ranking',{p_period:bestPeriod}),
+    voidCountsForPeriod(bestPeriod).catch(()=>null),
+    voidCountsForPeriod(worstPeriod).catch(()=>null)
+  ]);
+  if(seq!==chefRankingRequest)return;
+  if(best.error){
+    bestList.replaceChildren(row('No fue posible cargar el ranking de resultados.','ae-cp-leader ae-cp-leader-empty'));
+    worstList.replaceChildren(row('No fue posible cargar la clasificación de Peores Chefs.','ae-cp-leader ae-cp-leader-empty'));
+    sizeChefRankingWindows();
+    return;
+  }
+  // Primero seleccionamos el top 10 real. El ID (no el nombre) determina
+  // quién debe quedar excluido de la clasificación de Peores Chefs.
+  const bestRecords=(best.data||[]).slice(0,10);
+  const bestIds=new Set(bestRecords.map(record=>String(record.user_id||'')).filter(Boolean));
+  // La exclusión se aplica EN SQL antes del LIMIT 10. Así entran los
+  // siguientes usuarios elegibles, no sólo los primeros diez originales.
+  const worst=await db.rpc('ae_pick_result_ranking_worst_eligible',{
+    p_period:worstPeriod,
+    p_excluded_user_ids:[...bestIds]
+  });
+  if(seq!==chefRankingRequest)return;
+  const worstRecords=[];
+  if(!worst.error){
+    const used=new Set(bestIds);
+    for(const record of worst.data||[]){
+      const id=String(record.user_id||'');
+      if(!id||used.has(id))continue;
+      used.add(id);
+      worstRecords.push(record);
+      if(worstRecords.length>=10)break;
+    }
+  }
+  const [bestPicks,worstPicks]=await Promise.all([
+    rankingRepresentativePicks(bestRecords,bestPeriod,'best').catch(()=>new Map()),
+    worst.error?Promise.resolve(new Map()):rankingRepresentativePicks(worstRecords,worstPeriod,'worst').catch(()=>new Map())
+  ]);
+  if(seq!==chefRankingRequest)return;
+  // Reemplazar ambas tablas en una misma actualización sin duplicaciones
+  // transitorias; no se cambia ningún punto ni elemento visual.
+  bestList.replaceChildren();
+  if(!bestRecords.length)bestList.append(row(bestPeriod==='month'?'Este mes todavía no hay resultados confirmados.':'Aún no hay pronósticos con resultados confirmados.','ae-cp-leader ae-cp-leader-empty'));
+  bestRecords.forEach((record,index)=>bestList.append(chefRankingEntry(record,index,bestVoids,'best',bestPicks)));
+
+  worstList.replaceChildren();
+  if(worst.error){
+    worstList.append(row('No fue posible cargar la clasificación de Peores Chefs.','ae-cp-leader ae-cp-leader-empty'));
+  }else if(!worstRecords.length){
+    worstList.append(row(worstPeriod==='month'?'Este mes todavía no hay usuarios elegibles para Peores Chefs.':'Aún no hay usuarios elegibles para Peores Chefs.','ae-cp-leader ae-cp-leader-empty'));
+  }else{
+    worstRecords.forEach((record,index)=>worstList.append(chefRankingEntry(record,index,worstVoids,'worst',worstPicks)));
+  }
+  sizeChefRankingWindows();
  }
- const records=(r.data||[]).slice(0,10);
- const picks=await rankingRepresentativePicks(records,period,'worst').catch(()=>new Map());
- if(seq!==worstRankingRequest)return;
- list.replaceChildren();
- if(!records.length){
-   list.append(row(period==='month'
-     ?'Este mes todavía no hay resultados confirmados.'
-     :'Aún no hay pronósticos con resultados confirmados.',
-     'ae-cp-leader ae-cp-leader-empty'));
-   return;
- }
- records.forEach((record,index)=>list.append(chefRankingEntry(record,index,voids,'worst',picks)));
- sizeChefRankingWindows();
-}
-/* Clasificación editorial basada en votos netos reales, separada de los
+ // Al recargar Peores Chefs también se actualiza primero Mejores Chefs.
+ async function loadWorstRanking(){return loadRanking();}
+ /* Clasificación editorial basada en votos netos reales, separada de los
    puntos de la liga semanal. Sólo pronósticos aprobados de esta semana. */
 let chefRequest=0;
 // The old Platos viewport was 255px tall with 85px rows. It cropped longer
