@@ -202,3 +202,47 @@ plantilla anterior. El resultado acertado de Pick conserva en X su formato
 especial de cita a la publicación original. Para ampliar la biblioteca, añadir
 los JPG y las filas correspondientes de `cam_social.brand_images` en una nueva
 migración.
+
+## Rotación musical CC0 para Instagram/TikTok (22 de octubre de 2026)
+
+Migración: `supabase/migrations/20261022192000_cam_social_rotating_cc0_music.sql`.
+Se retiró el arpegio artificial fijo de `compose_original_music`. Cada entrega
+**nueva** de Instagram y TikTok recibe una pista de `cam_social.music_tracks`
+al crearse, con elección aleatoria entre las menos usadas (bolsa barajada).
+Se conservan las asignaciones para reintentos, se intenta no repetir una
+pista antes de utilizar todas y se prohíbe compartir pista entre ambas redes
+en el mismo evento cuando haya alternativas. Para ampliar o suspender el
+catálogo basta insertar pistas autorizadas o actualizar `enabled`. No se
+necesita modificar el generador, pero siempre hay que documentar su licencia.
+
+Catálogo inicial: diez pistas **CC0** de
+[FreePD](https://en.freepd.cn/music), en las familias electrónica, épica y
+animada. La fuente indica permiso comercial, sincronización y modificación;
+el usuario debe respetar cualquier reclamación de terceros que surja.
+Se mantienen en `cam_social.music_tracks` los títulos y enlaces de prueba
+de licencia. Solo se descargan las URLs exactas del dominio autorizado
+`en.freepd.cn`; redirecciones y otras ubicaciones se rechazan. La música
+se descarga durante el render, se normaliza a un volumen de fondo, recibe
+fade in/out y se integra como AAC en el MP4 de 8 segundos. La pista de
+prueba sintética existe únicamente en el `--smoke-test`: jamás se publica.
+
+Los MP4 ahora se generan como
+`assets/social-videos/<md5(event_key + ':' + network)>.mp4`, de forma
+independiente para `instagram` y `tiktok`. El publicador
+`cam_social.dispatch()` verifica el MP4 disponible antes de enviarlo a
+Buffer y **no publica videos** sin una pista activa y un archivo disponible.
+Si una pista no se puede descargar, el trabajo falla de forma visible,
+sin reutilizar el antiguo sonido ni sustituirlo por una foto.
+
+No se reescriben publicaciones antiguas, ni se vuelven a encolar entregas
+`accepted` o `published`. Los tres canales mantienen sus textos,
+credenciales, deduplicación, control de errores y rutina existentes; X sigue
+usando fotografías. TikTok e Instagram necesitan las correspondientes
+conexiones aprobadas en Buffer para completar la entrega.
+
+Antes de activar una migración en producción ejecutar:
+`node tests/social-music-rotation.mjs`,
+`node tests/social-instagram-publication.mjs`,
+`node tests/social-video-publication.mjs` y
+`python scripts/cam_social_make_video.py --smoke-test`.
+Se recomienda comprobar los primeros MP4 reales y su resultado en Buffer.
