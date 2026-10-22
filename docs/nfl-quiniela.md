@@ -1,42 +1,58 @@
-# La Quiniela NFL | CAM SPORTS
+# CAM SPORTS — La Quiniela NFL
 
-## Estado y alcance
+## Estado de entrega (22 de octubre de 2026)
 
-Frontend, tablas y funciones de puntuación independientes de Takes, autenticación CAM SPORTS, editor, clasificaciones y perfil. Añade una sección **solo al final de NFL**. Nunca sustituye los rankings existentes.
+La Quiniela está desarrollada en un Pull Request **pendiente de revisión y fusión**. Las tablas y la Edge Function se han instalado **solo en Supabase Staging**. El entorno público de producción **no está activado**. No presentar como automático en producción hasta validar credenciales, jobs, sincronización real y despliegue.
 
-La integración importa calendario y resultados reales desde la API de marcadores ESPN (no oficial ni garantizada por contrato) y cuotas moneyline verificadas desde The Odds API (si está configurada). Al faltar cuotas, la quiniela de ese partido **permanece cerrada** hasta que un administrador aporte dos cuotas reales. No hay resultados, probabilidades ni usuarios ficticios en producción.
+La sección figura **al final de NFL** y no aparece en Picks, Fútbol ni Home. Mantiene el diseño editorial día/noche y el sistema de usuarios existente. No toca el cómputo de Picks, Takes, Savant, Rookie, Genios ni Anoetos.
 
-Los partidos de temporada regular utilizan las semanas 1–18; no se mezclan semanas de playoffs. Para ampliar el torneo a playoffs deberá modelarse `seasontype=3` con clasificación independiente.
+## Arquitectura
 
-## Preparar producción
+- `index.html`: encabezado, selector de temporada/jornada, partidos, resumen de selecciones, historial y clasificaciones, panel administrativo, integración con perfiles.
+- `assets/cam-nfl-quiniela.js`: interacción, guardado de selecciones parciales, persistencia con RPC, historial, perfil, ranking semanal/mensual/temporada y detalle de picks resueltos.
+- `assets/nfl-teams.js` y `assets/cam-nfl-quiniela-logos.js`: catálogo **existente** de 32 escudos NFL, normalización de IDs y componente de visitante/local/selección. No se descargan ni duplican logos.
+- `supabase/migrations/20261022170000_cam_nfl_quiniela.sql`: partidos, puntos congelados, picks, auditoría, validación servidor, RLS, liquidación idempotente y rankings.
+- `supabase/migrations/20261022190000_cam_nfl_quiniela_cron_and_breakdown.sql`: Supabase Cron con Vault y desglose público **solo de pronósticos resueltos**.
+- `supabase/functions/cam-nfl-sync/index.ts`: importación de calendario y marcadores desde ESPN, más probabilidades moneyline verificadas cuando hay proveedor configurado.
 
-1. Revisar y aplicar `supabase/migrations/20261022170000_cam_nfl_quiniela.sql` en el proyecto CAM SPORTS de producción, después de verificar su esquema. **No** ejecutarlo de nuevo en Staging, donde ya se probó.
-2. Desplegar `supabase/functions/cam-nfl-sync/index.ts` como `cam-nfl-sync`, con verificación JWT desactivada **solo porque** el código verifica la sesión, permisos de `editors` y el secreto propio de cron antes de utilizar `service_role`.
-3. En los secretos de Supabase Edge Functions, configurar `THE_ODDS_API_KEY` (si se dispone de acceso a The Odds API) y `CAM_NFL_CRON_SECRET` (cadena aleatoria de alta entropía). `SUPABASE_URL`, `SUPABASE_ANON_KEY` y `SUPABASE_SERVICE_ROLE_KEY` deben existir como secretos internos de la plataforma. Nunca añadir estas claves al repositorio ni al navegador.
-4. En GitHub Actions del repositorio fuente, configurar la **variable** `CAM_NFL_SYNC_URL` con `https://<project-ref>.supabase.co/functions/v1/cam-nfl-sync` y el **secreto** `CAM_NFL_CRON_SECRET` con exactamente el mismo valor que en Supabase. `.github/workflows/cam-nfl-sync.yml` ejecuta la sincronización cada hora durante septiembre–febrero. Sin los dos parámetros, el trabajo se omite sin publicar datos falsos.
-5. Desde una cuenta administradora, abrir la sección NFL y usar **Sincronizar NFL** para revisar los partidos de la semana. La función normaliza las abreviaturas de los equipos y descarta datos que no puede verificar. Si hay cuotas verificadas, congela probabilidades y puntos antes de abrir cada encuentro. Como opción alternativa, introducir ambas cuotas americanas reales en los controles del partido.
-6. Comprobar manualmente una semana importada, probar el guardado con una cuenta registrada y verificar en la base de datos el resultado, los puntos y la clasificación después de un evento oficialmente finalizado.
+**Datos:** ESPN ofrece un endpoint público no oficial y sin SLA; SportsDataIO es una alternativa preferible para operación empresarial, pero requiere acceso y licencia que no se han acreditado. The Odds API es independiente para cuotas reales. No se generan pronósticos, probabilidades ni resultados ficticios. Confirmar los términos de uso de cada proveedor antes de producción.
 
-El sincronizador importa la semana corriente, anterior y siguiente en una ejecución automática. Las invocaciones manuales de administradores pueden especificar temporada y semana. Los resultados provisionales no puntúan; los definitivos y sus correcciones se procesan mediante trigger SQL transaccional e idempotente.
+## Fases NFL
 
-## Reglas de puntos y seguridad
+Temporada regular: semanas 1–18. Playoffs: 19 = Wild Card (ESPN postseason 1), 20 = Divisional (2), 21 = Finales de conferencia (3), 22 = Super Bowl (5). La semana 4 de postemporada en ESPN (Pro Bowl) queda fuera. Si ESPN cambia su calendario de playoffs, revisar el mapeo antes del lanzamiento. En temporada baja no se generan juegos ficticios: se conservan los históricos.
 
-`p = probabilidad implícita normalizada`; `puntos = max(2, min(12, round(2 / p)))`. Ejemplos: 80 % → 3 puntos, 50 % → 4 puntos, 25 % → 8 puntos. Un fallo suma 0; un empate o anulación suma 0 y no computa como fallo. Las probabilidades se congelan una sola vez antes de que haya selecciones.
+## Puntos, bloqueo y seguridad
 
-Los pronósticos se escriben solo vía `cam_nfl_save_pick`, que consulta la hora del **servidor**, bloquea la fila, verifica la sesión, el partido y el equipo. RLS deja a cada usuario consultar solo sus selecciones. Los visitantes solo consultan partidos y tablas agregadas. Las tablas de resultados, probabilidades y auditoría no conceden modificaciones a clientes. Los administradores se validan mediante `rcm_is_editor()`.
+Probabilidad `p` = probabilidad implícita moneyline normalizada; puntos congelados `max(2, min(12, round(2/p)))`. Pronóstico acertado = puntos asignados, fallado/empatado/cancelado = 0. Los empates o anulaciones no cuentan como fallo. Las cuotas se congelan antes de abrir el partido y permanecen iguales para todos los participantes.
 
-Los rankings usan solo resultados finales con ganador, y agrupan cada mes por fecha de partido en horario `America/New_York`, incluso cuando la temporada cruza de año. Los puntos de quiniela permanecen independientes de Savant, Rookie, Genios, Anoetos y Picks.
+El cierre de un partido se controla en `cam_nfl_save_pick` con hora de servidor, RLS, `user_id=auth.uid()` y bloqueo de fila. No existe un INSERT/UPDATE directo para los usuarios. El resultado oficial recalcula por trigger en forma idempotente y las correcciones administrativas quedan auditadas. Las selecciones pendientes sobreviven localmente hasta guardarse; solo los picks confirmados en Supabase cuentan.
 
-## Proveedor, disponibilidad y limitaciones
+Las clasificaciones independientes ordenan puntos, aciertos y efectividad. Los detalles de pronósticos de otros usuarios se consultan mediante `cam_nfl_public_pick_breakdown` y **solo incluyen partidos finalizados, empatados o cancelados**; no exponen predicciones anticipadas de rivales.
 
-- La API ESPN utilizada es un endpoint público **no oficial** (puede cambiar o limitarse). Se recomienda migrar a un proveedor con SLA antes de depender de ella para concursos de gran escala.
-- The Odds API usa una clave particular y puede requerir suscripción, límites o tarifas. El juego seguirá funcionando con configuración manual comprobada y auditada si no hay clave; **no** calculará probabilidades imaginarias.
-- Si el sincronizador no corre, un administrador puede ejecutarlo desde el módulo, revisar partidos y liquidar resultados. Las correcciones quedan auditadas y recalculan los puntos existentes sin duplicarlos.
-- Las selecciones temporales se conservan localmente por identificador de usuario y partido hasta guardarse; el sistema definitivo sigue siendo Supabase.
-- La puesta en producción requiere migración, despliegue de Edge Function y configuración del cron/secreto. Abrir solo la rama o fusionar el frontend no activa por sí mismo la automatización.
+La Edge Function requiere una sesión real de administrador o token cron de por lo menos 32 caracteres. Un secreto vacío **no autoriza** invocaciones.
 
-## Pruebas
+## Pasos para producción
 
-`node tests/nfl-quiniela-browser.cjs` comprueba con fixtures **solo de prueba** el diseño día/noche, móvil/escritorio, guardar selecciones y estadísticas del perfil en Chromium. Se ejecuta automáticamente en el Pull Request por `nfl-quiniela-tests.yml`.
+1. Revisar con pruebas de regresión la rama de integración y fusionarla con la implementación base; publicar desde el repositorio principal cuando esté aprobada.
+2. Aplicar en **producción** las dos migraciones SQL, en orden cronológico. No volver a aplicarlas en Staging; allí ya están instaladas.
+3. Desplegar la Edge Function `cam-nfl-sync`. Requiere `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`; mantener `verify_jwt=false` **solo** porque el propio código valida tanto el administrador como el secreto del cron antes de usar la service key. Restringir roles y auditar.
+4. En Supabase Edge Secrets configurar `CAM_NFL_CRON_SECRET`, valor aleatorio de al menos 32 caracteres; debe coincidir con el token secreto que se guardará en Vault. Configurar `THE_ODDS_API_KEY` si existe una suscripción válida; de lo contrario los partidos nuevos seguirán **cerrados** hasta cargar cuotas moneyline reales y auditadas desde administración.
+5. Guardar **solo en Supabase Vault** los secretos `cam_nfl_sync_url` (URL HTTPS del proyecto terminado en `/functions/v1/cam-nfl-sync`) y `cam_nfl_cron_token` (mismo `CAM_NFL_CRON_SECRET`). Por ejemplo, desde un entorno administrativo y **sin almacenar secretos en Git**:
+   ```sql
+   select vault.create_secret(
+     'https://REF-DEL-PROYECTO.supabase.co/functions/v1/cam-nfl-sync',
+     'cam_nfl_sync_url'
+   );
+   -- En una sesión segura: crear también cam_nfl_cron_token con el valor real.
+   ```
+6. Comprobar `cron.job`: cada hora a minuto 7 y cada 10 minutos durante ventanas de partido; **no duplicar** tareas existentes `cam-nfl-auto-hourly`/`cam-nfl-auto-results`. La migración evita crear tareas paralelas cuando estas ya están presentes. `.github/workflows/cam-nfl-sync.yml` queda como **disparo manual de emergencia**, sin agenda duplicada.
+7. Confirmar que una ejecución real ha importado temporada, jornada y todos los enfrentamientos; validar 32 logos, cuotas, selecciones, bloqueo individual y resultados oficiales. Comprobar `cron.job_run_details` y `net._http_response` mediante consultas administrativas cuando corresponda.
+8. Ejecutar los tests y revisar estilos día/noche, móvil/escritorio, perfiles, rankings y módulos existentes. Confirmar publicación de GitHub Pages en `https://camsports.github.io/`.
 
-En Supabase Staging se aplicó la migración y se comprobó en una transacción revertida que repetir una liquidación no suma doble, corregir el ganador recalcula el resultado y empatar lo anula. Aún deben verificarse con usuarios reales autorizados los RPC administrativos, el proveedor externo, errores de API y la sincronización programada antes de activar producción.
+**Sin el token y las claves del proveedor no afirmar sincronización operativa.** La función `cam_nfl_cron_dispatch` no realiza llamadas si faltan los secretos de Vault. Si el proveedor está caído, se conservan los últimos datos; no se aprueba ninguna cuota o resultado inventado.
+
+## Tests
+
+- `node tests/cam-nfl-quiniela-logos.mjs` — 32 logos canónicos y mapeos externos, selección, bloqueo y resultados.
+- `node tests/nfl-quiniela-browser.cjs` — Chromium en móvil/escritorio y día/noche, logos en partido/resumen/historial, guardado, perfil y ausencia de overflow horizontal.
+- En Staging: crear y liquidar picks dentro de una transacción revertida; comprobar idempotencia, corrección, empate y el RPC de resultados públicos. El despliegue a producción y una integración real del proveedor siguen siendo verificaciones separadas.
