@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Create CAM Sports Instagram/TikTok MP4s with original instrumental audio.
+"""Create CAM Sports Instagram/TikTok MP4s with authorized, rotating music.
 
 Only reads already-public editor events through an anonymous read-only RPC.
 Runs in GitHub Actions; the GITHUB_TOKEN commits public MP4s, never app secrets.
@@ -14,9 +14,9 @@ from pathlib import Path
 import subprocess
 import tempfile
 import urllib.parse
+import urllib.error
+import re
 import urllib.request
-import wave
-from array import array
 
 from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageOps
 
@@ -191,68 +191,91 @@ def brand_cover(image, title, kicker):
     return back
 
 
-def compose_original_music(path):
-    """Synthesized original four-chord arpeggio; no samples or licensed songs."""
-    # Am, F, C and G. Quiet plucked notes leave room for the news image.
-    progressions = [
-        (220.00, 261.63, 329.63),
-        (174.61, 220.00, 261.63),
-        (261.63, 329.63, 392.00),
-        (196.00, 246.94, 293.66),
-    ]
-    steps = [0, 1, 2, 1, 2, 1, 0, 1] * 4
-    samples = array("h")
-    for n in range(SAMPLE_RATE * DURATION):
-        t = n / SAMPLE_RATE
-        chord = progressions[min(3, int(t / 2))]
-        step = min(len(steps) - 1, int(t / .25))
-        tone = chord[steps[step]] * (2 if step % 4 == 3 else 1)
-        local = t % .25
-        envelope = min(1, local / .02) * math.exp(-local * 9)
-        pluck = (math.sin(2 * math.pi * tone * t)
-                 + .24 * math.sin(4 * math.pi * tone * t)) * envelope
-        bass = .28 * math.sin(2 * math.pi * chord[0] / 2 * t)
-        overall_fade = min(1, t / .35, (DURATION - t) / .7)
-        samples.append(int(max(-1, min(1, .20 * (pluck + bass) * overall_fade)) * 32767))
-    with wave.open(str(path), "wb") as wav:
-        wav.setnchannels(1)
-        wav.setsampwidth(2)
-        wav.setframerate(SAMPLE_RATE)
-        wav.writeframes(samples.tobytes())
+def get_authorized_music(source_url, destination):
+    """Only download CC0 catalog URLs assigned by the private publication queue."""
+    parsed = urllib.parse.urlsplit(source_url or "")
+    if (parsed.scheme != "https" or parsed.netloc != "en.freepd.cn"
+            or not re.fullmatch(r"/api/music/[a-fA-F0-9]+", parsed.path)
+            or parsed.query or parsed.fragment):
+        raise ValueError("Music URL is not on the authorized CC0 source allowlist")
+    request = urllib.request.Request(
+        source_url, headers={"User-Agent": "CAMSportsMedia/1.0", "Accept": "audio/mpeg"}
+    )
+    with HTTP.open(request, timeout=35) as response:
+        mime = response.headers.get("Content-Type", "").lower().split(";")[0].strip()
+        if mime not in ("audio/mpeg", "audio/mp3", "application/octet-stream"):
+            raise ValueError("Music source returned non-audio content")
+        data = response.read(18 * 1024 * 1024 + 1)
+    if not 4096 < len(data) <= 18 * 1024 * 1024:
+        raise ValueError("Music download is empty or exceeds the 18 MB limit")
+    destination.write_bytes(data)
 
 
-def make_video(image, title, output, style="news", kicker=None):
+def audio_duration(path):
+    info = json.loads(subprocess.check_output([
+        "ffprobe", "-v", "error", "-show_entries",
+        "format=duration:stream=codec_type", "-of", "json", str(path)
+    ], timeout=25))
+    if not any(t.get("codec_type") == "audio" for t in info.get("streams", [])):
+        raise ValueError("Licensed track has no audio stream")
+    duration = float(info.get("format", {}).get("duration") or 0)
+    if not math.isfinite(duration) or duration < DURATION + .2:
+        raise ValueError("Licensed track is too short for the video")
+    return duration
+
+
+def make_video(image, title, output, style="news", kicker=None,
+               audio_url=None, track_slug=None, selection_key="", fixture_audio=None):
+    """Music is mandatory: never fall back to the former synthesized jingle."""
+    if not fixture_audio and (not audio_url or not track_slug or not selection_key):
+        raise ValueError("Missing authorized music assignment; MP4 not published")
     output.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory() as tmp:
         still = Path(tmp) / "frame.png"
-        audio = Path(tmp) / "original-music.wav"
+        audio = Path(tmp) / "licensed-track.mp3"
         frame = (brand_cover(image, title, kicker) if style == "brand"
                  else promo_cover(image, title, kicker) if style == "promo"
                  else cover(image, title))
         frame.save(still)
-        compose_original_music(audio)
+        if fixture_audio:
+            audio = Path(fixture_audio)
+        else:
+            get_authorized_music(audio_url, audio)
+        duration = audio_duration(audio)
+        # Deterministic excerpt for safe retries, with variation across events.
+        fraction = int.from_bytes(hashlib.sha256(
+            (selection_key + ":" + (track_slug or "test")).encode("utf-8")
+        ).digest()[:8], "big") / 2 ** 64
+        offset = (duration - DURATION - .1) * fraction
+        # Gentle lead-in/out and normalized background loudness.
         subprocess.run([
             "ffmpeg", "-nostdin", "-hide_banner", "-loglevel", "error", "-y",
             "-loop", "1", "-framerate", str(FPS), "-i", str(still),
-            "-i", str(audio), "-t", str(DURATION), "-r", str(FPS),
+            "-ss", f"{offset:.3f}", "-i", str(audio),
+            "-t", str(DURATION), "-r", str(FPS),
+            "-map", "0:v:0", "-map", "1:a:0",
             "-c:v", "libx264", "-preset", "veryfast", "-crf", "26",
-            "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "112k",
-            "-movflags", "+faststart", "-shortest", str(output)
+            "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "128k",
+            "-af", "loudnorm=I=-20:TP=-3:LRA=9,afade=t=in:st=0:d=0.25,afade=t=out:st=7.1:d=0.9",
+            "-ar", "44100", "-movflags", "+faststart", "-shortest", str(output)
         ], check=True, timeout=120)
         tracks = subprocess.check_output([
-            "ffprobe", "-v", "error", "-show_entries", "stream=codec_type,avg_frame_rate",
+            "ffprobe", "-v", "error", "-show_entries", "stream=codec_type,codec_name,avg_frame_rate",
             "-of", "json", str(output)
         ], timeout=20)
-        kinds = {track.get("codec_type") for track in json.loads(tracks)["streams"]}
-        rates = [track.get("avg_frame_rate", "0/1") for track in json.loads(tracks)["streams"]
+        streams = json.loads(tracks)["streams"]
+        kinds = {track.get("codec_type") for track in streams}
+        rates = [track.get("avg_frame_rate", "0/1") for track in streams
                  if track.get("codec_type") == "video"]
         num, _, den = (rates[0] if rates else "0/1").partition("/")
         if float(num or 0) / float(den or 1) < 23:
             output.unlink(missing_ok=True)
             raise ValueError("MP4 frame rate is below Instagram's 23 fps minimum")
-        if kinds != {"video", "audio"} or output.stat().st_size < 30000:
+        if (kinds != {"video", "audio"} or
+                not any(t.get("codec_type") == "audio" and t.get("codec_name") == "aac" for t in streams)
+                or output.stat().st_size < 30000):
             output.unlink(missing_ok=True)
-            raise ValueError("MP4 lacks audio/video streams")
+            raise ValueError("MP4 lacks valid H.264/AAC streams")
 
 
 def main():
@@ -269,10 +292,22 @@ def main():
         return
     if args.smoke_test:
         with tempfile.TemporaryDirectory() as tmp:
+            # Local test fixture, NEVER used for a real publication.
+            fixture = Path(tmp) / "fixture.mp3"
+            subprocess.run(["ffmpeg", "-nostdin", "-hide_banner", "-loglevel", "error", "-y",
+                            "-f", "lavfi", "-i", "sine=frequency=440:duration=12",
+                            "-c:a", "libmp3lame", str(fixture)], check=True, timeout=30)
             image = Image.new("RGB", (1100, 650), "#285781")
-            make_video(image, "Prueba de CAM Sports con música original", Path(tmp) / "check.mp4")
-            make_video(image, "¿Ya pusiste tu Pick de hoy?", Path(tmp) / "promo.mp4", "promo", "Cocina Picks")
-        print("Smoke test: MP4 contains H.264 video and AAC audio.")
+            make_video(image, "Prueba de CAM Sports con música autorizada",
+                       Path(tmp) / "check.mp4", fixture_audio=fixture)
+            make_video(image, "¿Ya pusiste tu Pick de hoy?", Path(tmp) / "promo.mp4",
+                       "promo", "Cocina Picks", fixture_audio=fixture)
+            try:
+                make_video(image, "Sin licencia", Path(tmp) / "blocked.mp4")
+                raise AssertionError("Unlicensed output was incorrectly allowed")
+            except ValueError:
+                pass
+        print("Smoke test: music required, MP4 contains H.264 video and AAC audio.")
         return
 
     jobs = pending_jobs()
@@ -281,13 +316,19 @@ def main():
         key = job.get("event_key")
         if not isinstance(key, str) or not key or len(key) > 400:
             continue
-        output = OUTPUT / (hashlib.md5(key.encode("utf-8")).hexdigest() + ".mp4")
+        network = job.get("network")
+        if network not in ("instagram", "tiktok"):
+            raise ValueError("Unsupported music delivery network")
+        identity = key + ":" + network
+        output = OUTPUT / (hashlib.md5(identity.encode("utf-8")).hexdigest() + ".mp4")
         if output.exists() and output.stat().st_size > 30000:
             continue
         style = ("brand" if "/assets/social-brand/" in (job.get("image_url") or "")
                  else "promo" if job.get("style") == "promo" else "news")
-        make_video(read_image(job.get("image_url")), job.get("title"), output, style, job.get("kicker"))
-        print("Generated:", output.relative_to(ROOT))
+        make_video(read_image(job.get("image_url")), job.get("title"), output, style,
+                   job.get("kicker"), job.get("music_url"), job.get("track_slug"),
+                   selection_key=identity)
+        print("Generated:", network, job.get("track_slug"), output.relative_to(ROOT))
 
 
 if __name__ == "__main__":
