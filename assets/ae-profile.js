@@ -265,6 +265,7 @@ async function updateButton(){
 }
 
 function close(){
+  window.camNflProfile?.close();
   if(recentScrollObserver){recentScrollObserver.disconnect();recentScrollObserver=null;}
   ++request;
   activeAuthor=null;
@@ -693,49 +694,46 @@ function renderPublishAction(){
     });
     $('aeProfileDialog').append(action);
   }
-  action.hidden=!privateView;
+  action.hidden=!privateView||activeTab==='quiniela';
   action.textContent=activeTab==='picks'?'Publicar mi Pick':'Publicar mi Take';
   action.setAttribute('aria-controls',activeTab==='picks'?'cpComposePanel':'aeTakeComposerDialog');
 }
 
 function setPrivateTab(tab){
   if(!activeAuthor)return;
-  activeTab=tab==='picks'?'picks':'takes';
-  const takesButton=$('aeProfileTabTakes');
-  const picksButton=$('aeProfileTabPicks');
-  takesButton?.setAttribute('aria-selected',String(activeTab==='takes'));
-  picksButton?.setAttribute('aria-selected',String(activeTab==='picks'));
-  takesButton?.classList.toggle('is-active',activeTab==='takes');
-  picksButton?.classList.toggle('is-active',activeTab==='picks');
+  activeTab=['takes','picks','quiniela'].includes(tab)?tab:'takes';
+  for(const [id,value] of [['aeProfileTabTakes','takes'],['aeProfileTabPicks','picks'],['aeProfileTabQuiniela','quiniela']]){
+    const button=$(id);
+    button?.setAttribute('aria-selected',String(activeTab===value));
+    button?.classList.toggle('is-active',activeTab===value);
+  }
 
   renderPublishAction();
-  const takeHighlights=$('aeProfileTakeHighlights');
-  const takeList=$('aeProfileTakes');
-  const pickHighlights=$('aeProfilePickHighlights');
-  const pickList=$('aeProfilePicks');
-  const accuracy=$('aeProfileAccuracy');
-  const takeAccuracy=$('aeProfileTakeAccuracy');
+  const isTakes=activeTab==='takes',isPicks=activeTab==='picks';
+  $('aeProfileTakeHighlights').hidden=!isTakes;
+  $('aeProfileTakes').hidden=!isTakes;
+  $('aeProfileTakeAccuracy').hidden=!isTakes;
+  $('aeProfilePickHighlights').hidden=!isPicks;
+  $('aeProfilePicks').hidden=!isPicks;
+  $('aeProfileAccuracy').hidden=!isPicks;
   const prestige=$('aeProfilePrestige');
+  if(prestige)prestige.hidden=!isTakes||!prestige.childElementCount;
+  const quiniela=$('camNflProfile');
+  if(quiniela)quiniela.hidden=activeTab!=='quiniela';
 
-  if(activeTab==='takes'){
-    takeHighlights.hidden=false;
-    takeList.hidden=false;
-    pickHighlights.hidden=true;
-    pickList.hidden=true;
-    accuracy.hidden=true;
-    takeAccuracy.hidden=false;
-    if(prestige)prestige.hidden=!prestige.childElementCount;
+  if(isTakes){
     $('aeProfileTitle').textContent=privateView?'Mis Takes':publicAuthorLabel+' · Takes';
     renderTakes(ownTakes,activeAuthor,!privateView);
-  }else{
-    takeHighlights.hidden=true;
-    takeList.hidden=true;
-    pickHighlights.hidden=false;
-    pickList.hidden=false;
-    takeAccuracy.hidden=true;
-    if(prestige)prestige.hidden=true;
+  }else if(isPicks){
     $('aeProfileTitle').textContent=privateView?'Mis Picks':publicAuthorLabel+' · Picks';
     renderPicks(ownPicks,!privateView);
+  }else{
+    $('aeProfileTitle').textContent=privateView?'Mi Quiniela':'Quiniela de '+publicAuthorLabel;
+    $('aeProfileCount').textContent='La Quiniela NFL';
+    $('aeProfileOverviewText').textContent=privateView
+      ?'Tus pronósticos, estadísticas e historial de jornadas NFL.'
+      :'Resultados confirmados de este aficionado. Sus pronósticos futuros son privados.';
+    window.camNflProfile?.open(activeAuthor,privateView);
   }
 }
 
@@ -772,7 +770,7 @@ async function showOwn(){
   if($('aeProfileWelcomeAgain'))$('aeProfileWelcomeAgain').hidden=false;
   publicAuthorLabel='Aficionado';
   activeAuthor=user.id;
-  window.dispatchEvent(new CustomEvent('cam:nfl-profile',{detail:{userId:user.id}}));
+
   activeTab='takes';
   const ticket=++request;
   const dialog=$('aeProfileDialog');
@@ -818,14 +816,14 @@ async function showOwn(){
 async function showPublic(id,push=true,tab='takes'){
   if(!UUID.test(id))return;
   const user=await me();
-  if(user?.id===id){await showOwn();if(tab==='picks')setPrivateTab('picks');return;}
+  if(user?.id===id){await showOwn();if(tab==='picks'||tab==='quiniela')setPrivateTab(tab);return;}
 
   privateView=false;
   if($('aeProfilePublish'))$('aeProfilePublish').hidden=true;
   if($('aeProfileWelcomeAgain'))$('aeProfileWelcomeAgain').hidden=true;
   activeAuthor=id;
-  window.dispatchEvent(new CustomEvent('cam:nfl-profile',{detail:{userId:id}}));
-  activeTab=tab==='picks'?'picks':'takes';
+
+  activeTab=['takes','picks','quiniela'].includes(tab)?tab:'takes';
   ownTakes=[];
   ownPicks=[];
   publicAuthorLabel='Aficionado';
@@ -833,7 +831,7 @@ async function showPublic(id,push=true,tab='takes'){
   const dialog=$('aeProfileDialog');
   if(!dialog.open)dialog.showModal();
 
-  // Public profiles include two readable tabs. No private account data.
+  // Public profiles keep three tabs; NFL selections remain hidden before settlement.
   $('aeProfileTabs').hidden=false;
   $('aeProfileTakeHighlights').hidden=true;
   $('aeProfileTakes').hidden=true;
@@ -889,6 +887,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 
   $('aeProfileTabTakes')?.addEventListener('click',()=>setPrivateTab('takes'));
   $('aeProfileTabPicks')?.addEventListener('click',()=>setPrivateTab('picks'));
+  $('aeProfileTabQuiniela')?.addEventListener('click',()=>setPrivateTab('quiniela'));
 
   $('aeProfileDialog')?.addEventListener('click',e=>{if(e.target===$('aeProfileDialog'))close();});
   $('aeProfileDialog')?.addEventListener('close',()=>{++request;});
