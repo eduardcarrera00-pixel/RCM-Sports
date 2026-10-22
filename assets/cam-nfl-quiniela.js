@@ -393,7 +393,7 @@
     target.replaceChildren();
     target.append(el('h3','Administración · Quiniela NFL'));
     const controls=el('div',null,'cam-nfl-admin-controls');
-    const sea=el('input'),wk=el('input');sea.type=wk.type='number';sea.value=String(season);sea.min='2020';wk.value=String(week);wk.min='1';wk.max='18';
+    const sea=el('input'),wk=el('input');sea.type=wk.type='number';sea.value=String(season);sea.min='2020';wk.value=String(week);wk.min='1';wk.max='22';
     const sync=button('Sincronizar NFL',async()=>{
       sync.disabled=true;st('camNflStatus','Consultando resultados oficiales y cuotas…');
       try{
