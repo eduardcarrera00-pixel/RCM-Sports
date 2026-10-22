@@ -89,10 +89,35 @@
     const card = el('article', null, 'ae-season-card');
     const existing = mine.find(m => m.question_id === q.id);
     const open = isOpen(q);
-    const meta = el('p', null, 'ae-season-meta');
-    meta.append(el('span', (q.period === 'weekly' ? 'Partido' : 'Temporada') + ' · ' + rangeText(q)),
+    // La guía sustituye «Temporada» y explica las reglas sin saturar la tarjeta.
+    const meta = el('div', null, 'ae-season-meta');
+    const guide = el('div', null, 'ae-season-guide');
+    guide.id = 'aeSeasonGuide-' + q.id;
+    guide.hidden = true;
+    const help = [
+      ['Cierre:', 'Elige antes del ' + closeText(q.closes_at) + '. Una vez guardada, la elección es definitiva.'],
+      ['Puntos:', 'Cada escudo muestra lo que ganas al acertar. Si fallas, 0 puntos. Se suman a Takes tras confirmar el resultado.'],
+      ['Comentarios:', 'Debate en los comentarios de los Takes; no afectan tus puntos ni cambian tu elección.']
+    ];
+    for (const [label, description] of help) {
+      const p = el('p');
+      p.append(el('strong', label), document.createTextNode(' ' + description));
+      guide.append(p);
+    }
+    const guideButton = el('button', '¿Cómo funciona?', 'ae-season-guide-toggle');
+    guideButton.type = 'button';
+    guideButton.setAttribute('aria-controls', guide.id);
+    guideButton.setAttribute('aria-expanded', 'false');
+    guideButton.setAttribute('aria-label', 'Mostrar cierre, puntos y comentarios');
+    guideButton.addEventListener('click', () => {
+      const expanded = guideButton.getAttribute('aria-expanded') !== 'true';
+      guideButton.setAttribute('aria-expanded', String(expanded));
+      guideButton.setAttribute('aria-label', expanded ? 'Ocultar cierre, puntos y comentarios' : 'Mostrar cierre, puntos y comentarios');
+      guide.hidden = !expanded;
+    });
+    meta.append(guideButton,
       el('span', q.status === 'settled' ? 'Resultado confirmado' : open ? 'Cierra el ' + closeText(q.closes_at) : 'Cerrada · pendiente de resultado'));
-    card.append(meta, el('h3', q.prompt));
+    card.append(meta, guide, el('h3', q.prompt));
 
     if (existing) {
       // La elección se conserva en Supabase: una vez hecha, los demás escudos
