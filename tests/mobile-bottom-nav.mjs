@@ -20,6 +20,7 @@ assert.match(css, /display: flex !important/);
 assert.match(css, /bottom: 0 !important/);
 assert.match(css, /width: 100% !important/);
 assert.match(css, /border-radius: 50% !important/);
+assert.match(css, /@layer ae-editorial-square-corners/);
 assert.match(css, /content: none !important/);
 assert.match(css, /color: #d9ab70 !important/);
 assert.match(css, /color: #886237 !important/);
