@@ -112,6 +112,8 @@
         const club = clubs.get(String(id));
         item.append(element('strong', String(index + 1)));
         if (club) {
+            // Datos para la vista previa «por qué está aquí» (assets/ae-ranking-notes.js).
+            Object.assign(item.dataset, {rankSport: 'ucl', teamId: String(id), teamName: club.name, rank: String(index + 1), edition: latest?.edition || ''});
             const emblem = element('span',null,'ae-team-emblem');
             emblem.append(element('span',club.name.split(/\s+/).map(s=>s[0]).slice(0,2).join('').toUpperCase(),'ae-logo-initials'));
             if (/^https:\/\//i.test(club.logo)) {
@@ -169,6 +171,7 @@
                 track.append(group);
             }
         }
+        window.aeRankingNotes?.decorate();
     }
     function showError(message) {
         // The feature may not yet have been migrated: offer an accurate empty state.

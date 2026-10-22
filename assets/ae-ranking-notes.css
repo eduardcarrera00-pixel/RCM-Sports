@@ -1,0 +1,38 @@
+/* CAM SPORTS · Vista previa «por qué está aquí» en los Power Rankings (NFL y Champions).
+   Tarjeta editorial sobria: logo y nombre arriba, la publicación debajo. Día y noche. */
+.ae-rank-note{
+  --rn-surface:#FFFCF8;--rn-text:#273B49;--rn-muted:#566876;--rn-line:#D9D9D0;--rn-accent:#855B43;
+  position:fixed;z-index:2147483000;box-sizing:border-box;max-width:calc(100vw - 24px);
+  background:var(--rn-surface);color:var(--rn-text);border:1px solid var(--rn-line);border-top:3px solid var(--rn-accent);
+  box-shadow:0 18px 40px rgba(8,23,36,.22),0 2px 6px rgba(8,23,36,.10);
+  padding:16px 18px 14px;opacity:0;transform:translateY(4px);transition:opacity .16s ease,transform .16s ease;
+  font-family:Inter,system-ui,sans-serif;text-align:left;
+}
+html.dark .ae-rank-note{--rn-surface:#102B3E;--rn-text:#F4E8DB;--rn-muted:#C5CDD2;--rn-line:#49606C;--rn-accent:#BD8D6B;box-shadow:0 18px 44px rgba(0,0,0,.5)}
+.ae-rank-note[data-side="above"]{transform:translateY(-4px)}
+.ae-rank-note.is-open{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.ae-rank-note{transition:none;transform:none}}
+.ae-rank-note-head{display:flex;align-items:center;gap:12px;padding-bottom:12px;border-bottom:1px solid var(--rn-line)}
+.ae-rank-note-logo{position:relative;flex:0 0 48px;width:48px;height:48px;display:grid;place-items:center;
+  background:#fff;border:1px solid var(--rn-line);overflow:hidden}
+html.dark .ae-rank-note-logo{background:#F4E8DB}
+.ae-rank-note-logo img{position:absolute;inset:5px;width:calc(100% - 10px);height:calc(100% - 10px);object-fit:contain}
+.ae-rank-note-initials{font:700 13px/1 Inter,system-ui,sans-serif;color:#273B49;letter-spacing:.02em}
+.ae-rank-note-logo.is-loaded .ae-rank-note-initials{visibility:hidden}
+.ae-rank-note-titles{display:flex;flex-direction:column;gap:4px;min-width:0}
+.ae-rank-note-name{font:700 21px/1.15 Newsreader,Georgia,serif;color:var(--rn-text);overflow-wrap:anywhere}
+.ae-rank-note-meta{font:600 11.5px/1.4 Inter,system-ui,sans-serif;letter-spacing:.04em;text-transform:uppercase;color:var(--rn-muted)}
+.ae-rank-note-meta .ae-rank-note-trend{display:inline-block;margin-left:4px;padding:1px 6px;font-size:11px;letter-spacing:0;text-transform:none;border:0}
+.ae-rank-note-body{max-height:min(46vh,260px);overflow:auto;padding:12px 2px 2px 0;overscroll-behavior:contain}
+.ae-rank-note-body p{margin:0 0 10px;font-size:14.5px;line-height:1.6;color:var(--rn-text)}
+.ae-rank-note-body p:last-child{margin-bottom:0}
+.ae-rank-note-body p.ae-rank-note-empty{color:var(--rn-muted);font-style:italic}
+.ae-rank-note-read{display:inline-flex;align-items:center;min-height:40px;margin-top:8px;padding:0;background:none;border:0;cursor:pointer;
+  font:700 13px/1.2 Inter,system-ui,sans-serif;color:var(--rn-accent);text-decoration:underline;text-underline-offset:3px}
+.ae-rank-note-read:focus-visible{outline:2px solid var(--rn-accent);outline-offset:3px}
+/* Equipo con la tarjeta abierta y movimiento detenido mientras se lee. */
+#nflRankings li.ae-rank-note-anchor,#championsRankings li.ae-rank-note-anchor{outline:2px solid #BD8D6B;outline-offset:-2px}
+#nflRankings li[data-rank-sport],#championsRankings li[data-rank-sport]{cursor:pointer}
+#nflRankings li[data-rank-sport][tabindex]:focus-visible,#championsRankings li[data-rank-sport][tabindex]:focus-visible{outline:2px solid #BD8D6B;outline-offset:2px}
+.rcm-track.ae-note-hold{animation-play-state:paused!important}
+.ae-rank-note-sr{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}

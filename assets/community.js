@@ -350,6 +350,8 @@ function teamNode(id, position, priorTeamIds = null) {
     const item = node('li', null, 'rcm-team');
     item.append(node('strong', String(position)));
     if (team) {
+        // Datos para la vista previa «por qué está aquí» (assets/ae-ranking-notes.js).
+        Object.assign(item.dataset, {rankSport: 'nfl', teamId: team.id, teamName: team.name, rank: String(position), edition: rankingPublished?.edition || ''});
         const emblem = node('span', null, 'ae-team-emblem');
         emblem.append(node('span', team.id, 'ae-logo-initials'));
         const image = node('img'); image.src = team.logo; image.alt = team.name;
@@ -437,6 +439,7 @@ function renderRanking() {
         rankingPublished.team_ids.forEach((id,i) => group.append(teamNode(id,i+1,rankingPreviousTeamIds))); track.append(group);
     }
     applyRankingMotion();
+    window.aeRankingNotes?.decorate();
 }
 function applyRankingMotion() {
     document.getElementById('rankingTrack').classList.toggle('paused', rankingPaused);
