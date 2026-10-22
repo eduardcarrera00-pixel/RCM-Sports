@@ -26,7 +26,8 @@
   const CACHE = 'cam_site_images_v1';
   const BUCKET = 'article-images';
   const IMAGE_TYPES = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
-  const MAX_IMAGE = 5 * 1024 * 1024; // límite del bucket
+  const MAX_IMAGE = 5 * 1024 * 1024; // límite del bucket (se comprueba tras optimizar)
+  const MAX_ORIGINAL = 25 * 1024 * 1024; // fotos de móvil: se optimizan al subirlas
   const NIGHT = 'Noche', DAY = 'Día';
 
   // ---------------------------------------------------------------------------
@@ -52,9 +53,19 @@
   img('cabecera.avisos', 'Icono de avisos', 'Cabecera', 'assets/icons/ae-avisos-six-gold.webp');
   img('cabecera.perfil', 'Icono de perfil', 'Cabecera', 'assets/ui/ae-profile-mark.png');
   img('cabecera.cerrar-sesion', 'Icono de cerrar sesión', 'Cabecera', 'assets/ui/ae-logout-mark.png');
-  // Bienvenida y acceso
-  pair('bienvenida.fondo', 'Fondo de la bienvenida', 'Bienvenida', 'assets/cam-welcome-noche.webp', 'assets/cam-welcome-dia.webp');
-  pair('acceso.portico', 'Pórtico del acceso (iniciar sesión / registrarse)', 'Acceso', 'assets/cam-auth-architecture-night.svg', 'assets/cam-auth-architecture-day.svg');
+  pair('cabecera.fondo', 'Fondo de la cabecera (terraza)', 'Cabecera',
+    ['assets/cam-header-terrace-night.jpg', 'assets/cam-header-terrace-night-mobile.jpg'],
+    ['assets/cam-header-terrace-day.jpg', 'assets/cam-header-terrace-day-mobile.jpg']);
+  pair('pie.fondo', 'Fondo del pie de página (pueblo)', 'Pie de página',
+    ['assets/cam-footer-village-night.jpg', 'assets/cam-footer-village-night-mobile.jpg'],
+    ['assets/cam-footer-village-day.jpg', 'assets/cam-footer-village-day-mobile.jpg']);
+  // Bienvenida y acceso (cada imagen en sus tamaños: un reemplazo cambia todos)
+  pair('bienvenida.fondo', 'Fondo de la bienvenida', 'Bienvenida',
+    ['assets/cam-welcome-noche-oleo-960.webp', 'assets/cam-welcome-noche-oleo-1600.webp', 'assets/cam-welcome-noche.webp'],
+    ['assets/cam-welcome-dia-oleo-960.webp', 'assets/cam-welcome-dia-oleo-1600.webp', 'assets/cam-welcome-dia.webp']);
+  pair('acceso.fondo', 'Fondo del acceso (iniciar sesión / registrarse)', 'Acceso',
+    ['assets/cam-login-background-night.webp', 'assets/cam-login-background-night-HD.webp'],
+    ['assets/cam-login-background-day.webp', 'assets/cam-login-background-day-HD.webp']);
   // Navegación
   img('nav.picks', 'Icono de Picks', 'Navegación', 'assets/icons/ae-picks-gold.webp');
   img('nav.nfl', 'Icono de NFL', 'Navegación', 'assets/icons/ae-nfl-gold.webp');
@@ -79,6 +90,8 @@
   atlas('portada.lectores-atlas', 'Mosaico de la cabecera de lectores', 'Portada', 'assets/ae-readers-community-atlas.webp', [1, 2],
     'Dos escenas apiladas; la página muestra la de arriba.');
   f('takes.banner-comunidad', 'Banner de la comunidad de Takes', 'Takes', 'assets/ae-takes-community-banner.webp');
+  pair('portada.take-escena', 'Escena del botón «Publicar Take» de la portada', 'Portada', 'assets/cam-take-scene-dark.webp', 'assets/cam-take-scene-light.webp');
+  pair('portada.take-tinta', 'Tintero del botón «Publicar Take» de la portada', 'Portada', 'assets/cam-take-ink-dark.webp', 'assets/cam-take-ink-light.webp');
   f('takes.pluma', 'Pluma del título de Takes', 'Takes', 'assets/ae-feather.svg');
   // Fútbol
   pair('futbol.takes-cabecera', 'Cabecera de Takes de Fútbol (también en el perfil)', 'Fútbol', 'assets/takes/ae-football-takes-hero-night.webp', 'assets/takes/ae-football-takes-hero-day.webp');
@@ -647,7 +660,7 @@
           <div class="cam-site-image-preview" data-ui="preview" role="img" aria-label="Vista previa"><span class="cam-site-image-badge" data-ui="badge"></span></div>
           <p class="cam-site-image-meta" data-ui="meta"></p>
           <div class="ae-opinion-field-row">
-            <label class="ae-opinion-field"><span>Subir archivo <em>(JPG, PNG o WebP, hasta 5 MB)</em></span><input data-ui="file" type="file" accept="image/jpeg,image/png,image/webp"></label>
+            <label class="ae-opinion-field"><span>Subir archivo <em>(JPG, PNG o WebP; se optimiza al subirla)</em></span><input data-ui="file" type="file" accept="image/jpeg,image/png,image/webp"></label>
             <label class="ae-opinion-field"><span>o pegar enlace</span><input data-ui="url" type="url" inputmode="url" placeholder="https://…" maxlength="2048" autocomplete="off"></label>
           </div>
           <div class="cam-site-image-focus" data-ui="focusBox">
@@ -685,7 +698,7 @@
       dropLocal(); ui.error.textContent = '';
       const file = ui.file.files?.[0];
       if (file) {
-        if (!IMAGE_TYPES[file.type] || file.size > MAX_IMAGE) { ui.error.textContent = 'La imagen debe ser JPG, PNG o WebP de hasta 5 MB.'; ui.file.value = ''; }
+        if (!IMAGE_TYPES[file.type] || file.size > MAX_ORIGINAL) { ui.error.textContent = 'La imagen debe ser JPG, PNG o WebP de hasta 25 MB.'; ui.file.value = ''; }
         else { ui.localUrl = URL.createObjectURL(file); ui.url.value = ''; }
       }
       updatePreview();
@@ -802,6 +815,10 @@
   async function uploadImage(file, key) {
     const sb = client();
     if (!sb?.storage) throw Error('La subida de imágenes no está disponible. Pega un enlace HTTPS.');
+    // Igual que noticias y opiniones (cam-image-compress.js), pero con lado mayor de hasta
+    // 2400 px: los fondos de cabecera y banners se ven a todo lo ancho en escritorio.
+    if (window.camCompressImage) file = await window.camCompressImage(file, { maxSide: 2400 });
+    if (!IMAGE_TYPES[file.type] || file.size > MAX_IMAGE) throw Error('La imagen sigue pesando más de 5 MB después de optimizarla. Prueba con una más pequeña.');
     const name = 'site/' + key + '-' + Date.now() + '.' + IMAGE_TYPES[file.type];
     const r = await sb.storage.from(BUCKET).upload(name, file, { contentType: file.type, cacheControl: '31536000', upsert: false });
     if (r.error) throw Error('No se pudo guardar la imagen: ' + r.error.message);

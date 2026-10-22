@@ -196,7 +196,7 @@ def run():
         page.evaluate("document.getElementById('userAuthModal').classList.remove('hidden')")
         page.wait_for_timeout(900)
         keys = {p['key'] for p in visible_pencils(page)}
-        assert 'acceso.portico-dia' in keys, sorted(keys)
+        assert 'acceso.fondo-dia' in keys, sorted(keys)
         assert not page.errors, page.errors
 
     # 4) Un fallo de la base (migración sin aplicar) se explica en el diálogo.
