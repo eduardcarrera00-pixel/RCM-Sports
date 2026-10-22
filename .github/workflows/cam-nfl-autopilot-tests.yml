@@ -24,4 +24,4 @@ jobs:
       - name: Validate frontend JavaScript
         run: node --check assets/cam-nfl-quiniela.js
       - name: Validate SportsDataIO worker TypeScript
-        run: deno check supabase/functions/cam-nfl-auto/index.ts
+        run: deno check --node-modules-dir=auto supabase/functions/cam-nfl-auto/index.ts
