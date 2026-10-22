@@ -2655,8 +2655,10 @@ html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > .ae-takes-hea
 </style>
 <link rel="stylesheet" href="assets/cam-home-power-rankings-75.css?v=20261021-home-rankings-75-1">
 <link rel="stylesheet" href="assets/cam-football-last-takes-feed.css?v=20261021-football-compact-1">
-<script src="assets/ae-site-images.js?v=20261021-site-images-2"></script>
+<script src="assets/cam-global-edit.js?v=20261022-edit-mode-1"></script>
+<script src="assets/ae-site-images.js?v=20261022-edit-mode-1"></script>
 <link rel="stylesheet" href="assets/cam-pick-editor-night.css?v=20261021-editor-night-1">
+<link rel="stylesheet" href="assets/cam-global-edit.css?v=20261022-edit-mode-1">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 <a class="ae-skip-link" href="#mainContent">Ir al contenido</a>
@@ -2715,12 +2717,12 @@ html body:is(.ae-is-nfl,.ae-is-football) #mainContent #freeTakes > .ae-takes-hea
                         </button>
                     </div>
 
-                    <details id="aeCategoryAdmin" hidden class="ae-category-admin"><summary title="Gestionar deportes" aria-label="Gestionar deportes"><span class="ae-admin-manage-icon" aria-hidden="true"><i class="fa-solid fa-sliders"></i></span><span class="ae-admin-manage-label">Deportes</span></summary>
-                      <div class="ae-category-admin-menu">
-                        <div id="aeCategoryToggles" role="group" aria-label="Visibilidad de categorías"></div>
-                        <p id="aeCategoryStatus" role="status" aria-live="polite"></p>
-                      </div>
-                    </details>
+                    <button id="camGlobalEditToggle" type="button" class="cam-global-edit-toggle" hidden
+                      aria-pressed="false" aria-label="Activar modo edición" title="Activar modo edición">
+                      <span class="cam-global-edit-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false">
+                        <path d="M12 20h9"/><path d="m16.5 3.5 4 4L8.5 19.5l-5 1 1-5z"/>
+                      </svg></span><span class="cam-global-edit-label" aria-hidden="true">Editar</span>
+                    </button>
                     <!-- Logged-in State: Admin Profile & Actions -->
                     <div id="loggedAdminContainer" class="hidden flex items-center space-x-2 sm:space-x-3">
                         <!-- Publish Button -->
@@ -4173,6 +4175,7 @@ currentUser = {
 
         function renderAdminUI() {
             renderSessionHeader();
+            window.camGlobalEditMode?.sync();
             window.camSiteImages?.refresh();
             document.getElementById('legacyTools').classList.toggle('hidden', !currentAdmin || !readLegacyArticles().length);
             const modalDeleteButton = document.getElementById('modalDeleteArticleBtn');
