@@ -20,6 +20,9 @@ const {chromium}=require('playwright');
       const page=await browser.newPage({viewport:{width,height:850}});
       const html='<html class="'+(dark?'dark':'')+'"><head><meta name="viewport" content="width=device-width, initial-scale=1">'+theme+'</head><body class="ae-is-nfl">'+section+'<section id="camNflProfile" hidden></section></body></html>';
       await page.setContent(html);
+      // Reuse the real CAM SPORTS catalog, never fabricated logo URLs.
+      await page.addScriptTag({content:fs.readFileSync('assets/nfl-teams.js','utf8')});
+      await page.addScriptTag({content:fs.readFileSync('assets/cam-nfl-quiniela-logos.js','utf8')});
       await page.evaluate(()=>{
         const tomorrow=new Date(Date.now()+86400000).toISOString();
         const user={id:'11111111-1111-4111-8111-111111111111',user_metadata:{username:'TEST'}};
@@ -28,6 +31,10 @@ const {chromium}=require('playwright');
            picks_open:true,points_home:5,points_away:4,probability_home:.4,probability_away:.6},
           {id:'900000002',season:2026,week:7,home_id:'DAL',away_id:'SEA',kickoff:tomorrow,status:'scheduled',odds_locked_at:tomorrow,
            picks_open:true,points_home:4,points_away:4,probability_home:.5,probability_away:.5},
+          {id:'900000003',season:2026,week:6,home_id:'NE',away_id:'CHI',
+           kickoff:new Date(Date.now()-864000000).toISOString(),status:'final',
+           away_score:20,home_score:7,winner_id:'CHI',odds_locked_at:new Date(Date.now()-900000000).toISOString(),
+           picks_open:false,points_home:4,points_away:4,probability_home:.5,probability_away:.5}
         ];
         const teams=['BUF','KC','DAL','SEA'].map(id=>({id,name:'Equipo '+id,logo:'https://a.espncdn.com/i/teamlogos/nfl/500/'+id.toLowerCase()+'.png'}));
         const picks=[];
@@ -62,8 +69,15 @@ const {chromium}=require('playwright');
       await page.waitForSelector('.cam-nfl-game');
       assert.equal(await page.locator('.cam-nfl-game').count(),2);
       assert.equal(await page.locator('#camNflGames .cam-nfl-team').count(),4);
+      assert.equal(await page.locator('#camNflGames .cam-nfl-team img').count(),4);
+      assert.ok((await page.locator('#camNflGames .cam-nfl-team img').first().getAttribute('src')).includes('espncdn.com'));
+      await page.locator('#camNflHistory').evaluate(node=>node.open=true);
+      assert.ok(await page.locator('#camNflHistory .cam-quiniela-team-logo').count()>=2,
+        'Previous rounds must display both logos');
       await page.locator('.cam-nfl-game').first().locator('.cam-nfl-team').first().click();
       assert.match(await page.locator('#camNflProgress').innerText(),/1 de 2 seleccionados/);
+      assert.equal(await page.locator('#camNflSummary .cam-quiniela-team-logo').count(),2,
+        'The selection summary needs both logos');
       await page.locator('#camNflSave').click();
       await page.waitForFunction(()=>document.querySelector('#camNflStatus')?.textContent.includes('guardado'));
       assert.match(await page.locator('#camNflGames').innerText(),/Pronóstico guardado/);

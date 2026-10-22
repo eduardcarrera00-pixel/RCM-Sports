@@ -75,13 +75,21 @@ function statusOf(e: any, home: any, away: any) {
   if (type.state === "in" || name.includes("IN_PROGRESS") || name.includes("HALFTIME") || name.includes("END_PERIOD")) return "live";
   return "scheduled";
 }
-async function scoreboard(season?: number, week?: number) {
-  const qs = season && week ? "?season=" + season + "&seasontype=2&week=" + week : "?seasontype=2";
+// Postseason 1,2,3,5 map to CAM SPORTS 19,20,21,22; Pro Bowl excluded.
+const playoffWeeks: Record<number,number> = { 1:19, 2:20, 3:21, 5:22 };
+const espnPlayoffWeek: Record<number,number> = { 19:1, 20:2, 21:3, 22:5 };
+async function scoreboard(season?: number, week?: number, seasonType=2) {
+  const qs = season && week ? "?season="+season+"&seasontype="+seasonType+"&week="+week : "";
   return await readJSON("https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard" + qs);
 }
 async function syncWeek(season: number, week: number, catalog: Set<string>) {
-  const response = await scoreboard(season, week);
-  if (response.season?.year !== season || response.week?.number !== week) throw Error("ESPN no confirmó la temporada y semana pedidas");
+  const seasonType=week>=19?3:2;
+  const apiWeek=seasonType===3?espnPlayoffWeek[week]:week;
+  if(!apiWeek)throw Error("Semana NFL inválida");
+  const response=await scoreboard(season,apiWeek,seasonType);
+  if(Number(response.season?.year)!==season || Number(response.week?.number)!==apiWeek ||
+     Number(response.season?.type)!==seasonType)
+    throw Error("ESPN no confirmó la temporada, la fase ni la jornada");
   const events = Array.isArray(response.events) ? response.events : [];
   if (!events.length) return { season, week, games: 0, updated: 0 };
   const updates = [];
@@ -281,17 +289,38 @@ Deno.serve(async req => {
     let nflverseRows: NflRow[]|null=null;
     try { nflverseRows=await readNflverse(); } catch(error){console.warn("nflverse no disponible; intentando ESPN",String(error));}
     let weeks: {season:number,week:number}[];
-    if (Number.isInteger(year) && year>=2020 && year<=2100 && Number.isInteger(selected) && selected>=1 && selected<=18 && !identity.cron) {
+    let useNflverse=Boolean(nflverseRows);
+    if (Number.isInteger(year) && year>=2020 && year<=2100 && Number.isInteger(selected) && selected>=1 && selected<=22 && !identity.cron) {
       weeks=[{season:year,week:selected}];
+      if(selected>=19)useNflverse=false;
     } else {
-      const latest=nflverseRows?currentWeek(nflverseRows):await scoreboard();
-      const season=Number(nflverseRows?latest.season:latest.season?.year);
-      const week=Number(nflverseRows?latest.week:latest.week?.number);
-      if (!Number.isInteger(season) || !Number.isInteger(week) || week<1 || week>18) throw Error("No hay jornada regular de NFL vigente");
-      weeks = [week-1,week,week+1].filter(w=>w>=1&&w<=18).map(w=>({season,week:w}));
+      // ESPN identifies postseason; nflverse remains preferred for regular-season data.
+      const observed=await scoreboard().catch(()=>null);
+      const phase=Number(observed?.season?.type);
+      const currentSeason=Number(observed?.season?.year);
+      const apiWeek=Number(observed?.week?.number);
+      if (phase===3 && Number.isInteger(currentSeason)) {
+        useNflverse=false;
+        const current=playoffWeeks[apiWeek];
+        const sequence=[19,20,21,22];
+        if(!current)weeks=[]; // Pro Bowl and other exhibition games are excluded.
+        else {
+          const index=sequence.indexOf(current);
+          weeks=sequence.slice(Math.max(0,index-1),Math.min(4,index+2)).map(week=>({season:currentSeason,week}));
+        }
+      } else if(nflverseRows) {
+        const latest=currentWeek(nflverseRows);
+        weeks=[latest.week-1,latest.week,latest.week+1].filter(w=>w>=1&&w<=18)
+          .map(week=>({season:latest.season,week}));
+      } else if(phase===2 && Number.isInteger(apiWeek) && apiWeek>=1 && apiWeek<=18) {
+        weeks=[apiWeek-1,apiWeek,apiWeek+1].filter(w=>w>=1&&w<=18)
+          .map(week=>({season:currentSeason,week}));
+      } else {
+        weeks=[]; // Offseason or provider unavailable: preserve last good data.
+      }
     }
     const results=[];
-    for(const entry of weeks) results.push(nflverseRows
+    for(const entry of weeks) results.push(useNflverse && entry.week<=18 && nflverseRows
       ? await syncNflverseWeek(entry.season,entry.week,ids,nflverseRows)
       : await syncWeek(entry.season,entry.week,ids));
     const freeze=await freezeOdds();
