@@ -37,7 +37,9 @@ w.db={
    voteCalls++;
    const row=posts.find(p=>p.id===args.p_take_id);
    if(!row||row.author_id==='current-user')return {data:null,error:{message:'No puedes votarte'}};
-   row.upvotes++;row.my_vote=args.p_value;
+   if(row.my_vote===1)row.upvotes=Math.max(0,row.upvotes-1);
+   if(args.p_value===1)row.upvotes++;else row.downvotes++;
+   row.my_vote=args.p_value;
    return {data:null,error:null};
   }
   return {data:[],error:null};
@@ -70,7 +72,8 @@ assert.equal(w.__openedProfile,'other-1');
 voteButtons(other)[1].click();
 await tick();
 assert.equal(voteCalls,1,'Vote follows existing authenticated RPC exactly once');
-assert.equal(d.querySelector('[data-take-id="take-1"] .cam-football-vote-count').textContent,'4','Counters refresh after voting');
+assert.equal(d.querySelectorAll('[data-take-id="take-1"] .cam-football-vote-count')[0].textContent,'3','Changing votes removes the prior upvote');
+assert.equal(d.querySelectorAll('[data-take-id="take-1"] .cam-football-vote-count')[1].textContent,'2','Changing votes increases downvotes');
 assert.equal(d.getElementById('freeTakesMore').hidden,false,'Older Takes can be discovered');
 d.getElementById('freeTakesMore').click();
 await tick();
