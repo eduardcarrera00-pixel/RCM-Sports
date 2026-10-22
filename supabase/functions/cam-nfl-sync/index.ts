@@ -175,6 +175,9 @@ Deno.serve(async req => {
   try {
     const identity = await authenticate(req);
     const input = await req.json().catch(()=>({}));
+    const autoControl = await db.from("cam_nfl_automation_control")
+      .select("enabled").eq("singleton",true).maybeSingle();
+    if (autoControl.data?.enabled) throw Error("La automatización oficial SportsDataIO está activa; no mezclar calendario ESPN");
     const year = Number(input.season), selected = Number(input.week);
     if (!identity.cron && input.action !== "sync") throw Error("Acción inválida");
     if (identity.cron && (input.action && input.action !== "sync")) throw Error("Acción inválida");
