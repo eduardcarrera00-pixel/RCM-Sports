@@ -224,7 +224,7 @@ revoke all on function public.cam_nfl_leaderboard(text,integer,integer,text) fro
 grant execute on function public.cam_nfl_leaderboard(text,integer,integer,text) to anon,authenticated;
 
 create or replace function public.cam_nfl_profile_summary(p_user_id uuid,p_season integer)
-returns table(points bigint,hits bigint,resolved bigint,accuracy numeric,position bigint,last_week integer,last_week_points bigint)
+returns table(points bigint,hits bigint,resolved bigint,accuracy numeric,rank_position bigint,last_week integer,last_week_points bigint)
 language sql stable security definer set search_path='' as $$
  with r as (select * from public.cam_nfl_leaderboard('season',p_season,null,null) where user_id=p_user_id),
  last as (select g.week, sum(p.awarded_points)::bigint as pts
