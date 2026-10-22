@@ -45,7 +45,9 @@ async function readJSON(url: string, headers: HeadersInit = {}) {
   } finally { clearTimeout(timeout); }
 }
 async function authenticate(req: Request) {
-  if (compare(req.headers.get("x-cam-cron") || "", secret)) return { cron: true, userId: null };
+  const supplied = req.headers.get("x-cam-cron") || "";
+  // Empty secrets must never authenticate: compare("", "") is true.
+  if (secret.length >= 32 && supplied.length === secret.length && compare(supplied, secret)) return { cron: true, userId: null };
   const token = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
   if (!token) throw Error("Autenticación requerida");
   const client = createClient(URL, ANON, { auth: { persistSession: false } });
@@ -69,13 +71,22 @@ function statusOf(e: any, home: any, away: any) {
   if (type.state === "in" || name.includes("IN_PROGRESS") || name.includes("HALFTIME") || name.includes("END_PERIOD")) return "live";
   return "scheduled";
 }
-async function scoreboard(season?: number, week?: number) {
-  const qs = season && week ? "?season=" + season + "&seasontype=2&week=" + week : "?seasontype=2";
+// ESPN has postseason weeks 1,2,3,5 (week 4 is Pro Bowl, excluded).
+// Persist as weeks 19 (Wild Card), 20 (Divisional), 21 (Conference), 22 (Super Bowl).
+const postseason: Record<number, number> = { 1: 19, 2: 20, 3: 21, 5: 22 };
+const apiPlayoffWeek: Record<number, number> = { 19: 1, 20: 2, 21: 3, 22: 5 };
+async function scoreboard(season?: number, week?: number, seasonType = 2) {
+  const qs = season && week ? "?season=" + season + "&seasontype=" + seasonType + "&week=" + week : "";
   return await readJSON("https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard" + qs);
 }
 async function syncWeek(season: number, week: number, catalog: Set<string>) {
-  const response = await scoreboard(season, week);
-  if (response.season?.year !== season || response.week?.number !== week) throw Error("ESPN no confirmó la temporada y semana pedidas");
+  const seasonType = week >= 19 ? 3 : 2;
+  const apiWeek = seasonType === 3 ? apiPlayoffWeek[week] : week;
+  if (!apiWeek) throw Error("Semana NFL inválida");
+  const response = await scoreboard(season, apiWeek, seasonType);
+  if (Number(response.season?.year) !== season || Number(response.week?.number) !== apiWeek
+      || Number(response.season?.type) !== seasonType)
+    throw Error("ESPN no confirmó la temporada, fase y semana pedidas");
   const events = Array.isArray(response.events) ? response.events : [];
   if (!events.length) return { season, week, games: 0, updated: 0 };
   const updates = [];
@@ -176,14 +187,32 @@ Deno.serve(async req => {
     if (catalog.error) throw catalog.error;
     const ids = new Set((catalog.data || []).map((t:any)=>t.id));
     let weeks: {season:number,week:number}[];
-    if (Number.isInteger(year) && year>=2020 && year<=2100 && Number.isInteger(selected) && selected>=1 && selected<=18 && !identity.cron) {
+    if (Number.isInteger(year) && year>=2020 && year<=2100 && Number.isInteger(selected) && selected>=1 && selected<=22 && !identity.cron) {
       weeks=[{season:year,week:selected}];
     } else {
       const latest = await scoreboard();
       const season = Number(latest.season?.year);
-      const week = Number(latest.week?.number);
-      if (!Number.isInteger(season) || !Number.isInteger(week) || week<1 || week>18) throw Error("No hay jornada regular de NFL vigente");
-      weeks = [week-1,week,week+1].filter(w=>w>=1&&w<=18).map(w=>({season,week:w}));
+      const rawWeek = Number(latest.week?.number);
+      const phase = Number(latest.season?.type);
+      if (!Number.isInteger(season) || !Number.isInteger(rawWeek)) throw Error("ESPN no informó una semana válida");
+      if (phase === 3) {
+        const sequence = [19,20,21,22];
+        const current = postseason[rawWeek];
+        if (!current) {
+          // Pro Bowl is not part of the predictions; preserve other weeks.
+          weeks = [];
+        } else {
+          const index = sequence.indexOf(current);
+          weeks = sequence.slice(Math.max(index-1,0),Math.min(index+2,4)).map(week=>({season,week}));
+        }
+      } else if (phase === 2 && rawWeek>=1 && rawWeek<=18) {
+        weeks = [rawWeek-1,rawWeek,rawWeek+1].filter(w=>w>=1&&w<=18).map(week=>({season,week}));
+      } else {
+        // Preseason/offseason: check week 1 only if the official fixture is published.
+        const first = await scoreboard(season,1,2).catch(()=>null);
+        weeks = first?.events?.length && Number(first.season?.type)===2 && Number(first.season?.year)===season
+          ? [{season,week:1}] : [];
+      }
     }
     const results=[];
     for (const entry of weeks) results.push(await syncWeek(entry.season,entry.week,ids));
