@@ -8,6 +8,7 @@ on:
       - 'assets/ae-category-visibility.js'
       - 'index.html'
       - 'tests/mobile-bottom-nav.mjs'
+      - 'tests/mobile-bottom-nav-browser.cjs'
       - 'package.json'
       - '.github/workflows/mobile-bottom-nav.yml'
 
@@ -23,3 +24,5 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run test:mobile-nav
+      - run: npx playwright install --with-deps chromium
+      - run: node tests/mobile-bottom-nav-browser.cjs
