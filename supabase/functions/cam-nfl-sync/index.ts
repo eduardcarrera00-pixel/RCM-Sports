@@ -123,6 +123,103 @@ async function syncWeek(season: number, week: number, catalog: Set<string>) {
   }
   return { season, week, games: events.length, updated };
 }
+// nflverse maintains the season schedule, score records and independently sourced moneylines.
+// Its licensed, public CSV is a server-side fallback when ESPN rejects cloud IP addresses.
+type NflRow = Record<string,string>;
+async function readNflverse(): Promise<NflRow[]> {
+  const address = "https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv";
+  const res = await fetch(address, { headers: { "Accept":"text/csv" } });
+  if (!res.ok) throw Error("nflverse no disponible (HTTP " + res.status + ")");
+  const raw = await res.text();
+  const lines = raw.trim().split(/\\r?\\n/);
+  const columns = lines.shift()?.replace(/^\\uFEFF/, "").split(",") || [];
+  for (const name of ["season","game_type","week","gameday","gametime","home_team","away_team","home_score","away_score","espn","home_moneyline","away_moneyline"]) {
+    if (!columns.includes(name)) throw Error("El esquema de nflverse ha cambiado: " + name);
+  }
+  const current = new Date().getUTCFullYear();
+  const result: NflRow[]=[];
+  for (const line of lines) {
+    const values=line.split(",");
+    if (values[columns.indexOf("game_type")]!=="REG") continue;
+    const year=Number(values[columns.indexOf("season")]);
+    if (year!==current && year!==current-1 && year!==current+1) continue;
+    const game: NflRow={};
+    for (const name of columns.slice(0, 26)) game[name]=values[columns.indexOf(name)]||"";
+    result.push(game);
+  }
+  if (!result.length) throw Error("nflverse no entregó partidos de temporadas recientes");
+  return result;
+}
+function easternKickoff(date:string,time:string) {
+  if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(date)||!/^\\d{1,2}:\\d{2}$/.test(time)) throw Error("Horario NFL desconocido");
+  const [year,month,day]=date.split("-").map(Number),[hour,minute]=time.split(":").map(Number);
+  const base=Date.UTC(year,month-1,day,hour,minute);
+  const parts=new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).formatToParts(new Date(base));
+  const val=(name:string)=>Number(parts.find(part=>part.type===name)?.value);
+  const offset=Date.UTC(val("year"),val("month")-1,val("day"),val("hour"),val("minute"))-base;
+  return new Date(base-offset).toISOString();
+}
+function currentWeek(rows:NflRow[]) {
+  const now=new Date(),year=now.getUTCFullYear()-(now.getUTCMonth()<2?1:0);
+  const eligible=rows.filter(r=>Number(r.season)===year&&Number(r.week)>=1&&Number(r.week)<=18);
+  if (!eligible.length) throw Error("No hay una temporada regular NFL confirmada");
+  const weeks=[...new Set(eligible.map(r=>Number(r.week)))].sort((a,b)=>a-b);
+  const active=weeks.find(w=>eligible.some(r=>{
+    if(Number(r.week)!==w)return false;
+    try{return Date.parse(easternKickoff(r.gameday,r.gametime))+36*3600000>Date.now();}catch{return false;}
+  }));
+  return {season:year,week:active||weeks[weeks.length-1]};
+}
+async function syncNflverseWeek(season:number,week:number,catalog:Set<string>,rows:NflRow[]) {
+  const events=rows.filter(r=>Number(r.season)===season&&Number(r.week)===week);
+  let updated=0,frozen=0;
+  for(const event of events) {
+    const home=teamsFix[event.home_team]||event.home_team;
+    const away=teamsFix[event.away_team]||event.away_team;
+    const id=event.espn||event.old_game_id;
+    if(!/^[0-9]{6,16}$/.test(id)||!catalog.has(home)||!catalog.has(away)||home===away)
+      throw Error("Identificadores NFL sin verificar en "+(event.game_id||"partido"));
+    const kickoff=easternKickoff(event.gameday,event.gametime);
+    const hs=number(event.home_score),as=number(event.away_score);
+    // Only treat posted score records as final after a conservative match-duration window.
+    const completed=hs!==null&&as!==null&&Date.now()>Date.parse(kickoff)+4.5*3600000;
+    const status=completed?(hs===as?"tie":"final"):(Date.now()>=Date.parse(kickoff)?"live":"scheduled");
+    const row:any={
+      id,season,week,home_id:home,away_id:away,kickoff,status,
+      home_score:completed?hs:null,away_score:completed?as:null,
+      winner_id:status==="final"?(hs!>as!?home:away):null,
+      last_synced_at:new Date().toISOString()
+    };
+    const prev=await db.from("cam_nfl_games").select("season,week,home_id,away_id,odds_locked_at,opening_mode,status")
+      .eq("id",id).maybeSingle();
+    if(prev.error)throw prev.error;
+    if(prev.data?.odds_locked_at &&
+      (prev.data.home_id!==home||prev.data.away_id!==away||prev.data.season!==season||prev.data.week!==week))
+      throw Error("El proveedor cambió los equipos de un partido con pronósticos: "+id);
+    if(prev.data&&["final","tie","cancelled"].includes(prev.data.status)&&["scheduled","live"].includes(status))continue;
+    const ho=number(event.home_moneyline),ao=number(event.away_moneyline);
+    const realOdds=validOdd(ho)&&validOdd(ao)&&Date.parse(kickoff)>Date.now()&&status==="scheduled";
+    if(!prev.data?.odds_locked_at&&realOdds) {
+      const impliedHome=implied(ho!),impliedAway=implied(ao!);
+      const p=Math.round(impliedHome/(impliedHome+impliedAway)*1e6)/1e6, q=1-p;
+      Object.assign(row,{odds_home:ho,odds_away:ao,probability_home:p,probability_away:q,
+        points_home:Math.max(2,Math.min(12,Math.round(2/p))),
+        points_away:Math.max(2,Math.min(12,Math.round(2/q))),
+        odds_source:"nflverse: nfldata games.csv",odds_locked_at:new Date().toISOString(),
+        picks_open:prev.data?.opening_mode!=="closed"});
+    }
+    if(status!=="scheduled")row.picks_open=false;
+    const saved=await db.from("cam_nfl_games").upsert(row,{onConflict:"id"});
+    if(saved.error)throw saved.error;
+    updated++;
+    if(!prev.data?.odds_locked_at&&realOdds){
+      frozen++;
+      await db.from("cam_nfl_audit").insert({game_id:id,action:"freeze_odds_auto",
+       detail:{provider:"nflverse nfldata",home:ho,away:ao,at:new Date().toISOString()}});
+    }
+  }
+  return {season,week,games:events.length,updated,frozen,source:"nflverse"};
+}
 async function freezeOdds() {
   if (!oddsKey) return { provider: "Sin THE_ODDS_API_KEY", frozen: 0 };
   const params = new URLSearchParams({apiKey:oddsKey,markets:"h2h",regions:"us",oddsFormat:"american"});
@@ -181,18 +278,22 @@ Deno.serve(async req => {
     const catalog = await db.from("nfl_teams").select("id");
     if (catalog.error) throw catalog.error;
     const ids = new Set((catalog.data || []).map((t:any)=>t.id));
+    let nflverseRows: NflRow[]|null=null;
+    try { nflverseRows=await readNflverse(); } catch(error){console.warn("nflverse no disponible; intentando ESPN",String(error));}
     let weeks: {season:number,week:number}[];
     if (Number.isInteger(year) && year>=2020 && year<=2100 && Number.isInteger(selected) && selected>=1 && selected<=18 && !identity.cron) {
       weeks=[{season:year,week:selected}];
     } else {
-      const latest = await scoreboard();
-      const season = Number(latest.season?.year);
-      const week = Number(latest.week?.number);
+      const latest=nflverseRows?currentWeek(nflverseRows):await scoreboard();
+      const season=Number(nflverseRows?latest.season:latest.season?.year);
+      const week=Number(nflverseRows?latest.week:latest.week?.number);
       if (!Number.isInteger(season) || !Number.isInteger(week) || week<1 || week>18) throw Error("No hay jornada regular de NFL vigente");
       weeks = [week-1,week,week+1].filter(w=>w>=1&&w<=18).map(w=>({season,week:w}));
     }
     const results=[];
-    for (const entry of weeks) results.push(await syncWeek(entry.season,entry.week,ids));
+    for(const entry of weeks) results.push(nflverseRows
+      ? await syncNflverseWeek(entry.season,entry.week,ids,nflverseRows)
+      : await syncWeek(entry.season,entry.week,ids));
     const freeze=await freezeOdds();
     return reply({ok:true,weeks:results,odds:freeze},200,origin);
   } catch (error) {
