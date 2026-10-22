@@ -1,8 +1,6 @@
 name: Synchronize NFL Quiniela
 on:
-  schedule:
-    # Hourly during the NFL calendar; UTC. Secret configuration is required.
-    - cron: '17 * * 9-12,1-2 *'
+  # Supabase Cron is the single scheduled executor. GitHub remains a manual fallback.
   workflow_dispatch:
 permissions:
   contents: read
