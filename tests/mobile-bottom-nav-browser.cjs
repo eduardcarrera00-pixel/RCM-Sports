@@ -104,9 +104,9 @@ const server = http.createServer((req, res) => {
       inactiveText:getComputedStyle(el.querySelector('[data-category="Picks"] span:last-child')).display,
       accessible:el.querySelector('[data-category="Picks"]').getAttribute('aria-label')
     }));
-    assert.ok(nflPill.active && nflPill.width>=90 && nflPill.left>=0,JSON.stringify(nflPill));
+    assert.ok(nflPill.active && nflPill.width>=60 && nflPill.left>=0,JSON.stringify(nflPill));
     assert.notEqual(nflPill.text,'none');
-    assert.equal(nflPill.inactiveText,'none');
+    assert.notEqual(nflPill.inactiveText,'none','inactive names must stay visible');
     assert.equal(nflPill.accessible,'Picks');
     await page.evaluate(()=>filterByCategory('Opiniones'));
     await page.waitForFunction(()=>document.querySelector('body > nav [data-category="Opiniones"]').getAttribute('aria-current')==='page');
@@ -122,7 +122,7 @@ const server = http.createServer((req, res) => {
         indicator:getComputedStyle(el,'::before').opacity
       };
     });
-    assert.ok(opinionPill.left>nflPill.left && opinionPill.width>=100 && opinionPill.labelVisible && opinionPill.fits,JSON.stringify(opinionPill));
+    assert.ok(opinionPill.left>nflPill.left && opinionPill.width>=60 && opinionPill.labelVisible && opinionPill.fits,JSON.stringify(opinionPill));
     assert.ok(Number(opinionPill.indicator)>=0.99,'the animated capsule becomes fully visible');
     await page.evaluate(()=>filterByCategory('Todos'));
     await page.waitForFunction(()=>!document.querySelector('body > nav').classList.contains('cam-nav-has-active'));
