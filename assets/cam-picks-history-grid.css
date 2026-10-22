@@ -1,0 +1,172 @@
+/* CAM SPORTS · Historial de Picks: cuadrícula compacta y desplazamiento interior.
+   Solo afecta a #cpSettleHistory. Los resultados y puntos siguen siendo datos del servidor. */
+html body #footballTakes #communityPicks #cpSettleHistory{
+  --cam-h-card:#1c3949;
+  --cam-h-ink:#f6ede3;
+  --cam-h-muted:#b8c9cb;
+  --cam-h-edge:rgba(199,170,137,.27);
+  --cam-h-action:#d5b18b;
+  --cam-h-hover:#244858;
+  --cam-h-win:#9fd8b2;
+  --cam-h-loss:#edafa0;
+  --cam-h-void:#bdc8cf;
+}
+html:not(.dark) body #footballTakes #communityPicks #cpSettleHistory{
+  --cam-h-card:#fffcf6;
+  --cam-h-ink:#28414e;
+  --cam-h-muted:#62747d;
+  --cam-h-edge:#decbb6;
+  --cam-h-action:#80563b;
+  --cam-h-hover:#f5ecdf;
+  --cam-h-win:#2c7952;
+  --cam-h-loss:#a44b37;
+  --cam-h-void:#63747f;
+}
+html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-summary,
+html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-stat{
+  display:none!important;
+}
+html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-note{
+  margin:0 0 9px!important;
+  font:600 11px/1.45 Inter,system-ui,sans-serif!important;
+  color:var(--cam-h-muted)!important;
+  letter-spacing:0!important;
+}
+html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-frame{
+  position:relative!important;min-width:0!important;width:100%!important;
+}
+html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-frame::after{
+  display:none!important;content:none!important;
+}
+/* Cuatro tarjetas ocupan el lugar que antes correspondía a tres estadísticas. */
+html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-list.ae-pick-history-grid{
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  grid-auto-rows:164px!important;
+  align-items:stretch!important;
+  gap:10px!important;
+  max-height:510px!important;
+  width:100%!important;min-width:0!important;
+  box-sizing:border-box!important;
+  padding:1px 7px 1px 1px!important;margin:0!important;
+  overflow-x:hidden!important;overflow-y:auto!important;
+  overscroll-behavior-y:contain!important;
+  scroll-snap-type:none!important;scroll-behavior:auto!important;
+  scrollbar-width:thin!important;scrollbar-color:var(--cam-h-edge) transparent!important;
+}
+html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-list.ae-pick-history-grid::-webkit-scrollbar{width:5px!important}
+html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-list.ae-pick-history-grid::-webkit-scrollbar-thumb{background:var(--cam-h-edge)!important}
+html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-entry{
+  display:block!important;
+  grid-template-columns:none!important;list-style:none!important;
+  align-self:stretch!important;min-width:0!important;min-height:0!important;
+  padding:0!important;margin:0!important;
+  border:0!important;scroll-snap-align:none!important;
+}
+html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-entry .ae-pick-history-card{
+  display:flex!important;flex-direction:column!important;
+  box-sizing:border-box!important;position:relative!important;
+  width:100%!important;height:100%!important;min-width:0!important;
+  gap:7px!important;padding:12px 12px 10px!important;
+  color:var(--cam-h-ink)!important;background:var(--cam-h-card)!important;
+  border:1px solid var(--cam-h-edge)!important;
+  border-left:3px solid var(--cam-h-void)!important;
+  border-radius:0!important;text-decoration:none!important;box-shadow:none!important;
+  cursor:pointer!important;transition:background-color .16s ease,border-color .16s ease!important;
+}
+html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-entry[data-outcome="won"] .ae-pick-history-card{border-left-color:var(--cam-h-win)!important}
+html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-entry[data-outcome="lost"] .ae-pick-history-card{border-left-color:var(--cam-h-loss)!important}
+html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-entry[data-outcome="void"] .ae-pick-history-card{border-left-color:var(--cam-h-void)!important}
+html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-entry .ae-pick-history-card:hover{
+  background:var(--cam-h-hover)!important;border-color:var(--cam-h-action)!important;
+}
+html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-entry .ae-pick-history-card:focus-visible{
+  outline:2px solid var(--cam-h-action)!important;outline-offset:2px!important;
+}
+html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-card-top{
+  display:flex!important;align-items:flex-start!important;
+  justify-content:space-between!important;gap:4px!important;min-width:0!important;
+}
+html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-user{
+  display:block!important;min-width:0!important;max-width:100%!important;
+  overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;
+  color:var(--cam-h-action)!important;
+  font:700 10px/1.4 Inter,system-ui,sans-serif!important;
+}
+html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-entry .ae-pick-history-badge{
+  flex:none!important;display:inline-block!important;margin:0!important;
+  padding:2px 5px!important;border:1px solid currentColor!important;border-radius:0!important;
+  background:transparent!important;color:var(--cam-h-void)!important;
+  font:800 9px/1.35 Inter,system-ui,sans-serif!important;letter-spacing:0!important;text-transform:none!important;
+}
+html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-entry[data-outcome="won"] .ae-pick-history-badge{color:var(--cam-h-win)!important}
+html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-entry[data-outcome="lost"] .ae-pick-history-badge{color:var(--cam-h-loss)!important}
+html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-entry[data-outcome="void"] .ae-pick-history-badge{color:var(--cam-h-void)!important}
+html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-card-content{
+  display:flex!important;flex-direction:column!important;gap:5px!important;min-width:0!important;
+  flex:1 1 auto!important;overflow:hidden!important;
+}
+html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-match{
+  display:-webkit-box!important;-webkit-line-clamp:2!important;line-clamp:2!important;-webkit-box-orient:vertical!important;
+  overflow:hidden!important;overflow-wrap:anywhere!important;min-width:0!important;
+  margin:0!important;color:var(--cam-h-ink)!important;
+  font:650 13px/1.27 Inter,system-ui,sans-serif!important;
+}
+html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-prediction{
+  display:-webkit-box!important;-webkit-line-clamp:2!important;line-clamp:2!important;-webkit-box-orient:vertical!important;
+  overflow:hidden!important;overflow-wrap:anywhere!important;
+  color:var(--cam-h-muted)!important;font:550 11px/1.28 Inter,system-ui,sans-serif!important;
+}
+html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-multiple{
+  display:block!important;color:var(--cam-h-action)!important;
+  font:600 9px/1.3 Inter,system-ui,sans-serif!important;
+}
+html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-card-bottom{
+  display:flex!important;flex-wrap:wrap!important;justify-content:space-between!important;align-items:center!important;
+  gap:2px 6px!important;min-width:0!important;
+  padding-top:7px!important;border-top:1px solid var(--cam-h-edge)!important;
+}
+html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-odds{
+  color:var(--cam-h-ink)!important;font:800 11px/1.3 Inter,system-ui,sans-serif!important;
+  white-space:nowrap!important;
+}
+html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-date{
+  color:var(--cam-h-muted)!important;font:600 10px/1.3 Inter,system-ui,sans-serif!important;
+  white-space:nowrap!important;
+}
+html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-points{
+  display:none!important; /* sigue íntegro en los datos y en el detalle del Pick */
+}
+html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-source{
+  display:none!important; /* verificación conservada; la tarjeta prioriza el pronóstico */
+}
+@media(max-width:1050px){
+  html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-list.ae-pick-history-grid{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  }
+}
+@media(max-width:720px){
+  html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-list.ae-pick-history-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    grid-auto-rows:166px!important;
+    gap:8px!important;max-height:514px!important;
+  }
+  html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-entry .ae-pick-history-card{
+    padding:10px 8px!important;gap:6px!important;
+  }
+  html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-match{font-size:12px!important}
+  html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-user{font-size:9px!important}
+  html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-entry .ae-pick-history-badge{font-size:8px!important;padding:2px 4px!important}
+  html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-prediction{font-size:10px!important}
+  html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-odds{font-size:10px!important}
+  html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-date{font-size:9px!important}
+}
+@media(max-width:340px){
+  html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-list.ae-pick-history-grid{
+    grid-template-columns:minmax(0,1fr)!important;
+    grid-auto-rows:150px!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-card{transition:none!important}
+}
