@@ -77,7 +77,7 @@ const {chromium}=require('playwright');
         'The current week is selected by default, even when last week played two days ago');
       assert.equal(await page.locator('.cam-nfl-game').count(),2);
       for(const text of await page.locator('#camNflGames .cam-nfl-team small').allTextContents()){
-        assert.match(text,/^\\d+ pts$/,'Show only points, never a team win probability');
+        assert.match(text,/^\d+ pts$/,'Show only points, never a team win probability');
         assert.doesNotMatch(text,/%/);
       }
       await weekPicker.selectOption('6');
