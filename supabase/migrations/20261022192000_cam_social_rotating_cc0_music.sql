@@ -5,7 +5,7 @@
 create table if not exists cam_social.music_tracks(
   slug text primary key check (slug ~ '^[a-z0-9-]{2,64}$'),
   title text not null,
-  source_url text not null check (source_url ~ '^https://en\\.freepd\\.cn/api/music/[A-Fa-f0-9]+$'),
+  source_url text not null check (source_url ~ '^https://en\.freepd\.cn/api/music/[A-Fa-f0-9]+$'),
   license_proof_url text not null,
   license text not null check(license='CC0'),
   enabled boolean not null default true
