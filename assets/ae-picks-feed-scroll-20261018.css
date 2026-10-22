@@ -1,4 +1,4 @@
-/* AE SPORTS | Picks community feed: one-and-a-half cards high.
+/* CAM SPORTS | Picks community feed: 20 newest Picks; 3 visible on desktop, 2 on mobile.
    This is ONLY the scrolling list below "¿Eres Chef?". Rankings and the
    Mejor/Peor Plato modules stay in their original document flow. */
 html body #footballTakes.ae-picks-editorial #communityPicks #cpFeed.ae-picks-feed-scrollable{
@@ -7,7 +7,7 @@ html body #footballTakes.ae-picks-editorial #communityPicks #cpFeed.ae-picks-fee
   width:100%!important;
   max-width:none!important;
   height:auto!important;
-  max-height:var(--ae-picks-feed-window-height,440px)!important;
+  max-height:min(var(--ae-picks-feed-window-height,720px),78vh,820px)!important;
   min-height:0!important;
   margin:0!important;
   padding:0 5px 0 0!important;
@@ -51,6 +51,7 @@ html:not(.dark) body #footballTakes.ae-picks-editorial #communityPicks #cpFeedSc
 @media(max-width:760px){
   html body #footballTakes.ae-picks-editorial #communityPicks #cpFeed.ae-picks-feed-scrollable{
     padding-right:4px!important;
+    max-height:min(var(--ae-picks-feed-window-height,620px),72vh,650px)!important;
   }
   html body #footballTakes.ae-picks-editorial #communityPicks #cpFeedScrollHint{
     margin:5px 0 10px!important;
@@ -58,16 +59,16 @@ html:not(.dark) body #footballTakes.ae-picks-editorial #communityPicks #cpFeedSc
   }
 }
 
-/* Picks closing divider, in-list archive, and four-row Chef standings. */
-/* The feed ends as a unified, clearly separated piece of the Picks section. */
+/* Picks closing divider, archive button OUTSIDE scroll, and four-row Chef standings. */
+/* Only the cards scroll. The archive button is a fixed sibling below them. */
 html body #footballTakes.ae-picks-editorial #communityPicks #cpFeed{
   border-bottom:2px solid rgba(210,169,116,.92)!important;
   padding-bottom:0!important;
 }
 html body #footballTakes.ae-picks-editorial #communityPicks #cpFeed.ae-picks-feed-scrollable{
-  max-height:var(--ae-picks-feed-window-height,440px)!important;
+  max-height:min(var(--ae-picks-feed-window-height,720px),78vh,820px)!important;
 }
-html body #footballTakes.ae-picks-editorial #communityPicks #cpFeed > #cpFeedFooter.ae-picks-feed-footer{
+html body #footballTakes.ae-picks-editorial #communityPicks #cpFeedFooter.ae-picks-feed-footer{
   display:flex!important;
   box-sizing:border-box!important;
   justify-content:center!important;
@@ -109,7 +110,7 @@ html:not(.dark) body #footballTakes.ae-picks-editorial #communityPicks #cpFeedFo
   background:#e9e3da!important;
   color:#4e483f!important;
 }
-html:not(.dark) body #footballTakes.ae-picks-editorial #communityPicks #cpFeed > #cpFeedFooter{
+html:not(.dark) body #footballTakes.ae-picks-editorial #communityPicks #cpFeedFooter{
   background:rgba(215,207,192,.20)!important;
 }
 /* Preserve Top 10 data while presenting only four places before vertical
@@ -138,7 +139,7 @@ html body #footballTakes.ae-picks-editorial #communityPicks .ae-chefs-table-cols
   white-space:normal!important;
 }
 @media(max-width:760px){
-  html body #footballTakes.ae-picks-editorial #communityPicks #cpFeed > #cpFeedFooter.ae-picks-feed-footer{
+  html body #footballTakes.ae-picks-editorial #communityPicks #cpFeedFooter.ae-picks-feed-footer{
     min-height:70px!important;
     padding:14px 8px 16px!important;
   }
