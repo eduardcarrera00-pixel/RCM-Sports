@@ -213,3 +213,146 @@ html:not(.dark) body #picksFeatured .ae-weekly-shared-notice {
     margin:4px 15px 9px;
   }
 }
+
+/* CAM SPORTS | Pick del Editor - adaptación cromática nocturna.
+   Solo colores: la misma estructura, fotografía y acciones del modo día.
+   El tema lo controla la clase .dark del <html> existente. */
+html.dark body #picksFeatured.ae-picks-feature {
+  background:linear-gradient(125deg,var(--ds-surface),var(--ds-surface-soft))!important;
+  border-color:var(--ds-line)!important;
+  color:var(--ds-text)!important;
+}
+html.dark body #picksFeatured.ae-picks-feature::before {
+  display:block!important;
+  background:linear-gradient(
+    96deg,
+    color-mix(in srgb,var(--ds-surface-sunken) 97%,transparent) 0%,
+    color-mix(in srgb,var(--ds-surface-sunken) 92%,transparent) 35%,
+    color-mix(in srgb,var(--ds-surface-soft) 73%,transparent) 67%,
+    color-mix(in srgb,var(--ds-surface-soft) 43%,transparent) 100%
+  )!important;
+}
+html.dark body #picksFeatured :is(
+  .ae-picks-feature-label,
+  #picksFeaturedCard,
+  .ae-weekly-card,
+  .ae-weekly-expandable,
+  .ae-weekly-expand-summary,
+  .ae-weekly-expanded-content
+) {
+  background-color:transparent!important;
+  color:var(--ds-text)!important;
+}
+html.dark body #picksFeatured :is(
+  #picksFeaturedTitle,
+  .ae-weekly-title,
+  .ae-weekly-selection strong,
+  .ae-weekly-expand-summary .ae-weekly-title
+) { color:var(--ds-text-on-media)!important; }
+html.dark body #picksFeatured :is(
+  .ae-weekly-event,
+  .ae-weekly-compact-selection,
+  .ae-weekly-analysis,
+  .ae-weekly-expanded-content .ae-weekly-event,
+  .ae-weekly-expanded-content .ae-weekly-analysis,
+  .ae-weekly-empty
+) { color:var(--ds-text-muted)!important; }
+html.dark body #picksFeatured :is(
+  .ae-weekly-kicker,
+  .ae-weekly-expand-hint,
+  .ae-weekly-link
+) { color:var(--ds-gold)!important; }
+html.dark body #picksFeatured .ae-weekly-disclaimer {
+  color:var(--ds-text-subtle)!important;
+}
+html.dark body #picksFeatured :is(
+  .ae-weekly-expandable,
+  .ae-weekly-expanded-content
+) { border-color:var(--ds-line)!important; }
+html.dark body #picksFeatured :is(
+  #aeWeeklyOddsHighlight,
+  .ae-weekly-odds,
+  #aeWeeklyShareButton,
+  #aeWeeklyEditButton
+) {
+  background:var(--ds-surface-soft)!important;
+  border-color:var(--ds-line-strong)!important;
+  color:var(--ds-text)!important;
+}
+html.dark body #picksFeatured #aeWeeklyOddsHighlight {
+  color:var(--ds-gold)!important;
+}
+html.dark body #picksFeatured :is(
+  #aeWeeklyShareButton,
+  #aeWeeklyEditButton
+):hover {
+  background:var(--ds-action-soft)!important;
+  border-color:var(--ds-action-hover)!important;
+}
+html.dark body #picksFeatured :is(
+  #aeWeeklyShareButton,
+  #aeWeeklyEditButton,
+  .ae-weekly-expand-summary
+):focus-visible {
+  outline:2px solid var(--ds-focus)!important;
+  outline-offset:3px!important;
+}
+html.dark body #picksFeatured .ae-weekly-shared-notice {
+  background:var(--ds-surface-soft)!important;
+  border-color:var(--ds-action)!important;
+  color:var(--ds-text)!important;
+}
+
+/* El Pick del Editor de portada es el mismo componente de datos,
+   con su tarjeta compacta y su fotografía preservadas. */
+html.dark body.ae-is-home #mainContent .editorial-pick {
+  background:linear-gradient(125deg,var(--ds-surface),var(--ds-surface-soft))!important;
+  border-color:var(--ds-line)!important;
+  color:var(--ds-text)!important;
+}
+html.dark body.ae-is-home #mainContent .editorial-pick > h2 {
+  color:var(--ds-text-on-media)!important;
+  border-color:var(--ds-line)!important;
+}
+html.dark body.ae-is-home #mainContent .editorial-pick :is(
+  .editorial-pick-body,
+  #cpWeekly,
+  .ae-weekly-preview
+) {
+  background-color:transparent!important;
+  color:var(--ds-text)!important;
+}
+html.dark body.ae-is-home #mainContent .editorial-pick :is(
+  .ae-weekly-title,
+  .ae-weekly-selection strong
+) { color:var(--ds-text-on-media)!important; }
+html.dark body.ae-is-home #mainContent .editorial-pick :is(
+  .ae-weekly-event,
+  .ae-weekly-analysis,
+  .ae-weekly-empty
+) { color:var(--ds-text-muted)!important; }
+html.dark body.ae-is-home #mainContent .editorial-pick :is(
+  .ae-weekly-kicker,
+  .ae-weekly-link,
+  .ae-home-weekly-more
+) { color:var(--ds-gold)!important; }
+html.dark body.ae-is-home #mainContent .editorial-pick :is(
+  .ae-weekly-odds,
+  #aeHomeWeeklyShareButton
+) {
+  background:var(--ds-surface-soft)!important;
+  border-color:var(--ds-line-strong)!important;
+  color:var(--ds-text)!important;
+}
+html.dark body.ae-is-home #mainContent .editorial-pick #aeHomeWeeklyShareButton:hover {
+  background:var(--ds-action-soft)!important;
+  border-color:var(--ds-action-hover)!important;
+}
+html.dark body.ae-is-home #mainContent .editorial-pick :is(
+  #aeHomeWeeklyShareButton,
+  .ae-home-weekly-more,
+  .ae-weekly-link
+):focus-visible {
+  outline:2px solid var(--ds-focus)!important;
+  outline-offset:3px!important;
+}
