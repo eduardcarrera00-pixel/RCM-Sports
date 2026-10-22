@@ -12,7 +12,7 @@
   const client=()=>{try{return typeof db!=='undefined'?db:window.db;}catch{return null;}};
   const editor=()=>{try{return typeof currentAdmin!=='undefined'&&!!currentAdmin;}catch{return false;}};
   const clock=value=>new Date(value).toLocaleString('es',{timeZone:'America/Toronto',weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
-  const monthOf=g=>new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York',year:'numeric',month:'2-digit'}).format(new Date(g.kickoff)).slice(0,7);
+  const monthOf=g=>{const parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',year:'numeric',month:'2-digit'}).formatToParts(new Date(g.kickoff));const value=k=>parts.find(p=>p.type===k)?.value||'';return value('year')+'-'+value('month');};
   const seasons=()=>[...new Set(games.map(g=>Number(g.season)))].sort((a,b)=>b-a);
   const now=()=>Date.now();
   const seasonGuess=()=>{const d=new Date();return d.getUTCFullYear()-(d.getUTCMonth()<2?1:0);};
@@ -144,7 +144,7 @@
     const target=$('camNflGames');if(!target)return;
     target.replaceChildren();
     const chosen=games.filter(g=>g.season===season&&g.week===week).sort((a,b)=>Date.parse(a.kickoff)-Date.parse(b.kickoff));
-    if(!chosen.length){target.append(el('p','No hay partidos oficiales cargados para esta jornada.','cam-nfl-empty'));return;}
+    if(!chosen.length){target.append(el('p','No hay partidos oficiales cargados para esta jornada.','cam-nfl-empty'));st('camNflProgress','0 pronósticos');if($('camNflSave'))$('camNflSave').disabled=true;return;}
     let progress=0,potential=0;
     for(const g of chosen){
       const selected=active(g);
@@ -162,7 +162,7 @@
     }
     st('camNflProgress',progress+' de '+chosen.length+' seleccionados · '+potential+' pts potenciales pendientes');
     const save=$('camNflSave');
-    if(save){save.disabled=!user||!chosen.some(g=>draft.has(g.id)&&isOpen(g));save.textContent=user?'Guardar mi quiniela':'Inicia sesión para participar';}
+    if(save){save.disabled=user?!chosen.some(g=>draft.has(g.id)&&isOpen(g)):false;save.textContent=user?'Guardar mi quiniela':'Inicia sesión para participar';}
   }
   async function persist(){
     if(!user){window.openUserAuthModal?.();return;}
@@ -309,6 +309,7 @@
     if(!targetId)return;
     profile.hidden=false;profile.replaceChildren(el('h3','Mi Quiniela NFL'),el('p','Cargando estadísticas…'));
     try{
+      await loadSession();
       const c=client(),s=seasons()[0]||seasonGuess();
       const summary=await run(c.rpc('cam_nfl_profile_summary',{p_user_id:targetId,p_season:s}));
       if(!profile.isConnected)return;
