@@ -79,7 +79,9 @@ def run():
                 for sel in ['#articlesGrid', '#heroSection', '#footballTakes']:
                     assert not page.locator(sel).is_visible(), sel
                 assert page.locator('.ae-opinion-card').count() == 3, 'el borrador no se muestra al público'
-                assert page.locator('#aeOpinionsWrite').is_hidden()
+                assert page.locator('#aeOpinions > .ae-opinions-head').count() == 0, 'el encabezado antiguo se eliminó'
+                assert page.locator('#aeOpinions > :not(.sr-only)').first.get_attribute('id') == 'aeOpinionsTabs', 'los filtros son el primer bloque visible'
+                assert page.locator('#aeOpinionsWrite').is_hidden(), 'publicar opiniones solo es accesible en el panel admin'
                 assert page.locator('.ae-opinion-card').first.locator('.ae-opinion-title').inner_text().startswith('Los Chiefs')
                 tabs = page.locator('#aeOpinionsTabs [role=tab] > span:first-child').all_inner_texts()
                 assert tabs == ['Todas', 'NFL', 'Fútbol', 'Colegial', 'Ciclismo', 'Tenis'], tabs
@@ -127,11 +129,13 @@ def run():
     with fp.full_page(fake_js=fake(user=user, admin=True), width=1366) as page:
         images(page)
         open_opinions(page)
-        page.wait_for_selector('#aeOpinionsWrite:not([hidden])', timeout=10000)
         assert page.locator('.ae-opinion-card').count() == 4
         assert page.locator('.ae-opinion-card.is-draft').count() == 1
+        page.locator('#loggedAdminContainer .ae-publish-action').click()
+        page.wait_for_selector('#publishModal:not(.hidden)')
         page.locator('#aeOpinionsWrite').click()
         page.wait_for_selector('#aeOpinionEditor[open]')
+        assert page.locator('#publishModal').is_hidden(), 'el panel Publicar se cierra antes de abrir el editor'
         if SHOTS:
             page.wait_for_timeout(200)
             page.screenshot(path=f'{SHOTS}/opinion-editor-1366.png')
@@ -166,9 +170,11 @@ def run():
 
     with fp.full_page(fake_js=fake(user=user, admin=True), width=390, dark=True) as page:
         open_opinions(page)
-        page.wait_for_selector('#aeOpinionsWrite:not([hidden])', timeout=10000)
+        page.locator('#loggedAdminContainer .ae-publish-action').click()
+        page.wait_for_selector('#publishModal:not(.hidden)')
         page.locator('#aeOpinionsWrite').click()
         page.wait_for_selector('#aeOpinionEditor[open]')
+        assert page.locator('#publishModal').is_hidden(), 'el panel Publicar se cierra antes de abrir el editor'
         assert page.evaluate('document.documentElement.scrollWidth') <= 390
         if SHOTS:
             page.wait_for_timeout(200)
