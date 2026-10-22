@@ -81,6 +81,26 @@ const server = http.createServer((req, res) => {
             assert.equal(icon.imageDisplay,'none',key+' old WebP is hidden only on phone');
             assert.equal(icon.imageExists,true,key+' original desktop image remains');
             assert.ok(icon.circleSize>=35 && icon.circleSize<=37,key+' same small circle frame');
+            if(icon.circleRadius!=='50%'){
+              const trace=await page.evaluate(()=>{
+                const el=document.querySelector('body > nav.cam-mobile-bottom-nav > button[data-category="Picks"] .ae-nav-icon');
+                const matches=[];
+                function scan(rules,source){
+                  for(const r of rules){
+                    if(r.selectorText && r.style?.getPropertyValue('border-radius')){
+                      try{if(el.matches(r.selectorText))matches.push({source,selector:r.selectorText,
+                        radius:r.style.getPropertyValue('border-radius'),priority:r.style.getPropertyPriority('border-radius')});}catch{}
+                    }
+                    if(r.cssRules)scan(r.cssRules,source);
+                  }
+                }
+                for(const sheet of document.styleSheets)try{scan(sheet.cssRules,sheet.href||'inline')}catch{}
+                const st=getComputedStyle(el);
+                return {element:el.outerHTML.slice(0,200),radius:st.borderRadius,border:st.border,
+                  height:st.height,width:st.width, matches:matches.slice(-35)};
+              });
+              console.log('CAM RING TRACE',JSON.stringify(trace));
+            }
             assert.equal(icon.circleRadius,'50%',key+' circular stroke');
             assert.notEqual(icon.caption,'none',key+' caption remains visible');
             assert.equal(icon.iconColor,dark?'rgb(210, 192, 166)':'rgb(24, 51, 67)',key+' inactive theme color');
