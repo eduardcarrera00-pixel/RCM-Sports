@@ -84,4 +84,13 @@ assert.equal(p.extractSinglesSlip(scan(fx.sencillos_psm11.slice(0, 4))), null);
 // 7) Draftea (logos y «Mañana») no se lee en el teléfono; queda para la lectura avanzada.
 assert.notEqual(p.extract(scan(fx.draftea)).ok, true);
 
+// 6) Playdoit «1x2 Súper Pago Anticipado» con el icono «$ 1 UP» (OCR real del 21 oct): sin basura en el mercado.
+{
+ const rows=[["Parlay                                      ABIERTO", 94], ["Como                                         -175", 93], ["1x2 Súper Pago             1]", 93], ["Anticipado           Bu", 43], ["Como vs. Manchester          21/10 + 10:45", 87], ["United", 96], ["Lille                                            -155", 93], ["1x2 Súper Pago", 96], ["Anticipado               Bu", 50], ["Lille vs. Galatasaray SK          21/10 + 10:45", 89], ["Bayern Munich                            -209", 94], ["1x2 Super Pago             [1]", 91], ["Anticipado             EIB", 58], ["Bayern Munich vs. Arsenal 21/10 - 13:00", 91], ["Viking FK                                   +566", 94], ["1x2 Super Pago             [1]", 89], ["Anticipado             Bu", 48], ["Aston Villa vs. Viking FK        21/10 - 13:00", 94], ["RB Leipzig                                 +400", 94], ["1x2 Súper Pago             1)", 92], ["Anticipado             CB", 51], ["Real Madrid vs. RB Leipzig 21/10 - 13:00", 72], ["Lens                                           +116", 94], ["1x2 Súper Pago             [1]", 91], ["Anticipado             GB", 42], ["Club Brugge KV vs. Lens       21/10 + 13:00", 87], ["Feyenoord                                  +214", 94], ["1x2 Súper Pago             1)", 89], ["Anticipado             cau", 62], ["Real Betis vs. Feyenoord       21/10 + 13:00", 92], ["Momios                                  +86855", 91], ["Apuesta total                        $29.64", 94], ["Ganancia Total                  $30,923.06", 94], ["20/10 - 23:41                 ID: 5554226315 OS", 76]];
+ const lines=rows.map(([text,confidence])=>({text,confidence}));
+ const r=p.extractCardTicket({lines,text:rows.map(x=>x[0]).join('\n'),confidence:90},'2026-10-21');
+ assert.equal(r.ok,true,r.reason);assert.equal(r.readings[0].odds,86855);assert.equal(r.readings[0].selectionCount,7);
+ assert.match(r.readings[0].selection,/1\. Como vs\. Manchester United: 1x2: Como \/ 2\. Lille vs\. Galatasaray SK: 1x2: Lille/);
+ assert.doesNotMatch(r.readings[0].selection,/S[uú]per|Anticipado|Pago|\bBu\b|EIB|\[1\]|1\)/);
+}
 console.log('PASS: boletos reales de TeamMéxico, Ecuabet, Playdoit y sencillos (en vivo, resueltos, columnas, PA, totales y una publicación por apuesta).');

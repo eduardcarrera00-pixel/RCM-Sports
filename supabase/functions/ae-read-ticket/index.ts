@@ -15,12 +15,17 @@ async function flashModels(apiKey: string): Promise<string[]> {
   const res = await fetch(`${API}/models?pageSize=1000`, {headers: {'x-goog-api-key': apiKey}, signal: AbortSignal.timeout(5000)});
   if (!res.ok) return [];
   const list = (await res.json())?.models || [];
-  const version = (n: string) => (n.match(/gemini-(\d+(?:\.\d+)?)-flash$/) || [])[1];
-  return list
-    .filter((m: {name?: string, supportedGenerationMethods?: string[]}) => m.name && version(m.name) && (m.supportedGenerationMethods || []).includes('generateContent'))
-    .map((m: {name: string}) => m.name.replace(/^models\//, ''))
-    .sort((a: string, b: string) => Number(version(b)) - Number(version(a)));
+  // Primero los Flash (más recientes antes) y después los Flash-Lite, que suelen
+  // seguir respondiendo cuando Google marca «high demand» en los Flash.
+  const parse = (n: string) => n.match(/gemini-(\d+(?:\.\d+)?)-flash(-lite)?$/);
+  const names = list
+    .filter((m: {name?: string, supportedGenerationMethods?: string[]}) => m.name && parse(m.name.replace(/^models\//, '')) && (m.supportedGenerationMethods || []).includes('generateContent'))
+    .map((m: {name: string}) => m.name.replace(/^models\//, ''));
+  const rank = (n: string) => { const m = parse(n)!; return (m[2] ? 0 : 1000) + Number(m[1]); };
+  return names.sort((a: string, b: string) => rank(b) - rank(a));
 }
+// Si la lista de modelos no responde, se prueba con estos alias.
+const FALLBACK_MODELS = ['gemini-2.5-flash', 'gemini-flash-lite-latest', 'gemini-2.5-flash-lite'];
 const DAILY_LIMIT = 25;
 
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
@@ -101,7 +106,7 @@ Reglas:
 - En apuestas de mercado Sí/No, escribe el mercado y la respuesta: "Penalti en el encuentro: Sí".
 - Si el boleto aparece debajo de otra pantalla de la casa (filas de cuotas de mercados), lee solo el boleto o historial, no esas filas.
 - Si son apuestas sencillas (varias apuestas individuales, cada una con su cuota y sin cuota total), marca bet_type="sencillas" y devuelve cada una con su momio. En "Equipo - Mercado" el pronóstico es "Mercado: Equipo" (p. ej. "Resultado Final (Tiempo Regular): Como").
-- Ignora etiquetas como "PA", "Pago Anticipado", "Cuota de oro" o "EN VIVO" dentro del pronóstico. Si algún partido ya está en juego o terminado (marcador, minuto, "EN VIVO", palomita o tache), marca already_started=true.
+- Ignora etiquetas como "PA", "Pago Anticipado", "Súper Pago Anticipado" (y su icono "$ 1 UP"), "Cuota de oro" o "EN VIVO" dentro del pronóstico. "1x2 Súper Pago Anticipado" es el mercado 1x2: escribe "1x2: Equipo". Si algún partido ya está en juego o terminado (marcador, minuto, "EN VIVO", palomita o tache), marca already_started=true.
 - Devuelve bets[] agrupando POR BOLETO. Varios CREAR APUESTA con UN solo Importe/Ganancias y UN botón Cerrar apuesta al pie son UNA combinada: cada grupo es una selección con su partido, TODOS sus jugadores/condiciones y su decimal exacto. No los publiques como apuestas independientes. Solo separa boletos si cada uno tiene su propio importe y cierre/resumen. Las cifras 1+ remates/faltas son líneas, no cuotas. Si no se ve total pero están todos los grupos de partidos distintos, deja total null: calcularemos su producto sin usar importes de dinero.
 - En Playdoit, Parlay ABIERTO contiene varias tarjetas en UN boleto. Usa Momios para el total, nunca Apuesta total/Ganancia Total. La fecha al pie es la de creación y no la del encuentro.
 - Extrae todos los grupos y selecciones; no uses los ejemplos como si fueran el contenido del boleto actual.
@@ -163,7 +168,7 @@ Deno.serve(async req => {
           throw error;
         }
       },
-      listModels: () => flashModels(apiKey).catch(() => [])
+      listModels: async () => { const found = await flashModels(apiKey).catch(() => []); return [...found, ...FALLBACK_MODELS.filter(m => !found.includes(m))]; }
     });
     if (ai.ok) activeModel = MODEL;
     if (ai.status === 429) return respond({error: 'La lectura avanzada está muy solicitada ahora. Inténtalo en un minuto.'}, 429);

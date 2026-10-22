@@ -368,6 +368,18 @@
  // Etiquetas de la casa que no forman parte del pronóstico.
  const badges=s=>String(s||'').replace(/\s+-\s+cuota de oro\b.*$/i,'').replace(/\(\s*PA\s*\)|[=«»¢©®@_~⚡✓✔✕✗×¥]/g,' ').replace(/(?:^|\s)(?:PA|Pago Anticipado|EN VIVO)(?=\s|$)/g,' ').replace(/\s+/g,' ').trim();
 
+ // Mercado de una tarjeta. Playdoit pone «1x2 Súper Pago Anticipado» en dos filas con un
+ // icono a la derecha («$ 1 UP») que el OCR convierte en basura («1]», «Bu», «EIB»…):
+ // se quita lo que queda tras un hueco ancho de columna y la etiqueta de la promoción.
+ function cardMarket(rows){
+  let s=rows.map(l=>String(l.text).replace(/\s{3,}\S{1,6}\s*$/,'')).join(' ');
+  const promo=/\bs[uú]per\b|\bpago\s+anticipad|\banticipad[oa]\b/i.test(s);
+  s=s.replace(/\bs[uú]per\s+pago(?:\s+\S{1,4})?\s+anticipad[oa]\b/gi,' ').replace(/\bs[uú]per\s+pago\b/gi,' ').replace(/\bpago\s+anticipad[oa]\b/gi,' ').replace(/(?:^|\s)anticipad[oa]\b/gi,' ');
+  s=badges(tidyText(s));
+  if(promo&&/^1\s*x\s*2\b/i.test(s))return '1x2';
+  return s;
+ }
+
  // Tarjetas de boleto con una fila por selección y el momio total al final
  // (TeamMéxico, Ecuabet, Playdoit y similares):
  //   Parlay 5 / Múltiple 7 ............ ABIERTO
@@ -414,7 +426,7 @@
   for(const leg of legs){
    const e=leg.rest.findIndex(l=>EVENT_IN_LINE.test(' '+l.text.replace(DATE_IN_LINE,' ')+' '));
    if(e<0)return fail('No se leyó el partido de cada selección. Prueba una captura más nítida.');
-   const market=badges(tidyText(leg.rest.slice(0,e).map(l=>l.text).join(' ')));
+   const market=cardMarket(leg.rest.slice(0,e));
    let day='',eventLines=[];
    for(const l of leg.rest.slice(e)){
     let t=l.text;const d=t.match(DATE_IN_LINE);
