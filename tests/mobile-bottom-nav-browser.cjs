@@ -58,7 +58,8 @@ const server = http.createServer((req, res) => {
         if(phone){
           assert.equal(layout.buttons.length,4,JSON.stringify({width,dark,layout}));
           assert.deepEqual(layout.buttons.map(b=>b.key),['Picks','NFL','Fútbol','Opiniones']);
-          assert.ok(Math.abs(layout.bottom-780)<2,JSON.stringify({width,dark,layout}));
+          assert.ok(layout.bottom<=772 && layout.bottom>=750,JSON.stringify({width,dark,layout}));
+          assert.equal(layout.display,'flex','capsule dock should use flexible icon spacing');
           assert.ok(layout.height>=60 && layout.height<=110,JSON.stringify({width,dark,layout}));
           for(const b of layout.buttons){
             assert.ok(b.rect.height>=44 && b.rect.width>=44,JSON.stringify({width,dark,b}));
@@ -80,8 +81,35 @@ const server = http.createServer((req, res) => {
     await page.locator('body > nav [data-category="NFL"]').click();
     await page.waitForFunction(()=>document.querySelector('body > nav [data-category="NFL"]').getAttribute('aria-current')==='page');
     assert.equal(await page.evaluate(()=>document.body.dataset.section),'NFL');
+    const nflPill=await nav.evaluate(el=>({
+      active:el.classList.contains('cam-nav-has-active'),
+      left:parseFloat(el.style.getPropertyValue('--cam-pill-left')),
+      width:parseFloat(el.style.getPropertyValue('--cam-pill-width')),
+      text:getComputedStyle(el.querySelector('[data-category="NFL"] span:last-child')).display,
+      inactiveText:getComputedStyle(el.querySelector('[data-category="Picks"] span:last-child')).display,
+      accessible:el.querySelector('[data-category="Picks"]').getAttribute('aria-label')
+    }));
+    assert.ok(nflPill.active && nflPill.width>=90 && nflPill.left>=0,JSON.stringify(nflPill));
+    assert.notEqual(nflPill.text,'none');
+    assert.equal(nflPill.inactiveText,'none');
+    assert.equal(nflPill.accessible,'Picks');
     await page.evaluate(()=>filterByCategory('Opiniones'));
     await page.waitForFunction(()=>document.querySelector('body > nav [data-category="Opiniones"]').getAttribute('aria-current')==='page');
+    const opinionPill=await nav.evaluate(el=>{
+      const button=el.querySelector('[data-category="Opiniones"]');
+      const label=button.querySelector('span:last-child');
+      return {
+        left:parseFloat(el.style.getPropertyValue('--cam-pill-left')),
+        width:parseFloat(el.style.getPropertyValue('--cam-pill-width')),
+        labelVisible:getComputedStyle(label).display!=='none',
+        fits:label.scrollWidth<=label.clientWidth+1,
+        indicator:getComputedStyle(el,'::before').opacity
+      };
+    });
+    assert.ok(opinionPill.left>nflPill.left && opinionPill.width>=100 && opinionPill.labelVisible && opinionPill.fits,JSON.stringify(opinionPill));
+    assert.equal(opinionPill.indicator,'1');
+    await page.evaluate(()=>filterByCategory('Todos'));
+    await page.waitForFunction(()=>!document.querySelector('body > nav').classList.contains('cam-nav-has-active'));
     const input=page.locator('#mobileSearchInput');
     await input.evaluate(el=>{el.hidden=false;el.removeAttribute('aria-hidden');});
     await input.focus();
