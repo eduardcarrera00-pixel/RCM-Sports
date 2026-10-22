@@ -47,7 +47,7 @@ html.dark body #picksFeatured.ae-picks-feature :is(
   .ae-weekly-expanded-content,
   .ae-weekly-selection
 ) {
-  background-color:transparent!important;
+  background:transparent!important;
   color:var(--cam-editor-ink)!important;
 }
 html.dark body #picksFeatured.ae-picks-feature :is(
@@ -133,7 +133,7 @@ html.dark body.ae-is-home #mainContent .editorial-pick :is(
   .ae-weekly-preview,
   .ae-weekly-selection
 ) {
-  background-color:transparent!important;
+  background:transparent!important;
   color:var(--cam-editor-ink)!important;
 }
 html.dark body.ae-is-home #mainContent .editorial-pick:not(.ae-home-weekly-banner) .editorial-pick-body {
@@ -194,6 +194,6 @@ html.dark body.ae-is-home #mainContent > #picksFeatured.ae-home-native-picks :is
   .ae-weekly-expand-summary,
   .ae-weekly-expanded-content
 ) {
-  background-color:transparent!important;
+  background:transparent!important;
   color:var(--cam-editor-ink)!important;
 }
