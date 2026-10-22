@@ -1,0 +1,75 @@
+/* CAM SPORTS · La Quiniela NFL: usa los logos ya definidos en nfl-teams.js.
+   Incorporar a style-sources.json al integrar la vista de La Quiniela. */
+.cam-quiniela-matchup {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    gap: .45rem;
+    width: 100%;
+    min-width: 0;
+}
+.cam-quiniela-team {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    min-width: 0;
+    padding: .55rem .7rem;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    color: inherit;
+    font: inherit;
+    font-weight: 600;
+    text-align: left;
+    cursor: default;
+}
+button.cam-quiniela-team:not(:disabled) { cursor: pointer; }
+button.cam-quiniela-team:focus-visible {
+    outline: 2px solid #9a753f;
+    outline-offset: 2px;
+}
+.cam-quiniela-team.is-selected {
+    border-color: #a57b42;
+    background: rgba(165, 123, 66, .11);
+}
+html.dark .cam-quiniela-team.is-selected {
+    border-color: #b88b4d;
+    background: rgba(184, 139, 77, .16);
+}
+.cam-quiniela-team.is-locked { opacity: .85; }
+.cam-quiniela-team-logo {
+    display: block;
+    flex: none;
+    width: clamp(27px, 3vw, 38px);
+    height: clamp(27px, 3vw, 38px);
+    object-fit: contain;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    filter: none;
+}
+.cam-quiniela-team-name {
+    overflow-wrap: anywhere;
+    font-size: clamp(.75rem, 1.15vw, .92rem);
+    line-height: 1.25;
+}
+.cam-quiniela-at { font-size: .8rem; opacity: .6; }
+.cam-quiniela-status {
+    grid-column: 1 / -1;
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: .015em;
+    text-align: center;
+    color: inherit;
+}
+.cam-quiniela-matchup[data-pick-result="correct"] .cam-quiniela-status { color: #376e50; }
+.cam-quiniela-matchup[data-pick-result="incorrect"] .cam-quiniela-status { color: #a64b43; }
+.cam-quiniela-matchup[data-pick-result="void"] .cam-quiniela-status { color: #8b7858; }
+html.dark .cam-quiniela-matchup[data-pick-result="correct"] .cam-quiniela-status { color: #9bcbb0; }
+html.dark .cam-quiniela-matchup[data-pick-result="incorrect"] .cam-quiniela-status { color: #e8a9a1; }
+@media (max-width: 540px) {
+    .cam-quiniela-matchup { gap: .2rem; }
+    .cam-quiniela-team { flex-direction: column; align-items: center; padding: .4rem .2rem; gap: .25rem; text-align: center; }
+    .cam-quiniela-team-logo { width: 32px; height: 32px; }
+    .cam-quiniela-team-name { font-size: .72rem; }
+}
