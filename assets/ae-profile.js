@@ -772,6 +772,7 @@ async function showOwn(){
   if($('aeProfileWelcomeAgain'))$('aeProfileWelcomeAgain').hidden=false;
   publicAuthorLabel='Aficionado';
   activeAuthor=user.id;
+  window.dispatchEvent(new CustomEvent('cam:nfl-profile',{detail:{userId:user.id}}));
   activeTab='takes';
   const ticket=++request;
   const dialog=$('aeProfileDialog');
@@ -823,6 +824,7 @@ async function showPublic(id,push=true,tab='takes'){
   if($('aeProfilePublish'))$('aeProfilePublish').hidden=true;
   if($('aeProfileWelcomeAgain'))$('aeProfileWelcomeAgain').hidden=true;
   activeAuthor=id;
+  window.dispatchEvent(new CustomEvent('cam:nfl-profile',{detail:{userId:id}}));
   activeTab=tab==='picks'?'picks':'takes';
   ownTakes=[];
   ownPicks=[];
