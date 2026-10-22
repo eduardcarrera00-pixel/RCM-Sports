@@ -76,7 +76,7 @@ function statusOf(row:any):string {
   const raw=String(row?.Status??"").toLowerCase().replace(/[^a-z]/g,"");
   if(raw.includes("cancel")||raw.includes("nocontest"))return "cancelled";
   if(raw.includes("postpon")||raw.includes("suspend"))return "postponed";
-  if(["final","f","finalovertime","completed"].includes(raw))return "final";
+  if(["final","f","fot","finalot","finalovertime","completed"].includes(raw))return "final";
   if(["inprogress","live","halftime","ingame","overtime"].includes(raw))return "live";
   return "scheduled";
 }
@@ -141,8 +141,9 @@ async function updateFixture(row:any,w:Week,teams:Map<string,any>){
     last_synced_at:new Date().toISOString()
   };
   // A reschedule must not silently restore a locked game to an editable state.
-  if(previous && (previous.status!=="scheduled"||previous.picks_open===false
-    ||new Date(previous.kickoff).getTime()<=Date.now()))
+  if(result.status!=="scheduled" ||
+    (previous && (previous.status!=="scheduled" ||
+    new Date(previous.kickoff).getTime()<=Date.now())))
     record.picks_open=false;
   requireData(await db.from("cam_nfl_games").upsert(record,{onConflict:"id"}));
 }
@@ -220,6 +221,7 @@ async function syncResults(weeks:Week[],teams:Map<string,any>){
       const {home,away}=assertPair(row,teams);
       if(old.home_id!==home||old.away_id!==away)throw Error("Result team mismatch: "+id);
       const result=normalizeScore(row,home,away);
+      if(result.status==="scheduled")continue;
       if(["final","tie","cancelled"].includes(old.status)&&
         !["final","tie","cancelled"].includes(result.status))continue;
       const payload:any={...result,picks_open:false,last_synced_at:new Date().toISOString()};
