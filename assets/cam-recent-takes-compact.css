@@ -197,3 +197,47 @@ html body:is(.ae-is-football,.ae-is-nfl) #mainContent #freeTakes[data-sport] #fr
     transition:none!important;
   }
 }
+
+/* Fútbol mueve el mismo #freeTakes dentro de #aeFootballMobileStage en móvil.
+   Neutraliza aquí el antiguo viewport de una tarjeta por fila (4 IDs). */
+@media(max-width:760px){
+  html body.ae-is-football #mainContent #aeFootballMobileStage #freeTakes[data-sport="football"] > #freeTakesFeed{
+    --cam-recent-take-height:clamp(198px,52vw,222px);
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    grid-auto-rows:var(--cam-recent-take-height)!important;
+    align-content:start!important;
+    align-items:stretch!important;
+    gap:7px!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:calc(2 * var(--cam-recent-take-height) + 7px)!important;
+    padding:0 3px 0 0!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+  }
+  html body.ae-is-football #mainContent #aeFootballMobileStage #freeTakes[data-sport="football"] > #freeTakesFeed > article.ae-free-take-card:nth-child(n){
+    display:flex!important;
+    flex-direction:column!important;
+    width:100%!important;
+    height:var(--cam-recent-take-height)!important;
+    min-height:var(--cam-recent-take-height)!important;
+    max-height:var(--cam-recent-take-height)!important;
+    padding:8px!important;
+    overflow:hidden!important;
+  }
+  html body.ae-is-football #mainContent #aeFootballMobileStage #freeTakes[data-sport="football"] > #freeTakesFeed > .ae-free-take-card .ae-free-take-body{
+    display:-webkit-box!important;
+    -webkit-box-orient:vertical!important;
+    -webkit-line-clamp:2!important;
+    max-height:none!important;
+    overflow:hidden!important;
+  }
+}
+@media(max-width:350px){
+  html body.ae-is-football #mainContent #aeFootballMobileStage #freeTakes[data-sport="football"] > #freeTakesFeed{
+    --cam-recent-take-height:198px;
+    grid-template-columns:minmax(0,1fr)!important;
+  }
+}
