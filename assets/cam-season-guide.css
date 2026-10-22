@@ -1,0 +1,18 @@
+/* CAM SPORTS · explicación desplegable de las predicciones de campeón. */
+#freeTakes .ae-season-guide-toggle{display:inline-flex;align-items:center;gap:6px;min-height:28px;padding:4px 9px;border:1px solid rgba(133,90,56,.45);border-radius:0;background:rgba(133,90,56,.07);color:#765128;font:700 11px/1.2 Inter,system-ui,sans-serif;letter-spacing:0;text-transform:none;cursor:pointer}
+#freeTakes .ae-season-guide-toggle::after{content:'⌄';font-size:16px;line-height:0.7;transition:transform .15s ease}
+#freeTakes .ae-season-guide-toggle[aria-expanded=true]::after{transform:rotate(180deg)}
+#freeTakes .ae-season-guide-toggle:hover{background:rgba(133,90,56,.14)}
+#freeTakes .ae-season-guide-toggle:focus-visible{outline:2px solid #855a38;outline-offset:2px}
+#freeTakes .ae-season-guide{margin:9px 0 3px;padding:11px 13px;border:1px solid rgba(155,116,76,.3);background:rgba(238,225,206,.35);color:#4b4a44}
+#freeTakes .ae-season-guide[hidden]{display:none!important}
+#freeTakes .ae-season-guide p{margin:0;font:12px/1.55 Inter,system-ui,sans-serif;letter-spacing:normal;text-transform:none}
+#freeTakes .ae-season-guide p+p{margin-top:5px}
+#freeTakes .ae-season-guide strong{font-weight:800;color:#765128}
+html.dark #freeTakes .ae-season-guide-toggle{color:#efd0ac;border-color:rgba(209,175,144,.55);background:rgba(209,175,144,.09)}
+html.dark #freeTakes .ae-season-guide-toggle:hover{background:rgba(209,175,144,.18)}
+html.dark #freeTakes .ae-season-guide-toggle:focus-visible{outline-color:#d1af90}
+html.dark #freeTakes .ae-season-guide{color:#decebf;background:rgba(16,40,55,.84);border-color:rgba(209,175,144,.35)}
+html.dark #freeTakes .ae-season-guide strong{color:#f0cba4}
+@media(max-width:600px){#freeTakes .ae-season-meta{align-items:center}#freeTakes .ae-season-guide{padding:10px}#freeTakes .ae-season-guide-toggle{min-height:30px}}
+@media(prefers-reduced-motion:reduce){#freeTakes .ae-season-guide-toggle::after{transition:none}}
