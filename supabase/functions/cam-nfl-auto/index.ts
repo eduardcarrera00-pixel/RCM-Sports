@@ -94,22 +94,34 @@ function normalizeScore(row:any,home_id:string,away_id:string):Result{
   };
 }
 async function currentWeeks():Promise<Week[]>{
-  const [seasonVal,weekVal,tf]=await Promise.all([
-    sports("CurrentSeason"),sports("CurrentWeek"),sports("Timeframes/current")
+  const [seasonVal,weekVal,currentFeed,upcomingFeed]=await Promise.all([
+    sports("CurrentSeason"),sports("CurrentWeek"),
+    sports("Timeframes/current"),sports("Timeframes/upcoming")
   ]);
   const season=Number(seasonVal),week=Number(weekVal);
-  const rows=Array.isArray(tf)?tf:tf?[tf]:[];
-  // Use official season, phase and week simultaneously; never infer postseason from dates.
-  const matching=rows.find((row:any)=>Number(row.Season??row.season)===season &&
-    Number(row.Week??row.week)===week && phaseOf(row));
+  const currentRows=Array.isArray(currentFeed)?currentFeed:currentFeed?[currentFeed]:[];
+  const upcomingRows=Array.isArray(upcomingFeed)?upcomingFeed:upcomingFeed?[upcomingFeed]:[];
+  const matching=currentRows.find((r:any)=>Number(r.Season??r.season)===season &&
+    Number(r.Week??r.week)===week && phaseOf(r));
   const phase=matching?phaseOf(matching):null;
-  if(!Number.isInteger(season)||season<2020||season>2100||
-    !Number.isInteger(week)||week<1||week>22||!phase)
-    throw Error("No verified official NFL season/phase/week. Week not changed.");
-  const max=phase==="REG"?18:phase==="POST"?5:4;
-  const current:[Week]=[{season,phase,week}];
-  const entries=[week-1,week+1].filter(w=>w>=1&&w<=max).map(w=>({season,phase,week:w}));
-  return [...current,...entries].sort((a,b)=>a.week-b.week);
+  let rounds:Week[]=[];
+  if(Number.isInteger(season)&&season>=2020&&season<=2100&&
+    Number.isInteger(week)&&week>=1&&week<=22&&phase){
+    const max=phase==="REG"?18:phase==="POST"?5:4;
+    rounds=[week-1,week,week+1].filter(w=>w>=1&&w<=max).map(w=>({season,phase,week:w}));
+  }
+  // Timeframes/upcoming provides the official next phase/week, including
+  // REG -> POST and the next season; never guess an NFL phase from a date.
+  for(const row of upcomingRows.slice(0,10)){
+    const s=Number(row.Season??row.season),w=Number(row.Week??row.week),p=phaseOf(row);
+    if(s>=2020&&s<=2100&&Number.isInteger(s)&&w>=1&&w<=22&&Number.isInteger(w)&&p &&
+      !rounds.some(r=>r.season===s&&r.phase===p&&r.week===w)){
+      rounds.push({season:s,phase:p,week:w});
+    }
+  }
+  if(!rounds.length)throw Error("No verified official NFL season/phase/week. Week not changed.");
+  // Only the current, previous and two nearest confirmed upcoming rounds.
+  return rounds.slice(0,6);
 }
 async function catalog():Promise<Map<string,{name:string}>>{
   const data=requireData(await db.from("nfl_teams").select("id,name"));
