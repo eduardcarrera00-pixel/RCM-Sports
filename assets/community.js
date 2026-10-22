@@ -432,7 +432,7 @@ function renderRanking() {
     document.getElementById('homeRankingEdition').textContent = rankingPublished?.edition ? ' · ' + rankingPublished.edition : '';
     document.getElementById('homeRankingStatus').textContent = document.getElementById('rankingStatus').textContent;
     if (!rankingPublished) return;
-    rankingPublished.team_ids.slice(0,6).forEach((id,i) => preview.append(teamNode(id,i+1,rankingPreviousTeamIds)));
+    rankingPublished.team_ids.slice(0,3).forEach((id,i) => preview.append(teamNode(id,i+1,rankingPreviousTeamIds)));
     rankingPublished.team_ids.forEach((id,i) => list.append(teamNode(id,i+1,rankingPreviousTeamIds)));
     for (let copy=0; copy<2; copy++) {
         const group = node('ol', null, 'rcm-track-group');
