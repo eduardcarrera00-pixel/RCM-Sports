@@ -85,9 +85,11 @@ const {chromium}=require('playwright');
       assert.equal(await page.locator('.cam-nfl-game').count(),1,
         'Previous rounds must remain accessible in the selector');
       assert.match(await page.locator('#camNflGames').innerText(),/Finalizado/);
-      await page.locator('#camNflNav select[aria-label="Jornada NFL"]').selectOption('7');
+      await page.evaluate(()=>document.body.classList.remove('ae-is-nfl'));
+      await page.evaluate(()=>document.body.classList.add('ae-is-nfl'));
+      await page.waitForFunction(()=>document.querySelector('#camNflNav select[aria-label="Jornada NFL"]')?.value==='7');
       assert.equal(await page.locator('.cam-nfl-game').count(),2,
-        'Returning to the current week restores its matchups');
+        'Returning to NFL must reopen the current week, even after browsing older rounds');
       assert.equal(await page.locator('#camNflNav select[aria-label="Jornada NFL"]').inputValue(),'7');
       assert.equal(await page.locator('#camNflGames .cam-nfl-team').count(),4);
       assert.equal(await page.locator('#camNflGames .cam-nfl-team img').count(),4);
