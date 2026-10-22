@@ -25,11 +25,12 @@ const {chromium}=require('playwright');
       await page.addScriptTag({content:fs.readFileSync('assets/cam-nfl-quiniela-logos.js','utf8')});
       await page.evaluate(()=>{
         const tomorrow=new Date(Date.now()+86400000).toISOString();
+        const later=new Date(Date.now()+3*86400000).toISOString();
         const user={id:'11111111-1111-4111-8111-111111111111',user_metadata:{username:'TEST'}};
         const fixtures=[
           {id:'900000001',season:2026,week:7,home_id:'BUF',away_id:'KC',kickoff:tomorrow,status:'scheduled',odds_locked_at:tomorrow,
            picks_open:true,points_home:5,points_away:4,probability_home:.4,probability_away:.6},
-          {id:'900000002',season:2026,week:7,home_id:'DAL',away_id:'SEA',kickoff:tomorrow,status:'scheduled',odds_locked_at:tomorrow,
+          {id:'900000002',season:2026,week:7,home_id:'DAL',away_id:'SEA',kickoff:later,status:'scheduled',odds_locked_at:tomorrow,
            picks_open:true,points_home:4,points_away:4,probability_home:.5,probability_away:.5},
           {id:'900000003',season:2026,week:6,home_id:'NE',away_id:'CHI',
            // Two days ago: the old 4-day lookback incorrectly selected week 6.
@@ -39,7 +40,16 @@ const {chromium}=require('playwright');
           {id:'900000004',season:2026,week:8,home_id:'BAL',away_id:'PIT',
            kickoff:new Date(Date.now()+8*86400000).toISOString(),status:'scheduled',
            odds_locked_at:tomorrow,picks_open:true,
-           points_home:3,points_away:8,probability_home:.8,probability_away:.2}
+           points_home:3,points_away:8,probability_home:.8,probability_away:.2},
+          {id:'900000005',season:2026,week:7,home_id:'MIA',away_id:'NYJ',kickoff:later,status:'scheduled',
+           odds_locked_at:tomorrow,picks_open:true,points_home:5,points_away:6},
+          // 01:30 UTC is Saturday in Toronto; 06:30 UTC is Sunday after the DST shift.
+          {id:'900000006',season:2026,week:8,home_id:'SF',away_id:'LAR',
+           kickoff:'2026-11-01T01:30:00Z',status:'postponed',picks_open:false,odds_locked_at:tomorrow,
+           points_home:6,points_away:3},
+          {id:'900000007',season:2026,week:8,home_id:'GB',away_id:'DET',
+           kickoff:'2026-11-01T06:30:00Z',status:'scheduled',picks_open:true,odds_locked_at:tomorrow,
+           points_home:6,points_away:4}
         ];
         const teams=['BUF','KC','DAL','SEA'].map(id=>({id,name:'Equipo '+id,logo:'https://a.espncdn.com/i/teamlogos/nfl/500/'+id.toLowerCase()+'.png'}));
         const picks=[];
@@ -75,7 +85,12 @@ const {chromium}=require('playwright');
       const weekPicker=page.locator('#camNflNav select[aria-label="Jornada NFL"]');
       assert.equal(await weekPicker.inputValue(),'7',
         'The current week is selected by default, even when last week played two days ago');
-      assert.equal(await page.locator('.cam-nfl-game').count(),2);
+      assert.equal(await page.locator('.cam-nfl-game').count(),1,'Only the nearest day appears initially');
+      assert.equal(await page.locator('#camNflDayNav .cam-nfl-day').count(),2,'Show exactly the two days with matches');
+      assert.equal(await page.locator('#camNflDayNav .cam-nfl-day[aria-pressed="true"]').count(),1);
+      assert.match(await page.locator('#camNflDayNav').innerText(),/Este · America\/Toronto/);
+      assert.match(await page.locator('#camNflWeekSummary').innerText(),/Partidos/);
+      assert.match(await page.locator('#camNflWeekSummary').innerText(),/3/);
       for(const text of await page.locator('#camNflGames .cam-nfl-team small').allTextContents()){
         assert.match(text,/^\d+ pts$/,'Show only points, never a team win probability');
         assert.doesNotMatch(text,/%/);
@@ -88,22 +103,49 @@ const {chromium}=require('playwright');
       await page.evaluate(()=>document.body.classList.remove('ae-is-nfl'));
       await page.evaluate(()=>document.body.classList.add('ae-is-nfl'));
       await page.waitForFunction(()=>document.querySelector('#camNflNav select[aria-label="Jornada NFL"]')?.value==='7');
-      assert.equal(await page.locator('.cam-nfl-game').count(),2,
-        'Returning to NFL must reopen the current week, even after browsing older rounds');
+      assert.equal(await page.locator('.cam-nfl-game').count(),1,
+        'Returning to NFL must reopen the current week and its nearest match day');
       assert.equal(await page.locator('#camNflNav select[aria-label="Jornada NFL"]').inputValue(),'7');
-      assert.equal(await page.locator('#camNflGames .cam-nfl-team').count(),4);
-      assert.equal(await page.locator('#camNflGames .cam-nfl-team img').count(),4);
+      assert.equal(await page.locator('#camNflGames .cam-nfl-team').count(),2);
+      assert.equal(await page.locator('#camNflGames .cam-nfl-team img').count(),2);
       assert.ok((await page.locator('#camNflGames .cam-nfl-team img').first().getAttribute('src')).includes('espncdn.com'));
       await page.locator('#camNflHistory').evaluate(node=>node.open=true);
       assert.ok(await page.locator('#camNflHistory .cam-quiniela-team-logo').count()>=2,
         'Previous rounds must display both logos');
       await page.locator('.cam-nfl-game').first().locator('.cam-nfl-team').first().click();
-      assert.match(await page.locator('#camNflProgress').innerText(),/1 de 2 seleccionados/);
+      assert.match(await page.locator('#camNflProgress').innerText(),/1 de 3 seleccionados/);
       assert.equal(await page.locator('#camNflSummary .cam-quiniela-team-logo').count(),2,
         'The selection summary needs both logos');
-      await page.locator('#camNflSave').click();
+      await page.locator('#camNflSaveDay').click();
       await page.waitForFunction(()=>document.querySelector('#camNflStatus')?.textContent.includes('guardado'));
       assert.match(await page.locator('#camNflGames').innerText(),/Pronóstico guardado/);
+      assert.match(await page.locator('#camNflWeekSummary').innerText(),/1/);
+      await page.locator('#camNflDayNav .cam-nfl-day').nth(1).click();
+      assert.equal(await page.locator('.cam-nfl-game').count(),2,'A day with two fixtures shows both');
+      assert.equal(await page.locator('#camNflDayNav .cam-nfl-day').count(),2,'No invented weekdays');
+      assert.match(await page.locator('#camNflProgress').innerText(),/1 de 3 seleccionados/);
+      await page.locator('.cam-nfl-game').first().locator('.cam-nfl-team').first().click();
+      assert.match(await page.locator('#camNflProgress').innerText(),/2 de 3 seleccionados/);
+      await page.locator('#camNflSave').click();
+      await page.waitForFunction(()=>document.querySelector('#camNflProgress')?.textContent.includes('2 guardados'));
+      assert.match(await page.locator('#camNflWeekSummary').innerText(),/2/);
+      await page.locator('#camNflDayNav .cam-nfl-day').first().click();
+      assert.equal(await page.locator('.cam-nfl-game').count(),1,'Switching days keeps the list compact');
+      assert.match(await page.locator('#camNflGames').innerText(),/Pronóstico guardado/,'First-day pick persists');
+      assert.equal(await page.locator('.cam-nfl-team.is-selected').count(),1,'Saved winner remains highlighted');
+      await page.locator('#camNflNav select[aria-label="Jornada NFL"]').selectOption('8');
+      const grouped=await page.locator('#camNflDayNav .cam-nfl-day').evaluateAll(nodes=>
+        nodes.map(node=>({day:node.dataset.day,text:node.textContent})));
+      assert.ok(grouped.some(x=>x.day==='2026-10-31'&&/sábado/i.test(x.text)),
+        'International Saturday game is grouped by Toronto date, not the UTC Sunday date');
+      assert.ok(grouped.some(x=>x.day==='2026-11-01'&&/domingo/i.test(x.text)),
+        'DST rollover correctly yields a Sunday tab');
+      await page.locator('#camNflDayNav .cam-nfl-day[data-day="2026-10-31"]').click();
+      assert.match(await page.locator('#camNflGames').innerText(),/Pospuesto/);
+      assert.equal(await page.locator('#camNflGames .cam-nfl-team:not([disabled])').count(),0,
+        'Postponed games must remain locked');
+      await page.locator('#camNflNav select[aria-label="Jornada NFL"]').selectOption('7');
+      assert.equal(await page.locator('#camNflDayNav .cam-nfl-day[aria-pressed="true"]').count(),1);
       await page.evaluate(()=>window.dispatchEvent(new CustomEvent('cam:nfl-profile',{detail:{userId:'11111111-1111-4111-8111-111111111111'}})));
       await page.waitForFunction(()=>document.querySelector('#camNflProfile')?.textContent.includes('Efectividad'));
       assert.ok(await page.locator('#camNflProfile').isVisible());
