@@ -404,6 +404,7 @@
     if (needsCss()) { try { walkSheets(); } catch {} }
     applyDecls();
     applyImgs(document.documentElement);
+    window.camVisualSizes?.mark?.(document.documentElement);
     if (document.body) applySlots();
   }
 
