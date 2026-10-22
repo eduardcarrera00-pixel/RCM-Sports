@@ -749,6 +749,21 @@ async function loadOwnPicks(userId){
   return result.data||[];
 }
 
+// Refresh only visible Pick data when a moderation decision arrives.
+async function refreshProfilePicks(){
+  const dialog=$('aeProfileDialog'),author=activeAuthor,token=request,isOwn=privateView;
+  if(!dialog?.open||!author||document.hidden)return;
+  try{
+    const fresh=await loadOwnPicks(author);
+    if(token!==request||!dialog.open||activeAuthor!==author||privateView!==isOwn)return;
+    ownPicks=fresh;
+    if(activeTab==='picks')renderPicks(ownPicks,!isOwn);
+  }catch(error){
+    // Retain the previous view during transient network problems.
+    console.warn('No fue posible actualizar los Picks del perfil',error);
+  }
+}
+
 async function showOwn(){
   const user=await me();
   if(!user){if(typeof openUserAuthModal==='function')openUserAuthModal();return;}
@@ -877,6 +892,9 @@ document.addEventListener('DOMContentLoaded',()=>{
   $('aeProfileDialog')?.addEventListener('close',()=>{++request;});
 
   document.addEventListener('ae:takes-updated',refreshProfileTakes);
+  document.addEventListener('ae:picks-updated',refreshProfilePicks);
+  window.addEventListener('focus',refreshProfilePicks);
+  window.setInterval(refreshProfilePicks,30000);
   window.addEventListener('ae:take-category-changed',()=>{
     if($('aeProfileDialog')?.open&&privateView)showOwn();
     else if($('aeProfileDialog')?.open&&activeAuthor)showPublic(activeAuthor,false);
