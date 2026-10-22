@@ -46,7 +46,7 @@ w.document.querySelector('[data-reset="zoom"]').click();
 assert.equal(w.camImageVisual.get().mobile.zoom,100);
 w.camImageVisual.img(target,{visual:{desktop:{size:60,zoom:70,x:35,y:45,fit:'contain',ratio:'1:1'}}});
 assert.equal(target.style.getPropertyValue('object-fit'),'contain');
-assert.equal(target.style.getPropertyValue('aspect-ratio'),'1');
+assert.equal(target.style.getPropertyValue('aspect-ratio'),'1 / 1');
 assert.match(target.style.getPropertyValue('transform'),/0\.7/);
 w.camImageVisual.img(target,null);
 assert.equal(target.style.getPropertyValue('transform'),'');
