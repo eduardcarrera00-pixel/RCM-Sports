@@ -265,7 +265,7 @@ async function updateButton(){
 }
 
 function close(){
-  window.camNflProfile?.close();
+  window.camNflProfile?.close?.();
   if(recentScrollObserver){recentScrollObserver.disconnect();recentScrollObserver=null;}
   ++request;
   activeAuthor=null;
