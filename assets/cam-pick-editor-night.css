@@ -1,0 +1,199 @@
+/* CAM SPORTS | Pick del Editor: color-only nighttime theme.
+ * The system toggles html.dark before CSS loads; no JS/markup/dimensions changed.
+ * Light mode deliberately inherits its current design unchanged.
+ * Covers the original Picks component, native mobile Home relocation, and
+ * the desktop Home editorial preview.
+ */
+html.dark body #picksFeatured.ae-picks-feature,
+html.dark body.ae-is-home #mainContent .editorial-pick {
+  --cam-editor-bg:#091f32;
+  --cam-editor-bg-raised:#102c41;
+  --cam-editor-bg-soft:#173449;
+  --cam-editor-ink:#f3ebdd;
+  --cam-editor-secondary:#c9d5df;
+  --cam-editor-bronze:#e1b788;
+  --cam-editor-border:rgba(210,171,127,.48);
+  --cam-editor-border-soft:rgba(205,171,139,.26);
+  --cam-editor-interactive:#123754;
+  --cam-editor-interactive-hover:#1b4770;
+  --cam-editor-focus:#f1c490;
+  color:var(--cam-editor-ink)!important;
+  border-color:var(--cam-editor-border)!important;
+}
+/* Picks page, including its no-photo fallback. Never replace the real banner. */
+html.dark body #footballTakes #aePicksTopPair #picksFeatured.ae-picks-feature,
+html.dark body.ae-is-home #mainContent > #picksFeatured.ae-home-native-picks {
+  background-color:var(--cam-editor-bg)!important;
+  background-image:linear-gradient(128deg,var(--cam-editor-bg) 0%,var(--cam-editor-bg-raised) 75%,#19374a 100%)!important;
+  box-shadow:0 7px 20px rgba(2,10,23,.32)!important;
+}
+/* The existing image remains exactly the same; only the existing dark overlay
+   is color-corrected to prevent bright photography overpowering text. */
+html.dark body #picksFeatured.ae-picks-feature:has(>img.ae-weekly-banner)::before {
+  display:block!important;
+  background:linear-gradient(96deg,rgba(5,21,35,.97) 0%,rgba(6,24,39,.94) 37%,rgba(7,27,44,.78) 68%,rgba(8,28,46,.42) 100%)!important;
+}
+html.dark body #picksFeatured.ae-picks-feature:not(:has(>img.ae-weekly-banner))::before {
+  background-image:none!important;
+  background-color:transparent!important;
+}
+/* Keep the existing card structure, padding, image sizes and controls. */
+html.dark body #picksFeatured.ae-picks-feature :is(
+  .ae-picks-feature-label,
+  #picksFeaturedCard,
+  .ae-weekly-card,
+  .ae-weekly-expandable,
+  .ae-weekly-expand-summary,
+  .ae-weekly-expanded-content,
+  .ae-weekly-selection
+) {
+  background-color:transparent!important;
+  color:var(--cam-editor-ink)!important;
+}
+html.dark body #picksFeatured.ae-picks-feature :is(
+  #picksFeaturedTitle,
+  .ae-weekly-title,
+  .ae-weekly-expand-summary .ae-weekly-title,
+  .ae-weekly-selection strong
+) {
+  color:var(--cam-editor-ink)!important;
+  text-shadow:none!important;
+}
+html.dark body #picksFeatured.ae-picks-feature :is(
+  .ae-weekly-event,
+  .ae-weekly-analysis,
+  .ae-weekly-compact-selection,
+  .ae-weekly-disclaimer,
+  .ae-weekly-empty
+) {
+  color:var(--cam-editor-secondary)!important;
+}
+html.dark body #picksFeatured.ae-picks-feature :is(
+  .ae-weekly-kicker,
+  .ae-weekly-link,
+  .ae-weekly-expand-hint,
+  .ae-weekly-odds
+) {
+  color:var(--cam-editor-bronze)!important;
+}
+html.dark body #picksFeatured.ae-picks-feature :is(.ae-weekly-expandable,.ae-weekly-expanded-content) {
+  border-color:var(--cam-editor-border-soft)!important;
+}
+html.dark body #picksFeatured.ae-picks-feature :is(
+  .ae-weekly-odds,
+  #aeWeeklyOddsHighlight,
+  #aeWeeklyShareButton,
+  #aeWeeklyEditButton
+) {
+  background:var(--cam-editor-interactive)!important;
+  border-color:var(--cam-editor-border)!important;
+  color:var(--cam-editor-ink)!important;
+  box-shadow:none!important;
+}
+html.dark body #picksFeatured.ae-picks-feature :is(.ae-weekly-odds,#aeWeeklyOddsHighlight) {
+  color:var(--cam-editor-bronze)!important;
+  font-variant-numeric:tabular-nums;
+}
+html.dark body #picksFeatured.ae-picks-feature :is(#aeWeeklyShareButton,#aeWeeklyEditButton):hover:not(:disabled) {
+  background:var(--cam-editor-interactive-hover)!important;
+  border-color:var(--cam-editor-bronze)!important;
+}
+html.dark body #picksFeatured.ae-picks-feature .ae-weekly-shared-notice {
+  background:var(--cam-editor-bg-soft)!important;
+  color:var(--cam-editor-ink)!important;
+  border-color:var(--cam-editor-bronze)!important;
+}
+html.dark body #picksFeatured.ae-picks-feature :is(
+  #aeWeeklyShareButton,
+  #aeWeeklyEditButton,
+  .ae-weekly-expand-summary
+):focus-visible {
+  outline:2px solid var(--cam-editor-focus)!important;
+  outline-offset:3px!important;
+}
+/* Home preview, including its photo-backed mobile layout. */
+html.dark body.ae-is-home #mainContent .editorial-pick {
+  background-color:var(--cam-editor-bg)!important;
+  border-color:var(--cam-editor-border)!important;
+  color:var(--cam-editor-ink)!important;
+}
+html.dark body.ae-is-home #mainContent .editorial-pick:not(.ae-home-weekly-banner) {
+  background-image:linear-gradient(135deg,var(--cam-editor-bg),var(--cam-editor-bg-raised))!important;
+}
+html.dark body.ae-is-home #mainContent .editorial-pick.ae-home-weekly-banner {
+  background-color:var(--cam-editor-bg)!important;
+}
+html.dark body.ae-is-home #mainContent .editorial-pick.ae-home-weekly-banner::before {
+  background:linear-gradient(100deg,rgba(5,20,34,.96) 0%,rgba(6,23,37,.85) 42%,rgba(7,25,41,.54) 75%,rgba(8,27,42,.31) 100%)!important;
+}
+html.dark body.ae-is-home #mainContent .editorial-pick :is(
+  .editorial-pick-body,
+  #cpWeekly,
+  .ae-weekly-card,
+  .ae-weekly-preview,
+  .ae-weekly-selection
+) {
+  background-color:transparent!important;
+  color:var(--cam-editor-ink)!important;
+}
+html.dark body.ae-is-home #mainContent .editorial-pick:not(.ae-home-weekly-banner) .editorial-pick-body {
+  background:var(--cam-editor-bg-raised)!important;
+  border-color:var(--cam-editor-border-soft)!important;
+}
+html.dark body.ae-is-home #mainContent .editorial-pick.ae-home-weekly-banner .editorial-pick-body {
+  background:transparent!important;
+}
+html.dark body.ae-is-home #mainContent .editorial-pick :is(
+  #weeklyPickTitle,
+  .ae-weekly-title,
+  .ae-weekly-selection strong
+) {
+  color:var(--cam-editor-ink)!important;
+}
+html.dark body.ae-is-home #mainContent .editorial-pick :is(
+  .ae-weekly-event,
+  .ae-weekly-analysis,
+  .ae-weekly-empty
+) {
+  color:var(--cam-editor-secondary)!important;
+}
+html.dark body.ae-is-home #mainContent .editorial-pick :is(
+  .editorial-eyebrow,
+  .ae-weekly-kicker,
+  .ae-weekly-link,
+  .ae-home-weekly-more
+) {
+  color:var(--cam-editor-bronze)!important;
+}
+html.dark body.ae-is-home #mainContent .editorial-pick :is(
+  .ae-weekly-odds,
+  #aeHomeWeeklyShareButton
+) {
+  background:var(--cam-editor-interactive)!important;
+  color:var(--cam-editor-bronze)!important;
+  border-color:var(--cam-editor-border)!important;
+}
+html.dark body.ae-is-home #mainContent .editorial-pick #aeHomeWeeklyShareButton:hover:not(:disabled) {
+  background:var(--cam-editor-interactive-hover)!important;
+  border-color:var(--cam-editor-bronze)!important;
+}
+html.dark body.ae-is-home #mainContent .editorial-pick :is(
+  #aeHomeWeeklyShareButton,
+  .ae-home-weekly-more,
+  .ae-weekly-preview
+):focus-visible {
+  outline:2px solid var(--cam-editor-focus)!important;
+  outline-offset:3px!important;
+}
+/* On mobile Home the actual #picksFeatured is relocated out of #footballTakes.
+   The same scoped variables and imagery remain in force, with no new markup. */
+html.dark body.ae-is-home #mainContent > #picksFeatured.ae-home-native-picks :is(
+  .ae-picks-feature-label,
+  #picksFeaturedCard,
+  .ae-weekly-expandable,
+  .ae-weekly-expand-summary,
+  .ae-weekly-expanded-content
+) {
+  background-color:transparent!important;
+  color:var(--cam-editor-ink)!important;
+}
