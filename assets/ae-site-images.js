@@ -1050,6 +1050,9 @@
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
   addEventListener('load', () => { sheetsChanged(); applyAll(); });
+  // Al cruzar de escritorio a teléfono, aplicar el perfil visual adecuado.
+  let visualResize = 0;
+  addEventListener('resize', () => { clearTimeout(visualResize); visualResize = setTimeout(() => { applyAll(); if (admin.on) requestReposition(); }, 120); }, { passive: true });
 
   window.camSiteImages = {
     refresh, reload: load, open: openEditor,
