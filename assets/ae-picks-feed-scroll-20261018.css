@@ -261,3 +261,10 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings .ae
     font-size:9.5px!important;
   }
 }
+
+/* Mobile viewport cap must follow the shared desktop cap above. Only the feed window changes. */
+@media(max-width:760px){
+ html body #footballTakes.ae-picks-editorial #communityPicks #cpFeed.ae-picks-feed-scrollable{
+  max-height:min(var(--ae-picks-feed-window-height,620px),72vh,650px)!important;
+ }
+}
