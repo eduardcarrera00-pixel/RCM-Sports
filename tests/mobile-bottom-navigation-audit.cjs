@@ -126,7 +126,7 @@ async function visit(browser,name,width,height,dark,mobile){
       }
       await page.locator('header .cam-brand').click();
       await page.waitForTimeout(120);
-      assert.ok(await page.evaluate(()=>document.querySelector('header [data-category="Todos"]')?.classList.contains('active')),
+      assert.ok(await page.evaluate(()=>document.querySelector('nav.ae-sport-nav [data-category="Todos"]')?.classList.contains('active')),
         label+': el logo no abre Home');
       await page.evaluate(()=>window.scrollTo(0,document.documentElement.scrollHeight));
       await page.waitForTimeout(125);
