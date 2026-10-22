@@ -109,7 +109,7 @@ async function visit(browser,name,width,height,dark,mobile){
           dialogs:[...document.querySelectorAll('dialog[open]')].map(d=>d.id),
           nav:cs(n),button:cs(b),label:cs(label)};
       });
-      assert.equal(dockDebug.label.display,'none',label+': en Home las etiquetas inactivas deben ocultarse: '+JSON.stringify(dockDebug));
+      assert.notEqual(dockDebug.label.display,'none',label+': en Home los cuatro nombres deben permanecer visibles: '+JSON.stringify(dockDebug));
       for(const sport of ITEMS){
         // A real touch event detects obstructed or non-interactive menu controls.
         await page.locator('[data-cam-audit-nav] [data-category="'+sport+'"]').tap({timeout:4000});
@@ -132,10 +132,10 @@ async function visit(browser,name,width,height,dark,mobile){
         });
         assert.ok(state.live,label+': recarga innecesaria en '+sport);
         assert.deepEqual(state.active,[sport],label+': selección activa errónea en '+sport);
-        assert.ok(state.capsule && state.pillWidth>=95 && state.selectedFits,label+': cápsula incorrecta '+sport+' '+JSON.stringify(state));
+        assert.ok(state.capsule && state.pillWidth>=60 && state.selectedFits,label+': cápsula incorrecta '+sport+' '+JSON.stringify(state));
         for(const tab of state.labels){
           assert.equal(tab.ariaLabel,tab.category,label+': botón sin nombre accesible');
-          assert.equal(tab.display==='none',tab.category!==sport,label+': texto inactivo/activo incorrecto');
+          assert.notEqual(tab.display,'none',label+': los cuatro nombres deben permanecer visibles');
         }
       }
       await page.locator('header .cam-brand').click();

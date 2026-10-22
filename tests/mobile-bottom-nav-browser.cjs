@@ -57,6 +57,21 @@ const server = http.createServer((req, res) => {
         assert.equal(layout.position,phone?'fixed':layout.position,JSON.stringify({width,dark,layout}));
         if(phone){
           assert.equal(layout.buttons.length,4,JSON.stringify({width,dark,layout}));
+          // Every original title must remain visible in BOTH themes (not only the active tab).
+          const visibleLabels=await nav.evaluate(node=>Array.from(node.querySelectorAll('button.category-btn'))
+            .filter(button=>getComputedStyle(button).display!=='none')
+            .map(button=>{
+              const label=button.querySelector('span:not(.ae-nav-icon)');
+              const box=button.getBoundingClientRect(), rect=label?.getBoundingClientRect();
+              return {name:button.dataset.category,display:label?getComputedStyle(label).display:'none',
+                hasText:!!label?.textContent?.trim(),inside:!!rect && rect.left>=box.left-1 && rect.right<=box.right+1,
+                height:rect?.height??0};
+            }));
+          assert.equal(visibleLabels.length,4,JSON.stringify({width,dark,visibleLabels}));
+          for(const label of visibleLabels){
+            assert.notEqual(label.display,'none',JSON.stringify({width,dark,label}));
+            assert.ok(label.hasText && label.inside && label.height>=10,JSON.stringify({width,dark,label}));
+          }
           assert.deepEqual(layout.buttons.map(b=>b.key),['Picks','NFL','Fútbol','Opiniones']);
           assert.ok(layout.bottom<=772 && layout.bottom>=750,JSON.stringify({width,dark,layout}));
           assert.equal(layout.display,'flex','capsule dock should use flexible icon spacing');
@@ -89,9 +104,9 @@ const server = http.createServer((req, res) => {
       inactiveText:getComputedStyle(el.querySelector('[data-category="Picks"] span:last-child')).display,
       accessible:el.querySelector('[data-category="Picks"]').getAttribute('aria-label')
     }));
-    assert.ok(nflPill.active && nflPill.width>=90 && nflPill.left>=0,JSON.stringify(nflPill));
+    assert.ok(nflPill.active && nflPill.width>=60 && nflPill.left>=0,JSON.stringify(nflPill));
     assert.notEqual(nflPill.text,'none');
-    assert.equal(nflPill.inactiveText,'none');
+    assert.notEqual(nflPill.inactiveText,'none','inactive names must stay visible');
     assert.equal(nflPill.accessible,'Picks');
     await page.evaluate(()=>filterByCategory('Opiniones'));
     await page.waitForFunction(()=>document.querySelector('body > nav [data-category="Opiniones"]').getAttribute('aria-current')==='page');
@@ -107,7 +122,7 @@ const server = http.createServer((req, res) => {
         indicator:getComputedStyle(el,'::before').opacity
       };
     });
-    assert.ok(opinionPill.left>nflPill.left && opinionPill.width>=100 && opinionPill.labelVisible && opinionPill.fits,JSON.stringify(opinionPill));
+    assert.ok(opinionPill.left>nflPill.left && opinionPill.width>=60 && opinionPill.labelVisible && opinionPill.fits,JSON.stringify(opinionPill));
     assert.ok(Number(opinionPill.indicator)>=0.99,'the animated capsule becomes fully visible');
     await page.evaluate(()=>filterByCategory('Todos'));
     await page.waitForFunction(()=>!document.querySelector('body > nav').classList.contains('cam-nav-has-active'));
