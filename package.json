@@ -20,7 +20,8 @@
     "test:picks:browser": "node tests/picks-feed-scroll-browser.cjs",
     "test:home:rankings:browser": "node tests/home-power-rankings-75.cjs",
     "test:takes:football": "node tests/football-latest-takes-ui.mjs",
-    "test:takes:football:browser": "node tests/football-latest-takes-browser.cjs"
+    "test:takes:football:browser": "node tests/football-latest-takes-browser.cjs",
+    "test:pick-editor:themes": "node tests/pick-editor-night-browser.cjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.9",
