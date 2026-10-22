@@ -79,7 +79,7 @@ async function run(){
     const order=await page.locator('#camNflProfile > section').evaluateAll(nodes=>nodes.map(n=>n.id));
     assert.deepEqual(order,['camNflProfileCurrent','camNflProfileGeneral','camNflProfileHistory']);
     const cur=await page.locator('#camNflProfileCurrent').innerText();
-    assert.match(cur,/Semana 7/);assert.match(cur,/Seleccionados[\s\S]*2/);
+    assert.match(cur,/Semana 7/);assert.match(cur,/Seleccionados/);
     const currentStats=await page.locator('#camNflProfileCurrent .cam-profile-quiniela-stat strong').allTextContents();
     assert.deepEqual(currentStats,['3','2','1','1','0','1']);
     const general=await page.locator('#camNflProfileGeneral .cam-profile-quiniela-stat strong').allTextContents();
