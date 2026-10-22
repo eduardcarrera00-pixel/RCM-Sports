@@ -19,8 +19,8 @@ assert.match(css, /env\(safe-area-inset-bottom/);
 assert.match(css, /display: flex !important/);
 assert.match(css, /cam-nav-has-active/);
 assert.match(css, /prefers-reduced-motion: reduce/);
-assert.match(css, /svg\\.cam-mobile-nav-symbol/);
-assert.match(css, /img\\.ae-custom-sport-icon\\s*\\{\\s*display: none !important/);
+assert.match(css, /svg\.cam-mobile-nav-symbol/);
+assert.match(css, /img\.ae-custom-sport-icon\s*\{\s*display: none !important/);
 assert.doesNotMatch(css, /@media\s*\(min-width:/);
 assert.match(visibility, /querySelector\('nav\.ae-sport-nav'\)/);
 
