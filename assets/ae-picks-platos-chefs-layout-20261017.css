@@ -134,7 +134,8 @@ html body #footballTakes.ae-picks-editorial .ae-picks-rail>section.ae-chef-board
   overflow-x:hidden!important;
   overflow-y:auto!important;
 }
-html body #footballTakes.ae-picks-editorial .ae-picks-rail>section.ae-chef-board ol:not(.ae-chef-scroll){
+html body #footballTakes.ae-picks-editorial .ae-picks-rail>section.ae-chef-best > ol:not(.ae-chef-scroll),
+html body #footballTakes.ae-picks-editorial .ae-picks-rail>section.ae-chef-board:not(.ae-chef-best) ol:not(.ae-chef-scroll){
   box-sizing:border-box!important;
   width:100%!important;
   min-width:0!important;
