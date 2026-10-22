@@ -15,7 +15,7 @@ w.db={from(table){
 await new Promise(r=>setTimeout(r,0));
 w.eval(fs.readFileSync(process.env.CAM_HISTORY_MODULE||'assets/community-picks.js','utf8'));
 const area=d.getElementById('cpSettleHistory');
-const fixture=(id,title='Paris St-G v Barcelona',outcome='won')=>({id,title,author:'eduardcarrera00',american_odds:240,event_date:'2026-10-20',outcome,settled_at:'2026-10-21T01:42:56Z',result_points:outcome==='won'?2.4:-2.4});
+const fixture=(id,title='Paris St-G v Barcelona',outcome='won')=>({id,title,author:'eduardcarrera00',american_odds:240,event_date:'2026-10-20',outcome,settled_at:'2026-10-21T01:42:56Z',result_points:outcome==='won'?2.4:-2.4,legs:[{sport:'Fútbol',event:'Paris St-G v Barcelona',selection:'Barcelona gana · MONEYLINE'}]});
 const tick=async()=>{for(let i=0;i<4;i++)await new Promise(r=>setTimeout(r,0));};
 const start=()=>{w.updateAePicksAdmin();};
 const next=table=>{const i=pending.findIndex(p=>p.table===table);assert.notEqual(i,-1,'Expected a '+table+' request');return pending.splice(i,1)[0];};
@@ -27,7 +27,13 @@ start();start();await tick();const first=next('ae_pick_feed'),second=next('ae_pi
 success(first,[fixture('same')]);success(second,[fixture('same')]);await tick();
 while(pending.length){success(pending.shift(),[]);await tick();}
 assert.equal(count(),1,'Concurrent loads must display each Pick exactly once');
-assert.equal(area.querySelectorAll('.ae-pick-history-summary').length,1);
+assert.equal(area.querySelectorAll('.ae-pick-history-summary').length,0,'The three result counters are removed');
+assert.equal(area.querySelectorAll('.ae-pick-history-grid').length,1);
+assert.equal(area.querySelectorAll('.ae-pick-history-card').length,1);
+assert.match(area.textContent,/Barcelona gana/);
+assert.match(area.textContent,/Cuota \+240/);
+assert.match(area.textContent,/@eduardcarrera00/);
+assert.match(area.querySelector('.ae-pick-history-card').getAttribute('href'),/[?&]pick=same/);
 assert.equal(area.querySelectorAll('.ae-pick-history-frame').length,1);
 
 // An older automatic-verification response must not append to a newer snapshot.
@@ -37,7 +43,7 @@ start();await tick();success(next('ae_pick_feed'),[fixture('new','Resultado actu
 success(next('ae_pick_settlement_checks'),[]);await tick();
 success(oldChecks,[{pick_id:'old'}]);await tick();
 assert.equal(count(),1);assert.match(area.textContent,/Resultado actual/);assert.doesNotMatch(area.textContent,/Resultado anterior/);
-assert.equal(area.querySelector('[data-outcome="lost"] strong').textContent,'1');
+assert.equal(area.querySelector('[data-outcome="lost"] .ae-pick-history-badge').textContent,'Fallado');
 
 // A late error cannot overwrite the latest empty result.
 start();start();await tick();const stale=next('ae_pick_feed'),empty=next('ae_pick_feed');
@@ -51,6 +57,8 @@ start();await tick();success(next('ae_pick_feed'),[fixture('one'),fixture('one')
 success(next('ae_pick_settlement_checks'),[{pick_id:'one'}]);await tick();
 assert.equal(count(),2,'Only duplicate IDs are collapsed; separate Picks with the same title remain');
 assert.equal(area.querySelectorAll('.ae-pick-history-source').length,2);
+assert.equal(area.querySelectorAll('.ae-pick-history-card').length,2);
+assert.equal(new Set([...area.querySelectorAll('.ae-pick-history-card')].map(card=>card.href)).size,2);
 assert.match(area.textContent,/Verificado automáticamente/);assert.match(area.textContent,/Confirmado por un admin/);
 assert.equal(area.getAttribute('aria-busy'),'false');
 
