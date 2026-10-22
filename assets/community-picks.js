@@ -262,17 +262,61 @@ async function loadHistoricPick(){
   if(result.error)throw result.error;
   const pick=result.data?.[0];
   if(!pick){target.replaceChildren(el('p','Aún no hay un Pick acertado con puntos confirmados.','ae-discovery-empty'));return;}
-  const winner=button(null,()=>open(pick.id));
-  winner.className='ae-discovery-take';
-  winner.setAttribute('aria-label','Leer el Pick histórico: '+(pick.title||'Publicación'));
-  const sports=[...new Set((Array.isArray(pick.legs)?pick.legs:[]).map(leg=>leg.sport).filter(Boolean))];
-  winner.append(el('span','RÉCORD HISTÓRICO · '+(sports.join(' / ')||'Deportes'),'ae-discovery-sport'));
-  winner.append(el('strong',pick.title||'Pick de la comunidad','ae-discovery-title'));
-  const excerpt=(Array.isArray(pick.legs)?pick.legs:[]).map(leg=>leg.selection).filter(Boolean).join(' + ')||String(pick.explanation||'').trim();
-  if(excerpt)winner.append(el('span',excerpt.length>170?excerpt.slice(0,167).trimEnd()+'…':excerpt,'ae-discovery-excerpt'));
+  // Presentation only: keep the same winning Pick and points from the query.
+  // A stretched link opens the Pick; the author has an independent profile control.
+  const winner=el('div',null,'ae-discovery-take cam-historic-record');
+  const pickLink=el('a',null,'cam-historic-open');
+  pickLink.href=link(pick.id);
+  pickLink.setAttribute('aria-label','Leer el Pick histórico: '+(pick.title||'Publicación'));
+  pickLink.addEventListener('click',event=>{
+    if(event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;
+    event.preventDefault();
+    open(pick.id);
+  });
+  winner.append(pickLink);
+
+  const legs=Array.isArray(pick.legs)?pick.legs:[];
+  const matches=[...new Set(legs.map(leg=>String(leg?.event||'').trim()).filter(Boolean))];
+  const sports=[...new Set(legs.map(leg=>String(leg?.sport||'').trim()).filter(Boolean))];
+  const matchup=matches.join(' + ')||pick.title||'Pick de la comunidad';
+  const head=el('div',null,'cam-historic-head');
+  head.append(el('strong',matchup,'ae-discovery-title cam-historic-match'));
+  const authorName='@'+String(pick.author||'Aficionado').replace(/^@+/,'');
+  if(pick.user_id){
+    const profile=button(authorName,()=>{
+      if(typeof window.openAePublicProfile==='function')window.openAePublicProfile(pick.user_id,true,'picks');
+    });
+    profile.className='cam-historic-author cam-historic-profile';
+    profile.setAttribute('aria-label','Ver perfil de '+authorName);
+    profile.title='Ver perfil de '+authorName;
+    head.append(profile);
+  }else{
+    head.append(el('span',authorName,'cam-historic-author'));
+  }
+  winner.append(head);
+
+  const rows=el('div',null,'cam-historic-rows');
+  const row=(label,value)=>{
+    if(value===null||value===undefined||String(value).trim()==='')return;
+    const item=el('div',null,'cam-historic-row');
+    item.append(el('span',label,'cam-historic-row-label'),el('span',String(value),'cam-historic-row-value'));
+    rows.append(item);
+  };
+  const prediction=legs.map(leg=>String(leg?.selection||'').trim()).filter(Boolean).join(' + ')
+    ||String(pick.explanation||'').trim();
+  row('Pronóstico',prediction);
+  if(pick.american_odds!==null&&pick.american_odds!==undefined&&String(pick.american_odds).trim()!==''){
+    const american=Number(pick.american_odds);
+    row('Cuota',Number.isFinite(american)?(american>0?'+':'')+american:String(pick.american_odds));
+  }
+  row('Resultado',pick.outcome==='won'?'Acertado':pick.outcome==='lost'?'Fallado':pick.outcome==='void'?'Anulado':pick.outcome);
+  row('Fecha',pick.event_date);
+  row('Deporte',sports.join(' / '));
+  winner.append(rows);
+
+  // Do not change the existing points element, value or score styling.
   const meta=el('span',null,'ae-discovery-meta');
-  meta.append(el('span','@'+String(pick.author||'Aficionado').replace(/^@+/,'')),
-   el('span','+'+Number(pick.result_points).toLocaleString('es-ES',{maximumFractionDigits:2})+' puntos','ae-discovery-score'));
+  meta.append(el('span','+'+Number(pick.result_points).toLocaleString('es-ES',{maximumFractionDigits:2})+' puntos','ae-discovery-score'));
   winner.append(meta);
   target.replaceChildren(winner);
  }catch(error){
