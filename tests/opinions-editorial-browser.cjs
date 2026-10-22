@@ -77,6 +77,8 @@ const {chromium}=require('playwright');
       await page.waitForFunction(()=>document.querySelectorAll('#aeOpinionsDebatedContent .ae-opinions-take').length===5);
       assert.equal(await page.locator('.ae-opinions-front-grid .ae-opinion-card').count(),3);
       assert.equal(await page.locator('.ae-opinions-front-grid .is-lead').count(),1);
+      assert.match(await page.locator('.ae-opinions-front-grid .is-lead .ae-opinion-title').innerText(),
+        /Crónica del domingo en la NFL/, 'An original featured column wins over its duplicate news reference');
       assert.equal(await page.locator('.ae-opinions-recent-list .ae-opinion-card').count(),6);
       assert.equal(await page.locator('#aeOpinions .ae-opinion-card').count(),13,'All real unique stories stay reachable');
       assert.equal(await page.locator('.ae-opinion-card.is-draft').count(),0,'Drafts stay private');
