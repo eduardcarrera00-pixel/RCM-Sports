@@ -1,0 +1,199 @@
+/* CAM SPORTS · Últimos Takes compactos de Fútbol y NFL (2026-10-21).
+   Sólo cambia la presentación; cada Take conserva su apertura, votos y respuestas. */
+html body:is(.ae-is-football,.ae-is-nfl) #mainContent #freeTakes[data-sport] > #aeTakesFeedHeading{
+  display:flex!important;
+  align-items:center!important;
+  width:100%!important;
+}
+html body:is(.ae-is-football,.ae-is-nfl) #mainContent #freeTakes[data-sport] > #freeTakesFeed{
+  --cam-recent-take-height:226px;
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  grid-auto-rows:var(--cam-recent-take-height)!important;
+  align-content:start!important;
+  align-items:stretch!important;
+  gap:9px!important;
+  box-sizing:border-box!important;
+  width:100%!important;
+  min-width:0!important;
+  height:auto!important;
+  min-height:0!important;
+  max-height:calc(2 * var(--cam-recent-take-height) + 9px)!important;
+  margin:5px 0 14px!important;
+  padding:0 5px 0 0!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  overscroll-behavior-y:contain;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(172,131,87,.62) transparent;
+}
+html body:is(.ae-is-football,.ae-is-nfl) #mainContent #freeTakes[data-sport] > #freeTakesFeed:focus-visible{
+  outline:2px solid #c69968!important;
+  outline-offset:3px!important;
+}
+html body:is(.ae-is-football,.ae-is-nfl) #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.ae-free-take-card:nth-child(n){
+  box-sizing:border-box!important;
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:flex-start!important;
+  align-self:stretch!important;
+  width:100%!important;
+  min-width:0!important;
+  height:var(--cam-recent-take-height)!important;
+  min-height:var(--cam-recent-take-height)!important;
+  max-height:var(--cam-recent-take-height)!important;
+  margin:0!important;
+  padding:11px!important;
+  overflow:hidden!important;
+  border-radius:0!important;
+  cursor:pointer;
+  transition:border-color .18s ease,box-shadow .18s ease,transform .18s ease;
+}
+html body:is(.ae-is-football,.ae-is-nfl) #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.ae-free-take-card:hover{
+  border-color:#cda06f!important;
+  box-shadow:0 4px 13px rgba(7,24,37,.17)!important;
+}
+html body:is(.ae-is-football,.ae-is-nfl) #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.ae-free-take-card:focus-within{
+  outline:2px solid #cda06f!important;
+  outline-offset:-2px!important;
+}
+html body:is(.ae-is-football,.ae-is-nfl) #mainContent #freeTakes[data-sport] #freeTakesFeed > .ae-free-take-card .ae-take-overline{
+  display:flex!important;
+  flex:0 0 auto!important;
+  flex-wrap:wrap!important;
+  align-items:center!important;
+  min-width:0!important;
+  max-height:37px!important;
+  margin:0 0 5px!important;
+  gap:3px 6px!important;
+  overflow:hidden!important;
+  font-size:10px!important;
+  line-height:1.3!important;
+}
+html body:is(.ae-is-football,.ae-is-nfl) #mainContent #freeTakes[data-sport] #freeTakesFeed > .ae-free-take-card .ae-take-overline > span:first-child{
+  padding:2px 5px!important;
+  font-size:9px!important;
+}
+html body:is(.ae-is-football,.ae-is-nfl) #mainContent #freeTakes[data-sport] #freeTakesFeed > .ae-free-take-card .ae-feed-take-title{
+  display:block!important;
+  flex:0 0 auto!important;
+  min-width:0!important;
+  max-height:none!important;
+  margin:2px 0 5px!important;
+  overflow:hidden!important;
+  font:600 clamp(15px,1.35vw,18px)/1.2 Newsreader,Georgia,serif!important;
+  overflow-wrap:anywhere!important;
+}
+html body:is(.ae-is-football,.ae-is-nfl) #mainContent #freeTakes[data-sport] #freeTakesFeed > .ae-free-take-card .ae-feed-take-open{
+  display:-webkit-box!important;
+  -webkit-box-orient:vertical!important;
+  -webkit-line-clamp:2!important;
+  max-width:100%!important;
+  overflow:hidden!important;
+  font:inherit!important;
+  line-height:inherit!important;
+  text-align:left!important;
+  overflow-wrap:anywhere!important;
+  cursor:pointer!important;
+}
+html body:is(.ae-is-football,.ae-is-nfl) #mainContent #freeTakes[data-sport] #freeTakesFeed > .ae-free-take-card .ae-free-take-body{
+  display:-webkit-box!important;
+  -webkit-box-orient:vertical!important;
+  -webkit-line-clamp:3!important;
+  flex:1 1 auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  max-width:100%!important;
+  margin:0 0 6px!important;
+  padding:0!important;
+  overflow:hidden!important;
+  font-size:12px!important;
+  line-height:1.36!important;
+  overflow-wrap:anywhere!important;
+}
+html body:is(.ae-is-football,.ae-is-nfl) #mainContent #freeTakes[data-sport] #freeTakesFeed > .ae-free-take-card .ae-free-vote-row{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  flex:0 0 auto!important;
+  align-items:stretch!important;
+  align-content:end!important;
+  gap:4px!important;
+  width:100%!important;
+  min-width:0!important;
+  max-height:none!important;
+  margin-top:auto!important;
+  padding-top:5px!important;
+  border-top:1px solid rgba(176,142,106,.2)!important;
+  overflow:visible!important;
+}
+html body:is(.ae-is-football,.ae-is-nfl) #mainContent #freeTakes[data-sport] #freeTakesFeed > .ae-free-take-card .ae-free-vote-row button{
+  box-sizing:border-box!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:27px!important;
+  height:auto!important;
+  margin:0!important;
+  padding:4px 3px!important;
+  border-radius:0!important;
+  font-size:10px!important;
+  line-height:1.2!important;
+  white-space:nowrap!important;
+  text-align:center!important;
+}
+html body:is(.ae-is-football,.ae-is-nfl) #mainContent #freeTakes[data-sport] #freeTakesFeed > .ae-free-take-card .ae-free-vote-row .ae-take-reply-link{
+  grid-column:1/-1!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:6px!important;
+}
+html body:is(.ae-is-football,.ae-is-nfl) #mainContent #freeTakes[data-sport] #freeTakesFeed > .ae-free-take-card .ae-free-vote-row .ae-take-minor{
+  grid-column:1/-1!important;
+}
+html body:is(.ae-is-football,.ae-is-nfl) #mainContent #freeTakes[data-sport] #freeTakesFeed > .ae-take-empty{
+  grid-column:1/-1!important;
+}
+@media (min-width:761px) and (max-width:1139px){
+  html body:is(.ae-is-football,.ae-is-nfl) #mainContent #freeTakes[data-sport] > #freeTakesFeed{
+    --cam-recent-take-height:224px;
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  }
+}
+@media (max-width:760px){
+  html body:is(.ae-is-football,.ae-is-nfl) #mainContent #freeTakes[data-sport] > #freeTakesFeed{
+    --cam-recent-take-height:clamp(198px,52vw,222px);
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:7px!important;
+    max-height:calc(2 * var(--cam-recent-take-height) + 7px)!important;
+    padding-right:3px!important;
+  }
+  html body:is(.ae-is-football,.ae-is-nfl) #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.ae-free-take-card:nth-child(n){
+    padding:8px!important;
+  }
+  html body:is(.ae-is-football,.ae-is-nfl) #mainContent #freeTakes[data-sport] #freeTakesFeed > .ae-free-take-card .ae-feed-take-title{
+    font-size:15px!important;
+    line-height:1.2!important;
+  }
+  html body:is(.ae-is-football,.ae-is-nfl) #mainContent #freeTakes[data-sport] #freeTakesFeed > .ae-free-take-card .ae-free-take-body{
+    -webkit-line-clamp:2!important;
+    font-size:11px!important;
+  }
+  html body:is(.ae-is-football,.ae-is-nfl) #mainContent #freeTakes[data-sport] #freeTakesFeed > .ae-free-take-card .ae-free-vote-row button{
+    min-height:28px!important;
+    padding:4px 2px!important;
+    font-size:9px!important;
+    letter-spacing:-.035em!important;
+  }
+}
+@media(max-width:350px){
+  html body:is(.ae-is-football,.ae-is-nfl) #mainContent #freeTakes[data-sport] > #freeTakesFeed{
+    grid-template-columns:minmax(0,1fr)!important;
+    --cam-recent-take-height:198px;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  html body:is(.ae-is-football,.ae-is-nfl) #mainContent #freeTakes[data-sport] #freeTakesFeed > article.ae-free-take-card{
+    transition:none!important;
+  }
+}
