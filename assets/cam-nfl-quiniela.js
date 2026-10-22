@@ -17,7 +17,7 @@
   const now=()=>Date.now();
   const seasonGuess=()=>{const d=new Date();return d.getUTCFullYear()-(d.getUTCMonth()<2?1:0);};
   const st=(id,message)=>{const e=$(id);if(e)e.textContent=message||'';};
-  let games=[],teams=new Map(),user=null,mine=new Map(),draft=new Map(),season=seasonGuess(),week=1,scope='week',showAll=false,loading=false,loaded=false,request=0;
+  let games=[],teams=new Map(),user=null,mine=new Map(),draft=new Map(),season=seasonGuess(),week=1,phase='REG',scope='week',showAll=false,loading=false,loaded=false,request=0;
   function draftKey(id){return 'cam:nfl-quiniela:'+user?.id+':'+id;}
   function saveDraft(){
     if(!user)return;
@@ -31,13 +31,15 @@
       if(team&&[g.home_id,g.away_id].includes(team)&&!mine.has(g.id))draft.set(g.id,team);
     }catch{}}
   }
-  function isOpen(g){return g.status==='scheduled'&&g.picks_open&&new Date(g.kickoff).getTime()>now()&&g.odds_locked_at!=null;}
+  function isOpen(g){return g.status==='scheduled'&&g.picks_open&&new Date(g.pick_lock_at||g.kickoff).getTime()>now()&&g.odds_locked_at!=null;}
   function active(g){return draft.get(g.id)||mine.get(g.id)?.team_id||null;}
-  function chooseWeek(){
-    const weeks=[...new Set(games.filter(g=>g.season===season).map(g=>Number(g.week)))].sort((a,b)=>a-b);
-    if(!weeks.length)return 1;
-    const ref=now()-4*86400000;
-    return weeks.find(w=>games.some(g=>g.season===season&&g.week===w&&Date.parse(g.kickoff)>=ref))||weeks[weeks.length-1];
+  function chooseRound(){
+    const rounds=[...new Map(games.filter(g=>g.season===season).map(g=>[
+      (g.phase||'REG')+'-'+g.week,{phase:g.phase||'REG',week:Number(g.week)}
+    ])).values()].sort((a,b)=>(['PRE','REG','POST'].indexOf(a.phase)-['PRE','REG','POST'].indexOf(b.phase))||a.week-b.week);
+    if(!rounds.length)return {phase:'REG',week:1};
+    const visible=rounds.filter(r=>games.some(g=>g.season===season&&(g.phase||'REG')===r.phase&&Number(g.week)===r.week&&g.picks_open));
+    return visible[0]||rounds.find(r=>games.some(g=>g.season===season&&(g.phase||'REG')===r.phase&&Number(g.week)===r.week&&Date.parse(g.kickoff)>now()-3*86400000))||rounds[rounds.length-1];
   }
   const button=(text,action,cls='cam-nfl-action')=>{
     const b=el('button',text,cls);b.type='button';b.addEventListener('click',action);return b;
@@ -66,7 +68,7 @@
       games=fixtures||[];
       teams=new Map((logos||[]).map(t=>[t.id,t]));
       if(games.length&&!seasons().includes(season))season=seasons()[0];
-      week=chooseWeek();
+      ({phase,week}=chooseRound());
       await loadSession();
       await loadMine();
       recover();
@@ -93,14 +95,19 @@
       const op=el('option',String(value),null);op.value=String(value);op.selected=value===season;seasonSelect.append(op);
     }
     seasonSelect.addEventListener('change',async()=>{
-      season=Number(seasonSelect.value);week=chooseWeek();await loadMine();recover();paint();
+      season=Number(seasonSelect.value);({phase,week}=chooseRound());await loadMine();recover();paint();
     });
-    const weeks=[...new Set(games.filter(g=>g.season===season).map(g=>g.week))].sort((a,b)=>a-b);
-    const weekSelect=el('select',null,'cam-nfl-select');weekSelect.setAttribute('aria-label','Jornada NFL');
-    for(const value of weeks.length?weeks:[week]){
-      const op=el('option','Jornada '+value);op.value=String(value);op.selected=value===week;weekSelect.append(op);
+    const rounds=[...new Map(games.filter(g=>g.season===season).map(g=>[
+      (g.phase||'REG')+'-'+g.week,{phase:g.phase||'REG',week:Number(g.week)}
+    ])).values()].sort((a,b)=>(['PRE','REG','POST'].indexOf(a.phase)-['PRE','REG','POST'].indexOf(b.phase))||a.week-b.week);
+    const weekSelect=el('select',null,'cam-nfl-select');weekSelect.setAttribute('aria-label','Fase y jornada NFL');
+    const titles={PRE:'Pretemporada',REG:'Temporada regular',POST:'Playoffs'};
+    for(const value of rounds.length?rounds:[{phase,week}]){
+      const op=el('option',titles[value.phase]+' · Jornada '+value.week);
+      op.value=value.phase+'-'+value.week;op.selected=value.phase===phase&&value.week===week;
+      weekSelect.append(op);
     }
-    weekSelect.addEventListener('change',()=>{week=Number(weekSelect.value);paint();});
+    weekSelect.addEventListener('change',()=>{const p=weekSelect.value.split('-');phase=p[0];week=Number(p[1]);paint();});
     nav.append(seasonSelect,weekSelect);
   }
   function logo(id){
@@ -135,7 +142,7 @@
     }
     if(g.status==='live')return 'En vivo · resultado pendiente';
     if(g.status==='postponed')return 'Pospuesto · pronósticos suspendidos';
-    if(new Date(g.kickoff).getTime()<=now())return 'Partido bloqueado';
+    if(new Date(g.pick_lock_at||g.kickoff).getTime()<=now())return 'Partido bloqueado';
     if(!g.odds_locked_at)return 'Pendiente de probabilidades verificadas';
     if(!g.picks_open)return 'Quiniela cerrada';
     return mine.has(g.id)?'Pronóstico guardado':draft.has(g.id)?'Selección sin guardar':'Abierto para pronosticar';
@@ -143,7 +150,7 @@
   function paintGames(){
     const target=$('camNflGames');if(!target)return;
     target.replaceChildren();
-    const chosen=games.filter(g=>g.season===season&&g.week===week).sort((a,b)=>Date.parse(a.kickoff)-Date.parse(b.kickoff));
+    const chosen=games.filter(g=>g.season===season&&(g.phase||'REG')===phase&&Number(g.week)===week).sort((a,b)=>Date.parse(a.kickoff)-Date.parse(b.kickoff));
     if(!chosen.length){target.append(el('p','No hay partidos oficiales cargados para esta jornada.','cam-nfl-empty'));st('camNflProgress','0 pronósticos');if($('camNflSave'))$('camNflSave').disabled=true;return;}
     let progress=0,potential=0;
     for(const g of chosen){
@@ -166,7 +173,7 @@
   }
   async function persist(){
     if(!user){window.openUserAuthModal?.();return;}
-    const pending=games.filter(g=>g.season===season&&g.week===week&&draft.has(g.id)&&isOpen(g));
+    const pending=games.filter(g=>g.season===season&&(g.phase||'REG')===phase&&Number(g.week)===week&&draft.has(g.id)&&isOpen(g));
     if(!pending.length)return;
     const btn=$('camNflSave');btn.disabled=true;let successes=0;const errors=[];
     for(const g of pending){
@@ -188,11 +195,11 @@
     const target=$('camNflRanking');if(!target)return;
     const ticket=++rankingRequest;
     target.replaceChildren(el('p','Cargando clasificación…'));
-    const selected=games.find(g=>g.season===season&&g.week===week);
+    const selected=games.find(g=>g.season===season&&(g.phase||'REG')===phase&&Number(g.week)===week);
     const month=selected?monthOf(selected):new Date().toISOString().slice(0,7);
     try{
-      const rows=await run(client().rpc('cam_nfl_leaderboard',{
-        p_scope:scope,p_season:season,p_week:scope==='week'?week:null,p_month:scope==='month'?month:null,
+      const rows=await run(client().rpc('cam_nfl_leaderboard_phase',{
+        p_scope:scope,p_season:season,p_week:scope==='week'?week:null,p_month:scope==='month'?month:null,p_phase:phase,
       }));
       if(ticket!==rankingRequest)return;
       target.replaceChildren();
@@ -257,6 +264,15 @@
     if(target.hidden)return;
     target.replaceChildren();
     target.append(el('h3','Administración · Quiniela NFL'));
+    const warnings=el('div',null,'cam-nfl-admin-alerts');
+    target.append(warnings);
+    client().from('cam_nfl_admin_alerts').select('message,created_at')
+      .is('acknowledged_at',null).order('created_at',{ascending:false}).limit(3)
+      .then(({data,error})=>{
+        if(error||!warnings.isConnected)return;
+        warnings.replaceChildren();
+        for(const alert of data||[])warnings.append(el('p','Aviso · '+alert.message));
+      });
     const controls=el('div',null,'cam-nfl-admin-controls');
     const sea=el('input'),wk=el('input');sea.type=wk.type='number';sea.value=String(season);sea.min='2020';wk.value=String(week);wk.min='1';wk.max='18';
     const sync=button('Sincronizar NFL',async()=>{
@@ -327,7 +343,7 @@
         const names=new Map(games.map(g=>[g.id,g]));
         const history=(rows||[]).map(p=>({...p,game:names.get(p.game_id)})).filter(x=>x.game).sort((a,b)=>Date.parse(b.game.kickoff)-Date.parse(a.game.kickoff));
         const details=el('details',null,'cam-nfl-profile-history');details.append(el('summary','Ver mis pronósticos anteriores'));
-        for(const p of history.slice(0,40))details.append(el('p','Jornada '+p.game.week+' · '+(teams.get(p.team_id)?.name||p.team_id)+' · '+p.awarded_points+' pts'));
+        for(const p of history.slice(0,40))details.append(el('p',(p.game.phase==='POST'?'Playoffs':p.game.phase==='PRE'?'Pretemporada':'Regular')+' · Jornada '+p.game.week+' · '+(teams.get(p.team_id)?.name||p.team_id)+' · '+p.awarded_points+' pts'));
         if(!history.length)details.append(el('p','Aún no hay pronósticos guardados.'));
         profile.append(details);
       }
