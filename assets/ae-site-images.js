@@ -47,6 +47,7 @@
   const embedded = (key, label, section, sheet, extra) => f(key, label, section, [], Object.assign({ embedded: sheet }, extra));
 
   // Marca y cabecera
+  img('marca.logo-completo', 'Logotipo CAM Sports completo', 'Cabecera y pie', 'assets/cam-sports-logo-completo.png');
   img('marca.logo', 'Logotipo CAM Sports', 'Cabecera, pie y bienvenida', ['assets/cam-sports-logo.webp', 'assets/cam-sports-logo.jpeg']);
   img('cabecera.tema-noche', 'Botón de tema (luna)', 'Cabecera', 'assets/icons/ae-luna-gold.webp', { group: 'cabecera.tema', variant: 'Luna' });
   img('cabecera.tema-dia', 'Botón de tema (sol)', 'Cabecera', 'assets/icons/ae-sol-gold.webp', { group: 'cabecera.tema', variant: 'Sol' });

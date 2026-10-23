@@ -133,20 +133,19 @@ html body .cam-brand .cam-brand-crop{
   flex:0 0 100%!important;
   width:100%!important;
   max-width:100%!important;
-  aspect-ratio:2.05 / 1!important;
+  aspect-ratio:1760 / 894!important;
   overflow:hidden!important;
-  /* El arte (cam-sports-logo.webp) tiene fondo transparente: toma el azul de la
-     cabecera o del pie en cada tema, sin rectángulo alrededor. */
+  /* PNG completo: conserva la transparencia y muestra todas las letras. */
   background:transparent!important;
 }
 html body .cam-brand .cam-brand-art{
-  position:absolute!important;
+  position:static!important;
   display:block!important;
-  width:163%!important;
-  max-width:none!important;
-  height:auto!important;
-  left:-31.5%!important;
-  top:-66%!important;
+  width:100%!important;
+  max-width:100%!important;
+  height:100%!important;
+  left:auto!important;
+  top:auto!important;
   margin:0!important;
   padding:0!important;
   border:0!important;
