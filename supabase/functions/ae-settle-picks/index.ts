@@ -44,6 +44,7 @@ function scoreboard(path: string, date: string): Promise<Game[]> {
       } catch (error) {console.warn('ESPN scoreboard request failed', {path, date, error: String(error)});}
       if (attempt === 0) await new Promise(resolve => setTimeout(resolve, 500));
     }
+    if (path === 'soccer/mex.1') console.warn('CAM ESPN MEX', date, (j?.events || []).length);
     if (!j) return [];
     return (j.events || []).map((e: any) => ({
       id: String(e.id), path, name: e.name || '',
@@ -85,6 +86,7 @@ async function findGame(event: string, sport: string, eventDate: string): Promis
           || (sideMatches(sides[0], g.teams[1].names) && sideMatches(sides[1], g.teams[0].names));
         if (ok && !found.some(f => f.id === g.id)) found.push(g);
       }
+      if (start === 0 && n === 0 && sport === 'Fútbol') console.warn('CAM MATCH', event, date, sides, lists[0]?.filter(g => /Pumas|Santos/i.test(g.name)).map(g => [g.name,g.teams.map(t=>t.names)]));
       if (found.length === 1) return found[0];
       if (found.length > 1) return null;
     }
