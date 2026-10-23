@@ -69,7 +69,7 @@ const splitEvent = (event: string) => event.split(/\s+(?:vs\.?|v\.?|@|at|-|contr
 
 async function findGame(event: string, sport: string, eventDate: string): Promise<Game | null> {
   const sides = splitEvent(event);
-  if (sides.length !== 2) return null;
+  if (sides.length !== 2) { console.warn('Unrecognized match pairing', event); return null; }
   const paths = LEAGUES[sport] || Object.values(LEAGUES).flat();
   // Calling 30 leagues in parallel overwhelms the scoreboard provider and
   // can make valid matches appear "missing". Search priority leagues first
