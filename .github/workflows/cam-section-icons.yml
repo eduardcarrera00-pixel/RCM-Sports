@@ -1,0 +1,34 @@
+name: CAM SPORTS editorial section icons
+on:
+  pull_request:
+    paths:
+      - 'assets/cam-section-icons.css'
+      - 'assets/cam-section-icons.png'
+      - 'assets/ae-editorial-bundle.css'
+      - 'index.html'
+      - 'tests/cam-section-icons-browser.cjs'
+      - '.github/workflows/cam-section-icons.yml'
+permissions:
+  contents: read
+jobs:
+  editorial-icons:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: node --check tests/cam-section-icons-browser.cjs
+      - run: npx playwright install --with-deps chromium
+      - run: node tests/cam-section-icons-browser.cjs
+      - name: Upload visual evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cam-editorial-icons
+          path: test-results/cam-section-icons
+          if-no-files-found: warn
+          retention-days: 14
