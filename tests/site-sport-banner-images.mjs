@@ -154,5 +154,37 @@ await window.camSiteImages.reload();
 assert.equal(supported.style.backgroundImage, '', 'football must not inherit NFL banner');
 assert.equal(questioned.style.backgroundImage, '');
 
+// Eres Chef: banner personalizado guardado desde el editor debe verse igual
+// en el teléfono, también después de cambiar día/noche o restaurar uno.
+const picks = document.createElement('section');
+picks.id = 'footballTakes';
+picks.className = 'ae-picks-editorial';
+picks.innerHTML = '<section id="communityPicks"><div class="ae-picks-heading-cta-row ae-chef-marble">¿Eres Chef?</div></section>';
+document.body.append(picks);
+const chef = picks.querySelector('.ae-chef-marble');
+databaseRows = [
+  { key:'picks.marmol-dia', url:'https://img.test/eres-chef-dia.jpg', focus_x:null, focus_y:null, alt:null },
+  { key:'picks.marmol-noche', url:'https://img.test/eres-chef-noche.jpg', focus_x:70, focus_y:50, alt:null }
+];
+document.documentElement.classList.remove('dark');
+await window.camSiteImages.reload();
+assert.match(chef.style.getPropertyValue('background-image'), /eres-chef-dia.jpg/,
+  'Eres Chef day artwork must override stale mobile CSS');
+assert.match(chef.style.getPropertyValue('--chef-invite-art'), /eres-chef-dia.jpg/,
+  'the background custom property must also update');
+document.documentElement.classList.add('dark');
+await window.camSiteImages.reload();
+assert.match(chef.style.getPropertyValue('background-image'), /eres-chef-noche.jpg/,
+  'Eres Chef night artwork must load from Supabase');
+assert.equal(chef.style.backgroundPosition, '70% 50%');
+databaseRows = databaseRows.filter(row => row.key !== 'picks.marmol-noche');
+await window.camSiteImages.reload();
+assert.equal(chef.style.backgroundImage, '',
+  'restoring the night banner re-enables its CSS default');
+document.documentElement.classList.remove('dark');
+await window.camSiteImages.reload();
+assert.match(chef.style.backgroundImage, /eres-chef-dia.jpg/,
+  'restoring night must leave the saved day banner intact');
+
 window.happyDOM.abort();
-console.log('CAM SPORTS: sport news/rankings and independent NFL opinion banners (day/night) verified.');
+console.log('CAM SPORTS: sport banners, NFL opinions and Eres Chef overrides (day/night) verified.');
