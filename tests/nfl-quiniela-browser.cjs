@@ -38,7 +38,9 @@ const {chromium}=require('playwright');
            away_score:20,home_score:7,winner_id:'CHI',odds_locked_at:new Date(Date.now()-3*86400000).toISOString(),
            picks_open:false,points_home:4,points_away:4,probability_home:.5,probability_away:.5},
           {id:'900000004',season:2026,week:8,home_id:'BAL',away_id:'PIT',
-           kickoff:new Date(Date.now()+8*86400000).toISOString(),status:'scheduled',
+           // Fecha fija: con un desplazamiento relativo este partido caía algunos
+           // días en el 31 oct y rompía la comprobación del partido pospuesto.
+           kickoff:'2026-11-08T18:00:00Z',status:'scheduled',
            odds_locked_at:tomorrow,picks_open:true,
            points_home:3,points_away:8,probability_home:.8,probability_away:.2},
           {id:'900000005',season:2026,week:7,home_id:'MIA',away_id:'NYJ',kickoff:later,status:'scheduled',
