@@ -18,7 +18,7 @@ var openedArticle=null;function openArticleModal(id){openedArticle=id;}
 var openedTake=null;window.aeTakeReplies={open:take=>{openedTake=take;}};
 window.aeTakeRankings={setSport:()=>{}};
 `;
-const w=new Window({url:'https://aesportsclub.github.io/',settings:{enableJavaScriptEvaluation:true,disableJavaScriptFileLoading:true,suppressInsecureJavaScriptEnvironmentWarning:true}}),d=w.document;
+const w=new Window({url:'https://aesportsclub.github.io/'}),d=w.document;
 d.body.innerHTML=source.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,'');
 w.eval(seed+render);
 w.eval(fs.readFileSync('assets/free-takes.js','utf8'));
@@ -44,14 +44,17 @@ const image=preview.querySelector('img.ae-home-news-image-link');
 assert.ok(image);
 assert.equal(image.getAttribute('role'),'link');
 assert.equal(image.getAttribute('tabindex'),'0');
-image.click();assert.equal(w.openedArticle,'22');
+// Happy DOM no ejecuta atributos onclick insertados por innerHTML: probar su código
+// en el mismo contexto aislado; el botón de deporte sí prueba un clic real.
+const executeArticleClick = element => w.eval(element.getAttribute('onclick'));
+executeArticleClick(image);assert.equal(w.openedArticle,'22');
 w.openedArticle=null;
-image.dispatchEvent(new w.KeyboardEvent('keydown',{key:'Enter',bubbles:true}));
+w.eval("((event)=>{"+image.getAttribute('onkeydown')+"})({key:'Enter'})");
 assert.equal(w.openedArticle,'22');
 w.openedArticle=null;
-preview.querySelector('h3').click();assert.equal(w.openedArticle,'22');
+executeArticleClick(preview.querySelector('h3'));assert.equal(w.openedArticle,'22');
 w.openedArticle=null;
-preview.querySelector('button.text-pitch-600').click();assert.equal(w.openedArticle,'22');
+executeArticleClick(preview.querySelector('button.text-pitch-600'));assert.equal(w.openedArticle,'22');
 w.openedArticle=null;
 // Pulsar la etiqueta no activa ni un artículo ni el evento del contenedor.
 let bubbled=0;preview.addEventListener('click',()=>bubbled++);
