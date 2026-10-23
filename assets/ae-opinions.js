@@ -293,7 +293,9 @@
       if(story.length||sportTakes.length)bySport.set(key,{key,label,story,sportTakes});
     }
     if(!bySport.size)return;
-    sportTarget.append(sectionHeader('Opiniones por deporte','Columnas y conversaciones reunidas por tema, sin duplicar la portada.'));
+    const sportsHeading = sectionHeader('Opiniones por deporte','Columnas y conversaciones reunidas por tema, sin duplicar la portada.');
+    sportsHeading.dataset.camOpinionsBanner = 'sports';
+    sportTarget.append(sportsHeading);
     const grid=el('div',null,'ae-opinions-sport-grid');
     for(const entry of bySport.values()){
       const section=el('section',null,'ae-opinions-sport-block');
@@ -310,6 +312,7 @@
       section.append(see);grid.append(section);
     }
     sportTarget.append(grid);
+    window.camOpinionsBanners?.refresh();
   }
   function pickCover(stories){
     const publicStories=stories.filter(o=>o.is_published);
@@ -553,6 +556,7 @@
   // ---------- Integración con la navegación ----------
   function show() {
     render();
+    window.camOpinionsBanners?.refresh();
     if(!loaded)load();
     void loadTakes();
   }

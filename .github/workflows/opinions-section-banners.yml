@@ -1,0 +1,29 @@
+name: CAM SPORTS Opinions banners
+
+on:
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'assets/ae-opinions.js'
+      - 'assets/cam-opinions-section-banners.js'
+      - 'assets/cam-opinions-section-banners.css'
+      - 'sql/cam_opinions_section_banners.sql'
+      - 'tests/opinions-section-banners.mjs'
+      - '.github/workflows/opinions-section-banners.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'assets/cam-opinions-section-banners.js'
+      - 'assets/cam-opinions-section-banners.css'
+      - 'tests/opinions-section-banners.mjs'
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify banners and syntax
+        run: node tests/opinions-section-banners.mjs

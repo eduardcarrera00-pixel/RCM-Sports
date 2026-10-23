@@ -1,0 +1,162 @@
+/* CAM SPORTS · Banners independientes para los tres módulos de Opiniones.
+ * Sin imagen se conserva el aspecto editorial previo. Solo afecta a Opiniones.
+ */
+body.ae-is-opinions #aeOpinions .ae-opinions-section-head[data-cam-opinions-banner] {
+  position: relative;
+  isolation: isolate;
+  box-sizing: border-box;
+}
+body.ae-is-opinions #aeOpinions .ae-opinions-section-head.cam-op-banner-active {
+  min-height: clamp(126px, 14vw, 192px);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 12px 24px;
+  overflow: hidden;
+  padding: clamp(18px, 2.8vw, 34px) !important;
+  border: 1px solid #445d6b !important;
+  border-bottom: 2px solid #bd9872 !important;
+  background: #102938;
+}
+body.ae-is-opinions #aeOpinions .cam-op-banner-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  pointer-events: none;
+  z-index: -2;
+}
+body.ae-is-opinions #aeOpinions .cam-op-banner-active::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(10,27,39,.82), rgba(10,27,39,.58) 55%, rgba(10,27,39,.38));
+}
+body.ae-is-opinions #aeOpinions .cam-op-banner-active > :is(h3,p) {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  text-shadow: 0 1px 4px rgba(0,0,0,.25);
+}
+html body.ae-is-opinions #aeOpinions .cam-op-banner-active > h3 {
+  color: #fff2e4 !important;
+}
+html body.ae-is-opinions #aeOpinions .cam-op-banner-active > p {
+  color: #e3e8eb !important;
+  max-width: 34rem;
+}
+body.ae-is-opinions #aeOpinions .cam-op-banner-edit {
+  z-index: 3;
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  font: 600 11px/1.3 Inter, sans-serif;
+  padding: 6px 9px;
+  border-radius: 0;
+  border: 1px solid #a68b70;
+  background: #152e3c;
+  color: #fff2e4;
+  cursor: pointer;
+}
+body.ae-is-opinions #aeOpinions .cam-op-banner-edit:hover,
+body.ae-is-opinions #aeOpinions .cam-op-banner-edit:focus-visible {
+  outline: 2px solid #caa782;
+  outline-offset: 2px;
+}
+body.ae-is-opinions #aeOpinions .ae-opinions-section-head:not(.cam-op-banner-active):has(> .cam-op-banner-edit) {
+  padding-right: 114px;
+}
+#camOpBannerDialog {
+  width: min(94vw, 520px);
+  max-height: min(90vh, 730px);
+  padding: 0;
+  background: #102938;
+  border: 1px solid #a68b70;
+  border-radius: 0;
+  color: #fff2e4;
+  box-shadow: 0 14px 48px rgba(0,0,0,.45);
+}
+#camOpBannerDialog::backdrop { background: rgba(4,15,24,.72); }
+#camOpBannerDialog form { display: grid; gap: 13px; padding: 24px; }
+#camOpBannerDialog h2 { font: 600 27px/1.15 Newsreader,Georgia,serif; margin: 0; }
+#camOpBannerDialog p { margin: 0; color: #cfdae0; font: 12px/1.5 Inter,sans-serif; }
+#camOpBannerDialog label { display: grid; gap: 5px; font: 600 12px/1.3 Inter,sans-serif; }
+#camOpBannerDialog input,
+#camOpBannerDialog select {
+  width: 100%;
+  box-sizing: border-box;
+  min-width: 0;
+  border: 1px solid #647885;
+  border-radius: 0;
+  background: #152f40;
+  color: #f8eee0;
+  padding: 10px;
+}
+#camOpBannerDialog input[type="file"] { font-size: 12px; }
+#camOpBannerDialog .cam-op-banner-preview {
+  width: 100%;
+  aspect-ratio: 3 / 1;
+  object-fit: cover;
+  background: #0d2230;
+  border: 1px solid #647885;
+}
+#camOpBannerDialog .cam-op-banner-preview[hidden] { display: none; }
+#camOpBannerDialog .cam-op-banner-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+#camOpBannerDialog button {
+  border: 1px solid #aa8b69;
+  border-radius: 0;
+  padding: 9px 12px;
+  color: #fdf4e9;
+  background: #244054;
+  cursor: pointer;
+  font: 600 12px/1.2 Inter,sans-serif;
+}
+#camOpBannerDialog button[type="submit"] { background: #936744; }
+#camOpBannerDialog button:disabled { opacity: .6; cursor: progress; }
+#camOpBannerStatus { min-height: 1.5em; overflow-wrap: anywhere; }
+@media (max-width: 760px) {
+  body.ae-is-opinions #aeOpinions .cam-op-banner-active {
+    min-height: 132px;
+    padding: 42px 16px 17px !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+    align-items: start;
+  }
+  body.ae-is-opinions #aeOpinions .cam-op-banner-active::after {
+    background: linear-gradient(0deg, rgba(10,27,39,.84), rgba(10,27,39,.23));
+  }
+  body.ae-is-opinions #aeOpinions .cam-op-banner-active > p {
+    margin-top: 4px;
+    max-width: 100%;
+  }
+  body.ae-is-opinions #aeOpinions .ae-opinions-section-head:not(.cam-op-banner-active):has(> .cam-op-banner-edit) {
+    padding-right: 0;
+    padding-top: 32px;
+  }
+  #camOpBannerDialog form { padding: 17px; }
+}
+
+/* Una ilustración de día recibe veladura crema y tinta oscura.
+ * Si sólo hay banner nocturno, se conserva su contraste original.
+ */
+html:not(.dark) body.ae-is-opinions #aeOpinions .cam-op-banner-active.cam-op-banner-light-asset::after {
+  background: linear-gradient(90deg, rgba(250,244,235,.88), rgba(250,244,235,.67) 55%, rgba(250,244,235,.30));
+}
+html:not(.dark) body.ae-is-opinions #aeOpinions .cam-op-banner-active.cam-op-banner-light-asset > h3 {
+  color: #283a43 !important;
+  text-shadow: none;
+}
+html:not(.dark) body.ae-is-opinions #aeOpinions .cam-op-banner-active.cam-op-banner-light-asset > p {
+  color: #435763 !important;
+  text-shadow: none;
+}
+@media (max-width:760px) {
+  html:not(.dark) body.ae-is-opinions #aeOpinions .cam-op-banner-active.cam-op-banner-light-asset::after {
+    background: linear-gradient(0deg, rgba(250,244,235,.92), rgba(250,244,235,.12));
+  }
+}
