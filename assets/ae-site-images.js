@@ -507,12 +507,55 @@
     }
   }
 
+  // Banners con URL en una variable CSS y fondo en un hijo.
+  // A diferencia de background-image directo, su imagen no se puede sustituir
+  // de forma fiable recorriendo solo el CSSOM en todos los motores móviles.
+  const SPORT_ART = [
+    ['body.ae-is-nfl #aeNflTwinRankings .is-savant', 'nfl.savant', '--ae-community-portrait', '.ae-nfl-ranking-header'],
+    ['body.ae-is-nfl #aeNflTwinRankings .is-rookie', 'nfl.rookie', '--ae-community-portrait', '.ae-nfl-ranking-header'],
+    ['body.ae-is-football #aeNflTwinRankings .is-savant', 'futbol.respira', '--ae-community-portrait', '.ae-nfl-ranking-header'],
+    ['body.ae-is-football #aeNflTwinRankings .is-rookie', 'futbol.vende-humos', '--ae-community-portrait', '.ae-nfl-ranking-header'],
+    ['body.ae-is-football #aeSportTakeLeaders[data-sport="football"] .is-supported', 'futbol.populares', '--ae-opinion-art', '.ae-sport-chef-heading'],
+    ['body.ae-is-football #aeSportTakeLeaders[data-sport="football"] .is-questioned', 'futbol.impopulares', '--ae-opinion-art', '.ae-sport-chef-heading']
+  ];
+  const sportArtStyled = new Map();
+  function applySavedSportArt() {
+    const wanted = new Map();
+    for (const [selector, key, prop, child] of SPORT_ART) {
+      const row = rows.get(key);
+      if (!row?.url) continue;
+      for (const el of document.querySelectorAll(selector)) wanted.set(el, { key, prop, child, row });
+    }
+    for (const [el, previous] of sportArtStyled) {
+      const next = wanted.get(el);
+      if (next?.key === previous.key && next.prop === previous.prop) continue;
+      el.style.removeProperty(previous.prop);
+      previous.heading?.style.removeProperty('background-position');
+      sportArtStyled.delete(el);
+    }
+    for (const [el, item] of wanted) {
+      const image = cssUrl(item.row.url);
+      if (el.style.getPropertyValue(item.prop) !== image)
+        el.style.setProperty(item.prop, image, 'important');
+      const heading = el.querySelector(item.child);
+      const previous = sportArtStyled.get(el);
+      if (previous?.heading && previous.heading !== heading)
+        previous.heading.style.removeProperty('background-position');
+      if (heading) {
+        const focus = focusOf(item.row);
+        if (focus) heading.style.setProperty('background-position', '50% 50%, ' + focus, 'important');
+        else if (previous?.heading === heading) heading.style.removeProperty('background-position');
+      }
+      sportArtStyled.set(el, { key: item.key, prop: item.prop, heading });
+    }
+  }
+
   function applyAll() {
     if (needsCss()) { try { walkSheets(); } catch {} }
     applyDecls();
     applyImgs(document.documentElement);
     window.camVisualSizes?.mark?.(document.documentElement);
-    if (document.body) { applySlots(); applyNflOpinionBanners(); applyChefBanner(); }
+    if (document.body) { applySlots(); applyNflOpinionBanners(); applyChefBanner(); applySavedSportArt(); }
   }
 
   // ---------------------------------------------------------------------------
@@ -562,6 +605,7 @@
     // Cambios de tema, navegación NFL/Fútbol o render dinámico de las clasificaciones.
     applyNflOpinionBanners();
     applyChefBanner();
+    applySavedSportArt();
     if (admin.on) scheduleScan();
   }
   function sheetsChanged() {
