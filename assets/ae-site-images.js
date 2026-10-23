@@ -1026,10 +1026,19 @@
         throw Error('El servidor no confirmó la imagen. Vuelve a intentarlo.');
       }
       writeRevision++;
-      await saveSize();
       if (!args.p_url && args.p_focus_x == null && !args.p_alt) rows.delete(key);
       else rows.set(key, { url: args.p_url, focus_x: args.p_focus_x, focus_y: args.p_focus_y, alt: args.p_alt });
       writeCache(); applyAll();
+      try {
+        await saveSize();
+      } catch (sizeError) {
+        // La imagen ya se guardó. No informar que toda la operación falló ni
+        // obligar a subir de nuevo el archivo al reintentar únicamente el tamaño.
+        ui.url.value = args.p_url || '';
+        ui.file.value = '';
+        ui.error.textContent = 'La imagen sí se guardó, pero el tamaño no: ' + friendly(sizeError) + '. Puedes volver a pulsar Guardar.';
+        return;
+      }
       ui.dialog.close();
       notify('Imagen actualizada.');
     } catch (err) {
