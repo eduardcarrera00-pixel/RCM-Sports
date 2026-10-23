@@ -63,7 +63,10 @@ vm.runInNewContext(source, {
   getComputedStyle: window.getComputedStyle.bind(window),
   currentAdmin: true,
   addEventListener: window.addEventListener.bind(window),
-  setTimeout, clearTimeout, setInterval: () => 0
+  removeEventListener: window.removeEventListener.bind(window),
+  innerHeight: window.innerHeight, innerWidth: window.innerWidth,
+  requestAnimationFrame: window.requestAnimationFrame.bind(window),
+  setTimeout, clearTimeout, setInterval: () => 0, clearInterval: () => {}
 }, { filename: 'ae-site-images.js' });
 await window.camSiteImages.reload();
 
