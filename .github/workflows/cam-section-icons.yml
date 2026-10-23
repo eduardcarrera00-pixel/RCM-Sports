@@ -22,7 +22,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: node --check tests/cam-section-icons-browser.cjs
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install chromium
       - run: node tests/cam-section-icons-browser.cjs
       - name: Upload visual evidence
         if: always()
