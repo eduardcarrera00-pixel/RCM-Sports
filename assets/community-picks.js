@@ -499,7 +499,8 @@ function chefRankingEntry(record,index,voids,kind,picks){
   }
   // Primero seleccionamos el top 10 real. El ID (no el nombre) determina
   // quién debe quedar excluido de la clasificación de Peores Chefs.
-  const bestRecords=(best.data||[]).slice(0,10);
+  // A negative balance belongs in Peores Chefs, never in Mejores Chefs.
+  const bestRecords=(best.data||[]).filter(record=>Number(record.points)>0).slice(0,10);
   const bestIds=new Set(bestRecords.map(record=>String(record.user_id||'')).filter(Boolean));
   // La exclusión se aplica EN SQL antes del LIMIT 10. Así entran los
   // siguientes usuarios elegibles, no sólo los primeros diez originales.
@@ -513,7 +514,7 @@ function chefRankingEntry(record,index,voids,kind,picks){
     const used=new Set(bestIds);
     for(const record of worst.data||[]){
       const id=String(record.user_id||'');
-      if(!id||used.has(id))continue;
+      if(!id||used.has(id)||Number(record.points)>=0)continue;
       used.add(id);
       worstRecords.push(record);
       if(worstRecords.length>=10)break;
