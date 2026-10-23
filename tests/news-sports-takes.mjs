@@ -13,6 +13,7 @@ var db={auth:{getUser:async()=>({data:{user:{id:'reader'}}}),onAuthStateChange:(
 var categoryKey=x=>x,escapeHTML=x=>String(x).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;'),safeImageURL=x=>x,imagePosition=()=> 'center',imageScale=()=>1,articleIdArgument=x=>JSON.stringify(x);
 function renderHeroCard(){document.getElementById('heroSection').hidden=true;}
 function filterByCategory(sport){currentCategory=sport;renderArticlesFeed();}
+var openedArticle=null;function openArticleModal(id){openedArticle=id;}
 var openedTake=null;window.aeTakeReplies={open:take=>{openedTake=take;}};
 window.aeTakeRankings={setSport:()=>{}};
 `;
@@ -24,21 +25,50 @@ d.dispatchEvent(new w.Event('DOMContentLoaded'));
 w.renderArticlesFeed();
 let tracks=[...d.querySelectorAll('.ae-news-sport-track')];
 assert.equal(tracks.length,2);
-// Los títulos de Últimas noticias deben mostrar únicamente NFL y Fútbol, sin emblemas.
-const sportHeadings=[...d.querySelectorAll('.ae-news-sport-link')];
-assert.deepEqual(sportHeadings.map(h=>h.textContent.trim()),['NFL','Fútbol']);
-assert.equal(d.querySelectorAll('.ae-news-sport-head img, .ae-news-sport-emblem').length,0);
+// Los encabezados con botones duplicados desaparecen de Home.
+assert.equal(d.querySelectorAll('.ae-news-sport-head, .ae-news-sport-link').length,0);
+assert.deepEqual([...d.querySelectorAll('.ae-news-sport-lane')].map(lane=>lane.getAttribute('aria-label')),['Noticias de NFL','Noticias de Fútbol']);
+const badges=[...d.querySelectorAll('.ae-home-sport-badge')];
+assert.equal(badges.length,20);
+assert.deepEqual([...new Set(badges.map(b=>b.textContent.trim()))],['NFL','Fútbol']);
+for(const badge of badges){
+ assert.equal(badge.tagName,'BUTTON');
+ assert.equal(badge.type,'button');
+ assert.equal(badge.dataset.aeSportSection,badge.textContent.trim());
+ assert.equal(badge.getAttribute('aria-label'),'Ir a la sección '+badge.dataset.aeSportSection);
+}
+// En Home la foto, el título y Leer siguen abriendo el artículo.
+const preview=tracks[0].querySelector('article');
+const image=preview.querySelector('img.ae-home-news-image-link');
+assert.ok(image);
+assert.equal(image.getAttribute('role'),'link');
+assert.equal(image.getAttribute('tabindex'),'0');
+image.click();assert.equal(w.openedArticle,'22');
+w.openedArticle=null;
+image.dispatchEvent(new w.KeyboardEvent('keydown',{key:'Enter',bubbles:true}));
+assert.equal(w.openedArticle,'22');
+w.openedArticle=null;
+preview.querySelector('h3').click();assert.equal(w.openedArticle,'22');
+w.openedArticle=null;
+preview.querySelector('button.text-pitch-600').click();assert.equal(w.openedArticle,'22');
+w.openedArticle=null;
+// Pulsar la etiqueta no activa ni un artículo ni el evento del contenedor.
+let bubbled=0;preview.addEventListener('click',()=>bubbled++);
+preview.querySelector('.ae-home-sport-badge').click();
+assert.equal(w.currentCategory,'NFL');
+assert.equal(w.openedArticle,null);
+assert.equal(bubbled,0);
 for(const track of tracks){assert.equal(track.querySelectorAll('article').length,10);for(const card of track.children)assert.match(card.querySelector('h3').textContent,new RegExp(track.dataset.sport));}
 assert.equal(d.querySelectorAll('#articlesGrid>article').length,0);
 assert.equal(d.querySelectorAll('[data-news-scroll]').length,0);
 tracks[0].scrollLeft=123;w.renderArticlesFeed();assert.equal(d.querySelector('.ae-news-sport-track').scrollLeft,123);
 for(const [category,sport] of [['NFL','nfl'],['Fútbol','football']]){
  w.currentCategory='Todos';w.currentSearchQuery='';w.renderArticlesFeed();
- d.querySelector('[data-ae-sport-section="'+category+'"]').click();
+ d.querySelector('.ae-home-sport-badge[data-ae-sport-section="'+category+'"]').click();
  assert.equal(w.currentCategory,category);await new Promise(r=>setTimeout(r,40));
  const cards=[...d.querySelectorAll('#freeTakesFeed>article')];assert.equal(cards.length,20);
  assert.equal(cards[0].dataset.sport,sport);assert.match(cards[0].querySelector('h3').textContent,/24/);assert.match(cards.at(-1).querySelector('h3').textContent,/ 5/);
- assert.equal(d.querySelectorAll('.ae-news-sport-track').length,0);assert.equal(d.querySelectorAll('#articlesGrid>article').length,3);
+ assert.equal(d.querySelectorAll('.ae-news-sport-track').length,0);assert.equal(d.querySelectorAll('.ae-home-sport-badge').length,0);assert.equal(d.querySelectorAll('#articlesGrid>article').length,3);
  cards.at(-1).querySelector('.ae-take-reply-link').click();assert.equal(w.openedTake.id,sport+'-5');
  assert.equal(d.getElementById('freeTakes').hidden,false);assert.equal(d.getElementById('aeTakesFeedHeading').textContent,'Últimos Takes');
  assert.equal(cards[0].querySelector('.ae-take-reply-count').textContent,'4');
@@ -63,5 +93,5 @@ w.currentCategory='Fútbol';w.renderFreeTakesVisibility();await new Promise(r=>s
 resolveOldCounts({data:[{take_id:'football-24',reply_count:99}],error:null});await new Promise(r=>setTimeout(r,40));
 assert.equal(d.querySelector('#freeTakesFeed .ae-take-reply-count').textContent,'9');
 w.currentCategory='Todos';w.currentSearchQuery='NFL noticia 2';w.renderArticlesFeed();assert.equal(d.querySelectorAll('.ae-news-sport-track').length,0);assert.ok(d.querySelectorAll('#articlesGrid>article').length>0);
-console.log('PASS: news carousels, 20 sorted Takes per sport, count-free heading, real reply counts including zero, refresh, failure isolation, sport-switch race and reply access.');
+console.log('PASS: Home badges navigate without opening articles, image/title/Leer open articles, no duplicate buttons, native sport carousels and Takes stay intact.');
 await w.happyDOM.close();
