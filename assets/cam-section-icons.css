@@ -1,0 +1,97 @@
+/* CAM SPORTS — iconos editoriales de la biblioteca de marca (PowerPoint).
+   Solo titulares de contenido; NO header, footer, navegación ni botones interactivos.
+   Sprite: 4 columnas × 3 filas, celdas 64px con transparencia y arte de 52px. */
+html body :is(
+  #picksPopularTitle,#picksQuestionedTitle,#picksRankingTitle,#cpWorstRankingTitle,
+  #aeHomeTakesPositiveTitle,#aeHomeTakesNegativeTitle,
+  #aeSportGeniosTitle,#aeSportAnoetosTitle,
+  #aeNflSavantHeading,#aeNflRookieHeading,
+  #freeTakesTitle,#aeSportTakeRankingTitle
+)::before {
+  content:"";
+  display:inline-block;
+  box-sizing:border-box;
+  width:30px;
+  height:30px;
+  min-width:30px;
+  margin-right:9px;
+  vertical-align:-.27em;
+  border:1px solid rgba(188,152,111,.5);
+  border-radius:0;
+  background-color:#102535;
+  background-image:url("cam-section-icons.png");
+  background-size:400% 300%;
+  background-repeat:no-repeat;
+  background-position:var(--cam-section-icon-x,0%) var(--cam-section-icon-y,0%);
+  box-shadow:none;
+  pointer-events:none;
+  white-space:nowrap;
+}
+/* Fila 1: Mejores Chefs, Peores Chefs, Savant, Rookie. */
+html body :is(#picksPopularTitle,#picksRankingTitle) {
+  --cam-section-icon-x:0%;
+  --cam-section-icon-y:0%;
+}
+html body :is(#picksQuestionedTitle,#cpWorstRankingTitle) {
+  --cam-section-icon-x:33.333333%;
+  --cam-section-icon-y:0%;
+}
+html body #aeNflSavantHeading {
+  --cam-section-icon-x:66.666667%;
+  --cam-section-icon-y:0%;
+}
+html body #aeNflRookieHeading {
+  --cam-section-icon-x:100%;
+  --cam-section-icon-y:0%;
+}
+/* Fila 2: Opiniones populares/impopulares, Respira, Vende Humos. */
+html body #aeHomeTakesPositiveTitle {
+  --cam-section-icon-x:0%;
+  --cam-section-icon-y:50%;
+}
+html body #aeHomeTakesNegativeTitle {
+  --cam-section-icon-x:33.333333%;
+  --cam-section-icon-y:50%;
+}
+html body.ae-is-nfl #aeSportGeniosTitle {
+  --cam-section-icon-x:66.666667%;
+  --cam-section-icon-y:0%;
+}
+html body.ae-is-nfl #aeSportAnoetosTitle {
+  --cam-section-icon-x:100%;
+  --cam-section-icon-y:0%;
+}
+html body.ae-is-football #aeSportGeniosTitle {
+  --cam-section-icon-x:66.666667%;
+  --cam-section-icon-y:50%;
+}
+html body.ae-is-football #aeSportAnoetosTitle {
+  --cam-section-icon-x:100%;
+  --cam-section-icon-y:50%;
+}
+/* Fila 3: conocimiento y estadísticas. El arte siempre es decorativo. */
+html body #freeTakesTitle {
+  --cam-section-icon-x:0%;
+  --cam-section-icon-y:100%;
+}
+html body #aeSportTakeRankingTitle {
+  --cam-section-icon-x:33.333333%;
+  --cam-section-icon-y:100%;
+}
+/* Un encuadre menor evita desbordamientos en títulos largos en teléfonos. */
+@media (max-width:390px) {
+  html body :is(
+    #picksPopularTitle,#picksQuestionedTitle,#picksRankingTitle,#cpWorstRankingTitle,
+    #aeHomeTakesPositiveTitle,#aeHomeTakesNegativeTitle,
+    #aeSportGeniosTitle,#aeSportAnoetosTitle,
+    #aeNflSavantHeading,#aeNflRookieHeading,
+    #freeTakesTitle,#aeSportTakeRankingTitle
+  )::before {
+    width:25px;
+    height:25px;
+    min-width:25px;
+    margin-right:6px;
+    vertical-align:-.31em;
+  }
+}
+/* El icono no cambia la accesibilidad ni la interacción de las tarjetas. */
