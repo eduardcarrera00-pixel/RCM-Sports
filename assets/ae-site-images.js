@@ -125,6 +125,12 @@
   f('nfl.rookie', 'Fondo de «Rookie»', 'NFL', 'assets/rankings/ae-nfl-rookie-20261019.webp');
   f('nfl.savant-anterior', 'Fondo de «Savant» (versión anterior)', 'NFL', 'assets/atmospheres/ae-nfl-savant-reference.webp');
   f('nfl.rookie-anterior', 'Fondo de «Rookie» (versión anterior)', 'NFL', 'assets/atmospheres/ae-nfl-rookie-reference.webp');
+  // Cada clasificación de NFL tiene su propio fondo en día/noche.
+  // El CSS conserva la textura original de piedra mientras no exista reemplazo.
+  pair('nfl.opiniones-apoyadas', 'Banner de «Opiniones apoyadas»', 'NFL · Opiniones',
+    [], [], { originalPath: 'assets/cam-nfl-opinions-stone.webp' });
+  pair('nfl.opiniones-hateadas', 'Banner de «Opiniones hateadas»', 'NFL · Opiniones',
+    [], [], { originalPath: 'assets/cam-nfl-opinions-stone.webp' });
   atlas('rankings.gemelos-atlas', 'Mosaico de los rankings gemelos', 'NFL y Fútbol', 'assets/rankings/ae-classical-twin-ranking-atlas.webp', [2, 4],
     'Mosaico antiguo de 2 × 4 recortes; casi todas las vistas usan ya los fondos independientes.');
   // Picks
@@ -425,12 +431,40 @@
     for (const el of [...slotted]) if (!keep.has(el)) clearSlot(el);
   }
 
+  // Los dos fondos de Opiniones de NFL comparten una textura de origen.
+  // Sus reemplazos deben aplicarse por tarjeta y por tema, no por URL del CSS;
+  // de lo contrario cambiar uno también cambiaría el otro.
+  const NFL_OPINION_CARD_SELECTOR = 'body.ae-is-nfl #aeSportTakeLeaders.ae-sport-chefs[data-sport="nfl"] .ae-sport-takes-grid > .ae-sport-chef-card:is(.is-supported,.is-questioned)';
+  const nflOpinionStyled = new Set();
+  const nflOpinionKey = el => (el.classList.contains('is-supported') ? 'nfl.opiniones-apoyadas-' : 'nfl.opiniones-hateadas-') + (isDark() ? 'noche' : 'dia');
+  function clearNflOpinionStyle(el) {
+    el.style.removeProperty('background-image');
+    el.style.removeProperty('background-position');
+    nflOpinionStyled.delete(el);
+  }
+  function applyNflOpinionBanners() {
+    const active = new Set(document.querySelectorAll(NFL_OPINION_CARD_SELECTOR));
+    for (const el of [...nflOpinionStyled]) if (!active.has(el)) clearNflOpinionStyle(el);
+    for (const el of active) {
+      const row = rows.get(nflOpinionKey(el));
+      if (!row?.url) {
+        if (nflOpinionStyled.has(el)) clearNflOpinionStyle(el);
+        continue;
+      }
+      el.style.setProperty('background-image', cssUrl(row.url), 'important');
+      const focus = focusOf(row);
+      if (focus) el.style.setProperty('background-position', focus, 'important');
+      else el.style.removeProperty('background-position');
+      nflOpinionStyled.add(el);
+    }
+  }
+
   function applyAll() {
     if (needsCss()) { try { walkSheets(); } catch {} }
     applyDecls();
     applyImgs(document.documentElement);
     window.camVisualSizes?.mark?.(document.documentElement);
-    if (document.body) applySlots();
+    if (document.body) { applySlots(); applyNflOpinionBanners(); }
   }
 
   // ---------------------------------------------------------------------------
@@ -465,6 +499,8 @@
     }
     if (!layout) return;
     if (SLOTS.some(s => rows.get(s.key)?.url) || slotted.size) { clearTimeout(slotTimer); slotTimer = setTimeout(applySlots, 120); }
+    // Cambios de tema, navegación NFL/Fútbol o render dinámico de las clasificaciones.
+    applyNflOpinionBanners();
     if (admin.on) scheduleScan();
   }
   function sheetsChanged() {
@@ -571,6 +607,11 @@
       for (const k of keysOnElement(el, pseudos)) add(el, k);
     }
     for (const n of document.querySelectorAll('img[data-site-image]')) if (!own(n)) add(n, n.dataset.siteImage);
+    // La textura de ambas tarjetas viene del mismo archivo y no tiene lápices
+    // distintos por URL. Añadir uno por tarjeta al editor global del admin.
+    for (const el of document.querySelectorAll(NFL_OPINION_CARD_SELECTOR)) {
+      if (!own(el) && el.getClientRects().length) add(el, nflOpinionKey(el));
+    }
     // Escudos de rankings y logos ajenos al inventario: mismo sistema de lápices.
     for (const item of window.camVisualSizes?.allTargets?.() || []) {
       if (own(item.el) || !item.el.getClientRects().length || ENTRIES.has(item.el.dataset.siteImage)) continue;
