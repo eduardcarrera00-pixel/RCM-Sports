@@ -199,8 +199,8 @@ const rookieCard = cards.querySelector('.is-rookie');
 document.body.classList.remove('ae-is-football');
 document.body.classList.add('ae-is-nfl');
 databaseRows = [
-  {key:'nfl.savant',url:'https://img.test/nfl-savant-new.jpg',focus_x:50,focus_y:32,alt:null},
-  {key:'nfl.rookie',url:'https://img.test/nfl-rookie-new.jpg',focus_x:50,focus_y:26,alt:null}
+  {key:'nfl.savant-dia',url:'https://img.test/nfl-savant-new.jpg',focus_x:50,focus_y:32,alt:null},
+  {key:'nfl.rookie-dia',url:'https://img.test/nfl-rookie-new.jpg',focus_x:50,focus_y:26,alt:null}
 ];
 await window.camSiteImages.reload();
 assert.match(savantCard.style.getPropertyValue('--ae-community-portrait'), /nfl-savant-new.jpg/);
@@ -212,10 +212,10 @@ wrap.dataset.sport = 'football';
 supported.innerHTML = '<header class="ae-sport-chef-heading"></header>';
 questioned.innerHTML = '<header class="ae-sport-chef-heading"></header>';
 databaseRows = [
-  {key:'futbol.respira',url:'https://img.test/respira-new.jpg',focus_x:50,focus_y:29,alt:null},
-  {key:'futbol.vende-humos',url:'https://img.test/humos-new.jpg',focus_x:67,focus_y:39,alt:null},
-  {key:'futbol.populares',url:'https://img.test/football-popular-new.jpg',focus_x:50,focus_y:72,alt:null},
-  {key:'futbol.impopulares',url:'https://img.test/football-unpopular-new.jpg',focus_x:50,focus_y:72,alt:null}
+  {key:'futbol.respira-dia',url:'https://img.test/respira-new.jpg',focus_x:50,focus_y:29,alt:null},
+  {key:'futbol.vende-humos-dia',url:'https://img.test/humos-new.jpg',focus_x:67,focus_y:39,alt:null},
+  {key:'futbol.populares-dia',url:'https://img.test/football-popular-new.jpg',focus_x:50,focus_y:72,alt:null},
+  {key:'futbol.impopulares-dia',url:'https://img.test/football-unpopular-new.jpg',focus_x:50,focus_y:72,alt:null}
 ];
 await window.camSiteImages.reload();
 assert.match(savantCard.style.getPropertyValue('--ae-community-portrait'), /respira-new.jpg/,
@@ -224,7 +224,7 @@ assert.match(rookieCard.style.getPropertyValue('--ae-community-portrait'), /humo
 assert.match(supported.style.getPropertyValue('--ae-opinion-art'), /football-popular-new.jpg/);
 assert.match(questioned.style.getPropertyValue('--ae-opinion-art'), /football-unpopular-new.jpg/);
 assert.equal(questioned.querySelector('header').style.backgroundPosition, '50% 50%, 50% 72%');
-databaseRows = databaseRows.filter(r=>r.key !== 'futbol.impopulares');
+databaseRows = databaseRows.filter(r=>r.key !== 'futbol.impopulares-dia');
 await window.camSiteImages.reload();
 assert.equal(questioned.style.getPropertyValue('--ae-opinion-art'), '',
   'restoring an opinion must return it to the original stylesheet');
@@ -233,6 +233,56 @@ document.body.classList.remove('ae-is-football');
 await window.camSiteImages.reload();
 assert.equal(savantCard.style.getPropertyValue('--ae-community-portrait'), '',
   'navigating away should remove the old sports background');
+
+// Mejores y Peores Platos: las dos cabeceras conservan sus claves propias,
+// incluso cuando una de ellas solo tiene gradiente CSS y no URL original.
+const plateRail = document.createElement('aside');
+plateRail.className = 'ae-picks-rail';
+plateRail.innerHTML =
+  '<section class="ae-chef-board ae-chef-best"><div class="ae-picks-rail-heading">Mejores platos</div></section>' +
+  '<section class="ae-chef-board ae-chef-worst"><div class="ae-picks-rail-heading">Peores platos</div></section>';
+picks.querySelector('#communityPicks').append(plateRail);
+const bestPlate = plateRail.querySelector('.ae-chef-best .ae-picks-rail-heading');
+const worstPlate = plateRail.querySelector('.ae-chef-worst .ae-picks-rail-heading');
+for (const variant of ['dia', 'noche']) {
+  for (const type of ['mejores', 'peores']) {
+    const plateKey = 'picks.platos-' + type + '-banner-' + variant;
+    assert.ok(window.camSiteImages.keys().includes(plateKey), 'missing editable banner ' + plateKey);
+  }
+}
+databaseRows = [
+  {key:'picks.platos-mejores-banner-dia',url:'https://img.test/plates-best-day.jpg',focus_x:20,focus_y:35,alt:null},
+  {key:'picks.platos-peores-banner-dia',url:'https://img.test/plates-worst-day.jpg',focus_x:65,focus_y:70,alt:null},
+  {key:'picks.platos-mejores-banner-noche',url:'https://img.test/plates-best-night.jpg',focus_x:null,focus_y:null,alt:null},
+  {key:'picks.platos-peores-banner-noche',url:'https://img.test/plates-worst-night.jpg',focus_x:null,focus_y:null,alt:null},
+  {key:'picks.chefs-mejores-dia',url:'https://img.test/chefs-best-day.jpg',focus_x:null,focus_y:null,alt:null}
+];
+document.documentElement.classList.remove('dark');
+await window.camSiteImages.reload();
+assert.match(bestPlate.style.backgroundImage, /plates-best-day.jpg/);
+assert.match(worstPlate.style.backgroundImage, /plates-worst-day.jpg/);
+assert.equal(bestPlate.style.backgroundPosition, '20% 35%');
+assert.equal(worstPlate.style.backgroundPosition, '65% 70%');
+document.documentElement.classList.add('dark');
+await window.camSiteImages.reload();
+assert.match(bestPlate.style.backgroundImage, /plates-best-night.jpg/);
+assert.match(worstPlate.style.backgroundImage, /plates-worst-night.jpg/);
+databaseRows = databaseRows.filter(r => r.key !== 'picks.platos-peores-banner-noche');
+await window.camSiteImages.reload();
+assert.match(bestPlate.style.backgroundImage, /plates-best-night.jpg/,
+  'restoring worst night must not erase best night');
+assert.equal(worstPlate.style.backgroundImage, '',
+  'restoring worst night must reveal original CSS gradient');
+assert.ok(window.camSiteImages._state().rows.includes('picks.chefs-mejores-dia'),
+  'the unrelated Chefs personalizations remain intact');
+document.documentElement.classList.remove('dark');
+await window.camSiteImages.reload();
+assert.match(bestPlate.style.backgroundImage, /plates-best-day.jpg/);
+assert.match(worstPlate.style.backgroundImage, /plates-worst-day.jpg/);
+databaseRows = [];
+await window.camSiteImages.reload();
+assert.equal(bestPlate.style.backgroundImage, '', 'best restores original atlas CSS');
+assert.equal(worstPlate.style.backgroundImage, '', 'worst restores original gradient CSS');
 
 window.happyDOM.abort();
 console.log('CAM SPORTS: saved NFL and football banner overrides, separate news, NFL opinions and Eres Chef verified.');
