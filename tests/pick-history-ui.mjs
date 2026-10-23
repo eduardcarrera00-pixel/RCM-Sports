@@ -51,7 +51,7 @@ const oldChecks=next('ae_pick_settlement_checks');
 start();await tick();success(next('ae_pick_feed'),[fixture('new','Resultado actual','lost')]);await tick();
 success(next('ae_pick_settlement_checks'),[]);await tick();
 success(oldChecks,[{pick_id:'old'}]);await tick();
-assert.equal(count(),1);assert.match(area.textContent,/Resultado actual/);assert.doesNotMatch(area.textContent,/Resultado anterior/);
+assert.equal(count(),1);assert.ok(area.querySelector('[data-pick-id="new"]'));assert.equal(area.querySelector('[data-pick-id="old"]'),null,'The older response must not overwrite the latest history');
 assert.equal(area.querySelector('[data-outcome="lost"] .ae-pick-history-badge').textContent,'Fallado');
 
 // A late error cannot overwrite the latest empty result.
