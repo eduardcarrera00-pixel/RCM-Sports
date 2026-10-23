@@ -575,6 +575,13 @@
     ['body.ae-is-football #aeSportTakeLeaders[data-sport="football"] .is-supported', 'futbol.populares', '--ae-opinion-art', '.ae-sport-chef-heading'],
     ['body.ae-is-football #aeSportTakeLeaders[data-sport="football"] .is-questioned', 'futbol.impopulares', '--ae-opinion-art', '.ae-sport-chef-heading']
   ];
+  // Las dos opiniones de Fútbol comparten estructura con NFL, pero en modo día
+  // algunos estilos eliminan la URL del fondo. El escaneo CSS no las descubre:
+  // registrar cada tarjeta explícitamente en el editor, en ambos temas.
+  const FOOTBALL_OPINION_CARD_SELECTOR = 'body.ae-is-football #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-takes-grid > .ae-sport-chef-card:is(.is-supported,.is-questioned)';
+  const footballOpinionKey = el => themeArtKey(
+    el.classList.contains('is-supported') ? 'futbol.populares' : 'futbol.impopulares'
+  );
   const sportArtStyled = new Map();
   function applySavedSportArt() {
     const wanted = new Map();
@@ -772,8 +779,11 @@
     }
     for (const [el, pseudos] of wanted) {
       if (own(el) || !el.getClientRects().length) continue;
-      // No duplicar el lápiz del atlas heredado sobre las nuevas cabeceras.
-      if (PICKS_PLATE_BANNERS.some(([selector]) => el.matches(selector))) continue;
+      // Un lápiz por banner en Platos y Opiniones Fútbol, sin el lápiz
+      // genérico de la imagen CSS (que además puede faltar en modo día).
+      if (PICKS_PLATE_BANNERS.some(([selector]) => el.matches(selector)) ||
+          el.matches(FOOTBALL_OPINION_CARD_SELECTOR) ||
+          (el.matches('.ae-sport-chef-heading') && el.closest(FOOTBALL_OPINION_CARD_SELECTOR))) continue;
       for (const k of keysOnElement(el, pseudos)) add(el, k);
     }
     for (const n of document.querySelectorAll('img[data-site-image]')) if (!own(n)) add(n, n.dataset.siteImage);
@@ -786,6 +796,10 @@
     for (const [selector, base] of PICKS_PLATE_BANNERS)
       for (const el of document.querySelectorAll(selector))
         if (!own(el) && el.getClientRects().length) add(el, plateBannerKey(base));
+    // Opiniones populares e impopulares de Fútbol: una clave independiente
+    // por tarjeta y por tema, aunque el CSS diurno sea un fondo sin imagen.
+    for (const el of document.querySelectorAll(FOOTBALL_OPINION_CARD_SELECTOR))
+      if (!own(el) && el.getClientRects().length) add(el, footballOpinionKey(el));
     // Escudos de rankings y logos ajenos al inventario: mismo sistema de lápices.
     for (const item of window.camVisualSizes?.allTargets?.() || []) {
       if (own(item.el) || !item.el.getClientRects().length || ENTRIES.has(item.el.dataset.siteImage)) continue;

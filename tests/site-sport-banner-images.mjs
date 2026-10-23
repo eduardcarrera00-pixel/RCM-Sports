@@ -61,8 +61,12 @@ vm.runInNewContext(source, {
   window, document, localStorage: window.localStorage, MutationObserver: window.MutationObserver,
   URL, Image: window.Image,
   getComputedStyle: window.getComputedStyle.bind(window),
+  currentAdmin: true,
   addEventListener: window.addEventListener.bind(window),
-  setTimeout, clearTimeout, setInterval: () => 0
+  removeEventListener: window.removeEventListener.bind(window),
+  innerHeight: window.innerHeight, innerWidth: window.innerWidth,
+  requestAnimationFrame: window.requestAnimationFrame.bind(window),
+  setTimeout, clearTimeout, setInterval: () => 0, clearInterval: () => {}
 }, { filename: 'ae-site-images.js' });
 await window.camSiteImages.reload();
 
@@ -283,6 +287,53 @@ databaseRows = [];
 await window.camSiteImages.reload();
 assert.equal(bestPlate.style.backgroundImage, '', 'best restores original atlas CSS');
 assert.equal(worstPlate.style.backgroundImage, '', 'worst restores original gradient CSS');
+
+// Opiniones populares/impopulares Fútbol: modo día no puede depender de
+// detectar una URL CSS. Ambos lápices aparecen en el editor global y cambian
+// de clave al alternar día/noche, sin duplicados y sin acceso público.
+const rect = { top:100, left:100, right:340, bottom:230, width:240, height:130 };
+for (const card of [supported, questioned]) {
+  card.getClientRects = () => [rect];
+  card.getBoundingClientRect = () => rect;
+}
+wrap.dataset.sport = 'football';
+document.body.classList.add('ae-is-football');
+document.documentElement.classList.remove('dark');
+databaseRows = [
+  {key:'futbol.populares-dia',url:'https://img.test/popular-day.webp',focus_x:25,focus_y:60,alt:null},
+  {key:'futbol.impopulares-dia',url:'https://img.test/unpopular-day.webp',focus_x:70,focus_y:40,alt:null},
+  {key:'futbol.populares-noche',url:'https://img.test/popular-night.webp',focus_x:55,focus_y:60,alt:null},
+  {key:'futbol.impopulares-noche',url:'https://img.test/unpopular-night.webp',focus_x:40,focus_y:40,alt:null}
+];
+window.camGlobalEditMode = { isActive:() => true };
+await window.camSiteImages.reload();
+window.camSiteImages.refresh();
+const pencils = () => window.camSiteImages._state().pencils;
+assert.equal(pencils().filter(k => k === 'futbol.populares-dia').length, 1,
+  'day mode should provide exactly one pencil for popular opinions');
+assert.equal(pencils().filter(k => k === 'futbol.impopulares-dia').length, 1,
+  'day mode should provide exactly one pencil for unpopular opinions');
+assert.match(supported.style.getPropertyValue('--ae-opinion-art'), /popular-day.webp/);
+assert.match(questioned.style.getPropertyValue('--ae-opinion-art'), /unpopular-day.webp/);
+document.documentElement.classList.add('dark');
+await window.camSiteImages.reload();
+await new Promise(resolve => setTimeout(resolve, 450));
+assert.equal(pencils().filter(k => k === 'futbol.populares-noche').length, 1,
+  'night mode should keep exactly one pencil for popular opinions');
+assert.equal(pencils().filter(k => k === 'futbol.impopulares-noche').length, 1,
+  'night mode should keep exactly one pencil for unpopular opinions');
+assert.ok(!pencils().includes('futbol.populares-dia'),
+  'day pencil must be removed on switching to night');
+assert.match(supported.style.getPropertyValue('--ae-opinion-art'), /popular-night.webp/);
+assert.match(questioned.style.getPropertyValue('--ae-opinion-art'), /unpopular-night.webp/);
+document.documentElement.classList.remove('dark');
+await window.camSiteImages.reload();
+await new Promise(resolve => setTimeout(resolve, 450));
+assert.equal(pencils().filter(k => k === 'futbol.populares-dia').length, 1);
+assert.equal(pencils().filter(k => k === 'futbol.impopulares-dia').length, 1);
+window.camGlobalEditMode = { isActive:() => false };
+window.camSiteImages.refresh();
+assert.equal(pencils().length, 0, 'no pencils outside admin edit mode');
 
 window.happyDOM.abort();
 console.log('CAM SPORTS: saved NFL and football banner overrides, separate news, NFL opinions and Eres Chef verified.');
