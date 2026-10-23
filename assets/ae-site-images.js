@@ -469,12 +469,50 @@
     }
   }
 
+  // «Eres Chef» usa --chef-invite-art dentro de la propiedad abreviada
+  // background. En Safari iOS la sustitución por CSSOM no siempre se refleja
+  // después de cambiar de tema o volver a la pestaña; aplicar también la URL
+  // guardada al elemento evita que reaparezca la ilustración de fábrica.
+  const CHEF_BANNER_SELECTOR = '#footballTakes.ae-picks-editorial #communityPicks .ae-picks-heading-cta-row.ae-chef-marble';
+  const chefBannersStyled = new Set();
+  function applyChefBanner() {
+    const active = new Set(document.querySelectorAll(CHEF_BANNER_SELECTOR));
+    for (const el of [...chefBannersStyled]) {
+      if (active.has(el)) continue;
+      el.style.removeProperty('--chef-invite-art');
+      el.style.removeProperty('background-image');
+      el.style.removeProperty('background-position');
+      chefBannersStyled.delete(el);
+    }
+    const row = rows.get('picks.marmol-' + (isDark() ? 'noche' : 'dia'));
+    for (const el of active) {
+      if (!row?.url) {
+        if (chefBannersStyled.has(el)) {
+          el.style.removeProperty('--chef-invite-art');
+          el.style.removeProperty('background-image');
+          el.style.removeProperty('background-position');
+          chefBannersStyled.delete(el);
+        }
+        continue;
+      }
+      const image = cssUrl(row.url);
+      if (el.style.getPropertyValue('--chef-invite-art') !== image)
+        el.style.setProperty('--chef-invite-art', image, 'important');
+      if (el.style.getPropertyValue('background-image') !== image)
+        el.style.setProperty('background-image', image, 'important');
+      const focus = focusOf(row);
+      if (focus) el.style.setProperty('background-position', focus, 'important');
+      else if (chefBannersStyled.has(el)) el.style.removeProperty('background-position');
+      chefBannersStyled.add(el);
+    }
+  }
+
   function applyAll() {
     if (needsCss()) { try { walkSheets(); } catch {} }
     applyDecls();
     applyImgs(document.documentElement);
     window.camVisualSizes?.mark?.(document.documentElement);
-    if (document.body) { applySlots(); applyNflOpinionBanners(); }
+    if (document.body) { applySlots(); applyNflOpinionBanners(); applyChefBanner(); }
   }
 
   // ---------------------------------------------------------------------------
@@ -523,6 +561,7 @@
     if (SLOTS.some(s => rows.get(s.key)?.url) || slotted.size) { clearTimeout(slotTimer); slotTimer = setTimeout(applySlots, 120); }
     // Cambios de tema, navegación NFL/Fútbol o render dinámico de las clasificaciones.
     applyNflOpinionBanners();
+    applyChefBanner();
     if (admin.on) scheduleScan();
   }
   function sheetsChanged() {
