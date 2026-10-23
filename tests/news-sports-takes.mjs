@@ -18,7 +18,7 @@ var openedArticle=null;function openArticleModal(id){openedArticle=id;}
 var openedTake=null;window.aeTakeReplies={open:take=>{openedTake=take;}};
 window.aeTakeRankings={setSport:()=>{}};
 `;
-const w=new Window({url:'https://aesportsclub.github.io/'}),d=w.document;
+const w=new Window({url:'https://aesportsclub.github.io/',settings:{enableJavaScriptEvaluation:true,disableJavaScriptFileLoading:true,suppressInsecureJavaScriptEnvironmentWarning:true}}),d=w.document;
 d.body.innerHTML=source.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,'');
 w.eval(seed+render);
 w.eval(fs.readFileSync('assets/free-takes.js','utf8'));
