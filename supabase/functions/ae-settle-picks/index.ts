@@ -28,10 +28,14 @@ const ymd = (d: Date) => d.toISOString().slice(0, 10).replace(/-/g, '');
 const shift = (iso: string, n: number) => {const d = new Date(iso + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d;};
 
 // ---------- Marcadores ----------
-const boards = new Map<string, Promise<Game[]>>();
+// Keep scores fresh while a fixture is playing; Edge instances may outlive it.
+const boards = new Map<string, {checkedAt:number, promise:Promise<Game[]>}>();
+const BOARD_CACHE_MS = 5 * 60 * 1000;
 function scoreboard(path: string, date: string, db: any): Promise<Game[]> {
   const key = path + date;
-  if (!boards.has(key)) boards.set(key, (async () => {
+  const old = boards.get(key);
+  if (old && Date.now() - old.checkedAt < BOARD_CACHE_MS) return old.promise;
+  const promise = (async () => {
     // Prefer database-side fixed-host retrieval: ESPN returns 403 to Edge egress.
     // Avoid treating a temporary provider failure as "no game": log it and
     // retry once. Cron can retry remaining unavailable events on later runs.
@@ -60,8 +64,10 @@ function scoreboard(path: string, date: string, db: any): Promise<Game[]> {
         periods: (c.linescores || []).map((l: any) => Number(l.value ?? l.displayValue))
       }))
     }));
-  })().catch(() => []));
-  return boards.get(key)!;
+  })().catch(() => []);
+  boards.set(key, {checkedAt:Date.now(),promise});
+  if (boards.size > 500) for (const [k,entry] of boards) if (Date.now() - entry.checkedAt >= BOARD_CACHE_MS) boards.delete(k);
+  return promise;
 }
 
 function sideMatches(side: string, names: string[]) {
