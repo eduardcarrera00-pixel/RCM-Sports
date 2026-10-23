@@ -465,31 +465,43 @@
     for (const el of [...slotted]) if (!keep.has(el)) clearSlot(el);
   }
 
-  // Los dos fondos de Opiniones de NFL comparten una textura de origen.
-  // Sus reemplazos deben aplicarse por tarjeta y por tema, no por URL del CSS;
-  // de lo contrario cambiar uno también cambiaría el otro.
+  // Las dos imágenes de Opiniones de NFL se guardan con claves independientes.
+  // Pintarlas sólo en el encabezado evita que el arte cubra los Takes y votos.
   const NFL_OPINION_CARD_SELECTOR = 'body.ae-is-nfl #aeSportTakeLeaders.ae-sport-chefs[data-sport="nfl"] .ae-sport-takes-grid > .ae-sport-chef-card:is(.is-supported,.is-questioned)';
-  const nflOpinionStyled = new Set();
+  const nflOpinionStyled = new Map(); // tarjeta -> cabecera con estilo en línea
   const nflOpinionKey = el => (el.classList.contains('is-supported') ? 'nfl.opiniones-apoyadas-' : 'nfl.opiniones-hateadas-') + (isDark() ? 'noche' : 'dia');
-  function clearNflOpinionStyle(el) {
-    el.style.removeProperty('background-image');
-    el.style.removeProperty('background-position');
-    nflOpinionStyled.delete(el);
+  function clearNflOpinionStyle(card) {
+    const heading = nflOpinionStyled.get(card);
+    if (heading) {
+      heading.style.removeProperty('background-image');
+      heading.style.removeProperty('background-position');
+    }
+    // Limpiar también el estilo antiguo, que se aplicaba a toda la tarjeta.
+    card.style.removeProperty('background-image');
+    card.style.removeProperty('background-position');
+    nflOpinionStyled.delete(card);
   }
   function applyNflOpinionBanners() {
     const active = new Set(document.querySelectorAll(NFL_OPINION_CARD_SELECTOR));
-    for (const el of [...nflOpinionStyled]) if (!active.has(el)) clearNflOpinionStyle(el);
-    for (const el of active) {
-      const row = rows.get(nflOpinionKey(el));
-      if (!row?.url) {
-        if (nflOpinionStyled.has(el)) clearNflOpinionStyle(el);
+    for (const [card, heading] of nflOpinionStyled) {
+      if (!active.has(card) || card.querySelector('.ae-sport-chef-heading') !== heading)
+        clearNflOpinionStyle(card);
+    }
+    for (const card of active) {
+      // No restaurar jamás la imagen al cuerpo de la tarjeta.
+      card.style.removeProperty('background-image');
+      card.style.removeProperty('background-position');
+      const heading = card.querySelector('.ae-sport-chef-heading');
+      const row = rows.get(nflOpinionKey(card));
+      if (!heading || !row?.url) {
+        if (nflOpinionStyled.has(card)) clearNflOpinionStyle(card);
         continue;
       }
-      el.style.setProperty('background-image', cssUrl(row.url), 'important');
+      heading.style.setProperty('background-image', cssUrl(row.url), 'important');
       const focus = focusOf(row);
-      if (focus) el.style.setProperty('background-position', focus, 'important');
-      else el.style.removeProperty('background-position');
-      nflOpinionStyled.add(el);
+      if (focus) heading.style.setProperty('background-position', focus, 'important');
+      else heading.style.removeProperty('background-position');
+      nflOpinionStyled.set(card, heading);
     }
   }
 
@@ -783,14 +795,18 @@
       // genérico de la imagen CSS (que además puede faltar en modo día).
       if (PICKS_PLATE_BANNERS.some(([selector]) => el.matches(selector)) ||
           el.matches(FOOTBALL_OPINION_CARD_SELECTOR) ||
-          (el.matches('.ae-sport-chef-heading') && el.closest(FOOTBALL_OPINION_CARD_SELECTOR))) continue;
+          el.matches(NFL_OPINION_CARD_SELECTOR) ||
+          (el.matches('.ae-sport-chef-heading') &&
+           (el.closest(FOOTBALL_OPINION_CARD_SELECTOR) || el.closest(NFL_OPINION_CARD_SELECTOR)))) continue;
       for (const k of keysOnElement(el, pseudos)) add(el, k);
     }
     for (const n of document.querySelectorAll('img[data-site-image]')) if (!own(n)) add(n, n.dataset.siteImage);
-    // La textura de ambas tarjetas viene del mismo archivo y no tiene lápices
-    // distintos por URL. Añadir uno por tarjeta al editor global del admin.
-    for (const el of document.querySelectorAll(NFL_OPINION_CARD_SELECTOR)) {
-      if (!own(el) && el.getClientRects().length) add(el, nflOpinionKey(el));
+    // Los banners de NFL comparten archivo original, pero cada cabecera tiene
+    // su propia clave y lápiz. El cuerpo de la tarjeta no es editable como banner.
+    for (const card of document.querySelectorAll(NFL_OPINION_CARD_SELECTOR)) {
+      const heading = card.querySelector('.ae-sport-chef-heading');
+      if (heading && !own(heading) && heading.getClientRects().length)
+        add(heading, nflOpinionKey(card));
     }
     // Ambos lápices aparecen incluso si el CSS original es un gradiente sin URL.
     for (const [selector, base] of PICKS_PLATE_BANNERS)
