@@ -152,8 +152,9 @@ async function visit(browser,name,width,height,dark,mobile){
         label+': el logo no abre Home');
       assert.equal(await page.evaluate(()=>document.querySelector('body > nav.ae-sport-nav').classList.contains('cam-nav-has-active')),false,
         label+': Home deja la cápsula seleccionada por error');
-      await page.evaluate(()=>window.scrollTo(0,document.documentElement.scrollHeight));
-      await page.waitForTimeout(125);
+      // Bypass the page's smooth-scroll animation before measuring the footer.
+      // A fixed 125 ms wait can sample halfway through a long mobile page.
+      await page.evaluate(()=>window.scrollTo({top:document.documentElement.scrollHeight,behavior:'instant'}));
       const bottom=await page.evaluate(()=>{
         const nav=window.__camAuditNav().options[0].node.getBoundingClientRect();
         const last=[...document.querySelectorAll('footer a[href],footer button')].filter(e=>e.getBoundingClientRect().height>0).at(-1);
