@@ -611,8 +611,10 @@ function paintChefList(id,result,kind){
 }
 async function loadChefLists(){
  const seq=++chefRequest;
+ // Platos rank community votes from the current publication week. Keep the vote
+ // ranking after an event closes: resolving the Pick must not erase its votes.
  const query=()=>db.from('ae_pick_feed').select('*')
-   .in('moderation_status',['pending','approved']).eq('is_current_week',true).gte('event_date',todayToronto()).eq('outcome','pending');
+   .eq('moderation_status','approved').eq('is_current_week',true);
  try{
    const [best,worst]=await Promise.all([
      query().gt('score',0).order('score',{ascending:false})
