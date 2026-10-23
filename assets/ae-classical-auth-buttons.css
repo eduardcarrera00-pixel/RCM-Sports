@@ -2752,3 +2752,29 @@ html:not(.dark) body #userAuthModal .cam-auth-story-message>p:last-child{
   color:#2f2620!important;
   text-shadow:0 0 2px rgba(255,249,236,.98),0 1px 10px rgba(255,248,232,.95),0 0 22px rgba(255,246,226,.85)!important;
 }
+
+/* CAM SPORTS · Login arch banners · 2026-10-23
+   Supplied day/night artwork. Image only: auth form, controls and handlers unchanged.
+   Right-aligned architectural detail stays visible in the narrow desktop illustration
+   and the mobile panorama. Both themes use independent, versioned image assets. */
+html body #userAuthModal .cam-auth-story{
+  background-color:#081c2a!important;
+  background-image:
+    linear-gradient(90deg,rgba(4,17,27,.54) 0%,rgba(4,17,27,.26) 52%,rgba(4,17,27,.03) 100%),
+    url('cam-login-arch-night-20261023.jpg')!important;
+  background-position:center,right center!important;
+  background-size:cover,auto 100%!important;
+  background-repeat:no-repeat!important;
+}
+html:not(.dark) body #userAuthModal .cam-auth-story{
+  background-color:#fbf3e4!important;
+  background-image:
+    linear-gradient(90deg,rgba(255,249,237,.68) 0%,rgba(255,249,237,.22) 52%,rgba(255,249,237,0) 100%),
+    url('cam-login-arch-day-20261023.jpg')!important;
+}
+@media(max-width:860px){
+  html body #userAuthModal .cam-auth-story{
+    background-position:center,right center!important;
+    background-size:cover,cover!important;
+  }
+}
