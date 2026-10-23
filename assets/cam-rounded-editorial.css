@@ -101,3 +101,39 @@
     line-height:1.2!important;
   }
 }
+
+/* NFL: textura de piedra crema en Opiniones apoyadas y Opiniones hateadas.
+   Se mantiene la maqueta, la interacción y la misma imagen en modo día y noche. */
+html body.ae-is-nfl #mainContent #freeTakes #aeSportTakeLeaders.ae-sport-chefs[data-sport="nfl"] .ae-sport-takes-grid > .ae-sport-chef-card:is(.is-supported,.is-questioned) {
+  --nfl-ink:#193143!important;
+  --nfl-muted:#855b35!important;
+  --nfl-rule:rgba(120,91,60,.33)!important;
+  background:#e9d5bb url("cam-nfl-opinions-stone.webp") center center / cover no-repeat!important;
+  color:var(--nfl-ink)!important;
+}
+html body.ae-is-nfl #mainContent #freeTakes #aeSportTakeLeaders.ae-sport-chefs[data-sport="nfl"] .ae-sport-takes-grid > .ae-sport-chef-card.is-supported { --nfl-net:#176a52!important; }
+html body.ae-is-nfl #mainContent #freeTakes #aeSportTakeLeaders.ae-sport-chefs[data-sport="nfl"] .ae-sport-takes-grid > .ae-sport-chef-card.is-questioned { --nfl-net:#a13243!important; }
+html body.ae-is-nfl #mainContent #freeTakes #aeSportTakeLeaders.ae-sport-chefs[data-sport="nfl"] .ae-sport-takes-grid > .ae-sport-chef-card .ae-sport-chef-heading {
+  background:transparent!important;
+  background-image:none!important;
+  border-bottom-color:var(--nfl-rule)!important;
+}
+html body.ae-is-nfl #mainContent #freeTakes #aeSportTakeLeaders.ae-sport-chefs[data-sport="nfl"] .ae-sport-takes-grid > .ae-sport-chef-card .ae-sport-chef-heading > h3,
+html:not(.dark) body.ae-is-nfl #mainContent #freeTakes #aeSportTakeLeaders.ae-sport-chefs[data-sport="nfl"] .ae-sport-takes-grid > .ae-sport-chef-card .ae-sport-chef-heading > h3 {
+  color:#193143!important;
+  text-shadow:none!important;
+}
+html body.ae-is-nfl #mainContent #freeTakes #aeSportTakeLeaders.ae-sport-chefs[data-sport="nfl"] .ae-sport-takes-grid > .ae-sport-chef-card .ae-sport-chef-heading::before,
+html body.ae-is-nfl #mainContent #freeTakes #aeSportTakeLeaders.ae-sport-chefs[data-sport="nfl"] .ae-sport-takes-grid > .ae-sport-chef-card .ae-sport-chef-heading::after {
+  color:#69482f!important;
+}
+html body.ae-is-nfl #mainContent #freeTakes #aeSportTakeLeaders.ae-sport-chefs[data-sport="nfl"] .ae-sport-takes-grid > .ae-sport-chef-card .ae-sport-take-statline .ae-top-take-reply {
+  color:#734c2d!important;
+}
+@media(max-width:760px) {
+  html body.ae-is-nfl #mainContent #freeTakes #aeSportTakeLeaders.ae-sport-chefs[data-sport="nfl"] .ae-sport-takes-grid > .ae-sport-chef-card ol.ae-sport-takes-list > li.ae-sport-take-item:nth-child(n):not(.ae-top-takes-empty) {
+    background:rgba(255,248,236,.77)!important;
+    color:#193143!important;
+    border-color:var(--nfl-rule)!important;
+  }
+}
