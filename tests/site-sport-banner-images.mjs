@@ -129,11 +129,13 @@ wrap.id = 'aeSportTakeLeaders';
 wrap.className = 'ae-sport-chefs';
 wrap.dataset.sport = 'nfl';
 wrap.innerHTML = '<div class="ae-sport-takes-grid">' +
-  '<section class="ae-sport-chef-card is-supported"></section>' +
-  '<section class="ae-sport-chef-card is-questioned"></section></div>';
+  '<section class="ae-sport-chef-card is-supported"><header class="ae-sport-chef-heading"><h3>Opiniones apoyadas</h3></header><ol class="ae-sport-takes-list"></ol></section>' +
+  '<section class="ae-sport-chef-card is-questioned"><header class="ae-sport-chef-heading"><h3>Opiniones hateadas</h3></header><ol class="ae-sport-takes-list"></ol></section></div>';
 document.body.append(wrap);
 const supported = wrap.querySelector('.is-supported');
 const questioned = wrap.querySelector('.is-questioned');
+const supportedHeading = supported.querySelector('.ae-sport-chef-heading');
+const questionedHeading = questioned.querySelector('.ae-sport-chef-heading');
 databaseRows = [
   { key: 'nfl.opiniones-apoyadas-dia', url: 'https://img.test/supported-day.webp', focus_x: 25, focus_y: 75, alt: null },
   { key: 'nfl.opiniones-hateadas-dia', url: 'https://img.test/questioned-day.webp', focus_x: null, focus_y: null, alt: null },
@@ -141,21 +143,27 @@ databaseRows = [
   { key: 'nfl.opiniones-hateadas-noche', url: 'https://img.test/questioned-night.webp', focus_x: null, focus_y: null, alt: null }
 ];
 await window.camSiteImages.reload();
-assert.match(supported.style.backgroundImage, /supported-day.webp/);
-assert.match(questioned.style.backgroundImage, /questioned-day.webp/);
-assert.equal(supported.style.backgroundPosition, '25% 75%');
+assert.match(supportedHeading.style.backgroundImage, /supported-day.webp/);
+assert.match(questionedHeading.style.backgroundImage, /questioned-day.webp/);
+assert.equal(supportedHeading.style.backgroundPosition, '25% 75%');
+assert.equal(supported.style.backgroundImage, '', 'banner must never cover the supported Takes');
+assert.equal(questioned.style.backgroundImage, '', 'banner must never cover the questioned Takes');
 document.documentElement.classList.add('dark');
 await window.camSiteImages.reload();
-assert.match(supported.style.backgroundImage, /supported-night.webp/);
-assert.match(questioned.style.backgroundImage, /questioned-night.webp/);
+assert.match(supportedHeading.style.backgroundImage, /supported-night.webp/);
+assert.match(questionedHeading.style.backgroundImage, /questioned-night.webp/);
+assert.equal(supported.style.backgroundImage, '');
+assert.equal(questioned.style.backgroundImage, '');
 databaseRows = databaseRows.filter(r => r.key !== 'nfl.opiniones-hateadas-noche');
 await window.camSiteImages.reload();
-assert.match(supported.style.backgroundImage, /supported-night.webp/);
-assert.equal(questioned.style.backgroundImage, '', 'restoring one banner must leave original CSS intact');
+assert.match(supportedHeading.style.backgroundImage, /supported-night.webp/);
+assert.equal(questionedHeading.style.backgroundImage, '', 'restoring one header banner must leave original CSS intact');
 document.body.classList.remove('ae-is-nfl');
 document.body.classList.add('ae-is-football');
 await window.camSiteImages.reload();
-assert.equal(supported.style.backgroundImage, '', 'football must not inherit NFL banner');
+assert.equal(supportedHeading.style.backgroundImage, '', 'football must not inherit NFL banner');
+assert.equal(questionedHeading.style.backgroundImage, '');
+assert.equal(supported.style.backgroundImage, '');
 assert.equal(questioned.style.backgroundImage, '');
 
 // Eres Chef: banner personalizado guardado desde el editor debe verse igual
