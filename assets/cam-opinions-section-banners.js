@@ -46,6 +46,8 @@
     const header = document.querySelector('#aeOpinions .ae-opinions-section-head[data-cam-opinions-banner="' + slot + '"]');
     if (!header) return;
     const src = imageFor(slot);
+    const hasLightAsset = Boolean(banners.get(key(slot, 'light')));
+    header.classList.toggle('cam-op-banner-light-asset', hasLightAsset && themeNow() === 'light');
     let img = header.querySelector('.cam-op-banner-image');
     if (src) {
       if (!img) {
