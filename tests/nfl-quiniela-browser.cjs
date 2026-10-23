@@ -8,9 +8,12 @@ const {chromium}=require('playwright');
   const pageHtml=fs.readFileSync('index.html','utf8');
   const code=fs.readFileSync('assets/cam-nfl-quiniela.js','utf8');
   const theme=pageHtml.match(/<style id="cam-nfl-quiniela-theme">([\s\S]*?)<\/style>/)?.[0];
-  const section=pageHtml.match(/<!-- La Quiniela NFL es siempre el último módulo de NFL\. -->([\s\S]*?)<!-- Se retira el listado agregado/)?.[1];
+  const section=pageHtml.match(/<!-- Las quinielas van donde antes estaba el pick de campeon[\s\S]*?-->([\s\S]*?)<!-- La Quiniela de Fútbol/)?.[1];
   assert.ok(theme&&section,'The published page must contain the module + the day/night styling');
   assert.ok(pageHtml.indexOf('id="camNflQuiniela"')>pageHtml.indexOf('id="freeTakes"'),'NFL must be last');
+  // La quiniela sube al hueco del pick de campeón y campeón baja tras las clasificaciones.
+  assert.ok(pageHtml.indexOf('id="camNflQuiniela"')<pageHtml.indexOf('id="aeSportTakeRanking"'),'Quiniela before rankings');
+  assert.ok(pageHtml.indexOf('id="aeSportTakeRanking"')<pageHtml.indexOf('id="aeSeasonPredictions"'),'Champion pick after rankings');
   assert.ok(pageHtml.indexOf('id="camNflQuiniela"')<pageHtml.indexOf('</main>'),'Module must stay inside main');
   assert.ok(/create policy cam_nfl_picks_own/.test(fs.readFileSync('supabase/migrations/20261022170000_cam_nfl_quiniela.sql','utf8')),'RLS is required');
 

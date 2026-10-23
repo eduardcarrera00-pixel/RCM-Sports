@@ -169,9 +169,10 @@
     const team=window.CamNFLQuinielaTeams?.getTeam(id)||teams.get(id);
     const image=el('img');image.alt='Logo de '+(team?.name||id);image.loading='lazy';image.decoding='async';
     image.width=52;image.height=52;
+    // Un escudo que no carga se esconde pero conserva su hueco: la fila no se descoloca.
     if(team?.logo)image.src=team.logo;
-    else image.hidden=true;
-    image.addEventListener('error',()=>{image.hidden=true;image.dataset.logoError='true';});
+    else image.style.visibility='hidden';
+    image.addEventListener('error',()=>{image.style.visibility='hidden';image.dataset.logoError='true';});
     return image;
   }
   function side(g,id){
