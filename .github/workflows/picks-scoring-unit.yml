@@ -1,0 +1,31 @@
+name: CAM SPORTS pick scoring unit checks
+
+on:
+  pull_request:
+    paths:
+      - 'assets/community-picks.js'
+      - 'supabase/functions/ae-settle-picks/**'
+      - 'supabase/migrations/*pick*'
+      - 'tests/pick-history-ui.mjs'
+      - 'tests/community-picks-ui.mjs'
+      - 'tests/profile-compose.mjs'
+      - 'package*.json'
+      - '.github/workflows/picks-scoring-unit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  picks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Picks, history, Chef rankings and profile regressions
+        run: npm run test:picks && node tests/profile-compose.mjs
