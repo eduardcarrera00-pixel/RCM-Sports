@@ -270,9 +270,14 @@ Deno.serve(async req => {
   const body = await req.json().catch(() => ({}));
   const dryRun = body?.dry_run === true;
 
-  const {data: picks, error} = await db.from('ae_community_picks').select('id,legs,event_date')
-    .eq('outcome', 'pending').eq('moderation_status', 'approved').eq('hidden', false)
-    .not('event_date', 'is', null).lte('event_date', today).order('event_date', {ascending: true}).limit(300);
+  // Authorized dry-run diagnostics can re-check a known, already-resolved Pick
+  // without changing its outcome. Scheduled runs still process only pending.
+  const query = db.from('ae_community_picks').select('id,legs,event_date')
+    .eq('moderation_status', 'approved').eq('hidden', false)
+    .not('event_date', 'is', null).lte('event_date', today)
+    .order('event_date', {ascending: true}).limit(300);
+  if (!(dryRun && typeof body?.pick_id === 'string')) query.eq('outcome', 'pending');
+  const {data: picks, error} = await query;
   if (error) return respond({error: error.message}, 500);
   const {data: checks} = await db.from('ae_pick_settlement_checks').select('pick_id,status,last_checked_at,attempts').in('pick_id', (picks || []).map(p => p.id));
   const byPick = new Map((checks || []).map(c => [c.pick_id, c]));
