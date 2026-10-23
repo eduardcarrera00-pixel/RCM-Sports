@@ -524,6 +524,93 @@
   return {ok:true,readings:[{event,selection,sport:sports.length===1?sports[0]:'Otros',odds:price.american,confidence:Math.min(...readings.map(r=>r.confidence)),selectionCount:readings.length}],total:null,eventDate,dateSource};
  }
 
+ // Constructor de apuestas («CREAR APUESTA» de Caliente, «Crea tu apuesta»,
+ // bet builder): UN solo momio total arriba y varias condiciones del MISMO
+ // partido, ninguna con momio propio. Los dos equipos van en filas separadas al
+ // final, con la fecha en una y la hora en la otra. Todo ello es un solo Pick.
+ //   CREAR APUESTA 11.00
+ //   Raphinha: 2+ remates a puerta        SUSTITUTO+
+ //   Jugador - Remates a puerta
+ //   …
+ //   Barcelona      Dom 25 oct
+ //   Real Madrid    21:00
+ const BUILDER_HEADER=/\b(crear apuesta|crea tu (?:propia )?apuesta|apuesta creada|creador de apuestas|arma tu apuesta|bet ?builder)\b/;
+ const BUILDER_ROLE=/^(jugador(?:es)?|equipo(?:s)?|portero|partido|entrenador|arbitro|anotador|tarjetas|corners?|tiros de esquina)\s*[-:]\s*(.+)$/;
+ const BUILDER_MONTHS={ene:1,enero:1,jan:1,january:1,feb:2,febrero:2,february:2,mar:3,marzo:3,march:3,abr:4,abril:4,apr:4,april:4,may:5,mayo:5,jun:6,junio:6,june:6,jul:7,julio:7,july:7,ago:8,agosto:8,aug:8,august:8,sep:9,sept:9,septiembre:9,september:9,oct:10,octubre:10,october:10,nov:11,noviembre:11,november:11,dic:12,diciembre:12,dec:12,december:12};
+ function extractBetBuilder(data,todayOverride=''){
+  const lines=linesFrom(data).map(l=>({...l,text:String(l.text).replace(/[|]/g,' ').replace(/\s+/g,' ').trim()})).filter(l=>l.text);
+  const heads=lines.map((l,i)=>({i,t:clean(l.text)})).filter(l=>BUILDER_HEADER.test(l.t));
+  if(!heads.length)return null;
+  const fail=reason=>({ok:false,reason,readings:[]});
+  const plain=clean(lines.map(l=>l.text).join('\n'));
+  if(Number(data.confidence)<50)return fail('No se lee con suficiente claridad. Prueba una captura más nítida.');
+  if(heads.length>1)return fail('La captura contiene más de una apuesta creada. Captura un solo Pick completo.');
+  const h=heads[0].i;
+  // Momio total: en el encabezado o, en pantallas estrechas, en la fila siguiente.
+  let price=candidates(lines[h],h).filter(c=>c.confidence>=80);
+  if(!price.length&&lines[h+1]&&/^[+-]?\s*\d{1,3}(?:[.,]\d{1,3})?$/.test(lines[h+1].text))price=candidates(lines[h+1],h+1).filter(c=>c.confidence>=80);
+  if(price.length!==1||data.hasBoostedTicketPrice||/\b(profit boost|momio aumentado|cuota mejorada|super ?cuota)\b/.test(plain))
+   return fail('No pude leer un único momio total de la apuesta creada. Incluye su encabezado, sin bonos ni cuotas mejoradas.');
+  const badge=s=>String(s||'').replace(/\bsus?t[il1]tut[o0]s?\s*\+?/ig,' ').replace(/\bsuplentes?\s*\+?/ig,' ').replace(/[«»©®~¢]/g,' ').replace(/\s+/g,' ').trim();
+  const legs=[],used=new Set();let last=h;
+  for(let i=h+1;i<lines.length;i++){
+   if(!BUILDER_ROLE.test(clean(lines[i].text)))continue;
+   const previous=lines[i-1];
+   const selection=tidyText(badge(previous?.text||'')),role=tidyText(badge(lines[i].text));
+   const market=role.replace(/^[^-:]+[-:]\s*/,'');
+   if(i-1<=last||!previous||selection.length<3||selection.length>160||BUILDER_ROLE.test(clean(selection))||BUILDER_HEADER.test(clean(selection)))
+    return fail('Falta una selección junto a su mercado. Sube una captura completa de la apuesta.');
+   if(Math.min(previous.confidence,lines[i].confidence)<65)return fail('No se lee con suficiente claridad. Prueba una captura más nítida.');
+   legs.push(market&&!clean(selection).includes(clean(market))?selection+' · '+market:selection);
+   used.add(i-1);used.add(i);last=i;
+  }
+  // Nada entre el encabezado y la última selección puede quedar suelto: una fila
+  // sin pareja significa que falta un mercado y se perdería una selección.
+  for(let i=h+1;i<last;i++)if(!used.has(i)&&tidyText(badge(lines[i].text)).replace(/[^\p{L}\p{N}]/gu,'').length>2)
+   return fail('No pude separar todas las selecciones con su mercado. Sube una captura completa de la apuesta.');
+  if(!legs.length)return fail('No pude leer las selecciones de la apuesta creada. Sube una captura donde se vean completas, con su mercado.');
+  if(legs.length>12)return fail('La apuesta creada tiene demasiadas selecciones para un Pick.');
+  const stop=/\b(apostar|importe|ganancia|pago potencial|total a pagar|saldo|balance|anadir|agregar|eliminar|cuota total|momio total|mis apuestas)\b/;
+  const tail=[];
+  for(let i=last+1;i<lines.length&&!stop.test(clean(lines[i].text));i++)tail.push(lines[i]);
+  if(!tail.length)return fail('Falta el partido al final de la apuesta creada. Sube la captura completa.');
+  const monthNames=Object.keys(BUILDER_MONTHS).join('|');
+  const dayMonth=new RegExp('\\b(\\d{1,2})\\s*(?:de\\s*)?('+monthNames+')\\b|\\b('+monthNames+')\\s*(\\d{1,2})\\b','i');
+  const weekday=/\b(domingo|lunes|martes|miercoles|jueves|viernes|sabado|dom|lun|mar|mie|jue|vie|sab|sunday|monday|tuesday|wednesday|thursday|friday|saturday|sun|mon|tue|wed|thu|fri|sat|hoy|manana)\b/gi;
+  const timeRe=/\b\d{1,2}\s*[:.]\s*\d{2}\s*(?:h|hs|hrs|am|pm)?\b/gi;
+  const today=todayOverride||torontoToday();
+  let day='',live=false;
+  const rows=tail.map(l=>{
+   const slash=l.text.match(DATE_IN_LINE),dm=clean(l.text).match(dayMonth);
+   if(slash&&!day)day=nearestYearDate(+slash[1],+slash[2],today);
+   else if(dm&&!day)day=nearestYearDate(+(dm[1]||dm[4]),BUILDER_MONTHS[(dm[2]||dm[3]).toLowerCase()],today);
+   let t=' '+l.text.replace(DATE_IN_LINE,' ')+' ';
+   t=t.replace(new RegExp(dayMonth.source,'ig'),' ').replace(timeRe,' ');
+   const dated=t!==' '+l.text+' ';
+   t=t.replace(weekday,' ');
+   if(/\b(en vivo|live|medio tiempo|descanso|entretiempo|finalizado|final del partido|penaltis)\b/.test(clean(t))||/\b\d{1,2}\s*-\s*\d{1,2}\b/.test(t))live=true;
+   const name=tidyText(badge(t));
+   return {name:/\p{L}{2}/u.test(name)&&l.confidence>=65?name:'',dated};
+  });
+  if(live)return fail('Ese partido ya empezó o terminó. Publica tus Picks antes del partido.');
+  if(!day&&/\bhoy\b/.test(clean(tail.map(l=>l.text).join(' '))))day=today;
+  if(!day)return fail('No pude leer la fecha del partido. Sube una captura donde se vea junto a los equipos.');
+  const named=rows.filter(r=>r.name);
+  const pair=rows.findIndex((r,i)=>r.name&&r.dated&&rows[i+1]?.name&&rows[i+1].dated);
+  const vs=named.find(r=>EVENT_IN_LINE.test(' '+r.name+' '));
+  let a='',b='';
+  if(vs){const parts=vs.name.split(/\s+(?:vs?\.?|versus|contra)\s+|\s+@\s+/i);a=parts[0];b=parts.slice(1).join(' ');}
+  else if(pair>=0){a=rows[pair].name;b=rows[pair+1].name;}
+  else if(named.length===2){a=named[0].name;b=named[1].name;}
+  else return fail('No pude leer los dos equipos del partido. Sube la captura completa de la apuesta.');
+  if(tidyText(a).length<2||tidyText(b).length<2)return fail('No se leyó el partido completo de la apuesta creada.');
+  if(day<today)return fail('Ese partido ya se jugó. Publica tus Picks antes del partido.');
+  const event=tidyText(a)+' vs. '+tidyText(b),selection=legs.join(' + ');
+  if(event.length>160||selection.length>2000)return fail('La apuesta creada es demasiado extensa para publicarla completa.');
+  const q=price[0];
+  return {ok:true,readings:[{sport:sportOf(event+' '+selection),event,selection,selectionCount:legs.length,
+   odds:q.american,format:q.format,visible:q.visible,confidence:Math.floor(q.confidence)}],total:null,eventDate:day,dateSource:'exact'};
+ }
  // Pestaña de apuestas sencillas (varias apuestas independientes, cada una con su
  // momio y sin momio total). Cada una se publica como un Pick propio:
  //   SENCILLOS
@@ -580,6 +667,8 @@
   const dated=read=>read?.ok?{...read,...receiptEventDate(data)}:read;
   const singles=extractSinglesSlip(data);
   if(singles)return dated(singles);
+  const builder=extractBetBuilder(data);
+  if(builder)return builder;
   const card=extractCardTicket(data);
   if(card&&(card.ok||/empezaron|jugaron|resuelto/.test(card.reason)))return card.ok?card:{...card,terminal:true};
   const momios=extractMomiosTicket(data);
@@ -837,5 +926,5 @@
   if(!price||!Number.isFinite(price.american))return {...fail('Se recuperaron '+picks.length+' selecciones, pero no se lee el momio total original. Sube otra captura que incluya la parte superior y los partidos; no usamos el bonus ni el importe para calcularlo.'),partial:preview};
   return {ok:true,readings:[{...preview,odds:price.american,visible:price.visible,format:'americana',confidence:Math.floor(price.confidence),originalBeforeBoost}],total:null,eventDate:''};
  }
- return {odds,compare,extract,linesFrom,selectionMatches,extractGameParlay,extractOpenSameGameParlay,extractDirectTicket,extractMomiosTicket,extractCardTicket,extractSinglesSlip,receiptEventDate};
+ return {odds,compare,extract,linesFrom,selectionMatches,extractGameParlay,extractOpenSameGameParlay,extractDirectTicket,extractMomiosTicket,extractCardTicket,extractSinglesSlip,extractBetBuilder,receiptEventDate};
 });
