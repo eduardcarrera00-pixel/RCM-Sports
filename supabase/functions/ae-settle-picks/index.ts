@@ -29,13 +29,19 @@ const shift = (iso: string, n: number) => {const d = new Date(iso + 'T12:00:00Z'
 
 // ---------- Marcadores ----------
 const boards = new Map<string, Promise<Game[]>>();
-function scoreboard(path: string, date: string): Promise<Game[]> {
+function scoreboard(path: string, date: string, db: any): Promise<Game[]> {
   const key = path + date;
   if (!boards.has(key)) boards.set(key, (async () => {
+    // Prefer database-side fixed-host retrieval: ESPN returns 403 to Edge egress.
     // Avoid treating a temporary provider failure as "no game": log it and
     // retry once. Cron can retry remaining unavailable events on later runs.
     let j: any = null;
-    for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const proxy = await db.rpc('ae_pick_scoreboard_proxy', {p_path:path, p_date:date});
+      if (!proxy.error && proxy.data && Array.isArray(proxy.data.events)) j = proxy.data;
+      else console.warn('CAM scoreboard proxy unavailable', path, date, proxy.error?.message || 'empty response');
+    } catch (error) {console.warn('CAM scoreboard proxy request failed', path, date, String(error));}
+    for (let attempt = 0; !j && attempt < 2; attempt++) {
       try {
         const r = await fetch(`${ESPN}/${path}/scoreboard?dates=${date}&limit=300`, {signal: AbortSignal.timeout(12000)});
         if (r.ok) {j = await r.json(); break;}
@@ -44,7 +50,6 @@ function scoreboard(path: string, date: string): Promise<Game[]> {
       } catch (error) {console.warn('ESPN scoreboard request failed', {path, date, error: String(error)});}
       if (attempt === 0) await new Promise(resolve => setTimeout(resolve, 500));
     }
-    if (path === 'soccer/mex.1') console.warn('CAM ESPN MEX', date, (j?.events || []).length);
     if (!j) return [];
     return (j.events || []).map((e: any) => ({
       id: String(e.id), path, name: e.name || '',
@@ -68,9 +73,9 @@ function sideMatches(side: string, names: string[]) {
 }
 const splitEvent = (event: string) => event.split(/\s+(?:vs\.?|v\.?|@|at|-|contra)\s+/i).map(s => s.trim()).filter(Boolean);
 
-async function findGame(event: string, sport: string, eventDate: string): Promise<Game | null> {
+async function findGame(event: string, sport: string, eventDate: string, db: any): Promise<Game | null> {
   const sides = splitEvent(event);
-  if (sides.length !== 2) { console.warn('Unrecognized match pairing', event); return null; }
+  if (sides.length !== 2) return null;
   const paths = LEAGUES[sport] || Object.values(LEAGUES).flat();
   // Calling 30 leagues in parallel overwhelms the scoreboard provider and
   // can make valid matches appear "missing". Search priority leagues first
@@ -79,14 +84,13 @@ async function findGame(event: string, sport: string, eventDate: string): Promis
     const date = ymd(shift(eventDate, n));
     for (let start = 0; start < paths.length; start += 4) {
       const found: Game[] = [];
-      const lists = await Promise.all(paths.slice(start, start + 4).map(p => scoreboard(p, date)));
+      const lists = await Promise.all(paths.slice(start, start + 4).map(p => scoreboard(p, date, db)));
       for (const g of lists.flat()) {
         if (g.teams.length !== 2) continue;
         const ok = (sideMatches(sides[0], g.teams[0].names) && sideMatches(sides[1], g.teams[1].names))
           || (sideMatches(sides[0], g.teams[1].names) && sideMatches(sides[1], g.teams[0].names));
         if (ok && !found.some(f => f.id === g.id)) found.push(g);
       }
-      if (start === 0 && n === 0 && sport === 'Fútbol') console.warn('CAM MATCH', event, date, sides, lists[0]?.filter(g => /Pumas|Santos/i.test(g.name)).map(g => [g.name,g.teams.map(t=>t.names)]));
       if (found.length === 1) return found[0];
       if (found.length > 1) return null;
     }
@@ -237,7 +241,7 @@ function conditionsOf(pick: any): {event: string, selection: string, sport: stri
   return out;
 }
 
-async function evaluate(pick: any, today: string): Promise<Check> {
+async function evaluate(pick: any, today: string, db: any): Promise<Check> {
   const conditions = conditionsOf(pick);
   if (!conditions.length) return {status: 'needs_review', reason: 'No pudimos leer las condiciones del Pick.'};
   const verdicts: (Verdict & {condition: string})[] = [];
@@ -246,7 +250,7 @@ async function evaluate(pick: any, today: string): Promise<Check> {
   const old = shift(today, -1).toISOString().slice(0, 10) >= pick.event_date;
   for (const c of conditions) {
     if (!LEAGUES[c.sport] && c.sport !== 'Otros') {verdicts.push({condition: c.selection, result: 'unsupported', why: `Sin marcadores automáticos de ${c.sport}.`}); continue;}
-    const g = await findGame(c.event, c.sport, pick.event_date);
+    const g = await findGame(c.event, c.sport, pick.event_date, db);
     if (!g) {verdicts.push({condition: c.selection, result: old ? 'unsupported' : 'waiting', why: `No encontramos "${c.event}" en los marcadores oficiales.`}); continue;}
     verdicts.push({condition: c.selection, ...await judge(c.selection, c.event, g)});
   }
@@ -296,7 +300,7 @@ Deno.serve(async req => {
   const results = [];
   for (const pick of due) {
     let check: Check;
-    try {check = await evaluate(pick, today);}
+    try {check = await evaluate(pick, today, db);}
     catch (e) {console.error('settle', pick.id, e); check = {status: 'waiting', reason: 'Error temporal al consultar los marcadores.'};}
     if (!dryRun) {
       if (check.status === 'settled' && check.outcome) {
