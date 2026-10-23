@@ -1,0 +1,103 @@
+/* CAM SPORTS · Tipografía de las capturas y geometría suave.
+   Una capa importante de formas supera los overrides antiguos sin alterar
+   dimensiones, imágenes, colores ni comportamiento de los componentes. */
+@font-face {
+  font-family:"Playfair Display";
+  font-style:normal;
+  font-weight:600;
+  font-display:swap;
+  src:url("fonts/playfair-display-latin-600-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family:"Libre Baskerville";
+  font-style:normal;
+  font-weight:400;
+  font-display:swap;
+  src:url("fonts/libre-baskerville-latin-400-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family:"Libre Baskerville";
+  font-style:normal;
+  font-weight:700;
+  font-display:swap;
+  src:url("fonts/libre-baskerville-latin-700-normal.woff2") format("woff2");
+}
+@layer cam-rounded-editorial {
+  /* Base de esquinas: también cubre componentes creados por JavaScript. */
+  html body :not(:is(img, svg, svg *, video, canvas)) {
+    border-radius:var(--ds-radius)!important;
+  }
+
+  /* La página, cabecera y pie llegan hasta el borde de la pantalla. */
+  html body > :is(header, main, footer),
+  html body > header > div,
+  html body > footer > div {
+    border-radius:0!important;
+  }
+
+  /* Panel azul de la segunda referencia: radio amplio y proporcionado. */
+  html body :is(#heroSection,#picksFeatured,#aeOpinionsHighlights,
+    .ae-sport-hero,.ae-section-banner,.cam-op-banner-active,
+    .ae-community-banner,.ae-takes-community-banner) {
+    border-radius:var(--ds-radius-banner)!important;
+  }
+  html body :is(#communityPicks,#freeTakes,#aeSportTakeLeaders,
+    #aeTrendingPortada,.editorial-community,.editorial-pick,
+    .editorial-trending,.ae-opinions-section-head,
+    #articleModal,#userAuthModal,#publishModal,
+    #cpArchiveDialog,#aeNewsArchiveDialog,#aeProfileDialog,
+    #camOpBannerDialog,dialog,[role="dialog"]) {
+    border-radius:var(--ds-radius-panel)!important;
+  }
+  html body :is(article,.cp-card,.cam-pick-unified,.ae-top-takes-card,
+    .ae-news-card,.ae-weekly-card,.ae-ranking-card,.ae-sport-chef-card,
+    .ae-trending-item,#picksFeaturedCard,.ae-home-story,
+    .cam-logo-size-panel,.cam-op-banner-preview) {
+    border-radius:var(--ds-radius-card)!important;
+  }
+  html body :is(button,[role="button"],input[type="button"],
+    input[type="submit"],input[type="reset"],.category-btn,
+    .ae-news-all-button,.ae-history-more,.ae-pick-share-button,
+    .cam-take-cta-option7) {
+    border-radius:var(--ds-radius-pill)!important;
+  }
+  html body :is(input:not([type="button"]):not([type="submit"]):not([type="reset"]),
+    textarea,select) {
+    border-radius:var(--ds-radius)!important;
+  }
+
+  /* Los avatares e iconos redondos conservan su forma original. */
+  html body :is(.avatar,.ae-avatar,.cp-avatar,.ae-nav-icon,
+    .ae-notification-dot,.ae-profile-avatar,.cam-profile-avatar),
+  html body > nav.cam-mobile-bottom-nav > button.category-btn .ae-nav-icon {
+    border-radius:50%!important;
+  }
+  /* La barra móvil tiene esquinas superiores suaves y fondo hasta el borde inferior. */
+  html body > nav.cam-mobile-bottom-nav {
+    border-radius:var(--ds-radius-card) var(--ds-radius-card) 0 0!important;
+  }
+
+  /* Jerarquía de titulares; la lectura y los controles siguen en Inter. */
+  html body :is(h1,h2,.ae-section-heading > :is(h2,h3),
+    .ae-takes-head > :is(h2,h3),.ae-weekly-title,
+    .ae-sport-chef-heading,.cam-analytics-heading h2) {
+    font-family:var(--ds-font-serif)!important;
+    font-weight:600!important;
+    line-height:1.2!important;
+    overflow-wrap:break-word;
+  }
+  html body :is(h3,h4,h5,h6,.cp-card-title,.ae-trending-title,
+    .ae-opinions-section-head > h3,.ae-news-card-title,
+    .ae-take-title,.ae-story-title) {
+    font-family:var(--ds-font-serif-secondary)!important;
+    line-height:1.28!important;
+    overflow-wrap:break-word;
+  }
+  /* Encabezados h3 que actúan como títulos de sección. */
+  html body :is(.ae-section-heading > h3,.ae-takes-head > h3,
+    .ae-opinions-section-head > h3) {
+    font-family:var(--ds-font-serif)!important;
+    font-weight:600!important;
+    line-height:1.2!important;
+  }
+}

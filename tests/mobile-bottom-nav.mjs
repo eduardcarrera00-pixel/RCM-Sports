@@ -20,7 +20,7 @@ assert.match(css, /display: flex !important/);
 assert.match(css, /bottom: 0 !important/);
 assert.match(css, /width: 100% !important/);
 assert.match(css, /border-radius: 50% !important/);
-assert.match(css, /@layer ae-editorial-square-corners/);
+assert.match(readFileSync(new URL('../assets/cam-rounded-editorial.css', import.meta.url), 'utf8'), /@layer cam-rounded-editorial[\s\S]*\.ae-nav-icon[\s\S]*border-radius:50%!important/);
 assert.match(css, /content: none !important/);
 assert.match(css, /color: #d9ab70 !important/);
 assert.match(css, /color: #886237 !important/);

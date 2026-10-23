@@ -33,7 +33,6 @@
   "assets/ae-news-archive-cta.css",
   "assets/ae-picks-news-visual-finish.css",
   "assets/ae-picks-takes-history.css",
-  "assets/ae-all-square-corners.css",
   "assets/ae-header-gold-and-picks-centering.css",
   "assets/ae-nav-menu-takes-finishing.css",
   "assets/ae-footer-gold-brand.css",
@@ -91,5 +90,6 @@
   "assets/ae-chef-parchment-mobile.css",
   "assets/cam-picks-ticket.css",
   "assets/cam-picks-unified.css",
-  "assets/ae-ranking-notes.css"
+  "assets/ae-ranking-notes.css",
+  "assets/cam-rounded-editorial.css"
 ]

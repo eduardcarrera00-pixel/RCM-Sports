@@ -72,7 +72,8 @@
   --ds-target-min:44px;
 
   /* ---- Tipografía ---------------------------------------------------- */
-  --ds-font-serif:Newsreader, Georgia, "Times New Roman", serif;
+  --ds-font-serif:"Playfair Display", Georgia, "Times New Roman", serif;
+  --ds-font-serif-secondary:"Libre Baskerville", Georgia, "Times New Roman", serif;
   --ds-font-sans:Inter, system-ui, sans-serif;
   /* Escala única. Los títulos son fluidos: escalan solos de 320 a 1366 px. */
   --ds-text-2xs:11px;                                    /* mínimo absoluto */
@@ -105,7 +106,11 @@
   --ds-section-gap:clamp(24px, 20px + 1vw, 32px); /* ritmo vertical entre secciones */
 
   /* ---- Forma y profundidad ------------------------------------------- */
-  --ds-radius:0;              /* geometría recta en toda la web */
+  --ds-radius:14px;           /* controles pequeños */
+  --ds-radius-card:20px;      /* tarjetas y módulos compactos */
+  --ds-radius-panel:28px;     /* paneles, diálogos y secciones */
+  --ds-radius-banner:clamp(28px,3vw,42px); /* banners amplios */
+  --ds-radius-pill:999px;     /* botones de texto y etiquetas */
   --ds-radius-round:999px;    /* solo avatares y puntos */
   --ds-border:1px;
   --ds-shadow-soft:0 12px 32px rgba(20,35,48,.07);

@@ -320,13 +320,6 @@ html:not(#ds):not(#ds):not(#ds) body :is(#aeHomeTakePublish,#aeSportTakePublish)
   justify-content:center!important;
   box-shadow:var(--ds-shadow-soft)!important;
 }
-/* «Publicar mi Take» era la única pieza redondeada (excepción declarada dentro de
-   la capa ae-editorial-square-corners); se vuelve recta como el resto, en esa misma capa. */
-@layer ae-editorial-square-corners {
-  html:not(#ds):not(#ds):not(#ds) body #aeHomeTakePublish{
-    border-radius:0!important;
-  }
-}
 html:not(#ds):not(#ds):not(#ds) body #aeSportTakePublish{
   width:auto!important;
   min-width:96px!important;
