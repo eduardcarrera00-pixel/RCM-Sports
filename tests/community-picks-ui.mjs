@@ -141,11 +141,11 @@ d.querySelector('#cpFeed .cp-upvote').click();await settle();
 assert.equal(votes.get(records[0].id+'|voter'),1);
 // The "Mejores platos" Pick remains readable by guests; writing a reply
 // requires login and then resumes at the same Pick with the reply field focused.
-const bestPick=d.querySelector('#picksPopular .ae-chef-entry-link');
+const bestPick=d.querySelector('#picksPopular .cp-card-read-link');
 assert.ok(bestPick,'A positively voted Pick must appear in Mejores platos');
-assert.equal(bestPick.parentElement.classList.contains('ae-chef-entry'),true);
-assert.equal(bestPick.style.position,'absolute','Whole Mejores platos square must be clickable');
-assert.ok(bestPick.getAttribute('aria-label').includes('Abrir Pick'));
+assert.equal(bestPick.parentElement.classList.contains('cam-pick-unified'),true);
+assert.ok(bestPick.href.includes('pick='),'Mejores Platos has a working Pick permalink');
+assert.ok(bestPick.getAttribute('aria-label').includes('Leer Pick completo'));
 user=null;w.authOpened=false;bestPick.click();await settle();
 assert.equal(w.authOpened,false,'Reading Mejores platos is public');
 assert.ok(d.querySelector('#cpDialog .cp-login-to-reply'),'Guest has an authenticated reply action');
