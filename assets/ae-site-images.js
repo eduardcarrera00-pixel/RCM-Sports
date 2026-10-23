@@ -109,10 +109,16 @@
   pair('futbol.debate-calma', 'Cabecera de debate (tono tranquilo)', 'Fútbol', 'assets/atmospheres/ae-football-debate-calm-dark.svg', 'assets/atmospheres/ae-football-debate-calm-day.svg');
   pair('futbol.debate-fuego', 'Cabecera de debate (tono encendido)', 'Fútbol', 'assets/atmospheres/ae-football-debate-fire-dark.svg', 'assets/atmospheres/ae-football-debate-fire-day.svg');
   f('futbol.ranking-claro', 'Fondo claro del ranking de Fútbol', 'Fútbol', 'assets/atmospheres/ae-football-ranking-light.svg');
-  pair('futbol.estadio-champions', 'Estadio Champions (noticias y rankings)', 'Fútbol', 'assets/rankings/ae-champions-stadium-night.webp', 'assets/rankings/ae-champions-stadium-day.webp');
+  pair('futbol.estadio-champions', 'Estadio Champions · Rankings', 'Fútbol', 'assets/rankings/ae-champions-stadium-night.webp', 'assets/rankings/ae-champions-stadium-day.webp');
+  // Noticias comparte la imagen *original* con Rankings, pero guarda sus propias
+  // sustituciones por deporte y por tema. No se registra el mismo path dos veces.
+  f('futbol.noticias-noche', 'Banner de Noticias · Fútbol', 'Fútbol', [], { group: 'futbol.noticias', variant: NIGHT, originalPath: 'assets/rankings/ae-champions-stadium-night.webp' });
+  f('futbol.noticias-dia', 'Banner de Noticias · Fútbol', 'Fútbol', [], { group: 'futbol.noticias', variant: DAY, originalPath: 'assets/rankings/ae-champions-stadium-day.webp' });
   f('futbol.ambiente-champions', 'Ambiente Champions (tarjetas y cabeceras)', 'Fútbol y Portada', 'assets/rankings/champions-atmosphere.webp');
   // NFL
-  pair('nfl.estadio', 'Estadio NFL (noticias y rankings)', 'NFL', 'assets/rankings/ae-nfl-stadium-night.webp', 'assets/rankings/ae-nfl-stadium-day.webp');
+  pair('nfl.estadio', 'Estadio NFL · Rankings', 'NFL', 'assets/rankings/ae-nfl-stadium-night.webp', 'assets/rankings/ae-nfl-stadium-day.webp');
+  f('nfl.noticias-noche', 'Banner de Noticias · NFL', 'NFL', [], { group: 'nfl.noticias', variant: NIGHT, originalPath: 'assets/rankings/ae-nfl-stadium-night.webp' });
+  f('nfl.noticias-dia', 'Banner de Noticias · NFL', 'NFL', [], { group: 'nfl.noticias', variant: DAY, originalPath: 'assets/rankings/ae-nfl-stadium-day.webp' });
   f('nfl.ambiente', 'Ambiente NFL (tarjetas y cabeceras)', 'NFL y Portada', 'assets/rankings/nfl-atmosphere.webp');
   f('nfl.ranking-claro', 'Fondo claro del ranking NFL', 'NFL', 'assets/atmospheres/ae-nfl-ranking-light.svg');
   f('nfl.savant', 'Fondo de «Savant»', 'NFL', 'assets/rankings/ae-nfl-savant-20261019.webp');
@@ -170,6 +176,24 @@
   slotPair('picks.chefs-peores', 'Cabecera de peores chefs', 'Picks', 'picks.chefs-peores-atlas', '.ae-chefs-art-heading', stacked.night, stacked.day);
 
   const ENTRIES = new Map([...FILES, ...SLOTS].map(e => [e.key, e]));
+  // Los fondos originales de estadio aparecen en varios módulos. Solo las
+  // reglas del encabezado de Noticias usan su propia clave; Rankings y los
+  // demás módulos conservan la clave anterior (y sus imágenes guardadas).
+  const NEWS_BANNER_KEYS = Object.freeze({
+    'nfl.estadio-noche': 'nfl.noticias-noche',
+    'nfl.estadio-dia': 'nfl.noticias-dia',
+    'futbol.estadio-champions-noche': 'futbol.noticias-noche',
+    'futbol.estadio-champions-dia': 'futbol.noticias-dia'
+  });
+  const NEWS_BANNER_SELECTOR = /#aeNews(?:SectionTitle|HeadingRow)\\b/;
+  function keyForPlacement(key, selector, el) {
+    const newsKey = NEWS_BANNER_KEYS[key];
+    if (!newsKey) return key;
+    const newsHeader = selector
+      ? NEWS_BANNER_SELECTOR.test(selector)
+      : el?.id === 'aeNewsHeadingRow' || Boolean(el?.querySelector?.(':scope > #aeNewsSectionTitle'));
+    return newsHeader ? newsKey : key;
+  }
   const byBasename = new Map();
   for (const e of FILES) for (const p of e.paths) {
     const b = p.split('/').pop().toLowerCase();
@@ -304,7 +328,7 @@
     for (const d of decls) {
       let focusLayer = -1, focus = '';
       const layers = splitLayers(d.original).map((layer, idx) => layer.replace(URL_RE, (m, q, u) => {
-        const key = fileKeyFor(u, d.base); const r = key && rows.get(key);
+        const key = keyForPlacement(fileKeyFor(u, d.base), d.selector); const r = key && rows.get(key);
         const entry = key && ENTRIES.get(key);
         if (r && focusOf(r) && entry.kind !== 'atlas') { focusLayer = idx; focus = focusOf(r); }
         return r && r.url ? cssUrl(r.url) : m;
@@ -503,7 +527,7 @@
       const bg = cs.backgroundImage;
       if (!bg || bg === 'none' || !bg.includes('url(')) continue;
       for (const u of urlsIn(bg)) {
-        let key = overrideKeyFor(u, el) || fileKeyFor(u);
+        let key = keyForPlacement(overrideKeyFor(u, el) || fileKeyFor(u), '', el);
         if (!key) continue;
         if (ENTRIES.get(key).kind === 'atlas') key = slotFor(el, key) || key;
         if (!found.includes(key)) found.push(key);
@@ -761,7 +785,7 @@
   function originalSrc(entry) {
     const e = entry.kind === 'slot' ? ENTRIES.get(entry.atlas) : entry;
     if (e.embedded) return dataByKey.get(e.key) || '';
-    return toURL(e.paths[0]).href;
+    return toURL(e.originalPath || e.paths[0])?.href || '';
   }
   function measure(src) {
     return new Promise(res => { const i = new Image(); i.onload = () => res([i.naturalWidth, i.naturalHeight]); i.onerror = () => res([0, 0]); i.src = src; });
