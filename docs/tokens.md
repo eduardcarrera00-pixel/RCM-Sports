@@ -80,8 +80,9 @@ Antes la cabecera era #023787 (saturación 97 %) en los dos temas.
 
 ## Tipografía
 
-Familias: `--ds-font-serif` (Newsreader → Georgia) para titulares;
-`--ds-font-sans` (Inter → system-ui) para lectura y controles.
+Familias: `--ds-font-serif` (Playfair Display Semibold → Georgia) para títulos
+principales; `--ds-font-serif-secondary` (Libre Baskerville → Georgia) para
+encabezados secundarios; `--ds-font-sans` (Inter → system-ui) para lectura y controles.
 
 | Token | Tamaño | Uso |
 |---|---|---|
@@ -110,7 +111,11 @@ Margen lateral en móvil `--ds-gutter` 16 px. Hueco entre secciones
 
 | Token | Valor | Uso |
 |---|---|---|
-| `--ds-radius` | 0 | Todo es recto |
+| `--ds-radius` | 14 px | Controles pequeños y campos |
+| `--ds-radius-card` | 20 px | Tarjetas |
+| `--ds-radius-panel` | 28 px | Paneles y diálogos |
+| `--ds-radius-banner` | 28–42 px | Banners amplios |
+| `--ds-radius-pill` | 999 px | Botones |
 | `--ds-radius-round` | 999 px | Solo avatares y puntos |
 | `--ds-border` | 1 px | Grosor de contornos |
 | `--ds-shadow-soft` | día 0 12px 32px rgba(20,35,48,.07) · noche 0 14px 36px rgba(2,13,23,.19) | Tarjetas |

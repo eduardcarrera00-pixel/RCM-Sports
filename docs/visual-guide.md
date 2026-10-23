@@ -85,6 +85,13 @@ Añadir estilos al manifiesto y regenerar con `node scripts/build-editorial-css.
 No editar el bundle directamente. Mantener cambios visuales acotados; la guía no
 autoriza eliminar funciones ni rediseñar una sección ya aprobada.
 
+## Revisión de tipografía y esquinas (23 oct 2026)
+La referencia posterior aprobada usa Playfair Display Semibold en títulos
+principales, Libre Baskerville en encabezados secundarios y radios graduados
+de 14 a 42 px. `assets/cam-rounded-editorial.css` aplica estas formas a la
+interfaz. Esta decisión sustituye las referencias anteriores a Newsreader
+y a la geometría recta; los fondos de portada y pie se mantienen.
+
 ## Tokens y capa de armonía (20 oct 2026)
 Los valores de color, tipografía, espaciado, forma y estados están en
 `assets/ae-tokens.css` y se documentan en `docs/tokens.md`. La cabecera y el pie
