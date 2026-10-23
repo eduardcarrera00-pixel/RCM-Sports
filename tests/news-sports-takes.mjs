@@ -12,6 +12,7 @@ var db={auth:{getUser:async()=>({data:{user:{id:'reader'}}}),onAuthStateChange:(
  (failTakeReplyCounts?{data:null,error:{message:'Unavailable'}}:{data:args.p_take_ids.map(id=>({take_id:id,reply_count:takeReplyCounts.get(id)||0})),error:null}):{data:takeRows,error:null}};
 var categoryKey=x=>x,escapeHTML=x=>String(x).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;'),safeImageURL=x=>x,imagePosition=()=> 'center',imageScale=()=>1,articleIdArgument=x=>JSON.stringify(x);
 function renderHeroCard(){document.getElementById('heroSection').hidden=true;}
+function syncOpinionHighlights(){};
 function filterByCategory(sport){currentCategory=sport;renderArticlesFeed();}
 var openedArticle=null;function openArticleModal(id){openedArticle=id;}
 var openedTake=null;window.aeTakeReplies={open:take=>{openedTake=take;}};
