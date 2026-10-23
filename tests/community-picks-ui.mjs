@@ -135,6 +135,10 @@ await reply.onsubmit({preventDefault(){}});await settle();
 assert.equal(comments.length,1);
 assert.match(d.querySelector('#cpDialog').textContent,/Comentario antes de la aprobación/);
 d.querySelector('#cpDialog button').click();await settle();
+// Community plates use current net votes: restore a positive vote before
+// asserting the Pick belongs in Mejores Platos (it was downvoted above).
+d.querySelector('#cpFeed .cp-upvote').click();await settle();
+assert.equal(votes.get(records[0].id+'|voter'),1);
 // The "Mejores platos" Pick remains readable by guests; writing a reply
 // requires login and then resumes at the same Pick with the reply field focused.
 const bestPick=d.querySelector('#picksPopular .ae-chef-entry-link');
