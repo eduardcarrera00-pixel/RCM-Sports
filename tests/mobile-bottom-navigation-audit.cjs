@@ -86,7 +86,7 @@ async function visit(browser,name,width,height,dark,mobile){
       assert.equal(status.count,1,label+': la nueva barra no existe o está duplicada');
       assert.equal(status.headerCount,0,label+': botones duplicados en encabezado');
       assert.equal(status.pos,'fixed',label+': posición no es fija');
-      assert.ok(status.bottom>=8 && status.bottom<=32,label+': barra flotante fuera del área segura');
+      assert.ok(Math.abs(status.bottom)<=2,label+': la barra debe llegar al borde inferior');
       assert.deepEqual(status.buttons.map(b=>b.name),ITEMS,label+': orden o etiquetas incorrectos');
       assert.ok(Math.max(...status.buttons.map(b=>b.y))-Math.min(...status.buttons.map(b=>b.y))<=3,
         label+': accesos desalineados');
@@ -109,11 +109,11 @@ async function visit(browser,name,width,height,dark,mobile){
           dialogs:[...document.querySelectorAll('dialog[open]')].map(d=>d.id),
           nav:cs(n),button:cs(b),label:cs(label)};
       });
-      assert.notEqual(dockDebug.label.display,'none',label+': en Home los cuatro nombres deben permanecer visibles: '+JSON.stringify(dockDebug));
+      assert.notEqual(dockDebug.label.display,'none',label+': todas las etiquetas deben ser visibles: '+JSON.stringify(dockDebug));
       for(const sport of ITEMS){
         // A real touch event detects obstructed or non-interactive menu controls.
         await page.locator('[data-cam-audit-nav] [data-category="'+sport+'"]').tap({timeout:4000});
-        await page.waitForTimeout(125);
+        await page.waitForTimeout(240); // Account for intentional 160ms icon/color transitions.
         const state=await page.evaluate(()=>{
           const n=window.__camAuditNav().options[0];
           const current=n.node.querySelector('[data-category="'+n.items.find(b=>b.classList.contains('active'))?.dataset.category+'"]');
@@ -125,6 +125,9 @@ async function visit(browser,name,width,height,dark,mobile){
           return {live:window.__camAuditMarker?.stable===true,
             capsule:n.node.classList.contains('cam-nav-has-active'),
             pillWidth:parseFloat(n.node.style.getPropertyValue('--cam-pill-width')),
+            iconColor:getComputedStyle(current.querySelector('svg.cam-mobile-nav-symbol')).color,
+            ringRadius:getComputedStyle(current.querySelector('.ae-nav-icon')).borderRadius,
+            ringFill:getComputedStyle(current.querySelector('.ae-nav-icon')).backgroundColor,
             labels, selectedFits:!current||current.querySelector('span:last-child').scrollWidth<=current.querySelector('span:last-child').clientWidth+1,
             active:n.items.filter(b=>b.classList.contains('active')||
               b.getAttribute('aria-current')==='page'||b.getAttribute('aria-selected')==='true'||
@@ -132,10 +135,15 @@ async function visit(browser,name,width,height,dark,mobile){
         });
         assert.ok(state.live,label+': recarga innecesaria en '+sport);
         assert.deepEqual(state.active,[sport],label+': selección activa errónea en '+sport);
-        assert.ok(state.capsule && state.pillWidth>=60 && state.selectedFits,label+': cápsula incorrecta '+sport+' '+JSON.stringify(state));
+        assert.ok(state.capsule && state.selectedFits,label+': selección incorrecta '+sport+' '+JSON.stringify(state));
+        assert.equal(state.ringRadius,'50%',label+': falta contorno circular '+sport);
+        assert.equal(state.iconColor,dark?'rgb(217, 171, 112)':'rgb(136, 98, 55)',
+          label+': icono seleccionado debe ser dorado y no blanco '+sport);
+        assert.notEqual(state.ringFill,dark?'rgb(16, 37, 53)':'rgb(248, 242, 232)',
+          label+': el círculo activo debe tener un relleno dorado sutil');
         for(const tab of state.labels){
           assert.equal(tab.ariaLabel,tab.category,label+': botón sin nombre accesible');
-          assert.notEqual(tab.display,'none',label+': los cuatro nombres deben permanecer visibles');
+          assert.notEqual(tab.display,'none',label+': etiquetas siempre visibles');
         }
       }
       await page.locator('header .cam-brand').click();
@@ -152,7 +160,7 @@ async function visit(browser,name,width,height,dark,mobile){
         const r=last?.getBoundingClientRect();
         return {navBottom:nav.bottom,footerVisible:!r||r.bottom<=nav.top+1};
       });
-      assert.ok(bottom.navBottom<=height-8 && bottom.navBottom>=height-32,label+': barra se mueve al hacer scroll');
+      assert.ok(Math.abs(bottom.navBottom-height)<=2,label+': barra se mueve al hacer scroll');
       assert.ok(bottom.footerVisible,label+': el contenido final queda debajo de la barra');
       const layers=await page.evaluate(()=>{
         const nav=window.__camAuditNav().options[0].node.getBoundingClientRect();
