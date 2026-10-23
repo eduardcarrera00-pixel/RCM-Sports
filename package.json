@@ -6,7 +6,7 @@
     "build:css": "tailwindcss -i assets/styles-input.css -o assets/site.css --minify && node scripts/build-editorial-css.mjs",
     "test:database": "node tests/database.mjs",
     "test:browser": "node tests/browser.cjs",
-    "test": "npm run test:database && npm run test:picks && npm run test:auth && npm run test:drafts && npm run test:editor && npm run test:browser && npm run test:mobile-nav && npm run test:opinions-banners",
+    "test": "npm run test:database && npm run test:picks && npm run test:auth && npm run test:drafts && npm run test:editor && npm run test:browser && npm run test:mobile-nav && npm run test:opinions-banners && npm run test:site-banners",
     "test:database:observed": "node -e \"process.env.RCM_OBSERVED_SCHEMA='1';import('./tests/database.mjs')\"",
     "test:picks": "node tests/community-picks.mjs && node tests/community-picks-ui.mjs && node tests/pick-author-names.mjs && node tests/pick-history-ui.mjs && node tests/season-predictions-ui.mjs && node tests/picks-feed-scroll-ui.mjs",
     "test:sharing": "node tests/pick-sharing.mjs && node tests/profile-sharing.mjs",
@@ -23,7 +23,8 @@
     "test:takes:football:browser": "node tests/football-latest-takes-browser.cjs",
     "test:pick-editor:themes": "node tests/pick-editor-night-browser.cjs",
     "test:mobile-nav": "node tests/mobile-bottom-nav.mjs",
-    "test:opinions-banners": "node tests/opinions-section-banners.mjs"
+    "test:opinions-banners": "node tests/opinions-section-banners.mjs",
+    "test:site-banners": "node tests/site-sport-banner-images.mjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.9",
