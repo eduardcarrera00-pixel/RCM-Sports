@@ -1,0 +1,16 @@
+/* CAM SPORTS · NFL: la imagen editorial ocupa sólo la cabecera.
+   El cuerpo conserva un fondo liso para que se lean los Takes y sus votos.
+   Cargado tras el bundle para superar la regla histórica aplicada a la tarjeta. */
+html body.ae-is-nfl #mainContent #freeTakes #aeSportTakeLeaders.ae-sport-chefs[data-sport="nfl"] .ae-sport-takes-grid > .ae-sport-chef-card:is(.is-supported,.is-questioned) {
+  background:#f7f0e6!important;
+  background-image:none!important;
+}
+html body.ae-is-nfl #mainContent #freeTakes #aeSportTakeLeaders.ae-sport-chefs[data-sport="nfl"] .ae-sport-takes-grid > .ae-sport-chef-card:is(.is-supported,.is-questioned) > .ae-sport-chef-heading {
+  background:#e9d5bb url("cam-nfl-opinions-stone.webp") center center / cover no-repeat!important;
+  border-radius:var(--ds-radius-card) var(--ds-radius-card) 0 0!important;
+}
+/* El listado permanece transparente: nunca repite el arte del banner. */
+html body.ae-is-nfl #mainContent #freeTakes #aeSportTakeLeaders.ae-sport-chefs[data-sport="nfl"] .ae-sport-takes-grid > .ae-sport-chef-card:is(.is-supported,.is-questioned) > .ae-sport-takes-list {
+  background:transparent!important;
+  background-image:none!important;
+}
