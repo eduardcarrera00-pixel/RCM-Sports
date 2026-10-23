@@ -186,6 +186,54 @@ await window.camSiteImages.reload();
 assert.match(chef.style.backgroundImage, /eres-chef-dia.jpg/,
   'restoring night must leave the saved day banner intact');
 
+// Las tarjetas de Savant/Rookie, Respira/Vende Humos y Opiniones Fútbol
+// pintan un fondo en el encabezado desde variables CSS de la tarjeta.
+const cards = document.createElement('div');
+cards.innerHTML = '<section id="aeNflTwinRankings">' +
+  '<article class="is-savant"><header class="ae-nfl-ranking-header"></header></article>' +
+  '<article class="is-rookie"><header class="ae-nfl-ranking-header"></header></article>' +
+  '</section>';
+document.body.append(cards);
+const savantCard = cards.querySelector('.is-savant');
+const rookieCard = cards.querySelector('.is-rookie');
+document.body.classList.remove('ae-is-football');
+document.body.classList.add('ae-is-nfl');
+databaseRows = [
+  {key:'nfl.savant',url:'https://img.test/nfl-savant-new.jpg',focus_x:50,focus_y:32,alt:null},
+  {key:'nfl.rookie',url:'https://img.test/nfl-rookie-new.jpg',focus_x:50,focus_y:26,alt:null}
+];
+await window.camSiteImages.reload();
+assert.match(savantCard.style.getPropertyValue('--ae-community-portrait'), /nfl-savant-new.jpg/);
+assert.match(rookieCard.style.getPropertyValue('--ae-community-portrait'), /nfl-rookie-new.jpg/);
+assert.equal(savantCard.querySelector('header').style.backgroundPosition, '50% 50%, 50% 32%');
+document.body.classList.remove('ae-is-nfl');
+document.body.classList.add('ae-is-football');
+wrap.dataset.sport = 'football';
+supported.innerHTML = '<header class="ae-sport-chef-heading"></header>';
+questioned.innerHTML = '<header class="ae-sport-chef-heading"></header>';
+databaseRows = [
+  {key:'futbol.respira',url:'https://img.test/respira-new.jpg',focus_x:50,focus_y:29,alt:null},
+  {key:'futbol.vende-humos',url:'https://img.test/humos-new.jpg',focus_x:67,focus_y:39,alt:null},
+  {key:'futbol.populares',url:'https://img.test/football-popular-new.jpg',focus_x:50,focus_y:72,alt:null},
+  {key:'futbol.impopulares',url:'https://img.test/football-unpopular-new.jpg',focus_x:50,focus_y:72,alt:null}
+];
+await window.camSiteImages.reload();
+assert.match(savantCard.style.getPropertyValue('--ae-community-portrait'), /respira-new.jpg/,
+  'football must replace the NFL image on the same mobile card');
+assert.match(rookieCard.style.getPropertyValue('--ae-community-portrait'), /humos-new.jpg/);
+assert.match(supported.style.getPropertyValue('--ae-opinion-art'), /football-popular-new.jpg/);
+assert.match(questioned.style.getPropertyValue('--ae-opinion-art'), /football-unpopular-new.jpg/);
+assert.equal(questioned.querySelector('header').style.backgroundPosition, '50% 50%, 50% 72%');
+databaseRows = databaseRows.filter(r=>r.key !== 'futbol.impopulares');
+await window.camSiteImages.reload();
+assert.equal(questioned.style.getPropertyValue('--ae-opinion-art'), '',
+  'restoring an opinion must return it to the original stylesheet');
+assert.match(supported.style.getPropertyValue('--ae-opinion-art'), /football-popular-new.jpg/);
+document.body.classList.remove('ae-is-football');
+await window.camSiteImages.reload();
+assert.equal(savantCard.style.getPropertyValue('--ae-community-portrait'), '',
+  'navigating away should remove the old sports background');
+
 // Mejores y Peores Platos: las dos cabeceras conservan sus claves propias,
 // incluso cuando una de ellas solo tiene gradiente CSS y no URL original.
 const plateRail = document.createElement('aside');
@@ -235,54 +283,6 @@ databaseRows = [];
 await window.camSiteImages.reload();
 assert.equal(bestPlate.style.backgroundImage, '', 'best restores original atlas CSS');
 assert.equal(worstPlate.style.backgroundImage, '', 'worst restores original gradient CSS');
-
-// Las tarjetas de Savant/Rookie, Respira/Vende Humos y Opiniones Fútbol
-// pintan un fondo en el encabezado desde variables CSS de la tarjeta.
-const cards = document.createElement('div');
-cards.innerHTML = '<section id="aeNflTwinRankings">' +
-  '<article class="is-savant"><header class="ae-nfl-ranking-header"></header></article>' +
-  '<article class="is-rookie"><header class="ae-nfl-ranking-header"></header></article>' +
-  '</section>';
-document.body.append(cards);
-const savantCard = cards.querySelector('.is-savant');
-const rookieCard = cards.querySelector('.is-rookie');
-document.body.classList.remove('ae-is-football');
-document.body.classList.add('ae-is-nfl');
-databaseRows = [
-  {key:'nfl.savant',url:'https://img.test/nfl-savant-new.jpg',focus_x:50,focus_y:32,alt:null},
-  {key:'nfl.rookie',url:'https://img.test/nfl-rookie-new.jpg',focus_x:50,focus_y:26,alt:null}
-];
-await window.camSiteImages.reload();
-assert.match(savantCard.style.getPropertyValue('--ae-community-portrait'), /nfl-savant-new.jpg/);
-assert.match(rookieCard.style.getPropertyValue('--ae-community-portrait'), /nfl-rookie-new.jpg/);
-assert.equal(savantCard.querySelector('header').style.backgroundPosition, '50% 50%, 50% 32%');
-document.body.classList.remove('ae-is-nfl');
-document.body.classList.add('ae-is-football');
-wrap.dataset.sport = 'football';
-supported.innerHTML = '<header class="ae-sport-chef-heading"></header>';
-questioned.innerHTML = '<header class="ae-sport-chef-heading"></header>';
-databaseRows = [
-  {key:'futbol.respira',url:'https://img.test/respira-new.jpg',focus_x:50,focus_y:29,alt:null},
-  {key:'futbol.vende-humos',url:'https://img.test/humos-new.jpg',focus_x:67,focus_y:39,alt:null},
-  {key:'futbol.populares',url:'https://img.test/football-popular-new.jpg',focus_x:50,focus_y:72,alt:null},
-  {key:'futbol.impopulares',url:'https://img.test/football-unpopular-new.jpg',focus_x:50,focus_y:72,alt:null}
-];
-await window.camSiteImages.reload();
-assert.match(savantCard.style.getPropertyValue('--ae-community-portrait'), /respira-new.jpg/,
-  'football must replace the NFL image on the same mobile card');
-assert.match(rookieCard.style.getPropertyValue('--ae-community-portrait'), /humos-new.jpg/);
-assert.match(supported.style.getPropertyValue('--ae-opinion-art'), /football-popular-new.jpg/);
-assert.match(questioned.style.getPropertyValue('--ae-opinion-art'), /football-unpopular-new.jpg/);
-assert.equal(questioned.querySelector('header').style.backgroundPosition, '50% 50%, 50% 72%');
-databaseRows = databaseRows.filter(r=>r.key !== 'futbol.impopulares');
-await window.camSiteImages.reload();
-assert.equal(questioned.style.getPropertyValue('--ae-opinion-art'), '',
-  'restoring an opinion must return it to the original stylesheet');
-assert.match(supported.style.getPropertyValue('--ae-opinion-art'), /football-popular-new.jpg/);
-document.body.classList.remove('ae-is-football');
-await window.camSiteImages.reload();
-assert.equal(savantCard.style.getPropertyValue('--ae-community-portrait'), '',
-  'navigating away should remove the old sports background');
 
 window.happyDOM.abort();
 console.log('CAM SPORTS: saved NFL and football banner overrides, separate news, NFL opinions and Eres Chef verified.');
