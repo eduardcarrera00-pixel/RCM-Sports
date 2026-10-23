@@ -1,0 +1,291 @@
+/* CAM SPORTS · «Demuestra tu conocimiento»: una sola tarjeta-acción para NFL y Fútbol.
+ *
+ * Antes cada deporte tenía su propia cabecera (NFL con un círculo dorado que en el
+ * teléfono se estiraba en óvalo; Fútbol sin botón, con el título haciendo de enlace).
+ * Aquí los dos comparten exactamente la misma maqueta, el mismo botón y las mismas
+ * medidas; lo único que cambia es la escena de fondo de cada deporte.
+ *
+ * Toda la tarjeta abre el compositor de Takes (assets/cam-take-cta.js). El botón
+ * sigue siendo #aeSportTakePublish, con su onclick y su diálogo de siempre.
+ *
+ * Esta hoja se carga la última y lleva :not(#ds) repetidos para ganar a las capas
+ * antiguas de cada deporte sin tener que tocarlas una por una.
+ */
+
+/* ---------------------------------------------------------------- la tarjeta */
+html:not(#ds):not(#ds):not(#ds):not(#ds):not(#ds) body:is(.ae-is-nfl,.ae-is-football) #freeTakes > .ae-takes-head {
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  grid-template-rows:auto auto auto!important;
+  align-items:center!important;
+  align-content:center!important;
+  column-gap:clamp(18px,2.8vw,44px)!important;
+  row-gap:7px!important;
+  position:relative!important;
+  box-sizing:border-box!important;
+  width:100%!important;
+  min-width:0!important;
+  height:auto!important;
+  min-height:clamp(134px,13vw,172px)!important;
+  max-height:none!important;
+  margin:0 0 18px!important;
+  padding:clamp(20px,2.3vw,32px) clamp(20px,2.6vw,38px)!important;
+  border:1px solid rgba(201,151,93,.6)!important;
+  border-left:1px solid rgba(201,151,93,.6)!important;
+  border-radius:var(--ds-radius-card,20px)!important;
+  overflow:hidden!important;
+  background-color:#061b2b!important;
+  background-size:cover!important;
+  background-position:center 42%!important;
+  background-repeat:no-repeat!important;
+  box-shadow:0 14px 34px rgba(3,16,27,.2)!important;
+  cursor:pointer!important;
+  transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease!important;
+}
+
+/* Escena de cada deporte, con el mismo velo para que el texto se lea igual. */
+html:not(#ds):not(#ds):not(#ds):not(#ds):not(#ds) body.ae-is-nfl #freeTakes > .ae-takes-head {
+  background-image:linear-gradient(100deg,rgba(4,19,31,.95) 0%,rgba(5,21,34,.86) 48%,rgba(6,24,38,.44) 100%),url("rankings/ae-nfl-stadium-night.webp")!important;
+}
+html:not(#ds):not(#ds):not(#ds):not(#ds):not(#ds) body.ae-is-football #freeTakes > .ae-takes-head {
+  background-image:linear-gradient(100deg,rgba(4,19,31,.95) 0%,rgba(5,21,34,.86) 48%,rgba(6,24,38,.44) 100%),url("takes/ae-football-takes-hero-night.webp")!important;
+}
+html:not(.dark):not(#ds):not(#ds):not(#ds):not(#ds):not(#ds) body.ae-is-nfl #freeTakes > .ae-takes-head {
+  background-color:#faf5e8!important;
+  background-image:linear-gradient(100deg,rgba(255,250,240,.96) 0%,rgba(255,249,238,.88) 48%,rgba(255,248,236,.36) 100%),url("rankings/ae-nfl-stadium-day.webp")!important;
+}
+html:not(.dark):not(#ds):not(#ds):not(#ds):not(#ds):not(#ds) body.ae-is-football #freeTakes > .ae-takes-head {
+  background-color:#faf5e8!important;
+  background-image:linear-gradient(100deg,rgba(255,250,240,.96) 0%,rgba(255,249,238,.88) 48%,rgba(255,248,236,.36) 100%),url("takes/ae-football-takes-hero-day.webp")!important;
+}
+html:not(.dark):not(#ds):not(#ds):not(#ds):not(#ds):not(#ds) body:is(.ae-is-nfl,.ae-is-football) #freeTakes > .ae-takes-head {
+  border-color:rgba(176,131,80,.55)!important;
+  box-shadow:0 10px 26px rgba(80,59,38,.12)!important;
+}
+
+html:not(#ds):not(#ds):not(#ds):not(#ds):not(#ds) body:is(.ae-is-nfl,.ae-is-football) #freeTakes > .ae-takes-head:hover {
+  transform:translateY(-2px)!important;
+  border-color:#e0b47c!important;
+  box-shadow:0 20px 42px rgba(3,16,27,.28)!important;
+}
+html:not(#ds):not(#ds):not(#ds):not(#ds):not(#ds) body:is(.ae-is-nfl,.ae-is-football) #freeTakes > .ae-takes-head:active {
+  transform:translateY(0)!important;
+}
+
+/* ------------------------------------------------------------------- textos */
+html:not(#ds):not(#ds):not(#ds):not(#ds):not(#ds) body:is(.ae-is-nfl,.ae-is-football) #freeTakes > .ae-takes-head > .ae-takes-eyebrow {
+  display:block!important;
+  grid-column:1!important;
+  grid-row:1!important;
+  align-self:end!important;
+  margin:0!important;
+  padding:0!important;
+  max-width:100%!important;
+  color:#e3b57a!important;
+  font:700 clamp(10px,.85vw,12px)/1.2 Inter,system-ui,sans-serif!important;
+  letter-spacing:.17em!important;
+  text-transform:uppercase!important;
+  text-shadow:none!important;
+}
+html:not(#ds):not(#ds):not(#ds):not(#ds):not(#ds) body:is(.ae-is-nfl,.ae-is-football) #freeTakes > .ae-takes-head > #freeTakesTitle {
+  position:static!important;
+  grid-column:1!important;
+  grid-row:2!important;
+  align-self:center!important;
+  clip-path:none!important;
+  width:auto!important;
+  height:auto!important;
+  min-width:0!important;
+  max-width:100%!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  overflow:visible!important;
+  white-space:normal!important;
+  color:#fff3e4!important;
+  font-family:var(--ds-font-serif,"Playfair Display",Georgia,serif)!important;
+  font-weight:600!important;
+  font-size:clamp(25px,3.1vw,44px)!important;
+  line-height:1.05!important;
+  letter-spacing:-.025em!important;
+  text-shadow:0 2px 14px rgba(2,14,24,.4)!important;
+  text-wrap:balance;
+}
+html:not(#ds):not(#ds):not(#ds):not(#ds):not(#ds) body:is(.ae-is-nfl,.ae-is-football) #freeTakes > .ae-takes-head > p {
+  grid-column:1!important;
+  grid-row:3!important;
+  align-self:start!important;
+  display:block!important;
+  width:auto!important;
+  min-width:0!important;
+  max-width:62ch!important;
+  margin:0!important;
+  padding:0!important;
+  color:#e7ddd1!important;
+  font:400 clamp(12px,1vw,14px)/1.5 Inter,system-ui,sans-serif!important;
+  text-align:left!important;
+  text-shadow:0 1px 3px rgba(3,16,27,.4)!important;
+}
+html:not(.dark):not(#ds):not(#ds):not(#ds):not(#ds):not(#ds) body:is(.ae-is-nfl,.ae-is-football) #freeTakes > .ae-takes-head > .ae-takes-eyebrow {
+  color:#8a5a2d!important;
+}
+html:not(.dark):not(#ds):not(#ds):not(#ds):not(#ds):not(#ds) body:is(.ae-is-nfl,.ae-is-football) #freeTakes > .ae-takes-head > #freeTakesTitle {
+  color:#14293b!important;
+  text-shadow:none!important;
+}
+html:not(.dark):not(#ds):not(#ds):not(#ds):not(#ds):not(#ds) body:is(.ae-is-nfl,.ae-is-football) #freeTakes > .ae-takes-head > p {
+  color:#3d5365!important;
+  text-shadow:none!important;
+}
+
+/* ------------------------------------------------------------------- botón */
+html:not(#ds):not(#ds):not(#ds):not(#ds):not(#ds) body:is(.ae-is-nfl,.ae-is-football) #freeTakes > .ae-takes-head > #aeSportTakePublish {
+  grid-column:2!important;
+  grid-row:1 / 4!important;
+  justify-self:end!important;
+  align-self:center!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:12px!important;
+  position:relative!important;
+  inset:auto!important;
+  box-sizing:border-box!important;
+  flex:0 0 auto!important;
+  width:auto!important;
+  min-width:0!important;
+  max-width:100%!important;
+  height:auto!important;
+  min-height:52px!important;
+  max-height:none!important;
+  margin:0!important;
+  padding:13px 22px!important;
+  border:1px solid rgba(255,238,210,.85)!important;
+  border-radius:var(--ds-radius-pill,999px)!important;
+  background:linear-gradient(118deg,#f4d6a5 0%,#e2b87f 48%,#c9975d 100%)!important;
+  color:#152a3b!important;
+  font:700 clamp(13px,1.05vw,16px)/1.2 var(--ds-font-serif,"Playfair Display",Georgia,serif)!important;
+  letter-spacing:.005em!important;
+  text-align:center!important;
+  text-transform:none!important;
+  text-shadow:none!important;
+  white-space:nowrap!important;
+  overflow:visible!important;
+  box-shadow:0 8px 20px rgba(4,18,30,.3)!important;
+  cursor:pointer!important;
+  filter:none!important;
+  transform:none!important;
+  transition:transform .18s ease,box-shadow .18s ease,filter .18s ease!important;
+}
+html:not(#ds):not(#ds):not(#ds):not(#ds):not(#ds) body:is(.ae-is-nfl,.ae-is-football) #freeTakes > .ae-takes-head > #aeSportTakePublish::before,
+html:not(#ds):not(#ds):not(#ds):not(#ds):not(#ds) body:is(.ae-is-nfl,.ae-is-football) #freeTakes > .ae-takes-head > #aeSportTakePublish::after {
+  content:none!important;
+}
+html:not(#ds):not(#ds):not(#ds):not(#ds):not(#ds) body:is(.ae-is-nfl,.ae-is-football) #freeTakes > .ae-takes-head > #aeSportTakePublish .cam-take-cta-text {
+  display:inline-block!important;
+  flex:0 1 auto!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:0!important;
+  color:inherit!important;
+  font:inherit!important;
+  white-space:nowrap!important;
+  text-shadow:none!important;
+}
+html:not(#ds):not(#ds):not(#ds):not(#ds):not(#ds) body:is(.ae-is-nfl,.ae-is-football) #freeTakes > .ae-takes-head > #aeSportTakePublish .cam-take-cta-arrow {
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  flex:0 0 27px!important;
+  box-sizing:border-box!important;
+  width:27px!important;
+  min-width:27px!important;
+  height:27px!important;
+  min-height:27px!important;
+  margin:0!important;
+  padding:0!important;
+  border:1px solid rgba(21,42,59,.55)!important;
+  border-left:1px solid rgba(21,42,59,.55)!important;
+  border-radius:50%!important;
+  background:rgba(255,248,234,.5)!important;
+  color:inherit!important;
+  font:400 17px/1 Georgia,serif!important;
+  text-shadow:none!important;
+  transition:transform .18s ease!important;
+}
+html:not(#ds):not(#ds):not(#ds):not(#ds):not(#ds) body:is(.ae-is-nfl,.ae-is-football) #freeTakes > .ae-takes-head:hover > #aeSportTakePublish,
+html:not(#ds):not(#ds):not(#ds):not(#ds):not(#ds) body:is(.ae-is-nfl,.ae-is-football) #freeTakes > .ae-takes-head > #aeSportTakePublish:hover {
+  filter:brightness(1.06)!important;
+  transform:translateY(-1px)!important;
+  box-shadow:0 12px 26px rgba(4,18,30,.36)!important;
+}
+html:not(#ds):not(#ds):not(#ds):not(#ds):not(#ds) body:is(.ae-is-nfl,.ae-is-football) #freeTakes > .ae-takes-head:hover > #aeSportTakePublish .cam-take-cta-arrow {
+  transform:translateX(2px)!important;
+}
+html:not(#ds):not(#ds):not(#ds):not(#ds):not(#ds) body:is(.ae-is-nfl,.ae-is-football) #freeTakes > .ae-takes-head > #aeSportTakePublish:focus-visible {
+  outline:3px solid #fff0ca!important;
+  outline-offset:4px!important;
+}
+html:not(.dark):not(#ds):not(#ds):not(#ds):not(#ds):not(#ds) body:is(.ae-is-nfl,.ae-is-football) #freeTakes > .ae-takes-head > #aeSportTakePublish {
+  border-color:rgba(142,100,56,.5)!important;
+  box-shadow:0 7px 18px rgba(92,66,38,.22)!important;
+}
+html:not(.dark):not(#ds):not(#ds):not(#ds):not(#ds):not(#ds) body:is(.ae-is-nfl,.ae-is-football) #freeTakes > .ae-takes-head > #aeSportTakePublish:focus-visible {
+  outline-color:#8a5a2d!important;
+}
+
+/* --------------------------------------------------------------- teléfono */
+@media (max-width:760px) {
+  html:not(#ds):not(#ds):not(#ds):not(#ds):not(#ds) body:is(.ae-is-nfl,.ae-is-football) #freeTakes > .ae-takes-head {
+    grid-template-columns:minmax(0,1fr)!important;
+    grid-template-rows:auto auto auto auto!important;
+    align-items:start!important;
+    align-content:start!important;
+    row-gap:9px!important;
+    min-height:0!important;
+    margin:0 0 14px!important;
+    padding:clamp(17px,4.4vw,24px)!important;
+    background-position:center 38%!important;
+  }
+  /* En pantalla estrecha el texto va encima de la escena: velo más cerrado. */
+  html:not(#ds):not(#ds):not(#ds):not(#ds):not(#ds) body.ae-is-nfl #freeTakes > .ae-takes-head {
+    background-image:linear-gradient(168deg,rgba(4,19,31,.93) 0%,rgba(5,21,34,.88) 55%,rgba(6,24,38,.72) 100%),url("rankings/ae-nfl-stadium-night.webp")!important;
+  }
+  html:not(#ds):not(#ds):not(#ds):not(#ds):not(#ds) body.ae-is-football #freeTakes > .ae-takes-head {
+    background-image:linear-gradient(168deg,rgba(4,19,31,.93) 0%,rgba(5,21,34,.88) 55%,rgba(6,24,38,.72) 100%),url("takes/ae-football-takes-hero-night.webp")!important;
+  }
+  html:not(.dark):not(#ds):not(#ds):not(#ds):not(#ds):not(#ds) body.ae-is-nfl #freeTakes > .ae-takes-head {
+    background-image:linear-gradient(168deg,rgba(255,250,240,.96) 0%,rgba(255,249,238,.92) 55%,rgba(255,248,236,.78) 100%),url("rankings/ae-nfl-stadium-day.webp")!important;
+  }
+  html:not(.dark):not(#ds):not(#ds):not(#ds):not(#ds):not(#ds) body.ae-is-football #freeTakes > .ae-takes-head {
+    background-image:linear-gradient(168deg,rgba(255,250,240,.96) 0%,rgba(255,249,238,.92) 55%,rgba(255,248,236,.78) 100%),url("takes/ae-football-takes-hero-day.webp")!important;
+  }
+  html:not(#ds):not(#ds):not(#ds):not(#ds):not(#ds) body:is(.ae-is-nfl,.ae-is-football) #freeTakes > .ae-takes-head > #freeTakesTitle {
+    font-size:clamp(26px,6.6vw,34px)!important;
+  }
+  html:not(#ds):not(#ds):not(#ds):not(#ds):not(#ds) body:is(.ae-is-nfl,.ae-is-football) #freeTakes > .ae-takes-head > p {
+    max-width:100%!important;
+    font-size:13px!important;
+  }
+  html:not(#ds):not(#ds):not(#ds):not(#ds):not(#ds) body:is(.ae-is-nfl,.ae-is-football) #freeTakes > .ae-takes-head > #aeSportTakePublish {
+    grid-column:1!important;
+    grid-row:4!important;
+    justify-self:stretch!important;
+    align-self:start!important;
+    justify-content:center!important;
+    width:100%!important;
+    min-height:50px!important;
+    margin:4px 0 0!important;
+    padding:13px 18px!important;
+    font-size:16px!important;
+  }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  html:not(#ds):not(#ds):not(#ds):not(#ds):not(#ds) body:is(.ae-is-nfl,.ae-is-football) #freeTakes > .ae-takes-head,
+  html:not(#ds):not(#ds):not(#ds):not(#ds):not(#ds) body:is(.ae-is-nfl,.ae-is-football) #freeTakes > .ae-takes-head > #aeSportTakePublish,
+  html:not(#ds):not(#ds):not(#ds):not(#ds):not(#ds) body:is(.ae-is-nfl,.ae-is-football) #freeTakes > .ae-takes-head > #aeSportTakePublish .cam-take-cta-arrow {
+    transition:none!important;
+    transform:none!important;
+  }
+}
