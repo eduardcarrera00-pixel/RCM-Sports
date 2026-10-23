@@ -171,7 +171,12 @@
    ['portada.top-takes', 'Banner de «Top Takes»', '#aeHomeTopTakes .ae-top-takes-card:not(.is-questioned) .ae-top-takes-card-head'],
    ['portada.top-takes-cuestionados', 'Banner de Top Takes cuestionados', '#aeHomeTopTakes .ae-top-takes-card.is-questioned .ae-top-takes-card-head']
   ].forEach(([key, label, sel], i) => { const [n, d] = banner(rows4[i]); slotPair(key, label, 'Portada · Comunidad', 'portada.banners-comunidad', sel, n, d); });
-  slot('portada.lectores', 'Cabecera de lectores (Tendencias)', 'Portada', 'portada.lectores-atlas', null, '#aeTrendingPortada > .ae-section-heading', { size: '100% 200%', pos: 'center top' });
+  // La cabecera de lectores comparte el mismo recorte del mosaico en los dos temas,
+  // pero cada tema guarda su propio reemplazo: una foto nocturna no debe oscurecer el
+  // modo día (ni al revés). Las claves antiguas sin sufijo se migraron a «-noche».
+  const readersCrop = { size: '100% 200%', pos: 'center top' };
+  slotPair('portada.lectores', 'Cabecera de lectores (Tendencias)', 'Portada', 'portada.lectores-atlas',
+    '#aeTrendingPortada > .ae-section-heading', readersCrop, readersCrop);
   const stacked = { night: { size: 'auto 200%', pos: 'right top' }, day: { size: 'auto 200%', pos: 'right bottom' } };
   slotPair('picks.chef-mano', 'Mano del chef (invitación, ranking de chefs y detalle del Pick)', 'Picks', 'picks.chef-mano-atlas',
     '.ae-picks-heading-cta-row, #picksRankingTitle, #cpDialog .ae-cp-detail-hero', stacked.night, stacked.day);
@@ -181,6 +186,19 @@
   slotPair('picks.archivo-noticias', 'Archivo de noticias de Picks', 'Picks', 'picks.archivo-noticias-atlas', '#picksNews .ae-picks-news-heading', stacked.night, stacked.day);
   slotPair('picks.chefs-mejores', 'Cabecera de mejores chefs', 'Picks', 'picks.chefs-mejores-atlas', '.ae-chefs-art-heading', stacked.night, stacked.day);
   slotPair('picks.chefs-peores', 'Cabecera de peores chefs', 'Picks', 'picks.chefs-peores-atlas', '.ae-chefs-art-heading', stacked.night, stacked.day);
+
+  // Fondos que hasta ahora usaban la MISMA imagen en día y en noche. Al sustituirlos
+  // desde el editor con una foto nocturna, el modo día también se oscurecía. Cada tema
+  // guarda ya su propio reemplazo; sin reemplazo se conserva la imagen original.
+  const THEME_ART = new Set(['nfl.savant', 'nfl.rookie', 'futbol.populares', 'futbol.impopulares', 'futbol.respira', 'futbol.vende-humos']);
+  for (const base of THEME_ART) {
+    const source = FILES.find(e => e.key === base);
+    if (!source) continue;
+    const originalPath = source.paths[0];
+    f(base + '-noche', source.label, source.section, [], { group: base, variant: NIGHT, originalPath });
+    f(base + '-dia', source.label, source.section, [], { group: base, variant: DAY, originalPath });
+  }
+  const themeArtKey = key => THEME_ART.has(key) ? key + (isDark() ? '-noche' : '-dia') : key;
 
   const ENTRIES = new Map([...FILES, ...SLOTS].map(e => [e.key, e]));
   // Los fondos originales de estadio aparecen en varios módulos. Solo las
@@ -194,6 +212,7 @@
   });
   const NEWS_BANNER_SELECTOR = /#aeNews(?:SectionTitle|HeadingRow)\b/;
   function keyForPlacement(key, selector, el) {
+    if (THEME_ART.has(key)) return themeArtKey(key);
     const newsKey = NEWS_BANNER_KEYS[key];
     if (!newsKey) return key;
     const newsHeader = selector
@@ -521,7 +540,8 @@
   const sportArtStyled = new Map();
   function applySavedSportArt() {
     const wanted = new Map();
-    for (const [selector, key, prop, child] of SPORT_ART) {
+    for (const [selector, baseKey, prop, child] of SPORT_ART) {
+      const key = themeArtKey(baseKey);
       const row = rows.get(key);
       if (!row?.url) continue;
       for (const el of document.querySelectorAll(selector)) wanted.set(el, { key, prop, child, row });
@@ -590,6 +610,7 @@
   // Observación del DOM (imágenes que se pintan después, día/noche, secciones)
   // ---------------------------------------------------------------------------
   let slotTimer = 0;
+  let lastDark = isDark();
   function onMutations(list) {
     let layout = false;
     for (const m of list) {
@@ -601,6 +622,9 @@
       else layout = true;
     }
     if (!layout) return;
+    // Al cambiar de día a noche hay fondos cuya clave depende del tema: se vuelven a
+    // escribir las declaraciones del CSS, no solo los banners pintados a mano.
+    if (lastDark !== isDark()) { lastDark = isDark(); try { applyDecls(); } catch {} }
     if (SLOTS.some(s => rows.get(s.key)?.url) || slotted.size) { clearTimeout(slotTimer); slotTimer = setTimeout(applySlots, 120); }
     // Cambios de tema, navegación NFL/Fútbol o render dinámico de las clasificaciones.
     applyNflOpinionBanners();
