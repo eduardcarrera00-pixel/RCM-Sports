@@ -436,7 +436,7 @@
     addEventListener('pageshow',()=>syncVisible());
     addEventListener('focus',()=>syncVisible());
     addEventListener('online',()=>syncVisible(true));
-    setInterval(syncVisible,60000);
+    window.setInterval?.(syncVisible,60000);
   }
   window.camSiteTexts=Object.freeze({
     refresh:schedule, reload:load,
