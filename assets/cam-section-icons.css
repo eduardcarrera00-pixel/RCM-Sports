@@ -1,97 +1,87 @@
-/* CAM SPORTS — iconos editoriales de la biblioteca de marca (PowerPoint).
-   Solo titulares de contenido; NO header, footer, navegación ni botones interactivos.
-   Sprite: 4 columnas × 3 filas, celdas 64px con transparencia y arte de 52px. */
+/* CAM SPORTS — iconografía de secciones · revisión de visibilidad.
+   Usa el arte original extraído del PowerPoint en sprite compacto.
+   Solo encabezados de módulos del contenido: nunca altera header, footer,
+   barra de navegación, botones, sus eventos ni paisajes de fondo. */
 html body :is(
   #picksPopularTitle,#picksQuestionedTitle,#picksRankingTitle,#cpWorstRankingTitle,
   #aeHomeTakesPositiveTitle,#aeHomeTakesNegativeTitle,
-  #aeSportGeniosTitle,#aeSportAnoetosTitle,
-  #aeNflSavantHeading,#aeNflRookieHeading,
-  #freeTakesTitle,#aeSportTakeRankingTitle
+  #aeSportGeniosTitle,#aeSportAnoetosTitle,#aeNflSavantHeading,#aeNflRookieHeading,
+  #freeTakesTitle,#aeSportTakeRankingTitle,
+  #aeOpinionsDistinguishedHeading,#aeOpinionsDebatedHeading,
+  #aeTopTakesPositiveTitle,#aeTopTakesNegativeTitle,
+  #aeTakesFeedHeading,#aeSeasonTitle,#homeRankingTitle,#homeChampionsTitle,
+  #rankingTitle,#championsTitle
 )::before {
-  content:"";
-  display:inline-block;
-  box-sizing:border-box;
-  width:30px;
-  height:30px;
-  min-width:30px;
-  margin-right:9px;
-  vertical-align:-.27em;
-  border:1px solid rgba(188,152,111,.5);
-  border-radius:0;
-  background-color:#102535;
-  background-image:url("cam-section-icons.png");
-  background-size:400% 300%;
-  background-repeat:no-repeat;
-  background-position:var(--cam-section-icon-x,0%) var(--cam-section-icon-y,0%);
-  box-shadow:none;
-  pointer-events:none;
-  white-space:nowrap;
+  content:"" !important;
+  display:inline-block !important;
+  box-sizing:border-box !important;
+  width:34px !important;
+  height:34px !important;
+  min-width:34px !important;
+  min-height:34px !important;
+  margin:0 10px 0 0 !important;
+  vertical-align:-.28em !important;
+  border:1px solid #aa8866 !important;
+  border-radius:0 !important;
+  background-color:#102535 !important;
+  background-image:url("cam-section-icons.png?v=20261023-visible-v2") !important;
+  background-size:400% 300% !important;
+  background-repeat:no-repeat !important;
+  background-position:var(--cam-section-icon-x,0%) var(--cam-section-icon-y,0%) !important;
+  box-shadow:none !important;
+  opacity:1 !important;
+  pointer-events:none !important;
+  white-space:nowrap !important;
+  float:none !important;
 }
-/* Fila 1: Mejores Chefs, Peores Chefs, Savant, Rookie. */
-html body :is(#picksPopularTitle,#picksRankingTitle) {
-  --cam-section-icon-x:0%;
-  --cam-section-icon-y:0%;
+html:not(.dark) body :is(
+  #picksPopularTitle,#picksQuestionedTitle,#picksRankingTitle,#cpWorstRankingTitle,
+  #aeHomeTakesPositiveTitle,#aeHomeTakesNegativeTitle,
+  #aeSportGeniosTitle,#aeSportAnoetosTitle,#aeNflSavantHeading,#aeNflRookieHeading,
+  #freeTakesTitle,#aeSportTakeRankingTitle,
+  #aeOpinionsDistinguishedHeading,#aeOpinionsDebatedHeading,
+  #aeTopTakesPositiveTitle,#aeTopTakesNegativeTitle,
+  #aeTakesFeedHeading,#aeSeasonTitle,#homeRankingTitle,#homeChampionsTitle,
+  #rankingTitle,#championsTitle
+)::before {
+  border-color:#9e7652 !important;
+  background-color:#143449 !important;
 }
-html body :is(#picksQuestionedTitle,#cpWorstRankingTitle) {
-  --cam-section-icon-x:33.333333%;
-  --cam-section-icon-y:0%;
+/* Fila 1 · Podios, chefs, rankings de Takes. */
+html body :is(#picksPopularTitle,#picksRankingTitle) { --cam-section-icon-x:0%;--cam-section-icon-y:0%; }
+html body :is(#picksQuestionedTitle,#cpWorstRankingTitle) { --cam-section-icon-x:33.333333%;--cam-section-icon-y:0%; }
+html body :is(#aeNflSavantHeading,#aeTopTakesPositiveTitle) { --cam-section-icon-x:66.666667%;--cam-section-icon-y:0%; }
+html body :is(#aeNflRookieHeading,#aeTopTakesNegativeTitle) { --cam-section-icon-x:100%;--cam-section-icon-y:0%; }
+/* Fila 2 · Debate y valoración. */
+html body :is(#aeHomeTakesPositiveTitle,#aeOpinionsDistinguishedHeading) { --cam-section-icon-x:0%;--cam-section-icon-y:50%; }
+html body :is(#aeHomeTakesNegativeTitle,#aeOpinionsDebatedHeading) { --cam-section-icon-x:33.333333%;--cam-section-icon-y:50%; }
+html body :is(#aeSeasonTitle,#championsTitle) { --cam-section-icon-x:66.666667%;--cam-section-icon-y:50%; }
+html body.ae-is-football #aeSportGeniosTitle { --cam-section-icon-x:66.666667%;--cam-section-icon-y:50%; }
+html body.ae-is-football #aeSportAnoetosTitle { --cam-section-icon-x:100%;--cam-section-icon-y:50%; }
+html body.ae-is-nfl #aeSportGeniosTitle { --cam-section-icon-x:66.666667%;--cam-section-icon-y:0%; }
+html body.ae-is-nfl #aeSportAnoetosTitle { --cam-section-icon-x:100%;--cam-section-icon-y:0%; }
+/* Fila 3 · Conocimiento, Power Rankings y Takes. */
+html body #freeTakesTitle { --cam-section-icon-x:0%;--cam-section-icon-y:100%; }
+html body :is(#aeSportTakeRankingTitle,#homeRankingTitle,#homeChampionsTitle,#rankingTitle) {
+  --cam-section-icon-x:33.333333%;--cam-section-icon-y:100%;
 }
-html body #aeNflSavantHeading {
-  --cam-section-icon-x:66.666667%;
-  --cam-section-icon-y:0%;
+html body #aeTakesFeedHeading { --cam-section-icon-x:100%;--cam-section-icon-y:100%; }
+/* Las tarjetas de portada son compactas y mantienen su altura. */
+html body :is(#homeRankingTitle,#homeChampionsTitle)::before {
+  width:26px !important;height:26px !important;min-width:26px !important;min-height:26px !important;
+  margin-right:7px !important;vertical-align:-.27em !important;
 }
-html body #aeNflRookieHeading {
-  --cam-section-icon-x:100%;
-  --cam-section-icon-y:0%;
-}
-/* Fila 2: Opiniones populares/impopulares, Respira, Vende Humos. */
-html body #aeHomeTakesPositiveTitle {
-  --cam-section-icon-x:0%;
-  --cam-section-icon-y:50%;
-}
-html body #aeHomeTakesNegativeTitle {
-  --cam-section-icon-x:33.333333%;
-  --cam-section-icon-y:50%;
-}
-html body.ae-is-nfl #aeSportGeniosTitle {
-  --cam-section-icon-x:66.666667%;
-  --cam-section-icon-y:0%;
-}
-html body.ae-is-nfl #aeSportAnoetosTitle {
-  --cam-section-icon-x:100%;
-  --cam-section-icon-y:0%;
-}
-html body.ae-is-football #aeSportGeniosTitle {
-  --cam-section-icon-x:66.666667%;
-  --cam-section-icon-y:50%;
-}
-html body.ae-is-football #aeSportAnoetosTitle {
-  --cam-section-icon-x:100%;
-  --cam-section-icon-y:50%;
-}
-/* Fila 3: conocimiento y estadísticas. El arte siempre es decorativo. */
-html body #freeTakesTitle {
-  --cam-section-icon-x:0%;
-  --cam-section-icon-y:100%;
-}
-html body #aeSportTakeRankingTitle {
-  --cam-section-icon-x:33.333333%;
-  --cam-section-icon-y:100%;
-}
-/* Un encuadre menor evita desbordamientos en títulos largos en teléfonos. */
-@media (max-width:390px) {
+@media(max-width:390px){
   html body :is(
     #picksPopularTitle,#picksQuestionedTitle,#picksRankingTitle,#cpWorstRankingTitle,
     #aeHomeTakesPositiveTitle,#aeHomeTakesNegativeTitle,
-    #aeSportGeniosTitle,#aeSportAnoetosTitle,
-    #aeNflSavantHeading,#aeNflRookieHeading,
-    #freeTakesTitle,#aeSportTakeRankingTitle
+    #aeSportGeniosTitle,#aeSportAnoetosTitle,#aeNflSavantHeading,#aeNflRookieHeading,
+    #freeTakesTitle,#aeSportTakeRankingTitle,
+    #aeOpinionsDistinguishedHeading,#aeOpinionsDebatedHeading,
+    #aeTopTakesPositiveTitle,#aeTopTakesNegativeTitle,
+    #aeTakesFeedHeading,#aeSeasonTitle,#rankingTitle,#championsTitle
   )::before {
-    width:25px;
-    height:25px;
-    min-width:25px;
-    margin-right:6px;
-    vertical-align:-.31em;
+    width:27px !important;height:27px !important;min-width:27px !important;min-height:27px !important;
+    margin-right:7px !important;vertical-align:-.3em !important;
   }
 }
-/* El icono no cambia la accesibilidad ni la interacción de las tarjetas. */
