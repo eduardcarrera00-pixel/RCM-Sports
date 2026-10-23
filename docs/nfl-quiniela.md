@@ -61,3 +61,47 @@ El script de producción usa Supabase Cron a minuto 7 de cada hora y cada 10 min
 **Staging (verificado):** 42 partidos reales, 28 abiertos con cuotas congeladas y 14 finalizados. La producción permanece pendiente de migración, aprobación del Pull Request y prueba integral de proveedor y jobs.
 
 **Pruebas propuestas:** `node tests/cam-nfl-quiniela-logos.mjs` y `node tests/nfl-quiniela-browser.cjs`. El segundo incluye las insignias en enfrentamientos, resumen e historial y las cuatro combinaciones móvil/escritorio y día/noche. Los resultados de CI deben revisarse antes de la fusión.
+
+## Rediseño visual (23 octubre 2026)
+
+La Quiniela adopta el lenguaje curvo y editorial de CAM SPORTS. **No cambian las
+reglas, los RPC, la puntuación, los cierres por horario ni el tratamiento de
+aplazados**: solo la presentación y las etiquetas de estado.
+
+- **Forma.** Las esquinas se declaran dentro de `@layer cam-rounded-editorial`,
+  con selectores de id, para convivir con la base de esquinas del sitio en vez
+  de anularla con `border-radius:0`. Panel 28 px, tarjetas 20 px, filas y
+  controles 14 px, botones y etiquetas en píldora. Logos y celdas de tabla sin
+  redondeo.
+- **Color.** El módulo ya no tiene paleta propia (`--nfl-*`): alias `--q-*`
+  sobre los tokens `--ds-*`, con valor de respaldo por tema para que funcione
+  aunque `ae-tokens.css` no esté cargado (así lo monta `nfl-quiniela-browser.cjs`).
+  Cabecera en banda azul de marca con filete dorado; crema y azul profundo según
+  el modo.
+- **Estados.** `gameState()` marca cada tarjeta con `data-state`
+  (`abierto`, `guardado`, `borrador`, `vivo`, `pospuesto`, `pendiente`,
+  `cerrado`, `acierto`, `fallo`, `anulado`, `sin-pronostico`). El color y el
+  icono de la etiqueta siempre acompañan al texto, nunca lo sustituyen. En los
+  partidos cerrados el ganador real queda en verde (`is-winner`) y el pick
+  fallado en rojo, de modo que el resultado se lee sin abrir nada.
+- **Densidad.** El enfrentamiento pasa de dos columnas altas a dos filas
+  apiladas (logo · nombre · puntos) separadas por un filete con la `@`. La
+  rejilla es `auto-fill minmax(330px,1fr)`: tres columnas en escritorio, una en
+  teléfono. La zona de partidos ocupa alrededor de un 45 % menos de alto y el
+  módulo completo un 16 % menos, sin bajar de 44 px de zona táctil (los enlaces
+  de usuario de la clasificación, de 26 px, cumplen el mínimo de 24 px).
+- **Carteles cortos.** «Pospuesto», «Pendiente de cuotas», «En vivo»,
+  «Abierto», «Sin guardar», «Bloqueado», «Cerrada». El detalle sigue en el
+  desplegable de reglas. Cada equipo indica `ABR · Local` o `ABR · Visitante`.
+- **Avisos.** `st(id, mensaje, tono)` pinta el aviso de `#camNflStatus` como
+  neutro, de carga, correcto o error. Si falla la carga, la lista de partidos
+  explica qué pasó, la clasificación lo dice y los botones de guardar se
+  desactivan.
+
+Comprobado en escritorio (1280 px) y teléfono (390 y 320 px), día y noche, con
+una auditoría automática de esquinas cuadradas, desbordes horizontales, texto
+recortado, contraste (AA) y tamaño de los controles.
+
+La fixture de la semana 8 de `tests/nfl-quiniela-browser.cjs` pasa a fecha fija:
+con un desplazamiento relativo caía algunos días en el 31 de octubre junto al
+partido pospuesto y rompía la comprobación de bloqueo.

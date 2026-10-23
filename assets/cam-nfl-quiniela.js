@@ -53,7 +53,12 @@
   const seasons=()=>[...new Set(games.map(g=>Number(g.season)))].sort((a,b)=>b-a);
   const now=()=>Date.now();
   const seasonGuess=()=>{const d=new Date();return d.getUTCFullYear()-(d.getUTCMonth()<2?1:0);};
-  const st=(id,message)=>{const e=$(id);if(e)e.textContent=message||'';};
+  const st=(id,message,tone)=>{
+    const e=$(id);if(!e)return;
+    e.textContent=message||'';
+    // El tono solo pinta el aviso; el texto sigue diciendo lo mismo.
+    if(tone)e.dataset.tone=tone;else delete e.dataset.tone;
+  };
   let games=[],teams=new Map(),user=null,mine=new Map(),draft=new Map(),season=seasonGuess(),week=1,dayKey=null,scope='week',showAll=false,loading=false,loaded=false,saving=false,request=0;
   function draftKey(id){return 'cam:nfl-quiniela:'+user?.id+':'+id;}
   function saveDraft(){
@@ -97,7 +102,7 @@
   async function hydrate(){
     if(loading)return;
     loading=true;const ticket=++request;
-    st('camNflStatus','Cargando calendario oficial…');
+    st('camNflStatus','Cargando calendario oficial…','loading');
     try{
       const c=client();if(!c)throw Error('No se pudo iniciar Supabase');
       const fixtures=await run(c.from('cam_nfl_games').select('*').order('kickoff',{ascending:true}).limit(500));
@@ -113,9 +118,16 @@
       recover();
       loaded=true;
       paint();
-      st('camNflStatus',games.length?'Partidos y resultados consultados.':'Todavía no hay partidos sincronizados. No se muestran datos ficticios.');
+      st('camNflStatus',games.length?'':'Todavía no hay partidos sincronizados. No se muestran datos ficticios.');
     }catch(error){
-      st('camNflStatus','No se pudieron obtener partidos reales: '+error.message);
+      st('camNflStatus','No se pudieron obtener partidos reales: '+error.message,'error');
+      // Sin calendario no se puede pronosticar: se dice y se bloquea el guardado.
+      $('camNflDayNav')?.replaceChildren();
+      $('camNflGames')?.replaceChildren(el('p',
+        'No podemos mostrar la jornada ahora mismo. Inténtalo de nuevo en unos minutos; '+
+        'los pronósticos que ya guardaste siguen a salvo.','cam-nfl-empty'));
+      $('camNflRanking')?.replaceChildren(el('p','Clasificación no disponible mientras falle la conexión.'));
+      for(const id of ['camNflSave','camNflSaveDay']){const b=$(id);if(b)b.disabled=true;}
       renderAdmin();
     }finally{loading=false;}
   }
@@ -166,30 +178,45 @@
     const chosen=active(g)===id,disabled=!isOpen(g);
     const b=el('button',null,'cam-nfl-team'+(chosen?' is-selected':''));
     b.type='button';b.disabled=disabled;b.setAttribute('aria-pressed',String(chosen));
+    const home=id===g.home_id;
+    b.dataset.side=home?'home':'away';
+    if(g.status==='final'&&g.winner_id)b.classList.add(g.winner_id===id?'is-winner':'is-loser');
     const summary=el('span',null,'cam-nfl-team-name');
     const team=window.CamNFLQuinielaTeams?.getTeam(id)||teams.get(id);
-    summary.append(el('strong',team?.name||id),el('span',team?.id||id));
+    summary.append(el('strong',team?.name||id),el('span',(team?.id||id)+' · '+(home?'Local':'Visitante')));
     b.append(logo(id),summary);
     const points=id===g.home_id?g.points_home:g.points_away;
     // Sin probabilidad visible: el usuario ve solo los puntos del acierto.
-    b.append(el('small',points==null?'Puntos pendientes':points+' pts'));
+    b.append(el('small',points==null?'Pts pendientes':points+' pts'));
     b.addEventListener('click',()=>{if(!isOpen(g))return;if(!user){window.openUserAuthModal?.();return;}draft.set(g.id,id);saveDraft();paintGames();});
     if(disabled)b.title='Este partido está cerrado';
     return b;
   }
+  // Mismo criterio que gameStatus(): el color nunca contradice al texto.
+  function gameState(g){
+    const pick=mine.get(g.id);
+    if(g.status==='cancelled'||g.status==='tie')return 'anulado';
+    if(g.status==='final')return pick?(pick.team_id===g.winner_id?'acierto':'fallo'):'sin-pronostico';
+    if(g.status==='live')return 'vivo';
+    if(g.status==='postponed')return 'pospuesto';
+    if(new Date(g.kickoff).getTime()<=now())return 'cerrado';
+    if(!g.odds_locked_at)return 'pendiente';
+    if(!g.picks_open)return 'cerrado';
+    return mine.has(g.id)?'guardado':draft.has(g.id)?'borrador':'abierto';
+  }
   function gameStatus(g){
     const pick=mine.get(g.id);
-    if(g.status==='cancelled'||g.status==='tie')return 'Partido anulado · 0 pts';
+    if(g.status==='cancelled'||g.status==='tie')return 'Anulado · 0 pts';
     if(g.status==='final'){
-      if(!pick)return 'Finalizado · sin pronóstico';
+      if(!pick)return 'Finalizado · sin pick';
       return pick.team_id===g.winner_id?'Acertado · +'+pick.awarded_points+' pts':'Fallado · 0 pts';
     }
-    if(g.status==='live')return 'En vivo · resultado pendiente';
-    if(g.status==='postponed')return 'Pospuesto · pronósticos suspendidos';
-    if(new Date(g.kickoff).getTime()<=now())return 'Partido bloqueado';
-    if(!g.odds_locked_at)return 'Pendiente de probabilidades verificadas';
-    if(!g.picks_open)return 'Quiniela cerrada';
-    return mine.has(g.id)?'Pronóstico guardado':draft.has(g.id)?'Selección sin guardar':'Abierto para pronosticar';
+    if(g.status==='live')return 'En vivo';
+    if(g.status==='postponed')return 'Pospuesto';
+    if(new Date(g.kickoff).getTime()<=now())return 'Bloqueado';
+    if(!g.odds_locked_at)return 'Pendiente de cuotas';
+    if(!g.picks_open)return 'Cerrada';
+    return mine.has(g.id)?'Pronóstico guardado':draft.has(g.id)?'Sin guardar':'Abierto';
   }
   function paintDayNav(fixtures){
     const target=$('camNflDayNav');if(!target)return;
@@ -242,8 +269,9 @@
       (next?' · Próximo: '+clock(next.kickoff):' · No quedan partidos por disputar'));
     for(const g of visible){
       const box=el('article',null,'cam-nfl-game');
+      box.dataset.state=gameState(g);
       const top=el('div',null,'cam-nfl-game-meta');
-      top.append(el('span',clock(g.kickoff)),el('span',gameStatus(g)));box.append(top);
+      top.append(el('span',clock(g.kickoff)),el('span',gameStatus(g),'cam-nfl-badge'));box.append(top);
       const sides=el('div',null,'cam-nfl-sides');
       sides.append(side(g,g.away_id),el('span','@','cam-nfl-versus'),side(g,g.home_id));
       box.append(sides);
@@ -280,7 +308,8 @@
         }catch(error){errors.push((teams.get(g.home_id)?.name||g.id)+': '+error.message);}
       }
     }finally{saving=false;paintGames();}
-    st('camNflStatus',successes+' pronóstico(s) guardado(s)'+(mode==='day'?' en este día':' en la jornada')+'.'+(errors.length?' '+errors.join(' · '):''));
+    st('camNflStatus',successes+' pronóstico(s) guardado(s)'+(mode==='day'?' en este día':' en la jornada')+'.'+(errors.length?' '+errors.join(' · '):''),
+      errors.length?'error':successes?'ok':undefined);
     if(successes)document.dispatchEvent(new CustomEvent('cam:nfl-picks-updated'));
   }
   function paint(){
@@ -360,7 +389,7 @@
       const h=el('input'),a=el('input');h.type=a.type='number';h.placeholder='Cuota local';a.placeholder='Cuota visitante';
       const save=button('Congelar cuotas',async()=>{
         try{await run(client().rpc('cam_nfl_admin_odds',{p_game_id:g.id,p_home:Number(h.value),p_away:Number(a.value),p_source:'manual'}));await hydrate();}
-        catch(error){st('camNflStatus',error.message);}
+        catch(error){st('camNflStatus',error.message,'error');}
       });
       details.append(el('p','Cuotas moneyline americanas verificadas. Congeladas para todos.'),h,a,save);
     }
@@ -370,7 +399,7 @@
     for(const kind of ['final','tie','cancelled']){const op=el('option',kind);op.value=kind;status.append(op);}
     const settle=button('Resolver / corregir',async()=>{
       try{await run(client().rpc('cam_nfl_admin_result',{p_game_id:g.id,p_status:status.value,p_home:Number(scoreH.value),p_away:Number(scoreA.value),p_reason:reason.value}));await hydrate();}
-      catch(error){st('camNflStatus',error.message);}
+      catch(error){st('camNflStatus',error.message,'error');}
     });
     details.append(el('p','Corrección auditada: se recalculan los puntos, nunca se duplican.'),status,scoreH,scoreA,reason,settle);
     if(!g.odds_locked_at){
@@ -384,7 +413,7 @@
       details.append(el('p','Corregir equipos y fecha antes de congelar cuotas:'),h,a,date,why,
         button('Corregir calendario',async()=>{
           try{await run(client().rpc('cam_nfl_admin_fix_game',{p_game_id:g.id,p_home:h.value,p_away:a.value,p_kickoff:new Date(date.value).toISOString(),p_reason:why.value}));await hydrate();}
-          catch(error){st('camNflStatus',error.message);}
+          catch(error){st('camNflStatus',error.message,'error');}
         }));
     }
     return details;
@@ -404,8 +433,8 @@
         if(error)throw Error(error.message||'Error de sincronización');
         if(!data?.ok)throw Error(data?.error||'Sincronización no confirmada');
         await hydrate();
-        st('camNflStatus','Sincronizado: '+data.weeks.reduce((n,w)=>n+w.games,0)+' partidos; '+data.odds.frozen+' cuotas congeladas.');
-      }catch(e){st('camNflStatus',e.message);}finally{sync.disabled=false;}
+        st('camNflStatus','Sincronizado: '+data.weeks.reduce((n,w)=>n+w.games,0)+' partidos; '+data.odds.frozen+' cuotas congeladas.','ok');
+      }catch(e){st('camNflStatus',e.message,'error');}finally{sync.disabled=false;}
     });
     const open=button('Abrir jornada',()=>toggleWeek(true));
     const close=button('Cerrar jornada',()=>toggleWeek(false));
@@ -414,8 +443,8 @@
     async function toggleWeek(enabled){
       try{
         const count=await run(client().rpc('cam_nfl_admin_open',{p_season:Number(sea.value),p_week:Number(wk.value),p_open:enabled}));
-        await hydrate();st('camNflStatus',count+' partido(s) actualizados.');
-      }catch(error){st('camNflStatus',error.message);}
+        await hydrate();st('camNflStatus',count+' partido(s) actualizados.','ok');
+      }catch(error){st('camNflStatus',error.message,'error');}
     }
   }
   function setup(){
@@ -444,7 +473,7 @@
           season=latestSeason;
           week=chooseWeek();dayKey=null;
           loadMine().then(()=>{recover();paint();})
-            .catch(error=>st('camNflStatus','No se pudieron actualizar tus picks: '+error.message));
+            .catch(error=>st('camNflStatus','No se pudieron actualizar tus picks: '+error.message,'error'));
         }else{
           week=chooseWeek();dayKey=null;
           paint();
