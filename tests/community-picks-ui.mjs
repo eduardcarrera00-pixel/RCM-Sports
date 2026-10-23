@@ -135,13 +135,17 @@ await reply.onsubmit({preventDefault(){}});await settle();
 assert.equal(comments.length,1);
 assert.match(d.querySelector('#cpDialog').textContent,/Comentario antes de la aprobación/);
 d.querySelector('#cpDialog button').click();await settle();
+// Community plates use current net votes: restore a positive vote before
+// asserting the Pick belongs in Mejores Platos (it was downvoted above).
+d.querySelector('#cpFeed .cp-upvote').click();await settle();
+assert.equal(votes.get(records[0].id+'|voter'),1);
 // The "Mejores platos" Pick remains readable by guests; writing a reply
 // requires login and then resumes at the same Pick with the reply field focused.
-const bestPick=d.querySelector('#picksPopular .ae-chef-entry-link');
+const bestPick=d.querySelector('#picksPopular .cp-card-read-link');
 assert.ok(bestPick,'A positively voted Pick must appear in Mejores platos');
-assert.equal(bestPick.parentElement.classList.contains('ae-chef-entry'),true);
-assert.equal(bestPick.style.position,'absolute','Whole Mejores platos square must be clickable');
-assert.ok(bestPick.getAttribute('aria-label').includes('Abrir Pick'));
+assert.equal(bestPick.parentElement.classList.contains('cam-pick-unified'),true);
+assert.ok(bestPick.href.includes('pick='),'Mejores Platos has a working Pick permalink');
+assert.ok(bestPick.getAttribute('aria-label').includes('Leer Pick completo'));
 user=null;w.authOpened=false;bestPick.click();await settle();
 assert.equal(w.authOpened,false,'Reading Mejores platos is public');
 assert.ok(d.querySelector('#cpDialog .cp-login-to-reply'),'Guest has an authenticated reply action');
@@ -212,6 +216,7 @@ assert.match(chefMobileCss,/safe-area-inset-bottom/,'Composer stays inside the m
 assert.match(chefMobileCss,/min-height:44px!important/,'Close and vote controls preserve touch targets');
 assert.ok(chefMobileCss.includes('grid-column:1/-1!important'), 'Author and metadata can use the full phone width');
 assert.match(chefMobileCss,/cp-pick-line-choice/,'Pick selections remain visible in the mobile layout');
-assert.equal(JSON.parse(fs.readFileSync('assets/style-sources.json','utf8')).at(-1),'assets/ae-chef-parchment-mobile.css','Mobile overrides compile after the desktop parchment design');
+const orderedCss=JSON.parse(fs.readFileSync('assets/style-sources.json','utf8'));
+assert.ok(orderedCss.indexOf('assets/ae-chef-parchment-mobile.css')>orderedCss.indexOf('assets/ae-chef-parchment-b.css'),'Mobile overrides compile after the desktop parchment design, even if later unrelated CSS is added');
 console.log('PASS: auth before Mejores platos replies, public reading, resume, publishing, voting and drafts.');
 await w.happyDOM.close();

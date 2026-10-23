@@ -5,7 +5,7 @@ const w=new Window({url:'https://aesportsclub.github.io/'}),d=w.document;
 d.body.innerHTML=fs.readFileSync('index.html','utf8').replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,'');
 w.currentCategory='';w.currentAdmin=null;
 let entries=[],picks=[],fail=false;
-w.db={auth:{getUser:async()=>({data:{user:{id:'reader',user_metadata:{username:'Lector'}}}}),onAuthStateChange:()=>{}},rpc:async name=>({data:name==='ae_my_free_takes'?entries:[],error:fail&&name==='ae_post_free_take'?{message:'Sin conexión'}:null}),from:()=>({select(){return this;},eq(){return this;},order(){return this;},limit:async()=>({data:picks,error:null})})};
+w.db={auth:{getUser:async()=>({data:{user:{id:'reader',user_metadata:{username:'Lector'}}}}),onAuthStateChange:()=>{}},rpc:async name=>({data:name==='ae_my_free_takes'?entries:[],error:fail&&name==='ae_post_free_take'?{message:'Sin conexión'}:null}),from:()=>({select(){return this;},eq(){return this;},in(){return this;},order(){return this;},limit:async()=>({data:picks,error:null})})};
 w.aeRequestPublication=async(kind,callback)=>callback();
 let pickOpened=0;
 w.aeOpenPickComposer=()=>{pickOpened++;};

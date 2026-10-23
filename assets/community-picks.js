@@ -12,7 +12,7 @@ function todayToronto(){
 const isActive=p=>p.event_date&&p.event_date>=todayToronto()&&p.outcome==='pending';
 const resultLabel=p=>p.outcome==='won'?'Acertado · +'+Math.abs(Number(p.result_points||0)).toFixed(2)+' pts':
  p.outcome==='lost'?'Fallado · −'+Math.abs(Number(p.result_points||0)).toFixed(2)+' pts':
- p.outcome==='void'?'Anulado · 0 pts':(isActive(p)?'Activo':'Archivado');
+ p.outcome==='void'?'Anulado · 0 pts':(isActive(p)?'Activo':'Pendiente de calificación');
 function el(tag,text,cls){const n=document.createElement(tag);if(text!=null)n.textContent=text;if(cls)n.className=cls;return n;}
 function button(text,fn){const b=el('button',text);b.type='button';b.onclick=fn;return b;}
 function message(error){return error?.message||'No pudimos completar la operación. Inténtalo de nuevo.';}
@@ -499,7 +499,8 @@ function chefRankingEntry(record,index,voids,kind,picks){
   }
   // Primero seleccionamos el top 10 real. El ID (no el nombre) determina
   // quién debe quedar excluido de la clasificación de Peores Chefs.
-  const bestRecords=(best.data||[]).slice(0,10);
+  // A negative balance belongs in Peores Chefs, never in Mejores Chefs.
+  const bestRecords=(best.data||[]).filter(record=>Number(record.points)>0).slice(0,10);
   const bestIds=new Set(bestRecords.map(record=>String(record.user_id||'')).filter(Boolean));
   // La exclusión se aplica EN SQL antes del LIMIT 10. Así entran los
   // siguientes usuarios elegibles, no sólo los primeros diez originales.
@@ -513,7 +514,7 @@ function chefRankingEntry(record,index,voids,kind,picks){
     const used=new Set(bestIds);
     for(const record of worst.data||[]){
       const id=String(record.user_id||'');
-      if(!id||used.has(id))continue;
+      if(!id||used.has(id)||Number(record.points)>=0)continue;
       used.add(id);
       worstRecords.push(record);
       if(worstRecords.length>=10)break;
@@ -611,8 +612,10 @@ function paintChefList(id,result,kind){
 }
 async function loadChefLists(){
  const seq=++chefRequest;
+ // Platos rank community votes from the current publication week. Keep the vote
+ // ranking after an event closes: resolving the Pick must not erase its votes.
  const query=()=>db.from('ae_pick_feed').select('*')
-   .in('moderation_status',['pending','approved']).eq('is_current_week',true).gte('event_date',todayToronto()).eq('outcome','pending');
+   .in('moderation_status',['pending','approved']).eq('is_current_week',true);
  try{
    const [best,worst]=await Promise.all([
      query().gt('score',0).order('score',{ascending:false})
@@ -712,23 +715,23 @@ async function loadSettleHistory(){
  area.setAttribute('aria-busy','true');
  try{
  const r=await db.from('ae_pick_feed').select('id,title,author,event_date,american_odds,outcome,settled_at,result_points,legs')
-    .eq('moderation_status','approved').in('outcome',['won','lost','void']).order('settled_at',{ascending:false,nullsFirst:false}).limit(40);
+    .eq('moderation_status','approved').in('outcome',['pending','won','lost','void']).order('event_date',{ascending:false}).order('created_at',{ascending:false}).limit(200);
  if(!current())return;
  if(r.error){failure(r.error);return;}
  const seen=new Set();
- const rows=(r.data||[]).filter(p=>{if(!p.id||seen.has(p.id))return false;seen.add(p.id);return true;});
- if(!rows.length){area.replaceChildren(el('p','Todavía no hay Picks resueltos.','ae-pick-history-empty'));return;}
+ const rows=(r.data||[]).filter(p=>{if(!p.id||seen.has(p.id)||p.outcome==='pending'&&(!p.event_date||p.event_date>todayToronto()))return false;seen.add(p.id);return true;}).slice(0,40);
+ if(!rows.length){area.replaceChildren(el('p','Todavía no hay Picks finalizados.','ae-pick-history-empty'));return;}
  const auto=new Set();
  try{
   const c=await db.from('ae_pick_settlement_checks').select('pick_id').eq('status','settled').in('pick_id',rows.map(p=>p.id));
   for(const row of c.data||[])auto.add(row.pick_id);
  }catch{}
  if(!current())return;
- const labels={won:'Acertado',lost:'Fallado',void:'Anulado'};
- const note=el('p',rows.length===1?'1 Pick resuelto':'Últimos '+rows.length+' Picks resueltos · desliza para ver más','ae-pick-history-note');
+ const labels={won:'Acertado',lost:'Fallado',void:'Anulado',pending:'Pendiente de calificación'};
+ const note=el('p',rows.length===1?'1 Pick finalizado':'Últimos '+rows.length+' Picks finalizados · desliza para ver más','ae-pick-history-note');
  const list=el('ol',null,'ae-pick-history-list ae-pick-history-grid');
  list.tabIndex=0;
- list.setAttribute('aria-label','Historial de Picks, ordenado por fecha de resolución de más reciente a más antiguo');
+ list.setAttribute('aria-label','Historial de Picks finalizados, ordenado por fecha del evento de más reciente a más antiguo');
  const when=t=>t?new Date(t).toLocaleDateString('es-MX',{day:'numeric',month:'short',timeZone:'America/Toronto'}).replace('.',''):'';
  const odds=v=>v==null?'—':(Number(v)>0?'+':'')+v;
  for(const p of rows){
@@ -760,10 +763,10 @@ async function loadSettleHistory(){
   if(selections>1)content.append(el('small','Combinada · '+selections+' selecciones','ae-pick-history-multiple'));
   const bottom=el('div',null,'ae-pick-history-card-bottom');
   bottom.append(el('span','Cuota '+odds(p.american_odds),'ae-pick-history-odds'));
-  bottom.append(el('span',when(p.settled_at)||'Sin fecha','ae-pick-history-date'));
+  bottom.append(el('span',when(p.settled_at)||('Evento '+p.event_date),'ae-pick-history-date'));
   if(p.outcome==='won'&&p.result_points!=null)
    bottom.append(el('span','+'+Number(p.result_points).toFixed(2)+' pts','ae-pick-history-points'));
-  const source=el('small',auto.has(p.id)?'Verificado automáticamente':'Resultado confirmado','ae-pick-history-source');
+  const source=el('small',p.outcome==='pending'?'A la espera de verificación':auto.has(p.id)?'Verificado automáticamente':'Resultado confirmado','ae-pick-history-source');
   entry.append(top,content,bottom,source);
   li.append(entry);
   list.append(li);
