@@ -17,8 +17,18 @@ assert.match(css, /@media \(max-width: 760px\)/);
 assert.match(css, /position: fixed !important/);
 assert.match(css, /env\(safe-area-inset-bottom/);
 assert.match(css, /display: flex !important/);
-assert.match(css, /cam-nav-has-active/);
+assert.match(css, /bottom: 0 !important/);
+assert.match(css, /width: 100% !important/);
+assert.match(css, /border-radius: 50% !important/);
+assert.match(css, /@layer ae-editorial-square-corners/);
+assert.match(css, /content: none !important/);
+assert.match(css, /color: #d9ab70 !important/);
+assert.match(css, /color: #886237 !important/);
+assert.match(index, /viewport-fit=cover/);
 assert.match(css, /prefers-reduced-motion: reduce/);
+assert.match(css, /svg\.cam-mobile-nav-symbol/);
+assert.match(css, /calc\(7px \+ env\(safe-area-inset-bottom/);
+assert.match(css, /img\.ae-custom-sport-icon\s*\{\s*display: none !important/);
 assert.doesNotMatch(css, /@media\s*\(min-width:/);
 assert.match(visibility, /querySelector\('nav\.ae-sport-nav'\)/);
 
@@ -32,7 +42,7 @@ document.body.innerHTML = `
     <div class="ae-mobile-header-grid">
       <a class="cam-brand" href="#">CAM SPORTS</a>
       <nav class="ae-sport-nav" aria-label="Explorar deportes">
-        ${categories.map(category => `<button class="category-btn ${category === 'Todos' ? 'active' : ''}" data-category="${category}">${category}</button>`).join('')}
+        ${categories.map(category => `<button class="category-btn ${category === 'Todos' ? 'active' : ''}" data-category="${category}">${primary.includes(category) ? '<span class="ae-nav-icon"><img class="ae-custom-sport-icon" src="existing.webp" alt=""></span>' : ''}<span>${category}</span></button>`).join('')}
       </nav>
       <div class="ae-header-actions"><button id="themeToggle">Modo</button><button id="camGlobalEditToggle">Editar</button><button id="login">Iniciar sesión</button></div>
     </div>
@@ -61,6 +71,15 @@ assert.equal(nav.classList.contains('cam-mobile-bottom-nav'), true);
 assert.equal(nav.querySelectorAll('.category-btn').length, 9, 'existing optional buttons remain in DOM');
 assert.equal(document.querySelectorAll('.category-btn').length, 9, 'do not duplicate controls');
 for (const [key, button] of originalButtons) assert.equal(nav.querySelector('[data-category="' + key + '"]'), button);
+for (const category of primary) {
+  const button = originalButtons.get(category);
+  const icon = button.querySelector('svg.cam-mobile-nav-symbol');
+  assert.ok(icon, category + ': phone-only SVG is mounted');
+  assert.equal(icon.getAttribute('viewBox'), '0 0 24 24');
+  assert.equal(icon.getAttribute('stroke'), 'currentColor');
+  assert.ok(icon.children.length >= 2, category + ': visible details must remain');
+  assert.equal(button.querySelectorAll('img.ae-custom-sport-icon').length, 1, 'original desktop image stays');
+}
 assert.ok(document.getElementById('themeToggle')?.closest('header'));
 assert.ok(document.getElementById('camGlobalEditToggle')?.closest('header'));
 assert.ok(document.getElementById('login')?.closest('header'));
@@ -104,6 +123,10 @@ assert.equal(document.body.classList.contains('cam-mobile-input-focus'), false);
 isPhone = false;
 mobileListeners.forEach(listener => listener({ matches: false }));
 assert.equal(nav.parentElement, document.querySelector('header .ae-mobile-header-grid'));
+for (const category of primary) {
+  assert.equal(originalButtons.get(category).querySelectorAll('img.ae-custom-sport-icon').length, 1);
+  assert.equal(originalButtons.get(category).querySelectorAll('svg.cam-mobile-nav-symbol').length, 1);
+}
 assert.equal(nav.classList.contains('cam-mobile-bottom-nav'), false);
 assert.equal(nav.getAttribute('aria-label'), 'Explorar deportes');
 assert.equal(originalButtons.get('NFL').hasAttribute('aria-label'), false);
