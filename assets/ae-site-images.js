@@ -23,7 +23,8 @@
   'use strict';
   if (window.camSiteImages) return;
 
-  const CACHE = 'cam_site_images_v1';
+  const CACHE = 'cam_site_images_v2';
+  const CACHE_TTL_MS = 5 * 60 * 1000; // El navegador no conserva diseños antiguos indefinidamente.
   const BUCKET = 'article-images';
   const IMAGE_TYPES = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
   const MAX_IMAGE = 5 * 1024 * 1024; // límite del bucket (se comprueba tras optimizar)
@@ -271,13 +272,22 @@
   // ---------------------------------------------------------------------------
   let rows = new Map();
   let tableReady = null; // null: sin consultar · true/false
+  let writeRevision = 0;
+  let loading = null;
   function readCache() {
-    try { const raw = localStorage.getItem(CACHE); if (raw) rows = toRows(JSON.parse(raw)); } catch {}
+    try {
+      const saved = JSON.parse(localStorage.getItem(CACHE) || 'null');
+      if (saved && Number.isFinite(saved.savedAt) && Date.now() - saved.savedAt >= 0 &&
+          Date.now() - saved.savedAt < CACHE_TTL_MS) rows = toRows(saved.items);
+      else localStorage.removeItem(CACHE);
+    } catch { /* Sin caché: se lee la versión compartida de Supabase. */ }
   }
   function writeCache() {
     try {
-      if (rows.size) localStorage.setItem(CACHE, JSON.stringify([...rows.entries()].map(([key, r]) => Object.assign({ key }, r))));
-      else localStorage.removeItem(CACHE);
+      localStorage.setItem(CACHE, JSON.stringify({
+        savedAt: Date.now(),
+        items: [...rows.entries()].map(([key, r]) => Object.assign({ key }, r))
+      }));
     } catch {}
   }
   function toRows(list) {
@@ -471,16 +481,28 @@
   // Carga de datos
   // ---------------------------------------------------------------------------
   async function load() {
-    const sb = client(); if (!sb?.from) return;
-    try {
-      const r = await sb.from('ae_site_images').select('key,url,focus_x,focus_y,alt');
-      if (r.error) { tableReady = false; return; }
-      tableReady = true;
-      rows = toRows(r.data);
-      writeCache();
-      applyAll();
-      if (admin.on) scheduleScan();
-    } catch { tableReady = false; }
+    if (loading) return loading;
+    const sb = client(); if (!sb?.from) return false;
+    const startedAt = writeRevision;
+    loading = (async () => {
+      try {
+        const r = await sb.from('ae_site_images').select('key,url,focus_x,focus_y,alt');
+        if (r.error) throw r.error;
+        // Una lectura vieja nunca puede deshacer un guardado reciente de este navegador.
+        if (startedAt !== writeRevision) return false;
+        tableReady = true;
+        rows = toRows(r.data);
+        writeCache();
+        applyAll();
+        if (admin.on) scheduleScan();
+        return true;
+      } catch (err) {
+        tableReady = false;
+        console.warn('CAM SPORTS: no se pudieron sincronizar las imágenes.', err?.message || err);
+        return false;
+      }
+    })().finally(() => { loading = null; });
+    return loading;
   }
 
   // ---------------------------------------------------------------------------
@@ -1039,10 +1061,25 @@
       }
       const r = await sb.rpc('ae_set_site_image', args);
       if (r.error) throw r.error;
-      await saveSize();
+      // El RPC devuelve la fila guardada; no indicar éxito si no coincide.
+      if ((args.p_url || args.p_focus_x != null || args.p_alt) &&
+          (r.data?.key !== key || r.data?.url !== args.p_url)) {
+        throw Error('El servidor no confirmó la imagen. Vuelve a intentarlo.');
+      }
+      writeRevision++;
       if (!args.p_url && args.p_focus_x == null && !args.p_alt) rows.delete(key);
       else rows.set(key, { url: args.p_url, focus_x: args.p_focus_x, focus_y: args.p_focus_y, alt: args.p_alt });
       writeCache(); applyAll();
+      try {
+        await saveSize();
+      } catch (sizeError) {
+        // La imagen ya se guardó. No informar que toda la operación falló ni
+        // obligar a subir de nuevo el archivo al reintentar únicamente el tamaño.
+        ui.url.value = args.p_url || '';
+        ui.file.value = '';
+        ui.error.textContent = 'La imagen sí se guardó, pero el tamaño no: ' + friendly(sizeError) + '. Puedes volver a pulsar Guardar.';
+        return;
+      }
       ui.dialog.close();
       notify('Imagen actualizada.');
     } catch (err) {
@@ -1059,6 +1096,7 @@
     try {
       const r = await sb.rpc('ae_reset_site_image', { p_key: key });
       if (r.error) throw r.error;
+      writeRevision++;
       rows.delete(key); writeCache(); applyAll();
       ui.dialog.close();
       notify('Imagen original restaurada.');
@@ -1074,11 +1112,23 @@
   readCache();
   if (rows.size) { try { walkSheets(); applyDecls(); } catch {} }
   const observer = new MutationObserver(onMutations);
+  let lastSync = 0;
+  function syncVisible(force = false) {
+    if (document.hidden || (!force && Date.now() - lastSync < 15000)) return;
+    lastSync = Date.now();
+    load();
+  }
   function start() {
     applyAll();
     observer.observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ['src', 'class', 'open', 'hidden'] });
-    load();
+    syncVisible(true);
     refresh();
+    // Al volver a Safari/Chrome desde otra app, recuperar los cambios del editor.
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) syncVisible(); });
+    addEventListener('pageshow', () => syncVisible());
+    addEventListener('focus', () => syncVisible());
+    addEventListener('online', () => syncVisible(true));
+    setInterval(syncVisible, 60000);
     setInterval(refresh, 2500); // por si el inicio o cierre de sesión llega por otra vía
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();

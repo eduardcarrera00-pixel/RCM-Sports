@@ -2,11 +2,14 @@
 (() => {
   'use strict';
   if (window.camVisualSizes) return;
-  const CACHE = 'cam_visual_sizes_v1';
+  const CACHE = 'cam_visual_sizes_v2';
+  const CACHE_TTL_MS = 5 * 60 * 1000;
   const TABLE = 'cam_visual_sizes';
   const MOBILE = 979;
   const rows = new Map();
   const pending = new Map();
+  let writeRevision = 0;
+  let loading = null;
   const valid = key => /^[a-z0-9][a-z0-9._-]{2,119}$/.test(key || '');
   const percent = n => Math.max(50, Math.min(200, Math.round(Number(n) / 5) * 5 || 100));
   const cacheKey = (key, device, theme) => [key, device, theme].join('|');
@@ -19,15 +22,23 @@
     return { key: r.key, device: r.device, theme: r.theme, size_percent: r.size_percent };
   };
   function readCache() {
-    try { for (const item of JSON.parse(localStorage.getItem(CACHE) || '[]')) {
-      const r = clean(item); if (r) rows.set(cacheKey(r.key, r.device, r.theme), r.size_percent);
-    } } catch {}
+    try {
+      const saved = JSON.parse(localStorage.getItem(CACHE) || 'null');
+      if (!saved || !Number.isFinite(saved.savedAt) || Date.now() - saved.savedAt < 0 ||
+          Date.now() - saved.savedAt >= CACHE_TTL_MS) { localStorage.removeItem(CACHE); return; }
+      for (const item of saved.items || []) {
+        const r = clean(item); if (r) rows.set(cacheKey(r.key, r.device, r.theme), r.size_percent);
+      }
+    } catch {}
   }
   function store() {
-    try { localStorage.setItem(CACHE, JSON.stringify([...rows].map(([id, value]) => {
-      const [key, device, theme] = id.split('|');
-      return { key, device, theme, size_percent: value };
-    }))); } catch {}
+    try { localStorage.setItem(CACHE, JSON.stringify({
+      savedAt: Date.now(),
+      items: [...rows].map(([id, value]) => {
+        const [key, device, theme] = id.split('|');
+        return { key, device, theme, size_percent: value };
+      })
+    })); } catch {}
   }
   const slug = s => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 55);
@@ -123,14 +134,22 @@
   function cancelPreview() { if (!pending.size) return; pending.clear(); render(); }
   function api() { try { return typeof db !== 'undefined' ? db : window.db; } catch { return window.db; } }
   async function load() {
+    if (loading) return loading;
     const sb = api(); if (!sb?.from) return false;
-    const result = await sb.from(TABLE).select('key,device,theme,size_percent');
-    if (result.error) { console.warn('CAM SPORTS: sin lectura de tamaños', result.error.message); return false; }
-    rows.clear();
-    for (const item of result.data || []) {
-      const r = clean(item); if (r) rows.set(cacheKey(r.key, r.device, r.theme), r.size_percent);
-    }
-    store(); render(); mark(document.documentElement); return true;
+    const startedAt = writeRevision;
+    loading = (async () => {
+      try {
+        const result = await sb.from(TABLE).select('key,device,theme,size_percent');
+        if (result.error) throw result.error;
+        if (startedAt !== writeRevision) return false;
+        rows.clear();
+        for (const item of result.data || []) {
+          const r = clean(item); if (r) rows.set(cacheKey(r.key, r.device, r.theme), r.size_percent);
+        }
+        store(); render(); mark(document.documentElement); return true;
+      } catch (err) { console.warn('CAM SPORTS: sin lectura de tamaños', err?.message || err); return false; }
+    })().finally(() => { loading = null; });
+    return loading;
   }
   async function save(key, device, theme, value) {
     if (!valid(key) || !['desktop','mobile'].includes(device) ||
@@ -150,6 +169,7 @@
     const result = await sb.from(TABLE).upsert(
       { key, device, theme, size_percent:size }, { onConflict:'key,device,theme' });
     if (result.error) throw Error(result.error.message || 'No se pudo guardar el tamaño.');
+    writeRevision++;
     rows.set(id, size);
     pending.delete(id); store(); render();
   }
@@ -163,7 +183,22 @@
   });
   observer.observe(document.documentElement, { subtree:true, childList:true, attributes:true, attributeFilter:['src'] });
   mark(document.documentElement);
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => { mark(document.documentElement); load().catch(() => {}); });
-  else load().catch(() => {});
+  let lastSync = 0;
+  function syncVisible(force = false) {
+    if (document.hidden || (!force && Date.now() - lastSync < 15000)) return;
+    lastSync = Date.now();
+    load();
+  }
+  function start() {
+    mark(document.documentElement);
+    syncVisible(true);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) syncVisible(); });
+    addEventListener('pageshow', () => syncVisible());
+    addEventListener('focus', () => syncVisible());
+    addEventListener('online', () => syncVisible(true));
+    setInterval(syncVisible, 60000);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
+  else start();
   window.camVisualSizes = Object.freeze({ identify, allTargets, get, effective, deviceNow, themeNow, preview, cancelPreview, save, load, mark });
 })();

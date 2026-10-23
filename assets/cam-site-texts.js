@@ -4,7 +4,8 @@
 (() => {
   'use strict';
   if (window.camSiteTexts) return;
-  const CACHE = 'cam_site_texts_v1';
+  const CACHE = 'cam_site_texts_v2';
+  const CACHE_TTL_MS = 5 * 60 * 1000;
   const ITEMS = [
     ['home.take.cta',' .cam-home-take-square-label','Home · Demuestra tu conocimiento · Botón'],
     ['home.take.popular','#aeHomeTakesPositiveTitle','Home · Popular Takes'],
@@ -86,6 +87,7 @@
     muted: {day:'#596672',night:'#d1dbe1'}
   };
   let overlay = null, dialog = null, editing = null, scheduled = false, loading = false, loaded = false, savePending = false;
+  let writeRevision = 0;
   const $ = (sel, root=document) => root.querySelector(sel);
   const client = () => { try { return typeof db !== 'undefined' ? db : null; } catch { return null; } };
   const editOn = () => window.camGlobalEditMode?.isActive?.() === true;
@@ -95,12 +97,14 @@
     (r.content == null || typeof r.content === 'string') && r.settings && typeof r.settings === 'object' && !Array.isArray(r.settings);
   function readCache() {
     try {
-      const saved = JSON.parse(localStorage.getItem(CACHE) || '[]');
-      if (Array.isArray(saved)) for (const r of saved) if (validRow(r)) rows.set(r.key,r);
+      const saved = JSON.parse(localStorage.getItem(CACHE) || 'null');
+      if (!saved || !Number.isFinite(saved.savedAt) || Date.now() - saved.savedAt < 0 ||
+          Date.now() - saved.savedAt >= CACHE_TTL_MS) { localStorage.removeItem(CACHE); return; }
+      for (const r of saved.items || []) if (validRow(r)) rows.set(r.key, r);
     } catch {}
   }
   function writeCache() {
-    try { localStorage.setItem(CACHE, JSON.stringify([...rows.values()])); } catch {}
+    try { localStorage.setItem(CACHE, JSON.stringify({savedAt:Date.now(),items:[...rows.values()]})); } catch {}
   }
   function nodeFor(el) {
     if (!el) return null;
@@ -178,9 +182,11 @@
     const sb=client();
     if (!sb?.from) return;
     loading=true;
+    const startedAt = writeRevision;
     try {
       const {data,error}=await sb.from('cam_site_texts').select('key,content,settings');
       if (error) throw error;
+      if (startedAt !== writeRevision) return;
       rows.clear();
       for (const r of data || []) if (validRow(r)) rows.set(r.key,r);
       loaded=true;writeCache();applyAll();
@@ -374,6 +380,7 @@
         p_key:draft.key,p_content:content===original ? null : content,p_settings:draft.settings
       });
       if (result.error) throw result.error;
+      writeRevision++;
       rows.set(draft.key,{key:draft.key,content:content===original?null:content,settings:draft.settings});
       previewed.delete(draft.key);
       writeCache();
@@ -392,6 +399,7 @@
     try {
       const {error}=await sb.rpc('cam_reset_site_text',{p_key:key});
       if (error) throw error;
+      writeRevision++;
       rows.delete(key);previewed.delete(key);writeCache();
       const d=ITEMS.find(t=>t.key===key);
       // Los textos originales se guardan en la interfaz, no en Supabase.
@@ -417,7 +425,18 @@
     observer.observe(document.documentElement,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['class','hidden','open']});
     addEventListener('resize',schedule,{passive:true});
     addEventListener('scroll',schedule,{passive:true,capture:true});
-    load();schedule();
+    let lastSync=0;
+    const syncVisible=(force=false)=>{
+      if (document.hidden || editing || savePending || (!force && Date.now()-lastSync<15000)) return;
+      lastSync=Date.now();
+      load();
+    };
+    syncVisible(true);schedule();
+    document.addEventListener('visibilitychange',()=>{if(!document.hidden)syncVisible();});
+    addEventListener('pageshow',()=>syncVisible());
+    addEventListener('focus',()=>syncVisible());
+    addEventListener('online',()=>syncVisible(true));
+    window.setInterval?.(syncVisible,60000);
   }
   window.camSiteTexts=Object.freeze({
     refresh:schedule, reload:load,
