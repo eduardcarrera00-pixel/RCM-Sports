@@ -56,16 +56,17 @@ executeArticleClick(preview.querySelector('h3'));assert.equal(w.openedArticle,'2
 w.openedArticle=null;
 executeArticleClick(preview.querySelector('button.text-pitch-600'));assert.equal(w.openedArticle,'22');
 w.openedArticle=null;
-// Pulsar la etiqueta no activa ni un artículo ni el evento del contenedor.
-let bubbled=0;preview.addEventListener('click',()=>bubbled++);
-preview.querySelector('.ae-home-sport-badge').click();
-assert.equal(w.currentCategory,'NFL');
-assert.equal(w.openedArticle,null);
-assert.equal(bubbled,0);
 for(const track of tracks){assert.equal(track.querySelectorAll('article').length,10);for(const card of track.children)assert.match(card.querySelector('h3').textContent,new RegExp(track.dataset.sport));}
 assert.equal(d.querySelectorAll('#articlesGrid>article').length,0);
 assert.equal(d.querySelectorAll('[data-news-scroll]').length,0);
 tracks[0].scrollLeft=123;w.renderArticlesFeed();assert.equal(d.querySelector('.ae-news-sport-track').scrollLeft,123);
+// Pulsar la etiqueta no activa el artículo ni el evento del contenedor.
+const clickPreview=d.querySelector('.ae-news-sport-track article');
+let bubbled=0;clickPreview.addEventListener('click',()=>bubbled++);
+clickPreview.querySelector('.ae-home-sport-badge').click();
+assert.equal(w.currentCategory,'NFL');
+assert.equal(w.openedArticle,null);
+assert.equal(bubbled,0);
 for(const [category,sport] of [['NFL','nfl'],['Fútbol','football']]){
  w.currentCategory='Todos';w.currentSearchQuery='';w.renderArticlesFeed();
  d.querySelector('.ae-home-sport-badge[data-ae-sport-section="'+category+'"]').click();
