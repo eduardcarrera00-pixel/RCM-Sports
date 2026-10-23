@@ -224,7 +224,7 @@ assert.match(rookieCard.style.getPropertyValue('--ae-community-portrait'), /humo
 assert.match(supported.style.getPropertyValue('--ae-opinion-art'), /football-popular-new.jpg/);
 assert.match(questioned.style.getPropertyValue('--ae-opinion-art'), /football-unpopular-new.jpg/);
 assert.equal(questioned.querySelector('header').style.backgroundPosition, '50% 50%, 50% 72%');
-databaseRows = databaseRows.filter(r=>r.key !== 'futbol.impopulares');
+databaseRows = databaseRows.filter(r=>r.key !== 'futbol.impopulares-dia');
 await window.camSiteImages.reload();
 assert.equal(questioned.style.getPropertyValue('--ae-opinion-art'), '',
   'restoring an opinion must return it to the original stylesheet');
