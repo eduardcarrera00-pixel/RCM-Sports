@@ -112,11 +112,14 @@ function statusOf(event: any, home: any, away: any) {
 }
 
 // ESPN no publica el número de jornada en fútbol. Se agrupa por semana (lunes de Toronto)
-// contada desde el primer día del calendario oficial de la competición: un número estable
-// que no finge ser la jornada oficial; la web lo muestra con sus fechas reales.
-function mondayIndex(anchorMs: number, kickoffMs: number) {
+// contada desde el 1 de julio de la temporada: un número estable que no finge ser la
+// jornada oficial; la web lo muestra con sus fechas reales. El ancla no depende del
+// proveedor, así que el mismo partido cae siempre en la misma jornada.
+function matchdayOf(season: number, kickoff: string) {
   const week = 7 * 24 * 3600 * 1000;
-  return Math.max(1, Math.min(60, Math.floor((kickoffMs - anchorMs) / week) + 1));
+  const anchor = mondayOf(season + "-07-01T12:00:00Z");
+  const value = Math.floor((mondayOf(kickoff) - anchor) / week) + 1;
+  return Number.isFinite(value) ? Math.max(1, Math.min(60, value)) : null;
 }
 function mondayOf(iso: string) {
   const parts = new Intl.DateTimeFormat("en-CA", {
@@ -137,7 +140,6 @@ async function syncCompetition(key: string, requestedSeason: number | null) {
   }
   const teams = new Map<string, any>();
   const fixtures: any[] = [];
-  let anchor: number | null = null;
   let season: number | null = requestedSeason;
   let unavailable = 0;
 
@@ -145,9 +147,6 @@ async function syncCompetition(key: string, requestedSeason: number | null) {
     const board = await scoreboard(config.espn, day);
     if (!board) { unavailable++; continue; }
     const league = Array.isArray(board.leagues) ? board.leagues[0] : null;
-    const calendarStart = Array.isArray(league?.calendar) && league.calendar.length
-      ? String(league.calendar[0]) : null;
-    if (calendarStart && anchor === null) anchor = mondayOf(calendarStart);
     const leagueSeason = number(league?.season?.year);
     for (const event of Array.isArray(board.events) ? board.events : []) {
       const competitors = event.competitions?.[0]?.competitors || [];
@@ -192,8 +191,6 @@ async function syncCompetition(key: string, requestedSeason: number | null) {
     return { competition: key, games: 0, updated: 0, season,
       note: unavailable === days.length ? "ESPN no respondió; se conserva lo ya guardado." : "" };
   }
-  if (anchor === null) anchor = mondayOf(fixtures[0].kickoff);
-
   if (teams.size) {
     const saved = await db.from("cam_football_teams").upsert([...teams.values()], { onConflict: "id" });
     if (saved.error) throw saved.error;
@@ -201,7 +198,9 @@ async function syncCompetition(key: string, requestedSeason: number | null) {
 
   let updated = 0;
   for (const fixture of fixtures) {
-    const row = { ...fixture, matchday: mondayIndex(anchor, mondayOf(fixture.kickoff)) };
+    const matchday = matchdayOf(fixture.season, fixture.kickoff);
+    if (matchday === null) { console.warn("Jornada no calculable", fixture.id); continue; }
+    const row = { ...fixture, matchday };
     const previous = await db.from("cam_football_games")
       .select("competition,season,matchday,home_id,away_id,odds_locked_at,status")
       .eq("id", row.id).maybeSingle();
@@ -317,8 +316,18 @@ Deno.serve(async req => {
     const season = !identity.cron && Number.isInteger(year) && year >= 2020 && year <= 2100 ? year : null;
     const keys = requested && !identity.cron ? [requested] : Object.keys(COMPETITIONS);
 
+    // Una competición que falle no puede llevarse por delante a las otras tres
+    // ni impedir que se congelen las cuotas de las que sí entraron.
     const results = [];
-    for (const key of keys) results.push(await syncCompetition(key, season));
+    for (const key of keys) {
+      try { results.push(await syncCompetition(key, season)); }
+      catch (error) {
+        const why = String(error instanceof Error ? error.message : error);
+        console.error("Sincronización fallida", key, why);
+        results.push({ competition: key, games: 0, updated: 0, season,
+          note: COMPETITIONS[key].label + ": " + why });
+      }
+    }
     const freeze = await freezeOdds(keys);
     const games = results.reduce((n, r) => n + r.games, 0);
     const notes = [...results.map(r => r.note), freeze.note].filter(Boolean).join(" ");
