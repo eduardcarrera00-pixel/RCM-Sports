@@ -186,6 +186,56 @@ await window.camSiteImages.reload();
 assert.match(chef.style.backgroundImage, /eres-chef-dia.jpg/,
   'restoring night must leave the saved day banner intact');
 
+// Mejores y Peores Platos: las dos cabeceras conservan sus claves propias,
+// incluso cuando una de ellas solo tiene gradiente CSS y no URL original.
+const plateRail = document.createElement('aside');
+plateRail.className = 'ae-picks-rail';
+plateRail.innerHTML =
+  '<section class="ae-chef-board ae-chef-best"><div class="ae-picks-rail-heading">Mejores platos</div></section>' +
+  '<section class="ae-chef-board ae-chef-worst"><div class="ae-picks-rail-heading">Peores platos</div></section>';
+picks.querySelector('#communityPicks').append(plateRail);
+const bestPlate = plateRail.querySelector('.ae-chef-best .ae-picks-rail-heading');
+const worstPlate = plateRail.querySelector('.ae-chef-worst .ae-picks-rail-heading');
+for (const variant of ['dia', 'noche']) {
+  for (const type of ['mejores', 'peores']) {
+    const plateKey = 'picks.platos-' + type + '-banner-' + variant;
+    assert.ok(window.camSiteImages.keys().includes(plateKey), 'missing editable banner ' + plateKey);
+  }
+}
+databaseRows = [
+  {key:'picks.platos-mejores-banner-dia',url:'https://img.test/plates-best-day.jpg',focus_x:20,focus_y:35,alt:null},
+  {key:'picks.platos-peores-banner-dia',url:'https://img.test/plates-worst-day.jpg',focus_x:65,focus_y:70,alt:null},
+  {key:'picks.platos-mejores-banner-noche',url:'https://img.test/plates-best-night.jpg',focus_x:null,focus_y:null,alt:null},
+  {key:'picks.platos-peores-banner-noche',url:'https://img.test/plates-worst-night.jpg',focus_x:null,focus_y:null,alt:null},
+  {key:'picks.chefs-mejores-dia',url:'https://img.test/chefs-best-day.jpg',focus_x:null,focus_y:null,alt:null}
+];
+document.documentElement.classList.remove('dark');
+await window.camSiteImages.reload();
+assert.match(bestPlate.style.backgroundImage, /plates-best-day.jpg/);
+assert.match(worstPlate.style.backgroundImage, /plates-worst-day.jpg/);
+assert.equal(bestPlate.style.backgroundPosition, '20% 35%');
+assert.equal(worstPlate.style.backgroundPosition, '65% 70%');
+document.documentElement.classList.add('dark');
+await window.camSiteImages.reload();
+assert.match(bestPlate.style.backgroundImage, /plates-best-night.jpg/);
+assert.match(worstPlate.style.backgroundImage, /plates-worst-night.jpg/);
+databaseRows = databaseRows.filter(r => r.key !== 'picks.platos-peores-banner-noche');
+await window.camSiteImages.reload();
+assert.match(bestPlate.style.backgroundImage, /plates-best-night.jpg/,
+  'restoring worst night must not erase best night');
+assert.equal(worstPlate.style.backgroundImage, '',
+  'restoring worst night must reveal original CSS gradient');
+assert.ok(window.camSiteImages._state().rows.includes('picks.chefs-mejores-dia'),
+  'the unrelated Chefs personalizations remain intact');
+document.documentElement.classList.remove('dark');
+await window.camSiteImages.reload();
+assert.match(bestPlate.style.backgroundImage, /plates-best-day.jpg/);
+assert.match(worstPlate.style.backgroundImage, /plates-worst-day.jpg/);
+databaseRows = [];
+await window.camSiteImages.reload();
+assert.equal(bestPlate.style.backgroundImage, '', 'best restores original atlas CSS');
+assert.equal(worstPlate.style.backgroundImage, '', 'worst restores original gradient CSS');
+
 // Las tarjetas de Savant/Rookie, Respira/Vende Humos y Opiniones Fútbol
 // pintan un fondo en el encabezado desde variables CSS de la tarjeta.
 const cards = document.createElement('div');
