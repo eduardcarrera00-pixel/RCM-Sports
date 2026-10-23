@@ -32,9 +32,19 @@ const boards = new Map<string, Promise<Game[]>>();
 function scoreboard(path: string, date: string): Promise<Game[]> {
   const key = path + date;
   if (!boards.has(key)) boards.set(key, (async () => {
-    const r = await fetch(`${ESPN}/${path}/scoreboard?dates=${date}&limit=300`);
-    if (!r.ok) return [];
-    const j = await r.json();
+    // Avoid treating a temporary provider failure as "no game": log it and
+    // retry once. Cron can retry remaining unavailable events on later runs.
+    let j: any = null;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const r = await fetch(`${ESPN}/${path}/scoreboard?dates=${date}&limit=300`, {signal: AbortSignal.timeout(12000)});
+        if (r.ok) {j = await r.json(); break;}
+        console.warn('ESPN scoreboard unavailable', {path, date, status: r.status});
+        if (r.status !== 429 && r.status < 500) break;
+      } catch (error) {console.warn('ESPN scoreboard request failed', {path, date, error: String(error)});}
+      if (attempt === 0) await new Promise(resolve => setTimeout(resolve, 500));
+    }
+    if (!j) return [];
     return (j.events || []).map((e: any) => ({
       id: String(e.id), path, name: e.name || '',
       completed: !!e.status?.type?.completed, state: e.status?.type?.name || '', detail: e.status?.type?.detail || '',
@@ -61,17 +71,23 @@ async function findGame(event: string, sport: string, eventDate: string): Promis
   const sides = splitEvent(event);
   if (sides.length !== 2) return null;
   const paths = LEAGUES[sport] || Object.values(LEAGUES).flat();
+  // Calling 30 leagues in parallel overwhelms the scoreboard provider and
+  // can make valid matches appear "missing". Search priority leagues first
+  // (Liga MX first for Fútbol), in small batches. Stop once unambiguous.
   for (const n of [0, -1, 1]) {
-    const found: Game[] = [];
-    const lists = await Promise.all(paths.map(p => scoreboard(p, ymd(shift(eventDate, n)))));
-    for (const g of lists.flat()) {
-      if (g.teams.length !== 2) continue;
-      const ok = (sideMatches(sides[0], g.teams[0].names) && sideMatches(sides[1], g.teams[1].names))
-        || (sideMatches(sides[0], g.teams[1].names) && sideMatches(sides[1], g.teams[0].names));
-      if (ok && !found.some(f => f.id === g.id)) found.push(g);
+    const date = ymd(shift(eventDate, n));
+    for (let start = 0; start < paths.length; start += 4) {
+      const found: Game[] = [];
+      const lists = await Promise.all(paths.slice(start, start + 4).map(p => scoreboard(p, date)));
+      for (const g of lists.flat()) {
+        if (g.teams.length !== 2) continue;
+        const ok = (sideMatches(sides[0], g.teams[0].names) && sideMatches(sides[1], g.teams[1].names))
+          || (sideMatches(sides[0], g.teams[1].names) && sideMatches(sides[1], g.teams[0].names));
+        if (ok && !found.some(f => f.id === g.id)) found.push(g);
+      }
+      if (found.length === 1) return found[0];
+      if (found.length > 1) return null;
     }
-    if (found.length === 1) return found[0];
-    if (found.length > 1) return null;
   }
   return null;
 }
@@ -223,7 +239,9 @@ async function evaluate(pick: any, today: string): Promise<Check> {
   const conditions = conditionsOf(pick);
   if (!conditions.length) return {status: 'needs_review', reason: 'No pudimos leer las condiciones del Pick.'};
   const verdicts: (Verdict & {condition: string})[] = [];
-  const old = shift(today, -2).toISOString().slice(0, 10) >= pick.event_date;
+  // If the event date was yesterday and no scoreboard can verify it, expose
+  // the Pick for review rather than hiding it in a never-ending waiting state.
+  const old = shift(today, -1).toISOString().slice(0, 10) >= pick.event_date;
   for (const c of conditions) {
     if (!LEAGUES[c.sport] && c.sport !== 'Otros') {verdicts.push({condition: c.selection, result: 'unsupported', why: `Sin marcadores automáticos de ${c.sport}.`}); continue;}
     const g = await findGame(c.event, c.sport, pick.event_date);
@@ -262,8 +280,10 @@ Deno.serve(async req => {
     if (body?.pick_id) return p.id === body.pick_id;
     const c = byPick.get(p.id);
     if (!c) return true;
-    if (c.status === 'needs_review') return dryRun;
-    return Date.now() - new Date(c.last_checked_at).getTime() > 50 * 60 * 1000;
+    // Continue looking for official results after escalation: data can arrive
+    // late. Manual verification stays possible without blocking future retries.
+    const retryMs = c.status === 'needs_review' ? 6 * 60 * 60 * 1000 : 50 * 60 * 1000;
+    return Date.now() - new Date(c.last_checked_at).getTime() > retryMs;
   }).slice(0, BATCH);
 
   const results = [];
