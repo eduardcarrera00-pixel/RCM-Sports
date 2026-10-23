@@ -185,7 +185,7 @@
     'futbol.estadio-champions-noche': 'futbol.noticias-noche',
     'futbol.estadio-champions-dia': 'futbol.noticias-dia'
   });
-  const NEWS_BANNER_SELECTOR = /#aeNews(?:SectionTitle|HeadingRow)\\b/;
+  const NEWS_BANNER_SELECTOR = /#aeNews(?:SectionTitle|HeadingRow)\b/;
   function keyForPlacement(key, selector, el) {
     const newsKey = NEWS_BANNER_KEYS[key];
     if (!newsKey) return key;
