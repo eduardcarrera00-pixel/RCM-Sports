@@ -140,3 +140,23 @@ body.ae-is-opinions #aeOpinions .ae-opinions-section-head:not(.cam-op-banner-act
   }
   #camOpBannerDialog form { padding: 17px; }
 }
+
+/* Una ilustración de día recibe veladura crema y tinta oscura.
+ * Si sólo hay banner nocturno, se conserva su contraste original.
+ */
+html:not(.dark) body.ae-is-opinions #aeOpinions .cam-op-banner-active.cam-op-banner-light-asset::after {
+  background: linear-gradient(90deg, rgba(250,244,235,.88), rgba(250,244,235,.67) 55%, rgba(250,244,235,.30));
+}
+html:not(.dark) body.ae-is-opinions #aeOpinions .cam-op-banner-active.cam-op-banner-light-asset > h3 {
+  color: #283a43 !important;
+  text-shadow: none;
+}
+html:not(.dark) body.ae-is-opinions #aeOpinions .cam-op-banner-active.cam-op-banner-light-asset > p {
+  color: #435763 !important;
+  text-shadow: none;
+}
+@media (max-width:760px) {
+  html:not(.dark) body.ae-is-opinions #aeOpinions .cam-op-banner-active.cam-op-banner-light-asset::after {
+    background: linear-gradient(0deg, rgba(250,244,235,.92), rgba(250,244,235,.12));
+  }
+}
