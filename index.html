@@ -1454,6 +1454,12 @@ html body:is(.ae-is-nfl,.ae-is-football) #freeTakes #aeNflTakeFooterCta #aeSport
 
 <style id="ae-home-news-carousel-styles">
 /* Noticias de portada: carrusel de desplazamiento nativo, sin duplicar publicaciones. */
+/* Etiquetas navegables: sin cambios visuales, con zona táctil y foco accesible. */
+html body.ae-is-home #articlesGrid .ae-home-sport-badge { cursor:pointer; z-index:2; }
+html body.ae-is-home #articlesGrid .ae-home-sport-badge::before { content:""; position:absolute; inset:-7px; }
+html body.ae-is-home #articlesGrid .ae-home-sport-badge:focus-visible { outline:2px solid #bd8d6b; outline-offset:2px; }
+html body.ae-is-home #articlesGrid .ae-home-news-image-link { cursor:pointer; }
+html body.ae-is-home #articlesGrid .ae-home-news-image-link:focus-visible { outline:2px solid #bd8d6b; outline-offset:-3px; }
 html body.ae-is-home #articlesCount[hidden] { display:none!important; }
 /* En portada el carrusel habla por sí mismo: sin encabezado ni su espacio vacío. */
 html body.ae-is-home #aeNewsHeadingRow { display:none!important; }
@@ -4824,14 +4830,20 @@ currentUser = {
             const previousSportCategory = articlesGrid.dataset.aeSportCarouselCategory;
             const previousSportScroll = articlesGrid.scrollLeft;
             const laneScrolls = Object.fromEntries(Array.from(articlesGrid.querySelectorAll('.ae-news-sport-track'), lane => [lane.dataset.sport, lane.scrollLeft]));
-            const renderNewsCard = art => `
+            const renderNewsCard = art => {
+              const homeSport = isHome && ['NFL','Fútbol'].includes(categoryKey(art.category)) ? categoryKey(art.category) : null;
+              return `
                 <article class="bg-white rounded-2xl border border-slate-200 overflow-hidden flex flex-col justify-between shadow-sm hover:shadow-xl hover:border-pitch-300 transition-all duration-300 hover:-translate-y-1 relative">
                     <div>
                         <div class="relative h-48 overflow-hidden group">
-                            <img src="${escapeHTML(safeImageURL(art.image))}" alt="${escapeHTML(art.title)}" loading="lazy" decoding="async" width="640" height="360" style="--ae-image-focus:${imagePosition(art)};--ae-image-zoom:${imageScale(art)}" class="w-full h-full object-cover transition-transform duration-500">
+                            <img src="${escapeHTML(safeImageURL(art.image))}" alt="${escapeHTML(art.title)}" loading="lazy" decoding="async" width="640" height="360" style="--ae-image-focus:${imagePosition(art)};--ae-image-zoom:${imageScale(art)}" class="w-full h-full object-cover transition-transform duration-500${isHome ? ' ae-home-news-image-link' : ''}"${isHome ? ` role="link" tabindex="0" aria-label="Leer noticia: ${escapeHTML(art.title)}" onclick="openArticleModal(${articleIdArgument(art.id)})" onkeydown="if(event.key==='Enter')openArticleModal(${articleIdArgument(art.id)})"` : ''}>
+                            ${homeSport ? `
+                            <button type="button" data-ae-sport-section="${escapeHTML(homeSport)}" aria-label="Ir a la sección ${escapeHTML(homeSport)}" class="absolute top-3 left-3 bg-white/90 backdrop-blur-md border border-slate-200 text-pitch-800 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md shadow-sm ae-home-sport-badge">
+                                ${escapeHTML(art.category)}
+                            </button>` : `
                             <div class="absolute top-3 left-3 bg-white/90 backdrop-blur-md border border-slate-200 text-pitch-800 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md shadow-sm">
                                 ${escapeHTML(art.category)}
-                            </div>
+                            </div>`}
                             ${currentAdmin && art.remote ? `
                                 <button onclick="deleteArticle(${articleIdArgument(art.id)}, event)" title="Eliminar Artículo" class="absolute top-3 right-3 bg-red-600 hover:bg-red-700 text-white w-7 h-7 rounded-lg flex items-center justify-center text-xs shadow-md transition-colors">
                                     <i class="fa-solid fa-trash-can"></i>
@@ -4872,23 +4884,23 @@ currentUser = {
                         </div>
                     </div>
                 </article>
-            `;
+              `;
+            };
             if (isHome) {
                 articlesGrid.innerHTML = ['NFL','Fútbol'].map((sport,index) => {
                     const stories = filtered.filter(article => categoryKey(article.category) === sport).slice(0,10);
                     const trackId = 'aeNewsSportTrack' + index;
                     const sportKey = sport === 'NFL' ? 'nfl' : 'football';
-                    return `<section class="ae-news-sport-lane" data-sport="${sportKey}" aria-labelledby="aeNewsSportTitle${index}">
-                      <header class="ae-news-sport-head">
-                        <h2 id="aeNewsSportTitle${index}"><button type="button" class="ae-news-sport-link" data-ae-sport-section="${sport}" aria-label="Ir a la sección ${sport}">
-                          <span>${sport}</span>
-                        </button></h2>
-                      </header>
-                      <div id="${trackId}" class="ae-news-sport-track" data-sport="${sport}" role="region" aria-roledescription="carrusel" aria-label="Últimas noticias de ${sport}" tabindex="0">${stories.length ? stories.map(renderNewsCard).join('') : '<p class="ae-news-sport-empty">Todavía no hay noticias de este deporte.</p>'}</div>
+                    return `<section class="ae-news-sport-lane" data-sport="${sportKey}" aria-label="Noticias de ${sport}">
+                      <div id="${trackId}" class="ae-news-sport-track" data-sport="${sport}" role="region" aria-roledescription="carrusel" aria-label="Últimas noticias de ${sport}" tabindex="0">${stories.length ? stories.map(renderNewsCard).join('') : `<p class="ae-news-sport-empty">Todavía no hay noticias de ${sport}.</p>`}</div>
                     </section>`;
                 }).join('');
                 articlesGrid.querySelectorAll('.ae-news-sport-track').forEach(lane => {lane.scrollLeft = laneScrolls[lane.dataset.sport] || 0;});
-                articlesGrid.querySelectorAll('[data-ae-sport-section]').forEach(button => button.addEventListener('click', () => filterByCategory(button.dataset.aeSportSection)));
+                articlesGrid.querySelectorAll('.ae-home-sport-badge').forEach(badge => badge.addEventListener('click', event => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    filterByCategory(badge.dataset.aeSportSection);
+                }));
             } else {
                 articlesGrid.innerHTML = gridArticles.map(renderNewsCard).join('');
             }

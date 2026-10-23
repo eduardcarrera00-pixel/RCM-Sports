@@ -1,0 +1,29 @@
+name: CAM SPORTS Home sport badges
+
+on:
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'tests/news-sports-takes.mjs'
+      - '.github/workflows/home-sport-badges.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'tests/news-sports-takes.mjs'
+
+jobs:
+  home-sport-navigation:
+    name: Badge and article navigation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Verify Home badge routing and news/takes
+        run: node tests/news-sports-takes.mjs
+      - name: Preserve news editor and mobile navigation
+        run: npm run test:editor && npm run test:mobile-nav
