@@ -142,6 +142,11 @@
   atlas('picks.archivo-noticias-atlas', 'Mosaico del archivo de noticias', 'Picks', 'assets/ae-picks-news-archive-atlas.webp', [1, 2], 'Dos escenas apiladas: arriba noche, abajo día.');
   atlas('picks.chefs-mejores-atlas', 'Mosaico de la cabecera de mejores chefs', 'Picks', 'assets/ae-chefs-best-header-atlas.webp', [1, 2], 'Dos escenas apiladas: arriba noche, abajo día.');
   atlas('picks.chefs-peores-atlas', 'Mosaico de la cabecera de peores chefs', 'Picks', 'assets/ae-chefs-worst-header-atlas.webp', [1, 2], 'Dos escenas apiladas: arriba noche, abajo día.');
+  // Cabeceras de Platos independientes de los fondos de tarjeta y de Chefs.
+  pair('picks.platos-mejores-banner', 'Banner de «Mejores platos»', 'Picks',
+    [], [], { originalPath: 'assets/ae-picks-best-plate-atlas.webp' });
+  pair('picks.platos-peores-banner', 'Banner de «Peores platos»', 'Picks',
+    [], []);
   f('picks.mejores-platos', 'Escena de los mejores platos', 'Picks', 'assets/ae-best-plates-scene.webp');
   f('picks.peores-platos', 'Escena de los peores platos', 'Picks', 'assets/ae-worst-plates-scene.webp');
   pair('picks.marmol', 'Fondo de mármol de «Eres Chef»', 'Picks', 'assets/ae-chef-marble-night.webp', 'assets/ae-chef-marble-day.webp');
@@ -181,8 +186,8 @@
   slotPair('picks.chef-mano', 'Mano del chef (invitación, ranking de chefs y detalle del Pick)', 'Picks', 'picks.chef-mano-atlas',
     '.ae-picks-heading-cta-row, #picksRankingTitle, #cpDialog .ae-cp-detail-hero', stacked.night, stacked.day);
   slotPair('picks.mesa-comunidad', 'Mesa de la comunidad', 'Picks', 'picks.mesa-comunidad-atlas', '#cpTitle', stacked.night, stacked.day);
-  slotPair('picks.mejor-plato', 'Mejor plato', 'Picks', 'picks.mejor-plato-atlas', '.ae-chef-best, .ae-chef-best .ae-picks-rail-heading', stacked.night, stacked.day);
-  slotPair('picks.peor-plato', 'Peor plato', 'Picks', 'picks.peor-plato-atlas', '.ae-chef-worst, .ae-chef-worst .ae-picks-rail-heading, #cpWorstRankingTitle', stacked.night, stacked.day);
+  slotPair('picks.mejor-plato', 'Mejor plato', 'Picks', 'picks.mejor-plato-atlas', '.ae-chef-best', stacked.night, stacked.day);
+  slotPair('picks.peor-plato', 'Peor plato', 'Picks', 'picks.peor-plato-atlas', '.ae-chef-worst, #cpWorstRankingTitle', stacked.night, stacked.day);
   slotPair('picks.archivo-noticias', 'Archivo de noticias de Picks', 'Picks', 'picks.archivo-noticias-atlas', '#picksNews .ae-picks-news-heading', stacked.night, stacked.day);
   slotPair('picks.chefs-mejores', 'Cabecera de mejores chefs', 'Picks', 'picks.chefs-mejores-atlas', '.ae-chefs-art-heading', stacked.night, stacked.day);
   slotPair('picks.chefs-peores', 'Cabecera de peores chefs', 'Picks', 'picks.chefs-peores-atlas', '.ae-chefs-art-heading', stacked.night, stacked.day);
@@ -488,6 +493,39 @@
     }
   }
 
+  // Mejores y Peores Platos tienen cabeceras distintas de las tarjetas y de
+  // Mejores/Peores Chefs. El peor usa un gradiente sin URL, por lo que debe
+  // detectarse explícitamente en vez de depender de escanear imágenes CSS.
+  const PICKS_PLATE_BANNERS = [
+    ['#footballTakes.ae-picks-editorial .ae-picks-rail > .ae-chef-best > .ae-picks-rail-heading',
+      'picks.platos-mejores-banner'],
+    ['#footballTakes.ae-picks-editorial .ae-picks-rail > .ae-chef-worst > .ae-picks-rail-heading',
+      'picks.platos-peores-banner']
+  ];
+  const plateBannerStyled = new Set();
+  const plateBannerKey = base => base + (isDark() ? '-noche' : '-dia');
+  function clearPlateBanner(el) {
+    for (const prop of ['background-image', 'background-size', 'background-position', 'background-repeat'])
+      el.style.removeProperty(prop);
+    plateBannerStyled.delete(el);
+  }
+  function applyPlateBanners() {
+    const active = new Map();
+    for (const [selector, base] of PICKS_PLATE_BANNERS)
+      for (const el of document.querySelectorAll(selector)) active.set(el, plateBannerKey(base));
+    for (const el of [...plateBannerStyled])
+      if (!active.has(el) || !rows.get(active.get(el))?.url) clearPlateBanner(el);
+    for (const [el, key] of active) {
+      const row = rows.get(key);
+      if (!row?.url) continue; // sin personalizar: preservar el CSS original
+      el.style.setProperty('background-image', cssUrl(row.url), 'important');
+      el.style.setProperty('background-size', 'cover', 'important');
+      el.style.setProperty('background-position', focusOf(row) || '50% 50%', 'important');
+      el.style.setProperty('background-repeat', 'no-repeat', 'important');
+      plateBannerStyled.add(el);
+    }
+  }
+
   // «Eres Chef» usa --chef-invite-art dentro de la propiedad abreviada
   // background. En Safari iOS la sustitución por CSSOM no siempre se refleja
   // después de cambiar de tema o volver a la pestaña; aplicar también la URL
@@ -575,7 +613,7 @@
     applyDecls();
     applyImgs(document.documentElement);
     window.camVisualSizes?.mark?.(document.documentElement);
-    if (document.body) { applySlots(); applyNflOpinionBanners(); applyChefBanner(); applySavedSportArt(); }
+    if (document.body) { applySlots(); applyNflOpinionBanners(); applyPlateBanners(); applyChefBanner(); applySavedSportArt(); }
   }
 
   // ---------------------------------------------------------------------------
@@ -628,6 +666,7 @@
     if (SLOTS.some(s => rows.get(s.key)?.url) || slotted.size) { clearTimeout(slotTimer); slotTimer = setTimeout(applySlots, 120); }
     // Cambios de tema, navegación NFL/Fútbol o render dinámico de las clasificaciones.
     applyNflOpinionBanners();
+    applyPlateBanners();
     applyChefBanner();
     applySavedSportArt();
     if (admin.on) scheduleScan();
@@ -733,6 +772,8 @@
     }
     for (const [el, pseudos] of wanted) {
       if (own(el) || !el.getClientRects().length) continue;
+      // No duplicar el lápiz del atlas heredado sobre las nuevas cabeceras.
+      if (PICKS_PLATE_BANNERS.some(([selector]) => el.matches(selector))) continue;
       for (const k of keysOnElement(el, pseudos)) add(el, k);
     }
     for (const n of document.querySelectorAll('img[data-site-image]')) if (!own(n)) add(n, n.dataset.siteImage);
@@ -741,6 +782,10 @@
     for (const el of document.querySelectorAll(NFL_OPINION_CARD_SELECTOR)) {
       if (!own(el) && el.getClientRects().length) add(el, nflOpinionKey(el));
     }
+    // Ambos lápices aparecen incluso si el CSS original es un gradiente sin URL.
+    for (const [selector, base] of PICKS_PLATE_BANNERS)
+      for (const el of document.querySelectorAll(selector))
+        if (!own(el) && el.getClientRects().length) add(el, plateBannerKey(base));
     // Escudos de rankings y logos ajenos al inventario: mismo sistema de lápices.
     for (const item of window.camVisualSizes?.allTargets?.() || []) {
       if (own(item.el) || !item.el.getClientRects().length || ENTRIES.has(item.el.dataset.siteImage)) continue;
