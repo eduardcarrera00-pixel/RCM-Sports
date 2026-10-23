@@ -68,7 +68,7 @@ assert.equal(count(),2,'Only duplicate IDs are collapsed; separate Picks with th
 assert.equal(area.querySelectorAll('.ae-pick-history-source').length,2);
 assert.equal(area.querySelectorAll('.ae-pick-history-card').length,2);
 assert.equal(new Set([...area.querySelectorAll('.ae-pick-history-card')].map(card=>card.href)).size,2);
-assert.match(area.textContent,/Verificado automáticamente/);assert.match(area.textContent,/Confirmado por un admin/);
+assert.match(area.textContent,/Verificado automáticamente/);assert.match(area.textContent,/Resultado confirmado/);
 assert.equal(area.getAttribute('aria-busy'),'false');
 
 // The history keeps its own full-width row before the Chef standings.
