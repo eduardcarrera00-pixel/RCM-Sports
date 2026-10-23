@@ -10,7 +10,7 @@ var takeRows=['nfl','football'].flatMap(sport=>Array.from({length:25},(_,i)=>({i
 var takeReplyCounts=new Map(takeRows.map((t,i)=>[t.id,i%5])),failTakeReplyCounts=false;
 var db={auth:{getUser:async()=>({data:{user:{id:'reader'}}}),onAuthStateChange:()=>{}},rpc:async(name,args)=>name==='ae_public_take_reply_counts'?
  (failTakeReplyCounts?{data:null,error:{message:'Unavailable'}}:{data:args.p_take_ids.map(id=>({take_id:id,reply_count:takeReplyCounts.get(id)||0})),error:null}):{data:takeRows,error:null}};
-var categoryKey=x=>x,escapeHTML=x=>String(x).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;'),safeImageURL=x=>x,imagePosition=()=> 'center',imageScale=()=>1,articleIdArgument=x=>JSON.stringify(x);
+var categoryKey=x=>x,escapeHTML=x=>String(x).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;'),safeImageURL=x=>x,imagePosition=()=> 'center',imageScale=()=>1,articleIdArgument=x=>escapeHTML(JSON.stringify(x));
 function renderHeroCard(){document.getElementById('heroSection').hidden=true;}
 function syncOpinionHighlights(){};
 function filterByCategory(sport){currentCategory=sport;renderArticlesFeed();}
