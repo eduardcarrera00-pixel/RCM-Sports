@@ -85,3 +85,12 @@ html body :is(#homeRankingTitle,#homeChampionsTitle)::before {
     margin-right:7px !important;vertical-align:-.3em !important;
   }
 }
+
+/* El diseño Calm de la portada anulaba estos símbolos con
+   content:none y display:none !important. Recuperar SOLO los dos nuevos
+   iconos, sin restablecer los antiguos adornos ::after. */
+html body.ae-is-home #aeHomeTakeHighlights.ae-community-calm
+:is(#aeHomeTakesPopular,#aeHomeTakesUnpopular) .ae-vote-column-heading h3::before {
+  content:"" !important;
+  display:inline-block !important;
+}

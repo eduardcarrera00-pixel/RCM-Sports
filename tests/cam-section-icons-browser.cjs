@@ -57,6 +57,7 @@ const server = http.createServer((req,res) => {
     const s=getComputedStyle(el,'::before');
     return {id,exists:true,content:s.content,display:s.display,width:parseFloat(s.width),image:s.backgroundImage};
    }),titles);
+   console.log('SECTION_ICON_DIAGNOSTICS',name,JSON.stringify(inspect));
    for(const item of inspect){
     assert.ok(item.exists,name+': titulo inexistente '+item.id);
     assert.equal(item.display,'inline-block',name+': icono oculto '+item.id);
