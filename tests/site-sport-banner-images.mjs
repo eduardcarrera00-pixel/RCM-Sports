@@ -199,8 +199,8 @@ const rookieCard = cards.querySelector('.is-rookie');
 document.body.classList.remove('ae-is-football');
 document.body.classList.add('ae-is-nfl');
 databaseRows = [
-  {key:'nfl.savant',url:'https://img.test/nfl-savant-new.jpg',focus_x:50,focus_y:32,alt:null},
-  {key:'nfl.rookie',url:'https://img.test/nfl-rookie-new.jpg',focus_x:50,focus_y:26,alt:null}
+  {key:'nfl.savant-dia',url:'https://img.test/nfl-savant-new.jpg',focus_x:50,focus_y:32,alt:null},
+  {key:'nfl.rookie-dia',url:'https://img.test/nfl-rookie-new.jpg',focus_x:50,focus_y:26,alt:null}
 ];
 await window.camSiteImages.reload();
 assert.match(savantCard.style.getPropertyValue('--ae-community-portrait'), /nfl-savant-new.jpg/);
@@ -212,10 +212,10 @@ wrap.dataset.sport = 'football';
 supported.innerHTML = '<header class="ae-sport-chef-heading"></header>';
 questioned.innerHTML = '<header class="ae-sport-chef-heading"></header>';
 databaseRows = [
-  {key:'futbol.respira',url:'https://img.test/respira-new.jpg',focus_x:50,focus_y:29,alt:null},
-  {key:'futbol.vende-humos',url:'https://img.test/humos-new.jpg',focus_x:67,focus_y:39,alt:null},
-  {key:'futbol.populares',url:'https://img.test/football-popular-new.jpg',focus_x:50,focus_y:72,alt:null},
-  {key:'futbol.impopulares',url:'https://img.test/football-unpopular-new.jpg',focus_x:50,focus_y:72,alt:null}
+  {key:'futbol.respira-dia',url:'https://img.test/respira-new.jpg',focus_x:50,focus_y:29,alt:null},
+  {key:'futbol.vende-humos-dia',url:'https://img.test/humos-new.jpg',focus_x:67,focus_y:39,alt:null},
+  {key:'futbol.populares-dia',url:'https://img.test/football-popular-new.jpg',focus_x:50,focus_y:72,alt:null},
+  {key:'futbol.impopulares-dia',url:'https://img.test/football-unpopular-new.jpg',focus_x:50,focus_y:72,alt:null}
 ];
 await window.camSiteImages.reload();
 assert.match(savantCard.style.getPropertyValue('--ae-community-portrait'), /respira-new.jpg/,
