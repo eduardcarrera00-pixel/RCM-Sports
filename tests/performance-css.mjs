@@ -12,6 +12,8 @@ const links=[...head.matchAll(/<link\b[^>]*\brel="stylesheet"[^>]*>/gi)]
   .map(match=>(match[0].match(/\bhref="([^"]+)"/)||[])[1]?.split('?')[0]);
 assert.equal(links.length,27,'CAM SPORTS should load 27 stylesheets, down from 80');
 assert.equal(groups.length,4);
+const editorialSources=JSON.parse(fs.readFileSync(path.join(root,'assets/style-sources.json'),'utf8'));
+assert.equal(new Set(editorialSources).size,editorialSources.length,'Editorial CSS bundle must not repeat source entries');
 const allSources=new Set();
 for(const group of groups){
   assert.equal(links.filter(link=>link===group.output).length,1,group.output+' must load exactly once');
@@ -24,6 +26,8 @@ for(const group of groups){
   }
 }
 assert.equal(allSources.size,57,'All 57 original stylesheets must be represented');
+const redundancies=editorialSources.filter(source=>allSources.has(source));
+assert.deepEqual(redundancies,[],'Do not ship duplicate CSS files inside both the editorial bundle and later CSS packs');
 assert(links.indexOf('assets/ae-editorial-bundle.css')<links.indexOf('assets/cam-perf-core-extras.css'));
 assert(links.indexOf('assets/cam-perf-core-extras.css')<links.indexOf('assets/cam-perf-home-components.css'));
 assert(links.indexOf('assets/cam-perf-home-components.css')<links.indexOf('assets/cam-perf-rankings.css'));
