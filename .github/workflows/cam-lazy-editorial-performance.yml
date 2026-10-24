@@ -1,0 +1,45 @@
+name: CAM SPORTS lazy editorial performance
+on:
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'assets/ae-opinions.js'
+      - 'assets/ae-news-archive.js'
+      - 'assets/cam-lazy-editorial-loader.js'
+      - 'tests/lazy-editorial-browser.cjs'
+      - 'package.json'
+      - '.github/workflows/cam-lazy-editorial-performance.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'assets/ae-opinions.js'
+      - 'assets/ae-news-archive.js'
+      - 'assets/cam-lazy-editorial-loader.js'
+      - 'tests/lazy-editorial-browser.cjs'
+      - 'package.json'
+      - '.github/workflows/cam-lazy-editorial-performance.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  lazy-editorial:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: node --check assets/cam-lazy-editorial-loader.js
+      - run: node --check assets/ae-opinions.js
+      - run: node --check assets/ae-news-archive.js
+      - run: npx playwright install --with-deps chromium
+      - name: Home / Opiniones / archive / deep link integration
+        run: npm run test:perf:editorial
+      - name: Preserve published Opiniones look, filters and reader
+        run: node tests/opinions-editorial-browser.cjs
+      - name: Preserve article publication and navigation
+        run: npm run test:editor && npm run test:auth && npm run test:mobile-nav
