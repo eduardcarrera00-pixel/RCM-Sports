@@ -1,0 +1,24 @@
+name: CAM SPORTS CLS diagnosis (first visit)
+on:
+  push:
+    branches: [perf/cls-stability-20261024]
+    paths:
+      - 'scripts/diagnose-layout-shifts.cjs'
+      - '.github/workflows/cam-cls-diagnosis.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  trace-shifts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Trace CLS shifts in cold mobile and desktop visits
+        run: node scripts/diagnose-layout-shifts.cjs
