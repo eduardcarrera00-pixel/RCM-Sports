@@ -1,0 +1,55 @@
+/* CAM SPORTS — canonical imagery from the brand icon board, shared across desktop and phone.
+   The menu moves the original buttons to the phone dock; their image sources remain identical. */
+html body > header nav.ae-sport-nav .category-btn[data-category="Picks"] img.ae-custom-sport-icon,
+html body > header nav.ae-sport-nav .category-btn[data-category="NFL"] img.ae-custom-sport-icon,
+html body > header nav.ae-sport-nav .category-btn[data-category="Fútbol"] img.ae-custom-sport-icon,
+html body > header nav.ae-sport-nav .category-btn[data-category="Opiniones"] img.ae-custom-sport-icon {
+  display: block !important;
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: 28px !important;
+  max-height: 28px !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  opacity: 1 !important;
+  filter: none !important;
+}
+/* The brand board art is cream in the dark/blue header for both themes. */
+html body > header nav.ae-sport-nav .category-btn:is(:hover,.active,:focus-visible) img.ae-custom-sport-icon {
+  filter: none !important;
+  opacity: 1 !important;
+}
+html body > header #themeToggle img#themeIcon[src*="cam-brand-sol.svg"] {
+  filter: none !important;
+  opacity: 1 !important;
+  object-fit: contain !important;
+}
+/* Login: replace the old embedded WebP emblem with the actual board design. */
+html body > header #guestAdminContainer .ae-login-emblem,
+html.dark body > header #guestAdminContainer .ae-login-emblem,
+html:not(.dark) body > header #guestAdminContainer .ae-login-emblem {
+  background-image: url("./icons/cam-brand-login.svg?v=20261023-unified-1") !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: contain !important;
+  filter: none !important;
+  opacity: 1 !important;
+}
+/* Phone dock: one source per icon. Recolor only in cream day mode for contrast. */
+html body > nav.ae-sport-nav.cam-mobile-bottom-nav .ae-nav-icon > img.ae-custom-sport-icon {
+  display: block !important;
+  width: 24px !important;
+  height: 24px !important;
+  max-width: 24px !important;
+  max-height: 24px !important;
+  object-fit: contain !important;
+  opacity: 1 !important;
+  filter: none !important;
+}
+html:not(.dark) body > nav.ae-sport-nav.cam-mobile-bottom-nav .ae-nav-icon > img.ae-custom-sport-icon {
+  filter: brightness(0) saturate(100%) invert(16%) sepia(29%) saturate(991%) hue-rotate(164deg) brightness(95%) contrast(95%) !important;
+}
+/* Older cached nav JavaScript may have injected a second decorative SVG; never display it. */
+html body > nav.ae-sport-nav.cam-mobile-bottom-nav .cam-mobile-nav-symbol { display: none !important; }
