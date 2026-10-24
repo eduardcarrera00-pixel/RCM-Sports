@@ -5863,6 +5863,11 @@ html.dark :is(#camNflQuiniela,#camFootballQuiniela),html.dark #camNflProfile{
 }
 .cam-nfl-heading p{margin:0;font-size:var(--ds-text-sm,13px);line-height:1.5;color:var(--q-on-band-muted);max-width:62ch}
 .cam-nfl-heading p strong{color:var(--q-on-band);font-weight:700}
+/* Sólo la descripción de Fútbol se desplaza a la derecha; no el título ni la NFL. */
+#camFootballQuiniela .cam-nfl-heading > p{margin-left:12px}
+@media(max-width:720px){
+  #camFootballQuiniela .cam-nfl-heading > p{margin-left:8px}
+}
 
 :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-nav{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:13px 0 0}
 :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-nav select{
