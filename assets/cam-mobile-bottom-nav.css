@@ -9,7 +9,11 @@ html body nav.ae-sport-nav svg.cam-mobile-nav-symbol {
     padding-bottom: calc(var(--cam-bottom-nav-height) + env(safe-area-inset-bottom, 0px)) !important;
   }
 
-  /* Match and override the earlier compact-header grid selector: until the\n     dock's script relocates nav under <body>, it must take zero header space. */\n  html:not(#cam-nav-paint):not(#cam-nav-paint):not(#cam-nav-paint):not(#cam-nav-paint) body > header .ae-mobile-header-grid > nav.ae-sport-nav { display: none !important; }
+  /* Legacy header CSS is highly specific. On mobile, prevent the original
+     header nav from taking space before the fixed dock moves to <body>. */
+  html:not(#cam-nav-paint):not(#cam-nav-paint):not(#cam-nav-paint):not(#cam-nav-paint) body > header .ae-mobile-header-grid > nav.ae-sport-nav {
+    display: none !important;
+  }
   html body > header .ae-mobile-header-grid {
     height: auto !important;
     min-height: 64px !important;
