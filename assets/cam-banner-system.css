@@ -427,3 +427,108 @@
     .cam-nfl-heading[data-cam-banner] > h2 { font-size:22px!important; }
   }
 }
+
+/* CAM SPORTS · Fondo nocturno móvil sin recuadros detrás de los iconos.
+ * Solo los diez banners solicitados. Su escritorio, modo día y las cabeceras
+ * «Demuestra tu conocimiento» mantienen la presentación anterior.
+ *
+ * Las ilustraciones (incluidas las subidas por administración) siguen usando
+ * --cam-banner-art y los tamaños/encuadres elegidos en el editor. El filtro
+ * convierte únicamente su lienzo oscuro en transparente por composición
+ * screen: conserva la silueta luminosa sin mostrar el color rectangular.
+ */
+@layer cam-banners {
+  @media (max-width:760px) {
+    html.dark body :is(
+    [data-cam-banner-key="portada.opinadores-noche"],
+    [data-cam-banner-key="picks.marmol-noche"],
+    [data-cam-banner-key="picks.platos-mejores-banner-noche"],
+    [data-cam-banner-key="picks.platos-peores-banner-noche"],
+    [data-cam-banner-key="picks.chefs-mejores-noche"],
+    [data-cam-banner-key="picks.chefs-peores-noche"],
+    [data-cam-banner-key="nfl.opiniones-apoyadas-noche"],
+    [data-cam-banner-key="nfl.opiniones-hateadas-noche"],
+    [data-cam-banner-key="futbol.noticias-noche"],
+    [data-cam-banner-key="futbol.populares-noche"],
+    [data-cam-banner-key="futbol.impopulares-noche"],
+    #footballTakes.ae-picks-editorial #communityPicks .ae-picks-heading-cta-row.ae-chef-marble,
+    #footballTakes.ae-picks-editorial .ae-picks-rail > .ae-chef-best > .ae-picks-rail-heading,
+    #footballTakes.ae-picks-editorial .ae-picks-rail > .ae-chef-worst > .ae-picks-rail-heading,
+    .ae-inline-chefs-board > .ae-chefs-art-heading,
+    #aeSportTakeLeaders .ae-sport-chef-card.is-supported > .ae-sport-chef-heading,
+    #aeSportTakeLeaders .ae-sport-chef-card.is-questioned > .ae-sport-chef-heading,
+    .editorial-community > .ae-section-heading
+  ) {
+      --cam-banner-fill:#071827;
+      background-color:var(--cam-banner-fill)!important;
+      background-image:none!important;
+      background-blend-mode:normal!important;
+    }
+
+    /* Los iconos individuales se mantienen en la misma columna de arte. */
+    html.dark body :is(
+    [data-cam-banner-key="portada.opinadores-noche"],
+    [data-cam-banner-key="picks.marmol-noche"],
+    [data-cam-banner-key="picks.platos-mejores-banner-noche"],
+    [data-cam-banner-key="picks.platos-peores-banner-noche"],
+    [data-cam-banner-key="picks.chefs-mejores-noche"],
+    [data-cam-banner-key="picks.chefs-peores-noche"],
+    [data-cam-banner-key="nfl.opiniones-apoyadas-noche"],
+    [data-cam-banner-key="nfl.opiniones-hateadas-noche"],
+    [data-cam-banner-key="futbol.noticias-noche"],
+    [data-cam-banner-key="futbol.populares-noche"],
+    [data-cam-banner-key="futbol.impopulares-noche"],
+    #footballTakes.ae-picks-editorial #communityPicks .ae-picks-heading-cta-row.ae-chef-marble,
+    #footballTakes.ae-picks-editorial .ae-picks-rail > .ae-chef-best > .ae-picks-rail-heading,
+    #footballTakes.ae-picks-editorial .ae-picks-rail > .ae-chef-worst > .ae-picks-rail-heading,
+    .ae-inline-chefs-board > .ae-chefs-art-heading,
+    #aeSportTakeLeaders .ae-sport-chef-card.is-supported > .ae-sport-chef-heading,
+    #aeSportTakeLeaders .ae-sport-chef-card.is-questioned > .ae-sport-chef-heading,
+    .editorial-community > .ae-section-heading
+  ):not([data-cam-banner-atlas])::after {
+      content:""!important;
+      display:block!important;
+      filter:grayscale(1) contrast(8)!important;
+      mix-blend-mode:screen!important;
+    }
+
+    /* Los mosaicos conservan el recorte completo y el encuadre original. */
+    html.dark body :is(
+    [data-cam-banner-key="portada.opinadores-noche"],
+    [data-cam-banner-key="picks.marmol-noche"],
+    [data-cam-banner-key="picks.platos-mejores-banner-noche"],
+    [data-cam-banner-key="picks.platos-peores-banner-noche"],
+    [data-cam-banner-key="picks.chefs-mejores-noche"],
+    [data-cam-banner-key="picks.chefs-peores-noche"],
+    [data-cam-banner-key="nfl.opiniones-apoyadas-noche"],
+    [data-cam-banner-key="nfl.opiniones-hateadas-noche"],
+    [data-cam-banner-key="futbol.noticias-noche"],
+    [data-cam-banner-key="futbol.populares-noche"],
+    [data-cam-banner-key="futbol.impopulares-noche"],
+    #footballTakes.ae-picks-editorial #communityPicks .ae-picks-heading-cta-row.ae-chef-marble,
+    #footballTakes.ae-picks-editorial .ae-picks-rail > .ae-chef-best > .ae-picks-rail-heading,
+    #footballTakes.ae-picks-editorial .ae-picks-rail > .ae-chef-worst > .ae-picks-rail-heading,
+    .ae-inline-chefs-board > .ae-chefs-art-heading,
+    #aeSportTakeLeaders .ae-sport-chef-card.is-supported > .ae-sport-chef-heading,
+    #aeSportTakeLeaders .ae-sport-chef-card.is-questioned > .ae-sport-chef-heading,
+    .editorial-community > .ae-section-heading
+  )[data-cam-banner-atlas]::before {
+      content:""!important;
+      display:block!important;
+      position:absolute!important;
+      inset:0!important;
+      z-index:0!important;
+      margin:0!important;
+      border:0!important;
+      background-color:transparent!important;
+      background-image:var(--cam-banner-art,none)!important;
+      background-position:var(--cam-banner-art-position,center)!important;
+      background-size:var(--cam-banner-art-size,cover)!important;
+      background-repeat:no-repeat!important;
+      filter:grayscale(1) contrast(8)!important;
+      mix-blend-mode:screen!important;
+      opacity:1!important;
+      pointer-events:none!important;
+    }
+  }
+}
