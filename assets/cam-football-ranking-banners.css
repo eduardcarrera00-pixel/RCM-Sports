@@ -1,0 +1,121 @@
+/* CAM SPORTS · Respira Fútbol / Vende Humos · 23 Oct 2026
+   Exclusivamente las cabeceras visuales de la clasificación de Fútbol.
+   Las tablas HTML, sus datos, el scroll y los controles no se alteran. */
+
+/* El color base cubre la franja completa; la ilustración es una capa separada
+   y difuminada, evitando el corte rectangular de la imagen original. */
+html body.ae-is-football #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-header {
+  position:relative!important;
+  isolation:isolate!important;
+  overflow:hidden!important;
+  display:flex!important;
+  flex-direction:row!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  box-sizing:border-box!important;
+  min-height:102px!important;
+  padding:12px 18px!important;
+  background-color:#082334!important;
+  background-image:linear-gradient(100deg,#071e2d 0%,#0a2b40 65%,#12394e 100%)!important;
+  background-position:center!important;
+  background-size:cover!important;
+  background-repeat:no-repeat!important;
+}
+html body.ae-is-football #aeSportTakeRanking #aeNflTwinRankings .is-rookie .ae-nfl-ranking-header {
+  background-color:#2a2025!important;
+  background-image:linear-gradient(100deg,#2b2025 0%,#29242d 64%,#30262c 100%)!important;
+}
+
+/* Artwork: en la derecha, a tamaño completo (contain) y sin bordes visibles.
+   Pseudo-elemento decorativo, no intercepta clics ni ocupa espacio en el layout. */
+html body.ae-is-football #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-header::before {
+  content:""!important;
+  display:block!important;
+  position:absolute!important;
+  z-index:0!important;
+  inset:0 0 0 auto!important;
+  width:48%!important;
+  max-width:300px!important;
+  pointer-events:none!important;
+  background-repeat:no-repeat!important;
+  background-position:right center!important;
+  background-size:contain!important;
+  opacity:.96!important;
+  -webkit-mask-image:radial-gradient(ellipse 86% 78% at 69% 50%,#000 33%,rgba(0,0,0,.9) 60%,transparent 100%)!important;
+  mask-image:radial-gradient(ellipse 86% 78% at 69% 50%,#000 33%,rgba(0,0,0,.9) 60%,transparent 100%)!important;
+}
+html body.ae-is-football #aeSportTakeRanking #aeNflTwinRankings .is-savant .ae-nfl-ranking-header::before {
+  background-image:url("atmospheres/ae-respira-futbol-reference.webp")!important;
+}
+html body.ae-is-football #aeSportTakeRanking #aeNflTwinRankings .is-rookie .ae-nfl-ranking-header::before {
+  background-image:url("atmospheres/ae-vende-humos-reference.webp")!important;
+}
+
+/* Misma jerarquía tipográfica y mismo margen en las dos cabeceras. */
+html body.ae-is-football #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-header h3 {
+  position:relative!important;
+  z-index:1!important;
+  order:0!important;
+  flex:0 1 auto!important;
+  max-width:67%!important;
+  margin:0!important;
+  padding:0!important;
+  font-family:"Playfair Display",Georgia,serif!important;
+  font-size:clamp(23px,2.5vw,30px)!important;
+  font-weight:600!important;
+  line-height:1.15!important;
+  letter-spacing:-.018em!important;
+  text-align:left!important;
+  text-wrap:balance!important;
+  overflow-wrap:normal!important;
+  color:#f3ebdd!important;
+  text-shadow:0 1px 3px rgba(0,0,0,.3)!important;
+}
+html body.ae-is-football #aeSportTakeRanking #aeNflTwinRankings .is-rookie .ae-nfl-ranking-header h3 {
+  color:#f0cdb5!important;
+}
+
+/* Día: conservar los tonos cálidos y el contraste legible. */
+html:not(.dark) body.ae-is-football #aeSportTakeRanking #aeNflTwinRankings .is-savant .ae-nfl-ranking-header {
+  background-color:#f3ebdd!important;
+  background-image:linear-gradient(100deg,#f3ebdd 0%,#edf0ea 63%,#dbe6e7 100%)!important;
+}
+html:not(.dark) body.ae-is-football #aeSportTakeRanking #aeNflTwinRankings .is-rookie .ae-nfl-ranking-header {
+  background-color:#f3e9df!important;
+  background-image:linear-gradient(100deg,#f3e9df 0%,#f0e2d8 66%,#e9d7cc 100%)!important;
+}
+html:not(.dark) body.ae-is-football #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-header::before {
+  opacity:.48!important;
+}
+html:not(.dark) body.ae-is-football #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-header h3 {
+  color:#0a3268!important;
+  text-shadow:0 1px 0 rgba(255,255,255,.7)!important;
+}
+html:not(.dark) body.ae-is-football #aeSportTakeRanking #aeNflTwinRankings .is-rookie .ae-nfl-ranking-header h3 {
+  color:#875536!important;
+}
+
+/* Móvil: mismas alturas actuales; títulos legibles y arte anclado a la derecha. */
+@media(max-width:760px) {
+  html body.ae-is-football #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-header {
+    min-height:78px!important;
+    padding:11px 10px!important;
+  }
+  html body.ae-is-football #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-header h3 {
+    max-width:69%!important;
+    font-size:clamp(16px,4.1vw,22px)!important;
+    line-height:1.15!important;
+  }
+  html body.ae-is-football #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-header::before {
+    width:58%!important;
+    max-width:none!important;
+    background-size:contain!important;
+    background-position:right center!important;
+  }
+}
+@media(max-width:380px) {
+  html body.ae-is-football #aeSportTakeRanking #aeNflTwinRankings .ae-nfl-ranking-header h3 {
+    font-size:15px!important;
+    max-width:72%!important;
+  }
+}
