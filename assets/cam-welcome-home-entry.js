@@ -14,9 +14,13 @@
     const link = document.createElement('link');
     link.rel = 'preload';
     link.as = 'image';
-    // Misma selección que image-set() en CSS: 960 px en pantallas 1x, 1600 px en pantallas nítidas.
+    // Móvil: el CSS muestra la obra de 960 px incluso en pantallas Retina.
+    // Precargar la misma URL evita bajar la versión de 1600 px por duplicado.
+    const isMobile = window.matchMedia('(max-width:760px)').matches;
     link.href = 'assets/cam-welcome-' + theme + '-oleo-960.webp';
-    link.imageSrcset = 'assets/cam-welcome-' + theme + '-oleo-960.webp 1x, assets/cam-welcome-' + theme + '-oleo-1600.webp 2x';
+    if (!isMobile) {
+      link.imageSrcset = 'assets/cam-welcome-' + theme + '-oleo-960.webp 1x, assets/cam-welcome-' + theme + '-oleo-1600.webp 2x';
+    }
     link.fetchPriority = 'high';
     document.head.appendChild(link);
   }
