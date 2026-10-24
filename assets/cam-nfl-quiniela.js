@@ -487,5 +487,7 @@
     root.hidden=!document.body.classList.contains('ae-is-nfl');
     if(!root.hidden)hydrate();
   }
-  document.addEventListener('DOMContentLoaded',setup);
+  // Loaded on demand: initialize immediately when DOMContentLoaded has already fired.
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup,{once:true});
+  else setup();
 })();

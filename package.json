@@ -27,7 +27,8 @@
     "test:site-banners": "node tests/site-sport-banner-images.mjs",
     "build:css-packs": "node scripts/build-performance-css.mjs",
     "test:performance": "node scripts/build-performance-css.mjs --check && node tests/performance-css.mjs",
-    "test:ocr:lazy": "node tests/ocr-lazy-loading.mjs && node tests/pick-capture-ui.mjs"
+    "test:ocr:lazy": "node tests/ocr-lazy-loading.mjs && node tests/pick-capture-ui.mjs",
+    "test:perf:sports": "node tests/sport-quiniela-lazy-browser.cjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.9",
