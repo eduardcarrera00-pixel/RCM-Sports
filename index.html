@@ -5077,7 +5077,7 @@ currentUser = {
             }
         }, true);
 
-        function openPublishModal() {
+        async function openPublishModal() {
             editingArticleId = null;
             publishDraftId = null;
             document.getElementById('pubModalTitle').textContent = 'Publicar Nuevo Artículo';
@@ -5086,6 +5086,9 @@ currentUser = {
                 openLoginModal();
                 return;
             }
+            // Never download/initialize the rich text editor for public visitors.
+            // If it fails to load, the original textarea remains usable.
+            await window.camAdminNewsEditorLoader?.ensure();
             document.getElementById('pubTeam').value = '';
             updateTeamField();
             document.getElementById('pubAuthor').value = currentAdmin.name;
@@ -6430,7 +6433,7 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 <script src="assets/ae-take-category-edit.js?v=20261016-1"></script>
 <script src="assets/ae-picks-premium.js?v=20261021-picks-scroll20-1"></script>
 <script src="assets/ae-image-framing.js?v=20261020-photo-edit-1"></script>
-<script src="assets/ae-news-editor.js?v=20261016-1"></script>
+<script src="assets/cam-admin-news-editor-loader.js?v=20261024-lazy-1"></script>
 <script src="assets/ae-news-archive.js?v=20261018-sport-mobile-direct-1"></script>
 <script src="assets/ae-mobile-compact-home.js?v=20261016-top3-swipe-v1"></script>
 <script src="assets/ae-football-mobile-redesign.js?v=20261018-football-boards-v2"></script>
