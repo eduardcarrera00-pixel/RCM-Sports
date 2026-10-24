@@ -1,0 +1,24 @@
+name: CAM SPORTS identify layout shifts
+on:
+  push:
+    branches: [perf/diagnose-cls-20261024]
+    paths:
+      - 'tests/layout-shift-diagnostic.cjs'
+      - '.github/workflows/cam-layout-shift-diagnostic.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Measure exact layout shift sources on Home (mobile and desktop)
+        run: node tests/layout-shift-diagnostic.cjs
