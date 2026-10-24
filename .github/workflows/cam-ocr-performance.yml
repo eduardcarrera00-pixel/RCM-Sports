@@ -1,0 +1,42 @@
+name: CAM SPORTS on-demand OCR performance
+
+on:
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'assets/ae-pick-capture.js'
+      - 'assets/ae-pick-capture-parser.js'
+      - 'tests/ocr-lazy-loading.mjs'
+      - 'tests/pick-capture-ui.mjs'
+      - 'package.json'
+      - '.github/workflows/cam-ocr-performance.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'assets/ae-pick-capture.js'
+      - 'assets/ae-pick-capture-parser.js'
+      - 'tests/ocr-lazy-loading.mjs'
+      - 'tests/pick-capture-ui.mjs'
+      - 'package.json'
+      - '.github/workflows/cam-ocr-performance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lazy-ocr:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Verify OCR loads on demand and remains retryable
+        run: npm run test:ocr:lazy
+      - name: Verify existing Pick composer and capture regression tests
+        run: npm run test:capture && npm run test:picks
