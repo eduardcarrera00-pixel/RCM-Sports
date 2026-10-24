@@ -47,6 +47,16 @@ const {chromium}=require('playwright');
   assert.equal(await page.locator('#camFootballGames .cam-nfl-draw.is-selected').count(),1);
   assert.equal(await page.locator('#camFootballGames .cam-nfl-team small').filter({hasText:'%'}).count(),0);
   assert.deepEqual(errors,[]);
+  await page.evaluate(()=>{window.currentAdmin=true;window.dispatchEvent(new Event('focus'));});
+  await page.waitForSelector('.cam-nfl-admin-game summary');
+  await page.locator('.cam-nfl-admin-game summary').click();
+  await page.getByLabel('Puntos local',{exact:true}).fill('5');
+  await page.getByLabel('Puntos empate',{exact:true}).fill('7');
+  await page.getByLabel('Puntos visitante',{exact:true}).fill('9');
+  await page.getByRole('button',{name:'Guardar ajuste'}).click();
+  await page.waitForFunction(()=>window.__calls.some(c=>c.name==='cam_football_admin_points'));
+  const adjustment=await page.evaluate(()=>window.__calls.find(c=>c.name==='cam_football_admin_points').args);
+  assert.deepEqual(adjustment,{p_game_id:'900000001',p_home:5,p_draw:7,p_away:9});
   await page.close();
  }
  }finally{await browser.close();}

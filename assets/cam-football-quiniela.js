@@ -355,6 +355,7 @@
       const sides=el('div',null,'cam-nfl-sides');
       sides.append(side(g,'home'),drawOption(g),side(g,'away'));
       box.append(sides);
+      if(typeof currentAdmin!=='undefined'&&currentAdmin&&isOpen(g))box.append(adminPoints(g));
       if(g.status==='final')box.append(el('p',g.home_score+' — '+g.away_score,'cam-nfl-result'));
 
       target.append(box);
@@ -466,6 +467,27 @@
       if(rows.length>10)target.append(button(showAll?'Ver Top 10':'Ver clasificación completa',
         ()=>{showAll=!showAll;paintRanking();},'cam-nfl-more'));
     }catch(error){if(ticket===rankingRequest){target.replaceChildren(el('p','Ranking no disponible: '+error.message));}}
+  }
+  function adminPoints(g){
+    const panel=el('details',null,'cam-nfl-admin-game');
+    panel.append(el('summary','Ajustar puntos (opcional)'));
+    panel.append(el('p','El cálculo es automático. Puedes ajustar de 2 a 12 puntos antes de que alguien guarde un pronóstico.'));
+    const inputs=['home','draw','away'].map((side,i)=>{
+      const label=el('label',['Local','Empate','Visitante'][i]);
+      const input=el('input');input.type='number';input.min='2';input.max='12';input.step='1';
+      input.value=String(g['points_'+side]);input.setAttribute('aria-label','Puntos '+['local','empate','visitante'][i]);
+      label.append(input);panel.append(label);return input;
+    });
+    const save=button('Guardar ajuste',async()=>{
+      const values=inputs.map(i=>Number(i.value));
+      if(values.some(v=>!Number.isInteger(v)||v<2||v>12)){st('camFootballStatus','Usa puntos enteros de 2 a 12.','error');return;}
+      save.disabled=true;
+      try{
+        await run(client().rpc('cam_football_admin_points',{p_game_id:g.id,p_home:values[0],p_draw:values[1],p_away:values[2]}));
+        await hydrate();st('camFootballStatus','Puntos ajustados. El resto de partidos sigue en automático.','ok');
+      }catch(e){st('camFootballStatus',e.message,'error');}finally{save.disabled=false;}
+    });
+    panel.append(save);return panel;
   }
   function renderAdmin(){
     // Football is automatic. No per-game or per-round administration is required.
