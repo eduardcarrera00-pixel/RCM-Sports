@@ -3,6 +3,22 @@
  'use strict';
  const scriptUrl=document.currentScript?.src||new URL('assets/ae-pick-capture.js',location.href).href;
  const vendor=new URL('vendor/ocr/',scriptUrl).href;
+ // The 73 KB matching engine is only needed when a reader selects a screenshot.
+ // Keep the upload UI synchronous; reuse one in-flight download across retries.
+ const parserUrl=new URL('ae-pick-capture-parser.js?v=20261024-lazy-ocr-1',scriptUrl).href;
+ let parserPromise=null;
+ function parser(){
+  if(window.aePickCaptureParser)return Promise.resolve(window.aePickCaptureParser);
+  if(!parserPromise)parserPromise=new Promise((resolve,reject)=>{
+   const tag=document.createElement('script');
+   tag.src=parserUrl;
+   tag.async=true;
+   tag.onload=()=>window.aePickCaptureParser?resolve(window.aePickCaptureParser):reject(Error('No se pudo iniciar el analizador de capturas.'));
+   tag.onerror=()=>reject(Error('No se pudo cargar el analizador de capturas. Comprueba tu conexión e inténtalo de nuevo.'));
+   document.head.append(tag);
+  }).catch(error=>{parserPromise=null;throw error;});
+  return parserPromise;
+ }
  let enginePromise;
  function engine(){
   if(window.Tesseract)return Promise.resolve(window.Tesseract);
@@ -290,7 +306,7 @@
    let prepared=null,failure='',terminalFailure=false,localExpired=false,localTimer;
    const localAbort=Promise.race([aborted,new Promise((_,reject)=>{localTimer=setTimeout(()=>{localExpired=true;reject(Error('La lectura local tardó demasiado. Probamos la lectura avanzada.'));},35000);})]);
    try{
-    const T=await Promise.race([engine(),localAbort]);
+    const T=await Promise.race([Promise.all([engine(),parser()]).then(([reader])=>reader),localAbort]);
     if(!isCurrent(job))return;
     const pending=T.createWorker('eng+spa',1,{workerPath:vendor+'worker.min.js',corePath:vendor+'tesseract-core-lstm.wasm.js',langPath:vendor.replace(/\/$/,''),workerBlobURL:false,cacheMethod:'none',logger:m=>{
      if(isCurrent(job)&&m.status==='recognizing text'){
