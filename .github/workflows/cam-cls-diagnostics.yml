@@ -1,0 +1,31 @@
+name: CAM SPORTS diagnose initial layout shifts
+on:
+  push:
+    branches: [perf/cls-layout-diagnostics-20261024]
+    paths:
+      - tests/cls-layout-diagnostics.cjs
+      - .github/workflows/cam-cls-diagnostics.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  diagnose-cls:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Record layout shift attribution in mobile day/night and desktop
+        run: node tests/cls-layout-diagnostics.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cam-cls-shift-traces
+          path: cls-artifacts/*.json
+          if-no-files-found: warn
+          retention-days: 7
