@@ -1,0 +1,35 @@
+name: CAM SPORTS stable Home first frame
+on:
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'tests/home-initial-route-cls-browser.cjs'
+      - 'package.json'
+      - '.github/workflows/cam-home-first-frame-cls.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'tests/home-initial-route-cls-browser.cjs'
+      - 'package.json'
+      - '.github/workflows/cam-home-first-frame-cls.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  stable-home:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: node --check tests/home-initial-route-cls-browser.cjs
+      - run: npx playwright install --with-deps chromium
+      - name: Default Home route matches its final geometry on first frame
+        run: npm run test:cls:home
+      - name: Preserve first data load, navigation, editor and banners
+        run: node tests/home-first-load-stability.mjs && npm run test:mobile-nav && npm run test:auth && npm run test:site-banners
