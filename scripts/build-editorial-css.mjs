@@ -1,13 +1,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {spawnSync} from 'node:child_process';
-import {createRequire} from 'node:module';
 
 // Combina las hojas de assets/style-sources.json, en su orden, en assets/ae-editorial-bundle.css.
-// Ninguna hoja usa directivas de Tailwind: Tailwind solo se usaba para minificar. Si está
-// instalado se sigue usando; si no, se usa el minificador conservador de abajo (sin dependencias),
-// así el bundle se puede regenerar siempre y nunca hace falta editarlo a mano.
+// La salida usa siempre el mismo minificador conservador para preservar colores y
+// evitar diferencias entre máquinas con/sin Tailwind. No edites el bundle a mano.
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const out = path.join(root, 'assets/ae-editorial-bundle.css');
 const sources = JSON.parse(fs.readFileSync(path.join(root, 'assets/style-sources.json'), 'utf8'));
@@ -61,16 +58,10 @@ export function minifyCss(input) {
   return result.replace(/;}/g, '}').trim() + '\n';
 }
 
-const require = createRequire(import.meta.url);
-let tailwindCli = null;
-try { tailwindCli = require.resolve('tailwindcss/lib/cli.js'); } catch { tailwindCli = null; }
-
-if (tailwindCli && !process.env.AE_CSS_NO_TAILWIND) {
-  fs.writeFileSync(out, css);
-  const result = spawnSync(process.execPath, [tailwindCli, '-i', 'assets/ae-editorial-bundle.css', '-o', 'assets/ae-editorial-bundle.css', '--minify'], {cwd: root, stdio: 'inherit'});
-  if (result.status !== 0) throw new Error('Could not minify editorial CSS');
-  console.log(`Editorial CSS: ${sources.length} stylesheets combined with Tailwind minify, original order preserved.`);
-} else {
-  fs.writeFileSync(out, minifyCss(css));
-  console.log(`Editorial CSS: ${sources.length} stylesheets combined (built-in minifier, Tailwind not required), original order preserved.`);
-}
+// Always use the same conservative generator, locally and in CI.
+// A prior optional Tailwind pass rewrote rgba(245,236,223,.10) as HSL and
+// rounded its red/green/blue values, subtly changing the approved day colors.
+// Compression must not change presentation; removing the optional branch
+// makes every CSS rebuild reproducible regardless of npm dependencies.
+fs.writeFileSync(out, minifyCss(css));
+console.log(`Editorial CSS: ${sources.length} stylesheets combined with deterministic conservative minifier; source order preserved.`);
