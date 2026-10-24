@@ -1,0 +1,25 @@
+name: CAM SPORTS CLS diagnosis on cold load
+on:
+  push:
+    branches: [perf/cls-instrumentation-20261024]
+    paths:
+      - 'tests/cls-diagnostic-browser.cjs'
+      - '.github/workflows/cam-cls-diagnostic.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: node --check tests/cls-diagnostic-browser.cjs
+      - run: npx playwright install --with-deps chromium
+      - name: Identify layout shift sources in mobile and desktop
+        run: node tests/cls-diagnostic-browser.cjs
