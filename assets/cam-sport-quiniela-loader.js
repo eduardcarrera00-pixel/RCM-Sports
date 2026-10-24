@@ -8,7 +8,7 @@
     nfl:{className:'ae-is-nfl',root:'camNflQuiniela',status:'camNflStatus',
       src:'cam-nfl-quiniela.js?v=20261024-lazy-section-1'},
     football:{className:'ae-is-football',root:'camFootballQuiniela',status:'camFootballStatus',
-      src:'cam-football-quiniela.js?v=20261024-auto-points-1'}
+      src:'cam-football-quiniela.js?v=20261024-open-voting-2'}
   };
   const requests=new Map();
   const loaded=new Set();

@@ -14,11 +14,12 @@ const {chromium}=require('playwright');
   await page.route('**/*',r=>r.abort());
   await page.setContent(`<html class="${dark?'dark':''}"><head>${theme}</head><body class="ae-is-football">${section}</body></html>`);
   await page.evaluate(()=>{
-   window.currentAdmin=true;
+   window.currentAdmin=null;
    const kickoff=new Date(Date.now()+86400000).toISOString();
    const season=new Date().getUTCFullYear();
    const fixtures=[{id:'900000001',competition:'laliga',season,matchday:1,home_id:'1',away_id:'2',kickoff,status:'scheduled',picks_open:true,
     points_home:6,points_draw:6,points_away:6,odds_locked_at:new Date().toISOString(),odds_source:'automatic_equal_v1'}];
+   fixtures.push({...fixtures[0],id:'900000002',kickoff:new Date(Date.now()-3600000).toISOString(),status:'live',picks_open:false});
    const teams=[{id:'1',name:'Local',short_name:'Local',abbreviation:'LOC'},{id:'2',name:'Visitante',short_name:'Visitante',abbreviation:'VIS'}];
    const picks=[];window.__calls=[];
    window.db={auth:{getUser:async()=>({data:{user:{id:'user-test'}}}),onAuthStateChange(){}},
@@ -31,11 +32,12 @@ const {chromium}=require('playwright');
   });
   await page.addScriptTag({content:code});
   await page.waitForSelector('#camFootballGames .cam-nfl-game');
-  assert.equal(await page.locator('#camFootballAdmin').isVisible(),true);
+  assert.equal(await page.locator('#camFootballAdmin').isVisible(),false);
   assert.equal(await page.getByPlaceholder(/Cuota/).count(),0,'No per-match odds inputs');
   assert.equal(await page.getByRole('button',{name:/Congelar cuotas|Administrar puntos/}).count(),0);
-  assert.equal(await page.locator('button').filter({hasText:'Resolver / corregir'}).count(),1,'Emergency result correction remains');
+  assert.equal(await page.locator('button').filter({hasText:/Resolver|Administrar|Abrir jornada/}).count(),0,'No admin action is required');
   assert.deepEqual(await page.locator('#camFootballGames .cam-nfl-team small,#camFootballGames .cam-nfl-draw small').allTextContents(),['6 pts','6 pts','6 pts']);
+  assert.equal(await page.locator('#camFootballGames .cam-nfl-draw:not([disabled])').count(),1,'Default day must allow voting');
   await page.locator('#camFootballGames .cam-nfl-draw').click();
   await page.locator('#camFootballSaveDay').click();
   await page.waitForFunction(()=>document.getElementById('camFootballStatus').textContent.includes('guardado'));

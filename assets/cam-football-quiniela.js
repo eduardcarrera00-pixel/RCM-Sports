@@ -11,7 +11,6 @@
     if(cls)x.className=cls;return x;
   };
   const client=()=>{try{return typeof db!=='undefined'?db:window.db;}catch{return null;}};
-  const editor=()=>{try{return typeof currentAdmin!=='undefined'&&!!currentAdmin;}catch{return false;}};
   const clock=value=>new Date(value).toLocaleString('es',{timeZone:'America/Toronto',weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
 
   const COMPETITIONS=[
@@ -66,10 +65,13 @@
     const days=groupedDays(fixtures);
     if(!days.length)return null;
     const current=now(),today=torontoDate(current);
-    const todayGames=days.find(day=>day.key===today);
-    if(todayGames?.games.some(g=>g.status==='live'||(g.status==='scheduled'&&Date.parse(g.kickoff)>current)))return today;
-    const next=days.find(day=>day.games.some(g=>g.status==='live'||(g.status==='scheduled'&&Date.parse(g.kickoff)>current)));
-    return next?.key||days[days.length-1].key;
+    // Start on a day that accepts picks, even when today's remaining games are live.
+    const openToday=days.find(day=>day.key===today&&day.games.some(isOpen));
+    if(openToday)return openToday.key;
+    const nextOpen=days.find(day=>day.games.some(isOpen));
+    if(nextOpen)return nextOpen.key;
+    const live=days.find(day=>day.games.some(g=>g.status==='live'));
+    return live?.key||days[days.length-1].key;
   }
   const seasons=()=>[...new Set(games.filter(g=>g.competition===competition).map(g=>Number(g.season)))].sort((a,b)=>b-a);
   const st=(id,message,tone)=>{
@@ -106,7 +108,8 @@
     const rounds=[...new Set(list.map(g=>Number(g.matchday)))].sort((a,b)=>a-b);
     if(!rounds.length)return 1;
     const currentTime=now(),gameWindow=4*60*60*1000;
-    return rounds.find(r=>list.some(g=>Number(g.matchday)===r&&Date.parse(g.kickoff)+gameWindow>=currentTime))
+    return rounds.find(r=>list.some(g=>Number(g.matchday)===r&&isOpen(g)))
+      ||rounds.find(r=>list.some(g=>Number(g.matchday)===r&&Date.parse(g.kickoff)+gameWindow>=currentTime))
       ||rounds[rounds.length-1];
   }
   const button=(text,action,cls='cam-nfl-action')=>{
@@ -353,7 +356,7 @@
       sides.append(side(g,'home'),drawOption(g),side(g,'away'));
       box.append(sides);
       if(g.status==='final')box.append(el('p',g.home_score+' — '+g.away_score,'cam-nfl-result'));
-      if(editor())box.append(adminGame(g));
+
       target.append(box);
     }
     const save=$('camFootballSave'),saveDay=$('camFootballSaveDay');
@@ -464,64 +467,15 @@
         ()=>{showAll=!showAll;paintRanking();},'cam-nfl-more'));
     }catch(error){if(ticket===rankingRequest){target.replaceChildren(el('p','Ranking no disponible: '+error.message));}}
   }
-  function adminGame(g){
-    const details=el('details',null,'cam-nfl-admin-game');
-    details.append(el('summary','Administrar partido'));
-    const scoreH=el('input'),scoreA=el('input'),reason=el('input');
-    scoreH.type=scoreA.type='number';scoreH.placeholder='Goles local';scoreA.placeholder='Goles visitante';
-    reason.placeholder='Justificación (mínimo 8 caracteres)';
-    const status=el('select');
-    for(const kind of ['final','cancelled']){const op=el('option',kind==='final'?'Finalizado':'Anulado');op.value=kind;status.append(op);}
-    const settle=button('Resolver / corregir',async()=>{
-      try{
-        await run(client().rpc('cam_football_admin_result',{p_game_id:g.id,p_status:status.value,
-          p_home:Number(scoreH.value),p_away:Number(scoreA.value),p_reason:reason.value}));
-        await hydrate();
-      }catch(error){st('camFootballStatus',error.message,'error');}
-    });
-    details.append(el('p','Corrección auditada: se recalculan los puntos, nunca se duplican. El empate paga sus propios puntos.'),
-      status,scoreH,scoreA,reason,settle);
-    return details;
-  }
   function renderAdmin(){
-    const target=$('camFootballAdmin');if(!target)return;
-    target.hidden=!editor();
-    if(target.hidden)return;
-    target.replaceChildren();
-    target.append(el('h3','Administración · Quiniela de Fútbol'));
-    const controls=el('div',null,'cam-nfl-admin-controls');
-    const comp=el('select');
-    for(const option of COMPETITIONS){
-      const op=el('option',option.full);op.value=option.id;op.selected=option.id===competition;comp.append(op);
-    }
-    const sea=el('input'),round=el('input');
-    sea.type=round.type='number';sea.value=String(season);sea.min='2020';
-    round.value=String(matchday);round.min='1';round.max='60';
-    const sync=button('Sincronizar fútbol',async()=>{
-      sync.disabled=true;st('camFootballStatus','Sincronizando calendario, resultados y puntos automáticos…','loading');
-      try{
-        const {data,error}=await client().functions.invoke('cam-football-sync',
-          {body:{action:'sync',competition:comp.value,season:Number(sea.value)}});
-        if(error)throw Error(error.message||'Error de sincronización');
-        if(!data?.ok)throw Error(data?.error||'Sincronización no confirmada');
-        await hydrate();
-        st('camFootballStatus','Sincronizado: '+data.games+' partidos; '+data.frozen+' puntuaciones fijadas automáticamente.'+
-          (data.note?' '+data.note:''),'ok');
-      }catch(e){st('camFootballStatus',e.message,'error');}finally{sync.disabled=false;}
-    });
-    const open=button('Abrir jornada',()=>toggleRound(true));
-    const close=button('Cerrar jornada',()=>toggleRound(false));
-    controls.append(el('label','Competición'),comp,el('label','Temporada'),sea,el('label','Jornada'),round,sync,open,close);
-    target.append(controls,el('p','Los puntos se asignan y fijan automáticamente. Si faltan datos, cada resultado vale 6 puntos. Una jornada cerrada manualmente permanece cerrada.'));
-    async function toggleRound(enabled){
-      try{
-        const count=await run(client().rpc('cam_football_admin_open',{p_competition:comp.value,
-          p_season:Number(sea.value),p_matchday:Number(round.value),p_open:enabled}));
-        await hydrate();st('camFootballStatus',count+' partido(s) actualizados.','ok');
-      }catch(error){st('camFootballStatus',error.message,'error');}
-    }
+    // Football is automatic. No per-game or per-round administration is required.
+    const target=$('camFootballAdmin');
+    if(target){target.hidden=true;target.replaceChildren();}
   }
   function setup(){
+    // Refresh a previously closed snapshot when returning to this tab.
+    window.addEventListener('focus',()=>{if(!root.hidden)hydrate();});
+    document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!root.hidden)hydrate();});
     $('camFootballSave')?.addEventListener('click',()=>persist('round'));
     $('camFootballSaveDay')?.addEventListener('click',()=>persist('day'));
     const tabs=$('camFootballRankingTabs');
@@ -534,16 +488,14 @@
     $('camFootballLogin')?.addEventListener('click',()=>window.openUserAuthModal?.());
     client()?.auth?.onAuthStateChange?.(()=>setTimeout(async()=>{
       const was=user?.id;await loadSession();
-      if(was!==user?.id){await loadMine();recover();if(loaded)paint();}
+      if(was!==user?.id){if(loaded)await hydrate();else{await loadMine();recover();}}
     },150));
     let wasVisible=document.body.classList.contains('ae-is-football');
     const observer=new MutationObserver(()=>{
       const visible=document.body.classList.contains('ae-is-football');
       root.hidden=!visible;
       // Al volver a Fútbol, abrir la jornada vigente; consultar el pasado sigue siendo libre.
-      if(visible&&!wasVisible&&loaded){
-        matchday=chooseRound();dayKey=null;paint();
-      }
+      if(visible&&!wasVisible&&loaded)hydrate();
       wasVisible=visible;
       if(visible&&!loaded&&!loading)hydrate();
     });
