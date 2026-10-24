@@ -47,8 +47,11 @@ const server=http.createServer((req,res)=>{
    const reqs=[],errors=[];
    page.on('request',r=>reqs.push(r.url()));
    page.on('pageerror',e=>errors.push(e.message));
-   await page.route('**/admin-logo.png',route=>route.fulfill({status:200,contentType:'image/png',body:fs.readFileSync('assets/cam-sports-logo-completo.png')}));
-   await page.route('**/*',route=>route.request().url().startsWith(url)?route.continue():route.request().url().endsWith('admin-logo.png')?route.continue():route.abort());
+   await page.route('**/*',route=>{
+     if(route.request().url().endsWith('admin-logo.png'))
+       return route.fulfill({status:200,contentType:'image/png',body:fs.readFileSync('assets/cam-sports-logo-completo.png')});
+     return route.request().url().startsWith(url)?route.continue():route.abort();
+   });
    await page.goto(url+(custom?'/custom':'/normal'),{waitUntil:'load'});
    await page.waitForFunction(()=>document.querySelector('header img')?.dataset.siteImage==='marca.logo-completo');
    const data=await page.evaluate(()=>{
