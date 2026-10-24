@@ -86,7 +86,6 @@
   f('portada.comunidad-multitud', 'Fondo de multitud de la comunidad', 'Portada', 'assets/atmospheres/ae-community-crowd.svg');
   f('portada.laurel', 'Laurel de los Takes destacados', 'Portada', 'assets/ae-community-laurel.svg');
   f('decor.pincel', 'Trazo de pincel de las cabeceras', 'Portada y Takes', 'assets/atmospheres/ae-reference-brush.svg');
-  f('decor.trofeo', 'Trofeo de las cabeceras', 'Portada y Fútbol', 'assets/atmospheres/ae-reference-trophy.svg');
   atlas('portada.banners-comunidad', 'Mosaico de banners de la comunidad', 'Portada', 'assets/ae-community-banner-atlas.webp', [2, 4],
     'Mosaico de 2 columnas (noche, día) × 4 filas (Populares, Impopulares, Top Takes, Top Takes cuestionados). Cada banner también se puede cambiar por separado con su propio lápiz.');
   atlas('portada.lectores-atlas', 'Mosaico de la cabecera de lectores', 'Portada', 'assets/ae-readers-community-atlas.webp', [1, 2],
