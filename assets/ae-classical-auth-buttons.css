@@ -2778,3 +2778,16 @@ html:not(.dark) body #userAuthModal .cam-auth-story{
     background-size:cover,cover!important;
   }
 }
+
+/* CAM SPORTS · Mobile-only first-visit performance: retain the SAME artwork,
+   overlay and crop, but use the already approved 960px rendition at every DPR.
+   Desktop keeps the original 1600px high-density option. Paired with the
+   preload selector in cam-welcome-home-entry.js to prevent duplicate downloads. */
+@media(max-width:760px){
+  html body #camWelcomeDialog .cam-welcome-frame{
+    background-image:linear-gradient(180deg,rgba(3,15,25,.10) 0%,rgba(4,16,27,.34) 24%,rgba(6,19,28,.40) 70%,rgba(3,13,20,.30) 100%),url('cam-welcome-noche-oleo-960.webp')!important;
+  }
+  html:not(.dark) body #camWelcomeDialog .cam-welcome-frame{
+    background-image:linear-gradient(180deg,rgba(255,245,222,.22) 0%,rgba(255,248,229,.50) 24%,rgba(252,238,209,.36) 68%,rgba(244,221,183,.12) 100%),url('cam-welcome-dia-oleo-960.webp')!important;
+  }
+}
