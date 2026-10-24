@@ -91,7 +91,6 @@ const inspect=()=>({
        document.body.appendChild(nav);
     });
     const newFinal=await after.evaluate(inspect);
-    console.log('DEBUG '+width+' '+theme+' '+JSON.stringify({oldStart,newStart,oldFinal,newFinal}));
     assert.equal(newStart.header,oldFinal.header,'New first-paint header height equals previously settled height');
     assert.equal(newStart.top,oldFinal.top,'Main starts in settled position, no vertical jump');
     assert.deepEqual(newFinal.visible,oldFinal.visible,'Visible navigation options unchanged after placement');
@@ -104,7 +103,8 @@ const inspect=()=>({
        'px -> final '+oldFinal.header+'px; optimized from first frame '+newStart.header+'px, same 4 visible sports');
     await context.close();
   }
-  const context=await browser.newContext({viewport:{width:390,height:844}});
+  // Optional sports intentionally never appear in the four-tab phone dock; test the editable desktop navigation.
+  const context=await browser.newContext({viewport:{width:1366,height:844}});
   const enabled=await context.newPage();
   await enabled.route('**/*',route=>route.request().url().startsWith(origin)?route.continue():route.abort());
   await enabled.goto(origin+'/enabled',{waitUntil:'load'});
