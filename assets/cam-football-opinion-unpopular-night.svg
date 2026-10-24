@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="240" viewBox="0 0 1200 240">
+ <title>Fútbol · Opiniones impopulares · noche</title>
+ <rect width="1200" height="240" fill="#332634"/>
+ <path d="M720 0h480v240H720q68-120 0-240Z" fill="#532E3C" opacity=".75"/>
+ <g fill="none" stroke="#CAA16F" stroke-width="2.5" opacity=".34">
+ <path d="M748-35q-100 125-7 310M783-35q-80 125 0 310M1160-25q-75 130 25 290"/>
+ </g>
+ <g transform="translate(1050 120)" stroke="#E4D8C7" stroke-width="3.5" fill="none">
+ <circle r="76" stroke="#CAA16F" stroke-width="5"/>
+ <path d="M0-25 24-8 16 19h-32l-8-27Z" fill="#CAA16F" opacity=".65"/>
+ <path d="M0-25 0-56M24-8l32-11M16 19l22 28M-16 19l-22 28M-24-8l-32-11"/>
+ </g>
+ <g transform="translate(925 170) rotate(180)"><path d="M29 96H11c-7 0-11-5-11-12V45c0-7 4-12 11-12h18Zm17 0h41c11 0 17-5 20-15l8-34c3-12-4-19-17-19H75l5-20C83-4 67-8 60 1L33 35v55c0 4 4 6 13 6Z" fill="#CAA16F" stroke="#E4D8C7" stroke-width="3" stroke-linejoin="round"/></g>
+ <circle cx="777" cy="30" r="4" fill="#CAA16F" opacity=".62"/>
+ </svg>
