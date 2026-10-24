@@ -20,7 +20,8 @@ assert.match(opinions, /sportsHeading\.dataset\.camOpinionsBanner\s*=\s*'sports'
 assert.match(opinions, /window\.camOpinionsBanners\?\.refresh\(\)/,
   'El render dinámico debe refrescar el banner');
 
-assert.match(index, /cam-opinions-section-banners\.css/);
+assert.match(index, /cam-perf-home-components\.css/, 'El banner de Opiniones se carga ahora desde el CSS optimizado');
+assert.match(readFileSync(new URL('../assets/cam-perf-home-components.css', import.meta.url), 'utf8'), /cam-opinions-section-banners/, 'El pack debe conservar las reglas originales del banner');
 assert.match(index, /cam-opinions-section-banners\.js/);
 for (const name of ['distinguished','debated','sports']) {
   assert.match(manager, new RegExp('\\b' + name + ':'), 'Falta la sección ' + name);

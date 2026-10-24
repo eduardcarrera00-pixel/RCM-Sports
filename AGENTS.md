@@ -11,6 +11,21 @@ After changing any listed stylesheet, run `node scripts/build-editorial-css.mjs`
 
 Run `npm run test:editor` when changing news editing or publication. Preserve the textarea fallback and the existing HTML of unchanged articles.
 
+
+## CSS request consolidation (2026-10-24)
+
+Four compiled CSS packs replace 57 adjacent standalone stylesheet links while
+preserving their exact original ordering and the existing inline-style boundaries:
+`assets/cam-perf-core-extras.css`, `assets/cam-perf-home-components.css`,
+`assets/cam-perf-rankings.css` and `assets/cam-perf-picks-mobile.css`.
+
+**Edit the original component CSS**, never the generated packs. The definitive
+source list is `assets/performance-css-packs.json`. After editing any included CSS
+source, run `npm run build:css-packs` and commit the updated pack alongside it.
+`npm run build:css` also regenerates these packs. CI verifies freshness and
+cascade grouping with `npm run test:performance`. Never append a bundled source
+as another stylesheet link, and never move a pack across inline `<style>` blocks.
+
 ## Public address and publication
 
 The free branded public address is https://camsports.github.io/.
