@@ -27,6 +27,7 @@ insert into cam_football_picks(game_id,user_id,pick,awarded_points,settled_at)
 `);
 const legacy = (await db.query("select to_jsonb(g) game,(select jsonb_agg(p) from cam_football_picks p) picks from cam_football_games g where id='900000001'")).rows;
 await db.exec(migration);
+await db.exec(fs.readFileSync("supabase/migrations/20261024173013_cam_football_espn_odds.sql","utf8"));
 assert.deepEqual((await db.query("select to_jsonb(g) game,(select jsonb_agg(p) from cam_football_picks p) picks from cam_football_games g where id='900000001'")).rows,legacy,'Migration preserves history exactly');
 await db.exec(`grant all on all tables in schema public to service_role; grant all on all sequences in schema public to service_role;
 insert into cam_football_games(id,competition,season,matchday,home_id,away_id,kickoff,opening_mode)
@@ -81,7 +82,11 @@ const leaders=(await db.query("select * from cam_football_leaderboard('matchday'
 assert.equal(Number(leaders[0].points),6);assert.equal(Number(leaders[0].hits),1);
 const profile=(await db.query("select * from cam_football_profile_summary('00000000-0000-0000-0000-000000000002',2026)")).rows[0];
 assert.equal(Number(profile.points),6);
+await role('service_role');
+assert.equal(await freeze('900000008'),true);
+assert.equal(await freeze('900000008',",-200,300,500,'ESPN: DraftKings'"),true,'Unvoted provisional equal scores gain real probabilities');
+assert.equal(await freeze('900000008',",100,200,300,'ESPN: DraftKings'"),false,'Real scores remain fixed');
 await role('postgres');
-await assert.rejects(()=>db.query("update cam_football_games set picks_open=true where id='900000008'"),/check constraint/);
+await assert.rejects(()=>db.query("update cam_football_games set picks_open=true where id='900000006'"),/check constraint/);
 console.log('PASS: football scoring, normalization, equal fallback, immutable snapshots, auth, closure, existing history, 1X2 settlement/idempotency, leaderboard and profile.');
 await db.close();

@@ -129,6 +129,20 @@ function mondayOf(iso: string) {
   return base - (days[get("weekday")] ?? 0) * 24 * 3600 * 1000;
 }
 
+// ESPN already supplies the three moneylines alongside the official fixture.
+function espnMarket(event: any) {
+  for (const book of event.competitions?.[0]?.odds || []) {
+    if (!book || typeof book !== "object") continue;
+    const prices = ["home", "draw", "away"].map(side => {
+      const line = book.moneyline?.[side];
+      return number(line?.close?.odds ?? line?.open?.odds ?? book[side === "draw" ? "drawOdds" : side + "TeamOdds"]?.moneyLine);
+    });
+    if (prices.every(validOdd)) return {p_home:prices[0],p_draw:prices[1],p_away:prices[2],
+      p_source:"ESPN: " + (book.provider?.name || "1X2")};
+  }
+  return null;
+}
+
 async function syncCompetition(key: string, requestedSeason: number | null) {
   const config = COMPETITIONS[key];
   const today = new Date();
@@ -138,6 +152,7 @@ async function syncCompetition(key: string, requestedSeason: number | null) {
   }
   const teams = new Map<string, any>();
   const fixtures: any[] = [];
+  const markets = new Map<string, any>();
   let season: number | null = requestedSeason;
   let unavailable = 0;
 
@@ -171,6 +186,8 @@ async function syncCompetition(key: string, requestedSeason: number | null) {
           updated_at: new Date().toISOString(),
         });
       }
+      const offer = espnMarket(event);
+      if(offer) markets.set(id, offer);
       const status = statusOf(event, home, away);
       const hs = number(home.score), as = number(away.score);
       const closed = status === "final";
@@ -217,6 +234,10 @@ async function syncCompetition(key: string, requestedSeason: number | null) {
     if (row.status !== "scheduled") (row as any).picks_open = false;
     const saved = await db.from("cam_football_games").upsert(row, { onConflict: "id" });
     if (saved.error) throw saved.error;
+    if(row.status === "scheduled" && Date.parse(row.kickoff) > Date.now() && markets.has(row.id)) {
+      const scored = await db.rpc("cam_football_freeze_points", {p_game_id:row.id,...markets.get(row.id)});
+      if(scored.error) throw scored.error;
+    }
     updated++;
   }
   return { competition: key, games: fixtures.length, updated, season, note: "" };

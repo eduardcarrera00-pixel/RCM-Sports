@@ -27,8 +27,8 @@ function setup({key='',response=market,fail=false,games=[{...base,id:'900000001'
    fetch:async url=>{requests.push(url);if(fail)throw Error('Provider offline');return {ok:true,json:async()=>response}},
    Date,Intl,Map,Set,URL,URLSearchParams,AbortController,Response,setTimeout,clearTimeout,
    console:{warn(){},error(){}}});
- vm.runInContext(source+'\nglobalThis.freeze=freezeOdds;',context);
- return {run:()=>context.freeze(['laliga']),calls,requests,tables,handler};
+ vm.runInContext(source+'\nglobalThis.freeze=freezeOdds;globalThis.espnPrice=espnMarket;',context);
+ return {espn:input=>context.espnPrice(input),run:()=>context.freeze(['laliga']),calls,requests,tables,handler};
 }
 for(const options of [{},{key:'test',fail:true},{key:'test',response:{error:'quota'}},{key:'test',response:[]}]){
  const test=setup(options),result=await test.run();
@@ -48,3 +48,9 @@ const empty=setup({key:'test',games:[]});await empty.run();assert.equal(empty.re
 const unauthorized=setup();const denial=await unauthorized.handler(new Request('https://example.test',{method:'POST',body:'{}'}));
 assert.equal(denial.status,401);assert.equal(unauthorized.calls.length,0,'Public caller cannot synchronize');
 console.log('PASS: automatic sync with real 1X2 markets, missing key, provider failure, malformed/missing/ambiguous markets, retries, request budget and authentication.');
+
+const price=setup().espn({competitions:[{odds:[{provider:{name:'DraftKings'},moneyline:{home:{close:{odds:'-200'}},draw:{close:{odds:'+300'}},away:{close:{odds:'+500'}}}}]}]});
+assert.equal(price.p_home,-200);assert.equal(price.p_draw,300);assert.equal(price.p_away,500);
+assert.equal(setup().espn({competitions:[{odds:[{homeTeamOdds:{moneyLine:-200}}]}]}),null);
+
+assert.equal(setup().espn({competitions:[{odds:[null]}]}),null);
