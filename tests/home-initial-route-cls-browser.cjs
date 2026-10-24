@@ -52,9 +52,9 @@ const rect=async page=>page.evaluate(()=>{
     await page.route('**/*',route=>route.request().url().startsWith(base)?route.continue():route.abort());
     await page.addInitScript(theme=>localStorage.setItem('rcm_sports_theme',theme?'dark':'light'),dark);
    }
-   await first.goto(base+'/original',{waitUntil:'load'});
-   await stable.goto(base+'/optimized',{waitUntil:'load'});
-   await Promise.all([first.evaluate(()=>document.fonts.ready),stable.evaluate(()=>document.fonts.ready)]);
+   await first.goto(base+'/original',{waitUntil:'domcontentloaded',timeout:20000});
+   await stable.goto(base+'/optimized',{waitUntil:'domcontentloaded',timeout:20000});
+   await Promise.all([first.waitForTimeout(250),stable.waitForTimeout(250)]);
    const baseline=await rect(first),initial=await rect(stable);
    assert.equal(baseline.home,false,'Old Home view lacks route class before JS');
    assert.equal(initial.home,true,'New Home view has route class immediately');
