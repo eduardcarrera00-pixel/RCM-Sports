@@ -110,7 +110,7 @@
   }
   window.aeOpenNewsArchive=openArchive;
   window.aeRefreshNewsArchive=()=>{if(modal()?.open)render();};
-  document.addEventListener('DOMContentLoaded',()=>{
+  function init(){
     mobile.addEventListener('change',()=>{if(modal()?.open)updateArchivePresentation();});
     document.addEventListener('click',event=>{
       const trigger=event.target.closest('[data-ae-news-category]');
@@ -145,5 +145,8 @@
       }
       opener?.focus?.({preventScroll:true});
     });
-  });
+  }
+  // The first archive interaction can happen after DOMContentLoaded.
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});
+  else init();
 })();
