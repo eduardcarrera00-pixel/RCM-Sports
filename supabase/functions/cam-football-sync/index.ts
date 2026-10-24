@@ -1,7 +1,7 @@
 // CAM SPORTS · Sincronización de la Quiniela de Fútbol.
 // Calendario y resultados oficiales de ESPN (LaLiga, Premier, Liga MX, Champions)
 // y cuotas 1X2 de The Odds API. Solo administradores verificados o el secreto del cron.
-// Nunca se inventan partidos, escudos ni probabilidades: lo que no se confirma, no entra.
+// Nunca se inventan partidos, escudos ni probabilidades. Sin mercado: 6 puntos por opción.
 import { createClient } from "npm:@supabase/supabase-js@2.57.0";
 
 const URL_ = Deno.env.get("SUPABASE_URL") || "";
@@ -32,8 +32,6 @@ const safe = (s: unknown) => String(s ?? "").normalize("NFKD").replace(/[̀-ͯ]/
 const number = (n: unknown) => n !== null && n !== undefined && typeof n !== "boolean"
   && String(n).trim() !== "" && Number.isFinite(Number(n)) ? Number(n) : null;
 const validOdd = (n: unknown) => Number.isInteger(n) && Math.abs(Number(n)) >= 100 && Math.abs(Number(n)) < 100000;
-const implied = (odd: number) => odd > 0 ? 100 / (odd + 100) : -odd / (-odd + 100);
-const points = (p: number) => Math.max(2, Math.min(12, Math.round(2 / p)));
 const compare = (a: string, b: string) => {
   if (!a || !b || a.length !== b.length) return false;
   let v = 0;
@@ -236,70 +234,64 @@ function sameTeam(a: string, b: string) {
   return shared.length > 0;
 }
 
-async function freezeOdds(keys: string[]) {
-  if (!oddsKey) return { provider: "Sin THE_ODDS_API_KEY", frozen: 0, note: "Sin clave de cuotas: los partidos quedan cerrados hasta que un administrador las introduzca." };
-  let frozen = 0;
-  for (const key of keys) {
-    const config = COMPETITIONS[key];
-    const params = new URLSearchParams({ apiKey: oddsKey, markets: "h2h", regions: "eu,us", oddsFormat: "american" });
-    let market: any[] = [];
-    try {
-      market = await readJSON("https://api.the-odds-api.com/v4/sports/" + config.odds + "/odds/?" + params);
-    } catch (error) { console.warn("The Odds API no disponible", config.odds, String(error)); continue; }
-    if (!Array.isArray(market)) continue;
-    const games = await db.from("cam_football_games")
-      .select("id,home_id,away_id,kickoff,opening_mode")
-      .eq("competition", key).eq("status", "scheduled").is("odds_locked_at", null)
-      .gt("kickoff", new Date().toISOString()).limit(200);
-    if (games.error) throw games.error;
-    if (!games.data?.length) continue;
-    const squad = await db.from("cam_football_teams").select("id,name,short_name");
-    if (squad.error) throw squad.error;
-    const names = new Map((squad.data || []).map((t: any) => [t.id, [t.name, t.short_name]]));
-    for (const game of games.data) {
-      const [homeName] = names.get(game.home_id) || [];
-      const [awayName] = names.get(game.away_id) || [];
-      if (!homeName || !awayName) continue;
-      const candidates = market.filter((o: any) =>
-        Math.abs(Date.parse(o.commence_time) - Date.parse(game.kickoff)) < 12 * 3600000
-        && sameTeam(o.home_team, homeName) && sameTeam(o.away_team, awayName));
-      if (candidates.length !== 1) continue;   // Ambiguo o ausente: no se congela.
-      const match = candidates[0];
-      const price = (outcomes: any[], label: string) =>
-        outcomes.find((o: any) => label === "draw" ? safe(o.name) === "draw" || safe(o.name) === "empate"
-          : sameTeam(o.name, label === "home" ? match.home_team : match.away_team))?.price;
-      const bookmaker = (match.bookmakers || []).find((book: any) => (book.markets || []).some((m: any) =>
-        m.key === "h2h" && m.outcomes?.length === 3
-        && validOdd(price(m.outcomes, "home")) && validOdd(price(m.outcomes, "draw")) && validOdd(price(m.outcomes, "away"))));
-      if (!bookmaker) continue;
-      const outcomes = bookmaker.markets.find((m: any) => m.key === "h2h").outcomes;
-      const ho = price(outcomes, "home"), dr = price(outcomes, "draw"), ao = price(outcomes, "away");
-      const rawH = implied(ho), rawD = implied(dr), rawA = implied(ao);
-      const total = rawH + rawD + rawA;
-      const h = Math.round(rawH / total * 1e6) / 1e6;
-      const d = Math.round(rawD / total * 1e6) / 1e6;
-      const a = Math.round((1 - h - d) * 1e6) / 1e6;
-      if (!(h > 0 && d > 0 && a > 0)) continue;
-      const save = await db.from("cam_football_games").update({
-        odds_home: ho, odds_draw: dr, odds_away: ao,
-        probability_home: h, probability_draw: d, probability_away: a,
-        points_home: points(h), points_draw: points(d), points_away: points(a),
-        odds_source: "The Odds API: " + bookmaker.key,
-        odds_locked_at: new Date().toISOString(),
-        picks_open: game.opening_mode !== "closed",
-      }).eq("id", game.id).is("odds_locked_at", null).eq("status", "scheduled")
-        .gt("kickoff", new Date().toISOString()).select("id");
-      if (save.error) throw save.error;
-      if (save.data?.length) {
-        frozen++;
-        await db.from("cam_football_audit").insert({
-          game_id: game.id, action: "freeze_odds_auto",
-          detail: { provider: "The Odds API", bookmaker: bookmaker.key, home: ho, draw: dr, away: ao },
-        });
-      }
+// Only an unambiguous, complete 1X2 market can determine a scoring snapshot.
+// Outcome names must match the provider event exactly (City and United differ).
+function marketForGame(game: any, names: Map<string, string[]>, market: any[]) {
+  const [homeName] = names.get(game.home_id) || [];
+  const [awayName] = names.get(game.away_id) || [];
+  if (!homeName || !awayName) return null;
+  const candidates = market.filter((o: any) =>
+    Math.abs(Date.parse(o.commence_time) - Date.parse(game.kickoff)) < 12 * 3600000
+    && sameTeam(o.home_team, homeName) && sameTeam(o.away_team, awayName));
+  if (candidates.length !== 1) return null;
+  const match = candidates[0];
+  for (const book of match.bookmakers || []) {
+    for (const offer of book.markets || []) {
+      if (offer.key !== "h2h" || !Array.isArray(offer.outcomes) || offer.outcomes.length !== 3) continue;
+      const home = offer.outcomes.filter((o: any) => safe(o.name) === safe(match.home_team));
+      const away = offer.outcomes.filter((o: any) => safe(o.name) === safe(match.away_team));
+      const draw = offer.outcomes.filter((o: any) => ["draw", "empate"].includes(safe(o.name)));
+      if (home.length !== 1 || away.length !== 1 || draw.length !== 1) continue;
+      const h = home[0].price, d = draw[0].price, a = away[0].price;
+      if (!validOdd(h) || !validOdd(d) || !validOdd(a)) continue;
+      return { p_home: h, p_draw: d, p_away: a, p_source: "The Odds API: " + book.key };
     }
   }
-  return { provider: "The Odds API", frozen, note: "" };
+  return null;
+}
+
+async function freezeOdds(keys: string[]) {
+  let frozen = 0, fallback = 0;
+  for (const key of keys) {
+    // Avoid paid provider requests when there is nothing left to score.
+    const games = await db.from("cam_football_games")
+      .select("id,home_id,away_id,kickoff")
+      .eq("competition", key).eq("status", "scheduled").is("odds_locked_at", null)
+      .gt("kickoff", new Date().toISOString()).order("kickoff").limit(200);
+    if (games.error) throw games.error;
+    if (!games.data?.length) continue;
+    let market: any[] = [];
+    if (oddsKey) {
+      const params = new URLSearchParams({ apiKey: oddsKey, markets: "h2h", regions: "eu,us", oddsFormat: "american" });
+      try {
+        const response = await readJSON("https://api.the-odds-api.com/v4/sports/" + COMPETITIONS[key].odds + "/odds/?" + params);
+        if (Array.isArray(response)) market = response;
+      } catch (error) { console.warn("The Odds API no disponible; se aplicarán puntos base", key, String(error)); }
+    }
+    const squad = market.length ? await db.from("cam_football_teams").select("id,name,short_name") : { data: [] };
+    // A missing team lookup must not force admins to enter odds.
+    const names = new Map<string, string[]>((squad.data || []).map((t: any) => [t.id, [t.name, t.short_name]]));
+    for (const game of games.data) {
+      const offer = marketForGame(game, names, market);
+      // PostgreSQL normalizes probabilities, applies the shared NFL scale and
+      // opens the match atomically. Missing data uses equal points, NULL odds.
+      const save = await db.rpc("cam_football_freeze_points", { p_game_id: game.id, ...(offer || {}) });
+      if (save.error) throw save.error;
+      if (save.data === true) { frozen++; if (!offer) fallback++; }
+    }
+  }
+  return { provider: "automatic", frozen, fallback,
+    note: fallback ? fallback + " partido(s) con puntuación base automática de 6 puntos por resultado." : "" };
 }
 
 Deno.serve(async req => {

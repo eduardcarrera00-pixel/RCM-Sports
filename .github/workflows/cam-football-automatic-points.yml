@@ -1,0 +1,34 @@
+name: CAM SPORTS football automatic points
+on:
+  pull_request:
+    paths:
+      - 'assets/cam-football-quiniela.js'
+      - 'assets/cam-sport-quiniela-loader.js'
+      - 'supabase/functions/cam-football-sync/**'
+      - 'supabase/migrations/*cam_football*'
+      - 'tests/football-automatic-*'
+      - '.github/workflows/cam-football-automatic-points.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'assets/cam-football-quiniela.js'
+      - 'supabase/functions/cam-football-sync/**'
+      - 'supabase/migrations/*cam_football*'
+      - 'tests/football-automatic-*'
+      - '.github/workflows/cam-football-automatic-points.yml'
+permissions:
+  contents: read
+jobs:
+  football-points:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:football:points
+      - run: node tests/nfl-quiniela-browser.cjs && npm run test:perf:sports
