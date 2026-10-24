@@ -714,8 +714,14 @@ async function loadSettleHistory(){
  const failure=error=>{if(current())area.replaceChildren(el('p','No pudimos cargar el historial. '+message(error),'ae-pick-history-empty'));};
  area.setAttribute('aria-busy','true');
  try{
+ // Apply the 40-card limit AFTER filtering on the server: future active Picks
+ // must not displace approved, resolved Picks from the public history.
+ // Overdue Picks awaiting an official result remain in the same history.
  const r=await db.from('ae_pick_feed').select('id,title,author,event_date,american_odds,outcome,settled_at,result_points,legs')
-    .eq('moderation_status','approved').in('outcome',['pending','won','lost','void']).order('event_date',{ascending:false}).order('created_at',{ascending:false}).limit(200);
+    .eq('moderation_status','approved')
+    .or('outcome.in.(won,lost,void),and(outcome.eq.pending,event_date.lte.'+todayToronto()+')')
+    .order('event_date',{ascending:false,nullsFirst:false})
+    .order('created_at',{ascending:false}).order('id',{ascending:false}).limit(40);
  if(!current())return;
  if(r.error){failure(r.error);return;}
  const seen=new Set();

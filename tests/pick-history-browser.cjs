@@ -29,9 +29,9 @@ const server=http.createServer((req,res)=>{
   let requests=0;
   window.db={auth:{getUser:async()=>({data:{user:null}}),onAuthStateChange(){}},rpc:async()=>({data:[],error:null}),from(table){
    const filters={};
-   const q={select(){return q;},order(){return q;},limit(){return q;},range(){return q;},or(){return q;},eq(k,v){filters[k]=v;return q;},in(k,v){filters[k]=v;return q;},gte(){return q;},lte(){return q;},gt(){return q;},lt(){return q;},
+   const q={select(){return q;},order(){return q;},limit(){return q;},range(){return q;},or(expression){filters.history=expression;return q;},eq(k,v){filters[k]=v;return q;},in(k,v){filters[k]=v;return q;},gte(){return q;},lte(){return q;},gt(){return q;},lt(){return q;},
     async then(resolve,reject){
-     const history=table==='ae_pick_feed'&&Array.isArray(filters.outcome)&&filters.outcome.includes('void');
+     const history=table==='ae_pick_feed'&&typeof filters.history==='string'&&filters.history.includes('outcome.in.(won,lost,void)');
      if(history)await new Promise(r=>setTimeout(r,(++requests%4)*15));
      const data=table==='ae_pick_feed'?(history?settled:filters.outcome==='pending'?[{...pick,id:'00000000-0000-0000-0000-000000000002',outcome:'pending',settled_at:null,result_points:0}]:[pick]):[];
      return Promise.resolve({data,error:null}).then(resolve,reject);
