@@ -311,8 +311,7 @@ html.dark body aside .editorial-trending.rcm-panel>.ae-section-heading{
 }
 html body aside .editorial-trending.rcm-panel>.ae-section-heading,
 html.dark body aside .editorial-trending.rcm-panel>.ae-section-heading{
-  background-image:linear-gradient(90deg,rgba(4,30,44,.97),rgba(3,32,46,.85) 55%,rgba(4,29,43,.41)),
-    url('atmospheres/ae-reference-trophy.svg')!important;
+  background-image:linear-gradient(90deg,rgba(4,30,44,.97),rgba(3,32,46,.85) 55%,rgba(4,29,43,.41))!important;
 }
 html body aside .editorial-community.rcm-panel>.ae-section-heading h2,
 html body aside .editorial-trending.rcm-panel>.ae-section-heading h2,
@@ -553,8 +552,7 @@ html:not(.dark) body aside .editorial-community.rcm-panel>.ae-section-heading{
 }
 html:not(.dark) body aside .editorial-trending.rcm-panel>.ae-section-heading{
   background-color:#fffdf8!important;
-  background-image:linear-gradient(100deg,rgba(255,253,248,.98),rgba(255,252,247,.88) 50%,rgba(255,249,241,.25)),
-    url('atmospheres/ae-reference-trophy.svg')!important;
+  background-image:linear-gradient(100deg,rgba(255,253,248,.98),rgba(255,252,247,.88) 50%,rgba(255,249,241,.25))!important;
   border-bottom-color:#d9c4ad!important;
 }
 html:not(.dark) body #aeHomeTopTakes .ae-top-takes-card-head h3,
