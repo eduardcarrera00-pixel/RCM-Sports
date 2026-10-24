@@ -24,7 +24,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Font Awesome Icons & Google Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@300;400;500;600;700;800;900&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600;6..72,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@300;400;500;600;700;800;900&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600;6..72,700&family=Libre+Baskerville:wght@400;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
 
     <style>
         body {
@@ -3336,6 +3336,9 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
                 <span>CAM SPORTS · FÚTBOL</span>
                 <h2 id="camFootballTitle">LA QUINIELA DE FÚTBOL</h2>
                 <p><strong>Cada jornada es una oportunidad para demostrar cuánto sabes.</strong> LaLiga, Premier, Liga MX y Champions: elige local, empate o visitante y cuanto más difícil sea el acierto, más puntos sumas.</p>
+                <!-- Arte decorativo independiente del texto: editable por tema desde Modo Edición. -->
+                <img class="cam-football-quiniela-illustration cam-football-quiniela-illustration--day" src="assets/cam-football-quiniela-day.svg" alt="" aria-hidden="true" width="300" height="240" loading="lazy" decoding="async">
+                <img class="cam-football-quiniela-illustration cam-football-quiniela-illustration--night" src="assets/cam-football-quiniela-night.svg" alt="" aria-hidden="true" width="300" height="240" loading="lazy" decoding="async">
               </header>
               <div id="camFootballNav" class="cam-nfl-nav" aria-label="Competición, temporada y jornada"></div>
               <p id="camFootballRoundInfo" class="cam-nfl-status" aria-live="polite"></p>
@@ -6383,6 +6386,86 @@ button.cam-quiniela-team:focus-visible{outline:var(--ds-focus-width,3px) solid v
   html body :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-draw small{border-radius:var(--ds-radius-pill,999px)!important}
   html body #camFootballQuiniela :is(#camFootballStatus,#camFootballRoundInfo):not(:empty){
     border-radius:var(--ds-radius,14px)!important;
+  }
+}
+
+/* CAM SPORTS · La Quiniela de Fútbol · cabecera con ilustración a la derecha.
+   Sólo modifica el banner; los partidos, la navegación y NFL no cambian. */
+#camFootballQuiniela .cam-nfl-top{
+  background:#073B83;
+  background-image:linear-gradient(112deg,#073B83 0%,#073B83 65%,#0A3268 100%);
+  border-radius:var(--ds-radius-banner,20px);
+  isolation:isolate;
+}
+html.dark #camFootballQuiniela .cam-nfl-top{
+  background:#0A3268;
+  background-image:linear-gradient(112deg,#0A3268 0%,#073B83 100%);
+}
+#camFootballQuiniela .cam-nfl-heading{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+  box-sizing:border-box;
+  min-height:194px;
+  padding-right:clamp(168px,27vw,280px);
+  margin:0;
+  text-align:left;
+}
+#camFootballQuiniela .cam-nfl-heading>span{
+  color:#F3EBDD;
+  text-align:left;
+}
+#camFootballQuiniela .cam-nfl-heading h2{
+  font-family:"Playfair Display",Georgia,serif;
+  font-weight:600;
+  color:#FFFFFF;
+  text-align:left;
+  max-width:100%;
+}
+#camFootballQuiniela .cam-nfl-heading p{
+  font-family:"Libre Baskerville",Georgia,serif;
+  font-size:12.5px;
+  line-height:1.55;
+  color:#FFFFFF;
+  max-width:55ch;
+  text-align:left;
+}
+#camFootballQuiniela .cam-nfl-heading p strong{color:#FFFFFF}
+#camFootballQuiniela .cam-football-quiniela-illustration{
+  position:absolute;
+  z-index:0;
+  top:50%;
+  right:0;
+  width:clamp(152px,23vw,255px);
+  max-width:38%;
+  height:calc(100% - 12px);
+  object-fit:contain;
+  object-position:center right;
+  transform:translateY(-50%);
+  pointer-events:none;
+  user-select:none;
+}
+#camFootballQuiniela .cam-football-quiniela-illustration--night{display:none}
+html.dark #camFootballQuiniela .cam-football-quiniela-illustration--day{display:none}
+html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{display:block}
+@media(max-width:620px){
+  #camFootballQuiniela .cam-nfl-top{padding:17px 14px 15px}
+  #camFootballQuiniela .cam-nfl-heading{
+    min-height:215px;
+    padding-right:clamp(108px,33vw,162px);
+  }
+  #camFootballQuiniela .cam-nfl-heading h2{
+    font-size:clamp(20px,5.4vw,27px);
+    line-height:1.15;
+  }
+  #camFootballQuiniela .cam-nfl-heading p{font-size:11px;line-height:1.52}
+  #camFootballQuiniela .cam-football-quiniela-illustration{
+    width:clamp(110px,32vw,162px);
+    max-width:40%;
+    right:0;
+    height:min(195px,90%);
   }
 }
 </style>
