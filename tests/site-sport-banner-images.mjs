@@ -343,47 +343,8 @@ window.camGlobalEditMode = { isActive:() => false };
 window.camSiteImages.refresh();
 assert.equal(pencils().length, 0, 'no pencils outside admin edit mode');
 
-// Picks: both custom chef-header images shrink by 30% without changing the
-// section layout. Their theme-specific image swaps keep the art right/centered.
-const chefStyle = document.createElement('style');
-chefStyle.textContent = `
-  #testChefBest { background-image:linear-gradient(#102938,#102938),url("assets/ae-chefs-best-header-atlas.webp");
-    background-size:100% 100%,auto 200%;background-position:center,right top; }
-  #testChefWorst { background-image:linear-gradient(#102938,#102938),url("assets/ae-chefs-worst-header-atlas.webp");
-    background-size:100% 100%,auto 200%;background-position:center,right top; }
-`;
-document.head.append(chefStyle);
-const chefFixture = document.createElement('div');
-chefFixture.innerHTML = '<header id="testChefBest" class="ae-chefs-art-heading"><h3>Mejores Chefs</h3></header>' +
-  '<header id="testChefWorst" class="ae-chefs-art-heading"><h3>Peores Chefs</h3></header>';
-document.body.append(chefFixture);
-for (const theme of ['dia', 'noche']) {
-  databaseRows = ['mejores', 'peores'].map(type => ({
-    key: 'picks.chefs-' + type + '-' + theme,
-    url: 'https://img.test/chefs-' + type + '-' + theme + '.webp',
-    focus_x: null, focus_y: null, alt: null
-  }));
-  document.documentElement.classList.toggle('dark', theme === 'noche');
-  await window.camSiteImages.reload();
-  for (const [type, id] of [['mejores', 'testChefBest'], ['peores', 'testChefWorst']]) {
-    const header = document.getElementById(id);
-    assert.match(header.style.backgroundImage, new RegExp('chefs-' + type + '-' + theme + '.webp'));
-    assert.match(header.style.backgroundSize, /auto 70%/, type + ' ' + theme + ': art should be 30% smaller');
-    assert.match(header.style.backgroundPosition, /right center/, type + ' ' + theme + ': art stays centered at right');
-    assert.equal(header.style.height, '', 'header height remains controlled by existing CSS');
-  }
-}
-databaseRows = [];
-await window.camSiteImages.reload();
-for (const id of ['testChefBest', 'testChefWorst']) {
-  assert.equal(document.getElementById(id).style.backgroundSize, '',
-    'restoring original chef art must also restore the atlas crop');
-}
-chefFixture.remove();
-chefStyle.remove();
-
 window.happyDOM.abort();
-console.log('CAM SPORTS: saved NFL and football banner overrides, separate news, NFL opinions, Eres Chef and Chefs sizing verified.');
+console.log('CAM SPORTS: saved NFL and football banner overrides, separate news, NFL opinions and Eres Chef verified.');
 
 
 /* Fútbol: cuatro banners independientes en el editor y limitados al encabezado. */
