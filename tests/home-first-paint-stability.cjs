@@ -5,7 +5,8 @@ const http=require('node:http');
 const path=require('node:path');
 const {chromium}=require('playwright');
 const source=fs.readFileSync('index.html','utf8');
-assert.match(source,/<body class="cam-first-feed-pending /,'Home must declare initial state before paint');
+assert.doesNotMatch(source,/<body class="cam-first-feed-pending /,'Phone body must not enter desktop loading mode');
+assert.match(source,/<script id="cam-desktop-first-paint-init">[\\s\\S]*?matchMedia\\('\\(min-width:980px\\)'\\)/,'Initialize desktop loading styles before visible nodes');
 assert.match(source,/@media\(min-width:980px\)\s*\{[\s\S]*?#heroSection/,'Desktop cover reservation must be media-scoped');
 assert.match(source,/height:clamp\(205px,17vw,235px\)/,'Use the exact existing hero height, not a new design');
 assert.match(source,/await Promise\.allSettled\(\[[\s\S]*?loadArticlesFromStorage\(\)[\s\S]*?document\.body\.classList\.remove\('cam-first-feed-pending'\)/,'Remove placeholder state only after loading data');
@@ -49,13 +50,12 @@ const server=http.createServer((req,res)=>{
     ready:document.readyState,
     bottomNav:Boolean(document.querySelector('body > nav.cam-mobile-bottom-nav'))
    }));
-   assert.ok(summary.samples.length,'Capture loading state on '+mode+' '+theme);
    if(mode==='desktop'){
+    assert.ok(summary.samples.length,'Capture desktop loading state on '+mode+' '+theme);
     assert.ok(summary.samples.some(x=>x.heroHeight>=205&&x.heroHeight<=235),'Desktop reserves the approved cover footprint from the start');
     assert.ok(summary.samples.every(x=>x.bottomVisibility==='hidden'),'Desktop editorial movement is not painted during initialization');
    }else{
-    assert.ok(summary.samples.every(x=>x.bottomVisibility!=='hidden'),'Mobile editorial content must not be artificially hidden');
-    assert.ok(summary.samples.every(x=>x.heroHeight===0),'No desktop cover reservation on mobile');
+    assert.equal(summary.samples.length,0,'Mobile must never have desktop pending class');
     assert.ok(summary.bottomNav,'Mobile category navigation must still mount');
    }
    assert.equal(summary.bottom,'visible','The real editorial content is visible after loading');
