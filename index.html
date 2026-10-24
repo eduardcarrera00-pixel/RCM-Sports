@@ -19,7 +19,7 @@
     <title>CAM SPORTS | Tu blog deportivo</title>
 
     <link rel="stylesheet" href="assets/site.css?v=20261020-greek-terrace-village-footer-1">
-    <style id="cam-first-paint-stability">#editorialBottom[hidden]{display:none!important}</style>
+    <style id="cam-first-paint-stability">#editorialBottom[hidden]{display:none!important}html body:not(.cam-first-feed-ready) #mainContent{min-height:100vh!important}</style>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -4271,6 +4271,8 @@ async function handleUserLogout() {
         loadAdminSession(),
         loadArticlesFromStorage()
     ]);
+    // Remove the temporary first-paint main height only after real content settles.
+    document.body.classList.add('cam-first-feed-ready');
 
     openArticleFromShareLink();
 });
