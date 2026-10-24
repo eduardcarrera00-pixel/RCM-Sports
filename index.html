@@ -4116,6 +4116,7 @@ html:not(.dark) #aeAuthIntroNotice small{color:#5b6d76}
         ) : null;
         let publishDraftId = null;
         let loadingArticles = false;
+        let initialArticlesPending = true; // Show an empty state only after the first online query finishes.
         let authRevision = 0;
 
         // State variables
@@ -4488,6 +4489,7 @@ currentUser = {
                     if (data.length < 1000) break;
                 }
                 articles = [...rows.map(fromDatabase), ...defaultArticles.map(a => withLocalInteractions({...a, remote: false}))];
+                initialArticlesPending = false;
                 renderArticlesFeed();
                 window.aeRefreshNewsArchive?.();window.aeRankingNotes?.refresh?.();
                 window.aeOpinions?.refreshNews?.();
@@ -4497,6 +4499,8 @@ currentUser = {
                 await loadArticleViews();
                 setDataStatus('');
             } catch {
+                initialArticlesPending = false;
+                renderArticlesFeed(); // On network errors the actual empty state becomes available.
                 setDataStatus('No se pudieron cargar las publicaciones en línea. Comprueba tu conexión y recarga la página.');
             } finally { loadingArticles = false; }
         }
@@ -4694,7 +4698,9 @@ currentUser = {
             if (filtered.length === 0) {
                 heroSection.classList.add('hidden');
                 articlesGrid.classList.add('hidden');
-                noResults.classList.remove('hidden');
+                // Do not flash a false "No hay artículos" message during the
+                // first asynchronous fetch; the final message remains unchanged.
+                noResults.classList.toggle('hidden', initialArticlesPending);
                 return;
             }
 
