@@ -76,7 +76,9 @@ async function sample(browser,origin,test,old){
     else if(category==='Opiniones')document.body.classList.add('ae-is-opinions');
     result[category]=all.map((element,index)=>{
       const style=getComputedStyle(element);
-      return [index, ...props.map(prop=>style.getPropertyValue(prop))];
+      const id=element.id?'#'+element.id:'';
+      const cls=(element.getAttribute('class')||'').slice(0,100).replace(/\\s+/g,'.');
+      return [index, element.localName+id+(cls?'.'+cls:''), ...props.map(prop=>style.getPropertyValue(prop))];
     });
    }
    return result;
@@ -95,9 +97,9 @@ async function sample(browser,origin,test,old){
     assert.equal(next[cat].length,old[cat].length,'Same DOM for '+conf.label+' '+cat);
     for(let i=0;i<old[cat].length;i++){
      for(let p=0;p<properties.length;p++){
-      const a=old[cat][i][p+1],b=next[cat][i][p+1];
+      const a=old[cat][i][p+2],b=next[cat][i][p+2];
       if(a!==b)throw Error('CSS mismatch '+conf.label+'/'+cat+
-       ', element '+i+', property '+properties[p]+' (before='+a+', after='+b+')');
+       ', element '+i+' ('+old[cat][i][1]+'), property '+properties[p]+' (before='+a+', after='+b+')');
      }
     }
    }
