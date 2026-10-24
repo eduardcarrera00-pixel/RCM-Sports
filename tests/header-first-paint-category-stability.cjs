@@ -25,8 +25,8 @@ const prep=(str,enableDb)=>{
    };
    window.filterByCategory=()=>{};
    </script><script src="/assets/ae-category-visibility.js"></script>`:'';
-  return str.replace(/<script\\b[^>]*>[\\s\\S]*?<\\/script>/gi,'')
-    .replace(/<link\\b[^>]*href="https?:\\/\\/[^"]+"[^>]*>/gi,'')
+  return str.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,'')
+    .replace(/<link\b[^>]*href="https?:\/\/[^"]+"[^>]*>/gi,'')
     .replace('</body>',scripts+'</body>');
 };
 const originals=prep(original,false),optimized=prep(html,false),admin=prep(html,true);
