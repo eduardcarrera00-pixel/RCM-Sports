@@ -14,3 +14,48 @@ html body.ae-is-nfl #mainContent #freeTakes #aeSportTakeLeaders.ae-sport-chefs[d
   background:transparent!important;
   background-image:none!important;
 }
+
+/* CAM SPORTS · Opiniones NFL: titulares gemelos blancos y alineados a la izquierda.
+   Comparte geometría día/noche y reserva la derecha para los pulgares.
+   No modifica el arte ni el cuerpo de las tarjetas. */
+html body.ae-is-nfl #mainContent #freeTakes #aeSportTakeLeaders.ae-sport-chefs[data-sport="nfl"] .ae-sport-takes-grid > .ae-sport-chef-card:is(.is-supported,.is-questioned) > .ae-sport-chef-heading {
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  box-sizing:border-box!important;
+  padding:12px clamp(18px,2.25vw,28px)!important;
+  text-align:left!important;
+}
+html body.ae-is-nfl #mainContent #freeTakes #aeSportTakeLeaders.ae-sport-chefs[data-sport="nfl"] .ae-sport-takes-grid > .ae-sport-chef-card:is(.is-supported,.is-questioned) > .ae-sport-chef-heading > h3 {
+  display:block!important;
+  flex:0 1 auto!important;
+  align-self:center!important;
+  width:auto!important;
+  max-width:66%!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  background:transparent!important;
+  color:#fff!important;
+  font-family:"Playfair Display",Georgia,serif!important;
+  font-size:clamp(19px,1.7vw,25px)!important;
+  font-weight:600!important;
+  line-height:1.2!important;
+  letter-spacing:normal!important;
+  text-align:left!important;
+  text-transform:none!important;
+  text-shadow:0 2px 5px rgba(0,15,32,.65)!important;
+  white-space:normal!important;
+  overflow-wrap:normal!important;
+  text-wrap:balance!important;
+}
+@media (max-width:760px) {
+  html body.ae-is-nfl #mainContent #freeTakes #aeSportTakeLeaders.ae-sport-chefs[data-sport="nfl"] .ae-sport-takes-grid > .ae-sport-chef-card:is(.is-supported,.is-questioned) > .ae-sport-chef-heading {
+    padding:12px 16px!important;
+  }
+  html body.ae-is-nfl #mainContent #freeTakes #aeSportTakeLeaders.ae-sport-chefs[data-sport="nfl"] .ae-sport-takes-grid > .ae-sport-chef-card:is(.is-supported,.is-questioned) > .ae-sport-chef-heading > h3 {
+    max-width:64%!important;
+    font-size:clamp(17px,4.8vw,22px)!important;
+  }
+}
