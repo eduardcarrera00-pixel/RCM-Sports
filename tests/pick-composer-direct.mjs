@@ -82,7 +82,7 @@ assert.equal(form.querySelector('.cp-compose-add'),null,'The capture controls th
 assert.equal(form.querySelector('.cp-legs').hidden,true,'Imported betting fields remain data, not an editable form');
 const preview=form.querySelector('.cp-compose-preview');assert.equal(preview.hidden,true);
 assert.equal(input('event_date').value,'');
-assert.equal(form.querySelector('details').open,false);
+assert.equal(form.querySelector('details')?.open??false,false,'Removed legacy details panel must not reopen the form');
 importPick({readings:[{sport:'Baloncesto',event:'Toronto vs Boston',selection:'Toronto gana',odds:150}]});
 assert.equal(preview.hidden,false);assert.match(preview.textContent,/Vista previa de tu pick/);
 assert.equal(form.dataset.captureStep,'review');assert.equal(d.getElementById('cpComposeTitle').textContent,'Revisa tu Pick');assert.equal(d.getElementById('cpComposeIntro').hidden,true);
