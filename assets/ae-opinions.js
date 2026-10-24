@@ -602,7 +602,7 @@
     });
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
+  function init() {
     bind();
     try {
       const id = new URLSearchParams(location.search).get('opinion');
@@ -611,7 +611,10 @@
         if (typeof filterByCategory === 'function') setTimeout(() => filterByCategory('Opiniones'), 0);
       }
     } catch {}
-  });
+  }
+  // Also initialize when this module arrives after DOMContentLoaded.
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});
+  else init();
 
   window.aeOpinions = {
     show,
