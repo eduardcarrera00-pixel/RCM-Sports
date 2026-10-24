@@ -11,6 +11,7 @@
     if(cls)x.className=cls;return x;
   };
   const client=()=>{try{return typeof db!=='undefined'?db:window.db;}catch{return null;}};
+  const editor=()=>typeof currentAdmin!=='undefined'&&!!currentAdmin;
   const clock=value=>new Date(value).toLocaleString('es',{timeZone:'America/Toronto',weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
 
   const COMPETITIONS=[
@@ -472,11 +473,12 @@
     const panel=el('details',null,'cam-nfl-admin-game');
     panel.append(el('summary','Ajustar puntos (opcional)'));
     panel.append(el('p','El cálculo es automático. Puedes ajustar de 2 a 12 puntos antes de que alguien guarde un pronóstico.'));
+    const fields=el('div',null,'cam-football-point-fields');panel.append(fields);
     const inputs=['home','draw','away'].map((side,i)=>{
       const label=el('label',['Local','Empate','Visitante'][i]);
-      const input=el('input');input.type='number';input.min='2';input.max='12';input.step='1';
+      const input=el('input');input.type='number';input.min='2';input.max='12';input.step='1';input.inputMode='numeric';
       input.value=String(g['points_'+side]);input.setAttribute('aria-label','Puntos '+['local','empate','visitante'][i]);
-      label.append(input);panel.append(label);return input;
+      label.append(input);fields.append(label);return input;
     });
     const save=button('Guardar ajuste',async()=>{
       const values=inputs.map(i=>Number(i.value));
@@ -496,8 +498,17 @@
   }
   function setup(){
     // Refresh a previously closed snapshot when returning to this tab.
-    window.addEventListener('focus',()=>{if(!root.hidden)hydrate();});
-    document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!root.hidden)hydrate();});
+    const refreshWhenIdle=()=>{
+      // iOS keyboard/focus events must never replace a form being edited.
+      if(!root.hidden&&!root.querySelector('.cam-nfl-admin-game[open]'))hydrate();
+    };
+    window.addEventListener('focus',refreshWhenIdle);
+    document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshWhenIdle();});
+    let lastAdmin=editor();
+    window.addEventListener('cam:admin-state-change',()=>{
+      const next=editor();if(next===lastAdmin)return;lastAdmin=next;
+      if(loaded)paintGames();
+    });
     $('camFootballSave')?.addEventListener('click',()=>persist('round'));
     $('camFootballSaveDay')?.addEventListener('click',()=>persist('day'));
     const tabs=$('camFootballRankingTabs');

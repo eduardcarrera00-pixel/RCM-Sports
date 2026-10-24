@@ -4342,6 +4342,7 @@ currentUser = {
         }
 
         function renderAdminUI() {
+            window.dispatchEvent(new CustomEvent('cam:admin-state-change'));
             renderSessionHeader();
             window.camGlobalEditMode?.sync();
             window.camSiteImages?.refresh();
@@ -6102,6 +6103,14 @@ html.dark :is(#camNflQuiniela,#camFootballQuiniela),html.dark #camNflProfile{
   color:var(--q-ink);max-width:100%;font-size:var(--ds-text-xs,12px);
 }
 .cam-nfl-admin-game{margin-top:10px}
+
+/* Optional football point editor: touch targets and no iOS keyboard zoom. */
+#camFootballQuiniela .cam-football-point-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}
+#camFootballQuiniela .cam-football-point-fields label{display:flex;flex-direction:column;gap:4px;min-width:0;font-size:13px}
+#camFootballQuiniela .cam-football-point-fields input{box-sizing:border-box;width:100%;max-width:none;min-width:0;min-height:44px;margin:0;font-size:16px;padding:8px}
+#camFootballQuiniela .cam-nfl-admin-game summary{min-height:44px;padding:10px 0;box-sizing:border-box;touch-action:manipulation}
+#camFootballQuiniela .cam-nfl-admin-game .cam-nfl-action{min-height:44px;touch-action:manipulation}
+
 .cam-nfl-admin-game input,.cam-nfl-admin-game select{margin:4px 4px 0 0;max-width:180px}
 :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-admin-game button{margin-top:4px}
 
@@ -6425,7 +6434,7 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 </style>
 
 <link rel="stylesheet" href="assets/cam-nfl-profile.css?v=20261022-3tab-1">
-<script src="assets/cam-sport-quiniela-loader.js?v=20261024-optional-points-3"></script>
+<script src="assets/cam-sport-quiniela-loader.js?v=20261024-mobile-points-4"></script>
 <script src="assets/cam-nfl-profile.js?v=20261022-3tab-1"></script>
 <script src="assets/ae-season-predictions.js?v=20261021-champion-guide-1"></script>
 <script src="assets/cam-lazy-editorial-loader.js?v=20261024-1"></script>
