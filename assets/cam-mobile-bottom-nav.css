@@ -9,8 +9,7 @@ html body nav.ae-sport-nav svg.cam-mobile-nav-symbol {
     padding-bottom: calc(var(--cam-bottom-nav-height) + env(safe-area-inset-bottom, 0px)) !important;
   }
 
-  /* Override the more specific legacy multi-row header navigation BEFORE JS relocates it. */
-  html body > header .ae-mobile-header-grid > nav.ae-sport-nav { display: none !important; }
+  html body > header nav.ae-sport-nav { display: none !important; }
   html body > header .ae-mobile-header-grid {
     height: auto !important;
     min-height: 64px !important;
