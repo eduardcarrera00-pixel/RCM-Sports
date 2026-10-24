@@ -21,10 +21,11 @@
     <link rel="stylesheet" href="assets/site.css?v=20261020-greek-terrace-village-footer-1">
     <style id="cam-first-paint-stability">
       /* Keep the existing editorial space while JS moves its actual nodes into place. */
-      html body.cam-first-feed-pending #editorialBottom{visibility:hidden!important}
       /* Match Home's approved header-to-content spacing before initial route JS. */
       html body.cam-first-feed-pending > header + div{padding-top:4px!important}
       @media(min-width:980px){
+        /* Desktop: keep sections invisible while moving; phone layout stays untouched. */
+        html body.cam-first-feed-pending #editorialBottom{visibility:hidden!important}
         /* Match the approved Home cover's existing clamp, only while content loads. */
         html body.cam-first-feed-pending #heroSection{
           display:block!important;
