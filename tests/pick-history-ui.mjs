@@ -5,9 +5,11 @@ import {Window} from 'happy-dom';
 const w=new Window({url:'https://example.test/'}),d=w.document;
 d.body.innerHTML=fs.readFileSync('index.html','utf8').replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,'');
 w.currentAdmin=null;
-const pending=[];
+const pending=[],historyFilters=[];
 w.db={from(table){
- const q={select(){return q;},in(){return q;},eq(){return q;},order(){return q;},limit(){return q;},
+ const q={select(){return q;},in(){return q;},eq(){return q;},order(){return q;},
+  or(value){historyFilters.push({table,kind:'or',value});return q;},
+  limit(value){historyFilters.push({table,kind:'limit',value});return q;},
   then(resolve,reject){return new Promise((yes,no)=>pending.push({table,resolve:yes,reject:no})).then(resolve,reject);}};
  return q;
 }};
@@ -24,6 +26,12 @@ const count=()=>area.querySelectorAll('.ae-pick-history-entry').length;
 
 // Auth and initial feed loading can request the same history concurrently.
 start();start();await tick();const first=next('ae_pick_feed'),second=next('ae_pick_feed');
+const serverFilters=historyFilters.filter(item=>item.kind==='or'&&item.table==='ae_pick_feed');
+assert.equal(serverFilters.length,2,'Every history request must filter finalized/overdue Picks at the server');
+for(const filter of serverFilters)assert.match(filter.value,
+/^outcome\.in\.\(won,lost,void\),and\(outcome\.eq\.pending,event_date\.lte\.\d{4}-\d{2}-\d{2}\)$/);
+assert.deepEqual(historyFilters.filter(item=>item.kind==='limit'&&item.table==='ae_pick_feed').map(item=>item.value),[40,40],
+ 'The 40-card limit must apply after the server-side history filter');
 success(first,[fixture('same')]);success(second,[fixture('same')]);await tick();
 while(pending.length){success(pending.shift(),[]);await tick();}
 assert.equal(count(),1,'Concurrent loads must display each Pick exactly once');
