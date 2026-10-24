@@ -32,14 +32,14 @@ html body #footballTakes.ae-picks-editorial #communityPicks .ae-picks-heading-ct
  font:500 clamp(30px,3.5vw,48px)/1.12 Newsreader,Georgia,serif!important;
  letter-spacing:-.025em!important;
  text-transform:none!important;
- text-align:center!important;
+ text-align:left!important;
  text-shadow:none!important;
  white-space:normal!important;
 }
 html body #footballTakes.ae-picks-editorial #communityPicks .ae-picks-heading-cta-row.ae-chef-marble button#cpPublishCta.ae-chef-marble-button {
  display:inline-flex!important;
  position:static!important;
- align-self:center!important;
+ align-self:flex-start!important;
  align-items:center!important;
  justify-content:center!important;
  flex:0 0 auto!important;
@@ -85,5 +85,21 @@ html body #footballTakes.ae-picks-editorial #communityPicks .ae-chef-marble butt
  html body #footballTakes.ae-picks-editorial #communityPicks .ae-picks-heading-cta-row.ae-chef-marble button#cpPublishCta.ae-chef-marble-button {
   padding:8px 14px!important;
   font-size:18px!important;
+ }
+}
+
+/* Match the footer action's left edge to the banner's editorial inset. */
+html body #footballTakes.ae-picks-editorial #communityPicks #cpFeedFooter {
+ box-sizing:border-box!important;
+ width:100%!important;
+ padding-left:7%!important;
+ text-align:left!important;
+}
+html body #footballTakes.ae-picks-editorial #communityPicks #cpFeedFooter button#cpViewAll {
+ margin:15px 0 0!important;
+}
+@media(max-width:760px) {
+ html body #footballTakes.ae-picks-editorial #communityPicks #cpFeedFooter {
+  padding-left:5%!important;
  }
 }
