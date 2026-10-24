@@ -51,6 +51,9 @@ const inspect=()=>({
   header:Math.round(document.querySelector('body>header').getBoundingClientRect().height),
   top:Math.round(document.getElementById('mainContent').getBoundingClientRect().top),
   navHeight:Math.round(document.querySelector('nav.ae-sport-nav').getBoundingClientRect().height),
+  navDisplay:getComputedStyle(document.querySelector('nav.ae-sport-nav')).display,
+  gridHeight:Math.round(document.querySelector('.ae-mobile-header-grid').getBoundingClientRect().height),
+  gridAreas:getComputedStyle(document.querySelector('.ae-mobile-header-grid')).gridTemplateAreas,
   visible:[...document.querySelectorAll('nav.ae-sport-nav .category-btn[data-category]')]
     .filter(x=>getComputedStyle(x).display!=='none' && x.getClientRects().length>0)
     .map(x=>x.dataset.category)
@@ -88,6 +91,7 @@ const inspect=()=>({
        document.body.appendChild(nav);
     });
     const newFinal=await after.evaluate(inspect);
+    console.log('DEBUG '+width+' '+theme+' '+JSON.stringify({oldStart,newStart,oldFinal,newFinal}));
     assert.equal(newStart.header,oldFinal.header,'New first-paint header height equals previously settled height');
     assert.equal(newStart.top,oldFinal.top,'Main starts in settled position, no vertical jump');
     assert.deepEqual(newFinal.visible,oldFinal.visible,'Visible navigation options unchanged after placement');
