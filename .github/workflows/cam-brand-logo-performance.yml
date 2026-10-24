@@ -1,0 +1,51 @@
+name: CAM SPORTS exact brand logo performance
+
+on:
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'assets/ae-site-images.js'
+      - 'assets/cam-sports-logo-completo.webp'
+      - 'assets/cam-sports-logo-completo.png'
+      - 'scripts/build-lossless-brand-logo.py'
+      - 'tests/lossless-brand-image-browser.cjs'
+      - 'package.json'
+      - '.github/workflows/cam-brand-logo-performance.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'assets/ae-site-images.js'
+      - 'assets/cam-sports-logo-completo.webp'
+      - 'assets/cam-sports-logo-completo.png'
+      - 'scripts/build-lossless-brand-logo.py'
+      - 'tests/lossless-brand-image-browser.cjs'
+      - 'package.json'
+      - '.github/workflows/cam-brand-logo-performance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  brand:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci
+      - run: python -m pip install --disable-pip-version-check Pillow==11.3.0
+      - name: Assert logo is pixel identical and generated asset is current
+        run: python scripts/build-lossless-brand-logo.py --check
+      - run: npx playwright install --with-deps chromium
+      - name: Validate brand download, admin override and visual dimensions
+        run: npm run test:perf:brand
+      - name: Preserve CSS, navigation, admin authentication and banners
+        run: npm run test:performance && npm run test:auth && npm run test:mobile-nav && npm run test:site-banners
