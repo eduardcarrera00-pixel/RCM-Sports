@@ -30,7 +30,8 @@
     "test:ocr:lazy": "node tests/ocr-lazy-loading.mjs && node tests/pick-capture-ui.mjs",
     "test:perf:sports": "node tests/sport-quiniela-lazy-browser.cjs",
     "test:perf:admin": "node tests/admin-news-editor-lazy-browser.cjs",
-    "test:perf:editorial": "node tests/lazy-editorial-browser.cjs"
+    "test:perf:editorial": "node tests/lazy-editorial-browser.cjs",
+    "test:perf:welcome": "node tests/mobile-welcome-image-budget.cjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.9",
