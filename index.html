@@ -19,6 +19,19 @@
     <title>CAM SPORTS | Tu blog deportivo</title>
 
     <link rel="stylesheet" href="assets/site.css?v=20261020-greek-terrace-village-footer-1">
+    <style id="cam-first-paint-stability">
+      /* Reserve the exact approved Home cover footprint until articles are resolved.
+         Desktop-only; mobile markup, navigation and first-paint layout are unchanged. */
+      @media(min-width:980px){
+        html body.cam-first-feed-pending #editorialBottom{visibility:hidden!important}
+        html body.cam-first-feed-pending #heroSection{
+          display:block!important;
+          height:clamp(205px,17vw,235px)!important;
+          min-height:0!important;
+          margin-bottom:12px!important;
+        }
+      }
+    </style>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -2742,6 +2755,10 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
 <link rel="stylesheet" href="assets/cam-football-ranking-banners.css?v=20261023-football-ranking-banner-1">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
+<script id="cam-desktop-first-paint-init">
+  // Synchronous and before any visible nodes: mobile never enters this loading mode.
+  if (window.matchMedia('(min-width:980px)').matches) document.body.classList.add('cam-first-feed-pending');
+</script>
 <a class="ae-skip-link" href="#mainContent">Ir al contenido</a>
 
     <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
@@ -4271,6 +4288,8 @@ async function handleUserLogout() {
         loadAdminSession(),
         loadArticlesFromStorage()
     ]);
+    // Remove desktop-only first-paint styles once the initial articles and sessions settle.
+    document.body.classList.remove('cam-first-feed-pending');
 
     openArticleFromShareLink();
 });

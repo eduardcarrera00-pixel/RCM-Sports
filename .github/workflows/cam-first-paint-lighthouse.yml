@@ -1,0 +1,85 @@
+name: CAM SPORTS first-paint Lighthouse lab comparison
+on:
+  pull_request:
+    paths:
+      - 'index.html'
+      - '.github/workflows/cam-first-paint-lighthouse.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Serve the real static site checkout
+        shell: bash
+        run: |
+          python3 -m http.server 8123 --bind 127.0.0.1 >/tmp/cam-cls-server.log 2>&1 &
+          for i in {1..20}; do
+            if curl --fail --silent http://127.0.0.1:8123/ -o /dev/null; then break; fi
+            sleep 1
+          done
+          curl --fail --silent http://127.0.0.1:8123/ -o /dev/null
+          node -e 'console.log("CHROME_PATH="+require("playwright").chromium.executablePath())' >> "$GITHUB_ENV"
+          mkdir -p lighthouse
+      - name: Lighthouse PR mobile (cold checkout first)
+        run: >-
+          npx --yes lighthouse@13.5.0 http://127.0.0.1:8123/
+          --only-categories=performance --output=json --output-path=lighthouse/mobile.json
+          --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage"
+          --max-wait-for-load=45000 --quiet
+      - name: Lighthouse PR desktop
+        run: >-
+          npx --yes lighthouse@13.5.0 http://127.0.0.1:8123/
+          --only-categories=performance --preset=desktop --output=json --output-path=lighthouse/desktop.json
+          --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage"
+          --max-wait-for-load=45000 --quiet
+      - name: Read latest main HTML as baseline
+        shell: bash
+        run: |
+          git fetch origin main
+          git show FETCH_HEAD:index.html > index.html
+      - name: Lighthouse current-main mobile (second)
+        run: >-
+          npx --yes lighthouse@13.5.0 http://127.0.0.1:8123/
+          --only-categories=performance --output=json --output-path=lighthouse/mobile-main.json
+          --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage"
+          --max-wait-for-load=45000 --quiet
+      - name: Lighthouse current-main desktop
+        run: >-
+          npx --yes lighthouse@13.5.0 http://127.0.0.1:8123/
+          --only-categories=performance --preset=desktop --output=json --output-path=lighthouse/desktop-main.json
+          --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage"
+          --max-wait-for-load=45000 --quiet
+      - name: Compare Lighthouse CLS and LCP on same runner
+        run: |
+          echo "### Current main (no CLS fix)"
+          node scripts/report-lighthouse.mjs lighthouse/mobile-main.json lighthouse/desktop-main.json
+          echo "### Pull request (desktop-only CLS fix)"
+          node scripts/report-lighthouse.mjs lighthouse/mobile.json lighthouse/desktop.json
+          node - <<'NODE'
+          const fs=require('fs');
+          for(const mode of ['mobile','desktop']){
+            const before=JSON.parse(fs.readFileSync('lighthouse/'+mode+'-main.json'));
+            const after=JSON.parse(fs.readFileSync('lighthouse/'+mode+'.json'));
+            const v=x=>Number(x.audits['cumulative-layout-shift']?.numericValue||0);
+            console.log(mode+': baseline CLS='+v(before).toFixed(3)+', PR CLS='+v(after).toFixed(3)+', delta='+(v(after)-v(before)).toFixed(3));
+          }
+          NODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cam-cls-first-paint-lighthouse
+          path: lighthouse/*.json
+          if-no-files-found: warn
+          retention-days: 14

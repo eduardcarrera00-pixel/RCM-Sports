@@ -1,0 +1,35 @@
+name: CAM SPORTS desktop Home first-paint stability
+on:
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'tests/home-first-paint-stability.cjs'
+      - 'package.json'
+      - '.github/workflows/cam-home-first-paint.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'tests/home-first-paint-stability.cjs'
+      - 'package.json'
+      - '.github/workflows/cam-home-first-paint.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  home-first-paint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: node --check tests/home-first-paint-stability.cjs
+      - run: npx playwright install --with-deps chromium
+      - name: Verify day/night desktop skeleton and untouched mobile
+        run: npm run test:perf:first-paint
+      - name: Preserve mobile navigation, banners, editorial, picks and auth
+        run: npm run test:mobile-nav && npm run test:site-banners && npm run test:opinions-banners && npm run test:picks && npm run test:auth
