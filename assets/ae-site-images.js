@@ -96,6 +96,11 @@
   pair('portada.take-tinta', 'Tintero del botón «Publicar Take» de la portada', 'Portada', 'assets/cam-take-ink-dark.webp', 'assets/cam-take-ink-light.webp');
   f('takes.pluma', 'Pluma del título de Takes', 'Takes', 'assets/ae-feather.svg');
   // Fútbol
+  // Quiniela Fútbol: arte separado por tema para el editor global; el CSS controla su visibilidad.
+  img('futbol.quiniela-noche', 'Ilustración de La Quiniela de Fútbol', 'Fútbol · Quiniela',
+    'assets/cam-football-quiniela-night.svg', { group: 'futbol.quiniela', variant: NIGHT });
+  img('futbol.quiniela-dia', 'Ilustración de La Quiniela de Fútbol', 'Fútbol · Quiniela',
+    'assets/cam-football-quiniela-day.svg', { group: 'futbol.quiniela', variant: DAY });
   pair('futbol.takes-cabecera', 'Cabecera de Takes de Fútbol (también en el perfil)', 'Fútbol', 'assets/takes/ae-football-takes-hero-night.webp', 'assets/takes/ae-football-takes-hero-day.webp');
   pair('futbol.take-barca', 'Tarjetas de Take · Barça', 'Fútbol', 'assets/takes/ae-football-take-barca-night.webp', 'assets/takes/ae-football-take-barca-day.webp');
   pair('futbol.take-champions', 'Tarjetas de Take · Champions', 'Fútbol', 'assets/takes/ae-football-take-champions-night.webp', 'assets/takes/ae-football-take-champions-day.webp');
