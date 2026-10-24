@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 240" role="img" aria-labelledby="title">
+<title id="title">Selección de equipos para la Quiniela de Fútbol</title>
+<g fill="#FFEFD6">
+  <circle cx="191" cy="40" r="35"/>
+  <path d="M191 80v18M123 111v-9q0-7 7-7h122q7 0 7 7v9" fill="none" stroke="#FFEFD6" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="91" y="113" width="84" height="80" rx="11"/>
+  <rect x="211" y="113" width="84" height="80" rx="11"/>
+</g>
+<g fill="#0A3268" stroke="#0A3268">
+  <path d="M181 20l10-7 10 7-4 13h-12z"/>
+  <path d="M162 20l13-2 4 11-12 11-9-4z"/>
+  <path d="M211 18l13 4 7 16-12 3-11-13z"/>
+  <path d="M173 47l13-7 12 9-4 14-17 2-9-11z"/>
+  <path d="M205 47l9-1 11 9-12 14-13-3z"/>
+  <path d="M191 76l-10-9 18-1 11 5z"/>
+  <path d="M116 137l-16 14 10 13 13-9v28h25v-28l13 9 10-13-17-14-10-4-9 8-9-8z"/>
+  <path d="M236 137l-16 14 10 13 13-9v28h25v-28l13 9 10-13-17-14-10-4-9 8-9-8z"/>
+</g>
+<path d="M124 221c-6-7-14-15-18-21-4-5-3-11 1-14 5-4 10-3 14 2l11 12v-42c0-6 4-10 9-10s10 4 10 10v24c5-6 14-4 16 4 6-5 14 0 15 7 6-3 14 1 15 8l1 14c1 16-12 25-29 25h-15c-14 0-22-6-30-19z" fill="#FFEFD6" stroke="#0A3268" stroke-width="2.5" stroke-linejoin="round"/>
+</svg>
