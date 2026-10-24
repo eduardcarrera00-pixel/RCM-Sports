@@ -30,11 +30,35 @@ const anchorSelector=el=>{
  const browser=await chromium.launch({headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
  const address='http://127.0.0.1:'+server.address().port+'/';
  try{
-  for(const mode of ['mobile','desktop'])for(const theme of ['day','night']){
+  for(const mode of ['mobile','desktop'])for(const theme of ['day']){
    const context=await browser.newContext({viewport:mode==='mobile'?{width:390,height:844}:{width:1440,height:900},deviceScaleFactor:mode==='mobile'?3:1});
    await context.addInitScript(({isDark})=>{
      localStorage.setItem('rcm_sports_theme',isDark?'dark':'light');
      window.__camShiftLog=[];
+     window.__camLayoutTimeline=[];
+     let lastSnapshot='';
+     const snapshot=()=>{
+       const rect=selector=>{
+         const n=document.querySelector(selector);if(!n)return null;
+         const box=n.getBoundingClientRect();
+         return {y:Math.round(box.y),h:Math.round(box.height),display:getComputedStyle(n).display,hidden:n.hidden||false};
+       };
+       const current={
+         t:Math.round(performance.now()),
+         ready:document.readyState,
+         body:document.body?.className?.slice(0,100),
+         header:rect('body > header'), headerGrid:rect('.ae-mobile-header-grid'),
+         nav:rect('.ae-sport-nav'), actions:rect('.ae-header-actions'),
+         statusWrap:rect('body > div.max-w-7xl'),
+         main:rect('#mainContent'), hero:rect('#heroSection'),
+         bottom:rect('#editorialBottom'), publish:rect('#aeHomeTakePublish'),
+         sidebar:rect('#aeHomeSidebarFeatures'), layout:rect('.editorial-layout')
+       };
+       const key=JSON.stringify(Object.assign({},current,{t:0}));
+       if(key!==lastSnapshot){lastSnapshot=key;window.__camLayoutTimeline.push(current);}
+     };
+     const timer=setInterval(snapshot,40);
+     setTimeout(()=>{clearInterval(timer);snapshot();},3600);
      new PerformanceObserver(entries=>{
        for(const entry of entries.getEntries()){
          const sources=(entry.sources||[]).map(source=>{
@@ -53,17 +77,17 @@ const anchorSelector=el=>{
    const pageErrors=[];page.on('pageerror',e=>pageErrors.push(String(e.message).slice(0,220)));
    try{
     await page.goto(address,{waitUntil:'domcontentloaded',timeout:45000});
-    await page.waitForTimeout(12000);
+    await page.waitForTimeout(4200);
     const summary=await page.evaluate(()=>{
       const r=el=>{if(!el)return null;const b=el.getBoundingClientRect();return {top:Math.round(b.y),height:Math.round(b.height),width:Math.round(b.width)}};
-      return {events:window.__camShiftLog,bodyClass:document.body.className,fonts:document.fonts.status,
+      return {events:window.__camShiftLog,timeline:window.__camLayoutTimeline,bodyClass:document.body.className,fonts:document.fonts.status,
        rects:Object.fromEntries(['header','mainContent','heroSection','articlesGrid','aeHomeTopTakes','aeTrendingPortada','picksFeatured','camWelcomeDialog','footer'].map(id=>[id,r(id==='header'||id==='footer'?document.querySelector(id):document.getElementById(id))]))};
     });
     const actual=summary.events.filter(x=>!x.input),total=actual.reduce((a,x)=>a+x.value,0);
     const byNode=new Map();
     for(const e of actual)for(const source of e.sources){const o=byNode.get(source.el)||{score:0,events:0};o.score+=e.value;o.events++;byNode.set(source.el,o);}
     const list=[...byNode].sort((a,b)=>b[1].score-a[1].score).slice(0,16).map(([name,value])=>({name,...value}));
-    console.log('CAM CLS '+mode+' '+theme+': '+JSON.stringify({total:+total.toFixed(5),shiftCount:actual.length,topNodes:list,events:actual.slice(0,18),rects:summary.rects,fonts:summary.fonts,errors:pageErrors.slice(0,5)}));
+    console.log('CAM CLS '+mode+' '+theme+': '+JSON.stringify({total:+total.toFixed(5),shiftCount:actual.length,topNodes:list,events:actual.slice(0,18),timeline:summary.timeline.slice(0,40),rects:summary.rects,fonts:summary.fonts,errors:pageErrors.slice(0,5)}));
    }catch(e){console.error('CLS RUN ERROR '+mode+' '+theme+': '+String(e));process.exitCode=1;}
    await context.close();
   }
