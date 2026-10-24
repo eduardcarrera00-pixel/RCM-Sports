@@ -2740,8 +2740,14 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
 <script defer src="assets/cam-take-cta.js?v=20261023-take-cta-unificado-1"></script>
 <link rel="stylesheet" href="assets/cam-nfl-opinions-header-only.css?v=20261023-futbol-opinions-day-night-1">
 <link rel="stylesheet" href="assets/cam-football-ranking-banners.css?v=20261023-football-ranking-banner-1">
+<style id="cam-cls-initial-home">
+/* Reserve the first viewport only while Home articles are being fetched.
+   This prevents the flexible footer and other modules from crossing the fold
+   when the empty initial feed is replaced by live news. No final-design rules. */
+body.cam-articles-booting #mainContent{min-height:100svh!important}
+</style>
 </head>
-<body class="min-h-screen flex flex-col bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
+<body class="min-h-screen flex flex-col justify-between cam-articles-booting bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 <a class="ae-skip-link" href="#mainContent">Ir al contenido</a>
 
     <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
@@ -4498,7 +4504,10 @@ currentUser = {
                 setDataStatus('');
             } catch {
                 setDataStatus('No se pudieron cargar las publicaciones en línea. Comprueba tu conexión y recarga la página.');
-            } finally { loadingArticles = false; }
+            } finally {
+                loadingArticles = false;
+                document.body.classList.remove('cam-articles-booting');
+            }
         }
 
         function exportLegacyArticles() {
