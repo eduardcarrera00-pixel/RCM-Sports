@@ -1,0 +1,40 @@
+name: CAM SPORTS diagnose initial layout shifts
+on:
+  push:
+    branches: [perf/cls-layout-diagnostics-20261024]
+    paths:
+      - index.html
+      - assets/cam-mobile-bottom-nav.css
+      - tests/header-first-paint-category-stability.cjs
+      - tests/cls-layout-diagnostics.cjs
+      - .github/workflows/cam-cls-diagnostics.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  diagnose-cls:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Verify early sports hidden and optional admin sports still work
+        run: node tests/header-first-paint-category-stability.cjs
+      - name: Record layout shift attribution in mobile day/night and desktop
+        run: node tests/cls-layout-diagnostics.cjs
+      - name: Preserve navigation, auth, CSS packs and pick functionality
+        run: npm run test:mobile-nav && npm run test:auth && npm run test:performance && npm run test:picks
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cam-cls-shift-traces
+          path: cls-artifacts/*.json
+          if-no-files-found: warn
+          retention-days: 7
