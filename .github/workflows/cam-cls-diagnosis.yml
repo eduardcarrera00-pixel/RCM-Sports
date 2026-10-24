@@ -3,6 +3,7 @@ on:
   push:
     branches: [perf/cls-stability-20261024]
     paths:
+      - 'index.html'
       - 'scripts/diagnose-layout-shifts.cjs'
       - '.github/workflows/cam-cls-diagnosis.yml'
   workflow_dispatch:
