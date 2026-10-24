@@ -6,7 +6,7 @@ const path=require('node:path');
 const {chromium}=require('playwright');
 const source=fs.readFileSync('index.html','utf8');
 assert.doesNotMatch(source,/<body class="cam-first-feed-pending /,'Phone body must not enter desktop loading mode');
-assert.match(source,/<script id="cam-desktop-first-paint-init">[\\s\\S]*?matchMedia\\('\\(min-width:980px\\)'\\)/,'Initialize desktop loading styles before visible nodes');
+assert.ok(source.includes('<script id="cam-desktop-first-paint-init">') && source.includes("matchMedia('(min-width:980px)')"),'Initialize desktop loading styles before visible nodes');
 assert.match(source,/@media\(min-width:980px\)\s*\{[\s\S]*?#heroSection/,'Desktop cover reservation must be media-scoped');
 assert.match(source,/height:clamp\(205px,17vw,235px\)/,'Use the exact existing hero height, not a new design');
 assert.match(source,/await Promise\.allSettled\(\[[\s\S]*?loadArticlesFromStorage\(\)[\s\S]*?document\.body\.classList\.remove\('cam-first-feed-pending'\)/,'Remove placeholder state only after loading data');
