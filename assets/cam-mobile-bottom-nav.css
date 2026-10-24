@@ -1,5 +1,4 @@
-/* CAM SPORTS — edge-to-edge mobile navigation; no desktop artwork/layout changes.
-   Keep original four category buttons and use the SVGs provided by the icon-fix branch. */
+/* CAM SPORTS — edge-to-edge phone navigation reusing actual header brand art. */
 html body nav.ae-sport-nav svg.cam-mobile-nav-symbol {
   display: none !important;
 }
@@ -108,7 +107,7 @@ html body nav.ae-sport-nav svg.cam-mobile-nav-symbol {
     white-space: nowrap !important;
   }
 
-  /* Thin, equal circular frames. The SVG inherits the theme color (never pure white). */
+  /* Thin, equal circular frames around shared CAM SVG images. */
   html body > nav.cam-mobile-bottom-nav > button.category-btn .ae-nav-icon {
     display: grid !important;
     place-items: center !important;
@@ -127,27 +126,21 @@ html body nav.ae-sport-nav svg.cam-mobile-nav-symbol {
     transition: border-color 160ms ease, background-color 160ms ease !important;
   }
 
-  /* WebP art stays untouched for the desktop header, hidden only in the mobile dock. */
+  /* Same CAM brand SVG images as desktop, without separate phone symbols. */
   html body > nav.cam-mobile-bottom-nav > button.category-btn .ae-nav-icon > img.ae-custom-sport-icon {
-    display: none !important;
-  }
-  html body > nav.cam-mobile-bottom-nav > button.category-btn .ae-nav-icon > svg.cam-mobile-nav-symbol {
     display: block !important;
-    width: 23px !important;
-    height: 23px !important;
-    min-width: 23px !important;
-    min-height: 23px !important;
-    flex: 0 0 23px !important;
+    width: 24px !important;
+    height: 24px !important;
+    max-width: 24px !important;
+    max-height: 24px !important;
+    object-fit: contain !important;
     margin: 0 !important;
-    padding: 0 !important;
-    border: 0 !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    filter: none !important;
-    color: inherit !important;
     opacity: 1 !important;
+    filter: none !important;
     pointer-events: none !important;
   }
+  /* Hide stale client-cached mobile vectors if an older script injected them. */
+  html body > nav.cam-mobile-bottom-nav svg.cam-mobile-nav-symbol { display: none !important; }
 
   html body > nav.cam-mobile-bottom-nav > button.category-btn:is(.active,[aria-current="page"]) {
     flex: 1 1 0% !important;
