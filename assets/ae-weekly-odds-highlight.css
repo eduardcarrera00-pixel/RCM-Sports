@@ -413,3 +413,12 @@ html body.ae-is-home #mainContent .editorial-pick h2#weeklyPickTitle {
   line-height:1.3!important;
   text-align:left!important;
 }
+
+
+/* Mayor especificidad para las cabeceras con reglas históricas !important. */
+html body #footballTakes.ae-picks-editorial #communityPicks #cpSettleHistorySection h3#cpSettleHistoryTitle,
+html body #footballTakes.ae-picks-editorial #communityPicks > .ae-chefs-dual-standings.ae-chefs-classical .ae-chefs-art-heading h3:is(#picksRankingTitle,#cpWorstRankingTitle) {
+  font-size:13px!important;
+  line-height:1.3!important;
+  text-align:left!important;
+}
