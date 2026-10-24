@@ -1,0 +1,45 @@
+name: CAM SPORTS on-demand Quinielas performance
+
+on:
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'assets/cam-sport-quiniela-loader.js'
+      - 'assets/cam-nfl-quiniela.js'
+      - 'assets/cam-football-quiniela.js'
+      - 'tests/sport-quiniela-lazy-browser.cjs'
+      - 'package.json'
+      - '.github/workflows/cam-sport-lazy-performance.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'assets/cam-sport-quiniela-loader.js'
+      - 'assets/cam-nfl-quiniela.js'
+      - 'assets/cam-football-quiniela.js'
+      - 'tests/sport-quiniela-lazy-browser.cjs'
+      - 'package.json'
+      - '.github/workflows/cam-sport-lazy-performance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lazy-sport-modules:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: node --check assets/cam-sport-quiniela-loader.js
+      - run: node --check tests/sport-quiniela-lazy-browser.cjs
+      - run: npx playwright install --with-deps chromium
+      - name: Home should not request NFL or football Quinielas
+        run: npm run test:perf:sports
+      - name: Preserve Picks, auth, categories and predictions
+        run: npm run test:picks && npm run test:auth && npm run test:mobile-nav
