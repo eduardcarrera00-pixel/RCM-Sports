@@ -7,6 +7,8 @@ const fs=require('node:fs');
 const http=require('node:http');
 const path=require('node:path');
 const {chromium}=require('playwright');
+const {execFileSync}=require('node:child_process');
+const oldMobileCSS=execFileSync('git',['show','7ece13d0ea97225ef2b6fff43250975e386a2aaf:assets/cam-mobile-bottom-nav.css'],{encoding:'utf8'});
 const root=process.cwd();
 const html=fs.readFileSync('index.html','utf8');
 const categories=['Fútbol Americano Colegial','NBA','Tenis','Ciclismo'];
@@ -65,17 +67,31 @@ const inspect=()=>({
       await page.route('**/*',route=>route.request().url().startsWith(origin)?route.continue():route.abort());
       await page.addInitScript(t=>localStorage.setItem('rcm_sports_theme',t),theme);
     }
+    await before.route('**/assets/cam-mobile-bottom-nav.css*',route=>route.fulfill({status:200,contentType:'text/css',body:oldMobileCSS}));
     await Promise.all([before.goto(origin+'/before',{waitUntil:'load'}),after.goto(origin+'/after',{waitUntil:'load'})]);
     const oldStart=await before.evaluate(inspect),newStart=await after.evaluate(inspect);
-    await before.evaluate(cats=>cats.forEach(category=>{
-      const n=document.querySelector('nav.ae-sport-nav [data-category="'+category+'"]');
-      n.hidden=true;n.setAttribute('aria-hidden','true');
-    }),categories);
+    await before.evaluate(({width,cats})=>{
+      cats.forEach(category=>{
+        const n=document.querySelector('nav.ae-sport-nav [data-category="'+category+'"]');
+        n.hidden=true;n.setAttribute('aria-hidden','true');
+      });
+      if(width<=760){
+        const nav=document.querySelector('body>header nav.ae-sport-nav');
+        nav.classList.add('cam-mobile-bottom-nav');
+        document.body.appendChild(nav);
+      }
+    },{width,cats:categories});
     const oldFinal=await before.evaluate(inspect);
-    console.log('DEBUG nav '+width+' '+theme+' '+JSON.stringify({oldStart,newStart,oldFinal}));
+    if(width<=760)await after.evaluate(()=>{
+       const nav=document.querySelector('body>header nav.ae-sport-nav');
+       nav.classList.add('cam-mobile-bottom-nav');
+       document.body.appendChild(nav);
+    });
+    const newFinal=await after.evaluate(inspect);
     assert.equal(newStart.header,oldFinal.header,'New first-paint header height equals previously settled height');
     assert.equal(newStart.top,oldFinal.top,'Main starts in settled position, no vertical jump');
-    assert.deepEqual(newStart.visible,oldFinal.visible,'Visible navigation options unchanged');
+    assert.deepEqual(newFinal.visible,oldFinal.visible,'Visible navigation options unchanged after placement');
+    assert.equal(newStart.header,newFinal.header,'The new site must not resize header when dock relocates');
     if(width===390){
       assert.ok(oldStart.header>=oldFinal.header+80,'Old mobile page should show extra rows before JS hides sports');
       assert.ok(oldStart.top>=oldFinal.top+80,'Previously had an avoidable vertical movement');
