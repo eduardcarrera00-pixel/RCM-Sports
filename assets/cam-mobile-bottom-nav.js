@@ -14,56 +14,7 @@
   const originalButtonLabels = new Map(buttons.map(button => [button, button.getAttribute('aria-label')]));
   const editableSelector = 'input:not([type="checkbox"]):not([type="radio"]), textarea, select, [contenteditable="true"]';
 
-  // The original WebP artwork contains detail/color that is lost when the dock
-  // applies monochrome image filters. Draw transparent, single-color SVG icons
-  // ONLY for the relocated phone navigation; keep the desktop images intact.
-  const svgNS = 'http://www.w3.org/2000/svg';
-  const mobileIconShapes = {
-    Picks: [
-      ['circle', { cx: 12, cy: 12, r: 9 }],
-      ['circle', { cx: 12, cy: 12, r: 5.5 }],
-      ['circle', { cx: 12, cy: 12, r: 1.7, fill: 'currentColor', stroke: 'none' }]
-    ],
-    NFL: [
-      ['path', { d: 'M20.2 3.8c-6.2 0-10.3 2.1-13.3 5.1S2.3 16 3.8 20.2c4.2 1.5 8.3-.1 11.3-3.1s5.1-7.1 5.1-13.3Z' }],
-      ['path', { d: 'm8 8 8 8' }],
-      ['path', { d: 'm9.4 12.2 2.8-2.8M11.8 14.6l2.8-2.8' }]
-    ],
-    'Fútbol': [
-      ['circle', { cx: 12, cy: 12, r: 9 }],
-      ['polygon', { points: '12,7 16,10 14.7,15 9.3,15 8,10' }],
-      ['path', { d: 'M12 7V3.2M8 10 4.2 8.2M9.3 15l-2 4.2M14.7 15l2 4.2M16 10l3.8-1.8' }]
-    ],
-    Opiniones: [
-      ['path', { d: 'M20.5 11a8.5 8.5 0 0 1-8.5 8.5c-1.2 0-2.5-.2-3.7-.7L3.5 20l1.2-4.8A8.5 8.5 0 1 1 20.5 11Z' }],
-      ['path', { d: 'M8 10.5h8M8 13.5h5' }]
-    ]
-  };
-
-  function mountMobileVectorIcons() {
-    for (const button of buttons) {
-      const shapes = mobileIconShapes[button.dataset.category];
-      const wrapper = button.querySelector('.ae-nav-icon');
-      if (!shapes || !wrapper || wrapper.querySelector('.cam-mobile-nav-symbol')) continue;
-      const svg = document.createElementNS(svgNS, 'svg');
-      for (const [name, value] of Object.entries({
-        class: 'cam-mobile-nav-symbol',
-        viewBox: '0 0 24 24',
-        width: 27, height: 27,
-        fill: 'none', stroke: 'currentColor', 'stroke-width': 1.8,
-        'stroke-linecap': 'round', 'stroke-linejoin': 'round',
-        focusable: 'false', 'aria-hidden': 'true'
-      })) svg.setAttribute(name, String(value));
-      for (const [shapeName, attrs] of shapes) {
-        const shape = document.createElementNS(svgNS, shapeName);
-        for (const [name, value] of Object.entries(attrs)) shape.setAttribute(name, String(value));
-        svg.appendChild(shape);
-      }
-      wrapper.appendChild(svg);
-    }
-  }
-  mountMobileVectorIcons();
-
+  // Desktop and mobile display the same brand icon assets.
   function positionCapsule(activeButton) {
     if (!mobile.matches || nav.parentNode !== document.body) return;
     if (!activeButton) {
