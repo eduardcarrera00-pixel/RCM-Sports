@@ -1,7 +1,7 @@
 /* CAM Sports — Opinadores distinguidos; lienzo clásico, día y noche. */
 html body.ae-is-home aside .editorial-community.rcm-panel>.ae-section-heading,
 html:not(.dark) body.ae-is-home aside .editorial-community.rcm-panel>.ae-section-heading{
-  display:flex!important;align-items:center!important;justify-content:center!important;
+  display:flex!important;align-items:center!important;justify-content:flex-start!important;
   min-height:118px!important;height:118px!important;max-height:none!important;padding:15px 18px!important;
   position:relative!important;isolation:isolate!important;
   border-top:0!important;border-bottom:1px solid rgba(138,110,78,.20)!important;
@@ -16,14 +16,71 @@ html body.ae-is-home aside .editorial-community.rcm-panel>.ae-section-heading::a
 html body.ae-is-home aside .editorial-community.rcm-panel>.ae-section-heading h2,
 html:not(.dark) body.ae-is-home aside .editorial-community.rcm-panel>.ae-section-heading h2{
  position:relative!important;z-index:2!important;margin:0!important;padding:0!important;
- width:265px!important;max-width:85%!important;text-align:center!important;
- font:600 clamp(25px,3vw,34px)/.94 'Newsreader',Georgia,serif!important;
+ width:min(265px,64%)!important;max-width:64%!important;text-align:left!important;
+ font:600 clamp(25px,3vw,34px)/1.04 var(--ds-font-serif)!important;
  letter-spacing:-.03em!important;text-wrap:balance!important;
- color:#182a37!important;text-shadow:0 1px 3px rgba(255,242,218,.7)!important;
+ color:#FFFFFF!important;text-shadow:0 2px 5px rgba(0,0,0,.82)!important;
 }
 @media(max-width:640px){
  html body.ae-is-home aside .editorial-community.rcm-panel>.ae-section-heading,
 html:not(.dark) body.ae-is-home aside .editorial-community.rcm-panel>.ae-section-heading{min-height:102px!important;height:102px!important;max-height:none!important;padding:11px 12px!important}
  html body.ae-is-home aside .editorial-community.rcm-panel>.ae-section-heading h2,
-html:not(.dark) body.ae-is-home aside .editorial-community.rcm-panel>.ae-section-heading h2{width:210px!important;font-size:clamp(23px,5.8vw,29px)!important}
+html:not(.dark) body.ae-is-home aside .editorial-community.rcm-panel>.ae-section-heading h2{width:min(210px,64%)!important;max-width:64%!important;font-size:clamp(23px,5.8vw,29px)!important}
+}
+
+/* CAM SPORTS · Jerarquía tipográfica común. Esta hoja se carga en ambos modos.
+   Unifica familias sin modificar tamaños, alturas de tarjetas o componentes. */
+:root{
+  --cam-font-title:var(--ds-font-serif);
+  --cam-font-secondary:var(--ds-font-serif-secondary);
+  --cam-font-body:var(--ds-font-serif-secondary);
+}
+@layer cam-rounded-editorial {
+  html body,
+  html body :is(p,li,dt,dd,small,label,a,button,input,select,textarea,
+    blockquote,th,td,figcaption,summary,output,[role="tab"],[role="button"],
+    [role="menuitem"],.category-btn,.ae-opinions-lede,.ae-opinion-excerpt,
+    .ae-news-card-excerpt,.ae-take-excerpt,.ae-pick-excerpt) {
+    font-family:var(--cam-font-body)!important;
+  }
+
+  /* Titulares principales y banners, con la escala de tamaños existente. */
+  html body :is(h1,h2,.ae-weekly-title,.ae-sport-chef-heading > h3,
+    .ae-section-heading > h3,.ae-takes-head > h3,
+    .ae-opinions-section-head > h3,.cam-analytics-heading h2) {
+    font-family:var(--cam-font-title)!important;
+    font-weight:600!important;
+  }
+
+  /* Subtítulos editoriales, titulares de tarjetas y etiquetas secundarias. */
+  html body :is(h3,h4,h5,h6,.cp-card-title,.ae-trending-title,
+    .ae-news-card-title,.ae-take-title,.ae-story-title,.ae-opinion-title,
+    .ae-rank-note-headline,.ae-community-story-link) {
+    font-family:var(--cam-font-secondary)!important;
+  }
+
+  /* Los enlaces y spans dentro de un titular mantienen la fuente del título. */
+  html body :is(h1,h2,.ae-weekly-title,.ae-sport-chef-heading > h3,
+    .ae-section-heading > h3,.ae-takes-head > h3,
+    .ae-opinions-section-head > h3) :is(a,span) {
+    font-family:var(--cam-font-title)!important;
+  }
+
+  /* Estas cabeceras h3 son banners, no encabezados de tarjeta. */
+  html body :is(.ae-section-heading > h3,.ae-takes-head > h3,
+    .ae-opinions-section-head > h3,.ae-sport-chef-heading > h3) {
+    font-family:var(--cam-font-title)!important;
+    font-weight:600!important;
+  }
+}
+
+/* El banner también se reutiliza en Opiniones; alinear sin mover imágenes. */
+html body.ae-is-opinions #aeOpinionsHighlights > .ae-opinions-section-head[data-cam-opinions-banner="distinguished"]{
+  text-align:left!important;
+  justify-content:flex-start!important;
+}
+html body.ae-is-opinions #aeOpinionsDistinguishedHeading{
+  text-align:left!important;
+  color:#FFFFFF!important;
+  text-shadow:0 2px 5px rgba(0,0,0,.72)!important;
 }
