@@ -2847,7 +2847,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
     </header>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
-        <p id="dataStatus" role="status" class="text-sm text-slate-500">Cargando publicaciones…</p>
+        <p id="dataStatus" role="status" class="sr-only text-sm text-slate-500">Cargando publicaciones…</p>
         <div id="legacyTools" class="hidden mt-2 flex flex-wrap gap-3 text-sm">
             <button type="button" onclick="importLegacyArticles(event)" class="px-3 py-2 rounded-lg border border-slate-300">Recuperar notas de este navegador</button>
             <button type="button" onclick="exportLegacyArticles()" class="px-3 py-2 rounded-lg border border-slate-300">Descargar copia de notas antiguas</button>
@@ -4259,7 +4259,11 @@ async function handleUserLogout() {
         };
 
         function setDataStatus(message) {
-            document.getElementById('dataStatus').textContent = message;
+            const status = document.getElementById('dataStatus');
+            status.textContent = message;
+            // Announce loading/success to assistive tech without pushing the main content.
+            // Failed network requests and editorial errors remain visibly actionable.
+            status.classList.toggle('sr-only', !message);
         }
 
        window.addEventListener('DOMContentLoaded', async () => {
