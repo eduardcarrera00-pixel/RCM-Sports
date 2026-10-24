@@ -2740,14 +2740,8 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
 <script defer src="assets/cam-take-cta.js?v=20261023-take-cta-unificado-1"></script>
 <link rel="stylesheet" href="assets/cam-nfl-opinions-header-only.css?v=20261023-futbol-opinions-day-night-1">
 <link rel="stylesheet" href="assets/cam-football-ranking-banners.css?v=20261023-football-ranking-banner-1">
-<style id="cam-cls-initial-home">
-/* Reserve the first viewport only while Home articles are being fetched.
-   This prevents the flexible footer and other modules from crossing the fold
-   when the empty initial feed is replaced by live news. No final-design rules. */
-body.cam-articles-booting #mainContent{min-height:100svh!important}
-</style>
 </head>
-<body class="min-h-screen flex flex-col justify-between cam-articles-booting bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
+<body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white">
 <a class="ae-skip-link" href="#mainContent">Ir al contenido</a>
 
     <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
@@ -4122,6 +4116,7 @@ html:not(.dark) #aeAuthIntroNotice small{color:#5b6d76}
         ) : null;
         let publishDraftId = null;
         let loadingArticles = false;
+        let initialArticlesPending = true; // Show an empty state only after the first online query finishes.
         let authRevision = 0;
 
         // State variables
@@ -4494,6 +4489,7 @@ currentUser = {
                     if (data.length < 1000) break;
                 }
                 articles = [...rows.map(fromDatabase), ...defaultArticles.map(a => withLocalInteractions({...a, remote: false}))];
+                initialArticlesPending = false;
                 renderArticlesFeed();
                 window.aeRefreshNewsArchive?.();window.aeRankingNotes?.refresh?.();
                 window.aeOpinions?.refreshNews?.();
@@ -4503,11 +4499,10 @@ currentUser = {
                 await loadArticleViews();
                 setDataStatus('');
             } catch {
+                initialArticlesPending = false;
+                renderArticlesFeed(); // On network errors the actual empty state becomes available.
                 setDataStatus('No se pudieron cargar las publicaciones en línea. Comprueba tu conexión y recarga la página.');
-            } finally {
-                loadingArticles = false;
-                document.body.classList.remove('cam-articles-booting');
-            }
+            } finally { loadingArticles = false; }
         }
 
         function exportLegacyArticles() {
@@ -4703,7 +4698,9 @@ currentUser = {
             if (filtered.length === 0) {
                 heroSection.classList.add('hidden');
                 articlesGrid.classList.add('hidden');
-                noResults.classList.remove('hidden');
+                // Do not flash a false "No hay artículos" message during the
+                // first asynchronous fetch; the final message remains unchanged.
+                noResults.classList.toggle('hidden', initialArticlesPending);
                 return;
             }
 
