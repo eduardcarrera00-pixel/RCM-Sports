@@ -1,0 +1,45 @@
+name: CAM SPORTS mobile welcome image budget
+
+on:
+  pull_request:
+    paths:
+      - 'assets/ae-classical-auth-buttons.css'
+      - 'assets/cam-perf-core-extras.css'
+      - 'assets/cam-welcome-home-entry.js'
+      - 'tests/mobile-welcome-image-budget.cjs'
+      - 'package.json'
+      - '.github/workflows/cam-welcome-image-performance.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'assets/ae-classical-auth-buttons.css'
+      - 'assets/cam-perf-core-extras.css'
+      - 'assets/cam-welcome-home-entry.js'
+      - 'tests/mobile-welcome-image-budget.cjs'
+      - 'package.json'
+      - '.github/workflows/cam-welcome-image-performance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mobile-welcome-image:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Ensure generated CSS packs are current
+        run: npm run test:performance
+      - run: node --check assets/cam-welcome-home-entry.js
+      - run: node --check tests/mobile-welcome-image-budget.cjs
+      - run: npx playwright install --with-deps chromium
+      - name: Verify day/night phone image budgets and desktop quality
+        run: npm run test:perf:welcome
+      - name: Preserve auth, mobile navigation and home layout
+        run: npm run test:auth && npm run test:mobile-nav && npm run test:site-banners
