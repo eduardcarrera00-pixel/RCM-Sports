@@ -1,10 +1,16 @@
 name: CAM SPORTS CLS diagnosis (first visit)
 on:
-  push:
-    branches: [perf/cls-stability-20261024]
+  pull_request:
     paths:
       - 'index.html'
       - 'scripts/diagnose-layout-shifts.cjs'
+      - 'tests/home-first-load-stability.mjs'
+      - '.github/workflows/cam-cls-diagnosis.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/diagnose-layout-shifts.cjs'
+      - 'tests/home-first-load-stability.mjs'
       - '.github/workflows/cam-cls-diagnosis.yml'
   workflow_dispatch:
 permissions:
@@ -20,6 +26,10 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci
+      - name: Prevent false empty-news screen during first fetch
+        run: node tests/home-first-load-stability.mjs
       - run: npx playwright install --with-deps chromium
       - name: Trace CLS shifts in cold mobile and desktop visits
         run: node scripts/diagnose-layout-shifts.cjs
+      - name: Preserve Picks, auth, navigation and editorial views
+        run: npm run test:picks && npm run test:auth && npm run test:mobile-nav && npm run test:opinions-banners && npm run test:site-banners && npm run test:perf:editorial
