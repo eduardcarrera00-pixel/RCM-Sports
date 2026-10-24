@@ -13,6 +13,8 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -30,20 +32,53 @@ jobs:
           curl --fail --silent http://127.0.0.1:8123/ -o /dev/null
           node -e 'console.log("CHROME_PATH="+require("playwright").chromium.executablePath())' >> "$GITHUB_ENV"
           mkdir -p lighthouse
-      - name: Lighthouse mobile first visit
+      - name: Read latest main HTML as no-fix baseline
+        shell: bash
+        run: |
+          cp index.html /tmp/cam-pr-index.html
+          git fetch origin main
+          git show FETCH_HEAD:index.html > index.html
+      - name: Lighthouse baseline mobile
+        run: >-
+          npx --yes lighthouse@13.5.0 http://127.0.0.1:8123/
+          --only-categories=performance --output=json --output-path=lighthouse/mobile-main.json
+          --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage"
+          --max-wait-for-load=45000 --quiet
+      - name: Lighthouse baseline desktop
+        run: >-
+          npx --yes lighthouse@13.5.0 http://127.0.0.1:8123/
+          --only-categories=performance --preset=desktop --output=json --output-path=lighthouse/desktop-main.json
+          --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage"
+          --max-wait-for-load=45000 --quiet
+      - name: Restore pull request version
+        run: mv /tmp/cam-pr-index.html index.html
+      - name: Lighthouse PR mobile
         run: >-
           npx --yes lighthouse@13.5.0 http://127.0.0.1:8123/
           --only-categories=performance --output=json --output-path=lighthouse/mobile.json
           --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage"
           --max-wait-for-load=45000 --quiet
-      - name: Lighthouse desktop first visit
+      - name: Lighthouse PR desktop
         run: >-
           npx --yes lighthouse@13.5.0 http://127.0.0.1:8123/
           --only-categories=performance --preset=desktop --output=json --output-path=lighthouse/desktop.json
           --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage"
           --max-wait-for-load=45000 --quiet
-      - name: Record FCP LCP TBT CLS and total transfer
-        run: node scripts/report-lighthouse.mjs lighthouse/mobile.json lighthouse/desktop.json
+      - name: Compare Lighthouse CLS and LCP on same runner
+        run: |
+          echo "### Current main (no CLS fix)"
+          node scripts/report-lighthouse.mjs lighthouse/mobile-main.json lighthouse/desktop-main.json
+          echo "### Pull request (desktop-only CLS fix)"
+          node scripts/report-lighthouse.mjs lighthouse/mobile.json lighthouse/desktop.json
+          node - <<'NODE'
+          const fs=require('fs');
+          for(const mode of ['mobile','desktop']){
+            const before=JSON.parse(fs.readFileSync('lighthouse/'+mode+'-main.json'));
+            const after=JSON.parse(fs.readFileSync('lighthouse/'+mode+'.json'));
+            const v=x=>Number(x.audits['cumulative-layout-shift']?.numericValue||0);
+            console.log(mode+': baseline CLS='+v(before).toFixed(3)+', PR CLS='+v(after).toFixed(3)+', delta='+(v(after)-v(before)).toFixed(3));
+          }
+          NODE
       - uses: actions/upload-artifact@v4
         if: always()
         with:
