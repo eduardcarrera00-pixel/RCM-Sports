@@ -28,9 +28,25 @@ assert.match(index, /viewport-fit=cover/);
 assert.match(css, /prefers-reduced-motion: reduce/);
 assert.match(css, /svg\.cam-mobile-nav-symbol/);
 assert.match(css, /calc\(7px \+ env\(safe-area-inset-bottom/);
-assert.match(css, /img\.ae-custom-sport-icon\s*\{\s*display: none !important/);
+assert.match(css, /img\.ae-custom-sport-icon\s*\{\s*display: block !important/);
+assert.doesNotMatch(js, /mountMobileVectorIcons/);
 assert.doesNotMatch(css, /@media\s*\(min-width:/);
 assert.match(visibility, /querySelector\('nav\.ae-sport-nav'\)/);
+
+
+// The icon files in desktop and phone are the exact same artwork, rather than similar drawings.
+for (const [category, filename] of Object.entries({
+  Picks: 'picks', NFL: 'nfl', 'Fútbol': 'futbol', Opiniones: 'takes'
+})) {
+  assert.match(index, new RegExp('assets/icons/cam-brand-' + filename + '\\.svg'));
+  const iconSource = readFileSync(resolve(root, 'assets/icons/cam-brand-' + filename + '.svg'), 'utf8');
+  assert.match(iconSource, /viewBox=/);
+  assert.match(iconSource, /#F3EBDD/);
+}
+const brandStyles = readFileSync(resolve(root, 'assets/cam-brand-navigation-icons.css'), 'utf8');
+assert.match(index, /cam-brand-navigation-icons\.css/);
+assert.match(brandStyles, /cam-brand-login\.svg/);
+assert.match(index, /cam-brand-sol\.svg/);
 
 const window = new Window({ url: 'https://camsports.github.io/' });
 const { document } = window;
@@ -73,12 +89,8 @@ assert.equal(document.querySelectorAll('.category-btn').length, 9, 'do not dupli
 for (const [key, button] of originalButtons) assert.equal(nav.querySelector('[data-category="' + key + '"]'), button);
 for (const category of primary) {
   const button = originalButtons.get(category);
-  const icon = button.querySelector('svg.cam-mobile-nav-symbol');
-  assert.ok(icon, category + ': phone-only SVG is mounted');
-  assert.equal(icon.getAttribute('viewBox'), '0 0 24 24');
-  assert.equal(icon.getAttribute('stroke'), 'currentColor');
-  assert.ok(icon.children.length >= 2, category + ': visible details must remain');
-  assert.equal(button.querySelectorAll('img.ae-custom-sport-icon').length, 1, 'original desktop image stays');
+  assert.equal(button.querySelectorAll('img.ae-custom-sport-icon').length, 1, category + ': canonical icon reused');
+  assert.equal(button.querySelectorAll('svg.cam-mobile-nav-symbol').length, 0, 'no duplicated phone-only symbol');
 }
 assert.ok(document.getElementById('themeToggle')?.closest('header'));
 assert.ok(document.getElementById('camGlobalEditToggle')?.closest('header'));
@@ -125,7 +137,7 @@ mobileListeners.forEach(listener => listener({ matches: false }));
 assert.equal(nav.parentElement, document.querySelector('header .ae-mobile-header-grid'));
 for (const category of primary) {
   assert.equal(originalButtons.get(category).querySelectorAll('img.ae-custom-sport-icon').length, 1);
-  assert.equal(originalButtons.get(category).querySelectorAll('svg.cam-mobile-nav-symbol').length, 1);
+  assert.equal(originalButtons.get(category).querySelectorAll('svg.cam-mobile-nav-symbol').length, 0);
 }
 assert.equal(nav.classList.contains('cam-mobile-bottom-nav'), false);
 assert.equal(nav.getAttribute('aria-label'), 'Explorar deportes');
