@@ -17,7 +17,12 @@ const server=http.createServer((req,res)=>{
  const file=p===root?path.join(root,'index.html'):p;
  try{
   res.setHeader('Content-Type',types[path.extname(file)]||'application/octet-stream');
-  res.end(fs.readFileSync(file));
+  const contents=fs.readFileSync(file);
+  if(p===root && new URL(req.url,'http://127.0.0.1').searchParams.has('cls_before')){
+   const html=contents.toString('utf8').replace(' selection:text-white ae-is-home">',' selection:text-white">');
+   return res.end(html);
+  }
+  res.end(contents);
  }catch{res.writeHead(404);res.end();}
 });
 const initScript=({seen})=>{
@@ -62,10 +67,12 @@ function sessionMax(list){
  const url='http://127.0.0.1:'+server.address().port+'/';
  try{
   for(const variant of [
-   {label:'mobile first visit',w:390,h:844,dpr:3,seen:false},
-   {label:'mobile returning',w:390,h:844,dpr:3,seen:true},
-   {label:'desktop first visit',w:1366,h:900,dpr:1,seen:false},
-   {label:'desktop returning',w:1366,h:900,dpr:1,seen:true}
+   {label:'mobile initial baseline',w:390,h:844,dpr:3,seen:false,before:true},
+   {label:'mobile initial Home class',w:390,h:844,dpr:3,seen:false,before:false},
+   {label:'mobile returning baseline',w:390,h:844,dpr:3,seen:true,before:true},
+   {label:'mobile returning Home class',w:390,h:844,dpr:3,seen:true,before:false},
+   {label:'desktop initial baseline',w:1366,h:900,dpr:1,seen:false,before:true},
+   {label:'desktop initial Home class',w:1366,h:900,dpr:1,seen:false,before:false}
   ]){
    const context=await browser.newContext({viewport:{width:variant.w,height:variant.h},deviceScaleFactor:variant.dpr});
    const page=await context.newPage(),errors=[],failed=[];
@@ -76,7 +83,7 @@ function sessionMax(list){
     return method==='GET'||method==='HEAD'||method==='OPTIONS'?route.continue():route.abort('blockedbyclient');
    });
    await page.addInitScript(initScript,{seen:variant.seen});
-   await page.goto(url,{waitUntil:'domcontentloaded',timeout:45000});
+   await page.goto(url+(variant.before?'?cls_before=1':''),{waitUntil:'domcontentloaded',timeout:45000});
    await page.waitForTimeout(MAX_WAIT);
    const d=await page.evaluate(()=>({
     shifts:window.__camShifts||[],error:window.__camShiftError||null,
