@@ -458,14 +458,8 @@
           const hit = layerIndexOf(el, s.atlas); if (!hit) continue;
           const r = rows.get(s.key), cs = getComputedStyle(el), n = hit.layers.length;
           const imgs = hit.layers.slice(); imgs[hit.i] = cssUrl(r.url);
-          // En las dos cabeceras de Chefs, reducir un 30% únicamente el arte
-          // personalizado. El panel, sus textos y el atlas original no cambian.
-          const isChefHeading = /^picks\.chefs-(mejores|peores)-(dia|noche)$/.test(s.key)
-            && el.matches('.ae-chefs-art-heading');
-          const size = expand(splitLayers(cs.backgroundSize), n);
-          size[hit.i] = isChefHeading ? 'auto 70%' : 'cover';
-          const pos = expand(splitLayers(cs.backgroundPosition), n);
-          pos[hit.i] = isChefHeading ? 'right center' : (focusOf(r) || '50% 50%');
+          const size = expand(splitLayers(cs.backgroundSize), n); size[hit.i] = 'cover';
+          const pos = expand(splitLayers(cs.backgroundPosition), n); pos[hit.i] = focusOf(r) || '50% 50%';
           const rep = expand(splitLayers(cs.backgroundRepeat), n); rep[hit.i] = 'no-repeat';
           el.style.setProperty('background-image', imgs.join(', '), 'important');
           el.style.setProperty('background-size', size.join(', '), 'important');
