@@ -289,7 +289,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
     </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
-<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261023-chef-left-align-1">
+<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261023-banner-system-1">
 <link rel="stylesheet" href="assets/cam-season-guide.css?v=20261021-champion-guide-1">
 <link rel="stylesheet" href="assets/cam-pick-points-rules.css?v=20261021-rules-1">
 <link rel="stylesheet" href="assets/cam-analytics.css?v=20261020-1">
@@ -2784,7 +2784,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
 <link rel="stylesheet" href="assets/cam-football-last-takes-feed.css?v=20261021-football-compact-1">
 <script src="assets/cam-global-edit.js?v=20261022-edit-mode-1"></script>
 <script src="assets/cam-logo-sizing.js?v=20261023-mobile-cache-sync-2"></script>
-<script src="assets/ae-site-images.js?v=20261023-remove-trofeo-1"></script>
+<script src="assets/ae-site-images.js?v=20261023-banner-system-1"></script>
 <script src="assets/cam-site-texts.js?v=20261023-mobile-cache-sync-2"></script>
 <script defer src="assets/cam-mobile-bottom-nav.js?v=20261022-mobile-svg-circles-integrated-1"></script>
 <link rel="stylesheet" href="assets/cam-pick-editor-night.css?v=20261021-editor-night-1">
@@ -4633,6 +4633,7 @@ currentUser = {
                 if (p.trending.parentNode !== p.trendingSlot) { p.trendingSlot.append(p.trending); moved = true; }
                 if (p.community.parentNode !== p.communitySlot) { p.communitySlot.append(p.community); moved = true; }
                 p.trending.hidden = false;
+                p.community.hidden = false;
             } else {
                 if (p.trending.parentNode !== p.trendingParent) {
                     p.trendingParent.insertBefore(p.trending, p.trendingNext); moved = true;

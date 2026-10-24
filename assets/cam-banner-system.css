@@ -1,0 +1,429 @@
+/* CAM SPORTS · Shared banner geometry.
+ * Registered before the legacy rounded layer: important declarations in this
+ * named layer take precedence over its broad pill/radius rules. Artwork remains
+ * an editable CSS image; it never changes the size of the text column.
+ */
+@layer cam-banners {
+  :root {
+    --cam-banner-fill:#073b83;
+    --cam-banner-panel:#f3ebdd;
+    --cam-banner-radius:20px;
+    --cam-banner-pad:clamp(16px,2vw,24px);
+    --cam-banner-gap:16px;
+    --cam-banner-art-width:144px;
+    --cam-banner-art-height:88px;
+    --cam-banner-card-height:120px;
+    --cam-banner-title-size:clamp(20px,1.8vw,25px);
+  }
+  html.dark {
+    --cam-banner-fill:#0a3268;
+    --cam-banner-panel:var(--ds-surface,#102b3e);
+  }
+
+  /* The same frame is used by cards, calls to action and section headers. */
+  [data-cam-banner] {
+    position:relative!important;
+    isolation:isolate!important;
+    box-sizing:border-box!important;
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) var(--cam-banner-art-width)!important;
+    grid-template-rows:none!important;
+    grid-auto-rows:auto!important;
+    align-items:center!important;
+    align-content:center!important;
+    justify-content:normal!important;
+    gap:8px var(--cam-banner-gap)!important;
+    width:100%!important;
+    min-width:0!important;
+    height:auto!important;
+    min-height:var(--cam-banner-card-height)!important;
+    max-height:none!important;
+    margin:0!important;
+    padding:16px var(--cam-banner-pad)!important;
+    overflow:hidden!important;
+    border:0!important;
+    border-radius:var(--cam-banner-radius)!important;
+    background-color:var(--cam-banner-fill)!important;
+    background-image:none!important;
+    color:#fff!important;
+    text-align:left!important;
+    box-shadow:none!important;
+    clip-path:none!important;
+    mask-image:none!important;
+    -webkit-mask-image:none!important;
+  }
+  [data-cam-banner]::before {
+    content:none!important;
+    display:none!important;
+  }
+  [data-cam-banner]::after {
+    content:""!important;
+    display:block!important;
+    position:absolute!important;
+    inset:50% var(--cam-banner-pad) auto auto!important;
+    z-index:0!important;
+    width:var(--cam-banner-art-width)!important;
+    height:var(--cam-banner-art-height)!important;
+    max-width:100%!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    border-radius:0!important;
+    background-color:transparent!important;
+    background-image:var(--cam-banner-art,none)!important;
+    background-size:var(--cam-banner-art-size,contain)!important;
+    background-position:var(--cam-banner-art-position,center)!important;
+    background-repeat:no-repeat!important;
+    mask-image:none!important;
+    -webkit-mask-image:none!important;
+    opacity:1!important;
+    transform:translateY(-50%)!important;
+    filter:none!important;
+    box-shadow:none!important;
+    pointer-events:none!important;
+  }
+  [data-cam-banner]:not([data-cam-banner-key]):not([data-cam-banner-image]):not(:has(>.cam-football-quiniela-illustration)) {
+    grid-template-columns:minmax(0,1fr)!important;
+  }
+  [data-cam-banner]:not([data-cam-banner-key]):not([data-cam-banner-image])::after {
+    content:none!important;
+    display:none!important;
+  }
+  /* Flat original canvases are composited as ivory ink over the shared blue.
+     The source image stays unchanged and can still be replaced in the editor. */
+  [data-cam-banner-ink="light"]::after {
+    filter:grayscale(1) invert(1) contrast(4) sepia(.18)!important;
+    mix-blend-mode:screen!important;
+  }
+  [data-cam-banner-ink="dark"]::after {
+    filter:grayscale(1) contrast(4) sepia(.18)!important;
+    mix-blend-mode:screen!important;
+  }
+  /* Legacy multi-scene atlases remain backgrounds, with their exact original
+     cell crop. They must not appear as a thumbnail showing several scenes. */
+  [data-cam-banner-atlas] {
+    grid-template-columns:minmax(0,1fr)!important;
+    background-image:linear-gradient(90deg,var(--cam-banner-fill),color-mix(in srgb,var(--cam-banner-fill) 78%,transparent)),var(--cam-banner-art)!important;
+    background-size:100% 100%,var(--cam-banner-art-size)!important;
+    background-position:center,var(--cam-banner-art-position)!important;
+    background-repeat:no-repeat!important;
+  }
+  [data-cam-banner-atlas]::after { display:none!important; }
+  [data-cam-banner-photo] {
+    grid-template-columns:minmax(0,1fr)!important;
+    background-image:linear-gradient(90deg,var(--cam-banner-fill) 40%,color-mix(in srgb,var(--cam-banner-fill) 88%,transparent)),var(--cam-banner-art)!important;
+    background-size:100% 100%,cover!important;
+    background-position:center,var(--cam-banner-art-position)!important;
+    background-repeat:no-repeat!important;
+  }
+  [data-cam-banner-photo]::after { display:none!important; }
+  [data-cam-banner] > :is(h2,h3,.ae-weekly-heading-inline,.ae-picks-nudge,
+    .cam-home-take-square-label,.ae-rank-title-wrap) {
+    position:relative!important;
+    grid-column:1!important;
+    grid-row:auto!important;
+    align-self:center!important;
+    justify-self:start!important;
+    z-index:1!important;
+    display:block!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    color:#fff!important;
+    font-family:"Playfair Display",Georgia,serif!important;
+    font-size:var(--cam-banner-title-size)!important;
+    font-weight:600!important;
+    line-height:1.2!important;
+    letter-spacing:normal!important;
+    text-align:left!important;
+    text-transform:none!important;
+    text-shadow:none!important;
+    white-space:normal!important;
+    overflow:visible!important;
+    overflow-wrap:break-word!important;
+    text-wrap:pretty!important;
+    clip-path:none!important;
+  }
+  [data-cam-banner] > :is(h2,h3)::before,
+  [data-cam-banner] > :is(h2,h3)::after {
+    content:none!important;
+    display:none!important;
+  }
+  [data-cam-banner] > p {
+    grid-column:1!important;
+    grid-row:auto!important;
+    position:relative!important;
+    z-index:1!important;
+    width:auto!important;
+    min-width:0!important;
+    max-width:65ch!important;
+    margin:0!important;
+    padding:0!important;
+    color:#f3ebdd!important;
+    font:400 13px/1.55 "Libre Baskerville",Georgia,serif!important;
+    text-align:left!important;
+    text-shadow:none!important;
+    overflow-wrap:break-word!important;
+  }
+  [data-cam-banner] > p strong { color:inherit!important; }
+  [data-cam-banner] > :is(.ae-takes-eyebrow,.cam-home-take-square-arrow,span:not([class])) {
+    grid-column:1!important;
+    grid-row:auto!important;
+    position:relative!important;
+    margin:0!important;
+    padding:0!important;
+    color:#f3ebdd!important;
+    text-align:left!important;
+  }
+  [data-cam-banner] > button {
+    grid-column:1!important;
+    grid-row:auto!important;
+    position:relative!important;
+    inset:auto!important;
+    align-self:start!important;
+    justify-self:start!important;
+    width:max-content!important;
+    max-width:100%!important;
+    margin:0!important;
+  }
+  [data-cam-banner="feature"] {
+    --cam-banner-art-height:120px;
+    min-height:176px!important;
+    padding-block:24px!important;
+  }
+  [data-cam-banner="feature"] > h2 {
+    font-size:clamp(26px,2.6vw,36px)!important;
+  }
+  [data-cam-banner][hidden], [data-cam-banner].hidden { display:none!important; }
+
+  /* Integrated headers meet the card edges; the parent clips its outer corners. */
+  :is(.ae-sport-chef-card,.ae-nfl-ranking-panel,.ae-inline-chefs-board,
+    .ae-chef-board,.editorial-community,.editorial-trending,.ae-top-takes-card,
+    .ae-vote-column) {
+    overflow:hidden!important;
+    border-radius:var(--cam-banner-radius)!important;
+    container-type:inline-size!important;
+  }
+  :is(.ae-sport-chef-card,.ae-nfl-ranking-panel,.ae-inline-chefs-board,
+    .ae-chef-board,.editorial-community,.editorial-trending,.ae-top-takes-card,
+    .ae-vote-column) > [data-cam-banner] {
+    border-radius:0!important;
+  }
+  html :is(.ae-sport-chef-card,.ae-nfl-ranking-panel,
+    .ae-inline-chefs-board,.ae-chef-board,.editorial-community,.editorial-trending,
+    .ae-vote-column,.ae-top-takes-card) {
+    background-color:var(--cam-banner-panel)!important;
+    background-image:none!important;
+    color:var(--ds-text,#273b49)!important;
+  }
+  :is(.ae-vote-column,.ae-top-takes-card) { padding:0!important; }
+  .ae-vote-column > .ae-discovery-list {
+    box-sizing:border-box!important;
+    padding:14px 16px!important;
+  }
+  [data-cam-banner].ae-chefs-art-heading,
+  [data-cam-banner].ae-picks-rail-heading {
+    --cam-banner-title-size:13px;
+  }
+  [data-cam-banner].ae-picks-heading-cta-row .ae-picks-nudge {
+    font-size:24px!important;
+  }
+  [data-cam-banner].ae-picks-heading-cta-row .ae-picks-nudge::before,
+  [data-cam-banner].ae-picks-heading-cta-row .ae-picks-nudge::after {
+    content:none!important;
+  }
+  #aeHomeTakePublish[data-cam-banner] {
+    grid-template-rows:auto!important;
+  }
+  #aeHomeTakePublish[data-cam-banner] .cam-home-take-square-arrow {
+    display:none!important;
+  }
+  #aeNewsHeadingRow[data-cam-banner] h2 {
+    display:block!important;
+    flex:none!important;
+  }
+  #aeNewsHeadingRow[data-cam-banner] .ae-sport-news-title-link {
+    min-height:0!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    background:none!important;
+    color:#fff!important;
+    font:inherit!important;
+    text-align:left!important;
+    box-shadow:none!important;
+  }
+  #aeNewsHeadingRow[data-cam-banner] .ae-news-inline-tools {
+    grid-column:1!important;
+  }
+
+  /* Keep the existing article image and click targets, including saved framing. */
+  #heroSection,
+  #heroSection .editorial-hero,
+  #picksFeatured,
+  #nflRankings,
+  #championsRankings,
+  .ae-sport-hero,
+  .ae-section-banner,
+  .editorial-pick,
+  #aeTrendingPortada .ae-trending-link {
+    overflow:hidden!important;
+    border-radius:var(--cam-banner-radius)!important;
+  }
+  #heroSection .editorial-hero-image {
+    object-fit:contain!important;
+    object-position:var(--ae-image-focus,right center)!important;
+  }
+  #heroSection .editorial-hero {
+    height:auto!important;
+    min-height:218px!important;
+    max-height:none!important;
+  }
+  #heroSection .editorial-hero-copy {
+    min-width:0!important;
+    min-height:218px!important;
+    height:auto!important;
+  }
+  #heroSection .editorial-hero h1 {
+    overflow:visible!important;
+    -webkit-line-clamp:unset!important;
+    line-clamp:unset!important;
+  }
+  #aeTrendingPortada .ae-trending-link {
+    border-radius:14px!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    background-clip:padding-box!important;
+  }
+  #aeTrendingPortada .ae-trending-item {
+    border-radius:14px!important;
+    overflow:hidden!important;
+  }
+  .ae-home-take-feature {
+    border-radius:var(--cam-banner-radius)!important;
+    overflow:hidden!important;
+  }
+  :is(#aeHomeTakeHistoric,#aeHomePickHistoric) {
+    background-color:var(--cam-banner-fill)!important;
+    background-image:none!important;
+  }
+  #aeTrendingPortada .ae-trending-link::before,
+  #aeTrendingPortada .ae-trending-link::after { border-radius:inherit!important; }
+
+  /* Quiniela controls stay below the heading and retain their original events. */
+  .cam-nfl-top {
+    padding:var(--cam-banner-pad)!important;
+    background:var(--cam-banner-fill)!important;
+    border-radius:var(--cam-banner-radius)!important;
+    overflow:hidden!important;
+  }
+  .cam-nfl-heading[data-cam-banner] {
+    padding:0!important;
+    min-height:176px!important;
+  }
+  .cam-nfl-heading[data-cam-banner]::after { right:0!important; }
+  .cam-nfl-heading[data-cam-banner] > h2 { font-size:28px!important; }
+  .cam-nfl-heading[data-cam-banner] > span { font-size:10px!important; }
+  .cam-nfl-heading[data-cam-banner] .cam-football-quiniela-illustration {
+    position:absolute!important;
+    top:50%!important;
+    right:0!important;
+    width:var(--cam-banner-art-width)!important;
+    height:120px!important;
+    max-width:none!important;
+    object-fit:contain!important;
+    object-position:center!important;
+    transform:translateY(-50%)!important;
+  }
+  #camFootballQuiniela .cam-nfl-heading[data-cam-banner] > p {
+    padding-left:8px!important;
+  }
+
+  /* Custom Opinion section art uses the same slot as the CSS-backed banners. */
+  [data-cam-banner] > .cam-op-banner-image {
+    position:relative!important;
+    grid-column:2!important;
+    grid-row:1 / span 4!important;
+    align-self:center!important;
+    width:var(--cam-banner-art-width)!important;
+    height:120px!important;
+    inset:auto!important;
+    z-index:0!important;
+    object-fit:contain!important;
+    object-position:center!important;
+  }
+  [data-cam-banner-image] > .cam-op-banner-image { display:none!important; }
+
+  /* Narrow desktop columns need the same compact artwork as a phone, even
+     when the viewport itself is wide. Size follows the actual banner width. */
+  @container(max-width:380px) {
+    [data-cam-banner="card"] {
+      --cam-banner-art-width:96px;
+      --cam-banner-art-height:68px;
+      --cam-banner-pad:16px;
+      --cam-banner-title-size:20px;
+      min-height:104px!important;
+    }
+  }
+  @container(max-width:300px) {
+    [data-cam-banner="card"] {
+      --cam-banner-art-width:76px;
+      --cam-banner-art-height:62px;
+      --cam-banner-pad:14px;
+      --cam-banner-gap:10px;
+    }
+  }
+
+  @media(max-width:760px) {
+    :root {
+      --cam-banner-pad:16px;
+      --cam-banner-gap:12px;
+      --cam-banner-art-width:96px;
+      --cam-banner-art-height:68px;
+      --cam-banner-card-height:104px;
+      --cam-banner-title-size:20px;
+    }
+    [data-cam-banner="feature"] {
+      --cam-banner-art-height:88px;
+      min-height:160px!important;
+      padding-block:18px!important;
+    }
+    [data-cam-banner="feature"] > h2 { font-size:26px!important; }
+    [data-cam-banner="feature"] > p { grid-column:1 / -1!important; }
+    [data-cam-banner="feature"] > #aeSportTakePublish {
+      grid-column:1 / -1!important;
+      justify-self:start!important;
+    }
+    [data-cam-banner="feature"]::after {
+      top:18px!important;
+      transform:none!important;
+    }
+    .cam-nfl-heading[data-cam-banner]::after { top:0!important; }
+    .cam-nfl-heading[data-cam-banner] > h2 { font-size:23px!important; }
+    .cam-nfl-heading[data-cam-banner] .cam-football-quiniela-illustration {
+      height:88px!important;
+      top:0!important;
+      transform:none!important;
+    }
+    [data-cam-banner] > .cam-op-banner-image {
+      grid-row:1 / span 2!important;
+      height:88px!important;
+    }
+  }
+  @media(max-width:360px) {
+    :root {
+      --cam-banner-pad:14px;
+      --cam-banner-gap:10px;
+      --cam-banner-art-width:76px;
+      --cam-banner-art-height:62px;
+    }
+    .cam-nfl-heading[data-cam-banner] > h2 { font-size:22px!important; }
+  }
+}
