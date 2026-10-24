@@ -1,0 +1,66 @@
+name: CAM SPORTS Lighthouse performance baseline
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/report-lighthouse.mjs'
+      - '.github/workflows/cam-lighthouse-performance.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/report-lighthouse.mjs'
+      - '.github/workflows/cam-lighthouse-performance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: node --check scripts/report-lighthouse.mjs
+      - name: Install Chrome for Lighthouse
+        run: npx playwright install --with-deps chromium
+      - name: Serve exact source checkout
+        shell: bash
+        run: |
+          python3 -m http.server 8123 --bind 127.0.0.1 > /tmp/cam-local-site.log 2>&1 &
+          for i in {1..20}; do
+            if curl --fail --silent http://127.0.0.1:8123/ -o /dev/null; then break; fi
+            sleep 1
+          done
+          curl --fail --silent http://127.0.0.1:8123/ -o /dev/null
+          node -e 'console.log("CHROME_PATH="+require("playwright").chromium.executablePath())' >> "$GITHUB_ENV"
+          mkdir -p lighthouse
+      - name: Lighthouse mobile — simulated cold first visit
+        run: >-
+          npx --yes lighthouse@13.5.0 http://127.0.0.1:8123/
+          --only-categories=performance --output=json
+          --output-path=lighthouse/mobile.json
+          --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage"
+          --max-wait-for-load=45000 --quiet
+      - name: Lighthouse desktop — simulated cold first visit
+        run: >-
+          npx --yes lighthouse@13.5.0 http://127.0.0.1:8123/
+          --only-categories=performance --preset=desktop --output=json
+          --output-path=lighthouse/desktop.json
+          --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage"
+          --max-wait-for-load=45000 --quiet
+      - name: Show performance score and Core Web Vitals estimates
+        run: node scripts/report-lighthouse.mjs lighthouse/mobile.json lighthouse/desktop.json
+      - name: Attach raw Lighthouse JSON reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cam-sports-lighthouse-lab
+          path: lighthouse/*.json
+          if-no-files-found: warn
+          retention-days: 14
