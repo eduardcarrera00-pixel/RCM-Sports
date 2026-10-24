@@ -289,3 +289,35 @@ html:not(.dark):not(#ds):not(#ds):not(#ds):not(#ds):not(#ds) body:is(.ae-is-nfl,
     transform:none!important;
   }
 }
+
+/* CAM SPORTS · portada: quitar la pluma decorativa izquierda de
+   «Demuestra tu conocimiento» y devolver el espacio al título.
+   El arte del libro/bombilla a la derecha sigue en ::before. */
+html:not(#ds):not(#ds):not(#ds):not(#ds) body.ae-is-home #aeHomeTakeHighlights #aeHomeTakesSectionHeading button#aeHomeTakePublish.cam-home-take-square {
+  grid-template-columns:minmax(0,1fr) 24px!important;
+  gap:clamp(12px,1.6vw,19px)!important;
+}
+html:not(#ds):not(#ds):not(#ds):not(#ds) body.ae-is-home #aeHomeTakeHighlights #aeHomeTakePublish .cam-home-take-square-icon {
+  display:none!important;
+}
+html:not(#ds):not(#ds):not(#ds):not(#ds) body.ae-is-home #aeHomeTakeHighlights #aeHomeTakePublish .cam-home-take-square-label {
+  grid-column:1!important;
+  justify-self:start!important;
+  text-align:left!important;
+}
+html:not(#ds):not(#ds):not(#ds):not(#ds) body.ae-is-home #aeHomeTakeHighlights #aeHomeTakePublish .cam-home-take-square-arrow {
+  grid-column:2!important;
+  justify-self:end!important;
+}
+@media (max-width:760px) {
+  html:not(#ds):not(#ds):not(#ds):not(#ds) body.ae-is-home #aeHomeTakeHighlights #aeHomeTakesSectionHeading button#aeHomeTakePublish.cam-home-take-square {
+    grid-template-columns:minmax(0,1fr) 18px!important;
+    gap:11px!important;
+  }
+}
+@media (max-width:380px) {
+  html:not(#ds):not(#ds):not(#ds):not(#ds) body.ae-is-home #aeHomeTakeHighlights #aeHomeTakesSectionHeading button#aeHomeTakePublish.cam-home-take-square {
+    grid-template-columns:minmax(0,1fr) 16px!important;
+    gap:8px!important;
+  }
+}
