@@ -38,8 +38,7 @@ jobs:
             sleep 1
           done
           curl --fail --silent http://127.0.0.1:8123/ -o /dev/null
-          CHROME="$(node -p "require('playwright').chromium.executablePath()")"
-          printf 'CHROME_PATH=%s\\n' "$CHROME" >> "$GITHUB_ENV"
+          node -e 'console.log("CHROME_PATH="+require("playwright").chromium.executablePath())' >> "$GITHUB_ENV"
           mkdir -p lighthouse
       - name: Lighthouse mobile — simulated cold first visit
         run: >-
