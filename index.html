@@ -2786,10 +2786,11 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
 <script src="assets/cam-logo-sizing.js?v=20261023-mobile-cache-sync-2"></script>
 <script src="assets/ae-site-images.js?v=20261023-nfl-opinions-header-only-1"></script>
 <script src="assets/cam-site-texts.js?v=20261023-mobile-cache-sync-2"></script>
-<script defer src="assets/cam-mobile-bottom-nav.js?v=20261022-mobile-svg-circles-integrated-1"></script>
+<script defer src="assets/cam-mobile-bottom-nav.js?v=20261023-brand-icons-1"></script>
 <link rel="stylesheet" href="assets/cam-pick-editor-night.css?v=20261021-editor-night-1">
 <link rel="stylesheet" href="assets/cam-global-edit.css?v=20261022-logo-size-1">
-<link rel="stylesheet" href="assets/cam-mobile-bottom-nav.css?v=20261022-mobile-svg-circles-integrated-1">
+<link rel="stylesheet" href="assets/cam-mobile-bottom-nav.css?v=20261023-brand-icons-1">
+<link rel="stylesheet" href="assets/cam-brand-navigation-icons.css?v=20261023-unified-1">
 
 <link rel="stylesheet" href="assets/cam-take-cta.css?v=20261023-take-cta-unificado-1">
 <script defer src="assets/cam-take-cta.js?v=20261023-take-cta-unificado-1"></script>
@@ -2810,10 +2811,10 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
                 <input id="searchInput" type="search" hidden aria-hidden="true" tabindex="-1" oninput="handleSearch()">
                 <nav class="ae-sport-nav" aria-label="Explorar deportes">
                     <button onclick="filterByCategory('Todos')" class="category-btn active" data-category="Todos" hidden>Todos</button>
-                    <button onclick="filterByCategory('Picks')" class="category-btn" data-category="Picks"><span class="ae-nav-icon"><img class="ae-custom-sport-icon" src="assets/icons/ae-picks-gold.webp?v=20261016-1" width="40" height="40" loading="eager" decoding="async" alt="" aria-hidden="true"></span><span>Picks</span></button>
-                    <button onclick="filterByCategory('NFL')" class="category-btn" data-category="NFL"><span class="ae-nav-icon"><img class="ae-custom-sport-icon" src="assets/icons/ae-nfl-gold.webp?v=20261016-1" width="40" height="40" loading="eager" decoding="async" alt="" aria-hidden="true"></span><span>NFL</span></button>
-                    <button onclick="filterByCategory('Fútbol')" class="category-btn" data-category="Fútbol"><span class="ae-nav-icon"><img class="ae-custom-sport-icon" src="assets/icons/ae-futbol-gold.webp?v=20261016-1" width="40" height="40" loading="eager" decoding="async" alt="" aria-hidden="true"></span><span>Fútbol</span></button>
-                    <button onclick="filterByCategory('Opiniones')" class="category-btn" data-category="Opiniones"><span class="ae-nav-icon"><img class="ae-custom-sport-icon" src="assets/icons/ae-opiniones-gold.webp?v=20261020-1" width="40" height="40" loading="eager" decoding="async" alt="" aria-hidden="true"></span><span>Opiniones</span></button>
+                    <button onclick="filterByCategory('Picks')" class="category-btn" data-category="Picks"><span class="ae-nav-icon"><img class="ae-custom-sport-icon" src="assets/icons/cam-brand-picks.svg?v=20261023-unified-1" width="40" height="40" loading="eager" decoding="async" alt="" aria-hidden="true"></span><span>Picks</span></button>
+                    <button onclick="filterByCategory('NFL')" class="category-btn" data-category="NFL"><span class="ae-nav-icon"><img class="ae-custom-sport-icon" src="assets/icons/cam-brand-nfl.svg?v=20261023-unified-1" width="40" height="40" loading="eager" decoding="async" alt="" aria-hidden="true"></span><span>NFL</span></button>
+                    <button onclick="filterByCategory('Fútbol')" class="category-btn" data-category="Fútbol"><span class="ae-nav-icon"><img class="ae-custom-sport-icon" src="assets/icons/cam-brand-futbol.svg?v=20261023-unified-1" width="40" height="40" loading="eager" decoding="async" alt="" aria-hidden="true"></span><span>Fútbol</span></button>
+                    <button onclick="filterByCategory('Opiniones')" class="category-btn" data-category="Opiniones"><span class="ae-nav-icon"><img class="ae-custom-sport-icon" src="assets/icons/cam-brand-takes.svg?v=20261023-unified-1" width="40" height="40" loading="eager" decoding="async" alt="" aria-hidden="true"></span><span>Opiniones</span></button>
                     <button onclick="filterByCategory('Fútbol Americano Colegial')" class="category-btn" data-category="Fútbol Americano Colegial"><span class="ae-nav-icon"><img class="ae-custom-sport-icon" src="assets/icons/ae-colegial-gold.webp?v=20261016-1" width="40" height="40" loading="eager" decoding="async" alt="" aria-hidden="true"></span><span>Colegial</span></button>
                     <button onclick="filterByCategory('NBA')" class="category-btn" data-category="NBA"><span class="ae-nav-icon"><i class="fa-solid fa-basketball" aria-hidden="true"></i></span><span>NBA</span></button>
                     <button onclick="filterByCategory('Tenis')" class="category-btn" data-category="Tenis"><span class="ae-nav-icon"><i class="fa-solid fa-table-tennis-paddle-ball" aria-hidden="true"></i></span><span>Tenis</span></button>
@@ -5596,7 +5597,7 @@ function renderRelatedStories(article) {
     const icon = document.getElementById('themeIcon');
     const label = isDark ? 'Activar modo claro' : 'Activar modo oscuro';
 
-    icon.src = isDark ? 'assets/icons/ae-sol-gold.webp?v=20261016-1' : 'assets/icons/ae-luna-gold.webp?v=20261016-1';
+    icon.src = isDark ? 'assets/icons/cam-brand-sol.svg?v=20261023-unified-1' : 'assets/icons/ae-luna-gold.webp?v=20261016-1';
     button.classList.toggle('ae-theme-sun-unframed', isDark);
     button.setAttribute('aria-label', label);
     button.setAttribute('aria-pressed', String(isDark));
