@@ -1,0 +1,50 @@
+name: CAM SPORTS editorial CSS deduplication
+
+on:
+  pull_request:
+    paths:
+      - 'assets/style-sources.json'
+      - 'assets/ae-editorial-bundle.css'
+      - 'tests/editorial-css-dedup-browser.cjs'
+      - 'tests/performance-css.mjs'
+      - 'package.json'
+      - '.github/workflows/cam-editorial-css-dedup.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'assets/style-sources.json'
+      - 'assets/ae-editorial-bundle.css'
+      - 'tests/editorial-css-dedup-browser.cjs'
+      - 'tests/performance-css.mjs'
+      - 'package.json'
+      - '.github/workflows/cam-editorial-css-dedup.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  css-dedup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Validate regenerated bundle matches checked in CSS
+        run: |
+          node scripts/build-editorial-css.mjs
+          git diff --exit-code -- assets/ae-editorial-bundle.css
+      - name: Validate no stylesheet is bundled and reloaded
+        run: npm run test:performance
+      - run: node --check tests/editorial-css-dedup-browser.cjs
+      - run: npx playwright install --with-deps chromium
+      - name: Compare old/new computed CSS in all five sections and both themes at two screen sizes
+        run: npm run test:perf:css-cascade
+      - name: Verify visual functions, mobile navigation, picks, and editor
+        run: npm run test:mobile-nav && npm run test:opinions-banners && npm run test:site-banners && npm run test:editor && npm run test:picks
