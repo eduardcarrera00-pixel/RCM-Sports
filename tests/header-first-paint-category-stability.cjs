@@ -72,6 +72,7 @@ const inspect=()=>({
       n.hidden=true;n.setAttribute('aria-hidden','true');
     }),categories);
     const oldFinal=await before.evaluate(inspect);
+    console.log('DEBUG nav '+width+' '+theme+' '+JSON.stringify({oldStart,newStart,oldFinal}));
     assert.equal(newStart.header,oldFinal.header,'New first-paint header height equals previously settled height');
     assert.equal(newStart.top,oldFinal.top,'Main starts in settled position, no vertical jump');
     assert.deepEqual(newStart.visible,oldFinal.visible,'Visible navigation options unchanged');
