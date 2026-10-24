@@ -101,8 +101,8 @@
   pair('futbol.take-champions', 'Tarjetas de Take · Champions', 'Fútbol', 'assets/takes/ae-football-take-champions-night.webp', 'assets/takes/ae-football-take-champions-day.webp');
   pair('futbol.take-laliga', 'Tarjetas de Take · LaLiga', 'Fútbol', 'assets/takes/ae-football-take-laliga-night.webp', 'assets/takes/ae-football-take-laliga-day.webp');
   pair('futbol.take-premier', 'Tarjetas de Take · Premier', 'Fútbol', 'assets/takes/ae-football-take-premier-night.webp', 'assets/takes/ae-football-take-premier-day.webp');
-  f('futbol.populares', 'Fondo de «Populares»', 'Fútbol', 'assets/rankings/ae-football-popular-antagonist-20261020.webp');
-  f('futbol.impopulares', 'Fondo de «Impopulares»', 'Fútbol', 'assets/rankings/ae-football-impopular-antagonist-20261020.webp');
+  f('futbol.populares', 'Banner de «Opiniones populares»', 'Fútbol · Opiniones', 'assets/cam-football-opinion-popular-night.svg');
+  f('futbol.impopulares', 'Banner de «Opiniones impopulares»', 'Fútbol · Opiniones', 'assets/cam-football-opinion-unpopular-night.svg');
   f('futbol.respira', 'Fondo de «Respira Fútbol»', 'Fútbol', 'assets/rankings/ae-football-respira-antagonist-20261020.webp');
   f('futbol.vende-humos', 'Fondo de «Vende Humos»', 'Fútbol', 'assets/rankings/ae-football-humos-antagonist-20261020.webp');
   f('futbol.respira-anterior', 'Fondo de «Respira Fútbol» (versión anterior)', 'Fútbol', 'assets/atmospheres/ae-respira-futbol-reference.webp');
@@ -200,8 +200,10 @@
     const source = FILES.find(e => e.key === base);
     if (!source) continue;
     const originalPath = source.paths[0];
+    const dayPath = (base === 'futbol.populares' || base === 'futbol.impopulares')
+      ? originalPath.replace('-night.svg', '-day.svg') : originalPath;
     f(base + '-noche', source.label, source.section, [], { group: base, variant: NIGHT, originalPath });
-    f(base + '-dia', source.label, source.section, [], { group: base, variant: DAY, originalPath });
+    f(base + '-dia', source.label, source.section, [], { group: base, variant: DAY, originalPath: dayPath });
   }
   const themeArtKey = key => THEME_ART.has(key) ? key + (isDark() ? '-noche' : '-dia') : key;
 

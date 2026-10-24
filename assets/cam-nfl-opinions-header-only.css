@@ -59,3 +59,47 @@ html body.ae-is-nfl #mainContent #freeTakes #aeSportTakeLeaders.ae-sport-chefs[d
     font-size:clamp(17px,4.8vw,22px)!important;
   }
 }
+
+
+/* CAM SPORTS · Fútbol: Opiniones populares / impopulares.
+   Sólo la cabecera contiene el banner; Takes y NFL permanecen intactos.
+   El editor del sitio sobreescribe --ae-opinion-art por elemento y tema. */
+html body.ae-is-football #mainContent #freeTakes #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-takes-grid > .ae-sport-chef-card:is(.is-supported,.is-questioned) { background-image:none!important; }
+html body.ae-is-football #mainContent #freeTakes #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-takes-grid > .ae-sport-chef-card:is(.is-supported,.is-questioned) > .ae-sport-takes-list { background-image:none!important; }
+html:not(.dark) body.ae-is-football #mainContent #freeTakes #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-takes-grid > .ae-sport-chef-card.is-supported { --ae-opinion-art:url("cam-football-opinion-popular-day.svg")!important;--cam-opinion-bg:#073B83; }
+html.dark body.ae-is-football #mainContent #freeTakes #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-takes-grid > .ae-sport-chef-card.is-supported { --ae-opinion-art:url("cam-football-opinion-popular-night.svg")!important;--cam-opinion-bg:#0A3268; }
+html:not(.dark) body.ae-is-football #mainContent #freeTakes #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-takes-grid > .ae-sport-chef-card.is-questioned { --ae-opinion-art:url("cam-football-opinion-unpopular-day.svg")!important;--cam-opinion-bg:#743C46; }
+html.dark body.ae-is-football #mainContent #freeTakes #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-takes-grid > .ae-sport-chef-card.is-questioned { --ae-opinion-art:url("cam-football-opinion-unpopular-night.svg")!important;--cam-opinion-bg:#332634; }
+html body.ae-is-football #mainContent #freeTakes #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-takes-grid > .ae-sport-chef-card:is(.is-supported,.is-questioned) > .ae-sport-chef-heading {
+  position:relative!important;box-sizing:border-box!important;
+  display:flex!important;align-items:center!important;justify-content:flex-start!important;
+  padding:12px clamp(18px,2.25vw,28px)!important;text-align:left!important;
+  overflow:hidden!important;isolation:isolate;
+  border-radius:var(--ds-radius-card) var(--ds-radius-card) 0 0!important;
+  background-color:var(--cam-opinion-bg,#073B83)!important;
+  background-image:linear-gradient(90deg,rgba(4,22,43,.4),rgba(4,22,43,.13) 56%,transparent 78%),var(--ae-opinion-art)!important;
+  background-repeat:no-repeat,no-repeat!important;
+  background-size:100% 100%,cover!important;
+  background-position:center,right center!important;
+}
+html body.ae-is-football #mainContent #freeTakes #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-takes-grid > .ae-sport-chef-card:is(.is-supported,.is-questioned) > .ae-sport-chef-heading::before,
+html body.ae-is-football #mainContent #freeTakes #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-takes-grid > .ae-sport-chef-card:is(.is-supported,.is-questioned) > .ae-sport-chef-heading::after { content:none!important; }
+html body.ae-is-football #mainContent #freeTakes #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-takes-grid > .ae-sport-chef-card:is(.is-supported,.is-questioned) > .ae-sport-chef-heading > h3 {
+  position:relative!important;z-index:1!important;display:block!important;
+  flex:0 1 auto!important;align-self:center!important;
+  min-width:0!important;min-height:0!important;max-width:66%!important;width:auto!important;
+  margin:0!important;padding:0!important;border:0!important;
+  background:transparent!important;color:#FFFFFF!important;
+  font-family:"Playfair Display",Georgia,serif!important;
+  font-size:clamp(19px,1.7vw,25px)!important;font-weight:600!important;
+  line-height:1.2!important;letter-spacing:normal!important;
+  text-align:left!important;text-transform:none!important;text-wrap:balance!important;
+  overflow-wrap:break-word!important;text-shadow:0 2px 5px rgba(0,15,32,.48)!important;
+}
+html body.ae-is-football #mainContent #freeTakes #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-takes-grid > .ae-sport-chef-card:is(.is-supported,.is-questioned) > .ae-sport-chef-heading > button { position:relative;z-index:2; }
+@media(max-width:760px) {
+ html body.ae-is-football #mainContent #freeTakes #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-takes-grid > .ae-sport-chef-card:is(.is-supported,.is-questioned) > .ae-sport-chef-heading { padding:12px 16px!important; }
+ html body.ae-is-football #mainContent #freeTakes #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-takes-grid > .ae-sport-chef-card:is(.is-supported,.is-questioned) > .ae-sport-chef-heading > h3 {
+  max-width:64%!important;font-size:clamp(17px,4.8vw,22px)!important;
+ }
+}

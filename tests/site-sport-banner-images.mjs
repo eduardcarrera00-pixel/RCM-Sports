@@ -384,3 +384,21 @@ chefStyle.remove();
 
 window.happyDOM.abort();
 console.log('CAM SPORTS: saved NFL and football banner overrides, separate news, NFL opinions, Eres Chef and Chefs sizing verified.');
+
+
+/* Fútbol: cuatro banners independientes en el editor y limitados al encabezado. */
+const opinionHeaderCss = readFileSync(new URL('../assets/cam-nfl-opinions-header-only.css', import.meta.url), 'utf8');
+assert.match(opinionHeaderCss, /body\.ae-is-football/);
+assert.match(opinionHeaderCss, /background-image:none!important/);
+assert.match(opinionHeaderCss, /\.ae-sport-chef-heading/);
+assert.match(opinionHeaderCss, /color:#FFFFFF!important/);
+for (const kind of ['populares','impopulares'])
+ for (const mode of ['dia','noche'])
+  assert.ok(window.camSiteImages.keys().includes('futbol.' + kind + '-' + mode),
+    'Falta banner editable Fútbol ' + kind + '/' + mode);
+for (const kind of ['popular','unpopular'])
+ for (const mode of ['day','night']) {
+  const asset = 'cam-football-opinion-' + kind + '-' + mode + '.svg';
+  assert.match(readFileSync(new URL('../assets/' + asset, import.meta.url),'utf8'), /<svg /);
+  assert.ok(opinionHeaderCss.includes(asset), 'Falta recurso de ' + kind + '/' + mode);
+ }
