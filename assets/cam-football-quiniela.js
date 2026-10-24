@@ -291,7 +291,7 @@
     if(g.status==='live')return 'En vivo';
     if(g.status==='postponed')return 'Pospuesto';
     if(new Date(g.kickoff).getTime()<=now())return 'Bloqueado';
-    if(!g.odds_locked_at)return 'Pendiente de cuotas';
+    if(!g.odds_locked_at)return 'Preparando puntos';
     if(!g.picks_open)return 'Cerrada';
     return mine.has(g.id)?'Pronóstico guardado':draft.has(g.id)?'Sin guardar':'Abierto';
   }
@@ -342,7 +342,7 @@
     const next=chosen.filter(g=>Date.parse(g.kickoff)>now()).sort((a,b)=>Date.parse(a.kickoff)-Date.parse(b.kickoff))[0];
     const opened=chosen.filter(g=>g.odds_locked_at).sort((a,b)=>Date.parse(a.odds_locked_at)-Date.parse(b.odds_locked_at))[0];
     st('camFootballRoundInfo',competitionName(competition)+' · '+roundName(matchday)+
-      (opened?' · Apertura: '+clock(opened.odds_locked_at):' · Apertura pendiente de cuotas')+
+      (opened?' · Apertura: '+clock(opened.odds_locked_at):' · Preparando puntos automáticamente')+
       (next?' · Próximo: '+clock(next.kickoff):' · No quedan partidos por disputar'));
     for(const g of visible){
       const box=el('article',null,'cam-nfl-game');
@@ -467,19 +467,6 @@
   function adminGame(g){
     const details=el('details',null,'cam-nfl-admin-game');
     details.append(el('summary','Administrar partido'));
-    if(!g.odds_locked_at){
-      const h=el('input'),d=el('input'),a=el('input');
-      h.type=d.type=a.type='number';
-      h.placeholder='Cuota local';d.placeholder='Cuota empate';a.placeholder='Cuota visitante';
-      const save=button('Congelar cuotas',async()=>{
-        try{
-          await run(client().rpc('cam_football_admin_odds',{p_game_id:g.id,p_home:Number(h.value),
-            p_draw:Number(d.value),p_away:Number(a.value),p_source:'manual'}));
-          await hydrate();
-        }catch(error){st('camFootballStatus',error.message,'error');}
-      });
-      details.append(el('p','Cuotas americanas 1X2 verificadas. Congeladas para todos.'),h,d,a,save);
-    }
     const scoreH=el('input'),scoreA=el('input'),reason=el('input');
     scoreH.type=scoreA.type='number';scoreH.placeholder='Goles local';scoreA.placeholder='Goles visitante';
     reason.placeholder='Justificación (mínimo 8 caracteres)';
@@ -511,21 +498,21 @@
     sea.type=round.type='number';sea.value=String(season);sea.min='2020';
     round.value=String(matchday);round.min='1';round.max='60';
     const sync=button('Sincronizar fútbol',async()=>{
-      sync.disabled=true;st('camFootballStatus','Consultando calendario oficial y cuotas…','loading');
+      sync.disabled=true;st('camFootballStatus','Sincronizando calendario, resultados y puntos automáticos…','loading');
       try{
         const {data,error}=await client().functions.invoke('cam-football-sync',
           {body:{action:'sync',competition:comp.value,season:Number(sea.value)}});
         if(error)throw Error(error.message||'Error de sincronización');
         if(!data?.ok)throw Error(data?.error||'Sincronización no confirmada');
         await hydrate();
-        st('camFootballStatus','Sincronizado: '+data.games+' partidos; '+data.frozen+' cuotas congeladas.'+
+        st('camFootballStatus','Sincronizado: '+data.games+' partidos; '+data.frozen+' puntuaciones fijadas automáticamente.'+
           (data.note?' '+data.note:''),'ok');
       }catch(e){st('camFootballStatus',e.message,'error');}finally{sync.disabled=false;}
     });
     const open=button('Abrir jornada',()=>toggleRound(true));
     const close=button('Cerrar jornada',()=>toggleRound(false));
     controls.append(el('label','Competición'),comp,el('label','Temporada'),sea,el('label','Jornada'),round,sync,open,close);
-    target.append(controls,el('p','Para abrir un partido hacen falta probabilidades verificadas. Una jornada cerrada manualmente permanece cerrada.'));
+    target.append(controls,el('p','Los puntos se asignan y fijan automáticamente. Si faltan datos, cada resultado vale 6 puntos. Una jornada cerrada manualmente permanece cerrada.'));
     async function toggleRound(enabled){
       try{
         const count=await run(client().rpc('cam_football_admin_open',{p_competition:comp.value,
