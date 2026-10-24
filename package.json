@@ -11,7 +11,7 @@
     "test:picks": "node tests/community-picks.mjs && node tests/community-picks-ui.mjs && node tests/pick-author-names.mjs && node tests/pick-history-ui.mjs && node tests/season-predictions-ui.mjs && node tests/picks-feed-scroll-ui.mjs",
     "test:sharing": "node tests/pick-sharing.mjs && node tests/profile-sharing.mjs",
     "test:sharing:browser": "node tests/pick-sharing-browser.cjs && node tests/pick-history-browser.cjs",
-    "test:capture": "node tests/pick-capture-parser.cjs && node tests/pick-ticket-parser.cjs && node tests/pick-momios-parser.cjs && node tests/pick-card-tickets.cjs && node tests/pick-bet-builder.cjs && node tests/pick-capture-ui.mjs && node tests/pick-capture-database.mjs && node tests/pick-composer-direct.mjs",
+    "test:capture": "node tests/ocr-lazy-loading.mjs && node tests/pick-capture-parser.cjs && node tests/pick-ticket-parser.cjs && node tests/pick-momios-parser.cjs && node tests/pick-card-tickets.cjs && node tests/pick-bet-builder.cjs && node tests/pick-capture-ui.mjs && node tests/pick-capture-database.mjs && node tests/pick-composer-direct.mjs",
     "test:capture:browser": "node tests/pick-composer-compact.cjs && node tests/pick-capture-browser.cjs && python3 tests/pick-singles-browser.py",
     "test:auth": "node tests/username-auth-ui.mjs",
     "test:editor": "node tests/news-editor.mjs && node tests/article-photo-edit.mjs",
@@ -26,7 +26,8 @@
     "test:opinions-banners": "node tests/opinions-section-banners.mjs",
     "test:site-banners": "node tests/site-sport-banner-images.mjs",
     "build:css-packs": "node scripts/build-performance-css.mjs",
-    "test:performance": "node scripts/build-performance-css.mjs --check && node tests/performance-css.mjs"
+    "test:performance": "node scripts/build-performance-css.mjs --check && node tests/performance-css.mjs",
+    "test:ocr:lazy": "node tests/ocr-lazy-loading.mjs && node tests/pick-capture-ui.mjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.9",
