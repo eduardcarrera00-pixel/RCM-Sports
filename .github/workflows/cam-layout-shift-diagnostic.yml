@@ -3,6 +3,7 @@ on:
   push:
     branches: [perf/diagnose-cls-20261024]
     paths:
+      - 'index.html'
       - 'tests/layout-shift-diagnostic.cjs'
       - '.github/workflows/cam-layout-shift-diagnostic.yml'
   workflow_dispatch:
