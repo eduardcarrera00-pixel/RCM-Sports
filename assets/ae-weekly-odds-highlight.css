@@ -391,3 +391,25 @@ html body #picksFeatured #picksFeaturedCard .ae-weekly-expand-summary > :is(
     font-size:clamp(26px,6.3vw,30px)!important;
   }
 }
+
+
+/* CAM SPORTS · Uniformar a 13 px los títulos de las secciones de Picks.
+   Sólo encabezados; no afecta partidos, pronósticos, cuotas ni botones.
+   La especificidad protege el mismo tamaño frente a overrides móviles. */
+html body #footballTakes.ae-picks-editorial #aePicksTopPair #picksFeatured .ae-picks-feature-label .ae-weekly-heading-inline h3#picksFeaturedTitle,
+html body.ae-is-home #mainContent > #picksFeatured.ae-home-native-picks .ae-picks-feature-label .ae-weekly-heading-inline h3#picksFeaturedTitle,
+html body #footballTakes.ae-picks-editorial #communityPicks h3:is(
+  #picksPopularTitle,
+  #picksQuestionedTitle,
+  #cpSettleHistoryTitle,
+  #picksRankingTitle,
+  #cpWorstRankingTitle,
+  #aeHomePickHistoricTitle
+),
+html body #footballTakes.ae-picks-editorial #communityPicks .ae-picks-feed-heading h3,
+html body #footballTakes.ae-picks-editorial #communityPicks .ae-picks-heading-cta-row span.ae-picks-nudge,
+html body.ae-is-home #mainContent .editorial-pick h2#weeklyPickTitle {
+  font-size:13px!important;
+  line-height:1.3!important;
+  text-align:left!important;
+}
