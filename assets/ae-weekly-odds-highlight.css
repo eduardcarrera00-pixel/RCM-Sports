@@ -356,3 +356,38 @@ html.dark body.ae-is-home #mainContent .editorial-pick :is(
   outline:2px solid var(--ds-focus)!important;
   outline-offset:3px!important;
 }
+
+
+/* CAM SPORTS | Pick del editor: jerarquía y alineación de lectura.
+   Sólo se modifica la tipografía del encabezado y la alineación del texto.
+   Las acciones Compartir, cuota y estado conservan su posición. */
+html body #picksFeatured .ae-picks-feature-label .ae-weekly-heading-inline,
+html body #picksFeatured #picksFeaturedCard,
+html body #picksFeatured #picksFeaturedCard .ae-weekly-card,
+html body #picksFeatured #picksFeaturedCard .ae-weekly-expandable,
+html body #picksFeatured #picksFeaturedCard .ae-weekly-expand-summary,
+html body #picksFeatured #picksFeaturedCard .ae-weekly-expanded-content {
+  text-align:left!important;
+}
+html body #picksFeatured .ae-picks-feature-label .ae-weekly-heading-inline {
+  justify-content:flex-start!important;
+}
+html body #picksFeatured .ae-picks-feature-label #picksFeaturedTitle {
+  font-size:clamp(28px,2.8vw,36px)!important;
+  line-height:1.15!important;
+  text-align:left!important;
+}
+html body #picksFeatured #picksFeaturedCard .ae-weekly-expand-summary {
+  justify-items:start!important;
+}
+html body #picksFeatured #picksFeaturedCard .ae-weekly-expand-summary > :is(
+  .ae-weekly-title,.ae-weekly-compact-selection,.ae-weekly-expand-hint
+) {
+  text-align:left!important;
+  justify-self:start!important;
+}
+@media (max-width:480px) {
+  html body #picksFeatured .ae-picks-feature-label #picksFeaturedTitle {
+    font-size:clamp(26px,6.3vw,30px)!important;
+  }
+}
