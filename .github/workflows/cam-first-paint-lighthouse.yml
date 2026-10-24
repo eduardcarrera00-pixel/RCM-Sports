@@ -32,27 +32,7 @@ jobs:
           curl --fail --silent http://127.0.0.1:8123/ -o /dev/null
           node -e 'console.log("CHROME_PATH="+require("playwright").chromium.executablePath())' >> "$GITHUB_ENV"
           mkdir -p lighthouse
-      - name: Read latest main HTML as no-fix baseline
-        shell: bash
-        run: |
-          cp index.html /tmp/cam-pr-index.html
-          git fetch origin main
-          git show FETCH_HEAD:index.html > index.html
-      - name: Lighthouse baseline mobile
-        run: >-
-          npx --yes lighthouse@13.5.0 http://127.0.0.1:8123/
-          --only-categories=performance --output=json --output-path=lighthouse/mobile-main.json
-          --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage"
-          --max-wait-for-load=45000 --quiet
-      - name: Lighthouse baseline desktop
-        run: >-
-          npx --yes lighthouse@13.5.0 http://127.0.0.1:8123/
-          --only-categories=performance --preset=desktop --output=json --output-path=lighthouse/desktop-main.json
-          --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage"
-          --max-wait-for-load=45000 --quiet
-      - name: Restore pull request version
-        run: mv /tmp/cam-pr-index.html index.html
-      - name: Lighthouse PR mobile
+      - name: Lighthouse PR mobile (cold checkout first)
         run: >-
           npx --yes lighthouse@13.5.0 http://127.0.0.1:8123/
           --only-categories=performance --output=json --output-path=lighthouse/mobile.json
@@ -62,6 +42,23 @@ jobs:
         run: >-
           npx --yes lighthouse@13.5.0 http://127.0.0.1:8123/
           --only-categories=performance --preset=desktop --output=json --output-path=lighthouse/desktop.json
+          --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage"
+          --max-wait-for-load=45000 --quiet
+      - name: Read latest main HTML as baseline
+        shell: bash
+        run: |
+          git fetch origin main
+          git show FETCH_HEAD:index.html > index.html
+      - name: Lighthouse current-main mobile (second)
+        run: >-
+          npx --yes lighthouse@13.5.0 http://127.0.0.1:8123/
+          --only-categories=performance --output=json --output-path=lighthouse/mobile-main.json
+          --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage"
+          --max-wait-for-load=45000 --quiet
+      - name: Lighthouse current-main desktop
+        run: >-
+          npx --yes lighthouse@13.5.0 http://127.0.0.1:8123/
+          --only-categories=performance --preset=desktop --output=json --output-path=lighthouse/desktop-main.json
           --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage"
           --max-wait-for-load=45000 --quiet
       - name: Compare Lighthouse CLS and LCP on same runner
