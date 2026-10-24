@@ -18,7 +18,7 @@ d.head.append=function(...nodes){
   if(n.tagName==='SCRIPT'&&n.src.includes('ae-pick-capture-parser.js')){
    parserLoads++;
    w.eval(fs.readFileSync('assets/ae-pick-capture-parser.js','utf8'));
-   w.queueMicrotask(()=>n.onload?.());
+   queueMicrotask(()=>n.onload?.());
    continue;
   }
   appendHead(n);
@@ -33,7 +33,7 @@ assert.throws(()=>controller.proof(),/captura/);assert.equal(workers,0,'OCR is l
 assert.equal(parserLoads,0,'No parser request is made before the reader selects an image');
 assert.equal(form.firstElementChild,panel,'Screenshot comes before the form fields');
 assert.equal(privacy.hidden,true,'No cleanup claim before an image is selected');
-upload();await settle();assert.equal(parserLoads,1,'The OCR parser downloads once on first use');assert.equal(panel.dataset.state,'matched');assert.equal(input.files.length,0);assert.ok(canvases.every(c=>c.width===1&&c.height===1));assert.equal(terminated,1);assert.equal(closed,1);
+upload();for(let i=0;i<16&&panel.dataset.state==='reading';i++)await settle();assert.equal(parserLoads,1,'The OCR parser downloads once on first use');assert.equal(panel.dataset.state,'matched','OCR must reach matched after async parser load: '+panel.dataset.state+' / '+d.getElementById('cpCaptureStatus')?.textContent);assert.equal(input.files.length,0);assert.ok(canvases.every(c=>c.width===1&&c.height===1));assert.equal(terminated,1);assert.equal(closed,1);
 assert.equal(privacy.dataset.state,'complete');assert.match(privacy.textContent,/Captura descartada/);assert.match(privacy.textContent,/solo guardamos los datos de tu pick/);assert.ok(Array.from(privacy.querySelectorAll('li')).every(step=>step.dataset.state==='complete'));
 assert.equal(picks[0].odds,150,'Odds were imported without any typed inputs');assert.equal(picks[0].sport,'NBA');assert.equal(controller.hasImport(),true);
 assert.equal(d.querySelector('#cpCaptureConfirm'),null,'Publishing a reviewed ticket needs no separate confirmation checkbox');
