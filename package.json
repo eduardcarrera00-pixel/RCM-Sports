@@ -34,7 +34,8 @@
     "test:perf:editorial": "node tests/lazy-editorial-browser.cjs",
     "test:perf:welcome": "node tests/mobile-welcome-image-budget.cjs",
     "test:perf:brand": "node tests/lossless-brand-image-browser.cjs",
-    "test:perf:css-cascade": "node tests/editorial-css-dedup-browser.cjs"
+    "test:perf:css-cascade": "node tests/editorial-css-dedup-browser.cjs",
+    "test:cls:home": "node tests/home-initial-route-cls-browser.cjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.9",
