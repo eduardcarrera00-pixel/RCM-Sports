@@ -30,6 +30,14 @@
     --cam-banner-panel:var(--ds-surface,#102b3e);
   }
 
+  /* The four community symbols use the supplied gold night variant. */
+  html.dark :is(
+    [data-cam-banner-key="portada.populares-noche"],
+    [data-cam-banner-key="portada.impopulares-noche"],
+    [data-cam-banner-key="portada.top-takes-noche"],
+    [data-cam-banner-key="portada.top-takes-cuestionados-noche"]
+  ) { --cam-banner-ink:#e8bf79; }
+
   /* The same frame is used by cards, calls to action and section headers. */
   [data-cam-banner] {
     position:relative!important;
@@ -117,6 +125,19 @@
   [data-cam-banner-pending]::after { visibility:hidden!important; }
   [data-cam-banner-empty] { grid-template-columns:minmax(0,1fr)!important; }
   [data-cam-banner-empty]::after { display:none!important; }
+  /* Decoration removed by theme/placement policy, including saved uploads.
+     Keep the editor key, while returning its old image column to the copy. */
+  [data-cam-banner-artless] { grid-template-columns:minmax(0,1fr)!important; }
+  [data-cam-banner-artless]::before,
+  [data-cam-banner-artless]::after {
+    content:none!important;
+    display:none!important;
+    background-image:none!important;
+    mask-image:none!important;
+    -webkit-mask-image:none!important;
+    box-shadow:none!important;
+    filter:none!important;
+  }
   [data-cam-banner] > :is(h2,h3,.ae-weekly-heading-inline,.ae-picks-nudge,
     .cam-home-take-square-label,.ae-rank-title-wrap) {
     position:relative!important;
@@ -227,6 +248,12 @@
   .ae-vote-column > .ae-discovery-list {
     box-sizing:border-box!important;
     padding:14px 16px!important;
+  }
+  :is(#aeHomeTakesPositiveList,#aeHomeTakesNegativeList):has(> .ae-discovery-empty:only-child) {
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    overflow:visible!important;
   }
   [data-cam-banner].ae-chefs-art-heading,
   [data-cam-banner].ae-picks-rail-heading {
@@ -351,14 +378,20 @@
 
   /* Quiniela controls stay below the heading and retain their original events. */
   .cam-nfl-top {
+    --q-on-band:var(--cam-banner-title);
+    --q-on-band-muted:var(--cam-banner-copy);
+    --q-band-control:color-mix(in srgb,var(--cam-banner-ink) 5%,var(--cam-banner-fill));
+    --q-band-line:var(--cam-banner-accent);
     padding:var(--cam-banner-pad)!important;
     background:var(--cam-banner-fill)!important;
     border-radius:var(--cam-banner-radius)!important;
     overflow:hidden!important;
   }
-  .cam-nfl-heading[data-cam-banner] {
+  .cam-nfl-top > .cam-nfl-heading[data-cam-banner] {
     padding:0!important;
     min-height:176px!important;
+    border-radius:0!important;
+    box-shadow:none!important;
   }
   .cam-nfl-heading[data-cam-banner]::after { right:0!important; }
   .cam-nfl-heading[data-cam-banner-key^="futbol.quiniela"] > .cam-football-quiniela-illustration {

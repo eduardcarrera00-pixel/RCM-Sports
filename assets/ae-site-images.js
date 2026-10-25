@@ -188,6 +188,28 @@
    ['portada.top-takes', 'Banner de «Top Takes»', '#aeHomeTopTakes .ae-top-takes-card:not(.is-questioned) .ae-top-takes-card-head'],
    ['portada.top-takes-cuestionados', 'Banner de Top Takes cuestionados', '#aeHomeTopTakes .ae-top-takes-card.is-questioned .ae-top-takes-card-head']
   ].forEach(([key, label, sel], i) => { const [n, d] = banner(rows4[i]); slotPair(key, label, 'Portada · Comunidad', 'portada.banners-comunidad', sel, n, d); });
+  // Separate editable theme slots share crisp, transparent vector silhouettes.
+  // The banner palette supplies blue by day and gold by night.
+  for (const [base, path] of [
+    ['portada.populares', 'assets/cam-home-popular.svg'],
+    ['portada.impopulares', 'assets/cam-home-unpopular.svg'],
+    ['portada.top-takes', 'assets/cam-home-genios.svg'],
+    ['portada.top-takes-cuestionados', 'assets/cam-home-anoetos.svg']
+  ]) for (const theme of ['dia', 'noche']) {
+    SLOTS.find(entry => entry.key === base + '-' + theme).bannerOriginalPath = path;
+  }
+  FILES.find(entry => entry.key === 'portada.take-escena-dia').bannerOriginalPath = 'assets/cam-home-knowledge-day.svg';
+  const RETIRED_HOME_TEXTURES = new Map([
+    ['portada.populares-dia', 'portada.populares-dia-1792729028396.jpg'],
+    ['portada.impopulares-dia', 'portada.impopulares-dia-1792729036390.jpg'],
+    ['portada.populares-noche', 'portada.populares-noche-1792726240079.jpg'],
+    ['portada.impopulares-noche', 'portada.impopulares-noche-1792725138185.jpg'],
+    ['portada.top-takes-dia', 'portada.top-takes-dia-1792782632591.jpg'],
+    ['portada.top-takes-cuestionados-dia', 'portada.top-takes-cuestionados-dia-1792782649105.jpg'],
+    ['portada.top-takes-noche', 'portada.top-takes-noche-1792724537013.jpg'],
+    ['portada.top-takes-cuestionados-noche', 'portada.top-takes-cuestionados-noche-1792724524410.jpg'],
+    ['portada.take-escena-dia', 'portada.take-escena-dia-1792818842856.jpg']
+  ]);
   // La cabecera de lectores comparte el mismo recorte del mosaico en los dos temas,
   // pero cada tema guarda su propio reemplazo: una foto nocturna no debe oscurecer el
   // modo día (ni al revés). Las claves antiguas sin sufijo se migraron a «-noche».
@@ -333,6 +355,9 @@
     for (const r of Array.isArray(list) ? list : []) {
       if (!r || !ENTRIES.has(r.key)) continue;
       const url = safeUrl(r.url) || null;
+      // Retire the exact marble textures and the wide bookend border previously
+      // mistaken for small icons. Future administrator replacements still work.
+      if (url && RETIRED_HOME_TEXTURES.get(r.key) === new URL(url).pathname.split('/').pop()) continue;
       const fx = Number.isInteger(r.focus_x) ? r.focus_x : null, fy = Number.isInteger(r.focus_y) ? r.focus_y : null;
       if (!url && fx == null && !r.alt) continue;
       m.set(r.key, { url, focus_x: fx, focus_y: fy, alt: typeof r.alt === 'string' ? r.alt : null });
@@ -648,7 +673,25 @@
   const bannerProperty = (el, name, value) => {
     if (el.style.getPropertyValue(name) !== value) el.style.setProperty(name,value);
   };
+  const vectorBannerPaths = [
+    'assets/cam-home-popular.svg', 'assets/cam-home-unpopular.svg',
+    'assets/cam-home-genios.svg', 'assets/cam-home-anoetos.svg', 'assets/cam-home-knowledge-day.svg',
+    'assets/cam-banner-best-plate.svg', 'assets/cam-banner-worst-plate.svg',
+    'assets/cam-banner-nfl-news.svg'
+  ];
   function fitBannerArtwork(el, url, focus) {
+    // Curated monochrome SVGs already have real alpha. Mask directly with the
+    // vector so high-density displays never enlarge a small canvas snapshot.
+    if (vectorBannerPaths.some(path => toURL(path)?.href === url)) {
+      bannerProperty(el,'--cam-banner-mask',cssUrl(url));
+      bannerProperty(el,'--cam-banner-art-size','contain');
+      bannerProperty(el,'--cam-banner-art-position',focus || 'center');
+      if (el.dataset.camBannerTransparent !== '1') el.dataset.camBannerTransparent = '1';
+      delete el.dataset.camBannerPending;
+      delete el.dataset.camBannerPhoto;
+      delete el.dataset.camBannerEmpty;
+      return;
+    }
     if (!window.camBannerArtwork) return;
     const paint = art => {
       if (!art || !el.isConnected || el.style.getPropertyValue('--cam-banner-art') !== cssUrl(url)) return;
@@ -742,12 +785,20 @@
       if (!entry) continue;
       const row = rows.get(key);
       const visual = entry;
-      const parent = visual.kind === 'slot' ? ENTRIES.get(visual.atlas) : null;
+      const parent = visual.kind === 'slot' && !visual.bannerOriginalPath ? ENTRIES.get(visual.atlas) : null;
       const source = row?.url || (parent && (rows.get(parent.key)?.url || parent.paths[0]))
-        || visual.originalPath || visual.paths?.[0] || dataByKey.get(key);
+        || visual.bannerOriginalPath || visual.originalPath || visual.paths?.[0] || dataByKey.get(key);
       for (const el of document.querySelectorAll(selector)) {
         if (el.dataset.camBanner !== family) el.dataset.camBanner = family;
-        if (source) {
+        if (el.dataset.camBannerKey !== key) el.dataset.camBannerKey = key;
+        const artless = key.startsWith('nfl.quiniela-') ||
+          (isDark() && /^(?:portada\.take-escena|nfl\.takes-cabecera|futbol\.takes-cabecera)-noche$/.test(key));
+        if (artless) {
+          if (el.dataset.camBannerArtless !== '1') el.dataset.camBannerArtless = '1';
+          for (const attr of ['camBannerPhoto','camBannerEmpty','camBannerTransparent','camBannerPending','camBannerAtlas']) delete el.dataset[attr];
+          for (const prop of ['--cam-banner-art','--cam-banner-mask','--cam-banner-art-size','--cam-banner-art-position']) el.style.removeProperty(prop);
+        } else if (source) {
+          delete el.dataset.camBannerArtless;
           const url = source.startsWith('data:') ? source : toURL(source)?.href;
           if (el.dataset.camBannerKey !== key) el.dataset.camBannerKey = key;
           if (!row?.url && parent) { el.dataset.camBannerAtlas = '1'; delete el.dataset.camBannerPhoto; }
@@ -765,6 +816,7 @@
           if ((!parent || row?.url) && el.getClientRects().length)
             fitBannerArtwork(el, url || source, focusOf(row));
         } else {
+          delete el.dataset.camBannerArtless;
           delete el.dataset.camBannerKey;
           delete el.dataset.camBannerPhoto;
           delete el.dataset.camBannerEmpty;
@@ -998,6 +1050,7 @@
     }
     for (const n of document.querySelectorAll('img[data-site-image]')) if (!own(n)) add(n, n.dataset.siteImage);
     for (const el of document.querySelectorAll('[data-cam-banner-key]')) {
+      if (el.hasAttribute('data-cam-banner-artless')) continue;
       if (el.matches('.ae-sport-chef-heading') &&
           (el.closest(FOOTBALL_OPINION_CARD_SELECTOR) || el.closest(NFL_OPINION_CARD_SELECTOR))) continue;
       if (!own(el) && el.getClientRects().length) add(el, el.dataset.camBannerKey);
@@ -1229,6 +1282,7 @@
   function dropLocal() { if (ui.localUrl) { URL.revokeObjectURL(ui.localUrl); ui.localUrl = ''; } }
 
   function originalSrc(entry) {
+    if (entry.bannerOriginalPath) return toURL(entry.bannerOriginalPath)?.href || '';
     const e = entry.kind === 'slot' ? ENTRIES.get(entry.atlas) : entry;
     if (e.embedded) return dataByKey.get(e.key) || '';
     return toURL(e.originalPath || e.paths[0])?.href || '';
@@ -1317,7 +1371,7 @@
       ui.variants.appendChild(b);
     }
     const note = entry.kind === 'atlas' ? entry.note + ' Si subes una imagen aquí, reemplaza el mosaico completo: conserva la misma composición y proporción.'
-      : entry.kind === 'slot' ? 'Este banner sale de un mosaico de varias escenas; aquí cambias solo este, sin tocar los demás.' : '';
+      : entry.kind === 'slot' && !entry.bannerOriginalPath ? 'Este banner sale de un mosaico de varias escenas; aquí cambias solo este, sin tocar los demás.' : '';
     ui.note.hidden = !note; ui.note.textContent = note;
     ui.file.value = ''; dropLocal();
     ui.url.value = row?.url || '';
@@ -1525,7 +1579,7 @@
   window.camSiteImages = {
     refresh, reload: load, open: openEditor,
     keys: () => [...ENTRIES.keys()],
-    inventory: () => [...ENTRIES.values()].map(e => ({ key: e.key, label: e.label, section: e.section, kind: e.kind, paths: e.embedded ? ['assets/' + e.embedded + ' (incrustada)'] : (e.paths || [ENTRIES.get(e.atlas).paths[0]]) })),
+    inventory: () => [...ENTRIES.values()].map(e => ({ key: e.key, label: e.label, section: e.section, kind: e.kind, paths: e.bannerOriginalPath ? [e.bannerOriginalPath] : e.embedded ? ['assets/' + e.embedded + ' (incrustada)'] : (e.paths || [ENTRIES.get(e.atlas).paths[0]]) })),
     _state: () => ({ rows: [...rows.keys()], decls: decls.length, pencils: [...admin.pencils.values()].flat().map(p => p.key), admin: admin.on, tableReady })
   };
 })();
