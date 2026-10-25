@@ -116,3 +116,17 @@ escudos no se recolorean. Un archivo que contiene solo un fondo no se muestra
 como un pequeño logo. Mejores/Peores Platos tienen fondo liso e iconos SVG
 independientes, sin el atlas anterior. Opiniones no reutiliza una imagen del
 tema contrario cuando falta una variante.
+
+### Ajustes de ilustraciones y estados
+
+Popular/Unpopular Takes de Home en modo día usan SVG individuales. Se retiran
+únicamente las dos URLs antiguas que contenían mármol y el borde de libros
+usado como pequeño icono de conocimiento. Las nuevas sustituciones del editor
+conservan sus claves y funcionan de forma independiente en cada tema. Los SVG
+monocromos propios se usan directamente como máscara vectorial, sin rasterizar.
+En modo noche, Demuestra tu conocimiento (Home/NFL/Fútbol) conserva fondo liso
+y una sola columna de texto. La cabecera de Quiniela NFL no lleva balón en
+ningún tema; Quiniela de Fútbol mantiene su ilustración. Los estados vacíos
+de Popular/Unpopular ajustan su altura al mensaje; las listas con contenido
+conservan su altura y desplazamiento. Los selectores de quiniela toman su
+contraste de la paleta real del banner.

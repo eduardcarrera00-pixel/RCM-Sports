@@ -343,6 +343,77 @@ window.camGlobalEditMode = { isActive:() => false };
 window.camSiteImages.refresh();
 assert.equal(pencils().length, 0, 'no pencils outside admin edit mode');
 
+// Removed decorations cannot be brought back by cached administrator uploads.
+// Daytime Home votes use sharp independent SVGs, while night and future edits
+// remain independent. Genios/Anoetos keep their current art until replacements.
+document.body.classList.remove('ae-is-football', 'ae-is-nfl');
+const polish = document.createElement('div');
+polish.innerHTML = '<button id="aeHomeTakePublish">Demuestra tu conocimiento</button>' +
+  '<section id="aeHomeTakesPopular"><header class="ae-vote-column-heading"><h3>Popular Takes</h3></header></section>' +
+  '<section id="aeHomeTakesUnpopular"><header class="ae-vote-column-heading"><h3>Unpopular Takes</h3></header></section>' +
+  '<section id="aeHomeTopTakes"><article class="ae-top-takes-card"><header class="ae-top-takes-card-head">Genios</header></article>' +
+  '<article class="ae-top-takes-card is-questioned"><header class="ae-top-takes-card-head">Anoetos</header></article></section>' +
+  '<section id="freeTakes"><header class="ae-takes-head"><h2>Demuestra tu conocimiento</h2><button>Publicar</button></header></section>' +
+  '<section id="camNflQuiniela"><header class="cam-nfl-heading"><h2>La Quiniela NFL</h2></header></section>' +
+  '<section id="camFootballQuiniela"><header class="cam-nfl-heading"><h2>La Quiniela de Fútbol</h2></header></section>';
+document.body.append(polish);
+const popularHome = polish.querySelector('#aeHomeTakesPopular header');
+const unpopularHome = polish.querySelector('#aeHomeTakesUnpopular header');
+const takeHome = polish.querySelector('#aeHomeTakePublish');
+const takeSport = polish.querySelector('#freeTakes header');
+const poolNfl = polish.querySelector('#camNflQuiniela header');
+const poolFootball = polish.querySelector('#camFootballQuiniela header');
+databaseRows = [
+  {key:'portada.populares-dia',url:'https://img.test/site/portada.populares-dia-1792729028396.jpg'},
+  {key:'portada.impopulares-dia',url:'https://img.test/site/portada.impopulares-dia-1792729036390.jpg'},
+  {key:'portada.populares-noche',url:'https://img.test/popular-night-kept.png'},
+  {key:'portada.top-takes-dia',url:'https://img.test/genios-day-kept.png'},
+  {key:'portada.top-takes-cuestionados-dia',url:'https://img.test/anoetos-day-kept.png'},
+  ...['dia','noche'].flatMap(mode => [
+    {key:'portada.take-escena-'+mode,url:'https://img.test/home-'+mode+'.png'},
+    {key:'nfl.takes-cabecera-'+mode,url:'https://img.test/nfl-'+mode+'.png'},
+    {key:'futbol.takes-cabecera-'+mode,url:'https://img.test/football-'+mode+'.png'},
+    {key:'nfl.quiniela-'+mode,url:'https://img.test/ball-'+mode+'.png'}
+  ])
+];
+document.documentElement.classList.remove('dark');
+await window.camSiteImages.reload();
+assert.match(popularHome.style.getPropertyValue('--cam-banner-art'), /cam-home-popular-day\.svg/);
+assert.match(unpopularHome.style.getPropertyValue('--cam-banner-art'), /cam-home-unpopular-day\.svg/);
+assert.ok(!popularHome.hasAttribute('data-cam-banner-atlas'));
+assert.match(polish.querySelector('#aeHomeTopTakes .ae-top-takes-card-head').style.getPropertyValue('--cam-banner-art'), /genios-day-kept/);
+assert.match(polish.querySelector('#aeHomeTopTakes .is-questioned header').style.getPropertyValue('--cam-banner-art'), /anoetos-day-kept/);
+assert.match(takeHome.style.getPropertyValue('--cam-banner-art'), /home-dia/);
+assert.equal(poolNfl.dataset.camBannerArtless, '1');
+assert.equal(poolNfl.style.getPropertyValue('--cam-banner-art'), '');
+assert.ok(!poolFootball.hasAttribute('data-cam-banner-artless'));
+for (const sport of ['nfl','football']) {
+  document.body.classList.remove('ae-is-nfl','ae-is-football');
+  document.body.classList.add('ae-is-'+sport);
+  document.documentElement.classList.add('dark');
+  await window.camSiteImages.reload();
+  for (const el of [takeHome,takeSport,poolNfl]) {
+    assert.equal(el.dataset.camBannerArtless,'1');
+    assert.equal(el.style.getPropertyValue('--cam-banner-art'),'');
+    assert.equal(el.style.getPropertyValue('--cam-banner-mask'),'');
+  }
+  assert.match(popularHome.style.getPropertyValue('--cam-banner-art'), /popular-night-kept/);
+  document.documentElement.classList.remove('dark');
+  await window.camSiteImages.reload();
+  assert.ok(!takeSport.hasAttribute('data-cam-banner-artless'));
+  assert.match(takeSport.style.getPropertyValue('--cam-banner-art'), /-dia\.png/);
+}
+databaseRows.push({key:'portada.populares-dia',url:'https://img.test/future-custom-logo.png'});
+await window.camSiteImages.reload();
+assert.match(popularHome.style.getPropertyValue('--cam-banner-art'), /future-custom-logo/,
+  'New administrator uploads must still override the vector default');
+databaseRows = databaseRows.filter(r => r.key !== 'portada.take-escena-dia');
+databaseRows.push({key:'portada.take-escena-dia',url:'https://img.test/site/portada.take-escena-dia-1792818842856.jpg'});
+await window.camSiteImages.reload();
+assert.match(takeHome.style.getPropertyValue('--cam-banner-art'), /cam-home-knowledge-day\.svg/,
+  'The old full-width border must not appear as a horizontal smudge');
+console.log('PASS: sharp day Home originals, retired textures, unchanged Genios/Anoetos, theme-specific removal and future admin edits.');
+
 window.happyDOM.abort();
 console.log('CAM SPORTS: saved NFL and football banner overrides, separate news, NFL opinions and Eres Chef verified.');
 
