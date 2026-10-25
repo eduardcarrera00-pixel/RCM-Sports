@@ -209,16 +209,6 @@
       });
       tabs.append(tab);
     }
-    const seasonSelect=el('select',null,'cam-nfl-select');
-    seasonSelect.setAttribute('aria-label','Temporada');
-    for(const value of seasons().length?seasons():[season]){
-      const op=el('option',value+'/'+String(value+1).slice(2));op.value=String(value);op.selected=value===season;
-      seasonSelect.append(op);
-    }
-    seasonSelect.addEventListener('change',async()=>{
-      season=Number(seasonSelect.value);matchday=chooseRound();dayKey=null;
-      await loadMine();recover();paint();
-    });
     const rounds=[...new Set(inScope().map(g=>Number(g.matchday)))].sort((a,b)=>a-b);
     const roundSelect=el('select',null,'cam-nfl-select');
     roundSelect.setAttribute('aria-label','Jornada');
@@ -227,7 +217,7 @@
       roundSelect.append(op);
     }
     roundSelect.addEventListener('change',()=>{matchday=Number(roundSelect.value);dayKey=null;paint();});
-    nav.append(tabs,seasonSelect,roundSelect);
+    nav.append(tabs,roundSelect);
   }
   function logo(id){
     const team=teams.get(id);
@@ -327,6 +317,23 @@
     }
     target.append(nav,el('p','Fechas y horarios: America/Toronto','cam-nfl-day-timezone'));
   }
+  let gameViewportObserver;
+  function sizeGameViewport(){
+    const list=$('camFootballGames');
+    if(!list)return;
+    const cards=[...list.querySelectorAll(':scope > .cam-nfl-game')].slice(0,2);
+    const measure=()=>{
+      if(cards.length<2){list.style.removeProperty('--q-two-height');return;}
+      const height=cards[1].getBoundingClientRect().bottom-cards[0].getBoundingClientRect().top;
+      if(height>0)list.style.setProperty('--q-two-height',Math.ceil(height)+'px');
+    };
+    gameViewportObserver?.disconnect();
+    if(typeof ResizeObserver!=='undefined'){
+      gameViewportObserver=new ResizeObserver(measure);
+      cards.forEach(card=>gameViewportObserver.observe(card));
+    }
+    measure();
+  }
   function paintGames(){
     const target=$('camFootballGames');if(!target)return;
     target.replaceChildren();
@@ -361,6 +368,7 @@
 
       target.append(box);
     }
+    sizeGameViewport();
     const save=$('camFootballSave'),saveDay=$('camFootballSaveDay');
     if(save){
       save.disabled=saving||(user?!chosen.some(g=>draft.has(g.id)&&isOpen(g)):false);

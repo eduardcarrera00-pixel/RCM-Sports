@@ -3269,15 +3269,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
               <p>Favorito al 80 %: 3 puntos. Partido equilibrado al 50 %: 4 puntos. Sorpresa al 25 %: 8 puntos.</p>
               <p>Acertar suma los puntos mostrados; fallar, empatar o anular suma 0. Puedes editar hasta el inicio de cada partido. Las quinielas no modifican los puntos de Takes o Picks.</p>
             </details>
-            <section class="cam-nfl-standings" aria-labelledby="camNflStandingTitle">
-              <h3 id="camNflStandingTitle">Clasificación de La Quiniela</h3>
-              <nav id="camNflRankingTabs" class="cam-nfl-tabs" aria-label="Periodo de clasificación">
-                <button type="button" data-scope="week" aria-pressed="true">Jornada</button>
-                <button type="button" data-scope="month" aria-pressed="false">Mensual</button>
-                <button type="button" data-scope="season" aria-pressed="false">Temporada</button>
-              </nav>
-              <div id="camNflRanking" aria-live="polite"></div>
-            </section>
+
             <section id="camNflAdmin" class="cam-nfl-admin" aria-label="Controles de administradores" hidden></section>
           </section>
           <!-- La Quiniela de Fútbol comparte maqueta con la de NFL; sólo cambia el 1X2. -->
@@ -3307,15 +3299,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
               <p>Un resultado menos probable suma más puntos. Si faltan datos, las tres opciones valen 6 puntos. Los puntos publicados son iguales para todos y no cambian con las cuotas posteriores.</p>
               <p>Acertar suma los puntos mostrados; fallar o anular suma 0. El empate es un resultado más y paga sus propios puntos. Puedes editar hasta el inicio de cada partido. Las quinielas no modifican los puntos de Takes o Picks.</p>
             </details>
-            <section class="cam-nfl-standings" aria-labelledby="camFootballStandingTitle">
-              <h3 id="camFootballStandingTitle">Clasificación de La Quiniela</h3>
-              <nav id="camFootballRankingTabs" class="cam-nfl-tabs" aria-label="Periodo de clasificación">
-                <button type="button" data-scope="matchday" aria-pressed="true">Jornada</button>
-                <button type="button" data-scope="month" aria-pressed="false">Mensual</button>
-                <button type="button" data-scope="season" aria-pressed="false">Temporada</button>
-              </nav>
-              <div id="camFootballRanking" aria-live="polite"></div>
-            </section>
+
             <section id="camFootballAdmin" class="cam-nfl-admin" aria-label="Controles de administradores" hidden></section>
           </section>
           <section id="aeSportTakeRanking" class="ae-take-ranking" aria-labelledby="aeSportTakeRankingTitle">
@@ -3358,6 +3342,24 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
             <div id="aeSeasonList" class="ae-season-list"></div>
             <p id="aeSeasonStatus" class="ae-season-status" role="status" aria-live="polite"></p>
           </section>
+            <section id="camNflQuinielaStandings" class="cam-nfl-standings cam-nfl-quiniela cam-quiniela-ranking" aria-labelledby="camNflStandingTitle">
+              <h3 id="camNflStandingTitle">Clasificación de La Quiniela</h3>
+              <nav id="camNflRankingTabs" class="cam-nfl-tabs" aria-label="Periodo de clasificación">
+                <button type="button" data-scope="week" aria-pressed="true">Jornada</button>
+                <button type="button" data-scope="month" aria-pressed="false">Mensual</button>
+                <button type="button" data-scope="season" aria-pressed="false">Temporada</button>
+              </nav>
+              <div id="camNflRanking" aria-live="polite"></div>
+            </section>
+            <section id="camFootballQuinielaStandings" class="cam-nfl-standings cam-nfl-quiniela cam-quiniela-ranking" aria-labelledby="camFootballStandingTitle">
+              <h3 id="camFootballStandingTitle">Clasificación de La Quiniela</h3>
+              <nav id="camFootballRankingTabs" class="cam-nfl-tabs" aria-label="Periodo de clasificación">
+                <button type="button" data-scope="matchday" aria-pressed="true">Jornada</button>
+                <button type="button" data-scope="month" aria-pressed="false">Mensual</button>
+                <button type="button" data-scope="season" aria-pressed="false">Temporada</button>
+              </nav>
+              <div id="camFootballRanking" aria-live="polite"></div>
+            </section>
           <details id="aeTakeReview" class="ae-take-review" hidden><summary>Administrar · Puntuar Takes</summary><p>Primero calcula la dificultad de cada Take (tabla de la liga, nivel de sorpresa o cuota) y después marca si se cumplió. Los puntos (1–20) salen solos: lo obvio vale poco y la sorpresa vale mucho. Si recalculas un Take ya puntuado, su puntuación se actualiza.</p><p id="aeTakeReviewStatus" role="status" aria-live="polite"></p><div id="aeTakeReviewList"></div></details>
           
           
@@ -5729,10 +5731,12 @@ html .cam-weekly-result-surface .cam-weekly-result-on-photo{
    de la misma hoja. Las reglas de forma viven en la capa cam-rounded-editorial
    para convivir con la base de esquinas del sitio sin pelearse con ella.
    =========================================================================== */
+body:not(.ae-is-nfl) #camNflQuinielaStandings,
+body:not(.ae-is-football) #camFootballQuinielaStandings,
 body #camNflQuiniela[hidden],body:not(.ae-is-nfl) #camNflQuiniela,
 body #camFootballQuiniela[hidden],body:not(.ae-is-football) #camFootballQuiniela{display:none!important}
 
-:is(#camNflQuiniela,#camFootballQuiniela),#camNflProfile{
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking),#camNflProfile{
   --q-ink:var(--ds-text,#273b49);
   --q-muted:var(--ds-text-muted,#566876);
   --q-panel:var(--ds-surface-soft,#f4f0e9);
@@ -5768,7 +5772,7 @@ body #camFootballQuiniela[hidden],body:not(.ae-is-football) #camFootballQuiniela
   font-family:var(--ds-font-sans,Inter,system-ui,sans-serif);
   font-size:var(--ds-text-sm,13px);
 }
-html.dark :is(#camNflQuiniela,#camFootballQuiniela),html.dark #camNflProfile{
+html.dark :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking),html.dark #camNflProfile{
   --q-ink:var(--ds-text,#f4e8db);
   --q-muted:var(--ds-text-muted,#c5cdd2);
   --q-panel:var(--ds-surface-soft,#0b2030);
@@ -5797,15 +5801,15 @@ html.dark :is(#camNflQuiniela,#camFootballQuiniela),html.dark #camNflProfile{
   --q-warn-text:#f0cf9a;
 }
 
-:is(#camNflQuiniela,#camFootballQuiniela){
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking){
   margin:var(--ds-section-gap,26px) 0 0;
   padding:clamp(14px,1.4vw,20px);
   border:1px solid var(--q-line);
   background:var(--q-panel);
   box-shadow:var(--q-shadow);
 }
-:is(#camNflQuiniela,#camFootballQuiniela) *{box-sizing:border-box}
-:is(#camNflQuiniela,#camFootballQuiniela) button,:is(#camNflQuiniela,#camFootballQuiniela) select,:is(#camNflQuiniela,#camFootballQuiniela) input{font:inherit;min-height:40px}
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) *{box-sizing:border-box}
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) button,:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) select,:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) input{font:inherit;min-height:40px}
 
 /* ---- Cabecera azul: marca, título editorial y selectores en una sola pieza -- */
 .cam-nfl-top{
@@ -5832,25 +5836,25 @@ html.dark :is(#camNflQuiniela,#camFootballQuiniela),html.dark #camNflProfile{
 .cam-nfl-heading p{margin:0;font-size:var(--ds-text-sm,13px);line-height:1.5;color:var(--q-on-band-muted);max-width:62ch}
 .cam-nfl-heading p strong{color:var(--q-on-band);font-weight:700}
 
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-nav{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:13px 0 0}
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-nav select{
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-nav{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:13px 0 0}
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-nav select{
   padding:7px 12px;min-height:40px;font-weight:600;font-size:var(--ds-text-sm,13px);
   background:var(--q-band-control);color:var(--q-on-band);
   border:1px solid var(--q-band-line);cursor:pointer;max-width:100%;
 }
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-nav select option{color:#1b2d3d;background:#fffaf2}
-:is(#camNflQuiniela,#camFootballQuiniela) #camNflWeekInfo{
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-nav select option{color:#1b2d3d;background:#fffaf2}
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) #camNflWeekInfo{
   margin:10px 0 0;font-size:var(--ds-text-2xs,11px);line-height:1.5;
   color:var(--q-on-band-muted);letter-spacing:.012em;
 }
 /* En escritorio, los selectores y el contexto comparten renglón. */
 @media(min-width:860px){
-  :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-nav{display:inline-flex;vertical-align:middle}
-  :is(#camNflQuiniela,#camFootballQuiniela) #camNflWeekInfo{display:inline;margin-left:14px}
+  :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-nav{display:inline-flex;vertical-align:middle}
+  :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) #camNflWeekInfo{display:inline;margin-left:14px}
 }
 
 /* ---- Avisos: carga, confirmación y error ---------------------------------- */
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-status{margin:0;font-size:var(--ds-text-xs,12px);color:var(--q-meta);line-height:1.5}
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-status{margin:0;font-size:var(--ds-text-xs,12px);color:var(--q-meta);line-height:1.5}
 #camNflStatus:not(:empty){
   display:block;margin:0 0 12px;padding:9px 13px;
   background:var(--q-sunken);border:1px solid var(--q-line);color:var(--q-muted);
@@ -5867,21 +5871,21 @@ html.dark :is(#camNflQuiniela,#camFootballQuiniela),html.dark #camNflProfile{
   width:fit-content;max-width:100%;
   scrollbar-width:thin;-webkit-overflow-scrolling:touch;
 }
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-day{
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-day{
   flex:0 0 auto;display:flex;align-items:baseline;gap:7px;
   padding:8px 13px;min-height:44px;white-space:nowrap;
   background:transparent;border:1px solid transparent;color:var(--q-muted);
   cursor:pointer;text-align:left;
 }
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-day strong{font-size:var(--ds-text-sm,13px);font-weight:700;color:var(--q-ink);text-transform:capitalize}
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-day span{font-size:var(--ds-text-2xs,11px);color:var(--q-meta)}
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-day small{font-size:var(--ds-text-2xs,11px);color:var(--q-meta)}
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-day:hover{background:var(--q-card)}
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-day.is-active{
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-day strong{font-size:var(--ds-text-sm,13px);font-weight:700;color:var(--q-ink);text-transform:capitalize}
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-day span{font-size:var(--ds-text-2xs,11px);color:var(--q-meta)}
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-day small{font-size:var(--ds-text-2xs,11px);color:var(--q-meta)}
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-day:hover{background:var(--q-card)}
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-day.is-active{
   background:var(--q-card);border-color:var(--q-gold);
   box-shadow:inset 0 -2px 0 var(--q-gold);color:var(--q-gold);
 }
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-day.is-active strong{color:var(--q-gold)}
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-day.is-active strong{color:var(--q-gold)}
 .cam-nfl-day-timezone{margin:7px 0 0;font-size:var(--ds-text-2xs,11px);color:var(--q-meta)}
 
 /* ---- Rejilla de partidos --------------------------------------------------- */
@@ -5944,20 +5948,20 @@ html.dark :is(#camNflQuiniela,#camFootballQuiniela),html.dark #camNflProfile{
 }
 .cam-nfl-versus::before,.cam-nfl-versus::after{content:"";flex:1;height:1px;background:var(--q-line)}
 
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-team{
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-team{
   position:relative;overflow:hidden;width:100%;
   display:grid;grid-template-columns:34px minmax(0,1fr) auto;align-items:center;gap:10px;
   padding:7px 10px 7px 12px;min-height:50px;
   border:1px solid var(--q-line);background:var(--q-sunken);color:var(--q-ink);
   text-align:left;cursor:pointer;transition:background .14s ease,border-color .14s ease;
 }
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-team::before{
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-team::before{
   content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--q-side,var(--q-line));
 }
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-team[data-side="away"]{--q-side:var(--q-away)}
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-team[data-side="home"]{--q-side:var(--q-home)}
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-team:not(:disabled):hover{background:var(--q-card);border-color:var(--q-edge)}
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-team:disabled{cursor:default;opacity:.92}
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-team[data-side="away"]{--q-side:var(--q-away)}
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-team[data-side="home"]{--q-side:var(--q-home)}
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-team:not(:disabled):hover{background:var(--q-card);border-color:var(--q-edge)}
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-team:disabled{cursor:default;opacity:.92}
 .cam-nfl-team img{
   width:34px;height:34px;object-fit:contain;display:block;
   background:none;border:0;box-shadow:none;filter:none;
@@ -5971,7 +5975,7 @@ html.dark :is(#camNflQuiniela,#camFootballQuiniela),html.dark #camNflProfile{
   font-size:var(--ds-text-2xs,11px);line-height:1.3;color:var(--q-meta);
   letter-spacing:.06em;text-transform:uppercase;
 }
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-team small{
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-team small{
   padding:4px 9px;flex:none;text-align:center;
   font:700 var(--ds-text-2xs,11px)/1.25 var(--ds-font-sans,Inter,system-ui,sans-serif);white-space:nowrap;
   background:var(--q-gold-soft);color:var(--q-gold-text);
@@ -5979,39 +5983,39 @@ html.dark :is(#camNflQuiniela,#camFootballQuiniela),html.dark #camNflProfile{
 }
 
 /* Selección del usuario: oro, texto en negrita y una marca de verificación. */
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-team.is-selected{
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-team.is-selected{
   border-color:var(--q-gold);background:var(--q-gold-soft);
   box-shadow:inset 0 0 0 1px var(--q-gold);
 }
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-team.is-selected::before{background:var(--q-gold)}
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-team.is-selected .cam-nfl-team-name strong{color:var(--q-gold-text)}
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-team.is-selected .cam-nfl-team-name strong::after{content:" ✓";font-weight:800}
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-team.is-selected small{
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-team.is-selected::before{background:var(--q-gold)}
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-team.is-selected .cam-nfl-team-name strong{color:var(--q-gold-text)}
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-team.is-selected .cam-nfl-team-name strong::after{content:" ✓";font-weight:800}
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-team.is-selected small{
   background:var(--q-gold);color:var(--q-on-gold);border-color:var(--q-gold);
 }
 /* Ganador y perdedor de un partido cerrado. */
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-team.is-winner{
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-team.is-winner{
   border-color:color-mix(in srgb,var(--q-ok) 55%,transparent);
   background:var(--q-ok-bg);
 }
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-team.is-winner::before{background:var(--q-ok)}
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-team.is-winner .cam-nfl-team-name strong{color:var(--q-ok-text)}
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-team.is-winner small{
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-team.is-winner::before{background:var(--q-ok)}
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-team.is-winner .cam-nfl-team-name strong{color:var(--q-ok-text)}
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-team.is-winner small{
   background:var(--q-ok-bg);color:var(--q-ok-text);
   border-color:color-mix(in srgb,var(--q-ok) 45%,transparent);
 }
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-game[data-state="fallo"] .cam-nfl-team.is-selected:not(.is-winner){
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-game[data-state="fallo"] .cam-nfl-team.is-selected:not(.is-winner){
   border-color:color-mix(in srgb,var(--q-bad) 55%,transparent);
   background:var(--q-bad-bg);box-shadow:none;
 }
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-game[data-state="fallo"] .cam-nfl-team.is-selected:not(.is-winner)::before{background:var(--q-bad)}
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-game[data-state="fallo"] .cam-nfl-team.is-selected:not(.is-winner) .cam-nfl-team-name strong{color:var(--q-bad-text)}
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-game[data-state="fallo"] .cam-nfl-team.is-selected:not(.is-winner) .cam-nfl-team-name strong::after{content:" ✕"}
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-game[data-state="fallo"] .cam-nfl-team.is-selected:not(.is-winner) small{
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-game[data-state="fallo"] .cam-nfl-team.is-selected:not(.is-winner)::before{background:var(--q-bad)}
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-game[data-state="fallo"] .cam-nfl-team.is-selected:not(.is-winner) .cam-nfl-team-name strong{color:var(--q-bad-text)}
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-game[data-state="fallo"] .cam-nfl-team.is-selected:not(.is-winner) .cam-nfl-team-name strong::after{content:" ✕"}
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-game[data-state="fallo"] .cam-nfl-team.is-selected:not(.is-winner) small{
   background:var(--q-bad-bg);color:var(--q-bad-text);border-color:color-mix(in srgb,var(--q-bad) 45%,transparent);
 }
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-team.is-loser{opacity:.72}
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-team.is-loser::before{background:var(--q-line)}
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-team.is-loser{opacity:.72}
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-team.is-loser::before{background:var(--q-line)}
 
 .cam-nfl-result{
   display:flex;align-items:center;justify-content:center;gap:10px;
@@ -6023,14 +6027,14 @@ html.dark :is(#camNflQuiniela,#camFootballQuiniela),html.dark #camNflProfile{
 
 /* ---- Guardar y reglas ------------------------------------------------------ */
 .cam-nfl-save-row{display:flex;align-items:center;flex-wrap:wrap;gap:9px;margin:0 0 12px}
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-action{
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-action{
   background:var(--q-gold);color:var(--q-on-gold);border:1px solid var(--q-gold);
   padding:11px 20px;min-height:44px;font-weight:700;font-size:var(--ds-text-sm,13px);cursor:pointer;
 }
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-action:not(:disabled):hover{background:var(--q-gold-strong);border-color:var(--q-gold-strong)}
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-action-secondary{background:transparent;color:var(--q-gold)}
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-action-secondary:not(:disabled):hover{background:var(--q-gold-soft);color:var(--q-gold)}
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-action:disabled{opacity:var(--ds-disabled-opacity,.55);cursor:not-allowed}
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-action:not(:disabled):hover{background:var(--q-gold-strong);border-color:var(--q-gold-strong)}
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-action-secondary{background:transparent;color:var(--q-gold)}
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-action-secondary:not(:disabled):hover{background:var(--q-gold-soft);color:var(--q-gold)}
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-action:disabled{opacity:var(--ds-disabled-opacity,.55);cursor:not-allowed}
 
 .cam-nfl-rules,.cam-nfl-admin-game,.cam-nfl-profile-history{
   border:1px solid var(--q-line);background:var(--q-card);
@@ -6046,14 +6050,14 @@ html.dark :is(#camNflQuiniela,#camFootballQuiniela),html.dark #camNflProfile{
 .cam-nfl-standings h3,.cam-nfl-admin h3{
   margin:0 0 11px;font-size:var(--ds-text-lg,20px);line-height:var(--ds-leading-snug,1.3);color:var(--q-ink);
 }
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-tabs{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:0 0 12px;
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-tabs{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:0 0 12px;
   padding:3px;background:var(--q-sunken);border:1px solid var(--q-line);width:fit-content;max-width:100%}
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-tabs button{
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-tabs button{
   border:1px solid transparent;background:transparent;color:var(--q-meta);
   padding:7px 15px;min-height:40px;font-weight:600;font-size:var(--ds-text-xs,12px);cursor:pointer;
 }
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-tabs button:hover{color:var(--q-ink)}
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-tabs button[aria-pressed=true]{
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-tabs button:hover{color:var(--q-ink)}
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-tabs button[aria-pressed=true]{
   background:var(--q-card);border-color:var(--q-gold);color:var(--q-gold);
   box-shadow:inset 0 -2px 0 var(--q-gold);
 }
@@ -6072,19 +6076,19 @@ html.dark :is(#camNflQuiniela,#camFootballQuiniela),html.dark #camNflProfile{
 }
 .cam-nfl-table tbody tr:nth-child(-n+3) td:first-child{color:var(--q-gold)}
 .cam-nfl-table td:last-child{font-weight:800;color:var(--q-gold);font-size:var(--ds-text-sm,13px)}
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-link{
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-link{
   border:none;background:none;color:var(--q-ink);cursor:pointer;
   display:inline-flex;align-items:center;
   font-weight:700;font-size:var(--ds-text-xs,12px);padding:3px 0;min-height:26px;text-decoration:none;
   border-bottom:1px solid color-mix(in srgb,var(--q-gold) 50%,transparent);
 }
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-link:hover{color:var(--q-gold)}
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-more{
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-link:hover{color:var(--q-gold)}
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-more{
   border:1px solid var(--q-line);background:transparent;color:var(--q-gold);
   cursor:pointer;margin-top:11px;padding:9px 16px;min-height:40px;
   font-weight:700;font-size:var(--ds-text-xs,12px);text-decoration:none;
 }
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-more:hover{background:var(--q-gold-soft)}
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-more:hover{background:var(--q-gold-soft)}
 .cam-nfl-ranking-details{margin-top:4px}
 .cam-nfl-ranking-details summary{cursor:pointer;color:var(--q-muted);font-size:var(--ds-text-2xs,11px);font-weight:600}
 .cam-nfl-ranking-details summary:hover{color:var(--q-gold)}
@@ -6107,7 +6111,7 @@ html.dark :is(#camNflQuiniela,#camFootballQuiniela),html.dark #camNflProfile{
 .cam-nfl-admin-controls{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:0 0 10px}
 .cam-nfl-admin-controls label{font-size:var(--ds-text-2xs,11px);font-weight:700;color:var(--q-muted);
   text-transform:uppercase;letter-spacing:var(--ds-tracking-caps,.08em)}
-:is(#camNflQuiniela,#camFootballQuiniela) input,:is(#camNflQuiniela,#camFootballQuiniela) select{
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) input,:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) select{
   padding:8px 11px;border:1px solid var(--q-edge);background:var(--q-card);
   color:var(--q-ink);max-width:100%;font-size:var(--ds-text-xs,12px);
 }
@@ -6121,7 +6125,7 @@ html.dark :is(#camNflQuiniela,#camFootballQuiniela),html.dark #camNflProfile{
 #camFootballQuiniela .cam-nfl-admin-game .cam-nfl-action{min-height:44px;touch-action:manipulation}
 
 .cam-nfl-admin-game input,.cam-nfl-admin-game select{margin:4px 4px 0 0;max-width:180px}
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-admin-game button{margin-top:4px}
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-admin-game button{margin-top:4px}
 
 /* ---- Mi Quiniela (perfil) -------------------------------------------------- */
 #camNflProfile{
@@ -6136,7 +6140,7 @@ html.dark :is(#camNflQuiniela,#camFootballQuiniela),html.dark #camNflProfile{
   text-transform:uppercase;letter-spacing:var(--ds-tracking-caps,.08em);font-weight:700}
 .cam-nfl-profile-stats strong{display:block;font-size:var(--ds-text-md,17px);margin-top:5px;color:var(--q-gold)}
 
-:is(#camNflQuiniela,#camFootballQuiniela) :is(button,select,input,summary):focus-visible,
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) :is(button,select,input,summary):focus-visible,
 #camNflProfile :is(button,summary):focus-visible{
   outline:var(--ds-focus-width,3px) solid var(--q-focus);outline-offset:2px;
 }
@@ -6144,24 +6148,24 @@ html.dark :is(#camNflQuiniela,#camFootballQuiniela),html.dark #camNflProfile{
 
 /* ---- Teléfono: una fila por partido, recorrido rápido ---------------------- */
 @media(max-width:720px){
-  :is(#camNflQuiniela,#camFootballQuiniela){padding:10px;margin:18px 0 0}
+  :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking){padding:10px;margin:18px 0 0}
   .cam-nfl-top{padding:15px 14px 13px}
   .cam-nfl-games{grid-template-columns:minmax(0,1fr);gap:8px}
   .cam-nfl-game{padding:9px 10px 10px}
-  :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-team{grid-template-columns:30px minmax(0,1fr) auto;gap:9px;min-height:46px;padding:5px 9px 5px 11px}
+  :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-team{grid-template-columns:30px minmax(0,1fr) auto;gap:9px;min-height:46px;padding:5px 9px 5px 11px}
   .cam-nfl-game-meta{padding-bottom:6px}
   .cam-nfl-versus{margin:4px 2px}
   .cam-nfl-team img{width:30px;height:30px}
-  :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-day{flex:0 0 auto;padding:8px 11px}
+  :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-day{flex:0 0 auto;padding:8px 11px}
   .cam-nfl-save-row{display:grid;grid-template-columns:minmax(0,1fr)}
-  :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-action{width:100%}
+  :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-action{width:100%}
   .cam-nfl-table th,.cam-nfl-table td{padding:7px 5px}
   .cam-nfl-table th:nth-child(4),.cam-nfl-table td:nth-child(4){display:none}
   .cam-nfl-profile-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media(max-width:420px){
   /* Con pantallas estrechas caben los dos días sin recortar la pestaña. */
-  :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-day small{display:none}
+  :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-day small{display:none}
 }
 @media(max-width:380px){
   /* Antes que recortar la hora del partido, el cartel baja de renglón. */
@@ -6174,41 +6178,41 @@ html.dark :is(#camNflQuiniela,#camFootballQuiniela),html.dark #camNflProfile{
    de cam-rounded-editorial.css no devuelvan píldoras a las tarjetas de equipo.
    =========================================================================== */
 @layer cam-rounded-editorial{
-  html body :is(#camNflQuiniela,#camFootballQuiniela),
+  html body :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking),
   html body #camNflProfile{border-radius:var(--ds-radius-panel,28px)!important}
-  html body :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-top{
+  html body :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-top{
     border-radius:calc(var(--ds-radius-panel,28px) - 6px)!important;
   }
-  html body :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-game,
-  html body :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-rules,
-  html body :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-empty,
-  html body :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-admin-game,
-  html body :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-days,
-  html body :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-tabs,
+  html body :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-game,
+  html body :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-rules,
+  html body :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-empty,
+  html body :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-admin-game,
+  html body :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-days,
+  html body :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-tabs,
   html body #camNflRanking>p,
   html body #camNflProfile .cam-nfl-profile-stats>div{border-radius:var(--ds-radius-card,20px)!important}
-  html body :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-team,
-  html body :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-result,
-  html body :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-day,
-  html body :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-tabs button,
-  html body :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-nav select,
-  html body :is(#camNflQuiniela,#camFootballQuiniela) input,
-  html body :is(#camNflQuiniela,#camFootballQuiniela) select,
-  html body :is(#camNflQuiniela,#camFootballQuiniela) #camNflStatus:not(:empty){border-radius:var(--ds-radius,14px)!important}
-  html body :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-action,
-  html body :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-more,
-  html body :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-badge,
-  html body :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-team small{border-radius:var(--ds-radius-pill,999px)!important}
-  html body :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-link,
-  html body :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-table,
-  html body :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-table :is(thead,tbody,tr,th,td){border-radius:0!important}
-  html body :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-team img{border-radius:0!important}
+  html body :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-team,
+  html body :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-result,
+  html body :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-day,
+  html body :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-tabs button,
+  html body :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-nav select,
+  html body :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) input,
+  html body :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) select,
+  html body :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) #camNflStatus:not(:empty){border-radius:var(--ds-radius,14px)!important}
+  html body :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-action,
+  html body :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-more,
+  html body :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-badge,
+  html body :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-team small{border-radius:var(--ds-radius-pill,999px)!important}
+  html body :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-link,
+  html body :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-table,
+  html body :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-table :is(thead,tbody,tr,th,td){border-radius:0!important}
+  html body :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-team img{border-radius:0!important}
   /* Títulos: Playfair Display en el principal, Libre Baskerville en el resto. */
-  html body :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-heading h2{
+  html body :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-heading h2{
     font-family:var(--ds-font-serif,"Playfair Display",Georgia,serif)!important;font-weight:600!important;
   }
-  html body :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-standings h3,
-  html body :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-admin h3,
+  html body :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-standings h3,
+  html body :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-admin h3,
   html body #camNflProfile h3{
     font-family:var(--ds-font-serif-secondary,"Libre Baskerville",Georgia,serif)!important;font-weight:700!important;
   }
@@ -6263,51 +6267,51 @@ button.cam-quiniela-team:focus-visible{outline:var(--ds-focus-width,3px) solid v
    =========================================================================== */
 
 /* El empate ocupa el sitio de la «@»: misma altura de separador, pero elegible. */
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-draw{
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-draw{
   position:relative;width:100%;display:flex;align-items:center;gap:9px;
   margin:5px 2px;padding:0;min-height:26px;border:0;background:none;cursor:pointer;
   color:var(--q-muted);text-align:center;
   transition:color .14s ease;
 }
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-draw::before,
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-draw::after{
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-draw::before,
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-draw::after{
   content:"";flex:1;height:1px;background:var(--q-line);
 }
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-draw-label{
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-draw-label{
   font:700 9px/1 var(--ds-font-sans,Inter,system-ui,sans-serif);
   letter-spacing:.2em;text-transform:uppercase;white-space:nowrap;
 }
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-draw small{
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-draw small{
   padding:3px 9px;flex:none;white-space:nowrap;
   font:700 var(--ds-text-2xs,11px)/1.25 var(--ds-font-sans,Inter,system-ui,sans-serif);
   background:var(--q-gold-soft);color:var(--q-gold-text);
   border:1px solid color-mix(in srgb,var(--q-gold) 32%,transparent);
 }
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-draw:not(:disabled):hover{color:var(--q-ink)}
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-draw:disabled{cursor:default;opacity:.92}
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-draw.is-selected{color:var(--q-gold-text)}
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-draw.is-selected .cam-nfl-draw-label::after{content:" ✓";font-weight:800}
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-draw.is-selected small{
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-draw:not(:disabled):hover{color:var(--q-ink)}
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-draw:disabled{cursor:default;opacity:.92}
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-draw.is-selected{color:var(--q-gold-text)}
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-draw.is-selected .cam-nfl-draw-label::after{content:" ✓";font-weight:800}
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-draw.is-selected small{
   background:var(--q-gold);color:var(--q-on-gold);border-color:var(--q-gold);
 }
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-draw.is-winner{color:var(--q-ok-text)}
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-draw.is-winner small{
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-draw.is-winner{color:var(--q-ok-text)}
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-draw.is-winner small{
   background:var(--q-ok-bg);color:var(--q-ok-text);
   border-color:color-mix(in srgb,var(--q-ok) 45%,transparent);
 }
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-game[data-state="fallo"] .cam-nfl-draw.is-selected:not(.is-winner){
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-game[data-state="fallo"] .cam-nfl-draw.is-selected:not(.is-winner){
   color:var(--q-bad-text);
 }
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-game[data-state="fallo"] .cam-nfl-draw.is-selected:not(.is-winner) .cam-nfl-draw-label::after{content:" ✕"}
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-game[data-state="fallo"] .cam-nfl-draw.is-selected:not(.is-winner) small{
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-game[data-state="fallo"] .cam-nfl-draw.is-selected:not(.is-winner) .cam-nfl-draw-label::after{content:" ✕"}
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-game[data-state="fallo"] .cam-nfl-draw.is-selected:not(.is-winner) small{
   background:var(--q-bad-bg);color:var(--q-bad-text);border-color:color-mix(in srgb,var(--q-bad) 45%,transparent);
 }
 
 /* Pestañas de competición: LaLiga · Premier · Liga MX · Champions. */
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-competitions{
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-competitions{
   display:flex;flex-wrap:wrap;gap:6px;
 }
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-competition{
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-competition{
   padding:7px 14px;min-height:40px;cursor:pointer;
   font:700 var(--ds-text-2xs,11px)/1.25 var(--ds-font-sans,Inter,system-ui,sans-serif);
   letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;
@@ -6315,47 +6319,46 @@ button.cam-quiniela-team:focus-visible{outline:var(--ds-focus-width,3px) solid v
   border:1px solid var(--q-band-line);
   transition:background .14s ease,color .14s ease;
 }
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-competition:hover{color:var(--q-on-band)}
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-competition.is-active{
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-competition:hover{color:var(--q-on-band)}
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-competition.is-active{
   color:var(--q-on-gold);background:var(--q-gold);border-color:var(--q-gold);
 }
-:is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-ranking-pick-detail{
+:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-ranking-pick-detail{
   margin:2px 0 0;font-size:var(--ds-text-2xs,11px);color:var(--q-meta);
 }
 
-/* En el teléfono la jornada no se come la pantalla: se ven tres partidos y se desliza. */
+/* Dos partidos completos en móvil; el resto se consulta desplazando la lista. */
 @media(max-width:720px){
-  :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-games{
-    /* 3 tarjetas + sus huecos; la cuarta asoma cortada para que se note el scroll. */
-    max-height:calc(var(--q-card-height,152px) * 3 + 8px * 2 + 28px);
+  :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-games{
+    /* La altura medida respeta tarjetas con resultados o controles de admin. */
+    max-height:var(--q-two-height,calc(var(--q-card-height,152px) * 2 + 8px));
     overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
-    padding-bottom:12px;
-    /* El degradado del borde inferior indica que hay más partidos debajo. */
-    mask-image:linear-gradient(to bottom,#000 calc(100% - 28px),transparent 100%);
-    -webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 28px),transparent 100%);
+    padding-bottom:0;
+    mask-image:none;
+    -webkit-mask-image:none;
     scrollbar-width:thin;
   }
-  :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-games:focus-visible{
+  :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-games:focus-visible{
     outline:2px solid var(--q-focus);outline-offset:3px;
   }
   /* El fútbol añade la fila del empate: su tarjeta es algo más alta. */
   #camFootballQuiniela .cam-nfl-games{--q-card-height:178px}
-  :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-games::-webkit-scrollbar{width:6px}
-  :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-games::-webkit-scrollbar-thumb{
+  :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-games::-webkit-scrollbar{width:6px}
+  :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-games::-webkit-scrollbar-thumb{
     background:color-mix(in srgb,var(--q-edge) 45%,transparent);border-radius:999px;
   }
   /* Con un solo partido no hay nada que deslizar: ni recorte ni degradado. */
-  :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-games:has(>.cam-nfl-game:only-child),
-  :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-games:has(>.cam-nfl-empty){
+  :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-games:has(>.cam-nfl-game:only-child),
+  :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-games:has(>.cam-nfl-empty){
     max-height:none;mask-image:none;-webkit-mask-image:none;padding-bottom:0;
   }
-  :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-competition{padding:7px 12px}
+  :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-competition{padding:7px 12px}
 }
 
 @layer cam-rounded-editorial{
   html body #camFootballRanking>p{border-radius:var(--ds-radius-card,20px)!important}
-  html body :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-competition,
-  html body :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-draw small{border-radius:var(--ds-radius-pill,999px)!important}
+  html body :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-competition,
+  html body :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-draw small{border-radius:var(--ds-radius-pill,999px)!important}
   html body #camFootballQuiniela :is(#camFootballStatus,#camFootballRoundInfo):not(:empty){
     border-radius:var(--ds-radius,14px)!important;
   }
@@ -6443,7 +6446,7 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 </style>
 
 <link rel="stylesheet" href="assets/cam-nfl-profile.css?v=20261022-3tab-1">
-<script src="assets/cam-sport-quiniela-loader.js?v=20261024-mobile-points-4"></script>
+<script src="assets/cam-sport-quiniela-loader.js?v=20261025-two-games-1"></script>
 <script src="assets/cam-nfl-profile.js?v=20261022-3tab-1"></script>
 <script src="assets/ae-season-predictions.js?v=20261021-champion-guide-1"></script>
 <script src="assets/cam-lazy-editorial-loader.js?v=20261024-1"></script>

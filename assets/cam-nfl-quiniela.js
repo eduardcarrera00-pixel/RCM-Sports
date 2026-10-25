@@ -150,20 +150,13 @@
   }
   function paintNav(){
     const nav=$('camNflNav');nav.replaceChildren();
-    const seasonSelect=el('select',null,'cam-nfl-select');seasonSelect.setAttribute('aria-label','Temporada NFL');
-    for(const value of seasons().length?seasons():[season]){
-      const op=el('option',String(value),null);op.value=String(value);op.selected=value===season;seasonSelect.append(op);
-    }
-    seasonSelect.addEventListener('change',async()=>{
-      season=Number(seasonSelect.value);week=chooseWeek();dayKey=null;await loadMine();recover();paint();
-    });
     const weeks=[...new Set(games.filter(g=>g.season===season).map(g=>g.week))].sort((a,b)=>a-b);
     const weekSelect=el('select',null,'cam-nfl-select');weekSelect.setAttribute('aria-label','Jornada NFL');
     for(const value of weeks.length?weeks:[week]){
       const op=el('option',weekName(value));op.value=String(value);op.selected=value===week;weekSelect.append(op);
     }
     weekSelect.addEventListener('change',()=>{week=Number(weekSelect.value);dayKey=null;paint();});
-    nav.append(seasonSelect,weekSelect);
+    nav.append(weekSelect);
   }
   function logo(id){
     const team=window.CamNFLQuinielaTeams?.getTeam(id)||teams.get(id);
@@ -247,6 +240,23 @@
     }
     target.append(nav,el('p','Fechas y horarios: Este · America/Toronto','cam-nfl-day-timezone'));
   }
+  let gameViewportObserver;
+  function sizeGameViewport(){
+    const list=$('camNflGames');
+    if(!list)return;
+    const cards=[...list.querySelectorAll(':scope > .cam-nfl-game')].slice(0,2);
+    const measure=()=>{
+      if(cards.length<2){list.style.removeProperty('--q-two-height');return;}
+      const height=cards[1].getBoundingClientRect().bottom-cards[0].getBoundingClientRect().top;
+      if(height>0)list.style.setProperty('--q-two-height',Math.ceil(height)+'px');
+    };
+    gameViewportObserver?.disconnect();
+    if(typeof ResizeObserver!=='undefined'){
+      gameViewportObserver=new ResizeObserver(measure);
+      cards.forEach(card=>gameViewportObserver.observe(card));
+    }
+    measure();
+  }
   function paintGames(){
     const target=$('camNflGames');if(!target)return;
     target.replaceChildren();
@@ -255,7 +265,7 @@
       dayKey=null;
       $('camNflDayNav')?.replaceChildren();
       target.append(el('p','No hay partidos oficiales cargados para esta jornada.','cam-nfl-empty'));
-      st('camNflWeekInfo',weekName(week)+' · Temporada '+season);
+      st('camNflWeekInfo',weekName(week));
       if($('camNflSave'))$('camNflSave').disabled=true;
       if($('camNflSaveDay'))$('camNflSaveDay').disabled=true;
       return;
@@ -265,7 +275,7 @@
     const visible=chosen.filter(g=>gameDay(g)===dayKey);
     const next=chosen.filter(g=>Date.parse(g.kickoff)>now()).sort((a,b)=>Date.parse(a.kickoff)-Date.parse(b.kickoff))[0];
     const opened=chosen.filter(g=>g.odds_locked_at).sort((a,b)=>Date.parse(a.odds_locked_at)-Date.parse(b.odds_locked_at))[0];
-    st('camNflWeekInfo','Temporada '+season+' · '+weekName(week)+
+    st('camNflWeekInfo',weekName(week)+
       (opened?' · Apertura: '+clock(opened.odds_locked_at):' · Apertura pendiente de cuotas')+
       (next?' · Próximo: '+clock(next.kickoff):' · No quedan partidos por disputar'));
     for(const g of visible){
@@ -280,6 +290,7 @@
       if(editor())box.append(adminGame(g));
       target.append(box);
     }
+    sizeGameViewport();
 
     const save=$('camNflSave'),saveDay=$('camNflSaveDay');
     if(save){
