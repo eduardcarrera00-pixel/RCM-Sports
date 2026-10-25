@@ -10,7 +10,7 @@ assert.equal(manifest.version,1);assert.equal(manifest.clips.length,30);
 assert.equal(new Set(manifest.clips.map(c=>c.file)).size,30);
 for(const clip of manifest.clips){
   assert.ok(catalog.tracks.some(t=>t.slug===clip.track_slug&&t.license==='CC0'));
-  assert.equal(clip.file,`pick-v1-${clip.image_key}-${clip.track_slug}.mp4`);
+  assert.equal(clip.file,`pick-v1-safe-${clip.image_key}-${clip.track_slug}.mp4`);
   const path='assets/social-videos/'+clip.file,bytes=fs.readFileSync(path);
   assert.equal(crypto.createHash('sha256').update(bytes).digest('hex'),clip.sha256);
   assert.equal(bytes.length,clip.bytes);
@@ -54,6 +54,8 @@ insert into vault.secrets values('cam_buffer_api_key','TEST_ONLY');
 update cam_social.settings set enabled=true,activated_at=now()-interval '1 minute';`);
 const migration=fs.readFileSync('supabase/migrations/20261025195044_cam_pick_ready_social_videos.sql','utf8');
 await db.exec(migration);await db.exec(migration);
+const safeMigration=fs.readFileSync('supabase/migrations/20261025201928_cam_social_safe_frame.sql','utf8');
+await db.exec(safeMigration);await db.exec(safeMigration);
 const rows=async(sql,args)=>(await db.query(sql,args)).rows;
 const one=async(sql,args)=>(await rows(sql,args))[0];
 assert.equal((await one('select pick_media_cache_enabled from cam_social.settings')).pick_media_cache_enabled,false,'Assets cannot activate themselves before deployment');
@@ -71,7 +73,7 @@ await db.exec(migration);
 assert.equal((await one('select pick_media_cache_enabled from cam_social.settings')).pick_media_cache_enabled,true,'Reapplying cannot disable a verified rollout');
 for(const image of ['picks','football','champion','custom']){
   const {url}=await one('select cam_social.ready_pick_video_url($1,$2,$3) url',['ae_editorial_weekly_picks',{brand_image_key:image},'adventure']);
-  assert.ok(url.endsWith(`pick-v1-${image==='custom'?'picks':image}-adventure.mp4`));
+  assert.ok(url.endsWith(`pick-v1-safe-${image==='custom'?'picks':image}-adventure.mp4`));
 }
 assert.equal((await one("select cam_social.ready_pick_video_url('articles','{}','adventure') url")).url,null,'News keep their original individual videos');
 assert.equal((await one("select cam_social.ready_pick_video_url('ae_editorial_weekly_picks','{}','future-track') url")).url,null,'Unprepared future tracks fall back to the renderer');
@@ -82,7 +84,7 @@ let checks=await rows(`select c.*,d.network,d.music_track_slug from net.checks c
 assert.equal(checks.length,2);
 assert.notEqual(checks[0].url,checks[1].url,'The two networks retain distinct music assignments');
 for(const c of checks){
-  assert.ok(c.url.endsWith(`pick-v1-picks-${c.music_track_slug}.mp4`));
+  assert.ok(c.url.endsWith(`pick-v1-safe-picks-${c.music_track_slug}.mp4`));
   assert.deepEqual(c.headers,{Range:'bytes=0-0'});
   await db.query('insert into net._http_response(id,status_code,content_type)values($1,200,$2)',[c.id,'text/html']);
 }
@@ -105,6 +107,32 @@ await db.exec('select cam_social.dispatch();select cam_social.dispatch()');
 assert.equal((await one('select count(*)::int n from net.calls')).n,3,'No duplicate sends after success or uncertain responses');
 await db.exec("update ae_editorial_weekly_picks set title='Corrección de texto'");
 assert.equal((await one('select count(*)::int n from net.calls')).n,3,'Edits do not republish the Pick');
+const photoMigration=fs.readFileSync('supabase/migrations/20261025213843_cam_pick_photo_parlay_video.sql','utf8');
+await db.exec(fs.readFileSync('supabase/migrations/20261022145552_cam_social_brand_rotation.sql','utf8'));
+await db.exec(photoMigration);await db.exec(photoMigration);
+const newId='00000000-0000-0000-0000-000000000992',newKey='weekly:'+newId;
+await db.query(`insert into ae_editorial_weekly_picks(id,title,event_name,selection,american_odds,is_published,expires_at,image_path,banner_path)
+ values($1,'Parlay','Equipo C vs Equipo D',E'Equipo C gana\\nMás de 2.5 goles\\nAmbos anotan',250,true,now()+interval '1 day','weekly/photo/actual.jpg','weekly/banner/other.jpg')`,[newId]);
+const expectedPhoto='https://zahuhmvmqvxaunqebqaa.supabase.co/storage/v1/object/public/article-images/weekly/photo/actual.jpg';
+const pickJobs=(await one('select public.cam_social_video_jobs(12) jobs')).jobs;
+assert.equal(pickJobs.length,2,'New Picks use individual videos even with the cache enabled');
+for(const job of pickJobs){
+ assert.equal(job.video_version,'pick-v2');assert.equal(job.image_url,expectedPhoto);
+ assert.equal(job.selection.split('\n').length,3);assert.equal(job.american_odds,250);
+ assert.equal(job.event_name,'Equipo C vs Equipo D');
+}
+const photoCalls=(await rows('select body from net.calls order by id')).map(r=>r.body.variables.input);
+assert.equal(photoCalls.length,4);assert.equal(photoCalls[3].assets[0].image.url,expectedPhoto,'X uses the actual photograph');
+const photoChecks=await rows(`select c.url,d.network from net.checks c join cam_social.deliveries d on d.video_check_request_id=c.id where d.event_key=$1`,[newKey]);
+assert.equal(photoChecks.length,2);assert.ok(photoChecks.every(c=>/\/pick-v2-[a-f0-9]{32}\.mp4$/.test(c.url)));
+await db.exec(`update ae_editorial_weekly_picks set selection='Edited later' where id='${newId}';select cam_social.dispatch()`);
+assert.equal((await one('select count(*)::int n from net.calls')).n,4,'No duplicate sends');
+assert.equal((await one('select payload from cam_social.events where event_key=$1',[newKey])).payload.selection.split('\n').length,3,'Publication snapshot remains immutable');
+await db.exec(`update ae_editorial_weekly_picks set is_published=false where id='${newId}'`);
+assert.equal((await one('select public.cam_social_video_jobs(12) jobs')).jobs.length,0,'Hidden Picks never leak through the public jobs RPC');
+await db.exec("alter table articles add column category text;insert into articles(id,title,summary,is_public,category)values('00000000-0000-0000-0000-000000000993','Nueva noticia','Resumen',true,'NFL')");
+const newsChecks=await rows("select c.url from net.checks c join cam_social.deliveries d on d.video_check_request_id=c.id where d.event_key='article:00000000-0000-0000-0000-000000000993'");
+assert.equal(newsChecks.length,2);assert.ok(newsChecks.every(c=>/\/safe-v2-[a-f0-9]{32}\.mp4$/.test(c.url)),'Queued generic videos cannot reuse old unsafe files');
 await db.exec('set role anon');
 await assert.rejects(()=>db.query('select * from cam_social.ready_pick_videos'),/permission denied/);
 await assert.rejects(()=>db.query("select cam_social.ready_pick_video_url('ae_editorial_weekly_picks','{}','adventure')"),/permission denied/);

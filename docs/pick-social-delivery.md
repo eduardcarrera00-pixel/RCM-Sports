@@ -6,11 +6,46 @@ queued waiting for an event-specific MP4. The GitHub video worker, scheduled
 every five minutes, actually started hours apart. The queue and permissions
 were working; media readiness was the delay.
 
-## Ready media for new Picks
+## Current format: photo and complete parlay (25 October)
+
+New editorial Pick events use `video_version: pick-v2`. A private before-insert
+trigger runs after the brand illustration rotation and restores the actual Pick
+image (photo path, photo URL, banner path, then banner URL). The event freezes the
+match, original selection line breaks and odds alongside its publication data.
+X receives that same actual photo. If no editor image exists, the approved brand
+illustration remains the fallback.
+
+Instagram and TikTok render individual 720×1280 H.264/AAC videos. Meaningful
+content stays within x=72…588 and y=200…820, leaving room for the immersive app
+controls. The photo is contained without cropping. Every parlay selection is
+numbered and wrapped at a readable fixed font size. Long parlays receive more
+pages (at least four seconds each, eight seconds minimum total); no selection is
+ellipsized or discarded. A failed photo download stops that Pick's rendering
+instead of silently substituting a logo.
+
+New filenames use `pick-v2-` plus the existing event/network hash, so old generated
+files cannot be mistaken for the new layout. Other unsent videos use `safe-v2-`
+filenames, so pre-rendered unsafe files cannot be reused. Existing news/promos receive the
+safe framing too. Their data and per-network licensed music rotation are unchanged.
+Published, accepted or uncertain deliveries are never reset or re-sent.
+
+The individual media worker still runs on GitHub's five-minute schedule, which
+GitHub may delay. Renderer changes also trigger it on push to main. The branded
+Pages publisher must deploy its resulting media before the database can send a
+Reel. Individual photo/selection videos therefore wait for rendering; they no
+longer use a generic instant clip. Only public, visible, queued content is exposed
+by the existing read-only worker RPC; credentials and delivery metadata remain
+private.
+
+Apply `20261025213843_cam_pick_photo_parlay_video.sql` only after deploying this
+renderer. It marks future Pick events only and does not backfill history. The
+existing ready cache remains compatible with older unmarked events.
+
+## Ready media retained for legacy Picks
 
 `cam_social.ready_pick_videos` maps the three approved Pick illustrations and
 ten existing CC0 music assignments to thirty prepared 9:16 H.264/AAC videos.
-The dispatcher reuses a clip for each new Pick while keeping the individual
+For legacy unmarked events, the dispatcher reuses a clip while keeping the individual
 title, match, selection, odds and exact Pick link in its caption. Instagram
 still publishes a Reel shared to the feed. X keeps its existing image post.
 
@@ -19,7 +54,7 @@ keep independent tracks. The ready library's rotation uses the licensed catalog
 in `assets/social-videos/pick-template-tracks.json`; it is not a claim that these
 tracks are currently trending on either platform.
 
-The new lookup runs only for editorial Picks. Other content and future music
+The lookup runs only for legacy editorial Picks. Other content and future music
 tracks without a prepared clip retain the existing individual renderer. File
 HTTP/MIME verification, source visibility, rate limits, immutable results and
 ambiguous-send protection still run. Repeated edits and dispatches cannot

@@ -64,19 +64,23 @@ def pending_jobs():
     return jobs
 
 
-def read_image(image_url):
+def read_image(image_url, required=False):
+    def fallback():
+        if required:
+            raise ValueError("Pick photo unavailable; refusing replacement artwork")
+        return Image.open(FALLBACK).convert("RGB")
     parsed = urllib.parse.urlsplit(image_url or "")
     if (parsed.scheme != "https" or parsed.username or parsed.password
             or parsed.hostname not in ALLOWED_IMAGE_HOSTS or parsed.port not in (None, 443)):
-        return Image.open(FALLBACK).convert("RGB")
+        return fallback()
     if parsed.hostname == "zahuhmvmqvxaunqebqaa.supabase.co" and not parsed.path.startswith(
         "/storage/v1/object/public/article-images/"
     ):
-        return Image.open(FALLBACK).convert("RGB")
+        return fallback()
     if parsed.hostname in {"camsports.github.io", "eduardcarrera00-pixel.github.io"} and not (
         parsed.path.startswith("/assets/") or parsed.path.startswith("/RCM-Sports/assets/")
     ):
-        return Image.open(FALLBACK).convert("RGB")
+        return fallback()
 
     try:
         req = urllib.request.Request(image_url, headers={"User-Agent": "CAMSportsMedia/1.0"})
@@ -90,7 +94,7 @@ def read_image(image_url):
         image.load()
         return image.convert("RGB")
     except (ValueError, OSError, urllib.error.URLError):
-        return Image.open(FALLBACK).convert("RGB")
+        return fallback()
 
 
 def font(size, bold=False):
@@ -114,83 +118,123 @@ def wrap(draw, text, text_font, max_width=630, limit=4):
     return lines[:limit]
 
 
+# Conservative shared area for immersive app controls and taller phone crops.
+# 720x1280 canvas: top 200, bottom 460, left 72, right 132 pixels clear.
+SAFE_BOX = (72, 200, 588, 820)
+
+
+def safe_line(draw, text, position, text_font, fill):
+    text = " ".join(str(text or "").split())
+    while text and draw.textbbox((0, 0), text, font=text_font)[2] > 516:
+        text = text.rstrip("…")[:-1].rstrip() + "…"
+    draw.text(position, text, font=text_font, fill=fill)
+
+
+def short_cover(image, title, kicker, branded=False):
+    """Keep all meaningful content inside the shared short-video safe area."""
+    blue = image.getpixel((0, 0)) if branded else (9, 22, 34)
+    back = Image.new("RGB", (WIDTH, HEIGHT), blue)
+    draw = ImageDraw.Draw(back)
+    cream, gold = (250, 245, 235), (214, 177, 121)
+    safe_line(draw, "CAM SPORTS", (72, 200),
+              ImageFont.truetype(BRAND_FONT_PATH, 34), cream)
+    draw.rectangle((72, 253, 180, 256), fill=gold)
+    # Contain preserves the entire illustration/photo; never crop its sides.
+    art = ImageOps.contain(image, (516, 260), Image.Resampling.LANCZOS)
+    back.paste(art, (72 + (516-art.width)//2, 280 + (260-art.height)//2))
+    safe_line(draw, str(kicker or "CAM SPORTS").upper(), (72, 558), font(22, True), gold)
+    heading = font(34, True)
+    lines = wrap(draw, title, heading, max_width=516, limit=4)
+    for i, line in enumerate(lines):
+        safe_line(draw, line, (72, 600 + 43*i), heading, cream)
+    safe_line(draw, "CAMSPORTS.GITHUB.IO", (72, 792), font(18, True), gold)
+    return back
+
+
 def cover(image, title):
-    # 9:16 editorial still; colors follow CAM Sports' dark navy and muted gold.
-    back = ImageOps.fit(image, (WIDTH, HEIGHT), method=Image.Resampling.LANCZOS)
-    back = back.filter(ImageFilter.GaussianBlur(30)).convert("RGBA")
-    back.alpha_composite(Image.new("RGBA", (WIDTH, HEIGHT), (9, 22, 34, 190)))
-    draw = ImageDraw.Draw(back)
-    gold = (214, 177, 121, 255)
-    draw.text((44, 85), "CAM SPORTS", font=font(43, True), fill=(247, 237, 219, 255))
-    draw.rectangle((44, 152, 156, 155), fill=gold)
-    draw.text((44, 185), "LA NOTICIA EN 8 SEGUNDOS", font=font(22), fill=gold)
-
-    # Keep the full photo legible, no club logo or original image is altered.
-    thumb = ImageOps.contain(image, (650, 555), Image.Resampling.LANCZOS)
-    area = Image.new("RGBA", (660, 570), (14, 25, 36, 238))
-    x = (660 - thumb.width) // 2
-    y = (570 - thumb.height) // 2
-    area.paste(thumb, (x, y))
-    back.alpha_composite(area, (30, 270))
-    draw = ImageDraw.Draw(back)
-    draw.rectangle((30, 270, 689, 840), outline=gold, width=2)
-
-    heading = font(40, True)
-    for i, line in enumerate(wrap(draw, title, heading)):
-        draw.text((45, 895 + 56 * i), line, font=heading, fill=(250, 245, 235, 255))
-    draw.rectangle((44, 1165, 675, 1167), fill=(120, 117, 105, 255))
-    draw.text((44, 1190), "LEE MÁS EN CAM SPORTS", font=font(23, True), fill=gold)
-    return back.convert("RGB")
+    return short_cover(image, title, "LA NOTICIA EN 8 SEGUNDOS")
 
 
 def promo_cover(image, title, kicker):
-    """Daily promo post: full-bleed scene, gold kicker and a large headline."""
-    back = ImageOps.fit(image, (WIDTH, HEIGHT), method=Image.Resampling.LANCZOS).convert("RGBA")
-    # Navy veil, stronger at the bottom so the headline always reads.
-    veil = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
-    vd = ImageDraw.Draw(veil)
-    for y in range(HEIGHT):
-        alpha = int(70 + 165 * max(0, (y - HEIGHT * .25) / (HEIGHT * .75)) ** 1.2)
-        vd.line((0, y, WIDTH, y), fill=(9, 22, 34, min(235, alpha)))
-    back.alpha_composite(veil)
-    draw = ImageDraw.Draw(back)
-    gold = (214, 177, 121, 255)
-    cream = (250, 245, 235, 255)
-    draw.text((44, 85), "CAM SPORTS", font=font(43, True), fill=(247, 237, 219, 255))
-    draw.rectangle((44, 152, 156, 155), fill=gold)
-
-    heading = font(58, True)
-    lines = wrap(draw, title, heading, max_width=630, limit=5)
-    top = 1080 - 74 * len(lines)
-    kicker_font = font(25, True)
-    draw.text((44, top - 62), str(kicker or "CAM SPORTS")[:40].upper(), font=kicker_font, fill=gold)
-    for i, line in enumerate(lines):
-        draw.text((44, top + 74 * i), line, font=heading, fill=cream)
-    draw.rectangle((44, 1165, 675, 1167), fill=(120, 117, 105, 255))
-    draw.text((44, 1190), "CAMSPORTS.GITHUB.IO", font=font(23, True), fill=gold)
-    return back.convert("RGB")
+    return short_cover(image, title, kicker)
 
 
 def brand_cover(image, title, kicker):
-    """Preserve the curated blue illustration and add the changing editorial copy."""
-    blue = image.getpixel((0, 0))
-    back = Image.new("RGB", (WIDTH, HEIGHT), blue)
-    art = ImageOps.fit(image, (WIDTH, 850), method=Image.Resampling.LANCZOS)
-    back.paste(art, (0, 180))
-    draw = ImageDraw.Draw(back)
-    cream, gold = (250, 245, 235), (214, 177, 121)
-    # Solid bands protect the changing text without blurring or obscuring the art.
-    draw.rectangle((0, 0, WIDTH, 180), fill=blue)
-    draw.rectangle((0, 930, WIDTH, HEIGHT), fill=blue)
-    draw.text((42, 47), "CAM SPORTS", font=ImageFont.truetype(BRAND_FONT_PATH, 42), fill=cream)
-    draw.rectangle((42, 113, 150, 116), fill=gold)
-    draw.text((42, 947), str(kicker or "CAM SPORTS")[:36].upper(),
-              font=font(22, True), fill=gold)
-    heading = font(42, True)
-    for i, line in enumerate(wrap(draw, title, heading, max_width=634, limit=4)):
-        draw.text((42, 993 + 53 * i), line, font=heading, fill=cream)
-    draw.text((42, 1218), "CAMSPORTS.GITHUB.IO", font=font(19, True), fill=gold)
-    return back
+    return short_cover(image, title, kicker, branded=True)
+
+
+def pick_lines(selection):
+    """Keep explicit ticket lines; split common parlay separators, not odds."""
+    text = str(selection or "").replace("\\n", "\n")
+    return [line.strip(" •\t\r") for line in
+            re.split(r"\n+|\s+[|•]\s+|;\s*|\s+\+\s+(?!\d)", text)
+            if line.strip(" •\t\r")]
+
+
+def full_wrap(draw, text, text_font, width=480):
+    """Wrap every character, including long tokens, without ellipses."""
+    lines, current = [], ""
+    for char in " ".join(str(text).split()):
+        candidate = current + char
+        if current and draw.textlength(candidate, font=text_font) > width:
+            if " " in current:
+                prefix, tail = current.rsplit(" ", 1)
+                lines.append(prefix)
+                current = tail + char
+            else:
+                lines.append(current)
+                current = char
+        else:
+            current = candidate
+    if current.strip():
+        lines.append(current.strip())
+    return lines
+
+
+def pick_pages(image, job):
+    """Actual Pick photo and complete selections, paginated inside SAFE_BOX."""
+    base = Image.new("RGB", (WIDTH, HEIGHT), "#091622")
+    draw = ImageDraw.Draw(base)
+    cream, gold = "#faf5eb", "#d6b179"
+    safe_line(draw, "CAM SPORTS", (72, 200),
+              ImageFont.truetype(BRAND_FONT_PATH, 34), cream)
+    draw.rectangle((72, 253, 180, 256), fill=gold)
+    art = ImageOps.contain(image, (516, 190), Image.Resampling.LANCZOS)
+    base.paste(art, (72 + (516-art.width)//2, 270 + (190-art.height)//2))
+    safe_line(draw, "PICK DEL EDITOR", (72, 474), font(20, True), gold)
+    for i, line in enumerate(wrap(draw, job.get("event_name") or job.get("title"),
+                                  font(27, True), max_width=516, limit=2)):
+        safe_line(draw, line, (72, 510 + i*34), font(27, True), cream)
+    body_font = font(23, True)
+    pages, rows = [], []
+    selections = pick_lines(job.get("selection"))
+    if not selections:
+        raise ValueError("Pick has no selections; refusing a generic video")
+    # Five readable rows per page; never shrink or discard a parlay leg.
+    for number, selection in enumerate(selections, 1):
+        lines = full_wrap(draw, f"{number}. {selection}", body_font)
+        if rows and len(rows) + len(lines) > 5:
+            pages.append(rows)
+            rows = []
+        for line in lines:
+            if len(rows) == 5:
+                pages.append(rows)
+                rows = []
+            rows.append(line)
+    if rows:
+        pages.append(rows)
+    frames = []
+    odds = job.get("american_odds")
+    odds_text = f"Cuota {int(odds):+d}" if odds is not None else ""
+    for index, page in enumerate(pages, 1):
+        frame = base.copy()
+        draw = ImageDraw.Draw(frame)
+        for i, line in enumerate(page):
+            draw.text((72, 594 + 30*i), line, font=body_font, fill=cream)
+        safe_line(draw, f"{odds_text}   ·   {index}/{len(pages)}", (72, 762), font(20, True), gold)
+        safe_line(draw, "CAMSPORTS.GITHUB.IO", (72, 798), font(18, True), gold)
+        frames.append(frame)
+    return frames
 
 
 def check_music_url(source_url):
@@ -232,7 +276,7 @@ def audio_duration(path):
 
 def make_video(image, title, output, style="news", kicker=None,
                audio_url=None, track_slug=None, selection_key="", fixture_audio=None,
-               cached_audio=None):
+               cached_audio=None, pick=None):
     """Music is mandatory: never fall back to the former synthesized jingle."""
     if not fixture_audio and (not audio_url or not track_slug or not selection_key):
         raise ValueError("Missing authorized music assignment; MP4 not published")
@@ -246,6 +290,21 @@ def make_video(image, title, output, style="news", kicker=None,
                  else promo_cover(image, title, kicker) if style == "promo"
                  else cover(image, title))
         frame.save(still)
+        video_input = ["-loop", "1", "-framerate", str(FPS), "-i", str(still)]
+        video_duration = DURATION
+        if pick:
+            pages = pick_pages(image, pick)
+            page_duration = max(4, DURATION / len(pages))
+            video_duration = page_duration * len(pages)
+            playlist = Path(tmp) / "pages.txt"
+            entries = []
+            for index, page in enumerate(pages):
+                name = f"page-{index}.png"
+                page.save(Path(tmp) / name)
+                entries.extend([f"file '{name}'", f"duration {page_duration}"])
+            entries.append(f"file 'page-{len(pages)-1}.png'")
+            playlist.write_text("\n".join(entries) + "\n")
+            video_input = ["-f", "concat", "-safe", "0", "-i", str(playlist)]
         if fixture_audio:
             audio = Path(fixture_audio)
         elif cached_audio:
@@ -261,13 +320,13 @@ def make_video(image, title, output, style="news", kicker=None,
         # Gentle lead-in/out and normalized background loudness.
         subprocess.run([
             "ffmpeg", "-nostdin", "-hide_banner", "-loglevel", "error", "-y",
-            "-loop", "1", "-framerate", str(FPS), "-i", str(still),
-            "-ss", f"{offset:.3f}", "-i", str(audio),
-            "-t", str(DURATION), "-r", str(FPS),
+            *video_input,
+            "-stream_loop", "-1", "-ss", f"{offset:.3f}", "-i", str(audio),
+            "-t", str(video_duration), "-r", str(FPS),
             "-map", "0:v:0", "-map", "1:a:0",
             "-c:v", "libx264", "-preset", "veryfast", "-crf", "26",
             "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "128k",
-            "-af", "loudnorm=I=-20:TP=-3:LRA=9,afade=t=in:st=0:d=0.25,afade=t=out:st=7.1:d=0.9",
+            "-af", f"loudnorm=I=-20:TP=-3:LRA=9,afade=t=in:st=0:d=0.25,afade=t=out:st={video_duration-.9}:d=0.9",
             "-ar", "44100", "-movflags", "+faststart", "-shortest", str(output)
         ], check=True, timeout=120)
         tracks = subprocess.check_output([
@@ -312,7 +371,7 @@ def prepare_pick_templates():
             audio = Path(tmp) / (track["slug"] + ".mp3")
             get_authorized_music(track["source_url"], audio)
             for artwork in PICK_TEMPLATE_IMAGES:
-                filename = "pick-v1-" + artwork + "-" + track["slug"] + ".mp4"
+                filename = "pick-v1-safe-" + artwork + "-" + track["slug"] + ".mp4"
                 output = OUTPUT / filename
                 image = Image.open(ROOT / "assets/social-brand" / (artwork + ".jpg")).convert("RGB")
                 make_video(image, "Partido y pronóstico en la descripción", output,
@@ -356,6 +415,14 @@ def main():
                        Path(tmp) / "check.mp4", fixture_audio=fixture)
             make_video(image, "¿Ya pusiste tu Pick de hoy?", Path(tmp) / "promo.mp4",
                        "promo", "Cocina Picks", fixture_audio=fixture)
+            make_video(image, "Parlay", Path(tmp) / "pick.mp4", fixture_audio=fixture,
+                       pick={"event_name": "FC Barcelona vs Real Madrid",
+                             "selection": "\n".join(f"Selección {i}: más de 2.5 goles y ambos anotan" for i in range(8)),
+                             "american_odds": 250})
+            info = json.loads(subprocess.check_output([
+                "ffprobe", "-v", "error", "-show_entries", "format=duration",
+                "-of", "json", str(Path(tmp) / "pick.mp4")]))
+            assert float(info["format"]["duration"]) >= 12, "Parlay pages must all reach the encoded video"
             try:
                 make_video(image, "Sin licencia", Path(tmp) / "blocked.mp4")
                 raise AssertionError("Unlicensed output was incorrectly allowed")
@@ -374,14 +441,16 @@ def main():
         if network not in ("instagram", "tiktok"):
             raise ValueError("Unsupported music delivery network")
         identity = key + ":" + network
-        output = OUTPUT / (hashlib.md5(identity.encode("utf-8")).hexdigest() + ".mp4")
+        is_pick = job.get("video_version") == "pick-v2"
+        prefix = "pick-v2-" if is_pick else "safe-v2-"
+        output = OUTPUT / (prefix + hashlib.md5(identity.encode("utf-8")).hexdigest() + ".mp4")
         if output.exists() and output.stat().st_size > 30000:
             continue
         style = ("brand" if "/assets/social-brand/" in (job.get("image_url") or "")
                  else "promo" if job.get("style") == "promo" else "news")
-        make_video(read_image(job.get("image_url")), job.get("title"), output, style,
+        make_video(read_image(job.get("image_url"), required=is_pick), job.get("title"), output, style,
                    job.get("kicker"), job.get("music_url"), job.get("track_slug"),
-                   selection_key=identity)
+                   selection_key=identity, pick=job if is_pick else None)
         print("Generated:", network, job.get("track_slug"), output.relative_to(ROOT))
 
 

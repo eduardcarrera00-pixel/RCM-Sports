@@ -10,6 +10,9 @@ on:
       - 'tests/social-instagram-publication.mjs'
       - 'tests/social-music-rotation.mjs'
       - 'tests/ready-pick-social-videos.mjs'
+      - 'tests/social-safe-frame.py'
+      - 'supabase/migrations/*cam_social_safe_frame.sql'
+      - 'supabase/migrations/*cam_pick_photo_parlay_video.sql'
       - 'assets/social-videos/pick-template-*.json'
       - 'supabase/migrations/*cam_pick_ready_social_videos.sql'
       - 'supabase/migrations/*cam_social_rotating_cc0_music.sql'
@@ -49,4 +52,4 @@ jobs:
       - name: Verify ready Pick media, delivery guards and private access
         run: node tests/ready-pick-social-videos.mjs
       - name: Verify licensed music is required and audio embedded in MP4
-        run: python scripts/cam_social_make_video.py --smoke-test
+        run: python tests/social-safe-frame.py && python scripts/cam_social_make_video.py --smoke-test

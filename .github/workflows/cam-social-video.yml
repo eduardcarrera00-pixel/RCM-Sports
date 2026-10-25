@@ -1,6 +1,12 @@
 name: CAM Sports Instagram and TikTok audio videos
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/cam_social_make_video.py'
+      - 'supabase/migrations/*cam_pick_photo_parlay_video.sql'
+      - '.github/workflows/cam-social-video.yml'
   schedule:
     # GitHub cron has a five-minute minimum and may run late.
     - cron: '2/5 * * * *'
@@ -40,8 +46,13 @@ jobs:
       - name: Install renderer
         if: steps.waiting.outputs.pending != '0'
         run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq ffmpeg fonts-dejavu-core
+          if ! command -v ffmpeg >/dev/null || ! command -v ffprobe >/dev/null ||
+             ! test -f /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf ||
+             ! test -f /usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf ||
+             ! test -f /usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf; then
+            sudo timeout 180s apt-get -o Acquire::Retries=1 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20 update -qq
+            sudo timeout 180s apt-get -y -qq install ffmpeg fonts-dejavu-core
+          fi
           python -m pip install --disable-pip-version-check 'Pillow==11.3.0'
       - name: Verify audio and MP4 generation
         if: steps.waiting.outputs.pending != '0'
