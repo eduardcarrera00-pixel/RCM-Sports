@@ -2,304 +2,310 @@
   "version": 1,
   "clips": [
     {
-      "file": "pick-v1-picks-adventure.mp4",
+      "file": "pick-v1-safe-picks-adventure.mp4",
       "image_key": "picks",
       "track_slug": "adventure",
       "license": "CC0",
       "duration": 8,
       "fps": 30,
-      "bytes": 184488,
-      "sha256": "0c2ed8d968e9725d9b7d654d687365e9e1519f0f43ed4950bcb73ded3a2a019a"
+      "bytes": 162450,
+      "sha256": "af0da1100baf351be111b79f29ac28ed49c8058bd6d9b630382a1a0b470e8878"
     },
     {
-      "file": "pick-v1-football-adventure.mp4",
+      "file": "pick-v1-safe-football-adventure.mp4",
       "image_key": "football",
       "track_slug": "adventure",
       "license": "CC0",
       "duration": 8,
       "fps": 30,
-      "bytes": 184443,
-      "sha256": "e04c5f973f34a3d0549f121bc26aa859bfd4ad1c6dd97ae2e2babee9c1c02ffb"
+      "bytes": 163344,
+      "sha256": "01ff42140560dfee5faa376a3c1de6526eb186e3d22b774738c3c29c8a550010"
     },
     {
-      "file": "pick-v1-champion-adventure.mp4",
+      "file": "pick-v1-safe-champion-adventure.mp4",
       "image_key": "champion",
       "track_slug": "adventure",
       "license": "CC0",
       "duration": 8,
       "fps": 30,
-      "bytes": 181286,
-      "sha256": "f4e8b32c4f2046a20e8a674ed64b29a4db9030fef84db307affcff45a0857652"
+      "bytes": 163408,
+      "sha256": "3ad5d40ca6fc940fbc94b4f3d521fa60423b7f63ba222e62e4e559bf055b7850"
     },
     {
-      "file": "pick-v1-picks-arpent.mp4",
+      "file": "pick-v1-safe-picks-arpent.mp4",
       "image_key": "picks",
       "track_slug": "arpent",
       "license": "CC0",
       "duration": 8,
       "fps": 30,
-      "bytes": 195567,
-      "sha256": "b764c879f719b266a5cb5990bdc749d73b435a99627beed1a032aff29facfb18"
+      "bytes": 173529,
+      "sha256": "996e126d8f8a31d8e65e3a7ee65d01eeaf7d0be63c21f975f8c747c6b5db0c75"
     },
     {
-      "file": "pick-v1-football-arpent.mp4",
+      "file": "pick-v1-safe-football-arpent.mp4",
       "image_key": "football",
       "track_slug": "arpent",
       "license": "CC0",
       "duration": 8,
       "fps": 30,
-      "bytes": 197332,
-      "sha256": "2fd498bc5c6b30af375f1fe87747a60fe5f981b6eda4ef5943216660114ab7a1"
+      "bytes": 176233,
+      "sha256": "d2d7187e10dbe5d2e5766531c7e8c0b3cb262f20ea0ccc2a0bc752590d099de0"
     },
     {
-      "file": "pick-v1-champion-arpent.mp4",
+      "file": "pick-v1-safe-champion-arpent.mp4",
       "image_key": "champion",
       "track_slug": "arpent",
       "license": "CC0",
       "duration": 8,
       "fps": 30,
-      "bytes": 190889,
-      "sha256": "b872165e52fff3f27b8b91776142fc9296ae1ca605217787f9dd3704559c8d3a"
+      "bytes": 173011,
+      "sha256": "44dbd9e9e041e202fa2f5e70217e2d2805201c63e8191b25912a3139668b5227"
     },
     {
-      "file": "pick-v1-picks-backbeat.mp4",
+      "file": "pick-v1-safe-picks-backbeat.mp4",
       "image_key": "picks",
       "track_slug": "backbeat",
       "license": "CC0",
       "duration": 8,
       "fps": 30,
-      "bytes": 202809,
-      "sha256": "c8216c15c41ba711f5e42dcfc060e572491b37fa837a970b2eca22335ac1d453"
+      "bytes": 180771,
+      "sha256": "0b5a2edeb55999e26e6c151de4aaab84ffd61d4ddf827bdd5022bb53f74a6dbc"
     },
     {
-      "file": "pick-v1-football-backbeat.mp4",
+      "file": "pick-v1-safe-football-backbeat.mp4",
       "image_key": "football",
       "track_slug": "backbeat",
       "license": "CC0",
       "duration": 8,
       "fps": 30,
-      "bytes": 197680,
-      "sha256": "5dfc39f64e64235df9427d7048bb099ff7abc4251e0e981dffd3090cbbacf8db"
+      "bytes": 176581,
+      "sha256": "ea63ea361e68e11ffe3aa8ae19b1c212152abf69969a486f9dcdcfa847bf6c3a"
     },
     {
-      "file": "pick-v1-champion-backbeat.mp4",
+      "file": "pick-v1-safe-champion-backbeat.mp4",
       "image_key": "champion",
       "track_slug": "backbeat",
       "license": "CC0",
       "duration": 8,
       "fps": 30,
-      "bytes": 201250,
-      "sha256": "5231398b4a91009aee2fc47f2fd29533aa48a603812706bbdd66274582e5f09e"
+      "bytes": 183372,
+      "sha256": "de3696f220b96267aeab121a9a3554a225126df70cd73b1e82b83efad3a79b8e"
     },
     {
-      "file": "pick-v1-picks-battle-ready.mp4",
+      "file": "pick-v1-safe-picks-battle-ready.mp4",
       "image_key": "picks",
       "track_slug": "battle-ready",
       "license": "CC0",
       "duration": 8,
       "fps": 30,
-      "bytes": 184302,
-      "sha256": "01109a11ca8301d34bbd52d18f5bdf6467f3f3bad85f814040aa8dbebf7a014a"
+      "bytes": 162264,
+      "sha256": "e9946874b870e3fa3b9c84ae6976a3d806529a9cf638aaa0a046713633fe16be"
     },
     {
-      "file": "pick-v1-football-battle-ready.mp4",
+      "file": "pick-v1-safe-football-battle-ready.mp4",
       "image_key": "football",
       "track_slug": "battle-ready",
       "license": "CC0",
       "duration": 8,
       "fps": 30,
-      "bytes": 184397,
-      "sha256": "43cfefdb24a3078c21c736f1b1de87e89717cd21c42420c7efed1b05c1e95c60"
+      "bytes": 163298,
+      "sha256": "f2b5e308701a93d7800ef2a7adf33108c0313b68cd6a0b8d4fecf845f9abddf8"
     },
     {
-      "file": "pick-v1-champion-battle-ready.mp4",
+      "file": "pick-v1-safe-champion-battle-ready.mp4",
       "image_key": "champion",
       "track_slug": "battle-ready",
       "license": "CC0",
       "duration": 8,
       "fps": 30,
-      "bytes": 181280,
-      "sha256": "ddecb0d8e4d1e0a06b532bd38d5dde60d1d0fceb71a4f93c5e6e6eade4bfe63a"
+      "bytes": 163402,
+      "sha256": "6c49662c85b068c74cbf03045bd2a1295fd333a9a3f5ded6f967c17ea4093c7e"
     },
     {
-      "file": "pick-v1-picks-beat-one.mp4",
+      "file": "pick-v1-safe-picks-beat-one.mp4",
       "image_key": "picks",
       "track_slug": "beat-one",
       "license": "CC0",
       "duration": 8,
       "fps": 30,
-      "bytes": 197586,
-      "sha256": "5380bb2b8f87858de7ddf9cf23ed9f786ee60349fe72b09e3d286953af7d0a44"
+      "bytes": 175548,
+      "sha256": "a1b993ac218859d8ea08b99722764ce728ab99fce2df255e6b1adc24707b2b67"
     },
     {
-      "file": "pick-v1-football-beat-one.mp4",
+      "file": "pick-v1-safe-football-beat-one.mp4",
       "image_key": "football",
       "track_slug": "beat-one",
       "license": "CC0",
       "duration": 8,
       "fps": 30,
-      "bytes": 199646,
-      "sha256": "d6562125b4c7009e409e0b2afb0ffaf587580c55fb8a0300f3fb133fd2dc4def"
+      "bytes": 178547,
+      "sha256": "38fdc13e305b7c8aca67a71a51f97391cde2bca7a9c3015517bdbfd929d82f35"
     },
     {
-      "file": "pick-v1-champion-beat-one.mp4",
+      "file": "pick-v1-safe-champion-beat-one.mp4",
       "image_key": "champion",
       "track_slug": "beat-one",
       "license": "CC0",
       "duration": 8,
       "fps": 30,
-      "bytes": 197681,
-      "sha256": "2d74811a0afd99ed5d62d53f5bcd6e33ac7d276dd1ef96dc00018160101385ce"
+      "bytes": 179803,
+      "sha256": "3c7ac7f6a7b3d3a997074057009981e940af18d9e9879233ffb76fd3cf479da6"
     },
     {
-      "file": "pick-v1-picks-chronos.mp4",
+      "file": "pick-v1-safe-picks-chronos.mp4",
       "image_key": "picks",
       "track_slug": "chronos",
       "license": "CC0",
       "duration": 8,
       "fps": 30,
-      "bytes": 186881,
-      "sha256": "6017bc2c4a40f9c88f04bd57d32884d411331c7c16202c19fd89e96b191e956a"
+      "bytes": 164843,
+      "sha256": "6021d46367866c6aebdc63b0f59947195ae90e497c0084b717631bac21f917aa"
     },
     {
-      "file": "pick-v1-football-chronos.mp4",
+      "file": "pick-v1-safe-football-chronos.mp4",
       "image_key": "football",
       "track_slug": "chronos",
       "license": "CC0",
       "duration": 8,
       "fps": 30,
-      "bytes": 186496,
-      "sha256": "2466b0326bc8fbd6e719b4193c47b916a26187280a716b2cc056b41233b4fa33"
+      "bytes": 165397,
+      "sha256": "64790a0258226d122b68347b63b0570b6b5e1b6c6eee7fa9c7090ff55b9b2d6f"
     },
     {
-      "file": "pick-v1-champion-chronos.mp4",
+      "file": "pick-v1-safe-champion-chronos.mp4",
       "image_key": "champion",
       "track_slug": "chronos",
       "license": "CC0",
       "duration": 8,
       "fps": 30,
-      "bytes": 181660,
-      "sha256": "790190ef76c03857385b698595ee842a6b2eefcb1e915304dcb28d11468f4962"
+      "bytes": 163782,
+      "sha256": "cf6f4df4925d8f8138019a181fc74c1dd1de25b647698a22d988eb40524dd329"
     },
     {
-      "file": "pick-v1-picks-fireworks.mp4",
+      "file": "pick-v1-safe-picks-fireworks.mp4",
       "image_key": "picks",
       "track_slug": "fireworks",
       "license": "CC0",
       "duration": 8,
       "fps": 30,
-      "bytes": 186909,
-      "sha256": "bd1fe76582e825e6fdd0fcaccdd8395a660e426de258c76d35f254d61115b3ca"
+      "bytes": 164871,
+      "sha256": "2e9968589211b5c57e098a7734fb4f32fa39e39e0dafe6abd88489290d0320a2"
     },
     {
-      "file": "pick-v1-football-fireworks.mp4",
+      "file": "pick-v1-safe-football-fireworks.mp4",
       "image_key": "football",
       "track_slug": "fireworks",
       "license": "CC0",
       "duration": 8,
       "fps": 30,
-      "bytes": 189313,
-      "sha256": "017ccd957bc937ca5cdda9e7b8d3ab7d089b12341cc3352a2f7bb70a710a71fe"
+      "bytes": 168214,
+      "sha256": "384ced4218ad977c49ffe38abeda6039f02d7faea3b17aee0b3b719375828bc5"
     },
     {
-      "file": "pick-v1-champion-fireworks.mp4",
+      "file": "pick-v1-safe-champion-fireworks.mp4",
       "image_key": "champion",
       "track_slug": "fireworks",
       "license": "CC0",
       "duration": 8,
       "fps": 30,
-      "bytes": 183110,
-      "sha256": "f896cb5c4b2ea486bac64afe588511503c72484e6977cca70404f53d4e51e232"
+      "bytes": 165232,
+      "sha256": "1d5864e7426982edf57fcc5498a9dfd3cbb6881d2e96d77af6559a25091c095c"
     },
     {
-      "file": "pick-v1-picks-hippety-hop.mp4",
+      "file": "pick-v1-safe-picks-hippety-hop.mp4",
       "image_key": "picks",
       "track_slug": "hippety-hop",
       "license": "CC0",
       "duration": 8,
       "fps": 30,
-      "bytes": 196946,
-      "sha256": "c619e09b9bd2e5136e4dfa892235ab4ee6092308254e33396697c0ae254bc2bd"
+      "bytes": 174908,
+      "sha256": "bd87325a5861cd26e5b455ce978723aa63fd8d99b9e7eb993af293701e21b115"
     },
     {
-      "file": "pick-v1-football-hippety-hop.mp4",
+      "file": "pick-v1-safe-football-hippety-hop.mp4",
       "image_key": "football",
       "track_slug": "hippety-hop",
       "license": "CC0",
       "duration": 8,
       "fps": 30,
-      "bytes": 197214,
-      "sha256": "ce9566592f1677e97bd5285947432cf9773cdb11900cefdfcec5f57af07d108f"
+      "bytes": 176115,
+      "sha256": "b50f3258576192174e1142e531c5bbecdf9d923b98b2c562ad4d0eacc2f57744"
     },
     {
-      "file": "pick-v1-champion-hippety-hop.mp4",
+      "file": "pick-v1-safe-champion-hippety-hop.mp4",
       "image_key": "champion",
       "track_slug": "hippety-hop",
       "license": "CC0",
       "duration": 8,
       "fps": 30,
-      "bytes": 192649,
-      "sha256": "47db88ad7e90173b91c63fbd9d117e1a508cc60537c4d37b8301757d96ee186d"
+      "bytes": 174771,
+      "sha256": "dd62951c8d5dd4d0699917f71cc00d42fabe8bf8ed26b69b257aecc4734fd683"
     },
     {
-      "file": "pick-v1-picks-limit-70.mp4",
+      "file": "pick-v1-safe-picks-limit-70.mp4",
       "image_key": "picks",
       "track_slug": "limit-70",
       "license": "CC0",
       "duration": 8,
       "fps": 30,
-      "bytes": 190281,
-      "sha256": "dbdeca279f223cbf1b671cd3da3ead22c80a66ba693aa42cabd8f0ecd37b9235"
+      "bytes": 168243,
+      "sha256": "2f92a4e8a3ada5236653068cda0365ae7014cf8628b8ec9065a255aef6699329"
     },
     {
-      "file": "pick-v1-football-limit-70.mp4",
+      "file": "pick-v1-safe-football-limit-70.mp4",
       "image_key": "football",
       "track_slug": "limit-70",
       "license": "CC0",
       "duration": 8,
       "fps": 30,
-      "bytes": 195931,
-      "sha256": "d6df67cd949c90343a8831ea1122e361dbd8ea330bb205fccf772a78f8b4cbaf"
+      "bytes": 174832,
+      "sha256": "a29f31e715a85abcd9b07934c940507f98d961a78c4d2abf94744a84cc16cb0e"
     },
     {
-      "file": "pick-v1-champion-limit-70.mp4",
+      "file": "pick-v1-safe-champion-limit-70.mp4",
       "image_key": "champion",
       "track_slug": "limit-70",
       "license": "CC0",
       "duration": 8,
       "fps": 30,
-      "bytes": 185246,
-      "sha256": "21cf950da8e0cfc3cb304275a48577a0eda6d9dccd438fe767221447928b8406"
+      "bytes": 167368,
+      "sha256": "73cfd6313559c4d62099f33b90799f98620b6da6b4bc99081ea9f5d371203d41"
     },
     {
-      "file": "pick-v1-picks-motions.mp4",
+      "file": "pick-v1-safe-picks-motions.mp4",
       "image_key": "picks",
       "track_slug": "motions",
       "license": "CC0",
       "duration": 8,
       "fps": 30,
-      "bytes": 184259,
-      "sha256": "1df5a373b3cc1655587dafecccd018e1c90858373fbda83f5f67def9a21f8abc"
+      "bytes": 162221,
+      "sha256": "d310d566ba814829dc1a96f293c2d7791a0d7fc2b55cdac1f24416907037e8cc"
     },
     {
-      "file": "pick-v1-football-motions.mp4",
+      "file": "pick-v1-safe-football-motions.mp4",
       "image_key": "football",
       "track_slug": "motions",
       "license": "CC0",
       "duration": 8,
       "fps": 30,
-      "bytes": 184249,
-      "sha256": "bce98d299fd5ebb7d6dc47df00c57d345e921429488f42d0d450a9271e17469f"
+      "bytes": 163150,
+      "sha256": "37abb6fe34c79e9364ef809a3ad7f453b73e8b055dc04841a87a0e3856575de8"
     },
     {
-      "file": "pick-v1-champion-motions.mp4",
+      "file": "pick-v1-safe-champion-motions.mp4",
       "image_key": "champion",
       "track_slug": "motions",
       "license": "CC0",
       "duration": 8,
       "fps": 30,
-      "bytes": 181244,
-      "sha256": "f96d724143a1643fd526cacadf4295964a94524c712ab877910fba1b4523928c"
+      "bytes": 163366,
+      "sha256": "7e566ccb06688b4cbf85b57d82f8eee82b37d04c7b938265a6831db2539db325"
     }
+  ],
+  "safe_box": [
+    72,
+    200,
+    588,
+    820
   ]
 }
