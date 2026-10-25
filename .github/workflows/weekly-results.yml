@@ -5,6 +5,7 @@ on:
       - 'assets/cam-weekly-results.js'
       - 'assets/ae-editorial-weekly.js'
       - 'tests/weekly-results-ui.mjs'
+      - 'tests/weekly-admin-edit.mjs'
       - 'supabase/20_cam_weekly_results.sql'
       - 'supabase/22_cam_weekly_x_quote.sql'
       - 'tests/weekly-quote-dispatch.mjs'
@@ -24,6 +25,7 @@ jobs:
       - run: npm ci
       - run: node --check assets/cam-weekly-results.js && node --check assets/ae-editorial-weekly.js
       - run: node tests/weekly-results-ui.mjs
+      - run: node tests/weekly-admin-edit.mjs
       - run: node tests/social-publication.mjs
       - run: node tests/weekly-quote-dispatch.mjs
       - run: npm run test:editor

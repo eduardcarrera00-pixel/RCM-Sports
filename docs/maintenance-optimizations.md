@@ -66,3 +66,25 @@ public-only generation, failed refreshes, and 25 before/after authorization
 cases with synthetic data. The database test also checks migration
 repeatability and the eight indexes. CI additionally compares computed
 styles across five sections, two themes and mobile/desktop.
+
+## Pick del editor
+
+The current published Pick already has a confirmed result. Its original
+selection is deliberately immutable, but the interface still offered an Edit
+button. That button now opens a new publication when a result is confirmed.
+Pending Picks keep the existing edit flow, including edits by another editor.
+The new-Pick action also remains available from the edit form if the result is
+confirmed while an administrator is editing. A fresh result check runs before
+image uploads and edits; connection failures preserve the draft.
+
+No authorization rule or historical result was changed. The database-side
+immutability check still handles a result confirmed during the save itself.
+The interface regression covers replacement, pending edits, confirmation races,
+connection failures, retained drafts and reader denial.
+
+Run node tests/weekly-admin-edit.mjs for this regression. The optional owner-only
+tests/weekly-admin-save.sql verified all three production editors can edit a
+pending Pick and publish a replacement. It rolled back every fixture, original
+publication flag and social setting, preserving all real Picks and results.
+The staging project does not include the social-results schema, so this
+specific end-to-end SQL check could not run there.

@@ -109,6 +109,7 @@
    const {data,error}=await db.rpc('cam_weekly_pick_result',{p_pick_id:id});
    if(error)throw error;
    if(data)results.set(id,data);else results.delete(id);
+   document.dispatchEvent(new CustomEvent('cam:weekly-result',{detail:{id}}));
    return data;
  }
  function renderRow(row){
