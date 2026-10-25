@@ -5,7 +5,12 @@
  */
 @layer cam-banners {
   :root {
-    --cam-banner-fill:#073b83;
+    --cam-banner-fill:#f3ebdd;
+    --cam-banner-title:#0a3268;
+    --cam-banner-copy:#56616c;
+    --cam-banner-ink:#0a3268;
+    --cam-banner-accent:#8d8174;
+    --cam-banner-border:#d7cbb9;
     --cam-banner-panel:#f3ebdd;
     --cam-banner-radius:20px;
     --cam-banner-pad:clamp(16px,2vw,24px);
@@ -16,7 +21,12 @@
     --cam-banner-title-size:clamp(20px,1.8vw,25px);
   }
   html.dark {
-    --cam-banner-fill:#0a3268;
+    --cam-banner-fill:#0b2233;
+    --cam-banner-title:#f3ebdd;
+    --cam-banner-copy:#c2cdd4;
+    --cam-banner-ink:#f3ebdd;
+    --cam-banner-accent:#b79a76;
+    --cam-banner-border:#52616a;
     --cam-banner-panel:var(--ds-surface,#102b3e);
   }
 
@@ -45,7 +55,7 @@
     border-radius:var(--cam-banner-radius)!important;
     background-color:var(--cam-banner-fill)!important;
     background-image:none!important;
-    color:#fff!important;
+    color:var(--cam-banner-title)!important;
     text-align:left!important;
     box-shadow:none!important;
     clip-path:none!important;
@@ -89,34 +99,24 @@
     content:none!important;
     display:none!important;
   }
-  /* Flat original canvases are composited as ivory ink over the shared blue.
-     The source image stays unchanged and can still be replaced in the editor. */
-  [data-cam-banner-ink="light"]::after {
-    filter:grayscale(1) invert(1) contrast(4) sepia(.18)!important;
-    mix-blend-mode:screen!important;
+  /* The renderer supplies an actual RGBA cutout, shared by the two theme inks.
+     Its transparent pixels expose the exact banner fill, including on Safari. */
+  [data-cam-banner-transparent]::after {
+    background-image:none!important;
+    background-color:var(--cam-banner-ink)!important;
+    -webkit-mask-image:var(--cam-banner-mask)!important;
+    mask-image:var(--cam-banner-mask)!important;
+    -webkit-mask-size:var(--cam-banner-art-size,contain)!important;
+    mask-size:var(--cam-banner-art-size,contain)!important;
+    -webkit-mask-position:var(--cam-banner-art-position,center)!important;
+    mask-position:var(--cam-banner-art-position,center)!important;
+    -webkit-mask-repeat:no-repeat!important;
+    mask-repeat:no-repeat!important;
+    mix-blend-mode:normal!important;
   }
-  [data-cam-banner-ink="dark"]::after {
-    filter:grayscale(1) contrast(4) sepia(.18)!important;
-    mix-blend-mode:screen!important;
-  }
-  /* Legacy multi-scene atlases remain backgrounds, with their exact original
-     cell crop. They must not appear as a thumbnail showing several scenes. */
-  [data-cam-banner-atlas] {
-    grid-template-columns:minmax(0,1fr)!important;
-    background-image:linear-gradient(90deg,var(--cam-banner-fill),color-mix(in srgb,var(--cam-banner-fill) 78%,transparent)),var(--cam-banner-art)!important;
-    background-size:100% 100%,var(--cam-banner-art-size)!important;
-    background-position:center,var(--cam-banner-art-position)!important;
-    background-repeat:no-repeat!important;
-  }
-  [data-cam-banner-atlas]::after { display:none!important; }
-  [data-cam-banner-photo] {
-    grid-template-columns:minmax(0,1fr)!important;
-    background-image:linear-gradient(90deg,var(--cam-banner-fill) 40%,color-mix(in srgb,var(--cam-banner-fill) 88%,transparent)),var(--cam-banner-art)!important;
-    background-size:100% 100%,cover!important;
-    background-position:center,var(--cam-banner-art-position)!important;
-    background-repeat:no-repeat!important;
-  }
-  [data-cam-banner-photo]::after { display:none!important; }
+  [data-cam-banner-pending]::after { visibility:hidden!important; }
+  [data-cam-banner-empty] { grid-template-columns:minmax(0,1fr)!important; }
+  [data-cam-banner-empty]::after { display:none!important; }
   [data-cam-banner] > :is(h2,h3,.ae-weekly-heading-inline,.ae-picks-nudge,
     .cam-home-take-square-label,.ae-rank-title-wrap) {
     position:relative!important;
@@ -136,7 +136,7 @@
     border:0!important;
     border-radius:0!important;
     background:transparent!important;
-    color:#fff!important;
+    color:var(--cam-banner-title)!important;
     font-family:"Playfair Display",Georgia,serif!important;
     font-size:var(--cam-banner-title-size)!important;
     font-weight:600!important;
@@ -166,7 +166,7 @@
     max-width:65ch!important;
     margin:0!important;
     padding:0!important;
-    color:#f3ebdd!important;
+    color:var(--cam-banner-copy)!important;
     font:400 13px/1.55 "Libre Baskerville",Georgia,serif!important;
     text-align:left!important;
     text-shadow:none!important;
@@ -179,7 +179,7 @@
     position:relative!important;
     margin:0!important;
     padding:0!important;
-    color:#f3ebdd!important;
+    color:var(--cam-banner-copy)!important;
     text-align:left!important;
   }
   [data-cam-banner] > button {
@@ -255,13 +255,45 @@
     padding:0!important;
     border:0!important;
     background:none!important;
-    color:#fff!important;
+    color:var(--cam-banner-title)!important;
     font:inherit!important;
     text-align:left!important;
     box-shadow:none!important;
   }
   #aeNewsHeadingRow[data-cam-banner] .ae-news-inline-tools {
     grid-column:1!important;
+  }
+  [data-cam-banner] :is(.ae-rank-title-wrap h3,.ae-weekly-heading-inline h3) {
+    color:var(--cam-banner-title)!important;
+  }
+  [data-cam-banner] .ae-chef-recetario {
+    color:var(--cam-banner-copy)!important;
+  }
+  :is(#picksPopular,#picksQuestioned) .ae-chef-empty {
+    background:transparent!important;
+    color:var(--cam-banner-copy)!important;
+  }
+  html:not(.dark) [data-cam-banner] {
+    box-shadow:inset 0 0 0 1px var(--cam-banner-border)!important;
+  }
+  /* The full-width ranking mastheads follow the same theme; badges and the
+     actual ranking rows keep their existing images and result colours. */
+  :is(#nflRankings,#championsRankings) {
+    background-color:var(--cam-banner-fill)!important;
+    background-image:none!important;
+    color:var(--cam-banner-title)!important;
+  }
+  :is(#nflRankings,#championsRankings) :is(h2,.ae-rank-title,.ae-rank-title-wrap) {
+    color:var(--cam-banner-title)!important;
+    text-shadow:none!important;
+  }
+  :is(#nflRankings,#championsRankings) :is(.ae-ranking-kicker,.ae-rank-subtitle,#nflSubtitle,#championsSubtitle) {
+    color:var(--cam-banner-copy)!important;
+  }
+  [data-cam-banner] > .cam-op-banner-image {
+    background:transparent!important;
+    border:0!important;
+    box-shadow:none!important;
   }
 
   /* Keep the existing article image and click targets, including saved framing. */
@@ -329,6 +361,9 @@
     min-height:176px!important;
   }
   .cam-nfl-heading[data-cam-banner]::after { right:0!important; }
+  .cam-nfl-heading[data-cam-banner-key^="futbol.quiniela"] > .cam-football-quiniela-illustration {
+    display:none!important;
+  }
   .cam-nfl-heading[data-cam-banner] > h2 { font-size:28px!important; }
   .cam-nfl-heading[data-cam-banner] > span { font-size:10px!important; }
   .cam-nfl-heading[data-cam-banner] .cam-football-quiniela-illustration {
@@ -425,107 +460,5 @@
       --cam-banner-art-height:62px;
     }
     .cam-nfl-heading[data-cam-banner] > h2 { font-size:22px!important; }
-  }
-}
-
-/* CAM SPORTS · Fondo nocturno móvil sin recuadros detrás de los iconos.
- * Solo los diez banners solicitados. Su escritorio, modo día y las cabeceras
- * «Demuestra tu conocimiento» mantienen la presentación anterior.
- *
- * Las ilustraciones (incluidas las subidas por administración) siguen usando
- * --cam-banner-art y los tamaños/encuadres elegidos en el editor. El filtro
- * convierte únicamente su lienzo oscuro en transparente por composición
- * screen: conserva la silueta luminosa sin mostrar el color rectangular.
- */
-@layer cam-banners {
-  @media (max-width:760px) {
-    html.dark body :is(
-    [data-cam-banner-key="portada.opinadores-noche"],
-    [data-cam-banner-key="picks.marmol-noche"],
-    [data-cam-banner-key="picks.platos-mejores-banner-noche"],
-    [data-cam-banner-key="picks.platos-peores-banner-noche"],
-    [data-cam-banner-key="picks.chefs-mejores-noche"],
-    [data-cam-banner-key="nfl.opiniones-apoyadas-noche"],
-    [data-cam-banner-key="nfl.opiniones-hateadas-noche"],
-    [data-cam-banner-key="futbol.noticias-noche"],
-    [data-cam-banner-key="futbol.populares-noche"],
-    [data-cam-banner-key="futbol.impopulares-noche"],
-    #footballTakes.ae-picks-editorial #communityPicks .ae-picks-heading-cta-row.ae-chef-marble,
-    #footballTakes.ae-picks-editorial .ae-picks-rail > .ae-chef-best > .ae-picks-rail-heading,
-    #footballTakes.ae-picks-editorial .ae-picks-rail > .ae-chef-worst > .ae-picks-rail-heading,
-    .ae-inline-chefs-board:not(.ae-worst-chefs-board) > .ae-chefs-art-heading,
-    #aeSportTakeLeaders .ae-sport-chef-card.is-supported > .ae-sport-chef-heading,
-    #aeSportTakeLeaders .ae-sport-chef-card.is-questioned > .ae-sport-chef-heading,
-    .editorial-community > .ae-section-heading
-  ) {
-      --cam-banner-fill:#071827;
-      background-color:var(--cam-banner-fill)!important;
-      background-image:none!important;
-      background-blend-mode:normal!important;
-    }
-
-    /* Los iconos individuales se mantienen en la misma columna de arte. */
-    html.dark body :is(
-    [data-cam-banner-key="portada.opinadores-noche"],
-    [data-cam-banner-key="picks.marmol-noche"],
-    [data-cam-banner-key="picks.platos-mejores-banner-noche"],
-    [data-cam-banner-key="picks.platos-peores-banner-noche"],
-    [data-cam-banner-key="picks.chefs-mejores-noche"],
-    [data-cam-banner-key="nfl.opiniones-apoyadas-noche"],
-    [data-cam-banner-key="nfl.opiniones-hateadas-noche"],
-    [data-cam-banner-key="futbol.noticias-noche"],
-    [data-cam-banner-key="futbol.populares-noche"],
-    [data-cam-banner-key="futbol.impopulares-noche"],
-    #footballTakes.ae-picks-editorial #communityPicks .ae-picks-heading-cta-row.ae-chef-marble,
-    #footballTakes.ae-picks-editorial .ae-picks-rail > .ae-chef-best > .ae-picks-rail-heading,
-    #footballTakes.ae-picks-editorial .ae-picks-rail > .ae-chef-worst > .ae-picks-rail-heading,
-    .ae-inline-chefs-board:not(.ae-worst-chefs-board) > .ae-chefs-art-heading,
-    #aeSportTakeLeaders .ae-sport-chef-card.is-supported > .ae-sport-chef-heading,
-    #aeSportTakeLeaders .ae-sport-chef-card.is-questioned > .ae-sport-chef-heading,
-    .editorial-community > .ae-section-heading
-  ):not([data-cam-banner-atlas])::after {
-      content:""!important;
-      display:block!important;
-      filter:grayscale(1) contrast(8)!important;
-      mix-blend-mode:screen!important;
-    }
-
-    /* Los mosaicos conservan el recorte completo y el encuadre original. */
-    html.dark body :is(
-    [data-cam-banner-key="portada.opinadores-noche"],
-    [data-cam-banner-key="picks.marmol-noche"],
-    [data-cam-banner-key="picks.platos-mejores-banner-noche"],
-    [data-cam-banner-key="picks.platos-peores-banner-noche"],
-    [data-cam-banner-key="picks.chefs-mejores-noche"],
-    [data-cam-banner-key="nfl.opiniones-apoyadas-noche"],
-    [data-cam-banner-key="nfl.opiniones-hateadas-noche"],
-    [data-cam-banner-key="futbol.noticias-noche"],
-    [data-cam-banner-key="futbol.populares-noche"],
-    [data-cam-banner-key="futbol.impopulares-noche"],
-    #footballTakes.ae-picks-editorial #communityPicks .ae-picks-heading-cta-row.ae-chef-marble,
-    #footballTakes.ae-picks-editorial .ae-picks-rail > .ae-chef-best > .ae-picks-rail-heading,
-    #footballTakes.ae-picks-editorial .ae-picks-rail > .ae-chef-worst > .ae-picks-rail-heading,
-    .ae-inline-chefs-board:not(.ae-worst-chefs-board) > .ae-chefs-art-heading,
-    #aeSportTakeLeaders .ae-sport-chef-card.is-supported > .ae-sport-chef-heading,
-    #aeSportTakeLeaders .ae-sport-chef-card.is-questioned > .ae-sport-chef-heading,
-    .editorial-community > .ae-section-heading
-  )[data-cam-banner-atlas]::before {
-      content:""!important;
-      display:block!important;
-      position:absolute!important;
-      inset:0!important;
-      z-index:0!important;
-      margin:0!important;
-      border:0!important;
-      background-color:transparent!important;
-      background-image:var(--cam-banner-art,none)!important;
-      background-position:var(--cam-banner-art-position,center)!important;
-      background-size:var(--cam-banner-art-size,cover)!important;
-      background-repeat:no-repeat!important;
-      filter:grayscale(1) contrast(8)!important;
-      mix-blend-mode:screen!important;
-      opacity:1!important;
-      pointer-events:none!important;
-    }
   }
 }

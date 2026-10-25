@@ -99,3 +99,20 @@ usan el azul de marca #284A71 (día) / #1C2D40 (noche). `assets/ae-armonia.css`
 unifica pestañas, botones, etiquetas, estados vacíos, foco, áreas táctiles y
 ritmo vertical. El build (`node scripts/build-editorial-css.mjs`) ya no necesita
 Tailwind.
+
+## Banners compartidos · 25 oct 2026
+
+`assets/cam-banner-system.css` define la paleta de todos los banners mediante
+`--cam-banner-fill`, `--cam-banner-title`, `--cam-banner-copy` y `--cam-banner-ink`.
+Noche: fondo #0B2233, títulos e ilustraciones #F3EBDD, descripciones #C2CDD4.
+Día: fondo #F3EBDD, títulos e ilustraciones #0A3268, descripciones #56616C.
+Los acentos son #B79A76 de noche y #8D8174 de día.
+
+El renderer convierte los lienzos planos de ilustraciones guardadas en una
+imagen RGBA transparente con `cam-banner-artwork.js`. Conserva su URL original
+y el encuadre para el editor; la tinta depende del tema real (`html.dark`).
+No usar filtros ni mezcla screen para ocultar recuadros. Las fotos y los
+escudos no se recolorean. Un archivo que contiene solo un fondo no se muestra
+como un pequeño logo. Mejores/Peores Platos tienen fondo liso e iconos SVG
+independientes, sin el atlas anterior. Opiniones no reutiliza una imagen del
+tema contrario cuando falta una variante.

@@ -130,8 +130,8 @@
       {group:'nfl.quiniela',variant,originalPath:'assets/icons/ae-nfl-gold.webp'});
   }
   pair('nfl.estadio', 'Estadio NFL · Rankings', 'NFL', 'assets/rankings/ae-nfl-stadium-night.webp', 'assets/rankings/ae-nfl-stadium-day.webp');
-  f('nfl.noticias-noche', 'Banner de Noticias · NFL', 'NFL', [], { group: 'nfl.noticias', variant: NIGHT, originalPath: 'assets/rankings/ae-nfl-stadium-night.webp' });
-  f('nfl.noticias-dia', 'Banner de Noticias · NFL', 'NFL', [], { group: 'nfl.noticias', variant: DAY, originalPath: 'assets/rankings/ae-nfl-stadium-day.webp' });
+  f('nfl.noticias-noche', 'Banner de Noticias · NFL', 'NFL', [], { group: 'nfl.noticias', variant: NIGHT, originalPath: 'assets/cam-banner-nfl-news.svg' });
+  f('nfl.noticias-dia', 'Banner de Noticias · NFL', 'NFL', [], { group: 'nfl.noticias', variant: DAY, originalPath: 'assets/cam-banner-nfl-news.svg' });
   f('nfl.ambiente', 'Ambiente NFL (tarjetas y cabeceras)', 'NFL y Portada', 'assets/rankings/nfl-atmosphere.webp');
   f('nfl.ranking-claro', 'Fondo claro del ranking NFL', 'NFL', 'assets/atmospheres/ae-nfl-ranking-light.svg');
   f('nfl.savant', 'Fondo de «Savant»', 'NFL', 'assets/rankings/ae-nfl-savant-20261019.webp');
@@ -156,9 +156,9 @@
   atlas('picks.chefs-peores-atlas', 'Mosaico de la cabecera de peores chefs', 'Picks', 'assets/ae-chefs-worst-header-atlas.webp', [1, 2], 'Dos escenas apiladas: arriba noche, abajo día.');
   // Cabeceras de Platos independientes de los fondos de tarjeta y de Chefs.
   pair('picks.platos-mejores-banner', 'Banner de «Mejores platos»', 'Picks',
-    [], [], { originalPath: 'assets/ae-picks-best-plate-atlas.webp' });
+    'assets/cam-banner-best-plate.svg', 'assets/cam-banner-best-plate.svg');
   pair('picks.platos-peores-banner', 'Banner de «Peores platos»', 'Picks',
-    [], []);
+    'assets/cam-banner-worst-plate.svg', 'assets/cam-banner-worst-plate.svg');
   f('picks.mejores-platos', 'Escena de los mejores platos', 'Picks', 'assets/ae-best-plates-scene.webp');
   f('picks.peores-platos', 'Escena de los peores platos', 'Picks', 'assets/ae-worst-plates-scene.webp');
   pair('picks.marmol', 'Fondo de mármol de «Eres Chef»', 'Picks', 'assets/ae-chef-marble-night.webp', 'assets/ae-chef-marble-day.webp');
@@ -641,142 +641,65 @@
     }
   }
 
-  // Measure visible ink rather than the file canvas. Many approved uploads have
-  // a large empty margin around a small icon. Canvas analysis only controls CSS
-  // fitting; it never edits/uploads an image. Photographs and atlases keep their
-  // original colours; unreadable/photographic sources keep a full banner backdrop.
+  // Keep the editable original URL; render a cached transparent cutout in the
+  // artwork column. CSS supplies the theme colour without filters or blending.
   const bannerArtCache = new Map();
   const bannerArtRequests = new WeakMap();
   const bannerProperty = (el, name, value) => {
     if (el.style.getPropertyValue(name) !== value) el.style.setProperty(name,value);
   };
   function fitBannerArtwork(el, url, focus) {
+    if (!window.camBannerArtwork) return;
     const paint = art => {
       if (!art || !el.isConnected || el.style.getPropertyValue('--cam-banner-art') !== cssUrl(url)) return;
+      delete el.dataset.camBannerPending;
+      delete el.dataset.camBannerInk;
+      if (art.empty) {
+        if (el.dataset.camBannerEmpty !== '1') el.dataset.camBannerEmpty = '1';
+        delete el.dataset.camBannerPhoto;
+        delete el.dataset.camBannerTransparent;
+        el.style.removeProperty('--cam-banner-mask');
+        return;
+      }
+      delete el.dataset.camBannerEmpty;
       if (art.photo) {
         if (el.dataset.camBannerPhoto !== '1') el.dataset.camBannerPhoto = '1';
-        delete el.dataset.camBannerInk;
+        delete el.dataset.camBannerTransparent;
+        el.style.removeProperty('--cam-banner-mask');
         bannerProperty(el,'--cam-banner-art-position',focus || 'center');
         return;
       }
       delete el.dataset.camBannerPhoto;
-      if (art.ink) {
-        if (el.dataset.camBannerInk !== art.ink) el.dataset.camBannerInk = art.ink;
-      } else delete el.dataset.camBannerInk;
+      // This two-tone SVG already has alpha and theme-specific negative space.
+      const originalSvg = /cam-football-quiniela-(?:day|night)\.svg(?:[?#]|$)/.test(url);
+      if (!originalSvg) {
+        bannerProperty(el,'--cam-banner-mask',cssUrl(art.mask));
+        if (el.dataset.camBannerTransparent !== '1') el.dataset.camBannerTransparent = '1';
+      } else {
+        delete el.dataset.camBannerTransparent;
+        el.style.removeProperty('--cam-banner-mask');
+      }
       const cs = getComputedStyle(el, '::after');
       const width = parseFloat(cs.width), height = parseFloat(cs.height);
       if (!(width > 0 && height > 0)) return;
       const scale = Math.min(width / art.width, height / art.height);
-      const fullWidth = art.imageWidth * scale, fullHeight = art.imageHeight * scale;
-      // Keep saved X/Y as alignment inside the new artwork slot, so a previous
-      // right-aligned icon stays right-aligned without retaining its blank canvas.
       const anchor = focus ? focus.split(/\s+/).map(n => parseFloat(n)/100) : [.5,.5];
       const left = (width - art.width * scale) * anchor[0] - art.left * scale;
       const top = (height - art.height * scale) * anchor[1] - art.top * scale;
-      bannerProperty(el,'--cam-banner-art-size',fullWidth.toFixed(2) + 'px ' + fullHeight.toFixed(2) + 'px');
+      bannerProperty(el,'--cam-banner-art-size',(art.imageWidth*scale).toFixed(2) + 'px ' + (art.imageHeight*scale).toFixed(2) + 'px');
       bannerProperty(el,'--cam-banner-art-position',left.toFixed(2) + 'px ' + top.toFixed(2) + 'px');
     };
     if (bannerArtCache.has(url)) {
-      const cached = bannerArtCache.get(url);
-      if (cached && typeof cached.then !== 'function') paint(cached);
-      else if (cached && bannerArtRequests.get(el) !== url) {
-        bannerArtRequests.set(el, url); cached.then(paint);
-      }
+      paint(bannerArtCache.get(url));
       return;
     }
-    const job = new Promise(resolve => {
-      const image = new Image();
-      image.crossOrigin = 'anonymous';
-      image.onerror = () => resolve({photo:true});
-      image.onload = () => {
-        try {
-          const scale = Math.min(320 / image.naturalWidth, 180 / image.naturalHeight, 1);
-          const canvas = document.createElement('canvas');
-          const w = canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
-          const h = canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
-          const ctx = canvas.getContext('2d', { willReadFrequently:true });
-          if (!ctx || w < 8 || h < 8) { resolve({photo:true}); return; }
-          ctx.drawImage(image, 0, 0, w, h);
-          const pixels = ctx.getImageData(0, 0, w, h).data;
-          let transparent=0,alphaLeft=w,alphaTop=h,alphaRight=-1,alphaBottom=-1;
-          for (let y=0;y<h;y++) for (let x=0;x<w;x++) {
-            const alpha=pixels[(y*w+x)*4+3];
-            if (alpha<30) transparent++;
-            if (alpha>100) { alphaLeft=Math.min(alphaLeft,x);alphaTop=Math.min(alphaTop,y);alphaRight=Math.max(alphaRight,x);alphaBottom=Math.max(alphaBottom,y); }
-          }
-          // Transparent icons need no background removal or colour filter.
-          if (transparent>w*h*.2 && alphaRight>=alphaLeft) {
-            const pad=Math.max(2,Math.ceil(Math.max(alphaRight-alphaLeft,alphaBottom-alphaTop)*.08));
-            const left=Math.max(0,alphaLeft-pad),top=Math.max(0,alphaTop-pad);
-            const right=Math.min(w-1,alphaRight+pad),bottom=Math.min(h-1,alphaBottom+pad);
-            resolve({left,top,width:right-left+1,height:bottom-top+1,imageWidth:w,imageHeight:h,ink:null});
-            return;
-          }
-          const bins = new Map();
-          for (let i = 0; i < pixels.length; i += 4) {
-            if (pixels[i + 3] < 180) continue;
-            const key = (pixels[i] >> 4) * 256 + (pixels[i + 1] >> 4) * 16 + (pixels[i + 2] >> 4);
-            const bin = bins.get(key) || [0,0,0,0];
-            bin[0]++; bin[1] += pixels[i]; bin[2] += pixels[i + 1]; bin[3] += pixels[i + 2]; bins.set(key, bin);
-          }
-          const bg = [...bins.values()].sort((a,b) => b[0] - a[0])[0];
-          if (!bg) { resolve({photo:true}); return; }
-          const rgb = bg.slice(1).map(n => n / bg[0]);
-          // A softly shaded cream/blue canvas spans several adjacent bins. Count
-          // those together; a single-bin cutoff mistakes it for photography.
-          const backgroundCount = [...bins.values()].reduce((n,b) => {
-            const distance=b.slice(1).reduce((sum,c,i)=>sum+Math.abs(c/b[0]-rgb[i]),0);
-            return n+(distance<90?b[0]:0);
-          },0);
-          if (backgroundCount < w*h*.65) { resolve({photo:true}); return; }
-          const ink = new Uint8Array(w*h);
-          const edge = Math.max(1, Math.floor(Math.min(w,h) * .025));
-          for (let y = edge; y < h - edge; y++) for (let x = edge; x < w - edge; x++) {
-            const i = (y * w + x) * 4;
-            const distance = Math.abs(pixels[i] - rgb[0]) + Math.abs(pixels[i + 1] - rgb[1]) + Math.abs(pixels[i + 2] - rgb[2]);
-            if (pixels[i + 3] > 120 && distance > 150) {
-              ink[y*w+x] = 1;
-            }
-          }
-          // Ignore source-frame outlines and divider rules. They are not part of
-          // the logo and would otherwise expand its bounds to the whole canvas.
-          const parts = [];
-          for (let i = 0; i < ink.length; i++) {
-            if (!ink[i]) continue;
-            const queue = [i]; ink[i] = 0;
-            let left=w,top=h,right=-1,bottom=-1;
-            for (let n=0;n<queue.length;n++) {
-              const at=queue[n],x=at%w,y=Math.floor(at/w);
-              left=Math.min(left,x);top=Math.min(top,y);right=Math.max(right,x);bottom=Math.max(bottom,y);
-              for (const next of [at-1,at+1,at-w,at+w])
-                if (next>=0 && next<ink.length && ink[next] && Math.abs(next%w-x)<=1) {
-                  ink[next]=0;queue.push(next);
-                }
-            }
-            const pw=right-left+1,ph=bottom-top+1,fill=queue.length/(pw*ph);
-            if (queue.length<Math.max(3,w*h*.0002)) continue;
-            if ((pw>w*.85 && (ph<h*.12 || fill<.3)) || (ph>h*.85 && pw<w*.12)) continue;
-            parts.push({left,top,right,bottom,count:queue.length});
-          }
-          if (!parts.length) { resolve({photo:true}); return; }
-          parts.sort((a,b)=>b.count-a.count);
-          const main=parts[0],reach=Math.max(main.right-main.left,main.bottom-main.top)*.8+4;
-          const group=parts.filter(p=>p.right>=main.left-reach && p.left<=main.right+reach && p.bottom>=main.top-reach && p.top<=main.bottom+reach);
-          let left=Math.min(...group.map(p=>p.left)),top=Math.min(...group.map(p=>p.top));
-          let right=Math.max(...group.map(p=>p.right)),bottom=Math.max(...group.map(p=>p.bottom));
-          const pad = Math.max(2, Math.ceil(Math.max(right-left,bottom-top) * .08));
-          left = Math.max(0,left-pad); top = Math.max(0,top-pad);
-          right = Math.min(w-1,right+pad); bottom = Math.min(h-1,bottom+pad);
-          const luminance = (rgb[0]*.2126 + rgb[1]*.7152 + rgb[2]*.0722) / 255;
-          resolve({ left, top, width:right-left+1, height:bottom-top+1,
-            imageWidth:w, imageHeight:h, ink:luminance > .6 ? 'light' : 'dark' });
-        } catch { resolve({photo:true}); }
-      };
-      image.src = url;
-    });
-    bannerArtCache.set(url, job);
+    if (bannerArtRequests.get(el) === url) return;
     bannerArtRequests.set(el, url);
-    job.then(art => { bannerArtCache.set(url,art); paint(art); });
+    el.dataset.camBannerPending = '1';
+    window.camBannerArtwork.load(url).then(art => {
+      bannerArtCache.set(url, art);
+      paint(art);
+    });
   }
 
   // A shared frame for editorial banners. Saved image identities and focus stay
@@ -801,6 +724,7 @@
       [PICKS_PLATE_BANNERS[0][0], 'picks.platos-mejores-banner' + theme, 'card'],
       [PICKS_PLATE_BANNERS[1][0], 'picks.platos-peores-banner' + theme, 'card'],
       ['#camNflQuiniela .cam-nfl-heading', 'nfl.quiniela' + theme, 'feature'],
+      ['#camFootballQuiniela .cam-nfl-heading', 'futbol.quiniela' + theme, 'feature'],
       ['#picksNews .ae-picks-news-heading', 'picks.archivo-noticias' + theme, 'card']
     ];
     if (sport) {
@@ -817,8 +741,7 @@
       const entry = ENTRIES.get(key);
       if (!entry) continue;
       const row = rows.get(key);
-      const visual = !row?.url && key.startsWith('picks.platos-mejores-banner')
-        ? ENTRIES.get('picks.mejor-plato' + theme) : entry;
+      const visual = entry;
       const parent = visual.kind === 'slot' ? ENTRIES.get(visual.atlas) : null;
       const source = row?.url || (parent && (rows.get(parent.key)?.url || parent.paths[0]))
         || visual.originalPath || visual.paths?.[0] || dataByKey.get(key);
@@ -832,16 +755,22 @@
           const changed = el.style.getPropertyValue('--cam-banner-art') !== cssUrl(url || source);
           bannerProperty(el,'--cam-banner-art',cssUrl(url || source));
           if (changed || (!row?.url && parent)) {
+            delete el.dataset.camBannerEmpty;
             bannerProperty(el,'--cam-banner-art-size',!row?.url && parent ? visual.crop.size : 'contain');
             bannerProperty(el,'--cam-banner-art-position',focusOf(row)
               || (!row?.url && parent ? visual.crop.pos : 'center'));
             delete el.dataset.camBannerInk;
             delete el.dataset.camBannerPhoto;
           }
-          if (!parent || row?.url) fitBannerArtwork(el, url || source, focusOf(row));
+          if ((!parent || row?.url) && el.getClientRects().length)
+            fitBannerArtwork(el, url || source, focusOf(row));
         } else {
           delete el.dataset.camBannerKey;
           delete el.dataset.camBannerPhoto;
+          delete el.dataset.camBannerEmpty;
+          delete el.dataset.camBannerTransparent;
+          delete el.dataset.camBannerPending;
+          el.style.removeProperty('--cam-banner-mask');
           el.style.removeProperty('--cam-banner-art');
         }
         // Keep the original inline values for the existing editor and fallback,
@@ -855,7 +784,7 @@
               title.style.setProperty(prop,title.style.getPropertyValue(prop));
       }
     }
-    for (const el of document.querySelectorAll('#camFootballQuiniela .cam-nfl-heading,#aeOpinions .ae-opinions-section-head')) {
+    for (const el of document.querySelectorAll('#aeOpinions .ae-opinions-section-head')) {
       if (el.dataset.camBanner !== 'feature') el.dataset.camBanner = 'feature';
       const image = el.querySelector(':scope > .cam-op-banner-image');
       if (image) {
@@ -871,6 +800,9 @@
         fitBannerArtwork(el, source, '');
       } else if (el.dataset.camBannerImage) {
         delete el.dataset.camBannerImage;
+        delete el.dataset.camBannerTransparent;
+        delete el.dataset.camBannerPending;
+        el.style.removeProperty('--cam-banner-mask');
         delete el.dataset.camBannerPhoto;
         delete el.dataset.camBannerInk;
         for (const prop of ['--cam-banner-art','--cam-banner-art-size','--cam-banner-art-position']) el.style.removeProperty(prop);

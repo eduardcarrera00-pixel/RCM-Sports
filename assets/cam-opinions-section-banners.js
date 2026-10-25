@@ -40,7 +40,7 @@
   const key = (slot, theme) => slot + ':' + theme;
   const themeNow = () => document.documentElement.classList.contains('dark') ? 'dark' : 'light';
   function imageFor(slot) {
-    return banners.get(key(slot, themeNow())) || banners.get(key(slot, themeNow() === 'dark' ? 'light' : 'dark')) || '';
+    return banners.get(key(slot, themeNow())) || '';
   }
   function setSection(slot) {
     const header = document.querySelector('#aeOpinions .ae-opinions-section-head[data-cam-opinions-banner="' + slot + '"]');

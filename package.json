@@ -25,7 +25,7 @@
     "test:pick-editor:themes": "node tests/pick-editor-night-browser.cjs",
     "test:mobile-nav": "node tests/mobile-bottom-nav.mjs",
     "test:opinions-banners": "node tests/opinions-section-banners.mjs",
-    "test:site-banners": "node tests/site-sport-banner-images.mjs",
+    "test:site-banners": "node tests/site-sport-banner-images.mjs && node tests/banner-artwork.mjs",
     "build:css-packs": "node scripts/build-performance-css.mjs",
     "test:performance": "node scripts/build-performance-css.mjs --check && node tests/performance-css.mjs",
     "test:ocr:lazy": "node tests/ocr-lazy-loading.mjs && node tests/pick-capture-ui.mjs",
