@@ -44,7 +44,7 @@
     up:Math.max(0,Math.trunc(Number(p.upvotes)||0)),down:Math.max(0,Math.trunc(Number(p.downvotes)||0))};
   }
   const weekly=kind==='weekly';
-  const legs=weekly?[{event:p.event_name,selection:p.selection}]:Array.isArray(p.legs)?p.legs.slice(0,50):[];
+  const legs=weekly?String(p.selection||'').replace(/\\n/g,'\n').split(/\n+|\s+[|•]\s+|;\s*|\s+\+\s+(?!\d)/).map(selection=>selection.trim()).filter(Boolean).map((selection,i)=>({event:i===0?p.event_name:'',selection})):Array.isArray(p.legs)?p.legs.slice(0,50):[];
   const settled=weekly?window.camWeeklyResults?.getResult?.(p.id):null;
   const state=settled?.outcome||p.outcome;
   const outcome={won:'Pick acertado',lost:'Pick no acertado',void:'Pick anulado'}[state]||'Pendiente de resultado';
@@ -54,20 +54,20 @@
    result:outcome,state:['won','lost','void'].includes(state)?state:'pending',
    verified:!weekly&&p.moderation_status==='approved'&&odds(p.american_odds)!=='—',
    review:!weekly&&p.moderation_status!=='approved'?'Cuota en revisión':'',
-   legs:legs.map(l=>({event:clean(l?.event||l?.sport||'Evento',160),selection:clean(l?.selection||'Consulta el pronóstico completo',280)}))};
+   legs:legs.map(l=>({event:clean(l?.event||l?.sport||(weekly?'':'Evento'),160),selection:clean(l?.selection||'Consulta el pronóstico completo',weekly?10000:280)}))};
  }
  function urlFor(p){const u=new URL(BASE);if(p.kind==='take')u.searchParams.set('t',pack(p.author_id)+'.'+pack(p.id));else u.searchParams.set(p.kind==='weekly'?(p.state==='pending'?'e':'r'):'p',pack(p.id));return u.href;}
  const headline=p=>(p.kind==='take'?'Take de '+p.author:p.kind==='weekly'?'Pick del editor':'Pick de '+p.author)+' · CAM SPORTS';
  const quota=p=>p.verified?'Cuota verificada · '+p.odds:'Cuota '+p.odds+(p.review?' · '+p.review:p.kind==='weekly'?' · Editorial':'');
  const invitation=p=>p.kind==='take'?'¿De acuerdo o tienes otra lectura?':p.state==='won'?'Aquí lo que se canta, se baila.':p.state==='lost'?'También se da la cara cuando no sale.':p.state==='void'?'Este no cuenta en el marcador.':'Sobre la mesa. ¿Lo sigues o lo debates?';
- function caption(p){if(p.kind==='take')return [headline(p),p.competition,p.title,p.body,invitation(p),urlFor(p)].filter(Boolean).join('\n\n');return [headline(p),p.result,p.title,...p.legs.map(l=>l.event+' · '+l.selection),quota(p),invitation(p),urlFor(p)].filter(Boolean).join('\n\n');}
+ function caption(p){if(p.kind==='take')return [headline(p),p.competition,p.title,p.body,invitation(p),urlFor(p)].filter(Boolean).join('\n\n');return [headline(p),p.result,p.title,...p.legs.map(l=>[l.event,l.selection].filter(Boolean).join(' · ')),quota(p),invitation(p),urlFor(p)].filter(Boolean).join('\n\n');}
  // Reserve the URL's 23 X characters and keep the result/verification/CTA intact
  // even when a title, author or selection is long (including wide characters).
  const weight=s=>Array.from(s).reduce((n,c)=>n+(c.codePointAt(0)>0x10ff?2:1),0);
  function fit(s,budget){if(weight(s)<=budget)return s;let out='';for(const c of s){if(weight(out+c+'…')>budget)break;out+=c;}return out.trimEnd()+'…';}
  function xUrl(p){
   const title=fit(headline(p),85),tail=p.kind==='take'?invitation(p):p.result+' · '+quota(p)+'\n'+invitation(p);
-  const detail=p.kind==='take'?p.title:(p.legs[0]?p.legs[0].event+' · '+p.legs[0].selection:p.title)+(p.legs.length>1?' · '+p.legs.length+' selecciones':'');
+  const detail=p.kind==='take'?p.title:p.kind==='weekly'?p.title+'\n'+p.legs.map(l=>l.selection).join(' | '):(p.legs[0]?p.legs[0].event+' · '+p.legs[0].selection:p.title)+(p.legs.length>1?' · '+p.legs.length+' selecciones':'');
   const text=title+'\n'+fit(detail,256-weight(title+'\n\n'+tail))+'\n'+tail;
   const u=new URL('https://twitter.com/intent/tweet');u.searchParams.set('text',text);u.searchParams.set('url',urlFor(p));return u.href;
  }
@@ -83,7 +83,36 @@
   if(clipped){let last=visible[visible.length-1];while(last&&ctx.measureText(last+'…').width>width)last=last.slice(0,-1);visible[visible.length-1]=last+'…';}
   return visible;
  }
+ function renderWeeklyCard(p){
+  const canvas=document.createElement('canvas');canvas.width=1080;
+  const c=canvas.getContext('2d');if(!c)throw Error('Este navegador no permite crear la tarjeta. Puedes copiar el texto.');
+  c.font='bold 44px Georgia,serif';const title=wrap(c,p.title,900,Infinity);
+  c.font='27px Arial,sans-serif';const event=wrap(c,p.legs[0]?.event||'',900,Infinity);
+  c.font='bold 31px Georgia,serif';
+  const selections=p.legs.map((l,i)=>wrap(c,`${i+1}. ${l.selection}`,900,Infinity));
+  const end=310+title.length*54+event.length*37+44+selections.reduce((n,lines)=>n+lines.length*41+18,0);
+  canvas.height=Math.max(1350,end+282);
+  c.fillStyle='#eeebe4';c.fillRect(0,0,1080,canvas.height);
+  c.fillStyle='#fffcf8';c.fillRect(40,40,1000,canvas.height-80);
+  c.fillStyle='#102b3e';c.fillRect(40,40,1000,178);
+  c.fillStyle='#f4e8db';c.font='bold 53px Georgia,serif';c.fillText('CAM SPORTS',88,123);
+  c.fillStyle='#d6b179';c.font='600 22px Arial,sans-serif';c.fillText('PICK DEL EDITOR',90,177);
+  let y=310;c.fillStyle='#273b49';c.font='bold 44px Georgia,serif';
+  for(const line of title){c.fillText(line,90,y);y+=54;}
+  c.fillStyle='#566876';c.font='27px Arial,sans-serif';
+  for(const line of event){c.fillText(line,90,y);y+=37;}
+  y+=44;c.fillStyle='#273b49';c.font='bold 31px Georgia,serif';
+  for(const lines of selections){for(const line of lines){c.fillText(line,90,y);y+=41;}y+=18;}
+  const footer=canvas.height-279;
+  c.fillStyle='#102b3e';c.fillRect(90,footer,900,122);
+  c.fillStyle='#f4e8db';c.font='22px Arial,sans-serif';c.fillText('CUOTA TOTAL',118,footer+39);
+  c.font='bold 52px Georgia,serif';c.fillText(p.odds,118,footer+96);
+  c.font='600 25px Arial,sans-serif';c.textAlign='right';c.fillText(p.result,960,footer+69);
+  c.fillStyle='#855b43';c.font='600 22px Arial,sans-serif';c.fillText('camsports.github.io',990,canvas.height-109);c.textAlign='left';
+  return canvas;
+ }
  function renderCard(p){
+  if(p.kind==='weekly')return renderWeeklyCard(p);
   const canvas=document.createElement('canvas');canvas.width=1080;canvas.height=1350;
   const c=canvas.getContext('2d');if(!c)throw Error('Este navegador no permite crear la tarjeta. Puedes copiar el enlace.');
   const ink='#273b49',muted='#566876',bronze='#855b43';
@@ -164,7 +193,7 @@
    canvas.toBlob(blob=>{
     if(ticket!==request||!dialog.open)return;
     if(!blob){preview.replaceChildren(make('p','No se pudo preparar la imagen. Puedes copiar el texto o el enlace.'));preview.setAttribute('aria-busy','false');return;}
-    resource=URL.createObjectURL(blob);const img=make('img');img.src=resource;img.alt='Tarjeta para compartir: '+p.title+(p.kind==='take'?' · '+p.author:' · Cuota '+p.odds);img.width=1080;img.height=1350;preview.replaceChildren(img);preview.setAttribute('aria-busy','false');
+    resource=URL.createObjectURL(blob);const img=make('img');img.src=resource;img.alt='Tarjeta para compartir: '+p.title+(p.kind==='take'?' · '+p.author:' · Cuota '+p.odds);img.width=canvas.width;img.height=canvas.height;preview.replaceChildren(img);preview.setAttribute('aria-busy','false');
     file=new File([blob],download.download,{type:'image/png'});download.href=resource;download.hidden=false;ig.disabled=tk.disabled=false;
    },'image/png');
   }catch(error){preview.replaceChildren(make('p',error.message));preview.setAttribute('aria-busy','false');}

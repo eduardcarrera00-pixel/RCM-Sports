@@ -15,10 +15,18 @@ for size in [(1200,630),(630,1200),(800,800)]:
             assert bounds and bounds[0]>=72 and bounds[1]>=200 and bounds[2]<=588 and bounds[3]<=820,bounds
 print('PASS: 27 rendered layouts stay inside the safe area, including long text and portrait images.')
 
+drawn_text=[]
+original_line=r.safe_line
+def record_line(draw,text,position,text_font,fill):
+    drawn_text.append(text)
+    original_line(draw,text,position,text_font,fill)
+r.safe_line=record_line
 for count in (1,3,8,20):
     selections=[f'Equipo {i} gana con más de 2.5 goles y ambos equipos anotan' for i in range(count)]
-    job={'event_name':'FC Barcelona vs Real Madrid','selection':'\n'.join(selections),'american_odds':250}
+    job={'title':'El parlay del domingo','event_name':'FC Barcelona vs Real Madrid','selection':'\n'.join(selections),'american_odds':250}
+    start=len(drawn_text)
     pages=r.pick_pages(image,job)
+    assert job['title'] in drawn_text[start:],'The actual Pick title must be rendered, not replaced by its match'
     assert len(pages)>=1
     for frame in pages:
         bounds=ImageChops.difference(frame,Image.new('RGB',frame.size,frame.getpixel((0,0)))).getbbox()
