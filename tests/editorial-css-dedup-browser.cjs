@@ -1,4 +1,6 @@
-/* CAM SPORTS CSS cascade equivalence: original 94-source bundle vs 87-source bundle.
+/* CAM SPORTS CSS cascade equivalence: 94-source vs 87-source bundle, using
+ * today's component CSS in both. Intentional visual changes must not be
+ * compared against the historical site's colours or geometry.
  * Same markup, same remaining linked stylesheets, same assets.
  * Real Chromium at mobile/desktop, day/night, five body routes.
  * No production API calls or writes: scripts are removed from this fixture.
@@ -12,7 +14,7 @@ const {chromium}=require('playwright');
 
 const root=process.cwd();
 const repoBase='6e1e46752f4f96c03a99cc70cdf5e2fbf4fef28c';
-const baseline=execFileSync('git',['show',repoBase+':assets/ae-editorial-bundle.css'],{encoding:'utf8',maxBuffer:5e6});
+let baseline;
 const optimized=fs.readFileSync('assets/ae-editorial-bundle.css','utf8');
 const before=JSON.parse(execFileSync('git',['show',repoBase+':assets/style-sources.json'],{encoding:'utf8'}));
 const after=JSON.parse(fs.readFileSync('assets/style-sources.json','utf8'));
@@ -21,7 +23,6 @@ const removed=before.filter(p=>!after.includes(p));
 assert.equal(removed.length,7,'Only the seven later-duplicated CSS sources are removed');
 assert.deepEqual(after,before.filter(p=>!removed.includes(p)),'Preserve every other editorial source and its order');
 assert(removed.every(p=>packs.includes(p)),'Each removed source must remain in a later CSS pack');
-assert(optimized.length<baseline.length-50000,'Bundle should save at least 50 KB uncompressed');
 assert(!/@import\b|@layer\b/.test(removed.map(p=>fs.readFileSync(p,'utf8')).join('')),
  'Cascade-sensitive CSS imports/layers cannot be deleted without separate analysis');
 
@@ -86,6 +87,12 @@ async function sample(browser,origin,test,old){
  }finally{await context.close();}
 }
 (async()=>{
+ // Reinsert the seven duplicate sources at their original positions, while
+ // sharing all current component edits with the optimized bundle. This keeps
+ // the test about cascade equivalence, rather than freezing the old design.
+ const {minifyCss}=await import('../scripts/build-editorial-css.mjs');
+ baseline=minifyCss(before.map(file=>'/* '+file+' */\n'+fs.readFileSync(file,'utf8')).join('\n'));
+ assert(optimized.length<baseline.length-50000,'Bundle should save at least 50 KB uncompressed');
  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
  const browser=await chromium.launch({headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
  try{
