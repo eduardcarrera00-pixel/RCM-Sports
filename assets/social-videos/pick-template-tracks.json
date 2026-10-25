@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "tracks": [
+    {
+      "slug": "adventure",
+      "title": "Adventure",
+      "source_url": "https://en.freepd.cn/api/music/457069632f416476656e747572652e6d7033",
+      "license_proof_url": "https://en.freepd.cn/music/epic",
+      "license": "CC0"
+    },
+    {
+      "slug": "arpent",
+      "title": "Arpent",
+      "source_url": "https://en.freepd.cn/api/music/456c656374726f6e69632f417270656e742e6d7033",
+      "license_proof_url": "https://en.freepd.cn/music/electronic",
+      "license": "CC0"
+    },
+    {
+      "slug": "backbeat",
+      "title": "Backbeat",
+      "source_url": "https://en.freepd.cn/api/music/456c656374726f6e69632f4261636b626561742e6d7033",
+      "license_proof_url": "https://en.freepd.cn/music/electronic",
+      "license": "CC0"
+    },
+    {
+      "slug": "battle-ready",
+      "title": "Battle Ready",
+      "source_url": "https://en.freepd.cn/api/music/457069632f426174746c652052656164792e6d7033",
+      "license_proof_url": "https://en.freepd.cn/music/epic",
+      "license": "CC0"
+    },
+    {
+      "slug": "beat-one",
+      "title": "Beat One",
+      "source_url": "https://en.freepd.cn/api/music/456c656374726f6e69632f42656174204f6e652e6d7033",
+      "license_proof_url": "https://en.freepd.cn/music/electronic",
+      "license": "CC0"
+    },
+    {
+      "slug": "chronos",
+      "title": "Chronos",
+      "source_url": "https://en.freepd.cn/api/music/456c656374726f6e69632f4368726f6e6f732e6d7033",
+      "license_proof_url": "https://en.freepd.cn/music/electronic",
+      "license": "CC0"
+    },
+    {
+      "slug": "fireworks",
+      "title": "Fireworks",
+      "source_url": "https://en.freepd.cn/api/music/456c656374726f6e69632f46697265776f726b732e6d7033",
+      "license_proof_url": "https://en.freepd.cn/music/electronic",
+      "license": "CC0"
+    },
+    {
+      "slug": "hippety-hop",
+      "title": "Hippety Hop",
+      "source_url": "https://en.freepd.cn/api/music/456c656374726f6e69632f4869707065747920486f702e6d7033",
+      "license_proof_url": "https://en.freepd.cn/music/electronic",
+      "license": "CC0"
+    },
+    {
+      "slug": "limit-70",
+      "title": "Limit 70",
+      "source_url": "https://en.freepd.cn/api/music/5570626561742f4c696d69742037302e6d7033",
+      "license_proof_url": "https://en.freepd.cn/music/upbeat",
+      "license": "CC0"
+    },
+    {
+      "slug": "motions",
+      "title": "Motions",
+      "source_url": "https://en.freepd.cn/api/music/5570626561742f4d6f74696f6e732e6d7033",
+      "license_proof_url": "https://en.freepd.cn/music/upbeat",
+      "license": "CC0"
+    }
+  ]
+}

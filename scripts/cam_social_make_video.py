@@ -31,6 +31,8 @@ FPS = 30
 FONT_PATH = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
 BOLD_FONT_PATH = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
 BRAND_FONT_PATH = "/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf"
+PICK_TEMPLATE_IMAGES = ("picks", "football", "champion")
+PICK_TRACKS = OUTPUT / "pick-template-tracks.json"
 ALLOWED_IMAGE_HOSTS = {
     "zahuhmvmqvxaunqebqaa.supabase.co",
     "camsports.github.io",
@@ -191,13 +193,17 @@ def brand_cover(image, title, kicker):
     return back
 
 
-def get_authorized_music(source_url, destination):
-    """Only download CC0 catalog URLs assigned by the private publication queue."""
+def check_music_url(source_url):
     parsed = urllib.parse.urlsplit(source_url or "")
     if (parsed.scheme != "https" or parsed.netloc != "en.freepd.cn"
             or not re.fullmatch(r"/api/music/[a-fA-F0-9]+", parsed.path)
             or parsed.query or parsed.fragment):
         raise ValueError("Music URL is not on the authorized CC0 source allowlist")
+
+
+def get_authorized_music(source_url, destination):
+    """Only download CC0 catalog URLs assigned by the private publication queue."""
+    check_music_url(source_url)
     request = urllib.request.Request(
         source_url, headers={"User-Agent": "CAMSportsMedia/1.0", "Accept": "audio/mpeg"}
     )
@@ -225,10 +231,13 @@ def audio_duration(path):
 
 
 def make_video(image, title, output, style="news", kicker=None,
-               audio_url=None, track_slug=None, selection_key="", fixture_audio=None):
+               audio_url=None, track_slug=None, selection_key="", fixture_audio=None,
+               cached_audio=None):
     """Music is mandatory: never fall back to the former synthesized jingle."""
     if not fixture_audio and (not audio_url or not track_slug or not selection_key):
         raise ValueError("Missing authorized music assignment; MP4 not published")
+    if not fixture_audio:
+        check_music_url(audio_url)
     output.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory() as tmp:
         still = Path(tmp) / "frame.png"
@@ -239,6 +248,8 @@ def make_video(image, title, output, style="news", kicker=None,
         frame.save(still)
         if fixture_audio:
             audio = Path(fixture_audio)
+        elif cached_audio:
+            audio = Path(cached_audio)
         else:
             get_authorized_music(audio_url, audio)
         duration = audio_duration(audio)
@@ -278,12 +289,55 @@ def make_video(image, title, output, style="news", kicker=None,
             raise ValueError("MP4 lacks valid H.264/AAC streams")
 
 
+def prepare_pick_templates():
+    """Render the reusable Pick library before enabling it in the database.
+
+    Each post's caption keeps its own event, selection, odds and link. A new
+    Pick reuses a verified clip instead of waiting for a scheduled renderer.
+    """
+    catalog = json.loads(PICK_TRACKS.read_text())
+    tracks = catalog.get("tracks", [])
+    if catalog.get("version") != 1 or not tracks or len(tracks) > 24:
+        raise ValueError("Unexpected Pick music catalog")
+    slugs = [track.get("slug", "") for track in tracks]
+    if len(set(slugs)) != len(slugs):
+        raise ValueError("Duplicate Pick music assignment")
+    for track in tracks:
+        if (track.get("license") != "CC0" or not re.fullmatch(r"[a-z0-9-]{2,64}", track["slug"])
+                or not track.get("license_proof_url", "").startswith("https://en.freepd.cn/")):
+            raise ValueError("Unverified Pick music license")
+    clips = []
+    with tempfile.TemporaryDirectory() as tmp:
+        for track in tracks:
+            audio = Path(tmp) / (track["slug"] + ".mp3")
+            get_authorized_music(track["source_url"], audio)
+            for artwork in PICK_TEMPLATE_IMAGES:
+                filename = "pick-v1-" + artwork + "-" + track["slug"] + ".mp4"
+                output = OUTPUT / filename
+                image = Image.open(ROOT / "assets/social-brand" / (artwork + ".jpg")).convert("RGB")
+                make_video(image, "Partido y pronóstico en la descripción", output,
+                           "brand", "PICK DEL EDITOR", track["source_url"], track["slug"],
+                           selection_key=filename, cached_audio=audio)
+                clips.append({"file": filename, "image_key": artwork,
+                              "track_slug": track["slug"], "license": "CC0",
+                              "duration": DURATION, "fps": FPS,
+                              "bytes": output.stat().st_size,
+                              "sha256": hashlib.sha256(output.read_bytes()).hexdigest()})
+                print("Prepared Pick template:", filename, flush=True)
+    (OUTPUT / "pick-template-manifest.json").write_text(
+        json.dumps({"version": 1, "clips": clips}, indent=2) + "\n")
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--smoke-test", action="store_true")
+    parser.add_argument("--prepare-pick-templates", action="store_true")
     parser.add_argument("--brand-preview", type=Path,
                         help="Write a still preview of the new social layout")
     args = parser.parse_args()
+    if args.prepare_pick_templates:
+        prepare_pick_templates()
+        return
     if args.brand_preview:
         args.brand_preview.parent.mkdir(parents=True, exist_ok=True)
         brand_cover(Image.open(ROOT / "assets/social-brand/takes.jpg").convert("RGB"),
