@@ -208,7 +208,8 @@
     ['portada.top-takes-cuestionados-dia', 'portada.top-takes-cuestionados-dia-1792782649105.jpg'],
     ['portada.top-takes-noche', 'portada.top-takes-noche-1792724537013.jpg'],
     ['portada.top-takes-cuestionados-noche', 'portada.top-takes-cuestionados-noche-1792724524410.jpg'],
-    ['portada.take-escena-dia', 'portada.take-escena-dia-1792818842856.jpg']
+    ['portada.take-escena-dia', 'portada.take-escena-dia-1792818842856.jpg'],
+    ['portada.lectores-dia', 'portada.lectores-dia-1792781222322.jpg']
   ]);
   // La cabecera de lectores comparte el mismo recorte del mosaico en los dos temas,
   // pero cada tema guarda su propio reemplazo: una foto nocturna no debe oscurecer el
@@ -216,6 +217,11 @@
   const readersCrop = { size: '100% 200%', pos: 'center top' };
   slotPair('portada.lectores', 'Cabecera de lectores (Tendencias)', 'Portada', 'portada.lectores-atlas',
     '#aeTrendingPortada > .ae-section-heading', readersCrop, readersCrop);
+  // Use the approved night scroll/quill as the day original too. The shared
+  // transparent-art renderer supplies CAM blue on ivory, without a scenic crop.
+  // Retire only the old day bookend; future day/night editor uploads stay separate.
+  SLOTS.find(entry => entry.key === 'portada.lectores-dia').bannerOriginalPath =
+    'https://zahuhmvmqvxaunqebqaa.supabase.co/storage/v1/object/public/article-images/site/portada.lectores-1792727050477.jpg';
   const stacked = { night: { size: 'auto 200%', pos: 'right top' }, day: { size: 'auto 200%', pos: 'right bottom' } };
   slotPair('picks.chef-mano', 'Mano del chef (invitación, ranking de chefs y detalle del Pick)', 'Picks', 'picks.chef-mano-atlas',
     '.ae-picks-heading-cta-row, #picksRankingTitle, #cpDialog .ae-cp-detail-hero', stacked.night, stacked.day);

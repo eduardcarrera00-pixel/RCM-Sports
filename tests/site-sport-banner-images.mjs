@@ -433,6 +433,33 @@ await window.camSiteImages.reload();
 assert.match(polish.querySelector('#aeHomeTopTakes .ae-top-takes-card-head').style.getPropertyValue('--cam-banner-art'), /cam-home-genios\.svg/);
 console.log('PASS: transparent flames and brains in both themes, retired artwork, theme-specific removal and independent future admin edits.');
 
+// The old day bookend must use the same scroll/quill as the approved night art.
+const readers = document.createElement('section');
+readers.id = 'aeTrendingPortada';
+readers.innerHTML = '<header class="ae-section-heading"><h2>Lo más leído</h2></header>';
+document.body.append(readers);
+const readersHeading = readers.firstElementChild;
+const scrollUrl = 'https://zahuhmvmqvxaunqebqaa.supabase.co/storage/v1/object/public/article-images/site/portada.lectores-1792727050477.jpg';
+databaseRows = [
+  {key:'portada.lectores-dia',url:'https://img.test/site/portada.lectores-dia-1792781222322.jpg'},
+  {key:'portada.lectores-noche',url:scrollUrl}
+];
+document.documentElement.classList.remove('dark');
+await window.camSiteImages.reload();
+assert.ok(readersHeading.style.getPropertyValue('--cam-banner-art').includes(scrollUrl));
+assert.ok(!readersHeading.hasAttribute('data-cam-banner-atlas'));
+document.documentElement.classList.add('dark');
+await window.camSiteImages.reload();
+assert.ok(readersHeading.style.getPropertyValue('--cam-banner-art').includes(scrollUrl));
+databaseRows.push({key:'portada.lectores-dia',url:'https://img.test/new-day-scroll.svg'});
+document.documentElement.classList.remove('dark');
+await window.camSiteImages.reload();
+assert.match(readersHeading.style.getPropertyValue('--cam-banner-art'), /new-day-scroll/);
+document.documentElement.classList.add('dark');
+await window.camSiteImages.reload();
+assert.ok(readersHeading.style.getPropertyValue('--cam-banner-art').includes(scrollUrl));
+console.log('PASS: readers day uses the approved night scroll; future theme edits remain independent.');
+
 window.happyDOM.abort();
 console.log('CAM SPORTS: saved NFL and football banner overrides, separate news, NFL opinions and Eres Chef verified.');
 
