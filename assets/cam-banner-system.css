@@ -30,6 +30,14 @@
     --cam-banner-panel:var(--ds-surface,#102b3e);
   }
 
+  /* The four community symbols use the supplied gold night variant. */
+  html.dark :is(
+    [data-cam-banner-key="portada.populares-noche"],
+    [data-cam-banner-key="portada.impopulares-noche"],
+    [data-cam-banner-key="portada.top-takes-noche"],
+    [data-cam-banner-key="portada.top-takes-cuestionados-noche"]
+  ) { --cam-banner-ink:#e8bf79; }
+
   /* The same frame is used by cards, calls to action and section headers. */
   [data-cam-banner] {
     position:relative!important;

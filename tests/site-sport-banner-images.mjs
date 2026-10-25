@@ -344,8 +344,8 @@ window.camSiteImages.refresh();
 assert.equal(pencils().length, 0, 'no pencils outside admin edit mode');
 
 // Removed decorations cannot be brought back by cached administrator uploads.
-// Daytime Home votes use sharp independent SVGs, while night and future edits
-// remain independent. Genios/Anoetos keep their current art until replacements.
+// All four Home symbols use transparent SVGs in both themes; future editor
+// uploads remain independent and override only their selected theme slot.
 document.body.classList.remove('ae-is-football', 'ae-is-nfl');
 const polish = document.createElement('div');
 polish.innerHTML = '<button id="aeHomeTakePublish">Demuestra tu conocimiento</button>' +
@@ -366,9 +366,12 @@ const poolFootball = polish.querySelector('#camFootballQuiniela header');
 databaseRows = [
   {key:'portada.populares-dia',url:'https://img.test/site/portada.populares-dia-1792729028396.jpg'},
   {key:'portada.impopulares-dia',url:'https://img.test/site/portada.impopulares-dia-1792729036390.jpg'},
-  {key:'portada.populares-noche',url:'https://img.test/popular-night-kept.png'},
-  {key:'portada.top-takes-dia',url:'https://img.test/genios-day-kept.png'},
-  {key:'portada.top-takes-cuestionados-dia',url:'https://img.test/anoetos-day-kept.png'},
+  {key:'portada.populares-noche',url:'https://img.test/site/portada.populares-noche-1792726240079.jpg'},
+  {key:'portada.impopulares-noche',url:'https://img.test/site/portada.impopulares-noche-1792725138185.jpg'},
+  {key:'portada.top-takes-noche',url:'https://img.test/site/portada.top-takes-noche-1792724537013.jpg'},
+  {key:'portada.top-takes-cuestionados-noche',url:'https://img.test/site/portada.top-takes-cuestionados-noche-1792724524410.jpg'},
+  {key:'portada.top-takes-dia',url:'https://img.test/site/portada.top-takes-dia-1792782632591.jpg'},
+  {key:'portada.top-takes-cuestionados-dia',url:'https://img.test/site/portada.top-takes-cuestionados-dia-1792782649105.jpg'},
   ...['dia','noche'].flatMap(mode => [
     {key:'portada.take-escena-'+mode,url:'https://img.test/home-'+mode+'.png'},
     {key:'nfl.takes-cabecera-'+mode,url:'https://img.test/nfl-'+mode+'.png'},
@@ -378,11 +381,11 @@ databaseRows = [
 ];
 document.documentElement.classList.remove('dark');
 await window.camSiteImages.reload();
-assert.match(popularHome.style.getPropertyValue('--cam-banner-art'), /cam-home-popular-day\.svg/);
-assert.match(unpopularHome.style.getPropertyValue('--cam-banner-art'), /cam-home-unpopular-day\.svg/);
+assert.match(popularHome.style.getPropertyValue('--cam-banner-art'), /cam-home-popular\.svg/);
+assert.match(unpopularHome.style.getPropertyValue('--cam-banner-art'), /cam-home-unpopular\.svg/);
 assert.ok(!popularHome.hasAttribute('data-cam-banner-atlas'));
-assert.match(polish.querySelector('#aeHomeTopTakes .ae-top-takes-card-head').style.getPropertyValue('--cam-banner-art'), /genios-day-kept/);
-assert.match(polish.querySelector('#aeHomeTopTakes .is-questioned header').style.getPropertyValue('--cam-banner-art'), /anoetos-day-kept/);
+assert.match(polish.querySelector('#aeHomeTopTakes .ae-top-takes-card-head').style.getPropertyValue('--cam-banner-art'), /cam-home-genios\.svg/);
+assert.match(polish.querySelector('#aeHomeTopTakes .is-questioned header').style.getPropertyValue('--cam-banner-art'), /cam-home-anoetos\.svg/);
 assert.match(takeHome.style.getPropertyValue('--cam-banner-art'), /home-dia/);
 assert.equal(poolNfl.dataset.camBannerArtless, '1');
 assert.equal(poolNfl.style.getPropertyValue('--cam-banner-art'), '');
@@ -397,7 +400,13 @@ for (const sport of ['nfl','football']) {
     assert.equal(el.style.getPropertyValue('--cam-banner-art'),'');
     assert.equal(el.style.getPropertyValue('--cam-banner-mask'),'');
   }
-  assert.match(popularHome.style.getPropertyValue('--cam-banner-art'), /popular-night-kept/);
+  for (const [el, name] of [[popularHome,'popular'],[unpopularHome,'unpopular'],
+    [polish.querySelector('#aeHomeTopTakes .ae-top-takes-card-head'),'genios'],
+    [polish.querySelector('#aeHomeTopTakes .is-questioned header'),'anoetos']]) {
+    assert.ok(el.style.getPropertyValue('--cam-banner-art').includes('cam-home-'+name+'.svg'));
+    assert.equal(el.dataset.camBannerTransparent,'1');
+    assert.ok(!el.hasAttribute('data-cam-banner-atlas'));
+  }
   document.documentElement.classList.remove('dark');
   await window.camSiteImages.reload();
   assert.ok(!takeSport.hasAttribute('data-cam-banner-artless'));
@@ -412,7 +421,17 @@ databaseRows.push({key:'portada.take-escena-dia',url:'https://img.test/site/port
 await window.camSiteImages.reload();
 assert.match(takeHome.style.getPropertyValue('--cam-banner-art'), /cam-home-knowledge-day\.svg/,
   'The old full-width border must not appear as a horizontal smudge');
-console.log('PASS: sharp day Home originals, retired textures, unchanged Genios/Anoetos, theme-specific removal and future admin edits.');
+document.documentElement.classList.add('dark');
+await window.camSiteImages.reload();
+assert.match(popularHome.style.getPropertyValue('--cam-banner-art'), /cam-home-popular\.svg/,
+  'A future day upload must not overwrite the night flame');
+databaseRows.push({key:'portada.top-takes-noche',url:'https://img.test/future-night-brain.svg'});
+await window.camSiteImages.reload();
+assert.match(polish.querySelector('#aeHomeTopTakes .ae-top-takes-card-head').style.getPropertyValue('--cam-banner-art'), /future-night-brain/);
+document.documentElement.classList.remove('dark');
+await window.camSiteImages.reload();
+assert.match(polish.querySelector('#aeHomeTopTakes .ae-top-takes-card-head').style.getPropertyValue('--cam-banner-art'), /cam-home-genios\.svg/);
+console.log('PASS: transparent flames and brains in both themes, retired artwork, theme-specific removal and independent future admin edits.');
 
 window.happyDOM.abort();
 console.log('CAM SPORTS: saved NFL and football banner overrides, separate news, NFL opinions and Eres Chef verified.');

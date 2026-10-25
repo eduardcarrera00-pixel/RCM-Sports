@@ -188,16 +188,26 @@
    ['portada.top-takes', 'Banner de «Top Takes»', '#aeHomeTopTakes .ae-top-takes-card:not(.is-questioned) .ae-top-takes-card-head'],
    ['portada.top-takes-cuestionados', 'Banner de Top Takes cuestionados', '#aeHomeTopTakes .ae-top-takes-card.is-questioned .ae-top-takes-card-head']
   ].forEach(([key, label, sel], i) => { const [n, d] = banner(rows4[i]); slotPair(key, label, 'Portada · Comunidad', 'portada.banners-comunidad', sel, n, d); });
-  // These daytime headers now have individual, transparent vector originals.
-  // The night artwork and the Genios/Anoetos slots retain their own identities.
-  for (const [key, path] of [
-    ['portada.populares-dia', 'assets/cam-home-popular-day.svg'],
-    ['portada.impopulares-dia', 'assets/cam-home-unpopular-day.svg'],
-    ['portada.take-escena-dia', 'assets/cam-home-knowledge-day.svg']
-  ]) [...FILES, ...SLOTS].find(entry => entry.key === key).bannerOriginalPath = path;
+  // Separate editable theme slots share crisp, transparent vector silhouettes.
+  // The banner palette supplies blue by day and gold by night.
+  for (const [base, path] of [
+    ['portada.populares', 'assets/cam-home-popular.svg'],
+    ['portada.impopulares', 'assets/cam-home-unpopular.svg'],
+    ['portada.top-takes', 'assets/cam-home-genios.svg'],
+    ['portada.top-takes-cuestionados', 'assets/cam-home-anoetos.svg']
+  ]) for (const theme of ['dia', 'noche']) {
+    SLOTS.find(entry => entry.key === base + '-' + theme).bannerOriginalPath = path;
+  }
+  FILES.find(entry => entry.key === 'portada.take-escena-dia').bannerOriginalPath = 'assets/cam-home-knowledge-day.svg';
   const RETIRED_HOME_TEXTURES = new Map([
     ['portada.populares-dia', 'portada.populares-dia-1792729028396.jpg'],
     ['portada.impopulares-dia', 'portada.impopulares-dia-1792729036390.jpg'],
+    ['portada.populares-noche', 'portada.populares-noche-1792726240079.jpg'],
+    ['portada.impopulares-noche', 'portada.impopulares-noche-1792725138185.jpg'],
+    ['portada.top-takes-dia', 'portada.top-takes-dia-1792782632591.jpg'],
+    ['portada.top-takes-cuestionados-dia', 'portada.top-takes-cuestionados-dia-1792782649105.jpg'],
+    ['portada.top-takes-noche', 'portada.top-takes-noche-1792724537013.jpg'],
+    ['portada.top-takes-cuestionados-noche', 'portada.top-takes-cuestionados-noche-1792724524410.jpg'],
     ['portada.take-escena-dia', 'portada.take-escena-dia-1792818842856.jpg']
   ]);
   // La cabecera de lectores comparte el mismo recorte del mosaico en los dos temas,
@@ -664,7 +674,8 @@
     if (el.style.getPropertyValue(name) !== value) el.style.setProperty(name,value);
   };
   const vectorBannerPaths = [
-    'assets/cam-home-popular-day.svg', 'assets/cam-home-unpopular-day.svg', 'assets/cam-home-knowledge-day.svg',
+    'assets/cam-home-popular.svg', 'assets/cam-home-unpopular.svg',
+    'assets/cam-home-genios.svg', 'assets/cam-home-anoetos.svg', 'assets/cam-home-knowledge-day.svg',
     'assets/cam-banner-best-plate.svg', 'assets/cam-banner-worst-plate.svg',
     'assets/cam-banner-nfl-news.svg'
   ];
