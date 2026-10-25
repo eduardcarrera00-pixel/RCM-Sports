@@ -50,7 +50,11 @@ const server=http.createServer((req,res)=>{
  await page.evaluate(()=>{const p=document.createElement('dialog');p.id='aeProfileDialog';p.innerHTML='<div id="aeProfilePicks"><article class="ae-profile-pick ae-profile-pick-recent"><h4>Mi Pick</h4><div class="ae-profile-pick-footer"></div><button class="ae-profile-pick-hit" aria-label="Ver Pick completo"></button></article></div>';p.querySelector('.ae-profile-pick-footer').append(CamPickShare.button(window.pick));document.body.append(p);p.showModal();});
  await page.locator('#aeProfilePicks .cam-pick-share-button').click();await page.locator('#camPickShareDialog[open]').waitFor();await page.getByRole('button',{name:'Cerrar',exact:true}).click();
  await page.evaluate(()=>document.getElementById('aeProfileDialog').close());
- await page.evaluate(()=>CamPickShare.open({...window.pick,event_name:'Toronto vs Boston',selection:'Toronto gana'},{kind:'weekly'}));assert.match(await page.locator('#camPickShareTitle').innerText(),/Pick del editor/);assert.ok(new URL(new URL(await page.locator('.cam-pick-share-networks a').getAttribute('href')).searchParams.get('url')).searchParams.has('e'));
+ await page.evaluate(()=>CamPickShare.open({...window.pick,title:'El parlay del domingo',event_name:'Toronto vs Boston',selection:'Toronto gana\nMás de 2.5 goles\nAmbos equipos anotan\nMás de 8.5 córners\nMás de 3.5 tarjetas'},{kind:'weekly'}));assert.match(await page.locator('#camPickShareTitle').innerText(),/Pick del editor/);assert.ok(new URL(new URL(await page.locator('.cam-pick-share-networks a').getAttribute('href')).searchParams.get('url')).searchParams.has('e'));
+ await page.locator('.cam-pick-share-preview img').waitFor();
+ const weeklyDownloadPromise=page.waitForEvent('download');await page.getByRole('link',{name:'Descargar tarjeta',exact:true}).click();
+ const weeklyDownload=await weeklyDownloadPromise;await weeklyDownload.saveAs(path.join(qa,'editorial-parlay-card.png'));
+ assert.match(await page.locator('.cam-pick-share-caption-label textarea').inputValue(),/Más de 3.5 tarjetas/);
  // Exercise the real profile markup/renderers, rather than only an isolated card.
  await page.addInitScript(()=>{
   const owner='00000000-0000-0000-0000-000000000951';

@@ -199,12 +199,15 @@ def pick_pages(image, job):
     safe_line(draw, "CAM SPORTS", (72, 200),
               ImageFont.truetype(BRAND_FONT_PATH, 34), cream)
     draw.rectangle((72, 253, 180, 256), fill=gold)
-    art = ImageOps.contain(image, (516, 190), Image.Resampling.LANCZOS)
-    base.paste(art, (72 + (516-art.width)//2, 270 + (190-art.height)//2))
-    safe_line(draw, "PICK DEL EDITOR", (72, 474), font(20, True), gold)
-    for i, line in enumerate(wrap(draw, job.get("event_name") or job.get("title"),
+    art = ImageOps.contain(image, (516, 140), Image.Resampling.LANCZOS)
+    base.paste(art, (72 + (516-art.width)//2, 270 + (140-art.height)//2))
+    safe_line(draw, "PICK DEL EDITOR", (72, 424), font(20, True), gold)
+    for i, line in enumerate(wrap(draw, job.get("title") or job.get("event_name"),
                                   font(27, True), max_width=516, limit=2)):
-        safe_line(draw, line, (72, 510 + i*34), font(27, True), cream)
+        safe_line(draw, line, (72, 461 + i*34), font(27, True), cream)
+    for i, line in enumerate(wrap(draw, job.get("event_name") or "",
+                                  font(21), max_width=516, limit=2)):
+        safe_line(draw, line, (72, 535 + i*27), font(21), gold)
     body_font = font(23, True)
     pages, rows = [], []
     selections = pick_lines(job.get("selection"))
