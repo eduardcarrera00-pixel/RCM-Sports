@@ -18,6 +18,7 @@
    }catch{return '';}
  };
  let refreshing=false,active=null,submitting=false,editing=null,uncertainSave=null;
+ const resolvedActive=()=>Boolean(active&&window.camWeeklyResults?.getResult(active.id)?.outcome);
 
  // The id avoids accidentally displaying a different weekly selection on an old link.
  // Supabase exposes only the currently published weekly Pick; expired/replaced IDs
@@ -263,7 +264,10 @@
    const panel=$('aeWeeklyPickAdmin');
    if(panel)panel.hidden=!admin;
    const button=$('aeWeeklyEditButton');
-   if(button)button.hidden=!(admin&&active);
+   if(button){
+     button.hidden=!(admin&&active);
+     button.textContent=resolvedActive()?'Publicar nuevo Pick del editor':'Editar Pick del editor';
+   }
    if(!admin&&editing)cancelEdit();
  }
  function updateEditorLabels(){
@@ -271,6 +275,7 @@
    const save=$('aeWeeklySaveButton');
    if(save)save.textContent=isEditing?'Guardar cambios':'Publicar Pick del editor';
    const cancel=$('aeWeeklyCancelEdit');if(cancel)cancel.hidden=!isEditing;
+   const fresh=$('aeWeeklyNewPick');if(fresh)fresh.hidden=!isEditing;
    const note=$('aeWeeklyEditorMode');if(note)note.hidden=!isEditing;
    const summary=$('aeWeeklyAdminSummary');
    if(summary)summary.textContent=isEditing?'Administrar · Editando Pick del editor':'Administrar · Publicar Pick del editor';
@@ -288,6 +293,7 @@
  }
  function startEdit(){
    if(submitting||!(typeof currentAdmin!=='undefined'&&currentAdmin)||!active)return;
+   if(resolvedActive()){startNewPick();return;}
    const p=active,form=$('aeWeeklyPickForm');
    if(!form)return;
    editing={id:p.id,expectedEditedAt:p.edited_at||null};
@@ -316,6 +322,17 @@
    panel.scrollIntoView?.({behavior:'smooth',block:'start'});
    form.elements.title.focus({preventScroll:true});
  }
+ function startNewPick(){
+   if(submitting||!(typeof currentAdmin!=='undefined'&&currentAdmin))return;
+   const form=$('aeWeeklyPickForm'),panel=$('aeWeeklyPickAdmin');
+   if(!form||!panel)return;
+   if(editing&&!confirm('¿Preparar un Pick nuevo y descartar los cambios de este formulario?'))return;
+   cancelEdit();
+   panel.hidden=false;panel.open=true;
+   $('aeWeeklyPickAdminStatus').textContent='Prepara el nuevo Pick. Se mostrará al publicarlo; el Pick anterior y su resultado se conservarán en el historial.';
+   panel.scrollIntoView?.({behavior:'smooth',block:'start'});
+   form.elements.title.focus({preventScroll:true});
+ }
  async function publish(e){
    e.preventDefault();if(submitting)return;
    const form=e.currentTarget,status=$('aeWeeklyPickAdminStatus'),send=form.querySelector('[type=submit]');
@@ -329,9 +346,16 @@
    const isEditing=Boolean(editing), editSnapshot=editing?{...editing}:null;
    if(!confirm(isEditing?'¿Guardar los cambios en este Pick del editor? La publicación conservará su identidad.':'¿Publicar el Pick editorial y sustituir el anterior?'))return;
    submitting=true;send.disabled=true;uncertainSave=null;setCheckVisible(false);
-   let stage='banner',rpcAttempted=false,attemptedParams=null;
-   status.textContent='Preparando imágenes…';
+   let stage='guardar',rpcAttempted=false,attemptedParams=null;
+   status.textContent=isEditing?'Comprobando el estado del Pick…':'Preparando imágenes…';
    try{
+     if(isEditing){
+       const {data,error}=await db.rpc('cam_weekly_pick_result',{p_pick_id:editSnapshot.id});
+       if(error)throw error;
+       if(data?.outcome)throw Error('El resultado de este Pick ya está confirmado. Pulsa «Publicar un Pick nuevo» para sustituirlo; el historial se conservará.');
+     }
+     stage='banner';
+     status.textContent='Preparando imágenes…';
      const banner=await window.aeEditorialMedia.upload(form.elements.banner_file?.files?.[0],'weekly/banner');
      stage='imagen';
      const image=await window.aeEditorialMedia.upload(form.elements.image_file?.files?.[0],'weekly/article');
@@ -404,7 +428,9 @@
    $('aeWeeklyShareButton')?.addEventListener('click',shareWeeklyPick);
    $('aeHomeWeeklyShareButton')?.addEventListener('click',shareWeeklyPick);
    $('aeWeeklyCancelEdit')?.addEventListener('click',cancelEdit);
+   $('aeWeeklyNewPick')?.addEventListener('click',startNewPick);
    $('aeWeeklyCheckSave')?.addEventListener('click',manuallyCheckSave);
+   document.addEventListener('cam:weekly-result',adminVisibility);
    updateEditorLabels();
    adminVisibility();load();
    if((typeof db!=='undefined' && db))db.auth.onAuthStateChange(()=>setTimeout(adminVisibility,100));

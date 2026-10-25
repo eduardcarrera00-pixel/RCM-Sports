@@ -1,5 +1,5 @@
 /* AE SPORTS · Edición del Pick editorial solo disponible tras autenticar a un editor. */
-#aeWeeklyEditButton[hidden],#aeWeeklyCancelEdit[hidden],#aeWeeklyEditorMode[hidden]{display:none!important}
+#aeWeeklyEditButton[hidden],#aeWeeklyCancelEdit[hidden],#aeWeeklyNewPick[hidden],#aeWeeklyEditorMode[hidden]{display:none!important}
 #aeWeeklyEditButton.ae-weekly-edit-trigger{
   display:inline-flex;align-items:center;justify-content:center;
   min-height:39px;padding:9px 13px;margin:10px 0 5px;
@@ -9,14 +9,14 @@
 }
 #aeWeeklyEditButton.ae-weekly-edit-trigger:hover{background:#a07050;border-color:#e6bc92}
 #aeWeeklyEditButton.ae-weekly-edit-trigger:focus-visible,
-#aeWeeklyCancelEdit:focus-visible{outline:2px solid #e5b98b;outline-offset:3px}
+#aeWeeklyCancelEdit:focus-visible,#aeWeeklyNewPick:focus-visible{outline:2px solid #e5b98b;outline-offset:3px}
 #aeWeeklyEditorMode.ae-weekly-edit-status{
   padding:12px 14px;margin:9px 0;background:rgba(184,143,108,.10);
   border-left:3px solid #c4926a;color:inherit;font-size:13px;line-height:1.5;
 }
 #aeWeeklyPickForm .ae-weekly-admin-actions{display:flex;align-items:center;flex-wrap:wrap;gap:12px}
-#aeWeeklyCancelEdit{padding:11px 15px;border:1px solid #c19a79;background:transparent;color:inherit;font:700 12px/1.35 Inter,system-ui,sans-serif;cursor:pointer}
-#aeWeeklyCancelEdit:hover{background:rgba(183,134,96,.13)}
+#aeWeeklyCancelEdit,#aeWeeklyNewPick{padding:11px 15px;border:1px solid #c19a79;background:transparent;color:inherit;font:700 12px/1.35 Inter,system-ui,sans-serif;cursor:pointer}
+#aeWeeklyCancelEdit:hover,#aeWeeklyNewPick:hover{background:rgba(183,134,96,.13)}
 @media(max-width:550px){#aeWeeklyEditButton.ae-weekly-edit-trigger{max-width:100%}#aeWeeklyPickForm .ae-weekly-admin-actions{flex-direction:column;align-items:stretch}#aeWeeklyPickForm .ae-weekly-admin-actions button{width:100%}}
 
 /* Verification is only offered if the response to an edit cannot be confirmed. */

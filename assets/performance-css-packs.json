@@ -20,6 +20,16 @@
       ]
     },
     {
+      "output": "assets/cam-perf-sport-banners.css",
+      "sources": [
+        "assets/ae-power-rankings-scenic.css",
+        "assets/ae-football-takes-scenic.css",
+        "assets/ae-football-news-debate.css",
+        "assets/cam-football-opinion-heading-labels.css",
+        "assets/ae-football-news-editorial.css"
+      ]
+    },
+    {
       "output": "assets/cam-perf-home-components.css",
       "sources": [
         "assets/cam-opinions-section-banners.css",

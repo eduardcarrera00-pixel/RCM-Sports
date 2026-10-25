@@ -1,0 +1,36 @@
+name: CAM SPORTS news SEO and database permissions
+on:
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'assets/community.js'
+      - 'assets/cam-article-seo.js'
+      - 'scripts/build-news-seo.mjs'
+      - 'tests/article-seo.mjs'
+      - 'tests/database-performance.mjs'
+      - 'tests/fixtures/performance-policies-before.sql'
+      - 'supabase/migrations/20261025152342_optimize_public_relations_and_rls.sql'
+      - '.github/workflows/cam-seo-database-tests.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'assets/cam-article-seo.js'
+      - 'scripts/build-news-seo.mjs'
+      - 'tests/article-seo.mjs'
+      - 'tests/database-performance.mjs'
+      - 'supabase/migrations/20261025152342_optimize_public_relations_and_rls.sql'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  seo-database:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run test:seo && npm run test:database:performance && npm run test:editor

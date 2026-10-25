@@ -1,4 +1,4 @@
-/* CAM SPORTS CSS cascade equivalence: 94-source vs 87-source bundle, using
+/* CAM SPORTS CSS cascade equivalence: 94-source vs 83-source bundle, using
  * today's component CSS in both. Intentional visual changes must not be
  * compared against the historical site's colours or geometry.
  * Same markup, same remaining linked stylesheets, same assets.
@@ -20,7 +20,7 @@ const before=JSON.parse(execFileSync('git',['show',repoBase+':assets/style-sourc
 const after=JSON.parse(fs.readFileSync('assets/style-sources.json','utf8'));
 const packs=JSON.parse(fs.readFileSync('assets/performance-css-packs.json','utf8')).groups.flatMap(x=>x.sources);
 const removed=before.filter(p=>!after.includes(p));
-assert.equal(removed.length,7,'Only the seven later-duplicated CSS sources are removed');
+assert.equal(removed.length,11,'The eleven later-duplicated CSS sources are removed');
 assert.deepEqual(after,before.filter(p=>!removed.includes(p)),'Preserve every other editorial source and its order');
 assert(removed.every(p=>packs.includes(p)),'Each removed source must remain in a later CSS pack');
 assert(!/@import\b|@layer\b/.test(removed.map(p=>fs.readFileSync(p,'utf8')).join('')),
@@ -87,7 +87,7 @@ async function sample(browser,origin,test,old){
  }finally{await context.close();}
 }
 (async()=>{
- // Reinsert the seven duplicate sources at their original positions, while
+ // Reinsert the eleven duplicate sources at their original positions, while
  // sharing all current component edits with the optimized bundle. This keeps
  // the test about cascade equivalence, rather than freezing the old design.
  const {minifyCss}=await import('../scripts/build-editorial-css.mjs');
@@ -112,6 +112,6 @@ async function sample(browser,origin,test,old){
    }
    console.log('PASS '+conf.label+': '+next.Todos.length+' DOM nodes, '+categories.length+' sections, '+properties.length+' CSS properties, identical computed styles');
   }
-  console.log('PASS source list: 7 truly repeated stylesheet files removed from earlier bundle; '+(baseline.length-optimized.length)+' CSS bytes avoided.');
+  console.log('PASS source list: 11 truly repeated stylesheet files removed from earlier bundle; '+(baseline.length-optimized.length)+' CSS bytes avoided.');
  }finally{await browser.close();server.close();}
 })().catch(err=>{console.error(err);server.close();process.exitCode=1;});
