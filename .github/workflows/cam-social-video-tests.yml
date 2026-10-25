@@ -36,8 +36,13 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq ffmpeg fonts-dejavu-core
+          if ! command -v ffmpeg >/dev/null || ! command -v ffprobe >/dev/null ||
+             ! test -f /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf ||
+             ! test -f /usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf ||
+             ! test -f /usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf; then
+            sudo timeout 180s apt-get -o Acquire::Retries=1 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20 update -qq
+            sudo timeout 180s apt-get -y -qq install ffmpeg fonts-dejavu-core
+          fi
           python -m pip install --disable-pip-version-check 'Pillow==11.3.0'
       - name: Verify video routing, photo X channel, and retries
         run: node tests/social-video-publication.mjs && node tests/social-instagram-publication.mjs && node tests/social-music-rotation.mjs
