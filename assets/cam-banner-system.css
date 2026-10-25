@@ -379,7 +379,7 @@
     border-radius:var(--cam-banner-radius)!important;
     overflow:hidden!important;
   }
-  .cam-nfl-heading[data-cam-banner] {
+  .cam-nfl-top > .cam-nfl-heading[data-cam-banner] {
     padding:0!important;
     min-height:176px!important;
     border-radius:0!important;
