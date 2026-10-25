@@ -494,4 +494,29 @@
     }
     .cam-nfl-heading[data-cam-banner] > h2 { font-size:22px!important; }
   }
+  /* Home community symbols are supporting marks, sized below the headline.
+     Keep this scoped to the four supplied icons, including both theme slots. */
+  :is([data-cam-banner-key^="portada.populares-"],
+      [data-cam-banner-key^="portada.impopulares-"],
+      [data-cam-banner-key^="portada.top-takes-"]) {
+    --cam-banner-art-width:56px;
+    --cam-banner-art-height:56px;
+  }
+  @media(max-width:760px) {
+    :is([data-cam-banner-key^="portada.populares-"],
+        [data-cam-banner-key^="portada.impopulares-"],
+        [data-cam-banner-key^="portada.top-takes-"]) {
+      --cam-banner-art-width:44px;
+      --cam-banner-art-height:44px;
+    }
+  }
+  @container(max-width:380px) {
+    :is([data-cam-banner-key^="portada.populares-"],
+        [data-cam-banner-key^="portada.impopulares-"],
+        [data-cam-banner-key^="portada.top-takes-"]) {
+      --cam-banner-art-width:44px;
+      --cam-banner-art-height:44px;
+    }
+  }
+
 }
