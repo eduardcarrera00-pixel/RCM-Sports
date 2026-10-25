@@ -14,10 +14,11 @@ Run `npm run test:editor` when changing news editing or publication. Preserve th
 
 ## CSS request consolidation (2026-10-24)
 
-Four compiled CSS packs replace 57 adjacent standalone stylesheet links while
+Five compiled CSS packs replace 62 adjacent standalone stylesheets/rules while
 preserving their exact original ordering and the existing inline-style boundaries:
 `assets/cam-perf-core-extras.css`, `assets/cam-perf-home-components.css`,
-`assets/cam-perf-rankings.css` and `assets/cam-perf-picks-mobile.css`.
+`assets/cam-perf-rankings.css`, `assets/cam-perf-picks-mobile.css` and
+`assets/cam-perf-sport-banners.css`.
 
 **Edit the original component CSS**, never the generated packs. The definitive
 source list is `assets/performance-css-packs.json`. After editing any included CSS

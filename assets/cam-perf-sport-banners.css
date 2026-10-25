@@ -1,0 +1,1468 @@
+/* assets/ae-power-rankings-scenic.css */
+/* AE SPORTS · panoramas originales de Power Rankings · 16 oct 2026
+   Sólo presentación. Mantener intactos datos, posiciones, escudos y animaciones. */
+html body #nflRankings.rcm-panel,
+html body #championsRankings.rcm-panel,
+html.dark body #nflRankings.rcm-panel,
+html.dark body #championsRankings.rcm-panel{
+  background-repeat:no-repeat!important;
+  background-size:cover,cover,contain!important;
+  background-position:center,center,center 43%!important;
+  border:1px solid rgba(185,139,91,.59)!important;
+  border-radius:0!important;
+  overflow:hidden!important;
+  isolation:isolate;
+}
+/* Atmósferas nocturnas: transparencia suficiente para ver la ciudad/estadio. */
+html.dark body #nflRankings.rcm-panel{
+  background-color:#071b2b!important;
+  background-image:
+    linear-gradient(102deg,rgba(3,16,30,.86) 0%,rgba(5,20,34,.62) 43%,rgba(7,22,35,.28) 100%),
+    linear-gradient(0deg,rgba(4,17,30,.49) 0%,transparent 61%),
+    url("rankings/ae-nfl-stadium-night.webp")!important;
+  color:#fff0df!important;
+}
+html.dark body #championsRankings.rcm-panel{
+  background-color:#071b2b!important;
+  background-image:
+    linear-gradient(102deg,rgba(4,16,30,.82) 0%,rgba(8,22,38,.49) 43%,rgba(8,21,37,.32) 100%),
+    linear-gradient(0deg,rgba(4,17,31,.49) 0%,transparent 63%),
+    url("rankings/ae-champions-stadium-night.webp")!important;
+  color:#fff0df!important;
+}
+/* Modo día: brillo crema editorial sin perder la imagen de fondo. */
+html:not(.dark) body #nflRankings.rcm-panel{
+  background-color:#faf3e6!important;
+  background-image:
+    linear-gradient(100deg,rgba(255,250,241,.96) 0%,rgba(255,250,241,.78) 37%,rgba(255,249,238,.28) 75%,rgba(255,249,238,.14) 100%),
+    linear-gradient(0deg,rgba(255,247,234,.43),transparent 60%),
+    url("rankings/ae-nfl-stadium-day.webp")!important;
+  color:#10243a!important;
+}
+html:not(.dark) body #championsRankings.rcm-panel{
+  background-color:#faf3e6!important;
+  background-image:
+    linear-gradient(100deg,rgba(255,250,241,.95) 0%,rgba(255,250,241,.78) 37%,rgba(255,249,238,.25) 75%,rgba(255,249,238,.12) 100%),
+    linear-gradient(0deg,rgba(255,247,234,.44),transparent 60%),
+    url("rankings/ae-champions-stadium-day.webp")!important;
+  color:#10243a!important;
+}
+/* El encabezado debe dejar respirar el paisaje, no taparlo con una caja opaca. */
+html body #nflRankings.rcm-panel > .ae-rank-hero-head.rcm-row,
+html body #championsRankings.rcm-panel > .ae-rank-hero-head.rcm-row{
+  background:transparent!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  padding:8px 2px 4px!important;
+}
+html.dark body #nflRankings .ae-rank-title-wrap h2,
+html.dark body #championsRankings .ae-rank-title-wrap h2,
+html.dark body #nflRankings .ae-rank-title-wrap h2 span,
+html.dark body #championsRankings .ae-rank-title-wrap h2 span{
+  color:#fff3e5!important;
+  text-shadow:0 2px 16px rgba(1,13,25,.56)!important;
+}
+html.dark body #nflRankings .ae-rank-overline,
+html.dark body #championsRankings .ae-rank-overline,
+html.dark body #rankingEdition.ae-rank-edition,
+html.dark body #championsEdition.ae-rank-edition{
+  color:#e6bd8a!important;
+  text-shadow:0 1px 8px rgba(0,0,0,.36)!important;
+}
+html:not(.dark) body #nflRankings .ae-rank-title-wrap h2,
+html:not(.dark) body #championsRankings .ae-rank-title-wrap h2,
+html:not(.dark) body #nflRankings .ae-rank-title-wrap h2 span,
+html:not(.dark) body #championsRankings .ae-rank-title-wrap h2 span{
+  color:#10263d!important;
+  text-shadow:0 1px 9px rgba(255,249,237,.53)!important;
+}
+html:not(.dark) body #nflRankings .ae-rank-overline,
+html:not(.dark) body #championsRankings .ae-rank-overline,
+html:not(.dark) body #rankingEdition.ae-rank-edition,
+html:not(.dark) body #championsEdition.ae-rank-edition{
+  color:#865c36!important;
+  text-shadow:0 1px 8px rgba(255,249,237,.78)!important;
+}
+/* El primer puesto conserva escudos y layout; sólo se redefine su marco. */
+html.dark body #nflRankings .ae-ranking-leader,
+html.dark body #championsRankings .ae-ranking-leader{
+  background:linear-gradient(120deg,rgba(4,21,37,.95),rgba(7,29,47,.87))!important;
+  border:1px solid rgba(228,184,128,.67)!important;
+  border-left:3px solid #d9a771!important;
+  border-radius:0!important;
+  box-shadow:0 12px 30px rgba(0,0,0,.28)!important;
+}
+html:not(.dark) body #nflRankings .ae-ranking-leader,
+html:not(.dark) body #championsRankings .ae-ranking-leader{
+  background:linear-gradient(110deg,rgba(255,253,246,.98),rgba(255,248,232,.93))!important;
+  border:1px solid rgba(151,106,63,.62)!important;
+  border-left:3px solid #ab7b4f!important;
+  border-radius:0!important;
+  box-shadow:0 11px 28px rgba(70,53,34,.12)!important;
+}
+/* Franja de posiciones: deja ver un velo del paisaje, sin duplicar la fotografía.
+   NO modificar track, keyframes ni atributos de ranking. */
+html.dark body #nflRankings #rankingViewport.rcm-ticker,
+html.dark body #championsRankings #championsViewport.rcm-ticker{
+  background-color:transparent!important;
+  background-image:linear-gradient(90deg,rgba(3,20,34,.89),rgba(3,20,34,.68) 50%,rgba(3,20,34,.87))!important;
+  border-color:rgba(218,169,119,.47)!important;
+  border-radius:0!important;
+  box-shadow:inset 0 5px 20px rgba(1,11,21,.27)!important;
+}
+html:not(.dark) body #nflRankings #rankingViewport.rcm-ticker,
+html:not(.dark) body #championsRankings #championsViewport.rcm-ticker{
+  background-color:transparent!important;
+  background-image:linear-gradient(90deg,rgba(255,251,242,.88),rgba(255,251,242,.70) 50%,rgba(255,251,242,.90))!important;
+  border-color:rgba(153,111,64,.42)!important;
+  border-radius:0!important;
+  box-shadow:inset 0 3px 16px rgba(119,91,58,.06)!important;
+}
+/* Portada: miniaturas Power Rankings también heredan sus nuevos panoramas.
+   Conservamos allí el contraste nocturno de la tipografía ya existente. */
+html body #homeRankingLink.ae-ranking-card-link,
+html.dark body #homeRankingLink.ae-ranking-card-link{
+  background-image:linear-gradient(100deg,rgba(5,21,35,.93),rgba(7,25,39,.76) 58%,rgba(8,27,42,.40)),
+    url("rankings/ae-nfl-stadium-night.webp")!important;
+  background-size:cover,contain!important;
+  background-repeat:no-repeat!important;
+  background-position:center,center!important;
+}
+html body #homeChampionsLink.ae-ranking-card-link,
+html.dark body #homeChampionsLink.ae-ranking-card-link{
+  background-image:linear-gradient(100deg,rgba(5,21,35,.93),rgba(7,25,39,.74) 58%,rgba(8,27,42,.38)),
+    url("rankings/ae-champions-stadium-night.webp")!important;
+  background-size:cover,contain!important;
+  background-repeat:no-repeat!important;
+  background-position:center,center!important;
+}
+@media(max-width:700px){
+  html.dark body #nflRankings.rcm-panel,
+  html.dark body #championsRankings.rcm-panel,
+  html:not(.dark) body #nflRankings.rcm-panel,
+  html:not(.dark) body #championsRankings.rcm-panel{
+    background-position:center,center,62% center!important;
+    background-size:cover,cover,contain!important;
+  }
+  html body #nflRankings.rcm-panel > .ae-rank-hero-head.rcm-row,
+  html body #championsRankings.rcm-panel > .ae-rank-hero-head.rcm-row{
+    padding:4px 0 3px!important;
+  }
+}
+
+/* Blindaje para el diseño móvil de Champions: su panel de Power Rankings
+   reutiliza clases anteriores con reglas de alta especificidad. */
+@media(max-width:760px){
+  html.dark body.ae-is-football #championsRankings.rcm-panel.ae-football-ranking-feature:not(.hidden){
+    background-color:#071b2b!important;
+    background-image:
+      linear-gradient(105deg,rgba(4,16,30,.83),rgba(6,20,34,.49) 65%,rgba(7,21,36,.23)),
+      linear-gradient(0deg,rgba(3,15,28,.40),transparent 60%),
+      url("rankings/ae-champions-stadium-night.webp")!important;
+    background-size:cover,cover,contain!important;
+    background-position:center,center,58% center!important;
+  }
+  html:not(.dark) body.ae-is-football #championsRankings.rcm-panel.ae-football-ranking-feature:not(.hidden){
+    background-color:#faf3e6!important;
+    background-image:
+      linear-gradient(105deg,rgba(255,250,241,.95),rgba(255,249,238,.72) 58%,rgba(255,247,234,.22)),
+      linear-gradient(0deg,rgba(255,247,234,.33),transparent 65%),
+      url("rankings/ae-champions-stadium-day.webp")!important;
+    background-size:cover,cover,contain!important;
+    background-position:center,center,59% center!important;
+  }
+}
+
+/* assets/ae-football-takes-scenic.css */
+/* AE SPORTS · Escenografía editorial para Takes de la comunidad (Fútbol).
+   Sólo estilos: conservar los botones, votos, datos, respuesta y moderación existentes.
+   El diseño NFL se mantiene independiente. Los fondos no contienen texto ni controles. */
+
+/* Dos columnas de opiniones en escritorio, una sola en teléfono. */
+html body.ae-is-football #freeTakes #freeTakesFeed{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:clamp(10px,1.5vw,18px)!important;
+  align-items:stretch!important;
+}
+
+/* Banner inspirado en el diseño aprobado: skyline europeo y estadio al atardecer. */
+html.dark body.ae-is-football #freeTakes .ae-takes-head,
+html body.ae-is-football #freeTakes[data-sport="football"] .ae-takes-head{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  grid-template-rows:auto auto auto!important;
+  align-items:center!important;
+  column-gap:clamp(16px,3vw,38px)!important;
+  row-gap:clamp(3px,.6vw,7px)!important;
+  min-height:clamp(160px,19vw,235px)!important;
+  margin:0 0 17px!important;
+  padding:clamp(19px,2.4vw,35px) clamp(17px,3vw,45px)!important;
+  border:1px solid #b99262!important;
+  border-radius:0!important;
+  box-shadow:0 13px 34px rgba(1,13,25,.19)!important;
+  background-color:#051a2b!important;
+  background-image:url("takes/ae-football-takes-hero-night.webp")!important;
+  background-size:cover!important;
+  background-position:center!important;
+  background-repeat:no-repeat!important;
+  overflow:hidden!important;
+}
+html:not(.dark) body.ae-is-football #freeTakes[data-sport="football"] .ae-takes-head{
+  background-color:#faf5e8!important;
+  background-image:url("takes/ae-football-takes-hero-day.webp")!important;
+  border-color:#bd9460!important;
+  box-shadow:0 8px 24px rgba(80,59,38,.11)!important;
+}
+html body.ae-is-football #freeTakes .ae-takes-head>.ae-takes-eyebrow{
+  grid-column:1!important;grid-row:1!important;
+  align-self:end!important;
+  margin:0!important;padding:0!important;
+  color:#e6b777!important;
+  font:700 clamp(10px,1.08vw,13px)/1.2 Inter,system-ui,sans-serif!important;
+  letter-spacing:.17em!important;
+}
+html body.ae-is-football #freeTakes .ae-takes-head>#freeTakesTitle{
+  grid-column:1!important;grid-row:2!important;
+  align-self:center!important;
+  width:auto!important;max-width:100%!important;
+  margin:0!important;padding:0!important;
+  font:600 clamp(26px,3.8vw,57px)/1.02 Newsreader,Georgia,serif!important;
+  letter-spacing:-.035em!important;
+  color:#fff1e1!important;
+  text-shadow:0 2px 15px rgba(0,6,15,.36)!important;
+  text-wrap:balance;
+}
+html body.ae-is-football #freeTakes .ae-takes-head>p{
+  grid-column:1!important;grid-row:3!important;
+  margin:0!important;padding:0!important;
+  max-width:850px!important;
+  font:400 clamp(11px,1.2vw,15px)/1.5 Inter,system-ui,sans-serif!important;
+  color:#f3e9de!important;
+}
+html body.ae-is-football #freeTakes .ae-takes-head>#aeSportTakePublish{
+  grid-column:2!important;grid-row:1/4!important;
+  justify-self:end!important;align-self:center!important;
+  min-width:max-content!important;
+  margin:0!important;padding:clamp(12px,1.4vw,19px) clamp(15px,1.9vw,30px)!important;
+  min-height:49px!important;
+  border:1px solid #e6c18f!important;
+  border-radius:1px!important;
+  box-shadow:0 6px 24px rgba(2,17,27,.3)!important;
+  background:linear-gradient(115deg,#f1cc92,#c9975d)!important;
+  color:#172638!important;
+  font:700 clamp(12px,1.16vw,16px)/1.25 Newsreader,Georgia,serif!important;
+  letter-spacing:.005em!important;
+  transition:filter .18s ease,transform .18s ease!important;
+}
+html body.ae-is-football #freeTakes .ae-takes-head>#aeSportTakePublish:hover,
+html body.ae-is-football #freeTakes .ae-takes-head>#aeSportTakePublish:focus-visible{
+  filter:brightness(1.085)!important;transform:translateY(-1px)!important;
+}
+html:not(.dark) body.ae-is-football #freeTakes .ae-takes-head>.ae-takes-eyebrow{color:#875b31!important;}
+html:not(.dark) body.ae-is-football #freeTakes .ae-takes-head>#freeTakesTitle{
+  color:#162d40!important;text-shadow:0 1px 12px rgba(252,245,227,.76)!important;
+}
+html:not(.dark) body.ae-is-football #freeTakes .ae-takes-head>p{color:#394a55!important;}
+
+/* Las tarjetas siguen siendo artículos reales. Sólo reciben una ilustración tenue
+   a la derecha, proveniente de las escenas aprobadas. */
+html.dark body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card,
+html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card{
+  min-width:0!important;
+  min-height:205px!important;
+  padding:clamp(13px,1.5vw,21px)!important;
+  border:1px solid rgba(184,139,95,.57)!important;
+  border-left:3px solid var(--ae-scenic-accent,#d4a675)!important;
+  border-radius:0!important;
+  box-shadow:0 7px 18px rgba(1,14,24,.19)!important;
+  background-color:#061d2e!important;
+  background-image:url("takes/ae-football-take-laliga-night.webp")!important;
+  background-position:center!important;
+  background-size:cover!important;
+  background-repeat:no-repeat!important;
+  color:#f6eee7!important;
+  overflow:hidden!important;
+}
+html.dark body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card[data-sport="champions"],
+html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card[data-sport="champions"]{
+  --ae-scenic-accent:#79c4d8;
+  background-image:url("takes/ae-football-take-champions-night.webp")!important;
+}
+html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card[data-sport="laliga"]:nth-child(odd){
+  background-image:url("takes/ae-football-take-barca-night.webp")!important;
+}
+html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card[data-sport="premier"]{
+  --ae-scenic-accent:#89b8ce;
+  background-image:url("takes/ae-football-take-premier-night.webp")!important;
+}
+html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card[data-sport="ligamx"]{
+  --ae-scenic-accent:#bc915e;
+  background-image:url("takes/ae-football-take-laliga-night.webp")!important;
+}
+html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card .ae-take-overline,
+html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card .ae-feed-take-title,
+html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card .ae-free-take-body,
+html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card .ae-free-vote-row{
+  position:relative;z-index:1;
+}
+html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card .ae-feed-take-title{
+  margin:6px 0 8px!important;
+  color:#fff0dd!important;
+  font:600 clamp(19px,1.9vw,28px)/1.15 Newsreader,Georgia,serif!important;
+}
+html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card .ae-feed-take-open{
+  color:inherit!important;
+  font:inherit!important;
+  text-align:left!important;
+}
+html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card .ae-free-take-body{
+  color:#e2e8e8!important;
+  font-size:clamp(12px,1.1vw,15px)!important;
+  line-height:1.5!important;
+  max-width:79%!important;
+  margin:0 0 12px!important;
+}
+html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card .ae-take-overline>span:first-child{
+  background:rgba(9,34,49,.72)!important;
+  color:#eacaa7!important;
+  border:1px solid rgba(212,172,121,.8)!important;
+  border-radius:0!important;
+}
+html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card .ae-take-author-link{
+  color:#f1e4d8!important;
+}
+html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card .ae-free-vote-row{
+  gap:8px!important;
+  margin-top:auto!important;
+  padding-top:8px!important;
+}
+html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card .ae-free-vote-row button:not(.ae-take-reply-link):not(.ae-take-minor){
+  border-radius:0!important;
+  border:1px solid rgba(202,171,138,.29)!important;
+  background:rgba(11,40,57,.75)!important;
+  color:#f2e9dc!important;
+}
+html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card .ae-take-reply-link,
+html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card .ae-take-minor{
+  color:#e8bc86!important;
+  border-radius:0!important;
+}
+
+/* Versión crema/marfil: el arte pasa a color pastel y el texto a azul tinta. */
+html:not(.dark) body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card{
+  background-color:#fbf6eb!important;
+  background-image:url("takes/ae-football-take-laliga-day.webp")!important;
+  border:1px solid rgba(176,135,88,.44)!important;
+  border-left:3px solid var(--ae-scenic-accent,#ac7e50)!important;
+  box-shadow:0 7px 16px rgba(62,45,28,.09)!important;
+  color:#1a3042!important;
+}
+html:not(.dark) body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card[data-sport="champions"]{
+  --ae-scenic-accent:#3f6b7e;
+  background-image:url("takes/ae-football-take-champions-day.webp")!important;
+}
+html:not(.dark) body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card[data-sport="laliga"]:nth-child(odd){
+  background-image:url("takes/ae-football-take-barca-day.webp")!important;
+}
+html:not(.dark) body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card[data-sport="premier"]{
+  --ae-scenic-accent:#3e6f83;
+  background-image:url("takes/ae-football-take-premier-day.webp")!important;
+}
+html:not(.dark) body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card .ae-feed-take-title,
+html:not(.dark) body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card .ae-feed-take-open{color:#173044!important;}
+html:not(.dark) body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card .ae-free-take-body{
+  color:#334854!important;
+}
+html:not(.dark) body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card .ae-take-author-link{color:#3c4d58!important;}
+html:not(.dark) body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card .ae-take-overline>span:first-child{
+  background:rgba(240,221,190,.86)!important;
+  color:#223c4c!important;
+  border-color:#9f7744!important;
+}
+html:not(.dark) body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card .ae-free-vote-row button:not(.ae-take-reply-link):not(.ae-take-minor){
+  background:rgba(244,234,220,.85)!important;
+  color:#213b4d!important;
+  border:1px solid rgba(156,119,80,.20)!important;
+}
+html:not(.dark) body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card .ae-take-reply-link,
+html:not(.dark) body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card .ae-take-minor{
+  color:#86592f!important;
+}
+/* Respeta el diseño compacto existente y nunca cambia la semántica ni el ocultado. */
+@media(max-width:780px){
+  html body.ae-is-football #freeTakes #freeTakesFeed{grid-template-columns:minmax(0,1fr)!important;}
+  html body.ae-is-football #freeTakes .ae-takes-head{
+    min-height:185px!important;
+    padding:17px 16px!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    grid-template-rows:auto auto auto auto!important;
+    background-position:60% center!important;
+  }
+  html body.ae-is-football #freeTakes .ae-takes-head>.ae-takes-eyebrow{grid-column:1!important;grid-row:1!important;}
+  html body.ae-is-football #freeTakes .ae-takes-head>#freeTakesTitle{grid-column:1!important;grid-row:2!important;font-size:clamp(23px,5.8vw,37px)!important;}
+  html body.ae-is-football #freeTakes .ae-takes-head>p{grid-column:1!important;grid-row:3!important;max-width:90%!important;}
+  html body.ae-is-football #freeTakes .ae-takes-head>#aeSportTakePublish{
+    grid-column:1!important;grid-row:4!important;justify-self:start!important;
+    min-height:36px!important;padding:9px 13px!important;margin-top:5px!important;
+  }
+  html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card{min-height:169px!important;}
+  html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card .ae-free-take-body{max-width:94%!important;}
+}
+/* La versión móvil anterior ocultaba el subtítulo editorial; recuperarlo en
+   el nuevo banner sin hacer reaparecer feeds que el diseño móvil esconde. */
+html body.ae-is-football #freeTakes .ae-takes-head>.ae-takes-eyebrow{display:block!important;}
+@media(max-width:760px){
+  html body.ae-is-football #freeTakes #freeTakesFeed{display:none!important;}
+}
+
+
+/* AE SPORTS · ajuste compacto de Takes de Fútbol (octubre 2026).
+   Los Takes son mensajes, no banners. Sin imágenes de fondo ni alturas forzadas.
+   Exclusivo de Fútbol: NFL, resultados, votos y respuestas no cambian. */
+
+/* Dos columnas naturales: las filas no se estiran para rellenar huecos. */
+html body.ae-is-football #freeTakes #freeTakesFeed{
+  align-items:start!important;
+  grid-auto-rows:auto!important;
+  gap:10px!important;
+}
+
+/* Encabezado editorial más discreto, conservando la escena del estadio. */
+html body.ae-is-football #freeTakes[data-sport="football"] .ae-takes-head{
+  min-height:112px!important;
+  height:auto!important;
+  padding:13px clamp(14px,2vw,25px)!important;
+  margin:0 0 11px!important;
+  gap:3px 15px!important;
+  box-shadow:0 5px 15px rgba(3,19,30,.12)!important;
+}
+html body.ae-is-football #freeTakes .ae-takes-head>.ae-takes-eyebrow{
+  font-size:10px!important;
+  letter-spacing:.12em!important;
+}
+html body.ae-is-football #freeTakes .ae-takes-head>#freeTakesTitle{
+  font-size:clamp(24px,2.65vw,39px)!important;
+  line-height:1.06!important;
+  letter-spacing:-.024em!important;
+}
+html body.ae-is-football #freeTakes .ae-takes-head>p{
+  font-size:clamp(11px,.97vw,13px)!important;
+  line-height:1.4!important;
+  max-width:100%!important;
+}
+html body.ae-is-football #freeTakes .ae-takes-head>#aeSportTakePublish{
+  min-height:36px!important;
+  padding:9px 13px!important;
+  font-size:clamp(11px,1vw,13px)!important;
+  box-shadow:0 3px 12px rgba(3,20,32,.16)!important;
+}
+
+/* Tarjetas de texto: nada de escenas de fondo ni zonas vacías artificiales. */
+html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card{
+  height:auto!important;
+  min-height:0!important;
+  align-self:start!important;
+  padding:11px 13px!important;
+  border-radius:0!important;
+  border-left-width:2px!important;
+  box-shadow:0 2px 9px rgba(3,21,33,.10)!important;
+}
+/* Abarcar también las variantes de liga y las tarjetas pares/impares,
+   que antes tenían ilustraciones con selectores más específicos. */
+html.dark body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card,
+html.dark body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card[data-sport],
+html.dark body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card[data-sport]:nth-child(n){
+  background:#112b3b!important;
+  background-image:none!important;
+}
+html:not(.dark) body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card,
+html:not(.dark) body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card[data-sport],
+html:not(.dark) body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card[data-sport]:nth-child(n){
+  background:#fbf7f0!important;
+  background-image:none!important;
+}
+html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card .ae-take-overline{
+  margin:0!important;
+  gap:5px!important;
+  font-size:10px!important;
+  line-height:1.35!important;
+}
+html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card .ae-take-overline>span:first-child{
+  padding:3px 6px!important;
+  font-size:10px!important;
+}
+html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card .ae-feed-take-title{
+  margin:4px 0 4px!important;
+  font-size:clamp(17px,1.5vw,21px)!important;
+  line-height:1.18!important;
+}
+/* Contenido completo, sin limitarlo a cuatro líneas. La tarjeta crece sólo
+   cuando el propio mensaje lo necesita. */
+html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card .ae-free-take-body{
+  display:block!important;
+  -webkit-line-clamp:unset!important;
+  -webkit-box-orient:initial!important;
+  overflow:visible!important;
+  max-width:100%!important;
+  margin:0 0 5px!important;
+  padding:0!important;
+  font-size:13px!important;
+  line-height:1.42!important;
+  overflow-wrap:anywhere!important;
+}
+html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card .ae-free-vote-row{
+  margin-top:4px!important;
+  padding-top:5px!important;
+  gap:5px!important;
+}
+html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card .ae-free-vote-row button{
+  min-height:29px!important;
+  padding:4px 8px!important;
+  font-size:11px!important;
+}
+html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card .ae-free-vote-row .ae-take-reply-link{
+  min-height:29px!important;
+  padding:4px 6px!important;
+}
+
+/* Móvil: cabecera proporcionada, texto legible y controles táctiles.
+   Respeta la vista móvil existente (que muestra un resumen de Takes). */
+@media(max-width:780px){
+  html body.ae-is-football #freeTakes[data-sport="football"] .ae-takes-head{
+    min-height:0!important;
+    height:auto!important;
+    padding:12px 13px!important;
+    gap:3px 8px!important;
+    margin-bottom:10px!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    grid-template-rows:auto auto auto auto!important;
+  }
+  html body.ae-is-football #freeTakes .ae-takes-head>#freeTakesTitle{
+    font-size:clamp(21px,5.6vw,30px)!important;
+  }
+  html body.ae-is-football #freeTakes .ae-takes-head>p{
+    font-size:11px!important;
+    line-height:1.35!important;
+    max-width:100%!important;
+  }
+  html body.ae-is-football #freeTakes .ae-takes-head>#aeSportTakePublish{
+    min-height:34px!important;
+    margin-top:4px!important;
+    padding:7px 11px!important;
+    font-size:11px!important;
+  }
+  html body.ae-is-football #freeTakes #freeTakesFeed{
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:8px!important;
+  }
+  html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card{
+    min-height:0!important;
+    padding:10px 11px!important;
+  }
+  html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card .ae-feed-take-title{
+    font-size:18px!important;
+  }
+  html body.ae-is-football #freeTakes #freeTakesFeed>.ae-free-take-card .ae-free-vote-row button{
+    min-height:34px!important;
+  }
+}
+
+
+/* Fútbol: 4 Takes pequeños por fila, alineados arriba y juntos. */
+html body.ae-is-football #freeTakes[data-sport="football"] .ae-takes-head{
+  margin-bottom:5px!important;
+}
+html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesStatus:empty{
+  display:none!important;
+}
+html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesFeed{
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  grid-auto-rows:min-content!important;
+  align-content:start!important;
+  align-items:start!important;
+  gap:6px!important;
+  width:100%!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:0!important;
+}
+html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesFeed>.ae-free-take-card{
+  box-sizing:border-box!important;
+  align-self:start!important;
+  justify-content:flex-start!important;
+  min-height:0!important;
+  height:auto!important;
+  width:100%!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:9px!important;
+  border-left-width:2px!important;
+  box-shadow:0 2px 7px rgba(3,20,32,.08)!important;
+}
+html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesFeed>.ae-free-take-card .ae-take-overline{
+  display:flex!important;
+  flex-wrap:wrap!important;
+  gap:3px 5px!important;
+  min-width:0!important;
+  margin:0!important;
+  font-size:9px!important;
+  line-height:1.22!important;
+}
+html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesFeed>.ae-free-take-card .ae-take-overline>span:first-child{
+  font-size:9px!important;
+  padding:2px 4px!important;
+}
+html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesFeed>.ae-free-take-card .ae-feed-take-title{
+  font-size:clamp(15px,1.35vw,18px)!important;
+  line-height:1.16!important;
+  margin:4px 0!important;
+  overflow-wrap:anywhere!important;
+}
+html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesFeed>.ae-free-take-card .ae-free-take-body{
+  display:block!important;
+  max-width:100%!important;
+  min-width:0!important;
+  font-size:12px!important;
+  line-height:1.35!important;
+  margin:0 0 4px!important;
+  -webkit-line-clamp:unset!important;
+  overflow:visible!important;
+  overflow-wrap:anywhere!important;
+}
+html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesFeed>.ae-free-take-card .ae-free-vote-row{
+  display:flex!important;
+  flex-wrap:wrap!important;
+  align-items:center!important;
+  gap:3px!important;
+  padding-top:4px!important;
+  margin-top:4px!important;
+}
+html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesFeed>.ae-free-take-card .ae-free-vote-row button{
+  flex:0 0 auto!important;
+  width:auto!important;
+  min-height:27px!important;
+  margin:0!important;
+  padding:3px 5px!important;
+  font-size:10px!important;
+  line-height:1.2!important;
+}
+@media (min-width:900px) and (max-width:1139px){
+  html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesFeed{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  }
+}
+@media (min-width:761px) and (max-width:899px){
+  html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesFeed{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+}
+@media (max-width:760px){
+  html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesFeed{
+    grid-template-columns:minmax(0,1fr)!important;
+  }
+  html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesFeed>.ae-free-take-card .ae-free-vote-row button{
+    min-height:34px!important;
+  }
+}
+
+
+/* AE SPORTS · cuatro Takes iguales por fila, independientemente del contenido. */
+/* Sólo Fútbol: los Takes completos se abren tocando la tarjeta o el título. */
+@media(min-width:761px){
+  html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesFeed{
+    display:grid!important;
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    grid-auto-rows:206px!important;
+    align-content:start!important;
+    align-items:stretch!important;
+    gap:6px!important;
+    margin:0!important;
+    padding:0!important;
+  }
+  html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesFeed>.ae-free-take-card{
+    box-sizing:border-box!important;
+    align-self:stretch!important;
+    min-width:0!important;
+    width:100%!important;
+    height:206px!important;
+    min-height:206px!important;
+    max-height:206px!important;
+    padding:9px!important;
+    overflow:hidden!important;
+    display:flex!important;
+    flex-direction:column!important;
+    justify-content:flex-start!important;
+  }
+  html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesFeed>.ae-free-take-card .ae-take-overline{
+    flex:0 0 auto!important;
+    max-height:36px!important;
+    margin:0 0 3px!important;
+    overflow:hidden!important;
+  }
+  html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesFeed>.ae-free-take-card .ae-feed-take-title{
+    flex:0 0 auto!important;
+    min-width:0!important;
+    max-height:40px!important;
+    margin:2px 0 4px!important;
+    overflow:hidden!important;
+  }
+  html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesFeed>.ae-free-take-card .ae-feed-take-open{
+    display:-webkit-box!important;
+    -webkit-box-orient:vertical!important;
+    -webkit-line-clamp:2!important;
+    overflow:hidden!important;
+    max-width:100%!important;
+    text-align:left!important;
+    font:inherit!important;
+    overflow-wrap:anywhere!important;
+  }
+  html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesFeed>.ae-free-take-card .ae-free-take-body{
+    display:-webkit-box!important;
+    -webkit-box-orient:vertical!important;
+    -webkit-line-clamp:3!important;
+    flex:1 1 auto!important;
+    min-height:0!important;
+    max-height:54px!important;
+    overflow:hidden!important;
+    margin:0 0 4px!important;
+    overflow-wrap:anywhere!important;
+  }
+  html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesFeed>.ae-free-take-card .ae-free-vote-row{
+    flex:0 0 auto!important;
+    margin-top:auto!important;
+    padding-top:4px!important;
+    max-height:66px!important;
+    overflow:hidden!important;
+    align-content:end!important;
+    gap:3px!important;
+  }
+  html body.ae-is-football #freeTakes[data-sport="football"] #freeTakesFeed>.ae-free-take-card .ae-free-vote-row button{
+    width:auto!important;
+    white-space:nowrap!important;
+    padding:4px 5px!important;
+  }
+}
+
+/* assets/ae-football-news-debate.css */
+/* AE SPORTS · Fútbol: debate debajo de "Demuestra tu conocimiento".
+   Los datos son reales y los botones siguen siendo componentes DOM.
+   No modifica NFL, noticias, Power Rankings ni la sección inferior de Takes. */
+@media (min-width:960px){
+  html body.ae-is-football #mainContent .editorial-layout{
+    display:grid!important;
+    grid-template-columns:minmax(0,1.73fr) minmax(302px,1fr)!important;
+    column-gap:clamp(14px,1.55vw,22px)!important;
+    row-gap:14px!important;
+    align-items:start!important;
+  }
+  html body.ae-is-football #mainContent .editorial-layout>div:first-child,
+  html body.ae-is-football #mainContent .editorial-layout>aside{
+    grid-column:auto!important;
+    grid-row:auto!important;
+    width:100%!important;
+    min-width:0!important;
+    margin-top:0!important;
+    align-self:start!important;
+  }
+}
+@media (min-width:761px){
+  html body.ae-is-football #mainContent #freeTakes > #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"]{
+    box-sizing:border-box!important;
+    display:block!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+  }
+  html body.ae-is-football #mainContent #freeTakes > #aeSportTakeLeaders[hidden]{
+    display:none!important;
+  }
+  /* Dos tablas verticales paralelas, de ancho uniforme. */
+  html body.ae-is-football #freeTakes > #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-takes-grid{
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:14px!important;
+    width:100%!important;
+    padding:0!important;
+    margin:0!important;
+    align-items:start!important;
+  }
+  html body.ae-is-football #freeTakes > #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-takes-grid>.ae-sport-chef-card,
+  html:not(.dark) body.ae-is-football #freeTakes > #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-takes-grid>.ae-sport-chef-card{
+    box-sizing:border-box!important;
+    width:100%!important;
+    min-width:0!important;
+    min-height:0!important;
+    display:flex!important;
+    flex-direction:column!important;
+    border:1px solid #b88357!important;
+    border-radius:0!important;
+    padding:0!important;
+    margin:0!important;
+    overflow:hidden!important;
+    background:linear-gradient(165deg,#071a26,#05131e)!important;
+    box-shadow:0 4px 16px rgba(0,12,22,.14)!important;
+  }
+  html:not(.dark) body.ae-is-football #freeTakes > #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-takes-grid>.ae-sport-chef-card{
+    background:linear-gradient(155deg,#fffaf1,#fbf3e6)!important;
+    box-shadow:0 4px 14px rgba(85,58,37,.08)!important;
+  }
+  /* Banner: mismo arte del diseño aprobado, reducido a la columna derecha. */
+  html body.ae-is-football #freeTakes > #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-chef-heading{
+    position:relative!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:flex-start!important;
+    justify-content:flex-end!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    min-height:82px!important;
+    height:auto!important;
+    margin:0!important;
+    padding:27px 13px 10px!important;
+    border:0!important;
+    border-bottom:1px solid rgba(201,145,91,.69)!important;
+    background-color:#071b2a!important;
+    background-image:
+      linear-gradient(90deg,rgba(3,18,29,.94),rgba(4,23,33,.54) 53%,rgba(9,29,39,.08)),
+      url('atmospheres/ae-football-debate-calm-dark.svg')!important;
+    background-size:cover,cover!important;
+    background-position:center,center!important;
+    background-repeat:no-repeat!important;
+    isolation:isolate!important;
+  }
+  html body.ae-is-football #freeTakes > #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .is-questioned .ae-sport-chef-heading{
+    background-color:#28121b!important;
+    background-image:
+      linear-gradient(90deg,rgba(22,9,14,.94),rgba(34,12,17,.57) 55%,rgba(48,18,16,.10)),
+      url('atmospheres/ae-football-debate-fire-dark.svg')!important;
+  }
+  html:not(.dark) body.ae-is-football #freeTakes > #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-chef-heading{
+    background-color:#fcf1df!important;
+    background-image:
+      linear-gradient(90deg,rgba(255,250,240,.97),rgba(255,249,235,.72) 54%,rgba(255,249,235,.06)),
+      url('atmospheres/ae-football-debate-calm-day.svg')!important;
+  }
+  html:not(.dark) body.ae-is-football #freeTakes > #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .is-questioned .ae-sport-chef-heading{
+    background-color:#fff0df!important;
+    background-image:
+      linear-gradient(90deg,rgba(255,249,238,.97),rgba(255,243,225,.68) 54%,rgba(255,243,225,.05)),
+      url('atmospheres/ae-football-debate-fire-day.svg')!important;
+  }
+  html body.ae-is-football #freeTakes > #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-chef-heading::before{
+    content:"LA COMUNIDAD DEBATE"!important;
+    position:absolute!important;
+    left:13px!important;
+    top:9px!important;
+    color:#e6bb88!important;
+    font:700 8px/1.2 Inter,system-ui,sans-serif!important;
+    letter-spacing:.15em!important;
+  }
+  html body.ae-is-football #freeTakes > #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-chef-heading>h3{
+    position:relative!important;
+    display:block!important;
+    align-self:flex-start!important;
+    width:auto!important;
+    min-width:0!important;
+    max-width:100%!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    background:transparent!important;
+    color:#ffeddb!important;
+    font:600 clamp(22px,2.25vw,32px)/1.02 Newsreader,Georgia,serif!important;
+    letter-spacing:-.034em!important;
+    text-align:left!important;
+    text-shadow:0 2px 9px rgba(2,11,20,.48)!important;
+  }
+  html body.ae-is-football #freeTakes > #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .is-questioned .ae-sport-chef-heading>h3{
+    color:#f9ac75!important;
+  }
+  html:not(.dark) body.ae-is-football #freeTakes > #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-chef-heading>h3{
+    color:#152e3e!important;
+    text-shadow:none!important;
+  }
+  html:not(.dark) body.ae-is-football #freeTakes > #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .is-questioned .ae-sport-chef-heading>h3{
+    color:#8e3219!important;
+  }
+  html body.ae-is-football #freeTakes > #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-takes-list{
+    display:flex!important;
+    flex-direction:column!important;
+    gap:0!important;
+    width:100%!important;
+    min-width:0!important;
+    margin:0!important;
+    padding:1px 12px 4px!important;
+  }
+  html body.ae-is-football #freeTakes > #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-take-item.ae-sport-chef-entry{
+    display:grid!important;
+    grid-template-columns:27px minmax(0,1fr)!important;
+    align-items:start!important;
+    gap:6px!important;
+    box-sizing:border-box!important;
+    min-height:65px!important;
+    width:100%!important;
+    margin:0!important;
+    padding:10px 0 9px!important;
+    border:0!important;
+    border-bottom:1px solid rgba(198,156,119,.35)!important;
+  }
+  html body.ae-is-football #freeTakes > #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-take-item:last-child{
+    border-bottom:0!important;
+  }
+  html body.ae-is-football #freeTakes > #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-top-take-number{
+    font:600 25px/1 Newsreader,Georgia,serif!important;
+    letter-spacing:-.03em!important;
+    color:#e5b379!important;
+  }
+  html body.ae-is-football #freeTakes > #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-top-take-content{
+    display:grid!important;
+    grid-template-columns:minmax(67px,87px) minmax(0,1fr)!important;
+    grid-template-rows:auto auto!important;
+    column-gap:9px!important;
+    row-gap:1px!important;
+    align-items:start!important;
+    width:100%!important;
+    min-width:0!important;
+    margin:0!important;
+    padding:0!important;
+  }
+  html body.ae-is-football #freeTakes > #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-take-meta{
+    grid-column:1!important;
+    grid-row:1/3!important;
+    display:flex!important;
+    flex-direction:column!important;
+    gap:4px!important;
+    margin:0!important;
+    padding:2px 7px 0 0!important;
+    border-right:1px solid rgba(213,171,127,.36)!important;
+    height:100%!important;
+    min-height:46px!important;
+    overflow-wrap:anywhere!important;
+  }
+  html body.ae-is-football #freeTakes > #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-take-meta .ae-top-take-author{
+    font:700 12px/1.18 Newsreader,Georgia,serif!important;
+    color:#f2e3d7!important;
+    overflow-wrap:anywhere!important;
+    cursor:default!important;
+  }
+  html:not(.dark) body.ae-is-football #freeTakes > #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-take-meta .ae-top-take-author{
+    color:#22394c!important;
+  }
+  html body.ae-is-football #freeTakes > #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-take-net{
+    font:700 9px/1.28 Inter,system-ui,sans-serif!important;
+    color:#8ee1bd!important;
+  }
+  html body.ae-is-football #freeTakes > #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .is-questioned .ae-sport-take-net{
+    color:#ff777b!important;
+  }
+  html body.ae-is-football #freeTakes > #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-take-title{
+    grid-column:2!important;
+    grid-row:1!important;
+    display:block!important;
+    width:100%!important;
+    min-width:0!important;
+    margin:0!important;
+    padding:0!important;
+    font:400 12px/1.24 Newsreader,Georgia,serif!important;
+  }
+  html body.ae-is-football #freeTakes > #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-take-open{
+    display:-webkit-box!important;
+    -webkit-box-orient:vertical!important;
+    -webkit-line-clamp:2!important;
+    overflow:hidden!important;
+    font:inherit!important;
+    line-height:inherit!important;
+    max-width:100%!important;
+    width:100%!important;
+    padding:0!important;
+    white-space:normal!important;
+    text-align:left!important;
+    cursor:pointer!important;
+  }
+  html body.ae-is-football #freeTakes > #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-take-statline{
+    grid-column:2!important;
+    grid-row:2!important;
+    display:flex!important;
+    justify-content:flex-end!important;
+    align-items:center!important;
+    padding:0!important;
+    margin:2px 0 0!important;
+  }
+  html body.ae-is-football #freeTakes > #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-top-take-reply{
+    min-height:22px!important;
+    padding:2px 0!important;
+    margin:0!important;
+    font:650 10px/1.2 Inter,system-ui,sans-serif!important;
+    color:#f0bc83!important;
+    text-decoration:underline!important;
+  }
+  html body.ae-is-football #freeTakes > #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-top-take-reply::after{
+    font-size:15px!important;
+    margin-left:3px!important;
+  }
+  html:not(.dark) body.ae-is-football #freeTakes > #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-top-take-reply{
+    color:#92502b!important;
+  }
+  html:not(.dark) body.ae-is-football #freeTakes > #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-take-net{
+    color:#147554!important;
+  }
+  html:not(.dark) body.ae-is-football #freeTakes > #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .is-questioned .ae-sport-take-net{
+    color:#b92135!important;
+  }
+  html body.ae-is-football #freeTakes > #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-top-takes-empty{
+    font:400 12px/1.4 Newsreader,Georgia,serif!important;
+    padding:12px 3px!important;
+  }
+  /* El resumen va junto a las noticias. El feed completo sigue por debajo. */
+}
+
+
+/* AE SPORTS · Fondos de ciudad aprobados para Respira fútbol y Vende Humos.
+   Paisajes independientes sin textos ni controles incrustados. */
+html body.ae-is-football #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-chef-card.is-supported .ae-sport-chef-heading{
+  background-color:#071c2c!important;
+  background-image:
+    linear-gradient(90deg,rgba(2,19,30,.96) 0%,rgba(3,23,34,.82) 38%,rgba(4,20,30,.14) 100%),
+    url("atmospheres/ae-respira-futbol-reference.webp")!important;
+  background-position:center,right center!important;
+  background-size:cover,cover!important;
+  background-repeat:no-repeat!important;
+}
+html body.ae-is-football #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-chef-card.is-questioned .ae-sport-chef-heading{
+  background-color:#23101a!important;
+  background-image:
+    linear-gradient(90deg,rgba(24,8,13,.96) 0%,rgba(30,11,14,.77) 39%,rgba(46,15,13,.12) 100%),
+    url("atmospheres/ae-vende-humos-reference.webp")!important;
+  background-position:center,right center!important;
+  background-size:cover,cover!important;
+  background-repeat:no-repeat!important;
+}
+html:not(.dark) body.ae-is-football #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-chef-card.is-supported .ae-sport-chef-heading{
+  background-color:#fff4df!important;
+  background-image:
+    linear-gradient(90deg,rgba(255,250,241,.98) 0%,rgba(255,247,233,.84) 38%,rgba(255,247,233,.10) 100%),
+    url("atmospheres/ae-respira-futbol-reference.webp")!important;
+}
+html:not(.dark) body.ae-is-football #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-chef-card.is-questioned .ae-sport-chef-heading{
+  background-color:#fff0dd!important;
+  background-image:
+    linear-gradient(90deg,rgba(255,248,238,.98) 0%,rgba(255,239,223,.80) 39%,rgba(255,237,218,.08) 100%),
+    url("atmospheres/ae-vende-humos-reference.webp")!important;
+}
+/* La zona superior conserva la única llamada para publicar.
+   El formulario completo sigue abriéndose desde #aeSportTakePublish. */
+html body.ae-is-football #freeTakes #aeFootballPublishBottom{
+  display:none!important;
+}
+html body.ae-is-football #freeTakes #aeTakeComposePanel:not([open]){
+  display:none!important;
+}
+
+/* assets/cam-football-opinion-heading-labels.css */
+/* Football opinions have only their respective editorial title, no kicker. */
+html body.ae-is-football #mainContent #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-chef-heading::before{
+  content:none!important;
+  display:none!important;
+}
+
+/* assets/ae-football-news-editorial.css */
+/* AE SPORTS | Noticias de fútbol · dirección editorial.
+   Fotografía real, titulares y enlaces permanecen intactos.
+   Estas reglas sólo afectan a la categoría Fútbol; no modifican NFL ni Picks. */
+
+/* Cabecera cinematográfica a escala: unidad visual con Champions y los Takes. */
+html body.ae-is-football #mainContent div:has(> #aeNewsSectionTitle){
+  position:relative!important;
+  isolation:isolate!important;
+  box-sizing:border-box!important;
+  min-width:0!important;
+  min-height:83px!important;
+  padding:12px clamp(12px,1.7vw,20px)!important;
+  margin:0!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:10px 14px!important;
+  overflow:hidden!important;
+  border:1px solid rgba(200,157,111,.67)!important;
+  border-radius:0!important;
+  background-color:#081c2b!important;
+  background-image:
+    linear-gradient(96deg,rgba(4,19,31,.96) 0%,rgba(6,26,42,.84) 44%,rgba(10,29,44,.43) 100%),
+    url("rankings/ae-champions-stadium-night.webp")!important;
+  background-position:center,center 43%!important;
+  background-size:cover,cover!important;
+  background-repeat:no-repeat!important;
+  box-shadow:0 7px 22px rgba(0,15,25,.15),inset 0 1px rgba(255,242,215,.07)!important;
+}
+html body.ae-is-football #mainContent div:has(> #aeNewsSectionTitle)::after{
+  content:"";
+  pointer-events:none;
+  position:absolute;
+  z-index:-1;
+  inset:auto 0 0 0;
+  height:2px;
+  background:linear-gradient(90deg,#b88957,rgba(233,185,126,.85) 40%,transparent 94%);
+}
+html body.ae-is-football #mainContent #aeNewsSectionTitle{
+  display:flex!important;
+  flex:1 1 auto!important;
+  flex-direction:column!important;
+  align-items:flex-start!important;
+  justify-content:center!important;
+  gap:3px!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  background:none!important;
+  color:#fff2e4!important;
+  font:600 clamp(25px,2.5vw,35px)/1.03 Newsreader,Georgia,serif!important;
+  letter-spacing:-.035em!important;
+  text-transform:none!important;
+  text-shadow:0 2px 9px rgba(0,9,17,.35)!important;
+}
+html body.ae-is-football #mainContent #aeNewsSectionTitle::before{
+  content:"CRÓNICAS · ACTUALIDAD";
+  display:block!important;
+  margin:0!important;
+  padding:0!important;
+  color:#e8bd8c!important;
+  font:750 9px/1.15 Inter,system-ui,sans-serif!important;
+  letter-spacing:.15em!important;
+  text-transform:uppercase!important;
+  text-shadow:none!important;
+}
+html body.ae-is-football #mainContent #aeNewsSectionTitle>span{
+  display:none!important;
+}
+html body.ae-is-football #mainContent div:has(> #aeNewsSectionTitle)>.ae-news-inline-tools{
+  display:flex!important;
+  flex:0 0 auto!important;
+  flex-wrap:wrap!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  gap:7px!important;
+  width:auto!important;
+  margin:0!important;
+  min-width:0!important;
+}
+html body.ae-is-football #mainContent #articlesCount{
+  color:#e7c59e!important;
+  font:650 10px/1.2 Inter,system-ui,sans-serif!important;
+  white-space:nowrap!important;
+  text-shadow:0 1px 7px rgba(0,0,0,.5)!important;
+}
+html body.ae-is-football #mainContent #aeAllNewsSport:not([hidden]){
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  min-height:33px!important;
+  padding:7px 10px!important;
+  border:1px solid rgba(227,184,132,.75)!important;
+  border-radius:0!important;
+  background:rgba(9,31,45,.72)!important;
+  color:#f6d5ad!important;
+  font:750 10px/1.2 Inter,system-ui,sans-serif!important;
+  text-decoration:none!important;
+  box-shadow:none!important;
+}
+html body.ae-is-football #mainContent #aeAllNewsSport:not([hidden]):hover{
+  background:#b18151!important;
+  color:#061925!important;
+}
+html body.ae-is-football #mainContent #aeAllNewsSport:focus-visible{
+  outline:2px solid #ecc99a!important;
+  outline-offset:2px!important;
+}
+
+/* Tres fotografías articuladas como un pequeño periódico deportivo. */
+@media(min-width:761px){
+  html body.ae-is-football #mainContent #articlesGrid{
+    min-width:0!important;
+    margin-top:10px!important;
+    gap:clamp(8px,.9vw,13px)!important;
+    align-items:stretch!important;
+  }
+  html body.ae-is-football #mainContent #articlesGrid>article{
+    position:relative!important;
+    box-sizing:border-box!important;
+    min-width:0!important;
+    height:auto!important;
+    display:flex!important;
+    flex-direction:column!important;
+    justify-content:space-between!important;
+    margin:0!important;
+    padding:0!important;
+    overflow:hidden!important;
+    border:1px solid rgba(191,148,105,.50)!important;
+    border-top:2px solid #c99a67!important;
+    border-radius:0!important;
+    background:linear-gradient(156deg,#102a3d 0%,#0a1d2b 100%)!important;
+    box-shadow:0 5px 15px rgba(3,15,27,.12)!important;
+    transform:none!important;
+    transition:border-color .2s ease,box-shadow .2s ease!important;
+  }
+  html body.ae-is-football #mainContent #articlesGrid>article:hover{
+    transform:none!important;
+    border-color:#e4b984!important;
+    box-shadow:0 9px 22px rgba(2,14,23,.25)!important;
+  }
+  html body.ae-is-football #mainContent #articlesGrid>article>div:first-child{
+    flex:1 1 auto!important;
+    display:flex!important;
+    flex-direction:column!important;
+    min-width:0!important;
+    background:transparent!important;
+  }
+  html body.ae-is-football #mainContent #articlesGrid>article .relative.h-48{
+    position:relative!important;
+    flex:0 0 auto!important;
+    width:100%!important;
+    height:clamp(115px,12.7vw,169px)!important;
+    min-height:0!important;
+    overflow:hidden!important;
+    background:#0a2030!important;
+    border:0!important;
+    border-radius:0!important;
+  }
+  /* Sombra inclinada tenue que fusiona la fotografía con la tarjeta. */
+  html body.ae-is-football #mainContent #articlesGrid>article .relative.h-48::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    z-index:1;
+    pointer-events:none;
+    background:
+      linear-gradient(166deg,transparent 53%,rgba(4,18,29,.22) 76%,rgba(6,23,34,.68) 100%);
+  }
+  html body.ae-is-football #mainContent #articlesGrid>article .relative.h-48 img{
+    width:100%!important;
+    height:100%!important;
+    object-fit:cover!important;
+    border-radius:0!important;
+  }
+  html body.ae-is-football #mainContent #articlesGrid>article .absolute.top-3.left-3{
+    z-index:2!important;
+    left:9px!important;
+    top:9px!important;
+    padding:5px 7px!important;
+    border:1px solid rgba(232,184,131,.66)!important;
+    border-radius:0!important;
+    background:rgba(8,29,43,.88)!important;
+    color:#f7debf!important;
+    font:750 9px/1.1 Inter,system-ui,sans-serif!important;
+    letter-spacing:.06em!important;
+    box-shadow:0 2px 9px rgba(0,0,0,.14)!important;
+  }
+  html body.ae-is-football #mainContent #articlesGrid>article .p-5{
+    padding:12px 12px 13px!important;
+    flex:1 1 auto!important;
+    min-width:0!important;
+    background:transparent!important;
+  }
+  html body.ae-is-football #mainContent #articlesGrid>article .p-5>div:first-child{
+    margin-bottom:8px!important;
+    gap:4px!important;
+    flex-wrap:wrap!important;
+    color:#b6c7cb!important;
+    font:550 10px/1.35 Inter,system-ui,sans-serif!important;
+  }
+  html body.ae-is-football #mainContent #articlesGrid>article .p-5 h3{
+    margin:0 0 9px!important;
+    color:#fff0dd!important;
+    font:600 clamp(17px,1.6vw,23px)/1.10 Newsreader,Georgia,serif!important;
+    letter-spacing:-.018em!important;
+    -webkit-line-clamp:3!important;
+    line-clamp:3!important;
+    overflow-wrap:anywhere!important;
+  }
+  html body.ae-is-football #mainContent #articlesGrid>article .p-5 h3:hover{
+    color:#edbf86!important;
+  }
+  html body.ae-is-football #mainContent #articlesGrid>article .p-5 p{
+    margin:0!important;
+    color:#c0cdd1!important;
+    font:450 11px/1.52 Inter,system-ui,sans-serif!important;
+    -webkit-line-clamp:3!important;
+    line-clamp:3!important;
+    overflow-wrap:anywhere!important;
+  }
+  html body.ae-is-football #mainContent #articlesGrid>article>div:last-child{
+    display:flex!important;
+    flex-wrap:wrap!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+    gap:8px!important;
+    padding:11px 12px 12px!important;
+    margin-top:auto!important;
+    border:0!important;
+    border-top:1px solid rgba(197,153,109,.29)!important;
+    background:linear-gradient(180deg,rgba(18,48,63,.34),rgba(7,25,38,.25))!important;
+    min-width:0!important;
+  }
+  html body.ae-is-football #mainContent #articlesGrid>article>div:last-child>div:first-child{
+    min-width:0!important;
+    flex:1 1 100%!important;
+  }
+  html body.ae-is-football #mainContent #articlesGrid>article>div:last-child p{
+    color:#a8b8c0!important;
+    font:450 10px/1.37 Inter,system-ui,sans-serif!important;
+    margin:0!important;
+  }
+  html body.ae-is-football #mainContent #articlesGrid>article>div:last-child button{
+    min-height:27px!important;
+    font-size:11px!important;
+    color:#e6bc8f!important;
+  }
+  html body.ae-is-football #mainContent #articlesGrid>article>div:last-child button:hover{
+    color:#ffe4bf!important;
+  }
+  html body.ae-is-football #mainContent #articlesGrid>article>div:last-child button:focus-visible,
+  html body.ae-is-football #mainContent #articlesGrid>article h3:focus-visible{
+    outline:2px solid #e8b57f!important;
+    outline-offset:3px!important;
+  }
+}
+
+/* Día editorial marfil/azul con la misma jerarquía y las fotografías reales. */
+html:not(.dark) body.ae-is-football #mainContent div:has(> #aeNewsSectionTitle){
+  background-color:#fff7e9!important;
+  background-image:
+    linear-gradient(96deg,rgba(255,251,245,.97) 0%,rgba(255,249,239,.89) 44%,rgba(255,247,230,.42) 100%),
+    url("rankings/ae-champions-stadium-day.webp")!important;
+  border-color:rgba(174,123,75,.60)!important;
+  box-shadow:0 6px 20px rgba(67,45,29,.10)!important;
+}
+html:not(.dark) body.ae-is-football #mainContent #aeNewsSectionTitle{
+  color:#10263b!important;
+  text-shadow:none!important;
+}
+html:not(.dark) body.ae-is-football #mainContent #aeNewsSectionTitle::before{
+  color:#8f5c32!important;
+}
+html:not(.dark) body.ae-is-football #mainContent #articlesCount{
+  color:#785336!important;
+  text-shadow:none!important;
+}
+html:not(.dark) body.ae-is-football #mainContent #aeAllNewsSport:not([hidden]){
+  border-color:rgba(147,96,50,.64)!important;
+  color:#754323!important;
+  background:rgba(255,251,242,.83)!important;
+}
+html:not(.dark) body.ae-is-football #mainContent #aeAllNewsSport:not([hidden]):hover{
+  background:#976e45!important;
+  color:#fff8eb!important;
+}
+@media(min-width:761px){
+  html:not(.dark) body.ae-is-football #mainContent #articlesGrid>article{
+    background:linear-gradient(155deg,#fffaf2,#f8f0e4)!important;
+    border-color:rgba(181,137,91,.55)!important;
+    border-top-color:#b9844c!important;
+    box-shadow:0 4px 13px rgba(77,54,35,.09)!important;
+  }
+  html:not(.dark) body.ae-is-football #mainContent #articlesGrid>article:hover{
+    border-color:#af773e!important;
+    box-shadow:0 9px 19px rgba(77,54,35,.16)!important;
+  }
+  html:not(.dark) body.ae-is-football #mainContent #articlesGrid>article .relative.h-48::after{
+    background:linear-gradient(166deg,transparent 59%,rgba(255,248,236,.10) 78%,rgba(249,239,223,.45) 100%);
+  }
+  html:not(.dark) body.ae-is-football #mainContent #articlesGrid>article .absolute.top-3.left-3{
+    background:rgba(255,249,238,.93)!important;
+    border-color:rgba(151,100,57,.55)!important;
+    color:#674021!important;
+  }
+  html:not(.dark) body.ae-is-football #mainContent #articlesGrid>article .p-5>div:first-child{
+    color:#7b7066!important;
+  }
+  html:not(.dark) body.ae-is-football #mainContent #articlesGrid>article .p-5 h3{
+    color:#162a3a!important;
+  }
+  html:not(.dark) body.ae-is-football #mainContent #articlesGrid>article .p-5 h3:hover{
+    color:#9c5b27!important;
+  }
+  html:not(.dark) body.ae-is-football #mainContent #articlesGrid>article .p-5 p{
+    color:#4d5a61!important;
+  }
+  html:not(.dark) body.ae-is-football #mainContent #articlesGrid>article>div:last-child{
+    background:rgba(244,231,211,.42)!important;
+    border-top-color:rgba(170,132,89,.33)!important;
+  }
+  html:not(.dark) body.ae-is-football #mainContent #articlesGrid>article>div:last-child p{
+    color:#59616a!important;
+  }
+  html:not(.dark) body.ae-is-football #mainContent #articlesGrid>article>div:last-child button{
+    color:#80502d!important;
+  }
+  html:not(.dark) body.ae-is-football #mainContent #articlesGrid>article>div:last-child button:hover{
+    color:#1d4d60!important;
+  }
+}
+
+/* Móvil: conservar la lista compacta y la estructura aprobada.
+   Sólo decorar su encabezado y mantener un contraste correcto. */
+@media(max-width:760px){
+  html body.ae-is-football #mainContent #aeFootballMobileStage>div:has(> #aeNewsSectionTitle){
+    min-height:68px!important;
+    height:auto!important;
+    margin:4px 0 0!important;
+    padding:10px 12px!important;
+    display:flex!important;
+    align-items:center!important;
+    gap:8px!important;
+  }
+  html body.ae-is-football #mainContent #aeFootballMobileStage #aeNewsSectionTitle{
+    font-size:clamp(20px,5.5vw,27px)!important;
+    line-height:1.06!important;
+  }
+  html body.ae-is-football #mainContent #aeFootballMobileStage #aeNewsSectionTitle::before{
+    font-size:8px!important;
+    letter-spacing:.10em!important;
+  }
+  html body.ae-is-football #mainContent #aeFootballMobileStage #aeAllNewsSport:not([hidden]){
+    min-height:29px!important;
+    padding:5px 6px!important;
+    font-size:10px!important;
+    white-space:nowrap!important;
+  }
+  html body.ae-is-football #mainContent #aeFootballMobileStage #articlesGrid>article{
+    border-color:rgba(192,149,109,.40)!important;
+    border-radius:0!important;
+  }
+  html:not(.dark) body.ae-is-football #mainContent #aeFootballMobileStage #articlesGrid>article{
+    background:#fffaf3!important;
+    border-color:rgba(178,139,98,.40)!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  html body.ae-is-football #mainContent #articlesGrid>article{
+    transition:none!important;
+  }
+}
+
+
+/* Fútbol · Power Rankings alineado con el ancho del contenido editorial. */
+/* Neutraliza el max-width:1320px histórico sólo en Champions, sin alterar
+   medidas internas, fondos, animación, visibilidad ni la interfaz móvil. */
+@media (min-width:761px){
+  html body.ae-is-football #mainContent > #championsRankings.rcm-panel{
+    box-sizing:border-box!important;
+    width:100%!important;
+    max-width:none!important;
+    min-width:0!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    justify-self:stretch!important;
+  }
+}
+

@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://camsports.github.io/sitemap.xml

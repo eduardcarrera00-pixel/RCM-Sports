@@ -17,6 +17,19 @@
     document.documentElement.classList.toggle('dark', useDarkMode);
 </script>
     <title>CAM SPORTS | Tu blog deportivo</title>
+    <meta name="description" content="Noticias de NFL y fútbol, rankings, quinielas, Picks y opiniones de la comunidad CAM SPORTS.">
+    <link rel="canonical" href="https://camsports.github.io/">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="CAM SPORTS">
+    <meta property="og:locale" content="es_ES">
+    <meta property="og:title" content="CAM SPORTS | Tu blog deportivo">
+    <meta property="og:description" content="Noticias de NFL y fútbol, rankings, quinielas, Picks y opiniones de la comunidad CAM SPORTS.">
+    <meta property="og:url" content="https://camsports.github.io/">
+    <meta property="og:image" content="https://camsports.github.io/assets/social-brand/news.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="CAM SPORTS | Tu blog deportivo">
+    <meta name="twitter:description" content="Noticias de NFL y fútbol, rankings, quinielas, Picks y opiniones de la comunidad CAM SPORTS.">
+    <meta name="twitter:image" content="https://camsports.github.io/assets/social-brand/news.jpg">
 
     <link rel="stylesheet" href="assets/site.css?v=20261020-greek-terrace-village-footer-1">
 
@@ -289,22 +302,12 @@ html.dark [data-reading-size][aria-pressed="true"] {
     </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
-<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261025-community-logo-scale-1">
+<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261025-css-dedup-1">
 <link rel="stylesheet" href="assets/cam-perf-core-extras.css?v=20261024-perf-css-1">
 <script defer src="assets/ae-nfl-mobile-telephoto.js?v=20261016-1"></script>
 <link rel="stylesheet" href="assets/ae-football-mobile-redesign.css?v=20261018-hide-football-trending-mobile-1">
 <link rel="stylesheet" href="assets/ae-take-discussion-reference.css?v=20261018-comment-replies-votes-counts-2">
-<link rel="stylesheet" href="assets/ae-power-rankings-scenic.css?v=20261025-ranking-fit-1">
-<link rel="stylesheet" href="assets/ae-football-takes-scenic.css?v=20261016-uniform-grid-1">
-<link rel="stylesheet" href="assets/ae-football-news-debate.css?v=20261018-football-boards-v2">
-<style id="ae-football-opinions-heading-labels-20261017">
-/* Football opinions have only their respective editorial title, no kicker. */
-html body.ae-is-football #mainContent #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-chef-heading::before{
-  content:none!important;
-  display:none!important;
-}
-</style>
-<link rel="stylesheet" href="assets/ae-football-news-editorial.css?v=20261016-align-champions-1">
+<link rel="stylesheet" href="assets/cam-perf-sport-banners.css?v=20261025-css-seo-1">
 <link rel="stylesheet" href="assets/ae-login-art-button.css?v=20261016-3">
 <link rel="stylesheet" href="assets/ae-header-alignment-polish.css?v=20261017-login-icon-smaller-2">
 <link rel="stylesheet" href="assets/ae-admin-header-compact.css?v=20261016-1">
@@ -5209,6 +5212,7 @@ currentUser = {
             if (document.getElementById('articleModal').classList.contains('hidden')) articlePreviousFocus = document.activeElement;
             activeModalArticleId = article.id;
             if (options.updateUrl !== false) updateArticleShareUrl(article.id);
+            window.camArticleSeo?.setArticle(article);
 
             const modalDeleteButton = document.getElementById('modalDeleteArticleBtn');
             if (modalDeleteButton) {
@@ -5268,6 +5272,7 @@ loadCommentsFromSupabase(article.id);
             document.getElementById('articleModal').classList.add('hidden');
             syncModalScrollLock();
             activeModalArticleId = null;
+            window.camArticleSeo?.reset();
             articlePreviousFocus?.focus({preventScroll:true});
             updateArticleShareUrl(null);
         }
@@ -5578,7 +5583,8 @@ updateThemeButton();
     </script>
 <script src="assets/nfl-teams.js"></script>
 <script src="assets/cam-nfl-quiniela-logos.js?v=20261022-integration-1"></script>
-<script src="assets/community.js?v=20261021-rank-notes-1"></script>
+<script src="assets/cam-article-seo.js?v=20261025-news-metadata-1"></script>
+<script src="assets/community.js?v=20261025-news-metadata-1"></script>
 <script src="assets/ae-home-community-spotlight.js?v=20261018-reply-totals-1"></script>
 <script src="assets/champions.js?v=20261021-rank-notes-1"></script>
 <script src="assets/ae-ranking-notes.js?v=20261021-editorial-1"></script>

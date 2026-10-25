@@ -298,6 +298,7 @@ async function openArticleFromShareLink() {
     document.getElementById('articleMissing').classList.add('hidden');
     if (!articleId) {
         activeModalArticleId = null; ++commentsRequest;
+        window.camArticleSeo?.reset();
         document.getElementById('articleModal').classList.add('hidden'); syncModalScrollLock(); return;
     }
     let article = articles.find(a => String(a.id) === String(articleId) || a.legacyId === articleId);
@@ -312,6 +313,7 @@ async function openArticleFromShareLink() {
         if (data) { article = fromDatabase(data); articles.push(article); }
     }
     if (!article) {
+        window.camArticleSeo?.unavailable();
         document.getElementById('articleModal').classList.add('hidden'); activeModalArticleId = null;
         document.getElementById('articleMissing').classList.remove('hidden');
         document.getElementById('articleMissing').scrollIntoView(); syncModalScrollLock(); return;
@@ -326,7 +328,7 @@ function focusComment(id) {
 window.addEventListener('popstate', openArticleFromShareLink);
 async function copyShareLink() {
     if (activeModalArticleId == null) return;
-    const link = articleURL(activeModalArticleId);
+    const link = window.camArticleSeo?.shareURL(activeModalArticleId, articleURL(activeModalArticleId)) || articleURL(activeModalArticleId);
     try {
         await navigator.clipboard.writeText(link); notifyCommunity('Enlace copiado.');
     } catch {
@@ -341,7 +343,7 @@ async function copyShareLink() {
 async function shareArticle() {
     const article = articles.find(a => String(a.id) === String(activeModalArticleId)); if (!article) return;
     if (!navigator.share) return copyShareLink();
-    try { await navigator.share({title: article.title, text: article.summary, url: articleURL(article.id)}); }
+    try { await navigator.share({title: article.title, text: article.summary, url: window.camArticleSeo?.shareURL(article.id, articleURL(article.id)) || articleURL(article.id)}); }
     catch (error) { if (error.name !== 'AbortError') await copyShareLink(); }
 }
 

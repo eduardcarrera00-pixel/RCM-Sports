@@ -1,0 +1,5 @@
+/* Football opinions have only their respective editorial title, no kicker. */
+html body.ae-is-football #mainContent #aeSportTakeLeaders.ae-sport-chefs[data-sport="football"] .ae-sport-chef-heading::before{
+  content:none!important;
+  display:none!important;
+}

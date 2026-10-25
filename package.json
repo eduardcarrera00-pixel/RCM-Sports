@@ -5,6 +5,8 @@
   "scripts": {
     "build:css": "tailwindcss -i assets/styles-input.css -o assets/site.css --minify && node scripts/build-editorial-css.mjs && node scripts/build-performance-css.mjs",
     "test:database": "node tests/database.mjs",
+    "test:database:performance": "node tests/database-performance.mjs",
+    "test:seo": "node tests/article-seo.mjs",
     "test:football:points": "node tests/football-automatic-points.mjs && node tests/football-automatic-sync.mjs && node tests/football-automatic-points-browser.cjs",
     "test:browser": "node tests/browser.cjs",
     "test": "npm run test:database && npm run test:picks && npm run test:auth && npm run test:drafts && npm run test:editor && npm run test:browser && npm run test:mobile-nav && npm run test:opinions-banners && npm run test:site-banners && npm run test:performance",
