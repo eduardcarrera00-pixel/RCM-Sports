@@ -130,6 +130,9 @@ assert.equal((await one('select count(*)::int n from net.calls')).n,4,'No duplic
 assert.equal((await one('select payload from cam_social.events where event_key=$1',[newKey])).payload.selection.split('\n').length,3,'Publication snapshot remains immutable');
 await db.exec(`update ae_editorial_weekly_picks set is_published=false where id='${newId}'`);
 assert.equal((await one('select public.cam_social_video_jobs(12) jobs')).jobs.length,0,'Hidden Picks never leak through the public jobs RPC');
+await db.exec("alter table articles add column category text;insert into articles(id,title,summary,is_public,category)values('00000000-0000-0000-0000-000000000993','Nueva noticia','Resumen',true,'NFL')");
+const newsChecks=await rows("select c.url from net.checks c join cam_social.deliveries d on d.video_check_request_id=c.id where d.event_key='article:00000000-0000-0000-0000-000000000993'");
+assert.equal(newsChecks.length,2);assert.ok(newsChecks.every(c=>/\/safe-v2-[a-f0-9]{32}\.mp4$/.test(c.url)),'Queued generic videos cannot reuse old unsafe files');
 await db.exec('set role anon');
 await assert.rejects(()=>db.query('select * from cam_social.ready_pick_videos'),/permission denied/);
 await assert.rejects(()=>db.query("select cam_social.ready_pick_video_url('ae_editorial_weekly_picks','{}','adventure')"),/permission denied/);

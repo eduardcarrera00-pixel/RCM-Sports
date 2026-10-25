@@ -50,7 +50,7 @@ revoke all on function cam_social.ready_pick_video_url(text,jsonb,text) from pub
 do $migration$
 declare definition text;
   old_url text := $needle$'https://camsports.github.io/assets/social-videos/'||md5(d.event_key||':'||d.network)$needle$;
-  new_url text := $replacement$'https://camsports.github.io/assets/social-videos/'||case when d.payload->>'video_version'='pick-v2' then 'pick-v2-' else '' end||md5(d.event_key||':'||d.network)$replacement$;
+  new_url text := $replacement$'https://camsports.github.io/assets/social-videos/'||case when d.payload->>'video_version'='pick-v2' then 'pick-v2-' else 'safe-v2-' end||md5(d.event_key||':'||d.network)$replacement$;
 begin
   definition:=pg_get_functiondef('cam_social.dispatch()'::regprocedure);
   if strpos(definition,'pick-v2-')=0 then
@@ -89,4 +89,9 @@ returns jsonb language sql stable security definer set search_path='' as $functi
 $function$;
 revoke all on function public.cam_social_video_jobs(integer) from public,anon,authenticated;
 grant execute on function public.cam_social_video_jobs(integer) to anon,authenticated;
+-- A check for the old filename cannot validate the new media URL. Preserve the
+-- scheduled release time and never touch accepted, sent or uncertain deliveries.
+update cam_social.deliveries
+set video_check_request_id=null,video_check_at=null,error=null
+where network in ('instagram','tiktok') and status='queued';
 notify pgrst,'reload schema';

@@ -24,7 +24,8 @@ ellipsized or discarded. A failed photo download stops that Pick's rendering
 instead of silently substituting a logo.
 
 New filenames use `pick-v2-` plus the existing event/network hash, so old generated
-files cannot be mistaken for the new layout. Existing news/promos receive the
+files cannot be mistaken for the new layout. Other unsent videos use `safe-v2-`
+filenames, so pre-rendered unsafe files cannot be reused. Existing news/promos receive the
 safe framing too. Their data and per-network licensed music rotation are unchanged.
 Published, accepted or uncertain deliveries are never reset or re-sent.
 

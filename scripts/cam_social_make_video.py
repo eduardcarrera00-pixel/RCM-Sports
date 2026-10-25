@@ -441,15 +441,16 @@ def main():
         if network not in ("instagram", "tiktok"):
             raise ValueError("Unsupported music delivery network")
         identity = key + ":" + network
-        prefix = "pick-v2-" if job.get("video_version") == "pick-v2" else ""
+        is_pick = job.get("video_version") == "pick-v2"
+        prefix = "pick-v2-" if is_pick else "safe-v2-"
         output = OUTPUT / (prefix + hashlib.md5(identity.encode("utf-8")).hexdigest() + ".mp4")
         if output.exists() and output.stat().st_size > 30000:
             continue
         style = ("brand" if "/assets/social-brand/" in (job.get("image_url") or "")
                  else "promo" if job.get("style") == "promo" else "news")
-        make_video(read_image(job.get("image_url"), required=bool(prefix)), job.get("title"), output, style,
+        make_video(read_image(job.get("image_url"), required=is_pick), job.get("title"), output, style,
                    job.get("kicker"), job.get("music_url"), job.get("track_slug"),
-                   selection_key=identity, pick=job if prefix else None)
+                   selection_key=identity, pick=job if is_pick else None)
         print("Generated:", network, job.get("track_slug"), output.relative_to(ROOT))
 
 
