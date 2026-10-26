@@ -40,7 +40,7 @@ for(const selector of ['#aeProfileTakeHighlights .ae-profile-feature','#aeProfil
   assert.match(dialog.querySelector('h2').textContent,/Comparte este Take/);
   const caption=dialog.querySelector('textarea').value;assert.match(caption,/Take de @Lector/);assert.doesNotMatch(caption,/PRIVATE|Cuota|Pendiente/);
   const compact=new URL(dialog.querySelector('a').href).searchParams.get('url');assert.ok(compact.length<80);const visitor=new Window({url:compact});visitor.eval(fs.readFileSync('assets/cam-pick-share.js','utf8'));const href=new URL(visitor.location.href);await visitor.happyDOM.close();
-  assert.match(caption,/¿De acuerdo o tienes otra lectura/);assert.equal(href.origin,'https://camsports.github.io');assert.equal(href.searchParams.get('perfil'),owner);assert.ok(href.searchParams.has('take'));
+  assert.doesNotMatch(caption,/¿De acuerdo o tienes otra lectura/);assert.equal(href.origin,'https://camsports.github.io');assert.equal(href.searchParams.get('perfil'),owner);assert.ok(href.searchParams.has('take'));
   const row=takes.find(t=>t.id===href.searchParams.get('take'));assert.ok(caption.includes(row.body.trim()),'Copy text retains the full published Take');
   assert.equal(dialog.querySelector('.cam-pick-share-download').download,'cam-sports-take-'+row.id+'.png');
   const preview=dialog.querySelector('.cam-pick-share-preview img');assert.equal(preview.width,1080);assert.equal(preview.height,1080,'Take cards default to 1:1');

@@ -29,8 +29,10 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install --with-deps chromium webkit
       - name: Verify sharing and community/profile integration
         run: npm run test:sharing && npm run test:picks && node tests/profile-compose.mjs
       - name: Verify PNG, mobile layouts and native share activation
         run: npm run test:sharing:browser
+      - name: Verify Take export with the WebKit engine and iPhone viewport
+        run: CAM_SHARE_BROWSER=webkit node tests/pick-sharing-takes-browser.cjs

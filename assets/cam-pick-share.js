@@ -37,9 +37,11 @@
   if(kind==='take'){
    if(p.hidden||!UUID.test(String(p.author_id)))throw Error('No se puede compartir este Take.');
    const sports={nfl:'NFL',football:'Fútbol',laliga:'LaLiga',premier:'Premier League',ligamx:'Liga MX',champions:'Champions League',colegial:'Fútbol colegial'};
-   const date=String(p.created_at||'').slice(0,10);
+   const published=p.created_at?new Date(p.created_at):null;
+   // Use the same local calendar day as the original Take's date on the site.
+   const date=published&&!Number.isNaN(published.getTime())?[published.getFullYear(),String(published.getMonth()+1).padStart(2,'0'),String(published.getDate()).padStart(2,'0')].join('-'):'';
    return {id:String(p.id).toLowerCase(),kind:'take',author_id:String(p.author_id).toLowerCase(),
-    author:'@'+clean(p.author||'Aficionado',60).replace(/^@/,''),title:clean(p.title||'Take',160),body:clean(p.body,2000),
+    author:'@'+clean(p.author||'Aficionado',80).replace(/^@/,''),title:String(p.title||'Take').trim(),body:String(p.body||'').trim(),
     competition:clean(p.competition||sports[p.sport]||'Deportes',60),date:/^\d{4}-\d{2}-\d{2}$/.test(date)?date:'',
     up:Math.max(0,Math.trunc(Number(p.upvotes)||0)),down:Math.max(0,Math.trunc(Number(p.downvotes)||0))};
   }
@@ -60,7 +62,7 @@
  const headline=p=>(p.kind==='take'?'Take de '+p.author:p.kind==='weekly'?'Pick del editor':'Pick de '+p.author)+' · CAM SPORTS';
  const quota=p=>p.verified?'Cuota verificada · '+p.odds:'Cuota '+p.odds+(p.review?' · '+p.review:p.kind==='weekly'?' · Editorial':'');
  const invitation=p=>p.kind==='take'?'¿De acuerdo o tienes otra lectura?':p.state==='won'?'Aquí lo que se canta, se baila.':p.state==='lost'?'También se da la cara cuando no sale.':p.state==='void'?'Este no cuenta en el marcador.':'Sobre la mesa. ¿Lo sigues o lo debates?';
- function caption(p){if(p.kind==='take')return [headline(p),p.competition,p.title,p.body,invitation(p),urlFor(p)].filter(Boolean).join('\n\n');return [headline(p),p.result,p.title,...p.legs.map(l=>[l.event,l.selection].filter(Boolean).join(' · ')),quota(p),invitation(p),urlFor(p)].filter(Boolean).join('\n\n');}
+ function caption(p){if(p.kind==='take')return [headline(p),p.title,p.body,urlFor(p)].filter(Boolean).join('\n\n');return [headline(p),p.result,p.title,...p.legs.map(l=>[l.event,l.selection].filter(Boolean).join(' · ')),quota(p),invitation(p),urlFor(p)].filter(Boolean).join('\n\n');}
  // Reserve the URL's 23 X characters and keep the result/verification/CTA intact
  // even when a title, author or selection is long (including wide characters).
  const weight=s=>Array.from(s).reduce((n,c)=>n+(c.codePointAt(0)>0x10ff?2:1),0);
@@ -114,23 +116,41 @@
 
  // Take cards intentionally use the same blue editorial layout in both site themes.
  const takeFragments=body=>{
-  const source=clean(body,2000);if(!source)return [];
-  const sentences=source.match(/[^.!?]+(?:[.!?]+|$)/g)?.map(s=>s.trim()).filter(Boolean)||[source];
-  const parts=[];let part='';
-  for(const sentence of sentences){
-   if(part&&(part.length+sentence.length)>260){parts.push(part);part='';}
-   if(sentence.length>320){
-    if(part){parts.push(part);part='';}
-    const words=sentence.split(/\s+/);let chunk='';
-    for(const word of words){if(chunk&&chunk.length+word.length+1>245){parts.push(chunk);chunk='';}chunk+=(chunk?' ':'')+word;}
-    if(chunk)parts.push(chunk);
-   }else part+=(part?' ':'')+sentence;
+  // Every choice is a contiguous slice of the original, including punctuation
+  // and internal whitespace. Never rebuild sentences or cut a word in half.
+  let rest=String(body||'').trim();const parts=[];
+  while(rest){
+   let end=rest.length;
+   if(end>280){
+    const head=rest.slice(0,281),sentences=[...head.matchAll(/[.!?](?:["”’»])?(?=\s)/g)];
+    const sentence=sentences.at(-1);
+    const space=head.search(/\s+\S*$/);
+    end=sentence&&sentence.index>65?sentence.index+sentence[0].length:space>0?space:rest.search(/\s/);
+    if(end<=0)end=rest.length;
+   }
+   const part=rest.slice(0,end).trim();if(part)parts.push(part);
+   rest=rest.slice(end).trim();
   }
-  if(part)parts.push(part);
-  return parts.slice(0,12);
+  return parts;
  };
- // Extractive, rather than a fabricated paraphrase: preserve the author's words.
- const takeSummary=body=>takeFragments(body).slice(0,2).join(' ').slice(0,480);
+ // A brief extractive summary requires no external model or database writes.
+ // Label it as a summary, never put quotation marks around generated content.
+ const takeSummary=body=>{
+  const first=takeFragments(body)[0]||'';
+  const sentences=[...first.matchAll(/[.!?](?:["”’»])?(?=\s|$)/g)];
+  const end=sentences[Math.min(1,sentences.length-1)];
+  return end?first.slice(0,end.index+end[0].length):first;
+ };
+ let takeFonts=null;
+ function prepareTakeFonts(){
+  if(!document.fonts?.load)return null;
+  if(!takeFonts)takeFonts=Promise.all([
+   document.fonts.load('600 80px "Playfair Display"'),
+   document.fonts.load('400 32px "Libre Baskerville"'),
+   document.fonts.load('700 32px "Libre Baskerville"')
+  ]).catch(()=>{takeFonts=null;});
+  return takeFonts;
+ }
  function roundedShareBackground(c,w,h,r){
   c.fillStyle='#073B83';c.beginPath();
   if(typeof c.roundRect==='function')c.roundRect(0,0,w,h,r);
@@ -147,55 +167,53 @@
   const c=canvas.getContext('2d');if(!c)throw Error('Este navegador no permite generar la imagen. Prueba descargarla desde otro navegador.');
   roundedShareBackground(c,w,h,72);
   // White letterform logo, integrated into the same blue background (no box).
+  // Story content stays below the top chrome and above captions/navigation;
+  // its right margin also reserves space for TikTok's action rail.
+  const margin=82,right=portrait?916:998,maxWidth=right-margin;
+  const logoTop=portrait?295:85,logoWidth=174;
   c.textAlign='right';c.fillStyle='#fff';
-  c.font='700 80px "Playfair Display", Georgia, serif';c.fillText('CAM',w-77,153);
-  c.strokeStyle='#fff';c.lineWidth=3;c.beginPath();c.moveTo(w-302,168);c.lineTo(w-78,168);c.stroke();
-  c.font='600 24px Inter, Arial, sans-serif';c.fillText('S P O R T S',w-80,207);c.textAlign='left';
+  c.font='600 66px "Playfair Display", Georgia, serif';c.fillText('CAM',right,logoTop+65);
+  c.strokeStyle='#fff';c.lineWidth=2;c.beginPath();c.moveTo(right-logoWidth,logoTop+77);c.lineTo(right,logoTop+77);c.stroke();
+  c.font='500 18px Arial, sans-serif';c.fillText('S P O R T S',right,logoTop+106);c.textAlign='left';
 
   const mode=options.mode||'title',extra=mode==='summary'?takeSummary(p.body):mode==='fragment'?takeFragments(p.body)[options.fragment||0]||'':'';
-  const footerY=h-165,baseTop=portrait?515:267,margin=82,maxWidth=w-margin*2;
-  const textSpace=(portrait?footerY-125:footerY-98)-baseTop-(extra?portrait?460:275:0);
-  let font=portrait?90:88,lines=[];
-  for(;font>=31;font-=2){
-   c.font='600 '+font+'px "Playfair Display", Georgia, serif';
-   lines=wrap(c,p.title.toLocaleUpperCase('es'),maxWidth,Infinity);
-   if(lines.length*font*1.16<=textSpace)break;
+  const footerY=portrait?1370:909,baseTop=portrait?480:264,textSpace=footerY-70-baseTop;
+  const scale={compact:.86,large:1.14}[options.textSize]||1;
+  let font=Math.round((extra?82:104)*scale),extraFont=36,lines=[],extraLines=[],block=0;
+  for(;font>=22;font-=1){
+   c.font='600 '+font+'px "Playfair Display", Georgia, serif';lines=wrap(c,p.title,maxWidth,Infinity);
+   extraFont=Math.max(22,Math.min(portrait?40:34,Math.round(font*.55)));
+   c.font='400 '+extraFont+'px "Libre Baskerville", Georgia, serif';extraLines=extra?wrap(c,extra,maxWidth,Infinity):[];
+   block=lines.length*font*1.16+(extra?76+extraLines.length*extraFont*1.4:0);
+   if(block<=textSpace)break;
   }
-  c.fillStyle='#fff';c.font='600 '+Math.max(font,31)+'px "Playfair Display", Georgia, serif';
-  const step=Math.max(font,31)*1.16;
-  // The title is visually uppercase; the original stored title remains unchanged.
-  let y=baseTop+Math.max(font,31);
-  for(const line of lines){c.fillText(line,margin,y);y+=step;}
+  if(block>textSpace)throw Error('Este texto necesita más espacio. Elige otro fragmento o el formato vertical.');
+  c.fillStyle='#fff';c.font='600 '+font+'px "Playfair Display", Georgia, serif';
+  let y=baseTop+(textSpace-block)/2+font;
+  for(const line of lines){c.fillText(line,margin,y);y+=font*1.16;}
   if(extra){
-   y+=portrait?120:65;
-   c.fillStyle='#DDC5AD';c.font='600 25px Inter, Arial, sans-serif';
-   c.fillText(mode==='summary'?'RESUMEN DEL TAKE':'FRAGMENTO ORIGINAL',margin,y);y+=48;
-   c.fillStyle='#fff';
-   let extraFont=portrait?45:34,extraLines=[];
-   for(;extraFont>=25;extraFont-=2){
-    c.font='400 '+extraFont+'px "Libre Baskerville", Georgia, serif';
-    extraLines=wrap(c,extra,maxWidth,Infinity);
-    if(y+extraLines.length*extraFont*1.45<=(footerY-65))break;
-   }
-   // A summary/fragment is supplemental; crop it, never the title or attribution.
-   const max=Math.max(1,Math.floor((footerY-68-y)/(Math.max(extraFont,25)*1.45)));
-   c.font='400 '+Math.max(extraFont,25)+'px "Libre Baskerville", Georgia, serif';
-   for(const line of wrap(c,extra,maxWidth,max)){y+=Math.max(extraFont,25)*1.45;c.fillText(line,margin,y);}
+   y+=28-font;c.fillStyle='#DDC5AD';c.font='600 21px Arial, sans-serif';
+   c.fillText(mode==='summary'?'RESUMEN DEL TAKE':'FRAGMENTO ORIGINAL',margin,y);y+=30;
+   c.fillStyle='#fff';c.font='400 '+extraFont+'px "Libre Baskerville", Georgia, serif';
+   for(const line of extraLines){y+=extraFont*1.4;c.fillText(line,margin,y);}
   }
-  c.strokeStyle='#BE9270';c.lineWidth=3;c.beginPath();c.moveTo(margin,footerY);c.lineTo(w-margin,footerY);c.stroke();
+  c.strokeStyle='#BE9270';c.lineWidth=2;c.beginPath();c.moveTo(margin,footerY);c.lineTo(right,footerY);c.stroke();
   c.fillStyle='#fff';c.textAlign='left';c.font='400 34px "Libre Baskerville", Georgia, serif';
   c.fillText('Por',margin,footerY+75);
   let username=p.author.replace(/^@/,'')||'Aficionado';
   let nameFont=35;
   const date=options.showDate===false?'':p.date.split('-').reverse().join('/');
-  const dateWidth=date?235:0;
+  const dateWidth=date?245:0;
   for(;nameFont>=20;nameFont-=1){
    c.font='700 '+nameFont+'px "Libre Baskerville", Georgia, serif';
-   if(c.measureText(username).width<=w-2*margin-105-dateWidth)break;
+   if(c.measureText(username).width<=maxWidth-90-dateWidth)break;
   }
-  c.fillText(username,margin+72,footerY+75);
-  if(date){c.fillStyle='#BE9270';c.fillRect(w-margin-239,footerY+37,2,43);
-   c.fillStyle='#fff';c.textAlign='right';c.font='400 30px "Libre Baskerville", Georgia, serif';c.fillText(date,w-margin,footerY+75);c.textAlign='left';}
+  // Wrap a long username as needed instead of overlapping the publication date.
+  const names=wrap(c,username,maxWidth-90-dateWidth,Infinity);
+  c.font='700 '+Math.max(20,nameFont)+'px "Libre Baskerville", Georgia, serif';
+  names.forEach((line,i)=>c.fillText(line,margin+72,footerY+75+i*26));
+  if(date){c.fillStyle='#BE9270';c.fillRect(right-225,footerY+37,2,43);
+   c.fillStyle='#fff';c.textAlign='right';c.font='400 28px "Libre Baskerville", Georgia, serif';c.fillText(date,right,footerY+75);c.textAlign='left';}
   return canvas;
  }
 
@@ -213,14 +231,6 @@
   c.fillStyle=bronze;c.font='600 24px Arial,sans-serif';c.fillText(clean(p.author,48),90,276);
   c.fillStyle=ink;c.font='bold 46px Georgia,serif';wrap(c,p.title,900,2).forEach((l,i)=>c.fillText(l,90,341+i*55));
   c.strokeStyle='#d9d9d0';c.lineWidth=2;c.beginPath();c.moveTo(90,427);c.lineTo(990,427);c.stroke();
-  if(p.kind==='take'){
-   c.fillStyle=bronze;c.font='600 25px Arial,sans-serif';c.fillText(p.competition,90,479);
-   c.fillStyle=ink;c.font='34px Georgia,serif';
-   const lines=wrap(c,p.body,900,11);lines.forEach((line,i)=>c.fillText(line,90,550+i*43));
-   c.fillStyle=muted;c.font='22px Arial,sans-serif';c.fillText('Lee el Take completo y responde en CAM SPORTS',90,1038);
-   c.fillStyle='#102b3e';c.fillRect(90,1071,900,122);c.fillStyle='#f4e8db';c.font='22px Arial,sans-serif';c.fillText('LA COMUNIDAD OPINA',118,1110);
-   c.font='bold 30px Georgia,serif';c.fillText(p.up+' apoyos · '+p.down+' cuestionamientos',118,1167);
-  }else{
   let y=479;
   for(const [i,l] of p.legs.slice(0,3).entries()){
    c.fillStyle=bronze;c.font='600 22px Arial,sans-serif';c.fillText(String(i+1).padStart(2,'0'),90,y);
@@ -233,8 +243,7 @@
   c.fillText(more,90,1038);
   c.fillStyle='#102b3e';c.fillRect(90,1071,900,122);c.fillStyle='#f4e8db';c.font='22px Arial,sans-serif';c.fillText(p.verified?'CUOTA VERIFICADA':'CUOTA TOTAL',118,1110);c.font='bold 52px Georgia,serif';c.fillText(p.odds,118,1167);
   c.font='600 25px Arial,sans-serif';c.textAlign='right';c.fillText(p.result,960,1140);if(p.review){c.font='20px Arial,sans-serif';c.fillText(p.review,960,1175);}c.textAlign='left';
-  }
-  c.fillStyle=muted;c.font='22px Arial,sans-serif';c.fillText(p.date?(p.kind==='take'?'Publicado':'Evento')+' · '+p.date:'El deporte también se debate.',90,1241);
+  c.fillStyle=muted;c.font='22px Arial,sans-serif';c.fillText(p.date?'Evento · '+p.date:'El deporte también se debate.',90,1241);
   c.fillStyle=bronze;c.font='600 22px Arial,sans-serif';c.textAlign='right';c.fillText('camsports.github.io',990,1241);c.textAlign='left';
   return canvas;
  }
@@ -251,34 +260,41 @@
   let p;try{p=model(pick,kind);}catch(error){if(typeof notifyCommunity==='function')notifyCommunity(error.message,true);return;}
   restoreFocus=opener;release();const ticket=++request;
   if(!dialog){dialog=make('dialog',null,'cam-pick-share-dialog');dialog.id='camPickShareDialog';dialog.setAttribute('aria-labelledby','camPickShareTitle');document.body.append(dialog);dialog.addEventListener('close',()=>{if(dialog.open)return;request++;release();restoreFocus?.focus?.({preventScroll:true});});dialog.addEventListener('click',e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)close();}});}
+  dialog.classList.toggle('cam-take-share-dialog',p.kind==='take');
   const top=make('div',null,'cam-pick-share-heading');const heading=make('h2',p.kind==='take'?'Comparte este Take':p.kind==='weekly'?'Comparte el Pick del editor':'Comparte este Pick');heading.id='camPickShareTitle';top.append(heading);
   const exit=make('button','Cerrar','cam-pick-share-close');exit.type='button';exit.onclick=close;top.append(exit);
-  const intro=make('p','Llévalo a tus redes y que empiece el debate.','cam-pick-share-intro');
+  const intro=make('p',p.kind==='take'?'Tu Take, listo para compartir como imagen.':'Llévalo a tus redes y que empiece el debate.','cam-pick-share-intro');
   const layout=make('div',null,'cam-pick-share-layout');const preview=make('div',null,'cam-pick-share-preview');preview.setAttribute('aria-busy','true');preview.append(make('p','Preparando tarjeta…'));
   const content=make('div',null,'cam-pick-share-content');const actions=make('div',null,'cam-pick-share-networks');actions.setAttribute('aria-label','Opciones para compartir');
   const x=make('a','X','cam-pick-share-network');x.href=xUrl(p);x.target='_blank';x.rel='noopener noreferrer';x.setAttribute('aria-label','Abrir publicación preparada en X');
+  if(p.kind==='take')x.setAttribute('aria-label','Compartir imagen en X');
   const ig=make('button','Instagram','cam-pick-share-network'),tk=make('button','TikTok','cam-pick-share-network');ig.type=tk.type='button';ig.disabled=tk.disabled=true;actions.append(x,ig,tk);
   const hint=make('p','Elige Instagram o TikTok desde el menú de tu teléfono. Si la app solo recibe la imagen, usa «Copiar texto» para añadir el mensaje y el enlace. También puedes descargar la tarjeta.','cam-pick-share-hint');
   const status=make('p','', 'cam-pick-share-status');status.setAttribute('role','status');status.setAttribute('aria-live','polite');
   const download=make('a','Descargar tarjeta','cam-pick-share-download');download.hidden=true;download.download=`cam-sports-${p.kind==='take'?'take':p.kind==='weekly'?'pick-del-dia':'pick'}-${p.id}.png`;
+  if(p.kind==='take')download.textContent='Descargar imagen';
   const linkButton=make('button','Copiar enlace'),textButton=make('button','Copiar texto');linkButton.type=textButton.type='button';
   linkButton.onclick=()=>copy(urlFor(p),status,'Enlace copiado.');textButton.onclick=()=>copy(caption(p),status,'Texto y enlace copiados.');
   const utilities=make('div',null,'cam-pick-share-utilities');utilities.append(download,linkButton,textButton);
   const label=make('label','Texto para tu publicación','cam-pick-share-caption-label');const text=make('textarea');text.value=caption(p);text.readOnly=true;text.rows=5;text.setAttribute('aria-label','Texto y enlace de la publicación');label.append(text);
-  let takeOptions={mode:'title',size:'square',showDate:true,fragment:0};
-  let editor=null,modeSelect=null,fragmentLabel=null,fragmentSelect=null,sizeSelect=null,dateToggle=null;
+  const defaults=()=>({mode:'title',size:'square',showDate:true,fragment:0,textSize:'auto'});
+  let takeOptions=defaults();
+  let editor=null,modeSelect=null,fragmentLabel=null,fragmentSelect=null,sizeSelect=null,dateToggle=null,textSizeSelect=null,selectionNote=null,shareButton=null;
   if(p.kind==='take'){
    editor=make('section',null,'cam-take-share-editor');editor.setAttribute('aria-label','Personalizar la ficha del Take');
    const title=make('strong','Personaliza tu ficha','cam-take-share-editor-title');editor.append(title);
    const field=(name,control)=>{const label=make('label',name,'cam-take-share-field');label.append(control);editor.append(label);return label;};
-   modeSelect=make('select');for(const [value,name] of [['title','Solo título'],['summary','Título + resumen original'],['fragment','Título + fragmento']]){const option=make('option',name);option.value=value;modeSelect.append(option);}
+   modeSelect=make('select');for(const [value,name] of [['title','Solo título'],['summary','Con resumen'],['fragment','Con fragmento']]){const option=make('option',name);option.value=value;modeSelect.append(option);}
    field('Contenido de la ficha',modeSelect);
    fragmentSelect=make('select');const pieces=takeFragments(p.body);
    pieces.forEach((piece,i)=>{const option=make('option','Fragmento '+(i+1)+': '+piece.slice(0,44)+(piece.length>44?'…':''));option.value=String(i);fragmentSelect.append(option);});
-   fragmentLabel=field('Fragmento del texto original',fragmentSelect);fragmentLabel.hidden=true;
+   fragmentLabel=field('Fragmento del texto original',fragmentSelect);fragmentLabel.classList.add('cam-take-share-fragment');fragmentLabel.hidden=true;
+   selectionNote=make('p','','cam-take-share-selection');selectionNote.hidden=true;editor.append(selectionNote);
    if(!pieces.length){modeSelect.querySelector('option[value="summary"]').disabled=true;modeSelect.querySelector('option[value="fragment"]').disabled=true;}
-   sizeSelect=make('select');for(const [value,name] of [['square','Publicación · 1:1'],['story','Historia / TikTok · 9:16']]){const option=make('option',name);option.value=value;sizeSelect.append(option);}
+   sizeSelect=make('select');for(const [value,name] of [['square','Cuadrada'],['story','Vertical']]){const option=make('option',name);option.value=value;sizeSelect.append(option);}
    field('Formato',sizeSelect);
+   textSizeSelect=make('select');for(const [value,name] of [['auto','Automático'],['compact','Pequeño'],['large','Grande']]){const option=make('option',name);option.value=value;textSizeSelect.append(option);}
+   field('Tamaño del texto',textSizeSelect);
    const dateLabel=make('label',null,'cam-take-share-checkbox');dateToggle=make('input');dateToggle.type='checkbox';dateToggle.checked=true;dateLabel.append(dateToggle,make('span','Mostrar fecha'));editor.append(dateLabel);
    const reset=make('button','Restablecer diseño','cam-take-share-reset');reset.type='button';editor.append(reset);
    content.prepend(editor);
@@ -286,46 +302,70 @@
    fragmentSelect.onchange=()=>{takeOptions.fragment=Number(fragmentSelect.value)||0;refresh();};
    sizeSelect.onchange=()=>{takeOptions.size=sizeSelect.value;refresh();};
    dateToggle.onchange=()=>{takeOptions.showDate=dateToggle.checked;refresh();};
-   reset.onclick=()=>{takeOptions={mode:'title',size:'square',showDate:true,fragment:0};modeSelect.value='title';fragmentSelect.value='0';fragmentLabel.hidden=true;sizeSelect.value='square';dateToggle.checked=true;refresh();};
+   textSizeSelect.onchange=()=>{takeOptions.textSize=textSizeSelect.value;refresh();};
+   reset.onclick=()=>{takeOptions=defaults();modeSelect.value='title';fragmentSelect.value='0';fragmentLabel.hidden=true;sizeSelect.value='square';textSizeSelect.value='auto';dateToggle.checked=true;refresh();};
   }
-  content.append(actions,hint,utilities,status,label);layout.append(preview,content);dialog.replaceChildren(top,intro,layout);
+  if(p.kind==='take'){
+   hint.textContent='El menú del teléfono permite elegir una app. Si no recibe imágenes, descarga el PNG y adjúntalo; puedes copiar el enlace por separado.';
+   const details=make('details',null,'cam-take-share-caption');details.append(make('summary','Texto y enlace del Take'),label,textButton);
+   content.append(actions,hint,details);layout.append(preview,content);
+   shareButton=make('button','Compartir imagen','cam-take-share-primary');shareButton.type='button';shareButton.disabled=true;utilities.prepend(shareButton);
+   const bar=make('div',null,'cam-take-share-bar');bar.append(utilities,status);dialog.replaceChildren(top,intro,layout,bar);
+  }else{content.append(actions,hint,utilities,status,label);layout.append(preview,content);dialog.replaceChildren(top,intro,layout);}
   if(!dialog.open)dialog.showModal();exit.focus({preventScroll:true});dialog.scrollTop=0;
 
-  let file=null,generation=0;
+  let file=null,generation=0,imageOnly=false,sharingPending=false;
+  const ready=()=>{ig.disabled=tk.disabled=!file||sharingPending;if(shareButton)shareButton.disabled=!file||sharingPending;if(p.kind==='take')x.setAttribute('aria-disabled',String(!file||sharingPending));};
   function nativeShare(network){
-   if(!file)return;
+   if(!file||sharingPending)return;
    let fileSharing=false;try{fileSharing=typeof navigator.share==='function'&&Boolean(navigator.canShare?.({files:[file]}));}catch{}
    if(fileSharing){
-    let sharing;
+    let sharing;const current=generation;
+    let data={files:[file],title:headline(p),text:caption(p),url:urlFor(p)};
+    if(p.kind==='take'){
+     data.text=p.title;
+     // Instagram and TikTok often filter out combined text/file shares. Hand
+     // them the image; the separate copy action retains the original permalink.
+     let combined=false;try{combined=navigator.canShare(data);}catch{}
+     if(imageOnly||network==='Instagram'||network==='TikTok'||!combined)data={files:[file]};
+    }
     // Keep the native share invocation within the user's tap (iOS activation).
-    try{sharing=navigator.share({files:[file],title:headline(p),text:caption(p),url:urlFor(p)});}
-    catch{status.textContent='Descarga la tarjeta y compártela desde '+network+'.';return;}
-    Promise.resolve(sharing).then(()=>{if(ticket===request)status.textContent='Imagen enviada al menú de compartir. Selecciona la aplicación y completa la publicación.';})
-    .catch(e=>{if(ticket===request)status.textContent=e?.name==='AbortError'?'Puedes volver a compartir cuando quieras.':'Descarga la tarjeta y compártela desde '+network+'.';});
-   }else status.textContent='Descarga la tarjeta; tu navegador no permite enviarla directamente. Súbela desde '+network+'.';
+    const failure=e=>{
+     if(ticket!==request||current!==generation)return;
+     if(e?.name==='AbortError'){status.textContent='Puedes volver a compartir cuando quieras.';return;}
+     if(p.kind==='take'&&data.text){imageOnly=true;shareButton.textContent='Compartir solo imagen';status.textContent='No se pudo enviar la imagen con el enlace. Pulsa «Compartir solo imagen» o descarga el PNG.';}
+     else status.textContent='Descarga la tarjeta y adjúntala en la aplicación. También puedes copiar el enlace.';
+    };
+    try{sharing=navigator.share(data);}catch(e){failure(e);return;}
+    sharingPending=true;ready();
+    Promise.resolve(sharing).then(()=>{if(ticket===request&&current===generation)status.textContent='Imagen entregada al menú de compartir. Completa la publicación en la aplicación elegida.';})
+    .catch(failure).finally(()=>{sharingPending=false;if(ticket===request)ready();});
+   }else status.textContent='Descarga la tarjeta; tu navegador no permite enviarla directamente. Adjunta el PNG en la aplicación y usa «Copiar enlace» si lo necesitas.';
   }
+  if(shareButton)shareButton.onclick=()=>nativeShare('tu aplicación');
   for(const [button,network] of [[ig,'Instagram'],[tk,'TikTok']])button.onclick=()=>nativeShare(network);
   if(p.kind==='take'){
    // X Intent only transfers text. Prefer native file share; otherwise make the
    // image download explicit rather than pretending the tweet contains media.
    x.addEventListener('click',e=>{
-    if(file&&typeof navigator.share==='function'&&navigator.canShare?.({files:[file]})){e.preventDefault();nativeShare('X');}
-    else status.textContent='X abrirá el texto y el enlace. Para incluir la imagen, descárgala y adjúntala manualmente.';
+    e.preventDefault();nativeShare('X');
    });
   }
   function refresh(){
-   const current=++generation;file=null;ig.disabled=tk.disabled=true;download.hidden=true;release();
+   const current=++generation;file=null;ready();download.hidden=true;download.removeAttribute('href');release();
+   if(selectionNote){selectionNote.hidden=takeOptions.mode==='title';selectionNote.textContent=takeOptions.mode==='summary'?'Resumen extractivo automático: selección de frases del Take, sin texto añadido.':takeFragments(p.body)[takeOptions.fragment]||'';}
    preview.replaceChildren(make('p','Preparando tarjeta…'));preview.setAttribute('aria-busy','true');status.textContent='';
-   try{
+   const draw=()=>{if(ticket!==request||current!==generation||!dialog.open)return;try{
     const canvas=renderCard(p,takeOptions);
     canvas.toBlob(blob=>{
      if(ticket!==request||current!==generation||!dialog.open)return;
      if(!blob){preview.replaceChildren(make('p','No se pudo preparar la imagen. Puedes copiar el texto o el enlace.'));preview.setAttribute('aria-busy','false');return;}
      resource=URL.createObjectURL(blob);const img=make('img');img.src=resource;img.alt='Ficha para compartir: '+p.title+' · '+p.author;img.width=canvas.width;img.height=canvas.height;
      preview.replaceChildren(img);preview.setAttribute('aria-busy','false');
-     file=new File([blob],download.download,{type:'image/png'});download.href=resource;download.hidden=false;ig.disabled=tk.disabled=false;
+     file=new File([blob],download.download,{type:'image/png'});download.href=resource;download.hidden=false;ready();
     },'image/png');
-   }catch(error){preview.replaceChildren(make('p',error.message));preview.setAttribute('aria-busy','false');}
+   }catch(error){preview.replaceChildren(make('p',error.message));preview.setAttribute('aria-busy','false');}};
+   const fonts=p.kind==='take'?prepareTakeFonts():null;if(fonts)fonts.then(draw);else draw();
   }
   refresh();
 
