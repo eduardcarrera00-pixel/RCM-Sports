@@ -302,7 +302,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
     </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
-<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261025-css-dedup-1">
+<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261026-ticket-views-1">
 <link rel="stylesheet" href="assets/cam-perf-core-extras.css?v=20261024-perf-css-1">
 <script defer src="assets/ae-nfl-mobile-telephoto.js?v=20261016-1"></script>
 <link rel="stylesheet" href="assets/ae-football-mobile-redesign.css?v=20261018-hide-football-trending-mobile-1">
@@ -2741,7 +2741,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
 <link rel="stylesheet" href="assets/cam-global-edit.css?v=20261022-logo-size-1">
 <link rel="stylesheet" href="assets/cam-mobile-bottom-nav.css?v=20261022-mobile-svg-circles-integrated-1">
 
-<link rel="stylesheet" href="assets/cam-take-cta.css?v=20261023-take-cta-no-left-feather-2">
+<link rel="stylesheet" href="assets/cam-take-cta.css?v=20261026-ticket-views-1">
 <script defer src="assets/cam-take-cta.js?v=20261023-take-cta-unificado-1"></script>
 <link rel="stylesheet" href="assets/cam-nfl-opinions-header-only.css?v=20261023-futbol-opinions-day-night-1">
 <link rel="stylesheet" href="assets/cam-football-ranking-banners.css?v=20261023-football-ranking-banner-1">
@@ -3223,6 +3223,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
         <!-- Los Takes son una función editorial al final de NFL y Fútbol, no una categoría de navegación. -->
         <section id="freeTakes" class="ae-takes ae-free-takes" hidden aria-labelledby="freeTakesTitle">
           <div class="ae-takes-head"><span class="ae-takes-eyebrow">Takes de la comunidad</span><h2 id="freeTakesTitle">Demuestra tu conocimiento</h2><p>La comunidad vota y debate tus Takes. Los aciertos pueden sumar puntos; tu historial queda en tu perfil. Lo publicado no se borra.</p><button id="aeSportTakePublish" onclick="event.stopImmediatePropagation(); if(typeof window.aeOpenTakeComposer==='function'){window.aeOpenTakeComposer();}else{const modal=document.getElementById('aeTakeComposerDialog');if(modal&&!modal.open)modal.showModal();}" type="button" class="ae-participate-cta ae-sport-take-publish cam-take-cta-option7" aria-controls="aeTakeComposerDialog" aria-haspopup="dialog"><span class="cam-take-cta-text">Publicar mi Take</span><span class="cam-take-cta-arrow" aria-hidden="true">→</span></button></div>
+          <p class="cam-take-invitation" id="camTakeInvitation">Seguro que alguna vez dijiste “esto va a pasar”… y pasó. Ahora nadie te cree. Publica tu take y deja constancia para la historia. <strong>Aquí, lo que se publica no se borra.</strong></p>
           <!-- Dos columnas de opiniones: dentro del módulo, inmediatamente después del título. -->
         <section id="aeSportTakeLeaders" class="ae-sport-voice ae-sport-chefs" hidden aria-label="Takes más apoyados y más cuestionados de la comunidad">
           <p id="aeSportTakeStatus" class="sr-only" role="status" aria-live="polite">Cargando Takes…</p>
@@ -3253,9 +3254,15 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
                 <h2 id="camNflTitle">LA QUINIELA NFL</h2>
                 <p><strong>Cada jornada es una oportunidad para demostrar cuánto sabes.</strong> Elige a los ganadores: cuanto más difícil sea el acierto, más puntos sumas.</p>
               </header>
-              <div id="camNflNav" class="cam-nfl-nav" aria-label="Temporada y jornada"></div>
+              <nav id="camNflViewTabs" class="cam-quiniela-view-tabs" aria-label="Vistas de La Quiniela">
+                <button type="button" data-view="jornada" aria-pressed="true" aria-controls="camNflMatchPanel">Jornada</button>
+                <button type="button" data-view="month" aria-pressed="false" aria-controls="camNflQuinielaStandings">Clasificación mensual</button>
+                <button type="button" data-view="all" aria-pressed="false" aria-controls="camNflQuinielaStandings">Clasificación histórica</button>
+              </nav>
+              <div id="camNflNav" class="cam-nfl-nav" aria-label="Jornada"></div>
               <p id="camNflWeekInfo" class="cam-nfl-status" aria-live="polite"></p>
             </div>
+            <div id="camNflMatchPanel">
             <p id="camNflStatus" class="cam-nfl-status" role="status" aria-live="polite"></p>
             <div id="camNflDayNav" class="cam-nfl-day-nav" aria-label="Seleccionar día de partido"></div>
             <div id="camNflGames" class="cam-nfl-games" role="region" tabindex="0" aria-label="Partidos de la jornada: desliza para ver el resto"></div>
@@ -3271,6 +3278,12 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
             </details>
 
             <section id="camNflAdmin" class="cam-nfl-admin" aria-label="Controles de administradores" hidden></section>
+            </div>
+            <section id="camNflQuinielaStandings" class="cam-nfl-standings" hidden aria-labelledby="camNflStandingTitle">
+              <h3 id="camNflStandingTitle">Clasificación de La Quiniela</h3>
+              <p id="camNflRankingCaption" class="cam-quiniela-ranking-caption"></p>
+              <div id="camNflRanking" aria-live="polite"></div>
+            </section>
           </section>
           <!-- La Quiniela de Fútbol comparte maqueta con la de NFL; sólo cambia el 1X2. -->
           <section id="camFootballQuiniela" class="cam-nfl-quiniela cam-football-quiniela" aria-labelledby="camFootballTitle" hidden>
@@ -3283,9 +3296,15 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
                 <img class="cam-football-quiniela-illustration cam-football-quiniela-illustration--day" src="assets/cam-football-quiniela-day.svg" alt="" aria-hidden="true" width="300" height="240" loading="lazy" decoding="async">
                 <img class="cam-football-quiniela-illustration cam-football-quiniela-illustration--night" src="assets/cam-football-quiniela-night.svg" alt="" aria-hidden="true" width="300" height="240" loading="lazy" decoding="async">
               </header>
-              <div id="camFootballNav" class="cam-nfl-nav" aria-label="Competición, temporada y jornada"></div>
+              <nav id="camFootballViewTabs" class="cam-quiniela-view-tabs" aria-label="Vistas de La Quiniela">
+                <button type="button" data-view="jornada" aria-pressed="true" aria-controls="camFootballMatchPanel">Jornada</button>
+                <button type="button" data-view="month" aria-pressed="false" aria-controls="camFootballQuinielaStandings">Clasificación mensual</button>
+                <button type="button" data-view="all" aria-pressed="false" aria-controls="camFootballQuinielaStandings">Clasificación histórica</button>
+              </nav>
+              <div id="camFootballNav" class="cam-nfl-nav" aria-label="Competición y jornada"></div>
               <p id="camFootballRoundInfo" class="cam-nfl-status" aria-live="polite"></p>
             </div>
+            <div id="camFootballMatchPanel">
             <p id="camFootballStatus" class="cam-nfl-status" role="status" aria-live="polite"></p>
             <div id="camFootballDayNav" class="cam-nfl-day-nav" aria-label="Seleccionar día de partido"></div>
             <div id="camFootballGames" class="cam-nfl-games" role="region" tabindex="0" aria-label="Partidos de la jornada: desliza para ver el resto"></div>
@@ -3301,6 +3320,12 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
             </details>
 
             <section id="camFootballAdmin" class="cam-nfl-admin" aria-label="Controles de administradores" hidden></section>
+            </div>
+            <section id="camFootballQuinielaStandings" class="cam-nfl-standings" hidden aria-labelledby="camFootballStandingTitle">
+              <h3 id="camFootballStandingTitle">Clasificación de La Quiniela</h3>
+              <p id="camFootballRankingCaption" class="cam-quiniela-ranking-caption"></p>
+              <div id="camFootballRanking" aria-live="polite"></div>
+            </section>
           </section>
           <section id="aeSportTakeRanking" class="ae-take-ranking" aria-labelledby="aeSportTakeRankingTitle">
             <div class="ae-take-ranking-head"><div><span class="ae-take-ranking-kicker">CAM SPORTS · COMUNIDAD</span><h2 id="aeSportTakeRankingTitle">Top 10 · NFL</h2></div><p id="aeSportTakeRankingDescription">Los admins confirman cada acierto y asignan de 1 a 100 puntos. Un fallo vale 0.</p></div>
@@ -3342,24 +3367,6 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
             <div id="aeSeasonList" class="ae-season-list"></div>
             <p id="aeSeasonStatus" class="ae-season-status" role="status" aria-live="polite"></p>
           </section>
-            <section id="camNflQuinielaStandings" class="cam-nfl-standings cam-nfl-quiniela cam-quiniela-ranking" aria-labelledby="camNflStandingTitle">
-              <h3 id="camNflStandingTitle">Clasificación de La Quiniela</h3>
-              <nav id="camNflRankingTabs" class="cam-nfl-tabs" aria-label="Periodo de clasificación">
-                <button type="button" data-scope="week" aria-pressed="true">Jornada</button>
-                <button type="button" data-scope="month" aria-pressed="false">Mensual</button>
-                <button type="button" data-scope="season" aria-pressed="false">Temporada</button>
-              </nav>
-              <div id="camNflRanking" aria-live="polite"></div>
-            </section>
-            <section id="camFootballQuinielaStandings" class="cam-nfl-standings cam-nfl-quiniela cam-quiniela-ranking" aria-labelledby="camFootballStandingTitle">
-              <h3 id="camFootballStandingTitle">Clasificación de La Quiniela</h3>
-              <nav id="camFootballRankingTabs" class="cam-nfl-tabs" aria-label="Periodo de clasificación">
-                <button type="button" data-scope="matchday" aria-pressed="true">Jornada</button>
-                <button type="button" data-scope="month" aria-pressed="false">Mensual</button>
-                <button type="button" data-scope="season" aria-pressed="false">Temporada</button>
-              </nav>
-              <div id="camFootballRanking" aria-live="polite"></div>
-            </section>
           <details id="aeTakeReview" class="ae-take-review" hidden><summary>Administrar · Puntuar Takes</summary><p>Primero calcula la dificultad de cada Take (tabla de la liga, nivel de sorpresa o cuota) y después marca si se cumplió. Los puntos (1–20) salen solos: lo obvio vale poco y la sorpresa vale mucho. Si recalculas un Take ya puntuado, su puntuación se actualiza.</p><p id="aeTakeReviewStatus" role="status" aria-live="polite"></p><div id="aeTakeReviewList"></div></details>
           
           
@@ -5592,7 +5599,7 @@ updateThemeButton();
 <script src="assets/champions.js?v=20261021-rank-notes-1"></script>
 <script src="assets/ae-ranking-notes.js?v=20261021-editorial-1"></script>
 <script src="assets/ae-pick-capture.js?v=20261021-compact-pick-compose-1"></script>
-<script src="assets/community-picks.js?v=20261021-hide-rejected-picks-1"></script>
+<script src="assets/community-picks.js?v=20261026-ticket-views-1"></script>
 <script src="assets/weekly-picks.js?v=20261015-1"></script>
 <script src="assets/username-auth.js?v=20261020-classical-auth-panel-1"></script>
 <script src="assets/ae-category-visibility.js?v=20261016-dynamic-nav-1"></script>
@@ -6446,7 +6453,7 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 </style>
 
 <link rel="stylesheet" href="assets/cam-nfl-profile.css?v=20261022-3tab-1">
-<script src="assets/cam-sport-quiniela-loader.js?v=20261025-two-games-1"></script>
+<script src="assets/cam-sport-quiniela-loader.js?v=20261026-ticket-views-1"></script>
 <script src="assets/cam-nfl-profile.js?v=20261022-3tab-1"></script>
 <script src="assets/ae-season-predictions.js?v=20261021-champion-guide-1"></script>
 <script src="assets/cam-lazy-editorial-loader.js?v=20261024-1"></script>

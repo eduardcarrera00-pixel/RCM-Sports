@@ -321,3 +321,19 @@ html:not(#ds):not(#ds):not(#ds):not(#ds) body.ae-is-home #aeHomeTakeHighlights #
     gap:8px!important;
   }
 }
+
+/* Compact, single tap target on Home phones; desktop composition is unchanged.
+   Keep overrides in the banner layer because its important rules own sizing. */
+@layer cam-banners{
+@media(max-width:760px){
+ html:not(#ds):not(#ds):not(#ds):not(#ds) body.ae-is-home #aeHomeTakeHighlights #aeHomeTakesSectionHeading button#aeHomeTakePublish.cam-home-take-square{
+  min-height:44px!important;height:44px!important;max-height:none!important;padding:7px 12px!important;grid-template-columns:minmax(0,1fr) 18px!important;gap:8px!important;border:1px solid var(--ds-line-strong,#8a7a6a)!important;border-radius:14px!important;cursor:pointer!important;background-image:none!important;
+ }
+ html body.ae-is-home #aeHomeTakeHighlights #aeHomeTakesSectionHeading button#aeHomeTakePublish.cam-home-take-square::before,html body.ae-is-home #aeHomeTakeHighlights #aeHomeTakesSectionHeading button#aeHomeTakePublish.cam-home-take-square::after{display:none!important;content:none!important}
+ html body.ae-is-home #aeHomeTakeHighlights #aeHomeTakesSectionHeading #aeHomeTakePublish .cam-home-take-square-label{grid-column:1!important;grid-row:1!important;align-self:center!important;font-size:15px!important;line-height:1.25!important}
+ html body.ae-is-home #aeHomeTakeHighlights #aeHomeTakesSectionHeading #aeHomeTakePublish .cam-home-take-square-arrow{grid-column:2!important;grid-row:1!important;align-self:center!important;display:block!important;font-size:16px!important;opacity:.8!important}
+ html body.ae-is-home #aeHomeTakePublish:hover{filter:brightness(1.04)}
+ html body.ae-is-home #aeHomeTakePublish:active{transform:translateY(1px)}
+ html body.ae-is-home #aeHomeTakePublish:focus-visible{outline:2px solid var(--ds-action,#855b43);outline-offset:3px}
+}
+}

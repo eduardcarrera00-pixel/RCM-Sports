@@ -408,16 +408,33 @@
     if(pick==='draw')return 'Empate';
     return teamName(pick==='home'?g.home_id:g.away_id);
   }
+  function setQuinielaView(view){
+    if(!['jornada','month','all'].includes(view))return;
+    root.classList.toggle('is-ranking',view!=='jornada');
+    const panel=$('camFootballMatchPanel'),ranking=$('camFootballQuinielaStandings');
+    if(panel)panel.hidden=view!=='jornada';
+    if(ranking)ranking.hidden=view==='jornada';
+    for(const tab of $('camFootballViewTabs')?.querySelectorAll('[data-view]')||[])tab.setAttribute('aria-pressed',String(tab.dataset.view===view));
+    if(view!=='jornada'){scope=view;showAll=false;paintRanking();}
+    else sizeGameViewport();
+  }
+  $('camFootballViewTabs')?.addEventListener('click',event=>{
+    const tab=event.target.closest('button[data-view]');
+    if(tab)setQuinielaView(tab.dataset.view);
+  });
   async function paintRanking(){
     const target=$('camFootballRanking');if(!target)return;
     const ticket=++rankingRequest;
+    const rankingScope=scope;
     target.replaceChildren(el('p','Cargando clasificación…'));
     const selected=roundGames()[0]||inScope()[0];
     const month=selected?monthOf(selected):new Date().toISOString().slice(0,7);
+    const caption=$('camFootballRankingCaption');
+    if(caption)caption.textContent=scope==='all'?'Histórico · Todas las temporadas con resultados confirmados.':'Clasificación mensual · '+month;
     try{
       const rows=await run(client().rpc('cam_football_leaderboard',{
-        p_scope:scope,p_season:season,p_competition:competition,
-        p_matchday:scope==='matchday'?matchday:null,p_month:scope==='month'?month:null,
+        p_scope:rankingScope,p_season:season,p_competition:competition,
+        p_matchday:rankingScope==='matchday'?matchday:null,p_month:rankingScope==='month'?month:null,
       }));
       if(ticket!==rankingRequest)return;
       target.replaceChildren();
@@ -443,18 +460,25 @@
           content.replaceChildren(el('p','Consultando resultados…'));
           try{
             const picks=await run(client().rpc('cam_football_public_pick_breakdown',{
-              p_user_id:line.user_id,p_season:season,p_competition:competition,
-              p_matchday:scope==='matchday'?matchday:null
+              p_user_id:line.user_id,p_season:rankingScope==='all'?null:season,p_competition:competition,
+              p_matchday:rankingScope==='matchday'?matchday:null
             }));
             if(!details.isConnected)return;
             content.replaceChildren();
+            const lookup=new Map(games.map(g=>[g.id,g]));
+            const missing=[...new Set((picks||[]).map(p=>p.game_id).filter(id=>!lookup.has(id)))];
+            if(missing.length){
+              const older=await run(client().from('cam_football_games').select('*').in('id',missing));
+              for(const game of older||[])lookup.set(game.id,game);
+            }
+            if(!details.isConnected)return;
             const relevant=(picks||[]).filter(p=>{
-              const game=games.find(g=>g.id===p.game_id);
-              return game&&(scope!=='month'||monthOf(game)===month);
+              const game=lookup.get(p.game_id);
+              return game&&(rankingScope!=='month'||monthOf(game)===month);
             });
             if(!relevant.length)content.append(el('p','Aún no hay pronósticos resueltos.'));
             for(const pick of relevant.slice(0,60)){
-              const game=games.find(g=>g.id===pick.game_id);
+              const game=lookup.get(pick.game_id);
               const row=el('div',null,'cam-nfl-ranking-pick');
               row.dataset.result=pickResultFor(game,pick)||'';
               row.append(el('p',roundName(game.matchday)+' · '+pick.awarded_points+' pts'));

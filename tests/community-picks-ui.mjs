@@ -110,7 +110,7 @@ assert.equal(d.querySelector('#cpFeed .cp-picks-count'),null,'No count labels ap
 assert.equal(d.querySelector('#cpFeed .cp-card-legs').tagName,'OL','Picks use one ordered, accessible list');
 assert.equal(d.querySelector('#cpFeed .cp-pick-line-number'),null,'Connecting circles replace numbered boxes');
 assert.equal(d.querySelector('#cpFeed .cp-feed-meta .cp-card-sport').textContent,'NFL');
-assert.equal(d.querySelector('#cpFeed .cp-feed-meta .cp-odds').textContent,'Cuota +150');
+assert.equal(d.querySelector('#cpFeed .cp-feed-meta .cp-odds').textContent,'Cuota total +150');
 assert.equal(d.querySelector('#cpFeed .cp-feed-meta .cp-card-odds').parentElement.className,'cp-feed-meta','Odds are located below the sport, within the header');
 
 assert.match(d.querySelectorAll('#cpFeed .cp-pick-line')[1].textContent,/Más de 3.5 goles/);
@@ -123,7 +123,7 @@ assert.equal(d.querySelector('#cpDialog .cp-recipe-card .cp-card-legs').tagName,
 assert.equal(d.querySelectorAll('#cpDialog .cp-recipe-card .cp-pick-line').length,3,'Combo keeps every selection when opened');
 assert.match(d.querySelectorAll('#cpDialog .cp-recipe-card .cp-pick-line-choice')[1].textContent,/Más de 3.5 goles/);
 assert.match(d.querySelectorAll('#cpDialog .cp-recipe-card .cp-pick-line-choice')[2].textContent,/Ambos equipos marcan/);
-assert.equal(d.querySelector('#cpDialog .cp-recipe-card .cp-feed-meta .cp-odds').textContent,'Cuota +150');
+assert.equal(d.querySelector('#cpDialog .cp-recipe-card .cp-feed-meta .cp-odds').textContent,'Cuota total +150');
 assert.match(d.querySelector('#cpDialog .cp-recipe-card .cp-pick-line-market').textContent,/Ganador · 3 vías/,'Chef recipe includes a readable market label');
 assert.match(d.querySelectorAll('#cpDialog .cp-recipe-card .cp-pick-line-market')[1].textContent,/Total de goles/);
 assert.match(d.querySelectorAll('#cpDialog .cp-recipe-card .cp-pick-line-market')[2].textContent,/Ambos equipos marcan/);

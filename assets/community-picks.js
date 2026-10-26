@@ -43,7 +43,7 @@ window.openAeCommunityPick=open;
 function splitPickSelections(input){
  const text=String(input||'').trim();
  if(!text)return [];
- return text.split(/(?:\s+\+\s+|\s+\/\s+(?=\d+[.)]\s))/)
+ return text.replace(/\\n/g,'\n').split(/(?:\n+|;\s*|\s+[|]\s+|\s+\+\s+|\s+\/\s+(?=\d+[.)]\s))/)
   .map(part=>part.trim().replace(/^\d+[.)]\s*/,'')).filter(Boolean);
 }
 function pickSelectionDisplay(input){
@@ -59,6 +59,56 @@ function pickSelectionDisplay(input){
  return {choice:prediction||market,market:prediction?market:''};
 }
 
+const ticketStates={won:['✓','Acertado'],lost:['✕','Fallado'],void:['—','Anulado'],pending:['◷','Pendiente']};
+function ticketChoices(p){
+ const choices=[];
+ for(const leg of Array.isArray(p.legs)?p.legs:[]){
+  const selections=splitPickSelections(leg.selection);
+  for(const selection of selections.length?selections:[''])choices.push({leg,selection});
+ }
+ return choices;
+}
+function ticketOfficialResult(value){
+ if(typeof value==='string'||typeof value==='number')return String(value).trim();
+ return '';
+}
+function ticketRows(p,full=false){
+ const choices=ticketChoices(p),content=el('div',null,'cam-ticket-content');
+ const list=el('ol',null,'cp-card-legs cam-ticket-legs');
+ const extra=el('ol',null,'cp-card-legs cam-ticket-legs');
+ choices.forEach(({leg,selection},i)=>{
+  const row=el('li',null,'cp-pick-line');
+  const body=el('div',null,'cp-pick-line-body');
+  if(leg.event)body.append(el('span',leg.event,'cp-pick-line-event'));
+  const display=pickSelectionDisplay(selection);
+  body.append(el('strong',display.choice||'Consultar pronóstico','cp-pick-line-choice'));
+  let market=display.market;
+  if(full){
+   if(/MONEYLINE/i.test(selection))market=/3[- ]WAY|3 VIAS/i.test(selection)?'Ganador · 3 vías':'Ganador del partido';
+   else if(/OVER\/UNDER/i.test(selection))market='Total de goles';
+   else if(/BOTH TEAMS TO SCORE/i.test(selection))market='Ambos equipos marcan';
+  }
+  if(market)body.append(el('small',market,'cp-pick-line-market'));
+  const explicit=leg.outcome||leg.settlement_status;
+  const outcome=ticketStates[explicit]?explicit:choices.length===1&&ticketStates[p.outcome]?p.outcome:null;
+  row.dataset.outcome=outcome||'unknown';
+  const state=outcome?ticketStates[outcome]:['·','Sin resultado individual'];
+  if(outcome&&(choices.length>1||full))body.append(el('small',state.join(' '),'cam-ticket-leg-state'));
+  const result=ticketOfficialResult(leg.final_score||leg.event_result||leg.official_result);
+  if(result)body.append(el('small','Resultado del encuentro: '+result,'cam-ticket-official-result'));
+  row.append(el('span',String(i+1).padStart(2,'0'),'cam-ticket-leg-number'),body);
+  (full||i<2?list:extra).append(row);
+ });
+ content.append(list);
+ if(!full&&choices.length>2){
+  const details=el('details',null,'cam-ticket-more');
+  details.append(el('summary','Ver parlay completo · '+choices.length+' selecciones'),extra);
+  details.addEventListener('click',e=>e.stopPropagation());
+  content.append(details);
+ }
+ return content;
+}
+
 function card(p,compact=false,detail=false,viewerId=currentViewerId,variant='feed'){
  // Shared public Pick markup; the Chef recipe remains a separate detail view.
  const editorial=!detail;
@@ -66,13 +116,14 @@ function card(p,compact=false,detail=false,viewerId=currentViewerId,variant='fee
  const plate=variant==='best'||variant==='worst';
  const classes=detail?'cp-card cp-card-detail cp-recipe-card':
   'cp-card cp-feed-editorial cam-pick-unified'+(compact?' cam-pick-compact':'')+
-  (variant!=='feed'?' cam-pick--'+variant:'');
+  (variant!=='feed'?' cam-pick--'+variant:'')+' cam-ticket-card';
  const n=el(plate?'li':'article',null,classes);
  const pickSports=Array.isArray(p.legs)?p.legs.map(l=>String(l?.sport||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')):[];
  const hasNfl=pickSports.some(t=>/nfl|americano|american football|gridiron/.test(t));
  const hasFootball=pickSports.some(t=>!/nfl|americano|american football|gridiron/.test(t)&&/futbol|football|soccer|champions|liga|premier|barca|madrid|uefa|bundesliga|serie a/.test(t));
  n.dataset.sport=hasNfl&&hasFootball?'mixed':hasNfl?'nfl':hasFootball?'football':'general';
  const first=Array.isArray(p.legs)&&p.legs.length?p.legs[0]:null;
+ n.dataset.outcome=ticketStates[p.outcome]?p.outcome:'pending';
  const header=el('div',null,'cp-card-header');
  if(p.user_id){
    const profileButton=button('@'+(p.author||'Aficionado'),event=>{
@@ -101,12 +152,14 @@ function card(p,compact=false,detail=false,viewerId=currentViewerId,variant='fee
   header.append(el('span',String(first.sport),'cp-card-sport'));
  }
  if(detail&&p.event_date)header.append(el('span','Evento '+p.event_date,'cp-event-date'));
- if(!isActive(p))header.append(el('strong',resultLabel(p),'cp-result-badge'));
+ const state=ticketStates[p.outcome]||ticketStates.pending;
+ header.append(el('strong',state.join(' '),'cp-result-badge'));
  n.append(header);
  const title=el('h3',null,'cp-card-title');
  const normalize=value=>String(value||'').toLocaleLowerCase('es').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
- const duplicateSelection=editorial&&p.legs?.length===1&&first?.event&&first?.selection&&normalize(p.title).includes(normalize(first.event))&&normalize(p.title).includes(normalize(first.selection));
+ const duplicateSelection=editorial&&p.legs?.length===1&&first?.event&&first?.selection&&normalize(p.title).includes(normalize(first.event))&&normalize(p.title).includes(normalize(pickSelectionDisplay(first.selection).choice));
  title.append(el('span',duplicateSelection?first.event:p.title));
+ if(editorial&&(duplicateSelection||normalize(p.title)===normalize(first?.event)))title.classList.add('cam-ticket-redundant-title');
  n.append(title);
  if(!detail){
    const readLink=el('a',null,'cp-card-read-link');
@@ -119,60 +172,19 @@ function card(p,compact=false,detail=false,viewerId=currentViewerId,variant='fee
    };
    n.append(readLink);
  }
- const legs=el(publication?'ol':'div',null,'cp-card-legs');
-  const simplify=text=>String(text||'').toLocaleLowerCase('es')
-    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-    .replace(/[^a-z0-9]+/g,' ').trim();
-  const titleKey=simplify(p.title);
-  
-  if(publication){
-    // Feed and full recipe share individual ordered markets.
-    const choices=[];
-    for(const leg of p.legs||[]){
-      const selections=splitPickSelections(leg.selection);
-      for(const selection of selections)choices.push({leg,selection});
-      if(!selections.length&&leg.event)choices.push({leg,selection:''});
-    }
-    if(choices.length){
-      
-      
-      
-      choices.forEach(({leg,selection},i)=>{
-        const row=el('li',null,'cp-pick-line');
-        
-        const body=el('div',null,'cp-pick-line-body');
-        const matchup=String(leg.event||'').trim();
-        if(matchup&&!titleKey.includes(simplify(matchup)))body.append(el('span',matchup,'cp-pick-line-event'));
-        const display=pickSelectionDisplay(selection);
-        body.append(el('strong',display.choice||matchup||'Pronóstico','cp-pick-line-choice'));
-        // On the full Chef recipe, secondary labels clarify each market without
-        // making the compact public feed any taller.
-        let marketLabel=display.market;
-        if(detail){
-          if(/MONEYLINE/i.test(selection))marketLabel=/3[- ]WAY|3 VIAS/i.test(selection)?'Ganador · 3 vías':'Ganador del partido';
-          else if(/OVER\/UNDER/i.test(selection))marketLabel='Total de goles';
-          else if(/BOTH TEAMS TO SCORE/i.test(selection))marketLabel='Ambos equipos marcan';
-        }
-        if(marketLabel)body.append(el('small',marketLabel,'cp-pick-line-market'));
-        row.append(body);legs.append(row);
-      });
-    }
-  }else{
-    // Keep the compact archive cards unchanged.
-    for(const leg of p.legs||[]){
-      const row=el('p');
-      const matchup=String(leg.event||leg.sport||'Evento');
-      const matchupKey=simplify(matchup);
-      if(detail||!matchupKey||!titleKey.includes(matchupKey))row.append(el('span',matchup,'cp-leg-event'));
-      else row.classList.add('cp-leg-no-event');
-      if(leg.selection)row.append(el('strong',leg.selection,'cp-leg-selection'));
-      if(row.childNodes.length)legs.append(row);
-    }
-  }
-  if(legs.childNodes.length)n.append(legs);
+ if(editorial){
+  const count=ticketChoices(p).length;
+  const meta=el('div',null,'cam-ticket-meta');
+  meta.append(el('span',count>1?'Parlay · '+count+' selecciones':'Pick simple'));
+  if(p.event_date)meta.append(el('span',p.event_date));
+  n.append(meta);
+ }
+ n.append(ticketRows(p,detail));
  const odds=el('div',null,'cp-card-odds');
  
- odds.append(el('strong','Cuota '+(Number(p.american_odds)>0?'+':'')+p.american_odds,'cp-odds'));
+ const quota=el('strong',null,'cp-odds cam-ticket-quota');
+ quota.append(el('small',ticketChoices(p).length>1?'Cuota total ':'Cuota ','cam-ticket-odds-label'),el('span',(Number(p.american_odds)>0?'+':'')+p.american_odds,'cam-ticket-odds-value'));
+ odds.append(quota);
  const statusText=p.moderation_status==='approved'
    ?(publication?'':(['on_device_ocr','ai_vision'].includes(p.capture_check?.method)?'Momio cotejado con captura':'Cuota aprobada'))
    :p.moderation_status==='rejected'?'Cuota rechazada':'Cuota en revisión · votos abiertos';
@@ -181,7 +193,10 @@ function card(p,compact=false,detail=false,viewerId=currentViewerId,variant='fee
   if(publication)n.append(status);else odds.append(status);
  }
  if(publication)feedMeta.append(odds);else n.append(odds);
- if(p.explanation)n.append(el('p',p.explanation,'cp-explanation'));
+ if(p.explanation){
+  if(detail)n.append(el('p',p.explanation,'cp-explanation'));
+  else{const analysis=el('details',null,'cam-ticket-analysis');analysis.append(el('summary','Leer análisis'),el('p',p.explanation,'cp-explanation'));n.append(analysis);}
+ }
  const controls=el('div',null,'cp-actions');
  const canVote=['pending','approved'].includes(p.moderation_status)&&isActive(p);
  const isOwnPick=Boolean(viewerId&&p.user_id&&String(viewerId)===String(p.user_id));
@@ -265,6 +280,7 @@ async function loadHistoricPick(){
   // Presentation only: keep the same winning Pick and points from the query.
   // A stretched link opens the Pick; the author has an independent profile control.
   const winner=el('div',null,'ae-discovery-take cam-historic-record');
+  winner.dataset.outcome=pick.outcome;
   const pickLink=el('a',null,'cam-historic-open');
   pickLink.href=link(pick.id);
   pickLink.setAttribute('aria-label','Leer el Pick histórico: '+(pick.title||'Publicación'));
@@ -299,12 +315,11 @@ async function loadHistoricPick(){
   const row=(label,value)=>{
     if(value===null||value===undefined||String(value).trim()==='')return;
     const item=el('div',null,'cam-historic-row');
+    if(label==='Cuota')item.classList.add('cam-historic-quota');
     item.append(el('span',label,'cam-historic-row-label'),el('span',String(value),'cam-historic-row-value'));
     rows.append(item);
   };
-  const prediction=legs.map(leg=>String(leg?.selection||'').trim()).filter(Boolean).join(' + ')
-    ||String(pick.explanation||'').trim();
-  row('Pronóstico',prediction);
+  winner.append(ticketRows(pick,true));
   if(pick.american_odds!==null&&pick.american_odds!==undefined&&String(pick.american_odds).trim()!==''){
     const american=Number(pick.american_odds);
     row('Cuota',Number.isFinite(american)?(american>0?'+':'')+american:String(pick.american_odds));
@@ -557,7 +572,8 @@ function sizePlateWindow(target){
  target.style.removeProperty('--ae-plates-window-height');
  if(cards.length<=2)return;
  const measure=()=>{
-   const height=cards.slice(0,2).reduce((sum,card)=>sum+card.getBoundingClientRect().height,0);
+   const visible=cards.slice(0,2);
+   const height=visible[visible.length-1].getBoundingClientRect().bottom-visible[0].getBoundingClientRect().top;
    if(height>0)target.style.setProperty('--ae-plates-window-height',Math.ceil(height)+'px');
  };
  measure();

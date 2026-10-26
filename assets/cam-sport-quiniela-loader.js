@@ -6,9 +6,9 @@
   const base=new URL('.',document.currentScript?.src||new URL('assets/',location.href));
   const config={
     nfl:{className:'ae-is-nfl',root:'camNflQuiniela',status:'camNflStatus',
-      src:'cam-nfl-quiniela.js?v=20261025-two-games-1'},
+      src:'cam-nfl-quiniela.js?v=20261026-ticket-views-1'},
     football:{className:'ae-is-football',root:'camFootballQuiniela',status:'camFootballStatus',
-      src:'cam-football-quiniela.js?v=20261025-two-games-1'}
+      src:'cam-football-quiniela.js?v=20261026-ticket-views-1'}
   };
   const requests=new Map();
   const loaded=new Set();
