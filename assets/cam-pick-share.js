@@ -111,7 +111,96 @@
   c.fillStyle='#855b43';c.font='600 22px Arial,sans-serif';c.fillText('camsports.github.io',990,canvas.height-109);c.textAlign='left';
   return canvas;
  }
- function renderCard(p){
+
+ // Take cards intentionally use the same blue editorial layout in both site themes.
+ const takeFragments=body=>{
+  const source=clean(body,2000);if(!source)return [];
+  const sentences=source.match(/[^.!?]+(?:[.!?]+|$)/g)?.map(s=>s.trim()).filter(Boolean)||[source];
+  const parts=[];let part='';
+  for(const sentence of sentences){
+   if(part&&(part.length+sentence.length)>260){parts.push(part);part='';}
+   if(sentence.length>320){
+    if(part){parts.push(part);part='';}
+    const words=sentence.split(/\s+/);let chunk='';
+    for(const word of words){if(chunk&&chunk.length+word.length+1>245){parts.push(chunk);chunk='';}chunk+=(chunk?' ':'')+word;}
+    if(chunk)parts.push(chunk);
+   }else part+=(part?' ':'')+sentence;
+  }
+  if(part)parts.push(part);
+  return parts.slice(0,12);
+ };
+ // Extractive, rather than a fabricated paraphrase: preserve the author's words.
+ const takeSummary=body=>takeFragments(body).slice(0,2).join(' ').slice(0,480);
+ function roundedShareBackground(c,w,h,r){
+  c.fillStyle='#073B83';c.beginPath();
+  if(typeof c.roundRect==='function')c.roundRect(0,0,w,h,r);
+  else if(typeof c.quadraticCurveTo==='function'){
+   c.moveTo(r,0);c.lineTo(w-r,0);c.quadraticCurveTo(w,0,w,r);
+   c.lineTo(w,h-r);c.quadraticCurveTo(w,h,w-r,h);c.lineTo(r,h);
+   c.quadraticCurveTo(0,h,0,h-r);c.lineTo(0,r);c.quadraticCurveTo(0,0,r,0);
+  }else{c.fillRect(0,0,w,h);return;}
+  c.closePath?.();c.fill();
+ }
+ function renderTakeCard(p,options={}){
+  const portrait=options.size==='story',w=1080,h=portrait?1920:1080;
+  const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
+  const c=canvas.getContext('2d');if(!c)throw Error('Este navegador no permite generar la imagen. Prueba descargarla desde otro navegador.');
+  roundedShareBackground(c,w,h,72);
+  // White letterform logo, integrated into the same blue background (no box).
+  c.textAlign='right';c.fillStyle='#fff';
+  c.font='700 80px "Playfair Display", Georgia, serif';c.fillText('CAM',w-77,153);
+  c.strokeStyle='#fff';c.lineWidth=3;c.beginPath();c.moveTo(w-302,168);c.lineTo(w-78,168);c.stroke();
+  c.font='600 24px Inter, Arial, sans-serif';c.fillText('S P O R T S',w-80,207);c.textAlign='left';
+
+  const mode=options.mode||'title',extra=mode==='summary'?takeSummary(p.body):mode==='fragment'?takeFragments(p.body)[options.fragment||0]||'':'';
+  const footerY=h-165,baseTop=portrait?515:267,margin=82,maxWidth=w-margin*2;
+  const textSpace=(portrait?footerY-125:footerY-98)-baseTop-(extra?portrait?460:275:0);
+  let font=portrait?90:88,lines=[];
+  for(;font>=31;font-=2){
+   c.font='600 '+font+'px "Playfair Display", Georgia, serif';
+   lines=wrap(c,p.title.toLocaleUpperCase('es'),maxWidth,Infinity);
+   if(lines.length*font*1.16<=textSpace)break;
+  }
+  c.fillStyle='#fff';c.font='600 '+Math.max(font,31)+'px "Playfair Display", Georgia, serif';
+  const step=Math.max(font,31)*1.16;
+  // The title is visually uppercase; the original stored title remains unchanged.
+  let y=baseTop+Math.max(font,31);
+  for(const line of lines){c.fillText(line,margin,y);y+=step;}
+  if(extra){
+   y+=portrait?120:65;
+   c.fillStyle='#DDC5AD';c.font='600 25px Inter, Arial, sans-serif';
+   c.fillText(mode==='summary'?'RESUMEN DEL TAKE':'FRAGMENTO ORIGINAL',margin,y);y+=48;
+   c.fillStyle='#fff';
+   let extraFont=portrait?45:34,extraLines=[];
+   for(;extraFont>=25;extraFont-=2){
+    c.font='400 '+extraFont+'px "Libre Baskerville", Georgia, serif';
+    extraLines=wrap(c,extra,maxWidth,Infinity);
+    if(y+extraLines.length*extraFont*1.45<=(footerY-65))break;
+   }
+   // A summary/fragment is supplemental; crop it, never the title or attribution.
+   const max=Math.max(1,Math.floor((footerY-68-y)/(Math.max(extraFont,25)*1.45)));
+   c.font='400 '+Math.max(extraFont,25)+'px "Libre Baskerville", Georgia, serif';
+   for(const line of wrap(c,extra,maxWidth,max)){y+=Math.max(extraFont,25)*1.45;c.fillText(line,margin,y);}
+  }
+  c.strokeStyle='#BE9270';c.lineWidth=3;c.beginPath();c.moveTo(margin,footerY);c.lineTo(w-margin,footerY);c.stroke();
+  c.fillStyle='#fff';c.textAlign='left';c.font='400 34px "Libre Baskerville", Georgia, serif';
+  c.fillText('Por',margin,footerY+75);
+  let username=p.author.replace(/^@/,'')||'Aficionado';
+  let nameFont=35;
+  const date=options.showDate===false?'':p.date.split('-').reverse().join('/');
+  const dateWidth=date?235:0;
+  for(;nameFont>=20;nameFont-=1){
+   c.font='700 '+nameFont+'px "Libre Baskerville", Georgia, serif';
+   if(c.measureText(username).width<=w-2*margin-105-dateWidth)break;
+  }
+  c.fillText(username,margin+72,footerY+75);
+  if(date){c.fillStyle='#BE9270';c.fillRect(w-margin-239,footerY+37,2,43);
+   c.fillStyle='#fff';c.textAlign='right';c.font='400 30px "Libre Baskerville", Georgia, serif';c.fillText(date,w-margin,footerY+75);c.textAlign='left';}
+  return canvas;
+ }
+
+ function renderCard(p,options){
+  if(p.kind==='take')return renderTakeCard(p,options);
   if(p.kind==='weekly')return renderWeeklyCard(p);
   const canvas=document.createElement('canvas');canvas.width=1080;canvas.height=1350;
   const c=canvas.getContext('2d');if(!c)throw Error('Este navegador no permite crear la tarjeta. Puedes copiar el enlace.');
@@ -161,7 +250,7 @@
  function show(pick,{kind='community',opener=document.activeElement}={}){
   let p;try{p=model(pick,kind);}catch(error){if(typeof notifyCommunity==='function')notifyCommunity(error.message,true);return;}
   restoreFocus=opener;release();const ticket=++request;
-  if(!dialog){dialog=make('dialog',null,'cam-pick-share-dialog');dialog.id='camPickShareDialog';dialog.setAttribute('aria-labelledby','camPickShareTitle');document.body.append(dialog);dialog.addEventListener('close',()=>{request++;release();restoreFocus?.focus?.({preventScroll:true});});dialog.addEventListener('click',e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)close();}});}
+  if(!dialog){dialog=make('dialog',null,'cam-pick-share-dialog');dialog.id='camPickShareDialog';dialog.setAttribute('aria-labelledby','camPickShareTitle');document.body.append(dialog);dialog.addEventListener('close',()=>{if(dialog.open)return;request++;release();restoreFocus?.focus?.({preventScroll:true});});dialog.addEventListener('click',e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)close();}});}
   const top=make('div',null,'cam-pick-share-heading');const heading=make('h2',p.kind==='take'?'Comparte este Take':p.kind==='weekly'?'Comparte el Pick del editor':'Comparte este Pick');heading.id='camPickShareTitle';top.append(heading);
   const exit=make('button','Cerrar','cam-pick-share-close');exit.type='button';exit.onclick=close;top.append(exit);
   const intro=make('p','Llévalo a tus redes y que empiece el debate.','cam-pick-share-intro');
@@ -176,27 +265,70 @@
   linkButton.onclick=()=>copy(urlFor(p),status,'Enlace copiado.');textButton.onclick=()=>copy(caption(p),status,'Texto y enlace copiados.');
   const utilities=make('div',null,'cam-pick-share-utilities');utilities.append(download,linkButton,textButton);
   const label=make('label','Texto para tu publicación','cam-pick-share-caption-label');const text=make('textarea');text.value=caption(p);text.readOnly=true;text.rows=5;text.setAttribute('aria-label','Texto y enlace de la publicación');label.append(text);
+  let takeOptions={mode:'title',size:'square',showDate:true,fragment:0};
+  let editor=null,modeSelect=null,fragmentLabel=null,fragmentSelect=null,sizeSelect=null,dateToggle=null;
+  if(p.kind==='take'){
+   editor=make('section',null,'cam-take-share-editor');editor.setAttribute('aria-label','Personalizar la ficha del Take');
+   const title=make('strong','Personaliza tu ficha','cam-take-share-editor-title');editor.append(title);
+   const field=(name,control)=>{const label=make('label',name,'cam-take-share-field');label.append(control);editor.append(label);return label;};
+   modeSelect=make('select');for(const [value,name] of [['title','Solo título'],['summary','Título + resumen original'],['fragment','Título + fragmento']]){const option=make('option',name);option.value=value;modeSelect.append(option);}
+   field('Contenido de la ficha',modeSelect);
+   fragmentSelect=make('select');const pieces=takeFragments(p.body);
+   pieces.forEach((piece,i)=>{const option=make('option','Fragmento '+(i+1)+': '+piece.slice(0,44)+(piece.length>44?'…':''));option.value=String(i);fragmentSelect.append(option);});
+   fragmentLabel=field('Fragmento del texto original',fragmentSelect);fragmentLabel.hidden=true;
+   if(!pieces.length){modeSelect.querySelector('option[value="summary"]').disabled=true;modeSelect.querySelector('option[value="fragment"]').disabled=true;}
+   sizeSelect=make('select');for(const [value,name] of [['square','Publicación · 1:1'],['story','Historia / TikTok · 9:16']]){const option=make('option',name);option.value=value;sizeSelect.append(option);}
+   field('Formato',sizeSelect);
+   const dateLabel=make('label',null,'cam-take-share-checkbox');dateToggle=make('input');dateToggle.type='checkbox';dateToggle.checked=true;dateLabel.append(dateToggle,make('span','Mostrar fecha'));editor.append(dateLabel);
+   const reset=make('button','Restablecer diseño','cam-take-share-reset');reset.type='button';editor.append(reset);
+   content.prepend(editor);
+   modeSelect.onchange=()=>{takeOptions.mode=modeSelect.value;fragmentLabel.hidden=modeSelect.value!=='fragment';refresh();};
+   fragmentSelect.onchange=()=>{takeOptions.fragment=Number(fragmentSelect.value)||0;refresh();};
+   sizeSelect.onchange=()=>{takeOptions.size=sizeSelect.value;refresh();};
+   dateToggle.onchange=()=>{takeOptions.showDate=dateToggle.checked;refresh();};
+   reset.onclick=()=>{takeOptions={mode:'title',size:'square',showDate:true,fragment:0};modeSelect.value='title';fragmentSelect.value='0';fragmentLabel.hidden=true;sizeSelect.value='square';dateToggle.checked=true;refresh();};
+  }
   content.append(actions,hint,utilities,status,label);layout.append(preview,content);dialog.replaceChildren(top,intro,layout);
   if(!dialog.open)dialog.showModal();exit.focus({preventScroll:true});dialog.scrollTop=0;
-  let file=null;
-  for(const [button,network] of [[ig,'Instagram'],[tk,'TikTok']])button.onclick=()=>{
-   // The File is prepared before this click to preserve the browser's user activation.
+
+  let file=null,generation=0;
+  function nativeShare(network){
    if(!file)return;
    let fileSharing=false;try{fileSharing=typeof navigator.share==='function'&&Boolean(navigator.canShare?.({files:[file]}));}catch{}
    if(fileSharing){
-    let sharing;try{sharing=navigator.share({files:[file],title:headline(p),text:caption(p)});}catch{status.textContent='Descarga la tarjeta y súbela a '+network+'.';return;}
-    Promise.resolve(sharing).then(()=>{if(ticket===request)status.textContent='La tarjeta se entregó al menú de compartir. Termina la publicación en la app que elijas.';}).catch(e=>{if(ticket===request)status.textContent=e?.name==='AbortError'?'Puedes volver a compartir cuando quieras.':'Descarga la tarjeta y súbela a '+network+'.';});
-   }else status.textContent='Descarga la tarjeta, abre '+network+' y elígela desde tu galería. Puedes copiar el texto con el botón de arriba.';
-  };
-  try{
-   const canvas=renderCard(p);
-   canvas.toBlob(blob=>{
-    if(ticket!==request||!dialog.open)return;
-    if(!blob){preview.replaceChildren(make('p','No se pudo preparar la imagen. Puedes copiar el texto o el enlace.'));preview.setAttribute('aria-busy','false');return;}
-    resource=URL.createObjectURL(blob);const img=make('img');img.src=resource;img.alt='Tarjeta para compartir: '+p.title+(p.kind==='take'?' · '+p.author:' · Cuota '+p.odds);img.width=canvas.width;img.height=canvas.height;preview.replaceChildren(img);preview.setAttribute('aria-busy','false');
-    file=new File([blob],download.download,{type:'image/png'});download.href=resource;download.hidden=false;ig.disabled=tk.disabled=false;
-   },'image/png');
-  }catch(error){preview.replaceChildren(make('p',error.message));preview.setAttribute('aria-busy','false');}
+    let sharing;
+    // Keep the native share invocation within the user's tap (iOS activation).
+    try{sharing=navigator.share({files:[file],title:headline(p),text:caption(p),url:urlFor(p)});}
+    catch{status.textContent='Descarga la tarjeta y compártela desde '+network+'.';return;}
+    Promise.resolve(sharing).then(()=>{if(ticket===request)status.textContent='Imagen enviada al menú de compartir. Selecciona la aplicación y completa la publicación.';})
+    .catch(e=>{if(ticket===request)status.textContent=e?.name==='AbortError'?'Puedes volver a compartir cuando quieras.':'Descarga la tarjeta y compártela desde '+network+'.';});
+   }else status.textContent='Descarga la tarjeta; tu navegador no permite enviarla directamente. Súbela desde '+network+'.';
+  }
+  for(const [button,network] of [[ig,'Instagram'],[tk,'TikTok']])button.onclick=()=>nativeShare(network);
+  if(p.kind==='take'){
+   // X Intent only transfers text. Prefer native file share; otherwise make the
+   // image download explicit rather than pretending the tweet contains media.
+   x.addEventListener('click',e=>{
+    if(file&&typeof navigator.share==='function'&&navigator.canShare?.({files:[file]})){e.preventDefault();nativeShare('X');}
+    else status.textContent='X abrirá el texto y el enlace. Para incluir la imagen, descárgala y adjúntala manualmente.';
+   });
+  }
+  function refresh(){
+   const current=++generation;file=null;ig.disabled=tk.disabled=true;download.hidden=true;release();
+   preview.replaceChildren(make('p','Preparando tarjeta…'));preview.setAttribute('aria-busy','true');status.textContent='';
+   try{
+    const canvas=renderCard(p,takeOptions);
+    canvas.toBlob(blob=>{
+     if(ticket!==request||current!==generation||!dialog.open)return;
+     if(!blob){preview.replaceChildren(make('p','No se pudo preparar la imagen. Puedes copiar el texto o el enlace.'));preview.setAttribute('aria-busy','false');return;}
+     resource=URL.createObjectURL(blob);const img=make('img');img.src=resource;img.alt='Ficha para compartir: '+p.title+' · '+p.author;img.width=canvas.width;img.height=canvas.height;
+     preview.replaceChildren(img);preview.setAttribute('aria-busy','false');
+     file=new File([blob],download.download,{type:'image/png'});download.href=resource;download.hidden=false;ig.disabled=tk.disabled=false;
+    },'image/png');
+   }catch(error){preview.replaceChildren(make('p',error.message));preview.setAttribute('aria-busy','false');}
+  }
+  refresh();
+
  }
  function button(p,options={}){
   const type=options.kind==='take'?'Take':'Pick';
