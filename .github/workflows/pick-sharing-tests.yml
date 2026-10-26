@@ -18,6 +18,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: take-sharing-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   sharing:
     runs-on: ubuntu-latest
@@ -29,8 +33,31 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci
+      - name: Use the official HTTPS Ubuntu mirror for browser dependencies
+        run: |
+          if [ -f /etc/apt/apt-mirrors.txt ]; then
+            sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|https://archive.ubuntu.com/ubuntu|g' /etc/apt/apt-mirrors.txt
+          fi
       - run: npx playwright install --with-deps chromium
       - name: Verify sharing and community/profile integration
         run: npm run test:sharing && npm run test:picks && node tests/profile-compose.mjs
       - name: Verify PNG, mobile layouts and native share activation
         run: npm run test:sharing:browser
+  webkit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Use the official HTTPS Ubuntu mirror for browser dependencies
+        run: |
+          if [ -f /etc/apt/apt-mirrors.txt ]; then
+            sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|https://archive.ubuntu.com/ubuntu|g' /etc/apt/apt-mirrors.txt
+          fi
+      - run: npx playwright install --with-deps webkit
+      - name: Verify Take export with the WebKit engine and iPhone viewport
+        run: CAM_SHARE_BROWSER=webkit node tests/pick-sharing-takes-browser.cjs

@@ -72,7 +72,7 @@ const server=http.createServer((req,res)=>{
  }
  await page.setViewportSize({width:390,height:880});await page.locator('#aeProfileTakeHighlights .cam-pick-share-button').first().click();await page.locator('.cam-pick-share-preview img').waitFor();
  assert.equal(await page.evaluate(()=>openedTakes.length),0);assert.match(await page.locator('#camPickShareTitle').innerText(),/Comparte este Take/);assert.match(await page.locator('.cam-pick-share-caption-label textarea').inputValue(),/Take de @Lector/);
- const takeDownload=page.waitForEvent('download');await page.getByRole('link',{name:'Descargar tarjeta',exact:true}).click();await (await takeDownload).saveAs(path.join(qa,'take-card.png'));
+ const takeDownload=page.waitForEvent('download');await page.getByRole('link',{name:'Descargar imagen',exact:true}).click();await (await takeDownload).saveAs(path.join(qa,'take-card.png'));
  await page.getByRole('button',{name:'TikTok',exact:true}).click();assert.deepEqual(await page.evaluate(()=>({active:shares[0].active,take:shares[0].filename.includes('-take-')})),{active:true,take:true});
  await page.getByRole('button',{name:'Cerrar',exact:true}).click();assert.ok(await page.locator('#aeProfileTakeHighlights .cam-pick-share-button').first().evaluate(e=>document.activeElement===e));
  await page.locator('#aeProfileTakes .cam-pick-share-button').last().click();await page.getByRole('button',{name:'Cerrar',exact:true}).click();
