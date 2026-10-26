@@ -299,10 +299,10 @@
     let sharing;
     // Keep the native share invocation within the user's tap (iOS activation).
     try{sharing=navigator.share({files:[file],title:headline(p),text:caption(p),url:urlFor(p)});}
-    catch{status.textContent='Descarga la imagen y compártela desde '+network+'.';return;}
+    catch{status.textContent='Descarga la tarjeta y compártela desde '+network+'.';return;}
     Promise.resolve(sharing).then(()=>{if(ticket===request)status.textContent='Imagen enviada al menú de compartir. Selecciona la aplicación y completa la publicación.';})
-    .catch(e=>{if(ticket===request)status.textContent=e?.name==='AbortError'?'Puedes volver a compartir cuando quieras.':'Descarga la imagen y compártela desde '+network+'.';});
-   }else status.textContent='Tu navegador no permite entregar esta imagen directamente. Descárgala y súbela desde '+network+'.';
+    .catch(e=>{if(ticket===request)status.textContent=e?.name==='AbortError'?'Puedes volver a compartir cuando quieras.':'Descarga la tarjeta y compártela desde '+network+'.';});
+   }else status.textContent='Descarga la tarjeta; tu navegador no permite enviarla directamente. Súbela desde '+network+'.';
   }
   for(const [button,network] of [[ig,'Instagram'],[tk,'TikTok']])button.onclick=()=>nativeShare(network);
   if(p.kind==='take'){
