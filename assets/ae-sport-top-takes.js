@@ -81,9 +81,10 @@
    // Mover el nodo existente conserva votos, comentarios y escuchas.
    if(section==='NFL'){
      const feed=$('freeTakes'),header=feed?.querySelector(':scope > .ae-takes-head');
-     if(feed&&header&&
-        (root.parentElement!==feed||root.previousElementSibling!==header)){
-       header.after(root);
+     const invitation=$('camTakeInvitation'),anchor=invitation?.parentElement===feed?invitation:header;
+     if(feed&&anchor&&
+        (root.parentElement!==feed||root.previousElementSibling!==anchor)){
+       anchor.after(root);
      }
      root.style.removeProperty('--ae-nfl-opinions-height');
      return;

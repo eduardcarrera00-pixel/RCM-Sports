@@ -38,7 +38,7 @@ const server=http.createServer((req,res)=>{
   }};
   document.body.className='ae-is-picks';document.getElementById('mainContent').hidden=false;document.getElementById('footballTakes').hidden=false;
  });
- for(const file of ['assets/ae-picks-premium.js','assets/cam-banner-artwork.js','assets/ae-site-images.js','assets/cam-nfl-quiniela-logos.js'])await page.addScriptTag({content:fs.readFileSync(file,'utf8')});
+ for(const file of ['assets/ae-picks-premium.js','assets/ae-sport-top-takes.js','assets/cam-banner-artwork.js','assets/ae-site-images.js','assets/cam-nfl-quiniela-logos.js'])await page.addScriptTag({content:fs.readFileSync(file,'utf8')});
  await page.addScriptTag({content:fs.readFileSync('assets/cam-pick-share.js','utf8')});
  await page.addScriptTag({content:fs.readFileSync('assets/community-picks.js','utf8')});
  await page.evaluate(()=>document.dispatchEvent(new Event('DOMContentLoaded')));
@@ -82,7 +82,8 @@ const server=http.createServer((req,res)=>{
  await page.evaluate(()=>document.activeElement?.blur());
  for(const sport of ['nfl','football']){
   const prefix=sport==='nfl'?'camNfl':'camFootball';
-  await page.evaluate(sport=>{document.body.className='ae-is-'+sport;document.getElementById('communityPicks').hidden=true;document.getElementById('freeTakes').hidden=false;},sport);
+  await page.evaluate(async sport=>{window.currentCategory=sport==='nfl'?'NFL':'Fútbol';document.body.className='ae-is-'+sport;document.getElementById('communityPicks').hidden=true;document.getElementById('freeTakes').hidden=false;await window.refreshAeSportTopTakes(true);},sport);
+  assert.equal(await page.locator('#camTakeInvitation').evaluate(e=>e.previousElementSibling?.classList.contains('ae-takes-head')),true,'The invitation stays immediately below its action, ahead of the Takes rankings');
   await page.locator('#'+prefix+'Games>.cam-nfl-game').nth(4).waitFor();
   assert.equal(await page.locator('#camTakeInvitation').isVisible(),true);
   assert.match(await page.locator('#camTakeInvitation').innerText(),/Aquí, lo que se publica no se borra/);
