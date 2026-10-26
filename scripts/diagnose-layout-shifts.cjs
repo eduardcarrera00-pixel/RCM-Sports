@@ -23,6 +23,8 @@ const server=http.createServer((req,res)=>{
  try{
   for(const conf of [{name:'mobile',width:390,height:844,dpr:3},{name:'desktop',width:1440,height:900,dpr:1}]){
     const ctx=await browser.newContext({viewport:{width:conf.width,height:conf.height},deviceScaleFactor:conf.dpr});
+    // Nunca contra el Supabase real (cuota de egress y visitas falsas).
+    await ctx.route(/^https:\/\/[a-z0-9-]+\.supabase\.co\//i,route=>route.abort());
     const page=await ctx.newPage();
     const errors=[];
     page.on('pageerror',e=>errors.push(e.message));

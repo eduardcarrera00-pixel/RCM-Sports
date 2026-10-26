@@ -48,6 +48,9 @@ function server(){
 function visible(n){return n && n.getBoundingClientRect().width>0&&n.getBoundingClientRect().height>0;}
 async function visit(browser,name,width,height,dark,mobile){
   const context=await browser.newContext({viewport:{width,height},isMobile:mobile,hasTouch:mobile,deviceScaleFactor:mobile?2:1});
+  // Nunca contra el Supabase real: con 19 cargas y caché vacía cada pasada bajaba ~85 MB
+  // de Storage (cuota de egress del plan gratis) y apuntaba ~20 visitas falsas.
+  await context.route(/^https:\/\/[a-z0-9-]+\.supabase\.co\//i,route=>route.abort());
   const page=await context.newPage(), errors=[];
   page.on('pageerror',e=>errors.push(String(e.message)));
   const label=name+'-'+(dark?'noche':'dia');

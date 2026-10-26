@@ -2,7 +2,10 @@
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
-  const OPT_OUT = Boolean(navigator.globalPrivacyControl || navigator.doNotTrack === '1' || window.doNotTrack === '1');
+  // Navegadores automáticos (pruebas de GitHub, Lighthouse, rastreadores) no cuentan como visitas.
+  const AUTOMATED = navigator.webdriver === true ||
+    /HeadlessChrome|Lighthouse|PhantomJS|Googlebot|bingbot|crawler|spider/i.test(navigator.userAgent || '');
+  const OPT_OUT = Boolean(AUTOMATED || navigator.globalPrivacyControl || navigator.doNotTrack === '1' || window.doNotTrack === '1');
   const SESSION_KEY = 'cam_site_session_v1';
   const VISITOR_KEY = 'cam_site_visitor_v1';
   const SESSION_WINDOW = 30 * 60 * 1000;

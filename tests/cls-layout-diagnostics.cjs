@@ -48,6 +48,8 @@ const init=()=>{
  const host='http://127.0.0.1:'+server.address().port;
  for(const [width,height,theme] of [[390,844,'dark'],[390,844,'light'],[1366,900,'dark']]){
    const context=await browser.newContext({viewport:{width,height},deviceScaleFactor:width<500?3:1});
+   // Nunca contra el Supabase real (cuota de egress y visitas falsas).
+   await context.route(/^https:\/\/[a-z0-9-]+\.supabase\.co\//i,route=>route.abort());
    const page=await context.newPage();
    await page.addInitScript(init);
    await page.addInitScript(t=>localStorage.setItem('rcm_sports_theme',t),theme);
