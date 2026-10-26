@@ -96,7 +96,9 @@ function ticketRows(p,full=false){
   if(outcome&&(choices.length>1||full))body.append(el('small',state.join(' '),'cam-ticket-leg-state'));
   const result=ticketOfficialResult(leg.final_score||leg.event_result||leg.official_result);
   if(result)body.append(el('small','Resultado del encuentro: '+result,'cam-ticket-official-result'));
-  row.append(el('span',String(i+1).padStart(2,'0'),'cam-ticket-leg-number'),body);
+  const marker=el('span',null,'cam-ticket-leg-number');
+  marker.setAttribute('aria-hidden','true');
+  row.append(marker,body);
   (full||i<2?list:extra).append(row);
  });
  content.append(list);
