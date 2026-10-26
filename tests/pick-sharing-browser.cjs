@@ -29,7 +29,7 @@ const server=http.createServer((req,res)=>{
   Object.defineProperty(navigator,'share',{configurable:true,value:data=>{window.shares.push({active:navigator.userActivation.isActive,filename:data.files?.[0]?.name,type:data.files?.[0]?.type,size:data.files?.[0]?.size});return window.cancelShare?Promise.reject(new DOMException('cancel','AbortError')):Promise.resolve();}});
  });
  await page.getByRole('button',{name:'Compartir Pick: '+await page.evaluate(()=>window.pick.title),exact:true}).click();
- const dialog=page.locator('#camPickShareDialog');await dialog.waitFor({state:'visible'});await page.locator('.cam-pick-share-preview img').waitFor();
+ const dialog=page.locator('#camPickShareDialog');await dialog.waitFor({state:'visible'});await page.locator('.cam-pick-share-preview img').waitFor({timeout:7000}).catch(async()=>{throw new Error('PNG preview unavailable: '+await page.locator('.cam-pick-share-preview').innerText()+'; page errors: '+errors.join('; '));});
  assert.equal(await page.evaluate(()=>window.shares.length),0,'Opening the panel must never publish or open the native share UI');
  assert.equal(await page.getByRole('button',{name:'Instagram',exact:true}).isEnabled(),true);
  for(const width of [360,390,768,1366])for(const dark of [false,true]){
