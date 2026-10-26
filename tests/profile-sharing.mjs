@@ -43,10 +43,21 @@ for(const selector of ['#aeProfileTakeHighlights .ae-profile-feature','#aeProfil
   assert.match(caption,/¿De acuerdo o tienes otra lectura/);assert.equal(href.origin,'https://camsports.github.io');assert.equal(href.searchParams.get('perfil'),owner);assert.ok(href.searchParams.has('take'));
   const row=takes.find(t=>t.id===href.searchParams.get('take'));assert.ok(caption.includes(row.body.trim()),'Copy text retains the full published Take');
   assert.equal(dialog.querySelector('.cam-pick-share-download').download,'cam-sports-take-'+row.id+'.png');
+  const preview=dialog.querySelector('.cam-pick-share-preview img');assert.equal(preview.width,1080);assert.equal(preview.height,1080,'Take cards default to 1:1');
+  const editor=dialog.querySelector('.cam-take-share-editor');assert.ok(editor,'Take editor exists');
+  const selects=editor.querySelectorAll('select'),mode=selects[0],fragment=selects[1],size=selects[2];
+  assert.equal(mode.value,'title');
+  mode.value='summary';mode.dispatchEvent(new a.w.Event('change'));assert.ok(a.drawn.includes('RESUMEN DEL TAKE'));
+  mode.value='fragment';mode.dispatchEvent(new a.w.Event('change'));assert.ok(a.drawn.includes('FRAGMENTO ORIGINAL'));assert.equal(fragment.closest('label').hidden,false);
+  size.value='story';size.dispatchEvent(new a.w.Event('change'));assert.equal(dialog.querySelector('.cam-pick-share-preview img').height,1920);
+  editor.querySelector('input[type=checkbox]').click();assert.ok(!a.drawn.includes('PRIVATE_EMAIL'));
+  editor.querySelector('.cam-take-share-reset').click();assert.equal(mode.value,'title');assert.equal(size.value,'square');
+  assert.equal(dialog.querySelector('.cam-pick-share-preview img').height,1080);
+  assert.equal(row.title,takes.find(t=>t.id===row.id).title,'Export options never change the original Take');
   dialog.querySelector('.cam-pick-share-close').click();assert.equal(a.d.activeElement,button);
  }
 }
-assert.ok(a.drawn.includes('LA COMUNIDAD OPINA'));assert.ok(!a.drawn.includes('CUOTA TOTAL'));
+assert.ok(a.drawn.includes('CAM'));assert.ok(!a.drawn.includes('LA COMUNIDAD OPINA'),'Take cards should not show the vote panel');assert.ok(!a.drawn.includes('CUOTA TOTAL'));
 a.d.getElementById('aeProfileTabPicks').click();
 for(const selector of ['#aeProfilePickHighlights','#aeProfilePicks']){
  const button=a.d.querySelector(selector+' .cam-pick-share-button');assert.ok(button,'Featured and recent profile Picks stay shareable');button.click();
