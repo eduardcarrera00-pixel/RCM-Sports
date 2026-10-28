@@ -193,22 +193,26 @@
   function paintNav(){
     const nav=$('camFootballNav');if(!nav)return;
     nav.replaceChildren();
-    const tabs=el('div',null,'cam-nfl-competitions');
-    tabs.setAttribute('role','tablist');
-    tabs.setAttribute('aria-label','Competiciones de la quiniela');
+    const leagueField=el('label',null,'cam-football-league-control');
+    leagueField.htmlFor='camFootballLeague';
+    const leagueSelect=el('select',null,'cam-nfl-select');
+    leagueSelect.id='camFootballLeague';
+    leagueSelect.setAttribute('aria-label','Liga');
     for(const option of COMPETITIONS){
-      const chosen=option.id===competition;
-      const tab=el('button',option.label,'cam-nfl-competition'+(chosen?' is-active':''));
-      tab.type='button';tab.setAttribute('aria-pressed',String(chosen));
-      tab.addEventListener('click',async()=>{
-        if(competition===option.id)return;
-        competition=option.id;
-        if(!seasons().includes(season))season=seasons()[0]||season;
-        matchday=chooseRound();dayKey=null;showAll=false;
-        await loadMine();recover();paint();
-      });
-      tabs.append(tab);
+      const item=el('option',option.full);
+      item.value=option.id;
+      leagueSelect.append(item);
     }
+    leagueSelect.value=competition;
+    leagueSelect.addEventListener('change',async()=>{
+      if(competition===leagueSelect.value)return;
+      competition=leagueSelect.value;
+      if(!seasons().includes(season))season=seasons()[0]||season;
+      matchday=chooseRound();dayKey=null;showAll=false;
+      await loadMine();recover();paint();
+      $('camFootballLeague')?.focus({preventScroll:true});
+    });
+    leagueField.append(el('span','Liga','cam-football-filter-label'),leagueSelect);
     const rounds=[...new Set(inScope().map(g=>Number(g.matchday)))].sort((a,b)=>a-b);
     const roundSelect=el('select',null,'cam-nfl-select');
     roundSelect.setAttribute('aria-label','Jornada');
@@ -216,8 +220,11 @@
       const op=el('option',roundName(value));op.value=String(value);op.selected=value===matchday;
       roundSelect.append(op);
     }
+    roundSelect.value=String(matchday);
     roundSelect.addEventListener('change',()=>{matchday=Number(roundSelect.value);dayKey=null;paint();});
-    nav.append(tabs,roundSelect);
+    const roundField=el('label',null,'cam-football-round-control');
+    roundField.append(el('span','Jornada','cam-football-filter-label'),roundSelect);
+    nav.append(leagueField,roundField);
   }
   function logo(id){
     const team=teams.get(id);

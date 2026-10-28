@@ -36,6 +36,22 @@
     border-radius:var(--ds-radius)!important;
   }
 
+  /* Text boxes have no rounded clipping edge. In particular, line-clamped
+     Takes and champion names must keep their first and last letters intact. */
+  html body #aeProfileDialog :is(h2,h3,h4,p,small,strong,b,
+    .ae-profile-feature-label,.ae-profile-item-meta,.ae-profile-take-title-link,.ae-profile-medal-copy,
+    .ae-profile-medal-copy > span,.ae-profile-prestige-head > span,
+    .ae-profile-prestige-stat > span,.ae-champ-initials),
+  html body #freeTakes .ae-free-take-card :is(h3,p,.ae-feed-take-open,.ae-take-author-link),
+  html body #freeTakes .ae-season-card :is(h3,.ae-season-meta,
+    .ae-season-meta > span,.ae-season-receipt-copy,
+    .ae-season-receipt-kicker,.ae-season-receipt-team,.ae-season-receipt-detail) {
+    border-radius:0!important;
+  }
+  html body #aeProfileDialog :is(.ae-profile-medal-badge,.ae-champ-medal,.ae-champ-seal) {
+    border-radius:50%!important;
+  }
+
   /* La página, cabecera y pie llegan hasta el borde de la pantalla. */
   html body > :is(header, main, footer),
   html body > header > div,

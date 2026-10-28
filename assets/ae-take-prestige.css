@@ -20,6 +20,7 @@
 #aeProfileDialog .ae-profile-medal-copy small{font:800 8.5px/1.2 Inter,system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#8a6420}
 #aeProfileDialog .ae-profile-medal-copy strong{font:600 16px/1.2 Newsreader,Georgia,serif;color:#213c4e;overflow-wrap:anywhere}
 #aeProfileDialog .ae-profile-medal-copy span{font:10.5px/1.4 Inter,system-ui,sans-serif;color:#586975}
+#aeProfileDialog .ae-profile-medal-copy > *{min-width:0;max-width:100%;overflow-wrap:anywhere}
 
 html.dark #aeProfileDialog .ae-profile-prestige{border-color:rgba(207,165,117,.44);color:#f4eadc;
   background:radial-gradient(circle at 10% 10%,rgba(213,158,94,.13),transparent 42%),linear-gradient(110deg,rgba(22,52,67,.88),rgba(9,32,46,.68))}
@@ -42,7 +43,7 @@ html.dark #aeProfileDialog .ae-profile-medal-copy small{color:#e2b65d}
 #aeProfileDialog .ae-champ-tally span{padding:4px 9px;font:600 11px/1.2 Inter,system-ui,sans-serif;color:#7a5333;background:rgba(193,127,59,.12)}
 #aeProfileDialog .ae-champ-tally span.is-won{color:#2d5f43;background:rgba(61,128,90,.13)}
 #aeProfileDialog .ae-champ-shelf{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:12px}
-#aeProfileDialog .ae-champ{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;padding:16px 12px 13px;
+#aeProfileDialog .ae-champ{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;min-width:0;padding:16px 12px 13px;
   background:linear-gradient(180deg,#fffdf8 0%,#fbf3e6 62%,#f3e6d2 100%);border:1px solid rgba(197,163,128,.5);box-shadow:0 1px 0 #fff inset,0 6px 14px -10px rgba(85,58,30,.45)}
 #aeProfileDialog .ae-champ-medal{position:relative;width:78px;height:78px;display:grid;place-items:center;margin-bottom:19px;
   background:radial-gradient(circle at 50% 38%,#fff 0 52%,#f5ead9 74%);box-shadow:0 0 0 1px rgba(168,115,45,.35),0 0 0 5px #fbf3e6,0 0 0 6px rgba(168,115,45,.28)}
@@ -58,6 +59,7 @@ html.dark #aeProfileDialog .ae-profile-medal-copy small{color:#e2b65d}
 #aeProfileDialog .ae-champ-score b{font:600 24px/1 Newsreader,Georgia,serif;color:#9a6a30;font-variant-numeric:lining-nums}
 #aeProfileDialog .ae-champ-score span{font:500 11px/1.2 Inter,system-ui,sans-serif;color:#6a7680}
 #aeProfileDialog .ae-champ-foot{margin:6px 0 0;font:11px/1.35 Inter,system-ui,sans-serif;color:#6a7680}
+#aeProfileDialog .ae-champ :is(.ae-champ-league,.ae-champ-team,.ae-champ-foot){max-width:100%;overflow-wrap:anywhere}
 #aeProfileDialog .ae-champ.is-won{border-color:rgba(192,138,53,.75);background:linear-gradient(180deg,#fffaf0 0%,#f8ebcf 70%,#f1dcb1 100%)}
 #aeProfileDialog .ae-champ.is-won .ae-champ-medal{box-shadow:0 0 0 1px rgba(168,115,45,.6),0 0 0 5px #f8ebcf,0 0 0 7px #d4a54e}
 #aeProfileDialog .ae-champ.is-won .ae-champ-score b{color:#2f6b4a}

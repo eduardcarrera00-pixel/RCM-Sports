@@ -11,6 +11,12 @@ const el = (tag,text,cls) => {
   if(cls)n.className=cls;
   return n;
 };
+function setOverview(text=''){
+  const overview=$('aeProfileOverviewText');
+  if(!overview)return;
+  overview.textContent=text;
+  overview.hidden=!text;
+}
 
 const labels={
   football:'Fútbol',laliga:'LaLiga',premier:'Premier League',ligamx:'Liga MX',
@@ -507,10 +513,7 @@ function renderTakes(entries,owner,canVote){
   }
 
   $('aeProfileCount').textContent=entries.length+' '+(entries.length===1?'Take':'Takes');
-  const overview=$('aeProfileOverviewText');
-  if(overview)overview.textContent=privateView
-    ?'Tu mejor Take, tu peor Take y el Unpopular Take que tú elijas, seguidos por tus publicaciones más recientes.'
-    :'Selección histórica de Takes públicos de este aficionado.';
+  setOverview(privateView?'':'Selección histórica de Takes públicos de este aficionado.');
 
   if(!entries.length){
     target.append(el('p',privateView?'Aún no has publicado Takes.':'Todavía no hay Takes públicos en este perfil.','ae-profile-empty'));
@@ -662,8 +665,7 @@ function renderPicks(entries,isPublic=false){
   target.replaceChildren();
 
   $('aeProfileCount').textContent=entries.length+' '+(entries.length===1?'Pick':'Picks');
-  const overview=$('aeProfileOverviewText');
-  if(overview)overview.textContent=isPublic?'Resultados, Picks recientes y porcentaje de acierto de este aficionado.':'Tus mejores y peores resultados, tus Picks recientes y tu porcentaje de acierto real.';
+  setOverview(isPublic?'Resultados, Picks recientes y porcentaje de acierto de este aficionado.':'');
 
   const won=entries.filter(p=>p.outcome==='won').sort((a,b)=>numeric(b.result_points)-numeric(a.result_points)||numeric(b.american_odds)-numeric(a.american_odds)||new Date(b.created_at)-new Date(a.created_at));
   const lost=entries.filter(p=>p.outcome==='lost').sort((a,b)=>numeric(a.result_points)-numeric(b.result_points)||numeric(b.american_odds)-numeric(a.american_odds)||new Date(b.created_at)-new Date(a.created_at));
@@ -730,9 +732,7 @@ function setPrivateTab(tab){
   }else{
     $('aeProfileTitle').textContent=privateView?'Mi Quiniela':'Quiniela de '+publicAuthorLabel;
     $('aeProfileCount').textContent='La Quiniela NFL';
-    $('aeProfileOverviewText').textContent=privateView
-      ?'Tus pronósticos, estadísticas e historial de jornadas NFL.'
-      :'Resultados confirmados de este aficionado. Sus pronósticos futuros son privados.';
+    setOverview(privateView?'':'Resultados confirmados de este aficionado. Sus pronósticos futuros son privados.');
     window.camNflProfile?.open(activeAuthor,privateView);
   }
 }
