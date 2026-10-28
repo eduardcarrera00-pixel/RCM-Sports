@@ -14,7 +14,7 @@ const server=http.createServer((req,res)=>{
  const browser=await engine.launch(launch);
  try{
  const context=await browser.newContext({...devices['iPhone 13'],timezoneId:'America/Toronto',acceptDownloads:true}),page=await context.newPage(),errors=[];
- page.on('pageerror',e=>errors.push(e.message));await page.route('**/*',r=>r.request().url().startsWith('http://127.0.0.1')?r.continue():r.abort());
+ page.on('pageerror',e=>errors.push(e.message));await page.route('**/*',r=>(/^(?:blob:)?http:\/\/127\.0\.0\.1(?::|\/)/).test(r.request().url())?r.continue():r.abort());
  await page.goto('http://127.0.0.1:'+server.address().port);
  await page.evaluate(()=>{
   const draw=CanvasRenderingContext2D.prototype.fillText,logo=CanvasRenderingContext2D.prototype.drawImage;
