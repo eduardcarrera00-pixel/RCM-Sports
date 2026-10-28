@@ -299,7 +299,7 @@
   const label=make('label','Texto para tu publicación','cam-pick-share-caption-label');const text=make('textarea');text.value=caption(p);text.readOnly=true;text.rows=5;text.setAttribute('aria-label','Texto y enlace de la publicación');label.append(text);
   const defaults=()=>({mode:p.body&&!sameTakeText(p.body,p.title)?'fragment':'title',size:'feed',showDate:true,fragment:0,textSize:'auto',explanation:''});
   let takeOptions=defaults();
-  let editor=null,modeSelect=null,fragmentLabel=null,fragmentSelect=null,sizeSelect=null,dateToggle=null,textSizeSelect=null,selectionNote=null,shareButton=null,explanationInput=null,explanationCount=null;
+  let editor=null,modeSelect=null,fragmentLabel=null,fragmentSelect=null,sizeSelect=null,dateToggle=null,textSizeSelect=null,selectionNote=null,shareButton=null,explanationInput=null,explanationCount=null,sizeNote=null;
   if(p.kind==='take'){
    editor=make('section',null,'cam-take-share-editor');editor.setAttribute('aria-label','Personalizar la ficha del Take');
    const title=make('strong','Personaliza tu ficha','cam-take-share-editor-title');editor.append(title);
@@ -311,8 +311,8 @@
    fragmentLabel=field('Fragmento del texto original',fragmentSelect);fragmentLabel.classList.add('cam-take-share-fragment');fragmentLabel.hidden=takeOptions.mode!=='fragment'||pieces.length<2;
    selectionNote=make('p','','cam-take-share-selection');selectionNote.hidden=true;editor.append(selectionNote);
    if(!pieces.length){modeSelect.querySelector('option[value="summary"]').disabled=true;modeSelect.querySelector('option[value="fragment"]').disabled=true;}
-   sizeSelect=make('select');for(const [value,name] of [['feed','Publicación 4:5 · 1080 × 1350'],['story','Historia 9:16 · 1080 × 1920'],['square','Cuadrada 1:1 · 1080 × 1080']]){const option=make('option',name);option.value=value;sizeSelect.append(option);}
-   field('Formato',sizeSelect);
+   sizeSelect=make('select');for(const [value,name] of [['feed','Publicación 4:5'],['story','Historia 9:16'],['square','Cuadrada 1:1']]){const option=make('option',name);option.value=value;sizeSelect.append(option);}
+   sizeNote=make('span','1080 × 1350 px','cam-take-share-explanation-hint');field('Formato',sizeSelect).append(sizeNote);
    textSizeSelect=make('select');for(const [value,name] of [['auto','Automático'],['compact','Pequeño'],['large','Grande']]){const option=make('option',name);option.value=value;textSizeSelect.append(option);}
    field('Tamaño del texto',textSizeSelect);
    explanationInput=make('textarea');explanationInput.rows=3;explanationInput.maxLength=240;explanationInput.className='cam-take-share-explanation';
@@ -326,11 +326,11 @@
    content.prepend(editor);
    modeSelect.onchange=()=>{takeOptions.mode=modeSelect.value;fragmentLabel.hidden=modeSelect.value!=='fragment'||pieces.length<2;refresh();};
    fragmentSelect.onchange=()=>{takeOptions.fragment=Number(fragmentSelect.value)||0;refresh();};
-   sizeSelect.onchange=()=>{takeOptions.size=sizeSelect.value;refresh();};
+   sizeSelect.onchange=()=>{takeOptions.size=sizeSelect.value;sizeNote.textContent='1080 × '+({story:1920,square:1080}[sizeSelect.value]||1350)+' px';refresh();};
    dateToggle.onchange=()=>{takeOptions.showDate=dateToggle.checked;refresh();};
    textSizeSelect.onchange=()=>{takeOptions.textSize=textSizeSelect.value;refresh();};
    explanationInput.oninput=()=>{takeOptions.explanation=explanationInput.value.slice(0,240);explanationCount.textContent=takeOptions.explanation.length+' / 240';refresh();};
-   reset.onclick=()=>{takeOptions=defaults();modeSelect.value=takeOptions.mode;fragmentSelect.value='0';fragmentLabel.hidden=takeOptions.mode!=='fragment'||pieces.length<2;sizeSelect.value='feed';textSizeSelect.value='auto';dateToggle.checked=true;explanationInput.value='';explanationCount.textContent='0 / 240';refresh();};
+   reset.onclick=()=>{takeOptions=defaults();modeSelect.value=takeOptions.mode;fragmentSelect.value='0';fragmentLabel.hidden=takeOptions.mode!=='fragment'||pieces.length<2;sizeSelect.value='feed';sizeNote.textContent='1080 × 1350 px';textSizeSelect.value='auto';dateToggle.checked=true;explanationInput.value='';explanationCount.textContent='0 / 240';refresh();};
   }
   if(p.kind==='take'){
    hint.textContent='El menú del teléfono permite elegir una app. Si no recibe imágenes, descarga el PNG y adjúntalo; puedes copiar el enlace por separado.';
