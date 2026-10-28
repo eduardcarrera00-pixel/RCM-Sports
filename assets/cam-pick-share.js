@@ -162,24 +162,26 @@
   c.closePath?.();c.fill();
  }
  function renderTakeCard(p,options={}){
-  const portrait=options.size==='story',w=1080,h=portrait?1920:1080;
+  const portrait=options.size==='story',w=1080;
+  const mode=options.mode||'title',extra=mode==='summary'?takeSummary(p.body):mode==='fragment'?takeFragments(p.body)[options.fragment||0]||'':'';
+  // A compact horizontal editorial card is the default in every export format.
+  const h=extra?840:560;
   const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
   const c=canvas.getContext('2d');if(!c)throw Error('Este navegador no permite generar la imagen. Prueba descargarla desde otro navegador.');
   roundedShareBackground(c,w,h,72);
   // White letterform logo, integrated into the same blue background (no box).
   // Story content stays below the top chrome and above captions/navigation;
   // its right margin also reserves space for TikTok's action rail.
-  const margin=82,right=portrait?916:998,maxWidth=right-margin;
-  const logoTop=portrait?295:85,logoWidth=174;
+  const margin=54,right=1026,maxWidth=right-margin;
+  const logoTop=24,logoWidth=140;
   c.textAlign='right';c.fillStyle='#fff';
-  c.font='600 66px "Playfair Display", Georgia, serif';c.fillText('CAM',right,logoTop+65);
+  c.font='600 54px "Playfair Display", Georgia, serif';c.fillText('CAM',right,logoTop+65);
   c.strokeStyle='#fff';c.lineWidth=2;c.beginPath();c.moveTo(right-logoWidth,logoTop+77);c.lineTo(right,logoTop+77);c.stroke();
   c.font='500 18px Arial, sans-serif';c.fillText('S P O R T S',right,logoTop+106);c.textAlign='left';
 
-  const mode=options.mode||'title',extra=mode==='summary'?takeSummary(p.body):mode==='fragment'?takeFragments(p.body)[options.fragment||0]||'':'';
-  const footerY=portrait?1370:909,baseTop=portrait?480:264,textSpace=footerY-70-baseTop;
+  const footerY=h-100,baseTop=155,textSpace=footerY-28-baseTop;
   const scale={compact:.86,large:1.14}[options.textSize]||1;
-  let font=Math.round((extra?82:104)*scale),extraFont=36,lines=[],extraLines=[],block=0;
+  let font=Math.round((extra?72:84)*scale),extraFont=36,lines=[],extraLines=[],block=0;
   for(;font>=22;font-=1){
    c.font='600 '+font+'px "Playfair Display", Georgia, serif';lines=wrap(c,p.title,maxWidth,Infinity);
    extraFont=Math.max(22,Math.min(portrait?40:34,Math.round(font*.55)));
@@ -214,7 +216,14 @@
   names.forEach((line,i)=>c.fillText(line,margin+72,footerY+75+i*26));
   if(date){c.fillStyle='#BE9270';c.fillRect(right-225,footerY+37,2,43);
    c.fillStyle='#fff';c.textAlign='right';c.font='400 28px "Libre Baskerville", Georgia, serif';c.fillText(date,right,footerY+75);c.textAlign='left';}
-  return canvas;
+  // Keep 1:1 and 9:16 PNG dimensions without stretching the horizontal card.
+  const output=document.createElement('canvas');output.width=1080;output.height=portrait?1920:1080;
+  const out=output.getContext('2d');if(!out)throw Error('No se pudo preparar la imagen.');
+  out.fillStyle='#FFFFFF';out.fillRect(0,0,output.width,output.height);
+  const cardWidth=portrait?860:1000,cardHeight=h*cardWidth/w;
+  const left=(output.width-cardWidth)/2,top=portrait?280+(1220-cardHeight)/2:(1080-cardHeight)/2;
+  out.drawImage(canvas,left,top,cardWidth,cardHeight);
+  return output;
  }
 
  function renderCard(p,options){
