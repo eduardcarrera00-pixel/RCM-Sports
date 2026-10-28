@@ -1,0 +1,252 @@
+/* CAM SPORTS · Ajustes de diseño pedidos para el teléfono (28 oct 2026).
+   Se carga al final de la página para ganar a las capas anteriores sin tocarlas.
+   1. Historial de recetas: las letras de los extremos ya no se recortan.
+   2. «Ver Pick» y «Demuestra tu conocimiento»: chevron › en lugar de la flecha diagonal.
+   3. Pick histórico: perfil arriba, partido como título y datos compactos (cuota en cian).
+   4. Take histórico: contorno oscuro en los textos claros (modo día).
+   5. Quinielas: «Jornada» arriba; clasificación mensual e histórica lado a lado.
+
+   Las esquinas redondeadas viven en capas con !important (cam-rounded-editorial y
+   cam-banners), que ganan a cualquier regla fuera de capa; por eso los ajustes de
+   border-radius y del chevron de la portada van dentro de esas mismas capas. */
+
+/* ---------- 1 · Historial de recetas ---------- */
+/* El radio global de 14 px se aplicaba también a las cajas interiores de texto.
+   Con overflow:hidden, esa esquina curva cortaba la primera letra de la primera
+   línea («Santos», «Paris») y la de la última («Pumas», «selecciones»). */
+@layer cam-rounded-editorial {
+  html body #footballTakes #communityPicks #cpSettleHistory .ae-pick-history-card :is(
+    .ae-pick-history-card-top,.ae-pick-history-card-content,.ae-pick-history-card-bottom,
+    .ae-pick-history-user,.ae-pick-history-match,.ae-pick-history-prediction,
+    .ae-pick-history-multiple,.ae-pick-history-odds,.ae-pick-history-date) {
+    border-radius:0!important;
+  }
+  /* Misma causa: la línea bajo la cabecera salía curvada. */
+  html body #footballTakes #communityPicks #cpSettleHistorySection > .ae-pick-history-heading {
+    border-radius:0!important;
+  }
+}
+
+/* ---------- 2 · Chevron › ---------- */
+html body #footballTakes #communityPicks .ae-chefs-dual-standings a.ae-chef-ranked-pick-link .cam-chevron {
+  display:inline-block!important;
+  margin:0 0 0 4px!important;
+  font:400 1.55em/.8 Georgia,"Times New Roman",serif!important;
+  transform:translateY(-.04em);
+}
+@layer cam-banners {
+  html:not(#ds):not(#ds):not(#ds):not(#ds) body.ae-is-home #aeHomeTakeHighlights #aeHomeTakePublish .cam-home-take-square-arrow {
+    font-family:Georgia,"Times New Roman",serif!important;
+    font-weight:400!important;
+    line-height:1!important;
+  }
+  @media(max-width:760px){
+    html body.ae-is-home #aeHomeTakeHighlights #aeHomeTakesSectionHeading #aeHomeTakePublish .cam-home-take-square-arrow {
+      font-size:26px!important;
+      line-height:.9!important;
+      transform:translateY(-1px);
+    }
+  }
+}
+
+/* ---------- 3 · Pick histórico ---------- */
+html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-record {
+  --cam-hp-ink:var(--ds-text,#273b49);
+  --cam-hp-muted:var(--ds-text-muted,#566876);
+  --cam-hp-line:var(--ds-line,#ded3c3);
+  --cam-hp-neon:#00e1ff;
+  --cam-hp-chip:#0c2231;
+  --cam-hp-chip-line:rgba(0,225,255,.5);
+  gap:0!important;
+}
+html.dark body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-record {
+  --cam-hp-ink:#f3e9dc;
+  --cam-hp-muted:#a9b9c0;
+  --cam-hp-line:rgba(199,170,137,.3);
+  --cam-hp-chip:#061722;
+}
+/* Perfil arriba */
+html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-record .cam-historic-byline {
+  display:flex!important;
+  align-items:center!important;
+  min-width:0!important;
+  margin:0 0 4px!important;
+}
+html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-record .cam-historic-byline .cam-historic-author {
+  display:inline-block!important;
+  position:relative!important;
+  z-index:3!important;
+  justify-self:auto!important;
+  max-width:100%!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:2px 0!important;
+  text-align:left!important;
+  font-size:12px!important;
+  line-height:1.3!important;
+}
+/* El partido, título de las selecciones */
+html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-record .cam-historic-head {
+  display:block!important;
+  margin:0 0 4px!important;
+  padding:0 0 8px!important;
+  border-bottom:1px solid var(--cam-hp-line)!important;
+}
+html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-record .cam-historic-head .cam-historic-match {
+  display:block!important;
+  margin:0!important;
+  color:var(--cam-hp-ink)!important;
+  font-size:19px!important;
+  line-height:1.2!important;
+}
+/* Datos compactos: cuota · fecha · deporte · puntos */
+html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-record .cam-historic-facts {
+  display:flex!important;
+  flex-wrap:wrap!important;
+  align-items:center!important;
+  gap:8px!important;
+  min-width:0!important;
+  margin:8px 0 0!important;
+  padding:10px 0 0!important;
+  border-top:1px solid var(--cam-hp-line)!important;
+}
+html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-record .cam-historic-quota-chip {
+  display:inline-flex!important;
+  align-items:baseline!important;
+  gap:5px!important;
+  flex:none!important;
+  padding:5px 9px 5px 8px!important;
+  border:1px solid var(--cam-hp-chip-line)!important;
+  background:var(--cam-hp-chip)!important;
+  box-shadow:0 0 0 1px rgba(0,225,255,.08),0 0 14px rgba(0,225,255,.22)!important;
+}
+html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-record .cam-historic-quota-label {
+  color:rgba(150,238,255,.78)!important;
+  font:700 8px/1 Inter,system-ui,sans-serif!important;
+  letter-spacing:.1em!important;
+  text-transform:uppercase!important;
+}
+html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-record .cam-historic-quota-value {
+  color:var(--cam-hp-neon)!important;
+  font:800 15px/1 Inter,system-ui,sans-serif!important;
+  font-variant-numeric:tabular-nums!important;
+  letter-spacing:.01em!important;
+  text-shadow:0 0 6px rgba(0,225,255,.75),0 0 14px rgba(0,225,255,.35)!important;
+}
+html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-record .cam-historic-details {
+  display:inline-flex!important;
+  flex-wrap:wrap!important;
+  align-items:center!important;
+  gap:2px 0!important;
+  min-width:0!important;
+  color:var(--cam-hp-muted)!important;
+  font:600 11px/1.3 Inter,system-ui,sans-serif!important;
+}
+html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-record .cam-historic-fact {
+  display:inline-flex!important;
+  align-items:center!important;
+  white-space:nowrap!important;
+}
+html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-record .cam-historic-fact + .cam-historic-fact::before {
+  content:"·"!important;
+  margin:0 5px!important;
+  opacity:.7!important;
+}
+/* Etiquetas solo para lectores de pantalla */
+html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-record .cam-historic-fact-label {
+  position:absolute!important;
+  width:1px!important;height:1px!important;
+  margin:-1px!important;padding:0!important;
+  overflow:hidden!important;clip:rect(0 0 0 0)!important;
+  white-space:nowrap!important;border:0!important;
+}
+html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-record .cam-historic-facts > .ae-discovery-meta {
+  display:inline-flex!important;
+  margin:0 0 0 auto!important;
+  padding:0!important;
+}
+/* Separadores rectos: el radio global curvaba estas líneas. */
+@layer cam-rounded-editorial {
+  html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-record :is(.cam-historic-byline,.cam-historic-head,.cam-historic-facts,.cam-historic-details,.cam-historic-fact) {
+    border-radius:0!important;
+  }
+  html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-record .cam-historic-quota-chip {
+    border-radius:var(--ds-radius-pill,999px)!important;
+  }
+}
+
+/* ---------- 4 · Take histórico ---------- */
+/* Modo día: los textos son claros sobre fondo claro; un contorno oscuro fino
+   (más un halo suave) los hace legibles sin cambiar su color. */
+html:not(.dark) body :is(#aeHomeTakeHighlights,#mainContent) #aeHomeTakeHistoric :is(.ae-home-take-feature-intro,#aeHomeTakeHistoricTake > .ae-discovery-empty) {
+  --cam-outline:rgba(20,31,40,.88);
+  text-shadow:
+    -.8px -.8px 0 var(--cam-outline),.8px -.8px 0 var(--cam-outline),
+    -.8px .8px 0 var(--cam-outline),.8px .8px 0 var(--cam-outline),
+    0 -.8px 0 var(--cam-outline),0 .8px 0 var(--cam-outline),
+    -.8px 0 0 var(--cam-outline),.8px 0 0 var(--cam-outline),
+    0 0 5px rgba(12,20,28,.5)!important;
+}
+html:not(.dark) body :is(#aeHomeTakeHighlights,#communityPicks,#mainContent) :is(#aeHomeTakeHistoric) :is(#aeHomeTakeHistoricTitle) {
+  --cam-outline:rgba(20,31,40,.9);
+  text-shadow:
+    -1.3px -1.3px 0 var(--cam-outline),1.3px -1.3px 0 var(--cam-outline),
+    -1.3px 1.3px 0 var(--cam-outline),1.3px 1.3px 0 var(--cam-outline),
+    0 -1.3px 0 var(--cam-outline),0 1.3px 0 var(--cam-outline),
+    -1.3px 0 0 var(--cam-outline),1.3px 0 0 var(--cam-outline),
+    0 3px 12px rgba(10,18,26,.4)!important;
+}
+/* La ficha del Take es un botón: con la forma de píldora global se cortaban
+   las letras de sus esquinas. Se queda como tarjeta. */
+@layer cam-rounded-editorial {
+  html body #aeHomeTakeHighlights #aeHomeTakeHistoric #aeHomeTakeHistoricTake button.ae-discovery-take {
+    border-radius:var(--ds-radius-card,20px)!important;
+  }
+  html body #aeHomeTakeHighlights #aeHomeTakeHistoric #aeHomeTakeHistoricTake button.ae-discovery-take * {
+    border-radius:0!important;
+  }
+}
+
+/* ---------- 5 · Quinielas NFL y Fútbol ---------- */
+@media(max-width:760px){
+  html body #mainContent :is(#camNflViewTabs,#camFootballViewTabs).cam-quiniela-view-tabs {
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:8px!important;
+  }
+  html body #mainContent :is(#camNflViewTabs,#camFootballViewTabs).cam-quiniela-view-tabs > button[data-view="jornada"] {
+    grid-column:1 / -1!important;
+  }
+  html body #mainContent :is(#camNflViewTabs,#camFootballViewTabs).cam-quiniela-view-tabs > button[data-view] {
+    width:100%!important;
+    min-width:0!important;
+    margin:0!important;
+  }
+  html body #mainContent :is(#camNflViewTabs,#camFootballViewTabs).cam-quiniela-view-tabs > button:is([data-view="month"],[data-view="all"]) {
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:1px!important;
+    min-height:50px!important;
+    padding:6px 8px!important;
+    line-height:1.15!important;
+    white-space:normal!important;
+  }
+  html body #mainContent :is(#camNflViewTabs,#camFootballViewTabs) .cam-q-tab-kicker {
+    display:block!important;
+    font-family:Inter,system-ui,sans-serif!important;
+    font-size:9px!important;
+    font-weight:700!important;
+    letter-spacing:.1em!important;
+    text-transform:uppercase!important;
+    opacity:.75!important;
+  }
+  html body #mainContent :is(#camNflViewTabs,#camFootballViewTabs) .cam-q-tab-name {
+    display:block!important;
+    font-size:inherit!important;
+  }
+  html body #mainContent :is(#camNflViewTabs,#camFootballViewTabs) .cam-q-tab-name::first-letter {
+    text-transform:uppercase!important;
+  }
+}

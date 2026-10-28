@@ -297,8 +297,8 @@ async function loadHistoricPick(){
   const matches=[...new Set(legs.map(leg=>String(leg?.event||'').trim()).filter(Boolean))];
   const sports=[...new Set(legs.map(leg=>String(leg?.sport||'').trim()).filter(Boolean))];
   const matchup=matches.join(' + ')||pick.title||'Pick de la comunidad';
-  const head=el('div',null,'cam-historic-head');
-  head.append(el('strong',matchup,'ae-discovery-title cam-historic-match'));
+  // Orden: perfil arriba; el partido hace de título de las selecciones.
+  const byline=el('div',null,'cam-historic-byline');
   const authorName='@'+String(pick.author||'Aficionado').replace(/^@+/,'');
   if(pick.user_id){
     const profile=button(authorName,()=>{
@@ -307,34 +307,43 @@ async function loadHistoricPick(){
     profile.className='cam-historic-author cam-historic-profile';
     profile.setAttribute('aria-label','Ver perfil de '+authorName);
     profile.title='Ver perfil de '+authorName;
-    head.append(profile);
+    byline.append(profile);
   }else{
-    head.append(el('span',authorName,'cam-historic-author'));
+    byline.append(el('span',authorName,'cam-historic-author'));
   }
+  winner.append(byline);
+  const head=el('div',null,'cam-historic-head');
+  head.append(el('strong',matchup,'ae-discovery-title cam-historic-match'));
   winner.append(head);
-
-  const rows=el('div',null,'cam-historic-rows');
-  const row=(label,value)=>{
-    if(value===null||value===undefined||String(value).trim()==='')return;
-    const item=el('div',null,'cam-historic-row');
-    if(label==='Cuota')item.classList.add('cam-historic-quota');
-    item.append(el('span',label,'cam-historic-row-label'),el('span',String(value),'cam-historic-row-value'));
-    rows.append(item);
-  };
   winner.append(ticketRows(pick,true));
+
+  // Datos compactos: cuota, fecha, deporte y puntos. El resultado no se repite:
+  // el Pick histórico siempre es un acierto.
+  const facts=el('div',null,'cam-historic-facts');
+  const fact=(label,value,cls)=>{
+    const item=el('span',null,'cam-historic-fact '+cls);
+    item.append(el('span',label+': ','cam-historic-fact-label'),el('span',value,'cam-historic-fact-value'));
+    return item;
+  };
   if(pick.american_odds!==null&&pick.american_odds!==undefined&&String(pick.american_odds).trim()!==''){
     const american=Number(pick.american_odds);
-    row('Cuota',Number.isFinite(american)?(american>0?'+':'')+american:String(pick.american_odds));
+    const quota=el('span',null,'cam-historic-quota-chip');
+    quota.append(el('span','Cuota','cam-historic-quota-label'),
+      el('strong',Number.isFinite(american)?(american>0?'+':'')+american:String(pick.american_odds),'cam-historic-quota-value'));
+    facts.append(quota);
   }
-  row('Resultado',pick.outcome==='won'?'Acertado':pick.outcome==='lost'?'Fallado':pick.outcome==='void'?'Anulado':pick.outcome);
-  row('Fecha',pick.event_date);
-  row('Deporte',sports.join(' / '));
-  winner.append(rows);
-
+  const details=el('span',null,'cam-historic-details');
+  const eventDay=/^\d{4}-\d{2}-\d{2}$/.test(String(pick.event_date||''))
+    ?new Date(pick.event_date+'T12:00:00Z').toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}).replace(/\./g,'')
+    :String(pick.event_date||'').trim();
+  if(eventDay)details.append(fact('Fecha',eventDay,'cam-historic-date'));
+  if(sports.length)details.append(fact('Deporte',sports.join(' / '),'cam-historic-sport'));
+  if(details.childNodes.length)facts.append(details);
   // Do not change the existing points element, value or score styling.
   const meta=el('span',null,'ae-discovery-meta');
   meta.append(el('span','+'+Number(pick.result_points).toLocaleString('es-ES',{maximumFractionDigits:2})+' puntos','ae-discovery-score'));
-  winner.append(meta);
+  facts.append(meta);
+  winner.append(facts);
   target.replaceChildren(winner);
  }catch(error){
   if(seq!==historicRequest)return;
@@ -480,7 +489,10 @@ function chefRankingEntry(record,index,voids,kind,picks){
  }
  const selected=picks.get(record.user_id);
  if(selected){
-   const pick=el('a','Ver Pick ↗','ae-chef-ranked-pick-link');
+   const pick=el('a','Ver Pick','ae-chef-ranked-pick-link');
+   const chevron=el('span','›','cam-chevron');
+   chevron.setAttribute('aria-hidden','true');
+   pick.append(chevron);
    pick.href=link(selected.id);
    pick.title=selected.title||'Abrir Pick del aficionado';
    pick.setAttribute('aria-label','Abrir Pick de '+name+': '+(selected.title||'Pronóstico'));
