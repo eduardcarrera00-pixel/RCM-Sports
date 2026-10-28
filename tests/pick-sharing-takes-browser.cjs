@@ -58,6 +58,7 @@ const server=http.createServer((req,res)=>{
 
  // An exceptionally dense combination must stop before exporting unreadable
  // text. Reopen the original Take before the independent explanation cases.
+ await select(2,'feed');
  await dialog.locator('.cam-take-share-explanation').fill('Una explicación adicional sobre el partido y la temporada. '.repeat(5).slice(0,240));
  await page.waitForFunction(()=>document.querySelector('.cam-pick-share-preview')?.getAttribute('aria-busy')==='false');
  assert.match(await dialog.locator('.cam-pick-share-preview').innerText(),/más espacio/);
