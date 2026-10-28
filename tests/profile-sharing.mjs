@@ -44,16 +44,16 @@ for(const selector of ['#aeProfileTakeHighlights .ae-profile-feature','#aeProfil
   assert.doesNotMatch(caption,/¿De acuerdo o tienes otra lectura/);assert.equal(href.origin,'https://camsports.github.io');assert.equal(href.searchParams.get('perfil'),owner);assert.ok(href.searchParams.has('take'));
   const row=takes.find(t=>t.id===href.searchParams.get('take'));assert.ok(caption.includes(row.body.trim()),'Copy text retains the full published Take');
   assert.equal(dialog.querySelector('.cam-pick-share-download').download,'cam-sports-take-'+row.id+'.png');
-  const preview=dialog.querySelector('.cam-pick-share-preview img');assert.equal(preview.width,1080);assert.equal(preview.height,566,'Take cards default to a cropped horizontal card');
+  const preview=dialog.querySelector('.cam-pick-share-preview img');assert.equal(preview.width,1080);assert.equal(preview.height,760,'Preserve the current La cita Take card with original text');
   const editor=dialog.querySelector('.cam-take-share-editor');assert.ok(editor,'Take editor exists');
   const selects=editor.querySelectorAll('select'),mode=selects[0],fragment=selects[1],size=selects[2];
-  assert.equal(mode.value,'title');
+  assert.equal(mode.value,'summary');
   mode.value='summary';mode.dispatchEvent(new a.w.Event('change'));await a.tick();assert.ok(a.drawn.includes('RESUMEN DEL TAKE'));
   mode.value='fragment';mode.dispatchEvent(new a.w.Event('change'));await a.tick();assert.ok(a.drawn.includes('FRAGMENTO ORIGINAL'));assert.equal(fragment.closest('label').hidden,false);
   size.value='story';size.dispatchEvent(new a.w.Event('change'));await a.tick();assert.equal(dialog.querySelector('.cam-pick-share-preview img').height,1920);
   editor.querySelector('input[type=checkbox]').click();assert.ok(!a.drawn.includes('PRIVATE_EMAIL'));
-  editor.querySelector('.cam-take-share-reset').click();await a.tick();assert.equal(mode.value,'title');assert.equal(size.value,'card');
-  assert.equal(dialog.querySelector('.cam-pick-share-preview img').height,566);
+  editor.querySelector('.cam-take-share-reset').click();await a.tick();assert.equal(mode.value,'summary');assert.equal(size.value,'card');
+  assert.equal(dialog.querySelector('.cam-pick-share-preview img').height,760);
   assert.equal(row.title,takes.find(t=>t.id===row.id).title,'Export options never change the original Take');
   dialog.querySelector('.cam-pick-share-close').click();assert.equal(a.d.activeElement,button);
  }

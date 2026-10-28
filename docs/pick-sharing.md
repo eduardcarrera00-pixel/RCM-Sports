@@ -69,3 +69,22 @@ preview/download/native bytes, safe content bounds, long words/props,
 an iPhone viewport. Native destinations are mocked: a physical iPhone and
 actual target-app receipt still require a device test; no social account is
 posted to by QA.
+
+## Classic table · 28 October 2026
+
+All Pick PNGs use the approved compact sportsbook table: muted market labels
+on the left, bold sans-serif selections on the right, small official logo,
+modest odds and a single event heading when all legs share that event. Mixed
+events retain row-specific context. Recognized explicit market labels can be
+translated for readability; unknown markets and the original saved data remain
+unchanged. Tables paginate without cropping either column.
+
+The same composition adapts to horizontal X posts, square publications and
+vertical Instagram/TikTok stories; story content stays in safe areas. Network
+buttons share the prepared file in the chosen format; they never publish
+automatically. The format selector identifies the intended uses.
+
+Confirmed lost Picks show “✓ Revisado · No acertado”. That check identifies a
+settled result, not a win. Wins show “✓ Acertado”; pending Picks show
+“◷ Pendiente de resultado” and void Picks “— Anulado”. These labels also appear
+in copied/native text, with no changes to the underlying settlement records.

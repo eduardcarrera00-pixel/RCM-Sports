@@ -65,7 +65,7 @@
    odds:odds(p.american_odds),date,
    competition:clean(p.competition||p.sport||[...new Set(legs.map(l=>l.sport).filter(Boolean))].join(' · '),240),
    analysis:String(weekly?p.analysis||'':p.explanation||'').trim(),
-   result:{won:'Pick acertado',lost:'Pick no acertado',void:'Pick anulado'}[state]||'Pendiente de resultado',
+   result:{won:'Pick acertado',lost:'Pick revisado · No acertado',void:'Pick anulado'}[state]||'Pendiente de resultado',
    state:['won','lost','void'].includes(state)?state:'pending',
    verified:!weekly&&p.moderation_status==='approved'&&odds(p.american_odds)!=='—',
    review:!weekly&&p.moderation_status!=='approved'?(p.moderation_status==='rejected'?'Cuota rechazada':'Cuota en revisión'):'',legs};
@@ -386,66 +386,88 @@
  // Pick exports use the same official artwork, canvas wrapping and share dialog.
  // The registry contains only normalized public fields already rendered by the site.
  const pickKey=p=>p.kind+':'+p.id;
+ // Confirmed settlement and moderation are separate: a review check never
+ // marks a lost or pending Pick as a win.
+ const pickStatus=p=>({pending:'◷ Pendiente de resultado',won:'✓ Acertado',lost:'✓ Revisado · No acertado',void:'— Anulado'}[p.state]);
+ function pickColumns(leg){
+  const parts=leg.selection.split(/\s+[·•]\s+/),original=parts.shift();
+  let choice=original,market=[...parts,leg.market,leg.line&&!leg.selection.includes(leg.line)?'Línea '+leg.line:''].filter(Boolean).filter((v,i,a)=>a.indexOf(v)===i).join(' · ');
+  // Translate only explicit, recognized labels; never infer a missing market,
+  // change a line, or write the readable presentation back to the saved Pick.
+  if(/^MONEYLINE\s*\(?(?:3[- ]WAY|3 VIAS)\)?$/i.test(market))market='Ganador · 3 vías';
+  else if(/^MONEYLINE$/i.test(market))market='Ganador';
+  else if(/^BOTH TEAMS TO SCORE$/i.test(market)){market='Ambos equipos marcan';if(/^YES$/i.test(choice))choice='Sí';else if(/^NO$/i.test(choice))choice='No';}
+  else if(/^OVER\/UNDER(?:\s+\d+(?:[.,]\d+)?\s+GOALS?)?$/i.test(market)){
+   const match=choice.match(/^(Over|Under)\s+(\d+(?:[.,]\d+)?)\s+Goals?$/i);
+   if(match){market='Total de goles';choice=(/^over$/i.test(match[1])?'Más de ':'Menos de ')+match[2];}
+  }
+  return {market:market||'Selección',choice};
+ }
  function pickPages(p,options){
-  const w=1080,h=options.size==='story'?1920:options.size==='card'?700:1080;
-  const top=options.size==='story'?440:options.size==='card'?210:238,footer=options.size==='story'?1515:options.size==='card'?h-135:h-140,bottom=footer-(options.size==='card'?120:145),width=948;
-  const measure=document.createElement('canvas').getContext('2d');
-  if(!measure)throw Error('Este navegador no permite generar imágenes.');
-  const groups=[];
-  const lines=(text,font,size,color='#fff',gap=0)=>{
-   measure.font=font;return wrap(measure,text,width,Infinity).map((text,i)=>({text,font,size,color,height:size*1.28+(i===0?gap:0),gap:i===0?gap:0}));
-  };
-  p.legs.forEach((leg,index)=>{
-   const size=p.legs.length===1?72:46,parts=leg.selection.split(/\s+[·•]\s+/);
-   const choice=parts.shift(),market=[...parts,leg.market,leg.line&&!leg.selection.includes(leg.line)?'Línea '+leg.line:''].filter(Boolean).filter((v,i,a)=>a.indexOf(v)===i).join(' · ');
-   const group=[];
-   if(p.legs.length>1&&!leg.event)group.push(...lines('SELECCIÓN '+(index+1),'600 22px Arial, sans-serif',22,'#DDC5AD'));
-   if(leg.event)group.push(...lines((p.legs.length>1?String(index+1).padStart(2,'0')+' · ':'')+leg.event,'400 29px Arial, sans-serif',29,'#fff',8));
-   group.push(...lines(choice,'600 '+size+'px "Playfair Display", Georgia, serif',size,'#fff',10));
-   if(market)group.push(...lines(market,'400 28px Arial, sans-serif',28,'#DDC5AD',10));
-   groups.push(group);
+  const w=1080,h=options.size==='story'?1920:options.size==='card'?700:1080,story=options.size==='story';
+  const measure=document.createElement('canvas').getContext('2d');if(!measure)throw Error('Este navegador no permite generar imágenes.');
+  const wrapAt=(text,font,width)=>{measure.font=font;return wrap(measure,text,width,Infinity);};
+  const events=[...new Set(p.legs.map(l=>l.event).filter(Boolean))],common=events.length===1&&p.legs.every(l=>l.event===events[0])?events[0]:'';
+  const header=story?300:64;
+  const title=wrapAt(common||p.title,'600 36px Arial, sans-serif',948);
+  const sport=wrapAt(p.competition||'PICKS','400 26px Arial, sans-serif',948);
+  const tableTop=header+76+sport.length*32+title.length*44+14;
+  const dateVisible=options.showDate&&p.date;
+  let authorFont=25;for(;authorFont>18;authorFont--){measure.font='600 '+authorFont+'px Arial, sans-serif';if(measure.measureText('Por '+p.author).width<=(dateVisible?690:948))break;}
+  const authorExtra=Math.max(0,wrapAt('Por '+p.author,'600 '+authorFont+'px Arial, sans-serif',dateVisible?690:948).length-1)*20;
+  const footer=(story?1515:h-140)-authorExtra,bottom=footer-82,top=tableTop+40,capacity=bottom-top;
+  if(capacity<100)throw Error('El encabezado necesita más espacio. Elige el formato vertical.');
+  const entries=[];
+  for(const leg of p.legs){
+   const values=pickColumns(leg),left=wrapAt(values.market,'400 28px Arial, sans-serif',420),right=wrapAt(values.choice,'600 32px Arial, sans-serif',454);
+   const context=common?[]:wrapAt(leg.event,'400 25px Arial, sans-serif',948);
+   const total=Math.max(left.length,right.length),contextHeight=context.length*31;
+   // Long entries continue as readable table rows on additional images.
+   const maxLines=Math.max(1,Math.floor((capacity-contextHeight-28)/40));
+   if(contextHeight+68>capacity)throw Error('Este partido necesita más espacio. Elige el formato vertical.');
+   for(let i=0;i<total;i+=maxLines){const market=left.slice(i,i+maxLines),selection=right.slice(i,i+maxLines);entries.push({context,market,selection,height:contextHeight+Math.max(market.length,selection.length)*40+24});}
+  }
+  if(options.showAnalysis&&p.analysis){const fragment=takeFragments(p.analysis)[options.fragments[pickKey(p)]||0]||'',lines=wrapAt(fragment,'400 28px Arial, sans-serif',948),max=Math.max(1,Math.floor((capacity-70)/37));for(let i=0;i<lines.length;i+=max)entries.push({analysis:lines.slice(i,i+max),height:50+lines.slice(i,i+max).length*37});}
+  const pages=[];let rows=[],used=0;
+  const flush=()=>{if(rows.length){pages.push(rows);rows=[];used=0;}};
+  for(const entry of entries){if(used&&used+entry.height>capacity)flush();rows.push(entry);used+=entry.height;}
+  flush();return pages.map((rows,index)=>{
+   const used=rows.reduce((n,r)=>n+r.height,0),compactFooter=top+used+36,shift=Math.max(0,(footer-compactFooter)/2);
+   return {p,w,h,header:header+shift,title,sport,top:top+shift,tableTop:tableTop+shift,bottom:compactFooter+shift-36,footer:compactFooter+shift,rows,index,total:pages.length};
   });
-  if(options.showAnalysis&&p.analysis){
-   const fragment=takeFragments(p.analysis)[options.fragments[pickKey(p)]||0]||'';
-   groups.push([...lines('ANÁLISIS · FRAGMENTO ORIGINAL','600 22px Arial, sans-serif',22,'#DDC5AD'),...lines(fragment,'400 28px Arial, sans-serif',28,'#fff',12)]);
-  }
-  // Paginate at a readable, fixed size. A very long row continues on another
-  // image; no selections are discarded or replaced with an ellipsis.
-  const capacity=bottom-top,pages=[];let page=[],used=0;
-  const flush=()=>{if(page.length){pages.push(page);page=[];used=0;}};
-  for(const group of groups){
-   const height=group.reduce((n,l)=>n+l.height,0)+20;
-   if(used&&used+height>capacity)flush();
-   for(const line of group){if(used+line.height>capacity)flush();page.push(line);used+=line.height;}
-   used+=20;if(page.length)page[page.length-1]={...page.at(-1),height:page.at(-1).height+20};
-  }
-  flush();return pages.map((lines,index)=>({p,w,h,top,bottom,footer,lines,index,total:pages.length}));
  }
  function renderPickPage(page,options,position,count){
-  const {p,w,h,top,bottom,footer,lines}=page,canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
+  const {p,w,h,header,title,sport,top,tableTop,bottom,footer,rows}=page,canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
   const c=canvas.getContext('2d');if(!c||!takeLogo)throw Error('No se pudo preparar la ficha con el logo oficial.');
+  const margin=66,right=1014,choiceX=560;
   c.fillStyle='#073B83';c.fillRect(0,0,w,h);
-  const margin=66,right=1014,story=options.size==='story',header=story?300:76;
-  c.drawImage(takeLogo,right-154,header-28,154,154*takeLogo.naturalHeight/takeLogo.naturalWidth);
-  c.fillStyle='#fff';c.font='600 26px Arial, sans-serif';
-  // The header has reserved space for the logo and keeps the complete label.
-  let sportFont=26,sportLines=[];for(;sportFont>=20;sportFont--){c.font='600 '+sportFont+'px Arial, sans-serif';sportLines=wrap(c,p.competition||'PICKS',710,Infinity);if(sportLines.length<=3)break;}
-  sportLines.forEach((line,i)=>c.fillText(line,margin,header+i*(sportFont*1.2)));
-  c.fillStyle='#DDC5AD';c.font='600 23px Arial, sans-serif';
-  c.fillText(p.legs.length>1?'COMBINADA · '+p.legs.length+' SELECCIONES':p.kind==='weekly'?'PICK DEL EDITOR':'PICK INDIVIDUAL',margin,story?398:180);
-  const height=lines.reduce((n,l)=>n+l.height,0);let y=top+Math.max(0,(bottom-top-height)/2);
-  for(const line of lines){y+=line.gap+line.size;c.font=line.font;c.fillStyle=line.color;c.fillText(line.text,margin,y);y+=line.height-line.gap-line.size;}
-  c.fillStyle='#fff';c.font='600 34px Arial, sans-serif';
-  if(options.showOdds&&p.odds!=='—')c.fillText((p.legs.length>1?'Cuota total ':'Cuota ')+p.odds,margin,footer-86);
-  c.fillStyle='#DDC5AD';c.font='400 23px Arial, sans-serif';if(options.showOdds&&p.review&&p.odds!=='—')c.fillText(p.review,margin,footer-48);
-  c.textAlign='right';c.fillStyle='#fff';c.font='600 26px Arial, sans-serif';
-  c.fillText({pending:'◷ Pendiente',won:'✓ Acertado',lost:'✕ Fallado',void:'— Anulado'}[p.state],right,footer-48);c.textAlign='left';
-  c.strokeStyle='#BE9270';c.lineWidth=2;c.beginPath();c.moveTo(margin,footer);c.lineTo(right,footer);c.stroke();
+  c.drawImage(takeLogo,right-120,header-18,120,120*takeLogo.naturalHeight/takeLogo.naturalWidth);
+  c.fillStyle='#fff';c.font='600 28px Arial, sans-serif';c.fillText(p.legs.length>1?'COMBINADA · '+p.legs.length+' SELECCIONES':p.kind==='weekly'?'PICK DEL EDITOR':'PICK INDIVIDUAL',margin,header+16);
+  let y=header+76;c.fillStyle='#B8CAE0';c.font='400 26px Arial, sans-serif';for(const line of sport){c.fillText(line,margin,y);y+=32;}
+  c.fillStyle='#fff';c.font='600 36px Arial, sans-serif';for(const line of title){c.fillText(line,margin,y+6);y+=44;}
+  const rule=(at,color='#BE9270')=>{c.strokeStyle=color;c.lineWidth=1.5;c.beginPath();c.moveTo(margin,at);c.lineTo(right,at);c.stroke();};
+  c.fillStyle='#B8CAE0';c.font='600 23px Arial, sans-serif';c.fillText('MERCADO',margin,tableTop);c.fillText('SELECCIÓN',choiceX,tableTop);rule(tableTop+20);
+  // The square and story layouts center the SAME compact table in their safe
+  // area. Rows/fonts never stretch to fill a tall story canvas.
+  y=top;
+  for(const row of rows){
+   if(row.analysis){c.fillStyle='#B8CAE0';c.font='600 22px Arial, sans-serif';c.fillText('ANÁLISIS · FRAGMENTO ORIGINAL',margin,y+24);y+=50;c.fillStyle='#fff';c.font='400 28px Arial, sans-serif';for(const line of row.analysis){c.fillText(line,margin,y+28);y+=37;}continue;}
+   c.fillStyle='#B8CAE0';c.font='400 25px Arial, sans-serif';for(const event of row.context){c.fillText(event,margin,y+25);y+=31;}
+   const start=y;
+   c.fillStyle='#B8CAE0';c.font='400 28px Arial, sans-serif';row.market.forEach((line,i)=>c.fillText(line,margin,start+32+i*40));
+   c.fillStyle='#fff';c.font='600 32px Arial, sans-serif';row.selection.forEach((line,i)=>c.fillText(line,choiceX,start+32+i*40));
+   y=start+Math.max(row.market.length,row.selection.length)*40+24;rule(y-10,'#3B6094');
+  }
+  rule(footer);
+  c.fillStyle='#fff';c.font='600 32px Arial, sans-serif';if(options.showOdds&&p.odds!=='—')c.fillText((p.legs.length>1?'Cuota total ':'Cuota ')+p.odds,margin,footer+48);
+  // Long loss/pending labels wrap within their own right-hand summary column.
+  c.font='600 25px Arial, sans-serif';c.fillStyle=p.state==='lost'?'#F3C6A2':'#fff';c.textAlign='right';wrap(c,pickStatus(p),454,Infinity).forEach((line,i)=>c.fillText(line,right,footer+46+i*30));c.textAlign='left';
+  if(options.showOdds&&p.review&&p.odds!=='—'){c.fillStyle='#B8CAE0';c.font='400 21px Arial, sans-serif';c.fillText(p.review,margin,footer+76);}
   const date=options.showDate&&p.date?p.date.split('-').reverse().join('/'):'';
-  let font=30;for(;font>20;font--){c.font='600 '+font+'px Arial, sans-serif';if(c.measureText('Por '+p.author).width<(date?690:948))break;}
-  wrap(c,'Por '+p.author,date?690:948,Infinity).forEach((line,i)=>c.fillText(line,margin,footer+55+i*25));
-  if(date){c.font='400 25px Arial, sans-serif';c.textAlign='right';c.fillText(date,right,footer+55);c.textAlign='left';}
-  if(count>1){c.fillStyle='#DDC5AD';c.font='400 22px Arial, sans-serif';c.textAlign='right';c.fillText('IMAGEN '+(position+1)+' / '+count,right,story?398:180);c.textAlign='left';}
+  let font=25;for(;font>18;font--){c.font='600 '+font+'px Arial, sans-serif';if(c.measureText('Por '+p.author).width<=(date?690:948))break;}
+  c.font='600 '+font+'px Arial, sans-serif';c.fillStyle='#fff';wrap(c,'Por '+p.author,date?690:948,Infinity).forEach((line,i)=>c.fillText(line,margin,footer+110+i*20));
+  if(date){c.font='400 23px Arial, sans-serif';c.textAlign='right';c.fillText(date,right,footer+110);c.textAlign='left';}
+  if(count>1){c.fillStyle='#B8CAE0';c.font='400 21px Arial, sans-serif';c.textAlign='right';c.fillText('IMAGEN '+(position+1)+' / '+count,right,header+84);c.textAlign='left';}
   return canvas;
  }
  // A standard uncompressed ZIP keeps every PNG byte-identical and avoids
@@ -476,7 +498,7 @@
   const previous=make('button','Anterior'),counter=make('span'),next=make('button','Siguiente');previous.type=next.type='button';counter.setAttribute('aria-live','polite');navigation.append(previous,counter,next);
   const editor=make('section',null,'cam-picks-share-editor');editor.setAttribute('aria-label','Personalizar fichas de Picks');editor.append(make('strong','Personaliza tus fichas'));
   const field=(name,control)=>{control.setAttribute('aria-label',name);const label=make('label',name,'cam-picks-share-field');label.append(control);editor.append(label);return label;};
-  const format=make('select');for(const [value,label] of [['square','Cuadrada'],['story','Historia'],['card','Horizontal']]){const option=make('option',label);option.value=value;format.append(option);}field('Formato',format);
+  const format=make('select');for(const [value,label] of [['square','Cuadrada · Publicación'],['story','Historia · Instagram / TikTok'],['card','Horizontal · X']]){const option=make('option',label);option.value=value;format.append(option);}field('Formato',format);
   const picker=make('details',null,'cam-picks-share-picker');picker.append(make('summary','Elegir Picks · '+pool.length+' disponibles'));
   picker.append(make('p','Cada Pick conserva su autor, cuota y enlace. Los Picks independientes se exportan por separado.'));
   const checks=[];
@@ -525,7 +547,7 @@
    try{supported=typeof navigator.share==='function'&&navigator.canShare?.({files});}catch{}
    if(!supported){status.textContent=files.length>1?'Este dispositivo no admite enviar todas las imágenes juntas. Usa «Compartir esta imagen» o «Descargar todas (ZIP)».':'Descarga la imagen y adjúntala en la aplicación. Puedes copiar el enlace por separado.';return;}
    const current=generation,rows=one?[items[position].p]:chosen();
-   let data={files,title:rows.length===1?headline(rows[0]):'Picks · CAM SPORTS',text:rows.map(p=>p.title+'\n'+urlFor(p)).join('\n\n')};
+   let data={files,title:rows.length===1?headline(rows[0]):'Picks · CAM SPORTS',text:rows.map(p=>p.title+'\n'+p.result+'\n'+urlFor(p)).join('\n\n')};
    if(rows.length===1)data.url=urlFor(rows[0]);
    try{if(imageOnly||network==='Instagram'||network==='TikTok'||!navigator.canShare(data))data={files};}catch{data={files};}
    const fail=error=>{if(ticket!==request||current!==generation)return;if(error?.name==='AbortError'){status.textContent='Puedes volver a compartir cuando quieras.';return;}if(data.text){imageOnly=true;status.textContent='No se pudo enviar la imagen con el enlace. Vuelve a pulsar Compartir para enviar solo la imagen o descarga el PNG.';}else status.textContent='No se pudo enviar la imagen. Descarga el PNG y adjúntalo en la aplicación.';};

@@ -52,6 +52,16 @@ const server=http.createServer((req,res)=>{
  await refresh(()=>page.getByRole('button',{name:'Restablecer diseño',exact:true}).click());assert.deepEqual(await png(),first,'Reset recreates the same PNG');
  await refresh(()=>page.evaluate(()=>{draws=[];CamPickShare.open({...pick,author:'漢'.repeat(80),american_odds:null,created_at:null,publication_day:null});}));await checkImage(1080);assert.equal(await page.evaluate(()=>draws.some(d=>d.text.startsWith('Cuota '))),false);
  await refresh(()=>page.evaluate(()=>CamPickShare.open(pick)));
+ // Settlement labels stay unambiguous in every export format.
+ for(const [state,label] of [['won','✓ Acertado'],['lost','✓ Revisado · No acertado'],['pending','◷ Pendiente de resultado'],['void','— Anulado']]){
+  await refresh(()=>page.evaluate(state=>CamPickShare.open({...pick,outcome:state}),state));
+  for(const [format,height] of [['square',1080],['card',700],['story',1920]]){
+   await refresh(()=>page.getByLabel('Formato',{exact:true}).selectOption(format));await checkImage(height);
+   const labels=await page.evaluate(()=>draws.map(d=>d.text));assert.ok(labels.includes(label));if(state==='lost')fs.writeFileSync(path.join(qa,'pick-reviewed-'+format+'.png'),await png());if(state!=='won')assert.equal(labels.includes('✓ Acertado'),false);
+   assert.ok(labels.includes('MERCADO')&&labels.includes('SELECCIÓN'));
+  }
+ }
+ await refresh(()=>page.evaluate(()=>CamPickShare.open(pick)));
  // Independent Picks retain separate authors, odds and original links.
  await page.locator('.cam-picks-share-picker summary').click();await refresh(()=>page.getByLabel('Incluir Pick: Pronóstico registrado · @OtraAutora',{exact:true}).check());
  assert.match(await page.locator('.cam-picks-share-pagination').innerText(),/Imagen 1 de 2/);assert.match(await page.locator('textarea').inputValue(),/@OtraAutora/);
@@ -63,7 +73,7 @@ const server=http.createServer((req,res)=>{
  await page.getByRole('button',{name:'Compartir esta imagen',exact:true}).click();assert.equal(await page.evaluate(()=>shares.at(-1).data.files.length),1);
  await page.evaluate(()=>shareMode='cancel');await page.getByRole('button',{name:'Compartir esta imagen',exact:true}).click();await page.waitForFunction(()=>document.querySelector('[role=status]').textContent.includes('cuando quieras'));
  await page.evaluate(()=>shareMode='error');await page.getByRole('button',{name:'Compartir esta imagen',exact:true}).click();await page.waitForFunction(()=>document.querySelector('[role=status]').textContent.includes('Vuelve a pulsar'));await page.evaluate(()=>shareMode='all');await page.getByRole('button',{name:'Compartir esta imagen',exact:true}).click();assert.equal(await page.evaluate(()=>shares.at(-1).data.text),undefined);
- await page.evaluate(()=>CamPickShare.open({...pick,legs:[{event:'Paris St-G v Barcelona',selection:'Paris St-G · MONEYLINE (3-WAY)'},{event:'Paris St-G v Barcelona',selection:'Over 3.5 Goals · OVER/UNDER'},{event:'Paris St-G v Barcelona',selection:'Yes · BOTH TEAMS TO SCORE'}]}));await ready();assert.equal(await page.locator('.cam-picks-share-pagination').isVisible(),false,'Three short selections fit on one square card');
+ await page.evaluate(()=>CamPickShare.open({...pick,legs:[{event:'Paris St-G v Barcelona',selection:'Paris St-G · MONEYLINE (3-WAY)'},{event:'Paris St-G v Barcelona',selection:'Over 3.5 Goals · OVER/UNDER'},{event:'Paris St-G v Barcelona',selection:'Yes · BOTH TEAMS TO SCORE'}]}));await ready();assert.equal(await page.locator('.cam-picks-share-pagination').isVisible(),false,'Three short selections fit on one square card');fs.writeFileSync(path.join(qa,'pick-parlay-square.png'),await png());
  // Long parlays and unusual text are paginated at readable sizes, without loss.
  await page.evaluate(()=>{draws=[];CamPickShare.open({...pick,legs:Array.from({length:12},(_,i)=>({sport:'Fútbol',event:'Partido '+(i+1),selection:'Equipo '+(i+1)+' gana · Ganador del partido'}))});});await ready();
  let drawn=await page.evaluate(()=>draws.map(d=>d.text).join(' '));for(let i=1;i<=12;i++)assert.ok(drawn.includes('Equipo '+i+' gana'));assert.doesNotMatch(drawn,/…/);assert.match(drawn,/COMBINADA · 12 SELECCIONES/);await checkImage(1080);
