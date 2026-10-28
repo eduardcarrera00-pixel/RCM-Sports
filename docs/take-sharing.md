@@ -8,7 +8,13 @@ conservan sus generadores y opciones.
 La imagen azul #073B83 utiliza Playfair Display 600 y Libre Baskerville
 servidas desde los archivos de fuentes existentes. La exportación espera
 a que se carguen. La vista previa, la descarga y Web Share utilizan los
-mismos bytes PNG, en 1080 × 1080 o 1080 × 1920. El formato vertical reserva
+mismos bytes PNG. La ficha compacta predeterminada exporta 1080 × 566
+píxeles (1080 × 840 con texto adicional); también existen 1080 × 1080
+y 1080 × 1920. El archivo tiene fondo azul opaco hasta los bordes: no
+se incrusta una tarjeta pequeña en un lienzo blanco ni transparente.
+El logo utiliza el mismo archivo con transparencia que la cabecera,
+`assets/cam-sports-logo-completo.webp`, sin recrear las letras. Si no se
+puede cargar, no se ofrece un PNG sin marca. El formato vertical reserva
 280 px arriba, 420 px abajo y espacio para los controles laterales de TikTok.
 Son márgenes conservadores; la interfaz de cada plataforma puede cambiar.
 

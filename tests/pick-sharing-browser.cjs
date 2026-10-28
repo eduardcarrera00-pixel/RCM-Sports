@@ -9,7 +9,7 @@ const server=http.createServer((req,res)=>{
  if(pathname==='/profile'){res.setHeader('Content-Type','text/html; charset=utf-8');return res.end(fs.readFileSync('index.html','utf8').replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,'').replace('</body>','<script src="/assets/cam-pick-share.js"></script><script src="/assets/ae-profile.js"></script></body>'));}
  if(pathname==='/') {res.setHeader('Content-Type','text/html; charset=utf-8');return res.end('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="/assets/site.css"><link rel="stylesheet" href="/assets/ae-editorial-bundle.css"></head><body><main id="mainContent"><section id="footballTakes" class="ae-picks-editorial"><section id="communityPicks"><div id="cpFeed"><article class="cp-card cp-feed-editorial"><h3>Barça vs PSG</h3><div class="cp-actions" id="actions"></div></article></div></section></section></main><script src="/assets/cam-pick-share.js"></script></body></html>');}
  const file=path.resolve(root,'.'+pathname);if(!file.startsWith(root+path.sep)){res.writeHead(403);return res.end();}
- try{res.setHeader('Content-Type',file.endsWith('.css')?'text/css; charset=utf-8':'text/javascript; charset=utf-8');res.end(fs.readFileSync(file));}catch{res.writeHead(404);res.end();}
+ try{res.setHeader('Content-Type',file.endsWith('.css')?'text/css; charset=utf-8':file.endsWith('.webp')?'image/webp':'text/javascript; charset=utf-8');res.end(fs.readFileSync(file));}catch{res.writeHead(404);res.end();}
 });
 (async()=>{
  await new Promise(r=>server.listen(0,'127.0.0.1',r));let launch={headless:true,args:['--no-sandbox','--disable-dev-shm-usage']};
