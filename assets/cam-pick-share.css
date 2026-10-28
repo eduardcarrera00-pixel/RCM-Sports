@@ -74,3 +74,39 @@
  .cam-take-share-bar{bottom:-14px}
 }
 @media(max-width:380px){.cam-take-share-field{grid-column:1/-1}}
+
+/* Pick editor only; published cards and Take sharing retain their own styles. */
+.cam-pick-share-dialog.cam-picks-share-dialog{width:min(700px,calc(100vw - 24px));padding:20px;border-radius:20px;scroll-padding:70px 0 175px}
+.cam-picks-share-dialog .cam-pick-share-heading{position:sticky;top:-20px;z-index:2;background:var(--share-bg);padding:10px 0}
+.cam-picks-share-dialog h2{font-family:"Playfair Display",Georgia,serif;font-size:25px}
+.cam-picks-share-dialog .cam-pick-share-layout{display:flex;flex-direction:column;gap:14px}
+.cam-picks-share-dialog .cam-pick-share-preview{display:flex;align-items:center;justify-content:center;width:100%;max-width:100%;background:transparent;border:0}
+.cam-picks-share-dialog .cam-pick-share-preview img{width:auto;max-width:100%;max-height:min(46dvh,460px);height:auto;object-fit:contain}
+.cam-picks-share-dialog button,.cam-picks-share-dialog a{border-radius:12px}
+.cam-picks-share-editor{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;border:1px solid var(--share-line);padding:14px;border-radius:14px;min-width:0}
+.cam-picks-share-editor>strong,.cam-picks-share-picker,.cam-picks-share-analysis{grid-column:1/-1}
+.cam-picks-share-editor>strong{font:600 18px/1.4 "Playfair Display",Georgia,serif}
+.cam-picks-share-field{display:grid;gap:6px;min-width:0;align-content:start;font:600 13px/1.4 Inter,system-ui,sans-serif}
+.cam-picks-share-field select{width:100%;min-width:0;max-width:100%;min-height:44px;padding:9px;border:1px solid var(--share-line);border-radius:10px;background:var(--share-bg);color:var(--share-ink);font:400 16px/1.4 Inter,system-ui,sans-serif;text-overflow:ellipsis}
+.cam-picks-share-checkbox{display:flex;gap:10px;align-items:center;min-height:44px;font:400 14px/1.5 Inter,system-ui,sans-serif;min-width:0}
+.cam-picks-share-checkbox input{width:18px;height:18px;flex-shrink:0;accent-color:var(--share-action)}
+.cam-picks-share-picker{max-height:240px;overflow:auto;font:13px/1.5 Inter,system-ui,sans-serif}
+.cam-picks-share-picker summary,.cam-picks-share-caption summary{min-height:44px;cursor:pointer;padding:10px 0}
+.cam-picks-share-picker p{padding-bottom:8px;color:var(--share-muted)}
+.cam-picks-share-analysis{white-space:pre-wrap;max-height:120px;overflow:auto;font:13px/1.5 Inter,system-ui,sans-serif;color:var(--share-muted)}
+.cam-picks-share-pagination{display:flex;justify-content:space-between;align-items:center;gap:8px;font:500 13px/1.4 Inter,system-ui,sans-serif}
+.cam-picks-share-caption{font:13px/1.5 Inter,system-ui,sans-serif;color:var(--share-muted)}
+.cam-picks-share-caption textarea{max-height:160px}
+.cam-picks-share-bar{position:sticky;bottom:-20px;z-index:2;margin-top:16px;padding:12px 0 max(12px,env(safe-area-inset-bottom));border-top:1px solid var(--share-line);background:var(--share-bg)}
+.cam-picks-share-bar .cam-pick-share-utilities{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.cam-picks-share-dialog .cam-picks-share-primary{grid-column:1/-1;background:#073b83;border-color:#073b83;color:#fff;min-height:48px}
+.cam-picks-share-all{grid-column:1/-1}
+.cam-picks-share-status:not(:empty){padding-top:8px}
+@layer cam-rounded-editorial{html body #camPickShareDialog.cam-picks-share-dialog{border-radius:20px!important}}
+@media(max-width:700px){
+ .cam-pick-share-dialog.cam-picks-share-dialog{width:calc(100vw - 16px);max-width:calc(100vw - 16px);max-height:calc(100dvh - 16px);padding:14px}
+ .cam-picks-share-dialog .cam-pick-share-heading{top:-14px}
+ .cam-picks-share-dialog .cam-pick-share-preview img{max-height:42dvh}
+ .cam-picks-share-bar{bottom:-14px}
+}
+@media(max-width:380px){.cam-picks-share-field{grid-column:1/-1}}

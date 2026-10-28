@@ -59,5 +59,7 @@ jobs:
             sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|https://archive.ubuntu.com/ubuntu|g' /etc/apt/apt-mirrors.txt
           fi
       - run: npx playwright install --with-deps webkit
-      - name: Verify Take export with the WebKit engine and iPhone viewport
-        run: CAM_SHARE_BROWSER=webkit node tests/pick-sharing-takes-browser.cjs
+      - name: Verify Take and Pick exports with WebKit and the iPhone viewport
+        run: |
+          CAM_SHARE_BROWSER=webkit node tests/pick-sharing-takes-browser.cjs
+          CAM_SHARE_BROWSER=webkit node tests/pick-sharing-editor-browser.cjs

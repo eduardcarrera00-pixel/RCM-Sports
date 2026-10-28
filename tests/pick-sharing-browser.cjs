@@ -9,7 +9,7 @@ const server=http.createServer((req,res)=>{
  if(pathname==='/profile'){res.setHeader('Content-Type','text/html; charset=utf-8');return res.end(fs.readFileSync('index.html','utf8').replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,'').replace('</body>','<script src="/assets/cam-pick-share.js"></script><script src="/assets/ae-profile.js"></script></body>'));}
  if(pathname==='/') {res.setHeader('Content-Type','text/html; charset=utf-8');return res.end('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="/assets/site.css"><link rel="stylesheet" href="/assets/ae-editorial-bundle.css"></head><body><main id="mainContent"><section id="footballTakes" class="ae-picks-editorial"><section id="communityPicks"><div id="cpFeed"><article class="cp-card cp-feed-editorial"><h3>Barça vs PSG</h3><div class="cp-actions" id="actions"></div></article></div></section></section></main><script src="/assets/cam-pick-share.js"></script></body></html>');}
  const file=path.resolve(root,'.'+pathname);if(!file.startsWith(root+path.sep)){res.writeHead(403);return res.end();}
- try{res.setHeader('Content-Type',file.endsWith('.css')?'text/css; charset=utf-8':file.endsWith('.webp')?'image/webp':'text/javascript; charset=utf-8');res.end(fs.readFileSync(file));}catch{res.writeHead(404);res.end();}
+ try{res.setHeader('Content-Type',file.endsWith('.css')?'text/css; charset=utf-8':file.endsWith('.webp')?'image/webp':file.endsWith('.woff2')?'font/woff2':'text/javascript; charset=utf-8');res.end(fs.readFileSync(file));}catch{res.writeHead(404);res.end();}
 });
 (async()=>{
  await new Promise(r=>server.listen(0,'127.0.0.1',r));let launch={headless:true,args:['--no-sandbox','--disable-dev-shm-usage']};
@@ -34,25 +34,25 @@ const server=http.createServer((req,res)=>{
  assert.equal(await page.getByRole('button',{name:'Instagram',exact:true}).isEnabled(),true);
  for(const width of [360,390,768,1366])for(const dark of [false,true]){
   await page.setViewportSize({width,height:880});await page.evaluate(d=>document.documentElement.classList.toggle('dark',d),dark);
-  const fits=await dialog.evaluate(d=>({fit:d.scrollWidth<=d.clientWidth+1,children:[...d.querySelectorAll('button,a,textarea')].filter(e=>!e.hidden).every(e=>{const r=e.getBoundingClientRect(),b=d.getBoundingClientRect();return r.left>=b.left&&r.right<=b.right+1;})}));
+  const fits=await dialog.evaluate(d=>({fit:d.scrollWidth<=d.clientWidth+1,children:[...d.querySelectorAll('button,a,textarea')].filter(e=>!e.hidden&&e.getBoundingClientRect().width>0).every(e=>{const r=e.getBoundingClientRect(),b=d.getBoundingClientRect();return r.left>=b.left&&r.right<=b.right+1;})}));
   assert.equal(fits.fit,true,'Dialog overflow at '+width);assert.equal(fits.children,true,'Controls overflow at '+width);
   if(width===390)await page.screenshot({path:path.join(qa,'sharing-mobile-'+(dark?'night':'day')+'.png')});
  }
  await page.setViewportSize({width:390,height:880});
- const x=new URL(await page.locator('.cam-pick-share-networks a').getAttribute('href'));assert.equal(x.hostname,'twitter.com');assert.ok(x.searchParams.get('url').startsWith('https://camsports.github.io/?p='));
- const downloadPromise=page.waitForEvent('download');await page.getByRole('link',{name:'Descargar tarjeta',exact:true}).click();const download=await downloadPromise;await download.saveAs(path.join(qa,'pick-card.png'));
- const png=fs.readFileSync(path.join(qa,'pick-card.png'));assert.equal(png.readUInt32BE(16),1080);assert.equal(png.readUInt32BE(20),1350);
+ assert.ok((await page.locator('.cam-pick-share-caption-label textarea').inputValue()).includes('https://camsports.github.io/?p='));
+ const downloadPromise=page.waitForEvent('download');await page.getByRole('link',{name:'Descargar imagen',exact:true}).click();const download=await downloadPromise;await download.saveAs(path.join(qa,'pick-card.png'));
+ const png=fs.readFileSync(path.join(qa,'pick-card.png'));assert.equal(png.readUInt32BE(16),1080);assert.equal(png.readUInt32BE(20),1080);
  await page.getByRole('button',{name:'Instagram',exact:true}).click();assert.deepEqual(await page.evaluate(()=>({active:shares[0].active,type:shares[0].type})),{active:true,type:'image/png'});
  await page.evaluate(()=>window.cancelShare=true);await page.getByRole('button',{name:'TikTok',exact:true}).click();await page.waitForFunction(()=>document.querySelector('.cam-pick-share-status').textContent.includes('cuando quieras'));
- await page.evaluate(()=>{Object.defineProperty(navigator,'canShare',{configurable:true,value:()=>false});});await page.getByRole('button',{name:'TikTok',exact:true}).click();assert.match(await page.locator('.cam-pick-share-status').innerText(),/Descarga la tarjeta/);
+ await page.evaluate(()=>{Object.defineProperty(navigator,'canShare',{configurable:true,value:()=>false});});await page.getByRole('button',{name:'TikTok',exact:true}).click();assert.match(await page.locator('.cam-pick-share-status').innerText(),/Descarga la imagen/);
  await page.getByRole('button',{name:'Cerrar',exact:true}).click();assert.equal(await dialog.evaluate(e=>e.open),false);assert.ok(await page.locator('#actions .cam-pick-share-button').evaluate(e=>document.activeElement===e));
  // A share button remains reachable above the profile's whole-card hit target.
  await page.evaluate(()=>{const p=document.createElement('dialog');p.id='aeProfileDialog';p.innerHTML='<div id="aeProfilePicks"><article class="ae-profile-pick ae-profile-pick-recent"><h4>Mi Pick</h4><div class="ae-profile-pick-footer"></div><button class="ae-profile-pick-hit" aria-label="Ver Pick completo"></button></article></div>';p.querySelector('.ae-profile-pick-footer').append(CamPickShare.button(window.pick));document.body.append(p);p.showModal();});
  await page.locator('#aeProfilePicks .cam-pick-share-button').click();await page.locator('#camPickShareDialog[open]').waitFor();await page.getByRole('button',{name:'Cerrar',exact:true}).click();
  await page.evaluate(()=>document.getElementById('aeProfileDialog').close());
- await page.evaluate(()=>CamPickShare.open({...window.pick,title:'El parlay del domingo',event_name:'Toronto vs Boston',selection:'Toronto gana\nMás de 2.5 goles\nAmbos equipos anotan\nMás de 8.5 córners\nMás de 3.5 tarjetas'},{kind:'weekly'}));assert.match(await page.locator('#camPickShareTitle').innerText(),/Pick del editor/);assert.ok(new URL(new URL(await page.locator('.cam-pick-share-networks a').getAttribute('href')).searchParams.get('url')).searchParams.has('e'));
+ await page.evaluate(()=>CamPickShare.open({...window.pick,title:'El parlay del domingo',event_name:'Toronto vs Boston',selection:'Toronto gana\nMás de 2.5 goles\nAmbos equipos anotan\nMás de 8.5 córners\nMás de 3.5 tarjetas'},{kind:'weekly'}));assert.match(await page.locator('#camPickShareTitle').innerText(),/Pick del editor/);assert.match(await page.locator('.cam-pick-share-caption-label textarea').inputValue(),/https:\/\/camsports.github.io\/\?e=/);
  await page.locator('.cam-pick-share-preview img').waitFor();
- const weeklyDownloadPromise=page.waitForEvent('download');await page.getByRole('link',{name:'Descargar tarjeta',exact:true}).click();
+ const weeklyDownloadPromise=page.waitForEvent('download');await page.getByRole('link',{name:'Descargar imagen',exact:true}).click();
  const weeklyDownload=await weeklyDownloadPromise;await weeklyDownload.saveAs(path.join(qa,'editorial-parlay-card.png'));
  assert.match(await page.locator('.cam-pick-share-caption-label textarea').inputValue(),/Más de 3.5 tarjetas/);
  // Exercise the real profile markup/renderers, rather than only an isolated card.
