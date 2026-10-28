@@ -214,8 +214,8 @@
   const names=wrap(c,username,maxWidth-90-dateWidth,Infinity);
   c.font='700 '+Math.max(20,nameFont)+'px "Libre Baskerville", Georgia, serif';
   names.forEach((line,i)=>c.fillText(line,margin+72,footerY+75+i*26));
-  if(date){c.fillStyle='#BE9270';c.fillRect(right-225,footerY+37,2,43);
-   c.fillStyle='#fff';c.textAlign='right';c.font='400 28px "Libre Baskerville", Georgia, serif';c.fillText(date,right,footerY+75);c.textAlign='left';}
+  if(date){const dateRight=Math.min(right,margin+72+c.measureText(username).width+275);c.fillStyle='#BE9270';c.fillRect(dateRight-225,footerY+37,2,43);
+   c.fillStyle='#fff';c.textAlign='right';c.font='400 28px "Libre Baskerville", Georgia, serif';c.fillText(date,dateRight,footerY+75);c.textAlign='left';}
   // Keep 1:1 and 9:16 PNG dimensions without stretching the horizontal card.
   const output=document.createElement('canvas');output.width=1080;output.height=portrait?1920:1080;
   const out=output.getContext('2d');if(!out)throw Error('No se pudo preparar la imagen.');
