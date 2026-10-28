@@ -25,7 +25,7 @@ const finish=()=>callbacks.at(-1)(new w.Blob(['real PNG bytes '+frames.length],{
 const option=async(index,value)=>{const control=dialog().querySelectorAll('select')[index];control.value=value;control.dispatchEvent(new w.Event('change'));await tick();};
 
 open();assert.equal(dialog().querySelector('.cam-take-share-primary').disabled,true);await tick();finish();
-assert.equal(dialog().querySelector('img').width,1080);assert.equal(dialog().querySelector('img').height,566);
+assert.equal(dialog().querySelector('img').width,1080);assert.equal(dialog().querySelector('img').height,760);
 assert.ok(frame.logos[0].src.includes('assets/cam-sports-logo-completo.webp'),'Use the same real image as the header');
 assert.ok(!frame.text.some(t=>t.text==='CAM'),'Never recreate the logo with typed letters');
 assert.ok(frame.text.map(t=>t.text).join(' ').includes(take.title),'The original title keeps its spelling and case');
@@ -46,7 +46,7 @@ await option(2,'story');finish();assert.equal(dialog().querySelector('img').heig
 assert.ok(frame.text.every(t=>t.y>=280&&t.y<=1500),'Every story text item stays within the shared platform safe area');
 dialog().querySelector('input[type=checkbox]').click();await tick();assert.ok(!frame.text.some(t=>t.text==='24/10/2026'));
 await option(3,'compact');click('Restablecer diseño');await tick();finish();
-assert.deepEqual([...dialog().querySelectorAll('select')].map(s=>s.value),['title','0','card','auto']);
+assert.deepEqual([...dialog().querySelectorAll('select')].map(s=>s.value),['summary','0','card','auto']);
 assert.equal(dialog().querySelector('input').checked,true);assert.equal(JSON.stringify(take),original,'No option can mutate the original Take');
 
 click('Compartir imagen');assert.equal(shared.at(-1).files[0].type,'image/png');assert.equal(shared.at(-1).text,take.title);assert.match(shared.at(-1).url,/\?t=/);await tick();
@@ -63,7 +63,7 @@ sharingError=Object.assign(Error('cancel'),{name:'AbortError'});click('TikTok');
 // Delayed encodes and fonts cannot replace a newer selection or a closed dialog.
 await option(2,'story');const stale=callbacks.at(-1);await option(2,'square');finish();stale(new w.Blob(['stale']));assert.equal(dialog().querySelector('img').height,1080);
 await option(2,'story');const closed=callbacks.at(-1);click('Cerrar');closed(new w.Blob(['closed']));assert.equal(dialog().querySelector('img'),null);
-for(const sport of ['nfl','football','opinions']){w.CamPickShare.open({...take,sport},{kind:'take'});await tick();finish();assert.equal(dialog().querySelector('img').height,566);click('Cerrar');}
+for(const sport of ['nfl','football','opinions']){w.CamPickShare.open({...take,sport},{kind:'take'});await tick();finish();assert.equal(dialog().querySelector('img').height,760);click('Cerrar');}
 w.CamPickShare.open({...take,created_at:null,body:''},{kind:'take'});await tick();finish();assert.ok(!frame.text.some(t=>/\d{2}\/\d{2}\/\d{4}/.test(t.text)),'A missing date is never invented');
 assert.equal(dialog().querySelector('option[value=summary]').disabled,true);
 assert.equal(JSON.stringify(take),original);

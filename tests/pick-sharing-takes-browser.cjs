@@ -34,10 +34,10 @@ const server=http.createServer((req,res)=>{
  const select=async(index,value)=>{await dialog.locator('select').nth(index).selectOption(value);await ready();};
  const png=async()=>Buffer.from(await preview.evaluate(async img=>{const b=await(await fetch(img.src)).arrayBuffer();return Array.from(new Uint8Array(b));}));
  const checkBounds=async story=>{
-  const drawn=await page.evaluate(()=>draws);for(const t of drawn){const left=t.right?t.x-t.width:t.x,right=t.right?t.x:t.x+t.width;assert.ok(left>=(story?80:52)&&right<=(story?919:1029),`Text overflows horizontally: ${JSON.stringify(t)}`);assert.ok(t.y>=(story?280:120)&&t.y<=(story?1500:1045),`Text overflows safe height: ${JSON.stringify(t)}`);}
+  const drawn=await page.evaluate(()=>draws);for(const t of drawn){const left=t.right?t.x-t.width:t.x,right=t.right?t.x:t.x+t.width;assert.ok(left>=(story?80:52)&&right<=(story?1000:1029),`Text overflows horizontally: ${JSON.stringify(t)}`);assert.ok(t.y>=(story?280:120)&&t.y<=(story?1500:1045),`Text overflows safe height: ${JSON.stringify(t)}`);}
  };
  await open();assert.equal(await page.evaluate(()=>document.fonts.check('600 80px "Playfair Display"')),true,'The real Playfair font is loaded before PNG generation');
- const first=await png();assert.equal(first.readUInt32BE(16),1080);assert.equal(first.readUInt32BE(20),566);await checkBounds(false);
+ const first=await png();assert.equal(first.readUInt32BE(16),1080);assert.equal(first.readUInt32BE(20),760,'Default card shows the title with the summary');await checkBounds(false);
  assert.ok(await page.evaluate(()=>draws.some(t=>t.text==='24/10/2026')),'Date matches the original Take calendar day in Toronto');
  assert.ok(await page.evaluate(()=>draws.some(t=>t.text==='Adrianmendozac27')));
  fs.writeFileSync(path.join(qa,'take-card.png'),first);
@@ -50,9 +50,9 @@ const server=http.createServer((req,res)=>{
  assert.deepEqual(await page.evaluate(async()=>Array.from(new Uint8Array(await shares[0].data.files[0].arrayBuffer()))),Array.from(first),'Native sharing transmits the preview PNG');
  for(const mode of ['title','summary','fragment'])for(const size of ['card','square','story']){
   await page.evaluate(()=>draws=[]);await select(0,mode);await page.evaluate(()=>draws=[]);await select(2,size);await checkBounds(size==='story');
-  const data=await png();assert.equal(data.readUInt32BE(16),1080);assert.equal(data.readUInt32BE(20),size==='story'?1920:size==='square'?1080:mode==='title'?566:840);
-  const edges=await preview.evaluate(img=>{const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;const x=c.getContext('2d');x.drawImage(img,0,0);const rgba=x.getImageData(0,0,c.width,c.height).data;let valid=true;for(let p=0;p<rgba.length;p+=4){const pixel=p/4,px=pixel%c.width,py=Math.floor(pixel/c.width);if(px===0||px===c.width-1||py===0||py===c.height-1){if(rgba[p]!==7||rgba[p+1]!==59||rgba[p+2]!==131||rgba[p+3]!==255)valid=false;}}return valid;});
-  assert.equal(edges,true,'Every export edge is opaque CAM blue, with no white band or transparent corners');
+  const data=await png();assert.equal(data.readUInt32BE(16),1080);assert.equal(data.readUInt32BE(20),size==='story'?1920:size==='square'?1080:mode==='title'?608:760);
+  const edges=await preview.evaluate(img=>{const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;const x=c.getContext('2d');x.drawImage(img,0,0);const rgba=x.getImageData(0,0,c.width,c.height).data;let valid=true;for(let p=0;p<rgba.length;p+=4){const pixel=p/4,px=pixel%c.width,py=Math.floor(pixel/c.width);if(px===0||px===c.width-1||py===0||py===c.height-1){if(rgba[p]!==11||rgba[p+1]!==34||rgba[p+2]!==51||rgba[p+3]!==255)valid=false;}}return valid;});
+  assert.equal(edges,true,'Every export edge is opaque CAM night blue, with no white band or transparent corners');
   fs.writeFileSync(path.join(qa,'take-'+mode+'-'+size+'.png'),data);
   if(mode==='title'&&size==='story')fs.writeFileSync(path.join(qa,'take-story.png'),data);
  }
