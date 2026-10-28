@@ -4417,6 +4417,43 @@ currentUser = {
             return imageZoom(article) / 100;
         }
 
+        /* Encuadre: cuando un marco esconde menos del 15 % del ancho (o del alto)
+           de la foto, ese pequeño recorte se reparte a los dos lados. Así una portada
+           con texto en un borde no pierde letras en el lector, y el encuadre guardado
+           sigue mandando donde de verdad se recorta (miniaturas estrechas). */
+        function balanceImageFocus(img) {
+            if (!(img instanceof HTMLImageElement)) return;
+            const current = img.style.getPropertyValue('--ae-image-focus').trim();
+            if (!current) return;
+            if (current !== img.dataset.camFocusApplied) img.dataset.camFocusSaved = current;
+            const saved = (img.dataset.camFocusSaved || '').match(/^(-?[\d.]+)%\s+(-?[\d.]+)%$/);
+            const iw = img.naturalWidth, ih = img.naturalHeight, bw = img.clientWidth, bh = img.clientHeight;
+            if (!saved || !iw || !ih || !bw || !bh) return;
+            let x = Number(saved[1]), y = Number(saved[2]);
+            const photo = iw / ih, frame = bw / bh;
+            if (photo > frame && 1 - frame / photo < 0.15) x = 50;
+            if (photo < frame && 1 - photo / frame < 0.15) y = 50;
+            const next = x + '% ' + y + '%';
+            img.dataset.camFocusApplied = next;
+            if (next !== current) img.style.setProperty('--ae-image-focus', next);
+        }
+        // For an <img> that is reused for another article (the reader).
+        function setImageFocus(img, article) {
+            if (!img) return;
+            delete img.dataset.camFocusApplied;
+            img.dataset.camFocusSaved = imagePosition(article);
+            img.style.setProperty('--ae-image-focus', img.dataset.camFocusSaved);
+            balanceImageFocus(img);
+        }
+        document.addEventListener('load', event => balanceImageFocus(event.target), true);
+        {
+            let balanceFrame = 0;
+            window.addEventListener('resize', () => {
+                cancelAnimationFrame(balanceFrame);
+                balanceFrame = requestAnimationFrame(() => document.querySelectorAll('img[data-cam-focus-saved]').forEach(balanceImageFocus));
+            }, {passive:true});
+        }
+
         function safeImageURL(value) {
             try {
                 const url = new URL(value);
@@ -5051,7 +5088,7 @@ currentUser = {
                 if (String(activeModalArticleId) === String(articleId)) {
                     const image = document.getElementById('modalImage');
                     image.src = safeImageURL(updated.image);
-                    image.style.setProperty('--ae-image-focus', imagePosition(updated));
+                    setImageFocus(image, updated);
                     image.style.setProperty('--ae-image-zoom', String(imageScale(updated)));
                 }
                 renderArticlesFeed();
@@ -5230,7 +5267,7 @@ currentUser = {
             document.getElementById('modalAuthor').innerText = article.author || 'CAM SPORTS';
             document.getElementById('modalDate').innerText = article.date || '';
             document.getElementById('modalImage').src = safeImageURL(article.image);
-            document.getElementById('modalImage').style.setProperty('--ae-image-focus', imagePosition(article));
+            setImageFocus(document.getElementById('modalImage'), article);
             document.getElementById('modalImage').style.setProperty('--ae-image-zoom', String(imageScale(article)));
             document.getElementById('modalBody').innerHTML = cleanBody(article.body);
             document.getElementById('camChronicleCategory').textContent = article.category || 'Deporte';
@@ -5254,6 +5291,8 @@ loadCommentsFromSupabase(article.id);
             const articleModal = document.getElementById('articleModal');
             articleModal.classList.remove('hidden');
             articleModal.focus({preventScroll:true});
+            // The frame only has a size once the reader is visible.
+            requestAnimationFrame(() => balanceImageFocus(document.getElementById('modalImage')));
             // Cada artículo comienza en el título, incluso después de haber
             // recorrido otra noticia en este mismo lector.
             articleModal.scrollTop = 0;
