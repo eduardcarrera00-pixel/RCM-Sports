@@ -5,6 +5,7 @@ import {Window} from 'happy-dom';
 const w=new Window({url:'https://example.test/'}),d=w.document,frames=[],callbacks=[];
 let frame,shared=[],sharingError=null,canShare=()=>true;
 w.HTMLCanvasElement.prototype.getContext=function(){
+ if(this.height===1080||this.height===1920)return {fillRect(){},drawImage(source,x,y,width){const scale=width/source.width;frame.text=frame.text.map(t=>({...t,x:x+t.x*scale,y:y+t.y*scale}));}};
  frame={canvas:this,text:[]};frames.push(frame);
  return {font:'',fillRect(){},beginPath(){},moveTo(){},lineTo(){},stroke(){},
   fillText(text,x,y){frame.text.push({text,x,y,font:this.font});},
