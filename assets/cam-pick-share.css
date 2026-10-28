@@ -49,6 +49,10 @@
 .cam-take-share-field select{width:100%;max-width:100%;min-width:0;min-height:44px;padding:9px 8px;border:1px solid var(--share-line);border-radius:10px;background:var(--share-bg);color:var(--share-ink);font:500 16px/1.4 Inter,system-ui,sans-serif;text-overflow:ellipsis}
 .cam-take-share-dialog :is(.cam-pick-share-layout,.cam-pick-share-content,.cam-take-share-editor,.cam-take-share-field){min-inline-size:0;max-inline-size:100%}
 .cam-take-share-dialog .cam-take-share-field :is(select,textarea){box-sizing:border-box;inline-size:100%;min-inline-size:0;max-inline-size:100%}
+.cam-take-share-dialog .cam-take-share-field{overflow:hidden}
+.cam-take-share-dialog .cam-take-share-field select{overflow:hidden}
+.cam-take-share-dialog .cam-take-share-field :focus-visible{outline-offset:-3px}
+.cam-take-share-caption:not([open]) > :not(summary){display:none}
 .cam-take-share-explanation-field{grid-column:1/-1;position:relative}
 .cam-take-share-field .cam-take-share-explanation{display:block;width:100%;min-width:0;min-height:100px;max-height:220px;padding:12px;border:1px solid var(--share-line);border-radius:10px;background:var(--share-bg);color:var(--share-ink);font:400 16px/1.5 Inter,system-ui,sans-serif;resize:vertical}
 .cam-take-share-explanation-hint{padding-right:64px;font:400 12px/1.5 Inter,system-ui,sans-serif}

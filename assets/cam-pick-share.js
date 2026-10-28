@@ -307,7 +307,7 @@
    modeSelect=make('select');for(const [value,name] of [['title','Solo título'],['summary','Con resumen'],['fragment','Título y Take']]){const option=make('option',name);option.value=value;modeSelect.append(option);}modeSelect.value=takeOptions.mode;
    field('Contenido de la ficha',modeSelect);
    fragmentSelect=make('select');const pieces=takeFragments(p.body);
-   pieces.forEach((piece,i)=>{const option=make('option','Fragmento '+(i+1)+': '+piece.slice(0,44)+(piece.length>44?'…':''));option.value=String(i);fragmentSelect.append(option);});
+   pieces.forEach((piece,i)=>{const option=make('option','Fragmento '+(i+1)+' de '+pieces.length);option.value=String(i);fragmentSelect.append(option);});
    fragmentLabel=field('Fragmento del texto original',fragmentSelect);fragmentLabel.classList.add('cam-take-share-fragment');fragmentLabel.hidden=takeOptions.mode!=='fragment'||pieces.length<2;
    selectionNote=make('p','','cam-take-share-selection');selectionNote.hidden=true;editor.append(selectionNote);
    if(!pieces.length){modeSelect.querySelector('option[value="summary"]').disabled=true;modeSelect.querySelector('option[value="fragment"]').disabled=true;}
