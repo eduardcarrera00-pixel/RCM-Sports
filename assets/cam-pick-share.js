@@ -97,7 +97,7 @@
   if(clipped){let last=visible[visible.length-1];while(last&&ctx.measureText(last+'…').width>width)last=last.slice(0,-1);visible[visible.length-1]=last+'…';}
   return visible;
  }
- // Take cards intentionally use the same blue editorial layout in both site themes.
+ // Take cards intentionally use the same «La cita» layout in both site themes.
  const takeFragments=body=>{
   // Every choice is a contiguous slice of the original, including punctuation
   // and internal whitespace. Never rebuild sentences or cut a word in half.
@@ -117,18 +117,22 @@
   return parts;
  };
  // A brief extractive summary requires no external model or database writes.
- // Label it as a summary, never put quotation marks around generated content.
+ // It is always whole, verbatim sentences of the author (never generated text)
+ // and the card labels it as a summary. Short enough to read at a glance: the
+ // first sentence, plus the second only while both stay within 200 characters.
  const takeSummary=body=>{
   const first=takeFragments(body)[0]||'';
-  const sentences=[...first.matchAll(/[.!?](?:["”’»])?(?=\s|$)/g)];
-  const end=sentences[Math.min(1,sentences.length-1)];
-  return end?first.slice(0,end.index+end[0].length):first;
+  const ends=[...first.matchAll(/[.!?](?:["”’»])?(?=\s|$)/g)].map(m=>m.index+m[0].length);
+  if(!ends.length)return first;
+  const end=ends.length>1&&ends[1]<=200?ends[1]:ends[0];
+  return first.slice(0,end);
  };
  let takeFonts=null;
  function prepareTakeFonts(){
   if(!document.fonts?.load)return null;
   if(!takeFonts)takeFonts=Promise.all([
    document.fonts.load('600 80px "Playfair Display"'),
+   document.fonts.load('italic 600 80px "Playfair Display"'),
    document.fonts.load('400 32px "Libre Baskerville"'),
    document.fonts.load('700 32px "Libre Baskerville"')
   ]).catch(()=>{takeFonts=null;});
@@ -145,70 +149,106 @@
   });
   return Promise.all([prepareTakeFonts(),takeLogoLoading]);
  }
+ // «La cita»: the Take as a centred quotation on CAM night blue, identical in
+ // both site themes. Logo on top, link at the foot, everything else centred
+ // between them. Title and text are the author's own words, never rewritten.
+ const TAKE_CARD={
+  bg:'#0B2233',ink:'#F3EBDD',muted:'#C2CDD4',gold:'#BE9270',label:'#B79A76',line:'#2E4A5E',
+  story:{side:96,logoW:200,logoTop:300,logoGap:64,rule:1418,link:1478,foot:60,quote:230,title:112,extra:36,author:34,meta:22,linkFont:24,mark:72},
+  square:{side:96,logoW:150,logoTop:64,logoGap:40,rule:988,link:1034,foot:40,quote:180,title:94,extra:31,author:30,meta:19,linkFont:20,mark:64},
+  card:{side:84,logoW:112,logoTop:38,logoGap:22,rule:-74,link:-34,foot:24,quote:140,title:76,extra:27,author:27,meta:16,linkFont:17,mark:56}
+ };
+ // Same words and order as wrap(), with the narrowest width that keeps the line
+ // count: centred lines look even instead of one long line over a short one.
+ function balancedWrap(ctx,value,width){
+  const lines=wrap(ctx,value,width,Infinity);if(lines.length<2)return lines;
+  const widest=Math.max(...clean(value,10000).split(' ').map(word=>ctx.measureText(word).width));
+  if(widest>=width)return lines;
+  let lo=Math.max(widest,width*.5),hi=width;
+  if(wrap(ctx,value,lo,Infinity).length===lines.length)return wrap(ctx,value,lo,Infinity);
+  for(let i=0;i<14&&hi-lo>1;i++){const mid=(lo+hi)/2;if(wrap(ctx,value,mid,Infinity).length===lines.length)hi=mid;else lo=mid;}
+  return wrap(ctx,value,hi,Infinity);
+ }
  function renderTakeCard(p,options={}){
-  const portrait=options.size==='story',square=options.size==='square',w=1080;
+  const size=options.size==='story'?'story':options.size==='square'?'square':'card',w=1080;
   const mode=options.mode||'title',extra=mode==='summary'?takeSummary(p.body):mode==='fragment'?takeFragments(p.body)[options.fragment||0]||'':'';
-  // Default: export the card itself, never a smaller card on a white canvas.
-  const h=portrait?1920:square?1080:extra?840:566;
+  // Horizontal is 16:9 for X; a card with text needs a little more height.
+  const h=size==='story'?1920:size==='square'?1080:extra?760:608;
   const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
   const c=canvas.getContext('2d');if(!c)throw Error('Este navegador no permite generar la imagen. Prueba descargarla desde otro navegador.');
-  // Opaque CAM blue reaches every edge, including the corners. Transparent
+  // Opaque colour reaches every edge, including the corners. Transparent
   // padding could be flattened to white by a receiving social application.
-  c.fillStyle='#073B83';c.fillRect(0,0,w,h);
+  const T=TAKE_CARD,L=T[size],cx=w/2,maxWidth=w-2*L.side;
+  c.fillStyle=T.bg;c.fillRect(0,0,w,h);
   if(!takeLogo)throw Error('El logo oficial todavía no está listo.');
-  const margin=portrait?82:54,right=portrait?916:1026,maxWidth=right-margin;
-  const logoTop=portrait?295:24,logoWidth=164;
-  const logoHeight=logoWidth*takeLogo.naturalHeight/takeLogo.naturalWidth;
-  c.drawImage(takeLogo,right-logoWidth,logoTop,logoWidth,logoHeight);
-  c.textAlign='left';
-
-  const footerY=portrait?1370:square?909:h-100,baseTop=portrait?480:square?264:155,textSpace=footerY-(portrait?70:28)-baseTop;
+  const logoH=L.logoW*takeLogo.naturalHeight/takeLogo.naturalWidth;
+  c.drawImage(takeLogo,cx-L.logoW/2,L.logoTop,L.logoW,logoH);
+  const ruleY=L.rule<0?h+L.rule:L.rule,linkY=L.link<0?h+L.link:L.link;
+  const top=L.logoTop+logoH+L.logoGap,space=ruleY-L.foot-top;
+  const spacing=(px,em)=>{try{c.letterSpacing=Math.round(px*em*10)/10+'px';}catch{}};
+  const centre=(text,y)=>{c.textAlign='left';c.fillText(text,Math.round(cx-c.measureText(text).width/2),y);};
+  const titleFont=size=>'italic 600 '+size+'px "Playfair Display", Georgia, serif';
+  const quoteFont=size=>'600 '+size+'px "Playfair Display", Georgia, serif';
+  const textFont=size=>'400 '+size+'px "Libre Baskerville", Georgia, serif';
+  const nameFont=size=>'700 '+size+'px "Libre Baskerville", Georgia, serif';
+  const metaFont=size=>'600 '+size+'px Arial, sans-serif';
+  const username=p.author.replace(/^@/,'')||'Aficionado';
+  const date=options.showDate===false||!p.date?'':p.date.split('-').reverse().join('/');
+  const prefix=('Take · '+(p.competition||'Deportes')).toLocaleUpperCase('es');
+  const label=mode==='summary'?'RESUMEN DEL TAKE':'FRAGMENTO ORIGINAL';
   const scale={compact:.86,large:1.14}[options.textSize]||1;
-  let font=Math.round((extra?72:square||portrait?104:84)*scale),extraFont=36,lines=[],extraLines=[],block=0;
-  for(;font>=22;font-=1){
-   c.font='600 '+font+'px "Playfair Display", Georgia, serif';lines=wrap(c,p.title,maxWidth,Infinity);
-   extraFont=Math.max(22,Math.min(portrait?40:34,Math.round(font*.55)));
-   c.font='400 '+extraFont+'px "Libre Baskerville", Georgia, serif';extraLines=extra?wrap(c,extra,maxWidth,Infinity):[];
-   block=lines.length*font*1.16+(extra?76+extraLines.length*extraFont*1.4:0);
-   if(block<=textSpace)break;
+  // Prefer a slightly smaller title when it saves a line: «Lamine Yamal /
+  // Balón de Oro 2026» reads better than three short broken lines.
+  const titleWidth=size=>maxWidth-Math.round(size*.25);
+  let start=Math.round(L.title*scale);
+  {c.font=titleFont(start);let count=wrap(c,p.title,titleWidth(start),Infinity).length,best=start;
+   for(let size=start-1;size>=Math.round(start*.85);size--){c.font=titleFont(size);const n=wrap(c,p.title,titleWidth(size),Infinity).length;if(n<count){count=n;best=size;}}
+   start=best;}
+  let fit=null;
+  for(let title=start;title>=22;title--){
+   const k=title/L.title,quote=Math.max(56,Math.round(L.quote*Math.min(1,k)));
+   const extraSize=Math.max(20,Math.min(L.extra,Math.round(title*.42))),author=Math.max(20,Math.min(L.author,Math.round(title*.4))),meta=Math.max(14,Math.min(L.meta,Math.round(title*.26)));
+   c.font=quoteFont(quote);const qm=c.measureText('“');
+   const ascent=Number.isFinite(qm.actualBoundingBoxAscent)&&qm.actualBoundingBoxAscent>0?qm.actualBoundingBoxAscent:quote*.72;
+   const descent=Number.isFinite(qm.actualBoundingBoxDescent)?qm.actualBoundingBoxDescent:-quote*.4;
+   const quoteH=Math.max(quote*.2,ascent+descent);
+   // Italic capitals lean past their measured width: leave them room.
+   c.font=titleFont(title);const titleLines=balancedWrap(c,p.title,titleWidth(title));
+   c.font=textFont(extraSize);const extraLines=extra?balancedWrap(c,extra,Math.min(maxWidth,860)):[];
+   c.font=nameFont(author);const authorLines=wrap(c,username,maxWidth,Infinity);
+   // Keep the date as its own piece of text; break the line only if needed.
+   c.font=metaFont(meta);spacing(meta,.18);
+   const oneLine=c.measureText(prefix+(date?' · '+date:'')).width<=maxWidth;
+   const metaLines=oneLine?[[prefix+(date?' · ':''),date]]:[...wrap(c,prefix,maxWidth,Infinity).map(t=>[t,'']),...(date?[['',date]]:[])];
+   spacing(meta,0);
+   const gap=Math.round(title*.34),titleLead=title*1.12,extraLead=extraSize*1.55;
+   const block=quoteH+gap+titleLines.length*titleLead
+    +(extra?gap*1.2+meta+meta*.9+extraLines.length*extraLead:0)
+    +gap*1.4+2+gap*.8+authorLines.length*author*1.3+meta*.7+metaLines.length*meta*1.6;
+   fit={title,quote,extraSize,author,meta,ascent,quoteH,titleLines,extraLines,authorLines,metaLines,gap,titleLead,extraLead,block};
+   if(block<=space)break;
   }
-  if(block>textSpace)throw Error('Este texto necesita más espacio. Elige otro fragmento o el formato vertical.');
-  c.fillStyle='#fff';c.font='600 '+font+'px "Playfair Display", Georgia, serif';
-  // Balance a short final line without changing any words or the fitted height.
-  if(!clean(p.title,10000).split(' ').some(word=>c.measureText(word).width>maxWidth)){
-   for(let i=lines.length-1;i>0;i--){
-    const previous=lines[i-1].split(' ');
-    while(previous.length>1&&c.measureText(lines[i]).width<c.measureText(previous.join(' ')).width*.75){
-     const next=previous.at(-1)+' '+lines[i];if(c.measureText(next).width>maxWidth)break;
-     previous.pop();lines[i]=next;lines[i-1]=previous.join(' ');
-    }
-   }
-  }
-  let y=baseTop+(textSpace-block)/2+font;
-  for(const line of lines){c.fillText(line,margin,y);y+=font*1.16;}
+  if(!fit||fit.block>space)throw Error('Este texto necesita más espacio. Elige otro fragmento o el formato vertical.');
+  const F=fit;let y=top+(space-F.block)/2;
+  c.fillStyle=T.gold;c.font=quoteFont(F.quote);centre('“',y+F.ascent);y+=F.quoteH+F.gap;
+  c.fillStyle=T.ink;c.font=titleFont(F.title);
+  for(const line of F.titleLines){centre(line,y+F.title*.9);y+=F.titleLead;}
   if(extra){
-   y+=28-font;c.fillStyle='#DDC5AD';c.font='600 21px Arial, sans-serif';
-   c.fillText(mode==='summary'?'RESUMEN DEL TAKE':'FRAGMENTO ORIGINAL',margin,y);y+=30;
-   c.fillStyle='#fff';c.font='400 '+extraFont+'px "Libre Baskerville", Georgia, serif';
-   for(const line of extraLines){y+=extraFont*1.4;c.fillText(line,margin,y);}
+   y+=F.gap*1.2;c.fillStyle=T.label;c.font=metaFont(F.meta);spacing(F.meta,.18);centre(label,y+F.meta);spacing(F.meta,0);y+=F.meta+F.meta*.9;
+   c.fillStyle=T.muted;c.font=textFont(F.extraSize);
+   for(const line of F.extraLines){centre(line,y+F.extraSize*1.12);y+=F.extraLead;}
   }
-  c.strokeStyle='#BE9270';c.lineWidth=2;c.beginPath();c.moveTo(margin,footerY);c.lineTo(right,footerY);c.stroke();
-  c.fillStyle='#fff';c.textAlign='left';c.font='400 34px "Libre Baskerville", Georgia, serif';
-  c.fillText('Por',margin,footerY+75);
-  let username=p.author.replace(/^@/,'')||'Aficionado';
-  let nameFont=35;
-  const date=options.showDate===false?'':p.date.split('-').reverse().join('/');
-  const dateWidth=date?245:0;
-  for(;nameFont>=20;nameFont-=1){
-   c.font='700 '+nameFont+'px "Libre Baskerville", Georgia, serif';
-   if(c.measureText(username).width<=maxWidth-90-dateWidth)break;
+  y+=F.gap*1.4;c.fillStyle=T.gold;c.fillRect(Math.round(cx-L.mark/2),Math.round(y),L.mark,2);y+=2+F.gap*.8;
+  c.fillStyle=T.ink;c.font=nameFont(F.author);
+  for(const line of F.authorLines){centre(line,y+F.author*.95);y+=F.author*1.3;}
+  y+=F.meta*.7;c.fillStyle=T.label;c.font=metaFont(F.meta);spacing(F.meta,.18);
+  for(const [text,day] of F.metaLines){
+   const a=text?c.measureText(text).width:0,b=day?c.measureText(day).width:0,x=Math.round(cx-(a+b)/2);
+   c.textAlign='left';if(text)c.fillText(text,x,y+F.meta);if(day)c.fillText(day,x+a,y+F.meta);y+=F.meta*1.6;
   }
-  // Wrap a long username as needed instead of overlapping the publication date.
-  const names=wrap(c,username,maxWidth-90-dateWidth,Infinity);
-  c.font='700 '+Math.max(20,nameFont)+'px "Libre Baskerville", Georgia, serif';
-  names.forEach((line,i)=>c.fillText(line,margin+72,footerY+75+i*26));
-  if(date){const dateRight=Math.min(right,margin+72+c.measureText(username).width+275);c.fillStyle='#BE9270';c.fillRect(dateRight-225,footerY+37,2,43);
-   c.fillStyle='#fff';c.textAlign='right';c.font='400 28px "Libre Baskerville", Georgia, serif';c.fillText(date,dateRight,footerY+75);c.textAlign='left';}
+  spacing(F.meta,0);
+  c.fillStyle=T.line;c.fillRect(L.side,ruleY,w-2*L.side,2);
+  c.fillStyle=T.muted;c.font=metaFont(L.linkFont);spacing(L.linkFont,.08);centre('camsports.github.io',linkY);spacing(L.linkFont,0);
   return canvas;
  }
 
@@ -246,7 +286,9 @@
   linkButton.onclick=()=>copy(urlFor(p),status,'Enlace copiado.');textButton.onclick=()=>copy(caption(p),status,'Texto y enlace copiados.');
   const utilities=make('div',null,'cam-pick-share-utilities');utilities.append(download,linkButton,textButton);
   const label=make('label','Texto para tu publicación','cam-pick-share-caption-label');const text=make('textarea');text.value=caption(p);text.readOnly=true;text.rows=5;text.setAttribute('aria-label','Texto y enlace de la publicación');label.append(text);
-  const defaults=()=>({mode:'title',size:'card',showDate:true,fragment:0,textSize:'auto'});
+  // «La cita» shows the author's first words under the title when the Take has text.
+  const withText=p.kind==='take'&&takeFragments(p.body).length>0;
+  const defaults=()=>({mode:withText?'summary':'title',size:'card',showDate:true,fragment:0,textSize:'auto'});
   let takeOptions=defaults();
   let editor=null,modeSelect=null,fragmentLabel=null,fragmentSelect=null,sizeSelect=null,dateToggle=null,textSizeSelect=null,selectionNote=null,shareButton=null;
   if(p.kind==='take'){
@@ -260,6 +302,7 @@
    fragmentLabel=field('Fragmento del texto original',fragmentSelect);fragmentLabel.classList.add('cam-take-share-fragment');fragmentLabel.hidden=true;
    selectionNote=make('p','','cam-take-share-selection');selectionNote.hidden=true;editor.append(selectionNote);
    if(!pieces.length){modeSelect.querySelector('option[value="summary"]').disabled=true;modeSelect.querySelector('option[value="fragment"]').disabled=true;}
+   modeSelect.value=takeOptions.mode;
    sizeSelect=make('select');for(const [value,name] of [['card','Horizontal'],['square','Cuadrada'],['story','Historia']]){const option=make('option',name);option.value=value;sizeSelect.append(option);}
    field('Formato',sizeSelect);
    textSizeSelect=make('select');for(const [value,name] of [['auto','Automático'],['compact','Pequeño'],['large','Grande']]){const option=make('option',name);option.value=value;textSizeSelect.append(option);}
@@ -272,7 +315,7 @@
    sizeSelect.onchange=()=>{takeOptions.size=sizeSelect.value;refresh();};
    dateToggle.onchange=()=>{takeOptions.showDate=dateToggle.checked;refresh();};
    textSizeSelect.onchange=()=>{takeOptions.textSize=textSizeSelect.value;refresh();};
-   reset.onclick=()=>{takeOptions=defaults();modeSelect.value='title';fragmentSelect.value='0';fragmentLabel.hidden=true;sizeSelect.value='card';textSizeSelect.value='auto';dateToggle.checked=true;refresh();};
+   reset.onclick=()=>{takeOptions=defaults();modeSelect.value=takeOptions.mode;fragmentSelect.value='0';fragmentLabel.hidden=true;sizeSelect.value='card';textSizeSelect.value='auto';dateToggle.checked=true;refresh();};
   }
   if(p.kind==='take'){
    hint.textContent='El menú del teléfono permite elegir una app. Si no recibe imágenes, descarga el PNG y adjúntalo; puedes copiar el enlace por separado.';
