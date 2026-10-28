@@ -12,7 +12,7 @@
     "test": "npm run test:database && npm run test:picks && npm run test:auth && npm run test:drafts && npm run test:editor && npm run test:browser && npm run test:mobile-nav && npm run test:opinions-banners && npm run test:site-banners && npm run test:performance",
     "test:database:observed": "node -e \"process.env.RCM_OBSERVED_SCHEMA='1';import('./tests/database.mjs')\"",
     "test:picks": "node tests/community-picks.mjs && node tests/community-picks-ui.mjs && node tests/pick-author-names.mjs && node tests/pick-history-ui.mjs && node tests/season-predictions-ui.mjs && node tests/picks-feed-scroll-ui.mjs",
-    "test:sharing": "node tests/pick-sharing.mjs && node tests/profile-sharing.mjs && node tests/pick-sharing-takes.mjs",
+    "test:sharing": "node tests/pick-sharing.mjs && node tests/profile-sharing.mjs && node tests/pick-sharing-takes.mjs && node tests/take-detail-sharing.mjs",
     "test:sharing:browser": "node tests/pick-sharing-browser.cjs && node tests/pick-history-browser.cjs && node tests/pick-sharing-takes-browser.cjs",
     "test:capture": "node tests/ocr-lazy-loading.mjs && node tests/pick-capture-parser.cjs && node tests/pick-ticket-parser.cjs && node tests/pick-momios-parser.cjs && node tests/pick-card-tickets.cjs && node tests/pick-bet-builder.cjs && node tests/pick-capture-ui.mjs && node tests/pick-capture-database.mjs && node tests/pick-composer-direct.mjs",
     "test:capture:browser": "node tests/pick-composer-compact.cjs && node tests/pick-capture-browser.cjs && python3 tests/pick-singles-browser.py",

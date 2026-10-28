@@ -2,6 +2,7 @@
 (() => {
  'use strict';
  const BASE='https://camsports.github.io/';
+ const ASSETS=new URL('.',document.currentScript?.src||new URL('assets/cam-pick-share.js',document.baseURI));
  const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
  // Lossless UUID encoding: no shortening service, database writes or expiring links.
  const pack=id=>btoa(String.fromCharCode(...id.replace(/-/g,'').match(/../g).map(h=>parseInt(h,16)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
@@ -141,84 +142,103 @@
   const end=sentences[Math.min(1,sentences.length-1)];
   return end?first.slice(0,end.index+end[0].length):first;
  };
- let takeFonts=null;
+ const SHARE_DISPLAY=typeof FontFace==='function'?'CAM Share Playfair':'Playfair Display';
+ const SHARE_TEXT=typeof FontFace==='function'?'CAM Share Baskerville':'Libre Baskerville';
+ let takeFonts=null,takeLogo=null;
  function prepareTakeFonts(){
   if(!document.fonts?.load)return null;
-  if(!takeFonts)takeFonts=Promise.all([
-   document.fonts.load('600 80px "Playfair Display"'),
-   document.fonts.load('400 32px "Libre Baskerville"'),
-   document.fonts.load('700 32px "Libre Baskerville"')
-  ]).catch(()=>{takeFonts=null;});
+  if(!takeFonts){
+   // Private family names keep canvas exports independent of lazy stylesheets,
+   // theme changes and other faces registered under the site's family names.
+   const fonts=typeof FontFace==='function'?Promise.all([
+    [SHARE_DISPLAY,'playfair-display-latin-600-normal.woff2','600'],
+    [SHARE_TEXT,'libre-baskerville-latin-400-normal.woff2','400'],
+    [SHARE_TEXT,'libre-baskerville-latin-700-normal.woff2','700']
+   ].map(async([family,file,weight])=>{
+    const face=await new FontFace(family,'url("'+new URL('fonts/'+file,ASSETS).href+'")',{weight}).load();document.fonts.add(face);
+   })):Promise.all([
+    document.fonts.load('600 80px "Playfair Display"'),
+    document.fonts.load('400 32px "Libre Baskerville"'),
+    document.fonts.load('700 32px "Libre Baskerville"')
+   ]).then(loaded=>{if(loaded.some(f=>!f.length))throw Error('fonts');});
+   takeFonts=fonts.catch(()=>{takeFonts=null;throw Error('No se pudieron cargar las fuentes. Vuelve a preparar la ficha.');});
+  }
   return takeFonts;
  }
- function roundedShareBackground(c,w,h,r){
-  c.fillStyle='#073B83';c.beginPath();
-  if(typeof c.roundRect==='function')c.roundRect(0,0,w,h,r);
-  else if(typeof c.quadraticCurveTo==='function'){
-   c.moveTo(r,0);c.lineTo(w-r,0);c.quadraticCurveTo(w,0,w,r);
-   c.lineTo(w,h-r);c.quadraticCurveTo(w,h,w-r,h);c.lineTo(r,h);
-   c.quadraticCurveTo(0,h,0,h-r);c.lineTo(0,r);c.quadraticCurveTo(0,0,r,0);
-  }else{c.fillRect(0,0,w,h);return;}
-  c.closePath?.();c.fill();
+ function prepareTakeAssets(){
+  if(!takeLogo)takeLogo=new Promise((resolve,reject)=>{
+   const logo=new Image();
+   logo.onload=()=>resolve(logo);
+   logo.onerror=()=>{takeLogo=null;reject(Error('No se pudo cargar el logo. Vuelve a preparar la ficha.'));};
+   logo.src=new URL('cam-sports-logo-completo.webp',ASSETS).href;
+  });
+  return Promise.all([takeLogo,prepareTakeFonts()]).then(([logo])=>({logo}));
  }
- function renderTakeCard(p,options={}){
-  const portrait=options.size==='story',w=1080,h=portrait?1920:1080;
+ // Measured text blocks can also be used by future Pick templates. Never clip
+ // text or reduce it below a mobile-readable minimum to force an export.
+ function fitShareBlocks(c,blocks,width,height){
+  for(let step=0;step<=40;step++){
+   const ratio=1-step/40;
+   const measured=blocks.map(b=>{
+    const size=Math.round(b.min+(b.max-b.min)*ratio);
+    const font=b.weight+' '+size+'px '+b.family;
+    c.font=font;const lines=wrap(c,b.text,width,Infinity);
+    return {...b,size,font,lines,height:lines.length*size*b.leading};
+   });
+   const total=measured.reduce((sum,b)=>sum+b.gap+b.height,0);
+   if(total<=height)return {blocks:measured,height:total};
+  }
+  throw Error('El texto necesita más espacio para seguir siendo legible. Acorta la explicación, elige otro fragmento o usa Historia 9:16.');
+ }
+ const sameTakeText=(a,b)=>clean(a,10000).normalize('NFC').toLocaleLowerCase('es').replace(/[\p{P}\p{S}]/gu,'')===clean(b,10000).normalize('NFC').toLocaleLowerCase('es').replace(/[\p{P}\p{S}]/gu,'');
+ function renderTakeCard(p,options={},assets){
+  const portrait=options.size==='story',w=1080,h=portrait?1920:options.size==='square'?1080:1350;
   const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
   const c=canvas.getContext('2d');if(!c)throw Error('Este navegador no permite generar la imagen. Prueba descargarla desde otro navegador.');
-  roundedShareBackground(c,w,h,72);
-  // White letterform logo, integrated into the same blue background (no box).
-  // Story content stays below the top chrome and above captions/navigation;
-  // its right margin also reserves space for TikTok's action rail.
-  const margin=82,right=portrait?916:998,maxWidth=right-margin;
-  const logoTop=portrait?295:85,logoWidth=174;
-  c.textAlign='right';c.fillStyle='#fff';
-  c.font='600 66px "Playfair Display", Georgia, serif';c.fillText('CAM',right,logoTop+65);
-  c.strokeStyle='#fff';c.lineWidth=2;c.beginPath();c.moveTo(right-logoWidth,logoTop+77);c.lineTo(right,logoTop+77);c.stroke();
-  c.font='500 18px Arial, sans-serif';c.fillText('S P O R T S',right,logoTop+106);c.textAlign='left';
+  c.fillStyle='#073B83';c.fillRect(0,0,w,h);
+  // Stories leave 280px above and 350px below all essential content. A wider
+  // right inset protects the action rail; the feed uses its own composition.
+  const margin=82,right=portrait?936:998,maxWidth=right-margin;
+  const logoTop=portrait?280:76,logoWidth=248;
+  c.drawImage(assets.logo,margin,logoTop,logoWidth,logoWidth*assets.logo.naturalHeight/assets.logo.naturalWidth);
+  c.textAlign='right';c.textBaseline='top';c.fillStyle='#F3EBDD';
+  c.font='700 25px "'+SHARE_TEXT+'", Georgia, serif';
+  const competition=wrap(c,p.competition,460,Infinity);
+  competition.forEach((line,i)=>c.fillText(line,right,logoTop+34+i*34));c.textAlign='left';
+  const ruleY=logoTop+160;
+  c.strokeStyle='#BE9270';c.lineWidth=2;c.beginPath();c.moveTo(margin,ruleY);c.lineTo(right,ruleY);c.stroke();
 
-  const mode=options.mode||'title',extra=mode==='summary'?takeSummary(p.body):mode==='fragment'?takeFragments(p.body)[options.fragment||0]||'':'';
-  const footerY=portrait?1370:909,baseTop=portrait?480:264,textSpace=footerY-70-baseTop;
+  const mode=options.mode||'title';
+  let main=mode==='summary'?takeSummary(p.body):mode==='fragment'?takeFragments(p.body)[options.fragment||0]||'':'';
+  if(sameTakeText(main,p.title))main='';
+  const explanation=clean(options.explanation,240);
+  const date=options.showDate===false||!p.date?'':'Take guardado en '+p.date.split('-').reverse().join('/');
+  c.font='700 30px "'+SHARE_TEXT+'", Georgia, serif';
+  const author=wrap(c,p.author,maxWidth,Infinity),authorHeight=author.length*40;
+  const footerY=h-(portrait?350:76)-authorHeight-(date?52:0)-24;
+  const baseTop=ruleY+46,textSpace=footerY-46-baseTop;
   const scale={compact:.86,large:1.14}[options.textSize]||1;
-  let font=Math.round((extra?82:104)*scale),extraFont=36,lines=[],extraLines=[],block=0;
-  for(;font>=22;font-=1){
-   c.font='600 '+font+'px "Playfair Display", Georgia, serif';lines=wrap(c,p.title,maxWidth,Infinity);
-   extraFont=Math.max(22,Math.min(portrait?40:34,Math.round(font*.55)));
-   c.font='400 '+extraFont+'px "Libre Baskerville", Georgia, serif';extraLines=extra?wrap(c,extra,maxWidth,Infinity):[];
-   block=lines.length*font*1.16+(extra?76+extraLines.length*extraFont*1.4:0);
-   if(block<=textSpace)break;
+  const blocks=[{text:p.title,family:'"'+SHARE_DISPLAY+'", Georgia, serif',weight:600,min:main?38:44,max:Math.round((main?60:explanation?94:112)*scale),leading:1.18,gap:0,color:'#FFFFFF'}];
+  const contentLabel=main&&(mode==='summary'?'RESUMEN DEL TAKE':takeFragments(p.body).length>1?'FRAGMENTO ORIGINAL':'');
+  if(contentLabel)blocks.push({text:contentLabel,family:'"'+SHARE_TEXT+'", Georgia, serif',weight:700,min:18,max:20,leading:1.25,gap:28,color:'#DDC5AD'});
+  if(main)blocks.push({text:main,family:'"'+SHARE_TEXT+'", Georgia, serif',weight:400,min:40,max:Math.round((explanation?58:68)*scale),leading:1.3,gap:contentLabel?16:36,color:'#FFFFFF'});
+  if(explanation)blocks.push({text:explanation,family:'"'+SHARE_TEXT+'", Georgia, serif',weight:400,min:30,max:34,leading:1.4,gap:40,color:'#F3EBDD'});
+  const fitted=fitShareBlocks(c,blocks,maxWidth,textSpace);
+  let y=baseTop+Math.max(0,(textSpace-fitted.height)*(explanation ? .12 : .24));
+  for(const b of fitted.blocks){
+   y+=b.gap;c.fillStyle=b.color;c.font=b.font;
+   for(const line of b.lines){c.fillText(line,margin,y);y+=b.size*b.leading;}
   }
-  if(block>textSpace)throw Error('Este texto necesita más espacio. Elige otro fragmento o el formato vertical.');
-  c.fillStyle='#fff';c.font='600 '+font+'px "Playfair Display", Georgia, serif';
-  let y=baseTop+(textSpace-block)/2+font;
-  for(const line of lines){c.fillText(line,margin,y);y+=font*1.16;}
-  if(extra){
-   y+=28-font;c.fillStyle='#DDC5AD';c.font='600 21px Arial, sans-serif';
-   c.fillText(mode==='summary'?'RESUMEN DEL TAKE':'FRAGMENTO ORIGINAL',margin,y);y+=30;
-   c.fillStyle='#fff';c.font='400 '+extraFont+'px "Libre Baskerville", Georgia, serif';
-   for(const line of extraLines){y+=extraFont*1.4;c.fillText(line,margin,y);}
-  }
+  // No explanation block or reserved gap exists when the input is empty.
   c.strokeStyle='#BE9270';c.lineWidth=2;c.beginPath();c.moveTo(margin,footerY);c.lineTo(right,footerY);c.stroke();
-  c.fillStyle='#fff';c.textAlign='left';c.font='400 34px "Libre Baskerville", Georgia, serif';
-  c.fillText('Por',margin,footerY+75);
-  let username=p.author.replace(/^@/,'')||'Aficionado';
-  let nameFont=35;
-  const date=options.showDate===false?'':p.date.split('-').reverse().join('/');
-  const dateWidth=date?245:0;
-  for(;nameFont>=20;nameFont-=1){
-   c.font='700 '+nameFont+'px "Libre Baskerville", Georgia, serif';
-   if(c.measureText(username).width<=maxWidth-90-dateWidth)break;
-  }
-  // Wrap a long username as needed instead of overlapping the publication date.
-  const names=wrap(c,username,maxWidth-90-dateWidth,Infinity);
-  c.font='700 '+Math.max(20,nameFont)+'px "Libre Baskerville", Georgia, serif';
-  names.forEach((line,i)=>c.fillText(line,margin+72,footerY+75+i*26));
-  if(date){c.fillStyle='#BE9270';c.fillRect(right-225,footerY+37,2,43);
-   c.fillStyle='#fff';c.textAlign='right';c.font='400 28px "Libre Baskerville", Georgia, serif';c.fillText(date,right,footerY+75);c.textAlign='left';}
+  c.fillStyle='#FFFFFF';c.font='700 30px "'+SHARE_TEXT+'", Georgia, serif';
+  author.forEach((line,i)=>c.fillText(line,margin,footerY+24+i*40));
+  if(date){c.fillStyle='#F3EBDD';c.font='400 26px "'+SHARE_TEXT+'", Georgia, serif';c.fillText(date,margin,footerY+24+authorHeight+14);}
   return canvas;
  }
 
- function renderCard(p,options){
-  if(p.kind==='take')return renderTakeCard(p,options);
+ function renderCard(p,options,assets){
+  if(p.kind==='take')return renderTakeCard(p,options,assets);
   if(p.kind==='weekly')return renderWeeklyCard(p);
   const canvas=document.createElement('canvas');canvas.width=1080;canvas.height=1350;
   const c=canvas.getContext('2d');if(!c)throw Error('Este navegador no permite crear la tarjeta. Puedes copiar el enlace.');
@@ -277,33 +297,40 @@
   linkButton.onclick=()=>copy(urlFor(p),status,'Enlace copiado.');textButton.onclick=()=>copy(caption(p),status,'Texto y enlace copiados.');
   const utilities=make('div',null,'cam-pick-share-utilities');utilities.append(download,linkButton,textButton);
   const label=make('label','Texto para tu publicación','cam-pick-share-caption-label');const text=make('textarea');text.value=caption(p);text.readOnly=true;text.rows=5;text.setAttribute('aria-label','Texto y enlace de la publicación');label.append(text);
-  const defaults=()=>({mode:'title',size:'square',showDate:true,fragment:0,textSize:'auto'});
+  const defaults=()=>({mode:p.body&&!sameTakeText(p.body,p.title)?'fragment':'title',size:'feed',showDate:true,fragment:0,textSize:'auto',explanation:''});
   let takeOptions=defaults();
-  let editor=null,modeSelect=null,fragmentLabel=null,fragmentSelect=null,sizeSelect=null,dateToggle=null,textSizeSelect=null,selectionNote=null,shareButton=null;
+  let editor=null,modeSelect=null,fragmentLabel=null,fragmentSelect=null,sizeSelect=null,dateToggle=null,textSizeSelect=null,selectionNote=null,shareButton=null,explanationInput=null,explanationCount=null;
   if(p.kind==='take'){
    editor=make('section',null,'cam-take-share-editor');editor.setAttribute('aria-label','Personalizar la ficha del Take');
    const title=make('strong','Personaliza tu ficha','cam-take-share-editor-title');editor.append(title);
    const field=(name,control)=>{const label=make('label',name,'cam-take-share-field');label.append(control);editor.append(label);return label;};
-   modeSelect=make('select');for(const [value,name] of [['title','Solo título'],['summary','Con resumen'],['fragment','Con fragmento']]){const option=make('option',name);option.value=value;modeSelect.append(option);}
+   modeSelect=make('select');for(const [value,name] of [['title','Solo título'],['summary','Con resumen'],['fragment','Título y Take']]){const option=make('option',name);option.value=value;modeSelect.append(option);}modeSelect.value=takeOptions.mode;
    field('Contenido de la ficha',modeSelect);
    fragmentSelect=make('select');const pieces=takeFragments(p.body);
    pieces.forEach((piece,i)=>{const option=make('option','Fragmento '+(i+1)+': '+piece.slice(0,44)+(piece.length>44?'…':''));option.value=String(i);fragmentSelect.append(option);});
-   fragmentLabel=field('Fragmento del texto original',fragmentSelect);fragmentLabel.classList.add('cam-take-share-fragment');fragmentLabel.hidden=true;
+   fragmentLabel=field('Fragmento del texto original',fragmentSelect);fragmentLabel.classList.add('cam-take-share-fragment');fragmentLabel.hidden=takeOptions.mode!=='fragment'||pieces.length<2;
    selectionNote=make('p','','cam-take-share-selection');selectionNote.hidden=true;editor.append(selectionNote);
    if(!pieces.length){modeSelect.querySelector('option[value="summary"]').disabled=true;modeSelect.querySelector('option[value="fragment"]').disabled=true;}
-   sizeSelect=make('select');for(const [value,name] of [['square','Cuadrada'],['story','Vertical']]){const option=make('option',name);option.value=value;sizeSelect.append(option);}
+   sizeSelect=make('select');for(const [value,name] of [['feed','Publicación 4:5 · 1080 × 1350'],['story','Historia 9:16 · 1080 × 1920'],['square','Cuadrada 1:1 · 1080 × 1080']]){const option=make('option',name);option.value=value;sizeSelect.append(option);}
    field('Formato',sizeSelect);
    textSizeSelect=make('select');for(const [value,name] of [['auto','Automático'],['compact','Pequeño'],['large','Grande']]){const option=make('option',name);option.value=value;textSizeSelect.append(option);}
    field('Tamaño del texto',textSizeSelect);
+   explanationInput=make('textarea');explanationInput.rows=3;explanationInput.maxLength=240;explanationInput.className='cam-take-share-explanation';
+   explanationInput.setAttribute('aria-describedby','camTakeShareExplanationHint camTakeShareExplanationCount');
+   const explanationLabel=field('Tu explicación (opcional)',explanationInput);explanationLabel.classList.add('cam-take-share-explanation-field');
+   const explanationHint=make('span','Solo aparece en esta ficha. Tu Take original se conserva.','cam-take-share-explanation-hint');explanationHint.id='camTakeShareExplanationHint';
+   explanationCount=make('span','0 / 240','cam-take-share-explanation-count');explanationCount.id='camTakeShareExplanationCount';
+   explanationLabel.append(explanationHint,explanationCount);
    const dateLabel=make('label',null,'cam-take-share-checkbox');dateToggle=make('input');dateToggle.type='checkbox';dateToggle.checked=true;dateLabel.append(dateToggle,make('span','Mostrar fecha'));editor.append(dateLabel);
    const reset=make('button','Restablecer diseño','cam-take-share-reset');reset.type='button';editor.append(reset);
    content.prepend(editor);
-   modeSelect.onchange=()=>{takeOptions.mode=modeSelect.value;fragmentLabel.hidden=modeSelect.value!=='fragment';refresh();};
+   modeSelect.onchange=()=>{takeOptions.mode=modeSelect.value;fragmentLabel.hidden=modeSelect.value!=='fragment'||pieces.length<2;refresh();};
    fragmentSelect.onchange=()=>{takeOptions.fragment=Number(fragmentSelect.value)||0;refresh();};
    sizeSelect.onchange=()=>{takeOptions.size=sizeSelect.value;refresh();};
    dateToggle.onchange=()=>{takeOptions.showDate=dateToggle.checked;refresh();};
    textSizeSelect.onchange=()=>{takeOptions.textSize=textSizeSelect.value;refresh();};
-   reset.onclick=()=>{takeOptions=defaults();modeSelect.value='title';fragmentSelect.value='0';fragmentLabel.hidden=true;sizeSelect.value='square';textSizeSelect.value='auto';dateToggle.checked=true;refresh();};
+   explanationInput.oninput=()=>{takeOptions.explanation=explanationInput.value.slice(0,240);explanationCount.textContent=takeOptions.explanation.length+' / 240';refresh();};
+   reset.onclick=()=>{takeOptions=defaults();modeSelect.value=takeOptions.mode;fragmentSelect.value='0';fragmentLabel.hidden=takeOptions.mode!=='fragment'||pieces.length<2;sizeSelect.value='feed';textSizeSelect.value='auto';dateToggle.checked=true;explanationInput.value='';explanationCount.textContent='0 / 240';refresh();};
   }
   if(p.kind==='take'){
    hint.textContent='El menú del teléfono permite elegir una app. Si no recibe imágenes, descarga el PNG y adjúntalo; puedes copiar el enlace por separado.';
@@ -352,20 +379,22 @@
    });
   }
   function refresh(){
-   const current=++generation;file=null;ready();download.hidden=true;download.removeAttribute('href');release();
-   if(selectionNote){selectionNote.hidden=takeOptions.mode==='title';selectionNote.textContent=takeOptions.mode==='summary'?'Resumen extractivo automático: selección de frases del Take, sin texto añadido.':takeFragments(p.body)[takeOptions.fragment]||'';}
-   preview.replaceChildren(make('p','Preparando tarjeta…'));preview.setAttribute('aria-busy','true');status.textContent='';
-   const draw=()=>{if(ticket!==request||current!==generation||!dialog.open)return;try{
-    const canvas=renderCard(p,takeOptions);
+   const current=++generation;file=null;ready();download.hidden=true;download.removeAttribute('href');
+   if(selectionNote){const pieces=takeFragments(p.body);selectionNote.hidden=takeOptions.mode==='title'||takeOptions.mode==='fragment'&&pieces.length<2;selectionNote.textContent=takeOptions.mode==='summary'?'Resumen extractivo automático: selección de frases del Take, sin texto añadido.':'Fragmento '+(takeOptions.fragment+1)+' de '+pieces.length+'. '+(pieces[takeOptions.fragment]||'');}
+   if(!preview.querySelector('img'))preview.replaceChildren(make('p','Preparando tarjeta…'));preview.setAttribute('aria-busy','true');status.textContent='';
+   const failed=error=>{if(ticket!==request||current!==generation||!dialog.open)return;release();preview.replaceChildren(make('p',error.message));preview.setAttribute('aria-busy','false');status.textContent=error.message;};
+   const draw=assets=>{if(ticket!==request||current!==generation||!dialog.open)return;try{
+    const canvas=renderCard(p,takeOptions,assets);
     canvas.toBlob(blob=>{
      if(ticket!==request||current!==generation||!dialog.open)return;
-     if(!blob){preview.replaceChildren(make('p','No se pudo preparar la imagen. Puedes copiar el texto o el enlace.'));preview.setAttribute('aria-busy','false');return;}
+     if(!blob){failed(Error('No se pudo preparar la imagen. Puedes copiar el texto o el enlace.'));return;}
+     release();
      resource=URL.createObjectURL(blob);const img=make('img');img.src=resource;img.alt='Ficha para compartir: '+p.title+' · '+p.author;img.width=canvas.width;img.height=canvas.height;
      preview.replaceChildren(img);preview.setAttribute('aria-busy','false');
      file=new File([blob],download.download,{type:'image/png'});download.href=resource;download.hidden=false;ready();
     },'image/png');
-   }catch(error){preview.replaceChildren(make('p',error.message));preview.setAttribute('aria-busy','false');}};
-   const fonts=p.kind==='take'?prepareTakeFonts():null;if(fonts)fonts.then(draw);else draw();
+   }catch(error){failed(error);}};
+   if(p.kind==='take')prepareTakeAssets().then(draw).catch(failed);else draw();
   }
   refresh();
 

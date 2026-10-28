@@ -1,0 +1,47 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>CAM Sports · verificación de fichas Takes</title><style>body{margin:24px;background:#eeeae3;color:#0a3268;font:15px/1.5 system-ui}h1{font:600 26px Georgia}button,select{padding:10px;border:1px solid #0a3268;border-radius:10px;background:#fff;color:#0a3268;margin:0 8px 12px 0}iframe{display:block;background:#eeeae3;border:1px solid #abb8c4;max-width:none}#qaResults{white-space:pre-wrap}#qaResults:empty{display:none}</style></head><body>
+<h1>CAM Sports · fichas de Takes</h1><p>Pruebas con datos ficticios. Fuentes, logo, lienzo y PNG reales; no se publican datos.</p><button id="qaRun">Ejecutar matriz de pruebas</button><label>Ancho <select id="qaWidth"><option>390</option><option>320</option><option>375</option><option>430</option><option>768</option><option selected>1366</option></select></label><pre id="qaResults" role="status"></pre><iframe id="qaFrame" title="CAM Sports: prueba de Takes" width="1366" height="900" src="fixtures/take-sharing.html"></iframe>
+<script>
+const frame=document.getElementById('qaFrame'),results=document.getElementById('qaResults');
+document.getElementById('qaWidth').onchange=e=>frame.width=e.target.value;
+const tick=()=>new Promise(r=>setTimeout(r,0)),paint=()=>new Promise(r=>frame.contentWindow.requestAnimationFrame(()=>frame.contentWindow.requestAnimationFrame(r)));
+const report=text=>{results.textContent+=text+'\n';};
+function assert(ok,message){if(!ok)throw Error(message);}
+async function ready(){const d=frame.contentDocument;for(let i=0;i<400;i++){const p=d.querySelector('.cam-pick-share-preview');if(p?.getAttribute('aria-busy')==='false'){const img=p.querySelector('img');assert(img,p.textContent);await img.decode();return img;}await new Promise(r=>setTimeout(r,20));}throw Error('Tiempo de espera agotado');}
+async function choose(index,value){const w=frame.contentWindow,c=w.document.querySelectorAll('#camPickShareDialog select')[index];w.qaDraws=[];w.qaLogos=[];c.value=value;c.dispatchEvent(new w.Event('change'));return ready();}
+async function explanation(value){const w=frame.contentWindow,c=w.document.querySelector('.cam-take-share-explanation');w.qaDraws=[];w.qaLogos=[];c.value=value;c.dispatchEvent(new w.Event('input'));return ready();}
+async function bytes(img){return new Uint8Array(await(await fetch(img.src)).arrayBuffer());}
+function bounds(story){const w=frame.contentWindow,min=story?280:76,max=story?1570:1274;for(const t of w.qaDraws){const left=t.right?t.x-t.width:t.x,right=t.right?t.x:t.x+t.width;assert(left>=81&&right<=(story?937:999),'Texto fuera del margen horizontal: '+t.text);assert(t.y>=min&&t.y+t.size*1.3<=max+2,'Texto fuera del margen vertical: '+t.text);}assert(w.qaLogos.length===1&&w.qaLogos[0].complete&&w.qaLogos[0].width===1760,'Logo oficial cargado');}
+document.getElementById('qaRun').onclick=async()=>{
+const run=document.getElementById('qaRun');run.disabled=true;results.textContent='';const w=frame.contentWindow,d=w.document,base=w.qaTake,original=JSON.stringify(base);let count=0;
+try{
+const closeShare=()=>d.querySelector('.cam-pick-share-close')?.click();
+closeShare();d.querySelector('#aeDiscussionClose')?.click();
+d.querySelector('#freeTakesFeed .cam-pick-share-button').click();let img=await ready();assert(img.naturalHeight===1350,'Listado abre 4:5');const listed=await bytes(img);closeShare();report('✓ Compartir desde el listado');
+d.querySelector('#qaOpenDetail').click();assert(d.querySelectorAll('#aeDiscussionShare .cam-pick-share-button').length===1,'Un único botón en el detalle');
+const detailButton=d.querySelector('#aeDiscussionShare .cam-pick-share-button');detailButton.click();img=await ready();assert(String(await bytes(img))===String(listed),'Listado y detalle comparten el mismo componente y PNG');closeShare();assert(d.querySelector('#aeTakeDiscussion').open&&d.activeElement===detailButton,'Volver al detalle conserva foco y conversación');d.querySelector('#aeDiscussionClose').click();report('✓ Compartir desde detalle y devolver el foco');
+const rows=[base,{...base,title:'Un Take corto',body:''},{...base,body:base.title+'.'},{...base,title:('Una lectura del partido y de toda la temporada: el valor de decidir cuando el equipo más te necesita. ').repeat(2).slice(0,160),body:'Su capacidad para desequilibrar y crear ocasiones será decisiva en los partidos grandes.'},{...base,title:'W'.repeat(160),body:'Su rendimiento puede marcar la diferencia.'},{...base,author:'Autor'.repeat(16)}];
+for(const [i,row] of rows.entries()){
+ const frozen=Object.freeze(row);w.CamPickShare.open(frozen,{kind:'take'});await ready();
+ for(const size of ['feed','story'])for(const text of ['', 'Tiene recursos para crear ventajas, asumir la responsabilidad y ser decisivo en las noches importantes.']){
+  await choose(2,size);img=await explanation(text);bounds(size==='story');const data=new DataView((await bytes(img)).buffer);
+  assert(data.getUint32(16)===1080&&data.getUint32(20)===(size==='feed'?1350:1920),'Dimensiones exactas del PNG');
+  const drawn=w.qaDraws.map(t=>t.text).join(' ');assert(drawn.includes('Take guardado en 23/10/2026'),'Fecha original identificada');assert(!drawn.includes('…'),'Texto sin recortes');assert(w.qaDraws.filter(t=>t.font.includes('Playfair')).every(t=>t.size>=38),'Título legible');
+  if(text)assert(drawn.includes(text),'Explicación completa');
+  assert(JSON.stringify(base)===original,'Take original inmutable');assert(d.querySelector('.cam-pick-share-download').href===img.src,'Descarga y vista previa son el mismo PNG');count++;
+ }
+ closeShare();report('✓ Caso '+(i+1)+': con/sin explicación · 4:5/9:16');
+}
+w.CamPickShare.open(base,{kind:'take'});img=await ready();const before=await bytes(img);await explanation('Explicación temporal');img=await explanation('');assert(String(before)===String(await bytes(img)),'Eliminar explicación reproduce PNG original');report('✓ Campo vacío recompone la ficha sin huecos');
+await explanation('El rendimiento en los partidos grandes. '.repeat(6).slice(0,240));bounds(false);report('✓ Explicación de 240 caracteres legible y dentro de márgenes');
+d.querySelector('.cam-take-share-reset').click();await ready();
+for(const width of [320,375,390,430,768,1366])for(const dark of [false,true]){
+ frame.width=width;d.documentElement.classList.toggle('dark',dark);await paint();const dialog=d.querySelector('#camPickShareDialog');dialog.scrollTop=0;const rect=dialog.getBoundingClientRect();assert(dialog.scrollWidth<=dialog.clientWidth+1,'Sin desbordamiento a '+width);
+ const controls=[...dialog.querySelectorAll('button,a,select,textarea')].filter(e=>e.getClientRects().length);assert(controls.every(e=>{const b=e.getBoundingClientRect();return b.left>=rect.left&&b.right<=rect.right+1;}),'Controles dentro del diálogo a '+width);
+ const bar=dialog.querySelector('.cam-take-share-primary').getBoundingClientRect();assert(bar.top>=rect.top&&bar.bottom<=rect.bottom,'Compartir visible a '+width);count++;
+}
+report('✓ 320 / 375 / 390 / 430 / 768 / 1366 px · día y noche');
+assert(d.fonts.check('600 80px "CAM Share Playfair"')&&d.fonts.check('400 32px "CAM Share Baskerville"'),'Fuentes reales listas');assert(w.qaWrites.length===0,'Sin escrituras de publicaciones/votos/comentarios');
+frame.width=390;document.getElementById('qaWidth').value='390';d.documentElement.classList.remove('dark');report('PASS · '+count+' combinaciones, logo y fuentes reales. Lista para descargar y compartir.');
+}catch(e){report('FAIL · '+e.message);console.error(e);}finally{run.disabled=false;}
+};
+</script></body></html>
