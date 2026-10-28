@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {Window} from 'happy-dom';
 const w=new Window({url:'https://example.test/?article=old&token=PRIVATE#profile'}),d=w.document;
 const drawn=[];let pendingBlob=null,shared=null,clipboard='',cancel=false;
-w.HTMLCanvasElement.prototype.getContext=()=>({fillRect(){},beginPath(){},moveTo(){},lineTo(){},stroke(){},fillText:t=>drawn.push(t),measureText:t=>({width:String(t).length*18})});
+w.HTMLCanvasElement.prototype.getContext=()=>({drawImage(){},fillRect(){},beginPath(){},moveTo(){},lineTo(){},stroke(){},fillText:t=>drawn.push(t),measureText:t=>({width:String(t).length*18})});
 w.HTMLCanvasElement.prototype.toBlob=function(callback){pendingBlob=callback;};
 w.URL.createObjectURL=()=> 'blob:share-preview';const revoked=[];w.URL.revokeObjectURL=u=>revoked.push(u);
 Object.defineProperty(w.navigator,'clipboard',{configurable:true,value:{writeText:async text=>{clipboard=text;}}});
