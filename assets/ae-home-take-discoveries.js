@@ -101,20 +101,56 @@
     });
     return item;
   }
+  // Placa del Salón de la fama: medalla con los puntos + el Take.
   function historicalCard(t){
-    const btn=make('button',null,'ae-discovery-take');
+    const btn=make('button',null,'ae-discovery-take cam-take-record');
     btn.type='button';
-    btn.setAttribute('aria-label','Leer el Take histórico: '+(t.title||'Publicación'));
+    const points=Number(t.points||0);
+    const pointsLabel=points===1?'punto':'puntos';
+    btn.setAttribute('aria-label','Leer el Take histórico: '+(t.title||'Publicación')+'. '+points+' '+pointsLabel+'.');
     btn.addEventListener('click',()=>open(t));
-    btn.append(make('span','RÉCORD HISTÓRICO · '+(t.competition||'Deportes'),'ae-discovery-sport'));
-    btn.append(make('strong',t.title||'Take de la comunidad','ae-discovery-title'));
+    const medal=make('span',null,'cam-take-record-medal');
+    medal.setAttribute('aria-hidden','true');
+    medal.append(make('strong',points),make('small',points===1?'pt':'pts'));
+    const body=make('span',null,'cam-take-record-body');
+    body.append(make('span',t.competition||'Deportes','ae-discovery-sport cam-take-record-chip'));
+    body.append(make('strong',t.title||'Take de la comunidad','ae-discovery-title'));
     const excerpt=String(t.body||'').trim();
-    if(excerpt)btn.append(make('span',excerpt.length>170?excerpt.slice(0,167).trimEnd()+'…':excerpt,'ae-discovery-excerpt'));
-    const foot=make('span',null,'ae-discovery-meta');
-    foot.append(make('span','@'+String(t.author||'Aficionado').replace(/^@+/,'')));
-    foot.append(make('span',Number(t.points||0)+' '+(Number(t.points)===1?'punto':'puntos'),'ae-discovery-score'));
-    btn.append(foot);
+    if(excerpt)body.append(make('span',excerpt.length>170?excerpt.slice(0,167).trimEnd()+'…':excerpt,'ae-discovery-excerpt'));
+    const foot=make('span',null,'ae-discovery-meta cam-take-record-byline');
+    foot.append(make('span','@'+String(t.author||'Aficionado').replace(/^@+/,''),'cam-take-record-author'));
+    const when=date(t.created_at);
+    if(when)foot.append(make('span',when,'cam-take-record-date'));
+    body.append(foot);
+    btn.append(medal,body);
     return btn;
+  }
+  // Sin récord todavía: placa vacía con invitación a publicar.
+  function emptyHistoric(target,message){
+    if(!target)return;
+    const box=make('div',null,'cam-take-record-empty');
+    const medal=make('span',null,'cam-take-record-medal is-empty');
+    medal.setAttribute('aria-hidden','true');
+    const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+    svg.setAttribute('viewBox','0 0 24 24');
+    const cup=document.createElementNS('http://www.w3.org/2000/svg','path');
+    cup.setAttribute('d','M8 21h8M12 16.5V21M7 3.5h10V9a5 5 0 0 1-10 0V3.5ZM7 5.5H4v1.2A3.3 3.3 0 0 0 7.3 10M17 5.5h3v1.2a3.3 3.3 0 0 1-3.3 3.3');
+    cup.setAttribute('fill','none');cup.setAttribute('stroke','currentColor');
+    cup.setAttribute('stroke-width','1.6');cup.setAttribute('stroke-linecap','round');cup.setAttribute('stroke-linejoin','round');
+    svg.append(cup);medal.append(svg);
+    const copy=make('div',null,'cam-take-record-empty-copy');
+    copy.append(make('strong','El récord está libre','cam-take-record-empty-title'),make('p',message,'ae-discovery-empty'));
+    const cta=make('button',null,'cam-take-record-cta');
+    cta.type='button';
+    cta.append(document.createTextNode('Publicar mi Take'));
+    const chevron=make('span','›','cam-chevron');chevron.setAttribute('aria-hidden','true');cta.append(chevron);
+    cta.addEventListener('click',()=>{
+      if(typeof window.aeOpenTakeComposer==='function')window.aeOpenTakeComposer();
+      else $('aeHomeTakePublish')?.click();
+    });
+    copy.append(cta);
+    box.append(medal,copy);
+    target.replaceChildren(box);
   }
   function empty(target,message,isList=false){
     if(target)target.replaceChildren(make(isList?'li':'p',message,'ae-discovery-empty'));
@@ -133,7 +169,7 @@
     ranked('negative',negative,'Todavía no hay Takes con votos negativos.');
     const winner=rows.find(r=>r?.kind==='historical'&&Number(r.points)>0);
     if(winner)historic.replaceChildren(historicalCard(winner));
-    else empty(historic,'Aún no hay un Take acertado con puntos asignados por los administradores.');
+    else emptyHistoric(historic,'Cuando los administradores puntúen un Take acertado, el que más puntos sume quedará aquí.');
   }
   async function refresh(force=false){
     if(!$('aeHomeTakeHighlights')||typeof db==='undefined'||!db||$('editorialBottom')?.hidden)return;

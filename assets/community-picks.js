@@ -311,6 +311,13 @@ async function loadHistoricPick(){
   }else{
     byline.append(el('span',authorName,'cam-historic-author'));
   }
+  if(window.CamPickShare){
+    const share=window.CamPickShare.button(pick);
+    share.classList.add('cam-historic-share');
+    // Icono de compartir del teléfono (flecha hacia arriba saliendo de la bandeja).
+    share.querySelector('svg path')?.setAttribute('d','M12 3.5v11M7.5 8 12 3.5 16.5 8M6 12.5H5v7h14v-7h-1');
+    byline.append(share);
+  }
   winner.append(byline);
   const head=el('div',null,'cam-historic-head');
   head.append(el('strong',matchup,'ae-discovery-title cam-historic-match'));
