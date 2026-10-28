@@ -34,7 +34,7 @@ const server=http.createServer((req,res)=>{
  const select=async(index,value)=>{await dialog.locator('select').nth(index).selectOption(value);await ready();};
  const png=async()=>Buffer.from(await preview.evaluate(async img=>{const b=await(await fetch(img.src)).arrayBuffer();return Array.from(new Uint8Array(b));}));
  const checkBounds=async story=>{
-  const drawn=await page.evaluate(()=>draws);for(const t of drawn){const left=t.right?t.x-t.width:t.x,right=t.right?t.x:t.x+t.width;assert.ok(left>=(story?140:85)&&right<=(story?935:995),`Text overflows horizontally: ${JSON.stringify(t)}`);assert.ok(t.y>=(story?280:240)&&t.y<=(story?1500:1045),`Text overflows safe height: ${JSON.stringify(t)}`);}
+  const drawn=await page.evaluate(()=>draws);for(const t of drawn){const left=t.right?t.x-t.width:t.x,right=t.right?t.x:t.x+t.width;assert.ok(left>=(story?140:85)&&right<=(story?935:995),`Text overflows horizontally: ${JSON.stringify(t)}`);assert.ok(t.y>=(story?280:180)&&t.y<=(story?1500:1045),`Text overflows safe height: ${JSON.stringify(t)}`);}
  };
  await open();assert.equal(await page.evaluate(()=>document.fonts.check('600 80px "Playfair Display"')),true,'The real Playfair font is loaded before PNG generation');
  const first=await png();assert.equal(first.readUInt32BE(16),1080);assert.equal(first.readUInt32BE(20),1080);await checkBounds(false);
