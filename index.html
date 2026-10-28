@@ -2923,7 +2923,6 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
               <section id="cpSettleHistorySection" class="ae-picks-top-three ae-pick-history-section" aria-labelledby="cpSettleHistoryTitle">
                 <header class="ae-pick-history-heading">
                   <div><span class="ae-pick-history-kicker">EL RECETARIO · RESULTADOS</span><h3 id="cpSettleHistoryTitle">Historial de Picks</h3></div>
-                  <p>Pronósticos resueltos, del más reciente al más antiguo.</p>
                 </header>
                 <div id="cpSettleHistory" role="region" aria-label="Historial de Picks resueltos" aria-live="polite"><p class="ae-pick-history-empty">Cargando resultados…</p></div>
               </section>
@@ -2956,7 +2955,6 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
                 <section id="aeHomePickHistoric" class="ae-home-take-feature" aria-labelledby="aeHomePickHistoricTitle">
                   <div class="ae-historic-copy">
                     <h3 id="aeHomePickHistoricTitle">Pick histórico</h3>
-                    <p class="ae-home-take-feature-intro">El Pick individual acertado con más puntos de todo el historial.</p>
                   </div>
                   <div id="aeHomePickHistoricPick" aria-live="polite"><p class="ae-discovery-empty">Cargando Pick…</p></div>
                 </section>
@@ -3125,7 +3123,6 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
                   <div class="ae-historic-copy">
                     <span class="ae-home-take-feature-kicker cam-take-record-kicker">Salón de la fama · Takes</span>
                     <h3 id="aeHomeTakeHistoricTitle">Take histórico</h3>
-                    <p class="ae-home-take-feature-intro">El Take individual con más puntos otorgados por los administradores.</p>
                   </div>
                   <div id="aeHomeTakeHistoricTake" aria-live="polite"><p class="ae-discovery-empty">Cargando Take…</p></div>
                 </section>
@@ -3253,7 +3250,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
               <header class="cam-nfl-heading">
                 <span>CAM SPORTS · NFL</span>
                 <h2 id="camNflTitle">LA QUINIELA NFL</h2>
-                <p><strong>Cada jornada es una oportunidad para demostrar cuánto sabes.</strong> Elige a los ganadores: cuanto más difícil sea el acierto, más puntos sumas.</p>
+                <p><strong>Cada jornada es una oportunidad para demostrar cuánto sabes.</strong></p>
               </header>
               <nav id="camNflViewTabs" class="cam-quiniela-view-tabs" aria-label="Vistas de La Quiniela">
                 <button type="button" data-view="jornada" aria-pressed="true" aria-controls="camNflMatchPanel">Jornada</button>
@@ -3261,7 +3258,6 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
                 <button type="button" data-view="all" aria-pressed="false" aria-controls="camNflQuinielaStandings"><span class="cam-q-tab-kicker">Clasificación</span> <span class="cam-q-tab-name">histórica</span></button>
               </nav>
               <div id="camNflNav" class="cam-nfl-nav" aria-label="Jornada"></div>
-              <p id="camNflWeekInfo" class="cam-nfl-status" aria-live="polite"></p>
             </div>
             <div id="camNflMatchPanel">
             <p id="camNflStatus" class="cam-nfl-status" role="status" aria-live="polite"></p>
@@ -3303,7 +3299,6 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
                 <button type="button" data-view="all" aria-pressed="false" aria-controls="camFootballQuinielaStandings"><span class="cam-q-tab-kicker">Clasificación</span> <span class="cam-q-tab-name">histórica</span></button>
               </nav>
               <div id="camFootballNav" class="cam-nfl-nav" aria-label="Competición y jornada"></div>
-              <p id="camFootballRoundInfo" class="cam-nfl-status" aria-live="polite"></p>
             </div>
             <div id="camFootballMatchPanel">
             <p id="camFootballStatus" class="cam-nfl-status" role="status" aria-live="polite"></p>
@@ -3415,7 +3410,6 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
           <div><button type="button" data-cam-welcome-take="Fútbol">Fútbol</button><button type="button" data-cam-welcome-take="NFL">NFL</button></div>
         </div>
       </div>
-      <p class="cam-welcome-outro">Explora sin prisa, respeta las opiniones de los demás y, sobre todo, ¡pásatelo bien!</p>
       <button type="button" id="camWelcomeExplore" class="cam-welcome-explore">Comenzar a explorar <span aria-hidden="true">→</span></button>
     </div>
   </div>
@@ -5600,7 +5594,7 @@ updateThemeButton();
 <script src="assets/champions.js?v=20261021-rank-notes-1"></script>
 <script src="assets/ae-ranking-notes.js?v=20261021-editorial-1"></script>
 <script src="assets/ae-pick-capture.js?v=20261021-compact-pick-compose-1"></script>
-<script src="assets/community-picks.js?v=20261028-movil-2"></script>
+<script src="assets/community-picks.js?v=20261028-textos-1"></script>
 <script src="assets/weekly-picks.js?v=20261015-1"></script>
 <script src="assets/username-auth.js?v=20261020-classical-auth-panel-1"></script>
 <script src="assets/ae-category-visibility.js?v=20261016-dynamic-nav-1"></script>
@@ -6455,7 +6449,7 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 
 <link rel="stylesheet" href="assets/cam-nfl-profile.css?v=20261022-3tab-1">
 <!-- Ajustes de diseño para el teléfono (28 oct): va al final para ganar a las capas anteriores. -->
-<link rel="stylesheet" href="assets/cam-movil-ajustes.css?v=20261028-2">
+<link rel="stylesheet" href="assets/cam-movil-ajustes.css?v=20261028-3">
 <script src="assets/cam-sport-quiniela-loader.js?v=20261026-compact-squares-1"></script>
 <script src="assets/cam-nfl-profile.js?v=20261022-3tab-1"></script>
 <script src="assets/ae-season-predictions.js?v=20261021-champion-guide-1"></script>

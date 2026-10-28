@@ -771,7 +771,6 @@ async function loadSettleHistory(){
  }catch{}
  if(!current())return;
  const labels={won:'Acertado',lost:'Fallado',void:'Anulado',pending:'Pendiente de calificación'};
- const note=el('p',rows.length===1?'1 Pick finalizado':'Últimos '+rows.length+' Picks finalizados · desliza para ver más','ae-pick-history-note');
  const list=el('ol',null,'ae-pick-history-list ae-pick-history-grid');
  list.tabIndex=0;
  list.setAttribute('aria-label','Historial de Picks finalizados, ordenado por fecha del evento de más reciente a más antiguo');
@@ -819,7 +818,7 @@ async function loadSettleHistory(){
  const sync=()=>frame.classList.toggle('is-end',list.scrollTop+list.clientHeight>=list.scrollHeight-4);
  list.addEventListener('scroll',sync,{passive:true});
  // Reemplazar de una vez evita duplicados al concurrir las actualizaciones.
- area.replaceChildren(note,frame);
+ area.replaceChildren(frame);
  requestAnimationFrame(sync);
  }catch(error){failure(error);}
  finally{if(current())area.setAttribute('aria-busy','false');}

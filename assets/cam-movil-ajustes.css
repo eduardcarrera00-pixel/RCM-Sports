@@ -523,3 +523,14 @@ html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-r
     text-transform:uppercase!important;
   }
 }
+
+/* ---------- 6 · Depuración de textos (28 oct) ---------- */
+/* La Quiniela NFL perdió la segunda frase de su entradilla: sin la altura mínima
+   del banner no queda un hueco vacío entre el texto y las pestañas. */
+@layer cam-banners {
+  @media(max-width:760px){
+    html body #mainContent #camNflQuiniela .cam-nfl-top > .cam-nfl-heading[data-cam-banner] {
+      min-height:0!important;
+    }
+  }
+}
