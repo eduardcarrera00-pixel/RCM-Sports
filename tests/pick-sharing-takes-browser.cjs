@@ -22,6 +22,8 @@ const server=http.createServer((req,res)=>{
  await page.goto('http://127.0.0.1:'+server.address().port,{waitUntil:'load'});
  await page.evaluate(()=>{
   const native=CanvasRenderingContext2D.prototype.fillText;
+  const paint=CanvasRenderingContext2D.prototype.drawImage;
+  CanvasRenderingContext2D.prototype.drawImage=function(source,x,y,width,height){if(source instanceof HTMLCanvasElement&&source.width===1080){const scale=width/source.width;draws=draws.map(t=>({...t,x:x+t.x*scale,y:y+t.y*scale,width:t.width*scale}));}return paint.call(this,source,x,y,width,height);};
   window.draws=[];CanvasRenderingContext2D.prototype.fillText=function(text,x,y,...rest){const width=this.measureText(text).width;draws.push({text,x,y,width,right:this.textAlign==='right',font:this.font});return native.call(this,text,x,y,...rest);};
   window.take=Object.freeze({id:'00000000-0000-0000-0000-000000000972',author_id:'00000000-0000-0000-0000-000000000951',author:'Adrianmendozac27',sport:'football',created_at:'2026-10-25T01:15:00Z',title:'LAMINE YAMAL GANARÁ EL BALÓN DE ORO EN 2026',body:'El argumento parte de su rendimiento.\nNo doy el resultado por seguro: depende de toda la temporada.\n\nSu evolución marcará la diferencia. '.repeat(8)});
   document.getElementById('open').onclick=()=>{draws=[];CamPickShare.open(take,{kind:'take'});};
@@ -32,7 +34,7 @@ const server=http.createServer((req,res)=>{
  const select=async(index,value)=>{await dialog.locator('select').nth(index).selectOption(value);await ready();};
  const png=async()=>Buffer.from(await preview.evaluate(async img=>{const b=await(await fetch(img.src)).arrayBuffer();return Array.from(new Uint8Array(b));}));
  const checkBounds=async story=>{
-  const drawn=await page.evaluate(()=>draws);for(const t of drawn){const left=t.right?t.x-t.width:t.x,right=t.right?t.x:t.x+t.width;assert.ok(left>=75&&right<=(story?919:1001),`Text overflows horizontally: ${JSON.stringify(t)}`);assert.ok(t.y>=(story?280:80)&&t.y<=(story?1500:1045),`Text overflows safe height: ${JSON.stringify(t)}`);}
+  const drawn=await page.evaluate(()=>draws);for(const t of drawn){const left=t.right?t.x-t.width:t.x,right=t.right?t.x:t.x+t.width;assert.ok(left>=(story?140:85)&&right<=(story?935:995),`Text overflows horizontally: ${JSON.stringify(t)}`);assert.ok(t.y>=(story?280:240)&&t.y<=(story?1500:1045),`Text overflows safe height: ${JSON.stringify(t)}`);}
  };
  await open();assert.equal(await page.evaluate(()=>document.fonts.check('600 80px "Playfair Display"')),true,'The real Playfair font is loaded before PNG generation');
  const first=await png();assert.equal(first.readUInt32BE(16),1080);assert.equal(first.readUInt32BE(20),1080);await checkBounds(false);
