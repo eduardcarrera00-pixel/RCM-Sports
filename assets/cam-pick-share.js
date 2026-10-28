@@ -49,7 +49,8 @@
   if(p.hidden)throw Error('Este Pick no está disponible para compartir.');
   const weekly=kind==='weekly';
   const raw=weekly?[{event:p.event_name,selection:p.selection}]:Array.isArray(p.legs)?p.legs:[];
-  const legs=raw.flatMap(l=>String(l?.selection||'').replace(/\\n/g,'\n').split(/\n+|;\s*|\s+[|]\s+|\s+\+\s+(?!\d)/).map(selection=>({
+  const separator=weekly?/\n+|;\s*|\s+[|•]\s+|\s+\+\s+(?!\d)/:/\n+|;\s*|\s+[|]\s+|\s+\+\s+(?!\d)|\s+\/\s+(?=\d+[.)]\s)/;
+  const legs=raw.flatMap(l=>String(l?.selection||'').replace(/\\n/g,'\n').split(separator).map(selection=>({
    event:String(l?.event||'').trim(),selection:selection.trim(),sport:String(l?.sport||'').trim(),
    market:String(l?.market||'').trim(),line:l?.line==null?'':String(l.line)
   })).filter(l=>l.selection));
