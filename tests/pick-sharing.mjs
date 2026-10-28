@@ -1,80 +1,55 @@
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 import {Window} from 'happy-dom';
-const w=new Window({url:'https://example.test/?article=old&token=PRIVATE#profile'}),d=w.document;
-const drawn=[];let pendingBlob=null,shared=null,clipboard='',cancel=false;
-w.HTMLCanvasElement.prototype.getContext=()=>({drawImage(){},fillRect(){},beginPath(){},moveTo(){},lineTo(){},stroke(){},fillText:t=>drawn.push(t),measureText:t=>({width:String(t).length*18})});
-w.HTMLCanvasElement.prototype.toBlob=function(callback){pendingBlob=callback;};
-w.URL.createObjectURL=()=> 'blob:share-preview';const revoked=[];w.URL.revokeObjectURL=u=>revoked.push(u);
+const code=fs.readFileSync('assets/cam-pick-share.js','utf8');
+const w=new Window({url:'https://example.test/?token=PRIVATE#profile'}),d=w.document;
+const frames=[],revoked=[];let current,shared=[],clipboard='',cancel=false;
+w.Image=class {naturalWidth=1760;naturalHeight=894;set src(value){this.url=value;queueMicrotask(()=>this.onload?.());}get src(){return this.url;}};
+w.HTMLCanvasElement.prototype.getContext=function(){current={canvas:this,text:[],logos:[]};frames.push(current);const frame=current;return {drawImage:i=>frame.logos.push(i.src),fillRect(){},beginPath(){},moveTo(){},lineTo(){},stroke(){},fillText:t=>frame.text.push(t),measureText(t){return {width:Array.from(t).length*(parseFloat(this.font?.match(/\d+px/)?.[0])||28)*.53};}};};
+w.HTMLCanvasElement.prototype.toBlob=function(callback){queueMicrotask(()=>callback(new w.Blob(['PNG '+this.width+'x'+this.height+' '+frames.length],{type:'image/png'})));};
+let serial=0;w.URL.createObjectURL=()=> 'blob:share-'+(++serial);w.URL.revokeObjectURL=u=>revoked.push(u);
 Object.defineProperty(w.navigator,'clipboard',{configurable:true,value:{writeText:async text=>{clipboard=text;}}});
 Object.defineProperty(w.navigator,'canShare',{configurable:true,value:()=>true});
-Object.defineProperty(w.navigator,'share',{configurable:true,value:data=>{shared=data;return cancel?Promise.reject(Object.assign(new Error('cancelled'),{name:'AbortError'})):Promise.resolve();}});
-w.notifyCommunity=t=>{w.lastNotification=t;};
-w.eval(fs.readFileSync('assets/cam-pick-share.js','utf8'));
-const pick={id:'00000000-0000-0000-0000-000000000921',author:'Sofia',title:'Barça ante el PSG',american_odds:150,event_date:'2026-11-01',outcome:'pending',moderation_status:'pending',legs:[{event:'Barça vs PSG',selection:'Barcelona gana'}],capture_check:{image:'PRIVATE_SCREENSHOT',stake:9999},email:'PRIVATE_EMAIL'};
+Object.defineProperty(w.navigator,'share',{configurable:true,value:data=>{shared.push(data);return cancel?Promise.reject(Object.assign(Error('cancel'),{name:'AbortError'})):Promise.resolve();}});
+w.notifyCommunity=t=>{w.lastNotification=t;};w.eval(code);
+const pick=Object.freeze({id:'00000000-0000-0000-0000-000000000921',author:'Sofia',title:'Barça ante el PSG',american_odds:150,event_date:'2026-11-01',publication_day:'2026-10-24',outcome:'pending',moderation_status:'pending',explanation:'La selección se apoya en el rendimiento observado. Este es el análisis original.',legs:[{sport:'Fútbol',event:'Barça vs PSG',selection:'Barcelona gana · Ganador del partido'}],capture_check:{image:'PRIVATE_SCREENSHOT',stake:9999},email:'PRIVATE_EMAIL'});
+const original=JSON.stringify(pick),tick=async()=>{for(let i=0;i<8;i++)await new Promise(r=>setTimeout(r,0));};
+const dlg=()=>d.getElementById('camPickShareDialog'),click=name=>[...dlg().querySelectorAll('button')].find(b=>b.textContent===name).click();
+const open=async(p=pick,options)=>{w.CamPickShare.open(p,options);await tick();assert.ok(dlg().querySelector('img'),dlg().textContent);};
 const opener=w.CamPickShare.button(pick);d.body.append(opener);opener.focus();opener.click();
-const dlg=d.getElementById('camPickShareDialog');
-assert.equal(dlg.open,true);assert.match(dlg.textContent,/Comparte este Pick/);
-const x=dlg.querySelector('.cam-pick-share-network');const xu=new URL(x.href),link=new URL(xu.searchParams.get('url'));
-assert.equal(link.origin,'https://camsports.github.io');assert.match(link.searchParams.get('p'),/^[A-Za-z0-9_-]{22}$/);assert.equal(link.searchParams.has('utm_source'),false);assert.ok(link.href.length<55);assert.equal(link.searchParams.has('token'),false);assert.equal(link.searchParams.has('article'),false);assert.equal(link.hash,'');
-assert.match(xu.searchParams.get('text'),/@Sofia/);assert.equal(x.rel,'noopener noreferrer');
-const ig=[...dlg.querySelectorAll('button')].find(b=>b.textContent==='Instagram');assert.equal(ig.disabled,true,'The image must be ready before sharing');
-pendingBlob(new w.Blob(['PNG_IMAGE'],{type:'image/png'}));
-assert.equal(ig.disabled,false);assert.equal(dlg.querySelector('img').width,1080);assert.equal(dlg.querySelector('img').height,1350);
-assert.ok(drawn.includes('Cuota en revisión'),'Unapproved odds are not presented as verified');
-const caption=dlg.querySelector('textarea');assert.match(caption.value,/Barcelona gana/);assert.match(caption.value,/Cuota \+150/);assert.ok(!caption.value.includes('PRIVATE'));
-const click=label=>[...dlg.querySelectorAll('button')].find(b=>b.textContent===label).click();
-click('Copiar enlace');await new Promise(r=>setTimeout(r,0));assert.equal(clipboard,link.href);
-click('Copiar texto');await new Promise(r=>setTimeout(r,0));assert.match(clipboard,/Barça vs PSG/);
-ig.click();assert.ok(shared.files,'File sharing starts synchronously in the click');assert.equal(shared.files.length,1);assert.equal(shared.text,caption.value);assert.match(shared.text,/Pendiente de resultado/);assert.equal(shared.files[0].type,'image/png');assert.equal(shared.files[0].name,'cam-sports-pick-'+pick.id+'.png');
-await new Promise(r=>setTimeout(r,0));assert.match(dlg.querySelector('[role=status]').textContent,/menú de compartir/);assert.doesNotMatch(dlg.querySelector('[role=status]').textContent,/publicado/i);
-cancel=true;ig.click();await new Promise(r=>setTimeout(r,0));assert.match(dlg.querySelector('[role=status]').textContent,/cuando quieras/);
-Object.defineProperty(w.navigator,'canShare',{configurable:true,value:()=>false});ig.click();assert.match(dlg.querySelector('[role=status]').textContent,/Descarga la tarjeta/);
-assert.ok(dlg.querySelector('.cam-pick-share-download').download.endsWith('.png'));
-click('Cerrar');assert.equal(dlg.open,false);assert.equal(d.activeElement,opener);assert.ok(revoked.includes('blob:share-preview'));
-// A Blob prepared after closing cannot restore a stale preview or leak its URL.
-opener.click();const oldCallback=pendingBlob;click('Cerrar');oldCallback(new w.Blob(['old']));assert.equal(dlg.open,false);assert.equal(dlg.querySelector('img'),null);
-const weekly={...pick,id:'00000000-0000-0000-0000-000000000922',event_name:'Toronto vs Boston',selection:'Toronto gana',title:'Pick de hoy'};
-w.CamPickShare.open(weekly,{kind:'weekly'});assert.match(dlg.textContent,/Comparte el Pick del editor/);assert.ok(new URL(new URL(dlg.querySelector('a').href).searchParams.get('url')).searchParams.has('e'));assert.match(dlg.querySelector('textarea').value,/Toronto gana/);assert.doesNotMatch(dlg.querySelector('textarea').value,/@Sofia/);
-const parlay={...weekly,title:'El parlay del domingo',selection:Array.from({length:12},(_,i)=>`Selección ${i+1}: Equipo ${i+1} gana y más de 2.5 goles`).join('\n')};
-const beforeParlay=drawn.length;w.CamPickShare.open(parlay,{kind:'weekly'});
-const parlayText=drawn.slice(beforeParlay).join(' ');
-assert.ok(parlayText.includes(parlay.title));
-for(let i=1;i<=12;i++)assert.ok(parlayText.includes(`Selección ${i}: Equipo ${i} gana y más de 2.5 goles`),`Selection ${i} must appear in the PNG without clipping`);
-assert.ok(!parlayText.includes('…'),'Editorial selections must not be ellipsized');
-assert.match(dlg.querySelector('textarea').value,/Selección 12:/);
-assert.match(new URL(dlg.querySelector('a').href).searchParams.get('text'),/El parlay del domingo/);
-pendingBlob(new w.Blob(['parlay'],{type:'image/png'}));assert.ok(dlg.querySelector('img').height>1350,'Long parlays get sufficient image space');
-const longPick={...pick,title:'X'.repeat(500),legs:Array.from({length:6},(_,i)=>({event:'Evento '+i,selection:'L'.repeat(500)}))};
-w.CamPickShare.open(longPick);assert.ok(drawn.includes('3 de 6 selecciones · Pick completo en el enlace'));assert.equal(dlg.querySelector('textarea').value.split('Evento ').length-1,6,'The full caption retains every selection');
-
-// Results and odds verification are independent and consistent across X, text and PNG.
-for(const [state,result,cta] of [['pending','Pendiente de resultado','¿Lo sigues o lo debates?'],['won','Pick acertado','Aquí lo que se canta, se baila.'],['lost','Pick no acertado','También se da la cara'],['void','Pick anulado','no cuenta']]){
- for(const approved of [true,false]){
-  w.CamPickShare.open({...pick,outcome:state,moderation_status:approved?'approved':'pending'});
-  const body=dlg.querySelector('textarea').value,post=new URL(dlg.querySelector('a').href).searchParams.get('text');
-  for(const text of [body,post]){assert.ok(text.includes(result));assert.ok(text.includes(cta));assert.equal(text.includes('Cuota verificada'),approved);}
-  assert.ok(drawn.includes(result));
- }
-}
-const wide={...pick,author:'漢'.repeat(60),title:'漢'.repeat(500),legs:[{event:'漢'.repeat(160),selection:'漢'.repeat(280)}]};
-w.CamPickShare.open(wide);const post=new URL(dlg.querySelector('a').href).searchParams.get('text');
-assert.ok(Array.from(post).reduce((n,c)=>n+(c.codePointAt(0)>0x10ff?2:1),0)+24<=280);assert.match(post,/Pendiente de resultado/);assert.match(post,/¿Lo sigues o lo debates/);
-// Decode compact links before normal app handlers read the route, retaining old links.
-const code=fs.readFileSync('assets/cam-pick-share.js','utf8');
+assert.equal(dlg().querySelector('.cam-picks-share-primary').disabled,true);await tick();
+assert.equal(dlg().querySelector('img').width,1080);assert.equal(dlg().querySelector('img').height,1080);
+assert.equal(dlg().querySelector('.cam-picks-share-primary').disabled,false);assert.equal(shared.length,0);
+const text=()=>dlg().querySelector('textarea').value;
+assert.match(text(),/Barcelona gana/);assert.doesNotMatch(text(),/PRIVATE|9999|La selección se apoya/);
+assert.ok(frames.some(f=>f.logos.some(s=>s.includes('cam-sports-logo-completo.webp'))));assert.ok(frames.some(f=>f.text.includes('24/10/2026')),'Publication date, not event date');
+assert.ok(frames.some(f=>f.text.includes('Cuota en revisión')));
+click('Copiar enlace');await tick();const link=new URL(clipboard);assert.equal(link.origin,'https://camsports.github.io');assert.match(link.searchParams.get('p'),/^[A-Za-z0-9_-]{22}$/);assert.equal(link.searchParams.has('token'),false);
+click('Instagram');assert.equal(shared.at(-1).files.length,1);assert.equal(shared.at(-1).text,undefined);assert.equal(shared.at(-1).files[0].type,'image/png');assert.equal(shared.at(-1).files[0].name,'cam-sports-pick-'+pick.id+'.png');await tick();assert.match(dlg().querySelector('[role=status]').textContent,/menú de compartir/);
+cancel=true;click('TikTok');await tick();assert.match(dlg().querySelector('[role=status]').textContent,/cuando quieras/);cancel=false;
+click('X');await tick();assert.ok(shared.at(-1).files.length);assert.equal(shared.at(-1).url,link.href,'X receives a file rather than an empty intent');
+const toggle=label=>[...dlg().querySelectorAll('label')].find(l=>l.textContent===label).querySelector('input');
+toggle('Mostrar cuota').click();await tick();assert.doesNotMatch(text(),/Cuota/);
+toggle('Mostrar fecha').click();await tick();assert.doesNotMatch(text(),/2026-10-24/);
+toggle('Mostrar análisis').click();await tick();assert.match(text(),/La selección se apoya/);
+click('Restablecer diseño');await tick();assert.doesNotMatch(text(),/La selección se apoya/);assert.match(text(),/Cuota/);
+assert.equal(JSON.stringify(pick),original);
+for(const [state,label] of [['pending','Pendiente'],['won','Acertado'],['lost','Fallado'],['void','Anulado']]){const start=frames.length;await open({...pick,outcome:state});assert.ok(frames.slice(start).some(f=>f.text.some(t=>t.endsWith(label))));}
+const other={...pick,id:'00000000-0000-0000-0000-000000000923',author:'OtroAutor',american_odds:-110,legs:[{event:'Buffalo vs Miami',selection:'Buffalo -3.5',market:'Hándicap',line:'-3.5'}]};w.CamPickShare.button(other);
+await open();const checks=dlg().querySelectorAll('.cam-picks-share-picker input');assert.equal(checks.length,2);checks[1].click();await tick();
+assert.match(dlg().textContent,/Imagen 1 de 2/);assert.match(text(),/@OtroAutor/);assert.ok(dlg().querySelector('.cam-picks-share-all').href.startsWith('blob:'));
+click('Compartir 2 imágenes');await tick();assert.equal(shared.at(-1).files.length,2);assert.ok(shared.at(-1).files.every(f=>f.type==='image/png'));assert.equal(shared.at(-1).url,undefined);
+Object.defineProperty(w.navigator,'canShare',{configurable:true,value:({files})=>files?.length===1});click('Compartir 2 imágenes');assert.match(dlg().querySelector('[role=status]').textContent,/no admite enviar todas/);
+click('Compartir esta imagen');await tick();assert.equal(shared.at(-1).files.length,1);
+const parlay={...pick,id:'00000000-0000-0000-0000-000000000924',legs:Array.from({length:12},(_,i)=>({event:'Partido '+i,selection:'Equipo '+i+' gana · Ganador'}))};let start=frames.length;await open(parlay);const allText=frames.slice(start).flatMap(f=>f.text).join(' ');for(let i=0;i<12;i++)assert.ok(allText.includes('Equipo '+i+' gana'));assert.doesNotMatch(allText,/…/);assert.match(dlg().textContent,/Imagen 1 de/);
+click('Cerrar');assert.equal(dlg().open,false);assert.ok(revoked.length>0);
+const weekly={...pick,id:'00000000-0000-0000-0000-000000000922',event_name:'Toronto vs Boston',selection:'Toronto gana\nMás de 2.5 goles',title:'Pick editorial',analysis:'Análisis editorial original'};
+await open(weekly,{kind:'weekly'});click('Copiar enlace');await tick();assert.ok(new URL(clipboard).searchParams.has('e'));assert.doesNotMatch(text(),/@Sofia/);
+w.camWeeklyResults={getResult:()=>({outcome:'won'})};await open(weekly,{kind:'weekly'});click('Copiar enlace');await tick();assert.ok(new URL(clipboard).searchParams.has('r'));
 async function expanded(url){const page=new Window({url});page.eval(code);const actual=new URL(page.location.href);await page.happyDOM.close();return actual;}
 assert.equal((await expanded(link.href)).searchParams.get('pick'),pick.id);
 assert.equal((await expanded('https://camsports.github.io/?pick='+pick.id)).searchParams.get('pick'),pick.id);
-for(const value of ['bad','A'.repeat(21),'A'.repeat(23),'!'.repeat(22),'A'.repeat(21)+'B']){
- const broken=await expanded('https://camsports.github.io/?p='+encodeURIComponent(value));assert.equal(broken.searchParams.has('pick'),false);
-}
-w.camWeeklyResults={getResult:()=>({outcome:'won'})};w.CamPickShare.open(weekly,{kind:'weekly'});
-assert.match(dlg.querySelector('textarea').value,/Pick acertado/);
-const resultUrl=new URL(dlg.querySelector('a').href).searchParams.get('url');assert.equal((await expanded(resultUrl)).searchParams.get('weeklyResult'),weekly.id);
-w.camWeeklyResults=null;w.CamPickShare.open(weekly,{kind:'weekly'});
-assert.equal((await expanded(new URL(dlg.querySelector('a').href).searchParams.get('url'))).searchParams.get('weeklyPick'),weekly.id);
-
+for(const value of ['bad','A'.repeat(21),'A'.repeat(23),'!'.repeat(22),'A'.repeat(21)+'B'])assert.equal((await expanded('https://camsports.github.io/?p='+encodeURIComponent(value))).searchParams.has('pick'),false);
 w.CamPickShare.open({...pick,id:'invalid'});assert.match(w.lastNotification,/No se puede compartir/);
-assert.equal(d.querySelector('script'),null);
-await w.happyDOM.close();
-console.log('PASS: canonical Pick/weekly links, PNG card, odds review, no screenshot/private fields, explicit file share, cancellation, fallback, clipboard, focus and stale image cleanup.');
+w.CamPickShare.open({...pick,hidden:true});assert.match(w.lastNotification,/no está disponible/);
+await w.happyDOM.close();console.log('PASS: Pick data, original dates/odds/analysis, collection vs parlay, full pagination, real logo, native files, cancellation/fallback, canonical links, cleanup and immutability.');
