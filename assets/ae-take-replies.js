@@ -18,7 +18,7 @@
     dialog.innerHTML = `
       <div class="ae-take-discussion-inner">
         <header class="ae-discussion-header">
-          <div class="ae-discussion-titleblock"><h2 id="aeTakeDiscussionTitle"><button type="button" id="aeDiscussionAuthor">Aficionado</button> — Takes</h2></div>
+          <div class="ae-discussion-titleblock"><h2 id="aeTakeDiscussionTitle"><button type="button" id="aeDiscussionAuthor">Aficionado</button> — Takes</h2><div id="aeDiscussionShare" class="cam-take-detail-share"></div></div>
           <button type="button" id="aeDiscussionClose" aria-label="Cerrar comentarios"><span aria-hidden="true"></span></button>
         </header>
         <section class="ae-discussion-subject">
@@ -319,6 +319,8 @@
     $('aeDiscussionAuthor').disabled=!take.author_id;
     $('aeDiscussionAuthor').title=take.author_id?'Ver perfil de @'+authorName:'Perfil no disponible';
     $('aeDiscussionAuthor').setAttribute('aria-label','Ver perfil de '+authorName);
+    const share=$('aeDiscussionShare');share.replaceChildren();
+    if(!take.hidden&&take.author_id&&window.CamPickShare)share.append(window.CamPickShare.button(take,{kind:'take'}));
     $('aeDiscussionSubject').textContent=take.title||'Take de la comunidad';
     $('aeDiscussionBody').textContent=take.body||'';
     viewerReady=false;

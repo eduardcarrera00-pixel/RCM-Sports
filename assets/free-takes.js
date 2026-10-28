@@ -132,6 +132,7 @@
      reply.append(el('span',null,'ae-take-reply-count'));
      showReplyCount(reply,t);
      row.append(reply);
+     if(!t.hidden&&t.author_id&&window.CamPickShare)row.append(window.CamPickShare.button(t,{kind:'take'}));
      if(typeof currentAdmin!=='undefined'&&currentAdmin)row.append(button('Ocultar',async()=>{
        if(!confirm('¿Ocultar este Take?'))return;try{const r=await db.rpc('ae_hide_free_take',{p_take_id:t.id});if(r.error)throw r.error;await load();}catch(e){status(e.message||'No se pudo ocultar.');}
      },'ae-take-minor'));
