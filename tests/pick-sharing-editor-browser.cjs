@@ -29,7 +29,7 @@ const server=http.createServer((req,res)=>{
   Object.defineProperty(navigator,'share',{configurable:true,value:data=>{shares.push({data,active:navigator.userActivation.isActive});return shareMode==='cancel'?Promise.reject(new DOMException('cancel','AbortError')):shareMode==='error'?Promise.reject(new DOMException('no','DataError')):Promise.resolve();}});
  });
  const dialog=page.locator('#camPickShareDialog'),preview=page.locator('.cam-pick-share-preview img');
- const ready=async()=>{await preview.waitFor();await preview.evaluate(img=>img.decode());};
+ const ready=async()=>{await preview.waitFor();await page.waitForFunction(()=>{const img=document.querySelector('.cam-pick-share-preview img');return img?.complete&&img.naturalWidth>0;},{},{timeout:10000});await preview.evaluate(img=>img.decode());};
  const refresh=async(action)=>{await page.evaluate(()=>{draws=[];});await action();await ready();};
  await page.getByRole('button',{name:'Compartir Pick: Pronóstico registrado',exact:true}).first().click();await ready();assert.equal(await page.evaluate(()=>shares.length),0);
  const png=async()=>Buffer.from(await preview.evaluate(async img=>Array.from(new Uint8Array(await (await fetch(img.src)).arrayBuffer()))));

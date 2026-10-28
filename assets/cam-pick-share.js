@@ -499,10 +499,10 @@
      const canvas=renderPickPage(plan,options,index,plans.length);
      const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));if(!active())return;if(!blob)throw Error('No se pudo generar el PNG. Inténtalo de nuevo.');
      const name='cam-sports-'+(plan.p.kind==='weekly'?'pick-del-dia':'pick')+'-'+plan.p.id+(plans.length>1?'-'+(index+1):'')+'.png';
-     prepared.push({p:plan.p,file:new File([blob],name,{type:'image/png'}),width:canvas.width,height:canvas.height});
+     prepared.push({p:plan.p,blob,file:new File([blob],name,{type:'image/png'}),width:canvas.width,height:canvas.height});
     }
     const zip=prepared.length>1?await pickZip(prepared.map(i=>i.file)):null;if(!active())return;
-    for(const item of prepared){item.url=URL.createObjectURL(item.file);pickResources.push(item.url);}
+    for(const item of prepared){item.url=URL.createObjectURL(item.blob);pickResources.push(item.url);}
     if(zip){all.href=URL.createObjectURL(zip);pickResources.push(all.href);all.download='cam-sports-picks.zip';all.hidden=false;}
     items=prepared;showPage();preview.setAttribute('aria-busy','false');
    }catch(error){if(!active())return;release();items=[];enabled();preview.replaceChildren(make('p',error.message));preview.setAttribute('aria-busy','false');}
