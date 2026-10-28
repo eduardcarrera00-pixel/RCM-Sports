@@ -190,29 +190,26 @@
     if(game.status!=='final'||!game.outcome)return null;
     return pick.pick===game.outcome?'correct':'incorrect';
   }
+  // Logos de las competiciones: los mismos que publica ESPN (igual que los escudos),
+  // versión clara de día y versión para fondo oscuro de noche. Si no cargan, queda una
+  // sigla y el nombre debajo, así el botón nunca se queda vacío.
+  const LEAGUE_LOGOS={laliga:{espn:15,mark:'LL'},champions:{espn:2,mark:'UCL'},ligamx:{espn:22,mark:'MX'},premier:{espn:23,mark:'PL'}};
+  const LEAGUE_ORDER=['laliga','champions','ligamx','premier'];
+  function leagueLogo(id){
+    const info=LEAGUE_LOGOS[id],wrap=el('span',null,'cam-football-league-logo');
+    wrap.dataset.mark=info.mark;
+    for(const [variant,folder] of [['day','500'],['night','500-dark']]){
+      const image=el('img',null,'cam-football-league-logo--'+variant);
+      image.alt='';image.width=48;image.height=48;image.decoding='async';image.loading='lazy';
+      image.addEventListener('error',()=>{wrap.dataset.logoError='true';});
+      image.src='https://a.espncdn.com/i/leaguelogos/soccer/'+folder+'/'+info.espn+'.png';
+      wrap.append(image);
+    }
+    return wrap;
+  }
   function paintNav(){
     const nav=$('camFootballNav');if(!nav)return;
     nav.replaceChildren();
-    const leagueField=el('label',null,'cam-football-league-control');
-    leagueField.htmlFor='camFootballLeague';
-    const leagueSelect=el('select',null,'cam-nfl-select');
-    leagueSelect.id='camFootballLeague';
-    leagueSelect.setAttribute('aria-label','Liga');
-    for(const option of COMPETITIONS){
-      const item=el('option',option.full);
-      item.value=option.id;
-      leagueSelect.append(item);
-    }
-    leagueSelect.value=competition;
-    leagueSelect.addEventListener('change',async()=>{
-      if(competition===leagueSelect.value)return;
-      competition=leagueSelect.value;
-      if(!seasons().includes(season))season=seasons()[0]||season;
-      matchday=chooseRound();dayKey=null;showAll=false;
-      await loadMine();recover();paint();
-      $('camFootballLeague')?.focus({preventScroll:true});
-    });
-    leagueField.append(el('span','Liga','cam-football-filter-label'),leagueSelect);
     const rounds=[...new Set(inScope().map(g=>Number(g.matchday)))].sort((a,b)=>a-b);
     const roundSelect=el('select',null,'cam-nfl-select');
     roundSelect.setAttribute('aria-label','Jornada');
@@ -224,7 +221,27 @@
     roundSelect.addEventListener('change',()=>{matchday=Number(roundSelect.value);dayKey=null;paint();});
     const roundField=el('label',null,'cam-football-round-control');
     roundField.append(el('span','Jornada','cam-football-filter-label'),roundSelect);
-    nav.append(leagueField,roundField);
+    // Debajo de la jornada, las cuatro competiciones con su logo: tocar una la elige.
+    const leagues=el('div',null,'cam-football-leagues');
+    leagues.setAttribute('role','group');leagues.setAttribute('aria-label','Competición');
+    for(const id of LEAGUE_ORDER){
+      const option=COMPETITIONS.find(c=>c.id===id);if(!option)continue;
+      const chosen=id===competition;
+      const button=el('button',null,'cam-football-league'+(chosen?' is-active':''));
+      button.type='button';button.dataset.competition=id;button.title=option.full;
+      button.setAttribute('aria-pressed',String(chosen));
+      button.append(leagueLogo(id),el('span',option.label,'cam-football-league-name'));
+      button.addEventListener('click',async()=>{
+        if(competition===id)return;
+        competition=id;
+        if(!seasons().includes(season))season=seasons()[0]||season;
+        matchday=chooseRound();dayKey=null;showAll=false;
+        await loadMine();recover();paint();
+        $('camFootballNav')?.querySelector('[data-competition="'+id+'"]')?.focus({preventScroll:true});
+      });
+      leagues.append(button);
+    }
+    nav.append(roundField,leagues);
   }
   function logo(id){
     const team=teams.get(id);

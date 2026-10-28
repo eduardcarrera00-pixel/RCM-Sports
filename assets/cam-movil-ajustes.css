@@ -5,6 +5,9 @@
    3. Pick histórico: perfil arriba, partido como título y datos compactos (cuota en cian).
    4. Take histórico: rediseño «Salón de la fama» (placa con medalla de puntos).
    5. Quinielas: «Jornada» arriba; clasificación mensual e histórica lado a lado.
+   6. Depuración de textos.
+   7. Takes de Fútbol y NFL: la tarjeta crece con su texto (no se corta el voto).
+   8. Power Rankings (NFL y Champions): nombres de equipo sin letras cortadas.
 
    Las esquinas redondeadas viven en capas con !important (cam-rounded-editorial y
    cam-banners), que ganan a cualquier regla fuera de capa; por eso los ajustes de
@@ -532,5 +535,58 @@ html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-r
     html body #mainContent #camNflQuiniela .cam-nfl-top > .cam-nfl-heading[data-cam-banner] {
       min-height:0!important;
     }
+  }
+}
+
+/* ---------- 7 · Takes de Fútbol y NFL: tarjetas que no se cortan (28 oct) ---------- */
+/* Las tarjetas tenían una altura fija (168–228 px según la pantalla) menor que su
+   contenido: con un título de dos líneas el resumen quedaba tapado y la fila de
+   votos («↑ 0 ↓ 0», «Apoyar / Cuestionar») salía cortada por abajo. Ahora la
+   altura fija es solo el mínimo; la fila de la cuadrícula crece con la tarjeta. */
+@layer cam-banners {
+  html body:is(.ae-is-football,.ae-is-nfl) #mainContent #freeTakes[data-sport] > #freeTakesFeed {
+    grid-auto-rows:auto!important;
+  }
+  html body:is(.ae-is-football,.ae-is-nfl) #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.ae-free-take-card {
+    height:auto!important;
+    max-height:none!important;
+    align-self:stretch!important;
+  }
+}
+
+/* La línea que separa el texto de los votos es recta (la esquina global la curvaba). */
+@layer cam-rounded-editorial {
+  html body #freeTakes[data-sport] #freeTakesFeed > article.ae-free-take-card .ae-free-vote-row {
+    border-radius:0!important;
+  }
+}
+
+/* ---------- 8 · Power Rankings: nombres completos en el carrusel (28 oct) ---------- */
+/* El nombre ocupaba una caja más baja que la propia letra (11 px de cuerpo en
+   12 px de alto) y con overflow:hidden; además la esquina redondeada global le
+   recortaba la primera letra («Cleveland», «Kansas», «Bayern»). La esquina ya se
+   quita en cam-rounded-editorial.css; aquí se le da altura de línea suficiente y
+   2 px de margen interior para los trazos que salen de la caja (la «J» con serifa). */
+@layer cam-banners {
+  html body :is(#rankingTrack,#championsTrack,#nflRankOneList,#championsRankOneList,#homeRankingList,#homeChampionsList) .rcm-team .ae-team-name {
+    line-height:1.3!important;
+    padding:1px 2px!important;
+    margin:-1px -2px!important;
+  }
+  /* La cinta tenía 1 px menos que sus tarjetas: el borde inferior de cada equipo
+     salía cortado. Un poco de aire arriba y abajo las deja enteras. */
+  @media(max-width:760px){
+    html body :is(#rankingViewport,#championsViewport).rcm-ticker {
+      height:auto!important;
+      max-height:none!important;
+      padding-block:2px!important;
+    }
+  }
+  /* Sin logo cargado, las iniciales caben en el círculo del escudo y no tapan el nombre. */
+  html body :is(#rankingTrack,#championsTrack) .rcm-team .ae-team-emblem > .ae-logo-initials {
+    width:100%!important;
+    height:100%!important;
+    max-width:100%!important;
+    max-height:100%!important;
   }
 }

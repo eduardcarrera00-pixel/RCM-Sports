@@ -36,6 +36,14 @@
     border-radius:var(--ds-radius)!important;
   }
 
+  /* El texto no lleva esquinas redondeadas. Con overflow:hidden (títulos que
+     terminan en «…», nombres a dos líneas) la esquina curva de 14 px se comía
+     la primera y la última letra: la «R» de «Real Madrid», la «K» de «Kansas
+     City», la «C» de «Cleveland». Misma especificidad que la regla de arriba y
+     después de ella: cualquier regla propia que redondee un texto sigue mandando. */
+  html body :is(h1,h2,h3,h4,h5,h6,p,strong,b,em,small,cite,q,time,abbr) {
+    border-radius:0!important;
+  }
   /* Text boxes have no rounded clipping edge. In particular, line-clamped
      Takes and champion names must keep their first and last letters intact. */
   html body #aeProfileDialog :is(h2,h3,h4,p,small,strong,b,
@@ -123,6 +131,18 @@
     font-family:var(--ds-font-serif)!important;
     font-weight:600!important;
     line-height:1.2!important;
+  }
+
+  /* Textos que son <span> o <button> y se recortan solos (carrusel de Power
+     Rankings, listas de Takes de cada deporte). Van al final de la capa y con la
+     etiqueta delante para ganar también a la píldora de los botones. */
+  html body :is(span,button,strong,p,a):is(.ae-team-name,.ae-sport-take-open,.ae-sport-take-title,
+    .ae-sport-take-excerpt,.ae-feed-take-open,.ae-take-author-link,.ae-top-take-author,.ae-top-take-open) {
+    border-radius:0!important;
+  }
+  /* Estos textos tienen fondo o borde propio y conservan su esquina. */
+  html body :is(.ae-takes-history-heading,.cam-nfl-status,.ae-opinions-empty) {
+    border-radius:var(--ds-radius)!important;
   }
 }
 

@@ -110,12 +110,12 @@ const server=http.createServer((req,res)=>{
   if(sport==='football'){
    const before=await page.evaluate(()=>JSON.stringify({...localStorage}));
    await page.locator('#camFootballViewTabs [data-view=month]').click();
-   await page.locator('#camFootballNav .cam-nfl-competition').filter({hasText:'Premier'}).click();
+   await page.locator('#camFootballNav .cam-football-league[data-competition="premier"]').click();
    await page.waitForFunction(()=>__rpc.at(-1)?.args?.p_competition==='premier');
    assert.equal(await page.locator('#camFootballMatchPanel').isVisible(),false);
    await page.locator('#camFootballViewTabs [data-view=all]').click();
    await page.waitForFunction(()=>__rpc.at(-1)?.args?.p_scope==='all'&&__rpc.at(-1)?.args?.p_competition==='premier');
-   await page.locator('#camFootballNav .cam-nfl-competition').filter({hasText:'LaLiga'}).click();
+   await page.locator('#camFootballNav .cam-football-league[data-competition="laliga"]').click();
    await page.waitForFunction(()=>__rpc.at(-1)?.args?.p_competition==='laliga');
    await page.locator('#camFootballViewTabs [data-view=jornada]').click();
    assert.ok(await page.locator('#camFootballGames .is-selected').count()>0);
