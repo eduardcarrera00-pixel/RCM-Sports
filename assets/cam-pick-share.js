@@ -355,8 +355,8 @@
    const size=p.legs.length===1?72:46,parts=leg.selection.split(/\s+[·•]\s+/);
    const choice=parts.shift(),market=[...parts,leg.market,leg.line&&!leg.selection.includes(leg.line)?'Línea '+leg.line:''].filter(Boolean).filter((v,i,a)=>a.indexOf(v)===i).join(' · ');
    const group=[];
-   if(p.legs.length>1)group.push(...lines('SELECCIÓN '+(index+1),'600 22px Arial, sans-serif',22,'#DDC5AD'));
-   if(leg.event)group.push(...lines(leg.event,'400 29px Arial, sans-serif',29,'#fff',8));
+   if(p.legs.length>1&&!leg.event)group.push(...lines('SELECCIÓN '+(index+1),'600 22px Arial, sans-serif',22,'#DDC5AD'));
+   if(leg.event)group.push(...lines((p.legs.length>1?String(index+1).padStart(2,'0')+' · ':'')+leg.event,'400 29px Arial, sans-serif',29,'#fff',8));
    group.push(...lines(choice,'600 '+size+'px "Playfair Display", Georgia, serif',size,'#fff',10));
    if(market)group.push(...lines(market,'400 28px Arial, sans-serif',28,'#DDC5AD',10));
    groups.push(group);
@@ -370,10 +370,10 @@
   const capacity=bottom-top,pages=[];let page=[],used=0;
   const flush=()=>{if(page.length){pages.push(page);page=[];used=0;}};
   for(const group of groups){
-   const height=group.reduce((n,l)=>n+l.height,0)+28;
+   const height=group.reduce((n,l)=>n+l.height,0)+20;
    if(used&&used+height>capacity)flush();
    for(const line of group){if(used+line.height>capacity)flush();page.push(line);used+=line.height;}
-   used+=28;if(page.length)page[page.length-1]={...page.at(-1),height:page.at(-1).height+28};
+   used+=20;if(page.length)page[page.length-1]={...page.at(-1),height:page.at(-1).height+20};
   }
   flush();return pages.map((lines,index)=>({p,w,h,top,bottom,footer,lines,index,total:pages.length}));
  }
