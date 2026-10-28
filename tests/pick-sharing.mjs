@@ -45,6 +45,8 @@ const parlay={...pick,id:'00000000-0000-0000-0000-000000000924',legs:Array.from(
 click('Cerrar');assert.equal(dlg().open,false);assert.ok(revoked.length>0);
 const weekly={...pick,id:'00000000-0000-0000-0000-000000000922',event_name:'Toronto vs Boston',selection:'Toronto gana\nMás de 2.5 goles',title:'Pick editorial',analysis:'Análisis editorial original'};
 await open(weekly,{kind:'weekly'});click('Copiar enlace');await tick();assert.ok(new URL(clipboard).searchParams.has('e'));assert.doesNotMatch(text(),/@Sofia/);
+start=frames.length;await open({...weekly,selection:'Toronto gana • Más de 2.5 goles'},{kind:'weekly'});assert.ok(frames.slice(start).some(f=>f.text.includes('COMBINADA · 2 SELECCIONES')),'Keep editorial bullet ticket separators');
+start=frames.length;await open({...pick,legs:[{event:'Partido original',selection:'1. Equipo local gana / 2. Más de 2.5 goles'}]});assert.ok(frames.slice(start).some(f=>f.text.includes('COMBINADA · 2 SELECCIONES')),'Keep numbered captured ticket separators');
 w.camWeeklyResults={getResult:()=>({outcome:'won'})};await open(weekly,{kind:'weekly'});click('Copiar enlace');await tick();assert.ok(new URL(clipboard).searchParams.has('r'));
 async function expanded(url){const page=new Window({url});page.eval(code);const actual=new URL(page.location.href);await page.happyDOM.close();return actual;}
 assert.equal((await expanded(link.href)).searchParams.get('pick'),pick.id);
