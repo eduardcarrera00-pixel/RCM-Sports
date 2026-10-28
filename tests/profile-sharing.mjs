@@ -11,7 +11,7 @@ async function setup({own=false,shared='',rows=takes,compactQuery=''}={}){
  const w=new Window({url:'https://example.test/'+(compactQuery||(shared?'?perfil='+owner+'&take='+shared+'&token=PRIVATE_TOKEN':''))}),d=w.document;
  d.body.innerHTML=html;w.currentAdmin=null;
  const calls=[],opened=[],drawn=[];
- w.HTMLCanvasElement.prototype.getContext=()=>({fillRect(){},beginPath(){},moveTo(){},lineTo(){},stroke(){},fillText:t=>drawn.push(t),measureText:t=>({width:String(t).length*17})});
+ w.HTMLCanvasElement.prototype.getContext=()=>({drawImage(){},fillRect(){},beginPath(){},moveTo(){},lineTo(){},stroke(){},fillText:t=>drawn.push(t),measureText:t=>({width:String(t).length*17})});
  w.HTMLCanvasElement.prototype.toBlob=cb=>cb(new w.Blob(['PNG'],{type:'image/png'}));
  w.URL.createObjectURL=()=>'blob:profile-share';w.URL.revokeObjectURL=()=>{};
  w.db={auth:{getUser:async()=>({data:{user:own?{id:owner,user_metadata:{username:'Lector'}}:null}}),onAuthStateChange(){}},rpc:async(name,args)=>{
