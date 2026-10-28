@@ -28,7 +28,7 @@ const server=http.createServer((req,res)=>{
   window.shares=[];Object.defineProperty(navigator,'canShare',{configurable:true,value:()=>true});Object.defineProperty(navigator,'share',{configurable:true,value:data=>{shares.push({active:navigator.userActivation.isActive,data});return Promise.resolve();}});
  });
  const dialog=page.locator('#camPickShareDialog'),preview=page.locator('.cam-pick-share-preview img');
- const ready=async()=>{await page.waitForFunction(()=>document.querySelector('.cam-pick-share-preview')?.getAttribute('aria-busy')==='false');await preview.waitFor({state:'visible'});await preview.evaluate(img=>img.decode()).catch(error=>{throw Error('PNG decode failed: '+error.message+'; failed requests: '+JSON.stringify(failed));});},open=async()=>{await page.locator('#open').click();await ready();};
+ const ready=async()=>{await page.waitForFunction(()=>document.querySelector('.cam-pick-share-preview')?.getAttribute('aria-busy')==='false');if(!await preview.count())throw Error('Card generation: '+await dialog.locator('.cam-pick-share-preview').innerText());await preview.waitFor({state:'visible'});await preview.evaluate(img=>img.decode()).catch(error=>{throw Error('PNG decode failed: '+error.message+'; failed requests: '+JSON.stringify(failed));});},open=async()=>{await page.locator('#open').click();await ready();};
  const select=async(index,value)=>{await dialog.locator('select').nth(index).selectOption(value);await ready();};
  const png=async()=>Buffer.from(await preview.evaluate(async img=>{const b=await(await fetch(img.src)).arrayBuffer();return Array.from(new Uint8Array(b));}));
  const checkBounds=async story=>{
@@ -56,6 +56,14 @@ const server=http.createServer((req,res)=>{
   for(const size of ['feed','story'])for(const mode of ['title','summary','fragment']){await select(0,mode);await page.evaluate(()=>draws=[]);await select(2,size);await checkBounds(size==='story');}
  }
 
+ // An exceptionally dense combination must stop before exporting unreadable
+ // text. Reopen the original Take before the independent explanation cases.
+ await dialog.locator('.cam-take-share-explanation').fill('Una explicación adicional sobre el partido y la temporada. '.repeat(5).slice(0,240));
+ await page.waitForFunction(()=>document.querySelector('.cam-pick-share-preview')?.getAttribute('aria-busy')==='false');
+ assert.match(await dialog.locator('.cam-pick-share-preview').innerText(),/más espacio/);
+ assert.equal(await dialog.locator('.cam-take-share-primary').isDisabled(),true);
+ assert.equal(await dialog.locator('.cam-pick-share-download').isVisible(),false);
+ await page.getByRole('button',{name:'Cerrar',exact:true}).click();await page.evaluate(()=>take={...take,title:'LAMINE YAMAL GANARÁ EL BALÓN DE ORO EN 2026'});await open();
  // Optional explanation is local to the image, updates immediately, and clears
  // without leaving an empty block. Both export formats use the exact preview.
  for(const size of ['feed','story']){
