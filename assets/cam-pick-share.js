@@ -75,16 +75,6 @@
  const quota=p=>p.verified?'Cuota verificada · '+p.odds:'Cuota '+p.odds+(p.review?' · '+p.review:p.kind==='weekly'?' · Editorial':'');
  const invitation=p=>p.kind==='take'?'¿De acuerdo o tienes otra lectura?':p.state==='won'?'Aquí lo que se canta, se baila.':p.state==='lost'?'También se da la cara cuando no sale.':p.state==='void'?'Este no cuenta en el marcador.':'Sobre la mesa. ¿Lo sigues o lo debates?';
  function caption(p){if(p.kind==='take')return [headline(p),p.title,p.body,urlFor(p)].filter(Boolean).join('\n\n');return [headline(p),p.result,p.title,...p.legs.map(l=>[l.event,l.selection].filter(Boolean).join(' · ')),quota(p),invitation(p),urlFor(p)].filter(Boolean).join('\n\n');}
- // Reserve the URL's 23 X characters and keep the result/verification/CTA intact
- // even when a title, author or selection is long (including wide characters).
- const weight=s=>Array.from(s).reduce((n,c)=>n+(c.codePointAt(0)>0x10ff?2:1),0);
- function fit(s,budget){if(weight(s)<=budget)return s;let out='';for(const c of s){if(weight(out+c+'…')>budget)break;out+=c;}return out.trimEnd()+'…';}
- function xUrl(p){
-  const title=fit(headline(p),85),tail=p.kind==='take'?invitation(p):p.result+' · '+quota(p)+'\n'+invitation(p);
-  const detail=p.kind==='take'?p.title:p.kind==='weekly'?p.title+'\n'+p.legs.map(l=>l.selection).join(' | '):(p.legs[0]?p.legs[0].event+' · '+p.legs[0].selection:p.title)+(p.legs.length>1?' · '+p.legs.length+' selecciones':'');
-  const text=title+'\n'+fit(detail,256-weight(title+'\n\n'+tail))+'\n'+tail;
-  const u=new URL('https://twitter.com/intent/tweet');u.searchParams.set('text',text);u.searchParams.set('url',urlFor(p));return u.href;
- }
  function wrap(ctx,value,width,maxLines){
   const lines=[];let line='';
   for(const word of clean(value,10000).split(' ')){
@@ -152,12 +142,30 @@
  // «La cita»: the Take as a centred quotation on CAM night blue, identical in
  // both site themes. Logo on top, link at the foot, everything else centred
  // between them. Title and text are the author's own words, never rewritten.
+ // Each format keeps logo and text inside the area its network leaves visible
+ // (left, right, top = logo top, link = link baseline); the blue still reaches
+ // every edge. Instagram Stories cover ~250 px at the top and bottom. TikTok
+ // covers its tabs at the top, the caption and sound at the bottom (~660 px)
+ // and the action column on the right (180 px), so its text sits higher and
+ // narrower but still centred. The feed post is 4:5 and the profile grid trims
+ // it to 3:4 (~34 px per side), well outside the margins.
+ const TAKE_FORMATS=[
+  ['story','Historia','Instagram · 9:16'],
+  ['tiktok','TikTok','Vertical · 9:16'],
+  ['post','Publicación','Feed de Instagram · 4:5'],
+  ['card','X','Horizontal · 16:9']
+ ];
+ const TAKE_FILE={story:'historia',tiktok:'tiktok',post:'publicacion',card:'x'};
  const TAKE_CARD={
   bg:'#0B2233',ink:'#F3EBDD',muted:'#C2CDD4',gold:'#BE9270',label:'#B79A76',line:'#2E4A5E',
-  story:{side:96,logoW:200,logoTop:300,logoGap:64,rule:1418,link:1478,foot:60,quote:230,title:112,extra:36,author:34,meta:22,linkFont:24,mark:72},
-  square:{side:96,logoW:150,logoTop:64,logoGap:40,rule:988,link:1034,foot:40,quote:180,title:94,extra:31,author:30,meta:19,linkFont:20,mark:64},
-  card:{side:84,logoW:112,logoTop:38,logoGap:22,rule:-74,link:-34,foot:24,quote:140,title:76,extra:27,author:27,meta:16,linkFont:17,mark:56}
+  story:{h:1920,left:96,right:984,top:290,link:1630,ruleGap:62,logoW:220,logoGap:76,foot:64,quote:260,title:128,grow:148,extra:40,author:38,meta:24,linkFont:26,mark:84},
+  tiktok:{h:1920,left:180,right:900,top:262,link:1254,ruleGap:56,logoW:190,logoGap:56,foot:54,quote:230,title:112,grow:124,extra:37,author:35,meta:23,linkFont:25,mark:76},
+  post:{h:1350,left:96,right:984,top:78,link:1296,ruleGap:50,logoW:168,logoGap:48,foot:46,quote:200,title:102,grow:124,extra:34,author:32,meta:21,linkFont:22,mark:68},
+  card:{h:608,left:84,right:996,top:38,link:-34,ruleGap:40,logoW:112,logoGap:22,foot:24,quote:140,title:76,extra:27,author:27,meta:16,linkFont:17,mark:56}
  };
+ const takeSize=value=>TAKE_FORMATS.some(([size])=>size===value)?value:'card';
+ // Phones usually share to Instagram or TikTok; computers more often to X.
+ const takeDefaultSize=()=>{try{return matchMedia('(max-width: 760px), (hover: none) and (pointer: coarse)').matches?'story':'card';}catch{return 'card';}};
  // Same words and order as wrap(), with the narrowest width that keeps the line
  // count: centred lines look even instead of one long line over a short one.
  function balancedWrap(ctx,value,width){
@@ -170,21 +178,21 @@
   return wrap(ctx,value,hi,Infinity);
  }
  function renderTakeCard(p,options={}){
-  const size=options.size==='story'?'story':options.size==='square'?'square':'card',w=1080;
+  const size=takeSize(options.size),w=1080;
   const mode=options.mode||'title',extra=mode==='summary'?takeSummary(p.body):mode==='fragment'?takeFragments(p.body)[options.fragment||0]||'':'';
   // Horizontal is 16:9 for X; a card with text needs a little more height.
-  const h=size==='story'?1920:size==='square'?1080:extra?760:608;
+  const T=TAKE_CARD,L=T[size],h=size==='card'&&extra?760:L.h;
   const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
   const c=canvas.getContext('2d');if(!c)throw Error('Este navegador no permite generar la imagen. Prueba descargarla desde otro navegador.');
   // Opaque colour reaches every edge, including the corners. Transparent
   // padding could be flattened to white by a receiving social application.
-  const T=TAKE_CARD,L=T[size],cx=w/2,maxWidth=w-2*L.side;
+  const cx=(L.left+L.right)/2,maxWidth=L.right-L.left;
   c.fillStyle=T.bg;c.fillRect(0,0,w,h);
   if(!takeLogo)throw Error('El logo oficial todavía no está listo.');
   const logoH=L.logoW*takeLogo.naturalHeight/takeLogo.naturalWidth;
-  c.drawImage(takeLogo,cx-L.logoW/2,L.logoTop,L.logoW,logoH);
-  const ruleY=L.rule<0?h+L.rule:L.rule,linkY=L.link<0?h+L.link:L.link;
-  const top=L.logoTop+logoH+L.logoGap,space=ruleY-L.foot-top;
+  c.drawImage(takeLogo,cx-L.logoW/2,L.top,L.logoW,logoH);
+  const linkY=L.link<0?h+L.link:L.link,ruleY=linkY-L.ruleGap;
+  const top=L.top+logoH+L.logoGap,space=ruleY-L.foot-top;
   const spacing=(px,em)=>{try{c.letterSpacing=Math.round(px*em*10)/10+'px';}catch{}};
   const centre=(text,y)=>{c.textAlign='left';c.fillText(text,Math.round(cx-c.measureText(text).width/2),y);};
   const titleFont=size=>'italic 600 '+size+'px "Playfair Display", Georgia, serif';
@@ -200,7 +208,9 @@
   // Prefer a slightly smaller title when it saves a line: «Lamine Yamal /
   // Balón de Oro 2026» reads better than three short broken lines.
   const titleWidth=size=>maxWidth-Math.round(size*.25);
-  let start=Math.round(L.title*scale);
+  // On tall formats a short Take may grow (up to L.grow) while the whole block
+  // stays within ~72 % of its space: a poster, not a small block lost in blue.
+  const base=Math.round(L.title*scale);let start=Math.round((L.grow||L.title)*scale);
   {c.font=titleFont(start);let count=wrap(c,p.title,titleWidth(start),Infinity).length,best=start;
    for(let size=start-1;size>=Math.round(start*.85);size--){c.font=titleFont(size);const n=wrap(c,p.title,titleWidth(size),Infinity).length;if(n<count){count=n;best=size;}}
    start=best;}
@@ -226,9 +236,9 @@
     +(extra?gap*1.2+meta+meta*.9+extraLines.length*extraLead:0)
     +gap*1.4+2+gap*.8+authorLines.length*author*1.3+meta*.7+metaLines.length*meta*1.6;
    fit={title,quote,extraSize,author,meta,ascent,quoteH,titleLines,extraLines,authorLines,metaLines,gap,titleLead,extraLead,block};
-   if(block<=space)break;
+   if(block<=(title>base?space*.72:space))break;
   }
-  if(!fit||fit.block>space)throw Error('Este texto necesita más espacio. Elige otro fragmento o el formato vertical.');
+  if(!fit||fit.block>space)throw Error('Este texto necesita más espacio. Elige otro fragmento o la Historia de Instagram.');
   const F=fit;let y=top+(space-F.block)/2;
   c.fillStyle=T.gold;c.font=quoteFont(F.quote);centre('“',y+F.ascent);y+=F.quoteH+F.gap;
   c.fillStyle=T.ink;c.font=titleFont(F.title);
@@ -247,7 +257,7 @@
    c.textAlign='left';if(text)c.fillText(text,x,y+F.meta);if(day)c.fillText(day,x+a,y+F.meta);y+=F.meta*1.6;
   }
   spacing(F.meta,0);
-  c.fillStyle=T.line;c.fillRect(L.side,ruleY,w-2*L.side,2);
+  c.fillStyle=T.line;c.fillRect(L.left,ruleY,maxWidth,2);
   c.fillStyle=T.muted;c.font=metaFont(L.linkFont);spacing(L.linkFont,.08);centre('camsports.github.io',linkY);spacing(L.linkFont,0);
   return canvas;
  }
@@ -274,97 +284,85 @@
   const exit=make('button','Cerrar','cam-pick-share-close');exit.type='button';exit.onclick=close;top.append(exit);
   const intro=make('p',p.kind==='take'?'Tu Take, listo para compartir como imagen.':'Llévalo a tus redes y que empiece el debate.','cam-pick-share-intro');
   const layout=make('div',null,'cam-pick-share-layout');const preview=make('div',null,'cam-pick-share-preview');preview.setAttribute('aria-busy','true');preview.append(make('p','Preparando tarjeta…'));
-  const content=make('div',null,'cam-pick-share-content');const actions=make('div',null,'cam-pick-share-networks');actions.setAttribute('aria-label','Opciones para compartir');
-  const x=make('a','X','cam-pick-share-network');x.href=xUrl(p);x.target='_blank';x.rel='noopener noreferrer';x.setAttribute('aria-label','Abrir publicación preparada en X');
-  if(p.kind==='take')x.setAttribute('aria-label','Compartir imagen en X');
-  const ig=make('button','Instagram','cam-pick-share-network'),tk=make('button','TikTok','cam-pick-share-network');ig.type=tk.type='button';ig.disabled=tk.disabled=true;actions.append(x,ig,tk);
-  const hint=make('p','Elige Instagram o TikTok desde el menú de tu teléfono. Si la app solo recibe la imagen, usa «Copiar texto» para añadir el mensaje y el enlace. También puedes descargar la tarjeta.','cam-pick-share-hint');
+  const content=make('div',null,'cam-pick-share-content');
+  // Where it will be shared decides the format: each network gets its own
+  // canvas and safe area, so a story fills the screen instead of a strip.
+  const destinations=make('div',null,'cam-take-share-destinations');destinations.setAttribute('role','group');destinations.setAttribute('aria-labelledby','camTakeShareWhere');
+  const where=make('p','¿Dónde lo vas a compartir?','cam-take-share-destinations-title');where.id='camTakeShareWhere';
+  const choices=make('div',null,'cam-take-share-destination-grid');destinations.append(where,choices);
+  const destinationButtons=TAKE_FORMATS.map(([value,name,detail])=>{
+   const b=make('button',null,'cam-take-share-destination');b.type='button';b.dataset.size=value;b.setAttribute('aria-pressed','false');
+   b.append(make('span',name),make('small',detail));choices.append(b);return b;
+  });
+  const hint=make('p','Pulsa «Compartir imagen» y elige la app en el menú del teléfono. Si no recibe la imagen, descárgala y adjúntala; el enlace se copia aparte.','cam-pick-share-hint');
   const status=make('p','', 'cam-pick-share-status');status.setAttribute('role','status');status.setAttribute('aria-live','polite');
-  const download=make('a','Descargar tarjeta','cam-pick-share-download');download.hidden=true;download.download=`cam-sports-${p.kind==='take'?'take':p.kind==='weekly'?'pick-del-dia':'pick'}-${p.id}.png`;
-  if(p.kind==='take')download.textContent='Descargar imagen';
+  const download=make('a','Descargar imagen','cam-pick-share-download');download.hidden=true;
   const linkButton=make('button','Copiar enlace'),textButton=make('button','Copiar texto');linkButton.type=textButton.type='button';
   linkButton.onclick=()=>copy(urlFor(p),status,'Enlace copiado.');textButton.onclick=()=>copy(caption(p),status,'Texto y enlace copiados.');
-  const utilities=make('div',null,'cam-pick-share-utilities');utilities.append(download,linkButton,textButton);
+  const utilities=make('div',null,'cam-pick-share-utilities');utilities.append(download,linkButton);
   const label=make('label','Texto para tu publicación','cam-pick-share-caption-label');const text=make('textarea');text.value=caption(p);text.readOnly=true;text.rows=5;text.setAttribute('aria-label','Texto y enlace de la publicación');label.append(text);
   // «La cita» shows the author's first words under the title when the Take has text.
-  const withText=p.kind==='take'&&takeFragments(p.body).length>0;
-  const defaults=()=>({mode:withText?'summary':'title',size:'card',showDate:true,fragment:0,textSize:'auto'});
+  const withText=takeFragments(p.body).length>0,initialSize=takeDefaultSize();
+  const defaults=()=>({mode:withText?'summary':'title',size:initialSize,showDate:true,fragment:0,textSize:'auto'});
   let takeOptions=defaults();
-  let editor=null,modeSelect=null,fragmentLabel=null,fragmentSelect=null,sizeSelect=null,dateToggle=null,textSizeSelect=null,selectionNote=null,shareButton=null;
-  if(p.kind==='take'){
-   editor=make('section',null,'cam-take-share-editor');editor.setAttribute('aria-label','Personalizar la ficha del Take');
-   const title=make('strong','Personaliza tu ficha','cam-take-share-editor-title');editor.append(title);
-   const field=(name,control)=>{const label=make('label',name,'cam-take-share-field');label.append(control);editor.append(label);return label;};
-   modeSelect=make('select');for(const [value,name] of [['title','Solo título'],['summary','Con resumen'],['fragment','Con fragmento']]){const option=make('option',name);option.value=value;modeSelect.append(option);}
-   field('Contenido de la ficha',modeSelect);
-   fragmentSelect=make('select');const pieces=takeFragments(p.body);
-   pieces.forEach((piece,i)=>{const option=make('option','Fragmento '+(i+1)+': '+piece.slice(0,44)+(piece.length>44?'…':''));option.value=String(i);fragmentSelect.append(option);});
-   fragmentLabel=field('Fragmento del texto original',fragmentSelect);fragmentLabel.classList.add('cam-take-share-fragment');fragmentLabel.hidden=true;
-   selectionNote=make('p','','cam-take-share-selection');selectionNote.hidden=true;editor.append(selectionNote);
-   if(!pieces.length){modeSelect.querySelector('option[value="summary"]').disabled=true;modeSelect.querySelector('option[value="fragment"]').disabled=true;}
-   modeSelect.value=takeOptions.mode;
-   sizeSelect=make('select');for(const [value,name] of [['card','Horizontal'],['square','Cuadrada'],['story','Historia']]){const option=make('option',name);option.value=value;sizeSelect.append(option);}
-   field('Formato',sizeSelect);
-   textSizeSelect=make('select');for(const [value,name] of [['auto','Automático'],['compact','Pequeño'],['large','Grande']]){const option=make('option',name);option.value=value;textSizeSelect.append(option);}
-   field('Tamaño del texto',textSizeSelect);
-   const dateLabel=make('label',null,'cam-take-share-checkbox');dateToggle=make('input');dateToggle.type='checkbox';dateToggle.checked=true;dateLabel.append(dateToggle,make('span','Mostrar fecha'));editor.append(dateLabel);
-   const reset=make('button','Restablecer diseño','cam-take-share-reset');reset.type='button';editor.append(reset);
-   content.prepend(editor);
-   modeSelect.onchange=()=>{takeOptions.mode=modeSelect.value;fragmentLabel.hidden=modeSelect.value!=='fragment';refresh();};
-   fragmentSelect.onchange=()=>{takeOptions.fragment=Number(fragmentSelect.value)||0;refresh();};
-   sizeSelect.onchange=()=>{takeOptions.size=sizeSelect.value;refresh();};
-   dateToggle.onchange=()=>{takeOptions.showDate=dateToggle.checked;refresh();};
-   textSizeSelect.onchange=()=>{takeOptions.textSize=textSizeSelect.value;refresh();};
-   reset.onclick=()=>{takeOptions=defaults();modeSelect.value=takeOptions.mode;fragmentSelect.value='0';fragmentLabel.hidden=true;sizeSelect.value='card';textSizeSelect.value='auto';dateToggle.checked=true;refresh();};
-  }
-  if(p.kind==='take'){
-   hint.textContent='El menú del teléfono permite elegir una app. Si no recibe imágenes, descarga el PNG y adjúntalo; puedes copiar el enlace por separado.';
-   const details=make('details',null,'cam-take-share-caption');details.append(make('summary','Texto y enlace del Take'),label,textButton);
-   content.append(actions,hint,details);layout.append(preview,content);
-   shareButton=make('button','Compartir imagen','cam-take-share-primary');shareButton.type='button';shareButton.disabled=true;utilities.prepend(shareButton);
-   const bar=make('div',null,'cam-take-share-bar');bar.append(utilities,status);dialog.replaceChildren(top,intro,layout,bar);
-  }else{content.append(actions,hint,utilities,status,label);layout.append(preview,content);dialog.replaceChildren(top,intro,layout);}
+  const editor=make('section',null,'cam-take-share-editor');editor.setAttribute('aria-label','Personalizar la ficha del Take');
+  editor.append(make('strong','Personaliza tu ficha','cam-take-share-editor-title'));
+  const field=(name,control)=>{const label=make('label',name,'cam-take-share-field');label.append(control);editor.append(label);return label;};
+  const modeSelect=make('select');for(const [value,name] of [['title','Solo título'],['summary','Con resumen'],['fragment','Con fragmento']]){const option=make('option',name);option.value=value;modeSelect.append(option);}
+  field('Contenido de la ficha',modeSelect);
+  const textSizeSelect=make('select');for(const [value,name] of [['auto','Automático'],['compact','Pequeño'],['large','Grande']]){const option=make('option',name);option.value=value;textSizeSelect.append(option);}
+  field('Tamaño del texto',textSizeSelect);
+  const fragmentSelect=make('select'),pieces=takeFragments(p.body);
+  pieces.forEach((piece,i)=>{const option=make('option','Fragmento '+(i+1)+': '+piece.slice(0,44)+(piece.length>44?'…':''));option.value=String(i);fragmentSelect.append(option);});
+  const fragmentLabel=field('Fragmento del texto original',fragmentSelect);fragmentLabel.classList.add('cam-take-share-fragment');fragmentLabel.hidden=true;
+  const selectionNote=make('p','','cam-take-share-selection');selectionNote.hidden=true;editor.append(selectionNote);
+  if(!pieces.length){modeSelect.querySelector('option[value="summary"]').disabled=true;modeSelect.querySelector('option[value="fragment"]').disabled=true;}
+  modeSelect.value=takeOptions.mode;
+  const dateLabel=make('label',null,'cam-take-share-checkbox'),dateToggle=make('input');dateToggle.type='checkbox';dateToggle.checked=true;dateLabel.append(dateToggle,make('span','Mostrar fecha'));editor.append(dateLabel);
+  const reset=make('button','Restablecer diseño','cam-take-share-reset');reset.type='button';editor.append(reset);
+  const syncDestination=()=>destinationButtons.forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.size===takeOptions.size)));
+  destinationButtons.forEach(b=>b.onclick=()=>{if(takeOptions.size===b.dataset.size)return;takeOptions.size=b.dataset.size;syncDestination();refresh();});
+  modeSelect.onchange=()=>{takeOptions.mode=modeSelect.value;fragmentLabel.hidden=modeSelect.value!=='fragment';refresh();};
+  fragmentSelect.onchange=()=>{takeOptions.fragment=Number(fragmentSelect.value)||0;refresh();};
+  dateToggle.onchange=()=>{takeOptions.showDate=dateToggle.checked;refresh();};
+  textSizeSelect.onchange=()=>{takeOptions.textSize=textSizeSelect.value;refresh();};
+  reset.onclick=()=>{takeOptions=defaults();modeSelect.value=takeOptions.mode;fragmentSelect.value='0';fragmentLabel.hidden=true;textSizeSelect.value='auto';dateToggle.checked=true;syncDestination();refresh();};
+  syncDestination();
+  const details=make('details',null,'cam-take-share-caption');details.append(make('summary','Texto y enlace del Take'),label,textButton);
+  content.append(destinations,editor,hint,details);layout.append(preview,content);
+  const shareButton=make('button','Compartir imagen','cam-take-share-primary');shareButton.type='button';shareButton.disabled=true;utilities.prepend(shareButton);
+  const bar=make('div',null,'cam-take-share-bar');bar.append(utilities,status);dialog.replaceChildren(top,intro,layout,bar);
   if(!dialog.open)dialog.showModal();exit.focus({preventScroll:true});dialog.scrollTop=0;
 
   let file=null,generation=0,imageOnly=false,sharingPending=false;
-  const ready=()=>{ig.disabled=tk.disabled=!file||sharingPending;if(shareButton)shareButton.disabled=!file||sharingPending;if(p.kind==='take')x.setAttribute('aria-disabled',String(!file||sharingPending));};
-  function nativeShare(network){
+  const ready=()=>{shareButton.disabled=!file||sharingPending;};
+  function nativeShare(){
    if(!file||sharingPending)return;
    let fileSharing=false;try{fileSharing=typeof navigator.share==='function'&&Boolean(navigator.canShare?.({files:[file]}));}catch{}
    if(fileSharing){
     let sharing;const current=generation;
-    let data={files:[file],title:headline(p),text:caption(p),url:urlFor(p)};
-    if(p.kind==='take'){
-     data.text=p.title;
-     // Instagram and TikTok often filter out combined text/file shares. Hand
-     // them the image; the separate copy action retains the original permalink.
-     let combined=false;try{combined=navigator.canShare(data);}catch{}
-     if(imageOnly||network==='Instagram'||network==='TikTok'||!combined)data={files:[file]};
-    }
+    let data={files:[file],title:headline(p),text:p.title,url:urlFor(p)};
+    // Instagram and TikTok often filter out combined text/file shares. Hand
+    // them the image; the separate copy action retains the original permalink.
+    let combined=false;try{combined=navigator.canShare(data);}catch{}
+    if(imageOnly||takeOptions.size!=='card'||!combined)data={files:[file]};
     // Keep the native share invocation within the user's tap (iOS activation).
     const failure=e=>{
      if(ticket!==request||current!==generation)return;
      if(e?.name==='AbortError'){status.textContent='Puedes volver a compartir cuando quieras.';return;}
-     if(p.kind==='take'&&data.text){imageOnly=true;shareButton.textContent='Compartir solo imagen';status.textContent='No se pudo enviar la imagen con el enlace. Pulsa «Compartir solo imagen» o descarga el PNG.';}
-     else status.textContent='Descarga la tarjeta y adjúntala en la aplicación. También puedes copiar el enlace.';
+     if(data.text){imageOnly=true;shareButton.textContent='Compartir solo imagen';status.textContent='No se pudo enviar la imagen con el enlace. Pulsa «Compartir solo imagen» o descarga el PNG.';}
+     else status.textContent='Descarga la imagen y adjúntala en la aplicación. También puedes copiar el enlace.';
     };
     try{sharing=navigator.share(data);}catch(e){failure(e);return;}
     sharingPending=true;ready();
     Promise.resolve(sharing).then(()=>{if(ticket===request&&current===generation)status.textContent='Imagen entregada al menú de compartir. Completa la publicación en la aplicación elegida.';})
     .catch(failure).finally(()=>{sharingPending=false;if(ticket===request)ready();});
-   }else status.textContent='Descarga la tarjeta; tu navegador no permite enviarla directamente. Adjunta el PNG en la aplicación y usa «Copiar enlace» si lo necesitas.';
+   }else status.textContent='Descarga la imagen; tu navegador no permite enviarla directamente. Adjúntala en la aplicación y usa «Copiar enlace» si lo necesitas.';
   }
-  if(shareButton)shareButton.onclick=()=>nativeShare('tu aplicación');
-  for(const [button,network] of [[ig,'Instagram'],[tk,'TikTok']])button.onclick=()=>nativeShare(network);
-  if(p.kind==='take'){
-   // X Intent only transfers text. Prefer native file share; otherwise make the
-   // image download explicit rather than pretending the tweet contains media.
-   x.addEventListener('click',e=>{
-    e.preventDefault();nativeShare('X');
-   });
-  }
+  shareButton.onclick=nativeShare;
   function refresh(){
    const current=++generation;file=null;ready();download.hidden=true;download.removeAttribute('href');release();
+   download.download='cam-sports-take-'+p.id+'-'+TAKE_FILE[takeSize(takeOptions.size)]+'.png';
    if(selectionNote){selectionNote.hidden=takeOptions.mode==='title';selectionNote.textContent=takeOptions.mode==='summary'?'Resumen extractivo automático: selección de frases del Take, sin texto añadido.':takeFragments(p.body)[takeOptions.fragment]||'';}
    preview.replaceChildren(make('p','Preparando tarjeta…'));preview.setAttribute('aria-busy','true');status.textContent='';
    const draw=()=>{if(ticket!==request||current!==generation||!dialog.open)return;try{
@@ -372,7 +370,7 @@
     canvas.toBlob(blob=>{
      if(ticket!==request||current!==generation||!dialog.open)return;
      if(!blob){preview.replaceChildren(make('p','No se pudo preparar la imagen. Puedes copiar el texto o el enlace.'));preview.setAttribute('aria-busy','false');return;}
-     resource=URL.createObjectURL(blob);const img=make('img');img.src=resource;img.alt='Ficha para compartir: '+p.title+' · '+p.author;img.width=canvas.width;img.height=canvas.height;
+     resource=URL.createObjectURL(blob);const img=make('img');img.src=resource;img.alt='Ficha para compartir ('+TAKE_FORMATS.find(([size])=>size===takeSize(takeOptions.size)).slice(1).join(', ')+'): '+p.title+' · '+p.author;img.width=canvas.width;img.height=canvas.height;
      preview.replaceChildren(img);preview.setAttribute('aria-busy','false');
      file=new File([blob],download.download,{type:'image/png'});download.href=resource;download.hidden=false;ready();
     },'image/png');

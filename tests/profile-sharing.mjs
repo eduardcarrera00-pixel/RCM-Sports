@@ -66,7 +66,7 @@ for(const selector of ['#aeProfilePickHighlights','#aeProfilePicks']){
 }
 assert.equal(a.calls.some(c=>/post_|vote_/.test(c.name)),false,'Sharing must not write to the database');await a.w.happyDOM.close();
 
-const compactWindow=new Window({url:'https://example.test/'});mockLogo(compactWindow);compactWindow.eval(fs.readFileSync('assets/cam-pick-share.js','utf8'));compactWindow.CamPickShare.open({...takes[1],author:'Lector',author_id:owner},{kind:'take'});const compactTakeUrl=new URL(compactWindow.document.querySelector('#camPickShareDialog a').href).searchParams.get('url');const compactQuery=new URL(compactTakeUrl).search;await compactWindow.happyDOM.close();
+const compactWindow=new Window({url:'https://example.test/'});mockLogo(compactWindow);compactWindow.eval(fs.readFileSync('assets/cam-pick-share.js','utf8'));compactWindow.CamPickShare.open({...takes[1],author:'Lector',author_id:owner},{kind:'take'});const compactTakeUrl=compactWindow.document.querySelector('#camPickShareDialog textarea').value.trim().split('\n').at(-1);const compactQuery=new URL(compactTakeUrl).search;await compactWindow.happyDOM.close();
 const b=await setup({shared:takeId(1),compactQuery});assert.equal(b.opened.length,1,'A signed-out visitor opens the exact shared Take');assert.equal(b.opened[0].take.id,takeId(1));assert.equal(b.opened[0].take.author,'Lector');
 assert.ok(b.d.querySelector('#aeProfileTakeHighlights .cam-pick-share-button'),'Public profiles have share controls');
 assert.equal(b.calls.some(c=>c.name==='ae_my_free_takes'),false,'Visitors only load public Takes');
