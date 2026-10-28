@@ -34,7 +34,7 @@ toggle('Mostrar fecha').click();await tick();assert.doesNotMatch(text(),/2026-10
 toggle('Mostrar análisis').click();await tick();assert.match(text(),/La selección se apoya/);
 click('Restablecer diseño');await tick();assert.doesNotMatch(text(),/La selección se apoya/);assert.match(text(),/Cuota/);
 assert.equal(JSON.stringify(pick),original);
-for(const [state,label] of [['pending','Pendiente'],['won','Acertado'],['lost','Fallado'],['void','Anulado']]){const start=frames.length;await open({...pick,outcome:state});assert.ok(frames.slice(start).some(f=>f.text.some(t=>t.endsWith(label))));}
+for(const [state,label] of [['pending','Pendiente de resultado'],['won','Acertado'],['lost','No acertado'],['void','Anulado']]){const start=frames.length;await open({...pick,outcome:state});assert.ok(frames.slice(start).some(f=>f.text.some(t=>t.endsWith(label))));}
 const other={...pick,id:'00000000-0000-0000-0000-000000000923',author:'OtroAutor',american_odds:-110,legs:[{event:'Buffalo vs Miami',selection:'Buffalo -3.5',market:'Hándicap',line:'-3.5'}]};w.CamPickShare.button(other);
 await open();const checks=dlg().querySelectorAll('.cam-picks-share-picker input');assert.equal(checks.length,2);checks[1].click();await tick();
 assert.match(dlg().textContent,/Imagen 1 de 2/);assert.match(text(),/@OtroAutor/);assert.ok(dlg().querySelector('.cam-picks-share-all').href.startsWith('blob:'));
