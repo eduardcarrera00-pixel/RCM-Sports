@@ -2,6 +2,7 @@
 (() => {
  'use strict';
  const BASE='https://camsports.github.io/';
+ const LOGO_URL=new URL('cam-sports-logo-completo.webp?v=20261024-lossless-1',document.currentScript?.src||new URL('assets/cam-pick-share.js',location.href)).href;
  const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
  // Lossless UUID encoding: no shortening service, database writes or expiring links.
  const pack=id=>btoa(String.fromCharCode(...id.replace(/-/g,'').match(/../g).map(h=>parseInt(h,16)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
@@ -151,37 +152,37 @@
   ]).catch(()=>{takeFonts=null;});
   return takeFonts;
  }
- function roundedShareBackground(c,w,h,r){
-  c.fillStyle='#073B83';c.beginPath();
-  if(typeof c.roundRect==='function')c.roundRect(0,0,w,h,r);
-  else if(typeof c.quadraticCurveTo==='function'){
-   c.moveTo(r,0);c.lineTo(w-r,0);c.quadraticCurveTo(w,0,w,r);
-   c.lineTo(w,h-r);c.quadraticCurveTo(w,h,w-r,h);c.lineTo(r,h);
-   c.quadraticCurveTo(0,h,0,h-r);c.lineTo(0,r);c.quadraticCurveTo(0,0,r,0);
-  }else{c.fillRect(0,0,w,h);return;}
-  c.closePath?.();c.fill();
+ let takeLogo=null,takeLogoLoading=null;
+ function prepareTakeArtwork(){
+  if(!takeLogoLoading)takeLogoLoading=new Promise((resolve,reject)=>{
+   const img=new Image();
+   const timeout=setTimeout(()=>fail(),10000);
+   function fail(){clearTimeout(timeout);img.onload=img.onerror=null;takeLogoLoading=null;reject(Error('No se pudo cargar el logo oficial. Comprueba la conexión y vuelve a abrir Compartir.'));}
+   img.onload=()=>{clearTimeout(timeout);img.onload=img.onerror=null;takeLogo=img;resolve(img);};
+   img.onerror=fail;img.src=LOGO_URL;
+  });
+  return Promise.all([prepareTakeFonts(),takeLogoLoading]);
  }
  function renderTakeCard(p,options={}){
-  const portrait=options.size==='story',w=1080;
+  const portrait=options.size==='story',square=options.size==='square',w=1080;
   const mode=options.mode||'title',extra=mode==='summary'?takeSummary(p.body):mode==='fragment'?takeFragments(p.body)[options.fragment||0]||'':'';
-  // A compact horizontal editorial card is the default in every export format.
-  const h=extra?840:560;
+  // Default: export the card itself, never a smaller card on a white canvas.
+  const h=portrait?1920:square?1080:extra?840:566;
   const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
   const c=canvas.getContext('2d');if(!c)throw Error('Este navegador no permite generar la imagen. Prueba descargarla desde otro navegador.');
-  roundedShareBackground(c,w,h,72);
-  // White letterform logo, integrated into the same blue background (no box).
-  // Story content stays below the top chrome and above captions/navigation;
-  // its right margin also reserves space for TikTok's action rail.
-  const margin=54,right=1026,maxWidth=right-margin;
-  const logoTop=24,logoWidth=140;
-  c.textAlign='right';c.fillStyle='#fff';
-  c.font='600 54px "Playfair Display", Georgia, serif';c.fillText('CAM',right,logoTop+65);
-  c.strokeStyle='#fff';c.lineWidth=2;c.beginPath();c.moveTo(right-logoWidth,logoTop+77);c.lineTo(right,logoTop+77);c.stroke();
-  c.font='500 18px Arial, sans-serif';c.fillText('S P O R T S',right,logoTop+106);c.textAlign='left';
+  // Opaque CAM blue reaches every edge, including the corners. Transparent
+  // padding could be flattened to white by a receiving social application.
+  c.fillStyle='#073B83';c.fillRect(0,0,w,h);
+  if(!takeLogo)throw Error('El logo oficial todavía no está listo.');
+  const margin=portrait?82:54,right=portrait?916:1026,maxWidth=right-margin;
+  const logoTop=portrait?295:24,logoWidth=164;
+  const logoHeight=logoWidth*takeLogo.naturalHeight/takeLogo.naturalWidth;
+  c.drawImage(takeLogo,right-logoWidth,logoTop,logoWidth,logoHeight);
+  c.textAlign='left';
 
-  const footerY=h-100,baseTop=155,textSpace=footerY-28-baseTop;
+  const footerY=portrait?1370:square?909:h-100,baseTop=portrait?480:square?264:155,textSpace=footerY-(portrait?70:28)-baseTop;
   const scale={compact:.86,large:1.14}[options.textSize]||1;
-  let font=Math.round((extra?72:84)*scale),extraFont=36,lines=[],extraLines=[],block=0;
+  let font=Math.round((extra?72:square||portrait?104:84)*scale),extraFont=36,lines=[],extraLines=[],block=0;
   for(;font>=22;font-=1){
    c.font='600 '+font+'px "Playfair Display", Georgia, serif';lines=wrap(c,p.title,maxWidth,Infinity);
    extraFont=Math.max(22,Math.min(portrait?40:34,Math.round(font*.55)));
@@ -191,6 +192,16 @@
   }
   if(block>textSpace)throw Error('Este texto necesita más espacio. Elige otro fragmento o el formato vertical.');
   c.fillStyle='#fff';c.font='600 '+font+'px "Playfair Display", Georgia, serif';
+  // Balance a short final line without changing any words or the fitted height.
+  if(!clean(p.title,10000).split(' ').some(word=>c.measureText(word).width>maxWidth)){
+   for(let i=lines.length-1;i>0;i--){
+    const previous=lines[i-1].split(' ');
+    while(previous.length>1&&c.measureText(lines[i]).width<c.measureText(previous.join(' ')).width*.75){
+     const next=previous.at(-1)+' '+lines[i];if(c.measureText(next).width>maxWidth)break;
+     previous.pop();lines[i]=next;lines[i-1]=previous.join(' ');
+    }
+   }
+  }
   let y=baseTop+(textSpace-block)/2+font;
   for(const line of lines){c.fillText(line,margin,y);y+=font*1.16;}
   if(extra){
@@ -216,14 +227,7 @@
   names.forEach((line,i)=>c.fillText(line,margin+72,footerY+75+i*26));
   if(date){const dateRight=Math.min(right,margin+72+c.measureText(username).width+275);c.fillStyle='#BE9270';c.fillRect(dateRight-225,footerY+37,2,43);
    c.fillStyle='#fff';c.textAlign='right';c.font='400 28px "Libre Baskerville", Georgia, serif';c.fillText(date,dateRight,footerY+75);c.textAlign='left';}
-  // Keep 1:1 and 9:16 PNG dimensions without stretching the horizontal card.
-  const output=document.createElement('canvas');output.width=1080;output.height=portrait?1920:1080;
-  const out=output.getContext('2d');if(!out)throw Error('No se pudo preparar la imagen.');
-  out.fillStyle='#FFFFFF';out.fillRect(0,0,output.width,output.height);
-  const cardWidth=portrait?860:1000,cardHeight=h*cardWidth/w;
-  const left=(output.width-cardWidth)/2,top=portrait?280+(1220-cardHeight)/2:(1080-cardHeight)/2;
-  out.drawImage(canvas,left,top,cardWidth,cardHeight);
-  return output;
+  return canvas;
  }
 
  function renderCard(p,options){
@@ -286,7 +290,7 @@
   linkButton.onclick=()=>copy(urlFor(p),status,'Enlace copiado.');textButton.onclick=()=>copy(caption(p),status,'Texto y enlace copiados.');
   const utilities=make('div',null,'cam-pick-share-utilities');utilities.append(download,linkButton,textButton);
   const label=make('label','Texto para tu publicación','cam-pick-share-caption-label');const text=make('textarea');text.value=caption(p);text.readOnly=true;text.rows=5;text.setAttribute('aria-label','Texto y enlace de la publicación');label.append(text);
-  const defaults=()=>({mode:'title',size:'square',showDate:true,fragment:0,textSize:'auto'});
+  const defaults=()=>({mode:'title',size:'card',showDate:true,fragment:0,textSize:'auto'});
   let takeOptions=defaults();
   let editor=null,modeSelect=null,fragmentLabel=null,fragmentSelect=null,sizeSelect=null,dateToggle=null,textSizeSelect=null,selectionNote=null,shareButton=null;
   if(p.kind==='take'){
@@ -300,7 +304,7 @@
    fragmentLabel=field('Fragmento del texto original',fragmentSelect);fragmentLabel.classList.add('cam-take-share-fragment');fragmentLabel.hidden=true;
    selectionNote=make('p','','cam-take-share-selection');selectionNote.hidden=true;editor.append(selectionNote);
    if(!pieces.length){modeSelect.querySelector('option[value="summary"]').disabled=true;modeSelect.querySelector('option[value="fragment"]').disabled=true;}
-   sizeSelect=make('select');for(const [value,name] of [['square','Cuadrada'],['story','Vertical']]){const option=make('option',name);option.value=value;sizeSelect.append(option);}
+   sizeSelect=make('select');for(const [value,name] of [['card','Horizontal'],['square','Cuadrada'],['story','Historia']]){const option=make('option',name);option.value=value;sizeSelect.append(option);}
    field('Formato',sizeSelect);
    textSizeSelect=make('select');for(const [value,name] of [['auto','Automático'],['compact','Pequeño'],['large','Grande']]){const option=make('option',name);option.value=value;textSizeSelect.append(option);}
    field('Tamaño del texto',textSizeSelect);
@@ -312,7 +316,7 @@
    sizeSelect.onchange=()=>{takeOptions.size=sizeSelect.value;refresh();};
    dateToggle.onchange=()=>{takeOptions.showDate=dateToggle.checked;refresh();};
    textSizeSelect.onchange=()=>{takeOptions.textSize=textSizeSelect.value;refresh();};
-   reset.onclick=()=>{takeOptions=defaults();modeSelect.value='title';fragmentSelect.value='0';fragmentLabel.hidden=true;sizeSelect.value='square';textSizeSelect.value='auto';dateToggle.checked=true;refresh();};
+   reset.onclick=()=>{takeOptions=defaults();modeSelect.value='title';fragmentSelect.value='0';fragmentLabel.hidden=true;sizeSelect.value='card';textSizeSelect.value='auto';dateToggle.checked=true;refresh();};
   }
   if(p.kind==='take'){
    hint.textContent='El menú del teléfono permite elegir una app. Si no recibe imágenes, descarga el PNG y adjúntalo; puedes copiar el enlace por separado.';
@@ -374,7 +378,8 @@
      file=new File([blob],download.download,{type:'image/png'});download.href=resource;download.hidden=false;ready();
     },'image/png');
    }catch(error){preview.replaceChildren(make('p',error.message));preview.setAttribute('aria-busy','false');}};
-   const fonts=p.kind==='take'?prepareTakeFonts():null;if(fonts)fonts.then(draw);else draw();
+   const artwork=p.kind==='take'?prepareTakeArtwork():null;
+   if(artwork)artwork.then(draw,error=>{if(ticket!==request||current!==generation||!dialog.open)return;preview.replaceChildren(make('p',error.message));preview.setAttribute('aria-busy','false');});else draw();
   }
   refresh();
 

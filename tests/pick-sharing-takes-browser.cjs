@@ -7,7 +7,7 @@ const server=http.createServer((req,res)=>{
  const pathname=new URL(req.url,'http://localhost').pathname;
  if(pathname==='/'){res.setHeader('Content-Type','text/html; charset=utf-8');return res.end('<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="/assets/site.css"><link rel="stylesheet" href="/assets/ae-editorial-bundle.css"></head><body><main><button id="open">Compartir Take</button></main><script src="/assets/cam-pick-share.js"></script></body></html>');}
  const file=path.resolve(root,'.'+pathname);if(!file.startsWith(root+path.sep)){res.writeHead(403);return res.end();}
- try{res.setHeader('Content-Type',file.endsWith('.css')?'text/css':file.endsWith('.woff2')?'font/woff2':'text/javascript');res.end(fs.readFileSync(file));}catch{res.writeHead(404);res.end();}
+ try{res.setHeader('Content-Type',file.endsWith('.css')?'text/css':file.endsWith('.woff2')?'font/woff2':file.endsWith('.webp')?'image/webp':'text/javascript');res.end(fs.readFileSync(file));}catch{res.writeHead(404);res.end();}
 });
 (async()=>{
  await new Promise(r=>server.listen(0,'127.0.0.1',r));
@@ -23,7 +23,7 @@ const server=http.createServer((req,res)=>{
  await page.evaluate(()=>{
   const native=CanvasRenderingContext2D.prototype.fillText;
   const paint=CanvasRenderingContext2D.prototype.drawImage;
-  CanvasRenderingContext2D.prototype.drawImage=function(source,x,y,width,height){if(source instanceof HTMLCanvasElement&&source.width===1080){const scale=width/source.width;draws=draws.map(t=>({...t,x:x+t.x*scale,y:y+t.y*scale,width:t.width*scale}));}return paint.call(this,source,x,y,width,height);};
+  window.logos=[];CanvasRenderingContext2D.prototype.drawImage=function(source,...args){if(source instanceof HTMLImageElement)logos.push({src:source.src,args});return paint.call(this,source,...args);};
   window.draws=[];CanvasRenderingContext2D.prototype.fillText=function(text,x,y,...rest){const width=this.measureText(text).width;draws.push({text,x,y,width,right:this.textAlign==='right',font:this.font});return native.call(this,text,x,y,...rest);};
   window.take=Object.freeze({id:'00000000-0000-0000-0000-000000000972',author_id:'00000000-0000-0000-0000-000000000951',author:'Adrianmendozac27',sport:'football',created_at:'2026-10-25T01:15:00Z',title:'LAMINE YAMAL GANARÁ EL BALÓN DE ORO EN 2026',body:'El argumento parte de su rendimiento.\nNo doy el resultado por seguro: depende de toda la temporada.\n\nSu evolución marcará la diferencia. '.repeat(8)});
   document.getElementById('open').onclick=()=>{draws=[];CamPickShare.open(take,{kind:'take'});};
@@ -34,28 +34,32 @@ const server=http.createServer((req,res)=>{
  const select=async(index,value)=>{await dialog.locator('select').nth(index).selectOption(value);await ready();};
  const png=async()=>Buffer.from(await preview.evaluate(async img=>{const b=await(await fetch(img.src)).arrayBuffer();return Array.from(new Uint8Array(b));}));
  const checkBounds=async story=>{
-  const drawn=await page.evaluate(()=>draws);for(const t of drawn){const left=t.right?t.x-t.width:t.x,right=t.right?t.x:t.x+t.width;assert.ok(left>=(story?140:85)&&right<=(story?935:995),`Text overflows horizontally: ${JSON.stringify(t)}`);assert.ok(t.y>=(story?280:180)&&t.y<=(story?1500:1045),`Text overflows safe height: ${JSON.stringify(t)}`);}
+  const drawn=await page.evaluate(()=>draws);for(const t of drawn){const left=t.right?t.x-t.width:t.x,right=t.right?t.x:t.x+t.width;assert.ok(left>=(story?80:52)&&right<=(story?919:1029),`Text overflows horizontally: ${JSON.stringify(t)}`);assert.ok(t.y>=(story?280:120)&&t.y<=(story?1500:1045),`Text overflows safe height: ${JSON.stringify(t)}`);}
  };
  await open();assert.equal(await page.evaluate(()=>document.fonts.check('600 80px "Playfair Display"')),true,'The real Playfair font is loaded before PNG generation');
- const first=await png();assert.equal(first.readUInt32BE(16),1080);assert.equal(first.readUInt32BE(20),1080);await checkBounds(false);
+ const first=await png();assert.equal(first.readUInt32BE(16),1080);assert.equal(first.readUInt32BE(20),566);await checkBounds(false);
  assert.ok(await page.evaluate(()=>draws.some(t=>t.text==='24/10/2026')),'Date matches the original Take calendar day in Toronto');
  assert.ok(await page.evaluate(()=>draws.some(t=>t.text==='Adrianmendozac27')));
- fs.writeFileSync(path.join(qa,'take-square.png'),first);
+ fs.writeFileSync(path.join(qa,'take-card.png'),first);
+ assert.ok(await page.evaluate(()=>logos.length>0&&logos.every(l=>l.src.includes('/assets/cam-sports-logo-completo.webp'))),'Official header artwork is drawn without a typed substitute');
  // The downloadable bytes are exactly the preview, rather than a second render.
  const pending=page.waitForEvent('download');await page.getByRole('link',{name:'Descargar imagen',exact:true}).click();const download=await pending;await download.saveAs(path.join(qa,'take-downloaded.png'));
  assert.equal(crypto.createHash('sha256').update(fs.readFileSync(path.join(qa,'take-downloaded.png'))).digest('hex'),crypto.createHash('sha256').update(first).digest('hex'));
  await page.getByRole('button',{name:'Compartir imagen',exact:true}).click();assert.equal(await page.evaluate(()=>shares[0].active),true,'File share remains in the user tap');
  assert.equal(await page.evaluate(()=>shares[0].data.files[0].type),'image/png');
  assert.deepEqual(await page.evaluate(async()=>Array.from(new Uint8Array(await shares[0].data.files[0].arrayBuffer()))),Array.from(first),'Native sharing transmits the preview PNG');
- for(const mode of ['title','summary','fragment'])for(const size of ['square','story']){
+ for(const mode of ['title','summary','fragment'])for(const size of ['card','square','story']){
   await page.evaluate(()=>draws=[]);await select(0,mode);await page.evaluate(()=>draws=[]);await select(2,size);await checkBounds(size==='story');
-  const data=await png();assert.equal(data.readUInt32BE(16),1080);assert.equal(data.readUInt32BE(20),size==='story'?1920:1080);
+  const data=await png();assert.equal(data.readUInt32BE(16),1080);assert.equal(data.readUInt32BE(20),size==='story'?1920:size==='square'?1080:mode==='title'?566:840);
+  const edges=await preview.evaluate(img=>{const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;const x=c.getContext('2d');x.drawImage(img,0,0);const rgba=x.getImageData(0,0,c.width,c.height).data;let valid=true;for(let p=0;p<rgba.length;p+=4){const pixel=p/4,px=pixel%c.width,py=Math.floor(pixel/c.width);if(px===0||px===c.width-1||py===0||py===c.height-1){if(rgba[p]!==7||rgba[p+1]!==59||rgba[p+2]!==131||rgba[p+3]!==255)valid=false;}}return valid;});
+  assert.equal(edges,true,'Every export edge is opaque CAM blue, with no white band or transparent corners');
+  fs.writeFileSync(path.join(qa,'take-'+mode+'-'+size+'.png'),data);
   if(mode==='title'&&size==='story')fs.writeFileSync(path.join(qa,'take-story.png'),data);
  }
  await page.getByRole('button',{name:'Restablecer diseño',exact:true}).click();await ready();assert.equal((await png()).equals(first),true,'Reset reproduces the original exact PNG');
  for(const title of ['Un gran Take',('Una opinión larga con todos los detalles del partido y de la temporada. ').repeat(3).slice(0,160),'W'.repeat(160)]){
   await page.getByRole('button',{name:'Cerrar',exact:true}).click();await page.evaluate(title=>{take={...take,title};},title);await open();
-  for(const size of ['square','story'])for(const mode of ['title','summary','fragment']){await select(0,mode);await page.evaluate(()=>draws=[]);await select(2,size);await checkBounds(size==='story');}
+  for(const size of ['card','square','story'])for(const mode of ['title','summary','fragment']){await select(0,mode);await page.evaluate(()=>draws=[]);await select(2,size);await checkBounds(size==='story');}
  }
  // Mobile layout, both themes, scrolling, and persistent primary controls.
  await page.getByRole('button',{name:'Cerrar',exact:true}).click();await page.evaluate(()=>take={...take,title:'LAMINE YAMAL GANARÁ EL BALÓN DE ORO EN 2026'});await open();
@@ -71,6 +75,13 @@ const server=http.createServer((req,res)=>{
  }
  await page.evaluate(()=>{Object.defineProperty(navigator,'canShare',{configurable:true,value:()=>false});});
  const popups=[];page.on('popup',p=>popups.push(p));await page.getByRole('link',{name:'Compartir imagen en X',exact:true}).click();assert.equal(popups.length,0);assert.match(await page.locator('.cam-pick-share-status').innerText(),/Descarga/);
- assert.deepEqual(errors,[]);await context.close();console.log(`PASS: ${engine===webkit?'WebKit iPhone emulation':'Chromium iPhone emulation'}, real fonts and PNGs, download/preview/native bytes match, 3 modes × 2 formats, long titles, original attribution, safe areas, 320–1366px/day/night, no empty X popup. QA: ${qa}`);
+ await page.getByRole('button',{name:'Cerrar',exact:true}).click();
+ await page.route('**/assets/cam-sports-logo-completo.webp*',r=>r.abort());
+ await page.reload({waitUntil:'load'});
+ await page.evaluate(()=>{document.getElementById('open').onclick=()=>CamPickShare.open({id:'00000000-0000-0000-0000-000000000972',author_id:'00000000-0000-0000-0000-000000000951',author:'Lector',title:'Un Take real',body:'Contenido original',created_at:'2026-10-24T12:00:00Z'},{kind:'take'});});
+ await page.locator('#open').click();await page.getByText('No se pudo cargar el logo oficial.',{exact:false}).waitFor();
+ assert.equal(await page.getByRole('button',{name:'Compartir imagen',exact:true}).isEnabled(),false);
+ assert.equal(await page.locator('.cam-pick-share-download').isVisible(),false,'No PNG is offered if the official logo failed');
+ assert.deepEqual(errors,[]);await context.close();console.log(`PASS: ${engine===webkit?'WebKit iPhone emulation':'Chromium iPhone emulation'}, real fonts and PNGs, download/preview/native bytes match, 3 modes × 3 formats, opaque blue edges and official logo, long titles, original attribution, safe areas, 320–1366px/day/night, no empty X popup. QA: ${qa}`);
  }finally{await browser.close();server.close();}
 })().catch(e=>{console.error(e);server.close();process.exitCode=1;});
