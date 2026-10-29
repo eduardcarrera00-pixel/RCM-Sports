@@ -790,12 +790,18 @@ async function showOwn(){
   if($('aeProfilePrestige')){$('aeProfilePrestige').replaceChildren();$('aeProfilePrestige').hidden=true;}
   loadPrestige(user.id);
 
-  const [takesResult,picksResult,unpopularResult]=await Promise.allSettled([
+  const [takesResult,picksResult,unpopularResult,publicNameResult]=await Promise.allSettled([
     db.rpc('ae_my_free_takes'),
     loadOwnPicks(user.id),
-    db.rpc('ae_my_profile_unpopular_take')
+    db.rpc('ae_my_profile_unpopular_take'),
+    // El nombre público (el que ve la comunidad) no siempre está en los datos
+    // de la sesión; sin él, el perfil, la conversación y las fichas decían «Usuario».
+    db.rpc('ae_public_take_profile',{p_author_id:user.id})
   ]);
   if(ticket!==request||!dialog.open)return;
+  const publicName=publicNameResult.status==='fulfilled'&&!publicNameResult.value.error
+    ?String(publicNameResult.value.data?.[0]?.author||'').trim():'';
+  if(publicName&&publicName!=='Aficionado')$('aeProfileUsername').textContent='@'+publicName.replace(/^@+/,'');
 
   const takeError=takesResult.status==='rejected'?takesResult.reason:takesResult.value.error;
   const pickError=picksResult.status==='rejected'?picksResult.reason:null;

@@ -1,0 +1,636 @@
+/* CAM SPORTS · Conversación de un Take (28 oct 2026).
+   Ventana con el lenguaje de la página: papel crema de día y azul noche de
+   noche, sin la foto de estadio/ciudad de fondo. Cabecera con comunidad,
+   fecha, compartir y cerrar; el Take con su título, autor, texto y votos; los
+   comentarios y el formulario.
+
+   Se carga al final y va en la capa cam-banners con !important porque las
+   reglas antiguas del diálogo (ae-take-discussion-reference.css,
+   ae-conversation-refine.css y la esquina global de cam-rounded-editorial)
+   también usan !important. Una declaración importante en una capa registrada
+   antes gana a cualquier otra fuera de capa o en capas posteriores. */
+@layer cam-banners {
+  html body #aeTakeDiscussion.ae-take-discussion {
+    --tk-paper:#fffcf8;
+    --tk-paper-soft:#f6efe4;
+    --tk-field:#ffffff;
+    --tk-ink:#13324d;
+    --tk-text:#34444f;
+    --tk-muted:#6a7680;
+    --tk-line:rgba(133,91,67,.2);
+    --tk-line-strong:rgba(133,91,67,.34);
+    --tk-accent:#855b43;
+    --tk-accent-soft:rgba(133,91,67,.09);
+    --tk-action:#855b43;
+    --tk-action-ink:#ffffff;
+    --tk-focus:#855b43;
+    --tk-shadow:0 26px 70px rgba(31,40,48,.28);
+    box-sizing:border-box!important;
+    position:fixed!important;
+    inset:auto!important;
+    top:50%!important;
+    left:50%!important;
+    transform:translate(-50%,-50%)!important;
+    width:min(680px,calc(100vw - 24px))!important;
+    max-width:min(680px,calc(100vw - 24px))!important;
+    max-height:min(90dvh,860px)!important;
+    margin:0!important;
+    padding:0!important;
+    overflow:hidden!important;
+    border:1px solid var(--tk-line-strong)!important;
+    border-radius:24px!important;
+    background:var(--tk-paper)!important;
+    background-image:none!important;
+    color:var(--tk-text)!important;
+    box-shadow:var(--tk-shadow)!important;
+  }
+  html.dark body #aeTakeDiscussion.ae-take-discussion {
+    --tk-paper:#0f2639;
+    --tk-paper-soft:#13304a;
+    --tk-field:#0b1f30;
+    --tk-ink:#f6ecdf;
+    --tk-text:#dcd3c8;
+    --tk-muted:#a9b6bf;
+    --tk-line:rgba(214,166,112,.2);
+    --tk-line-strong:rgba(214,166,112,.36);
+    --tk-accent:#e0b37c;
+    --tk-accent-soft:rgba(224,179,124,.1);
+    --tk-action:#d9a66d;
+    --tk-action-ink:#132232;
+    --tk-focus:#e0b37c;
+    --tk-shadow:0 30px 80px rgba(0,0,0,.55);
+  }
+  html body #aeTakeDiscussion.ae-take-discussion::backdrop {
+    background:rgba(18,30,40,.48)!important;
+    -webkit-backdrop-filter:blur(6px)!important;
+    backdrop-filter:blur(6px)!important;
+  }
+  html.dark body #aeTakeDiscussion.ae-take-discussion::backdrop {
+    background:rgba(2,10,18,.72)!important;
+  }
+
+  /* Contenido que se desplaza; sin imágenes ni velos de fondo. */
+  html body #aeTakeDiscussion .ae-take-discussion-inner {
+    box-sizing:border-box!important;
+    max-height:min(90dvh,860px)!important;
+    margin:0!important;
+    padding:0 28px 24px!important;
+    overflow-x:hidden!important;
+    overflow-y:auto!important;
+    overscroll-behavior:contain!important;
+    border-radius:0!important;
+    background:transparent!important;
+    background-image:none!important;
+  }
+  html body #aeTakeDiscussion .ae-take-discussion-inner::before,
+  html body #aeTakeDiscussion .ae-take-discussion-inner::after {
+    content:none!important;
+    display:none!important;
+    background:none!important;
+  }
+
+  /* ---------- Cabecera ---------- */
+  html body #aeTakeDiscussion .ae-discussion-header {
+    position:sticky!important;
+    top:0!important;
+    z-index:3!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+    gap:12px!important;
+    min-height:0!important;
+    margin:0 -28px!important;
+    padding:16px 28px 14px!important;
+    border:0!important;
+    border-bottom:1px solid var(--tk-line)!important;
+    border-radius:0!important;
+    background:var(--tk-paper)!important;
+    background-image:none!important;
+  }
+  html body #aeTakeDiscussion .ae-discussion-kicker {
+    display:flex!important;
+    flex-wrap:wrap!important;
+    align-items:center!important;
+    gap:6px 10px!important;
+    min-width:0!important;
+    margin:0!important;
+    color:var(--tk-muted)!important;
+    font:500 12px/1.4 Inter,system-ui,sans-serif!important;
+  }
+  html body #aeTakeDiscussion .ae-discussion-kicker .ae-discussion-sport {
+    display:inline-flex!important;
+    align-items:center!important;
+    margin:0!important;
+    padding:5px 10px!important;
+    border:1px solid var(--tk-line-strong)!important;
+    border-radius:999px!important;
+    background:var(--tk-accent-soft)!important;
+    color:var(--tk-accent)!important;
+    font:700 10.5px/1 Inter,system-ui,sans-serif!important;
+    letter-spacing:.12em!important;
+    text-transform:uppercase!important;
+    box-shadow:none!important;
+  }
+  html body #aeTakeDiscussion .ae-discussion-kicker .ae-discussion-context {
+    display:inline!important;
+    margin:0!important;
+    padding:0!important;
+    color:var(--tk-muted)!important;
+    font:500 12px/1.4 Inter,system-ui,sans-serif!important;
+    letter-spacing:0!important;
+    text-transform:none!important;
+  }
+  html body #aeTakeDiscussion .ae-discussion-kicker .ae-discussion-context:empty { display:none!important; }
+  html body #aeTakeDiscussion .ae-discussion-tools {
+    display:flex!important;
+    align-items:center!important;
+    gap:8px!important;
+    flex:0 0 auto!important;
+  }
+  html body #aeTakeDiscussion :is(#aeDiscussionShare,#aeDiscussionClose) {
+    position:relative!important;
+    display:inline-grid!important;
+    place-items:center!important;
+    flex:0 0 38px!important;
+    width:38px!important;
+    height:38px!important;
+    min-width:38px!important;
+    min-height:38px!important;
+    margin:0!important;
+    padding:0!important;
+    border:1px solid var(--tk-line-strong)!important;
+    border-radius:50%!important;
+    background:transparent!important;
+    color:var(--tk-ink)!important;
+    font-size:0!important;
+    cursor:pointer!important;
+    box-shadow:none!important;
+    transition:background-color .18s,border-color .18s!important;
+  }
+  html body #aeTakeDiscussion #aeDiscussionShare[hidden] { display:none!important; }
+  html body #aeTakeDiscussion :is(#aeDiscussionShare,#aeDiscussionClose):hover {
+    border-color:var(--tk-accent)!important;
+    background:var(--tk-accent-soft)!important;
+  }
+  html body #aeTakeDiscussion :is(#aeDiscussionShare,#aeDiscussionClose):focus-visible {
+    outline:2px solid var(--tk-focus)!important;
+    outline-offset:2px!important;
+  }
+  html body #aeTakeDiscussion #aeDiscussionShare svg {
+    width:17px!important;
+    height:17px!important;
+    fill:none!important;
+    stroke:currentColor!important;
+    stroke-width:1.8!important;
+    stroke-linecap:round!important;
+    stroke-linejoin:round!important;
+  }
+  /* La X de cerrar: dos trazos finos centrados. */
+  html body #aeTakeDiscussion #aeDiscussionClose span { display:none!important; }
+  html body #aeTakeDiscussion #aeDiscussionClose::before,
+  html body #aeTakeDiscussion #aeDiscussionClose::after {
+    content:""!important;
+    position:absolute!important;
+    top:50%!important;
+    left:50%!important;
+    width:16px!important;
+    height:1.8px!important;
+    margin:-.9px 0 0 -8px!important;
+    border-radius:2px!important;
+    background:currentColor!important;
+  }
+  html body #aeTakeDiscussion #aeDiscussionClose::before { transform:rotate(45deg)!important; }
+  html body #aeTakeDiscussion #aeDiscussionClose::after { transform:rotate(-45deg)!important; }
+
+  /* ---------- El Take ---------- */
+  html body #aeTakeDiscussion .ae-discussion-subject {
+    display:block!important;
+    margin:0!important;
+    padding:22px 0 22px!important;
+    border:0!important;
+    border-bottom:1px solid var(--tk-line)!important;
+    border-radius:0!important;
+    background:transparent!important;
+    background-image:none!important;
+  }
+  html body #aeTakeDiscussion .ae-discussion-subject h2 {
+    margin:0!important;
+    padding:0!important;
+    color:var(--tk-ink)!important;
+    font:600 clamp(25px,5.2vw,34px)/1.16 "Playfair Display",Georgia,serif!important;
+    font-variant-numeric:lining-nums!important;
+    letter-spacing:-.01em!important;
+    text-transform:none!important;
+    text-shadow:none!important;
+    overflow-wrap:anywhere!important;
+  }
+  html body #aeTakeDiscussion .ae-discussion-subject h2 #aeDiscussionSubject {
+    display:inline!important;
+    margin:0!important;
+    color:inherit!important;
+    font:inherit!important;
+  }
+  html body #aeTakeDiscussion .ae-discussion-byline {
+    display:flex!important;
+    align-items:center!important;
+    gap:10px!important;
+    margin:14px 0 0!important;
+  }
+  html body #aeTakeDiscussion .ae-discussion-byline-avatar {
+    display:inline-grid!important;
+    place-items:center!important;
+    flex:0 0 32px!important;
+    width:32px!important;
+    height:32px!important;
+    margin:0!important;
+    border-radius:50%!important;
+    background:var(--tk-accent-soft)!important;
+    border:1px solid var(--tk-line-strong)!important;
+    color:var(--tk-accent)!important;
+    font:600 15px/1 "Playfair Display",Georgia,serif!important;
+    letter-spacing:0!important;
+    text-transform:uppercase!important;
+  }
+  html body #aeTakeDiscussion .ae-discussion-byline #aeDiscussionAuthor {
+    display:inline!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:2px 0!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    outline-offset:3px!important;
+    color:var(--tk-accent)!important;
+    font:600 14px/1.3 Inter,system-ui,sans-serif!important;
+    letter-spacing:0!important;
+    text-align:left!important;
+    text-decoration:underline!important;
+    text-decoration-color:color-mix(in srgb,var(--tk-accent) 40%,transparent)!important;
+    text-underline-offset:4px!important;
+    text-transform:none!important;
+    cursor:pointer!important;
+    overflow-wrap:anywhere!important;
+  }
+  html body #aeTakeDiscussion .ae-discussion-byline #aeDiscussionAuthor::after,
+  html body #aeTakeDiscussion .ae-discussion-byline #aeDiscussionAuthor::before { content:none!important; display:none!important; }
+  html body #aeTakeDiscussion .ae-discussion-byline #aeDiscussionAuthor:hover { text-decoration-color:currentColor!important; }
+  html body #aeTakeDiscussion .ae-discussion-byline #aeDiscussionAuthor:disabled { cursor:default!important; text-decoration:none!important; }
+  html body #aeTakeDiscussion #aeDiscussionEditSport {
+    margin:12px 0 0!important;
+    padding:6px 12px!important;
+    min-height:32px!important;
+    border:1px solid var(--tk-line-strong)!important;
+    border-radius:999px!important;
+    background:transparent!important;
+    color:var(--tk-accent)!important;
+    font:600 12px/1.2 Inter,system-ui,sans-serif!important;
+  }
+  html body #aeTakeDiscussion #aeDiscussionEditSport[hidden] { display:none!important; }
+  html body #aeTakeDiscussion .ae-discussion-subject #aeDiscussionBody {
+    margin:16px 0 0!important;
+    padding:0!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    color:var(--tk-text)!important;
+    font:400 16px/1.68 "Libre Baskerville",Georgia,serif!important;
+    white-space:pre-line!important;
+    overflow-wrap:anywhere!important;
+    text-shadow:none!important;
+  }
+  html body #aeTakeDiscussion .ae-discussion-subject #aeDiscussionBody:empty { display:none!important; }
+  html body #aeTakeDiscussion .ae-discussion-votes {
+    display:flex!important;
+    flex-wrap:wrap!important;
+    gap:8px!important;
+    margin:18px 0 0!important;
+  }
+  html body #aeTakeDiscussion .ae-discussion-votes button {
+    min-height:40px!important;
+    margin:0!important;
+    padding:8px 16px!important;
+    border:1px solid var(--tk-line-strong)!important;
+    border-radius:999px!important;
+    background:transparent!important;
+    color:var(--tk-ink)!important;
+    font:600 13px/1.2 Inter,system-ui,sans-serif!important;
+    box-shadow:none!important;
+    cursor:pointer!important;
+  }
+  html body #aeTakeDiscussion .ae-discussion-votes button:hover { border-color:var(--tk-accent)!important; background:var(--tk-accent-soft)!important; }
+  html body #aeTakeDiscussion .ae-discussion-votes button[aria-pressed="true"] {
+    border-color:var(--tk-action)!important;
+    background:var(--tk-action)!important;
+    color:var(--tk-action-ink)!important;
+  }
+
+  /* ---------- Comentarios ---------- */
+  html body #aeTakeDiscussion .ae-discussion-thread {
+    margin:0!important;
+    padding:20px 0 4px!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+  }
+  html body #aeTakeDiscussion .ae-discussion-counter {
+    margin:0 0 10px!important;
+    padding:0!important;
+    color:var(--tk-ink)!important;
+    font:600 20px/1.25 "Playfair Display",Georgia,serif!important;
+    font-variant-numeric:lining-nums!important;
+    letter-spacing:0!important;
+    text-transform:none!important;
+  }
+  html body #aeTakeDiscussion #aeDiscussionStatus {
+    margin:0!important;
+    color:var(--tk-muted)!important;
+    font:500 13px/1.5 Inter,system-ui,sans-serif!important;
+  }
+  html body #aeTakeDiscussion #aeDiscussionStatus:empty { display:none!important; }
+  html body #aeTakeDiscussion .ae-discussion-list {
+    max-height:none!important;
+    margin:0!important;
+    padding:0!important;
+    overflow:visible!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+  }
+  html body #aeTakeDiscussion .ae-discussion-empty {
+    margin:4px 0 0!important;
+    padding:14px 16px!important;
+    border:1px dashed var(--tk-line-strong)!important;
+    border-radius:14px!important;
+    background:var(--tk-paper-soft)!important;
+    color:var(--tk-muted)!important;
+    font:400 14.5px/1.55 "Libre Baskerville",Georgia,serif!important;
+    text-align:left!important;
+  }
+  html body #aeTakeDiscussion .ae-discussion-comment {
+    display:grid!important;
+    grid-template-columns:34px minmax(0,1fr)!important;
+    gap:12px!important;
+    margin:0!important;
+    padding:14px 0!important;
+    border:0!important;
+    border-top:1px solid var(--tk-line)!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+  }
+  html body #aeTakeDiscussion .ae-discussion-list > .ae-discussion-comment:first-child { border-top:0!important; padding-top:4px!important; }
+  html body #aeTakeDiscussion .ae-discussion-comment .ae-discussion-avatar {
+    display:grid!important;
+    place-items:center!important;
+    width:34px!important;
+    height:34px!important;
+    margin:0!important;
+    border:1px solid var(--tk-line-strong)!important;
+    border-radius:50%!important;
+    background:var(--tk-accent-soft)!important;
+    color:var(--tk-accent)!important;
+    font:600 15px/1 "Playfair Display",Georgia,serif!important;
+  }
+  html body #aeTakeDiscussion .ae-discussion-comment-content {
+    display:block!important;
+    min-width:0!important;
+    margin:0!important;
+    padding:0!important;
+  }
+  html body #aeTakeDiscussion .ae-discussion-meta {
+    display:flex!important;
+    flex-wrap:wrap!important;
+    align-items:center!important;
+    justify-content:flex-start!important;
+    gap:0 10px!important;
+    margin:0!important;
+    color:var(--tk-muted)!important;
+    font:500 12px/1.4 Inter,system-ui,sans-serif!important;
+  }
+  html body #aeTakeDiscussion .ae-discussion-meta :is(.ae-discussion-author-link,strong) {
+    min-height:28px!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    color:var(--tk-accent)!important;
+    font:600 13px/1.3 Inter,system-ui,sans-serif!important;
+    text-decoration:none!important;
+    cursor:pointer!important;
+  }
+  html body #aeTakeDiscussion .ae-discussion-meta .ae-discussion-author-link:hover { text-decoration:underline!important; text-underline-offset:3px!important; }
+  html body #aeTakeDiscussion .ae-discussion-meta time { color:var(--tk-muted)!important; font:500 12px/1.3 Inter,system-ui,sans-serif!important; }
+  html body #aeTakeDiscussion .ae-discussion-text {
+    margin:2px 0 10px!important;
+    color:var(--tk-text)!important;
+    font:400 15px/1.6 "Libre Baskerville",Georgia,serif!important;
+    white-space:pre-wrap!important;
+    overflow-wrap:anywhere!important;
+  }
+  html body #aeTakeDiscussion .ae-discussion-actions {
+    display:flex!important;
+    flex-wrap:wrap!important;
+    align-items:center!important;
+    gap:6px!important;
+    margin:0!important;
+  }
+  html body #aeTakeDiscussion .ae-discussion-actions :is(.ae-discussion-comment-vote,.ae-discussion-reply) {
+    min-height:32px!important;
+    margin:0!important;
+    padding:5px 12px!important;
+    border:1px solid var(--tk-line-strong)!important;
+    border-radius:999px!important;
+    background:transparent!important;
+    color:var(--tk-ink)!important;
+    font:600 12px/1.2 Inter,system-ui,sans-serif!important;
+    text-decoration:none!important;
+    box-shadow:none!important;
+    cursor:pointer!important;
+  }
+  html body #aeTakeDiscussion .ae-discussion-actions .ae-discussion-reply { color:var(--tk-accent)!important; }
+  html body #aeTakeDiscussion .ae-discussion-actions .ae-discussion-comment-vote[aria-pressed="true"] {
+    border-color:var(--tk-action)!important;
+    background:var(--tk-action)!important;
+    color:var(--tk-action-ink)!important;
+  }
+  html body #aeTakeDiscussion .ae-discussion-actions .ae-discussion-comment-vote:disabled { opacity:.55!important; cursor:default!important; }
+  html body #aeTakeDiscussion .ae-discussion-actions .ae-discussion-reply-count {
+    margin:0 0 0 4px!important;
+    color:var(--tk-muted)!important;
+    font:500 12px/1.2 Inter,system-ui,sans-serif!important;
+  }
+  html body #aeTakeDiscussion .ae-discussion-comment.ae-discussion-nested {
+    grid-column:1 / -1!important;
+    margin:12px 0 0!important;
+    padding:12px 0 2px 14px!important;
+    border:0!important;
+    border-left:2px solid var(--tk-line-strong)!important;
+    border-radius:0!important;
+    background:transparent!important;
+  }
+
+  /* ---------- Responder ---------- */
+  html body #aeTakeDiscussion .ae-discussion-reply-target {
+    display:flex!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+    gap:10px!important;
+    margin:14px 0 0!important;
+    padding:10px 14px!important;
+    border:1px solid var(--tk-line)!important;
+    border-radius:14px!important;
+    background:var(--tk-accent-soft)!important;
+    color:var(--tk-ink)!important;
+    font:500 13px/1.4 Inter,system-ui,sans-serif!important;
+  }
+  html body #aeTakeDiscussion .ae-discussion-reply-target[hidden] { display:none!important; }
+  html body #aeTakeDiscussion .ae-discussion-reply-target button {
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    background:transparent!important;
+    color:var(--tk-accent)!important;
+    font:600 12px/1.2 Inter,system-ui,sans-serif!important;
+    text-decoration:underline!important;
+    text-underline-offset:3px!important;
+    cursor:pointer!important;
+  }
+  html body #aeTakeDiscussion #aeDiscussionForm {
+    display:grid!important;
+    gap:10px!important;
+    margin:18px 0 0!important;
+    padding:18px!important;
+    border:1px solid var(--tk-line)!important;
+    border-radius:20px!important;
+    background:var(--tk-paper-soft)!important;
+    box-shadow:none!important;
+  }
+  html body #aeTakeDiscussion #aeDiscussionForm label {
+    margin:0!important;
+    padding:0!important;
+    color:var(--tk-ink)!important;
+    font:600 18px/1.25 "Playfair Display",Georgia,serif!important;
+    letter-spacing:0!important;
+    text-transform:none!important;
+  }
+  html body #aeTakeDiscussion #aeDiscussionText {
+    box-sizing:border-box!important;
+    width:100%!important;
+    min-height:96px!important;
+    margin:0!important;
+    padding:12px 14px!important;
+    border:1px solid var(--tk-line-strong)!important;
+    border-radius:14px!important;
+    background:var(--tk-field)!important;
+    color:var(--tk-ink)!important;
+    font:400 16px/1.55 "Libre Baskerville",Georgia,serif!important;
+    resize:vertical!important;
+    box-shadow:none!important;
+  }
+  html body #aeTakeDiscussion #aeDiscussionText::placeholder { color:var(--tk-muted)!important; opacity:1!important; }
+  html body #aeTakeDiscussion #aeDiscussionText:focus {
+    outline:2px solid color-mix(in srgb,var(--tk-focus) 55%,transparent)!important;
+    outline-offset:1px!important;
+    border-color:var(--tk-accent)!important;
+  }
+  html body #aeTakeDiscussion #aeDiscussionSubmit {
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:10px!important;
+    width:100%!important;
+    min-height:48px!important;
+    margin:0!important;
+    padding:12px 18px!important;
+    border:0!important;
+    border-radius:999px!important;
+    background:var(--tk-action)!important;
+    background-image:none!important;
+    color:var(--tk-action-ink)!important;
+    font:600 15px/1.2 "Libre Baskerville",Georgia,serif!important;
+    letter-spacing:0!important;
+    text-transform:none!important;
+    box-shadow:0 8px 22px color-mix(in srgb,var(--tk-action) 26%,transparent)!important;
+    cursor:pointer!important;
+  }
+  html body #aeTakeDiscussion #aeDiscussionSubmit:hover { filter:brightness(1.06)!important; }
+  html body #aeTakeDiscussion #aeDiscussionSubmit:disabled { opacity:.6!important; cursor:wait!important; }
+  html body #aeTakeDiscussion #aeDiscussionSubmit:focus-visible { outline:2px solid var(--tk-focus)!important; outline-offset:3px!important; }
+
+  @media(max-width:760px){
+    html body #aeTakeDiscussion.ae-take-discussion {
+      width:calc(100vw - 16px)!important;
+      max-width:calc(100vw - 16px)!important;
+      max-height:calc(100dvh - 24px)!important;
+      border-radius:22px!important;
+    }
+    html body #aeTakeDiscussion .ae-take-discussion-inner {
+      max-height:calc(100dvh - 24px)!important;
+      padding:0 18px 18px!important;
+    }
+    html body #aeTakeDiscussion .ae-discussion-header {
+      margin:0 -18px!important;
+      padding:14px 18px 12px!important;
+    }
+    html body #aeTakeDiscussion .ae-discussion-subject { padding:18px 0!important; }
+    html body #aeTakeDiscussion .ae-discussion-subject #aeDiscussionBody { font-size:15px!important; line-height:1.62!important; }
+    html body #aeTakeDiscussion #aeDiscussionForm { padding:14px!important; border-radius:18px!important; }
+  }
+}
+
+/* ---------- Botón pequeño de compartir en las tarjetas de Takes ---------- */
+@layer cam-banners {
+  html body #freeTakes .ae-free-take-card .ae-take-overline .cam-take-share-mini {
+    display:inline-grid!important;
+    place-items:center!important;
+    flex:0 0 30px!important;
+    width:30px!important;
+    height:30px!important;
+    min-width:30px!important;
+    min-height:30px!important;
+    margin:0 0 0 2px!important;
+    padding:0!important;
+    border:1px solid currentColor!important;
+    border-color:color-mix(in srgb,currentColor 28%,transparent)!important;
+    border-radius:50%!important;
+    background:transparent!important;
+    color:inherit!important;
+    opacity:.85!important;
+    box-shadow:none!important;
+    cursor:pointer!important;
+    font-size:0!important;
+  }
+  html body #freeTakes .ae-free-take-card .ae-take-overline .cam-take-share-mini:hover { opacity:1!important; border-color:currentColor!important; }
+  html body #freeTakes .ae-free-take-card .ae-take-overline .cam-take-share-mini:focus-visible { outline:2px solid currentColor!important; outline-offset:2px!important; }
+  html body #freeTakes .ae-free-take-card .ae-take-overline .cam-take-share-mini svg {
+    width:14px!important;
+    height:14px!important;
+    fill:none!important;
+    stroke:currentColor!important;
+    stroke-width:1.9!important;
+    stroke-linecap:round!important;
+    stroke-linejoin:round!important;
+  }
+}
+/* En tarjetas estrechas (4 columnas en ordenador) la fila de arriba no salta de
+   línea: el nombre del autor se acorta con «…» y el botón queda arriba a la derecha. */
+@layer cam-banners {
+  html body #freeTakes .ae-free-take-card .ae-take-overline:has(.cam-take-share-mini) {
+    flex-wrap:nowrap!important;
+    min-width:0!important;
+  }
+  html body #freeTakes .ae-free-take-card .ae-take-overline:has(.cam-take-share-mini) > :is(span,.ae-take-date) {
+    flex-shrink:0!important;
+  }
+  html body #freeTakes .ae-free-take-card .ae-take-overline:has(.cam-take-share-mini) > .ae-take-author-link {
+    min-width:0!important;
+    flex:0 1 auto!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+  }
+}

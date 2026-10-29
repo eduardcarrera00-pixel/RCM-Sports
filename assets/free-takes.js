@@ -91,6 +91,14 @@
      const date=el('time',new Date(t.created_at).toLocaleDateString('es',{day:'numeric',month:'short'}),'ae-take-date');
      date.dateTime=t.created_at;
      meta.append(author,date);
+     // Botón pequeño para compartir el Take como ficha «La cita».
+     if(window.CamPickShare&&t.author_id){
+       const share=button(null,()=>window.CamPickShare.open(t,{kind:'take',opener:share}),'cam-take-share-mini');
+       share.setAttribute('aria-label','Compartir Take: '+t.title);
+       share.title='Compartir';
+       share.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3v12M7.5 7.5 12 3l4.5 4.5M5 11v8.5c0 .8.7 1.5 1.5 1.5h11c.8 0 1.5-.7 1.5-1.5V11"/></svg>';
+       meta.append(share);
+     }
      const heading=el('h3',undefined,'ae-feed-take-title');
      const openTake=button(t.title,()=>window.aeTakeReplies?.open(t),'ae-feed-take-open');
      openTake.setAttribute('aria-label','Leer Take y abrir conversación: '+t.title);

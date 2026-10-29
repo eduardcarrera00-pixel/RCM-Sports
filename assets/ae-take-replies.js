@@ -15,15 +15,20 @@
     dialog.id = 'aeTakeDiscussion';
     dialog.className = 'ae-take-discussion';
     dialog.setAttribute('aria-labelledby','aeTakeDiscussionTitle');
+    // Cabecera: comunidad, fecha, compartir y cerrar. Debajo, el Take (título,
+    // autor, texto y votos), la conversación y el formulario.
     dialog.innerHTML = `
       <div class="ae-take-discussion-inner">
         <header class="ae-discussion-header">
-          <div class="ae-discussion-titleblock"><h2 id="aeTakeDiscussionTitle"><button type="button" id="aeDiscussionAuthor">Aficionado</button> — Takes</h2></div>
-          <button type="button" id="aeDiscussionClose" aria-label="Cerrar comentarios"><span aria-hidden="true"></span></button>
+          <p class="ae-discussion-kicker"><span id="aeDiscussionSport" class="ae-discussion-sport"></span><span id="aeDiscussionContext" class="ae-discussion-context"></span></p>
+          <div class="ae-discussion-tools">
+            <button type="button" id="aeDiscussionShare" class="ae-discussion-share" aria-label="Compartir este Take" title="Compartir" hidden><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3v12M7.5 7.5 12 3l4.5 4.5M5 11v8.5c0 .8.7 1.5 1.5 1.5h11c.8 0 1.5-.7 1.5-1.5V11"/></svg></button>
+            <button type="button" id="aeDiscussionClose" aria-label="Cerrar comentarios"><span aria-hidden="true"></span></button>
+          </div>
         </header>
         <section class="ae-discussion-subject">
-          <strong id="aeDiscussionSubject"></strong>
-          <span id="aeDiscussionSport" class="ae-discussion-sport"></span>
+          <h2 id="aeTakeDiscussionTitle"><span id="aeDiscussionSubject"></span></h2>
+          <div class="ae-discussion-byline"><span id="aeDiscussionAvatar" class="ae-discussion-byline-avatar" aria-hidden="true"></span><button type="button" id="aeDiscussionAuthor">Aficionado</button></div>
           <button type="button" id="aeDiscussionEditSport" hidden>Cambiar comunidad</button>
           <p id="aeDiscussionBody"></p>
           <div id="aeDiscussionVotes" class="ae-discussion-votes" aria-label="Votos del Take">
@@ -41,6 +46,10 @@
       </div>`;
     document.body.append(dialog);
     $('aeDiscussionClose').addEventListener('click',()=>dialog.close());
+    // Compartir abre la ficha «La cita» del Take (Historia, TikTok, Publicación o X).
+    $('aeDiscussionShare').addEventListener('click',event=>{
+      if(current&&window.CamPickShare)window.CamPickShare.open(current,{kind:'take',opener:event.currentTarget});
+    });
     $('aeDiscussionAuthor').addEventListener('click',()=>{
       if(current?.author_id)openAuthorProfile(current.author_id);
     });
@@ -319,7 +328,16 @@
     $('aeDiscussionAuthor').disabled=!take.author_id;
     $('aeDiscussionAuthor').title=take.author_id?'Ver perfil de @'+authorName:'Perfil no disponible';
     $('aeDiscussionAuthor').setAttribute('aria-label','Ver perfil de '+authorName);
+    $('aeDiscussionAvatar').textContent=authorName.charAt(0).toUpperCase()||'A';
     $('aeDiscussionSubject').textContent=take.title||'Take de la comunidad';
+    const published=take.created_at?new Date(take.created_at):null;
+    const day=published&&!Number.isNaN(published.getTime())?published.toLocaleDateString('es',{day:'numeric',month:'short',year:'numeric'}):'';
+    const sportLabel=$('aeDiscussionSport').textContent.toLowerCase();
+    const competition=String(take.competition||'').trim();
+    $('aeDiscussionContext').textContent=[competition&&competition.toLowerCase()!==sportLabel?competition:'',day].filter(Boolean).join(' · ');
+    // Solo Takes públicos con autor y número válidos se pueden convertir en ficha.
+    const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    $('aeDiscussionShare').hidden=!(window.CamPickShare&&!take.hidden&&uuid.test(String(take.id))&&uuid.test(String(take.author_id||'')));
     $('aeDiscussionBody').textContent=take.body||'';
     viewerReady=false;
     viewerId=null;
