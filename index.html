@@ -6347,8 +6347,8 @@ button.cam-quiniela-team:focus-visible{outline:var(--ds-focus-width,3px) solid v
   background:var(--q-bad-bg);color:var(--q-bad-text);border-color:color-mix(in srgb,var(--q-bad) 45%,transparent);
 }
 
-/* Jornada arriba y, debajo, las cuatro competiciones con su logo (elegir una
-   cambia la quiniela y su clasificación). */
+/* Jornada arriba y, debajo, los cuatro logos CAM sin rótulos visibles.
+   Elegir uno cambia la quiniela y su clasificación. */
 #camFootballQuiniela #camFootballNav{
   display:grid;grid-template-columns:minmax(0,1fr);
   gap:14px;width:min(100%,560px);
@@ -6369,7 +6369,7 @@ button.cam-quiniela-team:focus-visible{outline:var(--ds-focus-width,3px) solid v
   display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;min-width:0;
 }
 #camFootballQuiniela .cam-football-league{
-  display:grid;justify-items:center;align-content:center;gap:6px;min-width:0;min-height:84px;
+  display:grid;justify-items:center;align-content:center;min-width:0;min-height:84px;
   margin:0;padding:10px 4px 8px;border:1px solid var(--q-band-line);
   background:var(--q-band-control);color:var(--q-on-band-muted);cursor:pointer;
   font:600 11px/1.25 var(--ds-font-sans,Inter,system-ui,sans-serif);text-align:center;
@@ -6383,47 +6383,29 @@ button.cam-quiniela-team:focus-visible{outline:var(--ds-focus-width,3px) solid v
 }
 #camFootballQuiniela .cam-football-league:focus-visible{outline:2px solid var(--q-focus);outline-offset:3px}
 #camFootballQuiniela .cam-football-league-logo{
-  position:relative;display:grid;place-items:center;width:44px;height:44px;
+  position:relative;display:grid;place-items:center;width:58px;height:58px;
 }
-#camFootballQuiniela .cam-football-league-logo img{
-  display:block;width:100%;height:100%;object-fit:contain;
+#camFootballQuiniela .cam-football-league-logo > span{
+  display:block;width:100%;height:100%;
+  background-image:url("assets/cam-football-leagues-20261028.png");
+  background-repeat:no-repeat;background-size:400% 200%;
 }
 html:not(.dark) #camFootballQuiniela .cam-football-league-logo--night,
 html.dark #camFootballQuiniela .cam-football-league-logo--day{display:none}
-/* Si el logo no carga, queda la sigla de la competición. */
-#camFootballQuiniela .cam-football-league-logo[data-logo-error] img{display:none}
-#camFootballQuiniela .cam-football-league-logo[data-logo-error]::before{
-  content:attr(data-mark);display:grid;place-items:center;width:100%;height:100%;
-  border:1px solid var(--q-band-line);border-radius:50%;
-  font:700 12px/1 var(--ds-font-sans,Inter,system-ui,sans-serif);letter-spacing:.04em;color:var(--q-on-band);
-}
-#camFootballQuiniela #camFootballNav .cam-football-league-name{
-  display:block;max-width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
-  font:600 11px/1.25 var(--ds-font-sans,Inter,system-ui,sans-serif);letter-spacing:0;
-}
 @media(max-width:480px){
   #camFootballQuiniela .cam-football-league{padding-inline:2px}
-  #camFootballQuiniela #camFootballNav .cam-football-league-name{font-size:10px}
-}
-/* Pantallas muy estrechas: dos por fila para que el nombre se lea entero. */
-@media(max-width:374px){
-  #camFootballQuiniela .cam-football-leagues{grid-template-columns:repeat(2,minmax(0,1fr))}
-  #camFootballQuiniela .cam-football-league{min-height:76px}
-  #camFootballQuiniela #camFootballNav .cam-football-league-name{font-size:11px}
 }
 /* La esquina global de 14 px curvaba la línea de arriba y la píldora de los
    botones convertía las tarjetas de logo en óvalos. */
 @layer cam-rounded-editorial{
   html body #camFootballQuiniela #camFootballNav{border-radius:0!important}
   html body #camFootballQuiniela #camFootballNav .cam-football-league{border-radius:16px!important}
-  html body #camFootballQuiniela #camFootballNav .cam-football-league-name{border-radius:0!important}
 }
 /* En la clasificación no hay jornada que elegir, pero sí competición. */
 #camFootballQuiniela.is-ranking #camFootballNav .cam-football-round-control{display:none}
 @media(min-width:761px){
   #camFootballQuiniela .cam-football-league{min-height:96px}
-  #camFootballQuiniela .cam-football-league-logo{width:52px;height:52px}
-  #camFootballQuiniela #camFootballNav .cam-football-league-name{font-size:12px}
+  #camFootballQuiniela .cam-football-league-logo{width:68px;height:68px}
 }
 
 /* Competiciones de quiniela: estilos heredados para otros componentes. */
@@ -6569,7 +6551,7 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 <link rel="stylesheet" href="assets/cam-movil-ajustes.css?v=20261028-prepara-pick-1">
 <!-- Conversación de un Take y botón de compartir en las tarjetas (28 oct): al final, como los ajustes del teléfono. -->
 <link rel="stylesheet" href="assets/cam-take-conversacion.css?v=20261028-1">
-<script src="assets/cam-sport-quiniela-loader.js?v=20261028-league-logos-1"></script>
+<script src="assets/cam-sport-quiniela-loader.js?v=20261028-cam-league-art-2"></script>
 <script src="assets/cam-nfl-profile.js?v=20261022-3tab-1"></script>
 <script src="assets/ae-season-predictions.js?v=20261021-champion-guide-1"></script>
 <script src="assets/cam-lazy-editorial-loader.js?v=20261024-1"></script>
