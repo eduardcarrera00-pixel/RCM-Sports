@@ -2489,6 +2489,23 @@ html body:is(.ae-is-home,.ae-is-opinions) #mainContent #aeTrendingPortada #trend
 html body:is(.ae-is-home,.ae-is-opinions) #mainContent #aeTrendingPortada #trendingList .ae-trending-link .ae-trending-meta i{
   flex-shrink:0!important;
 }
+
+/* La portada de «Lo más leído» es una tarjeta editorial, no un botón cápsula.
+   En la misma capa se anula exclusivamente el radio global de los botones. */
+@layer cam-rounded-editorial {
+  html body:is(.ae-is-home,.ae-is-opinions) #mainContent #aeTrendingPortada #trendingList > li.ae-trending-item.is-featured {
+    border-radius:var(--ds-radius-card,18px)!important;
+  }
+  html body:is(.ae-is-home,.ae-is-opinions) #mainContent #aeTrendingPortada #trendingList > li.ae-trending-item.is-featured > button.ae-trending-link {
+    box-sizing:border-box!important;
+    border-radius:var(--ds-radius-card,18px)!important;
+    overflow:hidden!important;
+  }
+  html body:is(.ae-is-home,.ae-is-opinions) #mainContent #aeTrendingPortada #trendingList > li.ae-trending-item.is-featured .ae-trending-image {
+    border-radius:var(--ds-radius-card,18px)!important;
+    overflow:hidden!important;
+  }
+}
 </style>
 
 <style id="ae-picks-editorial-twins-league-20261017">
