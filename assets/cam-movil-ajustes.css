@@ -8,6 +8,7 @@
    6. Depuración de textos.
    7. Takes de Fútbol y NFL: la tarjeta crece con su texto (no se corta el voto).
    8. Power Rankings (NFL y Champions): nombres de equipo sin letras cortadas.
+   9. Opiniones apoyadas / hateadas de Fútbol: el voto se lee una sola vez.
 
    Las esquinas redondeadas viven en capas con !important (cam-rounded-editorial y
    cam-banners), que ganan a cualquier regla fuera de capa; por eso los ajustes de
@@ -588,5 +589,17 @@ html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-r
     height:100%!important;
     max-width:100%!important;
     max-height:100%!important;
+  }
+}
+
+/* ---------- 9 · Votos netos sin duplicar (28 oct) ---------- */
+/* En el teléfono, «Opiniones apoyadas» de Fútbol mostraba «+3 votos netos+3 netos»:
+   una regla antigua escondía el texto (font-size:0) para dejar solo la versión
+   corta del ::after, pero otra posterior le devolvía el tamaño. Se queda el texto
+   completo, que cabe, y se quita la copia corta. */
+@layer cam-banners {
+  html body.ae-is-football #mainContent #freeTakes > #aeSportTakeLeaders[data-sport="football"] .ae-sport-take-net[data-compact]::after {
+    content:none!important;
+    display:none!important;
   }
 }
