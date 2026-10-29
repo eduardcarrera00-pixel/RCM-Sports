@@ -302,7 +302,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
     </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
-<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261028-sin-ultimos-picks-1">
+<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261028-prepara-pick-1">
 <link rel="stylesheet" href="assets/cam-perf-core-extras.css?v=20261024-perf-css-1">
 <script defer src="assets/ae-nfl-mobile-telephoto.js?v=20261016-1"></script>
 <link rel="stylesheet" href="assets/ae-football-mobile-redesign.css?v=20261018-hide-football-trending-mobile-1">
@@ -2735,7 +2735,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
 <script src="assets/cam-logo-sizing.js?v=20261023-mobile-cache-sync-2"></script>
 <script src="assets/cam-banner-artwork.js?v=20261025-alpha-1"></script>
 <script src="assets/ae-site-images.js?v=20261025-readers-day-scroll-1"></script>
-<script src="assets/cam-site-texts.js?v=20261023-mobile-cache-sync-2"></script>
+<script src="assets/cam-site-texts.js?v=20261028-prepara-pick-1"></script>
 <script defer src="assets/cam-mobile-bottom-nav.js?v=20261022-mobile-svg-circles-integrated-1"></script>
 <link rel="stylesheet" href="assets/cam-pick-editor-night.css?v=20261021-editor-night-1">
 <link rel="stylesheet" href="assets/cam-global-edit.css?v=20261022-logo-size-1">
@@ -3450,13 +3450,12 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
 <dialog id="cpComposePanel" class="ae-pick-compose-dialog" aria-labelledby="cpComposeTitle" aria-describedby="cpComposeIntro">
  <header class="ae-pick-compose-head"><div><span>COCINA PICKS</span><h2 id="cpComposeTitle" tabindex="-1" autofocus>Prepara tu Pick</h2></div><button id="cpComposeClose" type="button" aria-label="Cerrar formulario de Pick">×</button></header>
  <div id="cpComposeIntro" class="cam-pick-hero" role="note">
-  <strong class="cam-pick-hero__title">¡A por el #1, Pickster!</strong>
   <div class="cam-pick-how">
-   <strong class="cam-pick-how__title">Cómo funcionan los Picks</strong>
-   <div class="cam-pick-hero__flow" aria-label="Sube la captura, preparamos tu Pick y borramos la foto">
+   <button type="button" class="cam-pick-how__title" aria-expanded="true" aria-controls="camPickHowFlow camPickHowNote camPickPointsRules">Cómo funcionan los Picks<svg class="cam-pick-how__chevron" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6"/></svg></button>
+   <div id="camPickHowFlow" class="cam-pick-hero__flow" aria-label="Sube la captura, preparamos tu Pick y borramos la foto">
     <span>Sube captura</span><span aria-hidden="true">→</span><span>Preparamos tu Pick</span><span aria-hidden="true">→</span><span>Borramos la foto</span>
    </div>
-   <small>Revisa los datos. <strong>Tú decides si publicarlo.</strong></small>
+   <small id="camPickHowNote">Revisa los datos. <strong>Tú decides si publicarlo.</strong></small>
    <details id="camPickPointsRules" class="cam-pick-rules">
     <summary>
      <svg class="cam-pick-rules__trophy" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 4h8v4c0 3.5-1.6 6-4 6s-4-2.5-4-6V4Zm0 2H5v2c0 2 1.2 3 3.7 3.2M16 6h3v2c0 2-1.2 3-3.7 3.2M12 14v4M8 20h8"/></svg>
@@ -5632,8 +5631,8 @@ updateThemeButton();
 <script src="assets/ae-home-community-spotlight.js?v=20261018-reply-totals-1"></script>
 <script src="assets/champions.js?v=20261021-rank-notes-1"></script>
 <script src="assets/ae-ranking-notes.js?v=20261021-editorial-1"></script>
-<script src="assets/ae-pick-capture.js?v=20261028-sin-ultimos-picks-1"></script>
-<script src="assets/community-picks.js?v=20261028-sin-ultimos-picks-1"></script>
+<script src="assets/ae-pick-capture.js?v=20261028-prepara-pick-1"></script>
+<script src="assets/community-picks.js?v=20261028-prepara-pick-1"></script>
 <script src="assets/weekly-picks.js?v=20261015-1"></script>
 <script src="assets/username-auth.js?v=20261020-classical-auth-panel-1"></script>
 <script src="assets/ae-category-visibility.js?v=20261016-dynamic-nav-1"></script>
@@ -6567,7 +6566,7 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 
 <link rel="stylesheet" href="assets/cam-nfl-profile.css?v=20261022-3tab-1">
 <!-- Ajustes de diseño para el teléfono (28 oct): va al final para ganar a las capas anteriores. -->
-<link rel="stylesheet" href="assets/cam-movil-ajustes.css?v=20261028-votos-netos-1">
+<link rel="stylesheet" href="assets/cam-movil-ajustes.css?v=20261028-prepara-pick-1">
 <!-- Conversación de un Take y botón de compartir en las tarjetas (28 oct): al final, como los ajustes del teléfono. -->
 <link rel="stylesheet" href="assets/cam-take-conversacion.css?v=20261028-1">
 <script src="assets/cam-sport-quiniela-loader.js?v=20261028-league-logos-1"></script>

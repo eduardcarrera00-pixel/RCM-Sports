@@ -34,7 +34,7 @@ assert.equal(parserLoads,0,'No parser request is made before the reader selects 
 assert.equal(form.firstElementChild,panel,'Screenshot comes before the form fields');
 assert.equal(privacy.hidden,true,'No cleanup claim before an image is selected');
 upload();for(let i=0;i<16&&panel.dataset.state==='reading';i++)await settle();assert.equal(parserLoads,1,'The OCR parser downloads once on first use');assert.equal(panel.dataset.state,'matched','OCR must reach matched after async parser load: '+panel.dataset.state+' / '+d.getElementById('cpCaptureStatus')?.textContent);assert.equal(input.files.length,0);assert.ok(canvases.every(c=>c.width===1&&c.height===1));assert.equal(terminated,1);assert.equal(closed,1);
-assert.equal(privacy.dataset.state,'complete');assert.match(privacy.textContent,/Captura descartada/);assert.match(privacy.textContent,/solo guardamos los datos de tu pick/);assert.ok(Array.from(privacy.querySelectorAll('li')).every(step=>step.dataset.state==='complete'));
+assert.equal(privacy.dataset.state,'complete');assert.equal(privacy.hidden,true,'Once discarded, step 03 is the only note on screen');assert.match(privacy.textContent,/Captura descartada/);assert.match(privacy.textContent,/solo guardamos los datos de tu pick/);assert.ok(Array.from(privacy.querySelectorAll('li')).every(step=>step.dataset.state==='complete'));
 assert.equal(picks[0].odds,150,'Odds were imported without any typed inputs');assert.equal(picks[0].sport,'NBA');assert.equal(controller.hasImport(),true);
 assert.equal(d.querySelector('#cpCaptureConfirm'),null,'Publishing a reviewed ticket needs no separate confirmation checkbox');
 assert.equal(controller.isConfirmed(),true);

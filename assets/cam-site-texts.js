@@ -34,7 +34,6 @@
     ['picks.ranking.worst','#cpWorstRankingTitle','Picks · Peores Chefs'],
     ['picks.all','#cpArchiveTitle','Picks · Todos los Picks'],
     ['picks.composer','#cpComposeTitle','Picks · Prepara tu Pick'],
-    ['picks.composer.hero','.cam-pick-hero__title','Picks · Instrucciones · Título'],
     ['picks.composer.how','.cam-pick-how__title','Picks · Cómo funcionan los Picks'],
     ['picks.composer.rules','.cam-pick-rules__lead','Picks · Reglas de puntos'],
     ['picks.table.label','.ae-pick-history-kicker','Picks · Resultados · Etiqueta'],

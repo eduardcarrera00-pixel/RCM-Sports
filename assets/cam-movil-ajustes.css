@@ -9,6 +9,8 @@
    7. Takes de Fútbol y NFL: la tarjeta crece con su texto (no se corta el voto).
    8. Power Rankings (NFL y Champions): nombres de equipo sin letras cortadas.
    9. Opiniones apoyadas / hateadas de Fútbol: el voto se lee una sola vez.
+   10. Prepara tu Pick: título sin marco, «Cómo funcionan los Picks» plegable y
+       separadores rectos.
 
    Las esquinas redondeadas viven en capas con !important (cam-rounded-editorial y
    cam-banners), que ganan a cualquier regla fuera de capa; por eso los ajustes de
@@ -601,5 +603,90 @@ html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-r
   html body.ae-is-football #mainContent #freeTakes > #aeSportTakeLeaders[data-sport="football"] .ae-sport-take-net[data-compact]::after {
     content:none!important;
     display:none!important;
+  }
+}
+
+/* ---------- 10 · Prepara tu Pick (28 oct) ---------- */
+/* El título del diálogo y el de la vista previa reciben el foco al abrirse (para
+   empezar la lectura por ellos sin sacar el teclado del teléfono). El anillo de
+   foco global los rodeaba con un marco blanco que parecía texto seleccionado.
+   No se puede llegar a ellos con el tabulador, así que no necesitan anillo. */
+html:not(#ds):not(#ds):not(#ds) body #cpComposePanel :is(#cpComposeTitle,#cpPreviewTitle):is(:focus,:focus-visible) {
+  outline:none!important;
+  box-shadow:none!important;
+}
+
+/* «Cómo funcionan los Picks»: el título abre y cierra la explicación. Abierta la
+   primera vez; después plegada, para que «Subir captura» quede arriba. */
+html body dialog#cpComposePanel #cpComposeIntro .cam-pick-how > button.cam-pick-how__title {
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:10px!important;
+  width:100%!important;
+  min-height:32px!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  color:var(--cp-dialog-ink)!important;
+  text-align:left!important;
+  cursor:pointer!important;
+}
+html body dialog#cpComposePanel #cpComposeIntro .cam-pick-how__chevron {
+  flex:0 0 auto;
+  width:18px;
+  height:18px;
+  fill:none;
+  stroke:var(--cp-dialog-action,#855b43);
+  stroke-width:2;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  transform:rotate(180deg);
+  transition:transform .2s ease;
+}
+html body dialog#cpComposePanel #cpComposeIntro .cam-pick-how[data-collapsed="true"] .cam-pick-how__chevron {
+  transform:none;
+}
+html body dialog#cpComposePanel #cpComposeIntro .cam-pick-how[data-collapsed="true"] > :not(.cam-pick-how__title) {
+  display:none!important;
+}
+@media (prefers-reduced-motion:reduce) {
+  html body dialog#cpComposePanel #cpComposeIntro .cam-pick-how__chevron { transition:none; }
+}
+/* Ahora es un botón: la capa de tipografía pondría la letra del texto corrido.
+   Se queda con la misma letra que tenía como título. */
+@layer cam-rounded-editorial {
+  html body dialog#cpComposePanel #cpComposeIntro .cam-pick-how > button.cam-pick-how__title {
+    font-family:Inter,system-ui,sans-serif!important;
+  }
+}
+
+/* «Publicar Pick» aparece solo cuando hay una captura válida (ae-pick-capture.css).
+   Mientras tanto, aire al final para que la tarjeta no toque el borde del diálogo. */
+html body #cpComposePanel #cpForm.cp-capture-first:not([data-imported="true"]) {
+  padding-bottom:max(18px,env(safe-area-inset-bottom))!important;
+}
+
+/* Separadores rectos: la esquina global de 14 px curvaba las líneas que solo
+   tienen borde arriba o abajo (reglas de puntos, aviso de lectura, pasos de la
+   lectura, comentario, apuestas sencillas, pie de publicar). */
+@layer cam-rounded-editorial {
+  html body #cpComposePanel :is(#camPickPointsRules,.cam-pick-rules__list,.cam-pick-rules__list > li,
+    .cp-capture-privacy,.cp-capture-privacy-steps > li,.cp-capture-overlay-steps > li,
+    .ae-draft-tools,.cp-compose-analysis,.cp-compose-date,.cp-singles,.cp-single,
+    .cp-compose-preview dl,.cp-compose-preview dl > div,.cp-compose-ticket-choices > li) {
+    border-radius:0!important;
+  }
+  /* La cabecera conserva arriba la esquina del diálogo; abajo, línea recta. */
+  html body #cpComposePanel > .ae-pick-compose-head {
+    border-bottom-left-radius:0!important;
+    border-bottom-right-radius:0!important;
+  }
+  /* El pie conserva abajo la esquina del diálogo; arriba, línea recta. */
+  html body #cpComposePanel #cpForm > .cp-compose-footer {
+    border-top-left-radius:0!important;
+    border-top-right-radius:0!important;
   }
 }

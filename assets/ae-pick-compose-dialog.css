@@ -75,10 +75,6 @@ html body dialog#cpComposePanel #cpComposeIntro.cam-pick-hero{
  border:1px solid rgba(170,130,88,.3)!important;border-left:3px solid var(--cp-dialog-action)!important;
  background:rgba(164,116,72,.07)!important;color:var(--cp-dialog-ink)!important;
 }
-html body dialog#cpComposePanel #cpComposeIntro.cam-pick-hero .cam-pick-hero__title{
- display:block!important;font:600 clamp(20px,4.9vw,25px)/1.12 Newsreader,Georgia,serif!important;
- color:var(--cp-dialog-ink)!important;letter-spacing:-.01em!important;
-}
 html body dialog#cpComposePanel #cpComposeIntro.cam-pick-hero .cam-pick-hero__flow{
  display:flex!important;align-items:center!important;flex-wrap:wrap!important;gap:4px 7px!important;
  font:750 11px/1.35 Inter,system-ui,sans-serif!important;
@@ -175,9 +171,6 @@ html body dialog#cpComposePanel #cpComposeTitle{font-size:27px;}
 html body dialog#cpComposePanel #cpComposeIntro.cam-pick-hero{
  display:block!important;margin:13px 24px 0!important;padding:0!important;
  border:0!important;background:transparent!important;
-}
-html body dialog#cpComposePanel #cpComposeIntro.cam-pick-hero .cam-pick-hero__title{
- margin:0 0 9px!important;font-size:clamp(20px,4.7vw,24px)!important;
 }
 html body dialog#cpComposePanel #cpComposeIntro.cam-pick-hero .cam-pick-how{
  display:grid;gap:7px;padding:11px 12px;border:1px solid var(--cp-dialog-line);

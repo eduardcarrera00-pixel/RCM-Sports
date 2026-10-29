@@ -845,12 +845,11 @@ function buildComposer(){
  const previewTitle=el('h3','Tu apuesta, lista para revisar');previewTitle.id='cpPreviewTitle';
  previewTitle.tabIndex=-1;
  const changeCapture=button('Cambiar captura',()=>capture?.clear());changeCapture.className='cp-compose-change-capture';
- const previewPrivacy=el('p','Captura descartada de la memoria del lector. No se envía ni guarda la imagen.','cp-compose-hint');
  const previewNote=el('p','Revisa estos datos antes de publicar.','cp-compose-hint');
  const previewLegs=el('div',null,'cp-compose-preview-legs'),previewTotal=el('p','','cp-compose-preview-total');
  // Apuestas sencillas: cada una se revisa en una línea y se publica como un Pick propio.
  const singlesList=el('ol',null,'cp-singles');
- preview.append(previewTitle,previewPrivacy,changeCapture,previewNote,singlesList,previewLegs,previewTotal);singlesList.hidden=true;
+ preview.append(previewTitle,changeCapture,previewNote,singlesList,previewLegs,previewTotal);singlesList.hidden=true;
  let previewKey='',originalBeforeBoost=false,captureReadings=[],singles=null;
  const validDay=value=>{const stamp=Date.parse(value+'T12:00:00Z');return /^\d{4}-\d{2}-\d{2}$/.test(value)&&Number.isFinite(stamp)&&new Date(stamp).toISOString().slice(0,10)===value&&value>=todayToronto()&&value<=eventDay.input.max;};
  const signed=n=>(n>0?'+':'')+n;
@@ -1287,8 +1286,23 @@ function closePickComposer(force=false){
  if(dialog?.open)dialog.close();
  syncPickComposer();
 }
+// «Cómo funcionan los Picks» se ve abierto la primera vez; después queda plegado
+// para que «Subir captura» quede arriba. El título lo abre y lo cierra.
+const PICK_HOW_SEEN='cam_pick_how_seen_v1';
+function setPickHowOpen(open){
+ const how=document.querySelector('#cpComposeIntro .cam-pick-how');if(!how)return;
+ how.dataset.collapsed=String(!open);
+ how.querySelector('.cam-pick-how__title')?.setAttribute('aria-expanded',String(open));
+}
+function preparePickHow(){
+ let seen=false;
+ try{seen=localStorage.getItem(PICK_HOW_SEEN)==='1';}catch{}
+ setPickHowOpen(!seen);
+ if(!seen){try{localStorage.setItem(PICK_HOW_SEEN,'1');}catch{}}
+}
 async function showPickComposer(){
  const dialog=$('cpComposePanel');if(!dialog)return;
+ if(!dialog.open)preparePickHow();
  await window.aeDraftGuard?.restore('pick');
  // A publication CTA can originate outside Picks; return to the correct
  // section only AFTER authentication has been completed.
@@ -1307,6 +1321,9 @@ document.addEventListener('DOMContentLoaded',()=>{
  buildComposer();
  $('cpPublishCta')?.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();void openPickComposer();});
  $('cpComposeClose')?.addEventListener('click',()=>closePickComposer());
+ document.querySelector('#cpComposeIntro .cam-pick-how__title')?.addEventListener('click',event=>{
+  setPickHowOpen(event.currentTarget.closest('.cam-pick-how')?.dataset.collapsed==='true');
+ });
  $('cpComposePanel')?.addEventListener('close',syncPickComposer);
  $('cpComposePanel')?.addEventListener('cancel',e=>{if(posting)e.preventDefault();});
  renderCommunityPicksVisibility();load();window.addEventListener('resize',()=>{sizeFeedWindow();sizeChefRankingWindows();sizePlateWindow($('picksPopular'));sizePlateWindow($('picksQuestioned'));},{passive:true});if(document.fonts?.ready)document.fonts.ready.then(()=>{sizeFeedWindow();sizeChefRankingWindows();sizePlateWindow($('picksPopular'));sizePlateWindow($('picksQuestioned'));});$('cpReload')?.addEventListener('click',load);$('cpWorstReload')?.addEventListener('click',loadWorstRanking);$('cpViewAll')?.addEventListener('click',()=>{const dlg=$('cpArchiveDialog');if(dlg&&!dlg.open)dlg.showModal();archiveLimit=30;loadArchive();});$('cpArchiveClose')?.addEventListener('click',closeArchive);$('cpArchiveMore')?.addEventListener('click',()=>{archiveLimit+=30;loadArchive();});for(const [id,mode] of [['cpRankMonth','month'],['cpRankHistory','all']]){$(id)?.addEventListener('click',()=>{currentRank=mode;for(const [i,m] of [['cpRankMonth','month'],['cpRankHistory','all']])$(i)?.setAttribute('aria-pressed',String(currentRank===m));loadRanking();});}for(const [id,mode] of [['cpWorstRankMonth','month'],['cpWorstRankHistory','all']]){

@@ -25,13 +25,15 @@ const css=[
    document.getElementById('cpComposePanel').showModal();
   });
 
-  assert.equal(await page.locator('.cam-pick-hero__title').innerText(),'¡A por el #1, Pickster!');
+  assert.equal(await page.locator('#cpComposeIntro .cam-pick-hero__title').count(),0,'The invitation lives next to the upload button');
   assert.equal(await page.locator('.cam-pick-how__title').innerText(),'Cómo funcionan los Picks');
   assert.match(await page.locator('.cam-pick-hero__flow').innerText(),/Sube captura[\s\S]*Preparamos tu Pick[\s\S]*Borramos la foto/);
   assert.equal(await page.locator('.cam-pick-how > #camPickPointsRules').count(),1);
-  assert.equal(await page.locator('.cp-capture-title').innerText(),'Sube tu captura');
+  assert.equal(await page.locator('.cp-capture-title').innerText(),'¡A por el #1, Pickster!');
+  assert.equal(await page.locator('.cam-pick-how__title').getAttribute('aria-expanded'),'true');
   assert.match(await page.locator('.cp-capture-intro').innerText(),/Lideratos en disputa[\s\S]*tablas mensuales e históricas/);
-  assert.equal(await page.locator('.cp-capture-help').innerText(),'No guardamos ni publicamos la captura.');
+  assert.equal(await page.locator('.cp-capture-help').count(),0,'Step 03 is the only note about deleting the photo');
+  assert.doesNotMatch(await page.locator('.cp-capture').innerText(),/descartamos|no guardamos/i);
   assert.doesNotMatch(await page.locator('.cp-capture').innerText(),/PNG|JPG|WebP|8 MB/);
   assert.equal(await page.locator('#camPickBrowseLatest').count(),0,'The composer no longer links to the latest Picks');
   assert.equal(await page.locator('.cp-capture').evaluate(el=>el.lastElementChild?.classList.contains('cp-capture-proof')),true);
@@ -44,14 +46,13 @@ const css=[
    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
    const layout=await page.evaluate(()=>{
     const panel=document.getElementById('cpComposePanel');
-    const title=document.querySelector('.cam-pick-hero__title').getBoundingClientRect();
     const how=document.querySelector('.cam-pick-how').getBoundingClientRect();
     const capture=document.querySelector('.cp-capture').getBoundingClientRect();
     const rect=panel.getBoundingClientRect();
     return {
      fits:rect.left>=-1&&rect.right<=innerWidth+1,
      noOverflow:panel.scrollWidth<=panel.clientWidth+1,
-     ordered:title.bottom<=how.top+1&&how.bottom<=capture.top+1,
+     ordered:how.bottom<=capture.top+1,
      captureFits:capture.left>=rect.left-1&&capture.right<=rect.right+1
     };
    });

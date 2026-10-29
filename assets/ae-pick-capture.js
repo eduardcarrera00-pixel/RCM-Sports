@@ -53,7 +53,7 @@
    reading:['Leyendo tu apuesta','Buscamos el partido, tu pronóstico y el momio en la captura.'],
    discarding:['Borrando tu captura','Eliminamos la imagen de esta página. Solo nos quedamos con los datos de tu pick.'],
    complete:['Captura eliminada','No guardamos la imagen. Tu foto original sigue solo en tu dispositivo.'],
-   failed:['Captura eliminada','No pudimos leer todos los datos, pero la imagen ya no está en la página. Prueba con otra captura más nítida.'],
+   failed:['No pudimos leer la captura','Prueba con otra captura más nítida.'],
    unconfirmed:['No pudimos confirmar el borrado','Recarga la página antes de volver a intentarlo para cerrar el lector por completo.']
   };
   let hideTimer=null;
@@ -63,6 +63,7 @@
    title.textContent=copy[state][0];text.textContent=note||copy[state][1];
    const index={reading:0,discarding:1,complete:2,failed:2,unconfirmed:1}[state];
    Array.from(steps.children).forEach((step,i)=>{step.dataset.state=i<index||((state==='complete'||state==='failed')&&i===index)?'complete':i===index?'active':'pending';});
+   if(state==='failed')steps.children[0].dataset.state='error';
    meter.hidden=state!=='reading';cancel.hidden=state!=='reading';close.hidden=state!=='unconfirmed';
    if(state==='reading')progress(percent);
    if(state==='unconfirmed')close.focus({preventScroll:true});
@@ -177,12 +178,11 @@
   let result=null,signature='',active=null,sequence=0,usedAi=false;
   const fingerprint=()=>JSON.stringify({picks:getPicks().map(p=>({sport:p.sport,event:p.event,selection:p.selection,odds:Number(p.odds)}))});
   const panel=node('section',null,'cp-capture');panel.setAttribute('aria-labelledby','cpCaptureTitle');
-  const title=node('h3','Sube tu captura','cp-capture-title');title.id='cpCaptureTitle';
+  const title=node('h3','¡A por el #1, Pickster!','cp-capture-title');title.id='cpCaptureTitle';
   const intro=node('p',null,'cp-capture-intro');
   intro.append(node('strong','Lideratos en disputa.'),document.createTextNode(' Compite en las tablas mensuales e históricas.'));
-  const picker=node('button','Subir captura','cp-capture-picker'),input=document.createElement('input');picker.type='button';picker.setAttribute('aria-describedby','cpCaptureHelp cpCaptureStatus');
+  const picker=node('button','Subir captura','cp-capture-picker'),input=document.createElement('input');picker.type='button';picker.setAttribute('aria-describedby','cpCaptureStatus');
   input.type='file';input.id='cpCaptureFile';input.accept='image/png,image/jpeg,image/webp';input.multiple=true;input.hidden=true;picker.addEventListener('click',()=>input.click());
-  const help=node('p','No guardamos ni publicamos la captura.','cp-capture-help');help.id='cpCaptureHelp';
   const status=node('p','','cp-capture-status');status.id='cpCaptureStatus';status.setAttribute('role','status');status.setAttribute('aria-live','polite');
   const privacy=node('div',null,'cp-capture-privacy');privacy.hidden=true;privacy.setAttribute('role','status');privacy.setAttribute('aria-live','polite');privacy.setAttribute('aria-atomic','true');
   const privacyIcon=document.createElementNS('http://www.w3.org/2000/svg','svg');privacyIcon.setAttribute('viewBox','0 0 32 32');privacyIcon.setAttribute('aria-hidden','true');privacyIcon.classList.add('cp-capture-privacy-icon');
@@ -196,10 +196,11 @@
   const progressBar=node('span',null,'cp-capture-progress-bar');progress.append(progressBar);
   const summary=node('ul',null,'cp-capture-readings');summary.hidden=true;
   const cancel=node('button','Cancelar lectura','cp-capture-cancel');cancel.type='button';cancel.hidden=true;
-  // El comprobante es temporal; este aviso acompaña al botón sin alterar el proceso.
+  // El comprobante es temporal. Que la foto se borra ya lo dice el paso 03 de «Cómo funcionan los Picks»:
+  // aquí no se repite.
   const proof=node('p',null,'cp-capture-proof');
-  proof.append(node('strong','Aquí lo que se canta se baila.'),node('span','Pedimos tu captura como evidencia del Pick. La leemos y después la descartamos.'));
-  panel.append(title,picker,intro,input,shot,help,progress,privacy,status,summary,cancel,proof);
+  proof.append(node('strong','Aquí lo que se canta se baila.'),node('span','Pedimos tu captura como evidencia del Pick.'));
+  panel.append(title,picker,intro,input,shot,progress,privacy,status,summary,cancel,proof);
   form.prepend(panel);form.classList.add('cp-capture-first');
   const overlay=makeOverlay(form.closest('dialog')||document.body,()=>clear('Lectura cancelada.',true));
   const isCurrent=job=>active===job&&!job.cancelled;
@@ -249,6 +250,9 @@
     privacySteps.children[0].textContent='Sin lectura';privacySteps.children[0].dataset.state='error';privacySteps.children[2].textContent='Descartada';
     privacyText.textContent='La imagen no se ha subido ni guardado. Prueba con otra captura para preparar tu pick.';
    }
+   // Terminado el descarte, el aviso no se queda en pantalla: el paso 03 ya lo explica.
+   // Mientras se lee sí se ve (dice si la imagen va al lector de Google) y también si el descarte falla.
+   if(state==='complete')privacy.hidden=true;
   }
   function dispose(job){
    if(!job)return Promise.resolve(true);
@@ -272,7 +276,7 @@
   }
   function clear(message='Elige una captura para importar tu apuesta y su momio.',showDiscard=false){
    const job=stop(),revision=++sequence;if(!(showDiscard&&job))overlay.hide();result=null;signature='';summary.hidden=true;summary.replaceChildren();privacy.hidden=true;
-   input.value='';picker.textContent='Subir captura';title.textContent='Sube tu captura';panel.dataset.state='empty';status.textContent=message;shotImage.removeAttribute('src');shot.hidden=true;progress.hidden=true;progressBar.style.width='0%';applyImport(null);onChange();
+   input.value='';picker.textContent='Subir captura';title.textContent='¡A por el #1, Pickster!';panel.dataset.state='empty';status.textContent=message;shotImage.removeAttribute('src');shot.hidden=true;progress.hidden=true;progressBar.style.width='0%';applyImport(null);onChange();
    if(showDiscard&&job){
     showPrivacy('discarding');
     void dispose(job).then(discarded=>{if(sequence===revision&&!active)showPrivacy(discarded?'complete':'unconfirmed');});
