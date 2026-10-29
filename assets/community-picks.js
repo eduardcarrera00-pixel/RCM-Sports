@@ -1307,11 +1307,6 @@ document.addEventListener('DOMContentLoaded',()=>{
  buildComposer();
  $('cpPublishCta')?.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();void openPickComposer();});
  $('cpComposeClose')?.addEventListener('click',()=>closePickComposer());
- $('camPickBrowseLatest')?.addEventListener('click',()=>{
-  closePickComposer();
-  const feed=$('cpFeed');
-  if(feed)feed.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
- });
  $('cpComposePanel')?.addEventListener('close',syncPickComposer);
  $('cpComposePanel')?.addEventListener('cancel',e=>{if(posting)e.preventDefault();});
  renderCommunityPicksVisibility();load();window.addEventListener('resize',()=>{sizeFeedWindow();sizeChefRankingWindows();sizePlateWindow($('picksPopular'));sizePlateWindow($('picksQuestioned'));},{passive:true});if(document.fonts?.ready)document.fonts.ready.then(()=>{sizeFeedWindow();sizeChefRankingWindows();sizePlateWindow($('picksPopular'));sizePlateWindow($('picksQuestioned'));});$('cpReload')?.addEventListener('click',load);$('cpWorstReload')?.addEventListener('click',loadWorstRanking);$('cpViewAll')?.addEventListener('click',()=>{const dlg=$('cpArchiveDialog');if(dlg&&!dlg.open)dlg.showModal();archiveLimit=30;loadArchive();});$('cpArchiveClose')?.addEventListener('click',closeArchive);$('cpArchiveMore')?.addEventListener('click',()=>{archiveLimit+=30;loadArchive();});for(const [id,mode] of [['cpRankMonth','month'],['cpRankHistory','all']]){$(id)?.addEventListener('click',()=>{currentRank=mode;for(const [i,m] of [['cpRankMonth','month'],['cpRankHistory','all']])$(i)?.setAttribute('aria-pressed',String(currentRank===m));loadRanking();});}for(const [id,mode] of [['cpWorstRankMonth','month'],['cpWorstRankHistory','all']]){

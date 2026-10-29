@@ -33,7 +33,7 @@ const css=[
   assert.match(await page.locator('.cp-capture-intro').innerText(),/Lideratos en disputa[\s\S]*tablas mensuales e históricas/);
   assert.equal(await page.locator('.cp-capture-help').innerText(),'No guardamos ni publicamos la captura.');
   assert.doesNotMatch(await page.locator('.cp-capture').innerText(),/PNG|JPG|WebP|8 MB/);
-  assert.equal(await page.locator('.cp-capture .cam-pick-hero__challenge > #camPickBrowseLatest').count(),1);
+  assert.equal(await page.locator('#camPickBrowseLatest').count(),0,'The composer no longer links to the latest Picks');
   assert.equal(await page.locator('.cp-capture').evaluate(el=>el.lastElementChild?.classList.contains('cp-capture-proof')),true);
 
   const qa=process.env.AE_CAPTURE_QA_DIR;
