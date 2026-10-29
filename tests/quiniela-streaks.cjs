@@ -1,0 +1,16 @@
+const assert=require('node:assert/strict');
+const vm=require('node:vm');
+const fs=require('node:fs');
+const window={};
+vm.runInNewContext(fs.readFileSync('assets/cam-quiniela-standings.js','utf8'),{window});
+const {streak}=window.CamQuinielaStandings;
+const result=(id,day,value)=>({id,kickoff:`2026-10-${day}T18:00:00Z`,result:value});
+const outcomes=[result('a',20,'correct'),result('b',21,'incorrect'),result('c',22,'correct'),result('d',23,'correct'),result('e',24,'void')];
+assert.equal(streak(outcomes,4).count,2,'Unordered finals are chronological; voids do not interrupt a streak');
+assert.equal(streak(outcomes,4).partial,false);
+assert.equal(streak([...outcomes,result('f',25,'incorrect')],5).count,0,'A recent miss resets the streak');
+assert.equal(streak([result('a',22,'correct'),result('b',23,'correct')],20).partial,true,'A capped all-winning history is a lower bound, not a fabricated full streak');
+assert.equal(streak([result('a',22,'correct')],1).partial,false);
+assert.equal(streak([],3),null,'An unavailable history never fabricates a zero');
+assert.equal(streak([result('a',24,'void')],0),null);
+console.log('PASS: chronological streaks, miss resets, void exclusions and capped/incomplete history.');

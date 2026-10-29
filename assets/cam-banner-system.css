@@ -15,8 +15,8 @@
     --cam-banner-radius:20px;
     --cam-banner-pad:clamp(16px,2vw,24px);
     --cam-banner-gap:16px;
-    --cam-banner-art-width:144px;
-    --cam-banner-art-height:88px;
+    --cam-banner-art-width:56px;
+    --cam-banner-art-height:56px;
     --cam-banner-card-height:120px;
     --cam-banner-title-size:clamp(20px,1.8vw,25px);
   }
@@ -139,7 +139,8 @@
     filter:none!important;
   }
   [data-cam-banner] > :is(h2,h3,.ae-weekly-heading-inline,.ae-picks-nudge,
-    .cam-home-take-square-label,.ae-rank-title-wrap) {
+    .cam-home-take-square-label,.ae-rank-title-wrap),
+  #aeTakesFeedHeading {
     position:relative!important;
     grid-column:1!important;
     grid-row:auto!important;
@@ -171,6 +172,18 @@
     overflow-wrap:break-word!important;
     text-wrap:pretty!important;
     clip-path:none!important;
+  }
+  /* Nested titles inherit the same scale as Popular Takes, including the
+     headings inside the Picks and Opinions wrappers. */
+  [data-cam-banner] :is(.ae-rank-title-wrap h3,.ae-weekly-heading-inline h3) {
+    font:inherit!important;
+    letter-spacing:inherit!important;
+    text-transform:none!important;
+    text-align:left!important;
+    margin:0!important;
+    padding:0!important;
+    white-space:normal!important;
+    overflow:visible!important;
   }
   [data-cam-banner] > :is(h2,h3)::before,
   [data-cam-banner] > :is(h2,h3)::after {
@@ -215,12 +228,7 @@
     margin:0!important;
   }
   [data-cam-banner="feature"] {
-    --cam-banner-art-height:120px;
-    min-height:176px!important;
-    padding-block:24px!important;
-  }
-  [data-cam-banner="feature"] > h2 {
-    font-size:clamp(26px,2.6vw,36px)!important;
+    min-height:var(--cam-banner-card-height)!important;
   }
   [data-cam-banner][hidden], [data-cam-banner].hidden { display:none!important; }
 
@@ -254,13 +262,6 @@
     min-height:0!important;
     max-height:none!important;
     overflow:visible!important;
-  }
-  [data-cam-banner].ae-chefs-art-heading,
-  [data-cam-banner].ae-picks-rail-heading {
-    --cam-banner-title-size:13px;
-  }
-  [data-cam-banner].ae-picks-heading-cta-row .ae-picks-nudge {
-    font-size:24px!important;
   }
   [data-cam-banner].ae-picks-heading-cta-row .ae-picks-nudge::before,
   [data-cam-banner].ae-picks-heading-cta-row .ae-picks-nudge::after {
@@ -316,6 +317,35 @@
   }
   :is(#nflRankings,#championsRankings) :is(.ae-ranking-kicker,.ae-rank-subtitle,#nflSubtitle,#championsSubtitle) {
     color:var(--cam-banner-copy)!important;
+  }
+  /* One clean title in both sports. No separate prefix or decorative glyph
+     above it; the section's accessible label still identifies the league. */
+  :is(#nflRankings,#championsRankings) .ae-rank-title-wrap > .ae-rank-overline {
+    display:none!important;
+  }
+  :is(#rankingTitle,#championsTitle),
+  :is(#rankingTitle,#championsTitle) > span {
+    font:600 var(--cam-banner-title-size)/1.2 "Playfair Display",Georgia,serif!important;
+    letter-spacing:normal!important;
+    text-align:left!important;
+    text-transform:none!important;
+    white-space:normal!important;
+    overflow:visible!important;
+    margin:0!important;
+    padding:0!important;
+  }
+  :is(#rankingTitle,#championsTitle,.ae-rank-overline)::before,
+  :is(#rankingTitle,#championsTitle,.ae-rank-overline)::after {
+    content:none!important;
+    display:none!important;
+  }
+  footer a:is([aria-label="CAM Sports en Instagram"],[aria-label="CAM Sports en X"],[aria-label="CAM Sports en TikTok"]) > :is(i,svg) {
+    display:block!important;
+    width:18px!important;
+    height:18px!important;
+    font-size:18px!important;
+    line-height:1!important;
+    flex:none!important;
   }
   [data-cam-banner] > .cam-op-banner-image {
     background:transparent!important;
@@ -389,7 +419,7 @@
   }
   .cam-nfl-top > .cam-nfl-heading[data-cam-banner] {
     padding:0!important;
-    min-height:176px!important;
+    min-height:var(--cam-banner-card-height)!important;
     border-radius:0!important;
     box-shadow:none!important;
   }
@@ -397,14 +427,13 @@
   .cam-nfl-heading[data-cam-banner-key^="futbol.quiniela"] > .cam-football-quiniela-illustration {
     display:none!important;
   }
-  .cam-nfl-heading[data-cam-banner] > h2 { font-size:28px!important; }
   .cam-nfl-heading[data-cam-banner] > span { font-size:10px!important; }
   .cam-nfl-heading[data-cam-banner] .cam-football-quiniela-illustration {
     position:absolute!important;
     top:50%!important;
     right:0!important;
     width:var(--cam-banner-art-width)!important;
-    height:120px!important;
+    height:var(--cam-banner-art-height)!important;
     max-width:none!important;
     object-fit:contain!important;
     object-position:center!important;
@@ -421,7 +450,7 @@
     grid-row:1 / span 4!important;
     align-self:center!important;
     width:var(--cam-banner-art-width)!important;
-    height:120px!important;
+    height:var(--cam-banner-art-height)!important;
     inset:auto!important;
     z-index:0!important;
     object-fit:contain!important;
@@ -429,93 +458,27 @@
   }
   [data-cam-banner-image] > .cam-op-banner-image { display:none!important; }
 
-  /* Narrow desktop columns need the same compact artwork as a phone, even
-     when the viewport itself is wide. Size follows the actual banner width. */
-  @container(max-width:380px) {
-    [data-cam-banner="card"] {
-      --cam-banner-art-width:96px;
-      --cam-banner-art-height:68px;
-      --cam-banner-pad:16px;
-      --cam-banner-title-size:20px;
-      min-height:104px!important;
-    }
-  }
-  @container(max-width:300px) {
-    [data-cam-banner="card"] {
-      --cam-banner-art-width:76px;
-      --cam-banner-art-height:62px;
-      --cam-banner-pad:14px;
-      --cam-banner-gap:10px;
-    }
-  }
-
   @media(max-width:760px) {
     :root {
       --cam-banner-pad:16px;
       --cam-banner-gap:12px;
-      --cam-banner-art-width:96px;
-      --cam-banner-art-height:68px;
+      --cam-banner-art-width:44px;
+      --cam-banner-art-height:44px;
       --cam-banner-card-height:104px;
       --cam-banner-title-size:20px;
     }
-    [data-cam-banner="feature"] {
-      --cam-banner-art-height:88px;
-      min-height:160px!important;
-      padding-block:18px!important;
-    }
-    [data-cam-banner="feature"] > h2 { font-size:26px!important; }
-    [data-cam-banner="feature"] > p { grid-column:1 / -1!important; }
-    [data-cam-banner="feature"] > #aeSportTakePublish {
-      grid-column:1 / -1!important;
-      justify-self:start!important;
-    }
-    [data-cam-banner="feature"]::after {
-      top:18px!important;
-      transform:none!important;
-    }
-    .cam-nfl-heading[data-cam-banner]::after { top:0!important; }
-    .cam-nfl-heading[data-cam-banner] > h2 { font-size:23px!important; }
     .cam-nfl-heading[data-cam-banner] .cam-football-quiniela-illustration {
-      height:88px!important;
-      top:0!important;
-      transform:none!important;
+      height:var(--cam-banner-art-height)!important;
     }
     [data-cam-banner] > .cam-op-banner-image {
       grid-row:1 / span 2!important;
-      height:88px!important;
+      height:var(--cam-banner-art-height)!important;
     }
   }
   @media(max-width:360px) {
     :root {
       --cam-banner-pad:14px;
       --cam-banner-gap:10px;
-      --cam-banner-art-width:76px;
-      --cam-banner-art-height:62px;
-    }
-    .cam-nfl-heading[data-cam-banner] > h2 { font-size:22px!important; }
-  }
-  /* Home community symbols are supporting marks, sized below the headline.
-     Keep this scoped to the four supplied icons, including both theme slots. */
-  :is([data-cam-banner-key^="portada.populares-"],
-      [data-cam-banner-key^="portada.impopulares-"],
-      [data-cam-banner-key^="portada.top-takes-"]) {
-    --cam-banner-art-width:56px;
-    --cam-banner-art-height:56px;
-  }
-  @media(max-width:760px) {
-    :is([data-cam-banner-key^="portada.populares-"],
-        [data-cam-banner-key^="portada.impopulares-"],
-        [data-cam-banner-key^="portada.top-takes-"]) {
-      --cam-banner-art-width:44px;
-      --cam-banner-art-height:44px;
-    }
-  }
-  @container(max-width:380px) {
-    :is([data-cam-banner-key^="portada.populares-"],
-        [data-cam-banner-key^="portada.impopulares-"],
-        [data-cam-banner-key^="portada.top-takes-"]) {
-      --cam-banner-art-width:44px;
-      --cam-banner-art-height:44px;
     }
   }
 

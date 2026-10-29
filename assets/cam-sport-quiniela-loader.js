@@ -6,12 +6,25 @@
   const base=new URL('.',document.currentScript?.src||new URL('assets/',location.href));
   const config={
     nfl:{className:'ae-is-nfl',root:'camNflQuiniela',status:'camNflStatus',
-      src:'cam-nfl-quiniela.js?v=20261026-ticket-views-1'},
+      src:'cam-nfl-quiniela.js?v=20261029-competition-1'},
     football:{className:'ae-is-football',root:'camFootballQuiniela',status:'camFootballStatus',
-      src:'cam-football-quiniela.js?v=20261028-cam-league-art-2'}
+      src:'cam-football-quiniela.js?v=20261029-competition-1'}
   };
   const requests=new Map();
   const loaded=new Set();
+  let standingsRequest=null;
+  function standings(){
+    if(window.CamQuinielaStandings)return Promise.resolve();
+    if(standingsRequest)return standingsRequest;
+    standingsRequest=new Promise((resolve,reject)=>{
+      const script=document.createElement('script');
+      script.src=new URL('cam-quiniela-standings.js?v=20261029-1',base).href;
+      script.onload=resolve;
+      script.onerror=()=>{script.remove();reject(Error('No se pudo cargar la clasificación.'));};
+      document.head.append(script);
+    }).catch(error=>{standingsRequest=null;throw error;});
+    return standingsRequest;
+  }
 
   function visible(key){
     return document.body.classList.contains(config[key].className);
@@ -27,7 +40,8 @@
     if(loaded.has(key))return Promise.resolve(true);
     if(requests.has(key))return requests.get(key);
     feedback(key,'Cargando La Quiniela…');
-    const task=new Promise((resolve,reject)=>{
+    // A presentation asset failing must never block the games or saving picks.
+    const task=standings().catch(()=>{}).then(()=>new Promise((resolve,reject)=>{
       const script=document.createElement('script');
       script.async=true;
       script.src=new URL(entry.src,base).href;
@@ -37,7 +51,7 @@
         reject(Error('No se pudo descargar La Quiniela. Vuelve a entrar en la sección para reintentar.'));
       };
       document.head.append(script);
-    }).catch(error=>{
+    })).catch(error=>{
       requests.delete(key);feedback(key,error.message);return false;
     });
     requests.set(key,task);

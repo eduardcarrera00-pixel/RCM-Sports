@@ -447,7 +447,7 @@
   async function paintRanking(){
     const target=$('camFootballRanking');if(!target)return;
     const ticket=++rankingRequest;
-    const rankingScope=scope;
+    const rankingScope=scope,rankingSeason=season,rankingCompetition=competition;
     target.replaceChildren(el('p','Cargando clasificación…'));
     const selected=roundGames()[0]||inScope()[0];
     const month=selected?monthOf(selected):new Date().toISOString().slice(0,7);
@@ -455,18 +455,25 @@
     if(caption)caption.textContent=scope==='all'?'Histórico · Todas las temporadas con resultados confirmados.':'Clasificación mensual · '+month;
     try{
       const rows=await run(client().rpc('cam_football_leaderboard',{
-        p_scope:rankingScope,p_season:season,p_competition:competition,
+        p_scope:rankingScope,p_season:rankingSeason,p_competition:rankingCompetition,
         p_matchday:rankingScope==='matchday'?matchday:null,p_month:rankingScope==='month'?month:null,
       }));
       if(ticket!==rankingRequest)return;
       target.replaceChildren();
-      if(!rows?.length){target.append(el('p','Todavía no hay resultados definitivos en este periodo.','cam-nfl-empty'));return;}
+      if(!rows?.length){
+        if(window.CamQuinielaStandings)window.CamQuinielaStandings.empty(target,()=>setQuinielaView('jornada'));
+        else target.append(el('p','Todavía no hay resultados definitivos en este periodo.','cam-nfl-empty'));
+        return;
+      }
       const table=el('table',null,'cam-nfl-table');
       const head=el('thead');const tr=el('tr');
       for(const cell of ['#','Usuario','Aciertos','% acierto','Pts'])tr.append(el('th',cell));
       head.append(tr);table.append(head);
       const body=el('tbody');
-      for(const line of rows.slice(0,showAll?500:10)){
+      const visibleRows=rows.slice(0,showAll?500:10);
+      const own=rows.find(line=>line.user_id===user?.id);
+      if(own&&!visibleRows.includes(own))visibleRows.push(own);
+      for(const line of visibleRows){
         const r=el('tr');
         r.append(el('td',line.rank_position));
         const c=el('td');const a=el('button','@'+line.username,'cam-nfl-link');a.type='button';
@@ -476,13 +483,16 @@
         details.append(el('summary','Ver pronósticos finalizados'));
         const content=el('div',null,'cam-nfl-ranking-picks');
         details.append(content);
-        details.addEventListener('toggle',async()=>{
-          if(!details.open||content.dataset.loaded)return;
+        let breakdownTask=null;
+        const loadBreakdown=()=>{
+          if(breakdownTask)return breakdownTask;
+          if(content.dataset.loaded==='yes')return Promise.resolve();
+          breakdownTask=(async()=>{
           content.dataset.loaded='loading';
           content.replaceChildren(el('p','Consultando resultados…'));
           try{
             const picks=await run(client().rpc('cam_football_public_pick_breakdown',{
-              p_user_id:line.user_id,p_season:rankingScope==='all'?null:season,p_competition:competition,
+              p_user_id:line.user_id,p_season:rankingScope==='all'?null:rankingSeason,p_competition:rankingCompetition,
               p_matchday:rankingScope==='matchday'?matchday:null
             }));
             if(!details.isConnected)return;
@@ -494,6 +504,7 @@
               for(const game of older||[])lookup.set(game.id,game);
             }
             if(!details.isConnected)return;
+            if(missing.some(id=>!lookup.has(id)))throw Error('Faltan resultados para calcular la racha.');
             const relevant=(picks||[]).filter(p=>{
               const game=lookup.get(p.game_id);
               return game&&(rankingScope!=='month'||monthOf(game)===month);
@@ -508,17 +519,26 @@
                 ' · eligió '+pickLabel(game,pick.pick),'cam-nfl-ranking-pick-detail'));
               content.append(row);
             }
+            details.dispatchEvent(new CustomEvent('cam:quiniela-results',{detail:{results:relevant.map(pick=>({
+              id:pick.game_id,kickoff:lookup.get(pick.game_id).kickoff,result:pickResultFor(lookup.get(pick.game_id),pick)
+            }))}}));
             content.dataset.loaded='yes';
           }catch(err){
             content.replaceChildren(el('p','No se pudo cargar el desglose: '+err.message));
             delete content.dataset.loaded;
+            details.dispatchEvent(new CustomEvent('cam:quiniela-results',{detail:{error:true}}));
           }
-        });
+          })().finally(()=>{breakdownTask=null;});
+          return breakdownTask;
+        };
+        details.loadQuinielaResults=loadBreakdown;
+        details.addEventListener('toggle',()=>{if(details.open)void loadBreakdown();});
         c.append(details);
         r.append(c,el('td',line.hits+'/'+line.resolved),el('td',line.accuracy+' %'),el('td',line.points));
         body.append(r);
       }
       table.append(body);target.append(table);
+      window.CamQuinielaStandings?.enhance(target,{rows,visibleRows,userId:user?.id});
       if(rows.length>10)target.append(button(showAll?'Ver Top 10':'Ver clasificación completa',
         ()=>{showAll=!showAll;paintRanking();},'cam-nfl-more'));
     }catch(error){if(ticket===rankingRequest){target.replaceChildren(el('p','Ranking no disponible: '+error.message));}}
