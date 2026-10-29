@@ -190,19 +190,16 @@
     if(game.status!=='final'||!game.outcome)return null;
     return pick.pick===game.outcome?'correct':'incorrect';
   }
-  // Logos de las competiciones: los mismos que publica ESPN (igual que los escudos),
-  // versión clara de día y versión para fondo oscuro de noche. Si no cargan, queda una
-  // sigla y el nombre debajo, así el botón nunca se queda vacío.
-  const LEAGUE_LOGOS={laliga:{espn:15,mark:'LL'},champions:{espn:2,mark:'UCL'},ligamx:{espn:22,mark:'MX'},premier:{espn:23,mark:'PL'}};
+  // Ilustraciones CAM propias en un atlas transparente: cuatro columnas y dos
+  // filas (día/noche). El tema cambia la fila sin filtros ni fondos añadidos.
+  const LEAGUE_LOGOS={laliga:'0%',champions:'33.333333%',ligamx:'66.666667%',premier:'100%'};
   const LEAGUE_ORDER=['laliga','champions','ligamx','premier'];
   function leagueLogo(id){
-    const info=LEAGUE_LOGOS[id],wrap=el('span',null,'cam-football-league-logo');
-    wrap.dataset.mark=info.mark;
-    for(const [variant,folder] of [['day','500'],['night','500-dark']]){
-      const image=el('img',null,'cam-football-league-logo--'+variant);
-      image.alt='';image.width=48;image.height=48;image.decoding='async';image.loading='lazy';
-      image.addEventListener('error',()=>{wrap.dataset.logoError='true';});
-      image.src='https://a.espncdn.com/i/leaguelogos/soccer/'+folder+'/'+info.espn+'.png';
+    const wrap=el('span',null,'cam-football-league-logo');
+    wrap.setAttribute('aria-hidden','true');
+    for(const [variant,row] of [['day','0%'],['night','100%']]){
+      const image=el('span',null,'cam-football-league-logo--'+variant);
+      image.style.backgroundPosition=LEAGUE_LOGOS[id]+' '+row;
       wrap.append(image);
     }
     return wrap;
@@ -230,7 +227,8 @@
       const button=el('button',null,'cam-football-league'+(chosen?' is-active':''));
       button.type='button';button.dataset.competition=id;button.title=option.full;
       button.setAttribute('aria-pressed',String(chosen));
-      button.append(leagueLogo(id),el('span',option.label,'cam-football-league-name'));
+      button.setAttribute('aria-label',option.full);
+      button.append(leagueLogo(id));
       button.addEventListener('click',async()=>{
         if(competition===id)return;
         competition=id;
