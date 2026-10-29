@@ -401,19 +401,97 @@
   }
   return {market:market||'Selección',choice};
  }
+ // Stories have their own stacked composition and readable type scale. They
+ // are not a compact table centred on an otherwise empty portrait canvas.
+ function pickStoryPages(p,options){
+  const measure=document.createElement('canvas').getContext('2d');if(!measure)throw Error('Este navegador no permite generar imágenes.');
+  const wrapAt=(text,font,width=808)=>{measure.font=font;return wrap(measure,text,width,Infinity);};
+  const events=[...new Set(p.legs.map(l=>l.event).filter(Boolean))],common=events.length===1&&p.legs.every(l=>l.event===events[0])?events[0]:'';
+  const sport=wrapAt(p.competition||'PICKS','400 28px Arial, sans-serif',888);
+  const title=wrapAt(common||p.title,'600 64px "Playfair Display", Georgia, serif',888);
+  const titleY=420+sport.length*36,top=titleY+(title.length-1)*76+62;
+  const author=wrapAt('Por '+p.author,'600 32px Arial, sans-serif',888),footer=1324-(author.length-1)*38,capacity=footer-48-top;
+  if(capacity<180)throw Error('El encabezado es demasiado largo para una historia. Acorta el título del Pick antes de compartirlo.');
+  const choiceSize=p.legs.length===1?84:p.legs.length===2?64:p.legs.length===3?56:48;
+  const entries=[];
+  function addLines(lines,analysis=false){
+   let content=[],height=64;
+   const flush=()=>{if(content.length)entries.push({lines:content,height,analysis});content=[];height=64;};
+   for(const line of lines){if(height+line.step>capacity)flush();content.push(line);height+=line.step;}
+   flush();
+  }
+  for(const leg of p.legs){
+   const values=pickColumns(leg),lines=[];
+   const add=(value,font,step,muted)=>wrapAt(value,font).forEach(text=>lines.push({text,font,step,muted}));
+   if(!common&&leg.event)add(leg.event,'600 28px Arial, sans-serif',36,true);
+   add(values.market,'400 26px Arial, sans-serif',34,true);
+   add(values.choice,'600 '+choiceSize+'px Arial, sans-serif',choiceSize+12,false);
+   addLines(lines);
+  }
+  if(options.showAnalysis&&p.analysis){
+   const fragment=takeFragments(p.analysis)[options.fragments[pickKey(p)]||0]||'';
+   addLines([
+    {text:'ANÁLISIS · FRAGMENTO ORIGINAL',font:'600 24px Arial, sans-serif',step:34,muted:true},
+    ...wrapAt(fragment,'400 30px Arial, sans-serif').map(text=>({text,font:'400 30px Arial, sans-serif',step:42,muted:false}))
+   ],true);
+  }
+  const pages=[];let rows=[],used=0;
+  const flush=()=>{if(rows.length)pages.push(rows);rows=[];used=0;};
+  for(const entry of entries){if(used&&used+entry.height+18>capacity)flush();if(rows.length)used+=18;rows.push(entry);used+=entry.height;}
+  flush();return pages.map((rows,index)=>({p,w:1080,h:1920,story:true,sport,title,titleY,top,footer,author,rows,index,total:pages.length}));
+ }
+ function renderPickStoryPage(page,options,position,count){
+  const {p,sport,title,titleY,top,footer,author,rows}=page,canvas=document.createElement('canvas');canvas.width=1080;canvas.height=1920;
+  const c=canvas.getContext('2d');if(!c||!takeLogo)throw Error('No se pudo preparar la ficha con el logo oficial.');
+  const left=96,right=984,width=888;
+  c.fillStyle='#073B83';c.fillRect(0,0,1080,1920);
+  c.drawImage(takeLogo,right-156,282,156,156*takeLogo.naturalHeight/takeLogo.naturalWidth);
+  c.fillStyle='#fff';c.font='600 28px Arial, sans-serif';c.fillText(p.legs.length>1?'COMBINADA · '+p.legs.length+' SELECCIONES':p.kind==='weekly'?'PICK DEL EDITOR':'PICK INDIVIDUAL',left,308);
+  c.fillStyle='#B8CAE0';c.font='400 28px Arial, sans-serif';sport.forEach((line,i)=>c.fillText(line,left,382+i*36));
+  c.fillStyle='#fff';c.font='600 64px "Playfair Display", Georgia, serif';title.forEach((line,i)=>c.fillText(line,left,titleY+i*76));
+  const rule=at=>{c.strokeStyle='#BE9270';c.lineWidth=2;c.beginPath();c.moveTo(left,at);c.lineTo(right,at);c.stroke();};
+  const capacity=footer-48-top,used=rows.reduce((n,r)=>n+r.height,0)+Math.max(0,rows.length-1)*18;
+  const extra=Math.min(rows.length===1?180:56,Math.max(0,(capacity-used)/rows.length));
+  let y=top+Math.max(0,(capacity-used-extra*rows.length)/2);
+  for(const row of rows){
+   const height=row.height+extra;c.fillStyle='#0A3470';
+   if(c.roundRect){c.beginPath();c.roundRect(left,y,width,height,24);c.fill();}else c.fillRect(left,y,width,height);
+   c.fillStyle='#BE9270';c.fillRect(left,y+28,4,height-56);
+   let baseline=y+32+extra/2;
+   for(const line of row.lines){baseline+=line.step;c.fillStyle=line.muted?'#B8CAE0':'#fff';c.font=line.font;c.fillText(line.text,left+40,baseline-8);}
+   y+=height+18;
+  }
+  rule(footer);
+  const hasOdds=options.showOdds&&p.odds!=='—';
+  if(hasOdds){
+   c.fillStyle='#B8CAE0';c.font='600 24px Arial, sans-serif';c.fillText(p.legs.length>1?'CUOTA TOTAL':'CUOTA',left,footer+38);
+   let size=84;for(;size>28;size--){c.font='600 '+size+'px Arial, sans-serif';if(c.measureText(p.odds).width<=400)break;}
+   c.fillStyle='#fff';c.fillText(p.odds,left,footer+130);
+   if(p.review){c.fillStyle='#B8CAE0';c.font='400 23px Arial, sans-serif';c.fillText(p.review,left,footer+166);}
+  }
+  c.font='600 28px Arial, sans-serif';c.fillStyle=p.state==='lost'?'#F3C6A2':'#fff';
+  wrap(c,pickStatus(p),hasOdds?440:width,Infinity).forEach((line,i)=>c.fillText(line,hasOdds?544:left,footer+82+i*36));
+  c.fillStyle='#fff';c.font='600 32px Arial, sans-serif';author.forEach((line,i)=>c.fillText(line,left,footer+204+i*38));
+  const authorExtra=(author.length-1)*38;
+  if(options.showDate&&p.date){c.fillStyle='#B8CAE0';c.font='400 26px Arial, sans-serif';c.fillText(p.date.split('-').reverse().join('/'),left,footer+246+authorExtra);}
+  c.fillStyle='#B8CAE0';c.font='400 24px Arial, sans-serif';c.fillText('camsports.github.io',left,1610);
+  if(count>1){c.textAlign='right';c.fillText('IMAGEN '+(position+1)+' / '+count,right,1610);c.textAlign='left';}
+  return canvas;
+ }
  function pickPages(p,options){
-  const w=1080,h=options.size==='story'?1920:options.size==='card'?700:1080,story=options.size==='story';
+  if(options.size==='story')return pickStoryPages(p,options);
+  const w=1080,h=options.size==='card'?700:1080;
   const measure=document.createElement('canvas').getContext('2d');if(!measure)throw Error('Este navegador no permite generar imágenes.');
   const wrapAt=(text,font,width)=>{measure.font=font;return wrap(measure,text,width,Infinity);};
   const events=[...new Set(p.legs.map(l=>l.event).filter(Boolean))],common=events.length===1&&p.legs.every(l=>l.event===events[0])?events[0]:'';
-  const header=story?300:64;
+  const header=64;
   const title=wrapAt(common||p.title,'600 36px Arial, sans-serif',948);
   const sport=wrapAt(p.competition||'PICKS','400 26px Arial, sans-serif',948);
   const tableTop=header+76+sport.length*32+title.length*44+14;
   const dateVisible=options.showDate&&p.date;
   let authorFont=25;for(;authorFont>18;authorFont--){measure.font='600 '+authorFont+'px Arial, sans-serif';if(measure.measureText('Por '+p.author).width<=(dateVisible?690:948))break;}
   const authorExtra=Math.max(0,wrapAt('Por '+p.author,'600 '+authorFont+'px Arial, sans-serif',dateVisible?690:948).length-1)*20;
-  const footer=(story?1515:h-140)-authorExtra,bottom=footer-82,top=tableTop+40,capacity=bottom-top;
+  const footer=h-140-authorExtra,bottom=footer-82,top=tableTop+40,capacity=bottom-top;
   if(capacity<100)throw Error('El encabezado necesita más espacio. Elige el formato vertical.');
   const entries=[];
   for(const leg of p.legs){
@@ -435,6 +513,7 @@
   });
  }
  function renderPickPage(page,options,position,count){
+  if(page.story)return renderPickStoryPage(page,options,position,count);
   const {p,w,h,header,title,sport,top,tableTop,bottom,footer,rows}=page,canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
   const c=canvas.getContext('2d');if(!c||!takeLogo)throw Error('No se pudo preparar la ficha con el logo oficial.');
   const margin=66,right=1014,choiceX=560;
@@ -445,8 +524,7 @@
   c.fillStyle='#fff';c.font='600 36px Arial, sans-serif';for(const line of title){c.fillText(line,margin,y+6);y+=44;}
   const rule=(at,color='#BE9270')=>{c.strokeStyle=color;c.lineWidth=1.5;c.beginPath();c.moveTo(margin,at);c.lineTo(right,at);c.stroke();};
   c.fillStyle='#B8CAE0';c.font='600 23px Arial, sans-serif';c.fillText('MERCADO',margin,tableTop);c.fillText('SELECCIÓN',choiceX,tableTop);rule(tableTop+20);
-  // The square and story layouts center the SAME compact table in their safe
-  // area. Rows/fonts never stretch to fill a tall story canvas.
+  // Square and horizontal exports retain the approved compact table.
   y=top;
   for(const row of rows){
    if(row.analysis){c.fillStyle='#B8CAE0';c.font='600 22px Arial, sans-serif';c.fillText('ANÁLISIS · FRAGMENTO ORIGINAL',margin,y+24);y+=50;c.fillStyle='#fff';c.font='400 28px Arial, sans-serif';for(const line of row.analysis){c.fillText(line,margin,y+28);y+=37;}continue;}
@@ -496,7 +574,8 @@
   const previous=make('button','Anterior'),counter=make('span'),next=make('button','Siguiente');previous.type=next.type='button';counter.setAttribute('aria-live','polite');navigation.append(previous,counter,next);
   const editor=make('section',null,'cam-picks-share-editor');editor.setAttribute('aria-label','Personalizar fichas de Picks');editor.append(make('strong','Personaliza tus fichas'));
   const field=(name,control)=>{control.setAttribute('aria-label',name);const label=make('label',name,'cam-picks-share-field');label.append(control);editor.append(label);return label;};
-  const format=make('select');for(const [value,label] of [['square','Cuadrada · Publicación'],['story','Historia · Instagram / TikTok'],['card','Horizontal · X']]){const option=make('option',label);option.value=value;format.append(option);}field('Formato',format);
+  const format=make('select');for(const [value,label] of [['square','Cuadrada · Publicación'],['story','Historia vertical · 9:16'],['card','Horizontal · X']]){const option=make('option',label);option.value=value;format.append(option);}
+  const formatBar=make('div',null,'cam-picks-share-format'),formatNote=make('p',null,'cam-pick-share-hint');formatNote.setAttribute('aria-live','polite');formatBar.append(field('Formato',format),formatNote);
   const picker=make('details',null,'cam-picks-share-picker');picker.append(make('summary','Elegir Picks · '+pool.length+' disponibles'));
   picker.append(make('p','Cada Pick conserva su autor, cuota y enlace. Los Picks independientes se exportan por separado.'));
   const checks=[];
@@ -527,7 +606,7 @@
   share.type=single.type=copyLink.type='button';download.hidden=all.hidden=true;single.hidden=true;
   const status=make('p','','cam-pick-share-status');status.setAttribute('role','status');status.setAttribute('aria-live','polite');
   const bar=make('div',null,'cam-picks-share-bar');utilities.append(share,download,copyLink,all);bar.append(utilities,status);
-  const layout=make('div',null,'cam-pick-share-layout'),content=make('div',null,'cam-pick-share-content');content.append(editor,actions,hint,details);layout.append(preview,navigation,single,content);
+  const layout=make('div',null,'cam-pick-share-layout'),content=make('div',null,'cam-pick-share-content');content.append(editor,actions,hint,details);layout.append(formatBar,preview,navigation,single,content);
   dialog.replaceChildren(top,make('p','Tu selección, lista para compartir como imagen.','cam-pick-share-intro'),layout,bar);
   function links(){return chosen().map(urlFor).join('\n');}
   function captionText(){return chosen().map(p=>[headline(p),p.result,...p.legs.map(l=>[l.event,l.selection,l.market,l.line].filter(Boolean).join(' · ')),options.showOdds&&p.odds!=='—'?quota(p):'',options.showDate&&p.date?p.date:'',options.showAnalysis?takeFragments(p.analysis)[options.fragments[pickKey(p)]||0]:'',urlFor(p)].filter(Boolean).join('\n\n')).join('\n\n———\n\n');}
@@ -553,6 +632,7 @@
    sharing=true;enabled();Promise.resolve(result).then(()=>{if(ticket===request&&current===generation)status.textContent='Imagen entregada al menú de compartir. Completa la publicación en la aplicación elegida.';}).catch(fail).finally(()=>{sharing=false;if(ticket===request)enabled();});
   }
   async function refresh(){
+   formatNote.textContent=options.size==='story'?'1080 × 1920 · Para historias de Instagram, Facebook y WhatsApp.':options.size==='card'?'1080 × 700 · Para publicaciones en X.':'1080 × 1080 · Para publicaciones cuadradas.';
    const current=++generation;items=[];position=0;release();enabled();download.hidden=all.hidden=single.hidden=navigation.hidden=true;download.removeAttribute('href');all.removeAttribute('href');text.value=captionText();status.textContent='';preview.setAttribute('aria-busy','true');preview.replaceChildren(make('p','Preparando fichas…'));
    const active=()=>ticket===request&&current===generation&&dialog.open;
    if(!selected.size){preview.replaceChildren(make('p','Elige al menos un Pick para compartir.'));preview.setAttribute('aria-busy','false');return;}
@@ -562,7 +642,7 @@
     for(const [index,plan] of plans.entries()){
      const canvas=renderPickPage(plan,options,index,plans.length);
      const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));if(!active())return;if(!blob)throw Error('No se pudo generar el PNG. Inténtalo de nuevo.');
-     const name='cam-sports-'+(plan.p.kind==='weekly'?'pick-del-dia':'pick')+'-'+plan.p.id+(plans.length>1?'-'+(index+1):'')+'.png';
+     const name='cam-sports-'+(plan.p.kind==='weekly'?'pick-del-dia':'pick')+'-'+plan.p.id+(options.size==='story'?'-historia':'')+(plans.length>1?'-'+(index+1):'')+'.png';
      prepared.push({p:plan.p,blob,file:new File([blob],name,{type:'image/png'}),width:canvas.width,height:canvas.height});
     }
     const zip=prepared.length>1?await pickZip(prepared.map(i=>i.file)):null;if(!active())return;

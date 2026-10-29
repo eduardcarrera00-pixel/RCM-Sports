@@ -11,7 +11,9 @@ const html=fs.readFileSync('index.html','utf8').replace(/<script\b[^>]*>[\s\S]*?
 async function setup({own=false,shared='',rows=takes,compactQuery=''}={}){
  const w=new Window({url:'https://example.test/'+(compactQuery||(shared?'?perfil='+owner+'&take='+shared+'&token=PRIVATE_TOKEN':''))}),d=w.document;
  d.body.innerHTML=html;w.currentAdmin=null;mockLogo(w);
- const calls=[],opened=[],drawn=[];
+ const calls=[],opened=[],drawn=[];let copied='';
+ Object.defineProperty(w.navigator,'clipboard',{configurable:true,value:{writeText:async text=>{copied=text;}}});
+ Object.defineProperty(w,'matchMedia',{configurable:true,value:()=>({matches:false})});
  w.HTMLCanvasElement.prototype.getContext=()=>({drawImage:image=>drawn.push(image.src.includes('cam-sports-logo-completo.webp')?'OFFICIAL_LOGO':'OTHER_IMAGE'),fillRect(){},beginPath(){},moveTo(){},lineTo(){},stroke(){},fillText:t=>drawn.push(t),measureText:t=>({width:String(t).length*17})});
  w.HTMLCanvasElement.prototype.toBlob=cb=>cb(new w.Blob(['PNG'],{type:'image/png'}));
  w.URL.createObjectURL=()=>'blob:profile-share';w.URL.revokeObjectURL=()=>{};
@@ -26,7 +28,7 @@ async function setup({own=false,shared='',rows=takes,compactQuery=''}={}){
  for(const file of ['assets/cam-pick-share.js','assets/ae-profile.js'])w.eval(fs.readFileSync(file,'utf8'));
  d.dispatchEvent(new w.Event('DOMContentLoaded'));
  const tick=async()=>{for(let i=0;i<15;i++)await new Promise(r=>setTimeout(r,0));};
- await tick();return {w,d,calls,opened,drawn,tick};
+ await tick();return {w,d,calls,opened,drawn,tick,copied:()=>copied};
 }
 
 const a=await setup({own:true});await a.w.openAeProfile();
@@ -40,19 +42,20 @@ for(const selector of ['#aeProfileTakeHighlights .ae-profile-feature','#aeProfil
   assert.equal(a.opened.length,0,'Sharing must not also open the Take discussion');
   assert.match(dialog.querySelector('h2').textContent,/Comparte este Take/);
   const caption=dialog.querySelector('textarea').value;assert.match(caption,/Take de @Lector/);assert.doesNotMatch(caption,/PRIVATE|Cuota|Pendiente/);
-  const compact=new URL(dialog.querySelector('a').href).searchParams.get('url');assert.ok(compact.length<80);const visitor=new Window({url:compact});visitor.eval(fs.readFileSync('assets/cam-pick-share.js','utf8'));const href=new URL(visitor.location.href);await visitor.happyDOM.close();
+  [...dialog.querySelectorAll('button')].find(b=>b.textContent==='Copiar enlace').click();await a.tick();
+  const compact=a.copied();assert.ok(compact.length<120);const visitor=new Window({url:compact});visitor.eval(fs.readFileSync('assets/cam-pick-share.js','utf8'));const href=new URL(visitor.location.href);await visitor.happyDOM.close();
   assert.doesNotMatch(caption,/¿De acuerdo o tienes otra lectura/);assert.equal(href.origin,'https://camsports.github.io');assert.equal(href.searchParams.get('perfil'),owner);assert.ok(href.searchParams.has('take'));
   const row=takes.find(t=>t.id===href.searchParams.get('take'));assert.ok(caption.includes(row.body.trim()),'Copy text retains the full published Take');
-  assert.equal(dialog.querySelector('.cam-pick-share-download').download,'cam-sports-take-'+row.id+'.png');
+  assert.equal(dialog.querySelector('.cam-pick-share-download').download,'cam-sports-take-'+row.id+'-x.png');
   const preview=dialog.querySelector('.cam-pick-share-preview img');assert.equal(preview.width,1080);assert.equal(preview.height,760,'Preserve the current La cita Take card with original text');
   const editor=dialog.querySelector('.cam-take-share-editor');assert.ok(editor,'Take editor exists');
-  const selects=editor.querySelectorAll('select'),mode=selects[0],fragment=selects[1],size=selects[2];
+  const selects=editor.querySelectorAll('select'),mode=selects[0],fragment=selects[2];
   assert.equal(mode.value,'summary');
   mode.value='summary';mode.dispatchEvent(new a.w.Event('change'));await a.tick();assert.ok(a.drawn.includes('RESUMEN DEL TAKE'));
   mode.value='fragment';mode.dispatchEvent(new a.w.Event('change'));await a.tick();assert.ok(a.drawn.includes('FRAGMENTO ORIGINAL'));assert.equal(fragment.closest('label').hidden,false);
-  size.value='story';size.dispatchEvent(new a.w.Event('change'));await a.tick();assert.equal(dialog.querySelector('.cam-pick-share-preview img').height,1920);
+  dialog.querySelector('.cam-take-share-destination[data-size="story"]').click();await a.tick();assert.equal(dialog.querySelector('.cam-pick-share-preview img').height,1920);
   editor.querySelector('input[type=checkbox]').click();assert.ok(!a.drawn.includes('PRIVATE_EMAIL'));
-  editor.querySelector('.cam-take-share-reset').click();await a.tick();assert.equal(mode.value,'summary');assert.equal(size.value,'card');
+  editor.querySelector('.cam-take-share-reset').click();await a.tick();assert.equal(mode.value,'summary');assert.equal(dialog.querySelector('.cam-take-share-destination[aria-pressed="true"]').dataset.size,'card');
   assert.equal(dialog.querySelector('.cam-pick-share-preview img').height,760);
   assert.equal(row.title,takes.find(t=>t.id===row.id).title,'Export options never change the original Take');
   dialog.querySelector('.cam-pick-share-close').click();assert.equal(a.d.activeElement,button);

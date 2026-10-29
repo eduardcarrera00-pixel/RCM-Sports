@@ -19,7 +19,7 @@ const server=http.createServer((req,res)=>{
  await page.evaluate(()=>{
   const draw=CanvasRenderingContext2D.prototype.fillText,logo=CanvasRenderingContext2D.prototype.drawImage;
   window.draws=[];window.logos=[];
-  CanvasRenderingContext2D.prototype.fillText=function(text,x,y){const m=this.measureText(text);draws.push({text,x,y,width:m.width,align:this.textAlign,h:this.canvas.height});return draw.apply(this,arguments);};
+  CanvasRenderingContext2D.prototype.fillText=function(text,x,y){const m=this.measureText(text);draws.push({text,x,y,width:m.width,font:this.font,align:this.textAlign,h:this.canvas.height});return draw.apply(this,arguments);};
   CanvasRenderingContext2D.prototype.drawImage=function(image){if(image instanceof HTMLImageElement&&!image.src.startsWith('blob:'))logos.push(image.src);return logo.apply(this,arguments);};
   window.pick={id:'00000000-0000-0000-0000-000000000981',author:'AutorOriginal',title:'Pronóstico registrado',publication_day:'2026-10-24',created_at:'2026-10-25T02:10:00Z',event_date:'2026-11-01',american_odds:-110,moderation_status:'approved',outcome:'pending',explanation:'Este es el análisis original, con  dos espacios.\nNo se añade información. '+('Contexto del autor sin alteraciones. ').repeat(15),legs:[{event:'Buffalo Bills vs Miami Dolphins',sport:'NFL',selection:'Buffalo Bills -3.5',market:'Hándicap',line:'-3.5'}],capture_check:{screenshot:'PRIVATE',stake:9999},email:'PRIVATE'};
   window.other={...pick,id:'00000000-0000-0000-0000-000000000982',author:'OtraAutora',american_odds:125,legs:[{event:'Barcelona vs PSG',sport:'Fútbol',selection:'Más de 2.5 goles · Total de goles'}]};
@@ -58,7 +58,7 @@ const server=http.createServer((req,res)=>{
   for(const [format,height] of [['square',1080],['card',700],['story',1920]]){
    await refresh(()=>page.getByLabel('Formato',{exact:true}).selectOption(format));await checkImage(height);
    const labels=await page.evaluate(()=>draws.map(d=>d.text));assert.ok(labels.includes(label));if(state==='lost')fs.writeFileSync(path.join(qa,'pick-reviewed-'+format+'.png'),await png());if(state!=='won')assert.equal(labels.includes('✓ Acertado'),false);
-   assert.ok(labels.includes('MERCADO')&&labels.includes('SELECCIÓN'));
+   if(format!=='story')assert.ok(labels.includes('MERCADO')&&labels.includes('SELECCIÓN'));
   }
  }
  await refresh(()=>page.evaluate(()=>CamPickShare.open(pick)));
@@ -74,11 +74,26 @@ const server=http.createServer((req,res)=>{
  await page.evaluate(()=>shareMode='cancel');await page.getByRole('button',{name:'Compartir esta imagen',exact:true}).click();await page.waitForFunction(()=>document.querySelector('[role=status]').textContent.includes('cuando quieras'));
  await page.evaluate(()=>shareMode='error');await page.getByRole('button',{name:'Compartir esta imagen',exact:true}).click();await page.waitForFunction(()=>document.querySelector('[role=status]').textContent.includes('Vuelve a pulsar'));await page.evaluate(()=>shareMode='all');await page.getByRole('button',{name:'Compartir esta imagen',exact:true}).click();assert.equal(await page.evaluate(()=>shares.at(-1).data.text),undefined);
  await page.evaluate(()=>CamPickShare.open({...pick,legs:[{event:'Paris St-G v Barcelona',selection:'Paris St-G · MONEYLINE (3-WAY)'},{event:'Paris St-G v Barcelona',selection:'Over 3.5 Goals · OVER/UNDER'},{event:'Paris St-G v Barcelona',selection:'Yes · BOTH TEAMS TO SCORE'}]}));await ready();assert.equal(await page.locator('.cam-picks-share-pagination').isVisible(),false,'Three short selections fit on one square card');fs.writeFileSync(path.join(qa,'pick-parlay-square.png'),await png());
+ // A story is a separate full-height composition, with large stacked choices.
+ await refresh(()=>page.getByLabel('Formato',{exact:true}).selectOption('story'));
+ const story=await checkImage(1920);fs.writeFileSync(path.join(qa,'pick-parlay-story.png'),story);
+ assert.equal(await page.locator('.cam-picks-share-pagination').isVisible(),false,'Three selections fit in one story');
+ const choices=await page.evaluate(()=>draws.filter(d=>['Paris St-G','Más de 3.5','Sí'].includes(d.text)));
+ assert.equal(choices.length,3);assert.ok(choices.every(d=>d.x===136&&parseFloat(d.font.match(/[\d.]+px/)[0])>=56),'Story choices are large and stacked, not a compact two-column table');
+ assert.ok(choices[2].y-choices[0].y>=350,'Selections use the vertical story space');
+ await page.getByRole('button',{name:'Instagram',exact:true}).click();assert.equal(await page.evaluate(()=>shares.at(-1).active),true);
+ assert.deepEqual(Buffer.from(await page.evaluate(async()=>Array.from(new Uint8Array(await shares.at(-1).data.files[0].arrayBuffer())))),story,'Instagram receives the exact vertical preview');
+ assert.match(await page.getByRole('link',{name:'Descargar imagen',exact:true}).getAttribute('download'),/-historia\.png$/);
+ dl=page.waitForEvent('download');await page.getByRole('link',{name:'Descargar imagen',exact:true}).click();assert.deepEqual(fs.readFileSync(await (await dl).path()),story);
  // Long parlays and unusual text are paginated at readable sizes, without loss.
  await page.evaluate(()=>{draws=[];CamPickShare.open({...pick,legs:Array.from({length:12},(_,i)=>({sport:'Fútbol',event:'Partido '+(i+1),selection:'Equipo '+(i+1)+' gana · Ganador del partido'}))});});await ready();
  let drawn=await page.evaluate(()=>draws.map(d=>d.text).join(' '));for(let i=1;i<=12;i++)assert.ok(drawn.includes('Equipo '+i+' gana'));assert.doesNotMatch(drawn,/…/);assert.match(drawn,/COMBINADA · 12 SELECCIONES/);await checkImage(1080);
+ await refresh(()=>page.getByLabel('Formato',{exact:true}).selectOption('story'));await checkImage(1920);
+ drawn=await page.evaluate(()=>draws.map(d=>d.text).join(' '));for(let i=1;i<=12;i++)assert.ok(drawn.includes('Equipo '+i+' gana'),'Every selection appears across the stories');
+ assert.match(await page.locator('.cam-picks-share-pagination').innerText(),/Imagen 1 de/);
  for(const selection of ['Lamine Yamal más de 1.5 tiros a puerta · Estadísticas de jugador','A'.repeat(600),('Una selección original extensa con significado completo ').repeat(40)]){
   await page.evaluate(s=>{draws=[];CamPickShare.open({...pick,legs:[{sport:'Fútbol',event:'Equipo local contra un rival con nombre muy largo',selection:s}]});},selection);await ready();await checkImage(1080);assert.doesNotMatch(await page.evaluate(()=>draws.map(d=>d.text).join(' ')),/…/);
+  await refresh(()=>page.getByLabel('Formato',{exact:true}).selectOption('story'));await checkImage(1920);assert.doesNotMatch(await page.evaluate(()=>draws.map(d=>d.text).join(' ')),/…/);
  }
  await page.evaluate(()=>{CamPickShare.open(other);document.querySelector('.cam-pick-share-close').click();CamPickShare.open(pick);});await ready();assert.match(await preview.getAttribute('alt'),/@AutorOriginal/);
  for(const width of [320,360,390,768,1366])for(const dark of [false,true]){

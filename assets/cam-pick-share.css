@@ -89,6 +89,8 @@
 .cam-picks-share-dialog .cam-pick-share-heading{position:sticky;top:-20px;z-index:2;background:var(--share-bg);padding:10px 0}
 .cam-picks-share-dialog h2{font-family:"Playfair Display",Georgia,serif;font-size:25px}
 .cam-picks-share-dialog .cam-pick-share-layout{display:flex;flex-direction:column;gap:14px}
+.cam-picks-share-format{display:grid;grid-template-columns:minmax(0,1fr);gap:6px}
+.cam-picks-share-format .cam-pick-share-hint{margin:0}
 .cam-picks-share-dialog .cam-pick-share-preview{display:flex;align-items:center;justify-content:center;width:100%;max-width:100%;background:transparent;border:0}
 .cam-picks-share-dialog .cam-pick-share-preview img{width:auto;max-width:100%;max-height:min(46dvh,460px);height:auto;object-fit:contain}
 .cam-picks-share-dialog button,.cam-picks-share-dialog a{border-radius:12px}
