@@ -36,7 +36,7 @@
   function onHome() {
     // Do not interrupt deep-linked picks, articles, comments or take discussions.
     const params = new URLSearchParams(location.search);
-    return !['article', 'pick', 'take', 'comment'].some(k => params.has(k));
+    return !['article', 'pick', 'take', 'comment', 'party'].some(k => params.has(k));
   }
   function safeToOpen() {
     if (document.hidden || $('camWelcomeDialog')?.open) return false;

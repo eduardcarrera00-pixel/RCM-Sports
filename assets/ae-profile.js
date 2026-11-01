@@ -272,6 +272,7 @@ async function updateButton(){
 
 function close(){
   window.camNflProfile?.close?.();
+  document.dispatchEvent(new CustomEvent('cam:profile-view',{detail:{userId:null}}));
   if(recentScrollObserver){recentScrollObserver.disconnect();recentScrollObserver=null;}
   ++request;
   activeAuthor=null;
@@ -735,6 +736,8 @@ function setPrivateTab(tab){
     setOverview(privateView?'':'Resultados confirmados de este aficionado. Sus pronósticos futuros son privados.');
     window.camNflProfile?.open(activeAuthor,privateView);
   }
+  // Parties (cam-parties.js) pone su bloque en la pestaña visible.
+  document.dispatchEvent(new CustomEvent('cam:profile-view',{detail:{userId:activeAuthor,own:privateView,tab:activeTab}}));
 }
 
 async function loadOwnPicks(userId){
