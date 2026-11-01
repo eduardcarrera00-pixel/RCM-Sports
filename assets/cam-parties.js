@@ -73,7 +73,7 @@ function message(e) {
   return m;
 }
 const chars = s => [...String(s || '')].length; // como char_length() de la base: emojis incluidos
-const cleanName = s => String(s || '').replace(/[\u0000-\u001f\u007f​‎‏‪-‮⁦-⁩﻿]/g, ' ').replace(/\s+/g, ' ').trim();
+const cleanName = s => String(s || '').replace(/[\u0000-\u001f\u007f\u200b\u200e\u200f\u202a-\u202e\u2066-\u2069\ufeff]/g, ' ').replace(/\s+/g, ' ').trim();
 const cleanCode = s => String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
 const sportLabel = p => p?.sport && p.sport !== 'all' ? SPORTS[p.sport] : 'Todos los deportes';
 const kindLabel = p => KINDS[p?.kind] || 'Party';

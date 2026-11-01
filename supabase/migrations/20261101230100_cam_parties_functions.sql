@@ -157,7 +157,7 @@ as $$
 declare
   v text;
 begin
-  v := regexp_replace(coalesce(p_name, ''), '[[:cntrl:]​‎‏‪-‮⁦-⁩﻿]', ' ', 'g');
+  v := regexp_replace(coalesce(p_name, ''), '[[:cntrl:]\u200B\u200E\u200F\u202A-\u202E\u2066-\u2069\uFEFF]', ' ', 'g');
   v := btrim(regexp_replace(v, '\s+', ' ', 'g'));
   if char_length(v) < 3 or char_length(v) > 40 then
     raise exception 'El nombre debe tener entre 3 y 40 caracteres.' using errcode = '22023';
