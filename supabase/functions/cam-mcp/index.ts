@@ -380,8 +380,14 @@ const TOOLS: Tool[] = [
           nfl: { partidos: nflGames.length, proximo: next(nflGames[0], nflNames) },
           futbol: { partidos: fbGames.length, por_competicion: byComp, proximo: next(fbGames[0], fbNames) },
         },
-        quien_sera_campeon_abiertas: Array.isArray(questions)
-          ? questions.map((q: any) => ({ id: q.id, pregunta: q.prompt, cierra: local(q.closes_at) }))
+        // Siguen en «open» hasta que se valida el campeón, aunque ya no admitan elecciones.
+        quien_sera_campeon: Array.isArray(questions)
+          ? questions.map((q: any) => ({
+            id: q.id,
+            pregunta: q.prompt,
+            estado: new Date(q.closes_at).getTime() < Date.now() ? "cerrada, pendiente de validar" : "abierta",
+            cierra: local(q.closes_at),
+          }))
           : questions,
         pick_de_la_semana: Array.isArray(weekly) ? weekly[0] ?? null : weekly,
         lideres_picks: Array.isArray(pickLeaders)

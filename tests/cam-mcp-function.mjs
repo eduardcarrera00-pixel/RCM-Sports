@@ -148,6 +148,7 @@ assert.equal((await post({jsonrpc: '2.0', id: 5, method: 'resources/list'})).bod
 const resumen = await data('resumen');
 assert.equal(resumen.takes_recientes[0].enlace, 'https://camsports.github.io/?t=tbPCysK9QYy56ms0YStpdg.fA16RHLmRbm-O0OSr2sNpw');
 assert.equal(resumen.quinielas_abiertas.nfl.proximo.startsWith('Baltimore Ravens @ Buffalo Bills'), true);
+assert.equal(resumen.quien_sera_campeon[0].estado, 'cerrada, pendiente de validar', 'una pregunta con cierre pasado no se presenta como abierta');
 assert.equal((await data('buscar_noticias', {texto: 'power', categoria: 'Fútbol'})).noticias[0].lecturas, 5);
 const noticia = await data('leer_noticia', {id: ARTICLE});
 assert.equal(noticia.texto, 'San Francisco\nSigue arriba & manda.\nFin');
