@@ -127,3 +127,14 @@ html body footer a.ae-brand-runner-clean .ae-runner-wordmark{
     max-height:24px!important;
   }
 }
+
+/* CAM SPORTS · Escritorio: aliviar el zoom del logo de la cabecera.
+   El arte original conserva sus proporciones y su recorte transparente;
+   no modifica footer, fondos, modo día/noche ni navegación móvil. */
+@media (min-width:980px) {
+  html body>header .ae-mobile-header-grid>a.cam-brand .cam-brand-art {
+    width:136%!important;
+    left:-18%!important;
+    top:-43%!important;
+  }
+}
