@@ -94,13 +94,14 @@
       }
 
       const grid = byId('articlesGrid');
-      const newsHeading = grid?.previousElementSibling;
+      const newsHeading = byId('aeNewsHeadingRow');
       const ranking = byId('championsRankings');
 
       // La clasificación encabeza siempre la categoría Fútbol en móvil.
       moveTo(ranking, stage);
       moveTo(byId('heroSection'), stage);
       moveTo(newsHeading, stage);
+      moveTo(byId('aeSportLatestNews'), stage);
       moveTo(grid, stage);
       // The same footer follows the mobile news grid.
       moveTo(byId('aeSportAllNewsFooter'), stage);

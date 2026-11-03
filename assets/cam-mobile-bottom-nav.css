@@ -318,11 +318,8 @@ html body nav.ae-sport-nav svg.cam-mobile-nav-symbol {
        The same selectors live in cam-mobile-sections.js (OWNERS) to reveal the
        right tab when a script scrolls to something inside another tab. */
     /* NFL and Fútbol */
-    html body[data-cam-tabs="sport"]:not([data-cam-tab="noticias"]) :is(#heroSection,#aeNewsHeadingRow,#articlesGrid,#aeSportAllNewsFooter,#aeMoreNews,#aeNflLatestComments,#mainContent > .editorial-layout,#aeFootballMobileStage > .editorial-trending) {
-      display: none !important;
-    }
-    /* Power Rankings (teams) and the Top 10 (fans) share the Clasificación tab. */
-    html body[data-cam-tabs="sport"]:not([data-cam-tab="clasificacion"]) :is(#nflRankings,#championsRankings) {
+    /* Team Power Rankings lead Noticias; fan standings stay in Clasificación. */
+    html body[data-cam-tabs="sport"]:not([data-cam-tab="noticias"]) :is(#nflRankings,#championsRankings,#heroSection,#aeNewsHeadingRow,#aeSportLatestNews,#articlesGrid,#aeSportAllNewsFooter,#aeMoreNews,#aeNflLatestComments,#mainContent > .editorial-layout,#aeFootballMobileStage > .editorial-trending) {
       display: none !important;
     }
     html body[data-cam-tabs="sport"][data-cam-tab="noticias"] #freeTakes {

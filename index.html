@@ -302,7 +302,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
     </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
-<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261103-unified-header-1">
+<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261103-sport-news-1">
 <link rel="stylesheet" href="assets/cam-perf-core-extras.css?v=20261103-unified-header-1">
 <script defer src="assets/ae-nfl-mobile-telephoto.js?v=20261016-1"></script>
 <link rel="stylesheet" href="assets/ae-football-mobile-redesign.css?v=20261018-hide-football-trending-mobile-1">
@@ -2522,7 +2522,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
 <script defer src="assets/cam-mobile-bottom-nav.js?v=20261103-app-dock-1"></script>
 <link rel="stylesheet" href="assets/cam-pick-editor-night.css?v=20261021-editor-night-1">
 <link rel="stylesheet" href="assets/cam-global-edit.css?v=20261022-logo-size-1">
-<link rel="stylesheet" href="assets/cam-mobile-bottom-nav.css?v=20261103-app-dock-1">
+<link rel="stylesheet" href="assets/cam-mobile-bottom-nav.css?v=20261103-sport-news-1">
 
 <link rel="stylesheet" href="assets/cam-take-cta.css?v=20261026-compact-squares-1">
 <script defer src="assets/cam-take-cta.js?v=20261023-take-cta-unificado-1"></script>
@@ -2849,6 +2849,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
                 </div>
 
                 <!-- Articles Cards Grid -->
+                <section id="aeSportLatestNews" aria-label="Última publicación" hidden></section>
                 <section id="articlesGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Cards JS Injected -->
                 </section>
@@ -4433,6 +4434,9 @@ currentUser = {
         }
 
         function renderArticlesFeed() {
+            const latestNews = document.getElementById('aeSportLatestNews');
+            latestNews.hidden = true;
+            latestNews.replaceChildren();
             document.body.classList.toggle('ae-is-football', currentCategory === 'Fútbol' && !currentSearchQuery && !currentTeam);
             document.body.classList.toggle('ae-is-nfl', currentCategory === 'NFL' && !currentSearchQuery);
             document.getElementById('footballTakes').hidden = currentCategory !== 'Picks';
@@ -4519,7 +4523,7 @@ currentUser = {
             // La cabecera de cada deporte es el acceso al archivo; sin CTA duplicado.
             const sportNewsFooter = document.getElementById('aeSportAllNewsFooter');
             if (sportNewsFooter) sportNewsFooter.hidden = true;
-            const visibleCount = isHome ? Math.min(7, Math.max(0,filtered.length-1)) : isSportNewsPreview ? Math.min(3, filtered.length) : filtered.length;
+            const visibleCount = isHome ? Math.min(7, Math.max(0,filtered.length-1)) : isSportNewsPreview ? Math.min(4, filtered.length) : filtered.length;
             articlesCount.innerText = `${visibleCount} ${visibleCount === 1 ? 'noticia' : 'noticias'}`;
             // Neither sport needs a redundant count beside its news title.
             articlesCount.hidden = isHome || isSportNewsPreview;
@@ -4545,18 +4549,34 @@ currentUser = {
             articlesGrid.classList.remove('hidden');
 
             let heroArticle = filtered[0];
-            let gridArticles = isHome ? filtered.slice(1, 8) : isSportNewsPreview ? filtered.slice(0, 3) : filtered;
+            let gridArticles = isHome ? filtered.slice(1, 8) : isSportNewsPreview ? filtered.slice(1, 4) : filtered;
 
             if (currentCategory !== 'Todos' || currentSearchQuery !== '') {
-                // Como NFL: en Fútbol móvil, Champions y luego Noticias,
-                // sin duplicar el artículo más reciente como hero.
+                // Sports use a compact latest-story preview before the carousel.
                 heroSection.classList.add('hidden');
                 heroSection.hidden = true;
-                gridArticles = isSportNewsPreview ? filtered.slice(0,3) : filtered;
             } else {
                 heroSection.hidden = false;
                 heroSection.classList.remove('hidden');
                 renderHeroCard(heroArticle);
+            }
+
+            if (isSportNewsPreview) {
+                latestNews.hidden = false;
+                latestNews.dataset.articleId = heroArticle.id;
+                latestNews.innerHTML = `
+                    <article class="cam-sport-latest-card">
+                        <button type="button" class="cam-sport-latest-image" aria-label="Leer noticia: ${escapeHTML(heroArticle.title)}" onclick="openArticleModal(${articleIdArgument(heroArticle.id)})">
+                            <img src="${escapeHTML(safeImageURL(heroArticle.image))}" alt="" width="800" height="450" decoding="async" style="--ae-image-focus:${imagePosition(heroArticle)};--ae-image-zoom:${imageScale(heroArticle)}">
+                        </button>
+                        <div class="cam-sport-latest-copy">
+                            <p class="cam-sport-latest-label">Última publicación</p>
+                            <h3><button type="button" onclick="openArticleModal(${articleIdArgument(heroArticle.id)})">${escapeHTML(heroArticle.title)}</button></h3>
+                            <p class="cam-sport-latest-summary">${escapeHTML(heroArticle.summary || '')}</p>
+                            <p class="cam-sport-latest-meta">${escapeHTML(heroArticle.author || 'CAM SPORTS')} · ${escapeHTML(heroArticle.date)} · ${escapeHTML(heroArticle.readTime)}</p>
+                            <button type="button" class="cam-sport-latest-read" onclick="openArticleModal(${articleIdArgument(heroArticle.id)})">Leer publicación <span aria-hidden="true">→</span></button>
+                        </div>
+                    </article>`;
             }
 
             // Conservar la posición si se actualiza una noticia (por ejemplo, al votar).
@@ -4638,13 +4658,12 @@ currentUser = {
             } else {
                 articlesGrid.innerHTML = gridArticles.map(renderNewsCard).join('');
             }
-            // Portada: dos carruseles independientes. NFL y Fútbol: carrusel táctil únicamente
-            // en teléfonos, con las mismas noticias, votos, enlaces y CTA del archivo.
-            const sportCarousel = isSportNewsPreview && gridArticles.length > 1;
-            const isMobileNews = window.matchMedia('(max-width:760px)').matches;
+            articlesGrid.classList.toggle('hidden', isSportNewsPreview && gridArticles.length === 0);
+            // The latest story appears once, above the remaining sport stories.
+            const sportCarousel = isSportNewsPreview && gridArticles.length > 0;
             articlesGrid.classList.remove('ae-home-news-carousel');
             articlesGrid.classList.toggle('ae-sport-news-carousel', sportCarousel);
-            if (sportCarousel && isMobileNews) {
+            if (sportCarousel) {
                 articlesGrid.setAttribute('role', 'region');
                 articlesGrid.setAttribute('aria-label', 'Noticias de ' + (currentCategory === 'NFL' ? 'NFL' : 'Fútbol') + '. Desliza a izquierda o derecha para explorar.');
                 articlesGrid.setAttribute('aria-roledescription', 'carrusel');
@@ -6361,14 +6380,14 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 <script src="assets/cam-admin-news-editor-loader.js?v=20261024-lazy-1"></script>
 
 <script src="assets/ae-mobile-compact-home.js?v=20261016-top3-swipe-v1"></script>
-<script src="assets/ae-football-mobile-redesign.js?v=20261018-football-boards-v2"></script>
+<script src="assets/ae-football-mobile-redesign.js?v=20261103-sport-news-1"></script>
 <script src="assets/ae-home-weekly-layout.js?v=20261021-pick-del-dia-1"></script>
 <script src="assets/ae-notifications.js?v=20261020-cam-welcome-v1"></script>
 <script src="assets/cam-welcome.js?v=20261021-welcome-again-1"></script>
 <script defer src="assets/cam-welcome-home-entry.js?v=20261101-parties-1"></script>
 <script src="assets/cam-analytics.js?v=20261026-sin-robots"></script>
 <!-- Teléfono (3 nov): pestañas dentro de NFL, Fútbol y Picks, y una dirección por sección (?s=nfl&v=quiniela). -->
-<script src="assets/cam-mobile-sections.js?v=20261103-app-dock-1"></script>
+<script src="assets/cam-mobile-sections.js?v=20261103-sport-news-1"></script>
 
 <script id="ae-home-news-carousel-motion">
 /* Movimiento ligero y reversible: sin clones, sin alterar enlaces, votos o artículos. */

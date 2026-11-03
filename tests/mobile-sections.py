@@ -36,10 +36,10 @@ try { sessionStorage.setItem('cam_sports_home_welcome_seen_session_v1', '1'); } 
 SPORT_TABS = ['noticias', 'takes', 'quiniela', 'clasificacion']
 # Módulos que deben verse (True) u ocultarse (False) en cada pestaña.
 SPORT_EXPECT = {
-    'noticias': {'#articlesGrid': True, '#freeTakes': False, '#RANK': False},
+    'noticias': {'#articlesGrid': True, '#aeSportLatestNews': True, '#freeTakes': False, '#RANK': True},
     'takes': {'#freeTakesTitle': True, '#aeSportTakeLeaders': True, '#QUINIELA': False, '#aeSportTakeRanking': False, '#articlesGrid': False, '#RANK': False},
     'quiniela': {'#QUINIELA': True, '#freeTakesTitle': False, '#aeSportTakeRanking': False, '#articlesGrid': False},
-    'clasificacion': {'#RANK': True, '#aeSportTakeRanking': True, '#QUINIELA': False, '#freeTakesTitle': False, '#articlesGrid': False},
+    'clasificacion': {'#RANK': False, '#aeSportTakeRanking': True, '#QUINIELA': False, '#freeTakesTitle': False, '#articlesGrid': False, '#aeSportLatestNews': False},
 }
 PICKS_TABS = ['picks', 'historial', 'chefs']
 PICKS_EXPECT = {
@@ -119,7 +119,7 @@ def phone(width, dark):
         page.click('body > nav.cam-mobile-bottom-nav > button[data-category="Todos"]'); page.wait_for_timeout(500)
         page.evaluate('openNflTopTen()'); page.wait_for_timeout(600)
         st = page.evaluate(STATE)
-        assert st['cat'] == 'NFL' and st['current'] == 'clasificacion', f'{where}: Top 10 {st}'
+        assert st['cat'] == 'NFL' and st['current'] == 'noticias', f'{where}: Top 10 {st}'
         assert page.evaluate("document.getElementById('nflRankings').getBoundingClientRect().top") >= 40, f'{where}: el Top 10 queda bajo la barra'
 
         # Tocar otra vez la sección activa sube arriba.

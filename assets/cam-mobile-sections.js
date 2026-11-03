@@ -25,9 +25,9 @@
   // Which tab owns each part (kept in step with the CSS hiding rules).
   const OWNERS = {
     sport: {
-      noticias: '#heroSection, #aeNewsHeadingRow, #articlesGrid, #aeSportAllNewsFooter, #aeMoreNews, #aeNflLatestComments, #mainContent > .editorial-layout, #aeFootballMobileStage > .editorial-trending',
+      noticias: '#nflRankings, #championsRankings, #heroSection, #aeNewsHeadingRow, #aeSportLatestNews, #articlesGrid, #aeSportAllNewsFooter, #aeMoreNews, #aeNflLatestComments, #mainContent > .editorial-layout, #aeFootballMobileStage > .editorial-trending',
       quiniela: '#camNflQuiniela, #camFootballQuiniela, #aeSeasonPredictions',
-      clasificacion: '#nflRankings, #championsRankings, #aeSportTakeRanking',
+      clasificacion: '#aeSportTakeRanking',
       takes: '#freeTakes'
     },
     picks: {
