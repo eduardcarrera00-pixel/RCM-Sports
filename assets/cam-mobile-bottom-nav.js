@@ -33,9 +33,9 @@
       const svg = document.createElementNS(svgNS, 'svg');
       for (const [name, value] of Object.entries({
         class: 'cam-mobile-nav-symbol',
-        viewBox: '0 0 24 24',
-        width: 27, height: 27,
-        fill: 'none', stroke: 'currentColor', 'stroke-width': 1.8,
+        viewBox: '1.9 1.4 20.1 20.1',
+        width: 24, height: 24,
+        fill: 'none', stroke: 'currentColor', 'stroke-width': 1.55,
         'stroke-linecap': 'round', 'stroke-linejoin': 'round',
         focusable: 'false', 'aria-hidden': 'true'
       })) svg.setAttribute(name, String(value));

@@ -141,13 +141,25 @@ proporciones. Los SVG propios se siguen mostrando como vectores; las fotografía
 y los originales editables conservan sus colores y su identidad. Los recortes de
 atlas se analizan por celda, con caché independiente para cada variante.
 
-## Iconos de navegación · 2 nov 2026
+## Cabecera e iconos compartidos · 2 nov 2026
 
-Picks (diana con dardo), NFL (balón americano) y Fútbol (balón de paneles)
-utilizan los vectores de la referencia del propietario, incluidos en el HTML
-para compartir el mismo dibujo entre cabecera y barra móvil. Opiniones conserva
-su imagen de escritorio y su símbolo de conversación en móvil. Los cuatro
-usan la misma escala: 22 px en escritorio y las medidas comunes de la barra
-móvil, con el mismo marco y sin recortes. `ae-custom-nav-icons.css` controla
-la tinta clara sobre la cabecera azul de ambos temas; la barra móvil conserva
-su tinta azul diurna, clara nocturna y bronce para la sección seleccionada.
+`assets/cam-header-system.css`, primera fuente del bundle editorial, concentra
+la geometría y el acabado bronce de cabecera y barra móvil en la capa
+`cam-header`. Sustituye las antiguas hojas de iconos atenuados, navegación
+personalizada, acceso artístico y alineación de controles. Las reglas inline
+anteriores de sol/luna y avisos ya no se publican.
+
+Los dibujos aprobados de Picks, NFL y Fútbol conservan sus formas; sus viewBox
+se ajustan a la silueta pintada, con un trazo principal de 1.55. Opiniones
+conserva el WebP original en escritorio (límites alfa 5,10–92,91) y la burbuja
+vectorial móvil. La corrección 96/87 y su centrado óptico eliminan el margen
+transparente sin alterar la imagen. El tamaño visible máximo es 24 px dentro
+de un marco de 32 × 32 px; las áreas de interacción miden al menos 44 × 44 px.
+
+Usuario, sol, luna y campana comparten símbolos SVG y el mismo degradado bronce.
+El estado claro de la barra inferior usa un bronce más oscuro sobre marfil;
+la cabecera conserva el fondo ilustrado azul y la marca oficial de ambos
+modos. Las etiquetas, separación, hover, selección y foco salen del mismo
+sistema. El contador de avisos es absoluto y no ocupa espacio junto a la
+campana. Se mantienen los IDs, eventos, ocultación según sesión y navegación
+inferior originales; el selector de tema ya no tiene un círculo exclusivo.

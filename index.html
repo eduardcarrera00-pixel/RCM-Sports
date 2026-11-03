@@ -302,14 +302,12 @@ html.dark [data-reading-size][aria-pressed="true"] {
     </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
-<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261102-logos-dorados-1">
-<link rel="stylesheet" href="assets/cam-perf-core-extras.css?v=20261102-reference-nav-icons-1">
+<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261103-unified-header-1">
+<link rel="stylesheet" href="assets/cam-perf-core-extras.css?v=20261103-unified-header-1">
 <script defer src="assets/ae-nfl-mobile-telephoto.js?v=20261016-1"></script>
 <link rel="stylesheet" href="assets/ae-football-mobile-redesign.css?v=20261018-hide-football-trending-mobile-1">
 <link rel="stylesheet" href="assets/ae-take-discussion-reference.css?v=20261018-comment-replies-votes-counts-2">
 <link rel="stylesheet" href="assets/cam-perf-sport-banners.css?v=20261025-css-seo-1">
-<link rel="stylesheet" href="assets/ae-login-art-button.css?v=20261016-3">
-<link rel="stylesheet" href="assets/ae-header-alignment-polish.css?v=20261017-login-icon-smaller-2">
 <link rel="stylesheet" href="assets/ae-admin-header-compact.css?v=20261016-1">
 <link rel="stylesheet" href="assets/ae-home-community-spotlight.css?v=20261017-opinadores-natural-height-1">
 <style id="ae-opinions-reused-home-panels">
@@ -2017,21 +2015,6 @@ html body.ae-is-nfl #mainContent #freeTakes > #aeSportTakeRanking{
 <link rel="stylesheet" href="assets/ae-sport-tables-news-20261017.css?v=20261018-mobile-opinions-order-v5">
 <link rel="stylesheet" href="assets/ae-article-actions-conversation.css?v=20261017-compact-2">
 <style id="ae-home-sun-takes-trending-polish">
-/* Sun artwork: the mode toggle itself should not frame the sun. */
-html body>header #themeToggle.ae-theme-sun-unframed,
-html body>header #themeToggle:has(#themeIcon[src*="ae-sol-gold"]){
-  border:0!important;border-color:transparent!important;border-radius:0!important;
-  background:transparent!important;box-shadow:none!important;
-  outline:none!important;
-}
-html body>header #themeToggle.ae-theme-sun-unframed #themeIcon,
-html body>header #themeToggle:has(#themeIcon[src*="ae-sol-gold"]) #themeIcon{
-  border:0!important;background:transparent!important;box-shadow:none!important;
-}
-html body>header #themeToggle.ae-theme-sun-unframed:focus-visible,
-html body>header #themeToggle:has(#themeIcon[src*="ae-sol-gold"]):focus-visible{
-  outline:2px solid #eac18e!important;outline-offset:3px!important;
-}
 /* Las cabeceras de Genios y Anoetos ahora son visibles: clasificación deportiva. */
 /* Only this invitation is gently rounded; site cards stay square. */
 html body.ae-is-home #editorialBottom #aeHomeTakeHighlights .ae-home-take-bottom-cta #aeHomeTakePublish{
@@ -2170,206 +2153,6 @@ html body:is(.ae-is-home,.ae-is-opinions) #mainContent #aeTrendingPortada.ae-tre
   html body:is(.ae-is-home,.ae-is-opinions) #mainContent #aeTrendingPortada.ae-trending-portada #trendingList .ae-trending-link{
     grid-template-columns:64px minmax(0,1fr)!important;
   }
-}
-</style>
-<style id="ae-header-moon-sport-icons-and-classic-avisos">
-/* AE SPORTS · desktop navigation polish; transient feedback, never a permanent frame. */
-@media(min-width:761px){
-  html body>header .ae-header-actions #themeToggle{
-    position:relative!important;
-    margin-right:11px!important;
-    transform:translateX(-4px)!important;
-  }
-}
-/* Both sun and moon are unframed. Hover darkens the artwork, never outlines it. */
-html body>header .ae-header-actions #themeToggle{
-  border:0!important;border-color:transparent!important;
-  outline:0!important;border-radius:0!important;
-  background:transparent!important;background-image:none!important;
-  box-shadow:none!important;
-}
-html body>header .ae-header-actions #themeToggle:hover,
-html body>header .ae-header-actions #themeToggle:active{
-  border:0!important;border-color:transparent!important;
-  outline:none!important;background:transparent!important;box-shadow:none!important;
-}
-html body>header .ae-header-actions #themeToggle:hover #themeIcon{
-  opacity:.82!important;
-  filter:brightness(.72) saturate(.82) contrast(1.04)!important;
-}
-html body>header .ae-header-actions #themeToggle:focus-visible{
-  outline:2px solid #e5bc83!important;outline-offset:3px!important;
-}
-/* Remove white/brass squares around sport artwork on hover and selection. */
-html body>header nav.ae-sport-nav .category-btn .ae-nav-icon,
-html body>header nav.ae-sport-nav .category-btn:hover .ae-nav-icon,
-html body>header nav.ae-sport-nav .category-btn.active .ae-nav-icon,
-html body>header nav.ae-sport-nav .category-btn:focus-visible .ae-nav-icon,
-html:not(.dark) body>header nav.ae-sport-nav .category-btn:hover .ae-nav-icon,
-html:not(.dark) body>header nav.ae-sport-nav .category-btn.active .ae-nav-icon{
-  border:0!important;border-color:transparent!important;
-  outline:none!important;background:transparent!important;
-  background-image:none!important;box-shadow:none!important;
-}
-html body>header nav.ae-sport-nav .category-btn:hover .ae-nav-icon .ae-custom-sport-icon{
-  opacity:.92!important;
-  filter:brightness(.85) saturate(.88) contrast(1.02)!important;
-}
-html body>header nav.ae-sport-nav .category-btn:focus-visible{
-  outline:2px solid #e2b786!important;outline-offset:2px!important;
-}
-/* A unique notification emblem aligned with the sport buttons' 35px/12px grid.
-   Preserve #aeNotificationsButton / #aeNotificationsBadge and their listeners. */
-html body>header #aeNotificationsButton[hidden],
-html body>header #aeNotificationsBadge[hidden]{display:none!important}
-html body>header .ae-header-actions #aeNotificationsButton:not([hidden]){
-  position:relative!important;
-  display:grid!important;
-  grid-template-columns:minmax(0,1fr)!important;
-  grid-template-rows:35px 12px!important;
-  place-items:center!important;
-  align-content:center!important;
-  flex:0 0 59px!important;
-  box-sizing:border-box!important;
-  width:59px!important;min-width:59px!important;max-width:59px!important;
-  height:58px!important;min-height:58px!important;max-height:58px!important;
-  margin:0!important;padding:4px 1px!important;gap:3px!important;
-  border:0!important;border-radius:0!important;
-  background:transparent!important;box-shadow:none!important;
-  cursor:pointer!important;
-}
-html body>header #aeNotificationsButton .ae-notifications-classic-icon{
-  display:block!important;
-  grid-column:1!important;grid-row:1!important;
-  align-self:center!important;justify-self:center!important;
-  width:35px!important;height:35px!important;
-  max-width:35px!important;max-height:35px!important;
-  margin:0!important;padding:2px!important;box-sizing:border-box!important;
-  border:0!important;background:transparent!important;
-  overflow:visible!important;
-  opacity:.87;transition:filter .16s ease,opacity .16s ease;
-  pointer-events:none!important;
-  --avisos-outline:#a36b3d;
-  --avisos-detail:#ffe0a8;
-}
-html body>header #aeNotificationsButton .ae-avisos-gold-light{stop-color:#f3dcab}
-html body>header #aeNotificationsButton .ae-avisos-gold-mid{stop-color:#d4a76a}
-html body>header #aeNotificationsButton .ae-avisos-gold-deep{stop-color:#9c6337}
-html body>header #aeNotificationsButton .ae-avisos-bell-metal{stroke:var(--avisos-outline)}
-html body>header #aeNotificationsButton .ae-avisos-engraving{stroke:#c99b67;opacity:.73}
-html body>header #aeNotificationsButton .ae-avisos-highlight{stroke:var(--avisos-detail);opacity:.7}
-html body>header #aeNotificationsButton .ae-avisos-rim{stroke:#edc994}
-html body>header #aeNotificationsButton .ae-avisos-clapper{stroke:#c79759}
-html body>header #aeNotificationsButton .ae-avisos-crown{fill:#d6a872}
-html body>header #aeNotificationsButton .ae-notifications-caption{
-  display:block!important;
-  grid-column:1!important;grid-row:2!important;
-  align-self:center!important;justify-self:center!important;
-  width:100%!important;min-width:0!important;max-width:100%!important;
-  margin:0!important;padding:0!important;
-  color:#f1dfc7!important;
-  font:800 9px/12px Inter,system-ui,sans-serif!important;
-  letter-spacing:.025em!important;line-height:12px!important;
-  text-align:center!important;text-transform:uppercase!important;
-  white-space:nowrap!important;
-}
-html body>header #aeNotificationsButton #aeNotificationsBadge:not([hidden]){
-  position:absolute!important;top:3px!important;right:4px!important;
-  z-index:2!important;display:grid!important;place-items:center!important;
-  box-sizing:border-box!important;min-width:16px!important;height:16px!important;
-  padding:0 3px!important;border:1px solid #f1d2ab!important;
-  border-radius:50%!important;background:#8d4b39!important;color:#fff7ef!important;
-  font:800 9px/1 Inter,system-ui,sans-serif!important;
-}
-html body>header #aeNotificationsButton:hover .ae-notifications-classic-icon{
-  opacity:1!important;filter:brightness(.8) saturate(.95)!important;
-}
-html body>header #aeNotificationsButton:focus-visible{
-  outline:2px solid #e6bc83!important;outline-offset:2px!important;
-}
-html:not(.dark) body>header #aeNotificationsButton .ae-avisos-gold-light{stop-color:#d5ae7b}
-html:not(.dark) body>header #aeNotificationsButton .ae-avisos-gold-mid{stop-color:#aa703f}
-html:not(.dark) body>header #aeNotificationsButton .ae-avisos-gold-deep{stop-color:#663d25}
-html:not(.dark) body>header #aeNotificationsButton .ae-notifications-classic-icon{--avisos-outline:#593c28;--avisos-detail:#f6d4a0}
-html:not(.dark) body>header #aeNotificationsButton .ae-avisos-engraving{stroke:#a06a45}
-html:not(.dark) body>header #aeNotificationsButton .ae-avisos-rim{stroke:#b88758}
-html:not(.dark) body>header #aeNotificationsButton .ae-avisos-clapper{stroke:#966537}
-html:not(.dark) body>header #aeNotificationsButton .ae-avisos-crown{fill:#a57244}
-@media(min-width:761px) and (max-width:1180px){
-  html body>header .ae-header-actions #themeToggle{margin-right:6px!important;transform:translateX(-3px)!important;}
-  html body>header .ae-header-actions #aeNotificationsButton:not([hidden]){
-    flex-basis:53px!important;width:53px!important;min-width:53px!important;max-width:53px!important;
-  }
-}
-@media(max-width:760px){
-  html body>header .ae-header-actions #themeToggle{margin-right:0!important;transform:none!important;}
-  html body>header .ae-header-actions #aeNotificationsButton:not([hidden]){
-    flex:0 0 57px!important;width:57px!important;min-width:57px!important;max-width:57px!important;
-    height:60px!important;min-height:60px!important;max-height:60px!important;
-    grid-template-rows:29px 12px!important;gap:5px!important;padding:5px 2px!important;
-  }
-  html body>header #aeNotificationsButton .ae-notifications-classic-icon{
-    width:30px!important;height:30px!important;max-width:30px!important;max-height:30px!important;
-  }
-  html body>header #aeNotificationsButton .ae-notifications-caption{
-    font-size:9px!important;
-  }
-}
-@media(prefers-reduced-motion:reduce){
-  html body>header #aeNotificationsButton .ae-notifications-classic-icon{transition:none!important}
-}
-</style>
-<style id="ae-avisos-harmonized-icon">
-/* AE SPORTS: mismo peso visual que sol/luna y acceso, sin palabra ni marco.
-   El botón y su indicador de avisos conservan los IDs y eventos existentes. */
-html body>header .ae-header-actions #aeNotificationsButton:not([hidden]){
-  position:relative!important;
-  display:flex!important;
-  flex:0 0 36px!important;
-  width:36px!important;min-width:36px!important;max-width:36px!important;
-  height:36px!important;min-height:36px!important;max-height:36px!important;
-  align-items:center!important;justify-content:center!important;
-  align-self:center!important;
-  margin:0!important;padding:0!important;gap:0!important;
-  border:0!important;border-radius:0!important;
-  background:transparent!important;box-shadow:none!important;
-  box-sizing:border-box!important;cursor:pointer!important;
-}
-html body>header #aeNotificationsButton .ae-avisos-icon{
-  display:block!important;flex:0 0 23px!important;
-  width:23px!important;height:23px!important;
-  min-width:23px!important;min-height:23px!important;
-  max-width:23px!important;max-height:23px!important;
-  object-fit:contain!important;object-position:center!important;
-  margin:0!important;padding:0!important;border:0!important;
-  opacity:.84!important;
-  filter:brightness(.80) saturate(.77) contrast(.96)!important;
-  pointer-events:none!important;
-  transition:filter .16s ease,opacity .16s ease;
-}
-html body>header #aeNotificationsButton .ae-avisos-icon-gold{display:block!important}
-html body>header #aeNotificationsButton .ae-notifications-caption{display:none!important}
-html body>header #aeNotificationsButton #aeNotificationsBadge:not([hidden]){
-  top:-4px!important;right:-4px!important;
-}
-html body>header #aeNotificationsButton:is(:hover,:focus-visible) .ae-avisos-icon-gold{
-  opacity:.95!important;filter:brightness(.91) saturate(.88) contrast(.98)!important;
-}
-@media(max-width:760px){
-  html body>header .ae-header-actions #aeNotificationsButton:not([hidden]){
-    flex:0 0 36px!important;
-    width:36px!important;min-width:36px!important;max-width:36px!important;
-    height:36px!important;min-height:36px!important;max-height:36px!important;
-  }
-  html body>header #aeNotificationsButton .ae-avisos-icon{
-    width:21px!important;height:21px!important;
-    min-width:21px!important;min-height:21px!important;
-    max-width:21px!important;max-height:21px!important;
-    flex-basis:21px!important;
-  }
-}
-@media(prefers-reduced-motion:reduce){
-  html body>header #aeNotificationsButton .ae-avisos-icon{transition:none!important}
 }
 </style>
 <link rel="stylesheet" href="assets/ae-home-esports-standings.css?v=20261017-league-v1">
@@ -2736,10 +2519,10 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
 <script src="assets/cam-banner-artwork.js?v=20261102-visible-size-1"></script>
 <script src="assets/ae-site-images.js?v=20261102-visible-size-1"></script>
 <script src="assets/cam-site-texts.js?v=20261028-prepara-pick-1"></script>
-<script defer src="assets/cam-mobile-bottom-nav.js?v=20261102-reference-nav-icons-1"></script>
+<script defer src="assets/cam-mobile-bottom-nav.js?v=20261103-unified-header-1"></script>
 <link rel="stylesheet" href="assets/cam-pick-editor-night.css?v=20261021-editor-night-1">
 <link rel="stylesheet" href="assets/cam-global-edit.css?v=20261022-logo-size-1">
-<link rel="stylesheet" href="assets/cam-mobile-bottom-nav.css?v=20261022-mobile-svg-circles-integrated-1">
+<link rel="stylesheet" href="assets/cam-mobile-bottom-nav.css?v=20261103-unified-header-1">
 
 <link rel="stylesheet" href="assets/cam-take-cta.css?v=20261026-compact-squares-1">
 <script defer src="assets/cam-take-cta.js?v=20261023-take-cta-unificado-1"></script>
@@ -2747,6 +2530,15 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
 <link rel="stylesheet" href="assets/cam-football-ranking-banners.css?v=20261023-football-ranking-banner-1">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white ae-is-home">
+<svg class="cam-header-symbols" xmlns="http://www.w3.org/2000/svg" width="0" height="0" aria-hidden="true" focusable="false"><defs>
+  <linearGradient id="cam-metal-header" x1="0" y1="0" x2="1" y2="1"><stop class="cam-metal-light" offset="0"/><stop class="cam-metal-mid" offset=".55"/><stop class="cam-metal-deep" offset="1"/></linearGradient>
+  <linearGradient id="cam-metal-day" x1="0" y1="0" x2="1" y2="1"><stop class="cam-day-metal-light" offset="0"/><stop class="cam-day-metal-mid" offset=".55"/><stop class="cam-day-metal-deep" offset="1"/></linearGradient>
+  <g id="cam-symbol-user" fill="none" stroke="var(--cam-icon-paint,currentColor)" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4" fill="var(--cam-icon-paint,currentColor)" fill-opacity=".2"/><path d="M3.5 22v-2.5a8.5 8.5 0 0 1 17 0V22Z" fill="var(--cam-icon-paint,currentColor)" fill-opacity=".2"/></g>
+  <g id="cam-symbol-sun" fill="none" stroke="var(--cam-icon-paint,currentColor)" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.4" fill="var(--cam-icon-paint,currentColor)" fill-opacity=".22"/><path d="M12 1v2m0 18v2M1 12h2m18 0h2M4.22 4.22l1.42 1.42m12.72 12.72 1.42 1.42M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></g>
+  <g id="cam-symbol-moon" fill="none" stroke="var(--cam-icon-paint,currentColor)" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M21.4 15.1A10 10 0 0 1 8.9 2.6 10 10 0 1 0 21.4 15.1Z" fill="var(--cam-icon-paint,currentColor)" fill-opacity=".22"/></g>
+  <g id="cam-symbol-bell" fill="none" stroke="var(--cam-icon-paint,currentColor)" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M5.3 9a6.7 6.7 0 0 1 13.4 0v5.1l2 3.2v1H3.3v-1l2-3.2Z" fill="var(--cam-icon-paint,currentColor)" fill-opacity=".2"/><path d="M9.3 21a3 3 0 0 0 5.4 0M10.5 2.3V1h3v1.3"/></g>
+  <g id="cam-symbol-signout" fill="none" stroke="var(--cam-icon-paint,currentColor)" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3H4v18h6m4-14 5 5-5 5m-6-5h12"/></g>
+<g id="cam-symbol-plus" fill="none" stroke="var(--cam-icon-paint,currentColor)" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18"/></g><g id="cam-symbol-edit" fill="none" stroke="var(--cam-icon-paint,currentColor)" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21h9M16 3l5 5L8 21l-5 1 1-5Z"/></g></defs></svg>
 <a class="ae-skip-link" href="#mainContent">Ir al contenido</a>
 
     <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
@@ -2761,9 +2553,9 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
                 <input id="searchInput" type="search" hidden aria-hidden="true" tabindex="-1" oninput="handleSearch()">
                 <nav class="ae-sport-nav" aria-label="Explorar deportes">
                     <button onclick="filterByCategory('Todos')" class="category-btn active" data-category="Todos" hidden>Todos</button>
-                    <button onclick="filterByCategory('Picks')" class="category-btn" data-category="Picks"><span class="ae-nav-icon"><svg class="cam-category-nav-symbol cam-mobile-nav-symbol" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="10.7" cy="13.3" r="7.9"/><circle cx="10.7" cy="13.3" r="6.5" stroke-width=".6"/><circle cx="10.7" cy="13.3" r="2.2" stroke-width=".6"/><path d="M10.70 6.80A6.5 6.5 0 0 1 13.19 7.29L11.54 11.27A2.2 2.2 0 0 0 10.70 11.10Z" fill="currentColor" stroke="none"/><path d="M15.30 8.70A6.5 6.5 0 0 1 16.71 10.81L12.73 12.46A2.2 2.2 0 0 0 12.26 11.74Z" fill="currentColor" stroke="none"/><path d="M17.20 13.30A6.5 6.5 0 0 1 16.71 15.79L12.73 14.14A2.2 2.2 0 0 0 12.90 13.30Z" fill="currentColor" stroke="none"/><path d="M15.30 17.90A6.5 6.5 0 0 1 13.19 19.31L11.54 15.33A2.2 2.2 0 0 0 12.26 14.86Z" fill="currentColor" stroke="none"/><path d="M10.70 19.80A6.5 6.5 0 0 1 8.21 19.31L9.86 15.33A2.2 2.2 0 0 0 10.70 15.50Z" fill="currentColor" stroke="none"/><path d="M6.10 17.90A6.5 6.5 0 0 1 4.69 15.79L8.67 14.14A2.2 2.2 0 0 0 9.14 14.86Z" fill="currentColor" stroke="none"/><path d="M4.20 13.30A6.5 6.5 0 0 1 4.69 10.81L8.67 12.46A2.2 2.2 0 0 0 8.50 13.30Z" fill="currentColor" stroke="none"/><path d="M6.10 8.70A6.5 6.5 0 0 1 8.21 7.29L9.86 11.27A2.2 2.2 0 0 0 9.14 11.74Z" fill="currentColor" stroke="none"/><circle cx="10.7" cy="13.3" r=".85" fill="currentColor" stroke="none"/><path d="m10.7 13.3 9.6-9.6" stroke-width="1.4"/><path d="m17.7 6.3-.1-2.2 2.7-1.9.1 2.1 2.1.1-1.9 2.7-2.2-.1" fill="currentColor" stroke="none"/></svg></span><span>Picks</span></button>
-                    <button onclick="filterByCategory('NFL')" class="category-btn" data-category="NFL"><span class="ae-nav-icon"><svg class="cam-category-nav-symbol cam-mobile-nav-symbol" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M2.8 21.2C1.1 10 10 1.1 21.2 2.8 22.9 14 14 22.9 2.8 21.2Z"/><path d="m3.1 13.9 7 7-3 .5-4.5-4.5Zm10.8-10.8 7 7 .5-3-4.5-4.5Z" fill="currentColor" stroke="none"/><path d="m8 16 8-8m-8.5 5 3.5 3.5m-.9-5.9 3.3 3.3m-.9-5.9 3.5 3.5"/></svg></span><span>NFL</span></button>
-                    <button onclick="filterByCategory('Fútbol')" class="category-btn" data-category="Fútbol"><span class="ae-nav-icon"><svg class="cam-category-nav-symbol cam-mobile-nav-symbol" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9.5"/><path d="m12 7 4.8 3.5-1.8 5.7H9l-1.8-5.7Z" fill="currentColor" stroke="none"/><path d="M12 7V4m4.8 6.5 3.1-1m-4.9 6.7 2 2.6m-8-2.6-2 2.6m.2-8.3-3.1-1" stroke-width=".75"/><path d="M8.6 3.2 12 4l3.4-.8M20 6.9l-.1 2.6 1.4 2.3M19.6 17.8l-2.6 1-1.2 2M8.2 20.8l-1.2-2-2.6-1M2.7 11.8l1.4-2.3L4 6.9" fill="currentColor" stroke-width=".6"/></svg></span><span>Fútbol</span></button>
+                    <button onclick="filterByCategory('Picks')" class="category-btn" data-category="Picks"><span class="ae-nav-icon"><svg class="cam-category-nav-symbol cam-mobile-nav-symbol" viewBox="2.000 1.825 20.525 20.525" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.55" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="10.7" cy="13.3" r="7.9"/><circle cx="10.7" cy="13.3" r="6.5" stroke-width=".6"/><circle cx="10.7" cy="13.3" r="2.2" stroke-width=".6"/><path d="M10.70 6.80A6.5 6.5 0 0 1 13.19 7.29L11.54 11.27A2.2 2.2 0 0 0 10.70 11.10Z" fill="currentColor" stroke="none"/><path d="M15.30 8.70A6.5 6.5 0 0 1 16.71 10.81L12.73 12.46A2.2 2.2 0 0 0 12.26 11.74Z" fill="currentColor" stroke="none"/><path d="M17.20 13.30A6.5 6.5 0 0 1 16.71 15.79L12.73 14.14A2.2 2.2 0 0 0 12.90 13.30Z" fill="currentColor" stroke="none"/><path d="M15.30 17.90A6.5 6.5 0 0 1 13.19 19.31L11.54 15.33A2.2 2.2 0 0 0 12.26 14.86Z" fill="currentColor" stroke="none"/><path d="M10.70 19.80A6.5 6.5 0 0 1 8.21 19.31L9.86 15.33A2.2 2.2 0 0 0 10.70 15.50Z" fill="currentColor" stroke="none"/><path d="M6.10 17.90A6.5 6.5 0 0 1 4.69 15.79L8.67 14.14A2.2 2.2 0 0 0 9.14 14.86Z" fill="currentColor" stroke="none"/><path d="M4.20 13.30A6.5 6.5 0 0 1 4.69 10.81L8.67 12.46A2.2 2.2 0 0 0 8.50 13.30Z" fill="currentColor" stroke="none"/><path d="M6.10 8.70A6.5 6.5 0 0 1 8.21 7.29L9.86 11.27A2.2 2.2 0 0 0 9.14 11.74Z" fill="currentColor" stroke="none"/><circle cx="10.7" cy="13.3" r=".85" fill="currentColor" stroke="none"/><path d="m10.7 13.3 9.6-9.6" stroke-width="1.4"/><path d="m17.7 6.3-.1-2.2 2.7-1.9.1 2.1 2.1.1-1.9 2.7-2.2-.1" fill="currentColor" stroke="none"/></svg></span><span>Picks</span></button>
+                    <button onclick="filterByCategory('NFL')" class="category-btn" data-category="NFL"><span class="ae-nav-icon"><svg class="cam-category-nav-symbol cam-mobile-nav-symbol" viewBox="1.775 1.775 20.450 20.450" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.55" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M2.8 21.2C1.1 10 10 1.1 21.2 2.8 22.9 14 14 22.9 2.8 21.2Z"/><path d="m3.1 13.9 7 7-3 .5-4.5-4.5Zm10.8-10.8 7 7 .5-3-4.5-4.5Z" fill="currentColor" stroke="none"/><path d="m8 16 8-8m-8.5 5 3.5 3.5m-.9-5.9 3.3 3.3m-.9-5.9 3.5 3.5"/></svg></span><span>NFL</span></button>
+                    <button onclick="filterByCategory('Fútbol')" class="category-btn" data-category="Fútbol"><span class="ae-nav-icon"><svg class="cam-category-nav-symbol cam-mobile-nav-symbol" viewBox="1.700 1.700 20.600 20.600" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.55" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9.5"/><path d="m12 7 4.8 3.5-1.8 5.7H9l-1.8-5.7Z" fill="currentColor" stroke="none"/><path d="M12 7V4m4.8 6.5 3.1-1m-4.9 6.7 2 2.6m-8-2.6-2 2.6m.2-8.3-3.1-1" stroke-width=".75"/><path d="M8.6 3.2 12 4l3.4-.8M20 6.9l-.1 2.6 1.4 2.3M19.6 17.8l-2.6 1-1.2 2M8.2 20.8l-1.2-2-2.6-1M2.7 11.8l1.4-2.3L4 6.9" fill="currentColor" stroke-width=".6"/></svg></span><span>Fútbol</span></button>
                     <button onclick="filterByCategory('Opiniones')" class="category-btn" data-category="Opiniones"><span class="ae-nav-icon"><img class="ae-custom-sport-icon" src="assets/icons/ae-opiniones-gold.webp?v=20261020-1" width="40" height="40" loading="eager" decoding="async" alt="" aria-hidden="true"></span><span>Opiniones</span></button>
                     <button onclick="filterByCategory('Fútbol Americano Colegial')" class="category-btn" data-category="Fútbol Americano Colegial" hidden aria-hidden="true"><span class="ae-nav-icon"><img class="ae-custom-sport-icon" src="assets/icons/ae-colegial-gold.webp?v=20261016-1" width="40" height="40" loading="eager" decoding="async" alt="" aria-hidden="true"></span><span>Colegial</span></button>
                     <button onclick="filterByCategory('NBA')" class="category-btn" data-category="NBA" hidden aria-hidden="true"><span class="ae-nav-icon"><i class="fa-solid fa-basketball" aria-hidden="true"></i></span><span>NBA</span></button>
@@ -2781,7 +2573,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
     title="Activar modo oscuro"
     class="w-9 h-9 rounded-xl bg-slate-100 border border-slate-200
            text-slate-600 flex items-center justify-center">
-    <img id="themeIcon" class="ae-custom-theme-icon" src="assets/icons/ae-luna-gold.webp?v=20261016-1" width="32" height="32" alt="" aria-hidden="true" decoding="async">
+    <span class="cam-control-icon" aria-hidden="true"><svg class="cam-ui-symbol" viewBox="0.975 1.750 21.275 21.275" width="24" height="24" fill="none" aria-hidden="true" focusable="false" id="themeIcon"><use href="#cam-symbol-moon"/></svg></span>
     <span class="ae-mobile-theme-caption" aria-hidden="true">Modo</span>
 </button>
 
@@ -2790,30 +2582,29 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
                     <button type="button" id="aeNotificationsButton" hidden
                       aria-label="Notificaciones" aria-controls="aeNotificationsDialog" aria-haspopup="dialog"
                       aria-expanded="false" title="Mis notificaciones">
-                      <img class="ae-avisos-icon ae-avisos-icon-gold" src="assets/icons/ae-avisos-six-gold.webp?v=20261017-1" width="64" height="64" alt="" aria-hidden="true" decoding="async">
+                      <span class="cam-control-icon " aria-hidden="true"><svg class="cam-ui-symbol" viewBox="0.300 0.150 23.400 23.400" width="24" height="24" fill="none" aria-hidden="true" focusable="false" ><use href="#cam-symbol-bell"/></svg></span>
+                      <span class="ae-notifications-caption" aria-hidden="true">Avisos</span>
                       
                       <span id="aeNotificationsBadge" class="ae-notifications-badge" hidden></span>
                     </button>
                     <div id="readerSession" class="hidden rcm-row"></div>
-                    <button id="aeMyTakesButton" type="button" hidden class="ae-profile-open ae-classical-auth-button ae-classical-profile" onclick="openAeProfile()" aria-label="Mi perfil: consultar mis Takes" title="Mi perfil"><img class="ae-classical-auth-art" src="assets/ui/ae-profile-mark.png?v=20261016-3" width="96" height="96" alt="" aria-hidden="true" decoding="async"><span class="ae-auth-caption" aria-hidden="true">Mi perfil</span></button>
+                    <button id="aeMyTakesButton" type="button" hidden class="ae-profile-open ae-classical-auth-button ae-classical-profile" onclick="openAeProfile()" aria-label="Mi perfil: consultar mis Takes" title="Mi perfil"><span class="cam-control-icon " aria-hidden="true"><svg class="cam-ui-symbol" viewBox="1.650 2.150 20.700 20.700" width="24" height="24" fill="none" aria-hidden="true" focusable="false" ><use href="#cam-symbol-user"/></svg></span><span class="ae-auth-caption" aria-hidden="true">Mi perfil</span></button>
                     <div id="guestAdminContainer">
                         <button type="button" onclick="openUserAuthModal()" aria-label="Iniciar sesión o crear cuenta" class="ae-login-art-control">
-                            <span class="ae-login-emblem" aria-hidden="true"></span>
+                            <span class="cam-control-icon ae-login-emblem" aria-hidden="true"><svg class="cam-ui-symbol" viewBox="1.650 2.150 20.700 20.700" width="24" height="24" fill="none" aria-hidden="true" focusable="false" ><use href="#cam-symbol-user"/></svg></span>
                             <span class="ae-login-label">Iniciar sesión</span>
                         </button>
                     </div>
 
                     <button id="camGlobalEditToggle" type="button" class="cam-global-edit-toggle" hidden
                       aria-pressed="false" aria-label="Activar modo edición" title="Activar modo edición">
-                      <span class="cam-global-edit-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false">
-                        <path d="M12 20h9"/><path d="m16.5 3.5 4 4L8.5 19.5l-5 1 1-5z"/>
-                      </svg></span><span class="cam-global-edit-label" aria-hidden="true">Editar</span>
+                      <span class="cam-control-icon" aria-hidden="true"><svg class="cam-ui-symbol" viewBox="2.15 2.15 20.7 20.7" width="24" height="24" fill="none" aria-hidden="true" focusable="false"><use href="#cam-symbol-edit"/></svg></span><span class="cam-global-edit-label" aria-hidden="true">Editar</span>
                     </button>
                     <!-- Logged-in State: Admin Profile & Actions -->
                     <div id="loggedAdminContainer" class="hidden flex items-center space-x-2 sm:space-x-3">
                         <!-- Publish Button -->
                         <button onclick="openPublishModal()" class="ae-publish-action flex items-center bg-pitch-600 hover:bg-pitch-700 text-white" aria-label="Publicar" title="Publicar">
-                            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                            <span class="cam-control-icon" aria-hidden="true"><svg class="cam-ui-symbol" viewBox="2.15 2.15 19.7 19.7" width="24" height="24" fill="none" aria-hidden="true" focusable="false"><use href="#cam-symbol-plus"/></svg></span>
                         </button>
 
                         <!-- Logout Button -->
@@ -2821,7 +2612,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
 
                         <!-- Compact admin profile, mirroring the consumer layout -->
                         <button type="button" class="ae-admin-profile" onclick="openAeProfile()" aria-label="Abrir mi perfil" title="Mi perfil">
-                            <img class="ae-admin-profile-art" src="assets/ui/ae-profile-mark.png?v=20261016-3" width="96" height="96" alt="" aria-hidden="true" decoding="async">
+                            <span class="cam-control-icon " aria-hidden="true"><svg class="cam-ui-symbol" viewBox="1.650 2.150 20.700 20.700" width="24" height="24" fill="none" aria-hidden="true" focusable="false" ><use href="#cam-symbol-user"/></svg></span>
                             <span id="adminNameDisplay">--</span>
                         </button>
                     </div>
@@ -5605,8 +5396,8 @@ function renderRelatedStories(article) {
     const icon = document.getElementById('themeIcon');
     const label = isDark ? 'Activar modo claro' : 'Activar modo oscuro';
 
-    icon.src = isDark ? 'assets/icons/ae-sol-gold.webp?v=20261016-1' : 'assets/icons/ae-luna-gold.webp?v=20261016-1';
-    button.classList.toggle('ae-theme-sun-unframed', isDark);
+    icon.querySelector('use').setAttribute('href', isDark ? '#cam-symbol-sun' : '#cam-symbol-moon');
+    icon.setAttribute('viewBox', isDark ? '0.150 0.150 23.700 23.700' : '0.975 1.750 21.275 21.275');
     button.setAttribute('aria-label', label);
     button.setAttribute('aria-pressed', String(isDark));
     button.title = label;

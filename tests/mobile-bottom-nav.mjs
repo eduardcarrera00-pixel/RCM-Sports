@@ -74,7 +74,11 @@ for (const category of primary) {
   const button = originalButtons.get(category);
   const icon = button.querySelector('svg.cam-mobile-nav-symbol');
   assert.ok(icon, category + ': phone-only SVG is mounted');
-  assert.equal(icon.getAttribute('viewBox'), '0 0 24 24');
+  const paintedBox = icon.getAttribute('viewBox').split(/\s+/).map(Number);
+  assert.equal(paintedBox.length, 4, category + ': a valid painted viewBox');
+  assert.ok(paintedBox.every(Number.isFinite));
+  assert.ok(paintedBox[2] > 0 && paintedBox[2] <= 24);
+  assert.equal(paintedBox[2], paintedBox[3], category + ': square crop preserves proportions');
   assert.equal(icon.getAttribute('stroke'), 'currentColor');
   assert.ok(icon.children.length >= 2, category + ': visible details must remain');
   assert.equal(button.querySelectorAll('img.ae-custom-sport-icon').length, category === 'Opiniones' ? 1 : 0, 'reference categories use inline SVG; Opiniones keeps its desktop image');

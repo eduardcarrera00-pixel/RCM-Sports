@@ -1,0 +1,264 @@
+/* CAM SPORTS · one geometry and bronze family for the header and mobile dock.
+   This first important layer owns chrome only, ahead of legacy component rules. */
+@layer cam-header {
+  :root {
+    --cam-icon-visible: 24px;
+    --cam-icon-frame: 32px;
+    --cam-control-hit: 44px;
+    --cam-control-height: 58px;
+    --cam-control-gap: 8px;
+    --cam-control-radius: 12px;
+    --cam-label-gap: 4px;
+    --cam-metal-light: #c9aa6b;
+    --cam-metal-mid: #a88a4d;
+    --cam-metal-deep: #8d703d;
+    --cam-day-metal-light: #9a713e;
+    --cam-day-metal-mid: #805a30;
+    --cam-day-metal-deep: #684822;
+  }
+  .cam-metal-light { stop-color: var(--cam-metal-light); }
+  .cam-metal-mid { stop-color: var(--cam-metal-mid); }
+  .cam-metal-deep { stop-color: var(--cam-metal-deep); }
+  .cam-day-metal-light { stop-color: var(--cam-day-metal-light); }
+  .cam-day-metal-mid { stop-color: var(--cam-day-metal-mid); }
+  .cam-day-metal-deep { stop-color: var(--cam-day-metal-deep); }
+  .cam-header-symbols {
+    position: absolute !important;
+    width: 0 !important; height: 0 !important;
+    overflow: hidden !important; pointer-events: none !important;
+  }
+  body > header, nav.cam-mobile-bottom-nav {
+    --cam-icon-paint: url(#cam-metal-header);
+    --cam-control-ink: #bda064;
+    --cam-control-label: #f3ebdd;
+    --cam-control-line: transparent;
+    --cam-control-hover: rgba(201,170,107,.09);
+    --cam-control-selected: rgba(201,170,107,.15);
+    --cam-control-focus: #e0bf80;
+  }
+  body > header > div {
+    max-width: 1664px !important;
+    padding-inline: clamp(16px,2.35vw,40px) !important;
+  }
+  body > header .ae-mobile-header-grid {
+    display: grid !important;
+    grid-template-columns: minmax(0,1fr) auto minmax(0,1fr) !important;
+    grid-template-areas: "brand sports account" !important;
+    align-items: center !important;
+    gap: 0 24px !important;
+    width: 100% !important; min-width: 0 !important;
+    height: 88px !important; min-height: 88px !important;
+    padding-block: 0 !important;
+  }
+  body > header .cam-brand { grid-area: brand !important; justify-self: start !important; }
+  body > header nav.ae-sport-nav {
+    grid-area: sports !important;
+    position: relative !important; inset: auto !important;
+    display: flex !important; flex-wrap: nowrap !important;
+    align-items: center !important; justify-content: center !important;
+    justify-self: center !important;
+    gap: var(--cam-control-gap) !important;
+    width: max-content !important; min-width: 0 !important; max-width: none !important;
+    margin: 0 !important; padding: 0 !important;
+    height: var(--cam-control-height) !important; min-height: var(--cam-control-height) !important;
+    border: 0 !important;
+    transform: none !important; overflow: visible !important;
+  }
+  body > header .ae-header-actions {
+    grid-area: account !important;
+    position: relative !important; inset: auto !important;
+    display: flex !important; flex-wrap: nowrap !important;
+    align-items: center !important; justify-content: flex-end !important;
+    justify-self: end !important; gap: var(--cam-control-gap) !important;
+    width: max-content !important; min-width: 0 !important; max-width: 100% !important;
+    height: auto !important; min-height: var(--cam-control-height) !important; max-height: none !important;
+    margin: 0 !important; padding: 0 !important; transform: none !important;
+  }
+  body > header .ae-header-actions > * { margin: 0 !important; }
+  body > header :is(#guestAdminContainer,#readerSession,#loggedAdminContainer) {
+    position: static !important; inset: auto !important; transform: none !important;
+    display: flex !important; align-items: center !important;
+    justify-content: center !important; flex-wrap: nowrap !important;
+    gap: var(--cam-control-gap) !important; margin: 0 !important; padding: 0 !important;
+    min-width: 0 !important;
+    height: auto !important; min-height: 0 !important; max-height: none !important;
+  }
+  /* Hidden account states and optional sports never reserve a slot. */
+  body > header :is([hidden],.hidden), nav.cam-mobile-bottom-nav > [hidden] {
+    display: none !important;
+  }
+  body > header :is(.category-btn,.ae-header-actions button):not([hidden]) {
+    position: relative !important; inset: auto !important;
+    display: flex !important; flex-direction: column !important;
+    align-items: center !important; justify-content: center !important;
+    align-self: center !important; flex: 0 0 auto !important;
+    box-sizing: border-box !important;
+    width: auto !important; min-width: var(--cam-control-hit) !important; max-width: none !important;
+    height: var(--cam-control-height) !important; min-height: var(--cam-control-hit) !important;
+    max-height: none !important;
+    gap: var(--cam-label-gap) !important; margin: 0 !important; padding: 4px 8px !important;
+    border: 1px solid var(--cam-control-line) !important;
+    border-radius: var(--cam-control-radius) !important;
+    background: transparent !important; box-shadow: none !important;
+    color: var(--cam-control-ink) !important;
+    transform: none !important; opacity: 1 !important; overflow: visible !important;
+    text-decoration: none !important; cursor: pointer !important;
+    transition: background-color .16s ease, border-color .16s ease !important;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body > header nav.ae-sport-nav .category-btn:not([hidden]) { min-width: 58px !important; }
+  body > header :is(.ae-nav-icon,.cam-control-icon),
+  nav.cam-mobile-bottom-nav .ae-nav-icon {
+    display: grid !important; place-items: center !important;
+    box-sizing: border-box !important; flex: 0 0 var(--cam-icon-frame) !important;
+    width: var(--cam-icon-frame) !important; height: var(--cam-icon-frame) !important;
+    min-width: var(--cam-icon-frame) !important; min-height: var(--cam-icon-frame) !important;
+    max-width: var(--cam-icon-frame) !important; max-height: var(--cam-icon-frame) !important;
+    padding: 0 !important; margin: 0 !important;
+    border: 0 !important; border-radius: 0 !important;
+    background: transparent !important; box-shadow: none !important;
+    color: var(--cam-control-ink) !important; filter: none !important;
+    transform: none !important; overflow: visible !important; pointer-events: none !important;
+  }
+  body > header :is(svg.cam-category-nav-symbol,svg.cam-ui-symbol),
+  nav.cam-mobile-bottom-nav svg.cam-mobile-nav-symbol {
+    display: block !important; flex: 0 0 var(--cam-icon-visible) !important;
+    width: var(--cam-icon-visible) !important; height: var(--cam-icon-visible) !important;
+    min-width: var(--cam-icon-visible) !important; min-height: var(--cam-icon-visible) !important;
+    max-width: var(--cam-icon-visible) !important; max-height: var(--cam-icon-visible) !important;
+    margin: 0 !important; padding: 0 !important; border: 0 !important;
+    background: transparent !important; box-shadow: none !important;
+    color: var(--cam-control-ink) !important; stroke: var(--cam-icon-paint) !important;
+    stroke-width: 1.55; opacity: 1 !important; filter: none !important;
+    pointer-events: none !important; overflow: visible !important;
+  }
+  :is(body > header,nav.cam-mobile-bottom-nav) svg [fill="currentColor"] {
+    fill: var(--cam-icon-paint) !important;
+  }
+  /* Original 96px Opiniones artwork: alpha bounds x=5..92, y=10..91.
+     96/87 removes empty pixels; the offset centers the actual silhouette. */
+  body > header .ae-nav-icon > img.ae-custom-sport-icon {
+    display: block !important; flex: none !important;
+    width: calc(var(--cam-icon-visible) * 96 / 87) !important;
+    height: calc(var(--cam-icon-visible) * 96 / 87) !important;
+    min-width: 0 !important; min-height: 0 !important;
+    max-width: none !important; max-height: none !important;
+    object-fit: contain !important; margin: 0 !important; padding: 0 !important;
+    border: 0 !important; background: transparent !important; box-shadow: none !important;
+    transform: translate(-.14px,-.69px) !important;
+    opacity: 1 !important; filter: brightness(.86) saturate(.68) !important;
+    pointer-events: none !important;
+  }
+  body > header .cam-mobile-nav-symbol:not(.cam-category-nav-symbol) { display: none !important; }
+  body > header :is(.category-btn > span:not(.ae-nav-icon),.ae-login-label,.ae-auth-caption,
+      .ae-mobile-theme-caption,.ae-notifications-caption,.cam-global-edit-label,#adminNameDisplay) {
+    display: block !important; width: auto !important; min-width: 0 !important; max-width: 112px !important;
+    height: 12px !important; min-height: 12px !important;
+    margin: 0 !important; padding: 0 !important;
+    color: var(--cam-control-label) !important;
+    font: 700 10px/12px Inter,system-ui,sans-serif !important;
+    letter-spacing: .015em !important; text-align: center !important;
+    text-transform: uppercase !important; white-space: nowrap !important;
+    overflow: hidden !important; text-overflow: ellipsis !important;
+  }
+  body > header .ae-header-actions button:not(:has(.ae-login-label,.ae-auth-caption,
+      .ae-mobile-theme-caption,.ae-notifications-caption,.cam-global-edit-label,#adminNameDisplay)) {
+    height: var(--cam-control-height) !important;
+  }
+  body > header .ae-header-actions button:not(:has(.ae-login-label,.ae-auth-caption,
+      .ae-mobile-theme-caption,.ae-notifications-caption,.cam-global-edit-label,#adminNameDisplay))::after {
+    content: "" !important; display: block !important; height: 12px !important; min-height: 12px !important;
+  }
+  body > header :is(.category-btn,.ae-header-actions button):is(.active,[aria-current="page"],.is-active) {
+    background: var(--cam-control-selected) !important;
+    border-color: rgba(201,170,107,.45) !important;
+  }
+  @media (hover: hover) {
+    body > header :is(.category-btn,.ae-header-actions button):hover,
+    nav.cam-mobile-bottom-nav > .category-btn:hover {
+      background: var(--cam-control-hover) !important;
+      border-color: rgba(201,170,107,.3) !important;
+    }
+  }
+  :is(body > header,nav.cam-mobile-bottom-nav) button:focus-visible {
+    outline: 2px solid var(--cam-control-focus) !important; outline-offset: 2px !important;
+  }
+  body > header #aeNotificationsBadge:not([hidden]) {
+    position: absolute !important; display: grid !important; place-items: center !important;
+    top: 1px !important; right: 0 !important; z-index: 2 !important;
+    min-width: 17px !important; height: 17px !important; padding: 0 4px !important;
+    margin: 0 !important; border: 1px solid #e6cda4 !important; border-radius: 9px !important;
+    background: #854936 !important; color: #fff8ee !important;
+    font: 700 9px/1 Inter,system-ui,sans-serif !important; pointer-events: none !important;
+  }
+  /* Registered/admin controls reuse the same glyphs without changing handlers. */
+  body > header :is(.ae-classical-auth-art,.ae-admin-profile-art) { display: none !important; }
+  body > header :is(.ae-classical-logout,.ae-signout-action)::before {
+    content: "" !important; display: block !important;
+    width: var(--cam-icon-frame) !important; height: var(--cam-icon-frame) !important;
+    background: var(--cam-control-ink) !important;
+    mask: url("icons/cam-signout.svg") center / var(--cam-icon-visible) var(--cam-icon-visible) no-repeat;
+    -webkit-mask: url("icons/cam-signout.svg") center / var(--cam-icon-visible) var(--cam-icon-visible) no-repeat;
+  }
+  @media (min-width: 761px) and (max-width: 1100px) {
+    body > header .ae-mobile-header-grid { column-gap: 12px !important; }
+    body > header { --cam-control-gap: 4px; }
+    body > header nav.ae-sport-nav .category-btn:not([hidden]) { min-width: 52px !important; padding-inline: 6px !important; }
+    /* Extra admin actions wrap on the account rail, never into the sports rail. */
+    body > header .ae-header-actions:has(#loggedAdminContainer:not(.hidden)) {
+      flex-wrap: wrap !important; max-width: 220px !important; gap: 0 4px !important;
+    }
+    body > header .ae-mobile-header-grid:has(#loggedAdminContainer:not(.hidden)) {
+      height: auto !important; min-height: 88px !important; padding-block: 6px !important;
+    }
+  }
+  @media (max-width: 760px), (orientation: landscape) and (max-height: 500px) and (hover: none) and (pointer: coarse) {
+    body > header > div { padding-inline: 12px !important; }
+    body > header .ae-mobile-header-grid {
+      grid-template-columns: auto minmax(0,1fr) !important;
+      grid-template-areas: "brand account" !important;
+      gap: 8px !important; height: auto !important; min-height: 76px !important;
+      padding-block: 4px !important;
+    }
+    body > header nav.ae-sport-nav { display: none !important; }
+    body > header { --cam-control-gap: 4px; }
+    body > header .ae-header-actions { max-width: 100% !important; }
+    body > header .ae-header-actions:has(#loggedAdminContainer:not(.hidden)) {
+      flex-wrap: wrap !important; justify-content: flex-end !important; gap: 2px 4px !important;
+    }
+    body > header :is(.ae-login-label,.ae-mobile-theme-caption,.ae-notifications-caption,
+        .ae-auth-caption,.cam-global-edit-label,#adminNameDisplay) {
+      font-size: 8px !important; letter-spacing: 0 !important;
+    }
+    body > header .ae-login-art-control { padding-inline: 5px !important; }
+    nav.cam-mobile-bottom-nav .ae-nav-icon { border-radius: 0 !important; }
+    nav.cam-mobile-bottom-nav > .category-btn {
+      gap: var(--cam-label-gap) !important;
+      color: var(--cam-control-label) !important;
+      border-radius: var(--cam-control-radius) !important;
+    }
+    nav.cam-mobile-bottom-nav > .category-btn > span:not(.ae-nav-icon) {
+      color: var(--cam-control-label) !important;
+      font: 700 10px/12px Inter,system-ui,sans-serif !important;
+      letter-spacing: .015em !important;
+    }
+    nav.cam-mobile-bottom-nav > .category-btn:is(.active,[aria-current="page"]) {
+      background: var(--cam-control-selected) !important;
+      box-shadow: inset 0 -2px var(--cam-control-ink) !important;
+    }
+    html:not(.dark) nav.cam-mobile-bottom-nav {
+      --cam-icon-paint: url(#cam-metal-day);
+      --cam-control-ink: #805a30;
+      --cam-control-label: #273b49;
+      --cam-control-hover: rgba(128,90,48,.07);
+      --cam-control-selected: rgba(128,90,48,.10);
+      --cam-control-focus: #805a30;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :is(body > header,nav.cam-mobile-bottom-nav) button { transition: none !important; }
+  }
+  body > header :is(#readerSession,#loggedAdminContainer,#guestAdminContainer).hidden,
+  body > header [hidden] { display: none !important; }
+}
