@@ -153,7 +153,8 @@ Los dibujos aprobados de Picks, NFL y Fútbol conservan sus formas; sus viewBox
 se ajustan a la silueta pintada, con un trazo principal de 1.55. Opiniones usa
 ahora la misma burbuja SVG en escritorio y móvil, con ese mismo grosor de línea,
 degradado y proporciones; ya no depende del WebP diferente de escritorio.
-El tamaño visible máximo es 24 px dentro de un marco de 32 × 32 px; las áreas
+La cabecera usa símbolos de 24 px dentro de un marco de 32 × 32 px; el dock
+móvil conserva su contorno circular de 37 px con símbolos de 23 px. Las áreas
 de interacción miden al menos 44 × 44 px.
 
 Usuario, sol, luna y campana comparten símbolos SVG y el mismo degradado bronce.
