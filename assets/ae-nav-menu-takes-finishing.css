@@ -14,7 +14,11 @@ html:not(.dark) body header .ae-sport-nav .category-btn:is([data-category="Picks
   box-shadow:none!important;
   border-radius:0!important;
   color:#d9a781!important;
-  transition:border-color .16s ease,color .16s ease!important;
+  /* Sin transición del contorno: en ordenador el aro blanco se quita al
+     pasar el ratón (bloque «ae-desktop-sport-nav-hover-no-squares» de
+     index.html), pero al salir el borde volvía y se desvanecía del blanco
+     al transparente: un círculo blanco visible ~0,16 s (2 nov 2026). */
+  transition:color .16s ease!important;
 }
 html body header .ae-sport-nav .category-btn:is([data-category="Picks"],[data-category="NFL"],[data-category="Fútbol"]):is(:hover,:focus-visible) .ae-nav-icon,
 html.dark body header .ae-sport-nav .category-btn:is([data-category="Picks"],[data-category="NFL"],[data-category="Fútbol"]):is(:hover,:focus-visible) .ae-nav-icon,
