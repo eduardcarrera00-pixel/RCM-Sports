@@ -150,11 +150,12 @@ personalizada, acceso artístico y alineación de controles. Las reglas inline
 anteriores de sol/luna y avisos ya no se publican.
 
 Los dibujos aprobados de Picks, NFL y Fútbol conservan sus formas; sus viewBox
-se ajustan a la silueta pintada, con un trazo principal de 1.55. Opiniones
-conserva el WebP original en escritorio (límites alfa 5,10–92,91) y la burbuja
-vectorial móvil. La corrección 96/87 y su centrado óptico eliminan el margen
-transparente sin alterar la imagen. El tamaño visible máximo es 24 px dentro
-de un marco de 32 × 32 px; las áreas de interacción miden al menos 44 × 44 px.
+se ajustan a la silueta pintada, con un trazo principal de 1.55. Opiniones usa
+ahora la misma burbuja SVG en escritorio y móvil, con ese mismo grosor de línea,
+degradado y proporciones; ya no depende del WebP diferente de escritorio.
+La cabecera usa símbolos de 24 px dentro de un marco de 32 × 32 px; el dock
+móvil conserva su contorno circular de 37 px con símbolos de 23 px. Las áreas
+de interacción miden al menos 44 × 44 px.
 
 Usuario, sol, luna y campana comparten símbolos SVG y el mismo degradado bronce.
 El estado claro de la barra inferior usa un bronce más oscuro sobre marfil;
@@ -163,3 +164,12 @@ modos. Las etiquetas, separación, hover, selección y foco salen del mismo
 sistema. El contador de avisos es absoluto y no ocupa espacio junto a la
 campana. Se mantienen los IDs, eventos, ocultación según sesión y navegación
 inferior originales; el selector de tema ya no tiene un círculo exclusivo.
+
+## Contraste de cabecera · 3 nov 2026
+
+El modo claro aplica una sombra de contorno azul oscuro muy fina a la silueta
+SVG de los cuatro deportes, al sol/luna y a los controles de sesión. El modo
+oscuro conserva el degradado sin sombreado adicional. El control de tema mantiene
+sus nombres accesibles dinámicos (Activar modo claro/oscuro), pero solo muestra
+el pictograma: se retira la etiqueta visual «Modo». El espaciado conserva el
+marco invisible de la segunda línea para alinear los símbolos con el menú.
