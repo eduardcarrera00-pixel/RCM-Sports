@@ -1,4 +1,5 @@
 -- CAM SPORTS · Cambiar el nombre de usuario desde el perfil (3 nov 2026).
+-- Aplicada en producción el 3 nov 2026 (por partes con execute_sql, mismo contenido).
 --
 -- El inicio de sesión busca el usuario en public.ae_auth_accounts (el correo
 -- interno no cambia), así que basta con renombrar esa fila: la contraseña, el
@@ -175,7 +176,15 @@ begin
   -- Lo ya publicado muestra el nombre nuevo.
   update public.ae_community_picks set author = left(wanted, 40) where user_id = me and author is distinct from left(wanted, 40);
   update public.ae_pick_comments set author = left(wanted, 40) where user_id = me and author is distinct from left(wanted, 40);
-  update public.comments set author = wanted where user_id = me and author is distinct from wanted;
+  -- Comentarios de noticias: solo los que siguen en una noticia existente (la
+  -- comprobación de hilo de rcm_check_parent rechaza respuestas de noticias borradas,
+  -- que además ya no se muestran).
+  update public.comments c set author = wanted
+   where c.user_id = me and c.author is distinct from wanted
+     and (c.parent_id is null or exists (
+       select 1 from public.comments p join public.articles a
+         on (a.id::text = p.article_id::text or a.legacy_id = p.article_id::text)
+        where p.id = c.parent_id and (a.id::text = c.article_id::text or a.legacy_id = c.article_id::text)));
   update public.ae_notifications set actor_name = left(wanted, 40)
    where actor_id = me and event_key <> 'welcome' and actor_name is distinct from left(wanted, 40);
 

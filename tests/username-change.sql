@@ -40,8 +40,9 @@ revoke all on public.ae_auth_accounts from public, anon, authenticated;
 
 create table public.ae_community_picks (id uuid primary key default gen_random_uuid(), user_id uuid, author text, title text);
 create table public.ae_pick_comments (id uuid primary key default gen_random_uuid(), user_id uuid, author text, body text);
+create table public.articles (id uuid primary key default gen_random_uuid(), legacy_id text);
 create table public.comments (id uuid primary key default gen_random_uuid(), article_id text not null default 'a1',
-  user_id uuid, author text not null, body text not null default 'x', created_at timestamptz not null default now());
+  parent_id uuid, user_id uuid, author text not null, body text not null default 'x', created_at timestamptz not null default now());
 create table public.ae_notifications (id uuid primary key default gen_random_uuid(), actor_id uuid not null,
   event_key text not null, actor_name text not null default 'Usuario');
 grant select, insert on public.comments to authenticated;
