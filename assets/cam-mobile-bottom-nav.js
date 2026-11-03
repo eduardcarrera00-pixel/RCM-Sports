@@ -81,7 +81,10 @@
     for (const button of originalOrder) {
       if (!dockButtons.includes(button) && button !== opinions) nav.appendChild(button);
     }
-    if (actions && profile.parentNode !== actions) actions.insertBefore(profile, actions.firstChild);
+    if (actions && profile.parentNode !== actions) {
+      const theme = actions.querySelector("#themeToggle");
+      actions.insertBefore(profile, theme?.parentNode === actions ? theme.nextSibling : actions.firstChild);
+    }
     for (const button of dockButtons) button.setAttribute('aria-label', button === home ? 'Inicio' : button.dataset.category);
   }
 

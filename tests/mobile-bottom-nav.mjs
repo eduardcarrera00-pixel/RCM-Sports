@@ -102,7 +102,7 @@ assert.equal(profile.textContent.trim(), 'Perfil');
 assert.match(profile.getAttribute('aria-label'), /perfil/i);
 const opinions = originalButtons.get('Opiniones');
 assert.equal(opinions.parentElement, nav, 'phone: Opiniones lives in the dock');
-assert.equal(profile.parentElement.firstElementChild, profile);
+assert.equal(profile.previousElementSibling.id, "themeToggle");
 for (const category of primary) {
   const button = originalButtons.get(category);
   const icon = button.querySelector('svg.cam-mobile-nav-symbol');

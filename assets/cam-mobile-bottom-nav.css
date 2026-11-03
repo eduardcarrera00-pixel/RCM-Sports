@@ -186,20 +186,14 @@ html body nav.ae-sport-nav svg.cam-mobile-nav-symbol {
     html body > header .ae-header-actions button.ae-admin-profile:not([hidden]) {
       display: none !important;
     }
-    html body > header .ae-header-actions > #camNavProfile > span:not(.ae-nav-icon) {
-      font-size: 8px !important; letter-spacing: 0 !important;
+    html body > header .ae-header-actions > #camNavProfile > span:not(.ae-nav-icon),
+    html body > header .ae-header-actions .ae-notifications-caption,
+    html body > header .ae-header-actions button:not(:has(.ae-login-label,.ae-auth-caption,
+        .ae-mobile-theme-caption,.ae-notifications-caption,.cam-global-edit-label,#adminNameDisplay))::after {
+      display: none !important;
     }
     html body > header .ae-header-actions > #camNavProfile {
       padding-inline: 5px !important;
-    }
-    /* Narrow phones with the editor's extra actions: icon only, so the header keeps two rows. */
-    @media (max-width: 360px) {
-      html body > header .ae-header-actions:has(#loggedAdminContainer:not(.hidden)) > #camNavProfile > span:not(.ae-nav-icon) {
-        display: none !important;
-      }
-      html body > header .ae-header-actions:has(#loggedAdminContainer:not(.hidden)) > #camNavProfile {
-        min-width: 44px !important; padding-inline: 4px !important;
-      }
     }
 
     /* ---------- Section tabs ---------- */
