@@ -21,7 +21,7 @@ assert.match(css, /display: flex !important/);
 assert.match(css, /bottom: 0 !important/);
 assert.match(css, /width: 100% !important/);
 const headerCSS = readFileSync(resolve(root, 'assets/cam-header-system.css'), 'utf8');
-assert.match(headerCSS, /border-radius: 50% !important/);
+assert.doesNotMatch(headerCSS, /border-radius: 50% !important/);
 assert.match(readFileSync(new URL('../assets/cam-rounded-editorial.css', import.meta.url), 'utf8'), /@layer cam-rounded-editorial[\s\S]*\.ae-nav-icon[\s\S]*border-radius:50%!important/);
 assert.match(css, /content: none !important/);
 assert.match(headerCSS, /color: #d9ab70 !important/);
@@ -45,7 +45,7 @@ assert.match(index, /id="themeToggle"[\s\S]*?aria-label="Activar modo oscuro"/);
 const window = new Window({ url: 'https://camsports.github.io/' });
 const { document } = window;
 const primary = ['Picks', 'NFL', 'Fútbol', 'Opiniones'];
-const dock = ['Todos', 'NFL', 'Fútbol', 'Picks'];
+const dock = ['Todos', 'NFL', 'Fútbol', 'Picks', 'Opiniones'];
 const sourceNav = index.match(/<nav class="ae-sport-nav"[^>]*>[\s\S]*?<\/nav>/)[0];
 document.body.innerHTML = `
   <header>
@@ -80,7 +80,7 @@ assert.equal(nav.parentElement, document.body, 'phone: move original nav outside
 assert.equal(nav.classList.contains('cam-mobile-bottom-nav'), true);
 const profile = document.getElementById('camNavProfile');
 assert.ok(profile, 'phone: Perfil tab exists');
-assert.equal(profile.parentElement, nav);
+assert.equal(profile.parentElement, document.querySelector('header .ae-header-actions'));
 assert.equal(nav.querySelectorAll('.category-btn').length, 9, 'eight real buttons plus Perfil');
 assert.equal(document.querySelectorAll('.category-btn').length, 10, 'do not duplicate controls');
 assert.equal(document.querySelectorAll('.category-btn[data-category]').length, 9, 'category buttons are never cloned');
@@ -89,9 +89,9 @@ for (const [key, button] of originalButtons) {
   assert.equal(nav.querySelector('[data-category="' + key + '"]'), button);
 }
 // Dock order: Inicio · NFL · Fútbol · Picks · Perfil (Perfil always last of the visible tabs).
-const visibleDock = Array.from(nav.children).filter(button => button === profile || dock.includes(button.dataset.category));
-assert.deepEqual(visibleDock.map(button => button.dataset.category || button.id), [...dock, 'camNavProfile']);
-assert.equal(nav.children[dock.length], profile, 'Perfil follows the four sections');
+const visibleDock = Array.from(nav.children).filter(button => dock.includes(button.dataset.category));
+assert.deepEqual(visibleDock.map(button => button.dataset.category || button.id), dock);
+assert.equal(nav.children[dock.length-1], originalButtons.get('Opiniones'), 'Opiniones follows Picks');
 const home = originalButtons.get('Todos');
 assert.equal(home.hidden, false, 'phone: Inicio is visible');
 assert.ok(home.querySelector('svg.cam-mobile-nav-symbol'), 'phone: Inicio has its icon');
@@ -101,8 +101,8 @@ assert.ok(profile.querySelector('svg.cam-mobile-nav-symbol'), 'Perfil has its ic
 assert.equal(profile.textContent.trim(), 'Perfil');
 assert.match(profile.getAttribute('aria-label'), /perfil/i);
 const opinions = originalButtons.get('Opiniones');
-assert.equal(opinions.parentElement, document.querySelector('header .ae-header-actions'), 'phone: Opiniones lives in the header');
-assert.equal(opinions.parentElement.firstElementChild, opinions);
+assert.equal(opinions.parentElement, nav, 'phone: Opiniones lives in the dock');
+assert.equal(profile.parentElement.firstElementChild, profile);
 for (const category of primary) {
   const button = originalButtons.get(category);
   const icon = button.querySelector('svg.cam-mobile-nav-symbol');
@@ -148,7 +148,7 @@ allButtons.forEach(button => button.classList.remove('active'));
 opinions.classList.add('active');
 await new Promise(resolve => setTimeout(resolve, 0));
 assert.equal(opinions.getAttribute('aria-current'), 'page');
-assert.equal(dock.every(key => !originalButtons.get(key).hasAttribute('aria-current')), true);
+assert.equal(dock.filter(key=>key!=='Opiniones').every(key => !originalButtons.get(key).hasAttribute('aria-current')), true);
 // Perfil opens the profile (or sign-in when the profile module is missing).
 const opened = [];
 window.openAeProfile = () => opened.push('perfil');

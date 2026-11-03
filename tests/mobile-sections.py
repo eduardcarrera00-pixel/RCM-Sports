@@ -79,7 +79,7 @@ def phone(width, dark):
     with fp.full_page(fake_js=FAKE, dark=dark, width=width, height=800) as page:
         page.wait_for_timeout(800)
         st = page.evaluate(STATE)
-        assert st['dock'] == ['Todos', 'NFL', 'Fútbol', 'Picks', 'camNavProfile'], f'{where}: barra inferior {st["dock"]}'
+        assert st['dock'] == ['Todos', 'NFL', 'Fútbol', 'Picks', 'Opiniones'], f'{where}: barra inferior {st["dock"]}'
         assert not st['bar'], f'{where}: Inicio no lleva pestañas'
 
         for cat, slug, tabs, expect in [('NFL', 'nfl', SPORT_TABS, SPORT_EXPECT), ('Fútbol', 'futbol', SPORT_TABS, SPORT_EXPECT),
@@ -128,7 +128,7 @@ def phone(width, dark):
         assert page.evaluate('scrollY') < 5, f'{where}: tocar NFL otra vez no sube'
 
         # Opiniones sigue en el encabezado y no lleva pestañas.
-        page.click('body > header .ae-header-actions > button[data-category="Opiniones"]'); page.wait_for_timeout(700)
+        page.click('body > nav.cam-mobile-bottom-nav > button[data-category="Opiniones"]'); page.wait_for_timeout(700)
         st = page.evaluate(STATE)
         assert st['cat'] == 'Opiniones' and not st['bar'] and st['url'] == '?s=opiniones', f'{where}: Opiniones {st}'
 

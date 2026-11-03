@@ -1,7 +1,7 @@
-/* CAM SPORTS — phone app dock: Inicio · NFL · Fútbol · Picks · Perfil.
+/* CAM SPORTS — phone app dock: Inicio · NFL · Fútbol · Picks · Opiniones.
    Reuses the real header category buttons (same handlers, same filterByCategory);
-   only their place and order change on phones. Opiniones moves to the header
-   actions, and the dock gains a Perfil button that opens the profile (or sign-in).
+   only their place and order change on phones. Perfil lives in the header
+   and opens the profile (or sign-in).
    Everything is restored exactly on wider screens. */
 (() => {
   'use strict';
@@ -18,8 +18,7 @@
   const byCategory = key => buttons.find(button => button.dataset.category === key) || null;
   const home = byCategory('Todos');
   const opinions = byCategory('Opiniones');
-  // Order of the phone dock; Perfil is appended after these.
-  const DOCK = ['Todos', 'NFL', 'Fútbol', 'Picks'];
+  const DOCK = ['Todos', 'NFL', 'Fútbol', 'Picks', 'Opiniones'];
   const dockButtons = DOCK.map(byCategory).filter(Boolean);
   const originalButtonLabels = new Map(buttons.map(button => [button, button.getAttribute('aria-label')]));
   const homeOriginal = home ? { html: home.innerHTML, hidden: home.hidden } : null;
@@ -77,15 +76,13 @@
       home.hidden = false;
       home.removeAttribute('aria-hidden');
     }
-    // Inicio · NFL · Fútbol · Picks · Perfil, then the dormant optional sports.
+    // The five real category buttons retain their original handlers.
     for (const button of dockButtons) nav.appendChild(button);
-    nav.appendChild(profile);
     for (const button of originalOrder) {
       if (!dockButtons.includes(button) && button !== opinions) nav.appendChild(button);
     }
-    // Opiniones stays one tap away, at the start of the header actions.
-    if (opinions && actions && opinions.parentNode !== actions) actions.insertBefore(opinions, actions.firstChild);
-    for (const button of [...dockButtons, opinions].filter(Boolean)) button.setAttribute('aria-label', button === home ? 'Inicio' : button.dataset.category);
+    if (actions && profile.parentNode !== actions) actions.insertBefore(profile, actions.firstChild);
+    for (const button of dockButtons) button.setAttribute('aria-label', button === home ? 'Inicio' : button.dataset.category);
   }
 
   function desktopLayout() {

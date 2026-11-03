@@ -266,8 +266,7 @@
       --cam-control-focus: #805a30;
     }
   }
-  /* The phone dock retains the approved compact 37px rings.
-     Keep all four bronze vectors visually equal and avoid the older square override. */
+  /* Bare, equally sized bronze symbols; selection belongs to the whole tab. */
   body > nav.cam-mobile-bottom-nav > button.category-btn {
     color: #d2c0a6 !important;
   }
@@ -280,8 +279,8 @@
     width: 37px !important; height: 37px !important;
     min-width: 37px !important; min-height: 37px !important;
     max-width: 37px !important; max-height: 37px !important;
-    border: 1px solid rgba(223,194,151,.42) !important;
-    border-radius: 50% !important; background: #102535 !important;
+    border: 0 !important;
+    border-radius: 0 !important; background: transparent !important;
     color: inherit !important;
   }
   body > nav.cam-mobile-bottom-nav svg.cam-mobile-nav-symbol {
@@ -291,7 +290,7 @@
     color: inherit !important;
   }
   body > nav.cam-mobile-bottom-nav > button.category-btn:is(.active,[aria-current="page"]) .ae-nav-icon {
-    border-color: #b98a50 !important; background: rgba(185,138,80,.17) !important;
+    border: 0 !important; background: transparent !important;
   }
   html:not(.dark) body > nav.cam-mobile-bottom-nav > button.category-btn {
     color: #183343 !important;
@@ -300,10 +299,10 @@
     color: #886237 !important;
   }
   html:not(.dark) body > nav.cam-mobile-bottom-nav > button.category-btn .ae-nav-icon {
-    border-color: rgba(24,51,67,.34) !important; background: #f8f2e8 !important;
+    border: 0 !important; background: transparent !important;
   }
   html:not(.dark) body > nav.cam-mobile-bottom-nav > button.category-btn:is(.active,[aria-current="page"]) .ae-nav-icon {
-    border-color: #a47946 !important; background: rgba(164,121,70,.14) !important;
+    border: 0 !important; background: transparent !important;
   }
   @media (prefers-reduced-motion: reduce) {
     :is(body > header,nav.cam-mobile-bottom-nav) button { transition: none !important; }

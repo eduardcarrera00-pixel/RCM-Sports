@@ -1,11 +1,11 @@
-/* Real browser QA for the phone dock (Inicio · NFL · Fútbol · Picks · Perfil); data/network isolated. */
+/* Real browser QA for the phone dock (Inicio · NFL · Fútbol · Picks · Opiniones); data/network isolated. */
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const http = require('node:http');
 const { chromium } = require('playwright');
 const root = process.cwd();
-const DOCK = ['Todos','NFL','Fútbol','Picks','camNavProfile'];
+const DOCK = ['Todos','NFL','Fútbol','Picks','Opiniones'];
 
 const server = http.createServer((req, res) => {
   const pathname = new URL(req.url, 'http://127.0.0.1').pathname;
@@ -84,7 +84,7 @@ const server = http.createServer((req, res) => {
             assert.equal(icon.imageExists,false,key+' uses the same inline SVG system, never a second bitmap');
             assert.equal(icon.imageDisplay,null,key+' has no obsolete bitmap');
             assert.ok(icon.circleSize>=35 && icon.circleSize<=37,key+' same small circle frame');
-            assert.equal(icon.circleRadius,'50%',key+' circular stroke');
+            assert.equal(icon.circleRadius,'0px',key+' icon has no circular frame');
             assert.notEqual(icon.caption,'none',key+' caption remains visible');
             // The page opens on Inicio, so that tab carries the selected colour.
             const selected=key==='Todos';
@@ -92,14 +92,14 @@ const server = http.createServer((req, res) => {
             if(selected) assert.notEqual(icon.iconColor,inactive,key+' selected tab is highlighted');
             else assert.equal(icon.iconColor,inactive,key+' inactive theme color');
           }
-          assert.deepEqual(layout.buttons.map(b=>b.key),DOCK,'Inicio · NFL · Fútbol · Picks · Perfil, Perfil last');
+          assert.deepEqual(layout.buttons.map(b=>b.key),DOCK,'Inicio · NFL · Fútbol · Picks · Opiniones, Opiniones last');
           // Opiniones stays one tap away in the header; Perfil replaces the header sign-in/profile.
           const header=await page.evaluate(()=>({
-            opinions:!!document.querySelector('body > header .ae-header-actions > button[data-category="Opiniones"]'),
-            opinionsVisible:getComputedStyle(document.querySelector('button[data-category="Opiniones"]')).display!=='none',
+            profile:!!document.querySelector('body > header .ae-header-actions > #camNavProfile'),
+            profileVisible:getComputedStyle(document.querySelector('#camNavProfile')).display!=='none',
             login:getComputedStyle(document.getElementById('guestAdminContainer')).display
           }));
-          assert.ok(header.opinions && header.opinionsVisible,JSON.stringify({width,dark,header}));
+          assert.ok(header.profile && header.profileVisible,JSON.stringify({width,dark,header}));
           assert.equal(header.login,'none','sign-in lives in the dock Perfil tab on phones');
           assert.ok(Math.abs(layout.bottom-780)<=1,JSON.stringify({width,dark,layout}));
           assert.ok(Math.abs(layout.width-width)<=1,JSON.stringify({width,dark,layout}));
@@ -161,7 +161,7 @@ const server = http.createServer((req, res) => {
     assert.ok(nflSelected.active,JSON.stringify(nflSelected));
     assert.equal(nflSelected.activeColor,'rgb(136, 98, 55)','day selected icon is muted gold, not white');
     assert.notEqual(nflSelected.selectedBorder,'rgb(255, 255, 255)');
-    assert.notEqual(nflSelected.selectedFill,nflSelected.normalFill,'active circle receives subtle fill');
+    assert.equal(nflSelected.selectedFill,nflSelected.normalFill,'selection uses the tab, never an icon circle');
     assert.equal(nflSelected.selectedCircle.width,nflSelected.normalCircle.width,'active circle does not grow');
     assert.notEqual(nflSelected.text,'none');
     assert.notEqual(nflSelected.inactiveText,'none');
@@ -190,8 +190,8 @@ const server = http.createServer((req, res) => {
     assert.equal(await page.locator('body > nav [data-category="Picks"] svg.cam-mobile-nav-symbol').evaluate(svg=>getComputedStyle(svg).color),'rgb(217, 171, 112)','night selected icon is gold, never white');
     // Opiniones (header) still marks itself as the current page.
     await page.evaluate(()=>filterByCategory('Opiniones'));
-    await page.waitForFunction(()=>document.querySelector('header [data-category="Opiniones"]').getAttribute('aria-current')==='page');
-    assert.equal(await page.evaluate(()=>document.querySelectorAll('body > nav [aria-current="page"]').length),0,'no dock tab is falsely selected on Opiniones');
+    await page.waitForFunction(()=>document.querySelector('body > nav [data-category="Opiniones"]').getAttribute('aria-current')==='page');
+    assert.equal(await page.evaluate(()=>document.querySelectorAll('body > nav [aria-current="page"]').length),1,'Opiniones selects its dock tab');
     // Inicio is the first tab and the home page selects it.
     await page.locator('body > nav [data-category="Todos"]').click();
     await page.waitForFunction(()=>document.querySelector('body > nav [data-category="Todos"]').getAttribute('aria-current')==='page');

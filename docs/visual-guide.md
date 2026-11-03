@@ -177,11 +177,10 @@ marco invisible de la segunda línea para alinear los símbolos con el menú.
 ## Navegación del teléfono · 3 nov 2026
 
 La barra inferior del teléfono es la de una aplicación: **Inicio · NFL · Fútbol ·
-Picks · Perfil**, con Perfil siempre al final. Reutiliza los botones reales de la
-cabecera (Inicio es el filtro «Todos», oculto en escritorio) y añade Perfil, que
-abre el perfil propio o, sin sesión, el acceso. En el teléfono la cabecera ya no
-muestra «Mi perfil» ni «Iniciar sesión»; Opiniones pasa a la cabecera con el
-mismo símbolo. Las cinco pestañas usan aros de 35 px con símbolos de 22 px.
+Picks · Opiniones**, con Opiniones siempre al final. Reutiliza los botones reales de la
+cabecera (Inicio es el filtro «Todos», oculto en escritorio) y conserva Perfil como botón estable de la cabecera, que
+abre el perfil propio o, sin sesión, el acceso. Las cinco pestañas usan
+símbolos de 22 px sin círculo de fondo; la selección se marca en la pestaña.
 Tocar otra vez la sección activa sube al principio.
 
 Dentro de NFL y Fútbol, una barra de pestañas fija bajo la cabecera muestra un
@@ -224,3 +223,20 @@ una vez al nombre anterior durante 7 días y el nombre anterior queda reservado
 30 días para su dueño. Picks, comentarios y avisos ya publicados pasan al nombre
 nuevo. Estilos: `assets/cam-profile-app.css`. Pruebas: `python3 -B tests/profile-edit.py`
 y `bash tests/username-change.sh` (PostgreSQL local).
+
+
+### Inicio y carga del perfil · 3 nov 2026
+
+En Inicio móvil, el Pick del editor precede a la última noticia y a los
+carruseles. El preview NFL se oculta solo en Inicio móvil; los rankings
+completos permanecen en Noticias NFL. El preview Champions conserva su sitio
+en la columna inferior, después de las noticias. Lo más leído precede
+inmediatamente a Opinadores distinguidos, reutilizando ambos módulos reales.
+
+El perfil abre su estado de carga en el primer toque. La sesión se lee una
+sola vez para pintar la interfaz y se actualiza desde los eventos de Auth;
+las consultas privadas siguen autorizadas en Supabase. Takes y Picks aparecen
+independientemente cuando llegan, sin esperar el nombre público ni cambiar
+la pestaña elegida. Cerrar sesión invalida las respuestas pendientes.
+Pruebas: `node tests/profile-loading.mjs`, `node tests/home-mobile-order.mjs`
+y `node tests/mobile-bottom-nav.mjs`.

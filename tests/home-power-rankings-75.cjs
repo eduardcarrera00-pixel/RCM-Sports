@@ -95,6 +95,7 @@ const server=http.createServer((req,res)=>{
     },ids);
     for(const id of ids){
      const prior=baseline[id],actual=report[id];
+     if(width<=760&&id==='homeRankingLink'){assert.equal(actual.height,0,'NFL preview is hidden on mobile Home');continue;}
      assert(prior>0&&actual.height>0,JSON.stringify({id,width,dark,prior,actual}));
      const ratio=actual.height/prior;
      assert(ratio>=0.64&&ratio<=0.86,JSON.stringify({id,width,dark,ratio,prior,actual}));

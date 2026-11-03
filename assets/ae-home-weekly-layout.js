@@ -11,6 +11,7 @@
     const sidebarFeatures = document.getElementById('aeHomeSidebarFeatures');
     const main = document.getElementById('mainContent');
     const trending = document.querySelector('.editorial-trending');
+    const community = document.querySelector('.editorial-community');
     if(!featured || !homePreview || !hero || !sidebarFeatures || !main || !trending || !featured.parentNode || !sidebarFeatures.parentNode) return;
 
     // Mark the native Picks component's permanent location without cloning it.
@@ -34,9 +35,15 @@
 
     function sync(){
       if(onMobileHome()){
-        if(featured.previousElementSibling !== hero) hero.insertAdjacentElement('afterend',featured);
-        if(sidebarFeatures.previousElementSibling !== featured) featured.insertAdjacentElement('afterend',sidebarFeatures);
-        // Relocate the REAL module after all mobile Home content, never copy it.
+        if(featured.nextElementSibling !== hero) hero.insertAdjacentElement('beforebegin',featured);
+        // Ranking previews stay below the news in their original sidebar.
+        if(sidebarAnchor.parentNode && sidebarAnchor.nextSibling !== sidebarFeatures){
+          sidebarAnchor.parentNode.insertBefore(sidebarFeatures,sidebarAnchor.nextSibling);
+        }
+        // Lo más leído precedes Opinadores distinguidos, using the same live nodes.
+        if(community?.parentNode && trendingMobileFooter.nextElementSibling !== community){
+          community.parentNode.insertBefore(trendingMobileFooter,community);
+        }
         if(trending.parentElement !== trendingMobileFooter) trendingMobileFooter.appendChild(trending);
         trendingMobileFooter.hidden = false;
         featured.classList.add('ae-home-native-picks');
@@ -87,6 +94,7 @@
       openPicks(event);
     },true);
 
+    window.camHomeLayout=Object.freeze({sync});
     sync();
     const observer = new MutationObserver(() => {
       sync();
