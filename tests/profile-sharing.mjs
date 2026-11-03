@@ -31,7 +31,7 @@ async function setup({own=false,shared='',rows=takes,compactQuery=''}={}){
  await tick();return {w,d,calls,opened,drawn,tick,copied:()=>copied};
 }
 
-const a=await setup({own:true});await a.w.openAeProfile();
+const a=await setup({own:true});await a.w.openAeProfile('takes');await a.tick();
 for(const selector of ['#aeProfileTakeHighlights .ae-profile-feature','#aeProfileTakes .ae-profile-item']){
  const cards=[...a.d.querySelectorAll(selector)];assert.ok(cards.length);
  for(const card of cards){
@@ -62,7 +62,7 @@ for(const selector of ['#aeProfileTakeHighlights .ae-profile-feature','#aeProfil
  }
 }
 assert.ok(a.drawn.includes('OFFICIAL_LOGO'));assert.ok(!a.drawn.includes('LA COMUNIDAD OPINA'),'Take cards should not show the vote panel');assert.ok(!a.drawn.includes('CUOTA TOTAL'));
-a.d.getElementById('aeProfileTabPicks').click();
+a.d.getElementById('aeProfileTabPicks').click();await a.tick();
 for(const selector of ['#aeProfilePickHighlights','#aeProfilePicks']){
  const button=a.d.querySelector(selector+' .cam-pick-share-button');assert.ok(button,'Featured and recent profile Picks stay shareable');button.click();
  assert.match(a.d.querySelector('#camPickShareDialog textarea').value,/Pick de @Lector/);a.d.querySelector('.cam-pick-share-close').click();

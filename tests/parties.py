@@ -1,4 +1,4 @@
-"""Parties: grupos privados con su propia clasificación (Picks o Takes).
+"""Parties: grupos privados con su propia clasificación (Quiniela, Picks o Takes).
 
 Página completa en Chromium con tests/full-page.py y el Supabase falso de
 tests/fake-supabase.js (sin red: nada llega a *.supabase.co). Las funciones
@@ -8,12 +8,15 @@ en SQL con tests/parties-sql.sh.
 
 Cubre, a 390 y 1366 px, de día y de noche, sin errores de consola ni textos
 cortados:
-  · crear un party desde el perfil (y ver su código para invitar);
+  · crear un party desde la pestaña «Mi Party» del perfil (y ver su código);
+  · parties de Quiniela: crear, invitar (la invitación dice «Quiniela · NFL»),
+    unirse, clasificación Esta semana · Este mes · Total en una llamada y una
+    actividad que nunca enseña una elección antes del inicio del partido;
   · invitar y unirse por enlace (?party=CÓDIGO) con sesión y sin sesión
     (inicia sesión y vuelve sola a la invitación);
   · la clasificación solo cuenta lo publicado tras unirse; Este mes / Total;
   · la actividad, sus filtros (estado y miembro), «Ver más» y abrir un Pick/Take;
-  · el perfil propio y el público, incluido ocultar un party del perfil;
+  · la pestaña «Mi Party» propia y la pública, incluido ocultar un party del perfil;
   · las opciones del creador: renombrar, cambiar código, expulsar y borrar;
     y salir del party como miembro;
   · la moderación: un administrador ve todos los parties y borra uno ajeno.
@@ -54,7 +57,9 @@ F.parties = [
   {id: 'f1000000-0000-4000-8000-000000000001', name: 'Los del barrio ⚽', kind: 'picks', sport: 'football', code: 'K7M2QX', owner_id: U.ana,
    members: [{user_id: U.ana, joined_at: D(40), show: true}, {user_id: U.dani, joined_at: D(30), show: true}, {user_id: U.beto, joined_at: D(10), show: true}]},
   {id: 'f2000000-0000-4000-8000-000000000002', name: 'Takes de la oficina', kind: 'takes', sport: 'all', code: 'T4KESZ', owner_id: U.beto,
-   members: [{user_id: U.beto, joined_at: D(20), show: true}, {user_id: U.ana, joined_at: D(15), show: true}]}
+   members: [{user_id: U.beto, joined_at: D(20), show: true}, {user_id: U.ana, joined_at: D(15), show: true}]},
+  {id: 'f5000000-0000-4000-8000-000000000005', name: 'Los Compas 🏈', kind: 'quiniela', sport: 'nfl', code: 'QNP234', owner_id: U.ana,
+   members: [{user_id: U.ana, joined_at: D(30), show: true}, {user_id: U.beto, joined_at: D(3), show: true}]}
 ];
 const leg = (event, selection, sport = 'Fútbol') => [{event, selection, sport}];
 F.items = [
@@ -70,6 +75,18 @@ F.items = [
   {type: 'champion', id: 'e1000000-0000-4000-8000-000000000001', user: 'ana', title: 'Campeón · Arsenal', body: '¿Quién será campeón de la Premier 2026/27?', competition: 'premier', state: 'pending', points: 9, created_at: D(14)},
   {type: 'take', id: 'd1000000-0000-4000-8000-000000000003', user: 'ana', title: 'Lamine gana el Balón de Oro', body: 'Publicado antes de entrar al party: no cuenta aquí.', sport: 'general', state: 'won', points: 20, created_at: D(18), month: true}
 ];
+// Quiniela NFL (created_at = inicio del partido). El de dentro de 2 días nunca
+// se ve en la actividad: la elección de cada uno es privada hasta el inicio.
+const q = (id, user, home, away, pick, state, points, days, extra) => Object.assign({type: 'quiniela', id, user, sport: 'nfl', competition: 'nfl',
+  home_name: home, away_name: away, pick_label: pick, state, points, created_at: D(days), kickoff: D(days)}, extra || {});
+F.items.push(
+  q('900000001', 'ana', 'Bills', 'Chiefs', 'Bills', 'won', 4, 9, {home_score: 27, away_score: 20, month: false}),
+  q('900000001', 'beto', 'Bills', 'Chiefs', 'Chiefs', 'lost', 0, 9, {home_score: 27, away_score: 20, month: false}),
+  q('900000002', 'ana', '49ers', 'Cowboys', 'Cowboys', 'won', 6, 2, {home_score: 17, away_score: 24, month: true, week: true}),
+  q('900000002', 'beto', '49ers', 'Cowboys', '49ers', 'lost', 0, 2, {home_score: 17, away_score: 24, month: true, week: true}),
+  q('900000003', 'ana', 'Chiefs', 'Bills', 'Chiefs', 'pending', 4, 0.04, {week: true}),
+  q('900000003', 'beto', 'Chiefs', 'Bills', 'Bills', 'pending', 5, 0.04, {week: true}),
+  q('900000004', 'beto', 'Cowboys', '49ers', 'Cowboys', 'pending', 5, -2, {week: true}));
 // Dani: 22 Picks pendientes publicados tras entrar, para probar «Ver más».
 for (let i = 1; i <= 22; i++) F.items.push({type: 'pick', id: 'c2000000-0000-4000-8000-' + String(i).padStart(12, '0'), user: 'dani', title: 'Parlay del domingo ' + i, legs: [...leg('Real Sociedad vs Betis', 'Ambos anotan'), ...leg('Valencia vs Getafe', 'Valencia gana')], american_odds: 450 + i, state: 'pending', created_at: D(28 - i)});
 F.codes = ['NEWPTY', 'CHG234', 'XYZ789'];
@@ -81,15 +98,15 @@ const party = id => F.parties.find(p => p.id === id);
 const member = (p, u) => p?.members.find(m => m.user_id === u);
 const ok = data => ({data, error: null});
 const isAdmin = () => Boolean(F.admin) && me() === U.ana;
-const sportOf = it => it.type === 'pick' ? (it.legs.every(l => l.sport === 'NFL') ? 'nfl' : it.legs.every(l => l.sport === 'Fútbol') ? 'football' : 'other')
+const sportOf = it => it.type === 'quiniela' ? it.sport : it.type === 'pick' ? (it.legs.every(l => l.sport === 'NFL') ? 'nfl' : it.legs.every(l => l.sport === 'Fútbol') ? 'football' : 'other')
   : it.sport === 'nfl' ? 'nfl' : ['football', 'laliga', 'premier', 'ligamx', 'champions'].includes(it.sport || it.competition) ? 'football' : 'other';
 function counted(p, m, it) {
-  const kindOk = p.kind === 'picks' ? it.type === 'pick' : it.type !== 'pick';
+  const kindOk = p.kind === 'picks' ? it.type === 'pick' : p.kind === 'quiniela' ? it.type === 'quiniela' : it.type === 'take' || it.type === 'champion';
   return kindOk && U[it.user] === m.user_id && it.created_at >= m.joined_at && (p.sport === 'all' || sportOf(it) === p.sport);
 }
 function standings(p, period) {
   const rows = p.members.map(m => {
-    const done = F.items.filter(it => counted(p, m, it) && ['won', 'lost', 'void'].includes(it.state) && (period === 'all' || it.month));
+    const done = F.items.filter(it => counted(p, m, it) && ['won', 'lost', 'void'].includes(it.state) && (period === 'all' || (period === 'week' ? it.week : it.month)));
     return {user_id: m.user_id, username: NAMES[byId[m.user_id]] || 'Aficionado', joined_at: m.joined_at,
       points: Math.round(done.reduce((s, it) => s + (Number(it.points) || 0), 0) * 100) / 100,
       correct: done.filter(it => it.state === 'won').length, attempts: done.length,
@@ -102,7 +119,8 @@ function standings(p, period) {
 const header = p => ({id: p.id, name: p.name, kind: p.kind, sport: p.sport, code: p.code, owner_id: p.owner_id,
   member_count: p.members.length, max_members: 50, is_owner: p.owner_id === me(), is_member: Boolean(member(p, me())),
   is_admin: isAdmin(), show_on_profile: member(p, me())?.show ?? null, created_at: D(40)});
-const summary = (p, u) => { const r = standings(p, 'all').find(x => x.user_id === u); return {position: r?.position || null, member_count: p.members.length, points: r?.points || 0}; };
+const summary = (p, u) => { const r = standings(p, 'all').find(x => x.user_id === u); const w = p.kind === 'quiniela' ? standings(p, 'week').find(x => x.user_id === u) : null;
+  return {position: r?.position || null, week_position: w?.position || null, member_count: p.members.length, points: r?.points || 0}; };
 function drop(p, u) {
   p.members = p.members.filter(m => m.user_id !== u);
   if (!p.members.length) F.parties = F.parties.filter(x => x !== p);
@@ -123,14 +141,17 @@ Object.assign(F.rpc, {
   cam_party_create: ({p_name, p_kind, p_sport}) => { const u = need(); const p = {id: 'f9000000-0000-4000-8000-00000000000' + (F.parties.length + 1), name: p_name, kind: p_kind, sport: p_sport || 'all',
     code: F.codes.shift(), owner_id: u, members: [{user_id: u, joined_at: new Date().toISOString(), show: true}]}; F.parties.push(p); return ok({id: p.id, code: p.code}); },
   cam_party_ranking: ({p_party}) => { const p = party(p_party); if (!p || !(member(p, me()) || isAdmin())) throw Error('Solo los miembros pueden ver este party.');
-    return ok({party: header(p), month: standings(p, 'month'), total: standings(p, 'all')}); },
+    const out = {party: header(p), month: standings(p, 'month'), total: standings(p, 'all')};
+    if (p.kind === 'quiniela') out.week = standings(p, 'week');
+    return ok(out); },
   cam_party_activity: ({p_party, p_filter = 'all', p_member, p_before, p_before_key, p_limit = 20}) => {
     const p = party(p_party); if (!p || !(member(p, me()) || isAdmin())) throw Error('Solo los miembros pueden ver este party.');
     let rows = F.items.filter(it => p.members.some(m => counted(p, m, it)))
+      .filter(it => it.type !== 'quiniela' || it.kickoff <= new Date().toISOString())
       .filter(it => !p_member || U[it.user] === p_member)
       .filter(it => p_filter === 'all' || (p_filter === 'resolved') === (it.state !== 'pending'))
-      .map(it => ({...it, key: it.id, user_id: U[it.user], username: NAMES[it.user], legs_count: it.legs?.length || 0,
-        upvotes: 3, downvotes: 1, my_vote: null, moderation_status: 'approved', points: it.state === 'pending' && it.type !== 'champion' ? null : it.points}))
+      .map(it => ({...it, key: it.type === 'quiniela' ? 'nfl:' + it.id + ':' + U[it.user] : it.id, user_id: U[it.user], username: NAMES[it.user], legs_count: it.legs?.length || 0,
+        upvotes: 3, downvotes: 1, my_vote: null, moderation_status: 'approved', points: it.state === 'pending' && (it.type === 'pick' || it.type === 'take') ? null : it.points}))
       .sort((a, b) => b.created_at.localeCompare(a.created_at) || b.key.localeCompare(a.key));
     if (p_before) rows = rows.filter(r => r.created_at < p_before || (r.created_at === p_before && r.key < p_before_key));
     return ok({items: rows.slice(0, p_limit), more: rows.length > p_limit}); },
@@ -141,6 +162,15 @@ Object.assign(F.rpc, {
   cam_party_leave: ({p_party}) => { const p = party(p_party); drop(p, need()); return ok({left: true, deleted: !party(p_party)}); },
   cam_party_delete: ({p_party}) => { const p = party(p_party); if (p.owner_id !== need() && !isAdmin()) throw Error('Solo quien administra el party puede borrarlo.');
     F.parties = F.parties.filter(x => x !== p); return ok({deleted: true}); },
+  // Pestaña «Mi Party» del perfil: el propio ve todos; los demás, los visibles.
+  cam_profile_party: ({p_user}) => { const own = p_user === me();
+    const list = F.parties.filter(p => member(p, p_user) && (own || member(p, p_user).show))
+      .sort((a, b) => (b.kind === 'quiniela') - (a.kind === 'quiniela'))
+      .map(p => ({id: own || member(p, me()) ? p.id : null, name: p.name, kind: p.kind, sport: p.sport, ...summary(p, p_user),
+        show_on_profile: own ? member(p, p_user).show : null, is_owner: own ? p.owner_id === p_user : null}));
+    return ok({own, parties: list, quiniela: {nfl: p_user === U.ana ? {position: 1, of: 2, points: 10, hits: 2, resolved: 2} : null, football: null},
+      recent: p_user === U.ana ? [{sport: 'nfl', home_name: '49ers', away_name: 'Cowboys', pick_label: 'Cowboys', state: 'won', points: 6, kickoff: D(2)}] : [],
+      last_sport: own ? 'nfl' : null}); },
   cam_party_admin_list: () => ok(F.parties.map(p => ({id: p.id, name: p.name, kind: p.kind, sport: p.sport, member_count: p.members.length, owner_name: NAMES[byId[p.owner_id]], created_at: D(40)})))
 });
 // Datos que usan las vistas existentes al abrir un Pick o un perfil.
@@ -153,6 +183,8 @@ F.rpc.ae_take_prestige = () => ok([]);
 F.rpc.ae_take_legendary = () => ok([]);
 F.rpc.ae_user_champion_picks = () => ok([]);
 F.rpc.ae_my_profile_unpopular_take = () => ok(null);
+F.rpc.cam_profile_overview = ({p_user}) => ok({user_id: p_user, username: NAMES[byId[p_user]] || 'Aficionado', joined_month: '2026-10',
+  takes: {count: 0, up: 0, down: 0, top: null}, picks: {count: 0, won: 0, lost: 0, top: null}, quiniela: {nfl: null, football: null, parties: []}});
 })();
 """ % {'users': json.dumps(USERS)}
 
@@ -244,29 +276,30 @@ def visible(page, sel):
 def scenario_create_and_ranking(dark, width, tag):
     page = open_page("window.__fake.start='ana';", dark, width)
     try:
-        # Perfil propio · pestaña Picks: bloque «Parties» con posición y botones.
+        # Perfil propio · pestaña «Mi Party»: parties de quiniela arriba y, al
+        # final, los de Picks y Takes («Otros parties»). Takes y Picks ya no los llevan.
         page.evaluate("window.openAeProfile()")
-        page.wait_for_selector('#camProfileParties', state='visible', timeout=8000)
-        assert 'MIS TAKES' in page.inner_text('#aeProfileTabs').upper()
+        page.wait_for_selector('#camProfileOverview .cam-ov-card', timeout=8000)
+        assert 'MI PARTY' in page.inner_text('#aeProfileTabs').upper()
         page.click('#aeProfileTabTakes')
         page.wait_for_timeout(300)
+        assert not visible(page, '#camProfileParties'), 'Takes sin bloque de parties'
+        page.click('#aeProfileTabParty')
+        page.wait_for_selector('#camProfileParties .cam-pp-block', timeout=8000)
         txt = page.inner_text('#camProfileParties')
-        assert 'Takes de la oficina' in txt and 'Los del barrio' not in txt, txt
-        page.click('#aeProfileTabPicks')
-        page.wait_for_timeout(300)
-        txt = page.inner_text('#camProfileParties')
-        assert 'Los del barrio ⚽' in txt and '1.º' in txt and 'de 3' in txt, txt
-        assert 'Crear party' in txt and 'Unirme con código' in txt
-        assert len(calls(page, 'cam_party_mine')) == 1, 'una sola llamada al abrir el perfil'
-        page.evaluate("document.getElementById('camProfileParties').scrollIntoView({block:'center'})")
+        assert txt.startswith('Tus parties de quiniela') and 'Los Compas 🏈' in txt and '1.º de 2 · esta semana' in txt, txt
+        assert 'Otros parties' in txt and 'Los del barrio ⚽' in txt and 'Takes de la oficina' in txt and '1.º de 3' in txt, txt
+        assert len(calls(page, 'cam_profile_party')) == 1 and len(calls(page, 'cam_party_mine')) == 0, 'una sola llamada al abrir la pestaña'
+        page.evaluate("document.querySelector('#camProfileParties .cam-pp-others').scrollIntoView({block:'center'})")
         page.wait_for_timeout(250)
         check_clean(page, tag + ' perfil propio')
         shot(page, f'{tag}-perfil-propio')
 
-        # Crear party desde el perfil.
-        page.click('#camProfileParties >> text=Crear party')
+        # Crear party desde el perfil (Quiniela ya elegida; se cambia a Picks).
+        page.click('#camProfileParties >> text=Crear otra')
         page.wait_for_selector('#camPartyName', state='visible')
-        assert page.locator('#camParty [data-value="picks"]').get_attribute('aria-pressed') == 'true'
+        assert page.locator('#camParty [data-value="quiniela"]').get_attribute('aria-pressed') == 'true'
+        page.click('#camParty [data-value="picks"]')
         page.fill('#camPartyName', 'ab')
         page.click('#camParty button[type=submit]')
         assert 'entre 3 y 40' in page.inner_text('#camParty .cam-party-error')
@@ -404,7 +437,7 @@ def scenario_takes_and_creator(dark, width, tag):
         page.click('#camParty .cam-party-sheet .cam-party-btn.is-danger >> text="Borrar"')
         page.wait_for_function("document.getElementById('camPartyTitle')?.textContent === 'Mis parties'")
         page.wait_for_function("document.querySelector('#camParty .cam-party-list')?.textContent === 'Aún no estás en ningún party de Takes.'")
-        assert page.evaluate("window.__fake.parties.length") == 1
+        assert page.evaluate("window.__fake.parties.length") == 2
 
         # Como miembro (no creador): salir del party de Picks.
         page.click('#camParty .cam-party-seg-btn >> text="Picks"')
@@ -503,12 +536,12 @@ def scenario_invite_login_new_member(dark, width, tag):
 def scenario_public_profile(dark, width, tag):
     page = open_page("window.__fake.start='beto';", dark, width)
     try:
-        # Beto ve el perfil público de Ana: nombre, tipo y posición de sus parties.
-        page.evaluate(f"window.openAePublicProfile({USERS['ana']!r}, true, 'picks')")
+        # Beto ve la pestaña «Party» de Ana: nombre, tipo y posición de sus parties.
+        page.evaluate(f"window.openAePublicProfile({USERS['ana']!r}, true, 'party')")
         page.wait_for_selector('#camProfileParties .cam-party-card', timeout=8000)
         txt = page.inner_text('#camProfileParties')
-        assert 'Los del barrio ⚽' in txt and '1.º' in txt and 'de 3' in txt, txt
-        assert 'Crear party' not in txt
+        assert txt.startswith('Parties') and 'Los Compas 🏈' in txt and 'Los del barrio ⚽' in txt and '1.º de 3' in txt, txt
+        assert 'Crear party' not in txt and '¿Juegas la quiniela? Arma tu party ›' in txt
         page.evaluate("document.getElementById('camProfileParties').scrollIntoView({block:'center'})")
         page.wait_for_timeout(250)
         check_clean(page, tag + ' perfil público')
@@ -530,13 +563,11 @@ def scenario_public_profile(dark, width, tag):
         assert calls(page, 'cam_party_set_visibility')[-1]['args'] == {'p_party': 'f1000000-0000-4000-8000-000000000001', 'p_show': False}
         page.evaluate("document.getElementById('camParty').close()")
         page.evaluate("window.__fake.user = window.__fake.asUser('beto')")
-        page.evaluate(f"window.openAePublicProfile({USERS['ana']!r}, true, 'picks')")
-        page.wait_for_timeout(1200)
-        assert page.locator('#camProfileParties').count() == 0 or not visible(page, '#camProfileParties'), 'el party oculto no sale'
-        # En la pestaña Takes sigue el otro party de Ana.
-        page.click('#aeProfileTabTakes')
-        page.wait_for_selector('#camProfileParties .cam-party-card')
-        assert 'Takes de la oficina' in page.inner_text('#camProfileParties')
+        page.evaluate(f"window.openAePublicProfile({USERS['ana']!r}, true, 'party')")
+        page.wait_for_selector('#camProfileParties .cam-party-card', timeout=8000)
+        txt = page.inner_text('#camProfileParties')
+        assert 'Los del barrio' not in txt, 'el party oculto no sale'
+        assert 'Takes de la oficina' in txt, txt
         check_clean(page, tag + ' perfil público tras ocultar')
     finally:
         close(page)
@@ -578,6 +609,80 @@ def scenario_entries(dark, width, tag):
         close(page)
 
 
+def scenario_quiniela(dark, width, tag):
+    page = open_page("window.__fake.start='ana';", dark, width)
+    try:
+        # Crear una party de quiniela desde «Mis parties» de la Quiniela NFL.
+        page.evaluate("window.camParties.openHub('quiniela','nfl')")
+        page.wait_for_selector('#camParty .cam-party-card')
+        segs = page.eval_on_selector_all('#camParty .cam-party-seg-btn', 'ns => ns.map(n => n.textContent)')
+        assert segs == ['Quiniela', 'Picks', 'Takes'], segs
+        page.click('#camParty >> text=Crear party')
+        page.wait_for_selector('#camPartyName', state='visible')
+        assert page.locator('#camParty [data-value="quiniela"]').get_attribute('aria-pressed') == 'true'
+        assert page.locator('#camParty [data-value="nfl"]').get_attribute('aria-pressed') == 'true'
+        page.fill('#camPartyName', 'Domingos de NFL')
+        check_clean(page, tag + ' crear quiniela')
+        page.click('#camParty button[type=submit]')
+        page.wait_for_selector('#camParty .cam-party-code', state='visible')
+        assert calls(page, 'cam_party_create')[-1]['args'] == {'p_name': 'Domingos de NFL', 'p_kind': 'quiniela', 'p_sport': 'nfl'}
+        page.click('#camParty .cam-party-sheet button[aria-label=Cerrar]')
+        assert 'QUINIELA' in page.inner_text('#camParty .cam-party-kicker').upper()
+
+        # La party existente: Esta semana · Este mes · Total en una llamada.
+        before = len(calls(page, 'cam_party_ranking'))
+        page.evaluate("window.camParties.openParty('f5000000-0000-4000-8000-000000000005','hub')")
+        page.wait_for_selector('#camPartyBoard .cam-party-row')
+        page.wait_for_function("document.getElementById('camPartyTitle')?.textContent === 'Los Compas 🏈'")
+        periods = page.eval_on_selector_all('#camPartyBoard .cam-party-seg-btn', 'ns => ns.map(n => n.textContent)')
+        assert periods == ['Esta semana', 'Este mes', 'Total'], periods
+        assert page.locator('#camPartyBoard .cam-party-seg-btn[aria-pressed=true]').inner_text() == 'Esta semana'
+        rows = lambda: page.eval_on_selector_all('#camPartyBoard .cam-party-row', "rs => rs.map(r => r.innerText.replace(/\\s+/g,' ').trim().toLowerCase())")
+        r = rows()
+        assert '@ana' in r[0] and ' 6 ' in r[0] + ' ' and '1/1 aciertos' in r[0] and '@beto_crack' in r[1] and '0/1 aciertos' in r[1], r
+        page.click('#camPartyBoard .cam-party-seg-btn >> text="Total"')
+        r = rows()
+        # Beto entró hace 3 días: el partido de hace 9 no le cuenta.
+        assert '@ana' in r[0] and ' 10 ' in r[0] + ' ' and '2/2 aciertos' in r[0] and '0/1 aciertos' in r[1], r
+        page.click('#camPartyBoard .cam-party-seg-btn >> text="Este mes"')
+        assert len(calls(page, 'cam_party_ranking')) == before + 1, 'cambiar de periodo no llama'
+        check_clean(page, tag + ' clasificación quiniela')
+        shot(page, f'{tag}-quiniela-clasificacion')
+
+        # Actividad: solo partidos empezados (nunca la elección de antes del inicio).
+        page.click('#camPartyTabActivity')
+        page.wait_for_selector('#camPartyFeed .cam-party-item')
+        filters = page.eval_on_selector_all('#camPartyFeed .cam-party-seg-btn', 'ns => ns.map(n => n.textContent)')
+        assert filters == ['Todos', 'En juego', 'Resueltos'], filters
+        txt = page.inner_text('#camPartyFeed')
+        assert 'Cowboys @ 49ers' in txt and 'Eligió Cowboys · 24–17' in txt, txt
+        assert '49ers @ Cowboys' not in txt, 'el partido de dentro de 2 días no se ve'
+        assert page.locator('#camPartyFeed .cam-party-item').count() == 5, page.locator('#camPartyFeed .cam-party-item').count()
+        page.click('#camPartyFeed .cam-party-seg-btn >> text="En juego"')
+        page.wait_for_function("document.querySelectorAll('#camPartyFeed .cam-party-item').length === 2")
+        assert 'En juego · vale' in page.inner_text('#camPartyFeed')
+        check_clean(page, tag + ' actividad quiniela')
+        shot(page, f'{tag}-quiniela-actividad')
+    finally:
+        close(page)
+
+    # Invitar y unirse: la invitación dice «Quiniela · NFL».
+    page = open_page("window.__fake.start='carla';", dark, width)
+    try:
+        goto(page, '?party=QNP234')
+        page.wait_for_selector('#camPartyJoin', state='visible', timeout=8000)
+        chips = page.eval_on_selector_all('#camParty .cam-party-chip', 'ns => ns.map(n => n.textContent)')
+        assert chips[:2] == ['Quiniela', 'NFL'], chips
+        check_clean(page, tag + ' invitación quiniela')
+        shot(page, f'{tag}-invitacion-quiniela')
+        page.click('#camPartyJoin')
+        page.wait_for_selector('#camPartyBoard .cam-party-row')
+        assert page.eval_on_selector_all('#camPartyBoard .cam-party-seg-btn', 'ns => ns.map(n => n.textContent)')[0] == 'Esta semana'
+        assert page.locator('#camPartyBoard .cam-party-row').count() == 3
+    finally:
+        close(page)
+
+
 def scenario_admin(dark, width, tag):
     # Administradora (tabla editors): ve todos los parties y puede borrar uno ajeno.
     fake = """window.__fake.start='ana'; window.__fake.admin=true;
@@ -590,7 +695,7 @@ def scenario_admin(dark, width, tag):
         page.wait_for_function("typeof currentAdmin !== 'undefined' && Boolean(currentAdmin)")
         page.evaluate("window.camParties.openHub('picks','all')")
         page.click('#camParty .cam-party-link >> text="Moderar todos los parties"')
-        page.wait_for_function("document.querySelectorAll('#camParty .cam-party-card').length === 3")
+        page.wait_for_function("document.querySelectorAll('#camParty .cam-party-card').length === 4")
         check_clean(page, tag + ' moderación')
         page.click('#camParty .cam-party-card >> text="Nombre a moderar"')
         page.wait_for_selector('#camPartyBoard .cam-party-row')
@@ -601,7 +706,7 @@ def scenario_admin(dark, width, tag):
         page.click('#camParty .cam-party-sheet >> text="Borrar party (moderación)"')
         page.click('#camParty .cam-party-sheet .cam-party-btn.is-danger >> text="Borrar"')
         page.wait_for_function("document.getElementById('camPartyTitle')?.textContent === 'Todos los parties'")
-        page.wait_for_function("document.querySelectorAll('#camParty .cam-party-card').length === 2")
+        page.wait_for_function("document.querySelectorAll('#camParty .cam-party-card').length === 3")
         assert not page.errors, page.errors
     finally:
         close(page)
@@ -609,7 +714,7 @@ def scenario_admin(dark, width, tag):
 
 COMBOS = [(390, False, '390-dia'), (390, True, '390-noche'), (1366, False, '1366-dia'), (1366, True, '1366-noche')]
 SCENARIOS = [scenario_create_and_ranking, scenario_takes_and_creator, scenario_invite,
-             scenario_invite_login_new_member, scenario_public_profile, scenario_entries, scenario_admin]
+             scenario_invite_login_new_member, scenario_public_profile, scenario_entries, scenario_quiniela, scenario_admin]
 
 for width, dark, tag in COMBOS:
     if ONLY and ONLY != tag:

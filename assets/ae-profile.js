@@ -1,5 +1,8 @@
-/* AE SPORTS · Unified private profile: Takes + Picks.
+/* AE SPORTS · Unified private profile: Perfil · Takes · Picks · Mi Party.
  * Public author profiles expose public Takes and Picks.
+ * 3 nov 2026: el perfil abre en «Perfil» (resumen, cam_profile_overview: una
+ * llamada). Takes y Picks se cargan al abrir su pestaña; «Mi Party» la pinta
+ * cam-parties.js. ?perfil=<id>&tab=takes|picks|party abre esa pestaña.
  */
 (() => {
 'use strict';
@@ -28,7 +31,9 @@ let request=0;
 let activeAuthor=null;
 let privateView=false;
 let working=false;
-let activeTab='takes';
+const TABS=['perfil','takes','picks','party'];
+const validTab=tab=>TABS.includes(tab)?tab:'perfil';
+let activeTab='perfil';
 let ownTakes=[];
 let ownPicks=[];
 let publicAuthorLabel='Aficionado';
@@ -36,13 +41,14 @@ let profileName='';
 let ownUnpopularTakeId=null;
 let recentScrollObserver=null;
 let prestigeRequest=0;
+// Cada pestaña carga lo suyo la primera vez que se abre (cuota de Supabase).
+let takesLoaded=false,takesLoading=null,picksLoaded=false,picksLoading=null;
 // Session data is used only to paint the UI; every private query remains
 // authorized by Supabase. Do not revalidate over the network on each tap/focus.
 let sessionUser;
 let sessionRead=null;
 let sessionRevision=0;
-let loadingTakes=false;
-let loadingPicks=false;
+let overview=null,overviewError='',overviewStale=false,overviewTimer=0;
 
 /* Perfil de prestigio: aciertos medidos por dificultad (escala 1–20). */
 const RISK_TEXT={
@@ -212,12 +218,13 @@ function openSharedProfileTake(owner){
 async function refreshProfileTakes(){
   const dialog=$('aeProfileDialog'),author=activeAuthor,isOwn=privateView,token=request;
   if(!dialog?.open||!author)return;
+  markOverviewStale();
+  if(!takesLoaded)return;
   try{
     const r=isOwn?await db.rpc('ae_my_free_takes'):await db.rpc('ae_public_take_profile',{p_author_id:author});
     if(r.error)throw r.error;
     if(token!==request||!dialog.open||activeAuthor!==author||privateView!==isOwn)return;
     ownTakes=r.data||[];
-    renderStats();
     if(activeTab==='takes')renderTakes(ownTakes,author,!isOwn);
     loadPrestige(author);
   }catch(e){
@@ -289,17 +296,15 @@ function updateButton(){
 
 function close(){
   closeEdit(false);
-  window.camNflProfile?.close?.();
   document.dispatchEvent(new CustomEvent('cam:profile-view',{detail:{userId:null}}));
   if(recentScrollObserver){recentScrollObserver.disconnect();recentScrollObserver=null;}
   ++request;
   activeAuthor=null;
   privateView=false;
-  activeTab='takes';
+  activeTab='perfil';
   ownTakes=[];
   ownPicks=[];
-  loadingTakes=false;
-  loadingPicks=false;
+  resetLoads();
   publicAuthorLabel='Aficionado';
   ownUnpopularTakeId=null;
   const dialog=$('aeProfileDialog');
@@ -308,7 +313,8 @@ function close(){
     const url=new URL(location.href);
     url.searchParams.delete('perfil');
     url.searchParams.delete('take');
-    history.replaceState({},'',url);
+    url.searchParams.delete('tab');
+    history.replaceState(history.state,'',url);
   }
 }
 
@@ -717,56 +723,179 @@ function renderPublishAction(){
     });
     $('aeProfileDialog').append(action);
   }
-  action.hidden=!privateView||activeTab==='quiniela';
+  action.hidden=!privateView||!(activeTab==='takes'||activeTab==='picks');
   action.textContent=activeTab==='picks'?'Publicar mi Pick':'Publicar mi Take';
   action.setAttribute('aria-controls',activeTab==='picks'?'cpComposePanel':'aeTakeComposerDialog');
 }
 
-function setPrivateTab(tab){
+function setPrivateTab(tab,options={}){
   if(!activeAuthor)return;
   labelTabs();
-  activeTab=['takes','picks','quiniela'].includes(tab)?tab:'takes';
-  for(const [id,value] of [['aeProfileTabTakes','takes'],['aeProfileTabPicks','picks'],['aeProfileTabQuiniela','quiniela']]){
+  activeTab=validTab(tab);
+  for(const [id,value] of [['aeProfileTabOverview','perfil'],['aeProfileTabTakes','takes'],['aeProfileTabPicks','picks'],['aeProfileTabParty','party']]){
     const button=$(id);
-    button?.setAttribute('aria-selected',String(activeTab===value));
-    button?.classList.toggle('is-active',activeTab===value);
+    if(!button)continue;
+    button.setAttribute('aria-selected',String(activeTab===value));
+    button.classList.toggle('is-active',activeTab===value);
+    button.tabIndex=activeTab===value?0:-1;
   }
 
   renderPublishAction();
   const isTakes=activeTab==='takes',isPicks=activeTab==='picks';
   $('aeProfileTakeHighlights').hidden=!isTakes;
   $('aeProfileTakes').hidden=!isTakes;
-  $('aeProfileTakeAccuracy').hidden=!isTakes;
+  $('aeProfileTakeAccuracy').hidden=!isTakes||!takesLoaded;
   $('aeProfilePickHighlights').hidden=!isPicks;
   $('aeProfilePicks').hidden=!isPicks;
-  $('aeProfileAccuracy').hidden=!isPicks;
+  $('aeProfileAccuracy').hidden=!isPicks||!picksLoaded;
   const prestige=$('aeProfilePrestige');
   if(prestige)prestige.hidden=!isTakes||!prestige.childElementCount;
-  const quiniela=$('camNflProfile');
-  if(quiniela)quiniela.hidden=activeTab!=='quiniela';
+  if($('camProfileOverview'))$('camProfileOverview').hidden=activeTab!=='perfil';
+  if($('camProfileParties'))$('camProfileParties').hidden=activeTab!=='party';
 
-  renderStats();
-  if(isTakes){
-    renderTakes(ownTakes,activeAuthor,!privateView);
-    if(loadingTakes){
+  let loading=null;
+  if(activeTab==='perfil'){
+    if(overviewStale&&overview)loading=loadOverview();
+    else renderOverview();
+  }else if(isTakes){
+    if(takesLoaded)renderTakes(ownTakes,activeAuthor,!privateView);
+    else{
+      // Mientras llegan, nunca parece un historial vacío.
       $('aeProfileTakeHighlights').hidden=true;
-      $('aeProfileTakeAccuracy').hidden=true;
-      $('aeProfileTakes').replaceChildren(el('p','Cargando tus Takes…','ae-profile-empty'));
+      $('aeProfileTakes').replaceChildren(el('p',privateView?'Cargando tus Takes…':'Cargando Takes…','ae-profile-empty'));
+      loading=loadTakes();
     }
   }else if(isPicks){
-    renderPicks(ownPicks,!privateView);
-    if(loadingPicks){
+    if(picksLoaded)renderPicks(ownPicks,!privateView);
+    else{
       $('aeProfilePickHighlights').hidden=true;
-      $('aeProfileAccuracy').hidden=true;
-      $('aeProfilePicks').replaceChildren(el('p','Cargando tus Picks…','ae-profile-empty'));
+      $('aeProfilePicks').replaceChildren(el('p',privateView?'Cargando tus Picks…':'Cargando Picks…','ae-profile-empty'));
+      loading=loadPicks();
     }
-  }else{
-    $('aeProfileCount').textContent='La Quiniela NFL';
-    setOverview(privateView?'':'Resultados confirmados de este aficionado. Sus pronósticos futuros son privados.');
-    window.camNflProfile?.open(activeAuthor,privateView);
   }
-  // Parties (cam-parties.js) pone su bloque en la pestaña visible.
+  if(options.url!==false)syncTabUrl();
+  // Mi Party (cam-parties.js) se pinta al recibir la pestaña visible.
   document.dispatchEvent(new CustomEvent('cam:profile-view',{detail:{userId:activeAuthor,own:privateView,tab:activeTab}}));
+  return loading;
+}
+
+/* La dirección del perfil público dice su pestaña (?perfil=<id>&tab=picks).
+   Cambiar de pestaña no suma pasos al botón Atrás. */
+function syncTabUrl(){
+  let url;
+  try{url=new URL(location.href);}catch{return;}
+  if(url.searchParams.get('perfil')!==String(activeAuthor))return;
+  const wanted=activeTab==='perfil'?null:activeTab;
+  if((url.searchParams.get('tab')||null)===wanted)return;
+  if(wanted)url.searchParams.set('tab',wanted);else url.searchParams.delete('tab');
+  try{history.replaceState(history.state,'',url.href);}catch{}
+}
+function urlTab(){
+  try{
+    const params=new URL(location.href).searchParams;
+    // Un Take compartido (?take=) se abre sobre su lista de Takes.
+    if(UUID.test(params.get('take')||''))return 'takes';
+    return validTab(params.get('tab'));
+  }catch{return 'perfil';}
+}
+
+function resetLoads(){
+  takesLoaded=false;takesLoading=null;picksLoaded=false;picksLoading=null;
+  overview=null;overviewError='';overviewStale=false;clearTimeout(overviewTimer);
+}
+
+/* ---------- Resumen («Perfil») ---------- */
+function markOverviewStale(){
+  if(!overview)return;
+  overviewStale=true;
+  if(activeTab!=='perfil'||!$('aeProfileDialog')?.open)return;
+  clearTimeout(overviewTimer);
+  overviewTimer=setTimeout(()=>{if(activeTab==='perfil'&&overviewStale)loadOverview();},800);
+}
+async function loadOverview(){
+  const author=activeAuthor,own=privateView,ticket=request;
+  if(!author)return;
+  overviewStale=false;overviewError='';
+  if(!overview)renderOverview();
+  try{
+    const r=await db.rpc('cam_profile_overview',{p_user:author});
+    if(r.error)throw r.error;
+    if(ticket!==request||activeAuthor!==author||privateView!==own)return;
+    overview=r.data||{username:profileName};
+    const name=String(overview.username||'').trim();
+    if(name&&(own?name!=='Aficionado':true))setIdentity(name,overview.joined_month?'Miembro desde '+monthText(overview.joined_month+'-15T12:00:00'):undefined);
+    if(!own)publicAuthorLabel=name||publicAuthorLabel;
+  }catch(e){
+    if(ticket!==request)return;
+    overviewError='El resumen no está disponible ahora mismo.';
+    // Sin resumen el perfil público conserva su nombre.
+    if(!own&&!profileName){
+      try{
+        const card=await db.rpc('cam_public_profile_card',{p_user:author});
+        if(ticket===request&&card?.data?.username){publicAuthorLabel=card.data.username;setIdentity(card.data.username,card.data.joined_month?'Miembro desde '+monthText(card.data.joined_month+'-15T12:00:00'):undefined);}
+      }catch{}
+    }
+  }
+  renderOverview();
+}
+function renderOverview(){
+  const target=$('camProfileOverview');
+  if(!target||activeTab!=='perfil')return;
+  const owner=activeAuthor;
+  // CamProfileOverview (cam-profile-overview.js); sin él, el resumen no se pinta.
+  if(typeof window.CamProfileOverview?.render!=='function')return;
+  window.CamProfileOverview.render(target,overview,{
+    own:privateView,name:profileName,error:overviewError,
+    tab:tab=>{setPrivateTab(tab);$('aeProfileTabs')?.scrollIntoView?.({block:'nearest'});},
+    openTake:t=>openProfileTake({...t,author_id:owner,hidden:false},owner),
+    openPick:id=>{if(typeof window.aeOpenPickDetail==='function')window.aeOpenPickDetail(id);else openPick(id);},
+    newTake:()=>{if(typeof window.aeOpenTakeComposer!=='function')return;close();window.aeOpenTakeComposer();},
+    newPick:()=>{if(typeof window.aeOpenPickComposer!=='function')return;close();window.aeOpenPickComposer();},
+    play:sport=>window.camGoQuiniela?.(sport)
+  });
+}
+
+/* ---------- Takes y Picks: se cargan al abrir su pestaña ---------- */
+function loadTakes(){
+  if(takesLoading)return takesLoading;
+  const author=activeAuthor,own=privateView,ticket=request;
+  loadPrestige(author);
+  takesLoading=(async()=>{
+    const [takesResult,unpopularResult]=await Promise.allSettled([
+      own?db.rpc('ae_my_free_takes'):db.rpc('ae_public_take_profile',{p_author_id:author}),
+      own?db.rpc('ae_my_profile_unpopular_take'):Promise.resolve({data:null})
+    ]);
+    if(ticket!==request||activeAuthor!==author)return;
+    const takeError=takesResult.status==='rejected'?takesResult.reason:takesResult.value.error;
+    const unpopularError=unpopularResult.status==='rejected'?unpopularResult.reason:unpopularResult.value.error;
+    ownTakes=takeError?[]:(takesResult.value.data||[]);
+    if(own)ownUnpopularTakeId=unpopularError?null:(unpopularResult.value.data||null);
+    if(!own&&ownTakes[0]?.author&&publicAuthorLabel==='Aficionado')publicAuthorLabel=String(ownTakes[0].author);
+    takesLoaded=true;
+    const errors=[];
+    if(takeError)errors.push('Takes: '+(takeError.message||'no disponibles'));
+    if(own&&unpopularError)errors.push('Unpopular Take: '+(unpopularError.message||'no disponible'));
+    $('aeProfileStatus').textContent=errors.length?'No se pudo cargar todo. '+errors.join(' · '):'';
+    if(activeTab==='takes'){
+      $('aeProfileTakeAccuracy').hidden=false;
+      renderTakes(ownTakes,author,!own);
+    }
+    if(!takeError)openSharedProfileTake(author);
+  })().finally(()=>{if(ticket===request)takesLoading=null;});
+  return takesLoading;
+}
+function loadPicks(){
+  if(picksLoading)return picksLoading;
+  const author=activeAuthor,own=privateView,ticket=request;
+  picksLoading=(async()=>{
+    let error=null;
+    try{ownPicks=await loadOwnPicks(author);}catch(e){error=e;ownPicks=[];}
+    if(ticket!==request||activeAuthor!==author)return;
+    picksLoaded=true;
+    $('aeProfileStatus').textContent=error?'Picks no disponibles. '+(error.message||''):'';
+    if(activeTab==='picks')renderPicks(ownPicks,!own);
+  })().finally(()=>{if(ticket===request)picksLoading=null;});
+  return picksLoading;
 }
 
 async function loadOwnPicks(userId){
@@ -782,12 +911,12 @@ async function loadOwnPicks(userId){
 // Refresh only visible Pick data when a moderation decision arrives.
 async function refreshProfilePicks(){
   const dialog=$('aeProfileDialog'),author=activeAuthor,token=request,isOwn=privateView;
-  if(!dialog?.open||!author||document.hidden)return;
+  // Solo con la pestaña Picks abierta: el resumen y las demás pestañas no se consultan solas.
+  if(!dialog?.open||!author||document.hidden||!picksLoaded||activeTab!=='picks')return;
   try{
     const fresh=await loadOwnPicks(author);
     if(token!==request||!dialog.open||activeAuthor!==author||privateView!==isOwn)return;
     ownPicks=fresh;
-    renderStats();
     if(activeTab==='picks')renderPicks(ownPicks,!isOwn);
   }catch(error){
     // Retain the previous view during transient network problems.
@@ -795,35 +924,32 @@ async function refreshProfilePicks(){
   }
 }
 
-async function showOwn(){
+function clearSections(){
+  for(const id of ['aeProfileTakeHighlights','aeProfileTakes','aeProfilePickHighlights','aeProfilePicks','aeProfileAccuracy','aeProfileTakeAccuracy','camProfileOverview']){
+    const n=$(id);if(n)n.replaceChildren();
+  }
+  $('aeProfileAccuracy').hidden=true;
+  $('aeProfileTakeAccuracy').hidden=true;
+  if($('aeProfilePrestige')){$('aeProfilePrestige').replaceChildren();$('aeProfilePrestige').hidden=true;}
+}
+
+async function showOwn(tab='perfil'){
+  // La ventana se abre al primer toque; la sesión (ya leída) llega después.
   const ticket=++request;
   const dialog=$('aeProfileDialog');
   closeEdit(false);
   privateView=true;
   activeAuthor=null;
-  activeTab='takes';
-  ownTakes=[];
-  ownPicks=[];
-  ownUnpopularTakeId=null;
-  loadingTakes=true;
-  loadingPicks=true;
+  ownTakes=[];ownPicks=[];ownUnpopularTakeId=null;
+  resetLoads();
   if($('aeProfileWelcomeAgain'))$('aeProfileWelcomeAgain').hidden=false;
+  if($('aeProfilePublish'))$('aeProfilePublish').hidden=true;
   publicAuthorLabel='Aficionado';
   $('aeProfileTabs').hidden=false;
   setIdentity('Tu perfil','');
-  resetStats();
+  clearSections();
+  for(const id of ['aeProfileTakeHighlights','aeProfileTakes','aeProfilePickHighlights','aeProfilePicks'])$(id).hidden=true;
   $('aeProfileStatus').textContent='Cargando tu perfil…';
-  for(const id of ['aeProfileTakeHighlights','aeProfileTakes','aeProfilePickHighlights','aeProfilePicks','aeProfileAccuracy','aeProfileTakeAccuracy']){
-    $(id).replaceChildren();
-    $(id).hidden=true;
-  }
-  for(const [id,selected] of [['aeProfileTabTakes',true],['aeProfileTabPicks',false],['aeProfileTabQuiniela',false]]){
-    $(id)?.setAttribute('aria-selected',String(selected));
-    $(id)?.classList.toggle('is-active',selected);
-  }
-  if($('camNflProfile'))$('camNflProfile').hidden=true;
-  if($('aeProfilePublish'))$('aeProfilePublish').hidden=true;
-  if($('aeProfilePrestige')){$('aeProfilePrestige').replaceChildren();$('aeProfilePrestige').hidden=true;}
   if(!dialog.open)dialog.showModal();
 
   const user=await me();
@@ -833,146 +959,46 @@ async function showOwn(){
   activeAuthor=user.id;
   setIdentity(user.user_metadata?.username||user.user_metadata?.display_name||'Usuario',
     user.created_at?'Miembro desde '+monthText(user.created_at):'Tu historial deportivo');
-  setPrivateTab('takes');
-  $('aeProfileTakes').replaceChildren(el('p','Cargando tus Takes…','ae-profile-empty'));
-  loadPrestige(user.id);
-
-  const current=()=>ticket===request&&dialog.open&&privateView&&activeAuthor===user.id;
-  // Paint each part independently. Slow Picks/name lookups must not block Takes,
-  // and completing a background request must never switch the selected tab.
-  const [takesResult,picksResult,unpopularResult,publicNameResult]=await Promise.allSettled([
-    Promise.resolve().then(()=>db.rpc('ae_my_free_takes')).then(result=>{
-      if(current()){
-        loadingTakes=false;
-        ownTakes=result.error?[]:result.data||[];
-        renderStats();
-        if(activeTab==='takes'){
-          renderTakes(ownTakes,user.id,false);
-          $('aeProfileStatus').textContent=result.error?'No se pudieron cargar tus Takes.':'';
-        }
-        if(!result.error)openSharedProfileTake(user.id);
-      }
-      return result;
-    }),
-    loadOwnPicks(user.id).then(entries=>{
-      if(current()){
-        loadingPicks=false;
-        ownPicks=entries;
-        renderStats();
-        if(activeTab==='picks'){
-          renderPicks(ownPicks,false);
-          $('aeProfileStatus').textContent='';
-        }
-      }
-      return entries;
-    }),
-    Promise.resolve().then(()=>db.rpc('ae_my_profile_unpopular_take')).then(result=>{
-      if(current()&&!result.error){
-        ownUnpopularTakeId=result.data||null;
-        if(activeTab==='takes'&&!loadingTakes)renderTakes(ownTakes,user.id,false);
-      }
-      return result;
-    }),
-    // El nombre público (el que ve la comunidad) no siempre está en los datos
-    // de la sesión; sin él, el perfil, la conversación y las fichas decían «Usuario».
-    Promise.resolve().then(()=>db.rpc('ae_public_take_profile',{p_author_id:user.id})).then(result=>{
-      if(current()&&!result.error){
-        const name=String(result.data?.[0]?.author||'').trim();
-        if(name&&name!=='Aficionado')setIdentity(name);
-      }
-      return result;
-    })
-  ]);
-  if(!current())return;
-  const publicName=publicNameResult.status==='fulfilled'&&!publicNameResult.value.error
-    ?String(publicNameResult.value.data?.[0]?.author||'').trim():'';
-  if(publicName&&publicName!=='Aficionado')setIdentity(publicName);
-
-  const takeError=takesResult.status==='rejected'?takesResult.reason:takesResult.value.error;
-  const pickError=picksResult.status==='rejected'?picksResult.reason:null;
-  const unpopularError=unpopularResult.status==='rejected'?unpopularResult.reason:unpopularResult.value.error;
-  ownTakes=takeError?[]:(takesResult.value.data||[]);
-  ownPicks=pickError?[]:picksResult.value;
-  ownUnpopularTakeId=unpopularError?null:(unpopularResult.value.data||null);
-  loadingTakes=false;
-  loadingPicks=false;
-
-  const errors=[];
-  if(takeError)errors.push('Takes: '+(takeError.message||'no disponibles'));
-  if(pickError)errors.push('Picks: '+(pickError.message||'no disponibles'));
-  if(unpopularError)errors.push('Unpopular Take: '+(unpopularError.message||'no disponible'));
-  $('aeProfileStatus').textContent=errors.length?'No se pudo cargar todo el perfil. '+errors.join(' · '):'';
-  // Redraw errors/empty results in the tab the reader is currently using.
-  if(activeTab==='takes')renderTakes(ownTakes,user.id,false);
-  else if(activeTab==='picks')renderPicks(ownPicks,false);
+  $('aeProfileStatus').textContent='';
+  // El resumen trae el nombre público (no siempre está en la sesión): una llamada.
+  const summary=loadOverview();
+  if(ticket!==request)return;
+  // Se espera a la pestaña abierta (quien llama puede usarla al terminar).
+  await Promise.all([summary,setPrivateTab(validTab(typeof tab==='string'?tab:'perfil'))]);
 }
 
-async function showPublic(id,push=true,tab='takes'){
+async function showPublic(id,push=true,tab='perfil'){
   if(!UUID.test(id))return;
+  tab=validTab(typeof tab==='string'?tab:'perfil');
   const user=await me();
-  if(user?.id===id){await showOwn();if(tab==='picks'||tab==='quiniela')setPrivateTab(tab);return;}
+  if(user?.id===id){await showOwn(tab);return;}
 
   privateView=false;
-  loadingTakes=false;
-  loadingPicks=false;
   if($('aeProfilePublish'))$('aeProfilePublish').hidden=true;
   if($('aeProfileWelcomeAgain'))$('aeProfileWelcomeAgain').hidden=true;
   activeAuthor=id;
-
-  activeTab=['takes','picks','quiniela'].includes(tab)?tab:'takes';
-  ownTakes=[];
-  ownPicks=[];
+  ownTakes=[];ownPicks=[];
+  resetLoads();
   publicAuthorLabel='Aficionado';
   const ticket=++request;
   const dialog=$('aeProfileDialog');
   if(!dialog.open)dialog.showModal();
 
-  // Public profiles keep three tabs; NFL selections remain hidden before settlement.
   $('aeProfileTabs').hidden=false;
-  $('aeProfileTakeHighlights').hidden=true;
-  $('aeProfileTakes').hidden=true;
-  $('aeProfilePickHighlights').hidden=true;
-  $('aeProfilePicks').hidden=true;
-  $('aeProfileAccuracy').hidden=true;
-  $('aeProfileTakeAccuracy').hidden=true;
-  setIdentity('',  'Aficionado de CAM SPORTS');
-  resetStats();
-  $('aeProfileStatus').textContent='Cargando perfil público…';
-  $('aeProfileTakeHighlights').replaceChildren();
-  $('aeProfileTakes').replaceChildren();
-  $('aeProfilePickHighlights').replaceChildren();
-  $('aeProfilePicks').replaceChildren();
-  $('aeProfileAccuracy').replaceChildren();
-  $('aeProfileTakeAccuracy').replaceChildren();
-  if($('aeProfilePrestige')){$('aeProfilePrestige').replaceChildren();$('aeProfilePrestige').hidden=true;}
-  loadPrestige(id);
+  setIdentity('','Aficionado de CAM SPORTS');
+  $('aeProfileStatus').textContent='';
+  clearSections();
 
   if(push){
     const u=new URL(location.href);
     u.searchParams.set('perfil',id);
     u.searchParams.delete('take');
+    if(tab==='perfil')u.searchParams.delete('tab');else u.searchParams.set('tab',tab);
     history.pushState({},'',u);
   }
-
-  const [takesResult,picksResult,cardResult]=await Promise.allSettled([
-    db.rpc('ae_public_take_profile',{p_author_id:id}),
-    loadOwnPicks(id), // ae_pick_feed is the existing public view.
-    db.rpc('cam_public_profile_card',{p_user:id})
-  ]);
-  if(ticket!==request||!dialog.open)return;
-  const takeError=takesResult.status==='rejected'?takesResult.reason:takesResult.value.error;
-  const pickError=picksResult.status==='rejected'?picksResult.reason:null;
-  ownTakes=takeError?[]:(takesResult.value.data||[]);
-  ownPicks=pickError?[]:picksResult.value;
-  const card=cardResult.status==='fulfilled'&&!cardResult.value.error?cardResult.value.data:null;
-  publicAuthorLabel=String(card?.username||ownTakes[0]?.author||ownPicks[0]?.author||'Aficionado');
-  setIdentity(publicAuthorLabel,card?.joined_month?'Miembro desde '+monthText(card.joined_month+'-15T12:00:00'):'Aficionado de CAM SPORTS');
-  const errors=[];
-  if(takeError)errors.push('Takes no disponibles');
-  if(pickError)errors.push('Picks no disponibles');
-  $('aeProfileStatus').textContent=errors.join(' · ');
-  setPrivateTab(tab);
-  if(!takeError)openSharedProfileTake(id);
+  const summary=loadOverview();
+  if(ticket!==request)return;
+  await Promise.all([summary,setPrivateTab(tab)]);
 }
 
 
@@ -1002,32 +1028,11 @@ function setIdentity(name,subtitle){
 }
 function labelTabs(){
   const own=privateView;
-  for(const [id,mine,theirs] of [['aeProfileTabTakes','Mis Takes','Takes'],['aeProfileTabPicks','Mis Picks','Picks'],['aeProfileTabQuiniela','Mi Quiniela','Quiniela']]){
-    const b=$(id);if(b)b.textContent=own?mine:theirs;
+  for(const [id,mine,theirs] of [['aeProfileTabOverview','Perfil','Perfil'],['aeProfileTabTakes','Takes','Takes'],['aeProfileTabPicks','Picks','Picks'],['aeProfileTabParty','Mi Party','Party']]){
+    const b=$(id);if(!b)continue;
+    const label=b.querySelector('.cam-tab-label')||b;
+    label.textContent=own?mine:theirs;
   }
-}
-function setStat(id,value,label){
-  const n=$(id);if(!n)return;
-  n.textContent=value;
-  n.parentElement?.setAttribute('aria-label',label);
-}
-function resetStats(){
-  setStat('camProfileStatTakes','·','Takes');
-  setStat('camProfileStatPicks','·','Picks');
-  setStat('camProfileStatHits','—','Porcentaje de acierto de los Picks');
-  setStat('camProfileStatSupport','—','Porcentaje de apoyo de los Takes');
-}
-function renderStats(){
-  const takes=ownTakes.filter(t=>privateView||!t.hidden);
-  const won=ownPicks.filter(p=>p.outcome==='won').length,lost=ownPicks.filter(p=>p.outcome==='lost').length;
-  const shown=takes.filter(t=>!t.hidden);
-  const up=shown.reduce((n,t)=>n+Math.max(0,numeric(t.upvotes)),0),down=shown.reduce((n,t)=>n+Math.max(0,numeric(t.downvotes)),0);
-  const hits=won+lost?Math.round(won/(won+lost)*100)+'%':'—';
-  const support=up+down?Math.round(up/(up+down)*100)+'%':'—';
-  setStat('camProfileStatTakes',loadingTakes?'·':String(takes.length),loadingTakes?'Cargando Takes':takes.length+(takes.length===1?' Take. Ver Takes':' Takes. Ver Takes'));
-  setStat('camProfileStatPicks',loadingPicks?'·':String(ownPicks.length),loadingPicks?'Cargando Picks':ownPicks.length+(ownPicks.length===1?' Pick. Ver Picks':' Picks. Ver Picks'));
-  setStat('camProfileStatHits',hits,'Acierto de los Picks: '+(hits==='—'?'sin Picks resueltos':hits)+'. Ver Picks');
-  setStat('camProfileStatSupport',support,'Apoyo de los Takes: '+(support==='—'?'sin votos':support)+'. Ver Takes');
 }
 let noticeTimer=0;
 function notice(text){
@@ -1206,11 +1211,14 @@ function bindProfileApp(){
   $('camProfileEditOpen')?.addEventListener('click',openEdit);
   $('camProfileEditBack')?.addEventListener('click',()=>closeEdit());
   $('camProfileShare')?.addEventListener('click',shareProfile);
-  $('camProfileStats')?.addEventListener('click',event=>{
-    const b=event.target.closest('button[data-tab]');
-    if(!b||!activeAuthor)return;
-    setPrivateTab(b.dataset.tab);
-    $('aeProfileTabs')?.scrollIntoView?.({block:'nearest'});
+  // Pestañas con flechas del teclado.
+  $('aeProfileTabs')?.addEventListener('keydown',event=>{
+    if(!['ArrowRight','ArrowLeft','Home','End'].includes(event.key)||!activeAuthor)return;
+    const index=TABS.indexOf(activeTab);
+    const next=event.key==='Home'?0:event.key==='End'?TABS.length-1:(index+(event.key==='ArrowRight'?1:-1)+TABS.length)%TABS.length;
+    event.preventDefault();
+    setPrivateTab(TABS[next]);
+    $({perfil:'aeProfileTabOverview',takes:'aeProfileTabTakes',picks:'aeProfileTabPicks',party:'aeProfileTabParty'}[TABS[next]])?.focus();
   });
   $('camUsernameInput')?.addEventListener('input',onNameInput);
   $('camUsernameForm')?.addEventListener('submit',event=>{
@@ -1246,28 +1254,33 @@ document.addEventListener('DOMContentLoaded',()=>{
   });
   window.addEventListener('cam:admin-state-change',updateButton);
 
+  $('aeProfileTabOverview')?.addEventListener('click',()=>setPrivateTab('perfil'));
   $('aeProfileTabTakes')?.addEventListener('click',()=>setPrivateTab('takes'));
   $('aeProfileTabPicks')?.addEventListener('click',()=>setPrivateTab('picks'));
-  $('aeProfileTabQuiniela')?.addEventListener('click',()=>setPrivateTab('quiniela'));
+  $('aeProfileTabParty')?.addEventListener('click',()=>setPrivateTab('party'));
 
   $('aeProfileDialog')?.addEventListener('click',e=>{if(e.target===$('aeProfileDialog'))close();});
   $('aeProfileDialog')?.addEventListener('close',()=>{++request;});
 
   document.addEventListener('ae:takes-updated',refreshProfileTakes);
-  document.addEventListener('ae:picks-updated',refreshProfilePicks);
+  document.addEventListener('ae:picks-updated',()=>{markOverviewStale();refreshProfilePicks();});
+  document.addEventListener('cam:parties-changed',markOverviewStale);
   window.addEventListener('focus',refreshProfilePicks);
   window.setInterval(refreshProfilePicks,30000);
   window.addEventListener('ae:take-category-changed',()=>{
-    if($('aeProfileDialog')?.open&&privateView)showOwn();
-    else if($('aeProfileDialog')?.open&&activeAuthor)showPublic(activeAuthor,false);
+    if($('aeProfileDialog')?.open&&privateView)showOwn(activeTab);
+    else if($('aeProfileDialog')?.open&&activeAuthor)showPublic(activeAuthor,false,activeTab);
   });
 
   const id=new URL(location.href).searchParams.get('perfil');
-  if(id&&UUID.test(id))showPublic(id,false);
+  if(id&&UUID.test(id))showPublic(id,false,urlTab());
 
   window.addEventListener('popstate',()=>{
     const newId=new URL(location.href).searchParams.get('perfil');
-    if(newId&&UUID.test(newId))showPublic(newId,false);
+    if(newId&&UUID.test(newId)){
+      if(newId===activeAuthor&&$('aeProfileDialog')?.open)setPrivateTab(urlTab(),{url:false});
+      else showPublic(newId,false,urlTab());
+    }
     else if($('aeProfileDialog')?.open&&!privateView)close();
   });
 });

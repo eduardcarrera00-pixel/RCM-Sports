@@ -59,6 +59,15 @@ function pickSelectionDisplay(input){
  return {choice:prediction||market,market:prediction?market:''};
 }
 
+/* Resumen del perfil: la primera selección en una línea legible, como la ficha
+   (MONEYLINE → «gana · 3 vías»). Un mercado que sigue en bruto no se enseña. */
+window.camPickChoiceText=input=>{
+ const first=splitPickSelections(input)[0]||String(input||'').trim();
+ const display=pickSelectionDisplay(first);
+ const raw=/^[A-Z0-9\s()\/&+.,'·-]{4,}$/.test(display.market)&&!/[a-záéíóúñ]/.test(display.market);
+ return [display.choice,raw?'':display.market].filter(Boolean).join(' · ');
+};
+
 const ticketStates={won:['✓','Acertado'],lost:['✕','Fallado'],void:['—','Anulado'],pending:['◷','Pendiente']};
 function ticketChoices(p){
  const choices=[];
@@ -302,7 +311,7 @@ async function loadHistoricPick(){
   const authorName='@'+String(pick.author||'Aficionado').replace(/^@+/,'');
   if(pick.user_id){
     const profile=button(authorName,()=>{
-      if(typeof window.openAePublicProfile==='function')window.openAePublicProfile(pick.user_id,true,'picks');
+      if(typeof window.openAePublicProfile==='function')window.openAePublicProfile(pick.user_id);
     });
     profile.className='cam-historic-author cam-historic-profile';
     profile.setAttribute('aria-label','Ver perfil de '+authorName);
@@ -485,7 +494,7 @@ function chefRankingEntry(record,index,voids,kind,picks){
  const person=el('div',null,'ae-chef-ranking-person');
  if(record.user_id){
    const profile=button(name,()=>{
-     if(typeof window.openAePublicProfile==='function')window.openAePublicProfile(record.user_id,true,'picks');
+     if(typeof window.openAePublicProfile==='function')window.openAePublicProfile(record.user_id);
    });
    profile.className='ae-take-name ae-chef-profile-link';
    profile.setAttribute('aria-label','Ver perfil y Picks de '+name);

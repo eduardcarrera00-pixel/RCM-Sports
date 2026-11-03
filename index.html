@@ -3280,23 +3280,19 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
   <div class="cam-profile-identity"><b id="camProfileAvatar" class="cam-profile-avatar" aria-hidden="true">·</b><div class="cam-profile-names"><h2 id="aeProfileTitle">Mi perfil</h2><p id="aeProfileUsername">Tu historial deportivo</p></div></div>
   <div class="cam-profile-actions"><button type="button" id="camProfileEditOpen" class="cam-profile-action" hidden aria-controls="camProfileEdit">Editar perfil</button><button type="button" id="camProfileShare" class="cam-profile-action">Compartir perfil</button></div>
  </div>
- <div id="camProfileStats" class="cam-profile-stats" role="group" aria-label="Resumen del perfil">
-  <button type="button" data-tab="takes"><strong id="camProfileStatTakes">0</strong><span>Takes</span></button>
-  <button type="button" data-tab="picks"><strong id="camProfileStatPicks">0</strong><span>Picks</span></button>
-  <button type="button" data-tab="picks"><strong id="camProfileStatHits">—</strong><span>Acierto</span></button>
-  <button type="button" data-tab="takes"><strong id="camProfileStatSupport">—</strong><span>Apoyo</span></button>
- </div>
  <p id="camProfileNotice" class="cam-profile-notice" role="status" aria-live="polite" hidden></p>
  <section id="camAnalyticsEntry" hidden aria-label="Herramientas de administración">
   <button type="button" id="camAnalyticsOpen"><i class="fa-solid fa-chart-column" aria-hidden="true"></i> Estadísticas de CAM SPORTS <span aria-hidden="true">↗</span></button>
  </section>
- <nav id="aeProfileTabs" class="ae-profile-tabs" aria-label="Secciones de mi perfil" hidden>
-   <button id="aeProfileTabTakes" type="button" role="tab" aria-selected="true" class="is-active">Mis Takes</button>
-   <button id="aeProfileTabPicks" type="button" role="tab" aria-selected="false">Mis Picks</button>
-   <button id="aeProfileTabQuiniela" type="button" role="tab" aria-selected="false">Mi Quiniela</button>
+ <nav id="aeProfileTabs" class="ae-profile-tabs" role="tablist" aria-label="Secciones del perfil" hidden>
+   <button id="aeProfileTabOverview" type="button" role="tab" aria-selected="true" aria-controls="camProfileOverview" class="is-active"><span class="cam-tab-label">Perfil</span></button>
+   <button id="aeProfileTabTakes" type="button" role="tab" aria-selected="false" tabindex="-1"><span class="cam-tab-label">Takes</span></button>
+   <button id="aeProfileTabPicks" type="button" role="tab" aria-selected="false" tabindex="-1"><span class="cam-tab-label">Picks</span></button>
+   <button id="aeProfileTabParty" type="button" role="tab" aria-selected="false" aria-controls="camProfileParties" tabindex="-1"><svg class="cam-tab-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15.5 19v-1.3a3.4 3.4 0 0 0-3.4-3.4H7.4A3.4 3.4 0 0 0 4 17.7V19"/><circle cx="9.75" cy="8" r="3.25"/><path d="M20 19v-1.2a3.3 3.3 0 0 0-2.5-3.2M15 4.9a3.25 3.25 0 0 1 0 6.2"/></svg><span class="cam-tab-label">Mi Party</span></button>
  </nav>
  <div class="ae-profile-overview"><strong id="aeProfileCount">0 Takes</strong><p id="aeProfileOverviewText" hidden></p></div>
  <p id="aeProfileStatus" role="status" aria-live="polite"></p>
+ <section id="camProfileOverview" class="cam-profile-overview" role="tabpanel" aria-labelledby="aeProfileTabOverview"></section>
  <section id="aeProfileTakeHighlights" class="ae-profile-highlights" aria-label="Takes destacados" hidden></section>
  <div id="aeProfileTakes" class="ae-profile-takes"></div>
  <section id="aeProfileTakeAccuracy" class="ae-profile-accuracy" aria-label="Porcentaje de apoyo de los Takes" hidden></section>
@@ -3304,7 +3300,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
  <section id="aeProfilePickHighlights" class="ae-profile-pick-highlights" aria-label="Picks destacados" hidden></section>
  <div id="aeProfilePicks" class="ae-profile-picks" hidden></div>
  <section id="aeProfileAccuracy" class="ae-profile-accuracy" aria-label="Porcentaje de acierto" hidden></section>
- <section id="camNflProfile" role="tabpanel" aria-labelledby="aeProfileTabQuiniela" aria-label="Mi Quiniela NFL" hidden></section>
+ <section id="camProfileParties" class="cam-party-profile cam-profile-party" role="tabpanel" aria-labelledby="aeProfileTabParty" hidden></section>
  <section id="camProfileEdit" class="cam-profile-edit" aria-labelledby="camProfileEditTitle" hidden>
   <header class="cam-profile-edit-head"><button type="button" id="camProfileEditBack" class="cam-profile-edit-back" aria-label="Volver al perfil"><span aria-hidden="true">‹</span> Perfil</button><h2 id="camProfileEditTitle" tabindex="-1">Editar perfil</h2></header>
   <div class="cam-profile-edit-avatar"><b id="camProfileEditAvatar" class="cam-profile-avatar" aria-hidden="true">·</b><p>Tu inicial es tu foto de perfil y cambia con tu nombre.</p></div>
@@ -5480,7 +5476,7 @@ updateThemeButton();
 <script src="assets/champions.js?v=20261021-rank-notes-1"></script>
 <script src="assets/ae-ranking-notes.js?v=20261021-editorial-1"></script>
 <script src="assets/ae-pick-capture.js?v=20261028-prepara-pick-1"></script>
-<script src="assets/community-picks.js?v=20261028-prepara-pick-1"></script>
+<script src="assets/community-picks.js?v=20261103-resumen-1"></script>
 <script src="assets/weekly-picks.js?v=20261015-1"></script>
 <script src="assets/username-auth.js?v=20261020-classical-auth-panel-1"></script>
 <script src="assets/ae-category-visibility.js?v=20261016-dynamic-nav-1"></script>
@@ -5611,7 +5607,8 @@ html .cam-weekly-result-surface .cam-weekly-result-on-photo{
 @media(max-width:480px){.cam-weekly-quick-result .cam-weekly-review-actions{display:flex}.cam-weekly-quick-result .cam-weekly-review-actions button{width:auto}}
 </style>
 <script src="assets/cam-weekly-results.js?v=20261025-admin-resolved-pick-1"></script>
-<script src="assets/ae-profile.js?v=20261103-mobile-home-profile-2"></script>
+<script src="assets/cam-profile-overview.js?v=20261103-resumen-1"></script>
+<script src="assets/ae-profile.js?v=20261103-resumen-1"></script>
 <style id="cam-nfl-quiniela-theme">
 /* ===========================================================================
    CAM SPORTS · La Quiniela NFL — lenguaje visual curvo, editorial y compacto.
@@ -6394,18 +6391,18 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 }
 </style>
 
-<link rel="stylesheet" href="assets/cam-nfl-profile.css?v=20261022-3tab-1">
 <!-- Ajustes de diseño para el teléfono (28 oct): va al final para ganar a las capas anteriores. -->
 <link rel="stylesheet" href="assets/cam-movil-ajustes.css?v=20261028-prepara-pick-1">
 <!-- Conversación de un Take y botón de compartir en las tarjetas (28 oct): al final, como los ajustes del teléfono. -->
 <link rel="stylesheet" href="assets/cam-take-conversacion.css?v=20261028-1">
 <!-- Parties (1 nov): grupos privados con clasificación propia. Al final, como los ajustes del teléfono. -->
-<link rel="stylesheet" href="assets/cam-parties.css?v=20261101-parties-1">
+<link rel="stylesheet" href="assets/cam-parties.css?v=20261103-quiniela-1">
 <!-- Perfil ordenado como una app y cambio de nombre de usuario (3 nov). Al final, como los ajustes del teléfono. -->
 <link rel="stylesheet" href="assets/cam-profile-app.css?v=20261103-perfil-1">
-<script src="assets/cam-parties.js?v=20261101-parties-1"></script>
+<!-- Perfil con resumen y pestaña Mi Party (3 nov). Al final, como los ajustes del teléfono. -->
+<link rel="stylesheet" href="assets/cam-profile-resumen.css?v=20261103-resumen-1">
+<script src="assets/cam-parties.js?v=20261103-quiniela-1"></script>
 <script src="assets/cam-sport-quiniela-loader.js?v=20261029-competition-1"></script>
-<script src="assets/cam-nfl-profile.js?v=20261022-3tab-1"></script>
 <script src="assets/ae-season-predictions.js?v=20261021-champion-guide-1"></script>
 <script src="assets/cam-lazy-editorial-loader.js?v=20261024-1"></script>
 <script src="assets/cam-opinions-section-banners.js?v=20261025-theme-assets-1"></script>

@@ -40,7 +40,7 @@ begin
   exception when invalid_parameter_value then null;
   end;
   begin
-    perform public.cam_party_create('Los del barrio', 'quiniela', 'all');
+    perform public.cam_party_create('Los del barrio', 'torneo', 'all');
     raise exception 'FALLO: tipo desconocido aceptado';
   exception when invalid_parameter_value then null;
   end;

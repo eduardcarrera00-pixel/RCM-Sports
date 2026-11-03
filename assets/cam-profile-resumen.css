@@ -1,0 +1,364 @@
+/* CAM SPORTS · Perfil con resumen y pestaña «Mi Party» (3 nov 2026).
+   Pestañas Perfil · Takes · Picks · Mi Party, las tres tarjetas del resumen y
+   la pestaña Mi Party (invitación a una party de quiniela, Mi quiniela y
+   Otros parties). Marfil de día, azul noche de noche, filete dorado y títulos
+   en Playfair.
+
+   Se carga al final del <body> y va entera en la capa cam-banners con
+   !important, como cam-parties.css: las reglas antiguas (la esquina global de
+   14 px de cam-rounded-editorial, el reset de botones…) también usan
+   !important y una declaración importante en una capa registrada antes gana a
+   las de fuera de capa. Todo parte de esquina 0: los separadores son rectos y
+   ninguna esquina curva recorta un texto. Fuera de style-sources.json. */
+@layer cam-banners {
+  /* ---------- paleta ---------- */
+  html body #aeProfileDialog {
+    --rs-card:#fffdf9;
+    --rs-soft:#f6efe4;
+    --rs-ink:#13324d;
+    --rs-text:#34444f;
+    --rs-muted:#66727c;
+    --rs-line:rgba(133,91,67,.2);
+    --rs-line-strong:rgba(133,91,67,.38);
+    --rs-gold:#b0803f;
+    --rs-accent:#855b43;
+    --rs-accent-soft:rgba(133,91,67,.09);
+    --rs-won:#2c6a4c;
+    --rs-won-soft:rgba(44,106,76,.1);
+    --rs-lost:#a3433a;
+    --rs-lost-soft:rgba(163,67,58,.09);
+    --rs-tab-bg:#f9f5ed;
+  }
+  html.dark body #aeProfileDialog {
+    --rs-card:#11293d;
+    --rs-soft:#163450;
+    --rs-ink:#f6ecdf;
+    --rs-text:#dcd3c8;
+    --rs-muted:#a9b6bf;
+    --rs-line:rgba(214,166,112,.2);
+    --rs-line-strong:rgba(214,166,112,.4);
+    --rs-gold:#e0b37c;
+    --rs-accent:#e0b37c;
+    --rs-accent-soft:rgba(224,179,124,.11);
+    --rs-won:#93d3aa;
+    --rs-won-soft:rgba(147,211,170,.12);
+    --rs-lost:#f2a397;
+    --rs-lost-soft:rgba(242,163,151,.12);
+    --rs-tab-bg:#0b2231;
+  }
+
+  /* ---------- pestañas: Perfil · Takes · Picks · Mi Party ----------
+     Cada pestaña mide lo que su texto: las cuatro caben a 320 px sin cortar. */
+  html body #aeProfileDialog .ae-profile-tabs:not([hidden]) {
+    display:flex!important;
+    flex-wrap:nowrap!important;
+    align-items:center!important;
+    gap:6px!important;
+    width:100%!important;
+    max-width:100%!important;
+    margin:0!important;
+    padding:12px 30px!important;
+    box-sizing:border-box!important;
+    background:var(--rs-tab-bg)!important;
+    border-bottom:1px solid var(--rs-line)!important;
+  }
+  html body #aeProfileDialog .ae-profile-tabs button {
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:5px!important;
+    flex:0 1 auto!important;
+    min-width:104px!important;
+    max-width:none!important;
+    min-height:40px!important;
+    margin:0!important;
+    padding:0 14px!important;
+    overflow:visible!important;
+    border:1px solid var(--rs-line)!important;
+    border-radius:999px!important;
+    background:var(--rs-card)!important;
+    background-image:none!important;
+    color:var(--rs-muted)!important;
+    font:750 10.5px/1.2 Inter,system-ui,sans-serif!important;
+    letter-spacing:.06em!important;
+    text-transform:uppercase!important;
+    text-overflow:clip!important;
+    white-space:nowrap!important;
+    box-shadow:none!important;
+    cursor:pointer!important;
+  }
+  html body #aeProfileDialog .ae-profile-tabs button:hover { border-color:var(--rs-line-strong)!important; color:var(--rs-ink)!important; }
+  html body #aeProfileDialog .ae-profile-tabs button[aria-selected="true"] {
+    border-color:var(--rs-gold)!important;
+    background:var(--rs-accent-soft)!important;
+    color:var(--rs-ink)!important;
+    box-shadow:inset 0 -2px 0 var(--rs-gold)!important;
+  }
+  html body #aeProfileDialog .ae-profile-tabs .cam-tab-label { display:inline!important; color:inherit!important; font:inherit!important; letter-spacing:inherit!important; }
+  html body #aeProfileDialog .ae-profile-tabs .cam-tab-icon {
+    display:block!important; flex:0 0 auto!important; width:14px!important; height:14px!important;
+    fill:none!important; stroke:currentColor!important; stroke-width:2!important; stroke-linecap:round!important; stroke-linejoin:round!important;
+  }
+
+  /* ---------- resumen («Perfil») ---------- */
+  html body #aeProfileDialog #camProfileOverview { display:block!important; margin:0!important; padding:18px 30px 28px!important; }
+  html body #aeProfileDialog #camProfileOverview[hidden] { display:none!important; }
+  html body #aeProfileDialog #camProfileOverview *,
+  html body #aeProfileDialog #camProfileOverview *::before,
+  html body #aeProfileDialog #camProfileOverview *::after { box-sizing:border-box!important; border-radius:0!important; }
+  html body #camProfileOverview .cam-ov-grid { display:grid!important; grid-template-columns:repeat(3,minmax(0,1fr))!important; gap:14px!important; align-items:stretch!important; }
+  html body #camProfileOverview .cam-ov-card {
+    display:flex!important;
+    flex-direction:column!important;
+    gap:10px!important;
+    min-width:0!important;
+    margin:0!important;
+    padding:14px 16px 10px!important;
+    border:1px solid var(--rs-line)!important;
+    border-radius:16px!important;
+    background:var(--rs-card)!important;
+    box-shadow:inset 0 2px 0 var(--rs-gold)!important;
+    color:var(--rs-text)!important;
+  }
+  html body #camProfileOverview .cam-ov-card.is-empty { justify-content:center!important; padding:12px 14px 12px 16px!important; }
+  html body #camProfileOverview .cam-ov-head {
+    display:flex!important; flex-wrap:wrap!important; align-items:baseline!important; justify-content:space-between!important;
+    gap:4px 12px!important; margin:0!important; padding:0!important; border:0!important; background:transparent!important;
+  }
+  html body #camProfileOverview .cam-ov-card.is-empty .cam-ov-head { align-items:center!important; }
+  html body #camProfileOverview .cam-ov-name {
+    margin:0!important; padding:0!important; color:var(--rs-ink)!important;
+    font:600 21px/1.2 "Playfair Display",Georgia,serif!important; letter-spacing:0!important; text-transform:none!important;
+  }
+  html body #camProfileOverview .cam-ov-figures {
+    display:flex!important; flex-wrap:wrap!important; align-items:baseline!important; gap:0 6px!important;
+    margin:0!important; padding:0!important; color:var(--rs-muted)!important;
+    font:600 13px/1.4 Inter,system-ui,sans-serif!important;
+  }
+  html body #camProfileOverview .cam-ov-figures > span:first-child { color:var(--rs-ink)!important; font-weight:800!important; }
+  html body #camProfileOverview .cam-ov-dot { color:var(--rs-line-strong)!important; }
+  html body #camProfileOverview .cam-ov-item {
+    display:grid!important;
+    gap:5px!important;
+    width:100%!important;
+    min-width:0!important;
+    margin:0!important;
+    padding:11px 12px 10px!important;
+    border:1px solid var(--rs-line)!important;
+    border-radius:12px!important;
+    background:var(--rs-soft)!important;
+    background-image:none!important;
+    color:var(--rs-text)!important;
+    text-align:left!important;
+    text-transform:none!important;
+    box-shadow:none!important;
+    cursor:pointer!important;
+  }
+  html body #camProfileOverview .cam-ov-item:hover { border-color:var(--rs-line-strong)!important; }
+  html body #camProfileOverview .cam-ov-item-top { display:flex!important; flex-wrap:wrap!important; align-items:center!important; gap:6px 8px!important; min-width:0!important; }
+  html body #camProfileOverview .cam-ov-label {
+    color:var(--rs-accent)!important; font:800 10.5px/1.35 Inter,system-ui,sans-serif!important;
+    letter-spacing:.12em!important; text-transform:uppercase!important;
+  }
+  html body #camProfileOverview .cam-ov-tag {
+    display:inline-block!important; padding:1px 8px!important; border:1px solid var(--rs-line-strong)!important; border-radius:999px!important;
+    color:var(--rs-muted)!important; font:700 11px/1.45 Inter,system-ui,sans-serif!important; white-space:nowrap!important;
+  }
+  html body #camProfileOverview .cam-ov-title {
+    display:-webkit-box!important; -webkit-box-orient:vertical!important; -webkit-line-clamp:2!important; overflow:hidden!important;
+    margin:0!important; padding:1px 0 2px!important; color:var(--rs-ink)!important;
+    font:600 17px/1.32 "Playfair Display",Georgia,serif!important; overflow-wrap:anywhere!important;
+  }
+  html body #camProfileOverview .cam-ov-title.is-one { -webkit-line-clamp:1!important; }
+  html body #camProfileOverview .cam-ov-choice {
+    display:block!important; overflow:hidden!important; padding:1px 0!important; color:var(--rs-text)!important;
+    font:600 13.5px/1.4 Inter,system-ui,sans-serif!important; text-overflow:ellipsis!important; white-space:nowrap!important;
+  }
+  html body #camProfileOverview .cam-ov-meta {
+    display:flex!important; flex-wrap:wrap!important; align-items:center!important; gap:4px 10px!important;
+    color:var(--rs-muted)!important; font:600 12.5px/1.4 Inter,system-ui,sans-serif!important;
+  }
+  html body #camProfileOverview .cam-ov-medal {
+    display:inline-flex!important; align-items:center!important; padding:2px 9px!important; border-radius:999px!important;
+    background:var(--rs-gold)!important; color:var(--rs-card)!important; font:800 12px/1.35 Inter,system-ui,sans-serif!important;
+  }
+  html.dark body #camProfileOverview .cam-ov-medal { color:#132232!important; }
+  html body #camProfileOverview .cam-ov-net { color:var(--rs-won)!important; font-weight:800!important; }
+  html body #camProfileOverview .cam-ov-odds { color:var(--rs-ink)!important; font-weight:800!important; }
+  html body #camProfileOverview .cam-ov-pts { color:var(--rs-ink)!important; }
+  html body #camProfileOverview .cam-ov-lines { gap:0!important; padding:4px 12px!important; }
+  html body #camProfileOverview .cam-ov-line {
+    display:flex!important; align-items:baseline!important; justify-content:space-between!important; gap:10px!important;
+    min-width:0!important; padding:8px 0!important; border-bottom:1px solid var(--rs-line)!important;
+  }
+  html body #camProfileOverview .cam-ov-line:last-child { border-bottom:0!important; }
+  html body #camProfileOverview .cam-ov-line-name {
+    min-width:0!important; overflow:hidden!important; padding:1px 0!important; color:var(--rs-ink)!important;
+    font:700 14px/1.35 Inter,system-ui,sans-serif!important; text-overflow:ellipsis!important; white-space:nowrap!important;
+  }
+  html body #camProfileOverview .cam-ov-line-rank {
+    display:inline-flex!important; flex:0 0 auto!important; align-items:baseline!important; gap:8px!important;
+    color:var(--rs-muted)!important; font:600 13px/1.35 Inter,system-ui,sans-serif!important; white-space:nowrap!important;
+  }
+  html body #camProfileOverview .cam-ov-line-rank b { color:var(--rs-accent)!important; font:600 16px/1.2 "Playfair Display",Georgia,serif!important; font-variant-numeric:lining-nums!important; }
+  html body #camProfileOverview .cam-ov-more,
+  html body #camProfileOverview .cam-ov-cta {
+    display:inline-flex!important; align-items:center!important; justify-content:center!important;
+    min-height:36px!important; margin:0!important; padding:0 2px!important;
+    border:0!important; background:transparent!important; background-image:none!important; box-shadow:none!important;
+    color:var(--rs-accent)!important; font:750 13.5px/1.2 Inter,system-ui,sans-serif!important;
+    letter-spacing:0!important; text-transform:none!important; white-space:nowrap!important; cursor:pointer!important;
+  }
+  html body #camProfileOverview .cam-ov-more { align-self:flex-end!important; margin-top:auto!important; }
+  html body #camProfileOverview .cam-ov-cta {
+    min-height:40px!important; padding:0 14px!important; border:1px solid var(--rs-line-strong)!important; border-radius:999px!important;
+  }
+  html body #camProfileOverview .cam-ov-cta:hover,
+  html body #camProfileOverview .cam-ov-more:hover { background:var(--rs-accent-soft)!important; }
+  html body #camProfileOverview .cam-ov-status {
+    margin:8px 0!important; color:var(--rs-muted)!important; font:400 15px/1.55 "Libre Baskerville",Georgia,serif!important;
+  }
+
+  /* ---------- «Mi Party» ---------- */
+  html body #aeProfileDialog #camProfileParties.cam-profile-party {
+    display:grid!important;
+    gap:14px!important;
+    margin:0!important;
+    padding:18px 30px 28px!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    background-image:none!important;
+  }
+  html body #aeProfileDialog #camProfileParties.cam-profile-party[hidden] { display:none!important; }
+  html body #camProfileParties .cam-pp-block {
+    display:grid!important;
+    gap:12px!important;
+    min-width:0!important;
+    margin:0!important;
+    padding:16px!important;
+    border:1px solid var(--rs-line)!important;
+    border-radius:16px!important;
+    background:var(--rs-card)!important;
+    box-shadow:inset 0 2px 0 var(--rs-gold)!important;
+    color:var(--rs-text)!important;
+  }
+  html body #camProfileParties .cam-pp-title {
+    margin:0!important; padding:0!important; color:var(--rs-ink)!important;
+    font:600 20px/1.25 "Playfair Display",Georgia,serif!important; letter-spacing:0!important; text-transform:none!important;
+  }
+  html body #camProfileParties .cam-pp-invite .cam-pp-title { font-size:22px!important; }
+  html body #camProfileParties .cam-pp-emblem {
+    display:grid!important; place-items:center!important; width:44px!important; height:44px!important;
+    border:1px solid var(--rs-line-strong)!important; border-radius:50%!important;
+    background:var(--rs-accent-soft)!important; color:var(--rs-accent)!important;
+  }
+  html body #camProfileParties .cam-pp-emblem .cam-party-icon { width:22px!important; height:22px!important; }
+  html body #camProfileParties .cam-pp-text {
+    margin:0!important; padding:0!important; color:var(--rs-text)!important;
+    font:400 14.5px/1.55 "Libre Baskerville",Georgia,serif!important;
+  }
+  html body #camProfileParties .cam-party-profile-list { margin:0!important; }
+  html body #camProfileParties .cam-party-card { background:var(--rs-soft)!important; }
+  html body #camProfileParties .cam-pp-hidden { display:block!important; font:700 12px/1.4 Inter,system-ui,sans-serif!important; }
+  html body #camProfileParties .cam-pp-link {
+    justify-self:start!important;
+    display:inline-flex!important; align-items:center!important; gap:6px!important;
+    min-height:36px!important; margin:0!important; padding:0 2px!important;
+    border:0!important; background:transparent!important; background-image:none!important; box-shadow:none!important;
+    color:var(--rs-accent)!important; font:750 14px/1.3 Inter,system-ui,sans-serif!important;
+    text-align:left!important; text-transform:none!important; cursor:pointer!important;
+  }
+  html body #camProfileParties .cam-pp-link .cam-party-icon { width:16px!important; height:16px!important; }
+  html body #camProfileParties .cam-pp-link:hover { text-decoration:underline!important; }
+  html body #camProfileParties .cam-pp-cta { justify-self:center!important; }
+  html body #camProfileParties .cam-pp-play { display:flex!important; width:100%!important; }
+
+  /* Mi quiniela: NFL y Fútbol en una fila cada una; separadores rectos. */
+  html body #camProfileParties .cam-pp-standings { display:grid!important; margin:0!important; border-top:1px solid var(--rs-line)!important; }
+  html body #camProfileParties .cam-pp-standing {
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto auto auto!important;
+    align-items:baseline!important;
+    gap:10px!important;
+    width:100%!important;
+    min-height:44px!important;
+    margin:0!important;
+    padding:10px 2px!important;
+    border:0!important;
+    border-bottom:1px solid var(--rs-line)!important;
+    border-radius:0!important;
+    background:transparent!important;
+    background-image:none!important;
+    box-shadow:none!important;
+    color:var(--rs-text)!important;
+    text-align:left!important;
+    text-transform:none!important;
+  }
+  html body #camProfileParties button.cam-pp-standing { cursor:pointer!important; }
+  html body #camProfileParties button.cam-pp-standing:hover { background:var(--rs-accent-soft)!important; }
+  html body #camProfileParties .cam-pp-standing-name { color:var(--rs-ink)!important; font:700 15px/1.35 Inter,system-ui,sans-serif!important; }
+  html body #camProfileParties .cam-pp-standing-rank { color:var(--rs-accent)!important; font:600 16px/1.2 "Playfair Display",Georgia,serif!important; font-variant-numeric:lining-nums!important; white-space:nowrap!important; }
+  html body #camProfileParties .cam-pp-standing-pts { color:var(--rs-ink)!important; font:700 13px/1.35 Inter,system-ui,sans-serif!important; white-space:nowrap!important; }
+  html body #camProfileParties .cam-pp-standing-hits { color:var(--rs-muted)!important; font:600 12.5px/1.35 Inter,system-ui,sans-serif!important; white-space:nowrap!important; }
+  html body #camProfileParties .cam-pp-standing-none { grid-column:2/-1!important; color:var(--rs-muted)!important; font:600 13px/1.35 Inter,system-ui,sans-serif!important; }
+  html body #camProfileParties .cam-pp-recent { display:grid!important; gap:6px!important; margin:0!important; padding:0!important; list-style:none!important; }
+  html body #camProfileParties .cam-pp-recent-row {
+    display:grid!important; grid-template-columns:22px minmax(0,1fr) auto!important; align-items:center!important; gap:10px!important;
+    margin:0!important; padding:0!important; list-style:none!important;
+  }
+  html body #camProfileParties .cam-pp-mark {
+    display:grid!important; place-items:center!important; width:22px!important; height:22px!important; border-radius:50%!important;
+    font:800 12px/1 Inter,system-ui,sans-serif!important;
+  }
+  html body #camProfileParties .is-won .cam-pp-mark { background:var(--rs-won-soft)!important; color:var(--rs-won)!important; }
+  html body #camProfileParties .is-lost .cam-pp-mark { background:var(--rs-lost-soft)!important; color:var(--rs-lost)!important; }
+  html body #camProfileParties .cam-pp-recent-match {
+    min-width:0!important; overflow:hidden!important; padding:1px 0!important; color:var(--rs-text)!important;
+    font:600 13.5px/1.4 Inter,system-ui,sans-serif!important; text-overflow:ellipsis!important; white-space:nowrap!important;
+  }
+  html body #camProfileParties .cam-pp-recent-pts { color:var(--rs-muted)!important; font:700 13px/1.35 Inter,system-ui,sans-serif!important; }
+  html body #camProfileParties .is-won .cam-pp-recent-pts { color:var(--rs-won)!important; }
+
+  /* ---------- acceso «Mis parties» en las quinielas ---------- */
+  html body .cam-party-entry-row.is-quiniela { justify-content:center!important; margin:16px 0 4px!important; }
+
+  /* ---------- ordenador ---------- */
+  @media (min-width:761px) {
+    html body #aeProfileDialog #camProfileParties.cam-profile-party { grid-template-columns:repeat(2,minmax(0,1fr))!important; align-items:start!important; }
+    html body #camProfileParties .cam-pp-invite { grid-column:1/-1!important; }
+    html body #camProfileParties .cam-pp-cta,
+    html body #camProfileParties > .cam-party-profile-empty { grid-column:1/-1!important; }
+  }
+
+  /* ---------- teléfono ---------- */
+  @media (max-width:760px) {
+    html body #aeProfileDialog .ae-profile-tabs:not([hidden]) { justify-content:stretch!important; gap:6px!important; padding:10px 12px!important; }
+    html body #aeProfileDialog .ae-profile-tabs button { flex:1 1 auto!important; min-width:0!important; padding:0 10px!important; }
+    html body #aeProfileDialog #camProfileOverview { padding:14px 14px 22px!important; }
+    html body #camProfileOverview .cam-ov-grid { grid-template-columns:minmax(0,1fr)!important; gap:12px!important; }
+    html body #camProfileOverview .cam-ov-card { padding:13px 14px 8px!important; }
+    html body #aeProfileDialog #camProfileParties.cam-profile-party { padding:14px 14px 22px!important; gap:12px!important; }
+    html body #camProfileParties .cam-pp-block { padding:14px!important; }
+  }
+  @media (max-width:360px) {
+    html body #aeProfileDialog .ae-profile-tabs:not([hidden]) { gap:4px!important; padding:10px 8px!important; }
+    html body #aeProfileDialog .ae-profile-tabs button { padding:0 7px!important; font-size:9.5px!important; letter-spacing:.03em!important; }
+    html body #aeProfileDialog .ae-profile-tabs .cam-tab-icon { width:12px!important; height:12px!important; }
+    html body #camProfileParties .cam-pp-standing { gap:7px!important; }
+  }
+}
+
+/* Esquinas: una regla de esquina 0 en la capa cam-header (la primera
+   registrada) gana a todo lo demás; aquí se devuelven las esquinas de las
+   tarjetas y botones. Los textos con «…» y los separadores siguen rectos. */
+@layer cam-header {
+  html body #aeProfileDialog .ae-profile-tabs button,
+  html body #camProfileOverview :is(.cam-ov-tag, .cam-ov-medal, .cam-ov-cta),
+  html body #camProfileParties .cam-party-btn { border-radius:999px!important; }
+  html body #camProfileOverview .cam-ov-card,
+  html body #camProfileParties .cam-pp-block { border-radius:16px!important; }
+  html body #camProfileOverview .cam-ov-item,
+  html body #camProfileParties .cam-party-card { border-radius:12px!important; }
+  html body #camProfileParties :is(.cam-pp-emblem, .cam-pp-mark) { border-radius:50%!important; }
+}

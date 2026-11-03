@@ -123,6 +123,64 @@ do $$ begin
 end $$;
 reset role;
 
+-- Parties de Quiniela (3 nov): Ana crea uno; Carla (no miembro) no ve nada y
+-- las funciones internas de puntos de quiniela no se pueden llamar.
+select set_config('request.jwt.claims', '{"sub":"7a000000-0000-4000-8000-000000000001","role":"authenticated"}', true);
+set local role authenticated;
+select set_config('test.quiniela', public.cam_party_create('Quiniela RLS 🏈', 'quiniela', 'nfl')->>'id', true);
+do $$ begin
+  if not (public.cam_party_ranking(current_setting('test.quiniela')::uuid) ? 'week') then
+    raise exception 'FALLO: la clasificación de quiniela no trae «Esta semana»';
+  end if;
+  perform public.cam_party_activity(current_setting('test.quiniela')::uuid, 'pending');
+end $$;
+reset role;
+
+select set_config('request.jwt.claims', '{"sub":"7a000000-0000-4000-8000-000000000003","role":"authenticated"}', true);
+set local role authenticated;
+do $$ begin
+  begin
+    perform public.cam_party_activity(current_setting('test.quiniela')::uuid);
+    raise exception 'FALLO: un no miembro lee la actividad de quiniela';
+  exception when insufficient_privilege then null;
+  end;
+  begin
+    perform * from public.cam_quiniela_score_rows('all');
+    raise exception 'FALLO: cam_quiniela_score_rows es accesible';
+  exception when insufficient_privilege then null;
+  end;
+  begin
+    perform * from public.cam_quiniela_week_games();
+    raise exception 'FALLO: cam_quiniela_week_games es accesible';
+  exception when insufficient_privilege then null;
+  end;
+  begin
+    perform public.cam_profile_quiniela_standing('7a000000-0000-4000-8000-000000000001');
+    raise exception 'FALLO: cam_profile_quiniela_standing es accesible';
+  exception when insufficient_privilege then null;
+  end;
+end $$;
+reset role;
+
+-- El resumen del perfil y Mi Party se leen sin sesión, sin datos privados.
+select set_config('request.jwt.claims', '{"role":"anon"}', true);
+set local role anon;
+do $$
+declare o jsonb; v jsonb;
+begin
+  o := public.cam_profile_overview('7a000000-0000-4000-8000-000000000001');
+  v := public.cam_profile_party('7a000000-0000-4000-8000-000000000001');
+  if o->>'username' <> 'rls_ana' then raise exception 'FALLO: resumen sin nombre %', o; end if;
+  if (v->>'own')::boolean or v->>'last_sport' is not null then raise exception 'FALLO: Mi Party ajeno dice que es propio %', v; end if;
+  if exists (select 1 from jsonb_array_elements(v->'parties') e where e->'id' <> 'null'::jsonb or e ? 'code') then
+    raise exception 'FALLO: Mi Party entrega id o código a un visitante %', v;
+  end if;
+  if exists (select 1 from jsonb_array_elements(o->'quiniela'->'parties') e where e->'id' <> 'null'::jsonb) then
+    raise exception 'FALLO: el resumen entrega el id de un party a un visitante %', o;
+  end if;
+end $$;
+reset role;
+
 -- Administrador: ve y puede borrar cualquier party.
 select set_config('request.jwt.claims', '{"sub":"7a000000-0000-4000-8000-000000000004","role":"authenticated"}', true);
 set local role authenticated;

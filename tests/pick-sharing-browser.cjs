@@ -63,7 +63,7 @@ const server=http.createServer((req,res)=>{
   window.openedTakes=[];window.aeTakeReplies={open:take=>openedTakes.push(take)};
   window.shares=[];Object.defineProperty(navigator,'canShare',{configurable:true,value:()=>true});Object.defineProperty(navigator,'share',{configurable:true,value:data=>{shares.push({active:navigator.userActivation.isActive,filename:data.files[0].name});return Promise.resolve();}});
  });
- await page.goto('http://127.0.0.1:'+server.address().port+'/profile',{waitUntil:'load'});await page.evaluate(()=>openAeProfile());
+ await page.goto('http://127.0.0.1:'+server.address().port+'/profile',{waitUntil:'load'});await page.evaluate(()=>openAeProfile('takes'));
  for(const width of [360,390,768,1366])for(const dark of [false,true]){
   await page.setViewportSize({width,height:880});await page.evaluate(d=>document.documentElement.classList.toggle('dark',d),dark);
   const buttons=page.locator('#aeProfileDialog .ae-profile-take-actions .cam-pick-share-button');assert.equal(await buttons.count(),7,'Featured and recent Takes all have sharing');
@@ -76,7 +76,7 @@ const server=http.createServer((req,res)=>{
  await page.locator('.cam-take-share-destination[data-size="tiktok"]').click();await page.waitForFunction(()=>document.querySelector('.cam-pick-share-preview img')?.alt.includes('(TikTok,'));await page.getByRole('button',{name:'Compartir imagen',exact:true}).click();assert.deepEqual(await page.evaluate(()=>({active:shares[0].active,take:shares[0].filename.includes('-take-'),tiktok:shares[0].filename.endsWith('-tiktok.png')})),{active:true,take:true,tiktok:true});
  await page.getByRole('button',{name:'Cerrar',exact:true}).click();assert.ok(await page.locator('#aeProfileTakeHighlights .cam-pick-share-button').first().evaluate(e=>document.activeElement===e));
  await page.locator('#aeProfileTakes .cam-pick-share-button').last().click();await page.getByRole('button',{name:'Cerrar',exact:true}).click();
- await page.locator('#aeProfileTabPicks').click();assert.equal(await page.locator('#aeProfilePickHighlights .cam-pick-share-button').count(),1);await page.locator('#aeProfilePicks .cam-pick-share-button').click();assert.match(await page.locator('#camPickShareTitle').innerText(),/Comparte este Pick/);
+ await page.locator('#aeProfileTabPicks').click();await page.locator('#aeProfilePickHighlights .cam-pick-share-button').first().waitFor();assert.equal(await page.locator('#aeProfilePickHighlights .cam-pick-share-button').count(),1);await page.locator('#aeProfilePicks .cam-pick-share-button').click();assert.match(await page.locator('#camPickShareTitle').innerText(),/Comparte este Pick/);
  assert.deepEqual(errors,[]);console.log('PASS: real Pick/Take PNG, responsive day/night 360–1366px, native activation, cancellation/fallback, actual profile featured/recent sharing and weekly share. QA: '+qa);
  await context.close();
  }finally{await browser.close();server.close();}

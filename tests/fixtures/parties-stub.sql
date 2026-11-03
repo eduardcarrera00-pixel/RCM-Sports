@@ -1,7 +1,8 @@
 -- Esquema mínimo de Supabase para probar las migraciones de Parties en un
 -- PostgreSQL local (tests/parties-sql.sh). Copia solo lo que usan: auth,
 -- roles, tablas de Picks y Takes y las funciones de puntos tal como están en
--- producción (ae_take_score_rows y ae_pick_result_ranking, 1 nov 2026).
+-- producción (ae_take_score_rows y ae_pick_result_ranking, 1 nov 2026;
+-- quinielas y sus clasificaciones, 3 nov 2026).
 
 -- Los roles son de todo el servidor: se crean solo si faltan (la prueba se puede repetir).
 do $$ begin
@@ -21,7 +22,8 @@ grant usage on schema auth to anon, authenticated, service_role;
 create table auth.users (
   id uuid primary key,
   raw_user_meta_data jsonb not null default '{}'::jsonb,
-  is_anonymous boolean not null default false
+  is_anonymous boolean not null default false,
+  created_at timestamptz not null default now()
 );
 create function auth.uid() returns uuid language sql stable as $$
   select coalesce(nullif(current_setting('request.jwt.claim.sub', true), ''),
@@ -187,3 +189,135 @@ begin
     limit 10;
 end
 $function$;
+
+-- ---------------------------------------------------------------------------
+-- Quinielas NFL y Fútbol (columnas que usan los parties y el perfil).
+-- Los pronósticos son privados: cada uno solo ve los suyos (RLS).
+-- ---------------------------------------------------------------------------
+create table public.nfl_teams (id text primary key, name text not null, logo text);
+create table public.cam_nfl_games (
+  id text primary key,
+  season integer not null,
+  week integer not null,
+  home_id text not null references public.nfl_teams(id),
+  away_id text not null references public.nfl_teams(id),
+  kickoff timestamptz not null,
+  status text not null default 'scheduled' check (status in ('scheduled','live','final','postponed','cancelled','tie')),
+  home_score integer, away_score integer,
+  winner_id text references public.nfl_teams(id),
+  points_home integer, points_away integer,
+  odds_locked_at timestamptz,
+  picks_open boolean not null default false
+);
+create table public.cam_nfl_picks (
+  game_id text not null references public.cam_nfl_games(id),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  team_id text not null references public.nfl_teams(id),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  awarded_points integer not null default 0,
+  settled_at timestamptz,
+  primary key (game_id, user_id)
+);
+create table public.cam_football_teams (id text primary key, name text not null, short_name text not null, abbreviation text not null default '', logo text);
+create table public.cam_football_games (
+  id text primary key,
+  competition text not null check (competition in ('laliga','premier','ligamx','champions')),
+  season integer not null,
+  matchday integer not null,
+  home_id text not null references public.cam_football_teams(id),
+  away_id text not null references public.cam_football_teams(id),
+  kickoff timestamptz not null,
+  status text not null default 'scheduled' check (status in ('scheduled','live','final','postponed','cancelled')),
+  home_score integer, away_score integer,
+  outcome text check (outcome in ('home','draw','away')),
+  points_home integer, points_draw integer, points_away integer,
+  odds_locked_at timestamptz,
+  picks_open boolean not null default false
+);
+create table public.cam_football_picks (
+  game_id text not null references public.cam_football_games(id),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  pick text not null check (pick in ('home','draw','away')),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  awarded_points integer not null default 0,
+  settled_at timestamptz,
+  primary key (game_id, user_id)
+);
+alter table public.cam_nfl_picks enable row level security;
+alter table public.cam_football_picks enable row level security;
+revoke all on public.cam_nfl_picks, public.cam_football_picks from anon, authenticated;
+grant select on public.cam_nfl_picks, public.cam_football_picks to authenticated;
+create policy cam_nfl_picks_own on public.cam_nfl_picks for select to authenticated using (user_id = (select auth.uid()));
+create policy cam_football_picks_own on public.cam_football_picks for select to authenticated using (user_id = (select auth.uid()));
+
+-- Copia literal de producción (3 nov 2026).
+CREATE OR REPLACE FUNCTION public.cam_nfl_leaderboard(p_scope text, p_season integer, p_week integer DEFAULT NULL::integer, p_month text DEFAULT NULL::text)
+ RETURNS TABLE(rank_position bigint, user_id uuid, username text, points bigint, hits bigint, resolved bigint, accuracy numeric)
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO ''
+AS $function$
+begin
+ if p_scope not in ('week','month','season','all') or p_season not between 2020 and 2100
+ or (p_scope='week' and (p_week is null or p_week not between 1 and 22))
+ or (p_scope='month' and (p_month is null or p_month !~ '^[0-9]{4}-[0-9]{2}$'))
+ then raise exception 'Periodo inválido'; end if;
+ return query
+ with totals as (
+ select p.user_id,sum(p.awarded_points)::bigint pts,
+ count(*) filter(where p.team_id=g.winner_id)::bigint wins,count(*)::bigint total
+ from public.cam_nfl_picks p join public.cam_nfl_games g on g.id=p.game_id
+ where g.status='final' and g.winner_id is not null and (p_scope='all' or g.season=p_season)
+ and (p_scope<>'week' or g.week=p_week)
+ and (p_scope<>'month' or to_char(g.kickoff at time zone 'America/New_York','YYYY-MM')=p_month)
+ group by p.user_id
+ ), ranked as (
+ select t.*,round(100.0*t.wins/nullif(t.total,0),1) pct,
+ dense_rank() over(order by t.pts desc,t.wins desc,
+ (100.0*t.wins/nullif(t.total,0)) desc) pos from totals t
+ )
+ select r.pos,r.user_id,
+ coalesce(nullif(left(a.username,40),''),nullif(left(u.raw_user_meta_data->>'username',40),''),'Aficionado')::text,
+ r.pts,r.wins,r.total,r.pct
+ from ranked r join auth.users u on u.id=r.user_id
+ left join public.ae_auth_accounts a on a.user_id=r.user_id
+ order by r.pos,r.user_id;
+end $function$;
+
+-- Copia literal de producción (3 nov 2026).
+CREATE OR REPLACE FUNCTION public.cam_football_leaderboard(p_scope text, p_season integer, p_competition text DEFAULT NULL::text, p_matchday integer DEFAULT NULL::integer, p_month text DEFAULT NULL::text)
+ RETURNS TABLE(rank_position bigint, user_id uuid, username text, points bigint, hits bigint, resolved bigint, accuracy numeric)
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO ''
+AS $function$
+begin
+ if p_scope not in ('matchday','month','season','all') or p_season not between 2020 and 2100
+ or (p_competition is not null and p_competition not in ('laliga','premier','ligamx','champions'))
+ or (p_scope='matchday' and (p_matchday is null or p_matchday not between 1 and 60 or p_competition is null))
+ or (p_scope='month' and (p_month is null or p_month !~ '^[0-9]{4}-[0-9]{2}$'))
+ then raise exception 'Periodo inválido'; end if;
+ return query
+ with totals as (
+ select p.user_id,sum(p.awarded_points)::bigint pts,
+ count(*) filter(where p.pick=g.outcome)::bigint wins,count(*)::bigint total
+ from public.cam_football_picks p join public.cam_football_games g on g.id=p.game_id
+ where g.status='final' and g.outcome is not null and (p_scope='all' or g.season=p_season)
+ and (p_competition is null or g.competition=p_competition)
+ and (p_scope<>'matchday' or g.matchday=p_matchday)
+ and (p_scope<>'month' or to_char(g.kickoff at time zone 'America/Toronto','YYYY-MM')=p_month)
+ group by p.user_id
+ ), ranked as (
+ select t.*,round(100.0*t.wins/nullif(t.total,0),1) pct,
+ dense_rank() over(order by t.pts desc,t.wins desc,
+ (100.0*t.wins/nullif(t.total,0)) desc) pos from totals t
+ )
+ select r.pos,r.user_id,
+ coalesce(nullif(left(a.username,40),''),nullif(left(u.raw_user_meta_data->>'username',40),''),'Aficionado')::text,
+ r.pts,r.wins,r.total,r.pct
+ from ranked r join auth.users u on u.id=r.user_id
+ left join public.ae_auth_accounts a on a.user_id=r.user_id
+ order by r.pos,r.user_id;
+end $function$;

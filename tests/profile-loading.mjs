@@ -25,7 +25,10 @@ assert.match(d.getElementById('aeProfileStatus').textContent,/Cargando/);
 auth.resolve({data:{session:{user}},error:null});await tick();
 assert.equal(sessionReads,1,'concurrent startup/click share the same session read');
 assert.equal(networkChecks,0);
-assert.match(d.getElementById('aeProfileTakes').textContent,/Mi Take/,'Takes render before slower Picks and public-name lookups');
+// El perfil abre en «Perfil»; Takes y Picks se cargan al abrir su pestaña.
+assert.equal(d.getElementById('aeProfileTabOverview').getAttribute('aria-selected'),'true','opens on the summary tab');
+d.getElementById('aeProfileTabTakes').click();await tick();
+assert.match(d.getElementById('aeProfileTakes').textContent,/Mi Take/,'Takes render before slower Picks');
 d.getElementById('aeProfileTabPicks').click();
 assert.match(d.getElementById('aeProfilePicks').textContent,/Cargando tus Picks/,'pending data must not look like an empty history');
 picks.resolve({data:[{id:'pick-1',user_id:user.id,title:'Mi Pick',outcome:'won',american_odds:150,result_points:1.5}],error:null});await tick();
@@ -37,7 +40,7 @@ assert.equal(d.getElementById('aeProfileDialog').open,true,'a token refresh neve
 
 // Old requests cannot repaint a closed profile or survive a signed-out session.
 const late=deferred();takes=late.promise;
-const reopening=w.openAeProfile();await tick();
+const reopening=w.openAeProfile('takes');await tick();
 authListener('SIGNED_OUT',null);
 assert.equal(d.getElementById('aeProfileDialog').open,false);
 late.resolve({data:[{id:'old',title:'Respuesta antigua',author_id:user.id}],error:null});await reopening;
@@ -47,5 +50,5 @@ await w.openAeProfile();
 assert.equal(login,1,'a known signed-out session goes to sign-in');
 assert.equal(d.getElementById('aeProfileDialog').open,false);
 assert.equal(sessionReads,1);assert.equal(networkChecks,0);
-console.log('PASS: immediate profile shell, one session read, independent Takes/Picks, retained tab, refresh stability and signed-out stale-response guard.');
+console.log('PASS: immediate profile shell, one session read, summary first, Takes/Picks on demand, retained tab, refresh stability and signed-out stale-response guard.');
 w.happyDOM.abort();

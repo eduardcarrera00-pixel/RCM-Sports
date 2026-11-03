@@ -1,11 +1,12 @@
-/* CAM SPORTS · Parties (1 nov 2026).
-   Grupos privados de amigos con su propia clasificación de Picks o de Takes.
-   · Se entra desde el perfil y desde «Mis parties» junto a las clasificaciones.
+/* CAM SPORTS · Parties (1 nov 2026; Quiniela, 3 nov 2026).
+   Grupos privados de amigos con su propia clasificación de Quiniela, Picks o Takes.
+   · Se entra desde la pestaña «Mi Party» del perfil y desde «Mis parties» junto
+     a las clasificaciones y en las quinielas NFL y Fútbol.
    · Invitación: camsports.github.io/?party=CÓDIGO (6 caracteres).
    · Cuota de Supabase: nada en bucle ni en tiempo real. Una llamada al abrir
      el party (clasificación de «Este mes» y «Total» juntas), otra al abrir la
-     actividad y una al abrir el perfil o «Mis parties».
-   Para añadir Quinielas: nuevo tipo en KINDS y en la base (cam_parties_kind_check). */
+     actividad, una al abrir la pestaña «Mi Party» del perfil (cam_profile_party)
+     y una al abrir «Mis parties». Cambiar de periodo no llama. */
 (() => {
 'use strict';
 
@@ -13,7 +14,7 @@ const SITE = 'https://camsports.github.io/';
 const CODE_RE = /^[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{6}$/;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const PENDING_KEY = 'cam_party_invite_v1';
-const KINDS = {picks: 'Picks', takes: 'Takes'};
+const KINDS = {quiniela: 'Quiniela', picks: 'Picks', takes: 'Takes'};
 const SPORTS = {all: 'Todos', football: 'Fútbol', nfl: 'NFL'};
 const PAGE = 20;
 
@@ -109,7 +110,7 @@ function clearInviteParam() {
 
 /* ---------- estado ---------- */
 const S = {
-  view: null, from: null, context: {kind: 'picks', sport: 'all'},
+  view: null, from: null, context: {kind: 'quiniela', sport: 'all'},
   mine: null, mineError: '', mineStale: true, hubList: null,
   partyId: null, data: null, error: '', tab: 'ranking', period: 'month', act: null,
   invite: null, admin: null, sheet: null, sheetReturn: null, loginPending: false
@@ -347,6 +348,11 @@ function openCreate(kind, sport) {
   const kindChoice = choice('Tipo', KINDS, S.context.kind, 'Kind');
   kindChoice.node.append(line('No se puede cambiar después.', 'cam-party-hint'));
   const sportChoice = choice('Deporte', SPORTS, S.context.sport || 'all', 'Sport');
+  const leagues = line('Fútbol: LaLiga, Premier, Liga MX y Champions.', 'cam-party-hint');
+  const syncLeagues = () => { leagues.hidden = kindChoice.value() !== 'quiniela'; };
+  sportChoice.node.append(leagues);
+  kindChoice.node.addEventListener('click', () => queueMicrotask(syncLeagues));
+  syncLeagues();
   const submit = el('button', 'Crear party', 'cam-party-btn is-primary is-wide', {type: 'submit'});
   form.append(field, kindChoice.node, sportChoice.node, status, submit);
   form.addEventListener('submit', async e => {
@@ -460,7 +466,7 @@ async function joinInvite(btn, status) {
 async function openParty(id, from, opts = {}) {
   if (!UUID.test(String(id || ''))) return;
   S.from = from || null; S.partyId = id; S.data = null; S.error = '';
-  S.tab = 'ranking'; S.period = 'month'; S.act = freshActivity();
+  S.tab = 'ranking'; S.period = null; S.act = freshActivity();
   renderParty();
   const req = ++partyReq;
   try {
@@ -538,16 +544,20 @@ function setTab(tab, focus) {
 }
 
 /* Clasificación */
+const PERIODS = {week: 'Esta semana', month: 'Este mes', total: 'Total'};
+function periodsOf(kind) { return kind === 'quiniela' ? ['week', 'month', 'total'] : ['month', 'total']; }
 function renderBoard() {
   const board = $('camPartyBoard');
   if (!board || !S.data) return;
   const kind = S.data.party.kind;
+  const periods = periodsOf(kind);
+  if (!periods.includes(S.period)) S.period = periods[0];
   const seg = el('div', null, 'cam-party-seg is-period', {role: 'group', 'aria-label': 'Periodo'});
-  for (const [k, label] of [['month', 'Este mes'], ['total', 'Total']]) {
-    seg.append(button(label, 'cam-party-seg-btn', () => { S.period = k; renderBoard(); }, {'aria-pressed': String(S.period === k)}));
+  for (const k of periods) {
+    seg.append(button(PERIODS[k], 'cam-party-seg-btn', () => { S.period = k; renderBoard(); }, {'aria-pressed': String(S.period === k)}));
   }
   const rows = S.data[S.period] || [];
-  const list = el('ol', null, 'cam-party-board', {'aria-label': 'Clasificación ' + (S.period === 'month' ? 'de este mes' : 'total')});
+  const list = el('ol', null, 'cam-party-board', {'aria-label': 'Clasificación: ' + PERIODS[S.period].toLowerCase()});
   for (const r of rows) list.append(boardRow(r, kind));
   board.replaceChildren(seg, rows.length ? list : line('Todavía no hay miembros.'));
 }
@@ -561,7 +571,7 @@ function boardRow(r, kind) {
   link.addEventListener('click', e => {
     if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey || typeof window.openAePublicProfile !== 'function') return;
     e.preventDefault();
-    window.openAePublicProfile(r.user_id, true, kind === 'picks' ? 'picks' : 'takes');
+    window.openAePublicProfile(r.user_id, true);
   });
   who.append(link);
   const sub = el('span', null, 'cam-party-sub');
@@ -590,7 +600,8 @@ function renderFeed() {
   const a = S.act;
   const filters = el('div', null, 'cam-party-filters');
   const seg = el('div', null, 'cam-party-seg', {role: 'group', 'aria-label': 'Estado'});
-  for (const [k, label] of [['all', 'Todos'], ['pending', 'Pendientes'], ['resolved', 'Resueltos']]) {
+  const quiniela = S.data.party.kind === 'quiniela';
+  for (const [k, label] of [['all', 'Todos'], ['pending', quiniela ? 'En juego' : 'Pendientes'], ['resolved', 'Resueltos']]) {
     seg.append(button(label, 'cam-party-seg-btn', () => { if (a.filter === k) return; a.filter = k; loadActivity(false); }, {'aria-pressed': String(a.filter === k)}));
   }
   const select = el('select', null, 'cam-party-select', {id: 'camPartyMember', 'aria-label': 'Miembro'});
@@ -606,7 +617,9 @@ function renderFeed() {
   if (a.items.length) for (const it of a.items) list.append(itemCard(it));
   else if (a.error) list.append(line(a.error));
   else if (!a.loaded || a.loading) list.append(line('Cargando…'));
-  else list.append(line(a.filter === 'pending' ? 'No hay nada pendiente.' : a.filter === 'resolved' ? 'Aún no hay nada resuelto.' : 'Todavía no hay ' + kindLabel(S.data.party) + ' en este party.'));
+  else list.append(line(a.filter === 'pending' ? (quiniela ? 'Ningún partido en juego.' : 'No hay nada pendiente.')
+    : a.filter === 'resolved' ? 'Aún no hay nada resuelto.'
+    : quiniela ? 'Todavía no ha empezado ningún partido.' : 'Todavía no hay ' + kindLabel(S.data.party) + ' en este party.'));
   const nodes = [filters, list];
   if (a.items.length && a.more) {
     const more = button(a.loading ? 'Cargando…' : 'Ver más', 'cam-party-btn is-wide', () => loadActivity(true), {disabled: a.loading});
@@ -641,6 +654,12 @@ async function loadActivity(more) {
 }
 function stateText(it, kind) {
   const pts = it.points;
+  if (it.type === 'quiniela') {
+    if (it.state === 'won') return {text: 'Acertado · +' + Math.round(Number(pts) || 0) + ' pts', tone: 'is-won'};
+    if (it.state === 'lost') return {text: 'Fallado', tone: 'is-lost'};
+    if (it.state === 'void') return {text: 'Anulado', tone: 'is-void'};
+    return {text: 'En juego' + (pts ? ' · vale ' + pts + ' pts' : ''), tone: 'is-pending'};
+  }
   if (it.state === 'won') return {text: 'Acertado · ' + formatPoints(pts, kind) + ' pts', tone: 'is-won'};
   if (it.state === 'lost') return {text: 'Fallado' + (kind === 'picks' ? ' · ' + formatPoints(pts, kind) + ' pts' : ''), tone: 'is-lost'};
   if (it.state === 'void') return {text: 'Anulado', tone: 'is-void'};
@@ -651,7 +670,28 @@ function stateText(it, kind) {
   if (it.type === 'champion' && pts) return {text: 'Pendiente · vale ' + pts + ' pts', tone: 'is-pending'};
   return {text: 'Pendiente', tone: 'is-pending'};
 }
+/* «Chiefs @ Bills» (NFL: visitante @ local) · «Barcelona vs Real Madrid» (fútbol). */
+function matchTitle(it) {
+  const home = it.home_name || 'Local', away = it.away_name || 'Visitante';
+  return it.sport === 'nfl' ? away + ' @ ' + home : home + ' vs ' + away;
+}
+function quinielaCard(it) {
+  const name = String(it.username || 'Aficionado').replace(/^@+/, '');
+  const card = el('div', null, 'cam-party-item is-quiniela');
+  const top = el('span', null, 'cam-party-item-top');
+  top.append(el('span', initial(name), 'cam-party-avatar is-small', {'aria-hidden': 'true'}), el('span', '@' + name, 'cam-party-item-author'), el('span', shortDate(it.kickoff || it.created_at), 'cam-party-item-date'));
+  card.append(top, el('span', matchTitle(it), 'cam-party-item-title'));
+  const score = Number.isFinite(Number(it.home_score)) && Number.isFinite(Number(it.away_score)) && it.home_score !== null && it.away_score !== null
+    ? (it.sport === 'nfl' ? it.away_score + '–' + it.home_score : it.home_score + '–' + it.away_score) : '';
+  card.append(el('span', 'Eligió ' + (it.pick_label || '—') + (score ? ' · ' + score : ''), 'cam-party-item-detail'));
+  const st = stateText(it, 'quiniela');
+  card.append(el('span', st.text, 'cam-party-state ' + st.tone));
+  card.setAttribute('role', 'group');
+  card.setAttribute('aria-label', '@' + name + ': ' + matchTitle(it) + '. Eligió ' + (it.pick_label || '') + '. ' + st.text);
+  return card;
+}
 function itemCard(it) {
+  if (it.type === 'quiniela') return quinielaCard(it);
   const kind = S.data.party.kind;
   const name = String(it.username || 'Aficionado').replace(/^@+/, '');
   const card = button('', 'cam-party-item', () => openItem(it));
@@ -840,74 +880,175 @@ async function openAdmin() {
   } catch (e) { if (list.isConnected) list.replaceChildren(line(message(e))); }
 }
 
-/* ---------- perfil ---------- */
-const P = {userId: null, own: false, tab: null, data: null, error: '', req: 0, node: null};
-function profileNode() {
-  if (!P.node) P.node = el('section', null, 'cam-party-profile', {id: 'camProfileParties', 'aria-labelledby': 'camProfilePartiesTitle'});
-  return P.node;
-}
+/* ---------- perfil: pestaña «Mi Party» ----------
+   Propio: invitación a armar una party de quiniela (o «Tus parties de
+   quiniela»), «Mi quiniela» compacta y «Otros parties».
+   Público: sus parties visibles (Quiniela primero), su quiniela compacta y
+   una línea para armar la tuya. Una llamada (cam_profile_party) por perfil;
+   cambiar de pestaña no vuelve a llamar. */
+const P = {userId: null, own: false, tab: null, data: null, error: '', req: 0, stale: false};
+const profileNode = () => $('camProfileParties');
+const SPORT_SHORT = {nfl: 'NFL', football: 'Fútbol'};
 async function loadProfile() {
-  const req = ++P.req, id = P.userId, own = P.own;
-  P.data = null; P.error = '';
+  const req = ++P.req, id = P.userId;
+  P.data = null; P.error = ''; P.stale = false;
+  renderProfile();
   try {
-    const d = own ? await rpc('cam_party_mine') : await rpc('cam_party_public_list', {p_user: id});
+    const d = await rpc('cam_profile_party', {p_user: id});
     if (req !== P.req) return;
-    P.data = Array.isArray(d) ? d : [];
-    if (own) { S.mine = P.data; S.mineStale = false; }
+    P.data = d || {parties: [], quiniela: {}, recent: []};
   } catch (e) {
     if (req !== P.req) return;
-    P.error = message(e); P.data = [];
+    P.error = message(e);
   }
   renderProfile();
+}
+function block(title, cls) {
+  const box = el('section', null, 'cam-pp-block' + (cls ? ' ' + cls : ''));
+  if (title) box.append(el('h3', title, 'cam-pp-title'));
+  return box;
+}
+function quinielaRows(q) {
+  const list = el('div', null, 'cam-pp-standings');
+  for (const [key, label] of [['nfl', 'NFL'], ['football', 'Fútbol']]) {
+    const s = q?.[key];
+    const row = P.own ? button('', 'cam-pp-standing', () => window.camGoQuiniela?.(key), {'aria-label': 'Jugar la quiniela ' + label}) : el('div', null, 'cam-pp-standing');
+    row.append(el('span', label, 'cam-pp-standing-name'));
+    if (s && s.position) {
+      row.append(el('span', placeText(s.position, s.of), 'cam-pp-standing-rank'),
+        el('span', Math.round(Number(s.points) || 0) + ' pts', 'cam-pp-standing-pts'),
+        el('span', (Number(s.hits) || 0) + '/' + (Number(s.resolved) || 0), 'cam-pp-standing-hits', {'aria-label': (Number(s.hits) || 0) + ' aciertos de ' + (Number(s.resolved) || 0)}));
+    } else row.append(el('span', 'Sin resultados', 'cam-pp-standing-none'));
+    list.append(row);
+  }
+  return list;
+}
+function recentList(items) {
+  const list = el('ol', null, 'cam-pp-recent', {'aria-label': 'Últimos pronósticos resueltos'});
+  for (const it of items) {
+    const li = el('li', null, 'cam-pp-recent-row ' + (it.state === 'won' ? 'is-won' : 'is-lost'));
+    li.append(el('span', it.state === 'won' ? '✓' : '✗', 'cam-pp-mark', {'aria-label': it.state === 'won' ? 'Acierto' : 'Fallo'}));
+    li.append(el('span', matchTitle(it), 'cam-pp-recent-match', {title: 'Eligió ' + (it.pick_label || '')}));
+    li.append(el('span', it.state === 'won' ? '+' + Math.round(Number(it.points) || 0) : '0', 'cam-pp-recent-pts'));
+    list.append(li);
+  }
+  return list;
+}
+function partyRow(p, weekly) {
+  const open = p.id ? () => openParty(p.id, null) : null;
+  const card = open ? button('', 'cam-party-card cam-pp-party', open) : el('div', null, 'cam-party-card cam-pp-party');
+  const copy = el('span', null, 'cam-party-card-copy');
+  copy.append(el('span', p.name, 'cam-party-card-name'));
+  const meta = el('span', null, 'cam-party-card-meta');
+  if (weekly) {
+    meta.append(el('span', placeText(p.week_position, p.member_count) + ' · esta semana'));
+    meta.append(el('span', membersText(p.member_count)));
+  } else {
+    meta.append(el('span', kindLabel(p) + (p.sport && p.sport !== 'all' ? ' · ' + SPORTS[p.sport] : '')));
+    meta.append(el('span', placeText(p.position, p.member_count)));
+  }
+  copy.append(meta);
+  if (P.own && p.show_on_profile === false) copy.append(el('span', 'Oculto en tu perfil', 'cam-party-card-tag cam-pp-hidden'));
+  card.append(copy);
+  if (open) {
+    card.setAttribute('aria-label', p.name + ', ' + kindLabel(p) + ', ' + (weekly ? placeText(p.week_position, p.member_count) + ' esta semana' : placeText(p.position, p.member_count)));
+    card.append(icon('chevron', 'cam-party-card-chevron'));
+  }
+  return card;
 }
 function renderProfile() {
   const node = profileNode();
-  const kind = P.tab === 'picks' || P.tab === 'takes' ? P.tab : null;
-  const anchor = kind === 'takes' ? $('aeProfilePrestige') : kind === 'picks' ? $('aeProfileAccuracy') : null;
-  if (!kind || !P.userId || !anchor || !$('aeProfileDialog')?.open) { node.remove(); return; }
-  if (node.previousElementSibling !== anchor) anchor.after(node);
-  node.dataset.kind = kind;
-  const items = (P.data || []).filter(p => p.kind === kind);
-  if (!P.own && P.data && !items.length) { node.remove(); return; }
-  const head = el('div', null, 'cam-party-profile-head');
-  head.append(el('h3', 'Parties', 'cam-party-profile-title', {id: 'camProfilePartiesTitle'}));
-  if (P.own) head.append(el('span', KINDS[kind], 'cam-party-profile-kind'));
-  const nodes = [head];
-  if (!P.data) nodes.push(line('Cargando…', 'cam-party-profile-empty'));
-  else if (P.error && !items.length) nodes.push(line(P.error, 'cam-party-profile-empty'));
-  else if (!items.length) nodes.push(line('Aún no estás en ningún party de ' + KINDS[kind] + '.', 'cam-party-profile-empty'));
-  else {
-    const list = el('div', null, 'cam-party-profile-list');
-    for (const p of items) {
-      const open = P.own || p.id ? () => openParty(p.id, null) : null;
-      list.append(partyCard(p, p.id ? open : null, P.own && p.show_on_profile === false ? 'Oculto en tu perfil' : ''));
-    }
-    nodes.push(list);
-  }
+  if (!node) return;
+  if (P.tab !== 'party' || !P.userId || !$('aeProfileDialog')?.open) { node.hidden = P.tab !== 'party'; return; }
+  node.hidden = false;
+  if (!P.data) { node.replaceChildren(line(P.error || 'Cargando…', 'cam-party-profile-empty')); return; }
+  const d = P.data, parties = Array.isArray(d.parties) ? d.parties : [];
+  const quiniela = parties.filter(p => p.kind === 'quiniela'), others = parties.filter(p => p.kind !== 'quiniela');
+  const q = d.quiniela || {}, recent = Array.isArray(d.recent) ? d.recent : [];
+  const played = Boolean(q.nfl?.position || q.football?.position);
+  const nodes = [];
   if (P.own) {
-    const actions = el('div', null, 'cam-party-actions');
-    const create = button('Crear party', 'cam-party-btn is-primary', () => openCreate(kind, 'all'));
-    create.prepend(icon('plus'));
-    const join = button('Unirme con código', 'cam-party-btn', () => { S.context.kind = kind; openJoin(); });
-    join.prepend(icon('ticket'));
-    actions.append(create, join);
-    nodes.push(actions);
+    // 1 · Invitación (o «Tus parties de quiniela»).
+    const invite = block(quiniela.length ? 'Tus parties de quiniela' : '¿Ya tienes tu party de quiniela?', 'cam-pp-invite');
+    if (quiniela.length) {
+      const list = el('div', null, 'cam-party-profile-list');
+      for (const p of quiniela) list.append(partyRow(p, true));
+      const other = button('Crear otra', 'cam-pp-link', () => openCreate('quiniela', 'all'));
+      other.prepend(icon('plus'));
+      invite.append(list, other);
+    } else {
+      invite.prepend(el('span', null, 'cam-pp-emblem'));
+      invite.firstChild.append(icon('users'));
+      invite.append(line('Arma un grupo con tus amigos y compitan cada semana con su propia clasificación.', 'cam-pp-text'));
+      const actions = el('div', null, 'cam-party-actions');
+      const create = button('Crear party', 'cam-party-btn is-primary', () => openCreate('quiniela', 'all'));
+      create.prepend(icon('plus'));
+      const join = button('Unirme con código', 'cam-party-btn', () => { S.context.kind = 'quiniela'; openJoin(); });
+      join.prepend(icon('ticket'));
+      actions.append(create, join);
+      invite.append(actions);
+    }
+    nodes.push(invite);
+    // 2 · Mi quiniela.
+    const mine = block('Mi quiniela', 'cam-pp-quiniela');
+    mine.append(quinielaRows(q));
+    if (recent.length) mine.append(recentList(recent));
+    const sport = d.last_sport === 'football' ? 'football' : 'nfl';
+    mine.append(button('Jugar esta semana ›', 'cam-party-btn is-wide cam-pp-play', () => window.camGoQuiniela?.(sport)));
+    nodes.push(mine);
+    // 3 · Otros parties.
+    if (others.length) {
+      const box = block('Otros parties', 'cam-pp-others');
+      const list = el('div', null, 'cam-party-profile-list');
+      for (const p of others) list.append(partyRow(p, false));
+      box.append(list);
+      nodes.push(box);
+    }
+  } else {
+    if (parties.length) {
+      const box = block('Parties', 'cam-pp-others');
+      const list = el('div', null, 'cam-party-profile-list');
+      for (const p of parties) list.append(partyRow(p, false));
+      box.append(list);
+      nodes.push(box);
+    }
+    if (played) {
+      const box = block('Quiniela', 'cam-pp-quiniela');
+      box.append(quinielaRows(q));
+      if (recent.length) box.append(recentList(recent));
+      nodes.push(box);
+    }
+    if (!parties.length && !played) nodes.push(line('@' + String(document.getElementById('aeProfileTitle')?.textContent || '').replace(/^@+/, '') + ' todavía no ha participado', 'cam-party-profile-empty'));
+    const cta = button('¿Juegas la quiniela? Arma tu party ›', 'cam-pp-link cam-pp-cta', () => armYourParty());
+    nodes.push(cta);
   }
   node.replaceChildren(...nodes);
 }
+// Desde un perfil ajeno: con sesión, crear tu party de quiniela; sin sesión,
+// iniciar sesión y volver a la invitación de tu pestaña «Mi Party».
+async function armYourParty() {
+  if (await currentUser()) { openCreate('quiniela', 'all'); return; }
+  window.closeAeProfile?.();
+  requireLogin(() => window.openAeProfile?.('party'), 'Para armar tu party, inicia sesión o crea una cuenta. Después volverás a la invitación.');
+}
 document.addEventListener('cam:profile-view', e => {
   const d = e.detail || {};
-  if (!d.userId) { P.userId = null; P.data = null; P.req++; P.node?.remove(); return; }
+  if (!d.userId) { P.userId = null; P.data = null; P.req++; P.tab = null; const n = profileNode(); if (n) { n.replaceChildren(); n.hidden = true; } return; }
   const changedUser = d.userId !== P.userId || Boolean(d.own) !== P.own;
   P.userId = d.userId; P.own = Boolean(d.own); P.tab = d.tab;
-  if (changedUser) loadProfile();
-  renderProfile();
+  if (changedUser) { P.req++; P.data = null; P.error = ''; P.stale = true; }
+  if (P.tab === 'party' && (P.stale || (!P.data && !P.error))) loadProfile();
+  else renderProfile();
 });
 
-/* Tras crear, unirse, salir, renombrar… el perfil abierto se pone al día (una llamada). */
+/* Tras crear, unirse, salir, renombrar… la pestaña «Mi Party» se pone al día
+   (una llamada si está abierta; si no, al volver a ella). */
 function changed() {
   S.mineStale = true;
-  if (P.userId && P.own && $('aeProfileDialog')?.open) loadProfile();
+  if (P.userId && P.own) {
+    P.stale = true;
+    if (P.tab === 'party' && $('aeProfileDialog')?.open) loadProfile();
+  }
   document.dispatchEvent(new CustomEvent('cam:parties-changed'));
 }
 
@@ -928,6 +1069,14 @@ function mountEntries() {
   if (chefs && !$('camPartyEntryPicks')) chefs.before(entry('camPartyEntryPicks', 'Mis parties de Picks', () => openHub('picks', 'all')));
   const twin = $('aeNflTwinRankings');
   if (twin && !$('camPartyEntryTakes')) twin.prepend(entry('camPartyEntryTakes', 'Mis parties de Takes', () => openHub('takes', sportNow())));
+  // Quinielas: también se juegan en grupo.
+  for (const [root, id, sport] of [['camNflQuiniela', 'camPartyEntryQuinielaNfl', 'nfl'], ['camFootballQuiniela', 'camPartyEntryQuinielaFootball', 'football']]) {
+    const section = $(root);
+    if (!section || $(id)) continue;
+    const row = entry(id, 'Mis parties de Quiniela', () => openHub('quiniela', sport));
+    row.classList.add('is-quiniela');
+    section.append(row);
+  }
 }
 
 /* ---------- arranque ---------- */

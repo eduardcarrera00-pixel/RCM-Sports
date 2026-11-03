@@ -11,7 +11,8 @@ let pickOpened=0;
 w.aeOpenPickComposer=()=>{pickOpened++;};
 for(const file of ['assets/free-takes.js','assets/ae-profile.js'])w.eval(fs.readFileSync(file,'utf8'));
 d.dispatchEvent(new w.Event('DOMContentLoaded'));
-await w.openAeProfile();
+// El perfil abre en «Perfil»; Takes y Picks se cargan al abrir su pestaña.
+await w.openAeProfile('takes');
 let action=d.getElementById('aeProfilePublish');
 assert.equal(action.hidden,false);assert.equal(action.textContent,'Publicar mi Take');
 assert.match(d.getElementById('aeProfileTakes').textContent,/Aún no/);
@@ -29,13 +30,13 @@ picks=Array.from({length:5},(_,i)=>({
   id:'pick-'+i,user_id:'reader',title:'Pick '+(i+1),created_at:new Date(Date.UTC(2026,9,19-i)).toISOString(),
   outcome:i<3?'won':'lost',american_odds:150,result_points:i<3?1.5:-1.5
 }));
-await w.openAeProfile();
+await w.openAeProfile('takes');
 let takesScroll=d.querySelector('#aeProfileTakes .ae-profile-recent-scroll');
 assert.equal(takesScroll.children.length,5);
 assert.equal(takesScroll.tabIndex,0);
 assert.match(takesScroll.firstElementChild.textContent,/Take 1/);
 assert.match(d.getElementById('aeProfileTakeAccuracy').textContent,/75%/);
-d.getElementById('aeProfileTabPicks').click();
+d.getElementById('aeProfileTabPicks').click();await new Promise(r=>setTimeout(r,30));
 let picksScroll=d.querySelector('#aeProfilePicks .ae-profile-recent-scroll');
 assert.equal(picksScroll.children.length,5);
 assert.equal(picksScroll.tabIndex,0);
@@ -43,7 +44,7 @@ assert.match(picksScroll.firstElementChild.textContent,/Pick 1/);
 assert.equal(d.getElementById('aeProfileTakeAccuracy').hidden,true);
 assert.match(d.getElementById('aeProfileAccuracy').textContent,/60%/);
 entries=[];picks=[];
-await w.openAeProfile();
+await w.openAeProfile('takes');
 action.click();await new Promise(r=>setTimeout(r,50));
 const dialog=d.getElementById('aeTakeComposerDialog'),form=d.getElementById('freeTakesForm');
 assert.equal(dialog.open,true);assert.equal(d.getElementById('aeProfileDialog').open,false);
@@ -57,6 +58,7 @@ await w.aeOpenTakeComposer('Fútbol');assert.equal(dialog.open,true);assert.equa
 fail=true;form.dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));await new Promise(r=>setTimeout(r,30));assert.equal(dialog.open,true);assert.match(form.elements.body.value,/conservar/);assert.match(d.getElementById('aeTakeComposerStatus').textContent,/Sin conexión/);
 fail=false;form.dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));await new Promise(r=>setTimeout(r,500));assert.equal(dialog.open,true);assert.equal(form.elements.body.value,'');assert.match(d.getElementById('aeTakeComposerStatus').textContent,/publicado/);
 d.getElementById('aeTakeComposerClose').click();await w.openAeProfile();
+assert.equal(action.hidden,true,'Perfil sin botón de publicar');
 d.getElementById('aeProfileTabPicks').click();assert.equal(action.hidden,false);assert.equal(action.textContent,'Publicar mi Pick');action.click();assert.equal(pickOpened,1);assert.equal(d.getElementById('aeProfileDialog').open,false);
 await w.openAePublicProfile('12345678-1234-1234-1234-123456789abc',false);assert.equal(action.hidden,true);
 console.log('PASS: empty profile publication, correct composer routing, retained draft, backdrop/Escape/focus safety, errors and success stay open, public profiles hide publishing.');

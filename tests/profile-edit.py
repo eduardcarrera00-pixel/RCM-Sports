@@ -6,7 +6,8 @@ aquí se imitan las funciones cam_username_* para probar la interfaz.
 
 Cubre, a 390 y 1366 px, de día y de noche:
   · cabecera: inicial, @usuario, «Miembro desde», Editar perfil / Compartir perfil;
-  · cifras (Takes, Picks, Acierto, Apoyo) que llevan a su pestaña;
+  · pestañas Perfil · Takes · Picks · Mi Party (sin fila de cifras: las cifras
+    están en las tarjetas del resumen, tests/profile-overview.py);
   · Editar perfil: comprobación en vivo (ocupado, espacios, acentos, libre),
     confirmación, cambio, deshacer y espera de 30 días; Escape vuelve al perfil;
   · el nombre nuevo llega a la cabecera y a la sesión;
@@ -66,6 +67,11 @@ try { sessionStorage.setItem('cam_sports_home_welcome_seen_session_v1', '1'); } 
     return {data: Object.assign(status(), {previous_username: previous, undo}), error: null};
   };
   F.rpc.cam_public_profile_card = ({p_user}) => ({data: {username: p_user === OTHER ? 'beto_crack' : N.current, joined_month: '2026-10'}, error: null});
+  // Resumen del perfil (pestaña Perfil): nombre público y cifras.
+  F.rpc.cam_profile_overview = ({p_user}) => ({data: {user_id: p_user, username: p_user === OTHER ? 'beto_crack' : N.current, joined_month: '2026-10',
+    takes: {count: 3, up: 41, down: 24, top: null}, picks: {count: 3, won: 1, lost: 1, top: null},
+    quiniela: {nfl: null, football: null, parties: []}}, error: null});
+  F.rpc.cam_profile_party = () => ({data: {own: true, parties: [], quiniela: {nfl: null, football: null}, recent: []}, error: null});
 })();
 """ % {'uid': UID, 'other': OTHER}
 
@@ -73,7 +79,9 @@ STATE = """() => {
   const $ = id => document.getElementById(id);
   return {title: $('aeProfileTitle').textContent, sub: $('aeProfileUsername').textContent, avatar: $('camProfileAvatar').textContent,
     kicker: $('camProfileKicker').textContent, edit: !$('camProfileEditOpen').hidden,
-    stats: [...document.querySelectorAll('#camProfileStats strong')].map(n => n.textContent),
+    stats: document.querySelectorAll('#camProfileStats').length,
+    figures: [...document.querySelectorAll('#camProfileOverview .cam-ov-figures')].map(n => n.textContent),
+    selected: [...document.querySelectorAll('#aeProfileTabs button')].find(b => b.getAttribute('aria-selected') === 'true')?.id || null,
     tabs: [...document.querySelectorAll('#aeProfileTabs button')].map(b => b.textContent),
     check: $('camUsernameCheck').textContent, tone: $('camUsernameCheck').dataset.tone || '',
     saveEnabled: !$('camUsernameSave').hidden && !$('camUsernameSave').disabled,
@@ -102,17 +110,20 @@ def run(width, dark):
         assert st['title'] == '@ana_futbolera' and st['avatar'] == 'A', f'{where}: identidad {st}'
         assert st['sub'] == 'Miembro desde octubre de 2026', f'{where}: miembro desde {st}'
         assert st['edit'] and st['kicker'].startswith('MI PERFIL'), f'{where}: botones propios {st}'
-        assert st['stats'] == ['3', '3', '50%', '63%'], f'{where}: cifras {st}'
-        assert st['tabs'] == ['Mis Takes', 'Mis Picks', 'Mi Quiniela'], f'{where}: pestañas {st}'
+        assert st['stats'] == 0, f'{where}: sin fila de cifras {st}'
+        assert st['figures'] == ['3·63 % apoyo', '3·50 % acierto'], f'{where}: cifras en el resumen {st}'
+        assert st['tabs'] == ['Perfil', 'Takes', 'Picks', 'Mi Party'] and st['selected'] == 'aeProfileTabOverview', f'{where}: pestañas {st}'
         assert st['overflow'] <= 1, f'{where}: desbordamiento {st}'
         if width < 700:
             box = page.evaluate("document.getElementById('aeProfileDialog').getBoundingClientRect().toJSON()")
             assert box['x'] == 0 and box['y'] == 0 and abs(box['width'] - width) <= 1, f'{where}: pantalla completa {box}'
         if SHOTS: page.screenshot(path=str(SHOTS / f'{where}-perfil.png'))
-        # Las cifras llevan a su pestaña.
-        page.click('#camProfileStats button:nth-child(2)'); page.wait_for_timeout(400)
-        assert page.evaluate("document.getElementById('aeProfileTabPicks').getAttribute('aria-selected')") == 'true', f'{where}: cifra Picks'
-        page.click('#camProfileStats button:nth-child(1)'); page.wait_for_timeout(300)
+        # Las pestañas siguen funcionando (Takes y Picks cargan al abrirlas).
+        page.click('#aeProfileTabPicks'); page.wait_for_timeout(400)
+        assert page.evaluate("document.getElementById('aeProfileTabPicks').getAttribute('aria-selected')") == 'true', f'{where}: pestaña Picks'
+        page.click('#aeProfileTabTakes'); page.wait_for_timeout(400)
+        assert page.locator('#aeProfileTakeHighlights .ae-profile-feature').count() >= 1, f'{where}: Takes cargados'
+        page.click('#aeProfileTabOverview'); page.wait_for_timeout(300)
 
         # Editar perfil.
         page.click('#camProfileEditOpen'); page.wait_for_timeout(500)
@@ -155,7 +166,7 @@ def run(width, dark):
         page.evaluate(f"openAePublicProfile('{OTHER}', false)"); page.wait_for_timeout(1200)
         st = page.evaluate(STATE)
         assert st['title'] == '@beto_crack' and not st['edit'] and st['kicker'].startswith('AFICIONADO'), f'{where}: público {st}'
-        assert st['tabs'] == ['Takes', 'Picks', 'Quiniela'], f'{where}: pestañas públicas {st}'
+        assert st['tabs'] == ['Perfil', 'Takes', 'Picks', 'Party'] and st['selected'] == 'aeProfileTabOverview', f'{where}: pestañas públicas {st}'
         assert not page.evaluate("document.getElementById('aeProfileWelcomeAgain').getClientRects().length"), f'{where}: bienvenida solo en el propio'
         if SHOTS: page.screenshot(path=str(SHOTS / f'{where}-publico.png'))
         assert page.errors == [], f'{where}: errores {page.errors}'

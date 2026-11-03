@@ -69,7 +69,7 @@ def run():
         page.evaluate("document.dispatchEvent(new Event('DOMContentLoaded'))")
 
         # 2) Perfil público con prestigio
-        page.evaluate("window.openAePublicProfile('11111111-1111-4111-8111-111111111111',false)")
+        page.evaluate("window.openAePublicProfile('11111111-1111-4111-8111-111111111111',false,'takes')")
         page.wait_for_function("document.querySelector('#aeProfilePrestige .ae-profile-medal')")
         prestige = page.locator('#aeProfilePrestige')
         assert prestige.is_visible()
@@ -103,7 +103,7 @@ def run():
           db.rpc = async (n, a) => n === 'ae_take_prestige' ? {data:[{resolved:0,risk_score:null,risk_label:null,bold_attempts:0,bold_hits:0,bold_rate:null,legendary_count:0,rated_points:0}],error:null}
             : n === 'ae_take_legendary' || n === 'ae_user_champion_picks' ? {data:[],error:null} : old(n, a);
           window.closeAeProfile && window.closeAeProfile();
-          window.openAePublicProfile('33333333-3333-4333-8333-333333333333', false);
+          window.openAePublicProfile('33333333-3333-4333-8333-333333333333', false, 'takes');
         }""")
         page.wait_for_function("/todavía no tiene Takes puntuados/i.test(document.getElementById('aeProfilePrestige').textContent)")
         assert page.locator('#aeProfilePrestige .ae-profile-prestige-stat').count() == 0

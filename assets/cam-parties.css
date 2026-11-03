@@ -674,6 +674,11 @@
   html body #camParty .cam-party-state.is-won { background:var(--pt-won-soft)!important; color:var(--pt-won)!important; }
   html body #camParty .cam-party-state.is-lost { background:var(--pt-lost-soft)!important; color:var(--pt-lost)!important; }
   html body #camParty .cam-party-state.is-void { background:var(--pt-paper-soft)!important; color:var(--pt-muted)!important; }
+  /* Quiniela: un pronóstico no abre nada (no hay ficha de partido). */
+  html body #camParty .cam-party-item.is-quiniela { cursor:default!important; }
+  html body #camParty .cam-party-item.is-quiniela:hover { border-color:var(--pt-line)!important; background:var(--pt-card)!important; }
+  html body #camParty .cam-party-item.is-quiniela .cam-party-item-detail { display:block!important; font:600 13.5px/1.45 Inter,system-ui,sans-serif!important; }
+  html body #camParty .cam-party-hint[hidden] { display:none!important; }
 
   /* ---------- invitación ---------- */
   /* La invitación queda en el centro de la pantalla; los botones, abajo. */
