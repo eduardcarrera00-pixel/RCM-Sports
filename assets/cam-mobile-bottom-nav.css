@@ -310,20 +310,17 @@ html body nav.ae-sport-nav svg.cam-mobile-nav-symbol {
        The same selectors live in cam-mobile-sections.js (OWNERS) to reveal the
        right tab when a script scrolls to something inside another tab. */
     /* NFL and Fútbol */
-    /* Team Power Rankings lead Noticias; fan standings stay in Clasificación. */
+    /* Team Power Rankings lead Noticias; fan standings (Savant · Rookie) close Takes. */
     html body[data-cam-tabs="sport"]:not([data-cam-tab="noticias"]) :is(#nflRankings,#championsRankings,#heroSection,#aeNewsHeadingRow,#aeSportLatestNews,#articlesGrid,#aeSportAllNewsFooter,#aeMoreNews,#aeNflLatestComments,#mainContent > .editorial-layout,#aeFootballMobileStage > .editorial-trending) {
       display: none !important;
     }
     html body[data-cam-tabs="sport"][data-cam-tab="noticias"] #freeTakes {
       display: none !important;
     }
-    html body[data-cam-tabs="sport"][data-cam-tab="takes"] #freeTakes > :is(#camNflQuiniela,#camFootballQuiniela,#aeSportTakeRanking,#aeSeasonPredictions) {
+    html body[data-cam-tabs="sport"][data-cam-tab="takes"] #freeTakes > :is(#camNflQuiniela,#camFootballQuiniela,#aeSeasonPredictions) {
       display: none !important;
     }
     html body[data-cam-tabs="sport"][data-cam-tab="quiniela"] #freeTakes > :not(#camNflQuiniela):not(#camFootballQuiniela):not(#aeSeasonPredictions) {
-      display: none !important;
-    }
-    html body[data-cam-tabs="sport"][data-cam-tab="clasificacion"] #freeTakes > :not(#aeSportTakeRanking) {
       display: none !important;
     }
     /* Picks */

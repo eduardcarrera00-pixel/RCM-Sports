@@ -4,10 +4,11 @@ Página completa en Chromium con tests/full-page.py y el Supabase falso (sin red
 
 Cubre, a 320/390 px de día y de noche (y 1366 px para escritorio):
   · la barra inferior Inicio · NFL · Fútbol · Picks · Perfil (Perfil al final);
-  · NFL y Fútbol: Noticias · Takes · Quiniela · Clasificación, y qué módulo
-    enseña cada pestaña; Picks: Picks · Historial · Chefs;
+  · NFL y Fútbol: Noticias · Takes · Quiniela, y qué módulo enseña cada
+    pestaña (Savant · Rookie, debajo de Últimos Takes); Picks: Picks · Historial · Chefs;
   · la barra de pestañas queda fija arriba al bajar y toca el encabezado;
-  · la dirección (?s=nfl&v=quiniela), abrir un enlace directo y el botón Atrás;
+  · la dirección (?s=nfl&v=quiniela), abrir un enlace directo (también el
+    antiguo ?v=clasificacion, que abre Takes) y el botón Atrás;
   · los atajos que llevan a un módulo (Top 10 NFL) abren su pestaña;
   · en escritorio no hay pestañas y se ve todo como antes;
   · sin errores de consola ni desbordamiento horizontal.
@@ -33,13 +34,13 @@ try { sessionStorage.setItem('cam_sports_home_welcome_seen_session_v1', '1'); } 
 })();
 """
 
-SPORT_TABS = ['noticias', 'takes', 'quiniela', 'clasificacion']
+SPORT_TABS = ['noticias', 'takes', 'quiniela']
 # Módulos que deben verse (True) u ocultarse (False) en cada pestaña.
 SPORT_EXPECT = {
     'noticias': {'#articlesGrid': True, '#aeSportLatestNews': True, '#freeTakes': False, '#RANK': True},
-    'takes': {'#freeTakesTitle': True, '#aeSportTakeLeaders': True, '#QUINIELA': False, '#aeSportTakeRanking': False, '#articlesGrid': False, '#RANK': False},
+    'takes': {'#freeTakesTitle': True, '#aeSportTakeLeaders': True, '#freeTakesFeed': True, '#aeSportTakeRanking': True, '#aeNflTwinRankings': True,
+              '#QUINIELA': False, '#aeSeasonPredictions': False, '#articlesGrid': False, '#RANK': False},
     'quiniela': {'#QUINIELA': True, '#freeTakesTitle': False, '#aeSportTakeRanking': False, '#articlesGrid': False},
-    'clasificacion': {'#RANK': False, '#aeSportTakeRanking': True, '#QUINIELA': False, '#freeTakesTitle': False, '#articlesGrid': False, '#aeSportLatestNews': False},
 }
 PICKS_TABS = ['picks', 'historial', 'chefs']
 PICKS_EXPECT = {
@@ -97,6 +98,15 @@ def phone(width, dark):
                 assert st['current'] == tab and st['url'] == f'?s={slug}&v={tab}', f'{where} {cat}/{tab}: {st}'
                 assert st['overflow'] <= 1, f'{where} {cat}/{tab}: desbordamiento {st["overflow"]}px'
                 expect_modules(page, expect[tab], f'{where} {cat}/{tab}')
+                if tab == 'takes':
+                    gap = page.evaluate("""() => {
+                      const shown = [...document.getElementById('freeTakes').children].filter(e => e.getClientRects().length);
+                      const rank = shown.findIndex(e => e.id === 'aeSportTakeRanking');
+                      const feed = shown.findIndex(e => e.id === 'freeTakesFeed');
+                      return {order: shown.slice(feed, rank + 1).map(e => e.id || e.className),
+                              below: document.getElementById('aeSportTakeRanking').getBoundingClientRect().top - document.getElementById('freeTakesFeed').getBoundingClientRect().bottom};
+                    }""")
+                    assert gap['below'] >= 0 and all(i in ('freeTakesFeed', 'aeSportTakeRanking') or 'ae-football-mobile-cta' in i or 'ae-history-more' in i or 'ae-nfl-take-footer' in i for i in gap['order']), f'{where} {cat}: la clasificación no va debajo de Últimos Takes {gap}'
                 if SHOTS: page.screenshot(path=str(SHOTS / f'{where}-{slug}-{tab}.png'))
             # Fija arriba al bajar.
             # (dentro de la sección: al llegar al pie de página la barra se va con ella)
@@ -110,10 +120,10 @@ def phone(width, dark):
         # Atrás: de Picks vuelve a Fútbol en la última pestaña usada (una sola vez por sección).
         page.go_back(); page.wait_for_timeout(700)
         st = page.evaluate(STATE)
-        assert st['cat'] == 'Fútbol' and st['current'] == 'clasificacion', f'{where}: Atrás {st}'
+        assert st['cat'] == 'Fútbol' and st['current'] == 'quiniela', f'{where}: Atrás {st}'
         page.go_back(); page.wait_for_timeout(700)
         st = page.evaluate(STATE)
-        assert st['cat'] == 'NFL' and st['current'] == 'clasificacion', f'{where}: Atrás 2 {st}'
+        assert st['cat'] == 'NFL' and st['current'] == 'quiniela', f'{where}: Atrás 2 {st}'
 
         # Un atajo al Top 10 NFL abre su pestaña.
         page.click('body > nav.cam-mobile-bottom-nav > button[data-category="Todos"]'); page.wait_for_timeout(500)
@@ -143,6 +153,11 @@ def phone(width, dark):
         st = page.evaluate(STATE)
         assert st['cat'] == 'Fútbol' and st['current'] == 'quiniela', f'{where}: enlace directo {st}'
         expect_modules(page, SPORT_EXPECT['quiniela'], f'{where} enlace directo')
+        # Enlace antiguo a la pestaña Clasificación: abre Takes.
+        page.goto(base + '/index.html?s=nfl&v=clasificacion', wait_until='load'); page.wait_for_timeout(1500)
+        st = page.evaluate(STATE)
+        assert st['cat'] == 'NFL' and st['current'] == 'takes' and st['url'] == '?s=nfl&v=takes', f'{where}: enlace antiguo {st}'
+        expect_modules(page, SPORT_EXPECT['takes'], f'{where} enlace antiguo')
         assert page.errors == [], f'{where}: errores {page.errors}'
     print('PASS', where)
 

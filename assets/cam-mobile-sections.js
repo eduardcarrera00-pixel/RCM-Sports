@@ -1,5 +1,6 @@
 /* CAM SPORTS — phone section tabs and addresses.
-   Inside NFL and Fútbol: Noticias · Takes · Quiniela · Clasificación.
+   Inside NFL and Fútbol: Noticias · Takes · Quiniela (the Savant · Rookie
+   standings close the Takes tab, under Últimos Takes).
    Inside Picks: Picks · Historial · Chefs.
    A sticky bar at the top of the section shows one part at a time (the hiding
    rules live in cam-mobile-bottom-nav.css). Nothing is moved or re-rendered:
@@ -13,7 +14,9 @@
   if (!main || typeof window.filterByCategory !== 'function' || !window.matchMedia) return;
 
   const mobile = window.matchMedia('(max-width: 760px), (orientation: landscape) and (max-height: 500px) and (hover: none) and (pointer: coarse)');
-  const SPORT_TABS = [['noticias', 'Noticias'], ['takes', 'Takes'], ['quiniela', 'Quiniela'], ['clasificacion', 'Clasificación']];
+  const SPORT_TABS = [['noticias', 'Noticias'], ['takes', 'Takes'], ['quiniela', 'Quiniela']];
+  // Old addresses keep working: ?v=clasificacion now opens Takes.
+  const OLD_TABS = { clasificacion: 'takes' };
   const SECTIONS = {
     NFL: { key: 'nfl', group: 'sport', label: 'NFL', tabs: SPORT_TABS },
     'Fútbol': { key: 'futbol', group: 'sport', label: 'Fútbol', tabs: SPORT_TABS },
@@ -27,7 +30,6 @@
     sport: {
       noticias: '#nflRankings, #championsRankings, #heroSection, #aeNewsHeadingRow, #aeSportLatestNews, #articlesGrid, #aeSportAllNewsFooter, #aeMoreNews, #aeNflLatestComments, #mainContent > .editorial-layout, #aeFootballMobileStage > .editorial-trending',
       quiniela: '#camNflQuiniela, #camFootballQuiniela, #aeSeasonPredictions',
-      clasificacion: '#aeSportTakeRanking',
       takes: '#freeTakes'
     },
     picks: {
@@ -153,8 +155,8 @@
     let params;
     try { params = new URL(location.href).searchParams; } catch { return { cat: 'Todos', tab: null }; }
     const cat = FROM_SLUG[params.get('s')] || 'Todos';
-    const tab = params.get('v');
-    return { cat, tab };
+    const old = OLD_TABS[params.get('v')];
+    return { cat, tab: old || params.get('v'), old: !!old };
   }
 
   // ---------- Navigation ----------
@@ -289,6 +291,7 @@
     chosen.set(start.cat, start.tab);
   }
   render();
+  if (start.old) syncUrl({ replace: true });
 
   window.camSectionTabs = Object.freeze({
     select: (tab, options) => selectTab(tab, options),
