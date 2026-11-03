@@ -31,6 +31,12 @@ assert.match(css, /calc\(7px \+ env\(safe-area-inset-bottom/);
 assert.match(css, /img\.ae-custom-sport-icon\s*\{\s*display: none !important/);
 assert.doesNotMatch(css, /@media\s*\(min-width:/);
 assert.match(visibility, /querySelector\('nav\.ae-sport-nav'\)/);
+const headerCSS = readFileSync(resolve(root, 'assets/cam-header-system.css'), 'utf8');
+assert.match(headerCSS, /html:not\(\.dark\) body > header nav\.ae-sport-nav[\s\S]*?drop-shadow\(/);
+assert.match(headerCSS, /body > nav\.cam-mobile-bottom-nav \.category-btn svg\.cam-mobile-nav-symbol/);
+assert.doesNotMatch(index, /<span class="ae-mobile-theme-caption"[^>]*>Modo<\/span>/);
+assert.match(index, /id="themeToggle"[\s\S]*?aria-label="Activar modo oscuro"/);
+
 
 const window = new Window({ url: 'https://camsports.github.io/' });
 const { document } = window;
@@ -41,7 +47,7 @@ document.body.innerHTML = `
     <div class="ae-mobile-header-grid">
       <a class="cam-brand" href="#">CAM SPORTS</a>
       ${sourceNav}
-      <div class="ae-header-actions"><button id="themeToggle">Modo</button><button id="camGlobalEditToggle">Editar</button><button id="login">Iniciar sesión</button></div>
+      <div class="ae-header-actions"><button id="themeToggle" aria-label="Cambiar tema">☾</button><button id="camGlobalEditToggle">Editar</button><button id="login">Iniciar sesión</button></div>
     </div>
   </header>
   <footer><a id="moreSports" href="#">NBA</a></footer>
@@ -51,7 +57,7 @@ document.body.innerHTML = `
 const nav = document.querySelector('header nav.ae-sport-nav');
 const allButtons = Array.from(nav.querySelectorAll('.category-btn'));
 const originalButtons = new Map(allButtons.map(button => [button.dataset.category, button]));
-const referenceIcons = new Map(primary.filter(key => key !== 'Opiniones').map(key => [key, originalButtons.get(key).querySelector('svg.cam-category-nav-symbol')]));
+const referenceIcons = new Map(primary.map(key => [key, originalButtons.get(key).querySelector('svg.cam-category-nav-symbol')]));
 for (const [key, icon] of referenceIcons) assert.ok(icon, key + ': reference vector exists in initial HTML');
 const mobileListeners = [];
 let isPhone = true;
@@ -81,7 +87,7 @@ for (const category of primary) {
   assert.equal(paintedBox[2], paintedBox[3], category + ': square crop preserves proportions');
   assert.equal(icon.getAttribute('stroke'), 'currentColor');
   assert.ok(icon.children.length >= 2, category + ': visible details must remain');
-  assert.equal(button.querySelectorAll('img.ae-custom-sport-icon').length, category === 'Opiniones' ? 1 : 0, 'reference categories use inline SVG; Opiniones keeps its desktop image');
+  assert.equal(button.querySelectorAll('img.ae-custom-sport-icon').length, 0, 'every primary category uses exactly one inline SVG');
   if (referenceIcons.has(category)) assert.equal(icon, referenceIcons.get(category), 'phone reuses the initial reference vector');
 }
 assert.ok(document.getElementById('themeToggle')?.closest('header'));
@@ -128,7 +134,7 @@ isPhone = false;
 mobileListeners.forEach(listener => listener({ matches: false }));
 assert.equal(nav.parentElement, document.querySelector('header .ae-mobile-header-grid'));
 for (const category of primary) {
-  assert.equal(originalButtons.get(category).querySelectorAll('img.ae-custom-sport-icon').length, category === 'Opiniones' ? 1 : 0);
+  assert.equal(originalButtons.get(category).querySelectorAll('img.ae-custom-sport-icon').length, 0);
   if (referenceIcons.has(category)) assert.equal(originalButtons.get(category).querySelector('svg.cam-category-nav-symbol'), referenceIcons.get(category), 'desktop restoration preserves the same artwork');
   assert.equal(originalButtons.get(category).querySelectorAll('svg.cam-mobile-nav-symbol').length, 1);
 }
