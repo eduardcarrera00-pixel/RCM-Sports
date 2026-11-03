@@ -266,6 +266,45 @@
       --cam-control-focus: #805a30;
     }
   }
+  /* The phone dock retains the approved compact 37px rings.
+     Keep all four bronze vectors visually equal and avoid the older square override. */
+  body > nav.cam-mobile-bottom-nav > button.category-btn {
+    color: #d2c0a6 !important;
+  }
+  body > nav.cam-mobile-bottom-nav > button.category-btn:is(.active,[aria-current="page"]) {
+    color: #d9ab70 !important;
+  }
+  body > nav.cam-mobile-bottom-nav > button.category-btn .ae-nav-icon {
+    display: grid !important; place-items: center !important;
+    flex: 0 0 37px !important; box-sizing: border-box !important;
+    width: 37px !important; height: 37px !important;
+    min-width: 37px !important; min-height: 37px !important;
+    max-width: 37px !important; max-height: 37px !important;
+    border: 1px solid rgba(223,194,151,.42) !important;
+    border-radius: 50% !important; background: #102535 !important;
+    color: inherit !important;
+  }
+  body > nav.cam-mobile-bottom-nav svg.cam-mobile-nav-symbol {
+    flex: 0 0 23px !important; width: 23px !important; height: 23px !important;
+    min-width: 23px !important; min-height: 23px !important;
+    max-width: 23px !important; max-height: 23px !important;
+    color: inherit !important;
+  }
+  body > nav.cam-mobile-bottom-nav > button.category-btn:is(.active,[aria-current="page"]) .ae-nav-icon {
+    border-color: #b98a50 !important; background: rgba(185,138,80,.17) !important;
+  }
+  html:not(.dark) body > nav.cam-mobile-bottom-nav > button.category-btn {
+    color: #183343 !important;
+  }
+  html:not(.dark) body > nav.cam-mobile-bottom-nav > button.category-btn:is(.active,[aria-current="page"]) {
+    color: #886237 !important;
+  }
+  html:not(.dark) body > nav.cam-mobile-bottom-nav > button.category-btn .ae-nav-icon {
+    border-color: rgba(24,51,67,.34) !important; background: #f8f2e8 !important;
+  }
+  html:not(.dark) body > nav.cam-mobile-bottom-nav > button.category-btn:is(.active,[aria-current="page"]) .ae-nav-icon {
+    border-color: #a47946 !important; background: rgba(164,121,70,.14) !important;
+  }
   @media (prefers-reduced-motion: reduce) {
     :is(body > header,nav.cam-mobile-bottom-nav) button { transition: none !important; }
   }
