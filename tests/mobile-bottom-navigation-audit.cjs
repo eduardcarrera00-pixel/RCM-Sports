@@ -1,5 +1,5 @@
-/* CAM SPORTS: browser audit, read-only. This intentionally fails until mobile
- * bottom navigation has been implemented and visually refined. */
+/* CAM SPORTS: browser audit, read-only, of the phone dock
+ * Inicio · NFL · Fútbol · Picks · Perfil (Perfil always last). */
 'use strict';
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
@@ -7,7 +7,8 @@ const path=require('node:path');
 const http=require('node:http');
 const {chromium}=require('playwright');
 const OUT=path.join(process.cwd(),'test-results/mobile-bottom-nav');
-const ITEMS=['Picks','NFL','Fútbol','Opiniones'];
+const ITEMS=['Todos','NFL','Fútbol','Picks','Perfil'];
+const SECTIONS=ITEMS.filter(item=>item!=='Perfil');
 const SIZES=[
  ['iphone-se',375,667],['iphone-standard',390,844],['iphone-pro-max',430,932],
  ['android-compact',360,740],['android-large',412,915],['extra-compact',320,568],
@@ -15,13 +16,13 @@ const SIZES=[
  ['iphone-pro-max-landscape',932,430]
 ];
 function navInfo(){
-  const labels=['Picks','NFL','Fútbol','Opiniones'];
-  const label=b=>(b.dataset.category||b.getAttribute('aria-label')||b.textContent||'').trim().replace(/\s+/g,' ');
+  const labels=['Todos','NFL','Fútbol','Picks','Perfil'];
+  const label=b=>(b.dataset.category||(b.id==='camNavProfile'?'Perfil':'')||b.getAttribute('aria-label')||b.textContent||'').trim().replace(/\s+/g,' ');
   const options=[...document.querySelectorAll('nav,[role="navigation"]')]
     .filter(n=>!n.closest('header')&&!n.closest('footer'))
     .map(n=>({node:n,items:[...n.querySelectorAll('button,a,[role="button"]')]
       .filter(b=>labels.includes(label(b)))}))
-    .filter(v=>v.items.length===4&&labels.every(s=>v.items.some(b=>label(b)===s)))
+    .filter(v=>v.items.length===5&&labels.every(s=>v.items.some(b=>label(b)===s)))
     .filter(v=>getComputedStyle(v.node).display!=='none'&&v.node.getBoundingClientRect().height>0);
   return {options,label};
 }
@@ -63,10 +64,11 @@ async function visit(browser,name,width,height,dark,mobile){
       const candidates=window.__camAuditNav().options;
       const header=[...document.querySelectorAll('header .category-btn')]
         .filter(el=>['Picks','NFL','Fútbol','Opiniones'].includes(el.dataset.category)&&el.getBoundingClientRect().width>0);
+      const headerOpinions=header.filter(el=>el.dataset.category==='Opiniones').length;
       const item=candidates[0];
       const rect=item?.node.getBoundingClientRect(),style=item?getComputedStyle(item.node):null;
       return {
-        count:candidates.length,headerCount:header.length,
+        count:candidates.length,headerCount:header.length,headerOpinions,
         headerExists:!!document.querySelector('header'),
         brand:!!document.querySelector('header .cam-brand'),auth:!!document.getElementById('guestAdminContainer'),
         pos:style?.position,bottom:rect?innerHeight-rect.bottom:null,barTop:rect?.top,
@@ -87,7 +89,8 @@ async function visit(browser,name,width,height,dark,mobile){
       assert.equal(status.headerCount,4,label+': cambió el menú de escritorio');
     }else{
       assert.equal(status.count,1,label+': la nueva barra no existe o está duplicada');
-      assert.equal(status.headerCount,0,label+': botones duplicados en encabezado');
+      assert.equal(status.headerCount,1,label+': botones duplicados en encabezado');
+      assert.equal(status.headerOpinions,1,label+': Opiniones debe seguir en el encabezado');
       assert.equal(status.pos,'fixed',label+': posición no es fija');
       assert.ok(Math.abs(status.bottom)<=2,label+': la barra debe llegar al borde inferior');
       assert.deepEqual(status.buttons.map(b=>b.name),ITEMS,label+': orden o etiquetas incorrectos');
@@ -113,20 +116,20 @@ async function visit(browser,name,width,height,dark,mobile){
           nav:cs(n),button:cs(b),label:cs(label)};
       });
       assert.notEqual(dockDebug.label.display,'none',label+': todas las etiquetas deben ser visibles: '+JSON.stringify(dockDebug));
-      for(const sport of ITEMS){
+      for(const sport of SECTIONS){
         // A real touch event detects obstructed or non-interactive menu controls.
         await page.locator('[data-cam-audit-nav] [data-category="'+sport+'"]').tap({timeout:4000});
         await page.waitForTimeout(240); // Account for intentional 160ms icon/color transitions.
         const state=await page.evaluate(()=>{
           const n=window.__camAuditNav().options[0];
           const current=n.node.querySelector('[data-category="'+n.items.find(b=>b.classList.contains('active'))?.dataset.category+'"]');
-          const labels=n.items.map(b=>({
+          const labels=n.items.filter(b=>b.dataset.category).map(b=>({
             category:b.dataset.category,
             display:getComputedStyle(b.querySelector('span:last-child')).display,
             ariaLabel:b.getAttribute('aria-label')
           }));
           return {live:window.__camAuditMarker?.stable===true,
-            capsule:n.node.classList.contains('cam-nav-has-active'),
+            capsule:!!current&&current.getAttribute('aria-current')==='page',
             pillWidth:parseFloat(n.node.style.getPropertyValue('--cam-pill-width')),
             iconColor:getComputedStyle(current.querySelector('svg.cam-mobile-nav-symbol')).color,
             ringRadius:getComputedStyle(current.querySelector('.ae-nav-icon')).borderRadius,
@@ -145,7 +148,7 @@ async function visit(browser,name,width,height,dark,mobile){
         assert.notEqual(state.ringFill,dark?'rgb(16, 37, 53)':'rgb(248, 242, 232)',
           label+': el círculo activo debe tener un relleno dorado sutil');
         for(const tab of state.labels){
-          assert.equal(tab.ariaLabel,tab.category,label+': botón sin nombre accesible');
+          assert.equal(tab.ariaLabel,tab.category==='Todos'?'Inicio':tab.category,label+': botón sin nombre accesible');
           assert.notEqual(tab.display,'none',label+': etiquetas siempre visibles');
         }
       }
@@ -153,8 +156,15 @@ async function visit(browser,name,width,height,dark,mobile){
       await page.waitForTimeout(120);
       assert.ok(await page.evaluate(()=>document.querySelector('nav.ae-sport-nav [data-category="Todos"]')?.classList.contains('active')),
         label+': el logo no abre Home');
-      assert.equal(await page.evaluate(()=>document.querySelector('body > nav.ae-sport-nav').classList.contains('cam-nav-has-active')),false,
-        label+': Home deja la cápsula seleccionada por error');
+      assert.deepEqual(await page.evaluate(()=>[...document.querySelectorAll('body > nav.ae-sport-nav [aria-current="page"]')].map(b=>b.dataset.category)),['Todos'],
+        label+': el logo debe seleccionar Inicio');
+      // Perfil (last tab) opens sign-in for visitors, without leaving the page.
+      await page.locator('[data-cam-audit-nav] #camNavProfile').tap({timeout:4000});
+      await page.waitForTimeout(200);
+      assert.ok(await page.evaluate(()=>!document.getElementById('userAuthModal').classList.contains('hidden')),
+        label+': Perfil no abre el acceso');
+      await page.evaluate(()=>typeof closeUserAuthModal==='function'?closeUserAuthModal():document.getElementById('userAuthModal').classList.add('hidden'));
+      await page.waitForTimeout(120);
       // Bypass the page's smooth-scroll animation before measuring the footer.
       // A fixed 125 ms wait can sample halfway through a long mobile page.
       await page.evaluate(()=>window.scrollTo({top:document.documentElement.scrollHeight,behavior:'instant'}));

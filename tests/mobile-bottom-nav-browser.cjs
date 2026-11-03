@@ -1,10 +1,11 @@
-/* Real browser QA for phone-only CAM SPORTS navigation; data/network isolated. */
+/* Real browser QA for the phone dock (Inicio · NFL · Fútbol · Picks · Perfil); data/network isolated. */
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const http = require('node:http');
 const { chromium } = require('playwright');
 const root = process.cwd();
+const DOCK = ['Todos','NFL','Fútbol','Picks','camNavProfile'];
 
 const server = http.createServer((req, res) => {
   const pathname = new URL(req.url, 'http://127.0.0.1').pathname;
@@ -52,14 +53,15 @@ const server = http.createServer((req, res) => {
           const buttons=Array.from(element.children).filter(el=>getComputedStyle(el).display!=='none');
           return {parent:element.parentElement.tagName,position:s.position,display:s.display,z:s.zIndex,
             top:r.top,bottom:r.bottom,width:r.width,height:r.height,background:s.backgroundColor,
-            buttons:buttons.map(b=>({key:b.dataset.category,rect:b.getBoundingClientRect().toJSON(),label:b.innerText}))};
+            buttons:buttons.map(b=>({key:b.dataset.category||b.id,rect:b.getBoundingClientRect().toJSON(),label:b.innerText}))};
         });
         assert.equal(layout.parent,phone?'BODY':'DIV',JSON.stringify({width,dark,layout}));
         assert.equal(layout.position,phone?'fixed':layout.position,JSON.stringify({width,dark,layout}));
         if(phone){
-          assert.equal(layout.buttons.length,4,JSON.stringify({width,dark,layout}));
-          for(const key of ['Picks','NFL','Fútbol','Opiniones']){
-            const icon=await page.locator('body > nav.ae-sport-nav > button[data-category="'+key+'"]').evaluate(button=>{
+          assert.equal(layout.buttons.length,5,JSON.stringify({width,dark,layout}));
+          for(const key of DOCK){
+            const selector=key==='camNavProfile'?'#camNavProfile':'[data-category="'+key+'"]';
+            const icon=await page.locator('body > nav.ae-sport-nav > button'+selector).evaluate(button=>{
               const svg=button.querySelector('svg.cam-mobile-nav-symbol');
               const image=button.querySelector('img.ae-custom-sport-icon');
               return {
@@ -84,9 +86,21 @@ const server = http.createServer((req, res) => {
             assert.ok(icon.circleSize>=35 && icon.circleSize<=37,key+' same small circle frame');
             assert.equal(icon.circleRadius,'50%',key+' circular stroke');
             assert.notEqual(icon.caption,'none',key+' caption remains visible');
-            assert.equal(icon.iconColor,dark?'rgb(210, 192, 166)':'rgb(24, 51, 67)',key+' inactive theme color');
+            // The page opens on Inicio, so that tab carries the selected colour.
+            const selected=key==='Todos';
+            const inactive=dark?'rgb(210, 192, 166)':'rgb(24, 51, 67)';
+            if(selected) assert.notEqual(icon.iconColor,inactive,key+' selected tab is highlighted');
+            else assert.equal(icon.iconColor,inactive,key+' inactive theme color');
           }
-          assert.deepEqual(layout.buttons.map(b=>b.key),['Picks','NFL','Fútbol','Opiniones']);
+          assert.deepEqual(layout.buttons.map(b=>b.key),DOCK,'Inicio · NFL · Fútbol · Picks · Perfil, Perfil last');
+          // Opiniones stays one tap away in the header; Perfil replaces the header sign-in/profile.
+          const header=await page.evaluate(()=>({
+            opinions:!!document.querySelector('body > header .ae-header-actions > button[data-category="Opiniones"]'),
+            opinionsVisible:getComputedStyle(document.querySelector('button[data-category="Opiniones"]')).display!=='none',
+            login:getComputedStyle(document.getElementById('guestAdminContainer')).display
+          }));
+          assert.ok(header.opinions && header.opinionsVisible,JSON.stringify({width,dark,header}));
+          assert.equal(header.login,'none','sign-in lives in the dock Perfil tab on phones');
           assert.ok(Math.abs(layout.bottom-780)<=1,JSON.stringify({width,dark,layout}));
           assert.ok(Math.abs(layout.width-width)<=1,JSON.stringify({width,dark,layout}));
           assert.equal(layout.display,'flex','mobile dock should use flexible icon spacing');
@@ -104,6 +118,9 @@ const server = http.createServer((req, res) => {
             JSON.stringify({width,dark,end,layoutHeight:layout.height}));
         }else{
           assert.notEqual(layout.position,'fixed',JSON.stringify({width,dark,layout}));
+          assert.equal(await page.locator('#camNavProfile').count(),0,'Perfil tab is phone-only');
+          assert.equal(await page.evaluate(()=>document.querySelector('[data-category="Todos"]').hidden),true,'Inicio stays hidden on desktop (the logo goes home)');
+          assert.deepEqual(await page.evaluate(()=>Array.from(document.querySelectorAll('header nav.ae-sport-nav > button')).filter(b=>!b.hidden).map(b=>b.dataset.category)),['Picks','NFL','Fútbol','Opiniones'],'desktop order unchanged');
           for(const key of ['Picks','NFL','Fútbol','Opiniones']){
             const restored=await page.locator('header nav.ae-sport-nav > button[data-category="'+key+'"]').evaluate(button=>({
               vector:getComputedStyle(button.querySelector('svg.cam-mobile-nav-symbol')).display,
@@ -129,7 +146,7 @@ const server = http.createServer((req, res) => {
       const a=active.querySelector('.ae-nav-icon');
       const b=normal.querySelector('.ae-nav-icon');
       return {
-        active:el.classList.contains('cam-nav-has-active'),
+        active:active.getAttribute('aria-pressed')==='true',
         activeColor:getComputedStyle(active.querySelector('svg.cam-mobile-nav-symbol')).color,
         selectedBorder:getComputedStyle(a).borderTopColor,
         selectedFill:getComputedStyle(a).backgroundColor,
@@ -149,29 +166,41 @@ const server = http.createServer((req, res) => {
     assert.notEqual(nflSelected.text,'none');
     assert.notEqual(nflSelected.inactiveText,'none');
     assert.equal(nflSelected.accessible,'Picks');
-    await page.evaluate(()=>filterByCategory('Opiniones'));
-    await page.waitForFunction(()=>document.querySelector('body > nav [data-category="Opiniones"]').getAttribute('aria-current')==='page');
+    await page.locator('body > nav [data-category="Picks"]').click();
+    await page.waitForFunction(()=>document.querySelector('body > nav [data-category="Picks"]').getAttribute('aria-current')==='page');
     await page.waitForTimeout(210);
-    const opinionSelected=await nav.evaluate(el=>{
-      const button=el.querySelector('[data-category="Opiniones"]');
+    const picksSelected=await nav.evaluate(el=>{
+      const button=el.querySelector('[data-category="Picks"]');
       const label=button.querySelector('span:last-child');
       return {
         iconColor:getComputedStyle(button.querySelector('svg.cam-mobile-nav-symbol')).color,
         circleSize:button.querySelector('.ae-nav-icon').getBoundingClientRect().width,
         labelVisible:getComputedStyle(label).display!=='none',
         fits:label.scrollWidth<=label.clientWidth+1,
-        indicator:getComputedStyle(el,'::before').content
+        indicator:getComputedStyle(el,'::before').content,
+        nflOff:!el.querySelector('[data-category="NFL"]').hasAttribute('aria-current')
       };
     });
-    assert.equal(opinionSelected.iconColor,'rgb(136, 98, 55)');
-    assert.equal(opinionSelected.circleSize,nflSelected.selectedCircle.width);
-    assert.ok(opinionSelected.labelVisible && opinionSelected.fits,JSON.stringify(opinionSelected));
-    assert.equal(opinionSelected.indicator,'none','old moving pill is removed');
+    assert.equal(picksSelected.iconColor,'rgb(136, 98, 55)');
+    assert.equal(picksSelected.circleSize,nflSelected.selectedCircle.width);
+    assert.ok(picksSelected.labelVisible && picksSelected.fits && picksSelected.nflOff,JSON.stringify(picksSelected));
+    assert.equal(picksSelected.indicator,'none','old moving pill is removed');
     await page.evaluate(()=>document.documentElement.classList.add('dark'));
     await page.waitForTimeout(210);
-    assert.equal(await page.locator('body > nav [data-category="Opiniones"] svg.cam-mobile-nav-symbol').evaluate(svg=>getComputedStyle(svg).color),'rgb(217, 171, 112)','night selected icon is gold, never white');
-    await page.evaluate(()=>filterByCategory('Todos'));
-    await page.waitForFunction(()=>!document.querySelector('body > nav').classList.contains('cam-nav-has-active'));
+    assert.equal(await page.locator('body > nav [data-category="Picks"] svg.cam-mobile-nav-symbol').evaluate(svg=>getComputedStyle(svg).color),'rgb(217, 171, 112)','night selected icon is gold, never white');
+    // Opiniones (header) still marks itself as the current page.
+    await page.evaluate(()=>filterByCategory('Opiniones'));
+    await page.waitForFunction(()=>document.querySelector('header [data-category="Opiniones"]').getAttribute('aria-current')==='page');
+    assert.equal(await page.evaluate(()=>document.querySelectorAll('body > nav [aria-current="page"]').length),0,'no dock tab is falsely selected on Opiniones');
+    // Inicio is the first tab and the home page selects it.
+    await page.locator('body > nav [data-category="Todos"]').click();
+    await page.waitForFunction(()=>document.querySelector('body > nav [data-category="Todos"]').getAttribute('aria-current')==='page');
+    assert.equal(await page.evaluate(()=>document.body.dataset.section),'Todos');
+    // Perfil opens the profile when available, otherwise sign-in.
+    await page.evaluate(()=>{window.__opened=[];window.openAeProfile=()=>window.__opened.push('perfil');});
+    await page.locator('#camNavProfile').click();
+    assert.deepEqual(await page.evaluate(()=>window.__opened),['perfil']);
+    assert.match(await page.locator('#camNavProfile').getAttribute('aria-label'),/perfil/i);
     const input=page.locator('#mobileSearchInput');
     await input.evaluate(el=>{el.hidden=false;el.removeAttribute('aria-hidden');});
     await input.focus();
@@ -185,6 +214,7 @@ const server = http.createServer((req, res) => {
     await page.setViewportSize({width:1366,height:780});
     assert.equal(await nav.evaluate(el=>!!el.closest('header')),true,'tablet/desktop header must regain real nav');
     assert.equal(await page.locator('.category-btn').count(),9,'never duplicate category buttons');
+    assert.equal(await page.evaluate(()=>!!document.querySelector('header nav.ae-sport-nav > [data-category="Opiniones"]')),true,'Opiniones returns to the desktop nav');
     await page.close();
     console.log('PASS: CAM SPORTS Chromium layout 320–1366 px, day/night, scroll, links, modal, input and desktop.');
   } finally {await browser.close();server.close();}

@@ -47,6 +47,8 @@ def fake(user=None, admin=False, predictions=()):
 
 def open_sport(page, sport='Fútbol'):
     page.evaluate("sport => filterByCategory(sport)", sport)
+    # En el teléfono, «¿Quién será campeón?» está en la pestaña Quiniela.
+    page.evaluate("window.camSectionTabs?.select('quiniela')")
     page.wait_for_selector('#aeSeasonPredictions:not([hidden]) .ae-season-card', timeout=15000)
 
 

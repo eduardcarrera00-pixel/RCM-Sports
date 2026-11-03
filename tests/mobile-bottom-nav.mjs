@@ -1,4 +1,5 @@
-/* Regression: the four existing sport buttons become the phone dock, never clones. */
+/* Regression: the real header buttons become the phone dock Inicio · NFL · Fútbol · Picks · Perfil,
+   never clones; Opiniones moves to the header actions and everything returns on desktop. */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -19,19 +20,22 @@ assert.match(css, /env\(safe-area-inset-bottom/);
 assert.match(css, /display: flex !important/);
 assert.match(css, /bottom: 0 !important/);
 assert.match(css, /width: 100% !important/);
-assert.match(css, /border-radius: 50% !important/);
+const headerCSS = readFileSync(resolve(root, 'assets/cam-header-system.css'), 'utf8');
+assert.match(headerCSS, /border-radius: 50% !important/);
 assert.match(readFileSync(new URL('../assets/cam-rounded-editorial.css', import.meta.url), 'utf8'), /@layer cam-rounded-editorial[\s\S]*\.ae-nav-icon[\s\S]*border-radius:50%!important/);
 assert.match(css, /content: none !important/);
-assert.match(css, /color: #d9ab70 !important/);
-assert.match(css, /color: #886237 !important/);
+assert.match(headerCSS, /color: #d9ab70 !important/);
+assert.match(headerCSS, /color: #886237 !important/);
 assert.match(index, /viewport-fit=cover/);
 assert.match(css, /prefers-reduced-motion: reduce/);
 assert.match(css, /svg\.cam-mobile-nav-symbol/);
-assert.match(css, /calc\(7px \+ env\(safe-area-inset-bottom/);
+assert.match(css, /calc\(6px \+ env\(safe-area-inset-bottom/);
+assert.match(css, /#camNavProfile/);
+assert.match(css, /nav#camSectionTabs/);
+assert.match(index, /cam-mobile-sections\.js/);
 assert.match(css, /img\.ae-custom-sport-icon\s*\{\s*display: none !important/);
 assert.doesNotMatch(css, /@media\s*\(min-width:/);
 assert.match(visibility, /querySelector\('nav\.ae-sport-nav'\)/);
-const headerCSS = readFileSync(resolve(root, 'assets/cam-header-system.css'), 'utf8');
 assert.match(headerCSS, /html:not\(\.dark\) body > header nav\.ae-sport-nav[\s\S]*?drop-shadow\(/);
 assert.match(headerCSS, /body > nav\.cam-mobile-bottom-nav \.category-btn svg\.cam-mobile-nav-symbol/);
 assert.doesNotMatch(index, /<span class="ae-mobile-theme-caption"[^>]*>Modo<\/span>/);
@@ -41,6 +45,7 @@ assert.match(index, /id="themeToggle"[\s\S]*?aria-label="Activar modo oscuro"/);
 const window = new Window({ url: 'https://camsports.github.io/' });
 const { document } = window;
 const primary = ['Picks', 'NFL', 'Fútbol', 'Opiniones'];
+const dock = ['Todos', 'NFL', 'Fútbol', 'Picks'];
 const sourceNav = index.match(/<nav class="ae-sport-nav"[^>]*>[\s\S]*?<\/nav>/)[0];
 document.body.innerHTML = `
   <header>
@@ -73,9 +78,31 @@ vm.runInNewContext(js, {
 
 assert.equal(nav.parentElement, document.body, 'phone: move original nav outside sticky/backdrop header');
 assert.equal(nav.classList.contains('cam-mobile-bottom-nav'), true);
-assert.equal(nav.querySelectorAll('.category-btn').length, 9, 'existing optional buttons remain in DOM');
-assert.equal(document.querySelectorAll('.category-btn').length, 9, 'do not duplicate controls');
-for (const [key, button] of originalButtons) assert.equal(nav.querySelector('[data-category="' + key + '"]'), button);
+const profile = document.getElementById('camNavProfile');
+assert.ok(profile, 'phone: Perfil tab exists');
+assert.equal(profile.parentElement, nav);
+assert.equal(nav.querySelectorAll('.category-btn').length, 9, 'eight real buttons plus Perfil');
+assert.equal(document.querySelectorAll('.category-btn').length, 10, 'do not duplicate controls');
+assert.equal(document.querySelectorAll('.category-btn[data-category]').length, 9, 'category buttons are never cloned');
+for (const [key, button] of originalButtons) {
+  if (key === 'Opiniones') continue;
+  assert.equal(nav.querySelector('[data-category="' + key + '"]'), button);
+}
+// Dock order: Inicio · NFL · Fútbol · Picks · Perfil (Perfil always last of the visible tabs).
+const visibleDock = Array.from(nav.children).filter(button => button === profile || dock.includes(button.dataset.category));
+assert.deepEqual(visibleDock.map(button => button.dataset.category || button.id), [...dock, 'camNavProfile']);
+assert.equal(nav.children[dock.length], profile, 'Perfil follows the four sections');
+const home = originalButtons.get('Todos');
+assert.equal(home.hidden, false, 'phone: Inicio is visible');
+assert.ok(home.querySelector('svg.cam-mobile-nav-symbol'), 'phone: Inicio has its icon');
+assert.equal(home.textContent.trim(), 'Inicio');
+assert.equal(home.getAttribute('aria-label'), 'Inicio');
+assert.ok(profile.querySelector('svg.cam-mobile-nav-symbol'), 'Perfil has its icon');
+assert.equal(profile.textContent.trim(), 'Perfil');
+assert.match(profile.getAttribute('aria-label'), /perfil/i);
+const opinions = originalButtons.get('Opiniones');
+assert.equal(opinions.parentElement, document.querySelector('header .ae-header-actions'), 'phone: Opiniones lives in the header');
+assert.equal(opinions.parentElement.firstElementChild, opinions);
 for (const category of primary) {
   const button = originalButtons.get(category);
   const icon = button.querySelector('svg.cam-mobile-nav-symbol');
@@ -104,19 +131,33 @@ assert.equal(originalButtons.get('NFL').getAttribute('aria-current'), 'page');
 assert.equal(originalButtons.get('NFL').getAttribute('aria-pressed'), 'true');
 assert.equal(originalButtons.get('NFL').getAttribute('aria-label'), 'NFL');
 assert.equal(originalButtons.get('Opiniones').getAttribute('aria-label'), 'Opiniones');
-assert.equal(nav.classList.contains('cam-nav-has-active'), true);
 assert.equal(originalButtons.get('Picks').getAttribute('aria-pressed'), 'false');
 originalButtons.get('Fútbol').classList.add('active');
 originalButtons.get('NFL').classList.remove('active');
 await new Promise(resolve => setTimeout(resolve, 0));
 assert.equal(originalButtons.get('Fútbol').getAttribute('aria-current'), 'page');
 assert.equal(originalButtons.get('NFL').hasAttribute('aria-current'), false);
-// Home uses the hidden Todos filter: there must be no stale capsule.
+// Home (the Todos filter) selects Inicio only.
 allButtons.forEach(button => button.classList.remove('active'));
 originalButtons.get('Todos').classList.add('active');
 await new Promise(resolve => setTimeout(resolve, 0));
-assert.equal(nav.classList.contains('cam-nav-has-active'), false);
-assert.equal(primary.every(key => originalButtons.get(key).getAttribute('aria-pressed') === 'false'), true);
+assert.equal(originalButtons.get('Todos').getAttribute('aria-current'), 'page');
+assert.equal(dock.filter(key => key !== 'Todos').every(key => originalButtons.get(key).getAttribute('aria-pressed') === 'false'), true);
+// Opiniones (header) is still marked as the current page when open.
+allButtons.forEach(button => button.classList.remove('active'));
+opinions.classList.add('active');
+await new Promise(resolve => setTimeout(resolve, 0));
+assert.equal(opinions.getAttribute('aria-current'), 'page');
+assert.equal(dock.every(key => !originalButtons.get(key).hasAttribute('aria-current')), true);
+// Perfil opens the profile (or sign-in when the profile module is missing).
+const opened = [];
+window.openAeProfile = () => opened.push('perfil');
+profile.click();
+assert.deepEqual(opened, ['perfil']);
+delete window.openAeProfile;
+window.openUserAuthModal = () => opened.push('login');
+profile.click();
+assert.deepEqual(opened, ['perfil', 'login']);
 
 // A mobile keyboard/editor should hide the dock until input focus ends.
 const input = document.getElementById('composerInput');
@@ -139,6 +180,11 @@ for (const category of primary) {
   assert.equal(originalButtons.get(category).querySelectorAll('svg.cam-mobile-nav-symbol').length, 1);
 }
 assert.equal(nav.classList.contains('cam-mobile-bottom-nav'), false);
+assert.equal(document.getElementById('camNavProfile'), null, 'desktop: no Perfil tab');
+assert.equal(opinions.parentElement, nav, 'desktop: Opiniones returns to the nav');
+assert.deepEqual(Array.from(nav.children), allButtons, 'desktop: original order restored');
+assert.equal(home.hidden, true, 'desktop: Inicio hidden again (the logo goes home)');
+assert.equal(home.textContent.trim(), 'Todos');
 assert.equal(nav.getAttribute('aria-label'), 'Explorar deportes');
 assert.equal(originalButtons.get('NFL').hasAttribute('aria-label'), false);
 assert.equal(nav.classList.contains('cam-nav-has-active'), false);
@@ -148,7 +194,8 @@ assert.equal(allButtons.every(button => originalButtons.get(button.dataset.categ
 isPhone = true;
 mobileListeners.forEach(listener => listener({ matches: true }));
 assert.equal(nav.parentElement, document.body);
-assert.equal(document.querySelectorAll('.category-btn').length, 9);
+assert.equal(document.querySelectorAll('.category-btn').length, 10);
+assert.equal(document.querySelectorAll('#camNavProfile').length, 1);
 
 window.happyDOM.abort();
 console.log('CAM SPORTS mobile bottom navigation: checks passed');

@@ -546,8 +546,9 @@ def scenario_entries(dark, width, tag):
     page = open_page("window.__fake.start='ana';", dark, width)
     try:
         page.evaluate("filterByCategory('Picks')")
-        page.wait_for_selector('#camPartyEntryPicks', state='visible', timeout=8000)
+        # En el teléfono está en la pestaña Chefs: ir a él la abre (cam-mobile-sections.js).
         page.evaluate("document.getElementById('camPartyEntryPicks').scrollIntoView({block:'center'})")
+        page.wait_for_selector('#camPartyEntryPicks', state='visible', timeout=8000)
         page.wait_for_timeout(300)
         check_clean(page, tag + ' acceso Picks')
         shot(page, f'{tag}-acceso-picks')
@@ -558,8 +559,9 @@ def scenario_entries(dark, width, tag):
         for category in ('Fútbol', 'NFL'):
             page.evaluate(f"filterByCategory({category!r})")
             page.wait_for_timeout(1500)
-            assert visible(page, '#camPartyEntryTakes'), category
+            # En el teléfono está en la pestaña Clasificación.
             page.evaluate("document.getElementById('camPartyEntryTakes').scrollIntoView({block:'center'})")
+            assert visible(page, '#camPartyEntryTakes'), category
             page.wait_for_timeout(300)
             check_clean(page, tag + ' acceso Takes ' + category)
             if category == 'Fútbol':

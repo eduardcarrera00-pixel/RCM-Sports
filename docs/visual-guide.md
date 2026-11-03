@@ -173,3 +173,24 @@ oscuro conserva el degradado sin sombreado adicional. El control de tema mantien
 sus nombres accesibles dinámicos (Activar modo claro/oscuro), pero solo muestra
 el pictograma: se retira la etiqueta visual «Modo». El espaciado conserva el
 marco invisible de la segunda línea para alinear los símbolos con el menú.
+
+## Navegación del teléfono · 3 nov 2026
+
+La barra inferior del teléfono es la de una aplicación: **Inicio · NFL · Fútbol ·
+Picks · Perfil**, con Perfil siempre al final. Reutiliza los botones reales de la
+cabecera (Inicio es el filtro «Todos», oculto en escritorio) y añade Perfil, que
+abre el perfil propio o, sin sesión, el acceso. En el teléfono la cabecera ya no
+muestra «Mi perfil» ni «Iniciar sesión»; Opiniones pasa a la cabecera con el
+mismo símbolo. Las cinco pestañas usan aros de 35 px con símbolos de 22 px.
+Tocar otra vez la sección activa sube al principio.
+
+Dentro de NFL y Fútbol, una barra de pestañas fija bajo la cabecera muestra un
+apartado cada vez: **Noticias · Takes · Quiniela · Clasificación** (Power
+Rankings y Top 10 van juntos en Clasificación; «¿Quién será campeón?» en
+Quiniela). Picks tiene **Picks · Historial · Chefs**. No se mueve ni se copia
+ningún módulo: `assets/cam-mobile-sections.js` solo marca la pestaña en `<body>`
+y `assets/cam-mobile-bottom-nav.css` oculta el resto. Cada sección tiene su
+dirección (`?s=nfl&v=quiniela`): cambiar de sección suma un paso al botón Atrás
+del teléfono y cambiar de pestaña no. Un atajo que lleva a un módulo (Top 10,
+Pick del editor) abre antes su pestaña. El escritorio no cambia.
+Pruebas: `python3 -B tests/mobile-sections.py` y `node tests/mobile-bottom-nav-browser.cjs`.

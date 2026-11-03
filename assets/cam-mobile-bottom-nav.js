@@ -1,4 +1,8 @@
-/* CAM SPORTS — reuse the real category buttons in a phone-only capsule dock. */
+/* CAM SPORTS — phone app dock: Inicio · NFL · Fútbol · Picks · Perfil.
+   Reuses the real header category buttons (same handlers, same filterByCategory);
+   only their place and order change on phones. Opiniones moves to the header
+   actions, and the dock gains a Perfil button that opens the profile (or sign-in).
+   Everything is restored exactly on wider screens. */
 (() => {
   'use strict';
 
@@ -10,81 +14,132 @@
   const originalNextSibling = nav.nextSibling;
   const originalLabel = nav.getAttribute('aria-label') || 'Explorar deportes';
   const buttons = Array.from(nav.querySelectorAll('button.category-btn[data-category]'));
-  const mainSports = new Set(['Picks', 'NFL', 'Fútbol', 'Opiniones']);
+  const originalOrder = buttons.slice();
+  const byCategory = key => buttons.find(button => button.dataset.category === key) || null;
+  const home = byCategory('Todos');
+  const opinions = byCategory('Opiniones');
+  // Order of the phone dock; Perfil is appended after these.
+  const DOCK = ['Todos', 'NFL', 'Fútbol', 'Picks'];
+  const dockButtons = DOCK.map(byCategory).filter(Boolean);
   const originalButtonLabels = new Map(buttons.map(button => [button, button.getAttribute('aria-label')]));
+  const homeOriginal = home ? { html: home.innerHTML, hidden: home.hidden } : null;
+  const actions = document.querySelector('body > header .ae-header-actions');
   const editableSelector = 'input:not([type="checkbox"]):not([type="radio"]), textarea, select, [contenteditable="true"]';
+  const svgAttrs = 'class="cam-category-nav-symbol cam-mobile-nav-symbol" viewBox="1.750 1.750 20.500 20.500" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.55" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"';
+  const HOME_ICON = '<span class="ae-nav-icon"><svg ' + svgAttrs + '><path d="M2.9 11.3 12 3.5l9.1 7.8"/><path d="M5.3 9.5v11.1h13.4V9.5"/><path d="M16 5.9V4h2.2v3.8"/><path d="M9.9 20.6v-5.3a.9.9 0 0 1 .9-.9h2.4a.9.9 0 0 1 .9.9v5.3Z" fill="currentColor" stroke="none"/></svg></span><span>Inicio</span>';
+  const PROFILE_ICON = '<span class="ae-nav-icon"><svg ' + svgAttrs + '><circle cx="12" cy="8.1" r="4.2" fill="currentColor" fill-opacity=".22"/><path d="M3.7 21c.7-4.4 4.1-7.1 8.3-7.1s7.6 2.7 8.3 7.1Z" fill="currentColor" fill-opacity=".22"/></svg></span><span>Perfil</span>';
 
-  // All four primary sections use one inline SVG, shared by desktop and phone.
-  // Reparenting the existing nav never recreates icons or event handlers.
+  // A plain category-btn keeps the dock's shared styling. It has no data-category,
+  // so filterByCategory never marks it active and sport counts ignore it.
+  const profile = document.createElement('button');
+  profile.type = 'button';
+  profile.id = 'camNavProfile';
+  profile.className = 'category-btn';
+  profile.innerHTML = PROFILE_ICON;
+  profile.addEventListener('click', () => {
+    if (typeof window.openAeProfile === 'function') window.openAeProfile();
+    else if (typeof window.openUserAuthModal === 'function') window.openUserAuthModal();
+  });
 
-  function positionCapsule(activeButton) {
-    if (!mobile.matches || nav.parentNode !== document.body) return;
-    if (!activeButton) {
-      nav.classList.remove('cam-nav-has-active');
-      return;
-    }
-    // The indicator is a single nav pseudo-element; no duplicate links or overlays.
-    const bar = nav.getBoundingClientRect();
-    const target = activeButton.getBoundingClientRect();
-    if (bar.width > 0 && target.width > 0) {
-      const left = Math.max(0, target.left - bar.left + 2);
-      nav.style.setProperty('--cam-pill-left', left.toFixed(2) + 'px');
-      nav.style.setProperty('--cam-pill-width', Math.max(0, target.width - 4).toFixed(2) + 'px');
-    }
-    nav.classList.add('cam-nav-has-active');
+  const signedIn = () => (typeof currentUser !== 'undefined' && Boolean(currentUser)) ||
+    (typeof currentAdmin !== 'undefined' && Boolean(currentAdmin));
+  function labelProfile() {
+    const name = (typeof currentUser !== 'undefined' && currentUser?.username) ||
+      (typeof currentAdmin !== 'undefined' && currentAdmin?.name) || '';
+    const label = signedIn() ? (name ? 'Mi perfil, ' + name : 'Mi perfil') : 'Perfil: iniciar sesión o crear cuenta';
+    profile.setAttribute('aria-label', label);
+    profile.title = signedIn() ? 'Mi perfil' : 'Iniciar sesión';
   }
 
+  let lastActive = null;
   function updateActive() {
-    let activeMain = null;
-    for (const button of buttons) {
-      // Existing filterByCategory() is still the only navigation implementation.
-      const active = button.classList.contains('active');
-      if (mainSports.has(button.dataset.category)) {
-        button.setAttribute('aria-pressed', String(active));
-        if (active) {
-          button.setAttribute('aria-current', 'page');
-          activeMain = button;
-        } else {
-          button.removeAttribute('aria-current');
-        }
-      }
+    let active = null;
+    for (const button of dockButtons) {
+      const on = button.classList.contains('active');
+      button.setAttribute('aria-pressed', String(on));
+      if (on) { button.setAttribute('aria-current', 'page'); active = button; }
+      else button.removeAttribute('aria-current');
     }
-    // Home ("Todos") and optional sections have no falsely selected main tab.
-    positionCapsule(activeMain);
+    if (opinions) {
+      if (opinions.classList.contains('active')) opinions.setAttribute('aria-current', 'page');
+      else opinions.removeAttribute('aria-current');
+    }
+    lastActive = active;
+    labelProfile();
+  }
+
+  function phoneLayout() {
+    if (nav.parentNode !== document.body) document.body.appendChild(nav);
+    nav.classList.add('cam-mobile-bottom-nav');
+    nav.setAttribute('aria-label', 'Secciones principales de CAM SPORTS');
+    if (home) {
+      if (!home.querySelector('.ae-nav-icon')) home.innerHTML = HOME_ICON;
+      home.hidden = false;
+      home.removeAttribute('aria-hidden');
+    }
+    // Inicio · NFL · Fútbol · Picks · Perfil, then the dormant optional sports.
+    for (const button of dockButtons) nav.appendChild(button);
+    nav.appendChild(profile);
+    for (const button of originalOrder) {
+      if (!dockButtons.includes(button) && button !== opinions) nav.appendChild(button);
+    }
+    // Opiniones stays one tap away, at the start of the header actions.
+    if (opinions && actions && opinions.parentNode !== actions) actions.insertBefore(opinions, actions.firstChild);
+    for (const button of [...dockButtons, opinions].filter(Boolean)) button.setAttribute('aria-label', button === home ? 'Inicio' : button.dataset.category);
+  }
+
+  function desktopLayout() {
+    if (nav.parentNode !== originalParent) originalParent.insertBefore(nav, originalNextSibling);
+    profile.remove();
+    for (const button of originalOrder) nav.appendChild(button);
+    if (home && homeOriginal) {
+      home.innerHTML = homeOriginal.html;
+      home.hidden = homeOriginal.hidden;
+    }
+    nav.classList.remove('cam-mobile-bottom-nav', 'cam-nav-has-active');
+    nav.style.removeProperty('--cam-pill-left');
+    nav.style.removeProperty('--cam-pill-width');
+    nav.setAttribute('aria-label', originalLabel);
+    document.body.classList.remove('cam-mobile-input-focus');
+    for (const button of buttons) {
+      const original = originalButtonLabels.get(button);
+      if (original === null || original === undefined) button.removeAttribute('aria-label');
+      else button.setAttribute('aria-label', original);
+    }
   }
 
   function updatePlacement() {
-    if (mobile.matches) {
-      if (nav.parentNode !== document.body) document.body.appendChild(nav);
-      nav.classList.add('cam-mobile-bottom-nav');
-      nav.setAttribute('aria-label', 'Secciones principales de CAM SPORTS');
-      // Inactive text is visually hidden, so preserve explicit accessible names.
-      for (const button of buttons) {
-        if (mainSports.has(button.dataset.category)) button.setAttribute('aria-label', button.dataset.category);
-      }
-    } else {
-      if (nav.parentNode !== originalParent) originalParent.insertBefore(nav, originalNextSibling);
-      nav.classList.remove('cam-mobile-bottom-nav', 'cam-nav-has-active');
-      nav.style.removeProperty('--cam-pill-left');
-      nav.style.removeProperty('--cam-pill-width');
-      nav.setAttribute('aria-label', originalLabel);
-      document.body.classList.remove('cam-mobile-input-focus');
-      for (const button of buttons) {
-        const original = originalButtonLabels.get(button);
-        if (original === null) button.removeAttribute('aria-label');
-        else button.setAttribute('aria-label', original);
-      }
-    }
+    if (mobile.matches) phoneLayout();
+    else desktopLayout();
     updateActive();
   }
 
   // Reflect section changes from the nav, footer, logo and every existing script.
   const observer = new MutationObserver(updateActive);
   for (const button of buttons) observer.observe(button, { attributes: true, attributeFilter: ['class'] });
-  nav.addEventListener('click', () => Promise.resolve().then(updateActive));
+
+  // Tapping the tab you are already on returns to the top, as in phone apps.
+  let reselect = false;
+  nav.addEventListener('click', event => {
+    const button = event.target.closest?.('button.category-btn[data-category]');
+    reselect = Boolean(button && mobile.matches && button === lastActive);
+  }, true);
+  nav.addEventListener('click', () => {
+    const again = reselect;
+    reselect = false;
+    Promise.resolve().then(() => {
+      updateActive();
+      if (again) {
+        const smooth = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        window.scrollTo({ top: 0, behavior: smooth ? 'smooth' : 'auto' });
+        document.dispatchEvent(new CustomEvent('cam:dock-reselect'));
+      }
+    });
+  });
   window.addEventListener('pageshow', updateActive);
   window.addEventListener('popstate', updateActive);
   window.addEventListener('resize', updateActive);
+  document.addEventListener('focusin', event => { if (event.target === profile) labelProfile(); });
 
   function isEditing(element) {
     return element instanceof Element && !!element.closest(editableSelector);
@@ -105,4 +160,5 @@
     mobile.addListener(updatePlacement);
   }
   updatePlacement();
+  window.camMobileDock = Object.freeze({ profile, update: updateActive });
 })();

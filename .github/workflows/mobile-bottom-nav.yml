@@ -5,6 +5,7 @@ on:
     paths:
       - 'assets/cam-mobile-bottom-nav.js'
       - 'assets/cam-mobile-bottom-nav.css'
+      - 'assets/cam-mobile-sections.js'
       - 'assets/ae-category-visibility.js'
       - 'index.html'
       - 'tests/mobile-bottom-nav.mjs'
