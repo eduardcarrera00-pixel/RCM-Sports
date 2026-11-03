@@ -150,6 +150,16 @@
     opacity: 1 !important; filter: brightness(.86) saturate(.68) !important;
     pointer-events: none !important;
   }
+
+  /* Daylight contrast: outline the painted glyph itself, not its 32px frame.
+     Every sport and user control keeps the same bronze art in both themes. */
+  html:not(.dark) body > header nav.ae-sport-nav .category-btn .ae-nav-icon > svg.cam-category-nav-symbol,
+  html:not(.dark) body > header .ae-header-actions svg.cam-ui-symbol,
+  html:not(.dark) body > nav.cam-mobile-bottom-nav .category-btn svg.cam-mobile-nav-symbol,
+  html:not(.dark) body > header :is(.ae-classical-logout,.ae-signout-action)::before {
+    filter: drop-shadow(0 0 .75px rgba(9, 24, 36, .95))
+            drop-shadow(0 .6px .25px rgba(9, 24, 36, .7)) !important;
+  }
   body > header .cam-mobile-nav-symbol:not(.cam-category-nav-symbol) { display: none !important; }
   body > header :is(.category-btn > span:not(.ae-nav-icon),.ae-login-label,.ae-auth-caption,
       .ae-mobile-theme-caption,.ae-notifications-caption,.cam-global-edit-label,#adminNameDisplay) {
