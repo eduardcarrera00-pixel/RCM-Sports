@@ -22,23 +22,17 @@
     --cam-banner-card-height:120px;
     --cam-banner-title-size:clamp(20px,1.8vw,25px);
   }
+  /* Night: every banner symbol uses the gold of Popular Takes, just as every
+     day symbol uses the title blue. Titles stay ivory in both cases. */
   html.dark {
     --cam-banner-fill:#0b2233;
     --cam-banner-title:#f3ebdd;
     --cam-banner-copy:#c2cdd4;
-    --cam-banner-ink:#f3ebdd;
+    --cam-banner-ink:#e8bf79;
     --cam-banner-accent:#b79a76;
     --cam-banner-border:#52616a;
     --cam-banner-panel:var(--ds-surface,#102b3e);
   }
-
-  /* The four community symbols use the supplied gold night variant. */
-  html.dark :is(
-    [data-cam-banner-key="portada.populares-noche"],
-    [data-cam-banner-key="portada.impopulares-noche"],
-    [data-cam-banner-key="portada.top-takes-noche"],
-    [data-cam-banner-key="portada.top-takes-cuestionados-noche"]
-  ) { --cam-banner-ink:#e8bf79; }
 
   /* The same frame is used by cards, calls to action and section headers. */
   [data-cam-banner] {
@@ -412,7 +406,7 @@
   .cam-nfl-top {
     --q-on-band:var(--cam-banner-title);
     --q-on-band-muted:var(--cam-banner-copy);
-    --q-band-control:color-mix(in srgb,var(--cam-banner-ink) 5%,var(--cam-banner-fill));
+    --q-band-control:color-mix(in srgb,var(--cam-banner-title) 5%,var(--cam-banner-fill));
     --q-band-line:var(--cam-banner-accent);
     padding:var(--cam-banner-pad)!important;
     background:var(--cam-banner-fill)!important;
