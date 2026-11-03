@@ -1,4 +1,4 @@
-/* CAM SPORTS CSS cascade equivalence: 94-source vs 83-source bundle, using
+/* CAM SPORTS CSS cascade equivalence: original vs deduplicated bundle, using
  * today's component CSS in both. Intentional visual changes must not be
  * compared against the historical site's colours or geometry.
  * Same markup, same remaining linked stylesheets, same assets.
@@ -20,9 +20,17 @@ const before=JSON.parse(execFileSync('git',['show',repoBase+':assets/style-sourc
 const after=JSON.parse(fs.readFileSync('assets/style-sources.json','utf8'));
 const packs=JSON.parse(fs.readFileSync('assets/performance-css-packs.json','utf8')).groups.flatMap(x=>x.sources);
 const removed=before.filter(p=>!after.includes(p));
+const added=after.filter(p=>!before.includes(p));
 assert.equal(removed.length,11,'The eleven later-duplicated CSS sources are removed');
-assert.deepEqual(after,before.filter(p=>!removed.includes(p)),'Preserve every other editorial source and its order');
+assert.deepEqual(after.filter(p=>!added.includes(p)),before.filter(p=>!removed.includes(p)),
+ 'Preserve the order of every existing editorial source; allow newly introduced sources');
 assert(removed.every(p=>packs.includes(p)),'Each removed source must remain in a later CSS pack');
+const baselineSources=[...before];
+for(const source of added){
+ const afterIndex=after.indexOf(source);
+ const next=after.slice(afterIndex+1).find(p=>baselineSources.includes(p));
+ baselineSources.splice(next?baselineSources.indexOf(next):baselineSources.length,0,source);
+}
 assert(!/@import\b|@layer\b/.test(removed.map(p=>fs.readFileSync(p,'utf8')).join('')),
  'Cascade-sensitive CSS imports/layers cannot be deleted without separate analysis');
 
@@ -87,11 +95,12 @@ async function sample(browser,origin,test,old){
  }finally{await context.close();}
 }
 (async()=>{
- // Reinsert the eleven duplicate sources at their original positions, while
- // sharing all current component edits with the optimized bundle. This keeps
+ // Reinsert the eleven duplicate sources at their original positions and add
+ // any new sources at their current positions, so both bundles share the same
+ // component edits. This keeps
  // the test about cascade equivalence, rather than freezing the old design.
  const {minifyCss}=await import('../scripts/build-editorial-css.mjs');
- baseline=minifyCss(before.map(file=>'/* '+file+' */\n'+fs.readFileSync(file,'utf8')).join('\n'));
+ baseline=minifyCss(baselineSources.map(file=>'/* '+file+' */\n'+fs.readFileSync(file,'utf8')).join('\n'));
  assert(optimized.length<baseline.length-50000,'Bundle should save at least 50 KB uncompressed');
  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
  const browser=await chromium.launch({headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
