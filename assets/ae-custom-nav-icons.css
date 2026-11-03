@@ -1,5 +1,4 @@
-/* AE SPORTS · iconografía dorada y azul entregada por el propietario.
-   Se carga DESPUÉS del bundle para conservar navegación y temas. */
+/* CAM SPORTS · category artwork, preserving navigation and theme controls. */
 html body header .ae-sport-nav .category-btn .ae-nav-icon{
   display:inline-flex!important;
   align-items:center!important;
@@ -29,6 +28,35 @@ html body header .ae-sport-nav .category-btn .ae-nav-icon .ae-custom-sport-icon{
   opacity:1!important;
   filter:drop-shadow(0 2px 2px rgba(4,19,31,.22));
   pointer-events:none!important;
+}
+/* Reference artwork: dartboard, American football and soccer ball.
+   Inline vectors share one drawing across themes and viewport sizes. Match
+   Opiniones' 22px image and its existing wrapper, without bitmap padding.
+   The desktop header stays blue in BOTH themes, so both inks remain light. */
+html body>header nav.ae-sport-nav .category-btn .ae-nav-icon>svg.cam-category-nav-symbol{
+  display:block!important;
+  flex:0 0 22px!important;
+  width:22px!important;
+  height:22px!important;
+  min-width:22px!important;
+  min-height:22px!important;
+  max-width:22px!important;
+  max-height:22px!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  background:transparent!important;
+  color:#efe2ce!important;
+  opacity:1!important;
+  filter:none!important;
+  box-shadow:none!important;
+  pointer-events:none!important;
+}
+html.dark body>header nav.ae-sport-nav .category-btn .ae-nav-icon>svg.cam-category-nav-symbol{
+  color:#f3ebdd!important;
+}
+html body>header nav.ae-sport-nav .category-btn:is(.active,[aria-current="page"]) .ae-nav-icon>svg.cam-category-nav-symbol{
+  color:#e0b77a!important;
 }
 html body header .ae-sport-nav .category-btn:hover .ae-nav-icon,
 html body header .ae-sport-nav .category-btn:focus-visible .ae-nav-icon{

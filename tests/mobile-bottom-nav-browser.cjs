@@ -79,8 +79,8 @@ const server = http.createServer((req, res) => {
             assert.equal(icon.svgDisplay,'block',key+' vector icon is visible');
             assert.ok(icon.svgWidth>=21 && icon.svgWidth<=23,key+' vector icon is legible inside circle');
             assert.equal(icon.svgStroke,'currentColor',key+' icon follows theme/active state');
-            assert.equal(icon.imageDisplay,'none',key+' old WebP is hidden only on phone');
-            assert.equal(icon.imageExists,true,key+' original desktop image remains');
+            assert.equal(icon.imageExists,key==='Opiniones',key+' uses shared reference SVG or preserves Opiniones artwork');
+            if(icon.imageExists) assert.equal(icon.imageDisplay,'none',key+' desktop WebP is hidden only on phone');
             assert.ok(icon.circleSize>=35 && icon.circleSize<=37,key+' same small circle frame');
             assert.equal(icon.circleRadius,'50%',key+' circular stroke');
             assert.notEqual(icon.caption,'none',key+' caption remains visible');
@@ -107,10 +107,11 @@ const server = http.createServer((req, res) => {
           for(const key of ['Picks','NFL','Fútbol','Opiniones']){
             const restored=await page.locator('header nav.ae-sport-nav > button[data-category="'+key+'"]').evaluate(button=>({
               vector:getComputedStyle(button.querySelector('svg.cam-mobile-nav-symbol')).display,
-              image:getComputedStyle(button.querySelector('img.ae-custom-sport-icon')).display
+              image:button.querySelector('img.ae-custom-sport-icon') ? getComputedStyle(button.querySelector('img.ae-custom-sport-icon')).display : null
             }));
-            assert.equal(restored.vector,'none',key+' mobile SVG is hidden on desktop');
-            assert.notEqual(restored.image,'none',key+' original desktop WebP remains visible');
+            assert.equal(restored.vector,key==='Opiniones'?'none':'block',key+' shares reference artwork or preserves Opiniones desktop image');
+            if(key==='Opiniones') assert.notEqual(restored.image,'none','Opiniones original desktop WebP remains visible');
+            else assert.equal(restored.image,null,key+' has no duplicate bitmap');
           }
           assert.equal(await nav.evaluate(el=>el.parentElement.closest('header')!==null),true);
         }
