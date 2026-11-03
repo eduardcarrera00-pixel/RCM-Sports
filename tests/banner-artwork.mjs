@@ -4,7 +4,7 @@ import vm from 'node:vm';
 
 const context = { window: {} };
 vm.runInNewContext(readFileSync(new URL('../assets/cam-banner-artwork.js', import.meta.url), 'utf8'), context);
-const { analyze, alphaFor } = context.window.camBannerArtwork;
+const { analyze, alphaFor, fit } = context.window.camBannerArtwork;
 const w = 120, h = 64;
 function image(background, foreground, border = false) {
   const pixels = new Uint8ClampedArray(w * h * 4);
@@ -34,10 +34,37 @@ for (const [bg, fg] of [
 const transparent = analyze(image([0, 0, 0, 0], [243, 235, 221, 255]), w, h);
 assert.equal(transparent.alphaOnly, true);
 assert.equal(alphaFor(15, 40, 60, 128, transparent), 128, 'Existing alpha is preserved');
+const outline = new Uint8ClampedArray(w*h*4);
+for(let y=4;y<60;y++)for(let x=4;x<116;x++)
+  if(x<7||x>112||y<7||y>56) outline.set([10,50,104,255],(y*w+x)*4);
+assert.ok(analyze(outline,w,h).bounds.width>100,
+  'Transparent vector outlines must never be mistaken for old canvas borders');
 assert.equal(analyze(new Uint8ClampedArray(w * h * 4).fill(128), w, h).empty, true,
   'A plain uploaded background must not appear as a rectangular logo');
 const photograph = new Uint8ClampedArray(w * h * 4);
 for (let y = 0; y < h; y++) for (let x = 0; x < w; x++)
   photograph.set([x * 255 / w, y * 255 / h, (x + y) * 255 / (w + h), 255], (y * w + x) * 4);
 assert.equal(analyze(photograph, w, h), null, 'Photographic colour gradients must not be recoloured');
+
+// Same artwork, radically different source canvases: visible size and centre
+// must match. A wide newspaper needs more width than the tall reference flame.
+for (const [width, height] of [[80, 56], [64, 44]]) {
+  const visible = (art) => {
+    const frame = fit(art, width, height), ink = art.bounds;
+    const scale = frame.width / art.imageWidth;
+    const w = ink.width * scale, h = ink.height * scale;
+    assert.ok(Math.abs(frame.left + ink.left * scale + w / 2 - width / 2) < .001);
+    assert.ok(Math.abs(frame.top + ink.top * scale + h / 2 - height / 2) < .001);
+    assert.ok(w <= width + .001 && h <= height + .001, 'No clipping or distortion');
+    return [w, h];
+  };
+  const glyph = { imageWidth:120, imageHeight:120, bounds:{left:10,top:4,width:100,height:112} };
+  const padded = { imageWidth:2400, imageHeight:700, bounds:{left:1800,top:250,width:100,height:112} };
+  assert.deepEqual(visible(glyph), visible(padded), 'Canvas whitespace must never shrink an icon');
+  const paper = visible({imageWidth:2244,imageHeight:701,bounds:{left:1600,top:250,width:400,height:190}});
+  assert.ok(paper[0] > height, 'Horizontal symbols use the shared wider slot');
+  const flame = visible(glyph);
+  assert.ok(paper[0]*paper[1] >= flame[0]*flame[1]*.9, 'Comparable visible footprints');
+}
+assert.equal(fit({bounds:{width:0,height:0}}, 80, 56), null);
 console.log('PASS: dark/cream backgrounds removed, canvas frames excluded, alpha edges retained, photographs preserved.');

@@ -58,11 +58,11 @@
       const pw = right - left + 1, ph = bottom - top + 1, fill = queue.length / (pw * ph);
       if (queue.length < Math.max(2, w * h * .0001)) continue;
       // Exclude old rectangular frames, keeping the actual illustration.
-      if ((pw > w * .85 && (ph < h * .12 || fill < .3)) ||
-          (ph > h * .85 && pw < w * .12)) continue;
+      if (!alphaOnly && ((pw > w * .85 && (ph < h * .12 || fill < .3)) ||
+          (ph > h * .85 && pw < w * .12))) continue;
       const edge = left < w * .025 || right >= w * .975 || top < h * .025 || bottom >= h * .975;
-      if (edge && ((pw < w * .06 && ph > h * .2) || (ph < h * .06 && pw > w * .2))) continue;
-      if (edge && fill < .45 && (pw < w * .12 || ph < h * .12)) continue;
+      if (!alphaOnly && edge && ((pw < w * .06 && ph > h * .2) || (ph < h * .06 && pw > w * .2))) continue;
+      if (!alphaOnly && edge && fill < .45 && (pw < w * .12 || ph < h * .12)) continue;
       parts.push({ left, top, right, bottom, count: queue.length, rgb: [red, green, blue] });
     }
     if (!parts.length) return { empty: true };
@@ -74,13 +74,30 @@
     foreground = [0, 1, 2].map(c => group.reduce((sum, p) => sum + p.rgb[c], 0) / inkCount);
     let left = Math.min(...group.map(p => p.left)), top = Math.min(...group.map(p => p.top));
     let right = Math.max(...group.map(p => p.right)), bottom = Math.max(...group.map(p => p.bottom));
+    const bounds = { left, top, width: right - left + 1, height: bottom - top + 1 };
     const pad = Math.max(2, Math.ceil(Math.max(right - left, bottom - top) * .08));
     left = Math.max(0, left - pad); top = Math.max(0, top - pad);
     right = Math.min(w - 1, right + pad); bottom = Math.min(h - 1, bottom + pad);
     const vector = rgb ? foreground.map((n, c) => n - rgb[c]) : [0, 0, 0];
     const energy = vector.reduce((sum, n) => sum + n * n, 0);
     return { left, top, width: right - left + 1, height: bottom - top + 1,
-      imageWidth: w, imageHeight: h, rgb, foreground, alphaOnly, vector, energy };
+      imageWidth: w, imageHeight: h, bounds, rgb, foreground, alphaOnly, vector, energy };
+  }
+
+  // Match the visible footprint, rather than the uploaded canvas. A horizontal
+  // symbol can use the wider shared slot; a tall one keeps Popular Takes' height.
+  // Centre the actual ink, including when the original has asymmetric padding.
+  function fit(art, width, height) {
+    if (!(width > 0 && height > 0)) return null;
+    const ink = art.bounds || art;
+    if (!(ink.width > 0 && ink.height > 0)) return null;
+    const scale = Math.min(width / ink.width, height / ink.height,
+      Math.sqrt(height * height / (ink.width * ink.height)));
+    return {
+      width: art.imageWidth * scale, height: art.imageHeight * scale,
+      left: (width - ink.width * scale) / 2 - ink.left * scale,
+      top: (height - ink.height * scale) / 2 - ink.top * scale
+    };
   }
 
   function alphaFor(r, g, b, alpha, art) {
@@ -92,28 +109,34 @@
     return Math.round(alpha * Math.max(0, Math.min(1, (projection - .035) / .965)));
   }
 
-  function load(url) {
-    if (cache.has(url)) return cache.get(url);
+  function load(url, crop = null) {
+    const key = JSON.stringify([url, crop]);
+    if (cache.has(key)) return cache.get(key);
     const job = new Promise(resolve => {
       const image = new Image();
       image.crossOrigin = 'anonymous';
       image.onerror = () => resolve({ photo: true });
       image.onload = () => {
         try {
-          const scale = Math.min(320 / image.naturalWidth, 180 / image.naturalHeight, 1);
+          const [cx, cy, cw, ch] = crop || [0, 0, 1, 1];
+          const sx = image.naturalWidth * cx, sy = image.naturalHeight * cy;
+          const sw = image.naturalWidth * cw, sh = image.naturalHeight * ch;
+          // Analyse each atlas cell separately. More detail prevents a small
+          // symbol inside a wide uploaded banner from disappearing in sampling.
+          const scale = Math.min(512 / sw, 512 / sh, 1);
           const canvas = document.createElement('canvas');
-          const w = canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
-          const h = canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+          const w = canvas.width = Math.max(1, Math.round(sw * scale));
+          const h = canvas.height = Math.max(1, Math.round(sh * scale));
           const ctx = canvas.getContext('2d', { willReadFrequently: true });
           if (!ctx || w < 8 || h < 8) { resolve({ photo: true }); return; }
-          ctx.drawImage(image, 0, 0, w, h);
+          ctx.drawImage(image, sx, sy, sw, sh, 0, 0, w, h);
           const art = analyze(ctx.getImageData(0, 0, w, h).data, w, h);
           if (!art) { resolve({ photo: true }); return; }
           if (art.empty) { resolve(art); return; }
-          const full = Math.min(768 / image.naturalWidth, 768 / image.naturalHeight, 1);
-          canvas.width = Math.max(1, Math.round(image.naturalWidth * full));
-          canvas.height = Math.max(1, Math.round(image.naturalHeight * full));
-          ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+          const full = Math.min(768 / sw, 768 / sh, 1);
+          canvas.width = Math.max(1, Math.round(sw * full));
+          canvas.height = Math.max(1, Math.round(sh * full));
+          ctx.drawImage(image, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
           const rgba = ctx.getImageData(0, 0, canvas.width, canvas.height);
           for (let y = 0; y < canvas.height; y++) for (let x = 0; x < canvas.width; x++) {
             const p = (y * canvas.width + x) * 4;
@@ -128,8 +151,8 @@
       };
       image.src = url;
     });
-    cache.set(url, job);
+    cache.set(key, job);
     return job;
   }
-  window.camBannerArtwork = Object.freeze({ load, analyze, alphaFor });
+  window.camBannerArtwork = Object.freeze({ load, analyze, alphaFor, fit });
 })();

@@ -15,7 +15,9 @@
     --cam-banner-radius:20px;
     --cam-banner-pad:clamp(16px,2vw,24px);
     --cam-banner-gap:16px;
-    --cam-banner-art-width:56px;
+    /* A shared wide slot lets horizontal symbols match the visible footprint
+       of Popular Takes without distorting either illustration. */
+    --cam-banner-art-width:80px;
     --cam-banner-art-height:56px;
     --cam-banner-card-height:120px;
     --cam-banner-title-size:clamp(20px,1.8vw,25px);
@@ -462,7 +464,7 @@
     :root {
       --cam-banner-pad:16px;
       --cam-banner-gap:12px;
-      --cam-banner-art-width:44px;
+      --cam-banner-art-width:64px;
       --cam-banner-art-height:44px;
       --cam-banner-card-height:104px;
       --cam-banner-title-size:20px;

@@ -214,15 +214,20 @@
   // La cabecera de lectores comparte el mismo recorte del mosaico en los dos temas,
   // pero cada tema guarda su propio reemplazo: una foto nocturna no debe oscurecer el
   // modo día (ni al revés). Las claves antiguas sin sufijo se migraron a «-noche».
-  const readersCrop = { size: '100% 200%', pos: 'center top' };
+  const readersCrop = { size: '100% 200%', pos: 'center top', bounds: [0, 0, 1, .5] };
   slotPair('portada.lectores', 'Cabecera de lectores (Tendencias)', 'Portada', 'portada.lectores-atlas',
     '#aeTrendingPortada > .ae-section-heading', readersCrop, readersCrop);
   // Use the approved night scroll/quill as the day original too. The shared
   // transparent-art renderer supplies CAM blue on ivory, without a scenic crop.
   // Retire only the old day bookend; future day/night editor uploads stay separate.
-  SLOTS.find(entry => entry.key === 'portada.lectores-dia').bannerOriginalPath =
-    'https://zahuhmvmqvxaunqebqaa.supabase.co/storage/v1/object/public/article-images/site/portada.lectores-1792727050477.jpg';
-  const stacked = { night: { size: 'auto 200%', pos: 'right top' }, day: { size: 'auto 200%', pos: 'right bottom' } };
+  for (const theme of ['dia', 'noche']) {
+    SLOTS.find(entry => entry.key === 'portada.lectores-' + theme).bannerOriginalPath =
+      'https://zahuhmvmqvxaunqebqaa.supabase.co/storage/v1/object/public/article-images/site/portada.lectores-1792727050477.jpg';
+  }
+  const stacked = {
+    night: { size: 'auto 200%', pos: 'right top', bounds: [0, 0, 1, .5] },
+    day: { size: 'auto 200%', pos: 'right bottom', bounds: [0, .5, 1, .5] }
+  };
   slotPair('picks.chef-mano', 'Mano del chef (invitación, ranking de chefs y detalle del Pick)', 'Picks', 'picks.chef-mano-atlas',
     '.ae-picks-heading-cta-row, #picksRankingTitle, #cpDialog .ae-cp-detail-hero', stacked.night, stacked.day);
   slotPair('picks.mesa-comunidad', 'Mesa de la comunidad', 'Picks', 'picks.mesa-comunidad-atlas', '#cpTitle', stacked.night, stacked.day);
@@ -685,10 +690,12 @@
     'assets/cam-banner-best-plate.svg', 'assets/cam-banner-worst-plate.svg',
     'assets/cam-banner-nfl-news.svg'
   ];
-  function fitBannerArtwork(el, url, focus) {
-    // Curated monochrome SVGs already have real alpha. Mask directly with the
-    // vector so high-density displays never enlarge a small canvas snapshot.
-    if (vectorBannerPaths.some(path => toURL(path)?.href === url)) {
+  function fitBannerArtwork(el, url, focus, crop = null) {
+    const vector = vectorBannerPaths.some(path => toURL(path)?.href === url);
+    const artKey = JSON.stringify([url, crop]);
+    // Paint vectors immediately, then measure their actual ink bounds too.
+    // The displayed mask remains the original SVG at every display density.
+    if (vector && !bannerArtCache.has(artKey)) {
       bannerProperty(el,'--cam-banner-mask',cssUrl(url));
       bannerProperty(el,'--cam-banner-art-size','contain');
       bannerProperty(el,'--cam-banner-art-position',focus || 'center');
@@ -696,11 +703,13 @@
       delete el.dataset.camBannerPending;
       delete el.dataset.camBannerPhoto;
       delete el.dataset.camBannerEmpty;
-      return;
     }
     if (!window.camBannerArtwork) return;
+    const requested = bannerArtRequests.get(el) === artKey;
+    bannerArtRequests.set(el, artKey);
     const paint = art => {
-      if (!art || !el.isConnected || el.style.getPropertyValue('--cam-banner-art') !== cssUrl(url)) return;
+      if (!art || !el.isConnected || bannerArtRequests.get(el) !== artKey ||
+          el.style.getPropertyValue('--cam-banner-art') !== cssUrl(url)) return;
       delete el.dataset.camBannerPending;
       delete el.dataset.camBannerInk;
       if (art.empty) {
@@ -715,14 +724,14 @@
         if (el.dataset.camBannerPhoto !== '1') el.dataset.camBannerPhoto = '1';
         delete el.dataset.camBannerTransparent;
         el.style.removeProperty('--cam-banner-mask');
-        bannerProperty(el,'--cam-banner-art-position',focus || 'center');
+        if (!crop) bannerProperty(el,'--cam-banner-art-position',focus || 'center');
         return;
       }
       delete el.dataset.camBannerPhoto;
       // This two-tone SVG already has alpha and theme-specific negative space.
       const originalSvg = /cam-football-quiniela-(?:day|night)\.svg(?:[?#]|$)/.test(url);
       if (!originalSvg) {
-        bannerProperty(el,'--cam-banner-mask',cssUrl(art.mask));
+        bannerProperty(el,'--cam-banner-mask',cssUrl(vector ? url : art.mask));
         if (el.dataset.camBannerTransparent !== '1') el.dataset.camBannerTransparent = '1';
       } else {
         delete el.dataset.camBannerTransparent;
@@ -731,22 +740,19 @@
       const cs = getComputedStyle(el, '::after');
       const width = parseFloat(cs.width), height = parseFloat(cs.height);
       if (!(width > 0 && height > 0)) return;
-      const scale = Math.min(width / art.width, height / art.height);
-      const anchor = focus ? focus.split(/\s+/).map(n => parseFloat(n)/100) : [.5,.5];
-      const left = (width - art.width * scale) * anchor[0] - art.left * scale;
-      const top = (height - art.height * scale) * anchor[1] - art.top * scale;
-      bannerProperty(el,'--cam-banner-art-size',(art.imageWidth*scale).toFixed(2) + 'px ' + (art.imageHeight*scale).toFixed(2) + 'px');
-      bannerProperty(el,'--cam-banner-art-position',left.toFixed(2) + 'px ' + top.toFixed(2) + 'px');
+      const frame = window.camBannerArtwork.fit(art, width, height);
+      if (!frame) return;
+      bannerProperty(el,'--cam-banner-art-size',frame.width.toFixed(2) + 'px ' + frame.height.toFixed(2) + 'px');
+      bannerProperty(el,'--cam-banner-art-position',frame.left.toFixed(2) + 'px ' + frame.top.toFixed(2) + 'px');
     };
-    if (bannerArtCache.has(url)) {
-      paint(bannerArtCache.get(url));
+    if (bannerArtCache.has(artKey)) {
+      paint(bannerArtCache.get(artKey));
       return;
     }
-    if (bannerArtRequests.get(el) === url) return;
-    bannerArtRequests.set(el, url);
-    el.dataset.camBannerPending = '1';
-    window.camBannerArtwork.load(url).then(art => {
-      bannerArtCache.set(url, art);
+    if (requested) return;
+    if (!vector) el.dataset.camBannerPending = '1';
+    window.camBannerArtwork.load(url, crop).then(art => {
+      bannerArtCache.set(artKey, art);
       paint(art);
     });
   }
@@ -819,8 +825,11 @@
             delete el.dataset.camBannerInk;
             delete el.dataset.camBannerPhoto;
           }
-          if ((!parent || row?.url) && el.getClientRects().length)
-            fitBannerArtwork(el, url || source, focusOf(row));
+          if ((!parent || row?.url || visual.crop.bounds) && el.getClientRects().length) {
+            const crop = !row?.url && parent
+              ? visual.crop.bounds : null;
+            fitBannerArtwork(el, url || source, focusOf(row), crop);
+          }
         } else {
           delete el.dataset.camBannerArtless;
           delete el.dataset.camBannerKey;

@@ -53,7 +53,7 @@ const screenshots=process.env.CAM_QA_SCREENSHOTS;
         });
         reference??=sizes.reference;
         for(const title of sizes.titles)assert.deepEqual(title.style,reference,width+'/'+dark+'/'+sport+': '+title.text);
-        for(const art of sizes.art)assert.deepEqual(art.size,[width<=760?'44px':'56px',width<=760?'44px':'56px'],art.key);
+        for(const art of sizes.art)assert.deepEqual(art.size,[width<=760?'64px':'80px',width<=760?'44px':'56px'],art.key);
       }
       const power=await page.evaluate(()=>['rankingTitle','championsTitle'].map(id=>{
         const title=document.getElementById(id),s=getComputedStyle(title);

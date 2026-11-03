@@ -130,3 +130,13 @@ ningún tema; Quiniela de Fútbol mantiene su ilustración. Los estados vacíos
 de Popular/Unpopular ajustan su altura al mensaje; las listas con contenido
 conservan su altura y desplazamiento. Los selectores de quiniela toman su
 contraste de la paleta real del banner.
+
+### Tamaño visible de los símbolos · 2 nov 2026
+
+Todos los banners comparten un espacio de 80 × 56 px en escritorio y 64 × 44 px
+en móvil. `cam-banner-artwork.js` mide la silueta real, elimina la influencia del
+margen vacío del archivo y centra el dibujo. Los símbolos horizontales aprovechan
+el ancho adicional para igualar el peso visual de Popular Takes, conservando sus
+proporciones. Los SVG propios se siguen mostrando como vectores; las fotografías
+y los originales editables conservan sus colores y su identidad. Los recortes de
+atlas se analizan por celda, con caché independiente para cada variante.
