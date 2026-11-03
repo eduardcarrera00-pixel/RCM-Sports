@@ -1,5 +1,6 @@
-/* CAM SPORTS — edge-to-edge mobile navigation; no desktop artwork/layout changes.
-   Keep original four category buttons and use the SVGs provided by the icon-fix branch. */
+/* CAM SPORTS — edge-to-edge mobile navigation, reusing the four real buttons.
+   Reference vectors also show on desktop through ae-custom-nav-icons.css;
+   Opiniones' conversation symbol remains phone-only. */
 html body nav.ae-sport-nav svg.cam-mobile-nav-symbol {
   display: none !important;
 }
@@ -131,7 +132,7 @@ html body nav.ae-sport-nav svg.cam-mobile-nav-symbol {
     transition: border-color 160ms ease, background-color 160ms ease !important;
   }
 
-  /* WebP art stays untouched for the desktop header, hidden only in the mobile dock. */
+  /* Opiniones keeps its desktop WebP; the reference vectors are shared. */
   html body > nav.cam-mobile-bottom-nav > button.category-btn .ae-nav-icon > img.ae-custom-sport-icon {
     display: none !important;
   }

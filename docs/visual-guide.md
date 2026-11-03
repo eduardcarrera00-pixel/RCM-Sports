@@ -140,3 +140,14 @@ el ancho adicional para igualar el peso visual de Popular Takes, conservando sus
 proporciones. Los SVG propios se siguen mostrando como vectores; las fotografías
 y los originales editables conservan sus colores y su identidad. Los recortes de
 atlas se analizan por celda, con caché independiente para cada variante.
+
+## Iconos de navegación · 2 nov 2026
+
+Picks (diana con dardo), NFL (balón americano) y Fútbol (balón de paneles)
+utilizan los vectores de la referencia del propietario, incluidos en el HTML
+para compartir el mismo dibujo entre cabecera y barra móvil. Opiniones conserva
+su imagen de escritorio y su símbolo de conversación en móvil. Los cuatro
+usan la misma escala: 22 px en escritorio y las medidas comunes de la barra
+móvil, con el mismo marco y sin recortes. `ae-custom-nav-icons.css` controla
+la tinta clara sobre la cabecera azul de ambos temas; la barra móvil conserva
+su tinta azul diurna, clara nocturna y bronce para la sección seleccionada.

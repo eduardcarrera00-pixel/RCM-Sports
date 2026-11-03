@@ -35,15 +35,12 @@ assert.match(visibility, /querySelector\('nav\.ae-sport-nav'\)/);
 const window = new Window({ url: 'https://camsports.github.io/' });
 const { document } = window;
 const primary = ['Picks', 'NFL', 'Fútbol', 'Opiniones'];
-const optional = ['Fútbol Americano Colegial', 'NBA', 'Tenis', 'Ciclismo'];
-const categories = ['Todos', ...primary, ...optional];
+const sourceNav = index.match(/<nav class="ae-sport-nav"[^>]*>[\s\S]*?<\/nav>/)[0];
 document.body.innerHTML = `
   <header>
     <div class="ae-mobile-header-grid">
       <a class="cam-brand" href="#">CAM SPORTS</a>
-      <nav class="ae-sport-nav" aria-label="Explorar deportes">
-        ${categories.map(category => `<button class="category-btn ${category === 'Todos' ? 'active' : ''}" data-category="${category}">${primary.includes(category) ? '<span class="ae-nav-icon"><img class="ae-custom-sport-icon" src="existing.webp" alt=""></span>' : ''}<span>${category}</span></button>`).join('')}
-      </nav>
+      ${sourceNav}
       <div class="ae-header-actions"><button id="themeToggle">Modo</button><button id="camGlobalEditToggle">Editar</button><button id="login">Iniciar sesión</button></div>
     </div>
   </header>
@@ -54,6 +51,8 @@ document.body.innerHTML = `
 const nav = document.querySelector('header nav.ae-sport-nav');
 const allButtons = Array.from(nav.querySelectorAll('.category-btn'));
 const originalButtons = new Map(allButtons.map(button => [button.dataset.category, button]));
+const referenceIcons = new Map(primary.filter(key => key !== 'Opiniones').map(key => [key, originalButtons.get(key).querySelector('svg.cam-category-nav-symbol')]));
+for (const [key, icon] of referenceIcons) assert.ok(icon, key + ': reference vector exists in initial HTML');
 const mobileListeners = [];
 let isPhone = true;
 const media = {
@@ -78,7 +77,8 @@ for (const category of primary) {
   assert.equal(icon.getAttribute('viewBox'), '0 0 24 24');
   assert.equal(icon.getAttribute('stroke'), 'currentColor');
   assert.ok(icon.children.length >= 2, category + ': visible details must remain');
-  assert.equal(button.querySelectorAll('img.ae-custom-sport-icon').length, 1, 'original desktop image stays');
+  assert.equal(button.querySelectorAll('img.ae-custom-sport-icon').length, category === 'Opiniones' ? 1 : 0, 'reference categories use inline SVG; Opiniones keeps its desktop image');
+  if (referenceIcons.has(category)) assert.equal(icon, referenceIcons.get(category), 'phone reuses the initial reference vector');
 }
 assert.ok(document.getElementById('themeToggle')?.closest('header'));
 assert.ok(document.getElementById('camGlobalEditToggle')?.closest('header'));
@@ -124,7 +124,8 @@ isPhone = false;
 mobileListeners.forEach(listener => listener({ matches: false }));
 assert.equal(nav.parentElement, document.querySelector('header .ae-mobile-header-grid'));
 for (const category of primary) {
-  assert.equal(originalButtons.get(category).querySelectorAll('img.ae-custom-sport-icon').length, 1);
+  assert.equal(originalButtons.get(category).querySelectorAll('img.ae-custom-sport-icon').length, category === 'Opiniones' ? 1 : 0);
+  if (referenceIcons.has(category)) assert.equal(originalButtons.get(category).querySelector('svg.cam-category-nav-symbol'), referenceIcons.get(category), 'desktop restoration preserves the same artwork');
   assert.equal(originalButtons.get(category).querySelectorAll('svg.cam-mobile-nav-symbol').length, 1);
 }
 assert.equal(nav.classList.contains('cam-mobile-bottom-nav'), false);
