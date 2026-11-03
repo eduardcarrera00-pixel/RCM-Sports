@@ -14,40 +14,8 @@
   const originalButtonLabels = new Map(buttons.map(button => [button, button.getAttribute('aria-label')]));
   const editableSelector = 'input:not([type="checkbox"]):not([type="radio"]), textarea, select, [contenteditable="true"]';
 
-  // Picks/NFL/Fútbol already contain the owner's reference vectors in HTML,
-  // shared by desktop and phone with no second artwork or image request.
-  // Keep Opiniones' existing desktop image and phone conversation symbol.
-  const svgNS = 'http://www.w3.org/2000/svg';
-  const mobileIconShapes = {
-    Opiniones: [
-      ['path', { d: 'M20.5 11a8.5 8.5 0 0 1-8.5 8.5c-1.2 0-2.5-.2-3.7-.7L3.5 20l1.2-4.8A8.5 8.5 0 1 1 20.5 11Z' }],
-      ['path', { d: 'M8 10.5h8M8 13.5h5' }]
-    ]
-  };
-
-  function mountMobileVectorIcons() {
-    for (const button of buttons) {
-      const shapes = mobileIconShapes[button.dataset.category];
-      const wrapper = button.querySelector('.ae-nav-icon');
-      if (!shapes || !wrapper || wrapper.querySelector('.cam-mobile-nav-symbol')) continue;
-      const svg = document.createElementNS(svgNS, 'svg');
-      for (const [name, value] of Object.entries({
-        class: 'cam-mobile-nav-symbol',
-        viewBox: '1.9 1.4 20.1 20.1',
-        width: 24, height: 24,
-        fill: 'none', stroke: 'currentColor', 'stroke-width': 1.55,
-        'stroke-linecap': 'round', 'stroke-linejoin': 'round',
-        focusable: 'false', 'aria-hidden': 'true'
-      })) svg.setAttribute(name, String(value));
-      for (const [shapeName, attrs] of shapes) {
-        const shape = document.createElementNS(svgNS, shapeName);
-        for (const [name, value] of Object.entries(attrs)) shape.setAttribute(name, String(value));
-        svg.appendChild(shape);
-      }
-      wrapper.appendChild(svg);
-    }
-  }
-  mountMobileVectorIcons();
+  // All four primary sections use one inline SVG, shared by desktop and phone.
+  // Reparenting the existing nav never recreates icons or event handlers.
 
   function positionCapsule(activeButton) {
     if (!mobile.matches || nav.parentNode !== document.body) return;
