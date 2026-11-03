@@ -70,7 +70,7 @@
     ['auth.subtitle','.cam-auth-intro','Acceso · Introducción'],
     ['auth.overline','.cam-auth-story-overline','Acceso · Eslogan'],
     ['auth.privacy','#aeAuthPrivacyNote','Acceso · Privacidad'],
-    ['profile.title','#aeProfileTitle','Perfil · Título principal'],
+    ['profile.title','#camProfileKicker','Perfil · Eslogan'],
     ['profile.overview','#aeProfileOverviewText','Perfil · Introducción'],
     ['analytics.title','#camAnalyticsTitle','Administración · Analíticas'],
     ['notifications.title','#aeNotificationsTitle','Notificaciones · Título']

@@ -32,6 +32,7 @@ let activeTab='takes';
 let ownTakes=[];
 let ownPicks=[];
 let publicAuthorLabel='Aficionado';
+let profileName='';
 let ownUnpopularTakeId=null;
 let recentScrollObserver=null;
 let prestigeRequest=0;
@@ -181,7 +182,7 @@ async function loadPrestige(userId){
 }
 
 function publicProfileEntry(t,owner){
-  const name=String(t.author||(privateView?$('aeProfileUsername')?.textContent:publicAuthorLabel)||'Aficionado')
+  const name=String(t.author||(privateView?profileName:publicAuthorLabel)||'Aficionado')
     .replace(/^@+/,'').split(' · ')[0].trim();
   return {...t,author_id:t.author_id||owner,author:name};
 }
@@ -209,6 +210,7 @@ async function refreshProfileTakes(){
     if(r.error)throw r.error;
     if(token!==request||!dialog.open||activeAuthor!==author||privateView!==isOwn)return;
     ownTakes=r.data||[];
+    renderStats();
     if(activeTab==='takes')renderTakes(ownTakes,author,!isOwn);
     loadPrestige(author);
   }catch(e){
@@ -271,6 +273,7 @@ async function updateButton(){
 }
 
 function close(){
+  closeEdit(false);
   window.camNflProfile?.close?.();
   document.dispatchEvent(new CustomEvent('cam:profile-view',{detail:{userId:null}}));
   if(recentScrollObserver){recentScrollObserver.disconnect();recentScrollObserver=null;}
@@ -704,6 +707,7 @@ function renderPublishAction(){
 
 function setPrivateTab(tab){
   if(!activeAuthor)return;
+  labelTabs();
   activeTab=['takes','picks','quiniela'].includes(tab)?tab:'takes';
   for(const [id,value] of [['aeProfileTabTakes','takes'],['aeProfileTabPicks','picks'],['aeProfileTabQuiniela','quiniela']]){
     const button=$(id);
@@ -724,14 +728,12 @@ function setPrivateTab(tab){
   const quiniela=$('camNflProfile');
   if(quiniela)quiniela.hidden=activeTab!=='quiniela';
 
+  renderStats();
   if(isTakes){
-    $('aeProfileTitle').textContent=privateView?'Mis Takes':publicAuthorLabel+' · Takes';
     renderTakes(ownTakes,activeAuthor,!privateView);
   }else if(isPicks){
-    $('aeProfileTitle').textContent=privateView?'Mis Picks':publicAuthorLabel+' · Picks';
     renderPicks(ownPicks,!privateView);
   }else{
-    $('aeProfileTitle').textContent=privateView?'Mi Quiniela':'Quiniela de '+publicAuthorLabel;
     $('aeProfileCount').textContent='La Quiniela NFL';
     setOverview(privateView?'':'Resultados confirmados de este aficionado. Sus pronósticos futuros son privados.');
     window.camNflProfile?.open(activeAuthor,privateView);
@@ -758,6 +760,7 @@ async function refreshProfilePicks(){
     const fresh=await loadOwnPicks(author);
     if(token!==request||!dialog.open||activeAuthor!==author||privateView!==isOwn)return;
     ownPicks=fresh;
+    renderStats();
     if(activeTab==='picks')renderPicks(ownPicks,!isOwn);
   }catch(error){
     // Retain the previous view during transient network problems.
@@ -780,7 +783,9 @@ async function showOwn(){
   if(!dialog.open)dialog.showModal();
 
   $('aeProfileTabs').hidden=false;
-  $('aeProfileUsername').textContent='@'+(user.user_metadata?.username||user.user_metadata?.display_name||'Usuario');
+  setIdentity(user.user_metadata?.username||user.user_metadata?.display_name||'Usuario',
+    user.created_at?'Miembro desde '+monthText(user.created_at):'Tu historial deportivo');
+  resetStats();
   $('aeProfileStatus').textContent='Cargando tu perfil…';
   $('aeProfileTakeHighlights').replaceChildren();
   $('aeProfileTakes').replaceChildren();
@@ -804,7 +809,7 @@ async function showOwn(){
   if(ticket!==request||!dialog.open)return;
   const publicName=publicNameResult.status==='fulfilled'&&!publicNameResult.value.error
     ?String(publicNameResult.value.data?.[0]?.author||'').trim():'';
-  if(publicName&&publicName!=='Aficionado')$('aeProfileUsername').textContent='@'+publicName.replace(/^@+/,'');
+  if(publicName&&publicName!=='Aficionado')setIdentity(publicName);
 
   const takeError=takesResult.status==='rejected'?takesResult.reason:takesResult.value.error;
   const pickError=picksResult.status==='rejected'?picksResult.reason:null;
@@ -848,8 +853,8 @@ async function showPublic(id,push=true,tab='takes'){
   $('aeProfilePicks').hidden=true;
   $('aeProfileAccuracy').hidden=true;
   $('aeProfileTakeAccuracy').hidden=true;
-  $('aeProfileTitle').textContent='Perfil de aficionado';
-  $('aeProfileUsername').textContent='Takes y Picks públicos';
+  setIdentity('',  'Aficionado de CAM SPORTS');
+  resetStats();
   $('aeProfileStatus').textContent='Cargando perfil público…';
   $('aeProfileTakeHighlights').replaceChildren();
   $('aeProfileTakes').replaceChildren();
@@ -867,17 +872,19 @@ async function showPublic(id,push=true,tab='takes'){
     history.pushState({},'',u);
   }
 
-  const [takesResult,picksResult]=await Promise.allSettled([
+  const [takesResult,picksResult,cardResult]=await Promise.allSettled([
     db.rpc('ae_public_take_profile',{p_author_id:id}),
-    loadOwnPicks(id) // ae_pick_feed is the existing public view.
+    loadOwnPicks(id), // ae_pick_feed is the existing public view.
+    db.rpc('cam_public_profile_card',{p_user:id})
   ]);
   if(ticket!==request||!dialog.open)return;
   const takeError=takesResult.status==='rejected'?takesResult.reason:takesResult.value.error;
   const pickError=picksResult.status==='rejected'?picksResult.reason:null;
   ownTakes=takeError?[]:(takesResult.value.data||[]);
   ownPicks=pickError?[]:picksResult.value;
-  publicAuthorLabel=ownTakes[0]?.author||ownPicks[0]?.author||'Aficionado';
-  $('aeProfileUsername').textContent='@'+publicAuthorLabel+' · Takes y Picks';
+  const card=cardResult.status==='fulfilled'&&!cardResult.value.error?cardResult.value.data:null;
+  publicAuthorLabel=String(card?.username||ownTakes[0]?.author||ownPicks[0]?.author||'Aficionado');
+  setIdentity(publicAuthorLabel,card?.joined_month?'Miembro desde '+monthText(card.joined_month+'-15T12:00:00'):'Aficionado de CAM SPORTS');
   const errors=[];
   if(takeError)errors.push('Takes no disponibles');
   if(pickError)errors.push('Picks no disponibles');
@@ -886,11 +893,268 @@ async function showPublic(id,push=true,tab='takes'){
   if(!takeError)openSharedProfileTake(id);
 }
 
+
+/* ---------- Cabecera de perfil (3 nov 2026): identidad, cifras, compartir ----------
+   Como en otras apps: inicial como foto, @usuario, «Miembro desde», botones
+   Editar perfil / Compartir perfil y una fila de cifras que lleva a cada pestaña. */
+function monthText(value){
+  const d=new Date(value);
+  if(Number.isNaN(d.getTime()))return '';
+  try{return new Intl.DateTimeFormat('es',{month:'long',year:'numeric'}).format(d);}catch{return '';}
+}
+function dayText(value){
+  const d=new Date(value);
+  if(Number.isNaN(d.getTime()))return '';
+  try{return new Intl.DateTimeFormat('es',{day:'numeric',month:'long'}).format(d);}catch{return dateText(value);}
+}
+function initialOf(name){const m=String(name||'').match(/[a-z0-9]/i);return m?m[0].toUpperCase():'·';}
+function setIdentity(name,subtitle){
+  const clean=String(name||'').replace(/^@+/,'').trim();
+  profileName=clean;
+  const title=$('aeProfileTitle');
+  if(title)title.textContent=clean?'@'+clean:(privateView?'Mi perfil':'Perfil de aficionado');
+  if(subtitle!==undefined&&$('aeProfileUsername'))$('aeProfileUsername').textContent=subtitle;
+  for(const id of ['camProfileAvatar','camProfileEditAvatar']){const n=$(id);if(n)n.textContent=initialOf(clean);}
+  if($('camProfileKicker'))$('camProfileKicker').textContent=privateView?'MI PERFIL · CAM SPORTS':'AFICIONADO · CAM SPORTS';
+  if($('camProfileEditOpen'))$('camProfileEditOpen').hidden=!privateView;
+}
+function labelTabs(){
+  const own=privateView;
+  for(const [id,mine,theirs] of [['aeProfileTabTakes','Mis Takes','Takes'],['aeProfileTabPicks','Mis Picks','Picks'],['aeProfileTabQuiniela','Mi Quiniela','Quiniela']]){
+    const b=$(id);if(b)b.textContent=own?mine:theirs;
+  }
+}
+function setStat(id,value,label){
+  const n=$(id);if(!n)return;
+  n.textContent=value;
+  n.parentElement?.setAttribute('aria-label',label);
+}
+function resetStats(){
+  setStat('camProfileStatTakes','·','Takes');
+  setStat('camProfileStatPicks','·','Picks');
+  setStat('camProfileStatHits','—','Porcentaje de acierto de los Picks');
+  setStat('camProfileStatSupport','—','Porcentaje de apoyo de los Takes');
+}
+function renderStats(){
+  const takes=ownTakes.filter(t=>privateView||!t.hidden);
+  const won=ownPicks.filter(p=>p.outcome==='won').length,lost=ownPicks.filter(p=>p.outcome==='lost').length;
+  const shown=takes.filter(t=>!t.hidden);
+  const up=shown.reduce((n,t)=>n+Math.max(0,numeric(t.upvotes)),0),down=shown.reduce((n,t)=>n+Math.max(0,numeric(t.downvotes)),0);
+  const hits=won+lost?Math.round(won/(won+lost)*100)+'%':'—';
+  const support=up+down?Math.round(up/(up+down)*100)+'%':'—';
+  setStat('camProfileStatTakes',String(takes.length),takes.length+(takes.length===1?' Take. Ver Takes':' Takes. Ver Takes'));
+  setStat('camProfileStatPicks',String(ownPicks.length),ownPicks.length+(ownPicks.length===1?' Pick. Ver Picks':' Picks. Ver Picks'));
+  setStat('camProfileStatHits',hits,'Acierto de los Picks: '+(hits==='—'?'sin Picks resueltos':hits)+'. Ver Picks');
+  setStat('camProfileStatSupport',support,'Apoyo de los Takes: '+(support==='—'?'sin votos':support)+'. Ver Takes');
+}
+let noticeTimer=0;
+function notice(text){
+  const n=$('camProfileNotice');if(!n)return;
+  n.textContent=text;n.hidden=!text;
+  clearTimeout(noticeTimer);
+  if(text)noticeTimer=setTimeout(()=>{n.hidden=true;n.textContent='';},4500);
+}
+async function shareProfile(){
+  if(!activeAuthor)return;
+  const url=new URL(location.origin+location.pathname);
+  url.searchParams.set('perfil',activeAuthor);
+  const title=(profileName?'@'+profileName:'Perfil')+' en CAM SPORTS';
+  if(navigator.share){
+    try{await navigator.share({title,text:title,url:url.href});return;}
+    catch(e){if(e?.name==='AbortError')return;}
+  }
+  try{await navigator.clipboard.writeText(url.href);notice('Enlace del perfil copiado. Pégalo donde quieras compartirlo.');}
+  catch{notice('Copia este enlace: '+url.href);}
+}
+
+/* ---------- Editar perfil: nombre de usuario ----------
+   La base de datos (cam_change_username) valida, evita nombres repetidos,
+   aplica la espera de 30 días y actualiza Picks, comentarios y avisos. */
+const USERNAME_RULE=/^[a-z0-9_]{3,30}$/;
+let editStatus=null,checkTimer=0,checkTicket=0,savingName=false;
+function setCheck(text,tone=''){const n=$('camUsernameCheck');if(!n)return;n.textContent=text;n.dataset.tone=tone;}
+function missingFeature(e){return e?.code==='PGRST202'||/could not find the function|does not exist|schema cache/i.test(String(e?.message||''));}
+function editing(){return Boolean($('aeProfileDialog')?.classList.contains('is-editing'));}
+function openEdit(){
+  if(!privateView||!activeAuthor)return;
+  const dialog=$('aeProfileDialog');
+  dialog.classList.add('is-editing');
+  $('camProfileEdit').hidden=false;
+  dialog.scrollTop=0;
+  const input=$('camUsernameInput');
+  input.value=profileName;
+  $('camUsernameConfirm').hidden=true;
+  $('camUsernameSave').hidden=false;
+  $('camUsernameSave').disabled=true;
+  $('camUsernameUndo').hidden=true;
+  setCheck('');
+  // Sin teclado automático en el teléfono: el foco va al título.
+  $('camProfileEditTitle').focus({preventScroll:true});
+  loadNameStatus();
+}
+function closeEdit(focus=true){
+  const dialog=$('aeProfileDialog');
+  if(!dialog)return;
+  const was=dialog.classList.contains('is-editing');
+  dialog.classList.remove('is-editing');
+  if($('camProfileEdit'))$('camProfileEdit').hidden=true;
+  clearTimeout(checkTimer);++checkTicket;
+  if(was&&focus)$('camProfileEditOpen')?.focus({preventScroll:true});
+}
+function applyNameStatus(status){
+  editStatus=status||{};
+  const input=$('camUsernameInput'),undo=$('camUsernameUndo');
+  if(editStatus.username&&!input.matches(':focus'))input.value=editStatus.username;
+  undo.hidden=!editStatus.undo_username;
+  if(editStatus.undo_username)undo.textContent='Volver a @'+editStatus.undo_username+(editStatus.undo_until?' (hasta el '+dayText(editStatus.undo_until)+')':'');
+  input.disabled=!editStatus.can_change;
+  $('camUsernameSave').hidden=!editStatus.can_change;
+}
+async function loadNameStatus(){
+  const input=$('camUsernameInput');
+  input.disabled=true;
+  setCheck('Comprobando tu cuenta…');
+  try{
+    const r=await db.rpc('cam_username_status');
+    if(r.error)throw r.error;
+    if(!editing())return;
+    applyNameStatus(r.data);
+    if(editStatus.can_change)setCheck('');
+    else setCheck(editStatus.next_change_at?'Ya cambiaste tu nombre hace poco. Podrás cambiarlo de nuevo el '+dayText(editStatus.next_change_at)+'.':'Ahora mismo no puedes cambiar tu nombre.','wait');
+  }catch(e){
+    if(!editing())return;
+    editStatus=null;input.disabled=true;$('camUsernameSave').disabled=true;
+    setCheck(missingFeature(e)?'El cambio de nombre se activará muy pronto.':'No se pudo comprobar tu cuenta. '+(e.message||'Inténtalo de nuevo.'),'error');
+  }
+}
+function normalizedInput(){
+  const input=$('camUsernameInput');
+  const raw=input.value,clean=raw.replace(/^@+/,'').toLowerCase().replace(/\s+/g,'_');
+  if(clean!==raw){
+    const pos=Math.max(0,(input.selectionStart??clean.length)-(raw.length-clean.length));
+    input.value=clean;
+    try{input.setSelectionRange(pos,pos);}catch{}
+  }
+  return clean;
+}
+function onNameInput(){
+  const name=normalizedInput(),save=$('camUsernameSave');
+  $('camUsernameConfirm').hidden=true;save.hidden=false;save.disabled=true;
+  clearTimeout(checkTimer);
+  const ticket=++checkTicket;
+  if(!name){setCheck('');return;}
+  if(name===profileName){setCheck('Es tu nombre actual.');return;}
+  if(!USERNAME_RULE.test(name)){
+    setCheck(name.length<3?'Escribe al menos 3 caracteres.':'Usa solo letras sin acentos, números y guion bajo (_).','error');
+    return;
+  }
+  setCheck('Comprobando si está libre…');
+  checkTimer=setTimeout(async()=>{
+    try{
+      const r=await db.rpc('cam_username_available',{p_username:name});
+      if(ticket!==checkTicket)return;
+      if(r.error)throw r.error;
+      if(r.data==='ok'){setCheck('@'+name+' está disponible.','ok');save.disabled=false;return;}
+      setCheck({same:'Es tu nombre actual.',taken:'@'+name+' ya lo usa otra persona.',reserved:'Ese nombre está reservado. Elige otro.',invalid:'Usa de 3 a 30 letras, números o guion bajo (_).'}[r.data]||'Ese nombre no está disponible.','error');
+    }catch(e){
+      if(ticket!==checkTicket)return;
+      setCheck(missingFeature(e)?'El cambio de nombre se activará muy pronto.':'No se pudo comprobar el nombre. '+(e.message||''),'error');
+    }
+  },350);
+}
+function askNameConfirm(name,undo=false){
+  if(!name||savingName)return;
+  $('camUsernameConfirmTitle').textContent=undo?'¿Volver a @'+name+'?':'¿Cambiar @'+profileName+' por @'+name+'?';
+  $('camUsernameConfirmLogin').textContent='Desde ahora inicias sesión con @'+name+' (misma contraseña).';
+  $('camUsernameConfirmKeep').textContent=undo
+    ?'Después tendrás que esperar 30 días para volver a cambiarlo.'
+    :'@'+profileName+' queda guardado para ti 30 días y puedes volver a él durante 7 días. Después tendrás que esperar 30 días para otro cambio.';
+  const box=$('camUsernameConfirm');
+  box.dataset.name=name;
+  box.hidden=false;
+  $('camUsernameSave').hidden=true;
+  $('camUsernameConfirmYes').focus({preventScroll:true});
+  box.scrollIntoView?.({block:'nearest'});
+}
+async function changeName(name){
+  if(savingName||!name)return;
+  savingName=true;
+  const yes=$('camUsernameConfirmYes'),no=$('camUsernameConfirmNo');
+  yes.disabled=true;no.disabled=true;
+  setCheck('Guardando tu nombre nuevo…');
+  try{
+    const r=await db.rpc('cam_change_username',{p_username:name});
+    if(r.error)throw r.error;
+    const result=r.data||{},fresh=String(result.username||name);
+    // La sesión guarda el nombre: se renueva para que todo use el nuevo.
+    try{await db.auth.refreshSession();}catch{}
+    if(typeof currentUser!=='undefined'&&currentUser)currentUser.username=fresh;
+    if(typeof renderSessionHeader==='function')renderSessionHeader();
+    setIdentity(fresh);
+    $('camUsernameConfirm').hidden=true;
+    $('camUsernameInput').value=fresh;
+    applyNameStatus(result);
+    setCheck(result.undo?'Has vuelto a @'+fresh+'. Usa este nombre para iniciar sesión.':'Listo: ahora eres @'+fresh+'. Usa este nombre para iniciar sesión.','ok');
+    document.dispatchEvent(new CustomEvent('cam:username-changed',{detail:{username:fresh,previous:result.previous_username||null}}));
+    document.dispatchEvent(new Event('ae:takes-updated'));
+    document.dispatchEvent(new Event('ae:picks-updated'));
+  }catch(e){
+    $('camUsernameConfirm').hidden=true;
+    $('camUsernameSave').hidden=false;
+    setCheck(missingFeature(e)?'El cambio de nombre se activará muy pronto.':(e.message||'No se pudo cambiar el nombre. Inténtalo de nuevo.'),'error');
+  }finally{
+    savingName=false;yes.disabled=false;no.disabled=false;
+  }
+}
+function openRecovery(){
+  const name=profileName;
+  close();
+  if(typeof openUserAuthModal==='function')openUserAuthModal();
+  if(typeof setAuthMode==='function')setAuthMode('code');
+  const field=$('userAuthUsername');
+  if(field)field.value=name;
+}
+function logout(){
+  const admin=typeof currentAdmin!=='undefined'&&Boolean(currentAdmin);
+  close();
+  if(admin&&typeof handleAdminLogout==='function')handleAdminLogout();
+  else if(typeof handleUserLogout==='function')handleUserLogout();
+}
+function bindProfileApp(){
+  $('camProfileEditOpen')?.addEventListener('click',openEdit);
+  $('camProfileEditBack')?.addEventListener('click',()=>closeEdit());
+  $('camProfileShare')?.addEventListener('click',shareProfile);
+  $('camProfileStats')?.addEventListener('click',event=>{
+    const b=event.target.closest('button[data-tab]');
+    if(!b||!activeAuthor)return;
+    setPrivateTab(b.dataset.tab);
+    $('aeProfileTabs')?.scrollIntoView?.({block:'nearest'});
+  });
+  $('camUsernameInput')?.addEventListener('input',onNameInput);
+  $('camUsernameForm')?.addEventListener('submit',event=>{
+    event.preventDefault();
+    const name=normalizedInput();
+    if($('camUsernameSave').disabled||!USERNAME_RULE.test(name))return;
+    askNameConfirm(name);
+  });
+  $('camUsernameConfirmNo')?.addEventListener('click',()=>{
+    $('camUsernameConfirm').hidden=true;$('camUsernameSave').hidden=!editStatus?.can_change;$('camUsernameInput').focus();
+  });
+  $('camUsernameConfirmYes')?.addEventListener('click',()=>changeName($('camUsernameConfirm').dataset.name));
+  $('camUsernameUndo')?.addEventListener('click',()=>{if(editStatus?.undo_username)askNameConfirm(editStatus.undo_username,true);});
+  $('camProfileRecovery')?.addEventListener('click',openRecovery);
+  $('camProfileLogout')?.addEventListener('click',logout);
+  // Escape en Editar perfil vuelve al perfil en lugar de cerrarlo.
+  $('aeProfileDialog')?.addEventListener('cancel',event=>{if(editing()){event.preventDefault();closeEdit();}});
+}
+window.aeProfileEdit=Object.freeze({open:openEdit,close:closeEdit});
+
 window.openAeProfile=showOwn;
 window.openAePublicProfile=showPublic;
 window.closeAeProfile=close;
 
 document.addEventListener('DOMContentLoaded',()=>{
+  bindProfileApp();
   updateButton();
   if(typeof db!=='undefined'&&db)db.auth.onAuthStateChange(()=>setTimeout(updateButton,150));
 

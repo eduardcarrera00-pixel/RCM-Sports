@@ -202,3 +202,25 @@ encabezado de noticias, una vista previa de la última publicación y el carruse
 de las siguientes tres, sin repetir la última. `cam-sport-news.css` comparte la
 presentación de la vista previa entre ambos deportes y temas. Clasificación
 conserva las tablas de usuarios; los accesos a Power Rankings abren Noticias.
+
+## Perfil · 3 nov 2026
+
+El perfil se ordena como el de una app (Instagram, X o Sleeper): arriba la
+inicial en un círculo bronce como foto, **@usuario** como título y «Miembro desde
+…»; debajo, **Editar perfil** (solo el propio) y **Compartir perfil** (enlace
+`?perfil=`). Una fila de cifras (Takes · Picks · Acierto · Apoyo) lleva a su
+pestaña, y las pestañas (Mis Takes · Mis Picks · Mi Quiniela; en perfiles
+públicos, Takes · Picks · Quiniela) quedan fijas al bajar. En el teléfono el
+perfil ocupa la pantalla completa. «Siempre serás bienvenido» sigue a la
+izquierda de la X.
+
+**Editar perfil** es una pantalla propia (con «‹ Perfil» para volver; Escape
+también vuelve): cambio de nombre de usuario con comprobación en vivo
+(disponible / ocupado / formato), confirmación que explica que se inicia sesión
+con el nombre nuevo, y la sección Cuenta (código de recuperación y cerrar
+sesión). Reglas en la base de datos (`supabase/migrations/20261103130000_cam_username_change.sql`):
+3–30 letras minúsculas, números o «_», un cambio cada 30 días, se puede volver
+una vez al nombre anterior durante 7 días y el nombre anterior queda reservado
+30 días para su dueño. Picks, comentarios y avisos ya publicados pasan al nombre
+nuevo. Estilos: `assets/cam-profile-app.css`. Pruebas: `python3 -B tests/profile-edit.py`
+y `bash tests/username-change.sh` (PostgreSQL local).
