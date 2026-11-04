@@ -1004,6 +1004,7 @@ const READ_TOOLS: Tool[] = [
   },
 ];
 
+
 // ───────────────────────────── administración ─────────────────────────────
 //
 // Las herramientas admin_* pasan por public.cam_mcp_admin (clave secreta, solo service_role).
@@ -1023,7 +1024,7 @@ async function admin(action: string, args: Json = {}): Promise<any> {
 const adminRpc = (fn: string, args: Json = {}) => admin("rpc", { fn, args });
 
 const norm = (v: unknown) =>
-  String(v ?? "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
+  String(v ?? "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
 
 /** Texto obligatorio u opcional con límites (sin recortar en silencio). */
 function content(args: Args, name: string, opts: { min?: number; max: number; required?: boolean }): string | null {
