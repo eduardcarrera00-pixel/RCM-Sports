@@ -942,7 +942,6 @@ async function showOwn(tab='perfil'){
   activeAuthor=null;
   ownTakes=[];ownPicks=[];ownUnpopularTakeId=null;
   resetLoads();
-  if($('aeProfileWelcomeAgain'))$('aeProfileWelcomeAgain').hidden=false;
   if($('aeProfilePublish'))$('aeProfilePublish').hidden=true;
   publicAuthorLabel='Aficionado';
   $('aeProfileTabs').hidden=false;
@@ -975,7 +974,6 @@ async function showPublic(id,push=true,tab='perfil'){
 
   privateView=false;
   if($('aeProfilePublish'))$('aeProfilePublish').hidden=true;
-  if($('aeProfileWelcomeAgain'))$('aeProfileWelcomeAgain').hidden=true;
   activeAuthor=id;
   ownTakes=[];ownPicks=[];
   resetLoads();

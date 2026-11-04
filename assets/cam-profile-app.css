@@ -7,23 +7,37 @@
 /* ---------- Cabecera ---------- */
 html body #aeProfileDialog .ae-profile-top.cam-profile-head {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   grid-template-areas:
-    "kicker welcome close"
-    "identity identity identity"
-    "actions actions actions";
+    "kicker close"
+    "identity identity"
+    "actions actions";
   align-items: center;
-  gap: 16px 8px;
+  gap: 12px;
   min-height: 0;
-  padding: 22px 30px 22px;
+  padding: 12px 24px 18px;
 }
 html body #aeProfileDialog .cam-profile-head > .cam-profile-kicker {
   grid-area: kicker;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin: 0;
   min-width: 0;
 }
-html body #aeProfileDialog .cam-profile-head > #aeProfileWelcomeAgain { grid-area: welcome; }
-html body #aeProfileDialog .cam-profile-head > .ae-profile-close { grid-area: close; }
+html body #aeProfileDialog .cam-profile-kicker::before {
+  content: "";
+  flex: 0 0 16px;
+  height: 1px;
+  background: currentColor;
+}
+html body #aeProfileDialog .cam-profile-head > .ae-profile-close {
+  --ds-focus-width: 2px;
+  --ds-focus-offset: 2px;
+  grid-area: close;
+  width: 44px;
+  height: 44px;
+}
 html body #aeProfileDialog .cam-profile-head > div {
   max-width: none;
   padding-top: 0;
@@ -32,52 +46,68 @@ html body #aeProfileDialog .cam-profile-identity {
   grid-area: identity;
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
   min-width: 0;
 }
 html body #aeProfileDialog .cam-profile-names { min-width: 0; }
 html body #aeProfileDialog .cam-profile-head h2 {
-  font-size: clamp(28px, 4.6vw, 46px);
-  line-height: 1.02;
+  font-size: clamp(27px, 4.6vw, 40px);
   overflow-wrap: anywhere;
 }
-html body #aeProfileDialog .cam-profile-head .cam-profile-names p { margin-top: 6px; font-size: 13px; }
+html body #aeProfileDialog .cam-profile-head .cam-profile-names p { margin-top: 3px; font-size: 13px; }
 html body #aeProfileDialog .cam-profile-avatar {
   display: grid;
   place-items: center;
-  flex: 0 0 76px;
-  width: 76px;
-  height: 76px;
+  flex: 0 0 64px;
+  width: 64px;
+  height: 64px;
   margin: 0;
   box-sizing: border-box;
   border: 2px solid #d4a36f;
   background: radial-gradient(circle at 32% 28%, #2d5269 0%, #12344a 58%, #0a2333 100%);
   color: #f6dcb6;
-  font: 600 36px/1 Newsreader, Georgia, serif;
+  font: 600 30px/1 "Playfair Display", Georgia, serif;
   text-transform: uppercase;
-  box-shadow: 0 0 0 4px rgba(10, 32, 47, .55), 0 10px 26px rgba(0, 0, 0, .35);
+  box-shadow: 0 0 0 3px rgba(10, 32, 47, .45);
   user-select: none;
 }
-html body #aeProfileDialog .cam-profile-actions {
+html body #aeProfileDialog .cam-profile-head > .cam-profile-actions {
   grid-area: actions;
   display: flex;
   gap: 8px;
-  max-width: 520px;
+  width: 100%;
+  max-width: 360px;
 }
 html body #aeProfileDialog .cam-profile-action {
   flex: 1 1 0;
-  min-height: 42px;
-  padding: 0 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 6px 12px;
   border: 1px solid rgba(238, 199, 154, .62);
   background: rgba(6, 22, 34, .58);
   color: #fff2df;
-  font: 700 13px/1 Inter, system-ui, sans-serif;
+  font: 700 13px/1.2 Inter, system-ui, sans-serif;
   letter-spacing: .01em;
   cursor: pointer;
   transition: background .15s ease, border-color .15s ease;
 }
 html body #aeProfileDialog .cam-profile-action[hidden] { display: none; }
 html body #aeProfileDialog .cam-profile-action:hover { background: rgba(20, 54, 72, .92); border-color: #f0c69d; }
+html body #aeProfileDialog .cam-profile-head :is(.ae-profile-close, .cam-profile-action) svg {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+html body #aeProfileDialog #camProfileEditOpen { background: #e4ba89; border-color: #e4ba89; color: #142d41; }
+html body #aeProfileDialog #camProfileEditOpen:hover { background: #f3d0a7; border-color: #f3d0a7; }
 
 /* ---------- Cifras ---------- */
 html body #aeProfileDialog .cam-profile-stats {
@@ -310,10 +340,12 @@ html:not(.dark) body #aeProfileDialog .cam-profile-avatar {
   border-color: #a47946;
   background: radial-gradient(circle at 32% 28%, #fffaf1 0%, #f1e3cd 62%, #e5d1b2 100%);
   color: #6f4a26;
-  box-shadow: 0 0 0 4px rgba(255, 250, 241, .8), 0 8px 22px rgba(81, 58, 35, .2);
+  box-shadow: 0 0 0 3px rgba(255, 250, 241, .8);
 }
 html:not(.dark) body #aeProfileDialog .cam-profile-action { border-color: #b68a60; background: rgba(255, 250, 242, .86); color: #273c49; }
 html:not(.dark) body #aeProfileDialog .cam-profile-action:hover { background: #fffaf1; }
+html:not(.dark) body #aeProfileDialog #camProfileEditOpen { background: #15334d; border-color: #15334d; color: #fff6e8; }
+html:not(.dark) body #aeProfileDialog #camProfileEditOpen:hover { background: #234a68; border-color: #234a68; }
 html:not(.dark) body #aeProfileDialog .cam-profile-stats { background: rgba(241, 232, 218, .55); }
 html:not(.dark) body #aeProfileDialog .cam-profile-stats strong { color: #1c3546; }
 html:not(.dark) body #aeProfileDialog .cam-profile-stats span { color: #8e603b; }
@@ -355,12 +387,12 @@ html:not(.dark) body #aeProfileDialog .cam-profile-row.is-danger strong { color:
     padding-bottom: env(safe-area-inset-bottom, 0px) !important;
   }
   html body #aeProfileDialog .ae-profile-top.cam-profile-head {
-    gap: 14px 8px;
-    padding: max(14px, env(safe-area-inset-top, 0px)) 16px 18px;
+    gap: 10px;
+    padding: max(6px, env(safe-area-inset-top, 0px)) 16px 14px;
   }
-  html body #aeProfileDialog .cam-profile-head h2 { font-size: clamp(25px, 7.4vw, 34px); }
-  html body #aeProfileDialog .cam-profile-avatar { flex-basis: 64px; width: 64px; height: 64px; font-size: 30px; }
-  html body #aeProfileDialog .cam-profile-actions { max-width: none; }
+  html body #aeProfileDialog .cam-profile-head h2 { font-size: clamp(24px, 7.1vw, 32px); }
+  html body #aeProfileDialog .cam-profile-identity .cam-profile-avatar { flex-basis: 54px; width: 54px; height: 54px; font-size: 26px; }
+  html body #aeProfileDialog .cam-profile-head > .cam-profile-actions { max-width: none; }
   html body #aeProfileDialog .cam-profile-stats strong { font-size: 21px; }
   html body #aeProfileDialog .cam-profile-stats span { font-size: 9.5px; letter-spacing: .06em; }
   html body #aeProfileDialog .ae-profile-tabs:not([hidden]) { padding: 10px 16px; }
