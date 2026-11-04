@@ -219,9 +219,9 @@ html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-r
 /* ---------- 4 · Take histórico: «Salón de la fama» ---------- */
 /* Rediseño completo (28 oct). Va en la capa cam-banners porque esa capa ya fija
    fondo y esquinas de la sección con !important y gana a todo lo que está fuera
-   de capa y a la capa de esquinas redondeadas. Solo afecta a #aeHomeTakeHistoric. */
+   de capa y a la capa de esquinas redondeadas. Compartido por Inicio y el récord de cada deporte. */
 @layer cam-banners {
-  html body #aeHomeTakeHighlights #aeHomeTakeHistoric {
+  html body :is(#aeHomeTakeHighlights #aeHomeTakeHistoric, #freeTakes #aeSportTakeHistoric) {
     --tr-paper:#f6eee1;
     --tr-paper-hi:#fffaf1;
     --tr-card:#fffdf8;
@@ -250,7 +250,7 @@ html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-r
     color:var(--tr-ink)!important;
     box-shadow:0 12px 28px rgba(70,46,14,.08)!important;
   }
-  html.dark body #aeHomeTakeHighlights #aeHomeTakeHistoric {
+  html.dark body :is(#aeHomeTakeHighlights #aeHomeTakeHistoric, #freeTakes #aeSportTakeHistoric) {
     --tr-paper:#0b2233;
     --tr-paper-hi:#11304a;
     --tr-card:#10283b;
@@ -264,19 +264,24 @@ html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-r
     --tr-cta-ink:#0b2233;
     box-shadow:0 14px 32px rgba(0,8,16,.35)!important;
   }
-  html body #aeHomeTakeHighlights #aeHomeTakeHistoric::before,
-  html body #aeHomeTakeHighlights #aeHomeTakeHistoric::after {
+  html body :is(#aeHomeTakeHighlights #aeHomeTakeHistoric, #freeTakes #aeSportTakeHistoric)::before,
+  html body :is(#aeHomeTakeHighlights #aeHomeTakeHistoric, #freeTakes #aeSportTakeHistoric)::after {
     content:none!important;
     display:none!important;
   }
+  html body #freeTakes #aeSportTakeHistoric {
+    margin:24px 0 0!important;
+    order:1000!important;
+  }
+  html body #freeTakes #aeSportTakeHistoric[hidden] {display:none!important;}
   /* Cabecera */
-  html body #aeHomeTakeHighlights #aeHomeTakeHistoric .ae-historic-copy {
+  html body :is(#aeHomeTakeHighlights #aeHomeTakeHistoric, #freeTakes #aeSportTakeHistoric) .ae-historic-copy {
     display:flex!important;
     flex-direction:column!important;
     align-items:flex-start!important;
     gap:6px!important;
   }
-  html body #aeHomeTakeHighlights #aeHomeTakeHistoric .cam-take-record-kicker {
+  html body :is(#aeHomeTakeHighlights #aeHomeTakeHistoric, #freeTakes #aeSportTakeHistoric) .cam-take-record-kicker {
     display:inline-flex!important;
     align-items:center!important;
     gap:8px!important;
@@ -286,13 +291,13 @@ html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-r
     letter-spacing:.2em!important;
     text-transform:uppercase!important;
   }
-  html body #aeHomeTakeHighlights #aeHomeTakeHistoric .cam-take-record-kicker::before {
+  html body :is(#aeHomeTakeHighlights #aeHomeTakeHistoric, #freeTakes #aeSportTakeHistoric) .cam-take-record-kicker::before {
     content:""!important;
     width:18px!important;height:1px!important;
     background:currentColor!important;
     opacity:.8!important;
   }
-  html body #aeHomeTakeHighlights #aeHomeTakeHistoric #aeHomeTakeHistoricTitle {
+  html body :is(#aeHomeTakeHighlights #aeHomeTakeHistoric, #freeTakes #aeSportTakeHistoric) :is(#aeHomeTakeHistoricTitle,#aeSportTakeHistoricTitle) {
     max-width:none!important;
     margin:0!important;
     color:var(--tr-ink)!important;
@@ -300,20 +305,20 @@ html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-r
     letter-spacing:-.02em!important;
     text-shadow:none!important;
   }
-  html body #aeHomeTakeHighlights #aeHomeTakeHistoric .ae-home-take-feature-intro {
+  html body :is(#aeHomeTakeHighlights #aeHomeTakeHistoric, #freeTakes #aeSportTakeHistoric) .ae-home-take-feature-intro {
     max-width:36ch!important;
     margin:0!important;
     color:var(--tr-muted)!important;
     font:500 13.5px/1.5 Inter,system-ui,sans-serif!important;
     text-shadow:none!important;
   }
-  html body #aeHomeTakeHighlights #aeHomeTakeHistoric #aeHomeTakeHistoricTake {
+  html body :is(#aeHomeTakeHighlights #aeHomeTakeHistoric, #freeTakes #aeSportTakeHistoric) :is(#aeHomeTakeHistoricTake,#aeSportTakeHistoricTake) {
     width:100%!important;
     max-width:none!important;
     margin:0!important;
   }
   /* Placa del récord y placa vacía comparten la medalla */
-  html body #aeHomeTakeHighlights #aeHomeTakeHistoric :is(button.cam-take-record,.cam-take-record-empty) {
+  html body :is(#aeHomeTakeHighlights #aeHomeTakeHistoric, #freeTakes #aeSportTakeHistoric) :is(button.cam-take-record,.cam-take-record-empty) {
     display:grid!important;
     grid-template-columns:62px minmax(0,1fr)!important;
     align-items:start!important;
@@ -333,22 +338,22 @@ html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-r
     text-align:left!important;
     cursor:pointer!important;
   }
-  html body #aeHomeTakeHighlights #aeHomeTakeHistoric .cam-take-record-empty {
+  html body :is(#aeHomeTakeHighlights #aeHomeTakeHistoric, #freeTakes #aeSportTakeHistoric) .cam-take-record-empty {
     background:color-mix(in srgb,var(--tr-card) 72%,transparent)!important;
     box-shadow:none!important;
     cursor:default!important;
   }
-  html body #aeHomeTakeHighlights #aeHomeTakeHistoric button.cam-take-record:hover,
-  html body #aeHomeTakeHighlights #aeHomeTakeHistoric button.cam-take-record:focus-visible {
+  html body :is(#aeHomeTakeHighlights #aeHomeTakeHistoric, #freeTakes #aeSportTakeHistoric) button.cam-take-record:hover,
+  html body :is(#aeHomeTakeHighlights #aeHomeTakeHistoric, #freeTakes #aeSportTakeHistoric) button.cam-take-record:focus-visible {
     border-color:var(--tr-gold)!important;
     background:var(--tr-card)!important;
     box-shadow:0 10px 24px rgba(70,46,14,.14)!important;
   }
-  html body #aeHomeTakeHighlights #aeHomeTakeHistoric button.cam-take-record:focus-visible {
+  html body :is(#aeHomeTakeHighlights #aeHomeTakeHistoric, #freeTakes #aeSportTakeHistoric) button.cam-take-record:focus-visible {
     outline:2px solid var(--tr-gold)!important;
     outline-offset:3px!important;
   }
-  html body #aeHomeTakeHighlights #aeHomeTakeHistoric .cam-take-record-medal {
+  html body :is(#aeHomeTakeHighlights #aeHomeTakeHistoric, #freeTakes #aeSportTakeHistoric) .cam-take-record-medal {
     display:flex!important;
     flex-direction:column!important;
     align-items:center!important;
@@ -359,31 +364,31 @@ html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-r
     box-shadow:inset 0 0 0 3px rgba(255,248,230,.55),inset 0 0 0 4px rgba(122,78,28,.35),0 4px 10px rgba(110,70,20,.25)!important;
     color:#3a230d!important;
   }
-  html body #aeHomeTakeHighlights #aeHomeTakeHistoric .cam-take-record-medal strong {
+  html body :is(#aeHomeTakeHighlights #aeHomeTakeHistoric, #freeTakes #aeSportTakeHistoric) .cam-take-record-medal strong {
     font:800 22px/1 Inter,system-ui,sans-serif!important;
     font-variant-numeric:tabular-nums!important;
   }
-  html body #aeHomeTakeHighlights #aeHomeTakeHistoric .cam-take-record-medal small {
+  html body :is(#aeHomeTakeHighlights #aeHomeTakeHistoric, #freeTakes #aeSportTakeHistoric) .cam-take-record-medal small {
     margin-top:2px!important;
     font:800 8.5px/1 Inter,system-ui,sans-serif!important;
     letter-spacing:.14em!important;
     text-transform:uppercase!important;
   }
-  html body #aeHomeTakeHighlights #aeHomeTakeHistoric .cam-take-record-medal.is-empty {
+  html body :is(#aeHomeTakeHighlights #aeHomeTakeHistoric, #freeTakes #aeSportTakeHistoric) .cam-take-record-medal.is-empty {
     background:transparent!important;
     border:1.5px solid var(--tr-gold)!important;
     box-shadow:none!important;
     color:var(--tr-gold)!important;
   }
-  html body #aeHomeTakeHighlights #aeHomeTakeHistoric .cam-take-record-medal.is-empty svg {
+  html body :is(#aeHomeTakeHighlights #aeHomeTakeHistoric, #freeTakes #aeSportTakeHistoric) .cam-take-record-medal.is-empty svg {
     width:28px!important;height:28px!important;
   }
   /* Las líneas recortadas (con «…») no deben llevar esquinas: cortarían letras. */
-  html body #aeHomeTakeHighlights #aeHomeTakeHistoric :is(.cam-take-record-body,.cam-take-record-empty-copy,.cam-take-record-byline) > :not(.cam-take-record-chip):not(.cam-take-record-cta) {
+  html body :is(#aeHomeTakeHighlights #aeHomeTakeHistoric, #freeTakes #aeSportTakeHistoric) :is(.cam-take-record-body,.cam-take-record-empty-copy,.cam-take-record-byline) > :not(.cam-take-record-chip):not(.cam-take-record-cta) {
     border-radius:0!important;
   }
   /* Texto de la placa */
-  html body #aeHomeTakeHighlights #aeHomeTakeHistoric :is(.cam-take-record-body,.cam-take-record-empty-copy) {
+  html body :is(#aeHomeTakeHighlights #aeHomeTakeHistoric, #freeTakes #aeSportTakeHistoric) :is(.cam-take-record-body,.cam-take-record-empty-copy) {
     display:flex!important;
     flex-direction:column!important;
     align-items:flex-start!important;
@@ -391,7 +396,7 @@ html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-r
     min-width:0!important;
     border-radius:0!important;
   }
-  html body #aeHomeTakeHighlights #aeHomeTakeHistoric .cam-take-record-chip {
+  html body :is(#aeHomeTakeHighlights #aeHomeTakeHistoric, #freeTakes #aeSportTakeHistoric) .cam-take-record-chip {
     display:inline-block!important;
     padding:3px 9px!important;
     border:1px solid var(--tr-line)!important;
@@ -401,17 +406,17 @@ html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-r
     letter-spacing:.12em!important;
     text-transform:uppercase!important;
   }
-  html body #aeHomeTakeHighlights #aeHomeTakeHistoric .cam-take-record .ae-discovery-title {
+  html body :is(#aeHomeTakeHighlights #aeHomeTakeHistoric, #freeTakes #aeSportTakeHistoric) .cam-take-record .ae-discovery-title {
     margin:0!important;
     color:var(--tr-ink)!important;
     font:650 19px/1.2 Newsreader,Georgia,serif!important;
     overflow-wrap:anywhere!important;
   }
-  html body #aeHomeTakeHighlights #aeHomeTakeHistoric .cam-take-record .ae-discovery-excerpt {
+  html body :is(#aeHomeTakeHighlights #aeHomeTakeHistoric, #freeTakes #aeSportTakeHistoric) .cam-take-record .ae-discovery-excerpt {
     color:var(--tr-muted)!important;
     font:500 13px/1.45 Inter,system-ui,sans-serif!important;
   }
-  html body #aeHomeTakeHighlights #aeHomeTakeHistoric .cam-take-record-byline {
+  html body :is(#aeHomeTakeHighlights #aeHomeTakeHistoric, #freeTakes #aeSportTakeHistoric) .cam-take-record-byline {
     display:flex!important;
     flex-wrap:wrap!important;
     align-items:center!important;
@@ -422,21 +427,21 @@ html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-r
     color:var(--tr-muted)!important;
     font:600 11.5px/1.3 Inter,system-ui,sans-serif!important;
   }
-  html body #aeHomeTakeHighlights #aeHomeTakeHistoric .cam-take-record-author {
+  html body :is(#aeHomeTakeHighlights #aeHomeTakeHistoric, #freeTakes #aeSportTakeHistoric) .cam-take-record-author {
     color:var(--tr-gold)!important;
     font-weight:800!important;
   }
-  html body #aeHomeTakeHighlights #aeHomeTakeHistoric .cam-take-record-date::before {
+  html body :is(#aeHomeTakeHighlights #aeHomeTakeHistoric, #freeTakes #aeSportTakeHistoric) .cam-take-record-date::before {
     content:"·"!important;
     margin-right:8px!important;
     opacity:.7!important;
   }
   /* Placa vacía */
-  html body #aeHomeTakeHighlights #aeHomeTakeHistoric .cam-take-record-empty-title {
+  html body :is(#aeHomeTakeHighlights #aeHomeTakeHistoric, #freeTakes #aeSportTakeHistoric) .cam-take-record-empty-title {
     color:var(--tr-ink)!important;
     font:650 18px/1.2 Newsreader,Georgia,serif!important;
   }
-  html body #aeHomeTakeHighlights #aeHomeTakeHistoric .cam-take-record-empty .ae-discovery-empty {
+  html body :is(#aeHomeTakeHighlights #aeHomeTakeHistoric, #freeTakes #aeSportTakeHistoric) .cam-take-record-empty .ae-discovery-empty {
     margin:0!important;
     padding:0!important;
     border:0!important;
@@ -446,7 +451,7 @@ html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-r
     text-align:left!important;
     text-shadow:none!important;
   }
-  html body #aeHomeTakeHighlights #aeHomeTakeHistoric button.cam-take-record-cta {
+  html body :is(#aeHomeTakeHighlights #aeHomeTakeHistoric, #freeTakes #aeSportTakeHistoric) button.cam-take-record-cta {
     display:inline-flex!important;
     align-items:center!important;
     gap:6px!important;
@@ -460,27 +465,27 @@ html body #footballTakes #communityPicks #aeHomePickHistoricPick .cam-historic-r
     font:700 13px/1 Inter,system-ui,sans-serif!important;
     cursor:pointer!important;
   }
-  html body #aeHomeTakeHighlights #aeHomeTakeHistoric button.cam-take-record-cta .cam-chevron {
+  html body :is(#aeHomeTakeHighlights #aeHomeTakeHistoric, #freeTakes #aeSportTakeHistoric) button.cam-take-record-cta .cam-chevron {
     font:400 20px/.8 Georgia,"Times New Roman",serif!important;
     transform:translateY(-1px);
   }
-  html body #aeHomeTakeHighlights #aeHomeTakeHistoric button.cam-take-record-cta:focus-visible {
+  html body :is(#aeHomeTakeHighlights #aeHomeTakeHistoric, #freeTakes #aeSportTakeHistoric) button.cam-take-record-cta:focus-visible {
     outline:2px solid var(--tr-gold)!important;
     outline-offset:3px!important;
   }
   /* Ordenador: cabecera a la izquierda, placa a la derecha */
   @media(min-width:901px){
-    html body #aeHomeTakeHighlights #aeHomeTakeHistoric {
+    html body :is(#aeHomeTakeHighlights #aeHomeTakeHistoric, #freeTakes #aeSportTakeHistoric) {
       grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr)!important;
       align-items:center!important;
       gap:clamp(24px,3.5vw,48px)!important;
       padding:clamp(26px,3.2vw,38px)!important;
     }
-    html body #aeHomeTakeHighlights #aeHomeTakeHistoric :is(button.cam-take-record,.cam-take-record-empty) {
+    html body :is(#aeHomeTakeHighlights #aeHomeTakeHistoric, #freeTakes #aeSportTakeHistoric) :is(button.cam-take-record,.cam-take-record-empty) {
       grid-template-columns:72px minmax(0,1fr)!important;
       padding:20px!important;
     }
-    html body #aeHomeTakeHighlights #aeHomeTakeHistoric .cam-take-record-medal {
+    html body :is(#aeHomeTakeHighlights #aeHomeTakeHistoric, #freeTakes #aeSportTakeHistoric) .cam-take-record-medal {
       width:72px!important;height:72px!important;
     }
   }
