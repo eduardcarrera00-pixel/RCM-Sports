@@ -78,6 +78,7 @@ const server=http.createServer((req,res)=>{
      repliesVisible:cards.every(card=>card.querySelector('.cam-football-replies .ae-take-reply-count').textContent==='4'),
      noOverflow:feed.scrollWidth<=feed.clientWidth+2,
      cardFits:cards.slice(0,6).every(card=>{const box=card.getBoundingClientRect();return box.width>150&&box.height>=150;}),
+     actionsInside:cards.slice(0,6).every(card=>{const box=card.getBoundingClientRect(),row=card.querySelector('.cam-tk-actions').getBoundingClientRect();return row.height>=36&&row.bottom<=box.bottom+1&&row.top>=box.top;}),
      feedFits:r.left>=-1&&r.right<=innerWidth+1
     };
    });
@@ -85,7 +86,15 @@ const server=http.createServer((req,res)=>{
    assert.equal(result.gridColumns,width<=760?1:width<=960?2:width<=1299?3:4,JSON.stringify({width,dark,result}));
    if([390,1366].includes(width))await page.locator('#freeTakesFeed').screenshot({path:path.join(qa,'football-'+width+'-'+(dark?'night':'day')+'.png')});
   }
+  // «Responder» abre el cuadro de respuesta dentro de la tarjeta, sin salir de la lista.
   await page.locator('#freeTakesFeed [data-take-id="take-1"] .cam-football-replies').click();
+  await page.waitForTimeout(150);
+  assert.deepEqual(await page.evaluate(()=>{
+   const card=document.querySelector('#freeTakesFeed [data-take-id="take-1"]'),form=card.querySelector('.cam-tk-quick');
+   return {open:!form.hidden,focused:document.activeElement===form.querySelector('textarea'),expanded:card.querySelector('.cam-football-replies').getAttribute('aria-expanded'),opens:window.__commentOpens.length};
+  }),{open:true,focused:true,expanded:'true',opens:0},'Reply opens inside the card');
+  // El título (o el texto) abre la conversación completa.
+  await page.locator('#freeTakesFeed [data-take-id="take-1"] .cam-tk-open').click();
   assert.deepEqual(await page.evaluate(()=>window.__commentOpens),['take-1'],'Comments remain linked to the Take');
   await page.locator('#freeTakesFeed [data-take-id="take-1"] .ae-take-author-link').click();
   assert.equal(await page.evaluate(()=>window.__profileOpened),'other-1','Author profiles remain clickable');

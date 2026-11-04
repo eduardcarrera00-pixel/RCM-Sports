@@ -15,34 +15,50 @@
     dialog.id = 'aeTakeDiscussion';
     dialog.className = 'ae-take-discussion';
     dialog.setAttribute('aria-labelledby','aeTakeDiscussionTitle');
-    // Cabecera: comunidad, fecha, compartir y cerrar. Debajo, el Take (título,
-    // autor, texto y votos), la conversación y el formulario.
+    // Rediseño «La cita» (3 nov 2026): cabecera fija con comunidad, compartir y
+    // cerrar; el Take como una ficha azul noche con comilla dorada (como la
+    // imagen para compartir); el veredicto (Apoyar / Cuestionar con barra de
+    // apoyo); la conversación y, abajo y siempre a mano, el cuadro de respuesta.
     dialog.innerHTML = `
       <div class="ae-take-discussion-inner">
         <header class="ae-discussion-header">
           <p class="ae-discussion-kicker"><span id="aeDiscussionSport" class="ae-discussion-sport"></span><span id="aeDiscussionContext" class="ae-discussion-context"></span></p>
           <div class="ae-discussion-tools">
             <button type="button" id="aeDiscussionShare" class="ae-discussion-share" aria-label="Compartir este Take" title="Compartir" hidden><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3v12M7.5 7.5 12 3l4.5 4.5M5 11v8.5c0 .8.7 1.5 1.5 1.5h11c.8 0 1.5-.7 1.5-1.5V11"/></svg></button>
-            <button type="button" id="aeDiscussionClose" aria-label="Cerrar comentarios"><span aria-hidden="true"></span></button>
+            <button type="button" id="aeDiscussionClose" aria-label="Cerrar"><span aria-hidden="true"></span></button>
           </div>
         </header>
-        <section class="ae-discussion-subject">
-          <h2 id="aeTakeDiscussionTitle"><span id="aeDiscussionSubject"></span></h2>
-          <div class="ae-discussion-byline"><span id="aeDiscussionAvatar" class="ae-discussion-byline-avatar" aria-hidden="true"></span><button type="button" id="aeDiscussionAuthor">Aficionado</button></div>
-          <button type="button" id="aeDiscussionEditSport" hidden>Cambiar comunidad</button>
-          <p id="aeDiscussionBody"></p>
-          <div id="aeDiscussionVotes" class="ae-discussion-votes" aria-label="Votos del Take">
-            <button type="button" id="aeDiscussionUp" aria-pressed="false">▲ Apoyar 0</button>
-            <button type="button" id="aeDiscussionDown" aria-pressed="false">▼ Cuestionar 0</button>
-          </div>
-        </section>
-        <section class="ae-discussion-thread" aria-labelledby="aeDiscussionCount">
-          <h3 class="ae-discussion-counter" id="aeDiscussionCount">Comentarios</h3>
-          <p id="aeDiscussionStatus" role="status" aria-live="polite"></p>
-          <div id="aeDiscussionList" class="ae-discussion-list" aria-live="polite"></div>
-        </section>
-        <div class="ae-discussion-reply-target" id="aeDiscussionTarget" hidden><span id="aeDiscussionTargetName"></span><button id="aeDiscussionCancel" type="button">Cancelar respuesta</button></div>
-        <form id="aeDiscussionForm"><label for="aeDiscussionText">Tu opinión</label><textarea id="aeDiscussionText" name="body" required minlength="2" maxlength="900" rows="3" placeholder="Responde a este Take con respeto…"></textarea><button type="submit" id="aeDiscussionSubmit">Publicar comentario <span aria-hidden="true">→</span></button></form>
+        <div class="cam-tv-scroll">
+          <section class="ae-discussion-subject cam-tv-hero">
+            <span class="cam-tv-quote" aria-hidden="true">“</span>
+            <h2 id="aeTakeDiscussionTitle"><span id="aeDiscussionSubject"></span></h2>
+            <span class="cam-tv-rule" aria-hidden="true"></span>
+            <p id="aeDiscussionBody"></p>
+            <div class="ae-discussion-byline">
+              <span id="aeDiscussionAvatar" class="ae-discussion-byline-avatar" aria-hidden="true"></span>
+              <span class="cam-tv-byline-text"><button type="button" id="aeDiscussionAuthor">Aficionado</button><time id="aeDiscussionDate" class="cam-tv-date"></time></span>
+            </div>
+            <button type="button" id="aeDiscussionEditSport" hidden>Cambiar comunidad</button>
+          </section>
+          <section class="cam-tv-verdict" aria-labelledby="camTvVerdictTitle">
+            <h3 id="camTvVerdictTitle" class="cam-tv-verdict-title">¿Qué opinas de este Take?</h3>
+            <div id="aeDiscussionVotes" class="ae-discussion-votes" role="group" aria-labelledby="camTvVerdictTitle">
+              <button type="button" id="aeDiscussionUp" data-vote="up" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5.5 5 13.5h4.4V19h5.2v-5.5H19z"/></svg><span class="cam-tv-vote-label">Apoyar</span><strong class="cam-tv-vote-count">0</strong></button>
+              <button type="button" id="aeDiscussionDown" data-vote="down" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 18.5 19 10.5h-4.4V5H9.4v5.5H5z"/></svg><span class="cam-tv-vote-label">Cuestionar</span><strong class="cam-tv-vote-count">0</strong></button>
+            </div>
+            <div class="cam-tv-meter" aria-hidden="true"><span id="camTvMeterUp"></span></div>
+            <p id="camTvMeterText" class="cam-tv-meter-text"></p>
+          </section>
+          <section class="ae-discussion-thread" aria-labelledby="aeDiscussionCount">
+            <h3 class="ae-discussion-counter" id="aeDiscussionCount">Conversación</h3>
+            <p id="aeDiscussionStatus" role="status" aria-live="polite"></p>
+            <div id="aeDiscussionList" class="ae-discussion-list" aria-live="polite"></div>
+          </section>
+        </div>
+        <div class="cam-tv-composer">
+          <div class="ae-discussion-reply-target" id="aeDiscussionTarget" hidden><span id="aeDiscussionTargetName"></span><button id="aeDiscussionCancel" type="button" aria-label="Cancelar respuesta"><span aria-hidden="true">×</span></button></div>
+          <form id="aeDiscussionForm"><label for="aeDiscussionText" class="cam-tv-sr">Tu opinión</label><textarea id="aeDiscussionText" name="body" required minlength="2" maxlength="900" rows="1" placeholder="Escribe tu opinión…"></textarea><button type="submit" id="aeDiscussionSubmit" aria-label="Publicar comentario" title="Publicar"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 19V5M5.5 11.5 12 5l6.5 6.5"/></svg></button></form>
+        </div>
       </div>`;
     document.body.append(dialog);
     $('aeDiscussionClose').addEventListener('click',()=>dialog.close());
@@ -69,15 +85,34 @@
     dialog.addEventListener('click',(event)=>{if(event.target===dialog)dialog.close();});
     dialog.addEventListener('close',()=>{current=null;sequence++;setParent(null);});
     $('aeDiscussionForm').addEventListener('submit',post);
+    const text=$('aeDiscussionText');
+    text.addEventListener('input',()=>grow(text));
+    text.addEventListener('keydown',event=>{
+      if(event.key==='Enter'&&(event.metaKey||event.ctrlKey)){event.preventDefault();$('aeDiscussionForm').requestSubmit?.();}
+    });
+  }
+  // El cuadro de respuesta crece con el texto (hasta unas cinco líneas).
+  function grow(field){
+    if(!field)return;
+    field.style.height='auto';
+    field.style.height=Math.min(field.scrollHeight+2,132)+'px';
   }
   function setParent(reply) {
     parentId=reply?.id||null;
     const hint=$('aeDiscussionTarget');
     if(!hint)return;
     hint.hidden=!reply;
-    $('aeDiscussionTargetName').textContent=reply?'Respondiendo a @'+reply.author:'';
-    $('aeDiscussionText').placeholder=reply?'Escribe tu respuesta…':'Responde a este Take con respeto…';
+    $('aeDiscussionTargetName').textContent=reply?'Respondiendo a @'+String(reply.author||'Aficionado').replace(/^@+/,''):'';
+    $('aeDiscussionText').placeholder=reply?'Escribe tu respuesta…':'Escribe tu opinión…';
     if(reply)$('aeDiscussionText').focus();
+  }
+  // Los Takes de NFL guardan su contexto (división, equipo, tema) en la primera línea.
+  function splitBody(take){
+    const text=String(take?.body||'').replace(/\r\n/g,'\n').trim();
+    if(String(take?.sport||'').toLowerCase()!=='nfl')return {context:'',text};
+    const match=text.match(/^NFL((?: · [^\n]*)?)\n\n/);
+    if(!match)return {context:'',text};
+    return {context:match[1].replace(/^ · /,''),text:text.slice(match[0].length).trim()};
   }
   function openAuthorProfile(authorId){
     if(!authorId || typeof window.openAePublicProfile!=='function')return;
@@ -88,9 +123,11 @@
   function render(comments, totals) {
     const list=$('aeDiscussionList');
     list.replaceChildren();
-    $('aeDiscussionCount').textContent=comments.length===1?'1 comentario':comments.length+' comentarios';
+    $('aeDiscussionCount').textContent=comments.length===1?'1 comentario':comments.length?comments.length+' comentarios':'Conversación';
     if(!comments.length) {
-      list.append(el('p','Todavía nadie ha comentado. Abre la conversación.','ae-discussion-empty'));
+      const empty=el('div',undefined,'ae-discussion-empty');
+      empty.append(el('strong','Todavía nadie ha comentado'),el('span','Abre la conversación: escribe abajo lo que piensas.'));
+      list.append(empty);
       return;
     }
     const scores=new Map((totals||[]).map(t=>[String(t.reply_id),t]));
@@ -117,7 +154,13 @@
       const actions=el('div',undefined,'ae-discussion-actions ae-discussion-comment-controls');
       for(const [value,label,count] of [[1,'▲',score.upvotes],[-1,'▼',score.downvotes]]){
         const selected=Number(score.my_vote)===value;
-        const button=el('button',label+' '+(Number(count)||0),'ae-discussion-comment-vote');
+        const button=el('button',undefined,'ae-discussion-comment-vote');
+        button.dataset.vote=value===1?'up':'down';
+        button.innerHTML=value===1
+          ?'<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5.5 5 13.5h4.4V19h5.2v-5.5H19z"/></svg>'
+          :'<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 18.5 19 10.5h-4.4V5H9.4v5.5H5z"/></svg>';
+        button.append(el('span',String(Number(count)||0)));
+        button.dataset.label=label;
         button.type='button';
         button.setAttribute('aria-pressed',String(selected));
         button.setAttribute('aria-label',(value===1?'Apoyar':'Cuestionar')+' comentario de '+(r.author||'Aficionado')+': '+(Number(count)||0)+' votos');
@@ -232,6 +275,7 @@
       const result=await db.rpc('ae_post_take_reply',{p_take_id:takeId,p_body:text,p_parent_id:parentId});
       if(result.error)throw result.error;
       $('aeDiscussionText').value='';
+      grow($('aeDiscussionText'));
       setParent(null);
       await load();
       document.dispatchEvent(new Event('ae:takes-updated'));
@@ -242,14 +286,26 @@
     }
   }
   function showVotes(take){
-    // Oculta ambos controles al autor; nunca muestra votos antes de comprobar la sesión.
-    $('aeDiscussionVotes').style.display=!viewerReady||(viewerId&&take.author_id&&String(viewerId)===String(take.author_id))?'none':'';
-    for(const [value,id,name,count] of [[1,'aeDiscussionUp','▲ Apoyar',take.upvotes],[-1,'aeDiscussionDown','▼ Cuestionar',take.downvotes]]){
+    // El autor ve sus votos pero no puede votarse. Antes de comprobar la sesión
+    // los botones quedan inactivos (nunca se vota sin saber quién vota).
+    const own=Boolean(viewerId&&take.author_id&&String(viewerId)===String(take.author_id));
+    const up=Math.max(0,Number(take.upvotes)||0),down=Math.max(0,Number(take.downvotes)||0),total=up+down;
+    $('aeDiscussionVotes').dataset.own=String(own);
+    for(const [value,id,name,count] of [[1,'aeDiscussionUp','Apoyar',up],[-1,'aeDiscussionDown','Cuestionar',down]]){
       const button=$(id);
-      button.textContent=name+' '+(Number(count)||0);
+      button.querySelector('.cam-tv-vote-count').textContent=String(count);
       button.setAttribute('aria-pressed',String(Number(take.my_vote)===value));
-      button.disabled=voting;
+      button.setAttribute('aria-label',name+' este Take: '+count+' '+(count===1?'voto':'votos')+(own?'. No puedes votar tu propio Take.':''));
+      button.disabled=voting||!viewerReady||own;
     }
+    // Barra de apoyo: qué parte de los votos apoya el Take.
+    const share=total?Math.round(up*100/total):0;
+    const meter=$('camTvMeterUp');
+    meter.style.width=(total?share:0)+'%';
+    meter.parentElement.dataset.empty=String(!total);
+    $('camTvMeterText').textContent=own
+      ?(total?'Es tu Take: '+share+' % de apoyo · '+total+' '+(total===1?'voto':'votos')+'.':'Es tu Take: la comunidad todavía no ha votado.')
+      :(total?share+' % lo apoya · '+total+' '+(total===1?'voto':'votos'):'Todavía nadie ha votado. ¿Lo apoyas o lo cuestionas?');
   }
   async function vote(value){
     if(!current||voting)return;
@@ -267,14 +323,27 @@
         return;
       }
       voting=true;
+      // Se pinta al momento; votar dos veces lo mismo retira el voto (como en el servidor).
+      const prev=Number(take.my_vote)||0;
+      const expected=prev===value?0:value;
+      const apply=next=>{
+        const was=Number(take.my_vote)||0;
+        if(was===1)take.upvotes=Math.max(0,(Number(take.upvotes)||0)-1);
+        if(was===-1)take.downvotes=Math.max(0,(Number(take.downvotes)||0)-1);
+        if(next===1)take.upvotes=(Number(take.upvotes)||0)+1;
+        if(next===-1)take.downvotes=(Number(take.downvotes)||0)+1;
+        take.my_vote=next||null;
+      };
+      apply(expected);
       showVotes(take);
-      const result=await db.rpc('ae_vote_free_take',{p_take_id:take.id,p_value:value});
-      if(result.error)throw result.error;
-      // El servidor es la fuente de verdad para votos y estado del usuario.
-      if(take.author_id){
-        const refreshed=await db.rpc('ae_public_take_profile',{p_author_id:take.author_id});
-        const updated=!refreshed.error&&(refreshed.data||[]).find(item=>String(item.id)===String(take.id));
-        if(updated&&current?.id===take.id)current={...take,...updated};
+      try{
+        const result=await db.rpc('ae_vote_free_take',{p_take_id:take.id,p_value:value});
+        if(result.error)throw result.error;
+        const saved=result.data!==null&&[1,-1,0].includes(Number(result.data))?Number(result.data):expected;
+        if(saved!==expected)apply(saved);
+      }catch(err){
+        apply(prev);
+        throw err;
       }
       if(current?.id===take.id){
         $('aeDiscussionStatus').textContent='';
@@ -334,16 +403,22 @@
     const day=published&&!Number.isNaN(published.getTime())?published.toLocaleDateString('es',{day:'numeric',month:'short',year:'numeric'}):'';
     const sportLabel=$('aeDiscussionSport').textContent.toLowerCase();
     const competition=String(take.competition||'').trim();
-    $('aeDiscussionContext').textContent=[competition&&competition.toLowerCase()!==sportLabel?competition:'',day].filter(Boolean).join(' · ');
+    const {context,text}=splitBody(take);
+    // Arriba, la competición (y en NFL, división/equipo); la fecha va con el autor.
+    $('aeDiscussionContext').textContent=[competition&&competition.toLowerCase()!==sportLabel?competition:'',context].filter(Boolean).join(' · ');
+    $('aeDiscussionDate').textContent=day;
+    try{$('aeDiscussionDate').dateTime=published?published.toISOString():'';}catch(_){$('aeDiscussionDate').removeAttribute('datetime');}
     // Solo Takes públicos con autor y número válidos se pueden convertir en ficha.
     const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     $('aeDiscussionShare').hidden=!(window.CamPickShare&&!take.hidden&&uuid.test(String(take.id))&&uuid.test(String(take.author_id||'')));
-    $('aeDiscussionBody').textContent=take.body||'';
+    $('aeDiscussionBody').textContent=text;
     viewerReady=false;
     viewerId=null;
     showVotes(take);
     $('aeDiscussionText').value='';
-    $('aeDiscussionCount').textContent='Comentarios';
+    grow($('aeDiscussionText'));
+    $('aeDiscussionCount').textContent='Conversación';
+    dialog.querySelector('.cam-tv-scroll').scrollTop=0;
     $('aeDiscussionList').replaceChildren();
     $('aeDiscussionStatus').textContent='';
     if(!dialog.open)dialog.showModal();

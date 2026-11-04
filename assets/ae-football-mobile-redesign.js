@@ -46,6 +46,10 @@
   const footballActive = () =>
     mobile.matches && document.body.classList.contains('ae-is-football');
 
+  // Coloca cada módulo justo después del anterior. Si ya está en su sitio no se
+  // toca: mover un nodo le quita el foco (el teclado del teléfono se cerraba al
+  // escribir una respuesta en «Últimos Takes») y reinicia su desplazamiento.
+  let placedBefore = null;
   function moveTo(element, container) {
     if (!element || !container) return;
     if (!originalLocations.has(element)) {
@@ -53,9 +57,13 @@
       element.parentNode?.insertBefore(marker, element);
       originalLocations.set(element, marker);
     }
-    if (element.parentNode !== container || element !== container.lastElementChild) {
-      container.appendChild(element);
+    const previous = placedBefore?.parentNode === container ? placedBefore : null;
+    const inPlace = element.parentNode === container && element.previousElementSibling === previous;
+    if (!inPlace) {
+      if (previous) previous.after(element);
+      else container.prepend(element);
     }
+    placedBefore = element;
   }
 
   function restoreDesktopOrder() {
@@ -98,6 +106,7 @@
       const ranking = byId('championsRankings');
 
       // La clasificación encabeza siempre la categoría Fútbol en móvil.
+      placedBefore = null;
       moveTo(ranking, stage);
       moveTo(byId('heroSection'), stage);
       moveTo(newsHeading, stage);

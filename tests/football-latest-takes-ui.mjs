@@ -64,9 +64,15 @@ assert.equal(own.querySelector('.ae-take-reply-count').textContent,'3');
 assert.equal(other.querySelector('.ae-take-reply-count').textContent,'3');
 assert.equal(own.querySelectorAll('.cam-football-replies').length,1);
 assert.equal(other.querySelectorAll('.cam-football-replies').length,1);
+// «Responder» abre el cuadro de respuesta dentro de la tarjeta (no la conversación).
 own.querySelector('.cam-football-replies').click();
+await tick();
+assert.equal(replies.length,0,'Reply stays inside the card');
+assert.equal(d.querySelector('[data-take-id="take-0"] .cam-tk-quick').hidden,false,'Inline reply box opens');
+assert.equal(d.querySelector('[data-take-id="take-0"] .cam-football-replies').getAttribute('aria-expanded'),'true');
+// El título abre la conversación completa.
+d.querySelector('[data-take-id="take-0"] .cam-tk-open').click();
 assert.equal(replies.at(-1).id,'take-0');
-assert.equal(replies.at(-1).options.focusComposer,true);
 other.querySelector('.ae-take-author-link').click();
 assert.equal(w.__openedProfile,'other-1');
 voteButtons(other)[1].click();
@@ -86,12 +92,14 @@ assert.equal(d.getElementById('freeTakesMore').hidden,true,'Pagination ends only
 w.currentCategory='NFL';w.renderFreeTakesVisibility();await tick();
 assert.equal(d.querySelectorAll('#freeTakesFeed .ae-free-take-card').length,1);
 assert.equal(d.getElementById('freeTakesMore').hidden,true);
-assert.equal(d.querySelectorAll('.cam-football-vote').length,0,'NFL UI remains unchanged');
-assert.equal(d.querySelectorAll('#freeTakesFeed .ae-free-vote-row .ae-take-reply-link').length,1);
+// NFL usa ya la misma tarjeta: votos visibles (el propio Take no se puede votar) y «Responder».
+assert.equal(d.querySelectorAll('#freeTakesFeed .cam-football-vote').length,2,'NFL shares the Football card');
+assert(voteButtons(d.querySelector('#freeTakesFeed .ae-free-take-card')).every(button=>button.disabled),'NFL self-voting remains forbidden');
+assert.equal(d.querySelectorAll('#freeTakesFeed .cam-tk-actions .ae-take-reply-link').length,1);
 const style=fs.readFileSync('assets/cam-football-last-takes-feed.css','utf8');
 assert(style.includes('.ae-is-football')&&!style.includes('.ae-is-nfl'),'New styles only target Football');
 assert(style.includes('grid-template-columns:minmax(0,1fr)!important'),'Mobile shows one column');
 assert(style.includes('html:not(.dark)')&&style.includes('--cam-ft-paper:#102c3e'),'Day and night palettes exist');
 assert(style.includes('cam-football-replies'),'Compact replies are styled');
 await w.happyDOM.close();
-console.log('PASS: Football own/other counts, self-vote permission, selected vote, comments, profiles, 42 Takes pagination; NFL unchanged.');
+console.log('PASS: Football own/other counts, self-vote permission, selected vote, inline reply, comments, profiles, 42 Takes pagination; NFL shares the card.');

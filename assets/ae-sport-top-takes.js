@@ -11,18 +11,6 @@
    return n;
  };
 
- // Fútbol: top 10 real, con scroll exclusivamente manual.
- // Sin intervalos, copias DOM ni saltos automáticos al primer puesto.
- function startFootballCycle(list,items,mode){
-   list.classList.remove('ae-football-cyclic');
-   list.style.removeProperty('--ae-cycle-count');
-   list.style.removeProperty('scroll-behavior');
-   list.tabIndex=0;
-   list.setAttribute('role','region');
-   const phone=window.matchMedia('(max-width:760px)').matches;
-   list.setAttribute('aria-label',(mode==='up'?'Opiniones populares':'Opiniones impopulares')+
-     ' de Fútbol; '+items.length+' entradas. Desliza hacia la '+(phone?'derecha':'parte inferior')+' para consultar las demás.');
- }
  let desktopHomeMarker=null;
  let nflAlignFrame=0;
  function alignNflOpinions(){
@@ -98,81 +86,91 @@
      desktopHomeMarker.after(root);
    }
  }
+ // Lista simétrica (3 nov 2026): populares e impopulares con la misma forma.
+ // Cada fila ocupa todo el ancho: posición, título, autor y balance de votos.
+ // Se ven las tres primeras; «Ver las N» despliega el resto (hasta 10).
+ const VISIBLE_ROWS=3;
  function renderList(id,items,mode){
    const list=$(id);if(!list)return;
-   const football=list.closest('#aeSportTakeLeaders')?.dataset.sport==='football';
-   const sport=football?'football':'nfl';
-   const savedTop=list.dataset.renderSport===sport?list.scrollTop:0;
-   const savedLeft=list.dataset.renderSport===sport?list.scrollLeft:0;
-   list.classList.remove('ae-football-cyclic');
+   const root=list.closest('#aeSportTakeLeaders');
+   const sport=root?.dataset.sport==='football'?'football':'nfl';
+   root?.classList.add('cam-op');
+   if(list.dataset.renderSport!==sport)list.dataset.expanded='false';
+   list.dataset.renderSport=sport;
+   list.classList.remove('ae-football-cyclic','ae-nfl-expanded');
    list.style.removeProperty('--ae-cycle-count');
    list.style.removeProperty('scroll-behavior');
+   list.removeAttribute('tabindex');
+   list.setAttribute('role','list');
+   const label=sport==='nfl'?(mode==='up'?'Opiniones apoyadas':'Opiniones hateadas'):(mode==='up'?'Opiniones populares':'Opiniones impopulares');
+   list.setAttribute('aria-label',label+' de '+(sport==='nfl'?'NFL':'Fútbol')+'; '+items.length+' '+(items.length===1?'Take':'Takes')+'.');
    list.replaceChildren();
-   list.dataset.renderSport=sport;
    for(const [i,t] of items.entries()){
-     const li=el('li',undefined,'ae-sport-take-item ae-sport-chef-entry');
-     const number=el('span',String(i+1).padStart(2,'0'),'ae-top-take-number');
-     const content=el('div',undefined,'ae-top-take-content');
-     const meta=el('div',undefined,'ae-sport-take-meta');
-     const author=el('button',(football?'':'@')+(t.author||'Aficionado'),'ae-top-take-author');
+     const li=el('li',undefined,'cam-op-row'+(i>=VISIBLE_ROWS?' cam-op-extra':''));
+     li.dataset.takeId=String(t.id);
+     const rank=el('span',String(i+1).padStart(2,'0'),'cam-op-rank');
+     rank.setAttribute('aria-hidden','true');
+     const main=el('div',undefined,'cam-op-main');
+     const open=el('button',t.title||'Ver Take','cam-op-title');
+     open.type='button';
+     open.setAttribute('aria-label',(i+1)+'. '+(t.title||'Take')+'. Leer y ver su conversación.');
+     open.addEventListener('click',()=>window.aeTakeReplies?.open(t));
+     const meta=el('p',undefined,'cam-op-meta');
+     const name=String(t.author||'Aficionado').replace(/^@+/,'');
+     const author=el('button','@'+name,'cam-op-author');
      author.type='button';
      author.disabled=!t.author_id;
-     author.setAttribute('aria-label','Ver perfil y Takes de '+(t.author||'Aficionado'));
-     author.addEventListener('click',()=>{
-       if(t.author_id)window.openAePublicProfile?.(t.author_id);
-     });
-     const up=Number(t.upvotes||0),down=Number(t.downvotes||0);
-     const net=up-down;
-     const score=el('span',(net>0?'+':'')+net+' votos netos','ae-sport-take-net');
-     score.setAttribute('title',up+' votos positivos · '+down+' negativos');
-     score.setAttribute('aria-label',up+' votos positivos, '+down+' negativos, balance '+net);
+     author.setAttribute('aria-label','Ver perfil y Takes de '+name);
+     author.addEventListener('click',()=>{if(t.author_id)window.openAePublicProfile?.(t.author_id);});
      meta.append(author);
-     const title=el('strong',undefined,'ae-sport-take-title');
-     const openTake=el('button',t.title||'Ver Take','ae-sport-take-open');
-     openTake.type='button';
-     openTake.setAttribute('aria-label','Leer Take y ver su conversación: '+(t.title||'Publicación'));
-     openTake.addEventListener('click',()=>window.aeTakeReplies?.open(t));
-     title.append(openTake);
-     // NFL stores its optional sport/division/team context on the first line.
-     // Keep the original body for the discussion; omit that metadata in this preview.
-     const preview=String(t.body||'').replace(/\r\n/g,'\n').trim();
-     const takeText=t.sport==='nfl'?preview.replace(/^NFL(?: · [^\n]*)?\n\n/,'').trim():preview;
-     const excerpt=el('p',takeText,'ae-sport-take-excerpt');
-     const reply=el('button','Responder','ae-top-take-reply');
-     reply.type='button';
-     reply.setAttribute('aria-label','Responder al Take: '+(t.title||'Publicación'));
-     reply.addEventListener('click',()=>window.aeTakeReplies?.open(t,{focusComposer:true}));
-     if(football){
-       // Perfil y votos en la misma línea; respuesta al final del Take.
-       score.dataset.compact=(net>0?'+':'')+net+' netos';
-       meta.append(score);
-       content.append(meta,title,excerpt,reply);
-     }else{
-       meta.append(score,reply);
-       content.append(meta,title,excerpt);
-     }
-     li.append(number,content);
+     const competition=String(t.competition||'').trim();
+     if(competition&&competition.toUpperCase()!=='NFL')meta.append(el('span',competition,'cam-op-competition'));
+     main.append(open,meta);
+     const up=Number(t.upvotes||0),down=Number(t.downvotes||0),net=up-down;
+     const score=el('span',undefined,'cam-op-score');
+     score.dataset.trend=net>0?'up':net<0?'down':'even';
+     score.title=up+' a favor · '+down+' en contra';
+     score.setAttribute('aria-label','Balance '+(net>0?'+':'')+net+': '+up+' votos a favor y '+down+' en contra');
+     const arrow=el('span',net>=0?'▲':'▼','cam-op-score-arrow');
+     arrow.setAttribute('aria-hidden','true');
+     const value=el('strong',String(Math.abs(net)),'cam-op-score-value');
+     value.setAttribute('aria-hidden','true');
+     const unit=el('small','netos','cam-op-score-unit');
+     unit.setAttribute('aria-hidden','true');
+     score.append(arrow,value,unit);
+     li.append(rank,main,score);
      li.addEventListener('click',event=>{
        if(!event.target.closest('button'))window.aeTakeReplies?.open(t);
      });
      list.append(li);
    }
-   if(football){
-     startFootballCycle(list,items,mode);
-   }else if(list.closest('#aeSportTakeLeaders')?.dataset.sport==='nfl'){
-     list.tabIndex=0;
-     list.setAttribute('role','region');
-     const phone=window.matchMedia('(max-width:760px)').matches;
-     list.setAttribute('aria-label',(mode==='up'?'Opiniones apoyadas':'Opiniones hateadas')+
-       ' de NFL; '+items.length+' entradas. Desliza hacia '+(phone?'la derecha':'abajo')+' para consultar las demás.');
-   }else{
-     list.removeAttribute('tabindex'); list.removeAttribute('role'); list.removeAttribute('aria-label');
+   if(!items.length){
+     const empty=el('li',mode==='up'?'Aún no hay Takes con más apoyos que críticas.':'Aún no hay Takes con más críticas que apoyos.','cam-op-empty');
+     list.append(empty);
    }
-   if(football && savedTop>0 && !window.matchMedia('(max-width:760px)').matches)list.scrollTop=savedTop;
-   if(savedLeft>0 && window.matchMedia('(max-width:760px)').matches)list.scrollLeft=savedLeft;
-   if(!items.length)list.append(el('li',mode==='up'?
-     'Aún no hay Takes con votos netos positivos.':
-     'Aún no hay Takes con votos netos negativos.','ae-top-takes-empty'));
+   // Botón propio para ver el resto; el antiguo «Ver todos» queda oculto.
+   const group=list.closest('.ae-sport-takes-group');
+   let more=group?.querySelector(':scope > .cam-op-more');
+   if(group&&!more){
+     more=el('button',undefined,'cam-op-more');
+     more.type='button';
+     more.setAttribute('aria-controls',id);
+     more.addEventListener('click',()=>{
+       const open=list.dataset.expanded!=='true';
+       list.dataset.expanded=String(open);
+       paintMore(more,list);
+       if(!open)group.scrollIntoView?.({block:'nearest',behavior:'smooth'});
+     });
+     list.after(more);
+   }
+   if(more)paintMore(more,list);
+ }
+ function paintMore(more,list){
+   const total=list.querySelectorAll(':scope > .cam-op-row').length;
+   const open=list.dataset.expanded==='true';
+   more.hidden=total<=VISIBLE_ROWS;
+   more.setAttribute('aria-expanded',String(open));
+   more.textContent=open?'Ver menos':'Ver las '+total+' ›';
  }
  async function refreshHistoric(sport,section,seq){
    const target=$('aeSportTakeHistoricTake');

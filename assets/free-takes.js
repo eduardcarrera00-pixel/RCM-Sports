@@ -7,8 +7,37 @@
  let replyCounts = null;
  let footballVisibleCount=20;
  const footballSports=new Set(['football','laliga','premier','ligamx','champions']);
+ // Tarjeta rápida (3 nov 2026): votar y responder sin salir de «Últimos Takes».
+ // openReply = id del Take con el cuadro de respuesta abierto; drafts guarda lo escrito
+ // para que una recarga (p. ej. tras iniciar sesión) no lo borre.
+ let openReply=null;
+ const drafts=new Map(), notes=new Map(), pendingVotes=new Set(), posting=new Set();
+ const SVG={
+   up:'<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5.5 5 13.5h4.4V19h5.2v-5.5H19z"/></svg>',
+   down:'<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 18.5 19 10.5h-4.4V5H9.4v5.5H5z"/></svg>',
+   reply:'<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 11.5c0 4-3.6 7-8 7-1.2 0-2.3-.2-3.3-.6L4 19.5l1.3-3.6C4.5 14.7 4 13.2 4 11.5c0-4 3.6-7 8-7s8 3 8 7Z"/></svg>',
+   share:'<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3v12M7.5 7.5 12 3l4.5 4.5M5 11v8.5c0 .8.7 1.5 1.5 1.5h11c.8 0 1.5-.7 1.5-1.5V11"/></svg>'
+ };
  function el(tag,text,cls){const n=document.createElement(tag);if(text!==undefined&&text!==null)n.textContent=String(text);if(cls)n.className=cls;return n;}
  function button(label,fn,cls='ae-take-button'){const n=el('button',label,cls);n.type='button';n.onclick=fn;return n;}
+ // Los Takes de NFL guardan su contexto (división, equipo, tema) en la primera línea.
+ function splitNflContext(t){
+   const text=String(t.body||'').replace(/\r\n/g,'\n').trim();
+   if(t.sport!=='nfl')return {context:'',text};
+   const match=text.match(/^NFL((?: · [^\n]*)?)\n\n/);
+   if(!match)return {context:'',text};
+   return {context:match[1].replace(/^ · /,''),text:text.slice(match[0].length).trim()};
+ }
+ function kicker(t){
+   if(t.sport==='nfl'){
+     const {context}=splitNflContext(t);
+     const competition=String(t.competition||'').trim();
+     return ['NFL',competition&&competition.toUpperCase()!=='NFL'?competition:'',context].filter(Boolean).join(' · ');
+   }
+   return t.competition||sports[t.sport]||'Deportes';
+ }
+ const cssId=v=>window.CSS?.escape?window.CSS.escape(String(v)):String(v).replace(/["\\]/g,'\\$&');
+ function isOwn(t){return Boolean(viewerId&&t.author_id&&String(viewerId)===String(t.author_id));}
  function status(msg){
    const n=$('freeTakesStatus');if(n)n.textContent=msg;
    const modal=$('aeTakeComposerStatus');if(modal)modal.textContent=msg;
@@ -31,12 +60,17 @@
    return items.filter(t=>activeSection==='NFL'?(t.sport==='nfl'&&(!window.aeNflTakes||window.aeNflTakes.matches(t))):footballSports.has(t.sport))
      .sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)||String(b.id||'').localeCompare(String(a.id||'')));
  }
- function latestTakes(){return sortedSectionTakes().slice(0,activeSection==='Fútbol'?footballVisibleCount:20);}
+ function latestTakes(){return sortedSectionTakes().slice(0,footballVisibleCount);}
+ function replyCount(t){return replyCounts?.get(String(t.id))??(replyCounts?0:null);}
  function showReplyCount(reply,t){
-   const count=replyCounts?.get(String(t.id))??(replyCounts?0:null);
+   if(!reply)return;
+   const count=replyCount(t);
    const badge=reply.querySelector('.ae-take-reply-count');
-   badge.textContent=count===null?'—':String(count);
+   badge.textContent=count===null?'':String(count);
+   badge.hidden=!count;
    reply.setAttribute('aria-label','Responder al Take: '+t.title+'. '+(count===null?'Número de respuestas no disponible':count+' '+(count===1?'respuesta':'respuestas')));
+   const link=reply.closest('article')?.querySelector('.cam-tk-quick-open');
+   if(link)link.textContent=count?'Ver conversación ('+count+') ›':'Ver conversación ›';
  }
  async function loadReplyCounts(seq){
    const takes=latestTakes();
@@ -49,7 +83,7 @@
      const byId=new Map(takes.map(t=>[String(t.id),t]));
      $('freeTakesFeed')?.querySelectorAll('article[data-take-id]').forEach(card=>{
        const take=byId.get(card.dataset.takeId);
-       if(take)showReplyCount(card.querySelector('.ae-take-reply-link'),take);
+       if(take)showReplyCount(card.querySelector('.cam-tk-reply'),take);
      });
    }catch(_){
      // El fallo de los contadores no debe ocultar los Takes ni inventar ceros.
@@ -73,77 +107,213 @@
    const more=$('freeTakesMore');
    if(more){
      const remaining=Math.max(0,sortedSectionTakes().length-sorted.length);
-     more.hidden=activeSection!=='Fútbol'||!remaining;
-     if(activeSection==='Fútbol'&&remaining)more.textContent='Ver '+Math.min(20,remaining)+' Takes anteriores →';
+     more.hidden=!remaining;
+     if(remaining)more.textContent='Ver '+Math.min(20,remaining)+' Takes anteriores →';
    }
-   // NFL continues to use its original vote controls and layout.
-   for(const t of sorted){
-     const card=el('article',null,'ae-take-card ae-free-take-card');
-     card.dataset.takeId=String(t.id);
-     // Acento basado exclusivamente en el deporte real; no altera contenido ni votos.
-     card.dataset.sport=Object.prototype.hasOwnProperty.call(sports,t.sport)?t.sport:'general';
-     const meta=el('div',null,'ae-take-overline');
-     meta.append(el('span',t.competition||sports[t.sport]||'Deportes'));
-     const author=button('@'+t.author,()=>{
-       if(typeof openAePublicProfile==='function')openAePublicProfile(t.author_id);
-     },'ae-take-author-link');
-     author.setAttribute('aria-label','Ver perfil y Takes de '+t.author);
-     const date=el('time',new Date(t.created_at).toLocaleDateString('es',{day:'numeric',month:'short'}),'ae-take-date');
-     date.dateTime=t.created_at;
-     meta.append(author,date);
-     // Botón pequeño para compartir el Take como ficha «La cita».
-     if(window.CamPickShare&&t.author_id){
-       const share=button(null,()=>window.CamPickShare.open(t,{kind:'take',opener:share}),'cam-take-share-mini');
-       share.setAttribute('aria-label','Compartir Take: '+t.title);
-       share.title='Compartir';
-       share.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3v12M7.5 7.5 12 3l4.5 4.5M5 11v8.5c0 .8.7 1.5 1.5 1.5h11c.8 0 1.5-.7 1.5-1.5V11"/></svg>';
-       meta.append(share);
+   // Fútbol y NFL comparten la misma tarjeta: Take, extracto, votos y respuesta rápida.
+   for(const t of sorted)area.append(buildCard(t));
+ }
+ function buildCard(t){
+   const own=isOwn(t);
+   const id=String(t.id);
+   const card=el('article',null,'ae-free-take-card cam-tk');
+   card.dataset.takeId=id;
+   // Acento basado exclusivamente en el deporte real; no altera contenido ni votos.
+   card.dataset.sport=Object.prototype.hasOwnProperty.call(sports,t.sport)?t.sport:'general';
+
+   // Autor y fecha arriba, como una publicación; compartir a la derecha.
+   const top=el('div',null,'cam-tk-top');
+   const name=String(t.author||'Aficionado').replace(/^@+/,'');
+   const avatar=el('span',name.charAt(0).toUpperCase()||'A','cam-tk-avatar');
+   avatar.setAttribute('aria-hidden','true');
+   const author=button('@'+name,()=>{
+     if(typeof openAePublicProfile==='function'&&t.author_id)openAePublicProfile(t.author_id);
+   },'ae-take-author-link cam-tk-author');
+   author.setAttribute('aria-label','Ver perfil y Takes de '+name);
+   const when=new Date(t.created_at);
+   const date=el('time',Number.isNaN(when.getTime())?'':when.toLocaleDateString('es',{day:'numeric',month:'short'}),'ae-take-date cam-tk-date');
+   date.dateTime=t.created_at||'';
+   top.append(avatar,author,date);
+   // Botón pequeño para compartir el Take como ficha «La cita».
+   if(window.CamPickShare&&t.author_id){
+     const share=button(null,()=>window.CamPickShare.open(t,{kind:'take',opener:share}),'cam-take-share-mini cam-tk-share');
+     share.setAttribute('aria-label','Compartir Take: '+t.title);
+     share.title='Compartir';
+     share.innerHTML=SVG.share;
+     top.append(share);
+   }
+
+   const label=el('p',kicker(t),'cam-tk-kicker');
+   const heading=el('h3',undefined,'cam-tk-title');
+   const openTake=button(t.title,()=>window.aeTakeReplies?.open(t),'cam-tk-open');
+   openTake.setAttribute('aria-label','Leer Take y abrir conversación: '+t.title);
+   heading.append(openTake);
+   const preview=splitNflContext(t).text;
+   card.append(top,label,heading);
+   if(preview)card.append(el('p',preview,'cam-tk-excerpt'));
+
+   // Acciones: votar arriba/abajo y responder, siempre visibles en la tarjeta.
+   const actions=el('div',null,'cam-tk-actions');
+   const votes=el('div',null,'cam-tk-vote');
+   votes.setAttribute('role','group');
+   votes.setAttribute('aria-label','Votar este Take');
+   const pending=pendingVotes.has(id);
+   for(const [val,count] of [[1,t.upvotes],[-1,t.downvotes]]){
+     const n=Math.max(0,Number(count)||0);
+     const b=button(null,()=>vote(t,val),'cam-football-vote cam-tk-vote-btn');
+     b.dataset.vote=val===1?'up':'down';
+     b.innerHTML=val===1?SVG.up:SVG.down;
+     b.append(el('span',String(n),'cam-football-vote-count'));
+     b.disabled=busy||own||pending;
+     b.setAttribute('aria-pressed',String(Number(t.my_vote)===val));
+     b.setAttribute('aria-label',(val===1?'Apoyar este Take. Votos a favor: ':'Cuestionar este Take. Votos en contra: ')+n+(own?'. No puedes votar tu propio Take.':''));
+     b.title=own?'No puedes votar tu propio Take':(val===1?'Apoyar':'Cuestionar');
+     votes.append(b);
+   }
+   const reply=button(null,()=>toggleQuick(t),'ae-take-reply-link cam-football-replies cam-tk-reply');
+   reply.innerHTML=SVG.reply;
+   reply.append(el('span','Responder','cam-tk-reply-label'),el('span',null,'ae-take-reply-count'));
+   reply.setAttribute('aria-expanded',String(openReply===id));
+   reply.setAttribute('aria-controls','camTkQuick-'+id);
+   showReplyCount(reply,t);
+   actions.append(votes,reply);
+   if(typeof currentAdmin!=='undefined'&&currentAdmin)actions.append(button('Ocultar',async()=>{
+     if(!confirm('¿Ocultar este Take?'))return;try{const r=await db.rpc('ae_hide_free_take',{p_take_id:t.id});if(r.error)throw r.error;await load();}catch(e){status(e.message||'No se pudo ocultar.');}
+   },'ae-take-minor cam-tk-hide'));
+   card.append(actions);
+
+   // Respuesta rápida dentro del cuadro.
+   const form=el('form',null,'cam-tk-quick');
+   form.id='camTkQuick-'+id;
+   form.hidden=openReply!==id;
+   form.noValidate=true;
+   const field=el('textarea',null,'cam-tk-quick-text');
+   field.name='body';
+   field.rows=2;
+   field.maxLength=900;
+   field.placeholder='Responde a @'+name+'…';
+   field.setAttribute('aria-label','Tu respuesta al Take: '+t.title);
+   field.value=drafts.get(id)||'';
+   field.addEventListener('input',()=>{drafts.set(id,field.value);grow(field);});
+   field.addEventListener('keydown',event=>{
+     if(event.key==='Enter'&&(event.metaKey||event.ctrlKey)){event.preventDefault();form.requestSubmit?.();}
+     if(event.key==='Escape'){event.preventDefault();closeQuick(t);}
+   });
+   const row=el('div',null,'cam-tk-quick-row');
+   const full=button(null,()=>window.aeTakeReplies?.open(t),'cam-tk-quick-open');
+   const cancel=button('Cancelar',()=>closeQuick(t),'cam-tk-quick-cancel');
+   const send=el('button',posting.has(id)?'Publicando…':'Publicar','cam-tk-quick-send');
+   send.type='submit';
+   send.disabled=posting.has(id);
+   row.append(full,cancel,send);
+   form.append(field,row);
+   form.addEventListener('submit',event=>{event.preventDefault();postQuick(t,form);});
+   card.append(form);
+   const note=el('p',notes.get(id)||'','cam-tk-note');
+   note.setAttribute('role','status');
+   note.setAttribute('aria-live','polite');
+   card.append(note);
+   showReplyCount(reply,t);
+
+   // Tocar el título, el texto o el fondo de la tarjeta abre la conversación completa.
+   card.addEventListener('click',event=>{
+     if(event.target.closest('button,a,textarea,input,form,.cam-tk-note'))return;
+     if(String(window.getSelection?.()||'').trim())return;
+     window.aeTakeReplies?.open(t);
+   });
+   return card;
+ }
+ function grow(field){
+   if(!field)return;
+   field.style.height='auto';
+   field.style.height=Math.min(field.scrollHeight+2,140)+'px';
+ }
+ function replaceCard(t,focusSelector){
+   const area=$('freeTakesFeed');
+   const old=area?.querySelector('article[data-take-id="'+cssId(String(t.id))+'"]');
+   if(!old)return null;
+   const fresh=buildCard(t);
+   old.replaceWith(fresh);
+   if(focusSelector)fresh.querySelector(focusSelector)?.focus({preventScroll:true});
+   return fresh;
+ }
+ function note(t,text){
+   const id=String(t.id);
+   if(text)notes.set(id,text);else notes.delete(id);
+   const n=$('freeTakesFeed')?.querySelector('article[data-take-id="'+cssId(id)+'"] .cam-tk-note');
+   if(n)n.textContent=text||'';
+ }
+ function openQuick(t){
+   const id=String(t.id);
+   openReply=id;
+   note(t,'');
+   // Cierra cualquier otro cuadro abierto y abre este.
+   $('freeTakesFeed')?.querySelectorAll('.cam-tk-quick:not([hidden])').forEach(form=>{
+     const other=form.closest('article');
+     if(other&&other.dataset.takeId!==id){
+       form.hidden=true;
+       other.querySelector('.cam-tk-reply')?.setAttribute('aria-expanded','false');
      }
-     const heading=el('h3',undefined,'ae-feed-take-title');
-     const openTake=button(t.title,()=>window.aeTakeReplies?.open(t),'ae-feed-take-open');
-     openTake.setAttribute('aria-label','Leer Take y abrir conversación: '+t.title);
-     heading.append(openTake);
-     card.append(meta,heading,el('p',t.body,'ae-free-take-body'));
-     card.addEventListener('click',event=>{
-       if(!event.target.closest('button'))window.aeTakeReplies?.open(t);
-     });
-     const row=el('div',null,'ae-free-vote-row');
-     const own=Boolean(viewerId&&t.author_id&&String(viewerId)===String(t.author_id));
-     if(activeSection==='Fútbol'){
-       for(const [val,glyph,count] of [[1,'↑',t.upvotes],[-1,'↓',t.downvotes]]){
-         const n=Math.max(0,Number(count)||0);
-         const b=button(null,()=>vote(t,val,b),'cam-football-vote');
-         b.dataset.vote=val===1?'up':'down';
-         const mark=el('span',glyph,'cam-football-vote-icon');
-         mark.setAttribute('aria-hidden','true');
-         b.append(mark,el('span',String(n),'cam-football-vote-count'));
-         b.disabled=busy||own;
-         b.setAttribute('aria-pressed',String(Number(t.my_vote)===val));
-         b.setAttribute('aria-label',(val===1?'Votos positivos: ':'Votos negativos: ')+n+(own?'. No puedes votar tu propio Take.':'. Votar.'));
-         if(own)b.title='Tus votos se muestran, pero no puedes votar tu propio Take';
-         row.append(b);
-       }
-     }else if(!own){
-       for(const [val,label,count] of [[1,'▲ Apoyar',t.upvotes],[-1,'▼ Cuestionar',t.downvotes]]){
-         const b=button(label+' '+count,()=>vote(t,val,b));
-         b.disabled=busy;
-         b.setAttribute('aria-pressed',String(Number(t.my_vote)===val));
-         row.append(b);
-       }
+   });
+   const card=$('freeTakesFeed')?.querySelector('article[data-take-id="'+cssId(id)+'"]');
+   if(!card)return;
+   card.querySelector('.cam-tk-quick').hidden=false;
+   card.querySelector('.cam-tk-reply')?.setAttribute('aria-expanded','true');
+   const field=card.querySelector('.cam-tk-quick-text');
+   grow(field);
+   field?.focus({preventScroll:true});
+   // Que se vean el cuadro y su botón «Publicar», también si la tarjeta está al fondo de la lista.
+   card.querySelector('.cam-tk-quick-row')?.scrollIntoView?.({block:'nearest',behavior:'smooth'});
+ }
+ function closeQuick(t){
+   const id=String(t.id);
+   if(openReply===id)openReply=null;
+   const card=$('freeTakesFeed')?.querySelector('article[data-take-id="'+cssId(id)+'"]');
+   if(!card)return;
+   card.querySelector('.cam-tk-quick').hidden=true;
+   const reply=card.querySelector('.cam-tk-reply');
+   reply?.setAttribute('aria-expanded','false');
+   reply?.focus({preventScroll:true});
+ }
+ function toggleQuick(t){
+   if(openReply===String(t.id))return closeQuick(t);
+   // Para responder hace falta una cuenta; después de entrar se vuelve a este cuadro.
+   if(typeof aeRequestPublication==='function')return aeRequestPublication('reply',()=>openQuick(t));
+   requireLogin().then(user=>{if(user)openQuick(t);}).catch(e=>note(t,e.message||'No se pudo comprobar tu sesión.'));
+ }
+ async function postQuick(t,form){
+   const id=String(t.id);
+   if(posting.has(id))return;
+   const text=form.elements.body.value.trim();
+   if(text.length<2){note(t,'Escribe al menos dos caracteres.');form.elements.body.focus();return;}
+   if(text.length>900){note(t,'La respuesta debe tener menos de 900 caracteres.');return;}
+   try{
+     if(typeof db==='undefined'||!db)throw Error('No hay conexión.');
+     const session=await db.auth.getUser();
+     if(!session.data?.user){
+       drafts.set(id,text);
+       if(typeof aeRequestPublication==='function')await aeRequestPublication('reply',()=>openQuick(t));
+       else if(typeof openUserAuthModal==='function')openUserAuthModal();
+       return;
      }
-     const reply=button(activeSection==='Fútbol'?null:'Responder',()=>window.aeTakeReplies?.open(t,{focusComposer:true}),'ae-take-reply-link'+(activeSection==='Fútbol'?' cam-football-replies':''));
-     if(activeSection==='Fútbol'){
-       const icon=el('i',null,'fa-regular fa-comment');
-       icon.setAttribute('aria-hidden','true');
-       reply.append(icon);
-     }
-     reply.append(el('span',null,'ae-take-reply-count'));
-     showReplyCount(reply,t);
-     row.append(reply);
-     if(typeof currentAdmin!=='undefined'&&currentAdmin)row.append(button('Ocultar',async()=>{
-       if(!confirm('¿Ocultar este Take?'))return;try{const r=await db.rpc('ae_hide_free_take',{p_take_id:t.id});if(r.error)throw r.error;await load();}catch(e){status(e.message||'No se pudo ocultar.');}
-     },'ae-take-minor'));
-     card.append(row);area.append(card);
+     posting.add(id);
+     replaceCard(t);
+     const r=await db.rpc('ae_post_take_reply',{p_take_id:t.id,p_body:text,p_parent_id:null});
+     if(r.error)throw r.error;
+     drafts.delete(id);
+     if(openReply===id)openReply=null;
+     if(replyCounts)replyCounts.set(id,(replyCounts.get(id)||0)+1);
+     notes.set(id,'Respuesta publicada ✓');
+     posting.delete(id);
+     replaceCard(t,'.cam-tk-reply');
+     setTimeout(()=>{if(notes.get(id)==='Respuesta publicada ✓')note(t,'');},6000);
+     document.dispatchEvent(new CustomEvent('ae:takes-updated',{detail:{source:'feed',takeId:id}}));
+   }catch(e){
+     posting.delete(id);
+     notes.set(id,'No se pudo publicar la respuesta. '+(e.message||''));
+     replaceCard(t,'.cam-tk-quick-text');
+   }finally{
+     posting.delete(id);
    }
  }
  async function load(){
@@ -174,17 +344,43 @@
      status('No se pudieron cargar los Takes. '+(e.message||''));
    }
  }
- async function vote(t,value,b){
-   if(busy)return;
+ // Pasar de un voto a otro: quita el anterior y suma el nuevo (votar dos veces lo mismo lo retira).
+ function applyVote(t,next){
+   const prev=Number(t.my_vote)||0;
+   if(prev===1)t.upvotes=Math.max(0,(Number(t.upvotes)||0)-1);
+   if(prev===-1)t.downvotes=Math.max(0,(Number(t.downvotes)||0)-1);
+   if(next===1)t.upvotes=(Number(t.upvotes)||0)+1;
+   if(next===-1)t.downvotes=(Number(t.downvotes)||0)+1;
+   t.my_vote=next||null;
+ }
+ async function vote(t,value){
+   const id=String(t.id);
+   if(busy||pendingVotes.has(id))return;
+   const focus='[data-vote="'+(value===1?'up':'down')+'"]';
    try{
      const user=await requireLogin();if(!user)return;
-     if(user.id===t.author_id)return;
-     busy=true;render();
-     const r=await db.rpc('ae_vote_free_take',{p_take_id:t.id,p_value:value});
-     if(r.error)throw r.error;
-     await load();document.dispatchEvent(new Event('ae:takes-updated'));
-   }catch(e){status(e.message||'No se pudo votar.');}
-   finally{busy=false;render();}
+     if(String(user.id)===String(t.author_id)){note(t,'No puedes votar tu propio Take.');return;}
+     const prev=Number(t.my_vote)||0;
+     const expected=prev===value?0:value;
+     pendingVotes.add(id);
+     applyVote(t,expected);
+     note(t,'');
+     replaceCard(t,focus);
+     try{
+       const r=await db.rpc('ae_vote_free_take',{p_take_id:t.id,p_value:value});
+       if(r.error)throw r.error;
+       // El servidor devuelve el voto que queda (1, -1 o 0); si no lo dice, vale lo esperado.
+       const saved=[1,-1,0].includes(Number(r.data))&&r.data!==null?Number(r.data):expected;
+       if(saved!==expected)applyVote(t,saved);
+     }catch(e){
+       applyVote(t,prev);
+       notes.set(id,'No se pudo guardar tu voto. '+(e.message||''));
+     }
+     pendingVotes.delete(id);
+     replaceCard(t,focus);
+     document.dispatchEvent(new CustomEvent('ae:takes-updated',{detail:{source:'feed',takeId:id}}));
+   }catch(e){note(t,e.message||'No se pudo votar.');}
+   finally{pendingVotes.delete(id);}
  }
  async function create(e){
    e.preventDefault();if(busy)return;
@@ -232,6 +428,7 @@
      if($('freeTakesFilterWrap'))$('freeTakesFilterWrap').hidden=true;
      if($('freeTakesSportFilter'))$('freeTakesSportFilter').value=filter;
      footballVisibleCount=20;
+     openReply=null;
      $('freeTakesTitle').textContent='Demuestra tu conocimiento';
    }
    if(changed){items=[];load();}
@@ -274,7 +471,7 @@
    $('aeTakeComposerDialog')?.addEventListener('cancel',event=>event.preventDefault());
    $('freeTakesSportFilter')?.addEventListener('change',e=>{filter=e.target.value;footballVisibleCount=20;load();});
    $('freeTakesMore')?.addEventListener('click',()=>{
-     if(activeSection!=='Fútbol')return;
+     if(activeSection!=='Fútbol'&&activeSection!=='NFL')return;
      const scroll=$('freeTakesFeed')?.scrollTop||0;
      footballVisibleCount+=20;
      render();
@@ -283,7 +480,9 @@
      void loadReplyCounts(request);
    });
    db?.auth.onAuthStateChange(()=>setTimeout(()=>{if(typeof currentCategory!=='undefined'&&(currentCategory==='Fútbol'||currentCategory==='NFL'))load();},150));
-   document.addEventListener('ae:takes-updated',()=>{
+   document.addEventListener('ae:takes-updated',event=>{
+     // Los votos y respuestas hechos en la propia tarjeta ya están pintados.
+     if(event.detail?.source==='feed')return;
      if(activeSection==='NFL'||activeSection==='Fútbol')load();
    });
    visibility();
