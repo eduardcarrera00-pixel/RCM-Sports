@@ -782,7 +782,11 @@
     if (sport) {
       targets.push(
         ['#freeTakes > .ae-takes-head', (sport === 'football' ? 'futbol.takes-cabecera' : 'nfl.takes-cabecera') + theme, 'feature'],
-        ['#aeNewsHeadingRow', (sport === 'football' ? 'futbol.noticias' : 'nfl.noticias') + theme, 'card'],
+        // «Noticias de NFL» usa la imagen de día también de noche (4 nov, pedido del
+        // dueño): la variante de noche guardada era un rectángulo azul sin dibujo y el
+        // banner salía vacío. La tinta sigue el tema (azul de día, dorado de noche) y
+        // el lápiz de noche edita esa misma imagen de día.
+        ['#aeNewsHeadingRow', sport === 'football' ? 'futbol.noticias' + theme : 'nfl.noticias-dia', 'card'],
         ['#aeSportTakeLeaders .is-supported > .ae-sport-chef-heading', (sport === 'football' ? 'futbol.populares' : 'nfl.opiniones-apoyadas') + theme, 'card'],
         ['#aeSportTakeLeaders .is-questioned > .ae-sport-chef-heading', (sport === 'football' ? 'futbol.impopulares' : 'nfl.opiniones-hateadas') + theme, 'card'],
         ['#aeNflTwinRankings .is-savant > .ae-nfl-ranking-header', (sport === 'football' ? 'futbol.respira' : 'nfl.savant') + theme, 'card'],
