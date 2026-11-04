@@ -64,6 +64,8 @@ insert into public.ae_notifications (actor_id, event_key, actor_name) values
   ('a0000000-0000-4000-8000-000000000001', 'welcome', 'CAM SPORTS');
 
 \i supabase/migrations/20261103130000_cam_username_change.sql
+-- Mayúsculas (4 nov): los nombres actuales pasan a empezar con mayúscula (Ana, Beto, Carla).
+\i supabase/migrations/20261104070000_cam_username_case.sql
 
 -- ---------- Ayudas ----------
 create function pg_temp.as_user(p uuid) returns void language sql as $$
@@ -80,6 +82,20 @@ end $$;
 create function pg_temp.check(ok boolean, what text) returns void language plpgsql as $$
 begin if not coalesce(ok, false) then raise exception 'FALLA: %', what; end if; end $$;
 
+-- ---------- Paso de datos: primera letra en mayúscula ----------
+select pg_temp.check((select string_agg(username, ',' order by username) from public.ae_auth_accounts) = 'Ana,Beto,Carla', 'cuentas con mayúscula');
+select pg_temp.check((select string_agg(username_key, ',' order by username_key) from public.ae_auth_accounts) = 'ana,beto,carla', 'clave en minúsculas');
+select pg_temp.check((select raw_user_meta_data->>'username' from auth.users where id = 'a0000000-0000-4000-8000-000000000002') = 'Beto', 'metadatos con mayúscula');
+select pg_temp.check((select author from public.ae_community_picks where title = 'Pick 2') = 'Beto', 'Picks con mayúscula');
+select pg_temp.check((select author from public.ae_pick_comments) = 'Ana', 'comentarios de Picks con mayúscula');
+select pg_temp.check((select author from public.comments) = 'Ana', 'comentarios de noticias con mayúscula');
+select pg_temp.check((select actor_name from public.ae_notifications where event_key = 'take_vote') = 'Ana', 'avisos con mayúscula');
+select pg_temp.check((select actor_name from public.ae_notifications where event_key = 'welcome') = 'CAM SPORTS', 'la bienvenida no cambia');
+-- No puede haber dos cuentas que solo cambien en mayúsculas.
+insert into auth.users (id) values ('a0000000-0000-4000-8000-000000000008');
+select pg_temp.expect_error($q$insert into public.ae_auth_accounts (username, user_id, email) values ('BETO', 'a0000000-0000-4000-8000-000000000008', 'y@accounts.aesports.invalid')$q$, '%username_key%');
+select pg_temp.expect_error($q$insert into public.ae_auth_accounts (username, user_id, email) values ('Ana Lu', 'a0000000-0000-4000-8000-000000000008', 'y@accounts.aesports.invalid')$q$, '%username_check%');
+
 -- ---------- Permisos ----------
 set role anon;
 select pg_temp.expect_error($q$select public.cam_change_username('x_y_z')$q$, '%permission denied%');
@@ -92,56 +108,70 @@ set role authenticated;
 select pg_temp.expect_error($q$select * from public.cam_username_changes$q$, '%permission denied%');
 select pg_temp.check(public.cam_username_available('beto') = 'taken', 'beto está ocupado');
 select pg_temp.check(public.cam_username_available('BETO') = 'taken', 'mayúsculas cuentan igual');
-select pg_temp.check(public.cam_username_available('ana') = 'same', 'mismo nombre');
+select pg_temp.check(public.cam_username_available('Ana') = 'same', 'mismo nombre');
+select pg_temp.check(public.cam_username_available('ana') = 'case', 'solo mayúsculas');
+select pg_temp.check(public.cam_username_available('@ANA') = 'case', 'solo mayúsculas, con @');
+select pg_temp.check(public.cam_username_available('SOPORTE') = 'reserved', 'reservado también en mayúsculas');
 select pg_temp.check(public.cam_username_available('a b') = 'invalid', 'espacios');
 select pg_temp.check(public.cam_username_available('ab') = 'invalid', 'muy corto');
 select pg_temp.check(public.cam_username_available('admin') = 'reserved', 'reservado');
 select pg_temp.check(public.cam_username_available('ana_fc') = 'ok', 'libre');
 select pg_temp.check((public.cam_username_status()->>'can_change')::boolean, 'puede cambiar la primera vez');
 select pg_temp.expect_error($q$select public.cam_change_username('beto')$q$, '%otra persona%');
-select pg_temp.expect_error($q$select public.cam_change_username('ana')$q$, '%ya es tu nombre%');
+select pg_temp.expect_error($q$select public.cam_change_username('Ana')$q$, '%ya es tu nombre%');
+select pg_temp.expect_error($q$select public.cam_change_username('BETO')$q$, '%otra persona%');
 select pg_temp.expect_error($q$select public.cam_change_username('Ana Futbolera')$q$, '%3 a 30%');
 select pg_temp.expect_error($q$select public.cam_change_username('soporte')$q$, '%reservado%');
-select pg_temp.check(public.cam_change_username('  Ana_FC ')->>'username' = 'ana_fc', 'cambio a ana_fc (minúsculas, sin espacios)');
+select pg_temp.check(public.cam_change_username('  Ana_FC ')->>'username' = 'Ana_FC', 'cambio a Ana_FC (respeta mayúsculas, sin espacios)');
 reset role;
 
-select pg_temp.check((select username from public.ae_auth_accounts where user_id = 'a0000000-0000-4000-8000-000000000001') = 'ana_fc', 'cuenta renombrada');
+select pg_temp.check((select username from public.ae_auth_accounts where user_id = 'a0000000-0000-4000-8000-000000000001') = 'Ana_FC', 'cuenta renombrada');
 select pg_temp.check((select email from public.ae_auth_accounts where user_id = 'a0000000-0000-4000-8000-000000000001') = 'a@accounts.aesports.invalid', 'el acceso interno no cambia');
-select pg_temp.check((select raw_user_meta_data->>'username' from auth.users where id = 'a0000000-0000-4000-8000-000000000001') = 'ana_fc', 'metadatos de la sesión');
-select pg_temp.check((select author from public.ae_community_picks where title = 'Pick 1') = 'ana_fc', 'Picks muestran el nombre nuevo');
-select pg_temp.check((select author from public.ae_community_picks where title = 'Pick 2') = 'beto', 'Picks ajenos intactos');
-select pg_temp.check((select author from public.ae_pick_comments) = 'ana_fc', 'comentarios de Picks');
-select pg_temp.check((select author from public.comments) = 'ana_fc', 'comentarios de noticias');
-select pg_temp.check((select actor_name from public.ae_notifications where event_key = 'take_vote') = 'ana_fc', 'avisos');
+select pg_temp.check((select raw_user_meta_data->>'username' from auth.users where id = 'a0000000-0000-4000-8000-000000000001') = 'Ana_FC', 'metadatos de la sesión');
+select pg_temp.check((select author from public.ae_community_picks where title = 'Pick 1') = 'Ana_FC', 'Picks muestran el nombre nuevo');
+select pg_temp.check((select author from public.ae_community_picks where title = 'Pick 2') = 'Beto', 'Picks ajenos intactos');
+select pg_temp.check((select author from public.ae_pick_comments) = 'Ana_FC', 'comentarios de Picks');
+select pg_temp.check((select author from public.comments) = 'Ana_FC', 'comentarios de noticias');
+select pg_temp.check((select actor_name from public.ae_notifications where event_key = 'take_vote') = 'Ana_FC', 'avisos');
 select pg_temp.check((select actor_name from public.ae_notifications where event_key = 'welcome') = 'CAM SPORTS', 'bienvenida intacta');
 
 -- ---------- Espera de 30 días y deshacer en 7 días ----------
 select pg_temp.as_user('a0000000-0000-4000-8000-000000000001');
 set role authenticated;
 select pg_temp.check(not (public.cam_username_status()->>'can_change')::boolean, 'ya no puede cambiar hasta dentro de 30 días');
-select pg_temp.check(public.cam_username_status()->>'undo_username' = 'ana', 'puede volver a ana');
+select pg_temp.check(public.cam_username_status()->>'undo_username' = 'Ana', 'puede volver a Ana');
+select pg_temp.check((public.cam_username_status()->>'can_change_case')::boolean, 'las mayúsculas se pueden cambiar siempre');
 select pg_temp.expect_error($q$select public.cam_change_username('ana_nueva')$q$, '%una vez cada 30 días%');
-select pg_temp.check(public.cam_change_username('ana')->>'undo' = 'true', 'deshacer: vuelve a ana');
+-- Solo mayúsculas: se permite aunque falten días, y no gasta ni el cambio ni el deshacer.
+select pg_temp.check(public.cam_change_username('ana_fc')->>'case_only' = 'true', 'cambio solo de mayúsculas');
+select pg_temp.check(public.cam_username_status()->>'username' = 'ana_fc', 'ahora en minúsculas');
+select pg_temp.check(public.cam_username_status()->>'undo_username' = 'Ana', 'sigue pudiendo volver a Ana');
+select pg_temp.check(public.cam_change_username('ana')->>'undo' = 'true', 'deshacer: vuelve a ana (como lo escribe)');
+select pg_temp.check(public.cam_username_status()->>'username' = 'ana', 'nombre tras deshacer');
 select pg_temp.check(public.cam_username_status()->>'undo_username' is null, 'solo se puede deshacer una vez');
 select pg_temp.expect_error($q$select public.cam_change_username('ana_fc')$q$, '%una vez cada 30 días%');
+select pg_temp.check(public.cam_change_username('Ana')->>'case_only' = 'true', 'vuelve a Ana solo con mayúsculas');
 reset role;
+select pg_temp.check((select count(*) from public.cam_username_changes) = 2, 'los cambios de mayúsculas no cuentan como cambio');
 
 -- ---------- Nombres retenidos 30 días ----------
 select pg_temp.as_user('a0000000-0000-4000-8000-000000000002');
 set role authenticated;
 select pg_temp.check(public.cam_username_available('ana_fc') = 'taken', 'ana_fc queda retenido para Ana');
+select pg_temp.check(public.cam_username_available('ANA_fc') = 'taken', 'retenido también con otras mayúsculas');
 select pg_temp.expect_error($q$select public.cam_change_username('ana_fc')$q$, '%otra persona%');
 reset role;
 -- Un registro nuevo tampoco puede quedárselo.
 insert into auth.users (id) values ('a0000000-0000-4000-8000-000000000009');
-select pg_temp.expect_error($q$insert into public.ae_auth_accounts (username, user_id, email) values ('ana_fc', 'a0000000-0000-4000-8000-000000000009', 'z@accounts.aesports.invalid')$q$, '%no está disponible%');
+select pg_temp.expect_error($q$insert into public.ae_auth_accounts (username, user_id, email) values ('Ana_fc', 'a0000000-0000-4000-8000-000000000009', 'z@accounts.aesports.invalid')$q$, '%no está disponible%');
 -- Pasados 30 días se libera.
 update public.cam_username_changes set changed_at = changed_at - interval '31 days';
-insert into public.ae_auth_accounts (username, user_id, email) values ('ana_fc', 'a0000000-0000-4000-8000-000000000009', 'z@accounts.aesports.invalid');
+insert into public.ae_auth_accounts (username, user_id, email) values ('Ana_fc', 'a0000000-0000-4000-8000-000000000009', 'z@accounts.aesports.invalid');
 select pg_temp.as_user('a0000000-0000-4000-8000-000000000001');
 set role authenticated;
 select pg_temp.check((public.cam_username_status()->>'can_change')::boolean, 'tras 30 días puede volver a cambiar');
 select pg_temp.check(public.cam_username_available('ana_fc') = 'taken', 'ya es de otra persona');
+select pg_temp.check(public.cam_username_available('ANA_FC') = 'taken', 'ya es de otra persona (otras mayúsculas)');
 reset role;
 
 -- ---------- Comentarios: el autor sale de la cuenta ----------
@@ -149,11 +179,11 @@ select pg_temp.as_user('a0000000-0000-4000-8000-000000000003');
 set role authenticated;
 insert into public.comments (user_id, author, body) values ('a0000000-0000-4000-8000-000000000003', 'beto', 'suplantación');
 reset role;
-select pg_temp.check((select author from public.comments where body = 'suplantación') = 'carla', 'no se puede firmar como otro');
+select pg_temp.check((select author from public.comments where body = 'suplantación') = 'Carla', 'no se puede firmar como otro');
 
 -- ---------- Perfil público ----------
 set role anon;
-select pg_temp.check(public.cam_public_profile_card('a0000000-0000-4000-8000-000000000002')->>'username' = 'beto', 'tarjeta pública: nombre');
+select pg_temp.check(public.cam_public_profile_card('a0000000-0000-4000-8000-000000000002')->>'username' = 'Beto', 'tarjeta pública: nombre');
 select pg_temp.check(public.cam_public_profile_card('a0000000-0000-4000-8000-000000000002')->>'joined_month' = '2026-10', 'tarjeta pública: mes');
 reset role;
 

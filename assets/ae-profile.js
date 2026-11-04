@@ -1057,8 +1057,11 @@ async function shareProfile(){
 
 /* ---------- Editar perfil: nombre de usuario ----------
    La base de datos (cam_change_username) valida, evita nombres repetidos,
-   aplica la espera de 30 días y actualiza Picks, comentarios y avisos. */
-const USERNAME_RULE=/^[a-z0-9_]{3,30}$/;
+   aplica la espera de 30 días y actualiza Picks, comentarios y avisos.
+   Mayúsculas (4 nov): se respetan como las escribe cada uno; cambiar solo
+   mayúsculas y minúsculas se puede siempre y no cuenta como cambio. */
+const USERNAME_RULE=/^[A-Za-z0-9_]{3,30}$/;
+const sameLetters=(a,b)=>String(a||'').toLowerCase()===String(b||'').toLowerCase();
 let editStatus=null,checkTimer=0,checkTicket=0,savingName=false;
 function setCheck(text,tone=''){const n=$('camUsernameCheck');if(!n)return;n.textContent=text;n.dataset.tone=tone;}
 function missingFeature(e){return e?.code==='PGRST202'||/could not find the function|does not exist|schema cache/i.test(String(e?.message||''));}
@@ -1095,8 +1098,14 @@ function applyNameStatus(status){
   if(editStatus.username&&!input.matches(':focus'))input.value=editStatus.username;
   undo.hidden=!editStatus.undo_username;
   if(editStatus.undo_username)undo.textContent='Volver a @'+editStatus.undo_username+(editStatus.undo_until?' (hasta el '+dayText(editStatus.undo_until)+')':'');
-  input.disabled=!editStatus.can_change;
-  $('camUsernameSave').hidden=!editStatus.can_change;
+  // Aunque falten días para otro cambio, las mayúsculas se pueden tocar.
+  const editable=Boolean(editStatus.can_change||editStatus.can_change_case);
+  input.disabled=!editable;
+  $('camUsernameSave').hidden=!editable;
+}
+// Mensaje de espera cuando ya se cambió el nombre hace poco.
+function waitText(){
+  return editStatus?.next_change_at?'Ya cambiaste tu nombre hace poco. Podrás cambiarlo de nuevo el '+dayText(editStatus.next_change_at)+'.':'Ahora mismo no puedes cambiar tu nombre.';
 }
 async function loadNameStatus(){
   const input=$('camUsernameInput');
@@ -1108,7 +1117,7 @@ async function loadNameStatus(){
     if(!editing())return;
     applyNameStatus(r.data);
     if(editStatus.can_change)setCheck('');
-    else setCheck(editStatus.next_change_at?'Ya cambiaste tu nombre hace poco. Podrás cambiarlo de nuevo el '+dayText(editStatus.next_change_at)+'.':'Ahora mismo no puedes cambiar tu nombre.','wait');
+    else setCheck(waitText()+(editStatus.can_change_case?' Las mayúsculas sí puedes cambiarlas.':''),'wait');
   }catch(e){
     if(!editing())return;
     editStatus=null;input.disabled=true;$('camUsernameSave').disabled=true;
@@ -1117,7 +1126,7 @@ async function loadNameStatus(){
 }
 function normalizedInput(){
   const input=$('camUsernameInput');
-  const raw=input.value,clean=raw.replace(/^@+/,'').toLowerCase().replace(/\s+/g,'_');
+  const raw=input.value,clean=raw.replace(/^@+/,'').replace(/\s+/g,'_');
   if(clean!==raw){
     const pos=Math.max(0,(input.selectionStart??clean.length)-(raw.length-clean.length));
     input.value=clean;
@@ -1136,6 +1145,9 @@ function onNameInput(){
     setCheck(name.length<3?'Escribe al menos 3 caracteres.':'Usa solo letras sin acentos, números y guion bajo (_).','error');
     return;
   }
+  // Solo mayúsculas y minúsculas: es tu mismo nombre, no hace falta preguntar.
+  if(sameLetters(name,profileName)){setCheck('Solo cambias mayúsculas y minúsculas.','ok');save.disabled=false;return;}
+  if(editStatus&&!editStatus.can_change){setCheck(waitText()+' Las mayúsculas sí puedes cambiarlas.','wait');return;}
   setCheck('Comprobando si está libre…');
   checkTimer=setTimeout(async()=>{
     try{
@@ -1143,6 +1155,7 @@ function onNameInput(){
       if(ticket!==checkTicket)return;
       if(r.error)throw r.error;
       if(r.data==='ok'){setCheck('@'+name+' está disponible.','ok');save.disabled=false;return;}
+      if(r.data==='case'){setCheck('Solo cambias mayúsculas y minúsculas.','ok');save.disabled=false;return;}
       setCheck({same:'Es tu nombre actual.',taken:'@'+name+' ya lo usa otra persona.',reserved:'Ese nombre está reservado. Elige otro.',invalid:'Usa de 3 a 30 letras, números o guion bajo (_).'}[r.data]||'Ese nombre no está disponible.','error');
     }catch(e){
       if(ticket!==checkTicket)return;
@@ -1152,9 +1165,14 @@ function onNameInput(){
 }
 function askNameConfirm(name,undo=false){
   if(!name||savingName)return;
+  const caseOnly=!undo&&sameLetters(name,profileName);
   $('camUsernameConfirmTitle').textContent=undo?'¿Volver a @'+name+'?':'¿Cambiar @'+profileName+' por @'+name+'?';
-  $('camUsernameConfirmLogin').textContent='Desde ahora inicias sesión con @'+name+' (misma contraseña).';
-  $('camUsernameConfirmKeep').textContent=undo
+  $('camUsernameConfirmLogin').textContent=caseOnly
+    ?'Inicias sesión igual que siempre: con mayúsculas o sin ellas.'
+    :'Desde ahora inicias sesión con @'+name+' (misma contraseña; da igual si lo escribes con mayúsculas).';
+  $('camUsernameConfirmKeep').textContent=caseOnly
+    ?'Cambiar solo mayúsculas no cuenta como cambio de nombre: puedes hacerlo cuando quieras.'
+    :undo
     ?'Después tendrás que esperar 30 días para volver a cambiarlo.'
     :'@'+profileName+' queda guardado para ti 30 días y puedes volver a él durante 7 días. Después tendrás que esperar 30 días para otro cambio.';
   const box=$('camUsernameConfirm');
@@ -1182,7 +1200,7 @@ async function changeName(name){
     $('camUsernameConfirm').hidden=true;
     $('camUsernameInput').value=fresh;
     applyNameStatus(result);
-    setCheck(result.undo?'Has vuelto a @'+fresh+'. Usa este nombre para iniciar sesión.':'Listo: ahora eres @'+fresh+'. Usa este nombre para iniciar sesión.','ok');
+    setCheck(result.case_only?'Listo: ahora eres @'+fresh+'.':result.undo?'Has vuelto a @'+fresh+'. Usa este nombre para iniciar sesión.':'Listo: ahora eres @'+fresh+'. Usa este nombre para iniciar sesión.','ok');
     document.dispatchEvent(new CustomEvent('cam:username-changed',{detail:{username:fresh,previous:result.previous_username||null}}));
     document.dispatchEvent(new Event('ae:takes-updated'));
     document.dispatchEvent(new Event('ae:picks-updated'));
@@ -1230,7 +1248,7 @@ function bindProfileApp(){
     askNameConfirm(name);
   });
   $('camUsernameConfirmNo')?.addEventListener('click',()=>{
-    $('camUsernameConfirm').hidden=true;$('camUsernameSave').hidden=!editStatus?.can_change;$('camUsernameInput').focus();
+    $('camUsernameConfirm').hidden=true;$('camUsernameSave').hidden=!(editStatus?.can_change||editStatus?.can_change_case);$('camUsernameInput').focus();
   });
   $('camUsernameConfirmYes')?.addEventListener('click',()=>changeName($('camUsernameConfirm').dataset.name));
   $('camUsernameUndo')?.addEventListener('click',()=>{if(editStatus?.undo_username)askNameConfirm(editStatus.undo_username,true);});

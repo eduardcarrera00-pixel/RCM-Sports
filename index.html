@@ -3292,7 +3292,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
    <label for="camUsernameInput">Nombre de usuario</label>
    <div class="cam-username-field"><span aria-hidden="true">@</span><input id="camUsernameInput" name="username" type="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="30" aria-describedby="camUsernameCheck camUsernameHint"></div>
    <p id="camUsernameCheck" class="cam-username-check" role="status" aria-live="polite"></p>
-   <p id="camUsernameHint" class="cam-username-hint">De 3 a 30 letras, números o guion bajo (_). Puedes cambiarlo una vez cada 30 días.</p>
+   <p id="camUsernameHint" class="cam-username-hint">De 3 a 30 letras, números o guion bajo (_). El nombre se cambia una vez cada 30 días; las mayúsculas, cuando quieras.</p>
    <div id="camUsernameConfirm" class="cam-username-confirm" hidden>
     <p id="camUsernameConfirmTitle"></p>
     <ul>
@@ -3949,8 +3949,9 @@ html:not(.dark) #aeAuthIntroNotice small{color:#5b6d76}
         let activeModalArticleId = null;
 let currentUser = null;
 
+// Las mayúsculas se respetan (4 nov): el servidor busca la cuenta sin distinguirlas.
 function normalizeUsername(username) {
-    return username.trim().toLowerCase();
+    return username.trim().replace(/^@+/, '');
 }
 
 function validateUsername(username) {
@@ -5592,7 +5593,7 @@ html .cam-weekly-result-surface .cam-weekly-result-on-photo{
 <script src="assets/cam-weekly-results.js?v=20261025-admin-resolved-pick-1"></script>
 <script src="assets/cam-profile-overview.js?v=20261103-jornadas-1"></script>
 <script src="assets/cam-profile-quiniela.js?v=20261103-jornadas-1"></script>
-<script src="assets/ae-profile.js?v=20261103-jornadas-1"></script>
+<script src="assets/ae-profile.js?v=20261104-mayusculas-1"></script>
 <style id="cam-nfl-quiniela-theme">
 /* ===========================================================================
    CAM SPORTS · La Quiniela NFL — lenguaje visual curvo, editorial y compacto.

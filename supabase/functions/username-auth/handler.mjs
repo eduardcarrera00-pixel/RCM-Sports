@@ -16,9 +16,11 @@ export function makeHandler({url,serviceKey,anonKey,createClient}) {
  try{
   let text='',size=0;const reader=req.body?.getReader();if(!reader)return respond({error:'Solicitud inválida.'},400);
   const decoder=new TextDecoder();while(true){const {done,value}=await reader.read();if(done)break;size+=value.length;if(size>8192){await reader.cancel();return respond({error:'Solicitud demasiado grande.'},413);}text+=decoder.decode(value,{stream:true});}text+=decoder.decode();
-  const body=JSON.parse(text),action=body.action,username=String(body.username||'').trim().toLowerCase(),password=String(body.password||'');
+  // The name keeps its capital letters (ae_auth_accounts.username); sign-in,
+  // uniqueness and limits ignore them (lower-case username_key).
+  const body=JSON.parse(text),action=body.action,typed=String(body.username||'').trim().replace(/^@+/,''),username=typed.toLowerCase(),password=String(body.password||'');
   if(!['register','login','recover','code'].includes(action)||username.length>254||password.length>128)return respond({error:'Solicitud inválida.'},400);
-  if(!/^[a-z0-9_]{3,30}$/.test(username)&&!(action!=='register'&&/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(username)))return respond({error:'Usa entre 3 y 30 letras, números o guion bajo.'},400);
+  if(!/^[A-Za-z0-9_]{3,30}$/.test(typed)&&!(action!=='register'&&/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(username)))return respond({error:'Usa entre 3 y 30 letras, números o guion bajo.'},400);
   if((action==='register'||action==='recover')&&password.length<8)return respond({error:'Usa una contraseña de al menos 8 caracteres.'},400);
   const options={auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}};
   const admin=createClient(url,serviceKey,options),client=createClient(url,anonKey,options);
@@ -28,19 +30,21 @@ export function makeHandler({url,serviceKey,anonKey,createClient}) {
   if(!await limit('global',300,600)||!await limit('account:'+key,15,600))return respond({error:'Demasiados intentos. Espera unos minutos antes de volver a probar.'},429);
   if(action==='register'){
    if(reserved.test(username)||!await limit('registrations',20,3600))return respond({error:'No se pudo registrar ese usuario. Prueba otro nombre o inténtalo más tarde.'},400);
+   // New names start with a capital letter; the profile can change the case at any time.
+   const name=typed.charAt(0).toUpperCase()+typed.slice(1);
    const reservation=crypto.randomUUID(),email=crypto.randomUUID()+'@accounts.aesports.invalid',code=randomCode();
-   await admin.from('ae_auth_accounts').delete().eq('username',username).is('user_id',null).lt('created_at',new Date(Date.now()-15*60*1000).toISOString());
-   const hold=await admin.from('ae_auth_accounts').insert({username,email,reservation,recovery_hash:await hash(code)});
+   await admin.from('ae_auth_accounts').delete().eq('username_key',username).is('user_id',null).lt('created_at',new Date(Date.now()-15*60*1000).toISOString());
+   const hold=await admin.from('ae_auth_accounts').insert({username:name,email,reservation,recovery_hash:await hash(code)});
    if(hold.error)return respond({error:'No se pudo registrar ese usuario. Prueba otro nombre o inténtalo más tarde.'},400);
-   const created=await admin.auth.admin.createUser({email,password,email_confirm:true,user_metadata:{username}});
-   if(created.error||!created.data.user){await admin.from('ae_auth_accounts').delete().eq('username',username).eq('reservation',reservation).is('user_id',null);return respond({error:'No pudimos crear la cuenta. Revisa la contraseña e inténtalo de nuevo.'},400);}
-   const saved=await admin.from('ae_auth_accounts').update({user_id:created.data.user.id}).eq('username',username).eq('reservation',reservation).select('user_id').single();
-   if(saved.error){await admin.auth.admin.deleteUser(created.data.user.id);await admin.from('ae_auth_accounts').delete().eq('username',username).eq('reservation',reservation);throw Error('service');}
+   const created=await admin.auth.admin.createUser({email,password,email_confirm:true,user_metadata:{username:name}});
+   if(created.error||!created.data.user){await admin.from('ae_auth_accounts').delete().eq('username',name).eq('reservation',reservation).is('user_id',null);return respond({error:'No pudimos crear la cuenta. Revisa la contraseña e inténtalo de nuevo.'},400);}
+   const saved=await admin.from('ae_auth_accounts').update({user_id:created.data.user.id}).eq('username',name).eq('reservation',reservation).select('user_id').single();
+   if(saved.error){await admin.auth.admin.deleteUser(created.data.user.id);await admin.from('ae_auth_accounts').delete().eq('username',name).eq('reservation',reservation);throw Error('service');}
    const signed=await client.auth.signInWithPassword({email,password});
    // Even if automatic sign-in is rate limited, deliver the recovery code.
-   return respond({session:signed.data.session||null,recovery_code:code,username,created:true});
+   return respond({session:signed.data.session||null,recovery_code:code,username:name,created:true});
   }
-  let lookup=admin.from('ae_auth_accounts').select('*');lookup=username.includes('@')?lookup.eq('email',username):lookup.eq('username',username);
+  let lookup=admin.from('ae_auth_accounts').select('*');lookup=username.includes('@')?lookup.eq('email',username):lookup.eq('username_key',username);
   const found=await lookup.maybeSingle();if(found.error)throw Error('service');const account=found.data;
   if(action==='recover'){
    const code=String(body.recovery_code||'').replace(/\s|-/g,'').toLowerCase();

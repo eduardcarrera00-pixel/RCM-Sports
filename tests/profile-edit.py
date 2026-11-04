@@ -31,40 +31,45 @@ try { sessionStorage.setItem('cam_sports_home_welcome_seen_session_v1', '1'); } 
 (() => {
   const F = window.__fake; F.rpc = F.rpc || {}; F.tables = F.tables || {};
   const UID = '%(uid)s', OTHER = '%(other)s';
-  F.user = {id: UID, is_anonymous: false, created_at: '2026-10-12T15:00:00Z', user_metadata: {username: 'ana_futbolera'}};
+  F.user = {id: UID, is_anonymous: false, created_at: '2026-10-12T15:00:00Z', user_metadata: {username: 'Ana_futbolera'}};
   const D = d => new Date(Date.now() - d * 864e5).toISOString();
-  const take = (n, up, down) => ({id: 'd100000' + n + '-0000-4000-8000-000000000000', author_id: UID, author: 'ana_futbolera',
+  const take = (n, up, down) => ({id: 'd100000' + n + '-0000-4000-8000-000000000000', author_id: UID, author: 'Ana_futbolera',
     title: 'Take ' + n, body: 'Texto del Take ' + n, sport: 'laliga', competition: 'LaLiga', upvotes: up, downvotes: down, created_at: D(n), hidden: false});
   const takes = [take(1, 14, 3), take(2, 6, 9), take(3, 21, 12)];
   F.rpc.ae_my_free_takes = () => ({data: takes, error: null});
   F.rpc.ae_public_take_profile = () => ({data: takes, error: null});
-  const pick = (n, outcome) => ({id: 'c100000' + n + '-0000-4000-8000-000000000000', user_id: UID, author: 'ana_futbolera', title: 'Pick ' + n,
+  const pick = (n, outcome) => ({id: 'c100000' + n + '-0000-4000-8000-000000000000', user_id: UID, author: 'Ana_futbolera', title: 'Pick ' + n,
     legs: [{event: 'Barcelona vs Sevilla', selection: 'Barcelona gana', sport: 'Fútbol'}], american_odds: 140, created_at: D(n),
     outcome, result_points: outcome === 'won' ? 1.4 : outcome === 'lost' ? -1.4 : null, moderation_status: 'approved', hidden: false, upvotes: 1, downvotes: 0});
   F.tables.ae_pick_feed = [pick(1, 'won'), pick(2, 'lost'), pick(3, 'pending')];
-  const N = {current: 'ana_futbolera', taken: ['beto', 'carla'], last: null, prev: null, undoUsed: false};
+  // Como el servidor desde el 4 nov: respeta mayúsculas, compara sin ellas y deja cambiar solo mayúsculas siempre.
+  const N = {current: 'Ana_futbolera', taken: ['beto', 'carla'], last: null, prev: null, undoUsed: false};
+  const low = v => String(v || '').toLowerCase();
   F.names = N;
   const status = () => {
     const now = Date.now(), last = N.last, undoOk = last && !N.undoUsed && now - last < 7 * 864e5;
-    return {username: N.current, can_change: !last || now - last > 30 * 864e5,
+    return {username: N.current, can_change: !last || now - last > 30 * 864e5, can_change_case: true,
       next_change_at: last && new Date(last + 30 * 864e5).toISOString(),
       undo_username: undoOk ? N.prev : null, undo_until: undoOk ? new Date(last + 7 * 864e5).toISOString() : null};
   };
   F.rpc.cam_username_status = () => ({data: status(), error: null});
   F.rpc.cam_username_available = ({p_username}) => {
-    const n = String(p_username).trim().toLowerCase();
-    if (!/^[a-z0-9_]{3,30}$/.test(n)) return {data: 'invalid', error: null};
+    const n = String(p_username).trim().replace(/^@+/, '');
+    if (!/^[A-Za-z0-9_]{3,30}$/.test(n)) return {data: 'invalid', error: null};
     if (n === N.current) return {data: 'same', error: null};
-    return {data: N.taken.includes(n) ? 'taken' : 'ok', error: null};
+    if (low(n) === low(N.current)) return {data: 'case', error: null};
+    return {data: N.taken.includes(low(n)) ? 'taken' : 'ok', error: null};
   };
+  F.calls_case = 0;
   F.rpc.cam_change_username = ({p_username}) => {
-    const n = String(p_username).trim().toLowerCase(), st = status(), undo = st.undo_username === n;
-    if (!st.can_change && !undo) return {data: null, error: {message: 'Solo puedes cambiar tu nombre una vez cada 30 días.'}};
-    if (N.taken.includes(n)) return {data: null, error: {message: 'Ese nombre ya lo usa otra persona.'}};
+    const n = String(p_username).trim().replace(/^@+/, ''), st = status();
+    const caseOnly = low(n) === low(N.current), undo = !caseOnly && !!st.undo_username && low(st.undo_username) === low(n);
+    if (!caseOnly && !st.can_change && !undo) return {data: null, error: {message: 'Solo puedes cambiar tu nombre una vez cada 30 días.'}};
+    if (N.taken.includes(low(n))) return {data: null, error: {message: 'Ese nombre ya lo usa otra persona.'}};
     const previous = N.current;
-    if (undo) N.undoUsed = true; else { N.prev = previous; N.undoUsed = false; }
-    N.current = n; N.last = Date.now(); F.user.user_metadata.username = n;
-    return {data: Object.assign(status(), {previous_username: previous, undo}), error: null};
+    if (!caseOnly) { if (undo) N.undoUsed = true; else { N.prev = previous; N.undoUsed = false; } N.last = Date.now(); }
+    N.current = n; F.user.user_metadata.username = n;
+    return {data: Object.assign(status(), {previous_username: previous, undo, case_only: caseOnly}), error: null};
   };
   F.rpc.cam_public_profile_card = ({p_user}) => ({data: {username: p_user === OTHER ? 'beto_crack' : N.current, joined_month: '2026-10'}, error: null});
   // Resumen del perfil (pestaña Perfil): nombre público y cifras.
@@ -82,7 +87,7 @@ STATE = """() => {
     stats: document.querySelectorAll('#camProfileStats').length,
     figures: [...document.querySelectorAll('#camProfileOverview .cam-ov-figures')].map(n => n.textContent),
     selected: [...document.querySelectorAll('#aeProfileTabs button')].find(b => b.getAttribute('aria-selected') === 'true')?.id || null,
-    tabs: [...document.querySelectorAll('#aeProfileTabs button')].map(b => b.textContent),
+    tabs: [...document.querySelectorAll('#aeProfileTabs button')].filter(b => !b.hidden && b.getClientRects().length).map(b => b.textContent),
     check: $('camUsernameCheck').textContent, tone: $('camUsernameCheck').dataset.tone || '',
     saveEnabled: !$('camUsernameSave').hidden && !$('camUsernameSave').disabled,
     confirm: !$('camUsernameConfirm').hidden, inputDisabled: $('camUsernameInput').disabled,
@@ -107,12 +112,12 @@ def run(width, dark):
         page.wait_for_timeout(1200)
         page.evaluate('openAeProfile()'); page.wait_for_timeout(1300)
         st = page.evaluate(STATE)
-        assert st['title'] == '@ana_futbolera' and st['avatar'] == 'A', f'{where}: identidad {st}'
+        assert st['title'] == '@Ana_futbolera' and st['avatar'] == 'A', f'{where}: identidad {st}'
         assert st['sub'] == 'Miembro desde octubre de 2026', f'{where}: miembro desde {st}'
         assert st['edit'] and st['kicker'].startswith('MI PERFIL'), f'{where}: botones propios {st}'
         assert st['stats'] == 0, f'{where}: sin fila de cifras {st}'
         assert st['figures'] == ['3·63 % apoyo', '3·50 % acierto'], f'{where}: cifras en el resumen {st}'
-        assert st['tabs'] == ['Perfil', 'Takes', 'Picks', 'Mi Party'] and st['selected'] == 'aeProfileTabOverview', f'{where}: pestañas {st}'
+        assert st['tabs'] == ['Perfil', 'Takes', 'Picks', 'Mi Quiniela', 'Mi Party'] and st['selected'] == 'aeProfileTabOverview', f'{where}: pestañas {st}'
         assert st['overflow'] <= 1, f'{where}: desbordamiento {st}'
         if width < 700:
             box = page.evaluate("document.getElementById('aeProfileDialog').getBoundingClientRect().toJSON()")
@@ -139,25 +144,36 @@ def run(width, dark):
         st = typed(page, 'ab')
         assert st['tone'] == 'error' and '3 caracteres' in st['check'], f'{where}: corto {st}'
         st = typed(page, 'Ana FC')
-        assert page.input_value('#camUsernameInput') == 'ana_fc', f'{where}: minúsculas y espacios → _'
+        assert page.input_value('#camUsernameInput') == 'Ana_FC', f'{where}: respeta mayúsculas y espacios → _'
         assert st['tone'] == 'ok' and st['saveEnabled'], f'{where}: libre {st}'
         if SHOTS: page.screenshot(path=str(SHOTS / f'{where}-editar.png'))
         page.click('#camUsernameSave'); page.wait_for_timeout(300)
         st = page.evaluate(STATE)
-        assert st['confirm'] and '@ana_fc' in page.inner_text('#camUsernameConfirm'), f'{where}: confirmación {st}'
+        assert st['confirm'] and '@Ana_FC' in page.inner_text('#camUsernameConfirm'), f'{where}: confirmación {st}'
         page.click('#camUsernameConfirmNo'); page.wait_for_timeout(200)
         assert not page.evaluate(STATE)['confirm'], f'{where}: cancelar'
         page.click('#camUsernameSave'); page.wait_for_timeout(200)
         page.click('#camUsernameConfirmYes'); page.wait_for_timeout(900)
         st = page.evaluate(STATE)
-        assert st['title'] == '@ana_fc' and st['session'] == 'ana_fc', f'{where}: nombre nuevo {st}'
+        assert st['title'] == '@Ana_FC' and st['session'] == 'Ana_FC', f'{where}: nombre nuevo {st}'
         assert st['tone'] == 'ok' and 'iniciar sesión' in st['check'], f'{where}: aviso de acceso {st}'
-        assert st['inputDisabled'] and st['undo'] and '@ana_futbolera' in st['undo'], f'{where}: espera y deshacer {st}'
+        # Falta un mes para otro cambio, pero las mayúsculas siguen editables.
+        assert not st['inputDisabled'] and st['undo'] and '@Ana_futbolera' in st['undo'], f'{where}: espera y deshacer {st}'
         if SHOTS: page.screenshot(path=str(SHOTS / f'{where}-cambiado.png'))
+        st = typed(page, 'Pepe_10')
+        assert st['tone'] == 'wait' and 'mayúsculas' in st['check'] and not st['saveEnabled'], f'{where}: otro nombre durante la espera {st}'
+        st = typed(page, 'ana_fc')
+        assert st['tone'] == 'ok' and 'mayúsculas' in st['check'] and st['saveEnabled'], f'{where}: solo mayúsculas {st}'
+        page.click('#camUsernameSave'); page.wait_for_timeout(300)
+        assert 'no cuenta como cambio' in page.inner_text('#camUsernameConfirm'), f'{where}: confirmación de mayúsculas'
+        page.click('#camUsernameConfirmYes'); page.wait_for_timeout(900)
+        st = page.evaluate(STATE)
+        assert st['title'] == '@ana_fc' and st['session'] == 'ana_fc' and st['check'] == 'Listo: ahora eres @ana_fc.', f'{where}: minúsculas {st}'
+        assert st['undo'] and '@Ana_futbolera' in st['undo'], f'{where}: el deshacer sigue disponible {st}'
         page.click('#camUsernameUndo'); page.wait_for_timeout(200)
         page.click('#camUsernameConfirmYes'); page.wait_for_timeout(900)
         st = page.evaluate(STATE)
-        assert st['title'] == '@ana_futbolera' and st['undo'] is None and st['inputDisabled'], f'{where}: deshacer {st}'
+        assert st['title'] == '@Ana_futbolera' and st['undo'] is None and not st['inputDisabled'], f'{where}: deshacer {st}'
         page.keyboard.press('Escape'); page.wait_for_timeout(300)
         st = page.evaluate(STATE)
         assert st['open'] and not st['editing'], f'{where}: Escape vuelve al perfil {st}'
