@@ -108,12 +108,15 @@
       moveTo(byId('freeTakes'), stage);
       // El bloque real de opiniones se muestra debajo de "Demuestra tu
       // conocimiento" y antes de los últimos Takes; nunca en la barra lateral.
+      // Como en NFL, «Seguro que alguna vez dijiste…» va debajo de las opiniones.
       const footballFeed=byId('freeTakes');
       const history=byId('aeTakesFeedHeading');
       const leaders=byId('aeSportTakeLeaders');
-      if(footballFeed&&history?.parentElement===footballFeed&&leaders&&
-         (leaders.parentElement!==footballFeed||leaders.nextElementSibling!==history)){
-        footballFeed.insertBefore(leaders,history);
+      const invitation=byId('camTakeInvitation');
+      const before=invitation?.parentElement===footballFeed?invitation:history;
+      if(footballFeed&&history?.parentElement===footballFeed&&leaders&&before&&
+         (leaders.parentElement!==footballFeed||leaders.nextElementSibling!==before)){
+        footballFeed.insertBefore(leaders,before);
       }
       moveTo(byId('aeNflLatestComments'), stage);
       // Opinadores distinguidos pertenece a la portada, no a Fútbol móvil.

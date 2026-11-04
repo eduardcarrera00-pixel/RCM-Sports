@@ -70,9 +70,13 @@
    // justo debajo del encabezado y antes del historial, a cualquier ancho.
    if(section==='Fútbol'){
      const feed=$('freeTakes'),history=$('aeTakesFeedHeading');
-     if(feed&&history?.parentElement===feed&&
-        (root.parentElement!==feed||root.nextElementSibling!==history)){
-       feed.insertBefore(root,history);
+     // Teléfono, igual que NFL: opiniones → «Seguro que alguna vez dijiste…» → Últimos Takes.
+     // Escritorio, igual que NFL: el párrafo sigue justo debajo de la tarjeta.
+     const invitation=$('camTakeInvitation');
+     const before=window.matchMedia('(max-width:760px)').matches&&invitation?.parentElement===feed?invitation:history;
+     if(feed&&history?.parentElement===feed&&before&&
+        (root.parentElement!==feed||root.nextElementSibling!==before)){
+       feed.insertBefore(root,before);
      }
      return;
    }
