@@ -284,6 +284,23 @@
     return cfg && li.closest(cfg.section) && cfg.lists.some(sel => li.closest(sel)) ? li : null;
   };
 
+  // Hand an animated strip to native touch scrolling at its current position.
+  // Keep manual mode after release, so autoplay cannot fight the finger/inertia.
+  document.addEventListener('pointerdown', e => {
+    if (e.pointerType === 'mouse') return;
+    const viewport = e.target?.closest?.('#rankingViewport, #championsViewport');
+    if (!viewport || !window.matchMedia('(max-width:760px), (orientation:landscape) and (max-height:500px) and (hover:none) and (pointer:coarse)').matches) return;
+    const track = viewport.querySelector('.rcm-track');
+    if (!track || track.classList.contains('ae-ranking-manual')) return;
+    const group = track.querySelector('.rcm-track-group');
+    const width = group?.getBoundingClientRect().width || 0;
+    const transform = getComputedStyle(track).transform;
+    const offset = transform === 'none' ? 0 : -new DOMMatrixReadOnly(transform).m41;
+    const position = viewport.scrollLeft + (width ? ((offset % width) + width) % width : 0);
+    track.classList.add('ae-ranking-manual');
+    viewport.scrollLeft = position;
+  }, {passive:true});
+
   document.addEventListener('pointerover', e => {
     if (e.pointerType !== 'mouse') return;
     const li = teamFrom(e.target);

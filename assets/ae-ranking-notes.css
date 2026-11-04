@@ -116,3 +116,35 @@ html.dark .ae-rank-note-body .ae-rank-note-figure{
   .ae-rank-note-body .ae-rank-note-headline{font-size:18px;line-height:1.22}
   .ae-rank-note-body .ae-rank-note-paragraph{font-size:13px}
 }
+
+/* One mobile motion policy for both real tracks. Layered important rules beat
+   older sport-specific overflow/animation rules, including their hidden copies. */
+@layer cam-ranking-motion {
+  @media (max-width:760px), (orientation:landscape) and (max-height:500px) and (hover:none) and (pointer:coarse) {
+    :is(#rankingViewport,#championsViewport).rcm-ticker {
+      overflow-x:auto!important;
+      overflow-y:hidden!important;
+      touch-action:pan-x pan-y;
+      -webkit-overflow-scrolling:touch;
+    }
+    :is(#rankingTrack,#championsTrack).rcm-track.ae-ranking-manual {
+      animation:none!important;
+      transform:none!important;
+    }
+    :is(#rankingTrack,#championsTrack).ae-ranking-manual > .rcm-track-group:nth-child(2) {
+      display:none!important;
+    }
+    :is(#rankingTrack,#championsTrack).rcm-track.ae-note-hold {
+      animation-play-state:paused!important;
+    }
+  }
+  @media (prefers-reduced-motion:reduce) {
+    :is(#rankingTrack,#championsTrack).rcm-track {
+      animation:none!important;
+      transform:none!important;
+    }
+    :is(#rankingTrack,#championsTrack) > .rcm-track-group:nth-child(2) {
+      display:none!important;
+    }
+  }
+}
