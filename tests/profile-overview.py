@@ -390,7 +390,8 @@ def scenario_own_empty(dark, width, tag):
         assert page.evaluate("currentCategory") == 'NFL'
         if width < 700:
             q = page.evaluate("new URL(location.href).searchParams.toString()")
-            assert 's=nfl' in q and 'v=quiniela' in q, q
+            # En NFL la quiniela vive en La semana (4 nov 2026).
+            assert 's=nfl' in q and 'v=semana' in q, q
         assert page.locator('#camPartyEntryQuinielaNfl').is_visible(), 'acceso «Mis parties» en la quiniela'
         page.evaluate("document.getElementById('camPartyEntryQuinielaNfl').scrollIntoView({block:'center'})")
         page.wait_for_timeout(300)

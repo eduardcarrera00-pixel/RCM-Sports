@@ -9,7 +9,8 @@ Cubre:
     intercaladas), Últimas noticias, Takes de la comunidad y Power Rankings;
     sin desbordamiento horizontal ni errores de consola;
   · cada tarjeta abre lo de siempre: la quiniela (?s=nfl&v=quiniela), la
-    noticia, la conversación del Take, el Top 10, el compositor de Takes;
+    noticia, la conversación del Take, el Top 10 (La columna de NFL · La semana),
+    el compositor de Takes;
     al volver a Inicio, «Tu jornada» vuelve a verse;
   · vacíos: sin partidos ni Pick no hay fila Cierran pronto; sin Takes queda
     solo la invitación; sin Power Rankings no hay fila;
@@ -132,7 +133,10 @@ def phone(width, dark):
         # Partido NFL → quiniela NFL; Inicio → Tu jornada otra vez (sin volver a pedir datos).
         tap(page, '#camHomeJornada .cam-hj-game[data-sport="nfl"]')
         st = page.evaluate(STATE)
-        assert st['cat'] == 'NFL' and st['tab'] == 'quiniela' and st['url'] == '?s=nfl&v=quiniela' and not st['on'], f'{where}: partido NFL {st}'
+        # En NFL la quiniela vive en La semana (4 nov 2026): se abre esa pestaña y se baja hasta la quiniela.
+        assert st['cat'] == 'NFL' and st['tab'] == 'semana' and st['url'] == '?s=nfl&v=semana' and not st['on'], f'{where}: partido NFL {st}'
+        q_top = page.evaluate("document.getElementById('camNflQuiniela').getBoundingClientRect().top")
+        assert 0 <= q_top < 200, f'{where}: el partido NFL no lleva a la quiniela ({q_top})'
         go_home(page)
         st = page.evaluate(STATE)
         assert st['on'] and st['visible'] and st['loadedAt'] == loaded_at, f'{where}: volver a Inicio no debe volver a pedir datos {st}'
@@ -157,10 +161,11 @@ def phone(width, dark):
         tap(page, '#camHomeJornada .cam-hj-take')
         assert page.evaluate("!!document.getElementById('aeTakeDiscussion')?.open"), f'{where}: el Take no abre su conversación'
         page.evaluate("document.getElementById('aeTakeDiscussion').close()"); page.wait_for_timeout(300)
-        # Power Rankings → Top 10 de NFL.
+        # Power Rankings → Top 10 de NFL («La columna» de La semana, abierta con los diez).
         tap(page, '#camHomeJornada .cam-hj-ranking[data-sport="nfl"]')
         st = page.evaluate(STATE)
-        assert st['cat'] == 'NFL' and st['tab'] == 'noticias', f'{where}: Top 10 {st}'
+        assert st['cat'] == 'NFL' and st['tab'] == 'semana', f'{where}: Top 10 {st}'
+        assert page.evaluate("document.querySelectorAll('#camNflColumna .cam-ns-team').length") == 10, f'{where}: La columna no abre los diez'
         go_home(page)
         # Publicar Take: compositor (o el acceso si hace falta sesión).
         tap(page, '#camHomeJornada .cam-hj-shortcut[data-shortcut="take"]')

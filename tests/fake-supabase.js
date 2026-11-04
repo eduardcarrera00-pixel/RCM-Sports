@@ -19,9 +19,11 @@
     q.in = (col, vals) => { state.filters.push(r => vals.includes(r[col])); return q; };
     for (const name of ['insert', 'update', 'upsert', 'delete']) q[name] = payload => { fake.calls.push({ table, op: name, payload }); return q; };
     const rows = () => (fake.tables[table] || []).filter(r => state.filters.every(f => f(r)));
-    q.single = () => Promise.resolve({ data: rows()[0] || null, error: null });
+    // window.__fake.tableErrors[tabla] = 'mensaje' simula una tabla que aún no existe.
+    const failure = () => fake.tableErrors && fake.tableErrors[table] ? { message: fake.tableErrors[table] } : null;
+    q.single = () => Promise.resolve(failure() ? { data: null, error: failure() } : { data: rows()[0] || null, error: null });
     q.maybeSingle = q.single;
-    q.then = (ok, ko) => Promise.resolve({ data: rows(), error: null, count: rows().length }).then(ok, ko);
+    q.then = (ok, ko) => Promise.resolve(failure() ? { data: null, error: failure(), count: 0 } : { data: rows(), error: null, count: rows().length }).then(ok, ko);
     return q;
   }
   const auth = {

@@ -60,6 +60,19 @@
     if(tone)e.dataset.tone=tone;else delete e.dataset.tone;
   };
   let games=[],teams=new Map(),user=null,mine=new Map(),draft=new Map(),season=seasonGuess(),week=1,dayKey=null,scope='week',showAll=false,loading=false,loaded=false,saving=false,request=0;
+  /* «La semana» (4 nov 2026): el laurel (x2), las elecciones del editor y lo que
+     eligió la comunidad. Cada parte depende de la migración 20261104090000; si la
+     base de datos aún no la tiene, esa parte simplemente no aparece. */
+  const laurels=new Map();           // 'temporada|semana' → id del partido con el laurel
+  let laurelReady=false,laurelBusy=false;
+  const expert={key:null,ready:false,name:'',picks:new Map()};
+  const split={key:null,ready:false,rows:new Map()};
+  const weekKey=(s,w)=>s+'|'+w;
+  const nickname=id=>{
+    const team=window.CamNFLQuinielaTeams?.getTeam(id)||teams.get(id);
+    const words=String(team?.name||id).trim().split(/\s+/);
+    return words[words.length-1]||id;
+  };
   function draftKey(id){return 'cam:nfl-quiniela:'+user?.id+':'+id;}
   function saveDraft(){
     if(!user)return;
@@ -132,12 +145,139 @@
     }finally{loading=false;}
   }
   async function loadMine(){
-    mine.clear();
+    mine.clear();laurels.clear();laurelReady=false;
     if(!user)return;
     const ids=games.filter(g=>g.season===season).map(g=>g.id);
     if(!ids.length)return;
     const rows=await run(client().from('cam_nfl_picks').select('game_id,team_id,awarded_points,settled_at').eq('user_id',user.id).in('game_id',ids).limit(500));
     for(const row of rows||[])mine.set(row.game_id,row);
+    // Sin la tabla del laurel (migración pendiente) la quiniela sigue igual que antes.
+    try{
+      const own=await client().from('cam_nfl_laurels').select('season,week,game_id').eq('user_id',user.id).eq('season',season).limit(40);
+      if(!own.error){laurelReady=true;for(const row of own.data||[])laurels.set(weekKey(row.season,row.week),row.game_id);}
+    }catch{}
+  }
+  // Elecciones del editor y reparto de la comunidad de la jornada visible: una consulta por jornada.
+  async function loadExtras(force){
+    const key=weekKey(season,week),c=client();
+    if(!c)return;
+    const jobs=[];
+    if(force||expert.key!==key){
+      expert.key=key;
+      jobs.push(c.rpc('cam_nfl_expert_picks',{p_season:season,p_week:week}).then(({data,error})=>{
+        if(expert.key!==key)return;
+        expert.picks.clear();expert.ready=!error;expert.name='';
+        if(error)return;
+        for(const row of data||[]){
+          if(!expert.name)expert.name=row.username||'Editor';
+          if(!expert.picks.has(row.game_id))expert.picks.set(row.game_id,row);
+        }
+      },()=>{expert.ready=false;}));
+    }
+    if(force||split.key!==key){
+      split.key=key;
+      jobs.push(c.rpc('cam_nfl_pick_split',{p_season:season,p_week:week}).then(({data,error})=>{
+        if(split.key!==key)return;
+        split.rows.clear();split.ready=!error;
+        if(!error)for(const row of data||[])if(Number(row.total)>=5)split.rows.set(row.game_id,row);
+      },()=>{split.ready=false;}));
+    }
+    if(!jobs.length)return;
+    await Promise.all(jobs);
+    if(loaded){paintGames();paintRules();}
+    announce();
+  }
+  function laurelOf(g){return laurels.get(weekKey(g.season,g.week))||null;}
+  function laurelLocked(g){
+    const id=laurelOf(g);if(!id||id===g.id)return false;
+    const other=games.find(x=>x.id===id);
+    return !!other&&!isOpen(other);
+  }
+  async function toggleLaurel(g){
+    if(laurelBusy||!user||!laurelReady)return;
+    const key=weekKey(g.season,g.week),here=laurelOf(g)===g.id;
+    laurelBusy=true;
+    try{
+      if(here){
+        await run(client().rpc('cam_nfl_clear_laurel',{p_season:g.season,p_week:g.week}));
+        laurels.delete(key);
+        st('camNflStatus','Quitaste el laurel. Puedes ponérselo a otro partido hasta que empiece.','ok');
+      }else{
+        await run(client().rpc('cam_nfl_set_laurel',{p_game_id:g.id}));
+        laurels.set(key,g.id);
+        st('camNflStatus','Laurel en '+nickname(g.away_id)+' @ '+nickname(g.home_id)+': si aciertas, ese partido vale el doble.','ok');
+      }
+      document.dispatchEvent(new CustomEvent('cam:nfl-picks-updated'));
+    }catch(error){st('camNflStatus',error.message,'error');}
+    finally{laurelBusy=false;paintGames();announce();}
+  }
+  function extras(g){
+    const row=el('div',null,'cam-nfl-extras');
+    const pick=expert.ready?expert.picks.get(g.id):null;
+    if(pick){
+      const done=g.status==='final'&&g.winner_id;
+      const chip=el('span',null,'cam-nfl-chip cam-nfl-chip-expert'+(done?(pick.team_id===g.winner_id?' is-hit':' is-miss'):''));
+      chip.append(el('span','El editor','cam-nfl-chip-label'),el('strong',nickname(pick.team_id)));
+      if(done)chip.append(el('span',pick.team_id===g.winner_id?'acertó':'falló','cam-nfl-chip-result'));
+      chip.title=(expert.name?'@'+expert.name+' · ':'')+'elección del editor para este partido';
+      row.append(chip);
+    }
+    const here=laurelOf(g)===g.id;
+    if(user&&laurelReady){
+      if(isOpen(g)&&mine.has(g.id)&&!laurelLocked(g)){
+        const b=el('button',null,'cam-nfl-laurel'+(here?' is-on':''));
+        b.type='button';b.setAttribute('aria-pressed',String(here));b.disabled=laurelBusy;
+        b.append(el('span',here?'Laurel · x2':'Poner el laurel','cam-nfl-laurel-text'));
+        b.title=here?'Quitar el laurel de este partido':'Este partido valdrá el doble si aciertas (0 si fallas). Uno por jornada.';
+        b.addEventListener('click',()=>toggleLaurel(g));
+        row.append(b);
+      }else if(here){
+        row.append(el('span','Laurel · x2','cam-nfl-chip cam-nfl-chip-laurel'));
+      }
+    }
+    const share=split.ready?split.rows.get(g.id):null;
+    if(share){
+      const total=Number(share.total)||0,away=Number(share.away_picks)||0;
+      const awayPct=total?Math.round(100*away/total):0,homePct=100-awayPct;
+      const bar=el('div',null,'cam-nfl-split');
+      bar.setAttribute('role','img');
+      bar.setAttribute('aria-label','La comunidad eligió '+nickname(g.away_id)+' '+awayPct+' %, '+nickname(g.home_id)+' '+homePct+' %, sobre '+total+' elecciones');
+      const track=el('span',null,'cam-nfl-split-track');
+      const fill=el('span',null,'cam-nfl-split-fill');fill.style.width=awayPct+'%';
+      track.append(fill);
+      bar.append(el('span','Comunidad','cam-nfl-split-label'),
+        el('span',nickname(g.away_id)+' '+awayPct+' %','cam-nfl-split-side'),track,
+        el('span',homePct+' % '+nickname(g.home_id),'cam-nfl-split-side'));
+      row.append(bar);
+    }
+    return row.childElementCount?row:null;
+  }
+  // «La semana» lee lo mismo que la quiniela: ni una consulta más.
+  function announce(){
+    document.dispatchEvent(new CustomEvent('cam:nfl-quiniela-data'));
+  }
+  async function saveOne(gameId,teamId){
+    const g=games.find(x=>x.id===gameId);
+    if(!g||![g.home_id,g.away_id].includes(teamId))return false;
+    if(!user){window.openUserAuthModal?.();return false;}
+    if(!isOpen(g)){st('camNflStatus','Este partido ya está cerrado.','error');return false;}
+    try{
+      await run(client().rpc('cam_nfl_save_pick',{p_game_id:g.id,p_team_id:teamId}));
+      mine.set(g.id,{game_id:g.id,team_id:teamId,awarded_points:0});
+      draft.delete(g.id);
+      try{localStorage.removeItem(draftKey(g.id));}catch{}
+      st('camNflStatus','Pronóstico guardado: '+nickname(teamId)+'.','ok');
+      document.dispatchEvent(new CustomEvent('cam:nfl-picks-updated'));
+      return true;
+    }catch(error){st('camNflStatus',error.message,'error');return false;}
+    finally{paintGames();announce();}
+  }
+  function focusGame(gameId){
+    const g=games.find(x=>x.id===gameId);
+    if(g&&Number(g.week)===week&&Number(g.season)===season){dayKey=gameDay(g);setQuinielaView('jornada');paintGames();}
+    const card=g&&$('camNflGames')?.querySelector('[data-game-id="'+CSS.escape(g.id)+'"]');
+    const target=card||root;
+    requestAnimationFrame(()=>{try{target.scrollIntoView({block:card?'center':'start'});}catch{}});
   }
   function weekName(value){
     return ({19:'Playoffs · Wild Card',20:'Playoffs · Divisional',21:'Playoffs · Conferencias',22:'Super Bowl'})[value] || 'Jornada '+value;
@@ -174,8 +314,9 @@
     summary.append(el('strong',team?.name||id),el('span',(team?.id||id)+' · '+(home?'Local':'Visitante')));
     b.append(logo(id),summary);
     const points=id===g.home_id?g.points_home:g.points_away;
-    // Sin probabilidad visible: el usuario ve solo los puntos del acierto.
-    b.append(el('small',points==null?'Pts pendientes':points+' pts'));
+    // Sin probabilidad visible: el usuario ve solo los puntos del acierto (el doble con el laurel).
+    const doubled=points!=null&&laurelOf(g)===g.id;
+    b.append(el('small',points==null?'Pts pendientes':doubled?(points*2)+' pts · x2':points+' pts'));
     b.addEventListener('click',()=>{if(!isOpen(g))return;if(!user){window.openUserAuthModal?.();return;}draft.set(g.id,id);saveDraft();paintGames();});
     if(disabled)b.title='Este partido está cerrado';
     return b;
@@ -275,12 +416,16 @@
     for(const g of visible){
       const box=el('article',null,'cam-nfl-game');
       box.dataset.state=gameState(g);
+      box.dataset.gameId=g.id;
+      if(laurelOf(g)===g.id)box.classList.add('has-laurel');
       const top=el('div',null,'cam-nfl-game-meta');
       top.append(el('span',clock(g.kickoff)),el('span',gameStatus(g),'cam-nfl-badge'));box.append(top);
       const sides=el('div',null,'cam-nfl-sides');
       sides.append(side(g,g.away_id),el('span','@','cam-nfl-versus'),side(g,g.home_id));
       box.append(sides);
       if(g.status==='final'||g.status==='tie')box.append(el('p',g.away_score+' — '+g.home_score,'cam-nfl-result'));
+      const more=extras(g);
+      if(more)box.append(more);
       if(editor())box.append(adminGame(g));
       target.append(box);
     }
@@ -313,13 +458,20 @@
           successes++;
         }catch(error){errors.push((teams.get(g.home_id)?.name||g.id)+': '+error.message);}
       }
-    }finally{saving=false;paintGames();}
+    }finally{saving=false;paintGames();announce();}
     st('camNflStatus',successes+' pronóstico(s) guardado(s)'+(mode==='day'?' en este día':' en la jornada')+'.'+(errors.length?' '+errors.join(' · '):''),
       errors.length?'error':successes?'ok':undefined);
     if(successes)document.dispatchEvent(new CustomEvent('cam:nfl-picks-updated'));
   }
   function paint(){
-    paintNav();paintGames();renderAdmin();paintRanking();
+    paintNav();paintGames();renderAdmin();paintRanking();paintRules();
+    announce();
+    void loadExtras();
+  }
+  // Las reglas del laurel y del editor solo se cuentan cuando existen.
+  function paintRules(){
+    const laurelRule=$('camNflLaurelRule');if(laurelRule)laurelRule.hidden=!laurelReady;
+    const expertRule=$('camNflExpertRule');if(expertRule)expertRule.hidden=!expert.ready;
   }
   function setQuinielaView(view){
     if(!['jornada','month','all'].includes(view))return;
@@ -536,6 +688,20 @@
     root.hidden=!document.body.classList.contains('ae-is-nfl');
     if(!root.hidden)hydrate();
   }
+  // Lo que «La semana» (cam-nfl-semana.js) necesita: los mismos datos, sin otra consulta.
+  window.camNflQuiniela=Object.freeze({
+    snapshot:()=>({
+      loaded,season,week,user:user?{id:user.id}:null,
+      games:games.slice(),
+      mine:new Map([...mine].map(([id,row])=>[id,row.team_id])),
+      laurel:laurelReady?laurels.get(weekKey(season,week))||null:undefined,
+      expert:expert.ready&&expert.key===weekKey(season,week)?{name:expert.name,picks:new Map([...expert.picks].map(([id,row])=>[id,row.team_id]))}:null,
+      split:split.ready&&split.key===weekKey(season,week)?new Map(split.rows):null
+    }),
+    isOpen,
+    save:saveOne,
+    focus:focusGame
+  });
   // Loaded on demand: initialize immediately when DOMContentLoaded has already fired.
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup,{once:true});
   else setup();

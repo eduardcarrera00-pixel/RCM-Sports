@@ -4,12 +4,15 @@ Página completa en Chromium con tests/full-page.py y el Supabase falso (sin red
 
 Cubre, a 320/390 px de día y de noche (y 1366 px para escritorio):
   · la barra inferior Inicio · NFL · Fútbol · Picks · Perfil (Perfil al final);
-  · NFL y Fútbol: Noticias · Takes · Quiniela, y qué módulo enseña cada
-    pestaña (Savant · Rookie, debajo de Últimos Takes); Picks: Picks · Historial · Chefs;
+  · NFL: La semana · Takes · Noticias (La semana con La Quiniela; los Power
+    Rankings de NFL viven en «La columna», no en Noticias); Fútbol: Noticias ·
+    Takes · Quiniela; qué módulo enseña cada pestaña (Savant · Rookie, debajo
+    de Últimos Takes); Picks: Picks · Historial · Chefs;
   · la barra de pestañas queda fija arriba al bajar y toca el encabezado;
   · la dirección (?s=nfl&v=quiniela), abrir un enlace directo (también el
     antiguo ?v=clasificacion, que abre Takes) y el botón Atrás;
-  · los atajos que llevan a un módulo (Top 10 NFL) abren su pestaña;
+  · los atajos que llevan a un módulo (Top 10 NFL → «La columna» de La semana)
+    abren su pestaña;
   · en escritorio no hay pestañas y se ve todo como antes;
   · sin errores de consola ni desbordamiento horizontal.
 
@@ -41,6 +44,12 @@ SPORT_EXPECT = {
     'takes': {'#freeTakesTitle': True, '#aeSportTakeLeaders': True, '#freeTakesFeed': True, '#aeSportTakeRanking': True, '#aeNflTwinRankings': True,
               '#QUINIELA': False, '#aeSeasonPredictions': False, '#articlesGrid': False, '#RANK': False},
     'quiniela': {'#QUINIELA': True, '#freeTakesTitle': False, '#aeSportTakeRanking': False, '#articlesGrid': False},
+}
+NFL_TABS = ['semana', 'takes', 'noticias']
+NFL_EXPECT = {
+    'semana': {'#camNflSemana': True, '#QUINIELA': True, '#freeTakesTitle': False, '#aeSportTakeRanking': False, '#articlesGrid': False, '#RANK': False},
+    'takes': {**SPORT_EXPECT['takes'], '#camNflSemana': False},
+    'noticias': {'#articlesGrid': True, '#aeSportLatestNews': True, '#freeTakes': False, '#camNflSemana': False, '#RANK': False},
 }
 PICKS_TABS = ['picks', 'historial', 'chefs']
 PICKS_EXPECT = {
@@ -83,7 +92,7 @@ def phone(width, dark):
         assert st['dock'] == ['Todos', 'NFL', 'Fútbol', 'Picks', 'Opiniones'], f'{where}: barra inferior {st["dock"]}'
         assert not st['bar'], f'{where}: Inicio no lleva pestañas'
 
-        for cat, slug, tabs, expect in [('NFL', 'nfl', SPORT_TABS, SPORT_EXPECT), ('Fútbol', 'futbol', SPORT_TABS, SPORT_EXPECT),
+        for cat, slug, tabs, expect in [('NFL', 'nfl', NFL_TABS, NFL_EXPECT), ('Fútbol', 'futbol', SPORT_TABS, SPORT_EXPECT),
                                         ('Picks', 'picks', PICKS_TABS, PICKS_EXPECT)]:
             page.click(f'body > nav.cam-mobile-bottom-nav > button[data-category="{cat}"]')
             page.wait_for_timeout(700)
@@ -123,14 +132,14 @@ def phone(width, dark):
         assert st['cat'] == 'Fútbol' and st['current'] == 'quiniela', f'{where}: Atrás {st}'
         page.go_back(); page.wait_for_timeout(700)
         st = page.evaluate(STATE)
-        assert st['cat'] == 'NFL' and st['current'] == 'quiniela', f'{where}: Atrás 2 {st}'
+        assert st['cat'] == 'NFL' and st['current'] == 'noticias', f'{where}: Atrás 2 {st}'
 
         # Un atajo al Top 10 NFL abre su pestaña.
         page.click('body > nav.cam-mobile-bottom-nav > button[data-category="Todos"]'); page.wait_for_timeout(500)
         page.evaluate('openNflTopTen()'); page.wait_for_timeout(600)
         st = page.evaluate(STATE)
-        assert st['cat'] == 'NFL' and st['current'] == 'noticias', f'{where}: Top 10 {st}'
-        assert page.evaluate("document.getElementById('nflRankings').getBoundingClientRect().top") >= 40, f'{where}: el Top 10 queda bajo la barra'
+        assert st['cat'] == 'NFL' and st['current'] == 'semana', f'{where}: Top 10 {st}'
+        assert page.evaluate("document.getElementById('camNflSemana').getBoundingClientRect().top") >= 40, f'{where}: el Top 10 queda bajo la barra'
 
         # Tocar otra vez la sección activa sube arriba.
         page.evaluate('scrollTo(0, 700)'); page.wait_for_timeout(200)
@@ -153,6 +162,11 @@ def phone(width, dark):
         st = page.evaluate(STATE)
         assert st['cat'] == 'Fútbol' and st['current'] == 'quiniela', f'{where}: enlace directo {st}'
         expect_modules(page, SPORT_EXPECT['quiniela'], f'{where} enlace directo')
+        # NFL: ?v=quiniela (atajos y enlaces viejos) abre La semana.
+        page.goto(base + '/index.html?s=nfl&v=quiniela', wait_until='load'); page.wait_for_timeout(1500)
+        st = page.evaluate(STATE)
+        assert st['cat'] == 'NFL' and st['current'] == 'semana' and st['url'] == '?s=nfl&v=semana', f'{where}: quiniela NFL {st}'
+        expect_modules(page, NFL_EXPECT['semana'], f'{where} quiniela NFL')
         # Enlace antiguo a la pestaña Clasificación: abre Takes.
         page.goto(base + '/index.html?s=nfl&v=clasificacion', wait_until='load'); page.wait_for_timeout(1500)
         st = page.evaluate(STATE)

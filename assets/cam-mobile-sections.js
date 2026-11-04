@@ -1,5 +1,8 @@
 /* CAM SPORTS — phone section tabs and addresses.
-   Inside NFL and Fútbol: Noticias · Takes · Quiniela (the Savant · Rookie
+   Inside NFL: La semana · Takes · Noticias (4 nov 2026: La semana holds the
+   quiniela, the duel of the week, the scores and «La columna» Power Rankings;
+   ?v=quiniela still works and opens it).
+   Inside Fútbol: Noticias · Takes · Quiniela (the Savant · Rookie
    standings close the Takes tab, under Últimos Takes).
    Inside Picks: Picks · Historial · Chefs.
    A sticky bar at the top of the section shows one part at a time (the hiding
@@ -15,10 +18,13 @@
 
   const mobile = window.matchMedia('(max-width: 760px), (orientation: landscape) and (max-height: 500px) and (hover: none) and (pointer: coarse)');
   const SPORT_TABS = [['noticias', 'Noticias'], ['takes', 'Takes'], ['quiniela', 'Quiniela']];
+  // NFL (4 nov 2026): La semana abre la sección (quiniela, duelo, marcador y Power Rankings).
+  const NFL_TABS = [['semana', 'La semana'], ['takes', 'Takes'], ['noticias', 'Noticias']];
   // Old addresses keep working: ?v=clasificacion now opens Takes.
   const OLD_TABS = { clasificacion: 'takes' };
   const SECTIONS = {
-    NFL: { key: 'nfl', group: 'sport', label: 'NFL', tabs: SPORT_TABS },
+    // ?s=nfl&v=quiniela (atajos de Inicio, perfil, enlaces viejos) abre La semana.
+    NFL: { key: 'nfl', group: 'sport', owners: 'nfl', label: 'NFL', tabs: NFL_TABS, aliases: { quiniela: 'semana' } },
     'Fútbol': { key: 'futbol', group: 'sport', label: 'Fútbol', tabs: SPORT_TABS },
     Picks: { key: 'picks', group: 'picks', label: 'Picks', tabs: [['picks', 'Picks'], ['historial', 'Historial'], ['chefs', 'Chefs']] }
   };
@@ -30,6 +36,13 @@
     sport: {
       noticias: '#nflRankings, #championsRankings, #heroSection, #aeNewsHeadingRow, #aeSportLatestNews, #articlesGrid, #aeSportAllNewsFooter, #aeMoreNews, #aeNflLatestComments, #mainContent > .editorial-layout, #aeFootballMobileStage > .editorial-trending',
       quiniela: '#camNflQuiniela, #camFootballQuiniela, #aeSeasonPredictions',
+      takes: '#freeTakes'
+    },
+    // La semana va primero: la quiniela vive dentro de #freeTakes. En el teléfono los
+    // Power Rankings de NFL se leen en «La columna», dentro de La semana.
+    nfl: {
+      semana: '#camNflSemana, #camNflQuiniela, #aeSeasonPredictions, #nflRankings',
+      noticias: '#heroSection, #aeNewsHeadingRow, #aeSportLatestNews, #articlesGrid, #aeSportAllNewsFooter, #aeMoreNews, #aeNflLatestComments, #mainContent > .editorial-layout',
       takes: '#freeTakes'
     },
     picks: {
@@ -47,7 +60,8 @@
   const category = () => (typeof currentCategory === 'string' ? currentCategory : 'Todos');
   const searching = () => typeof currentSearchQuery === 'string' && currentSearchQuery.trim() !== '';
   const sectionOf = cat => (mobile.matches && !searching() && SECTIONS[cat]) || null;
-  const validTab = (section, tab) => section.tabs.some(([key]) => key === tab);
+  const aliasOf = (section, tab) => (section && section.aliases && section.aliases[tab]) || tab;
+  const validTab = (section, tab) => section.tabs.some(([key]) => key === aliasOf(section, tab));
   const tabOf = cat => {
     const section = SECTIONS[cat];
     if (!section) return null;
@@ -88,6 +102,7 @@
       bar.hidden = true;
       delete body.dataset.camTabs;
       delete body.dataset.camTab;
+      delete body.dataset.camSection;
       return;
     }
     buildBar(cat);
@@ -95,6 +110,7 @@
     main.style.setProperty('--cam-tabs-pull', getComputedStyle(main).paddingTop);
     const tab = tabOf(cat);
     body.dataset.camTabs = section.group;
+    body.dataset.camSection = section.key;
     body.dataset.camTab = tab;
     bar.hidden = false;
     for (const button of bar.children) {
@@ -155,8 +171,10 @@
     let params;
     try { params = new URL(location.href).searchParams; } catch { return { cat: 'Todos', tab: null }; }
     const cat = FROM_SLUG[params.get('s')] || 'Todos';
-    const old = OLD_TABS[params.get('v')];
-    return { cat, tab: old || params.get('v'), old: !!old };
+    const asked = params.get('v');
+    const old = OLD_TABS[asked];
+    const tab = aliasOf(SECTIONS[cat], old || asked);
+    return { cat, tab, old: !!old || (asked != null && tab !== asked) };
   }
 
   // ---------- Navigation ----------
@@ -164,6 +182,7 @@
     const cat = category();
     const section = SECTIONS[cat];
     if (!section || !validTab(section, tab)) return false;
+    tab = aliasOf(section, tab);
     const previous = tabOf(cat);
     if (previous === tab && !options.force) {
       if (options.scroll !== false) {
@@ -193,7 +212,7 @@
     if (mobile.matches) remember(before, sectionOf(before) ? beforeTab : null);
     const result = originalFilter.apply(this, arguments);
     const after = category();
-    if (pendingTab && SECTIONS[after] && validTab(SECTIONS[after], pendingTab)) chosen.set(after, pendingTab);
+    if (pendingTab && SECTIONS[after] && validTab(SECTIONS[after], pendingTab)) chosen.set(after, aliasOf(SECTIONS[after], pendingTab));
     pendingTab = null;
     render();
     if (after !== before && mobile.matches) {
@@ -232,7 +251,7 @@
     const cat = category();
     const section = sectionOf(cat);
     if (!section || !(element instanceof Element)) return;
-    const owners = OWNERS[section.group];
+    const owners = OWNERS[section.owners || section.group];
     for (const [tab, selector] of Object.entries(owners)) {
       if (element.closest(selector)) {
         if (tab !== tabOf(cat)) selectTab(tab, { scroll: false });
@@ -287,8 +306,8 @@
       applyingUrl = false;
       pendingTab = null;
     }
-  } else if (start.tab && SECTIONS[start.cat]) {
-    chosen.set(start.cat, start.tab);
+  } else if (start.tab && SECTIONS[start.cat] && validTab(SECTIONS[start.cat], start.tab)) {
+    chosen.set(start.cat, aliasOf(SECTIONS[start.cat], start.tab));
   }
   render();
   if (start.old) syncUrl({ replace: true });

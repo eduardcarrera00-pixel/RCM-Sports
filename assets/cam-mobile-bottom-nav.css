@@ -323,6 +323,15 @@ html body nav.ae-sport-nav svg.cam-mobile-nav-symbol {
     html body[data-cam-tabs="sport"][data-cam-tab="quiniela"] #freeTakes > :not(#camNflQuiniela):not(#camFootballQuiniela):not(#aeSeasonPredictions) {
       display: none !important;
     }
+    /* NFL (4 nov 2026): La semana · Takes · Noticias. La semana enseña #camNflSemana
+       (cam-nfl-semana.css), La Quiniela y ¿Quién será campeón?; los Power Rankings
+       de NFL se leen en «La columna», así que el carrusel no se repite en Noticias. */
+    html body[data-cam-section="nfl"] #nflRankings {
+      display: none !important;
+    }
+    html body[data-cam-section="nfl"][data-cam-tab="semana"] #freeTakes > :not(#camNflSemana):not(#camNflQuiniela):not(#aeSeasonPredictions) {
+      display: none !important;
+    }
     /* Picks */
     html body[data-cam-tabs="picks"]:not([data-cam-tab="picks"]) :is(#aePicksTopPair,#aeWeeklyPickAdmin,#camWeeklyResultsAdmin,#communityPicks > :is(.ae-picks-feed-heading,#cpStatus,#cpFeed,#cpFeedScrollHint,#cpFeedFooter,.ae-picks-rail)) {
       display: none !important;

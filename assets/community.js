@@ -391,13 +391,26 @@ function rankingTrendNode(teamId, position, priorTeamIds) {
     badge.setAttribute('aria-label',(delta > 0 ? 'Subió ' : 'Bajó ') + Math.abs(delta) + ' posiciones desde la edición anterior');
     return badge;
 }
+// La edición anterior es la última versión que estuvo publicada al menos 12 horas:
+// guardar dos veces seguidas (una corrección) no borra las flechas de la semana.
+function rankingPreviousEdition(rows, current) {
+    const list = (Array.isArray(rows) ? rows : []).filter(Boolean).slice()
+        .sort((a, b) => (Date.parse(a.superseded_at) || 0) - (Date.parse(b.superseded_at) || 0) || (Number(a.id) || 0) - (Number(b.id) || 0));
+    const sameAsCurrent = ids => Array.isArray(current) && ids.join(',') === current.join(',');
+    for (let i = list.length - 1; i >= 0; i--) {
+        const ids = list[i].team_ids;
+        if (!Array.isArray(ids) || ids.length !== 10 || sameAsCurrent(ids)) continue;
+        const end = Date.parse(list[i].superseded_at), start = i > 0 ? Date.parse(list[i - 1].superseded_at) : NaN;
+        if (!Number.isFinite(end) || !Number.isFinite(start) || end - start >= 12 * 36e5) return ids;
+    }
+    return null;
+}
 async function loadRankingPrevious(client = db) {
     rankingPreviousTeamIds = null;
     try {
         const {data, error} = await client.from('nfl_ranking_history')
-            .select('team_ids').order('id',{ascending:false}).limit(1).maybeSingle();
-        if (!error && Array.isArray(data?.team_ids) && data.team_ids.length === 10)
-            rankingPreviousTeamIds = data.team_ids;
+            .select('id,team_ids,superseded_at').order('id',{ascending:false}).limit(40);
+        if (!error) rankingPreviousTeamIds = rankingPreviousEdition(data, rankingPublished?.team_ids);
     } catch { /* Optional migration is not installed yet. Keep displaying current ranking. */ }
     renderRanking();
 }
@@ -442,6 +455,8 @@ function renderRanking() {
     }
     applyRankingMotion();
     window.aeRankingNotes?.decorate();
+    // «La columna» de NFL · La semana (teléfono) se pinta con estos mismos datos.
+    document.dispatchEvent(new CustomEvent('cam:nfl-ranking'));
 }
 function applyRankingMotion() {
     document.getElementById('rankingTrack').classList.toggle('paused', rankingPaused);

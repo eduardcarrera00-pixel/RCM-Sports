@@ -2522,7 +2522,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
 <script defer src="assets/cam-mobile-bottom-nav.js?v=20261104-actualidad-1"></script>
 <link rel="stylesheet" href="assets/cam-pick-editor-night.css?v=20261021-editor-night-1">
 <link rel="stylesheet" href="assets/cam-global-edit.css?v=20261022-logo-size-1">
-<link rel="stylesheet" href="assets/cam-mobile-bottom-nav.css?v=20261103-sin-clasificacion">
+<link rel="stylesheet" href="assets/cam-mobile-bottom-nav.css?v=20261104-la-semana-1">
 
 <link rel="stylesheet" href="assets/cam-take-cta.css?v=20261026-compact-squares-1">
 <script defer src="assets/cam-take-cta.js?v=20261023-take-cta-unificado-1"></script>
@@ -3033,6 +3033,10 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
           <button id="aeFootballMoreTakes" type="button" class="ae-football-mobile-cta" aria-controls="freeTakesFeed" aria-expanded="false">Ver todos los Takes <span aria-hidden="true">→</span></button>
           <button id="freeTakesMore" type="button" class="ae-history-more" hidden>Ver todos los Takes <span aria-hidden="true">→</span></button>
           <div id="aeNflTakeFooterCta" class="ae-nfl-take-footer" hidden></div>
+          <!-- NFL · La semana (4 nov 2026): primera pestaña de NFL en el teléfono (cam-nfl-semana.js). En escritorio no se ve. -->
+          <section id="camNflSemana" class="cam-nfl-semana" aria-labelledby="camNflSemanaTitle">
+            <div id="camNflSemanaBody" class="cam-ns-body" aria-live="polite"></div>
+          </section>
           <!-- Las quinielas van donde antes estaba el pick de campeon: justo tras los ultimos Takes. -->
           <section id="camNflQuiniela" class="cam-nfl-quiniela" aria-labelledby="camNflTitle" hidden>
             <div class="cam-nfl-top">
@@ -3061,6 +3065,8 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
               <p>Antes de abrir cada partido congelamos las probabilidades reales, sin el margen de la casa. La fórmula es <strong>máximo de 2, mínimo de 12 y redondear 2 dividido entre la probabilidad</strong>.</p>
               <p>Favorito al 80 %: 3 puntos. Partido equilibrado al 50 %: 4 puntos. Sorpresa al 25 %: 8 puntos.</p>
               <p>Acertar suma los puntos mostrados; fallar, empatar o anular suma 0. Puedes editar hasta el inicio de cada partido. Las quinielas no modifican los puntos de Takes o Picks.</p>
+              <p id="camNflLaurelRule" hidden><strong>El laurel.</strong> Una vez por jornada puedes ponerle el laurel a un partido que ya pronosticaste: si aciertas, vale el doble; si fallas, 0. Puedes cambiarlo de partido hasta que empiece el que lo lleva.</p>
+              <p id="camNflExpertRule" hidden><strong>¿Le ganas al editor?</strong> En cada partido verás qué eligió el editor. Lo que eligió la comunidad aparece cuando empieza el partido, si lo eligieron al menos 5 personas.</p>
             </details>
 
             <section id="camNflAdmin" class="cam-nfl-admin" aria-label="Controles de administradores" hidden></section>
@@ -5475,7 +5481,7 @@ updateThemeButton();
 <script src="assets/nfl-teams.js"></script>
 <script src="assets/cam-nfl-quiniela-logos.js?v=20261022-integration-1"></script>
 <script src="assets/cam-article-seo.js?v=20261025-news-metadata-1"></script>
-<script src="assets/community.js?v=20261025-news-metadata-1"></script>
+<script src="assets/community.js?v=20261104-la-semana-1"></script>
 <script src="assets/ae-home-community-spotlight.js?v=20261018-reply-totals-1"></script>
 <script src="assets/champions.js?v=20261021-rank-notes-1"></script>
 <script src="assets/ae-ranking-notes.js?v=20261021-editorial-1"></script>
@@ -6410,8 +6416,10 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 <link rel="stylesheet" href="assets/cam-home-jornada.css?v=20261103-jornada-1">
 <!-- Takes de la comunidad (3 nov): tarjetas para votar y responder, opiniones simétricas. Al final, como los ajustes del teléfono. -->
 <link rel="stylesheet" href="assets/cam-takes-tarjetas.css?v=20261104-sin-netos-1">
+<!-- NFL · La semana (4 nov): la pestaña del teléfono y el editor, el laurel y la comunidad en La Quiniela. Al final, como los ajustes del teléfono. -->
+<link rel="stylesheet" href="assets/cam-nfl-semana.css?v=20261104-la-semana-1">
 <script src="assets/cam-parties.js?v=20261104-perfil-claro-1"></script>
-<script src="assets/cam-sport-quiniela-loader.js?v=20261103-jornadas-1"></script>
+<script src="assets/cam-sport-quiniela-loader.js?v=20261104-la-semana-1"></script>
 <script src="assets/ae-season-predictions.js?v=20261021-champion-guide-1"></script>
 <script src="assets/cam-lazy-editorial-loader.js?v=20261104-actualidad-1"></script>
 <script src="assets/cam-opinions-section-banners.js?v=20261104-actualidad-1"></script>
@@ -6432,9 +6440,11 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 <script src="assets/ae-notifications.js?v=20261103-remove-welcome-1"></script>
 <script src="assets/cam-analytics.js?v=20261026-sin-robots"></script>
 <!-- Teléfono (3 nov): pestañas dentro de NFL, Fútbol y Picks, y una dirección por sección (?s=nfl&v=quiniela). -->
-<script src="assets/cam-mobile-sections.js?v=20261103-sin-clasificacion"></script>
+<script src="assets/cam-mobile-sections.js?v=20261104-la-semana-1"></script>
 <!-- Teléfono (3 nov): Inicio como «Tu jornada» (atajos + filas deslizables). Escritorio sin cambios. -->
 <script src="assets/cam-home-jornada.js?v=20261103-jornada-1"></script>
+<!-- Teléfono (4 nov): NFL · La semana (duelo, partidos, editor, marcador y La columna). Escritorio sin cambios. -->
+<script src="assets/cam-nfl-semana.js?v=20261104-la-semana-1"></script>
 
 <script id="ae-home-news-carousel-motion">
 /* Movimiento ligero y reversible: sin clones, sin alterar enlaces, votos o artículos. */
