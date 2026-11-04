@@ -20,12 +20,8 @@ USER = {'id': 'u1', 'email': 'eduard@example.com', 'is_anonymous': False,
 
 def fake(admin=False, rows=None):
     js = 'window.__fake.tables=' + json.dumps({'ae_site_images': rows or []}) + ';'
-    # La bienvenida de la portada se abre en la primera visita de cada sesión; aquí ya se vio.
-    js += "try{sessionStorage.setItem('cam_sports_home_welcome_seen_session_v1','1')}catch(e){}"
-
     if admin:
-        js += ('window.__fake.user=' + json.dumps(USER) + ';window.__fake.tables.editors=[{user_id:"u1"}];'
-               "try{localStorage.setItem('cam_sports_admin_welcome_preview_u1','1')}catch(e){}")
+        js += 'window.__fake.user=' + json.dumps(USER) + ';window.__fake.tables.editors=[{user_id:"u1"}];'
     js += """window.__fake.rpc=window.__fake.rpc||{};
       window.__fake.rpc.ae_set_site_image=a=>{const t=window.__fake.tables.ae_site_images;
         const i=t.findIndex(r=>r.key===a.p_key); const row={key:a.p_key,url:a.p_url,focus_x:a.p_focus_x,focus_y:a.p_focus_y,alt:a.p_alt};
@@ -179,20 +175,11 @@ def run():
             assert page.locator('cam-site-image-layer').count() == 0
             assert not page.errors, page.errors
 
-    # 3b) Imágenes dentro de diálogos: bienvenida (modal nativo) y acceso
+    # 3b) Imágenes dentro del diálogo de acceso
     with fp.full_page(fake_js=fake(admin=True), width=1366) as page:
         images(page)
         page.wait_for_timeout(800)
         page.evaluate("for(const d of document.querySelectorAll('dialog[open]'))d.close()")
-        page.evaluate("document.getElementById('camWelcomeDialog').showModal()")
-        page.wait_for_timeout(900)
-        keys = {p['key'] for p in visible_pencils(page)}
-        assert 'bienvenida.fondo-dia' in keys, sorted(keys)
-        page.locator('#camWelcomeDialog cam-site-image-layer > .cam-site-image-pencil[data-key="bienvenida.fondo-dia"]').click()
-        page.wait_for_selector('#camSiteImageDialog[open]')
-        assert page.locator('#camSiteImageDialog [data-ui=variants] button').count() == 2
-        page.locator('#camSiteImageDialog [data-act=cancel]').click()
-        page.evaluate("document.getElementById('camWelcomeDialog').close()")
         page.evaluate("document.getElementById('userAuthModal').classList.remove('hidden')")
         page.wait_for_timeout(900)
         keys = {p['key'] for p in visible_pencils(page)}

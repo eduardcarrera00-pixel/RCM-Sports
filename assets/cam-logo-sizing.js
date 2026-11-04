@@ -48,7 +48,6 @@
       const scope = img.closest('header') ? 'header' : img.closest('footer') ? 'footer' : 'other';
       return { key: 'brand.' + scope, label: 'Logo CAM SPORTS · ' + ({header:'cabecera',footer:'pie',other:'sección'}[scope]), max: 175 };
     }
-    if (img.classList.contains('cam-welcome-logo')) return { key: 'brand.welcome', label:'Logo CAM SPORTS · bienvenida', max:175 };
     const nav = img.closest('header .category-btn[data-category]');
     if (nav && img.classList.contains('ae-custom-sport-icon')) {
       const category = slug(nav.dataset.category);

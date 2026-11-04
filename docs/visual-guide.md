@@ -212,7 +212,6 @@ pestaña, y las pestañas (Mis Takes · Mis Picks · Mi Quiniela; en perfiles
 públicos, Takes · Picks · Quiniela) quedan fijas al bajar. En el teléfono el
 perfil ocupa la pantalla completa. La cabecera compacta usa un acento bronce
 junto al rótulo CAM SPORTS y botones con iconos para editar, compartir y cerrar.
-«Siempre serás bienvenido» se muestra en la pantalla de acceso.
 
 **Editar perfil** es una pantalla propia (con «‹ Perfil» para volver; Escape
 también vuelve): cambio de nombre de usuario con comprobación en vivo

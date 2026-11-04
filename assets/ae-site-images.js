@@ -49,7 +49,7 @@
 
   // Marca y cabecera
   img('marca.logo-completo', 'Logotipo CAM Sports completo', 'Cabecera y pie', ['assets/cam-sports-logo-completo.webp', 'assets/cam-sports-logo-completo.png']);
-  img('marca.logo', 'Logotipo CAM Sports', 'Cabecera, pie y bienvenida', ['assets/cam-sports-logo.webp', 'assets/cam-sports-logo.jpeg']);
+  img('marca.logo', 'Logotipo CAM Sports', 'Cabecera y pie', ['assets/cam-sports-logo.webp', 'assets/cam-sports-logo.jpeg']);
   img('cabecera.tema-noche', 'Botón de tema (luna)', 'Cabecera', 'assets/icons/ae-luna-gold.webp', { group: 'cabecera.tema', variant: 'Luna' });
   img('cabecera.tema-dia', 'Botón de tema (sol)', 'Cabecera', 'assets/icons/ae-sol-gold.webp', { group: 'cabecera.tema', variant: 'Sol' });
   img('cabecera.avisos', 'Icono de avisos', 'Cabecera', 'assets/icons/ae-avisos-six-gold.webp');
@@ -61,10 +61,7 @@
   pair('pie.fondo', 'Fondo del pie de página (pueblo)', 'Pie de página',
     ['assets/cam-footer-village-night.jpg', 'assets/cam-footer-village-night-mobile.jpg'],
     ['assets/cam-footer-village-day.jpg', 'assets/cam-footer-village-day-mobile.jpg']);
-  // Bienvenida y acceso (cada imagen en sus tamaños: un reemplazo cambia todos)
-  pair('bienvenida.fondo', 'Fondo de la bienvenida', 'Bienvenida',
-    ['assets/cam-welcome-noche-oleo-960.webp', 'assets/cam-welcome-noche-oleo-1600.webp', 'assets/cam-welcome-noche.webp'],
-    ['assets/cam-welcome-dia-oleo-960.webp', 'assets/cam-welcome-dia-oleo-1600.webp', 'assets/cam-welcome-dia.webp']);
+  // Acceso (cada imagen en sus tamaños: un reemplazo cambia todos)
   pair('acceso.fondo', 'Fondo del acceso (iniciar sesión / registrarse)', 'Acceso',
     ['assets/cam-login-background-night.webp', 'assets/cam-login-background-night-HD.webp'],
     ['assets/cam-login-background-day.webp', 'assets/cam-login-background-day-HD.webp']);

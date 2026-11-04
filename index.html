@@ -303,7 +303,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
 <link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261103-chef-center">
-<link rel="stylesheet" href="assets/cam-perf-core-extras.css?v=20261103-notifications-panel-1">
+<link rel="stylesheet" href="assets/cam-perf-core-extras.css?v=20261103-remove-welcome-1">
 <script defer src="assets/ae-nfl-mobile-telephoto.js?v=20261016-1"></script>
 <link rel="stylesheet" href="assets/ae-football-mobile-redesign.css?v=20261018-hide-football-trending-mobile-1">
 <link rel="stylesheet" href="assets/ae-take-discussion-reference.css?v=20261018-comment-replies-votes-counts-2">
@@ -2515,10 +2515,10 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
 }
 </style><link rel="stylesheet" href="assets/cam-perf-picks-mobile.css?v=20261024-perf-css-1">
 <script src="assets/cam-global-edit.js?v=20261022-edit-mode-1"></script>
-<script src="assets/cam-logo-sizing.js?v=20261023-mobile-cache-sync-2"></script>
+<script src="assets/cam-logo-sizing.js?v=20261103-remove-welcome-1"></script>
 <script src="assets/cam-banner-artwork.js?v=20261102-visible-size-1"></script>
-<script src="assets/ae-site-images.js?v=20261102-visible-size-1"></script>
-<script src="assets/cam-site-texts.js?v=20261103-perfil-1"></script>
+<script src="assets/ae-site-images.js?v=20261103-remove-welcome-1"></script>
+<script src="assets/cam-site-texts.js?v=20261103-remove-welcome-1"></script>
 <script defer src="assets/cam-mobile-bottom-nav.js?v=20261103-icon-row"></script>
 <link rel="stylesheet" href="assets/cam-pick-editor-night.css?v=20261021-editor-night-1">
 <link rel="stylesheet" href="assets/cam-global-edit.css?v=20261022-logo-size-1">
@@ -3172,37 +3172,11 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
     <div id="aeNotificationsList" class="ae-notifications-groups" aria-live="polite"></div>
     <footer class="ae-notifications-footer">
       <p id="aeNotificationsStatus" role="status" aria-live="polite"></p>
-      <button type="button" id="camWelcomeAdminPreview" hidden>Ver bienvenida · Vista previa admin</button>
       <button type="button" id="aeNotificationsReadAll" hidden>Marcar todas como leídas</button>
     </footer>
   </div>
 </dialog>
 
-<dialog id="camWelcomeDialog" class="cam-welcome-dialog" aria-labelledby="camWelcomeTitle" aria-describedby="camWelcomeIntro">
-  <div class="cam-welcome-frame">
-    <header class="cam-welcome-top">
-      <span class="cam-welcome-eyebrow">CAM SPORTS · TU COMUNIDAD DEPORTIVA</span>
-      <button id="camWelcomeClose" type="button" aria-label="Cerrar bienvenida">×</button>
-    </header>
-    <div class="cam-welcome-content">
-      <img src="assets/cam-sports-logo.jpeg" alt="CAM SPORTS" class="cam-welcome-logo">
-      <span id="camWelcomePreviewLabel" class="cam-welcome-preview" hidden>VISTA PREVIA PARA ADMINISTRADORES · NO SE ENVIARÁ NINGUNA NOTIFICACIÓN</span>
-      <p class="cam-welcome-overline">HAY SITIO PARA TI</p>
-      <h2 id="camWelcomeTitle">¡Bienvenido a <em>CAM SPORTS!</em></h2>
-      <p id="camWelcomeIntro" class="cam-welcome-intro">Tu cancha está aquí. Entra, opina y vive cada partido.</p>
-      <div class="cam-welcome-features">
-        <button type="button" class="cam-welcome-feature" data-cam-welcome="news"><strong>Descubre las noticias <span aria-hidden="true">→</span></strong><span>Sigue fútbol, NFL y otros deportes con nuestras noticias y análisis.</span></button>
-        <button type="button" class="cam-welcome-feature" data-cam-welcome="picks"><strong>Cocina tus Picks <span aria-hidden="true">→</span></strong><span>Publica tus pronósticos, conoce los de la comunidad y participa en los rankings.</span></button>
-        <button type="button" class="cam-welcome-feature" data-cam-welcome="takes" aria-expanded="false" aria-controls="camWelcomeTakeChoice"><strong>Haz oír tus Takes <span aria-hidden="true">→</span></strong><span>Comparte tus opiniones, responde, vota y debate con otros aficionados.</span></button>
-        <div id="camWelcomeTakeChoice" class="cam-welcome-take-choice" role="group" aria-label="¿Sobre qué quieres publicar tu Take?" hidden>
-          <p>¿Sobre qué quieres publicar tu Take?</p>
-          <div><button type="button" data-cam-welcome-take="Fútbol">Fútbol</button><button type="button" data-cam-welcome-take="NFL">NFL</button></div>
-        </div>
-      </div>
-      <button type="button" id="camWelcomeExplore" class="cam-welcome-explore">Comenzar a explorar <span aria-hidden="true">→</span></button>
-    </div>
-  </div>
-</dialog>
 
 <dialog id="aeTakeComposerDialog" class="ae-take-composer-dialog" aria-labelledby="aeTakeComposerTitle" aria-describedby="aeTakeComposerIntro">
   <div class="ae-take-composer-shell">
@@ -3382,7 +3356,6 @@ html:not(.dark) #aeAuthIntroNotice small{color:#5b6d76}
     <div class="cam-auth-shell relative bg-white border border-slate-200 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden my-auto">
         <aside class="cam-auth-story">
             <div class="cam-auth-story-brand" aria-hidden="true"><span>CAM</span> SPORTS</div>
-            <button type="button" id="camAuthWelcomeAgain" class="cam-welcome-again cam-auth-welcome-again" data-cam-welcome-again>Siempre serás bienvenido</button>
             <div class="cam-auth-story-message" aria-hidden="true">
                 <p class="cam-auth-story-overline">HAY SITIO PARA TI</p>
                 <h2>El deporte nos reúne.</h2>
@@ -5479,7 +5452,7 @@ updateThemeButton();
 <script src="assets/ae-pick-capture.js?v=20261028-prepara-pick-1"></script>
 <script src="assets/community-picks.js?v=20261103-resumen-1"></script>
 <script src="assets/weekly-picks.js?v=20261015-1"></script>
-<script src="assets/username-auth.js?v=20261020-classical-auth-panel-1"></script>
+<script src="assets/username-auth.js?v=20261103-remove-welcome-1"></script>
 <script src="assets/ae-category-visibility.js?v=20261016-dynamic-nav-1"></script>
 <script src="assets/ae-nfl-takes.js?v=20261015-3"></script>
 <script src="assets/free-takes.js?v=20261028-compartir-1"></script>
@@ -6423,9 +6396,7 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 <script src="assets/ae-mobile-compact-home.js?v=20261016-top3-swipe-v1"></script>
 <script src="assets/ae-football-mobile-redesign.js?v=20261103-invitacion-abajo-1"></script>
 <script src="assets/ae-home-weekly-layout.js?v=20261103-mobile-home-profile-2"></script>
-<script src="assets/ae-notifications.js?v=20261103-notifications-panel-1"></script>
-<script src="assets/cam-welcome.js?v=20261021-welcome-again-1"></script>
-<script defer src="assets/cam-welcome-home-entry.js?v=20261101-parties-1"></script>
+<script src="assets/ae-notifications.js?v=20261103-remove-welcome-1"></script>
 <script src="assets/cam-analytics.js?v=20261026-sin-robots"></script>
 <!-- Teléfono (3 nov): pestañas dentro de NFL, Fútbol y Picks, y una dirección por sección (?s=nfl&v=quiniela). -->
 <script src="assets/cam-mobile-sections.js?v=20261103-sin-clasificacion"></script>
