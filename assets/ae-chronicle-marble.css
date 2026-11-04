@@ -204,28 +204,91 @@ html body #articleModal .cam-chronicle-aside-signature {
 html body #articleModal .ae-article-actions,
 html body #articleModal .ae-conversation,
 html body #articleModal #relatedStoriesSection {max-width:920px;margin-left:auto!important;margin-right:auto!important}
-html body #articleModal #relatedStoriesHeading {
-  color:var(--cam-marble-ink)!important;
-  font:600 25px/1.1 Newsreader,Georgia,serif!important;
+/* «Sigue leyendo»: lista de crónica, sin cajas ni píldoras. Filetes finos,
+   antetítulo de bronce, titular en serif y miniatura cuadrada con marco fino.
+   Las reglas viven en capas porque la esquina global (cam-rounded-editorial)
+   convierte cualquier botón en píldora con !important: cam-header y
+   cam-banners se registran antes y su !important gana. */
+@layer cam-header{
+  html body #articleModal #relatedStoriesSection,
+  html body #articleModal #relatedStoriesSection :where(*){border-radius:0!important}
 }
-html body #articleModal #relatedStoriesList button {
-  border-radius:0!important;
-  border:1px solid var(--cam-marble-rule)!important;
-  background:var(--cam-marble-surface)!important;
-  transition:border-color .16s ease,background .16s ease;
+@layer cam-banners{
+  html body #articleModal #relatedStoriesSection{
+    padding:28px 0 6px!important;
+    border-top:0!important;
+  }
+  html body #articleModal #relatedStoriesHeading{
+    display:flex!important;align-items:center!important;gap:16px!important;
+    margin:0 0 6px!important;
+    color:var(--cam-marble-ink)!important;
+    font:600 22px/1.15 Newsreader,Georgia,serif!important;
+    letter-spacing:-.005em!important;
+  }
+  /* Un filete que sigue al título hasta el margen. */
+  html body #articleModal #relatedStoriesHeading::after{
+    content:"";flex:1 1 auto;height:1px;min-width:24px;
+    background:var(--cam-marble-rule);opacity:.85;
+  }
+  html body #articleModal #relatedStoriesList{
+    display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:0!important;margin:0!important;
+  }
+  html body #articleModal #relatedStoriesList button.cam-related-item{
+    display:grid!important;grid-template-columns:minmax(0,1fr)!important;align-items:center!important;column-gap:16px!important;
+    width:100%!important;min-height:0!important;margin:0!important;padding:16px 0!important;
+    border:0!important;border-bottom:1px solid var(--cam-marble-rule)!important;
+    background:transparent!important;box-shadow:none!important;
+    color:var(--cam-marble-ink)!important;text-align:left!important;
+    cursor:pointer;transition:none!important;
+  }
+  html body #articleModal #relatedStoriesList button.cam-related-item.has-thumb{grid-template-columns:minmax(0,1fr) 76px!important}
+  html body #articleModal #relatedStoriesList button.cam-related-item:last-child{border-bottom:0!important}
+  html body #articleModal #relatedStoriesList .cam-related-text{display:grid!important;gap:5px!important;min-width:0!important}
+  html body #articleModal #relatedStoriesList .cam-related-kicker{
+    display:block!important;color:var(--cam-marble-bronze)!important;
+    font:700 10px/1.4 Inter,system-ui,sans-serif!important;letter-spacing:.16em!important;text-transform:uppercase!important;
+  }
+  html body #articleModal #relatedStoriesList h3.cam-related-title{
+    display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:3!important;overflow:hidden!important;
+    margin:0!important;padding:0 0 1px!important;
+    color:var(--cam-marble-ink)!important;
+    font:600 19px/1.24 Newsreader,Georgia,serif!important;letter-spacing:0!important;
+    overflow-wrap:anywhere!important;
+    text-decoration:underline 1px transparent!important;text-underline-offset:4px!important;
+    transition:text-decoration-color .18s ease!important;
+  }
+  html body #articleModal #relatedStoriesList .cam-related-meta{
+    display:block!important;color:var(--cam-marble-muted)!important;
+    font:italic 400 14px/1.35 Newsreader,Georgia,serif!important;
+  }
+  html body #articleModal #relatedStoriesList .cam-related-figure{
+    display:block!important;position:relative!important;width:76px!important;height:76px!important;overflow:hidden!important;
+    border:1px solid var(--cam-marble-rule)!important;background:var(--cam-marble-surface)!important;
+  }
+  html body #articleModal #relatedStoriesList img.cam-related-thumb{
+    display:block!important;width:100%!important;height:100%!important;max-width:none!important;
+    object-fit:cover!important;object-position:var(--ae-image-focus,50% 50%)!important;
+    transform:scale(var(--ae-image-zoom,1))!important;transform-origin:var(--ae-image-focus,50% 50%)!important;
+    filter:saturate(.8)!important;transition:filter .2s ease!important;
+  }
+  html.dark body #articleModal #relatedStoriesList img.cam-related-thumb{filter:saturate(.72) brightness(.88)!important}
+  @media (hover:hover){
+    html body #articleModal #relatedStoriesList button.cam-related-item:hover h3.cam-related-title{text-decoration-color:var(--cam-marble-bronze)!important}
+    html body #articleModal #relatedStoriesList button.cam-related-item:hover img.cam-related-thumb{filter:none!important}
+  }
+  html body #articleModal #relatedStoriesList button.cam-related-item:focus-visible{
+    outline:2px solid var(--cam-marble-bronze)!important;outline-offset:4px!important;
+  }
+  /* Ordenador: las dos historias lado a lado, separadas por un filete vertical. */
+  @media (min-width:761px){
+    html body #articleModal #relatedStoriesList{grid-template-columns:repeat(2,minmax(0,1fr))!important;column-gap:0!important}
+    html body #articleModal #relatedStoriesList button.cam-related-item{padding:18px 28px 18px 0!important;border-bottom:0!important}
+    html body #articleModal #relatedStoriesList button.cam-related-item:nth-child(2n){padding:18px 0 18px 28px!important;border-left:1px solid var(--cam-marble-rule)!important}
+    html body #articleModal #relatedStoriesList button.cam-related-item.has-thumb{grid-template-columns:minmax(0,1fr) 88px!important}
+    html body #articleModal #relatedStoriesList .cam-related-figure{width:88px!important;height:88px!important}
+    html body #articleModal #relatedStoriesList button.cam-related-item:only-child{grid-column:1/-1!important;padding-right:0!important}
+  }
 }
-html body #articleModal #relatedStoriesList button:hover {border-color:var(--cam-marble-bronze)!important}
-html body #articleModal #relatedStoriesList button>span:first-child {
-  color:var(--cam-marble-bronze)!important;
-  font:700 10px/1.4 Inter,system-ui,sans-serif!important;
-  letter-spacing:.14em;
-  text-transform:uppercase;
-}
-html body #articleModal #relatedStoriesList button h3 {
-  color:var(--cam-marble-ink)!important;
-  font:600 18px/1.2 Newsreader,Georgia,serif!important;
-}
-html body #articleModal #relatedStoriesList button>span:last-child {color:var(--cam-marble-muted)!important;font-size:12px!important}
 html body #articleModal .ae-article-scroll div.ae-article-actions {
   border-color:var(--cam-marble-rule)!important;
 }

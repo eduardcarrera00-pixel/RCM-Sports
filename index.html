@@ -302,7 +302,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
     </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
-<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261104-take-foto-1">
+<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261104-sigue-leyendo-1">
 <link rel="stylesheet" href="assets/cam-perf-core-extras.css?v=20261103-remove-welcome-1">
 <script defer src="assets/ae-nfl-mobile-telephoto.js?v=20261016-1"></script>
 <link rel="stylesheet" href="assets/ae-football-mobile-redesign.css?v=20261018-hide-football-trending-mobile-1">
@@ -3681,16 +3681,10 @@ html:not(.dark) #aeAuthIntroNotice small{color:#5b6d76}
                         <span class="cam-chronicle-aside-signature">El juego también se piensa.</span>
                     </aside>
                 </div>
-                <section id="relatedStoriesSection" class="hidden space-y-4"
+                <section id="relatedStoriesSection" class="hidden cam-related"
          aria-labelledby="relatedStoriesHeading">
-    <h2 id="relatedStoriesHeading"
-        class="text-xl font-bold text-slate-900">
-        Sigue leyendo
-    </h2>
-
-    <div id="relatedStoriesList"
-         class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-    </div>
+    <h2 id="relatedStoriesHeading" class="cam-related-heading">Sigue leyendo</h2>
+    <div id="relatedStoriesList" class="cam-related-list"></div>
 </section>
 
                 <div class="ae-article-actions" role="group" aria-label="Acciones de la noticia">
@@ -5385,29 +5379,55 @@ function renderRelatedStories(article) {
 
     section.classList.toggle('hidden', related.length === 0);
 
+    // «Sigue leyendo»: una lista de crónica, sin cajas. Antetítulo de bronce,
+    // titular en serif, fecha y lectura, y una miniatura con el encuadre guardado
+    // (la misma foto que ya usan las tarjetas, así que suele venir de la caché).
     related.forEach(story => {
         const button = document.createElement('button');
         button.type = 'button';
-        button.className =
-            'min-w-0 w-full text-left bg-slate-50 border ' +
-            'border-slate-200 rounded-xl p-4 space-y-2 ' +
-            'hover:border-pitch-600 transition-colors';
+        button.className = 'cam-related-item';
+
+        const text = document.createElement('span');
+        text.className = 'cam-related-text';
 
         const category = document.createElement('span');
-        category.className =
-            'block text-xs font-bold text-pitch-700';
+        category.className = 'cam-related-kicker';
         category.textContent = story.category;
 
         const title = document.createElement('h3');
-        title.className =
-            'text-base font-bold text-slate-900 leading-snug break-words';
+        title.className = 'cam-related-title';
         title.textContent = story.title;
 
-        const readTime = document.createElement('span');
-        readTime.className = 'block text-sm text-slate-500';
-        readTime.textContent = story.readTime || 'Leer artículo';
+        const meta = document.createElement('span');
+        meta.className = 'cam-related-meta';
+        meta.textContent = [story.date, story.readTime || 'Leer artículo'].filter(Boolean).join(' · ');
 
-        button.append(category, title, readTime);
+        text.append(category, title, meta);
+        button.append(text);
+
+        const image = safeImageURL(story.image);
+        if (image) {
+            const figure = document.createElement('span');
+            figure.className = 'cam-related-figure';
+            figure.setAttribute('aria-hidden', 'true');
+            const img = document.createElement('img');
+            img.className = 'cam-related-thumb';
+            img.alt = '';
+            img.loading = 'lazy';
+            img.decoding = 'async';
+            img.width = 160;
+            img.height = 160;
+            img.style.setProperty('--ae-image-zoom', imageScale(story));
+            img.onerror = () => {
+                figure.remove();
+                button.classList.remove('has-thumb');
+            };
+            img.src = image;
+            setImageFocus(img, story);
+            figure.append(img);
+            button.append(figure);
+            button.classList.add('has-thumb');
+        }
 
         button.onclick = () => {
             openArticleModal(story.id);
