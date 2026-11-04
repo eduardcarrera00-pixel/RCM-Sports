@@ -3,6 +3,10 @@
  * 3 nov 2026: el perfil abre en «Perfil» (resumen, cam_profile_overview: una
  * llamada). Takes y Picks se cargan al abrir su pestaña; «Mi Party» la pinta
  * cam-parties.js. ?perfil=<id>&tab=takes|picks|party abre esa pestaña.
+ * 4 nov 2026: cuatro pestañas. «Mis jornadas» (cam-profile-quiniela.js) va al
+ * final de «Mi Party»; la pestaña «quiniela» de antes abre Mi Party y baja a
+ * las jornadas. La cabecera enseña lo que destaca de cada uno y, en un perfil
+ * ajeno, «Invitar a mi party».
  */
 (() => {
 'use strict';
@@ -31,8 +35,9 @@ let request=0;
 let activeAuthor=null;
 let privateView=false;
 let working=false;
-const TABS=['perfil','takes','picks','quiniela','party'];
-const validTab=tab=>TABS.includes(tab)?tab:'perfil';
+const TABS=['perfil','takes','picks','party'];
+// «quiniela» (Mis jornadas) vive dentro de «Mi Party» desde el 4 nov.
+const validTab=tab=>tab==='quiniela'?'party':TABS.includes(tab)?tab:'perfil';
 let activeTab='perfil';
 let ownTakes=[];
 let ownPicks=[];
@@ -49,6 +54,11 @@ let sessionUser;
 let sessionRead=null;
 let sessionRevision=0;
 let overview=null,overviewError='',overviewStale=false,overviewTimer=0;
+// Lo que el resumen y la cabecera piden junto al resumen (una vez por perfil):
+// campeones elegidos y perfil de prestigio. La pestaña Takes los reutiliza.
+let extras=null;
+// «Primeros pasos» del perfil propio: qué le falta probar.
+let steps=null,stepsTicket=0;
 
 /* Perfil de prestigio: aciertos medidos por dificultad (escala 1–20). */
 const RISK_TEXT={
@@ -172,15 +182,17 @@ function appendChampionPicks(target,champions){
   paint();
   if(champions.some(c=>c.competition==='nfl')&&!nflCrests)loadNflCrests().then(paint);
 }
-async function loadPrestige(userId){
+async function loadPrestige(userId,reuse=false){
   const target=$('aeProfilePrestige');
   if(!target||!userId)return;
   const ticket=++prestigeRequest;
+  // Al abrir Takes se reutiliza lo que ya trajo el resumen (prestigio y campeones).
+  const cached=reuse&&extras?.author===userId&&extras.prestigeOk&&extras.championsOk?extras:null;
   try{
     const [summary,legendary,champions]=await Promise.all([
-      db.rpc('ae_take_prestige',{p_user_id:userId}),
+      cached?{data:cached.prestige?[cached.prestige]:[]}:db.rpc('ae_take_prestige',{p_user_id:userId}),
       db.rpc('ae_take_legendary',{p_user_id:userId}),
-      Promise.resolve(db.rpc('ae_user_champion_picks',{p_user_id:userId})).catch(()=>({data:[],error:true}))
+      cached?{data:cached.champions}:Promise.resolve(db.rpc('ae_user_champion_picks',{p_user_id:userId})).catch(()=>({data:[],error:true}))
     ]);
     if(ticket!==prestigeRequest||activeAuthor!==userId)return;
     if(summary.error)throw summary.error;
@@ -731,8 +743,9 @@ function renderPublishAction(){
 function setPrivateTab(tab,options={}){
   if(!activeAuthor)return;
   labelTabs();
-  activeTab=tab==='quiniela'&&!privateView?'perfil':validTab(tab);
-  for(const [id,value] of [['aeProfileTabOverview','perfil'],['aeProfileTabTakes','takes'],['aeProfileTabPicks','picks'],['aeProfileTabQuiniela','quiniela'],['aeProfileTabParty','party']]){
+  const toJornadas=tab==='quiniela'&&privateView;
+  activeTab=validTab(tab);
+  for(const [id,value] of [['aeProfileTabOverview','perfil'],['aeProfileTabTakes','takes'],['aeProfileTabPicks','picks'],['aeProfileTabParty','party']]){
     const button=$(id);
     if(!button)continue;
     button.setAttribute('aria-selected',String(activeTab===value));
@@ -751,7 +764,7 @@ function setPrivateTab(tab,options={}){
   const prestige=$('aeProfilePrestige');
   if(prestige)prestige.hidden=!isTakes||!prestige.childElementCount;
   if($('camProfileOverview'))$('camProfileOverview').hidden=activeTab!=='perfil';
-  if($('camProfileQuiniela'))$('camProfileQuiniela').hidden=activeTab!=='quiniela';
+  if($('camProfileQuiniela'))$('camProfileQuiniela').hidden=activeTab!=='party'||!privateView;
   if($('camProfileParties'))$('camProfileParties').hidden=activeTab!=='party';
 
   let loading=null;
@@ -777,8 +790,24 @@ function setPrivateTab(tab,options={}){
   if(options.url!==false)syncTabUrl();
   // Mi Party (cam-parties.js) se pinta al recibir la pestaña visible.
   document.dispatchEvent(new CustomEvent('cam:profile-view',{detail:{userId:activeAuthor,own:privateView,tab:activeTab}}));
+  // «Ver mis jornadas» desde la quiniela: Mi Party, ya en las jornadas (otra
+  // vez cuando Mi Party termina de pintarse, porque empuja las jornadas).
+  jornadasPending=toJornadas;
+  if(toJornadas)requestAnimationFrame(scrollToJornadas);
   return loading;
 }
+let jornadasPending=false;
+function scrollToJornadas(){
+  const n=$('camProfileQuiniela');
+  if(!n||n.hidden||activeTab!=='party')return;
+  try{n.scrollIntoView({block:'start'});}catch{}
+}
+document.addEventListener('cam:profile-party-rendered',()=>{
+  if(!jornadasPending)return;
+  jornadasPending=false;
+  requestAnimationFrame(scrollToJornadas);
+});
+window.camProfileShowJornadas=()=>{if(activeAuthor&&privateView&&$('aeProfileDialog')?.open){setPrivateTab('quiniela');return true;}return false;};
 
 /* La dirección del perfil público dice su pestaña (?perfil=<id>&tab=picks).
    Cambiar de pestaña no suma pasos al botón Atrás. */
@@ -796,13 +825,15 @@ function urlTab(){
     const params=new URL(location.href).searchParams;
     // Un Take compartido (?take=) se abre sobre su lista de Takes.
     if(UUID.test(params.get('take')||''))return 'takes';
-    return validTab(params.get('tab'));
+    const tab=params.get('tab');
+    return tab==='quiniela'?tab:validTab(tab);
   }catch{return 'perfil';}
 }
 
 function resetLoads(){
   takesLoaded=false;takesLoading=null;picksLoaded=false;picksLoading=null;
   overview=null;overviewError='';overviewStale=false;clearTimeout(overviewTimer);
+  extras=null;steps=null;stepsTicket++;
 }
 
 /* ---------- Resumen («Perfil») ---------- */
@@ -819,10 +850,25 @@ async function loadOverview(){
   overviewStale=false;overviewError='';
   if(!overview)renderOverview();
   try{
-    const r=await db.rpc('cam_profile_overview',{p_user:author});
+    // Junto al resumen: campeones elegidos y prestigio (para la cabecera y la
+    // tarjeta de Takes). Si fallan, el resumen sale igual.
+    const wantExtras=!extras||extras.author!==author;
+    const [r,champions,prestige]=await Promise.all([
+      db.rpc('cam_profile_overview',{p_user:author}),
+      wantExtras?Promise.resolve(db.rpc('ae_user_champion_picks',{p_user_id:author})).catch(()=>({error:true})):null,
+      wantExtras?Promise.resolve(db.rpc('ae_take_prestige',{p_user_id:author})).catch(()=>({error:true})):null
+    ]);
     if(r.error)throw r.error;
     if(ticket!==request||activeAuthor!==author||privateView!==own)return;
+    if(wantExtras){
+      const championsOk=Boolean(champions&&!champions.error&&Array.isArray(champions.data));
+      const prestigeOk=Boolean(prestige&&!prestige.error);
+      extras={author,championsOk,prestigeOk,
+        champions:championsOk?champions.data:[],
+        prestige:prestigeOk?(Array.isArray(prestige.data)?prestige.data[0]:prestige.data)||null:null};
+    }
     overview=r.data||{username:profileName};
+    if(own)loadSteps(author,ticket);
     const name=String(overview.username||'').trim();
     if(name&&(own?name!=='Aficionado':true))setIdentity(name,overview.joined_month?'Miembro desde '+monthText(overview.joined_month+'-15T12:00:00'):undefined);
     if(!own)publicAuthorLabel=name||publicAuthorLabel;
@@ -837,8 +883,71 @@ async function loadOverview(){
       }catch{}
     }
   }
+  renderHighlights();
   renderOverview();
 }
+
+/* Lo que destaca de cada uno, bajo el nombre: su mejor puesto en la quiniela,
+   su perfil de riesgo, sus campeones, su acierto. Sale solo con datos. */
+function renderHighlights(){
+  const list=$('camProfileHighlights');
+  if(!list)return;
+  const items=overview&&typeof window.CamProfileOverview?.highlights==='function'
+    ?window.CamProfileOverview.highlights(overview,extras||{}):[];
+  list.replaceChildren(...items.map(item=>{
+    const li=el('li',null,'cam-profile-highlight'+(item.strong?' is-strong':''));
+    if(item.icon==='trophy'){
+      const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+      svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('aria-hidden','true');svg.setAttribute('focusable','false');
+      svg.innerHTML='<path d="M8 4h8v5a4 4 0 0 1-8 0V4z"/><path d="M8 6H5v1a3 3 0 0 0 3 3M16 6h3v1a3 3 0 0 1-3 3M12 13v4M9 20h6"/>';
+      li.append(svg);
+    }
+    li.append(document.createTextNode(item.text));
+    return li;
+  }));
+  list.hidden=!items.length;
+}
+
+/* «Primeros pasos» del perfil propio: Take y Pick salen del resumen; quiniela
+   y party se cuentan sin traer filas (solo si el resumen no lo dice ya). Con
+   todo hecho se recuerda en este navegador y no se vuelve a preguntar. */
+const STEPS_KEY='cam_profile_steps_done_v1:';
+function stepsDone(id){try{return localStorage.getItem(STEPS_KEY+id)==='1';}catch{return false;}}
+async function loadSteps(author,ticket){
+  const mine=++stepsTicket;
+  if(stepsDone(author)){steps={complete:true};return;}
+  const o=overview||{},q=o.quiniela||{};
+  const next={
+    take:Number(o.takes?.count)>0,
+    pick:Number(o.picks?.count)>0,
+    quiniela:Boolean(q.nfl?.position||q.football?.position),
+    party:Array.isArray(q.parties)&&q.parties.length>0
+  };
+  steps={...next,checking:!(next.quiniela&&next.party)};
+  const count=async(table)=>{
+    try{
+      const r=await db.from(table).select(table==='cam_party_members'?'party_id':'game_id',{count:'exact',head:true}).eq('user_id',author);
+      if(r.error)return null;
+      return Number(r.count)||0;
+    }catch{return null;}
+  };
+  const [nfl,football,parties]=await Promise.all([
+    next.quiniela?0:count('cam_nfl_picks'),
+    next.quiniela?0:count('cam_football_picks'),
+    next.party?0:count('cam_party_members')
+  ]);
+  if(mine!==stepsTicket||ticket!==request||activeAuthor!==author)return;
+  // Si no se pudo contar, no se insiste con ese paso.
+  if(!next.quiniela)next.quiniela=nfl===null||football===null||nfl+football>0;
+  if(!next.party)next.party=parties===null||parties>0;
+  steps={...next,checking:false};
+  if(next.take&&next.pick&&next.quiniela&&next.party){
+    try{localStorage.setItem(STEPS_KEY+author,'1');}catch{}
+    steps={complete:true};
+  }
+  renderOverview();
+}
+
 function renderOverview(){
   const target=$('camProfileOverview');
   if(!target||activeTab!=='perfil')return;
@@ -847,6 +956,9 @@ function renderOverview(){
   if(typeof window.CamProfileOverview?.render!=='function')return;
   window.CamProfileOverview.render(target,overview,{
     own:privateView,name:profileName,error:overviewError,
+    extras:extras||{},steps:privateView?steps:null,
+    crest:c=>championCrest(c),
+    crestsReady:()=>loadNflCrests(),
     tab:tab=>{setPrivateTab(tab);$('aeProfileTabs')?.scrollIntoView?.({block:'nearest'});},
     openTake:t=>openProfileTake({...t,author_id:owner,hidden:false},owner),
     openPick:id=>{if(typeof window.aeOpenPickDetail==='function')window.aeOpenPickDetail(id);else openPick(id);},
@@ -860,7 +972,7 @@ function renderOverview(){
 function loadTakes(){
   if(takesLoading)return takesLoading;
   const author=activeAuthor,own=privateView,ticket=request;
-  loadPrestige(author);
+  loadPrestige(author,true);
   takesLoading=(async()=>{
     const [takesResult,unpopularResult]=await Promise.allSettled([
       own?db.rpc('ae_my_free_takes'):db.rpc('ae_public_take_profile',{p_author_id:author}),
@@ -965,12 +1077,13 @@ async function showOwn(tab='perfil'){
   const summary=loadOverview();
   if(ticket!==request)return;
   // Se espera a la pestaña abierta (quien llama puede usarla al terminar).
-  await Promise.all([summary,setPrivateTab(validTab(typeof tab==='string'?tab:'perfil'))]);
+  await Promise.all([summary,setPrivateTab(typeof tab==='string'?tab:'perfil')]);
 }
 
 async function showPublic(id,push=true,tab='perfil'){
   if(!UUID.test(id))return;
-  tab=validTab(typeof tab==='string'?tab:'perfil');
+  // «quiniela» se conserva para el perfil propio (baja a Mis jornadas).
+  tab=typeof tab==='string'&&tab==='quiniela'?tab:validTab(typeof tab==='string'?tab:'perfil');
   const user=await me();
   if(user?.id===id){await showOwn(tab);return;}
 
@@ -1025,10 +1138,25 @@ function setIdentity(name,subtitle){
   for(const id of ['camProfileAvatar','camProfileEditAvatar']){const n=$(id);if(n)n.textContent=initialOf(clean);}
   if($('camProfileKicker'))$('camProfileKicker').textContent=privateView?'MI PERFIL · CAM SPORTS':'AFICIONADO · CAM SPORTS';
   if($('camProfileEditOpen'))$('camProfileEditOpen').hidden=!privateView;
+  // Perfil ajeno: «Invitar a mi party» manda; compartir queda como icono.
+  if($('camProfileInvite'))$('camProfileInvite').hidden=privateView;
+  const share=$('camProfileShare');
+  if(share){
+    share.classList.toggle('is-icon',!privateView);
+    if(privateView)share.removeAttribute('aria-label');else share.setAttribute('aria-label','Compartir perfil');
+  }
+  if(!clean&&$('camProfileHighlights')){$('camProfileHighlights').replaceChildren();$('camProfileHighlights').hidden=true;}
+}
+/* Invitar a alguien a tu party: abre «Mis parties» de quiniela (elegir una
+   para compartir su enlace, o crearla). Sin sesión, primero el acceso. */
+async function inviteToParty(){
+  if(typeof window.camParties?.openHub!=='function')return;
+  const user=await me();
+  if(!user)close();
+  window.camParties.openHub('quiniela','all');
 }
 function labelTabs(){
   const own=privateView;
-  if($('aeProfileTabQuiniela'))$('aeProfileTabQuiniela').hidden=!own;
   for(const [id,mine,theirs] of [['aeProfileTabOverview','Perfil','Perfil'],['aeProfileTabTakes','Takes','Takes'],['aeProfileTabPicks','Picks','Picks'],['aeProfileTabParty','Mi Party','Party']]){
     const b=$(id);if(!b)continue;
     const label=b.querySelector('.cam-tab-label')||b;
@@ -1212,15 +1340,15 @@ function bindProfileApp(){
   $('camProfileEditOpen')?.addEventListener('click',openEdit);
   $('camProfileEditBack')?.addEventListener('click',()=>closeEdit());
   $('camProfileShare')?.addEventListener('click',shareProfile);
+  $('camProfileInvite')?.addEventListener('click',inviteToParty);
   // Pestañas con flechas del teclado.
   $('aeProfileTabs')?.addEventListener('keydown',event=>{
     if(!['ArrowRight','ArrowLeft','Home','End'].includes(event.key)||!activeAuthor)return;
-    const available=TABS.filter(tab=>tab!=='quiniela'||privateView);
-    const index=available.indexOf(activeTab);
-    const next=event.key==='Home'?0:event.key==='End'?available.length-1:(index+(event.key==='ArrowRight'?1:-1)+available.length)%available.length;
+    const index=TABS.indexOf(activeTab);
+    const next=event.key==='Home'?0:event.key==='End'?TABS.length-1:(index+(event.key==='ArrowRight'?1:-1)+TABS.length)%TABS.length;
     event.preventDefault();
-    setPrivateTab(available[next]);
-    $({perfil:'aeProfileTabOverview',takes:'aeProfileTabTakes',picks:'aeProfileTabPicks',quiniela:'aeProfileTabQuiniela',party:'aeProfileTabParty'}[available[next]])?.focus();
+    setPrivateTab(TABS[next]);
+    $({perfil:'aeProfileTabOverview',takes:'aeProfileTabTakes',picks:'aeProfileTabPicks',party:'aeProfileTabParty'}[TABS[next]])?.focus();
   });
   $('camUsernameInput')?.addEventListener('input',onNameInput);
   $('camUsernameForm')?.addEventListener('submit',event=>{
@@ -1259,7 +1387,6 @@ document.addEventListener('DOMContentLoaded',()=>{
   $('aeProfileTabOverview')?.addEventListener('click',()=>setPrivateTab('perfil'));
   $('aeProfileTabTakes')?.addEventListener('click',()=>setPrivateTab('takes'));
   $('aeProfileTabPicks')?.addEventListener('click',()=>setPrivateTab('picks'));
-  $('aeProfileTabQuiniela')?.addEventListener('click',()=>setPrivateTab('quiniela'));
   $('aeProfileTabParty')?.addEventListener('click',()=>setPrivateTab('party'));
 
   $('aeProfileDialog')?.addEventListener('click',e=>{if(e.target===$('aeProfileDialog'))close();});

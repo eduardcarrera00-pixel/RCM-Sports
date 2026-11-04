@@ -363,7 +363,7 @@
   html body #camProfileParties :is(.cam-pp-emblem, .cam-pp-mark) { border-radius:50%!important; }
 }
 
-/* Historial propio: cinco pestañas y jornadas independientes del calendario público. */
+/* Historial propio («Mis jornadas»): desde el 4 nov va al final de «Mi Party»; cuatro pestañas. */
 @layer cam-banners {
   html body #aeProfileDialog .ae-profile-tabs button[hidden] { display:none!important; }
   html body #aeProfileDialog .ae-profile-tabs:not([hidden]) { overflow-x:auto!important; }
@@ -406,16 +406,199 @@
   html body #camProfileQuiniela :is(button,select):focus-visible { outline:2px solid var(--rs-gold)!important; outline-offset:3px!important; }
   @media(max-width:760px) {
     html body #aeProfileDialog #camProfileQuiniela { padding:14px 14px 22px!important; }
-    html body #aeProfileDialog .ae-profile-tabs button { min-height:44px!important; padding:0 6px!important; font-size:10px!important; letter-spacing:0!important; }
+    html body #aeProfileDialog .ae-profile-tabs button { min-height:44px!important; padding:0 10px!important; font-size:11px!important; letter-spacing:.04em!important; }
     html body #camProfileQuiniela .cam-qh-games { grid-template-columns:minmax(0,1fr)!important; }
     html body #camProfileQuiniela .cam-qh-filters:has(>label:nth-child(3)) > label:last-child { grid-column:1/-1!important; }
   }
   @media(max-width:360px) {
-    html body #aeProfileDialog .ae-profile-tabs button { padding:0 4px!important; font-size:9px!important; }
+    html body #aeProfileDialog .ae-profile-tabs button { padding:0 6px!important; font-size:10px!important; letter-spacing:.02em!important; }
   }
 }
 @layer cam-header {
   html body #camProfileQuiniela .cam-qh-button { border-radius:999px!important; }
   html body #camProfileQuiniela :is(select,.cam-qh-game) { border-radius:14px!important; }
   html body #camProfileQuiniela img { border-radius:0!important; }
+}
+
+
+/* ===========================================================================
+   4 nov 2026 · Perfil más claro
+   · Cabecera compacta: sin antetítulo, cerrar a la altura del nombre y, bajo
+     el nombre, lo que destaca de cada uno (#camProfileHighlights).
+   · Perfil ajeno: «Invitar a mi party» como botón principal y compartir como
+     icono.
+   · Resumen: «Ver todo ›» junto al nombre de la tarjeta, primeras líneas del
+     Take con sus votos, campeones elegidos y «Primeros pasos» en el perfil
+     propio.
+   · «Mis jornadas» al final de «Mi Party», como una tarjeta más.
+   =========================================================================== */
+@layer cam-banners {
+  /* ---------- cabecera ---------- */
+  html body #aeProfileDialog .cam-profile-head > .cam-profile-kicker { display:none!important; }
+  html body #aeProfileDialog .ae-profile-top.cam-profile-head {
+    grid-template-columns:minmax(0,1fr) auto!important;
+    grid-template-areas:"identity close" "highlights highlights" "actions actions"!important;
+    gap:12px!important;
+    padding-top:20px!important;
+  }
+  html body #aeProfileDialog .cam-profile-head > .ae-profile-close { grid-area:close!important; align-self:start!important; }
+  /* El foco inicial va al nombre (no a cerrar, que salía con doble anillo en
+     el iPhone). No es una parada del tabulador: sin anillo. */
+  html body #aeProfileDialog #aeProfileTitle:is(:focus, :focus-visible) { outline:none!important; box-shadow:none!important; }
+  html body #aeProfileDialog .cam-profile-action-label {
+    display:inline!important; margin:0!important; padding:0!important;
+    color:inherit!important; font:inherit!important; letter-spacing:inherit!important; text-transform:none!important;
+  }
+  html body #aeProfileDialog .cam-profile-highlights {
+    grid-area:highlights!important;
+    display:flex!important; flex-wrap:wrap!important; gap:6px!important;
+    margin:0!important; padding:0!important; list-style:none!important;
+  }
+  html body #aeProfileDialog .cam-profile-highlights[hidden] { display:none!important; }
+  html body #aeProfileDialog .cam-profile-highlight {
+    display:inline-flex!important; align-items:center!important; gap:6px!important;
+    min-height:30px!important; margin:0!important; padding:4px 12px!important;
+    border:1px solid rgba(238,199,154,.42)!important;
+    background:rgba(6,22,34,.62)!important;
+    color:#f3e6d3!important;
+    font:600 12.5px/1.3 Inter,system-ui,sans-serif!important;
+    letter-spacing:0!important; text-transform:none!important;
+    list-style:none!important;
+  }
+  html body #aeProfileDialog .cam-profile-highlight.is-strong {
+    border-color:#e4ba89!important; background:rgba(40,36,30,.72)!important; color:#f6d3a6!important; font-weight:750!important;
+  }
+  html body #aeProfileDialog .cam-profile-highlight svg {
+    flex:0 0 auto!important; width:14px!important; height:14px!important;
+    fill:none!important; stroke:currentColor!important; stroke-width:1.9!important; stroke-linecap:round!important; stroke-linejoin:round!important;
+  }
+  html body #aeProfileDialog #camProfileInvite { background:#e4ba89!important; border-color:#e4ba89!important; color:#142d41!important; }
+  html body #aeProfileDialog #camProfileInvite:hover { background:#f3d0a7!important; border-color:#f3d0a7!important; }
+  html body #aeProfileDialog #camProfileInvite[hidden] { display:none!important; }
+  html body #aeProfileDialog #camProfileShare.is-icon { flex:0 0 48px!important; width:48px!important; min-width:48px!important; padding:0!important; }
+  html body #aeProfileDialog #camProfileShare.is-icon .cam-profile-action-label { display:none!important; }
+  html:not(.dark) body #aeProfileDialog .cam-profile-highlight { border-color:#c9a77f!important; background:rgba(255,250,242,.92)!important; color:#273c49!important; }
+  html:not(.dark) body #aeProfileDialog .cam-profile-highlight.is-strong { border-color:#a47946!important; background:#f6ead8!important; color:#5f3f20!important; }
+  html:not(.dark) body #aeProfileDialog #camProfileInvite { background:#15334d!important; border-color:#15334d!important; color:#fff6e8!important; }
+  html:not(.dark) body #aeProfileDialog #camProfileInvite:hover { background:#234a68!important; border-color:#234a68!important; }
+
+  /* ---------- tarjetas del resumen ---------- */
+  html body #camProfileOverview .cam-ov-head { align-items:center!important; flex-wrap:nowrap!important; }
+  html body #camProfileOverview .cam-ov-heading {
+    display:flex!important; flex:1 1 auto!important; flex-wrap:wrap!important; align-items:baseline!important;
+    gap:2px 10px!important; min-width:0!important;
+  }
+  html body #camProfileOverview .cam-ov-head .cam-ov-more { flex:0 0 auto!important; align-self:center!important; margin:0!important; min-height:40px!important; padding:0 4px!important; }
+  html body #camProfileOverview .cam-ov-excerpt {
+    display:-webkit-box!important; -webkit-box-orient:vertical!important; -webkit-line-clamp:2!important; overflow:hidden!important;
+    margin:0!important; padding:0 0 1px!important; color:var(--rs-text)!important;
+    font:400 13.5px/1.55 "Libre Baskerville",Georgia,serif!important; overflow-wrap:anywhere!important;
+  }
+  html body #camProfileOverview .cam-ov-votes {
+    display:inline-flex!important; align-items:center!important; gap:8px!important;
+    padding:2px 10px!important; border:1px solid var(--rs-line-strong)!important;
+    font:800 12.5px/1.35 Inter,system-ui,sans-serif!important; white-space:nowrap!important;
+  }
+  html body #camProfileOverview .cam-ov-up { color:var(--rs-won)!important; }
+  html body #camProfileOverview .cam-ov-down { color:var(--rs-lost)!important; }
+  html body #camProfileOverview .cam-ov-votes-sep { width:1px!important; height:12px!important; background:var(--rs-line-strong)!important; }
+
+  /* Campeones elegidos, dentro de la tarjeta de Takes. */
+  html body #camProfileOverview .cam-ov-champs { display:grid!important; gap:4px!important; padding-top:2px!important; }
+  html body #camProfileOverview .cam-ov-sublabel {
+    margin:0!important; color:var(--rs-muted)!important;
+    font:800 10.5px/1.35 Inter,system-ui,sans-serif!important; letter-spacing:.12em!important; text-transform:uppercase!important;
+  }
+  html body #camProfileOverview .cam-ov-champ-list { display:grid!important; margin:0!important; padding:0!important; list-style:none!important; }
+  html body #camProfileOverview .cam-ov-champ {
+    display:grid!important; grid-template-columns:34px minmax(0,1fr) auto!important; align-items:center!important; gap:10px!important;
+    margin:0!important; padding:8px 0!important; border-bottom:1px solid var(--rs-line)!important; list-style:none!important;
+  }
+  html body #camProfileOverview .cam-ov-champ:last-child { border-bottom:0!important; }
+  html body #camProfileOverview .cam-ov-crest {
+    position:relative!important; display:grid!important; place-items:center!important; width:34px!important; height:34px!important;
+    overflow:hidden!important; border:1px solid var(--rs-line-strong)!important; background:var(--rs-soft)!important;
+  }
+  html body #camProfileOverview .cam-ov-crest-initials { color:var(--rs-muted)!important; font:800 10.5px/1 Inter,system-ui,sans-serif!important; letter-spacing:.02em!important; }
+  html body #camProfileOverview .cam-ov-crest img { position:absolute!important; inset:4px!important; width:calc(100% - 8px)!important; height:calc(100% - 8px)!important; object-fit:contain!important; }
+  html body #camProfileOverview .cam-ov-crest.has-img .cam-ov-crest-initials { visibility:hidden!important; }
+  html body #camProfileOverview .cam-ov-champ-copy { display:grid!important; gap:1px!important; min-width:0!important; }
+  html body #camProfileOverview .cam-ov-champ-team {
+    overflow:hidden!important; padding:1px 0!important; color:var(--rs-ink)!important;
+    font:700 14px/1.35 Inter,system-ui,sans-serif!important; text-overflow:ellipsis!important; white-space:nowrap!important;
+  }
+  html body #camProfileOverview .cam-ov-champ-meta { color:var(--rs-muted)!important; font:600 12px/1.4 Inter,system-ui,sans-serif!important; }
+  html body #camProfileOverview .cam-ov-champ-state {
+    padding:3px 9px!important; border:1px solid var(--rs-gold)!important; color:var(--rs-accent)!important;
+    font:800 10.5px/1.3 Inter,system-ui,sans-serif!important; letter-spacing:.06em!important; text-transform:uppercase!important; white-space:nowrap!important;
+  }
+  html body #camProfileOverview .cam-ov-champ.is-won .cam-ov-champ-state { border-color:var(--rs-won)!important; color:var(--rs-won)!important; }
+  html body #camProfileOverview .cam-ov-champ.is-lost .cam-ov-champ-state { border-color:var(--rs-line-strong)!important; color:var(--rs-muted)!important; }
+
+  /* Primeros pasos (perfil propio). */
+  html body #camProfileOverview .cam-ov-steps { grid-column:1/-1!important; gap:12px!important; padding-bottom:6px!important; }
+  html body #camProfileOverview .cam-ov-steps-count { margin:0!important; color:var(--rs-muted)!important; font:700 13px/1.3 Inter,system-ui,sans-serif!important; white-space:nowrap!important; }
+  html body #camProfileOverview .cam-ov-progress { display:grid!important; grid-template-columns:repeat(4,minmax(0,1fr))!important; gap:4px!important; }
+  html body #camProfileOverview .cam-ov-progress > span { display:block!important; height:4px!important; background:var(--rs-line-strong)!important; }
+  html body #camProfileOverview .cam-ov-progress > span.is-done { background:var(--rs-gold)!important; }
+  html body #camProfileOverview .cam-ov-step-list { display:grid!important; margin:0!important; padding:0!important; list-style:none!important; }
+  html body #camProfileOverview .cam-ov-step { margin:0!important; padding:0!important; border-bottom:1px solid var(--rs-line)!important; list-style:none!important; }
+  html body #camProfileOverview .cam-ov-step:last-child { border-bottom:0!important; }
+  html body #camProfileOverview .cam-ov-step.is-done,
+  html body #camProfileOverview .cam-ov-step-go {
+    display:grid!important; grid-template-columns:30px minmax(0,1fr) auto!important; align-items:center!important; gap:12px!important;
+    width:100%!important; min-height:58px!important; margin:0!important; padding:10px 0!important;
+  }
+  html body #camProfileOverview .cam-ov-step-go {
+    border:0!important; background:transparent!important; background-image:none!important; box-shadow:none!important;
+    color:inherit!important; text-align:left!important; text-transform:none!important; cursor:pointer!important;
+  }
+  html body #camProfileOverview .cam-ov-step-go:hover .cam-ov-step-name { color:var(--rs-accent)!important; }
+  html body #camProfileOverview .cam-ov-step-mark {
+    display:grid!important; place-items:center!important; width:30px!important; height:30px!important;
+    border:1.5px solid var(--rs-line-strong)!important; color:var(--rs-muted)!important;
+    font:800 13px/1 Inter,system-ui,sans-serif!important;
+  }
+  html body #camProfileOverview .cam-ov-step.is-done .cam-ov-step-mark { border-color:var(--rs-gold)!important; background:var(--rs-gold)!important; color:var(--rs-card)!important; }
+  html.dark body #camProfileOverview .cam-ov-step.is-done .cam-ov-step-mark { color:#132232!important; }
+  html body #camProfileOverview .cam-ov-step-copy { display:grid!important; gap:2px!important; min-width:0!important; }
+  html body #camProfileOverview .cam-ov-step-name { color:var(--rs-ink)!important; font:700 15px/1.35 Inter,system-ui,sans-serif!important; }
+  html body #camProfileOverview .cam-ov-step.is-done .cam-ov-step-name { color:var(--rs-muted)!important; text-decoration:line-through!important; }
+  html body #camProfileOverview .cam-ov-step-hint { color:var(--rs-muted)!important; font:500 12.5px/1.45 Inter,system-ui,sans-serif!important; }
+  html body #camProfileOverview .cam-ov-step-chevron { color:var(--rs-accent)!important; font:400 24px/1 Inter,system-ui,sans-serif!important; }
+
+  /* ---------- «Mis jornadas» al final de «Mi Party» ---------- */
+  html body #aeProfileDialog #camProfileParties.cam-profile-party:has(+ #camProfileQuiniela:not([hidden])) { padding-bottom:14px!important; }
+  html body #aeProfileDialog #camProfileQuiniela.cam-profile-jornadas {
+    margin:0 30px 28px!important; padding:16px!important;
+    border:1px solid var(--rs-line)!important; background:var(--rs-card)!important; box-shadow:inset 0 2px 0 var(--rs-gold)!important;
+  }
+  html body #camProfileQuiniela h3 { font-size:20px!important; }
+  html body #camProfileQuiniela .cam-qh-game { background:var(--rs-soft)!important; }
+
+  /* ---------- ordenador ---------- */
+  @media (min-width:761px) {
+    html body #camProfileOverview .cam-ov-step-list { grid-template-columns:repeat(2,minmax(0,1fr))!important; column-gap:28px!important; }
+    html body #camProfileOverview .cam-ov-step:nth-last-child(2):nth-child(odd) { border-bottom:0!important; }
+  }
+  /* Pantallas muy estrechas: dos etiquetas como mucho, para no apilar tres filas. */
+  @media (max-width:360px) {
+    html body #aeProfileDialog .cam-profile-highlight:nth-child(n+3) { display:none!important; }
+  }
+  /* ---------- teléfono ---------- */
+  @media (max-width:760px) {
+    html body #aeProfileDialog .ae-profile-top.cam-profile-head { gap:10px!important; padding-top:max(14px, env(safe-area-inset-top, 0px))!important; }
+    html body #aeProfileDialog .cam-profile-identity { gap:12px!important; }
+    html body #aeProfileDialog .cam-profile-identity .cam-profile-avatar { flex-basis:52px!important; width:52px!important; height:52px!important; font-size:25px!important; }
+    html body #aeProfileDialog .cam-profile-head .cam-profile-names p { font-size:12.5px!important; }
+    html body #aeProfileDialog #camProfileParties.cam-profile-party:has(+ #camProfileQuiniela:not([hidden])) { padding-bottom:12px!important; }
+    html body #aeProfileDialog #camProfileQuiniela.cam-profile-jornadas { margin:0 14px 22px!important; padding:14px!important; }
+  }
+}
+@layer cam-header {
+  html body #aeProfileDialog .cam-profile-highlight,
+  html body #camProfileOverview :is(.cam-ov-votes, .cam-ov-champ-state) { border-radius:999px!important; }
+  html body #camProfileOverview :is(.cam-ov-crest, .cam-ov-step-mark) { border-radius:50%!important; }
+  html body #camProfileOverview .cam-ov-progress > span { border-radius:2px!important; }
+  html body #aeProfileDialog #camProfileQuiniela.cam-profile-jornadas { border-radius:16px!important; }
 }

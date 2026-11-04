@@ -1,5 +1,20 @@
 # AE SPORTS · Guía visual v1
 
+### Perfil más claro · 4 nov 2026
+
+Cuatro pestañas: Perfil · Takes · Picks · Mi Party. «Mis jornadas» va al final de
+«Mi Party» (perfil propio); «Ver mis jornadas» y `?tab=quiniela` abren Mi Party y
+bajan hasta ellas. La cabecera no lleva antetítulo; el foco inicial va al nombre
+(no al botón de cerrar). Bajo el nombre, hasta tres etiquetas con lo que destaca
+(puesto en la quiniela, perfil de riesgo, campeones, acierto o apoyo), solo con
+datos. En un perfil ajeno el botón principal es «Invitar a mi party» (abre «Mis
+parties» de quiniela) y compartir queda como icono. En el resumen, «Ver todo ›» va
+junto al nombre de cada tarjeta; el Take enseña dos líneas de texto y sus votos, y
+solo se llama «más apoyado» si alguien lo apoyó. Debajo, los campeones elegidos.
+El perfil propio cambia las tarjetas vacías por «Primeros pasos» (Take, quiniela,
+Pick y party); con todo hecho, desaparece. En un perfil ajeno la quiniela va
+primero si va en el podio.
+
 ### Jornadas en el perfil · 3 nov 2026
 
 Las vistas principales de Quiniela NFL y Fútbol abren automáticamente la jornada

@@ -1,4 +1,5 @@
-/* CAM SPORTS · Jornadas personales. Solo consulta al abrir «Mi Quiniela».
+/* CAM SPORTS · Jornadas personales. Solo consulta al abrir «Mi Party» del
+   perfil propio (desde el 4 nov «Mis jornadas» va al final de esa pestaña).
    Las tablas conservan RLS de propietario; nunca se leen picks de otro perfil.
    La consulta incluye el partido y sus equipos, y pagina todo el historial. */
 (() => {
@@ -98,7 +99,7 @@
     return n;
   }
   function paint(){
-    root.hidden=state.tab!=='quiniela'||!state.userId;
+    root.hidden=state.tab!=='party'||!state.userId;
     if(root.hidden)return;
     root.replaceChildren();
     root.append(el('h3','Mis jornadas'),el('p','Tus pronósticos guardados y sus resultados. Horarios del Este · America/Toronto.','cam-qh-intro'));
@@ -144,7 +145,7 @@
     for(const row of selected)list.append(card(row));
     root.append(summary,list,button('Jugar la jornada actual ›',()=>window.camGoQuiniela?.(state.sport)));
   }
-  function ensure(){if(state.userId&&state.tab==='quiniela'&&!state.data[state.sport]&&!state.errors[state.sport])void load(state.sport);}
+  function ensure(){if(state.userId&&state.tab==='party'&&!state.data[state.sport]&&!state.errors[state.sport])void load(state.sport);}
   document.addEventListener('cam:profile-view',event=>{
     const d=event.detail||{},userId=d.own?d.userId:null;
     if(userId!==state.userId){state.revision++;state.data={};state.pending={};state.errors={};state.filters={};}
@@ -163,7 +164,8 @@
   });
   window.camOpenQuinielaHistory=sport=>{
     state.sport=sport==='football'?'football':'nfl';
-    if(state.userId&&$('aeProfileDialog')?.open){$('aeProfileTabQuiniela')?.click();return;}
+    // Con el perfil propio abierto, Mi Party y abajo hasta las jornadas.
+    if(state.userId&&window.camProfileShowJornadas?.()){paint();ensure();return;}
     return window.openAeProfile?.('quiniela');
   };
 })();

@@ -24,7 +24,7 @@ w.db={from(table){
 }};
 w.openAeProfile=tab=>{opening=tab;};w.camGoQuiniela=sport=>{play=sport;};
 w.eval(fs.readFileSync('assets/cam-profile-quiniela.js','utf8'));
-const view=(userId='reader',own=true,tab='quiniela')=>d.dispatchEvent(new w.CustomEvent('cam:profile-view',{detail:{userId,own,tab}}));
+const view=(userId='reader',own=true,tab='party')=>d.dispatchEvent(new w.CustomEvent('cam:profile-view',{detail:{userId,own,tab}}));
 const root=d.getElementById('camProfileQuiniela');
 view('reader',true,'perfil');await tick();assert.equal(calls.length,0,'summary does not load personal history');
 view();await tick();

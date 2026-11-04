@@ -1,4 +1,4 @@
-"""Perfil con resumen («Perfil») y pestaña «Mi Party».
+"""Perfil con resumen («Perfil») y pestaña «Mi Party» (con «Mis jornadas»).
 
 Página completa en Chromium con tests/full-page.py y el Supabase falso de
 tests/fake-supabase.js (sin red). Las reglas reales de los datos
@@ -13,9 +13,15 @@ Cubre, a 320, 390 y 1366 px, de día y de noche:
   · una sola llamada por pestaña: el resumen no carga Takes ni Picks;
   · tarjetas: mejor Take y mejor Pick, y sus alternativas («Take más
     apoyado», «Último Pick»); mercado traducido, nunca en bruto;
-  · líneas de quiniela y de party; la tarjeta lleva a «Mi Party»;
-  · tarjetas vacías del perfil propio (una línea y un botón) y del público
-    (no se muestran; si no hay nada, «@usuario todavía no ha participado»);
+  · líneas de quiniela y de party; la tarjeta lleva a «Mi Party», con «Mis
+    jornadas» al final (?tab=quiniela y «Ver mis jornadas» también);
+  · cabecera: lo que destaca de cada uno, «Invitar a mi party» en un perfil
+    ajeno (compartir como icono) y el foco en el nombre, no en cerrar;
+  · el Take con sus primeras líneas y votos; «Su Take» si nadie lo apoyó;
+    campeones elegidos; la quiniela primero si va en el podio;
+  · «Primeros pasos» en el perfil propio en lugar de tarjetas vacías; del
+    público no se muestran (si no hay nada, «@usuario todavía no ha
+    participado»);
   · Mi Party: invitación a una party de quiniela, «Tus parties de quiniela»,
     Mi quiniela compacta, Otros parties y la línea del perfil público;
   · cabecera + resumen ≤ 1,5 pantallas y Mi Party ≤ 2 pantallas a 390×844;
@@ -33,14 +39,15 @@ ONLY = sys.argv[sys.argv.index('--only') + 1] if '--only' in sys.argv else None
 if SHOTS: SHOTS.mkdir(parents=True, exist_ok=True)
 
 U = {'ana': 'a0000000-0000-4000-8000-000000000001', 'beto': 'b0000000-0000-4000-8000-000000000002',
-     'carla': 'c0000000-0000-4000-8000-000000000003', 'dani': 'd0000000-0000-4000-8000-000000000004'}
+     'carla': 'c0000000-0000-4000-8000-000000000003', 'dani': 'd0000000-0000-4000-8000-000000000004',
+     'eva': 'e0000000-0000-4000-8000-000000000005'}
 
 MODEL = r"""
 try { sessionStorage.setItem('cam_sports_home_welcome_seen_session_v1', '1'); } catch (e) {}
 (() => {
 const F = window.__fake; F.rpc = F.rpc || {}; F.tables = F.tables || {};
 const U = %(users)s;
-const NAMES = {[U.ana]: 'ana_futbolera', [U.beto]: 'beto_crack', [U.carla]: 'carla', [U.dani]: 'dani'};
+const NAMES = {[U.ana]: 'ana_futbolera', [U.beto]: 'beto_crack', [U.carla]: 'carla', [U.dani]: 'dani', [U.eva]: 'eva_nfl'};
 const D = d => new Date(Date.now() - d * 864e5).toISOString();
 const ok = data => ({data, error: null});
 const me = () => F.user?.id || null;
@@ -69,8 +76,17 @@ const OVERVIEW = {
   [U.carla]: {user_id: U.carla, username: 'carla', joined_month: '2026-11', takes: {count: 0, up: 0, down: 0, top: null},
     picks: {count: 0, won: 0, lost: 0, top: null}, quiniela: {nfl: null, football: null, parties: []}},
   [U.dani]: {user_id: U.dani, username: 'dani', joined_month: '2026-11', takes: {count: 0, up: 0, down: 0, top: null},
+    picks: {count: 0, won: 0, lost: 0, top: null}, quiniela: {nfl: null, football: null, parties: []}},
+  // Eva: un Take de la NFL sin votos (con la línea de contexto) y dos campeones.
+  [U.eva]: {user_id: U.eva, username: 'eva_nfl', joined_month: '2026-11',
+    takes: {count: 1, up: 0, down: 0, top: take('d1000000-0000-4000-8000-000000000005', 'Campeón NFL',
+      {kind: 'supported', type: 'take', net: 0, sport: 'nfl', competition: null, upvotes: 0, downvotes: 0,
+       body: 'NFL · NFC · NFC North\n\nBears, Caleb y su lesión llevarán a Chicago a su superbowl'})},
     picks: {count: 0, won: 0, lost: 0, top: null}, quiniela: {nfl: null, football: null, parties: []}}
 };
+const CHAMPIONS = {[U.eva]: [
+  {competition: 'laliga', season: '2026/27', team: 'FC Barcelona', points: 3, state: 'pending', awarded_points: 0},
+  {competition: 'nfl', season: '2026/27', team: 'Kansas City Chiefs', points: 5, state: 'pending', awarded_points: 0}]};
 const PARTY = {
   [U.ana]: {parties: [
       {id: 'f1000000-0000-4000-8000-000000000001', name: 'Los Compas', kind: 'quiniela', sport: 'all', member_count: 5, position: 1, week_position: 1, show_on_profile: true, is_owner: true},
@@ -95,12 +111,14 @@ F.rpc.cam_profile_overview = ({p_user}) => ok(OVERVIEW[p_user] || null);
 F.rpc.cam_profile_party = ({p_user}) => ok(Object.assign({own: p_user === me()}, PARTY[p_user] || PARTY[U.carla]));
 // Lo que cargan las pestañas Takes y Picks (solo al abrirlas).
 const takes = [take('d1000000-0000-4000-8000-000000000001', 'El Madrid gana la Champions', {author_id: U.ana, author: 'ana_futbolera', hidden: false})];
+// Primeros pasos: lo que falta se cuenta sin traer filas (count + head).
+F.tables.cam_nfl_picks = []; F.tables.cam_football_picks = []; F.tables.cam_party_members = [];
 F.rpc.ae_my_free_takes = () => ok(takes);
 F.rpc.ae_public_take_profile = ({p_author_id}) => ok(p_author_id === U.ana ? takes : []);
 F.rpc.ae_my_profile_unpopular_take = () => ok(null);
 F.rpc.ae_take_prestige = () => ok([]);
 F.rpc.ae_take_legendary = () => ok([]);
-F.rpc.ae_user_champion_picks = () => ok([]);
+F.rpc.ae_user_champion_picks = ({p_user_id}) => ok(CHAMPIONS[p_user_id] || []);
 F.tables.ae_pick_feed = [{id: 'c1000000-0000-4000-8000-000000000001', user_id: U.ana, author: 'ana_futbolera', title: 'Barça gana',
   legs: [{event: 'Barcelona vs Sevilla', selection: 'Barcelona · MONEYLINE (3-WAY)', sport: 'Fútbol'}], american_odds: 240,
   created_at: D(5), outcome: 'won', result_points: 2.4, moderation_status: 'approved', hidden: false, upvotes: 1, downvotes: 0}];
@@ -110,7 +128,7 @@ F.rpc.cam_username_status = () => ok({username: NAMES[me()], can_change: true});
 """ % {'users': json.dumps(U)}
 
 CLIPPED = (ROOT / 'tests/parties.py').read_text(encoding='utf8').split('CLIPPED = r"""', 1)[1].split('"""', 1)[0]
-SELECTOR = '#aeProfileTabs, #camProfileOverview, #camProfileParties, .cam-profile-head'
+SELECTOR = '#aeProfileTabs, #camProfileOverview, #camProfileParties, #camProfileQuiniela, .cam-profile-head'
 
 STATE = """() => {
   const $ = id => document.getElementById(id);
@@ -126,6 +144,13 @@ STATE = """() => {
     title: $('aeProfileTitle').textContent, url: location.search, history: history.length,
     overview: vis($('camProfileOverview')), party: vis($('camProfileParties')), takes: vis($('aeProfileTakes')),
     cards: [...document.querySelectorAll('#camProfileOverview .cam-ov-card')].map(txt),
+    kinds: [...document.querySelectorAll('#camProfileOverview .cam-ov-card')].map(n => n.dataset.kind),
+    highlights: [...document.querySelectorAll('#camProfileHighlights li')].filter(vis).map(n => n.textContent.trim()),
+    strong: [...document.querySelectorAll('#camProfileHighlights li.is-strong')].map(n => n.textContent.trim()),
+    edit: vis($('camProfileEditOpen')), invite: vis($('camProfileInvite')),
+    shareIcon: $('camProfileShare').classList.contains('is-icon'), shareText: txt($('camProfileShare')),
+    kicker: vis($('camProfileKicker')), focus: document.activeElement ? document.activeElement.id || document.activeElement.className : '',
+    jornadas: vis($('camProfileQuiniela')),
     partyText: txt($('camProfileParties')),
     calls, overflow: $('aeProfileDialog').scrollWidth - $('aeProfileDialog').clientWidth};
 }"""
@@ -205,19 +230,28 @@ def scenario_own(dark, width, tag):
         open_own(page, width)
         st = state(page)
         assert st['tab'] == 'aeProfileTabOverview' and st['overview'] and not st['takes'], (tag, 'abre en Perfil', st)
-        assert st['tabs'] == ['Perfil', 'Takes', 'Picks', 'Mi Quiniela', 'Mi Party'], (tag, st['tabs'])
+        assert st['tabs'] == ['Perfil', 'Takes', 'Picks', 'Mi Party'], (tag, st['tabs'])
+        assert not st['kicker'] and st['focus'] == 'aeProfileTitle', (tag, 'cabecera sin antetítulo y foco en el nombre', st['kicker'], st['focus'])
+        assert st['edit'] and not st['invite'] and not st['shareIcon'] and st['shareText'] == 'Compartir', (tag, st)
+        shown = 2 if width <= 360 else 3   # a 320 px, dos etiquetas como mucho
+        assert st['highlights'] == ['2.º en la Quiniela Fútbol', '63 % de acierto en Picks', '80 % de apoyo en Takes'][:shown], st['highlights']
+        assert st['strong'] == ['2.º en la Quiniela Fútbol'], st['strong']
+        assert page.locator('#camProfileHighlights svg').count() == 1, 'trofeo en el podio'
         assert page.locator('#aeProfileTabParty .cam-tab-icon').count() == 1, 'icono de grupo junto a Mi Party'
         assert page.locator('#camProfileStats').count() == 0, 'sin fila de cifras en la cabecera'
         assert st['calls'].count('cam_profile_overview') == 1, (tag, st['calls'])
+        assert st['calls'].count('ae_user_champion_picks') == 1 and st['calls'].count('ae_take_prestige') == 1, (tag, st['calls'])
+        assert st['kinds'] == ['takes', 'picks', 'quiniela'], (tag, 'todo hecho: sin «Primeros pasos»', st['kinds'])
         assert not any(c in st['calls'] for c in ('ae_my_free_takes', 'from:ae_pick_feed', 'cam_profile_party')), (tag, 'el resumen no carga las otras pestañas', st['calls'])
         takes, picks, quiniela = st['cards']
-        assert takes.startswith('Takes 12 · 80 % apoyo') and 'Mejor Take' in takes and '+13 pts' in takes and 'Champions League' in takes, takes
+        assert takes.startswith('Takes 12 · 80 % apoyo Ver todo ›') and 'Mejor Take' in takes and '+13 pts' in takes and 'Champions League' in takes, takes
+        assert 'Con Mbappé en este nivel no hay rival en Europa.' in takes and '▲ 9' in takes and '▼ 2' in takes, takes
         assert picks.startswith('Picks 8 · 63 % acierto') and 'Mejor Pick' in picks and 'Barcelona vs Sevilla' in picks, picks
         assert 'Barcelona gana · 3 vías' in picks and 'MONEYLINE' not in picks and '+240' in picks and '+2,40 pts' in picks, picks
         assert quiniela.startswith('Quiniela 59 % acierto'), quiniela
         for line in ('NFL 4.º de 12 28 pts', 'Fútbol 2.º de 7 10 pts', 'Party Los Compas 1.º de 5'):
             assert line in quiniela, (line, quiniela)
-        assert all(c.endswith('Ver todo ›') for c in st['cards']), st['cards']
+        assert all('Ver todo ›' in c and not c.endswith('Ver todo ›') for c in st['cards']), st['cards']
         # El título del Take va a 2 líneas como máximo, con «…».
         lines = page.evaluate("(() => { const t = document.querySelector('#camProfileOverview [data-kind=takes] .cam-ov-title'); return Math.round(t.getBoundingClientRect().height / parseFloat(getComputedStyle(t).lineHeight)); })()")
         assert lines <= 2, (tag, 'título en más de 2 líneas', lines)
@@ -245,34 +279,35 @@ def scenario_own(dark, width, tag):
         page.wait_for_timeout(400)
         st = state(page)
         assert st['takes'] and st['calls'].count('ae_my_free_takes') == 1, (tag, st['calls'])
+        # La pestaña Takes reutiliza el prestigio y los campeones del resumen.
+        assert st['calls'].count('ae_user_champion_picks') == 1 and st['calls'].count('ae_take_prestige') == 1, (tag, st['calls'])
+        assert st['calls'].count('ae_take_legendary') == 1, (tag, st['calls'])
         page.click('#aeProfileTabOverview')
         page.wait_for_timeout(200)
 
-        # La tarjeta lleva a Mi Quiniela; Mi Party mantiene su carga independiente.
+        # La tarjeta de quiniela lleva a Mi Party, con «Mis jornadas» al final.
         page.click('#camProfileOverview [data-kind=quiniela] .cam-ov-item')
-        page.wait_for_selector('#camProfileQuiniela .cam-qh-message', timeout=8000)
-        assert page.locator('#aeProfileTabQuiniela').get_attribute('aria-selected') == 'true'
-        assert state(page)['calls'].count('cam_profile_party') == 0
-        page.click('#aeProfileTabParty')
         page.wait_for_selector('#camProfileParties .cam-pp-block', timeout=8000)
+        page.wait_for_selector('#camProfileQuiniela .cam-qh-message', timeout=8000)
         page.wait_for_timeout(250)
         st = state(page)
-        assert st['tab'] == 'aeProfileTabParty' and st['party'] and not st['overview'], (tag, st)
+        assert st['tab'] == 'aeProfileTabParty' and st['party'] and st['jornadas'] and not st['overview'], (tag, st)
+        assert 'Mis jornadas' in page.inner_text('#camProfileQuiniela'), 'jornadas al final de Mi Party'
+        order = page.evaluate("document.getElementById('camProfileParties').getBoundingClientRect().bottom <= document.getElementById('camProfileQuiniela').getBoundingClientRect().top + 1")
+        assert order, (tag, 'Mis jornadas debajo de Mi Party')
         txt = st['partyText']
         assert txt.startswith('Tus parties de quiniela'), txt
         assert 'Los Compas 1.º de 5 · esta semana 5 miembros' in txt, txt
         assert 'Oculto en tu perfil' in txt, txt
         assert 'Crear otra' in txt and 'Mi quiniela' in txt and 'NFL 4.º de 12 28 pts 7/12' in txt and 'Fútbol 2.º de 7 10 pts 3/5' in txt, txt
-        assert 'Chiefs @ Bills' in txt and 'Barcelona vs Real Madrid' in txt and 'Jugar esta semana ›' in txt, txt
+        assert 'Jugar esta semana ›' in txt and 'Chiefs @ Bills' not in txt, (tag, 'los pronósticos van en Mis jornadas', txt)
         assert txt.index('Otros parties') > txt.index('Mi quiniela') and 'Los del barrio ⚽' in txt and 'Takes de la oficina' in txt, txt
-        marks = page.eval_on_selector_all('#camProfileParties .cam-pp-mark', 'ns => ns.map(n => n.textContent)')
-        assert marks == ['✓', '✗', '✓'], marks
         if width == 390:
             h = bottom_of(page, 'camProfileParties')
             assert h <= 2 * 844, (tag, 'Mi Party en 2 pantallas', h)
         check_clean(page, tag + ' mi party')
         shot(page, f'{tag}-mi-party')
-        shot_full(page, f'{tag}-mi-party-completo', 'camProfileParties')
+        shot_full(page, f'{tag}-mi-party-completo', 'camProfileQuiniela')
         page.click('#aeProfileTabPicks')
         page.wait_for_timeout(300)
         page.click('#aeProfileTabParty')
@@ -298,10 +333,31 @@ def scenario_own_empty(dark, width, tag):
     page = open_page('dani', dark, width)
     try:
         open_own(page, width)
+        page.wait_for_selector('#camProfileOverview .cam-ov-steps', timeout=8000)
+        page.wait_for_timeout(250)
         st = state(page)
-        assert st['cards'] == ['Takes Publicar mi Take ›', 'Picks Prepara tu Pick ›', 'Quiniela Jugar la quiniela ›'], st['cards']
+        assert st['kinds'] == ['steps'], (tag, 'Primeros pasos en lugar de tarjetas vacías', st['cards'])
+        steps = st['cards'][0]
+        assert steps.startswith('Primeros pasos 0 de 4'), steps
+        for name in ('Publica tu primer Take', 'Juega la quiniela', 'Prepara tu primer Pick', 'Únete a una party'):
+            assert name in steps, (name, steps)
+        assert not st['highlights'], st['highlights']
         check_clean(page, tag + ' resumen vacío')
         shot(page, f'{tag}-perfil-vacio')
+        # Con un Take publicado, ese paso sale hecho.
+        page.evaluate("""(() => { const o = window.__fake.rpc.cam_profile_overview; window.__fake.rpc.cam_profile_overview = a => {
+          const r = o(a); r.data = JSON.parse(JSON.stringify(r.data)); r.data.takes = {count: 1, up: 0, down: 0, top: {kind: 'supported', type: 'take',
+          id: 'd1000000-0000-4000-8000-000000000009', title: 'Mi primer Take', body: 'Hola', sport: 'nfl', net: 0, upvotes: 0, downvotes: 0,
+          created_at: new Date().toISOString()}}; return r; }; })()""")
+        page.evaluate("closeAeProfile()")
+        page.wait_for_timeout(200)
+        open_own(page, width)
+        page.wait_for_selector('#camProfileOverview .cam-ov-steps .cam-ov-step.is-done', timeout=8000)
+        st = state(page)
+        assert st['kinds'] == ['steps', 'takes'] and st['cards'][0].startswith('Primeros pasos 1 de 4'), (tag, st['cards'])
+        assert 'Tu Take' in st['cards'][1] and 'Take más apoyado' not in st['cards'][1], st['cards'][1]
+        check_clean(page, tag + ' primeros pasos 1 de 4')
+        shot(page, f'{tag}-primeros-pasos')
         page.click('#aeProfileTabParty')
         page.wait_for_selector('#camProfileParties .cam-pp-invite')
         txt = state(page)['partyText']
@@ -309,9 +365,11 @@ def scenario_own_empty(dark, width, tag):
         assert 'Arma un grupo con tus amigos y compitan cada semana con su propia clasificación.' in txt, txt
         assert 'Crear party' in txt and 'Unirme con código' in txt and 'Otros parties' not in txt, txt
         assert 'NFL Sin resultados' in txt and 'Fútbol Sin resultados' in txt, txt
+        page.wait_for_selector('#camProfileQuiniela .cam-qh-message', timeout=8000)
+        assert 'Aún no has guardado pronósticos de NFL.' in page.inner_text('#camProfileQuiniela')
         check_clean(page, tag + ' mi party vacío')
         shot(page, f'{tag}-mi-party-vacio')
-        shot_full(page, f'{tag}-mi-party-vacio-completo', 'camProfileParties')
+        shot_full(page, f'{tag}-mi-party-vacio-completo', 'camProfileQuiniela')
         # Crear party abre la creación con Quiniela ya elegida (y primera).
         page.click('#camProfileParties .cam-party-btn >> text=Crear party')
         page.wait_for_selector('#camPartyName', state='visible')
@@ -324,9 +382,9 @@ def scenario_own_empty(dark, width, tag):
         assert not page.locator('#camParty .cam-party-hint >> text=LaLiga').is_visible(), 'las ligas solo con Quiniela'
         page.evaluate("document.getElementById('camParty').close()")
         page.wait_for_timeout(200)
-        # «Jugar la quiniela ›» lleva a la quiniela NFL.
+        # «Juega la quiniela» (Primeros pasos) lleva a la quiniela NFL.
         page.click('#aeProfileTabOverview')
-        page.click('#camProfileOverview [data-kind=quiniela] .cam-ov-cta')
+        page.click('#camProfileOverview .cam-ov-step-go >> text=Juega la quiniela')
         page.wait_for_timeout(800)
         assert not page.evaluate("document.getElementById('aeProfileDialog').open")
         assert page.evaluate("currentCategory") == 'NFL'
@@ -356,6 +414,10 @@ def scenario_public(dark, width, tag):
         assert st['tab'] == 'aeProfileTabOverview' and st['title'] == '@ana_futbolera', st
         assert st['tabs'] == ['Perfil', 'Takes', 'Picks', 'Party'], st['tabs']
         assert len(st['cards']) == 3 and not page.locator('#camProfileEditOpen').is_visible()
+        assert st['invite'] and not st['edit'] and st['shareIcon'], (tag, 'Invitar a mi party y compartir como icono', st)
+        assert page.get_attribute('#camProfileShare', 'aria-label') == 'Compartir perfil'
+        assert st['kinds'] == ['quiniela', 'takes', 'picks'], (tag, 'la quiniela primero: va en el podio', st['kinds'])
+        assert st['highlights'][0] == '2.º en la Quiniela Fútbol', st['highlights']
         before = st['history']
         page.click('#aeProfileTabPicks')
         page.wait_for_timeout(300)
@@ -366,6 +428,30 @@ def scenario_public(dark, width, tag):
         assert 'tab=' not in state(page)['url']
         check_clean(page, tag + ' público')
         shot(page, f'{tag}-publico')
+        shot_full(page, f'{tag}-publico-completo', 'camProfileOverview')
+        # «Invitar a mi party» abre «Mis parties» de quiniela.
+        page.click('#camProfileInvite')
+        page.wait_for_selector('#camParty .cam-party-seg-btn[aria-pressed=true]', timeout=8000)
+        assert page.locator('#camParty .cam-party-seg-btn[aria-pressed=true]').inner_text() == 'Quiniela'
+        page.evaluate("document.getElementById('camParty').close()")
+        page.wait_for_timeout(200)
+    finally:
+        close(page)
+    # Un Take sin votos no es «el más apoyado»; campeones con su estado.
+    page = open_page('dani', dark, width, f"?perfil={U['eva']}")
+    try:
+        page.wait_for_selector('#camProfileOverview .cam-ov-champ', timeout=8000)
+        page.wait_for_timeout(300)
+        st = state(page)
+        assert st['kinds'] == ['takes'], st['kinds']
+        takes = st['cards'][0]
+        assert 'Su Take' in takes and 'Take más apoyado' not in takes, takes
+        assert 'Bears, Caleb y su lesión llevarán a Chicago a su superbowl' in takes and 'NFC North' not in takes, takes
+        assert '▲ 0' in takes and '▼ 0' in takes, takes
+        assert 'Campeones elegidos FB FC Barcelona LaLiga 2026/27 · paga 3 pts En juego KC Kansas City Chiefs NFL 2026/27 · paga 5 pts En juego' in takes, takes
+        assert st['highlights'] == ['Campeones: Barcelona · Chiefs'], st['highlights']
+        check_clean(page, tag + ' su take y campeones')
+        shot(page, f'{tag}-campeones')
     finally:
         close(page)
     for tab, panel in (('takes', 'aeProfileTabTakes'), ('picks', 'aeProfileTabPicks'), ('party', 'aeProfileTabParty')):
@@ -395,7 +481,7 @@ def scenario_public(dark, width, tag):
                 page.wait_for_timeout(300)
                 st = state(page)
                 takes, picks, quiniela = st['cards']
-                assert 'Take más apoyado' in takes and '▲ 5' in takes and 'NFL' in takes, takes
+                assert 'Take más apoyado' in takes and '▲ 6' in takes and '▼ 1' in takes and 'NFL' in takes, takes
                 assert 'Último Pick' in picks and 'Chiefs vs Bills +1' in picks and 'Chiefs gana' in picks and '+120' in picks and 'pts' not in picks, picks
                 assert quiniela.startswith('Quiniela 22 % acierto') and 'NFL 9.º de 12 6 pts' in quiniela, quiniela
                 check_clean(page, tag + ' alternativas')
@@ -418,6 +504,41 @@ def scenario_public(dark, width, tag):
         close(page)
 
 
+def scenario_jornadas(dark, width, tag):
+    # ?perfil=<propio>&tab=quiniela y «Ver mis jornadas» abren Mi Party en las jornadas.
+    page = open_page('ana', dark, width, f"?perfil={U['ana']}&tab=quiniela")
+    try:
+        page.wait_for_function("document.getElementById('aeProfileTabParty').getAttribute('aria-selected') === 'true'", timeout=8000)
+        page.wait_for_selector('#camProfileQuiniela .cam-qh-message', timeout=8000)
+        page.wait_for_timeout(400)
+        st = state(page)
+        assert st['jornadas'] and st['party'] and 'tab=party' in st['url'], (tag, st)
+        # Baja hasta Mis jornadas (con el historial vacío, hasta el final).
+        pos = page.evaluate("""(() => { const d = document.getElementById('aeProfileDialog'), r = document.getElementById('camProfileQuiniela').getBoundingClientRect();
+          return {top: r.top, bottom: r.bottom, h: innerHeight, scrolled: d.scrollTop, max: d.scrollHeight - d.clientHeight}; })()""")
+        assert pos['top'] < pos['h'] - 80 and (pos['top'] < 260 or pos['scrolled'] >= pos['max'] - 2), (tag, 'baja hasta Mis jornadas', pos)
+        page.click('#aeProfileTabOverview')
+        page.wait_for_timeout(200)
+        assert not state(page)['jornadas']
+        page.evaluate("window.camOpenQuinielaHistory('football')")
+        page.wait_for_timeout(500)
+        st = state(page)
+        assert st['tab'] == 'aeProfileTabParty' and st['jornadas'], (tag, st)
+        assert page.locator('#camProfileQuiniela [data-sport=football]').get_attribute('aria-pressed') == 'true'
+        check_clean(page, tag + ' jornadas')
+    finally:
+        close(page)
+    # Un perfil ajeno nunca enseña jornadas privadas.
+    page = open_page('dani', dark, width, f"?perfil={U['beto']}&tab=quiniela")
+    try:
+        page.wait_for_function("document.getElementById('aeProfileTabParty').getAttribute('aria-selected') === 'true'", timeout=8000)
+        page.wait_for_timeout(500)
+        assert not state(page)['jornadas']
+        assert not any(c in state(page)['calls'] for c in ('from:cam_nfl_picks', 'from:cam_football_picks'))
+    finally:
+        close(page)
+
+
 def scenario_author(dark, width, tag):
     # El @autor de un Take abre el perfil en «Perfil».
     page = open_page('dani', dark, width)
@@ -436,7 +557,7 @@ def scenario_author(dark, width, tag):
 
 COMBOS = [(320, False, '320-dia'), (320, True, '320-noche'), (390, False, '390-dia'), (390, True, '390-noche'),
           (1366, False, '1366-dia'), (1366, True, '1366-noche')]
-SCENARIOS = [scenario_own, scenario_own_empty, scenario_public, scenario_author]
+SCENARIOS = [scenario_own, scenario_own_empty, scenario_public, scenario_jornadas, scenario_author]
 
 if __name__ == '__main__':
     for width, dark, tag in COMBOS:

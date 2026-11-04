@@ -882,7 +882,8 @@ async function openAdmin() {
 
 /* ---------- perfil: pestaña «Mi Party» ----------
    Propio: invitación a armar una party de quiniela (o «Tus parties de
-   quiniela»), «Mi quiniela» compacta y «Otros parties».
+   quiniela»), «Mi quiniela» compacta y «Otros parties»; debajo, «Mis
+   jornadas» (cam-profile-quiniela.js).
    Público: sus parties visibles (Quiniela primero), su quiniela compacta y
    una línea para armar la tuya. Una llamada (cam_profile_party) por perfil;
    cambiar de pestaña no vuelve a llamar. */
@@ -989,10 +990,10 @@ function renderProfile() {
       invite.append(actions);
     }
     nodes.push(invite);
-    // 2 · Mi quiniela.
+    // 2 · Mi quiniela. Los pronósticos, jornada a jornada, van al final de
+    // esta pestaña («Mis jornadas», cam-profile-quiniela.js).
     const mine = block('Mi quiniela', 'cam-pp-quiniela');
     mine.append(quinielaRows(q));
-    if (recent.length) mine.append(recentList(recent));
     const sport = d.last_sport === 'football' ? 'football' : 'nfl';
     mine.append(button('Jugar esta semana ›', 'cam-party-btn is-wide cam-pp-play', () => window.camGoQuiniela?.(sport)));
     nodes.push(mine);
@@ -1023,6 +1024,8 @@ function renderProfile() {
     nodes.push(cta);
   }
   node.replaceChildren(...nodes);
+  // El perfil espera a esto para bajar hasta «Mis jornadas» si se pidió.
+  document.dispatchEvent(new CustomEvent('cam:profile-party-rendered'));
 }
 // Desde un perfil ajeno: con sesión, crear tu party de quiniela; sin sesión,
 // iniciar sesión y volver a la invitación de tu pestaña «Mi Party».
