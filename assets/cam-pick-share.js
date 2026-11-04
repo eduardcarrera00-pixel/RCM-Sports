@@ -149,18 +149,31 @@
  // and the action column on the right (180 px), so its text sits higher and
  // narrower but still centred. The feed post is 4:5 and the profile grid trims
  // it to 3:4 (~34 px per side), well outside the margins.
+ // «Foto» is not for a network: a 3:4 JPEG (the iPhone camera's own shape)
+ // that goes to the camera roll. Nothing covers it, so it only keeps the
+ // square thumbnail of the Photos grid (the middle 1080 px) for the title.
  const TAKE_FORMATS=[
   ['story','Historia','Instagram · 9:16'],
   ['tiktok','TikTok','Vertical · 9:16'],
   ['post','Publicación','Feed de Instagram · 4:5'],
-  ['card','X','Horizontal · 16:9']
+  ['card','X','Horizontal · 16:9'],
+  ['photo','Foto','Se guarda en tu carrete · 3:4']
  ];
- const TAKE_FILE={story:'historia',tiktok:'tiktok',post:'publicacion',card:'x'};
+ const TAKE_FILE={story:'historia',tiktok:'tiktok',post:'publicacion',card:'x',photo:'foto'};
+ // Only the share sheet reaches the iPhone camera roll («Guardar imagen»); a
+ // download there lands in Files. Android shows downloads in its gallery.
+ const photoTarget=()=>{try{const ua=navigator.userAgent||'';if(/iP(?:hone|ad|od)/.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1))return 'ios';if(/Android/i.test(ua))return 'android';}catch{}return 'desktop';};
+ const PHOTO_COPY={
+  ios:{button:'Guardar en Fotos',hint:'Pulsa «Guardar en Fotos» y, en el menú, toca «Guardar imagen»: la foto queda en tu carrete.',done:'Si tocaste «Guardar imagen», la foto ya está en tu carrete.'},
+  android:{button:'Guardar en la galería',hint:'Pulsa «Guardar en la galería»: la foto se descarga y aparece en tu galería, en Descargas.',done:'Foto guardada: la verás en tu galería, en Descargas.'},
+  desktop:{button:'Descargar foto',hint:'Pulsa «Descargar foto»: se guarda como JPG en tu carpeta de descargas.',done:'Foto descargada.'}
+ };
  const TAKE_CARD={
   bg:'#0B2233',ink:'#F3EBDD',muted:'#C2CDD4',gold:'#BE9270',label:'#B79A76',line:'#2E4A5E',
   story:{h:1920,left:96,right:984,top:290,link:1630,ruleGap:62,logoW:220,logoGap:76,foot:64,quote:260,title:128,grow:148,extra:40,author:38,meta:24,linkFont:26,mark:84},
   tiktok:{h:1920,left:180,right:900,top:262,link:1254,ruleGap:56,logoW:190,logoGap:56,foot:54,quote:230,title:112,grow:124,extra:37,author:35,meta:23,linkFont:25,mark:76},
   post:{h:1350,left:96,right:984,top:78,link:1296,ruleGap:50,logoW:168,logoGap:48,foot:46,quote:200,title:102,grow:124,extra:34,author:32,meta:21,linkFont:22,mark:68},
+  photo:{h:1440,left:96,right:984,top:112,link:1364,ruleGap:54,logoW:184,logoGap:56,foot:50,quote:214,title:106,grow:130,extra:35,author:33,meta:22,linkFont:23,mark:72},
   card:{h:608,left:84,right:996,top:38,link:-34,ruleGap:40,logoW:112,logoGap:22,foot:24,quote:140,title:76,extra:27,author:27,meta:16,linkFont:17,mark:56}
  };
  const takeSize=value=>TAKE_FORMATS.some(([size])=>size===value)?value:'card';
@@ -294,7 +307,9 @@
    const b=make('button',null,'cam-take-share-destination');b.type='button';b.dataset.size=value;b.setAttribute('aria-pressed','false');
    b.append(make('span',name),make('small',detail));choices.append(b);return b;
   });
-  const hint=make('p','Pulsa «Compartir imagen» y elige la app en el menú del teléfono. Si no recibe la imagen, descárgala y adjúntala; el enlace se copia aparte.','cam-pick-share-hint');
+  const networkHint='Pulsa «Compartir imagen» y elige la app en el menú del teléfono. Si no recibe la imagen, descárgala y adjúntala; el enlace se copia aparte.';
+  const photoCopy=PHOTO_COPY[photoTarget()];
+  const hint=make('p',networkHint,'cam-pick-share-hint');
   const status=make('p','', 'cam-pick-share-status');status.setAttribute('role','status');status.setAttribute('aria-live','polite');
   const download=make('a','Descargar imagen','cam-pick-share-download');download.hidden=true;
   const linkButton=make('button','Copiar enlace'),textButton=make('button','Copiar texto');linkButton.type=textButton.type='button';
@@ -335,7 +350,37 @@
   if(!dialog.open)dialog.showModal();exit.focus({preventScroll:true});dialog.scrollTop=0;
 
   let file=null,generation=0,imageOnly=false,sharingPending=false;
+  const isPhoto=()=>takeSize(takeOptions.size)==='photo';
   const ready=()=>{shareButton.disabled=!file||sharingPending;};
+  // «Foto» swaps the share button for «Guardar en Fotos» (or its Android and
+  // computer equivalents); the extra PNG download would only add confusion.
+  const syncAction=()=>{
+   const photo=isPhoto();
+   shareButton.textContent=photo?photoCopy.button:imageOnly?'Compartir solo imagen':'Compartir imagen';
+   hint.textContent=photo?photoCopy.hint:networkHint;
+   utilities.classList.toggle('cam-take-share-photo',photo);
+  };
+  function savePhoto(){
+   if(!file||sharingPending)return;
+   const current=generation,target=photoTarget();
+   if(target!=='ios'){
+    // Same bytes as the preview, saved where the gallery (or Downloads) finds them.
+    const link=make('a');link.href=download.href;link.download=download.download;link.hidden=true;document.body.append(link);link.click();link.remove();
+    status.textContent=photoCopy.done;return;
+   }
+   let fileSharing=false;try{fileSharing=typeof navigator.share==='function'&&Boolean(navigator.canShare?.({files:[file]}));}catch{}
+   // In-app browsers without the share sheet: Safari still offers «Guardar en Fotos» on a long press.
+   if(!fileSharing){status.textContent='Mantén pulsada la foto de arriba y elige «Guardar en Fotos».';return;}
+   // Only the file: with text or a link attached, iOS hides «Guardar imagen».
+   const failure=e=>{
+    if(ticket!==request||current!==generation)return;
+    status.textContent=e?.name==='AbortError'?'Puedes guardarla cuando quieras.':'Mantén pulsada la foto de arriba y elige «Guardar en Fotos».';
+   };
+   let sharing;try{sharing=navigator.share({files:[file]});}catch(e){failure(e);return;}
+   sharingPending=true;ready();
+   Promise.resolve(sharing).then(()=>{if(ticket===request&&current===generation)status.textContent=photoCopy.done;})
+   .catch(failure).finally(()=>{sharingPending=false;if(ticket===request)ready();});
+  }
   function nativeShare(){
    if(!file||sharingPending)return;
    let fileSharing=false;try{fileSharing=typeof navigator.share==='function'&&Boolean(navigator.canShare?.({files:[file]}));}catch{}
@@ -359,10 +404,12 @@
     .catch(failure).finally(()=>{sharingPending=false;if(ticket===request)ready();});
    }else status.textContent='Descarga la imagen; tu navegador no permite enviarla directamente. Adjúntala en la aplicación y usa «Copiar enlace» si lo necesitas.';
   }
-  shareButton.onclick=nativeShare;
+  shareButton.onclick=()=>isPhoto()?savePhoto():nativeShare();
   function refresh(){
-   const current=++generation;file=null;ready();download.hidden=true;download.removeAttribute('href');release();
-   download.download='cam-sports-take-'+p.id+'-'+TAKE_FILE[takeSize(takeOptions.size)]+'.png';
+   const current=++generation;file=null;ready();download.hidden=true;download.removeAttribute('href');release();syncAction();
+   // Networks keep the exact PNG; the camera-roll photo is a JPEG like any other photo.
+   const photo=isPhoto(),type=photo?'image/jpeg':'image/png';
+   download.download='cam-sports-take-'+p.id+'-'+TAKE_FILE[takeSize(takeOptions.size)]+(photo?'.jpg':'.png');
    if(selectionNote){selectionNote.hidden=takeOptions.mode==='title';selectionNote.textContent=takeOptions.mode==='summary'?'Resumen extractivo automático: selección de frases del Take, sin texto añadido.':takeFragments(p.body)[takeOptions.fragment]||'';}
    preview.replaceChildren(make('p','Preparando tarjeta…'));preview.setAttribute('aria-busy','true');status.textContent='';
    const draw=()=>{if(ticket!==request||current!==generation||!dialog.open)return;try{
@@ -372,8 +419,8 @@
      if(!blob){preview.replaceChildren(make('p','No se pudo preparar la imagen. Puedes copiar el texto o el enlace.'));preview.setAttribute('aria-busy','false');return;}
      resource=URL.createObjectURL(blob);const img=make('img');img.src=resource;img.alt='Ficha para compartir ('+TAKE_FORMATS.find(([size])=>size===takeSize(takeOptions.size)).slice(1).join(', ')+'): '+p.title+' · '+p.author;img.width=canvas.width;img.height=canvas.height;
      preview.replaceChildren(img);preview.setAttribute('aria-busy','false');
-     file=new File([blob],download.download,{type:'image/png'});download.href=resource;download.hidden=false;ready();
-    },'image/png');
+     file=new File([blob],download.download,{type:blob.type||type});download.href=resource;download.hidden=photo;ready();
+    },type,photo?.95:undefined);
    }catch(error){preview.replaceChildren(make('p',error.message));preview.setAttribute('aria-busy','false');}};
    const artwork=p.kind==='take'?prepareTakeArtwork():null;
    if(artwork)artwork.then(draw,error=>{if(ticket!==request||current!==generation||!dialog.open)return;preview.replaceChildren(make('p',error.message));preview.setAttribute('aria-busy','false');});else draw();

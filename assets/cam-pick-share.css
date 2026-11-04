@@ -43,7 +43,7 @@
 .cam-take-share-dialog .cam-pick-share-preview img{display:block;width:auto;max-width:100%;max-height:min(48dvh,480px);height:auto;object-fit:contain}
 .cam-take-share-dialog .cam-pick-share-content{gap:12px}
 .cam-take-share-dialog button,.cam-take-share-dialog a{border-radius:14px}
-/* Destination decides the format (Historia, TikTok, Publicación, X). */
+/* Destination decides the format (Historia, TikTok, Publicación, X, Foto). */
 .cam-take-share-destinations{display:grid;gap:8px;min-width:0}
 .cam-take-share-destinations-title{font:600 12px/1.3 Inter,system-ui,sans-serif;color:var(--share-muted)}
 .cam-take-share-destination-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
@@ -52,6 +52,8 @@
 .cam-take-share-destination small{font:500 12px/1.3 Inter,system-ui,sans-serif;color:var(--share-muted)}
 .cam-take-share-dialog .cam-take-share-destination[aria-pressed="true"]{border-color:#073b83;background:rgba(7,59,131,.08);box-shadow:inset 0 0 0 1px #073b83}
 .dark .cam-take-share-dialog .cam-take-share-destination[aria-pressed="true"]{border-color:var(--share-action);background:rgba(189,141,107,.14);box-shadow:inset 0 0 0 1px var(--share-action)}
+/* «Foto» is not a network: its own full-width row, under the four networks. */
+.cam-take-share-destination-grid .cam-take-share-destination[data-size="photo"]{grid-column:1/-1}
 .cam-take-share-editor{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 14px;border:1px solid var(--share-line);border-radius:14px;padding:16px;min-width:0}
 .cam-take-share-editor-title{grid-column:1/-1;font:600 18px/1.3 "Playfair Display",Georgia,serif}
 .cam-take-share-field{display:grid;gap:6px;align-content:start;min-width:0;font:600 12px/1.3 Inter,system-ui,sans-serif;color:var(--share-muted)}
@@ -68,6 +70,7 @@
 .cam-take-share-bar{position:sticky;bottom:-20px;z-index:2;padding:12px 0 max(12px,env(safe-area-inset-bottom));margin-top:16px;border-top:1px solid var(--share-line);background:var(--share-bg)}
 .cam-take-share-bar .cam-pick-share-utilities{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .cam-take-share-dialog .cam-take-share-primary{grid-column:1/-1;background:#073b83;border-color:#073b83;color:#fff;min-height:48px}
+.cam-take-share-bar .cam-take-share-photo .cam-pick-share-download+button{grid-column:1/-1}
 .cam-take-share-bar .cam-pick-share-status:not(:empty){padding-top:8px}
 .cam-take-share-dialog [aria-disabled="true"]{opacity:.5;cursor:wait}
 @layer cam-rounded-editorial{

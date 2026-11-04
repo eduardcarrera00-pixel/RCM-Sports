@@ -65,7 +65,28 @@ const server=http.createServer((req,res)=>{
  assert.deepEqual(await page.evaluate(()=>Object.keys(shares[0].data)),['files'],'Instagram and TikTok formats receive only the image');
  await choose('card');await page.getByRole('button',{name:'Compartir imagen',exact:true}).click();
  assert.deepEqual(await page.evaluate(()=>[shares[1].data.text,/\?t=/.test(shares[1].data.url)]),['LAMINE YAMAL GANARÁ EL BALÓN DE ORO EN 2026',true],'X keeps the title and the permalink with the image');
+ // «Foto»: a 3:4 JPEG for the camera roll. On the iPhone only the share sheet
+ // reaches Photos («Guardar imagen»), so the file goes alone and no PNG is offered.
+ names.photo='Foto';safe.photo={left:90,right:990,top:100,bottom:1400};
+ await page.evaluate(()=>draws=[]);await choose('photo');await checkBounds('photo');
+ assert.deepEqual(await pressed(),['photo']);
+ const photo=await png();assert.deepEqual([...photo.subarray(0,3)],[0xff,0xd8,0xff],'The camera-roll photo is a JPEG, not a PNG');
+ assert.equal(await preview.evaluate(img=>img.naturalWidth+'x'+img.naturalHeight),'1080x1440','iPhone photo proportions (3:4)');
+ assert.ok(await page.evaluate(()=>draws.filter(t=>t.font.includes('Playfair')&&t.text!=='“').every(t=>t.y>=180&&t.y<=1260)),'The title stays inside the square thumbnail of the Photos grid');
+ assert.equal(await preview.evaluate(img=>{const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;const x=c.getContext('2d');x.drawImage(img,0,0);const d=x.getImageData(0,0,c.width,c.height).data;for(const [px,py] of [[0,0],[c.width-1,0],[0,c.height-1],[c.width-1,c.height-1],[540,0],[0,720]]){const p=(py*c.width+px)*4;if(Math.abs(d[p]-11)>4||Math.abs(d[p+1]-34)>4||Math.abs(d[p+2]-51)>4)return false;}return true;}),true,'The photo keeps the CAM night blue to the edges');
+ assert.equal(await page.locator('.cam-pick-share-download').isVisible(),false,'Foto offers no PNG download');
+ assert.match(await page.locator('.cam-pick-share-hint').innerText(),/Guardar imagen/,'The hint names the share-sheet action that saves to the camera roll');
+ await page.getByRole('button',{name:'Guardar en Fotos',exact:true}).click();
+ const saved=await page.evaluate(async()=>{const s=shares.at(-1);return {count:shares.length,active:s.active,keys:Object.keys(s.data),type:s.data.files[0].type,name:s.data.files[0].name,bytes:Array.from(new Uint8Array(await s.data.files[0].arrayBuffer()))};});
+ assert.equal(saved.count,3);assert.equal(saved.active,true,'The share sheet opens within the tap');
+ assert.deepEqual(saved.keys,['files'],'Only the file: with text attached iOS hides «Guardar imagen»');
+ assert.equal(saved.type,'image/jpeg');assert.match(saved.name,/-foto\.jpg$/);assert.deepEqual(saved.bytes,Array.from(photo),'The saved photo is exactly the preview');
+ await page.locator('.cam-pick-share-status',{hasText:'carrete'}).waitFor();
+ fs.writeFileSync(path.join(qa,'take-photo.jpg'),photo);
  await choose('story');
+ assert.equal(await page.getByRole('button',{name:'Compartir imagen',exact:true}).isVisible(),true,'Networks keep «Compartir imagen»');
+ assert.equal(await page.locator('.cam-pick-share-download').isVisible(),true,'Networks keep the PNG download');
+ assert.equal((await png()).equals(first),true,'Networks keep the exact same PNG');
  for(const mode of ['title','summary','fragment'])for(const size of ['card','post','tiktok','story']){
   await select(0,mode);await page.evaluate(()=>draws=[]);await choose(size);await checkBounds(size);
   assert.deepEqual(await pressed(),[size]);
@@ -80,7 +101,7 @@ const server=http.createServer((req,res)=>{
  assert.deepEqual(await pressed(),['story'],'Reset returns to the default destination');
  for(const title of ['Un gran Take',('Una opinión larga con todos los detalles del partido y de la temporada. ').repeat(3).slice(0,160),'W'.repeat(160)]){
   await page.getByRole('button',{name:'Cerrar',exact:true}).click();await page.evaluate(title=>{take={...take,title};},title);await open();
-  for(const size of ['card','post','tiktok','story'])for(const mode of ['title','summary','fragment']){await choose(size);await page.evaluate(()=>draws=[]);await select(0,mode);await checkBounds(size);}
+  for(const size of ['card','post','tiktok','story','photo'])for(const mode of ['title','summary','fragment']){await choose(size);await page.evaluate(()=>draws=[]);await select(0,mode);await checkBounds(size);}
  }
  // Mobile layout, both themes, scrolling, and persistent primary controls.
  await page.getByRole('button',{name:'Cerrar',exact:true}).click();await page.evaluate(()=>take={...take,title:'LAMINE YAMAL GANARÁ EL BALÓN DE ORO EN 2026'});await open();
@@ -103,6 +124,19 @@ const server=http.createServer((req,res)=>{
  await page.locator('#open').click();await page.getByText('No se pudo cargar el logo oficial.',{exact:false}).waitFor();
  assert.equal(await page.getByRole('button',{name:'Compartir imagen',exact:true}).isEnabled(),false);
  assert.equal(await page.locator('.cam-pick-share-download').isVisible(),false,'No PNG is offered if the official logo failed');
- assert.deepEqual(errors,[]);await context.close();console.log(`PASS: ${engine===webkit?'WebKit iPhone emulation':'Chromium iPhone emulation'}, real fonts and PNGs, download/preview/native bytes match, 3 modes × 4 destinations (Instagram story, TikTok, 4:5 post, X), opaque blue edges and official logo, long titles, original attribution, per-network safe areas, 320–1366px/day/night, no empty X popup. QA: ${qa}`);
+ assert.deepEqual(errors,[]);await context.close();
+ // Android: the photo is downloaded, which is where its gallery shows it.
+ const androidContext=await browser.newContext({...devices['Pixel 7'],timezoneId:'America/Toronto',acceptDownloads:true}),android=await androidContext.newPage();
+ const androidErrors=[];android.on('pageerror',e=>androidErrors.push(e.message));
+ await android.route('**/*',r=>/^(?:blob:)?http:\/\/127\.0\.0\.1(?::|\/)/.test(r.request().url())?r.continue():r.abort());
+ await android.goto('http://127.0.0.1:'+server.address().port,{waitUntil:'load'});
+ await android.evaluate(()=>{window.shares=[];Object.defineProperty(navigator,'share',{configurable:true,value:data=>{shares.push(data);return Promise.resolve();}});document.getElementById('open').onclick=()=>CamPickShare.open({id:'00000000-0000-0000-0000-000000000972',author_id:'00000000-0000-0000-0000-000000000951',author:'Lector',title:'Un Take real',body:'Contenido original.',created_at:'2026-10-24T12:00:00Z'},{kind:'take'});});
+ await android.locator('#open').click();await android.locator('.cam-take-share-destination[data-size="photo"]').click();
+ await android.waitForFunction(()=>document.querySelector('.cam-pick-share-preview img')?.alt.includes('(Foto,'));
+ const androidSave=android.waitForEvent('download');await android.getByRole('button',{name:'Guardar en la galería',exact:true}).click();const androidPhoto=await androidSave;
+ assert.match(androidPhoto.suggestedFilename(),/-foto\.jpg$/);assert.equal(await android.evaluate(()=>shares.length),0,'Android saves without opening the share sheet');
+ await android.locator('.cam-pick-share-status',{hasText:'galería'}).waitFor();
+ assert.deepEqual(androidErrors,[]);await androidContext.close();
+ console.log(`PASS: ${engine===webkit?'WebKit iPhone emulation':'Chromium iPhone emulation'}, real fonts and PNGs, download/preview/native bytes match, 3 modes × 4 destinations (Instagram story, TikTok, 4:5 post, X) + camera-roll JPEG (iPhone share sheet, Android download), opaque blue edges and official logo, long titles, original attribution, per-network safe areas, 320–1366px/day/night, no empty X popup. QA: ${qa}`);
  }finally{await browser.close();server.close();}
 })().catch(e=>{console.error(e);server.close();process.exitCode=1;});
