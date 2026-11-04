@@ -1,4 +1,4 @@
-/* CAM SPORTS · Private in-app alerts, including a one-time new-member welcome. */
+/* CAM SPORTS · Private in-app alerts for community activity. */
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
@@ -28,7 +28,6 @@
   }
 
   function label(notification) {
-    if (notification.event_key === 'welcome') return '¡Bienvenido a CAM SPORTS!';
     const who = '@' + (notification.actor_name || 'Usuario');
     const entry = {
       take_reply: 'respondió en tu Take',
@@ -58,7 +57,8 @@
           : 'Notificaciones, ' + total + ' sin leer');
     const panel = $('aeNotificationsList');
     if (!panel || !dialog()?.open) return;
-    // Preserve the two readers' scroll positions when Realtime refreshes alerts.
+    // Preserve list positions when Realtime refreshes alerts.
+    const panelScrollTop = panel.scrollTop;
     const scrollPositions = new Map(
       [...panel.querySelectorAll('[data-ae-notification-group]')]
         .map(list=>[list.dataset.aeNotificationGroup,list.scrollTop])
@@ -66,13 +66,6 @@
     panel.replaceChildren();
     const reactionTypes = new Set(['take_vote','pick_vote','comment_vote','article_like']);
     const groups = [
-      {
-        id:'aeNotificationsWelcomeTitle',
-        title:'Bienvenida',
-        subtitle:'Tu inicio en CAM SPORTS',
-        items:alerts.filter(item=>item.event_key==='welcome'),
-        empty:'Tu comunidad te espera.'
-      },
       {
         id:'aeNotificationsReactionsTitle',
         title:'Reacciones',
@@ -84,12 +77,10 @@
         id:'aeNotificationsCommentsTitle',
         title:'Comentarios',
         subtitle:'Respuestas a tus publicaciones',
-        items:alerts.filter(item=>!reactionTypes.has(item.event_key) && item.event_key!=='welcome'),
+        items:alerts.filter(item=>!reactionTypes.has(item.event_key)),
         empty:'Todavía no has recibido comentarios.'
       }
     ];
-    // Only new members see a welcome section; keep the usual inbox uncluttered.
-    if (!groups[0].items.length) groups.shift();
     for (const group of groups) {
       const section = create('section',null,'ae-notifications-group');
       section.setAttribute('aria-labelledby',group.id);
@@ -116,8 +107,7 @@
         row.setAttribute('role','listitem');
         const action = create('button',null,'ae-notification-entry'+(item.read_at?'':' is-unread'));
         action.type = 'button';
-        const icon = create('span',item.event_key === 'welcome' ? '✦' :
-          item.event_key.includes('vote') ? (item.vote_value === -1 ? '▼' : '▲') :
+        const icon = create('span',item.event_key.includes('vote') ? (item.vote_value === -1 ? '▼' : '▲') :
           item.event_key === 'article_like' ? '♥' : '↩','ae-notification-event-icon');
         icon.setAttribute('aria-hidden','true');
         const content = create('span',null,'ae-notification-text');
@@ -134,6 +124,7 @@
       panel.append(section);
       list.scrollTop = scrollPositions.get(group.id) || 0;
     }
+    panel.scrollTop = panelScrollTop;
     const all = $('aeNotificationsReadAll');
     all.disabled = total === 0;
     all.hidden = total === 0;
@@ -147,9 +138,9 @@
       const availableAt = new Date().toISOString();
       const [recent,count] = await Promise.all([
         db.from('ae_notifications').select('id,recipient_id,event_key,target_kind,target_id,source_id,actor_name,context_title,vote_value,created_at,read_at')
-          .eq('recipient_id',uid).lte('created_at',availableAt).order('created_at',{ascending:false}).limit(70),
+          .eq('recipient_id',uid).neq('event_key','welcome').lte('created_at',availableAt).order('created_at',{ascending:false}).limit(70),
         db.from('ae_notifications').select('id',{count:'exact',head:true})
-          .eq('recipient_id',uid).is('read_at',null).lte('created_at',availableAt)
+          .eq('recipient_id',uid).neq('event_key','welcome').is('read_at',null).lte('created_at',availableAt)
       ]);
       if (seq !== loadToken || userId !== uid) return;
       if (recent.error || count.error) throw recent.error || count.error;
@@ -171,10 +162,6 @@
   }
 
   async function openTarget(item) {
-    if (item.event_key === 'welcome') {
-      window.camWelcome?.showFromInbox();
-      return;
-    }
     if (item.target_kind === 'article') {
       const url = new URL(location.href);
       url.searchParams.set('article',item.target_id);
@@ -304,7 +291,6 @@
       dialog()?.close();
       window.camWelcome?.showPreview();
     });
-    window.addEventListener('cam-welcome-claimed',()=>void refresh());
     dialog()?.addEventListener('close',()=>{
       $('aeNotificationsButton').setAttribute('aria-expanded','false');
       $('aeNotificationsButton').focus({preventScroll:true});
@@ -315,8 +301,10 @@
       const button=$('aeNotificationsReadAll');
       button.disabled=true;
       try {
+        const readAt = new Date().toISOString();
         const response=await db.from('ae_notifications')
-          .update({read_at:new Date().toISOString()}).eq('recipient_id',userId).is('read_at',null);
+          .update({read_at:readAt})
+          .eq('recipient_id',userId).neq('event_key','welcome').is('read_at',null).lte('created_at',readAt);
         if(response.error) throw response.error;
         await refresh();
       } catch (_) {

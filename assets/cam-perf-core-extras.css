@@ -835,96 +835,6 @@ html body #aeNotificationsDialog .ae-notifications-group .ae-notification-text>*
   min-width:0!important;
   overflow-wrap:anywhere!important;
 }
-@media(max-width:760px){
-  html body #aeNotificationsDialog.ae-notifications-dialog{
-    width:calc(100vw - 16px)!important;
-    max-width:calc(100vw - 16px)!important;
-    max-height:90dvh!important;
-  }
-  html body #aeNotificationsDialog .ae-notifications-groups{
-    grid-template-columns:repeat(2,minmax(0,1fr))!important;
-    gap:8px!important;
-    padding:9px 8px 12px!important;
-  }
-  html body #aeNotificationsDialog .ae-notifications-group-heading{
-    flex-direction:column!important;
-    align-items:flex-start!important;
-    justify-content:flex-start!important;
-    gap:7px!important;
-    min-height:91px!important;
-    padding:11px 9px!important;
-  }
-  html body #aeNotificationsDialog .ae-notifications-group-heading h3{
-    font-size:clamp(17px,4.8vw,21px)!important;
-    overflow-wrap:anywhere!important;
-  }
-  html body #aeNotificationsDialog .ae-notifications-group-heading p{
-    font-size:9px!important;
-    overflow-wrap:anywhere!important;
-  }
-  html body #aeNotificationsDialog .ae-notifications-group-pending{
-    font-size:9px!important;
-  }
-  html body #aeNotificationsDialog .ae-notifications-group .ae-notifications-list{
-    height:clamp(155px,46dvh,360px)!important;
-    max-height:clamp(155px,46dvh,360px)!important;
-  }
-  /* Narrow cards: indicator above text, no squeezed central column. */
-  html body #aeNotificationsDialog .ae-notifications-group .ae-notification-entry{
-    display:flex!important;
-    position:relative!important;
-    flex-direction:column!important;
-    align-items:flex-start!important;
-    justify-content:flex-start!important;
-    gap:6px!important;
-    min-height:94px!important;
-    padding:10px 9px!important;
-  }
-  html body #aeNotificationsDialog .ae-notifications-group .ae-notification-event-icon{
-    flex:0 0 auto!important;
-    width:22px!important;
-    height:22px!important;
-    font-size:12px!important;
-  }
-  html body #aeNotificationsDialog .ae-notifications-group .ae-notification-text{
-    width:100%!important;
-    min-width:0!important;
-  }
-  html body #aeNotificationsDialog .ae-notifications-group .ae-notification-text strong{
-    font-size:11px!important;
-    line-height:1.35!important;
-    white-space:normal!important;
-  }
-  html body #aeNotificationsDialog .ae-notifications-group .ae-notification-text small,
-  html body #aeNotificationsDialog .ae-notifications-group .ae-notification-text time{
-    font-size:9.5px!important;
-    line-height:1.35!important;
-    white-space:normal!important;
-  }
-  html body #aeNotificationsDialog .ae-notifications-group .ae-notification-dot{
-    position:absolute!important;
-    top:16px!important;
-    right:10px!important;
-  }
-  html body #aeNotificationsDialog .ae-notifications-group .ae-notifications-empty{
-    font-size:11px!important;
-    line-height:1.5!important;
-    padding:17px 9px!important;
-  }
-}
-@media(max-width:360px){
-  html body #aeNotificationsDialog .ae-notifications-groups{
-    gap:6px!important;
-    padding:8px 6px 11px!important;
-  }
-  html body #aeNotificationsDialog .ae-notifications-group-heading{
-    padding:10px 7px!important;
-  }
-  html body #aeNotificationsDialog .ae-notifications-group-heading h3{
-    font-size:17px!important;
-  }
-}
-
 /* 2026-10-17 · Avisos: bandeja editorial compacta, cerca del borde superior.
    Conserva dos listas independientes y los estados de lectura reales. */
 html body #aeNotificationsDialog.ae-notifications-dialog{
@@ -960,13 +870,17 @@ html body #aeNotificationsDialog .ae-notifications-heading h2{
   font-size:25px!important;
 }
 html body #aeNotificationsDialog #aeNotificationsClose{
-  width:40px!important;
-  height:40px!important;
+  width:44px!important;
+  height:44px!important;
+  box-shadow:none!important;
   font-size:24px!important;
 }
 html body #aeNotificationsDialog .ae-notifications-groups{
   grid-template-columns:repeat(2,minmax(0,1fr))!important;
-  align-items:start!important;
+  align-items:stretch!important;
+  align-content:start!important;
+  min-height:0!important;
+  overflow-y:auto!important;
   gap:10px!important;
   padding:11px 12px 9px!important;
 }
@@ -988,14 +902,13 @@ html body #aeNotificationsDialog .ae-notifications-group-heading h3{
   letter-spacing:-.015em!important;
 }
 html body #aeNotificationsDialog .ae-notifications-group-heading p{
-  font-size:10px!important;
+  font-size:11px!important;
   line-height:1.35!important;
 }
 html body #aeNotificationsDialog .ae-notifications-group .ae-notifications-list{
   flex:0 1 auto!important;
-  height:clamp(140px,32dvh,282px)!important;
-  max-height:clamp(140px,32dvh,282px)!important;
-  scrollbar-gutter:stable;
+  height:auto!important;
+  max-height:min(40dvh,320px)!important;
 }
 html body #aeNotificationsDialog .ae-notifications-group .ae-notification-entry{
   position:relative!important;
@@ -1056,8 +969,8 @@ html body #aeNotificationsDialog .ae-notifications-group .ae-notification-entry:
   background:rgba(202,170,132,.19)!important;
 }
 html body #aeNotificationsDialog .ae-notifications-group .ae-notifications-empty{
-  padding:18px 12px!important;
-  font-size:11px!important;
+  padding:14px 12px!important;
+  font:500 13px/1.5 Inter,system-ui,sans-serif!important;
 }
 html body #aeNotificationsDialog .ae-notifications-footer{
   display:flex!important;
@@ -1069,7 +982,10 @@ html body #aeNotificationsDialog .ae-notifications-footer{
   border-top:1px solid rgba(195,163,132,.18)!important;
   background:linear-gradient(180deg,rgba(17,46,60,.30),rgba(17,40,54,.80))!important;
 }
-html body #aeNotificationsDialog #aeNotificationsStatus:empty{display:none!important;}
+html body #aeNotificationsDialog #aeNotificationsStatus:empty,
+html body #aeNotificationsDialog .ae-notifications-footer:not(:has(#aeNotificationsStatus:not(:empty), button:not([hidden]))){
+  display:none!important;
+}
 html body #aeNotificationsDialog #aeNotificationsReadAll{
   display:inline-flex!important;
   align-items:center!important;
@@ -1156,9 +1072,9 @@ html:not(.dark) body #aeNotificationsDialog #aeNotificationsReadAll:hover{
     font-size:23px!important;
   }
   html body #aeNotificationsDialog .ae-notifications-groups{
-    grid-template-columns:repeat(2,minmax(0,1fr))!important;
-    gap:8px!important;
-    padding:9px 9px 7px!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:10px!important;
+    padding:10px!important;
   }
   html body #aeNotificationsDialog .ae-notifications-group-heading{
     flex-direction:column!important;
@@ -1170,48 +1086,33 @@ html:not(.dark) body #aeNotificationsDialog #aeNotificationsReadAll:hover{
   html body #aeNotificationsDialog .ae-notifications-group-heading h3{
     font-size:clamp(17px,4.5vw,20px)!important;
   }
-  html body #aeNotificationsDialog .ae-notifications-group-heading p{
-    font-size:9px!important;
-  }
   html body #aeNotificationsDialog .ae-notifications-group .ae-notifications-list{
-    height:clamp(144px,32dvh,252px)!important;
-    max-height:clamp(144px,32dvh,252px)!important;
+    max-height:clamp(110px,26dvh,220px)!important;
   }
   html body #aeNotificationsDialog .ae-notifications-group .ae-notification-entry{
-    display:block!important;
-    position:relative!important;
-    min-height:0!important;
-    padding:10px 10px 10px 12px!important;
-  }
-  html body #aeNotificationsDialog .ae-notifications-group .ae-notification-event-icon{
-    display:none!important;
-  }
-  html body #aeNotificationsDialog .ae-notifications-group .ae-notification-text{
-    display:flex!important;
-    flex-direction:column!important;
-    width:100%!important;
-    gap:4px!important;
-    padding-right:9px!important;
+    min-height:64px!important;
+    padding:10px 12px!important;
   }
   html body #aeNotificationsDialog .ae-notifications-group .ae-notification-text strong{
-    font-size:11px!important;
-    line-height:1.32!important;
+    font-size:13px!important;
   }
   html body #aeNotificationsDialog .ae-notifications-group .ae-notification-text small,
   html body #aeNotificationsDialog .ae-notifications-group .ae-notification-text time{
-    font-size:9.5px!important;
-  }
-  html body #aeNotificationsDialog .ae-notifications-group .ae-notification-dot{
-    top:12px!important;
-    right:8px!important;
+    font-size:11px!important;
   }
   html body #aeNotificationsDialog .ae-notifications-footer{
     padding:9px 10px 10px!important;
   }
   html body #aeNotificationsDialog #aeNotificationsReadAll{
-    min-height:40px!important;
+    min-height:44px!important;
     padding:8px 10px!important;
     font-size:10px!important;
+  }
+}
+@layer cam-rounded-editorial {
+  html body #aeNotificationsDialog .ae-notification-entry,
+  html body #aeNotificationsDialog .ae-notifications-group-heading{
+    border-radius:0!important;
   }
 }
 @media(prefers-reduced-motion:reduce){
