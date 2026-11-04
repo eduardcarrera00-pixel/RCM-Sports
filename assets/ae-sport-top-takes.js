@@ -135,9 +135,7 @@
      arrow.setAttribute('aria-hidden','true');
      const value=el('strong',String(Math.abs(net)),'cam-op-score-value');
      value.setAttribute('aria-hidden','true');
-     const unit=el('small','netos','cam-op-score-unit');
-     unit.setAttribute('aria-hidden','true');
-     score.append(arrow,value,unit);
+     score.append(arrow,value);
      li.append(rank,main,score);
      li.addEventListener('click',event=>{
        if(!event.target.closest('button'))window.aeTakeReplies?.open(t);

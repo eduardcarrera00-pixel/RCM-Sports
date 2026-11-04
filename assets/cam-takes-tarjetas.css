@@ -744,17 +744,16 @@
   }
   /* Balance de votos: flecha + número, con el color como ayuda (no como único aviso). */
   html body #mainContent #aeSportTakeLeaders.cam-op[data-sport]:not(#cam-op) .cam-op-score {
-    display:grid!important;
-    grid-template-columns:auto auto!important;
-    grid-template-areas:"arrow value" "unit unit"!important;
+    display:inline-flex!important;
     align-items:center!important;
-    justify-items:center!important;
-    column-gap:4px!important;
+    justify-content:center!important;
+    gap:5px!important;
     min-width:52px!important;
+    height:34px!important;
     margin:0!important;
-    padding:7px 9px 6px!important;
+    padding:0 10px!important;
     box-sizing:border-box!important;
-    border-radius:12px!important;
+    border-radius:999px!important;
     background:var(--op-up-soft)!important;
     color:var(--op-up)!important;
   }
@@ -762,16 +761,8 @@
     background:var(--op-down-soft)!important;
     color:var(--op-down)!important;
   }
-  html body #mainContent #aeSportTakeLeaders.cam-op[data-sport]:not(#cam-op) .cam-op-score-arrow { grid-area:arrow!important; font:600 10px/1 Inter,system-ui,sans-serif!important; }
-  html body #mainContent #aeSportTakeLeaders.cam-op[data-sport]:not(#cam-op) .cam-op-score-value { grid-area:value!important; font:700 17px/1 Inter,system-ui,sans-serif!important; font-variant-numeric:tabular-nums!important; color:inherit!important; }
-  html body #mainContent #aeSportTakeLeaders.cam-op[data-sport]:not(#cam-op) .cam-op-score-unit {
-    grid-area:unit!important;
-    margin:3px 0 0!important;
-    font:600 9.5px/1 Inter,system-ui,sans-serif!important;
-    letter-spacing:.06em!important;
-    text-transform:uppercase!important;
-    opacity:.85!important;
-  }
+  html body #mainContent #aeSportTakeLeaders.cam-op[data-sport]:not(#cam-op) .cam-op-score-arrow { font:600 10px/1 Inter,system-ui,sans-serif!important; }
+  html body #mainContent #aeSportTakeLeaders.cam-op[data-sport]:not(#cam-op) .cam-op-score-value { font:700 16px/1 Inter,system-ui,sans-serif!important; font-variant-numeric:tabular-nums!important; color:inherit!important; }
   html body #mainContent #aeSportTakeLeaders.cam-op[data-sport]:not(#cam-op) ol.ae-sport-takes-list > .cam-op-empty {
     display:grid!important;
     place-items:center!important;

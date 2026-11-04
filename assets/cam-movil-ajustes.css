@@ -11,6 +11,7 @@
    9. Opiniones apoyadas / hateadas de Fútbol: el voto se lee una sola vez.
    10. Prepara tu Pick: título sin marco, «Cómo funcionan los Picks» plegable y
        separadores rectos.
+   11. Noticias de NFL a la misma distancia que las de Fútbol (4 nov).
 
    Las esquinas redondeadas viven en capas con !important (cam-rounded-editorial y
    cam-banners), que ganan a cualquier regla fuera de capa; por eso los ajustes de
@@ -693,5 +694,22 @@ html body #cpComposePanel #cpForm.cp-capture-first:not([data-imported="true"]) {
   html body #cpComposePanel #cpForm > .cp-compose-footer {
     border-top-left-radius:0!important;
     border-top-right-radius:0!important;
+  }
+}
+
+/* ---------- 11 · Noticias de NFL a la misma distancia que Fútbol (4 nov) ---------- */
+/* En el teléfono, Fútbol deja 6 px entre Power Rankings, «Noticias de Fútbol» y la
+   primera noticia (el hueco de #aeFootballMobileStage). NFL dejaba 24 px arriba (el
+   margen general de los bloques de #mainContent) y 0 px debajo del banner, así que
+   las noticias se veían apartadas de la clasificación y pegadas a la tarjeta. */
+@layer cam-banners {
+  @media(max-width:760px){
+    html body.ae-is-nfl #mainContent > #nflRankings.rcm-panel:not(.hidden):not(#cam-noticias) {
+      margin-bottom:6px!important;
+    }
+    html body.ae-is-nfl #mainContent #aeNewsHeadingRow:not(#cam-noticias) {
+      margin-top:0!important;
+      margin-bottom:6px!important;
+    }
   }
 }
