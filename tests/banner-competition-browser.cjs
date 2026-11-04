@@ -48,11 +48,20 @@ const screenshots=process.env.CAM_QA_SCREENSHOTS;
           const titles=[...document.querySelectorAll('[data-cam-banner] > h2,[data-cam-banner] > h3,[data-cam-banner] .ae-weekly-heading-inline h3,[data-cam-banner] .ae-rank-title-wrap h3,[data-cam-banner] > .ae-picks-nudge,#aeTakesFeedHeading')];
           const ref=document.querySelector('#aeHomeTakesPopular .ae-vote-column-heading');
           const rt=ref.querySelector('h2,h3');
-          const signature=node=>{const s=getComputedStyle(node);return [s.fontFamily,s.fontSize,s.fontWeight,s.lineHeight,s.letterSpacing,s.textAlign];};
-          return {reference:signature(rt),titles:titles.filter(x=>x.getClientRects().length).map(x=>({text:x.textContent,style:signature(x)})),art:[...document.querySelectorAll('[data-cam-banner-key]')].filter(x=>x.getClientRects().length).map(x=>({key:x.dataset.camBannerKey,size:[getComputedStyle(x,'::after').width,getComputedStyle(x,'::after').height]}))};
+          const signature=node=>{const s=getComputedStyle(node);return [s.fontFamily,s.fontSize,s.fontWeight,s.lineHeight,s.letterSpacing];};
+          const chef=document.querySelector('[data-cam-banner].ae-picks-heading-cta-row');
+          const chefTitle=chef?.querySelector('.ae-picks-nudge');
+          const centerX=node=>{const {left,width}=node.getBoundingClientRect();return left+width/2;};
+          const chefOffset=chefTitle?.getClientRects().length?Math.abs(centerX(chefTitle)-centerX(chef.querySelector('#cpPublishCta'))):null;
+          return {reference:signature(rt),titles:titles.filter(x=>x.getClientRects().length).map(x=>({text:x.textContent,style:signature(x),align:getComputedStyle(x).textAlign,chef:x===chefTitle})),chefOffset,art:[...document.querySelectorAll('[data-cam-banner-key]')].filter(x=>x.getClientRects().length).map(x=>({key:x.dataset.camBannerKey,size:[getComputedStyle(x,'::after').width,getComputedStyle(x,'::after').height]}))};
         });
         reference??=sizes.reference;
-        for(const title of sizes.titles)assert.deepEqual(title.style,reference,width+'/'+dark+'/'+sport+': '+title.text);
+        for(const title of sizes.titles){
+          const label=width+'/'+dark+'/'+sport+': '+title.text;
+          assert.deepEqual(title.style,reference,label);
+          assert.equal(title.align,title.chef?'center':'left',label);
+        }
+        if(sizes.chefOffset!==null)assert.ok(sizes.chefOffset<1,'Chef title and CTA must share a center');
         for(const art of sizes.art)assert.deepEqual(art.size,[width<=760?'64px':'80px',width<=760?'44px':'56px'],art.key);
       }
       const power=await page.evaluate(()=>['rankingTitle','championsTitle'].map(id=>{

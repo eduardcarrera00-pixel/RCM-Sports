@@ -259,6 +259,12 @@
     max-height:none!important;
     overflow:visible!important;
   }
+  [data-cam-banner].ae-picks-heading-cta-row > .ae-picks-nudge {
+    text-align:center!important;
+  }
+  [data-cam-banner].ae-picks-heading-cta-row > button {
+    justify-self:center!important;
+  }
   [data-cam-banner].ae-picks-heading-cta-row .ae-picks-nudge::before,
   [data-cam-banner].ae-picks-heading-cta-row .ae-picks-nudge::after {
     content:none!important;
