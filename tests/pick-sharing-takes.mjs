@@ -6,7 +6,7 @@ const w=new Window({url:'https://example.test/'}),d=w.document,frames=[],callbac
 let frame,shared=[],sharingError=null,canShare=()=>true;
 w.HTMLCanvasElement.prototype.getContext=function(){
  frame={canvas:this,text:[],logos:[]};frames.push(frame);
- return {font:'',drawImage(image,x,y,width,height){frame.logos.push({src:image.src,x,y,width,height});},fillRect(){},beginPath(){},moveTo(){},lineTo(){},stroke(){},
+ return {font:'',scale(){},translate(){},drawImage(image,x,y,width,height){frame.logos.push({src:image.src,x,y,width,height});},fillRect(){},beginPath(){},moveTo(){},lineTo(){},stroke(){},
   fillText(text,x,y){frame.text.push({text,x,y,font:this.font});},
   measureText(text){return {width:Array.from(String(text)).length*(Number.parseFloat(this.font.match(/[\d.]+px/)?.[0])||30)*.6};}};
 };
@@ -29,7 +29,7 @@ const destination=async size=>{dialog().querySelector(`.cam-take-share-destinati
 const pressed=()=>[...dialog().querySelectorAll('.cam-take-share-destination')].filter(b=>b.getAttribute('aria-pressed')==='true').map(b=>b.dataset.size);
 
 open();assert.equal(dialog().querySelector('.cam-take-share-primary').disabled,true);await tick();finish();
-assert.equal(dialog().querySelector('img').width,1080);assert.equal(dialog().querySelector('img').height,760);assert.deepEqual(pressed(),['card']);
+assert.equal(dialog().querySelector('img').width,1200);assert.equal(dialog().querySelector('img').height,675);assert.deepEqual(pressed(),['card']);
 assert.ok(frame.logos[0].src.includes('assets/cam-sports-logo-completo.webp'),'Use the same real image as the header');
 assert.ok(!frame.text.some(t=>t.text==='CAM'),'Never recreate the logo with typed letters');
 assert.ok(frame.text.map(t=>t.text).join(' ').includes(take.title),'The original title keeps its spelling and case');
@@ -71,7 +71,7 @@ sharingError=Object.assign(Error('cancel'),{name:'AbortError'});click('Compartir
 // Delayed encodes and fonts cannot replace a newer selection or a closed dialog.
 await destination('story');const stale=callbacks.at(-1);await destination('post');finish();stale(new w.Blob(['stale']));assert.equal(dialog().querySelector('img').height,1350);
 await destination('story');const closed=callbacks.at(-1);click('Cerrar');closed(new w.Blob(['closed']));assert.equal(dialog().querySelector('img'),null);
-for(const sport of ['nfl','football','opinions']){w.CamPickShare.open({...take,sport},{kind:'take'});await tick();finish();assert.equal(dialog().querySelector('img').height,760);click('Cerrar');}
+for(const sport of ['nfl','football','opinions']){w.CamPickShare.open({...take,sport},{kind:'take'});await tick();finish();assert.equal(dialog().querySelector('img').height,675);click('Cerrar');}
 w.CamPickShare.open({...take,created_at:null,body:''},{kind:'take'});await tick();finish();assert.ok(!frame.text.some(t=>/\d{2}\/\d{2}\/\d{4}/.test(t.text)),'A missing date is never invented');
 assert.equal(dialog().querySelector('option[value=summary]').disabled,true);
 assert.equal(JSON.stringify(take),original);

@@ -13,7 +13,10 @@ const index = readFileSync(resolve(root, 'index.html'), 'utf8');
 const visibility = readFileSync(resolve(root, 'assets/ae-category-visibility.js'), 'utf8');
 
 assert.match(index, /cam-mobile-bottom-nav\.js/);
-assert.match(index, /cam-mobile-bottom-nav\.css/);
+assert.match(index, /cam-perf-controls\.css/);
+const controlPack = JSON.parse(readFileSync(resolve(root, 'assets/performance-css-packs.json'), 'utf8')).groups
+  .find(group => group.output === 'assets/cam-perf-controls.css');
+assert(controlPack.sources.includes('assets/cam-mobile-bottom-nav.css'), 'The real dock CSS must remain in the loaded controls bundle');
 assert.match(css, /@media \(max-width: 760px\)/);
 assert.match(css, /position: fixed !important/);
 assert.match(css, /env\(safe-area-inset-bottom/);

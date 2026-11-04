@@ -1,30 +1,18 @@
 {
-  "comment": "Bundled in the exact original stylesheet order and at the same positions within index.html. Do not edit generated packs directly.",
+  "comment": "Delivery bundles retain the exact source order and the existing inline-style and script boundaries in index.html. Edit component sources, then run npm run build:styles. The former core-extras sources now follow the editorial sources in style-sources.json.",
   "groups": [
-    {
-      "output": "assets/cam-perf-core-extras.css",
-      "sources": [
-        "assets/cam-season-guide.css",
-        "assets/cam-pick-points-rules.css",
-        "assets/cam-analytics.css",
-        "assets/ae-classical-auth-buttons.css",
-        "assets/ae-reference-community-design.css",
-        "assets/ae-mobile-header-ranking-polish.css",
-        "assets/ae-desktop-header-layout.css",
-        "assets/ae-mobile-compact-home.css",
-        "assets/ae-home-weekly-layout-top4.css",
-        "assets/ae-nfl-mobile-reference.css",
-        "assets/ae-nfl-mobile-telephoto.css"
-      ]
-    },
     {
       "output": "assets/cam-perf-sport-banners.css",
       "sources": [
+        "assets/ae-football-mobile-redesign.css",
+        "assets/ae-take-discussion-reference.css",
         "assets/ae-power-rankings-scenic.css",
         "assets/ae-football-takes-scenic.css",
         "assets/ae-football-news-debate.css",
         "assets/cam-football-opinion-heading-labels.css",
-        "assets/ae-football-news-editorial.css"
+        "assets/ae-football-news-editorial.css",
+        "assets/ae-admin-header-compact.css",
+        "assets/ae-home-community-spotlight.css"
       ]
     },
     {
@@ -84,6 +72,42 @@
         "assets/cam-picks-history-grid.css",
         "assets/cam-home-power-rankings-75.css",
         "assets/cam-football-last-takes-feed.css"
+      ]
+    },
+    {
+      "output": "assets/cam-perf-news.css",
+      "sources": [
+        "assets/ae-sport-tables-news-20261017.css",
+        "assets/ae-article-actions-conversation.css"
+      ]
+    },
+    {
+      "output": "assets/cam-perf-controls.css",
+      "sources": [
+        "assets/cam-pick-editor-night.css",
+        "assets/cam-global-edit.css",
+        "assets/cam-mobile-bottom-nav.css",
+        "assets/cam-take-cta.css"
+      ]
+    },
+    {
+      "output": "assets/cam-perf-football-headings.css",
+      "sources": [
+        "assets/cam-nfl-opinions-header-only.css",
+        "assets/cam-football-ranking-banners.css"
+      ]
+    },
+    {
+      "output": "assets/cam-perf-app-panels.css",
+      "sources": [
+        "assets/cam-movil-ajustes.css",
+        "assets/cam-take-conversacion.css",
+        "assets/cam-parties.css",
+        "assets/cam-profile-app.css",
+        "assets/cam-profile-resumen.css",
+        "assets/cam-home-jornada.css",
+        "assets/cam-takes-tarjetas.css",
+        "assets/cam-nfl-semana.css"
       ]
     }
   ]

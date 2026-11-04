@@ -265,3 +265,21 @@ independientemente cuando llegan, sin esperar el nombre público ni cambiar
 la pestaña elegida. Cerrar sesión invalida las respuestas pendientes.
 Pruebas: `node tests/profile-loading.mjs`, `node tests/home-mobile-order.mjs`
 y `node tests/mobile-bottom-nav.mjs`.
+
+## Consolidación de estilos · 4 nov 2026
+
+La entrega mantiene el orden original de reglas y los límites entre estilos
+inline y scripts, con 11 hojas CSS propias en lugar de 28. Los componentes
+editables siguen en sus archivos de origen; los dos manifiestos indican dónde
+compila cada uno. Regenerar con `npm run build:styles` y comprobar con
+`npm run test:performance`. El compresor conserva colores, valores y prioridades.
+Se retiraron cinco hojas antiguas de cabecera sin referencias activas.
+
+La comparación previa a la publicación conserva 31 propiedades CSS de todos los elementos de la interfaz
+entre el CSS original y consolidado, en las cinco secciones, día/noche y anchos
+360, 390, 768 y 1366 px. El único cambio de geometría intencional es el aviso
+compacto del Pick del editor cuando está vacío o falla su carga; la ficha vigente
+mantiene su diseño. Los mensajes distinguen Picks activos de su historial.
+Las fichas de Takes para X se exportan a 1200 × 675 (16:9) en todos los modos de
+texto, centrando la composición original sin deformarla. Historia, TikTok,
+publicación y Foto conservan sus dimensiones y comportamiento.

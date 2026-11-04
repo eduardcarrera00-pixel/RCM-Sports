@@ -67,6 +67,8 @@ w.eval(fs.readFileSync('assets/community-picks.js','utf8'));
 d.dispatchEvent(new w.Event('DOMContentLoaded'));
 await settle();
 assert.match(d.getElementById('cpStatus').textContent,/Todavía/);
+assert.match(d.getElementById('cpStatus').textContent,/Picks activos/);
+assert.doesNotMatch(d.getElementById('cpStatus').textContent,/Comparte el primero/);
 const form=d.getElementById('cpForm');
 const field=name=>form.elements.namedItem(name);
 const fill=(title,eventName)=>{

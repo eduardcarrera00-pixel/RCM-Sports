@@ -383,7 +383,7 @@ async function load(){
    sizeFeedWindow();
    // Voting refreshes the feed; don't throw readers back to the top.
    feedEl.scrollTop=previousScroll;
-   $('cpStatus').textContent=feed.data?.length?'':'Todavía no hay Picks. Comparte el primero.';
+   $('cpStatus').textContent=feed.data?.length?'':'Todavía no hay Picks activos. Consulta el historial o comparte el tuyo.';
    loaded=true;
    await Promise.all([loadRanking(),loadModeration(),loadChefLists(),loadSettlement(),loadSettleHistory()]);
  }catch(e){if(seq!==request)return;$('cpFeed').replaceChildren();sizeFeedWindow();$('cpStatus').textContent='No pudimos cargar los Picks. '+message(e);}

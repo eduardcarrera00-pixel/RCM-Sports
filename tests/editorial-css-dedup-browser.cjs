@@ -1,126 +1,69 @@
-/* CAM SPORTS CSS cascade equivalence: original vs deduplicated bundle, using
- * today's component CSS in both. Intentional visual changes must not be
- * compared against the historical site's colours or geometry.
- * Same markup, same remaining linked stylesheets, same assets.
- * Real Chromium at mobile/desktop, day/night, five body routes.
- * No production API calls or writes: scripts are removed from this fixture.
+/* Browser regression: authored component CSS vs compressed delivery bundles.
+ * Same markup, source order, media/layer boundaries and assets; no API calls.
  */
 const assert=require('node:assert/strict');
-const fs=require('node:fs');
-const http=require('node:http');
-const path=require('node:path');
-const {execFileSync}=require('node:child_process');
+const fs=require('node:fs'),http=require('node:http'),path=require('node:path');
 const {chromium}=require('playwright');
-
 const root=process.cwd();
-const repoBase='6e1e46752f4f96c03a99cc70cdf5e2fbf4fef28c';
-let baseline;
-const optimized=fs.readFileSync('assets/ae-editorial-bundle.css','utf8');
-const before=JSON.parse(execFileSync('git',['show',repoBase+':assets/style-sources.json'],{encoding:'utf8'}));
-const after=JSON.parse(fs.readFileSync('assets/style-sources.json','utf8'));
-const packs=JSON.parse(fs.readFileSync('assets/performance-css-packs.json','utf8')).groups.flatMap(x=>x.sources);
-const removed=before.filter(p=>!after.includes(p));
-const added=after.filter(p=>!before.includes(p));
-assert.equal(removed.length,11,'The eleven later-duplicated CSS sources are removed');
-assert.deepEqual(after.filter(p=>!added.includes(p)),before.filter(p=>!removed.includes(p)),
- 'Preserve the order of every existing editorial source; allow newly introduced sources');
-assert(removed.every(p=>packs.includes(p)),'Each removed source must remain in a later CSS pack');
-const baselineSources=[...before];
-for(const source of added){
- const afterIndex=after.indexOf(source);
- const next=after.slice(afterIndex+1).find(p=>baselineSources.includes(p));
- baselineSources.splice(next?baselineSources.indexOf(next):baselineSources.length,0,source);
-}
-assert(!/@import\b|@layer\b/.test(removed.map(p=>fs.readFileSync(p,'utf8')).join('')),
- 'Cascade-sensitive CSS imports/layers cannot be deleted without separate analysis');
-
-let html=fs.readFileSync('index.html','utf8');
-html=html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,'')
- .replace(/<link\b[^>]*href="https?:\/\/[^"]+"[^>]*>/gi,'');
-const server=http.createServer((req,res)=>{
- const u=new URL(req.url,'http://127.0.0.1');
- if(u.pathname==='/'){res.setHeader('Content-Type','text/html; charset=utf-8');return res.end(html);}
- const file=path.resolve(root,'.'+decodeURIComponent(u.pathname));
- if(!file.startsWith(root+path.sep)){res.writeHead(403);return res.end();}
- try{
-  const type=file.endsWith('.css')?'text/css':file.endsWith('.js')?'text/javascript':
-   file.endsWith('.png')?'image/png':file.endsWith('.svg')?'image/svg+xml':
-   file.endsWith('.webp')?'image/webp':file.endsWith('.jpg')?'image/jpeg':'application/octet-stream';
-  res.setHeader('Content-Type',type);res.end(fs.readFileSync(file));
- }catch{res.writeHead(404);res.end();}
+const groups=[{output:'assets/ae-editorial-bundle.css',sources:JSON.parse(fs.readFileSync('assets/style-sources.json','utf8'))},
+ ...JSON.parse(fs.readFileSync('assets/performance-css-packs.json','utf8')).groups];
+const byOutput=new Map(groups.map(group=>[group.output,group.sources]));
+const original=fs.readFileSync('index.html','utf8');
+const markup=original.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,'')
+ .replace(/<link\b[^>]*href="https?:\/\/[^\"]+"[^>]*>/gi,'');
+const expanded=markup.replace(/<link\b(?=[^>]*rel="stylesheet")[^>]*href="([^\"]+)"[^>]*>/gi,(tag,href)=>{
+ const sources=byOutput.get(href.split('?')[0]);
+ return sources?sources.map(source=>'<link rel="stylesheet" href="'+source+'">').join('\n'):tag;
 });
-const properties=[
- 'display','visibility','position','color','background-color','background-image',
- 'font-family','font-size','font-weight','line-height','letter-spacing','text-align',
- 'padding-top','padding-right','padding-bottom','padding-left','margin-top','margin-left',
- 'border-top-width','border-top-color','border-radius','box-shadow',
- 'flex-direction','align-items','justify-content','grid-template-columns','gap',
- 'overflow','overflow-x','overflow-y','z-index','order','object-position','opacity'
-];
-const pages=[
- {label:'mobile day',w:390,h:844,dpr:3,dark:false},
- {label:'mobile night',w:390,h:844,dpr:3,dark:true},
- {label:'desktop day',w:1440,h:900,dpr:1,dark:false},
- {label:'desktop night',w:1440,h:900,dpr:1,dark:true}
-];
+const freeze='@layer cam-header{html'+':not(#cam-css-freeze)'.repeat(12)+' body *,'+
+ 'html'+':not(#cam-css-freeze)'.repeat(12)+' body *::before,'+
+ 'html'+':not(#cam-css-freeze)'.repeat(12)+' body *::after{animation:none!important;transition:none!important}}';
+const server=http.createServer((req,res)=>{
+ const url=new URL(req.url,'http://127.0.0.1');
+ if(url.pathname==='/'){res.setHeader('Content-Type','text/html; charset=utf-8');return res.end(url.searchParams.has('expanded')?expanded:markup);}
+ const file=path.resolve(root,'.'+decodeURIComponent(url.pathname));
+ if(!file.startsWith(root+path.sep)){res.writeHead(403);return res.end();}
+ try{res.setHeader('Content-Type',file.endsWith('.css')?'text/css':file.endsWith('.svg')?'image/svg+xml':file.endsWith('.webp')?'image/webp':'application/octet-stream');res.end(fs.readFileSync(file));}
+ catch{res.writeHead(404);res.end();}
+});
+const properties=['display','visibility','position','color','background-color','background-image',
+ 'font-family','font-size','font-weight','line-height','letter-spacing','text-align','padding','margin',
+ 'border','border-radius','box-shadow','width','height','min-width','min-height','flex-direction',
+ 'align-items','justify-content','grid-template-columns','gap','overflow','z-index','order','object-position','opacity'];
 const categories=['Todos','Picks','NFL','Fútbol','Opiniones'];
-async function sample(browser,origin,test,old){
- const context=await browser.newContext({viewport:{width:test.w,height:test.h},deviceScaleFactor:test.dpr});
- const page=await context.newPage();
+async function sample(browser,origin,width,dark,unbundled){
+ const context=await browser.newContext({viewport:{width,height:900}}),page=await context.newPage();
  await page.route('**/*',route=>route.request().url().startsWith(origin)?route.continue():route.abort());
- if(old)await page.route('**/assets/ae-editorial-bundle.css*',route=>
-  route.fulfill({status:200,contentType:'text/css; charset=utf-8',body:baseline}));
  try{
-  await page.goto(origin,{waitUntil:'load'});
-  await page.addStyleTag({content:'*,*::before,*::after{animation:none!important;transition:none!important}'});
-  return await page.evaluate(({dark,categories,props})=>{
+  await page.goto(origin+(unbundled?'?expanded=1':''),{waitUntil:'load'});
+  await page.addStyleTag({content:freeze});
+  return await page.evaluate(({dark,categories,properties})=>{
    document.documentElement.classList.toggle('dark',dark);
-   const all=[...document.body.querySelectorAll('*')].slice(0,3000);
+   const nodes=[...document.body.querySelectorAll('*')].filter(node=>!['STYLE','LINK','SCRIPT'].includes(node.tagName));
    const result={};
    for(const category of categories){
-    document.body.classList.remove('ae-is-picks','ae-is-nfl','ae-is-football','ae-is-opinions');
-    if(category==='Picks')document.body.classList.add('ae-is-picks');
-    else if(category==='NFL')document.body.classList.add('ae-is-nfl');
-    else if(category==='Fútbol')document.body.classList.add('ae-is-football');
-    else if(category==='Opiniones')document.body.classList.add('ae-is-opinions');
-    result[category]=all.map((element,index)=>{
-      const style=getComputedStyle(element);
-      const id=element.id?'#'+element.id:'';
-      const cls=(element.getAttribute('class')||'').slice(0,100).replace(/\\s+/g,'.');
-      return [index, element.localName+id+(cls?'.'+cls:''), ...props.map(prop=>style.getPropertyValue(prop))];
-    });
+    document.body.classList.remove('ae-is-home','ae-is-picks','ae-is-nfl','ae-is-football','ae-is-opinions');
+    document.body.classList.add('ae-is-'+({Todos:'home',Picks:'picks',NFL:'nfl','Fútbol':'football',Opiniones:'opinions'}[category]));
+    result[category]=nodes.map(node=>{const css=getComputedStyle(node);return [node.tagName,node.id,...properties.map(prop=>css.getPropertyValue(prop))];});
    }
    return result;
-  },{dark:test.dark,categories,props:properties});
+  },{dark,categories,properties});
  }finally{await context.close();}
 }
 (async()=>{
- // Reinsert the eleven duplicate sources at their original positions and add
- // any new sources at their current positions, so both bundles share the same
- // component edits. This keeps
- // the test about cascade equivalence, rather than freezing the old design.
- const {minifyCss}=await import('../scripts/build-editorial-css.mjs');
- baseline=minifyCss(baselineSources.map(file=>'/* '+file+' */\n'+fs.readFileSync(file,'utf8')).join('\n'));
- assert(optimized.length<baseline.length-50000,'Bundle should save at least 50 KB uncompressed');
  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
  const browser=await chromium.launch({headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
  try{
   const origin='http://127.0.0.1:'+server.address().port+'/';
-  for(const conf of pages){
-   const old=await sample(browser,origin,conf,true);
-   const next=await sample(browser,origin,conf,false);
-   for(const cat of categories){
-    assert.equal(next[cat].length,old[cat].length,'Same DOM for '+conf.label+' '+cat);
-    for(let i=0;i<old[cat].length;i++){
-     for(let p=0;p<properties.length;p++){
-      const a=old[cat][i][p+2],b=next[cat][i][p+2];
-      if(a!==b)throw Error('CSS mismatch '+conf.label+'/'+cat+
-       ', element '+i+' ('+old[cat][i][1]+'), property '+properties[p]+' (before='+a+', after='+b+')');
-     }
-    }
+  for(const width of [360,390,768,1366])for(const dark of [false,true]){
+   const before=await sample(browser,origin,width,dark,true),after=await sample(browser,origin,width,dark,false);
+   for(const category of categories){
+    assert.equal(after[category].length,before[category].length,'Keep the same content DOM');
+    for(let i=0;i<before[category].length;i++)assert.deepEqual(after[category][i],before[category][i],
+     `CSS mismatch at ${width}px/${dark?'night':'day'}/${category}, node ${i} (${before[category][i][0]}#${before[category][i][1]})`);
    }
-   console.log('PASS '+conf.label+': '+next.Todos.length+' DOM nodes, '+categories.length+' sections, '+properties.length+' CSS properties, identical computed styles');
+   console.log(`PASS ${width}px ${dark?'night':'day'}: five sections, ${before.Todos.length} nodes, ${properties.length} CSS properties`);
   }
-  console.log('PASS source list: 11 truly repeated stylesheet files removed from earlier bundle; '+(baseline.length-optimized.length)+' CSS bytes avoided.');
+  console.log('PASS: all nine delivery bundles preserve the authored cascade in 40 viewport/theme/section combinations.');
  }finally{await browser.close();server.close();}
-})().catch(err=>{console.error(err);server.close();process.exitCode=1;});
+})().catch(error=>{console.error(error);server.close();process.exitCode=1;});

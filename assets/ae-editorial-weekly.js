@@ -163,6 +163,7 @@
    }
    const featured=$('picksFeatured');
    if(featured){
+     featured.dataset.camEditorState=active?'ready':'empty';
      featured.querySelector('.ae-weekly-banner')?.remove();
      const url=editorialUrl(active?.banner_path,active?.banner_url);
      if(url){const banner=make('img',undefined,'ae-weekly-banner');banner.src=url;banner.style.setProperty('--ae-image-focus',framedPosition(active,'banner'));banner.alt='';banner.loading='lazy';featured.prepend(banner);}
@@ -194,6 +195,7 @@
      const oddsHighlight=$('aeWeeklyOddsHighlight');
      if(oddsHighlight){oddsHighlight.hidden=true;oddsHighlight.textContent='';}
      renderHomeBanner();
+     if($('picksFeatured'))$('picksFeatured').dataset.camEditorState='error';
      $('picksFeatured')?.querySelector('.ae-weekly-banner')?.remove();
      for(const id of ['cpWeekly','picksFeaturedCard']){$(id)?.replaceChildren(make('p','No se pudo cargar el Pick editorial.','ae-weekly-empty'));}
      revealSharedPick();

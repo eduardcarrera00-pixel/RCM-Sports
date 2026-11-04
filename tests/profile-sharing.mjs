@@ -14,7 +14,7 @@ async function setup({own=false,shared='',rows=takes,compactQuery=''}={}){
  const calls=[],opened=[],drawn=[];let copied='';
  Object.defineProperty(w.navigator,'clipboard',{configurable:true,value:{writeText:async text=>{copied=text;}}});
  Object.defineProperty(w,'matchMedia',{configurable:true,value:()=>({matches:false})});
- w.HTMLCanvasElement.prototype.getContext=()=>({drawImage:image=>drawn.push(image.src.includes('cam-sports-logo-completo.webp')?'OFFICIAL_LOGO':'OTHER_IMAGE'),fillRect(){},beginPath(){},moveTo(){},lineTo(){},stroke(){},fillText:t=>drawn.push(t),measureText:t=>({width:String(t).length*17})});
+ w.HTMLCanvasElement.prototype.getContext=()=>({scale(){},translate(){},drawImage:image=>drawn.push(image.src.includes('cam-sports-logo-completo.webp')?'OFFICIAL_LOGO':'OTHER_IMAGE'),fillRect(){},beginPath(){},moveTo(){},lineTo(){},stroke(){},fillText:t=>drawn.push(t),measureText:t=>({width:String(t).length*17})});
  w.HTMLCanvasElement.prototype.toBlob=cb=>cb(new w.Blob(['PNG'],{type:'image/png'}));
  w.URL.createObjectURL=()=>'blob:profile-share';w.URL.revokeObjectURL=()=>{};
  w.db={auth:{getUser:async()=>({data:{user:own?{id:owner,user_metadata:{username:'Lector'}}:null}}),onAuthStateChange(){}},rpc:async(name,args)=>{
@@ -47,7 +47,7 @@ for(const selector of ['#aeProfileTakeHighlights .ae-profile-feature','#aeProfil
   assert.doesNotMatch(caption,/¿De acuerdo o tienes otra lectura/);assert.equal(href.origin,'https://camsports.github.io');assert.equal(href.searchParams.get('perfil'),owner);assert.ok(href.searchParams.has('take'));
   const row=takes.find(t=>t.id===href.searchParams.get('take'));assert.ok(caption.includes(row.body.trim()),'Copy text retains the full published Take');
   assert.equal(dialog.querySelector('.cam-pick-share-download').download,'cam-sports-take-'+row.id+'-x.png');
-  const preview=dialog.querySelector('.cam-pick-share-preview img');assert.equal(preview.width,1080);assert.equal(preview.height,760,'Preserve the current La cita Take card with original text');
+  const preview=dialog.querySelector('.cam-pick-share-preview img');assert.equal(preview.width,1200);assert.equal(preview.height,675,'X keeps its exact 16:9 export and original text');
   const editor=dialog.querySelector('.cam-take-share-editor');assert.ok(editor,'Take editor exists');
   const selects=editor.querySelectorAll('select'),mode=selects[0],fragment=selects[2];
   assert.equal(mode.value,'summary');
@@ -56,7 +56,7 @@ for(const selector of ['#aeProfileTakeHighlights .ae-profile-feature','#aeProfil
   dialog.querySelector('.cam-take-share-destination[data-size="story"]').click();await a.tick();assert.equal(dialog.querySelector('.cam-pick-share-preview img').height,1920);
   editor.querySelector('input[type=checkbox]').click();assert.ok(!a.drawn.includes('PRIVATE_EMAIL'));
   editor.querySelector('.cam-take-share-reset').click();await a.tick();assert.equal(mode.value,'summary');assert.equal(dialog.querySelector('.cam-take-share-destination[aria-pressed="true"]').dataset.size,'card');
-  assert.equal(dialog.querySelector('.cam-pick-share-preview img').height,760);
+  assert.equal(dialog.querySelector('.cam-pick-share-preview img').height,675);
   assert.equal(row.title,takes.find(t=>t.id===row.id).title,'Export options never change the original Take');
   dialog.querySelector('.cam-pick-share-close').click();assert.equal(a.d.activeElement,button);
  }

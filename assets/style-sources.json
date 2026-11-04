@@ -85,5 +85,16 @@
   "assets/ae-ranking-notes.css",
   "assets/cam-rounded-editorial.css",
   "assets/cam-pick-tickets-refresh.css",
-  "assets/cam-sport-news.css"
+  "assets/cam-sport-news.css",
+  "assets/cam-season-guide.css",
+  "assets/cam-pick-points-rules.css",
+  "assets/cam-analytics.css",
+  "assets/ae-classical-auth-buttons.css",
+  "assets/ae-reference-community-design.css",
+  "assets/ae-mobile-header-ranking-polish.css",
+  "assets/ae-desktop-header-layout.css",
+  "assets/ae-mobile-compact-home.css",
+  "assets/ae-home-weekly-layout-top4.css",
+  "assets/ae-nfl-mobile-reference.css",
+  "assets/ae-nfl-mobile-telephoto.css"
 ]

@@ -6,12 +6,11 @@ import {fileURLToPath} from 'node:url';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
-const head=html.slice(0,html.indexOf('</head>'));
 const groups=JSON.parse(fs.readFileSync(path.join(root,'assets/performance-css-packs.json'),'utf8')).groups;
-const links=[...head.matchAll(/<link\b(?=[^>]*\brel="stylesheet")[^>]*>/gi)]
+const links=[...html.matchAll(/<link\b(?=[^>]*\brel="stylesheet")[^>]*>/gi)]
   .map(match=>(match[0].match(/\bhref="([^"]+)"/)||[])[1]?.split('?')[0]);
-assert.equal(links.length,22,'Header consolidation removes the two superseded control stylesheets');
-assert.equal(groups.length,5);
+assert.equal(links.length,13,'Eleven local CSS bundles plus the two external font stylesheets');
+assert.equal(groups.length,8);
 const editorialSources=JSON.parse(fs.readFileSync(path.join(root,'assets/style-sources.json'),'utf8'));
 assert.equal(new Set(editorialSources).size,editorialSources.length,'Editorial CSS bundle must not repeat source entries');
 const allSources=new Set();
@@ -25,18 +24,18 @@ for(const group of groups){
     assert(!links.includes(source),source+' must not also load separately');
   }
 }
-assert.equal(allSources.size,60,'The two retired icon sources must not be reintroduced into CSS packs');
+assert.equal(allSources.size,69,'Sources moved into the editorial bundle must not load in later packs');
 assert(editorialSources.every(source=>!links.includes(source)), 'Editorial sources cannot also load separately');
 const redundancies=editorialSources.filter(source=>allSources.has(source));
 assert.deepEqual(redundancies,[],'Do not ship duplicate CSS files inside both the editorial bundle and later CSS packs');
-assert(links.indexOf('assets/ae-editorial-bundle.css')<links.indexOf('assets/cam-perf-core-extras.css'));
-assert(links.indexOf('assets/cam-perf-core-extras.css')<links.indexOf('assets/cam-perf-home-components.css'));
+assert(!links.includes('assets/cam-perf-core-extras.css'),'The old core pack is superseded by the editorial bundle');
+assert(links.indexOf('assets/ae-editorial-bundle.css')<links.indexOf('assets/cam-perf-home-components.css'));
 assert(links.indexOf('assets/cam-perf-home-components.css')<links.indexOf('assets/cam-perf-rankings.css'));
 assert(links.indexOf('assets/cam-perf-rankings.css')<links.indexOf('assets/cam-perf-picks-mobile.css'));
-assert(links.indexOf('assets/cam-perf-picks-mobile.css')<links.indexOf('assets/cam-mobile-bottom-nav.css'),
+assert(links.indexOf('assets/cam-perf-picks-mobile.css')<links.indexOf('assets/cam-perf-controls.css'),
   'Mobile/Picks pack must remain before the late theme overrides');
 const sport=groups.find(g=>g.output==='assets/cam-perf-sport-banners.css');
-assert.deepEqual(sport.sources, ['assets/ae-power-rankings-scenic.css','assets/ae-football-takes-scenic.css','assets/ae-football-news-debate.css','assets/cam-football-opinion-heading-labels.css','assets/ae-football-news-editorial.css']);
-assert(links.indexOf(sport.output)>links.indexOf('assets/ae-take-discussion-reference.css'));
-assert(links.indexOf(sport.output)<links.indexOf('assets/ae-admin-header-compact.css'));
+assert.deepEqual(sport.sources, ['assets/ae-football-mobile-redesign.css','assets/ae-take-discussion-reference.css','assets/ae-power-rankings-scenic.css','assets/ae-football-takes-scenic.css','assets/ae-football-news-debate.css','assets/cam-football-opinion-heading-labels.css','assets/ae-football-news-editorial.css','assets/ae-admin-header-compact.css','assets/ae-home-community-spotlight.css']);
+assert(links.indexOf(sport.output)>links.indexOf('assets/ae-editorial-bundle.css'));
+assert(links.indexOf(sport.output)<links.indexOf('assets/cam-perf-home-components.css'));
 console.log('PASS: consolidated header CSS, no duplicated sources and original component cascade boundaries retained.');

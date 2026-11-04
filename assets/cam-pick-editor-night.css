@@ -197,3 +197,28 @@ html.dark body.ae-is-home #mainContent > #picksFeatured.ae-home-native-picks :is
   background:transparent!important;
   color:var(--cam-editor-ink)!important;
 }
+
+/* A missing editorial Pick is a short notice in both themes. Published Picks
+   retain their current artwork, dimensions, controls and result footer. */
+html body #mainContent #footballTakes #aePicksTopPair #picksFeatured.ae-picks-feature:is([data-cam-editor-state="empty"],[data-cam-editor-state="error"]),
+html body.ae-is-home #mainContent > #picksFeatured.ae-home-native-picks:is([data-cam-editor-state="empty"],[data-cam-editor-state="error"]) {
+  display:block!important;
+  min-height:0!important;
+  height:auto!important;
+  aspect-ratio:auto!important;
+  padding:14px 18px!important;
+}
+html body #mainContent #picksFeatured:is([data-cam-editor-state="empty"],[data-cam-editor-state="error"]) .ae-picks-feature-label {
+  min-height:0!important;
+  height:auto!important;
+  padding:0!important;
+  margin:0 0 8px!important;
+}
+html body #mainContent #picksFeatured:is([data-cam-editor-state="empty"],[data-cam-editor-state="error"]) #picksFeaturedCard,
+html body #mainContent #picksFeatured:is([data-cam-editor-state="empty"],[data-cam-editor-state="error"]) .ae-weekly-empty,
+html body #mainContent #picksFeatured:is([data-cam-editor-state="empty"],[data-cam-editor-state="error"]) .ae-weekly-odds-footer {
+  min-height:0!important;
+  height:auto!important;
+  padding:0!important;
+  margin:0!important;
+}

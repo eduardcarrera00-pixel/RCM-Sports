@@ -5,6 +5,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {minifyCss} from './css-minifier.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const manifest = JSON.parse(fs.readFileSync(path.join(root, 'assets/performance-css-packs.json'), 'utf8'));
@@ -16,7 +17,7 @@ for (const group of manifest.groups) {
   if (!/^assets\/[a-z0-9-]+\.css$/.test(group.output) || !Array.isArray(group.sources) || group.sources.length < 2) {
     throw new Error('Invalid performance CSS pack: ' + group.output);
   }
-  const contents = group.sources.map(source => {
+  const contents = minifyCss(group.sources.map(source => {
     if (!/^assets\/[\w-]+\.css$/.test(source)) throw new Error('Invalid CSS source: ' + source);
     const css = fs.readFileSync(path.join(root, source), 'utf8').trimEnd();
     if (/^\s*@(import|charset)\b/m.test(css)) {
@@ -24,7 +25,7 @@ for (const group of manifest.groups) {
     }
     files++;
     return `/* ${source} */\n${css}\n`;
-  }).join('\n') + '\n';
+  }).join('\n'));
   const output = path.join(root, group.output);
   bytes += Buffer.byteLength(contents);
   if (verifyOnly) {

@@ -116,7 +116,9 @@ const run = async () => {
   assert.match(html,/filterByCategory\('NFL'\)/);
   assert.match(html,/filterByCategory\('Fútbol'\)/);
   assert.match(html,/assets\/cam-global-edit\.js/);
-  assert.match(html,/assets\/cam-global-edit\.css/);
+  assert.match(html,/assets\/cam-perf-controls\.css/);
+  assert(JSON.parse(fs.readFileSync('assets/performance-css-packs.json','utf8')).groups
+    .find(group=>group.output==='assets/cam-perf-controls.css').sources.includes('assets/cam-global-edit.css'));
   assert.match(css,/camGlobalEditToggle\[hidden\]/);
   assert.match(css,/html:not\(\.cam-global-edit-active\) cam-site-image-layer/);
   assert.match(css,/@media\(max-width:979px\)/);

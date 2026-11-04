@@ -12,20 +12,21 @@ After changing any listed stylesheet, run `node scripts/build-editorial-css.mjs`
 Run `npm run test:editor` when changing news editing or publication. Preserve the textarea fallback and the existing HTML of unchanged articles.
 
 
-## CSS request consolidation (2026-10-24)
+## CSS request consolidation (2026-11-04)
 
-Five compiled CSS packs replace 62 adjacent standalone stylesheets/rules while
-preserving their exact original ordering and the existing inline-style boundaries:
-`assets/cam-perf-core-extras.css`, `assets/cam-perf-home-components.css`,
-`assets/cam-perf-rankings.css`, `assets/cam-perf-picks-mobile.css` and
-`assets/cam-perf-sport-banners.css`.
+Eleven local stylesheet requests replace the former 28, preserving the exact
+component order and every existing inline-style/script boundary. The editorial
+bundle combines the 98 sources in `assets/style-sources.json`; the eight smaller
+packs combine the 69 sources in `assets/performance-css-packs.json`. All generated
+CSS uses the same whitespace-only compressor in `scripts/css-minifier.mjs`.
 
-**Edit the original component CSS**, never the generated packs. The definitive
-source list is `assets/performance-css-packs.json`. After editing any included CSS
-source, run `npm run build:css-packs` and commit the updated pack alongside it.
-`npm run build:css` also regenerates these packs. CI verifies freshness and
-cascade grouping with `npm run test:performance`. Never append a bundled source
-as another stylesheet link, and never move a pack across inline `<style>` blocks.
+**Edit original component CSS**, never generated bundles. Run `npm run build:styles`
+after source changes and commit the outputs. `npm run test:performance` checks
+freshness, rule/declaration equality and delivery order. Do not load a bundled
+source as an additional link or move a bundle across an inline style or script.
+The retired core-extras output is retained for already cached older HTML; do not
+reintroduce it as a link. The five obsolete header stylesheet sources are removed;
+`assets/cam-header-system.css` remains the shared header authority.
 
 ## Public address and publication
 

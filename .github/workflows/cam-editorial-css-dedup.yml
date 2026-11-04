@@ -1,10 +1,15 @@
-name: CAM SPORTS editorial CSS deduplication
+name: CAM SPORTS stylesheet consolidation
 
 on:
   pull_request:
     paths:
       - 'assets/style-sources.json'
-      - 'assets/ae-editorial-bundle.css'
+      - 'assets/**/*.css'
+      - 'assets/performance-css-packs.json'
+      - 'scripts/css-minifier.mjs'
+      - 'scripts/build-editorial-css.mjs'
+      - 'scripts/build-performance-css.mjs'
+      - 'index.html'
       - 'tests/editorial-css-dedup-browser.cjs'
       - 'tests/performance-css.mjs'
       - 'package.json'
@@ -13,7 +18,12 @@ on:
     branches: [main]
     paths:
       - 'assets/style-sources.json'
-      - 'assets/ae-editorial-bundle.css'
+      - 'assets/**/*.css'
+      - 'assets/performance-css-packs.json'
+      - 'scripts/css-minifier.mjs'
+      - 'scripts/build-editorial-css.mjs'
+      - 'scripts/build-performance-css.mjs'
+      - 'index.html'
       - 'tests/editorial-css-dedup-browser.cjs'
       - 'tests/performance-css.mjs'
       - 'package.json'
@@ -44,7 +54,7 @@ jobs:
         run: npm run test:performance
       - run: node --check tests/editorial-css-dedup-browser.cjs
       - run: npx playwright install --with-deps chromium
-      - name: Compare old/new computed CSS in all five sections and both themes at two screen sizes
+      - name: Compare old/new computed CSS in all five sections and both themes at four screen sizes
         run: npm run test:perf:css-cascade
       - name: Verify visual functions, mobile navigation, picks, and editor
         run: npm run test:mobile-nav && npm run test:opinions-banners && npm run test:site-banners && npm run test:editor && npm run test:picks

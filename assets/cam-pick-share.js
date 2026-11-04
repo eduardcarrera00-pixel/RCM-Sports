@@ -193,10 +193,15 @@
  function renderTakeCard(p,options={}){
   const size=takeSize(options.size),w=1080;
   const mode=options.mode||'title',extra=mode==='summary'?takeSummary(p.body):mode==='fragment'?takeFragments(p.body)[options.fragment||0]||'':'';
-  // Horizontal is 16:9 for X; a card with text needs a little more height.
+  // Keep the approved text layout, then centre it inside an exact 16:9 canvas.
+  // Extra copy must never change the export's advertised aspect ratio.
   const T=TAKE_CARD,L=T[size],h=size==='card'&&extra?760:L.h;
-  const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
+  const canvas=document.createElement('canvas');canvas.width=size==='card'?1200:w;canvas.height=size==='card'?675:h;
   const c=canvas.getContext('2d');if(!c)throw Error('Este navegador no permite generar la imagen. Prueba descargarla desde otro navegador.');
+  if(size==='card'){
+   c.fillStyle=T.bg;c.fillRect(0,0,canvas.width,canvas.height);
+   const scale=canvas.height/h;c.scale(scale,scale);c.translate((canvas.width/scale-w)/2,0);
+  }
   // Opaque colour reaches every edge, including the corners. Transparent
   // padding could be flattened to white by a receiving social application.
   const cx=(L.left+L.right)/2,maxWidth=L.right-L.left;

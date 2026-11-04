@@ -23,8 +23,8 @@ const server=http.createServer((req,res)=>{
  await page.evaluate(()=>{
   const native=CanvasRenderingContext2D.prototype.fillText;
   const paint=CanvasRenderingContext2D.prototype.drawImage;
-  window.logos=[];CanvasRenderingContext2D.prototype.drawImage=function(source,...args){if(source instanceof HTMLImageElement)logos.push({src:source.src,args});return paint.call(this,source,...args);};
-  window.draws=[];CanvasRenderingContext2D.prototype.fillText=function(text,x,y,...rest){const width=this.measureText(text).width;draws.push({text,x,y,width,right:this.textAlign==='right',font:this.font});return native.call(this,text,x,y,...rest);};
+  window.logos=[];CanvasRenderingContext2D.prototype.drawImage=function(source,...args){if(source instanceof HTMLImageElement){const m=this.getTransform();logos.push({src:source.src,args:[args[0]*m.a+m.e,args[1]*m.d+m.f,args[2]*m.a,args[3]*m.d]});}return paint.call(this,source,...args);};
+  window.draws=[];CanvasRenderingContext2D.prototype.fillText=function(text,x,y,...rest){const m=this.getTransform(),width=this.measureText(text).width*m.a;draws.push({text,x:x*m.a+m.e,y:y*m.d+m.f,width,right:this.textAlign==='right',font:this.font});return native.call(this,text,x,y,...rest);};
   window.take=Object.freeze({id:'00000000-0000-0000-0000-000000000972',author_id:'00000000-0000-0000-0000-000000000951',author:'Adrianmendozac27',sport:'football',created_at:'2026-10-25T01:15:00Z',title:'LAMINE YAMAL GANARÁ EL BALÓN DE ORO EN 2026',body:'El argumento parte de su rendimiento.\nNo doy el resultado por seguro: depende de toda la temporada.\n\nSu evolución marcará la diferencia. '.repeat(8)});
   document.getElementById('open').onclick=()=>{draws=[];CamPickShare.open(take,{kind:'take'});};
   window.shares=[];Object.defineProperty(navigator,'canShare',{configurable:true,value:()=>true});Object.defineProperty(navigator,'share',{configurable:true,value:data=>{shares.push({active:navigator.userActivation.isActive,data});return Promise.resolve();}});
@@ -41,7 +41,7 @@ const server=http.createServer((req,res)=>{
  // Text never sits under a network's own interface: Instagram Stories cover
  // ~250 px top and bottom; TikTok its tabs (240), caption and sound (660) and
  // the 180 px action column; the feed grid trims a 4:5 post to 3:4 (34 px/side).
- const safe={story:{left:90,right:990,top:250,bottom:1670},tiktok:{left:174,right:900,top:240,bottom:1260},post:{left:52,right:1028,top:60,bottom:1310},card:{left:52,right:1029,top:30,bottom:745}};
+ const safe={story:{left:90,right:990,top:250,bottom:1670},tiktok:{left:174,right:900,top:240,bottom:1260},post:{left:52,right:1028,top:60,bottom:1310},card:{left:52,right:1148,top:25,bottom:660}};
  const checkBounds=async size=>{
   const s=safe[size],drawn=await page.evaluate(()=>draws);assert.ok(drawn.length>3,'Text was drawn');
   for(const t of drawn){const left=t.right?t.x-t.width:t.x,right=t.right?t.x:t.x+t.width;assert.ok(left>=s.left&&right<=s.right,`${size}: text overflows horizontally: ${JSON.stringify(t)}`);assert.ok(t.y>=s.top&&t.y+6<=s.bottom,`${size}: text outside the safe height: ${JSON.stringify(t)}`);}
@@ -90,7 +90,7 @@ const server=http.createServer((req,res)=>{
  for(const mode of ['title','summary','fragment'])for(const size of ['card','post','tiktok','story']){
   await select(0,mode);await page.evaluate(()=>draws=[]);await choose(size);await checkBounds(size);
   assert.deepEqual(await pressed(),[size]);
-  const data=await png();assert.equal(data.readUInt32BE(16),1080);assert.equal(data.readUInt32BE(20),heights[size]||(mode==='title'?608:760));
+  const data=await png();assert.equal(data.readUInt32BE(16),size==='card'?1200:1080);assert.equal(data.readUInt32BE(20),size==='card'?675:heights[size]);
   const edges=await preview.evaluate(img=>{const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;const x=c.getContext('2d');x.drawImage(img,0,0);const rgba=x.getImageData(0,0,c.width,c.height).data;let valid=true;for(let p=0;p<rgba.length;p+=4){const pixel=p/4,px=pixel%c.width,py=Math.floor(pixel/c.width);if(px===0||px===c.width-1||py===0||py===c.height-1){if(rgba[p]!==11||rgba[p+1]!==34||rgba[p+2]!==51||rgba[p+3]!==255)valid=false;}}return valid;});
   assert.equal(edges,true,'Every export edge is opaque CAM night blue, with no white band or transparent corners');
   fs.writeFileSync(path.join(qa,'take-'+mode+'-'+size+'.png'),data);
