@@ -150,13 +150,7 @@
   }
   function paintNav(){
     const nav=$('camNflNav');nav.replaceChildren();
-    const weeks=[...new Set(games.filter(g=>g.season===season).map(g=>g.week))].sort((a,b)=>a-b);
-    const weekSelect=el('select',null,'cam-nfl-select');weekSelect.setAttribute('aria-label','Jornada NFL');
-    for(const value of weeks.length?weeks:[week]){
-      const op=el('option',weekName(value));op.value=String(value);op.selected=value===week;weekSelect.append(op);
-    }
-    weekSelect.addEventListener('change',()=>{week=Number(weekSelect.value);dayKey=null;paint();});
-    nav.append(weekSelect);
+    nav.append(button('Ver mis jornadas ›',()=>window.camOpenQuinielaHistory?.('nfl'),'cam-nfl-action cam-nfl-action-secondary'));
   }
   function logo(id){
     const team=window.CamNFLQuinielaTeams?.getTeam(id)||teams.get(id);
@@ -522,7 +516,7 @@
     const observer=new MutationObserver(()=>{
       const visible=document.body.classList.contains('ae-is-nfl');
       root.hidden=!visible;
-      // Al regresar a NFL, abrir la jornada vigente; consultar el pasado sigue siendo libre.
+      // La vista pública siempre abre la jornada vigente; el historial vive en el perfil.
       if(visible&&!wasVisible&&loaded){
         const latestSeason=seasons()[0]||season;
         if(latestSeason!==season){

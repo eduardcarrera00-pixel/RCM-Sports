@@ -21,6 +21,7 @@ const {chromium}=require('playwright');
   try{
     for(const [width,dark] of [[1365,true],[1365,false],[375,true],[375,false]]){
       const page=await browser.newPage({viewport:{width,height:850}});
+      await page.clock.install({time:new Date('2026-10-22T12:00:00Z')});
       const html='<html class="'+(dark?'dark':'')+'"><head><meta name="viewport" content="width=device-width, initial-scale=1">'+theme+'</head><body class="ae-is-nfl">'+section+'<section id="camNflProfile" hidden></section></body></html>';
       await page.setContent(html);
       // Reuse the real CAM SPORTS catalog, never fabricated logo URLs.
@@ -83,13 +84,13 @@ const {chromium}=require('playwright');
         window.openUserAuthModal=()=>{window.__loginOpened=true;};
         window.openAePublicProfile=id=>{window.__publicProfile=id;};
         window.currentAdmin=null;
+        window.camOpenQuinielaHistory=sport=>{window.__historySport=sport;};
       });
       await page.addScriptTag({content:code});
       await page.evaluate(()=>document.dispatchEvent(new Event('DOMContentLoaded')));
       await page.waitForSelector('.cam-nfl-game');
-      const weekPicker=page.locator('#camNflNav select[aria-label="Jornada NFL"]');
-      assert.equal(await weekPicker.inputValue(),'7',
-        'The current week is selected by default, even when last week played two days ago');
+      assert.equal(await page.locator('#camNflNav select').count(),0,'Round selection belongs in the profile');
+      assert.doesNotMatch(await page.locator('#camNflGames').innerText(),/Finalizado/,'Current week opens automatically');
       assert.equal(await page.locator('.cam-nfl-game').count(),1,'Only the nearest day appears initially');
       assert.equal(await page.locator('#camNflDayNav .cam-nfl-day').count(),2,'Show exactly the two days with matches');
       assert.equal(await page.locator('#camNflDayNav .cam-nfl-day[aria-pressed="true"]').count(),1);
@@ -101,17 +102,13 @@ const {chromium}=require('playwright');
         assert.match(text,/^\d+ pts$/,'Show only points, never a team win probability');
         assert.doesNotMatch(text,/%/);
       }
-      await weekPicker.selectOption('6');
-      assert.equal(await page.locator('#camNflNav select[aria-label="Jornada NFL"]').inputValue(),'6');
-      assert.equal(await page.locator('.cam-nfl-game').count(),1,
-        'Previous rounds must remain accessible in the selector');
-      assert.match(await page.locator('#camNflGames').innerText(),/Finalizado/);
+      await page.locator('#camNflNav button').click();
+      assert.equal(await page.evaluate(()=>window.__historySport),'nfl','History entry opens Mi Quiniela for NFL');
       await page.evaluate(()=>document.body.classList.remove('ae-is-nfl'));
       await page.evaluate(()=>document.body.classList.add('ae-is-nfl'));
-      await page.waitForFunction(()=>document.querySelector('#camNflNav select[aria-label="Jornada NFL"]')?.value==='7');
+      await page.waitForSelector('#camNflGames .cam-nfl-game');
       assert.equal(await page.locator('.cam-nfl-game').count(),1,
         'Returning to NFL must reopen the current week and its nearest match day');
-      assert.equal(await page.locator('#camNflNav select[aria-label="Jornada NFL"]').inputValue(),'7');
       assert.equal(await page.locator('#camNflGames .cam-nfl-team').count(),2);
       assert.equal(await page.locator('#camNflGames .cam-nfl-team img').count(),2);
       assert.ok((await page.locator('#camNflGames .cam-nfl-team img').first().getAttribute('src')).includes('espncdn.com'));
@@ -133,7 +130,11 @@ const {chromium}=require('playwright');
       assert.equal(await page.locator('.cam-nfl-game').count(),1,'Switching days keeps the list compact');
       assert.match(await page.locator('#camNflGames').innerText(),/Pronóstico guardado/,'First-day pick persists');
       assert.equal(await page.locator('.cam-nfl-team.is-selected').count(),1,'Saved winner remains highlighted');
-      await page.locator('#camNflNav select[aria-label="Jornada NFL"]').selectOption('8');
+      // Advancing to the next week changes the public display automatically.
+      await page.clock.setFixedTime(new Date('2026-10-30T12:00:00Z'));
+      await page.evaluate(()=>document.body.classList.remove('ae-is-nfl'));
+      await page.evaluate(()=>document.body.classList.add('ae-is-nfl'));
+      await page.waitForSelector('#camNflDayNav .cam-nfl-day[data-day="2026-10-31"]');
       const grouped=await page.locator('#camNflDayNav .cam-nfl-day').evaluateAll(nodes=>
         nodes.map(node=>({day:node.dataset.day,text:node.textContent})));
       assert.ok(grouped.some(x=>x.day==='2026-10-31'&&/sábado/i.test(x.text)),
@@ -144,7 +145,6 @@ const {chromium}=require('playwright');
       assert.match(await page.locator('#camNflGames').innerText(),/Pospuesto/);
       assert.equal(await page.locator('#camNflGames .cam-nfl-team:not([disabled])').count(),0,
         'Postponed games must remain locked');
-      await page.locator('#camNflNav select[aria-label="Jornada NFL"]').selectOption('7');
       assert.equal(await page.locator('#camNflDayNav .cam-nfl-day[aria-pressed="true"]').count(),1);
 
       const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);

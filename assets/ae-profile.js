@@ -31,7 +31,7 @@ let request=0;
 let activeAuthor=null;
 let privateView=false;
 let working=false;
-const TABS=['perfil','takes','picks','party'];
+const TABS=['perfil','takes','picks','quiniela','party'];
 const validTab=tab=>TABS.includes(tab)?tab:'perfil';
 let activeTab='perfil';
 let ownTakes=[];
@@ -731,8 +731,8 @@ function renderPublishAction(){
 function setPrivateTab(tab,options={}){
   if(!activeAuthor)return;
   labelTabs();
-  activeTab=validTab(tab);
-  for(const [id,value] of [['aeProfileTabOverview','perfil'],['aeProfileTabTakes','takes'],['aeProfileTabPicks','picks'],['aeProfileTabParty','party']]){
+  activeTab=tab==='quiniela'&&!privateView?'perfil':validTab(tab);
+  for(const [id,value] of [['aeProfileTabOverview','perfil'],['aeProfileTabTakes','takes'],['aeProfileTabPicks','picks'],['aeProfileTabQuiniela','quiniela'],['aeProfileTabParty','party']]){
     const button=$(id);
     if(!button)continue;
     button.setAttribute('aria-selected',String(activeTab===value));
@@ -751,6 +751,7 @@ function setPrivateTab(tab,options={}){
   const prestige=$('aeProfilePrestige');
   if(prestige)prestige.hidden=!isTakes||!prestige.childElementCount;
   if($('camProfileOverview'))$('camProfileOverview').hidden=activeTab!=='perfil';
+  if($('camProfileQuiniela'))$('camProfileQuiniela').hidden=activeTab!=='quiniela';
   if($('camProfileParties'))$('camProfileParties').hidden=activeTab!=='party';
 
   let loading=null;
@@ -925,11 +926,12 @@ async function refreshProfilePicks(){
 }
 
 function clearSections(){
-  for(const id of ['aeProfileTakeHighlights','aeProfileTakes','aeProfilePickHighlights','aeProfilePicks','aeProfileAccuracy','aeProfileTakeAccuracy','camProfileOverview']){
+  for(const id of ['aeProfileTakeHighlights','aeProfileTakes','aeProfilePickHighlights','aeProfilePicks','aeProfileAccuracy','aeProfileTakeAccuracy','camProfileOverview','camProfileQuiniela']){
     const n=$(id);if(n)n.replaceChildren();
   }
   $('aeProfileAccuracy').hidden=true;
   $('aeProfileTakeAccuracy').hidden=true;
+  if($('camProfileQuiniela'))$('camProfileQuiniela').hidden=true;
   if($('aeProfilePrestige')){$('aeProfilePrestige').replaceChildren();$('aeProfilePrestige').hidden=true;}
 }
 
@@ -1026,6 +1028,7 @@ function setIdentity(name,subtitle){
 }
 function labelTabs(){
   const own=privateView;
+  if($('aeProfileTabQuiniela'))$('aeProfileTabQuiniela').hidden=!own;
   for(const [id,mine,theirs] of [['aeProfileTabOverview','Perfil','Perfil'],['aeProfileTabTakes','Takes','Takes'],['aeProfileTabPicks','Picks','Picks'],['aeProfileTabParty','Mi Party','Party']]){
     const b=$(id);if(!b)continue;
     const label=b.querySelector('.cam-tab-label')||b;
@@ -1212,11 +1215,12 @@ function bindProfileApp(){
   // Pestañas con flechas del teclado.
   $('aeProfileTabs')?.addEventListener('keydown',event=>{
     if(!['ArrowRight','ArrowLeft','Home','End'].includes(event.key)||!activeAuthor)return;
-    const index=TABS.indexOf(activeTab);
-    const next=event.key==='Home'?0:event.key==='End'?TABS.length-1:(index+(event.key==='ArrowRight'?1:-1)+TABS.length)%TABS.length;
+    const available=TABS.filter(tab=>tab!=='quiniela'||privateView);
+    const index=available.indexOf(activeTab);
+    const next=event.key==='Home'?0:event.key==='End'?available.length-1:(index+(event.key==='ArrowRight'?1:-1)+available.length)%available.length;
     event.preventDefault();
-    setPrivateTab(TABS[next]);
-    $({perfil:'aeProfileTabOverview',takes:'aeProfileTabTakes',picks:'aeProfileTabPicks',party:'aeProfileTabParty'}[TABS[next]])?.focus();
+    setPrivateTab(available[next]);
+    $({perfil:'aeProfileTabOverview',takes:'aeProfileTabTakes',picks:'aeProfileTabPicks',quiniela:'aeProfileTabQuiniela',party:'aeProfileTabParty'}[available[next]])?.focus();
   });
   $('camUsernameInput')?.addEventListener('input',onNameInput);
   $('camUsernameForm')?.addEventListener('submit',event=>{
@@ -1255,6 +1259,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   $('aeProfileTabOverview')?.addEventListener('click',()=>setPrivateTab('perfil'));
   $('aeProfileTabTakes')?.addEventListener('click',()=>setPrivateTab('takes'));
   $('aeProfileTabPicks')?.addEventListener('click',()=>setPrivateTab('picks'));
+  $('aeProfileTabQuiniela')?.addEventListener('click',()=>setPrivateTab('quiniela'));
   $('aeProfileTabParty')?.addEventListener('click',()=>setPrivateTab('party'));
 
   $('aeProfileDialog')?.addEventListener('click',e=>{if(e.target===$('aeProfileDialog'))close();});

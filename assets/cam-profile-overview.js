@@ -159,8 +159,9 @@ function quinielaCard(data, ctx) {
   if (!lines.length) return ctx.own ? emptyCard('quiniela', 'Quiniela', 'Jugar la quiniela ›', () => ctx.play('nfl')) : null;
   const hits = num(q.nfl?.hits) + num(q.football?.hits);
   const resolved = num(q.nfl?.resolved) + num(q.football?.resolved);
-  const card = shell('quiniela', 'Quiniela', [resolved ? Math.round(hits / resolved * 100) + ' % acierto' : ''], () => ctx.tab('party'));
-  const body = button('', 'cam-ov-item cam-ov-lines', () => ctx.tab('party'), {'aria-label': 'Quiniela: ' + lines.map(l => l.filter(Boolean).join(', ')).join('. ')});
+  const open = () => ctx.tab(ctx.own ? 'quiniela' : 'party');
+  const card = shell('quiniela', 'Quiniela', [resolved ? Math.round(hits / resolved * 100) + ' % acierto' : ''], open);
+  const body = button('', 'cam-ov-item cam-ov-lines', open, {'aria-label': 'Quiniela: ' + lines.map(l => l.filter(Boolean).join(', ')).join('. ')});
   for (const [label, rank, pts] of lines) {
     const row = el('span', null, 'cam-ov-line');
     row.append(el('span', label, 'cam-ov-line-name'));

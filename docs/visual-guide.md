@@ -1,5 +1,15 @@
 # AE SPORTS · Guía visual v1
 
+### Jornadas en el perfil · 3 nov 2026
+
+Las vistas principales de Quiniela NFL y Fútbol abren automáticamente la jornada
+vigente. La pestaña de partidos se llama «Partidos» y los selectores de jornadas
+anteriores se trasladan al perfil propio, en «Mi Quiniela». «Ver mis jornadas»
+abre ese historial con el deporte elegido. Permite consultar pronósticos guardados
+por competición, temporada y jornada, con marcador, acierto, fallo, anulado o
+estado pendiente. Los datos se cargan solo al abrir esa pestaña, con paginación
+y las políticas de propietario existentes. «Mi Party» mantiene su pestaña.
+
 Fecha: 16 de octubre de 2026. Basada en la página publicada y sus recursos actuales.
 Versión visual: `guia-visual.html` en la raíz del proyecto.
 

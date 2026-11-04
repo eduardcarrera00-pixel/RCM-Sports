@@ -3042,11 +3042,11 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
                 <p><strong>Cada jornada es una oportunidad para demostrar cuánto sabes.</strong></p>
               </header>
               <nav id="camNflViewTabs" class="cam-quiniela-view-tabs" aria-label="Vistas de La Quiniela">
-                <button type="button" data-view="jornada" aria-pressed="true" aria-controls="camNflMatchPanel">Jornada</button>
+                <button type="button" data-view="jornada" aria-pressed="true" aria-controls="camNflMatchPanel">Partidos</button>
                 <button type="button" data-view="month" aria-pressed="false" aria-controls="camNflQuinielaStandings"><span class="cam-q-tab-kicker">Clasificación</span> <span class="cam-q-tab-name">mensual</span></button>
                 <button type="button" data-view="all" aria-pressed="false" aria-controls="camNflQuinielaStandings"><span class="cam-q-tab-kicker">Clasificación</span> <span class="cam-q-tab-name">histórica</span></button>
               </nav>
-              <div id="camNflNav" class="cam-nfl-nav" aria-label="Jornada"></div>
+              <div id="camNflNav" class="cam-nfl-nav" aria-label="Mi quiniela"></div>
             </div>
             <div id="camNflMatchPanel">
             <p id="camNflStatus" class="cam-nfl-status" role="status" aria-live="polite"></p>
@@ -3083,11 +3083,11 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
                 <img class="cam-football-quiniela-illustration cam-football-quiniela-illustration--night" src="assets/cam-football-quiniela-night.svg" alt="" aria-hidden="true" width="300" height="240" loading="lazy" decoding="async">
               </header>
               <nav id="camFootballViewTabs" class="cam-quiniela-view-tabs" aria-label="Vistas de La Quiniela">
-                <button type="button" data-view="jornada" aria-pressed="true" aria-controls="camFootballMatchPanel">Jornada</button>
+                <button type="button" data-view="jornada" aria-pressed="true" aria-controls="camFootballMatchPanel">Partidos</button>
                 <button type="button" data-view="month" aria-pressed="false" aria-controls="camFootballQuinielaStandings"><span class="cam-q-tab-kicker">Clasificación</span> <span class="cam-q-tab-name">mensual</span></button>
                 <button type="button" data-view="all" aria-pressed="false" aria-controls="camFootballQuinielaStandings"><span class="cam-q-tab-kicker">Clasificación</span> <span class="cam-q-tab-name">histórica</span></button>
               </nav>
-              <div id="camFootballNav" class="cam-nfl-nav" aria-label="Competición y jornada"></div>
+              <div id="camFootballNav" class="cam-nfl-nav" aria-label="Competición y mi quiniela"></div>
             </div>
             <div id="camFootballMatchPanel">
             <p id="camFootballStatus" class="cam-nfl-status" role="status" aria-live="polite"></p>
@@ -3263,6 +3263,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
    <button id="aeProfileTabOverview" type="button" role="tab" aria-selected="true" aria-controls="camProfileOverview" class="is-active"><span class="cam-tab-label">Perfil</span></button>
    <button id="aeProfileTabTakes" type="button" role="tab" aria-selected="false" tabindex="-1"><span class="cam-tab-label">Takes</span></button>
    <button id="aeProfileTabPicks" type="button" role="tab" aria-selected="false" tabindex="-1"><span class="cam-tab-label">Picks</span></button>
+   <button id="aeProfileTabQuiniela" type="button" role="tab" aria-selected="false" aria-controls="camProfileQuiniela" tabindex="-1" hidden><span class="cam-tab-label">Mi Quiniela</span></button>
    <button id="aeProfileTabParty" type="button" role="tab" aria-selected="false" aria-controls="camProfileParties" tabindex="-1"><svg class="cam-tab-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15.5 19v-1.3a3.4 3.4 0 0 0-3.4-3.4H7.4A3.4 3.4 0 0 0 4 17.7V19"/><circle cx="9.75" cy="8" r="3.25"/><path d="M20 19v-1.2a3.3 3.3 0 0 0-2.5-3.2M15 4.9a3.25 3.25 0 0 1 0 6.2"/></svg><span class="cam-tab-label">Mi Party</span></button>
  </nav>
  <div class="ae-profile-overview"><strong id="aeProfileCount">0 Takes</strong><p id="aeProfileOverviewText" hidden></p></div>
@@ -3275,6 +3276,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
  <section id="aeProfilePickHighlights" class="ae-profile-pick-highlights" aria-label="Picks destacados" hidden></section>
  <div id="aeProfilePicks" class="ae-profile-picks" hidden></div>
  <section id="aeProfileAccuracy" class="ae-profile-accuracy" aria-label="Porcentaje de acierto" hidden></section>
+ <section id="camProfileQuiniela" role="tabpanel" aria-labelledby="aeProfileTabQuiniela" hidden></section>
  <section id="camProfileParties" class="cam-party-profile cam-profile-party" role="tabpanel" aria-labelledby="aeProfileTabParty" hidden></section>
  <section id="camProfileEdit" class="cam-profile-edit" aria-labelledby="camProfileEditTitle" hidden>
   <header class="cam-profile-edit-head"><button type="button" id="camProfileEditBack" class="cam-profile-edit-back" aria-label="Volver al perfil"><span aria-hidden="true">‹</span> Perfil</button><h2 id="camProfileEditTitle" tabindex="-1">Editar perfil</h2></header>
@@ -5581,8 +5583,9 @@ html .cam-weekly-result-surface .cam-weekly-result-on-photo{
 @media(max-width:480px){.cam-weekly-quick-result .cam-weekly-review-actions{display:flex}.cam-weekly-quick-result .cam-weekly-review-actions button{width:auto}}
 </style>
 <script src="assets/cam-weekly-results.js?v=20261025-admin-resolved-pick-1"></script>
-<script src="assets/cam-profile-overview.js?v=20261103-resumen-1"></script>
-<script src="assets/ae-profile.js?v=20261103-perfil-cabecera-1"></script>
+<script src="assets/cam-profile-overview.js?v=20261103-jornadas-1"></script>
+<script src="assets/cam-profile-quiniela.js?v=20261103-jornadas-1"></script>
+<script src="assets/ae-profile.js?v=20261103-jornadas-1"></script>
 <style id="cam-nfl-quiniela-theme">
 /* ===========================================================================
    CAM SPORTS · La Quiniela NFL — lenguaje visual curvo, editorial y compacto.
@@ -6374,11 +6377,11 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 <!-- Perfil ordenado como una app y cambio de nombre de usuario (3 nov). Al final, como los ajustes del teléfono. -->
 <link rel="stylesheet" href="assets/cam-profile-app.css?v=20261103-perfil-cabecera-1">
 <!-- Perfil con resumen y pestaña Mi Party (3 nov). Al final, como los ajustes del teléfono. -->
-<link rel="stylesheet" href="assets/cam-profile-resumen.css?v=20261103-resumen-1">
+<link rel="stylesheet" href="assets/cam-profile-resumen.css?v=20261103-jornadas-1">
 <!-- Inicio en el teléfono: «Tu jornada» con atajos y filas deslizables (3 nov). Al final, como los ajustes del teléfono. -->
 <link rel="stylesheet" href="assets/cam-home-jornada.css?v=20261103-jornada-1">
 <script src="assets/cam-parties.js?v=20261103-quiniela-1"></script>
-<script src="assets/cam-sport-quiniela-loader.js?v=20261029-competition-1"></script>
+<script src="assets/cam-sport-quiniela-loader.js?v=20261103-jornadas-1"></script>
 <script src="assets/ae-season-predictions.js?v=20261021-champion-guide-1"></script>
 <script src="assets/cam-lazy-editorial-loader.js?v=20261024-1"></script>
 <script src="assets/cam-opinions-section-banners.js?v=20261025-theme-assets-1"></script>

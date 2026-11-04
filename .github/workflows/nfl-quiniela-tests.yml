@@ -5,6 +5,8 @@ on:
       - 'index.html'
       - 'assets/cam-nfl-quiniela.js'
       - 'assets/ae-profile.js'
+      - 'assets/cam-profile-quiniela.js'
+      - 'tests/profile-quiniela.mjs'
       - 'tests/nfl-quiniela-browser.cjs'
       - 'supabase/migrations/*cam_nfl_quiniela*'
       - 'supabase/functions/cam-nfl-sync/**'
@@ -26,3 +28,4 @@ jobs:
       - run: npx playwright install chromium
       - run: node tests/nfl-quiniela-browser.cjs
       - run: npm run test:auth
+      - run: npm run test:quiniela:profile

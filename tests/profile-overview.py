@@ -122,7 +122,7 @@ STATE = """() => {
     return out.join(' ').replace(/\\s+/g, ' '); };
   const calls = window.__fake.calls.filter(c => c.rpc || c.table).map(c => c.rpc || ('from:' + c.table));
   return {open: $('aeProfileDialog').open, tab: tab ? tab.id : null,
-    tabs: [...document.querySelectorAll('#aeProfileTabs button')].map(b => b.textContent.trim()),
+    tabs: [...document.querySelectorAll('#aeProfileTabs button')].filter(b => !b.hidden).map(b => b.textContent.trim()),
     title: $('aeProfileTitle').textContent, url: location.search, history: history.length,
     overview: vis($('camProfileOverview')), party: vis($('camProfileParties')), takes: vis($('aeProfileTakes')),
     cards: [...document.querySelectorAll('#camProfileOverview .cam-ov-card')].map(txt),
@@ -205,7 +205,7 @@ def scenario_own(dark, width, tag):
         open_own(page, width)
         st = state(page)
         assert st['tab'] == 'aeProfileTabOverview' and st['overview'] and not st['takes'], (tag, 'abre en Perfil', st)
-        assert st['tabs'] == ['Perfil', 'Takes', 'Picks', 'Mi Party'], (tag, st['tabs'])
+        assert st['tabs'] == ['Perfil', 'Takes', 'Picks', 'Mi Quiniela', 'Mi Party'], (tag, st['tabs'])
         assert page.locator('#aeProfileTabParty .cam-tab-icon').count() == 1, 'icono de grupo junto a Mi Party'
         assert page.locator('#camProfileStats').count() == 0, 'sin fila de cifras en la cabecera'
         assert st['calls'].count('cam_profile_overview') == 1, (tag, st['calls'])
@@ -248,8 +248,12 @@ def scenario_own(dark, width, tag):
         page.click('#aeProfileTabOverview')
         page.wait_for_timeout(200)
 
-        # La tarjeta de quiniela lleva a Mi Party (una llamada; volver no repite).
+        # La tarjeta lleva a Mi Quiniela; Mi Party mantiene su carga independiente.
         page.click('#camProfileOverview [data-kind=quiniela] .cam-ov-item')
+        page.wait_for_selector('#camProfileQuiniela .cam-qh-message', timeout=8000)
+        assert page.locator('#aeProfileTabQuiniela').get_attribute('aria-selected') == 'true'
+        assert state(page)['calls'].count('cam_profile_party') == 0
+        page.click('#aeProfileTabParty')
         page.wait_for_selector('#camProfileParties .cam-pp-block', timeout=8000)
         page.wait_for_timeout(250)
         st = state(page)

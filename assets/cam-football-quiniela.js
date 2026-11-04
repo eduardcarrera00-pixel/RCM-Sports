@@ -207,18 +207,7 @@
   function paintNav(){
     const nav=$('camFootballNav');if(!nav)return;
     nav.replaceChildren();
-    const rounds=[...new Set(inScope().map(g=>Number(g.matchday)))].sort((a,b)=>a-b);
-    const roundSelect=el('select',null,'cam-nfl-select');
-    roundSelect.setAttribute('aria-label','Jornada');
-    for(const value of rounds.length?rounds:[matchday]){
-      const op=el('option',roundName(value));op.value=String(value);op.selected=value===matchday;
-      roundSelect.append(op);
-    }
-    roundSelect.value=String(matchday);
-    roundSelect.addEventListener('change',()=>{matchday=Number(roundSelect.value);dayKey=null;paint();});
-    const roundField=el('label',null,'cam-football-round-control');
-    roundField.append(el('span','Jornada','cam-football-filter-label'),roundSelect);
-    // Debajo de la jornada, las cuatro competiciones con su logo: tocar una la elige.
+    // La competición sigue aquí; las jornadas guardadas se consultan en el perfil.
     const leagues=el('div',null,'cam-football-leagues');
     leagues.setAttribute('role','group');leagues.setAttribute('aria-label','Competición');
     for(const id of LEAGUE_ORDER){
@@ -239,7 +228,7 @@
       });
       leagues.append(button);
     }
-    nav.append(roundField,leagues);
+    nav.append(leagues,button('Ver mis jornadas ›',()=>window.camOpenQuinielaHistory?.('football'),'cam-nfl-action cam-nfl-action-secondary'));
   }
   function logo(id){
     const team=teams.get(id);
@@ -601,7 +590,7 @@
     const observer=new MutationObserver(()=>{
       const visible=document.body.classList.contains('ae-is-football');
       root.hidden=!visible;
-      // Al volver a Fútbol, abrir la jornada vigente; consultar el pasado sigue siendo libre.
+      // La vista pública siempre abre la jornada vigente; el historial vive en el perfil.
       if(visible&&!wasVisible&&loaded)hydrate();
       wasVisible=visible;
       if(visible&&!loaded&&!loading)hydrate();

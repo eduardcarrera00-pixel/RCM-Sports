@@ -362,3 +362,60 @@
   html body #camProfileParties .cam-party-card { border-radius:12px!important; }
   html body #camProfileParties :is(.cam-pp-emblem, .cam-pp-mark) { border-radius:50%!important; }
 }
+
+/* Historial propio: cinco pestañas y jornadas independientes del calendario público. */
+@layer cam-banners {
+  html body #aeProfileDialog .ae-profile-tabs button[hidden] { display:none!important; }
+  html body #aeProfileDialog .ae-profile-tabs:not([hidden]) { overflow-x:auto!important; }
+  html body #aeProfileDialog #camProfileQuiniela {
+    display:grid!important; gap:14px!important; margin:0!important; padding:18px 30px 28px!important;
+    color:var(--rs-ink)!important; font:14px/1.5 Inter,system-ui,sans-serif!important;
+  }
+  html body #aeProfileDialog #camProfileQuiniela[hidden] { display:none!important; }
+  html body #camProfileQuiniela * { box-sizing:border-box!important; }
+  html body #camProfileQuiniela h3 { margin:0!important; color:var(--rs-ink)!important; font:600 24px/1.2 "Playfair Display",Georgia,serif!important; }
+  html body #camProfileQuiniela p { margin:0!important; }
+  html body #camProfileQuiniela .cam-qh-intro,
+  html body #camProfileQuiniela .cam-qh-message { color:var(--rs-muted)!important; font-size:12px!important; }
+  html body #camProfileQuiniela .cam-qh-sports { display:flex!important; gap:8px!important; }
+  html body #camProfileQuiniela .cam-qh-button {
+    display:inline-flex!important; align-items:center!important; justify-content:center!important;
+    min-height:44px!important; width:auto!important; padding:9px 16px!important; margin:0!important;
+    border:1px solid var(--rs-line-strong)!important; background:var(--rs-card)!important;
+    color:var(--rs-accent)!important; font:700 12px/1.4 Inter,system-ui,sans-serif!important; cursor:pointer!important;
+  }
+  html body #camProfileQuiniela .cam-qh-button[aria-pressed="true"] { background:var(--rs-accent-soft)!important; border-color:var(--rs-gold)!important; }
+  html body #camProfileQuiniela .cam-qh-filters { display:grid!important; grid-template-columns:repeat(auto-fit,minmax(130px,1fr))!important; gap:10px!important; }
+  html body #camProfileQuiniela .cam-qh-filter { display:grid!important; gap:6px!important; min-width:0!important; font-size:12px!important; color:var(--rs-muted)!important; }
+  html body #camProfileQuiniela select {
+    min-height:44px!important; min-width:0!important; width:100%!important; max-width:100%!important; padding:10px!important;
+    border:1px solid var(--rs-line-strong)!important; background:var(--rs-card)!important; color:var(--rs-ink)!important;
+    font:600 13px/1.4 Inter,system-ui,sans-serif!important;
+  }
+  html body #camProfileQuiniela .cam-qh-summary { color:var(--rs-accent)!important; font-size:12px!important; }
+  html body #camProfileQuiniela .cam-qh-games { display:grid!important; grid-template-columns:repeat(2,minmax(0,1fr))!important; gap:12px!important; margin:0!important; padding:0!important; list-style:none!important; }
+  html body #camProfileQuiniela .cam-qh-game { display:grid!important; gap:8px!important; min-width:0!important; padding:14px!important; border:1px solid var(--rs-line)!important; background:var(--rs-card)!important; }
+  html body #camProfileQuiniela .cam-qh-game-head { display:flex!important; flex-wrap:wrap!important; justify-content:space-between!important; gap:6px!important; font-size:11px!important; color:var(--rs-muted)!important; }
+  html body #camProfileQuiniela .cam-qh-state { font-weight:700!important; color:var(--rs-accent)!important; }
+  html body #camProfileQuiniela .is-won .cam-qh-state { color:var(--rs-won)!important; }
+  html body #camProfileQuiniela .is-lost .cam-qh-state { color:var(--rs-lost)!important; }
+  html body #camProfileQuiniela .cam-qh-team { display:flex!important; align-items:center!important; gap:8px!important; min-width:0!important; }
+  html body #camProfileQuiniela .cam-qh-team img { flex:0 0 28px!important; width:28px!important; height:28px!important; object-fit:contain!important; }
+  html body #camProfileQuiniela .cam-qh-team span { flex:1!important; overflow-wrap:anywhere!important; }
+  html body #camProfileQuiniela .cam-qh-choice { padding-top:8px!important; border-top:1px solid var(--rs-line)!important; font-size:12px!important; color:var(--rs-text)!important; overflow-wrap:anywhere!important; }
+  html body #camProfileQuiniela :is(button,select):focus-visible { outline:2px solid var(--rs-gold)!important; outline-offset:3px!important; }
+  @media(max-width:760px) {
+    html body #aeProfileDialog #camProfileQuiniela { padding:14px 14px 22px!important; }
+    html body #aeProfileDialog .ae-profile-tabs button { min-height:44px!important; padding:0 6px!important; font-size:10px!important; letter-spacing:0!important; }
+    html body #camProfileQuiniela .cam-qh-games { grid-template-columns:minmax(0,1fr)!important; }
+    html body #camProfileQuiniela .cam-qh-filters:has(>label:nth-child(3)) > label:last-child { grid-column:1/-1!important; }
+  }
+  @media(max-width:360px) {
+    html body #aeProfileDialog .ae-profile-tabs button { padding:0 4px!important; font-size:9px!important; }
+  }
+}
+@layer cam-header {
+  html body #camProfileQuiniela .cam-qh-button { border-radius:999px!important; }
+  html body #camProfileQuiniela :is(select,.cam-qh-game) { border-radius:14px!important; }
+  html body #camProfileQuiniela img { border-radius:0!important; }
+}
