@@ -174,12 +174,44 @@
      'Aún no hay Takes con votos netos positivos.':
      'Aún no hay Takes con votos netos negativos.','ae-top-takes-empty'));
  }
+ async function refreshHistoric(sport,section,seq){
+   const target=$('aeSportTakeHistoricTake');
+   if(!target)return;
+   const active=()=>seq===request&&current===sport&&currentCategory===section;
+   target.setAttribute('aria-busy','true');
+   target.replaceChildren(el('p','Cargando Take histórico…','ae-discovery-empty'));
+   try{
+     if(typeof db==='undefined'||!db)throw Error('Sin conexión');
+     const result=await db.rpc('ae_sport_take_historic',{p_sport:sport});
+     if(result.error)throw result.error;
+     if(!active())return;
+     const winner=(result.data||[]).find(t=>t.id&&Number(t.points)>0&&
+       (sport==='nfl'?t.sport==='nfl':footballSports.has(t.sport)));
+     if(winner)target.replaceChildren(window.aeTakeHistoricCard.create(winner));
+     else window.aeTakeHistoricCard.empty(target,
+       'Cuando se puntúe un Take acertado de '+section+', el que más puntos sume quedará aquí.',section);
+   }catch(error){
+     if(!active())return;
+     const retry=el('button','Volver a intentar','cam-take-record-cta');
+     retry.type='button';
+     retry.addEventListener('click',()=>refresh(true));
+     target.replaceChildren(el('p','No se pudo cargar el Take histórico de '+section+'.','ae-discovery-empty'),retry);
+   }finally{
+     if(active())target.removeAttribute('aria-busy');
+   }
+ }
  async function refresh(force=false) {
    const section=typeof currentCategory==='undefined'?'':currentCategory;
    const root=$('aeSportTakeLeaders'),voices=document.querySelector('.editorial-community');
    if(!root||!voices)return;
    const sport=section==='NFL'?'nfl':section==='Fútbol'?'football':'';
    root.hidden=!sport;voices.hidden=!!sport;
+   const historic=$('aeSportTakeHistoric');
+   if(historic){
+     historic.hidden=!sport;
+     historic.dataset.sport=sport;
+     $('aeSportTakeHistoricKicker').textContent='Salón de la fama · '+section;
+   }
    root.dataset.sport=sport;
    syncFootballDesktopPlacement();
    alignNflOpinions();
@@ -191,6 +223,7 @@
    if(!force&&sport===current&&Date.now()-lastRun<15000)return;
    current=sport;
    const seq=++request;const status=$('aeSportTakeStatus');
+   const historicRequest=refreshHistoric(sport,section,seq);
    status.textContent='Cargando opiniones de la comunidad…';
    try{
      if(!db)throw Error('Sin conexión');
@@ -215,6 +248,8 @@
          if(list)list.replaceChildren(el('li','No pudimos cargar la clasificación.','ae-top-takes-empty'));
        }
      }
+   }finally{
+     await historicRequest;
    }
  }
  window.refreshAeSportTopTakes=refresh;

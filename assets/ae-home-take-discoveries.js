@@ -113,9 +113,9 @@
     medal.setAttribute('aria-hidden','true');
     medal.append(make('strong',points),make('small',points===1?'pt':'pts'));
     const body=make('span',null,'cam-take-record-body');
-    body.append(make('span',t.competition||'Deportes','ae-discovery-sport cam-take-record-chip'));
+    body.append(make('span',t.competition||(t.sport==='nfl'?'NFL':t.sport?'Fútbol':'Deportes'),'ae-discovery-sport cam-take-record-chip'));
     body.append(make('strong',t.title||'Take de la comunidad','ae-discovery-title'));
-    const excerpt=String(t.body||'').trim();
+    const excerpt=String(t.body||'').replace(/\r\n/g,'\n').replace(/^NFL(?: · [^\n]*)?\n\n/,'').trim();
     if(excerpt)body.append(make('span',excerpt.length>170?excerpt.slice(0,167).trimEnd()+'…':excerpt,'ae-discovery-excerpt'));
     const foot=make('span',null,'ae-discovery-meta cam-take-record-byline');
     foot.append(make('span','@'+String(t.author||'Aficionado').replace(/^@+/,''),'cam-take-record-author'));
@@ -126,7 +126,7 @@
     return btn;
   }
   // Sin récord todavía: placa vacía con invitación a publicar.
-  function emptyHistoric(target,message){
+  function emptyHistoric(target,message,sport){
     if(!target)return;
     const box=make('div',null,'cam-take-record-empty');
     const medal=make('span',null,'cam-take-record-medal is-empty');
@@ -145,13 +145,15 @@
     cta.append(document.createTextNode('Publicar mi Take'));
     const chevron=make('span','›','cam-chevron');chevron.setAttribute('aria-hidden','true');cta.append(chevron);
     cta.addEventListener('click',()=>{
-      if(typeof window.aeOpenTakeComposer==='function')window.aeOpenTakeComposer();
+      if(typeof window.aeOpenTakeComposer==='function')window.aeOpenTakeComposer(sport);
       else $('aeHomeTakePublish')?.click();
     });
     copy.append(cta);
     box.append(medal,copy);
     target.replaceChildren(box);
   }
+  // Portada y deportes comparten la misma placa y la conversación original.
+  window.aeTakeHistoricCard={create:historicalCard,empty:emptyHistoric};
   function empty(target,message,isList=false){
     if(target)target.replaceChildren(make(isList?'li':'p',message,'ae-discovery-empty'));
   }

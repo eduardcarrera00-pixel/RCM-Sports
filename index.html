@@ -3153,7 +3153,14 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
             <p id="aeSeasonStatus" class="ae-season-status" role="status" aria-live="polite"></p>
           </section>
           <details id="aeTakeReview" class="ae-take-review" hidden><summary>Administrar · Puntuar Takes</summary><p>Primero calcula la dificultad de cada Take (tabla de la liga, nivel de sorpresa o cuota) y después marca si se cumplió. Los puntos (1–20) salen solos: lo obvio vale poco y la sorpresa vale mucho. Si recalculas un Take ya puntuado, su puntuación se actualiza.</p><p id="aeTakeReviewStatus" role="status" aria-live="polite"></p><div id="aeTakeReviewList"></div></details>
-          
+          <section id="aeSportTakeHistoric" class="ae-home-take-feature" hidden aria-labelledby="aeSportTakeHistoricTitle">
+            <div class="ae-historic-copy">
+              <span id="aeSportTakeHistoricKicker" class="ae-home-take-feature-kicker cam-take-record-kicker">Salón de la fama · Takes</span>
+              <h3 id="aeSportTakeHistoricTitle">Take histórico</h3>
+              <p class="ae-home-take-feature-intro">El Take acertado con más puntos de todo el historial de este deporte.</p>
+            </div>
+            <div id="aeSportTakeHistoricTake" aria-live="polite"><p class="ae-discovery-empty">Cargando Take histórico…</p></div>
+          </section>
           
         </section>
 
@@ -6366,7 +6373,7 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 </style>
 
 <!-- Ajustes de diseño para el teléfono (28 oct): va al final para ganar a las capas anteriores. -->
-<link rel="stylesheet" href="assets/cam-movil-ajustes.css?v=20261028-prepara-pick-1">
+<link rel="stylesheet" href="assets/cam-movil-ajustes.css?v=20261103-sport-take-historic-1">
 <!-- Conversación de un Take y botón de compartir en las tarjetas (28 oct): al final, como los ajustes del teléfono. -->
 <link rel="stylesheet" href="assets/cam-take-conversacion.css?v=20261028-1">
 <!-- Parties (1 nov): grupos privados con clasificación propia. Al final, como los ajustes del teléfono. -->
@@ -6383,9 +6390,9 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 <script src="assets/cam-lazy-editorial-loader.js?v=20261024-1"></script>
 <script src="assets/cam-opinions-section-banners.js?v=20261025-theme-assets-1"></script>
 <script src="assets/ae-home-takes.js?v=20261017-esports-league-v1"></script>
-<script src="assets/ae-home-take-discoveries.js?v=20261028-salon-fama-1"></script>
+<script src="assets/ae-home-take-discoveries.js?v=20261103-sport-take-historic-1"></script>
 
-<script src="assets/ae-sport-top-takes.js?v=20261103-invitacion-abajo-1"></script>
+<script src="assets/ae-sport-top-takes.js?v=20261103-sport-take-historic-1"></script>
 <script src="assets/ae-take-replies.js?v=20261028-conversacion-1"></script>
 <script src="assets/ae-draft-guard.js?v=20261019-photo-date-1"></script>
 <script src="assets/ae-take-category-edit.js?v=20261016-1"></script>
