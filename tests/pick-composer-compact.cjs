@@ -29,9 +29,12 @@ const css=[
   assert.equal(await page.locator('.cam-pick-how__title').innerText(),'Cómo funcionan los Picks');
   assert.match(await page.locator('.cam-pick-hero__flow').innerText(),/Sube captura[\s\S]*Preparamos tu Pick[\s\S]*Borramos la foto/);
   assert.equal(await page.locator('.cam-pick-how > #camPickPointsRules').count(),1);
-  assert.equal(await page.locator('.cp-capture-title').innerText(),'¡A por el #1, Pickster!');
+  assert.equal(await page.locator('.cp-capture-title').innerText(),'Sube tu apuesta real');
   assert.equal(await page.locator('.cam-pick-how__title').getAttribute('aria-expanded'),'true');
-  assert.match(await page.locator('.cp-capture-intro').innerText(),/Lideratos en disputa[\s\S]*tablas mensuales e históricas/);
+  assert.equal(await page.locator('.cp-capture-intro').innerText(),'Apuesta confirmada, selección y cuota visibles.');
+  assert.equal(await page.locator('.cp-capture-picker').innerText(),'Subir captura de mi apuesta');
+  assert.equal(await page.locator('.cp-capture-proof').innerText(),'Tu captura respalda el Pick.');
+  assert.equal(await page.locator('.cp-capture-intro + .cp-capture-picker').count(),1,'The screenshot requirements appear immediately before upload');
   assert.equal(await page.locator('.cp-capture-help').count(),0,'Step 03 is the only note about deleting the photo');
   assert.doesNotMatch(await page.locator('.cp-capture').innerText(),/descartamos|no guardamos/i);
   assert.doesNotMatch(await page.locator('.cp-capture').innerText(),/PNG|JPG|WebP|8 MB/);

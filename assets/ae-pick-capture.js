@@ -178,10 +178,10 @@
   let result=null,signature='',active=null,sequence=0,usedAi=false;
   const fingerprint=()=>JSON.stringify({picks:getPicks().map(p=>({sport:p.sport,event:p.event,selection:p.selection,odds:Number(p.odds)}))});
   const panel=node('section',null,'cp-capture');panel.setAttribute('aria-labelledby','cpCaptureTitle');
-  const title=node('h3','¡A por el #1, Pickster!','cp-capture-title');title.id='cpCaptureTitle';
+  const title=node('h3','Sube tu apuesta real','cp-capture-title');title.id='cpCaptureTitle';
   const intro=node('p',null,'cp-capture-intro');
-  intro.append(node('strong','Lideratos en disputa.'),document.createTextNode(' Compite en las tablas mensuales e históricas.'));
-  const picker=node('button','Subir captura','cp-capture-picker'),input=document.createElement('input');picker.type='button';picker.setAttribute('aria-describedby','cpCaptureStatus');
+  intro.textContent='Apuesta confirmada, selección y cuota visibles.';intro.id='cpCaptureIntro';
+  const picker=node('button','Subir captura de mi apuesta','cp-capture-picker'),input=document.createElement('input');picker.type='button';picker.setAttribute('aria-describedby','cpCaptureIntro cpCaptureStatus');
   input.type='file';input.id='cpCaptureFile';input.accept='image/png,image/jpeg,image/webp';input.multiple=true;input.hidden=true;picker.addEventListener('click',()=>input.click());
   const status=node('p','','cp-capture-status');status.id='cpCaptureStatus';status.setAttribute('role','status');status.setAttribute('aria-live','polite');
   const privacy=node('div',null,'cp-capture-privacy');privacy.hidden=true;privacy.setAttribute('role','status');privacy.setAttribute('aria-live','polite');privacy.setAttribute('aria-atomic','true');
@@ -199,8 +199,8 @@
   // El comprobante es temporal. Que la foto se borra ya lo dice el paso 03 de «Cómo funcionan los Picks»:
   // aquí no se repite.
   const proof=node('p',null,'cp-capture-proof');
-  proof.append(node('strong','Aquí lo que se canta se baila.'),node('span','Pedimos tu captura como evidencia del Pick.'));
-  panel.append(title,picker,intro,input,shot,progress,privacy,status,summary,cancel,proof);
+  proof.textContent='Tu captura respalda el Pick.';
+  panel.append(title,intro,picker,input,shot,progress,privacy,status,summary,cancel,proof);
   form.prepend(panel);form.classList.add('cp-capture-first');
   const overlay=makeOverlay(form.closest('dialog')||document.body,()=>clear('Lectura cancelada.',true));
   const isCurrent=job=>active===job&&!job.cancelled;
@@ -276,7 +276,7 @@
   }
   function clear(message='Elige una captura para importar tu apuesta y su momio.',showDiscard=false){
    const job=stop(),revision=++sequence;if(!(showDiscard&&job))overlay.hide();result=null;signature='';summary.hidden=true;summary.replaceChildren();privacy.hidden=true;
-   input.value='';picker.textContent='Subir captura';title.textContent='¡A por el #1, Pickster!';panel.dataset.state='empty';status.textContent=message;shotImage.removeAttribute('src');shot.hidden=true;progress.hidden=true;progressBar.style.width='0%';applyImport(null);onChange();
+   input.value='';picker.textContent='Subir captura de mi apuesta';title.textContent='Sube tu apuesta real';panel.dataset.state='empty';status.textContent=message;shotImage.removeAttribute('src');shot.hidden=true;progress.hidden=true;progressBar.style.width='0%';applyImport(null);onChange();
    if(showDiscard&&job){
     showPrivacy('discarding');
     void dispose(job).then(discarded=>{if(sequence===revision&&!active)showPrivacy(discarded?'complete':'unconfirmed');});
