@@ -1,16 +1,16 @@
 /* CAM SPORTS · Load editorial views when requested, not on every Home visit.
- * Public Home, Picks, NFL and Fútbol do not need Opiniones or the full news archive.
+ * Public Home, Picks, NFL and Fútbol do not need Actualidad or the full news archive.
  */
 (() => {
   'use strict';
   const base=new URL('.',document.currentScript?.src||new URL('assets/',location.href));
   const source={
-    opinions:'ae-opinions.js?v=20261024-lazy-editorial-1',
+    opinions:'ae-opinions.js?v=20261104-actualidad-1',
     archive:'ae-news-archive.js?v=20261024-lazy-editorial-1'
   };
   const inFlight=new Map(),loaded=new Set();
   const errorMessage=key=>key==='opinions'
-    ? 'No pudimos cargar Opiniones. Vuelve a entrar en esta sección.'
+    ? 'No pudimos cargar Actualidad. Vuelve a entrar en esta sección.'
     : 'No pudimos abrir todas las noticias. Inténtalo de nuevo.';
   function report(key){
     const node=document.getElementById(key==='opinions'?'aeOpinionsStatus':'aeNewsArchiveStatus');
@@ -68,7 +68,7 @@
     void archiveProxy(trigger.dataset.aeNewsCategory||'Todas',trigger);
   },true);
 
-  // Shared URLs must still open Opiniones when arriving directly from a link.
+  // Shared URLs must still open Actualidad when arriving directly from a link.
   function deepLink(){
     if(!/^[0-9a-f-]{36}$/i.test(new URLSearchParams(location.search).get('opinion')||''))return;
     if(typeof filterByCategory==='function')filterByCategory('Opiniones');

@@ -1,4 +1,4 @@
-/* CAM SPORTS · Opiniones.
+/* CAM SPORTS · Actualidad.
  * Columnas y noticias comentadas por la redacción, divididas por deporte.
  * Lectura pública (ae_opinions, solo publicadas); los administradores ven también
  * los borradores y publican, editan o borran con ae_publish_opinion,
@@ -293,7 +293,7 @@
       if(story.length||sportTakes.length)bySport.set(key,{key,label,story,sportTakes});
     }
     if(!bySport.size)return;
-    const sportsHeading = sectionHeader('Opiniones por deporte','Columnas y conversaciones reunidas por tema, sin duplicar la portada.');
+    const sportsHeading = sectionHeader('Actualidad por deporte','Columnas y conversaciones reunidas por tema, sin duplicar la portada.');
     sportsHeading.dataset.camOpinionsBanner = 'sports';
     sportTarget.append(sportsHeading);
     const grid=el('div',null,'ae-opinions-sport-grid');
@@ -325,7 +325,7 @@
     list.replaceChildren();
     list.setAttribute('aria-busy',String(!loaded));
     const shown=visible();
-    if(!loaded&&!shown.length){list.append(el('p','Cargando opiniones…','ae-opinions-empty'));return;}
+    if(!loaded&&!shown.length){list.append(el('p','Cargando actualidad…','ae-opinions-empty'));return;}
     if(failed){
       const box=el('div',null,'ae-opinions-empty');
       const retry=el('button','Reintentar','ae-opinions-button is-secondary');retry.type='button';
@@ -335,7 +335,7 @@
     }
     if(!shown.length){
       const empty=el('div',null,'ae-opinions-empty');
-      empty.append(el('h3','Todavía no hay opiniones'+(active==='todas'?'':' de '+SPORT_NAME[active])),
+      empty.append(el('h3','Todavía no hay publicaciones'+(active==='todas'?'':' de '+SPORT_NAME[active])),
         el('p',admin?'Pulsa «Escribir opinión» para publicar la primera.':'La redacción publicará aquí sus próximas columnas.'));
       list.append(empty);
     }else{
@@ -350,7 +350,7 @@
       const recent=shown.filter(o=>!cover.includes(o)).slice(0,6);
       if(recent.length){
         const section=el('section',null,'ae-opinions-recent');
-        section.append(sectionHeader('Últimas opiniones','Publicaciones en orden de fecha, de más recientes a más antiguas.'));
+        section.append(sectionHeader('Últimas publicaciones','Publicaciones en orden de fecha, de más recientes a más antiguas.'));
         const rows=el('div',null,'ae-opinions-recent-list');
         for(const o of recent)rows.append(card(o,false,true));
         section.append(rows);list.append(section);

@@ -1,4 +1,4 @@
-/* CAM SPORTS · Banners configurables de Opiniones.
+/* CAM SPORTS · Banners configurables de Actualidad.
  * Tres secciones x dos temas; sólo los editores pueden guardar.
  * La configuración pública se lee con RLS desde Supabase.
  */
@@ -7,7 +7,7 @@
   const SLOTS = {
     distinguished: 'Opinadores distinguidos',
     debated: 'Lo más debatido',
-    sports: 'Opiniones por deporte'
+    sports: 'Actualidad por deporte'
   };
   const THEMES = ['light', 'dark'];
   const MIME = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
@@ -131,7 +131,7 @@
     form.noValidate = true;
     const title = element('h2', null, 'Editar banner');
     title.id = 'camOpBannerTitle';
-    const note = element('p', null, 'Cada sección puede tener una imagen distinta para día y noche. Se muestra sólo en Opiniones.');
+    const note = element('p', null, 'Cada sección puede tener una imagen distinta para día y noche. Se muestra sólo en Actualidad.');
     const theme = element('select'); theme.id = 'camOpBannerTheme';
     [['light','Modo día'],['dark','Modo noche']].forEach(pair => {
       const option = element('option', null, pair[1]); option.value = pair[0]; theme.append(option);

@@ -1,4 +1,4 @@
-/* CAM SPORTS — phone app dock: Inicio · NFL · Fútbol · Picks · Opiniones.
+/* CAM SPORTS — phone app dock: Inicio · NFL · Fútbol · Picks · Actualidad.
    Reuses the real header category buttons (same handlers, same filterByCategory);
    only their place and order change on phones. Perfil lives in the header
    and opens the profile (or sign-in).
@@ -85,7 +85,7 @@
       const theme = actions.querySelector("#themeToggle");
       actions.insertBefore(profile, theme?.parentNode === actions ? theme.nextSibling : actions.firstChild);
     }
-    for (const button of dockButtons) button.setAttribute('aria-label', button === home ? 'Inicio' : button.dataset.category);
+    for (const button of dockButtons) button.setAttribute('aria-label', button === home ? 'Inicio' : button === opinions ? 'Actualidad' : button.dataset.category);
   }
 
   function desktopLayout() {

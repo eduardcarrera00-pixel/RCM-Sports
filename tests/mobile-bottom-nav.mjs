@@ -130,7 +130,7 @@ await new Promise(resolve => setTimeout(resolve, 0));
 assert.equal(originalButtons.get('NFL').getAttribute('aria-current'), 'page');
 assert.equal(originalButtons.get('NFL').getAttribute('aria-pressed'), 'true');
 assert.equal(originalButtons.get('NFL').getAttribute('aria-label'), 'NFL');
-assert.equal(originalButtons.get('Opiniones').getAttribute('aria-label'), 'Opiniones');
+assert.equal(originalButtons.get('Opiniones').getAttribute('aria-label'), 'Actualidad');
 assert.equal(originalButtons.get('Picks').getAttribute('aria-pressed'), 'false');
 originalButtons.get('Fútbol').classList.add('active');
 originalButtons.get('NFL').classList.remove('active');
