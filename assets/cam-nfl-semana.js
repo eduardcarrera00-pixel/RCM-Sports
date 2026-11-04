@@ -4,13 +4,11 @@
      · cabecera de edición: la semana, sus fechas y cuándo cierra el próximo partido;
      · Duelo de la semana: el partido entre los dos mejores del Power Ranking
        (sin ranking, el más parejo), para elegir ahí mismo;
-     · Abre la semana y La que más paga, con un atajo a todos los partidos;
+     · Juega la quiniela: Abre la semana y La que más paga, con accesos a cada partido;
      · ¿Le ganas al editor? (cuando la base de datos tiene la migración 20261104090000);
      · El marcador (o La crónica, lunes y martes): resultados con sorpresas y caídas
        del Top 10;
-     · Power Rankings con su diseño de siempre (#nflRankings: título, n.º 1 y la
-       cinta). En el teléfono el módulo se coloca entre La semana y La Quiniela
-       y vuelve a su sitio en escritorio; el movimiento lo calcula community.js.
+     · Power Rankings conserva su módulo completo y su diseño en Noticias.
    El orden cambia con el día: lunes y martes manda La crónica; con partidos en
    juego, En juego; el resto de la semana, los duelos.
 
@@ -28,7 +26,7 @@
   const mobile = window.matchMedia('(max-width: 760px), (orientation: landscape) and (max-height: 500px) and (hover: none) and (pointer: coarse)');
   const TZ = 'America/Toronto';
   const H = 36e5;
-  const ui = { scoreOpen: false };
+  const ui = { scoreOpen: false, savingGame: null, saveResult: null };
   const duelCache = new Map();   // 'temporada|semana|usuario' → fila de cam_nfl_expert_duel (o null)
 
   /* ---------- utilidades ---------- */
@@ -88,7 +86,13 @@
     return b;
   }
   const quiniela = () => window.camNflQuiniela || null;
-  const focusGame = id => { const q = quiniela(); if (q) q.focus(id); else document.getElementById('camNflQuiniela')?.scrollIntoView({ block: 'start' }); };
+  function focusGame(id) {
+    release();
+    window.camSectionTabs?.select?.('quiniela', { scroll: false });
+    const q = quiniela();
+    if (q) q.focus(id);
+    else document.getElementById('camNflQuiniela')?.scrollIntoView({ block: 'start' });
+  }
 
   /* ---------- la semana en datos ---------- */
   function currentWeek(games, season) {
@@ -145,16 +149,23 @@
     const chosen = snap.mine.get(g.id) === id;
     const b = el('button', null, 'cam-ns-pick' + (chosen ? ' is-selected' : ''));
     b.type = 'button';
+    b.disabled = ui.savingGame != null;
     b.setAttribute('aria-pressed', String(chosen));
     const p = pointsFor(g, id);
     const doubled = p != null && snap.laurel === g.id;
     b.append(el('strong', nick(id)), el('span', p == null ? 'pts pendientes' : (doubled ? pts(p * 2) + ' · x2' : pts(p)), 'cam-ns-pick-points'));
-    b.setAttribute('aria-label', 'Elegir ' + (teamOf(id)?.name || id) + (p == null ? '' : ', ' + pts(doubled ? p * 2 : p)) + (chosen ? ' (tu elección)' : ''));
+    b.setAttribute('aria-label', 'Quiniela: elegir ' + (teamOf(id)?.name || id) + (p == null ? '' : ', ' + pts(doubled ? p * 2 : p)) + (chosen ? ' (tu elección guardada)' : ''));
     b.addEventListener('click', async () => {
       const q = quiniela();
-      if (!q) return;
-      b.disabled = true;
-      try { await q.save(g.id, id); } finally { b.disabled = false; }
+      if (!q || ui.savingGame != null) return;
+      ui.savingGame = g.id;
+      ui.saveResult = null;
+      for (const button of b.parentElement.children) if (button.tagName === 'BUTTON') button.disabled = true;
+      try {
+        const saved = await q.save(g.id, id);
+        if (saved) ui.saveResult = { game: g.id, text: 'Quiniela guardada: ' + nick(id) + '.' };
+        else if (snap.user) ui.saveResult = { game: g.id, text: document.getElementById('camNflStatus')?.textContent || 'No se pudo guardar. Inténtalo de nuevo.' };
+      } finally { ui.savingGame = null; schedule(); }
     });
     return b;
   }
@@ -178,33 +189,52 @@
 
     if (finished(duel)) {
       box.append(el('p', duel.away_id + ' ' + duel.away_score + ' – ' + duel.home_score + ' ' + duel.home_id, 'cam-ns-duel-score'));
+    } else {
+      box.append(el('p', (started(duel) ? (duel.status === 'live' ? 'En juego · ' : 'Cerrado · ') : '') + when(duel.kickoff) + ' · ' + dayMonth(duel.kickoff), 'cam-ns-duel-when'));
+    }
+
+    const opinion = el('div', null, 'cam-ns-opinion');
+    opinion.append(el('p', 'Tu opinión', 'cam-ns-action-label'));
+    const take = link('Publicar mi take sobre este duelo', () => {
+      window.aeOpenTakeComposer?.('NFL');
+    }, 'cam-ns-link-take');
+    take.setAttribute('aria-controls', 'aeTakeComposerDialog');
+    take.setAttribute('aria-haspopup', 'dialog');
+    opinion.append(take);
+    box.append(opinion);
+
+    const play = el('div', null, 'cam-ns-quiniela', { role: 'group', 'aria-label': 'Quiniela del duelo de la semana' });
+    play.append(el('p', 'Quiniela · Elige ganador', 'cam-ns-action-label'));
+    if (finished(duel)) {
       const mine = snap.mine.get(duel.id);
       const winner = duel.winner_id;
-      if (mine) box.append(el('p', mine === winner ? 'Acertaste: ' + nick(mine) + '.' : 'Elegiste ' + nick(mine) + '.', 'cam-ns-note'));
+      if (mine) play.append(el('p', mine === winner ? 'Acertaste: ' + nick(mine) + '.' : 'Elegiste ' + nick(mine) + '.', 'cam-ns-note'));
     } else if (started(duel)) {
-      box.append(el('p', duel.status === 'live' ? 'En juego' : 'Cerrado · ' + when(duel.kickoff), 'cam-ns-duel-when'));
       const mine = snap.mine.get(duel.id);
-      if (mine) box.append(el('p', 'Tu elección: ' + nick(mine), 'cam-ns-note'));
+      play.append(el('p', mine ? 'Tu elección: ' + nick(mine) : 'Pronósticos cerrados', 'cam-ns-note'));
     } else {
-      box.append(el('p', when(duel.kickoff) + ' · ' + dayMonth(duel.kickoff), 'cam-ns-duel-when'));
       const picks = el('div', null, 'cam-ns-picks');
       if (quiniela()?.isOpen?.(duel)) picks.append(sideButton(duel, duel.away_id, snap), sideButton(duel, duel.home_id, snap));
       else picks.append(el('p', 'Se abre cuando lleguen las cuotas.', 'cam-ns-note'));
-      box.append(picks);
+      play.append(picks);
+    }
+    if (ui.saveResult?.game === duel.id) {
+      play.append(el('p', ui.saveResult.text, 'cam-ns-note', { role: 'status' }));
+    } else if (!started(duel) && snap.mine.has(duel.id)) {
+      play.append(el('p', 'Tu elección guardada: ' + nick(snap.mine.get(duel.id)), 'cam-ns-note'));
     }
     const expertPick = snap.expert?.picks.get(duel.id);
     if (expertPick) {
       const done = finished(duel) && duel.winner_id;
-      box.append(el('p', done ? 'El editor eligió ' + nick(expertPick) + (expertPick === duel.winner_id ? ' y acertó.' : ' y falló.') : 'El editor va con ' + nick(expertPick) + '.', 'cam-ns-note cam-ns-expert-note'));
+      play.append(el('p', done ? 'El editor eligió ' + nick(expertPick) + (expertPick === duel.winner_id ? ' y acertó.' : ' y falló.') : 'El editor va con ' + nick(expertPick) + '.', 'cam-ns-note cam-ns-expert-note'));
     }
     const share = snap.split?.get(duel.id);
     if (share && Number(share.total) >= 5) {
       const away = Math.round(100 * Number(share.away_picks) / Number(share.total));
-      box.append(el('p', 'La comunidad: ' + away + ' % ' + nick(duel.away_id) + ' · ' + (100 - away) + ' % ' + nick(duel.home_id), 'cam-ns-note'));
+      play.append(el('p', 'La comunidad: ' + away + ' % ' + nick(duel.away_id) + ' · ' + (100 - away) + ' % ' + nick(duel.home_id), 'cam-ns-note'));
     }
-    box.append(link('Publicar mi Take sobre este duelo ›', () => {
-      if (typeof window.aeOpenTakeComposer === 'function') window.aeOpenTakeComposer('NFL');
-    }, 'cam-ns-link-take'));
+    play.append(link('Ver este partido en la quiniela →', () => focusGame(duel.id)));
+    box.append(play);
     return box;
   }
 
@@ -215,17 +245,21 @@
     const rest = open.filter(g => g.id !== duel?.id && g.id !== firstGame?.id && g.points_home != null && g.points_away != null);
     const payer = rest.sort((a, b) => Math.max(b.points_home, b.points_away) - Math.max(a.points_home, a.points_away))[0] || null;
     const box = el('section', null, 'cam-ns-block cam-ns-teasers', { 'data-block': 'partidos' });
-    box.append(el('h3', 'Los partidos', 'cam-ns-sr'));
+    box.append(el('h3', 'Juega la quiniela', 'cam-ns-section-title'));
+    box.append(el('p', 'Elige ganadores y suma puntos', 'cam-ns-intro'));
     const grid = el('div', null, 'cam-ns-teaser-grid');
     const card = (g, tag, line) => {
       const b = el('button', null, 'cam-ns-teaser');
       b.type = 'button';
+      b.dataset.gameId = g.id;
+      b.setAttribute('aria-controls', 'camNflQuiniela');
       b.append(el('span', tag, 'cam-ns-teaser-tag'));
       const match = el('span', null, 'cam-ns-teaser-match');
       match.append(crest(g.away_id, 22), el('span', g.away_id + ' @ ' + g.home_id), crest(g.home_id, 22));
       b.append(match, el('span', line, 'cam-ns-teaser-line'));
       const mine = snap.mine.get(g.id);
       if (mine) b.append(el('span', 'Tu elección: ' + nick(mine), 'cam-ns-teaser-mine'));
+      b.append(el('span', 'Participar en la quiniela →', 'cam-ns-teaser-cta'));
       b.setAttribute('aria-label', tag + ': ' + (teamOf(g.away_id)?.name || g.away_id) + ' en ' + (teamOf(g.home_id)?.name || g.home_id) + '. ' + line + '. Abrir en la quiniela');
       b.addEventListener('click', () => focusGame(g.id));
       return b;
@@ -238,11 +272,12 @@
       const id = payer.points_away >= payer.points_home ? payer.away_id : payer.home_id;
       grid.append(card(payer, 'La que más paga', 'Si gana ' + id + ': ' + pts(pointsFor(payer, id))));
     }
-    if (grid.childElementCount) box.append(grid);
+    if (!grid.childElementCount) return null;
+    box.append(grid);
     const picked = weekGames.filter(g => snap.mine.has(g.id)).length;
     const foot = el('div', null, 'cam-ns-foot');
     foot.append(el('span', snap.user ? 'Llevas ' + picked + ' de ' + weekGames.length : weekGames.length + ' partidos esta semana', 'cam-ns-progress'));
-    foot.append(link('Elegir los partidos ›', () => focusGame(open[0].id)));
+    foot.append(link('Ver toda la quiniela ›', () => focusGame(open[0].id)));
     box.append(foot);
     return box;
   }
@@ -332,20 +367,6 @@
     return box;
   }
 
-  /* ---------- Power Rankings: el módulo de siempre ----------
-     El mismo #nflRankings (título, n.º 1 y la cinta, con sus vistas previas «por qué
-     está aquí»): en el teléfono va justo después de La semana, antes de La Quiniela;
-     en escritorio, o fuera de NFL, vuelve a su sitio. Va fuera de #camNflSemana para
-     que ningún estilo de esta sección le cambie el diseño. */
-  const rankings = document.getElementById('nflRankings');
-  const rankingsHome = rankings ? document.createComment('nflRankings') : null;
-  if (rankings) rankings.before(rankingsHome);
-  function placeRankings() {
-    if (!rankings || !rankingsHome) return;
-    if (active()) { if (rankings.previousElementSibling !== root) root.after(rankings); }
-    else if (rankings.previousSibling !== rankingsHome) rankingsHome.after(rankings);
-  }
-
   /* ---------- tú contra el editor (una llamada por jornada) ---------- */
   async function loadDuel(season, week, user) {
     const key = season + '|' + week + '|' + (user?.id || '-');
@@ -362,7 +383,6 @@
 
   /* ---------- pintar ---------- */
   function render() {
-    placeRankings();
     if (!active()) return;
     const q = quiniela();
     const snap = q?.snapshot?.() || null;
@@ -393,7 +413,6 @@
       editor: expertBlock(snap, weekGames, scoreWeek),
       marcador: score
     };
-    // Power Rankings sigue a La semana (placeRankings), antes de La Quiniela.
     const order = mode === 'cronica' ? ['marcador', 'editor', 'duelo', 'partidos']
       : mode === 'envivo' ? ['envivo', 'duelo', 'marcador', 'partidos', 'editor']
       : ['duelo', 'partidos', 'editor', 'marcador'];
@@ -431,20 +450,27 @@
     requestAnimationFrame(() => { queued = false; render(); });
   }
 
-  /* ---------- «Ver Top 10» lleva a Power Rankings, dentro de La semana ---------- */
-  const originalTopTen = typeof window.openNflTopTen === 'function' ? window.openNflTopTen : null;
+  /* ---------- «Ver Top 10» abre Noticias y enfoca el módulo completo ---------- */
   window.openNflTopTen = function camSemanaTopTen() {
-    if (!mobile.matches && originalTopTen) return originalTopTen.apply(this, arguments);
     if (typeof window.filterByCategory === 'function') window.filterByCategory('NFL');
-    window.camSectionTabs?.select?.('semana', { scroll: false });
+    window.camSectionTabs?.select?.('noticias', { scroll: false });
     anchor('nflRankings');
-    render();
-    requestAnimationFrame(keepAnchor);
+    requestAnimationFrame(() => {
+      const rankings = document.getElementById('nflRankings');
+      rankings?.focus({ preventScroll: true });
+      rankings?.scrollIntoView({ block: 'start' });
+    });
   };
 
   document.addEventListener('cam:nfl-quiniela-data', schedule);
   document.addEventListener('cam:nfl-ranking', schedule);
-  document.addEventListener('cam:section-tab', event => { if (event.detail?.section === 'nfl') schedule(); });
+  document.addEventListener('cam:section-tab', event => {
+    if (event.detail?.section !== 'nfl') return;
+    // A delayed data repaint must not undo the visitor's next tab choice.
+    if ((anchorId === 'nflRankings' && event.detail.tab !== 'noticias') ||
+        (anchorId === 'camNflQuiniela' && event.detail.tab !== 'semana')) release();
+    schedule();
+  });
   document.addEventListener('visibilitychange', () => { if (!document.hidden) schedule(); });
   if (typeof mobile.addEventListener === 'function') mobile.addEventListener('change', schedule);
   new MutationObserver(schedule).observe(document.body, { attributes: true, attributeFilter: ['class'] });

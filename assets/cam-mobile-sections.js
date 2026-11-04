@@ -1,6 +1,6 @@
 /* CAM SPORTS — phone section tabs and addresses.
    Inside NFL: La semana · Takes · Noticias (4 nov 2026: La semana holds the
-   quiniela, the duel of the week, the scores and «La columna» Power Rankings;
+   quiniela, the duel of the week and the scores; Power Rankings lives in Noticias;
    ?v=quiniela still works and opens it).
    Inside Fútbol: Noticias · Takes · Quiniela (the Savant · Rookie
    standings close the Takes tab, under Últimos Takes).
@@ -18,7 +18,7 @@
 
   const mobile = window.matchMedia('(max-width: 760px), (orientation: landscape) and (max-height: 500px) and (hover: none) and (pointer: coarse)');
   const SPORT_TABS = [['noticias', 'Noticias'], ['takes', 'Takes'], ['quiniela', 'Quiniela']];
-  // NFL (4 nov 2026): La semana abre la sección (quiniela, duelo, marcador y Power Rankings).
+  // NFL: La semana abre la sección; Power Rankings pertenece a Noticias.
   const NFL_TABS = [['semana', 'La semana'], ['takes', 'Takes'], ['noticias', 'Noticias']];
   // Old addresses keep working: ?v=clasificacion now opens Takes.
   const OLD_TABS = { clasificacion: 'takes' };
@@ -38,11 +38,10 @@
       quiniela: '#camNflQuiniela, #camFootballQuiniela, #aeSeasonPredictions',
       takes: '#freeTakes'
     },
-    // La semana va primero: la quiniela vive dentro de #freeTakes. En el teléfono los
-    // Power Rankings de NFL se leen en «La columna», dentro de La semana.
+    // La quiniela vive dentro de #freeTakes; el ranking completo encabeza Noticias.
     nfl: {
-      semana: '#camNflSemana, #camNflQuiniela, #aeSeasonPredictions, #nflRankings',
-      noticias: '#heroSection, #aeNewsHeadingRow, #aeSportLatestNews, #articlesGrid, #aeSportAllNewsFooter, #aeMoreNews, #aeNflLatestComments, #mainContent > .editorial-layout',
+      semana: '#camNflSemana, #camNflQuiniela, #aeSeasonPredictions',
+      noticias: '#nflRankings, #heroSection, #aeNewsHeadingRow, #aeSportLatestNews, #articlesGrid, #aeSportAllNewsFooter, #aeMoreNews, #aeNflLatestComments, #mainContent > .editorial-layout',
       takes: '#freeTakes'
     },
     picks: {

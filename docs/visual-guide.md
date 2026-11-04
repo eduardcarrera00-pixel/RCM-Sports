@@ -283,3 +283,13 @@ mantiene su diseño. Los mensajes distinguen Picks activos de su historial.
 Las fichas de Takes para X se exportan a 1200 × 675 (16:9) en todos los modos de
 texto, centrando la composición original sin deformarla. Historia, TikTok,
 publicación y Foto conservan sus dimensiones y comportamiento.
+
+### NFL · Opinión y quiniela · 4 nov 2026
+
+Se conservan las pestañas móviles **La semana · Takes · Noticias**. El duelo
+separa «Tu opinión» (botón principal para abrir el formulario NFL) de
+«Quiniela · Elige ganador» (selecciones de puntos). Las tarjetas de partidos
+reales van bajo «Juega la quiniela», con «Elige ganadores y suma puntos» y
+«Participar en la quiniela →». Cada acceso enfoca su partido y conserva las
+elecciones. Power Rankings permanece completo en Noticias; sus accesos abren
+esa pestaña y enfocan el módulo original. El escritorio conserva su composición.

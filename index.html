@@ -2514,7 +2514,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
 <script src="assets/ae-site-images.js?v=20261104-noticias-nfl-dia-1"></script>
 <script src="assets/cam-site-texts.js?v=20261103-remove-welcome-1"></script>
 <script defer src="assets/cam-mobile-bottom-nav.js?v=20261104-actualidad-1"></script>
-<link rel="stylesheet" href="assets/cam-perf-controls.css?v=20261104-power-rankings-semana-1">
+<link rel="stylesheet" href="assets/cam-perf-controls.css?v=20261104-nfl-take-quiniela-1">
 
 <script defer src="assets/cam-take-cta.js?v=20261023-take-cta-unificado-1"></script>
 <link rel="stylesheet" href="assets/cam-perf-football-headings.css?v=20261104-css-consolidated-1">
@@ -2626,7 +2626,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
     <main id="mainContent" tabindex="-1" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
 
         <div id="articleMissing" class="rcm-panel hidden" role="alert"><p>No encontramos esta publicación. Puede que haya sido eliminada.</p><button type="button" onclick="closeModal()">Volver al inicio</button></div>
-        <section id="nflRankings" class="rcm-panel hidden" aria-labelledby="rankingTitle">
+        <section id="nflRankings" class="rcm-panel hidden" tabindex="-1" aria-labelledby="rankingTitle">
             <div class="rcm-row ae-rank-hero-head">
                 <div class="ae-rank-title-wrap">
                     <span class="ae-rank-overline">NFL · LA ÉLITE DE LA LIGA</span>
@@ -4398,6 +4398,7 @@ currentUser = {
 
         function openNflTopTen() {
             filterByCategory('NFL');
+            window.camSectionTabs?.select?.('noticias', {scroll:false});
             document.getElementById('nflRankings').scrollIntoView({block:'start', behavior:'instant'});
         }
         function openChampionsTopTen() {
@@ -6393,9 +6394,9 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 </style>
 
 <!-- Componentes finales: móvil, conversación, parties, perfil y Takes; orden en performance-css-packs.json. -->
-<link rel="stylesheet" href="assets/cam-perf-app-panels.css?v=20261104-power-rankings-semana-1">
+<link rel="stylesheet" href="assets/cam-perf-app-panels.css?v=20261104-nfl-take-quiniela-1">
 <script src="assets/cam-parties.js?v=20261104-perfil-claro-1"></script>
-<script src="assets/cam-sport-quiniela-loader.js?v=20261104-la-semana-1"></script>
+<script src="assets/cam-sport-quiniela-loader.js?v=20261104-nfl-take-quiniela-1"></script>
 <script src="assets/ae-season-predictions.js?v=20261021-champion-guide-1"></script>
 <script src="assets/cam-lazy-editorial-loader.js?v=20261104-actualidad-1"></script>
 <script src="assets/cam-opinions-section-banners.js?v=20261104-actualidad-1"></script>
@@ -6416,11 +6417,11 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 <script src="assets/ae-notifications.js?v=20261103-remove-welcome-1"></script>
 <script src="assets/cam-analytics.js?v=20261026-sin-robots"></script>
 <!-- Teléfono (3 nov): pestañas dentro de NFL, Fútbol y Picks, y una dirección por sección (?s=nfl&v=quiniela). -->
-<script src="assets/cam-mobile-sections.js?v=20261104-la-semana-1"></script>
+<script src="assets/cam-mobile-sections.js?v=20261104-nfl-take-quiniela-1"></script>
 <!-- Teléfono (3 nov): Inicio como «Tu jornada» (atajos + filas deslizables). Escritorio sin cambios. -->
 <script src="assets/cam-home-jornada.js?v=20261103-jornada-1"></script>
-<!-- Teléfono (4 nov): NFL · La semana (duelo, partidos, editor, marcador y La columna). Escritorio sin cambios. -->
-<script src="assets/cam-nfl-semana.js?v=20261104-power-rankings-1"></script>
+<!-- Teléfono (4 nov): NFL · La semana (opinión y quiniela); Power Rankings en Noticias. Escritorio sin cambios. -->
+<script src="assets/cam-nfl-semana.js?v=20261104-nfl-take-quiniela-1"></script>
 
 <script id="ae-home-news-carousel-motion">
 /* Movimiento ligero y reversible: sin clones, sin alterar enlaces, votos o artículos. */

@@ -7,14 +7,13 @@ Cubre:
     (?s=nfl&v=semana) con cabecera de edición, Duelo de la semana (n.º 3 vs n.º 2),
     Abre la semana y La que más paga, ¿Le ganas al editor? (con «tú contra el
     editor» de la semana anterior), El marcador / La crónica (sorpresa primero)
-    y después los Power Rankings de siempre (#nflRankings, con el movimiento
-    real contra la última edición publicada ≥ 12 h), antes de La Quiniela; no se
-    repiten en Noticias; sin desbordamiento ni textos recortados;
+    y los Power Rankings de siempre en Noticias (#nflRankings, con el movimiento
+    real contra la última edición publicada ≥ 12 h), sin duplicar el módulo; sin desbordamiento ni textos recortados;
   · elegir en el duelo guarda el pronóstico (cam_nfl_save_pick) y lo marca;
   · en La Quiniela: la elección del editor en cada partido, el laurel en un
     partido ya pronosticado (cam_nfl_set_laurel, puntos x2) y la regla visible;
   · tocar «La que más paga» abre ese partido en la quiniela;
-  · «Ver Top 10» desde Inicio abre La semana a la altura de los Power Rankings;
+  · «Ver Top 10» desde Inicio abre Noticias a la altura de los Power Rankings;
   · sin la migración (tabla y funciones inexistentes): ni editor, ni laurel, ni
     comunidad, ni reglas nuevas, y ningún error;
   · escritorio (1366 px): La semana no se ve; Power Rankings como siempre; la
@@ -129,7 +128,7 @@ def phone(width, dark):
         st = page.evaluate(STATE)
         assert st['cat'] == 'NFL' and st['tab'] == 'semana' and st['url'] == '?s=nfl&v=semana', f'{where}: NFL no abre La semana {st}'
         assert st['tabs'] == ['La semana', 'Takes', 'Noticias'], f'{where}: pestañas {st["tabs"]}'
-        assert st['semana'] and st['quiniela'] and st['rankings'], f'{where}: visibles {st}'
+        assert st['semana'] and st['quiniela'] and not st['rankings'], f'{where}: visibles {st}'
         assert st['edition'].startswith('NFL · Semana 9 · ') and st['title'] == 'La semana', f'{where}: cabecera {st["edition"]} / {st["title"]}'
         assert st['sub'].startswith('5 partidos · el primero cierra el '), f'{where}: subtítulo {st["sub"]}'
         expected_order = {'cronica': ['marcador', 'editor', 'duelo', 'partidos'],
@@ -149,8 +148,12 @@ def phone(width, dark):
         # Marcador: la sorpresa primero, luego las caídas del Top 10.
         assert st['scoreTitle'] in ('El marcador · Semana 8', 'La crónica · Semana 8'), f'{where}: marcador {st["scoreTitle"]}'
         assert st['scoreTags'][:3] == ['Sorpresa · pagó 7', 'Cae el n.º 2', 'Cae el n.º 4'] and st['scoreRows'] == 3, f'{where}: marcador {st["scoreTags"]}'
-        # Power Rankings de siempre, entre La semana y La Quiniela, con movimiento real (≥ 12 h).
-        assert st['order'] == {'after': True, 'before': True, 'sibling': 'camNflSemana', 'parent': 'freeTakes'}, f'{where}: posición de Power Rankings {st["order"]}'
+        # Power Rankings queda fuera de La semana, con movimiento real (≥ 12 h).
+        assert st['order'] is None, f'{where}: ranking visible en La semana'
+        assert page.locator('#nflRankings').count() == 1
+        assert page.locator('.cam-ns-section-title').inner_text() == 'Juega la quiniela'
+        assert page.locator('.cam-ns-intro').inner_text() == 'Elige ganadores y suma puntos'
+        assert page.locator('.cam-ns-teaser-cta').all_text_contents() == ['Participar en la quiniela →'] * 2
         assert st['moves'] == ['–', '▲2', '–', '▼2', '–', '–', '–', 'Nuevo', '▼1', 'Nuevo'], f'{where}: movimiento {st["moves"]}'
         # La Quiniela: editor, laurel y reglas.
         # La quiniela enseña un día cada vez: el jueves, el editor va con Jaguars.
@@ -159,9 +162,6 @@ def phone(width, dark):
         clipped = page.evaluate(CLIPPED)
         assert not clipped, f'{where}: textos recortados {clipped}'
         if SHOTS: page.screenshot(path=str(SHOTS / f'{where}-semana.png'), full_page=False)
-        if SHOTS:
-            page.locator('#nflRankings').scroll_into_view_if_needed(); page.wait_for_timeout(200)
-            page.screenshot(path=str(SHOTS / f'{where}-power-rankings.png'))
 
         # Elegir en el duelo guarda el pronóstico.
         page.locator('#camNflSemana .cam-ns-pick', has_text='Vikings').click(); page.wait_for_timeout(700)
@@ -196,16 +196,17 @@ def phone(width, dark):
             page.locator('#camNflGames [data-game-id="w9-1"]').scroll_into_view_if_needed(); page.wait_for_timeout(200)
             page.screenshot(path=str(SHOTS / f'{where}-quiniela-laurel.png'))
 
-        # «Ver Top 10» desde Inicio abre La semana a la altura de los Power Rankings.
+        # «Ver Top 10» desde Inicio abre Noticias a la altura de los Power Rankings.
         page.click('body > nav.cam-mobile-bottom-nav > button[data-category="Todos"]'); page.wait_for_timeout(600)
         page.evaluate('openNflTopTen()'); page.wait_for_timeout(900)
         st = page.evaluate(STATE)
         top = page.evaluate("document.getElementById('nflRankings').getBoundingClientRect().top")
-        assert st['tab'] == 'semana' and st['rankings'] and 40 <= top < 400, f'{where}: Top 10 {top}'
-        # Noticias de NFL ya no repite los Power Rankings.
-        page.click('#camSectionTabs button[data-tab="noticias"]'); page.wait_for_timeout(500)
+        assert st['tab'] == 'noticias' and st['rankings'] and 40 <= top < 400, f'{where}: Top 10 {top}'
+        # La semana no repite los Power Rankings.
+        if SHOTS: page.screenshot(path=str(SHOTS / f'{where}-power-rankings.png'))
+        page.click('#camSectionTabs button[data-tab="semana"]'); page.wait_for_timeout(500)
         st = page.evaluate(STATE)
-        assert not st['rankings'] and not st['semana'], f'{where}: Noticias {st}'
+        assert not st['rankings'] and st['semana'], f'{where}: La semana {st}'
         assert page.errors == [], f'{where}: errores {page.errors}'
     print('PASS', where)
 
@@ -215,7 +216,7 @@ def without_migration():
     with fp.full_page(fake_js=NO_MIGRATION + BASE, width=390, height=820) as page:
         open_nfl(page)
         st = page.evaluate(STATE)
-        assert st['semana'] and st['rankings'] and 'editor' not in st['blocks'] and 'duelo' in st['blocks'], f'{where}: bloques {st["blocks"]}'
+        assert st['semana'] and not st['rankings'] and 'editor' not in st['blocks'] and 'duelo' in st['blocks'], f'{where}: bloques {st["blocks"]}'
         assert st['chips'] == [] and st['laurels'] == [], f'{where}: editor o laurel sin migración {st["chips"]} {st["laurels"]}'
         assert not any('editor' in n.lower() for n in st['duelNotes']), f'{where}: notas {st["duelNotes"]}'
         hidden = page.evaluate("[document.getElementById('camNflLaurelRule').hidden, document.getElementById('camNflExpertRule').hidden]")

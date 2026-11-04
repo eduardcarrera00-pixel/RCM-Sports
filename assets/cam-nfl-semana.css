@@ -2,7 +2,7 @@
    1. La sección #camNflSemana: solo en el teléfono, en la pestaña La semana de
       NFL (body[data-cam-section="nfl"][data-cam-tab="semana"], que pone
       cam-mobile-sections.js). En escritorio no existe a la vista. Los Power
-      Rankings van después, con su diseño de siempre: estas reglas no los tocan.
+      Rankings viven en Noticias, con su diseño de siempre.
    2. En La Quiniela NFL (teléfono y escritorio): la elección del editor, el
       laurel (x2) y lo que eligió la comunidad, debajo de cada partido.
    Va al final del <body> en la capa cam-banners con !important, como
@@ -103,10 +103,23 @@
       color:var(--ns-accent)!important; font:700 12.5px/1.2 Inter,system-ui,sans-serif!important;
       letter-spacing:0!important; text-transform:none!important; white-space:nowrap!important; cursor:pointer!important;
     }
-    html body #camNflSemana .cam-ns-link-take { display:flex!important; justify-content:center!important; width:100%!important; margin-top:4px!important; }
+    html body #camNflSemana .cam-ns-opinion { margin-top:16px!important; }
+    html body #camNflSemana .cam-ns-action-label {
+      color:var(--ns-muted)!important; font:700 11.5px/1.4 Inter,system-ui,sans-serif!important;
+    }
+    html body #camNflSemana .cam-ns-link-take {
+      display:flex!important; justify-content:center!important; width:100%!important; min-height:44px!important;
+      margin-top:6px!important; padding:10px 12px!important; border:1px solid var(--ns-accent)!important; border-radius:12px!important;
+      background:var(--ns-accent)!important; color:var(--ns-on-accent)!important;
+      font-size:13px!important; line-height:1.4!important; white-space:normal!important; text-align:center!important; overflow-wrap:anywhere!important;
+    }
+    html body #camNflSemana .cam-ns-quiniela {
+      margin-top:16px!important; padding-top:12px!important; border-top:1px solid var(--ns-line)!important; border-radius:0!important;
+    }
+    html body #camNflSemana .cam-ns-quiniela > .cam-ns-link { min-height:44px!important; max-width:100%!important; white-space:normal!important; }
     html body #camNflSemana :is(.cam-ns-link,.cam-ns-pick,.cam-ns-teaser):focus-visible { outline:2px solid var(--ns-accent)!important; outline-offset:2px!important; }
     html body #camNflSemana .cam-ns-foot {
-      display:flex!important; align-items:center!important; justify-content:space-between!important; gap:10px!important; margin-top:8px!important;
+      display:flex!important; flex-wrap:wrap!important; align-items:center!important; justify-content:space-between!important; gap:4px 10px!important; margin-top:8px!important;
     }
     html body #camNflSemana .cam-ns-progress { color:var(--ns-muted)!important; font:600 12.5px/1.3 Inter,system-ui,sans-serif!important; }
 
@@ -154,6 +167,12 @@
     html body #camNflSemana .cam-ns-pick:active { transform:scale(.98)!important; }
 
     /* los partidos */
+    html body #camNflSemana .cam-ns-section-title {
+      color:var(--ns-ink)!important; font:600 21px/1.25 "Playfair Display",Georgia,serif!important;
+    }
+    html body #camNflSemana .cam-ns-intro {
+      margin:4px 0 10px!important; color:var(--ns-muted)!important; font:500 12.5px/1.4 Inter,system-ui,sans-serif!important;
+    }
     html body #camNflSemana .cam-ns-teaser-grid { display:grid!important; grid-template-columns:repeat(2,minmax(0,1fr))!important; gap:8px!important; }
     html body #camNflSemana .cam-ns-teaser {
       display:flex!important; flex-direction:column!important; align-items:flex-start!important; justify-content:flex-start!important; gap:6px!important;
@@ -171,6 +190,12 @@
     html body #camNflSemana .cam-ns-teaser-match { display:flex!important; align-items:center!important; gap:6px!important; color:var(--ns-ink)!important; font:700 13.5px/1.2 Inter,system-ui,sans-serif!important; }
     html body #camNflSemana .cam-ns-teaser-line { color:var(--ns-muted)!important; font:600 12px/1.35 Inter,system-ui,sans-serif!important; }
     html body #camNflSemana .cam-ns-teaser-mine { color:var(--ns-accent)!important; font:700 11.5px/1.3 Inter,system-ui,sans-serif!important; }
+    html body #camNflSemana .cam-ns-teaser-cta {
+      display:flex!important; align-items:center!important; align-self:stretch!important; min-height:44px!important; margin-top:auto!important;
+      padding-top:8px!important; border-top:1px solid var(--ns-line)!important; border-radius:0!important;
+      color:var(--ns-accent)!important; font:700 12px/1.4 Inter,system-ui,sans-serif!important; white-space:normal!important; overflow-wrap:anywhere!important;
+    }
+    html body #camNflSemana .cam-ns-teaser-match { flex-wrap:wrap!important; max-width:100%!important; }
     html body #camNflSemana .cam-ns-teasers .cam-ns-foot { margin-top:6px!important; padding:0 2px!important; }
     @media (max-width: 360px) {
       html body #camNflSemana .cam-ns-teaser-match .cam-ns-crest { display:none!important; }

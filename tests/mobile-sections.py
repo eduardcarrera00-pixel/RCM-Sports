@@ -5,13 +5,13 @@ Página completa en Chromium con tests/full-page.py y el Supabase falso (sin red
 Cubre, a 320/390 px de día y de noche (y 1366 px para escritorio):
   · la barra inferior Inicio · NFL · Fútbol · Picks · Perfil (Perfil al final);
   · NFL: La semana · Takes · Noticias (La semana con La Quiniela; los Power
-    Rankings de NFL van en La semana, no en Noticias); Fútbol: Noticias ·
+    Rankings de NFL van en Noticias); Fútbol: Noticias ·
     Takes · Quiniela; qué módulo enseña cada pestaña (Savant · Rookie, debajo
     de Últimos Takes); Picks: Picks · Historial · Chefs;
   · la barra de pestañas queda fija arriba al bajar y toca el encabezado;
   · la dirección (?s=nfl&v=quiniela), abrir un enlace directo (también el
     antiguo ?v=clasificacion, que abre Takes) y el botón Atrás;
-  · los atajos que llevan a un módulo (Top 10 NFL → Power Rankings en La semana)
+  · los atajos que llevan a un módulo (Top 10 NFL → Power Rankings en Noticias)
     abren su pestaña;
   · en escritorio no hay pestañas y se ve todo como antes;
   · sin errores de consola ni desbordamiento horizontal.
@@ -47,9 +47,9 @@ SPORT_EXPECT = {
 }
 NFL_TABS = ['semana', 'takes', 'noticias']
 NFL_EXPECT = {
-    'semana': {'#camNflSemana': True, '#QUINIELA': True, '#freeTakesTitle': False, '#aeSportTakeRanking': False, '#articlesGrid': False, '#RANK': True},
+    'semana': {'#camNflSemana': True, '#QUINIELA': True, '#freeTakesTitle': False, '#aeSportTakeRanking': False, '#articlesGrid': False, '#RANK': False},
     'takes': {**SPORT_EXPECT['takes'], '#camNflSemana': False},
-    'noticias': {'#articlesGrid': True, '#aeSportLatestNews': True, '#freeTakes': False, '#camNflSemana': False, '#RANK': False},
+    'noticias': {'#articlesGrid': True, '#aeSportLatestNews': True, '#freeTakes': False, '#camNflSemana': False, '#RANK': True},
 }
 PICKS_TABS = ['picks', 'historial', 'chefs']
 PICKS_EXPECT = {
@@ -138,7 +138,7 @@ def phone(width, dark):
         page.click('body > nav.cam-mobile-bottom-nav > button[data-category="Todos"]'); page.wait_for_timeout(500)
         page.evaluate('openNflTopTen()'); page.wait_for_timeout(600)
         st = page.evaluate(STATE)
-        assert st['cat'] == 'NFL' and st['current'] == 'semana', f'{where}: Top 10 {st}'
+        assert st['cat'] == 'NFL' and st['current'] == 'noticias', f'{where}: Top 10 {st}'
         assert page.evaluate("document.getElementById('nflRankings').getBoundingClientRect().top") >= 40, f'{where}: el Top 10 queda bajo la barra'
 
         # Tocar otra vez la sección activa sube arriba.

@@ -273,11 +273,15 @@
     finally{paintGames();announce();}
   }
   function focusGame(gameId){
+    window.camSectionTabs?.select?.('quiniela',{scroll:false});
     const g=games.find(x=>x.id===gameId);
     if(g&&Number(g.week)===week&&Number(g.season)===season){dayKey=gameDay(g);setQuinielaView('jornada');paintGames();}
     const card=g&&$('camNflGames')?.querySelector('[data-game-id="'+CSS.escape(g.id)+'"]');
     const target=card||root;
-    requestAnimationFrame(()=>{try{target.scrollIntoView({block:card?'center':'start'});}catch{}});
+    requestAnimationFrame(()=>{
+      if(card){card.tabIndex=-1;card.focus({preventScroll:true});}
+      try{target.scrollIntoView({block:card?'center':'start'});}catch{}
+    });
   }
   function weekName(value){
     return ({19:'Playoffs · Wild Card',20:'Playoffs · Divisional',21:'Playoffs · Conferencias',22:'Super Bowl'})[value] || 'Jornada '+value;
