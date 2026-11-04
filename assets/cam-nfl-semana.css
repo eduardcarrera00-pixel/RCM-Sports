@@ -1,7 +1,8 @@
 /* CAM SPORTS · NFL «La semana» (4 nov 2026).
    1. La sección #camNflSemana: solo en el teléfono, en la pestaña La semana de
       NFL (body[data-cam-section="nfl"][data-cam-tab="semana"], que pone
-      cam-mobile-sections.js). En escritorio no existe a la vista.
+      cam-mobile-sections.js). En escritorio no existe a la vista. Los Power
+      Rankings van después, con su diseño de siempre: estas reglas no los tocan.
    2. En La Quiniela NFL (teléfono y escritorio): la elección del editor, el
       laurel (x2) y lo que eligió la comunidad, debajo de cada partido.
    Va al final del <body> en la capa cam-banners con !important, como
@@ -59,7 +60,7 @@
       overflow:hidden!important; clip:rect(0 0 0 0)!important; white-space:nowrap!important; border:0!important;
     }
     /* Las líneas entre filas son rectas: la esquina global del sitio no llega aquí. */
-    html body #camNflSemana :is(.cam-ns-result,.cam-ns-team,.cam-ns-versus,.cam-ns-rule,.cam-ns-results,.cam-ns-column) { border-radius:0!important; }
+    html body #camNflSemana :is(.cam-ns-result,.cam-ns-versus,.cam-ns-rule,.cam-ns-results) { border-radius:0!important; }
 
     /* cabecera de edición */
     html body #camNflSemana .cam-ns-head { display:block!important; margin:2px 2px 0!important; padding:0!important; }
@@ -199,30 +200,6 @@
     html body #camNflSemana .cam-ns-versus { margin-top:10px!important; padding-top:10px!important; border-top:1px solid var(--ns-line)!important; color:var(--ns-text)!important; font:400 13px/1.45 Inter,system-ui,sans-serif!important; }
     html body #camNflSemana .cam-ns-versus strong { color:var(--ns-ink)!important; font-weight:800!important; }
 
-    /* la columna */
-    html body #camNflSemana .cam-ns-column { display:block!important; }
-    html body #camNflSemana .cam-ns-team {
-      display:grid!important; grid-template-columns:20px 30px minmax(0,1fr)!important; align-items:start!important; gap:10px!important;
-      padding:10px 0!important; border-top:1px solid var(--ns-line)!important;
-    }
-    html body #camNflSemana .cam-ns-team:first-child { border-top:0!important; padding-top:2px!important; }
-    html body #camNflSemana .cam-ns-rank { padding-top:3px!important; color:var(--ns-gold)!important; font:600 19px/1 "Playfair Display",Georgia,serif!important; text-align:center!important; }
-    html body #camNflSemana .cam-ns-team-main { min-width:0!important; }
-    html body #camNflSemana .cam-ns-team-line { display:flex!important; flex-wrap:wrap!important; align-items:center!important; gap:4px 8px!important; min-height:30px!important; }
-    html body #camNflSemana .cam-ns-team-name { color:var(--ns-ink)!important; font:700 14px/1.25 Inter,system-ui,sans-serif!important; overflow-wrap:anywhere!important; }
-    html body #camNflSemana .cam-ns-move {
-      display:inline-flex!important; align-items:center!important; padding:2px 7px!important; border-radius:999px!important;
-      font:800 11px/1.2 Inter,system-ui,sans-serif!important; white-space:nowrap!important; font-variant-numeric:tabular-nums!important;
-    }
-    html body #camNflSemana .cam-ns-move.is-up { background:color-mix(in srgb,var(--ns-up) 14%,transparent)!important; color:var(--ns-up)!important; }
-    html body #camNflSemana .cam-ns-move.is-down { background:color-mix(in srgb,var(--ns-down) 14%,transparent)!important; color:var(--ns-down)!important; }
-    html body #camNflSemana .cam-ns-move.is-new { background:var(--ns-accent-soft)!important; color:var(--ns-accent)!important; }
-    html body #camNflSemana .cam-ns-move.is-flat { padding:2px 4px!important; color:var(--ns-muted)!important; }
-    html body #camNflSemana .cam-ns-last { margin-left:auto!important; color:var(--ns-muted)!important; font:600 11.5px/1.25 Inter,system-ui,sans-serif!important; white-space:nowrap!important; font-variant-numeric:tabular-nums!important; }
-    html body #camNflSemana .cam-ns-team-note {
-      display:-webkit-box!important; -webkit-box-orient:vertical!important; -webkit-line-clamp:2!important; overflow:hidden!important;
-      margin-top:4px!important; color:var(--ns-text)!important; font:italic 400 13px/1.45 "Playfair Display",Georgia,serif!important;
-    }
   }
 
   /* ---------- 2. La Quiniela NFL: editor, laurel y comunidad ---------- */

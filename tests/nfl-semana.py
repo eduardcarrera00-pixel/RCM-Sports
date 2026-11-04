@@ -7,14 +7,14 @@ Cubre:
     (?s=nfl&v=semana) con cabecera de edición, Duelo de la semana (n.º 3 vs n.º 2),
     Abre la semana y La que más paga, ¿Le ganas al editor? (con «tú contra el
     editor» de la semana anterior), El marcador / La crónica (sorpresa primero)
-    y La columna (movimiento real contra la última edición publicada ≥ 12 h,
-    último resultado y frase de la columna del editor); el carrusel de Power
-    Rankings no se repite en Noticias; sin desbordamiento ni textos recortados;
+    y después los Power Rankings de siempre (#nflRankings, con el movimiento
+    real contra la última edición publicada ≥ 12 h), antes de La Quiniela; no se
+    repiten en Noticias; sin desbordamiento ni textos recortados;
   · elegir en el duelo guarda el pronóstico (cam_nfl_save_pick) y lo marca;
   · en La Quiniela: la elección del editor en cada partido, el laurel en un
     partido ya pronosticado (cam_nfl_set_laurel, puntos x2) y la regla visible;
   · tocar «La que más paga» abre ese partido en la quiniela;
-  · «Ver Top 10» desde Inicio abre La columna con los diez;
+  · «Ver Top 10» desde Inicio abre La semana a la altura de los Power Rankings;
   · sin la migración (tabla y funciones inexistentes): ni editor, ni laurel, ni
     comunidad, ni reglas nuevas, y ningún error;
   · escritorio (1366 px): La semana no se ve; Power Rankings como siempre; la
@@ -95,10 +95,11 @@ STATE = """() => {
     editor: text('#camNflSemana [data-block=editor] p'),
     scoreTitle: text('#camNflSemana [data-block=marcador] .cam-ns-kicker')[0] || '', scoreTags: text('#camNflSemana [data-block=marcador] .cam-ns-result-tag'),
     scoreRows: document.querySelectorAll('#camNflSemana [data-block=marcador] .cam-ns-result').length,
-    column: [...document.querySelectorAll('#camNflSemana .cam-ns-team')].map(li => ({
-      name: li.querySelector('.cam-ns-team-name')?.textContent, move: li.querySelector('.cam-ns-move')?.textContent || null,
-      last: li.querySelector('.cam-ns-last')?.textContent || null, note: !!li.querySelector('.cam-ns-team-note')})),
-    columnAside: text('#camNflSemana [data-block=columna] .cam-ns-aside')[0] || '',
+    moves: [...document.querySelectorAll('#rankingList > li')].map(li => li.querySelector('.ae-rank-trend')?.textContent.replace(/\\s+/g, '') || null),
+    order: (() => { const r = document.getElementById('nflRankings'); const s = document.getElementById('camNflSemana'); const q = document.getElementById('camNflQuiniela');
+      if (!shown('#nflRankings')) return null;
+      const rr = r.getBoundingClientRect(); return {after: rr.top >= s.getBoundingClientRect().bottom - 1, before: rr.bottom <= q.getBoundingClientRect().top + 1,
+        sibling: r.previousElementSibling?.id || null, parent: r.parentElement.id}; })(),
     chips: text('#camNflQuiniela .cam-nfl-chip-expert'), laurels: text('#camNflQuiniela .cam-nfl-laurel'),
     laurelRule: shown('#camNflLaurelRule'), expertRule: shown('#camNflExpertRule'),
     overflow: document.documentElement.scrollWidth - innerWidth,
@@ -128,11 +129,11 @@ def phone(width, dark):
         st = page.evaluate(STATE)
         assert st['cat'] == 'NFL' and st['tab'] == 'semana' and st['url'] == '?s=nfl&v=semana', f'{where}: NFL no abre La semana {st}'
         assert st['tabs'] == ['La semana', 'Takes', 'Noticias'], f'{where}: pestañas {st["tabs"]}'
-        assert st['semana'] and st['quiniela'] and not st['rankings'], f'{where}: visibles {st}'
+        assert st['semana'] and st['quiniela'] and st['rankings'], f'{where}: visibles {st}'
         assert st['edition'].startswith('NFL · Semana 9 · ') and st['title'] == 'La semana', f'{where}: cabecera {st["edition"]} / {st["title"]}'
         assert st['sub'].startswith('5 partidos · el primero cierra el '), f'{where}: subtítulo {st["sub"]}'
-        expected_order = {'cronica': ['marcador', 'editor', 'duelo', 'partidos', 'columna'],
-                          'duelos': ['duelo', 'partidos', 'editor', 'marcador', 'columna']}[st['phase']]
+        expected_order = {'cronica': ['marcador', 'editor', 'duelo', 'partidos'],
+                          'duelos': ['duelo', 'partidos', 'editor', 'marcador']}[st['phase']]
         assert st['blocks'] == expected_order, f'{where}: orden {st["phase"]} {st["blocks"]}'
         # Duelo: Bills (n.º 3) en Minnesota (n.º 2).
         assert st['duelKicker'] == 'Duelo de la semana · n.º 3 vs n.º 2', f'{where}: duelo {st["duelKicker"]}'
@@ -148,13 +149,9 @@ def phone(width, dark):
         # Marcador: la sorpresa primero, luego las caídas del Top 10.
         assert st['scoreTitle'] in ('El marcador · Semana 8', 'La crónica · Semana 8'), f'{where}: marcador {st["scoreTitle"]}'
         assert st['scoreTags'][:3] == ['Sorpresa · pagó 7', 'Cae el n.º 2', 'Cae el n.º 4'] and st['scoreRows'] == 3, f'{where}: marcador {st["scoreTags"]}'
-        # La columna: movimiento real (contra la edición que estuvo publicada ≥ 12 h).
-        col = st['column']
-        assert [c['name'] for c in col] == ['San Francisco 49ers', 'Minnesota Vikings', 'Buffalo Bills', 'Kansas City Chiefs', 'Jacksonville Jaguars'], f'{where}: columna {col}'
-        assert [c['move'] for c in col] == ['=', '▲2', '=', '▼2', '='], f'{where}: movimiento {col}'
-        assert col[2]['last'] == 'G 36–10 vs BAL' and col[1]['last'] == 'D 15–19 en DET' and col[0]['last'] == 'G 27–19 vs CAR' or col[0]['last'] is None, f'{where}: últimos resultados {col}'
-        assert col[0]['note'] and col[1]['note'] and not col[2]['note'], f'{where}: frases de la columna {col}'
-        assert st['columnAside'] == 'Edición del 29 oct', f'{where}: edición {st["columnAside"]}'
+        # Power Rankings de siempre, entre La semana y La Quiniela, con movimiento real (≥ 12 h).
+        assert st['order'] == {'after': True, 'before': True, 'sibling': 'camNflSemana', 'parent': 'freeTakes'}, f'{where}: posición de Power Rankings {st["order"]}'
+        assert st['moves'] == ['–', '▲2', '–', '▼2', '–', '–', '–', 'Nuevo', '▼1', 'Nuevo'], f'{where}: movimiento {st["moves"]}'
         # La Quiniela: editor, laurel y reglas.
         # La quiniela enseña un día cada vez: el jueves, el editor va con Jaguars.
         assert st['chips'] == ['El editorJaguars'], f'{where}: elección del editor {st["chips"]}'
@@ -163,8 +160,8 @@ def phone(width, dark):
         assert not clipped, f'{where}: textos recortados {clipped}'
         if SHOTS: page.screenshot(path=str(SHOTS / f'{where}-semana.png'), full_page=False)
         if SHOTS:
-            page.locator('#camNflColumna').scroll_into_view_if_needed(); page.wait_for_timeout(200)
-            page.screenshot(path=str(SHOTS / f'{where}-columna.png'))
+            page.locator('#nflRankings').scroll_into_view_if_needed(); page.wait_for_timeout(200)
+            page.screenshot(path=str(SHOTS / f'{where}-power-rankings.png'))
 
         # Elegir en el duelo guarda el pronóstico.
         page.locator('#camNflSemana .cam-ns-pick', has_text='Vikings').click(); page.wait_for_timeout(700)
@@ -199,12 +196,12 @@ def phone(width, dark):
             page.locator('#camNflGames [data-game-id="w9-1"]').scroll_into_view_if_needed(); page.wait_for_timeout(200)
             page.screenshot(path=str(SHOTS / f'{where}-quiniela-laurel.png'))
 
-        # «Ver Top 10» desde Inicio abre La columna con los diez.
+        # «Ver Top 10» desde Inicio abre La semana a la altura de los Power Rankings.
         page.click('body > nav.cam-mobile-bottom-nav > button[data-category="Todos"]'); page.wait_for_timeout(600)
         page.evaluate('openNflTopTen()'); page.wait_for_timeout(900)
         st = page.evaluate(STATE)
-        top = page.evaluate("document.getElementById('camNflColumna').getBoundingClientRect().top")
-        assert st['tab'] == 'semana' and len(st['column']) == 10 and 40 <= top < 400, f'{where}: Top 10 {len(st["column"])} {top}'
+        top = page.evaluate("document.getElementById('nflRankings').getBoundingClientRect().top")
+        assert st['tab'] == 'semana' and st['rankings'] and 40 <= top < 400, f'{where}: Top 10 {top}'
         # Noticias de NFL ya no repite los Power Rankings.
         page.click('#camSectionTabs button[data-tab="noticias"]'); page.wait_for_timeout(500)
         st = page.evaluate(STATE)
@@ -218,12 +215,12 @@ def without_migration():
     with fp.full_page(fake_js=NO_MIGRATION + BASE, width=390, height=820) as page:
         open_nfl(page)
         st = page.evaluate(STATE)
-        assert st['semana'] and 'editor' not in st['blocks'] and 'duelo' in st['blocks'] and 'columna' in st['blocks'], f'{where}: bloques {st["blocks"]}'
+        assert st['semana'] and st['rankings'] and 'editor' not in st['blocks'] and 'duelo' in st['blocks'], f'{where}: bloques {st["blocks"]}'
         assert st['chips'] == [] and st['laurels'] == [], f'{where}: editor o laurel sin migración {st["chips"]} {st["laurels"]}'
         assert not any('editor' in n.lower() for n in st['duelNotes']), f'{where}: notas {st["duelNotes"]}'
         hidden = page.evaluate("[document.getElementById('camNflLaurelRule').hidden, document.getElementById('camNflExpertRule').hidden]")
         assert hidden == [True, True], f'{where}: reglas nuevas a la vista {hidden}'
-        assert [c['move'] for c in st['column']] == ['=', '▲2', '=', '▼2', '='], f'{where}: movimiento {st["column"]}'
+        assert st['moves'][:4] == ['–', '▲2', '–', '▼2'], f'{where}: movimiento {st["moves"]}'
         assert page.errors == [], f'{where}: errores {page.errors}'
     print('PASS', where)
 
@@ -246,6 +243,8 @@ def desktop(dark):
         page.evaluate('filterByCategory("NFL")'); page.wait_for_timeout(1800)
         st = page.evaluate(STATE)
         assert not st['semana'] and st['rankings'] and st['quiniela'], f'{where}: escritorio {st}'
+        # En escritorio los Power Rankings siguen en su sitio de siempre.
+        assert st['order'] and st['order']['parent'] != 'freeTakes', f'{where}: Power Rankings fuera de su sitio {st["order"]}'
         assert len(st['chips']) >= 1, f'{where}: la elección del editor no sale en escritorio {st["chips"]}'
         assert page.errors == [], f'{where}: errores {page.errors}'
         if SHOTS:

@@ -8,8 +8,9 @@
      · ¿Le ganas al editor? (cuando la base de datos tiene la migración 20261104090000);
      · El marcador (o La crónica, lunes y martes): resultados con sorpresas y caídas
        del Top 10;
-     · La columna: el Power Ranking con su movimiento real, el último resultado de
-       cada equipo y una frase de la columna del editor.
+     · Power Rankings con su diseño de siempre (#nflRankings: título, n.º 1 y la
+       cinta). En el teléfono el módulo se coloca entre La semana y La Quiniela
+       y vuelve a su sitio en escritorio; el movimiento lo calcula community.js.
    El orden cambia con el día: lunes y martes manda La crónica; con partidos en
    juego, En juego; el resto de la semana, los duelos.
 
@@ -27,7 +28,7 @@
   const mobile = window.matchMedia('(max-width: 760px), (orientation: landscape) and (max-height: 500px) and (hover: none) and (pointer: coarse)');
   const TZ = 'America/Toronto';
   const H = 36e5;
-  const ui = { columnOpen: false, scoreOpen: false };
+  const ui = { scoreOpen: false };
   const duelCache = new Map();   // 'temporada|semana|usuario' → fila de cam_nfl_expert_duel (o null)
 
   /* ---------- utilidades ---------- */
@@ -43,7 +44,6 @@
   const teamOf = id => window.CamNFLQuinielaTeams?.getTeam?.(id) || catalog().find(t => t.id === id) || null;
   const nick = id => { const words = String(teamOf(id)?.name || id).trim().split(/\s+/); return words[words.length - 1] || id; };
   const published = () => { try { return typeof rankingPublished !== 'undefined' ? rankingPublished : null; } catch { return null; } };
-  const previous = () => { try { return typeof rankingPreviousTeamIds !== 'undefined' ? rankingPreviousTeamIds : null; } catch { return null; } };
   const nflOn = () => document.body.classList.contains('ae-is-nfl');
   const active = () => mobile.matches && nflOn();
   const pts = n => n + (Number(n) === 1 ? ' pt' : ' pts');
@@ -116,16 +116,6 @@
     };
     return weekGames.slice().sort((a, b) => score(a) - score(b) || Date.parse(a.kickoff) - Date.parse(b.kickoff))[0];
   }
-  function lastResult(games, id) {
-    const g = games.filter(x => finished(x) && (x.home_id === id || x.away_id === id))
-      .sort((a, b) => Date.parse(b.kickoff) - Date.parse(a.kickoff))[0];
-    if (!g || g.home_score == null || g.away_score == null) return null;
-    const home = g.home_id === id;
-    const own = home ? g.home_score : g.away_score, other = home ? g.away_score : g.home_score;
-    const mark = own > other ? 'G' : own < other ? 'D' : 'E';
-    return { text: mark + ' ' + own + '–' + other + (home ? ' vs ' : ' en ') + (home ? g.away_id : g.home_id), mark };
-  }
-
   /* ---------- bloques ---------- */
   function header(snap, week, weekGames) {
     const head = el('header', null, 'cam-ns-head');
@@ -342,54 +332,18 @@
     return box;
   }
 
-  function columnBlock(games) {
-    const ranking = published();
-    const ids = Array.isArray(ranking?.team_ids) ? ranking.team_ids.filter(Boolean) : [];
-    if (!ids.length) return null;
-    const date = ranking.updated_at ? 'Edición del ' + dayMonth(ranking.updated_at) : (ranking.edition || '');
-    const box = section('columna', 'La columna · Power Rankings', date);
-    box.id = 'camNflColumna';
-    const before = previous();
-    let notes = new Map(), article = null;
-    try { const found = window.aeRankingNotes?.notesFor?.('nfl'); notes = found?.notes || notes; article = found?.article || null; } catch {}
-    const list = el('ol', null, 'cam-ns-column');
-    const shown = ui.columnOpen ? ids : ids.slice(0, 5);
-    shown.forEach((id, index) => {
-      const position = index + 1;
-      const row = el('li', null, 'cam-ns-team');
-      row.append(el('span', String(position), 'cam-ns-rank', { 'aria-hidden': 'true' }), crest(id, 30));
-      const main = el('div', null, 'cam-ns-team-main');
-      const line = el('div', null, 'cam-ns-team-line');
-      line.append(el('strong', teamOf(id)?.name || id, 'cam-ns-team-name'));
-      if (Array.isArray(before) && before.length === 10) {
-        const was = before.indexOf(id);
-        let text, cls, label;
-        if (was < 0) { text = 'Nuevo'; cls = 'is-new'; label = 'nuevo en el Top 10'; }
-        else if (was + 1 === position) { text = '='; cls = 'is-flat'; label = 'mismo puesto que la edición anterior'; }
-        else { const d = was + 1 - position; text = (d > 0 ? '▲' : '▼') + Math.abs(d); cls = d > 0 ? 'is-up' : 'is-down'; label = (d > 0 ? 'sube ' : 'baja ') + Math.abs(d) + (Math.abs(d) === 1 ? ' puesto' : ' puestos'); }
-        line.append(el('span', text, 'cam-ns-move ' + cls, { 'aria-label': label, title: label }));
-      }
-      const result = lastResult(games, id);
-      if (result) line.append(el('span', result.text, 'cam-ns-last is-' + result.mark));
-      main.append(line);
-      const note = notes.get(id)?.[0];
-      if (note) main.append(el('p', note, 'cam-ns-team-note'));
-      row.append(main);
-      row.setAttribute('aria-label', position + '. ' + (teamOf(id)?.name || id));
-      list.append(row);
-    });
-    box.append(list);
-    const foot = el('div', null, 'cam-ns-foot');
-    if (ids.length > 5) {
-      const more = link(ui.columnOpen ? 'Ver Top 5' : 'Ver Top ' + ids.length + ' ›', () => { ui.columnOpen = !ui.columnOpen; render(); });
-      more.setAttribute('aria-expanded', String(ui.columnOpen));
-      foot.append(more);
-    }
-    if (article && typeof window.openArticleModal === 'function') {
-      foot.append(link('Leer la columna ›', () => window.openArticleModal(article.id)));
-    }
-    if (foot.childElementCount) box.append(foot);
-    return box;
+  /* ---------- Power Rankings: el módulo de siempre ----------
+     El mismo #nflRankings (título, n.º 1 y la cinta, con sus vistas previas «por qué
+     está aquí»): en el teléfono va justo después de La semana, antes de La Quiniela;
+     en escritorio, o fuera de NFL, vuelve a su sitio. Va fuera de #camNflSemana para
+     que ningún estilo de esta sección le cambie el diseño. */
+  const rankings = document.getElementById('nflRankings');
+  const rankingsHome = rankings ? document.createComment('nflRankings') : null;
+  if (rankings) rankings.before(rankingsHome);
+  function placeRankings() {
+    if (!rankings || !rankingsHome) return;
+    if (active()) { if (rankings.previousElementSibling !== root) root.after(rankings); }
+    else if (rankings.previousSibling !== rankingsHome) rankingsHome.after(rankings);
   }
 
   /* ---------- tú contra el editor (una llamada por jornada) ---------- */
@@ -408,6 +362,7 @@
 
   /* ---------- pintar ---------- */
   function render() {
+    placeRankings();
     if (!active()) return;
     const q = quiniela();
     const snap = q?.snapshot?.() || null;
@@ -415,9 +370,7 @@
     const fragment = document.createDocumentFragment();
     const rankIds = Array.isArray(published()?.team_ids) ? published().team_ids : [];
     if (!snap || !snap.loaded) {
-      fragment.append(el('p', q ? 'Cargando la semana…' : 'Cargando la semana…', 'cam-ns-loading'));
-      const column = columnBlock(games);
-      if (column) fragment.append(column);
+      fragment.append(el('p', 'Cargando la semana…', 'cam-ns-loading'));
       body.replaceChildren(fragment);
       root.dataset.phase = 'cargando';
       return;
@@ -438,33 +391,34 @@
       duelo: duel ? duelBlock(snap, duel, rankIds) : null,
       partidos: teaserBlock(snap, weekGames, duel),
       editor: expertBlock(snap, weekGames, scoreWeek),
-      marcador: score,
-      columna: columnBlock(games)
+      marcador: score
     };
-    const order = mode === 'cronica' ? ['marcador', 'editor', 'duelo', 'partidos', 'columna']
-      : mode === 'envivo' ? ['envivo', 'duelo', 'marcador', 'partidos', 'editor', 'columna']
-      : ['duelo', 'partidos', 'editor', 'marcador', 'columna'];
+    // Power Rankings sigue a La semana (placeRankings), antes de La Quiniela.
+    const order = mode === 'cronica' ? ['marcador', 'editor', 'duelo', 'partidos']
+      : mode === 'envivo' ? ['envivo', 'duelo', 'marcador', 'partidos', 'editor']
+      : ['duelo', 'partidos', 'editor', 'marcador'];
     for (const key of order) if (blocks[key]) fragment.append(blocks[key]);
     if (!weekGames.length) fragment.append(el('p', 'Todavía no hay partidos de esta semana. Vuelve cuando se publique el calendario.', 'cam-ns-text'));
     body.replaceChildren(fragment);
-    keepQuiniela();
+    keepAnchor();
   }
 
-  /* ---------- Ir a la quiniela (Inicio, perfil) ----------
-     La semana se pinta encima de La Quiniela cuando llegan los datos: quien pidió
-     la quiniela la sigue teniendo a la vista, salvo que ya esté moviendo la pantalla. */
-  let anchorUntil = 0;
+  /* ---------- Ir a la quiniela o al Top 10 (Inicio, perfil) ----------
+     La semana se pinta encima cuando llegan los datos: quien pidió la quiniela o los
+     Power Rankings los sigue teniendo a la vista, salvo que ya esté moviendo la pantalla. */
+  let anchorUntil = 0, anchorId = null;
   const release = () => { anchorUntil = 0; };
   for (const type of ['touchmove', 'wheel', 'keydown']) window.addEventListener(type, release, { passive: true, capture: true });
-  function keepQuiniela() {
+  function anchor(id) { anchorId = id; anchorUntil = Date.now() + 6000; }
+  function keepAnchor() {
     if (!anchorUntil) return;
     if (Date.now() > anchorUntil || !active()) { anchorUntil = 0; return; }
-    const target = document.getElementById('camNflQuiniela');
+    const target = document.getElementById(anchorId);
     if (target && target.getClientRects().length) { try { target.scrollIntoView({ block: 'start' }); } catch {} }
   }
   const originalGo = typeof window.camGoQuiniela === 'function' ? window.camGoQuiniela : null;
   window.camGoQuiniela = function camSemanaGoQuiniela(sport) {
-    if (sport !== 'football' && mobile.matches) anchorUntil = Date.now() + 6000;
+    if (sport !== 'football' && mobile.matches) anchor('camNflQuiniela');
     if (originalGo) return originalGo.apply(this, arguments);
     if (typeof window.filterByCategory === 'function') window.filterByCategory(sport === 'football' ? 'Fútbol' : 'NFL');
     window.camSectionTabs?.select?.('quiniela');
@@ -477,18 +431,15 @@
     requestAnimationFrame(() => { queued = false; render(); });
   }
 
-  /* ---------- «Ver Top 10» lleva aquí en el teléfono ---------- */
+  /* ---------- «Ver Top 10» lleva a Power Rankings, dentro de La semana ---------- */
   const originalTopTen = typeof window.openNflTopTen === 'function' ? window.openNflTopTen : null;
   window.openNflTopTen = function camSemanaTopTen() {
     if (!mobile.matches && originalTopTen) return originalTopTen.apply(this, arguments);
     if (typeof window.filterByCategory === 'function') window.filterByCategory('NFL');
     window.camSectionTabs?.select?.('semana', { scroll: false });
-    ui.columnOpen = true;
+    anchor('nflRankings');
     render();
-    requestAnimationFrame(() => {
-      const target = document.getElementById('camNflColumna') || root;
-      try { target.scrollIntoView({ block: 'start' }); } catch {}
-    });
+    requestAnimationFrame(keepAnchor);
   };
 
   document.addEventListener('cam:nfl-quiniela-data', schedule);

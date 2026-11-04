@@ -311,7 +311,7 @@ html body nav.ae-sport-nav svg.cam-mobile-nav-symbol {
        right tab when a script scrolls to something inside another tab. */
     /* NFL and Fútbol */
     /* Team Power Rankings lead Noticias; fan standings (Savant · Rookie) close Takes. */
-    html body[data-cam-tabs="sport"]:not([data-cam-tab="noticias"]) :is(#nflRankings,#championsRankings,#heroSection,#aeNewsHeadingRow,#aeSportLatestNews,#articlesGrid,#aeSportAllNewsFooter,#aeMoreNews,#aeNflLatestComments,#mainContent > .editorial-layout,#aeFootballMobileStage > .editorial-trending) {
+    html body[data-cam-tabs="sport"]:not([data-cam-tab="noticias"]) :is(#championsRankings,#heroSection,#aeNewsHeadingRow,#aeSportLatestNews,#articlesGrid,#aeSportAllNewsFooter,#aeMoreNews,#aeNflLatestComments,#mainContent > .editorial-layout,#aeFootballMobileStage > .editorial-trending) {
       display: none !important;
     }
     html body[data-cam-tabs="sport"][data-cam-tab="noticias"] #freeTakes {
@@ -324,12 +324,15 @@ html body nav.ae-sport-nav svg.cam-mobile-nav-symbol {
       display: none !important;
     }
     /* NFL (4 nov 2026): La semana · Takes · Noticias. La semana enseña #camNflSemana
-       (cam-nfl-semana.css), La Quiniela y ¿Quién será campeón?; los Power Rankings
-       de NFL se leen en «La columna», así que el carrusel no se repite en Noticias. */
-    html body[data-cam-section="nfl"] #nflRankings {
+       (cam-nfl-semana.css), los Power Rankings de siempre (cam-nfl-semana.js los
+       coloca justo después), La Quiniela y ¿Quién será campeón? */
+    html body[data-cam-tabs="sport"]:not([data-cam-tab="noticias"]):not([data-cam-tab="semana"]) #nflRankings {
       display: none !important;
     }
-    html body[data-cam-section="nfl"][data-cam-tab="semana"] #freeTakes > :not(#camNflSemana):not(#camNflQuiniela):not(#aeSeasonPredictions) {
+    html body[data-cam-section="nfl"][data-cam-tab="noticias"] #nflRankings {
+      display: none !important;
+    }
+    html body[data-cam-section="nfl"][data-cam-tab="semana"] #freeTakes > :not(#camNflSemana):not(#nflRankings):not(#camNflQuiniela):not(#aeSeasonPredictions) {
       display: none !important;
     }
     /* Picks */

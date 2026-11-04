@@ -9,7 +9,7 @@ Cubre:
     intercaladas), Últimas noticias, Takes de la comunidad y Power Rankings;
     sin desbordamiento horizontal ni errores de consola;
   · cada tarjeta abre lo de siempre: la quiniela (?s=nfl&v=quiniela), la
-    noticia, la conversación del Take, el Top 10 (La columna de NFL · La semana),
+    noticia, la conversación del Take, el Top 10 (Power Rankings en NFL · La semana),
     el compositor de Takes;
     al volver a Inicio, «Tu jornada» vuelve a verse;
   · vacíos: sin partidos ni Pick no hay fila Cierran pronto; sin Takes queda
@@ -161,11 +161,12 @@ def phone(width, dark):
         tap(page, '#camHomeJornada .cam-hj-take')
         assert page.evaluate("!!document.getElementById('aeTakeDiscussion')?.open"), f'{where}: el Take no abre su conversación'
         page.evaluate("document.getElementById('aeTakeDiscussion').close()"); page.wait_for_timeout(300)
-        # Power Rankings → Top 10 de NFL («La columna» de La semana, abierta con los diez).
+        # Power Rankings → Top 10 de NFL (los Power Rankings de siempre, dentro de La semana).
         tap(page, '#camHomeJornada .cam-hj-ranking[data-sport="nfl"]')
         st = page.evaluate(STATE)
         assert st['cat'] == 'NFL' and st['tab'] == 'semana', f'{where}: Top 10 {st}'
-        assert page.evaluate("document.querySelectorAll('#camNflColumna .cam-ns-team').length") == 10, f'{where}: La columna no abre los diez'
+        rank_top = page.evaluate("document.getElementById('nflRankings').getBoundingClientRect().top")
+        assert 0 <= rank_top < 400, f'{where}: el Top 10 no queda a la vista ({rank_top})'
         go_home(page)
         # Publicar Take: compositor (o el acceso si hace falta sesión).
         tap(page, '#camHomeJornada .cam-hj-shortcut[data-shortcut="take"]')
