@@ -21,10 +21,10 @@ async function scenario({anonymous=false,failed=false}={}){
   const iso=h=>new Date(Date.now()+h*36e5).toISOString();
   const season=new Date().getUTCFullYear();
   const g=(id,competition,home,away,h,ph,pd,pa)=>({id,competition,season,matchday:10,home_id:home,away_id:away,kickoff:iso(h),status:'scheduled',picks_open:true,odds_locked_at:iso(-24),points_home:ph,points_draw:pd,points_away:pa});
-  F.tables.cam_football_games=[g('first','laliga','barca','atleti',24,3,5,7),g('duel','laliga','madrid','sociedad',72,4,7,4),g('payer','laliga','athletic','valencia',50,2,8,12),
+  F.tables.cam_football_games=[g('first','laliga','barca','atleti',24,3,5,7),g('duel','laliga','madrid','barca',72,4,7,4),g('payer','laliga','athletic','valencia',50,2,8,12),
     {...g('past','laliga','barca','madrid',-70,4,6,4),matchday:9,status:'final',home_score:0,away_score:1,outcome:'away',picks_open:false},
     g('premier','premier','arsenal','city',48,4,7,4),g('champions','champions','barca','arsenal',80,4,7,4)];
-  F.tables.cam_football_teams=['barca','atleti','madrid','sociedad','athletic','valencia','arsenal','city'].map(id=>({id,name:id==='sociedad'?'Real Sociedad de Fútbol con nombre largo':id,short_name:id,abbreviation:id.slice(0,3).toUpperCase()}));
+  F.tables.cam_football_teams=['barca','atleti','madrid','sociedad','athletic','valencia','arsenal','city'].map(id=>({id,name:({madrid:'Real Madrid',barca:'FC Barcelona',atleti:'Atlético de Madrid'})[id]||id,short_name:id,abbreviation:id.slice(0,3).toUpperCase()}));
   F.tables.cam_football_picks=anonymous?[]:[{game_id:'first',user_id:'reader',pick:'home'},{game_id:'premier',user_id:'reader',pick:'draw'},{game_id:'champions',user_id:'reader',pick:'away'}];
   F.tableErrors=failed?{cam_football_games:'Calendario temporalmente no disponible'}:{};
   F.rpc.cam_football_save_pick=a=>{
@@ -67,8 +67,19 @@ async function scenario({anonymous=false,failed=false}={}){
   assert.equal(one('#camFootballSemana .cam-ns-edition'),null);
   assert.equal(one('#camFootballSemana .cam-ns-opinion .cam-ns-action-label'),null);
   assert.equal(one('#camFootballSemana .cam-ns-intro'),null);
-  assert.deepEqual([...d.querySelectorAll('#camFootballSemana .cam-ns-pick strong')].map(n=>n.textContent),['madrid','Empate','sociedad']);
+  assert.deepEqual([...d.querySelectorAll('#camFootballSemana .cam-ns-pick strong')].map(n=>n.textContent),['madrid','Empate','barca']);
   assert.equal(d.querySelectorAll('#camFootballSemana [data-competition]').length,4);
+  for(const area of ['#camFootballSemana','#camFootballNav'])assert.deepEqual([...d.querySelectorAll(area+' [data-competition]')].map(n=>n.dataset.competition),['ligamx','champions','laliga','premier']);
+  const choose=w.camFootballSemana._choose;
+  const teams=new Map([['1',{name:'Club América'}],['2',{name:'Guadalajara'}],['3',{name:'Paris Saint-Germain'}],['4',{name:'FC Barcelona'}],['5',{name:'Manchester United'}],['6',{name:'Liverpool'}]]);
+  const fixture=(id,home,away,status='scheduled')=>({id,home_id:home,away_id:away,status,kickoff:iso(status==='final'?-24:24),points_home:4,points_away:4});
+  for(const [home,away] of [['1','2'],['3','4'],['5','6']]){
+    const popular={...fixture('popular',home,away),points_away:12};
+    assert.equal(choose([fixture('balanced','unknown','other'),popular],teams).id,'popular');
+    assert.equal(choose([fixture('finished',home,away,'final'),fixture('upcoming','unknown','other')],teams).id,'upcoming');
+  }
+  assert.equal(choose([],teams),null);
+  assert.equal(choose([fixture('final','1','2','final')],teams).id,'final');
   assert.equal(one('#camFootballScore [data-block=marcador] .cam-ns-result-score').textContent,'barca 0 – 1 madrid');
   assert.ok(one('#camFootballQuiniela').compareDocumentPosition(one('#camFootballScore'))&w.Node.DOCUMENT_POSITION_FOLLOWING,'the scoreboard follows the actual quiniela');
   one('.cam-ns-link-take').click();assert.equal(takeSport,'Fútbol');

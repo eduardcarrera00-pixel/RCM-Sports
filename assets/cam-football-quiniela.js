@@ -200,7 +200,7 @@
   // Ilustraciones CAM propias en un atlas transparente: cuatro columnas y dos
   // filas (día/noche). El tema cambia la fila sin filtros ni fondos añadidos.
   const LEAGUE_LOGOS={laliga:'0%',champions:'33.333333%',ligamx:'66.666667%',premier:'100%'};
-  const LEAGUE_ORDER=['laliga','champions','ligamx','premier'];
+  const LEAGUE_ORDER=['ligamx','champions','laliga','premier'];
   function leagueLogo(id){
     const wrap=el('span',null,'cam-football-league-logo');
     wrap.setAttribute('aria-hidden','true');

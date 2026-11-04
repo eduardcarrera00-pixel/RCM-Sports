@@ -48,11 +48,26 @@
     if(aside)head.append(el('span',aside,'cam-ns-aside'));
     node.append(head);return node;
   }
-  function chooseDuel(games){
+  // Prioridad editorial por afición, no probabilidades ni puntos de la quiniela.
+  // Referencias: CIES (popularidad social, 2026) y MITOFSKY (afición MX, 2026).
+  // Bandas, no un recuento de fans; los alias cubren nombres ESPN en ambos idiomas.
+  const normalizeClub=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+  const CLUB_PRIORITY=[
+    [5,['Real Madrid','Real Madrid CF','Barcelona','FC Barcelona','Barça','Manchester United','Man United','Manchester City','Man City','Liverpool','Chelsea','Arsenal','Paris Saint-Germain','Paris Saint Germain','PSG','Bayern Munich','Bayern München','Bayern Múnich','Juventus','América','Club América','Guadalajara','Chivas','Chivas Guadalajara']],
+    [4,['Atlético Madrid','Atlético de Madrid','Atletico','Atlético','Cruz Azul','Pumas UNAM','UNAM','Pumas','AC Milan','Milan','Inter','Internazionale','Inter Milan','Borussia Dortmund','Tottenham Hotspur','Tottenham']],
+    [3,['Tigres UANL','Tigres','Monterrey','Toluca','Athletic Club','Athletic Bilbao','Valencia','Valencia CF','Sevilla','Sevilla FC','Real Betis','Betis','Newcastle United','Newcastle','Aston Villa','Napoli','Benfica','Porto','Ajax','Bayer Leverkusen']]
+  ];
+  const clubPriorities=new Map(CLUB_PRIORITY.flatMap(([weight,aliases])=>aliases.map(alias=>[normalizeClub(alias),weight])));
+  function popularity(teams,id){
+    const team=teams.get(id);
+    return Math.max(0,...[team?.name,team?.short_name].map(value=>clubPriorities.get(normalizeClub(value))||0));
+  }
+  function chooseDuel(games,teams=new Map()){
+    const appeal=g=>popularity(teams,g.home_id)+popularity(teams,g.away_id);
     const candidates=games.filter(g=>g.status==='live'||!started(g));
     const list=candidates.length?candidates:games.filter(g=>g.status==='final');
     return list.slice().sort((a,b)=>
-      Math.abs((a.points_home??6)-(a.points_away??6))-Math.abs((b.points_home??6)-(b.points_away??6))||Date.parse(a.kickoff)-Date.parse(b.kickoff))[0]||null;
+      appeal(b)-appeal(a)||Math.abs((a.points_home??6)-(a.points_away??6))-Math.abs((b.points_home??6)-(b.points_away??6))||Date.parse(a.kickoff)-Date.parse(b.kickoff))[0]||null;
   }
   function focusGame(id){release();window.camSectionTabs?.select?.('quiniela',{scroll:false});void q()?.focus(id);}
   function pickButton(snap,g,pick){
@@ -152,7 +167,7 @@
     }else if(!snap?.loaded||snap.loading){
       fragment.append(el('p','Cargando la semana…','cam-ns-loading'));scores.replaceChildren();
     }else{
-      const duel=chooseDuel(snap.games);
+      const duel=chooseDuel(snap.games,snap.teams);
       if(duel)fragment.append(duelBlock(snap,duel));
       else fragment.append(el('p','Todavía no hay partidos de esta competición.','cam-ns-text'));
       const teasers=teaserBlock(snap,duel);if(teasers)fragment.append(teasers);
