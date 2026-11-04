@@ -59,7 +59,11 @@ async function scenario(anonymous = false) {
   assert.equal(w.camSectionTabs.current().tab,'semana');
   assert.deepEqual([...d.querySelectorAll('#camSectionTabs button')].map(b=>b.textContent),['La semana','Takes','Noticias']);
   assert.equal(one('.cam-ns-section-title').textContent,'Juega la quiniela');
-  assert.equal(one('.cam-ns-intro').textContent,'Elige ganadores y suma puntos');
+  assert.equal(one('.cam-ns-intro'),null);
+  assert.equal(one('.cam-ns-edition'),null);
+  assert.equal(one('.cam-ns-sub'),null);
+  assert.equal(one('.cam-ns-opinion .cam-ns-action-label'),null);
+  assert.ok(d.getElementById('camNflQuiniela').compareDocumentPosition(d.getElementById('camNflScore')) & w.Node.DOCUMENT_POSITION_FOLLOWING,'the scoreboard follows the quiniela');
   assert.equal(d.querySelectorAll('.cam-ns-teaser').length,2);
   for(const card of d.querySelectorAll('.cam-ns-teaser')) {
     assert.ok(['first','payer'].includes(card.dataset.gameId),'cards come from the current week');
@@ -108,7 +112,7 @@ async function scenario(anonymous = false) {
   assert.equal(w.camSectionTabs.current().tab,'semana','a quiniela access from Noticias reveals the match');
   assert.equal(d.activeElement.dataset.gameId,'payer');
   w.filterByCategory('Fútbol');w.camSectionTabs.select('quiniela',{scroll:false});
-  assert.equal(w.camSectionTabs.current().tab,'quiniela','football keeps its existing tabs');
+  assert.equal(w.camSectionTabs.current().tab,'semana','football quiniela links keep working through La semana');
   await w.happyDOM.close();
 }
 await scenario();

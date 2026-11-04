@@ -2,8 +2,8 @@
    Inside NFL: La semana · Takes · Noticias (4 nov 2026: La semana holds the
    quiniela, the duel of the week and the scores; Power Rankings lives in Noticias;
    ?v=quiniela still works and opens it).
-   Inside Fútbol: Noticias · Takes · Quiniela (the Savant · Rookie
-   standings close the Takes tab, under Últimos Takes).
+   Inside Fútbol: La semana · Takes · Noticias, with the same saved quiniela
+   and its competition selector. Both scoreboards close La semana.
    Inside Picks: Picks · Historial · Chefs.
    A sticky bar at the top of the section shows one part at a time (the hiding
    rules live in cam-mobile-bottom-nav.css). Nothing is moved or re-rendered:
@@ -17,7 +17,6 @@
   if (!main || typeof window.filterByCategory !== 'function' || !window.matchMedia) return;
 
   const mobile = window.matchMedia('(max-width: 760px), (orientation: landscape) and (max-height: 500px) and (hover: none) and (pointer: coarse)');
-  const SPORT_TABS = [['noticias', 'Noticias'], ['takes', 'Takes'], ['quiniela', 'Quiniela']];
   // NFL: La semana abre la sección; Power Rankings pertenece a Noticias.
   const NFL_TABS = [['semana', 'La semana'], ['takes', 'Takes'], ['noticias', 'Noticias']];
   // Old addresses keep working: ?v=clasificacion now opens Takes.
@@ -25,7 +24,7 @@
   const SECTIONS = {
     // ?s=nfl&v=quiniela (atajos de Inicio, perfil, enlaces viejos) abre La semana.
     NFL: { key: 'nfl', group: 'sport', owners: 'nfl', label: 'NFL', tabs: NFL_TABS, aliases: { quiniela: 'semana' } },
-    'Fútbol': { key: 'futbol', group: 'sport', label: 'Fútbol', tabs: SPORT_TABS },
+    'Fútbol': { key: 'futbol', group: 'sport', owners: 'football', label: 'Fútbol', tabs: NFL_TABS, aliases: { quiniela: 'semana' } },
     Picks: { key: 'picks', group: 'picks', label: 'Picks', tabs: [['picks', 'Picks'], ['historial', 'Historial'], ['chefs', 'Chefs']] }
   };
   // Address of each top-level page (Inicio has none).
@@ -40,8 +39,13 @@
     },
     // La quiniela vive dentro de #freeTakes; el ranking completo encabeza Noticias.
     nfl: {
-      semana: '#camNflSemana, #camNflQuiniela, #aeSeasonPredictions',
+      semana: '#camNflSemana, #camNflQuiniela, #camNflScore, #aeSeasonPredictions',
       noticias: '#nflRankings, #heroSection, #aeNewsHeadingRow, #aeSportLatestNews, #articlesGrid, #aeSportAllNewsFooter, #aeMoreNews, #aeNflLatestComments, #mainContent > .editorial-layout',
+      takes: '#freeTakes'
+    },
+    football: {
+      semana: '#camFootballSemana, #camFootballQuiniela, #camFootballScore, #aeSeasonPredictions',
+      noticias: '#championsRankings, #heroSection, #aeNewsHeadingRow, #aeSportLatestNews, #articlesGrid, #aeSportAllNewsFooter, #aeMoreNews, #mainContent > .editorial-layout, #aeFootballMobileStage > .editorial-trending',
       takes: '#freeTakes'
     },
     picks: {

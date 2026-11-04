@@ -9,8 +9,7 @@
      · El marcador (o La crónica, lunes y martes): resultados con sorpresas y caídas
        del Top 10;
      · Power Rankings conserva su módulo completo y su diseño en Noticias.
-   El orden cambia con el día: lunes y martes manda La crónica; con partidos en
-   juego, En juego; el resto de la semana, los duelos.
+   El marcador y la crónica cierran la pestaña, después de la quiniela.
 
    Cuota: no hace consultas propias salvo el marcador «tú contra el editor» (una
    llamada por jornada). Los partidos, tus elecciones y las del editor salen de
@@ -21,6 +20,7 @@
 
   const root = document.getElementById('camNflSemana');
   const body = document.getElementById('camNflSemanaBody');
+  const scoreRoot = document.getElementById('camNflScore');
   if (!root || !body || !window.matchMedia) return;
 
   const mobile = window.matchMedia('(max-width: 760px), (orientation: landscape) and (max-height: 500px) and (hover: none) and (pointer: coarse)');
@@ -121,26 +121,9 @@
     return weekGames.slice().sort((a, b) => score(a) - score(b) || Date.parse(a.kickoff) - Date.parse(b.kickoff))[0];
   }
   /* ---------- bloques ---------- */
-  function header(snap, week, weekGames) {
+  function header() {
     const head = el('header', null, 'cam-ns-head');
-    const first = weekGames[0], last = weekGames[weekGames.length - 1];
-    let range = '';
-    if (first && last) {
-      const a = dayMonth(first.kickoff), b = dayMonth(last.kickoff);
-      const sameMonth = a.split(' ')[1] === b.split(' ')[1];
-      range = a === b ? a : (sameMonth ? a.split(' ')[0] : a) + '–' + b;
-    }
-    head.append(el('p', ['NFL', weekName(week), range].filter(Boolean).join(' · '), 'cam-ns-edition'));
     head.append(el('h2', 'La semana', 'cam-ns-title', { id: 'camNflSemanaTitle' }));
-    const upcoming = weekGames.filter(g => !started(g));
-    const live = weekGames.filter(g => started(g) && !finished(g) && g.status !== 'cancelled' && g.status !== 'postponed');
-    let line;
-    if (!weekGames.length) line = 'Calendario pendiente';
-    else if (live.length) line = live.length === 1 ? 'Un partido en juego ahora' : live.length + ' partidos en juego ahora';
-    else if (upcoming.length === weekGames.length && upcoming.length) line = upcoming.length + ' partidos · el primero cierra el ' + when(upcoming[0].kickoff).toLowerCase();
-    else if (upcoming.length) line = (upcoming.length === 1 ? 'Queda 1 partido' : 'Quedan ' + upcoming.length + ' partidos') + ' · el próximo cierra el ' + when(upcoming[0].kickoff).toLowerCase();
-    else line = 'Jornada terminada';
-    head.append(el('p', line, 'cam-ns-sub'));
     head.append(el('span', null, 'cam-ns-rule', { 'aria-hidden': 'true' }));
     return head;
   }
@@ -194,7 +177,6 @@
     }
 
     const opinion = el('div', null, 'cam-ns-opinion');
-    opinion.append(el('p', 'Tu opinión', 'cam-ns-action-label'));
     const take = link('Publicar mi take sobre este duelo', () => {
       window.aeOpenTakeComposer?.('NFL');
     }, 'cam-ns-link-take');
@@ -246,7 +228,6 @@
     const payer = rest.sort((a, b) => Math.max(b.points_home, b.points_away) - Math.max(a.points_home, a.points_away))[0] || null;
     const box = el('section', null, 'cam-ns-block cam-ns-teasers', { 'data-block': 'partidos' });
     box.append(el('h3', 'Juega la quiniela', 'cam-ns-section-title'));
-    box.append(el('p', 'Elige ganadores y suma puntos', 'cam-ns-intro'));
     const grid = el('div', null, 'cam-ns-teaser-grid');
     const card = (g, tag, line) => {
       const b = el('button', null, 'cam-ns-teaser');
@@ -392,6 +373,7 @@
     if (!snap || !snap.loaded) {
       fragment.append(el('p', 'Cargando la semana…', 'cam-ns-loading'));
       body.replaceChildren(fragment);
+      scoreRoot?.replaceChildren();
       root.dataset.phase = 'cargando';
       return;
     }
@@ -413,9 +395,9 @@
       editor: expertBlock(snap, weekGames, scoreWeek),
       marcador: score
     };
-    const order = mode === 'cronica' ? ['marcador', 'editor', 'duelo', 'partidos']
-      : mode === 'envivo' ? ['envivo', 'duelo', 'marcador', 'partidos', 'editor']
-      : ['duelo', 'partidos', 'editor', 'marcador'];
+    // La quiniela precede al editor y al marcador en todos los días de la semana.
+    const order = ['envivo', 'duelo', 'partidos'];
+    scoreRoot?.replaceChildren(...[blocks.editor, blocks.marcador].filter(Boolean));
     for (const key of order) if (blocks[key]) fragment.append(blocks[key]);
     if (!weekGames.length) fragment.append(el('p', 'Todavía no hay partidos de esta semana. Vuelve cuando se publique el calendario.', 'cam-ns-text'));
     body.replaceChildren(fragment);

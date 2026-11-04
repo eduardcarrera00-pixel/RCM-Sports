@@ -327,7 +327,13 @@ html body nav.ae-sport-nav svg.cam-mobile-nav-symbol {
     html body[data-cam-tabs="sport"]:not([data-cam-tab="noticias"]) #nflRankings {
       display: none !important;
     }
-    html body[data-cam-section="nfl"][data-cam-tab="semana"] #freeTakes > :not(#camNflSemana):not(#camNflQuiniela):not(#aeSeasonPredictions) {
+    html body[data-cam-section="nfl"][data-cam-tab="semana"] #freeTakes > :not(#camNflSemana):not(#camNflQuiniela):not(#camNflScore):not(#aeSeasonPredictions) {
+      display: none !important;
+    }
+    html body[data-cam-section="futbol"][data-cam-tab="semana"] #freeTakes > :not(#camFootballSemana):not(#camFootballQuiniela):not(#camFootballScore):not(#aeSeasonPredictions) {
+      display: none !important;
+    }
+    html body[data-cam-tabs="sport"][data-cam-tab="takes"] :is(#camNflScore,#camFootballScore) {
       display: none !important;
     }
     /* Picks */

@@ -2514,7 +2514,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
 <script src="assets/ae-site-images.js?v=20261104-noticias-nfl-dia-1"></script>
 <script src="assets/cam-site-texts.js?v=20261103-remove-welcome-1"></script>
 <script defer src="assets/cam-mobile-bottom-nav.js?v=20261104-actualidad-1"></script>
-<link rel="stylesheet" href="assets/cam-perf-controls.css?v=20261104-nfl-take-quiniela-1">
+<link rel="stylesheet" href="assets/cam-perf-controls.css?v=20261104-semana-deportes-2">
 
 <script defer src="assets/cam-take-cta.js?v=20261023-take-cta-unificado-1"></script>
 <link rel="stylesheet" href="assets/cam-perf-football-headings.css?v=20261104-css-consolidated-1">
@@ -3067,6 +3067,9 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
               <div id="camNflRanking" aria-live="polite"></div>
             </section>
           </section>
+          <section id="camFootballSemana" class="cam-nfl-semana" aria-labelledby="camFootballSemanaTitle">
+            <div id="camFootballSemanaBody" class="cam-ns-body" aria-live="polite"></div>
+          </section>
           <!-- La Quiniela de Fútbol comparte maqueta con la de NFL; sólo cambia el 1X2. -->
           <section id="camFootballQuiniela" class="cam-nfl-quiniela cam-football-quiniela" aria-labelledby="camFootballTitle" hidden>
             <div class="cam-nfl-top">
@@ -3148,6 +3151,8 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
             <div id="aeSeasonList" class="ae-season-list"></div>
             <p id="aeSeasonStatus" class="ae-season-status" role="status" aria-live="polite"></p>
           </section>
+          <div id="camNflScore" class="cam-sport-score" aria-live="polite"></div>
+          <div id="camFootballScore" class="cam-sport-score" aria-live="polite"></div>
           <details id="aeTakeReview" class="ae-take-review" hidden><summary>Administrar · Puntuar Takes</summary><p>Primero calcula la dificultad de cada Take (tabla de la liga, nivel de sorpresa o cuota) y después marca si se cumplió. Los puntos (1–20) salen solos: lo obvio vale poco y la sorpresa vale mucho. Si recalculas un Take ya puntuado, su puntuación se actualiza.</p><p id="aeTakeReviewStatus" role="status" aria-live="polite"></p><div id="aeTakeReviewList"></div></details>
           <section id="aeSportTakeHistoric" class="ae-home-take-feature" hidden aria-labelledby="aeSportTakeHistoricTitle">
             <div class="ae-historic-copy">
@@ -6212,35 +6217,35 @@ button.cam-quiniela-team:focus-visible{outline:var(--ds-focus-width,3px) solid v
 #camFootballQuiniela #camFootballNav select:focus-visible{
   outline:2px solid var(--q-focus);outline-offset:3px;
 }
-#camFootballQuiniela .cam-football-leagues{
+:is(#camFootballQuiniela,#camFootballSemana) .cam-football-leagues{
   display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;min-width:0;
 }
-#camFootballQuiniela .cam-football-league{
+:is(#camFootballQuiniela,#camFootballSemana) .cam-football-league{
   display:grid;justify-items:center;align-content:center;min-width:0;min-height:84px;
   margin:0;padding:10px 4px 8px;border:1px solid var(--q-band-line);
   background:var(--q-band-control);color:var(--q-on-band-muted);cursor:pointer;
   font:600 11px/1.25 var(--ds-font-sans,Inter,system-ui,sans-serif);text-align:center;
   transition:border-color .18s,background-color .18s,color .18s,box-shadow .18s;
 }
-#camFootballQuiniela .cam-football-league:hover{color:var(--q-on-band);border-color:var(--q-gold)}
-#camFootballQuiniela .cam-football-league.is-active{
+:is(#camFootballQuiniela,#camFootballSemana) .cam-football-league:hover{color:var(--q-on-band);border-color:var(--q-gold)}
+:is(#camFootballQuiniela,#camFootballSemana) .cam-football-league.is-active{
   color:var(--q-on-band);border-color:var(--q-gold);
   background:color-mix(in srgb,var(--q-gold) 16%,var(--q-band-control));
   box-shadow:inset 0 0 0 1px var(--q-gold);
 }
-#camFootballQuiniela .cam-football-league:focus-visible{outline:2px solid var(--q-focus);outline-offset:3px}
-#camFootballQuiniela .cam-football-league-logo{
+:is(#camFootballQuiniela,#camFootballSemana) .cam-football-league:focus-visible{outline:2px solid var(--q-focus);outline-offset:3px}
+:is(#camFootballQuiniela,#camFootballSemana) .cam-football-league-logo{
   position:relative;display:grid;place-items:center;width:58px;height:58px;
 }
-#camFootballQuiniela .cam-football-league-logo > span{
+:is(#camFootballQuiniela,#camFootballSemana) .cam-football-league-logo > span{
   display:block;width:100%;height:100%;
   background-image:url("assets/cam-football-leagues-20261028.png");
   background-repeat:no-repeat;background-size:400% 200%;
 }
-html:not(.dark) #camFootballQuiniela .cam-football-league-logo--night,
-html.dark #camFootballQuiniela .cam-football-league-logo--day{display:none}
+html:not(.dark) :is(#camFootballQuiniela,#camFootballSemana) .cam-football-league-logo--night,
+html.dark :is(#camFootballQuiniela,#camFootballSemana) .cam-football-league-logo--day{display:none}
 @media(max-width:480px){
-  #camFootballQuiniela .cam-football-league{padding-inline:2px}
+  :is(#camFootballQuiniela,#camFootballSemana) .cam-football-league{padding-inline:2px}
 }
 /* La esquina global de 14 px curvaba la línea de arriba y la píldora de los
    botones convertía las tarjetas de logo en óvalos. */
@@ -6251,8 +6256,8 @@ html.dark #camFootballQuiniela .cam-football-league-logo--day{display:none}
 /* En la clasificación no hay jornada que elegir, pero sí competición. */
 #camFootballQuiniela.is-ranking #camFootballNav .cam-football-round-control{display:none}
 @media(min-width:761px){
-  #camFootballQuiniela .cam-football-league{min-height:96px}
-  #camFootballQuiniela .cam-football-league-logo{width:68px;height:68px}
+  :is(#camFootballQuiniela,#camFootballSemana) .cam-football-league{min-height:96px}
+  :is(#camFootballQuiniela,#camFootballSemana) .cam-football-league-logo{width:68px;height:68px}
 }
 
 /* Competiciones de quiniela: estilos heredados para otros componentes. */
@@ -6394,9 +6399,9 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 </style>
 
 <!-- Componentes finales: móvil, conversación, parties, perfil y Takes; orden en performance-css-packs.json. -->
-<link rel="stylesheet" href="assets/cam-perf-app-panels.css?v=20261104-nfl-take-quiniela-1">
+<link rel="stylesheet" href="assets/cam-perf-app-panels.css?v=20261104-semana-deportes-2">
 <script src="assets/cam-parties.js?v=20261104-perfil-claro-1"></script>
-<script src="assets/cam-sport-quiniela-loader.js?v=20261104-nfl-take-quiniela-1"></script>
+<script src="assets/cam-sport-quiniela-loader.js?v=20261104-semana-deportes-2"></script>
 <script src="assets/ae-season-predictions.js?v=20261021-champion-guide-1"></script>
 <script src="assets/cam-lazy-editorial-loader.js?v=20261104-actualidad-1"></script>
 <script src="assets/cam-opinions-section-banners.js?v=20261104-actualidad-1"></script>
@@ -6417,11 +6422,12 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 <script src="assets/ae-notifications.js?v=20261103-remove-welcome-1"></script>
 <script src="assets/cam-analytics.js?v=20261026-sin-robots"></script>
 <!-- Teléfono (3 nov): pestañas dentro de NFL, Fútbol y Picks, y una dirección por sección (?s=nfl&v=quiniela). -->
-<script src="assets/cam-mobile-sections.js?v=20261104-nfl-take-quiniela-1"></script>
+<script src="assets/cam-mobile-sections.js?v=20261104-semana-deportes-2"></script>
 <!-- Teléfono (3 nov): Inicio como «Tu jornada» (atajos + filas deslizables). Escritorio sin cambios. -->
 <script src="assets/cam-home-jornada.js?v=20261103-jornada-1"></script>
 <!-- Teléfono (4 nov): NFL · La semana (opinión y quiniela); Power Rankings en Noticias. Escritorio sin cambios. -->
-<script src="assets/cam-nfl-semana.js?v=20261104-nfl-take-quiniela-1"></script>
+<script src="assets/cam-nfl-semana.js?v=20261104-semana-deportes-2"></script>
+<script src="assets/cam-football-semana.js?v=20261104-semana-deportes-2"></script>
 
 <script id="ae-home-news-carousel-motion">
 /* Movimiento ligero y reversible: sin clones, sin alterar enlaces, votos o artículos. */

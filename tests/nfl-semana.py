@@ -4,7 +4,7 @@ Página completa en Chromium con tests/full-page.py y el Supabase falso (sin red
 
 Cubre:
   · 390 y 320 px, de día y de noche, con sesión: NFL abre «La semana»
-    (?s=nfl&v=semana) con cabecera de edición, Duelo de la semana (n.º 3 vs n.º 2),
+    (?s=nfl&v=semana) con cabecera compacta, Duelo de la semana (n.º 3 vs n.º 2),
     Abre la semana y La que más paga, ¿Le ganas al editor? (con «tú contra el
     editor» de la semana anterior), El marcador / La crónica (sorpresa primero)
     y los Power Rankings de siempre en Noticias (#nflRankings, con el movimiento
@@ -91,9 +91,9 @@ STATE = """() => {
     duelNames: text('#camNflSemana .cam-ns-duel-name'), duelPicks: text('#camNflSemana .cam-ns-pick'),
     duelSelected: text('#camNflSemana .cam-ns-pick.is-selected'), duelNotes: text('#camNflSemana [data-block=duelo] .cam-ns-note'),
     teasers: text('#camNflSemana .cam-ns-teaser-tag'), teaserLines: text('#camNflSemana .cam-ns-teaser-line'), progress: text('#camNflSemana .cam-ns-progress')[0] || '',
-    editor: text('#camNflSemana [data-block=editor] p'),
-    scoreTitle: text('#camNflSemana [data-block=marcador] .cam-ns-kicker')[0] || '', scoreTags: text('#camNflSemana [data-block=marcador] .cam-ns-result-tag'),
-    scoreRows: document.querySelectorAll('#camNflSemana [data-block=marcador] .cam-ns-result').length,
+    editor: text('#camNflScore [data-block=editor] p'),
+    scoreTitle: text('#camNflScore [data-block=marcador] .cam-ns-kicker')[0] || '', scoreTags: text('#camNflScore [data-block=marcador] .cam-ns-result-tag'),
+    scoreRows: document.querySelectorAll('#camNflScore [data-block=marcador] .cam-ns-result').length,
     moves: [...document.querySelectorAll('#rankingList > li')].map(li => li.querySelector('.ae-rank-trend')?.textContent.replace(/\\s+/g, '') || null),
     order: (() => { const r = document.getElementById('nflRankings'); const s = document.getElementById('camNflSemana'); const q = document.getElementById('camNflQuiniela');
       if (!shown('#nflRankings')) return null;
@@ -129,10 +129,9 @@ def phone(width, dark):
         assert st['cat'] == 'NFL' and st['tab'] == 'semana' and st['url'] == '?s=nfl&v=semana', f'{where}: NFL no abre La semana {st}'
         assert st['tabs'] == ['La semana', 'Takes', 'Noticias'], f'{where}: pestañas {st["tabs"]}'
         assert st['semana'] and st['quiniela'] and not st['rankings'], f'{where}: visibles {st}'
-        assert st['edition'].startswith('NFL · Semana 9 · ') and st['title'] == 'La semana', f'{where}: cabecera {st["edition"]} / {st["title"]}'
-        assert st['sub'].startswith('5 partidos · el primero cierra el '), f'{where}: subtítulo {st["sub"]}'
-        expected_order = {'cronica': ['marcador', 'editor', 'duelo', 'partidos'],
-                          'duelos': ['duelo', 'partidos', 'editor', 'marcador']}[st['phase']]
+        assert st['edition'] == '' and st['title'] == 'La semana', f'{where}: cabecera {st["edition"]} / {st["title"]}'
+        assert st['sub'] == '', f'{where}: subtítulo {st["sub"]}'
+        expected_order = ['duelo', 'partidos']
         assert st['blocks'] == expected_order, f'{where}: orden {st["phase"]} {st["blocks"]}'
         # Duelo: Bills (n.º 3) en Minnesota (n.º 2).
         assert st['duelKicker'] == 'Duelo de la semana · n.º 3 vs n.º 2', f'{where}: duelo {st["duelKicker"]}'
@@ -152,7 +151,9 @@ def phone(width, dark):
         assert st['order'] is None, f'{where}: ranking visible en La semana'
         assert page.locator('#nflRankings').count() == 1
         assert page.locator('.cam-ns-section-title').inner_text() == 'Juega la quiniela'
-        assert page.locator('.cam-ns-intro').inner_text() == 'Elige ganadores y suma puntos'
+        assert page.locator('.cam-ns-intro').count() == 0
+        assert page.locator('.cam-ns-opinion .cam-ns-action-label').count() == 0
+        assert page.evaluate("document.getElementById('camNflScore').getBoundingClientRect().top >= document.getElementById('camNflQuiniela').getBoundingClientRect().bottom")
         assert page.locator('.cam-ns-teaser-cta').all_text_contents() == ['Participar en la quiniela →'] * 2
         assert st['moves'] == ['–', '▲2', '–', '▼2', '–', '–', '–', 'Nuevo', '▼1', 'Nuevo'], f'{where}: movimiento {st["moves"]}'
         # La Quiniela: editor, laurel y reglas.

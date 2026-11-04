@@ -284,12 +284,20 @@ Las fichas de Takes para X se exportan a 1200 × 675 (16:9) en todos los modos d
 texto, centrando la composición original sin deformarla. Historia, TikTok,
 publicación y Foto conservan sus dimensiones y comportamiento.
 
-### NFL · Opinión y quiniela · 4 nov 2026
+### NFL y Fútbol · La semana · 4 nov 2026
 
-Se conservan las pestañas móviles **La semana · Takes · Noticias**. El duelo
-separa «Tu opinión» (botón principal para abrir el formulario NFL) de
-«Quiniela · Elige ganador» (selecciones de puntos). Las tarjetas de partidos
-reales van bajo «Juega la quiniela», con «Elige ganadores y suma puntos» y
-«Participar en la quiniela →». Cada acceso enfoca su partido y conserva las
-elecciones. Power Rankings permanece completo en Noticias; sus accesos abren
-esa pestaña y enfocan el módulo original. El escritorio conserva su composición.
+Ambos deportes abren **La semana · Takes · Noticias** en móvil. La cabecera de
+La semana muestra solo el título: sin la edición NFL ni el resumen de horarios.
+El duelo separa el botón principal «Publicar mi take sobre este duelo» de las
+selecciones de quiniela. No lleva «Tu opinión». Las tarjetas inferiores van
+bajo «Juega la quiniela», sin explicación adicional; conservan «Participar en
+la quiniela →». Sigue la quiniela completa. El editor (NFL) y el marcador cierran
+la pestaña, después de ella, sin adelantar resultados lunes o martes.
+
+Fútbol reutiliza el selector de ligas, el calendario, equipos y elecciones de
+su quiniela. El duelo y las tarjetas corresponden a la competición y jornada
+vigentes, con local/empate/visitante y sus puntos publicados. Cambiar de liga
+conserva lo guardado; una respuesta atrasada no sustituye la competición actual.
+Power Rankings sigue completo en Noticias. Los enlaces antiguos `v=quiniela`
+abren La semana y los accesos a partidos enfocan el día y la tarjeta correctos.
+La composición de escritorio se conserva.

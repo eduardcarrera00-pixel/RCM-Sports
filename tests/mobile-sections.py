@@ -5,8 +5,8 @@ Página completa en Chromium con tests/full-page.py y el Supabase falso (sin red
 Cubre, a 320/390 px de día y de noche (y 1366 px para escritorio):
   · la barra inferior Inicio · NFL · Fútbol · Picks · Perfil (Perfil al final);
   · NFL: La semana · Takes · Noticias (La semana con La Quiniela; los Power
-    Rankings de NFL van en Noticias); Fútbol: Noticias ·
-    Takes · Quiniela; qué módulo enseña cada pestaña (Savant · Rookie, debajo
+    Rankings de NFL van en Noticias); Fútbol: La semana ·
+    Takes · Noticias; qué módulo enseña cada pestaña (Savant · Rookie, debajo
     de Últimos Takes); Picks: Picks · Historial · Chefs;
   · la barra de pestañas queda fija arriba al bajar y toca el encabezado;
   · la dirección (?s=nfl&v=quiniela), abrir un enlace directo (también el
@@ -37,13 +37,13 @@ try { sessionStorage.setItem('cam_sports_home_welcome_seen_session_v1', '1'); } 
 })();
 """
 
-SPORT_TABS = ['noticias', 'takes', 'quiniela']
+SPORT_TABS = ['semana', 'takes', 'noticias']
 # Módulos que deben verse (True) u ocultarse (False) en cada pestaña.
 SPORT_EXPECT = {
     'noticias': {'#articlesGrid': True, '#aeSportLatestNews': True, '#freeTakes': False, '#RANK': True},
     'takes': {'#freeTakesTitle': True, '#aeSportTakeLeaders': True, '#freeTakesFeed': True, '#aeSportTakeRanking': True, '#aeNflTwinRankings': True,
               '#QUINIELA': False, '#aeSeasonPredictions': False, '#articlesGrid': False, '#RANK': False},
-    'quiniela': {'#QUINIELA': True, '#freeTakesTitle': False, '#aeSportTakeRanking': False, '#articlesGrid': False},
+    'semana': {'#camFootballSemana': True, '#QUINIELA': True, '#freeTakesTitle': False, '#aeSportTakeRanking': False, '#articlesGrid': False, '#RANK': False},
 }
 NFL_TABS = ['semana', 'takes', 'noticias']
 NFL_EXPECT = {
@@ -129,7 +129,7 @@ def phone(width, dark):
         # Atrás: de Picks vuelve a Fútbol en la última pestaña usada (una sola vez por sección).
         page.go_back(); page.wait_for_timeout(700)
         st = page.evaluate(STATE)
-        assert st['cat'] == 'Fútbol' and st['current'] == 'quiniela', f'{where}: Atrás {st}'
+        assert st['cat'] == 'Fútbol' and st['current'] == 'noticias', f'{where}: Atrás {st}'
         page.go_back(); page.wait_for_timeout(700)
         st = page.evaluate(STATE)
         assert st['cat'] == 'NFL' and st['current'] == 'noticias', f'{where}: Atrás 2 {st}'
@@ -160,8 +160,8 @@ def phone(width, dark):
         base = page.url.split('/index.html')[0]
         page.goto(base + '/index.html?s=futbol&v=quiniela', wait_until='load'); page.wait_for_timeout(1500)
         st = page.evaluate(STATE)
-        assert st['cat'] == 'Fútbol' and st['current'] == 'quiniela', f'{where}: enlace directo {st}'
-        expect_modules(page, SPORT_EXPECT['quiniela'], f'{where} enlace directo')
+        assert st['cat'] == 'Fútbol' and st['current'] == 'semana', f'{where}: enlace directo {st}'
+        expect_modules(page, SPORT_EXPECT['semana'], f'{where} enlace directo')
         # NFL: ?v=quiniela (atajos y enlaces viejos) abre La semana.
         page.goto(base + '/index.html?s=nfl&v=quiniela', wait_until='load'); page.wait_for_timeout(1500)
         st = page.evaluate(STATE)

@@ -8,7 +8,7 @@
     nfl:{className:'ae-is-nfl',root:'camNflQuiniela',status:'camNflStatus',
       src:'cam-nfl-quiniela.js?v=20261104-nfl-take-quiniela-1'},
     football:{className:'ae-is-football',root:'camFootballQuiniela',status:'camFootballStatus',
-      src:'cam-football-quiniela.js?v=20261103-jornadas-1'}
+      src:'cam-football-quiniela.js?v=20261104-semana-deportes-2'}
   };
   const requests=new Map();
   const loaded=new Set();

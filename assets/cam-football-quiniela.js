@@ -85,6 +85,9 @@
   let games=[],teams=new Map(),user=null,mine=new Map(),draft=new Map();
   let competition=COMPETITIONS[0].id,season=seasonGuess(),matchday=1,dayKey=null;
   let scope='matchday',showAll=false,loading=false,loaded=false,saving=false,request=0,rankingRequest=0;
+  let loadError='',changingCompetition=false,competitionRequest=0,mineRequest=0;
+
+  function announce(){document.dispatchEvent(new CustomEvent('cam:football-quiniela-data'));}
 
   function draftKey(id){return 'cam:football-quiniela:'+user?.id+':'+id;}
   function saveDraft(){
@@ -128,7 +131,8 @@
   }
   async function hydrate(){
     if(loading)return;
-    loading=true;const ticket=++request;
+    loading=true;loadError='';const ticket=++request;
+    announce();
     st('camFootballStatus','Cargando calendario oficial…','loading');
     try{
       const c=client();if(!c)throw Error('No se pudo iniciar Supabase');
@@ -150,6 +154,7 @@
       paint();
       st('camFootballStatus',games.length?'':'Todavía no hay partidos sincronizados. No se muestran datos ficticios.');
     }catch(error){
+      loadError='No se pudo cargar la semana. Inténtalo de nuevo.';
       st('camFootballStatus','No se pudieron obtener partidos reales: '+error.message,'error');
       // Sin calendario no se puede pronosticar: se dice y se bloquea el guardado.
       $('camFootballDayNav')?.replaceChildren();
@@ -159,15 +164,17 @@
       $('camFootballRanking')?.replaceChildren(el('p','Clasificación no disponible mientras falle la conexión.'));
       for(const id of ['camFootballSave','camFootballSaveDay']){const b=$(id);if(b)b.disabled=true;}
       renderAdmin();
-    }finally{loading=false;}
+    }finally{loading=false;announce();}
   }
   async function loadMine(){
+    const ticket=++mineRequest,owner=user?.id,league=competition,year=season;
     mine.clear();
     if(!user)return;
     const ids=inScope().map(g=>g.id);
     if(!ids.length)return;
     const rows=await run(client().from('cam_football_picks')
       .select('game_id,pick,awarded_points,settled_at').eq('user_id',user.id).in('game_id',ids).limit(1000));
+    if(ticket!==mineRequest||owner!==user?.id||league!==competition||year!==season)return;
     for(const row of rows||[])mine.set(row.game_id,row);
   }
   // ESPN no publica el número oficial de jornada en fútbol, así que la jornada se
@@ -204,10 +211,29 @@
     }
     return wrap;
   }
-  function paintNav(){
-    const nav=$('camFootballNav');if(!nav)return;
-    nav.replaceChildren();
-    // La competición sigue aquí; las jornadas guardadas se consultan en el perfil.
+  async function selectCompetition(id){
+    if(!COMPETITIONS.some(c=>c.id===id))return false;
+    if(competition===id&&!changingCompetition)return true;
+    const ticket=++competitionRequest;
+    competition=id;
+    if(!seasons().includes(season))season=seasons()[0]||season;
+    matchday=chooseRound();dayKey=null;showAll=false;
+    changingCompetition=true;loadError='';mine.clear();paintNav();paintGames();announce();
+    try{
+      await loadMine();
+      if(ticket!==competitionRequest)return false;
+      changingCompetition=false;recover();paint();
+      return true;
+    }catch(error){
+      if(ticket===competitionRequest){
+        loadError='No se pudieron cargar tus pronósticos. Inténtalo de nuevo.';
+        st('camFootballStatus',loadError,'error');
+      }
+      return false;
+    }finally{if(ticket===competitionRequest){changingCompetition=false;paintGames();announce();}}
+  }
+  // La semana y la quiniela usan los mismos botones, logos y cambio de competición.
+  function competitionNav(){
     const leagues=el('div',null,'cam-football-leagues');
     leagues.setAttribute('role','group');leagues.setAttribute('aria-label','Competición');
     for(const id of LEAGUE_ORDER){
@@ -220,15 +246,17 @@
       button.append(leagueLogo(id));
       button.addEventListener('click',async()=>{
         if(competition===id)return;
-        competition=id;
-        if(!seasons().includes(season))season=seasons()[0]||season;
-        matchday=chooseRound();dayKey=null;showAll=false;
-        await loadMine();recover();paint();
-        $('camFootballNav')?.querySelector('[data-competition="'+id+'"]')?.focus({preventScroll:true});
+        const origin=leagues.closest('[id]')?.id;
+        await selectCompetition(id);
+        requestAnimationFrame(()=>$(origin)?.querySelector('[data-competition="'+competition+'"]')?.focus({preventScroll:true}));
       });
       leagues.append(button);
     }
-    nav.append(leagues,button('Ver mis jornadas ›',()=>window.camOpenQuinielaHistory?.('football'),'cam-nfl-action cam-nfl-action-secondary'));
+    return leagues;
+  }
+  function paintNav(){
+    const nav=$('camFootballNav');if(!nav)return;
+    nav.replaceChildren(competitionNav(),button('Ver mis jornadas ›',()=>window.camOpenQuinielaHistory?.('football'),'cam-nfl-action cam-nfl-action-secondary'));
   }
   function logo(id){
     const team=teams.get(id);
@@ -241,13 +269,13 @@
     return image;
   }
   function choose(g,pick){
-    if(!isOpen(g))return;
+    if(!isOpen(g)||changingCompetition||loadError)return;
     if(!user){window.openUserAuthModal?.();return;}
-    draft.set(g.id,pick);saveDraft();paintGames();
+    draft.set(g.id,pick);saveDraft();paintGames();announce();
   }
   function side(g,pick){
     const id=pick==='home'?g.home_id:g.away_id;
-    const chosen=active(g)===pick,disabled=!isOpen(g);
+    const chosen=active(g)===pick,disabled=!isOpen(g)||changingCompetition||!!loadError;
     const b=el('button',null,'cam-nfl-team'+(chosen?' is-selected':''));
     b.type='button';b.disabled=disabled;b.setAttribute('aria-pressed',String(chosen));
     b.dataset.side=pick==='home'?'home':'away';
@@ -264,7 +292,7 @@
   }
   // El empate ocupa el lugar de la «@» de la NFL: misma tarjeta, un resultado más.
   function drawOption(g){
-    const chosen=active(g)==='draw',disabled=!isOpen(g);
+    const chosen=active(g)==='draw',disabled=!isOpen(g)||changingCompetition||!!loadError;
     const b=el('button',null,'cam-nfl-draw'+(chosen?' is-selected':''));
     b.type='button';b.disabled=disabled;b.setAttribute('aria-pressed',String(chosen));
     if(g.status==='final'&&g.outcome)b.classList.add(g.outcome==='draw'?'is-winner':'is-loser');
@@ -368,6 +396,7 @@
       (next?' · Próximo: '+clock(next.kickoff):' · No quedan partidos por disputar'));
     for(const g of visible){
       const box=el('article',null,'cam-nfl-game');
+      box.dataset.gameId=g.id;
       box.dataset.state=gameState(g);
       const top=el('div',null,'cam-nfl-game-meta');
       top.append(el('span',clock(g.kickoff)),el('span',gameStatus(g),'cam-nfl-badge'));box.append(top);
@@ -382,16 +411,16 @@
     sizeGameViewport();
     const save=$('camFootballSave'),saveDay=$('camFootballSaveDay');
     if(save){
-      save.disabled=saving||(user?!chosen.some(g=>draft.has(g.id)&&isOpen(g)):false);
+      save.disabled=saving||changingCompetition||!!loadError||(user?!chosen.some(g=>draft.has(g.id)&&isOpen(g)):false);
       save.textContent=user?'Guardar toda la jornada':'Inicia sesión para participar';
     }
     if(saveDay){
-      saveDay.disabled=saving||(user?!visible.some(g=>draft.has(g.id)&&isOpen(g)):false);
+      saveDay.disabled=saving||changingCompetition||!!loadError||(user?!visible.some(g=>draft.has(g.id)&&isOpen(g)):false);
       saveDay.textContent=user?'Guardar picks del día':'Inicia sesión para participar';
     }
   }
   async function persist(mode='round'){
-    if(saving)return;
+    if(saving||changingCompetition||loadError)return;
     if(!user){window.openUserAuthModal?.();return;}
     const pending=roundGames().filter(g=>draft.has(g.id)&&isOpen(g)&&(mode!=='day'||gameDay(g)===dayKey));
     if(!pending.length)return;
@@ -407,13 +436,46 @@
           successes++;
         }catch(error){errors.push(teamName(g.home_id)+': '+error.message);}
       }
-    }finally{saving=false;paintGames();}
+    }finally{saving=false;paintGames();announce();}
     st('camFootballStatus',successes+' pronóstico(s) guardado(s)'+(mode==='day'?' en este día':' en la jornada')+'.'+
       (errors.length?' '+errors.join(' · '):''),errors.length?'error':successes?'ok':undefined);
     if(successes)document.dispatchEvent(new CustomEvent('cam:football-picks-updated'));
   }
   function paint(){
     paintNav();paintGames();renderAdmin();paintRanking();
+    announce();
+  }
+  async function saveOne(gameId,pick){
+    const g=games.find(x=>x.id===gameId);
+    if(!g||!PICKS.includes(pick)||saving||changingCompetition||loadError)return false;
+    if(!user){window.openUserAuthModal?.();return false;}
+    if(!isOpen(g)){st('camFootballStatus','Este partido ya está cerrado.','error');return false;}
+    const owner=user.id;
+    saving=true;
+    try{
+      await run(client().rpc('cam_football_save_pick',{p_game_id:g.id,p_pick:pick}));
+      if(owner!==user?.id)return false;
+      if(g.competition===competition&&Number(g.season)===season)mine.set(g.id,{game_id:g.id,pick,awarded_points:0});
+      draft.delete(g.id);
+      try{localStorage.removeItem(draftKey(g.id));}catch{}
+      st('camFootballStatus','Pronóstico guardado: '+pickLabel(g,pick)+'.','ok');
+      document.dispatchEvent(new CustomEvent('cam:football-picks-updated'));
+      return true;
+    }catch(error){st('camFootballStatus',error.message,'error');return false;}
+    finally{saving=false;paintGames();announce();}
+  }
+  async function focusGame(gameId){
+    if(!loaded)await hydrate();
+    const g=games.find(x=>x.id===gameId);
+    if(g&&g.competition!==competition&&!await selectCompetition(g.competition))return;
+    if(g&&Number(g.season)!==season){season=Number(g.season);await loadMine();recover();}
+    window.camSectionTabs?.select?.('quiniela',{scroll:false});
+    if(g){matchday=Number(g.matchday);dayKey=gameDay(g);setQuinielaView('jornada');paintGames();}
+    requestAnimationFrame(()=>{
+      const card=g&&$('camFootballGames')?.querySelector('[data-game-id="'+CSS.escape(g.id)+'"]');
+      if(card){card.tabIndex=-1;card.focus({preventScroll:true});}
+      (card||root).scrollIntoView({block:card?'center':'start'});
+    });
   }
   function pickLabel(g,pick){
     if(pick==='draw')return 'Empate';
@@ -600,6 +662,15 @@
     if(!root.hidden)hydrate();
   }
   // Loaded on demand: initialize immediately when DOMContentLoaded has already fired.
+  window.camFootballQuiniela=Object.freeze({
+    snapshot:()=>({loaded,loading:loading||changingCompetition,error:loadError,competition,season,matchday,
+      games:roundGames().map(g=>({...g})),
+      results:inScope().filter(g=>g.status==='final').map(g=>({...g})),
+      teams:new Map([...teams].map(([id,t])=>[id,{...t}])),
+      mine:new Map([...mine].map(([id,row])=>[id,row.pick])),draft:new Map(draft),
+      user:user?{id:user.id}:null,competitionName:competitionName(competition)}),
+    isOpen,save:saveOne,focus:focusGame,selectCompetition,competitionNav,refresh:hydrate
+  });
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup,{once:true});
   else setup();
 })();
