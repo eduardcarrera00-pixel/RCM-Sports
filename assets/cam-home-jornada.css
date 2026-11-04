@@ -1,0 +1,311 @@
+/* CAM SPORTS · Inicio en el teléfono: «Tu jornada» (3 nov 2026).
+   Atajos arriba y filas deslizables (Cierran pronto, Últimas noticias, Takes
+   de la comunidad, Power Rankings). Solo existe con body.cam-home-jornada,
+   que pone assets/cam-home-jornada.js en Inicio y en el teléfono; en
+   escritorio la portada no cambia.
+
+   Se carga al final del <body> y va en la capa cam-banners con !important,
+   como cam-profile-resumen.css: así gana a la esquina global de 14 px de
+   cam-rounded-editorial y a los !important sin capa. Todo parte de esquina 0
+   (ningún texto queda recortado por una curva); las tarjetas y píldoras
+   recuperan su radio con reglas más concretas. Fuera de style-sources.json. */
+@layer cam-banners {
+  /* ---------- paleta ---------- */
+  html body #camHomeJornada {
+    --hj-card:#fffdf9;
+    --hj-soft:#f4ece0;
+    --hj-ink:#13324d;
+    --hj-text:#34444f;
+    --hj-muted:#66727c;
+    --hj-line:rgba(133,91,67,.2);
+    --hj-line-strong:rgba(133,91,67,.36);
+    --hj-gold:#b0803f;
+    --hj-accent:#855b43;
+    --hj-accent-soft:rgba(133,91,67,.1);
+    --hj-on-accent:#fffaf2;
+    --hj-up:#2c6a4c;
+    --hj-down:#a3433a;
+    --hj-shadow:0 1px 2px rgba(19,50,77,.06),0 6px 18px -12px rgba(19,50,77,.28);
+    --hj-photo:linear-gradient(140deg,#284a71 0%,#13324d 55%,#855b43 140%);
+  }
+  html.dark body #camHomeJornada {
+    --hj-card:#11293d;
+    --hj-soft:#163450;
+    --hj-ink:#f6ecdf;
+    --hj-text:#dcd3c8;
+    --hj-muted:#a9b6bf;
+    --hj-line:rgba(214,166,112,.2);
+    --hj-line-strong:rgba(214,166,112,.4);
+    --hj-gold:#e0b37c;
+    --hj-accent:#e0b37c;
+    --hj-accent-soft:rgba(224,179,124,.12);
+    --hj-on-accent:#0b2233;
+    --hj-up:#93d3aa;
+    --hj-down:#f2a397;
+    --hj-shadow:0 1px 2px rgba(0,0,0,.25),0 8px 20px -14px rgba(0,0,0,.6);
+    --hj-photo:linear-gradient(140deg,#1c2d40 0%,#0b2233 60%,#6b4a33 150%);
+  }
+
+  /* ---------- la portada de siempre se oculta solo aquí ---------- */
+  body.cam-home-jornada #mainContent > :is(#picksFeatured, #heroSection, .editorial-layout, #aeMoreNews) { display:none!important; }
+  html body #camHomeJornada[hidden] { display:none!important; }
+
+  html body #camHomeJornada {
+    display:flex!important;
+    flex-direction:column!important;
+    gap:24px!important;
+    width:100%!important;
+    max-width:100%!important;
+    /* Aire bajo el encabezado sin tocar el relleno de #mainContent (8 px en
+       el teléfono), que cam-mobile-sections.js mide para pegar su barra. */
+    margin:10px 0 0!important;
+    padding:0!important;
+    color:var(--hj-text)!important;
+    font:400 14px/1.45 Inter,system-ui,sans-serif!important;
+  }
+  html body #camHomeJornada *,
+  html body #camHomeJornada *::before,
+  html body #camHomeJornada *::after { box-sizing:border-box!important; border-radius:0!important; }
+
+  /* ---------- cabecera: «Tu jornada» y la fecha ---------- */
+  html body #camHomeJornada .cam-hj-top {
+    display:flex!important; align-items:baseline!important; justify-content:space-between!important;
+    gap:12px!important; flex-wrap:wrap!important; margin:0!important; padding:0 2px!important;
+  }
+  html body #camHomeJornada .cam-hj-title {
+    margin:0!important; padding:0!important; color:var(--hj-ink)!important;
+    font:600 26px/1.15 "Playfair Display",Georgia,serif!important; letter-spacing:0!important; text-transform:none!important;
+  }
+  html body #camHomeJornada .cam-hj-date {
+    margin:0!important; padding:0!important; color:var(--hj-muted)!important;
+    font:600 12px/1.3 Inter,system-ui,sans-serif!important;
+  }
+  html body #camHomeJornada .cam-hj-date::first-letter { text-transform:uppercase!important; }
+
+  /* ---------- atajos ---------- */
+  html body #camHomeJornada .cam-hj-shortcuts {
+    display:grid!important; grid-template-columns:repeat(4,minmax(0,1fr))!important; gap:8px!important;
+    margin:-8px 0 0!important; padding:0!important;
+  }
+  html body #camHomeJornada .cam-hj-shortcut {
+    position:relative!important;
+    display:flex!important; flex-direction:column!important; align-items:center!important; justify-content:flex-start!important;
+    gap:7px!important; width:100%!important; min-width:0!important; min-height:88px!important;
+    margin:0!important; padding:12px 4px 10px!important;
+    border:1px solid var(--hj-line)!important; background:var(--hj-card)!important; background-image:none!important;
+    box-shadow:var(--hj-shadow)!important;
+    color:var(--hj-ink)!important; text-align:center!important; text-transform:none!important; letter-spacing:0!important;
+    font:700 11.5px/1.2 Inter,system-ui,sans-serif!important;
+    cursor:pointer!important; -webkit-tap-highlight-color:transparent!important;
+  }
+  html body #camHomeJornada .cam-hj-shortcut:active { transform:scale(.97)!important; }
+  html body #camHomeJornada .cam-hj-shortcut-label { display:block!important; color:inherit!important; font:inherit!important; overflow-wrap:anywhere!important; }
+  html body #camHomeJornada .cam-hj-icon {
+    display:inline-flex!important; align-items:center!important; justify-content:center!important;
+    flex:0 0 auto!important; width:36px!important; height:36px!important;
+    background:var(--hj-accent-soft)!important; color:var(--hj-accent)!important;
+  }
+  html body #camHomeJornada .cam-hj-icon svg { display:block!important; width:22px!important; height:22px!important; color:inherit!important; }
+  html body #camHomeJornada .cam-hj-badge {
+    position:absolute!important; top:6px!important; right:6px!important;
+    min-width:20px!important; height:20px!important; padding:0 6px!important;
+    background:var(--hj-accent)!important; color:var(--hj-on-accent)!important;
+    font:800 10.5px/20px Inter,system-ui,sans-serif!important; text-align:center!important;
+  }
+
+  /* ---------- filas deslizables ---------- */
+  html body #camHomeJornada .cam-hj-section { display:block!important; margin:0!important; padding:0!important; }
+  html body #camHomeJornada .cam-hj-section[hidden] { display:none!important; }
+  html body #camHomeJornada .cam-hj-head {
+    display:flex!important; align-items:center!important; justify-content:space-between!important; gap:12px!important;
+    margin:0 0 10px!important; padding:0 2px!important;
+  }
+  html body #camHomeJornada .cam-hj-heading {
+    margin:0!important; padding:0!important; color:var(--hj-ink)!important;
+    font:600 19px/1.2 "Playfair Display",Georgia,serif!important; letter-spacing:0!important; text-transform:none!important;
+  }
+  html body #camHomeJornada .cam-hj-more {
+    display:inline-flex!important; align-items:center!important; flex:0 0 auto!important;
+    min-height:36px!important; margin:0 -4px 0 0!important; padding:0 4px!important;
+    border:0!important; background:none!important; box-shadow:none!important;
+    color:var(--hj-accent)!important; font:700 12.5px/1.2 Inter,system-ui,sans-serif!important;
+    letter-spacing:0!important; text-transform:none!important; white-space:nowrap!important; cursor:pointer!important;
+  }
+  html body #camHomeJornada .cam-hj-row {
+    display:flex!important; align-items:stretch!important; gap:12px!important;
+    margin:0 -16px!important; padding:2px 16px 12px!important;
+    overflow-x:auto!important; overflow-y:hidden!important;
+    scroll-snap-type:x mandatory!important; scroll-padding-inline:16px!important;
+    overscroll-behavior-x:contain!important; -webkit-overflow-scrolling:touch!important;
+    scrollbar-width:none!important;
+  }
+  html body #camHomeJornada .cam-hj-row::-webkit-scrollbar { display:none!important; }
+  html body #camHomeJornada .cam-hj-item { display:flex!important; flex:0 0 auto!important; scroll-snap-align:start!important; margin:0!important; padding:0!important; }
+
+  /* ---------- tarjeta base ---------- */
+  html body #camHomeJornada .cam-hj-card {
+    position:relative!important;
+    display:flex!important; flex-direction:column!important; align-items:stretch!important; justify-content:flex-start!important;
+    gap:10px!important; width:236px!important; min-width:0!important; height:auto!important; min-height:0!important;
+    margin:0!important; padding:14px!important;
+    border:1px solid var(--hj-line)!important; background:var(--hj-card)!important; background-image:none!important;
+    box-shadow:var(--hj-shadow)!important;
+    color:var(--hj-text)!important; text-align:left!important; text-transform:none!important; letter-spacing:0!important;
+    font:400 13px/1.4 Inter,system-ui,sans-serif!important;
+    overflow:hidden!important; cursor:pointer!important; -webkit-tap-highlight-color:transparent!important;
+  }
+  html body #camHomeJornada .cam-hj-card:active { transform:scale(.985)!important; }
+  html body #camHomeJornada :is(.cam-hj-card, .cam-hj-shortcut, .cam-hj-more):focus-visible {
+    outline:2px solid var(--hj-accent)!important; outline-offset:2px!important;
+  }
+  html body #camHomeJornada .cam-hj-kicker {
+    display:flex!important; align-items:baseline!important; justify-content:space-between!important; gap:8px!important; min-width:0!important;
+  }
+  html body #camHomeJornada .cam-hj-league {
+    min-width:0!important; overflow:hidden!important; text-overflow:ellipsis!important; white-space:nowrap!important;
+    color:var(--hj-accent)!important; font:800 10.5px/1.3 Inter,system-ui,sans-serif!important;
+    letter-spacing:.08em!important; text-transform:uppercase!important;
+  }
+  html body #camHomeJornada .cam-hj-when {
+    flex:0 0 auto!important; color:var(--hj-muted)!important; font:600 11.5px/1.3 Inter,system-ui,sans-serif!important; white-space:nowrap!important;
+  }
+  html body #camHomeJornada .cam-hj-when::first-letter { text-transform:uppercase!important; }
+  html body #camHomeJornada .cam-hj-card-title {
+    display:-webkit-box!important; -webkit-box-orient:vertical!important; -webkit-line-clamp:3!important; overflow:hidden!important;
+    margin:0!important; padding:0 0 1px!important; color:var(--hj-ink)!important;
+    font:600 16px/1.28 "Playfair Display",Georgia,serif!important; overflow-wrap:anywhere!important;
+  }
+  html body #camHomeJornada .cam-hj-card-sub { display:block!important; color:var(--hj-muted)!important; font:600 12px/1.35 Inter,system-ui,sans-serif!important; }
+  html body #camHomeJornada .cam-hj-card-sub:empty { display:none!important; }
+  html body #camHomeJornada .cam-hj-cta {
+    display:block!important; margin-top:auto!important; padding-top:10px!important;
+    border-top:1px solid var(--hj-line)!important;
+    color:var(--hj-accent)!important; font:700 12.5px/1.2 Inter,system-ui,sans-serif!important;
+  }
+
+  /* escudos */
+  html body #camHomeJornada .cam-hj-crest {
+    position:relative!important; display:inline-flex!important; align-items:center!important; justify-content:center!important;
+    flex:0 0 auto!important; width:28px!important; height:28px!important; overflow:hidden!important;
+    background:var(--hj-soft)!important; color:var(--hj-muted)!important;
+    font:800 8.5px/1 Inter,system-ui,sans-serif!important; letter-spacing:.02em!important;
+  }
+  html body #camHomeJornada .cam-hj-crest img {
+    position:absolute!important; inset:3px!important; width:22px!important; height:22px!important; max-width:none!important;
+    margin:0!important; object-fit:contain!important; background:none!important;
+  }
+  html body #camHomeJornada .cam-hj-crest.is-loaded { background:transparent!important; }
+  html body #camHomeJornada .cam-hj-crest.is-loaded .cam-hj-crest-text { visibility:hidden!important; }
+  html body #camHomeJornada .cam-hj-crest--draw { font:800 14px/1 Inter,system-ui,sans-serif!important; color:var(--hj-muted)!important; }
+
+  /* ---------- Cierran pronto ---------- */
+  html body #camHomeJornada .cam-hj-game { width:224px!important; }
+  html body #camHomeJornada .cam-hj-picks { display:flex!important; flex-direction:column!important; gap:7px!important; }
+  html body #camHomeJornada .cam-hj-pick {
+    display:grid!important; grid-template-columns:28px minmax(0,1fr) auto!important; align-items:center!important; gap:9px!important;
+  }
+  html body #camHomeJornada .cam-hj-pick-name {
+    min-width:0!important; overflow:hidden!important; text-overflow:ellipsis!important; white-space:nowrap!important;
+    color:var(--hj-ink)!important; font:650 13.5px/1.3 Inter,system-ui,sans-serif!important;
+  }
+  html body #camHomeJornada .cam-hj-at { color:var(--hj-muted)!important; font-weight:600!important; }
+  html body #camHomeJornada .cam-hj-pts {
+    flex:0 0 auto!important; padding:3px 8px!important; background:var(--hj-accent-soft)!important; color:var(--hj-accent)!important;
+    font:800 11px/1.3 Inter,system-ui,sans-serif!important; white-space:nowrap!important;
+  }
+  html body #camHomeJornada .cam-hj-editor { width:236px!important; box-shadow:inset 0 3px 0 var(--hj-gold),var(--hj-shadow)!important; }
+  html body #camHomeJornada .cam-hj-selection {
+    display:flex!important; align-items:center!important; justify-content:space-between!important; gap:10px!important;
+    padding:9px 10px!important; background:var(--hj-soft)!important;
+  }
+  html body #camHomeJornada .cam-hj-selection-text { min-width:0!important; color:var(--hj-ink)!important; font:700 13px/1.35 Inter,system-ui,sans-serif!important; overflow-wrap:anywhere!important; }
+  html body #camHomeJornada .cam-hj-odds {
+    flex:0 0 auto!important; padding:4px 8px!important; background:#0b2233!important; color:#7ee8f2!important;
+    font:800 12px/1.2 Inter,system-ui,sans-serif!important;
+  }
+
+  /* tarjeta final «Quiniela NFL ›» / invitación */
+  html body #camHomeJornada .cam-hj-more-card {
+    width:148px!important; justify-content:center!important; gap:6px!important;
+    background:var(--hj-accent-soft)!important; border-color:var(--hj-line-strong)!important; box-shadow:none!important;
+  }
+  html body #camHomeJornada .cam-hj-more-card .cam-hj-card-title { font-size:15.5px!important; -webkit-line-clamp:2!important; }
+  html body #camHomeJornada .cam-hj-more-arrow {
+    display:block!important; margin-top:6px!important; color:var(--hj-accent)!important;
+    font:600 26px/1 "Playfair Display",Georgia,serif!important;
+  }
+  html body #camHomeJornada .cam-hj-invite { width:172px!important; }
+
+  /* ---------- Últimas noticias ---------- */
+  html body #camHomeJornada .cam-hj-news { width:256px!important; padding:0!important; gap:0!important; }
+  html body #camHomeJornada .cam-hj-media {
+    position:relative!important; display:block!important; width:100%!important; height:144px!important; overflow:hidden!important;
+    background:var(--hj-photo)!important;
+  }
+  html body #camHomeJornada .cam-hj-media img {
+    display:block!important; width:100%!important; height:100%!important; max-width:none!important; margin:0!important;
+    object-fit:cover!important; object-position:var(--ae-image-focus,50% 50%)!important;
+  }
+  html body #camHomeJornada .cam-hj-chip {
+    position:absolute!important; left:10px!important; top:10px!important; padding:4px 9px!important;
+    background:rgba(8,23,36,.74)!important; color:#f6ecdf!important;
+    font:800 10px/1.2 Inter,system-ui,sans-serif!important; letter-spacing:.08em!important; text-transform:uppercase!important;
+    -webkit-backdrop-filter:blur(4px)!important; backdrop-filter:blur(4px)!important;
+  }
+  html body #camHomeJornada .cam-hj-news-body { display:flex!important; flex-direction:column!important; gap:8px!important; padding:12px 14px 14px!important; flex:1 1 auto!important; }
+  html body #camHomeJornada .cam-hj-meta { display:block!important; margin-top:auto!important; color:var(--hj-muted)!important; font:600 11.5px/1.3 Inter,system-ui,sans-serif!important; }
+
+  /* ---------- Takes ---------- */
+  html body #camHomeJornada .cam-hj-take { width:244px!important; }
+  html body #camHomeJornada .cam-hj-excerpt {
+    display:-webkit-box!important; -webkit-box-orient:vertical!important; -webkit-line-clamp:2!important; overflow:hidden!important;
+    color:var(--hj-text)!important; font:400 13px/1.45 Inter,system-ui,sans-serif!important; overflow-wrap:anywhere!important;
+  }
+  html body #camHomeJornada .cam-hj-take-foot {
+    display:flex!important; align-items:center!important; justify-content:space-between!important; gap:10px!important;
+    margin-top:auto!important; padding-top:10px!important; border-top:1px solid var(--hj-line)!important;
+  }
+  html body #camHomeJornada .cam-hj-author {
+    min-width:0!important; overflow:hidden!important; text-overflow:ellipsis!important; white-space:nowrap!important;
+    color:var(--hj-accent)!important; font:700 12px/1.3 Inter,system-ui,sans-serif!important;
+  }
+  html body #camHomeJornada .cam-hj-votes { display:flex!important; gap:10px!important; flex:0 0 auto!important; font:700 11.5px/1.3 Inter,system-ui,sans-serif!important; }
+  html body #camHomeJornada .cam-hj-votes .is-up { color:var(--hj-up)!important; }
+  html body #camHomeJornada .cam-hj-votes .is-down { color:var(--hj-down)!important; }
+
+  /* ---------- Power Rankings ---------- */
+  html body #camHomeJornada .cam-hj-ranking { width:260px!important; }
+  html body #camHomeJornada .cam-hj-rank-list { display:flex!important; flex-direction:column!important; gap:7px!important; }
+  html body #camHomeJornada .cam-hj-rank {
+    display:grid!important; grid-template-columns:16px 28px minmax(0,1fr) auto!important; align-items:center!important; gap:9px!important;
+  }
+  html body #camHomeJornada .cam-hj-rank-n { color:var(--hj-muted)!important; font:800 12px/1 Inter,system-ui,sans-serif!important; text-align:right!important; }
+  html body #camHomeJornada .cam-hj-rank-name {
+    min-width:0!important; overflow:hidden!important; text-overflow:ellipsis!important; white-space:nowrap!important;
+    color:var(--hj-ink)!important; font:650 13.5px/1.3 Inter,system-ui,sans-serif!important;
+  }
+  html body #camHomeJornada .cam-hj-trend { padding:2px 7px!important; font:800 10.5px/1.3 Inter,system-ui,sans-serif!important; color:var(--hj-muted)!important; background:var(--hj-soft)!important; white-space:nowrap!important; }
+  html body #camHomeJornada .cam-hj-trend.is-up { color:var(--hj-up)!important; }
+  html body #camHomeJornada .cam-hj-trend.is-down { color:var(--hj-down)!important; }
+  html body #camHomeJornada .cam-hj-trend.is-new { color:var(--hj-accent)!important; background:var(--hj-accent-soft)!important; }
+
+  /* ---------- esquinas (después del reset a 0) ---------- */
+  html body #camHomeJornada :is(.cam-hj-card, .cam-hj-shortcut) { border-radius:16px!important; }
+  html body #camHomeJornada .cam-hj-icon { border-radius:12px!important; }
+  html body #camHomeJornada :is(.cam-hj-badge, .cam-hj-pts, .cam-hj-chip, .cam-hj-trend, .cam-hj-odds) { border-radius:999px!important; }
+  html body #camHomeJornada .cam-hj-crest { border-radius:50%!important; }
+  html body #camHomeJornada .cam-hj-selection { border-radius:10px!important; }
+  html body #camHomeJornada .cam-hj-news .cam-hj-media { border-radius:15px 15px 0 0!important; }
+
+  /* pantallas estrechas (320 px): atajos más compactos */
+  @media (max-width:359px) {
+    html body #camHomeJornada .cam-hj-shortcuts { gap:6px!important; }
+    html body #camHomeJornada .cam-hj-shortcut { min-height:84px!important; padding:10px 2px 9px!important; font-size:10.5px!important; }
+    html body #camHomeJornada .cam-hj-icon { width:32px!important; height:32px!important; }
+    html body #camHomeJornada .cam-hj-title { font-size:24px!important; }
+  }
+  @media (prefers-reduced-motion:reduce) {
+    html body #camHomeJornada :is(.cam-hj-card, .cam-hj-shortcut):active { transform:none!important; }
+    html body #camHomeJornada .cam-hj-row { scroll-behavior:auto!important; }
+  }
+}

@@ -173,6 +173,8 @@
      if(active)area.append(createCard(active,preview && !weeklyMobile.matches));
      else area.append(make('p','CAM SPORTS todavía no ha publicado un Pick del editor.','ae-weekly-empty'));
    }
+   // «Tu jornada» (Inicio en el teléfono) enseña el Pick vigente sin volver a pedirlo.
+   window.camEditorPick=active?Object.freeze({id:active.id,title:active.title,event_name:active.event_name,selection:active.selection,american_odds:active.american_odds,expires_at:active.expires_at}):null;
    document.dispatchEvent(new Event('cam:weekly-render'));
  }
  async function load(){
