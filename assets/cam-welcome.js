@@ -86,7 +86,7 @@
     $('camWelcomeClose')?.addEventListener('click',()=>$('camWelcomeDialog')?.close());
     $('camWelcomeExplore')?.addEventListener('click',()=>$('camWelcomeDialog')?.close());
     // Cada tarjeta lleva a su sección. Takes pide antes elegir Fútbol o NFL.
-    // «Siempre serás bienvenido» reabre la bienvenida encima del acceso o del perfil.
+    // «Siempre serás bienvenido» reabre la bienvenida desde el acceso.
     // Si desde ahí se elige una sección, se cierra también la ventana de debajo.
     const closeOpeners = () => {
       const auth = $('userAuthModal');

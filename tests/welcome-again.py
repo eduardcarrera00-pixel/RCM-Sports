@@ -1,4 +1,4 @@
-"""«Siempre serás bienvenido»: reabre la bienvenida desde el acceso y desde el perfil propio.
+"""«Siempre serás bienvenido»: reabre la bienvenida desde el acceso.
 Uso: python3 tests/welcome-again.py [--shots DIR]"""
 import importlib.util, pathlib, sys
 
@@ -37,30 +37,22 @@ def run():
                 page.locator('[data-cam-welcome="picks"]').click()
                 assert page.evaluate("document.getElementById('userAuthModal').classList.contains('hidden')"), 'ir a una sección cierra el acceso'
                 assert not page.errors, page.errors
-            # 2) Perfil propio: el botón está a la izquierda de la X; no aparece en perfiles públicos.
+            # 2) Perfil propio: la cabecera solo muestra la X junto al rótulo.
             with fp.full_page(fake_js=SEEN + USER, dark=dark, width=width, scale=scale) as page:
                 page.evaluate('window.openAeProfile()')
-                button = page.locator('#aeProfileWelcomeAgain')
-                button.wait_for(state='visible')
-                close = page.locator('#aeProfileDialog .ae-profile-close').bounding_box()
-                box = button.bounding_box()
-                assert box['x'] + box['width'] <= close['x'] and abs(box['y'] - close['y']) < 4, 'a la izquierda de la X'
-                assert page.evaluate("document.activeElement.classList.contains('ae-profile-close')"), 'el foco inicial sigue en la X'
+                header = page.locator('#aeProfileDialog .cam-profile-head')
+                close = header.get_by_role('button', name='Cerrar perfil')
+                close.wait_for(state='visible')
+                assert not header.locator('[data-cam-welcome-again]').count()
+                box = close.bounding_box()
+                assert box['width'] >= 44 and box['height'] >= 44
+                assert close.evaluate('(button) => button === document.activeElement'), 'el foco inicial sigue en la X'
                 if SHOTS:
-                    page.screenshot(path=f'{SHOTS}/bienvenido-perfil-{name}.png')
-                button.click()
-                page.wait_for_function(OPEN)
-                page.locator('#camWelcomeExplore').click()
-                assert page.evaluate("document.getElementById('aeProfileDialog').open"), 'explorar vuelve al perfil'
-                button.click()
-                page.wait_for_function(OPEN)
-                page.locator('[data-cam-welcome="news"]').click()
-                assert not page.evaluate("document.getElementById('aeProfileDialog').open"), 'ir a una sección cierra el perfil'
-                page.evaluate("window.openAePublicProfile('33333333-3333-4333-8333-333333333333', false)")
-                page.wait_for_timeout(500)
-                assert button.is_hidden(), 'solo en el perfil propio'
+                    page.screenshot(path=f'{SHOTS}/perfil-cabecera-{name}.png')
+                close.click()
+                assert not page.evaluate("document.getElementById('aeProfileDialog').open")
                 assert not page.errors, page.errors
-    print('PASS: «Siempre serás bienvenido» en acceso y perfil (día, noche, móvil y escritorio).')
+    print('PASS: bienvenida en acceso y cabecera del perfil (día, noche, móvil y escritorio).')
 
 
 if __name__ == '__main__':

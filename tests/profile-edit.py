@@ -167,7 +167,7 @@ def run(width, dark):
         st = page.evaluate(STATE)
         assert st['title'] == '@beto_crack' and not st['edit'] and st['kicker'].startswith('AFICIONADO'), f'{where}: público {st}'
         assert st['tabs'] == ['Perfil', 'Takes', 'Picks', 'Party'] and st['selected'] == 'aeProfileTabOverview', f'{where}: pestañas públicas {st}'
-        assert not page.evaluate("document.getElementById('aeProfileWelcomeAgain').getClientRects().length"), f'{where}: bienvenida solo en el propio'
+        assert not page.locator('#aeProfileDialog [data-cam-welcome-again]').count(), f'{where}: cabecera sin botón de bienvenida'
         if SHOTS: page.screenshot(path=str(SHOTS / f'{where}-publico.png'))
         assert page.errors == [], f'{where}: errores {page.errors}'
     print('PASS', where)
