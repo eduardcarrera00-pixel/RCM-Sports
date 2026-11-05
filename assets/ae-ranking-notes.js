@@ -60,7 +60,13 @@
     tpl.innerHTML = String(html || '');
     const blocks = [...tpl.content.querySelectorAll('h1,h2,h3,h4,h5,p,li,blockquote')]
       .filter(el => !el.querySelector('p,li,h1,h2,h3,h4,h5'))
-      .map(el => el.textContent.replace(/\s+/g, ' ').trim()).filter(Boolean);
+      .flatMap(el => {
+        // El editor también guarda «equipo<br>análisis» dentro de un párrafo.
+        // Conservar ese límite antes de normalizar espacios evita perder el título.
+        const copy = el.cloneNode(true);
+        copy.querySelectorAll('br').forEach(br => br.replaceWith('\n'));
+        return copy.textContent.split(/\n+/).map(line => line.replace(/\s+/g, ' ').trim());
+      }).filter(Boolean);
     const keys = teamKeys(teams), notes = new Map();
     let current = null;
     for (const text of blocks) {
@@ -81,7 +87,7 @@
     const sport = a => norm(a.category);
     const match = scope === 'nfl'
       ? a => sport(a) === 'nfl'
-      : a => sport(a) === 'futbol' && /champions|\bucl\b/i.test((a.title || '') + ' ' + (a.summary || ''));
+      : a => sport(a) === 'futbol';
     return list.filter(a => a && a.remote !== false && a.body && isRanking(a) && match(a))
       .sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')))[0] || null;
   }
