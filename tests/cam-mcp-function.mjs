@@ -1,6 +1,7 @@
 // Prueba sin red del conector MCP (supabase/functions/cam-mcp): protocolo, clave,
-// las 15 herramientas con datos falsos y que nunca escribe ni usa la clave secreta
-// fuera de «visitas».
+// las 15 herramientas de consulta con datos falsos (sin escribir y con la clave publicable),
+// y las de administración: qué piden exactamente a public.cam_mcp_admin (clave secreta),
+// cómo convierten los argumentos y cómo devuelven sus errores.
 import fs from 'node:fs';
 import vm from 'node:vm';
 import crypto from 'node:crypto';
@@ -22,8 +23,34 @@ const take = {id: TAKE, author_id: AUTHOR, author: 'eduardcarrera00', sport: 'fo
 const pick = {id: PICK, author: 'eduardcarrera00', title: 'PSG v Barcelona', explanation: '', legs: [{event: 'PSG v Barcelona', selection: 'PSG', sport: 'Fútbol', odds: 240}], american_odds: 240, decimal_odds: 3.4, created_at: '2026-10-20T23:32:00Z', event_date: '2026-10-20', outcome: 'won', result_points: 2.4, moderation_status: 'approved'};
 const leaderRow = {rank_position: 1, user_id: AUTHOR, username: 'eduardcarrera00', points: 6, hits: 2, resolved: 2, accuracy: 100};
 
+const adminCalls = [];
+function fakeAdmin(body) {
+  adminCalls.push(body);
+  const {p_action: action, p_args: args} = body;
+  if (action === 'rpc') {
+    if (args.fn === 'ae_void_take') return {ok: false, error: 'Take no anulable'};
+    const results = {
+      ae_take_review_queue: [{id: TAKE, title: take.title, author: 'eduardcarrera00', sport: 'football', created_at: take.created_at, outcome: null, points: null, scored_at: null}],
+      ae_classify_free_take: [{probability: 0.2, points: 7, trivial: false, snapshot_id: null}],
+      ae_score_free_take_auto: 7,
+      cam_admin_weekly_results: [{id: 'b6e943cb-017f-44cf-8fd6-3b5a1d7c7d12', title: 'El Clásico', expires_at: '2026-10-26T17:42:00Z', outcome: null}],
+      ae_settle_take: 3,
+      ae_moderate_community_pick: 'approved',
+      ae_publish_editorial_weekly_pick_visual_v2: 'b6e943cb-017f-44cf-8fd6-3b5a1d7c7d13',
+    };
+    return {ok: true, result: results[args.fn] ?? true};
+  }
+  const results = {
+    picks_pendientes: {por_moderar: [pick], por_resolver: [], por_jugarse: 2},
+    noticia_publicar: {id: ARTICLE, title: args.title, category: args.category, is_public: true},
+    redes_promos: {promos_activas: false, entregas_canceladas: 1},
+  };
+  return {ok: true, result: results[action] ?? null};
+}
+
 function fake(path, body) {
   const [name, query = ''] = path.split('?');
+  if (name === 'rpc/cam_mcp_admin') return fakeAdmin(body);
   const rpcs = {
     ae_public_take_feed: [take],
     ae_public_take_reply_counts: [{take_id: TAKE, reply_count: 3}],
@@ -63,7 +90,9 @@ function fake(path, body) {
     ae_editorial_weekly_picks: [{id: 'b6e943cb-017f-44cf-8fd6-3b5a1d7c7d12', title: 'El Clásico', event_name: 'FC Barcelona vs Real Madrid', selection: 'Over 4.5', american_odds: 125, analysis: 'Será cine.', created_at: '2026-10-25T17:42:00Z', expires_at: '2026-10-26T17:42:00Z'}],
     nfl_rankings: [{edition: 'Week 7', team_ids: ['SF', 'MIN', 'BUF'], updated_at: '2026-10-29T18:34:20Z'}],
     nfl_ranking_history: [{edition: 'Week 7', team_ids: ['SF', 'MIN', 'BUF'], superseded_at: '2026-10-29T18:33:00Z'}, {edition: 'Week 6', team_ids: ['MIN', 'SF', 'KC'], superseded_at: '2026-10-20T00:00:00Z'}],
-    nfl_teams: [{id: 'SF', name: 'San Francisco 49ers'}, {id: 'MIN', name: 'Minnesota Vikings'}, {id: 'BUF', name: 'Buffalo Bills'}, {id: 'BAL', name: 'Baltimore Ravens'}],
+    nfl_teams: [{id: 'SF', name: 'San Francisco 49ers'}, {id: 'MIN', name: 'Minnesota Vikings'}, {id: 'BUF', name: 'Buffalo Bills'}, {id: 'BAL', name: 'Baltimore Ravens'},
+      {id: 'KC', name: 'Kansas City Chiefs'}, {id: 'DET', name: 'Detroit Lions'}, {id: 'PHI', name: 'Philadelphia Eagles'}, {id: 'GB', name: 'Green Bay Packers'},
+      {id: 'LAR', name: 'Los Angeles Rams'}, {id: 'LAC', name: 'Los Angeles Chargers'}, {id: 'HOU', name: 'Houston Texans'}],
     champions_rankings: [{season: '2026/27', edition: 'Jornada 3', team_ids: ['52747', '50037'], published_at: '2026-10-24T04:25:38Z'}],
     champions_clubs: [{id: '52747', name: 'Paris Saint-Germain'}, {id: '50037', name: 'Bayern München'}],
     cam_nfl_games: query.startsWith('select=season') ? [{season: 2026}] : query.startsWith('select=week') ? [{week: 8}]
@@ -133,12 +162,14 @@ assert.equal(init.body.result.serverInfo.name, 'cam-sports');
 assert.equal((await post({jsonrpc: '2.0', method: 'notifications/initialized'})).status, 202);
 const list = await post({jsonrpc: '2.0', id: 2, method: 'tools/list'});
 const tools = list.body.result.tools;
-assert.equal(tools.length, 15);
+assert.equal(tools.length, 29);
 for (const tool of tools) {
   assert.match(tool.name, /^[a-z_]+$/);
-  assert.equal(tool.annotations.readOnlyHint, true);
-  assert.equal(tool.annotations.destructiveHint, false);
+  const writes = tool.name.startsWith('admin_') && !['admin_pendientes', 'admin_consultar'].includes(tool.name);
+  assert.equal(tool.annotations.readOnlyHint, !writes, tool.name);
+  assert.equal(tool.annotations.destructiveHint, writes, tool.name);
 }
+assert.equal(tools.filter((t) => t.annotations.readOnlyHint).length, 17);
 const batch = await post([{jsonrpc: '2.0', id: 3, method: 'ping'}, {jsonrpc: '2.0', method: 'notifications/x'}]);
 assert.deepEqual(batch.body, [{jsonrpc: '2.0', id: 3, result: {}}]);
 assert.equal((await post({jsonrpc: '2.0', id: 4, method: 'tools/call', params: {name: 'nada'}})).body.error.code, -32602);
@@ -177,16 +208,68 @@ const perfil = await data('perfil_jugador', {usuario: '@EduardCarrera00'});
 assert.equal(perfil.usuario_id, AUTHOR);
 assert.equal(perfil.prestigio.perfil, 'Atrevido');
 
+assert.equal(adminCalls.length, 0, 'las herramientas de consulta nunca pasan por cam_mcp_admin');
+
+// Administración: lo que se pide a cam_mcp_admin
+const lastAdmin = () => adminCalls.at(-1);
+const pend = await data('admin_pendientes');
+assert.equal(pend.takes_sin_puntuar.futbol.sin_puntuar, 1);
+assert.match(pend.picks.por_moderar[0].enlace, /^https:\/\/camsports\.github\.io\/\?p=[A-Za-z0-9_-]{22}$/);
+assert.equal(pend.pick_del_editor_sin_resultado[0].resultado, 'pendiente de resultado');
+assert.equal((await data('admin_consultar', {tipo: 'takes_por_puntuar', deporte: 'futbol'})).futbol.takes[0].id, TAKE);
+
+await data('admin_takes', {accion: 'dificultad', take_id: TAKE, metodo: 'nivel', nivel: 'sorpresa'});
+assert.deepEqual(lastAdmin(), {p_action: 'rpc', p_args: {fn: 'ae_classify_free_take', args: {p_take_id: TAKE, p_rescore: false, p_method: 'tier', p_tier: 'sorpresa'}}});
+await data('admin_takes', {accion: 'dificultad', take_id: TAKE, metodo: 'tabla', competicion: 'laliga', temporada: '2026/27', equipo: 'Getafe', condicion: 'o_mejor', posicion: 4});
+assert.equal(lastAdmin().p_args.args.p_condition, 'at_or_above');
+assert.equal((await data('admin_takes', {accion: 'resultado', take_id: TAKE, resultado: 'acertado'})).puntos, 7);
+assert.equal(lastAdmin().p_args.args.p_outcome, 'won');
+
+await data('admin_noticia', {accion: 'publicar', titulo: 'Semana 9', categoria: 'nfl', texto: 'Primer párrafo con <b>\n\n## Subtítulo\n**Clave** & más texto aquí'});
+assert.deepEqual(lastAdmin(), {p_action: 'noticia_publicar', p_args: {
+  title: 'Semana 9', category: 'NFL', body: '<p>Primer párrafo con &lt;b&gt;</p><h2>Subtítulo</h2><p><strong>Clave</strong> &amp; más texto aquí</p>',
+  image: 'https://images.unsplash.com/photo-1587280501635-68a0e82cd5ff?w=800&auto=format&fit=crop&q=80',
+}});
+await data('admin_noticia', {accion: 'editar', id: ARTICLE, visible: false});
+assert.deepEqual(lastAdmin(), {p_action: 'noticia_editar', p_args: {id: ARTICLE, is_public: false}});
+
+await data('admin_quiniela', {accion: 'cuotas', deporte: 'futbol', partido_id: '401882828', momio_local: 120, momio_empate: 230, momio_visitante: 260});
+assert.deepEqual(lastAdmin().p_args, {fn: 'cam_football_admin_odds', args: {p_game_id: '401882828', p_home: 120, p_away: 260, p_source: 'manual', p_draw: 230}});
+await data('admin_quiniela', {accion: 'resultado', deporte: 'nfl', partido_id: '401873026', estado: 'empate', marcador_local: 20, marcador_visitante: 20, motivo: 'Empate en tiempo extra'});
+assert.equal(lastAdmin().p_args.args.p_status, 'tie');
+assert.equal((await call('admin_quiniela', {accion: 'resultado', deporte: 'nfl', partido_id: '401873026', estado: 'final', marcador_local: 1, marcador_visitante: 0, motivo: 'corto'})).isError, true, 'motivo de menos de 8 caracteres');
+
+const nflTop10 = ['49ers', 'Vikings', 'Buffalo', 'BAL', 'Chiefs', 'Detroit Lions', 'Eagles', 'Packers', 'Rams', 'Houston'];
+await data('admin_power_rankings', {liga: 'nfl', edicion: 'Semana 9', equipos: nflTop10});
+assert.deepEqual(adminCalls.at(-1).p_args.args, {p_edition: 'Semana 9', p_team_ids: ['SF', 'MIN', 'BUF', 'BAL', 'KC', 'DET', 'PHI', 'GB', 'LAR', 'HOU'], p_expected_updated_at: '2026-10-29T18:34:20Z'});
+const ambiguous = await call('admin_power_rankings', {liga: 'nfl', edicion: 'Semana 9', equipos: ['Los Angeles', ...nflTop10.slice(1)]});
+assert.match(ambiguous.content[0].text, /ambiguo/);
+
+await data('admin_campeon', {accion: 'validar', pregunta_id: '41df762f-a97c-4e3d-8044-842f86470056', campeon: 'fc barcelona'});
+assert.deepEqual(lastAdmin().p_args.args, {p_question_id: '41df762f-a97c-4e3d-8044-842f86470056', p_option_id: 'o1'});
+const voided = await call('admin_campeon', {accion: 'anular', pregunta_id: '41df762f-a97c-4e3d-8044-842f86470056'});
+assert.equal(voided.isError, true);
+assert.equal(voided.content[0].text, 'No se hizo el cambio: Take no anulable', 'el motivo de la base de datos llega tal cual');
+
+await data('admin_pick_editor', {accion: 'publicar', titulo: 'Bills ganan', partido: 'Chiefs @ Bills', seleccion: 'Bills ML', momio: -120, analisis: 'Buffalo en casa es otra cosa.', cierra: '2026-11-09 20:00'});
+assert.equal(lastAdmin().p_args.args.p_expires_at, '2026-11-10T01:00:00.000Z', 'la hora sin zona se entiende en Toronto');
+await data('admin_picks', {accion: 'aprobar', pick_id: PICK});
+assert.deepEqual(lastAdmin().p_args, {fn: 'ae_moderate_community_pick', args: {p_pick_id: PICK, p_approve: true}});
+assert.equal((await data('admin_redes', {accion: 'pausar_promos'})).entregas_canceladas, 1);
+assert.deepEqual(lastAdmin(), {p_action: 'redes_promos', p_args: {active: false}});
+assert.equal((await call('admin_redes', {accion: 'nuevo_mensaje', mensaje_id: 'Mal Id'})).isError, true);
+assert.equal((await call('admin_noticia', {accion: 'publicar', titulo: 'x', categoria: 'golf', texto: 'y'.repeat(30)})).isError, true);
+
 // Errores de argumentos: respuesta normal con isError, nunca una excepción
 for (const [name, args] of [['takes', {deporte: 'golf'}], ['leer_noticia', {id: 'x'}], ['quiniela', {}], ['clasificacion_quiniela', {deporte: 'futbol', periodo: 'jornada'}]]) {
   const result = await call(name, args);
   assert.equal(result.isError, true, name);
 }
 
-// Solo lectura y la clave secreta solo para las visitas
+// La clave secreta solo para las visitas y la administración
 for (const r of requests) {
-  if (r.path === 'rpc/cam_mcp_analytics_summary') assert.equal(r.key, 'sb_secret_test');
+  if (['rpc/cam_mcp_analytics_summary', 'rpc/cam_mcp_admin'].includes(r.path)) assert.equal(r.key, 'sb_secret_test');
   else assert.equal(r.key, 'sb_publishable_test', r.path);
   assert.equal(r.auth, undefined, 'las claves nuevas no van como Bearer');
 }
-console.log(`PASS: cam-mcp responde solo con clave, habla MCP (initialize, notificaciones, lotes) y sus 15 herramientas devuelven datos de solo lectura (${requests.length} consultas, clave secreta solo en «visitas»).`);
+console.log(`PASS: cam-mcp responde solo con clave, habla MCP (initialize, notificaciones, lotes); 17 herramientas de consulta y 12 de administración (${requests.length} consultas, ${adminCalls.length} a cam_mcp_admin; clave secreta solo en «visitas» y administración).`);
