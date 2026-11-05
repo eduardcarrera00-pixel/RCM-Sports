@@ -291,16 +291,49 @@
   };
 
   // Hand an animated strip to native touch scrolling at its current position.
-  // Keep manual mode after release, so autoplay cannot fight the finger/inertia.
+  // Let touch scrolling settle, then resume autoplay at the same visible position.
+  const resumeTimers = new WeakMap();
+  const trackDurations = new WeakMap();
+  const touching = new Set();
+  function resumeLater(viewport) {
+    clearTimeout(resumeTimers.get(viewport));
+    resumeTimers.set(viewport, setTimeout(() => {
+      if (touching.has(viewport)) return;
+      const track = viewport.querySelector('.rcm-track');
+      if (!track?.classList.contains('ae-ranking-manual')) return;
+      const width = track.querySelector('.rcm-track-group')?.getBoundingClientRect().width || 0;
+      const duration = trackDurations.get(track) || 40;
+      const offset = width ? ((viewport.scrollLeft % width) + width) % width : 0;
+      track.style.setProperty('animation-delay', -(offset / (width || 1)) * duration + 's');
+      track.classList.remove('ae-ranking-manual');
+      viewport.scrollLeft = 0;
+    }, 6000));
+  }
+  document.addEventListener('pointerup', () => {
+    for (const viewport of touching) resumeLater(viewport);
+    touching.clear();
+  }, {passive:true});
+  document.addEventListener('pointercancel', () => {
+    for (const viewport of touching) resumeLater(viewport);
+    touching.clear();
+  }, {passive:true});
+  // Scroll includes momentum after the finger is released.
+  document.addEventListener('scroll', e => {
+    if (e.target?.matches?.('#rankingViewport, #championsViewport')) resumeLater(e.target);
+  }, {passive:true, capture:true});
   document.addEventListener('pointerdown', e => {
     if (e.pointerType === 'mouse') return;
     const viewport = e.target?.closest?.('#rankingViewport, #championsViewport');
     if (!viewport || !window.matchMedia('(max-width:760px), (orientation:landscape) and (max-height:500px) and (hover:none) and (pointer:coarse)').matches) return;
+    touching.add(viewport);
+    clearTimeout(resumeTimers.get(viewport));
     const track = viewport.querySelector('.rcm-track');
     if (!track || track.classList.contains('ae-ranking-manual')) return;
     const group = track.querySelector('.rcm-track-group');
     const width = group?.getBoundingClientRect().width || 0;
-    const transform = getComputedStyle(track).transform;
+    const trackStyle = getComputedStyle(track);
+    trackDurations.set(track, parseFloat(trackStyle.animationDuration) || 40);
+    const transform = trackStyle.transform;
     const offset = transform === 'none' ? 0 : -new DOMMatrixReadOnly(transform).m41;
     const position = viewport.scrollLeft + (width ? ((offset % width) + width) % width : 0);
     track.classList.add('ae-ranking-manual');

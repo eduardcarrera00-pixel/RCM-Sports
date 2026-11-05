@@ -56,7 +56,6 @@
   };
 
   const chosen = new Map();   // section → last tab chosen in this visit
-  const scrolls = new Map();  // section|tab → scroll position
   let applyingUrl = false;
   let pendingTab = null;
 
@@ -71,7 +70,6 @@
     const tab = chosen.get(cat);
     return validTab(section, tab) ? tab : section.tabs[0][0];
   };
-  const memoryKey = (cat, tab) => cat + '|' + (tab || '');
 
   // ---------- The bar ----------
   const bar = document.createElement('nav');
@@ -128,15 +126,10 @@
   }
 
   // ---------- Scroll ----------
-  // Where the content of the section starts (the bar sticks right there).
-  function contentTop() {
-    return Math.max(0, main.getBoundingClientRect().top + window.scrollY);
-  }
-  function remember(cat, tab) {
-    scrolls.set(memoryKey(cat, tab), window.scrollY);
-  }
-  function jump(y) {
-    window.scrollTo({ top: Math.max(0, Math.round(y)), behavior: 'auto' });
+  // Every page starts at the top; browser history must not restore an old height.
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  function jumpTop() {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   }
 
   // ---------- Address ----------
@@ -188,21 +181,12 @@
     tab = aliasOf(section, tab);
     const previous = tabOf(cat);
     if (previous === tab && !options.force) {
-      if (options.scroll !== false) {
-        const top = contentTop();
-        if (window.scrollY > top) jump(top);
-      }
+      if (options.scroll !== false) jumpTop();
       return true;
     }
-    if (mobile.matches && options.scroll !== false) remember(cat, previous);
     chosen.set(cat, tab);
     render();
-    if (mobile.matches && options.scroll !== false) {
-      const top = contentTop();
-      const saved = scrolls.get(memoryKey(cat, tab));
-      const settle = Math.min(window.scrollY, top);
-      jump(saved != null ? Math.max(saved, settle) : settle);
-    }
+    if (mobile.matches && options.scroll !== false) jumpTop();
     if (options.url !== false) syncUrl({ replace: true });
     document.dispatchEvent(new CustomEvent('cam:section-tab', { detail: { section: SECTIONS[cat].key, tab } }));
     return true;
@@ -211,17 +195,12 @@
   const originalFilter = window.filterByCategory;
   window.filterByCategory = function camSectionAwareFilter() {
     const before = category();
-    const beforeTab = tabOf(before);
-    if (mobile.matches) remember(before, sectionOf(before) ? beforeTab : null);
     const result = originalFilter.apply(this, arguments);
     const after = category();
     if (pendingTab && SECTIONS[after] && validTab(SECTIONS[after], pendingTab)) chosen.set(after, aliasOf(SECTIONS[after], pendingTab));
     pendingTab = null;
     render();
-    if (after !== before && mobile.matches) {
-      const saved = scrolls.get(memoryKey(after, sectionOf(after) ? tabOf(after) : null));
-      jump(saved || 0);
-    }
+    if (after !== before) jumpTop();
     syncUrl();
     return result;
   };
@@ -240,12 +219,6 @@
       : (index + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
     tabs[index].focus();
     selectTab(tabs[index].dataset.tab);
-  });
-
-  // Tapping the section you are on again (in the dock) goes back to the top of its tab.
-  document.addEventListener('cam:dock-reselect', () => {
-    const cat = category();
-    if (sectionOf(cat)) scrolls.delete(memoryKey(cat, tabOf(cat)));
   });
 
   // Scripts that scroll to a part of the section (Top 10, Pick del editor…)
@@ -280,6 +253,7 @@
       } else if (tab && SECTIONS[cat] && tab !== tabOf(cat)) {
         selectTab(tab, { url: false });
       }
+      jumpTop();
     } finally {
       applyingUrl = false;
       pendingTab = null;

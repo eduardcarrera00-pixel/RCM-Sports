@@ -130,8 +130,7 @@
     Promise.resolve().then(() => {
       updateActive();
       if (again) {
-        const smooth = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        window.scrollTo({ top: 0, behavior: smooth ? 'smooth' : 'auto' });
+        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
         document.dispatchEvent(new CustomEvent('cam:dock-reselect'));
       }
     });

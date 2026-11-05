@@ -2519,7 +2519,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
 <script src="assets/cam-banner-artwork.js?v=20261102-visible-size-1"></script>
 <script src="assets/ae-site-images.js?v=20261104-noticias-nfl-dia-1"></script>
 <script src="assets/cam-site-texts.js?v=20261103-remove-welcome-1"></script>
-<script defer src="assets/cam-mobile-bottom-nav.js?v=20261104-actualidad-1"></script>
+<script defer src="assets/cam-mobile-bottom-nav.js?v=20261105-instant-top-1"></script>
 <link rel="stylesheet" href="assets/cam-perf-controls.css?v=20261104-semana-deportes-2">
 
 <script defer src="assets/cam-take-cta.js?v=20261023-take-cta-unificado-1"></script>
@@ -5486,7 +5486,7 @@ updateThemeButton();
 <script src="assets/community.js?v=20261104-la-semana-1"></script>
 <script src="assets/ae-home-community-spotlight.js?v=20261018-reply-totals-1"></script>
 <script src="assets/champions.js?v=20261021-rank-notes-1"></script>
-<script src="assets/ae-ranking-notes.js?v=20261105-football-analysis-1"></script>
+<script src="assets/ae-ranking-notes.js?v=20261105-resume-motion-1"></script>
 <script src="assets/ae-pick-capture.js?v=20261104-apuesta-real-1"></script>
 <script src="assets/community-picks.js?v=20261104-active-empty-1"></script>
 <script src="assets/weekly-picks.js?v=20261015-1"></script>
@@ -6428,7 +6428,7 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 <script src="assets/ae-notifications.js?v=20261103-remove-welcome-1"></script>
 <script src="assets/cam-analytics.js?v=20261026-sin-robots"></script>
 <!-- Teléfono (3 nov): pestañas dentro de NFL, Fútbol y Picks, y una dirección por sección (?s=nfl&v=quiniela). -->
-<script src="assets/cam-mobile-sections.js?v=20261104-semana-deportes-2"></script>
+<script src="assets/cam-mobile-sections.js?v=20261105-instant-top-1"></script>
 <!-- Teléfono (3 nov): Inicio como «Tu jornada» (atajos + filas deslizables). Escritorio sin cambios. -->
 <script src="assets/cam-home-jornada.js?v=20261103-jornada-1"></script>
 <!-- Teléfono (4 nov): NFL · La semana (opinión y quiniela); Power Rankings en Noticias. Escritorio sin cambios. -->
@@ -6455,8 +6455,8 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
       inViewport = entries[0]?.isIntersecting ?? false;
     }, {threshold:0.1}).observe(track);
   }
-  track.addEventListener('mouseenter', () => {hovering = true;});
-  track.addEventListener('mouseleave', () => {hovering = false;});
+  track.addEventListener('pointerenter', e => {if (e.pointerType === 'mouse') hovering = true;});
+  track.addEventListener('pointerleave', e => {if (e.pointerType === 'mouse') hovering = false;});
   track.addEventListener('focusin', () => {focused = true;});
   track.addEventListener('focusout', () => {focused = track.contains(document.activeElement);});
   const hold = () => {heldUntil = performance.now() + 4500;};
@@ -6468,17 +6468,20 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
   function frame(now) {
     const elapsed = lastFrame ? Math.min(now - lastFrame, 64) : 0;
     lastFrame = now;
-    if ((track.classList.contains('ae-home-news-carousel') || track.classList.contains('ae-news-by-sport'))
-      && document.body.classList.contains('ae-is-home')
+    if ((track.classList.contains('ae-home-news-carousel') || track.classList.contains('ae-news-by-sport') || track.classList.contains('ae-sport-news-carousel'))
+      && ['ae-is-home', 'ae-is-nfl', 'ae-is-football'].some(cls => document.body.classList.contains(cls))
       && inViewport && !document.hidden && !reduced.matches
       && !hovering && !focused && now > heldUntil) {
       const lanes = track.classList.contains('ae-news-by-sport') ? track.querySelectorAll('.ae-news-sport-track') : [track];
       for (const lane of lanes) {
-        if (!motion.has(lane)) motion.set(lane,{direction:1,pauseUntil:0});
+        if (!motion.has(lane)) motion.set(lane,{direction:1,pauseUntil:0,position:lane.scrollLeft});
         const state = motion.get(lane);
         const end = lane.scrollWidth - lane.clientWidth;
         if (end <= 2 || now < state.pauseUntil) continue;
-        lane.scrollLeft = Math.max(0,Math.min(end,lane.scrollLeft + state.direction * elapsed * .021));
+        // Accumulate subpixel steps: some browsers round scrollLeft on every write.
+        if (Math.abs(lane.scrollLeft - state.position) > 2) state.position = lane.scrollLeft;
+        state.position = Math.max(0,Math.min(end,state.position + state.direction * elapsed * .021));
+        lane.scrollLeft = state.position;
         if ((state.direction > 0 && lane.scrollLeft >= end - 1) || (state.direction < 0 && lane.scrollLeft <= 1)) {
           state.direction *= -1;
           state.pauseUntil = now + 1600;

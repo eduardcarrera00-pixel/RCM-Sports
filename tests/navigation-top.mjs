@@ -1,0 +1,30 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {Window} from 'happy-dom';
+const w = new Window({url: 'https://camsports.github.io/'});
+w.document.body.innerHTML = '<main id="mainContent"></main>';
+let mobile = true;
+w.matchMedia = () => ({get matches() {return mobile;}, addEventListener() {}});
+w.currentCategory = 'Todos';
+w.currentSearchQuery = '';
+w.filterByCategory = cat => {w.currentCategory = cat;};
+let y = 0, lastScroll;
+Object.defineProperty(w, 'scrollY', {get: () => y});
+w.scrollTo = options => {lastScroll = options; y = options.top;};
+w.history.scrollRestoration = 'auto';
+w.eval(fs.readFileSync('assets/cam-mobile-sections.js', 'utf8'));
+for (const cat of ['NFL', 'Fútbol', 'Picks', 'Opiniones', 'NFL', 'Todos', 'Picks']) {
+  y = 1200;
+  w.filterByCategory(cat);
+  assert.equal(y, 0, cat + ' always starts at top, including a return visit');
+  assert.equal(lastScroll.behavior, 'instant');
+}
+y = 900; w.camSectionTabs.select('historial'); assert.equal(y, 0);
+y = 700; w.camSectionTabs.select('picks'); assert.equal(y, 0);
+y = 800; w.camSectionTabs.select('picks'); assert.equal(y, 0, 'reselect is instant');
+y = 800; w.camSectionTabs.select('chefs', {scroll:false}); assert.equal(y, 800, 'explicit reveal retains anchor scrolling');
+mobile = false; y = 500; w.filterByCategory('NFL'); assert.equal(y, 0, 'desktop section starts at top too');
+assert.equal(w.history.scrollRestoration, 'manual');
+y = 600; w.dispatchEvent(new w.PopStateEvent('popstate')); assert.equal(y, 0, 'Back never restores an old height');
+console.log('PASS: sections, return visits, tabs, reselect, desktop and history start instantly at top.');
+w.happyDOM.abort();
