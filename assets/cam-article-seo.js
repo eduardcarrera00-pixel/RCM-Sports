@@ -4,10 +4,10 @@
   const ORIGIN = 'https://camsports.github.io/';
   const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   const defaults = {
-    title: 'CAM SPORTS | Tu blog deportivo',
-    description: 'Noticias de NFL y fútbol, rankings, quinielas, Picks y opiniones de la comunidad CAM SPORTS.',
+    title: 'CAM SPORTS | Ask to Take',
+    description: 'Demuestra tu conocimiento. Publica tu take en CAM SPORTS.',
     url: ORIGIN,
-    image: ORIGIN + 'assets/social-brand/news.jpg',
+    image: ORIGIN + 'assets/cam-sports-logo.jpeg?v=20261105-link-preview-1',
     type: 'website'
   };
   function text(value, limit = 200) {
@@ -73,10 +73,18 @@
     meta('description', data.description);
     meta('robots', unavailable ? 'noindex,follow' : null);
     for (const key of ['title','description','url','image','type']) meta('og:' + key, data[key], true);
+    const brandImage = data.image === defaults.image;
+    const imageAlt = brandImage ? 'Logo oficial de CAM SPORTS sobre fondo azul' : data.title;
+    meta('og:image:secure_url', data.image, true);
+    meta('og:image:type', brandImage ? 'image/jpeg' : null, true);
+    meta('og:image:width', brandImage ? '1536' : null, true);
+    meta('og:image:height', brandImage ? '1024' : null, true);
+    meta('og:image:alt', imageAlt, true);
     meta('og:site_name', 'CAM SPORTS', true);
     meta('og:locale', 'es_ES', true);
     meta('twitter:card', 'summary_large_image');
     for (const key of ['title','description','image']) meta('twitter:' + key, data[key]);
+    meta('twitter:image:alt', imageAlt);
     meta('article:published_time', data.published, true);
     meta('article:author', data.author, true);
   }
