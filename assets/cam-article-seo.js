@@ -4,7 +4,7 @@
   const ORIGIN = 'https://camsports.github.io/';
   const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   const defaults = {
-    title: 'CAM SPORTS | Ask to Take',
+    title: 'CAM SPORTS | Publica tu Take',
     description: 'Demuestra tu conocimiento. Publica tu take en CAM SPORTS.',
     url: ORIGIN,
     image: ORIGIN + 'assets/cam-sports-logo.jpeg?v=20261105-link-preview-1',
