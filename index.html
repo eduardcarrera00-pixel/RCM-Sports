@@ -2624,6 +2624,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
         <p id="dataStatus" role="status" class="text-sm text-slate-500">Cargando publicaciones…</p>
+        <button id="retryArticles" type="button" hidden onclick="loadArticlesFromStorage()" class="mt-2 rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold">Reintentar</button>
         <div id="legacyTools" class="hidden mt-2 flex flex-wrap gap-3 text-sm">
             <button type="button" onclick="importLegacyArticles(event)" class="px-3 py-2 rounded-lg border border-slate-300">Recuperar notas de este navegador</button>
             <button type="button" onclick="exportLegacyArticles()" class="px-3 py-2 rounded-lg border border-slate-300">Descargar copia de notas antiguas</button>
@@ -3933,6 +3934,11 @@ html:not(.dark) #aeAuthIntroNotice small{color:#5b6d76}
             'https://zahuhmvmqvxaunqebqaa.supabase.co',
             'sb_publishable_QK4qV6totowE4KjolNANrQ_O46olHYg'
         ) : null;
+        // Public news must remain readable while a saved session is refreshing.
+        // Keep the signed-in client for permissions, publishing and interactions.
+        const publicArticlesDb = db ? window.supabase.createClient(db.supabaseUrl, db.supabaseKey, {
+            auth: {storageKey: 'cam-public-articles', persistSession: false, autoRefreshToken: false, detectSessionInUrl: false}
+        }) : null;
         let publishDraftId = null;
         let loadingArticles = false;
         let initialArticlesPending = true; // Show an empty state only after the first online query finishes.
@@ -4065,8 +4071,9 @@ async function handleUserLogout() {
             'Ciclismo': 'https://images.unsplash.com/photo-1541625602330-2277a4c46182?w=800&auto=format&fit=crop&q=80'
         };
 
-        function setDataStatus(message) {
+        function setDataStatus(message, retry = false) {
             document.getElementById('dataStatus').textContent = message;
+            document.getElementById('retryArticles').hidden = !retry;
         }
 
        window.addEventListener('DOMContentLoaded', async () => {
@@ -4084,14 +4091,11 @@ async function handleUserLogout() {
     renderPoll();
     renderTrending();
 
-    await loadUserSession();
-
-    await Promise.allSettled([
-        loadAdminSession(),
-        loadArticlesFromStorage()
-    ]);
-
+    // Authentication can take longer than the public feed on mobile networks.
+    const sessionReady = loadUserSession().then(loadAdminSession);
+    await loadArticlesFromStorage();
     openArticleFromShareLink();
+    await sessionReady;
 });
 
         async function loadAdminSession() {
@@ -4334,13 +4338,16 @@ currentUser = {
         async function loadArticlesFromStorage() {
             if (loadingArticles) return;
             loadingArticles = true;
+            setDataStatus('Cargando publicaciones…');
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 15000);
             try {
-                if (!db) throw new Error('Conexión no disponible');
+                if (!publicArticlesDb) throw new Error('Conexión no disponible');
                 const rows = [];
                 for (let offset = 0; ; offset += 1000) {
-                    const {data, error} = await db.from('articles').select('*').eq('is_public', true)
+                    const {data, error} = await publicArticlesDb.from('articles').select('*').eq('is_public', true)
                         .order('created_at', {ascending: false}).order('id')
-                        .range(offset, offset + 999);
+                        .range(offset, offset + 999).abortSignal(controller.signal);
                     if (error) throw error;
                     rows.push(...data);
                     if (data.length < 1000) break;
@@ -4352,14 +4359,14 @@ currentUser = {
                 window.aeOpinions?.refreshNews?.();
                 renderTrending();
                 refreshCommunity();
-                await refreshArticleStats();
-                await loadArticleViews();
                 setDataStatus('');
+                // Likes and view counts must not hold the loading state or a shared article open.
+                void Promise.allSettled([refreshArticleStats(), loadArticleViews()]);
             } catch {
                 initialArticlesPending = false;
                 renderArticlesFeed(); // On network errors the actual empty state becomes available.
-                setDataStatus('No se pudieron cargar las publicaciones en línea. Comprueba tu conexión y recarga la página.');
-            } finally { loadingArticles = false; }
+                setDataStatus('No se pudieron cargar las publicaciones. Comprueba tu conexión y vuelve a intentarlo.', true);
+            } finally { clearTimeout(timeout); loadingArticles = false; }
         }
 
         function exportLegacyArticles() {
