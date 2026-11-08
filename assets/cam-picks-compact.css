@@ -163,7 +163,7 @@
     width:auto!important;min-width:49px!important;box-sizing:border-box!important;padding:4px 7px!important;
     border:1px solid #afc9e8!important;border-radius:7px!important;background:#e5efff!important;color:#123e78!important;
   }
-  html.dark body #mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#cpFeed,#picksPopular,#picksQuestioned) > .cp-card.cam-ticket-card .cp-feed-meta .cp-card-odds .cp-odds.cam-ticket-quota {
+  html.dark body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#cpFeed,#picksPopular,#picksQuestioned),#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog :is(#aeProfilePicks,#aeProfilePickHighlights)) .cp-card.cam-ticket-card .cp-feed-meta .cp-card-odds .cp-odds.cam-ticket-quota {
     border-color:#416c95!important;background:#163f68!important;color:#d8eaff!important;
   }
   html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#cpFeed,#picksPopular,#picksQuestioned),#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog :is(#aeProfilePicks,#aeProfilePickHighlights)) .cp-card.cam-ticket-card .cam-ticket-odds-label {
