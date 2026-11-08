@@ -615,26 +615,31 @@ function paintHomePlateList(result,kind){
  }
  const picks=Array.isArray(result?.data)?result.data:[];
  if(!picks.length){target.append(el('li','Todavía no hay platos '+(kind==='best'?'con votos positivos.':'con votos negativos.'),'cam-home-plate-empty'));return;}
- for(const [index,p] of picks.entries()){
-  const item=el('li',null,'cam-home-plate-row');
-  const content=el('div',null,'cam-home-plate-copy');
+ for(const p of picks){
+  // Reuse the history card's structure, without a result badge or outcome data.
+  const item=el('li',null,'cam-home-plate-row ae-pick-history-entry');
+  item.dataset.pickId=p.id;
   const first=p.legs?.[0];
-  const read=el('a',first?.event||p.title,'cam-home-plate-open');
-  read.href=link(p.id);read.setAttribute('aria-label','Leer Pick completo: '+p.title);
+  const match=first?.event||p.title;
+  const prediction=window.camPickChoiceText(first?.selection||p.title);
+  const read=el('a',null,'cam-home-plate-open ae-pick-history-card');
+  read.href=link(p.id);read.setAttribute('aria-label','Abrir Pick de '+(p.author||'Aficionado')+': '+match+'. '+prediction);
   read.addEventListener('click',event=>{
-   if(event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;
+   if(event.ctrlKey||event.metaKey||event.shiftKey||event.altKey||event.button!==0)return;
    event.preventDefault();open(p.id);
   });
+  const top=el('div',null,'ae-pick-history-card-top');
+  top.append(el('span','@'+String(p.author||'Aficionado').replace(/^@+/,''),'ae-pick-history-user'));
+  const content=el('div',null,'ae-pick-history-card-content');
+  content.append(el('strong',match,'ae-pick-history-match'),el('span',prediction,'ae-pick-history-prediction'));
   const count=ticketChoices(p).length;
-  content.append(read,el('span',window.camPickChoiceText(first?.selection||p.title)+(count>1?' · +'+(count-1)+' selecciones':''),'cam-home-plate-choice'));
-  const author=el('span','@'+(p.author||'Aficionado'),'cam-home-plate-author');
-  content.append(author);
-  const figures=el('div',null,'cam-home-plate-figures');
-  const odds=el('span',(Number(p.american_odds)>0?'+':'')+p.american_odds,'cam-home-plate-odds');
-  odds.setAttribute('aria-label','Cuota '+odds.textContent);
+  if(count>1)content.append(el('small','Combinada · '+count+' selecciones','ae-pick-history-multiple'));
+  const figures=el('div',null,'cam-home-plate-figures ae-pick-history-card-bottom');
+  const odds=el('span',p.american_odds==null?'—':(Number(p.american_odds)>0?'+':'')+p.american_odds,'ae-pick-history-odds');
+  odds.setAttribute('aria-label','Momio '+odds.textContent);
   const score=Number(p.score||0);
   figures.append(odds,el('small',(score>0?'+':'')+score+(Math.abs(score)===1?' voto':' votos'),'cam-home-plate-votes'));
-  item.append(el('span',String(index+1),'cam-home-plate-position'),content,figures);target.append(item);
+  read.append(top,content,figures);item.append(read);target.append(item);
  }
 }
 function paintChefList(id,result,kind){
