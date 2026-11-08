@@ -1,0 +1,36 @@
+/* One live weekly module across mobile Home, Picks and desktop. */
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {Window} from 'happy-dom';
+const source=file=>fs.readFileSync(file,'utf8');
+const w=new Window({url:'https://camsports.github.io/',settings:{disableCSSFileLoading:true,disableJavaScriptFileLoading:true}});
+const d=w.document;d.body.innerHTML=source('index.html').replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,'');
+let mobile=true;const listeners=[];
+w.matchMedia=()=>({get matches(){return mobile;},addEventListener(type,fn){listeners.push(fn);}});
+d.body.classList.add('ae-is-home');
+w.eval(source('assets/ae-home-weekly-layout.js'));
+w.eval(source('assets/cam-home-jornada.js'));
+d.dispatchEvent(new w.Event('DOMContentLoaded'));
+const settle=()=>new Promise(resolve=>setTimeout(resolve,15));
+await settle();
+const module=d.getElementById('camHomePicks'),weekly=d.getElementById('cpWeekly'),full=d.getElementById('picksFeatured');
+assert.equal(module.parentElement.id,'camHomeJornada','mobile replaces the former rankings with the shared Pick module');
+assert.equal(d.querySelector('.cam-hj-ranking,[data-row=rankings]'),null);
+assert.equal(d.querySelector('#camHomeJornada .cam-hj-editor'),null,'the editorial Pick is not duplicated in Cierran pronto');
+assert.equal(full.closest('#footballTakes')!==null,true,'the full Pick stays in Picks');
+d.body.classList.remove('ae-is-home');d.body.classList.add('ae-is-nfl');await settle();
+assert.equal(module.hidden,true);assert.equal(module.parentElement.tagName,'ASIDE');
+d.body.classList.remove('ae-is-nfl');d.body.classList.add('ae-is-home');await settle();
+assert.equal(module.hidden,false);assert.equal(module.parentElement.id,'camHomeJornada');
+mobile=false;listeners.forEach(fn=>fn());await settle();
+assert.equal(module.parentElement.tagName,'ASIDE');assert.equal(d.getElementById('cpWeekly'),weekly);
+assert.equal(d.querySelectorAll('#camHomePicks').length,1);
+// Dragging scrolls without opening the Pick underneath; a subsequent tap works.
+const list=d.getElementById('camHomeBestPlates'),link=d.createElement('a');link.href='#pick';list.replaceChildren(link);
+let opens=0;link.addEventListener('click',()=>opens++);
+const pointer=(type,y)=>{const e=new w.Event(type,{bubbles:true,cancelable:true});Object.assign(e,{pointerType:'mouse',button:0,pointerId:1,clientY:y});list.dispatchEvent(e);};
+list.scrollTop=100;pointer('pointerdown',150);pointer('pointermove',110);pointer('pointerup',110);link.click();
+assert.equal(list.scrollTop,140);assert.equal(opens,0);
+pointer('pointerdown',110);pointer('pointerup',110);link.click();assert.equal(opens,1);
+await w.happyDOM.close();
+console.log('PASS: one weekly display, no mobile team rankings, full Pick preserved, route/viewport round trips, mouse drag versus tap.');

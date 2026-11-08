@@ -145,6 +145,11 @@ assert.equal(votes.get(records[0].id+'|voter'),1);
 // requires login and then resumes at the same Pick with the reply field focused.
 const bestPick=d.querySelector('#picksPopular .cp-card-read-link');
 assert.ok(bestPick,'A positively voted Pick must appear in Mejores platos');
+const homePick=d.querySelector('#camHomeBestPlates .cam-home-plate-open');
+assert.equal(homePick.href,bestPick.href,'Home opens the same ranked Pick as Picks');
+assert.match(d.querySelector('#camHomeBestPlates .cam-home-plate-figures').textContent,/\+150.*\+1 voto/);
+assert.equal(d.querySelector('#homeRankingList,#homeChampionsList'),null,'Home no longer contains team ranking previews');
+
 assert.equal(bestPick.parentElement.classList.contains('cam-pick-unified'),true);
 assert.ok(bestPick.href.includes('pick='),'Mejores Platos has a working Pick permalink');
 assert.ok(bestPick.getAttribute('aria-label').includes('Leer Pick completo'));

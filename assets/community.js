@@ -425,7 +425,8 @@ async function loadRanking(quiet = false, strict = false, client = db) {
         return data;
     } catch (error) {
         document.getElementById('rankingStatus').textContent = 'No pudimos cargar el ranking: ' + (error.message || 'error de conexión');
-        document.getElementById('homeRankingStatus').textContent = 'No pudimos cargar el ranking. Inténtalo de nuevo más tarde.';
+        const homeStatus=document.getElementById('homeRankingStatus');
+        if(homeStatus) homeStatus.textContent = 'No pudimos cargar el ranking. Inténtalo de nuevo más tarde.';
         if (strict) throw error;
     }
 }
@@ -437,17 +438,19 @@ function renderRanking() {
     document.getElementById('rankingEdition').textContent = rankingPublished ? rankingPublished.edition : '';
     document.getElementById('rankingStatus').textContent = rankingPublished ? '' : 'Aún no hay un ranking publicado. Nuestro equipo está preparando la primera edición.';
     const preview = document.getElementById('homeRankingList');
-    preview.replaceChildren();
+    preview?.replaceChildren();
     const leader=document.getElementById('nflRankOne');
     const leaderList=document.getElementById('nflRankOneList');
     if(leaderList)leaderList.replaceChildren();
     const topId=Array.isArray(rankingPublished?.team_ids)?rankingPublished.team_ids[0]:null;
     if(leader)leader.hidden=!topId;
     if(topId&&leaderList)leaderList.append(teamNode(topId,1,rankingPreviousTeamIds));
-    document.getElementById('homeRankingEdition').textContent = rankingPublished?.edition ? ' · ' + rankingPublished.edition : '';
-    document.getElementById('homeRankingStatus').textContent = document.getElementById('rankingStatus').textContent;
+    const previewEdition = document.getElementById('homeRankingEdition');
+    const previewStatus = document.getElementById('homeRankingStatus');
+    if(previewEdition) previewEdition.textContent = rankingPublished?.edition ? ' · ' + rankingPublished.edition : '';
+    if(previewStatus) previewStatus.textContent = document.getElementById('rankingStatus').textContent;
     if (!rankingPublished) return;
-    rankingPublished.team_ids.slice(0,3).forEach((id,i) => preview.append(teamNode(id,i+1,rankingPreviousTeamIds)));
+    if(preview) rankingPublished.team_ids.slice(0,3).forEach((id,i) => preview.append(teamNode(id,i+1,rankingPreviousTeamIds)));
     rankingPublished.team_ids.forEach((id,i) => list.append(teamNode(id,i+1,rankingPreviousTeamIds)));
     for (let copy=0; copy<2; copy++) {
         const group = node('ol', null, 'rcm-track-group');

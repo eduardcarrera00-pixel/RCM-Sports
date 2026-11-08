@@ -147,7 +147,7 @@
         const preview = byId('homeChampionsList');
         const full = byId('championsList');
         const track = byId('championsTrack');
-        preview.replaceChildren(); full.replaceChildren(); track.replaceChildren();
+        preview?.replaceChildren(); full.replaceChildren(); track.replaceChildren();
         const leader=byId('championsRankOne');
         const leaderList=byId('championsRankOneList');
         if(leaderList)leaderList.replaceChildren();
@@ -156,12 +156,12 @@
         if(leader)leader.hidden=!hasPublished;
         if(hasPublished&&leaderList)leaderList.append(row(latest.team_ids[0],0));
         const status = hasPublished ? '' : 'Todavía no hay una clasificación de Champions publicada.';
-        byId('homeChampionsStatus').textContent = status;
+        if(byId('homeChampionsStatus')) byId('homeChampionsStatus').textContent = status;
         byId('championsStatus').textContent = status;
-        byId('homeChampionsEdition').textContent = hasPublished ? latest.edition : '';
+        if(byId('homeChampionsEdition')) byId('homeChampionsEdition').textContent = hasPublished ? latest.edition : '';
         byId('championsEdition').textContent = hasPublished ? latest.edition : '';
         if (hasPublished) {
-            latest.team_ids.slice(0, 3).forEach((id,i) => preview.append(row(id,i)));
+            if(preview) latest.team_ids.slice(0, 3).forEach((id,i) => preview.append(row(id,i)));
             latest.team_ids.forEach((id,i) => full.append(row(id,i)));
             // Two identical groups make a seamless visual loop. The canonical,
             // screen-reader-accessible Top 10 above is never duplicated.
@@ -176,7 +176,7 @@
     function showError(message) {
         // The feature may not yet have been migrated: offer an accurate empty state.
         const status = 'La clasificación de Champions aún no está disponible. ' + message;
-        byId('homeChampionsStatus').textContent = status;
+        if(byId('homeChampionsStatus')) byId('homeChampionsStatus').textContent = status;
         byId('championsStatus').textContent = status;
     }
     async function refreshChampions() {

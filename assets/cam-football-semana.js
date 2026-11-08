@@ -111,34 +111,7 @@
     else if(draft||mine)play.append(el('p',(draft?'Tu elección sin guardar: ':'Tu elección guardada: ')+label(snap,g,draft||mine),'cam-ns-note'));
     play.append(button('Ver este partido en la quiniela →',()=>focusGame(g.id)));box.append(play);return box;
   }
-  function teaserBlock(snap,duel){
-    const games=snap.games.filter(g=>!started(g)&&g.id!==duel?.id).sort((a,b)=>Date.parse(a.kickoff)-Date.parse(b.kickoff));
-    if(!games.length)return null;
-    const first=games[0];
-    const maxPoints=g=>Math.max(...['home','draw','away'].map(p=>Number(points(g,p))||0));
-    const payer=games.slice(1).sort((a,b)=>maxPoints(b)-maxPoints(a)||Date.parse(a.kickoff)-Date.parse(b.kickoff))[0];
-    const box=el('section',null,'cam-ns-block cam-ns-teasers',{'data-block':'partidos'});
-    box.append(el('h3','Juega la quiniela','cam-ns-section-title'));
-    const grid=el('div',null,'cam-ns-teaser-grid');
-    for(const g of [first,payer].filter(Boolean)){
-      const pick=['home','draw','away'].sort((a,b)=>(Number(points(g,b))||0)-(Number(points(g,a))||0))[0];
-      const tag=g===first?'Abre · '+when(g.kickoff):'La que más paga';
-      const b=button(null,()=>focusGame(g.id),'cam-ns-teaser');b.dataset.gameId=g.id;b.setAttribute('aria-controls','camFootballQuiniela');
-      b.setAttribute('aria-label',fullName(snap,g.home_id)+' contra '+fullName(snap,g.away_id)+'. Participar en la quiniela');
-      b.append(el('span',tag,'cam-ns-teaser-tag'));
-      const match=el('span',null,'cam-ns-teaser-match');match.append(crest(snap,g.home_id,22),el('span',abbr(snap,g.home_id)+' · '+abbr(snap,g.away_id)),crest(snap,g.away_id,22));b.append(match);
-      const line=g===first?(['home','draw','away'].some(p=>points(g,p)==null)?'Puntos pendientes':'1 '+g.points_home+' · X '+g.points_draw+' · 2 '+g.points_away+' pts')
-        :(points(g,pick)==null?'Puntos pendientes':(pick==='draw'?'Si empatan':label(snap,g,pick))+': '+pts(points(g,pick)));
-      b.append(el('span',line,'cam-ns-teaser-line'));
-      const mine=snap.draft.get(g.id)||snap.mine.get(g.id);
-      if(mine)b.append(el('span','Tu elección: '+label(snap,g,mine),'cam-ns-teaser-mine'));
-      b.append(el('span','Participar en la quiniela →','cam-ns-teaser-cta'));grid.append(b);
-    }
-    const foot=el('div',null,'cam-ns-foot');
-    const picked=snap.games.filter(g=>snap.mine.has(g.id)).length;
-    foot.append(el('span',snap.user?'Llevas '+picked+' de '+snap.games.length:snap.games.length+' partidos','cam-ns-progress'),button('Ver toda la quiniela ›',()=>focusGame(first.id)));
-    box.append(grid,foot);return box;
-  }
+
   function scoreBlock(snap){
     const finals=snap.results.filter(g=>g.home_score!=null&&g.away_score!=null).sort((a,b)=>Date.parse(b.kickoff)-Date.parse(a.kickoff));
     if(!finals.length)return null;
@@ -170,7 +143,6 @@
       const duel=chooseDuel(snap.games,snap.teams);
       if(duel)fragment.append(duelBlock(snap,duel));
       else fragment.append(el('p','Todavía no hay partidos de esta competición.','cam-ns-text'));
-      const teasers=teaserBlock(snap,duel);if(teasers)fragment.append(teasers);
       const score=scoreBlock(snap);scores.replaceChildren(...(score?[score]:[]));
     }
     body.replaceChildren(fragment);keepAnchor();

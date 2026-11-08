@@ -4,13 +4,13 @@
         (las quinielas con el número de partidos abiertos).
      2. Filas deslizables, cada una solo si tiene algo que enseñar:
         Cierran pronto (Pick del editor vigente y partidos abiertos de las dos
-        quinielas), Últimas noticias, Takes de la comunidad y Power Rankings.
+        quinielas), Últimas noticias, Takes de la comunidad; al final, el módulo compartido de Picks.
    Cada tarjeta abre lo de siempre (la quiniela, la noticia, la conversación
    del Take, el Top 10). En escritorio no cambia nada: los bloques de la
    portada de siempre solo se ocultan en el teléfono (clase cam-home-jornada
    en <body>, reglas en cam-home-jornada.css).
 
-   Cuota: noticias, Power Rankings y Pick del editor salen de lo que la página
+   Cuota: noticias y Picks salen de lo que la página
    ya cargó. Solo se piden los partidos abiertos (dos consultas pequeñas + los
    escudos de fútbol) y los últimos Takes, una vez al abrir Inicio en el
    teléfono y de nuevo como mucho cada 5 minutos. Sin temporizadores. */
@@ -171,8 +171,7 @@
   const rows = {
     jornada: row('jornada', 'Cierran pronto'),
     news: row('news', 'Últimas noticias', { text: 'Ver todas ›', aria: 'Ver todas las noticias', newsCategory: 'Todas' }),
-    takes: row('takes', 'Takes de la comunidad', { text: 'Publicar ›', aria: 'Publicar un Take', action: openTakeComposer }),
-    rankings: row('rankings', 'Power Rankings')
+    takes: row('takes', 'Takes de la comunidad', { text: 'Publicar ›', aria: 'Publicar un Take', action: openTakeComposer })
   };
   root.append(head, shortcuts, ...Object.values(rows).map(r => r.section));
 
@@ -238,26 +237,6 @@
     card.addEventListener('click', () => goQuiniela(sport));
     return card;
   }
-  function editorPickCard(p) {
-    const card = el('button', null, 'cam-hj-card cam-hj-editor', { type: 'button' });
-    const top = el('span', null, 'cam-hj-kicker');
-    top.append(el('span', 'Pick del editor', 'cam-hj-league'), el('span', 'Cierra ' + dayLabel(p.expires_at).replace(' · ', ' '), 'cam-hj-when'));
-    const odds = Number(p.american_odds);
-    const oddsText = Number.isFinite(odds) && odds ? (odds > 0 ? '+' : '') + odds : '';
-    card.append(top,
-      el('span', p.title || p.event_name || 'Pick del editor', 'cam-hj-card-title'),
-      el('span', p.event_name && p.event_name !== p.title ? p.event_name : '', 'cam-hj-card-sub'));
-    const sel = el('span', null, 'cam-hj-selection');
-    sel.append(el('span', p.selection || '', 'cam-hj-selection-text'));
-    if (oddsText) sel.append(el('span', oddsText, 'cam-hj-odds'));
-    card.append(sel, el('span', 'Ver Pick ›', 'cam-hj-cta'));
-    card.setAttribute('aria-label', 'Pick del editor: ' + (p.title || '') + '. ' + (p.selection || '') + (oddsText ? ', cuota ' + oddsText : ''));
-    card.addEventListener('click', () => {
-      goPicks('picks');
-      requestAnimationFrame(() => { try { document.getElementById('picksFeatured')?.scrollIntoView({ block: 'start' }); } catch {} });
-    });
-    return card;
-  }
   function moreCard(label, sub, action, className) {
     const card = el('button', null, 'cam-hj-card cam-hj-more-card' + (className ? ' ' + className : ''), { type: 'button' });
     card.append(el('span', label, 'cam-hj-card-title'));
@@ -281,8 +260,6 @@
   }
   function paintJornada() {
     const cards = [];
-    const pick = window.camEditorPick;
-    if (pick && new Date(pick.expires_at).getTime() > now()) cards.push(editorPickCard(pick));
     const nfl = state.nfl.filter(isOpen).map(g => ({ ...g, sport: 'nfl' }));
     const football = state.football.filter(isOpen).map(g => ({ ...g, sport: 'football' }));
     for (const g of interleave(nfl, football, 10)) cards.push(gameCard(g, g.sport));
@@ -348,41 +325,6 @@
     fill(rows.takes, cards);
   }
 
-  /* ---------- Power Rankings (de las listas que ya pintó la página) ---------- */
-  function rankingCard(sport, listId, editionId, open) {
-    const items = [...(document.getElementById(listId)?.querySelectorAll('li.rcm-team') || [])].slice(0, 5);
-    if (!items.length) return null;
-    const card = el('button', null, 'cam-hj-card cam-hj-ranking', { type: 'button', 'data-sport': sport });
-    const edition = (document.getElementById(editionId)?.textContent || '').trim();
-    const label = sport === 'nfl' ? 'NFL' : 'Champions';
-    const top = el('span', null, 'cam-hj-kicker');
-    top.append(el('span', label, 'cam-hj-league'), el('span', edition, 'cam-hj-when'));
-    card.append(top);
-    const list = el('span', null, 'cam-hj-rank-list');
-    for (const li of items) {
-      const line = el('span', null, 'cam-hj-rank');
-      const rank = li.dataset.rank || li.querySelector('strong')?.textContent || '';
-      const name = li.dataset.teamName || li.querySelector('.ae-team-name')?.textContent || '';
-      line.append(el('span', rank, 'cam-hj-rank-n'), crest(li.querySelector('img')?.src, li.querySelector('.ae-logo-initials')?.textContent || initials(name), ''), el('span', name, 'cam-hj-rank-name'));
-      const trend = li.querySelector('.ae-rank-trend');
-      // Solo los cambios (▲ ▼ Nuevo): un «–» por equipo era ruido.
-      const kind = trend && ['up', 'down', 'new'].find(k => trend.classList.contains('ae-rank-' + k));
-      if (kind) line.append(el('span', trend.textContent.trim(), 'cam-hj-trend is-' + kind, { 'aria-label': trend.getAttribute('aria-label') || '' }));
-      list.append(line);
-    }
-    card.append(list, el('span', 'Ver Top 10 ›', 'cam-hj-cta'));
-    card.setAttribute('aria-label', 'Power Rankings ' + label + (edition ? ' ' + edition : '') + ': abrir el Top 10');
-    card.addEventListener('click', open);
-    return card;
-  }
-  function paintRankings() {
-    const cards = [
-      rankingCard('nfl', 'rankingList', 'rankingEdition', () => window.openNflTopTen?.()),
-      rankingCard('champions', 'championsList', 'championsEdition', () => window.openChampionsTopTen?.())
-    ].filter(Boolean);
-    fill(rows.rankings, cards);
-  }
-
   /* ---------- datos ---------- */
   async function load(force) {
     const c = client();
@@ -426,7 +368,6 @@
     paintJornada();
     paintNews();
     paintTakes();
-    paintRankings();
   }
   let on = false;
   function sync() {
@@ -451,7 +392,7 @@
   for (const id of ['searchInput', 'mobileSearchInput']) {
     document.getElementById(id)?.addEventListener('input', () => queueMicrotask(sync));
   }
-  // La página pinta noticias, rankings y Pick del editor cuando llegan sus datos.
+  // La página pinta las noticias cuando llegan sus datos.
   const original = window.renderArticlesFeed;
   if (typeof original === 'function') {
     window.renderArticlesFeed = function camJornadaArticles() {
@@ -459,11 +400,6 @@
       queueMicrotask(() => { sync(); if (on) paintNews(); });
       return result;
     };
-  }
-  document.addEventListener('cam:weekly-render', () => { if (on) paintJornada(); });
-  for (const id of ['rankingList', 'championsList']) {
-    const list = document.getElementById(id);
-    if (list) new MutationObserver(() => { if (on) paintRankings(); }).observe(list, { childList: true });
   }
   document.addEventListener('ae:takes-updated', () => { state.loadedAt = 0; if (on) void load(true); });
   // Al volver a la página (otra app, otra pestaña) se refresca si pasaron 5 min.

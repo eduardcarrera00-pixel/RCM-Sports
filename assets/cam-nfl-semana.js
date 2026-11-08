@@ -4,7 +4,7 @@
      · cabecera de edición: la semana, sus fechas y cuándo cierra el próximo partido;
      · Duelo de la semana: el partido entre los dos mejores del Power Ranking
        (sin ranking, el más parejo), para elegir ahí mismo;
-     · Juega la quiniela: Abre la semana y La que más paga, con accesos a cada partido;
+     · La quiniela completa sigue directamente al duelo;
      · ¿Le ganas al editor? (cuando la base de datos tiene la migración 20261104090000);
      · El marcador (o La crónica, lunes y martes): resultados con sorpresas y caídas
        del Top 10;
@@ -220,48 +220,6 @@
     return box;
   }
 
-  function teaserBlock(snap, weekGames, duel) {
-    const open = weekGames.filter(g => !started(g));
-    if (!open.length) return null;
-    const firstGame = open.find(g => g.id !== duel?.id) || null;
-    const rest = open.filter(g => g.id !== duel?.id && g.id !== firstGame?.id && g.points_home != null && g.points_away != null);
-    const payer = rest.sort((a, b) => Math.max(b.points_home, b.points_away) - Math.max(a.points_home, a.points_away))[0] || null;
-    const box = el('section', null, 'cam-ns-block cam-ns-teasers', { 'data-block': 'partidos' });
-    box.append(el('h3', 'Juega la quiniela', 'cam-ns-section-title'));
-    const grid = el('div', null, 'cam-ns-teaser-grid');
-    const card = (g, tag, line) => {
-      const b = el('button', null, 'cam-ns-teaser');
-      b.type = 'button';
-      b.dataset.gameId = g.id;
-      b.setAttribute('aria-controls', 'camNflQuiniela');
-      b.append(el('span', tag, 'cam-ns-teaser-tag'));
-      const match = el('span', null, 'cam-ns-teaser-match');
-      match.append(crest(g.away_id, 22), el('span', g.away_id + ' @ ' + g.home_id), crest(g.home_id, 22));
-      b.append(match, el('span', line, 'cam-ns-teaser-line'));
-      const mine = snap.mine.get(g.id);
-      if (mine) b.append(el('span', 'Tu elección: ' + nick(mine), 'cam-ns-teaser-mine'));
-      b.append(el('span', 'Participar en la quiniela →', 'cam-ns-teaser-cta'));
-      b.setAttribute('aria-label', tag + ': ' + (teamOf(g.away_id)?.name || g.away_id) + ' en ' + (teamOf(g.home_id)?.name || g.home_id) + '. ' + line + '. Abrir en la quiniela');
-      b.addEventListener('click', () => focusGame(g.id));
-      return b;
-    };
-    if (firstGame) {
-      const line = firstGame.points_away != null ? firstGame.away_id + ' ' + firstGame.points_away + ' · ' + firstGame.home_id + ' ' + firstGame.points_home + ' pts' : 'Puntos pendientes';
-      grid.append(card(firstGame, 'Abre · ' + when(firstGame.kickoff), line));
-    }
-    if (payer) {
-      const id = payer.points_away >= payer.points_home ? payer.away_id : payer.home_id;
-      grid.append(card(payer, 'La que más paga', 'Si gana ' + id + ': ' + pts(pointsFor(payer, id))));
-    }
-    if (!grid.childElementCount) return null;
-    box.append(grid);
-    const picked = weekGames.filter(g => snap.mine.has(g.id)).length;
-    const foot = el('div', null, 'cam-ns-foot');
-    foot.append(el('span', snap.user ? 'Llevas ' + picked + ' de ' + weekGames.length : weekGames.length + ' partidos esta semana', 'cam-ns-progress'));
-    foot.append(link('Ver toda la quiniela ›', () => focusGame(open[0].id)));
-    box.append(foot);
-    return box;
-  }
 
   function liveBlock(weekGames) {
     const live = weekGames.filter(g => started(g) && !finished(g) && g.status !== 'cancelled' && g.status !== 'postponed');
@@ -391,12 +349,11 @@
     const blocks = {
       envivo: liveBlock(weekGames),
       duelo: duel ? duelBlock(snap, duel, rankIds) : null,
-      partidos: teaserBlock(snap, weekGames, duel),
       editor: expertBlock(snap, weekGames, scoreWeek),
       marcador: score
     };
     // La quiniela precede al editor y al marcador en todos los días de la semana.
-    const order = ['envivo', 'duelo', 'partidos'];
+    const order = ['envivo', 'duelo'];
     scoreRoot?.replaceChildren(...[blocks.editor, blocks.marcador].filter(Boolean));
     for (const key of order) if (blocks[key]) fragment.append(blocks[key]);
     if (!weekGames.length) fragment.append(el('p', 'Todavía no hay partidos de esta semana. Vuelve cuando se publique el calendario.', 'cam-ns-text'));

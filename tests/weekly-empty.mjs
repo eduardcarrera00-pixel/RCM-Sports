@@ -23,6 +23,9 @@ rows = [{id: '00000000-0000-0000-0000-000000000901', title: 'Pick vigente', even
 await w.refreshEditorialWeeklyPick();
 assert.equal(featured.dataset.camEditorState, 'ready');
 assert.match(featured.textContent, /Pick vigente/);
+assert.equal(w.document.querySelector('#cpWeekly .ae-weekly-preview').getAttribute('role'),'button','Home uses the compact preview at every viewport');
+assert.equal(w.document.querySelector('#cpWeekly details'),null);
+assert.ok(featured.querySelector('details'),'Picks retains its full expandable analysis');
 assert.equal(featured.querySelectorAll('.ae-weekly-empty').length, 0, 'Published Picks keep the complete existing card');
 
 error = {message: 'Read unavailable'};

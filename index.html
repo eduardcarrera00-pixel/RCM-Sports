@@ -308,7 +308,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
     </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
-<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261104-ranking-touch-1">
+<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261108-picks-display-1">
 <script defer src="assets/ae-nfl-mobile-telephoto.js?v=20261016-1"></script>
 <link rel="stylesheet" href="assets/cam-perf-sport-banners.css?v=20261104-css-consolidated-1">
 <style id="ae-opinions-reused-home-panels">
@@ -2518,7 +2518,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
 <script src="assets/cam-logo-sizing.js?v=20261103-remove-welcome-1"></script>
 <script src="assets/cam-banner-artwork.js?v=20261102-visible-size-1"></script>
 <script src="assets/ae-site-images.js?v=20261104-noticias-nfl-dia-1"></script>
-<script src="assets/cam-site-texts.js?v=20261103-remove-welcome-1"></script>
+<script src="assets/cam-site-texts.js?v=20261108-picks-display-1"></script>
 <script defer src="assets/cam-mobile-bottom-nav.js?v=20261105-instant-top-1"></script>
 <link rel="stylesheet" href="assets/cam-perf-controls.css?v=20261104-semana-deportes-2">
 
@@ -2920,31 +2920,26 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
             </div>
 
             <aside class="lg:col-span-4 space-y-8">
-                <section class="editorial-pick" aria-labelledby="weeklyPickTitle">
-                    <h2 id="weeklyPickTitle">Pick del editor</h2>
+                <section id="camHomePicks" class="editorial-pick cam-home-picks" aria-labelledby="weeklyPickTitle">
+                    <h2 id="weeklyPickTitle">Picks de la semana</h2>
+                    <span class="cam-home-weekly-label">Pick de la semana</span>
                     <button type="button" id="aeHomeWeeklyShareButton" class="ae-weekly-share ae-home-weekly-share" hidden aria-label="Compartir el Pick del editor" title="Compartir Pick del editor"><i class="fa-solid fa-share-nodes" aria-hidden="true"></i><span>Compartir</span></button>
                     <button type="button" class="ae-home-weekly-more" onclick="filterByCategory('Picks')" aria-label="Abrir Pick del editor y todos sus detalles">Ver más <span aria-hidden="true">→</span></button>
                     <div class="editorial-pick-body">
                     <div id="cpWeekly" aria-live="polite"><p>Cargando nuestra selección…</p></div></div>
+                    <div class="cam-home-plates">
+                      <section aria-labelledby="camHomeBestTitle" class="cam-home-plate-board">
+                        <header><h3 id="camHomeBestTitle">Mejores platos</h3><span aria-hidden="true">↑</span></header>
+                        <ol id="camHomeBestPlates" class="cam-home-plate-list" tabindex="0" aria-label="Mejores platos de la semana; desliza verticalmente"><li>Cargando Picks…</li></ol>
+                      </section>
+                      <section aria-labelledby="camHomeWorstTitle" class="cam-home-plate-board">
+                        <header><h3 id="camHomeWorstTitle">Peores platos</h3><span aria-hidden="true">↓</span></header>
+                        <ol id="camHomeWorstPlates" class="cam-home-plate-list" tabindex="0" aria-label="Peores platos de la semana; desliza verticalmente"><li>Cargando Picks…</li></ol>
+                      </section>
+                    </div>
                 </section>
 
                 <div id="aeHomeSidebarFeatures" class="ae-home-sidebar-features" hidden>
-            <section class="rcm-panel editorial-ranking" aria-labelledby="homeRankingTitle">
-                <a href="#nflRankings" id="homeRankingLink" class="ae-ranking-card-link" onclick="event.preventDefault(); openNflTopTen();" aria-label="Abrir clasificación completa NFL Power Rankings, Top 10">
-                    <div class="editorial-module-heading"><h2 id="homeRankingTitle">NFL Power Rankings <span id="homeRankingEdition"></span></h2><span class="ae-ranking-link-arrow" aria-hidden="true"><svg class="ae-ranking-open-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M7 17 17 7M8 7h9v9"/></svg></span></div>
-                    <p id="homeRankingStatus" role="status">Cargando ranking…</p>
-                    <ol id="homeRankingList" class="editorial-ranking-list"></ol>
-                    <span class="ae-ranking-hint">Selecciona para ver el Top 10 <span aria-hidden="true">→</span></span>
-                </a>
-            </section>
-            <section class="rcm-panel editorial-ranking" aria-labelledby="homeChampionsTitle">
-                <a href="#championsRankings" id="homeChampionsLink" class="ae-ranking-card-link" onclick="event.preventDefault(); openChampionsTopTen();" aria-label="Abrir clasificación completa Champions League, Top 10">
-                    <div class="editorial-module-heading"><h2 id="homeChampionsTitle">Champions League <span id="homeChampionsEdition"></span></h2><span class="ae-ranking-link-arrow" aria-hidden="true"><svg class="ae-ranking-open-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M7 17 17 7M8 7h9v9"/></svg></span></div>
-                    <p id="homeChampionsStatus" role="status">Comprobando ediciones publicadas…</p>
-                    <ol id="homeChampionsList" class="editorial-ranking-list"></ol>
-                    <span class="ae-ranking-hint">Selecciona para ver el Top 10 <span aria-hidden="true">→</span></span>
-                </a>
-            </section>
         <section id="aeTrendingPortada" class="rcm-panel editorial-trending ae-trending-portada" aria-labelledby="trendingTitle" hidden>
     <div class="ae-section-heading"><h2 id="trendingTitle">Lo más leído</h2></div>
     <ol id="trendingList" class="ae-trending-list" aria-live="polite"></ol>
@@ -5490,12 +5485,12 @@ updateThemeButton();
 <script src="assets/nfl-teams.js"></script>
 <script src="assets/cam-nfl-quiniela-logos.js?v=20261022-integration-1"></script>
 <script src="assets/cam-article-seo.js?v=20261105-link-preview-2"></script>
-<script src="assets/community.js?v=20261104-la-semana-1"></script>
+<script src="assets/community.js?v=20261108-picks-display-1"></script>
 <script src="assets/ae-home-community-spotlight.js?v=20261018-reply-totals-1"></script>
-<script src="assets/champions.js?v=20261021-rank-notes-1"></script>
+<script src="assets/champions.js?v=20261108-picks-display-1"></script>
 <script src="assets/ae-ranking-notes.js?v=20261105-resume-motion-1"></script>
 <script src="assets/ae-pick-capture.js?v=20261104-apuesta-real-1"></script>
-<script src="assets/community-picks.js?v=20261108-monthly-leagues-1"></script>
+<script src="assets/community-picks.js?v=20261108-picks-display-1"></script>
 <script src="assets/weekly-picks.js?v=20261015-1"></script>
 <script src="assets/username-auth.js?v=20261103-remove-welcome-1"></script>
 <script src="assets/ae-category-visibility.js?v=20261016-dynamic-nav-1"></script>
@@ -5503,7 +5498,7 @@ updateThemeButton();
 <script src="assets/free-takes.js?v=20261103-tarjetas-1"></script>
 <script src="assets/ae-take-rankings.js?v=20261020-difficulty-2"></script>
 <script src="assets/cam-image-compress.js?v=20261021-1"></script>
-<script src="assets/ae-editorial-weekly.js?v=20261104-empty-compact-1"></script>
+<script src="assets/ae-editorial-weekly.js?v=20261108-picks-display-1"></script>
 
 <style id="cam-weekly-results-style">
 .cam-weekly-review{margin-top:16px;clear:both}
@@ -6432,16 +6427,16 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 
 <script src="assets/ae-mobile-compact-home.js?v=20261016-top3-swipe-v1"></script>
 <script src="assets/ae-football-mobile-redesign.js?v=20261103-sin-mover-1"></script>
-<script src="assets/ae-home-weekly-layout.js?v=20261103-mobile-home-profile-2"></script>
+<script src="assets/ae-home-weekly-layout.js?v=20261108-picks-display-1"></script>
 <script src="assets/ae-notifications.js?v=20261103-remove-welcome-1"></script>
 <script src="assets/cam-analytics.js?v=20261026-sin-robots"></script>
 <!-- Teléfono (3 nov): pestañas dentro de NFL, Fútbol y Picks, y una dirección por sección (?s=nfl&v=quiniela). -->
 <script src="assets/cam-mobile-sections.js?v=20261105-instant-top-1"></script>
 <!-- Teléfono (3 nov): Inicio como «Tu jornada» (atajos + filas deslizables). Escritorio sin cambios. -->
-<script src="assets/cam-home-jornada.js?v=20261103-jornada-1"></script>
+<script src="assets/cam-home-jornada.js?v=20261108-picks-display-1"></script>
 <!-- Teléfono (4 nov): NFL · La semana (opinión y quiniela); Power Rankings en Noticias. Escritorio sin cambios. -->
-<script src="assets/cam-nfl-semana.js?v=20261104-semana-deportes-2"></script>
-<script src="assets/cam-football-semana.js?v=20261104-duelo-aficion-1"></script>
+<script src="assets/cam-nfl-semana.js?v=20261108-picks-display-1"></script>
+<script src="assets/cam-football-semana.js?v=20261108-picks-display-1"></script>
 
 <script id="ae-home-news-carousel-motion">
 /* Movimiento ligero y reversible: sin clones, sin alterar enlaces, votos o artículos. */

@@ -97,12 +97,6 @@
    const box=make('article',undefined,isPreview?'ae-weekly-card ae-weekly-preview':'ae-weekly-card');
    box.dataset.camWeeklyId=String(p.id);
    if(isPreview){
-     const photoUrl=editorialUrl(p.image_path,p.image_url);
-     const bannerUrl=editorialUrl(p.banner_path,p.banner_url);
-     if(photoUrl&&!bannerUrl){const photo=make('img',undefined,'ae-weekly-home-thumbnail');photo.src=photoUrl;photo.style.setProperty('--ae-image-focus',framedPosition(p,'image'));photo.alt='Imagen del Pick editorial';photo.loading='lazy';box.append(photo);}
-     // El banner sigue intacto en escritorio; en el diseño móvil usamos
-     // una miniatura auténtica del Pick sin duplicar sus datos.
-     if(bannerUrl){const thumb=make('img',undefined,'ae-weekly-mobile-banner-thumb');thumb.src=photoUrl||bannerUrl;thumb.style.setProperty('--ae-image-focus',framedPosition(p,photoUrl?'image':'banner'));thumb.alt='Imagen del Pick del editor';thumb.loading='lazy';box.append(thumb);}
      const go=()=>{
        if(typeof filterByCategory==='function')filterByCategory('Picks');
        const detail=$('picksFeaturedCard')?.querySelector('details');
@@ -132,29 +126,9 @@
    details.append(summary,expanded);box.append(details);
    return box;
  }
- function renderHomeBanner(){
-   const panel=document.querySelector('.editorial-pick');
-   if(!panel)return;
-   panel.querySelector('.ae-weekly-home-banner')?.remove();
-   panel.classList.remove('ae-home-weekly-banner');
-   const url=editorialUrl(active?.banner_path,active?.banner_url);
-   if(!url)return;
-   const banner=make('img',undefined,'ae-weekly-home-banner');
-   banner.src=url;
-   banner.style.setProperty('--ae-image-focus',framedPosition(active,'banner'));
-   banner.alt='';
-   banner.setAttribute('aria-hidden','true');
-   banner.loading='lazy';
-   banner.addEventListener('error',()=>{
-     banner.remove();
-     panel.classList.remove('ae-home-weekly-banner');
-   },{once:true});
-   panel.prepend(banner);
-   panel.classList.add('ae-home-weekly-banner');
- }
+
  function render(){
    syncShareButtons();
-   renderHomeBanner();
    // Single non-interactive odds badge in the lower-right footer, from the published Pick.
    const oddsHighlight=$('aeWeeklyOddsHighlight');
    if(oddsHighlight){
@@ -171,7 +145,7 @@
    for(const [id,preview] of [['cpWeekly',true],['picksFeaturedCard',false]]){
      const area=$(id);if(!area)continue;
      area.replaceChildren();
-     if(active)area.append(createCard(active,preview && !weeklyMobile.matches));
+     if(active)area.append(createCard(active,preview));
      else area.append(make('p','CAM SPORTS todavía no ha publicado un Pick del editor.','ae-weekly-empty'));
    }
    // «Tu jornada» (Inicio en el teléfono) enseña el Pick vigente sin volver a pedirlo.
@@ -194,8 +168,7 @@
      syncShareButtons();
      const oddsHighlight=$('aeWeeklyOddsHighlight');
      if(oddsHighlight){oddsHighlight.hidden=true;oddsHighlight.textContent='';}
-     renderHomeBanner();
-     if($('picksFeatured'))$('picksFeatured').dataset.camEditorState='error';
+       if($('picksFeatured'))$('picksFeatured').dataset.camEditorState='error';
      $('picksFeatured')?.querySelector('.ae-weekly-banner')?.remove();
      for(const id of ['cpWeekly','picksFeaturedCard']){$(id)?.replaceChildren(make('p','No se pudo cargar el Pick editorial.','ae-weekly-empty'));}
      revealSharedPick();

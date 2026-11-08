@@ -58,17 +58,13 @@ async function scenario(anonymous = false) {
   const one = selector => d.querySelector(selector);
   assert.equal(w.camSectionTabs.current().tab,'semana');
   assert.deepEqual([...d.querySelectorAll('#camSectionTabs button')].map(b=>b.textContent),['La semana','Takes','Noticias']);
-  assert.equal(one('.cam-ns-section-title').textContent,'Juega la quiniela');
+  assert.equal(one('[data-block=partidos]'),null,'redundant promotional matches are removed');
   assert.equal(one('.cam-ns-intro'),null);
   assert.equal(one('.cam-ns-edition'),null);
   assert.equal(one('.cam-ns-sub'),null);
   assert.equal(one('.cam-ns-opinion .cam-ns-action-label'),null);
   assert.ok(d.getElementById('camNflQuiniela').compareDocumentPosition(d.getElementById('camNflScore')) & w.Node.DOCUMENT_POSITION_FOLLOWING,'the scoreboard follows the quiniela');
-  assert.equal(d.querySelectorAll('.cam-ns-teaser').length,2);
-  for(const card of d.querySelectorAll('.cam-ns-teaser')) {
-    assert.ok(['first','payer'].includes(card.dataset.gameId),'cards come from the current week');
-    assert.equal(card.querySelector('.cam-ns-teaser-cta').textContent,'Participar en la quiniela →');
-  }
+  assert.equal(d.getElementById('camNflSemana').nextElementSibling.id,'camNflQuiniela','the full quiniela directly follows the duel section');
   assert.equal(one('.cam-ns-pick').closest('.cam-ns-quiniela').getAttribute('role'),'group');
   assert.match(one('.cam-ns-pick').getAttribute('aria-label'),/^Quiniela:/);
   const ranking = d.getElementById('nflRankings');
@@ -76,13 +72,11 @@ async function scenario(anonymous = false) {
   one('.cam-ns-link-take').click();
   assert.equal(takeSport,'NFL','the opinion action opens the NFL composer');
   assert.equal(F.calls.filter(c=>c.rpc==='cam_nfl_save_pick').length,0,'opening a take never saves a prediction');
-  for(const card of [...d.querySelectorAll('.cam-ns-teaser')]) {
-    const gameId = card.dataset.gameId;
-    card.click();await settle();
+  for(const gameId of ['first','payer']) {
+    await w.camNflQuiniela.focus(gameId);await settle();
     assert.equal(w.camSectionTabs.current().tab,'semana');
-    assert.equal(d.activeElement.dataset.gameId,gameId,'focus follows the selected match, across game days');
-    assert.equal(w.lastScroll.dataset.gameId,gameId);
-    assert.equal(w.camNflQuiniela.snapshot().mine.get('first'),anonymous?undefined:'BAL','navigation preserves saved predictions');
+    assert.equal(d.activeElement.dataset.gameId,gameId);
+    assert.equal(w.camNflQuiniela.snapshot().mine.get('first'),anonymous?undefined:'BAL');
   }
   one('.cam-ns-pick').click();await settle();
   if(anonymous) {

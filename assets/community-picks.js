@@ -615,7 +615,43 @@ function sizePlateWindow(target){
    plateWindowObservers.set(target,observer);
  }
 }
+// Home uses the same weekly vote ranking and refresh, without another query.
+function paintHomePlateList(result,kind){
+ const target=$(kind==='best'?'camHomeBestPlates':'camHomeWorstPlates');
+ if(!target)return;
+ target.replaceChildren();
+ if(result?.error){
+  const retry=button('Reintentar',()=>loadChefLists());
+  const empty=el('li','No se pudo cargar la clasificación. ','cam-home-plate-empty');
+  empty.append(retry);target.append(empty);
+  return;
+ }
+ const picks=Array.isArray(result?.data)?result.data:[];
+ if(!picks.length){target.append(el('li','Todavía no hay platos '+(kind==='best'?'con votos positivos.':'con votos negativos.'),'cam-home-plate-empty'));return;}
+ for(const [index,p] of picks.entries()){
+  const item=el('li',null,'cam-home-plate-row');
+  const content=el('div',null,'cam-home-plate-copy');
+  const first=p.legs?.[0];
+  const read=el('a',first?.event||p.title,'cam-home-plate-open');
+  read.href=link(p.id);read.setAttribute('aria-label','Leer Pick completo: '+p.title);
+  read.addEventListener('click',event=>{
+   if(event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;
+   event.preventDefault();open(p.id);
+  });
+  const count=ticketChoices(p).length;
+  content.append(read,el('span',window.camPickChoiceText(first?.selection||p.title)+(count>1?' · +'+(count-1)+' selecciones':''),'cam-home-plate-choice'));
+  const author=el('span','@'+(p.author||'Aficionado'),'cam-home-plate-author');
+  content.append(author);
+  const figures=el('div',null,'cam-home-plate-figures');
+  const odds=el('span',(Number(p.american_odds)>0?'+':'')+p.american_odds,'cam-home-plate-odds');
+  odds.setAttribute('aria-label','Cuota '+odds.textContent);
+  const score=Number(p.score||0);
+  figures.append(odds,el('small',(score>0?'+':'')+score+(Math.abs(score)===1?' voto':' votos'),'cam-home-plate-votes'));
+  item.append(el('span',String(index+1),'cam-home-plate-position'),content,figures);target.append(item);
+ }
+}
 function paintChefList(id,result,kind){
+ paintHomePlateList(result,kind);
  const target=$(id);
  if(!target)return;
  plateWindowObservers.get(target)?.disconnect();

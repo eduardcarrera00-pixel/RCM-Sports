@@ -94,7 +94,9 @@ async function scenario({anonymous=false,failed=false}={}){
     assert.match(one('#camFootballSemana [role=status]').textContent,/No se pudo guardar/);rejectSave=false;
   }
   one('#camFootballViewTabs [data-view=month]').click();
-  const card=one('#camFootballSemana .cam-ns-teaser');const target=card.dataset.gameId;card.click();await settle();
+  assert.equal(one('#camFootballSemana [data-block=partidos]'),null,'redundant promotional matches are removed');
+  assert.equal(one('#camFootballSemana').nextElementSibling.id,'camFootballQuiniela','the quiniela follows the duel section');
+  const target='first';await api.focus(target);await settle();
   assert.equal(d.activeElement.dataset.gameId,target);assert.equal(w.lastScroll.dataset.gameId,target);
   assert.equal(one('#camFootballViewTabs [data-view=jornada]').getAttribute('aria-pressed'),'true','match link restores Partidos from standings');
   assert.equal(api.snapshot().mine.get('first'),anonymous?undefined:'home');
