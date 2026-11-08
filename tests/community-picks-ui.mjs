@@ -150,6 +150,8 @@ assert.ok(bestPick,'A positively voted Pick must appear in Mejores platos');
 const homePick=d.querySelector('#camHomeBestPlates .cam-home-plate-open');
 assert.equal(homePick.href,bestPick.href,'Home opens the same ranked Pick as Picks');
 assert.match(d.querySelector('#camHomeBestPlates .cam-home-plate-figures').textContent,/\+150.*\+1 voto/);
+assert.ok(homePick.classList.contains('ae-pick-history-card'),'Home uses the compact history card format');
+assert.equal(d.querySelector('#camHomePicks [data-outcome],#camHomePicks .ae-pick-history-badge'),null,'Home cards do not announce or color results');
 assert.equal(d.querySelector('#homeRankingList,#homeChampionsList'),null,'Home no longer contains team ranking previews');
 
 assert.equal(bestPick.parentElement.classList.contains('cam-pick-unified'),true);

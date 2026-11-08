@@ -8,7 +8,7 @@
     const trending=document.querySelector('.editorial-trending');
     const community=document.querySelector('.editorial-community');
     if(!preview||!hero||!main||!trending)return;
-    const anchor=document.createComment('Picks de la semana · columna de escritorio');
+    const anchor=document.createComment('Picks de la comunidad · columna de escritorio');
     preview.before(anchor);
     const trendingAnchor=document.createComment('Lo más leído · columna de escritorio');
     trending.before(trendingAnchor);
@@ -37,21 +37,28 @@
       let drag=null,suppressClick=false;
       list.addEventListener('pointerdown',event=>{
         if(event.pointerType!=='mouse'||event.button!==0)return;
-        drag={id:event.pointerId,y:event.clientY,top:list.scrollTop,moved:false};
+        drag={id:event.pointerId,x:event.clientX,left:list.scrollLeft,moved:false};
         suppressClick=false;
       });
       list.addEventListener('pointermove',event=>{
         if(!drag||drag.id!==event.pointerId)return;
-        const delta=event.clientY-drag.y;
+        const delta=event.clientX-drag.x;
         if(!drag.moved&&Math.abs(delta)<5)return;
         if(!drag.moved){drag.moved=true;list.setPointerCapture?.(event.pointerId);list.classList.add('is-dragging');}
-        list.scrollTop=drag.top-delta;event.preventDefault();
+        list.scrollLeft=drag.left-delta;event.preventDefault();
       });
       const end=()=>{suppressClick=Boolean(drag?.moved);drag=null;list.classList.remove('is-dragging');};
       list.addEventListener('pointerup',end);list.addEventListener('pointercancel',end);
       list.addEventListener('pointerleave',()=>{if(drag&&!drag.moved)drag=null;});
       list.addEventListener('click',event=>{if(suppressClick){event.preventDefault();event.stopPropagation();suppressClick=false;}},true);
       list.addEventListener('dragstart',event=>event.preventDefault());
+      list.addEventListener('keydown',event=>{
+        if(event.target!==list||event.ctrlKey||event.metaKey||event.altKey)return;
+        const step=(list.firstElementChild?.getBoundingClientRect().width||164)+10;
+        const destinations={ArrowLeft:list.scrollLeft-step,ArrowRight:list.scrollLeft+step,Home:0,End:list.scrollWidth-list.clientWidth};
+        if(!(event.key in destinations))return;
+        event.preventDefault();suppressClick=false;list.scrollLeft=destinations[event.key];
+      });
     }
     window.camHomeLayout=Object.freeze({sync});sync();
     new MutationObserver(sync).observe(document.body,{attributes:true,attributeFilter:['class']});

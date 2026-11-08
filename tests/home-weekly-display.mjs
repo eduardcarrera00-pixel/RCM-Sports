@@ -28,9 +28,9 @@ assert.equal(d.querySelectorAll('#camHomePicks').length,1);
 // Dragging scrolls without opening the Pick underneath; a subsequent tap works.
 const list=d.getElementById('camHomeBestPlates'),link=d.createElement('a');link.href='#pick';list.replaceChildren(link);
 let opens=0;link.addEventListener('click',()=>opens++);
-const pointer=(type,y)=>{const e=new w.Event(type,{bubbles:true,cancelable:true});Object.assign(e,{pointerType:'mouse',button:0,pointerId:1,clientY:y});list.dispatchEvent(e);};
-list.scrollTop=100;pointer('pointerdown',150);pointer('pointermove',110);pointer('pointerup',110);link.click();
-assert.equal(list.scrollTop,140);assert.equal(opens,0);
+const pointer=(type,x)=>{const e=new w.Event(type,{bubbles:true,cancelable:true});Object.assign(e,{pointerType:'mouse',button:0,pointerId:1,clientX:x});list.dispatchEvent(e);};
+list.scrollLeft=100;pointer('pointerdown',150);pointer('pointermove',110);pointer('pointerup',110);link.click();
+assert.equal(list.scrollLeft,140);assert.equal(opens,0);
 pointer('pointerdown',110);pointer('pointerup',110);link.click();assert.equal(opens,1);
 await w.happyDOM.close();
 console.log('PASS: one weekly display, no mobile team rankings, full Pick preserved, route/viewport round trips, mouse drag versus tap.');
