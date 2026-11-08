@@ -1,4 +1,21 @@
 /* Ligas CAM. Scoped accents preserve the site's established day/night surfaces. */
+html body #aeProfileDialog #camProfileRank{display:none}
+html body #aeProfileDialog .cam-profile-footer-actions{display:flex;flex-wrap:wrap;gap:10px;padding:20px 30px 30px;margin-top:20px;border-top:1px solid var(--ae-profile-line,#49606c)}
+html body #aeProfileDialog .cam-profile-footer-actions .cam-profile-action{min-height:46px}
+html body #aeProfileDialog .cam-profile-footer-actions .cam-profile-action svg{width:18px;height:18px;flex:0 0 18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.cam-rank-disclosure>summary{display:flex;align-items:center;gap:18px;list-style:none;cursor:pointer;padding:8px 2px;min-height:100px}
+.cam-rank-disclosure>summary::-webkit-details-marker{display:none}
+.cam-rank-feature-crest .cam-rank-emblem{width:68px;height:80px}
+.cam-rank-feature-copy{display:flex;flex:1;min-width:0;flex-direction:column;gap:7px}
+.cam-rank-feature-copy>small{font:700 10px/1.4 Inter,system-ui,sans-serif;letter-spacing:.14em;opacity:.75}
+.cam-rank-feature-copy>strong{font:600 clamp(28px,4vw,38px)/1.1 'Playfair Display',Georgia,serif;overflow-wrap:anywhere}
+.cam-rank-feature-copy>span{font:500 12px/1.4 Inter,system-ui,sans-serif}
+.cam-rank-expand{font:600 11px/1.4 Inter,system-ui,sans-serif;max-width:65px}
+.cam-rank-disclosure[open]>.cam-rank-summary{border-bottom:1px solid var(--ae-profile-line,#49606c);margin-bottom:16px;padding-bottom:18px}
+.cam-rank-summary:focus-visible{outline:2px solid #bd8d6b;outline-offset:4px}
+.cam-league-fine-print{margin:12px 0}
+.cam-league-rules p{max-width:62ch;line-height:1.7;margin:12px 0}
+@media(max-width:640px){.cam-rank-disclosure>summary{gap:12px}.cam-rank-feature-crest .cam-rank-emblem{width:54px;height:64px}.cam-rank-expand{max-width:45px;font-size:10px}html body #aeProfileDialog .cam-profile-footer-actions{padding:18px 14px 28px}}
 [data-rank="cobre"],[data-league-rank="cobre"]{--league-metal:#cc9878;--league-wash:rgba(173,112,76,.16)}
 [data-rank="bronce"],[data-league-rank="bronce"]{--league-metal:#dbac79;--league-wash:rgba(179,125,64,.17)}
 [data-rank="plata"],[data-league-rank="plata"]{--league-metal:#c6d8e8;--league-wash:rgba(155,184,210,.18)}

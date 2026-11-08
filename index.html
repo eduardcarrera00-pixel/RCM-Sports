@@ -3261,11 +3261,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
   <button type="button" class="ae-profile-close" onclick="closeAeProfile()" aria-label="Cerrar perfil"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
   <div class="cam-profile-identity"><b id="camProfileAvatar" class="cam-profile-avatar" aria-hidden="true">·</b><div class="cam-profile-names"><h2 id="aeProfileTitle" tabindex="-1" autofocus>Mi perfil</h2><p id="aeProfileUsername">Tu historial deportivo</p></div></div>
   <ul id="camProfileHighlights" class="cam-profile-highlights" aria-label="Lo que destaca" hidden></ul>
-  <div class="cam-profile-actions">
-   <button type="button" id="camProfileEditOpen" class="cam-profile-action" hidden aria-controls="camProfileEdit"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m14.5 6.5 3 3M4 20l4.5-1 11-11a2.1 2.1 0 0 0-3-3l-11 11L4 20Z"/></svg>Editar perfil</button>
-   <button type="button" id="camProfileInvite" class="cam-profile-action" hidden><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15.5 19v-1.3a3.4 3.4 0 0 0-3.4-3.4H7.4A3.4 3.4 0 0 0 4 17.7V19"/><circle cx="9.75" cy="8" r="3.25"/><path d="M20 19v-1.2a3.3 3.3 0 0 0-2.5-3.2M15 4.9a3.25 3.25 0 0 1 0 6.2"/></svg>Invitar a mi party</button>
-   <button type="button" id="camProfileShare" class="cam-profile-action"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 15V3m-4 4 4-4 4 4M7 11H5v9h14v-9h-2"/></svg><span class="cam-profile-action-label">Compartir</span></button>
-  </div>
+
  </div>
  <p id="camProfileNotice" class="cam-profile-notice" role="status" aria-live="polite" hidden></p>
  <section id="camAnalyticsEntry" hidden aria-label="Herramientas de administración">
@@ -3289,6 +3285,11 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
  <section id="aeProfileAccuracy" class="ae-profile-accuracy" aria-label="Porcentaje de acierto" hidden></section>
  <section id="camProfileParties" class="cam-party-profile cam-profile-party" role="tabpanel" aria-labelledby="aeProfileTabParty" hidden></section>
  <section id="camProfileQuiniela" class="cam-profile-jornadas" aria-label="Mis jornadas" hidden></section>
+  <div class="cam-profile-actions cam-profile-footer-actions">
+   <button type="button" id="camProfileEditOpen" class="cam-profile-action" hidden aria-controls="camProfileEdit"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m14.5 6.5 3 3M4 20l4.5-1 11-11a2.1 2.1 0 0 0-3-3l-11 11L4 20Z"/></svg>Editar perfil</button>
+   <button type="button" id="camProfileInvite" class="cam-profile-action" hidden><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15.5 19v-1.3a3.4 3.4 0 0 0-3.4-3.4H7.4A3.4 3.4 0 0 0 4 17.7V19"/><circle cx="9.75" cy="8" r="3.25"/><path d="M20 19v-1.2a3.3 3.3 0 0 0-2.5-3.2M15 4.9a3.25 3.25 0 0 1 0 6.2"/></svg>Invitar a mi party</button>
+   <button type="button" id="camProfileShare" class="cam-profile-action"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 15V3m-4 4 4-4 4 4M7 11H5v9h14v-9h-2"/></svg><span class="cam-profile-action-label">Compartir perfil</span></button>
+  </div>
  <section id="camProfileEdit" class="cam-profile-edit" aria-labelledby="camProfileEditTitle" hidden>
   <header class="cam-profile-edit-head"><button type="button" id="camProfileEditBack" class="cam-profile-edit-back" aria-label="Volver al perfil"><span aria-hidden="true">‹</span> Perfil</button><h2 id="camProfileEditTitle" tabindex="-1">Editar perfil</h2></header>
   <div class="cam-profile-edit-avatar"><b id="camProfileEditAvatar" class="cam-profile-avatar" aria-hidden="true">·</b><p>Tu inicial es tu foto de perfil y cambia con tu nombre.</p></div>
@@ -5621,10 +5622,10 @@ html .cam-weekly-result-surface .cam-weekly-result-on-photo{
 @media(max-width:480px){.cam-weekly-quick-result .cam-weekly-review-actions{display:flex}.cam-weekly-quick-result .cam-weekly-review-actions button{width:auto}}
 </style>
 <script src="assets/cam-weekly-results.js?v=20261025-admin-resolved-pick-1"></script>
-<script src="assets/cam-profile-overview.js?v=20261104-perfil-claro-1"></script>
+<script src="assets/cam-profile-overview.js?v=20261108-profile-simple-1"></script>
 <script src="assets/cam-profile-quiniela.js?v=20261108-signed-scoring-1"></script>
-<script src="assets/ae-profile.js?v=20261108-monthly-leagues-1"></script>
-<script src="assets/cam-leagues.js?v=20261108-signed-scoring-1"></script>
+<script src="assets/ae-profile.js?v=20261108-profile-simple-1"></script>
+<script src="assets/cam-leagues.js?v=20261108-profile-simple-1"></script>
 <style id="cam-nfl-quiniela-theme">
 /* ===========================================================================
    CAM SPORTS · La Quiniela NFL — lenguaje visual curvo, editorial y compacto.
@@ -6408,7 +6409,7 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 </style>
 
 <!-- Componentes finales: móvil, conversación, parties, perfil y Takes; orden en performance-css-packs.json. -->
-<link rel="stylesheet" href="assets/cam-perf-app-panels.css?v=20261108-monthly-leagues-1">
+<link rel="stylesheet" href="assets/cam-perf-app-panels.css?v=20261108-profile-simple-1">
 <script src="assets/cam-parties.js?v=20261104-perfil-claro-1"></script>
 <script src="assets/cam-sport-quiniela-loader.js?v=20261108-signed-scoring-1"></script>
 <script src="assets/ae-season-predictions.js?v=20261021-champion-guide-1"></script>

@@ -66,6 +66,7 @@ function chooseRank(r){
   const dialog=$('aeProfileDialog');if(!dialog)return;
   dialog.dataset.leagueRank=KEYS[level(r.rank)];
   const identity=$('camProfileRank');identity.replaceChildren(emblem(r.rank),el('span',LEVELS[level(r.rank)]+' · '+r.label));
+  if($('camRankFeatureName')){$('camRankFeatureLabel').textContent='RANGO ACTUAL · '+r.label;$('camRankFeatureName').textContent=LEVELS[level(r.rank)];$('camRankFeatureBest').textContent='Mejor rango · '+LEVELS[level(r.best_rank)];$('camRankFeatureCrest').replaceChildren(emblem(r.rank));}
   const earned=profileData.awards.filter(a=>a.active);
   const badges=$('camProfileAwards');badges.replaceChildren(...earned.slice(0,3).map(a=>award(a)));
   for(const card of $('camProfileLeagues')?.querySelectorAll('[data-competition]')||[])card.setAttribute('aria-pressed',String(card.dataset.competition===selected));
@@ -73,18 +74,31 @@ function chooseRank(r){
 function rules(){
   const details=el('details',null,'cam-league-rules');details.append(el('summary','Cómo funcionan las ligas'));
   const text=el('div');
-  text.append(el('p','Cada mes: el 20 % superior sube un rango, el 60 % central lo conserva y el 20 % inferior baja. Se redondean las plazas de ascenso hacia arriba y las de descenso hacia abajo.'));
-  text.append(el('p','Para clasificar: 10 Picks acertados o fallados, o pronósticos en al menos el 50 % de los partidos resueltos de la quiniela. Los anulados, pendientes y rechazados no cuentan.'));
-  text.append(el('p','En las quinielas, cada acierto suma los puntos de tu selección y cada fallo resta esa misma cantidad. Los anulados y empates de NFL valen 0. El laurel NFL duplica el acierto; un fallo resta los puntos base. Ese saldo decide la clasificación y el cambio de rango.'));
-  text.append(el('p','Leyenda CAM: desde Diamante, dos meses seguidos en el 5 % superior. Se conserva terminando en el 10 % superior. Dos meses sin el mínimo bajan un rango; las pausas deportivas no penalizan.'));
-  text.append(el('p','Los resultados del mes cierran el día 1 siguiente a las 12:00, hora de Toronto. El Top 10 gana una insignia para el mes siguiente y la conserva en su historial. Empates: puntos, aciertos, porcentaje de acierto y primer resultado registrado.'));
+  text.append(el('p','Cada acierto suma puntos y cada fallo resta. Los anulados valen 0.'));
+  text.append(el('p','Al cerrar el mes, el 20 % mejor clasificado sube de rango; el 20 % de abajo baja. El resto mantiene su rango.'));
+  text.append(el('p','Para clasificar necesitas 10 Picks acertados o fallados, o participar en la mitad de los partidos resueltos de tu quiniela. El Top 10 del mes gana una insignia con su puesto y mes.'));
+  const advanced=el('details',null,'cam-league-fine-print');advanced.append(el('summary','Reglas completas'));
+  advanced.append(el('p','El cierre es el día 1 a las 12:00 de Toronto. Las plazas de ascenso se redondean hacia arriba y las de descenso hacia abajo. Dos meses sin el mínimo bajan un rango; las pausas deportivas no penalizan.'));
+  advanced.append(el('p','Desde Diamante, dos meses seguidos en el mejor 5 % dan acceso a Leyenda. Para conservarla, termina en el mejor 10 %. El laurel NFL duplica el acierto; el fallo resta los puntos base. Los empates NFL valen 0.'));
+  advanced.append(el('p','En caso de empate: puntos, aciertos, porcentaje de acierto y primer resultado registrado. Los premios quedan guardados en tu historial.'));
+  text.append(advanced);
   const ladder=el('ol',null,'cam-league-ladder');LEVELS.forEach((name,i)=>{const li=el('li');li.append(emblem(i),el('span',name));ladder.append(li);});
   text.append(ladder);details.append(text);return details;
 }
 function renderProfile(){
   const panel=$('camProfileLeagues');if(!panel||!profileData)return;
   panel.hidden=profileTab!=='perfil';panel.replaceChildren();
-  const head=el('div',null,'cam-league-heading');head.append(el('h3','Ligas CAM'),el('span',month(profileData.month)));panel.append(head);
+  const disclosure=el('details',null,'cam-rank-disclosure');
+  const summary=el('summary',null,'cam-rank-summary');
+  const crest=el('span',null,'cam-rank-feature-crest');crest.id='camRankFeatureCrest';
+  const copy=el('span',null,'cam-rank-feature-copy');
+  const label=el('small','RANGO ACTUAL');label.id='camRankFeatureLabel';copy.append(label);
+  const name=el('strong');name.id='camRankFeatureName';
+  const best=el('span');best.id='camRankFeatureBest';
+  const expand=el('span','Ver detalle ↓','cam-rank-expand');
+  disclosure.addEventListener('toggle',()=>{expand.textContent=disclosure.open?'Cerrar detalle ↑':'Ver detalle ↓';});
+  copy.append(name,best);summary.append(crest,copy,expand);
+  disclosure.append(summary);panel.append(disclosure);
   const cards=el('div',null,'cam-league-cards');
   for(const key of Object.keys(COMPETITIONS)){
     const r=profileData.ranks.find(x=>x.competition===key);if(!r)continue;
@@ -97,9 +111,9 @@ function renderProfile(){
     if(r.current?.eligible&&r.current.position<=10)card.append(award(r.current,true));
     cards.append(card);
   }
-  panel.append(cards);
+  disclosure.append(cards);
   const actions=el('div',null,'cam-league-actions');
-  actions.append(btn('Ver clasificación mensual','cam-league-link',()=>openBoard(selected||'picks')));panel.append(actions);
+  actions.append(btn('Ver clasificación mensual','cam-league-link',()=>openBoard(selected||'picks')));disclosure.append(actions);
   const log=el('details',null,'cam-league-history');log.append(el('summary','Historial de rangos e insignias'));
   if(!profileData.history.length)log.append(el('p','La primera temporada es '+month(profileData.ranks[0]?.starts_on)+'. Tus logros quedarán aquí después del cierre mensual.'));
   else{
@@ -112,7 +126,7 @@ function renderProfile(){
     }
     log.append(list);
   }
-  panel.append(log,rules());
+  disclosure.append(log,rules());
   const preferred=profileData.ranks.find(r=>r.competition===selected)||[...profileData.ranks].sort((a,b)=>level(b.rank)-level(a.rank)||Object.keys(COMPETITIONS).indexOf(a.competition)-Object.keys(COMPETITIONS).indexOf(b.competition))[0];
   if(preferred)chooseRank(preferred);
 }

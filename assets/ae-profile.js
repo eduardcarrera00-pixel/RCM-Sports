@@ -84,7 +84,6 @@ function renderPrestige(summary,legendary,champions=[]){
   const resolved=numeric(summary?.resolved);
   if(!summary||!resolved){
     target.append(el('p',privateView?'Cuando se puntúen tus primeros Takes por dificultad, aquí verás tu perfil de riesgo y tus medallas.':'Este aficionado todavía no tiene Takes puntuados por dificultad.','ae-profile-empty'));
-    appendChampionPicks(target,champions);
     target.hidden=activeTab!=='takes';
     return;
   }
@@ -115,7 +114,6 @@ function renderPrestige(summary,legendary,champions=[]){
     }
     target.append(el('h3','Salón de la fama','ae-profile-list-heading'),list);
   }
-  appendChampionPicks(target,champions);
   target.hidden=activeTab!=='takes';
 }
 /* Vitrina de campeones: las elecciones de «¿Quién será campeón?» (suman a Takes). */
@@ -1140,12 +1138,12 @@ function setIdentity(name,subtitle){
   for(const id of ['camProfileAvatar','camProfileEditAvatar']){const n=$(id);if(n)n.textContent=initialOf(clean);}
   if($('camProfileKicker'))$('camProfileKicker').textContent=privateView?'MI PERFIL · CAM SPORTS':'AFICIONADO · CAM SPORTS';
   if($('camProfileEditOpen'))$('camProfileEditOpen').hidden=!privateView;
-  // Perfil ajeno: «Invitar a mi party» manda; compartir queda como icono.
+  // Acciones al final del perfil, siempre con etiquetas legibles.
   if($('camProfileInvite'))$('camProfileInvite').hidden=privateView;
   const share=$('camProfileShare');
   if(share){
-    share.classList.toggle('is-icon',!privateView);
-    if(privateView)share.removeAttribute('aria-label');else share.setAttribute('aria-label','Compartir perfil');
+    share.classList.remove('is-icon');
+    share.setAttribute('aria-label','Compartir perfil');
   }
   if(!clean&&$('camProfileHighlights')){$('camProfileHighlights').replaceChildren();$('camProfileHighlights').hidden=true;}
 }

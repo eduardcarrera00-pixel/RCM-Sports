@@ -437,7 +437,7 @@
   html body #aeProfileDialog .cam-profile-head > .cam-profile-kicker { display:none!important; }
   html body #aeProfileDialog .ae-profile-top.cam-profile-head {
     grid-template-columns:minmax(0,1fr) auto!important;
-    grid-template-areas:"identity close" "highlights highlights" "actions actions"!important;
+    grid-template-areas:"identity close" "highlights highlights"!important;
     gap:12px!important;
     padding-top:20px!important;
   }

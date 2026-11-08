@@ -390,7 +390,7 @@ html:not(.dark) body #aeProfileDialog .cam-profile-row.is-danger strong { color:
     gap: 10px;
     padding: max(6px, env(safe-area-inset-top, 0px)) 16px 14px;
   }
-  html body #aeProfileDialog .cam-profile-head h2 { font-size: clamp(24px, 7.1vw, 32px); }
+  html body #aeProfileDialog .cam-profile-head h2 { font-size: clamp(20px, 5.6vw, 28px); }
   html body #aeProfileDialog .cam-profile-identity .cam-profile-avatar { flex-basis: 54px; width: 54px; height: 54px; font-size: 26px; }
   html body #aeProfileDialog .cam-profile-head > .cam-profile-actions { max-width: none; }
   html body #aeProfileDialog .cam-profile-stats strong { font-size: 21px; }

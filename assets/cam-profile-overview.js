@@ -165,8 +165,7 @@ function takesCard(data, ctx) {
   const t = data.takes || {};
   const top = t.top;
   const count = num(t.count);
-  const champions = Array.isArray(ctx.extras?.champions) ? ctx.extras.champions : [];
-  if (!top && !count && !champions.length) return ctx.own && !ctx.stepsShown ? emptyCard('takes', 'Takes', 'Publicar mi Take ›', ctx.newTake) : null;
+  if (!top && !count) return ctx.own && !ctx.stepsShown ? emptyCard('takes', 'Takes', 'Publicar mi Take ›', ctx.newTake) : null;
   const support = pct(num(t.up), num(t.down));
   const card = shell('takes', 'Takes', [count ? String(count) : '', support && support + ' apoyo'], () => ctx.tab('takes'));
   if (top) {
@@ -190,7 +189,6 @@ function takesCard(data, ctx) {
     item.append(meta);
     card.append(item);
   }
-  if (champions.length) card.append(championList(champions, ctx));
   return card;
 }
 
@@ -308,8 +306,6 @@ function highlights(data, extras) {
     const legends = num(prestige.legendary_count);
     out.push({text: prestige.risk_label + (legends ? ' · ' + legends + (legends === 1 ? ' legendario' : ' legendarios') : '')});
   }
-  const teams = (Array.isArray(extras?.champions) ? extras.champions : []).filter(c => c.state !== 'lost').map(shortTeam).filter(Boolean);
-  if (teams.length) out.push({text: 'Campeones: ' + [...new Set(teams)].slice(0, 2).join(' · ')});
   const p = data.picks || {};
   const decided = num(p.won) + num(p.lost);
   if (decided >= 3) out.push({text: Math.round(num(p.won) / decided * 100) + ' % de acierto en Picks'});
