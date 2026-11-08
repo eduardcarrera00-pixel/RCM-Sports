@@ -73,7 +73,7 @@ assert.equal(card.querySelector('.cp-pick-line-choice').textContent,'Tigres gana
 assert.equal(card.querySelector('.cp-card-legs').tagName,'OL');
 assert.equal(card.querySelector('.cp-picks-count'),null,'Single/combo labels are removed');
 assert.equal(card.querySelector('.cp-feed-meta .cp-card-sport').textContent,'Fútbol');
-assert.equal(card.querySelector('.cp-feed-meta .cp-odds').textContent,'Cuota +200');
+assert.equal(card.querySelector('.cp-feed-meta .cp-odds').textContent,'+200');
 assert.equal(card.querySelector('.cp-feed-meta .cp-card-odds').parentElement.className,'cp-feed-meta');
 
 assert.equal(card.querySelector('.cp-pick-line-number'),null);
@@ -84,7 +84,7 @@ replies.click();await settle();assert.ok(d.querySelector('#cpDialog .cp-card-det
 assert.equal(d.querySelector('#cpDialog .cp-recipe-card .cp-card-legs').tagName,'OL','Recipe and feed use the same list');
 assert.equal(d.querySelector('#cpDialog .cp-recipe-card .cp-pick-line-choice').textContent,'Tigres gana');
 assert.equal(d.querySelector('#cpDialog .cp-recipe-card .cp-feed-meta .cp-card-sport').textContent,'Fútbol');
-assert.equal(d.querySelector('#cpDialog .cp-recipe-card .cp-feed-meta .cp-odds').textContent,'Cuota +200');
+assert.equal(d.querySelector('#cpDialog .cp-recipe-card .cp-feed-meta .cp-odds').textContent,'+200');
 assert.match(d.querySelector('#cpDialog .cp-card-title').textContent,/Tigres gana/,'Conversation retains original title');
 d.querySelector('#cpDialog button').click();await settle();
 card.querySelector('.cp-upvote').click();await settle();assert.equal(votes.size,1);
@@ -96,3 +96,4 @@ records[0].capture_check={method:'on_device_ocr'};
 d.dispatchEvent(new w.Event('visibilitychange'));await settle();
 assert.equal(d.querySelector('#cpFeed .cp-card-state'),null,'Approved OCR source note is not displayed on feed');
 console.log('Editorial Pick cards: readable title, profile, replies, pending votes, and original archive/detail passed.');process.exit(0);
+

@@ -102,7 +102,7 @@ function ticketRows(p,full=false){
   const outcome=ticketStates[explicit]?explicit:choices.length===1&&ticketStates[p.outcome]?p.outcome:null;
   row.dataset.outcome=outcome||'unknown';
   const state=outcome?ticketStates[outcome]:['·','Sin resultado individual'];
-  if(outcome&&(choices.length>1||full))body.append(el('small',state.join(' '),'cam-ticket-leg-state'));
+  if(outcome&&outcome!=='pending'&&(choices.length>1||full))body.append(el('small',state.join(' '),'cam-ticket-leg-state'));
   const result=ticketOfficialResult(leg.final_score||leg.event_result||leg.official_result);
   if(result)body.append(el('small','Resultado del encuentro: '+result,'cam-ticket-official-result'));
   const marker=el('span',null,'cam-ticket-leg-number');
@@ -163,9 +163,8 @@ function card(p,compact=false,detail=false,viewerId=currentViewerId,variant='fee
  }else if(first?.sport){
   header.append(el('span',String(first.sport),'cp-card-sport'));
  }
- if(detail&&p.event_date)header.append(el('span','Evento '+p.event_date,'cp-event-date'));
  const state=ticketStates[p.outcome]||ticketStates.pending;
- header.append(el('strong',state.join(' '),'cp-result-badge'));
+ if(['won','lost','void'].includes(p.outcome))header.append(el('strong',state.join(' '),'cp-result-badge'));
  n.append(header);
  const title=el('h3',null,'cp-card-title');
  const normalize=value=>String(value||'').toLocaleLowerCase('es').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
@@ -184,26 +183,14 @@ function card(p,compact=false,detail=false,viewerId=currentViewerId,variant='fee
    };
    n.append(readLink);
  }
- if(editorial){
-  const count=ticketChoices(p).length;
-  const meta=el('div',null,'cam-ticket-meta');
-  meta.append(el('span',count>1?'Parlay · '+count+' selecciones':'Pick simple'));
-  if(p.event_date)meta.append(el('span',p.event_date));
-  n.append(meta);
- }
  n.append(ticketRows(p,detail));
  const odds=el('div',null,'cp-card-odds');
  
  const quota=el('strong',null,'cp-odds cam-ticket-quota');
- quota.append(el('small',ticketChoices(p).length>1?'Cuota total ':'Cuota ','cam-ticket-odds-label'),el('span',(Number(p.american_odds)>0?'+':'')+p.american_odds,'cam-ticket-odds-value'));
+ const momio=(Number(p.american_odds)>0?'+':'')+p.american_odds;
+ quota.setAttribute('aria-label','Momio '+momio);
+ quota.append(el('span',momio,'cam-ticket-odds-value'));
  odds.append(quota);
- const statusText=p.moderation_status==='approved'
-   ?(publication?'':(['on_device_ocr','ai_vision'].includes(p.capture_check?.method)?'Momio cotejado con captura':'Cuota aprobada'))
-   :p.moderation_status==='rejected'?'Cuota rechazada':'Cuota en revisión · votos abiertos';
- if(statusText){
-  const status=el('small',statusText,'cp-card-state');
-  if(publication)n.append(status);else odds.append(status);
- }
  if(publication)feedMeta.append(odds);else n.append(odds);
  if(p.explanation){
   if(detail)n.append(el('p',p.explanation,'cp-explanation'));
@@ -1405,4 +1392,5 @@ window.setInterval(refreshVisiblePicks,30000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){load();void refreshOpenPickVisibility();}});
 window.addEventListener('popstate',()=>{const id=new URL(location.href).searchParams.get('pick');if(id)showDetail(id);else closeDetail();});
 })();
+
 

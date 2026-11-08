@@ -116,46 +116,69 @@
     display:flex!important;flex-direction:column!important;justify-content:flex-start!important;align-items:stretch!important;
     gap:8px!important;padding:3px!important;min-height:0!important;scroll-snap-type:y proximity!important;
   }
-  html body #mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#cpFeed,#picksPopular,#picksQuestioned) > .cp-card.cam-ticket-card {
+  html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#cpFeed,#picksPopular,#picksQuestioned),#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog :is(#aeProfilePicks,#aeProfilePickHighlights)) .cp-card.cam-ticket-card {
     display:flex!important;flex:0 0 auto!important;flex-direction:column!important;gap:4px!important;
     min-height:0!important;height:auto!important;margin:0!important;padding:9px 11px!important;border-radius:12px!important;
   }
-  html body #mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#cpFeed,#picksPopular,#picksQuestioned) > .cp-card.cam-ticket-card .cp-feed-author {
-    min-height:28px!important;font-size:11px!important;
+  html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#cpFeed,#picksPopular,#picksQuestioned),#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog :is(#aeProfilePicks,#aeProfilePickHighlights)) .cp-card.cam-ticket-card .cp-feed-meta .cp-card-odds {
+    flex:none!important;width:auto!important;max-width:none!important;min-width:0!important;
   }
-  html body #mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#cpFeed,#picksPopular,#picksQuestioned) > .cp-card.cam-ticket-card .cp-feed-initial {
-    width:22px!important;height:22px!important;flex-basis:22px!important;font-size:10px!important;
+  /* Keep the header on one row once the secondary ticket labels are removed. */
+  html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#cpFeed,#picksPopular,#picksQuestioned),#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog :is(#aeProfilePicks,#aeProfilePickHighlights)) .cp-card.cam-ticket-card > .cp-card-header {
+    gap:0 8px!important;min-height:0!important;
   }
-  html body #mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#cpFeed,#picksPopular,#picksQuestioned) > .cp-card.cam-ticket-card .cp-card-legs {
+  html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#cpFeed,#picksPopular,#picksQuestioned),#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog :is(#aeProfilePicks,#aeProfilePickHighlights)) .cp-card.cam-ticket-card .cp-feed-meta {
+    flex-direction:row!important;align-items:center!important;gap:6px!important;grid-row:1!important;
+    width:auto!important;max-width:none!important;justify-self:end!important;
+  }
+  html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#cpFeed,#picksPopular,#picksQuestioned),#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog :is(#aeProfilePicks,#aeProfilePickHighlights)) .cp-card.cam-ticket-card :is(.cam-ticket-content,.cp-card-legs,.cp-pick-line-body) {
+    min-height:0!important;margin:0!important;
+  }
+  html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#cpFeed,#picksPopular,#picksQuestioned),#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog :is(#aeProfilePicks,#aeProfilePickHighlights)) .cp-card.cam-ticket-card .cam-ticket-content {
     gap:3px!important;
   }
-  html body #mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#cpFeed,#picksPopular,#picksQuestioned) > .cp-card.cam-ticket-card .cp-pick-line {
+  html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#cpFeed,#picksPopular,#picksQuestioned),#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog :is(#aeProfilePicks,#aeProfilePickHighlights)) .cp-card.cam-ticket-card .cp-pick-line-event {
+    font-size:11px!important;line-height:1.3!important;
+  }
+  html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#cpFeed,#picksPopular,#picksQuestioned),#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog :is(#aeProfilePicks,#aeProfilePickHighlights)) .cp-card.cam-ticket-card :is(.cam-ticket-analysis,.cam-ticket-more) {
+    margin:0!important;padding:0!important;
+  }
+  html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#cpFeed,#picksPopular,#picksQuestioned),#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog :is(#aeProfilePicks,#aeProfilePickHighlights)) .cp-card.cam-ticket-card .cp-feed-author {
+    min-height:28px!important;font-size:11px!important;
+  }
+  html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#cpFeed,#picksPopular,#picksQuestioned),#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog :is(#aeProfilePicks,#aeProfilePickHighlights)) .cp-card.cam-ticket-card .cp-feed-initial {
+    width:22px!important;height:22px!important;flex-basis:22px!important;font-size:10px!important;
+  }
+  html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#cpFeed,#picksPopular,#picksQuestioned),#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog :is(#aeProfilePicks,#aeProfilePickHighlights)) .cp-card.cam-ticket-card .cp-card-legs {
+    gap:3px!important;
+  }
+  html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#cpFeed,#picksPopular,#picksQuestioned),#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog :is(#aeProfilePicks,#aeProfilePickHighlights)) .cp-card.cam-ticket-card .cp-pick-line {
     padding:3px 0!important;
   }
-  html body #mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#cpFeed,#picksPopular,#picksQuestioned) > .cp-card.cam-ticket-card .cp-pick-line-choice {
+  html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#cpFeed,#picksPopular,#picksQuestioned),#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog :is(#aeProfilePicks,#aeProfilePickHighlights)) .cp-card.cam-ticket-card .cp-pick-line-choice {
     font-size:14px!important;line-height:1.3!important;
   }
-  html body #mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#cpFeed,#picksPopular,#picksQuestioned) > .cp-card.cam-ticket-card .cp-feed-meta .cp-card-odds .cp-odds.cam-ticket-quota {
-    display:flex!important;flex-direction:column!important;align-items:center!important;gap:1px!important;
+  html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#cpFeed,#picksPopular,#picksQuestioned),#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog :is(#aeProfilePicks,#aeProfilePickHighlights)) .cp-card.cam-ticket-card .cp-feed-meta .cp-card-odds .cp-odds.cam-ticket-quota {
+    display:flex!important;align-items:center!important;justify-content:center!important;gap:0!important;
     width:auto!important;min-width:49px!important;box-sizing:border-box!important;padding:4px 7px!important;
     border:1px solid #afc9e8!important;border-radius:7px!important;background:#e5efff!important;color:#123e78!important;
   }
   html.dark body #mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#cpFeed,#picksPopular,#picksQuestioned) > .cp-card.cam-ticket-card .cp-feed-meta .cp-card-odds .cp-odds.cam-ticket-quota {
     border-color:#416c95!important;background:#163f68!important;color:#d8eaff!important;
   }
-  html body #mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#cpFeed,#picksPopular,#picksQuestioned) > .cp-card.cam-ticket-card .cam-ticket-odds-label {
-    color:inherit!important;font:600 8px/1.1 Inter,system-ui,sans-serif!important;
+  html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#cpFeed,#picksPopular,#picksQuestioned),#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog :is(#aeProfilePicks,#aeProfilePickHighlights)) .cp-card.cam-ticket-card .cam-ticket-odds-label {
+    display:none!important;
   }
-  html body #mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#cpFeed,#picksPopular,#picksQuestioned) > .cp-card.cam-ticket-card .cam-ticket-odds-value {
+  html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#cpFeed,#picksPopular,#picksQuestioned),#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog :is(#aeProfilePicks,#aeProfilePickHighlights)) .cp-card.cam-ticket-card .cam-ticket-odds-value {
     color:inherit!important;font:750 15px/1.15 Inter,system-ui,sans-serif!important;
   }
-  html body #mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#cpFeed,#picksPopular,#picksQuestioned) > .cp-card.cam-ticket-card :is(.cam-ticket-analysis,.cam-ticket-more) > summary {
+  html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#cpFeed,#picksPopular,#picksQuestioned),#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog :is(#aeProfilePicks,#aeProfilePickHighlights)) .cp-card.cam-ticket-card :is(.cam-ticket-analysis,.cam-ticket-more) > summary {
     min-height:30px!important;padding:5px 0!important;font-size:11px!important;
   }
-  html body #mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#cpFeed,#picksPopular,#picksQuestioned) > .cp-card.cam-ticket-card .cp-actions {
+  html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#cpFeed,#picksPopular,#picksQuestioned),#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog :is(#aeProfilePicks,#aeProfilePickHighlights)) .cp-card.cam-ticket-card .cp-actions {
     gap:4px!important;padding-top:0!important;
   }
-  html body #mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#cpFeed,#picksPopular,#picksQuestioned) > .cp-card.cam-ticket-card .cp-actions button {
+  html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#cpFeed,#picksPopular,#picksQuestioned),#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog :is(#aeProfilePicks,#aeProfilePickHighlights)) .cp-card.cam-ticket-card .cp-actions button {
     min-height:32px!important;padding:4px 7px!important;font-size:10px!important;
   }
   @media(max-width:760px) {
@@ -164,6 +187,7 @@
     html body #mainContent #camHomePicks .cam-home-plate-list {max-height:186px!important;}
   }
   @media(pointer:coarse) {
-    html body #mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#cpFeed,#picksPopular,#picksQuestioned) > .cp-card.cam-ticket-card :is(.cp-feed-author,.cp-actions button,.cam-ticket-analysis > summary,.cam-ticket-more > summary) {min-height:44px!important;}
+    html body :is(#mainContent #footballTakes.ae-picks-editorial #communityPicks :is(#cpFeed,#picksPopular,#picksQuestioned),#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog :is(#aeProfilePicks,#aeProfilePickHighlights)) .cp-card.cam-ticket-card :is(.cp-feed-author,.cp-actions button,.cam-ticket-analysis > summary,.cam-ticket-more > summary) {min-height:44px!important;}
   }
 }
+
