@@ -10,7 +10,7 @@
   const scores=document.getElementById('camFootballScore');
   if(!root||!body||!scores||!window.matchMedia)return;
   const mobile=window.matchMedia('(max-width: 760px), (orientation: landscape) and (max-height: 500px) and (hover: none) and (pointer: coarse)');
-  const ui={scoreOpen:false,saving:false,result:null};
+  const ui={scoreOpen:false,liveOpen:false,liveKey:null,saving:false,result:null};
   const q=()=>window.camFootballQuiniela;
   const active=()=>mobile.matches&&document.body.classList.contains('ae-is-football');
   const el=(tag,text,cls,attrs)=>{
@@ -112,6 +112,31 @@
     play.append(button('Ver este partido en la quiniela →',()=>focusGame(g.id)));box.append(play);return box;
   }
 
+  function liveBlock(snap){
+    const live=(snap.liveGames||snap.games).filter(g=>g.status==='live'||
+      (g.status==='scheduled'&&started(g)&&Date.parse(g.kickoff)+4*36e5>Date.now()))
+      .sort((a,b)=>Date.parse(a.kickoff)-Date.parse(b.kickoff));
+    if(!live.length){ui.liveOpen=false;return null;}
+    const box=el('details',null,'cam-ns-block cam-ns-live',{'data-block':'envivo'});
+    box.open=ui.liveOpen;
+    const toggle=el('summary',null,'cam-ns-live-toggle');
+    toggle.append(el('span','En juego','cam-ns-kicker'),el('span',live.length+(live.length===1?' partido':' partidos'),'cam-ns-aside'));
+    box.append(toggle);
+    box.addEventListener('toggle',()=>{
+      if(!box.isConnected||ui.liveOpen===box.open)return;
+      ui.liveOpen=box.open;
+      if(ui.liveOpen)refreshLive();
+    });
+    const list=el('ul',null,'cam-ns-results');
+    for(const g of live){
+      const row=el('li',null,'cam-ns-result');
+      const score=g.home_score!=null&&g.away_score!=null
+        ?name(snap,g.home_id)+' '+g.home_score+' – '+g.away_score+' '+name(snap,g.away_id)
+        :name(snap,g.home_id)+' vs '+name(snap,g.away_id);
+      row.append(el('span',score,'cam-ns-result-score'));list.append(row);
+    }
+    box.append(list);return box;
+  }
   function scoreBlock(snap){
     const finals=snap.results.filter(g=>g.home_score!=null&&g.away_score!=null).sort((a,b)=>Date.parse(b.kickoff)-Date.parse(a.kickoff));
     if(!finals.length)return null;
@@ -140,12 +165,18 @@
     }else if(!snap?.loaded||snap.loading){
       fragment.append(el('p','Cargando la semana…','cam-ns-loading'));scores.replaceChildren();
     }else{
+      const liveKey=snap.competition+'|'+snap.season;
+      if(ui.liveKey!==liveKey){ui.liveKey=liveKey;ui.liveOpen=false;}
+      const live=liveBlock(snap);if(live)fragment.append(live);
       const duel=chooseDuel(snap.games,snap.teams);
       if(duel)fragment.append(duelBlock(snap,duel));
       else fragment.append(el('p','Todavía no hay partidos de esta competición.','cam-ns-text'));
       const score=scoreBlock(snap);scores.replaceChildren(...(score?[score]:[]));
     }
-    body.replaceChildren(fragment);keepAnchor();
+    const liveFocused=body.querySelector('.cam-ns-live-toggle')===document.activeElement;
+    body.replaceChildren(fragment);
+    if(liveFocused)body.querySelector('.cam-ns-live-toggle')?.focus({preventScroll:true});
+    keepAnchor();
   }
   let anchorUntil=0;
   function release(){anchorUntil=0;}
@@ -164,4 +195,11 @@
   mobile.addEventListener?.('change',schedule);
   new MutationObserver(schedule).observe(document.body,{attributes:true,attributeFilter:['class']});
   window.camFootballSemana=Object.freeze({render,_choose:chooseDuel});schedule();
+  function refreshLive(){
+    if(active()&&!document.hidden&&document.body.dataset.camTab==='semana'&&ui.liveOpen)
+      void q()?.refreshLive?.();
+  }
+  setInterval(refreshLive,60000);
+  window.addEventListener('focus',refreshLive);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshLive();});
 })();
