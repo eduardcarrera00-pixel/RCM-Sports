@@ -228,7 +228,7 @@
         const b=el('button',null,'cam-nfl-laurel'+(here?' is-on':''));
         b.type='button';b.setAttribute('aria-pressed',String(here));b.disabled=laurelBusy;
         b.append(el('span',here?'Laurel · x2':'Poner el laurel','cam-nfl-laurel-text'));
-        b.title=here?'Quitar el laurel de este partido':'Este partido valdrá el doble si aciertas (0 si fallas). Uno por jornada.';
+        b.title=here?'Quitar el laurel de este partido':'Suma el doble si aciertas; resta los puntos base si fallas. Uno por jornada.';
         b.addEventListener('click',()=>toggleLaurel(g));
         row.append(b);
       }else if(here){
@@ -289,7 +289,7 @@
   function pickResultFor(game, pick){
     if(!pick)return null;
     if(game.status==='tie'||game.status==='cancelled')return 'void';
-    if(game.status!=='final')return null;
+    if(game.status!=='final'||!game.winner_id)return null;
     return pick.team_id===game.winner_id?'correct':'incorrect';
   }
   function paintNav(){
@@ -321,6 +321,7 @@
     // Sin probabilidad visible: el usuario ve solo los puntos del acierto (el doble con el laurel).
     const doubled=points!=null&&laurelOf(g)===g.id;
     b.append(el('small',points==null?'Pts pendientes':doubled?(points*2)+' pts · x2':points+' pts'));
+    if(points!=null)b.title='Acierto: +'+(doubled?points*2:points)+' puntos. Fallo: −'+points+' puntos.';
     b.addEventListener('click',()=>{if(!isOpen(g))return;if(!user){window.openUserAuthModal?.();return;}draft.set(g.id,id);saveDraft();paintGames();});
     if(disabled)b.title='Este partido está cerrado';
     return b;
@@ -329,7 +330,7 @@
   function gameState(g){
     const pick=mine.get(g.id);
     if(g.status==='cancelled'||g.status==='tie')return 'anulado';
-    if(g.status==='final')return pick?(pick.team_id===g.winner_id?'acierto':'fallo'):'sin-pronostico';
+    if(g.status==='final')return !g.winner_id?'pendiente':pick?(pick.team_id===g.winner_id?'acierto':'fallo'):'sin-pronostico';
     if(g.status==='live')return 'vivo';
     if(g.status==='postponed')return 'pospuesto';
     if(new Date(g.kickoff).getTime()<=now())return 'cerrado';
@@ -342,7 +343,9 @@
     if(g.status==='cancelled'||g.status==='tie')return 'Anulado · 0 pts';
     if(g.status==='final'){
       if(!pick)return 'Finalizado · sin pick';
-      return pick.team_id===g.winner_id?'Acertado · +'+pick.awarded_points+' pts':'Fallado · 0 pts';
+      if(!g.winner_id||!pick.settled_at)return 'Puntuación pendiente';
+      const value=Number(pick.awarded_points||0);
+      return (pick.team_id===g.winner_id?'Acertado · ':'Fallado · ')+(value>0?'+':value<0?'−':'')+Math.abs(value)+' pts';
     }
     if(g.status==='live')return 'En vivo';
     if(g.status==='postponed')return 'Pospuesto';

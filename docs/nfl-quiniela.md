@@ -21,7 +21,7 @@ El sincronizador importa la semana corriente, anterior y siguiente en una ejecuc
 
 ## Reglas de puntos y seguridad
 
-`p = probabilidad implícita normalizada`; `puntos = max(2, min(12, round(2 / p)))`. Ejemplos: 80 % → 3 puntos, 50 % → 4 puntos, 25 % → 8 puntos. Un fallo suma 0; un empate o anulación suma 0 y no computa como fallo. Las probabilidades se congelan una sola vez antes de que haya selecciones.
+`p = probabilidad implícita normalizada`; `puntos = max(2, min(12, round(2 / p)))`. Ejemplos: 80 % → 3 puntos, 50 % → 4 puntos, 25 % → 8 puntos. Un fallo resta los puntos publicados de la selección; un empate o anulación suma 0 y no computa como fallo. El laurel duplica el acierto y mantiene la pérdida en los puntos base. Las probabilidades se congelan una sola vez antes de que haya selecciones.
 
 Los pronósticos se escriben solo vía `cam_nfl_save_pick`, que consulta la hora del **servidor**, bloquea la fila, verifica la sesión, el partido y el equipo. RLS deja a cada usuario consultar solo sus selecciones. Los visitantes solo consultan partidos y tablas agregadas. Las tablas de resultados, probabilidades y auditoría no conceden modificaciones a clientes. Los administradores se validan mediante `rcm_is_editor()`.
 

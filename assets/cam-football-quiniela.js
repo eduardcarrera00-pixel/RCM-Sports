@@ -286,6 +286,7 @@
     const points=pick==='home'?g.points_home:g.points_away;
     // Sin probabilidad visible: el usuario ve solo los puntos del acierto.
     b.append(el('small',points==null?'Pts pendientes':points+' pts'));
+    if(points!=null)b.title='Acierto: +'+points+' puntos. Fallo: −'+points+' puntos.';
     b.addEventListener('click',()=>choose(g,pick));
     if(disabled)b.title='Este partido está cerrado';
     return b;
@@ -298,6 +299,7 @@
     if(g.status==='final'&&g.outcome)b.classList.add(g.outcome==='draw'?'is-winner':'is-loser');
     b.append(el('span','Empate','cam-nfl-draw-label'));
     b.append(el('small',g.points_draw==null?'Pts pendientes':g.points_draw+' pts'));
+    if(g.points_draw!=null)b.title='Acierto: +'+g.points_draw+' puntos. Fallo: −'+g.points_draw+' puntos.';
     b.addEventListener('click',()=>choose(g,'draw'));
     if(disabled)b.title='Este partido está cerrado';
     return b;
@@ -306,7 +308,7 @@
   function gameState(g){
     const pick=mine.get(g.id);
     if(g.status==='cancelled')return 'anulado';
-    if(g.status==='final')return pick?(pick.pick===g.outcome?'acierto':'fallo'):'sin-pronostico';
+    if(g.status==='final')return !g.outcome?'pendiente':pick?(pick.pick===g.outcome?'acierto':'fallo'):'sin-pronostico';
     if(g.status==='live')return 'vivo';
     if(g.status==='postponed')return 'pospuesto';
     if(new Date(g.kickoff).getTime()<=now())return 'cerrado';
@@ -319,7 +321,9 @@
     if(g.status==='cancelled')return 'Anulado · 0 pts';
     if(g.status==='final'){
       if(!pick)return 'Finalizado · sin pick';
-      return pick.pick===g.outcome?'Acertado · +'+pick.awarded_points+' pts':'Fallado · 0 pts';
+      if(!g.outcome||!pick.settled_at)return 'Puntuación pendiente';
+      const value=Number(pick.awarded_points||0);
+      return (pick.pick===g.outcome?'Acertado · ':'Fallado · ')+(value>0?'+':value<0?'−':'')+Math.abs(value)+' pts';
     }
     if(g.status==='live')return 'En vivo';
     if(g.status==='postponed')return 'Pospuesto';

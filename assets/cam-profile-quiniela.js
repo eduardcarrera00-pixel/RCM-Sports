@@ -78,9 +78,10 @@
   function outcome(row){
     const g=row.game;
     if(g.status==='cancelled'||g.status==='tie')return {tone:'void',text:'Anulado · 0 pts'};
-    if(g.status==='final'&&row.settled_at){
+    if(g.status==='final'&&row.settled_at&&(state.sport==='nfl'?g.winner_id:g.outcome)){
       const hit=state.sport==='nfl'?row.team_id===g.winner_id:row.pick===g.outcome;
-      return {tone:hit?'won':'lost',text:hit?'Acertado · +'+Number(row.awarded_points||0)+' pts':'Fallado · 0 pts'};
+      const points=Number(row.awarded_points||0);
+      return {tone:hit?'won':'lost',text:(hit?'Acertado · ':'Fallado · ')+(points>0?'+':points<0?'−':'')+Math.abs(points)+' pts'};
     }
     return {tone:'pending',text:g.status==='live'?'En vivo':g.status==='postponed'?'Pospuesto':g.status==='final'?'Puntuación pendiente':Date.parse(g.kickoff)<=Date.now()?'Pendiente de resultado':'Pronóstico guardado'};
   }

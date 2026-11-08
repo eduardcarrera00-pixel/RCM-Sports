@@ -6,9 +6,9 @@
   const base=new URL('.',document.currentScript?.src||new URL('assets/',location.href));
   const config={
     nfl:{className:'ae-is-nfl',root:'camNflQuiniela',status:'camNflStatus',
-      src:'cam-nfl-quiniela.js?v=20261104-nfl-take-quiniela-1'},
+      src:'cam-nfl-quiniela.js?v=20261108-signed-scoring-1'},
     football:{className:'ae-is-football',root:'camFootballQuiniela',status:'camFootballStatus',
-      src:'cam-football-quiniela.js?v=20261104-duelo-aficion-1'}
+      src:'cam-football-quiniela.js?v=20261108-signed-scoring-1'}
   };
   const requests=new Map();
   const loaded=new Set();
@@ -18,7 +18,7 @@
     if(standingsRequest)return standingsRequest;
     standingsRequest=new Promise((resolve,reject)=>{
       const script=document.createElement('script');
-      script.src=new URL('cam-quiniela-standings.js?v=20261029-1',base).href;
+      script.src=new URL('cam-quiniela-standings.js?v=20261108-monthly-leagues-1',base).href;
       script.onload=resolve;
       script.onerror=()=>{script.remove();reject(Error('No se pudo cargar la clasificación.'));};
       document.head.append(script);

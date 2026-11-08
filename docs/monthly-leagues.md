@@ -17,6 +17,10 @@ readable without relying only on color.
 - Quinielas use existing awarded points and only final games with a winner or
   football outcome. Month is the game's kickoff in Toronto; the minimum is
   50% (rounded up) of the final games in that league across competitions.
+- Correct quiniela predictions earn their selected published points; misses
+  lose that same selection's points. NFL ties/cancellations and football
+  cancellations score zero. The NFL laurel doubles wins only; misses lose
+  the base points. Signed totals drive standings, profiles, Parties and ranks.
 - Only eligible participants determine percentiles and awards. The top 20%
   rise one rank; the bottom 20% lose one. Promotion slots round up and demotion
   slots round down so a tiny league does not assign the same player both.

@@ -8,12 +8,12 @@ const tick=()=>new Promise(resolve=>setTimeout(resolve,15));
 const fixture=(id,extra={})=>({game_id:id,team_id:'BUF',awarded_points:4,settled_at:'2026-10-25T22:00:00Z',
   game:{id,season:2026,week:8,kickoff:'2026-10-25T17:00:00Z',status:'final',winner_id:'BUF',home_id:'BUF',away_id:'KC',
     home:{name:'Buffalo Bills'},away:{name:'Kansas City Chiefs'},home_score:24,away_score:21,...extra}});
-const nfl=[fixture('one'),fixture('two',{week:7,winner_id:'KC'}),fixture('old',{season:2025,week:6}),
+const nfl=[fixture('one'),{...fixture('two',{week:7,winner_id:'KC'}),awarded_points:-4},fixture('old',{season:2025,week:6}),
   {...fixture('pending',{week:9,status:'scheduled',kickoff:'2099-11-01T18:00:00Z'}),settled_at:null,awarded_points:0},
   {...fixture('void',{week:8,status:'tie'}),awarded_points:0}];
 const football=[
   {...fixture('f1',{competition:'laliga',matchday:10,week:undefined,outcome:'draw',home:{name:'Barcelona'},away:{name:'Sevilla'}}),pick:'draw',awarded_points:8},
-  {...fixture('f2',{competition:'premier',matchday:10,week:undefined,outcome:'away',home:{name:'Arsenal'},away:{name:'Chelsea'}}),pick:'home',awarded_points:0}
+  {...fixture('f2',{competition:'premier',matchday:10,week:undefined,outcome:'away',home:{name:'Arsenal'},away:{name:'Chelsea'}}),pick:'home',awarded_points:-4}
 ];
 const calls=[];let fail=false,delayed=null,play=null,opening=null;
 w.db={from(table){
@@ -36,12 +36,13 @@ assert.match(root.textContent,/Pronóstico guardado/);
 const select=(id,value)=>{const n=d.getElementById(id);n.value=value;n.dispatchEvent(new w.Event('change'));};
 select('camQhRound','8');assert.match(root.textContent,/4 pts · 1\/1 aciertos · 2 pronósticos/);
 assert.match(root.textContent,/Acertado · \+4 pts/);assert.match(root.textContent,/Anulado · 0 pts/);
-select('camQhRound','7');assert.match(root.textContent,/Fallado · 0 pts/);
+select('camQhRound','7');assert.match(root.textContent,/Fallado · −4 pts/);assert.match(root.textContent,/-4 pts · 0\/1 aciertos/);
 select('camQhSeason','2025');assert.equal(d.getElementById('camQhRound').value,'6');
 root.querySelector('[data-sport="football"]').click();await tick();
 assert.equal(calls.length,2);assert.match(calls[1].select,/cam_football_games.*cam_football_teams!home_id/);
 assert.match(root.textContent,/Tu pronóstico: Empate/);assert.match(root.textContent,/Acertado · \+8 pts/);
 select('camQhLeague','premier');assert.match(root.textContent,/Arsenal/);assert.doesNotMatch(root.textContent,/Barcelona/);
+assert.match(root.textContent,/Fallado · −4 pts/);assert.match(root.textContent,/-4 pts · 0\/1 aciertos/);
 root.querySelector('[data-sport="nfl"]').click();await tick();assert.equal(calls.length,2,'switching cached sports and filters does not query again');
 root.lastElementChild.click();assert.equal(play,'nfl');
 view(null);assert.equal(root.hidden,true);assert.equal(root.textContent,'');

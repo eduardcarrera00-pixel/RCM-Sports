@@ -3040,7 +3040,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
               <header class="cam-nfl-heading">
                 <span>CAM SPORTS · NFL</span>
                 <h2 id="camNflTitle">LA QUINIELA NFL</h2>
-                <p><strong>Cada jornada es una oportunidad para demostrar cuánto sabes.</strong></p>
+                <p><strong>Aciertas: sumas. Fallas: restas.</strong> Tus puntos cuentan para la liga mensual.</p>
               </header>
               <nav id="camNflViewTabs" class="cam-quiniela-view-tabs" aria-label="Vistas de La Quiniela">
                 <button type="button" data-view="jornada" aria-pressed="true" aria-controls="camNflMatchPanel">Partidos</button>
@@ -3059,10 +3059,10 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
             </div>
             <details class="cam-nfl-rules">
               <summary>¿Cómo funcionan los puntos?</summary>
-              <p>Antes de abrir cada partido congelamos las probabilidades reales, sin el margen de la casa. La fórmula es <strong>máximo de 2, mínimo de 12 y redondear 2 dividido entre la probabilidad</strong>.</p>
+              <p>Antes de abrir cada partido congelamos las probabilidades reales, sin el margen de la casa. Redondeamos 2 dividido entre la probabilidad, con un <strong>mínimo de 2 y un máximo de 12 puntos</strong>.</p>
               <p>Favorito al 80 %: 3 puntos. Partido equilibrado al 50 %: 4 puntos. Sorpresa al 25 %: 8 puntos.</p>
-              <p>Acertar suma los puntos mostrados; fallar, empatar o anular suma 0. Puedes editar hasta el inicio de cada partido. Las quinielas no modifican los puntos de Takes o Picks.</p>
-              <p id="camNflLaurelRule" hidden><strong>El laurel.</strong> Una vez por jornada puedes ponerle el laurel a un partido que ya pronosticaste: si aciertas, vale el doble; si fallas, 0. Puedes cambiarlo de partido hasta que empiece el que lo lleva.</p>
+              <p>Acertar suma los puntos de tu selección; fallar resta esa misma cantidad. Un empate NFL o una anulación vale 0. Por ejemplo, una selección de 4 puntos suma +4 al acertar y resta −4 al fallar. Ese saldo decide tu clasificación y el ascenso o descenso mensual en la liga NFL. Puedes editar hasta el inicio del partido.</p>
+              <p id="camNflLaurelRule" hidden><strong>El laurel.</strong> Una vez por jornada puedes ponerle el laurel a un partido que ya pronosticaste: si aciertas, suma el doble; si fallas, resta los puntos base. Puedes cambiarlo de partido hasta que empiece el que lo lleva.</p>
               <p id="camNflExpertRule" hidden><strong>¿Le ganas al editor?</strong> En cada partido verás qué eligió el editor. Lo que eligió la comunidad aparece cuando empieza el partido, si lo eligieron al menos 5 personas.</p>
             </details>
 
@@ -3083,7 +3083,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
               <header class="cam-nfl-heading">
                 <span>CAM SPORTS · FÚTBOL</span>
                 <h2 id="camFootballTitle">LA QUINIELA DE FÚTBOL</h2>
-                <p><strong>Cada jornada es una oportunidad para demostrar cuánto sabes.</strong> LaLiga, Premier, Liga MX y Champions: elige local, empate o visitante y cuanto más difícil sea el acierto, más puntos sumas.</p>
+                <p><strong>Aciertas: sumas. Fallas: restas.</strong> Elige local, empate o visitante y compite en la liga mensual.</p>
                 <!-- Arte decorativo independiente del texto: editable por tema desde Modo Edición. -->
                 <img class="cam-football-quiniela-illustration cam-football-quiniela-illustration--day" src="assets/cam-football-quiniela-day.svg" alt="" aria-hidden="true" width="300" height="240" loading="lazy" decoding="async">
                 <img class="cam-football-quiniela-illustration cam-football-quiniela-illustration--night" src="assets/cam-football-quiniela-night.svg" alt="" aria-hidden="true" width="300" height="240" loading="lazy" decoding="async">
@@ -3107,7 +3107,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
               <summary>¿Cómo funcionan los puntos?</summary>
               <p>Los puntos de local, empate y visitante se calculan automáticamente y quedan fijados antes de abrir el partido. Con datos disponibles, el sistema descuenta el margen de la casa y redondea 2 dividido entre la probabilidad, con un mínimo de 2 y un máximo de 12 puntos.</p>
               <p>Un resultado menos probable suma más puntos. Si faltan datos, las tres opciones valen 6 puntos. Los puntos publicados son iguales para todos y no cambian con las cuotas posteriores.</p>
-              <p>Acertar suma los puntos mostrados; fallar o anular suma 0. El empate es un resultado más y paga sus propios puntos. Puedes editar hasta el inicio de cada partido. Las quinielas no modifican los puntos de Takes o Picks.</p>
+              <p>Acertar suma los puntos de tu selección; fallar resta esa misma cantidad. Una anulación vale 0. El empate es un resultado más: suma sus puntos si lo aciertas y los resta si lo fallas. Ese saldo decide tu clasificación y el ascenso o descenso mensual en la liga de Fútbol. Puedes editar hasta el inicio del partido.</p>
             </details>
 
             <section id="camFootballAdmin" class="cam-nfl-admin" aria-label="Controles de administradores" hidden></section>
@@ -5627,9 +5627,9 @@ html .cam-weekly-result-surface .cam-weekly-result-on-photo{
 </style>
 <script src="assets/cam-weekly-results.js?v=20261025-admin-resolved-pick-1"></script>
 <script src="assets/cam-profile-overview.js?v=20261104-perfil-claro-1"></script>
-<script src="assets/cam-profile-quiniela.js?v=20261104-perfil-claro-1"></script>
+<script src="assets/cam-profile-quiniela.js?v=20261108-signed-scoring-1"></script>
 <script src="assets/ae-profile.js?v=20261108-monthly-leagues-1"></script>
-<script src="assets/cam-leagues.js?v=20261108-monthly-leagues-1"></script>
+<script src="assets/cam-leagues.js?v=20261108-signed-scoring-1"></script>
 <style id="cam-nfl-quiniela-theme">
 /* ===========================================================================
    CAM SPORTS · La Quiniela NFL — lenguaje visual curvo, editorial y compacto.
@@ -6415,7 +6415,7 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 <!-- Componentes finales: móvil, conversación, parties, perfil y Takes; orden en performance-css-packs.json. -->
 <link rel="stylesheet" href="assets/cam-perf-app-panels.css?v=20261108-monthly-leagues-1">
 <script src="assets/cam-parties.js?v=20261104-perfil-claro-1"></script>
-<script src="assets/cam-sport-quiniela-loader.js?v=20261104-duelo-aficion-1"></script>
+<script src="assets/cam-sport-quiniela-loader.js?v=20261108-signed-scoring-1"></script>
 <script src="assets/ae-season-predictions.js?v=20261021-champion-guide-1"></script>
 <script src="assets/cam-lazy-editorial-loader.js?v=20261104-actualidad-1"></script>
 <script src="assets/cam-opinions-section-banners.js?v=20261104-actualidad-1"></script>

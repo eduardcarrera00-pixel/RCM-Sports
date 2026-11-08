@@ -75,6 +75,7 @@ function rules(){
   const text=el('div');
   text.append(el('p','Cada mes: el 20 % superior sube un rango, el 60 % central lo conserva y el 20 % inferior baja. Se redondean las plazas de ascenso hacia arriba y las de descenso hacia abajo.'));
   text.append(el('p','Para clasificar: 10 Picks acertados o fallados, o pronósticos en al menos el 50 % de los partidos resueltos de la quiniela. Los anulados, pendientes y rechazados no cuentan.'));
+  text.append(el('p','En las quinielas, cada acierto suma los puntos de tu selección y cada fallo resta esa misma cantidad. Los anulados y empates de NFL valen 0. El laurel NFL duplica el acierto; un fallo resta los puntos base. Ese saldo decide la clasificación y el cambio de rango.'));
   text.append(el('p','Leyenda CAM: desde Diamante, dos meses seguidos en el 5 % superior. Se conserva terminando en el 10 % superior. Dos meses sin el mínimo bajan un rango; las pausas deportivas no penalizan.'));
   text.append(el('p','Los resultados del mes cierran el día 1 siguiente a las 12:00, hora de Toronto. El Top 10 gana una insignia para el mes siguiente y la conserva en su historial. Empates: puntos, aciertos, porcentaje de acierto y primer resultado registrado.'));
   const ladder=el('ol',null,'cam-league-ladder');LEVELS.forEach((name,i)=>{const li=el('li');li.append(emblem(i),el('span',name));ladder.append(li);});
