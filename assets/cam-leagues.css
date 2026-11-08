@@ -1,0 +1,96 @@
+/* Ligas CAM. Scoped accents preserve the site's established day/night surfaces. */
+[data-rank="cobre"],[data-league-rank="cobre"]{--league-metal:#cc9878;--league-wash:rgba(173,112,76,.16)}
+[data-rank="bronce"],[data-league-rank="bronce"]{--league-metal:#dbac79;--league-wash:rgba(179,125,64,.17)}
+[data-rank="plata"],[data-league-rank="plata"]{--league-metal:#c6d8e8;--league-wash:rgba(155,184,210,.18)}
+[data-rank="oro"],[data-league-rank="oro"]{--league-metal:#edc76b;--league-wash:rgba(207,163,54,.18)}
+[data-rank="platino"],[data-league-rank="platino"]{--league-metal:#87ddd0;--league-wash:rgba(64,183,169,.16)}
+[data-rank="diamante"],[data-league-rank="diamante"]{--league-metal:#97caff;--league-wash:rgba(75,149,227,.19)}
+[data-rank="leyenda"],[data-league-rank="leyenda"]{--league-metal:#dbb3fa;--league-wash:rgba(165,103,211,.19)}
+.cam-rank-emblem{display:inline-flex;flex:0 0 38px;width:38px;height:44px;align-items:center;justify-content:center;color:var(--league-metal,#cc9878)}
+.cam-rank-emblem svg{width:100%;height:100%;overflow:visible}
+.cam-rank-shield{fill:#0d2c44;stroke:currentColor;stroke-width:2}
+.cam-rank-symbol{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+html body #aeProfileDialog[data-league-rank]{border-color:var(--league-metal)}
+html body #aeProfileDialog[data-league-rank] .cam-profile-head{border-bottom:1px solid var(--league-metal);background:radial-gradient(ellipse at 95% 10%,var(--league-wash),transparent 65%),#0b2233}
+html body #aeProfileDialog[data-league-rank] .cam-profile-avatar{border-color:var(--league-metal);color:var(--league-metal);background:linear-gradient(135deg,var(--league-wash),transparent),#0d2c44;box-shadow:0 0 0 3px var(--league-wash)}
+html body #aeProfileDialog[data-league-rank="leyenda"] .cam-profile-avatar{border-radius:20px 20px 28px 28px;box-shadow:0 0 0 3px var(--league-wash),0 5px 24px var(--league-wash)}
+.cam-profile-rank{display:flex;align-items:center;gap:6px;margin-top:7px;color:var(--league-metal,#cc9878);font:700 12px/1.4 Inter,system-ui,sans-serif}
+.cam-profile-rank:empty,.cam-profile-awards:empty{display:none}
+.cam-profile-rank .cam-rank-emblem{flex-basis:20px;width:20px;height:24px}
+.cam-profile-awards{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.cam-top10-badge{display:inline-flex;align-items:center;gap:5px;width:fit-content;max-width:100%;padding:4px 7px;border:1px solid #b79a76;border-radius:7px;background:#0a3268;color:#ffe3a5;font:700 10px/1.35 Inter,system-ui,sans-serif;overflow-wrap:anywhere}
+.cam-top10-symbol{font-weight:900;color:#edc76b}
+.cam-top10-badge[data-podium="1"]{background:#5d471c;color:#fff0bf;border-color:#e2bd64}
+.cam-top10-badge[data-podium="2"]{background:#324558;color:#f0f5fc;border-color:#b9cedd}
+.cam-top10-badge[data-podium="3"]{background:#65452e;color:#ffdfba;border-color:#cc9878}
+.cam-top10-badge.is-provisional{background:transparent;border-style:dashed;color:inherit}
+.cam-profile-leagues{margin:18px 30px 24px;padding:18px;border:1px solid var(--ae-profile-line,#49606c);border-radius:18px;background:rgba(7,35,51,.3);color:inherit}
+.cam-profile-leagues[hidden],#aeProfileDialog.is-editing .cam-profile-leagues{display:none!important}
+.cam-league-heading{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.cam-league-heading h3{margin:0;font:600 22px/1.2 'Playfair Display',Georgia,serif}
+.cam-league-heading>span{font:500 11px/1.4 Inter,system-ui,sans-serif;opacity:.8;text-transform:capitalize}
+.cam-league-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+html body .cam-league-card{display:flex;flex-wrap:wrap;align-items:center;gap:10px;min-width:0;padding:14px 12px;border:1px solid #49606c;border-radius:12px;background:linear-gradient(145deg,var(--league-wash),transparent);color:inherit;text-align:left;cursor:pointer}
+html body .cam-league-card[aria-pressed="true"]{border-color:var(--league-metal);box-shadow:inset 0 0 0 1px var(--league-metal)}
+.cam-league-card-copy{display:flex;flex:1 1 90px;min-width:0;flex-direction:column;gap:4px;overflow-wrap:anywhere}
+.cam-league-card-copy>small{font:500 10px/1.4 Inter,system-ui,sans-serif;opacity:.85}
+.cam-league-card-copy>strong{font:600 20px/1.2 'Playfair Display',Georgia,serif}
+.cam-league-state,.cam-league-place{font:600 11px/1.5 Inter,system-ui,sans-serif}
+.cam-league-state{min-height:32px}
+.cam-league-place{width:100%}
+.cam-league-actions{margin-top:12px}
+html body .cam-league-link,html body .cam-league-entry{min-height:44px;padding:9px 12px;border:1px solid #8d8174;border-radius:10px;background:transparent;color:inherit;font:700 12px/1.5 Inter,system-ui,sans-serif;cursor:pointer}
+.cam-league-entry{margin:10px 0}
+.cam-league-rules,.cam-league-history{margin-top:12px;border-top:1px solid var(--ae-profile-line,#49606c);padding-top:8px;font:400 12px/1.6 Inter,system-ui,sans-serif}
+.cam-league-rules summary,.cam-league-history summary{min-height:44px;display:list-item;align-content:center;cursor:pointer;font-weight:700;padding:8px 0}
+.cam-league-history ul{padding:0;list-style:none}
+.cam-league-history li{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--ae-profile-line,#49606c)}
+.cam-league-history li>span:first-child{flex:1 1 180px;text-transform:capitalize}
+.cam-league-history li>small{width:100%}
+.cam-league-ladder{display:grid;grid-template-columns:repeat(auto-fit,minmax(72px,1fr));gap:10px;list-style:none;padding:8px 0}
+.cam-league-ladder li{display:flex;align-items:center;flex-direction:column;text-align:center;font-size:10px}
+.cam-league-dialog{width:min(740px,calc(100% - 24px));max-height:90dvh;margin:auto;padding:22px;border:1px solid #8d8174;border-radius:22px;background:#0b2233;color:#f3ebdd;overflow:auto}
+.cam-league-dialog::backdrop{background:rgba(4,17,29,.78)}
+.cam-league-dialog>header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.cam-league-dialog h2{margin:0;font:600 clamp(23px,4vw,30px)/1.25 'Playfair Display',Georgia,serif}
+html body .cam-league-close{width:44px;height:44px;flex:0 0 44px;border:1px solid #8d8174;border-radius:50%;background:transparent;color:inherit;font-size:28px;cursor:pointer}
+#camLeagueTabs{display:flex;flex-wrap:wrap;gap:6px;margin:16px 0}
+html body .cam-league-tab{min-height:44px;border:1px solid #8d8174;border-radius:10px;padding:6px 10px;background:transparent;color:inherit;font:600 12px/1.4 Inter,system-ui,sans-serif;cursor:pointer}
+html body .cam-league-tab[aria-pressed="true"]{background:#d4ad78;color:#102b3e}
+.cam-league-status{font:400 13px/1.5 Inter,system-ui,sans-serif}
+.cam-league-board-list{padding:0;list-style:none}
+.cam-league-board-list>li{display:grid;grid-template-columns:30px 30px minmax(0,1fr) auto;align-items:center;gap:8px;padding:14px 0;border-bottom:1px solid #49606c}
+.cam-league-board-list .cam-rank-emblem{width:28px;height:34px}
+html body .cam-league-person{min-height:44px;min-width:0;padding:4px 0;border:0;background:transparent;color:inherit;text-align:left;overflow-wrap:anywhere;font:600 14px/1.4 Inter,system-ui,sans-serif;cursor:pointer}
+.cam-league-board-list strong{font:700 12px/1.4 Inter,system-ui,sans-serif}
+.cam-league-board-meta{grid-column:3/-1;font:400 11px/1.5 Inter,system-ui,sans-serif;opacity:.85}
+.cam-league-board-list .cam-top10-badge{grid-column:3/-1}
+.cam-author-rank{display:inline-flex;align-items:center;flex-wrap:wrap;gap:3px;margin-left:5px;vertical-align:middle}
+.cam-author-rank .cam-rank-emblem{width:17px;height:20px;flex-basis:17px}
+.cam-author-rank .cam-top10-badge{font-size:9px;padding:2px 4px}
+html body :is(.cam-league-card,.cam-league-link,.cam-league-entry,.cam-league-tab,.cam-league-person,.cam-league-close):focus-visible{outline:2px solid #bd8d6b;outline-offset:3px}
+html:not(.dark) body .cam-profile-leagues,html:not(.dark) body .cam-league-dialog{background:#fffaf2;color:#273b49;border-color:#d4c9b9}
+html:not(.dark) [data-league-rank="cobre"]{--league-ink:#825234}
+html:not(.dark) [data-league-rank="bronce"]{--league-ink:#825727}
+html:not(.dark) [data-league-rank="plata"]{--league-ink:#43596b}
+html:not(.dark) [data-league-rank="oro"]{--league-ink:#70551d}
+html:not(.dark) [data-league-rank="platino"]{--league-ink:#21665c}
+html:not(.dark) [data-league-rank="diamante"]{--league-ink:#205b9c}
+html:not(.dark) [data-league-rank="leyenda"]{--league-ink:#6c398e}
+html:not(.dark) body #aeProfileDialog[data-league-rank] .cam-profile-head{background:radial-gradient(ellipse at 95% 10%,var(--league-wash),transparent 65%),#f3ebdd;color:#273b49}
+html:not(.dark) body #aeProfileDialog[data-league-rank] .cam-profile-head h2{color:#143449;text-shadow:none}
+html:not(.dark) body #aeProfileDialog[data-league-rank] .cam-profile-names p{color:#566876}
+html:not(.dark) body #aeProfileDialog[data-league-rank] .cam-profile-rank{color:var(--league-ink,#825234)}
+html:not(.dark) body .cam-league-card{border-color:#b1a28f}
+html:not(.dark) body .cam-league-card[aria-pressed="true"]{border-color:#715b43;box-shadow:inset 0 0 0 1px #715b43}
+html:not(.dark) body .cam-league-board-list>li{border-color:#d4c9b9}
+@media(max-width:640px){
+ .cam-profile-leagues{margin:14px 14px 20px;padding:14px}
+ .cam-league-cards{grid-template-columns:1fr}
+ html body .cam-league-card{display:grid;grid-template-columns:38px minmax(0,1fr);gap:8px 12px;padding:12px}
+ .cam-league-card .cam-league-place,.cam-league-card .cam-top10-badge{grid-column:2}
+ .cam-league-card-copy{gap:3px}
+ .cam-league-state{min-height:0}
+ .cam-league-dialog{padding:16px;max-height:92dvh}
+ .cam-league-board-list>li{grid-template-columns:24px 26px minmax(0,1fr) auto;gap:6px}
+}

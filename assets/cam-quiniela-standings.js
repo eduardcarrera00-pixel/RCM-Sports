@@ -66,6 +66,7 @@
       const initial=el('span',String(line.username||'A').replace(/^@/,'').charAt(0).toLocaleUpperCase('es'),'cam-q-avatar');
       initial.setAttribute('aria-hidden','true');
       identity.replaceChildren(initial,el('span','@'+line.username,'cam-q-username'));
+      window.CamLeagues?.markAuthor(identity,line.user_id,target.id.includes('Football')?'football':'nfl');
       if(own)identity.append(el('span','Tú','cam-q-you'));
       row.cells[1].insertBefore(el('span',format(line.hits)+' aciertos de '+format(line.resolved)+' · '+format(line.accuracy)+' %','cam-q-mobile-stats'),row.cells[1].querySelector('details'));
       const details=row.querySelector('details');
@@ -102,6 +103,7 @@
       if(observer)observer.observe(row);
       else details.addEventListener('toggle',()=>{if(details.open)drain();});
     });
+    window.CamLeagues?.mountEntry(target,target.id.includes('Football')?'football':'nfl');
     // The observer must not keep removed rankings alive after a period switch.
     if(observer){
       const cleanup=new MutationObserver(()=>{
@@ -117,6 +119,7 @@
       el('p','Todavía no hay resultados definitivos en este periodo. Guarda tus pronósticos y vuelve cuando terminen los partidos.','cam-q-race-meta'));
     const play=el('button','Ir a la jornada','cam-nfl-action');play.type='button';
     play.addEventListener('click',onPlay);card.append(play);target.replaceChildren(card);
+    window.CamLeagues?.mountEntry(target,target.id.includes('Football')?'football':'nfl');
   }
   window.CamQuinielaStandings=Object.freeze({enhance,streak,empty});
 })();

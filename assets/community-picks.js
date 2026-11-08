@@ -149,6 +149,7 @@ function card(p,compact=false,detail=false,viewerId=currentViewerId,variant='fee
    }
    profileButton.setAttribute('aria-label','Ver perfil de '+(p.author||'Aficionado'));
    profileButton.title='Ver perfil de '+(p.author||'Aficionado');
+   window.CamLeagues?.markAuthor(profileButton,p.user_id,'picks');
    header.append(profileButton);
  }else{
    header.append(el('strong','@'+(p.author||'Aficionado'),'cp-feed-author-label'));
@@ -499,6 +500,7 @@ function chefRankingEntry(record,index,voids,kind,picks){
    profile.className='ae-take-name ae-chef-profile-link';
    profile.setAttribute('aria-label','Ver perfil y Picks de '+name);
    profile.title='Perfil de '+name;
+   window.CamLeagues?.markAuthor(profile,record.user_id,'picks');
    person.append(profile);
  }else{
    person.append(el('span',name,'ae-take-name'));

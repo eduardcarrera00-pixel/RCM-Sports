@@ -3,6 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
+    "test:leagues": "node tests/monthly-leagues.mjs && node tests/monthly-leagues-ui.mjs",
     "build:css": "tailwindcss -i assets/styles-input.css -o assets/site.css --minify && node scripts/build-editorial-css.mjs && node scripts/build-performance-css.mjs",
     "test:database": "node tests/database.mjs",
     "test:database:performance": "node tests/database-performance.mjs",

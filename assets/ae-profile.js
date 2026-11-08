@@ -1048,6 +1048,7 @@ function clearSections(){
 }
 
 async function showOwn(tab='perfil'){
+  document.dispatchEvent(new CustomEvent('cam:profile-view',{detail:{userId:null}}));
   // La ventana se abre al primer toque; la sesión (ya leída) llega después.
   const ticket=++request;
   const dialog=$('aeProfileDialog');
@@ -1082,6 +1083,7 @@ async function showOwn(tab='perfil'){
 
 async function showPublic(id,push=true,tab='perfil'){
   if(!UUID.test(id))return;
+  document.dispatchEvent(new CustomEvent('cam:profile-view',{detail:{userId:null}}));
   // «quiniela» se conserva para el perfil propio (baja a Mis jornadas).
   tab=typeof tab==='string'&&tab==='quiniela'?tab:validTab(typeof tab==='string'?tab:'perfil');
   const user=await me();
