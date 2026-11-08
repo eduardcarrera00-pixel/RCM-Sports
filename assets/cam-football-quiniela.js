@@ -44,6 +44,8 @@
   const inScope=()=>games.filter(g=>g.competition===competition&&Number(g.season)===season);
   const roundGames=()=>inScope().filter(g=>Number(g.matchday)===matchday)
     .sort((a,b)=>Date.parse(a.kickoff)-Date.parse(b.kickoff));
+  const liveGames=()=>inScope().filter(g=>g.status==='live'||
+    (g.status==='scheduled'&&Date.parse(g.kickoff)<=now()&&Date.parse(g.kickoff)+4*36e5>now()));
 
   function groupedDays(fixtures){
     const groups=new Map();
@@ -165,6 +167,27 @@
       for(const id of ['camFootballSave','camFootballSaveDay']){const b=$(id);if(b)b.disabled=true;}
       renderAdmin();
     }finally{loading=false;announce();}
+  }
+  // Leer marcadores sin recargar equipos, sesión, elecciones o borradores.
+  let refreshingLive=false;
+  async function refreshLive(){
+    const ids=liveGames().map(g=>g.id),c=client(),ticket=request;
+    if(!loaded||loading||changingCompetition||refreshingLive||!ids.length||!c)return;
+    refreshingLive=true;
+    try{
+      const rows=await run(c.from('cam_football_games')
+        .select('id,status,home_score,away_score,outcome,picks_open').in('id',ids));
+      if(ticket!==request)return;
+      const updates=new Map((rows||[]).map(g=>[g.id,g]));
+      let changed=false;
+      games=games.map(g=>{
+        const next=updates.get(g.id);
+        if(!next||Object.keys(next).every(key=>g[key]===next[key]))return g;
+        changed=true;return {...g,...next};
+      });
+      if(changed){paintGames();announce();}
+    }catch{/* Mantener el último resultado conocido si el proveedor no responde. */}
+    finally{refreshingLive=false;}
   }
   async function loadMine(){
     const ticket=++mineRequest,owner=user?.id,league=competition,year=season;
@@ -669,11 +692,12 @@
   window.camFootballQuiniela=Object.freeze({
     snapshot:()=>({loaded,loading:loading||changingCompetition,error:loadError,competition,season,matchday,
       games:roundGames().map(g=>({...g})),
+      liveGames:liveGames().map(g=>({...g})),
       results:inScope().filter(g=>g.status==='final').map(g=>({...g})),
       teams:new Map([...teams].map(([id,t])=>[id,{...t}])),
       mine:new Map([...mine].map(([id,row])=>[id,row.pick])),draft:new Map(draft),
       user:user?{id:user.id}:null,competitionName:competitionName(competition)}),
-    isOpen,save:saveOne,focus:focusGame,selectCompetition,competitionNav,refresh:hydrate
+    isOpen,save:saveOne,focus:focusGame,selectCompetition,competitionNav,refresh:hydrate,refreshLive
   });
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup,{once:true});
   else setup();

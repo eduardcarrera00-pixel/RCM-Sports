@@ -23,6 +23,8 @@
   const gameDay=game=>torontoDate(game.kickoff);
   const weekGames=()=>games.filter(g=>Number(g.season)===season&&Number(g.week)===week)
     .sort((a,b)=>Date.parse(a.kickoff)-Date.parse(b.kickoff));
+  const liveGames=()=>games.filter(g=>Number(g.season)===season&&(g.status==='live'||
+    (g.status==='scheduled'&&Date.parse(g.kickoff)<=now()&&Date.parse(g.kickoff)+6*36e5>now())));
   function groupedDays(fixtures){
     const groups=new Map();
     for(const game of fixtures){
@@ -156,6 +158,27 @@
       const own=await client().from('cam_nfl_laurels').select('season,week,game_id').eq('user_id',user.id).eq('season',season).limit(40);
       if(!own.error){laurelReady=true;for(const row of own.data||[])laurels.set(weekKey(row.season,row.week),row.game_id);}
     }catch{}
+  }
+  // Actualizar solo los marcadores visibles, sin recargar sesión ni borrar borradores.
+  let refreshingLive=false;
+  async function refreshLive(){
+    const ids=liveGames().map(g=>g.id),c=client(),ticket=request;
+    if(!loaded||loading||refreshingLive||!ids.length||!c)return;
+    refreshingLive=true;
+    try{
+      const rows=await run(c.from('cam_nfl_games')
+        .select('id,status,home_score,away_score,winner_id,picks_open').in('id',ids));
+      if(ticket!==request)return;
+      const updates=new Map((rows||[]).map(g=>[g.id,g]));
+      let changed=false;
+      games=games.map(g=>{
+        const next=updates.get(g.id);
+        if(!next||Object.keys(next).every(key=>g[key]===next[key]))return g;
+        changed=true;return {...g,...next};
+      });
+      if(changed){paintGames();announce();}
+    }catch{/* Conservar el último marcador disponible si falla la conexión. */}
+    finally{refreshingLive=false;}
   }
   // Elecciones del editor y reparto de la comunidad de la jornada visible: una consulta por jornada.
   async function loadExtras(force){
@@ -700,12 +723,14 @@
     snapshot:()=>({
       loaded,season,week,user:user?{id:user.id}:null,
       games:games.slice(),
+      liveGames:liveGames().map(g=>({...g})),
       mine:new Map([...mine].map(([id,row])=>[id,row.team_id])),
       laurel:laurelReady?laurels.get(weekKey(season,week))||null:undefined,
       expert:expert.ready&&expert.key===weekKey(season,week)?{name:expert.name,picks:new Map([...expert.picks].map(([id,row])=>[id,row.team_id]))}:null,
       split:split.ready&&split.key===weekKey(season,week)?new Map(split.rows):null
     }),
     isOpen,
+    refreshLive,
     save:saveOne,
     focus:focusGame
   });

@@ -26,7 +26,7 @@
   const mobile = window.matchMedia('(max-width: 760px), (orientation: landscape) and (max-height: 500px) and (hover: none) and (pointer: coarse)');
   const TZ = 'America/Toronto';
   const H = 36e5;
-  const ui = { scoreOpen: false, savingGame: null, saveResult: null };
+  const ui = { scoreOpen: false, liveOpen: false, liveKey: null, savingGame: null, saveResult: null };
   const duelCache = new Map();   // 'temporada|semana|usuario' → fila de cam_nfl_expert_duel (o null)
 
   /* ---------- utilidades ---------- */
@@ -222,9 +222,19 @@
 
 
   function liveBlock(weekGames) {
-    const live = weekGames.filter(g => started(g) && !finished(g) && g.status !== 'cancelled' && g.status !== 'postponed');
-    if (!live.length) return null;
-    const box = section('envivo', 'En juego');
+    const live = weekGames.filter(g => g.status === 'live' || (g.status === 'scheduled' && started(g) && Date.parse(g.kickoff) + 6 * H > Date.now()))
+      .sort((a, b) => Date.parse(a.kickoff) - Date.parse(b.kickoff));
+    if (!live.length) { ui.liveOpen = false; return null; }
+    const box = el('details', null, 'cam-ns-block cam-ns-live', { 'data-block': 'envivo' });
+    box.open = ui.liveOpen;
+    const toggle = el('summary', null, 'cam-ns-live-toggle');
+    toggle.append(el('span', 'En juego', 'cam-ns-kicker'), el('span', live.length + (live.length === 1 ? ' partido' : ' partidos'), 'cam-ns-aside'));
+    box.append(toggle);
+    box.addEventListener('toggle', () => {
+      if (!box.isConnected || ui.liveOpen === box.open) return;
+      ui.liveOpen = box.open;
+      if (ui.liveOpen) refreshLive();
+    });
     const list = el('ul', null, 'cam-ns-results');
     for (const g of live) {
       const row = el('li', null, 'cam-ns-result');
@@ -337,6 +347,8 @@
     }
     const season = Number(snap.season);
     const week = currentWeek(games, season) ?? Number(snap.week);
+    const liveKey = season + '|' + week;
+    if (ui.liveKey !== liveKey) { ui.liveKey = liveKey; ui.liveOpen = false; }
     const weekGames = games.filter(g => Number(g.season) === season && Number(g.week) === week)
       .sort((a, b) => Date.parse(a.kickoff) - Date.parse(b.kickoff));
     const mode = phase(weekGames);
@@ -347,7 +359,7 @@
     const scoreWeek = score ? Number(score.dataset.week) : null;
     if (scoreWeek != null && snap.expert) void loadDuel(season, scoreWeek, snap.user);
     const blocks = {
-      envivo: liveBlock(weekGames),
+      envivo: liveBlock(snap.liveGames || weekGames),
       duelo: duel ? duelBlock(snap, duel, rankIds) : null,
       editor: expertBlock(snap, weekGames, scoreWeek),
       marcador: score
@@ -357,7 +369,9 @@
     scoreRoot?.replaceChildren(...[blocks.editor, blocks.marcador].filter(Boolean));
     for (const key of order) if (blocks[key]) fragment.append(blocks[key]);
     if (!weekGames.length) fragment.append(el('p', 'Todavía no hay partidos de esta semana. Vuelve cuando se publique el calendario.', 'cam-ns-text'));
+    const liveFocused = body.querySelector('.cam-ns-live-toggle') === document.activeElement;
     body.replaceChildren(fragment);
+    if (liveFocused) body.querySelector('.cam-ns-live-toggle')?.focus({ preventScroll: true });
     keepAnchor();
   }
 
@@ -416,4 +430,11 @@
   schedule();
 
   window.camNflSemana = Object.freeze({ render, _ui: ui, _choose: chooseDuel, _phase: phase });
+  function refreshLive() {
+    if (active() && !document.hidden && document.body.dataset.camTab === 'semana' && ui.liveOpen)
+      void quiniela()?.refreshLive?.();
+  }
+  setInterval(refreshLive, 60000);
+  window.addEventListener('focus', refreshLive);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) refreshLive(); });
 })();

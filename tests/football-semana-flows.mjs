@@ -10,6 +10,8 @@ async function scenario({anonymous=false,failed=false}={}){
   const d=w.document;d.body.innerHTML=html;
   w.matchMedia=query=>({matches:query.includes('max-width: 760px'),addEventListener(){},removeEventListener(){}});
   let frames=[],takeSport=null,logins=0,rejectSave=false,reads=0;
+  const intervals=[];
+  w.setInterval=(fn,ms)=>{intervals.push({fn,ms});return intervals.length;};
   w.requestAnimationFrame=fn=>frames.push(fn);
   w.Element.prototype.scrollIntoView=function(){w.lastScroll=this;};
   w.currentCategory='Todos';w.currentSearchQuery='';
@@ -23,7 +25,11 @@ async function scenario({anonymous=false,failed=false}={}){
   const g=(id,competition,home,away,h,ph,pd,pa)=>({id,competition,season,matchday:10,home_id:home,away_id:away,kickoff:iso(h),status:'scheduled',picks_open:true,odds_locked_at:iso(-24),points_home:ph,points_draw:pd,points_away:pa});
   F.tables.cam_football_games=[g('first','laliga','barca','atleti',24,3,5,7),g('duel','laliga','madrid','barca',72,4,7,4),g('payer','laliga','athletic','valencia',50,2,8,12),
     {...g('past','laliga','barca','madrid',-70,4,6,4),matchday:9,status:'final',home_score:0,away_score:1,outcome:'away',picks_open:false},
-    g('premier','premier','arsenal','city',48,4,7,4),g('champions','champions','barca','arsenal',80,4,7,4)];
+    g('premier','premier','arsenal','city',48,4,7,4),g('champions','champions','barca','arsenal',80,4,7,4),
+    {...g('live-a','laliga','athletic','valencia',-1,4,7,4),status:'live',home_score:0,away_score:0,matchday:9},
+    {...g('live-b','laliga','sociedad','atleti',-2,4,7,4),status:'live',home_score:null,away_score:null},
+    g('live-c','laliga','valencia','sociedad',-1,4,7,4),g('stale','laliga','madrid','barca',-30,4,7,4),
+    {...g('cancelled','laliga','barca','sociedad',-1,4,7,4),status:'cancelled'}];
   F.tables.cam_football_teams=['barca','atleti','madrid','sociedad','athletic','valencia','arsenal','city'].map(id=>({id,name:({madrid:'Real Madrid',barca:'FC Barcelona',atleti:'Atlético de Madrid'})[id]||id,short_name:id,abbreviation:id.slice(0,3).toUpperCase()}));
   F.tables.cam_football_picks=anonymous?[]:[{game_id:'first',user_id:'reader',pick:'home'},{game_id:'premier',user_id:'reader',pick:'draw'},{game_id:'champions',user_id:'reader',pick:'away'}];
   F.tableErrors=failed?{cam_football_games:'Calendario temporalmente no disponible'}:{};
@@ -81,6 +87,28 @@ async function scenario({anonymous=false,failed=false}={}){
   assert.equal(choose([],teams),null);
   assert.equal(choose([fixture('final','1','2','final')],teams).id,'final');
   assert.equal(one('#camFootballScore [data-block=marcador] .cam-ns-result-score').textContent,'barca 0 – 1 madrid');
+  let live=one('#camFootballSemana details[data-block=envivo]');
+  assert.equal(live.open,false,'live games start collapsed');
+  assert.equal(live.querySelector('.cam-ns-aside').textContent,'3 partidos');
+  assert.equal(live.querySelectorAll('li').length,3,'live matches from another round remain visible');
+  assert.match(live.textContent,/athletic 0 – 0 valencia/);
+  assert.match(live.textContent,/sociedad vs atleti/,'missing scores are not presented as zero');
+  const poll=intervals.find(i=>i.ms===60000).fn,initialReads=reads;
+  poll();await settle();assert.equal(reads,initialReads,'a closed panel does not fetch');
+  live.open=true;live.dispatchEvent(new w.Event('toggle'));await settle();
+  assert.equal(reads,initialReads+1,'opening only reads live match data');
+  live.querySelector('summary').focus();
+  F.tables.cam_football_games=F.tables.cam_football_games.map(g=>g.id==='live-a'?{...g,home_score:1}:g);
+  poll();await settle();live=one('#camFootballSemana details[data-block=envivo]');
+  assert.equal(live.open,true,'score updates preserve the expanded state');
+  assert.equal(d.activeElement,live.querySelector('summary'),'focus survives a score update');
+  assert.match(live.textContent,/athletic 1 – 0 valencia/);
+  assert.equal(api.snapshot().mine.get('first'),anonymous?undefined:'home');
+  w.camSectionTabs.select('takes',{scroll:false});await settle();
+  const hiddenReads=reads;poll();await settle();assert.equal(reads,hiddenReads,'another tab pauses score polling');
+  w.camSectionTabs.select('semana',{scroll:false});await settle();
+  live=one('#camFootballSemana details');live.open=false;live.dispatchEvent(new w.Event('toggle'));
+  const closedReads=reads;poll();await settle();assert.equal(reads,closedReads);
   assert.ok(one('#camFootballQuiniela').compareDocumentPosition(one('#camFootballScore'))&w.Node.DOCUMENT_POSITION_FOLLOWING,'the scoreboard follows the actual quiniela');
   one('.cam-ns-link-take').click();assert.equal(takeSport,'Fútbol');
   assert.equal(F.calls.filter(c=>c.rpc==='cam_football_save_pick').length,0,'a take never saves quiniela data');
@@ -127,4 +155,4 @@ async function scenario({anonymous=false,failed=false}={}){
   await w.happyDOM.close();
 }
 await scenario();await scenario({anonymous:true});await scenario({failed:true});
-console.log('PASS football week: NFL-style tabs, real fixtures, 1X2 save/error/login, match/day focus, competition races, saved picks, empty/error recovery and ranking routes.');
+console.log('PASS football week: collapsed live games across rounds, score refresh/focus, 1X2 save/error/login, competition races and navigation.');

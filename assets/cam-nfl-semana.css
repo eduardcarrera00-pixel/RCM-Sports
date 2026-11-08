@@ -221,6 +221,27 @@
     html body :is(#camNflSemana,#camFootballSemana) .cam-ns-section-title { margin-bottom:10px!important; }
     html body[data-cam-tabs="sport"][data-cam-tab="semana"] :is(#camNflScore,#camFootballScore):empty { display:none!important; }
 
+    /* En juego: un único control compacto; la lista solo ocupa espacio al abrir. */
+    html body :is(#camNflSemana,#camFootballSemana) .cam-ns-block.cam-ns-live { padding:0 14px!important; }
+    html body :is(#camNflSemana,#camFootballSemana) .cam-ns-live-toggle {
+      display:flex!important; align-items:center!important; gap:10px!important; min-height:48px!important;
+      margin:0!important; padding:0!important; border:0!important; border-radius:0!important;
+      background:none!important; color:var(--ns-accent)!important; list-style:none!important;
+      cursor:pointer!important; touch-action:manipulation!important; -webkit-tap-highlight-color:transparent!important;
+    }
+    html body :is(#camNflSemana,#camFootballSemana) .cam-ns-live-toggle .cam-ns-aside { margin-left:auto!important; }
+    html body :is(#camNflSemana,#camFootballSemana) .cam-ns-live-toggle::-webkit-details-marker { display:none!important; }
+    html body :is(#camNflSemana,#camFootballSemana) .cam-ns-live-toggle::marker { content:""!important; }
+    html body :is(#camNflSemana,#camFootballSemana) .cam-ns-live-toggle::after {
+      content:""!important; display:block!important; flex:0 0 7px!important; width:7px!important; height:7px!important;
+      border:solid currentColor!important; border-width:0 2px 2px 0!important; border-radius:0!important;
+      transform:rotate(45deg)!important; margin:0 2px 4px!important;
+    }
+    html body :is(#camNflSemana,#camFootballSemana) .cam-ns-live[open] > .cam-ns-live-toggle::after { transform:rotate(225deg)!important; margin-top:5px!important; }
+    html body :is(#camNflSemana,#camFootballSemana) .cam-ns-live-toggle:focus-visible { outline:2px solid var(--ns-accent)!important; outline-offset:2px!important; border-radius:6px!important; }
+    html body :is(#camNflSemana,#camFootballSemana) .cam-ns-live:not([open]) > .cam-ns-results { display:none!important; }
+    html body :is(#camNflSemana,#camFootballSemana) .cam-ns-live[open] > .cam-ns-results { padding:4px 0 12px!important; }
+
     /* marcador */
     html body :is(#camNflSemana,#camNflScore,#camFootballSemana,#camFootballScore) .cam-ns-results { display:block!important; }
     html body :is(#camNflSemana,#camNflScore,#camFootballSemana,#camFootballScore) .cam-ns-result {
