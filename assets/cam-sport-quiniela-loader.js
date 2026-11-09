@@ -18,7 +18,7 @@
     if(standingsRequest)return standingsRequest;
     standingsRequest=new Promise((resolve,reject)=>{
       const script=document.createElement('script');
-      script.src=new URL('cam-quiniela-standings.js?v=20261109-ranking-cards-1',base).href;
+      script.src=new URL('cam-quiniela-standings.js?v=20261109-league-table-1',base).href;
       script.onload=resolve;
       script.onerror=()=>{script.remove();reject(Error('No se pudo cargar la clasificación.'));};
       document.head.append(script);

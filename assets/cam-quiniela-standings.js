@@ -42,19 +42,31 @@
     if(month)caption.textContent=new Intl.DateTimeFormat('es',{month:'long',year:'numeric',timeZone:'UTC'})
       .format(new Date(Date.UTC(Number(month[1]),Number(month[2])-1,15)));
     else if(caption?.textContent.startsWith('Histórico'))caption.textContent='Todas las temporadas';
-    const board=el('ol',null,'cam-q-board');
+    const originalRows=[...table.querySelectorAll('tbody > tr')];
+    const board=el('table',null,'cam-nfl-table cam-q-board cam-q-league');
     board.setAttribute('aria-label','Clasificación de la quiniela');
-    board.setAttribute('role','list');
-    const rowNodes=[...table.querySelectorAll('tbody > tr')];
-    rowNodes.forEach((row,index)=>{
+    const thead=el('thead'),header=el('tr');
+    for(const [text,title,kind] of [
+      ['#','Posición','position'],['Usuario','Usuario','user'],
+      ['PJ','Pronósticos resueltos','played'],['A','Aciertos','hits'],
+      ['F','Fallos','misses'],['%','Porcentaje de acierto','accuracy'],
+      ['Pts','Puntos','points'],['','Estadísticas y pronósticos','expand']
+    ]){
+      const th=el('th',text);th.scope='col';th.dataset.kind=kind;th.title=title;
+      th.setAttribute('aria-label',title);header.append(th);
+    }
+    thead.append(header);board.append(thead);
+    const tbody=el('tbody');board.append(tbody);
+    originalRows.forEach((row,index)=>{
       const line=visibleRows[index];if(!line)return;
       const own=line.user_id===userId;
-      const card=el('li',null,'cam-q-card'+(own?' cam-q-own':''));
-      card.dataset.rank=String(line.rank_position);card.value=number(line.rank_position);
-      const head=el('div',null,'cam-q-card-head');
+      const standing=el('tr',null,'cam-q-league-row'+(own?' cam-q-own':''));
+      standing.dataset.rank=String(line.rank_position);
+      const cell=(value,kind)=>{const td=el('td',value);td.dataset.kind=kind;standing.append(td);return td;};
       const badge=el('span',format(line.rank_position),'cam-q-position');
       badge.setAttribute('aria-label','Puesto '+format(line.rank_position));
       if(number(line.rank_position)<=3)badge.title=['Primer puesto','Segundo puesto','Tercer puesto'][number(line.rank_position)-1];
+      cell(null,'position').append(badge);
       const identity=row.querySelector('td:nth-child(2) button');
       identity.classList.add('cam-q-identity');
       identity.title='Ver perfil de @'+line.username;
@@ -65,28 +77,38 @@
       if(own)name.append(el('span','Tú','cam-q-you'));
       identity.replaceChildren(initial,name);
       window.CamLeagues?.markAuthor(identity,line.user_id,target.id.includes('Football')?'football':'nfl');
-      const points=el('div',null,'cam-q-points');
+      cell(null,'user').append(identity);
+      cell(format(line.resolved),'played');
+      cell(format(line.hits),'hits');
+      cell(format(Math.max(0,number(line.resolved)-number(line.hits))),'misses');
+      cell(format(line.accuracy),'accuracy').setAttribute('aria-label',format(line.accuracy)+' % de acierto');
+      const points=cell(null,'points');points.className='cam-q-points';
       points.dataset.tone=number(line.points)<0?'negative':number(line.points)>0?'positive':'neutral';
-      points.append(el('strong',(number(line.points)>0?'+':'')+format(line.points)),el('span','pts'));
+      points.append(el('strong',format(line.points)));
       points.setAttribute('aria-label',format(line.points)+(Math.abs(number(line.points))===1?' punto':' puntos'));
-      head.append(badge,identity,points);card.append(head);
-      const metrics=el('dl',null,'cam-q-metrics');
-      const metric=(label,value,kind)=>{
-        const cell=el('div');cell.dataset.kind=kind;
-        cell.append(el('dt',label),el('dd',value));metrics.append(cell);
-      };
-      metric('Aciertos',format(line.hits),'hits');
-      metric('Fallos',format(Math.max(0,number(line.resolved)-number(line.hits))),'misses');
-      metric('Efectividad',format(line.accuracy)+' %','accuracy');
-      card.append(metrics);
       const details=row.querySelector('details');
-      details.querySelector('summary').textContent='Ver pronósticos';
+      const panelRow=el('tr',null,'cam-q-detail-row');
+      panelRow.hidden=true;panelRow.id=target.id+'Detail'+index;
+      const panel=el('td');panel.colSpan=8;panelRow.append(panel);panel.append(details);
+      const expand=el('button',null,'cam-q-expand');expand.type='button';
+      const arrow=el('span','⌄');arrow.setAttribute('aria-hidden','true');expand.append(arrow);
+      expand.setAttribute('aria-label','Ver estadísticas y pronósticos de @'+line.username);
+      expand.setAttribute('aria-controls',panelRow.id);expand.setAttribute('aria-expanded','false');
+      const sync=()=>{panelRow.hidden=!details.open;expand.setAttribute('aria-expanded',String(details.open));};
+      expand.addEventListener('click',()=>{details.open=!details.open;sync();});
+      details.addEventListener('toggle',sync);
+      cell(null,'expand').append(expand);
+      standing.addEventListener('click',event=>{if(!event.target.closest('button'))expand.click();});
+      details.querySelector('summary').textContent='Estadísticas y pronósticos';
       const stats=el('dl',null,'cam-q-stats');
       const stat=(label,value)=>{
         const pair=el('div');pair.append(el('dt',label));
         const output=el('dd',value);pair.append(output);stats.append(pair);return output;
       };
-      stat('Resueltos',format(line.resolved));
+      stat('Pronósticos resueltos',format(line.resolved));
+      stat('Aciertos',format(line.hits));
+      stat('Fallos',format(Math.max(0,number(line.resolved)-number(line.hits))));
+      stat('Efectividad',format(line.accuracy)+' %');
       stat('Distancia al líder',format(gap(line))+' pts');
       const current=stat('Racha de aciertos','Consultando…');
       current.className='cam-q-streak';
@@ -109,10 +131,11 @@
           }
         }
       });
-      // Move the existing controls so profile clicks and lazy result loading stay intact.
-      card.append(details);board.append(card);
+      tbody.append(standing,panelRow);
     });
-    table.replaceWith(board);
+    const wrap=el('div',null,'cam-q-table-wrap');wrap.append(board);
+    const legend=el('p','PJ: resueltos · A: aciertos · F: fallos','cam-q-legend');
+    table.replaceWith(wrap,legend);
     mountLeague(target);
   }
   function empty(target,onPlay){

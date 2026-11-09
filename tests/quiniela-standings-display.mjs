@@ -1,4 +1,4 @@
-/* Ranking cards preserve signed scores, aggregate counts and the real controls. */
+/* League rows preserve signed scores, aggregate counts and the real controls. */
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {Window} from 'happy-dom';
@@ -26,32 +26,40 @@ for(const prefix of ['camNfl','camFootball']){
   }
   target.append(table);
   w.CamQuinielaStandings.enhance(target,{rows,visibleRows,userId:'u11'});
-  const cards=[...target.querySelectorAll('.cam-q-card')];
+  const cards=[...target.querySelectorAll('.cam-q-league-row')];
   assert.equal(cards.length,11,'Top 10 and the reader keep server ordering');
   assert.deepEqual(cards.map(c=>Number(c.dataset.rank)),[1,2,3,4,5,6,7,8,9,10,12]);
-  assert.equal(target.querySelector('.cam-q-points strong').textContent,'+31');
+  assert.equal(target.querySelector('.cam-q-points strong').textContent,'31');
   assert.equal(cards[2].querySelector('.cam-q-points strong').textContent,'0');
   const own=target.querySelector('.cam-q-own');
   assert.equal(own.querySelector('.cam-q-points strong').textContent,'-14');
-  assert.equal(own.querySelector('[data-kind=hits] dd').textContent,'7');
-  assert.equal(own.querySelector('[data-kind=misses] dd').textContent,'6');
-  assert.equal(own.querySelector('[data-kind=accuracy] dd').textContent,'53,8 %');
+  assert.equal(own.querySelector('[data-kind=hits]').textContent,'7');
+  assert.equal(own.querySelector('[data-kind=misses]').textContent,'6');
+  assert.equal(own.querySelector('[data-kind=accuracy]').textContent,'53,8');
   assert.equal(own.querySelector('.cam-q-you').textContent,'Tú');
   assert.equal(own.querySelector('button'),controls[10].profile,'Existing profile handler survives the new markup');
   own.querySelector('button').click();assert.equal(opened,'u11');
   assert.equal(reads,0,'Rendering cards does not fetch every participant history');
-  controls[10].details.open=true;controls[10].details.dispatchEvent(new w.Event('toggle'));
+  const panel=own.nextElementSibling;
+  assert.equal(panel.hidden,true);
+  own.querySelector('.cam-q-expand').click();
+  controls[10].details.dispatchEvent(new w.Event('toggle'));
+  assert.equal(panel.hidden,false);
+  assert.equal(own.querySelector('.cam-q-expand').getAttribute('aria-expanded'),'true');
   assert.ok(reads>0,'Opening predictions still loads their existing data');
-  assert.equal(own.querySelector('.cam-q-streak').textContent,'1 acierto');
-  assert.equal(own.querySelectorAll('.cam-q-form-result').length,2);
+  assert.equal(panel.querySelector('.cam-q-streak').textContent,'1 acierto');
+  assert.equal(panel.querySelectorAll('.cam-q-form-result').length,2);
   controls[10].details.dispatchEvent(new w.CustomEvent('cam:quiniela-results',{detail:{error:true}}));
-  assert.equal(own.querySelector('.cam-q-streak').textContent,'No disponible');
+  assert.equal(panel.querySelector('.cam-q-streak').textContent,'No disponible');
   assert.equal(d.getElementById(prefix+'RankingCaption').textContent,'noviembre de 2026');
   assert.equal(leagueMounts,1,'One league entry per ranking panel');
+  assert.equal(target.querySelectorAll('th[scope=col]').length,8,'All league columns have headers');
+  own.querySelector('[data-kind=hits]').click();
+  assert.equal(panel.hidden,true,'Tapping a statistic closes its detail');
   let played=false;w.CamQuinielaStandings.empty(target,()=>{played=true;});
-  assert.equal(target.querySelectorAll('.cam-q-card').length,0,'Empty periods show no invented participants');
+  assert.equal(target.querySelectorAll('.cam-q-league-row').length,0,'Empty periods show no invented participants');
   assert.equal(leagueMounts,1,'Empty periods keep the existing league entry');
   target.querySelector('.cam-nfl-action').click();assert.equal(played,true);
   await w.happyDOM.close();
 }
-console.log('PASS ranking cards: exact scores/counts/order, own row, profile actions, lazy predictions, errors and empty states in both sports.');
+console.log('PASS league table: exact scores/counts/order, own row, profile actions, lazy predictions, errors and empty states in both sports.');
