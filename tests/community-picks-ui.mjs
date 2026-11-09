@@ -106,18 +106,19 @@ assert.equal(votes.size,1,'Another account can vote while Pick is pending');
 /* A capture-based combination displays each market as its own numbered item. */
 records[0].legs[0].selection='Paris St-G · MONEYLINE (3-WAY) + Over 3.5 Goals · OVER/UNDER 3.5 GOALS + Yes · BOTH TEAMS TO SCORE';
 d.querySelector('#cpFeed .cp-downvote').click();await settle();
-assert.equal(d.querySelectorAll('#cpFeed .cp-pick-line').length,3,'Combined Picks display three individually separated markets');
+assert.equal(d.querySelectorAll('#cpFeed .cam-pk-leg').length,3,'Combined Picks display three individually separated markets');
 assert.equal(d.querySelector('#cpFeed .cp-picks-count'),null,'No count labels appear in Picks');
-assert.equal(d.querySelector('#cpFeed .cp-card-legs').tagName,'OL','Picks use one ordered, accessible list');
+assert.equal(d.querySelector('#cpFeed .cam-pk-legs').tagName,'OL','Picks use one ordered, accessible list');
 assert.equal(d.querySelector('#cpFeed .cp-pick-line-number'),null,'Connecting circles replace numbered boxes');
-assert.equal(d.querySelector('#cpFeed .cp-feed-meta .cp-card-sport').textContent,'NFL');
-assert.equal(d.querySelector('#cpFeed .cp-feed-meta .cp-odds').textContent,'+150');
-assert.equal(d.querySelector('#cpFeed .cam-ticket-odds-label,.cam-ticket-meta,.cp-card-state,.cp-result-badge'),null,'Pending cards omit secondary labels and dates');
+assert.equal(d.querySelector('#cpFeed .cam-pk-head .cam-pk-sport').textContent,'NFL');
+assert.equal(d.querySelector('#cpFeed .cam-pk-odds').textContent,'+150');
+assert.equal(d.querySelector('#cpFeed .cam-ticket-odds-label,.cam-ticket-meta,.cp-card-state,.cp-result-badge,.cam-pk-result'),null,'Pending cards omit secondary labels and dates');
+assert.doesNotMatch(d.querySelector('#cpFeed .cam-pk').textContent,/paga|cierra/i,'Picks moderno: the momio speaks for itself');
 assert.equal(d.querySelector('#cpFeed .cp-odds').getAttribute('aria-label'),'Momio +150');
-assert.equal(d.querySelector('#cpFeed .cp-feed-meta .cp-card-odds').parentElement.className,'cp-feed-meta','Odds are located below the sport, within the header');
+assert.equal(d.querySelector('#cpFeed .cam-pk-odds').parentElement.className,'cam-pk-body','Picks moderno: the momio sits to the right of the forecast');
 
-assert.match(d.querySelectorAll('#cpFeed .cp-pick-line')[1].textContent,/Más de 3.5 goles/);
-assert.match(d.querySelectorAll('#cpFeed .cp-pick-line')[2].textContent,/Ambos equipos marcan/);
+assert.match(d.querySelectorAll('#cpFeed .cam-pk-leg')[1].textContent,/Más de 3.5 goles/);
+assert.match(d.querySelectorAll('#cpFeed .cam-pk-leg')[2].textContent,/Ambos equipos marcan/);
 
 d.querySelector('#cpFeed .cp-card-read-link').click();await settle();
 assert.equal(d.querySelector('#cpDialog .cp-card-detail')!==null,true);
@@ -144,7 +145,7 @@ d.querySelector('#cpFeed .cp-upvote').click();await settle();
 assert.equal(votes.get(records[0].id+'|voter'),1);
 // The "Mejores platos" Pick remains readable by guests; writing a reply
 // requires login and then resumes at the same Pick with the reply field focused.
-const bestPick=d.querySelector('#picksPopular .cp-card-read-link');
+const bestPick=d.querySelector('#picksPopular .cam-plato-link');
 assert.ok(bestPick,'A positively voted Pick must appear in Mejores platos');
 const homePick=d.querySelector('#camHomeBestPlates .cam-home-plate-open');
 assert.equal(homePick.href,bestPick.href,'Home opens the same ranked Pick as Picks');
@@ -153,9 +154,9 @@ assert.ok(homePick.classList.contains('ae-pick-history-card'),'Home uses the com
 assert.equal(d.querySelector('#camHomePicks [data-outcome],#camHomePicks .ae-pick-history-badge'),null,'Home cards do not announce or color results');
 assert.equal(d.querySelector('#homeRankingList,#homeChampionsList'),null,'Home no longer contains team ranking previews');
 
-assert.equal(bestPick.parentElement.classList.contains('cam-pick-unified'),true);
+assert.equal(bestPick.parentElement.classList.contains('cam-plato'),true,'Platos are one-line ranking rows');
 assert.ok(bestPick.href.includes('pick='),'Mejores Platos has a working Pick permalink');
-assert.ok(bestPick.getAttribute('aria-label').includes('Leer Pick completo'));
+assert.match(bestPick.getAttribute('aria-label'),/^1\. .*momio \+150/,'The row announces rank, Pick and momio');
 user=null;w.authOpened=false;bestPick.click();await settle();
 assert.equal(w.authOpened,false,'Reading Mejores platos is public');
 assert.ok(d.querySelector('#cpDialog .cp-login-to-reply'),'Guest has an authenticated reply action');

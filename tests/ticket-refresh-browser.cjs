@@ -44,34 +44,36 @@ const server=http.createServer((req,res)=>{
  await page.evaluate(()=>document.dispatchEvent(new Event('DOMContentLoaded')));
  await page.addScriptTag({content:fs.readFileSync('assets/cam-nfl-quiniela.js','utf8')});
  await page.addScriptTag({content:fs.readFileSync('assets/cam-football-quiniela.js','utf8')});
- await page.locator('#cpFeed .cam-ticket-card').first().waitFor();
- await page.locator('#picksPopular .cam-ticket-card').first().waitFor();
- const card=page.locator('#cpFeed .cam-ticket-card').filter({hasText:'El parlay del domingo'});
- assert.equal(await card.locator('.cam-ticket-more').getAttribute('open'),null);
- assert.equal(await card.locator('.cp-pick-line').count(),4);
- await card.locator('.cam-ticket-more summary').click();
- assert.equal(await card.locator('.cam-ticket-more').getAttribute('open'),'');
+ // Picks moderno (9 nov 2026): el feed usa .cam-pk y los platos, filas .cam-plato.
+ await page.locator('#cpFeed .cam-pk').first().waitFor();
+ await page.locator('#picksPopular .cam-plato').first().waitFor();
+ const card=page.locator('#cpFeed .cam-pk').filter({hasText:'El parlay del domingo'});
+ assert.equal(await card.locator('.cam-pk-more').getAttribute('open'),null);
+ assert.equal(await card.locator('.cam-pk-leg').count(),4);
+ assert.equal(await card.locator('.cam-pk-combo').innerText(),'Combinada');
+ await card.locator('.cam-pk-more summary').click();
+ assert.equal(await card.locator('.cam-pk-more').getAttribute('open'),'');
  assert.match(await card.innerText(),/Buffalo Bills gana/);
- assert.match(await card.innerText(),/Cuota total/i);
+ assert.equal(await card.locator('.cam-pk-odds').innerText(),'+850','El momio es la cuota total');
  assert.equal(await card.locator('.cp-actions button').count(),4);
  for(const width of [360,390,768,1366])for(const dark of [false,true]){
   await page.setViewportSize({width,height:1000});await page.evaluate(dark=>document.documentElement.classList.toggle('dark',dark),dark);
-  const fits=await page.locator('.cam-ticket-card').evaluateAll(cards=>cards.every(card=>card.scrollWidth<=card.clientWidth+2));
+  const fits=await page.locator('#cpFeed .cam-pk, .cam-ticket-card').evaluateAll(cards=>cards.every(card=>card.scrollWidth<=card.clientWidth+2));
 
   assert.ok(fits,'Pick content overflow '+width+' '+dark);
-  assert.ok(await card.locator('.cp-pick-line-body').first().evaluate(e=>e.getBoundingClientRect().width>180),'The selection must retain readable column width');
+  assert.ok(await card.locator('.cam-pk-main').first().evaluate(e=>e.getBoundingClientRect().width>180),'The selection must retain readable column width');
   assert.ok((await card.boundingBox()).height<1000,'Expanded four-leg parlay must not become a narrow vertical column');
-  assert.ok((await page.locator('#picksPopular').boundingBox()).height>200,'Platos panel must not collapse on desktop');
+  assert.ok((await page.locator('#picksPopular .cam-plato').first().boundingBox()).height>40,'Platos rows must not collapse');
   if(width===1366)await page.locator('#communityPicks .ae-picks-community-main').screenshot({path:path.join(qa,'picks-escritorio-'+(dark?'noche':'dia')+'.png')});
   if(width===390){
-   await page.locator('#picksPopular .cam-ticket-card').first().screenshot({path:path.join(qa,'mejores-platos-'+(dark?'noche':'dia')+'.png')});
+   await page.locator('#picksPopular .cam-plato').first().screenshot({path:path.join(qa,'mejores-platos-'+(dark?'noche':'dia')+'.png')});
    await card.screenshot({path:path.join(qa,'parlay-'+(dark?'noche':'dia')+'.png')});
    await page.locator('#aeHomePickHistoricPick .cam-historic-record').screenshot({path:path.join(qa,'pick-historico-'+(dark?'noche':'dia')+'.png')});
    await page.locator('#cpSettleHistory .ae-pick-history-card').first().screenshot({path:path.join(qa,'recetario-'+(dark?'noche':'dia')+'.png')});
   }
  }
- await page.evaluate(()=>{document.documentElement.style.scrollBehavior='auto';document.body.style.scrollBehavior='auto';document.querySelector('#picksPopular .cam-ticket-card').scrollIntoView({behavior:'instant',block:'center'});});
- await page.locator('#picksPopular .cp-card-read-link').first().click({timeout:3000});
+ await page.evaluate(()=>{document.documentElement.style.scrollBehavior='auto';document.body.style.scrollBehavior='auto';document.querySelector('#picksPopular .cam-plato').scrollIntoView({behavior:'instant',block:'center'});});
+ await page.locator('#picksPopular .cam-plato-link').first().click({timeout:3000});
  await page.locator('#cpDialog .cp-recipe-card').waitFor();
  for(const width of [390,1366])for(const dark of [false,true]){
   await page.setViewportSize({width,height:1000});await page.evaluate(d=>document.documentElement.classList.toggle('dark',d),dark);

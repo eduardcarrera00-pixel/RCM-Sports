@@ -135,6 +135,7 @@ function ticketRows(p,full=false,{groupEvents=false,compactLabels=!full}={}){
 }
 
 function card(p,compact=false,detail=false,viewerId=currentViewerId,variant='feed'){
+ if(variant==='stream'&&!detail)return streamCard(p,viewerId);
  // Shared public Pick markup; the Chef recipe remains a separate detail view.
  const editorial=!detail;
  const publication=editorial||detail;
@@ -229,6 +230,191 @@ function card(p,compact=false,detail=false,viewerId=currentViewerId,variant='fee
  n.append(controls);
  return n;
 }
+/* Picks moderno (9 nov 2026) · feed de Picks › Picks.
+   La misma información con menos cajas: pronóstico grande, partido y mercado en
+   una línea gris, momio a la derecha sin chip y acciones discretas. Sin fechas,
+   «paga» ni «cierra en»: el momio y «Picks activos» ya lo dicen. Las demás
+   vistas (Inicio, archivo, perfil, platos) siguen con card(). */
+const normalizeText=value=>String(value||'').toLocaleLowerCase('es').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
+function pickSportKind(p){
+ const sports=Array.isArray(p.legs)?p.legs.map(l=>String(l?.sport||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')):[];
+ const nfl=sports.some(t=>/nfl|americano|american football|gridiron/.test(t));
+ const football=sports.some(t=>!/nfl|americano|american football|gridiron/.test(t)&&/futbol|football|soccer|champions|liga|premier|barca|madrid|uefa|bundesliga|serie a/.test(t));
+ return nfl&&football?'mixed':nfl?'nfl':football?'football':'general';
+}
+// Signo menos tipográfico (−175): el guion se separa del número en Inter.
+const momioText=odds=>odds==null||odds===''||!Number.isFinite(Number(odds))?'—':(Number(odds)>0?'+':Number(odds)<0?'−':'')+Math.abs(Number(odds));
+function legOutcome(p,leg,count){
+ const explicit=leg.outcome||leg.settlement_status;
+ return ticketStates[explicit]?explicit:count===1&&ticketStates[p.outcome]?p.outcome:'';
+}
+function streamCard(p,viewerId){
+ const n=el('article',null,'cp-card cam-pk');
+ const choices=ticketChoices(p),legs=Array.isArray(p.legs)?p.legs:[],first=legs[0]||null;
+ n.dataset.sport=pickSportKind(p);
+ n.dataset.outcome=ticketStates[p.outcome]?p.outcome:'pending';
+ const author=String(p.author||'Aficionado').replace(/^@+/,'');
+ const head=el('div',null,'cam-pk-head');
+ if(p.user_id){
+   const profile=button('',event=>{
+     event?.stopPropagation?.();
+     if(typeof window.openAePublicProfile==='function')window.openAePublicProfile(p.user_id);
+   });
+   profile.className='cp-feed-author cam-pk-author';
+   const avatar=el('span',author.charAt(0).toLocaleUpperCase('es'),'cam-pk-avatar');
+   avatar.setAttribute('aria-hidden','true');
+   profile.append(avatar,el('span','@'+author,'cam-pk-user'));
+   profile.setAttribute('aria-label','Ver perfil de '+author);
+   window.CamLeagues?.markAuthor(profile,p.user_id,'picks');
+   head.append(profile);
+ }else{
+   const label=el('span',null,'cp-feed-author-label cam-pk-author');
+   const avatar=el('span',author.charAt(0).toLocaleUpperCase('es'),'cam-pk-avatar');
+   avatar.setAttribute('aria-hidden','true');
+   label.append(avatar,el('span','@'+author,'cam-pk-user'));
+   head.append(label);
+ }
+ if(first?.sport)head.append(el('span',String(first.sport),'cam-pk-sport'));
+ if(['won','lost','void'].includes(p.outcome)){
+   const state=ticketStates[p.outcome];
+   head.append(el('strong',state.join(' '),'cam-pk-result'));
+ }
+ n.append(head);
+ const body=el('div',null,'cam-pk-body');
+ const main=el('div',null,'cam-pk-main');
+ const combo=choices.length>1;
+ const title=String(p.title||'').trim();
+ const redundant=!title||/^combinada\b/i.test(title)||legs.some(l=>{
+   const t=normalizeText(title),e=normalizeText(l?.event);
+   return e&&(t===e||t.includes(e));
+ });
+ // Un título escrito por el Chef se conserva; los automáticos repiten el partido.
+ if(!redundant)main.append(el('h3',title,'cam-pk-title'));
+ if(combo)main.append(el('span','Combinada','cam-pk-combo'));
+ const list=el('ol',null,'cam-pk-legs'),more=el('ol',null,'cam-pk-legs');
+ let previous='';
+ choices.forEach(({leg,selection},i)=>{
+   const li=el('li',null,'cam-pk-leg');
+   const display=pickSelectionDisplay(selection,leg.sport);
+   li.append(el('strong',display.choice||'Consultar pronóstico','cam-pk-choice'));
+   const key=normalizeText(leg.event);
+   const meta=[key&&key!==previous?String(leg.event).trim():'',display.market].filter(Boolean).join(' · ');
+   previous=key;
+   if(meta)li.append(el('span',meta,'cam-pk-meta'));
+   const outcome=legOutcome(p,leg,choices.length);
+   li.dataset.outcome=outcome||'pending';
+   if(outcome&&outcome!=='pending'&&combo)li.append(el('span',ticketStates[outcome].join(' '),'cam-pk-leg-state'));
+   (i<3?list:more).append(li);
+ });
+ if(!choices.length)list.append(el('li',title||'Pronóstico','cam-pk-leg cam-pk-choice'));
+ main.append(list);
+ if(more.children.length){
+   const details=el('details',null,'cam-pk-more');
+   details.append(el('summary','+'+more.children.length+(more.children.length===1?' selección':' selecciones')),more);
+   details.addEventListener('click',e=>e.stopPropagation());
+   main.append(details);
+ }
+ const odds=el('strong',momioText(p.american_odds),'cp-odds cam-pk-odds');
+ odds.setAttribute('aria-label','Momio '+momioText(p.american_odds));
+ body.append(main,odds);
+ n.append(body);
+ const read=el('a',null,'cp-card-read-link cam-pk-open');
+ read.href=link(p.id);
+ read.setAttribute('aria-label','Abrir Pick de '+author+': '+(title||'Pronóstico deportivo'));
+ read.onclick=event=>{
+   if(event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;
+   event.preventDefault();open(p.id);
+ };
+ n.append(read);
+ if(p.explanation){
+   const analysis=el('details',null,'cam-pk-analysis');
+   analysis.append(el('summary','Leer análisis'),el('p',p.explanation,'cp-explanation'));
+   analysis.addEventListener('click',e=>e.stopPropagation());
+   n.append(analysis);
+ }
+ const actions=el('div',null,'cp-actions cam-pk-actions');
+ const canVote=['pending','approved'].includes(p.moderation_status)&&isActive(p);
+ const own=Boolean(viewerId&&p.user_id&&String(viewerId)===String(p.user_id));
+ if(!own){
+   const votes=el('span',null,'cam-pk-votes');
+   for(const [value,arrow,count] of [[1,'▲',p.upvotes],[-1,'▼',p.downvotes]]){
+     const b=button(arrow+' '+Number(count||0),()=>vote(p,value,b));
+     b.classList.add(value===1?'cp-upvote':'cp-downvote');
+     b.setAttribute('aria-label',(value===1?'Voto positivo':'Voto negativo')+' para el Pick de '+author+' ('+Number(count||0)+')');
+     b.setAttribute('aria-pressed',String(Number(p.my_vote)===value));
+     b.disabled=!canVote;
+     if(!canVote)b.title='La votación de este Pick está cerrada';
+     votes.append(b);
+   }
+   actions.append(votes);
+ }
+ const replies=button('',()=>requestPickReply(p.id));
+ replies.classList.add('cp-replies-button','cam-pk-replies');
+ const icon=document.createElementNS('http://www.w3.org/2000/svg','svg');
+ icon.setAttribute('viewBox','0 0 24 24');icon.setAttribute('aria-hidden','true');
+ const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+ path.setAttribute('d','M5 4h14v11H10l-5 5V4Z');path.setAttribute('fill','none');
+ path.setAttribute('stroke','currentColor');path.setAttribute('stroke-width','1.6');
+ icon.append(path);replies.append(icon,el('span',String(Number(p.comments_count||0))));
+ replies.setAttribute('aria-label','Abrir respuestas del Pick: '+(title||'Pronóstico')+' ('+Number(p.comments_count||0)+')');
+ actions.append(replies);
+ if(window.CamPickShare){
+   const share=window.CamPickShare.button(p);
+   share.classList.add('cam-pk-share');
+   actions.append(share);
+ }
+ n.append(actions);
+ return n;
+}
+/* Platos de la semana: ranking de una línea por Pick (número, pronóstico,
+   @usuario · momio y saldo de votos con su barra). Abre el Pick al tocarlo. */
+const PLATOS_VISIBLE=5;
+function plateName(p,choices){
+ if(choices.length>1){
+   const fromTitle=String(p.title||'').replace(/^combinada\s*[·:-]?\s*/i,'').trim();
+   if(fromTitle&&fromTitle!==String(p.title||'').trim())return fromTitle;
+   return choices.map(({leg,selection})=>pickSelectionDisplay(selection,leg.sport).choice.replace(/^Gana\s+/,'')).join(' + ');
+ }
+ const only=choices[0];
+ return only?pickSelectionDisplay(only.selection,only.leg.sport).choice||p.title||'Pronóstico':p.title||'Pronóstico';
+}
+function plateRow(p,index){
+ const li=el('li',null,'cam-plato');
+ const choices=ticketChoices(p);
+ const author=String(p.author||'Aficionado').replace(/^@+/,'');
+ const name=plateName(p,choices);
+ const up=Math.max(0,Number(p.upvotes||0)),down=Math.max(0,Number(p.downvotes||0));
+ const score=Number.isFinite(Number(p.score))?Number(p.score):up-down;
+ const a=el('a',null,'cam-plato-link');
+ a.href=link(p.id);
+ a.addEventListener('click',event=>{
+   if(event.ctrlKey||event.metaKey||event.shiftKey||event.altKey||event.button!==0)return;
+   event.preventDefault();open(p.id);
+ });
+ const state=['won','lost','void'].includes(p.outcome)?{won:'Acertó',lost:'Falló',void:'Anulado'}[p.outcome]:'';
+ a.setAttribute('aria-label',(index+1)+'. '+name+', de '+author+', momio '+momioText(p.american_odds)+
+   (state?', '+state:'')+'. '+up+' a favor y '+down+' en contra.');
+ const text=el('span',null,'cam-plato-text');
+ text.append(el('strong',name,'cam-plato-name'));
+ const meta=el('span',null,'cam-plato-meta');
+ // «Equipo A + Equipo B» ya dice que es combinada: el pie solo lleva @usuario y momio.
+ meta.append(el('span','@'+author,'cam-plato-user'),el('span',momioText(p.american_odds),'cam-plato-odds'));
+ // El resultado va como símbolo (✓ ✕ —); el nombre completo está en el aria-label del enlace.
+ if(state){const mark=el('span',ticketStates[p.outcome][0],'cam-plato-state is-'+p.outcome);mark.title=state;meta.append(mark);}
+ text.append(meta);
+ const votes=el('span',null,'cam-plato-score');
+ votes.append(el('strong',(score>0?'+':score<0?'−':'')+Math.abs(score),'cam-plato-net '+(score>0?'is-up':score<0?'is-down':'is-even')));
+ const bar=el('span',null,'cam-plato-bar');
+ const total=up+down,share=total?Math.round(100*up/total):50;
+ const upBar=el('span',null,'is-up'),downBar=el('span',null,'is-down');
+ upBar.style.width=share+'%';downBar.style.width=(100-share)+'%';
+ bar.append(upBar,downBar);
+ votes.append(bar);
+ a.append(el('span',String(index+1),'cam-plato-rank'),text,votes);
+ for(const node of [a.children[0],text,votes])node.setAttribute('aria-hidden','true');
+ li.append(a);
+ return li;
+}
 window.renderCamPickCard=(pick,options={})=>card(pick,Boolean(options.compact),false,
  options.viewerId===undefined?currentViewerId:options.viewerId,options.variant||'feed');
 async function vote(p,value,b){if(!['pending','approved'].includes(p.moderation_status)||!isActive(p))return;b.disabled=true;try{const user=await account();if(!user)return;if(user.id===p.user_id)throw Error('No puedes votar tu propio Pick.');
@@ -237,40 +423,17 @@ async function vote(p,value,b){if(!['pending','approved'].includes(p.moderation_
  else q=db.from('ae_pick_votes').insert({pick_id:p.id,value});
  const r=await q;if(r.error)throw r.error;await load();if($('cpDialog')?.open)await showDetail(p.id);
  }catch(e){notifyCommunity(message(e),true);}finally{b.disabled=false;}}
-// Keep the existing 20 newest active Picks; scroll after several original cards.
- // Three cards are initially visible on desktop, two on mobile.
-let feedWindowFrame=0;
-let feedCardObserver=null;
+// Picks moderno (9 nov 2026): el feed ya no tiene ventana con scroll propio.
+// Se enseñan FEED_VISIBLE Picks en el flujo de la página y el resto vive en
+// «Ver todos los Picks». La función queda para quien la llame y limpia el modo
+// antiguo (clase, altura medida, aviso «Desliza…» y tabindex).
+const FEED_VISIBLE=6;
 function sizeFeedWindow(){
  const feed=$('cpFeed'),hint=$('cpFeedScrollHint');if(!feed)return;
- if(feedCardObserver){feedCardObserver.disconnect();feedCardObserver=null;}
- const cards=Array.from(feed.children).filter(node=>node.classList?.contains('cp-card'));
- const visibleCount=Math.min(cards.length,window.matchMedia('(max-width: 760px)').matches?2:3);
- const scrollable=cards.length>visibleCount;
- feed.classList.toggle('ae-picks-feed-scrollable',scrollable);
- if(hint)hint.hidden=!scrollable;
- if(!scrollable){
-  feed.style.removeProperty('--ae-picks-feed-window-height');
-  feed.removeAttribute('tabindex');
-  return;
- }
- feed.setAttribute('tabindex','0');
- const watched=cards.slice(0,visibleCount);
- const measure=()=>{
-  const top=watched[0].getBoundingClientRect().top;
-  const bottom=watched[watched.length-1].getBoundingClientRect().bottom;
-  if(bottom<=top)return;
-  // Includes the real cards' heights and spacing; CSS caps tall viewports.
-  feed.style.setProperty('--ae-picks-feed-window-height',Math.ceil(bottom-top)+'px');
- };
- measure();
- if(typeof ResizeObserver!=='undefined'){
-  feedCardObserver=new ResizeObserver(()=>{
-   if(feedWindowFrame)return;
-   feedWindowFrame=requestAnimationFrame(()=>{feedWindowFrame=0;measure();});
-  });
-  watched.forEach(card=>feedCardObserver.observe(card));
- }
+ feed.classList.remove('ae-picks-feed-scrollable');
+ feed.style.removeProperty('--ae-picks-feed-window-height');
+ feed.removeAttribute('tabindex');
+ if(hint)hint.hidden=true;
 }
 let historicRequest=0;
 async function loadHistoricPick(){
@@ -376,12 +539,12 @@ async function load(){
    ]);
    if(seq!==request)return;if(feed.error)throw feed.error;
    currentViewerId=session.data?.user?.id||null;
-   const feedEl=$('cpFeed'),previousScroll=feedEl.scrollTop;
-   // Keep the archive button outside the scroll region; never recreate it.
-   feedEl.replaceChildren(...(feed.data||[]).map(p=>card(p)));
+   const feedEl=$('cpFeed');
+   // Picks moderno: los primeros Picks en el flujo de la página (sin scroll
+   // propio); el resto en «Ver todos los Picks». El botón nunca se recrea.
+   feedEl.replaceChildren(...(feed.data||[]).slice(0,FEED_VISIBLE).map(p=>card(p,false,false,currentViewerId,'stream')));
+   feedEl.dataset.camMore=String(Math.max(0,(feed.data||[]).length-FEED_VISIBLE));
    sizeFeedWindow();
-   // Voting refreshes the feed; don't throw readers back to the top.
-   feedEl.scrollTop=previousScroll;
    $('cpStatus').textContent=feed.data?.length?'':'Aún sin Picks activos.';
    $('cpFeed').dataset.camContentState=feed.data?.length?'ready':'empty';
    const viewAll=$('cpViewAll');
@@ -672,6 +835,8 @@ function paintChefList(id,result,kind){
  target.onscroll=null;
  const oldHint=target.closest('.ae-chef-board')?.querySelector('.ae-chef-scroll-note');
  if(oldHint)oldHint.hidden=true;
+ const oldMore=target.closest('.ae-chef-board')?.querySelector(':scope > .cam-platos-more');
+ if(oldMore)oldMore.hidden=true;
  const good=kind==='best';
  if(result?.error){
    target.dataset.camContentState='error';
@@ -684,25 +849,46 @@ function paintChefList(id,result,kind){
    target.append(row('Aún sin votos esta semana.','ae-chef-empty'));
    return;
  }
- const scrollable=picks.length>2;
- // Mantiene el mismo diseño fotográfico con una o varias posiciones.
- // Solo habilitamos interacción de desplazamiento cuando hay más de un Pick.
- target.classList.add('ae-chef-scroll');
- target.setAttribute('aria-label',(good?'Mejores platos':'Peores platos')+', '+picks.length+' Picks. Desliza verticalmente para recorrer la clasificación.');
- target.tabIndex=scrollable?0:-1;
- target.scrollTop=0;
- const heading=target.closest('.ae-chef-board')?.querySelector('.ae-picks-rail-heading');
- let hint=heading?.querySelector('.ae-chef-scroll-note');
- if(heading&&!hint){hint=el('p',null,'ae-chef-scroll-note');heading.append(hint);}
- const updateHint=()=>{
-   if(!hint)return;
-   hint.hidden=!scrollable;
-   hint.textContent='Desliza para ver más ↓';
- };
- target.onscroll=updateHint;
+ // Picks moderno: ranking de una línea por Pick, sin scroll propio. Se ven
+ // PLATOS_VISIBLE y «Ver los N» despliega el resto en el sitio.
+ target.classList.add('cam-platos-list');
+ target.classList.remove('is-expanded');
+ target.setAttribute('aria-label',(good?'Mejores platos':'Peores platos')+' de la semana, '+picks.length+(picks.length===1?' Pick':' Picks'));
  // Keep the server's score order; only replace the visual renderer.
- for(const p of picks)target.append(card(p,false,false,currentViewerId,good?'best':'worst'));
- sizePlateWindow(target);
+ picks.forEach((p,i)=>target.append(plateRow(p,i)));
+ const board=target.closest('.ae-chef-board');
+ let more=board?.querySelector(':scope > .cam-platos-more');
+ if(board&&!more){
+   more=button('',()=>{
+     const open=!target.classList.contains('is-expanded');
+     target.classList.toggle('is-expanded',open);
+     more.setAttribute('aria-expanded',String(open));
+     more.textContent=open?'Ver menos':more.dataset.label;
+   });
+   more.className='cam-platos-more';
+   more.setAttribute('aria-controls',id);
+   board.append(more);
+ }
+ if(more){
+   more.dataset.label='Ver los '+picks.length;
+   more.textContent=more.dataset.label;
+   more.setAttribute('aria-expanded','false');
+   more.hidden=picks.length<=PLATOS_VISIBLE;
+ }
+}
+/* Teléfono: Mejores y Peores platos comparten un bloque con dos pestañas.
+   En el ordenador se ven lado a lado y las pestañas se ocultan (CSS). */
+function bindPlatosTabs(){
+ const rail=document.querySelector('#communityPicks .ae-picks-rail');
+ const tabs=rail?.querySelectorAll('.cam-platos-tabs [data-platos]');
+ if(!rail||!tabs?.length||rail.dataset.camPlatosBound)return;
+ rail.dataset.camPlatosBound='1';
+ const select=kind=>{
+   rail.dataset.camPlatos=kind;
+   tabs.forEach(tab=>tab.setAttribute('aria-pressed',String(tab.dataset.platos===kind)));
+ };
+ tabs.forEach(tab=>tab.addEventListener('click',()=>select(tab.dataset.platos)));
+ select(rail.dataset.camPlatos||'best');
 }
 async function loadChefLists(){
  const seq=++chefRequest;
@@ -1388,7 +1574,7 @@ document.addEventListener('DOMContentLoaded',()=>{
  });
  $('cpComposePanel')?.addEventListener('close',syncPickComposer);
  $('cpComposePanel')?.addEventListener('cancel',e=>{if(posting)e.preventDefault();});
- renderCommunityPicksVisibility();load();
+ renderCommunityPicksVisibility();bindPlatosTabs();load();
  const resize=()=>{sizeFeedWindow();sizeChefRankingWindows();sizePlateWindow($('picksPopular'));sizePlateWindow($('picksQuestioned'));};
  window.addEventListener('resize',resize,{passive:true});
  if(document.fonts?.ready)document.fonts.ready.then(resize);

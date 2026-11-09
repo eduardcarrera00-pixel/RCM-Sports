@@ -1,0 +1,809 @@
+/* CAM SPORTS · Picks moderno (9 nov 2026).
+   Picks › Picks con menos cajas y menos texto: barra fina «¿Eres Chef? · Cocina
+   Picks», feed en una sola superficie con líneas finas entre Picks (sin scroll
+   propio), pronóstico grande, partido y mercado en una línea gris, momio a la
+   derecha sin chip y acciones discretas (▲ ▼ en una píldora, responder y
+   compartir como iconos). Mejores y Peores platos pasan a un ranking de una
+   línea por Pick: en el teléfono un bloque con pestañas; en el ordenador, lado a
+   lado bajo «Platos de la semana».
+   Marcado: streamCard() y plateRow() de assets/community-picks.js.
+   Va en la capa cam-header (la primera registrada tras cam-display-clarity) con
+   !important: gana a las tarjetas de cam-pick-tickets-refresh.css (cam-banners),
+   a la esquina global (cam-rounded-editorial) y a los !important sin capa.
+   Nunca fija «display» en piezas que las pestañas ocultan (#cpFeed, pie, carril)
+   salvo bajo [data-cam-tab="picks"], para no ganar a cam-mobile-bottom-nav.css.
+   Inicio, archivo y perfil no cambian: siguen con card(). */
+@layer cam-header {
+
+/* ---------- paleta (día · noche) ---------- */
+html body #mainContent #footballTakes #communityPicks {
+  --pk-card: #fffcf8;
+  --pk-ink: #273b49;
+  --pk-text: #34444f;
+  --pk-muted: #566876;
+  --pk-line: rgba(133, 91, 67, .2);
+  --pk-accent: #855b43;
+  --pk-soft: rgba(133, 91, 67, .09);
+  --pk-up: #2c6a4c;
+  --pk-up-soft: rgba(44, 106, 76, .1);
+  --pk-down: #a3433a;
+  --pk-down-soft: rgba(163, 67, 58, .09);
+  --pk-serif: Newsreader, Georgia, "Times New Roman", serif;
+  --pk-sans: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+html.dark body #mainContent #footballTakes #communityPicks {
+  --pk-card: #102b3e;
+  --pk-ink: #f4e8db;
+  --pk-text: #e3dacd;
+  --pk-muted: #c5cdd2;
+  --pk-line: rgba(214, 166, 112, .2);
+  --pk-accent: #d9ad84;
+  --pk-soft: rgba(217, 173, 132, .12);
+  --pk-up: #7cc49d;
+  --pk-up-soft: rgba(124, 196, 157, .14);
+  --pk-down: #ec9286;
+  --pk-down-soft: rgba(236, 146, 134, .13);
+}
+
+/* ---------- el marco de la sección desaparece en Picks › Picks ---------- */
+html body[data-cam-tab="picks"] #mainContent #footballTakes > .ae-picks-layout,
+html body[data-cam-tab="picks"] #mainContent #footballTakes #communityPicks,
+html body[data-cam-tab="picks"] #mainContent #footballTakes #communityPicks > .ae-picks-community-main {
+  background: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+html body[data-cam-tab="picks"] #mainContent #footballTakes > .ae-picks-layout::before,
+html body[data-cam-tab="picks"] #mainContent #footballTakes > .ae-picks-layout::after,
+html body[data-cam-tab="picks"] #mainContent #footballTakes #communityPicks::before,
+html body[data-cam-tab="picks"] #mainContent #footballTakes #communityPicks::after,
+html body[data-cam-tab="picks"] #mainContent #footballTakes #communityPicks > .ae-picks-community-main::before,
+html body[data-cam-tab="picks"] #mainContent #footballTakes #communityPicks > .ae-picks-community-main::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* ---------- barra fina para publicar ---------- */
+html body #mainContent #footballTakes #communityPicks .ae-picks-feed-heading {
+  margin: 0 0 12px !important;
+  padding: 0 !important;
+  background: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+html body #mainContent #footballTakes #communityPicks .ae-picks-heading-cta-row {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  min-height: 0 !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 7px 7px 7px 18px !important;
+  background: var(--pk-card) !important;
+  background-image: none !important;
+  border: 1px solid var(--pk-line) !important;
+  border-radius: 999px !important;
+  box-shadow: none !important;
+  text-align: left !important;
+}
+html body #mainContent #footballTakes #communityPicks .ae-picks-heading-cta-row::before,
+html body #mainContent #footballTakes #communityPicks .ae-picks-heading-cta-row::after,
+html body #mainContent #footballTakes #communityPicks .ae-picks-heading-cta-row > :not(.ae-picks-nudge):not(#cpPublishCta) {
+  content: none !important;
+  display: none !important;
+}
+html body #mainContent #footballTakes #communityPicks .ae-picks-heading-cta-row .ae-picks-nudge {
+  display: block !important;
+  flex: 1 1 auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font: 500 15px/1.3 var(--pk-sans) !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--pk-muted) !important;
+  background: none !important;
+  text-shadow: none !important;
+  text-align: left !important;
+}
+html body #mainContent #footballTakes #communityPicks .ae-picks-heading-cta-row #cpPublishCta {
+  flex: none !important;
+  width: auto !important;
+  min-width: 0 !important;
+  min-height: 38px !important;
+  margin: 0 !important;
+  padding: 8px 16px !important;
+  font: 600 14px/1.2 var(--pk-sans) !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--pk-accent) !important;
+  background: var(--pk-soft) !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+html body #mainContent #footballTakes #communityPicks .ae-picks-heading-cta-row #cpPublishCta::before,
+html body #mainContent #footballTakes #communityPicks .ae-picks-heading-cta-row #cpPublishCta::after { content: none !important; display: none !important; }
+html body #mainContent #footballTakes #communityPicks .ae-picks-heading-cta-row #cpPublishCta:hover { background: var(--pk-line) !important; }
+
+/* ---------- feed: una superficie, líneas finas, sin scroll propio ---------- */
+html body #mainContent #footballTakes #communityPicks #cpFeed {
+  flex-direction: column !important;
+  gap: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  margin: 0 !important;
+  padding: 0 16px !important;
+  background: var(--pk-card) !important;
+  background-image: none !important;
+  border: 1px solid var(--pk-line) !important;
+  border-radius: 16px !important;
+  box-shadow: none !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+}
+html body #mainContent #footballTakes #communityPicks #cpFeed::before,
+html body #mainContent #footballTakes #communityPicks #cpFeed::after { content: none !important; display: none !important; }
+html body #mainContent #footballTakes #communityPicks #cpFeedScrollHint { display: none !important; }
+
+html body #mainContent #footballTakes #communityPicks #cpFeed > .cp-card.cam-pk {
+  position: relative !important;
+  display: block !important;
+  width: auto !important;
+  min-width: 0 !important;
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 16px 0 14px !important;
+  background: none !important;
+  border: 0 !important;
+  border-top: 1px solid var(--pk-line) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  color: var(--pk-text) !important;
+  font-family: var(--pk-sans) !important;
+  transform: none !important;
+  overflow: visible !important;
+}
+html body #mainContent #footballTakes #communityPicks #cpFeed > .cp-card.cam-pk:first-child { border-top: 0 !important; }
+html body #mainContent #footballTakes #communityPicks #cpFeed > .cp-card.cam-pk::before,
+html body #mainContent #footballTakes #communityPicks #cpFeed > .cp-card.cam-pk::after { content: none !important; display: none !important; }
+
+/* cabecera: avatar · @usuario · deporte */
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-head {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font: 400 13px/1.3 var(--pk-sans) !important;
+  color: var(--pk-muted) !important;
+}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-author {
+  position: relative !important;
+  z-index: 2 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  min-width: 0 !important;
+  max-width: 70% !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  font: 600 13px/1.3 var(--pk-sans) !important;
+  color: var(--pk-ink) !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-avatar {
+  display: inline-flex !important;
+  flex: none !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 26px !important;
+  height: 26px !important;
+  border-radius: 50% !important;
+  background: var(--pk-soft) !important;
+  color: var(--pk-accent) !important;
+  font: 700 12px/1 var(--pk-sans) !important;
+}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-user {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  color: var(--pk-ink) !important;
+}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-sport {
+  flex: none !important;
+  display: inline !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  border: 0 !important;
+  font: 400 13px/1.3 var(--pk-sans) !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--pk-muted) !important;
+}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-sport::before { content: "· " !important; }
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-result {
+  margin-left: auto !important;
+  font: 600 12px/1.3 var(--pk-sans) !important;
+  color: var(--pk-muted) !important;
+}
+html body #mainContent #footballTakes #communityPicks .cam-pk[data-outcome="won"] .cam-pk-result { color: var(--pk-up) !important; }
+html body #mainContent #footballTakes #communityPicks .cam-pk[data-outcome="lost"] .cam-pk-result { color: var(--pk-down) !important; }
+
+/* cuerpo: pronóstico a la izquierda, momio a la derecha */
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-body {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: start !important;
+  gap: 14px !important;
+  margin: 10px 0 0 !important;
+  padding: 0 !important;
+}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-main { min-width: 0 !important; }
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-combo {
+  display: block !important;
+  margin: 0 0 6px !important;
+  font: 600 12px/1.3 var(--pk-sans) !important;
+  letter-spacing: .02em !important;
+  text-transform: none !important;
+  color: var(--pk-accent) !important;
+}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-title {
+  margin: 0 0 4px !important;
+  font: 500 13px/1.35 var(--pk-sans) !important;
+  color: var(--pk-muted) !important;
+}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-legs {
+  display: grid !important;
+  gap: 10px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none !important;
+  background: none !important;
+  border: 0 !important;
+}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-leg {
+  position: relative !important;
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  border: 0 !important;
+  list-style: none !important;
+}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-leg::before,
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-leg::marker { content: none !important; }
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-choice {
+  display: block !important;
+  margin: 0 !important;
+  font: 600 21px/1.2 var(--pk-serif) !important;
+  letter-spacing: 0 !important;
+  color: var(--pk-ink) !important;
+  overflow-wrap: anywhere !important;
+}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-meta {
+  display: block !important;
+  margin: 3px 0 0 !important;
+  font: 400 13px/1.4 var(--pk-sans) !important;
+  color: var(--pk-muted) !important;
+  overflow-wrap: anywhere !important;
+}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-leg-state {
+  display: block !important;
+  margin: 2px 0 0 !important;
+  font: 600 12px/1.3 var(--pk-sans) !important;
+  color: var(--pk-muted) !important;
+}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-leg[data-outcome="won"] .cam-pk-leg-state { color: var(--pk-up) !important; }
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-leg[data-outcome="lost"] .cam-pk-leg-state { color: var(--pk-down) !important; }
+/* combinada: cada selección con su punto */
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-combo ~ .cam-pk-legs > .cam-pk-leg,
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-more .cam-pk-leg { padding-left: 19px !important; }
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-combo ~ .cam-pk-legs > .cam-pk-leg::before,
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-more .cam-pk-leg::before {
+  content: "" !important;
+  position: absolute !important;
+  left: 0 !important;
+  top: 7px !important;
+  width: 9px !important;
+  height: 9px !important;
+  box-sizing: border-box !important;
+  border: 1.5px solid var(--pk-accent) !important;
+  border-radius: 50% !important;
+  background: none !important;
+}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-leg[data-outcome="won"]::before { background: var(--pk-up) !important; border-color: var(--pk-up) !important; }
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-leg[data-outcome="lost"]::before { background: var(--pk-down) !important; border-color: var(--pk-down) !important; }
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-combo ~ .cam-pk-legs .cam-pk-choice,
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-more .cam-pk-choice { font-size: 18px !important; }
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-more {
+  position: relative !important;
+  z-index: 2 !important;
+  margin: 8px 0 0 !important;
+}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-more > summary {
+  display: inline-block !important;
+  cursor: pointer !important;
+  list-style: none !important;
+  font: 600 13px/1.4 var(--pk-sans) !important;
+  color: var(--pk-accent) !important;
+}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-more > summary::-webkit-details-marker { display: none !important; }
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-more > .cam-pk-legs { margin-top: 10px !important; }
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-odds {
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  font: 700 21px/1.2 var(--pk-sans) !important;
+  font-variant-numeric: tabular-nums !important;
+  letter-spacing: -.01em !important;
+  color: var(--pk-accent) !important;
+  text-align: right !important;
+  white-space: nowrap !important;
+}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-odds::before,
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-odds::after { content: none !important; }
+
+/* todo el Pick abre su ficha; lo interactivo queda por encima */
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-open {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 1 !important;
+  display: block !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  opacity: 1 !important;
+  font-size: 0 !important;
+}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-open:focus-visible {
+  outline: 2px solid var(--pk-accent) !important;
+  outline-offset: 2px !important;
+}
+
+/* análisis plegado */
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-analysis {
+  position: relative !important;
+  z-index: 2 !important;
+  margin: 6px 0 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  border: 0 !important;
+}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-analysis > summary {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  min-height: 30px !important;
+  height: auto !important;
+  cursor: pointer !important;
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font: 600 13px/1.4 var(--pk-sans) !important;
+  color: var(--pk-accent) !important;
+  background: none !important;
+}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-analysis > summary::-webkit-details-marker { display: none !important; }
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-analysis > summary::before { content: none !important; display: none !important; }
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-analysis > summary::after {
+  content: "›" !important;
+  display: inline-block !important;
+  font-size: 15px !important;
+  transform: rotate(90deg) !important;
+  transition: transform .15s ease !important;
+}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-analysis[open] > summary::after { transform: rotate(-90deg) !important; }
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-analysis .cp-explanation {
+  margin: 6px 0 0 !important;
+  padding: 0 !important;
+  font: 400 14px/1.55 var(--pk-sans) !important;
+  color: var(--pk-text) !important;
+  background: none !important;
+  border: 0 !important;
+}
+
+/* acciones: ▲ ▼ en una píldora, responder y compartir como iconos */
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-actions {
+  position: relative !important;
+  z-index: 2 !important;
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 14px !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  margin: 8px 0 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  border: 0 !important;
+}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-votes {
+  display: inline-flex !important;
+  align-items: stretch !important;
+  overflow: hidden !important;
+  border: 1px solid var(--pk-line) !important;
+  border-radius: 999px !important;
+  background: none !important;
+}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-actions button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  width: auto !important;
+  min-width: 0 !important;
+  min-height: 34px !important;
+  margin: 0 !important;
+  padding: 0 4px !important;
+  background: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  font: 600 13px/1 var(--pk-sans) !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--pk-muted) !important;
+  opacity: 1 !important;
+  transform: none !important;
+  cursor: pointer !important;
+}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-actions button::before,
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-actions button::after { content: none !important; display: none !important; }
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-votes button { padding: 0 12px !important; }
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-votes button + button { border-left: 1px solid var(--pk-line) !important; }
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-votes .cp-upvote[aria-pressed="true"] { color: var(--pk-up) !important; background: var(--pk-up-soft) !important; }
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-votes .cp-downvote[aria-pressed="true"] { color: var(--pk-down) !important; background: var(--pk-down-soft) !important; }
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-votes button:not(:disabled):hover { background: var(--pk-soft) !important; }
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-votes button:disabled { cursor: default !important; }
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-actions svg {
+  display: block !important;
+  width: 18px !important;
+  height: 18px !important;
+  flex: none !important;
+}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-actions .cam-pk-share { font-size: 0 !important; min-width: 34px !important; }
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-actions :is(.cam-pk-replies, .cam-pk-share):hover { color: var(--pk-accent) !important; }
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-actions button:focus-visible {
+  outline: 2px solid var(--pk-accent) !important;
+  outline-offset: 2px !important;
+}
+
+/* «Ver todos los Picks»: enlace, no caja */
+html body #mainContent #footballTakes #communityPicks #cpFeedFooter {
+  justify-content: center !important;
+  margin: 0 !important;
+  padding: 6px 0 0 !important;
+  min-height: 0 !important;
+  background: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+html body #mainContent #footballTakes #communityPicks #cpFeedFooter::before,
+html body #mainContent #footballTakes #communityPicks #cpFeedFooter::after { content: none !important; display: none !important; }
+html body #mainContent #footballTakes #communityPicks #cpFeedFooter #cpViewAll {
+  min-height: 44px !important;
+  margin: 0 auto !important;
+  padding: 10px 14px !important;
+  background: none !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  box-shadow: none !important;
+  font: 600 14px/1.2 var(--pk-sans) !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--pk-accent) !important;
+}
+html body #mainContent #footballTakes #communityPicks #cpFeedFooter #cpViewAll:hover { background: var(--pk-soft) !important; }
+
+/* ---------- Platos de la semana ---------- */
+html body #mainContent #footballTakes #communityPicks > .ae-picks-rail {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  margin: 20px 0 0 !important;
+  padding: 16px 16px 6px !important;
+  background: var(--pk-card) !important;
+  background-image: none !important;
+  border: 1px solid var(--pk-line) !important;
+  border-radius: 16px !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+/* Sin pestañas (body sin data-cam-tabs) nada lo oculta: también vale. */
+html body[data-cam-tab="picks"] #mainContent #footballTakes #communityPicks > .ae-picks-rail,
+html body:not([data-cam-tabs]) #mainContent #footballTakes #communityPicks > .ae-picks-rail {
+  display: block !important;
+}
+html body #mainContent #footballTakes #communityPicks > .ae-picks-rail::before,
+html body #mainContent #footballTakes #communityPicks > .ae-picks-rail::after { content: none !important; display: none !important; }
+html body #mainContent #footballTakes #communityPicks .cam-platos-head { margin: 0 0 4px !important; padding: 0 !important; }
+html body #mainContent #footballTakes #communityPicks .cam-platos-title {
+  margin: 0 !important;
+  padding: 0 !important;
+  font: 600 22px/1.2 var(--pk-serif) !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--pk-ink) !important;
+  background: none !important;
+}
+html body #mainContent #footballTakes #communityPicks .cam-platos-tabs {
+  display: flex !important;
+  gap: 4px !important;
+  margin: 12px 0 0 !important;
+  padding: 3px !important;
+  background: var(--pk-soft) !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+}
+html body #mainContent #footballTakes #communityPicks .cam-platos-tabs button {
+  flex: 1 1 0 !important;
+  min-height: 36px !important;
+  margin: 0 !important;
+  padding: 6px 8px !important;
+  background: none !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  box-shadow: none !important;
+  font: 600 14px/1.2 var(--pk-sans) !important;
+  color: var(--pk-muted) !important;
+  cursor: pointer !important;
+}
+html body #mainContent #footballTakes #communityPicks .cam-platos-tabs button[aria-pressed="true"] {
+  background: var(--pk-card) !important;
+  color: var(--pk-accent) !important;
+  box-shadow: 0 0 0 1px var(--pk-line) !important;
+}
+html body #mainContent #footballTakes #communityPicks .cam-platos-tabs button:focus-visible {
+  outline: 2px solid var(--pk-accent) !important;
+  outline-offset: 2px !important;
+}
+
+/* cada ranking, sin caja propia */
+html body #mainContent #footballTakes #communityPicks > .ae-picks-rail > .ae-chef-board {
+  width: auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+html body #mainContent #footballTakes #communityPicks > .ae-picks-rail > .ae-chef-board::before,
+html body #mainContent #footballTakes #communityPicks > .ae-picks-rail > .ae-chef-board::after { content: none !important; display: none !important; }
+html body[data-cam-tab="picks"] #mainContent #footballTakes #communityPicks > .ae-picks-rail[data-cam-platos="best"] > .ae-chef-worst,
+html body[data-cam-tab="picks"] #mainContent #footballTakes #communityPicks > .ae-picks-rail[data-cam-platos="worst"] > .ae-chef-best { display: none !important; }
+/* En el teléfono las pestañas nombran el ranking: el título queda para lectores de pantalla. */
+html body #mainContent #footballTakes #communityPicks > .ae-picks-rail .ae-picks-rail-heading {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+html body #mainContent #footballTakes #communityPicks > .ae-picks-rail .ae-chef-scroll-note { display: none !important; }
+
+html body #mainContent #footballTakes #communityPicks > .ae-picks-rail :is(#picksPopular, #picksQuestioned) {
+  display: block !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  list-style: none !important;
+  background: none !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+}
+html body #mainContent #footballTakes #communityPicks > .ae-picks-rail :is(#picksPopular, #picksQuestioned)::before,
+html body #mainContent #footballTakes #communityPicks > .ae-picks-rail :is(#picksPopular, #picksQuestioned)::after { content: none !important; display: none !important; }
+html body #mainContent #footballTakes #communityPicks > .ae-picks-rail .cam-platos-list:not(.is-expanded) > .cam-plato:nth-child(n+6) { display: none !important; }
+html body #mainContent #footballTakes #communityPicks > .ae-picks-rail .ae-chef-empty {
+  display: block !important;
+  margin: 0 !important;
+  padding: 18px 0 14px !important;
+  background: none !important;
+  border: 0 !important;
+  font: 400 14px/1.4 var(--pk-sans) !important;
+  color: var(--pk-muted) !important;
+  text-align: center !important;
+}
+
+html body #mainContent #footballTakes #communityPicks .cam-plato {
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none !important;
+  background: none !important;
+  border: 0 !important;
+  border-top: 1px solid var(--pk-line) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+html body #mainContent #footballTakes #communityPicks .cam-plato::before,
+html body #mainContent #footballTakes #communityPicks .cam-plato::marker { content: none !important; }
+html body #mainContent #footballTakes #communityPicks .cam-plato-link {
+  display: grid !important;
+  grid-template-columns: 24px minmax(0, 1fr) 64px !important;
+  align-items: center !important;
+  gap: 12px !important;
+  margin: 0 !important;
+  padding: 12px 0 !important;
+  color: var(--pk-text) !important;
+  text-decoration: none !important;
+  background: none !important;
+  border-radius: 8px !important;
+}
+html body #mainContent #footballTakes #communityPicks .cam-plato-link:hover .cam-plato-name { color: var(--pk-accent) !important; }
+html body #mainContent #footballTakes #communityPicks .cam-plato-link:focus-visible {
+  outline: 2px solid var(--pk-accent) !important;
+  outline-offset: 2px !important;
+}
+html body #mainContent #footballTakes #communityPicks .cam-plato-rank {
+  font: 600 22px/1 var(--pk-serif) !important;
+  font-variant-numeric: lining-nums tabular-nums !important;
+  color: var(--pk-accent) !important;
+  text-align: center !important;
+}
+html body #mainContent #footballTakes #communityPicks .cam-plato-text { display: block !important; min-width: 0 !important; }
+html body #mainContent #footballTakes #communityPicks .cam-plato-name {
+  display: -webkit-box !important;
+  -webkit-box-orient: vertical !important;
+  -webkit-line-clamp: 2 !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  font: 600 17px/1.25 var(--pk-serif) !important;
+  color: var(--pk-ink) !important;
+  overflow-wrap: anywhere !important;
+}
+html body #mainContent #footballTakes #communityPicks .cam-plato-meta {
+  display: block !important;
+  margin: 3px 0 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  font: 400 13px/1.35 var(--pk-sans) !important;
+  color: var(--pk-muted) !important;
+}
+html body #mainContent #footballTakes #communityPicks .cam-plato-meta > span + span::before { content: " · " !important; color: var(--pk-muted) !important; }
+html body #mainContent #footballTakes #communityPicks .cam-plato-odds { font-variant-numeric: tabular-nums !important; }
+html body #mainContent #footballTakes #communityPicks .cam-plato-state { font-weight: 700 !important; }
+html body #mainContent #footballTakes #communityPicks .cam-plato-state.is-won { color: var(--pk-up) !important; }
+html body #mainContent #footballTakes #communityPicks .cam-plato-state.is-lost { color: var(--pk-down) !important; }
+html body #mainContent #footballTakes #communityPicks .cam-plato-score { display: block !important; text-align: right !important; }
+html body #mainContent #footballTakes #communityPicks .cam-plato-net {
+  display: block !important;
+  font: 700 16px/1.1 var(--pk-sans) !important;
+  font-variant-numeric: tabular-nums !important;
+  color: var(--pk-muted) !important;
+}
+html body #mainContent #footballTakes #communityPicks .cam-plato-net.is-up { color: var(--pk-up) !important; }
+html body #mainContent #footballTakes #communityPicks .cam-plato-net.is-down { color: var(--pk-down) !important; }
+html body #mainContent #footballTakes #communityPicks .cam-plato-bar {
+  display: flex !important;
+  height: 4px !important;
+  margin: 6px 0 0 auto !important;
+  width: 100% !important;
+  overflow: hidden !important;
+  border-radius: 2px !important;
+  background: var(--pk-line) !important;
+}
+html body #mainContent #footballTakes #communityPicks .cam-plato-bar > .is-up { display: block !important; background: var(--pk-up) !important; }
+html body #mainContent #footballTakes #communityPicks .cam-plato-bar > .is-down { display: block !important; background: var(--pk-down) !important; }
+html body #mainContent #footballTakes #communityPicks .cam-platos-more {
+  display: block !important;
+  width: 100% !important;
+  min-height: 44px !important;
+  margin: 0 !important;
+  padding: 10px 0 !important;
+  background: none !important;
+  border: 0 !important;
+  border-top: 1px solid var(--pk-line) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  font: 600 14px/1.2 var(--pk-sans) !important;
+  color: var(--pk-accent) !important;
+  cursor: pointer !important;
+}
+html body #mainContent #footballTakes #communityPicks .cam-platos-more[hidden] { display: none !important; }
+
+/* ---------- ordenador: los dos rankings lado a lado ---------- */
+@media (min-width: 761px) {
+  html body[data-cam-tab="picks"] #mainContent #footballTakes #communityPicks > .ae-picks-rail,
+  html body:not([data-cam-tabs]) #mainContent #footballTakes #communityPicks > .ae-picks-rail {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    column-gap: 32px !important;
+    row-gap: 0 !important;
+    align-items: start !important;
+    padding: 20px 24px 8px !important;
+  }
+  html body #mainContent #footballTakes #communityPicks > .ae-picks-rail > .cam-platos-head { grid-column: 1 / -1 !important; margin-bottom: 8px !important; }
+  html body #mainContent #footballTakes #communityPicks > .ae-picks-rail .cam-platos-tabs { display: none !important; }
+  html body[data-cam-tab="picks"] #mainContent #footballTakes #communityPicks > .ae-picks-rail[data-cam-platos] > .ae-chef-board,
+  html body:not([data-cam-tabs]) #mainContent #footballTakes #communityPicks > .ae-picks-rail[data-cam-platos] > .ae-chef-board { display: block !important; }
+  html body #mainContent #footballTakes #communityPicks > .ae-picks-rail .ae-picks-rail-heading {
+    position: static !important;
+    display: block !important;
+    width: auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 4px 0 10px !important;
+    overflow: visible !important;
+    clip: auto !important;
+    clip-path: none !important;
+    white-space: normal !important;
+    background: none !important;
+    box-shadow: none !important;
+  }
+  html body #mainContent #footballTakes #communityPicks > .ae-picks-rail .ae-picks-rail-heading::before,
+  html body #mainContent #footballTakes #communityPicks > .ae-picks-rail .ae-picks-rail-heading::after { content: none !important; display: none !important; }
+  html body #mainContent #footballTakes #communityPicks > .ae-picks-rail .ae-picks-rail-heading h3 {
+    margin: 0 !important;
+    padding: 0 !important;
+    font: 600 14px/1.3 var(--pk-sans) !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+    color: var(--pk-muted) !important;
+    background: none !important;
+  }
+  html body #mainContent #footballTakes #communityPicks > .ae-picks-rail .ae-picks-rail-heading h3::before,
+  html body #mainContent #footballTakes #communityPicks > .ae-picks-rail .ae-picks-rail-heading h3::after { content: none !important; display: none !important; }
+  html body #mainContent #footballTakes #communityPicks > .ae-picks-rail .ae-picks-rail-heading > :not(h3) { display: none !important; }
+}
+
+/* ---------- teléfonos estrechos ---------- */
+@media (max-width: 360px) {
+  html body #mainContent #footballTakes #communityPicks #cpFeed { padding: 0 12px !important; }
+  html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-choice { font-size: 19px !important; }
+  html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-odds { font-size: 19px !important; }
+  html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-actions { gap: 10px !important; }
+  html body #mainContent #footballTakes #communityPicks > .ae-picks-rail { padding: 14px 12px 6px !important; }
+  html body #mainContent #footballTakes #communityPicks .cam-plato-link { grid-template-columns: 20px minmax(0, 1fr) 56px !important; gap: 10px !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-analysis > summary::after { transition: none !important; }
+}
+}
