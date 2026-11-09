@@ -89,10 +89,12 @@
   // ae_opinions, no cambian la fecha de publicación ni pierden sus comentarios.
   function sportNews() {
     const source = typeof articles !== 'undefined' && Array.isArray(articles) ? articles : [];
-    return source.filter(a => a && ['NFL', 'Fútbol'].includes(a.category))
+    const sports = {'NFL':'nfl', 'Fútbol':'futbol', 'Fútbol Americano Colegial':'colegial', 'Colegial':'colegial', 'Ciclismo':'ciclismo', 'Tenis':'tenis'};
+    return source.filter(a => a && sports[a.category])
       .map(a => ({
         id: a.id,
-        sport: a.category === 'NFL' ? 'nfl' : 'futbol',
+        sport: sports[a.category],
+        article: a,
         title: a.title || 'Sin título',
         summary: a.summary || '',
         body: a.body || '',
@@ -258,6 +260,14 @@
     if (showsByline(o.author)) text.append(el('p', 'Por ' + o.author, 'ae-opinion-author'));
     b.append(media(o, 'ae-opinion-media'), text);
     a.append(b);
+    // Shared article controls stay outside the story button: each action has
+    // its own keyboard target and keeps the original article's live counts.
+    const article = o.article || sportNews().find(news => storyKey(news) === storyKey(o))?.article;
+    if (article && typeof renderArticleInteractions === 'function') {
+      const actions = el('div', null, 'cam-actualidad-news-actions');
+      actions.innerHTML = renderArticleInteractions(article);
+      a.append(actions);
+    }
     return a;
   }
 

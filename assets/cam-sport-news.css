@@ -153,7 +153,7 @@ html body #mainContent #articlesGrid article .p-5 > p {
   overflow:hidden!important;
   max-height:none!important;
 }
-html body #mainContent :is(#articlesGrid,#aeSportLatestNews,#camHomeJornada) .cam-news-interactions {
+html body #mainContent :is(#articlesGrid,#aeSportLatestNews,#camHomeJornada,#aeOpinions,#heroSection) .cam-news-interactions {
   --cam-news-action-muted:#c5cdd2;
   --cam-news-action-accent:#e3b979;
   display:flex!important;
@@ -164,11 +164,11 @@ html body #mainContent :is(#articlesGrid,#aeSportLatestNews,#camHomeJornada) .ca
   margin:-8px -6px 0!important;
   padding:0!important;
 }
-html:not(.dark) body #mainContent :is(#articlesGrid,#aeSportLatestNews,#camHomeJornada) .cam-news-interactions {
+html:not(.dark) body #mainContent :is(#articlesGrid,#aeSportLatestNews,#camHomeJornada,#aeOpinions,#heroSection) .cam-news-interactions {
   --cam-news-action-muted:#566876;
   --cam-news-action-accent:#855b43;
 }
-html body #mainContent :is(#articlesGrid,#aeSportLatestNews,#camHomeJornada) .cam-news-interaction {
+html body #mainContent :is(#articlesGrid,#aeSportLatestNews,#camHomeJornada,#aeOpinions,#heroSection) .cam-news-interaction {
   display:inline-flex!important;
   align-items:center;
   justify-content:center;
@@ -187,21 +187,21 @@ html body #mainContent :is(#articlesGrid,#aeSportLatestNews,#camHomeJornada) .ca
   cursor:pointer;
   touch-action:manipulation;
 }
-html body #mainContent :is(#articlesGrid,#aeSportLatestNews,#camHomeJornada) .cam-news-interaction i {
+html body #mainContent :is(#articlesGrid,#aeSportLatestNews,#camHomeJornada,#aeOpinions,#heroSection) .cam-news-interaction i {
   font-size:14px;
   color:inherit!important;
 }
-html body #mainContent :is(#articlesGrid,#aeSportLatestNews,#camHomeJornada) .cam-news-interaction span {
+html body #mainContent :is(#articlesGrid,#aeSportLatestNews,#camHomeJornada,#aeOpinions,#heroSection) .cam-news-interaction span {
   font-variant-numeric:tabular-nums;
 }
-html body #mainContent :is(#articlesGrid,#aeSportLatestNews,#camHomeJornada) .cam-news-interaction:is(:hover,[aria-pressed="true"]) {
+html body #mainContent :is(#articlesGrid,#aeSportLatestNews,#camHomeJornada,#aeOpinions,#heroSection) .cam-news-interaction:is(:hover,[aria-pressed="true"]) {
   color:var(--cam-news-action-accent)!important;
 }
-html body #mainContent :is(#articlesGrid,#aeSportLatestNews,#camHomeJornada) .cam-news-interaction:focus-visible {
+html body #mainContent :is(#articlesGrid,#aeSportLatestNews,#camHomeJornada,#aeOpinions,#heroSection) .cam-news-interaction:focus-visible {
   outline:2px solid var(--cam-news-action-accent);
   outline-offset:-3px;
 }
-html body #mainContent :is(#articlesGrid,#aeSportLatestNews,#camHomeJornada) .cam-news-interaction:disabled {
+html body #mainContent :is(#articlesGrid,#aeSportLatestNews,#camHomeJornada,#aeOpinions,#heroSection) .cam-news-interaction:disabled {
   opacity:.65;
   cursor:wait;
 }

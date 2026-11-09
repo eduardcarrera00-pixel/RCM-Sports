@@ -1313,3 +1313,23 @@ html body.ae-is-opinions #aeOpinions #aeOpinionsList { container-type:inline-siz
   html body.ae-is-opinions #aeOpinions .editorial-community.rcm-panel #communityLeaders .ae-community-scroll-entry:has(> .ae-community-empty) { background:transparent !important; }
 }
 }
+
+/* Quiet article counters in every Actualidad sport and card size. */
+html body.ae-is-opinions #aeOpinions .cam-actualidad-news-actions {
+  padding:0 14px;
+}
+html body.ae-is-opinions #aeOpinions .cam-news-interactions {
+  margin:0 -6px!important;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinion-card.is-lead .cam-actualidad-news-actions {
+  position:relative;
+  padding:0 20px 8px;
+  background:#0c2232;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinion-card.is-lead .cam-news-interactions {
+  --cam-news-action-muted:#c5cdd2;
+  --cam-news-action-accent:#e3b979;
+}
+html body.ae-is-opinions #aeOpinions .ae-opinions-recent-list .cam-actualidad-news-actions {
+  padding:0;
+}

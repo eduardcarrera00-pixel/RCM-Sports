@@ -4768,6 +4768,7 @@ currentUser = {
                     <div class="editorial-hero-copy">
                         <h1>${escapeHTML(hero.title)}</h1>
                         <p>${escapeHTML(hero.summary || 'La historia completa, desde otra perspectiva.')}</p>
+                        ${renderArticleInteractions(hero)}
                         <div class="editorial-actions">
                             <button type="button" class="editorial-featured ae-hero-read-cta" onclick="openArticleModal(${articleIdArgument(hero.id)})">
                                 <span>LEER LA HISTORIA</span>

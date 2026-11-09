@@ -145,5 +145,33 @@ assert.equal(w.document.activeElement.id,'commentAuthStatus');
 context.activeModalArticleId='another-story';
 context.focusArticleComments('news-a');
 assert.equal(jumps,2,'A stale animation frame cannot move a different article');
+// Actualidad uses the same source articles and keeps actions outside its open button.
+const opinions = fs.readFileSync('assets/ae-opinions.js', 'utf8');
+context.el = (tag, text, cls) => { const n=w.document.createElement(tag); if(text!=null)n.textContent=text; if(cls)n.className=cls; return n; };
+context.meta = () => w.document.createElement('p');
+context.media = () => w.document.createElement('div');
+context.excerpt = o => o.summary || '';
+context.showsByline = () => false;
+context.items = []; context.active = 'todas';
+vm.runInContext(between(opinions,'  function sportNews()', '  function renderTabs()'),context);
+vm.runInContext(between(opinions,'  function card(', '  const sectionHeader='),context);
+for (const category of ['NFL','Fútbol','Fútbol Americano Colegial','Tenis','Ciclismo']) {
+  const source = {id:'source-'+category,category,title:'Power Rankings '+category,likes:7,commentCount:3,createdAt:'2026-11-09'};
+  context.articles.push(source);
+  const story = context.sportNews().find(o => o.id===source.id);
+  assert.ok(story,category+' news is available in Actualidad');
+  for (const lead of [true,false]) {
+    const tile = context.card(story,lead);
+    assert.equal(tile.querySelector('[data-cam-news-like] span').textContent,'7');
+    assert.equal(tile.querySelector('[data-cam-news-comments] span').textContent,'3');
+    assert.equal(tile.querySelector('button button'),null);
+    assert.equal(tile.querySelector('.ae-opinion-open .cam-news-interactions'),null);
+    w.document.body.append(tile);
+  }
+  source.likes=8; context.syncArticleInteractions();
+  assert.equal(w.document.querySelector('[data-cam-news-like="'+source.id+'"] span').textContent,'8');
+}
+const duplicate = {...context.sportNews().at(-1),is_news:false,article:undefined};
+assert.ok(context.card(duplicate,false).querySelector('[data-cam-news-like]'),'An original column linked to the same article retains article interactions');
 await w.happyDOM.close();
 console.log('PASS: shared news counters, guest reads, zero/unknown/error states, replies and pagination, duplicate-tap guard, like/unlike, stable cards, and direct comment focus.');
