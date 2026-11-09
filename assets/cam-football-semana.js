@@ -11,8 +11,10 @@
   if(!root||!body||!scores||!window.matchMedia)return;
   const mobile=window.matchMedia('(max-width: 760px), (orientation: landscape) and (max-height: 500px) and (hover: none) and (pointer: coarse)');
   const ui={scoreOpen:false,liveOpen:false,liveKey:null,saving:false,result:null};
-  const q=()=>window.camFootballQuiniela;
-  const active=()=>mobile.matches&&document.body.classList.contains('ae-is-football');
+  // Antes de que cargue la quiniela, window.camFootballQuiniela es la <section> con ese id.
+  const q=()=>{const api=window.camFootballQuiniela;return api&&typeof api.snapshot==='function'?api:null;};
+  // 8 nov 2026: también en escritorio (cam-escritorio.css la compone en columnas).
+  const active=()=>document.body.classList.contains('ae-is-football');
   const el=(tag,text,cls,attrs)=>{
     const n=document.createElement(tag);
     if(text!=null)n.textContent=String(text);
@@ -184,7 +186,7 @@
   for(const type of ['touchmove','wheel','keydown'])window.addEventListener(type,release,{passive:true,capture:true});
   const originalGo=window.camGoQuiniela;
   window.camGoQuiniela=function camFootballWeekGo(sport){
-    if(sport==='football'&&mobile.matches)anchorUntil=Date.now()+6000;
+    if(sport==='football')anchorUntil=Date.now()+6000;
     return originalGo?.apply(this,arguments);
   };
   let queued=false;

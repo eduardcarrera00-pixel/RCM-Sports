@@ -188,10 +188,22 @@
   function giveBack(node) {
     const mark = borrowed.get(node);
     borrowed.delete(node);
-    if (mark && mark.parentNode) mark.parentNode.replaceChild(node, mark);
+    if (!mark) return;
+    // Si otro script ya se lo llevó (p. ej. Lo más leído a Actualidad), manda ese script.
+    if (node.parentNode === asideIn && mark.parentNode) mark.parentNode.replaceChild(node, mark);
+    else mark.remove();
   }
+  const byId = id => document.getElementById(id);
   const ASIDE = {
-    home: () => { paintRankings(); return [rankings]; }
+    home: () => { paintRankings(); return [rankings]; },
+    // NFL y Fútbol: ¿Quién será campeón? junto a La semana; las opiniones junto a
+    // los Takes (el Take histórico y el Top 10 necesitan ancho: siguen en el centro);
+    // Lo más leído junto a las noticias de Fútbol.
+    'nfl:semana': () => [borrow(byId('aeSeasonPredictions'))],
+    'futbol:semana': () => [borrow(byId('aeSeasonPredictions'))],
+    'nfl:takes': () => [borrow(byId('aeSportTakeLeaders'))],
+    'futbol:takes': () => [borrow(byId('aeSportTakeLeaders'))],
+    'futbol:noticias': () => [borrow(byId('aeTrendingPortada'))]
   };
   let asideFor = null;
   function fillAside(p) {
@@ -201,7 +213,15 @@
     const nodes = (ASIDE[p] ? ASIDE[p]() : []).filter(Boolean);
     asideIn.replaceChildren(...nodes);
   }
-  const asideHasContent = () => [...asideIn.children].some(node => !node.hidden);
+  // Algunos módulos prestados se muestran solos cuando llegan sus datos (atributo hidden).
+  function asideHasContent() {
+    const was = aside.hidden;
+    aside.hidden = false;
+    const any = [...asideIn.children].some(node => node.getClientRects().length > 0);
+    aside.hidden = was;
+    return any;
+  }
+  new MutationObserver(() => queue()).observe(asideIn, { attributes: true, attributeFilter: ['hidden'], subtree: true });
 
   /* ---------- 4. Inicio: «Cierran pronto» a todo el ancho, con flechas ---------- */
   const strip = () => document.querySelector('#camHomeJornada .cam-hj-section[data-row="jornada"]');
@@ -259,10 +279,15 @@
       const after = shown(strip()) ? strip() : root.querySelector('.cam-hj-top');
       if (after && after.nextSibling !== rail) after.after(rail);
       else if (!after && root.firstChild !== rail) root.prepend(rail);
+    } else if (/^(nfl|futbol):semana$/.test(p) && semana(p)) {
+      // La semana: los atajos entran en su rejilla, bajo la cabecera a todo el ancho.
+      const box = semana(p);
+      if (box.nextSibling !== rail) box.after(rail);
     } else if (bar && bar.parentNode === main) {
       if (bar.nextSibling !== rail) bar.after(rail);
     } else if (main.firstChild !== rail) main.prepend(rail);
   }
+  const semana = p => document.getElementById(p.startsWith('nfl') ? 'camNflSemana' : 'camFootballSemana');
   function placeAside() {
     if (main.lastElementChild !== aside) main.append(aside);
   }
@@ -285,7 +310,8 @@
     const mainStyle = getComputedStyle(main);
     const mainTop = main.getBoundingClientRect().top;
     let top = parseFloat(mainStyle.paddingTop) || 0;
-    for (const node of [bar, ...main.querySelectorAll('[data-cam-desk-full]')]) {
+    // Lo que va a todo el ancho: la tira de Inicio y la cabecera de La semana (se repinta, por eso va por selector).
+    for (const node of [bar, ...main.querySelectorAll('[data-cam-desk-full], body[data-cam-tab="semana"] .cam-nfl-semana .cam-ns-head')]) {
       if (!shown(node)) continue;
       top = Math.max(top, node.getBoundingClientRect().bottom - mainTop + 24);
     }

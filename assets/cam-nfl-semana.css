@@ -1,7 +1,8 @@
 /* CAM SPORTS · NFL y Fútbol «La semana» (4 nov 2026).
-   1. La sección :is(#camNflSemana,#camNflScore,#camFootballSemana,#camFootballScore): solo en el teléfono, en la pestaña La semana de
-      NFL (body[data-cam-section="nfl"][data-cam-tab="semana"], que pone
-      cam-mobile-sections.js). En escritorio no existe a la vista. Los Power
+   1. La sección :is(#camNflSemana,#camNflScore,#camFootballSemana,#camFootballScore): en la pestaña La semana de
+      NFL y Fútbol (body[data-cam-section][data-cam-tab="semana"], que pone
+      cam-mobile-sections.js). Desde el 8 nov 2026 también en escritorio, donde
+      cam-escritorio.css la compone en columnas. Los Power
       Rankings viven en Noticias, con su diseño de siempre.
    2. En La Quiniela NFL (teléfono y escritorio): la elección del editor, el
       laurel (x2) y lo que eligió la comunidad, debajo de cada partido.
@@ -12,7 +13,7 @@
   /* ---------- 1. La semana ---------- */
   html body :is(#camNflSemana,#camNflScore,#camFootballSemana,#camFootballScore) { display:none!important; }
 
-  @media (max-width: 760px), (orientation: landscape) and (max-height: 500px) and (hover: none) and (pointer: coarse) {
+  /* 8 nov 2026: en todos los anchos; en escritorio cam-escritorio.css (capa cam-header) la compone en columnas. */
     html body[data-cam-section="nfl"][data-cam-tab="semana"] :is(#camNflSemana,#camNflScore),
     html body[data-cam-section="futbol"][data-cam-tab="semana"] :is(#camFootballSemana,#camFootballScore) {
       --ns-card:#fffdf9;
@@ -266,7 +267,7 @@
     html body :is(#camNflSemana,#camNflScore,#camFootballSemana,#camFootballScore) .cam-ns-versus { margin-top:10px!important; padding-top:10px!important; border-top:1px solid var(--ns-line)!important; color:var(--ns-text)!important; font:400 13px/1.45 Inter,system-ui,sans-serif!important; }
     html body :is(#camNflSemana,#camNflScore,#camFootballSemana,#camFootballScore) .cam-ns-versus strong { color:var(--ns-ink)!important; font-weight:800!important; }
 
-  }
+
 
   /* ---------- 2. La Quiniela NFL: editor, laurel y comunidad ---------- */
   html body #camNflQuiniela .cam-nfl-extras {

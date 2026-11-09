@@ -14,7 +14,8 @@
    Cuota: no hace consultas propias salvo el marcador «tú contra el editor» (una
    llamada por jornada). Los partidos, tus elecciones y las del editor salen de
    La Quiniela (window.camNflQuiniela); el ranking, de community.js.
-   En escritorio no se pinta (la sección se oculta en cam-nfl-semana.css). */
+   Escritorio (8 nov 2026): la misma pestaña, compuesta en columnas por
+   cam-escritorio.css. */
 (() => {
   'use strict';
 
@@ -43,7 +44,8 @@
   const nick = id => { const words = String(teamOf(id)?.name || id).trim().split(/\s+/); return words[words.length - 1] || id; };
   const published = () => { try { return typeof rankingPublished !== 'undefined' ? rankingPublished : null; } catch { return null; } };
   const nflOn = () => document.body.classList.contains('ae-is-nfl');
-  const active = () => mobile.matches && nflOn();
+  // 8 nov 2026: también en escritorio (cam-escritorio.css la compone en columnas).
+  const active = () => nflOn();
   const pts = n => n + (Number(n) === 1 ? ' pt' : ' pts');
 
   const parts = (value, options) => new Intl.DateTimeFormat('es', { timeZone: TZ, ...options }).format(new Date(value)).replace(/\./g, '');
@@ -390,7 +392,7 @@
   }
   const originalGo = typeof window.camGoQuiniela === 'function' ? window.camGoQuiniela : null;
   window.camGoQuiniela = function camSemanaGoQuiniela(sport) {
-    if (sport !== 'football' && mobile.matches) anchor('camNflQuiniela');
+    if (sport !== 'football') anchor('camNflQuiniela');
     if (originalGo) return originalGo.apply(this, arguments);
     if (typeof window.filterByCategory === 'function') window.filterByCategory(sport === 'football' ? 'Fútbol' : 'NFL');
     window.camSectionTabs?.select?.('quiniela');

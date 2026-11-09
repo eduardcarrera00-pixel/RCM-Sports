@@ -46,6 +46,9 @@
  }
  function syncFootballDesktopPlacement(){
    const root=$('aeSportTakeLeaders');
+   // Escritorio (8 nov 2026): mientras está en el carril derecho, cam-escritorio.js
+   // lo devuelve a su sitio al cambiar de pestaña.
+   if(root&&root.closest('#camDeskAside'))return;
    const layout=document.querySelector('#mainContent .editorial-layout');
    const sidebar=layout?.querySelector('aside');
    if(!root||!layout||!sidebar)return;

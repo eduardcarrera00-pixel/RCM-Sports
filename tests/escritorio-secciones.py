@@ -15,6 +15,11 @@ Cubre, a 1024, 1366 y 1920 px, de día y de noche:
     principal + cuatro, Takes en rejilla de tres, Power Rankings en el carril
     derecho; siguen a la vista Popular/Unpopular Takes, Genios/Anoetos, Take
     histórico y Picks de la comunidad;
+  · NFL y Fútbol: La semana con su cabecera a todo el ancho, el duelo a la
+    izquierda, lo de la semana a la derecha y la quiniela debajo; Takes en
+    rejilla con las opiniones en el carril derecho (y de vuelta a su sitio al
+    cambiar de pestaña); Noticias con Power Rankings y, en Fútbol, Lo más leído
+    en el carril;
   · sin scroll horizontal, sin textos recortados (por el borde o por una
     esquina redondeada) y sin errores de consola;
   · teléfono (390 px): nada del escritorio aparece.
@@ -254,6 +259,71 @@ def sections(width, dark):
         check(st['cat'] == 'Opiniones' and not st['bar'] and st['navCurrent'] == ['Actualidad'], f'{where}: Actualidad {st["cat"]} {st["bar"]} {st["navCurrent"]}')
         check(not page.errors, f'{where}: errores {page.errors}')
 
+SPORT = r"""() => {
+  const q = s => document.querySelector(s);
+  const rect = e => { e = typeof e === 'string' ? q(e) : e; if (!e || !e.getClientRects().length) return null; const r = e.getBoundingClientRect(); return {l: Math.round(r.left), r: Math.round(r.right), t: Math.round(r.top + scrollY), b: Math.round(r.bottom + scrollY), w: Math.round(r.width)}; };
+  const main = q('#mainContent').getBoundingClientRect();
+  const visibleScore = ['#camNflScore', '#camFootballScore'].map(s => q(s)).find(e => e && e.getClientRects().length && e.childElementCount);
+  return {
+    main: {l: Math.round(main.left), r: Math.round(main.right)},
+    head: rect('#mainContent .cam-nfl-semana .cam-ns-head:not(:empty)') || [...document.querySelectorAll('.cam-nfl-semana .cam-ns-head')].map(rect).find(Boolean) || null,
+    leagues: !!q('#camFootballSemana .cam-ns-head .cam-football-leagues'),
+    duel: [...document.querySelectorAll('.cam-nfl-semana .cam-ns-feature')].map(rect).find(Boolean) || null,
+    score: rect(visibleScore), quiniela: rect('#camNflQuiniela') || rect('#camFootballQuiniela'),
+    feed: [...document.querySelectorAll('#freeTakesFeed > .ae-free-take-card')].map(rect).filter(Boolean),
+    asideKids: [...document.querySelectorAll('#camDeskAside .cam-desk-aside-in > *')].filter(e => e.getClientRects().length).map(e => e.id || e.className),
+    asideOn: 'camDeskAside' in document.body.dataset, aside: rect('#camDeskAside'),
+    leadersHome: (q('#aeSportTakeLeaders') || {}).parentElement?.id || null,
+    trending: document.querySelectorAll('#camDeskAside #aeTrendingPortada .ae-trending-item').length,
+    twin: [...document.querySelectorAll('#aeNflTwinRankings > section')].map(rect).filter(Boolean),
+    rankings: ['#nflRankings', '#championsRankings'].map(s => !!rect(s)),
+    rail: rect('#camDeskRail'),
+  };
+}"""
+
+def sport(width, dark):
+    where = f'{width}-{"noche" if dark else "dia"}'
+    with fp.full_page(fake_js=FAKE, dark=dark, width=width, height=900, scale=1) as page:
+        for query in ('?s=nfl', '?s=futbol'):
+            visit(page, query); page.wait_for_timeout(700)
+            sp = page.evaluate(SPORT)
+            check(sp['head'] and abs(sp['head']['l'] - (sp['main']['l'] + 24)) <= 1.5 and abs(sp['head']['r'] - (sp['main']['r'] - 24)) <= 1.5,
+                  f'{where} {query}: cabecera de La semana a todo el ancho {sp["head"]} {sp["main"]}')
+            check(sp['duel'] and sp['quiniela'] and sp['quiniela']['t'] > sp['duel']['b'], f'{where} {query}: la quiniela va debajo del duelo {sp["duel"]} {sp["quiniela"]}')
+            if sp['score']:
+                check(sp['score']['l'] > sp['duel']['r'] and sp['score']['t'] < sp['duel']['b'], f'{where} {query}: lo de la semana a la derecha del duelo {sp["duel"]} {sp["score"]}')
+            check(sp['rail']['t'] >= sp['head']['b'] - 1, f'{where} {query}: los carriles empiezan bajo la cabecera {sp["rail"]} {sp["head"]}')
+            if query == '?s=futbol':
+                check(sp['leagues'], f'{where}: el selector de ligas va en la cabecera de La semana')
+            clipped = page.evaluate(TEXT_CHECK, ['#freeTakes', '#camDeskAside', '#camSectionTabs'])
+            check(not clipped, f'{where} {query}: textos recortados {clipped}')
+            shot(page, f'{where}-semana-{query[3:]}')
+        visit(page, '?s=futbol&v=takes'); page.wait_for_timeout(500)
+        sp = page.evaluate(SPORT)
+        cols = 3 if width >= 1280 else 2
+        check(len(sp['feed']) >= cols and len({f['l'] for f in sp['feed']}) == cols, f'{where}: Últimos Takes en rejilla de {cols} {sp["feed"]}')
+        check(sp['asideKids'] == ['aeSportTakeLeaders'] and sp['leadersHome'] != 'freeTakes', f'{where}: opiniones en el carril {sp["asideKids"]} {sp["leadersHome"]}')
+        check(sp['aside'] and sp['feed'] and sp['aside']['l'] > max(f['r'] for f in sp['feed']), f'{where}: carril a la derecha de los Takes {sp["aside"]} {sp["feed"]}')
+        check(len(sp['twin']) == 2 and sp['twin'][0]['l'] == sp['twin'][1]['l'], f'{where}: Respira Fútbol y Vende Humos, una debajo de otra {sp["twin"]}')
+        clipped = page.evaluate(TEXT_CHECK, ['#freeTakes', '#camDeskAside'])
+        check(not clipped, f'{where} Takes: textos recortados {clipped}')
+        shot(page, f'{where}-takes')
+        page.click('#camSectionTabs [data-tab="noticias"]'); page.wait_for_timeout(700)
+        sp = page.evaluate(SPORT)
+        check(sp['leadersHome'] == 'freeTakes', f'{where}: las opiniones vuelven a su sitio al dejar Takes ({sp["leadersHome"]})')
+        check(sp['asideKids'] == ['aeTrendingPortada'] and sp['trending'] >= 3, f'{where}: Lo más leído en el carril de Noticias de Fútbol {sp["asideKids"]} {sp["trending"]}')
+        check(sp['rankings'][1], f'{where}: Power Rankings Champions en Noticias')
+        clipped = page.evaluate(TEXT_CHECK, ['#camDeskAside'])
+        check(not clipped, f'{where} Noticias: textos recortados {clipped}')
+        visit(page, '?s=nfl&v=noticias')
+        sp = page.evaluate(SPORT)
+        check(sp['rankings'][0] and not sp['asideOn'], f'{where}: Noticias NFL con Power Rankings y sin carril derecho {sp["rankings"]} {sp["asideOn"]}')
+        # Al ir a Actualidad, Lo más leído se va con ella (no se queda en el carril).
+        visit(page, '?s=futbol&v=noticias'); page.click('body > header nav.ae-sport-nav button[data-category="Opiniones"]'); page.wait_for_timeout(900)
+        check(page.evaluate("!document.querySelector('#camDeskAside #aeTrendingPortada')"), f'{where}: Lo más leído se quedó en el carril al ir a Actualidad')
+        check(page.evaluate("document.documentElement.scrollWidth - innerWidth") <= 0, f'{where}: scroll horizontal en NFL/Fútbol')
+        check(not page.errors, f'{where}: errores {page.errors}')
+
 def phone(dark):
     where = f'390-{"noche" if dark else "dia"}'
     with fp.full_page(fake_js=FAKE, dark=dark, width=390, height=844) as page:
@@ -276,9 +346,10 @@ for width in (1024, 1366, 1920):
     for dark in (False, True):
         home(width, dark)
         sections(width, dark)
+        sport(width, dark)
 for dark in (False, True):
     phone(dark)
 
 if errors:
     print('FALLOS:'); print('\n'.join('  · ' + e for e in errors)); sys.exit(1)
-print('OK: escritorio con secciones, pestañas, direcciones, rejilla e Inicio (1024/1366/1920, día y noche); el teléfono sin cambios.')
+print('OK: escritorio con secciones, pestañas, direcciones, rejilla, Inicio, NFL y Fútbol (1024/1366/1920, día y noche); el teléfono sin cambios.')

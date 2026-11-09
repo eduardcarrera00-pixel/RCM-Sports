@@ -554,6 +554,153 @@
     html body[data-cam-desk].cam-home-jornada #mainContent > .editorial-layout :is(#aeNewsHeadingRow, #aeSportLatestNews, #articlesGrid, #aeSportAllNewsFooter, #aeHomeAllNewsActions, #noResults, #aeHomeTakesSectionHeading, #aeHomeSidebarFeatures, .editorial-community) {
       display: none !important;
     }
+
+    /* ---------- NFL y Fútbol · La semana ---------- */
+    /* La cabecera a todo el ancho; debajo, el duelo a la izquierda y lo que pasa
+       esta semana (En juego, ¿le ganas al editor?, marcador o crónica) a la derecha;
+       la quiniela completa debajo. Sin mover módulos: rejilla con áreas sobre
+       #freeTakes (La semana y su cuerpo con display:contents). Los atajos entran en
+       la rejilla bajo la cabecera (fila propia hasta 1279 px; carril desde 1280). */
+    html body[data-cam-desk][data-cam-tabs="sport"][data-cam-tab="semana"] #freeTakes {
+      display: grid !important;
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) !important;
+      grid-template-areas: "head head" "rail rail" "duel live" "duel score" "quin quin" !important;
+      /* La fila de «score» es flexible: el alto del duelo no estira «En juego». */
+      grid-template-rows: auto auto auto 1fr auto !important;
+      align-items: start !important;
+      gap: 20px 24px !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      border: 0 !important;
+      border-radius: 0 !important;
+      background: none !important;
+      background-image: none !important;
+      box-shadow: none !important;
+      overflow: visible !important;
+    }
+    html body[data-cam-desk][data-cam-tabs="sport"][data-cam-tab="semana"] #freeTakes:not(:has(.cam-ns-live)) {
+      grid-template-areas: "head head" "rail rail" "duel score" "duel ." "quin quin" !important;
+    }
+    html body[data-cam-desk][data-cam-tabs="sport"][data-cam-tab="semana"] #freeTakes:not(:has(.cam-ns-live)):not(:has(> :is(#camNflScore, #camFootballScore):not(:empty))) {
+      grid-template-areas: "head head" "rail rail" "duel duel" "duel duel" "quin quin" !important;
+    }
+    html body[data-cam-desk][data-cam-tabs="sport"][data-cam-tab="semana"] #freeTakes > * { min-width: 0 !important; }
+    /* Los atajos son hijos de #freeTakes aquí: la regla de pestañas no debe esconderlos. */
+    html body[data-cam-desk][data-cam-tab="semana"] #freeTakes > #camDeskRail:not([hidden]):not(#cam-dk1):not(#cam-dk2):not(#cam-dk3):not(#cam-dk4) {
+      display: block !important;
+      grid-area: rail !important;
+    }
+    html body[data-cam-desk][data-cam-tab="semana"] :is(#camNflSemana, #camFootballSemana),
+    html body[data-cam-desk][data-cam-tab="semana"] :is(#camNflSemanaBody, #camFootballSemanaBody) { display: contents !important; }
+    html body[data-cam-desk][data-cam-tab="semana"] .cam-nfl-semana .cam-ns-head {
+      grid-area: head !important;
+      display: flex !important;
+      flex-wrap: wrap !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      gap: 12px 24px !important;
+      margin: -24px calc(var(--dk-pad) - var(--dk-pr)) 4px calc(var(--dk-pad) - var(--dk-pl)) !important;
+      padding: 18px 0 !important;
+      border: 0 !important;
+      border-image: linear-gradient(to top, var(--dk-line) 1px, var(--dk-band) 1px) fill 0 / 0 / 0 100vmax !important;
+      background: var(--dk-band) !important;
+    }
+    html body[data-cam-desk][data-cam-tab="semana"] .cam-nfl-semana .cam-ns-title {
+      margin: 0 !important;
+      color: var(--dk-ink) !important;
+      font: 600 30px/1.15 "Playfair Display", Georgia, serif !important;
+    }
+    html body[data-cam-desk][data-cam-tab="semana"] .cam-nfl-semana .cam-ns-head .cam-football-leagues { margin: 0 !important; width: auto !important; }
+    html body[data-cam-desk][data-cam-tab="semana"] .cam-nfl-semana .cam-ns-loading { grid-area: duel !important; }
+    html body[data-cam-desk][data-cam-tab="semana"] .cam-nfl-semana .cam-ns-feature {
+      grid-area: duel !important;
+      margin: 0 !important;
+      padding: 24px !important;
+    }
+    html body[data-cam-desk][data-cam-tab="semana"] .cam-nfl-semana .cam-ns-feature .cam-ns-duel { gap: 16px !important; padding: 8px 0 !important; }
+    html body[data-cam-desk][data-cam-tab="semana"] .cam-nfl-semana .cam-ns-feature .cam-ns-duel-name { font-size: 28px !important; }
+    html body[data-cam-desk][data-cam-tab="semana"] .cam-nfl-semana .cam-ns-live { grid-area: live !important; margin: 0 !important; }
+    html body[data-cam-desk][data-cam-tab="semana"] #freeTakes > :is(#camNflScore, #camFootballScore) { grid-area: score !important; margin: 0 !important; }
+    html body[data-cam-desk][data-cam-tab="semana"] #freeTakes > :is(#camNflScore, #camFootballScore) > :first-child { margin-top: 0 !important; }
+    html body[data-cam-desk][data-cam-tab="semana"] #freeTakes > :is(#camNflScore, #camFootballScore) > * + * { margin-top: 16px !important; }
+    html body[data-cam-desk][data-cam-tab="semana"] #freeTakes > :is(#camNflQuiniela, #camFootballQuiniela) { grid-area: quin !important; margin: 8px 0 0 !important; }
+
+    /* ---------- NFL y Fútbol · Takes ---------- */
+    html body[data-cam-desk][data-cam-tabs="sport"][data-cam-tab="takes"] #freeTakesFeed {
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
+      grid-auto-flow: row !important;
+      grid-auto-columns: auto !important;
+      overflow: visible !important;
+      width: 100% !important;
+      max-width: none !important;
+    }
+    html body[data-cam-desk][data-cam-tabs="sport"][data-cam-tab="takes"] #freeTakesFeed > .ae-free-take-card {
+      width: auto !important;
+      min-width: 0 !important;
+      max-width: none !important;
+    }
+
+    /* Savant/Rookie (Respira Fútbol/Vende Humos), una tabla debajo de la otra: en media columna se pisaban sus cabeceras. */
+    html body[data-cam-desk][data-cam-tabs="sport"] #aeNflTwinRankings:not([hidden]) {
+      display: grid !important;
+      grid-template-columns: minmax(0, 1fr) !important;
+      gap: 16px !important;
+    }
+
+    /* ---------- módulos prestados al carril derecho ---------- */
+    html body[data-cam-desk] #camDeskAside > .cam-desk-aside-in > * { width: 100% !important; max-width: none !important; margin: 0 !important; }
+    html body[data-cam-desk] #camDeskAside #aeSportTakeLeaders .ae-sport-takes-grid {
+      display: grid !important;
+      grid-template-columns: minmax(0, 1fr) !important;
+      gap: 16px !important;
+    }
+    html body[data-cam-desk] #camDeskAside #aeTrendingPortada,
+    html body[data-cam-desk] #camDeskAside #aeTrendingPortada[hidden] { display: block !important; }
+    /* Lo más leído en una columna estrecha: foto pequeña (si hay) y texto al lado. */
+    html body[data-cam-desk] #camDeskAside #aeTrendingPortada .ae-trending-item {
+      display: block !important;
+      width: 100% !important;
+      margin: 0 !important;
+      padding: 12px 0 !important;
+      border: 0 !important;
+      border-top: 1px solid var(--dk-line) !important;
+      background: none !important;
+    }
+    html body[data-cam-desk] #camDeskAside #aeTrendingPortada .ae-trending-item:first-child { border-top: 0 !important; }
+    html body[data-cam-desk] #camDeskAside #aeTrendingPortada .ae-trending-link {
+      display: flex !important;
+      flex-direction: row !important;
+      justify-content: flex-start !important;
+      align-items: flex-start !important;
+      aspect-ratio: auto !important;
+      min-height: 0 !important;
+      gap: 12px !important;
+      width: 100% !important;
+      min-width: 0 !important;
+      height: auto !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      text-align: left !important;
+    }
+    html body[data-cam-desk] #camDeskAside #aeTrendingPortada .ae-trending-image { display: none !important; }
+    html body[data-cam-desk] #camDeskAside #aeTrendingPortada .ae-trending-image:has(img[src^="http"]) {
+      display: block !important;
+      flex: 0 0 64px !important;
+      width: 64px !important;
+      height: 64px !important;
+      overflow: hidden !important;
+      border-radius: 10px !important;
+    }
+    html body[data-cam-desk] #camDeskAside #aeTrendingPortada .ae-trending-image img { width: 100% !important; height: 100% !important; object-fit: cover !important; }
+    html body[data-cam-desk] #camDeskAside #aeTrendingPortada .ae-trending-story {
+      display: flex !important;
+      flex: 1 1 auto !important;
+      flex-direction: column !important;
+      align-items: flex-start !important;
+      gap: 4px !important;
+      width: auto !important;
+      min-width: 0 !important;
+    }
   }
 
   /* ---------- 1024–1279 px: contenido + carril derecho fijo ---------- */
@@ -602,6 +749,17 @@
     html body[data-cam-desk] #camDeskRail .cam-hj-shortcuts {
       grid-template-columns: minmax(0, 1fr) !important;
       gap: 8px !important;
+    }
+    /* La semana: el carril va por fuera de la rejilla, sin fila propia. */
+    html body[data-cam-desk][data-cam-tabs="sport"][data-cam-tab="semana"] #freeTakes {
+      grid-template-areas: "head head" "duel live" "duel score" "quin quin" !important;
+      grid-template-rows: auto auto 1fr auto !important;
+    }
+    html body[data-cam-desk][data-cam-tabs="sport"][data-cam-tab="semana"] #freeTakes:not(:has(.cam-ns-live)) {
+      grid-template-areas: "head head" "duel score" "duel ." "quin quin" !important;
+    }
+    html body[data-cam-desk][data-cam-tabs="sport"][data-cam-tab="semana"] #freeTakes:not(:has(.cam-ns-live)):not(:has(> :is(#camNflScore, #camFootballScore):not(:empty))) {
+      grid-template-areas: "head head" "duel duel" "duel duel" "quin quin" !important;
     }
     html body[data-cam-desk] #camDeskRail .cam-hj-shortcut {
       flex-direction: row !important;

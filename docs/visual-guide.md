@@ -331,3 +331,21 @@ qué enseña cada pestaña (`assets/cam-mobile-bottom-nav.css`) valen en todos l
 anchos. Estilos: `assets/cam-escritorio.css` (paquete `cam-perf-app-panels.css`, capa
 `cam-header`). Prueba: `python3 -B tests/escritorio-secciones.py` (1024/1366/1920,
 día y noche).
+
+### NFL y Fútbol en escritorio · 8 nov 2026
+
+**La semana** se ve también en el ordenador (`cam-nfl-semana.js` y
+`cam-football-semana.js` ya no dependen del ancho). Su cabecera ocupa todo el ancho
+(en Fútbol, con el selector de ligas); debajo, el duelo de la semana a la izquierda y,
+a la derecha, En juego, ¿Le ganas al editor? y el marcador o la crónica; la quiniela
+completa cierra la pestaña. Sin nada a la derecha, el duelo ocupa todo el ancho. Es
+una rejilla con áreas sobre `#freeTakes` (La semana y su cuerpo con
+`display: contents`): no se mueve ningún módulo. «¿Quién será campeón?» va al carril
+derecho cuando tiene contenido.
+
+**Takes**: Últimos Takes en rejilla de 2 (hasta 1279 px) o 3 columnas; Opiniones
+populares/impopulares en el carril derecho (se devuelven a su sitio al cambiar de
+pestaña o al teléfono); Top 10 de la comunidad (Savant/Rookie, Respira Fútbol/Vende
+Humos, una tabla debajo de otra) y Take histórico siguen en el centro.
+**Noticias**: Power Rankings con su diseño de siempre y las noticias; en Fútbol, Lo
+más leído en el carril derecho (vuelve a Actualidad al cambiar de sección).
