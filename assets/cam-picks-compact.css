@@ -3,8 +3,12 @@
 @layer cam-banners {
   html body #mainContent #camHomePicks {
     --cam-odds-bg:#e5efff;--cam-odds-ink:#123e78;--cam-odds-line:#afc9e8;
-    --cam-h-card:#fffcf6;--cam-h-ink:#28414e;--cam-h-muted:#62747d;
-    --cam-h-edge:#decbb6;--cam-h-action:#80563b;--cam-h-hover:#f5ecdf;
+    /* In mobile Home these inherit the community Takes palette. The same
+       fallbacks keep the cards consistent in the desktop sidebar. */
+    --cam-h-card:var(--hj-card,#fffdf9);--cam-h-ink:var(--hj-ink,#13324d);--cam-h-muted:var(--hj-muted,#66727c);
+    --cam-h-edge:var(--hj-line,rgba(133,91,67,.2));--cam-h-action:var(--hj-accent,#855b43);--cam-h-hover:var(--hj-soft,#f4ece0);
+    --cam-h-shadow:var(--hj-shadow,0 1px 2px rgba(19,50,77,.06),0 6px 18px -12px rgba(19,50,77,.28));
+    --cam-h-odds-bg:var(--hj-accent-soft,rgba(133,91,67,.1));
     display:block!important;position:relative!important;isolation:isolate!important;
     box-sizing:border-box!important;width:100%!important;min-width:0!important;
     height:auto!important;min-height:0!important;margin:0 0 16px!important;padding:0!important;
@@ -14,8 +18,10 @@
   }
   html.dark body #mainContent #camHomePicks {
     --cam-odds-bg:#163f68;--cam-odds-ink:#d8eaff;--cam-odds-line:#416c95;
-    --cam-h-card:#1c3949;--cam-h-ink:#f6ede3;--cam-h-muted:#b8c9cb;
-    --cam-h-edge:rgba(199,170,137,.27);--cam-h-action:#d5b18b;--cam-h-hover:#244858;
+    --cam-h-card:var(--hj-card,#11293d);--cam-h-ink:var(--hj-ink,#f6ecdf);--cam-h-muted:var(--hj-muted,#a9b6bf);
+    --cam-h-edge:var(--hj-line,rgba(214,166,112,.2));--cam-h-action:var(--hj-accent,#e0b37c);--cam-h-hover:var(--hj-soft,#163450);
+    --cam-h-shadow:var(--hj-shadow,0 1px 2px rgba(0,0,0,.25),0 8px 20px -14px rgba(0,0,0,.6));
+    --cam-h-odds-bg:var(--hj-accent-soft,rgba(224,179,124,.12));
   }
   html body #mainContent #camHomePicks[hidden] {display:none!important;}
   html body #mainContent #camHomePicks::before,
@@ -94,7 +100,7 @@
   html body #mainContent #camHomePicks .cam-home-plate-open {
     display:flex!important;flex-direction:column!important;gap:7px!important;box-sizing:border-box!important;
     width:100%!important;height:100%!important;min-width:0!important;margin:0!important;padding:12px 12px 10px!important;
-    border:1px solid var(--cam-h-edge)!important;border-radius:0!important;box-shadow:none!important;
+    border:1px solid var(--cam-h-edge)!important;border-radius:16px!important;box-shadow:var(--cam-h-shadow)!important;
     background:var(--cam-h-card)!important;color:var(--cam-h-ink)!important;text-decoration:none!important;overflow:hidden!important;
   }
   html body #mainContent #camHomePicks .cam-home-plate-open:hover {background:var(--cam-h-hover)!important;border-color:var(--cam-h-action)!important;}
@@ -115,7 +121,13 @@
     display:flex!important;align-items:center!important;justify-content:space-between!important;gap:6px!important;flex-shrink:0!important;
     padding-top:7px!important;border-top:1px solid var(--cam-h-edge)!important;
   }
-  html body #mainContent #camHomePicks .ae-pick-history-odds {color:var(--cam-h-ink)!important;font:800 11px/1.3 Inter,system-ui,sans-serif!important;white-space:nowrap!important;}
+  html body #mainContent #camHomePicks .ae-pick-history-odds {
+    display:inline-flex!important;align-items:center!important;justify-content:center!important;flex:none!important;
+    box-sizing:border-box!important;min-width:43px!important;padding:2px 7px!important;
+    border:1px solid var(--cam-h-edge)!important;border-radius:6px!important;
+    background:var(--cam-h-odds-bg)!important;color:var(--cam-h-action)!important;
+    font:800 11px/1.3 Inter,system-ui,sans-serif!important;font-variant-numeric:tabular-nums!important;white-space:nowrap!important;
+  }
   html body #mainContent #camHomePicks .cam-home-plate-votes {color:var(--cam-h-muted)!important;font:600 10px/1.3 Inter,system-ui,sans-serif!important;white-space:nowrap!important;}
   html body #mainContent #camHomePicks .cam-home-plate-empty {flex:0 0 100%!important;padding:8px 0!important;color:var(--ds-text-muted,#566876)!important;font:400 12px/1.5 Inter,system-ui,sans-serif!important;}
   html body #mainContent #camHomePicks :is(a,button,[tabindex]):focus-visible {outline:2px solid var(--cam-odds-ink)!important;outline-offset:2px!important;}
