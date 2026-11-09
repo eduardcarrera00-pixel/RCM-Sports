@@ -1,12 +1,15 @@
 """Picks moderno (9 nov 2026) sobre la página completa (Chromium + Supabase falso).
 Uso: python3 -B tests/picks-moderno.py [--shots DIR]
-Comprueba en 360/390/1366 px, día y noche:
+Comprueba en 360/390/900/1366 px, día y noche:
+  · orden: Pick del editor → Mejores y Peores platos → «¿Eres Chef?» → últimos Picks;
+  · los banners de siempre (¿Eres Chef?, Mejores platos, Peores platos) siguen ahí
+    y el botón «Cocina Picks» es grande (≥ 54 px de alto, letra ≥ 21 px);
   · feed sin scroll propio: 6 Picks en el flujo y el resto en «Ver todos los Picks»;
   · cada Pick: @usuario · deporte, pronóstico, momio a la derecha (con «−»), sin
     «paga», «cierra en» ni fechas; ▲ ▼, responder y compartir; combinada con su rótulo;
-  · Platos de la semana: filas con número, @usuario · momio y barra de votos;
-    en el teléfono una pestaña a la vez (Mejores / Peores), en el ordenador lado a lado;
-    «Ver los N» despliega del 6.º en adelante;
+  · platos: filas con número, @usuario · momio y barra de votos; «Ver los N»
+    despliega del 6.º en adelante; en el ordenador los dos tableros lado a lado y
+    Chefs a la derecha desde 1024 px;
   · sin desplazamiento horizontal y sin errores; Inicio sigue con la tarjeta de siempre.
 Sustituye a picks-feed-scroll-browser.cjs (la ventana con scroll interno ya no existe).
 """
@@ -78,9 +81,15 @@ STATE = """() => {
     combos: cards.filter(c => c.querySelector('.cam-pk-combo')).map(c => c.querySelectorAll('.cam-pk-leg').length),
     cardOverflow: cards.some(c => c.scrollWidth > c.clientWidth + 1),
     railVisible: vis(rail),
-    tabsVisible: vis(document.querySelector('.cam-platos-tabs')),
     bestVisible: vis(document.querySelector('.ae-chef-best')),
     worstVisible: vis(document.querySelector('.ae-chef-worst')),
+    banners: ['.ae-picks-heading-cta-row', '.ae-chef-best .ae-picks-rail-heading', '.ae-chef-worst .ae-picks-rail-heading']
+      .map(s => { const e = document.querySelector(s); return !!e && vis(e) && e.hasAttribute('data-cam-banner') && e.getBoundingClientRect().height >= 80; }),
+    order: ['#aePicksTopPair', '#communityPicks > .ae-picks-rail', '.ae-picks-heading-cta-row', '#cpFeed', '#cpViewAll']
+      .map(s => Math.round(document.querySelector(s).getBoundingClientRect().top + scrollY)),
+    sideBySide: (() => { const a = document.querySelector('.ae-chef-best').getBoundingClientRect(), b = document.querySelector('.ae-chef-worst').getBoundingClientRect(); return Math.abs(a.top - b.top) < 2 && b.left > a.right - 1; })(),
+    chefsRight: (() => { const c = document.querySelector('#communityPicks > .ae-chefs-dual-standings'), f = document.getElementById('cpFeed'); return !!c && vis(c) && c.getBoundingClientRect().left >= f.getBoundingClientRect().right - 1; })(),
+    cta: (() => { const b = document.getElementById('cpPublishCta'), r = b.getBoundingClientRect(); return [Math.round(r.height), parseFloat(getComputedStyle(b).fontSize)]; })(),
     bestRows: rows('picksPopular').length,
     bestShown: rows('picksPopular').filter(vis).length,
     worstRows: rows('picksQuestioned').length,
@@ -90,7 +99,7 @@ STATE = """() => {
     bars: rows('picksPopular').every(r => r.querySelector('.cam-plato-bar > .is-up') && r.querySelector('.cam-plato-net')),
     moreText: document.querySelector('.ae-chef-best > .cam-platos-more')?.textContent,
     moreVisible: vis(document.querySelector('.ae-chef-best > .cam-platos-more')),
-    pressed: [...document.querySelectorAll('.cam-platos-tabs [data-platos]')].map(b => b.getAttribute('aria-pressed')),
+    tabs: document.querySelectorAll('.cam-platos-tabs').length,
   };
 }"""
 
@@ -124,15 +133,13 @@ def check(width, dark):
         assert st['bars'], f'{where}: saldo y barra en cada fila'
         assert all('Combinada' not in m for m in st['worstMeta']), f'{where}: el pie de la fila no repite «Combinada»'
         assert any(n.startswith('Gana ') for n in st['bestNames'])
-        if width < 761:
-            assert st['tabsVisible'] and st['bestVisible'] and not st['worstVisible'], f'{where}: una pestaña a la vez {st}'
-            assert st['pressed'] == ['true', 'false']
-            page.click('.cam-platos-tabs [data-platos="worst"]'); page.wait_for_timeout(150)
-            st2 = page.evaluate(STATE)
-            assert st2['worstVisible'] and not st2['bestVisible'] and st2['pressed'] == ['false', 'true'], f'{where}: pestaña Peores'
-            page.click('.cam-platos-tabs [data-platos="best"]'); page.wait_for_timeout(150)
-        else:
-            assert not st['tabsVisible'] and st['bestVisible'] and st['worstVisible'], f'{where}: lado a lado en el ordenador'
+        assert st['banners'] == [True, True, True], f'{where}: banners de siempre {st["banners"]}'
+        assert st['order'] == sorted(st['order']), f'{where}: orden editor → platos → ¿Eres Chef? → Picks → Ver todos {st["order"]}'
+        assert st['cta'][0] >= 54 and st['cta'][1] >= 21, f'{where}: «Cocina Picks» grande {st["cta"]}'
+        assert st['bestVisible'] and st['worstVisible'] and st['tabs'] == 0, f'{where}: los dos tableros, sin pestañas'
+        assert st['sideBySide'] == (width >= 761), f'{where}: tableros lado a lado solo en el ordenador'
+        if width >= 1024:
+            assert st['chefsRight'], f'{where}: Mejores y Peores Chefs a la derecha'
         page.click('.ae-chef-best > .cam-platos-more'); page.wait_for_timeout(150)
         st3 = page.evaluate(STATE)
         assert st3['bestShown'] == len(BEST) and st3['moreText'] == 'Ver menos', f'{where}: «Ver los N» despliega'
@@ -146,6 +153,6 @@ def check(width, dark):
 
 
 for dark in (False, True):
-    for width in (360, 390, 1366):
+    for width in (360, 390, 900, 1366):
         check(width, dark)
-print('PASS: Picks moderno · feed sin scroll propio (6 + «Ver todos»), Pick sin texto de sobra, platos en ranking con pestañas en el teléfono y lado a lado en el ordenador (360/390/1366, día y noche).')
+print('PASS: Picks moderno · platos primero con sus banners, «Cocina Picks» grande, feed sin scroll propio (6 + «Ver todos»), Pick sin texto de sobra (360/390/900/1366, día y noche).')

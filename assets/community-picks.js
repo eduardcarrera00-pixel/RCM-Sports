@@ -876,20 +876,6 @@ function paintChefList(id,result,kind){
    more.hidden=picks.length<=PLATOS_VISIBLE;
  }
 }
-/* Teléfono: Mejores y Peores platos comparten un bloque con dos pestañas.
-   En el ordenador se ven lado a lado y las pestañas se ocultan (CSS). */
-function bindPlatosTabs(){
- const rail=document.querySelector('#communityPicks .ae-picks-rail');
- const tabs=rail?.querySelectorAll('.cam-platos-tabs [data-platos]');
- if(!rail||!tabs?.length||rail.dataset.camPlatosBound)return;
- rail.dataset.camPlatosBound='1';
- const select=kind=>{
-   rail.dataset.camPlatos=kind;
-   tabs.forEach(tab=>tab.setAttribute('aria-pressed',String(tab.dataset.platos===kind)));
- };
- tabs.forEach(tab=>tab.addEventListener('click',()=>select(tab.dataset.platos)));
- select(rail.dataset.camPlatos||'best');
-}
 async function loadChefLists(){
  const seq=++chefRequest;
  // Platos rank community votes from the current publication week. Keep the vote
@@ -1574,7 +1560,7 @@ document.addEventListener('DOMContentLoaded',()=>{
  });
  $('cpComposePanel')?.addEventListener('close',syncPickComposer);
  $('cpComposePanel')?.addEventListener('cancel',e=>{if(posting)e.preventDefault();});
- renderCommunityPicksVisibility();bindPlatosTabs();load();
+ renderCommunityPicksVisibility();load();
  const resize=()=>{sizeFeedWindow();sizeChefRankingWindows();sizePlateWindow($('picksPopular'));sizePlateWindow($('picksQuestioned'));};
  window.addEventListener('resize',resize,{passive:true});
  if(document.fonts?.ready)document.fonts.ready.then(resize);
