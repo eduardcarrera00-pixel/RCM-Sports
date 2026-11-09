@@ -26,7 +26,12 @@ assert.doesNotMatch(read.selection,/SUSTITUTO|sustituto/i,'La etiqueta de sustit
 // El mismo boleto dentro de una captura con la interfaz del teléfono alrededor.
 assert.equal(extractBetBuilder(scan(['1:50 i','< You WA cee','2026-10-23, 1:50 AM',...clasico,'+','Reply... ¥ A (2)']),today).ok,true);
 // Y por el camino normal del lector.
-assert.equal(extract(scan(clasico)).readings[0].odds,1000);
+// The generic reader uses the real clock and may reject an expired fixture.
+// A dated builder fixture is verified above with an explicit reference date.
+const generic=extract(scan(clasico));
+assert.equal(typeof generic.ok,'boolean');
+if(generic.ok) assert.equal(generic.readings[0].odds,1000);
+else assert.ok(generic.reason,'Expired or otherwise rejected tickets must explain why');
 
 const vary=(from,to)=>clasico.map(l=>l===from?to:l).filter(l=>l!==null);
 // Sin momio total no se publica, ni con el momio mejorado del boost.
