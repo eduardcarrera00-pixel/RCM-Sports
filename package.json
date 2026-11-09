@@ -3,6 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
+    "test:social:x": "node tests/social-x-only-daily-plates.mjs",
     "test:quiniela:scoring": "node tests/quiniela-signed-scoring.mjs && node tests/profile-quiniela.mjs",
     "test:leagues": "node tests/monthly-leagues.mjs && node tests/monthly-leagues-ui.mjs",
     "build:css": "tailwindcss -i assets/styles-input.css -o assets/site.css --minify && node scripts/build-editorial-css.mjs && node scripts/build-performance-css.mjs",

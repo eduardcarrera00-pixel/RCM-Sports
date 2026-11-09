@@ -1,5 +1,10 @@
 # Automatic editorial Pick sharing
 
+**Current policy, 9 November 2026:** automatic publication is X-only.
+Instagram/TikTok channels and queued retries are disabled, and the video worker
+is manual-only. The historical video pipeline below is retained for reference
+and manual assets. See `SOCIAL_PUBLICATION.md` for the two daily X vote leaders.
+
 A newly published Pick already creates one delivery for each enabled channel.
 The Pick published on 25 October reached X, while Instagram and TikTok stayed
 queued waiting for an event-specific MP4. The GitHub video worker, scheduled

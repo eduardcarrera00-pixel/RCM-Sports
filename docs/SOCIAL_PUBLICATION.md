@@ -1,5 +1,35 @@
 # Publicación de CAM Sports en redes
 
+## Política vigente desde el 9 de noviembre de 2026
+
+Solo **X / Twitter** publica automáticamente las noticias, Picks editoriales y
+Power Rankings nuevos. Instagram y TikTok quedan desactivados en los canales;
+sus entregas pendientes se cancelan. Una guarda impide crear nuevas entregas
+automáticas para esas redes y el publicador solo selecciona X. Se conserva el
+historial y las herramientas de compartir manualmente. El generador de vídeos
+ya no tiene disparadores por horario ni por cambios del código.
+
+Dos automatizaciones diarias llaman a la función privada
+`cam_social.queue_daily_plate('best')` a las **11:00** y
+`cam_social.queue_daily_plate('worst')` a las **15:00**, en **America/Toronto**,
+incluidos sus cambios de horario de verano. No se añade otro cron para esos
+envíos. El cron existente sigue despachando y confirmando las publicaciones.
+
+Cada pase toma el primer puesto de la tabla semanal vigente de Mejores o Peores
+Platos: saldo de votos positivo/negativo, votos del signo correspondiente,
+fecha de creación y UUID para desempatar. Coincide con `loadChefLists()`.
+El texto dice «por votos» e incluye autor, momio y enlace al Pick completo.
+No convierte votos en resultados de apuestas ni entrega premios. Si no hay un
+Pick apto, no publica. Una ejecución fuera de su hora (más una hora de margen)
+se omite. La clave por fecha local y tipo impide duplicados entre reintentos;
+los envíos ambiguos siguen requiriendo revisión y no se reenvían a ciegas.
+
+Migración: `20261109123349_cam_social_x_only_daily_plates.sql`.
+Validación: `npm run test:social:x`.
+
+Las fases que siguen documentan la integración anterior; esta política tiene
+prioridad sobre sus referencias a publicación automática en las tres redes.
+
 ## Primera fase
 
 `supabase/19_cam_social_publication.sql` instala una cola privada para noticias
