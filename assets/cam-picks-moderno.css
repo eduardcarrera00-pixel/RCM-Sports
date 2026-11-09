@@ -90,6 +90,38 @@ html body #mainContent #footballTakes #communityPicks .ae-picks-heading-cta-row 
   }
 }
 
+/* ---------- «Últimos Picks»: título que separa los platos del feed ----------
+   Mismo azul de título y dorado de noche que los banners; una línea de ayuda. Solo
+   en Picks › Picks y con Picks que enseñar (como el feed y su pie). */
+html body #mainContent #footballTakes #communityPicks > #cpFeedHeading {
+  display: block !important;
+  margin: 0 !important;
+  padding: 18px 4px 0 !important;
+  border: 0 !important;
+  border-top: 1px solid var(--pk-odds-line) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: none !important;
+}
+html body[data-cam-tabs="picks"]:not([data-cam-tab="picks"]) #mainContent #footballTakes #communityPicks > #cpFeedHeading,
+html body #mainContent #footballTakes #communityPicks:has(> #cpFeed[data-cam-content-state="empty"]) > #cpFeedHeading,
+html body #mainContent #footballTakes #communityPicks:has(#cpFeed[data-cam-content-state="empty"]) > #cpFeedHeading { display: none !important; }
+html body #mainContent #footballTakes #communityPicks > #cpFeedHeading h3 {
+  margin: 0 !important;
+  padding: 0 !important;
+  font: 600 26px/1.15 "Playfair Display", var(--pk-serif) !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--pk-odds-ink) !important;
+  background: none !important;
+}
+html body #mainContent #footballTakes #communityPicks > #cpFeedHeading p {
+  margin: 4px 0 0 !important;
+  padding: 0 !important;
+  font: 400 14px/1.45 var(--pk-sans) !important;
+  color: var(--pk-muted) !important;
+}
+
 /* ---------- feed: una superficie, líneas finas, sin scroll propio ---------- */
 html body #mainContent #footballTakes #communityPicks #cpFeed {
   flex-direction: column !important;
@@ -649,9 +681,10 @@ html body[data-cam-tabs="picks"][data-cam-tab="picks"] #mainContent #footballTak
 html body[data-cam-tabs="picks"][data-cam-tab="picks"] #mainContent #footballTakes #communityPicks > .ae-picks-feed-heading { order: 1 !important; }
 html body[data-cam-tabs="picks"][data-cam-tab="picks"] #mainContent #footballTakes > #aePicksTopPair { order: 2 !important; }
 html body[data-cam-tabs="picks"][data-cam-tab="picks"] #mainContent #footballTakes #communityPicks > .ae-picks-rail { order: 3 !important; }
-html body[data-cam-tabs="picks"][data-cam-tab="picks"] #mainContent #footballTakes #communityPicks > #cpStatus { order: 4 !important; }
-html body[data-cam-tabs="picks"][data-cam-tab="picks"] #mainContent #footballTakes #communityPicks > :is(#cpFeed, .ae-picks-community-main) { order: 5 !important; }
-html body[data-cam-tabs="picks"][data-cam-tab="picks"] #mainContent #footballTakes #communityPicks > #cpFeedFooter { order: 6 !important; margin-top: -8px !important; }
+html body[data-cam-tabs="picks"][data-cam-tab="picks"] #mainContent #footballTakes #communityPicks > #cpFeedHeading { order: 4 !important; margin-top: 20px !important; }
+html body[data-cam-tabs="picks"][data-cam-tab="picks"] #mainContent #footballTakes #communityPicks > #cpStatus { order: 5 !important; }
+html body[data-cam-tabs="picks"][data-cam-tab="picks"] #mainContent #footballTakes #communityPicks > :is(#cpFeed, .ae-picks-community-main) { order: 6 !important; margin-top: -4px !important; }
+html body[data-cam-tabs="picks"][data-cam-tab="picks"] #mainContent #footballTakes #communityPicks > #cpFeedFooter { order: 7 !important; margin-top: -8px !important; }
 html body[data-cam-tabs="picks"][data-cam-tab="picks"] #mainContent #footballTakes #communityPicks > #cpStatus:empty { display: none !important; }
 /* En el ordenador el feed y su pie van juntos en .ae-picks-community-main. */
 html body #mainContent #footballTakes #communityPicks > .ae-picks-community-main #cpFeed { margin-top: 0 !important; }

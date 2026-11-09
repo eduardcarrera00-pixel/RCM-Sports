@@ -2,7 +2,7 @@
 Uso: python3 -B tests/picks-moderno.py [--shots DIR]
 Comprueba en 360/390/900/1366 px, día y noche:
   · pestañas Picks · Chefs · Historial;
-  · orden: «¿Eres Chef?» → Pick del editor → Mejores y Peores platos → últimos Picks;
+  · orden: «¿Eres Chef?» → Pick del editor → Mejores y Peores platos → título «Últimos Picks» → feed;
   · los banners de siempre (¿Eres Chef?, Mejores platos, Peores platos) siguen ahí
     y el botón «Cocina Picks» es grande (≥ 54 px de alto, letra ≥ 21 px);
   · feed sin scroll propio: 6 Picks en el flujo y el resto en «Ver todos los Picks»;
@@ -89,7 +89,7 @@ STATE = """() => {
     banners: ['.ae-picks-heading-cta-row', '.ae-chef-best .ae-picks-rail-heading', '.ae-chef-worst .ae-picks-rail-heading']
       .map(s => { const e = document.querySelector(s); return !!e && vis(e) && e.hasAttribute('data-cam-banner') && e.getBoundingClientRect().height >= 80; }),
     tabs: [...document.querySelectorAll('#camSectionTabs .cam-section-tab, #camSectionTabs button')].map(b => b.dataset.tab).filter((t, i, a) => t && a.indexOf(t) === i),
-    order: ['.ae-picks-heading-cta-row', '#aePicksTopPair', '#communityPicks > .ae-picks-rail', '#cpFeed', '#cpViewAll']
+    order: ['.ae-picks-heading-cta-row', '#aePicksTopPair', '#communityPicks > .ae-picks-rail', '#cpFeedHeading', '#cpFeed', '#cpViewAll']
       .map(s => document.querySelector(s)).filter(vis).map(e => Math.round(e.getBoundingClientRect().top + scrollY)),
     sideBySide: (() => { const a = document.querySelector('.ae-chef-best').getBoundingClientRect(), b = document.querySelector('.ae-chef-worst').getBoundingClientRect(); return Math.abs(a.top - b.top) < 2 && b.left > a.right - 1; })(),
     chefsRight: (() => { const c = document.querySelector('#communityPicks > .ae-chefs-dual-standings'), f = document.getElementById('cpFeed'); return !!c && vis(c) && c.getBoundingClientRect().left >= f.getBoundingClientRect().right - 1; })(),
@@ -139,7 +139,7 @@ def check(width, dark):
         assert any(n.startswith('Gana ') for n in st['bestNames'])
         assert st['banners'] == [True, True, True], f'{where}: banners de siempre {st["banners"]}'
         assert st['tabs'] == ['picks', 'chefs', 'historial'], f'{where}: pestañas {st["tabs"]}'
-        assert len(st['order']) == 5 and st['order'] == sorted(st['order']), f'{where}: orden ¿Eres Chef? → editor → platos → Picks → Ver todos {st["order"]}'
+        assert len(st['order']) == 6 and st['order'] == sorted(st['order']), f'{where}: orden ¿Eres Chef? → editor → platos → Picks → Ver todos {st["order"]}'
         assert st['cta'][0] >= 54 and st['cta'][1] >= 21, f'{where}: «Cocina Picks» grande {st["cta"]}'
         assert st['bestVisible'] and st['worstVisible'] and st['platosTabs'] == 0, f'{where}: los dos tableros, sin pestañas'
         assert st['sideBySide'] == (width >= 761), f'{where}: tableros lado a lado solo en el ordenador'
