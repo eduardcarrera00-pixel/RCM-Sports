@@ -28,7 +28,10 @@
         footer.hidden=false;
       }else{
         if(anchor.nextSibling!==preview)anchor.after(preview);
-        if(trendingAnchor.nextSibling!==trending)trendingAnchor.after(trending);
+        // En Actualidad «Lo más leído» vive en su propio hueco (syncOpinionHighlights);
+        // devolverlo aquí lo dejaba oculto dentro de la columna de Inicio.
+        const opinions=document.body.classList.contains('ae-is-opinions');
+        if(!opinions&&trendingAnchor.nextSibling!==trending)trendingAnchor.after(trending);
         footer.hidden=true;
       }
     }

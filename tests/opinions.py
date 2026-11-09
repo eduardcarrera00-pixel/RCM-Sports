@@ -93,7 +93,7 @@ def run():
                     page.screenshot(path=f'{SHOTS}/opiniones-{width}-{"dark" if dark else "light"}.png', full_page=True)
                 if width == 390 and not dark:
                     page.locator('#aeOpinionsTabs [role=tab][data-sport="colegial"]').click()
-                    assert 'Todavía no hay opiniones de Colegial' in page.locator('#aeOpinionsList').inner_text()
+                    assert 'Todavía no hay publicaciones de Colegial' in page.locator('#aeOpinionsList').inner_text()
                     page.locator('#aeOpinionsTabs [role=tab][data-sport="tenis"]').click()
                     assert page.locator('.ae-opinion-card').count() == 1
                     page.locator('#aeOpinionsTabs [role=tab][data-sport="todas"]').click()

@@ -5,7 +5,7 @@
   'use strict';
   const base=new URL('.',document.currentScript?.src||new URL('assets/',location.href));
   const source={
-    opinions:'ae-opinions.js?v=20261104-actualidad-1',
+    opinions:'ae-opinions.js?v=20261108-actualidad-moderna-1',
     archive:'ae-news-archive.js?v=20261024-lazy-editorial-1'
   };
   const inFlight=new Map(),loaded=new Set();
