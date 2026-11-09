@@ -82,7 +82,7 @@
      if(details)details.open=true;
    }else{
      featured.querySelector('.ae-weekly-shared-notice')?.remove();
-     const notice=make('p','El Pick compartido ya no está publicado o ha vencido. Debajo puedes consultar el Pick del editor vigente.','ae-weekly-shared-notice');
+     const notice=make('p',active?'Este Pick ha vencido. Consulta el Pick del editor vigente.':'Este Pick ya no está disponible.','ae-weekly-shared-notice');
      $('picksFeaturedCard')?.before(notice);
    }
    // Mobile Home relocates the actual Picks panel. Allow the category layout
@@ -109,7 +109,9 @@
      box.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();go();}});
      box.append(make('h3',p.title,'ae-weekly-title'),make('p',p.event_name,'ae-weekly-event'));
      const selection=make('div',undefined,'ae-weekly-selection');
-     selection.append(make('strong',p.selection),make('span','Cuota '+odds(p.american_odds),'ae-weekly-odds'));
+     const quota=make('span',odds(p.american_odds),'ae-weekly-odds');
+     quota.setAttribute('aria-label','Momio '+odds(p.american_odds));
+     selection.append(make('strong',p.selection),quota);
      box.append(selection,make('span','Ver análisis completo →','ae-weekly-link'));
      return box;
    }
@@ -117,7 +119,7 @@
    const summary=make('summary',undefined,'ae-weekly-expand-summary');
    summary.append(make('strong',p.title,'ae-weekly-title'));
    summary.append(make('span',p.selection,'ae-weekly-compact-selection'));
-   summary.append(make('span','Ver análisis y detalles ↓','ae-weekly-expand-hint'));
+   summary.append(make('span','Ver detalles ↓','ae-weekly-expand-hint'));
    const expanded=make('div',undefined,'ae-weekly-expanded-content');
    const photoUrl=editorialUrl(p.image_path,p.image_url);
    if(photoUrl){const photo=make('img',undefined,'ae-weekly-inline-photo');photo.src=photoUrl;photo.style.setProperty('--ae-image-focus',framedPosition(p,'image'));photo.alt='Imagen del Pick del editor';photo.loading='lazy';expanded.append(photo);}
@@ -127,13 +129,23 @@
    return box;
  }
 
+ function setDisplayState(state){
+   for(const id of ['aePicksTopPair','cpWeekly']){
+     const target=$(id);if(target)target.dataset.camContentState=id==='aePicksTopPair'&&state==='empty'&&sharedId?'unavailable':state;
+   }
+   for(const id of ['picksFeatured','camHomePicks']){
+     const target=$(id);if(target)target.dataset.camEditorState=state;
+   }
+ }
  function render(){
    syncShareButtons();
+   setDisplayState(active?'ready':'empty');
    // Single non-interactive odds badge in the lower-right footer, from the published Pick.
    const oddsHighlight=$('aeWeeklyOddsHighlight');
    if(oddsHighlight){
      oddsHighlight.hidden=!active;
-     oddsHighlight.textContent=active?'Cuota '+odds(active.american_odds):'';
+     oddsHighlight.textContent=active?odds(active.american_odds):'';
+     oddsHighlight.setAttribute('aria-label',active?'Momio '+odds(active.american_odds):'');
    }
    const featured=$('picksFeatured');
    if(featured){
@@ -146,7 +158,7 @@
      const area=$(id);if(!area)continue;
      area.replaceChildren();
      if(active)area.append(createCard(active,preview));
-     else area.append(make('p','CAM SPORTS todavía no ha publicado un Pick del editor.','ae-weekly-empty'));
+     else area.append(make('p','Aún sin Pick del editor.','ae-weekly-empty'));
    }
    // «Tu jornada» (Inicio en el teléfono) enseña el Pick vigente sin volver a pedirlo.
    window.camEditorPick=active?Object.freeze({id:active.id,title:active.title,event_name:active.event_name,selection:active.selection,american_odds:active.american_odds,expires_at:active.expires_at}):null;
@@ -168,9 +180,16 @@
      syncShareButtons();
      const oddsHighlight=$('aeWeeklyOddsHighlight');
      if(oddsHighlight){oddsHighlight.hidden=true;oddsHighlight.textContent='';}
-       if($('picksFeatured'))$('picksFeatured').dataset.camEditorState='error';
+     setDisplayState('error');
      $('picksFeatured')?.querySelector('.ae-weekly-banner')?.remove();
-     for(const id of ['cpWeekly','picksFeaturedCard']){$(id)?.replaceChildren(make('p','No se pudo cargar el Pick editorial.','ae-weekly-empty'));}
+     for(const id of ['cpWeekly','picksFeaturedCard']){
+       const area=$(id);if(!area)continue;
+       const retry=make('button','Reintentar','ae-weekly-retry');retry.type='button';
+       retry.addEventListener('click',()=>void load());
+       area.replaceChildren(make('p','No se pudo cargar el Pick editorial.','ae-weekly-empty'),retry);
+     }
+     window.camEditorPick=null;
+     document.dispatchEvent(new Event('cam:weekly-render'));
      revealSharedPick();
    }finally{refreshing=false;adminVisibility();}
  }

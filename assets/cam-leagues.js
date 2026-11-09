@@ -214,7 +214,7 @@ async function decorate(){
 }
 function mountEntry(host,comp){
   if(!host||host.querySelector(':scope > .cam-league-entry'))return;
-  const link=btn('Liga CAM · Rangos e insignias ›','cam-league-entry',()=>openBoard(comp));
+  const link=btn('Liga CAM ›','cam-league-entry',()=>openBoard(comp));
   if(host.tagName==='OL'){if(!host.previousElementSibling?.classList.contains('cam-league-entry'))host.before(link);}else host.prepend(link);
 }
 function init(){

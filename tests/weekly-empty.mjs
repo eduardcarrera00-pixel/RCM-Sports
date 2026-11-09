@@ -15,13 +15,15 @@ w.eval(fs.readFileSync('assets/ae-editorial-weekly.js', 'utf8'));
 const featured = w.document.getElementById('picksFeatured');
 await w.refreshEditorialWeeklyPick();
 assert.equal(featured.dataset.camEditorState, 'empty');
-assert.match(featured.textContent, /todavía no ha publicado/);
+assert.equal(w.document.getElementById('aePicksTopPair').dataset.camContentState, 'empty');
+assert.equal(w.document.getElementById('cpWeekly').dataset.camContentState, 'empty');
 
 rows = [{id: '00000000-0000-0000-0000-000000000901', title: 'Pick vigente', event_name: 'Local vs visitante',
   selection: 'Local gana', american_odds: 150, analysis: 'Análisis original.',
   expires_at: new Date(Date.now() + 86400000).toISOString(), created_at: new Date().toISOString()}];
 await w.refreshEditorialWeeklyPick();
 assert.equal(featured.dataset.camEditorState, 'ready');
+assert.equal(w.document.getElementById('aePicksTopPair').dataset.camContentState, 'ready');
 assert.match(featured.textContent, /Pick vigente/);
 assert.equal(w.document.querySelector('#cpWeekly .ae-weekly-preview').getAttribute('role'),'button','Home uses the compact preview at every viewport');
 assert.equal(w.document.querySelector('#cpWeekly details'),null);
@@ -31,6 +33,8 @@ assert.equal(featured.querySelectorAll('.ae-weekly-empty').length, 0, 'Published
 error = {message: 'Read unavailable'};
 await w.refreshEditorialWeeklyPick();
 assert.equal(featured.dataset.camEditorState, 'error');
+assert.equal(w.document.getElementById('aePicksTopPair').dataset.camContentState, 'error', 'A failed read must remain visible rather than look empty');
+assert.ok(featured.querySelector('.ae-weekly-retry'), 'The error state offers recovery');
 assert.match(featured.textContent, /No se pudo cargar/);
 assert.equal(featured.querySelectorAll('.ae-weekly-banner').length, 0, 'A failed read clears stale imagery');
 

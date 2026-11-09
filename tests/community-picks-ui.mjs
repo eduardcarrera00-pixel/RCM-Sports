@@ -66,7 +66,6 @@ w.aePickCapture={mount:({getPicks})=>({hasImport:()=>true,getTotal:()=>null,proo
 w.eval(fs.readFileSync('assets/community-picks.js','utf8'));
 d.dispatchEvent(new w.Event('DOMContentLoaded'));
 await settle();
-assert.match(d.getElementById('cpStatus').textContent,/Todavía/);
 assert.match(d.getElementById('cpStatus').textContent,/Picks activos/);
 assert.doesNotMatch(d.getElementById('cpStatus').textContent,/Comparte el primero/);
 const form=d.getElementById('cpForm');

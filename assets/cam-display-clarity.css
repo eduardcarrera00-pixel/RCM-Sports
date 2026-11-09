@@ -1,0 +1,110 @@
+@layer cam-display-clarity {
+/* CAM SPORTS · Text hierarchy and confirmed-empty highlights, 9 Nov 2026.
+   Empty is distinct from loading/error. Global editing keeps optional modules
+   available so their headings and artwork can still be edited. This layer is
+   declared first in the document for the scoped important-rule priority. */
+html:not(.cam-global-edit-active) body :is(#aePicksTopPair,#aeHomeTakeHistoric,#aeHomeTopTakes,#aeHomePickHistoric,#aeSportTakeHistoric)[data-cam-content-state="empty"] {
+  display:none!important;
+}
+
+/* Home shows published content. The dedicated Picks page retains a concise
+   empty state and its history action; failed reads remain visible everywhere. */
+html:not(.cam-global-edit-active) body #mainContent #camHomePicks[data-cam-editor-state="empty"] > :is(.cam-home-weekly-label,.ae-home-weekly-more,.editorial-pick-body),
+html:not(.cam-global-edit-active) body #mainContent #camHomePicks .cam-home-plate-board:has(> ol[data-cam-content-state="empty"]),
+html:not(.cam-global-edit-active) body #mainContent #camHomePicks[data-cam-editor-state="empty"]:has(#camHomeBestPlates[data-cam-content-state="empty"]):has(#camHomeWorstPlates[data-cam-content-state="empty"]),
+html:not(.cam-global-edit-active) body #mainContent #footballTakes #communityPicks .ae-picks-rail:has(#picksPopular[data-cam-content-state="empty"]):has(#picksQuestioned[data-cam-content-state="empty"]) {
+  display:none!important;
+}
+
+html body #mainContent #articlesGrid .cam-news-card-comment[hidden] { display:none!important; }
+html body #mainContent #articlesGrid article .p-5 > .cam-news-card-summary,
+html body #mainContent #aeSportLatestNews .cam-sport-latest-summary {
+  display:-webkit-box!important;
+  -webkit-box-orient:vertical!important;
+  -webkit-line-clamp:2!important;
+  line-clamp:2!important;
+  overflow:hidden!important;
+  font-family:Inter,system-ui,sans-serif!important;
+  font-size:14px!important;
+  line-height:1.45!important;
+  font-weight:400!important;
+}
+html body #mainContent #articlesGrid article > .cam-news-card-footer {
+  min-height:0!important;
+  gap:8px!important;
+  justify-content:flex-end!important;
+  padding-top:0!important;
+  padding-bottom:12px!important;
+  border:0!important;
+  box-shadow:none!important;
+}
+html body #mainContent #articlesGrid .cam-news-card-comment {
+  flex:1 1 auto!important;
+  min-width:0!important;
+}
+
+/* One heading and one short invitation; the original publishing control and
+   artwork retain their behavior and brand styles. */
+html body #mainContent #freeTakes > .ae-takes-head > p {
+  max-width:48ch!important;
+  margin:6px 0 12px!important;
+  font-family:Inter,system-ui,sans-serif!important;
+  line-height:1.5!important;
+}
+html:not(.cam-global-edit-active) body #mainContent #aeSportTakeHistoric :is(#aeSportTakeHistoricKicker,.ae-home-take-feature-intro),
+html:not(.cam-global-edit-active) body #mainContent #footballTakes #communityPicks .ae-chef-recetario {
+  display:none!important;
+}
+html body #mainContent #aeSportTakeLeaders .ae-sport-takes-group[data-cam-content-state="empty"] {
+  min-height:0!important;
+  height:auto!important;
+}
+html body #mainContent #aeSportTakeLeaders .ae-sport-chef-heading {
+  min-height:72px!important;
+  height:auto!important;
+  padding-block:12px!important;
+}
+html body #mainContent #aeSportTakeLeaders .cam-op-empty,
+html body #mainContent #footballTakes #communityPicks .ae-chef-empty {
+  min-height:0!important;
+  height:auto!important;
+  padding:12px 16px!important;
+  font:400 13px/1.5 Inter,system-ui,sans-serif!important;
+  border:0!important;
+}
+
+/* The period applies to both Chef tables, rather than repeating four buttons. */
+html body #mainContent #footballTakes #communityPicks .cam-chef-period {
+  grid-column:1 / -1!important;
+  flex:0 0 100%!important;
+  order:-1!important;
+  width:100%!important;
+  margin:0!important;
+}
+html body #mainContent #footballTakes #communityPicks .cam-chef-period button {
+  min-height:44px!important;
+}
+html body #mainContent #footballTakes #aeHomePickHistoric .cp-pick-line-market {
+  font:500 12px/1.4 Inter,system-ui,sans-serif!important;
+}
+html body #mainContent #footballTakes #aeHomePickHistoric .cam-historic-details {
+  color:var(--ds-text-muted,#566876)!important;
+  font:400 12px/1.4 Inter,system-ui,sans-serif!important;
+}
+html.dark body #mainContent #footballTakes #aeHomePickHistoric .cam-historic-details {
+  color:var(--ds-text-muted,#c5cdd2)!important;
+}
+
+@media(max-width:760px) {
+  html body #mainContent #freeTakes > .ae-takes-head > p { max-width:none!important; }
+  html body #mainContent #aeSportTakeLeaders .ae-sport-chef-heading { min-height:64px!important; }
+}
+html body #mainContent #footballTakes #communityPicks #cpFeed[data-cam-content-state="empty"] { display:none!important; }
+html body #mainContent #footballTakes #communityPicks:has(#cpFeed[data-cam-content-state="empty"]) #cpFeedFooter {
+  min-height:0!important;
+  padding:8px 16px!important;
+  border:0!important;
+  background:none!important;
+  box-shadow:none!important;
+}
+}

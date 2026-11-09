@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <style>@layer cam-display-clarity;</style>
     <script src="assets/cam-pick-share.js?v=20261104-x-16x9-1"></script>
     <script>
     let savedTheme = null;
@@ -2518,7 +2519,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
 <script src="assets/cam-logo-sizing.js?v=20261103-remove-welcome-1"></script>
 <script src="assets/cam-banner-artwork.js?v=20261102-visible-size-1"></script>
 <script src="assets/ae-site-images.js?v=20261104-noticias-nfl-dia-1"></script>
-<script src="assets/cam-site-texts.js?v=20261108-community-picks-horizontal-1"></script>
+<script src="assets/cam-site-texts.js?v=20261109-text-clarity-1"></script>
 <script defer src="assets/cam-mobile-bottom-nav.js?v=20261108-escritorio-1"></script>
 <link rel="stylesheet" href="assets/cam-perf-controls.css?v=20261108-escritorio-1">
 
@@ -2669,7 +2670,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
             <ol id="championsList" class="ae-full-ranking-list ae-ranking-accessible" aria-label="Clasificación publicada de Champions League"></ol>
         </section>
         <section id="footballTakes" class="ae-takes ae-picks-editorial" hidden aria-labelledby="takesTitle">
-          <div id="aePicksTopPair" class="ae-picks-top-pair" aria-label="Pick del editor">
+          <div id="aePicksTopPair" class="ae-picks-top-pair" aria-label="Pick del editor" data-cam-optional>
           <section id="picksFeatured" class="ae-picks-feature" aria-labelledby="picksFeaturedTitle">
             <div class="ae-picks-feature-label"><div class="ae-weekly-heading-inline"><h3 id="picksFeaturedTitle">Pick del editor</h3></div>
               <button type="button" id="aeWeeklyShareButton" class="ae-weekly-share ae-weekly-share-picks" hidden aria-label="Compartir el Pick del editor" title="Compartir Pick del editor"><i class="fa-solid fa-share-nodes" aria-hidden="true"></i><span>Compartir</span></button>
@@ -2707,19 +2708,18 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
               </aside>
               <section id="cpSettleHistorySection" class="ae-picks-top-three ae-pick-history-section" aria-labelledby="cpSettleHistoryTitle">
                 <header class="ae-pick-history-heading">
-                  <div><span class="ae-pick-history-kicker">EL RECETARIO · RESULTADOS</span><h3 id="cpSettleHistoryTitle">Historial de Picks</h3></div>
+                  <div><h3 id="cpSettleHistoryTitle">Historial de recetas</h3></div>
                 </header>
                 <div id="cpSettleHistory" role="region" aria-label="Historial de Picks resueltos" aria-live="polite"><p class="ae-pick-history-empty">Cargando resultados…</p></div>
               </section>
               <div class="ae-chefs-dual-standings ae-chefs-classical" role="group" aria-label="Clasificaciones de Mejores y Peores Chefs">
+                <div class="ae-takes-tabs cam-chef-period" role="group" aria-label="Periodo de las clasificaciones de Chefs">
+                  <button id="cpRankMonth" type="button" aria-pressed="true" aria-controls="cpLeaderboard cpWorstLeaderboard">Mensual</button>
+                  <button id="cpRankHistory" type="button" aria-pressed="false" aria-controls="cpLeaderboard cpWorstLeaderboard">Histórico</button>
+                </div>
               <section class="ae-takes-side ae-inline-chefs-board" aria-labelledby="picksRankingTitle">
 
                 <header class="ae-chefs-art-heading"><h3 id="picksRankingTitle">Mejores Chefs</h3></header>
-                <div class="ae-takes-tabs" role="group" aria-label="Clasificación">
-                  <button id="cpRankMonth" type="button" aria-pressed="true">Mensual</button>
-                  <button id="cpRankHistory" type="button" aria-pressed="false">Histórico</button>
-                </div>
-
                 <div class="ae-chefs-table-cols" aria-hidden="true"><span>#</span><span>AFICIONADO</span><span>%</span><span>PTS</span></div>
                 <ol id="cpLeaderboard" class="ae-take-leaderboard-list" role="region" aria-label="Ranking de Mejores Chefs; desplázate para consultar más puestos" aria-live="polite"></ol>
                 <details class="ae-chefs-scoring-info"><summary>¿Cómo se calculan los puntos?</summary>
@@ -2729,15 +2729,11 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
               <section class="ae-takes-side ae-inline-chefs-board ae-worst-chefs-board" aria-labelledby="cpWorstRankingTitle">
 
                 <header class="ae-chefs-art-heading"><h3 id="cpWorstRankingTitle">Peores Chefs</h3></header>
-                <div class="ae-takes-tabs" role="group" aria-label="Periodo de Peores Chefs">
-                  <button id="cpWorstRankMonth" type="button" aria-pressed="true">Mensual</button>
-                  <button id="cpWorstRankHistory" type="button" aria-pressed="false">Histórico</button>
-                </div>
                 <div class="ae-chefs-table-cols" aria-hidden="true"><span>#</span><span>AFICIONADO</span><span>%</span><span>PTS</span></div>
                 <ol id="cpWorstLeaderboard" class="ae-take-leaderboard-list" role="region" aria-label="Ranking de Peores Chefs; desplázate para consultar más puestos" aria-live="polite"></ol>
               </section>
               </div>
-                <section id="aeHomePickHistoric" class="ae-home-take-feature" aria-labelledby="aeHomePickHistoricTitle">
+                <section id="aeHomePickHistoric" class="ae-home-take-feature" aria-labelledby="aeHomePickHistoricTitle" data-cam-optional>
                   <div class="ae-historic-copy">
                     <h3 id="aeHomePickHistoricTitle">Pick histórico</h3>
                   </div>
@@ -2876,14 +2872,14 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
                 <p id="aeTopTakesStatus" class="sr-only" role="status" aria-live="polite">Cargando los Takes destacados…</p>
               </header>
                 <section id="aeHomeTakesPopular" class="ae-home-take-feature ae-vote-column is-positive" aria-labelledby="aeHomeTakesPositiveTitle">
-                  <header class="ae-vote-column-heading"><h3 id="aeHomeTakesPositiveTitle">Popular Takes</h3></header>
+                  <header class="ae-vote-column-heading"><h3 id="aeHomeTakesPositiveTitle">Takes populares</h3></header>
                   <ol id="aeHomeTakesPositiveList" class="ae-discovery-list" aria-live="polite"><li class="ae-discovery-empty">Cargando Takes…</li></ol>
                 </section>
                 <section id="aeHomeTakesUnpopular" class="ae-home-take-feature ae-vote-column is-negative" aria-labelledby="aeHomeTakesNegativeTitle">
-                  <header class="ae-vote-column-heading"><h3 id="aeHomeTakesNegativeTitle">Unpopular Takes</h3></header>
+                  <header class="ae-vote-column-heading"><h3 id="aeHomeTakesNegativeTitle">Takes impopulares</h3></header>
                   <ol id="aeHomeTakesNegativeList" class="ae-discovery-list" aria-live="polite"><li class="ae-discovery-empty">Cargando Takes…</li></ol>
                 </section>
-            <section id="aeHomeTopTakes" class="ae-esports-standings" aria-label="Liga de Takes de la comunidad: Genios y Anoetos">
+            <section id="aeHomeTopTakes" class="ae-esports-standings" aria-label="Liga de Takes de la comunidad: Genios y Anoetos" data-cam-optional>
               <div class="ae-points-period" role="group" aria-label="Periodo de la clasificación por puntos de Takes">
                 <button type="button" data-home-take-period="month" aria-pressed="false">Mensual</button>
                 <button type="button" data-home-take-period="all" aria-pressed="true">Histórico</button>
@@ -2905,9 +2901,8 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
                 </section>
               </div>
             </section>
-                <section id="aeHomeTakeHistoric" class="ae-home-take-feature" aria-labelledby="aeHomeTakeHistoricTitle">
+                <section id="aeHomeTakeHistoric" class="ae-home-take-feature" aria-labelledby="aeHomeTakeHistoricTitle" data-cam-optional>
                   <div class="ae-historic-copy">
-                    <span class="ae-home-take-feature-kicker cam-take-record-kicker">Salón de la fama · Takes</span>
                     <h3 id="aeHomeTakeHistoricTitle">Take histórico</h3>
                   </div>
                   <div id="aeHomeTakeHistoricTake" aria-live="polite"><p class="ae-discovery-empty">Cargando Take…</p></div>
@@ -3001,18 +2996,17 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
 
         <!-- Los Takes son una función editorial al final de NFL y Fútbol, no una categoría de navegación. -->
         <section id="freeTakes" class="ae-takes ae-free-takes" hidden aria-labelledby="freeTakesTitle">
-          <div class="ae-takes-head"><span class="ae-takes-eyebrow">Takes de la comunidad</span><h2 id="freeTakesTitle">Demuestra tu conocimiento</h2><p>La comunidad vota y debate tus Takes. Los aciertos pueden sumar puntos; tu historial queda en tu perfil. Lo publicado no se borra.</p><button id="aeSportTakePublish" onclick="event.stopImmediatePropagation(); if(typeof window.aeOpenTakeComposer==='function'){window.aeOpenTakeComposer();}else{const modal=document.getElementById('aeTakeComposerDialog');if(modal&&!modal.open)modal.showModal();}" type="button" class="ae-participate-cta ae-sport-take-publish cam-take-cta-option7" aria-controls="aeTakeComposerDialog" aria-haspopup="dialog"><span class="cam-take-cta-text">Publicar mi Take</span><span class="cam-take-cta-arrow" aria-hidden="true">→</span></button></div>
-          <p class="cam-take-invitation" id="camTakeInvitation">Seguro que alguna vez dijiste “esto va a pasar”… y pasó. Ahora nadie te cree. Publica tu take y deja constancia para la historia. <strong>Aquí, lo que se publica no se borra.</strong></p>
+          <div class="ae-takes-head"><h2 id="freeTakesTitle">Demuestra tu conocimiento</h2><p>Tu opinión queda guardada.</p><button id="aeSportTakePublish" onclick="event.stopImmediatePropagation(); if(typeof window.aeOpenTakeComposer==='function'){window.aeOpenTakeComposer();}else{const modal=document.getElementById('aeTakeComposerDialog');if(modal&&!modal.open)modal.showModal();}" type="button" class="ae-participate-cta ae-sport-take-publish cam-take-cta-option7" aria-controls="aeTakeComposerDialog" aria-haspopup="dialog"><span class="cam-take-cta-text">Publicar mi Take</span><span class="cam-take-cta-arrow" aria-hidden="true">→</span></button></div>
           <!-- Dos columnas de opiniones: dentro del módulo, inmediatamente después del título. -->
         <section id="aeSportTakeLeaders" class="ae-sport-voice ae-sport-chefs" hidden aria-label="Takes más apoyados y más cuestionados de la comunidad">
           <p id="aeSportTakeStatus" class="sr-only" role="status" aria-live="polite">Cargando Takes…</p>
           <div class="ae-sport-takes-grid">
             <section class="ae-sport-takes-group ae-sport-chef-card is-supported" aria-labelledby="aeSportGeniosTitle">
-              <header class="ae-sport-chef-heading"><h3 id="aeSportGeniosTitle">Opiniones apoyadas</h3><button type="button" class="ae-football-leaders-more" aria-controls="aeSportTakePositive" aria-expanded="false">Ver todos <span aria-hidden="true">→</span></button></header>
+              <header class="ae-sport-chef-heading"><h3 id="aeSportGeniosTitle">Takes populares</h3><button type="button" class="ae-football-leaders-more" aria-controls="aeSportTakePositive" aria-expanded="false">Ver todos <span aria-hidden="true">→</span></button></header>
               <ol id="aeSportTakePositive" class="ae-sport-takes-list" aria-live="polite"></ol>
             </section>
             <section class="ae-sport-takes-group ae-sport-chef-card is-questioned" aria-labelledby="aeSportAnoetosTitle">
-              <header class="ae-sport-chef-heading"><h3 id="aeSportAnoetosTitle">Opiniones hateadas</h3><button type="button" class="ae-football-leaders-more" aria-controls="aeSportTakeNegative" aria-expanded="false">Ver todos <span aria-hidden="true">→</span></button></header>
+              <header class="ae-sport-chef-heading"><h3 id="aeSportAnoetosTitle">Takes impopulares</h3><button type="button" class="ae-football-leaders-more" aria-controls="aeSportTakeNegative" aria-expanded="false">Ver todos <span aria-hidden="true">→</span></button></header>
               <ol id="aeSportTakeNegative" class="ae-sport-takes-list" aria-live="polite"></ol>
             </section>
           </div>
@@ -3156,7 +3150,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
           <div id="camNflScore" class="cam-sport-score" aria-live="polite"></div>
           <div id="camFootballScore" class="cam-sport-score" aria-live="polite"></div>
           <details id="aeTakeReview" class="ae-take-review" hidden><summary>Administrar · Puntuar Takes</summary><p>Primero calcula la dificultad de cada Take (tabla de la liga, nivel de sorpresa o cuota) y después marca si se cumplió. Los puntos (1–20) salen solos: lo obvio vale poco y la sorpresa vale mucho. Si recalculas un Take ya puntuado, su puntuación se actualiza.</p><p id="aeTakeReviewStatus" role="status" aria-live="polite"></p><div id="aeTakeReviewList"></div></details>
-          <section id="aeSportTakeHistoric" class="ae-home-take-feature" hidden aria-labelledby="aeSportTakeHistoricTitle">
+          <section id="aeSportTakeHistoric" class="ae-home-take-feature" hidden aria-labelledby="aeSportTakeHistoricTitle" data-cam-optional>
             <div class="ae-historic-copy">
               <span id="aeSportTakeHistoricKicker" class="ae-home-take-feature-kicker cam-take-record-kicker">Salón de la fama · Takes</span>
               <h3 id="aeSportTakeHistoricTitle">Take histórico</h3>
@@ -4490,7 +4484,10 @@ currentUser = {
             }
             for (const text of document.querySelectorAll('[data-cam-news-top-comment]')) {
                 const article = byId.get(text.dataset.camNewsTopComment);
-                if (article) text.textContent = article.topComment || 'Sin comentarios destacados';
+                if (article) {
+                    text.textContent = article.topComment || '';
+                    text.parentElement.hidden = !article.topComment;
+                }
             }
         }
 
@@ -4687,15 +4684,15 @@ currentUser = {
                                 ${escapeHTML(art.title)}
                             </h3>
 
-                            <p class="text-xs text-slate-500 line-clamp-2 leading-relaxed mb-4">
+                            <p class="cam-news-card-summary text-xs text-slate-500 line-clamp-2 leading-relaxed mb-2">
                                 ${escapeHTML(art.summary)}
                             </p>
                         </div>
                     </div>
 
-                    <div class="px-5 pb-5 pt-0 flex items-center justify-between border-t border-slate-100 mt-auto">
-                        <div class="flex items-center space-x-2">
-                            <p data-cam-news-top-comment="${escapeHTML(art.id)}" class="text-xs text-slate-700 line-clamp-2">${escapeHTML(art.topComment || 'Sin comentarios destacados')}</p>
+                    <div class="cam-news-card-footer px-5 pb-5 pt-0 flex items-center justify-between mt-auto">
+                        <div class="cam-news-card-comment flex items-center space-x-2"${art.topComment ? '' : ' hidden'}>
+                            <p data-cam-news-top-comment="${escapeHTML(art.id)}" class="text-xs text-slate-700 line-clamp-2">${escapeHTML(art.topComment || '')}</p>
                         </div>
 
                         <div class="flex items-center space-x-3">
@@ -4709,7 +4706,8 @@ currentUser = {
             };
             if (isHome) {
                 articlesGrid.innerHTML = ['NFL','Fútbol'].map((sport,index) => {
-                    const stories = filtered.filter(article => categoryKey(article.category) === sport).slice(0,10);
+                    const stories = filtered.filter(article => categoryKey(article.category) === sport && String(article.id) !== String(heroArticle.id)).slice(0,10);
+                    if (!stories.length) return '';
                     const trackId = 'aeNewsSportTrack' + index;
                     const sportKey = sport === 'NFL' ? 'nfl' : 'football';
                     return `<section class="ae-news-sport-lane" data-sport="${sportKey}" aria-label="Noticias de ${sport}">
@@ -5535,7 +5533,7 @@ updateThemeButton();
 <script src="assets/champions.js?v=20261108-picks-display-1"></script>
 <script src="assets/ae-ranking-notes.js?v=20261105-resume-motion-1"></script>
 <script src="assets/ae-pick-capture.js?v=20261104-apuesta-real-1"></script>
-<script src="assets/community-picks.js?v=20261108-historial-parejo-1"></script>
+<script src="assets/community-picks.js?v=20261109-text-clarity-1"></script>
 <script src="assets/weekly-picks.js?v=20261015-1"></script>
 <script src="assets/username-auth.js?v=20261103-remove-welcome-1"></script>
 <script src="assets/ae-category-visibility.js?v=20261016-dynamic-nav-1"></script>
@@ -5543,7 +5541,7 @@ updateThemeButton();
 <script src="assets/free-takes.js?v=20261103-tarjetas-1"></script>
 <script src="assets/ae-take-rankings.js?v=20261020-difficulty-2"></script>
 <script src="assets/cam-image-compress.js?v=20261021-1"></script>
-<script src="assets/ae-editorial-weekly.js?v=20261108-picks-display-1"></script>
+<script src="assets/ae-editorial-weekly.js?v=20261109-text-clarity-1"></script>
 
 <style id="cam-weekly-results-style">
 .cam-weekly-review{margin-top:16px;clear:both}
@@ -5669,7 +5667,7 @@ html .cam-weekly-result-surface .cam-weekly-result-on-photo{
 <script src="assets/cam-profile-overview.js?v=20261108-profile-simple-1"></script>
 <script src="assets/cam-profile-quiniela.js?v=20261108-signed-scoring-1"></script>
 <script src="assets/ae-profile.js?v=20261108-profile-simple-1"></script>
-<script src="assets/cam-leagues.js?v=20261108-profile-simple-1"></script>
+<script src="assets/cam-leagues.js?v=20261109-text-clarity-1"></script>
 <style id="cam-nfl-quiniela-theme">
 /* ===========================================================================
    CAM SPORTS · La Quiniela NFL — lenguaje visual curvo, editorial y compacto.
@@ -6453,16 +6451,16 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 </style>
 
 <!-- Componentes finales: móvil, conversación, parties, perfil y Takes; orden en performance-css-packs.json. -->
-<link rel="stylesheet" href="assets/cam-perf-app-panels.css?v=20261109-escritorio-4">
+<link rel="stylesheet" href="assets/cam-perf-app-panels.css?v=20261109-text-clarity-1">
 <script src="assets/cam-parties.js?v=20261104-perfil-claro-1"></script>
 <script src="assets/cam-sport-quiniela-loader.js?v=20261108-en-juego-1"></script>
 <script src="assets/ae-season-predictions.js?v=20261021-champion-guide-1"></script>
 <script src="assets/cam-lazy-editorial-loader.js?v=20261109-escritorio-4"></script>
 <script src="assets/cam-opinions-section-banners.js?v=20261104-actualidad-1"></script>
-<script src="assets/ae-home-takes.js?v=20261017-esports-league-v1"></script>
-<script src="assets/ae-home-take-discoveries.js?v=20261103-sport-take-historic-1"></script>
+<script src="assets/ae-home-takes.js?v=20261109-text-clarity-1"></script>
+<script src="assets/ae-home-take-discoveries.js?v=20261109-text-clarity-1"></script>
 
-<script src="assets/ae-sport-top-takes.js?v=20261108-escritorio-2"></script>
+<script src="assets/ae-sport-top-takes.js?v=20261109-text-clarity-1"></script>
 <script src="assets/ae-take-replies.js?v=20261103-la-cita-1"></script>
 <script src="assets/ae-draft-guard.js?v=20261019-photo-date-1"></script>
 <script src="assets/ae-take-category-edit.js?v=20261016-1"></script>
@@ -6471,7 +6469,7 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 <script src="assets/cam-admin-news-editor-loader.js?v=20261024-lazy-1"></script>
 
 <script src="assets/ae-mobile-compact-home.js?v=20261016-top3-swipe-v1"></script>
-<script src="assets/ae-football-mobile-redesign.js?v=20261103-sin-mover-1"></script>
+<script src="assets/ae-football-mobile-redesign.js?v=20261109-text-clarity-1"></script>
 <script src="assets/ae-home-weekly-layout.js?v=20261109-escritorio-4"></script>
 <script src="assets/ae-notifications.js?v=20261103-remove-welcome-1"></script>
 <script src="assets/cam-analytics.js?v=20261026-sin-robots"></script>

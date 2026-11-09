@@ -8,8 +8,8 @@
   const CACHE_TTL_MS = 5 * 60 * 1000;
   const ITEMS = [
     ['home.take.cta',' .cam-home-take-square-label','Home · Demuestra tu conocimiento · Botón'],
-    ['home.take.popular','#aeHomeTakesPositiveTitle','Home · Popular Takes'],
-    ['home.take.unpopular','#aeHomeTakesNegativeTitle','Home · Unpopular Takes'],
+    ['home.take.popular','#aeHomeTakesPositiveTitle','Home · Takes populares'],
+    ['home.take.unpopular','#aeHomeTakesNegativeTitle','Home · Takes impopulares'],
     ['home.take.genios','#aeTopTakesPositiveTitle','Home · Genios'],
     ['home.take.anoetos','#aeTopTakesNegativeTitle','Home · Anoetos'],
     ['home.take.historic','#aeHomeTakeHistoricTitle','Home · Take histórico'],
@@ -53,8 +53,8 @@
     ['takes.feed','#aeTakesFeedHeading','NFL / Fútbol · Últimos Takes'],
     ['takes.ranking','#aeSportTakeRankingTitle','NFL / Fútbol · Ranking'],
     ['takes.ranking.description','#aeSportTakeRankingDescription','NFL / Fútbol · Puntuación'],
-    ['takes.genios','#aeSportGeniosTitle','NFL / Fútbol · Opiniones apoyadas'],
-    ['takes.anoetos','#aeSportAnoetosTitle','NFL / Fútbol · Opiniones hateadas'],
+    ['takes.genios','#aeSportGeniosTitle','NFL / Fútbol · Takes populares'],
+    ['takes.anoetos','#aeSportAnoetosTitle','NFL / Fútbol · Takes impopulares'],
     ['takes.season.overline','#aeSeasonOverline','Fútbol · Competición · Etiqueta'],
     ['takes.season.title','#aeSeasonTitle','Fútbol · ¿Quién será campeón?'],
     ['takes.composer.title','#aeTakeComposerTitle','Takes · Publicar mi Take'],
@@ -131,6 +131,22 @@
     if (clearClass) el.classList.remove('cam-site-text-custom');
   }
   const number = (settings, key) => Number.isFinite(settings[key]) ? settings[key] : null;
+  // Upgrade former default copy, including cached site-text rows. Other custom
+  // wording and every editor-controlled style remain untouched.
+  const revisedCopy = {
+    'home.take.popular': [['Popular Takes','Takes populares']],
+    'home.take.unpopular': [['Unpopular Takes','Takes impopulares']],
+    'takes.genios': [['Opiniones apoyadas','Takes populares'],['Opiniones populares','Takes populares']],
+    'takes.anoetos': [['Opiniones hateadas','Takes impopulares'],['Opiniones impopulares','Takes impopulares']],
+    'takes.subtitle': [
+      ['La comunidad vota y debate tus Takes. Los aciertos pueden sumar puntos; tu historial queda en tu perfil. Lo publicado no se borra.','Tu opinión queda guardada.'],
+      ['¿Y si aquella opinión que nadie te creyó hubiera quedado escrita? Todos hemos dicho algo que terminó pasando. Esta vez, deja huella. Publica tu opinión y que tu próximo «yo lo dije» tenga pruebas.','Tu opinión queda guardada.']
+    ]
+  };
+  const currentCopy = (key, value) => {
+    const clean=String(value).replace(/\s+/g,' ').trim();
+    return revisedCopy[key]?.find(([old])=>old===clean)?.[1] ?? value;
+  };
   function apply(descriptor, override=null) {
     const found = find(descriptor);
     if (!found) return;
@@ -143,7 +159,7 @@
       if (el.classList.contains('cam-site-text-custom')) resetStyle(el);
       return;
     }
-    const content = typeof row.content === 'string' ? row.content : original;
+    const content = currentCopy(descriptor.key, typeof row.content === 'string' ? row.content : original);
     const leading = (base.raw.match(/^\s*/) || [''])[0];
     const trailing = (base.raw.match(/\s*$/) || [''])[0];
     const wanted = leading + content + trailing;

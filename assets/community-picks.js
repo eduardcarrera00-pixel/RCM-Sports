@@ -46,7 +46,16 @@ function splitPickSelections(input){
  return text.replace(/\\n/g,'\n').split(/(?:\n+|;\s*|\s+[|]\s+|\s+\+\s+|\s+\/\s+(?=\d+[.)]\s))/)
   .map(part=>part.trim().replace(/^\d+[.)]\s*/,'')).filter(Boolean);
 }
-function pickSelectionDisplay(input){
+function pickSelectionDisplay(input,sport=''){
+ const raw=String(input||'').trim();
+ const winner=value=>/^(?:empate|x)$/i.test(value.trim())?'Empate':'Gana '+value.trim();
+ const regular=raw.match(/^(Resultado\s+final\s*\(\s*tiempo\s+regular\s*\))\s*:\s*(.+)$/i);
+ const football=/^(?:f[uú]tbol|football|soccer|champions(?: league)?|premier(?: league)?|la\s?liga|liga\s?mx)$/i.test(String(sport).trim());
+ if(regular)return {choice:winner(regular[2]),market:football?'90 min':'Tiempo regular',fullMarket:regular[1]};
+ const result=raw.match(/^(1x2)\s*:\s*(.+)$/i);
+ if(result)return {choice:winner(result[2]),market:'1X2',fullMarket:result[1]};
+ const matchWinner=raw.match(/^(Ganador del partido(?:\s*\(([^)]+)\))?)\s*:\s*(.+)$/i);
+ if(matchWinner)return {choice:winner(matchWinner[3]),market:matchWinner[2]||'',fullMarket:matchWinner[1]};
  const parts=String(input||'').split(/\s*[·•]\s*/);
  const prediction=(parts.shift()||'').trim();
  const market=parts.join(' · ').trim();
@@ -61,11 +70,11 @@ function pickSelectionDisplay(input){
 
 /* Resumen del perfil: la primera selección en una línea legible, como la ficha
    (MONEYLINE → «gana · 3 vías»). Un mercado que sigue en bruto no se enseña. */
-window.camPickChoiceText=input=>{
+window.camPickChoiceText=(input,sport='')=>{
  const first=splitPickSelections(input)[0]||String(input||'').trim();
- const display=pickSelectionDisplay(first);
- const raw=/^[A-Z0-9\s()\/&+.,'·-]{4,}$/.test(display.market)&&!/[a-záéíóúñ]/.test(display.market);
- return [display.choice,raw?'':display.market].filter(Boolean).join(' · ');
+ const display=pickSelectionDisplay(first,sport);
+ // Keep period, handicap and other market conditions in compact summaries.
+ return [display.choice,display.market].filter(Boolean).join(' · ');
 };
 
 const ticketStates={won:['✓','Acertado'],lost:['✕','Fallado'],void:['—','Anulado'],pending:['◷','Pendiente']};
@@ -81,18 +90,23 @@ function ticketOfficialResult(value){
  if(typeof value==='string'||typeof value==='number')return String(value).trim();
  return '';
 }
-function ticketRows(p,full=false){
+function ticketRows(p,full=false,{groupEvents=false,compactLabels=!full}={}){
  const choices=ticketChoices(p),content=el('div',null,'cam-ticket-content');
+ const events=new Set(choices.map(({leg})=>String(leg.event||'').trim().toLocaleLowerCase('es')).filter(Boolean));
+ let previousEvent='';
  const list=el('ol',null,'cp-card-legs cam-ticket-legs');
  const extra=el('ol',null,'cp-card-legs cam-ticket-legs');
  choices.forEach(({leg,selection},i)=>{
   const row=el('li',null,'cp-pick-line');
   const body=el('div',null,'cp-pick-line-body');
-  if(leg.event)body.append(el('span',leg.event,'cp-pick-line-event'));
-  const display=pickSelectionDisplay(selection);
+  const eventKey=String(leg.event||'').trim().toLocaleLowerCase('es');
+  if(leg.event&&(!groupEvents||events.size>1&&eventKey!==previousEvent))body.append(el('span',leg.event,'cp-pick-line-event'));
+  previousEvent=eventKey;
+  const display=pickSelectionDisplay(selection,leg.sport);
   body.append(el('strong',display.choice||'Consultar pronóstico','cp-pick-line-choice'));
   let market=display.market;
-  if(full){
+  if(full&&!compactLabels){
+   market=display.fullMarket||market;
    if(/MONEYLINE/i.test(selection))market=/3[- ]WAY|3 VIAS/i.test(selection)?'Ganador · 3 vías':'Ganador del partido';
    else if(/OVER\/UNDER/i.test(selection))market='Total de goles';
    else if(/BOTH TEAMS TO SCORE/i.test(selection))market='Ambos equipos marcan';
@@ -211,7 +225,7 @@ function card(p,compact=false,detail=false,viewerId=currentViewerId,variant='fee
  }
  }
  if(window.CamPickShare)controls.append(window.CamPickShare.button(p));
- if(!detail){const replies=button('Respuestas '+Number(p.comments_count||0)+(editorial?' ›':''),()=>requestPickReply(p.id));replies.classList.add('cp-replies-button');if(editorial){const icon=document.createElementNS('http://www.w3.org/2000/svg','svg');icon.setAttribute('viewBox','0 0 24 24');icon.setAttribute('aria-hidden','true');const path=document.createElementNS('http://www.w3.org/2000/svg','path');path.setAttribute('d','M5 4h14v11H10l-5 5V4Z');path.setAttribute('fill','none');path.setAttribute('stroke','currentColor');path.setAttribute('stroke-width','1.6');icon.append(path);replies.prepend(icon);}replies.setAttribute('aria-label','Abrir respuestas del Pick: '+p.title+' ('+Number(p.comments_count||0)+')');controls.append(replies);}
+ if(!detail){const replies=button(String(Number(p.comments_count||0)),()=>requestPickReply(p.id));replies.classList.add('cp-replies-button');if(editorial){const icon=document.createElementNS('http://www.w3.org/2000/svg','svg');icon.setAttribute('viewBox','0 0 24 24');icon.setAttribute('aria-hidden','true');const path=document.createElementNS('http://www.w3.org/2000/svg','path');path.setAttribute('d','M5 4h14v11H10l-5 5V4Z');path.setAttribute('fill','none');path.setAttribute('stroke','currentColor');path.setAttribute('stroke-width','1.6');icon.append(path);replies.prepend(icon);}replies.setAttribute('aria-label','Abrir respuestas del Pick: '+p.title+' ('+Number(p.comments_count||0)+')');controls.append(replies);}
  n.append(controls);
  return n;
 }
@@ -275,7 +289,9 @@ async function loadHistoricPick(){
   if(seq!==historicRequest)return;
   if(result.error)throw result.error;
   const pick=result.data?.[0];
-  if(!pick){target.replaceChildren(el('p','Aún no hay un Pick acertado con puntos confirmados.','ae-discovery-empty'));return;}
+  const section=$('aeHomePickHistoric');
+  if(section)section.dataset.camContentState=pick?'ready':'empty';
+  if(!pick){target.replaceChildren(el('p','Aún sin Picks puntuados.','ae-discovery-empty'));return;}
   // Presentation only: keep the same winning Pick and points from the query.
   // A stretched link opens the Pick; the author has an independent profile control.
   const winner=el('div',null,'ae-discovery-take cam-historic-record');
@@ -292,8 +308,7 @@ async function loadHistoricPick(){
 
   const legs=Array.isArray(pick.legs)?pick.legs:[];
   const matches=[...new Set(legs.map(leg=>String(leg?.event||'').trim()).filter(Boolean))];
-  const sports=[...new Set(legs.map(leg=>String(leg?.sport||'').trim()).filter(Boolean))];
-  const matchup=matches.join(' + ')||pick.title||'Pick de la comunidad';
+  const matchup=matches.length>1?'Combinada · '+ticketChoices(pick).length+' selecciones':matches[0]||pick.title||'Pick de la comunidad';
   // Orden: perfil arriba; el partido hace de título de las selecciones.
   const byline=el('div',null,'cam-historic-byline');
   const authorName='@'+String(pick.author||'Aficionado').replace(/^@+/,'');
@@ -319,29 +334,24 @@ async function loadHistoricPick(){
   const head=el('div',null,'cam-historic-head');
   head.append(el('strong',matchup,'ae-discovery-title cam-historic-match'));
   winner.append(head);
-  winner.append(ticketRows(pick,true));
+  winner.append(ticketRows(pick,true,{groupEvents:true,compactLabels:true}));
 
-  // Datos compactos: cuota, fecha, deporte y puntos. El resultado no se repite:
+  // Datos compactos: momio, fecha y puntos. El resultado no se repite:
   // el Pick histórico siempre es un acierto.
   const facts=el('div',null,'cam-historic-facts');
-  const fact=(label,value,cls)=>{
-    const item=el('span',null,'cam-historic-fact '+cls);
-    item.append(el('span',label+': ','cam-historic-fact-label'),el('span',value,'cam-historic-fact-value'));
-    return item;
-  };
   if(pick.american_odds!==null&&pick.american_odds!==undefined&&String(pick.american_odds).trim()!==''){
     const american=Number(pick.american_odds);
     const quota=el('span',null,'cam-historic-quota-chip');
-    quota.append(el('span','Cuota','cam-historic-quota-label'),
-      el('strong',Number.isFinite(american)?(american>0?'+':'')+american:String(pick.american_odds),'cam-historic-quota-value'));
+    const value=Number.isFinite(american)?(american>0?'+':'')+american:String(pick.american_odds);
+    quota.setAttribute('aria-label','Momio '+value);
+    quota.append(el('strong',value,'cam-historic-quota-value'));
     facts.append(quota);
   }
   const details=el('span',null,'cam-historic-details');
   const eventDay=/^\d{4}-\d{2}-\d{2}$/.test(String(pick.event_date||''))
     ?new Date(pick.event_date+'T12:00:00Z').toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}).replace(/\./g,'')
     :String(pick.event_date||'').trim();
-  if(eventDay)details.append(fact('Fecha',eventDay,'cam-historic-date'));
-  if(sports.length)details.append(fact('Deporte',sports.join(' / '),'cam-historic-sport'));
+  if(eventDay)details.append(el('time',eventDay,'cam-historic-date'));
   if(details.childNodes.length)facts.append(details);
   // Do not change the existing points element, value or score styling.
   const meta=el('span',null,'ae-discovery-meta');
@@ -351,6 +361,7 @@ async function loadHistoricPick(){
   target.replaceChildren(winner);
  }catch(error){
   if(seq!==historicRequest)return;
+  const section=$('aeHomePickHistoric');if(section)section.dataset.camContentState='error';
   const retry=button('Reintentar',()=>void loadHistoricPick());
   target.replaceChildren(el('p','No se pudo cargar el Pick histórico.','ae-discovery-empty'),retry);
  }finally{if(seq===historicRequest)target.setAttribute('aria-busy','false');}
@@ -371,10 +382,13 @@ async function load(){
    sizeFeedWindow();
    // Voting refreshes the feed; don't throw readers back to the top.
    feedEl.scrollTop=previousScroll;
-   $('cpStatus').textContent=feed.data?.length?'':'Todavía no hay Picks activos. Consulta el historial o comparte el tuyo.';
+   $('cpStatus').textContent=feed.data?.length?'':'Aún sin Picks activos.';
+   $('cpFeed').dataset.camContentState=feed.data?.length?'ready':'empty';
+   const viewAll=$('cpViewAll');
+   if(viewAll?.firstChild)viewAll.firstChild.textContent=feed.data?.length?'Ver todos los Picks ':'Ver historial ';
    loaded=true;
    await Promise.all([loadRanking(),loadModeration(),loadChefLists(),loadSettlement(),loadSettleHistory()]);
- }catch(e){if(seq!==request)return;$('cpFeed').replaceChildren();sizeFeedWindow();$('cpStatus').textContent='No pudimos cargar los Picks. '+message(e);}
+ }catch(e){if(seq!==request)return;$('cpFeed').dataset.camContentState='error';$('cpFeed').replaceChildren();sizeFeedWindow();$('cpStatus').textContent='No pudimos cargar los Picks. '+message(e);}
 }
 let currentRank='month';
 let currentWorstRank='month';
@@ -608,20 +622,22 @@ function paintHomePlateList(result,kind){
  if(!target)return;
  target.replaceChildren();
  if(result?.error){
+  target.dataset.camContentState='error';
   const retry=button('Reintentar',()=>loadChefLists());
   const empty=el('li','No se pudo cargar la clasificación. ','cam-home-plate-empty');
   empty.append(retry);target.append(empty);
   return;
  }
  const picks=Array.isArray(result?.data)?result.data:[];
- if(!picks.length){target.append(el('li','Todavía no hay platos '+(kind==='best'?'con votos positivos.':'con votos negativos.'),'cam-home-plate-empty'));return;}
+ target.dataset.camContentState=picks.length?'ready':'empty';
+ if(!picks.length){target.append(el('li','Aún sin votos esta semana.','cam-home-plate-empty'));return;}
  for(const p of picks){
   // Reuse the history card's structure, without a result badge or outcome data.
   const item=el('li',null,'cam-home-plate-row ae-pick-history-entry');
   item.dataset.pickId=p.id;
   const first=p.legs?.[0];
   const match=first?.event||p.title;
-  const prediction=window.camPickChoiceText(first?.selection||p.title);
+  const prediction=window.camPickChoiceText(first?.selection||p.title,first?.sport);
   const read=el('a',null,'cam-home-plate-open ae-pick-history-card');
   read.href=link(p.id);read.setAttribute('aria-label','Abrir Pick de '+(p.author||'Aficionado')+': '+match+'. '+prediction);
   read.addEventListener('click',event=>{
@@ -658,12 +674,14 @@ function paintChefList(id,result,kind){
  if(oldHint)oldHint.hidden=true;
  const good=kind==='best';
  if(result?.error){
+   target.dataset.camContentState='error';
    target.append(row('No se pudo cargar esta clasificación.','ae-chef-empty'));
    return;
  }
  const picks=Array.isArray(result?.data)?result.data:[];
+ target.dataset.camContentState=picks.length?'ready':'empty';
  if(!picks.length){
-   target.append(row(good?'Aún no hay Picks con votos netos positivos esta semana.':'Aún no hay Picks con votos netos negativos esta semana.','ae-chef-empty'));
+   target.append(row('Aún sin votos esta semana.','ae-chef-empty'));
    return;
  }
  const scrollable=picks.length>2;
@@ -824,8 +842,7 @@ async function loadSettleHistory(){
   const legs=Array.isArray(p.legs)?p.legs:[];
   const first=legs[0]||{};
   const match=String(first.event||p.title||'Partido sin especificar').trim();
-  const selection=splitPickSelections(first.selection||'').map(s=>pickSelectionDisplay(s).choice).filter(Boolean);
-  const prediction=selection[0]||String(first.selection||'').trim()||(legs.length?'Consultar pronóstico':'Ver pronóstico completo');
+  const prediction=window.camPickChoiceText(first.selection||'',first.sport)||(legs.length?'Consultar pronóstico':'Ver pronóstico completo');
   const selections=legs.reduce((total,leg)=>total+Math.max(1,splitPickSelections(leg.selection).length),0);
   const entry=el('a',null,'ae-pick-history-card');
   entry.href=link(p.id);
@@ -846,8 +863,10 @@ async function loadSettleHistory(){
   // Pie de una sola línea: cuota · combinada · fecha (la del resultado o, si
   // aún no lo hay, la del partido con el mismo formato «8 nov»).
   const bottom=el('div',null,'ae-pick-history-card-bottom');
-  bottom.append(el('span','Cuota '+odds(p.american_odds),'ae-pick-history-odds'));
-  if(selections>1)bottom.append(el('span','Combinada de '+selections,'ae-pick-history-multiple'));
+  const quota=el('span',odds(p.american_odds),'ae-pick-history-odds');
+  quota.setAttribute('aria-label','Momio '+odds(p.american_odds));
+  bottom.append(quota);
+  if(selections>1)bottom.append(el('span',selections+' selecciones','ae-pick-history-multiple'));
   bottom.append(el('span',when(p.settled_at)||(p.event_date?when(p.event_date+'T12:00:00Z'):''),'ae-pick-history-date'));
   if(p.outcome==='won'&&p.result_points!=null)
    bottom.append(el('span','+'+Number(p.result_points).toFixed(2)+' pts','ae-pick-history-points'));
@@ -1369,15 +1388,24 @@ document.addEventListener('DOMContentLoaded',()=>{
  });
  $('cpComposePanel')?.addEventListener('close',syncPickComposer);
  $('cpComposePanel')?.addEventListener('cancel',e=>{if(posting)e.preventDefault();});
- renderCommunityPicksVisibility();load();window.addEventListener('resize',()=>{sizeFeedWindow();sizeChefRankingWindows();sizePlateWindow($('picksPopular'));sizePlateWindow($('picksQuestioned'));},{passive:true});if(document.fonts?.ready)document.fonts.ready.then(()=>{sizeFeedWindow();sizeChefRankingWindows();sizePlateWindow($('picksPopular'));sizePlateWindow($('picksQuestioned'));});$('cpReload')?.addEventListener('click',load);$('cpWorstReload')?.addEventListener('click',loadWorstRanking);$('cpViewAll')?.addEventListener('click',()=>{const dlg=$('cpArchiveDialog');if(dlg&&!dlg.open)dlg.showModal();archiveLimit=30;loadArchive();});$('cpArchiveClose')?.addEventListener('click',closeArchive);$('cpArchiveMore')?.addEventListener('click',()=>{archiveLimit+=30;loadArchive();});for(const [id,mode] of [['cpRankMonth','month'],['cpRankHistory','all']]){$(id)?.addEventListener('click',()=>{currentRank=mode;for(const [i,m] of [['cpRankMonth','month'],['cpRankHistory','all']])$(i)?.setAttribute('aria-pressed',String(currentRank===m));loadRanking();});}for(const [id,mode] of [['cpWorstRankMonth','month'],['cpWorstRankHistory','all']]){
- $(id)?.addEventListener('click',()=>{
-   currentWorstRank=mode;
-   for(const [buttonId,buttonMode] of [['cpWorstRankMonth','month'],['cpWorstRankHistory','all']]){
-     $(buttonId)?.setAttribute('aria-pressed',String(currentWorstRank===buttonMode));
-   }
-   void loadWorstRanking();
- });
-}
+ renderCommunityPicksVisibility();load();
+ const resize=()=>{sizeFeedWindow();sizeChefRankingWindows();sizePlateWindow($('picksPopular'));sizePlateWindow($('picksQuestioned'));};
+ window.addEventListener('resize',resize,{passive:true});
+ if(document.fonts?.ready)document.fonts.ready.then(resize);
+ $('cpReload')?.addEventListener('click',load);
+ $('cpWorstReload')?.addEventListener('click',loadWorstRanking);
+ $('cpViewAll')?.addEventListener('click',()=>{const dlg=$('cpArchiveDialog');if(dlg&&!dlg.open)dlg.showModal();archiveLimit=30;loadArchive();});
+ $('cpArchiveClose')?.addEventListener('click',closeArchive);
+ $('cpArchiveMore')?.addEventListener('click',()=>{archiveLimit+=30;loadArchive();});
+ for(const [id,mode] of [['cpRankMonth','month'],['cpRankHistory','all']]){
+   $(id)?.addEventListener('click',()=>{
+     currentRank=currentWorstRank=mode;
+     for(const [buttonId,buttonMode] of [['cpRankMonth','month'],['cpRankHistory','all']]){
+       $(buttonId)?.setAttribute('aria-pressed',String(mode===buttonMode));
+     }
+     void loadRanking();
+   });
+ }
 const id=new URL(location.href).searchParams.get('pick');if(id)showDetail(id);if(db)db.auth.onAuthStateChange(()=>setTimeout(()=>{load();const id=new URL(location.href).searchParams.get('pick');if(id)showDetail(id);},0));});
 // An already open Pick or profile must not remain visible after a rejection.
 // Initial exclusion is server/query-side; focus and a low-frequency foreground

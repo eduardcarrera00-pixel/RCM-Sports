@@ -95,7 +95,10 @@ assert.equal(d.querySelector('#freeTakesFeed .ae-take-reply-count').textContent,
 // Un fallo de contadores no elimina publicaciones ni finge cero respuestas.
 w.failTakeReplyCounts=true;d.dispatchEvent(new w.Event('ae:takes-updated'));await new Promise(r=>setTimeout(r,40));
 assert.equal(d.querySelectorAll('#freeTakesFeed>article').length,20);
-assert.equal(d.querySelector('#freeTakesFeed .ae-take-reply-count').textContent,'—');
+const unavailable=d.querySelector('#freeTakesFeed .ae-take-reply-count');
+assert.equal(unavailable.textContent,'');
+assert.equal(unavailable.hidden,true);
+assert.match(unavailable.closest('button').getAttribute('aria-label'),/Número de respuestas no disponible/);
 // Una respuesta NFL tardía no puede sustituir los contadores de Fútbol.
 w.failTakeReplyCounts=false;
 const originalRpc=w.db.rpc;let resolveOldCounts;

@@ -99,12 +99,16 @@
     const byUser=new Map((Array.isArray(movements)?movements:[]).map(m=>[m.user_id,m]));
     const best=$('aeTopTakesPositive'),worst=$('aeTopTakesNegative');
     const rows=Array.isArray(data)?data:[];
+    // An empty all-time result means there is no ranking to feature yet.
+    // Keep a selected monthly empty state visible so its period switch remains usable.
+    const panel=$('aeHomeTopTakes');
+    if(panel)panel.dataset.camContentState=period==='all'&&!rows.length?'empty':'ready';
     const top=rows.filter(x=>x?.side==='genios').sort((a,b)=>Number(a.rank_number)-Number(b.rank_number)).slice(0,10);
     const tail=rows.filter(x=>x?.side==='anoetos').sort((a,b)=>Number(a.rank_number)-Number(b.rank_number)).slice(0,10);
     if(top.length)best.replaceChildren(...top.map(r=>leader(r,'genios',byUser.get(r.user_id))));
-    else empty(best,'Todavía no hay Takes puntuados en este periodo.');
+    else empty(best,'Aún sin Takes puntuados en este periodo.');
     if(tail.length)worst.replaceChildren(...tail.map(r=>leader(r,'anoetos',byUser.get(r.user_id))));
-    else empty(worst,'No hay participantes puntuados fuera del podio todavía.');
+    else empty(worst,'Aún sin participantes fuera del podio.');
     const status=$('aeTopTakesStatus');
     if(status)status.textContent='';
   }
@@ -134,6 +138,7 @@
       lastLoad=Date.now();
     }catch(error){
       if(sequence===request){
+        $('aeHomeTopTakes').dataset.camContentState='error';
         empty($('aeTopTakesPositive'),'No se pudo cargar la clasificación por puntos.');
         empty($('aeTopTakesNegative'),'No se pudo cargar la cola de la clasificación.');
         const status=$('aeTopTakesStatus');

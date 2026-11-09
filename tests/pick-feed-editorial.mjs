@@ -62,6 +62,16 @@ w.db={
 const settle=()=>new Promise(resolve=>setTimeout(resolve,40));
 await settle();
 w.eval(fs.readFileSync('assets/community-picks.js','utf8'));
+// Compact labels must preserve the conditions needed to understand a Pick.
+for(const [selection,condition] of [
+ ['Resultado Final (Tiempo Regular): Atlético Madrid','90 min'],
+ ['Resultado Final (Tiempo Regular): Empate','Empate'],
+ ['Ganador del partido (incl. prórroga): Dallas Cowboys','incl. prórroga'],
+ ['Más de 1.5 · TOTAL (1ST HALF)','1ST HALF'],
+ ['Hándicap (incl. extra innings): Águilas (+1.5)','(+1.5)']
+])assert.ok(w.camPickChoiceText(selection,'Fútbol').includes(condition),selection);
+assert.ok(w.camPickChoiceText('Resultado Final (Tiempo Regular): Buffalo Bills','NFL').includes('Tiempo regular'));
+assert.ok(!w.camPickChoiceText('Resultado Final (Tiempo Regular): Buffalo Bills','NFL').includes('90 min'));
 d.dispatchEvent(new w.Event('DOMContentLoaded'));
 await settle();
 records.push({id:'12345678-1234-1234-1234-000000000001',user_id:'author-1',author:'sofia007',title:'Monterrey vs Tigres · Tigres gana',legs:[{sport:'Fútbol',event:'Monterrey vs Tigres',selection:'Tigres gana',odds:200}],event_date:dayOffset(1),outcome:'pending',moderation_status:'pending',american_odds:200,explanation:'Mi análisis',is_current_week:true,created_at:new Date().toISOString()});
@@ -79,7 +89,7 @@ assert.equal(card.querySelector('.cp-feed-meta .cp-card-odds').parentElement.cla
 assert.equal(card.querySelector('.cp-pick-line-number'),null);
 assert.equal(card.querySelector('.cp-feed-initial').textContent,'S');
 card.querySelector('.cp-feed-author').click();assert.equal(openedProfile,'author-1');
-const replies=card.querySelector('.cp-replies-button');assert.match(replies.textContent,/Respuestas 0/);assert.ok(replies.querySelector('svg'));
+const replies=card.querySelector('.cp-replies-button');assert.equal(replies.textContent,'0');assert.match(replies.getAttribute('aria-label'),/respuestas/);assert.ok(replies.querySelector('svg'));
 replies.click();await settle();assert.ok(d.querySelector('#cpDialog .cp-card-detail'));
 assert.equal(d.querySelector('#cpDialog .cp-recipe-card .cp-card-legs').tagName,'OL','Recipe and feed use the same list');
 assert.equal(d.querySelector('#cpDialog .cp-recipe-card .cp-pick-line-choice').textContent,'Tigres gana');

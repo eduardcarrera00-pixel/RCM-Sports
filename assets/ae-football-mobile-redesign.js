@@ -117,12 +117,10 @@
       moveTo(byId('freeTakes'), stage);
       // El bloque real de opiniones se muestra debajo de "Demuestra tu
       // conocimiento" y antes de los últimos Takes; nunca en la barra lateral.
-      // Como en NFL, «Seguro que alguna vez dijiste…» va debajo de las opiniones.
       const footballFeed=byId('freeTakes');
       const history=byId('aeTakesFeedHeading');
       const leaders=byId('aeSportTakeLeaders');
-      const invitation=byId('camTakeInvitation');
-      const before=invitation?.parentElement===footballFeed?invitation:history;
+      const before=history;
       if(footballFeed&&history?.parentElement===footballFeed&&leaders&&before&&
          (leaders.parentElement!==footballFeed||leaders.nextElementSibling!==before)){
         footballFeed.insertBefore(leaders,before);
@@ -134,8 +132,8 @@
       if (trending) trending.hidden = false;
 
       // El título interactivo lo actualiza renderArticlesFeed; no reemplazar su botón.
-      if (byId('aeSportGeniosTitle')) byId('aeSportGeniosTitle').textContent = 'Opiniones populares';
-      if (byId('aeSportAnoetosTitle')) byId('aeSportAnoetosTitle').textContent = 'Opiniones impopulares';
+      if (byId('aeSportGeniosTitle')) byId('aeSportGeniosTitle').textContent = 'Takes populares';
+      if (byId('aeSportAnoetosTitle')) byId('aeSportAnoetosTitle').textContent = 'Takes impopulares';
 
       if (ranking) {
         ranking.classList.add('ae-football-ranking-feature');

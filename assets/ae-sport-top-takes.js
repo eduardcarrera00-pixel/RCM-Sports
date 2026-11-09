@@ -61,10 +61,7 @@
    // justo debajo del encabezado y antes del historial, a cualquier ancho.
    if(section==='Fútbol'){
      const feed=$('freeTakes'),history=$('aeTakesFeedHeading');
-     // Teléfono, igual que NFL: opiniones → «Seguro que alguna vez dijiste…» → Últimos Takes.
-     // Escritorio, igual que NFL: el párrafo sigue justo debajo de la tarjeta.
-     const invitation=$('camTakeInvitation');
-     const before=window.matchMedia('(max-width:760px)').matches&&invitation?.parentElement===feed?invitation:history;
+     const before=history;
      if(feed&&history?.parentElement===feed&&before&&
         (root.parentElement!==feed||root.nextElementSibling!==before)){
        feed.insertBefore(root,before);
@@ -76,7 +73,7 @@
    // Mover el nodo existente conserva votos, comentarios y escuchas.
    if(section==='NFL'){
      const feed=$('freeTakes'),header=feed?.querySelector(':scope > .ae-takes-head');
-     const invitation=$('camTakeInvitation'),anchor=invitation?.parentElement===feed?invitation:header;
+     const anchor=header;
      if(feed&&anchor&&
         (root.parentElement!==feed||root.previousElementSibling!==anchor)){
        anchor.after(root);
@@ -105,7 +102,7 @@
    list.style.removeProperty('scroll-behavior');
    list.removeAttribute('tabindex');
    list.setAttribute('role','list');
-   const label=sport==='nfl'?(mode==='up'?'Opiniones apoyadas':'Opiniones hateadas'):(mode==='up'?'Opiniones populares':'Opiniones impopulares');
+   const label=mode==='up'?'Takes populares':'Takes impopulares';
    list.setAttribute('aria-label',label+' de '+(sport==='nfl'?'NFL':'Fútbol')+'; '+items.length+' '+(items.length===1?'Take':'Takes')+'.');
    list.replaceChildren();
    for(const [i,t] of items.entries()){
@@ -146,11 +143,12 @@
      list.append(li);
    }
    if(!items.length){
-     const empty=el('li',mode==='up'?'Aún no hay Takes con más apoyos que críticas.':'Aún no hay Takes con más críticas que apoyos.','cam-op-empty');
+     const empty=el('li','Aún sin votos '+(mode==='up'?'positivos.':'negativos.'),'cam-op-empty');
      list.append(empty);
    }
    // Botón propio para ver el resto; el antiguo «Ver todos» queda oculto.
    const group=list.closest('.ae-sport-takes-group');
+   if(group)group.dataset.camContentState=items.length?'ready':'empty';
    let more=group?.querySelector(':scope > .cam-op-more');
    if(group&&!more){
      more=el('button',undefined,'cam-op-more');
@@ -186,11 +184,13 @@
      if(!active())return;
      const winner=(result.data||[]).find(t=>t.id&&Number(t.points)>0&&
        (sport==='nfl'?t.sport==='nfl':footballSports.has(t.sport)));
+     target.closest('#aeSportTakeHistoric').dataset.camContentState=winner?'ready':'empty';
      if(winner)target.replaceChildren(window.aeTakeHistoricCard.create(winner));
      else window.aeTakeHistoricCard.empty(target,
-       'Cuando se puntúe un Take acertado de '+section+', el que más puntos sume quedará aquí.',section);
+       'Aún sin Takes puntuados.',section);
    }catch(error){
      if(!active())return;
+     target.closest('#aeSportTakeHistoric').dataset.camContentState='error';
      const retry=el('button','Volver a intentar','cam-take-record-cta');
      retry.type='button';
      retry.addEventListener('click',()=>refresh(true));
@@ -217,8 +217,8 @@
    if(!sport){current='';request++;return;}
    // Los destacados deportivos tienen nombres propios; los de portada
    // (#aeTopTakesPositiveTitle / #aeTopTakesNegativeTitle) no se modifican.
-   $('aeSportGeniosTitle').textContent=sport==='nfl'?'Opiniones apoyadas':'Opiniones populares';
-   $('aeSportAnoetosTitle').textContent=sport==='nfl'?'Opiniones hateadas':'Opiniones impopulares';
+   $('aeSportGeniosTitle').textContent='Takes populares';
+   $('aeSportAnoetosTitle').textContent='Takes impopulares';
    if(!force&&sport===current&&Date.now()-lastRun<15000)return;
    current=sport;
    const seq=++request;const status=$('aeSportTakeStatus');

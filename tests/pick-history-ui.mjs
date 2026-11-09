@@ -41,7 +41,7 @@ assert.equal(area.querySelectorAll('.ae-pick-history-summary').length,0,'The thr
 assert.equal(area.querySelectorAll('.ae-pick-history-grid').length,1);
 assert.equal(area.querySelectorAll('.ae-pick-history-card').length,1);
 assert.match(area.textContent,/Barcelona gana/);
-assert.match(area.textContent,/Cuota \+240/);
+assert.ok(area.querySelector('[aria-label="Momio +240"]'));
 assert.match(area.textContent,/@eduardcarrera00/);
 assert.match(area.querySelector('.ae-pick-history-card').getAttribute('href'),/[?&]pick=same/);
 assert.equal(area.querySelectorAll('.ae-pick-history-frame').length,1);

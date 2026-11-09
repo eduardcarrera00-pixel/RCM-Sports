@@ -1,5 +1,21 @@
 # AE SPORTS · Guía visual v1
 
+### Textos más claros · 9 nov 2026
+
+NFL y Fútbol comparten «Takes populares» y «Takes impopulares» con Inicio.
+«Demuestra tu conocimiento» lleva una sola frase y el botón de publicar.
+Las noticias conservan la entradilla de dos líneas y sus acciones; no muestran
+un aviso cuando no hay comentario destacado. La noticia de portada no se repite
+en su carrusel inmediato. Ambos rankings de Chefs usan el mismo periodo.
+
+Los destacados editoriales y récords sin contenido confirmado se ocultan al
+público; la carga y el error siguen siendo estados distintos. Modo Edición
+mantiene disponibles los módulos vacíos. Las etiquetas de Picks se resumen sin
+perder tiempo regular, hándicap ni otras condiciones, y el detalle conserva el
+mercado completo. El historial mantiene resultado y fecha. Los resúmenes de
+perfil usan un contorno por tarjeta y permiten dos líneas para selección y título.
+Estilos: `assets/cam-display-clarity.css`, incluido en el paquete de paneles.
+
 ### Perfil más claro · 4 nov 2026
 
 Cuatro pestañas: Perfil · Takes · Picks · Mi Party. «Mis jornadas» va al final de

@@ -54,12 +54,14 @@ target.querySelector('.cam-take-record').click();
 assert.equal(opened.at(-1),football);
 
 mode='empty';await w.refreshAeSportTopTakes(true);
+assert.equal(root.dataset.camContentState,'empty');
 assert.match(target.textContent,/El récord está libre/);
 target.querySelector('.cam-take-record-cta').click();
 assert.equal(composers.at(-1),'Fútbol','Empty state opens the correct sport composer');
 mode='error';await w.refreshAeSportTopTakes(true);
+assert.equal(root.dataset.camContentState,'error','An error remains distinct from an optional empty record');
 assert.match(target.textContent,/No se pudo cargar/);
-assert.equal(d.querySelectorAll('#aeSportTakePositive .ae-sport-take-item').length,1,'Record failure leaves the opinions working');
+assert.equal(d.querySelectorAll('#aeSportTakePositive .cam-op-row').length,1,'Record failure leaves the opinions working');
 mode='normal';target.querySelector('.cam-take-record-cta').click();
 for(let i=0;i<4;i++)await new Promise(resolve=>setTimeout(resolve,0));
 assert.match(target.textContent,/Fútbol récord/,'Retry recovers the record');

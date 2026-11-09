@@ -170,8 +170,9 @@
     ranked('positive',positive,'Todavía no hay Takes con votos positivos.');
     ranked('negative',negative,'Todavía no hay Takes con votos negativos.');
     const winner=rows.find(r=>r?.kind==='historical'&&Number(r.points)>0);
+    $('aeHomeTakeHistoric').dataset.camContentState=winner?'ready':'empty';
     if(winner)historic.replaceChildren(historicalCard(winner));
-    else emptyHistoric(historic,'Cuando los administradores puntúen un Take acertado, el que más puntos sume quedará aquí.');
+    else emptyHistoric(historic,'Aún sin Takes puntuados.');
   }
   async function refresh(force=false){
     if(!$('aeHomeTakeHighlights')||typeof db==='undefined'||!db||$('editorialBottom')?.hidden)return;
@@ -204,8 +205,9 @@
       render(rows,replyCounts,session.data?.user?.id||null);
       lastFetch=Date.now();
     }catch(error){
-      empty($('aeHomeTakesPositiveList'),'No se pudieron cargar los Popular Takes.',true);
-      empty($('aeHomeTakesNegativeList'),'No se pudieron cargar los Unpopular Takes.',true);
+      empty($('aeHomeTakesPositiveList'),'No se pudieron cargar los Takes populares.',true);
+      empty($('aeHomeTakesNegativeList'),'No se pudieron cargar los Takes impopulares.',true);
+      $('aeHomeTakeHistoric').dataset.camContentState='error';
       empty($('aeHomeTakeHistoricTake'),'No se pudo cargar el Take histórico.');
     }finally{
       loading=false;

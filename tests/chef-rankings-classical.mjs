@@ -21,7 +21,7 @@ w.aeRequestPublication=async(kind,continueToComposer)=>{
 w.filterByCategory=category=>{w.currentCategory=category;w.renderCommunityPicksVisibility();};
 w.db={
   auth:{getUser:async()=>({data:{user},error:null}),onAuthStateChange:()=>{}},
-  rpc:async(name,args)=>{rpcCalls.push({name,args});return {data:Array.from({length:10},(_,i)=>({user_id:'chef-'+i,username:'chef_'+i,points:(name.includes('worst')?-1:1)*(10-i),total_resolved:5,correct_picks:name.includes('worst')?1:4})),error:null};},
+  rpc:async(name,args)=>{rpcCalls.push({name,args});return {data:Array.from({length:10},(_,i)=>({user_id:(name.includes('worst')?'low-':'chef-')+i,username:'chef_'+i,points:(name.includes('worst')?-1:1)*(10-i),total_resolved:5,correct_picks:name.includes('worst')?1:4})),error:null};},
   from(table){
     let operation='select',payload={},filters=[],limit=1000,single=false;
     const q={
@@ -75,8 +75,10 @@ assert.equal(d.querySelector('#cpWorstLeaderboard .ae-chef-accuracy').textConten
 assert.equal(d.querySelectorAll('.ae-chefs-art-heading').length,2);
 assert.equal(d.querySelector('.ae-worst-chefs-intro'),null);
 assert.ok(!d.querySelector('.ae-chefs-art-heading').textContent.includes('Acierto'));
-d.getElementById('cpWorstRankHistory').click();await settle();
-assert.ok(rpcCalls.some(c=>c.name==='ae_pick_result_ranking_worst'&&c.args.p_period==='all'));
-assert.equal(d.getElementById('cpRankMonth').getAttribute('aria-pressed'),'true');
-assert.equal(d.getElementById('cpWorstRankHistory').getAttribute('aria-pressed'),'true');
-console.log('Chef rankings: ten real rows, separate periods, numeric points/accuracy, and clean headings passed.');process.exit(0);
+d.getElementById('cpRankHistory').click();await settle();
+assert.ok(rpcCalls.some(c=>c.name==='ae_pick_result_ranking_worst_eligible'&&c.args.p_period==='all'));
+assert.ok(rpcCalls.some(c=>c.name==='ae_pick_result_ranking'&&c.args.p_period==='all'));
+assert.equal(d.getElementById('cpRankMonth').getAttribute('aria-pressed'),'false');
+assert.equal(d.getElementById('cpRankHistory').getAttribute('aria-pressed'),'true');
+assert.equal(d.querySelectorAll('.cam-chef-period button').length,2);
+console.log('Chef rankings: ten real rows, one shared period, numeric points/accuracy, and clean headings passed.');process.exit(0);

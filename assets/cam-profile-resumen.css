@@ -143,10 +143,10 @@
     width:100%!important;
     min-width:0!important;
     margin:0!important;
-    padding:11px 12px 10px!important;
-    border:1px solid var(--rs-line)!important;
-    border-radius:12px!important;
-    background:var(--rs-soft)!important;
+    padding:6px 0!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
     background-image:none!important;
     color:var(--rs-text)!important;
     text-align:left!important;
@@ -169,10 +169,11 @@
     margin:0!important; padding:1px 0 2px!important; color:var(--rs-ink)!important;
     font:600 17px/1.32 "Playfair Display",Georgia,serif!important; overflow-wrap:anywhere!important;
   }
-  html body #camProfileOverview .cam-ov-title.is-one { -webkit-line-clamp:1!important; }
+  html body #camProfileOverview .cam-ov-title.is-one { -webkit-line-clamp:2!important; }
   html body #camProfileOverview .cam-ov-choice {
-    display:block!important; overflow:hidden!important; padding:1px 0!important; color:var(--rs-text)!important;
-    font:600 13.5px/1.4 Inter,system-ui,sans-serif!important; text-overflow:ellipsis!important; white-space:nowrap!important;
+    display:-webkit-box!important; -webkit-box-orient:vertical!important; -webkit-line-clamp:2!important;
+    overflow:hidden!important; padding:1px 0!important; color:var(--rs-text)!important;
+    font:500 14px/1.4 Inter,system-ui,sans-serif!important; white-space:normal!important; overflow-wrap:anywhere!important;
   }
   html body #camProfileOverview .cam-ov-meta {
     display:flex!important; flex-wrap:wrap!important; align-items:center!important; gap:4px 10px!important;
