@@ -287,6 +287,7 @@
     read.append(media);
     const body = el('span', null, 'cam-hj-news-body');
     body.append(el('span', a.title || '', 'cam-hj-card-title'));
+    if (a.summary) body.append(el('span', a.summary, 'cam-hj-news-summary'));
     read.append(body);
     read.setAttribute('aria-label', (a.category ? a.category + ': ' : '') + (a.title || 'Noticia'));
     read.addEventListener('click', () => { if (typeof window.openArticleModal === 'function') window.openArticleModal(a.id); });

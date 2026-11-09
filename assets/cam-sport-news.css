@@ -146,6 +146,13 @@ html body #aeSportLatestNews button:focus-visible {
 }
 
 /* Small shared actions replace date/read-time metadata in the news cards. */
+html body #mainContent #articlesGrid article .p-5 > p {
+  display:-webkit-box!important;
+  -webkit-box-orient:vertical!important;
+  -webkit-line-clamp:2!important;
+  overflow:hidden!important;
+  max-height:none!important;
+}
 html body #mainContent :is(#articlesGrid,#aeSportLatestNews,#camHomeJornada) .cam-news-interactions {
   --cam-news-action-muted:#c5cdd2;
   --cam-news-action-accent:#e3b979;

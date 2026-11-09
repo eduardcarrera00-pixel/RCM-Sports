@@ -268,6 +268,11 @@
   }
   html body #camHomeJornada .cam-hj-news-body { display:flex!important; flex-direction:column!important; gap:0!important; padding:12px 14px 0!important; flex:1 1 auto!important; }
   html body #camHomeJornada .cam-hj-meta { display:block!important; margin-top:auto!important; color:var(--hj-muted)!important; font:600 11.5px/1.3 Inter,system-ui,sans-serif!important; }
+  html body #camHomeJornada .cam-hj-news-summary {
+    display:-webkit-box!important; -webkit-box-orient:vertical!important; -webkit-line-clamp:2!important;
+    overflow:hidden!important; margin:7px 0 4px!important; color:var(--hj-muted)!important;
+    font:400 12px/1.45 Inter,system-ui,sans-serif!important;
+  }
 
   /* ---------- Takes ---------- */
   html body #camHomeJornada .cam-hj-take { width:244px!important; }
