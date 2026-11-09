@@ -381,7 +381,7 @@
       });
       nav.append(tab);
     }
-    target.append(nav,el('p','Fechas y horarios: America/Toronto','cam-nfl-day-timezone'));
+    target.append(nav);
   }
   let gameViewportObserver;
   function sizeGameViewport(){
@@ -401,6 +401,7 @@
     measure();
   }
   function paintGames(){
+    if($('camFootballSave'))$('camFootballSave').hidden=!user;
     const target=$('camFootballGames');if(!target)return;
     target.replaceChildren();
     const chosen=roundGames();
@@ -704,3 +705,4 @@
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup,{once:true});
   else setup();
 })();
+

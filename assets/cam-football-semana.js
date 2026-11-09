@@ -91,7 +91,7 @@
     return b;
   }
   function duelBlock(snap,g){
-    const box=section('duelo','Duelo de la semana',snap.competitionName);box.classList.add('cam-ns-feature');
+    const box=el('section',null,'cam-ns-block',{'data-block':'duelo','aria-label':'Partido destacado'});box.classList.add('cam-ns-feature');
     const teams=el('div',null,'cam-ns-duel');
     const side=id=>{const n=el('div',null,'cam-ns-duel-team');n.append(crest(snap,id,40),el('span',name(snap,id),'cam-ns-duel-name'));return n;};
     teams.append(side(g.home_id),el('span','vs','cam-ns-at',{'aria-hidden':'true'}),side(g.away_id));box.append(teams);
@@ -107,7 +107,7 @@
       const picks=el('div',null,'cam-ns-picks');
       for(const pick of ['home','draw','away'])picks.append(pickButton(snap,g,pick));
       play.append(picks);
-    }else play.append(el('p',started(g)?'Pronósticos cerrados':'Puntos pendientes','cam-ns-note'));
+    }else if(!started(g))play.append(el('p','Puntos pendientes','cam-ns-note'));
     const mine=snap.mine.get(g.id),draft=snap.draft.get(g.id);
     if(ui.result?.game===g.id)play.append(el('p',ui.result.text,'cam-ns-note',{role:'status'}));
     else if(draft||mine)play.append(el('p',(draft?'Tu elección sin guardar: ':'Tu elección guardada: ')+label(snap,g,draft||mine),'cam-ns-note'));
@@ -205,3 +205,4 @@
   window.addEventListener('focus',refreshLive);
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshLive();});
 })();
+

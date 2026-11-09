@@ -236,15 +236,6 @@
   }
   function extras(g){
     const row=el('div',null,'cam-nfl-extras');
-    const pick=expert.ready?expert.picks.get(g.id):null;
-    if(pick){
-      const done=g.status==='final'&&g.winner_id;
-      const chip=el('span',null,'cam-nfl-chip cam-nfl-chip-expert'+(done?(pick.team_id===g.winner_id?' is-hit':' is-miss'):''));
-      chip.append(el('span','El editor','cam-nfl-chip-label'),el('strong',nickname(pick.team_id)));
-      if(done)chip.append(el('span',pick.team_id===g.winner_id?'acertó':'falló','cam-nfl-chip-result'));
-      chip.title=(expert.name?'@'+expert.name+' · ':'')+'elección del editor para este partido';
-      row.append(chip);
-    }
     const here=laurelOf(g)===g.id;
     if(user&&laurelReady){
       if(isOpen(g)&&mine.has(g.id)&&!laurelLocked(g)){
@@ -403,7 +394,7 @@
       });
       nav.append(tab);
     }
-    target.append(nav,el('p','Fechas y horarios: Este · America/Toronto','cam-nfl-day-timezone'));
+    target.append(nav);
   }
   let gameViewportObserver;
   function sizeGameViewport(){
@@ -423,6 +414,7 @@
     measure();
   }
   function paintGames(){
+    if($('camNflSave'))$('camNflSave').hidden=!user;
     const target=$('camNflGames');if(!target)return;
     target.replaceChildren();
     const chosen=weekGames();
@@ -501,7 +493,6 @@
   // Las reglas del laurel y del editor solo se cuentan cuando existen.
   function paintRules(){
     const laurelRule=$('camNflLaurelRule');if(laurelRule)laurelRule.hidden=!laurelReady;
-    const expertRule=$('camNflExpertRule');if(expertRule)expertRule.hidden=!expert.ready;
   }
   function setQuinielaView(view){
     if(!['jornada','month','all'].includes(view))return;
@@ -740,3 +731,4 @@
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup,{once:true});
   else setup();
 })();
+

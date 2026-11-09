@@ -188,7 +188,7 @@
     box.append(opinion);
 
     const play = el('div', null, 'cam-ns-quiniela', { role: 'group', 'aria-label': 'Quiniela del duelo de la semana' });
-    play.append(el('p', 'Quiniela · Elige ganador', 'cam-ns-action-label'));
+    play.append(el('p', 'Quiniela', 'cam-ns-action-label'));
     if (finished(duel)) {
       const mine = snap.mine.get(duel.id);
       const winner = duel.winner_id;
@@ -207,17 +207,11 @@
     } else if (!started(duel) && snap.mine.has(duel.id)) {
       play.append(el('p', 'Tu elección guardada: ' + nick(snap.mine.get(duel.id)), 'cam-ns-note'));
     }
-    const expertPick = snap.expert?.picks.get(duel.id);
-    if (expertPick) {
-      const done = finished(duel) && duel.winner_id;
-      play.append(el('p', done ? 'El editor eligió ' + nick(expertPick) + (expertPick === duel.winner_id ? ' y acertó.' : ' y falló.') : 'El editor va con ' + nick(expertPick) + '.', 'cam-ns-note cam-ns-expert-note'));
-    }
     const share = snap.split?.get(duel.id);
     if (share && Number(share.total) >= 5) {
       const away = Math.round(100 * Number(share.away_picks) / Number(share.total));
       play.append(el('p', 'La comunidad: ' + away + ' % ' + nick(duel.away_id) + ' · ' + (100 - away) + ' % ' + nick(duel.home_id), 'cam-ns-note'));
     }
-    play.append(link('Ver este partido en la quiniela →', () => focusGame(duel.id)));
     box.append(play);
     return box;
   }
@@ -289,35 +283,6 @@
     return box;
   }
 
-  function expertBlock(snap, weekGames, scoreWeek) {
-    if (!snap.expert) return null;   // migración pendiente: el bloque no existe
-    const box = section('editor', '¿Le ganas al editor?');
-    const chosen = weekGames.filter(g => snap.expert.picks.has(g.id)).length;
-    const name = snap.expert.name ? '@' + snap.expert.name : 'El editor';
-    if (chosen) {
-      box.append(el('p', name + ' ya eligió ' + chosen + ' de ' + weekGames.length + ' partidos. Su elección aparece en cada partido de la quiniela.', 'cam-ns-text'));
-    } else {
-      box.append(el('p', 'El editor todavía no ha elegido esta semana. Cuando lo haga, verás su elección en cada partido.', 'cam-ns-text'));
-    }
-    if (snap.user) {
-      const mine = weekGames.filter(g => snap.mine.has(g.id)).length;
-      box.append(el('p', 'Tú: ' + mine + ' de ' + weekGames.length + '.', 'cam-ns-text cam-ns-text-strong'));
-    }
-    const duel = scoreWeek != null ? duelCache.get(snap.season + '|' + scoreWeek + '|' + (snap.user?.id || '-')) : null;
-    if (duel && Number(duel.resolved) > 0) {
-      const line = el('p', null, 'cam-ns-versus');
-      if (snap.user && Number(duel.my_picks) > 0) {
-        const me = Number(duel.my_points), them = Number(duel.expert_points);
-        line.append(el('span', weekName(scoreWeek) + ': ', 'cam-ns-versus-week'), el('strong', 'tú ' + pts(me)), el('span', ' · '), el('strong', 'editor ' + pts(them)));
-        line.append(el('span', me > them ? ' · Le ganaste.' : me < them ? ' · Ganó el editor.' : ' · Empate.', 'cam-ns-versus-verdict'));
-      } else {
-        line.append(el('span', weekName(scoreWeek) + ': el editor sumó ' + pts(Number(duel.expert_points)) + ' (' + duel.expert_hits + ' aciertos).', 'cam-ns-versus-week'));
-      }
-      box.append(line);
-    }
-    return box;
-  }
-
   /* ---------- tú contra el editor (una llamada por jornada) ---------- */
   async function loadDuel(season, week, user) {
     const key = season + '|' + week + '|' + (user?.id || '-');
@@ -363,12 +328,11 @@
     const blocks = {
       envivo: liveBlock(snap.liveGames || weekGames),
       duelo: duel ? duelBlock(snap, duel, rankIds) : null,
-      editor: expertBlock(snap, weekGames, scoreWeek),
-      marcador: score
+            marcador: score
     };
     // La quiniela precede al editor y al marcador en todos los días de la semana.
     const order = ['envivo', 'duelo'];
-    scoreRoot?.replaceChildren(...[blocks.editor, blocks.marcador].filter(Boolean));
+    scoreRoot?.replaceChildren(...[blocks.marcador].filter(Boolean));
     for (const key of order) if (blocks[key]) fragment.append(blocks[key]);
     if (!weekGames.length) fragment.append(el('p', 'Todavía no hay partidos de esta semana. Vuelve cuando se publique el calendario.', 'cam-ns-text'));
     const liveFocused = body.querySelector('.cam-ns-live-toggle') === document.activeElement;
@@ -440,3 +404,4 @@
   window.addEventListener('focus', refreshLive);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) refreshLive(); });
 })();
+
