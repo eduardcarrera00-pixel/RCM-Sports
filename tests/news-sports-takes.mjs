@@ -82,7 +82,7 @@ for(const [category,sport] of [['NFL','nfl'],['Fútbol','football']]){
  const cards=[...d.querySelectorAll('#freeTakesFeed>article')];assert.equal(cards.length,20);
  assert.equal(cards[0].dataset.sport,sport);assert.match(cards[0].querySelector('h3').textContent,/24/);assert.match(cards.at(-1).querySelector('h3').textContent,/ 5/);
  assert.equal(d.querySelectorAll('.ae-news-sport-track').length,0);assert.equal(d.querySelectorAll('.ae-home-sport-badge').length,0);assert.equal(d.querySelectorAll('#articlesGrid>article').length,3);
- cards.at(-1).querySelector('.ae-take-reply-link').click();assert.equal(w.openedTake.id,sport+'-5');
+ cards.at(-1).querySelector('.ae-take-reply-link').click();assert.equal(cards.at(-1).querySelector('.ae-take-reply-link').getAttribute('aria-expanded'),'true');
  assert.equal(d.getElementById('freeTakes').hidden,false);assert.equal(d.getElementById('aeTakesFeedHeading').textContent,'Últimos Takes');
  assert.equal(cards[0].querySelector('.ae-take-reply-count').textContent,'4');
  assert.equal(cards.at(-1).querySelector('.ae-take-reply-count').textContent,'0');
