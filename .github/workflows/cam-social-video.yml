@@ -1,15 +1,8 @@
-name: CAM Sports Instagram and TikTok audio videos
+name: CAM Sports manual social video rendering
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'scripts/cam_social_make_video.py'
-      - 'supabase/migrations/*cam_pick_photo_parlay_video.sql'
-      - '.github/workflows/cam-social-video.yml'
-  schedule:
-    # GitHub cron has a five-minute minimum and may run late.
-    - cron: '2/5 * * * *'
+  # Instagram and TikTok are manual as of 9 November 2026. Rendering can be
+  # requested explicitly; publishing a website article no longer starts it.
   workflow_dispatch:
 
 permissions:

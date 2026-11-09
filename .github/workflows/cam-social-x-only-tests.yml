@@ -1,0 +1,33 @@
+name: X-only publication and daily plates
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/migrations/*cam_social_x_only_daily_plates.sql'
+      - 'tests/social-x-only-daily-plates.mjs'
+      - '.github/workflows/cam-social-video.yml'
+      - '.github/workflows/cam-social-x-only-tests.yml'
+  pull_request:
+    paths:
+      - 'supabase/migrations/*cam_social_x_only_daily_plates.sql'
+      - 'tests/social-x-only-daily-plates.mjs'
+      - '.github/workflows/cam-social-video.yml'
+      - '.github/workflows/cam-social-x-only-tests.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run test:social:x
