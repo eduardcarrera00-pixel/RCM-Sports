@@ -18,66 +18,75 @@
     for(const item of settled){if(item.result!=='correct')break;count++;}
     return {count,partial:count===settled.length&&settled.length<number(total),recent:settled.slice(0,5)};
   }
+  function mountLeague(target){
+    window.CamLeagues?.mountEntry(target.closest('.cam-nfl-standings')||target,
+      target.id.includes('Football')?'football':'nfl');
+  }
   function enhance(target,{rows,visibleRows,userId}){
     const table=target.querySelector('table');if(!table)return;
-    table.classList.add('cam-q-board');
-    table.setAttribute('aria-label','Clasificación de la quiniela');
-    table.querySelectorAll('th').forEach(th=>th.scope='col');
     const leader=rows[0],mine=rows.find(row=>row.user_id===userId);
-    const gap=line=>Math.max(0,number(leader.points)-number(line.points));
-    const race=el('div',null,'cam-q-race');
-    race.append(el('span','LA CARRERA POR EL #1','cam-q-eyebrow'));
-    race.append(el('strong','Cada acierto te acerca a la cima.','cam-q-race-title'));
-    race.append(el('p',format(rows.length)+' participantes · Lidera @'+leader.username+' con '+format(leader.points)+' pts','cam-q-race-meta'));
+    const gap=line=>Math.max(0,number(leader?.points)-number(line.points));
+    const overview=el('div',null,'cam-q-overview');
+    overview.append(el('span',format(rows.length)+(rows.length===1?' participante':' participantes'),'cam-q-count'));
     if(mine){
-      const message=number(mine.rank_position)===1?'Estás en el primer puesto. ¡Defiende tu posición!'
-        :gap(mine)===0?'Estás igualado a puntos con el líder. El desempate decide tu posición.'
+      const message=number(mine.rank_position)===1?'Lideras la clasificación.'
+        :gap(mine)===0?'Empatado a puntos con el líder.'
         :'Estás a '+format(gap(mine))+' puntos del líder.';
-      race.append(el('p','#'+format(mine.rank_position)+' · '+message,'cam-q-chase'));
-    }else if(userId)race.append(el('p','Tu posición aparecerá cuando tengas pronósticos resueltos en este periodo.','cam-q-chase'));
-    target.prepend(race);
-    const queue=[];let active=0;
-    const drain=()=>{
-      while(active<3&&queue.length){
-        const task=queue.shift();
-        if(!task.details.isConnected)continue;
-        active++;
-        Promise.resolve().then(()=>task.details.loadQuinielaResults?.()).catch(()=>{})
-          .finally(()=>{active--;drain();});
-      }
-    };
-    const observer='IntersectionObserver' in window?new IntersectionObserver(entries=>{
-      for(const entry of entries)if(entry.isIntersecting){
-        observer.unobserve(entry.target);
-        queue.push({details:entry.target.querySelector('details')});
-      }
-      drain();
-    },{rootMargin:'80px'}):null;
-    const rowNodes=[...table.tBodies[0].rows];
+      const chase=el('span','Tu puesto #'+format(mine.rank_position),'cam-q-chase');
+      chase.title=message;chase.setAttribute('aria-label',chase.textContent+'. '+message);
+      overview.append(chase);
+    }
+    target.prepend(overview);
+    const caption=document.getElementById(target.id+'Caption');
+    const month=caption?.textContent.match(/(\d{4})-(\d{2})$/);
+    if(month)caption.textContent=new Intl.DateTimeFormat('es',{month:'long',year:'numeric',timeZone:'UTC'})
+      .format(new Date(Date.UTC(Number(month[1]),Number(month[2])-1,15)));
+    else if(caption?.textContent.startsWith('Histórico'))caption.textContent='Todas las temporadas';
+    const board=el('ol',null,'cam-q-board');
+    board.setAttribute('aria-label','Clasificación de la quiniela');
+    board.setAttribute('role','list');
+    const rowNodes=[...table.querySelectorAll('tbody > tr')];
     rowNodes.forEach((row,index)=>{
       const line=visibleRows[index];if(!line)return;
       const own=line.user_id===userId;
-      row.dataset.rank=String(line.rank_position);
-      if(own){row.classList.add('cam-q-own');row.setAttribute('aria-label','Tu posición: '+line.rank_position);}
-      const badge=el('span','#'+format(line.rank_position),'cam-q-position');
+      const card=el('li',null,'cam-q-card'+(own?' cam-q-own':''));
+      card.dataset.rank=String(line.rank_position);card.value=number(line.rank_position);
+      const head=el('div',null,'cam-q-card-head');
+      const badge=el('span',format(line.rank_position),'cam-q-position');
+      badge.setAttribute('aria-label','Puesto '+format(line.rank_position));
       if(number(line.rank_position)<=3)badge.title=['Primer puesto','Segundo puesto','Tercer puesto'][number(line.rank_position)-1];
-      row.cells[0].replaceChildren(badge);
-      const identity=row.cells[1].querySelector('button');
+      const identity=row.querySelector('td:nth-child(2) button');
+      identity.classList.add('cam-q-identity');
+      identity.title='Ver perfil de @'+line.username;
       const initial=el('span',String(line.username||'A').replace(/^@/,'').charAt(0).toLocaleUpperCase('es'),'cam-q-avatar');
       initial.setAttribute('aria-hidden','true');
-      identity.replaceChildren(initial,el('span','@'+line.username,'cam-q-username'));
+      const name=el('span',null,'cam-q-name');
+      name.append(el('span','@'+line.username,'cam-q-username'));
+      if(own)name.append(el('span','Tú','cam-q-you'));
+      identity.replaceChildren(initial,name);
       window.CamLeagues?.markAuthor(identity,line.user_id,target.id.includes('Football')?'football':'nfl');
-      if(own)identity.append(el('span','Tú','cam-q-you'));
-      row.cells[1].insertBefore(el('span',format(line.hits)+' aciertos de '+format(line.resolved)+' · '+format(line.accuracy)+' %','cam-q-mobile-stats'),row.cells[1].querySelector('details'));
+      const points=el('div',null,'cam-q-points');
+      points.dataset.tone=number(line.points)<0?'negative':number(line.points)>0?'positive':'neutral';
+      points.append(el('strong',(number(line.points)>0?'+':'')+format(line.points)),el('span','pts'));
+      points.setAttribute('aria-label',format(line.points)+(Math.abs(number(line.points))===1?' punto':' puntos'));
+      head.append(badge,identity,points);card.append(head);
+      const metrics=el('dl',null,'cam-q-metrics');
+      const metric=(label,value,kind)=>{
+        const cell=el('div');cell.dataset.kind=kind;
+        cell.append(el('dt',label),el('dd',value));metrics.append(cell);
+      };
+      metric('Aciertos',format(line.hits),'hits');
+      metric('Fallos',format(Math.max(0,number(line.resolved)-number(line.hits))),'misses');
+      metric('Efectividad',format(line.accuracy)+' %','accuracy');
+      card.append(metrics);
       const details=row.querySelector('details');
-      details.querySelector('summary').textContent='Estadísticas y pronósticos';
+      details.querySelector('summary').textContent='Ver pronósticos';
       const stats=el('dl',null,'cam-q-stats');
       const stat=(label,value)=>{
         const pair=el('div');pair.append(el('dt',label));
         const output=el('dd',value);pair.append(output);stats.append(pair);return output;
       };
-      stat('Aciertos / resueltos',format(line.hits)+' / '+format(line.resolved));
-      stat('Porcentaje de acierto',format(line.accuracy)+' %');
+      stat('Resueltos',format(line.resolved));
       stat('Distancia al líder',format(gap(line))+' pts');
       const current=stat('Racha de aciertos','Consultando…');
       current.className='cam-q-streak';
@@ -100,26 +109,19 @@
           }
         }
       });
-      if(observer)observer.observe(row);
-      else details.addEventListener('toggle',()=>{if(details.open)drain();});
+      // Move the existing controls so profile clicks and lazy result loading stay intact.
+      card.append(details);board.append(card);
     });
-    window.CamLeagues?.mountEntry(target,target.id.includes('Football')?'football':'nfl');
-    // The observer must not keep removed rankings alive after a period switch.
-    if(observer){
-      const cleanup=new MutationObserver(()=>{
-        if(!table.isConnected){observer.disconnect();cleanup.disconnect();queue.length=0;}
-      });
-      cleanup.observe(target,{childList:true});
-    }
+    table.replaceWith(board);
+    mountLeague(target);
   }
   function empty(target,onPlay){
     const card=el('div',null,'cam-q-race cam-q-empty');
-    card.append(el('span','LA CARRERA POR EL #1','cam-q-eyebrow'),
-      el('strong','La carrera empieza contigo.','cam-q-race-title'),
-      el('p','Todavía no hay resultados definitivos en este periodo. Guarda tus pronósticos y vuelve cuando terminen los partidos.','cam-q-race-meta'));
+    card.append(el('strong','Aún no hay clasificación','cam-q-race-title'),
+      el('p','Aparecerá cuando terminen los primeros partidos.','cam-q-race-meta'));
     const play=el('button','Ir a la jornada','cam-nfl-action');play.type='button';
     play.addEventListener('click',onPlay);card.append(play);target.replaceChildren(card);
-    window.CamLeagues?.mountEntry(target,target.id.includes('Football')?'football':'nfl');
+    mountLeague(target);
   }
   window.CamQuinielaStandings=Object.freeze({enhance,streak,empty});
 })();
