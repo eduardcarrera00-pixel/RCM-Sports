@@ -5,8 +5,9 @@ import {Window} from 'happy-dom';
 const w=new Window({url:'https://example.test/'}),d=w.document;
 d.body.innerHTML=fs.readFileSync('index.html','utf8').replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,'');
 w.currentAdmin=null;
-const pending=[],historyFilters=[];
+const pending=[],historyFilters=[],requests=[];
 w.db={from(table){
+ requests.push(table);
  const q={select(){return q;},in(){return q;},eq(){return q;},order(){return q;},
   or(value){historyFilters.push({table,kind:'or',value});return q;},
   limit(value){historyFilters.push({table,kind:'limit',value});return q;},
@@ -34,6 +35,7 @@ assert.deepEqual(historyFilters.filter(item=>item.kind==='limit'&&item.table==='
  'The 40-card limit must apply after the server-side history filter');
 success(first,[fixture('same')]);success(second,[fixture('same')]);await tick();
 while(pending.length){success(pending.shift(),[]);await tick();}
+assert.equal(requests.includes('ae_pick_settlement_checks'),false,'Public history must not request the editor-only verification table');
 assert.equal(count(),1,'Concurrent loads must display each Pick exactly once');
 assert.equal(area.querySelectorAll('.ae-pick-history-summary').length,0,'The three result counters are removed');
 assert.equal(area.querySelectorAll('.ae-pick-history-grid').length,1);
@@ -47,12 +49,15 @@ assert.equal(area.querySelectorAll('.ae-pick-history-frame').length,1);
 // An overdue unresolved Pick must remain visible, clearly pending, with no invented points.
 start();await tick();
 success(next('ae_pick_feed'),[fixture('overdue','Santos Laguna vs Pumas','pending'),fixture('settled')]);await tick();
-success(next('ae_pick_settlement_checks'),[]);await tick();
 assert.equal(count(),2,'Overdue pending Picks stay in the history alongside resolved Picks');
 assert.equal(area.querySelector('[data-outcome="pending"] .ae-pick-history-badge').textContent,'Pendiente de calificación');
 assert.match(area.querySelector('[data-outcome="pending"]').textContent,/A la espera de verificación/);
 assert.doesNotMatch(area.querySelector('[data-outcome="pending"]').textContent,/\\+2\\.40 pts/);
 
+// Editors retain verification details and concurrent response protection.
+d.getElementById('cpModeration')?.remove();
+d.getElementById('cpSettleList')?.remove();
+w.currentAdmin={id:'editor'};
 // An older automatic-verification response must not append to a newer snapshot.
 start();await tick();success(next('ae_pick_feed'),[fixture('old','Resultado anterior')]);await tick();
 const oldChecks=next('ae_pick_settlement_checks');
@@ -78,6 +83,14 @@ assert.equal(area.querySelectorAll('.ae-pick-history-card').length,2);
 assert.equal(new Set([...area.querySelectorAll('.ae-pick-history-card')].map(card=>card.href)).size,2);
 assert.match(area.textContent,/Verificado automáticamente/);assert.match(area.textContent,/Resultado confirmado/);
 assert.equal(area.getAttribute('aria-busy'),'false');
+
+// A signed-in non-editor must also use only the public feed after sign-out
+// from the editor role; no private-table permission errors are needed.
+w.currentAdmin=null;
+const privateRequests=requests.filter(table=>table==='ae_pick_settlement_checks').length;
+start();await tick();success(next('ae_pick_feed'),[fixture('public')]);await tick();
+assert.equal(requests.filter(table=>table==='ae_pick_settlement_checks').length,privateRequests);
+assert.match(area.textContent,/Resultado confirmado/);
 
 // The history keeps its own full-width row before the Chef standings.
 const history=d.getElementById('cpSettleHistorySection'),community=d.getElementById('communityPicks');

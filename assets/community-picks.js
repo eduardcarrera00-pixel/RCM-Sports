@@ -804,7 +804,9 @@ async function loadSettleHistory(){
  const rows=(r.data||[]).filter(p=>{if(!p.id||seen.has(p.id)||p.outcome==='pending'&&(!p.event_date||p.event_date>todayToronto()))return false;seen.add(p.id);return true;}).slice(0,40);
  if(!rows.length){area.replaceChildren(el('p','Todavía no hay Picks finalizados.','ae-pick-history-empty'));return;}
  const auto=new Set();
- try{
+ // Verification details are private to editors; public history uses the
+ // confirmed outcome already returned by the public feed.
+ if(typeof currentAdmin!=='undefined'&&Boolean(currentAdmin))try{
   const c=await db.from('ae_pick_settlement_checks').select('pick_id').eq('status','settled').in('pick_id',rows.map(p=>p.id));
   for(const row of c.data||[])auto.add(row.pick_id);
  }catch{}
