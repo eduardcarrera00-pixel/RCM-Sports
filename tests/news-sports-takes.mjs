@@ -2,7 +2,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {Window} from 'happy-dom';
 const source=fs.readFileSync('index.html','utf8');
-const render=source.slice(source.indexOf('        function renderArticlesFeed()'),source.indexOf('        function renderHeroCard('));
+const interactions=source.slice(source.indexOf('        function renderArticleInteractions('),source.indexOf('        function renderArticlesFeed()'));
+const render=interactions+source.slice(source.indexOf('        function renderArticlesFeed()'),source.indexOf('        function renderHeroCard('));
 export const seed=`
 var currentCategory='Todos',currentSearchQuery='',currentTeam='',currentAdmin=null,initialArticlesPending=false;
 var articles=Array.from({length:24},(_,i)=>({id:String(i),title:(i%2?'Fútbol':'NFL')+' noticia '+i,category:i%2?'Fútbol':'NFL',summary:'Análisis deportivo de la jornada.',createdAt:new Date(Date.UTC(2026,9,18,12,i)).toISOString(),date:'18 oct',readTime:'3 min',image:'assets/takes/ae-football-takes-hero-day.webp',likes:i,remote:true}));
