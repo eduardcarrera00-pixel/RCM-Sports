@@ -4,7 +4,7 @@
    ?v=quiniela still works and opens it).
    Inside Fútbol: La semana · Takes · Noticias, with the same saved quiniela
    and its competition selector. Both scoreboards close La semana.
-   Inside Picks: Picks · Historial · Chefs.
+   Inside Picks: Picks · Chefs · Historial (9 nov 2026, pedido del dueño).
    A sticky bar at the top of the section shows one part at a time (the hiding
    rules live in cam-mobile-bottom-nav.css). Nothing is moved or re-rendered:
    the same live modules stay where their own scripts put them.
@@ -27,7 +27,7 @@
     // ?s=nfl&v=quiniela (atajos de Inicio, perfil, enlaces viejos) abre La semana.
     NFL: { key: 'nfl', group: 'sport', owners: 'nfl', label: 'NFL', tabs: NFL_TABS, aliases: { quiniela: 'semana' } },
     'Fútbol': { key: 'futbol', group: 'sport', owners: 'football', label: 'Fútbol', tabs: NFL_TABS, aliases: { quiniela: 'semana' } },
-    Picks: { key: 'picks', group: 'picks', label: 'Picks', tabs: [['picks', 'Picks'], ['historial', 'Historial'], ['chefs', 'Chefs']] }
+    Picks: { key: 'picks', group: 'picks', label: 'Picks', tabs: [['picks', 'Picks'], ['chefs', 'Chefs'], ['historial', 'Historial']] }
   };
   // Address of each top-level page (Inicio has none).
   const SLUGS = { NFL: 'nfl', 'Fútbol': 'futbol', Picks: 'picks', Opiniones: 'opiniones' };

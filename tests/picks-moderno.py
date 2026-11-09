@@ -1,7 +1,8 @@
 """Picks moderno (9 nov 2026) sobre la página completa (Chromium + Supabase falso).
 Uso: python3 -B tests/picks-moderno.py [--shots DIR]
 Comprueba en 360/390/900/1366 px, día y noche:
-  · orden: Pick del editor → Mejores y Peores platos → «¿Eres Chef?» → últimos Picks;
+  · pestañas Picks · Chefs · Historial;
+  · orden: «¿Eres Chef?» → Pick del editor → Mejores y Peores platos → últimos Picks;
   · los banners de siempre (¿Eres Chef?, Mejores platos, Peores platos) siguen ahí
     y el botón «Cocina Picks» es grande (≥ 54 px de alto, letra ≥ 21 px);
   · feed sin scroll propio: 6 Picks en el flujo y el resto en «Ver todos los Picks»;
@@ -55,7 +56,9 @@ FEED = [{'id': U(100 + i), 'user_id': U(uid), 'author': a, 'title': t, 'explanat
          'outcome': state, 'settled_at': None if state == 'pending' else '2026-11-09T05:00:00Z', 'result_points': 0,
          'upvotes': up, 'downvotes': down, 'score': up - down, 'comments_count': i, 'my_vote': 0, 'is_current_week': True}
         for i, (a, uid, t, legs, odds, day, state, up, down) in enumerate(RAW)]
-FAKE = ('window.__fake.tables=Object.assign(window.__fake.tables||{},' + json.dumps({'ae_pick_feed': FEED}) + ');')
+WEEKLY = [{'id': U(900), 'title': 'Pick de la Semana: Buffalo gana', 'event_name': 'Minnesota Vikings vs. Buffalo Bills', 'selection': 'Gana Buffalo Bills',
+           'american_odds': -142, 'analysis': 'Buffalo llega mejor.', 'expires_at': '2099-11-16T18:00:00Z', 'created_at': '2026-11-09T12:00:00Z', 'is_published': True}]
+FAKE = ('window.__fake.tables=Object.assign(window.__fake.tables||{},' + json.dumps({'ae_pick_feed': FEED, 'ae_editorial_weekly_picks': WEEKLY}) + ');')
 ACTIVE = [p for p in FEED if p['outcome'] == 'pending']
 BEST = sorted([p for p in FEED if p['score'] > 0], key=lambda p: -p['score'])
 WORST = [p for p in FEED if p['score'] < 0]
@@ -85,8 +88,9 @@ STATE = """() => {
     worstVisible: vis(document.querySelector('.ae-chef-worst')),
     banners: ['.ae-picks-heading-cta-row', '.ae-chef-best .ae-picks-rail-heading', '.ae-chef-worst .ae-picks-rail-heading']
       .map(s => { const e = document.querySelector(s); return !!e && vis(e) && e.hasAttribute('data-cam-banner') && e.getBoundingClientRect().height >= 80; }),
-    order: ['#aePicksTopPair', '#communityPicks > .ae-picks-rail', '.ae-picks-heading-cta-row', '#cpFeed', '#cpViewAll']
-      .map(s => Math.round(document.querySelector(s).getBoundingClientRect().top + scrollY)),
+    tabs: [...document.querySelectorAll('#camSectionTabs .cam-section-tab, #camSectionTabs button')].map(b => b.dataset.tab).filter((t, i, a) => t && a.indexOf(t) === i),
+    order: ['.ae-picks-heading-cta-row', '#aePicksTopPair', '#communityPicks > .ae-picks-rail', '#cpFeed', '#cpViewAll']
+      .map(s => document.querySelector(s)).filter(vis).map(e => Math.round(e.getBoundingClientRect().top + scrollY)),
     sideBySide: (() => { const a = document.querySelector('.ae-chef-best').getBoundingClientRect(), b = document.querySelector('.ae-chef-worst').getBoundingClientRect(); return Math.abs(a.top - b.top) < 2 && b.left > a.right - 1; })(),
     chefsRight: (() => { const c = document.querySelector('#communityPicks > .ae-chefs-dual-standings'), f = document.getElementById('cpFeed'); return !!c && vis(c) && c.getBoundingClientRect().left >= f.getBoundingClientRect().right - 1; })(),
     cta: (() => { const b = document.getElementById('cpPublishCta'), r = b.getBoundingClientRect(); return [Math.round(r.height), parseFloat(getComputedStyle(b).fontSize)]; })(),
@@ -99,7 +103,7 @@ STATE = """() => {
     bars: rows('picksPopular').every(r => r.querySelector('.cam-plato-bar > .is-up') && r.querySelector('.cam-plato-net')),
     moreText: document.querySelector('.ae-chef-best > .cam-platos-more')?.textContent,
     moreVisible: vis(document.querySelector('.ae-chef-best > .cam-platos-more')),
-    tabs: document.querySelectorAll('.cam-platos-tabs').length,
+    platosTabs: document.querySelectorAll('.cam-platos-tabs').length,
   };
 }"""
 
@@ -134,9 +138,10 @@ def check(width, dark):
         assert all('Combinada' not in m for m in st['worstMeta']), f'{where}: el pie de la fila no repite «Combinada»'
         assert any(n.startswith('Gana ') for n in st['bestNames'])
         assert st['banners'] == [True, True, True], f'{where}: banners de siempre {st["banners"]}'
-        assert st['order'] == sorted(st['order']), f'{where}: orden editor → platos → ¿Eres Chef? → Picks → Ver todos {st["order"]}'
+        assert st['tabs'] == ['picks', 'chefs', 'historial'], f'{where}: pestañas {st["tabs"]}'
+        assert len(st['order']) == 5 and st['order'] == sorted(st['order']), f'{where}: orden ¿Eres Chef? → editor → platos → Picks → Ver todos {st["order"]}'
         assert st['cta'][0] >= 54 and st['cta'][1] >= 21, f'{where}: «Cocina Picks» grande {st["cta"]}'
-        assert st['bestVisible'] and st['worstVisible'] and st['tabs'] == 0, f'{where}: los dos tableros, sin pestañas'
+        assert st['bestVisible'] and st['worstVisible'] and st['platosTabs'] == 0, f'{where}: los dos tableros, sin pestañas'
         assert st['sideBySide'] == (width >= 761), f'{where}: tableros lado a lado solo en el ordenador'
         if width >= 1024:
             assert st['chefsRight'], f'{where}: Mejores y Peores Chefs a la derecha'
@@ -155,4 +160,4 @@ def check(width, dark):
 for dark in (False, True):
     for width in (360, 390, 900, 1366):
         check(width, dark)
-print('PASS: Picks moderno · platos primero con sus banners, «Cocina Picks» grande, feed sin scroll propio (6 + «Ver todos»), Pick sin texto de sobra (360/390/900/1366, día y noche).')
+print('PASS: Picks moderno · pestañas Picks · Chefs · Historial, «¿Eres Chef?» primero con «Cocina Picks» grande, platos con sus banners y luego los Picks, feed sin scroll propio (6 + «Ver todos»), Pick sin texto de sobra (360/390/900/1366, día y noche).')

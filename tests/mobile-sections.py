@@ -7,7 +7,7 @@ Cubre, a 320/390 px de día y de noche (y 1366 px para escritorio):
   · NFL: La semana · Takes · Noticias (La semana con La Quiniela; los Power
     Rankings de NFL van en Noticias); Fútbol: La semana ·
     Takes · Noticias; qué módulo enseña cada pestaña (Savant · Rookie, debajo
-    de Últimos Takes); Picks: Picks · Historial · Chefs;
+    de Últimos Takes); Picks: Picks · Chefs · Historial;
   · la barra de pestañas queda fija arriba al bajar y toca el encabezado;
   · la dirección (?s=nfl&v=quiniela), abrir un enlace directo (también el
     antiguo ?v=clasificacion, que abre Takes) y el botón Atrás;
@@ -52,7 +52,7 @@ NFL_EXPECT = {
     'takes': {**SPORT_EXPECT['takes'], '#camNflSemana': False},
     'noticias': {'#articlesGrid': True, '#aeSportLatestNews': True, '#freeTakes': False, '#camNflSemana': False, '#RANK': True},
 }
-PICKS_TABS = ['picks', 'historial', 'chefs']
+PICKS_TABS = ['picks', 'chefs', 'historial']
 PICKS_EXPECT = {
     'picks': {'#picksFeatured': True, '#cpPublishCta': True, '#cpSettleHistorySection': False, '#cpLeaderboard': False},
     'historial': {'#cpSettleHistorySection': True, '#aeHomePickHistoric': True, '#picksFeatured': False, '#cpPublishCta': False, '#cpLeaderboard': False},
@@ -184,7 +184,7 @@ def desktop(dark):
         page.wait_for_timeout(800)
         order = page.evaluate("[...document.querySelectorAll('header nav.ae-sport-nav > button')].filter(b => !b.hidden && b.getClientRects().length).sort((a, b) => a.getBoundingClientRect().left - b.getBoundingClientRect().left).map(b => b.dataset.category || b.id)")
         assert order == ['Todos', 'NFL', 'Fútbol', 'Picks', 'Opiniones', 'camNavProfile'], f'{where}: menú de escritorio {order}'
-        for cat, tabs in [('NFL', ['semana', 'takes', 'noticias']), ('Picks', ['picks', 'historial', 'chefs'])]:
+        for cat, tabs in [('NFL', ['semana', 'takes', 'noticias']), ('Picks', ['picks', 'chefs', 'historial'])]:
             page.evaluate('c => filterByCategory(c)', cat); page.wait_for_timeout(700)
             assert not page.evaluate("document.getElementById('camSectionTabs').hidden"), f'{where} {cat}: faltan las pestañas en escritorio'
             got = page.evaluate("[...document.querySelectorAll('#camSectionTabs .cam-section-tab')].map(b => b.dataset.tab)")

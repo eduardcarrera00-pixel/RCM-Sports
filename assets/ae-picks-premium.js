@@ -94,8 +94,9 @@
    const sync=()=>{
      if(desktop.matches){
        if(leftColumn){schedule();return;}
+       // Picks moderno (9 nov 2026): «¿Eres Chef?» va primero en la página, separado
+       // del feed, así que se queda como hijo directo de #communityPicks.
        const nodes=[
-         community.querySelector(':scope > .ae-picks-feed-heading'),
          community.querySelector(':scope > #cpStatus'),
          community.querySelector(':scope > #cpFeed'),
          community.querySelector(':scope > #cpFeedScrollHint'),

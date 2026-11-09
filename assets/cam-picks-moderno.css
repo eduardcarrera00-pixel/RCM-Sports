@@ -1,8 +1,8 @@
 /* CAM SPORTS · Picks moderno (9 nov 2026).
-   Picks › Picks con menos cajas y menos texto. Orden: Pick del editor → Mejores y
-   Peores platos (sus banners de siempre, con filas de una línea: número,
-   pronóstico, @usuario · momio y saldo de votos) → banner «¿Eres Chef? · Cocina
-   Picks» con el botón más grande → últimos Picks en una sola superficie con líneas
+   Picks › Picks con menos cajas y menos texto. Orden: banner «¿Eres Chef? · Cocina
+   Picks» (gorro de línea, botón grande) → Pick del editor → Mejores y Peores platos
+   (sus banners de siempre, con filas de una línea: número, pronóstico, @usuario ·
+   momio y saldo de votos) → últimos Picks en una sola superficie con líneas
    finas (sin scroll propio): pronóstico grande, partido y mercado en una línea
    gris, momio a la derecha sin chip y acciones discretas (▲ ▼ en una píldora,
    responder y compartir como iconos).
@@ -625,28 +625,36 @@ html body #mainContent #footballTakes #communityPicks .cam-platos-more {
 }
 html body #mainContent #footballTakes #communityPicks .cam-platos-more[hidden] { display: none !important; }
 
-/* ---------- orden en Picks › Picks: platos primero, últimos Picks al final ----------
-   Pick del editor → Mejores y Peores platos → «¿Eres Chef?» → últimos Picks → «Ver
-   todos». Solo con la sección visible (:not([hidden])) y en la pestaña Picks. */
-/* Hasta 1023 px la sección es una columna; desde 1024 px cam-escritorio.css la
-   deja en display:contents dentro de su rejilla (Chefs y Mis parties a la derecha),
-   y «order» coloca igual las piezas de la columna central. */
+/* ---------- orden en Picks › Picks ----------
+   «¿Eres Chef?» → Pick del editor → Mejores y Peores platos → últimos Picks →
+   «Ver todos» (9 nov 2026, pedido del dueño). El banner vive dentro de
+   #communityPicks y el Pick del editor fuera, en #footballTakes: hasta 1023 px
+   #footballTakes es una columna flex y .ae-picks-layout y #communityPicks pasan a
+   display:contents para que «order» los mezcle; desde 1024 px ya son
+   display:contents dentro de la rejilla de cam-escritorio.css (Chefs y Mis
+   parties a la derecha) y «order» coloca igual la columna central. */
 @media (max-width: 1023px) {
-  html body[data-cam-tabs="picks"][data-cam-tab="picks"] #mainContent #footballTakes #communityPicks:not([hidden]) {
+  html body[data-cam-tabs="picks"][data-cam-tab="picks"] #mainContent #footballTakes:not([hidden]) {
     display: flex !important;
     flex-direction: column !important;
     gap: 16px !important;
   }
+  html body[data-cam-tabs="picks"][data-cam-tab="picks"] #mainContent #footballTakes > .ae-picks-layout,
+  html body[data-cam-tabs="picks"][data-cam-tab="picks"] #mainContent #footballTakes #communityPicks:not([hidden]) {
+    display: contents !important;
+  }
 }
+html body[data-cam-tabs="picks"][data-cam-tab="picks"] #mainContent #footballTakes > *,
 html body[data-cam-tabs="picks"][data-cam-tab="picks"] #mainContent #footballTakes #communityPicks > * { order: 10 !important; margin-top: 0 !important; margin-bottom: 0 !important; }
-html body[data-cam-tabs="picks"][data-cam-tab="picks"] #mainContent #footballTakes #communityPicks > .ae-picks-rail { order: 1 !important; }
-html body[data-cam-tabs="picks"][data-cam-tab="picks"] #mainContent #footballTakes #communityPicks > :is(.ae-picks-feed-heading, .ae-picks-community-main) { order: 2 !important; }
-html body[data-cam-tabs="picks"][data-cam-tab="picks"] #mainContent #footballTakes #communityPicks > #cpStatus { order: 3 !important; }
-html body[data-cam-tabs="picks"][data-cam-tab="picks"] #mainContent #footballTakes #communityPicks > #cpFeed { order: 4 !important; }
-html body[data-cam-tabs="picks"][data-cam-tab="picks"] #mainContent #footballTakes #communityPicks > #cpFeedFooter { order: 5 !important; margin-top: -8px !important; }
+html body[data-cam-tabs="picks"][data-cam-tab="picks"] #mainContent #footballTakes #communityPicks > .ae-picks-feed-heading { order: 1 !important; }
+html body[data-cam-tabs="picks"][data-cam-tab="picks"] #mainContent #footballTakes > #aePicksTopPair { order: 2 !important; }
+html body[data-cam-tabs="picks"][data-cam-tab="picks"] #mainContent #footballTakes #communityPicks > .ae-picks-rail { order: 3 !important; }
+html body[data-cam-tabs="picks"][data-cam-tab="picks"] #mainContent #footballTakes #communityPicks > #cpStatus { order: 4 !important; }
+html body[data-cam-tabs="picks"][data-cam-tab="picks"] #mainContent #footballTakes #communityPicks > :is(#cpFeed, .ae-picks-community-main) { order: 5 !important; }
+html body[data-cam-tabs="picks"][data-cam-tab="picks"] #mainContent #footballTakes #communityPicks > #cpFeedFooter { order: 6 !important; margin-top: -8px !important; }
 html body[data-cam-tabs="picks"][data-cam-tab="picks"] #mainContent #footballTakes #communityPicks > #cpStatus:empty { display: none !important; }
-/* En el ordenador el banner y el feed van juntos en .ae-picks-community-main. */
-html body #mainContent #footballTakes #communityPicks > .ae-picks-community-main #cpFeed { margin-top: 16px !important; }
+/* En el ordenador el feed y su pie van juntos en .ae-picks-community-main. */
+html body #mainContent #footballTakes #communityPicks > .ae-picks-community-main #cpFeed { margin-top: 0 !important; }
 html body #mainContent #footballTakes #communityPicks > .ae-picks-community-main #cpFeedFooter { margin-top: 8px !important; }
 
 /* ---------- ordenador: los dos tableros lado a lado ---------- */
