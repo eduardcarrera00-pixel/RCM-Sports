@@ -144,3 +144,57 @@ html body #aeSportLatestNews button:focus-visible {
     scroll-snap-align:start;
   }
 }
+
+/* Small shared actions replace date/read-time metadata in the news cards. */
+html body #mainContent :is(#articlesGrid,#aeSportLatestNews,#camHomeJornada) .cam-news-interactions {
+  --cam-news-action-muted:#c5cdd2;
+  --cam-news-action-accent:#e3b979;
+  display:flex!important;
+  align-items:center;
+  gap:4px;
+  width:max-content;
+  max-width:100%;
+  margin:-8px -6px 0!important;
+  padding:0!important;
+}
+html:not(.dark) body #mainContent :is(#articlesGrid,#aeSportLatestNews,#camHomeJornada) .cam-news-interactions {
+  --cam-news-action-muted:#566876;
+  --cam-news-action-accent:#855b43;
+}
+html body #mainContent :is(#articlesGrid,#aeSportLatestNews,#camHomeJornada) .cam-news-interaction {
+  display:inline-flex!important;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  min-width:44px;
+  min-height:44px;
+  margin:0!important;
+  padding:0 6px!important;
+  border:0!important;
+  border-radius:8px;
+  background:transparent!important;
+  box-shadow:none!important;
+  color:var(--cam-news-action-muted)!important;
+  font:600 11px/1.2 Inter,system-ui,sans-serif!important;
+  letter-spacing:normal;
+  cursor:pointer;
+  touch-action:manipulation;
+}
+html body #mainContent :is(#articlesGrid,#aeSportLatestNews,#camHomeJornada) .cam-news-interaction i {
+  font-size:14px;
+  color:inherit!important;
+}
+html body #mainContent :is(#articlesGrid,#aeSportLatestNews,#camHomeJornada) .cam-news-interaction span {
+  font-variant-numeric:tabular-nums;
+}
+html body #mainContent :is(#articlesGrid,#aeSportLatestNews,#camHomeJornada) .cam-news-interaction:is(:hover,[aria-pressed="true"]) {
+  color:var(--cam-news-action-accent)!important;
+}
+html body #mainContent :is(#articlesGrid,#aeSportLatestNews,#camHomeJornada) .cam-news-interaction:focus-visible {
+  outline:2px solid var(--cam-news-action-accent);
+  outline-offset:-3px;
+}
+html body #mainContent :is(#articlesGrid,#aeSportLatestNews,#camHomeJornada) .cam-news-interaction:disabled {
+  opacity:.65;
+  cursor:wait;
+}

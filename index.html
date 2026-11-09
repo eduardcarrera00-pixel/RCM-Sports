@@ -308,7 +308,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
     </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
-<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261108-community-picks-horizontal-1">
+<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261108-news-interactions-1">
 <script defer src="assets/ae-nfl-mobile-telephoto.js?v=20261016-1"></script>
 <link rel="stylesheet" href="assets/cam-perf-sport-banners.css?v=20261104-css-consolidated-1">
 <style id="ae-opinions-reused-home-panels">
@@ -4456,6 +4456,57 @@ currentUser = {
             if (moved) requestAnimationFrame(() => window.dispatchEvent(new Event('resize')));
         }
 
+        function renderArticleInteractions(article) {
+            return `<div class="cam-news-interactions" role="group" aria-label="Interacciones de la publicación">
+                <button type="button" class="cam-news-interaction" data-cam-news-like="${escapeHTML(article.id)}" aria-pressed="${Boolean(article.userLiked)}" aria-label="${article.userLiked ? 'Quitar me gusta' : 'Me gusta'}" title="${article.userLiked ? 'Quitar me gusta' : 'Me gusta'}" onclick="toggleLike(${articleIdArgument(article.id)}, event)">
+                    <i class="${article.userLiked ? 'fa-solid' : 'fa-regular'} fa-heart" aria-hidden="true"></i><span>${article.likes ?? '—'}</span>
+                </button>
+                <button type="button" class="cam-news-interaction" data-cam-news-comments="${escapeHTML(article.id)}" aria-label="Comentar" title="Comentar" onclick="openArticleComments(${articleIdArgument(article.id)}, event)">
+                    <i class="fa-regular fa-comment" aria-hidden="true"></i><span>${article.commentCount ?? '—'}</span>
+                </button>
+            </div>`;
+        }
+
+        function syncArticleInteractions() {
+            const byId = new Map(articles.map(article => [String(article.id), article]));
+            for (const button of document.querySelectorAll('[data-cam-news-like]')) {
+                const article = byId.get(button.dataset.camNewsLike);
+                if (!article) continue;
+                button.querySelector('span').textContent = article.likes ?? '—';
+                button.querySelector('i').className = `${article.userLiked ? 'fa-solid' : 'fa-regular'} fa-heart`;
+                button.setAttribute('aria-pressed', String(Boolean(article.userLiked)));
+                const action = article.userLiked ? 'Quitar me gusta' : 'Me gusta';
+                button.title = action;
+                button.setAttribute('aria-label', `${action} · ${article.likes ?? 'Cargando'} likes`);
+                const pending = typeof articleLikePending !== 'undefined' && articleLikePending.has(String(article.id));
+                button.disabled = pending;
+                button.setAttribute('aria-busy', String(pending));
+            }
+            for (const button of document.querySelectorAll('[data-cam-news-comments]')) {
+                const article = byId.get(button.dataset.camNewsComments);
+                if (!article) continue;
+                button.querySelector('span').textContent = article.commentCount ?? '—';
+                button.setAttribute('aria-label', `Comentar · ${article.commentCount ?? 'Cargando'} comentarios`);
+            }
+            for (const text of document.querySelectorAll('[data-cam-news-top-comment]')) {
+                const article = byId.get(text.dataset.camNewsTopComment);
+                if (article) text.textContent = article.topComment || 'Sin comentarios destacados';
+            }
+        }
+
+        function openArticleComments(articleId, event) {
+            event?.stopPropagation();
+            openArticleModal(articleId, {focusComments: true});
+        }
+
+        function focusArticleComments(articleId) {
+            if (String(activeModalArticleId) !== String(articleId) || document.getElementById('articleModal').classList.contains('hidden')) return;
+            const target = document.getElementById(currentUser ? 'commentText' : 'commentAuthStatus');
+            if (!currentUser) target.tabIndex = -1;
+            target.focus({preventScroll: true});
+            target.closest('.ae-conversation').scrollIntoView({block: 'start', behavior: 'instant'});
+        }
+
         function renderArticlesFeed() {
             const latestNews = document.getElementById('aeSportLatestNews');
             latestNews.hidden = true;
@@ -4597,7 +4648,7 @@ currentUser = {
                             <p class="cam-sport-latest-label">Última publicación</p>
                             <h3><button type="button" onclick="openArticleModal(${articleIdArgument(heroArticle.id)})">${escapeHTML(heroArticle.title)}</button></h3>
                             <p class="cam-sport-latest-summary">${escapeHTML(heroArticle.summary || '')}</p>
-                            <p class="cam-sport-latest-meta">${escapeHTML(heroArticle.author || 'CAM SPORTS')} · ${escapeHTML(heroArticle.date)} · ${escapeHTML(heroArticle.readTime)}</p>
+                            ${renderArticleInteractions(heroArticle)}
                             <button type="button" class="cam-sport-latest-read" onclick="openArticleModal(${articleIdArgument(heroArticle.id)})">Leer publicación <span aria-hidden="true">→</span></button>
                         </div>
                     </article>`;
@@ -4630,11 +4681,7 @@ currentUser = {
                         </div>
 
                         <div class="p-5">
-                            <div class="flex items-center space-x-2 text-[11px] text-slate-400 mb-2">
-                                <span><i class="fa-regular fa-calendar mr-1"></i>${escapeHTML(art.date)}</span>
-                                <span>•</span>
-                                <span><i class="fa-regular fa-clock mr-1"></i>${escapeHTML(art.readTime)}</span>
-                            </div>
+                            ${renderArticleInteractions(art)}
 
                             <h3 onclick="openArticleModal(${articleIdArgument(art.id)})" class="text-base font-bold text-slate-900 hover:text-pitch-600 cursor-pointer transition-colors leading-snug line-clamp-2 mb-2">
                                 ${escapeHTML(art.title)}
@@ -4648,14 +4695,10 @@ currentUser = {
 
                     <div class="px-5 pb-5 pt-0 flex items-center justify-between border-t border-slate-100 mt-auto">
                         <div class="flex items-center space-x-2">
-                            <p class="text-xs text-slate-700 line-clamp-2">${escapeHTML(art.topComment || 'Sin comentarios destacados')}</p>
+                            <p data-cam-news-top-comment="${escapeHTML(art.id)}" class="text-xs text-slate-700 line-clamp-2">${escapeHTML(art.topComment || 'Sin comentarios destacados')}</p>
                         </div>
 
                         <div class="flex items-center space-x-3">
-                            <button onclick="toggleLike(${articleIdArgument(art.id)}, event)" class="flex items-center space-x-1 text-xs ${art.userLiked ? 'text-red-500' : 'text-slate-400 hover:text-red-500'} transition-colors">
-                                <i class="${art.userLiked ? 'fa-solid' : 'fa-regular'} fa-heart"></i>
-                                <span class="font-bold">${art.likes ?? '—'}</span>
-                            </button>
                             <button onclick="openArticleModal(${articleIdArgument(art.id)})" class="text-xs font-bold text-pitch-600 hover:underline flex items-center">
                                 Leer <i class="fa-solid fa-arrow-right ml-1 text-[10px]"></i>
                             </button>
@@ -4915,7 +4958,7 @@ currentUser = {
                 if (error || !data) throw new Error('No se pudo guardar la foto: ' + (error?.message || 'comprueba tu conexión') + '.');
                 const updated = fromDatabase(data);
                 articles = articles.map(a => String(a.id) === String(articleId)
-                    ? {...updated, likes:a.likes, userLiked:a.userLiked, views:a.views, comments:a.comments} : a);
+                    ? {...updated, likes:a.likes, userLiked:a.userLiked, views:a.views, comments:a.comments, commentCount:a.commentCount} : a);
                 // Update visible image only: preserve the open story, comments and reading position.
                 if (String(activeModalArticleId) === String(articleId)) {
                     const image = document.getElementById('modalImage');
@@ -5031,7 +5074,7 @@ currentUser = {
                 // Updating a news item must replace its existing entry, not prepend it.
                 articles = editingArticleId
                     ? articles.map(a => String(a.id) === String(data.id)
-                        ? {...savedArticle, likes:a.likes, userLiked:a.userLiked, views:a.views, comments:a.comments} : a)
+                        ? {...savedArticle, likes:a.likes, userLiked:a.userLiked, views:a.views, comments:a.comments, commentCount:a.commentCount} : a)
                     : [savedArticle, ...articles.filter(a => String(a.id) !== String(data.id))];
                 publishDraftId = null;
                 editingArticleId = null;
@@ -5140,6 +5183,7 @@ loadCommentsFromSupabase(article.id);
                 });
             }
             syncModalScrollLock();
+            if (options.focusComments) requestAnimationFrame(() => focusArticleComments(article.id));
             void recordArticleRead(article);
         }
 
@@ -5486,7 +5530,7 @@ updateThemeButton();
 <script src="assets/nfl-teams.js"></script>
 <script src="assets/cam-nfl-quiniela-logos.js?v=20261022-integration-1"></script>
 <script src="assets/cam-article-seo.js?v=20261105-link-preview-2"></script>
-<script src="assets/community.js?v=20261108-picks-display-1"></script>
+<script src="assets/community.js?v=20261108-news-interactions-1"></script>
 <script src="assets/ae-home-community-spotlight.js?v=20261018-reply-totals-1"></script>
 <script src="assets/champions.js?v=20261108-picks-display-1"></script>
 <script src="assets/ae-ranking-notes.js?v=20261105-resume-motion-1"></script>
@@ -6409,7 +6453,7 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 </style>
 
 <!-- Componentes finales: móvil, conversación, parties, perfil y Takes; orden en performance-css-packs.json. -->
-<link rel="stylesheet" href="assets/cam-perf-app-panels.css?v=20261108-en-juego-1">
+<link rel="stylesheet" href="assets/cam-perf-app-panels.css?v=20261108-news-interactions-1">
 <script src="assets/cam-parties.js?v=20261104-perfil-claro-1"></script>
 <script src="assets/cam-sport-quiniela-loader.js?v=20261108-en-juego-1"></script>
 <script src="assets/ae-season-predictions.js?v=20261021-champion-guide-1"></script>
@@ -6434,7 +6478,7 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 <!-- Teléfono (3 nov): pestañas dentro de NFL, Fútbol y Picks, y una dirección por sección (?s=nfl&v=quiniela). -->
 <script src="assets/cam-mobile-sections.js?v=20261105-instant-top-1"></script>
 <!-- Teléfono (3 nov): Inicio como «Tu jornada» (atajos + filas deslizables). Escritorio sin cambios. -->
-<script src="assets/cam-home-jornada.js?v=20261108-picks-display-1"></script>
+<script src="assets/cam-home-jornada.js?v=20261108-news-interactions-1"></script>
 <!-- Teléfono (4 nov): NFL · La semana (opinión y quiniela); Power Rankings en Noticias. Escritorio sin cambios. -->
 <script src="assets/cam-nfl-semana.js?v=20261108-en-juego-1"></script>
 <script src="assets/cam-football-semana.js?v=20261108-en-juego-1"></script>

@@ -119,6 +119,8 @@ async function loadCommentsFromSupabase(articleId, quiet = false) {
         article.comments = rows.filter(c => !c.parent_id).map(c => ({id: c.id, text: c.body,
             author: c.author, upvotes: Number(c.upvotes), downvotes: Number(c.downvotes),
             myVote: Number(c.my_vote), date: c.created_at, replies: []}));
+        article.commentCount = rows.length;
+        syncArticleInteractions();
         // Avoid destroying a reader's unfinished reply during background refreshes.
         const signature = JSON.stringify(rows);
         if (!quiet || target.dataset.signature !== signature) {
@@ -582,21 +584,42 @@ document.addEventListener('keydown', event => {
 let articleStatsRequest = 0;
 const articleLikePending = new Set();
 async function refreshArticleStats() {
-    if (!db) return false;
+    const client = currentUser ? db : (publicArticlesDb || db);
+    if (!client) return false;
     const request = ++articleStatsRequest;
     try {
-        const rows = await fetchAll(() => db.from('rcm_article_totals').select('*').order('article_id'));
+        const articleIds = articles.filter(article => article.remote).map(article => String(article.id));
+        const [likesResult, commentsResult] = await Promise.allSettled([
+            fetchAll(() => client.from('rcm_article_totals').select('*').order('article_id')),
+            articleIds.length ? fetchAll(() => client.from('comments').select('id,article_id')
+                .in('article_id', articleIds).order('id')) : Promise.resolve([])
+        ]);
         if (request !== articleStatsRequest) return false;
-        const byId = new Map(rows.map(r => [String(r.article_id), r]));
-        for (const article of articles) {
-            const row = byId.get(String(article.id));
-            article.likes = row ? Number(row.likes) : null;
-            article.userLiked = Boolean(row?.my_like);
-            article.topComment = row?.top_comment || '';
+        const byId = likesResult.status === 'fulfilled'
+            ? new Map(likesResult.value.map(r => [String(r.article_id), r])) : null;
+        const commentsById = new Map();
+        if (commentsResult.status === 'fulfilled') {
+            for (const row of commentsResult.value) {
+                const id = String(row.article_id);
+                commentsById.set(id, (commentsById.get(id) || 0) + 1);
+            }
         }
-        renderArticlesFeed(); renderTrending();
+        for (const article of articles) {
+            if (byId) {
+                const row = byId.get(String(article.id));
+                article.likes = row ? Number(row.likes) : null;
+                article.userLiked = Boolean(row?.my_like);
+                article.topComment = row?.top_comment || '';
+            }
+            if (article.remote && commentsResult.status === 'fulfilled') {
+                article.commentCount = commentsById.get(String(article.id)) || 0;
+            }
+        }
+        // Keep card nodes, keyboard focus and the carousel position during refreshes.
+        syncArticleInteractions(); renderTrending();
         const active = articles.find(a => String(a.id) === String(activeModalArticleId));
         if (active) updateModalLikeBtn(active);
+        if (!byId) throw likesResult.reason;
         return true;
     } catch {
         notifyCommunity('No pudimos cargar los likes compartidos. Vuelve a intentarlo más tarde.', true);
@@ -608,6 +631,7 @@ async function setArticleLike(id) {
     const article = articles.find(a => String(a.id) === String(id));
     if (!article || articleLikePending.has(String(id))) return;
     articleLikePending.add(String(id));
+    syncArticleInteractions();
     try {
         if (article.likes == null) { await refreshArticleStats(); if (article.likes == null) return; }
         const {error} = await db.rpc('rcm_set_article_like', {p_article_id:String(id),p_liked:!article.userLiked});
@@ -615,5 +639,5 @@ async function setArticleLike(id) {
         if (!await refreshArticleStats()) throw new Error('No se pudo comprobar el conteo actualizado');
     } catch (error) {
         notifyCommunity('No pudimos confirmar el like: ' + (error.message || 'error de conexión') + '. Recarga para comprobar su estado.', true);
-    } finally { articleLikePending.delete(String(id)); }
+    } finally { articleLikePending.delete(String(id)); syncArticleInteractions(); }
 }

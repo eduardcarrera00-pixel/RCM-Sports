@@ -9,7 +9,7 @@
     "test:database": "node tests/database.mjs",
     "test:database:performance": "node tests/database-performance.mjs",
     "test:seo": "node tests/article-seo.mjs",
-    "test:news-loading": "node tests/news-loading.mjs && node tests/home-first-load-stability.mjs",
+    "test:news-loading": "node tests/news-loading.mjs && node tests/home-first-load-stability.mjs && node tests/news-card-interactions.mjs",
     "test:football:points": "node tests/football-automatic-points.mjs && node tests/football-automatic-sync.mjs && node tests/football-automatic-points-browser.cjs",
     "test:quiniela:competition": "node tests/quiniela-streaks.cjs && node tests/banner-competition-browser.cjs",
     "test:quiniela:profile": "node tests/profile-quiniela.mjs && node tests/profile-loading.mjs",
