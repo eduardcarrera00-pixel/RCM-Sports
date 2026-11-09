@@ -29,6 +29,9 @@ html body #mainContent #footballTakes #communityPicks {
   --pk-up-soft: rgba(44, 106, 76, .1);
   --pk-down: #a3433a;
   --pk-down-soft: rgba(163, 67, 58, .09);
+  --pk-odds-bg: #f3ebdd;
+  --pk-odds-line: #d7cbb9;
+  --pk-odds-ink: #0a3268;
   --pk-serif: Newsreader, Georgia, "Times New Roman", serif;
   --pk-sans: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
 }
@@ -44,6 +47,9 @@ html.dark body #mainContent #footballTakes #communityPicks {
   --pk-up-soft: rgba(124, 196, 157, .14);
   --pk-down: #ec9286;
   --pk-down-soft: rgba(236, 146, 134, .13);
+  --pk-odds-bg: #0b2233;
+  --pk-odds-line: #52616a;
+  --pk-odds-ink: #e8bf79;
 }
 
 /* ---------- el marco de la sección desaparece en Picks › Picks ---------- */
@@ -298,19 +304,21 @@ html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-more > sum
 }
 html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-more > summary::-webkit-details-marker { display: none !important; }
 html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-more > .cam-pk-legs { margin-top: 10px !important; }
+/* Momio en su recuadro (9 nov, pedido del dueño), con los colores de los banners:
+   marfil y azul de título de día, azul noche y dorado de noche. */
 html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-odds {
   display: block !important;
   margin: 0 !important;
-  padding: 0 !important;
-  background: none !important;
-  border: 0 !important;
-  border-radius: 0 !important;
+  padding: 5px 11px !important;
+  background: var(--pk-odds-bg) !important;
+  border: 1px solid var(--pk-odds-line) !important;
+  border-radius: 8px !important;
   box-shadow: none !important;
-  font: 700 21px/1.2 var(--pk-sans) !important;
+  font: 700 18px/1.2 var(--pk-sans) !important;
   font-variant-numeric: tabular-nums !important;
   letter-spacing: -.01em !important;
-  color: var(--pk-accent) !important;
-  text-align: right !important;
+  color: var(--pk-odds-ink) !important;
+  text-align: center !important;
   white-space: nowrap !important;
 }
 html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-odds::before,
@@ -657,7 +665,7 @@ html body #mainContent #footballTakes #communityPicks > .ae-picks-community-main
 @media (max-width: 360px) {
   html body #mainContent #footballTakes #communityPicks #cpFeed { padding: 0 12px !important; }
   html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-choice { font-size: 19px !important; }
-  html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-odds { font-size: 19px !important; }
+  html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-odds { font-size: 17px !important; padding: 4px 9px !important; }
   html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-actions { gap: 10px !important; }
   html body #mainContent #footballTakes #communityPicks > .ae-picks-rail :is(#picksPopular, #picksQuestioned) { padding: 0 12px !important; }
   html body #mainContent #footballTakes #communityPicks .cam-plato-link { grid-template-columns: 20px minmax(0, 1fr) 56px !important; gap: 10px !important; }

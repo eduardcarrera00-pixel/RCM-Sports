@@ -158,7 +158,9 @@
     'assets/cam-banner-worst-plate.svg', 'assets/cam-banner-worst-plate.svg');
   f('picks.mejores-platos', 'Escena de los mejores platos', 'Picks', 'assets/ae-best-plates-scene.webp');
   f('picks.peores-platos', 'Escena de los peores platos', 'Picks', 'assets/ae-worst-plates-scene.webp');
-  pair('picks.marmol', 'Fondo de mármol de «Eres Chef»', 'Picks', 'assets/ae-chef-marble-night.webp', 'assets/ae-chef-marble-day.webp');
+  // «¿Eres Chef?» (9 nov 2026, pedido del dueño): un gorro de chef de línea, como los
+  // platos, en vez del mármol realista. La clave se mantiene para el editor.
+  pair('picks.marmol', 'Banner de «¿Eres Chef?» (gorro de chef)', 'Picks', 'assets/cam-banner-chef-hat.svg', 'assets/cam-banner-chef-hat.svg');
   f('picks.publicar', 'Ilustración del diálogo para publicar un Pick', 'Picks', 'assets/ae-pick-compose-hand-leaf.webp');
   // Noticias: foto por defecto de las noticias sin imagen
   const UNSPLASH = 'https://images.unsplash.com/';
@@ -206,7 +208,11 @@
     ['portada.top-takes-noche', 'portada.top-takes-noche-1792724537013.jpg'],
     ['portada.top-takes-cuestionados-noche', 'portada.top-takes-cuestionados-noche-1792724524410.jpg'],
     ['portada.take-escena-dia', 'portada.take-escena-dia-1792818842856.jpg'],
-    ['portada.lectores-dia', 'portada.lectores-dia-1792781222322.jpg']
+    ['portada.lectores-dia', 'portada.lectores-dia-1792781222322.jpg'],
+    // El mármol realista de «¿Eres Chef?» se retira (9 nov 2026): vuelve el gorro de
+    // línea. Una imagen nueva subida desde el editor sigue mandando.
+    ['picks.marmol-dia', 'picks.marmol-dia-1792782244747.png'],
+    ['picks.marmol-noche', 'picks.marmol-noche-1792723523113.jpg']
   ]);
   // La cabecera de lectores comparte el mismo recorte del mosaico en los dos temas,
   // pero cada tema guarda su propio reemplazo: una foto nocturna no debe oscurecer el
@@ -685,7 +691,7 @@
     'assets/cam-home-popular.svg', 'assets/cam-home-unpopular.svg',
     'assets/cam-home-genios.svg', 'assets/cam-home-anoetos.svg', 'assets/cam-home-knowledge-day.svg',
     'assets/cam-banner-best-plate.svg', 'assets/cam-banner-worst-plate.svg',
-    'assets/cam-banner-nfl-news.svg'
+    'assets/cam-banner-nfl-news.svg', 'assets/cam-banner-chef-hat.svg'
   ];
   function fitBannerArtwork(el, url, focus, crop = null) {
     const vector = vectorBannerPaths.some(path => toURL(path)?.href === url);
