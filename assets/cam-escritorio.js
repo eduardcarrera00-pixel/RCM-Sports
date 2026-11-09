@@ -203,11 +203,18 @@
     'futbol:semana': () => [borrow(byId('aeSeasonPredictions'))],
     'nfl:takes': () => [borrow(byId('aeSportTakeLeaders'))],
     'futbol:takes': () => [borrow(byId('aeSportTakeLeaders'))],
-    'futbol:noticias': () => [borrow(byId('aeTrendingPortada'))]
+    'futbol:noticias': () => [borrow(byId('aeTrendingPortada'))],
+    // Picks no presta nada: sus estilos dependen de #communityPicks, así que su
+    // columna derecha (Chefs y Mis parties; Pick histórico) se compone en su sitio
+    // con una rejilla en cam-escritorio.css.
+    // Actualidad: Opinadores distinguidos y Lo más leído.
+    opiniones: () => [borrow(byId('aeOpinionsHighlights'))]
   };
   let asideFor = null;
   function fillAside(p) {
-    if (asideFor === p) return;
+    // Otro script puede llevarse un módulo prestado (p. ej. Lo más leído vuelve a su
+    // sitio al cambiar una clase de <body>): entonces se vuelve a pedir.
+    if (asideFor === p && [...borrowed.keys()].every(node => node.parentNode === asideIn)) return;
     asideFor = p;
     for (const node of [...borrowed.keys()]) giveBack(node);
     const nodes = (ASIDE[p] ? ASIDE[p]() : []).filter(Boolean);

@@ -647,6 +647,40 @@
       gap: 16px !important;
     }
 
+    /* ---------- Picks ---------- */
+    /* En el ordenador ae-picks-premium.js agrupa el feed en .ae-picks-community-main:
+       la regla de pestañas solo conocía sus piezas sueltas (las del teléfono). */
+    html body[data-cam-desk][data-cam-tabs="picks"]:not([data-cam-tab="picks"]) #communityPicks > .ae-picks-community-main { display: none !important; }
+    /* Picks · Picks también enseña Mejores y Peores Chefs y Mis parties (al final hasta
+       1023 px; en la columna derecha desde 1024). Los estilos de esas tablas dependen
+       de #communityPicks: no se mueven, se colocan con la rejilla de abajo. */
+    html body[data-cam-desk][data-cam-tabs="picks"][data-cam-tab="picks"] #footballTakes #communityPicks > .ae-chefs-dual-standings { display: grid !important; }
+    html body[data-cam-desk][data-cam-tabs="picks"][data-cam-tab="picks"] #footballTakes #communityPicks > #camPartyEntryPicks { display: flex !important; }
+    /* El feed y los platos, uno debajo del otro. */
+    html body[data-cam-desk][data-cam-tabs="picks"] #communityPicks > :is(.ae-picks-community-main, .ae-picks-rail) {
+      width: 100% !important;
+      max-width: none !important;
+      height: auto !important;
+      max-height: none !important;
+      margin: 0 !important;
+    }
+    html body[data-cam-desk][data-cam-tabs="picks"][data-cam-tab="picks"] #communityPicks > .ae-picks-rail {
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      gap: 16px !important;
+    }
+    html body[data-cam-desk][data-cam-tabs="picks"][data-cam-tab="picks"] #communityPicks > .ae-picks-rail > * { height: auto !important; max-height: none !important; margin: 0 !important; }
+    html body[data-cam-desk][data-cam-tabs="picks"] #communityPicks:not([hidden]) {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 20px !important;
+    }
+    /* Chefs: Mejores y Peores Chefs, lado a lado a todo el ancho. */
+    html body[data-cam-desk][data-cam-tabs="picks"][data-cam-tab="chefs"] #communityPicks > .ae-chefs-dual-standings {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      gap: 20px !important;
+    }
+
     /* ---------- módulos prestados al carril derecho ---------- */
     html body[data-cam-desk] #camDeskAside > .cam-desk-aside-in > * { width: 100% !important; max-width: none !important; margin: 0 !important; }
     html body[data-cam-desk] #camDeskAside #aeSportTakeLeaders .ae-sport-takes-grid {
@@ -654,6 +688,16 @@
       grid-template-columns: minmax(0, 1fr) !important;
       gap: 16px !important;
     }
+    /* Actualidad: Opinadores distinguidos y Lo más leído, uno debajo del otro. */
+    html body[data-cam-desk] #camDeskAside #aeOpinionsHighlights { display: block !important; }
+    /* Cada bloque ya trae su título: la cabecera de la sección sobra en el carril. */
+    html body[data-cam-desk] #camDeskAside #aeOpinionsHighlights > header { display: none !important; }
+    html body[data-cam-desk] #camDeskAside #aeOpinionsHighlights > :not(header) {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 16px !important;
+    }
+    html body[data-cam-desk] #camDeskAside #aeOpinionsHighlights .ae-opinions-highlight-slot { width: 100% !important; max-width: none !important; margin: 0 !important; }
     html body[data-cam-desk] #camDeskAside #aeTrendingPortada,
     html body[data-cam-desk] #camDeskAside #aeTrendingPortada[hidden] { display: block !important; }
     /* Lo más leído en una columna estrecha: foto pequeña (si hay) y texto al lado. */
@@ -703,6 +747,85 @@
     }
   }
 
+  /* ---------- Perfil (≥ 1024 px): cabecera y cifras a la izquierda, pestañas y contenido a la derecha ---------- */
+  /* Como el perfil de ESPN Fantasy o Sleeper. La ventana se ensancha y se reparte en
+     dos columnas con una rejilla sobre sus propios hijos (no se mueve nada): la
+     cabecera ocupa la izquierda de arriba abajo y «Editar perfil / Compartir» va
+     debajo de ella; todo lo demás, a la derecha. */
+  @media (min-width: 1024px) {
+    html body[data-cam-desk] #aeProfileDialog.ae-profile-dialog[open] {
+      display: grid !important;
+      grid-template-columns: 340px minmax(0, 1fr) !important;
+      grid-template-rows: repeat(28, auto) 1fr auto !important;
+      align-content: start !important;
+      width: min(1180px, calc(100vw - 48px)) !important;
+      max-width: none !important;
+      height: min(900px, calc(100dvh - 48px)) !important;
+      max-height: none !important;
+    }
+    html body[data-cam-desk] #aeProfileDialog.ae-profile-dialog[open] > * { grid-column: 2 !important; min-width: 0 !important; }
+    html body[data-cam-desk] #aeProfileDialog.ae-profile-dialog[open] > .cam-profile-head {
+      grid-column: 1 !important;
+      grid-row: 1 / -2 !important;
+      align-self: stretch !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: stretch !important;
+      justify-content: flex-start !important;
+      gap: 18px !important;
+      margin: 0 !important;
+      padding: 32px 28px !important;
+      border-right: 1px solid var(--rs-line-strong, rgba(204, 161, 111, .4)) !important;
+      border-bottom: 0 !important;
+    }
+    /* Cerrar, arriba a la derecha de la ventana (como antes), no dentro de la columna. */
+    /* La cabecera es elemento de la rejilla: su z-index la pone (con el botón) sobre las pestañas fijas. */
+    html body[data-cam-desk] #aeProfileDialog.ae-profile-dialog[open] > .cam-profile-head { position: static !important; z-index: 7 !important; border-radius: 0 !important; }
+    html body[data-cam-desk] #aeProfileDialog.ae-profile-dialog[open] > .cam-profile-head > .ae-profile-close {
+      position: absolute !important;
+      top: 14px !important;
+      right: 14px !important;
+      left: auto !important;
+      z-index: 8 !important;
+      margin: 0 !important;
+    }
+    html body[data-cam-desk] #aeProfileDialog.ae-profile-dialog[open] > .cam-profile-head .cam-profile-identity {
+      flex-direction: column !important;
+      align-items: flex-start !important;
+      gap: 14px !important;
+    }
+    html body[data-cam-desk] #aeProfileDialog.ae-profile-dialog[open] > .cam-profile-head .cam-profile-avatar {
+      flex-basis: 84px !important;
+      width: 84px !important;
+      height: 84px !important;
+      font-size: 40px !important;
+    }
+    html body[data-cam-desk] #aeProfileDialog.ae-profile-dialog[open] > .cam-profile-head h2 { overflow-wrap: anywhere !important; }
+    html body[data-cam-desk] #aeProfileDialog.ae-profile-dialog[open] > .cam-profile-head .cam-profile-highlights {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: flex-start !important;
+      gap: 8px !important;
+    }
+    html body[data-cam-desk] #aeProfileDialog.ae-profile-dialog[open] > .cam-profile-head .cam-profile-highlights[hidden] { display: none !important; }
+    html body[data-cam-desk] #aeProfileDialog.ae-profile-dialog[open] > .cam-profile-footer-actions {
+      grid-column: 1 !important;
+      grid-row: -2 / -1 !important;
+      flex-direction: column !important;
+      align-items: stretch !important;
+      gap: 10px !important;
+      margin: 0 !important;
+      padding: 0 28px 28px !important;
+      border-top: 0 !important;
+      border-right: 1px solid var(--rs-line-strong, rgba(204, 161, 111, .4)) !important;
+      position: static !important;
+    }
+    html body[data-cam-desk] #aeProfileDialog.ae-profile-dialog[open] > .cam-profile-footer-actions > .cam-profile-action { width: 100% !important; flex: 0 0 auto !important; }
+    /* «Editar perfil» ocupa la ventana entera, como antes. */
+    html body[data-cam-desk] #aeProfileDialog.ae-profile-dialog[open]:has(> #camProfileEdit:not([hidden])) > #camProfileEdit { grid-column: 1 / -1 !important; grid-row: 1 / -1 !important; }
+    html body[data-cam-desk] #aeProfileDialog.ae-profile-dialog[open]:has(> #camProfileEdit:not([hidden])) > :not(#camProfileEdit) { display: none !important; }
+  }
+
   /* ---------- 1024–1279 px: contenido + carril derecho fijo ---------- */
   @media (min-width: 1024px) {
     html body[data-cam-desk] #mainContent { max-width: calc(1320px + 2 * var(--dk-pad)) !important; }
@@ -718,6 +841,39 @@
     html body[data-cam-desk] #camDeskAside > .cam-desk-aside-in {
       position: sticky !important;
       top: var(--cam-desk-stick-aside, var(--cam-desk-stick, 150px)) !important;
+    }
+  }
+
+  /* ---------- Picks (≥ 1024 px): columna derecha compuesta en su sitio ---------- */
+  @media (min-width: 1024px) {
+    html body[data-cam-desk][data-cam-tabs="picks"]:not([data-cam-tab="chefs"]) #footballTakes:not([hidden]) {
+      display: grid !important;
+      grid-template-columns: minmax(0, 1fr) var(--dk-aside) !important;
+      grid-template-rows: repeat(14, auto) 1fr !important;
+      column-gap: var(--dk-gap) !important;
+      row-gap: 20px !important;
+      align-items: start !important;
+    }
+    html body[data-cam-desk][data-cam-tabs="picks"]:not([data-cam-tab="chefs"]) #footballTakes > .ae-picks-layout,
+    html body[data-cam-desk][data-cam-tabs="picks"]:not([data-cam-tab="chefs"]) #footballTakes #communityPicks:not([hidden]) { display: contents !important; }
+    html body[data-cam-desk][data-cam-tabs="picks"]:not([data-cam-tab="chefs"]) #footballTakes > :not(.ae-picks-layout),
+    html body[data-cam-desk][data-cam-tabs="picks"]:not([data-cam-tab="chefs"]) #footballTakes #communityPicks > * { grid-column: 1 !important; grid-row: auto !important; min-width: 0 !important; }
+    html body[data-cam-desk][data-cam-tabs="picks"][data-cam-tab="picks"] #footballTakes #communityPicks > #camPartyEntryPicks { grid-column: 2 !important; grid-row: 1 !important; margin: 0 !important; }
+    html body[data-cam-desk][data-cam-tabs="picks"][data-cam-tab="picks"] #footballTakes #communityPicks > .ae-chefs-dual-standings {
+      grid-column: 2 !important;
+      grid-row: 2 / -1 !important;
+      grid-template-columns: minmax(0, 1fr) !important;
+      gap: 16px !important;
+      position: sticky !important;
+      top: var(--cam-desk-stick, 150px) !important;
+      margin: 0 !important;
+    }
+    html body[data-cam-desk][data-cam-tabs="picks"][data-cam-tab="historial"] #footballTakes #communityPicks > #aeHomePickHistoric {
+      grid-column: 2 !important;
+      grid-row: 1 / -1 !important;
+      position: sticky !important;
+      top: var(--cam-desk-stick, 150px) !important;
+      margin: 0 !important;
     }
   }
 

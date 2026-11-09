@@ -11,11 +11,15 @@
     const anchor=document.createComment('Picks de la comunidad · columna de escritorio');
     preview.before(anchor);
     const trendingAnchor=document.createComment('Lo más leído · columna de escritorio');
-    trending.before(trendingAnchor);
+    // Escritorio (8 nov 2026): si la página abrió en Actualidad, Lo más leído ya está en
+    // su hueco; su sitio de la portada es #aeHomeSidebarFeatures, no ese hueco.
+    const trendingHome=document.getElementById('aeHomeSidebarFeatures');
+    const mobile=window.matchMedia('(max-width: 760px)');
+    if(!mobile.matches&&trendingHome&&trending.closest('#aeOpinionsTrendingSlot'))trendingHome.append(trendingAnchor);
+    else trending.before(trendingAnchor);
     const footer=document.createElement('aside');
     footer.id='aeHomeTrendingMobileFooter';footer.setAttribute('aria-label','Lo más leído');
     footer.hidden=true;main.append(footer);
-    const mobile=window.matchMedia('(max-width: 760px)');
     function sync(){
       const home=document.body.classList.contains('ae-is-home');
       preview.hidden=!home;
@@ -28,7 +32,12 @@
         footer.hidden=false;
       }else{
         if(anchor.nextSibling!==preview)anchor.after(preview);
-        if(trendingAnchor.nextSibling!==trending)trendingAnchor.after(trending);
+        // Escritorio (8 nov 2026): Actualidad lleva Lo más leído en su propio hueco
+        // (syncOpinionHighlights en index.html); antes se devolvía aquí a la portada y
+        // Actualidad se quedaba sin él al llegar desde otra sección. El teléfono no cambia.
+        const slot=!mobile.matches&&document.body.classList.contains('ae-is-opinions')?document.getElementById('aeOpinionsTrendingSlot'):null;
+        if(slot){if(trending.parentNode!==slot)slot.append(trending);}
+        else if(trendingAnchor.nextSibling!==trending)trendingAnchor.after(trending);
         footer.hidden=true;
       }
     }

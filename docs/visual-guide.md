@@ -349,3 +349,28 @@ pestaña o al teléfono); Top 10 de la comunidad (Savant/Rookie, Respira Fútbol
 Humos, una tabla debajo de otra) y Take histórico siguen en el centro.
 **Noticias**: Power Rankings con su diseño de siempre y las noticias; en Fútbol, Lo
 más leído en el carril derecho (vuelve a Actualidad al cambiar de sección).
+
+### Picks, Actualidad y Perfil en escritorio · 8 nov 2026
+
+**Picks** conserva Picks · Historial · Chefs. En Picks, el Pick del editor, el feed y
+los platos van en el centro, con Mejores y Peores Chefs y Mis parties a la derecha
+(al final, hasta 1023 px). En Historial, el historial va en el centro y el Pick
+histórico a la derecha. En Chefs, Mejores y Peores Chefs van lado a lado a todo el
+ancho. Las tablas de Chefs no se mueven de `#communityPicks`, porque sus estilos
+dependen de él: la columna derecha es una rejilla sobre `#footballTakes`
+(`.ae-picks-layout` y `#communityPicks` con `display: contents`). En el ordenador,
+`ae-picks-premium.js` agrupa el feed en `.ae-picks-community-main`, que ahora también
+respeta las pestañas.
+
+**Actualidad**: las columnas y Lo más debatido van en el centro. Opinadores
+distinguidos y Lo más leído van en el carril derecho y vuelven a su sitio al salir.
+`ae-home-weekly-layout.js` devolvía Lo más leído a la portada en cuanto cambiaba la
+sección (y, si la página abría en Actualidad, tomaba ese hueco como su sitio). Por
+eso Actualidad se quedaba sin él al llegar desde otra sección del ordenador. Está
+corregido solo en escritorio: el teléfono no cambia.
+
+**Perfil** (≥ 1024 px): la ventana se ensancha (hasta 1180 px) y se reparte como en
+ESPN Fantasy o Sleeper. A la izquierda van la foto, @usuario, lo que destaca,
+«Editar perfil» y «Compartir perfil». A la derecha, las pestañas fijas y su
+contenido. «Cerrar» sigue arriba a la derecha. Es una rejilla sobre los propios
+hijos de `#aeProfileDialog`, sin mover nada. «Editar perfil» ocupa la ventana entera.

@@ -20,6 +20,11 @@ Cubre, a 1024, 1366 y 1920 px, de día y de noche:
     rejilla con las opiniones en el carril derecho (y de vuelta a su sitio al
     cambiar de pestaña); Noticias con Power Rankings y, en Fútbol, Lo más leído
     en el carril;
+  · Picks: Mejores/Peores Chefs y Mis parties a la derecha del feed, el Pick
+    histórico junto al historial, Chefs a todo el ancho; Actualidad con
+    Opinadores distinguidos y Lo más leído en el carril (y de vuelta al salir);
+  · Perfil (≥ 1024 px): cabecera y cifras a la izquierda, pestañas y
+    contenido a la derecha; «Cerrar» a la vista y sin textos recortados;
   · sin scroll horizontal, sin textos recortados (por el borde o por una
     esquina redondeada) y sin errores de consola;
   · teléfono (390 px): nada del escritorio aparece.
@@ -83,7 +88,7 @@ TEXT_CHECK = r"""(scopes) => {
       if (!node.textContent.trim()) continue;
       const host = node.parentElement;
       if (!host || !host.getClientRects().length || getComputedStyle(host).visibility === 'hidden') continue;
-      if (host.closest('.sr-only,[hidden]') || intended(host)) continue;
+      if (host.closest('.sr-only,[hidden],details:not([open])') || intended(host)) continue;
       const range = document.createRange(); range.selectNodeContents(node);
       const rects = [...range.getClientRects()].filter(r => r.width > 0.5 && r.height > 0.5);
       if (!rects.length) continue;
@@ -96,6 +101,9 @@ TEXT_CHECK = r"""(scopes) => {
         const raw = cs.borderTopLeftRadius.split(' ')[0];
         const rad = Math.min(raw.endsWith('%') ? parseFloat(raw) * b.width / 100 : parseFloat(raw) || 0, b.width / 2, b.height / 2);
         for (const r of rects) {
+          // Un texto que queda entero fuera de la caja está plegado a propósito (desplegables), no cortado.
+          const inside = r.right > b.left + 1 && r.left < b.right - 1 && r.bottom > b.top + 1 && r.top < b.bottom - 1;
+          if (!inside) continue;
           const out = r.left < b.left - 1 || r.right > b.right + 1 || r.top < b.top - 2 || r.bottom > b.bottom + 2;
           let corner = false;
           if (rad > 2) for (const [x, y, cx, cy] of [[r.left, r.top, b.left + rad, b.top + rad], [r.right, r.top, b.right - rad, b.top + rad],
@@ -318,11 +326,110 @@ def sport(width, dark):
         visit(page, '?s=nfl&v=noticias')
         sp = page.evaluate(SPORT)
         check(sp['rankings'][0] and not sp['asideOn'], f'{where}: Noticias NFL con Power Rankings y sin carril derecho {sp["rankings"]} {sp["asideOn"]}')
-        # Al ir a Actualidad, Lo más leído se va con ella (no se queda en el carril).
+        # Al ir a Actualidad, Lo más leído pasa a su hueco de Actualidad (no se queda suelto en el carril).
         visit(page, '?s=futbol&v=noticias'); page.click('body > header nav.ae-sport-nav button[data-category="Opiniones"]'); page.wait_for_timeout(900)
-        check(page.evaluate("!document.querySelector('#camDeskAside #aeTrendingPortada')"), f'{where}: Lo más leído se quedó en el carril al ir a Actualidad')
+        check(page.evaluate("!!document.querySelector('#aeOpinionsTrendingSlot > #aeTrendingPortada')"), f'{where}: Lo más leído no llegó a su hueco de Actualidad')
         check(page.evaluate("document.documentElement.scrollWidth - innerWidth") <= 0, f'{where}: scroll horizontal en NFL/Fútbol')
         check(not page.errors, f'{where}: errores {page.errors}')
+
+PICKS = r"""() => {
+  const q = s => document.querySelector(s);
+  const rect = e => { e = typeof e === 'string' ? q(e) : e; if (!e || !e.getClientRects().length) return null; const r = e.getBoundingClientRect(); return {l: Math.round(r.left), r: Math.round(r.right), t: Math.round(r.top + scrollY), b: Math.round(r.bottom + scrollY)}; };
+  const boards = [...document.querySelectorAll('#communityPicks > .ae-chefs-dual-standings > section')].map(rect);
+  return {
+    feed: rect('#communityPicks > .ae-picks-community-main') || rect('#cpFeed'), editor: rect('#aePicksTopPair'),
+    chefs: rect('#communityPicks > .ae-chefs-dual-standings'), boards, parties: rect('#camPartyEntryPicks'),
+    history: rect('#cpSettleHistorySection'), historic: rect('#aeHomePickHistoric'),
+    chefsHome: q('.ae-chefs-dual-standings')?.parentElement?.id || null,
+    asideOn: 'camDeskAside' in document.body.dataset,
+  };
+}"""
+
+OPINIONS = r"""() => {
+  const q = s => document.querySelector(s);
+  return {
+    aside: [...document.querySelectorAll('#camDeskAside .cam-desk-aside-in > *')].map(e => e.id),
+    slots: ['#aeOpinionsCommunitySlot .editorial-community', '#aeOpinionsTrendingSlot #aeTrendingPortada'].map(s => !!q(s)),
+    highlightsHome: q('#aeOpinionsHighlights')?.parentElement?.id || null,
+    trendingHome: q('#aeTrendingPortada')?.parentElement?.id || null,
+  };
+}"""
+
+def picks_and_opinions(width, dark):
+    where = f'{width}-{"noche" if dark else "dia"}'
+    with fp.full_page(fake_js=FAKE, dark=dark, width=width, height=900, scale=1) as page:
+        visit(page, '?s=picks')
+        pk = page.evaluate(PICKS)
+        check(pk['feed'] and pk['chefs'] and pk['parties'], f'{where}: Picks · Picks enseña feed, Chefs y Mis parties {pk}')
+        check(pk['chefsHome'] == 'communityPicks' and not pk['asideOn'], f'{where}: los Chefs no se mueven de #communityPicks {pk["chefsHome"]}')
+        if pk['feed'] and pk['chefs']:
+            check(pk['chefs']['l'] > pk['feed']['r'] and pk['chefs']['t'] < pk['feed']['b'], f'{where}: Chefs a la derecha del feed {pk["feed"]} {pk["chefs"]}')
+            check(pk['editor']['b'] <= pk['feed']['t'], f'{where}: el Pick del editor encima del feed {pk["editor"]} {pk["feed"]}')
+        clipped = page.evaluate(TEXT_CHECK, ['#footballTakes'])
+        check(not clipped, f'{where} Picks: textos recortados {clipped}')
+        shot(page, f'{where}-picks')
+        page.click('#camSectionTabs [data-tab="historial"]'); page.wait_for_timeout(600)
+        pk = page.evaluate(PICKS)
+        check(not pk['feed'] and not pk['chefs'] and pk['history'] and pk['historic'], f'{where}: Historial {pk}')
+        if pk['history'] and pk['historic']:
+            check(pk['historic']['l'] > pk['history']['r'], f'{where}: Pick histórico a la derecha del historial {pk["history"]} {pk["historic"]}')
+        page.click('#camSectionTabs [data-tab="chefs"]'); page.wait_for_timeout(600)
+        pk = page.evaluate(PICKS)
+        check(not pk['feed'] and len(pk['boards']) == 2 and pk['boards'][1]['l'] > pk['boards'][0]['r'] and pk['boards'][0]['t'] == pk['boards'][1]['t'],
+              f'{where}: Chefs a todo el ancho, lado a lado {pk["boards"]} feed={pk["feed"]}')
+        clipped = page.evaluate(TEXT_CHECK, ['#footballTakes'])
+        check(not clipped, f'{where} Chefs: textos recortados {clipped}')
+        page.click('body > header nav.ae-sport-nav button[data-category="Opiniones"]'); page.wait_for_timeout(1500)
+        op = page.evaluate(OPINIONS)
+        check(op['aside'] == ['aeOpinionsHighlights'] and all(op['slots']), f'{where}: Actualidad con Opinadores y Lo más leído en el carril {op}')
+        clipped = page.evaluate(TEXT_CHECK, ['#camDeskAside', '#aeOpinions'])
+        check(not clipped, f'{where} Actualidad: textos recortados {clipped}')
+        shot(page, f'{where}-actualidad')
+        page.click('body > header nav.ae-sport-nav button[data-category="Todos"]'); page.wait_for_timeout(900)
+        op = page.evaluate(OPINIONS)
+        check(op['highlightsHome'] == 'aeOpinions' and op['trendingHome'] != 'aeOpinionsTrendingSlot', f'{where}: al salir de Actualidad todo vuelve a su sitio {op}')
+        check(page.evaluate("document.documentElement.scrollWidth - innerWidth") <= 0, f'{where}: scroll horizontal en Picks/Actualidad')
+        check(not page.errors, f'{where}: errores {page.errors}')
+
+_po_spec = importlib.util.spec_from_file_location('profile_overview', ROOT / 'tests/profile-overview.py')
+PO = importlib.util.module_from_spec(_po_spec)
+_argv = sys.argv; sys.argv = sys.argv[:1]
+_po_spec.loader.exec_module(PO)
+sys.argv = _argv
+
+PROFILE = r"""() => {
+  const d = document.getElementById('aeProfileDialog');
+  const rect = e => { if (!e || !e.getClientRects().length) return null; const r = e.getBoundingClientRect(); return {l: Math.round(r.left), r: Math.round(r.right), t: Math.round(r.top), b: Math.round(r.bottom)}; };
+  const close = d.querySelector('.ae-profile-close'), cr = close.getBoundingClientRect();
+  const hit = document.elementFromPoint(cr.left + cr.width / 2, cr.top + cr.height / 2);
+  return {open: d.open, dialog: rect(d), head: rect(d.querySelector(':scope > .cam-profile-head')), tabs: rect(d.querySelector('#aeProfileTabs')),
+    overview: rect(d.querySelector('#camProfileOverview')), actions: rect(d.querySelector(':scope > .cam-profile-footer-actions')),
+    closeOk: !!hit && !!hit.closest('.ae-profile-close'), overflow: d.scrollWidth - d.clientWidth};
+}"""
+
+def profile(width, dark):
+    where = f'{width}-{"noche" if dark else "dia"}'
+    page = PO.open_page('ana', dark, width)
+    try:
+        PO.open_own(page, width)
+        pr = page.evaluate(PROFILE)
+        check(pr['open'] and pr['closeOk'], f'{where}: perfil abierto con «Cerrar» a la vista {pr}')
+        if width >= 1024:
+            check(pr['head']['r'] <= pr['tabs']['l'] and pr['head']['r'] <= pr['overview']['l'], f'{where}: perfil en dos columnas {pr}')
+            check(pr['actions'] and pr['actions']['r'] <= pr['tabs']['l'] and pr['actions']['t'] >= pr['head']['b'] - 1, f'{where}: Editar/Compartir bajo la cabecera {pr}')
+        check(pr['overflow'] <= 1, f'{where}: el perfil se desborda en horizontal {pr["overflow"]}')
+        clipped = page.evaluate(TEXT_CHECK, ['#aeProfileDialog'])
+        check(not clipped, f'{where} Perfil: textos recortados {clipped}')
+        page.click('#aeProfileTabTakes'); page.wait_for_timeout(500)
+        pr2 = page.evaluate(PROFILE)
+        if width >= 1024:
+            check(pr2['head']['r'] <= pr2['tabs']['l'], f'{where}: Takes sigue en dos columnas {pr2}')
+        shot(page, f'{where}-perfil')
+        page.click('#aeProfileDialog .ae-profile-close'); page.wait_for_timeout(400)
+        check(not page.evaluate("document.getElementById('aeProfileDialog').open"), f'{where}: «Cerrar» no cierra el perfil')
+        check(not page.errors, f'{where}: errores {page.errors}')
+    finally:
+        PO.close(page)
 
 def phone(dark):
     where = f'390-{"noche" if dark else "dia"}'
@@ -347,9 +454,11 @@ for width in (1024, 1366, 1920):
         home(width, dark)
         sections(width, dark)
         sport(width, dark)
+        picks_and_opinions(width, dark)
+        profile(width, dark)
 for dark in (False, True):
     phone(dark)
 
 if errors:
     print('FALLOS:'); print('\n'.join('  · ' + e for e in errors)); sys.exit(1)
-print('OK: escritorio con secciones, pestañas, direcciones, rejilla, Inicio, NFL y Fútbol (1024/1366/1920, día y noche); el teléfono sin cambios.')
+print('OK: escritorio con secciones, pestañas, direcciones, rejilla, Inicio, NFL, Fútbol, Picks, Actualidad y Perfil (1024/1366/1920, día y noche); el teléfono sin cambios.')
