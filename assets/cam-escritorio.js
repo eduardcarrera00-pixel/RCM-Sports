@@ -203,12 +203,13 @@
     'futbol:semana': () => [borrow(byId('aeSeasonPredictions'))],
     'nfl:takes': () => [borrow(byId('aeSportTakeLeaders'))],
     'futbol:takes': () => [borrow(byId('aeSportTakeLeaders'))],
-    'futbol:noticias': () => [borrow(byId('aeTrendingPortada'))],
+    'futbol:noticias': () => [borrow(byId('aeTrendingPortada'))]
     // Picks no presta nada: sus estilos dependen de #communityPicks, así que su
     // columna derecha (Chefs y Mis parties; Pick histórico) se compone en su sitio
     // con una rejilla en cam-escritorio.css.
-    // Actualidad: Opinadores distinguidos y Lo más leído.
-    opiniones: () => [borrow(byId('aeOpinionsHighlights'))]
+    // Actualidad (9 nov, «Actualidad moderna»): ya trae su propia columna derecha con
+    // Opinadores distinguidos y Lo más leído, y sus estilos dependen de #aeOpinions;
+    // no se presta nada.
   };
   let asideFor = null;
   function fillAside(p) {

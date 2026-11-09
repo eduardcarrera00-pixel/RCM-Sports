@@ -843,10 +843,12 @@ async function loadSettleHistory(){
   const content=el('div',null,'ae-pick-history-card-content');
   content.append(el('strong',match,'ae-pick-history-match'));
   content.append(el('span',prediction,'ae-pick-history-prediction'));
-  if(selections>1)content.append(el('small','Combinada · '+selections+' selecciones','ae-pick-history-multiple'));
+  // Pie de una sola línea: cuota · combinada · fecha (la del resultado o, si
+  // aún no lo hay, la del partido con el mismo formato «8 nov»).
   const bottom=el('div',null,'ae-pick-history-card-bottom');
   bottom.append(el('span','Cuota '+odds(p.american_odds),'ae-pick-history-odds'));
-  bottom.append(el('span',when(p.settled_at)||('Evento '+p.event_date),'ae-pick-history-date'));
+  if(selections>1)bottom.append(el('span','Combinada de '+selections,'ae-pick-history-multiple'));
+  bottom.append(el('span',when(p.settled_at)||(p.event_date?when(p.event_date+'T12:00:00Z'):''),'ae-pick-history-date'));
   if(p.outcome==='won'&&p.result_points!=null)
    bottom.append(el('span','+'+Number(p.result_points).toFixed(2)+' pts','ae-pick-history-points'));
   const source=el('small',p.outcome==='pending'?'A la espera de verificación':auto.has(p.id)?'Verificado automáticamente':'Resultado confirmado','ae-pick-history-source');

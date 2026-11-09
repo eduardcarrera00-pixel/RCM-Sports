@@ -12,6 +12,8 @@
    10. Prepara tu Pick: título sin marco, «Cómo funcionan los Picks» plegable y
        separadores rectos.
    11. Noticias de NFL a la misma distancia que las de Fútbol (4 nov).
+   12. Historial de recetas: tarjetas parejas que no se montan unas sobre otras;
+       en el teléfono, una por fila (8 nov).
 
    Las esquinas redondeadas viven en capas con !important (cam-rounded-editorial y
    cam-banners), que ganan a cualquier regla fuera de capa; por eso los ajustes de
@@ -711,5 +713,156 @@ html body #cpComposePanel #cpForm.cp-capture-first:not([data-imported="true"]) {
       margin-top:0!important;
       margin-bottom:6px!important;
     }
+  }
+}
+
+/* ---------- 12 · Historial de recetas: tarjetas parejas (8 nov) ---------- */
+/* Las filas medían 164–166 px fijos, pero la tarjeta crecía con su texto
+   (height:auto de cam-pick-tickets-refresh.css): las combinadas y los nombres
+   largos se montaban sobre la fila de abajo y las demás quedaban más cortas.
+   Ahora la fila mide lo que su tarjeta, todas parten de la misma altura, el pie
+   (cuota · combinada · fecha) queda siempre abajo y en el teléfono va una
+   tarjeta por fila para que el partido, el usuario y el estado se lean enteros. */
+html body #mainContent #footballTakes #communityPicks #cpSettleHistorySection #cpSettleHistory .ae-pick-history-list.ae-pick-history-grid {
+  grid-auto-rows:auto!important;
+  align-items:stretch!important;
+}
+html body #mainContent #footballTakes #communityPicks #cpSettleHistorySection #cpSettleHistory .ae-pick-history-entry {
+  display:flex!important;
+  align-self:stretch!important;
+}
+html body #mainContent #footballTakes #communityPicks #cpSettleHistorySection #cpSettleHistory .ae-pick-history-entry .ae-pick-history-card {
+  flex:1 1 auto!important;
+  display:flex!important;
+  flex-direction:column!important;
+  gap:8px!important;
+  height:auto!important;
+  min-height:148px!important;
+  overflow:hidden!important;
+}
+html body #mainContent #footballTakes #communityPicks #cpSettleHistorySection #cpSettleHistory .ae-pick-history-card-top {
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:8px!important;
+}
+html body #mainContent #footballTakes #communityPicks #cpSettleHistorySection #cpSettleHistory .ae-pick-history-user {
+  flex:1 1 auto!important;
+  min-width:0!important;
+}
+html body #mainContent #footballTakes #communityPicks #cpSettleHistorySection #cpSettleHistory .ae-pick-history-card-content {
+  flex:0 1 auto!important;
+  gap:4px!important;
+  overflow:visible!important;
+}
+html body #mainContent #footballTakes #communityPicks #cpSettleHistorySection #cpSettleHistory :is(.ae-pick-history-match,.ae-pick-history-prediction) {
+  display:-webkit-box!important;
+  -webkit-box-orient:vertical!important;
+  overflow:hidden!important;
+  overflow-wrap:break-word!important;
+  word-break:normal!important;
+  max-height:none!important;
+  white-space:normal!important;
+}
+html body #mainContent #footballTakes #communityPicks #cpSettleHistorySection #cpSettleHistory .ae-pick-history-match {
+  -webkit-line-clamp:3!important;
+  line-clamp:3;
+}
+html body #mainContent #footballTakes #communityPicks #cpSettleHistorySection #cpSettleHistory .ae-pick-history-prediction {
+  -webkit-line-clamp:2!important;
+  line-clamp:2;
+}
+/* El pie siempre abajo: cuota, «Combinada de N» y fecha en una sola línea. */
+html body #mainContent #footballTakes #communityPicks #cpSettleHistorySection #cpSettleHistory .ae-pick-history-card-bottom {
+  display:flex!important;
+  flex-wrap:nowrap!important;
+  align-items:baseline!important;
+  justify-content:flex-start!important;
+  gap:8px!important;
+  margin-top:auto!important;
+}
+html body #mainContent #footballTakes #communityPicks #cpSettleHistorySection #cpSettleHistory .ae-pick-history-odds {
+  flex:none!important;
+}
+html body #mainContent #footballTakes #communityPicks #cpSettleHistorySection #cpSettleHistory .ae-pick-history-card-bottom .ae-pick-history-multiple {
+  flex:0 1 auto!important;
+  min-width:0!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+  color:var(--cam-h-action)!important;
+  font:650 10px/1.3 Inter,system-ui,sans-serif!important;
+  letter-spacing:0!important;
+}
+html body #mainContent #footballTakes #communityPicks #cpSettleHistorySection #cpSettleHistory .ae-pick-history-date {
+  flex:none!important;
+  margin-left:auto!important;
+}
+
+@media(max-width:600px){
+  html body #mainContent #footballTakes #communityPicks #cpSettleHistorySection #cpSettleHistory .ae-pick-history-frame {
+    padding:0!important;
+  }
+  html body #mainContent #footballTakes #communityPicks #cpSettleHistorySection #cpSettleHistory .ae-pick-history-list.ae-pick-history-grid {
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:10px!important;
+    padding:3px!important;
+    max-height:600px!important;
+    max-height:min(600px,calc(100svh - 230px))!important;
+  }
+  html body #mainContent #footballTakes #communityPicks #cpSettleHistorySection #cpSettleHistory .ae-pick-history-entry .ae-pick-history-card {
+    min-height:158px!important;
+    gap:8px!important;
+    padding:13px 16px 12px 15px!important;
+  }
+  html body #mainContent #footballTakes #communityPicks #cpSettleHistorySection #cpSettleHistory .ae-pick-history-user {
+    font-size:12px!important;
+  }
+  html body #mainContent #footballTakes #communityPicks #cpSettleHistorySection #cpSettleHistory .ae-pick-history-entry .ae-pick-history-badge {
+    font-size:10px!important;
+    padding:3px 8px!important;
+  }
+  html body #mainContent #footballTakes #communityPicks #cpSettleHistorySection #cpSettleHistory .ae-pick-history-match {
+    font:650 16px/1.3 Inter,system-ui,sans-serif!important;
+    -webkit-line-clamp:2!important;
+    line-clamp:2;
+  }
+  html body #mainContent #footballTakes #communityPicks #cpSettleHistorySection #cpSettleHistory .ae-pick-history-prediction {
+    font:500 13px/1.4 Inter,system-ui,sans-serif!important;
+  }
+  html body #mainContent #footballTakes #communityPicks #cpSettleHistorySection #cpSettleHistory .ae-pick-history-card-bottom {
+    padding-top:9px!important;
+  }
+  html body #mainContent #footballTakes #communityPicks #cpSettleHistorySection #cpSettleHistory .ae-pick-history-odds {
+    font-size:13px!important;
+  }
+  html body #mainContent #footballTakes #communityPicks #cpSettleHistorySection #cpSettleHistory .ae-pick-history-card-bottom .ae-pick-history-multiple {
+    font-size:11.5px!important;
+  }
+  html body #mainContent #footballTakes #communityPicks #cpSettleHistorySection #cpSettleHistory .ae-pick-history-date {
+    font-size:12px!important;
+  }
+}
+/* Teléfonos estrechos (320–360 px): menos margen alrededor para que el usuario,
+   el estado y «Combinada de N» quepan enteros en la misma línea. */
+@media(max-width:360px){
+  html body #mainContent #footballTakes #communityPicks #cpSettleHistorySection #cpSettleHistory {
+    padding:6px 4px!important;
+  }
+  html body #mainContent #footballTakes #communityPicks #cpSettleHistorySection #cpSettleHistory .ae-pick-history-entry .ae-pick-history-card {
+    padding:12px 12px 11px 12px!important;
+  }
+  html body #mainContent #footballTakes #communityPicks #cpSettleHistorySection #cpSettleHistory .ae-pick-history-entry .ae-pick-history-badge {
+    font-size:9.5px!important;
+    padding:3px 7px!important;
+  }
+  html body #mainContent #footballTakes #communityPicks #cpSettleHistorySection #cpSettleHistory .ae-pick-history-card-bottom {
+    gap:6px!important;
+  }
+  html body #mainContent #footballTakes #communityPicks #cpSettleHistorySection #cpSettleHistory .ae-pick-history-odds {
+    font-size:12.5px!important;
+  }
+  html body #mainContent #footballTakes #communityPicks #cpSettleHistorySection #cpSettleHistory .ae-pick-history-card-bottom .ae-pick-history-multiple {
+    font-size:11px!important;
   }
 }

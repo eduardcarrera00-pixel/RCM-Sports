@@ -47,7 +47,7 @@ const server=http.createServer((req,res)=>{
   assert.equal(await page.locator('#cpSettleHistory .ae-pick-history-summary').count(),0);
   assert.equal(await page.locator('#cpSettleHistory .ae-pick-history-card').count(),20);
   assert.equal(await page.locator('#cpSettleHistory .ae-pick-history-prediction').count(),20);
-  for(const width of [360,390,768,910,911,1366])for(const dark of [false,true]){
+  for(const width of [360,390,640,768,910,911,1366])for(const dark of [false,true]){
    await page.setViewportSize({width,height:1000});await page.evaluate(dark=>document.documentElement.classList.toggle('dark',dark),dark);
    await page.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))));
    const layout=await page.evaluate(()=>{
@@ -59,11 +59,16 @@ const server=http.createServer((req,res)=>{
    const grid=await page.evaluate(()=>{
     const list=document.querySelector('#cpSettleHistory .ae-pick-history-grid');
     const cards=[...list.querySelectorAll('.ae-pick-history-card')];
-    return {columns:getComputedStyle(list).gridTemplateColumns.split(' ').filter(Boolean).length,scrolls:list.scrollHeight>list.clientHeight+10,hasLinks:cards.every(card=>card.href.includes('pick=')),hasOdds:cards.every(card=>card.querySelector('.ae-pick-history-odds')),noOverflow:list.scrollWidth<=list.clientWidth+1,visible:cards[0].getBoundingClientRect().width>0};
+    // 8 nov: ninguna tarjeta se monta sobre otra y todas miden lo mismo (datos de igual largo).
+    const boxes=cards.map(card=>card.getBoundingClientRect());
+    const separate=boxes.every((a,i)=>boxes.every((b,j)=>j<=i||a.right<=b.left+1||b.right<=a.left+1||a.bottom<=b.top+1||b.bottom<=a.top+1));
+    const even=new Set(boxes.map(b=>Math.round(b.height))).size===1;
+    const footerDown=cards.every(card=>{const f=card.querySelector('.ae-pick-history-card-bottom').getBoundingClientRect(),c=card.getBoundingClientRect();return c.bottom-f.bottom<20;});
+    return {columns:getComputedStyle(list).gridTemplateColumns.split(' ').filter(Boolean).length,scrolls:list.scrollHeight>list.clientHeight+10,hasLinks:cards.every(card=>card.href.includes('pick=')),hasOdds:cards.every(card=>card.querySelector('.ae-pick-history-odds')),noOverflow:list.scrollWidth<=list.clientWidth+1,visible:cards[0].getBoundingClientRect().width>0,separate,even,footerDown};
    });
-   const expectedColumns=width<=720?2:width<=1050?3:4;
+   const expectedColumns=width<=600?1:width<=720?2:width<=1050?3:4;
    assert.equal(grid.columns,expectedColumns,JSON.stringify({width,dark,admin,grid}));
-   assert(grid.scrolls&&grid.hasLinks&&grid.hasOdds&&grid.noOverflow&&grid.visible,JSON.stringify({width,dark,admin,grid}));
+   assert(grid.scrolls&&grid.hasLinks&&grid.hasOdds&&grid.noOverflow&&grid.visible&&grid.separate&&grid.even&&grid.footerDown,JSON.stringify({width,dark,admin,grid}));
    const record=await page.evaluate(()=>{
     const el=document.getElementById('aeHomePickHistoric'),r=el.getBoundingClientRect(),c=document.querySelector('.ae-chefs-dual-standings').getBoundingClientRect();
     const card=document.querySelector('#cpFeed > .cp-card'),b=card.getBoundingClientRect();
@@ -78,6 +83,6 @@ const server=http.createServer((req,res)=>{
   }
  }
  assert.deepEqual(errors,[]);
- console.log('PASS: twenty deduplicated historic cards, internal grid scroll, 2–4 columns, linked selections, no overflow at 360–1366px in day/night. QA: '+qa);
+ console.log('PASS: twenty deduplicated historic cards, internal grid scroll, 1–4 columns, even non-overlapping cards, linked selections, no overflow at 360–1366px in day/night. QA: '+qa);
  }finally{await browser.close();server.close();}
 })().catch(error=>{console.error(error);server.close();process.exitCode=1;});

@@ -26,6 +26,34 @@
   const dateText = s => new Intl.DateTimeFormat('es', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(s));
   const shortDate = s => new Intl.DateTimeFormat('es', { day: 'numeric', month: 'short' }).format(new Date(s));
   const readMinutes = text => Math.max(1, Math.round(String(text || '').trim().split(/\s+/).length / 200));
+  // Fecha relativa («hace 3 h», «ayer»); a partir de una semana, la fecha corta.
+  function relTime(s) {
+    const t = Date.parse(s);
+    if (!Number.isFinite(t)) return '';
+    const diff = Date.now() - t;
+    if (diff < 0) return shortDate(s);
+    const min = Math.floor(diff / 60000);
+    if (min < 1) return 'ahora';
+    if (min < 60) return 'hace ' + min + ' min';
+    const h = Math.floor(min / 60);
+    if (h < 24) return 'hace ' + h + ' h';
+    const d = Math.floor(h / 24);
+    if (d === 1) return 'ayer';
+    if (d < 7) return 'hace ' + d + ' días';
+    return shortDate(s);
+  }
+  function timeEl(s) {
+    const text = relTime(s);
+    if (!text) return null;
+    const t = el('time', text);
+    t.dateTime = new Date(s).toISOString();
+    t.title = dateText(s);
+    return t;
+  }
+  // La firma de la casa no se repite en cada tarjeta; las demás sí se muestran.
+  const HOUSE_AUTHOR = /^(eduard\s*carrera|eduardcarrera00)$/i;
+  const showsByline = name => Boolean(String(name || '').trim()) && !HOUSE_AUTHOR.test(String(name).trim());
+  const reducedMotion = () => { try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch { return true; } };
   const safeImage = url => (typeof url === 'string' && /^https:\/\/[A-Za-z0-9.-]+(:[0-9]{1,5})?(\/\S*)?$/.test(url)) ? url : '';
   const clamp = v => Math.min(100, Math.max(0, Math.round(Number(v)) || 0));
   const excerpt = o => (o.summary || '').trim() || String(o.body || '').trim().split(/\n\s*\n/)[0].slice(0, 220).trim() + (String(o.body || '').length > 220 ? '…' : '');
@@ -109,16 +137,76 @@
       b.setAttribute('aria-selected', String(active === key));
       b.tabIndex = active === key ? 0 : -1;
       b.append(el('span', label));
-      b.addEventListener('click', () => { active = key; render(); });
+      b.addEventListener('click', () => selectSport(key));
       b.addEventListener('keydown', e => {
         if (!['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(e.key)) return;
         e.preventDefault();
         const tabs = [...root.querySelectorAll('[role=tab]')]; let i = tabs.indexOf(b);
         i = e.key === 'Home' ? 0 : e.key === 'End' ? tabs.length - 1 : (i + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
-        active = tabs[i].dataset.sport; render(); root.querySelector('[aria-selected=true]')?.focus();
+        selectSport(tabs[i].dataset.sport); root.querySelector('[aria-selected=true]')?.focus();
       });
       root.append(b);
     }
+    // Degradados de los bordes: decorativos, fuera del orden de las pestañas.
+    for (const side of ['start', 'end']) {
+      const fade = el('span', null, 'cam-act-tabs-fade is-' + side);
+      fade.setAttribute('aria-hidden', 'true');
+      side === 'start' ? root.prepend(fade) : root.append(fade);
+    }
+    const selected = root.querySelector('[aria-selected=true]');
+    if (selected) {
+      // La pestaña elegida queda a la vista dentro de la barra, sin mover la página.
+      const left = selected.offsetLeft - 16, right = selected.offsetLeft + selected.offsetWidth + 16;
+      if (left < root.scrollLeft) root.scrollLeft = Math.max(0, left);
+      else if (right > root.scrollLeft + root.clientWidth) root.scrollLeft = right - root.clientWidth;
+    }
+    syncTabsChrome();
+  }
+
+  // Degradado en el borde de la barra cuando hay más pestañas fuera de la vista.
+  function syncTabsChrome() {
+    const root = $('aeOpinionsTabs'); if (!root) return;
+    const max = root.scrollWidth - root.clientWidth;
+    const fade = [];
+    if (root.scrollLeft > 4) fade.push('start');
+    if (root.scrollLeft < max - 4) fade.push('end');
+    root.dataset.camFade = fade.join(' ');
+    // La barra queda fija bajo la cabecera cuando esta también es fija (escritorio).
+    const header = document.querySelector('body > header, header');
+    let top = 0;
+    if (header) {
+      const pos = getComputedStyle(header).position;
+      if (pos === 'sticky' || pos === 'fixed') top = Math.max(0, Math.round(header.getBoundingClientRect().height));
+    }
+    $('aeOpinions')?.style.setProperty('--cam-act-sticky-top', top + 'px');
+    syncTabsStuck();
+  }
+  // Solo cuando la barra está pegada arriba lleva fondo propio (el contenido pasa por debajo).
+  let stuckQueued = false;
+  function syncTabsStuck() {
+    stuckQueued = false;
+    const root = $('aeOpinionsTabs'), section = $('aeOpinions');
+    if (!root || !section || section.hidden) return;
+    const top = parseFloat(section.style.getPropertyValue('--cam-act-sticky-top')) || 0;
+    const stuck = root.getBoundingClientRect().top <= top + 0.5 && section.getBoundingClientRect().top < top - 1;
+    root.classList.toggle('is-stuck', stuck);
+  }
+  function queueTabsStuck() {
+    if (stuckQueued || $('aeOpinions')?.hidden) return;
+    stuckQueued = true;
+    requestAnimationFrame(syncTabsStuck);
+  }
+
+  function selectSport(key) {
+    if (active === key) return;
+    active = key;
+    render();
+    // Si la barra ya está pegada arriba, volver al inicio del contenido nuevo.
+    const section = $('aeOpinions'), tabs = $('aeOpinionsTabs');
+    if (!section || !tabs) return;
+    const top = parseFloat(getComputedStyle(section).getPropertyValue('--cam-act-sticky-top')) || 0;
+    const start = section.getBoundingClientRect().top + window.scrollY - top;
+    if (window.scrollY > start + 2) window.scrollTo({ top: start, behavior: reducedMotion() ? 'auto' : 'smooth' });
   }
 
   function media(o, cls) {
@@ -140,16 +228,20 @@
   function meta(o) {
     const m = el('p', null, 'ae-opinion-meta');
     m.append(el('span', SPORT_NAME[o.sport] || '', 'ae-opinion-sport'));
-    m.append(el('span', shortDate(o.created_at)));
-    m.append(el('span', o.readTime || readMinutes(o.body) + ' min de lectura'));
-    if (o.is_news) m.append(el('span', 'Noticia', 'ae-opinion-flag'));
-    else if (!o.is_published) m.append(el('span', 'Borrador', 'ae-opinion-flag'));
-    else if (o.featured) m.append(el('span', 'Destacada', 'ae-opinion-flag is-featured'));
+    const when = timeEl(o.created_at);
+    if (when) m.append(when);
+    m.append(el('span', o.readTime || readMinutes(o.body) + ' min de lectura', 'ae-opinion-read'));
+    // Casi todo son noticias: solo se marca lo que es distinto (columnas y borradores).
+    if (!o.is_news) {
+      if (!o.is_published) m.append(el('span', 'Borrador', 'ae-opinion-flag'));
+      else if (o.featured) m.append(el('span', 'Destacada', 'ae-opinion-flag is-featured'));
+      else m.append(el('span', 'Opinión', 'ae-opinion-flag is-column'));
+    }
     return m;
   }
 
-  function card(o, lead, compact = false) {
-    const a = el('article', null, 'ae-opinion-card' + (lead ? ' is-lead' : '') + (compact ? ' is-compact' : '') + (o.is_published ? '' : ' is-draft'));
+  function card(o, lead, compact = false, tile = false) {
+    const a = el('article', null, 'ae-opinion-card' + (lead ? ' is-lead' : '') + (compact ? ' is-compact' : '') + (tile ? ' is-tile' : '') + (o.is_published ? '' : ' is-draft'));
     const b = el('button', null, 'ae-opinion-open');
     b.type = 'button';
     b.setAttribute('aria-label', (o.is_news ? 'Leer noticia: ' : 'Leer opinión: ') + o.title);
@@ -162,7 +254,8 @@
       }
     });
     const text = el('div', null, 'ae-opinion-text');
-    text.append(meta(o), el('h3', o.title, 'ae-opinion-title'), el('p', excerpt(o), 'ae-opinion-excerpt'), el('p', 'Por ' + o.author, 'ae-opinion-author'));
+    text.append(meta(o), el('h3', o.title, 'ae-opinion-title'), el('p', excerpt(o), 'ae-opinion-excerpt'));
+    if (showsByline(o.author)) text.append(el('p', 'Por ' + o.author, 'ae-opinion-author'));
     b.append(media(o, 'ae-opinion-media'), text);
     a.append(b);
     return a;
@@ -179,11 +272,20 @@
   const takeSport=t=>['football','laliga','premier','ligamx','champions'].includes(t.sport)?'futbol':
     t.sport==='nfl'?'nfl':t.sport==='colegial'?'colegial':'general';
   const takeVotes=t=>[Math.max(0,Number(t.upvotes)||0),Math.max(0,Number(t.downvotes)||0)];
-  function takeRow(t, compact=false){
-    const wrap=el('article',null,'ae-opinions-take'+(compact?' is-compact':''));
+  // Barra fina «a favor / en contra»; los números siguen en los botones de voto.
+  function voteMeter(up,down){
+    const meter=el('span',null,'cam-act-meter'+(up+down?'':' is-empty'));
+    meter.setAttribute('aria-hidden','true');
+    meter.style.setProperty('--cam-favor',(up+down?Math.round(up*100/(up+down)):50)+'%');
+    meter.append(el('span',null,'cam-act-meter-fill'));
+    return meter;
+  }
+  function takeRow(t, compact=false, rank=0){
+    const wrap=el('article',null,'ae-opinions-take'+(compact?' is-compact':'')+(rank?' is-ranked':''));
     wrap.dataset.takeId=String(t.id);
+    if(rank){const n=el('span',String(rank),'cam-act-rank');n.setAttribute('aria-hidden','true');wrap.append(n);}
     const body=el('div',null,'ae-opinions-take-content');
-    const tag=el('p',sportLabel(t.sport)+' · Debate de la comunidad','ae-opinions-take-tag');
+    const tag=el('p',compact?'Take de la comunidad':sportLabel(t.sport),'ae-opinions-take-tag');
     const title=el('button',t.title||'Leer opinión','ae-opinions-take-open');
     title.type='button';
     title.addEventListener('click',()=>window.aeTakeReplies?.open(t));
@@ -193,27 +295,45 @@
     author.type='button';
     author.addEventListener('click',()=>window.openAePublicProfile?.(t.author_id));
     by.append(author);
-    if(t.created_at&&Number.isFinite(Date.parse(t.created_at)))by.append(el('time',shortDate(t.created_at)));
+    const when=timeEl(t.created_at);
+    if(when)by.append(when);
     body.append(tag,heading,by);
     if(!compact&&t.body)body.append(el('p',String(t.body).slice(0,170)+(String(t.body).length>170?'…':''),'ae-opinions-take-excerpt'));
     wrap.append(body);
     const actions=el('div',null,'ae-opinions-take-actions');
     const [up,down]=takeVotes(t);
-    for(const [value,glyph,count] of [[1,'▲',up],[-1,'▼',down]]){
-      const b=el('button',glyph+' '+count,'ae-opinions-take-vote');
+    const voteButton=(value,glyph,count)=>{
+      const b=el('button',null,'ae-opinions-take-vote '+(value===1?'is-up':'is-down'));
+      b.append(el('span',glyph,'cam-act-vote-glyph'),el('strong',String(count)));
       b.type='button';b.setAttribute('aria-pressed',String(Number(t.my_vote)===value));
       b.setAttribute('aria-label',(value===1?'Votos favorables: ':'Votos contrarios: ')+count+'. Votar.');
       b.disabled=voteBusy;
       b.addEventListener('click',()=>voteTake(t,value));
-      actions.append(b);
-    }
+      return b;
+    };
+    const votes=el('div',null,'cam-act-votes');
+    votes.append(voteButton(1,'▲',up),voteMeter(up,down),voteButton(-1,'▼',down));
+    actions.append(votes);
     const replies=takeReplies.get(String(t.id));
-    const reply=el('button',replies===undefined?'Respuestas —':replies+' '+(replies===1?'respuesta':'respuestas'),'ae-opinions-take-reply');
+    const reply=el('button',null,'ae-opinions-take-reply');
+    const bubble=el('i',null,'fa-regular fa-comment');bubble.setAttribute('aria-hidden','true');
+    reply.append(bubble,el('span',replies===undefined?'Respuestas —':replies+' '+(replies===1?'respuesta':'respuestas')));
     reply.type='button';reply.setAttribute('aria-label','Abrir conversación: '+(t.title||'Take'));
     reply.addEventListener('click',()=>window.aeTakeReplies?.open(t));
     actions.append(reply);
     wrap.append(actions);
     return wrap;
+  }
+  // Bloques grises mientras llega el contenido (texto real para lectores de pantalla).
+  function skeleton(kind,count,label){
+    const box=el('div',null,'cam-act-skeleton is-'+kind);
+    box.append(el('p',label,'cam-act-sr'));
+    for(let i=0;i<count;i++){
+      const row=el('div',null,'cam-act-skeleton-item');row.setAttribute('aria-hidden','true');
+      row.append(el('span',null,'cam-act-skel-media'),el('span',null,'cam-act-skel-line'),el('span',null,'cam-act-skel-line is-short'));
+      box.append(row);
+    }
+    return box;
   }
   async function voteTake(t,value){
     if(voteBusy)return;
@@ -276,10 +396,10 @@
       latestFirst(a,b));
     const debated=sorted.filter(t=>takeReplies.get(String(t.id))>0).slice(0,5);
     if(debated.length){
-      for(const t of debated)target.append(takeRow(t));
+      debated.forEach((t,i)=>target.append(takeRow(t,false,i+1)));
     }else if(takesLoaded){
       target.append(el('p',known.length?'Aún no hay discusiones con respuestas en este deporte.':'Todavía no hay debates publicados con respuestas verificadas.','ae-opinions-empty'));
-    }else target.append(el('p','Consultando los debates de la comunidad…','ae-opinions-empty'));
+    }else target.append(skeleton('rows',3,'Consultando los debates de la comunidad…'));
     const leftovers=communityTakes.filter(t=>!debated.some(d=>String(d.id)===String(t.id)));
     const latest=visible();
     const front=pickCover(latest),remaining=latest.filter(o=>!front.includes(o));
@@ -289,7 +409,10 @@
     const bySport=new Map();
     for(const [key,label] of SPORTS){
       const story=editorialRemainder.filter(o=>o.sport===key);
-      const sportTakes=leftovers.filter(t=>takeSport(t)===key).sort(latestFirst).slice(0,3);
+      // Primero los Takes con conversación; después, los más recientes.
+      const sportTakes=leftovers.filter(t=>takeSport(t)===key)
+        .sort((a,b)=>((takeReplies.get(String(b.id))||0)-(takeReplies.get(String(a.id))||0))||latestFirst(a,b))
+        .slice(0,3);
       if(story.length||sportTakes.length)bySport.set(key,{key,label,story,sportTakes});
     }
     if(!bySport.size)return;
@@ -300,16 +423,21 @@
     for(const entry of bySport.values()){
       const section=el('section',null,'ae-opinions-sport-block');
       section.dataset.sport=entry.key;
+      const head=el('div',null,'cam-act-sport-head');
       const title=el('h4',entry.label);
-      section.append(title);
-      for(const o of entry.story) section.append(card(o,false,true));
-      for(const t of entry.sportTakes)section.append(takeRow(t,true));
-      const see=el('button','Ver '+entry.label,'ae-opinions-sport-link');
-      see.type='button';
+      const see=el('button',null,'ae-opinions-sport-link');
+      see.append(el('span','Ver todo'),el('span',' ›','cam-act-chevron'));
+      see.type='button';see.setAttribute('aria-label','Ver todo de '+entry.label);
       see.addEventListener('click',()=>{
-        active=entry.key;render();$('aeOpinionsTabs')?.querySelector('[aria-selected=true]')?.focus();
+        selectSport(entry.key);$('aeOpinionsTabs')?.querySelector('[aria-selected=true]')?.focus();
       });
-      section.append(see);grid.append(section);
+      head.append(title,see);
+      // Una fila que se desliza de lado: columnas y Takes del mismo deporte.
+      const rail=el('div',null,'cam-act-rail');
+      rail.setAttribute('role','group');rail.setAttribute('aria-label',entry.label+': desliza para ver más');
+      for(const o of entry.story) rail.append(card(o,false,true,true));
+      for(const t of entry.sportTakes)rail.append(takeRow(t,true));
+      section.append(head,rail);grid.append(section);
     }
     sportTarget.append(grid);
     window.camOpinionsBanners?.refresh();
@@ -325,7 +453,7 @@
     list.replaceChildren();
     list.setAttribute('aria-busy',String(!loaded));
     const shown=visible();
-    if(!loaded&&!shown.length){list.append(el('p','Cargando actualidad…','ae-opinions-empty'));return;}
+    if(!loaded&&!shown.length){list.append(skeleton('front',3,'Cargando actualidad…'));return;}
     if(failed){
       const box=el('div',null,'ae-opinions-empty');
       const retry=el('button','Reintentar','ae-opinions-button is-secondary');retry.type='button';
@@ -344,7 +472,13 @@
         const section=el('section',null,'ae-opinions-front');
         section.append(sectionHeader('En portada','El análisis que marca la conversación.'));
         const grid=el('div',null,'ae-opinions-front-grid');
-        cover.forEach((o,i)=>grid.append(card(o,i===0,i>0)));
+        grid.append(card(cover[0],true));
+        if(cover.length>1){
+          // En el teléfono las otras dos se deslizan de lado; en el ordenador van debajo.
+          const rail=el('div',null,'cam-act-front-rail');
+          for(const o of cover.slice(1))rail.append(card(o,false,false,true));
+          grid.append(rail);
+        }
         section.append(grid);list.append(section);
       }
       const recent=shown.filter(o=>!cover.includes(o)).slice(0,6);
@@ -553,9 +687,42 @@
     render(); status('Opinión borrada.');
   }
 
+  // Opinadores distinguidos reutiliza el panel original de Inicio. Aquí solo se
+  // añade, dentro de Actualidad, la barra a favor / en contra de cada comentario
+  // (fuera de Actualidad está oculta); votos, enlaces y respuestas no cambian.
+  let communityQueued = false;
+  function enhanceCommunity() {
+    communityQueued = false;
+    const slot = $('aeOpinionsCommunitySlot'); if (!slot) return;
+    for (const entry of slot.querySelectorAll('.ae-community-scroll-entry')) {
+      const upButton = entry.querySelector('.ae-community-vote.is-up');
+      if (!upButton) continue;
+      const up = Number(upButton.querySelector('strong')?.textContent) || 0;
+      const down = Number(entry.querySelector('.ae-community-vote.is-down strong')?.textContent) || 0;
+      const favor = (up + down ? Math.round(up * 100 / (up + down)) : 50) + '%';
+      let meter = entry.querySelector('.cam-act-meter');
+      if (!meter) { meter = voteMeter(up, down); upButton.after(meter); }
+      else if (meter.style.getPropertyValue('--cam-favor') !== favor) {
+        meter.style.setProperty('--cam-favor', favor);
+        meter.classList.toggle('is-empty', !(up + down));
+      }
+    }
+  }
+  function watchCommunity() {
+    const slot = $('aeOpinionsCommunitySlot');
+    if (!slot || typeof MutationObserver !== 'function') return;
+    new MutationObserver(() => {
+      if (communityQueued) return;
+      communityQueued = true;
+      requestAnimationFrame(enhanceCommunity);
+    }).observe(slot, { childList: true, subtree: true });
+    enhanceCommunity();
+  }
+
   // ---------- Integración con la navegación ----------
   function show() {
     render();
+    enhanceCommunity();
     window.camOpinionsBanners?.refresh();
     if(!loaded)load();
     void loadTakes();
@@ -571,6 +738,9 @@
     document.addEventListener('ae:takes-updated',()=>{
       if(!$('aeOpinions')?.hidden)void loadTakes(true);
     });
+    $('aeOpinionsTabs')?.addEventListener('scroll', syncTabsChrome, { passive: true });
+    window.addEventListener('resize', () => { if (!$('aeOpinions')?.hidden) syncTabsChrome(); }, { passive: true });
+    window.addEventListener('scroll', queueTabsStuck, { passive: true });
     $('aeOpinionReaderClose')?.addEventListener('click', closeReader);
     $('aeOpinionReaderShare')?.addEventListener('click', share);
     $('aeOpinionReaderEdit')?.addEventListener('click', () => { const o = reading; closeReader(); openEditor(o); });
@@ -604,6 +774,7 @@
 
   function init() {
     bind();
+    watchCommunity();
     try {
       const id = new URLSearchParams(location.search).get('opinion');
       if (id && /^[0-9a-f-]{36}$/i.test(id)) {

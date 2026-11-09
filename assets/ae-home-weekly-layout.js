@@ -32,12 +32,10 @@
         footer.hidden=false;
       }else{
         if(anchor.nextSibling!==preview)anchor.after(preview);
-        // Escritorio (8 nov 2026): Actualidad lleva Lo más leído en su propio hueco
-        // (syncOpinionHighlights en index.html); antes se devolvía aquí a la portada y
-        // Actualidad se quedaba sin él al llegar desde otra sección. El teléfono no cambia.
-        const slot=!mobile.matches&&document.body.classList.contains('ae-is-opinions')?document.getElementById('aeOpinionsTrendingSlot'):null;
-        if(slot){if(trending.parentNode!==slot)slot.append(trending);}
-        else if(trendingAnchor.nextSibling!==trending)trendingAnchor.after(trending);
+        // En Actualidad «Lo más leído» vive en su propio hueco (syncOpinionHighlights);
+        // devolverlo aquí lo dejaba oculto dentro de la columna de Inicio.
+        const opinions=document.body.classList.contains('ae-is-opinions');
+        if(!opinions&&trendingAnchor.nextSibling!==trending)trendingAnchor.after(trending);
         footer.hidden=true;
       }
     }

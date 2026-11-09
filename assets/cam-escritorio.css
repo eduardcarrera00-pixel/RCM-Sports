@@ -688,16 +688,6 @@
       grid-template-columns: minmax(0, 1fr) !important;
       gap: 16px !important;
     }
-    /* Actualidad: Opinadores distinguidos y Lo más leído, uno debajo del otro. */
-    html body[data-cam-desk] #camDeskAside #aeOpinionsHighlights { display: block !important; }
-    /* Cada bloque ya trae su título: la cabecera de la sección sobra en el carril. */
-    html body[data-cam-desk] #camDeskAside #aeOpinionsHighlights > header { display: none !important; }
-    html body[data-cam-desk] #camDeskAside #aeOpinionsHighlights > :not(header) {
-      display: flex !important;
-      flex-direction: column !important;
-      gap: 16px !important;
-    }
-    html body[data-cam-desk] #camDeskAside #aeOpinionsHighlights .ae-opinions-highlight-slot { width: 100% !important; max-width: none !important; margin: 0 !important; }
     html body[data-cam-desk] #camDeskAside #aeTrendingPortada,
     html body[data-cam-desk] #camDeskAside #aeTrendingPortada[hidden] { display: block !important; }
     /* Lo más leído en una columna estrecha: foto pequeña (si hay) y texto al lado. */

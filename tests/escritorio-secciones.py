@@ -21,8 +21,8 @@ Cubre, a 1024, 1366 y 1920 px, de día y de noche:
     cambiar de pestaña); Noticias con Power Rankings y, en Fútbol, Lo más leído
     en el carril;
   · Picks: Mejores/Peores Chefs y Mis parties a la derecha del feed, el Pick
-    histórico junto al historial, Chefs a todo el ancho; Actualidad con
-    Opinadores distinguidos y Lo más leído en el carril (y de vuelta al salir);
+    histórico junto al historial, Chefs a todo el ancho; Actualidad («moderna»,
+    9 nov) con su propia columna de Opinadores distinguidos y Lo más leído;
   · Perfil (≥ 1024 px): cabecera y cifras a la izquierda, pestañas y
     contenido a la derecha; «Cerrar» a la vista y sin textos recortados;
   · sin scroll horizontal, sin textos recortados (por el borde o por una
@@ -347,9 +347,11 @@ PICKS = r"""() => {
 
 OPINIONS = r"""() => {
   const q = s => document.querySelector(s);
+  const rect = e => { e = typeof e === 'string' ? q(e) : e; if (!e || !e.getClientRects().length) return null; const r = e.getBoundingClientRect(); return {l: Math.round(r.left), r: Math.round(r.right), t: Math.round(r.top + scrollY)}; };
   return {
     aside: [...document.querySelectorAll('#camDeskAside .cam-desk-aside-in > *')].map(e => e.id),
     slots: ['#aeOpinionsCommunitySlot .editorial-community', '#aeOpinionsTrendingSlot #aeTrendingPortada'].map(s => !!q(s)),
+    highlights: rect('#aeOpinionsHighlights'), list: rect('#aeOpinionsList'), rail: rect('#camDeskRail'),
     highlightsHome: q('#aeOpinionsHighlights')?.parentElement?.id || null,
     trendingHome: q('#aeTrendingPortada')?.parentElement?.id || null,
   };
@@ -381,7 +383,10 @@ def picks_and_opinions(width, dark):
         check(not clipped, f'{where} Chefs: textos recortados {clipped}')
         page.click('body > header nav.ae-sport-nav button[data-category="Opiniones"]'); page.wait_for_timeout(1500)
         op = page.evaluate(OPINIONS)
-        check(op['aside'] == ['aeOpinionsHighlights'] and all(op['slots']), f'{where}: Actualidad con Opinadores y Lo más leído en el carril {op}')
+        # «Actualidad moderna» (9 nov) trae su propia columna derecha: no se presta nada.
+        check(op['aside'] == [] and all(op['slots']) and op['highlightsHome'] == 'aeOpinions', f'{where}: Actualidad con Opinadores y Lo más leído en su sitio {op}')
+        if width >= 1280 and op['highlights'] and op['list']:
+            check(op['rail']['r'] < op['list']['l'] and op['highlights']['l'] > op['list']['r'], f'{where}: Actualidad entre atajos y su columna derecha {op}')
         clipped = page.evaluate(TEXT_CHECK, ['#camDeskAside', '#aeOpinions'])
         check(not clipped, f'{where} Actualidad: textos recortados {clipped}')
         shot(page, f'{where}-actualidad')

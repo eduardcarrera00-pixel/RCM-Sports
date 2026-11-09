@@ -362,12 +362,12 @@ dependen de él: la columna derecha es una rejilla sobre `#footballTakes`
 `ae-picks-premium.js` agrupa el feed en `.ae-picks-community-main`, que ahora también
 respeta las pestañas.
 
-**Actualidad**: las columnas y Lo más debatido van en el centro. Opinadores
-distinguidos y Lo más leído van en el carril derecho y vuelven a su sitio al salir.
-`ae-home-weekly-layout.js` devolvía Lo más leído a la portada en cuanto cambiaba la
-sección (y, si la página abría en Actualidad, tomaba ese hueco como su sitio). Por
-eso Actualidad se quedaba sin él al llegar desde otra sección del ordenador. Está
-corregido solo en escritorio: el teléfono no cambia.
+**Actualidad** («Actualidad moderna», 9 nov) ya trae su propia columna derecha con
+Opinadores distinguidos y Lo más leído; en el ordenador solo se añaden los atajos a la
+izquierda (no se presta nada: sus estilos dependen de `#aeOpinions`). Si la página
+abre directamente en Actualidad, `ae-home-weekly-layout.js` marca ahora el sitio de Lo
+más leído en la portada (`#aeHomeSidebarFeatures`) y no en el hueco de Actualidad, para
+que vuelva a Inicio al salir (solo escritorio).
 
 **Perfil** (≥ 1024 px): la ventana se ensancha (hasta 1180 px) y se reparte como en
 ESPN Fantasy o Sleeper. A la izquierda van la foto, @usuario, lo que destaca,
