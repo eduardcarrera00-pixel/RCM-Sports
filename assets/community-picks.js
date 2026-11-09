@@ -1397,11 +1397,12 @@ document.addEventListener('DOMContentLoaded',()=>{
  $('cpViewAll')?.addEventListener('click',()=>{const dlg=$('cpArchiveDialog');if(dlg&&!dlg.open)dlg.showModal();archiveLimit=30;loadArchive();});
  $('cpArchiveClose')?.addEventListener('click',closeArchive);
  $('cpArchiveMore')?.addEventListener('click',()=>{archiveLimit+=30;loadArchive();});
- for(const [id,mode] of [['cpRankMonth','month'],['cpRankHistory','all']]){
-   $(id)?.addEventListener('click',()=>{
+ for(const button of document.querySelectorAll('[data-chef-period]')){
+   const mode=button.dataset.chefPeriod;
+   button.addEventListener('click',()=>{
      currentRank=currentWorstRank=mode;
-     for(const [buttonId,buttonMode] of [['cpRankMonth','month'],['cpRankHistory','all']]){
-       $(buttonId)?.setAttribute('aria-pressed',String(mode===buttonMode));
+     for(const periodButton of document.querySelectorAll('[data-chef-period]')){
+       periodButton.setAttribute('aria-pressed',String(mode===periodButton.dataset.chefPeriod));
      }
      void loadRanking();
    });

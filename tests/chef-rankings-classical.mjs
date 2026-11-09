@@ -80,5 +80,13 @@ assert.ok(rpcCalls.some(c=>c.name==='ae_pick_result_ranking_worst_eligible'&&c.a
 assert.ok(rpcCalls.some(c=>c.name==='ae_pick_result_ranking'&&c.args.p_period==='all'));
 assert.equal(d.getElementById('cpRankMonth').getAttribute('aria-pressed'),'false');
 assert.equal(d.getElementById('cpRankHistory').getAttribute('aria-pressed'),'true');
-assert.equal(d.querySelectorAll('.cam-chef-period button').length,2);
-console.log('Chef rankings: ten real rows, one shared period, numeric points/accuracy, and clean headings passed.');process.exit(0);
+assert.equal(d.querySelectorAll('.cam-chef-period button').length,4);
+assert.equal(d.querySelectorAll('.ae-worst-chefs-board .cam-chef-period button').length,2);
+assert.equal(d.getElementById('cpWorstRankHistory').getAttribute('aria-pressed'),'true');
+d.getElementById('cpWorstRankMonth').click();await settle();
+for(const button of d.querySelectorAll('[data-chef-period]')){
+ assert.equal(button.getAttribute('aria-pressed'),String(button.dataset.chefPeriod==='month'));
+}
+assert.equal(rpcCalls.filter(c=>c.name==='ae_pick_result_ranking_worst_eligible').at(-1).args.p_period,'month');
+assert.equal(rpcCalls.filter(c=>c.name==='ae_pick_result_ranking').at(-1).args.p_period,'month');
+console.log('Chef rankings: ten real rows, visible synchronized period controls on both tables, numeric points/accuracy, and clean headings passed.');process.exit(0);

@@ -2713,13 +2713,13 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
                 <div id="cpSettleHistory" role="region" aria-label="Historial de Picks resueltos" aria-live="polite"><p class="ae-pick-history-empty">Cargando resultados…</p></div>
               </section>
               <div class="ae-chefs-dual-standings ae-chefs-classical" role="group" aria-label="Clasificaciones de Mejores y Peores Chefs">
-                <div class="ae-takes-tabs cam-chef-period" role="group" aria-label="Periodo de las clasificaciones de Chefs">
-                  <button id="cpRankMonth" type="button" aria-pressed="true" aria-controls="cpLeaderboard cpWorstLeaderboard">Mensual</button>
-                  <button id="cpRankHistory" type="button" aria-pressed="false" aria-controls="cpLeaderboard cpWorstLeaderboard">Histórico</button>
-                </div>
               <section class="ae-takes-side ae-inline-chefs-board" aria-labelledby="picksRankingTitle">
 
                 <header class="ae-chefs-art-heading"><h3 id="picksRankingTitle">Mejores Chefs</h3></header>
+                <div class="ae-takes-tabs cam-chef-period" role="group" aria-label="Periodo de Mejores Chefs">
+                  <button id="cpRankMonth" data-chef-period="month" type="button" aria-pressed="true" aria-controls="cpLeaderboard cpWorstLeaderboard">Mensual</button>
+                  <button id="cpRankHistory" data-chef-period="all" type="button" aria-pressed="false" aria-controls="cpLeaderboard cpWorstLeaderboard">Histórico</button>
+                </div>
                 <div class="ae-chefs-table-cols" aria-hidden="true"><span>#</span><span>AFICIONADO</span><span>%</span><span>PTS</span></div>
                 <ol id="cpLeaderboard" class="ae-take-leaderboard-list" role="region" aria-label="Ranking de Mejores Chefs; desplázate para consultar más puestos" aria-live="polite"></ol>
                 <details class="ae-chefs-scoring-info"><summary>¿Cómo se calculan los puntos?</summary>
@@ -2729,6 +2729,10 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
               <section class="ae-takes-side ae-inline-chefs-board ae-worst-chefs-board" aria-labelledby="cpWorstRankingTitle">
 
                 <header class="ae-chefs-art-heading"><h3 id="cpWorstRankingTitle">Peores Chefs</h3></header>
+                <div class="ae-takes-tabs cam-chef-period" role="group" aria-label="Periodo de Peores Chefs">
+                  <button id="cpWorstRankMonth" data-chef-period="month" type="button" aria-pressed="true" aria-controls="cpLeaderboard cpWorstLeaderboard">Mensual</button>
+                  <button id="cpWorstRankHistory" data-chef-period="all" type="button" aria-pressed="false" aria-controls="cpLeaderboard cpWorstLeaderboard">Histórico</button>
+                </div>
                 <div class="ae-chefs-table-cols" aria-hidden="true"><span>#</span><span>AFICIONADO</span><span>%</span><span>PTS</span></div>
                 <ol id="cpWorstLeaderboard" class="ae-take-leaderboard-list" role="region" aria-label="Ranking de Peores Chefs; desplázate para consultar más puestos" aria-live="polite"></ol>
               </section>
