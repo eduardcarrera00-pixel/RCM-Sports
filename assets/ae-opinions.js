@@ -336,7 +336,7 @@
     if(!shown.length){
       const empty=el('div',null,'ae-opinions-empty');
       empty.append(el('h3','Todavía no hay publicaciones'+(active==='todas'?'':' de '+SPORT_NAME[active])),
-        el('p',admin?'Pulsa «Escribir opinión» para publicar la primera.':'La redacción publicará aquí sus próximas columnas.'));
+        el('p',isAdmin()?'Pulsa «Escribir opinión» para publicar la primera.':'La redacción publicará aquí sus próximas columnas.'));
       list.append(empty);
     }else{
       const cover=pickCover(shown);

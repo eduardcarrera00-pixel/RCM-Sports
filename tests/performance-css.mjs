@@ -24,7 +24,7 @@ for(const group of groups){
     assert(!links.includes(source),source+' must not also load separately');
   }
 }
-assert.equal(allSources.size,70,'Original pack sources plus monthly leagues; editorial sources must not load in later packs');
+assert.equal(allSources.size,71,'Original pack sources plus monthly leagues and the desktop sections (cam-escritorio.css); editorial sources must not load in later packs');
 assert(editorialSources.every(source=>!links.includes(source)), 'Editorial sources cannot also load separately');
 const redundancies=editorialSources.filter(source=>allSources.has(source));
 assert.deepEqual(redundancies,[],'Do not ship duplicate CSS files inside both the editorial bundle and later CSS packs');

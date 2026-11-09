@@ -14,8 +14,10 @@ Cubre:
     al volver a Inicio, «Tu jornada» vuelve a verse;
   · vacíos: sin partidos ni Pick no hay fila Cierran pronto; sin Takes queda
     solo la invitación; sin Power Rankings no hay fila;
-  · cuota: los partidos y los Takes se piden una vez; en escritorio no se piden;
-  · escritorio (1366 px): sin cambios, la portada de siempre a la vista.
+  · cuota: los partidos y los Takes se piden una vez (también en escritorio desde
+    el 8 nov 2026, aprobado: mismas consultas que el teléfono);
+  · escritorio (1366 px): «Tu jornada» compuesta en columnas; el detalle está en
+    tests/escritorio-secciones.py.
 
 Uso: python3 -B tests/home-jornada.py [--shots DIR]
 """
@@ -190,13 +192,14 @@ def empty(width):
 
 
 def desktop(dark):
+    """Desde el 8 nov 2026 «Tu jornada» también compone Inicio en escritorio."""
     where = f'1366-{"noche" if dark else "dia"}'
     with fp.full_page(fake_js=BASE, dark=dark, width=1366, height=900, scale=1) as page:
         page.wait_for_timeout(1000)
         st = page.evaluate(STATE)
-        assert not st['on'] and not st['visible'], f'{where}: Tu jornada en escritorio {st}'
-        assert st['old'][1] and st['old'][2], f'{where}: la portada de siempre debe verse {st["old"]}'
-        assert st['reads'] == [] and st['feedCalls'] == 0, f'{where}: en escritorio no se piden partidos ni Takes {st}'
+        assert st['on'] and st['visible'], f'{where}: Tu jornada en escritorio {st}'
+        assert not st['old'][1] and st['old'][2], f'{where}: portada en escritorio (sin el hero, con los destacados) {st["old"]}'
+        assert st['feedCalls'] == 1, f'{where}: los Takes se piden una vez {st}'
         assert page.errors == [], f'{where}: errores {page.errors}'
     print('PASS', where)
 

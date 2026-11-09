@@ -13,7 +13,8 @@ Cubre, a 320/390 px de día y de noche (y 1366 px para escritorio):
     antiguo ?v=clasificacion, que abre Takes) y el botón Atrás;
   · los atajos que llevan a un módulo (Top 10 NFL → Power Rankings en Noticias)
     abren su pestaña;
-  · en escritorio no hay pestañas y se ve todo como antes;
+  · escritorio (8 nov 2026): las mismas secciones, pestañas y direcciones (el detalle
+    de la composición de escritorio está en tests/escritorio-secciones.py);
   · sin errores de consola ni desbordamiento horizontal.
 
 Uso: python3 -B tests/mobile-sections.py [--shots DIR]
@@ -177,20 +178,19 @@ def phone(width, dark):
 
 
 def desktop(dark):
+    """Desde el 8 nov 2026 el escritorio tiene las mismas pestañas y direcciones."""
     where = f'1366-{"noche" if dark else "dia"}'
     with fp.full_page(fake_js=FAKE, dark=dark, width=1366, height=900, scale=1) as page:
         page.wait_for_timeout(800)
-        assert page.evaluate("document.getElementById('camNavProfile')") is None, f'{where}: Perfil solo en teléfono'
-        order = page.evaluate("[...document.querySelectorAll('header nav.ae-sport-nav > button')].filter(b => !b.hidden).map(b => b.dataset.category)")
-        assert order == ['Picks', 'NFL', 'Fútbol', 'Opiniones'], f'{where}: menú de escritorio {order}'
-        for cat, sels in [('NFL', ['#nflRankings', '#articlesGrid', '#freeTakesTitle', '#camNflQuiniela', '#aeSportTakeRanking']),
-                          ('Picks', ['#picksFeatured', '#cpSettleHistorySection', '#cpLeaderboard'])]:
+        order = page.evaluate("[...document.querySelectorAll('header nav.ae-sport-nav > button')].filter(b => !b.hidden && b.getClientRects().length).sort((a, b) => a.getBoundingClientRect().left - b.getBoundingClientRect().left).map(b => b.dataset.category || b.id)")
+        assert order == ['Todos', 'NFL', 'Fútbol', 'Picks', 'Opiniones', 'camNavProfile'], f'{where}: menú de escritorio {order}'
+        for cat, tabs in [('NFL', ['semana', 'takes', 'noticias']), ('Picks', ['picks', 'historial', 'chefs'])]:
             page.evaluate('c => filterByCategory(c)', cat); page.wait_for_timeout(700)
-            assert page.evaluate("document.getElementById('camSectionTabs').hidden"), f'{where} {cat}: pestañas en escritorio'
-            shown = page.evaluate(SHOWN, sels)
-            assert all(shown.values()), f'{where} {cat}: escritorio debe verlo todo {shown}'
+            assert not page.evaluate("document.getElementById('camSectionTabs').hidden"), f'{where} {cat}: faltan las pestañas en escritorio'
+            got = page.evaluate("[...document.querySelectorAll('#camSectionTabs .cam-section-tab')].map(b => b.dataset.tab)")
+            assert got == tabs, f'{where} {cat}: pestañas {got}'
         page.evaluate('() => filterByCategory("Fútbol")'); page.wait_for_timeout(300)
-        assert page.evaluate('location.search') == '?s=futbol', f'{where}: dirección en escritorio'
+        assert page.evaluate('location.search') == '?s=futbol&v=semana', f'{where}: dirección en escritorio'
         assert page.errors == [], f'{where}: errores {page.errors}'
     print('PASS', where)
 

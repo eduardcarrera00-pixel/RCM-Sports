@@ -108,7 +108,8 @@
         "assets/cam-leagues.css",
         "assets/cam-home-jornada.css",
         "assets/cam-takes-tarjetas.css",
-        "assets/cam-nfl-semana.css"
+        "assets/cam-nfl-semana.css",
+        "assets/cam-escritorio.css"
       ]
     }
   ]

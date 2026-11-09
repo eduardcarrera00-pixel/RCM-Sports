@@ -305,46 +305,48 @@ html body nav.ae-sport-nav svg.cam-mobile-nav-symbol {
     html:not(.dark) body #mainContent > nav#camSectionTabs > button.cam-section-tab:focus-visible {
       outline-color: #805a30 !important;
     }
+  }
 
-    /* ---------- One part of the section at a time ----------
-       The same selectors live in cam-mobile-sections.js (OWNERS) to reveal the
-       right tab when a script scrolls to something inside another tab. */
-    /* NFL and Fútbol */
-    /* Team Power Rankings lead Noticias; fan standings (Savant · Rookie) close Takes. */
-    html body[data-cam-tabs="sport"]:not([data-cam-tab="noticias"]) :is(#championsRankings,#heroSection,#aeNewsHeadingRow,#aeSportLatestNews,#articlesGrid,#aeSportAllNewsFooter,#aeMoreNews,#aeNflLatestComments,#mainContent > .editorial-layout,#aeFootballMobileStage > .editorial-trending) {
-      display: none !important;
-    }
-    html body[data-cam-tabs="sport"][data-cam-tab="noticias"] #freeTakes {
-      display: none !important;
-    }
-    html body[data-cam-tabs="sport"][data-cam-tab="takes"] #freeTakes > :is(#camNflQuiniela,#camFootballQuiniela,#aeSeasonPredictions) {
-      display: none !important;
-    }
-    html body[data-cam-tabs="sport"][data-cam-tab="quiniela"] #freeTakes > :not(#camNflQuiniela):not(#camFootballQuiniela):not(#aeSeasonPredictions) {
-      display: none !important;
-    }
-    /* NFL: el único módulo Power Rankings pertenece a Noticias. */
-    html body[data-cam-tabs="sport"]:not([data-cam-tab="noticias"]) #nflRankings {
-      display: none !important;
-    }
-    html body[data-cam-section="nfl"][data-cam-tab="semana"] #freeTakes > :not(#camNflSemana):not(#camNflQuiniela):not(#camNflScore):not(#aeSeasonPredictions) {
-      display: none !important;
-    }
-    html body[data-cam-section="futbol"][data-cam-tab="semana"] #freeTakes > :not(#camFootballSemana):not(#camFootballQuiniela):not(#camFootballScore):not(#aeSeasonPredictions) {
-      display: none !important;
-    }
-    html body[data-cam-tabs="sport"][data-cam-tab="takes"] :is(#camNflScore,#camFootballScore) {
-      display: none !important;
-    }
-    /* Picks */
-    html body[data-cam-tabs="picks"]:not([data-cam-tab="picks"]) :is(#aePicksTopPair,#aeWeeklyPickAdmin,#camWeeklyResultsAdmin,#communityPicks > :is(.ae-picks-feed-heading,#cpStatus,#cpFeed,#cpFeedScrollHint,#cpFeedFooter,.ae-picks-rail)) {
-      display: none !important;
-    }
-    html body[data-cam-tabs="picks"]:not([data-cam-tab="historial"]) :is(#cpSettleHistorySection,#aeHomePickHistoric) {
-      display: none !important;
-    }
-    html body[data-cam-tabs="picks"]:not([data-cam-tab="chefs"]) :is(#camPartyEntryPicks,#communityPicks > .ae-chefs-dual-standings) {
-      display: none !important;
-    }
+  /* 8 nov 2026: these rules apply on every width. Desktop has the same tabs
+     (cam-escritorio.css arranges the large-screen columns); on phones nothing changes. */
+  /* ---------- One part of the section at a time ----------
+     The same selectors live in cam-mobile-sections.js (OWNERS) to reveal the
+     right tab when a script scrolls to something inside another tab. */
+  /* NFL and Fútbol */
+  /* Team Power Rankings lead Noticias; fan standings (Savant · Rookie) close Takes. */
+  html body[data-cam-tabs="sport"]:not([data-cam-tab="noticias"]) :is(#championsRankings,#heroSection,#aeNewsHeadingRow,#aeSportLatestNews,#articlesGrid,#aeSportAllNewsFooter,#aeMoreNews,#aeNflLatestComments,#mainContent > .editorial-layout,#aeFootballMobileStage > .editorial-trending) {
+    display: none !important;
+  }
+  html body[data-cam-tabs="sport"][data-cam-tab="noticias"] #freeTakes {
+    display: none !important;
+  }
+  html body[data-cam-tabs="sport"][data-cam-tab="takes"] #freeTakes > :is(#camNflQuiniela,#camFootballQuiniela,#aeSeasonPredictions) {
+    display: none !important;
+  }
+  html body[data-cam-tabs="sport"][data-cam-tab="quiniela"] #freeTakes > :not(#camNflQuiniela):not(#camFootballQuiniela):not(#aeSeasonPredictions) {
+    display: none !important;
+  }
+  /* NFL: el único módulo Power Rankings pertenece a Noticias. */
+  html body[data-cam-tabs="sport"]:not([data-cam-tab="noticias"]) #nflRankings {
+    display: none !important;
+  }
+  html body[data-cam-section="nfl"][data-cam-tab="semana"] #freeTakes > :not(#camNflSemana):not(#camNflQuiniela):not(#camNflScore):not(#aeSeasonPredictions) {
+    display: none !important;
+  }
+  html body[data-cam-section="futbol"][data-cam-tab="semana"] #freeTakes > :not(#camFootballSemana):not(#camFootballQuiniela):not(#camFootballScore):not(#aeSeasonPredictions) {
+    display: none !important;
+  }
+  html body[data-cam-tabs="sport"][data-cam-tab="takes"] :is(#camNflScore,#camFootballScore) {
+    display: none !important;
+  }
+  /* Picks */
+  html body[data-cam-tabs="picks"]:not([data-cam-tab="picks"]) :is(#aePicksTopPair,#aeWeeklyPickAdmin,#camWeeklyResultsAdmin,#communityPicks > :is(.ae-picks-feed-heading,#cpStatus,#cpFeed,#cpFeedScrollHint,#cpFeedFooter,.ae-picks-rail)) {
+    display: none !important;
+  }
+  html body[data-cam-tabs="picks"]:not([data-cam-tab="historial"]) :is(#cpSettleHistorySection,#aeHomePickHistoric) {
+    display: none !important;
+  }
+  html body[data-cam-tabs="picks"]:not([data-cam-tab="chefs"]) :is(#camPartyEntryPicks,#communityPicks > .ae-chefs-dual-standings) {
+    display: none !important;
   }
 }

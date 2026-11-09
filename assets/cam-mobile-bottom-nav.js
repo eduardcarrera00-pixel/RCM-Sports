@@ -159,5 +159,6 @@
     mobile.addListener(updatePlacement);
   }
   updatePlacement();
-  window.camMobileDock = Object.freeze({ profile, update: updateActive });
+  // homeIcon: cam-escritorio.js shows the same Inicio button in the desktop header.
+  window.camMobileDock = Object.freeze({ profile, update: updateActive, homeIcon: HOME_ICON });
 })();

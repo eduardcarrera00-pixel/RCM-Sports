@@ -301,3 +301,33 @@ conserva lo guardado; una respuesta atrasada no sustituye la competición actual
 Power Rankings sigue completo en Noticias. Los enlaces antiguos `v=quiniela`
 abren La semana y los accesos a partidos enfocan el día y la tarjeta correctos.
 La composición de escritorio se conserva.
+
+## Escritorio · secciones y pestañas · 8 nov 2026
+
+El ordenador tiene las mismas secciones, pestañas y direcciones (`?s=…&v=…`) que el
+teléfono, compuestas para pantalla grande. La cabecera ordena **Inicio · NFL ·
+Fútbol · Picks · Actualidad · Perfil** (Perfil sustituye a «Iniciar sesión», como en
+el teléfono). Bajo ella, la misma barra de pestañas (`#camSectionTabs`) se queda
+fija al bajar, con el nombre de la sección a la izquierda y la pestaña activa
+subrayada en dorado; responde al ratón, al teclado (flechas) y al foco.
+
+Rejilla: ≥ 1280 px, carril de atajos (Quiniela NFL, Quiniela Fútbol, Publicar Take,
+Sube tu Pick, Mis parties) · contenido · carril derecho fijo (hasta ~1320 px);
+1024–1279 px, los atajos pasan a una fila de cinco fichas sobre el contenido;
+761–1023 px, una columna con el carril derecho al final. Lo que va «a todo el ancho»
+(sub-barra, «Cierran pronto») cubre también el sitio de los carriles y su banda
+llega a los bordes de la pantalla sin crear scroll horizontal.
+
+Inicio usa «Tu jornada»: «Cierran pronto» como tira de marcadores con flechas ‹ ›,
+una noticia principal y cuatro secundarias, Takes de la comunidad en rejilla de tres,
+y después Popular/Unpopular Takes, Genios y Anoetos (una tabla debajo de la otra),
+Take histórico y Picks de la comunidad. El carril derecho lleva los Power Rankings
+NFL y Champions (top 5) con lo que la página ya cargó. Lo más leído y Opinadores
+distinguidos siguen en Actualidad.
+
+No se copia HTML: `assets/cam-escritorio.js` marca `body[data-cam-desk]`, presta los
+atajos de «Tu jornada» al carril y los devuelve al pasar al teléfono; las reglas de
+qué enseña cada pestaña (`assets/cam-mobile-bottom-nav.css`) valen en todos los
+anchos. Estilos: `assets/cam-escritorio.css` (paquete `cam-perf-app-panels.css`, capa
+`cam-header`). Prueba: `python3 -B tests/escritorio-secciones.py` (1024/1366/1920,
+día y noche).

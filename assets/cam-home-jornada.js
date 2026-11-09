@@ -6,14 +6,17 @@
         Cierran pronto (Pick del editor vigente y partidos abiertos de las dos
         quinielas), Últimas noticias, Takes de la comunidad; al final, el módulo compartido de Picks.
    Cada tarjeta abre lo de siempre (la quiniela, la noticia, la conversación
-   del Take, el Top 10). En escritorio no cambia nada: los bloques de la
-   portada de siempre solo se ocultan en el teléfono (clase cam-home-jornada
-   en <body>, reglas en cam-home-jornada.css).
+   del Take, el Top 10). Los bloques de la portada de siempre se ocultan con
+   la clase cam-home-jornada en <body> (reglas en cam-home-jornada.css).
+   Escritorio (8 nov 2026): el mismo módulo en todos los anchos; en pantalla
+   grande cam-escritorio.js/.css convierten las filas en tira con flechas y
+   rejillas, y llevan los atajos al carril izquierdo.
 
    Cuota: noticias y Picks salen de lo que la página
    ya cargó. Solo se piden los partidos abiertos (dos consultas pequeñas + los
-   escudos de fútbol) y los últimos Takes, una vez al abrir Inicio en el
-   teléfono y de nuevo como mucho cada 5 minutos. Sin temporizadores. */
+   escudos de fútbol) y los últimos Takes, una vez al abrir Inicio y de nuevo
+   como mucho cada 5 minutos (también en escritorio, aprobado el 8 nov 2026).
+   Sin temporizadores. */
 (() => {
   'use strict';
 
@@ -42,7 +45,8 @@
   const client = () => (typeof db !== 'undefined' && db) ? db : null;
   const isHome = () => document.body.classList.contains('ae-is-home');
   const searching = () => typeof currentSearchQuery === 'string' && currentSearchQuery.trim() !== '';
-  const active = () => mobile.matches && isHome() && !searching();
+  // 8 nov 2026: también en escritorio (cam-escritorio.css le da rejillas y flechas).
+  const active = () => isHome() && !searching();
   const now = () => Date.now();
   const isOpen = g => g && g.status === 'scheduled' && g.picks_open && g.odds_locked_at != null && new Date(g.kickoff).getTime() > now();
 

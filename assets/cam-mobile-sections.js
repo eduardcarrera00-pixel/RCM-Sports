@@ -9,7 +9,9 @@
    rules live in cam-mobile-bottom-nav.css). Nothing is moved or re-rendered:
    the same live modules stay where their own scripts put them.
    Every section and tab has its own address (?s=nfl&v=quiniela), so the phone's
-   Back button works and a link can open a section directly. */
+   Back button works and a link can open a section directly.
+   Desktop (8 nov 2026): the same sections, tabs and addresses on every width;
+   cam-escritorio.js and cam-escritorio.css give them the large-screen layout. */
 (() => {
   'use strict';
 
@@ -61,7 +63,7 @@
 
   const category = () => (typeof currentCategory === 'string' ? currentCategory : 'Todos');
   const searching = () => typeof currentSearchQuery === 'string' && currentSearchQuery.trim() !== '';
-  const sectionOf = cat => (mobile.matches && !searching() && SECTIONS[cat]) || null;
+  const sectionOf = cat => (!searching() && SECTIONS[cat]) || null;
   const aliasOf = (section, tab) => (section && section.aliases && section.aliases[tab]) || tab;
   const validTab = (section, tab) => section.tabs.some(([key]) => key === aliasOf(section, tab));
   const tabOf = cat => {
@@ -137,8 +139,8 @@
     const cat = category();
     const slug = SLUGS[cat] || null;
     const section = SECTIONS[cat];
-    // The tab is part of the address on phones only (desktop shows every part).
-    const tab = section && mobile.matches && !searching() ? tabOf(cat) : null;
+    // The tab is part of the address on every width (desktop has the same tabs).
+    const tab = section && !searching() ? tabOf(cat) : null;
     return { slug, tab };
   }
   function userGesture() {
@@ -154,8 +156,7 @@
     const { slug, tab } = wanted();
     const currentSlug = url.searchParams.get('s');
     const currentTab = url.searchParams.get('v');
-    const tabMatters = mobile.matches;
-    if (currentSlug === slug && (!tabMatters || currentTab === tab)) return;
+    if (currentSlug === slug && currentTab === tab) return;
     if (slug) url.searchParams.set('s', slug); else url.searchParams.delete('s');
     if (tab) url.searchParams.set('v', tab); else url.searchParams.delete('v');
     try {
@@ -186,7 +187,7 @@
     }
     chosen.set(cat, tab);
     render();
-    if (mobile.matches && options.scroll !== false) jumpTop();
+    if (options.scroll !== false) jumpTop();
     if (options.url !== false) syncUrl({ replace: true });
     document.dispatchEvent(new CustomEvent('cam:section-tab', { detail: { section: SECTIONS[cat].key, tab } }));
     return true;

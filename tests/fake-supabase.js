@@ -12,7 +12,7 @@
   function builder(table) {
     const state = { filters: [] };
     const q = {};
-    const chain = ['select', 'order', 'limit', 'range', 'not', 'is', 'gte', 'lte', 'gt', 'lt', 'ilike', 'like', 'match', 'filter', 'or', 'contains', 'overlaps'];
+    const chain = ['select', 'order', 'limit', 'range', 'not', 'is', 'gte', 'lte', 'gt', 'lt', 'ilike', 'like', 'match', 'filter', 'or', 'contains', 'overlaps', 'abortSignal'];
     for (const name of chain) q[name] = () => q;
     q.eq = (col, val) => { state.filters.push(r => r[col] === val); return q; };
     q.neq = (col, val) => { state.filters.push(r => r[col] !== val); return q; };
