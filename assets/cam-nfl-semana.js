@@ -188,7 +188,6 @@
     box.append(opinion);
 
     const play = el('div', null, 'cam-ns-quiniela', { role: 'group', 'aria-label': 'Quiniela del duelo de la semana' });
-    play.append(el('p', 'Quiniela', 'cam-ns-action-label'));
     if (finished(duel)) {
       const mine = snap.mine.get(duel.id);
       const winner = duel.winner_id;

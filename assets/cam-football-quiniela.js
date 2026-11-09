@@ -401,7 +401,13 @@
     measure();
   }
   function paintGames(){
-    if($('camFootballSave'))$('camFootballSave').hidden=!user;
+    const roundSave=$('camFootballSave');
+    if(roundSave){
+      roundSave.hidden=!user;
+      // Inline priority prevents component button styles from revealing the guest duplicate.
+      if(user)roundSave.style.removeProperty('display');
+      else roundSave.style.setProperty('display','none','important');
+    }
     const target=$('camFootballGames');if(!target)return;
     target.replaceChildren();
     const chosen=roundGames();

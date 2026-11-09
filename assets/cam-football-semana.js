@@ -102,7 +102,6 @@
     const take=button('Publicar mi take sobre este duelo',()=>window.aeOpenTakeComposer?.('Fútbol'),'cam-ns-link cam-ns-link-take');
     take.setAttribute('aria-controls','aeTakeComposerDialog');take.setAttribute('aria-haspopup','dialog');opinion.append(take);box.append(opinion);
     const play=el('div',null,'cam-ns-quiniela',{role:'group','aria-label':'Quiniela del duelo de la semana'});
-    play.append(el('p','Quiniela · Elige resultado','cam-ns-action-label'));
     if(q().isOpen(g)){
       const picks=el('div',null,'cam-ns-picks');
       for(const pick of ['home','draw','away'])picks.append(pickButton(snap,g,pick));

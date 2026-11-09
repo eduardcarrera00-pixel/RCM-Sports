@@ -414,7 +414,13 @@
     measure();
   }
   function paintGames(){
-    if($('camNflSave'))$('camNflSave').hidden=!user;
+    const roundSave=$('camNflSave');
+    if(roundSave){
+      roundSave.hidden=!user;
+      // Inline priority prevents component button styles from revealing the guest duplicate.
+      if(user)roundSave.style.removeProperty('display');
+      else roundSave.style.setProperty('display','none','important');
+    }
     const target=$('camNflGames');if(!target)return;
     target.replaceChildren();
     const chosen=weekGames();
