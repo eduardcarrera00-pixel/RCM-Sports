@@ -89,7 +89,7 @@ const server=http.createServer((req,res)=>{
   assert.match(await page.locator('#camTakeInvitation').innerText(),/Aquí, lo que se publica no se borra/);
   for(const width of [390,1366])for(const dark of [false,true]){
    await page.setViewportSize({width,height:1000});await page.evaluate(dark=>document.documentElement.classList.toggle('dark',dark),dark);
-   await page.locator('#'+prefix+'ViewTabs [data-view="jornada"]').click();
+   { const active=page.locator('#'+prefix+'ViewTabs [aria-pressed="true"]');if(await active.count())await active.click(); }
    await page.locator('#'+prefix+'Games .cam-nfl-team').first().click();
    const before=await page.evaluate(()=>JSON.stringify({...localStorage}));
    const selected=await page.locator('#'+prefix+'Games .is-selected').count();assert.ok(selected>0);
@@ -97,13 +97,13 @@ const server=http.createServer((req,res)=>{
    if(width===390)await page.locator('#'+prefix+'Quiniela').screenshot({path:path.join(qa,'quiniela-'+sport+'-jornada-'+(dark?'noche':'dia')+'.png')});
    for(const view of ['month','all']){
     await page.locator('#'+prefix+'ViewTabs [data-view="'+view+'"]').click();
-    assert.equal(await page.locator('#'+prefix+'MatchPanel').isVisible(),false);
+    assert.equal(await page.locator('#'+prefix+'MatchPanel').isVisible(),true);
     assert.equal(await page.locator('#'+prefix+'QuinielaStandings').isVisible(),true);
     assert.match(await page.locator('#'+prefix+'Ranking').innerText(),/Eduard/);
     assert.ok(await page.evaluate(({sport,view})=>__rpc.some(r=>r.name==='cam_'+sport+'_leaderboard'&&r.args.p_scope===view),{sport,view}));
-    await page.locator('#'+prefix+'Quiniela').screenshot({path:path.join(qa,'quiniela-'+sport+'-'+view+'-'+(width===1366?'escritorio-':'')+(dark?'noche':'dia')+'.png')});
+    await page.locator('#'+prefix+'Score .cam-quiniela-ranking').screenshot({path:path.join(qa,'quiniela-'+sport+'-'+view+'-'+(width===1366?'escritorio-':'')+(dark?'noche':'dia')+'.png')});
    }
-   await page.locator('#'+prefix+'ViewTabs [data-view="jornada"]').click();
+   { const active=page.locator('#'+prefix+'ViewTabs [aria-pressed="true"]');if(await active.count())await active.click(); }
    assert.equal(await page.locator('#'+prefix+'Games .is-selected').count(),selected);
    assert.equal(await page.evaluate(()=>JSON.stringify({...localStorage})),before,'Changing views must preserve drafts exactly');
   }
@@ -112,12 +112,12 @@ const server=http.createServer((req,res)=>{
    await page.locator('#camFootballViewTabs [data-view=month]').click();
    await page.locator('#camFootballNav .cam-football-league[data-competition="premier"]').click();
    await page.waitForFunction(()=>__rpc.at(-1)?.args?.p_competition==='premier');
-   assert.equal(await page.locator('#camFootballMatchPanel').isVisible(),false);
+   assert.equal(await page.locator('#camFootballMatchPanel').isVisible(),true);
    await page.locator('#camFootballViewTabs [data-view=all]').click();
    await page.waitForFunction(()=>__rpc.at(-1)?.args?.p_scope==='all'&&__rpc.at(-1)?.args?.p_competition==='premier');
    await page.locator('#camFootballNav .cam-football-league[data-competition="laliga"]').click();
    await page.waitForFunction(()=>__rpc.at(-1)?.args?.p_competition==='laliga');
-   await page.locator('#camFootballViewTabs [data-view=jornada]').click();
+   await page.locator('#camFootballViewTabs [data-view=all]').click();
    assert.ok(await page.locator('#camFootballGames .is-selected').count()>0);
    assert.equal(await page.evaluate(()=>JSON.stringify({...localStorage})),before);
   }

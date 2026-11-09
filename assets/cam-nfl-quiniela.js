@@ -505,17 +505,19 @@
   }
   function setQuinielaView(view){
     if(!['jornada','month','all'].includes(view))return;
-    root.classList.toggle('is-ranking',view!=='jornada');
-    const panel=$('camNflMatchPanel'),ranking=$('camNflQuinielaStandings');
-    if(panel)panel.hidden=view!=='jornada';
+    const ranking=$('camNflQuinielaStandings');
     if(ranking)ranking.hidden=view==='jornada';
-    for(const tab of $('camNflViewTabs')?.querySelectorAll('[data-view]')||[])tab.setAttribute('aria-pressed',String(tab.dataset.view===view));
+    for(const tab of $('camNflViewTabs')?.querySelectorAll('[data-view]')||[]){
+      const selected=tab.dataset.view===view;
+      tab.setAttribute('aria-pressed',String(selected));
+      tab.setAttribute('aria-expanded',String(selected));
+    }
     if(view!=='jornada'){scope=view;showAll=false;paintRanking();}
     else sizeGameViewport();
   }
   $('camNflViewTabs')?.addEventListener('click',event=>{
     const tab=event.target.closest('button[data-view]');
-    if(tab)setQuinielaView(tab.dataset.view);
+    if(tab)setQuinielaView(tab.getAttribute('aria-pressed')==='true'?'jornada':tab.dataset.view);
   });
   async function paintRanking(){
     const target=$('camNflRanking');if(!target)return;

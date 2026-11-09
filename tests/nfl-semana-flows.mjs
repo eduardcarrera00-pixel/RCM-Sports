@@ -134,6 +134,19 @@ async function scenario(anonymous = false) {
   w.camNflQuiniela.focus('payer');await settle();
   assert.equal(w.camSectionTabs.current().tab,'semana','a quiniela access from Noticias reveals the match');
   assert.equal(d.activeElement.dataset.gameId,'payer');
+  const savedBeforeRanking=JSON.stringify([...w.camNflQuiniela.snapshot().mine]);
+  for(const scope of ['month','all']){
+    const tab=one('#camNflViewTabs [data-view='+scope+']');
+    tab.click();await settle();
+    assert.equal(one('#camNflMatchPanel').hidden,false,'rankings do not hide the matches');
+    assert.equal(one('#camNflQuinielaStandings').hidden,false);
+    w.camNflSemana.render();
+    assert.equal(one('#camNflViewTabs [data-view='+scope+']'),tab,'score repaint preserves the ranking controls');
+    assert.equal(tab.getAttribute('aria-expanded'),'true');
+  }
+  one('#camNflViewTabs [data-view=all]').click();
+  assert.equal(one('#camNflQuinielaStandings').hidden,true,'the active ranking button closes the table');
+  assert.equal(JSON.stringify([...w.camNflQuiniela.snapshot().mine]),savedBeforeRanking,'rankings preserve saved picks');
   w.filterByCategory('Fútbol');w.camSectionTabs.select('quiniela',{scroll:false});
   assert.equal(w.camSectionTabs.current().tab,'semana','football quiniela links keep working through La semana');
   await w.happyDOM.close();

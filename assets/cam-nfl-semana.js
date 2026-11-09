@@ -21,7 +21,7 @@
 
   const root = document.getElementById('camNflSemana');
   const body = document.getElementById('camNflSemanaBody');
-  const scoreRoot = document.getElementById('camNflScore');
+  const scoreRoot = document.getElementById('camNflScoreBody');
   if (!root || !body || !window.matchMedia) return;
 
   const mobile = window.matchMedia('(max-width: 760px), (orientation: landscape) and (max-height: 500px) and (hover: none) and (pointer: coarse)');

@@ -57,3 +57,20 @@
   .cam-q-stats{gap:10px 8px}
   .cam-q-stats dd{font-size:12px}
 }
+
+/* The same compact table fits the desktop score column as well as the phone. */
+.cam-quiniela-ranking{container-type:inline-size}
+@container(max-width:620px){
+  .cam-nfl-table.cam-q-board{table-layout:fixed}
+  .cam-nfl-table.cam-q-board :is(th,td):first-child{width:42px;padding-inline:5px}
+  .cam-nfl-table.cam-q-board :is(th,td):last-child{width:55px;padding-inline:6px}
+  .cam-nfl-table.cam-q-board :is(th,td):is(:nth-child(3),:nth-child(4)){display:none}
+  .cam-nfl-table.cam-q-board td{padding:10px 7px;vertical-align:top}
+  .cam-nfl-table.cam-q-board td:last-child{font-size:18px;padding-top:20px}
+  .cam-q-board .cam-nfl-link{gap:6px;font-size:12px}
+  .cam-q-mobile-stats{display:block;color:var(--q-muted);font-size:10px;line-height:1.5;white-space:normal}
+  .cam-q-race{padding:16px}
+  .cam-q-race-title{font-size:18px}
+  .cam-q-stats{gap:10px 8px}
+  .cam-q-stats dd{font-size:12px}
+}

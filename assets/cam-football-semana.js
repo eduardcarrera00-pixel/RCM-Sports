@@ -7,7 +7,7 @@
   'use strict';
   const root=document.getElementById('camFootballSemana');
   const body=document.getElementById('camFootballSemanaBody');
-  const scores=document.getElementById('camFootballScore');
+  const scores=document.getElementById('camFootballScoreBody');
   if(!root||!body||!scores||!window.matchMedia)return;
   const mobile=window.matchMedia('(max-width: 760px), (orientation: landscape) and (max-height: 500px) and (hover: none) and (pointer: coarse)');
   const ui={scoreOpen:false,liveOpen:false,liveKey:null,saving:false,result:null};

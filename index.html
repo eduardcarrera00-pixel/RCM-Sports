@@ -309,7 +309,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
     </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
-<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261108-actualidad-moderna-1">
+<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261109-quiniela-clasificaciones-1">
 <script defer src="assets/ae-nfl-mobile-telephoto.js?v=20261016-1"></script>
 <link rel="stylesheet" href="assets/cam-perf-sport-banners.css?v=20261104-css-consolidated-1">
 <style id="ae-opinions-reused-home-panels">
@@ -3031,11 +3031,6 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
                 <h2 id="camNflTitle">LA QUINIELA NFL</h2>
                 <p><strong>Aciertas: sumas. Fallas: restas.</strong> Tus puntos cuentan para la liga mensual.</p>
               </header>
-              <nav id="camNflViewTabs" class="cam-quiniela-view-tabs" aria-label="Vistas de La Quiniela">
-                <button type="button" data-view="jornada" aria-pressed="true" aria-controls="camNflMatchPanel">Partidos</button>
-                <button type="button" data-view="month" aria-pressed="false" aria-controls="camNflQuinielaStandings"><span class="cam-q-tab-kicker">Clasificación</span> <span class="cam-q-tab-name">mensual</span></button>
-                <button type="button" data-view="all" aria-pressed="false" aria-controls="camNflQuinielaStandings"><span class="cam-q-tab-kicker">Clasificación</span> <span class="cam-q-tab-name">histórica</span></button>
-              </nav>
               <div id="camNflNav" class="cam-nfl-nav" aria-label="Mi quiniela"></div>
             </div>
             <div id="camNflMatchPanel">
@@ -3057,11 +3052,6 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
 
             <section id="camNflAdmin" class="cam-nfl-admin" aria-label="Controles de administradores" hidden></section>
             </div>
-            <section id="camNflQuinielaStandings" class="cam-nfl-standings" hidden aria-labelledby="camNflStandingTitle">
-              <h3 id="camNflStandingTitle">Clasificación de La Quiniela</h3>
-              <p id="camNflRankingCaption" class="cam-quiniela-ranking-caption"></p>
-              <div id="camNflRanking" aria-live="polite"></div>
-            </section>
           </section>
           <section id="camFootballSemana" class="cam-nfl-semana" aria-labelledby="camFootballSemanaTitle">
             <div id="camFootballSemanaBody" class="cam-ns-body" aria-live="polite"></div>
@@ -3077,11 +3067,6 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
                 <img class="cam-football-quiniela-illustration cam-football-quiniela-illustration--day" src="assets/cam-football-quiniela-day.svg" alt="" aria-hidden="true" width="300" height="240" loading="lazy" decoding="async">
                 <img class="cam-football-quiniela-illustration cam-football-quiniela-illustration--night" src="assets/cam-football-quiniela-night.svg" alt="" aria-hidden="true" width="300" height="240" loading="lazy" decoding="async">
               </header>
-              <nav id="camFootballViewTabs" class="cam-quiniela-view-tabs" aria-label="Vistas de La Quiniela">
-                <button type="button" data-view="jornada" aria-pressed="true" aria-controls="camFootballMatchPanel">Partidos</button>
-                <button type="button" data-view="month" aria-pressed="false" aria-controls="camFootballQuinielaStandings"><span class="cam-q-tab-kicker">Clasificación</span> <span class="cam-q-tab-name">mensual</span></button>
-                <button type="button" data-view="all" aria-pressed="false" aria-controls="camFootballQuinielaStandings"><span class="cam-q-tab-kicker">Clasificación</span> <span class="cam-q-tab-name">histórica</span></button>
-              </nav>
               <div id="camFootballNav" class="cam-nfl-nav" aria-label="Competición y mi quiniela"></div>
             </div>
             <div id="camFootballMatchPanel">
@@ -3101,11 +3086,6 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
 
             <section id="camFootballAdmin" class="cam-nfl-admin" aria-label="Controles de administradores" hidden></section>
             </div>
-            <section id="camFootballQuinielaStandings" class="cam-nfl-standings" hidden aria-labelledby="camFootballStandingTitle">
-              <h3 id="camFootballStandingTitle">Clasificación de La Quiniela</h3>
-              <p id="camFootballRankingCaption" class="cam-quiniela-ranking-caption"></p>
-              <div id="camFootballRanking" aria-live="polite"></div>
-            </section>
           </section>
           <section id="aeSportTakeRanking" class="ae-take-ranking" aria-labelledby="aeSportTakeRankingTitle">
             <div class="ae-take-ranking-head"><div><span class="ae-take-ranking-kicker">CAM SPORTS · COMUNIDAD</span><h2 id="aeSportTakeRankingTitle">Top 10 · NFL</h2></div><p id="aeSportTakeRankingDescription">Los admins confirman cada acierto y asignan de 1 a 100 puntos. Un fallo vale 0.</p></div>
@@ -3147,8 +3127,34 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
             <div id="aeSeasonList" class="ae-season-list"></div>
             <p id="aeSeasonStatus" class="ae-season-status" role="status" aria-live="polite"></p>
           </section>
-          <div id="camNflScore" class="cam-sport-score" aria-live="polite"></div>
-          <div id="camFootballScore" class="cam-sport-score" aria-live="polite"></div>
+          <div id="camNflScore" class="cam-sport-score">
+            <div class="cam-quiniela-ranking">
+              <nav id="camNflViewTabs" class="cam-quiniela-view-tabs" aria-label="Clasificaciones de La Quiniela">
+                <button type="button" data-view="month" aria-pressed="false" aria-expanded="false" aria-controls="camNflQuinielaStandings"><span class="cam-q-tab-kicker">Clasificación</span> <span class="cam-q-tab-name">mensual</span></button>
+                <button type="button" data-view="all" aria-pressed="false" aria-expanded="false" aria-controls="camNflQuinielaStandings"><span class="cam-q-tab-kicker">Clasificación</span> <span class="cam-q-tab-name">histórica</span></button>
+              </nav>
+              <section id="camNflQuinielaStandings" class="cam-nfl-standings" hidden aria-labelledby="camNflStandingTitle">
+                <h3 id="camNflStandingTitle">Clasificación de La Quiniela</h3>
+                <p id="camNflRankingCaption" class="cam-quiniela-ranking-caption"></p>
+                <div id="camNflRanking" aria-live="polite"></div>
+              </section>
+            </div>
+            <div id="camNflScoreBody" class="cam-sport-score-body" aria-live="polite"></div>
+          </div>
+          <div id="camFootballScore" class="cam-sport-score">
+            <div class="cam-quiniela-ranking">
+              <nav id="camFootballViewTabs" class="cam-quiniela-view-tabs" aria-label="Clasificaciones de La Quiniela">
+                <button type="button" data-view="month" aria-pressed="false" aria-expanded="false" aria-controls="camFootballQuinielaStandings"><span class="cam-q-tab-kicker">Clasificación</span> <span class="cam-q-tab-name">mensual</span></button>
+                <button type="button" data-view="all" aria-pressed="false" aria-expanded="false" aria-controls="camFootballQuinielaStandings"><span class="cam-q-tab-kicker">Clasificación</span> <span class="cam-q-tab-name">histórica</span></button>
+              </nav>
+              <section id="camFootballQuinielaStandings" class="cam-nfl-standings" hidden aria-labelledby="camFootballStandingTitle">
+                <h3 id="camFootballStandingTitle">Clasificación de La Quiniela</h3>
+                <p id="camFootballRankingCaption" class="cam-quiniela-ranking-caption"></p>
+                <div id="camFootballRanking" aria-live="polite"></div>
+              </section>
+            </div>
+            <div id="camFootballScoreBody" class="cam-sport-score-body" aria-live="polite"></div>
+          </div>
           <details id="aeTakeReview" class="ae-take-review" hidden><summary>Administrar · Puntuar Takes</summary><p>Primero calcula la dificultad de cada Take (tabla de la liga, nivel de sorpresa o cuota) y después marca si se cumplió. Los puntos (1–20) salen solos: lo obvio vale poco y la sorpresa vale mucho. Si recalculas un Take ya puntuado, su puntuación se actualiza.</p><p id="aeTakeReviewStatus" role="status" aria-live="polite"></p><div id="aeTakeReviewList"></div></details>
           <section id="aeSportTakeHistoric" class="ae-home-take-feature" hidden aria-labelledby="aeSportTakeHistoricTitle" data-cam-optional>
             <div class="ae-historic-copy">
@@ -6451,9 +6457,9 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 </style>
 
 <!-- Componentes finales: móvil, conversación, parties, perfil y Takes; orden en performance-css-packs.json. -->
-<link rel="stylesheet" href="assets/cam-perf-app-panels.css?v=20261109-text-clarity-1">
+<link rel="stylesheet" href="assets/cam-perf-app-panels.css?v=20261109-quiniela-clasificaciones-2">
 <script src="assets/cam-parties.js?v=20261104-perfil-claro-1"></script>
-<script src="assets/cam-sport-quiniela-loader.js?v=20261108-en-juego-1"></script>
+<script src="assets/cam-sport-quiniela-loader.js?v=20261109-quiniela-clasificaciones-1"></script>
 <script src="assets/ae-season-predictions.js?v=20261021-champion-guide-1"></script>
 <script src="assets/cam-lazy-editorial-loader.js?v=20261109-escritorio-4"></script>
 <script src="assets/cam-opinions-section-banners.js?v=20261104-actualidad-1"></script>
@@ -6478,8 +6484,8 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 <!-- Inicio como «Tu jornada» (3 nov, teléfono; desde el 8 nov también en escritorio con tira, rejillas y carriles). -->
 <script src="assets/cam-home-jornada.js?v=20261108-escritorio-1"></script>
 <!-- NFL y Fútbol · La semana (4 nov, teléfono; desde el 8 nov también en escritorio, en columnas). Power Rankings en Noticias. -->
-<script src="assets/cam-nfl-semana.js?v=20261108-escritorio-2"></script>
-<script src="assets/cam-football-semana.js?v=20261108-escritorio-2"></script>
+<script src="assets/cam-nfl-semana.js?v=20261109-quiniela-clasificaciones-1"></script>
+<script src="assets/cam-football-semana.js?v=20261109-quiniela-clasificaciones-1"></script>
 <!-- Escritorio (8 nov): mismas secciones y pestañas que el teléfono, en columnas (cam-escritorio.css va en cam-perf-app-panels.css). -->
 <script defer src="assets/cam-escritorio.js?v=20261109-escritorio-4"></script>
 

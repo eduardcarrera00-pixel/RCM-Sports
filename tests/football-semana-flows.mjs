@@ -126,7 +126,9 @@ async function scenario({anonymous=false,failed=false}={}){
   assert.equal(one('#camFootballSemana').nextElementSibling.id,'camFootballQuiniela','the quiniela follows the duel section');
   const target='first';await api.focus(target);await settle();
   assert.equal(d.activeElement.dataset.gameId,target);assert.equal(w.lastScroll.dataset.gameId,target);
-  assert.equal(one('#camFootballViewTabs [data-view=jornada]').getAttribute('aria-pressed'),'true','match link restores Partidos from standings');
+  assert.equal(one('#camFootballQuinielaStandings').hidden,true,'match link closes the separate standings');
+  assert.equal(one('#camFootballViewTabs [aria-pressed=true]'),null);
+  assert.equal(one('#camFootballMatchPanel').hidden,false,'matches remain available');
   assert.equal(api.snapshot().mine.get('first'),anonymous?undefined:'home');
   const beforeReads=reads;
   one('#camFootballSemana [data-competition=premier]').click();await settle();
@@ -147,7 +149,7 @@ async function scenario({anonymous=false,failed=false}={}){
   await api.selectCompetition('ligamx');await settle();
   assert.match(one('#camFootballSemanaBody').textContent,/Todavía no hay partidos/);
   assert.equal(one('#camFootballSemana .cam-ns-feature'),null);
-  assert.equal(one('#camFootballScore').children.length,0);
+  assert.equal(one('#camFootballScoreBody').children.length,0);
   w.camSectionTabs.select('noticias',{scroll:false});one('#championsRankings').scrollIntoView();
   assert.equal(w.camSectionTabs.current().tab,'noticias');assert.equal(d.querySelectorAll('#championsRankings').length,1);
   w.camSectionTabs.select('takes',{scroll:false});one('#camFootballQuiniela').scrollIntoView();
