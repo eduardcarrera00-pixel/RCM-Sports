@@ -1,4 +1,230 @@
 @layer cam-display-clarity {
+/* One reading system for Home, sports, Picks, Actualidad and public profiles.
+   Component-specific layouts, brand artwork and data remain authoritative. */
+html body {
+  --cam-calm-bg:#eeeae3;
+  --cam-calm-surface:#fffcf8;
+  --cam-calm-soft:#f3ebdd;
+  --cam-calm-ink:#273b49;
+  --cam-calm-muted:#566876;
+  --cam-calm-line:rgba(39,59,73,.16);
+  --cam-calm-action:#855b43;
+  --cam-calm-accent:#855b43;
+  --cam-calm-up:#2c6a4c;
+  --cam-calm-down:#a3433a;
+  --cam-calm-radius:16px;
+  --cam-banner-art-width:64px;
+  --cam-banner-art-height:44px;
+  --cam-banner-card-height:88px;
+  --cam-banner-title-size:clamp(20px,1.8vw,25px);
+  --cam-banner-fill:var(--cam-calm-soft);
+  --cam-banner-title:var(--cam-calm-ink);
+  --cam-banner-copy:var(--cam-calm-muted);
+  --cam-banner-border:var(--cam-calm-line);
+}
+html.dark body {
+  --cam-calm-bg:#081724;
+  --cam-calm-surface:#102b3e;
+  --cam-calm-soft:#0b2233;
+  --cam-calm-ink:#f4e8db;
+  --cam-calm-muted:#c5cdd2;
+  --cam-calm-line:rgba(197,205,210,.19);
+  --cam-calm-action:#d9ad84;
+  --cam-calm-accent:#e8bf79;
+  --cam-calm-up:#93d3aa;
+  --cam-calm-down:#f2a397;
+}
+/* The existing components consume the same surface, text and separator tokens. */
+html body :is(#camHomeJornada,#communityPicks,#aeOpinions,#freeTakes,#camDeskRail,#camDeskAside,#aeProfileDialog,#articleModal) {
+  --ds-surface:var(--cam-calm-surface)!important;
+  --ds-text:var(--cam-calm-ink)!important;
+  --ds-text-muted:var(--cam-calm-muted)!important;
+  --ds-line:var(--cam-calm-line)!important;
+  --ds-action:var(--cam-calm-action)!important;
+  --hj-card:var(--cam-calm-surface)!important;
+  --hj-soft:var(--cam-calm-soft)!important;
+  --hj-ink:var(--cam-calm-ink)!important;
+  --hj-text:var(--cam-calm-ink)!important;
+  --hj-muted:var(--cam-calm-muted)!important;
+  --hj-line:var(--cam-calm-line)!important;
+  --hj-accent:var(--cam-calm-action)!important;
+  --dk-card:var(--cam-calm-surface)!important;
+  --dk-line:var(--cam-calm-line)!important;
+  --dk-ink:var(--cam-calm-ink)!important;
+  --dk-muted:var(--cam-calm-muted)!important;
+  --pk-card:var(--cam-calm-surface)!important;
+  --pk-ink:var(--cam-calm-ink)!important;
+  --pk-muted:var(--cam-calm-muted)!important;
+  --pk-line:var(--cam-calm-line)!important;
+  --pk-serif:"Playfair Display",Georgia,serif!important;
+}
+html body :is(.cam-hj-heading,.cam-desk-panel-title,.cam-ov-name,.ae-top-take-open,.cam-pk-title,.ae-feed-take-open,.cam-nfl-heading h2) {
+  font-family:"Playfair Display",Georgia,serif!important;
+  font-weight:600!important;
+  line-height:1.28!important;
+  letter-spacing:normal!important;
+  text-transform:none!important;
+}
+html body :is(.cam-hj-news-summary,.cam-hj-excerpt,.ae-top-take-summary,.cam-ov-excerpt) {
+  color:var(--cam-calm-muted)!important;
+  font:400 14px/1.55 Inter,system-ui,sans-serif!important;
+  display:-webkit-box!important;
+  -webkit-box-orient:vertical!important;
+  -webkit-line-clamp:2!important;
+  line-clamp:2!important;
+  overflow:hidden!important;
+  border-radius:0!important;
+}
+html body :is(.cam-hj-card,.cam-ov-card,.ae-free-take-card,.ae-nfl-ranking-panel,.cam-desk-panel,.cam-ns-duel,.ae-chef-board) {
+  border-color:var(--cam-calm-line)!important;
+  border-radius:var(--cam-calm-radius)!important;
+  box-shadow:none!important;
+}
+html body :is(.cam-list-more,.cam-take-filter,.cam-desk-rail-toggle) {
+  min-height:44px!important;
+  font:600 14px/1.3 Inter,system-ui,sans-serif!important;
+  color:var(--cam-calm-action)!important;
+  letter-spacing:normal!important;
+  text-transform:none!important;
+  cursor:pointer!important;
+}
+html body .cam-list-more {
+  display:inline-flex!important;
+  align-items:center!important;
+  margin:8px 0 0!important;
+  padding:4px 8px!important;
+  border:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+html body :is(.cam-list-more,.cam-take-filter,.cam-desk-rail-toggle):focus-visible {
+  outline:2px solid var(--cam-calm-action)!important;
+  outline-offset:3px!important;
+}
+html body .cam-list-more[hidden] { display:none!important; }
+
+/* The same compact, optional shortcuts in every desktop section and on Home mobile. */
+html body #camHomeJornada > .cam-hj-top { display:none!important; }
+html body :is(.cam-hj-shortcuts-disclosure,.cam-desk-rail-in) {
+  border:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  padding:0!important;
+}
+html body .cam-desk-rail-toggle { width:fit-content!important; padding:8px 4px!important; }
+html body :is(.cam-hj-shortcuts-disclosure,.cam-desk-rail-in):not([open]) > .cam-hj-shortcuts { display:none!important; }
+html body[data-cam-desk] #camHomeJornada > .cam-hj-shortcuts-disclosure { display:none!important; }
+html body[data-cam-desk] #camDeskRail { margin:0 0 16px!important; }
+html body[data-cam-desk] #camDeskRail .cam-hj-shortcut {
+  min-height:52px!important;
+  flex-direction:row!important;
+  align-items:center!important;
+  justify-content:center!important;
+  padding:8px!important;
+  background:transparent!important;
+  border-color:var(--cam-calm-line)!important;
+  box-shadow:none!important;
+}
+html body[data-cam-desk] #camDeskRail .cam-hj-icon { width:26px!important; height:26px!important; background:none!important; }
+html body[data-cam-desk] #camDeskRail .cam-hj-badge { display:none!important; }
+html body #camDeskAside .cam-desk-rankings > summary { min-height:44px!important; margin:0!important; padding:8px 0!important; cursor:pointer!important; }
+html body #camDeskAside .cam-desk-rankings:not([open]) > .cam-desk-rankings-list { display:none!important; }
+html body #camDeskAside .cam-desk-rankings[open] > .cam-desk-rankings-list { margin-top:16px!important; }
+
+/* A single Takes destination; previews expand into the page, never a nested scroll. */
+html body #camHomeJornada [hidden] { display:none!important; }
+html body #camHomeJornada .cam-take-filters {
+  display:flex!important; gap:4px!important; flex-wrap:wrap!important;
+  margin:0 0 16px!important; padding:0!important;
+  border-bottom:1px solid var(--cam-calm-line)!important;
+}
+html body #camHomeJornada .cam-take-filter {
+  padding:8px 12px!important; border:0!important; border-bottom:2px solid transparent!important;
+  background:transparent!important; border-radius:0!important; box-shadow:none!important;
+  color:var(--cam-calm-muted)!important;
+}
+html body #camHomeJornada .cam-take-filter[aria-pressed="true"] { color:var(--cam-calm-ink)!important; border-bottom-color:var(--cam-calm-action)!important; }
+html body #camHomeJornada #camHomeTakesRecent[data-expanded="true"]:not([hidden]) { display:grid!important; grid-template-columns:repeat(3,minmax(0,1fr))!important; overflow:visible!important; margin:0!important; padding:0!important; }
+html body #camHomeJornada #camHomeTakesRecent[data-expanded="true"] > .cam-hj-item { display:flex!important; }
+html body #camHomeJornada #camHomeTakesRecent[data-expanded="true"] .cam-hj-take { width:100%!important; }
+html body #camHomeJornada .ae-home-take-feature {
+  margin:0!important; padding:0!important; width:100%!important;
+  max-height:none!important; height:auto!important;
+  background:transparent!important; border:0!important; box-shadow:none!important;
+}
+html body #camHomeJornada .ae-home-take-feature > header { display:none!important; }
+html body #camHomeJornada .ae-home-take-feature .ae-discovery-list {
+  display:grid!important; grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:16px!important; margin:0!important; padding:0!important;
+  height:auto!important; min-height:0!important; max-height:none!important; overflow:visible!important;
+}
+html body #camHomeJornada .ae-home-take-feature:not([data-expanded="true"]) .ae-discovery-list > li:nth-child(n+4) { display:none!important; }
+html body #camHomeJornada .ae-community-popular-take {
+  display:block!important;
+  margin:0!important; padding:16px!important; min-width:0!important;
+  border:1px solid var(--cam-calm-line)!important;
+  border-radius:var(--cam-calm-radius)!important;
+  background:var(--cam-calm-surface)!important; box-shadow:none!important;
+}
+html body #camHomeJornada .ae-top-take-open { font-size:19px!important; text-align:left!important; }
+html body #camHomeJornada .ae-top-take-title { margin:0!important; padding:0!important; }
+html body #camHomeJornada :is(.ae-top-take-sport,.ae-top-take-number) { display:none!important; }
+html body #camHomeJornada .ae-home-take-head { display:block!important; }
+html body #camHomeJornada :is(.ae-home-take-title-row,.ae-top-take-title,.ae-take-reference-footer,.ae-take-reference-identity) {
+  display:block!important; width:100%!important; max-width:none!important; min-width:0!important;
+}
+html body #camHomeJornada .ae-top-take-open { width:100%!important; max-width:none!important; }
+html body #camHomeJornada .ae-top-take-content { display:flex!important; flex-direction:column!important; width:100%!important; min-width:0!important; gap:10px!important; padding:0!important; background:none!important; border:0!important; }
+html body #camHomeJornada .ae-top-take-summary { width:100%!important; margin:0!important; }
+html body #camHomeJornada .ae-take-reference-avatar { display:none!important; }
+html body #camHomeJornada .ae-take-reference-footer { margin:0!important; }
+html body #camHomeJornada .ae-top-take-votes { flex-wrap:wrap!important; }
+html body #camHomeJornada .ae-home-take-feature .ae-discovery-empty { grid-column:1/-1!important; }
+html body :is(.cam-hj-empty,.cam-ranking-empty) { margin:0!important; padding:12px 0!important; color:var(--cam-calm-muted)!important; font:400 14px/1.5 Inter,system-ui,sans-serif!important; }
+
+/* Sport rankings retain their period controls and distinguish empty from error. */
+html:not(.cam-global-edit-active) body #aeSportTakeRanking .ae-nfl-ranking-panel[data-cam-content-state="empty"],
+html:not(.cam-global-edit-active) body #aeSportTakeLeaders .ae-sport-takes-group[data-cam-content-state="empty"],
+html:not(.cam-global-edit-active) body #communityLeaders .ae-community-scroll-group[data-cam-content-state="empty"] { display:none!important; }
+html body #aeSportTakeRanking { padding:16px!important; border-color:var(--cam-calm-line)!important; box-shadow:none!important; }
+html body :is(#camNflQuiniela,#camFootballQuiniela) { border:0!important; background:transparent!important; box-shadow:none!important; }
+html body :is(#camNflScore,#camFootballScore) { box-shadow:none!important; border-color:var(--cam-calm-line)!important; }
+html body :is(#camNflScore,#camFootballScore) > details { border:0!important; background:transparent!important; }
+
+/* Actualidad uses the same preview/expand behavior as Takes. */
+html body #communityLeaders .ae-community-scroll-viewport { height:auto!important; min-height:0!important; max-height:none!important; overflow:visible!important; }
+html body #communityLeaders .ae-community-scroll-group:not([data-expanded="true"]) .ae-community-scroll-entry:nth-child(n+2) { display:none!important; }
+html body #communityLeaders .ae-community-quote { font-size:16px!important; line-height:1.55!important; display:-webkit-box!important; -webkit-box-orient:vertical!important; -webkit-line-clamp:3!important; overflow:hidden!important; border-radius:0!important; }
+
+/* The reader preserves the article body; repeated introductions and ornaments recede. */
+html body #articleModal :is(.ae-article-eyebrow,.cam-chronicle-aside-kicker,.cam-chronicle-aside-signature,#camChronicleToolbarDate) { display:none!important; }
+html body #articleModal #camChronicleDek { font-size:18px!important; line-height:1.6!important; max-width:65ch!important; }
+html body #articleModal #modalBody > p:empty { display:none!important; }
+html body #articleModal #modalBody { font-size:18px!important; line-height:1.75!important; }
+html body #aeProfileDialog .cam-ov-grid { grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr))!important; gap:20px!important; }
+html body #aeProfileDialog .cam-ov-card { width:100%!important; max-width:none!important; }
+html body #aeProfileDialog .cam-ov-title { white-space:normal!important; -webkit-line-clamp:3!important; font-size:18px!important; line-height:1.35!important; }
+
+@media(min-width:761px) {
+  html body[data-cam-desk].ae-is-home #mainContent { --dk-pr:var(--dk-pad)!important; max-width:1120px!important; }
+  html body[data-cam-desk].ae-is-home #camDeskAside { position:static!important; width:100%!important; margin:24px 0 0!important; }
+  html body[data-cam-desk].ae-is-home #camDeskAside > .cam-desk-aside-in { position:static!important; }
+  html body[data-cam-desk].ae-is-home #camDeskAside .cam-desk-rankings-list { display:grid!important; grid-template-columns:repeat(2,minmax(0,1fr))!important; gap:24px!important; }
+  html body[data-cam-tab="picks"] #footballTakes { grid-template-columns:minmax(0,1fr)!important; grid-template-rows:none!important; }
+  html body[data-cam-tab="picks"] #communityPicks > .ae-chefs-dual-standings { display:none!important; }
+  html body[data-cam-tab="picks"] #communityPicks > #camPartyEntryPicks { grid-column:1!important; grid-row:auto!important; }
+  html body #camHomeJornada .cam-hj-section[data-row="jornada"] .cam-hj-row { display:grid!important; grid-template-columns:repeat(2,minmax(0,1fr))!important; overflow:visible!important; }
+  html body #camHomeJornada .cam-hj-game { width:100%!important; }
+}
+@media(max-width:760px) {
+  html body #camHomeJornada { gap:24px!important; margin-top:0!important; }
+  html body #camHomeJornada .ae-home-take-feature .ae-discovery-list { grid-template-columns:minmax(0,1fr)!important; }
+  html body #camHomeJornada #camHomeTakesRecent[data-expanded="true"]:not([hidden]) { grid-template-columns:minmax(0,1fr)!important; }
+  html body #camHomeJornada .cam-hj-heading { font-size:22px!important; }
+  html body #camHomeJornada .cam-hj-shortcuts { margin:8px 0 0!important; }
+  html body #camHomeJornada .cam-hj-shortcut { min-height:76px!important; background:transparent!important; box-shadow:none!important; }
+  html body #camHomeJornada .cam-hj-shortcut .cam-hj-badge { display:none!important; }
+}
 /* CAM SPORTS · Text hierarchy and confirmed-empty highlights, 9 Nov 2026.
    Empty is distinct from loading/error. Global editing keeps optional modules
    available so their headings and artwork can still be edited. This layer is

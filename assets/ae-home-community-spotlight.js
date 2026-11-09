@@ -145,13 +145,13 @@
   function scrollingLeaders(kind,rows,replyCounts){
     const questioned=kind==='questioned';
     const group=node('section',null,'ae-community-spotlight ae-community-scroll-group '+(questioned?'is-questioned':'is-supported'));
+    group.dataset.camContentState=rows.length?'ready':'empty';
     const viewport=node('div',null,'ae-community-scroll-viewport');
     viewport.dataset.communityScroll=kind;
-    viewport.tabIndex=0;
     viewport.setAttribute('role','list');
     viewport.setAttribute('aria-label',questioned?
-      'Hasta 10 comentarios más cuestionados. Desplaza hacia abajo para verlos.':
-      'Hasta 10 comentarios más apoyados. Desplaza hacia abajo para verlos.');
+      'Comentarios más cuestionados.':
+      'Comentarios más apoyados.');
     for(const row of rows){
       // Reuse the existing card unchanged: article links, votes, author and
       // reply actions still point to the original comment and publication.
@@ -167,6 +167,17 @@
       viewport.append(empty);
     }
     group.append(viewport);
+    if(rows.length>1){
+      const more=node('button','Ver más comentarios','cam-list-more');more.type='button';
+      more.setAttribute('aria-expanded','false');
+      more.addEventListener('click',()=>{
+        const expanded=group.dataset.expanded!=='true';
+        group.dataset.expanded=String(expanded);
+        more.setAttribute('aria-expanded',String(expanded));
+        more.textContent=expanded?'Ver menos':'Ver más comentarios';
+      });
+      group.append(more);
+    }
     return group;
   }
   // Una entrada completa debe caber en cada ventana con scroll vertical.

@@ -2694,7 +2694,6 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
               <!-- Separa los platos de los últimos Picks (9 nov 2026). -->
               <header id="cpFeedHeading" class="cam-picks-latest-head">
                 <h3>Últimos Picks</h3>
-                <p>Los pronósticos más recientes de la comunidad. Vota ▲ o ▼ y comenta.</p>
               </header>
               <p id="cpStatus" role="status" aria-live="polite"></p>
               <div id="cpFeed" role="region" aria-label="Últimos 20 Picks activos de la comunidad; desplázate para ver más publicaciones" aria-live="polite"></div>
@@ -3037,8 +3036,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
           <section id="camNflQuiniela" class="cam-nfl-quiniela" aria-labelledby="camNflTitle" hidden>
             <div class="cam-nfl-top">
               <header class="cam-nfl-heading">
-                <h2 id="camNflTitle">LA QUINIELA NFL</h2>
-                <p><strong>Aciertas: sumas. Fallas: restas.</strong> Tus puntos cuentan para la liga mensual.</p>
+                <h2 id="camNflTitle">La quiniela NFL</h2>
               </header>
               <div id="camNflNav" class="cam-nfl-nav" aria-label="Mi quiniela"></div>
             </div>
@@ -3062,8 +3060,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
           <section id="camFootballQuiniela" class="cam-nfl-quiniela cam-football-quiniela" aria-labelledby="camFootballTitle" hidden>
             <div class="cam-nfl-top">
               <header class="cam-nfl-heading">
-                <h2 id="camFootballTitle">LA QUINIELA DE FÚTBOL</h2>
-                <p><strong>Aciertas: sumas. Fallas: restas.</strong> Elige local, empate o visitante y compite en la liga mensual.</p>
+                <h2 id="camFootballTitle">La quiniela de fútbol</h2>
                 <!-- Arte decorativo independiente del texto: editable por tema desde Modo Edición. -->
                 <img class="cam-football-quiniela-illustration cam-football-quiniela-illustration--day" src="assets/cam-football-quiniela-day.svg" alt="" aria-hidden="true" width="300" height="240" loading="lazy" decoding="async">
                 <img class="cam-football-quiniela-illustration cam-football-quiniela-illustration--night" src="assets/cam-football-quiniela-night.svg" alt="" aria-hidden="true" width="300" height="240" loading="lazy" decoding="async">
@@ -3652,7 +3649,7 @@ html:not(.dark) #aeAuthIntroNotice small{color:#5b6d76}
                     <span id="modalCategory" class="text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full bg-pitch-100 text-pitch-800 border border-pitch-200">
                         CATEGORÍA
                     </span>
-                    <span id="camChronicleToolbarDate" class="cam-chronicle-toolbar-date"></span>
+                    <span id="camChronicleToolbarDate" class="cam-chronicle-toolbar-date" hidden aria-hidden="true"></span>
                     <button id="modalDeleteArticleBtn" type="button" onclick="deleteArticle(activeModalArticleId, event)" title="Eliminar publicación" aria-label="Eliminar publicación" class="hidden px-3 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-bold items-center gap-2 transition-colors">
                         <i class="fa-solid fa-trash-can"></i>
                         <span class="hidden sm:inline">Eliminar</span>
@@ -5139,6 +5136,17 @@ currentUser = {
 
 
         let articlePreviousFocus = null;
+        // Presentation only: stored article HTML and editor content stay intact.
+        function articleReadingSummary(summary, opening) {
+            const text = String(summary || '').replace(/\s+/g, ' ').trim();
+            const normalized = value => String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+            const lead = normalized(text);
+            if (lead.length >= 40 && normalized(opening).startsWith(lead.slice(0, 96))) return '';
+            if (text.length <= 240) return text;
+            const sentence = text.slice(0, 240).match(/^([\s\S]*[.!?])\s/);
+            return sentence ? sentence[1] : text.slice(0, 237).replace(/\s+\S*$/, '') + '…';
+        }
+
         function openArticleModal(articleId, options = {}) {
             document.getElementById('articleMissing').classList.add('hidden');
             const article = articles.find(a => String(a.id) === String(articleId));
@@ -5167,7 +5175,7 @@ currentUser = {
             const readingWords = document.getElementById('modalBody').textContent.trim().split(/\s+/).filter(Boolean).length;
             document.getElementById('camChronicleReadTime').textContent = `${Math.max(1, Math.ceil(readingWords / 220))} min`;
             const chronicleDek = document.getElementById('camChronicleDek');
-            const chronicleSummary = String(article.summary || '').trim();
+            const chronicleSummary = articleReadingSummary(article.summary, document.getElementById('modalBody').textContent);
             chronicleDek.textContent = chronicleSummary;
             chronicleDek.classList.toggle('hidden', !chronicleSummary);
             const chronicleToolbarDate = document.getElementById('camChronicleToolbarDate');
@@ -5549,7 +5557,7 @@ updateThemeButton();
 <script src="assets/cam-nfl-quiniela-logos.js?v=20261022-integration-1"></script>
 <script src="assets/cam-article-seo.js?v=20261105-link-preview-2"></script>
 <script src="assets/community.js?v=20261108-news-excerpts-1"></script>
-<script src="assets/ae-home-community-spotlight.js?v=20261018-reply-totals-1"></script>
+<script src="assets/ae-home-community-spotlight.js?v=20261109-calm-unity-1"></script>
 <script src="assets/champions.js?v=20261108-picks-display-1"></script>
 <script src="assets/ae-ranking-notes.js?v=20261105-resume-motion-1"></script>
 <script src="assets/ae-pick-capture.js?v=20261104-apuesta-real-1"></script>
@@ -5559,7 +5567,7 @@ updateThemeButton();
 <script src="assets/ae-category-visibility.js?v=20261016-dynamic-nav-1"></script>
 <script src="assets/ae-nfl-takes.js?v=20261015-3"></script>
 <script src="assets/free-takes.js?v=20261103-tarjetas-1"></script>
-<script src="assets/ae-take-rankings.js?v=20261020-difficulty-2"></script>
+<script src="assets/ae-take-rankings.js?v=20261109-calm-unity-1"></script>
 <script src="assets/cam-image-compress.js?v=20261021-1"></script>
 <script src="assets/ae-editorial-weekly.js?v=20261109-text-clarity-1"></script>
 
@@ -6475,7 +6483,7 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 </style>
 
 <!-- Componentes finales: móvil, conversación, parties, perfil y Takes; orden en performance-css-packs.json. -->
-<link rel="stylesheet" href="assets/cam-perf-app-panels.css?v=20261109-rango-avisos-1">
+<link rel="stylesheet" href="assets/cam-perf-app-panels.css?v=20261109-calm-unity-2">
 <script src="assets/cam-parties.js?v=20261104-perfil-claro-1"></script>
 <script src="assets/cam-sport-quiniela-loader.js?v=20261109-single-login-2"></script>
 <script src="assets/ae-season-predictions.js?v=20261021-champion-guide-1"></script>
@@ -6500,12 +6508,12 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 <!-- Pestañas dentro de NFL, Fútbol y Picks, y una dirección por sección (?s=nfl&v=quiniela); desde el 8 nov también en escritorio. -->
 <script src="assets/cam-mobile-sections.js?v=20261109-picks-chefs-historial-1"></script>
 <!-- Inicio como «Tu jornada» (3 nov, teléfono; desde el 8 nov también en escritorio con tira, rejillas y carriles). -->
-<script src="assets/cam-home-jornada.js?v=20261108-escritorio-1"></script>
+<script src="assets/cam-home-jornada.js?v=20261109-calm-unity-1"></script>
 <!-- NFL y Fútbol · La semana (4 nov, teléfono; desde el 8 nov también en escritorio, en columnas). Power Rankings en Noticias. -->
 <script src="assets/cam-nfl-semana.js?v=20261109-single-login-2"></script>
 <script src="assets/cam-football-semana.js?v=20261109-single-login-2"></script>
 <!-- Escritorio (8 nov): mismas secciones y pestañas que el teléfono, en columnas (cam-escritorio.css va en cam-perf-app-panels.css). -->
-<script defer src="assets/cam-escritorio.js?v=20261109-escritorio-4"></script>
+<script defer src="assets/cam-escritorio.js?v=20261109-calm-unity-1"></script>
 
 <script id="ae-home-news-carousel-motion">
 /* Movimiento ligero y reversible: sin clones, sin alterar enlaces, votos o artículos. */

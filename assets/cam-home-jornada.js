@@ -1,22 +1,10 @@
-/* CAM SPORTS · Inicio en el teléfono: «Tu jornada» (3 nov 2026).
-   En el teléfono, la portada pasa de ~6 pantallas a unas 2:
-     1. Atajos: Quiniela NFL · Quiniela Fútbol · Publicar Take · Sube tu Pick
-        (las quinielas con el número de partidos abiertos).
-     2. Filas deslizables, cada una solo si tiene algo que enseñar:
-        Cierran pronto (Pick del editor vigente y partidos abiertos de las dos
-        quinielas), Últimas noticias, Takes de la comunidad; al final, el módulo compartido de Picks.
-   Cada tarjeta abre lo de siempre (la quiniela, la noticia, la conversación
-   del Take, el Top 10). Los bloques de la portada de siempre se ocultan con
-   la clase cam-home-jornada en <body> (reglas en cam-home-jornada.css).
-   Escritorio (8 nov 2026): el mismo módulo en todos los anchos; en pantalla
-   grande cam-escritorio.js/.css convierten las filas en tira con flechas y
-   rejillas, y llevan los atajos al carril izquierdo.
-
-   Cuota: noticias y Picks salen de lo que la página
-   ya cargó. Solo se piden los partidos abiertos (dos consultas pequeñas + los
-   escudos de fútbol) y los últimos Takes, una vez al abrir Inicio y de nuevo
-   como mucho cada 5 minutos (también en escritorio, aprobado el 8 nov 2026).
-   Sin temporizadores. */
+/* CAM SPORTS · Inicio: lectura y comunidad, 9 nov 2026.
+   Una noticia principal y dos secundarias; la próxima cita de cada quiniela;
+   un bloque de Takes con Recientes, Populares e Impopulares y acceso al resto.
+   Atajos opcionales en un desplegable. Se reutilizan los listados originales,
+   sus conversaciones y sus votos; vuelven a su sitio al salir de Inicio.
+   Los calendarios y sus contadores siguen completos. Se conservan la caché de
+   cinco minutos y las consultas públicas existentes, sin temporizadores. */
 (() => {
   'use strict';
 
@@ -31,7 +19,7 @@
   const state = {
     loadedAt: 0, loading: false,
     nfl: [], football: [], teams: new Map(), gamesOk: false,
-    takes: [], takesOk: false
+    takes: [], takesOk: false, takesError: false
   };
 
   /* ---------- utilidades ---------- */
@@ -173,11 +161,80 @@
     return { section, list };
   }
   const rows = {
-    jornada: row('jornada', 'Cierran pronto'),
+    jornada: row('jornada', 'Quinielas', { text: 'Ver partidos ›', action: () => goQuiniela(rows.jornada.section.dataset.nextSport || 'nfl') }),
     news: row('news', 'Últimas noticias', { text: 'Ver todas ›', aria: 'Ver todas las noticias', newsCategory: 'Todas' }),
     takes: row('takes', 'Takes de la comunidad', { text: 'Publicar ›', aria: 'Publicar un Take', action: openTakeComposer })
   };
-  root.append(head, shortcuts, ...Object.values(rows).map(r => r.section));
+  // La lectura abre Inicio. Los partidos y la comunidad se descubren después.
+  const shortcutDisclosure = el('details', null, 'cam-hj-shortcuts-disclosure');
+  shortcutDisclosure.append(el('summary', 'Atajos', 'cam-desk-rail-toggle'), shortcuts);
+  root.append(head, shortcutDisclosure, rows.news.section, rows.jornada.section, rows.takes.section);
+
+  // Una sola comunidad: reutiliza los listados reales y sus votos/respuestas.
+  // Los controles son botones de filtro; no hay paneles con scroll interior.
+  let takeView = 'recent';
+  let recentExpanded = false;
+  const takeViews = new Map();
+  const takeFilters = el('div', null, 'cam-take-filters', { role: 'group', 'aria-label': 'Orden de los Takes' });
+  rows.takes.list.id = 'camHomeTakesRecent';
+  const takeButtons = new Map();
+  for (const [key, label, id] of [
+    ['recent', 'Recientes', 'camHomeTakesRecent'],
+    ['positive', 'Populares', 'aeHomeTakesPopular'],
+    ['negative', 'Impopulares', 'aeHomeTakesUnpopular']
+  ]) {
+    const button = el('button', label, 'cam-take-filter', { type: 'button', 'aria-controls': id, 'aria-pressed': String(key === takeView) });
+    button.addEventListener('click', () => selectTakeView(key));
+    takeButtons.set(key, button);
+    takeFilters.append(button);
+  }
+  rows.takes.section.querySelector('.cam-hj-head').after(takeFilters);
+  const recentMore = el('button', 'Ver todos ›', 'cam-list-more', { type: 'button', 'aria-expanded': 'false', 'aria-controls': 'camHomeTakesRecent' });
+  recentMore.hidden = true;
+  recentMore.addEventListener('click', () => { recentExpanded = !recentExpanded; paintTakes(); });
+  rows.takes.section.append(recentMore);
+  function selectTakeView(key) {
+    takeView = key;
+    rows.takes.section.dataset.takeView = key;
+    rows.takes.list.hidden = key !== 'recent';
+    recentMore.hidden = key !== 'recent' || state.takes.length <= 3;
+    for (const [view, button] of takeButtons) button.setAttribute('aria-pressed', String(view === key));
+    for (const [view, entry] of takeViews) entry.node.hidden = view !== key;
+  }
+  function mountTakeViews() {
+    for (const [key, id] of [['positive', 'aeHomeTakesPopular'], ['negative', 'aeHomeTakesUnpopular']]) {
+      const node = document.getElementById(id);
+      if (!node || takeViews.has(key)) continue;
+      const mark = document.createComment(' cam-home: ' + id + ' ');
+      node.before(mark);
+      takeViews.set(key, { node, mark });
+      rows.takes.section.append(node);
+      const list = node.querySelector('ol');
+      const more = el('button', 'Ver todos ›', 'cam-list-more', { type: 'button', 'aria-expanded': 'false', 'aria-controls': list.id });
+      more.addEventListener('click', () => {
+        const expanded = node.dataset.expanded !== 'true';
+        node.dataset.expanded = String(expanded);
+        more.setAttribute('aria-expanded', String(expanded));
+        more.textContent = expanded ? 'Ver menos' : 'Ver todos ›';
+      });
+      node.append(more);
+      const syncMore = () => { more.hidden = list.querySelectorAll('.ae-top-take').length <= 3; };
+      const observer = new MutationObserver(syncMore);
+      observer.observe(list, { childList: true });
+      takeViews.get(key).observer = observer;
+      syncMore();
+    }
+    selectTakeView(takeView);
+  }
+  function returnTakeViews() {
+    for (const { node, mark, observer } of takeViews.values()) {
+      observer.disconnect();
+      node.hidden = false;
+      node.querySelector('.cam-list-more')?.remove();
+      if (mark.parentNode) mark.replaceWith(node);
+    }
+    takeViews.clear();
+  }
 
   function place() {
     const tabs = document.getElementById('camSectionTabs');
@@ -241,34 +298,16 @@
     card.addEventListener('click', () => goQuiniela(sport));
     return card;
   }
-  function moreCard(label, sub, action, className) {
-    const card = el('button', null, 'cam-hj-card cam-hj-more-card' + (className ? ' ' + className : ''), { type: 'button' });
-    card.append(el('span', label, 'cam-hj-card-title'));
-    if (sub) card.append(el('span', sub, 'cam-hj-card-sub'));
-    card.append(el('span', '›', 'cam-hj-more-arrow', { 'aria-hidden': 'true' }));
-    card.addEventListener('click', action);
-    return card;
-  }
-  // Las dos quinielas se intercalan (la más próxima primero) para que una
-  // jornada llena de una competición no esconda la otra al final de la fila.
-  function interleave(a, b, limit) {
-    const out = [];
-    let i = 0, j = 0;
-    let takeA = !b.length || (a.length && new Date(a[0].kickoff) <= new Date(b[0].kickoff));
-    while (out.length < limit && (i < a.length || j < b.length)) {
-      if ((takeA && i < a.length) || j >= b.length) out.push(a[i++]);
-      else out.push(b[j++]);
-      takeA = !takeA;
-    }
-    return out;
-  }
   function paintJornada() {
     const cards = [];
     const nfl = state.nfl.filter(isOpen).map(g => ({ ...g, sport: 'nfl' }));
     const football = state.football.filter(isOpen).map(g => ({ ...g, sport: 'football' }));
-    for (const g of interleave(nfl, football, 10)) cards.push(gameCard(g, g.sport));
-    if (nfl.length) cards.push(moreCard('Quiniela NFL', nfl.length + (nfl.length === 1 ? ' partido abierto' : ' partidos abiertos'), () => goQuiniela('nfl')));
-    if (football.length) cards.push(moreCard('Quiniela de Fútbol', football.length + (football.length === 1 ? ' partido abierto' : ' partidos abiertos'), () => goQuiniela('football')));
+    // Muestra la próxima cita de cada deporte. Todo el calendario permanece en
+    // su quiniela y los contadores de los atajos siguen contando todos los juegos.
+    const upcoming = [nfl[0], football[0]].filter(Boolean)
+      .sort((a, b) => new Date(a.kickoff) - new Date(b.kickoff));
+    for (const g of upcoming) cards.push(gameCard(g, g.sport));
+    rows.jornada.section.dataset.nextSport = upcoming[0]?.sport || 'nfl';
     fill(rows.jornada, cards);
     badge(nflShortcut, nfl.length, nfl.length === 1 ? 'partido abierto' : 'partidos abiertos');
     badge(footballShortcut, football.length, football.length === 1 ? 'partido abierto' : 'partidos abiertos');
@@ -303,7 +342,7 @@
   }
   function paintNews() {
     const list = typeof articles !== 'undefined' && Array.isArray(articles) ? articles : [];
-    const shown = list.filter(a => a && a.remote && a.id && a.title).slice(0, 8);
+    const shown = list.filter(a => a && a.remote && a.id && a.title).slice(0, 3);
     fill(rows.news, shown.map(newsCard));
   }
 
@@ -326,11 +365,14 @@
     return card;
   }
   function paintTakes() {
-    const cards = state.takes.slice(0, 8).map(takeCard);
-    if (state.takesOk || cards.length) {
-      cards.push(moreCard('Publica tu Take', 'Opina y suma puntos si aciertas', openTakeComposer, 'cam-hj-invite'));
-    }
+    const cards = state.takes.slice(0, recentExpanded ? state.takes.length : 3).map(takeCard);
+    if (!cards.length) cards.push(el('p', state.takesOk ? 'Aún no hay Takes.' : state.takesError ? 'No se pudieron cargar los Takes.' : 'Cargando Takes…', 'cam-hj-empty'));
     fill(rows.takes, cards);
+    rows.takes.list.dataset.expanded = String(recentExpanded);
+    recentMore.hidden = takeView !== 'recent' || state.takes.length <= 3;
+    recentMore.setAttribute('aria-expanded', String(recentExpanded));
+    recentMore.textContent = recentExpanded ? 'Ver menos' : 'Ver todos ›';
+    rows.takes.list.dataset.camContentState = state.takesOk ? (state.takes.length ? 'ready' : 'empty') : state.takesError ? 'error' : 'loading';
   }
 
   /* ---------- datos ---------- */
@@ -353,6 +395,7 @@
       if (!nfl.error) state.nfl = (nfl.data || []).filter(isOpen).sort((a, b) => new Date(a.kickoff) - new Date(b.kickoff));
       if (!football.error) state.football = (football.data || []).filter(isOpen).sort((a, b) => new Date(a.kickoff) - new Date(b.kickoff));
       state.takesOk = !takes.error;
+      state.takesError = Boolean(takes.error);
       if (!takes.error) state.takes = Array.isArray(takes.data) ? takes.data : [];
       // Escudos solo de los partidos que se van a ver.
       const ids = [...new Set(state.football.slice(0, 12).flatMap(g => [g.home_id, g.away_id]).map(String))]
@@ -363,6 +406,7 @@
       }
       state.loadedAt = now();
     } catch (error) {
+      if (!state.takesOk) state.takesError = true;
       console.warn('Tu jornada: no se pudieron cargar los partidos o los Takes.', error);
     } finally {
       state.loading = false;
@@ -386,9 +430,10 @@
       root.hidden = !on;
       document.body.classList.toggle('cam-home-jornada', on);
       if (on) {
+        mountTakeViews();
         paint();
         void load(false);
-      }
+      } else returnTakeViews();
     }
   }
   const repaint = () => { if (on) paint(); };

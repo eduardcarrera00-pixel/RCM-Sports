@@ -141,6 +141,8 @@
     if(!best||!worst)return;
     best.replaceChildren(sportStandingMessage('Cargando clasificación…'));
     worst.replaceChildren(sportStandingMessage('Cargando clasificación…'));
+    $('aeSportTakeRanking')?.querySelector('.cam-ranking-empty')?.remove();
+    for(const list of [best,worst])list.closest('.ae-nfl-ranking-panel').dataset.camContentState='loading';
     const args={p_sport:selectedSport,p_period:period};
     // Both independent public RPCs already support NFL and Fútbol.
     const [winners,losers]=await Promise.allSettled([
@@ -150,10 +152,12 @@
     if(seq!==rankRequest.sport||sport!==selectedSport||rankState.sport!==period)return;
     for(const [outcome,list,isRookie] of [[winners,best,false],[losers,worst,true]]){
       if(outcome.status!=='fulfilled'||outcome.value.error){
+        list.closest('.ae-nfl-ranking-panel').dataset.camContentState='error';
         list.replaceChildren(sportStandingMessage('No se pudo cargar la clasificación.'));
         continue;
       }
       const rows=(outcome.value.data||[]).slice(0,10);
+      list.closest('.ae-nfl-ranking-panel').dataset.camContentState=rows.length?'ready':'empty';
       const empty=isRookie?
         (period==='month'?'Este mes aún no hay Takes fallados.':'Todavía no hay Takes fallados.'):
         (period==='month'?'Este mes aún no hay Takes puntuados.':'Todavía no hay Takes puntuados.');
@@ -164,6 +168,11 @@
         [sportStandingMessage(empty)]));
       // Guardar la posición sólo tras una respuesta válida.
       previousPositions.set(snapshotKey,new Map(rows.map((r,i)=>[String(r.user_id||r.username||''),i+1])));
+    }
+    if([best,worst].every(list=>list.closest('.ae-nfl-ranking-panel').dataset.camContentState==='empty')){
+      const message=element('p',period==='month'?'Este mes aún no hay Takes puntuados.':'Aún no hay Takes puntuados.','cam-ranking-empty');
+      message.setAttribute('role','status');
+      $('aeSportTakeRanking').append(message);
     }
   }
   async function loadRanking(where){

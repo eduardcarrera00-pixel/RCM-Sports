@@ -1,5 +1,29 @@
 # AE SPORTS · Guía visual v1
 
+### Calma y unidad de lectura · 9 nov 2026
+
+Todas las vistas comparten superficie, texto, separador, acento y jerarquía en
+`assets/cam-display-clarity.css`, sin otra petición CSS. Se conservan los recursos
+de marca y los controles reales. Los atajos se abren con un desplegable común;
+el escritorio deja de reservar una tercera columna. Inicio abre con tres noticias,
+seguido de la próxima cita de cada quiniela. Los contadores siguen contando el
+calendario completo, accesible desde las tarjetas y los atajos.
+
+Los Takes de Inicio comparten Recientes · Populares · Impopulares. Se reutilizan
+los nodos originales, con sus votos, conversaciones y perfiles; vuelven a su sitio
+al salir. Tres entradas iniciales y «Ver todos» para el resto, sin scroll vertical
+interior. Actualidad usa el mismo despliegue progresivo de comentarios. Las tablas
+vacías de Takes conservan el selector de periodo y un mensaje breve; los errores
+siguen siendo visibles. En Picks, las tablas completas se consultan en Chefs.
+
+El lector conserva el HTML original y el editor. Solo omite la entradilla cuando
+repite el comienzo del cuerpo y acorta las demás a una introducción breve. Una fecha
+visible, cuerpo de 18 px y detalles secundarios discretos. El resumen del perfil
+aprovecha el ancho disponible sin agregar estadísticas. Día y noche comparten las
+mismas reglas. Pruebas: `npm run test:clarity`, `npm run test:editor`,
+`npm run test:performance` y revisión visual adaptable.
+
+
 ### Textos más claros · 9 nov 2026
 
 NFL y Fútbol comparten «Takes populares» y «Takes impopulares» con Inicio.

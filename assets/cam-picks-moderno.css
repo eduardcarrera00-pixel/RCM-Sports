@@ -514,7 +514,7 @@ html body #mainContent #footballTakes #communityPicks #cpFeedFooter #cpViewAll {
 html body #mainContent #footballTakes #communityPicks #cpFeedFooter #cpViewAll:hover { background: var(--pk-soft) !important; }
 
 /* ---------- Mejores y Peores platos: los banners de siempre, filas nuevas ----------
-   Cada tablero conserva su banner (picks.platos-mejores-*/peores-*) y su marco;
+   Cada tablero conserva su banner (picks.platos-mejores y peores) y su marco;
    la lista ya no tiene ventana con scroll: 5 filas y «Ver los N». */
 html body #mainContent #footballTakes #communityPicks > .ae-picks-rail {
   height: auto !important;

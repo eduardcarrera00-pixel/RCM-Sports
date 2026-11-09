@@ -1,7 +1,7 @@
 /* CAM SPORTS · Escritorio (8 nov 2026).
    Las mismas secciones y pestañas del teléfono, compuestas para pantalla
    grande (ESPN / Fox / NFL.com): cabecera con secciones, sub-barra fija de
-   pestañas y hasta tres columnas (atajos · contenido · carril derecho).
+   pestañas y hasta dos columnas, con los atajos en un desplegable.
    Solo existe con body[data-cam-desk], que pone assets/cam-escritorio.js
    fuera del teléfono; nada aquí afecta a ≤ 760 px.
 
@@ -163,7 +163,7 @@
       outline-offset: -6px !important;
     }
 
-    /* ---------- rejilla: una columna (761–1023), dos (1024–1279), tres (≥ 1280) ---------- */
+    /* ---------- rejilla: una columna (761–1023), hasta dos (≥ 1024) ---------- */
     html body[data-cam-desk] #mainContent {
       --dk-pl: var(--dk-pad);
       --dk-pr: var(--dk-pad);
@@ -437,10 +437,10 @@
       padding: 18px 0 20px !important;
       border: 0 !important;
       /* Banda y filetes hasta los bordes de la pantalla, sin scroll horizontal. */
-      border-image: linear-gradient(to bottom, var(--dk-line) 1px, var(--dk-band) 1px, var(--dk-band) calc(100% - 1px), var(--dk-line) calc(100% - 1px)) fill 0 / 0 / 0 100vmax !important;
-      background: var(--dk-band) !important;
+      border-image: none !important;
+      background: transparent !important;
       /* Su sitio empieza donde empieza la página: sin hueco sobre la tira. */
-      margin-top: calc(-1 * var(--cam-desk-pull, 32px)) !important;
+      margin-top: 0 !important;
     }
     html body[data-cam-desk] #camHomeJornada .cam-hj-section[data-row="jornada"] > .cam-hj-head { margin-bottom: 12px !important; }
     html body[data-cam-desk] #camHomeJornada .cam-hj-section[data-row="jornada"] .cam-hj-row {
@@ -818,7 +818,7 @@
 
   /* ---------- 1024–1279 px: contenido + carril derecho fijo ---------- */
   @media (min-width: 1024px) {
-    html body[data-cam-desk] #mainContent { max-width: calc(1320px + 2 * var(--dk-pad)) !important; }
+    html body[data-cam-desk] #mainContent { max-width: calc(1248px + 2 * var(--dk-pad)) !important; }
     html body[data-cam-desk][data-cam-desk-aside] #mainContent { --dk-pr: calc(var(--dk-pad) + var(--dk-aside) + var(--dk-gap)); }
     html body[data-cam-desk] #camDeskAside {
       position: absolute !important;
@@ -864,63 +864,6 @@
       position: sticky !important;
       top: var(--cam-desk-stick, 150px) !important;
       margin: 0 !important;
-    }
-  }
-
-  /* ---------- ≥ 1280 px: tres columnas ---------- */
-  @media (min-width: 1280px) {
-    html body[data-cam-desk] #mainContent { --dk-pl: calc(var(--dk-pad) + var(--dk-rail) + var(--dk-gap)); }
-    html body[data-cam-desk] #camDeskRail {
-      position: absolute !important;
-      top: var(--cam-desk-top, 32px) !important;
-      bottom: 32px !important;
-      left: var(--dk-pad) !important;
-      width: var(--dk-rail) !important;
-      margin: 0 !important;
-    }
-    html body[data-cam-desk] #camDeskRail > .cam-desk-rail-in {
-      position: sticky !important;
-      top: var(--cam-desk-stick, 150px) !important;
-    }
-    html body[data-cam-desk] #camDeskRail .cam-desk-rail-title {
-      position: static !important;
-      width: auto !important; height: auto !important;
-      margin: 0 0 10px !important;
-      overflow: visible !important; clip: auto !important;
-      color: var(--dk-muted) !important;
-      font: 800 11px/1.3 Inter, system-ui, sans-serif !important;
-      letter-spacing: .1em !important;
-      text-transform: uppercase !important;
-    }
-    html body[data-cam-desk] #camDeskRail .cam-hj-shortcuts {
-      grid-template-columns: minmax(0, 1fr) !important;
-      gap: 8px !important;
-    }
-    /* La semana: el carril va por fuera de la rejilla, sin fila propia. */
-    html body[data-cam-desk][data-cam-tabs="sport"][data-cam-tab="semana"] #freeTakes {
-      grid-template-areas: "head head" "duel live" "duel score" "quin quin" !important;
-      grid-template-rows: auto auto 1fr auto !important;
-    }
-    html body[data-cam-desk][data-cam-tabs="sport"][data-cam-tab="semana"] #freeTakes:not(:has(.cam-ns-live)) {
-      grid-template-areas: "head head" "duel score" "duel ." "quin quin" !important;
-    }
-    html body[data-cam-desk][data-cam-tabs="sport"][data-cam-tab="semana"] #freeTakes:not(:has(.cam-ns-live)):not(:has(> :is(#camNflScore, #camFootballScore):not(:empty))) {
-      grid-template-areas: "head head" "duel duel" "duel duel" "quin quin" !important;
-    }
-    html body[data-cam-desk] #camDeskRail .cam-hj-shortcut {
-      flex-direction: row !important;
-      align-items: center !important;
-      gap: 10px !important;
-      min-height: 52px !important;
-      padding: 8px 12px 8px 8px !important;
-      text-align: left !important;
-      font-size: 13.5px !important;
-    }
-    html body[data-cam-desk] #camDeskRail .cam-hj-shortcut[data-desk-label]::after { order: 2 !important; }
-    html body[data-cam-desk] #camDeskRail .cam-hj-badge {
-      position: static !important;
-      order: 3 !important;
-      margin: 0 0 0 auto !important;
     }
   }
 

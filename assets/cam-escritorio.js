@@ -5,9 +5,9 @@
      · cabecera: Inicio · NFL · Fútbol · Picks · Actualidad · Perfil (los
        mismos botones; Inicio y Perfil son los de la barra del teléfono);
      · sub-barra de pestañas fija bajo la cabecera (la misma #camSectionTabs);
-     · ≥ 1280 px: carril de atajos · contenido · carril derecho fijo;
-       1024–1279 px: contenido + carril derecho, los atajos arriba;
-       761–1023 px: una columna (el carril derecho va al final).
+     · atajos opcionales en todas las secciones;
+     · una columna de lectura en Inicio; en deportes, hasta dos columnas;
+     · 761–1023 px: una columna (los destacados van al final).
    No copia HTML ni lógica: los atajos son los de «Tu jornada» (se mueven al
    carril y vuelven a su sitio en el teléfono) y el carril derecho muestra lo
    que la página ya cargó (Power Rankings de #rankingList y #championsList).
@@ -65,8 +65,8 @@
 
   /* ---------- 2. Carriles ---------- */
   const rail = el('aside', null, 'cam-desk-rail', { id: 'camDeskRail', 'aria-labelledby': 'camDeskRailTitle' });
-  const railIn = el('div', null, 'cam-desk-rail-in');
-  railIn.append(el('h2', 'Atajos', 'cam-desk-rail-title', { id: 'camDeskRailTitle' }));
+  const railIn = el('details', null, 'cam-desk-rail-in');
+  railIn.append(el('summary', 'Atajos', 'cam-desk-rail-toggle', { id: 'camDeskRailTitle' }));
   rail.append(railIn);
   const aside = el('aside', null, 'cam-desk-aside', { id: 'camDeskAside', 'aria-label': 'Destacados' });
   const asideIn = el('div', null, 'cam-desk-aside-in');
@@ -117,9 +117,9 @@
 
   /* ---------- 3. Carril derecho: qué lleva cada página ---------- */
   // Power Rankings compactos (top 5) con las listas que la página ya pintó.
-  const rankings = el('section', null, 'cam-desk-panel cam-desk-rankings', { 'aria-labelledby': 'camDeskRankingsTitle' });
+  const rankings = el('details', null, 'cam-desk-panel cam-desk-rankings', { 'aria-labelledby': 'camDeskRankingsTitle' });
   const rankingsList = el('div', null, 'cam-desk-rankings-list');
-  rankings.append(el('h2', 'Power Rankings', 'cam-desk-panel-title', { id: 'camDeskRankingsTitle' }), rankingsList);
+  rankings.append(el('summary', 'Power Rankings', 'cam-desk-panel-title', { id: 'camDeskRankingsTitle' }), rankingsList);
   function initials(name) {
     return String(name || '?').split(/\s+/).filter(Boolean).map(s => s[0]).slice(0, 3).join('').toUpperCase();
   }
@@ -233,7 +233,7 @@
 
   /* ---------- 4. Inicio: «Cierran pronto» a todo el ancho, con flechas ---------- */
   const strip = () => document.querySelector('#camHomeJornada .cam-hj-section[data-row="jornada"]');
-  const arrows = el('div', null, 'cam-desk-arrows', { role: 'group', 'aria-label': 'Mover «Cierran pronto»' });
+  const arrows = el('div', null, 'cam-desk-arrows', { role: 'group', 'aria-label': 'Mover partidos de quiniela' });
   const prev = el('button', '‹', 'cam-desk-arrow', { type: 'button', 'aria-label': 'Partidos anteriores' });
   const next = el('button', '›', 'cam-desk-arrow', { type: 'button', 'aria-label': 'Más partidos' });
   arrows.append(prev, next);
@@ -256,7 +256,6 @@
   function addArrows() {
     const section = strip();
     if (!section) return;
-    section.dataset.camDeskFull = '';
     const head = section.querySelector('.cam-hj-head');
     const list = section.querySelector('.cam-hj-row');
     if (head && arrows.parentNode !== head) head.append(arrows);
@@ -284,7 +283,7 @@
     const bar = document.getElementById('camSectionTabs');
     if (p === 'home' && root && !root.hidden) {
       // Inicio: los atajos siguen a la tira «Cierran pronto» (o a la cabecera de Tu jornada).
-      const after = shown(strip()) ? strip() : root.querySelector('.cam-hj-top');
+      const after = root.querySelector('.cam-hj-top');
       if (after && after.nextSibling !== rail) after.after(rail);
       else if (!after && root.firstChild !== rail) root.prepend(rail);
     } else if (/^(nfl|futbol):semana$/.test(p) && semana(p)) {
@@ -329,7 +328,7 @@
     const asideH = asideIn.getBoundingClientRect().height;
     const room = window.innerHeight - stick - 16;
     setVar('--cam-desk-stick-aside', px(asideH > room ? Math.min(stick, window.innerHeight - asideH - 16) : stick));
-    const railH = wide.matches && !rail.hidden ? railIn.getBoundingClientRect().height : 0;
+    const railH = 0; // Atajos está en el flujo, sin una tercera columna fija.
     const sideH = medium.matches && !aside.hidden ? asideH : 0;
     const bottom = parseFloat(mainStyle.paddingBottom) || 0;
     setVar('--cam-desk-minh', px(Math.max(railH, sideH) ? top + Math.max(railH, sideH) + bottom : 0));
