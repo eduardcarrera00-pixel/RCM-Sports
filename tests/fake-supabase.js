@@ -14,16 +14,19 @@
     const q = {};
     const chain = ['select', 'order', 'limit', 'range', 'not', 'is', 'gte', 'lte', 'gt', 'lt', 'ilike', 'like', 'match', 'filter', 'or', 'contains', 'overlaps', 'abortSignal'];
     for (const name of chain) q[name] = () => q;
+    // .is(col, null) filtra de verdad (solo lo usan los avisos: read_at sin leer).
+    q.is = (col, val) => { if (val === null) state.filters.push(r => r[col] == null); return q; };
     q.eq = (col, val) => { state.filters.push(r => r[col] === val); return q; };
     q.neq = (col, val) => { state.filters.push(r => r[col] !== val); return q; };
     q.in = (col, vals) => { state.filters.push(r => vals.includes(r[col])); return q; };
-    for (const name of ['insert', 'update', 'upsert', 'delete']) q[name] = payload => { fake.calls.push({ table, op: name, payload }); return q; };
+    for (const name of ['insert', 'update', 'upsert', 'delete']) q[name] = payload => { fake.calls.push({ table, op: name, payload }); if (name === 'update') state.update = payload; return q; };
     const rows = () => (fake.tables[table] || []).filter(r => state.filters.every(f => f(r)));
     // window.__fake.tableErrors[tabla] = 'mensaje' simula una tabla que aún no existe.
     const failure = () => fake.tableErrors && fake.tableErrors[table] ? { message: fake.tableErrors[table] } : null;
     q.single = () => Promise.resolve(failure() ? { data: null, error: failure() } : { data: rows()[0] || null, error: null });
     q.maybeSingle = q.single;
-    q.then = (ok, ko) => Promise.resolve(failure() ? { data: null, error: failure(), count: 0 } : { data: rows(), error: null, count: rows().length }).then(ok, ko);
+    // window.__fake.applyUpdates = true: los update cambian las filas filtradas (opcional).
+    q.then = (ok, ko) => { if (state.update && fake.applyUpdates && !failure()) { for (const r of rows()) Object.assign(r, state.update); state.update = null; } return Promise.resolve(failure() ? { data: null, error: failure(), count: 0 } : { data: rows(), error: null, count: rows().length }).then(ok, ko); };
     return q;
   }
   const auth = {

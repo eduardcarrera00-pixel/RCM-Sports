@@ -45,7 +45,10 @@
   function labelProfile() {
     const name = (typeof currentUser !== 'undefined' && currentUser?.username) ||
       (typeof currentAdmin !== 'undefined' && currentAdmin?.name) || '';
-    const label = signedIn() ? (name ? 'Mi perfil, ' + name : 'Mi perfil') : 'Perfil: iniciar sesión o crear cuenta';
+    let label = signedIn() ? (name ? 'Mi perfil, ' + name : 'Mi perfil') : 'Perfil: iniciar sesión o crear cuenta';
+    // ae-notifications.js deja aquí los avisos sin leer (el globito sobre el icono).
+    const unread = signedIn() ? Number(profile.dataset.unread) || 0 : 0;
+    if (unread) label += ', ' + (unread === 1 ? '1 notificación sin leer' : unread + ' notificaciones sin leer');
     profile.setAttribute('aria-label', label);
     profile.title = signedIn() ? 'Mi perfil' : 'Iniciar sesión';
   }

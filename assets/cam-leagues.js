@@ -42,7 +42,12 @@ function stateText(r){
   return 'En zona de permanencia';
 }
 
-let profileId=null,profileTab='perfil',profileData=null,profileTicket=0,selected=null;
+// El rango que se muestra de alguien es el más alto de sus ligas (empate: Picks, NFL, Fútbol).
+function topRank(ranks){
+  const order=Object.keys(COMPETITIONS);
+  return [...(ranks||[])].sort((a,b)=>level(b.rank)-level(a.rank)||order.indexOf(a.competition)-order.indexOf(b.competition))[0]||null;
+}
+let profileId=null,profileTab='perfil',profileData=null,profileTicket=0,selected=null,expandNext=false;
 const cache=new Map(),pending=new Map();
 async function profile(user,force=false){
   const hit=cache.get(user);
@@ -127,8 +132,10 @@ function renderProfile(){
     log.append(list);
   }
   disclosure.append(log,rules());
-  const preferred=profileData.ranks.find(r=>r.competition===selected)||[...profileData.ranks].sort((a,b)=>level(b.rank)-level(a.rank)||Object.keys(COMPETITIONS).indexOf(a.competition)-Object.keys(COMPETITIONS).indexOf(b.competition))[0];
+  const preferred=profileData.ranks.find(r=>r.competition===selected)||topRank(profileData.ranks);
   if(preferred)chooseRank(preferred);
+  // Desde el icono del rango de la cabecera: el detalle llega abierto.
+  if(expandNext&&profileTab==='perfil'&&profileId===headerUser){expandNext=false;disclosure.open=true;}
 }
 async function onProfile(event){
   const detail=event.detail||{};
@@ -142,6 +149,7 @@ async function onProfile(event){
     const data=await profile(user);
     if(ticket!==profileTicket||profileId!==user||!$('aeProfileDialog')?.open)return;
     profileData=data;renderProfile();
+    if(user===headerUser)paintHeader(data);
   }catch{
     if(ticket!==profileTicket)return;
     panel.replaceChildren(el('p','No se pudieron cargar las ligas.','cam-league-status'),btn('Reintentar','cam-league-link',()=>{profileId=null;onProfile({detail});}));
@@ -217,7 +225,49 @@ function mountEntry(host,comp){
   const link=btn('Liga CAM ›','cam-league-entry',()=>openBoard(comp));
   if(host.tagName==='OL'){if(!host.previousElementSibling?.classList.contains('cam-league-entry'))host.before(link);}else host.prepend(link);
 }
+/* Cabecera (9 nov 2026): solo el icono del rango actual, sin texto; el dibujo
+   y el color dicen el rango y el nombre va en aria-label. Sin sesión no se
+   muestra. Una llamada al iniciar sesión (la misma caché de 60 s que el perfil)
+   y como mucho otra cada 10 min al volver a la pestaña. */
+let headerUser=null,headerTicket=0,headerAt=0;
+function paintHeader(data){
+  const b=$('camHeaderRank');if(!b)return;
+  const icon=b.querySelector('.cam-control-icon');
+  const r=data&&topRank(data.ranks);
+  if(!r){b.hidden=true;delete b.dataset.rank;icon?.replaceChildren();b.setAttribute('aria-label','Tu rango');b.title='Tu rango';return;}
+  const name=LEVELS[level(r.rank)];
+  b.dataset.rank=KEYS[level(r.rank)];
+  icon?.replaceChildren(emblem(r.rank));
+  b.setAttribute('aria-label','Tu rango: '+name);
+  b.title='Rango '+name+' · '+r.label;
+  b.hidden=false;
+}
+async function syncHeader(force=false){
+  if(!$('camHeaderRank')||typeof db==='undefined'||!db)return;
+  const ticket=++headerTicket;
+  let id=null;
+  try{const {data}=await db.auth.getUser();id=data?.user&&!data.user.is_anonymous?data.user.id:null;}catch{return;}
+  if(ticket!==headerTicket)return;
+  if(!id){headerUser=null;headerAt=0;paintHeader(null);return;}
+  if(id!==headerUser){headerUser=id;headerAt=0;paintHeader(null);force=true;}
+  if(!force&&Date.now()-headerAt<6e5)return;
+  try{
+    const data=await profile(id,force&&headerAt>0);
+    if(ticket!==headerTicket||headerUser!==id)return;
+    headerAt=Date.now();paintHeader(data);
+  }catch{/* Sin ligas: la cabecera sigue sin rango. */}
+}
+function bindHeader(){
+  const b=$('camHeaderRank');if(!b)return;
+  b.addEventListener('click',()=>{expandNext=true;window.openAeProfile?.();});
+  if(typeof db!=='undefined'&&typeof db?.auth?.onAuthStateChange==='function')db.auth.onAuthStateChange(()=>setTimeout(()=>void syncHeader(),40));
+  window.addEventListener('cam:admin-state-change',()=>void syncHeader());
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)void syncHeader();});
+  void syncHeader();
+}
+
 function init(){
+  bindHeader();
   const names=document.querySelector('#aeProfileDialog .cam-profile-names');
   if(names&&!$('camProfileRank')){const rank=el('div',null,'cam-profile-rank');rank.id='camProfileRank';const awards=el('div',null,'cam-profile-awards');awards.id='camProfileAwards';names.append(rank,awards);}
   const overview=$('camProfileOverview');
@@ -234,9 +284,10 @@ function init(){
     mountEntry(host,comp);
   }
   document.addEventListener('cam:profile-view',onProfile);
+  $('aeProfileDialog')?.addEventListener('close',()=>{expandNext=false;});
   document.addEventListener('ae:picks-updated',()=>{cache.clear();identityCache.clear();});
 }
-window.CamLeagues=Object.freeze({markAuthor,mountEntry,open:openBoard,emblem,award,levels:LEVELS,stateText});
+window.CamLeagues=Object.freeze({markAuthor,mountEntry,open:openBoard,emblem,award,levels:LEVELS,stateText,topRank,syncHeader});
 // This script follows the profile markup. Bind before the profile's own
 // DOMContentLoaded listener: an already-resolved session can emit its view event
 // in a microtask between DOMContentLoaded listeners on a direct profile URL.

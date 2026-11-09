@@ -1,0 +1,213 @@
+/* CAM SPORTS · Rango y avisos (9 nov 2026).
+   1. Cabecera: luna · perfil · rango · salir, en ese orden y del mismo tamaño
+      (en el ordenador Perfil está en la navegación: luna · rango · salir).
+      Las herramientas del editor (Editar, Publicar) van en su propia fila en
+      el teléfono y antes de la luna en el ordenador ancho.
+   2. Rango: el icono de siempre (CamLeagues.emblem), sin texto.
+   3. Globito con los avisos sin leer sobre el icono de Perfil.
+   4. Campana junto a «Editar perfil» y panel de avisos: hoja desde abajo en el
+      teléfono y panel lateral en el ordenador.
+   Va en la capa cam-header (la primera registrada tras cam-display-clarity)
+   con !important: gana a las reglas antiguas de la cabecera y a las esquinas
+   globales. Lógica: cam-leagues.js (rango) y ae-notifications.js (avisos). */
+@layer cam-header {
+  /* ---------- 1. Cabecera: un solo orden para todos los estados de sesión ---------- */
+  /* Los envoltorios de sesión dejan que sus botones entren en la misma fila. */
+  html body > header .ae-header-actions > :is(#readerSession,#loggedAdminContainer):not(.hidden):not([hidden]) {
+    display: contents !important;
+  }
+  html body > header .ae-header-actions > #themeToggle { order: 1 !important; }
+  html body > header .ae-header-actions > #camNavProfile { order: 2 !important; }
+  html body > header .ae-header-actions > #guestAdminContainer { order: 2 !important; }
+  html body > header .ae-header-actions > #aeMyTakesButton { order: 2 !important; }
+  html body > header .ae-header-actions > #camHeaderRank { order: 3 !important; }
+  html body > header .ae-header-actions :is(.ae-classical-logout,.ae-signout-action) { order: 4 !important; }
+  html body > header .ae-header-actions .ae-admin-profile { order: 5 !important; }
+  html body > header .ae-header-actions :is(#camGlobalEditToggle,.ae-publish-action) { order: 10 !important; }
+  html body > header .ae-header-actions .ae-publish-action { order: 11 !important; }
+  html body > header #camHeaderRank[hidden] { display: none !important; }
+
+  /* Rango: el escudo de las ligas, del alto de los otros iconos. */
+  html body > header #camHeaderRank .cam-control-icon { color: var(--league-metal, #cc9878) !important; }
+  html body > header #camHeaderRank .cam-rank-emblem {
+    display: block !important; flex: none !important;
+    width: 22px !important; height: 26px !important;
+    margin: 0 !important; padding: 0 !important;
+    color: var(--league-metal, #cc9878) !important;
+  }
+  html body > header #camHeaderRank .cam-rank-emblem svg {
+    display: block !important; width: 100% !important; height: 100% !important; overflow: visible !important;
+  }
+  html body > header #camHeaderRank .cam-rank-shield { fill: #0d2c44 !important; stroke: currentColor !important; stroke-width: 2.6 !important; }
+  html body > header #camHeaderRank .cam-rank-symbol { stroke: currentColor !important; stroke-width: 2.8 !important; }
+
+  /* Ordenador ancho: Editar y Publicar antes de la luna, en la misma fila. */
+  @media (min-width: 1101px) {
+    html body > header .ae-header-actions :is(#camGlobalEditToggle,.ae-publish-action) { order: 0 !important; }
+  }
+  /* Teléfono y 761–1100 px: el editor tiene sus herramientas en una segunda fila. */
+  @media (max-width: 1100px) {
+    html body > header .ae-header-actions:has(#loggedAdminContainer:not(.hidden)) {
+      flex-wrap: wrap !important; justify-content: flex-end !important; max-width: 100% !important;
+    }
+    html body > header .ae-header-actions:has(#loggedAdminContainer:not(.hidden))::after {
+      content: "" !important; display: block !important; order: 9 !important;
+      flex: 0 0 100% !important; width: 100% !important; height: 0 !important;
+      margin: 0 !important; padding: 0 !important; border: 0 !important;
+    }
+  }
+
+  /* Teléfono: cuatro botones iguales de 44 × 44 (área táctil mínima). */
+  @media (max-width: 760px), (orientation: landscape) and (max-height: 500px) and (hover: none) and (pointer: coarse) {
+    html body > header .ae-header-actions,
+    html body > header .ae-header-actions:has(#loggedAdminContainer:not(.hidden)) {
+      column-gap: 2px !important; row-gap: 2px !important;
+    }
+    /* Herramientas del editor (segunda fila): mismo ancho que los de arriba. */
+    html body > header .ae-header-actions :is(#camGlobalEditToggle,.ae-publish-action):not([hidden]) {
+      flex: 0 0 44px !important;
+      width: 44px !important; min-width: 44px !important; max-width: 44px !important;
+      padding-inline: 0 !important;
+    }
+    html body > header .ae-header-actions > :is(#themeToggle,#camNavProfile,#camHeaderRank):not([hidden]),
+    html body > header .ae-header-actions :is(.ae-classical-logout,.ae-signout-action) {
+      flex: 0 0 44px !important;
+      width: 44px !important; min-width: 44px !important; max-width: 44px !important;
+      height: 44px !important; min-height: 44px !important; max-height: 44px !important;
+      padding: 0 !important; gap: 0 !important;
+      justify-content: center !important;
+    }
+    html body > header .ae-header-actions > :is(#themeToggle,#camNavProfile,#camHeaderRank)::after,
+    html body > header .ae-header-actions :is(.ae-classical-logout,.ae-signout-action)::after {
+      display: none !important; content: none !important;
+    }
+    html body > header .ae-header-actions > #camNavProfile > span:not(.ae-nav-icon) { display: none !important; }
+    /* El icono de Perfil (37 px en la barra) usa aquí el marco de 32 px de los demás. */
+    html body > header .ae-header-actions > #camNavProfile .ae-nav-icon {
+      flex: 0 0 var(--cam-icon-frame) !important;
+      width: var(--cam-icon-frame) !important; height: var(--cam-icon-frame) !important;
+      min-width: var(--cam-icon-frame) !important; min-height: var(--cam-icon-frame) !important;
+      max-width: var(--cam-icon-frame) !important; max-height: var(--cam-icon-frame) !important;
+    }
+    html body > header .ae-header-actions > #camNavProfile svg.cam-mobile-nav-symbol {
+      flex: 0 0 var(--cam-icon-visible) !important;
+      width: var(--cam-icon-visible) !important; height: var(--cam-icon-visible) !important;
+      min-width: var(--cam-icon-visible) !important; min-height: var(--cam-icon-visible) !important;
+      max-width: var(--cam-icon-visible) !important; max-height: var(--cam-icon-visible) !important;
+    }
+    /* Pantallas de 320–359 px: el logo cede unos píxeles para que nada se toque. */
+    @media (max-width: 359px) {
+      html body > header > div { padding-inline: 10px !important; }
+      html body > header .ae-mobile-header-grid { column-gap: 6px !important; }
+    }
+  }
+
+  /* ---------- 3. Globito sobre Perfil ---------- */
+  html body #camNavProfile .ae-nav-icon { position: relative !important; }
+  html body #camNavProfile .cam-profile-badge[hidden] { display: none !important; }
+  html body #camNavProfile .cam-profile-badge:not([hidden]),
+  html body #aeProfileDialog #aeNotificationsButton .cam-profile-bell-badge:not([hidden]) {
+    position: absolute !important; z-index: 2 !important;
+    display: grid !important; place-items: center !important;
+    box-sizing: border-box !important;
+    min-width: 18px !important; height: 18px !important;
+    margin: 0 !important; padding: 0 4px !important;
+    border: 1px solid #e6cda4 !important; border-radius: 9px !important;
+    background: #854936 !important; color: #fff8ee !important;
+    box-shadow: 0 1px 3px rgba(4, 16, 26, .35) !important;
+    font: 700 10px/1 Inter, system-ui, sans-serif !important;
+    font-variant-numeric: tabular-nums !important;
+    letter-spacing: 0 !important; text-transform: none !important;
+    white-space: nowrap !important; pointer-events: none !important;
+    filter: none !important;
+  }
+  html body #camNavProfile .cam-profile-badge:not([hidden]) { top: -6px !important; right: -9px !important; }
+
+  /* ---------- 4. Campana del perfil, junto a «Editar perfil» ---------- */
+  html body #aeProfileDialog #aeNotificationsButton { position: relative !important; }
+  html body #aeProfileDialog #aeNotificationsButton[hidden],
+  html body #aeProfileDialog #camProfileEditOpen[hidden] + #aeNotificationsButton { display: none !important; }
+  html body #aeProfileDialog .cam-profile-footer-actions > #aeNotificationsButton:not([hidden]) {
+    flex: 0 0 46px !important;
+    width: 46px !important; min-width: 46px !important; max-width: 46px !important;
+    height: 46px !important; min-height: 46px !important;
+    padding: 0 !important; gap: 0 !important;
+    overflow: visible !important;
+  }
+  html body #aeProfileDialog #aeNotificationsButton svg { width: 20px !important; height: 20px !important; flex: 0 0 20px !important; }
+  html body #aeProfileDialog #aeNotificationsButton .cam-profile-bell-badge:not([hidden]) { top: -7px !important; right: -7px !important; }
+  /* Con la campana: «Editar perfil» + campana en una fila y «Compartir perfil» debajo. */
+  html body #aeProfileDialog .cam-profile-footer-actions:has(> #camProfileEditOpen:not([hidden]) + #aeNotificationsButton:not([hidden])) {
+    flex-direction: row !important; flex-wrap: wrap !important; align-items: stretch !important;
+  }
+  html body #aeProfileDialog .cam-profile-footer-actions:has(> #camProfileEditOpen:not([hidden]) + #aeNotificationsButton:not([hidden])) > #camProfileEditOpen {
+    flex: 1 1 calc(100% - 56px) !important; width: auto !important; min-width: 0 !important;
+  }
+  html body #aeProfileDialog .cam-profile-footer-actions:has(> #camProfileEditOpen:not([hidden]) + #aeNotificationsButton:not([hidden])) > #camProfileShare {
+    flex: 1 1 100% !important; width: 100% !important;
+  }
+  html body[data-cam-desk] #aeProfileDialog.ae-profile-dialog[open] > .cam-profile-footer-actions:has(> #camProfileEditOpen:not([hidden]) + #aeNotificationsButton:not([hidden])) {
+    flex-direction: row !important; flex-wrap: wrap !important; align-items: stretch !important;
+    /* Aire para el número de la campana, que sobresale por arriba. */
+    padding-top: 10px !important; overflow: visible !important;
+  }
+  html body[data-cam-desk] #aeProfileDialog.ae-profile-dialog[open] > .cam-profile-footer-actions:has(> #camProfileEditOpen:not([hidden]) + #aeNotificationsButton:not([hidden])) > #camProfileEditOpen {
+    flex: 1 1 calc(100% - 56px) !important; width: auto !important; min-width: 0 !important;
+  }
+  html body[data-cam-desk] #aeProfileDialog.ae-profile-dialog[open] > .cam-profile-footer-actions:has(> #camProfileEditOpen:not([hidden]) + #aeNotificationsButton:not([hidden])) > #aeNotificationsButton {
+    flex: 0 0 46px !important; width: 46px !important;
+  }
+  html body[data-cam-desk] #aeProfileDialog.ae-profile-dialog[open] > .cam-profile-footer-actions:has(> #camProfileEditOpen:not([hidden]) + #aeNotificationsButton:not([hidden])) > #camProfileShare {
+    flex: 1 1 100% !important; width: 100% !important;
+  }
+
+  /* ---------- Panel de avisos: el de siempre, en otro sitio ---------- */
+  html body #aeNotificationsDialog.ae-notifications-dialog .ae-notifications-shell {
+    display: flex !important; flex-direction: column !important;
+    height: 100% !important; max-height: 100% !important; min-height: 0 !important;
+  }
+  html body #aeNotificationsDialog.ae-notifications-dialog .ae-notifications-groups {
+    display: flex !important; flex-direction: column !important;
+    flex: 1 1 auto !important; min-height: 0 !important;
+    overflow-y: auto !important; overscroll-behavior: contain !important;
+  }
+  html body #aeNotificationsDialog.ae-notifications-dialog .ae-notifications-group { flex: 0 0 auto !important; }
+  html body #aeNotificationsDialog.ae-notifications-dialog .ae-notifications-group .ae-notifications-list {
+    height: auto !important; max-height: none !important; overflow: visible !important;
+  }
+  html body #aeNotificationsDialog.ae-notifications-dialog .ae-notifications-footer { flex: 0 0 auto !important; }
+
+  /* Ordenador: panel lateral a la derecha (el teléfono apaisado usa la hoja de abajo). */
+  @media (min-width: 761px) {
+    html body #aeNotificationsDialog.ae-notifications-dialog[open] {
+      position: fixed !important;
+      top: 0 !important; right: 0 !important; bottom: 0 !important; left: auto !important;
+      width: min(440px, calc(100vw - 48px)) !important; max-width: 440px !important;
+      height: 100dvh !important; max-height: 100dvh !important;
+      margin: 0 !important;
+      border-right: 0 !important;
+      border-radius: 22px 0 0 22px !important;
+      animation: cam-panel-in .26s cubic-bezier(.2, .8, .2, 1) both;
+    }
+  }
+  /* Teléfono: hoja desde abajo. */
+  @media (max-width: 760px), (orientation: landscape) and (max-height: 500px) and (hover: none) and (pointer: coarse) {
+    html body #aeNotificationsDialog.ae-notifications-dialog[open] {
+      position: fixed !important;
+      top: auto !important; right: 0 !important; bottom: 0 !important; left: 0 !important;
+      width: 100% !important; max-width: 100% !important;
+      height: auto !important; max-height: min(88dvh, 760px) !important;
+      margin: 0 !important;
+      border-bottom: 0 !important;
+      border-radius: 22px 22px 0 0 !important;
+      padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+      animation: cam-sheet-up .26s cubic-bezier(.2, .8, .2, 1) both;
+    }
+    html body #aeNotificationsDialog.ae-notifications-dialog .ae-notifications-shell { max-height: min(88dvh, 760px) !important; }
+  }
+  @keyframes cam-sheet-up { from { transform: translateY(32px); opacity: 0; } to { transform: none; opacity: 1; } }
+  @keyframes cam-panel-in { from { transform: translateX(32px); opacity: 0; } to { transform: none; opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) {
+    html body #aeNotificationsDialog.ae-notifications-dialog[open] { animation: none !important; }
+  }
+}

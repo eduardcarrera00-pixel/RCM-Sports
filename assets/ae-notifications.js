@@ -1,4 +1,11 @@
-/* CAM SPORTS · Private in-app alerts for community activity. */
+/* CAM SPORTS · Private in-app alerts for community activity.
+   9 nov 2026: los avisos ya no tienen botón en la cabecera. El número sin leer
+   es un globito sobre el icono de Perfil (cabecera del teléfono y navegación
+   del ordenador) y la campana vive en el perfil propio, junto a «Editar
+   perfil». El panel es el mismo de siempre, abierto como hoja desde abajo en
+   el teléfono y panel lateral en el ordenador; al abrirlo se marcan como
+   leídos (los nuevos siguen resaltados mientras está abierto). Tocar el
+   globito abre el perfil directamente con el panel. */
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
@@ -7,6 +14,39 @@
   let loadToken = 0;
   let realtime = null;
   let authCheck = 0;
+  let unreadTotal = 0;
+  // Avisos que estaban sin leer al abrir el panel: siguen resaltados hasta cerrarlo.
+  const fresh = new Set();
+  const short = total => total > 9 ? '9+' : String(total);
+  const profileButton = () => $('camNavProfile');
+  function profileBadge() {
+    const button = profileButton();
+    if (!button) return null;
+    let badge = button.querySelector('.cam-profile-badge');
+    if (!badge) {
+      badge = document.createElement('span');
+      badge.className = 'cam-profile-badge';
+      badge.hidden = true;
+      badge.setAttribute('aria-hidden', 'true');
+      (button.querySelector('.ae-nav-icon') || button).append(badge);
+    }
+    return badge;
+  }
+  // Globito sobre Perfil: nada con 0, «9+» con más de 9.
+  function paintProfileBadge() {
+    const total = userId ? unreadTotal : 0;
+    const badge = profileBadge();
+    if (badge) {
+      badge.hidden = total === 0;
+      badge.textContent = total === 0 ? '' : short(total);
+    }
+    const button = profileButton();
+    if (button) {
+      if (total) button.dataset.unread = String(total);
+      else delete button.dataset.unread;
+    }
+    window.camMobileDock?.update?.();
+  }
   const create = (tag, value, className) => {
     const element = document.createElement(tag);
     if (value != null) element.textContent = String(value);
@@ -17,6 +57,9 @@
 
   function reset() {
     alerts = [];
+    unreadTotal = 0;
+    fresh.clear();
+    paintProfileBadge();
     $('aeNotificationsButton').hidden = true;
     $('aeNotificationsBadge').hidden = true;
     $('aeNotificationsBadge').textContent = '';
@@ -47,9 +90,11 @@
   function paint(unread) {
     // Display absolutely nothing around the bell if there are no unread alerts.
     const total = Math.max(0, Number(unread) || 0);
+    unreadTotal = total;
+    paintProfileBadge();
     const badge = $('aeNotificationsBadge');
     badge.hidden = total === 0;
-    badge.textContent = total === 0 ? '' : total > 99 ? '99+' : String(total);
+    badge.textContent = total === 0 ? '' : short(total);
     $('aeNotificationsButton').setAttribute('aria-label',
       total === 0 ? 'Notificaciones, ninguna sin leer'
         : total === 1 ? 'Notificaciones, 1 sin leer'
@@ -104,7 +149,7 @@
       for (const item of group.items) {
         const row = create('div',null,'ae-notification-row');
         row.setAttribute('role','listitem');
-        const action = create('button',null,'ae-notification-entry'+(item.read_at?'':' is-unread'));
+        const action = create('button',null,'ae-notification-entry'+(item.read_at&&!fresh.has(item.id)?'':' is-unread'));
         action.type = 'button';
         const icon = create('span',item.event_key.includes('vote') ? (item.vote_value === -1 ? '▼' : '▲') :
           item.event_key === 'article_like' ? '♥' : '↩','ae-notification-event-icon');
@@ -205,6 +250,8 @@
       if (!item.read_at) await markRead(item.id);
       const panel = dialog();
       if (panel?.open) panel.close();
+      // El panel se abre desde el perfil: se cierra para ver la publicación.
+      if ($('aeProfileDialog')?.open) window.closeAeProfile?.();
       await refresh();
       await openTarget(item);
     } catch (error) {
@@ -246,20 +293,65 @@
       void watch(id);
     } catch (_) {}
   }
+  // Marca como leídos todos los avisos hasta ahora (los de bienvenida no se cuentan).
+  async function markAllRead() {
+    if (!userId) return;
+    const readAt = new Date().toISOString();
+    const response = await db.from('ae_notifications')
+      .update({read_at:readAt})
+      .eq('recipient_id',userId).neq('event_key','welcome').is('read_at',null).lte('created_at',readAt);
+    if (response.error) throw response.error;
+  }
+  async function openPanel() {
+    const panel = dialog();
+    if (!panel || !userId) return;
+    if (panel.open) { panel.close(); return; }
+    fresh.clear();
+    for (const item of alerts) if (!item.read_at) fresh.add(item.id);
+    panel.showModal();
+    $('aeNotificationsButton').setAttribute('aria-expanded','true');
+    paint(unreadTotal);
+    await refresh();
+    for (const item of alerts) if (!item.read_at) fresh.add(item.id);
+    if (!unreadTotal || !panel.open) return;
+    try {
+      await markAllRead();
+      await refresh();
+    } catch (_) {
+      // «Marcar todas como leídas» queda visible para reintentar.
+    }
+  }
+  // Tocar el globito de Perfil abre el perfil propio ya con el panel.
+  function badgeHit(event) {
+    const badge = profileBadge();
+    if (!badge || badge.hidden || !event.clientX && !event.clientY) return false;
+    // Margen hacia fuera del botón (arriba y a la derecha), casi nada hacia el
+    // icono: tocar la silueta de Perfil sigue abriendo el perfil sin el panel.
+    const r = badge.getBoundingClientRect();
+    return event.clientX >= r.left - 2 && event.clientX <= r.right + 8 &&
+      event.clientY >= r.top - 8 && event.clientY <= r.bottom + 2;
+  }
+  async function openFromProfileBadge() {
+    if (typeof window.openAeProfile !== 'function') return;
+    await window.openAeProfile();
+    const own = $('aeProfileDialog')?.open && !$('camProfileEditOpen')?.hidden;
+    if (own && !dialog()?.open) await openPanel();
+  }
   function init() {
-    $('aeNotificationsButton')?.addEventListener('click',()=>{
-      const panel = dialog();
-      if (!panel) return;
-      if (panel.open) { panel.close(); return; }
-      panel.showModal();
-      $('aeNotificationsButton').setAttribute('aria-expanded','true');
-      paint(alerts.filter(x=>!x.read_at).length);
-      void refresh();
-    });
+    $('aeNotificationsButton')?.addEventListener('click',()=>void openPanel());
+    document.addEventListener('click',event=>{
+      if (!userId || !unreadTotal || !event.target?.closest?.('#camNavProfile') || !badgeHit(event)) return;
+      event.preventDefault();
+      event.stopPropagation();
+      void openFromProfileBadge();
+    },true);
     $('aeNotificationsClose')?.addEventListener('click',()=>dialog()?.close());
     dialog()?.addEventListener('close',()=>{
+      fresh.clear();
+      paint(unreadTotal);
       $('aeNotificationsButton').setAttribute('aria-expanded','false');
-      $('aeNotificationsButton').focus({preventScroll:true});
+      const bell = $('aeNotificationsButton');
+      if (bell?.getClientRects().length) bell.focus({preventScroll:true});
     });
     dialog()?.addEventListener('click',event=>{if (event.target === dialog()) dialog().close();});
     $('aeNotificationsReadAll')?.addEventListener('click',async()=>{
@@ -267,11 +359,7 @@
       const button=$('aeNotificationsReadAll');
       button.disabled=true;
       try {
-        const readAt = new Date().toISOString();
-        const response=await db.from('ae_notifications')
-          .update({read_at:readAt})
-          .eq('recipient_id',userId).neq('event_key','welcome').is('read_at',null).lte('created_at',readAt);
-        if(response.error) throw response.error;
+        await markAllRead();
         await refresh();
       } catch (_) {
         $('aeNotificationsStatus').textContent = 'No pudimos marcar las notificaciones. Inténtalo de nuevo.';

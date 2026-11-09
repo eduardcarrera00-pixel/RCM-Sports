@@ -24,7 +24,7 @@ for(const group of groups){
     assert(!links.includes(source),source+' must not also load separately');
   }
 }
-assert.equal(allSources.size,73,'Original pack sources plus monthly leagues, desktop sections, display clarity and Picks moderno; editorial sources must not load in later packs');
+assert.equal(allSources.size,74,'Original pack sources plus monthly leagues, desktop sections, display clarity, Picks moderno and header rank; editorial sources must not load in later packs');
 assert(editorialSources.every(source=>!links.includes(source)), 'Editorial sources cannot also load separately');
 const redundancies=editorialSources.filter(source=>allSources.has(source));
 assert.deepEqual(redundancies,[],'Do not ship duplicate CSS files inside both the editorial bundle and later CSS packs');
