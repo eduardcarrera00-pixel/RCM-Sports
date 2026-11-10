@@ -148,8 +148,8 @@ async function scenario({anonymous=false,failed=false}={}){
   }
   await api.selectCompetition('ligamx');await settle();
   assert.match(one('#camFootballSemanaBody').textContent,/Todavía no hay partidos/);
-  assert.match(one('#camLiguilla').textContent,/Liguilla Liga MX/,'the event is visible before the official seeds are ready');
-  assert.match(one('#camLiguilla').textContent,/Cruces por confirmar/,'the fallback never invents teams');
+  assert.match(one('#camLiguilla').textContent,/Arma tu cuadro/,'the event is visible before the official seeds are ready');
+  assert.match(one('#camLiguilla').textContent,/Pendiente/,'the fallback never invents teams');
   assert.equal(d.querySelectorAll('#camLiguilla').length,1);
   await api.selectCompetition('premier');await settle();
   assert.equal(one('#camLiguilla'),null,'other leagues never display the Liga MX event');
