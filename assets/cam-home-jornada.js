@@ -1,6 +1,6 @@
 /* CAM SPORTS · Inicio: lectura y comunidad, 9 nov 2026.
    Una noticia principal y dos secundarias; la próxima cita de cada quiniela;
-   un bloque de Takes con Recientes, Populares e Impopulares y acceso al resto.
+   un carrusel de Takes compartido por Recientes, Populares e Impopulares.
    Atajos opcionales en un desplegable. Se reutilizan los listados originales,
    sus conversaciones y sus votos; vuelven a su sitio al salir de Inicio.
    Los calendarios y sus contadores siguen completos. Se conservan la caché de
@@ -171,12 +171,18 @@
   root.append(head, shortcutDisclosure, rows.news.section, rows.jornada.section, rows.takes.section);
 
   // Una sola comunidad: reutiliza los listados reales y sus votos/respuestas.
-  // Los controles son botones de filtro; no hay paneles con scroll interior.
+  // Cada filtro conserva su lista y usa el mismo carrusel horizontal nativo.
   let takeView = 'recent';
-  let recentExpanded = false;
   const takeViews = new Map();
   const takeFilters = el('div', null, 'cam-take-filters', { role: 'group', 'aria-label': 'Orden de los Takes' });
   rows.takes.list.id = 'camHomeTakesRecent';
+  function takeTrack(list, label) {
+    list.classList.add('cam-home-takes-track');
+    list.setAttribute('tabindex', '0');
+    list.setAttribute('aria-label', label);
+    list.setAttribute('aria-roledescription', 'carrusel');
+  }
+  takeTrack(rows.takes.list, 'Takes recientes');
   const takeButtons = new Map();
   for (const [key, label, id] of [
     ['recent', 'Recientes', 'camHomeTakesRecent'],
@@ -189,15 +195,10 @@
     takeFilters.append(button);
   }
   rows.takes.section.querySelector('.cam-hj-head').after(takeFilters);
-  const recentMore = el('button', 'Ver todos ›', 'cam-list-more', { type: 'button', 'aria-expanded': 'false', 'aria-controls': 'camHomeTakesRecent' });
-  recentMore.hidden = true;
-  recentMore.addEventListener('click', () => { recentExpanded = !recentExpanded; paintTakes(); });
-  rows.takes.section.append(recentMore);
   function selectTakeView(key) {
     takeView = key;
     rows.takes.section.dataset.takeView = key;
     rows.takes.list.hidden = key !== 'recent';
-    recentMore.hidden = key !== 'recent' || state.takes.length <= 3;
     for (const [view, button] of takeButtons) button.setAttribute('aria-pressed', String(view === key));
     for (const [view, entry] of takeViews) entry.node.hidden = view !== key;
   }
@@ -210,27 +211,16 @@
       takeViews.set(key, { node, mark });
       rows.takes.section.append(node);
       const list = node.querySelector('ol');
-      const more = el('button', 'Ver todos ›', 'cam-list-more', { type: 'button', 'aria-expanded': 'false', 'aria-controls': list.id });
-      more.addEventListener('click', () => {
-        const expanded = node.dataset.expanded !== 'true';
-        node.dataset.expanded = String(expanded);
-        more.setAttribute('aria-expanded', String(expanded));
-        more.textContent = expanded ? 'Ver menos' : 'Ver todos ›';
-      });
-      node.append(more);
-      const syncMore = () => { more.hidden = list.querySelectorAll('.ae-top-take').length <= 3; };
-      const observer = new MutationObserver(syncMore);
-      observer.observe(list, { childList: true });
-      takeViews.get(key).observer = observer;
-      syncMore();
+      takeTrack(list, key === 'positive' ? 'Takes populares' : 'Takes impopulares');
     }
     selectTakeView(takeView);
   }
   function returnTakeViews() {
-    for (const { node, mark, observer } of takeViews.values()) {
-      observer.disconnect();
+    for (const { node, mark } of takeViews.values()) {
       node.hidden = false;
-      node.querySelector('.cam-list-more')?.remove();
+      const list = node.querySelector('ol');
+      list.classList.remove('cam-home-takes-track');
+      for (const attribute of ['tabindex', 'aria-label', 'aria-roledescription']) list.removeAttribute(attribute);
       if (mark.parentNode) mark.replaceWith(node);
     }
     takeViews.clear();
@@ -366,13 +356,9 @@
     return card;
   }
   function paintTakes() {
-    const cards = state.takes.slice(0, recentExpanded ? state.takes.length : 3).map(takeCard);
+    const cards = state.takes.map(takeCard);
     if (!cards.length) cards.push(el('p', state.takesOk ? 'Aún no hay Takes.' : state.takesError ? 'No se pudieron cargar los Takes.' : 'Cargando Takes…', 'cam-hj-empty'));
     fill(rows.takes, cards);
-    rows.takes.list.dataset.expanded = String(recentExpanded);
-    recentMore.hidden = takeView !== 'recent' || state.takes.length <= 3;
-    recentMore.setAttribute('aria-expanded', String(recentExpanded));
-    recentMore.textContent = recentExpanded ? 'Ver menos' : 'Ver todos ›';
     rows.takes.list.dataset.camContentState = state.takesOk ? (state.takes.length ? 'ready' : 'empty') : state.takesError ? 'error' : 'loading';
   }
 
