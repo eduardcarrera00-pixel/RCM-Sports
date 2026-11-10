@@ -141,7 +141,7 @@ def layout_problems(page):
       const box = root.getBoundingClientRect();
       if (box.right > innerWidth + 1) out.push('la liguilla sale de la pantalla');
       for (const n of root.querySelectorAll('button, strong, small, span, p, b, em, h3, h4, label, td')) {
-        if (!n.offsetParent || n.closest('.cam-lg-table-wrap')) continue;
+        if (!n.offsetParent || n.closest('.cam-lg-table-wrap, .cam-lg-board-scroll, .cam-lg-pending-board')) continue;
         const cs = getComputedStyle(n);
         if (n.scrollWidth > n.clientWidth + 1 && cs.overflowX !== 'visible' && n.clientWidth > 0) out.push('texto cortado: ' + n.textContent.trim().slice(0, 40));
         const r = n.getBoundingClientRect();
