@@ -61,10 +61,12 @@ el escritorio deja de reservar una tercera columna. Inicio abre con tres noticia
 seguido de la próxima cita de cada quiniela. Los contadores siguen contando el
 calendario completo, accesible desde las tarjetas y los atajos.
 
-Los Takes de Inicio comparten Recientes · Populares · Impopulares. Se reutilizan
+Los Takes de Inicio comparten Recientes · Populares · Impopulares. Los tres filtros
+usan el mismo carrusel horizontal, con tarjetas del mismo ancho, contorno y
+tipografía en móvil y escritorio. Todas las entradas quedan disponibles al deslizar,
+con desplazamiento nativo, barra horizontal y acceso de teclado. Se reutilizan
 los nodos originales, con sus votos, conversaciones y perfiles; vuelven a su sitio
-al salir. Tres entradas iniciales y «Ver todos» para el resto, sin scroll vertical
-interior. Actualidad usa el mismo despliegue progresivo de comentarios. Las tablas
+al salir. Actualidad mantiene el despliegue progresivo de comentarios. Las tablas
 vacías de Takes conservan el selector de periodo y un mensaje breve; los errores
 siguen siendo visibles. En Picks, las tablas completas se consultan en Chefs.
 

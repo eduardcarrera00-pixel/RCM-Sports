@@ -131,7 +131,7 @@ html body #camDeskAside .cam-desk-rankings > summary { min-height:44px!important
 html body #camDeskAside .cam-desk-rankings:not([open]) > .cam-desk-rankings-list { display:none!important; }
 html body #camDeskAside .cam-desk-rankings[open] > .cam-desk-rankings-list { margin-top:16px!important; }
 
-/* A single Takes destination; previews expand into the page, never a nested scroll. */
+/* One horizontal carousel for all three Home Takes filters. */
 html body #camHomeJornada [hidden] { display:none!important; }
 html body #camHomeJornada .cam-take-filters {
   display:flex!important; gap:4px!important; flex-wrap:wrap!important;
@@ -144,29 +144,50 @@ html body #camHomeJornada .cam-take-filter {
   color:var(--cam-calm-muted)!important;
 }
 html body #camHomeJornada .cam-take-filter[aria-pressed="true"] { color:var(--cam-calm-ink)!important; border-bottom-color:var(--cam-calm-action)!important; }
-html body #camHomeJornada #camHomeTakesRecent[data-expanded="true"]:not([hidden]) { display:grid!important; grid-template-columns:repeat(3,minmax(0,1fr))!important; overflow:visible!important; margin:0!important; padding:0!important; }
-html body #camHomeJornada #camHomeTakesRecent[data-expanded="true"] > .cam-hj-item { display:flex!important; }
-html body #camHomeJornada #camHomeTakesRecent[data-expanded="true"] .cam-hj-take { width:100%!important; }
 html body #camHomeJornada .ae-home-take-feature {
   margin:0!important; padding:0!important; width:100%!important;
   max-height:none!important; height:auto!important;
   background:transparent!important; border:0!important; box-shadow:none!important;
 }
 html body #camHomeJornada .ae-home-take-feature > header { display:none!important; }
-html body #camHomeJornada .ae-home-take-feature .ae-discovery-list {
-  display:grid!important; grid-template-columns:repeat(3,minmax(0,1fr))!important;
-  gap:16px!important; margin:0!important; padding:0!important;
-  height:auto!important; min-height:0!important; max-height:none!important; overflow:visible!important;
+html body #camHomeJornada .cam-home-takes-track {
+  --cam-take-width:clamp(252px,80vw,320px);
+  display:flex!important; align-items:stretch!important; gap:16px!important;
+  box-sizing:border-box!important; width:100%!important; min-width:0!important;
+  height:auto!important; min-height:0!important; max-height:none!important;
+  margin:0!important; padding:3px 2px 12px!important;
+  overflow-x:auto!important; overflow-y:hidden!important; list-style:none!important;
+  scroll-snap-type:x proximity!important; scroll-padding-inline:2px!important;
+  overscroll-behavior-x:contain!important; -webkit-overflow-scrolling:touch;
+  scrollbar-width:thin!important; scrollbar-color:var(--cam-calm-action) transparent!important;
+  mask-image:none!important; -webkit-mask-image:none!important;
 }
-html body #camHomeJornada .ae-home-take-feature:not([data-expanded="true"]) .ae-discovery-list > li:nth-child(n+4) { display:none!important; }
-html body #camHomeJornada .ae-community-popular-take {
-  display:block!important;
-  margin:0!important; padding:16px!important; min-width:0!important;
+html body #camHomeJornada .cam-home-takes-track[hidden] { display:none!important; }
+html body #camHomeJornada .cam-home-takes-track::-webkit-scrollbar { display:block!important; height:6px!important; }
+html body #camHomeJornada .cam-home-takes-track::-webkit-scrollbar-thumb { background:var(--cam-calm-action)!important; border-radius:6px!important; }
+html body #camHomeJornada .cam-home-takes-track > :is(.cam-hj-item,.ae-top-take) {
+  display:flex!important; flex:0 0 var(--cam-take-width)!important;
+  width:var(--cam-take-width)!important; min-width:0!important; max-width:none!important;
+  margin:0!important; scroll-snap-align:start!important;
+}
+html body #camHomeJornada .cam-home-takes-track :is(.cam-hj-take,.ae-community-popular-take) {
+  display:flex!important; flex-direction:column!important;
+  box-sizing:border-box!important; width:100%!important; min-height:252px!important;
+  margin:0!important; padding:16px!important; min-width:0!important; height:auto!important;
   border:1px solid var(--cam-calm-line)!important;
   border-radius:var(--cam-calm-radius)!important;
   background:var(--cam-calm-surface)!important; box-shadow:none!important;
 }
-html body #camHomeJornada .ae-top-take-open { font-size:19px!important; text-align:left!important; }
+html body #camHomeJornada .cam-home-takes-track :is(.cam-hj-card-title,.ae-top-take-open) {
+  display:-webkit-box!important; -webkit-box-orient:vertical!important; -webkit-line-clamp:2!important;
+  overflow:hidden!important; font:600 20px/1.28 "Playfair Display",Georgia,serif!important;
+  color:var(--cam-calm-ink)!important; text-align:left!important;
+}
+html body #camHomeJornada .cam-home-takes-track :is(.cam-hj-excerpt,.ae-top-take-summary) { -webkit-line-clamp:2!important; line-clamp:2!important; }
+html body #camHomeJornada .cam-home-takes-track .ae-top-take-open::after { content:none!important; }
+html body #camHomeJornada .cam-home-takes-track:focus-visible { outline:2px solid var(--cam-calm-action)!important; outline-offset:2px!important; }
+html body #camHomeJornada .cam-home-takes-track > .cam-hj-item:has(.cam-hj-empty),
+html body #camHomeJornada .cam-home-takes-track > .ae-discovery-empty { flex:1 0 100%!important; width:100%!important; }
 html body #camHomeJornada .ae-top-take-title { margin:0!important; padding:0!important; }
 html body #camHomeJornada :is(.ae-top-take-sport,.ae-top-take-number) { display:none!important; }
 html body #camHomeJornada .ae-home-take-head { display:block!important; }
@@ -174,10 +195,13 @@ html body #camHomeJornada :is(.ae-home-take-title-row,.ae-top-take-title,.ae-tak
   display:block!important; width:100%!important; max-width:none!important; min-width:0!important;
 }
 html body #camHomeJornada .ae-top-take-open { width:100%!important; max-width:none!important; }
-html body #camHomeJornada .ae-top-take-content { display:flex!important; flex-direction:column!important; width:100%!important; min-width:0!important; gap:10px!important; padding:0!important; background:none!important; border:0!important; }
+html body #camHomeJornada .ae-top-take-content { display:flex!important; flex:1!important; flex-direction:column!important; width:100%!important; min-width:0!important; gap:10px!important; padding:0!important; background:none!important; border:0!important; }
 html body #camHomeJornada .ae-top-take-summary { width:100%!important; margin:0!important; }
 html body #camHomeJornada .ae-take-reference-avatar { display:none!important; }
-html body #camHomeJornada .ae-take-reference-footer { margin:0!important; }
+html body #camHomeJornada .ae-take-reference-footer { margin:auto 0 0!important; }
+html body #camHomeJornada .ae-take-reference-identity { display:flex!important; align-items:center!important; gap:6px!important; }
+html body #camHomeJornada :is(.ae-top-take-author,.ae-take-reference-date) { font:600 12px/1.3 Inter,system-ui,sans-serif!important; }
+html body #camHomeJornada .ae-top-take-author { min-width:0!important; max-width:60%!important; overflow:hidden!important; text-overflow:ellipsis!important; white-space:nowrap!important; }
 html body #camHomeJornada .ae-top-take-votes { flex-wrap:wrap!important; }
 html body #camHomeJornada .ae-home-take-feature .ae-discovery-empty { grid-column:1/-1!important; }
 html body :is(.cam-hj-empty,.cam-ranking-empty) { margin:0!important; padding:12px 0!important; color:var(--cam-calm-muted)!important; font:400 14px/1.5 Inter,system-ui,sans-serif!important; }
@@ -214,8 +238,6 @@ html body #aeProfileDialog .cam-ov-title { white-space:normal!important; -webkit
 }
 @media(max-width:760px) {
   html body #camHomeJornada { gap:24px!important; margin-top:0!important; }
-  html body #camHomeJornada .ae-home-take-feature .ae-discovery-list { grid-template-columns:minmax(0,1fr)!important; }
-  html body #camHomeJornada #camHomeTakesRecent[data-expanded="true"]:not([hidden]) { grid-template-columns:minmax(0,1fr)!important; }
   html body #camHomeJornada .cam-hj-heading { font-size:22px!important; }
   html body #camHomeJornada .cam-hj-shortcuts { margin:8px 0 0!important; }
   html body #camHomeJornada .cam-hj-shortcut { min-height:76px!important; background:transparent!important; box-shadow:none!important; }

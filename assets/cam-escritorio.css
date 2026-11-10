@@ -1030,11 +1030,6 @@
     }
     html body[data-cam-desk] #camHomeJornada .cam-hj-game { width:100%!important; min-height:184px!important; padding:20px!important; }
     html body[data-cam-desk] #camHomeJornada .cam-hj-game .cam-hj-picks { gap:12px!important; }
-    html body[data-cam-desk] #camHomeJornada .cam-hj-section[data-row="takes"] .cam-hj-row,
-    html body[data-cam-desk] #camHomeJornada .ae-home-take-feature .ae-discovery-list { display:grid!important; grid-template-columns:repeat(2,minmax(0,1fr))!important; gap:16px!important; margin:0!important; padding:0!important; overflow:visible!important; }
-    html body[data-cam-desk] #camHomeJornada .cam-hj-take { min-height:220px!important; padding:20px!important; }
-    html body[data-cam-desk] #camHomeJornada .cam-hj-take .cam-hj-card-title { font-size:21px!important; -webkit-line-clamp:3!important; }
-    html body[data-cam-desk] #camHomeJornada .cam-hj-take .cam-hj-excerpt { -webkit-line-clamp:3!important; line-clamp:3!important; }
     html body[data-cam-desk].ae-is-home #camDeskMain > .editorial-layout { display:flex!important; flex-direction:column!important; gap:28px!important; }
     html body[data-cam-desk].ae-is-home #camDeskMain > .editorial-layout > * { width:100%!important; max-width:none!important; margin:0!important; }
     html body[data-cam-desk].ae-is-home #camDeskMain :is(#aeNewsHeadingRow,#aeSportLatestNews,#articlesGrid,#aeSportAllNewsFooter,#aeHomeAllNewsActions,#noResults,#aeHomeTakesSectionHeading,#aeHomeSidebarFeatures,.editorial-community) { display:none!important; }
@@ -1130,8 +1125,6 @@
   }
   @media (min-width:1600px) {
     html body[data-cam-desk] #mainContent { max-width:1760px!important; --dk-rail:180px; --dk-aside:330px; --dk-gap:32px; --dk-pad:32px; }
-    html body[data-cam-desk] #camHomeJornada .cam-hj-section[data-row="takes"] .cam-hj-row,
-    html body[data-cam-desk] #camHomeJornada .ae-home-take-feature .ae-discovery-list { grid-template-columns:repeat(3,minmax(0,1fr))!important; }
   }
   @media (min-width:761px) and (max-width:1100px) {
     html body[data-cam-desk] #mainContent { --dk-pad:20px; --dk-rail:152px; --dk-aside:280px; --dk-gap:20px; }
@@ -1141,7 +1134,6 @@
     html body[data-cam-desk] #camDeskLayout { grid-template-columns:minmax(0,1fr)!important; }
     html body[data-cam-desk] #camDeskAside { position:static!important; }
     html body[data-cam-desk].ae-is-opinions #mainContent #aeOpinions:not([hidden]) { display:flex!important; flex-direction:column!important; }
-    html body[data-cam-desk] #camHomeJornada .cam-hj-section[data-row="takes"] .cam-hj-row { grid-template-columns:repeat(2,minmax(0,1fr))!important; }
     html body[data-cam-desk][data-cam-tab="picks"] #footballTakes { display:flex!important; flex-direction:column!important; }
     html body[data-cam-desk][data-cam-tab="picks"] #footballTakes #communityPicks { display:flex!important; }
   }
