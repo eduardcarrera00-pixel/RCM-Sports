@@ -1,0 +1,173 @@
+/* CAM SPORTS · Liguilla Liga MX en la Quiniela de Fútbol (assets/cam-liguilla.js).
+   Usa los tokens --q-* de la quiniela: día y noche salen solos de html.dark.
+   El campeón y la final llevan el azul noche y el dorado de la marca en los dos temas. */
+#camLiguilla{display:grid;gap:14px;margin:0 0 14px;color:var(--q-ink)}
+#camLiguilla[hidden]{display:none!important}
+#camFootballQuiniela.cam-liguilla-round #camFootballDayNav,
+#camFootballQuiniela.cam-liguilla-round #camFootballGames,
+#camFootballQuiniela.cam-liguilla-round .cam-nfl-save-row{display:none!important}
+#camLiguilla button{cursor:pointer}
+#camLiguilla button:disabled{cursor:default}
+#camLiguilla :focus-visible{outline:3px solid var(--q-focus);outline-offset:2px}
+
+/* ---- Tu liguilla ----------------------------------------------------------------- */
+#camLiguilla .cam-lg-bracket{background:var(--q-card);border:1px solid var(--q-line);padding:clamp(14px,2.4vw,22px);display:grid;gap:16px;container-type:inline-size;min-width:0}
+#camLiguilla .cam-lg-head{display:grid;gap:8px;min-width:0}
+#camLiguilla .cam-lg-eyebrow{margin:0;font:700 11px/1.35 var(--ds-font-sans,Inter,system-ui,sans-serif);letter-spacing:.14em;text-transform:uppercase;color:var(--q-gold-text)}
+#camLiguilla .cam-lg-head h3{margin:0;font:600 clamp(25px,4.6vw,32px)/1.12 var(--ds-font-serif,"Playfair Display",Georgia,serif);color:var(--q-ink);text-wrap:balance}
+#camLiguilla .cam-lg-sub{margin:0;color:var(--q-muted);font-size:14px;line-height:1.5;max-width:62ch}
+#camLiguilla .cam-lg-meter{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;align-items:center}
+#camLiguilla .cam-lg-track{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+#camLiguilla .cam-lg-track i{display:block;height:6px;border-radius:3px;background:var(--q-sunken);transition:background .25s ease}
+#camLiguilla .cam-lg-track i.is-on{background:var(--q-ornament)}
+#camLiguilla .cam-lg-count{font-size:13px;color:var(--q-meta);font-variant-numeric:tabular-nums}
+#camLiguilla .cam-lg-potential{grid-column:1/-1;margin:0;font-size:14px}
+#camLiguilla .cam-lg-potential b{font:600 22px/1 var(--ds-font-serif,"Playfair Display",Georgia,serif);color:var(--q-gold-text);font-variant-numeric:tabular-nums}
+#camLiguilla .cam-lg-board{display:grid;gap:20px;min-width:0}
+#camLiguilla .cam-lg-round{display:grid;gap:10px;align-content:start;min-width:0}
+#camLiguilla .cam-lg-round-head{margin:0;display:flex;justify-content:space-between;align-items:baseline;gap:8px;font:700 12px/1.3 var(--ds-font-sans,Inter,system-ui,sans-serif);letter-spacing:.12em;text-transform:uppercase;color:var(--q-meta)}
+#camLiguilla .cam-lg-round-head small{font-weight:500;letter-spacing:0;text-transform:none;font-size:12px}
+#camLiguilla .cam-lg-matches{display:grid;gap:10px}
+#camLiguilla .cam-lg-match{background:var(--q-card);border:1px solid var(--q-line);display:grid;overflow:hidden;min-width:0}
+#camLiguilla .cam-lg-team{display:grid;grid-template-columns:20px 30px minmax(0,1fr) auto;align-items:center;gap:10px;width:100%;min-height:54px;padding:9px 12px;border:0;border-radius:0;background:transparent;color:var(--q-ink);text-align:left;position:relative;transition:background .2s ease,opacity .25s ease,transform .25s ease}
+#camLiguilla .cam-lg-team+.cam-lg-team{border-top:1px solid var(--q-line)}
+#camLiguilla .cam-lg-team:not(:disabled):hover{background:var(--q-gold-soft)}
+#camLiguilla .cam-lg-seed{font:700 12px/1 var(--ds-font-sans,Inter,system-ui,sans-serif);color:var(--q-meta);text-align:center;font-variant-numeric:tabular-nums}
+#camLiguilla .cam-lg-crest{width:30px;height:30px;object-fit:contain;display:block}
+#camLiguilla .cam-lg-name{display:grid;gap:2px;min-width:0}
+#camLiguilla .cam-lg-name strong{font-weight:650;font-size:15px;line-height:1.25;overflow-wrap:anywhere}
+#camLiguilla .cam-lg-name small{font-size:11px;color:var(--q-meta);line-height:1.3}
+#camLiguilla .cam-lg-pts{font:700 12px/1 var(--ds-font-sans,Inter,system-ui,sans-serif);padding:7px 9px;border-radius:999px;background:var(--q-sunken);color:var(--q-ink);white-space:nowrap;font-variant-numeric:tabular-nums}
+#camLiguilla .cam-lg-pts.is-blank{background:none;padding:0}
+#camLiguilla .cam-lg-pts.is-hit{background:var(--q-ok-bg);color:var(--q-ok-text)}
+#camLiguilla .cam-lg-pts.is-miss{background:var(--q-bad-bg);color:var(--q-bad-text)}
+#camLiguilla .cam-lg-pts.is-live{background:transparent;border:1px dashed var(--q-edge);color:var(--q-meta)}
+#camLiguilla .cam-lg-team.is-chosen{background:var(--q-gold-soft)}
+#camLiguilla .cam-lg-team.is-chosen::before{content:"";position:absolute;left:0;top:8px;bottom:8px;width:3px;background:var(--q-ornament);border-radius:0 2px 2px 0}
+#camLiguilla .cam-lg-team.is-chosen .cam-lg-pts:not(.is-hit):not(.is-miss):not(.is-live):not(.is-blank){background:var(--q-gold);color:var(--q-on-gold)}
+#camLiguilla .cam-lg-team.is-behind{opacity:.5;transform:translateX(-3px)}
+#camLiguilla .cam-lg-team.is-behind .cam-lg-name strong{font-weight:500}
+#camLiguilla .cam-lg-foot{margin:0;padding:7px 12px;border-top:1px solid var(--q-line);background:var(--q-panel);font-size:12px;line-height:1.4;color:var(--q-meta)}
+#camLiguilla .cam-lg-wait{margin:0;border:1px dashed var(--q-line);padding:16px;font-size:14px;line-height:1.5;color:var(--q-muted);text-align:center}
+#camLiguilla .cam-lg-champion{position:relative;overflow:hidden;display:grid;gap:7px;justify-items:center;text-align:center;padding:22px 16px;background:#0B2233;color:#F3EBDD;border:1px solid #2E4A5E}
+#camLiguilla .cam-lg-champion-label{font:700 11px/1 var(--ds-font-sans,Inter,system-ui,sans-serif);letter-spacing:.2em;text-transform:uppercase;color:#E8BF79}
+#camLiguilla .cam-lg-champion-rule{width:64px;height:1px;background:#BE9270}
+#camLiguilla .cam-lg-champion-name{font:italic 600 clamp(26px,5vw,34px)/1.12 var(--ds-font-serif,"Playfair Display",Georgia,serif);text-wrap:balance;overflow-wrap:anywhere}
+#camLiguilla .cam-lg-champion-name.is-empty{font:italic 400 17px/1.45 var(--ds-font-serif-secondary,"Libre Baskerville",Georgia,serif);color:#C2CDD4}
+#camLiguilla .cam-lg-champion-sub{font:400 14px/1.45 var(--ds-font-serif-secondary,"Libre Baskerville",Georgia,serif);color:#C2CDD4}
+#camLiguilla .cam-lg-champion.is-crowned .cam-lg-champion-name{animation:cam-lg-crown .6s ease both}
+#camLiguilla .cam-lg-champion.is-crowned::before{content:"";position:absolute;inset:-40%;background:radial-gradient(circle at 50% 50%,rgba(232,191,121,.26),transparent 55%);animation:cam-lg-glow 1.2s ease both;pointer-events:none}
+@keyframes cam-lg-crown{from{transform:translateY(8px) scale(.96);opacity:0}to{transform:none;opacity:1}}
+@keyframes cam-lg-glow{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+#camLiguilla .cam-lg-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+#camLiguilla .cam-lg-actions .cam-nfl-action{min-height:44px}
+#camLiguilla .cam-lg-link{border:0;background:none;padding:10px 4px;min-height:44px;color:var(--q-gold-text);font-weight:600;text-decoration:underline;text-underline-offset:3px}
+#camLiguilla .cam-lg-link:disabled{opacity:.5;text-decoration:none}
+#camLiguilla .cam-lg-hint,#camLiguilla .cam-lg-players{margin:0;font-size:13px;line-height:1.5;color:var(--q-meta)}
+#camLiguilla .cam-lg-note{margin:0;min-height:1.2em;font-size:14px;line-height:1.45}
+#camLiguilla .cam-lg-note.is-ok{color:var(--q-ok-text)}
+#camLiguilla .cam-lg-note.is-error{color:var(--q-bad-text)}
+#camLiguilla .cam-lg-empty{margin:0;padding:14px;background:var(--q-panel);border:1px solid var(--q-line);font-size:14px;line-height:1.5}
+#camLiguilla .cam-lg-rules{border-top:1px solid var(--q-line);padding-top:10px}
+#camLiguilla .cam-lg-rules summary{cursor:pointer;font-weight:600;min-height:32px;display:flex;align-items:center}
+#camLiguilla .cam-lg-rules p{margin:8px 0 0;font-size:14px;line-height:1.6;color:var(--q-muted);max-width:68ch}
+#camLiguilla .cam-lg-ranking{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:center}
+#camLiguilla .cam-lg-ranking>.cam-lg-table-wrap,#camLiguilla .cam-lg-ranking>.cam-lg-hint:last-child{flex-basis:100%}
+#camLiguilla .cam-lg-table-wrap{overflow-x:auto;border:1px solid var(--q-line);max-width:100%;min-width:0;flex:1 1 100%}
+#camLiguilla .cam-lg-bracket>*,#camLiguilla .cam-lg-rounds>*,#camLiguilla .cam-lg-ranking{min-width:0}
+#camLiguilla .cam-lg-table{border-collapse:collapse;width:100%;min-width:420px;font-size:13px;font-variant-numeric:tabular-nums}
+#camLiguilla .cam-lg-table th,#camLiguilla .cam-lg-table td{padding:8px 10px;border-bottom:1px solid var(--q-line);text-align:left;white-space:nowrap}
+#camLiguilla .cam-lg-table th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--q-meta)}
+#camLiguilla .cam-lg-table td:nth-child(4),#camLiguilla .cam-lg-table td:nth-child(5),#camLiguilla .cam-lg-table th:nth-child(4),#camLiguilla .cam-lg-table th:nth-child(5){text-align:right}
+#camLiguilla .cam-lg-table tr.is-me td{background:var(--q-gold-soft);font-weight:600}
+@container (min-width:760px){
+  #camLiguilla .cam-lg-head{grid-template-columns:minmax(0,1fr) 320px;column-gap:28px;align-items:end}
+  #camLiguilla .cam-lg-head>.cam-lg-meter{grid-column:2;grid-row:1/4}
+  #camLiguilla .cam-lg-board{grid-template-columns:1.08fr 1fr 1fr .9fr;gap:16px;align-items:center}
+  #camLiguilla .cam-lg-round-head{min-height:2.6em;align-items:flex-end}
+}
+
+/* ---- Ronda a ronda -------------------------------------------------------------- */
+#camLiguilla .cam-lg-rounds{background:var(--q-card);border:1px solid var(--q-line);container-type:inline-size;min-width:0;display:grid;gap:14px;padding-bottom:16px}
+#camLiguilla .cam-lg-stage{background:var(--q-band);color:var(--q-on-band);padding:clamp(16px,2.4vw,24px);display:grid;gap:14px;position:relative}
+#camLiguilla .cam-lg-stage::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:linear-gradient(90deg,transparent,var(--q-ornament) 22%,var(--q-ornament) 78%,transparent);opacity:.72}
+#camLiguilla .cam-lg-rounds.is-final .cam-lg-stage{background:#0B2233;color:#F3EBDD}
+#camLiguilla .cam-lg-rounds.is-final{border-color:#BE9270}
+#camLiguilla .cam-lg-rail{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:0;padding:0;list-style:none}
+#camLiguilla .cam-lg-rail li{display:grid;gap:6px;font-size:12px;color:var(--q-on-band-muted);min-width:0}
+#camLiguilla .cam-lg-rail li::before{content:"";height:4px;border-radius:2px;background:var(--q-band-line)}
+#camLiguilla .cam-lg-rail li.is-done::before,#camLiguilla .cam-lg-rail li.is-now::before{background:var(--q-ornament)}
+#camLiguilla .cam-lg-rail li.is-now{color:var(--q-on-band);font-weight:600}
+#camLiguilla .cam-lg-rail b{display:block;font-weight:700}
+#camLiguilla .cam-lg-rail-btn{display:grid;gap:1px;justify-items:start;text-align:left;border:0;background:none;padding:2px 0;min-height:40px;color:inherit;font:inherit}
+#camLiguilla .cam-lg-rail-btn[aria-pressed="true"] b{text-decoration:underline;text-underline-offset:4px;text-decoration-color:var(--q-ornament)}
+#camLiguilla .cam-lg-stage-main{display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:center}
+#camLiguilla .cam-lg-left{font:600 60px/.9 var(--ds-font-serif,"Playfair Display",Georgia,serif);color:var(--q-ornament);text-align:center;min-width:58px;font-variant-numeric:lining-nums}
+#camLiguilla .cam-lg-left small{display:block;margin-top:5px;font:700 10px/1.3 var(--ds-font-sans,Inter,system-ui,sans-serif);letter-spacing:.16em;text-transform:uppercase;color:var(--q-on-band-muted)}
+#camLiguilla .cam-lg-stage h3{margin:0;font:600 clamp(24px,4.4vw,32px)/1.1 var(--ds-font-serif,"Playfair Display",Georgia,serif);color:inherit;text-wrap:balance}
+#camLiguilla .cam-lg-rounds.is-final .cam-lg-stage h3{font-style:italic;color:#F3EBDD}
+#camLiguilla .cam-lg-rounds.is-final .cam-lg-left{color:#E8BF79}
+#camLiguilla .cam-lg-stage-dates{margin:6px 0 0;font-size:14px;color:var(--q-on-band-muted)}
+#camLiguilla .cam-lg-rounds.is-final .cam-lg-stage-dates,#camLiguilla .cam-lg-rounds.is-final .cam-lg-rail li,#camLiguilla .cam-lg-rounds.is-final .cam-lg-left small{color:#C2CDD4}
+#camLiguilla .cam-lg-rounds.is-final .cam-lg-rail li.is-now{color:#F3EBDD}
+#camLiguilla .cam-lg-series-list{display:grid;gap:14px;padding:0 clamp(12px,2.4vw,22px);min-width:0}
+#camLiguilla .cam-lg-rounds-hint{margin:0;font-size:13px;line-height:1.5;color:var(--q-meta)}
+#camLiguilla .cam-lg-series{border:1px solid var(--q-line);background:var(--q-card);display:grid;min-width:0;overflow:hidden}
+#camLiguilla .cam-lg-series.is-final{border-color:#BE9270}
+#camLiguilla .cam-lg-series-top{display:flex;justify-content:space-between;gap:8px;padding:12px 14px 0;font:700 11px/1.3 var(--ds-font-sans,Inter,system-ui,sans-serif);letter-spacing:.12em;text-transform:uppercase;color:var(--q-meta)}
+#camLiguilla .cam-lg-series-title{margin:0;padding:6px 14px 12px;display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;font:600 19px/1.25 var(--ds-font-serif,"Playfair Display",Georgia,serif);color:var(--q-ink)}
+#camLiguilla .cam-lg-series-team{display:inline-flex;align-items:center;gap:8px;min-width:0}
+#camLiguilla .cam-lg-series-team strong{font-weight:600;overflow-wrap:anywhere}
+#camLiguilla .cam-lg-series-team .cam-lg-crest{width:28px;height:28px}
+#camLiguilla .cam-lg-vs{font:500 13px/1 var(--ds-font-sans,Inter,system-ui,sans-serif);color:var(--q-meta)}
+#camLiguilla .cam-lg-pass{margin:0 14px;background:var(--q-gold-soft);padding:12px;display:grid;gap:9px}
+#camLiguilla .cam-lg-pass-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 10px;align-items:baseline}
+#camLiguilla .cam-lg-pass-head b{font:600 18px/1.2 var(--ds-font-serif,"Playfair Display",Georgia,serif)}
+#camLiguilla .cam-lg-pass-head span{font-size:12px;color:var(--q-meta)}
+#camLiguilla .cam-lg-pass-options{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#camLiguilla .cam-lg-opt{display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:46px;padding:8px 10px;border:1px solid var(--q-line);background:var(--q-card);color:var(--q-ink);font:600 14px/1.25 var(--ds-font-sans,Inter,system-ui,sans-serif);text-align:left;min-width:0}
+#camLiguilla .cam-lg-opt span{min-width:0;overflow-wrap:anywhere}
+#camLiguilla .cam-lg-opt em{font:700 12px/1 var(--ds-font-sans,Inter,system-ui,sans-serif);font-style:normal;color:var(--q-gold-text);white-space:nowrap;font-variant-numeric:tabular-nums}
+#camLiguilla .cam-lg-opt em.is-hit{color:var(--q-ok-text)}
+#camLiguilla .cam-lg-opt em.is-miss{color:var(--q-bad-text)}
+#camLiguilla .cam-lg-opt:not(:disabled):hover{border-color:var(--q-gold)}
+#camLiguilla .cam-lg-opt.is-chosen{border-color:var(--q-gold);box-shadow:inset 0 0 0 1px var(--q-gold);background:var(--q-gold-soft)}
+#camLiguilla .cam-lg-opt:disabled:not(.is-chosen){opacity:.72}
+#camLiguilla .cam-lg-opt.is-winner{border-color:var(--q-ok)}
+#camLiguilla .cam-lg-opt.is-loser:not(.is-chosen){opacity:.55}
+#camLiguilla .cam-lg-legs{display:grid;margin-top:12px}
+#camLiguilla .cam-lg-leg{display:grid;gap:8px;padding:12px 14px;border-top:1px solid var(--q-line)}
+#camLiguilla .cam-lg-leg-top{display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px 10px;font-size:13px;color:var(--q-meta)}
+#camLiguilla .cam-lg-leg-top b{color:var(--q-ink);font-weight:650}
+#camLiguilla .cam-lg-leg-status{font-weight:600}
+#camLiguilla .cam-lg-x3{display:grid;grid-template-columns:1fr .82fr 1fr;gap:6px}
+#camLiguilla .cam-lg-x3 .cam-lg-opt{flex-direction:column;justify-content:center;text-align:center;gap:3px;min-height:54px}
+#camLiguilla .cam-lg-series-foot{margin:0;padding:10px 14px;border-top:1px solid var(--q-line);background:var(--q-panel);font-size:12px;line-height:1.45;color:var(--q-meta)}
+#camLiguilla .cam-lg-series.is-decided .cam-lg-series-foot{color:var(--q-ink);font-weight:600}
+#camLiguilla .cam-lg-admin-winner{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px 14px;border-top:1px dashed var(--q-edge)}
+#camLiguilla .cam-lg-admin-winner p{margin:0;flex-basis:100%;font-size:13px;font-weight:600}
+#camLiguilla .cam-lg-admin-winner input{flex:1 1 180px;min-width:0;padding:8px 10px;border:1px solid var(--q-line);background:var(--q-card);color:var(--q-ink)}
+@container (min-width:760px){
+  #camLiguilla .cam-lg-stage-main{grid-template-columns:auto minmax(0,1fr)}
+  #camLiguilla .cam-lg-series-list{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}
+  #camLiguilla .cam-lg-series-list>.cam-lg-rounds-hint{grid-column:1/-1}
+  #camLiguilla .cam-lg-series-list.is-solo{grid-template-columns:minmax(0,640px);justify-content:center}
+}
+
+/* ---- Administrar ---------------------------------------------------------------- */
+#camLiguilla .cam-lg-admin{border:1px dashed var(--q-edge);background:var(--q-card);padding:0 14px}
+#camLiguilla .cam-lg-admin summary{cursor:pointer;font-weight:700;padding:12px 0;min-height:44px;display:flex;align-items:center}
+#camLiguilla .cam-lg-admin[open]{padding-bottom:14px}
+#camLiguilla .cam-lg-admin>*+*{margin-top:10px}
+#camLiguilla .cam-lg-admin-form{display:grid;gap:12px}
+#camLiguilla .cam-lg-admin-grid{display:grid;grid-template-columns:36px minmax(0,1fr) 54px 54px 58px;gap:6px;align-items:center}
+#camLiguilla .cam-lg-admin-th{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--q-meta)}
+#camLiguilla .cam-lg-admin-seed{font-weight:700;font-variant-numeric:tabular-nums}
+#camLiguilla .cam-lg-admin-grid select,#camLiguilla .cam-lg-admin-grid input,#camLiguilla .cam-lg-admin-field input{width:100%;min-width:0;padding:6px 8px;border:1px solid var(--q-line);background:var(--q-card);color:var(--q-ink)}
+#camLiguilla .cam-lg-admin-field{display:grid;gap:4px;font-size:13px;font-weight:600}
+#camLiguilla .cam-lg-admin-check{display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.45}
+#camLiguilla .cam-lg-admin-check input{width:20px;height:20px;min-height:20px;margin:0;flex:none;accent-color:var(--q-gold)}
+
+@media (prefers-reduced-motion:reduce){
+  #camLiguilla *{animation:none!important;transition:none!important}
+}

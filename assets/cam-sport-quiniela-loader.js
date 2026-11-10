@@ -8,7 +8,9 @@
     nfl:{className:'ae-is-nfl',root:'camNflQuiniela',status:'camNflStatus',
       src:'cam-nfl-quiniela.js?v=20261109-single-login-2'},
     football:{className:'ae-is-football',root:'camFootballQuiniela',status:'camFootballStatus',
-      src:'cam-football-quiniela.js?v=20261109-single-login-2'}
+      src:'cam-football-quiniela.js?v=20261109-single-login-2',
+      // La liguilla de la Liga MX vive dentro de la quiniela de fútbol y se carga después.
+      extra:'cam-liguilla.js?v=20261110-liguilla-1'}
   };
   const requests=new Map();
   const loaded=new Set();
@@ -45,7 +47,15 @@
       const script=document.createElement('script');
       script.async=true;
       script.src=new URL(entry.src,base).href;
-      script.onload=()=>{loaded.add(key);resolve(true);};
+      script.onload=()=>{
+        loaded.add(key);resolve(true);
+        if(entry.extra){
+          // Un complemento que falla nunca bloquea los partidos ni el guardado.
+          const extra=document.createElement('script');extra.async=true;
+          extra.src=new URL(entry.extra,base).href;extra.onerror=()=>extra.remove();
+          document.head.append(extra);
+        }
+      };
       script.onerror=()=>{
         script.remove();
         reject(Error('No se pudo descargar La Quiniela. Vuelve a entrar en la sección para reintentar.'));

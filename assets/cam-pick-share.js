@@ -706,6 +706,156 @@
   if(!dialog.open)dialog.showModal();exit.focus({preventScroll:true});dialog.scrollTop=0;syncAnalysis();refresh();
  }
 
+ // «Tu liguilla» (Liga MX): el cuadro completo con el campeón en el centro, en la
+ // misma ficha azul noche y dorada que «La cita» y con las mismas zonas seguras.
+ // Los que pasan van en marfil; los eliminados se quedan atrás, apagados.
+ // Formatos altos: árbol vertical (cuartos → semis → campeón ← semis ← cuartos).
+ // X: árbol horizontal. Sin escudos externos: el lienzo sigue siendo exportable.
+ function renderBracketCard(m,size){
+  size=takeSize(size);
+  const T=TAKE_CARD,L=T[size],w=1080,h=L.h,wide=size==='card';
+  const canvas=document.createElement('canvas');canvas.width=wide?1200:w;canvas.height=wide?675:h;
+  const c=canvas.getContext('2d');if(!c)throw Error('Este navegador no permite generar la imagen. Prueba desde otro navegador.');
+  if(wide){c.fillStyle=T.bg;c.fillRect(0,0,canvas.width,canvas.height);const scale=canvas.height/h;c.scale(scale,scale);c.translate((canvas.width/scale-w)/2,0);}
+  c.fillStyle=T.bg;c.fillRect(0,0,w,h);
+  if(!takeLogo)throw Error('El logo oficial todavía no está listo.');
+  const cx=(L.left+L.right)/2,W=L.right-L.left;
+  // Los recuadros dejan unos píxeles de aire: su borde nunca toca la zona que tapa la red.
+  const BL=L.left+6,BW=W-12;
+  const spacing=(px,em)=>{try{c.letterSpacing=Math.round(px*em*10)/10+'px';}catch{}};
+  const fitFont=(text,max,start,font,min)=>{let s=start;for(;s>(min||10);s--){c.font=font(s);if(c.measureText(text).width<=max)break;}c.font=font(s);return s;};
+  const centre=(text,y)=>{c.textAlign='left';c.fillText(text,Math.round(cx-c.measureText(text).width/2),y);};
+  const serif=s=>'400 '+s+'px "Libre Baskerville", Georgia, serif',serifBold=s=>'700 '+s+'px "Libre Baskerville", Georgia, serif';
+  const display=s=>'italic 600 '+s+'px "Playfair Display", Georgia, serif',meta=s=>'600 '+s+'px Arial, sans-serif';
+  // Cabecera: logo, etiqueta y torneo
+  const logoW=wide?96:L.logoW,logoH=logoW*takeLogo.naturalHeight/takeLogo.naturalWidth;
+  c.drawImage(takeLogo,cx-logoW/2,L.top,logoW,logoH);
+  let y=L.top+logoH+(wide?14:Math.round(L.logoGap*.55));
+  const lab=wide?14:Math.round(L.meta*1.05);
+  c.fillStyle=T.label;c.font=meta(lab);spacing(lab,.24);centre('MI LIGUILLA · LIGA MX',y+lab);spacing(lab,0);y+=lab+(wide?6:12);
+  const sub=wide?17:Math.round(L.extra*.9);c.fillStyle=T.muted;fitFont(m.name,W,sub,s=>'italic 400 '+s+'px "Libre Baskerville", Georgia, serif',12);centre(m.name,y+sub);
+  y+=sub+(wide?14:Math.round(L.logoGap*.6));
+  // Pie: usuario, filete y enlace en la línea base segura de cada red.
+  const linkY=L.link<0?h+L.link:L.link,ruleY=linkY-L.ruleGap;
+  c.fillStyle=T.line;c.fillRect(L.left,ruleY,W,2);
+  c.fillStyle=T.muted;c.font=meta(L.linkFont);spacing(L.linkFont,.08);centre('camsports.github.io',linkY);spacing(L.linkFont,0);
+  const who=m.user?'El cuadro de @'+m.user:'Mi cuadro';const userS=wide?20:Math.round(L.author*1.05);
+  c.fillStyle=T.ink;fitFont(who,W,userS,display,14);const userY=ruleY-(wide?12:Math.round(L.foot*.55));centre(who,userY);
+  const bottom=userY-userS-(wide?10:Math.round(L.foot*.7));
+  const line=(pts)=>{c.strokeStyle='rgba(190,146,112,.55)';c.lineWidth=2;c.beginPath();pts.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.stroke();};
+  const box=(x,yy,bw,bh,pair,winner,fs)=>{
+   c.fillStyle='#10304A';c.beginPath();const r=Math.min(14,bh*.14);
+   c.moveTo(x+r,yy);c.arcTo(x+bw,yy,x+bw,yy+bh,r);c.arcTo(x+bw,yy+bh,x,yy+bh,r);c.arcTo(x,yy+bh,x,yy,r);c.arcTo(x,yy,x+bw,yy,r);c.closePath();c.fill();
+   c.strokeStyle=T.line;c.lineWidth=2;c.stroke();
+   const rows=[...pair].sort((a,b)=>(b.seed===winner.seed)-(a.seed===winner.seed)),rh=bh/2,pad=Math.round(fs*.75);
+   c.strokeStyle=T.line;c.lineWidth=1.5;c.beginPath();c.moveTo(x+pad*.6,yy+rh);c.lineTo(x+bw-pad*.6,yy+rh);c.stroke();
+   rows.forEach((t,i)=>{
+    const win=t.seed===winner.seed,ty=yy+rh*i+rh/2;
+    c.globalAlpha=win?1:.45;c.textBaseline='middle';c.textAlign='left';
+    c.font=meta(Math.round(fs*.7));c.fillStyle=win?'#E8BF79':T.muted;c.fillText(String(t.seed),x+pad,ty+1);
+    const sx=x+pad+fs*1.05;c.fillStyle=win?T.ink:T.muted;
+    fitFont(t.name,bw-(sx-x)-pad,fs,win?serifBold:serif,Math.round(fs*.55));c.fillText(t.name,sx,ty+1);
+   });
+   c.globalAlpha=1;c.textBaseline='alphabetic';
+  };
+  const champion=(top,big,width)=>{
+   const lab2=Math.round(big*.3);c.fillStyle='#E8BF79';c.font=meta(lab2);spacing(lab2,.28);centre('CAMPEÓN',top+lab2);spacing(lab2,0);
+   c.fillStyle=T.gold;c.fillRect(Math.round(cx-big*.8),Math.round(top+lab2*1.8),Math.round(big*1.6),2);
+   c.fillStyle=T.ink;const s=fitFont(m.champion.name,width,big,display,Math.round(big*.5));const ny=top+lab2*1.8+s*1.06;centre(m.champion.name,ny);
+   const vs='en la final ante '+m.runner.name;c.fillStyle=T.muted;fitFont(vs,width,Math.round(big*.32),serif,12);centre(vs,ny+big*.6);
+   return ny+big*.6;
+  };
+  const [A,B]=m.sides;
+  if(wide){
+   const H=bottom-y,cy=y+H/2,gap=18,chW=210,qfW=166,sfW=(BW-chW-qfW*2-gap*4)/2,fs=19,bh=Math.min(80,(H-16)/2);
+   const col=[BL,BL+qfW+gap,BL+qfW+gap+sfW+gap,BL+BW-qfW-gap-sfW,BL+BW-qfW],qy=[cy-bh-8,cy+8];
+   A.qfs.forEach((q,i)=>box(col[0],qy[i],qfW,bh,q.pair,q.winner,fs));
+   B.qfs.forEach((q,i)=>box(col[4],qy[i],qfW,bh,q.pair,q.winner,fs));
+   box(col[1],cy-bh/2,sfW,bh,A.pair,A.winner,fs);box(col[3],cy-bh/2,sfW,bh,B.pair,B.winner,fs);
+   for(const [from,to] of [[col[0]+qfW,col[1]],[col[4],col[3]+sfW]]){const mid=(from+to)/2;qy.forEach(q=>line([[from,q+bh/2],[mid,q+bh/2],[mid,cy],[to,cy]]));}
+   line([[col[1]+sfW,cy],[col[2]+6,cy]]);line([[col[3],cy],[col[2]+chW-6,cy]]);
+   champion(cy-58,48,chW-16);
+  }else{
+   const H=bottom-y,u=H/(2.1*2+2*2+3.3+.75*4),qfH=2.1*u,sfH=2*u,g=.75*u;
+   const fs=Math.min(Math.round(u*.6),size==='tiktok'?34:40),gap=Math.round(BW*.05),qfW=(BW-gap)/2,sfW=Math.min(BW*.62,qfW*1.2);
+   const row=(side,yy)=>side.qfs.map((q,i)=>{const x=BL+i*(qfW+gap);box(x,yy,qfW,qfH,q.pair,q.winner,fs);return x+qfW/2;});
+   const tops=row(A,y);let yy=y+qfH+g;
+   tops.forEach(x=>line([[x,y+qfH],[x,yy-g/2],[cx,yy-g/2],[cx,yy]]));
+   box(cx-sfW/2,yy,sfW,sfH,A.pair,A.winner,fs);yy+=sfH+g;
+   line([[cx,yy-g],[cx,yy]]);
+   champion(yy,Math.min(Math.round(u*1.2),size==='tiktok'?84:104),W);
+   yy+=3.3*u+g;line([[cx,yy-g*.6],[cx,yy]]);
+   box(cx-sfW/2,yy,sfW,sfH,B.pair,B.winner,fs);yy+=sfH+g;
+   const rowY=yy,bottoms=row(B,rowY);bottoms.forEach(x=>line([[cx,rowY-g],[cx,rowY-g/2],[x,rowY-g/2],[x,rowY]]));
+  }
+  return canvas;
+ }
+ function bracketCaption(m){return ['Mi cuadro de la liguilla de la Liga MX · '+m.name,'Campeón: '+m.champion.full,'Arma el tuyo en CAM SPORTS',BASE].join('\n\n');}
+ function showBracket(m,{opener=document.activeElement}={}){
+  if(!m||!m.champion||!Array.isArray(m.sides)||m.sides.length!==2)return;
+  restoreFocus=opener;release();const ticket=++request;
+  if(!dialog){dialog=make('dialog',null,'cam-pick-share-dialog');dialog.id='camPickShareDialog';dialog.setAttribute('aria-labelledby','camPickShareTitle');document.body.append(dialog);dialog.addEventListener('close',()=>{if(dialog.open)return;request++;release();restoreFocus?.focus?.({preventScroll:true});});dialog.addEventListener('click',e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)close();}});}
+  dialog.classList.add('cam-take-share-dialog');dialog.classList.remove('cam-picks-share-dialog');
+  const top=make('div',null,'cam-pick-share-heading');const heading=make('h2','Comparte tu cuadro');heading.id='camPickShareTitle';top.append(heading);
+  const exit=make('button','Cerrar','cam-pick-share-close');exit.type='button';exit.onclick=close;top.append(exit);
+  const intro=make('p','Tu liguilla de la Liga MX, de cuartos a campeón, lista para tus redes.','cam-pick-share-intro');
+  const layout=make('div',null,'cam-pick-share-layout');const preview=make('div',null,'cam-pick-share-preview');preview.setAttribute('aria-busy','true');preview.append(make('p','Preparando tu cuadro…'));
+  const content=make('div',null,'cam-pick-share-content');
+  const destinations=make('div',null,'cam-take-share-destinations');destinations.setAttribute('role','group');destinations.setAttribute('aria-labelledby','camTakeShareWhere');
+  const where=make('p','¿Dónde lo vas a compartir?','cam-take-share-destinations-title');where.id='camTakeShareWhere';
+  const choices=make('div',null,'cam-take-share-destination-grid');destinations.append(where,choices);
+  let size=takeDefaultSize();
+  const buttons=TAKE_FORMATS.map(([value,name,detail])=>{const b=make('button',null,'cam-take-share-destination');b.type='button';b.dataset.size=value;b.append(make('span',name),make('small',detail));choices.append(b);return b;});
+  const sync=()=>buttons.forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.size===size)));
+  buttons.forEach(b=>b.onclick=()=>{if(size===b.dataset.size)return;size=b.dataset.size;sync();refresh();});sync();
+  const networkHint='Pulsa «Compartir imagen» y elige la app en el menú del teléfono. Si no recibe la imagen, descárgala y adjúntala.';
+  const photoCopy=PHOTO_COPY[photoTarget()];
+  const hint=make('p',networkHint,'cam-pick-share-hint');
+  const status=make('p','','cam-pick-share-status');status.setAttribute('role','status');status.setAttribute('aria-live','polite');
+  const download=make('a','Descargar imagen','cam-pick-share-download');download.hidden=true;
+  const linkButton=make('button','Copiar texto y enlace');linkButton.type='button';linkButton.onclick=()=>copy(bracketCaption(m),status,'Texto y enlace copiados.');
+  const utilities=make('div',null,'cam-pick-share-utilities');utilities.append(download,linkButton);
+  content.append(destinations,hint);layout.append(preview,content);
+  const shareButton=make('button','Compartir imagen','cam-take-share-primary');shareButton.type='button';shareButton.disabled=true;utilities.prepend(shareButton);
+  const bar=make('div',null,'cam-take-share-bar');bar.append(utilities,status);dialog.replaceChildren(top,intro,layout,bar);
+  if(!dialog.open)dialog.showModal();exit.focus({preventScroll:true});dialog.scrollTop=0;
+  let file=null,generation=0,pending=false;
+  const isPhoto=()=>size==='photo';
+  const ready=()=>{shareButton.disabled=!file||pending;};
+  function share(){
+   if(!file||pending)return;
+   const current=generation,photo=isPhoto(),target=photoTarget();
+   if(photo&&target!=='ios'){const a=make('a');a.href=download.href;a.download=download.download;a.hidden=true;document.body.append(a);a.click();a.remove();status.textContent=photoCopy.done;return;}
+   let can=false;try{can=typeof navigator.share==='function'&&Boolean(navigator.canShare?.({files:[file]}));}catch{}
+   if(!can){status.textContent=photo?'Mantén pulsada la imagen de arriba y elige «Guardar en Fotos».':'Descarga la imagen; tu navegador no permite enviarla directamente.';return;}
+   const fail=e=>{if(ticket!==request||current!==generation)return;status.textContent=e?.name==='AbortError'?'Puedes compartirlo cuando quieras.':'Descarga la imagen y adjúntala en la aplicación.';};
+   let sending;try{sending=navigator.share({files:[file]});}catch(e){fail(e);return;}
+   pending=true;ready();
+   Promise.resolve(sending).then(()=>{if(ticket===request&&current===generation)status.textContent=photo?photoCopy.done:'Imagen entregada al menú de compartir.';}).catch(fail).finally(()=>{pending=false;if(ticket===request)ready();});
+  }
+  shareButton.onclick=share;
+  function refresh(){
+   const current=++generation;file=null;ready();download.hidden=true;download.removeAttribute('href');release();
+   const photo=isPhoto(),type=photo?'image/jpeg':'image/png';
+   shareButton.textContent=photo?photoCopy.button:'Compartir imagen';hint.textContent=photo?photoCopy.hint:networkHint;utilities.classList.toggle('cam-take-share-photo',photo);
+   download.download='cam-sports-liguilla-'+(m.user||'cuadro').replace(/[^a-z0-9_-]+/gi,'').slice(0,40)+'-'+TAKE_FILE[takeSize(size)]+(photo?'.jpg':'.png');
+   preview.replaceChildren(make('p','Preparando tu cuadro…'));preview.setAttribute('aria-busy','true');status.textContent='';
+   prepareTakeArtwork().then(()=>{
+    if(ticket!==request||current!==generation||!dialog.open)return;
+    const canvas=renderBracketCard(m,size);
+    canvas.toBlob(blob=>{
+     if(ticket!==request||current!==generation||!dialog.open)return;
+     if(!blob){preview.replaceChildren(make('p','No se pudo preparar la imagen. Inténtalo de nuevo.'));preview.setAttribute('aria-busy','false');return;}
+     resource=URL.createObjectURL(blob);const img=make('img');img.src=resource;img.width=canvas.width;img.height=canvas.height;
+     img.alt='Tu cuadro de la liguilla ('+TAKE_FORMATS.find(([s])=>s===takeSize(size)).slice(1).join(', ')+'): campeón '+m.champion.full+', finalista '+m.runner.full+'.';
+     preview.replaceChildren(img);preview.setAttribute('aria-busy','false');
+     file=new File([blob],download.download,{type:blob.type||type});download.href=resource;download.hidden=photo;ready();
+    },type,photo?.95:undefined);
+   }).catch(error=>{if(ticket!==request||current!==generation)return;preview.replaceChildren(make('p',error.message));preview.setAttribute('aria-busy','false');});
+  }
+  refresh();
+ }
+
  function button(p,options={}){
   if(options.kind!=='take')try{const entry=model(p,options.kind);pickRegistry.set(entry.kind+':'+entry.id,entry);}catch{}
   const type=options.kind==='take'?'Take':'Pick';
@@ -714,5 +864,5 @@
   const path=document.createElementNS('http://www.w3.org/2000/svg','path');path.setAttribute('d','M15 3h6v6M21 3 10 14M10 5H4v16h16v-6');path.setAttribute('fill','none');path.setAttribute('stroke','currentColor');path.setAttribute('stroke-width','1.7');icon.append(path);b.prepend(icon);
   b.onclick=e=>{e.preventDefault();e.stopPropagation();show(p,{...options,opener:b});};return b;
  }
- window.CamPickShare=Object.freeze({open:show,button});
+ window.CamPickShare=Object.freeze({open:show,button,openBracket:showBracket,renderBracketCard});
 })();
