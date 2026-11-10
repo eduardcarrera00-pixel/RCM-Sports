@@ -404,15 +404,20 @@ html.dark [data-reading-size][aria-pressed="true"] {
  #camLiguilla .cam-fan-center h4{font-size:26px}
  #camLiguilla .cam-fan-final-pair{max-width:320px}
 }
-@media(max-width:430px){
+@media(max-width:600px){
+ /* En móvil, un cuadro vertical permite leer nombres completos sin apretar ocho selectores. */
  #camLiguilla .cam-fan-shell{padding:14px;gap:14px}
  #camLiguilla .cam-fan-intro{align-items:stretch}
  #camLiguilla .cam-fan-toggle{width:100%}
- #camLiguilla .cam-fan-tree{gap:8px;padding:12px 0}
- #camLiguilla .cam-fan-team-select{grid-template-columns:minmax(0,1fr) 27px;padding:4px;gap:2px}
- #camLiguilla .cam-fan-select{font-size:11px}
- #camLiguilla .cam-fan-pass{min-width:26px}
- #camLiguilla .cam-fan-option{font-size:12px;padding:8px 4px}
+ #camLiguilla .cam-fan-tree{grid-template-columns:minmax(0,1fr);gap:18px;padding:14px 0}
+ #camLiguilla .cam-fan-column,#camLiguilla .cam-fan-center{grid-column:1;min-width:0}
+ #camLiguilla .cam-fan-column{gap:10px}
+ #camLiguilla .cam-fan-team-select{grid-template-columns:minmax(0,1fr) 42px;gap:8px;padding:6px}
+ #camLiguilla .cam-fan-select{font-size:14px;min-height:44px;padding:7px 9px}
+ #camLiguilla .cam-fan-pass{min-width:42px;min-height:44px}
+ #camLiguilla .cam-fan-option{font-size:14px;min-height:46px;padding:10px 12px}
+ #camLiguilla .cam-fan-actions .cam-nfl-action{flex:1 1 140px}
+ #camLiguilla .cam-fan-center{padding:20px 16px}
 }
 
 
