@@ -43,6 +43,10 @@ try{sessionStorage.setItem('cam_sports_home_welcome_seen_session_v1','1')}catch(
   let games = [], series = [], mine = {bracket: [], series: []}, open = true, closes = now + 2*D;
   const done = (g, hs, as) => Object.assign(g, {status:'final', home_score:hs, away_score:as, picks_open:false,
     outcome: hs>as?'home':hs<as?'away':'draw', kickoff: new Date(now - 3*D).toISOString()});
+  if (MODE === 'none') {
+    // Equipos reales registrados en la prueba: sin liguilla oficial también se puede armar un cuadro libre.
+    pairs.forEach(([h,l], i) => games.push(game('free-000'+i, ids[l], ids[h], now + 10*D)));
+  }
   if (MODE === 'open') {
     pairs.forEach(([h,l], i) => {
       const g1 = game('99000010'+i, ids[l], ids[h], now + 2*D + i*H), g2 = game('99000020'+i, ids[h], ids[l], now + 5*D + i*H, {probability_home:null,probability_draw:null,probability_away:null,points_home:6,points_draw:6,points_away:6,odds_source:'automatic_equal_v1',odds_home:null,odds_draw:null,odds_away:null});
@@ -312,7 +316,43 @@ def run():
         assert not problems, 'admin: ' + str(problems)
         assert not page.errors, page.errors
 
-    print('OK · liguilla: cuadro, ficha (5 formatos y zonas seguras), ronda a ronda, admin; 320/390/1366, día y noche')
+    # 5) La comunidad arma un cuadro SIN que un admin abra la liguilla y SIN cuenta.
+    # El botón admite equipos reales desde los partidos de Liga MX, guardado local e imagen social.
+    with fp.full_page(fake_js=fake('none', user=False), width=390, height=900) as page:
+        open_liga_mx(page)
+        assert page.locator('#camLiguilla .cam-fan-toggle').is_visible(), 'falta Arma tu cuadro'
+        page.locator('#camLiguilla .cam-fan-toggle').click()
+        page.wait_for_function("() => document.querySelector('#camLiguilla .cam-fan-select')?.options.length >= 8")
+        for i, (team_id, _, _) in enumerate(TEAMS):
+            page.locator('#camLiguilla .cam-fan-select').nth(i).select_option(team_id)
+        assert page.locator('#camLiguilla .cam-fan-count').inner_text().startswith('8/8')
+        for n in [0, 2, 4, 6]:
+            page.locator('#camLiguilla .cam-fan-team-select').nth(n).locator('.cam-fan-pass').click()
+        page.locator('#camLiguilla .cam-fan-left-semi .cam-fan-option').first.click()
+        page.locator('#camLiguilla .cam-fan-right-semi .cam-fan-option').first.click()
+        page.locator('#camLiguilla .cam-fan-final-pair .cam-fan-option').first.click()
+        assert '7/7' in page.locator('#camLiguilla .cam-fan-count').inner_text()
+        assert 'Cruz Azul' in page.locator('#camLiguilla .cam-fan-champion').inner_text()
+        page.locator('#camLiguilla .cam-fan-actions button').filter(has_text='Guardar mi cuadro').click()
+        assert page.evaluate("() => !!localStorage.getItem('cam-sports:cuadro-libre:ligamx:'+(window.camFootballQuiniela.snapshot().season)+':invitado')")
+        assert 'este dispositivo' in page.locator('#camLiguilla .cam-fan-status').inner_text()
+        page.locator('#camLiguilla .cam-fan-actions button').filter(has_text='Compartir en redes').click()
+        page.wait_for_selector('#camPickShareDialog[open] .cam-pick-share-preview img', timeout=15000)
+        page.locator('#camPickShareDialog .cam-pick-share-close').click()
+        assert not layout_problems(page), layout_problems(page)
+        assert not page.errors, page.errors
+
+    # 6) Con sesión activa el botón guarda también en la tabla privada de Supabase.
+    with fp.full_page(fake_js=fake('open', user=True), width=390, height=900) as page:
+        open_liga_mx(page)
+        page.locator('#camLiguilla .cam-fan-toggle').click()
+        page.wait_for_function("() => document.querySelectorAll('#camLiguilla .cam-fan-select').length === 8")
+        page.locator('#camLiguilla .cam-fan-actions button').filter(has_text='Guardar mi cuadro').click()
+        page.wait_for_timeout(200)
+        assert page.evaluate("() => window.__fake.calls.some(c => c.table==='cam_liguilla_fan_brackets' && c.op==='upsert')"), 'cuadro no se sincroniza'
+        assert not page.errors, page.errors
+
+    print('OK · liguilla oficial y libre: crear, guardar (dispositivo y cuenta), compartir; 320/390/1366, día y noche')
 
 
 if __name__ == '__main__':
