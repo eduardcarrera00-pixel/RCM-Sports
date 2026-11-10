@@ -16,7 +16,7 @@
 
     document.documentElement.classList.toggle('dark', useDarkMode);
 </script>
-    <!-- Critical entrance: available before the application or its styles download. -->
+    <!-- Critical navigation screen: available before the application downloads. -->
     <style id="cam-page-loader-style">
       html.cam-booting{overflow:hidden!important;background:#081724}
       html.cam-booting body > :not(#camPageLoader):not(script):not(style){opacity:0!important;visibility:hidden!important;pointer-events:none!important}
@@ -38,31 +38,43 @@
       'use strict';
       const root = document.documentElement;
       const pending = new Set();
-      let active = true, domReady = false, assetsReady = false, preparing = false;
-      let revision = 0, settleTimer = 0;
-      const noop = () => {};
-      root.classList.add('cam-booting');
+      const MIN_VISIBLE_MS = 750;
+      const locked = new Set();
+      let active = false, domReady = false, assetsReady = false;
+      let cycle = 0, revision = 0, preparingFor = 0, shownAt = null;
+      let settleTimer = 0, deadline = 0, leaveTimer = 0, lockObserver, returnFocus;
 
+      function restoreFocus() {
+        const visible = node => node?.isConnected && !node.inert && node.getClientRects().length;
+        const dialog = [...document.querySelectorAll('dialog[open], [role="dialog"]')].filter(visible).at(-1);
+        let target;
+        if (dialog && !dialog.contains(document.activeElement)) {
+          target = dialog.contains(returnFocus) && visible(returnFocus) ? returnFocus
+            : dialog.querySelector('[autofocus]') || (dialog.hasAttribute('tabindex') ? dialog : null)
+              || dialog.querySelector('input:not(:disabled), button:not(:disabled), [tabindex]');
+        } else if (document.activeElement === document.body && visible(returnFocus)) target = returnFocus;
+        target?.focus({preventScroll:true});
+      }
       function reveal() {
         if (!active) return;
         active = false;
         clearTimeout(deadline);
         clearTimeout(settleTimer);
-        pending.clear();
         const screen = document.getElementById('camPageLoader');
-        // Restore interaction only on nodes locked by this entrance.
+        // Restore only the interaction locks owned by this transition.
         for (const node of locked) node.inert = false;
         locked.clear();
         lockObserver?.disconnect();
+        lockObserver = null;
         screen?.classList.add('is-leaving');
         root.classList.remove('cam-booting');
         document.body?.removeAttribute('aria-busy');
-        setTimeout(() => screen?.remove(), 200);
+        restoreFocus();
+        const ticket = cycle;
+        leaveTimer = setTimeout(() => {
+          if (!active && ticket === cycle) screen?.classList.remove('is-leaving');
+        }, 200);
       }
-      // A failed request or script must never strand visitors behind the logo.
-      const deadline = setTimeout(reveal, 15000);
-      const locked = new Set();
-      let lockObserver;
       function lockPage() {
         if (!active || !document.body) return;
         document.body.setAttribute('aria-busy', 'true');
@@ -72,13 +84,41 @@
           locked.add(node);
         }
       }
-      function schedule() {
+      function schedule(delay = 80) {
         if (!active) return;
         clearTimeout(settleTimer);
-        settleTimer = setTimeout(prepare, 80);
+        settleTimer = setTimeout(prepare, delay);
+      }
+      function markShown(ticket) {
+        requestAnimationFrame(() => {
+          if (!active || ticket !== cycle || !document.getElementById('camPageLoader')) return;
+          shownAt = performance.now();
+          schedule();
+        });
+      }
+      function start() {
+        if (!active) returnFocus = document.activeElement;
+        active = true;
+        cycle++;
+        revision++;
+        shownAt = null;
+        clearTimeout(deadline);
+        clearTimeout(leaveTimer);
+        document.getElementById('camPageLoader')?.classList.remove('is-leaving');
+        root.classList.add('cam-booting');
+        lockPage();
+        if (document.body && !lockObserver) {
+          lockObserver = new MutationObserver(lockPage);
+          lockObserver.observe(document.body, {childList:true});
+        }
+        if (document.getElementById('camPageLoader')) markShown(cycle);
+        // A failed request must not strand this or future navigation.
+        deadline = setTimeout(() => {pending.clear(); reveal();}, 15000);
+        schedule();
       }
       function begin() {
-        if (!active) return noop;
+        // Keep existing in-flight data attached when a route reuses its request.
+        // Background refreshes alone never open the navigation screen.
         const token = {};
         pending.add(token);
         revision++;
@@ -87,9 +127,10 @@
         };
       }
       async function prepare() {
-        if (!active || !domReady || !assetsReady || pending.size || preparing) return;
-        preparing = true;
-        const version = revision;
+        if (!active || !domReady || !assetsReady || shownAt === null || pending.size || preparingFor === cycle) return;
+        const ticket = cycle, version = revision;
+        preparingFor = ticket;
+        let nextDelay = 80;
         try {
           await document.fonts?.ready;
           // Decode only the images in the opening viewport. Lazy content below
@@ -109,25 +150,30 @@
             });
           }));
           await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-          if (active && !pending.size && revision === version) reveal();
+          if (active && ticket === cycle && !pending.size && revision === version) {
+            const remaining = MIN_VISIBLE_MS - (performance.now() - shownAt);
+            if (remaining > 0) nextDelay = remaining;
+            else reveal();
+          }
         } finally {
-          preparing = false;
-          if (active) schedule();
+          if (preparingFor === ticket) preparingFor = 0;
+          if (active && ticket === cycle) schedule(nextDelay);
         }
       }
-      window.camPageLoader = Object.freeze({begin});
+      window.camPageLoader = Object.freeze({start, begin});
       document.addEventListener('DOMContentLoaded', () => {
         domReady = true;
         lockPage();
-        if (active) {
+        if (active && !lockObserver) {
           lockObserver = new MutationObserver(lockPage);
           lockObserver.observe(document.body, {childList:true});
         }
+        if (active && shownAt === null) markShown(cycle);
         schedule();
       }, {once:true});
       window.addEventListener('load', () => {assetsReady = true; schedule();}, {once:true});
-      // Back/forward cache restores the completed page, never its entrance.
-      window.addEventListener('pageshow', event => {if (event.persisted) reveal();});
+      window.addEventListener('pageshow', event => {if (event.persisted) start();});
+      start();
     })();
     </script>
     <link rel="preload" as="image" href="assets/cam-sports-logo-completo.webp?v=20261024-lossless-1" fetchpriority="high">
@@ -5302,6 +5348,7 @@ currentUser = {
             document.getElementById('articleMissing').classList.add('hidden');
             const article = articles.find(a => String(a.id) === String(articleId));
             if (!article) return;
+            if (String(activeModalArticleId) !== String(article.id) || document.getElementById('articleModal').classList.contains('hidden')) window.camPageLoader?.start?.();
 
             if (document.getElementById('articleModal').classList.contains('hidden')) articlePreviousFocus = document.activeElement;
             activeModalArticleId = article.id;
@@ -5707,12 +5754,12 @@ updateThemeButton();
 <script src="assets/nfl-teams.js"></script>
 <script src="assets/cam-nfl-quiniela-logos.js?v=20261022-integration-1"></script>
 <script src="assets/cam-article-seo.js?v=20261105-link-preview-2"></script>
-<script src="assets/community.js?v=20261110-branded-loading-1"></script>
+<script src="assets/community.js?v=20261110-navigation-loading-1"></script>
 <script src="assets/ae-home-community-spotlight.js?v=20261109-calm-unity-1"></script>
 <script src="assets/champions.js?v=20261110-branded-loading-1"></script>
 <script src="assets/ae-ranking-notes.js?v=20261105-resume-motion-1"></script>
 <script src="assets/ae-pick-capture.js?v=20261104-apuesta-real-1"></script>
-<script src="assets/community-picks.js?v=20261110-branded-loading-1"></script>
+<script src="assets/community-picks.js?v=20261110-navigation-loading-1"></script>
 <script src="assets/weekly-picks.js?v=20261015-1"></script>
 <script src="assets/username-auth.js?v=20261103-remove-welcome-1"></script>
 <script src="assets/ae-category-visibility.js?v=20261016-dynamic-nav-1"></script>
@@ -5844,8 +5891,8 @@ html .cam-weekly-result-surface .cam-weekly-result-on-photo{
 </style>
 <script src="assets/cam-weekly-results.js?v=20261025-admin-resolved-pick-1"></script>
 <script src="assets/cam-profile-overview.js?v=20261110-mi-liguilla-1"></script>
-<script src="assets/cam-profile-quiniela.js?v=20261108-signed-scoring-1"></script>
-<script src="assets/ae-profile.js?v=20261108-profile-simple-1"></script>
+<script src="assets/cam-profile-quiniela.js?v=20261110-navigation-loading-1"></script>
+<script src="assets/ae-profile.js?v=20261110-navigation-loading-1"></script>
 <script src="assets/cam-leagues.js?v=20261109-rango-avisos-1"></script>
 <style id="cam-nfl-quiniela-theme">
 /* ===========================================================================
@@ -6635,10 +6682,10 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 
 <!-- Componentes finales: móvil, conversación, parties, perfil y Takes; orden en performance-css-packs.json. -->
 <link rel="stylesheet" href="assets/cam-perf-app-panels.css?v=20261110-mi-liguilla-2">
-<script src="assets/cam-parties.js?v=20261104-perfil-claro-1"></script>
+<script src="assets/cam-parties.js?v=20261110-navigation-loading-1"></script>
 <script src="assets/cam-sport-quiniela-loader.js?v=20261110-mis-8-2"></script>
 <script src="assets/ae-season-predictions.js?v=20261021-champion-guide-1"></script>
-<script src="assets/cam-lazy-editorial-loader.js?v=20261110-branded-loading-1"></script>
+<script src="assets/cam-lazy-editorial-loader.js?v=20261110-navigation-loading-1"></script>
 <script src="assets/cam-opinions-section-banners.js?v=20261104-actualidad-1"></script>
 <script src="assets/ae-home-takes.js?v=20261109-text-clarity-1"></script>
 <script src="assets/ae-home-take-discoveries.js?v=20261110-branded-loading-1"></script>
@@ -6657,7 +6704,7 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 <script src="assets/ae-notifications.js?v=20261109-rango-avisos-1"></script>
 <script src="assets/cam-analytics.js?v=20261026-sin-robots"></script>
 <!-- Pestañas dentro de NFL, Fútbol y Picks, y una dirección por sección (?s=nfl&v=quiniela); desde el 8 nov también en escritorio. -->
-<script src="assets/cam-mobile-sections.js?v=20261109-desktop-continuous-1"></script>
+<script src="assets/cam-mobile-sections.js?v=20261110-navigation-loading-1"></script>
 <!-- Inicio como «Tu jornada» (3 nov, teléfono; desde el 8 nov también en escritorio con tira, rejillas y carriles). -->
 <script src="assets/cam-home-jornada.js?v=20261110-branded-loading-1"></script>
 <!-- NFL y Fútbol · La semana (4 nov, teléfono; desde el 8 nov también en escritorio, en columnas). Power Rankings en Noticias. -->

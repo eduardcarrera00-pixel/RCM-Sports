@@ -246,6 +246,9 @@ async function requireLogin(resume, hint) {
 
 /* ---------- Mis parties ---------- */
 async function openHub(kind, sport) {
+  window.camPageLoader?.start?.();
+  const finishEntrance=window.camPageLoader?.begin?.();
+  try{
   if (KINDS[kind]) S.context.kind = kind;
   S.context.sport = SPORTS[sport] ? sport : 'all';
   if (!await currentUser()) {
@@ -254,6 +257,7 @@ async function openHub(kind, sport) {
   }
   renderHub();
   if (S.mineStale || !S.mine) loadMine();
+  }finally{finishEntrance?.();}
 }
 function renderHub() {
   S.view = 'hub';
@@ -301,6 +305,7 @@ function partyCard(p, onOpen, extra) {
   return card;
 }
 async function loadMine() {
+  const finishEntrance=window.camPageLoader?.begin?.();
   const req = ++hubReq;
   S.mine = null; S.mineError = '';
   fillMine();
@@ -312,7 +317,7 @@ async function loadMine() {
   } catch (e) {
     if (req !== hubReq) return;
     S.mineError = message(e);
-  }
+  }finally{finishEntrance?.();}
   fillMine();
 }
 function backToHub() { renderHub(); if (S.mineStale || !S.mine) loadMine(); }
@@ -464,6 +469,9 @@ async function joinInvite(btn, status) {
 
 /* ---------- un party ---------- */
 async function openParty(id, from, opts = {}) {
+  window.camPageLoader?.start?.();
+  const finishEntrance=window.camPageLoader?.begin?.();
+  try{
   if (!UUID.test(String(id || ''))) return;
   S.from = from || null; S.partyId = id; S.data = null; S.error = '';
   S.tab = 'ranking'; S.period = null; S.act = freshActivity();
@@ -480,6 +488,7 @@ async function openParty(id, from, opts = {}) {
   if (S.view !== 'party' || S.partyId !== id) return;
   renderParty();
   if (opts.justCreated && S.data) openInviteSheet();
+  }finally{finishEntrance?.();}
 }
 async function reloadParty() {
   const id = S.partyId, req = ++partyReq;
@@ -891,6 +900,7 @@ const P = {userId: null, own: false, tab: null, data: null, error: '', req: 0, s
 const profileNode = () => $('camProfileParties');
 const SPORT_SHORT = {nfl: 'NFL', football: 'Fútbol'};
 async function loadProfile() {
+  const finishEntrance=window.camPageLoader?.begin?.();
   const req = ++P.req, id = P.userId;
   P.data = null; P.error = ''; P.stale = false;
   renderProfile();
@@ -901,7 +911,7 @@ async function loadProfile() {
   } catch (e) {
     if (req !== P.req) return;
     P.error = message(e);
-  }
+  }finally{finishEntrance?.();}
   renderProfile();
 }
 function block(title, cls) {

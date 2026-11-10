@@ -1281,6 +1281,8 @@ function buildComposer(){
 async function loadArchive(){
  const target=$('cpArchiveFeed'),status=$('cpArchiveStatus'),more=$('cpArchiveMore');
  if(!target||!db)return;
+ const finishEntrance=window.camPageLoader?.begin?.();
+ try{
  target.replaceChildren(el('p','Cargando historial…'));status.textContent='';
  const r=await db.from('ae_pick_feed').select('*').in('moderation_status',['pending','approved']).order('created_at',{ascending:false}).order('id',{ascending:false}).range(0,archiveLimit-1);
  if(r.error){target.replaceChildren(el('p','No se pudo cargar el historial. '+message(r.error)));more.hidden=true;return;}
@@ -1288,6 +1290,7 @@ async function loadArchive(){
  target.replaceChildren(...records.map(p=>card(p,true)));
  status.textContent=records.length?'Picks publicados, incluso vencidos y con resultado verificado.':'Todavía no hay Picks disponibles.';
  more.hidden=records.length<archiveLimit;
+ }finally{finishEntrance?.();}
 }
 function closeArchive(){const dialog=$('cpArchiveDialog');if(dialog?.open)dialog.close();}
 function closeDetail(){const d=$('cpDialog');if(d?.open)d.close();}
@@ -1312,6 +1315,7 @@ function pickDetailHero(p){
 async function showDetail(id,options={}){
  if(!/^[0-9a-f-]{36}$/i.test(id))return;
  let dialog=$('cpDialog');
+ if(!dialog?.open||dialog.dataset.pickId!==id)window.camPageLoader?.start?.();
  if(!dialog){
   dialog=el('dialog',null,'rcm-dialog cp-dialog ae-cp-detail-dialog');
   dialog.id='cpDialog';
@@ -1325,6 +1329,8 @@ async function showDetail(id,options={}){
   });
  }
  dialog.classList.add('ae-cp-detail-dialog');
+ dialog.dataset.pickId=id;
+ const finishEntrance=window.camPageLoader?.begin?.();
  dialog.replaceChildren(pickDetailClose(),el('p','Cargando Pick…','ae-cp-detail-loading'));
  if(!dialog.open)dialog.showModal();
  try{
@@ -1500,6 +1506,7 @@ async function showDetail(id,options={}){
    conversation.insertBefore(reply,conversation.children[1]||null);
   }
  }catch(e){dialog.replaceChildren(pickDetailClose(),el('p',message(e),'ae-cp-detail-loading'));}
+ finally{finishEntrance?.();}
 }
 // Route an alert directly into its Pick without reloading or creating another dialog.
 window.aeOpenPickDetail=(id)=>{
@@ -1569,7 +1576,7 @@ document.addEventListener('DOMContentLoaded',()=>{
  if(document.fonts?.ready)document.fonts.ready.then(resize);
  $('cpReload')?.addEventListener('click',load);
  $('cpWorstReload')?.addEventListener('click',loadWorstRanking);
- $('cpViewAll')?.addEventListener('click',()=>{const dlg=$('cpArchiveDialog');if(dlg&&!dlg.open)dlg.showModal();archiveLimit=30;loadArchive();});
+ $('cpViewAll')?.addEventListener('click',()=>{window.camPageLoader?.start?.();const dlg=$('cpArchiveDialog');if(dlg&&!dlg.open)dlg.showModal();archiveLimit=30;loadArchive();});
  $('cpArchiveClose')?.addEventListener('click',closeArchive);
  $('cpArchiveMore')?.addEventListener('click',()=>{archiveLimit+=30;loadArchive();});
  for(const button of document.querySelectorAll('[data-chef-period]')){

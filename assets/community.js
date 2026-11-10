@@ -105,6 +105,7 @@ async function fetchAll(query) {
 }
 async function loadCommentsFromSupabase(articleId, quiet = false) {
     if (!db || articleId == null) return;
+    const finishEntrance = window.camPageLoader?.begin?.();
     const request = ++commentsRequest;
     const target = document.getElementById('modalCommentsList');
     if (!quiet && String(activeModalArticleId) === String(articleId)) target.textContent = 'Cargando comentarios…';
@@ -143,7 +144,7 @@ async function loadCommentsFromSupabase(articleId, quiet = false) {
             const retry = node('button', 'Volver a intentar'); retry.onclick = () => loadCommentsFromSupabase(articleId);
             target.append(retry);
         } else notifyCommunity('No pudimos actualizar los comentarios. Los datos mostrados pueden estar desactualizados.', true);
-    }
+    } finally { finishEntrance?.(); }
 }
 function renderModalComments(article) {
     if (String(article.id) === String(activeModalArticleId)) loadCommentsFromSupabase(article.id);

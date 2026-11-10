@@ -31,10 +31,12 @@ function fixture() {
   const hidden = {loading: 'lazy', getBoundingClientRect: () => ({width:0,height:0,top:0,bottom:0,left:0,right:0}),
     decode() {throw Error('Hidden sections must stay lazy');}};
   const document = {documentElement: root, body, fonts: {ready: fonts.promise}, images: [visible,below,hidden],
+    activeElement: body, querySelectorAll: () => [],
     getElementById: id => id === screen.id && !screen.removed ? screen : null,
     addEventListener: (name, callback) => docEvents.set(name, callback)};
   const setTimeout = (callback, delay = 0) => {timers.set(++nextTimer, {callback, at:now + delay}); return nextTimer;};
   const context = {document, console, innerWidth:390, innerHeight:844, setTimeout,
+    performance: {now: () => now},
     clearTimeout: id => timers.delete(id), requestAnimationFrame: callback => setTimeout(callback, 16),
     addEventListener: (name, callback) => winEvents.set(name, callback),
     MutationObserver: class {constructor(callback) {this.callback = callback; observer = this;} observe() {} disconnect() {this.disconnected = true;}}};
@@ -83,10 +85,38 @@ assert.equal(f.visible.loading, 'eager');
 assert.equal(f.below.loading, 'lazy');
 assert.ok(f.observer().disconnected);
 await f.advance(250);
-assert.equal(f.screen.removed, true);
+assert.equal(f.screen.classList.contains('is-leaving'), false, 'The cached screen becomes hidden without being removed');
 f.context.camPageLoader.begin()();
 f.restore();
-assert.equal(f.root.classList.contains('cam-booting'), false, 'Later requests and back navigation cannot restart the entrance');
+assert.equal(f.root.classList.contains('cam-booting'), true, 'Back cache also uses the navigation screen');
+await f.advance(850);
+assert.equal(f.root.classList.contains('cam-booting'), false);
+
+// Fast and cached views still get at least 750 ms after the first painted frame.
+const fast = fixture();
+fast.boot(); fast.fonts.resolve(); fast.image.resolve();
+await fast.advance(765);
+assert.ok(fast.root.classList.contains('cam-booting'), 'No fast-path reveal before 750 ms of visible loading');
+await fast.advance(85);
+assert.equal(fast.root.classList.contains('cam-booting'), false);
+fast.context.camPageLoader.start(); // Reenter during the previous exit fade.
+await fast.advance(250);
+assert.ok(fast.root.classList.contains('cam-booting'), 'The previous exit timer cannot hide a new navigation');
+assert.equal(fast.screen.classList.contains('is-leaving'), false);
+await fast.advance(515);
+assert.ok(fast.root.classList.contains('cam-booting'), 'Cached navigation also respects 750 ms');
+await fast.advance(85);
+assert.equal(fast.root.classList.contains('cam-booting'), false);
+
+// An existing background request is joined by navigation, without a second fetch.
+const finishBackground = fast.context.camPageLoader.begin();
+assert.equal(fast.root.classList.contains('cam-booting'), false, 'Background refresh never opens the screen');
+fast.context.camPageLoader.start();
+await fast.advance(1000);
+assert.ok(fast.root.classList.contains('cam-booting'), 'A reused in-flight request stays covered');
+finishBackground();
+await fast.advance(150);
+assert.equal(fast.root.classList.contains('cam-booting'), false);
 
 // A late module that starts during image decoding must also finish first.
 const late = fixture();
@@ -98,15 +128,27 @@ late.image.resolve();
 await late.advance(200);
 assert.ok(late.root.classList.contains('cam-booting'));
 finishLate();
-await late.advance(150);
+await late.advance(600);
 assert.equal(late.root.classList.contains('cam-booting'), false);
+
+// A superseded image decode cannot block or finish a newer destination.
+const changing = fixture();
+changing.boot(); changing.fonts.resolve();
+await changing.advance(100);
+changing.context.camPageLoader.start();
+changing.visible.decode = () => Promise.resolve();
+await changing.advance(700);
+assert.ok(changing.root.classList.contains('cam-booting'));
+changing.image.resolve();
+await changing.advance(150);
+assert.equal(changing.root.classList.contains('cam-booting'), false);
 
 // Image errors settle like successful downloads; a stalled request has a bound.
 const broken = fixture();
 broken.boot(); broken.fonts.resolve();
 await broken.advance(100);
 broken.image.reject(Error('Image unavailable'));
-await broken.advance(150);
+await broken.advance(800);
 assert.equal(broken.root.classList.contains('cam-booting'), false);
 const offline = fixture();
 offline.context.camPageLoader.begin(); offline.boot();
@@ -116,8 +158,11 @@ await offline.advance(1);
 assert.equal(offline.root.classList.contains('cam-booting'), false);
 assert.equal(offline.main.inert, false);
 offline.fonts.resolve(); offline.image.resolve();
+offline.context.camPageLoader.start();
+await offline.advance(850);
+assert.equal(offline.root.classList.contains('cam-booting'), false, 'A stalled old request cannot poison later navigation');
 
 assert.ok(html.indexOf('id="cam-page-loader"') < html.indexOf('src="assets/cam-pick-share.js'), 'Entrance starts before blocking app downloads');
 assert.match(html, /@media\(prefers-reduced-motion:reduce\)/);
 assert.match(html, /cam-loading-logo[\s\S]*?src="assets\/cam-sports-logo-completo.webp\?v=20261024-lossless-1"/);
-console.log('PASS: real data, late modules, image decoding, lazy images, idempotent completion, input locks, back cache, image errors and bounded offline exit.');
+console.log('PASS: 750 ms on initial and cached views, repeated navigation, in-flight reuse, background refresh, overlapping image decodes, input locks, back cache and offline recovery.');

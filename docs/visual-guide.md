@@ -2,15 +2,18 @@
 
 ### Entrada con marca · 10 nov 2026
 
-La primera visita muestra el logo oficial sobre azul con una barra bronce en CSS.
-La pantalla espera la carga inicial del documento, los módulos públicos, las fuentes
-y las imágenes del primer viewport antes de revelar la composición. Reutiliza el
+La entrada y la navegación muestran el logo oficial sobre azul con una barra bronce
+en CSS. La pantalla se mantiene al menos 750 ms desde su primer fotograma visible,
+también en vistas ya almacenadas en caché, y espera los datos, los módulos públicos,
+las fuentes y las imágenes del viewport antes de revelar la composición. Reutiliza el
 mismo WebP de la cabecera; no añade vídeos, dependencias ni otra petición de estilos.
 El contenido inferior conserva su carga diferida. Los errores liberan la espera y
 una salida a los 15 segundos evita bloqueos ante conexiones interrumpidas.
-La navegación interna y las vueltas desde la caché del navegador no repiten la
-animación. Se conserva el foco y los bloqueos anteriores, y se respeta movimiento
-reducido. Verificación: `npm run test:loading` y revisión de Inicio, NFL y Fútbol.
+Se reutiliza la misma pantalla al cambiar de sección, pestaña, competición o abrir
+un perfil, noticia o Pick; Atrás/Adelante también la muestran. Las actualizaciones
+en segundo plano no la abren, y una petición existente se espera sin duplicarla.
+Se conserva el foco y los bloqueos anteriores, y se respeta movimiento reducido.
+Verificación: `npm run test:loading`, `test:desktop` y revisión de navegación.
 
 ### Power Rankings arriba y atajos persistentes · 10 nov 2026
 

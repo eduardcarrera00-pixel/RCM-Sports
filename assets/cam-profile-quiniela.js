@@ -31,6 +31,7 @@
   }
   async function load(sport){
     if(state.pending[sport])return state.pending[sport];
+    const finishEntrance=window.camPageLoader?.begin?.();
     const revision=state.revision,userId=state.userId;
     const task=(async()=>{
       await Promise.resolve(); // Registrar la petición antes de cualquier error síncrono.
@@ -53,6 +54,7 @@
         if(revision===state.revision)state.errors[sport]=error.message;
       }finally{
         if(revision===state.revision){delete state.pending[sport];paint();}
+        finishEntrance?.();
       }
     })();
     state.pending[sport]=task;

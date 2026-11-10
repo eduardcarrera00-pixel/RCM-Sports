@@ -238,6 +238,8 @@
   async function selectCompetition(id){
     if(!COMPETITIONS.some(c=>c.id===id))return false;
     if(competition===id&&!changingCompetition)return true;
+    window.camPageLoader?.start?.();
+    const finishEntrance=window.camPageLoader?.begin?.();
     const ticket=++competitionRequest;
     competition=id;
     if(!seasons().includes(season))season=seasons()[0]||season;
@@ -254,7 +256,7 @@
         st('camFootballStatus',loadError,'error');
       }
       return false;
-    }finally{if(ticket===competitionRequest){changingCompetition=false;paintGames();announce();}}
+    }finally{if(ticket===competitionRequest){changingCompetition=false;paintGames();announce();}finishEntrance?.();}
   }
   // La semana y la quiniela usan los mismos botones, logos y cambio de competición.
   function competitionNav(){

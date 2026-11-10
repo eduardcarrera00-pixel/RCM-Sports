@@ -183,6 +183,7 @@ function appendChampionPicks(target,champions){
 async function loadPrestige(userId,reuse=false){
   const target=$('aeProfilePrestige');
   if(!target||!userId)return;
+  const finishEntrance=window.camPageLoader?.begin?.();
   const ticket=++prestigeRequest;
   // Al abrir Takes se reutiliza lo que ya trajo el resumen (prestigio y campeones).
   const cached=reuse&&extras?.author===userId&&extras.prestigeOk&&extras.championsOk?extras:null;
@@ -201,7 +202,7 @@ async function loadPrestige(userId,reuse=false){
     if(ticket!==prestigeRequest)return;
     target.replaceChildren(el('p','El perfil de prestigio no está disponible ahora mismo.','ae-profile-empty'));
     target.hidden=activeTab!=='takes';
-  }
+  }finally{finishEntrance?.();}
 }
 
 function publicProfileEntry(t,owner){
@@ -740,6 +741,7 @@ function renderPublishAction(){
 
 function setPrivateTab(tab,options={}){
   if(!activeAuthor)return;
+  if(validTab(tab)!==activeTab)window.camPageLoader?.start?.();
   labelTabs();
   const toJornadas=tab==='quiniela'&&privateView;
   activeTab=validTab(tab);
@@ -845,6 +847,7 @@ function markOverviewStale(){
 async function loadOverview(){
   const author=activeAuthor,own=privateView,ticket=request;
   if(!author)return;
+  const finishEntrance=window.camPageLoader?.begin?.();
   overviewStale=false;overviewError='';
   if(!overview)renderOverview();
   try{
@@ -880,7 +883,7 @@ async function loadOverview(){
         if(ticket===request&&card?.data?.username){publicAuthorLabel=card.data.username;setIdentity(card.data.username,card.data.joined_month?'Miembro desde '+monthText(card.data.joined_month+'-15T12:00:00'):undefined);}
       }catch{}
     }
-  }
+  }finally{finishEntrance?.();}
   renderHighlights();
   renderOverview();
 }
@@ -969,6 +972,7 @@ function renderOverview(){
 /* ---------- Takes y Picks: se cargan al abrir su pestaña ---------- */
 function loadTakes(){
   if(takesLoading)return takesLoading;
+  const finishEntrance=window.camPageLoader?.begin?.();
   const author=activeAuthor,own=privateView,ticket=request;
   loadPrestige(author,true);
   takesLoading=(async()=>{
@@ -992,11 +996,12 @@ function loadTakes(){
       renderTakes(ownTakes,author,!own);
     }
     if(!takeError)openSharedProfileTake(author);
-  })().finally(()=>{if(ticket===request)takesLoading=null;});
+  })().finally(()=>{if(ticket===request)takesLoading=null;finishEntrance?.();});
   return takesLoading;
 }
 function loadPicks(){
   if(picksLoading)return picksLoading;
+  const finishEntrance=window.camPageLoader?.begin?.();
   const author=activeAuthor,own=privateView,ticket=request;
   picksLoading=(async()=>{
     let error=null;
@@ -1005,7 +1010,7 @@ function loadPicks(){
     picksLoaded=true;
     $('aeProfileStatus').textContent=error?'Picks no disponibles. '+(error.message||''):'';
     if(activeTab==='picks')renderPicks(ownPicks,!own);
-  })().finally(()=>{if(ticket===request)picksLoading=null;});
+  })().finally(()=>{if(ticket===request)picksLoading=null;finishEntrance?.();});
   return picksLoading;
 }
 
@@ -1046,6 +1051,9 @@ function clearSections(){
 }
 
 async function showOwn(tab='perfil'){
+  window.camPageLoader?.start?.();
+  const finishEntrance=window.camPageLoader?.begin?.();
+  try{
   document.dispatchEvent(new CustomEvent('cam:profile-view',{detail:{userId:null}}));
   // La ventana se abre al primer toque; la sesión (ya leída) llega después.
   const ticket=++request;
@@ -1077,10 +1085,14 @@ async function showOwn(tab='perfil'){
   if(ticket!==request)return;
   // Se espera a la pestaña abierta (quien llama puede usarla al terminar).
   await Promise.all([summary,setPrivateTab(typeof tab==='string'?tab:'perfil')]);
+  }finally{finishEntrance?.();}
 }
 
 async function showPublic(id,push=true,tab='perfil'){
   if(!UUID.test(id))return;
+  window.camPageLoader?.start?.();
+  const finishEntrance=window.camPageLoader?.begin?.();
+  try{
   document.dispatchEvent(new CustomEvent('cam:profile-view',{detail:{userId:null}}));
   // «quiniela» se conserva para el perfil propio (baja a Mis jornadas).
   tab=typeof tab==='string'&&tab==='quiniela'?tab:validTab(typeof tab==='string'?tab:'perfil');
@@ -1112,6 +1124,7 @@ async function showPublic(id,push=true,tab='perfil'){
   const summary=loadOverview();
   if(ticket!==request)return;
   await Promise.all([summary,setPrivateTab(tab)]);
+  }finally{finishEntrance?.();}
 }
 
 
