@@ -192,7 +192,6 @@
     const askedTab = tab;
     tab = aliasOf(section, tab);
     const previous = tabOf(cat);
-    if (previous !== tab) window.camPageLoader?.start?.();
     if (!mobile.matches && section.group === 'sport') {
       chosen.set(cat, tab);
       render();
@@ -219,7 +218,8 @@
   const originalFilter = window.filterByCategory;
   window.filterByCategory = function camSectionAwareFilter() {
     const before = category();
-    if (arguments[0] !== before) window.camPageLoader?.start?.();
+    // The section entrance prepares all its tabs. Internal navigation stays instant.
+    if (['Todos', 'NFL', 'Fútbol', 'Picks', 'Opiniones'].includes(arguments[0]) && arguments[0] !== before) window.camPageLoader?.start?.();
     const result = originalFilter.apply(this, arguments);
     const after = category();
     if (pendingTab && SECTIONS[after] && validTab(SECTIONS[after], pendingTab)) chosen.set(after, aliasOf(SECTIONS[after], pendingTab));

@@ -201,7 +201,6 @@
   }
 
   function selectSport(key) {
-    if(active!==key)window.camPageLoader?.start?.();
     if (active === key) return;
     active = key;
     render();
@@ -509,7 +508,6 @@
   // ---------- Lectura ----------
   function openReader(id, opener) {
     const o = items.find(x => x.id === id); if (!o) return;
-    window.camPageLoader?.start?.();
     reading = o;
     const d = $('aeOpinionReader');
     const body = $('aeOpinionReaderBody'); body.replaceChildren();

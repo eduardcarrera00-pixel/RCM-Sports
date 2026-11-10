@@ -741,7 +741,6 @@ function renderPublishAction(){
 
 function setPrivateTab(tab,options={}){
   if(!activeAuthor)return;
-  if(validTab(tab)!==activeTab)window.camPageLoader?.start?.();
   labelTabs();
   const toJornadas=tab==='quiniela'&&privateView;
   activeTab=validTab(tab);
@@ -1051,7 +1050,6 @@ function clearSections(){
 }
 
 async function showOwn(tab='perfil'){
-  window.camPageLoader?.start?.();
   const finishEntrance=window.camPageLoader?.begin?.();
   try{
   document.dispatchEvent(new CustomEvent('cam:profile-view',{detail:{userId:null}}));
@@ -1090,7 +1088,6 @@ async function showOwn(tab='perfil'){
 
 async function showPublic(id,push=true,tab='perfil'){
   if(!UUID.test(id))return;
-  window.camPageLoader?.start?.();
   const finishEntrance=window.camPageLoader?.begin?.();
   try{
   document.dispatchEvent(new CustomEvent('cam:profile-view',{detail:{userId:null}}));

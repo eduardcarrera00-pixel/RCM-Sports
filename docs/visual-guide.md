@@ -2,16 +2,20 @@
 
 ### Entrada con marca · 10 nov 2026
 
-La entrada y la navegación muestran el logo oficial sobre azul con una barra bronce
-en CSS. La pantalla se mantiene al menos 750 ms desde su primer fotograma visible,
-también en vistas ya almacenadas en caché, y espera los datos, los módulos públicos,
+La entrada y los cambios entre Inicio, NFL, Fútbol, Picks y Actualidad muestran el
+logo oficial sobre azul con una barra bronce en CSS. La pantalla se mantiene al
+menos 750 ms desde su primer fotograma visible y espera los datos de la sección,
+los módulos públicos,
 las fuentes y las imágenes del viewport antes de revelar la composición. Reutiliza el
 mismo WebP de la cabecera; no añade vídeos, dependencias ni otra petición de estilos.
 El contenido inferior conserva su carga diferida. Los errores liberan la espera y
 una salida a los 15 segundos evita bloqueos ante conexiones interrumpidas.
-Se reutiliza la misma pantalla al cambiar de sección, pestaña, competición o abrir
-un perfil, noticia o Pick; Atrás/Adelante también la muestran. Las actualizaciones
-en segundo plano no la abren, y una petición existente se espera sin duplicarla.
+La semana, Takes y Noticias cambian directamente dentro de NFL y Fútbol. Picks,
+Chefs e Historial también; los filtros de Actualidad (Todas, NFL, Fútbol, Colegial…)
+no abren el cargador. Sus datos se preparan al entrar a la sección. Los detalles,
+perfiles y competiciones tampoco repiten la pantalla. Atrás/Adelante la muestran
+solo al cambiar de sección principal. Las actualizaciones en segundo plano no la
+abren, y una petición existente se espera sin duplicarla.
 Se conserva el foco y los bloqueos anteriores, y se respeta movimiento reducido.
 Verificación: `npm run test:loading`, `test:desktop` y revisión de navegación.
 

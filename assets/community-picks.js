@@ -1315,7 +1315,6 @@ function pickDetailHero(p){
 async function showDetail(id,options={}){
  if(!/^[0-9a-f-]{36}$/i.test(id))return;
  let dialog=$('cpDialog');
- if(!dialog?.open||dialog.dataset.pickId!==id)window.camPageLoader?.start?.();
  if(!dialog){
   dialog=el('dialog',null,'rcm-dialog cp-dialog ae-cp-detail-dialog');
   dialog.id='cpDialog';
@@ -1329,7 +1328,6 @@ async function showDetail(id,options={}){
   });
  }
  dialog.classList.add('ae-cp-detail-dialog');
- dialog.dataset.pickId=id;
  const finishEntrance=window.camPageLoader?.begin?.();
  dialog.replaceChildren(pickDetailClose(),el('p','Cargando Pick…','ae-cp-detail-loading'));
  if(!dialog.open)dialog.showModal();
@@ -1576,7 +1574,7 @@ document.addEventListener('DOMContentLoaded',()=>{
  if(document.fonts?.ready)document.fonts.ready.then(resize);
  $('cpReload')?.addEventListener('click',load);
  $('cpWorstReload')?.addEventListener('click',loadWorstRanking);
- $('cpViewAll')?.addEventListener('click',()=>{window.camPageLoader?.start?.();const dlg=$('cpArchiveDialog');if(dlg&&!dlg.open)dlg.showModal();archiveLimit=30;loadArchive();});
+ $('cpViewAll')?.addEventListener('click',()=>{const dlg=$('cpArchiveDialog');if(dlg&&!dlg.open)dlg.showModal();archiveLimit=30;loadArchive();});
  $('cpArchiveClose')?.addEventListener('click',closeArchive);
  $('cpArchiveMore')?.addEventListener('click',()=>{archiveLimit+=30;loadArchive();});
  for(const button of document.querySelectorAll('[data-chef-period]')){

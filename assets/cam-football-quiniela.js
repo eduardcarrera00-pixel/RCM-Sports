@@ -238,7 +238,6 @@
   async function selectCompetition(id){
     if(!COMPETITIONS.some(c=>c.id===id))return false;
     if(competition===id&&!changingCompetition)return true;
-    window.camPageLoader?.start?.();
     const finishEntrance=window.camPageLoader?.begin?.();
     const ticket=++competitionRequest;
     competition=id;

@@ -246,7 +246,6 @@ async function requireLogin(resume, hint) {
 
 /* ---------- Mis parties ---------- */
 async function openHub(kind, sport) {
-  window.camPageLoader?.start?.();
   const finishEntrance=window.camPageLoader?.begin?.();
   try{
   if (KINDS[kind]) S.context.kind = kind;
@@ -469,7 +468,6 @@ async function joinInvite(btn, status) {
 
 /* ---------- un party ---------- */
 async function openParty(id, from, opts = {}) {
-  window.camPageLoader?.start?.();
   const finishEntrance=window.camPageLoader?.begin?.();
   try{
   if (!UUID.test(String(id || ''))) return;

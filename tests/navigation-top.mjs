@@ -32,9 +32,15 @@ y = 900; w.camSectionTabs.select('historial'); assert.equal(y, 0);
 y = 700; w.camSectionTabs.select('picks'); assert.equal(y, 0);
 y = 800; w.camSectionTabs.select('picks'); assert.equal(y, 0, 'reselect is instant');
 y = 800; w.camSectionTabs.select('chefs', {scroll:false}); assert.equal(y, 800, 'explicit reveal retains anchor scrolling');
-assert.equal(transitions.filter(value=>value==='loading').length,beforeTabs+3,'Historial, Picks and Chefs load; reselecting the active tab only scrolls');
+assert.equal(transitions.filter(value=>value==='loading').length,beforeTabs,'Picks, Chefs and Historial switch instantly without another loading screen');
+for (const sport of ['NFL','Fútbol']) {
+  w.filterByCategory(sport);
+  const started=transitions.filter(value=>value==='loading').length;
+  for (const tab of ['takes','noticias','semana']) w.camSectionTabs.select(tab);
+  assert.equal(transitions.filter(value=>value==='loading').length,started,sport+' tabs never reopen the loading screen');
+}
 mobile = false; y = 500; w.filterByCategory('NFL'); assert.equal(y, 0, 'desktop section starts at top too');
 assert.equal(w.history.scrollRestoration, 'manual');
 y = 600; w.dispatchEvent(new w.PopStateEvent('popstate')); assert.equal(y, 0, 'Back never restores an old height');
-console.log('PASS: section/tab loading starts before rendering, returns through Back and desktop navigation, and retains instant scroll and reselect behavior.');
+console.log('PASS: only main sections open the loader; NFL/football/Picks tabs, scroll, reselect and Back retain instant navigation.');
 w.happyDOM.abort();

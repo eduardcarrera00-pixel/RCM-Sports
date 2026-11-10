@@ -5,7 +5,7 @@
   'use strict';
   const base=new URL('.',document.currentScript?.src||new URL('assets/',location.href));
   const source={
-    opinions:'ae-opinions.js?v=20261110-navigation-loading-1',
+    opinions:'ae-opinions.js?v=20261110-section-entrance-only-1',
     archive:'ae-news-archive.js?v=20261024-lazy-editorial-1'
   };
   const inFlight=new Map(),loaded=new Set();
@@ -51,7 +51,6 @@
   window.aeOpinions=opinionsProxy;
 
   function archiveProxy(category='Todas',opener=null){
-    window.camPageLoader?.start?.();
     return load('archive').then(ok=>{
       if(ok)window.aeOpenNewsArchive(category,opener);
       return ok;
