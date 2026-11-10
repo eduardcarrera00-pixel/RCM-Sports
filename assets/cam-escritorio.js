@@ -43,8 +43,8 @@
 
   /* ---------- 2. Carriles ---------- */
   const rail = el('aside', null, 'cam-desk-rail', { id: 'camDeskRail', 'aria-labelledby': 'camDeskRailTitle' });
-  const railIn = el('details', null, 'cam-desk-rail-in');
-  railIn.append(el('summary', 'Atajos', 'cam-desk-rail-toggle', { id: 'camDeskRailTitle' }));
+  const railIn = el('div', null, 'cam-desk-rail-in');
+  railIn.append(el('h2', 'Atajos', 'cam-desk-rail-toggle', { id: 'camDeskRailTitle' }));
   rail.append(railIn);
   const aside = el('aside', null, 'cam-desk-aside', { id: 'camDeskAside', 'aria-label': 'Destacados' });
   const asideIn = el('div', null, 'cam-desk-aside-in');
@@ -61,6 +61,11 @@
       const copy = svg.cloneNode(true);
       copy.removeAttribute('class');
       copy.setAttribute('aria-hidden', 'true');
+      copy.setAttribute('fill', 'none');
+      copy.setAttribute('stroke', 'currentColor');
+      copy.setAttribute('stroke-width', '1.6');
+      copy.setAttribute('stroke-linecap', 'round');
+      copy.setAttribute('stroke-linejoin', 'round');
       copy.setAttribute('focusable', 'false');
       icon.append(copy);
     }
@@ -94,6 +99,7 @@
   }
 
 
+  const top = el('div', null, 'cam-desk-top', {id:'camDeskTop'});
   const shell = el('div', null, 'cam-desk-layout', {id:'camDeskLayout'});
   const primary = el('div', null, 'cam-desk-main', {id:'camDeskMain'});
   shell.append(primary, aside);
@@ -127,6 +133,7 @@
     }
     placements.clear();
     shell.remove();
+    top.remove();
     rail.remove();
     returnShortcuts();
     mounted = null;
@@ -139,7 +146,7 @@
     rail.hidden = !shortcuts;
     if (p === 'home' || p === 'nfl' || p === 'futbol') {
       if (!shell.isConnected) main.append(shell);
-      if (rail.parentNode !== main || rail.nextSibling !== shell) main.insertBefore(rail,shell);
+      if (rail.parentNode !== main) main.insertBefore(rail,shell);
       if (p === 'home') {
         move(byId('camHomeJornada'), primary);
         move(editorial, primary);
@@ -149,13 +156,14 @@
         const prefix = p === 'nfl' ? 'camNfl' : 'camFootball';
         move(byId(prefix + 'Semana'), primary);
         move(editorial, primary);
-        move(byId(p === 'nfl' ? 'nflRankings' : 'championsRankings'), primary);
+        if (top.parentNode !== main || top.nextSibling !== shell) main.insertBefore(top,shell);
+        move(byId(p === 'nfl' ? 'nflRankings' : 'championsRankings'), top);
         move(byId(prefix + 'Quiniela'), primary);
         move(byId('freeTakes'), primary);
         move(byId(prefix + 'Score'), asideIn);
         move(byId('aeTrendingPortada'), asideIn);
         move(byId('aeSportTakeLeaders'), asideIn);
-        order(primary,[byId(prefix+'Semana'),editorial,byId(p==='nfl'?'nflRankings':'championsRankings'),byId(prefix+'Quiniela'),byId('freeTakes')]);
+        order(primary,[byId(prefix+'Semana'),editorial,byId(prefix+'Quiniela'),byId('freeTakes')]);
         order(asideIn,[byId(prefix+'Score'),byId('aeTrendingPortada'),byId('aeSportTakeLeaders')]);
       }
       aside.hidden = false;
@@ -175,6 +183,7 @@
     const barH = bar && !bar.hidden ? bar.getBoundingClientRect().height : 0;
     const values = {
       '--cam-desk-head':headerH + 'px',
+      '--cam-desk-bar-height':barH + 'px',
       '--cam-desk-stick':(headerH + barH + 20) + 'px',
       '--cam-desk-pull':getComputedStyle(main).paddingTop,
       '--cam-desk-aside-top':Math.min(headerH + barH + 20, innerHeight - asideIn.getBoundingClientRect().height - 24) + 'px'
@@ -185,7 +194,7 @@
     if (mobile.matches) {
       restore();
       delete body.dataset.camDesk;
-      for (const name of ['--cam-desk-head','--cam-desk-stick','--cam-desk-pull','--cam-desk-aside-top']) main.style.removeProperty(name);
+      for (const name of ['--cam-desk-head','--cam-desk-stick','--cam-desk-pull','--cam-desk-aside-top','--cam-desk-bar-height']) main.style.removeProperty(name);
       return;
     }
     body.dataset.camDesk = '';
@@ -203,7 +212,7 @@
   // Mobile and legacy renderers may restore their own nodes after a resize.
   // Re-adopt only when ownership actually changes; stable nodes keep focus.
   const children = new MutationObserver(queue);
-  for (const node of [main,primary,asideIn]) children.observe(node,{childList:true});
+  for (const node of [main,top,primary,asideIn]) children.observe(node,{childList:true});
   document.addEventListener('cam:section-tab',queue);
   window.addEventListener('resize',queue);
   window.addEventListener('pageshow',queue);

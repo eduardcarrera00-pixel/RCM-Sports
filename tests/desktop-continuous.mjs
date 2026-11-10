@@ -28,7 +28,7 @@ const disclosure=d.createElement('details'); disclosure.className='cam-hj-shortc
 const shortcuts=d.createElement('nav'); shortcuts.className='cam-hj-shortcuts';
 shortcuts.innerHTML='<button class="cam-hj-shortcut"><span class="cam-hj-shortcut-label">Quiniela<br>NFL</span></button>';
 disclosure.append(shortcuts);home.append(disclosure);d.getElementById('mainContent').prepend(home);
-const ids=['freeTakes','camNflSemana','camFootballSemana','camNflQuiniela','camFootballQuiniela','camNflScore','camFootballScore','aeTrendingPortada','aeSportTakeLeaders'];
+const ids=['freeTakes','camNflSemana','camFootballSemana','camNflQuiniela','camFootballQuiniela','camNflScore','camFootballScore','aeTrendingPortada','aeSportTakeLeaders','nflRankings','championsRankings'];
 // Score shells are created dynamically by the existing sport scripts.
 for(const id of ['camNflScore','camFootballScore']) if(!d.getElementById(id)){const n=d.createElement('section');n.id=id;d.getElementById('freeTakes').append(n);}
 const original = new Map(ids.map(id=>{const node=d.getElementById(id);return[id,{node,parent:node.parentNode}];}));
@@ -47,6 +47,11 @@ for(const [category,slug,prefix] of [['NFL','nfl','camNfl'],['Fútbol','futbol',
   assert.equal(d.body.dataset.camTabs,undefined);
   assert.equal(d.body.dataset.camTab,undefined);
   assert.equal(d.getElementById('camSectionTabs').hidden,true);
+  const ranking=d.getElementById(slug==='nfl'?'nflRankings':'championsRankings');
+  assert.equal(ranking.parentNode.id,'camDeskTop','The original sport ranking leads the desktop content');
+  assert.equal(d.getElementById('camDeskTop').nextElementSibling,d.getElementById('camDeskLayout'));
+  assert.equal(d.querySelector('#camDeskRail .cam-desk-rail-in').tagName,'DIV','Shortcuts are always exposed, with no collapse control');
+  assert.equal(d.querySelector('#camDeskRail summary'),null);
   for(const id of [prefix+'Semana',prefix+'Quiniela','freeTakes']) assert.equal(d.getElementById(id).parentNode,d.getElementById('camDeskMain'));
   assert.equal(editorial.parentNode,d.getElementById('camDeskMain'));
   assert.equal(d.getElementById(prefix+'Score').parentNode,d.querySelector('#camDeskAside > div'));
@@ -70,6 +75,7 @@ assert.equal(d.body.dataset.camDesk,undefined);
 assert.equal(d.body.dataset.camTabs,'sport');
 assert.equal(d.getElementById('camSectionTabs').hidden,false);
 assert.equal(d.getElementById('camDeskLayout'),null);
+assert.equal(d.getElementById('camDeskTop'),null);
 assert.equal(shortcuts.parentNode,disclosure);
 for(const id of ids.filter(id=>id!=='aeTrendingPortada'))assert.equal(d.getElementById(id).parentNode,original.get(id).parent,'Restored '+id);
 w.camSectionTabs.select('noticias');assert.equal(d.body.dataset.camTab,'noticias');
@@ -78,9 +84,11 @@ assert.equal(d.body.dataset.camSportPage,'futbol');assert.equal(d.body.dataset.c
 assert.equal(d.querySelectorAll('#camDeskLayout').length,1);
 // Legacy mobile/data renderers can finish after the desktop resize callback.
 original.get('freeTakes').parent.append(d.getElementById('freeTakes'));
+original.get('championsRankings').parent.append(d.getElementById('championsRankings'));
 original.get('aeTrendingPortada').parent.append(d.getElementById('aeTrendingPortada'));
 await settle();
 assert.equal(d.getElementById('freeTakes').parentNode,d.getElementById('camDeskMain'));
+assert.equal(d.getElementById('championsRankings').parentNode.id,'camDeskTop');
 assert.deepEqual([...d.querySelector('#camDeskAside > div').children].map(n=>n.id),['camFootballScore','aeTrendingPortada','aeSportTakeLeaders']);
 for(const id of ids)assert.equal(d.querySelectorAll('#'+id).length,1,'One live '+id+' after width changes');
 w.filterByCategory('Picks');await settle();

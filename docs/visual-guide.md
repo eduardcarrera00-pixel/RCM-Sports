@@ -1,5 +1,15 @@
 # AE SPORTS · Guía visual v1
 
+### Power Rankings arriba y atajos persistentes · 10 nov 2026
+
+En el ordenador, NFL y Fútbol abren con el Power Ranking original por encima
+de las columnas de contenido. Los atajos se muestran siempre como navegación
+vertical a la izquierda; su panel acompaña el desplazamiento y mantiene el
+acceso a quinielas, publicar Take, subir Pick y Mis parties en todas las secciones.
+El ancho reservado evita solapamientos y el teléfono conserva sus módulos y
+pestañas. El cambio reutiliza los nodos y controladores existentes; no duplica
+rankings ni carga datos adicionales.
+
 ### Escritorio como página completa · 9 nov 2026
 
 NFL y Fútbol ya no separan La semana, Takes y Noticias en tres pestañas del

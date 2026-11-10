@@ -112,7 +112,7 @@ html body :is(.cam-hj-shortcuts-disclosure,.cam-desk-rail-in) {
   padding:0!important;
 }
 html body .cam-desk-rail-toggle { width:fit-content!important; padding:8px 4px!important; }
-html body :is(.cam-hj-shortcuts-disclosure,.cam-desk-rail-in):not([open]) > .cam-hj-shortcuts { display:none!important; }
+html body .cam-hj-shortcuts-disclosure:not([open]) > .cam-hj-shortcuts { display:none!important; }
 html body[data-cam-desk] #camHomeJornada > .cam-hj-shortcuts-disclosure { display:none!important; }
 html body[data-cam-desk] #camDeskRail { margin:0 0 16px!important; }
 html body[data-cam-desk] #camDeskRail .cam-hj-shortcut {
