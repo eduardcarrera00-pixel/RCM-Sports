@@ -333,12 +333,21 @@ def run():
         page.locator('#camLiguilla .cam-fan-final-pair .cam-fan-option').first.click()
         assert '7/7' in page.locator('#camLiguilla .cam-fan-count').inner_text()
         assert 'Cruz Azul' in page.locator('#camLiguilla .cam-fan-champion').inner_text()
+        mobile_columns = page.evaluate("() => getComputedStyle(document.querySelector('#camLiguilla .cam-fan-tree')).gridTemplateColumns.split(' ').length")
+        assert mobile_columns == 1, 'en móvil el cuadro libre debe tener 1 columna legible: %s' % mobile_columns
         page.locator('#camLiguilla .cam-fan-actions button').filter(has_text='Guardar mi cuadro').click()
         assert page.evaluate("() => !!localStorage.getItem('cam-sports:cuadro-libre:ligamx:'+(window.camFootballQuiniela.snapshot().season)+':invitado')")
         assert 'este dispositivo' in page.locator('#camLiguilla .cam-fan-status').inner_text()
         page.locator('#camLiguilla .cam-fan-actions button').filter(has_text='Compartir en redes').click()
         page.wait_for_selector('#camPickShareDialog[open] .cam-pick-share-preview img', timeout=15000)
         page.locator('#camPickShareDialog .cam-pick-share-close').click()
+        # Iniciar sesión después de armar el cuadro no debe borrar la selección de invitado.
+        page.evaluate("() => { currentUser = {id:'u-1',username:'QA'}; window.camLiguilla.render(); }")
+        page.wait_for_timeout(200)
+        assert 'Cruz Azul' in page.locator('#camLiguilla .cam-fan-champion').inner_text(), 'se perdió el cuadro al entrar con cuenta'
+        page.locator('#camLiguilla .cam-fan-actions button').filter(has_text='Guardar mi cuadro').click()
+        page.wait_for_timeout(250)
+        assert page.evaluate("() => window.__fake.calls.some(c => c.table==='cam_liguilla_fan_brackets' && c.op==='upsert')"), 'no se sincronizó el cuadro del invitado'
         assert not layout_problems(page), layout_problems(page)
         assert not page.errors, page.errors
 
