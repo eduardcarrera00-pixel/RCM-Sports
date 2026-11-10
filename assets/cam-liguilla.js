@@ -606,7 +606,14 @@
     section.hidden=false;
     const focusKey=document.activeElement&&section.contains(document.activeElement)?keyOf(document.activeElement):null;
     const parts=[];
-    if(!state)parts.push(pendingPanel());
+    // El cuadro libre se puede armar sin esperar a que se publiquen los 8 clasificados oficiales.
+    const community=window.CamFanBracket?.panel?.(snap,state,viewer());
+    if(community)parts.push(community);
+    if(!state){
+      const official=el('details',null,'cam-lg-official-details');
+      official.append(el('summary','Cuadro oficial · Cruces por confirmar'),pendingPanel());
+      parts.push(official);
+    }
     if(loadError)parts.push(el('p',loadError,'cam-lg-note is-error'));
     if(state){
       parts.push(bracketPanel());
@@ -639,6 +646,6 @@
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)stale=true;});
   window.addEventListener('focus',()=>{stale=true;});
   window.addEventListener('cam:admin-state-change',()=>render());
-  window.camLiguilla=Object.freeze({refresh:()=>{stale=true;sync();},state:()=>state,shareModel});
+  window.camLiguilla=Object.freeze({refresh:()=>{stale=true;sync();},render,state:()=>state,shareModel});
   sync();
 })();
