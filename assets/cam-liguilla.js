@@ -30,7 +30,10 @@
   let draft=null,saving=false,note='',noteKind='',roundView=null,board=null,boardOpen=false,adminTable=null,adminMessage='';
   let animate='';
 
-  const section=el('section',null,'cam-liguilla');
+  // Reutilizar el contenedor de La semana: evita dos cuadros al cambiar de liga.
+  const section=window.camLiguillaNode||document.getElementById('camLiguilla')||el('section',null,'cam-liguilla');
+  window.camLiguillaNode=section;
+  section.classList.add('cam-liguilla');
   section.id='camLiguilla';section.hidden=true;section.setAttribute('aria-labelledby','camLiguillaTitle');
   (quiniela.querySelector('.cam-nfl-top')||quiniela.firstElementChild)?.after(section);
   function place(complete){

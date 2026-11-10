@@ -155,6 +155,25 @@
     if(results.length>3){const b=button(ui.scoreOpen?'Ver menos':'Ver los '+results.length+' resultados ›',()=>{ui.scoreOpen=!ui.scoreOpen;render();});b.setAttribute('aria-expanded',String(ui.scoreOpen));box.append(b);}
     return box;
   }
+  // Mostrar la Liguilla en La semana incluso cuando el complemento todavía carga.
+  // Nunca inventar cruces, equipos ni cuotas: la versión completa sustituye este estado.
+  function liguillaPlaceholder(){
+    const host=el('section',null,'cam-liguilla',{id:'camLiguilla','aria-labelledby':'camLiguillaTitle'});
+    window.camLiguillaNode=host;
+    const panel=el('div',null,'cam-lg-bracket cam-lg-pending');
+    const header=el('header',null,'cam-lg-head');
+    header.append(el('p','Liga MX · Liguilla','cam-lg-eyebrow'),
+      el('h3','Liguilla Liga MX',null,{id:'camLiguillaTitle'}),
+      el('p','Cruces por confirmar','cam-lg-sub'));
+    const board=el('div',null,'cam-lg-pending-board');
+    for(const stage of ['Cuartos','Semifinales','Final','Campeón']){
+      const column=el('div',null,'cam-lg-pending-stage');
+      column.append(el('span',stage,'cam-lg-round-head'),el('span','Pendiente','cam-lg-pending-slot'));
+      board.append(column);
+    }
+    panel.append(header,board);host.append(panel);
+    return host;
+  }
   function render(){
     if(!active())return;
     const api=q(),snap=api?.snapshot();
@@ -162,7 +181,9 @@
     if(api)head.append(api.competitionNav());
     const fragment=document.createDocumentFragment();fragment.append(head);
     // El evento de Liga MX pertenece a La semana; comparte datos con la quiniela.
-    const liguilla=document.getElementById('camLiguilla');
+    const liguilla=snap?.competition==='ligamx'
+      ?(window.camLiguillaNode||document.getElementById('camLiguilla')||liguillaPlaceholder())
+      :document.getElementById('camLiguilla');
     if(snap?.competition==='ligamx'&&liguilla&&!liguilla.hidden&&liguilla.dataset.complete!=='true')
       fragment.append(liguilla);
     if(snap?.error){

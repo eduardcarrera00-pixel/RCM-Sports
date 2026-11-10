@@ -296,6 +296,9 @@
     if(!user){window.openUserAuthModal?.();return;}
     draft.set(g.id,pick);saveDraft();paintGames();announce();
   }
+  // Un bloqueo temporal de carga no significa que el partido esté cerrado.
+  const unavailableReason=()=>changingCompetition?'Actualizando competición…'
+    :loadError?'Pronósticos no disponibles':'Este partido está cerrado';
   function side(g,pick){
     const id=pick==='home'?g.home_id:g.away_id;
     const chosen=active(g)===pick,disabled=!isOpen(g)||changingCompetition||!!loadError;
@@ -311,7 +314,7 @@
     b.append(el('small',points==null?'Pts pendientes':points+' pts'));
     if(points!=null)b.title='Acierto: +'+points+' puntos. Fallo: −'+points+' puntos.';
     b.addEventListener('click',()=>choose(g,pick));
-    if(disabled)b.title='Este partido está cerrado';
+    if(disabled)b.title=unavailableReason();
     return b;
   }
   // El empate ocupa el lugar de la «@» de la NFL: misma tarjeta, un resultado más.
@@ -324,7 +327,7 @@
     b.append(el('small',g.points_draw==null?'Pts pendientes':g.points_draw+' pts'));
     if(g.points_draw!=null)b.title='Acierto: +'+g.points_draw+' puntos. Fallo: −'+g.points_draw+' puntos.';
     b.addEventListener('click',()=>choose(g,'draw'));
-    if(disabled)b.title='Este partido está cerrado';
+    if(disabled)b.title=unavailableReason();
     return b;
   }
   // Mismo criterio que gameStatus(): el color nunca contradice al texto.
@@ -334,6 +337,8 @@
     if(g.status==='final')return !g.outcome?'pendiente':pick?(pick.pick===g.outcome?'acierto':'fallo'):'sin-pronostico';
     if(g.status==='live')return 'vivo';
     if(g.status==='postponed')return 'pospuesto';
+    if(changingCompetition)return 'cargando';
+    if(loadError)return 'no-disponible';
     if(new Date(g.kickoff).getTime()<=now())return 'cerrado';
     if(!g.odds_locked_at)return 'pendiente';
     if(!g.picks_open)return 'cerrado';
@@ -350,6 +355,8 @@
     }
     if(g.status==='live')return 'En vivo';
     if(g.status==='postponed')return 'Pospuesto';
+    if(changingCompetition)return 'Actualizando…';
+    if(loadError)return 'No disponible';
     if(new Date(g.kickoff).getTime()<=now())return 'Bloqueado';
     if(!g.odds_locked_at)return 'Preparando puntos';
     if(!g.picks_open)return 'Cerrada';
