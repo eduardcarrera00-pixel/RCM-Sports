@@ -69,7 +69,7 @@ async function scenario({anonymous=false,failed=false}={}){
     F.tableErrors={};one('#camFootballSemanaBody button.cam-ns-link').click();await settle();
   }
   assert.equal(api.snapshot().loaded,true);
-  assert.equal(one('.cam-ns-feature .cam-ns-kicker').textContent,'Duelo de la semana');
+  assert.ok(one('.cam-ns-feature'),'La semana keeps its featured match without restoring a redundant title');
   assert.equal(one('#camFootballSemana .cam-ns-edition'),null);
   assert.equal(one('#camFootballSemana .cam-ns-opinion .cam-ns-action-label'),null);
   assert.equal(one('#camFootballSemana .cam-ns-intro'),null);
