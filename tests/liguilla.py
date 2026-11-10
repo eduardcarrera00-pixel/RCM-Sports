@@ -316,16 +316,31 @@ def run():
         assert not problems, 'admin: ' + str(problems)
         assert not page.errors, page.errors
 
-    # 5) La comunidad arma un cuadro SIN que un admin abra la liguilla y SIN cuenta.
-    # El botón admite equipos reales desde los partidos de Liga MX, guardado local e imagen social.
+    # 5) Sin los ocho clasificados oficiales, Arma tu cuadro es solo un aviso:
+    # nada se puede elegir, guardar ni compartir, aunque existan equipos en la liga.
     with fp.full_page(fake_js=fake('none', user=False), width=390, height=900) as page:
         open_liga_mx(page)
-        assert page.locator('#camLiguilla .cam-fan-toggle').is_visible(), 'falta Arma tu cuadro'
+        toggle = page.locator('#camLiguilla .cam-fan-toggle')
+        assert toggle.is_visible(), 'debe mantenerse visible el módulo Arma tu cuadro'
+        assert toggle.is_disabled(), 'no se pueden abrir selecciones antes de los ocho clasificados'
+        assert toggle.inner_text() == 'Próximamente'
+        assert 'Pronto estará disponible' in page.locator('#camLiguilla .cam-fan-shell').inner_text()
+        assert '8 clasificados' in page.locator('#camLiguilla .cam-fan-shell').inner_text()
+        assert page.locator('#camLiguilla .cam-fan-select').count() == 0
+        assert page.locator('#camLiguilla .cam-fan-actions').count() == 0
+        assert not page.evaluate("() => window.CamFanBracket.shareModel()"), 'sin clasificados no existe imagen para compartir'
+        assert not layout_problems(page), layout_problems(page)
+        assert not page.errors, page.errors
+
+    # 6) Cuando se confirman los ocho, el cuadro se activa: solo ellos pueden avanzar.
+    with fp.full_page(fake_js=fake('open', user=False), width=390, height=900) as page:
+        open_liga_mx(page)
+        assert not page.locator('#camLiguilla .cam-fan-toggle').is_disabled()
         page.locator('#camLiguilla .cam-fan-toggle').click()
-        page.wait_for_function("() => document.querySelector('#camLiguilla .cam-fan-select')?.options.length >= 8")
-        for i, (team_id, _, _) in enumerate(TEAMS):
-            page.locator('#camLiguilla .cam-fan-select').nth(i).select_option(team_id)
-        assert page.locator('#camLiguilla .cam-fan-count').inner_text().startswith('8/8')
+        page.wait_for_function("() => document.querySelectorAll('#camLiguilla .cam-fan-team-select').length === 8")
+        assert page.locator('#camLiguilla .cam-fan-select').count() == 8
+        assert page.locator('#camLiguilla select.cam-fan-select').count() == 0, 'los ocho puestos oficiales no se pueden cambiar por otros equipos'
+        assert '8/8' in page.locator('#camLiguilla .cam-fan-count').inner_text()
         for n in [0, 2, 4, 6]:
             page.locator('#camLiguilla .cam-fan-team-select').nth(n).locator('.cam-fan-pass').click()
         page.locator('#camLiguilla .cam-fan-left-semi .cam-fan-option').first.click()
@@ -341,27 +356,27 @@ def run():
         page.locator('#camLiguilla .cam-fan-actions button').filter(has_text='Compartir en redes').click()
         page.wait_for_selector('#camPickShareDialog[open] .cam-pick-share-preview img', timeout=15000)
         page.locator('#camPickShareDialog .cam-pick-share-close').click()
-        # Iniciar sesión después de armar el cuadro no debe borrar la selección de invitado.
         page.evaluate("() => { currentUser = {id:'u-1',username:'QA'}; window.camLiguilla.render(); }")
         page.wait_for_timeout(200)
+        page.locator('#camLiguilla .cam-fan-toggle').click()
         assert 'Cruz Azul' in page.locator('#camLiguilla .cam-fan-champion').inner_text(), 'se perdió el cuadro al entrar con cuenta'
         page.locator('#camLiguilla .cam-fan-actions button').filter(has_text='Guardar mi cuadro').click()
         page.wait_for_timeout(250)
-        assert page.evaluate("() => window.__fake.calls.some(c => c.table==='cam_liguilla_fan_brackets' && c.op==='upsert')"), 'no se sincronizó el cuadro del invitado'
+        assert page.evaluate("() => window.__fake.calls.some(c => c.table==='cam_liguilla_fan_brackets' && c.op==='upsert')"), 'no se sincronizó el cuadro'
         assert not layout_problems(page), layout_problems(page)
         assert not page.errors, page.errors
 
-    # 6) Con sesión activa el botón guarda también en la tabla privada de Supabase.
+    # 7) Con sesión activa el botón guarda también en la tabla privada de Supabase.
     with fp.full_page(fake_js=fake('open', user=True), width=390, height=900) as page:
         open_liga_mx(page)
         page.locator('#camLiguilla .cam-fan-toggle').click()
-        page.wait_for_function("() => document.querySelectorAll('#camLiguilla .cam-fan-select').length === 8")
+        page.wait_for_function("() => document.querySelectorAll('#camLiguilla .cam-fan-team-select').length === 8")
         page.locator('#camLiguilla .cam-fan-actions button').filter(has_text='Guardar mi cuadro').click()
         page.wait_for_timeout(200)
         assert page.evaluate("() => window.__fake.calls.some(c => c.table==='cam_liguilla_fan_brackets' && c.op==='upsert')"), 'cuadro no se sincroniza'
         assert not page.errors, page.errors
 
-    print('OK · liguilla oficial y libre: crear, guardar (dispositivo y cuenta), compartir; 320/390/1366, día y noche')
+    print('OK · liguilla: esperar ocho clasificados, desbloqueo oficial, guardar y compartir; 320/390/1366, día y noche')
 
 
 if __name__ == '__main__':
