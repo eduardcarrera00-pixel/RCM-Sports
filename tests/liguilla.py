@@ -1,8 +1,9 @@
 """Liguilla de la Liga MX en la Quiniela de Fútbol (Chromium + Supabase falso).
 
-Un solo «Arma tu cuadro» en dos pasos:
-  · paso 1, antes de la J17: elegir a los 8 que entran (sin eliminados, tope de
-    8, invitado en el aparato, con cuenta en Supabase; cerrado = solo lectura);
+La Liguilla como evento (cabecera con los tres pasos) en dos pasos:
+  · paso 1, antes de la J17: los ya clasificados van fijos y se eligen solo los
+    lugares que faltan (sin eliminados; invitado en el aparato, con cuenta en
+    Supabase siempre con los 8; cerrado = solo lectura);
   · paso 2, con los 8 reales: el cuadro hasta el campeón (reclasificación de
     semis, guardar, compartir), la ficha para redes en sus 5 formatos con las
     zonas seguras y, después, la vista ronda a ronda (cuartos, semis y final);
@@ -275,7 +276,13 @@ def run():
         build_bracket(page)
         assert '56' in page.locator('#camLiguilla .cam-lg-potential').inner_text(), page.locator('#camLiguilla .cam-lg-potential').inner_text()
         assert not page.locator('#camLiguilla .cam-lg-share').is_disabled(), 'con los 7 elegidos ya se puede compartir'
-        assert 'acertaste 7 de 8' in page.locator('#camLiguilla .cam-lg-q8-hits').inner_text(), 'falta «Tus 8» en el cuadro'
+        assert 'acertaste 7 de 8' in page.locator('#camLiguilla .cam-lg-q8-hits').inner_text().lower(), 'falta «Tus 8» en el cuadro'
+        # La Liguilla como evento: cabecera con los tres pasos, el 2 en curso y la fecha de cierre.
+        assert page.locator('#camLiguilla .cam-lg-event h3').inner_text() == 'La Liguilla'
+        assert page.locator('#camLiguilla .cam-lg-steps li').nth(1).get_attribute('aria-current') == 'step'
+        assert 'al empezar los cuartos' in page.locator('#camLiguilla .cam-lg-event-close').inner_text()
+        # Una sola nota de reglas para todos los cruces, no una bajo cada uno.
+        assert page.locator('#camLiguilla .cam-lg-foot').count() == 0 and page.locator('#camLiguilla .cam-lg-board-note').count() == 1
         assert page.locator('#camLiguilla .cam-lg-bracket').count() == 1, 'debe haber un solo cuadro'
         assert page.locator('#camLiguilla [class*="cam-fan-"]').count() == 0 and not page.evaluate('() => !!window.CamFanBracket'), 'quedan restos del cuadro libre'
         page.locator('#camLiguilla .cam-lg-save').click()
@@ -291,7 +298,11 @@ def run():
         page.wait_for_timeout(300)
         assert page.evaluate("() => window.__fake.calls.some(c => c.rpc === 'cam_liguilla_save_series_pick' && c.args.p_team === '234')")
         # 1X2 de la ida desde la serie: usa el guardado de la quiniela
-        page.locator('#camLiguilla .cam-lg-series').first.locator('.cam-lg-leg').first.locator('.cam-lg-opt').nth(1).click()
+        # El 1X2 de ida y vuelta va plegado bajo «¿Quién pasa?».
+        first = page.locator('#camLiguilla .cam-lg-series').first
+        assert not first.locator('.cam-lg-leg').first.is_visible(), 'el 1X2 de la serie debía empezar plegado'
+        first.locator('summary.cam-lg-legs-sum').click(); page.wait_for_timeout(150)
+        first.locator('.cam-lg-leg').first.locator('.cam-lg-opt').nth(1).click()
         page.wait_for_timeout(500)
         assert page.evaluate("() => window.__fake.calls.some(c => c.rpc === 'cam_football_save_pick' && c.args.p_pick === 'draw')")
         assert page.evaluate("() => document.getElementById('camFootballQuiniela').classList.contains('cam-liguilla-round')"), 'la jornada normal debía ocultarse'
@@ -342,7 +353,7 @@ def run():
     with fp.full_page(fake_js=fake('none'), width=390, height=900) as page:
         open_liga_mx(page)
         assert page.locator('#camLiguilla').is_visible(), 'sin equipos oficiales debe aparecer estado pendiente'
-        assert 'Paso 1 de 2' in page.locator('#camLiguilla').inner_text(), 'antes de abrir se eligen los 8'
+        assert '¿Quién entra?' in page.locator('#camLiguilla').inner_text(), 'antes de abrir se eligen los 8'
         page.evaluate("() => { currentAdmin = {id:'u-1'}; window.dispatchEvent(new Event('cam:admin-state-change')); }")
         page.wait_for_timeout(200)
         page.locator('#camLiguilla .cam-lg-admin .cam-nfl-action').first.click()
@@ -367,16 +378,27 @@ def run():
     with fp.full_page(fake_js=fake('none', user=False), width=390, height=900) as page:
         open_liga_mx(page)
         root = page.locator('#camLiguilla')
-        assert root.locator('h3').first.inner_text() == 'Arma tu cuadro'
-        assert 'paso 1 de 2' in root.inner_text().lower() and 'paso 2 de 2' in root.inner_text().lower()
+        assert root.locator('h3').first.inner_text() == 'La Liguilla'
+        steps = root.locator('.cam-lg-steps li')
+        assert steps.count() == 3 and steps.nth(0).get_attribute('aria-current') == 'step', 'paso 1 en curso'
+        assert 'al empezar la última jornada' in root.locator('.cam-lg-event-close').inner_text()
         assert root.locator('[class*="cam-fan-"]').count() == 0 and not page.evaluate('() => !!window.CamFanBracket')
         teams = root.locator('.cam-lg-q8-team')
         assert teams.count() == 12, 'solo los que aún pueden clasificar: %d' % teams.count()
-        assert 'Ya eliminados:' in root.inner_text() and 'Atlas' in root.locator('.cam-lg-hint').first.inner_text()
+        assert 'Ya no pueden entrar:' in root.inner_text() and 'Atlas' in root.locator('.cam-lg-hint').first.inner_text()
         assert root.locator('.cam-lg-q8-team[data-team="216"]').count() == 0, 'un eliminado no se puede elegir'
-        assert root.locator('.cam-lg-q8-status.is-in').count() == 4, 'los ya clasificados llevan su etiqueta'
-        # Paso 2: vista previa del cuadro con los 8 primeros de hoy, de cuartos al trofeo, y «Próximamente».
-        pv = root.locator('.cam-lg-q8-next .cam-lg-pv')
+        # Los ya clasificados van fijos: no son botones, llevan candado y nadie los elige ni los quita.
+        fixed = root.locator('.cam-lg-q8-team.is-fixed')
+        assert fixed.count() == 4 and root.locator('button.cam-lg-q8-team').count() == 8, 'fijos: %d' % fixed.count()
+        assert fixed.locator('svg').count() == 4 and fixed.first.get_attribute('aria-pressed') is None
+        assert '4 ya están dentro. Elige los 4 que faltan.' in root.inner_text()
+        assert root.locator('.cam-lg-track i.is-fixed').count() == 4
+        # Paso 2: la vista previa del cuadro va plegada en «Tu cuadro se abre…».
+        teaser = root.locator('.cam-lg-teaser')
+        assert teaser.count() == 1 and not teaser.locator('.cam-lg-pv').is_visible(), 'la vista previa debía empezar plegada'
+        teaser.locator('summary').click(); page.wait_for_timeout(150)
+        pv = root.locator('.cam-lg-teaser .cam-lg-pv')
+        assert pv.is_visible(), 'la vista previa no se abre'
         assert pv.count() == 1, 'falta la vista previa del cuadro'
         seeds = pv.locator('.cam-lg-pv-seed').evaluate_all('n => n.map(x => x.textContent)')
         assert seeds == ['1', '8', '4', '5', '2', '7', '3', '6'], seeds
@@ -395,22 +417,24 @@ def run():
         assert 'CAZ' in page.evaluate("() => decodeURIComponent(document.querySelector('#camLiguilla .cam-lg-pv img.cam-lg-crest').src)")
         save = root.locator('.cam-lg-q8-save')
         assert save.is_disabled()
-        for team in ['218', '227', '219', '223', '15720', '225', '228']:
+        assert 'Elige 4 más' in save.inner_text()
+        root.locator('.cam-lg-q8-team.is-fixed[data-team="218"]').click(); page.wait_for_timeout(100)
+        assert '0 de 4' in root.locator('.cam-lg-count').inner_text(), 'tocar un fijo no debe contar'
+        for team in ['15720', '225', '228']:
             root.locator('.cam-lg-q8-team[data-team="%s"]' % team).click()
-        assert '7 de 8' in root.locator('.cam-lg-count').inner_text() and save.is_disabled()
-        assert 'Te faltan 1' in root.inner_text()
+        assert '3 de 4' in root.locator('.cam-lg-count').inner_text() and save.is_disabled()
+        assert 'Elige 1 más' in save.inner_text()
         root.locator('.cam-lg-q8-team[data-team="220"]').click()
-        assert '8 de 8' in root.locator('.cam-lg-count').inner_text()
-        assert root.locator('.cam-lg-q8-team[data-team="234"]').is_disabled(), 'no se puede elegir un noveno'
+        assert '4 de 4' in root.locator('.cam-lg-count').inner_text()
+        assert root.locator('.cam-lg-q8-team[data-team="234"]').is_disabled(), 'no se puede elegir un quinto'
         assert root.locator('.cam-lg-q8-team[data-team="220"]').get_attribute('aria-pressed') == 'true'
         # Quitar y volver a poner con el teclado (el foco se queda en el equipo).
         root.locator('.cam-lg-q8-team[data-team="220"]').focus(); page.keyboard.press('Enter'); page.wait_for_timeout(100)
-        assert '7 de 8' in root.locator('.cam-lg-count').inner_text()
+        assert '3 de 4' in root.locator('.cam-lg-count').inner_text()
         assert page.evaluate("() => document.activeElement?.dataset?.team") == '220', 'el foco se perdió al quitar'
         page.keyboard.press('Enter'); page.wait_for_timeout(100)
-        assert '8 de 8' in root.locator('.cam-lg-count').inner_text()
-        assert 'Ya clasificados: 4 de 8' in root.locator('.cam-lg-potential').inner_text()
-        assert not save.is_disabled()
+        assert '4 de 4' in root.locator('.cam-lg-count').inner_text()
+        assert not save.is_disabled() and save.inner_text() == 'Guardar mis 8'
         if SHOTS:
             root.screenshot(path=SHOTS + '/mis8-390-dia.png')
         save.click(); page.wait_for_timeout(150)
@@ -422,13 +446,14 @@ def run():
         # Entra con su cuenta: sus 8 siguen ahí y se guardan.
         page.evaluate("() => { window.__fake.user = JSON.parse(%r); currentUser = {id:'u-1', username:'QA_Liguilla_Larga'}; window.camLiguilla.refresh(); }" % USER)
         page.wait_for_timeout(500)
-        assert '8 de 8' in root.locator('.cam-lg-count').inner_text(), 'se perdieron los 8 al entrar con cuenta'
+        assert '4 de 4' in root.locator('.cam-lg-count').inner_text(), 'se perdieron los 8 al entrar con cuenta'
         assert root.locator('.cam-lg-q8-save').is_enabled()
         root.locator('.cam-lg-q8-save').click(); page.wait_for_timeout(400)
         call = page.evaluate("() => window.__fake.calls.filter(c => c.rpc === 'cam_liguilla_save_qualifiers').pop()")
         assert call and call['args']['p_window'] == 3 and sorted(call['args']['p_teams']) == sorted(['218', '227', '219', '223', '15720', '225', '228', '220']), call
         assert 'salen en tu perfil' in root.locator('.cam-lg-note').inner_text()
         assert root.locator('.cam-lg-q8-save').is_disabled(), 'sin cambios no hay nada que guardar'
+        assert 'guardados' in root.locator('.cam-lg-q8-save').inner_text()
         assert not page.evaluate("() => localStorage.getItem('cam:liguilla:mis8:anon:3')"), 'el borrador del aparato debía borrarse'
         assert not layout_problems(page), layout_problems(page)
         assert not page.errors, page.errors
@@ -437,8 +462,9 @@ def run():
     for width, dark in [(320, False), (320, True), (390, True), (1366, False), (1366, True)]:
         with fp.full_page(fake_js=fake('none'), width=width, height=900, dark=dark) as page:
             open_liga_mx(page)
-            for team in ['218', '227', '219', '223', '15720', '225', '228', '220']:
+            for team in ['15720', '225', '228', '220']:
                 page.locator('#camLiguilla .cam-lg-q8-team[data-team="%s"]' % team).click()
+            page.locator('#camLiguilla .cam-lg-teaser summary').click(); page.wait_for_timeout(150)
             problems = layout_problems(page)
             assert not problems, 'mis 8 %d %s: %s' % (width, 'noche' if dark else 'día', problems)
             # El aviso «Próximamente» no tapa los cuartos, el trofeo ni «Campeón».
@@ -453,7 +479,7 @@ def run():
             if width == 1366:
                 cols, wide = page.evaluate("() => [getComputedStyle(document.querySelector('#camLiguilla .cam-lg-q8-list')).gridTemplateColumns.split(' ').length,"
                     " document.querySelector('#camLiguilla .cam-lg-bracket').clientWidth]")
-                assert cols >= 2 and (cols == 3) == (wide >= 900), 'en escritorio la lista va en %s columnas (ancho %s)' % (cols, wide)
+                assert cols == (2 if wide < 560 else 3 if wide < 760 else 4), 'en escritorio la lista va en %s columnas (ancho %s)' % (cols, wide)
             if SHOTS:
                 page.locator('#camLiguilla').screenshot(path=SHOTS + '/mis8-%d-%s.png' % (width, 'noche' if dark else 'dia'))
             assert not page.errors, page.errors
@@ -462,9 +488,9 @@ def run():
     with fp.full_page(fake_js=fake('q8closed'), width=390, height=900, dark=True) as page:
         open_liga_mx(page)
         root = page.locator('#camLiguilla')
-        assert 'Paso 1 cerrado' in root.inner_text()
+        assert root.locator('.cam-lg-steps li').nth(0).inner_text().endswith('Cerrado')
         assert root.locator('.cam-lg-q8-team').count() == 8
-        assert root.locator('.cam-lg-q8-team:not([disabled])').count() == 0, 'cerrado: no se puede cambiar nada'
+        assert root.locator('button.cam-lg-q8-team').count() == 0, 'cerrado: no se puede cambiar nada'
         assert root.locator('.cam-lg-q8-save').count() == 0
         assert root.locator('.cam-lg-q8-status.is-in').count() == 4 and root.locator('.cam-lg-q8-status.is-alive').count() == 4
         problems = layout_problems(page)
@@ -499,7 +525,7 @@ def run():
             card.locator('.cam-ov-more').click()
             page.wait_for_function("() => { const r = document.getElementById('camLiguilla'); return r && !r.hidden && r.getClientRects().length && !document.getElementById('aeProfileDialog').open; }", timeout=8000)
             page.wait_for_timeout(500)
-            assert page.locator('#camLiguilla .cam-lg-q8-list' if mode == 'none' else '#camLiguilla .cam-lg-board').count() == 1
+            assert page.locator('#camLiguilla .cam-lg-q8-list' if mode == 'none' else '#camLiguilla .cam-lg-board').count() >= 1
             assert not page.errors, page.errors
 
     print('OK · liguilla: paso 1 (mis 8), un solo cuadro, ronda a ronda, perfil y admin; 320/390/1366, día y noche')

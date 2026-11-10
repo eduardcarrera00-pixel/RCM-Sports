@@ -179,6 +179,8 @@
     const api=q(),snap=api?.snapshot();
     const head=el('header',null,'cam-ns-head');head.append(el('h2','La semana','cam-ns-title',{id:'camFootballSemanaTitle'}));
     if(api)head.append(api.competitionNav());
+    // Un solo selector de competición: con el de La semana arriba, la quiniela no repite el suyo.
+    root.classList.toggle('has-competition-nav',!!api);
     const fragment=document.createDocumentFragment();fragment.append(head);
     // El evento de Liga MX pertenece a La semana; comparte datos con la quiniela.
     const liguilla=snap?.competition==='ligamx'

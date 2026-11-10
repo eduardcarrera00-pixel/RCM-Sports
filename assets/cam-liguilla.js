@@ -23,6 +23,13 @@
   const now=()=>Date.now();
   const clock=value=>new Date(value).toLocaleString('es',{timeZone:'America/Toronto',weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}).replace('.','');
   const day=value=>new Date(value).toLocaleDateString('es',{timeZone:'America/Toronto',weekday:'short',day:'numeric',month:'short'}).replace(/\./g,'');
+  // «viernes 20 nov, 20:00» y «22 nov»: lo que se lee en la cabecera del evento.
+  const longClock=value=>new Date(value).toLocaleString('es',{timeZone:'America/Toronto',weekday:'long',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit',hour12:false}).replace(/\./g,'').replace(/^(\p{L}+),\s*/u,'$1 ');
+  const shortDay=value=>new Date(value).toLocaleDateString('es',{timeZone:'America/Toronto',day:'numeric',month:'short'}).replace(/\./g,'');
+  const plusDays=(value,n)=>Date.parse(value)+n*864e5;
+  const CHECK='<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 8.5 6.5 12 13 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  const LOCK='<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><rect x="3.5" y="7" width="9" height="6.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M5.5 7V5.2a2.5 2.5 0 0 1 5 0V7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>';
+  const BRACKET_ICON='<svg viewBox="0 0 44 44" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h9v8H4M4 28h9v8H4M13 12h6v20h-6M19 22h7"/><path d="M30 15h8v4c0 3-2 5-4 5s-4-2-4-5Z"/><path d="M34 24v5M30.5 31h7"/></g></svg>';
   const QF=[[1,8],[2,7],[3,6],[4,5]];
   const ROUNDS={
     qf:{title:'Cuartos de final',short:'Cuartos',left:8},
@@ -37,6 +44,7 @@
   // «Mis 8»: la tabla y la ventana llegan de cam_liguilla_candidates mientras no hay liguilla.
   let cand=null,q8=[],q8Saving=false,q8Note='',q8Kind='';
   let animate='';
+  const openLegs=new Set();
 
   // Reutilizar el contenedor de La semana: evita dos cuadros al cambiar de liga.
   const section=window.camLiguillaNode||document.getElementById('camLiguilla')||el('section',null,'cam-liguilla');
@@ -91,14 +99,53 @@
     if(full)wrap.append(el('figcaption','Referencia con la tabla de hoy.','cam-lg-pv-caption'));
     return wrap;
   }
+  // La Liguilla como evento: azul noche y dorado (los de la ficha que se comparte), los tres
+  // pasos y una sola fecha de cierre. `when` es lo que se lee bajo cada paso.
+  function eventHero(step,{name,when,closes,closesWhat}){
+    const hero=el('header',null,'cam-lg-event');
+    const top=el('div',null,'cam-lg-event-name');
+    top.append(el('p','Liga MX'+(name?' · '+name:''),'cam-lg-event-kicker'));
+    const h=el('h3','La Liguilla','cam-lg-event-title');h.id='camLiguillaTitle';top.append(h);hero.append(top);
+    const steps=el('ol',null,'cam-lg-steps');steps.setAttribute('aria-label','Pasos de la liguilla');
+    ['Tus 8','Tu cuadro','Ronda a ronda'].forEach((label,i)=>{
+      const n=i+1,li=el('li',null,n<step?'is-done':n===step?'is-now':'');
+      if(n===step)li.setAttribute('aria-current','step');
+      const dot=el('span',n<step?null:String(n),'cam-lg-step-dot');dot.setAttribute('aria-hidden','true');
+      if(n<step)dot.innerHTML=CHECK;
+      const sub=when?.[i];
+      li.append(dot,el('b',label),sub instanceof Node?sub:el('span',sub||'','cam-lg-step-when'));
+      steps.append(li);
+    });
+    hero.append(steps);
+    if(closes){
+      const p=el('p',null,'cam-lg-event-close');
+      p.append('Cierra el ',el('strong',closes),closesWhat?', '+closesWhat+'.':'.');
+      hero.append(p);
+    }
+    return hero;
+  }
+  // «Tu cuadro» mientras no se abre: una tarjeta plegada con la vista previa dentro.
+  function teaser(teams,title){
+    const box=el('details',null,'cam-lg-teaser');
+    const sum=el('summary',null,'cam-lg-teaser-sum');
+    const icon=el('span',null,'cam-lg-teaser-icon');icon.innerHTML=BRACKET_ICON;
+    const text=el('span',null,'cam-lg-teaser-text');
+    text.append(el('strong',title),el('span','De cuartos al campeón. Las sorpresas valen más.'),el('span','Ver cómo será','cam-lg-teaser-more'));
+    sum.append(icon,text);box.append(sum);
+    const body=el('div',null,'cam-lg-teaser-body');
+    const how=el('ul',null,'cam-lg-how');
+    for(const line of ['Eliges quién gana cada cruce, de cuartos al campeón.',
+      'Cada acierto suma puntos en la quiniela; una sorpresa vale más.',
+      'Lo compartes en redes y queda en tu perfil.'])how.append(el('li',line));
+    body.append(previewBracket(teams),how);box.append(body);
+    return box;
+  }
   // Sin liguilla ni ventana de «mis 8» (o mientras carga): el recuadro espera.
   function pendingPanel(){
     const wrap=el('div',null,'cam-lg-bracket cam-lg-pending');
-    const head=el('header',null,'cam-lg-head');
-    head.append(el('p','Liga MX · La liguilla','cam-lg-eyebrow'));
-    const h=el('h3','Arma tu cuadro');h.id='camLiguillaTitle';head.append(h);
-    head.append(el('p',loading?'Cargando…':'Próximamente: se abre cuando se confirmen los 8 clasificados.','cam-lg-sub'));
-    wrap.append(head,previewBracket([]));return wrap;
+    wrap.append(eventHero(1,{when:['Pronto','','']}));
+    wrap.append(el('p',loading?'Cargando…':'Próximamente: se abre cuando se confirmen los 8 clasificados.','cam-lg-sub'));
+    wrap.append(previewBracket([]));return wrap;
   }
 
   // ------------------------------------------------------------- Datos derivados
@@ -216,13 +263,15 @@
     return img;
   }
   function pointsChip(text,cls=''){return el('span',text,'cam-lg-pts'+(cls?' '+cls:''));}
+  // Un equipo dentro de un cruce: escudo, nombre corto y, debajo, su lugar en la tabla y los puntos.
   function teamButton(id,{chosen,decided,disabled,pointsText,result,onPick,label}){
     const b=el('button',null,'cam-lg-team'+(chosen?' is-chosen':'')+(decided&&!chosen?' is-behind':''));
     b.type='button';b.setAttribute('aria-pressed',String(!!chosen));b.disabled=!!disabled;b.dataset.team=id;
-    const seed=el('span',String(seedOf(id)||''),'cam-lg-seed');seed.setAttribute('aria-hidden','true');
-    const name=el('span',null,'cam-lg-name');name.append(el('strong',fullName(id)),el('small',(team(id)?.abbreviation||'')+' · '+seedOf(id)+'.º de la tabla'));
-    b.append(seed,crest(id),name);
-    if(result)b.append(result);else if(pointsText)b.append(pointsChip(pointsText));
+    const name=el('span',null,'cam-lg-name');
+    const meta=el('small',null,'cam-lg-team-meta');meta.append(el('span',(seedOf(id)||'')+'.º','cam-lg-seed'));
+    if(result)meta.append(result);else if(pointsText)meta.append(pointsChip(pointsText));
+    name.append(el('strong',shortName(id)),meta);
+    b.append(crest(id,26),name);
     b.setAttribute('aria-label',label||fullName(id));
     if(onPick)b.addEventListener('click',onPick);
     return b;
@@ -235,17 +284,14 @@
   function bracketPanel(){
     const open=isOpen(),b=open?draft:saved(),mine=saved(),done=count(mine)===7;
     const wrap=el('div',null,'cam-lg-bracket');
-    const head=el('header',null,'cam-lg-head');
-    head.append(el('p','Liga MX · '+(L().name||'Liguilla')+' · Tu liguilla','cam-lg-eyebrow'));
-    const title=el('h3',open?'Arma tu cuadro':'Tu cuadro');title.id='camLiguillaTitle';head.append(title);
-    head.append(el('p',open
-      ?'Ya están los 8. Elige quién pasa en cada cruce hasta el campeón. Cierra el '+clock(L().closes_at)+' (hora de Toronto), al empezar los cuartos.'
-      :'Se cerró al empezar los cuartos. Cada acierto suma el día que se decide.','cam-lg-sub'));
     const mine8=Array.isArray(state.mine?.qualifiers)?state.mine.qualifiers.map(String):null;
-    if(mine8){
-      const hits=mine8.filter(id=>!!seedOf(id)).length;
-      head.append(el('p','Tus 8: acertaste '+hits+' de 8 clasificados.','cam-lg-q8-hits'));
-    }
+    const hits=mine8?el('span','Acertaste '+mine8.filter(id=>!!seedOf(id)).length+' de 8','cam-lg-step-when cam-lg-q8-hits'):'Cerrado';
+    wrap.append(eventHero(open?2:3,{name:L().name,
+      when:[hits,open?'Ahora':'Cerrado',open?'Desde el '+shortDay(L().closes_at):'Ahora'],
+      closes:open?longClock(L().closes_at):null,closesWhat:'al empezar los cuartos'}));
+    const head=el('header',null,'cam-lg-head');
+    const sh=el('div',null,'cam-lg-sec-head');sh.append(el('h4',open?'Arma tu cuadro':'Tu cuadro','cam-lg-sec-title'));head.append(sh);
+    if(open)head.append(el('p','Toca quién pasa en cada cruce.','cam-lg-sub'));
     const meter=el('div',null,'cam-lg-meter');
     const track=el('div',null,'cam-lg-track');track.setAttribute('aria-hidden','true');
     const n=count(b);for(let i=0;i<7;i++)track.append(el('i',null,i<n?'is-on':''));
@@ -267,9 +313,9 @@
     // Cuartos
     const qf=el('section',null,'cam-lg-round');qf.append(roundHead('Cuartos','pasa a semis'));
     const qfList=el('div',null,'cam-lg-matches');
-    QF.forEach((pairSeeds,i)=>{
+    QF.forEach((_,i)=>{
       const pair=qfPair(i);
-      qfList.append(matchCard(pair,b.semis[i],'semis',i,open,'Ida en casa del '+pairSeeds[1]+'.º · si empatan, pasa '+shortName(pair[0]),(id)=>{
+      qfList.append(matchCard(pair,b.semis[i],'semis',i,open,null,(id)=>{
         draft.semis[i]=draft.semis[i]===id?null:id;afterPick();
       }));
     });
@@ -277,7 +323,7 @@
     // Semis
     const sf=el('section',null,'cam-lg-round');sf.append(roundHead('Semifinales','pasa a la final'));
     const sfList=el('div',null,'cam-lg-matches');const sp=semiPairs(b.semis);
-    if(sp)sp.forEach((pair,i)=>sfList.append(matchCard(pair,b.finals[i],'final',i,open,'Si empatan, pasa '+shortName(pair[0]),(id)=>{
+    if(sp)sp.forEach((pair,i)=>sfList.append(matchCard(pair,b.finals[i],'final',i,open,null,(id)=>{
       draft.finals[i]=draft.finals[i]===id?null:id;afterPick();
     })));
     else sfList.append(el('p',L().reseed!==false
@@ -287,7 +333,7 @@
     // Final
     const fi=el('section',null,'cam-lg-round');fi.append(roundHead('Final','campeón'));
     const fiList=el('div',null,'cam-lg-matches');const fp=finalPair(b.finals);
-    if(fp)fiList.append(matchCard(fp,b.champion,'champion',0,open,'Si empatan: prórroga y penales',(id)=>{
+    if(fp)fiList.append(matchCard(fp,b.champion,'champion',0,open,null,(id)=>{
       draft.champion=draft.champion===id?null:id;animate=draft.champion?'crown':'';afterPick();
     }));
     else fiList.append(el('p','Elige a tus dos finalistas.','cam-lg-wait'));
@@ -303,6 +349,9 @@
     }else champ.append(el('strong','Todavía sin elegir','cam-lg-champion-name is-empty'));
     boardEl.append(champ);animate='';
     wrap.append(boardEl);
+    // Una sola nota con las reglas de los cruces, en vez de repetirla bajo cada uno.
+    wrap.append(el('p','Si empatan en el global, pasa el mejor de la tabla; en la final, prórroga y penales.'
+      +(L().reseed!==false?' En semis, el mejor que siga vivo juega contra el peor.':''),'cam-lg-hint cam-lg-board-note'));
     // Acciones
     if(open){
       const actions=el('div',null,'cam-lg-actions');
@@ -435,114 +484,153 @@
   const q8Open=()=>!!W()&&!!W().open&&Date.parse(W().closes_at)>now();
   const q8Key=who=>'cam:liguilla:mis8:'+(who||'anon')+':'+(W()?.id||0);
   const q8Saved=()=>Array.isArray(cand?.mine)?cand.mine.map(String):null;
+  // Los que ya están matemáticamente dentro van fijos en los 8 de todos: nadie los elige ni
+  // los quita. Cada aficionado elige solo los lugares que faltan; `q8` guarda solo esos.
+  const fixedIds=()=>candTeams().filter(t=>t.status==='in').map(t=>String(t.team_id));
+  const isFixed=id=>fixedIds().includes(String(id));
+  const slots=()=>Math.max(0,8-fixedIds().length);
+  const ownPicks=list=>[...new Set((list||[]).map(String))].filter(id=>cteam(id)&&cteam(id).status==='alive');
+  const fullEight=()=>[...fixedIds(),...q8];
+  const sameSet=(a,b)=>a.length===b.length&&[...a].sort().join()===[...b].sort().join();
   function recoverQualifiers(){
-    q8=q8Saved()||[];q8Note='';
+    q8=ownPicks(q8Saved());q8Note='';
     if(q8.length)return;
     // Primero lo de esta cuenta y después lo que hizo como invitado en este aparato.
     for(const who of [...new Set([viewer()?.id||'anon','anon'])]){
       try{
         const raw=JSON.parse(localStorage.getItem(q8Key(who))||'null');
         if(Array.isArray(raw)){
-          q8=[...new Set(raw.map(String))].filter(id=>cteam(id)&&cteam(id).status!=='out').slice(0,8);
+          q8=ownPicks(raw).slice(0,slots());
           if(q8.length)return;
         }
       }catch{}
     }
   }
-  function storeQ8(){try{localStorage.setItem(q8Key(viewer()?.id),JSON.stringify(q8));}catch{}}
+  // Si desde la última vez un elegido quedó eliminado o ya entró por su cuenta, deja de contar como elección.
+  function tidyQ8(){
+    const gone=q8.filter(id=>cteam(id)?.status==='out').map(id=>cteam(id).short_name||cteam(id).name);
+    q8=ownPicks(q8);
+    if(gone.length&&!q8Note){q8Note=gone.join(' y ')+(gone.length===1?' ya quedó eliminado':' ya quedaron eliminados')+': elige otro.';q8Kind='error';}
+  }
+  function storeQ8(){try{localStorage.setItem(q8Key(viewer()?.id),JSON.stringify(fullEight()));}catch{}}
   function toggleQ8(id){
-    if(!q8Open()||q8Saving)return;
+    if(!q8Open()||q8Saving||isFixed(id))return;
     const i=q8.indexOf(id);
-    if(i>=0)q8.splice(i,1);else if(q8.length<8)q8.push(id);
+    if(i>=0)q8.splice(i,1);else if(q8.length<slots())q8.push(id);
     storeQ8();q8Note='';render();
     section.querySelector('.cam-lg-q8-team[data-team="'+CSS.escape(id)+'"]')?.focus({preventScroll:true});
   }
   async function saveQ8(){
-    if(q8Saving||!q8Open()||q8.length!==8)return;
+    const eight=fullEight();
+    if(q8Saving||!q8Open()||q8.length!==slots()||eight.length!==8)return;
     storeQ8();
     if(!viewer()){
       q8Note='Guardado en este dispositivo. Inicia sesión para que tus 8 salgan en tu perfil.';q8Kind='ok';render();return;
     }
     q8Saving=true;q8Note='';render();
     try{
-      const {error}=await client().rpc('cam_liguilla_save_qualifiers',{p_window:W().id,p_teams:q8});
+      const {error}=await client().rpc('cam_liguilla_save_qualifiers',{p_window:W().id,p_teams:eight});
       if(error)throw error;
-      cand.mine=[...q8];
+      cand.mine=[...eight];
       try{localStorage.removeItem(q8Key(viewer()?.id));localStorage.removeItem(q8Key('anon'));}catch{}
-      q8Note='Tus 8 están guardados y salen en tu perfil. Puedes cambiarlos hasta el cierre.';q8Kind='ok';
+      q8Note='Tus 8 están guardados y salen en tu perfil.';q8Kind='ok';
     }catch(error){q8Note=error?.message||'No se pudo guardar. Inténtalo de nuevo.';q8Kind='error';}
     finally{q8Saving=false;render();}
   }
-  function q8Team(t,{chosen,disabled,showStatus}){
-    const b=el('button',null,'cam-lg-q8-team'+(chosen?' is-chosen':'')+(t.status==='out'?' is-out':''));
-    b.type='button';b.dataset.team=String(t.team_id);b.disabled=!!disabled;b.setAttribute('aria-pressed',String(!!chosen));
-    const rank=el('span',String(t.rank||''),'cam-lg-seed');rank.setAttribute('aria-hidden','true');
+  // Una ficha por equipo, en dos columnas. `fixed`: ya dentro, no se toca. `showStatus`: tras el cierre.
+  function q8Team(t,{chosen,disabled,fixed,readonly,showStatus}){
+    const still=fixed||readonly;
+    const b=el(still?'div':'button',null,'cam-lg-q8-team'+(chosen?' is-chosen':'')+(fixed?' is-fixed':'')+(readonly?' is-readonly':'')+(t.status==='out'?' is-out':''));
+    b.dataset.team=String(t.team_id);
+    if(!still){b.type='button';b.disabled=!!disabled;b.setAttribute('aria-pressed',String(!!chosen));}
     const name=el('span',null,'cam-lg-name');
-    const gd=Number(t.goal_diff||0);
-    name.append(el('strong',t.name||t.short_name||t.team_id),el('small',t.points+' pts · '+t.played+' PJ · DG '+(gd>0?'+':'')+gd));
     const status=t.status==='in'?'Clasificado':t.status==='out'?'Eliminado':'En juego';
-    const tag=el('span',showStatus||t.status==='in'?status:'','cam-lg-q8-status is-'+(t.status||'alive'));
-    b.append(rank,crest(t.team_id,28,t),name,tag);
-    b.setAttribute('aria-label',(t.name||t.short_name)+', '+t.rank+'.º con '+t.points+' puntos, '+status.toLowerCase()+(chosen?', elegido':''));
+    const meta=el('small',(t.rank?t.rank+'.º · ':'')+t.points+' pts');
+    if(showStatus)meta.append(' · ',el('span',status,'cam-lg-q8-status is-'+(t.status||'alive')));
+    name.append(el('strong',t.short_name||t.name||t.team_id),meta);
+    b.append(crest(t.team_id,26,t),name);
+    const mark=el('span',null,'cam-lg-q8-mark');mark.setAttribute('aria-hidden','true');
+    if(fixed)mark.innerHTML=LOCK;else if(chosen)mark.innerHTML=CHECK;
+    b.append(mark);
+    if(fixed)b.title='Ya está dentro';
+    const said=(t.name||t.short_name)+', '+(t.rank?t.rank+'.º con ':'')+t.points+' puntos';
+    if(fixed){b.setAttribute('role','listitem');b.setAttribute('aria-label',said+', ya clasificado: va en tus 8');}
+    else if(readonly){b.setAttribute('role','listitem');b.setAttribute('aria-label',said+', '+status.toLowerCase());}
+    else b.setAttribute('aria-label',said+', '+status.toLowerCase()+(chosen?', elegido':''));
     return b;
   }
+  const listText=a=>a.length<2?a.join(''):a.slice(0,-1).join(', ')+' y '+a[a.length-1];
   function qualifiersPanel(){
-    const open=q8Open(),saved=q8Saved(),mine=open?q8:(saved||[]);
+    const open=q8Open(),saved=q8Saved();
+    if(open)tidyQ8();
+    const fixed=fixedIds(),need=slots();
     const wrap=el('div',null,'cam-lg-bracket cam-lg-q8');
-    const head=el('header',null,'cam-lg-head');
-    head.append(el('p','Liga MX · '+(W().name||'Liguilla')+' · La liguilla','cam-lg-eyebrow'));
-    const h=el('h3','Elige tus 8');h.id='camLiguillaTitle';head.append(h);
-    head.append(el('p',open
-      ?'Elige ocho clasificados. Cierre: '+clock(W().closes_at)+' (hora de Toronto), al empezar la última jornada.'
-      :saved?'Paso 1 cerrado: estos son tus 8. El cuadro se abre en cuanto se confirmen los 8 clasificados.'
-      :'Paso 1 cerrado. El cuadro se abre en cuanto se confirmen los 8 clasificados.','cam-lg-sub'));
-    const meter=el('div',null,'cam-lg-meter');
-    const track=el('div',null,'cam-lg-track is-eight');track.setAttribute('aria-hidden','true');
-    for(let i=0;i<8;i++)track.append(el('i',null,i<mine.length?'is-on':''));
-    meter.append(track,el('span',mine.length+' de 8','cam-lg-count'));
-    const already=mine.filter(id=>cteam(id)?.status==='in').length,gone=mine.filter(id=>cteam(id)?.status==='out').length;
-    const line=el('p',null,'cam-lg-potential');
-    if(mine.length){line.append('Ya clasificados: ',el('b',String(already)),' de '+mine.length+(gone?' · '+gone+' eliminado'+(gone===1?'':'s'):''));}
-    else line.append(Number(cand.players||0)?Number(cand.players)+(Number(cand.players)===1?' aficionado ya eligió':' aficionados ya eligieron')+' a sus 8.':'Sé el primero en elegir a tus 8.');
-    meter.append(line);head.append(meter);wrap.append(head);
+    const closes=W()?.closes_at;
+    wrap.append(eventHero(open?1:2,{name:W()?.name,
+      when:[open?'Ahora':'Cerrado',open&&closes?'Desde el '+shortDay(plusDays(closes,2)):'Al terminar la J17',closes?'Desde el '+shortDay(plusDays(closes,5)):''],
+      closes:open&&closes?longClock(closes):null,closesWhat:'al empezar la última jornada'}));
     if(!candTeams().length){
       wrap.append(el('p','La tabla de la Liga MX no está disponible ahora mismo. Vuelve a entrar en unos minutos.','cam-lg-wait'));
       return wrap;
     }
-    const list=el('div',null,'cam-lg-q8-list');list.setAttribute('role','group');list.setAttribute('aria-label','Elige a tus 8 clasificados');
+    const body=el('section',null,'cam-lg-q8-body');body.setAttribute('aria-labelledby','camLiguillaQ8Title');
+    const head=el('div',null,'cam-lg-sec-head');
+    const h=el('h4',open?'¿Quién entra?':'Tus 8','cam-lg-sec-title');h.id='camLiguillaQ8Title';head.append(h);
+    if(open&&need){const c=el('span',null,'cam-lg-count');c.append(el('b',String(Math.min(q8.length,need))),' de '+need);head.append(c);}
+    body.append(head);
     if(open){
-      for(const t of candTeams().filter(t=>t.status!=='out')){
-        const chosen=mine.includes(String(t.team_id));
-        const b=q8Team(t,{chosen,disabled:q8Saving||(!chosen&&mine.length>=8),showStatus:false});
-        b.addEventListener('click',()=>toggleQ8(String(t.team_id)));
-        list.append(b);
+      const track=el('div',null,'cam-lg-track is-eight');track.setAttribute('aria-hidden','true');
+      for(let i=0;i<8;i++)track.append(el('i',null,i<fixed.length?'is-fixed':i<fixed.length+q8.length?'is-on':''));
+      body.append(track);
+      body.append(el('p',need===8?'Toca los 8 equipos que crees que juegan la Liguilla.'
+        :need===0?'Ya se conocen los 8: van solos en tu lista.'
+        :fixed.length+(fixed.length===1?' ya está dentro. ':' ya están dentro. ')+(need===1?'Elige el que falta.':'Elige los '+need+' que faltan.'),'cam-lg-sub'));
+      if(fixed.length){
+        body.append(el('p','Ya dentro','cam-lg-group-label'));
+        const list=el('div',null,'cam-lg-q8-list is-fixed');list.setAttribute('role','list');list.setAttribute('aria-label','Ya clasificados: van en tus 8');
+        for(const id of fixed){const t=cteam(id);if(t)list.append(q8Team(t,{fixed:true}));}
+        body.append(list);
       }
-    }else for(const id of mine){const t=cteam(id);if(t)list.append(q8Team(t,{chosen:true,disabled:true,showStatus:true}));}
-    if(list.childElementCount)wrap.append(list);
-    const outs=candTeams().filter(t=>t.status==='out').map(t=>t.short_name||t.name);
-    if(open&&outs.length)wrap.append(el('p','Ya eliminados: '+outs.join(', ')+'.','cam-lg-hint'));
-    if(open){
-      const dirty=JSON.stringify(mine)!==JSON.stringify(saved||[]);
-      const actions=el('div',null,'cam-lg-actions');
-      const save=btn(q8Saving?'Guardando…':'Guardar mis 8','cam-nfl-action cam-lg-q8-save',saveQ8);
-      save.disabled=q8Saving||mine.length!==8||(!!viewer()&&!dirty);
-      actions.append(save);
-      if(!viewer())actions.append(btn('Iniciar sesión','cam-lg-link',()=>window.openUserAuthModal?.()));
-      const clear=btn('Quitar todos','cam-lg-link',()=>{q8=[];storeQ8();q8Note='';render();});clear.disabled=!mine.length||q8Saving;
-      actions.append(clear);wrap.append(actions);
-      wrap.append(el('p',mine.length<8?'Te faltan '+(8-mine.length)+'. Toca un equipo para elegirlo o quitarlo.'
-        :dirty?(viewer()?'Tienes cambios sin guardar.':'Pulsa «Guardar mis 8».')
-        :'Tus 8 están guardados. Puedes cambiarlos hasta el cierre.','cam-lg-hint'));
-      const p=el('p',q8Note,'cam-lg-note'+(q8Kind?' is-'+q8Kind:''));p.setAttribute('role','status');p.setAttribute('aria-live','polite');wrap.append(p);
+      if(need){
+        if(fixed.length)body.append(el('p','Se juegan el lugar','cam-lg-group-label'));
+        const list=el('div',null,'cam-lg-q8-list');list.setAttribute('role','group');
+        list.setAttribute('aria-label',need===8?'Elige a tus 8 clasificados':'Elige '+(need===1?'el que falta':'los '+need+' que faltan'));
+        for(const t of candTeams().filter(t=>t.status==='alive')){
+          const chosen=q8.includes(String(t.team_id));
+          const b=q8Team(t,{chosen,disabled:q8Saving||(!chosen&&q8.length>=need)});
+          b.addEventListener('click',()=>toggleQ8(String(t.team_id)));
+          list.append(b);
+        }
+        body.append(list);
+      }
+      const outs=candTeams().filter(t=>t.status==='out').map(t=>t.short_name||t.name);
+      if(outs.length)body.append(el('p','Ya no pueden entrar: '+listText(outs)+'.','cam-lg-hint'));
+      if(need){
+        const eight=fullEight(),dirty=!sameSet(eight,saved||[]),over=q8.length-need,who=viewer();
+        const actions=el('div',null,'cam-lg-actions');
+        const save=btn(q8Saving?'Guardando…':over>0?'Quita '+over:q8.length<need?'Elige '+(need-q8.length)+' más'
+          :who&&!dirty?'Tus 8 están guardados':'Guardar mis 8','cam-nfl-action cam-lg-q8-save',saveQ8);
+        save.disabled=q8Saving||q8.length!==need||(!!who&&!dirty);
+        actions.append(save);
+        if(!who)actions.append(btn('Iniciar sesión','cam-lg-link',()=>window.openUserAuthModal?.()));
+        if(q8.length){const clear=btn('Quitar mis elecciones','cam-lg-link',()=>{q8=[];storeQ8();q8Note='';render();});clear.disabled=q8Saving;actions.append(clear);}
+        body.append(actions);
+        body.append(el('p',over>0?'Otro equipo ya entró por su cuenta: quita '+(over===1?'uno':over)+' de tus elegidos.'
+          :dirty&&q8.length===need?(who?'Tienes cambios sin guardar.':'Pulsa «Guardar mis 8».')
+          :'Puedes cambiarlos hasta el cierre.','cam-lg-hint'));
+        const p=el('p',q8Note,'cam-lg-note'+(q8Kind?' is-'+q8Kind:''));p.setAttribute('role','status');p.setAttribute('aria-live','polite');body.append(p);
+      }
+    }else{
+      const mine=saved||[];
+      if(mine.length){
+        const list=el('div',null,'cam-lg-q8-list');list.setAttribute('role','list');list.setAttribute('aria-label','Tus 8');
+        for(const id of mine){const t=cteam(id);if(t)list.append(q8Team(t,{readonly:true,showStatus:true}));}
+        body.append(list);
+      }else body.append(el('p','No elegiste tus 8 esta vez. El cuadro se abre en cuanto se confirmen los 8 clasificados.','cam-lg-sub'));
     }
-    const next=el('section',null,'cam-lg-q8-next');next.setAttribute('aria-labelledby','camLiguillaStep2');
-    const step=el('h4','Tu cuadro · Próximamente','cam-lg-round-head');step.id='camLiguillaStep2';
-    const how=el('ul',null,'cam-lg-how');
-    for(const line of ['Eliges quién gana cada cruce, de cuartos al campeón.',
-      'Cada acierto suma puntos en la quiniela; una sorpresa vale más.',
-      'Lo compartes en redes y queda en tu perfil.'])how.append(el('li',line));
-    next.append(step,previewBracket(candTeams().filter(t=>t.status!=='out')),how);
-    wrap.append(next);
+    wrap.append(body);
+    wrap.append(teaser(candTeams().filter(t=>t.status!=='out'),
+      open&&closes?'Tu cuadro se abre el '+shortDay(plusDays(closes,2)):'Tu cuadro se abre al terminar la J17'));
     return wrap;
   }
 
@@ -600,10 +688,16 @@
     const side=id=>{const span=el('span',null,'cam-lg-series-team');span.append(crest(id,28),el('strong',fullName(id)));return span;};
     title.append(side(s.high_id),el('span','vs','cam-lg-vs'),side(s.low_id));card.append(title);
     card.append(passBox(s));
-    const legs=el('div',null,'cam-lg-legs');
-    legs.append(legRow(s,'Ida',s.leg1_id),legRow(s,'Vuelta',s.leg2_id));
+    // El 1X2 de la ida y la vuelta va plegado: «¿Quién pasa?» es lo primero. Se abre solo
+    // en cuanto hay algo que ver (en vivo o con marcador) o si ya elegiste en alguno.
+    const g1=legOf(s,s.leg1_id),g2=legOf(s,s.leg2_id),snap=api()?.snapshot?.();
+    const busy=[g1,g2].some(g=>g&&(g.status==='live'||g.status==='final'||snap?.mine?.get?.(g.id)));
+    const legs=el('details',null,'cam-lg-legs');legs.open=!!busy||openLegs.has(s.id);
+    legs.addEventListener('toggle',()=>{if(legs.open)openLegs.add(s.id);else openLegs.delete(s.id);});
+    legs.append(el('summary','Marcador de ida y vuelta','cam-lg-legs-sum'),legRow(s,'Ida',s.leg1_id),legRow(s,'Vuelta',s.leg2_id));
     card.append(legs);
-    card.append(el('p',seriesFoot(s),'cam-lg-series-foot'));
+    const played=[g1,g2].some(g=>g&&g.status==='final');
+    if(played||s.status==='decided'||s.status==='penalties')card.append(el('p',seriesFoot(s),'cam-lg-series-foot'));
     if(isAdmin()&&s.status==='penalties')card.append(adminWinner(s));
     return card;
   }

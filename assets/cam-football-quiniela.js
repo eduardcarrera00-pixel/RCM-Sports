@@ -293,10 +293,17 @@
     image.addEventListener('error',()=>{image.style.visibility='hidden';image.dataset.logoError='true';});
     return image;
   }
+  // 10 nov 2026: como en el Duelo de la semana, la elección se guarda al tocarla. Los toques
+  // seguidos van en fila; si uno falla, queda como borrador y vuelve «Guardar picks del día».
+  let tapQueue=Promise.resolve();
   function choose(g,pick){
     if(!isOpen(g)||changingCompetition||loadError)return;
     if(!user){window.openUserAuthModal?.();return;}
     draft.set(g.id,pick);saveDraft();paintGames();announce();
+    tapQueue=tapQueue.then(()=>{
+      const latest=draft.get(g.id);
+      return latest&&user?saveOne(g.id,latest):false;
+    }).catch(()=>false);
   }
   // Un bloqueo temporal de carga no significa que el partido esté cerrado.
   const unavailableReason=()=>changingCompetition?'Actualizando competición…'
@@ -454,11 +461,18 @@
     sizeGameViewport();
     const save=$('camFootballSave'),saveDay=$('camFootballSaveDay');
     if(save){
-      save.disabled=saving||changingCompetition||!!loadError||(user?!chosen.some(g=>draft.has(g.id)&&isOpen(g)):false);
+      const pendingRound=chosen.some(g=>draft.has(g.id)&&isOpen(g));
+      // Cada toque ya se guarda: «Guardar toda la jornada» solo aparece si algo quedó sin guardar.
+      if(user&&!pendingRound&&!saving){save.hidden=true;save.style.setProperty('display','none','important');}
+      else if(user){save.hidden=false;save.style.removeProperty('display');}
+      save.disabled=saving||changingCompetition||!!loadError||(user?!pendingRound:false);
       save.textContent=user?'Guardar toda la jornada':'Inicia sesión para participar';
     }
     if(saveDay){
-      saveDay.disabled=saving||changingCompetition||!!loadError||(user?!visible.some(g=>draft.has(g.id)&&isOpen(g)):false);
+      const pendingDay=visible.some(g=>draft.has(g.id)&&isOpen(g));
+      // Con sesión, cada toque ya se guarda: el botón solo vuelve si algo quedó sin guardar.
+      saveDay.hidden=!!user&&!pendingDay&&!saving;
+      saveDay.disabled=saving||changingCompetition||!!loadError||(user?!pendingDay:false);
       saveDay.textContent=user?'Guardar picks del día':'Inicia sesión para participar';
     }
   }

@@ -103,27 +103,9 @@
 /* ---- Paso 1 · «Mis 8» ---------------------------------------------------------- */
 #camLiguilla .cam-lg-track.is-eight{grid-template-columns:repeat(8,1fr)}
 #camLiguilla .cam-lg-q8-hits{margin:0;font-size:14px;font-weight:600;color:var(--q-gold-text)}
-#camLiguilla .cam-lg-q8-list{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;min-width:0}
-#camLiguilla .cam-lg-q8-team{display:grid;grid-template-columns:22px 28px minmax(0,1fr) auto;align-items:center;gap:10px;width:100%;min-height:56px;padding:8px 12px;border:1px solid var(--q-line);border-radius:0;background:var(--q-card);color:var(--q-ink);text-align:left;position:relative;transition:background .2s ease,border-color .2s ease}
-#camLiguilla .cam-lg-q8-team .cam-lg-crest{width:28px;height:28px}
 @media (hover:hover){#camLiguilla .cam-lg-q8-team:not(:disabled):hover{border-color:var(--q-gold);background:var(--q-gold-soft)}}
-#camLiguilla .cam-lg-q8-team.is-chosen{border-color:var(--q-gold);box-shadow:inset 0 0 0 1px var(--q-gold);background:var(--q-gold-soft)}
-#camLiguilla .cam-lg-q8-team.is-chosen::after{content:"✓";position:absolute;top:6px;right:8px;font:800 12px/1 var(--ds-font-sans,Inter,system-ui,sans-serif);color:var(--q-gold-text)}
 #camLiguilla .cam-lg-q8-team:disabled:not(.is-chosen){opacity:.5}
 #camLiguilla .cam-lg-q8-team.is-chosen:disabled{opacity:1}
-#camLiguilla .cam-lg-q8-status{font:700 11px/1 var(--ds-font-sans,Inter,system-ui,sans-serif);white-space:nowrap;padding:5px 8px;border-radius:999px;margin-right:12px}
-#camLiguilla .cam-lg-q8-status:empty{display:none}
-#camLiguilla .cam-lg-q8-status.is-in{background:var(--q-ok-bg);color:var(--q-ok-text)}
-#camLiguilla .cam-lg-q8-status.is-out{background:var(--q-bad-bg);color:var(--q-bad-text)}
-#camLiguilla .cam-lg-q8-status.is-alive{background:var(--q-sunken);color:var(--q-meta)}
-#camLiguilla .cam-lg-q8-next{display:grid;gap:10px;padding-top:14px;border-top:1px dashed var(--q-line)}
-#camLiguilla .cam-lg-q8-next h4{margin:0}
-@container (min-width:560px){
-  #camLiguilla .cam-lg-q8-list{grid-template-columns:repeat(2,minmax(0,1fr))}
-}
-@container (min-width:900px){
-  #camLiguilla .cam-lg-q8-list{grid-template-columns:repeat(3,minmax(0,1fr))}
-}
 
 /* ---- Ronda a ronda -------------------------------------------------------------- */
 #camLiguilla .cam-lg-rounds{background:var(--q-card);border:1px solid var(--q-line);container-type:inline-size;min-width:0;display:grid;gap:14px;padding-bottom:16px}
@@ -292,11 +274,166 @@
   html body #camLiguilla .cam-lg-admin>*+*{margin-top:10px!important}
 }
 @layer cam-rounded-editorial{
-  /* Las filas llenan su tarjeta (la tarjeta conserva sus esquinas) y los 8 son tarjetas, no píldoras. */
-  html body #camLiguilla .cam-lg-match .cam-lg-team{border-radius:0!important}
-  html body #camLiguilla .cam-lg-q8-list .cam-lg-q8-team{border-radius:var(--ds-radius,10px)!important}
   html body #camLiguilla .cam-lg-pv .cam-lg-pv-dot{border-radius:50%!important}
   html body #camLiguilla .cam-lg-pv .cam-lg-pv-slot{border-radius:4px!important}
   html body #camLiguilla .cam-lg-pv .cam-lg-pv-match{border-radius:8px!important}
   html body #camLiguilla .cam-lg-pv .cam-lg-pv-soon{border-radius:14px!important}
+}
+
+/* ---- La Liguilla como evento (10 nov 2026) ----------------------------------------
+   Cabecera azul noche y dorada con los tres pasos; debajo, el contenido sobre la página
+   (sin caja alrededor) y fichas que se tocan. Elegido = azul de día, dorado de noche. */
+#camLiguilla{--lg-title:#0A3268;--lg-sel:#0A3268;--lg-on-sel:#F3EBDD;--lg-on-sel-meta:#C2CDD4;--lg-on-sel-pts:#E8BF79;--lg-accent:#855B43}
+html.dark #camLiguilla{--lg-title:#F3EBDD;--lg-sel:#E8BF79;--lg-on-sel:#0B2233;--lg-on-sel-meta:#3D4A52;--lg-on-sel-pts:#0B2233;--lg-accent:#E8BF79}
+#camLiguilla .cam-lg-bracket{background:none;border:0;padding:0;gap:18px}
+#camLiguilla .cam-lg-event{display:grid;gap:16px;padding:20px 18px 18px;background:#0B2233;color:#F3EBDD;border:1px solid #0B2233;min-width:0}
+html.dark #camLiguilla .cam-lg-event{border-color:rgba(232,191,121,.3)}
+#camLiguilla .cam-lg-event-name{display:grid;gap:4px;min-width:0}
+#camLiguilla .cam-lg-event-kicker{margin:0;font:600 11px/1.35 var(--ds-font-sans,Inter,system-ui,sans-serif);letter-spacing:.14em;text-transform:uppercase;color:#E8BF79}
+#camLiguilla .cam-lg-event-title{margin:0;font:500 clamp(30px,8vw,36px)/1.1 var(--ds-font-serif,"Playfair Display",Georgia,serif);color:#F3EBDD}
+#camLiguilla .cam-lg-steps{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;margin:0;padding:0;list-style:none}
+#camLiguilla .cam-lg-steps::before{content:"";position:absolute;top:13px;left:16.6%;right:16.6%;height:1px;background:rgba(243,235,221,.28)}
+#camLiguilla .cam-lg-steps li{position:relative;display:grid;justify-items:center;align-content:start;gap:6px;text-align:center;min-width:0;font-size:13px;line-height:1.3;color:#C2CDD4}
+#camLiguilla .cam-lg-steps li b{font-weight:600}
+#camLiguilla .cam-lg-steps li.is-now b{color:#F3EBDD}
+#camLiguilla .cam-lg-step-dot{width:26px;height:26px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;font:700 12px/1 var(--ds-font-sans,Inter,system-ui,sans-serif);background:#0B2233;border:1px solid rgba(243,235,221,.35);color:#C2CDD4}
+#camLiguilla .cam-lg-steps .is-now .cam-lg-step-dot{background:#E8BF79;border-color:#E8BF79;color:#0B2233}
+#camLiguilla .cam-lg-steps .is-done .cam-lg-step-dot{border-color:#E8BF79;color:#E8BF79}
+#camLiguilla .cam-lg-step-dot svg{width:12px;height:12px;display:block}
+#camLiguilla .cam-lg-step-when,#camLiguilla .cam-lg-steps .cam-lg-q8-hits{font-size:12px;font-weight:400;line-height:1.3;color:#C2CDD4}
+#camLiguilla .cam-lg-steps .cam-lg-q8-hits{font-weight:600;color:#E8BF79}
+#camLiguilla .cam-lg-event-close{margin:0;padding-top:14px;border-top:1px solid rgba(243,235,221,.16);font-size:13px;line-height:1.45;color:#C2CDD4}
+#camLiguilla .cam-lg-event-close strong{color:#F3EBDD;font-weight:600}
+/* Títulos de cada paso: «¿Quién entra?», «Arma tu cuadro». */
+#camLiguilla .cam-lg-sec-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;min-width:0}
+#camLiguilla .cam-lg-sec-title{margin:0;font:500 24px/1.25 var(--ds-font-serif,"Playfair Display",Georgia,serif);color:var(--lg-title)}
+#camLiguilla .cam-lg-sec-head .cam-lg-count{font-size:15px;color:var(--q-meta);white-space:nowrap}
+#camLiguilla .cam-lg-sec-head .cam-lg-count b{font-weight:700;color:var(--q-ink)}
+#camLiguilla .cam-lg-head{gap:10px}
+/* Paso 1: los que ya están dentro, fijos; los demás, fichas de dos en dos. */
+#camLiguilla .cam-lg-q8-body{display:grid;gap:12px;min-width:0}
+#camLiguilla .cam-lg-track i.is-fixed{background:var(--lg-sel);opacity:.7}
+#camLiguilla .cam-lg-group-label{margin:0;font:700 11px/1.3 var(--ds-font-sans,Inter,system-ui,sans-serif);letter-spacing:.12em;text-transform:uppercase;color:var(--q-meta)}
+#camLiguilla .cam-lg-q8-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;min-width:0}
+#camLiguilla .cam-lg-q8-team{display:grid;grid-template-columns:26px minmax(0,1fr) 14px;align-items:center;gap:9px;width:100%;min-width:0;min-height:56px;padding:8px 10px;border:1px solid var(--q-line);background:var(--q-card);color:var(--q-ink);text-align:left;position:relative;transition:background .2s ease,border-color .2s ease,color .2s ease}
+#camLiguilla .cam-lg-q8-team .cam-lg-crest{width:26px;height:26px}
+#camLiguilla .cam-lg-q8-team .cam-lg-name strong{font-size:14px;font-weight:650;line-height:1.25;overflow-wrap:anywhere}
+#camLiguilla .cam-lg-q8-team .cam-lg-name small{font-size:12px;line-height:1.3;color:var(--q-meta)}
+#camLiguilla .cam-lg-q8-mark{width:14px;height:14px;display:block}
+#camLiguilla .cam-lg-q8-mark svg{width:14px;height:14px;display:block}
+#camLiguilla .cam-lg-q8-team.is-chosen{background:var(--lg-sel);border-color:var(--lg-sel);color:var(--lg-on-sel)}
+#camLiguilla .cam-lg-q8-team.is-chosen .cam-lg-name small{color:var(--lg-on-sel-meta)}
+#camLiguilla .cam-lg-q8-team.is-fixed{background:var(--q-panel);cursor:default}
+#camLiguilla .cam-lg-q8-team.is-fixed .cam-lg-q8-mark{color:var(--lg-accent)}
+#camLiguilla .cam-lg-q8-team.is-readonly{background:var(--q-card)}
+#camLiguilla .cam-lg-q8-status{font-weight:650}
+#camLiguilla .cam-lg-q8-status.is-in{color:var(--q-ok-text)}
+#camLiguilla .cam-lg-q8-status.is-out{color:var(--q-bad-text)}
+@media (hover:hover){#camLiguilla .cam-lg-q8-team.is-chosen:not(:disabled):hover{background:var(--lg-sel);opacity:.92}}
+@container (min-width:560px){#camLiguilla .cam-lg-q8-list{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@container (min-width:760px){#camLiguilla .cam-lg-q8-list{grid-template-columns:repeat(4,minmax(0,1fr))}}
+#camLiguilla .cam-lg-q8-save{min-width:180px}
+/* «Tu cuadro» plegado hasta que se abre. */
+#camLiguilla .cam-lg-teaser{border:1px solid var(--q-line);background:var(--q-card);min-width:0}
+#camLiguilla .cam-lg-teaser-sum{list-style:none;display:grid;grid-template-columns:44px minmax(0,1fr);gap:14px;align-items:center;padding:16px;cursor:pointer}
+#camLiguilla .cam-lg-teaser-sum::-webkit-details-marker{display:none}
+#camLiguilla .cam-lg-teaser-icon{width:44px;height:44px;color:var(--lg-accent)}
+#camLiguilla .cam-lg-teaser-icon svg{width:100%;height:100%;display:block}
+#camLiguilla .cam-lg-teaser-text{display:grid;gap:3px;min-width:0;font-size:13px;line-height:1.4;color:var(--q-muted)}
+#camLiguilla .cam-lg-teaser-text strong{font-size:15px;font-weight:600;color:var(--q-ink)}
+#camLiguilla .cam-lg-teaser-more{margin-top:2px;color:var(--q-gold-text);font-weight:600}
+#camLiguilla .cam-lg-teaser-more::after{content:"›";display:inline-block;margin-left:6px;transition:transform .2s ease}
+#camLiguilla .cam-lg-teaser[open] .cam-lg-teaser-more::after{transform:rotate(90deg)}
+#camLiguilla .cam-lg-teaser-body{display:grid;gap:12px;padding:0 16px 16px}
+/* Paso 2: cada cruce son dos fichas lado a lado; una sola nota de reglas debajo. */
+#camLiguilla .cam-lg-match{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;background:none;border:0;overflow:visible}
+#camLiguilla .cam-lg-team{grid-template-columns:26px minmax(0,1fr);gap:8px;min-height:56px;padding:8px 10px;border:1px solid var(--q-line);background:var(--q-card)}
+#camLiguilla .cam-lg-team+.cam-lg-team{border-top:1px solid var(--q-line)}
+#camLiguilla .cam-lg-team .cam-lg-crest{width:26px;height:26px}
+#camLiguilla .cam-lg-team .cam-lg-name strong{font-size:14px;overflow-wrap:anywhere}
+#camLiguilla .cam-lg-team-meta{display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;font-size:12px;color:var(--q-meta)}
+#camLiguilla .cam-lg-team .cam-lg-seed{font-size:11px;text-align:left;color:inherit}
+#camLiguilla .cam-lg-team .cam-lg-pts{padding:3px 6px;font-size:11px}
+#camLiguilla .cam-lg-team.is-chosen{background:var(--lg-sel);border-color:var(--lg-sel);color:var(--lg-on-sel)}
+#camLiguilla .cam-lg-team.is-chosen::before{display:none}
+#camLiguilla .cam-lg-team.is-chosen .cam-lg-team-meta{color:var(--lg-on-sel-meta)}
+#camLiguilla .cam-lg-team.is-chosen .cam-lg-pts:not(.is-hit):not(.is-miss):not(.is-live):not(.is-blank){background:transparent;color:var(--lg-on-sel-pts);padding:3px 0}
+#camLiguilla .cam-lg-team.is-chosen .cam-lg-pts.is-live{border-color:var(--lg-on-sel-meta);color:var(--lg-on-sel)}
+#camLiguilla .cam-lg-team.is-behind{opacity:.55;transform:none}
+@media (hover:hover){#camLiguilla .cam-lg-team.is-chosen:not(:disabled):hover{background:var(--lg-sel);opacity:.92}}
+#camLiguilla .cam-lg-board-note{margin-top:-6px}
+@container (min-width:900px){
+  #camLiguilla .cam-lg-board .cam-lg-match{grid-template-columns:minmax(0,1fr)}
+  #camLiguilla .cam-lg-board .cam-lg-team{grid-template-columns:24px minmax(0,1fr);padding:8px 10px}
+  #camLiguilla .cam-lg-board .cam-lg-name small{display:flex}
+}
+/* Ronda a ronda: el 1X2 de ida y vuelta, plegado bajo «¿Quién pasa?». */
+#camLiguilla .cam-lg-legs{margin-top:12px;border-top:1px solid var(--q-line)}
+#camLiguilla .cam-lg-legs-sum{list-style:none;display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:44px;padding:0 14px;cursor:pointer;color:var(--q-gold-text);font-size:14px;font-weight:600}
+#camLiguilla .cam-lg-legs-sum::-webkit-details-marker{display:none}
+#camLiguilla .cam-lg-legs-sum::after{content:"⌄";font-size:16px;line-height:1;transition:transform .2s ease}
+#camLiguilla .cam-lg-legs[open]>.cam-lg-legs-sum::after{transform:rotate(180deg)}
+@layer cam-banners{
+  html body #camLiguilla .cam-lg-event-close{padding:14px 0 0!important}
+  html body #camLiguilla .cam-lg-steps li{padding:0!important;margin:0!important}
+  html body #camLiguilla .cam-lg-board-note{margin:-6px 0 0!important}
+}
+@layer cam-rounded-editorial{
+  html body #camLiguilla .cam-lg-event{border-radius:18px!important}
+  html body #camLiguilla .cam-lg-step-dot{border-radius:50%!important}
+  html body #camLiguilla .cam-lg-steps li,html body #camLiguilla .cam-lg-steps b,html body #camLiguilla .cam-lg-step-when{border-radius:0!important}
+  html body #camLiguilla .cam-lg-q8-list .cam-lg-q8-team,html body #camLiguilla .cam-lg-match .cam-lg-team{border-radius:14px!important}
+  html body #camLiguilla .cam-lg-teaser{border-radius:16px!important}
+  html body #camLiguilla .cam-lg-teaser-sum{border-radius:16px!important}
+  html body #camLiguilla .cam-lg-legs,html body #camLiguilla .cam-lg-legs-sum{border-radius:0!important}
+  html body #camLiguilla .cam-lg-track i{border-radius:3px!important}
+}
+/* La web pone su serif de lectura (con !important, en cam-rounded-editorial) a p, small, button…
+   Las fichas, los pasos y las etiquetas son interfaz: van en la sans de la casa, como en la quiniela. */
+@layer cam-rounded-editorial{
+  html body #camLiguilla :is(.cam-lg-event-kicker,.cam-lg-steps,.cam-lg-steps *,.cam-lg-q8-team,.cam-lg-q8-team *,.cam-lg-team,.cam-lg-team *,.cam-lg-group-label,.cam-lg-sec-head .cam-lg-count,.cam-lg-sec-head .cam-lg-count *){font-family:var(--ds-font-sans,Inter,system-ui,sans-serif)!important}
+  html body #camLiguilla :is(.cam-lg-event-kicker,.cam-lg-group-label){text-transform:uppercase!important}
+  html body #camLiguilla .cam-lg-event-kicker{letter-spacing:.14em!important}
+  html body #camLiguilla .cam-lg-group-label{letter-spacing:.12em!important}
+}
+
+/* ---- Quiniela de Fútbol junto a La semana (10 nov 2026) ----------------------------
+   1. Un solo selector de competición: el de La semana. La quiniela conserva «Ver mis jornadas».
+   2. Cada partido con los tres resultados en fila (local · empate · visitante), como el Duelo.
+   Solo fútbol: la NFL no cambia. Más peso que las reglas compartidas del <style> de index.html. */
+#camFootballQuiniela{--lg-sel:#0A3268;--lg-on-sel:#F3EBDD;--lg-on-sel-pts:#E8BF79}
+html.dark #camFootballQuiniela{--lg-sel:#E8BF79;--lg-on-sel:#0B2233;--lg-on-sel-pts:#0B2233}
+html body #camFootballSemana.has-competition-nav~#camFootballQuiniela #camFootballNav .cam-football-leagues{display:none}
+html body #camFootballSemana.has-competition-nav~#camFootballQuiniela #camFootballNav{margin-top:12px;padding-top:12px}
+html body #camFootballQuiniela .cam-nfl-sides{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;align-items:stretch}
+html body #camFootballQuiniela .cam-nfl-sides :is(.cam-nfl-team,.cam-nfl-draw){display:grid;grid-template-columns:minmax(0,1fr);justify-items:center;align-content:center;gap:5px;width:100%;min-width:0;min-height:96px;margin:0;padding:10px 6px;border:1px solid var(--q-line);background:var(--q-card);color:var(--q-ink);text-align:center;box-shadow:none}
+html body #camFootballQuiniela .cam-nfl-sides .cam-nfl-team::before,
+html body #camFootballQuiniela .cam-nfl-sides .cam-nfl-draw::before,
+html body #camFootballQuiniela .cam-nfl-sides .cam-nfl-draw::after{display:none}
+html body #camFootballQuiniela .cam-nfl-sides .cam-nfl-team img{width:30px;height:30px}
+html body #camFootballQuiniela .cam-nfl-sides .cam-nfl-team-name{align-items:center;min-width:0}
+html body #camFootballQuiniela .cam-nfl-sides .cam-nfl-team-name strong{font-size:13px;line-height:1.25;text-align:center}
+html body #camFootballQuiniela .cam-nfl-sides .cam-nfl-team-name span{display:none}
+html body #camFootballQuiniela .cam-nfl-sides .cam-nfl-draw-label{font:700 13px/1.25 var(--ds-font-sans,Inter,system-ui,sans-serif);letter-spacing:0;text-transform:none;color:inherit}
+html body #camFootballQuiniela .cam-nfl-sides :is(.cam-nfl-team,.cam-nfl-draw) small{padding:0;border:0;background:none;color:var(--q-gold-text);font:600 12px/1.2 var(--ds-font-sans,Inter,system-ui,sans-serif)}
+html body #camFootballQuiniela .cam-nfl-sides :is(.cam-nfl-team,.cam-nfl-draw).is-selected{background:var(--lg-sel);border-color:var(--lg-sel);color:var(--lg-on-sel)}
+html body #camFootballQuiniela .cam-nfl-sides :is(.cam-nfl-team,.cam-nfl-draw).is-selected :is(strong,.cam-nfl-draw-label){color:var(--lg-on-sel)}
+html body #camFootballQuiniela .cam-nfl-sides :is(.cam-nfl-team,.cam-nfl-draw).is-selected small{background:none;color:var(--lg-on-sel-pts)}
+html body #camFootballQuiniela .cam-nfl-sides :is(.cam-nfl-team,.cam-nfl-draw).is-winner{border-color:var(--q-ok);box-shadow:inset 0 0 0 1px var(--q-ok)}
+html body #camFootballQuiniela .cam-nfl-game[data-state="fallo"] .cam-nfl-sides :is(.cam-nfl-team,.cam-nfl-draw).is-selected:not(.is-winner){background:var(--q-bad-bg);border-color:var(--q-bad);color:var(--q-bad-text)}
+html body #camFootballQuiniela .cam-nfl-game[data-state="fallo"] .cam-nfl-sides :is(.cam-nfl-team,.cam-nfl-draw).is-selected:not(.is-winner) :is(strong,small,.cam-nfl-draw-label){color:var(--q-bad-text)}
+@media (hover:hover){html body #camFootballQuiniela .cam-nfl-sides :is(.cam-nfl-team,.cam-nfl-draw):not(:disabled):not(.is-selected):hover{border-color:var(--q-edge);background:var(--q-card)}}
+/* Botones apagados que se leen: «Elige 3 más», «Faltan 7». */
+html body #camLiguilla :is(.cam-lg-q8-save,.cam-lg-save):disabled{background:var(--q-panel);border:1px solid var(--q-line);color:var(--q-meta);opacity:1;box-shadow:none}
+#camLiguilla .cam-lg-note:empty{min-height:0}
+@layer cam-rounded-editorial{
+  html body #camFootballQuiniela .cam-nfl-sides :is(.cam-nfl-team,.cam-nfl-draw){border-radius:14px!important}
+  html body #camFootballQuiniela .cam-nfl-sides :is(.cam-nfl-team,.cam-nfl-draw) small{border-radius:0!important}
+  html body #camFootballQuiniela .cam-nfl-sides :is(.cam-nfl-team,.cam-nfl-draw) :is(strong,small,span){font-family:var(--ds-font-sans,Inter,system-ui,sans-serif)!important}
+  html body #camLiguilla :is(.cam-lg-q8-save,.cam-lg-save):disabled{background:var(--q-panel)!important;color:var(--q-meta)!important;opacity:1!important}
+}
+/* cam-display-clarity (la primera capa) fuerza display:flex en todos los selectores de liga;
+   solo otra regla !important de esa misma capa, con más peso, puede esconder el duplicado. */
+@layer cam-display-clarity{
+  html body #camFootballSemana.has-competition-nav~#camFootballQuiniela #camFootballNav .cam-football-leagues{display:none!important}
 }
