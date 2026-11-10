@@ -5,7 +5,7 @@
   'use strict';
   const base=new URL('.',document.currentScript?.src||new URL('assets/',location.href));
   const source={
-    opinions:'ae-opinions.js?v=20261109-escritorio-4',
+    opinions:'ae-opinions.js?v=20261110-branded-loading-1',
     archive:'ae-news-archive.js?v=20261024-lazy-editorial-1'
   };
   const inFlight=new Map(),loaded=new Set();
@@ -19,6 +19,7 @@
   function load(key){
     if(loaded.has(key))return Promise.resolve(true);
     if(inFlight.has(key))return inFlight.get(key);
+    const finishEntrance=window.camPageLoader?.begin?.();
     const promise=new Promise((resolve,reject)=>{
       const tag=document.createElement('script');
       tag.src=new URL(source[key],base).href;
@@ -36,7 +37,7 @@
       inFlight.delete(key);
       report(key);
       return false; // Safe retry if the user visits the view again.
-    });
+    }).finally(()=>finishEntrance?.());
     inFlight.set(key,promise);
     return promise;
   }

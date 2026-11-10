@@ -382,6 +382,7 @@
     if (!c || state.loading) return;
     if (!force && state.loadedAt && now() - state.loadedAt < REFRESH_MS) return;
     state.loading = true;
+    const finishEntrance = window.camPageLoader?.begin?.();
     try {
       const since = new Date().toISOString();
       const open = (table, cols) => c.from(table).select(cols)
@@ -412,6 +413,7 @@
     } finally {
       state.loading = false;
       if (active()) paint();
+      finishEntrance?.();
     }
   }
 

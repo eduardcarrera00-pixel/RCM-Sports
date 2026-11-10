@@ -64,6 +64,7 @@
     const sb = client();
     if (!sb) { status('La conexión no está disponible.', true); return; }
     if (loading && !force) return loading;
+    const finishEntrance = window.camPageLoader?.begin?.();
     loading = (async () => {
       const r = await sb.from('ae_opinions')
         .select('id,sport,title,summary,body,image,image_focus_x,image_focus_y,author,is_published,featured,created_at,edited_at')
@@ -79,7 +80,7 @@
       }
       loaded = true; status('');
     })();
-    try { await loading; } finally { loading = null; }
+    try { await loading; } finally { loading = null; finishEntrance?.(); }
     render();
     openDeepLink();
   }
@@ -366,6 +367,7 @@
     if(takesLoaded&&!force)return;
     const sb=client();if(!sb)return;
     const seq=++takeRequest;
+    const finishEntrance=window.camPageLoader?.begin?.();
     takesLoading=(async()=>{
       try{
         const feed=await sb.rpc('ae_public_take_feed',{p_sport:'all'});
@@ -392,7 +394,7 @@
         if(block&&!takesLoaded)block.replaceChildren(el('p','Los debates no están disponibles por ahora. Las columnas siguen accesibles.','ae-opinions-empty'));
       }
     })();
-    try{await takesLoading;}finally{takesLoading=null;}
+    try{await takesLoading;}finally{takesLoading=null;finishEntrance?.();}
   }
   function renderTakes(){
     const target=$('aeOpinionsDebatedContent'),sportTarget=$('aeOpinionsSports');

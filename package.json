@@ -3,6 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
+    "test:loading": "node tests/page-loader.mjs",
     "test:social:x": "node tests/social-x-only-daily-plates.mjs",
     "test:liguilla": "python3 -B tests/liguilla.py",
     "test:quiniela:scoring": "node tests/quiniela-signed-scoring.mjs && node tests/profile-quiniela.mjs",
@@ -16,7 +17,7 @@
     "test:quiniela:competition": "node tests/quiniela-streaks.cjs && node tests/banner-competition-browser.cjs",
     "test:quiniela:profile": "node tests/profile-quiniela.mjs && node tests/profile-loading.mjs",
     "test:browser": "node tests/browser.cjs",
-    "test": "npm run test:database && npm run test:news-loading && npm run test:picks && npm run test:auth && npm run test:drafts && npm run test:editor && npm run test:browser && npm run test:mobile-nav && npm run test:opinions-banners && npm run test:site-banners && npm run test:performance",
+    "test": "npm run test:loading && npm run test:database && npm run test:news-loading && npm run test:picks && npm run test:auth && npm run test:drafts && npm run test:editor && npm run test:browser && npm run test:mobile-nav && npm run test:opinions-banners && npm run test:site-banners && npm run test:performance",
     "test:database:observed": "node -e \"process.env.RCM_OBSERVED_SCHEMA='1';import('./tests/database.mjs')\"",
     "test:picks": "node tests/community-picks.mjs && node tests/community-picks-ui.mjs && node tests/pick-author-names.mjs && node tests/pick-history-ui.mjs && node tests/season-predictions-ui.mjs && node tests/picks-feed-scroll-ui.mjs && node tests/weekly-empty.mjs",
     "test:sharing": "node tests/pick-sharing.mjs && node tests/profile-sharing.mjs && node tests/pick-sharing-takes.mjs",

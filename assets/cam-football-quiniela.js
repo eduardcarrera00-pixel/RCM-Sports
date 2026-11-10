@@ -134,6 +134,7 @@
   async function hydrate(){
     if(loading)return;
     loading=true;loadError='';const ticket=++request;
+    const finishEntrance=window.camPageLoader?.begin?.();
     announce();
     st('camFootballStatus','Cargando calendario oficial…','loading');
     try{
@@ -166,7 +167,7 @@
       $('camFootballRanking')?.replaceChildren(el('p','Clasificación no disponible mientras falle la conexión.'));
       for(const id of ['camFootballSave','camFootballSaveDay']){const b=$(id);if(b)b.disabled=true;}
       renderAdmin();
-    }finally{loading=false;announce();}
+    }finally{loading=false;announce();finishEntrance?.();}
   }
   // Leer marcadores sin recargar equipos, sesión, elecciones o borradores.
   let refreshingLive=false;
@@ -540,6 +541,7 @@
   });
   async function paintRanking(){
     const target=$('camFootballRanking');if(!target)return;
+    const finishEntrance=window.camPageLoader?.begin?.();
     const ticket=++rankingRequest;
     const rankingScope=scope,rankingSeason=season,rankingCompetition=competition;
     target.replaceChildren(el('p','Cargando clasificación…'));
@@ -636,6 +638,7 @@
       if(rows.length>10)target.append(button(showAll?'Ver Top 10':'Ver clasificación completa',
         ()=>{showAll=!showAll;paintRanking();},'cam-nfl-more'));
     }catch(error){if(ticket===rankingRequest){target.replaceChildren(el('p','Ranking no disponible: '+error.message));}}
+    finally{finishEntrance?.();}
   }
   function adminPoints(g){
     const panel=el('details',null,'cam-nfl-admin-game');

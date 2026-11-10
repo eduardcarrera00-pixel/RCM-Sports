@@ -167,6 +167,7 @@
  async function load(){
    if(refreshing||!(typeof db!=='undefined' && db))return;
    refreshing=true;
+   const finishEntrance=window.camPageLoader?.begin?.();
    try{
      const {data,error}=await db.from('ae_editorial_weekly_picks')
        .select('id,title,event_name,selection,american_odds,analysis,expires_at,created_at,banner_path,image_path,banner_url,image_url,banner_focus_x,banner_focus_y,image_focus_x,image_focus_y,edited_at')
@@ -191,7 +192,7 @@
      window.camEditorPick=null;
      document.dispatchEvent(new Event('cam:weekly-render'));
      revealSharedPick();
-   }finally{refreshing=false;adminVisibility();}
+   }finally{refreshing=false;adminVisibility();finishEntrance?.();}
  }
  const localDatetime=iso=>{
    const d=new Date(iso);

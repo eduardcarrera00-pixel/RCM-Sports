@@ -910,6 +910,7 @@
     if (loading) return loading;
     const sb = client(); if (!sb?.from) return false;
     const startedAt = writeRevision;
+    const finishEntrance = window.camPageLoader?.begin?.();
     loading = (async () => {
       try {
         const r = await sb.from('ae_site_images').select('key,url,focus_x,focus_y,alt');
@@ -927,7 +928,7 @@
         console.warn('CAM SPORTS: no se pudieron sincronizar las imágenes.', err?.message || err);
         return false;
       }
-    })().finally(() => { loading = null; });
+    })().finally(() => { loading = null; finishEntrance?.(); });
     return loading;
   }
 

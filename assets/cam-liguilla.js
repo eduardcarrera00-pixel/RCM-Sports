@@ -125,6 +125,7 @@
   async function load(season){
     const c=client();if(!c)return;
     const ticket=++request;loading=true;
+    const finishEntrance=window.camPageLoader?.begin?.();
     try{
       const {data,error}=await c.rpc('cam_liguilla_state',{p_season:season});
       if(ticket!==request)return;
@@ -135,7 +136,7 @@
     }catch{
       if(ticket!==request)return;
       loadError='No se pudo cargar la liguilla. Vuelve a abrir la sección para reintentarlo.';
-    }finally{if(ticket===request){loading=false;render();}}
+    }finally{if(ticket===request){loading=false;render();}finishEntrance?.();}
   }
   function sync(){
     const s=api()?.snapshot?.();

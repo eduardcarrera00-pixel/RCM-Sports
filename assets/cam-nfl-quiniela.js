@@ -117,6 +117,7 @@
   async function hydrate(){
     if(loading)return;
     loading=true;const ticket=++request;
+    const finishEntrance=window.camPageLoader?.begin?.();
     st('camNflStatus','Cargando calendario oficial…','loading');
     try{
       const c=client();if(!c)throw Error('No se pudo iniciar Supabase');
@@ -144,7 +145,7 @@
       $('camNflRanking')?.replaceChildren(el('p','Clasificación no disponible mientras falle la conexión.'));
       for(const id of ['camNflSave','camNflSaveDay']){const b=$(id);if(b)b.disabled=true;}
       renderAdmin();
-    }finally{loading=false;}
+    }finally{loading=false;finishEntrance?.();}
   }
   async function loadMine(){
     mine.clear();laurels.clear();laurelReady=false;
@@ -185,6 +186,8 @@
     const key=weekKey(season,week),c=client();
     if(!c)return;
     const jobs=[];
+    const finishEntrance=window.camPageLoader?.begin?.();
+    try{
     if(force||expert.key!==key){
       expert.key=key;
       jobs.push(c.rpc('cam_nfl_expert_picks',{p_season:season,p_week:week}).then(({data,error})=>{
@@ -209,6 +212,7 @@
     await Promise.all(jobs);
     if(loaded){paintGames();paintRules();}
     announce();
+    }finally{finishEntrance?.();}
   }
   function laurelOf(g){return laurels.get(weekKey(g.season,g.week))||null;}
   function laurelLocked(g){
@@ -518,6 +522,7 @@
   });
   async function paintRanking(){
     const target=$('camNflRanking');if(!target)return;
+    const finishEntrance=window.camPageLoader?.begin?.();
     const ticket=++rankingRequest;
     const rankingScope=scope,rankingSeason=season;
     target.replaceChildren(el('p','Cargando clasificación…'));
@@ -611,6 +616,7 @@
       window.CamQuinielaStandings?.enhance(target,{rows,visibleRows,userId:user?.id});
       if(rows.length>10)target.append(button(showAll?'Ver Top 10':'Ver clasificación completa',()=>{showAll=!showAll;paintRanking();},'cam-nfl-more'));
     }catch(error){if(ticket===rankingRequest){target.replaceChildren(el('p','Ranking no disponible: '+error.message));}}
+    finally{finishEntrance?.();}
   }
   let rankingRequest=0;
   function adminGame(g){

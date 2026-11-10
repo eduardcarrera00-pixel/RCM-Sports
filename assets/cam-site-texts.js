@@ -191,6 +191,7 @@
     if (!sb?.from) return;
     loading=true;
     const startedAt = writeRevision;
+    const finishEntrance = window.camPageLoader?.begin?.();
     try {
       const {data,error}=await sb.from('cam_site_texts').select('key,content,settings');
       if (error) throw error;
@@ -199,7 +200,7 @@
       for (const r of data || []) if (validRow(r)) rows.set(r.key,r);
       loaded=true;writeCache();applyAll();
     } catch (err) { console.warn('CAM SPORTS: textos originales disponibles; personalización no cargada.',err?.message || err); }
-    finally { loading=false;schedule(); }
+    finally { loading=false;schedule();finishEntrance?.(); }
   }
   function ensureOverlay() {
     if (overlay) return overlay;

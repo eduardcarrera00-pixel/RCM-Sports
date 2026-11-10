@@ -6,11 +6,11 @@
   const base=new URL('.',document.currentScript?.src||new URL('assets/',location.href));
   const config={
     nfl:{className:'ae-is-nfl',root:'camNflQuiniela',status:'camNflStatus',
-      src:'cam-nfl-quiniela.js?v=20261109-single-login-2'},
+      src:'cam-nfl-quiniela.js?v=20261110-branded-loading-1'},
     football:{className:'ae-is-football',root:'camFootballQuiniela',status:'camFootballStatus',
-      src:'cam-football-quiniela.js?v=20261109-single-login-2',
+      src:'cam-football-quiniela.js?v=20261110-branded-loading-1',
       // La liguilla de la Liga MX vive dentro de la quiniela de fútbol y se carga después.
-      extra:['cam-fan-bracket.js?v=20261110-wait-for-top-eight-1','cam-liguilla.js?v=20261110-community-builder-1']}
+      extra:['cam-fan-bracket.js?v=20261110-wait-for-top-eight-1','cam-liguilla.js?v=20261110-branded-loading-1']}
   };
   const requests=new Map();
   const loaded=new Set();
@@ -41,6 +41,7 @@
     if(!document.getElementById(entry.root))return Promise.resolve(false);
     if(loaded.has(key))return Promise.resolve(true);
     if(requests.has(key))return requests.get(key);
+    const finishEntrance=window.camPageLoader?.begin?.();
     feedback(key,'Cargando La Quiniela…');
     // A presentation asset failing must never block the games or saving picks.
     const task=standings().catch(()=>{}).then(()=>new Promise((resolve,reject)=>{
@@ -50,10 +51,11 @@
       script.onload=()=>{
         loaded.add(key);resolve(true);
         if(entry.extra){
+          const finishExtras=window.camPageLoader?.begin?.();
           // Primero el constructor libre y después el cuadro oficial. Un fallo no bloquea la quiniela.
           const extras=Array.isArray(entry.extra)?entry.extra:[entry.extra];
           const next=i=>{
-            if(i>=extras.length)return;
+            if(i>=extras.length){finishExtras?.();return;}
             const extra=document.createElement('script');extra.async=true;
             extra.src=new URL(extras[i],base).href;
             extra.onload=()=>next(i+1);
@@ -70,7 +72,7 @@
       document.head.append(script);
     })).catch(error=>{
       requests.delete(key);feedback(key,error.message);return false;
-    });
+    }).finally(()=>finishEntrance?.());
     requests.set(key,task);
     return task;
   }

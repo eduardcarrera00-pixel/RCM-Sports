@@ -181,6 +181,7 @@
     if(!force&&Date.now()-lastFetch<30000)return;
     const request=++sequence;
     loading=true;
+    const finishEntrance=window.camPageLoader?.begin?.();
     try{
       const [result,session]=await Promise.all([
         db.rpc('ae_home_take_showcase'),
@@ -212,6 +213,7 @@
     }finally{
       loading=false;
       if(pending){pending=false;void refresh(true);}
+      finishEntrance?.();
     }
   }
   window.refreshAeHomeTakeDiscoveries=refresh;

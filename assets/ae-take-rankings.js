@@ -178,6 +178,8 @@
   async function loadRanking(where){
     const isHome=where==='home', list=$(isHome?'aeHomeTakeRankingList':'aeSportTakeRankingList');
     if(!list || !db || (!isHome&&!sport))return;
+    const finishEntrance=window.camPageLoader?.begin?.();
+    try{
     const seq=++rankRequest[where], selectedSport=isHome?'all':sport,period=rankState[where];
     if(!isHome&&(selectedSport==='nfl'||selectedSport==='football')){
       await loadSportTwinRankings(seq,period,selectedSport);
@@ -193,6 +195,7 @@
       const emptyMessage=period==='month'?'Este mes aún no hay Takes puntuados.':'Todavía no hay Takes puntuados.';
       list.replaceChildren(...(rows.length?rows.map(isHome?rankRow:standingRow):[isHome?element('li',emptyMessage,'ae-take-ranking-empty'):standingMessage(emptyMessage)]));
     }catch(e){if(seq===rankRequest[where])list.replaceChildren(isHome?element('li','No se pudo cargar la clasificación.','ae-take-ranking-empty'):standingMessage('No se pudo cargar la clasificación.'));}
+    }finally{finishEntrance?.();}
   }
   /* Revisión admin: dificultad por probabilidad (motor 1–20) y resultado. */
   const TIERS=[['casi_seguro','Casi seguro · no puntúa'],['muy_probable','Muy probable · 1 pt'],['probable','Probable · 3 pts'],

@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <style>@layer cam-display-clarity;</style>
-    <script src="assets/cam-pick-share.js?v=20261110-liguilla-1"></script>
     <script>
     let savedTheme = null;
 
@@ -17,6 +16,122 @@
 
     document.documentElement.classList.toggle('dark', useDarkMode);
 </script>
+    <!-- Critical entrance: available before the application or its styles download. -->
+    <style id="cam-page-loader-style">
+      html.cam-booting{overflow:hidden!important;background:#081724}
+      html.cam-booting body > :not(#camPageLoader):not(script):not(style){opacity:0!important;visibility:hidden!important;pointer-events:none!important}
+      html.cam-booting dialog::backdrop{visibility:hidden!important}
+      html body #camPageLoader{position:fixed;inset:0;z-index:2147483647;display:none;place-items:center;margin:0;padding:24px;border:0!important;border-radius:0!important;box-shadow:none!important;background:radial-gradient(ellipse at center,#123353 0,#081724 70%);color:#f3ebdd;opacity:1;transition:opacity .18s ease;touch-action:none}
+      html.cam-booting body #camPageLoader,html body #camPageLoader.is-leaving{display:grid}
+      html body #camPageLoader.is-leaving{opacity:0;pointer-events:none}
+      #camPageLoader .cam-loading-brand{display:grid;justify-items:center;gap:28px;width:min(228px,64vw)}
+      #camPageLoader .cam-loading-logo{display:block;width:100%;height:auto;aspect-ratio:1760/894;object-fit:contain;animation:cam-loading-breathe 2.2s ease-in-out infinite}
+      #camPageLoader .cam-loading-track{display:block;width:88px;height:2px;overflow:hidden;border-radius:2px;background:#b79a7630}
+      #camPageLoader .cam-loading-track::after{content:"";display:block;width:40%;height:100%;border-radius:inherit;background:#b79a76;animation:cam-loading-slide 1.3s ease-in-out infinite}
+      #camPageLoader .cam-loading-caption{margin:0;color:#c5cdd2;font:500 10px/1.5 system-ui,sans-serif!important;letter-spacing:.24em;text-transform:uppercase}
+      @keyframes cam-loading-breathe{0%,100%{opacity:.72}50%{opacity:1}}
+      @keyframes cam-loading-slide{0%{transform:translateX(-110%)}100%{transform:translateX(360%)}}
+      @media(prefers-reduced-motion:reduce){html body #camPageLoader{transition:none}#camPageLoader .cam-loading-logo,#camPageLoader .cam-loading-track::after{animation:none}#camPageLoader .cam-loading-track::after{transform:translateX(75%)}}
+    </style>
+    <script id="cam-page-loader">
+    (() => {
+      'use strict';
+      const root = document.documentElement;
+      const pending = new Set();
+      let active = true, domReady = false, assetsReady = false, preparing = false;
+      let revision = 0, settleTimer = 0;
+      const noop = () => {};
+      root.classList.add('cam-booting');
+
+      function reveal() {
+        if (!active) return;
+        active = false;
+        clearTimeout(deadline);
+        clearTimeout(settleTimer);
+        pending.clear();
+        const screen = document.getElementById('camPageLoader');
+        // Restore interaction only on nodes locked by this entrance.
+        for (const node of locked) node.inert = false;
+        locked.clear();
+        lockObserver?.disconnect();
+        screen?.classList.add('is-leaving');
+        root.classList.remove('cam-booting');
+        document.body?.removeAttribute('aria-busy');
+        setTimeout(() => screen?.remove(), 200);
+      }
+      // A failed request or script must never strand visitors behind the logo.
+      const deadline = setTimeout(reveal, 15000);
+      const locked = new Set();
+      let lockObserver;
+      function lockPage() {
+        if (!active || !document.body) return;
+        document.body.setAttribute('aria-busy', 'true');
+        for (const node of document.body.children) {
+          if (node.id === 'camPageLoader' || /^(SCRIPT|STYLE)$/.test(node.tagName) || node.inert) continue;
+          node.inert = true;
+          locked.add(node);
+        }
+      }
+      function schedule() {
+        if (!active) return;
+        clearTimeout(settleTimer);
+        settleTimer = setTimeout(prepare, 80);
+      }
+      function begin() {
+        if (!active) return noop;
+        const token = {};
+        pending.add(token);
+        revision++;
+        return () => {
+          if (pending.delete(token)) schedule();
+        };
+      }
+      async function prepare() {
+        if (!active || !domReady || !assetsReady || pending.size || preparing) return;
+        preparing = true;
+        const version = revision;
+        try {
+          await document.fonts?.ready;
+          // Decode only the images in the opening viewport. Lazy content below
+          // it stays lazy; no duplicate downloads or hidden-section prefetching.
+          const images = [...document.images].filter(img => {
+            const box = img.getBoundingClientRect();
+            return box.width && box.height && box.top < innerHeight && box.bottom > 0
+              && box.left < innerWidth && box.right > 0;
+          });
+          await Promise.allSettled(images.map(img => {
+            img.loading = 'eager';
+            if (typeof img.decode === 'function') return img.decode();
+            if (img.complete) return Promise.resolve();
+            return new Promise(resolve => {
+              img.addEventListener('load', resolve, {once:true});
+              img.addEventListener('error', resolve, {once:true});
+            });
+          }));
+          await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+          if (active && !pending.size && revision === version) reveal();
+        } finally {
+          preparing = false;
+          if (active) schedule();
+        }
+      }
+      window.camPageLoader = Object.freeze({begin});
+      document.addEventListener('DOMContentLoaded', () => {
+        domReady = true;
+        lockPage();
+        if (active) {
+          lockObserver = new MutationObserver(lockPage);
+          lockObserver.observe(document.body, {childList:true});
+        }
+        schedule();
+      }, {once:true});
+      window.addEventListener('load', () => {assetsReady = true; schedule();}, {once:true});
+      // Back/forward cache restores the completed page, never its entrance.
+      window.addEventListener('pageshow', event => {if (event.persisted) reveal();});
+    })();
+    </script>
+    <link rel="preload" as="image" href="assets/cam-sports-logo-completo.webp?v=20261024-lossless-1" fetchpriority="high">
+    <script src="assets/cam-pick-share.js?v=20261110-liguilla-1"></script>
     <title>CAM SPORTS | Publica tu Take</title>
     <meta name="description" content="Demuestra tu conocimiento. Publica tu take en CAM SPORTS.">
     <link rel="canonical" href="https://camsports.github.io/">
@@ -2628,10 +2743,10 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
 }
 </style><link rel="stylesheet" href="assets/cam-perf-picks-mobile.css?v=20261104-css-consolidated-1">
 <script src="assets/cam-global-edit.js?v=20261022-edit-mode-1"></script>
-<script src="assets/cam-logo-sizing.js?v=20261103-remove-welcome-1"></script>
+<script src="assets/cam-logo-sizing.js?v=20261110-branded-loading-1"></script>
 <script src="assets/cam-banner-artwork.js?v=20261102-visible-size-1"></script>
-<script src="assets/ae-site-images.js?v=20261109-eres-chef-gorro-1"></script>
-<script src="assets/cam-site-texts.js?v=20261109-text-clarity-1"></script>
+<script src="assets/ae-site-images.js?v=20261110-branded-loading-1"></script>
+<script src="assets/cam-site-texts.js?v=20261110-branded-loading-1"></script>
 <script defer src="assets/cam-mobile-bottom-nav.js?v=20261109-rango-avisos-1"></script>
 <link rel="stylesheet" href="assets/cam-perf-controls.css?v=20261108-escritorio-1">
 
@@ -2639,6 +2754,13 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
 <link rel="stylesheet" href="assets/cam-perf-football-headings.css?v=20261104-css-consolidated-1">
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-900 selection:bg-pitch-600 selection:text-white ae-is-home">
+    <div id="camPageLoader" role="status" aria-label="Cargando CAM SPORTS" aria-live="polite">
+      <div class="cam-loading-brand" aria-hidden="true">
+        <img class="cam-loading-logo" src="assets/cam-sports-logo-completo.webp?v=20261024-lossless-1" alt="" width="1760" height="894" fetchpriority="high" decoding="async">
+        <span class="cam-loading-track"></span>
+        <p class="cam-loading-caption">Cargando</p>
+      </div>
+    </div>
 <svg class="cam-header-symbols" xmlns="http://www.w3.org/2000/svg" width="0" height="0" aria-hidden="true" focusable="false"><defs>
   <linearGradient id="cam-metal-header" x1="0" y1="0" x2="1" y2="1"><stop class="cam-metal-light" offset="0"/><stop class="cam-metal-mid" offset=".55"/><stop class="cam-metal-deep" offset="1"/></linearGradient>
   <linearGradient id="cam-metal-day" x1="0" y1="0" x2="1" y2="1"><stop class="cam-day-metal-light" offset="0"/><stop class="cam-day-metal-mid" offset=".55"/><stop class="cam-day-metal-deep" offset="1"/></linearGradient>
@@ -4456,6 +4578,7 @@ currentUser = {
         async function loadArticlesFromStorage() {
             if (loadingArticles) return;
             loadingArticles = true;
+            const finishEntrance = window.camPageLoader?.begin?.();
             setDataStatus('Cargando publicaciones…');
             const controller = new AbortController();
             const timeout = setTimeout(() => controller.abort(), 15000);
@@ -4484,7 +4607,7 @@ currentUser = {
                 initialArticlesPending = false;
                 renderArticlesFeed(); // On network errors the actual empty state becomes available.
                 setDataStatus('No se pudieron cargar las publicaciones. Comprueba tu conexión y vuelve a intentarlo.', true);
-            } finally { clearTimeout(timeout); loadingArticles = false; }
+            } finally { clearTimeout(timeout); loadingArticles = false; finishEntrance?.(); }
         }
 
         function exportLegacyArticles() {
@@ -5668,20 +5791,20 @@ updateThemeButton();
 <script src="assets/nfl-teams.js"></script>
 <script src="assets/cam-nfl-quiniela-logos.js?v=20261022-integration-1"></script>
 <script src="assets/cam-article-seo.js?v=20261105-link-preview-2"></script>
-<script src="assets/community.js?v=20261108-news-excerpts-1"></script>
+<script src="assets/community.js?v=20261110-branded-loading-1"></script>
 <script src="assets/ae-home-community-spotlight.js?v=20261109-calm-unity-1"></script>
-<script src="assets/champions.js?v=20261108-picks-display-1"></script>
+<script src="assets/champions.js?v=20261110-branded-loading-1"></script>
 <script src="assets/ae-ranking-notes.js?v=20261105-resume-motion-1"></script>
 <script src="assets/ae-pick-capture.js?v=20261104-apuesta-real-1"></script>
-<script src="assets/community-picks.js?v=20261109-picks-moderno-5"></script>
+<script src="assets/community-picks.js?v=20261110-branded-loading-1"></script>
 <script src="assets/weekly-picks.js?v=20261015-1"></script>
 <script src="assets/username-auth.js?v=20261103-remove-welcome-1"></script>
 <script src="assets/ae-category-visibility.js?v=20261016-dynamic-nav-1"></script>
 <script src="assets/ae-nfl-takes.js?v=20261015-3"></script>
-<script src="assets/free-takes.js?v=20261103-tarjetas-1"></script>
-<script src="assets/ae-take-rankings.js?v=20261109-calm-unity-1"></script>
+<script src="assets/free-takes.js?v=20261110-branded-loading-1"></script>
+<script src="assets/ae-take-rankings.js?v=20261110-branded-loading-1"></script>
 <script src="assets/cam-image-compress.js?v=20261021-1"></script>
-<script src="assets/ae-editorial-weekly.js?v=20261109-text-clarity-1"></script>
+<script src="assets/ae-editorial-weekly.js?v=20261110-branded-loading-1"></script>
 
 <style id="cam-weekly-results-style">
 .cam-weekly-review{margin-top:16px;clear:both}
@@ -6597,12 +6720,12 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 <!-- Componentes finales: móvil, conversación, parties, perfil y Takes; orden en performance-css-packs.json. -->
 <link rel="stylesheet" href="assets/cam-perf-app-panels.css?v=20261110-desktop-shortcuts-1">
 <script src="assets/cam-parties.js?v=20261104-perfil-claro-1"></script>
-<script src="assets/cam-sport-quiniela-loader.js?v=20261110-wait-for-top-eight-1"></script>
+<script src="assets/cam-sport-quiniela-loader.js?v=20261110-branded-loading-1"></script>
 <script src="assets/ae-season-predictions.js?v=20261021-champion-guide-1"></script>
-<script src="assets/cam-lazy-editorial-loader.js?v=20261109-escritorio-4"></script>
+<script src="assets/cam-lazy-editorial-loader.js?v=20261110-branded-loading-1"></script>
 <script src="assets/cam-opinions-section-banners.js?v=20261104-actualidad-1"></script>
 <script src="assets/ae-home-takes.js?v=20261109-text-clarity-1"></script>
-<script src="assets/ae-home-take-discoveries.js?v=20261109-text-clarity-1"></script>
+<script src="assets/ae-home-take-discoveries.js?v=20261110-branded-loading-1"></script>
 
 <script src="assets/ae-sport-top-takes.js?v=20261109-text-clarity-1"></script>
 <script src="assets/ae-take-replies.js?v=20261103-la-cita-1"></script>
@@ -6620,7 +6743,7 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 <!-- Pestañas dentro de NFL, Fútbol y Picks, y una dirección por sección (?s=nfl&v=quiniela); desde el 8 nov también en escritorio. -->
 <script src="assets/cam-mobile-sections.js?v=20261109-desktop-continuous-1"></script>
 <!-- Inicio como «Tu jornada» (3 nov, teléfono; desde el 8 nov también en escritorio con tira, rejillas y carriles). -->
-<script src="assets/cam-home-jornada.js?v=20261109-desktop-continuous-1"></script>
+<script src="assets/cam-home-jornada.js?v=20261110-branded-loading-1"></script>
 <!-- NFL y Fútbol · La semana (4 nov, teléfono; desde el 8 nov también en escritorio, en columnas). Power Rankings en Noticias. -->
 <script src="assets/cam-nfl-semana.js?v=20261109-desktop-continuous-1"></script>
 <script src="assets/cam-football-semana.js?v=20261109-week-first-1"></script>

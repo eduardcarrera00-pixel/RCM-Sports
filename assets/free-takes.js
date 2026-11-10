@@ -326,6 +326,7 @@
    }
    if(area)area.replaceChildren(el('p','Cargando Takes publicados…','ae-take-empty'));
    status('');
+   const finishEntrance=window.camPageLoader?.begin?.();
    try {
      const [r, viewer] = await Promise.all([
        db.rpc('ae_public_take_feed',{p_sport:filter}),
@@ -342,7 +343,7 @@
      items=[];
      if(area)area.replaceChildren(el('p','No se pudo cargar el historial. Intenta actualizar.','ae-take-empty'));
      status('No se pudieron cargar los Takes. '+(e.message||''));
-   }
+   } finally { finishEntrance?.(); }
  }
  // Pasar de un voto a otro: quita el anterior y suma el nuevo (votar dos veces lo mismo lo retira).
  function applyVote(t,next){

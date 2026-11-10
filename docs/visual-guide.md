@@ -1,5 +1,17 @@
 # AE SPORTS · Guía visual v1
 
+### Entrada con marca · 10 nov 2026
+
+La primera visita muestra el logo oficial sobre azul con una barra bronce en CSS.
+La pantalla espera la carga inicial del documento, los módulos públicos, las fuentes
+y las imágenes del primer viewport antes de revelar la composición. Reutiliza el
+mismo WebP de la cabecera; no añade vídeos, dependencias ni otra petición de estilos.
+El contenido inferior conserva su carga diferida. Los errores liberan la espera y
+una salida a los 15 segundos evita bloqueos ante conexiones interrumpidas.
+La navegación interna y las vueltas desde la caché del navegador no repiten la
+animación. Se conserva el foco y los bloqueos anteriores, y se respeta movimiento
+reducido. Verificación: `npm run test:loading` y revisión de Inicio, NFL y Fútbol.
+
 ### Power Rankings arriba y atajos persistentes · 10 nov 2026
 
 En el ordenador, NFL y Fútbol abren con el Power Ranking original por encima

@@ -243,6 +243,7 @@ async function refreshCommunity() {
     if (!db) return;
     const request = ++communityRequest;
     const target = document.getElementById('communityLeaders');
+    const finishEntrance = window.camPageLoader?.begin?.();
     try {
         const {data,error} = await db.rpc('rcm_community_leaders');
         if (error) throw error;
@@ -287,7 +288,7 @@ async function refreshCommunity() {
         }
     }catch{
         if(request===communityRequest)target.replaceChildren(node('p','No pudimos cargar los comentarios destacados. Volveremos a intentarlo.'));
-    }
+    } finally { finishEntrance?.(); }
 }
 function articleURL(articleId, commentId = null) {
     const url = new URL(location.href); url.searchParams.set('article', String(articleId));
@@ -418,6 +419,7 @@ async function loadRankingPrevious(client = db) {
 }
 async function loadRanking(quiet = false, strict = false, client = db) {
     if (!client) return;
+    const finishEntrance = window.camPageLoader?.begin?.();
     try {
         const {data, error} = await client.from('nfl_rankings').select('*').eq('id',1).maybeSingle();
         if (error) throw error;
@@ -430,7 +432,7 @@ async function loadRanking(quiet = false, strict = false, client = db) {
         const homeStatus=document.getElementById('homeRankingStatus');
         if(homeStatus) homeStatus.textContent = 'No pudimos cargar el ranking. Inténtalo de nuevo más tarde.';
         if (strict) throw error;
-    }
+    } finally { finishEntrance?.(); }
 }
 function renderRanking() {
     const list = document.getElementById('rankingList'), track = document.getElementById('rankingTrack');

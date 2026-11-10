@@ -136,6 +136,7 @@
     if (loading) return loading;
     const sb = api(); if (!sb?.from) return false;
     const startedAt = writeRevision;
+    const finishEntrance = window.camPageLoader?.begin?.();
     loading = (async () => {
       try {
         const result = await sb.from(TABLE).select('key,device,theme,size_percent');
@@ -147,7 +148,7 @@
         }
         store(); render(); mark(document.documentElement); return true;
       } catch (err) { console.warn('CAM SPORTS: sin lectura de tamaños', err?.message || err); return false; }
-    })().finally(() => { loading = null; });
+    })().finally(() => { loading = null; finishEntrance?.(); });
     return loading;
   }
   async function save(key, device, theme, value) {

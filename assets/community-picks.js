@@ -440,6 +440,7 @@ async function loadHistoricPick(){
  const target=$('aeHomePickHistoricPick');
  if(!target||!db)return;
  const seq=++historicRequest;
+ const finishEntrance=window.camPageLoader?.begin?.();
  target.setAttribute('aria-busy','true');
  try{
   // Rank individual settled Picks across all time, independently of votes,
@@ -527,11 +528,12 @@ async function loadHistoricPick(){
   const section=$('aeHomePickHistoric');if(section)section.dataset.camContentState='error';
   const retry=button('Reintentar',()=>void loadHistoricPick());
   target.replaceChildren(el('p','No se pudo cargar el Pick histórico.','ae-discovery-empty'),retry);
- }finally{if(seq===historicRequest)target.setAttribute('aria-busy','false');}
+ }finally{if(seq===historicRequest)target.setAttribute('aria-busy','false');finishEntrance?.();}
 }
 async function load(){
  void loadHistoricPick();
  if(!db)return;const seq=++request;
+ const finishEntrance=window.camPageLoader?.begin?.();
  try{
    const [feed,session]=await Promise.all([
      db.from('ae_pick_feed').select('*').in('moderation_status',['pending','approved']).gte('event_date',todayToronto()).eq('outcome','pending').order('created_at',{ascending:false}).order('id',{ascending:false}).range(0,limit-1),
@@ -552,6 +554,7 @@ async function load(){
    loaded=true;
    await Promise.all([loadRanking(),loadModeration(),loadChefLists(),loadSettlement(),loadSettleHistory()]);
  }catch(e){if(seq!==request)return;$('cpFeed').dataset.camContentState='error';$('cpFeed').replaceChildren();sizeFeedWindow();$('cpStatus').textContent='No pudimos cargar los Picks. '+message(e);}
+ finally{finishEntrance?.();}
 }
 let currentRank='month';
 let currentWorstRank='month';

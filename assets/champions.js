@@ -182,6 +182,7 @@
     async function refreshChampions() {
         if (loading) return;
         loading = true;
+        const finishEntrance = window.camPageLoader?.begin?.();
         try {
             if (!db) throw new Error('Sin conexión con los datos publicados.');
             const [editionResult, clubsResult] = await Promise.all([
@@ -197,7 +198,7 @@
         } catch(error) {
             latest = null; previousTeamIds = null; clubs.clear(); render();
             showError('Vuelve a consultar más tarde.');
-        } finally { loading = false; }
+        } finally { loading = false; finishEntrance?.(); }
     }
     window.renderChampionsVisibility = function renderChampionsVisibility() {
         const visible = currentCategory === 'Fútbol' && !currentTeam && !currentSearchQuery;
