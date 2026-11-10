@@ -238,14 +238,14 @@
 #camLiguilla .cam-lg-pv-match{display:grid;align-content:center;gap:4px;padding:6px 7px;background:rgba(243,235,221,.05);border:1px solid var(--pv-soft);min-width:0}
 /* La final queda debajo del aviso: guarda su sitio para que el trofeo y «Campeón» queden arriba y abajo. */
 #camLiguilla .cam-lg-pv-match.is-final{width:100%;min-height:64px;grid-row:2;visibility:hidden}
-#camLiguilla .cam-lg-pv-team{display:grid;grid-template-columns:10px 18px minmax(0,1fr);align-items:center;gap:6px;min-width:0;font:650 12px/1.25 var(--ds-font-sans,Inter,system-ui,sans-serif);color:var(--pv-ink)}
+#camLiguilla .cam-lg-pv-team{display:grid;grid-template-columns:10px 22px minmax(0,1fr);align-items:center;gap:6px;min-width:0;font:650 12px/1.25 var(--ds-font-sans,Inter,system-ui,sans-serif);color:var(--pv-ink)}
 #camLiguilla .cam-lg-pv-seed{font:700 11px/1 var(--ds-font-sans,Inter,system-ui,sans-serif);color:var(--pv-gold);font-variant-numeric:tabular-nums;text-align:center}
-#camLiguilla .cam-lg-pv .cam-lg-crest{width:18px;height:18px}
+#camLiguilla .cam-lg-pv .cam-lg-crest{width:22px;height:22px}
 #camLiguilla .cam-lg-pv-dot{width:14px;height:14px;justify-self:center;background:var(--pv-soft)}
 #camLiguilla .cam-lg-pv-abbr,#camLiguilla .cam-lg-pv-name{min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;letter-spacing:.03em}
 #camLiguilla .cam-lg-pv-name{display:none}
 #camLiguilla .cam-lg-pv-team.is-ghost{color:rgba(243,235,221,.55)}
-#camLiguilla .cam-lg-pv-slot{display:block;height:18px;background:rgba(243,235,221,.08)}
+#camLiguilla .cam-lg-pv-slot{display:block;height:22px;background:rgba(243,235,221,.08)}
 #camLiguilla .cam-lg-pv-cup{grid-row:1;align-self:end;display:block;width:clamp(30px,10cqi,52px);color:var(--pv-gold)}
 #camLiguilla .cam-lg-pv-cup svg{display:block;width:100%;height:auto}
 #camLiguilla .cam-lg-pv-champ{grid-row:3;align-self:start;opacity:.85;font:700 10px/1.2 var(--ds-font-sans,Inter,system-ui,sans-serif);letter-spacing:.14em;text-transform:uppercase;color:var(--pv-gold)}
@@ -258,13 +258,21 @@
   #camLiguilla .cam-lg-pv-heads,#camLiguilla .cam-lg-pv-tree{--pv-gap:28px;--pv-pair-gap:18px;--pv-match-gap:8px;grid-template-columns:minmax(0,1fr) minmax(0,.8fr) minmax(0,.75fr)}
   #camLiguilla .cam-lg-pv-abbr{display:none}
   #camLiguilla .cam-lg-pv-name{display:block}
-  #camLiguilla .cam-lg-pv-team{grid-template-columns:14px 22px minmax(0,1fr);gap:8px;font-size:13.5px}
-  #camLiguilla .cam-lg-pv .cam-lg-crest{width:22px;height:22px}
+  #camLiguilla .cam-lg-pv-team{grid-template-columns:14px 28px minmax(0,1fr);gap:8px;font-size:13.5px}
+  #camLiguilla .cam-lg-pv .cam-lg-crest{width:28px;height:28px}
   #camLiguilla .cam-lg-pv-match{padding:8px 10px;gap:6px}
-  #camLiguilla .cam-lg-pv-slot{height:22px}
+  #camLiguilla .cam-lg-pv-slot{height:28px}
   #camLiguilla .cam-lg-pv-soon{padding:12px 16px}
   #camLiguilla .cam-lg-pv-soon strong{font-size:23px}
   #camLiguilla .cam-lg-pv-soon span{font-size:12.5px}
+}
+/* Teléfonos de 320 px: las siglas completas caben con un poco menos de aire. */
+@container (max-width:300px){
+  #camLiguilla .cam-lg-pv-heads,#camLiguilla .cam-lg-pv-tree{--pv-gap:12px}
+  #camLiguilla .cam-lg-pv-match{padding:6px 5px}
+  #camLiguilla .cam-lg-pv-team{grid-template-columns:9px 20px minmax(0,1fr);gap:5px;font-size:11.5px}
+  #camLiguilla .cam-lg-pv .cam-lg-crest{width:20px;height:20px}
+  #camLiguilla .cam-lg-pv-abbr{letter-spacing:0}
 }
 /* «Tu cuadro» en tres líneas. */
 #camLiguilla .cam-lg-how{display:grid;gap:8px}

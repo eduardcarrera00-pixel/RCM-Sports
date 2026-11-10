@@ -200,10 +200,19 @@
   function hide(){section.hidden=true;quiniela.classList.remove('cam-liguilla-round');}
 
   // ------------------------------------------------------------- Piezas comunes
+  // Escudo del club (ESPN). Si no hay o no carga: un escudo azul y dorado con sus siglas, nunca un hueco.
+  function shield(t,id){
+    const ab=String(t?.abbreviation||t?.short_name||t?.name||id||'').normalize('NFD').replace(/[^A-Za-z0-9]/g,'').slice(0,3).toUpperCase();
+    return 'data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 46">'
+      +'<path d="M20 2 37 8v14c0 11-7.5 18.5-17 22C10.5 40.5 3 33 3 22V8Z" fill="#0B2233" stroke="#BE9270" stroke-width="2.4" stroke-linejoin="round"/>'
+      +'<path d="M8 11.5 20 7.6l12 3.9" fill="none" stroke="#E8BF79" stroke-width="1.4" stroke-linecap="round" opacity=".7"/>'
+      +'<text x="20" y="28" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="'+(ab.length>2?10.5:13)+'" fill="#E8BF79">'+ab+'</text></svg>');
+  }
   function crest(id,size=30,info=null){
     const t=info||team(id)||cteam(id);const img=el('img',null,'cam-lg-crest');img.alt='';img.width=size;img.height=size;img.loading='lazy';img.decoding='async';
-    if(t?.logo)img.src=t.logo;else img.style.visibility='hidden';
-    img.addEventListener('error',()=>{img.style.visibility='hidden';});
+    const fallback=()=>{if(img.dataset.fallback)return;img.dataset.fallback='1';img.src=shield(t,id);};
+    img.addEventListener('error',fallback);
+    if(t?.logo)img.src=t.logo;else fallback();
     return img;
   }
   function pointsChip(text,cls=''){return el('span',text,'cam-lg-pts'+(cls?' '+cls:''));}
