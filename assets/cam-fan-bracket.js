@@ -27,7 +27,11 @@
     if(season===snap.season&&owner===newOwner)return;
     season=snap.season;owner=newOwner;loaded=false;loading=false;cloudLoaded=false;clubs=[];message='';messageError=false;
     const local=storage();
+    // Un visitante que inicia sesión no pierde las selecciones hechas antes de autenticarse.
+    let guest=null;
+    if(owner)try{guest=JSON.parse(localStorage.getItem(['cam-sports','cuadro-libre','ligamx',season,'invitado'].join(':'))||'null');}catch{}
     if(valid(local))model=clean(local);
+    else if(valid(guest))model=clean(guest);
     else if(official?.seeds?.length===8){
       const s=[...official.seeds].sort((a,b)=>a.seed-b.seed);
       model={...slots(),teams:[0,7,1,6,2,5,3,4].map(n=>id(s[n]?.team_id))};
@@ -73,9 +77,11 @@
     }catch{ /* El borrador local sigue funcionando si falla el servicio. */ }
   }
   async function start(){
-    opened=true;rerender();
+    opened=true;
+    // Encender la carga antes del primer pintado evita el aviso falso de error.
     if(!loaded&&!loading)void loadTeams();
     if(owner&&!cloudLoaded)void loadCloud();
+    rerender();
   }
   function selector(pos){
     const row=txt('div',null,'cam-fan-team-select');
