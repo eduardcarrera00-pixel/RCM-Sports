@@ -133,7 +133,7 @@
   shortcuts.append(
     nflShortcut, footballShortcut,
     shortcut('Publicar\nTake', penIcon(), openTakeComposer, 'take'),
-    shortcut('Sube tu\nPick', navIcon('Picks'), openPickComposer, 'pick')
+    shortcut('Publicar\nPick', navIcon('Picks'), openPickComposer, 'pick')
   );
   function badge(button, count, label) {
     button.querySelector('.cam-hj-badge')?.remove();
