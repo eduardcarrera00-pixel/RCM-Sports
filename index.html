@@ -353,6 +353,69 @@ html.dark [data-reading-size][aria-pressed="true"] {
 }
 @media(prefers-reduced-motion:reduce){#camLiguilla .cam-lg-board-scroll{scroll-behavior:auto}}
 
+/* CAM SPORTS · pronóstico libre: cuadro espejo, de cuartos al campeón. */
+#camLiguilla .cam-fan-shell{display:grid;gap:18px;min-width:0;padding:clamp(16px,2.5vw,28px);background:var(--q-card);border:1px solid var(--q-edge);color:var(--q-ink)}
+#camLiguilla .cam-fan-intro{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap}
+#camLiguilla .cam-fan-intro-copy{display:grid;gap:7px;flex:1 1 280px;min-width:0}
+#camLiguilla .cam-fan-eyebrow{margin:0;color:var(--q-gold-text);font:700 11px/1.3 var(--ds-font-sans,Inter,system-ui,sans-serif);letter-spacing:.15em}
+#camLiguilla .cam-fan-intro h3{margin:0;font:600 clamp(27px,3vw,39px)/1.12 var(--ds-font-serif,"Playfair Display",Georgia,serif);color:var(--q-ink)}
+#camLiguilla .cam-fan-lead{margin:0;color:var(--q-muted);font-size:14px;line-height:1.6;max-width:65ch}
+#camLiguilla .cam-fan-toggle{min-height:46px;white-space:nowrap}
+#camLiguilla .cam-fan-tree{min-width:0;display:grid;grid-template-columns:minmax(0,1.18fr) minmax(0,.9fr) minmax(0,1.16fr) minmax(0,.9fr) minmax(0,1.18fr);align-items:center;gap:clamp(8px,1.2vw,20px);padding:22px 0;border-top:1px solid var(--q-line);border-bottom:1px solid var(--q-line)}
+#camLiguilla .cam-fan-column{display:grid;align-content:center;gap:13px;min-width:0}
+#camLiguilla .cam-fan-column-title{margin:0;text-align:center;text-transform:uppercase;font:700 11px/1.3 var(--ds-font-sans,Inter,system-ui,sans-serif);letter-spacing:.09em;color:var(--q-gold-text)}
+#camLiguilla .cam-fan-pair{border:1px solid var(--q-line);background:var(--q-panel);display:grid;gap:0;min-width:0}
+#camLiguilla .cam-fan-match-label{padding:7px 8px 5px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--q-meta)}
+#camLiguilla .cam-fan-team-select{display:grid;grid-template-columns:minmax(0,1fr) 33px;gap:4px;align-items:stretch;min-height:49px;padding:5px 6px;border-top:1px solid var(--q-line);min-width:0}
+#camLiguilla .cam-fan-choice-label{min-width:0;display:flex;align-items:center}
+#camLiguilla .cam-fan-select{width:100%;min-width:0;min-height:39px;max-width:100%;padding:4px 2px;border:0;border-radius:0;background:var(--q-card);color:var(--q-ink);font:600 12px/1.35 var(--ds-font-sans,Inter,system-ui,sans-serif);text-overflow:ellipsis}
+#camLiguilla .cam-fan-pass{border:1px solid var(--q-line);background:var(--q-card);color:var(--q-muted);font-size:20px;min-width:30px;min-height:39px;border-radius:0}
+#camLiguilla :is(.cam-fan-pass,.cam-fan-option).is-selected{background:var(--q-gold-soft);border-color:var(--q-gold);color:var(--q-ink);font-weight:700}
+#camLiguilla .cam-fan-pass:disabled{opacity:.35;cursor:default}
+#camLiguilla .cam-fan-option{width:100%;min-width:0;min-height:50px;padding:10px 8px;border:0;border-top:1px solid var(--q-line);border-radius:0;background:var(--q-card);color:var(--q-ink);text-align:center;font:600 12px/1.25 var(--ds-font-sans,Inter,system-ui,sans-serif);overflow-wrap:anywhere}
+#camLiguilla .cam-fan-option:disabled{opacity:.6;cursor:default}
+#camLiguilla .cam-fan-center{align-self:stretch;display:grid;align-content:center;justify-items:center;gap:12px;text-align:center;min-width:0;padding:16px 8px;background:#0b2233;color:#f3ebdd;border:1px solid #2e4a5e}
+#camLiguilla .cam-fan-centre-kicker{font-size:9px;letter-spacing:.12em;color:#e8bf79;font-weight:700}
+#camLiguilla .cam-fan-center h4{margin:0;color:#f3ebdd;font:600 clamp(19px,2.3vw,28px)/1.2 var(--ds-font-serif,"Playfair Display",Georgia,serif)}
+#camLiguilla .cam-fan-final-pair{display:grid;gap:5px;width:100%;min-width:0}
+#camLiguilla .cam-fan-final-pair .cam-fan-option{background:#15344a;color:#f3ebdd;border:1px solid #345167}
+#camLiguilla .cam-fan-final-pair .cam-fan-option.is-selected{background:#c99a5b;color:#102535}
+#camLiguilla .cam-fan-champion{display:grid;justify-items:center;gap:7px;width:100%;min-width:0;padding:16px 6px 4px;border-top:1px solid #896b4e}
+#camLiguilla .cam-fan-star{color:#e8bf79;font-size:30px;line-height:1}
+#camLiguilla .cam-fan-champion small{color:#e8bf79;letter-spacing:.17em;font-weight:700;font-size:10px}
+#camLiguilla .cam-fan-champion strong{font:italic 600 clamp(17px,2.3vw,28px)/1.2 var(--ds-font-serif,"Playfair Display",Georgia,serif);overflow-wrap:anywhere}
+#camLiguilla .cam-fan-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#camLiguilla .cam-fan-actions .cam-nfl-action{min-height:44px}
+#camLiguilla .cam-fan-count{margin-right:auto;font-size:13px;font-weight:700;color:var(--q-meta)}
+#camLiguilla .cam-fan-reset{padding:10px;border:0;background:transparent;color:var(--q-muted);text-decoration:underline;min-height:44px}
+#camLiguilla .cam-fan-status{margin:0;font-size:13px;line-height:1.5;color:var(--q-gold-text)}
+#camLiguilla .cam-fan-status.is-error{color:var(--q-bad-text)}
+#camLiguilla .cam-fan-disclaimer{margin:0;color:var(--q-meta);font-size:11px;line-height:1.5}
+#camLiguilla .cam-lg-official-details{border:1px solid var(--q-line);background:var(--q-card);padding:0 12px}
+#camLiguilla .cam-lg-official-details>summary{cursor:pointer;padding:12px 2px;min-height:44px;color:var(--q-muted);font-size:13px}
+#camLiguilla .cam-lg-official-details[open]{padding-bottom:12px}
+@media(max-width:1050px){
+ #camLiguilla .cam-fan-tree{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+ #camLiguilla .cam-fan-left-quarter{order:1}
+ #camLiguilla .cam-fan-right-quarter{order:2}
+ #camLiguilla .cam-fan-left-semi{order:3}
+ #camLiguilla .cam-fan-right-semi{order:4}
+ #camLiguilla .cam-fan-center{order:5;grid-column:1/-1}
+ #camLiguilla .cam-fan-center h4{font-size:26px}
+ #camLiguilla .cam-fan-final-pair{max-width:320px}
+}
+@media(max-width:430px){
+ #camLiguilla .cam-fan-shell{padding:14px;gap:14px}
+ #camLiguilla .cam-fan-intro{align-items:stretch}
+ #camLiguilla .cam-fan-toggle{width:100%}
+ #camLiguilla .cam-fan-tree{gap:8px;padding:12px 0}
+ #camLiguilla .cam-fan-team-select{grid-template-columns:minmax(0,1fr) 27px;padding:4px;gap:2px}
+ #camLiguilla .cam-fan-select{font-size:11px}
+ #camLiguilla .cam-fan-pass{min-width:26px}
+ #camLiguilla .cam-fan-option{font-size:12px;padding:8px 4px}
+}
+
+
 </style>
 <script defer src="assets/ae-nfl-mobile-telephoto.js?v=20261016-1"></script>
 <link rel="stylesheet" href="assets/cam-perf-sport-banners.css?v=20261104-css-consolidated-1">
