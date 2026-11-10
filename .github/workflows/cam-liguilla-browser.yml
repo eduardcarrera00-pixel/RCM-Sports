@@ -5,6 +5,7 @@ on:
     paths:
       - 'index.html'
       - 'assets/cam-liguilla.js'
+      - 'assets/cam-fan-bracket.js'
       - 'assets/cam-football-semana.js'
       - 'assets/cam-football-quiniela.js'
       - 'assets/cam-sport-quiniela-loader.js'
