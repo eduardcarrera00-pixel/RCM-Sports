@@ -179,7 +179,7 @@
     }
 
     const opinion = el('div', null, 'cam-ns-opinion');
-    const take = link('Publicar mi take sobre este duelo', () => {
+    const take = link('Publicar Take', () => {
       window.aeOpenTakeComposer?.('NFL');
     }, 'cam-ns-link-take');
     take.setAttribute('aria-controls', 'aeTakeComposerDialog');

@@ -466,3 +466,12 @@ ESPN Fantasy o Sleeper. A la izquierda van la foto, @usuario, lo que destaca,
 «Editar perfil» y «Compartir perfil». A la derecha, las pestañas fijas y su
 contenido. «Cerrar» sigue arriba a la derecha. Es una rejilla sobre los propios
 hijos de `#aeProfileDialog`, sin mover nada. «Editar perfil» ocupa la ventana entera.
+
+### Auditoría visual aplicada · 10 nov 2026
+Ligas con icono y nombre visible; platos identificados por votos y Chefs por resultados.
+La fase de clasificados se llama Elige tus 8 y el cuadro futuro se presenta como Próximamente.
+La selección del duelo precede a Publicar Take; en escritorio la quiniela sigue al duelo.
+Los periodos de quiniela abren en mensual con tabla visible. Los detalles de Picks usan
+la superficie común; el Pick histórico pone el título arriba y elimina brillos en momios.
+Historial y Chefs aprovechan el desplazamiento de la página. Se conserva la navegación
+móvil, las rutas, los controles y las reglas de puntuación. Los grupos usan Mis grupos.

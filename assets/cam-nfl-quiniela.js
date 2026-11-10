@@ -61,7 +61,7 @@
     // El tono solo pinta el aviso; el texto sigue diciendo lo mismo.
     if(tone)e.dataset.tone=tone;else delete e.dataset.tone;
   };
-  let games=[],teams=new Map(),user=null,mine=new Map(),draft=new Map(),season=seasonGuess(),week=1,dayKey=null,scope='week',showAll=false,loading=false,loaded=false,saving=false,request=0;
+  let games=[],teams=new Map(),user=null,mine=new Map(),draft=new Map(),season=seasonGuess(),week=1,dayKey=null,scope='month',showAll=false,loading=false,loaded=false,saving=false,request=0;
   /* «La semana» (4 nov 2026): el laurel (x2), las elecciones del editor y lo que
      eligió la comunidad. Cada parte depende de la migración 20261104090000; si la
      base de datos aún no la tiene, esa parte simplemente no aparece. */
@@ -507,7 +507,7 @@
   function setQuinielaView(view){
     if(!['jornada','month','all'].includes(view))return;
     const ranking=$('camNflQuinielaStandings');
-    if(ranking)ranking.hidden=view==='jornada';
+    if(ranking)ranking.hidden=false;
     for(const tab of $('camNflViewTabs')?.querySelectorAll('[data-view]')||[]){
       const selected=tab.dataset.view===view;
       tab.setAttribute('aria-pressed',String(selected));
@@ -518,7 +518,7 @@
   }
   $('camNflViewTabs')?.addEventListener('click',event=>{
     const tab=event.target.closest('button[data-view]');
-    if(tab)setQuinielaView(tab.getAttribute('aria-pressed')==='true'?'jornada':tab.dataset.view);
+    if(tab)setQuinielaView(tab.dataset.view);
   });
   async function paintRanking(){
     const target=$('camNflRanking');if(!target)return;

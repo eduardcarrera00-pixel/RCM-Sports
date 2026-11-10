@@ -2881,7 +2881,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
               <div class="ae-picks-feed-heading">
                  <div class="ae-picks-heading-cta-row ae-chef-marble">
                    <span class="ae-picks-nudge">¿Eres Chef?</span>
-                   <button id="cpPublishCta" type="button" class="ae-participate-cta ae-picks-publish-cta ae-chef-marble-button" aria-label="Cocina Picks: inicia sesión o crea una cuenta para publicar tu pronóstico" aria-controls="cpComposePanel" aria-haspopup="dialog" aria-expanded="false">Cocina Picks</button>
+                   <button id="cpPublishCta" type="button" class="ae-participate-cta ae-picks-publish-cta ae-chef-marble-button" aria-label="Publicar Pick: inicia sesión o crea una cuenta para publicar tu pronóstico" aria-controls="cpComposePanel" aria-haspopup="dialog" aria-expanded="false">Publicar Pick</button>
                  </div>
                  
                  
@@ -2898,11 +2898,11 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
               <!-- Mejores y Peores Platos preceden a las clasificaciones de Chefs. -->
               <aside class="ae-picks-rail">
               <section class="ae-picks-top-three ae-picks-small-top ae-chef-board ae-chef-best" aria-labelledby="picksPopularTitle">
-                <div class="ae-picks-rail-heading"><h3 id="picksPopularTitle">Mejores platos</h3><span class="ae-chef-recetario">El recetario</span></div>
+                <div class="ae-picks-rail-heading"><h3 id="picksPopularTitle">Mejores platos</h3><span class="ae-chef-recetario">Por votos</span></div>
                 <ol id="picksPopular" aria-live="polite"><li class="ae-chef-empty">Cargando clasificación…</li></ol>
               </section>
               <section class="ae-picks-top-three ae-picks-small-top ae-chef-board ae-chef-worst" aria-labelledby="picksQuestionedTitle">
-                <div class="ae-picks-rail-heading"><h3 id="picksQuestionedTitle">Peores platos</h3><span class="ae-chef-recetario">El recetario</span></div>
+                <div class="ae-picks-rail-heading"><h3 id="picksQuestionedTitle">Peores platos</h3><span class="ae-chef-recetario">Por votos</span></div>
                 <ol id="picksQuestioned" aria-live="polite"><li class="ae-chef-empty">Cargando clasificación…</li></ol>
               </section>
 
@@ -2916,12 +2916,12 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
               <div class="ae-chefs-dual-standings ae-chefs-classical" role="group" aria-label="Clasificaciones de Mejores y Peores Chefs">
               <section class="ae-takes-side ae-inline-chefs-board" aria-labelledby="picksRankingTitle">
 
-                <header class="ae-chefs-art-heading"><h3 id="picksRankingTitle">Mejores Chefs</h3></header>
+                <header class="ae-chefs-art-heading"><h3 id="picksRankingTitle">Mejores Chefs</h3><span class="cam-metric-label">Por resultados</span></header>
                 <div class="ae-takes-tabs cam-chef-period" role="group" aria-label="Periodo de Mejores Chefs">
                   <button id="cpRankMonth" data-chef-period="month" type="button" aria-pressed="true" aria-controls="cpLeaderboard cpWorstLeaderboard">Mensual</button>
                   <button id="cpRankHistory" data-chef-period="all" type="button" aria-pressed="false" aria-controls="cpLeaderboard cpWorstLeaderboard">Histórico</button>
                 </div>
-                <div class="ae-chefs-table-cols" aria-hidden="true"><span>#</span><span>AFICIONADO</span><span>%</span><span>PTS</span></div>
+                <div class="ae-chefs-table-cols" aria-hidden="true"><span>#</span><span>AFICIONADO</span><span>% acierto</span><span>PTS</span></div>
                 <ol id="cpLeaderboard" class="ae-take-leaderboard-list" role="region" aria-label="Ranking de Mejores Chefs; desplázate para consultar más puestos" aria-live="polite"></ol>
                 <details class="ae-chefs-scoring-info"><summary>¿Cómo se calculan los puntos?</summary>
                 <p class="ae-picks-ranking-intro"><strong>¡Atención: fallar resta puntos!</strong> Publicar más Picks no da puntos por sí solo. Cada acierto suma el valor absoluto de la cuota americana ÷ 100; cada fallo resta esa misma cantidad; si se anula, 0 puntos. Ejemplo: una cuota +250 suma 2,50 puntos al acertar y resta 2,50 al fallar. Las selecciones de <strong>¿Quién será campeón?</strong> también cuentan: al acertar sumas los puntos indicados junto al escudo; si fallas, sumas 0. <strong>Ranking mensual:</strong> empieza de cero el día 1 de cada mes (hora de Toronto, según la fecha de confirmación). <strong>Ranking histórico:</strong> conserva todos los resultados.</p>
@@ -2929,12 +2929,12 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
               </section>
               <section class="ae-takes-side ae-inline-chefs-board ae-worst-chefs-board" aria-labelledby="cpWorstRankingTitle">
 
-                <header class="ae-chefs-art-heading"><h3 id="cpWorstRankingTitle">Peores Chefs</h3></header>
+                <header class="ae-chefs-art-heading"><h3 id="cpWorstRankingTitle">Peores Chefs</h3><span class="cam-metric-label">Por resultados</span></header>
                 <div class="ae-takes-tabs cam-chef-period" role="group" aria-label="Periodo de Peores Chefs">
                   <button id="cpWorstRankMonth" data-chef-period="month" type="button" aria-pressed="true" aria-controls="cpLeaderboard cpWorstLeaderboard">Mensual</button>
                   <button id="cpWorstRankHistory" data-chef-period="all" type="button" aria-pressed="false" aria-controls="cpLeaderboard cpWorstLeaderboard">Histórico</button>
                 </div>
-                <div class="ae-chefs-table-cols" aria-hidden="true"><span>#</span><span>AFICIONADO</span><span>%</span><span>PTS</span></div>
+                <div class="ae-chefs-table-cols" aria-hidden="true"><span>#</span><span>AFICIONADO</span><span>% acierto</span><span>PTS</span></div>
                 <ol id="cpWorstLeaderboard" class="ae-take-leaderboard-list" role="region" aria-label="Ranking de Peores Chefs; desplázate para consultar más puestos" aria-live="polite"></ol>
               </section>
               </div>
@@ -3129,11 +3129,11 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
                     <div id="cpWeekly" aria-live="polite"><p>Cargando nuestra selección…</p></div></div>
                     <div class="cam-home-plates">
                       <section aria-labelledby="camHomeBestTitle" class="cam-home-plate-board">
-                        <header><h3 id="camHomeBestTitle">Mejores platos</h3><span aria-hidden="true">↔</span></header>
+                        <header><h3 id="camHomeBestTitle">Mejores platos</h3><span class="cam-metric-label">Por votos</span><span aria-hidden="true">↔</span></header>
                         <ol id="camHomeBestPlates" class="cam-home-plate-list" tabindex="0" aria-label="Mejores platos de la semana; desliza horizontalmente" aria-live="polite"><li class="cam-home-plate-empty">Cargando Picks…</li></ol>
                       </section>
                       <section aria-labelledby="camHomeWorstTitle" class="cam-home-plate-board">
-                        <header><h3 id="camHomeWorstTitle">Peores platos</h3><span aria-hidden="true">↔</span></header>
+                        <header><h3 id="camHomeWorstTitle">Peores platos</h3><span class="cam-metric-label">Por votos</span><span aria-hidden="true">↔</span></header>
                         <ol id="camHomeWorstPlates" class="cam-home-plate-list" tabindex="0" aria-label="Peores platos de la semana; desliza horizontalmente" aria-live="polite"><li class="cam-home-plate-empty">Cargando Picks…</li></ol>
                       </section>
                     </div>
@@ -3319,7 +3319,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
           <div id="camNflScore" class="cam-sport-score">
             <div class="cam-quiniela-ranking">
               <nav id="camNflViewTabs" class="cam-quiniela-view-tabs" aria-label="Clasificaciones de La Quiniela">
-                <button type="button" data-view="month" aria-pressed="false" aria-expanded="false" aria-controls="camNflQuinielaStandings"><span class="cam-q-tab-kicker">Clasificación</span> <span class="cam-q-tab-name">mensual</span></button>
+                <button type="button" data-view="month" aria-pressed="true" aria-expanded="true" aria-controls="camNflQuinielaStandings"><span class="cam-q-tab-kicker">Clasificación</span> <span class="cam-q-tab-name">mensual</span></button>
                 <button type="button" data-view="all" aria-pressed="false" aria-expanded="false" aria-controls="camNflQuinielaStandings"><span class="cam-q-tab-kicker">Clasificación</span> <span class="cam-q-tab-name">histórica</span></button>
               </nav>
             <details class="cam-nfl-rules">
@@ -3329,7 +3329,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
               <p>Acertar suma los puntos de tu selección; fallar resta esa misma cantidad. Un empate NFL o una anulación vale 0. Por ejemplo, una selección de 4 puntos suma +4 al acertar y resta −4 al fallar. Ese saldo decide tu clasificación y el ascenso o descenso mensual en la liga NFL. Puedes editar hasta el inicio del partido.</p>
               <p id="camNflLaurelRule" hidden><strong>El laurel.</strong> Una vez por jornada puedes ponerle el laurel a un partido que ya pronosticaste: si aciertas, suma el doble; si fallas, resta los puntos base. Puedes cambiarlo de partido hasta que empiece el que lo lleva.</p>
             </details>
-              <section id="camNflQuinielaStandings" class="cam-nfl-standings" hidden aria-labelledby="camNflStandingTitle">
+              <section id="camNflQuinielaStandings" class="cam-nfl-standings" aria-labelledby="camNflStandingTitle">
                 <h3 id="camNflStandingTitle">Clasificación de La Quiniela</h3>
                 <p id="camNflRankingCaption" class="cam-quiniela-ranking-caption"></p>
                 <div id="camNflRanking" aria-live="polite"></div>
@@ -3340,7 +3340,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
           <div id="camFootballScore" class="cam-sport-score">
             <div class="cam-quiniela-ranking">
               <nav id="camFootballViewTabs" class="cam-quiniela-view-tabs" aria-label="Clasificaciones de La Quiniela">
-                <button type="button" data-view="month" aria-pressed="false" aria-expanded="false" aria-controls="camFootballQuinielaStandings"><span class="cam-q-tab-kicker">Clasificación</span> <span class="cam-q-tab-name">mensual</span></button>
+                <button type="button" data-view="month" aria-pressed="true" aria-expanded="true" aria-controls="camFootballQuinielaStandings"><span class="cam-q-tab-kicker">Clasificación</span> <span class="cam-q-tab-name">mensual</span></button>
                 <button type="button" data-view="all" aria-pressed="false" aria-expanded="false" aria-controls="camFootballQuinielaStandings"><span class="cam-q-tab-kicker">Clasificación</span> <span class="cam-q-tab-name">histórica</span></button>
               </nav>
             <details class="cam-nfl-rules">
@@ -3349,7 +3349,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
               <p>Un resultado menos probable suma más puntos. Si faltan datos, las tres opciones valen 6 puntos. Los puntos publicados son iguales para todos y no cambian con las cuotas posteriores.</p>
               <p>Acertar suma los puntos de tu selección; fallar resta esa misma cantidad. Una anulación vale 0. El empate es un resultado más: suma sus puntos si lo aciertas y los resta si lo fallas. Ese saldo decide tu clasificación y el ascenso o descenso mensual en la liga de Fútbol. Puedes editar hasta el inicio del partido.</p>
             </details>
-              <section id="camFootballQuinielaStandings" class="cam-nfl-standings" hidden aria-labelledby="camFootballStandingTitle">
+              <section id="camFootballQuinielaStandings" class="cam-nfl-standings" aria-labelledby="camFootballStandingTitle">
                 <h3 id="camFootballStandingTitle">Clasificación de La Quiniela</h3>
                 <p id="camFootballRankingCaption" class="cam-quiniela-ranking-caption"></p>
                 <div id="camFootballRanking" aria-live="polite"></div>
@@ -3473,7 +3473,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
    <button id="aeProfileTabOverview" type="button" role="tab" aria-selected="true" aria-controls="camProfileOverview" class="is-active"><span class="cam-tab-label">Perfil</span></button>
    <button id="aeProfileTabTakes" type="button" role="tab" aria-selected="false" tabindex="-1"><span class="cam-tab-label">Takes</span></button>
    <button id="aeProfileTabPicks" type="button" role="tab" aria-selected="false" tabindex="-1"><span class="cam-tab-label">Picks</span></button>
-   <button id="aeProfileTabParty" type="button" role="tab" aria-selected="false" aria-controls="camProfileParties" tabindex="-1"><svg class="cam-tab-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15.5 19v-1.3a3.4 3.4 0 0 0-3.4-3.4H7.4A3.4 3.4 0 0 0 4 17.7V19"/><circle cx="9.75" cy="8" r="3.25"/><path d="M20 19v-1.2a3.3 3.3 0 0 0-2.5-3.2M15 4.9a3.25 3.25 0 0 1 0 6.2"/></svg><span class="cam-tab-label">Mi Party</span></button>
+   <button id="aeProfileTabParty" type="button" role="tab" aria-selected="false" aria-controls="camProfileParties" tabindex="-1"><svg class="cam-tab-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15.5 19v-1.3a3.4 3.4 0 0 0-3.4-3.4H7.4A3.4 3.4 0 0 0 4 17.7V19"/><circle cx="9.75" cy="8" r="3.25"/><path d="M20 19v-1.2a3.3 3.3 0 0 0-2.5-3.2M15 4.9a3.25 3.25 0 0 1 0 6.2"/></svg><span class="cam-tab-label">Mi grupo</span></button>
  </nav>
  <div class="ae-profile-overview"><strong id="aeProfileCount">0 Takes</strong><p id="aeProfileOverviewText" hidden></p></div>
  <p id="aeProfileStatus" role="status" aria-live="polite"></p>
@@ -3493,7 +3493,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
    <button type="button" id="aeNotificationsButton" class="cam-profile-action cam-profile-bell" hidden
      aria-label="Notificaciones" aria-controls="aeNotificationsDialog" aria-haspopup="dialog"
      aria-expanded="false" title="Notificaciones"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5.3 9a6.7 6.7 0 0 1 13.4 0v5.1l2 3.2v1H3.3v-1l2-3.2Z"/><path d="M9.3 21a3 3 0 0 0 5.4 0"/></svg><span id="aeNotificationsBadge" class="ae-notifications-badge cam-profile-bell-badge" hidden></span></button>
-   <button type="button" id="camProfileInvite" class="cam-profile-action" hidden><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15.5 19v-1.3a3.4 3.4 0 0 0-3.4-3.4H7.4A3.4 3.4 0 0 0 4 17.7V19"/><circle cx="9.75" cy="8" r="3.25"/><path d="M20 19v-1.2a3.3 3.3 0 0 0-2.5-3.2M15 4.9a3.25 3.25 0 0 1 0 6.2"/></svg>Invitar a mi party</button>
+   <button type="button" id="camProfileInvite" class="cam-profile-action" hidden><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15.5 19v-1.3a3.4 3.4 0 0 0-3.4-3.4H7.4A3.4 3.4 0 0 0 4 17.7V19"/><circle cx="9.75" cy="8" r="3.25"/><path d="M20 19v-1.2a3.3 3.3 0 0 0-2.5-3.2M15 4.9a3.25 3.25 0 0 1 0 6.2"/></svg>Invitar a mi grupo</button>
    <button type="button" id="camProfileShare" class="cam-profile-action"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 15V3m-4 4 4-4 4 4M7 11H5v9h14v-9h-2"/></svg><span class="cam-profile-action-label">Compartir perfil</span></button>
   </div>
  <section id="camProfileEdit" class="cam-profile-edit" aria-labelledby="camProfileEditTitle" hidden>

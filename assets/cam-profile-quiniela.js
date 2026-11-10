@@ -1,4 +1,4 @@
-/* CAM SPORTS · Jornadas personales. Solo consulta al abrir «Mi Party» del
+/* CAM SPORTS · Jornadas personales. Solo consulta al abrir «Mi grupo» del
    perfil propio (desde el 4 nov «Mis jornadas» va al final de esa pestaña).
    Las tablas conservan RLS de propietario; nunca se leen picks de otro perfil.
    La consulta incluye el partido y sus equipos, y pagina todo el historial. */
@@ -167,7 +167,7 @@
   });
   window.camOpenQuinielaHistory=sport=>{
     state.sport=sport==='football'?'football':'nfl';
-    // Con el perfil propio abierto, Mi Party y abajo hasta las jornadas.
+    // Con el perfil propio abierto, Mi grupo y abajo hasta las jornadas.
     if(state.userId&&window.camProfileShowJornadas?.()){paint();ensure();return;}
     return window.openAeProfile?.('quiniela');
   };

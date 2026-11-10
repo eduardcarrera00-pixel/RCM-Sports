@@ -253,7 +253,7 @@ function quinielaCard(data, ctx) {
   if (!lines.length) return ctx.own && !ctx.stepsShown ? emptyCard('quiniela', 'Quiniela', 'Jugar la quiniela ›', () => ctx.play('nfl')) : null;
   const hits = num(q.nfl?.hits) + num(q.football?.hits);
   const resolved = num(q.nfl?.resolved) + num(q.football?.resolved);
-  // Lleva a «Mi Party» (en el perfil propio, con «Mis jornadas» al final).
+  // Lleva a «Mi grupo» (en el perfil propio, con «Mis jornadas» al final).
   const open = () => ctx.tab('party');
   const card = shell('quiniela', 'Quiniela', [resolved ? Math.round(hits / resolved * 100) + ' % acierto' : ''], open);
   const body = button('', 'cam-ov-item cam-ov-lines', open, {'aria-label': 'Quiniela: ' + lines.map(l => l.filter(Boolean).join(', ')).join('. ')});

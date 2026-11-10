@@ -1,12 +1,12 @@
-/* AE SPORTS · Unified private profile: Perfil · Takes · Picks · Mi Party.
+/* AE SPORTS · Unified private profile: Perfil · Takes · Picks · Mi grupo.
  * Public author profiles expose public Takes and Picks.
  * 3 nov 2026: el perfil abre en «Perfil» (resumen, cam_profile_overview: una
- * llamada). Takes y Picks se cargan al abrir su pestaña; «Mi Party» la pinta
+ * llamada). Takes y Picks se cargan al abrir su pestaña; «Mi grupo» la pinta
  * cam-parties.js. ?perfil=<id>&tab=takes|picks|party abre esa pestaña.
  * 4 nov 2026: cuatro pestañas. «Mis jornadas» (cam-profile-quiniela.js) va al
- * final de «Mi Party»; la pestaña «quiniela» de antes abre Mi Party y baja a
+ * final de «Mi grupo»; la pestaña «quiniela» de antes abre Mi grupo y baja a
  * las jornadas. La cabecera enseña lo que destaca de cada uno y, en un perfil
- * ajeno, «Invitar a mi party».
+ * ajeno, «Invitar a mi grupo».
  */
 (() => {
 'use strict';
@@ -36,7 +36,7 @@ let activeAuthor=null;
 let privateView=false;
 let working=false;
 const TABS=['perfil','takes','picks','party'];
-// «quiniela» (Mis jornadas) vive dentro de «Mi Party» desde el 4 nov.
+// «quiniela» (Mis jornadas) vive dentro de «Mi grupo» desde el 4 nov.
 const validTab=tab=>tab==='quiniela'?'party':TABS.includes(tab)?tab:'perfil';
 let activeTab='perfil';
 let ownTakes=[];
@@ -787,10 +787,10 @@ function setPrivateTab(tab,options={}){
     }
   }
   if(options.url!==false)syncTabUrl();
-  // Mi Party (cam-parties.js) se pinta al recibir la pestaña visible.
+  // Mi grupo (cam-parties.js) se pinta al recibir la pestaña visible.
   document.dispatchEvent(new CustomEvent('cam:profile-view',{detail:{userId:activeAuthor,own:privateView,tab:activeTab}}));
-  // «Ver mis jornadas» desde la quiniela: Mi Party, ya en las jornadas (otra
-  // vez cuando Mi Party termina de pintarse, porque empuja las jornadas).
+  // «Ver mis jornadas» desde la quiniela: Mi grupo, ya en las jornadas (otra
+  // vez cuando Mi grupo termina de pintarse, porque empuja las jornadas).
   jornadasPending=toJornadas;
   if(toJornadas)requestAnimationFrame(scrollToJornadas);
   return loading;
@@ -1157,7 +1157,7 @@ function setIdentity(name,subtitle){
   }
   if(!clean&&$('camProfileHighlights')){$('camProfileHighlights').replaceChildren();$('camProfileHighlights').hidden=true;}
 }
-/* Invitar a alguien a tu party: abre «Mis parties» de quiniela (elegir una
+/* Invitar a alguien a tu grupo: abre «Mis grupos» de quiniela (elegir una
    para compartir su enlace, o crearla). Sin sesión, primero el acceso. */
 async function inviteToParty(){
   if(typeof window.camParties?.openHub!=='function')return;
@@ -1167,7 +1167,7 @@ async function inviteToParty(){
 }
 function labelTabs(){
   const own=privateView;
-  for(const [id,mine,theirs] of [['aeProfileTabOverview','Perfil','Perfil'],['aeProfileTabTakes','Takes','Takes'],['aeProfileTabPicks','Picks','Picks'],['aeProfileTabParty','Mi Party','Party']]){
+  for(const [id,mine,theirs] of [['aeProfileTabOverview','Perfil','Perfil'],['aeProfileTabTakes','Takes','Takes'],['aeProfileTabPicks','Picks','Picks'],['aeProfileTabParty','Mi grupo','Party']]){
     const b=$(id);if(!b)continue;
     const label=b.querySelector('.cam-tab-label')||b;
     label.textContent=own?mine:theirs;

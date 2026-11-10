@@ -99,7 +99,7 @@
     box.append(el('p',(g.status==='live'?'En juego · ':g.status==='final'?'Finalizado · ':'')+when(g.kickoff),'cam-ns-duel-when'));
     if(['live','final'].includes(g.status)&&g.home_score!=null&&g.away_score!=null)box.append(el('p',g.home_score+' – '+g.away_score,'cam-ns-duel-score'));
     const opinion=el('div',null,'cam-ns-opinion');
-    const take=button('Publicar mi take sobre este duelo',()=>window.aeOpenTakeComposer?.('Fútbol'),'cam-ns-link cam-ns-link-take');
+    const take=button('Publicar Take',()=>window.aeOpenTakeComposer?.('Fútbol'),'cam-ns-link cam-ns-link-take');
     take.setAttribute('aria-controls','aeTakeComposerDialog');take.setAttribute('aria-haspopup','dialog');opinion.append(take);box.append(opinion);
     const play=el('div',null,'cam-ns-quiniela',{role:'group','aria-label':'Quiniela del duelo de la semana'});
     if(q().isOpen(g)){

@@ -1,12 +1,12 @@
 /* CAM SPORTS · Parties (1 nov 2026; Quiniela, 3 nov 2026).
    Grupos privados de amigos con su propia clasificación de Quiniela, Picks o Takes.
-   · Se entra desde la pestaña «Mi Party» del perfil y desde «Mis parties» junto
+   · Se entra desde la pestaña «Mi grupo» del perfil y desde «Mis grupos» junto
      a las clasificaciones y en las quinielas NFL y Fútbol.
    · Invitación: camsports.github.io/?party=CÓDIGO (6 caracteres).
    · Cuota de Supabase: nada en bucle ni en tiempo real. Una llamada al abrir
      el party (clasificación de «Este mes» y «Total» juntas), otra al abrir la
-     actividad, una al abrir la pestaña «Mi Party» del perfil (cam_profile_party)
-     y una al abrir «Mis parties». Cambiar de periodo no llama. */
+     actividad, una al abrir la pestaña «Mi grupo» del perfil (cam_profile_party)
+     y una al abrir «Mis grupos». Cambiar de periodo no llama. */
 (() => {
 'use strict';
 
@@ -244,7 +244,7 @@ async function requireLogin(resume, hint) {
   window.openUserAuthModal?.();
 }
 
-/* ---------- Mis parties ---------- */
+/* ---------- Mis grupos ---------- */
 async function openHub(kind, sport) {
   const finishEntrance=window.camPageLoader?.begin?.();
   try{
@@ -274,7 +274,7 @@ function renderHub() {
   actions.append(create, join);
   const body = [seg, list];
   if (isAdmin()) body.push(button('Moderar todos los parties', 'cam-party-link', () => openAdmin()));
-  mount(frame({kicker: 'CAM SPORTS · PARTIES', title: 'Mis parties', body, foot: actions}));
+  mount(frame({kicker: 'CAM SPORTS · PARTIES', title: 'Mis grupos', body, foot: actions}));
   fillMine();
 }
 function fillMine() {
@@ -747,7 +747,7 @@ function openInviteSheet() {
   const actions = el('div', null, 'cam-party-actions');
   if (typeof navigator.share === 'function') {
     const share = button('Compartir', 'cam-party-btn is-primary', async () => {
-      try { await navigator.share({title: p.name + ' · CAM SPORTS', text: 'Únete a mi party «' + p.name + '» en CAM SPORTS', url: link}); }
+      try { await navigator.share({title: p.name + ' · CAM SPORTS', text: 'Únete a mi grupo «' + p.name + '» en CAM SPORTS', url: link}); }
       catch (e) { if (e?.name !== 'AbortError') copy(); }
     });
     share.prepend(icon('share'));
@@ -887,7 +887,7 @@ async function openAdmin() {
   } catch (e) { if (list.isConnected) list.replaceChildren(line(message(e))); }
 }
 
-/* ---------- perfil: pestaña «Mi Party» ----------
+/* ---------- perfil: pestaña «Mi grupo» ----------
    Propio: invitación a armar una party de quiniela (o «Tus parties de
    quiniela»), «Mi quiniela» compacta y «Otros parties»; debajo, «Mis
    jornadas» (cam-profile-quiniela.js).
@@ -978,7 +978,7 @@ function renderProfile() {
   const nodes = [];
   if (P.own) {
     // 1 · Invitación (o «Tus parties de quiniela»).
-    const invite = block(quiniela.length ? 'Tus parties de quiniela' : '¿Ya tienes tu party de quiniela?', 'cam-pp-invite');
+    const invite = block(quiniela.length ? 'Tus parties de quiniela' : '¿Ya tienes tu grupo de quiniela?', 'cam-pp-invite');
     if (quiniela.length) {
       const list = el('div', null, 'cam-party-profile-list');
       for (const p of quiniela) list.append(partyRow(p, true));
@@ -1028,19 +1028,19 @@ function renderProfile() {
       nodes.push(box);
     }
     if (!parties.length && !played) nodes.push(line('@' + String(document.getElementById('aeProfileTitle')?.textContent || '').replace(/^@+/, '') + ' todavía no ha participado', 'cam-party-profile-empty'));
-    const cta = button('¿Juegas la quiniela? Arma tu party ›', 'cam-pp-link cam-pp-cta', () => armYourParty());
+    const cta = button('¿Juegas la quiniela? Arma tu grupo ›', 'cam-pp-link cam-pp-cta', () => armYourParty());
     nodes.push(cta);
   }
   node.replaceChildren(...nodes);
   // El perfil espera a esto para bajar hasta «Mis jornadas» si se pidió.
   document.dispatchEvent(new CustomEvent('cam:profile-party-rendered'));
 }
-// Desde un perfil ajeno: con sesión, crear tu party de quiniela; sin sesión,
-// iniciar sesión y volver a la invitación de tu pestaña «Mi Party».
+// Desde un perfil ajeno: con sesión, crear tu grupo de quiniela; sin sesión,
+// iniciar sesión y volver a la invitación de tu pestaña «Mi grupo».
 async function armYourParty() {
   if (await currentUser()) { openCreate('quiniela', 'all'); return; }
   window.closeAeProfile?.();
-  requireLogin(() => window.openAeProfile?.('party'), 'Para armar tu party, inicia sesión o crea una cuenta. Después volverás a la invitación.');
+  requireLogin(() => window.openAeProfile?.('party'), 'Para armar tu grupo, inicia sesión o crea una cuenta. Después volverás a la invitación.');
 }
 document.addEventListener('cam:profile-view', e => {
   const d = e.detail || {};
@@ -1052,7 +1052,7 @@ document.addEventListener('cam:profile-view', e => {
   else renderProfile();
 });
 
-/* Tras crear, unirse, salir, renombrar… la pestaña «Mi Party» se pone al día
+/* Tras crear, unirse, salir, renombrar… la pestaña «Mi grupo» se pone al día
    (una llamada si está abierta; si no, al volver a ella). */
 function changed() {
   S.mineStale = true;
@@ -1063,11 +1063,11 @@ function changed() {
   document.dispatchEvent(new CustomEvent('cam:parties-changed'));
 }
 
-/* ---------- accesos «Mis parties» junto a las clasificaciones ---------- */
+/* ---------- accesos «Mis grupos» junto a las clasificaciones ---------- */
 function entry(id, label, onClick) {
   const row = el('div', null, 'cam-party-entry-row', {id});
   const b = button('', 'cam-party-entry', onClick, {'aria-label': label});
-  b.append(icon('users'), el('span', 'Mis parties'), icon('chevron', 'cam-party-entry-chevron'));
+  b.append(icon('users'), el('span', 'Mis grupos'), icon('chevron', 'cam-party-entry-chevron'));
   row.append(b);
   return row;
 }
@@ -1077,14 +1077,14 @@ function sportNow() {
 }
 function mountEntries() {
   const chefs = document.querySelector('.ae-chefs-dual-standings');
-  if (chefs && !$('camPartyEntryPicks')) chefs.before(entry('camPartyEntryPicks', 'Mis parties de Picks', () => openHub('picks', 'all')));
+  if (chefs && !$('camPartyEntryPicks')) chefs.before(entry('camPartyEntryPicks', 'Mis grupos de Picks', () => openHub('picks', 'all')));
   const twin = $('aeNflTwinRankings');
-  if (twin && !$('camPartyEntryTakes')) twin.prepend(entry('camPartyEntryTakes', 'Mis parties de Takes', () => openHub('takes', sportNow())));
+  if (twin && !$('camPartyEntryTakes')) twin.prepend(entry('camPartyEntryTakes', 'Mis grupos de Takes', () => openHub('takes', sportNow())));
   // Quinielas: también se juegan en grupo.
   for (const [root, id, sport] of [['camNflQuiniela', 'camPartyEntryQuinielaNfl', 'nfl'], ['camFootballQuiniela', 'camPartyEntryQuinielaFootball', 'football']]) {
     const section = $(root);
     if (!section || $(id)) continue;
-    const row = entry(id, 'Mis parties de Quiniela', () => openHub('quiniela', sport));
+    const row = entry(id, 'Mis grupos de Quiniela', () => openHub('quiniela', sport));
     row.classList.add('is-quiniela');
     section.append(row);
   }

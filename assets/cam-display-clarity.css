@@ -330,3 +330,42 @@ html body #mainContent #footballTakes #communityPicks:has(#cpFeed[data-cam-conte
   box-shadow:none!important;
 }
 }
+
+@layer cam-display-clarity {
+/* Visual audit: shared semantics and surfaces, 10 November 2026. */
+html body .cam-football-leagues{display:flex!important;gap:8px!important;max-width:100%!important;overflow-x:auto!important;flex-wrap:nowrap!important}
+html body .cam-football-leagues .cam-football-league{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:5px!important;width:auto!important;min-width:76px!important;height:auto!important;min-height:64px!important;padding:8px 12px!important;flex:0 0 auto!important}
+html body .cam-football-league-label{display:block!important;font:600 12px/1.3 Inter,system-ui,sans-serif!important;white-space:nowrap!important;color:var(--cam-calm-ink)!important}
+html body .cam-metric-label,html body #footballTakes .ae-chef-recetario{display:block!important;font:500 12px/1.4 Inter,system-ui,sans-serif!important;color:var(--cam-calm-muted)!important;letter-spacing:0!important;text-transform:none!important;margin:4px 0!important}
+html body .cam-ns-feature{display:flex!important;flex-direction:column!important}
+html body .cam-ns-feature .cam-ns-opinion{order:2!important;margin-top:12px!important}
+html body .cam-ns-feature .cam-ns-link-take{background:transparent!important;color:var(--cam-calm-ink)!important;border:1px solid var(--cam-calm-line)!important;min-height:44px!important;box-shadow:none!important}
+html body dialog#cpDialog.ae-cp-detail-dialog{--ae-chef-surface:var(--cam-calm-surface);background:var(--cam-calm-surface)!important;color:var(--cam-calm-ink)!important;border:1px solid var(--cam-calm-line)!important;border-radius:16px!important}
+html body #cpDialog.ae-cp-detail-dialog .ae-cp-detail-hero{background:var(--cam-calm-surface)!important;border-bottom:1px solid var(--cam-calm-line)!important;min-height:0!important;padding:28px!important}
+html body #cpDialog.ae-cp-detail-dialog .ae-cp-detail-hero::before,html body #cpDialog.ae-cp-detail-dialog .ae-cp-detail-hero::after{display:none!important}
+html body #cpDialog.ae-cp-detail-dialog .cp-recipe-card,html body #cpDialog.ae-cp-detail-dialog .ae-cp-detail-conversation{background:var(--cam-calm-surface)!important;color:var(--cam-calm-ink)!important;border:1px solid var(--cam-calm-line)!important;border-radius:12px!important;box-shadow:none!important}
+html body #mainContent #footballTakes #aeHomePickHistoric{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:16px!important;background:var(--cam-calm-surface)!important;box-shadow:none!important}
+html body #mainContent #footballTakes #aeHomePickHistoric > *{width:100%!important;max-width:none!important;min-width:0!important}
+html body #mainContent #footballTakes #aeHomePickHistoric .cp-card{width:100%!important;max-width:none!important;box-sizing:border-box!important;box-shadow:none!important}
+html body #mainContent #footballTakes #aeHomePickHistoric .cp-card-legs{list-style:none!important;padding-left:0!important}
+html body #mainContent #footballTakes #aeHomePickHistoric .cp-card-legs li::before{content:none!important}
+html body #mainContent #footballTakes :is(.cp-odds,.ae-weekly-odds){background:var(--cam-calm-surface)!important;color:var(--cam-calm-ink)!important;border:1px solid var(--cam-calm-line)!important;border-radius:6px!important;text-shadow:none!important;box-shadow:none!important;font:700 13px/1.3 Inter,system-ui,sans-serif!important}
+html body #mainContent #footballTakes :is(#cpSettleHistory,#cpSettleHistory > ol,#cpLeaderboard,#cpWorstLeaderboard){height:auto!important;max-height:none!important;overflow:visible!important}
+html body #mainContent #footballTakes #cpSettleHistory{border:0!important;padding:0!important;background:transparent!important}
+html body :is(.cam-chef-period,.cam-nfl-view-tabs) button{min-height:44px!important;border-radius:8px!important;font-family:Inter,system-ui,sans-serif!important}
+html body :is(.cam-chef-period,.cam-nfl-view-tabs) button[aria-pressed=true]{background:var(--cam-calm-accent)!important;color:var(--cam-calm-surface)!important;text-decoration:underline!important;text-underline-offset:5px}
+html body :is(#rankingList,#championsList):is(:hover,:focus-within){animation-play-state:paused!important}
+html body :is(#rankingList,#championsList) > *{cursor:pointer}
+@media(min-width:761px){html body #mainContent .cam-nfl-ranking-table{table-layout:auto!important}html body #mainContent .cam-nfl-ranking-table button{white-space:normal!important;overflow-wrap:anywhere!important}}
+
+}
+
+@layer cam-display-clarity {
+html body #mainContent #footballTakes #aeHomePickHistoric :is(.cam-historic-quota,.cam-ticket-odds-value){color:var(--cam-calm-ink)!important;background:var(--cam-calm-soft)!important;text-shadow:none!important;box-shadow:none!important}
+html body :is(#articleModal,#aeProfileDialog,#cpDialog) :is(button[aria-label^="Cerrar"],.ae-cp-detail-close){min-width:44px!important;min-height:44px!important;border-radius:50%!important;box-shadow:none!important}
+html body :is(.cam-q-board td,.ae-chefs-table-cols){font-family:Inter,system-ui,sans-serif!important;vertical-align:middle!important}
+html body .cam-q-board td{padding-block:14px!important}
+html body .cam-q-board button{white-space:normal!important;overflow-wrap:anywhere!important}
+html body .cam-q-board :is(.cam-q-user,.cam-q-name){text-overflow:clip!important;white-space:normal!important}
+html body #mainContent :is(#rankingTitle,#championsTitle)::after{content:'Toca un equipo para ver el análisis';display:block;font:500 12px/1.4 Inter,system-ui,sans-serif;color:var(--cam-calm-muted);margin-top:6px}
+}

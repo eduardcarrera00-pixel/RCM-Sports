@@ -33,7 +33,7 @@ function award(item,provisional=false){
 }
 function stateText(r){
   const c=r.current;
-  if(!c)return r.last_month?'Sin resultados este mes':'Por clasificar';
+  if(!c)return r.last_month?'Sin resultados este mes':'Rango provisional · Por clasificar';
   if(!c.available)return 'Temporada en pausa';
   if(!c.eligible)return c.resolved+' / '+c.required+' resultados para clasificar';
   if(c.zone==='ascenso')return 'En zona de ascenso a '+LEVELS[level(c.rank_after)];

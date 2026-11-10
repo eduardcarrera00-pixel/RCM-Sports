@@ -1557,7 +1557,7 @@ async function showPickComposer(){
 function openPickComposer(){
  if(typeof aeRequestPublication==='function')return aeRequestPublication('pick',showPickComposer);
 }
-// Public entry point for "¿Eres Chef? Cocina Picks" from any section.
+// Public entry point for "¿Eres Chef? Publicar Pick" from any section.
 window.aeOpenPickComposer=openPickComposer;
 document.addEventListener('DOMContentLoaded',()=>{
  buildComposer();

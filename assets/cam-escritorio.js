@@ -50,10 +50,10 @@
   const asideIn = el('div', null, 'cam-desk-aside-in');
   aside.append(asideIn);
 
-  // Atajos: los cuatro de «Tu jornada» (con su número de partidos abiertos) + Mis parties.
+  // Atajos: los cuatro de «Tu jornada» (con su número de partidos abiertos) + Mis grupos.
   let shortcuts = null;
   let shortcutsHome = null;
-  const parties = el('button', null, 'cam-hj-shortcut cam-desk-parties', { type: 'button', 'aria-label': 'Mis parties', 'data-shortcut': 'parties' });
+  const parties = el('button', null, 'cam-hj-shortcut cam-desk-parties', { type: 'button', 'aria-label': 'Mis grupos', 'data-shortcut': 'parties' });
   {
     const icon = el('span', null, 'cam-hj-icon', { 'aria-hidden': 'true' });
     const svg = document.querySelector('#aeProfileTabParty svg');
@@ -69,7 +69,7 @@
       copy.setAttribute('focusable', 'false');
       icon.append(copy);
     }
-    parties.append(icon, el('span', 'Mis parties', 'cam-hj-shortcut-label'));
+    parties.append(icon, el('span', 'Mis grupos', 'cam-hj-shortcut-label'));
     parties.addEventListener('click', () => {
       const cat = category();
       const sport = cat === 'NFL' ? 'nfl' : cat === 'Fútbol' ? 'football' : 'all';
@@ -163,7 +163,7 @@
         move(byId(prefix + 'Score'), asideIn);
         move(byId('aeTrendingPortada'), asideIn);
         move(byId('aeSportTakeLeaders'), asideIn);
-        order(primary,[byId(prefix+'Semana'),editorial,byId(prefix+'Quiniela'),byId('freeTakes')]);
+        order(primary,[byId(prefix+'Semana'),byId(prefix+'Quiniela'),byId('freeTakes'),editorial]);
         order(asideIn,[byId(prefix+'Score'),byId('aeTrendingPortada'),byId('aeSportTakeLeaders')]);
       }
       aside.hidden = false;

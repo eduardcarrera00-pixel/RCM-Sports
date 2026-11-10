@@ -491,9 +491,9 @@
     const wrap=el('div',null,'cam-lg-bracket cam-lg-q8');
     const head=el('header',null,'cam-lg-head');
     head.append(el('p','Liga MX · '+(W().name||'Liguilla')+' · La liguilla','cam-lg-eyebrow'));
-    const h=el('h3','Arma tu cuadro');h.id='camLiguillaTitle';head.append(h);
+    const h=el('h3','Elige tus 8');h.id='camLiguillaTitle';head.append(h);
     head.append(el('p',open
-      ?'Paso 1 de 2 · Elige a los 8 que crees que entran a la liguilla. Se cierra el '+clock(W().closes_at)+' (hora de Toronto), al empezar la última jornada.'
+      ?'Elige ocho clasificados. Cierre: '+clock(W().closes_at)+' (hora de Toronto), al empezar la última jornada.'
       :saved?'Paso 1 cerrado: estos son tus 8. El cuadro se abre en cuanto se confirmen los 8 clasificados.'
       :'Paso 1 cerrado. El cuadro se abre en cuanto se confirmen los 8 clasificados.','cam-lg-sub'));
     const meter=el('div',null,'cam-lg-meter');
@@ -536,7 +536,7 @@
       const p=el('p',q8Note,'cam-lg-note'+(q8Kind?' is-'+q8Kind:''));p.setAttribute('role','status');p.setAttribute('aria-live','polite');wrap.append(p);
     }
     const next=el('section',null,'cam-lg-q8-next');next.setAttribute('aria-labelledby','camLiguillaStep2');
-    const step=el('h4','Paso 2 de 2 · Tu cuadro','cam-lg-round-head');step.id='camLiguillaStep2';
+    const step=el('h4','Tu cuadro · Próximamente','cam-lg-round-head');step.id='camLiguillaStep2';
     const how=el('ul',null,'cam-lg-how');
     for(const line of ['Eliges quién gana cada cruce, de cuartos al campeón.',
       'Cada acierto suma puntos en la quiniela; una sorpresa vale más.',

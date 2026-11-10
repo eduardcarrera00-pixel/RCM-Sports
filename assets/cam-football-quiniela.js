@@ -86,7 +86,7 @@
 
   let games=[],teams=new Map(),user=null,mine=new Map(),draft=new Map();
   let competition=COMPETITIONS[0].id,season=seasonGuess(),matchday=1,dayKey=null;
-  let scope='matchday',showAll=false,loading=false,loaded=false,saving=false,request=0,rankingRequest=0;
+  let scope='month',showAll=false,loading=false,loaded=false,saving=false,request=0,rankingRequest=0;
   let loadError='',changingCompetition=false,competitionRequest=0,mineRequest=0;
 
   function announce(){document.dispatchEvent(new CustomEvent('cam:football-quiniela-data'));}
@@ -268,7 +268,7 @@
       button.type='button';button.dataset.competition=id;button.title=option.full;
       button.setAttribute('aria-pressed',String(chosen));
       button.setAttribute('aria-label',option.full);
-      button.append(leagueLogo(id));
+      button.append(leagueLogo(id),el('span',({ligamx:'Liga MX',champions:'Champions',laliga:'LaLiga',premier:'Premier'})[id]||option.full,'cam-football-league-label'));
       button.addEventListener('click',async()=>{
         if(competition===id)return;
         const origin=leagues.closest('[id]')?.id;
@@ -527,7 +527,7 @@
   function setQuinielaView(view){
     if(!['jornada','month','all'].includes(view))return;
     const ranking=$('camFootballQuinielaStandings');
-    if(ranking)ranking.hidden=view==='jornada';
+    if(ranking)ranking.hidden=false;
     for(const tab of $('camFootballViewTabs')?.querySelectorAll('[data-view]')||[]){
       const selected=tab.dataset.view===view;
       tab.setAttribute('aria-pressed',String(selected));
@@ -538,7 +538,7 @@
   }
   $('camFootballViewTabs')?.addEventListener('click',event=>{
     const tab=event.target.closest('button[data-view]');
-    if(tab)setQuinielaView(tab.getAttribute('aria-pressed')==='true'?'jornada':tab.dataset.view);
+    if(tab)setQuinielaView(tab.dataset.view);
   });
   async function paintRanking(){
     const target=$('camFootballRanking');if(!target)return;
