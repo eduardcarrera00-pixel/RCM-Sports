@@ -7,6 +7,9 @@ on:
       - 'supabase/functions/cam-football-sync/**'
       - 'supabase/migrations/*cam_football*'
       - 'tests/football-automatic-*'
+      - 'tests/football-semana-flows.mjs'
+      - 'tests/nfl-quiniela-browser.cjs'
+      - 'assets/cam-football-semana.js'
       - '.github/workflows/cam-football-automatic-points.yml'
   push:
     branches: [main]
@@ -15,6 +18,9 @@ on:
       - 'supabase/functions/cam-football-sync/**'
       - 'supabase/migrations/*cam_football*'
       - 'tests/football-automatic-*'
+      - 'tests/football-semana-flows.mjs'
+      - 'tests/nfl-quiniela-browser.cjs'
+      - 'assets/cam-football-semana.js'
       - '.github/workflows/cam-football-automatic-points.yml'
 permissions:
   contents: read
@@ -31,4 +37,5 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npm run test:football:points
+      - run: node tests/football-semana-flows.mjs
       - run: node tests/nfl-quiniela-browser.cjs && npm run test:perf:sports

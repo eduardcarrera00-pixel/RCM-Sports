@@ -94,7 +94,8 @@ const {chromium}=require('playwright');
       assert.equal(await page.locator('.cam-nfl-game').count(),1,'Only the nearest day appears initially');
       assert.equal(await page.locator('#camNflDayNav .cam-nfl-day').count(),2,'Show exactly the two days with matches');
       assert.equal(await page.locator('#camNflDayNav .cam-nfl-day[aria-pressed="true"]').count(),1);
-      assert.match(await page.locator('#camNflDayNav').innerText(),/Este · America\/Toronto/);
+      assert.doesNotMatch(await page.locator('#camNflDayNav').innerText(),/Este · America\/Toronto/,'Do not restore obsolete redundant timezone helper');
+      assert.match(await page.locator('#camNflDayNav').innerText(),/partidos?/,'Day selector still shows meaningful match count');
       for(const id of ['camNflWeekSummary','camNflProgress','camNflSummary','camNflHistory']){
         assert.equal(await page.locator('#'+id).count(),0,'Personal summary belongs only in Mi Quiniela: '+id);
       }
