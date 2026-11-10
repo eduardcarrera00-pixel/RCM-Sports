@@ -1,0 +1,37 @@
+name: CAM SPORTS Liguilla bracket browser regression
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'assets/cam-liguilla.js'
+      - 'assets/cam-football-semana.js'
+      - 'assets/cam-football-quiniela.js'
+      - 'assets/cam-sport-quiniela-loader.js'
+      - 'tests/liguilla.py'
+      - '.github/workflows/cam-liguilla-browser.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  liguilla-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Chromium and Playwright
+        run: |
+          python -m pip install playwright
+          python -m playwright install --with-deps chromium
+      - name: Check JavaScript syntax
+        run: |
+          node --check assets/cam-football-semana.js
+          node --check assets/cam-liguilla.js
+          node --check assets/cam-sport-quiniela-loader.js
+      - name: Test day and night, all bracket rounds, mobile and desktop
+        run: python3 -B tests/liguilla.py
