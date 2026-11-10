@@ -10,7 +10,7 @@
     football:{className:'ae-is-football',root:'camFootballQuiniela',status:'camFootballStatus',
       src:'cam-football-quiniela.js?v=20261109-single-login-2',
       // La liguilla de la Liga MX vive dentro de la quiniela de fútbol y se carga después.
-      extra:'cam-liguilla.js?v=20261109-week-first-1'}
+      extra:['cam-fan-bracket.js?v=20261110-community-builder-1','cam-liguilla.js?v=20261110-community-builder-1']}
   };
   const requests=new Map();
   const loaded=new Set();
@@ -50,10 +50,17 @@
       script.onload=()=>{
         loaded.add(key);resolve(true);
         if(entry.extra){
-          // Un complemento que falla nunca bloquea los partidos ni el guardado.
-          const extra=document.createElement('script');extra.async=true;
-          extra.src=new URL(entry.extra,base).href;extra.onerror=()=>extra.remove();
-          document.head.append(extra);
+          // Primero el constructor libre y después el cuadro oficial. Un fallo no bloquea la quiniela.
+          const extras=Array.isArray(entry.extra)?entry.extra:[entry.extra];
+          const next=i=>{
+            if(i>=extras.length)return;
+            const extra=document.createElement('script');extra.async=true;
+            extra.src=new URL(extras[i],base).href;
+            extra.onload=()=>next(i+1);
+            extra.onerror=()=>{extra.remove();next(i+1);};
+            document.head.append(extra);
+          };
+          next(0);
         }
       };
       script.onerror=()=>{
