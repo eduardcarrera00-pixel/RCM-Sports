@@ -378,3 +378,7 @@ html body #mainContent #footballTakes #aeHomePickHistoric .cp-pick-line{grid-tem
 @layer cam-display-clarity {
 html body #cpDialog.ae-cp-detail-dialog .ae-cp-detail-content{background:var(--cam-calm-surface)!important;color:var(--cam-calm-ink)!important}
 }
+
+@layer cam-display-clarity {
+html body #mainContent #footballTakes #communityPicks section > p.cam-metric-label{display:block!important;height:auto!important;max-height:none!important;margin:0!important;padding:4px 16px 10px!important;color:var(--cam-calm-muted)!important;font:500 12px/1.4 Inter,system-ui,sans-serif!important}
+}
