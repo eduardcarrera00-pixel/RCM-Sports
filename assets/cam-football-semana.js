@@ -162,9 +162,9 @@
     window.camLiguillaNode=host;
     const panel=el('div',null,'cam-lg-bracket cam-lg-pending');
     const header=el('header',null,'cam-lg-head');
-    header.append(el('p','Liga MX · Liguilla','cam-lg-eyebrow'),
-      el('h3','Liguilla Liga MX',null,{id:'camLiguillaTitle'}),
-      el('p','Cruces por confirmar','cam-lg-sub'));
+    header.append(el('p','Liga MX · La liguilla','cam-lg-eyebrow'),
+      el('h3','Arma tu cuadro',null,{id:'camLiguillaTitle'}),
+      el('p','Cargando…','cam-lg-sub'));
     const board=el('div',null,'cam-lg-pending-board');
     for(const stage of ['Cuartos','Semifinales','Final','Campeón']){
       const column=el('div',null,'cam-lg-pending-stage');

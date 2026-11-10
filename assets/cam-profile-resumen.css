@@ -603,3 +603,22 @@
   html body #camProfileOverview .cam-ov-progress > span { border-radius:2px!important; }
   html body #aeProfileDialog #camProfileQuiniela.cam-profile-jornadas { border-radius:16px!important; }
 }
+
+/* Mi liguilla (10 nov 2026): los 8 elegidos para la liguilla de la Liga MX, en una fila de escudos. */
+@layer cam-banners {
+  html body #camProfileOverview .cam-ov-l8 {
+    display:grid!important; grid-template-columns:repeat(4,minmax(0,1fr))!important; gap:8px!important;
+    margin:2px 0 0!important; padding:0!important; list-style:none!important;
+  }
+  html body #camProfileOverview .cam-ov-l8-team {
+    display:grid!important; justify-items:center!important; gap:4px!important; min-width:0!important;
+    margin:0!important; padding:6px 2px!important; border:1px solid var(--rs-line)!important; list-style:none!important;
+  }
+  html body #camProfileOverview .cam-ov-l8-team.is-in { border-color:var(--rs-won)!important; background:var(--rs-won-soft)!important; }
+  html body #camProfileOverview .cam-ov-l8-team.is-out { opacity:.5!important; }
+  html body #camProfileOverview .cam-ov-l8-abbr {
+    max-width:100%!important; overflow:hidden!important; color:var(--rs-ink)!important; text-overflow:ellipsis!important; white-space:nowrap!important;
+    font:800 11px/1.5 Inter,system-ui,sans-serif!important; letter-spacing:.04em!important;
+  }
+  html body #camProfileOverview .cam-ov-l8-note { margin:4px 0 0!important; color:var(--rs-muted)!important; font:600 12.5px/1.4 Inter,system-ui,sans-serif!important; }
+}

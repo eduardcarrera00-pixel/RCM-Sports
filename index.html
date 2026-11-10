@@ -424,18 +424,15 @@ html.dark [data-reading-size][aria-pressed="true"] {
     </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
-<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261110-liguilla-1">
+<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261110-mis-8-1">
 <style id="cam-liguilla-week-styles">
-/* Integración de la Liguilla existente en Fútbol → La semana */
+/* Integración de la Liguilla en Fútbol → La semana. Un solo recuadro, «Arma tu cuadro»:
+   primero «mis 8» y después el cuadro con puntos (estilos en assets/cam-liguilla.css). */
 #camFootballSemana #camLiguilla{width:100%;max-width:none;min-width:0;grid-area:liguilla;gap:0;margin:0 0 14px}
 #camLiguilla .cam-lg-bracket+.cam-lg-rounds{border-top:0}
-#camLiguilla .cam-lg-board-scroll{max-width:100%;min-width:0;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;scrollbar-color:var(--q-edge) transparent;overscroll-behavior-inline:contain;padding-bottom:8px}
-#camLiguilla .cam-lg-board{display:grid;grid-template-columns:repeat(3,minmax(218px,1fr)) minmax(176px,.82fr);gap:18px;align-items:center;min-width:888px}
-#camLiguilla .cam-lg-round{position:relative;min-width:0}
-#camLiguilla .cam-lg-round::after{content:"";position:absolute;top:51%;right:-18px;width:18px;height:1px;background:var(--q-ornament);pointer-events:none}
 #camLiguilla .cam-lg-pending-board{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
 #camLiguilla .cam-lg-pending-stage{display:grid;gap:8px;min-width:0}
-#camLiguilla .cam-lg-pending-slot{display:flex;align-items:center;justify-content:center;min-height:74px;padding:12px;background:var(--q-panel);border:1px dashed var(--q-line);color:var(--q-meta);font-size:13px}
+#camLiguilla .cam-lg-pending-slot{display:flex;align-items:center;justify-content:center;min-height:64px;padding:12px;background:var(--q-panel);border:1px dashed var(--q-line);color:var(--q-meta);font-size:13px}
 #camLiguilla .cam-lg-table{min-width:340px}
 #camLiguilla .cam-lg-table :is(th,td):nth-child(n+3){text-align:right}
 #camLiguilla .cam-lg-rail-btn>span{display:none}
@@ -443,11 +440,8 @@ html.dark [data-reading-size][aria-pressed="true"] {
 #camLiguilla .cam-lg-archive{padding:14px 18px;background:var(--q-card);border:1px solid var(--q-line)}
 #camLiguilla .cam-lg-archive>summary{cursor:pointer;color:var(--q-ink);font-weight:650;min-height:40px;align-content:center}
 #camLiguilla .cam-lg-archive[open]{display:grid;gap:12px}
-@container (min-width:960px){#camLiguilla .cam-lg-board{min-width:0;grid-template-columns:1.2fr 1fr 1fr .8fr}}
-@media(max-width:760px){
-  #camLiguilla .cam-lg-board-scroll{margin-right:-10px;padding-right:10px}
-  #camLiguilla .cam-lg-board{grid-template-columns:repeat(3,230px) 178px;min-width:922px;gap:16px}
-  #camLiguilla .cam-lg-pending-board{grid-template-columns:repeat(4,164px);overflow-x:auto;padding-bottom:8px}
+@media(max-width:600px){
+  #camLiguilla .cam-lg-pending-board{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media(min-width:900px){
   html body[data-cam-desk][data-cam-tabs="sport"][data-cam-tab="semana"].ae-is-football #freeTakes:has(#camLiguilla:not([hidden])){
@@ -458,84 +452,6 @@ html.dark [data-reading-size][aria-pressed="true"] {
   }
   html body[data-cam-desk][data-cam-tab="semana"].ae-is-football #camLiguilla:not([hidden]){grid-area:liguilla!important;min-width:0}
 }
-@media(min-width:1250px){
-  #camLiguilla .cam-lg-bracket{grid-template-columns:minmax(0,1fr) minmax(228px,270px);align-items:start;column-gap:22px}
-  #camLiguilla .cam-lg-bracket>.cam-lg-head{grid-column:1/-1}
-  #camLiguilla .cam-lg-bracket>.cam-lg-board-scroll{grid-column:1;grid-row:2 / span 4}
-  #camLiguilla .cam-lg-bracket>.cam-lg-ranking{grid-column:2;grid-row:2}
-  #camLiguilla .cam-lg-bracket>:not(.cam-lg-head):not(.cam-lg-board-scroll):not(.cam-lg-ranking){grid-column:1}
-  #camLiguilla .cam-lg-board{min-width:750px;grid-template-columns:repeat(3,minmax(170px,1fr)) minmax(138px,.75fr)}
-}
-@media(prefers-reduced-motion:reduce){#camLiguilla .cam-lg-board-scroll{scroll-behavior:auto}}
-
-/* CAM SPORTS · pronóstico libre: cuadro espejo, de cuartos al campeón. */
-#camLiguilla .cam-fan-shell{display:grid;gap:18px;min-width:0;padding:clamp(16px,2.5vw,28px);background:var(--q-card);border:1px solid var(--q-edge);color:var(--q-ink)}
-#camLiguilla .cam-fan-intro{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap}
-#camLiguilla .cam-fan-intro-copy{display:grid;gap:7px;flex:1 1 280px;min-width:0}
-#camLiguilla .cam-fan-eyebrow{margin:0;color:var(--q-gold-text);font:700 11px/1.3 var(--ds-font-sans,Inter,system-ui,sans-serif);letter-spacing:.15em}
-#camLiguilla .cam-fan-intro h3{margin:0;font:600 clamp(27px,3vw,39px)/1.12 var(--ds-font-serif,"Playfair Display",Georgia,serif);color:var(--q-ink)}
-#camLiguilla .cam-fan-lead{margin:0;color:var(--q-muted);font-size:14px;line-height:1.6;max-width:65ch}
-#camLiguilla .cam-fan-toggle{min-height:46px;white-space:nowrap}
-#camLiguilla .cam-fan-tree{min-width:0;display:grid;grid-template-columns:minmax(0,1.18fr) minmax(0,.9fr) minmax(0,1.16fr) minmax(0,.9fr) minmax(0,1.18fr);align-items:center;gap:clamp(8px,1.2vw,20px);padding:22px 0;border-top:1px solid var(--q-line);border-bottom:1px solid var(--q-line)}
-#camLiguilla .cam-fan-column{display:grid;align-content:center;gap:13px;min-width:0}
-#camLiguilla .cam-fan-column-title{margin:0;text-align:center;text-transform:uppercase;font:700 11px/1.3 var(--ds-font-sans,Inter,system-ui,sans-serif);letter-spacing:.09em;color:var(--q-gold-text)}
-#camLiguilla .cam-fan-pair{border:1px solid var(--q-line);background:var(--q-panel);display:grid;gap:0;min-width:0}
-#camLiguilla .cam-fan-match-label{padding:7px 8px 5px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--q-meta)}
-#camLiguilla .cam-fan-team-select{display:grid;grid-template-columns:minmax(0,1fr) 33px;gap:4px;align-items:stretch;min-height:49px;padding:5px 6px;border-top:1px solid var(--q-line);min-width:0}
-#camLiguilla .cam-fan-choice-label{min-width:0;display:flex;align-items:center}
-#camLiguilla .cam-fan-select{width:100%;min-width:0;min-height:39px;max-width:100%;padding:4px 2px;border:0;border-radius:0;background:var(--q-card);color:var(--q-ink);font:600 12px/1.35 var(--ds-font-sans,Inter,system-ui,sans-serif);text-overflow:ellipsis}
-#camLiguilla .cam-fan-pass{border:1px solid var(--q-line);background:var(--q-card);color:var(--q-muted);font-size:20px;min-width:30px;min-height:39px;border-radius:0}
-#camLiguilla :is(.cam-fan-pass,.cam-fan-option).is-selected{background:var(--q-gold-soft);border-color:var(--q-gold);color:var(--q-ink);font-weight:700}
-#camLiguilla .cam-fan-pass:disabled{opacity:.35;cursor:default}
-#camLiguilla .cam-fan-option{width:100%;min-width:0;min-height:50px;padding:10px 8px;border:0;border-top:1px solid var(--q-line);border-radius:0;background:var(--q-card);color:var(--q-ink);text-align:center;font:600 12px/1.25 var(--ds-font-sans,Inter,system-ui,sans-serif);overflow-wrap:anywhere}
-#camLiguilla .cam-fan-option:disabled{opacity:.6;cursor:default}
-#camLiguilla .cam-fan-center{align-self:stretch;display:grid;align-content:center;justify-items:center;gap:12px;text-align:center;min-width:0;padding:16px 8px;background:#0b2233;color:#f3ebdd;border:1px solid #2e4a5e}
-#camLiguilla .cam-fan-centre-kicker{font-size:9px;letter-spacing:.12em;color:#e8bf79;font-weight:700}
-#camLiguilla .cam-fan-center h4{margin:0;color:#f3ebdd;font:600 clamp(19px,2.3vw,28px)/1.2 var(--ds-font-serif,"Playfair Display",Georgia,serif)}
-#camLiguilla .cam-fan-final-pair{display:grid;gap:5px;width:100%;min-width:0}
-#camLiguilla .cam-fan-final-pair .cam-fan-option{background:#15344a;color:#f3ebdd;border:1px solid #345167}
-#camLiguilla .cam-fan-final-pair .cam-fan-option.is-selected{background:#c99a5b;color:#102535}
-#camLiguilla .cam-fan-champion{display:grid;justify-items:center;gap:7px;width:100%;min-width:0;padding:16px 6px 4px;border-top:1px solid #896b4e}
-#camLiguilla .cam-fan-star{color:#e8bf79;font-size:30px;line-height:1}
-#camLiguilla .cam-fan-champion small{color:#e8bf79;letter-spacing:.17em;font-weight:700;font-size:10px}
-#camLiguilla .cam-fan-champion strong{font:italic 600 clamp(17px,2.3vw,28px)/1.2 var(--ds-font-serif,"Playfair Display",Georgia,serif);overflow-wrap:anywhere}
-#camLiguilla .cam-fan-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-#camLiguilla .cam-fan-actions .cam-nfl-action{min-height:44px}
-#camLiguilla .cam-fan-count{margin-right:auto;font-size:13px;font-weight:700;color:var(--q-meta)}
-#camLiguilla .cam-fan-reset{padding:10px;border:0;background:transparent;color:var(--q-muted);text-decoration:underline;min-height:44px}
-#camLiguilla .cam-fan-status{margin:0;font-size:13px;line-height:1.5;color:var(--q-gold-text)}
-#camLiguilla .cam-fan-status.is-error{color:var(--q-bad-text)}
-#camLiguilla .cam-fan-disclaimer{margin:0;color:var(--q-meta);font-size:11px;line-height:1.5}
-#camLiguilla .cam-lg-official-details{border:1px solid var(--q-line);background:var(--q-card);padding:0 12px}
-#camLiguilla .cam-lg-official-details>summary{cursor:pointer;padding:12px 2px;min-height:44px;color:var(--q-muted);font-size:13px}
-#camLiguilla .cam-lg-official-details[open]{padding-bottom:12px}
-@media(max-width:1050px){
- #camLiguilla .cam-fan-tree{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
- #camLiguilla .cam-fan-left-quarter{order:1}
- #camLiguilla .cam-fan-right-quarter{order:2}
- #camLiguilla .cam-fan-left-semi{order:3}
- #camLiguilla .cam-fan-right-semi{order:4}
- #camLiguilla .cam-fan-center{order:5;grid-column:1/-1}
- #camLiguilla .cam-fan-center h4{font-size:26px}
- #camLiguilla .cam-fan-final-pair{max-width:320px}
-}
-@media(max-width:600px){
- /* En móvil, un cuadro vertical permite leer nombres completos sin apretar ocho selectores. */
- #camLiguilla .cam-fan-shell{padding:14px;gap:14px}
- #camLiguilla .cam-fan-intro{align-items:stretch}
- #camLiguilla .cam-fan-toggle{width:100%}
- #camLiguilla .cam-fan-tree{grid-template-columns:minmax(0,1fr);gap:18px;padding:14px 0}
- #camLiguilla .cam-fan-column,#camLiguilla .cam-fan-center{grid-column:1;min-width:0}
- #camLiguilla .cam-fan-column{gap:10px}
- #camLiguilla .cam-fan-team-select{grid-template-columns:minmax(0,1fr) 42px;gap:8px;padding:6px}
- #camLiguilla .cam-fan-select{font-size:14px;min-height:44px;padding:7px 9px}
- #camLiguilla .cam-fan-pass{min-width:42px;min-height:44px}
- #camLiguilla .cam-fan-option{font-size:14px;min-height:46px;padding:10px 12px}
- #camLiguilla .cam-fan-actions .cam-nfl-action{flex:1 1 140px}
- #camLiguilla .cam-fan-center{padding:20px 16px}
-}
-
-
 </style>
 <script defer src="assets/ae-nfl-mobile-telephoto.js?v=20261016-1"></script>
 <link rel="stylesheet" href="assets/cam-perf-sport-banners.css?v=20261104-css-consolidated-1">
@@ -5927,7 +5843,7 @@ html .cam-weekly-result-surface .cam-weekly-result-on-photo{
 @media(max-width:480px){.cam-weekly-quick-result .cam-weekly-review-actions{display:flex}.cam-weekly-quick-result .cam-weekly-review-actions button{width:auto}}
 </style>
 <script src="assets/cam-weekly-results.js?v=20261025-admin-resolved-pick-1"></script>
-<script src="assets/cam-profile-overview.js?v=20261108-profile-simple-1"></script>
+<script src="assets/cam-profile-overview.js?v=20261110-mi-liguilla-1"></script>
 <script src="assets/cam-profile-quiniela.js?v=20261108-signed-scoring-1"></script>
 <script src="assets/ae-profile.js?v=20261108-profile-simple-1"></script>
 <script src="assets/cam-leagues.js?v=20261109-rango-avisos-1"></script>
@@ -6237,14 +6153,14 @@ html body #camNflSemana .cam-ns-quiniela .cam-ns-action-label{font-size:20px!imp
 /* ---- Guardar y reglas ------------------------------------------------------ */
 .cam-nfl-save-row button[hidden]{display:none!important}
 .cam-nfl-save-row{display:flex;align-items:center;flex-wrap:wrap;gap:9px;margin:0 0 12px}
-:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-action{
+:is(#camNflQuiniela,#camFootballQuiniela,#camLiguilla,.cam-quiniela-ranking) .cam-nfl-action{
   background:var(--q-gold);color:var(--q-on-gold);border:1px solid var(--q-gold);
   padding:11px 20px;min-height:44px;font-weight:700;font-size:var(--ds-text-sm,13px);cursor:pointer;
 }
-:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-action:not(:disabled):hover{background:var(--q-gold-strong);border-color:var(--q-gold-strong)}
-:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-action-secondary{background:transparent;color:var(--q-gold)}
-:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-action-secondary:not(:disabled):hover{background:var(--q-gold-soft);color:var(--q-gold)}
-:is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-action:disabled{opacity:var(--ds-disabled-opacity,.55);cursor:not-allowed}
+:is(#camNflQuiniela,#camFootballQuiniela,#camLiguilla,.cam-quiniela-ranking) .cam-nfl-action:not(:disabled):hover{background:var(--q-gold-strong);border-color:var(--q-gold-strong)}
+:is(#camNflQuiniela,#camFootballQuiniela,#camLiguilla,.cam-quiniela-ranking) .cam-nfl-action-secondary{background:transparent;color:var(--q-gold)}
+:is(#camNflQuiniela,#camFootballQuiniela,#camLiguilla,.cam-quiniela-ranking) .cam-nfl-action-secondary:not(:disabled):hover{background:var(--q-gold-soft);color:var(--q-gold)}
+:is(#camNflQuiniela,#camFootballQuiniela,#camLiguilla,.cam-quiniela-ranking) .cam-nfl-action:disabled{opacity:var(--ds-disabled-opacity,.55);cursor:not-allowed}
 
 .cam-nfl-rules,.cam-nfl-admin-game,.cam-nfl-profile-history{
   border:1px solid var(--q-line);background:var(--q-card);
@@ -6369,7 +6285,7 @@ html body #camNflSemana .cam-ns-quiniela .cam-ns-action-label{font-size:20px!imp
   .cam-nfl-team img{width:30px;height:30px}
   :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-day{flex:0 0 auto;padding:8px 11px}
   .cam-nfl-save-row{display:grid;grid-template-columns:minmax(0,1fr)}
-  :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-action{width:100%}
+  :is(#camNflQuiniela,#camFootballQuiniela,#camLiguilla,.cam-quiniela-ranking) .cam-nfl-action{width:100%}
   .cam-nfl-table th,.cam-nfl-table td{padding:7px 5px}
   .cam-nfl-table th:nth-child(4),.cam-nfl-table td:nth-child(4){display:none}
   .cam-nfl-profile-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -6410,7 +6326,7 @@ html body #camNflSemana .cam-ns-quiniela .cam-ns-action-label{font-size:20px!imp
   html body :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) input,
   html body :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) select,
   html body :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) #camNflStatus:not(:empty){border-radius:var(--ds-radius,14px)!important}
-  html body :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-action,
+  html body :is(#camNflQuiniela,#camFootballQuiniela,#camLiguilla,.cam-quiniela-ranking) .cam-nfl-action,
   html body :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-more,
   html body :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-badge,
   html body :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking) .cam-nfl-team small{border-radius:var(--ds-radius-pill,999px)!important}
@@ -6718,9 +6634,9 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 </style>
 
 <!-- Componentes finales: móvil, conversación, parties, perfil y Takes; orden en performance-css-packs.json. -->
-<link rel="stylesheet" href="assets/cam-perf-app-panels.css?v=20261110-desktop-shortcuts-1">
+<link rel="stylesheet" href="assets/cam-perf-app-panels.css?v=20261110-mi-liguilla-2">
 <script src="assets/cam-parties.js?v=20261104-perfil-claro-1"></script>
-<script src="assets/cam-sport-quiniela-loader.js?v=20261110-branded-loading-1"></script>
+<script src="assets/cam-sport-quiniela-loader.js?v=20261110-mis-8-2"></script>
 <script src="assets/ae-season-predictions.js?v=20261021-champion-guide-1"></script>
 <script src="assets/cam-lazy-editorial-loader.js?v=20261110-branded-loading-1"></script>
 <script src="assets/cam-opinions-section-banners.js?v=20261104-actualidad-1"></script>
@@ -6746,7 +6662,7 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 <script src="assets/cam-home-jornada.js?v=20261110-branded-loading-1"></script>
 <!-- NFL y Fútbol · La semana (4 nov, teléfono; desde el 8 nov también en escritorio, en columnas). Power Rankings en Noticias. -->
 <script src="assets/cam-nfl-semana.js?v=20261109-desktop-continuous-1"></script>
-<script src="assets/cam-football-semana.js?v=20261109-week-first-1"></script>
+<script src="assets/cam-football-semana.js?v=20261110-mis-8-1"></script>
 <!-- Escritorio: páginas completas de NFL/Fútbol y dos columnas de contenido real. El teléfono conserva sus pestañas. -->
 <script defer src="assets/cam-escritorio.js?v=20261110-desktop-shortcuts-1"></script>
 

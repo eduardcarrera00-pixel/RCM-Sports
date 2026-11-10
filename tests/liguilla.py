@@ -1,9 +1,14 @@
 """Liguilla de la Liga MX en la Quiniela de Fútbol (Chromium + Supabase falso).
 
-Comprueba «Tu liguilla» (armar el cuadro, reclasificación de semis, guardar,
-compartir), la ficha para redes en sus 5 formatos con las zonas seguras, la
-vista ronda a ronda (cuartos, semis y final), el panel de apertura del admin y
-que no haya desbordes ni textos cortados a 320, 390 y 1366 px, de día y de noche.
+Un solo «Arma tu cuadro» en dos pasos:
+  · paso 1, antes de la J17: elegir a los 8 que entran (sin eliminados, tope de
+    8, invitado en el aparato, con cuenta en Supabase; cerrado = solo lectura);
+  · paso 2, con los 8 reales: el cuadro hasta el campeón (reclasificación de
+    semis, guardar, compartir), la ficha para redes en sus 5 formatos con las
+    zonas seguras y, después, la vista ronda a ronda (cuartos, semis y final);
+  · «Mi liguilla» en el perfil (mis 8 y mi cuadro) lleva a la liguilla;
+  · el panel de apertura del admin;
+y que no haya desbordes ni textos cortados a 320, 390 y 1366 px, de día y de noche.
 
 Uso: python3 tests/liguilla.py [--shots DIR]
 """
@@ -13,11 +18,16 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 spec = importlib.util.spec_from_file_location('full_page', ROOT / 'tests/full-page.py')
 fp = importlib.util.module_from_spec(spec); spec.loader.exec_module(fp)
 SHOTS = sys.argv[sys.argv.index('--shots') + 1] if '--shots' in sys.argv else None
+CLIPPED = (ROOT / 'tests/parties.py').read_text(encoding='utf8').split('CLIPPED = r"""', 1)[1].split('"""', 1)[0]
 
 USER = '{"id":"u-1","email":"liguilla@qa.camsports.invalid","user_metadata":{"username":"QA_Liguilla_Larga"}}'
 TEAMS = [('218', 'Cruz Azul', 'CAZ'), ('227', 'América', 'AME'), ('219', 'Guadalajara', 'GDL'),
          ('223', 'Toluca', 'TOL'), ('15720', 'Atlético de San Luis', 'ASL'), ('225', 'Santos', 'SAN'),
          ('228', 'León', 'LEO'), ('234', 'Pachuca', 'PAC')]
+# El resto de la Liga MX para el paso 1 (elegir a los 8): 18 equipos en total.
+EXTRA = [('220', 'Monterrey', 'MTY'), ('232', 'Tigres UANL', 'TIG'), ('233', 'Pumas UNAM', 'PUM'),
+         ('229', 'Necaxa', 'NEC'), ('231', 'Puebla', 'PUE'), ('222', 'Querétaro', 'QRO'),
+         ('20702', 'Mazatlán FC', 'MAZ'), ('17851', 'FC Juárez', 'JUA'), ('10125', 'Tijuana', 'TIJ'), ('216', 'Atlas', 'ATL')]
 # Puntos de ejemplo por equipo: [semis, final, campeón]
 PTS = {'218': [1, 3, 5], '227': [1, 3, 5], '219': [1, 4, 7], '223': [1, 5, 8],
        '15720': [6, 11, 16], '225': [6, 11, 15], '228': [7, 13, 17], '234': [6, 12, 16]}
@@ -27,7 +37,7 @@ try{sessionStorage.setItem('cam_sports_home_welcome_seen_session_v1','1')}catch(
 (() => {
   const f = window.__fake = window.__fake || {};
   const MODE = %(mode)s;
-  const TEAMS = %(teams)s, PTS = %(pts)s;
+  const TEAMS = %(teams)s, PTS = %(pts)s, EXTRA = %(extra)s;
   const now = Date.now(), H = 3600e3, D = 24*H;
   const season = new Date().getUTCFullYear() - (new Date().getUTCMonth() < 6 ? 1 : 0);
   f.tables = f.tables || {};
@@ -99,7 +109,7 @@ try{sessionStorage.setItem('cam_sports_home_welcome_seen_session_v1','1')}catch(
     seeds: TEAMS.map(([id,name,abbr], i) => ({seed:i+1, team_id:id, name, short_name:name.replace('Atlético de ','Atl. '), abbreviation:abbr, logo:null, played:17, points:30-i, goal_diff:10-i})),
     odds, series, mine: f.user ? mine : null, players: 12});
   f.rpc = f.rpc || {};
-  f.rpc.cam_liguilla_state = () => ({data: MODE === 'none' ? null : state(), error: null});
+  f.rpc.cam_liguilla_state = () => ({data: (MODE === 'none' || MODE === 'q8closed') ? null : state(), error: null});
   f.rpc.cam_liguilla_save_bracket = a => {
     const pts = (id, k) => PTS[id][k];
     mine.bracket = [];
@@ -115,6 +125,37 @@ try{sessionStorage.setItem('cam_sports_home_welcome_seen_session_v1','1')}catch(
   f.rpc.cam_liguilla_admin_table = () => ({data: TEAMS.map(([id,name], i) => ({team_id:id, name, rank:i+1, played:17, points:31-i, goal_diff:9-i})), error:null});
   f.rpc.cam_liguilla_admin_open = a => { f.opened = a; return {data: 7, error: null}; };
   f.rpc.cam_football_leaderboard = () => ({data: [], error: null});
+  // Paso 1: los 18 de la tabla. 1-4 ya clasificados, 5-12 en juego, 13-18 eliminados.
+  const PRE = MODE === 'none' || MODE === 'q8closed';
+  const CAND = TEAMS.concat(EXTRA).map(([id,name,abbr], i) => ({team_id:id, name, short_name:name.replace('Atlético de ','Atl. '),
+    abbreviation:abbr, logo:null, rank:i+1, played:16, points:36-2*i, goal_diff:14-2*i, status: i<4?'in':i<12?'alive':'out'}));
+  f.q8 = MODE === 'q8closed' ? ids.slice(0,7).concat(['220']) : null;
+  const win = () => ({id:3, competition:'ligamx', season, name:'Apertura '+season,
+    closes_at: new Date(MODE === 'q8closed' ? now - H : now + 3*D).toISOString(),
+    open: MODE === 'none', opened: !PRE, server_time: new Date().toISOString()});
+  f.rpc.cam_liguilla_candidates = () => ({data: {window: win(), fetched_at: new Date(now - H).toISOString(), teams: CAND,
+    mine: f.user && f.q8 ? [...f.q8] : null, players: 5}, error: null});
+  f.rpc.cam_liguilla_save_qualifiers = a => {
+    const t = a.p_teams || [];
+    if (t.length !== 8 || new Set(t).size !== 8) return {data:null, error:{message:'Elige exactamente 8 equipos distintos.'}};
+    if (t.some(id => CAND.find(c => c.team_id === id)?.status === 'out')) return {data:null, error:{message:'Estos equipos ya no pueden clasificar.'}};
+    f.q8 = [...t]; return {data:{saved:8}, error:null}; };
+  if (!PRE) mine.qualifiers = ids.slice(0,7).concat(['220']);
+  // «Mi liguilla» en el perfil: lo que devuelve cam_liguilla_profile dentro de cam_profile_overview.
+  const T = id => { const c = CAND.find(x => x.team_id === id); return {team_id:id, name:c.name, short_name:c.short_name, abbreviation:c.abbreviation, logo:null, status:c.status}; };
+  const q8teams = ids.slice(0,7).concat(['220']).map(T);
+  const lgProfile = PRE
+    ? {name:'Apertura '+season, season, own:true, phase: MODE === 'none' ? 'qualifiers_open' : 'qualifiers_closed', closes_at: win().closes_at,
+       qualifiers:{teams:q8teams, hits:4, decided:false}, bracket:null}
+    : {name:'Apertura '+season, season, own:true, phase: open ? 'bracket_open' : 'bracket', closes_at: new Date(closes).toISOString(),
+       qualifiers:{teams:q8teams.map((t,i) => Object.assign(t, {status: i<7?'in':'out'})), hits:7, decided:true},
+       bracket:{champion:Object.assign(T('228'), {points:17, awarded:0, settled:false}),
+         finalists:[Object.assign(T('228'), {points:13, awarded:0, settled:false}), Object.assign(T('15720'), {points:11, awarded:0, settled:false})],
+         semis:[], picks:7, points: open ? 0 : 8, alive: open ? 0 : 3, hits: open ? 0 : 2}};
+  f.rpc.cam_profile_overview = ({p_user}) => ({data: {user_id:p_user, username:'QA_Liguilla_Larga', joined_month:'2026-10',
+    takes:{count:0, up:0, down:0, top:null}, picks:{count:0, won:0, lost:0, top:null},
+    quiniela:{nfl:null, football:null, parties:[]}, liguilla: lgProfile}, error: null});
+  f.rpc.cam_username_status = () => ({data: {username:'QA_Liguilla_Larga', can_change:true}, error: null});
   f.rpc.cam_football_save_pick = a => { f.tables.cam_football_picks.push({game_id:a.p_game_id, user_id:'u-1', pick:a.p_pick, awarded_points:0}); return {data:true, error:null}; };
 })();
 window.__fake.user = %(user)s;
@@ -122,7 +163,7 @@ window.__fake.user = %(user)s;
 
 
 def fake(mode='open', user=True):
-    return FAKE % {'mode': json.dumps(mode), 'teams': json.dumps(TEAMS), 'pts': json.dumps(PTS),
+    return FAKE % {'mode': json.dumps(mode), 'teams': json.dumps(TEAMS), 'pts': json.dumps(PTS), 'extra': json.dumps(EXTRA),
                    'user': USER if user else 'null'}
 
 
@@ -233,13 +274,16 @@ def run():
         assert page.locator('#camLiguilla .cam-lg-wait').count() >= 2
         build_bracket(page)
         assert '56' in page.locator('#camLiguilla .cam-lg-potential').inner_text(), page.locator('#camLiguilla .cam-lg-potential').inner_text()
-        assert page.locator('#camLiguilla .cam-lg-share').is_disabled(), 'no se comparte sin guardar'
+        assert not page.locator('#camLiguilla .cam-lg-share').is_disabled(), 'con los 7 elegidos ya se puede compartir'
+        assert 'acertaste 7 de 8' in page.locator('#camLiguilla .cam-lg-q8-hits').inner_text(), 'falta «Tus 8» en el cuadro'
+        assert page.locator('#camLiguilla .cam-lg-bracket').count() == 1, 'debe haber un solo cuadro'
+        assert page.locator('#camLiguilla [class*="cam-fan-"]').count() == 0 and not page.evaluate('() => !!window.CamFanBracket'), 'quedan restos del cuadro libre'
         page.locator('#camLiguilla .cam-lg-save').click()
         page.wait_for_timeout(400)
         call = page.evaluate("() => window.__fake.calls.filter(c => c.rpc === 'cam_liguilla_save_bracket').pop()")
         assert call and call['args']['p_semis'] == ['218', '228', '219', '15720'] and call['args']['p_champion'] == '228', call
         assert 'guardado' in page.locator('#camLiguilla .cam-lg-note').inner_text().lower()
-        assert not page.locator('#camLiguilla .cam-lg-share').is_disabled(), 'tras guardar se puede compartir'
+        assert not page.locator('#camLiguilla .cam-lg-share').is_disabled(), 'tras guardar se sigue pudiendo compartir'
         assert not layout_problems(page), layout_problems(page)
         # Ronda a ronda (cuartos abiertos) y «¿Quién pasa?»
         assert page.locator('#camLiguilla .cam-lg-rounds .cam-lg-series').count() == 4
@@ -264,8 +308,10 @@ def run():
             problems = layout_problems(page)
             assert not problems, '%d %s: %s' % (width, 'noche' if dark else 'día', problems)
             if width == 1366:
-                cols = page.evaluate("() => getComputedStyle(document.querySelector('#camLiguilla .cam-lg-board')).gridTemplateColumns.split(' ').length")
-                assert cols == 4, 'en escritorio el cuadro va en 4 columnas: %s' % cols
+                cols, wide = page.evaluate("() => { const b = document.querySelector('#camLiguilla .cam-lg-board');"
+                    " return [getComputedStyle(b).gridTemplateColumns.split(' ').length, document.querySelector('#camLiguilla .cam-lg-bracket').clientWidth]; }")
+                # Con los atajos a la izquierda la liguilla mide ~800 px: cuartos y semis lado a lado; desde 900 px, las 4 rondas.
+                assert cols == (4 if wide >= 900 else 2), 'en escritorio el cuadro va en %s columnas (ancho %s)' % (cols, wide)
             if SHOTS:
                 page.locator('#camLiguilla').screenshot(path=SHOTS + '/liguilla-%d-%s.png' % (width, 'noche' if dark else 'dia'))
             assert not page.errors, page.errors
@@ -296,7 +342,7 @@ def run():
     with fp.full_page(fake_js=fake('none'), width=390, height=900) as page:
         open_liga_mx(page)
         assert page.locator('#camLiguilla').is_visible(), 'sin equipos oficiales debe aparecer estado pendiente'
-        assert 'Cruces por confirmar' in page.locator('#camLiguilla').inner_text()
+        assert 'Paso 1 de 2' in page.locator('#camLiguilla').inner_text(), 'antes de abrir se eligen los 8'
         page.evaluate("() => { currentAdmin = {id:'u-1'}; window.dispatchEvent(new Event('cam:admin-state-change')); }")
         page.wait_for_timeout(200)
         page.locator('#camLiguilla .cam-lg-admin .cam-nfl-action').first.click()
@@ -316,67 +362,120 @@ def run():
         assert not problems, 'admin: ' + str(problems)
         assert not page.errors, page.errors
 
-    # 5) Sin los ocho clasificados oficiales, Arma tu cuadro es solo un aviso:
-    # nada se puede elegir, guardar ni compartir, aunque existan equipos en la liga.
+    # 5) Paso 1 como invitado: elegir a los 8 (sin eliminados, tope de 8), guardar en el aparato,
+    #    y al entrar con cuenta se recupera y se guarda en Supabase.
     with fp.full_page(fake_js=fake('none', user=False), width=390, height=900) as page:
         open_liga_mx(page)
-        toggle = page.locator('#camLiguilla .cam-fan-toggle')
-        assert toggle.is_visible(), 'debe mantenerse visible el módulo Arma tu cuadro'
-        assert toggle.is_disabled(), 'no se pueden abrir selecciones antes de los ocho clasificados'
-        assert toggle.inner_text() == 'Próximamente'
-        assert 'Pronto estará disponible' in page.locator('#camLiguilla .cam-fan-shell').inner_text()
-        assert '8 clasificados' in page.locator('#camLiguilla .cam-fan-shell').inner_text()
-        assert page.locator('#camLiguilla .cam-fan-select').count() == 0
-        assert page.locator('#camLiguilla .cam-fan-actions').count() == 0
-        assert not page.evaluate("() => window.CamFanBracket.shareModel()"), 'sin clasificados no existe imagen para compartir'
+        root = page.locator('#camLiguilla')
+        assert root.locator('h3').first.inner_text() == 'Arma tu cuadro'
+        assert 'paso 1 de 2' in root.inner_text().lower() and 'paso 2 de 2' in root.inner_text().lower()
+        assert root.locator('[class*="cam-fan-"]').count() == 0 and not page.evaluate('() => !!window.CamFanBracket')
+        teams = root.locator('.cam-lg-q8-team')
+        assert teams.count() == 12, 'solo los que aún pueden clasificar: %d' % teams.count()
+        assert 'Ya eliminados:' in root.inner_text() and 'Atlas' in root.locator('.cam-lg-hint').first.inner_text()
+        assert root.locator('.cam-lg-q8-team[data-team="216"]').count() == 0, 'un eliminado no se puede elegir'
+        assert root.locator('.cam-lg-q8-status.is-in').count() == 4, 'los ya clasificados llevan su etiqueta'
+        save = root.locator('.cam-lg-q8-save')
+        assert save.is_disabled()
+        for team in ['218', '227', '219', '223', '15720', '225', '228']:
+            root.locator('.cam-lg-q8-team[data-team="%s"]' % team).click()
+        assert '7 de 8' in root.locator('.cam-lg-count').inner_text() and save.is_disabled()
+        assert 'Te faltan 1' in root.inner_text()
+        root.locator('.cam-lg-q8-team[data-team="220"]').click()
+        assert '8 de 8' in root.locator('.cam-lg-count').inner_text()
+        assert root.locator('.cam-lg-q8-team[data-team="234"]').is_disabled(), 'no se puede elegir un noveno'
+        assert root.locator('.cam-lg-q8-team[data-team="220"]').get_attribute('aria-pressed') == 'true'
+        # Quitar y volver a poner con el teclado (el foco se queda en el equipo).
+        root.locator('.cam-lg-q8-team[data-team="220"]').focus(); page.keyboard.press('Enter'); page.wait_for_timeout(100)
+        assert '7 de 8' in root.locator('.cam-lg-count').inner_text()
+        assert page.evaluate("() => document.activeElement?.dataset?.team") == '220', 'el foco se perdió al quitar'
+        page.keyboard.press('Enter'); page.wait_for_timeout(100)
+        assert '8 de 8' in root.locator('.cam-lg-count').inner_text()
+        assert 'Ya clasificados: 4 de 8' in root.locator('.cam-lg-potential').inner_text()
+        assert not save.is_disabled()
+        if SHOTS:
+            root.screenshot(path=SHOTS + '/mis8-390-dia.png')
+        save.click(); page.wait_for_timeout(150)
+        assert 'este dispositivo' in root.locator('.cam-lg-note').inner_text()
+        stored = page.evaluate("() => JSON.parse(localStorage.getItem('cam:liguilla:mis8:anon:3'))")
+        assert stored and len(stored) == 8, stored
+        assert not page.evaluate("() => window.__fake.calls.some(c => c.rpc === 'cam_liguilla_save_qualifiers')"), 'un invitado no llama a Supabase'
+        assert not layout_problems(page), layout_problems(page)
+        # Entra con su cuenta: sus 8 siguen ahí y se guardan.
+        page.evaluate("() => { window.__fake.user = JSON.parse(%r); currentUser = {id:'u-1', username:'QA_Liguilla_Larga'}; window.camLiguilla.refresh(); }" % USER)
+        page.wait_for_timeout(500)
+        assert '8 de 8' in root.locator('.cam-lg-count').inner_text(), 'se perdieron los 8 al entrar con cuenta'
+        assert root.locator('.cam-lg-q8-save').is_enabled()
+        root.locator('.cam-lg-q8-save').click(); page.wait_for_timeout(400)
+        call = page.evaluate("() => window.__fake.calls.filter(c => c.rpc === 'cam_liguilla_save_qualifiers').pop()")
+        assert call and call['args']['p_window'] == 3 and sorted(call['args']['p_teams']) == sorted(['218', '227', '219', '223', '15720', '225', '228', '220']), call
+        assert 'salen en tu perfil' in root.locator('.cam-lg-note').inner_text()
+        assert root.locator('.cam-lg-q8-save').is_disabled(), 'sin cambios no hay nada que guardar'
+        assert not page.evaluate("() => localStorage.getItem('cam:liguilla:mis8:anon:3')"), 'el borrador del aparato debía borrarse'
         assert not layout_problems(page), layout_problems(page)
         assert not page.errors, page.errors
 
-    # 6) Cuando se confirman los ocho, el cuadro se activa: solo ellos pueden avanzar.
-    with fp.full_page(fake_js=fake('open', user=False), width=390, height=900) as page:
+    # 5b) Paso 1 en todos los anchos y temas.
+    for width, dark in [(320, False), (320, True), (390, True), (1366, False), (1366, True)]:
+        with fp.full_page(fake_js=fake('none'), width=width, height=900, dark=dark) as page:
+            open_liga_mx(page)
+            for team in ['218', '227', '219', '223', '15720', '225', '228', '220']:
+                page.locator('#camLiguilla .cam-lg-q8-team[data-team="%s"]' % team).click()
+            problems = layout_problems(page)
+            assert not problems, 'mis 8 %d %s: %s' % (width, 'noche' if dark else 'día', problems)
+            if width == 1366:
+                cols, wide = page.evaluate("() => [getComputedStyle(document.querySelector('#camLiguilla .cam-lg-q8-list')).gridTemplateColumns.split(' ').length,"
+                    " document.querySelector('#camLiguilla .cam-lg-bracket').clientWidth]")
+                assert cols >= 2 and (cols == 3) == (wide >= 900), 'en escritorio la lista va en %s columnas (ancho %s)' % (cols, wide)
+            if SHOTS:
+                page.locator('#camLiguilla').screenshot(path=SHOTS + '/mis8-%d-%s.png' % (width, 'noche' if dark else 'dia'))
+            assert not page.errors, page.errors
+
+    # 6) Paso 1 cerrado (empezó la J17): sus 8 se ven con su estado y ya no se tocan.
+    with fp.full_page(fake_js=fake('q8closed'), width=390, height=900, dark=True) as page:
         open_liga_mx(page)
-        assert not page.locator('#camLiguilla .cam-fan-toggle').is_disabled()
-        page.locator('#camLiguilla .cam-fan-toggle').click()
-        page.wait_for_function("() => document.querySelectorAll('#camLiguilla .cam-fan-team-select').length === 8")
-        assert page.locator('#camLiguilla .cam-fan-select').count() == 8
-        assert page.locator('#camLiguilla select.cam-fan-select').count() == 0, 'los ocho puestos oficiales no se pueden cambiar por otros equipos'
-        assert '8/8' in page.locator('#camLiguilla .cam-fan-count').inner_text()
-        for n in [0, 2, 4, 6]:
-            page.locator('#camLiguilla .cam-fan-team-select').nth(n).locator('.cam-fan-pass').click()
-        page.locator('#camLiguilla .cam-fan-left-semi .cam-fan-option').first.click()
-        page.locator('#camLiguilla .cam-fan-right-semi .cam-fan-option').first.click()
-        page.locator('#camLiguilla .cam-fan-final-pair .cam-fan-option').first.click()
-        assert '7/7' in page.locator('#camLiguilla .cam-fan-count').inner_text()
-        assert 'Cruz Azul' in page.locator('#camLiguilla .cam-fan-champion').inner_text()
-        mobile_columns = page.evaluate("() => getComputedStyle(document.querySelector('#camLiguilla .cam-fan-tree')).gridTemplateColumns.split(' ').length")
-        assert mobile_columns == 1, 'en móvil el cuadro libre debe tener 1 columna legible: %s' % mobile_columns
-        page.locator('#camLiguilla .cam-fan-actions button').filter(has_text='Guardar mi cuadro').click()
-        assert page.evaluate("() => !!localStorage.getItem('cam-sports:cuadro-libre:ligamx:'+(window.camFootballQuiniela.snapshot().season)+':invitado')")
-        assert 'este dispositivo' in page.locator('#camLiguilla .cam-fan-status').inner_text()
-        page.locator('#camLiguilla .cam-fan-actions button').filter(has_text='Compartir en redes').click()
-        page.wait_for_selector('#camPickShareDialog[open] .cam-pick-share-preview img', timeout=15000)
-        page.locator('#camPickShareDialog .cam-pick-share-close').click()
-        page.evaluate("() => { currentUser = {id:'u-1',username:'QA'}; window.camLiguilla.render(); }")
-        page.wait_for_timeout(200)
-        page.locator('#camLiguilla .cam-fan-toggle').click()
-        assert 'Cruz Azul' in page.locator('#camLiguilla .cam-fan-champion').inner_text(), 'se perdió el cuadro al entrar con cuenta'
-        page.locator('#camLiguilla .cam-fan-actions button').filter(has_text='Guardar mi cuadro').click()
-        page.wait_for_timeout(250)
-        assert page.evaluate("() => window.__fake.calls.some(c => c.table==='cam_liguilla_fan_brackets' && c.op==='upsert')"), 'no se sincronizó el cuadro'
-        assert not layout_problems(page), layout_problems(page)
+        root = page.locator('#camLiguilla')
+        assert 'Paso 1 cerrado' in root.inner_text()
+        assert root.locator('.cam-lg-q8-team').count() == 8
+        assert root.locator('.cam-lg-q8-team:not([disabled])').count() == 0, 'cerrado: no se puede cambiar nada'
+        assert root.locator('.cam-lg-q8-save').count() == 0
+        assert root.locator('.cam-lg-q8-status.is-in').count() == 4 and root.locator('.cam-lg-q8-status.is-alive').count() == 4
+        problems = layout_problems(page)
+        assert not problems, 'cerrado: %s' % problems
+        if SHOTS:
+            root.screenshot(path=SHOTS + '/mis8-cerrado-390-noche.png')
         assert not page.errors, page.errors
 
-    # 7) Con sesión activa el botón guarda también en la tabla privada de Supabase.
-    with fp.full_page(fake_js=fake('open', user=True), width=390, height=900) as page:
-        open_liga_mx(page)
-        page.locator('#camLiguilla .cam-fan-toggle').click()
-        page.wait_for_function("() => document.querySelectorAll('#camLiguilla .cam-fan-team-select').length === 8")
-        page.locator('#camLiguilla .cam-fan-actions button').filter(has_text='Guardar mi cuadro').click()
-        page.wait_for_timeout(200)
-        assert page.evaluate("() => window.__fake.calls.some(c => c.table==='cam_liguilla_fan_brackets' && c.op==='upsert')"), 'cuadro no se sincroniza'
-        assert not page.errors, page.errors
+    # 7) «Mi liguilla» en el perfil: mis 8 (antes) y mi cuadro (después); lleva a la liguilla.
+    for mode, width, dark in [('none', 390, False), ('none', 320, True), ('open', 390, True), ('sf', 1366, False)]:
+        with fp.full_page(fake_js=fake(mode), width=width, height=844 if width < 700 else 900, dark=dark) as page:
+            page.wait_for_timeout(600)
+            if width < 700:
+                page.click('#camNavProfile')
+            else:
+                page.evaluate("document.getElementById('aeMyTakesButton').click()")
+            card = page.locator('#camProfileOverview .cam-ov-card[data-kind="liguilla"]')
+            card.wait_for(timeout=8000)
+            text = card.inner_text()
+            assert 'Mi liguilla' in text and 'Liga MX' in text, text
+            if mode == 'none':
+                assert card.locator('.cam-ov-l8-team').count() == 8, 'faltan los 8 en el perfil'
+                assert 'mis 8 para la liguilla' in text.lower() and '4 de 8 ya clasificados' in text, text
+            else:
+                assert 'León' in text and 'campeón' in text.lower() and 'mis 8: 7 de 8 acertados' in text.lower(), text
+                assert card.locator('.cam-ov-l8-team').count() == 0
+            bad = page.evaluate(CLIPPED, '#camProfileOverview')
+            assert not bad, '%s %d: %s' % (mode, width, bad)
+            assert page.evaluate("() => document.getElementById('aeProfileDialog').scrollWidth - document.getElementById('aeProfileDialog').clientWidth") <= 1
+            if SHOTS:
+                card.screenshot(path=SHOTS + '/perfil-%s-%d-%s.png' % (mode, width, 'noche' if dark else 'dia'))
+            card.locator('.cam-ov-more').click()
+            page.wait_for_function("() => { const r = document.getElementById('camLiguilla'); return r && !r.hidden && r.getClientRects().length && !document.getElementById('aeProfileDialog').open; }", timeout=8000)
+            page.wait_for_timeout(500)
+            assert page.locator('#camLiguilla .cam-lg-q8-list' if mode == 'none' else '#camLiguilla .cam-lg-board').count() == 1
+            assert not page.errors, page.errors
 
-    print('OK · liguilla: esperar ocho clasificados, desbloqueo oficial, guardar y compartir; 320/390/1366, día y noche')
+    print('OK · liguilla: paso 1 (mis 8), un solo cuadro, ronda a ronda, perfil y admin; 320/390/1366, día y noche')
 
 
 if __name__ == '__main__':

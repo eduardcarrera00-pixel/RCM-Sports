@@ -1,8 +1,12 @@
 /* CAM SPORTS · La liguilla de la Liga MX en la Quiniela de Fútbol.
-   «Tu liguilla»: el cuadro completo (cuartos → campeón) antes del primer saque.
-   Ronda a ronda: cada serie con su ida, su vuelta (1X2 de siempre) y «¿Quién pasa?».
-   Lee un solo RPC (cam_liguilla_state) cuando se abre Liga MX. Sin temporizadores:
-   se refresca al volver a la pestaña, igual que la quiniela. */
+   Un solo recuadro, «Arma tu cuadro»:
+   1. Antes de conocerse los 8 (cam_liguilla_candidates): cada aficionado elige a
+      los 8 que cree que clasificarán; se cierra al empezar la última jornada.
+   2. Con la liguilla abierta (cam_liguilla_state): el cuadro con puntos, de
+      cuartos a campeón, que se comparte en redes y sale en el perfil.
+   3. Ronda a ronda: cada serie con su ida, su vuelta (1X2 de siempre) y «¿Quién pasa?».
+   Una o dos llamadas al abrir Liga MX. Sin temporizadores: se refresca al volver
+   a la pestaña, igual que la quiniela. */
 (() => {
   'use strict';
   const quiniela=document.getElementById('camFootballQuiniela');
@@ -30,6 +34,8 @@
   // Estado
   let state=null,seasonLoaded=null,userLoaded=undefined,stale=true,loading=false,request=0,loadError='';
   let draft=null,saving=false,note='',noteKind='',roundView=null,board=null,boardOpen=false,adminTable=null,adminMessage='';
+  // «Mis 8»: la tabla y la ventana llegan de cam_liguilla_candidates mientras no hay liguilla.
+  let cand=null,q8=[],q8Saving=false,q8Note='',q8Kind='';
   let animate='';
 
   // Reutilizar el contenedor de La semana: evita dos cuadros al cambiar de liga.
@@ -44,19 +50,23 @@
       :document.querySelector('#camFootballSemanaBody .cam-ns-head');
     if(target&&section.previousElementSibling!==target)target.after(section);
   }
-  function pendingPanel(){
-    const wrap=el('div',null,'cam-lg-bracket cam-lg-pending');
-    const head=el('header',null,'cam-lg-head');
-    head.append(el('p','Liga MX · Liguilla','cam-lg-eyebrow'));
-    const h=el('h3','Liguilla Liga MX');h.id='camLiguillaTitle';head.append(h);
-    head.append(el('p','Cruces por confirmar','cam-lg-sub'));wrap.append(head);
-    const board=el('div',null,'cam-lg-pending-board');
+  function pendingBoard(){
+    const board=el('div',null,'cam-lg-pending-board');board.setAttribute('aria-hidden','true');
     for(const name of ['Cuartos','Semifinales','Final','Campeón']){
       const stage=el('div',null,'cam-lg-pending-stage');
       stage.append(el('span',name,'cam-lg-round-head'),el('span','Pendiente','cam-lg-pending-slot'));
       board.append(stage);
     }
-    wrap.append(board);return wrap;
+    return board;
+  }
+  // Sin liguilla ni ventana de «mis 8» (o mientras carga): el recuadro espera.
+  function pendingPanel(){
+    const wrap=el('div',null,'cam-lg-bracket cam-lg-pending');
+    const head=el('header',null,'cam-lg-head');
+    head.append(el('p','Liga MX · La liguilla','cam-lg-eyebrow'));
+    const h=el('h3','Arma tu cuadro');h.id='camLiguillaTitle';head.append(h);
+    head.append(el('p',loading?'Cargando…':'Próximamente: se abre cuando se confirmen los 8 clasificados.','cam-lg-sub'));
+    wrap.append(head,pendingBoard());return wrap;
   }
 
   // ------------------------------------------------------------- Datos derivados
@@ -109,7 +119,9 @@
   function recoverDraft(){
     draft=saved();
     try{
-      const raw=JSON.parse(localStorage.getItem(draftKey())||'null');
+      // Un invitado que inicia sesión no pierde el cuadro que armó antes.
+      let raw=JSON.parse(localStorage.getItem(draftKey())||'null');
+      if(!raw&&viewer()?.id&&!count(draft))raw=JSON.parse(localStorage.getItem('cam:liguilla:anon:'+(L()?.id||0))||'null');
       if(raw&&Array.isArray(raw.semis)&&raw.semis.length===4&&Array.isArray(raw.finals)&&raw.finals.length===2){
         const valid=raw.semis.every((id,i)=>!id||qfPair(i).includes(id));
         if(valid)draft=clean({semis:raw.semis,finals:raw.finals,champion:raw.champion||null});
@@ -131,8 +143,15 @@
       if(ticket!==request)return;
       if(error)throw error;
       state=data&&typeof data==='object'&&!Array.isArray(data)&&data.liguilla?data:null;
+      if(state){recoverDraft();cand=null;}
+      else{
+        draft=null;
+        const r=await c.rpc('cam_liguilla_candidates',{p_season:season});
+        if(ticket!==request)return;
+        cand=!r.error&&r.data&&typeof r.data==='object'&&r.data.window?r.data:null;
+        recoverQualifiers();
+      }
       seasonLoaded=season;userLoaded=viewer()?.id||null;stale=false;loadError='';
-      if(state)recoverDraft();else draft=null;
     }catch{
       if(ticket!==request)return;
       loadError='No se pudo cargar la liguilla. Vuelve a abrir la sección para reintentarlo.';
@@ -149,8 +168,8 @@
   function hide(){section.hidden=true;quiniela.classList.remove('cam-liguilla-round');}
 
   // ------------------------------------------------------------- Piezas comunes
-  function crest(id,size=30){
-    const t=team(id);const img=el('img',null,'cam-lg-crest');img.alt='';img.width=size;img.height=size;img.loading='lazy';img.decoding='async';
+  function crest(id,size=30,info=null){
+    const t=info||team(id)||cteam(id);const img=el('img',null,'cam-lg-crest');img.alt='';img.width=size;img.height=size;img.loading='lazy';img.decoding='async';
     if(t?.logo)img.src=t.logo;else img.style.visibility='hidden';
     img.addEventListener('error',()=>{img.style.visibility='hidden';});
     return img;
@@ -177,10 +196,15 @@
     const wrap=el('div',null,'cam-lg-bracket');
     const head=el('header',null,'cam-lg-head');
     head.append(el('p','Liga MX · '+(L().name||'Liguilla')+' · Tu liguilla','cam-lg-eyebrow'));
-    const title=el('h3',open?'Tu liguilla':'Tu cuadro');title.id='camLiguillaTitle';head.append(title);
+    const title=el('h3',open?'Arma tu cuadro':'Tu cuadro');title.id='camLiguillaTitle';head.append(title);
     head.append(el('p',open
-      ?'Cierre: '+clock(L().closes_at)
-      :'Pronósticos cerrados','cam-lg-sub'));
+      ?'Ya están los 8. Elige quién pasa en cada cruce hasta el campeón. Cierra el '+clock(L().closes_at)+' (hora de Toronto), al empezar los cuartos.'
+      :'Se cerró al empezar los cuartos. Cada acierto suma el día que se decide.','cam-lg-sub'));
+    const mine8=Array.isArray(state.mine?.qualifiers)?state.mine.qualifiers.map(String):null;
+    if(mine8){
+      const hits=mine8.filter(id=>!!seedOf(id)).length;
+      head.append(el('p','Tus 8: acertaste '+hits+' de 8 clasificados.','cam-lg-q8-hits'));
+    }
     const meter=el('div',null,'cam-lg-meter');
     const track=el('div',null,'cam-lg-track');track.setAttribute('aria-hidden','true');
     const n=count(b);for(let i=0;i<7;i++)track.append(el('i',null,i<n?'is-on':''));
@@ -237,23 +261,21 @@
         :pick?.settled_at?(pick.awarded_points>0?'¡Campeón! +'+pick.awarded_points+' pts':'Se quedó en el camino'):'+'+pick?.points+' pts si gana la final','cam-lg-champion-sub'));
     }else champ.append(el('strong','Todavía sin elegir','cam-lg-champion-name is-empty'));
     boardEl.append(champ);animate='';
-    const scroll=el('div',null,'cam-lg-board-scroll');scroll.tabIndex=0;
-    scroll.setAttribute('role','region');
-    scroll.setAttribute('aria-label','Tu liguilla: desliza para ver las rondas siguientes');
-    scroll.append(boardEl);wrap.append(scroll);
+    wrap.append(boardEl);
     // Acciones
     if(open){
       const actions=el('div',null,'cam-lg-actions');
       const dirty=!same(draft,mine),who=viewer();
       const save=btn(!who?'Inicia sesión para guardar':saving?'Guardando…':'Guardar mi cuadro','cam-nfl-action cam-lg-save',saveBracket);
       save.disabled=!!who&&(saving||!dirty||!count(draft));
-      const share=btn('Compartir mi liguilla','cam-nfl-action cam-nfl-action-secondary cam-lg-share',e=>shareBracket(e.currentTarget));
-      share.disabled=!done||dirty||!window.CamPickShare?.openBracket;
+      const share=btn('Compartir mi cuadro','cam-nfl-action cam-nfl-action-secondary cam-lg-share',e=>shareBracket(e.currentTarget));
+      share.disabled=count(draft)!==7||!window.CamPickShare?.openBracket;
       const reset=btn('Empezar de nuevo','cam-lg-link',()=>{draft={semis:[null,null,null,null],finals:[null,null],champion:null};storeDraft();note='';render();});
       reset.disabled=!count(draft);
       actions.append(save,share,reset);
       wrap.append(actions);
-      wrap.append(el('p',done&&!dirty?'Cuadro guardado. Puedes cambiarlo hasta el cierre.'
+      wrap.append(el('p',!who&&count(draft)===7?'Inicia sesión para que tu cuadro cuente para la quiniela y salga en tu perfil. Ya puedes compartirlo.'
+        :done&&!dirty?'Cuadro guardado: sale en tu perfil. Puedes cambiarlo hasta el cierre.'
         :dirty&&count(draft)?'Tienes cambios sin guardar.'
         :'Faltan '+(7-count(draft))+' elecciones para poder compartirlo.','cam-lg-hint'));
       wrap.append(message());
@@ -306,7 +328,8 @@
     finally{saving=false;render();}
   }
   function shareModel(){
-    const b=saved();if(count(b)!==7)return null;
+    // Lo que se ve en el recuadro: el borrador mientras está abierto, lo guardado después.
+    const b=isOpen()&&draft?draft:saved();if(count(b)!==7)return null;
     const sp=semiPairs(b.semis),fp=finalPair(b.finals);
     const t=id=>({name:shortName(id),full:fullName(id),seed:seedOf(id)});
     const sides=sp.map((pair,i)=>({pair:pair.map(t),winner:t(b.finals[i]),
@@ -362,6 +385,121 @@
   async function loadBoard(){
     try{const {data,error}=await client().rpc('cam_liguilla_leaderboard',{p_liguilla:L().id});if(error)throw error;board=Array.isArray(data)?data:[];}
     catch{board=[];}
+  }
+
+  // ------------------------------------------------------------- «Mis 8» (antes de abrir)
+  const W=()=>cand?.window||null;
+  const candTeams=()=>Array.isArray(cand?.teams)?cand.teams:[];
+  function cteam(id){return candTeams().find(t=>String(t.team_id)===String(id))||null;}
+  const q8Open=()=>!!W()&&!!W().open&&Date.parse(W().closes_at)>now();
+  const q8Key=who=>'cam:liguilla:mis8:'+(who||'anon')+':'+(W()?.id||0);
+  const q8Saved=()=>Array.isArray(cand?.mine)?cand.mine.map(String):null;
+  function recoverQualifiers(){
+    q8=q8Saved()||[];q8Note='';
+    if(q8.length)return;
+    // Primero lo de esta cuenta y después lo que hizo como invitado en este aparato.
+    for(const who of [...new Set([viewer()?.id||'anon','anon'])]){
+      try{
+        const raw=JSON.parse(localStorage.getItem(q8Key(who))||'null');
+        if(Array.isArray(raw)){
+          q8=[...new Set(raw.map(String))].filter(id=>cteam(id)&&cteam(id).status!=='out').slice(0,8);
+          if(q8.length)return;
+        }
+      }catch{}
+    }
+  }
+  function storeQ8(){try{localStorage.setItem(q8Key(viewer()?.id),JSON.stringify(q8));}catch{}}
+  function toggleQ8(id){
+    if(!q8Open()||q8Saving)return;
+    const i=q8.indexOf(id);
+    if(i>=0)q8.splice(i,1);else if(q8.length<8)q8.push(id);
+    storeQ8();q8Note='';render();
+    section.querySelector('.cam-lg-q8-team[data-team="'+CSS.escape(id)+'"]')?.focus({preventScroll:true});
+  }
+  async function saveQ8(){
+    if(q8Saving||!q8Open()||q8.length!==8)return;
+    storeQ8();
+    if(!viewer()){
+      q8Note='Guardado en este dispositivo. Inicia sesión para que tus 8 salgan en tu perfil.';q8Kind='ok';render();return;
+    }
+    q8Saving=true;q8Note='';render();
+    try{
+      const {error}=await client().rpc('cam_liguilla_save_qualifiers',{p_window:W().id,p_teams:q8});
+      if(error)throw error;
+      cand.mine=[...q8];
+      try{localStorage.removeItem(q8Key(viewer()?.id));localStorage.removeItem(q8Key('anon'));}catch{}
+      q8Note='Tus 8 están guardados y salen en tu perfil. Puedes cambiarlos hasta el cierre.';q8Kind='ok';
+    }catch(error){q8Note=error?.message||'No se pudo guardar. Inténtalo de nuevo.';q8Kind='error';}
+    finally{q8Saving=false;render();}
+  }
+  function q8Team(t,{chosen,disabled,showStatus}){
+    const b=el('button',null,'cam-lg-q8-team'+(chosen?' is-chosen':'')+(t.status==='out'?' is-out':''));
+    b.type='button';b.dataset.team=String(t.team_id);b.disabled=!!disabled;b.setAttribute('aria-pressed',String(!!chosen));
+    const rank=el('span',String(t.rank||''),'cam-lg-seed');rank.setAttribute('aria-hidden','true');
+    const name=el('span',null,'cam-lg-name');
+    const gd=Number(t.goal_diff||0);
+    name.append(el('strong',t.name||t.short_name||t.team_id),el('small',t.points+' pts · '+t.played+' PJ · DG '+(gd>0?'+':'')+gd));
+    const status=t.status==='in'?'Clasificado':t.status==='out'?'Eliminado':'En juego';
+    const tag=el('span',showStatus||t.status==='in'?status:'','cam-lg-q8-status is-'+(t.status||'alive'));
+    b.append(rank,crest(t.team_id,28,t),name,tag);
+    b.setAttribute('aria-label',(t.name||t.short_name)+', '+t.rank+'.º con '+t.points+' puntos, '+status.toLowerCase()+(chosen?', elegido':''));
+    return b;
+  }
+  function qualifiersPanel(){
+    const open=q8Open(),saved=q8Saved(),mine=open?q8:(saved||[]);
+    const wrap=el('div',null,'cam-lg-bracket cam-lg-q8');
+    const head=el('header',null,'cam-lg-head');
+    head.append(el('p','Liga MX · '+(W().name||'Liguilla')+' · La liguilla','cam-lg-eyebrow'));
+    const h=el('h3','Arma tu cuadro');h.id='camLiguillaTitle';head.append(h);
+    head.append(el('p',open
+      ?'Paso 1 de 2 · Elige a los 8 que crees que entran a la liguilla. Se cierra el '+clock(W().closes_at)+' (hora de Toronto), al empezar la última jornada.'
+      :saved?'Paso 1 cerrado: estos son tus 8. El cuadro se abre en cuanto se confirmen los 8 clasificados.'
+      :'Paso 1 cerrado. El cuadro se abre en cuanto se confirmen los 8 clasificados.','cam-lg-sub'));
+    const meter=el('div',null,'cam-lg-meter');
+    const track=el('div',null,'cam-lg-track is-eight');track.setAttribute('aria-hidden','true');
+    for(let i=0;i<8;i++)track.append(el('i',null,i<mine.length?'is-on':''));
+    meter.append(track,el('span',mine.length+' de 8','cam-lg-count'));
+    const already=mine.filter(id=>cteam(id)?.status==='in').length,gone=mine.filter(id=>cteam(id)?.status==='out').length;
+    const line=el('p',null,'cam-lg-potential');
+    if(mine.length){line.append('Ya clasificados: ',el('b',String(already)),' de '+mine.length+(gone?' · '+gone+' eliminado'+(gone===1?'':'s'):''));}
+    else line.append(Number(cand.players||0)?Number(cand.players)+(Number(cand.players)===1?' aficionado ya eligió':' aficionados ya eligieron')+' a sus 8.':'Sé el primero en elegir a tus 8.');
+    meter.append(line);head.append(meter);wrap.append(head);
+    if(!candTeams().length){
+      wrap.append(el('p','La tabla de la Liga MX no está disponible ahora mismo. Vuelve a entrar en unos minutos.','cam-lg-wait'));
+      return wrap;
+    }
+    const list=el('div',null,'cam-lg-q8-list');list.setAttribute('role','group');list.setAttribute('aria-label','Elige a tus 8 clasificados');
+    if(open){
+      for(const t of candTeams().filter(t=>t.status!=='out')){
+        const chosen=mine.includes(String(t.team_id));
+        const b=q8Team(t,{chosen,disabled:q8Saving||(!chosen&&mine.length>=8),showStatus:false});
+        b.addEventListener('click',()=>toggleQ8(String(t.team_id)));
+        list.append(b);
+      }
+    }else for(const id of mine){const t=cteam(id);if(t)list.append(q8Team(t,{chosen:true,disabled:true,showStatus:true}));}
+    if(list.childElementCount)wrap.append(list);
+    const outs=candTeams().filter(t=>t.status==='out').map(t=>t.short_name||t.name);
+    if(open&&outs.length)wrap.append(el('p','Ya eliminados: '+outs.join(', ')+'.','cam-lg-hint'));
+    if(open){
+      const dirty=JSON.stringify(mine)!==JSON.stringify(saved||[]);
+      const actions=el('div',null,'cam-lg-actions');
+      const save=btn(q8Saving?'Guardando…':'Guardar mis 8','cam-nfl-action cam-lg-q8-save',saveQ8);
+      save.disabled=q8Saving||mine.length!==8||(!!viewer()&&!dirty);
+      actions.append(save);
+      if(!viewer())actions.append(btn('Iniciar sesión','cam-lg-link',()=>window.openUserAuthModal?.()));
+      const clear=btn('Quitar todos','cam-lg-link',()=>{q8=[];storeQ8();q8Note='';render();});clear.disabled=!mine.length||q8Saving;
+      actions.append(clear);wrap.append(actions);
+      wrap.append(el('p',mine.length<8?'Te faltan '+(8-mine.length)+'. Toca un equipo para elegirlo o quitarlo.'
+        :dirty?(viewer()?'Tienes cambios sin guardar.':'Pulsa «Guardar mis 8».')
+        :'Tus 8 están guardados. Puedes cambiarlos hasta el cierre.','cam-lg-hint'));
+      const p=el('p',q8Note,'cam-lg-note'+(q8Kind?' is-'+q8Kind:''));p.setAttribute('role','status');p.setAttribute('aria-live','polite');wrap.append(p);
+    }
+    const next=el('section',null,'cam-lg-q8-next');next.setAttribute('aria-label','Paso 2: tu cuadro');
+    next.append(el('h4','Paso 2 de 2 · Tu cuadro','cam-lg-round-head'),
+      el('p','Con los 8 reales eliges quién pasa en cada cruce hasta el campeón. Cada acierto da puntos para la quiniela y tu cuadro se puede compartir y sale en tu perfil. Después, la liguilla ronda a ronda.','cam-lg-hint'),
+      pendingBoard());
+    wrap.append(next);
+    return wrap;
   }
 
   // ------------------------------------------------------------- Ronda a ronda
@@ -552,7 +690,7 @@
         }
       });
       form.append(grid);
-      const name=el('input');name.name='lgName';name.value=state?.liguilla?.name||'Apertura '+(api()?.snapshot?.()?.season||new Date().getFullYear());
+      const name=el('input');name.name='lgName';name.value=state?.liguilla?.name||W()?.name||'Apertura '+(api()?.snapshot?.()?.season||new Date().getFullYear());
       const start=el('input');start.type='datetime-local';start.name='lgStart';
       const startISO=adminTable?.start||state?.liguilla?.starts_at||null;if(startISO)start.value=torontoLocal(startISO);
       const reseed=el('input');reseed.type='checkbox';reseed.name='lgReseed';reseed.checked=state?.liguilla?.reseed!==false;
@@ -607,14 +745,8 @@
     section.hidden=false;
     const focusKey=document.activeElement&&section.contains(document.activeElement)?keyOf(document.activeElement):null;
     const parts=[];
-    // El cuadro libre se puede armar sin esperar a que se publiquen los 8 clasificados oficiales.
-    const community=window.CamFanBracket?.panel?.(snap,state,viewer());
-    if(community)parts.push(community);
-    if(!state){
-      const official=el('details',null,'cam-lg-official-details');
-      official.append(el('summary','Cuadro oficial · Cruces por confirmar'),pendingPanel());
-      parts.push(official);
-    }
+    // Un solo recuadro: «mis 8» antes de abrir, el cuadro con puntos después.
+    if(!state)parts.push(cand?qualifiersPanel():pendingPanel());
     if(loadError)parts.push(el('p',loadError,'cam-lg-note is-error'));
     if(state){
       parts.push(bracketPanel());
@@ -637,6 +769,7 @@
   function keyOf(node){
     const b=node.closest('button');if(!b)return null;
     const card=b.closest('[data-series]');
+    if(b.classList.contains('cam-lg-q8-team'))return '.cam-lg-q8-team[data-team="'+CSS.escape(b.dataset.team)+'"]';
     if(b.dataset.team){const round=b.closest('.cam-lg-round');const i=[...section.querySelectorAll('.cam-lg-round')].indexOf(round);
       return '.cam-lg-round:nth-of-type('+(i+1)+') .cam-lg-team[data-team="'+CSS.escape(b.dataset.team)+'"]';}
     if(card)return null;

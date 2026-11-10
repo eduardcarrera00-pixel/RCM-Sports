@@ -6,6 +6,7 @@
    perfil propio, «Primeros pasos» sustituye a las tarjetas vacías; en el
    ajeno, la quiniela va primero si va en el podio. highlights() da las
    etiquetas de la cabecera.
+   10 nov 2026: «Mi liguilla» (Liga MX) con mis 8 y mi cuadro, de cam_profile_overview.
    Solo pinta: los datos llegan de ae-profile.js (cam_profile_overview y, una
    vez por perfil, campeones y prestigio). Sin llamadas, bucles ni
    temporizadores propios. */
@@ -90,6 +91,21 @@ function goQuiniela(sport) {
   requestAnimationFrame(() => { try { root?.scrollIntoView({block: 'start'}); } catch {} });
 }
 window.camGoQuiniela = goQuiniela;
+
+/* Ir a «Arma tu cuadro» (Fútbol → Liga MX → La semana). */
+function goLiguilla() {
+  try { window.closeAeProfile?.(); } catch {}
+  try { document.getElementById('camParty')?.open && document.getElementById('camParty').close(); } catch {}
+  if (typeof window.filterByCategory === 'function') window.filterByCategory('Fútbol');
+  window.camSectionTabs?.select?.('semana');
+  Promise.resolve(window.camSportQuinielaLoader?.ensure?.('football'))
+    .then(() => window.camFootballQuiniela?.selectCompetition?.('ligamx'))
+    .catch(() => {})
+    .then(() => requestAnimationFrame(() => {
+      try { document.getElementById('camLiguilla')?.scrollIntoView({block: 'start'}); } catch {}
+    }));
+}
+window.camGoLiguilla = goLiguilla;
 
 /* ---------- tarjetas ---------- */
 function shell(kind, name, figures, onMore) {
@@ -254,6 +270,67 @@ function quinielaCard(data, ctx) {
   return card;
 }
 
+/* ---------- Mi liguilla (Liga MX): mis 8 y mi cuadro ---------- */
+const LG_STATE = {in: 'Clasificado', out: 'Eliminado', alive: 'En juego'};
+function lgCrest(team) {
+  const crest = el('span', null, 'cam-ov-crest', {'aria-hidden': 'true'});
+  crest.append(el('span', initials(team?.short_name || team?.name), 'cam-ov-crest-initials'));
+  if (team?.logo) {
+    const img = el('img', null, null, {alt: '', width: 32, height: 32, loading: 'lazy', decoding: 'async'});
+    img.addEventListener('load', () => crest.classList.add('has-img'));
+    img.addEventListener('error', () => img.remove());
+    img.src = team.logo;
+    crest.append(img);
+  }
+  return crest;
+}
+function liguillaCard(data, ctx) {
+  const lg = data.liguilla;
+  if (!lg) return null;
+  const name = 'Mi liguilla';
+  const b = lg.bracket, q = lg.qualifiers;
+  const open = () => goLiguilla();
+  if (!b && !q) {
+    if (!ctx.own) return null;
+    const label = lg.phase === 'bracket_open' ? 'Arma tu cuadro ›' : lg.phase === 'qualifiers_open' ? 'Elige a tus 8 ›' : '';
+    return label ? emptyCard('liguilla', name, label, open) : null;
+  }
+  const figures = ['Liga MX · ' + (lg.name || 'Liguilla')];
+  if (b) figures.push(num(b.points) + ' pts' + (num(b.alive) ? ' · ' + num(b.alive) + ' en juego' : ''));
+  else if (q) figures.push(num(q.hits) + ' de 8 ' + (q.decided ? 'acertados' : 'ya clasificados'));
+  const card = shell('liguilla', name, figures, open);
+  const box = el('div', null, 'cam-ov-champs');
+  if (b) {
+    box.append(el('p', ctx.own ? 'Mi cuadro' : 'Su cuadro', 'cam-ov-sublabel'));
+    const list = el('ul', null, 'cam-ov-champ-list');
+    const row = (team, role, pts) => {
+      const state = !team ? 'open' : team.settled ? (num(team.awarded) > 0 ? 'won' : 'lost') : 'pending';
+      const li = el('li', null, 'cam-ov-champ is-' + state);
+      const copy = el('span', null, 'cam-ov-champ-copy');
+      copy.append(el('span', team ? (team.name || team.short_name) : '—', 'cam-ov-champ-team'),
+        el('span', role + (state === 'won' ? ' · +' + num(team.awarded) + ' pts' : pts ? ' · paga ' + pts + ' pts' : ''), 'cam-ov-champ-meta'));
+      li.append(lgCrest(team), copy, el('span', {open: 'Por elegir', pending: 'En juego', won: 'Acierto', lost: 'Fallo'}[state], 'cam-ov-champ-state'));
+      return li;
+    };
+    list.append(row(b.champion, 'Campeón', num(b.champion?.points)));
+    for (const f of (Array.isArray(b.finalists) ? b.finalists : []).filter(f => f.team_id !== b.champion?.team_id).slice(0, 1)) list.append(row(f, 'Finalista', 0));
+    box.append(list);
+    if (q) box.append(el('p', 'Sus 8: ' + num(q.hits) + ' de 8 acertados', 'cam-ov-l8-note'));
+  } else {
+    box.append(el('p', ctx.own ? 'Mis 8 para la liguilla' : 'Sus 8 para la liguilla', 'cam-ov-sublabel'));
+    const list = el('ul', null, 'cam-ov-l8');
+    for (const t of q.teams || []) {
+      const li = el('li', null, 'cam-ov-l8-team is-' + (t.status || 'alive'), {title: (t.name || t.short_name) + ' · ' + (LG_STATE[t.status] || 'En juego')});
+      li.append(lgCrest(t), el('span', t.abbreviation || t.short_name || '', 'cam-ov-l8-abbr'));
+      list.append(li);
+    }
+    box.append(list);
+  }
+  if (b && q && ctx.own) box.querySelector('.cam-ov-l8-note').textContent = 'Mis 8: ' + num(q.hits) + ' de 8 acertados';
+  card.append(box);
+  return card;
+}
+
 /* ---------- «Primeros pasos» (solo el perfil propio) ---------- */
 const STEPS = [
   ['take', 'Publica tu primer Take', 'Da tu opinión y deja que la comunidad vote', ctx => ctx.newTake()],
@@ -324,11 +401,11 @@ function render(target, data, ctx) {
   const steps = ctx.own && ctx.steps && !ctx.steps.complete ? ctx.steps : null;
   const stepsShown = Boolean(steps && !(steps.take && steps.quiniela && steps.pick && steps.party));
   const c = {...ctx, stepsShown};
-  const takes = takesCard(data, c), picks = picksCard(data, c), quiniela = quinielaCard(data, c);
+  const takes = takesCard(data, c), picks = picksCard(data, c), quiniela = quinielaCard(data, c), liguilla = liguillaCard(data, c);
   // En un perfil ajeno, la quiniela va primero si va en el podio.
   const q = data.quiniela || {};
   const podium = [q.nfl, q.football].some(s => num(s?.position) > 0 && num(s.position) <= 3);
-  const ordered = !ctx.own && podium ? [quiniela, takes, picks] : [takes, picks, quiniela];
+  const ordered = !ctx.own && podium ? [quiniela, liguilla, takes, picks] : [liguilla, takes, picks, quiniela];
   const cards = ordered.filter(Boolean);
   if (stepsShown) {
     const grid = el('div', null, 'cam-ov-grid');
@@ -345,5 +422,5 @@ function render(target, data, ctx) {
   target.append(grid);
 }
 
-window.CamProfileOverview = Object.freeze({render, goQuiniela, highlights});
+window.CamProfileOverview = Object.freeze({render, goQuiniela, goLiguilla, highlights});
 })();

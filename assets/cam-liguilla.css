@@ -35,7 +35,7 @@
 #camLiguilla .cam-lg-seed{font:700 12px/1 var(--ds-font-sans,Inter,system-ui,sans-serif);color:var(--q-meta);text-align:center;font-variant-numeric:tabular-nums}
 #camLiguilla .cam-lg-crest{width:30px;height:30px;object-fit:contain;display:block}
 #camLiguilla .cam-lg-name{display:grid;gap:2px;min-width:0}
-#camLiguilla .cam-lg-name strong{font-weight:650;font-size:15px;line-height:1.25;overflow-wrap:anywhere}
+#camLiguilla .cam-lg-name strong{font-weight:650;font-size:15px;line-height:1.25;overflow-wrap:break-word;hyphens:manual}
 #camLiguilla .cam-lg-name small{font-size:11px;color:var(--q-meta);line-height:1.3}
 #camLiguilla .cam-lg-pts{font:700 12px/1 var(--ds-font-sans,Inter,system-ui,sans-serif);padding:7px 9px;border-radius:999px;background:var(--q-sunken);color:var(--q-ink);white-space:nowrap;font-variant-numeric:tabular-nums}
 #camLiguilla .cam-lg-pts.is-blank{background:none;padding:0}
@@ -80,11 +80,49 @@
 #camLiguilla .cam-lg-table th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--q-meta)}
 #camLiguilla .cam-lg-table td:nth-child(4),#camLiguilla .cam-lg-table td:nth-child(5),#camLiguilla .cam-lg-table th:nth-child(4),#camLiguilla .cam-lg-table th:nth-child(5){text-align:right}
 #camLiguilla .cam-lg-table tr.is-me td{background:var(--q-gold-soft);font-weight:600}
+/* El cuadro se lee de arriba abajo en el teléfono; 2×2 en pantallas medianas y las
+   cuatro rondas en fila en el ordenador. Nunca se desliza en horizontal. */
+@container (min-width:560px){
+  #camLiguilla .cam-lg-board{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:start}
+  #camLiguilla .cam-lg-champion{align-self:center}
+}
 @container (min-width:760px){
   #camLiguilla .cam-lg-head{grid-template-columns:minmax(0,1fr) 320px;column-gap:28px;align-items:end}
-  #camLiguilla .cam-lg-head>.cam-lg-meter{grid-column:2;grid-row:1/4}
-  #camLiguilla .cam-lg-board{grid-template-columns:1.08fr 1fr 1fr .9fr;gap:16px;align-items:center}
+  #camLiguilla .cam-lg-head>.cam-lg-meter{grid-column:2;grid-row:1 / span 5}
+}
+@container (min-width:900px){
+  #camLiguilla .cam-lg-board{grid-template-columns:1.1fr 1fr 1fr .9fr;gap:14px;align-items:center}
   #camLiguilla .cam-lg-round-head{min-height:2.6em;align-items:flex-end}
+  #camLiguilla .cam-lg-board .cam-lg-team{grid-template-columns:16px 24px minmax(0,1fr) auto;gap:8px;padding:8px 10px}
+  #camLiguilla .cam-lg-board .cam-lg-crest{width:24px;height:24px}
+  #camLiguilla .cam-lg-board .cam-lg-name strong{font-size:14px}
+  #camLiguilla .cam-lg-board .cam-lg-name small{display:none}
+  #camLiguilla .cam-lg-board .cam-lg-pts{padding:6px 7px}
+}
+
+/* ---- Paso 1 · «Mis 8» ---------------------------------------------------------- */
+#camLiguilla .cam-lg-track.is-eight{grid-template-columns:repeat(8,1fr)}
+#camLiguilla .cam-lg-q8-hits{margin:0;font-size:14px;font-weight:600;color:var(--q-gold-text)}
+#camLiguilla .cam-lg-q8-list{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;min-width:0}
+#camLiguilla .cam-lg-q8-team{display:grid;grid-template-columns:22px 28px minmax(0,1fr) auto;align-items:center;gap:10px;width:100%;min-height:56px;padding:8px 12px;border:1px solid var(--q-line);border-radius:0;background:var(--q-card);color:var(--q-ink);text-align:left;position:relative;transition:background .2s ease,border-color .2s ease}
+#camLiguilla .cam-lg-q8-team .cam-lg-crest{width:28px;height:28px}
+#camLiguilla .cam-lg-q8-team:not(:disabled):hover{border-color:var(--q-gold);background:var(--q-gold-soft)}
+#camLiguilla .cam-lg-q8-team.is-chosen{border-color:var(--q-gold);box-shadow:inset 0 0 0 1px var(--q-gold);background:var(--q-gold-soft)}
+#camLiguilla .cam-lg-q8-team.is-chosen::after{content:"✓";position:absolute;top:6px;right:8px;font:800 12px/1 var(--ds-font-sans,Inter,system-ui,sans-serif);color:var(--q-gold-text)}
+#camLiguilla .cam-lg-q8-team:disabled:not(.is-chosen){opacity:.5}
+#camLiguilla .cam-lg-q8-team.is-chosen:disabled{opacity:1}
+#camLiguilla .cam-lg-q8-status{font:700 11px/1 var(--ds-font-sans,Inter,system-ui,sans-serif);white-space:nowrap;padding:5px 8px;border-radius:999px;margin-right:12px}
+#camLiguilla .cam-lg-q8-status:empty{display:none}
+#camLiguilla .cam-lg-q8-status.is-in{background:var(--q-ok-bg);color:var(--q-ok-text)}
+#camLiguilla .cam-lg-q8-status.is-out{background:var(--q-bad-bg);color:var(--q-bad-text)}
+#camLiguilla .cam-lg-q8-status.is-alive{background:var(--q-sunken);color:var(--q-meta)}
+#camLiguilla .cam-lg-q8-next{display:grid;gap:10px;padding-top:14px;border-top:1px dashed var(--q-line)}
+#camLiguilla .cam-lg-q8-next h4{margin:0}
+@container (min-width:560px){
+  #camLiguilla .cam-lg-q8-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@container (min-width:900px){
+  #camLiguilla .cam-lg-q8-list{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
 
 /* ---- Ronda a ronda -------------------------------------------------------------- */
@@ -142,6 +180,11 @@
 #camLiguilla .cam-lg-leg-status{font-weight:600}
 #camLiguilla .cam-lg-x3{display:grid;grid-template-columns:1fr .82fr 1fr;gap:6px}
 #camLiguilla .cam-lg-x3 .cam-lg-opt{flex-direction:column;justify-content:center;text-align:center;gap:3px;min-height:54px}
+/* Nombres largos de una sola palabra («Guadalajara») caben en el 1X2 del teléfono; si aun así no caben,
+   se parten con guion donde el navegador sabe hacerlo. */
+#camLiguilla .cam-lg-x3 .cam-lg-opt{padding:8px 5px}
+#camLiguilla .cam-lg-x3 .cam-lg-opt span{-webkit-hyphens:auto;hyphens:auto}
+@container (max-width:400px){#camLiguilla .cam-lg-x3 .cam-lg-opt{font-size:13px}}
 #camLiguilla .cam-lg-series-foot{margin:0;padding:10px 14px;border-top:1px solid var(--q-line);background:var(--q-panel);font-size:12px;line-height:1.45;color:var(--q-meta)}
 #camLiguilla .cam-lg-series.is-decided .cam-lg-series-foot{color:var(--q-ink);font-weight:600}
 #camLiguilla .cam-lg-admin-winner{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px 14px;border-top:1px dashed var(--q-edge)}
@@ -170,4 +213,22 @@
 
 @media (prefers-reduced-motion:reduce){
   #camLiguilla *{animation:none!important;transition:none!important}
+}
+/* La semana pone a 0 (con !important, en la capa cam-banners) el margen y el relleno de h2, h3, p, ul
+   y li, y la capa cam-rounded-editorial convierte todos los botones en píldoras. Un !important dentro
+   de una capa gana a cualquiera fuera de capas, así que esto va en esas mismas capas y con más peso. */
+@layer cam-banners{
+  html body #camLiguilla .cam-lg-foot{padding:7px 12px!important}
+  html body #camLiguilla .cam-lg-series-foot{padding:10px 14px!important}
+  html body #camLiguilla .cam-lg-series-title{padding:6px 14px 12px!important}
+  html body #camLiguilla .cam-lg-wait{padding:16px!important}
+  html body #camLiguilla .cam-lg-empty{padding:14px!important}
+  html body #camLiguilla .cam-lg-rules p{margin:8px 0 0!important}
+  html body #camLiguilla .cam-lg-stage-dates{margin:6px 0 0!important}
+  html body #camLiguilla .cam-lg-admin>*+*{margin-top:10px!important}
+}
+@layer cam-rounded-editorial{
+  /* Las filas llenan su tarjeta (la tarjeta conserva sus esquinas) y los 8 son tarjetas, no píldoras. */
+  html body #camLiguilla .cam-lg-match .cam-lg-team{border-radius:0!important}
+  html body #camLiguilla .cam-lg-q8-list .cam-lg-q8-team{border-radius:var(--ds-radius,10px)!important}
 }

@@ -10,7 +10,7 @@
     football:{className:'ae-is-football',root:'camFootballQuiniela',status:'camFootballStatus',
       src:'cam-football-quiniela.js?v=20261110-branded-loading-1',
       // La liguilla de la Liga MX vive dentro de la quiniela de fútbol y se carga después.
-      extra:['cam-fan-bracket.js?v=20261110-wait-for-top-eight-1','cam-liguilla.js?v=20261110-branded-loading-1']}
+      extra:['cam-liguilla.js?v=20261110-mis-8-2']}
   };
   const requests=new Map();
   const loaded=new Set();
@@ -52,7 +52,7 @@
         loaded.add(key);resolve(true);
         if(entry.extra){
           const finishExtras=window.camPageLoader?.begin?.();
-          // Primero el constructor libre y después el cuadro oficial. Un fallo no bloquea la quiniela.
+          // Complementos en orden. Un fallo no bloquea la quiniela.
           const extras=Array.isArray(entry.extra)?entry.extra:[entry.extra];
           const next=i=>{
             if(i>=extras.length){finishExtras?.();return;}
