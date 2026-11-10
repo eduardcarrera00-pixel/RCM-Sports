@@ -161,6 +161,10 @@
     const head=el('header',null,'cam-ns-head');head.append(el('h2','La semana','cam-ns-title',{id:'camFootballSemanaTitle'}));
     if(api)head.append(api.competitionNav());
     const fragment=document.createDocumentFragment();fragment.append(head);
+    // El evento de Liga MX pertenece a La semana; comparte datos con la quiniela.
+    const liguilla=document.getElementById('camLiguilla');
+    if(snap?.competition==='ligamx'&&liguilla&&!liguilla.hidden&&liguilla.dataset.complete!=='true')
+      fragment.append(liguilla);
     if(snap?.error){
       fragment.append(el('p',snap.error,'cam-ns-text'),button('Reintentar',()=>void api.refresh()));scores.replaceChildren();
     }else if(!snap?.loaded||snap.loading){

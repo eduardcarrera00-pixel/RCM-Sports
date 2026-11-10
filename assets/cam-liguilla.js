@@ -20,7 +20,7 @@
   const QF=[[1,8],[2,7],[3,6],[4,5]];
   const ROUNDS={
     qf:{title:'Cuartos de final',short:'Cuartos',left:8},
-    sf:{title:'Semifinales',short:'Semis',left:4},
+    sf:{title:'Semifinales',short:'Semifinales',left:4},
     final:{title:'La Final',short:'Final',left:2}
   };
   const STAGE_OF={qf:'semis',sf:'final',final:'champion'};
@@ -33,6 +33,26 @@
   const section=el('section',null,'cam-liguilla');
   section.id='camLiguilla';section.hidden=true;section.setAttribute('aria-labelledby','camLiguillaTitle');
   (quiniela.querySelector('.cam-nfl-top')||quiniela.firstElementChild)?.after(section);
+  function place(complete){
+    const target=complete
+      ?(quiniela.querySelector('.cam-nfl-top')||quiniela.firstElementChild)
+      :document.querySelector('#camFootballSemanaBody .cam-ns-head');
+    if(target&&section.previousElementSibling!==target)target.after(section);
+  }
+  function pendingPanel(){
+    const wrap=el('div',null,'cam-lg-bracket cam-lg-pending');
+    const head=el('header',null,'cam-lg-head');
+    head.append(el('p','Liga MX · Liguilla','cam-lg-eyebrow'));
+    const h=el('h3','Liguilla Liga MX');h.id='camLiguillaTitle';head.append(h);
+    head.append(el('p','Cruces por confirmar','cam-lg-sub'));wrap.append(head);
+    const board=el('div',null,'cam-lg-pending-board');
+    for(const name of ['Cuartos','Semifinales','Final','Campeón']){
+      const stage=el('div',null,'cam-lg-pending-stage');
+      stage.append(el('span',name,'cam-lg-round-head'),el('span','Pendiente','cam-lg-pending-slot'));
+      board.append(stage);
+    }
+    wrap.append(board);return wrap;
+  }
 
   // ------------------------------------------------------------- Datos derivados
   const L=()=>state?.liguilla||null;
@@ -151,10 +171,10 @@
     const wrap=el('div',null,'cam-lg-bracket');
     const head=el('header',null,'cam-lg-head');
     head.append(el('p','Liga MX · '+(L().name||'Liguilla')+' · Tu liguilla','cam-lg-eyebrow'));
-    const title=el('h3',open?'Arma tu cuadro':'Tu cuadro, en juego');title.id='camLiguillaTitle';head.append(title);
+    const title=el('h3',open?'Tu liguilla':'Tu cuadro');title.id='camLiguillaTitle';head.append(title);
     head.append(el('p',open
-      ?'De cuartos a campeón: 7 elecciones. Cierra el '+clock(L().closes_at)+' (hora de Toronto), al empezar los cuartos.'
-      :'Se cerró al empezar los cuartos. Cada acierto suma el día que se decide.','cam-lg-sub'));
+      ?'Cierre: '+clock(L().closes_at)
+      :'Pronósticos cerrados','cam-lg-sub'));
     const meter=el('div',null,'cam-lg-meter');
     const track=el('div',null,'cam-lg-track');track.setAttribute('aria-hidden','true');
     const n=count(b);for(let i=0;i<7;i++)track.append(el('i',null,i<n?'is-on':''));
@@ -211,14 +231,17 @@
         :pick?.settled_at?(pick.awarded_points>0?'¡Campeón! +'+pick.awarded_points+' pts':'Se quedó en el camino'):'+'+pick?.points+' pts si gana la final','cam-lg-champion-sub'));
     }else champ.append(el('strong','Todavía sin elegir','cam-lg-champion-name is-empty'));
     boardEl.append(champ);animate='';
-    wrap.append(boardEl);
+    const scroll=el('div',null,'cam-lg-board-scroll');scroll.tabIndex=0;
+    scroll.setAttribute('role','region');
+    scroll.setAttribute('aria-label','Tu liguilla: desliza para ver las rondas siguientes');
+    scroll.append(boardEl);wrap.append(scroll);
     // Acciones
     if(open){
       const actions=el('div',null,'cam-lg-actions');
       const dirty=!same(draft,mine),who=viewer();
       const save=btn(!who?'Inicia sesión para guardar':saving?'Guardando…':'Guardar mi cuadro','cam-nfl-action cam-lg-save',saveBracket);
       save.disabled=!!who&&(saving||!dirty||!count(draft));
-      const share=btn('Compartir mi cuadro','cam-nfl-action cam-nfl-action-secondary cam-lg-share',e=>shareBracket(e.currentTarget));
+      const share=btn('Compartir mi liguilla','cam-nfl-action cam-nfl-action-secondary cam-lg-share',e=>shareBracket(e.currentTarget));
       share.disabled=!done||dirty||!window.CamPickShare?.openBracket;
       const reset=btn('Empezar de nuevo','cam-lg-link',()=>{draft={semis:[null,null,null,null],finals:[null,null],champion:null};storeDraft();note='';render();});
       reset.disabled=!count(draft);
@@ -316,13 +339,13 @@
       else{
         const wrap=el('div',null,'cam-lg-table-wrap');wrap.setAttribute('role','region');wrap.setAttribute('aria-label','Clasificación de cuadros');wrap.tabIndex=0;
         const table=el('table',null,'cam-lg-table');
-        const head=el('tr');for(const h of ['#','Usuario','Campeón','Pts','En juego'])head.append(el('th',h));
+        const head=el('tr');for(const h of ['#','Usuario','Aciertos','Pts'])head.append(el('th',h));
         const thead=el('thead');thead.append(head);table.append(thead);
         const body=el('tbody');
         for(const r of board.slice(0,20)){
           const tr=el('tr');if(r.user_id===viewer()?.id)tr.className='is-me';
           tr.append(el('td',String(r.rank_position)),el('td','@'+String(r.username||'Aficionado').replace(/^@+/,'')),
-            el('td',r.champion_id?shortName(r.champion_id):'—'),el('td',String(r.points)),el('td',String(r.alive)));
+            el('td',String(r.hits??0)),el('td',String(r.points??0)));
           body.append(tr);
         }
         table.append(body);wrap.append(table);box.append(wrap);
@@ -573,10 +596,12 @@
     const snap=api()?.snapshot?.();
     if(!snap||snap.competition!=='ligamx'){hide();return;}
     const admin=isAdmin();
-    if(!state&&!admin&&!loadError){hide();return;}
+    const complete=!!state&&series('final').length>0&&series('final').every(s=>s.status==='decided');
+    section.dataset.complete=String(complete);
     section.hidden=false;
     const focusKey=document.activeElement&&section.contains(document.activeElement)?keyOf(document.activeElement):null;
     const parts=[];
+    if(!state)parts.push(pendingPanel());
     if(loadError)parts.push(el('p',loadError,'cam-lg-note is-error'));
     if(state){
       parts.push(bracketPanel());
@@ -584,7 +609,13 @@
       if(!isOpen())parts.push(message());
     }
     if(admin&&(!state||(isOpen()&&!Number(state.players||0))))parts.push(adminPanel());
-    section.replaceChildren(...parts);
+    if(complete){
+      const archive=el('details',null,'cam-lg-archive');
+      archive.append(el('summary','Liguilla · '+(L().name||'Liga MX')+' · Mi cuadro y resultados'),...parts);
+      section.replaceChildren(archive);
+    }else section.replaceChildren(...parts);
+    place(complete);
+    if(!complete)window.camFootballSemana?.render?.();
     // Durante la liguilla, la ronda reemplaza a la lista de la jornada (mismos partidos).
     const legs=allLegIds(),round=snap.games||[];
     quiniela.classList.toggle('cam-liguilla-round',!!state&&round.length>0&&round.every(g=>legs.has(g.id)));

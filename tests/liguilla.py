@@ -224,7 +224,7 @@ def run():
     # 1) Teléfono de día: armar, guardar y compartir el cuadro.
     with fp.full_page(fake_js=fake('open'), width=390, height=900) as page:
         open_liga_mx(page)
-        assert page.locator('#camLiguilla').is_visible(), 'no se ve la liguilla'
+        assert page.locator('#camFootballSemana #camLiguilla').is_visible(), 'la liguilla debe estar dentro de La semana'
         assert page.locator('#camLiguilla .cam-lg-round').nth(0).locator('.cam-lg-team').count() == 8
         assert page.locator('#camLiguilla .cam-lg-wait').count() >= 2
         build_bracket(page)
@@ -291,7 +291,8 @@ def run():
     # 4) Administración: abrir «Tu liguilla» con la tabla de ESPN.
     with fp.full_page(fake_js=fake('none'), width=390, height=900) as page:
         open_liga_mx(page)
-        assert page.locator('#camLiguilla').is_hidden(), 'sin liguilla y sin admin no se enseña nada'
+        assert page.locator('#camLiguilla').is_visible(), 'sin equipos oficiales debe aparecer estado pendiente'
+        assert 'Cruces por confirmar' in page.locator('#camLiguilla').inner_text()
         page.evaluate("() => { currentAdmin = {id:'u-1'}; window.dispatchEvent(new Event('cam:admin-state-change')); }")
         page.wait_for_timeout(200)
         page.locator('#camLiguilla .cam-lg-admin .cam-nfl-action').first.click()
