@@ -6,7 +6,9 @@
 (() => {
   'use strict';
   const quiniela=document.getElementById('camFootballQuiniela');
-  if(!quiniela||window.camLiguilla)return;
+  // Un elemento con id=camLiguilla aparece como window.camLiguilla en el navegador;
+  // solo una API ya inicializada (no ese elemento) debe impedir cargar el módulo.
+  if(!quiniela||(window.camLiguilla&&typeof window.camLiguilla.refresh==='function'))return;
 
   const client=()=>{try{return typeof db!=='undefined'?db:window.db;}catch{return null;}};
   const api=()=>window.camFootballQuiniela;
