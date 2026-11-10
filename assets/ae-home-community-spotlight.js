@@ -224,6 +224,7 @@
       for(const list of target.querySelectorAll('[data-community-scroll]')){
         list.scrollTop=positions.get(list.dataset.communityScroll)||0;
       }
+      document.dispatchEvent(new Event('cam:community-updated'));
       scheduleCommunityFit();
     }catch{
       if(request===communityRequest)target.replaceChildren(node('p','No pudimos cargar los comentarios destacados. Volveremos a intentarlo.','ae-community-empty'));

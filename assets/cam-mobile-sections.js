@@ -35,19 +35,19 @@
   // Which tab owns each part (kept in step with the CSS hiding rules).
   const OWNERS = {
     sport: {
-      noticias: '#nflRankings, #championsRankings, #heroSection, #aeNewsHeadingRow, #aeSportLatestNews, #articlesGrid, #aeSportAllNewsFooter, #aeMoreNews, #aeNflLatestComments, #mainContent > .editorial-layout, #aeFootballMobileStage > .editorial-trending',
+      noticias: '#nflRankings, #championsRankings, #heroSection, #aeNewsHeadingRow, #aeSportLatestNews, #articlesGrid, #aeSportAllNewsFooter, #camSportNewsCommunity, #aeMoreNews, #aeNflLatestComments, #mainContent > .editorial-layout, #aeFootballMobileStage > .editorial-trending',
       quiniela: '#camNflQuiniela, #camFootballQuiniela, #aeSeasonPredictions',
       takes: '#freeTakes'
     },
     // La quiniela vive dentro de #freeTakes; el ranking completo encabeza Noticias.
     nfl: {
       semana: '#camNflSemana, #camNflQuiniela, #camNflScore, #aeSeasonPredictions',
-      noticias: '#nflRankings, #heroSection, #aeNewsHeadingRow, #aeSportLatestNews, #articlesGrid, #aeSportAllNewsFooter, #aeMoreNews, #aeNflLatestComments, #mainContent > .editorial-layout',
+      noticias: '#nflRankings, #heroSection, #aeNewsHeadingRow, #aeSportLatestNews, #articlesGrid, #aeSportAllNewsFooter, #camSportNewsCommunity, #aeMoreNews, #aeNflLatestComments, #mainContent > .editorial-layout',
       takes: '#freeTakes'
     },
     football: {
       semana: '#camFootballSemana, #camFootballQuiniela, #camFootballScore, #aeSeasonPredictions',
-      noticias: '#championsRankings, #heroSection, #aeNewsHeadingRow, #aeSportLatestNews, #articlesGrid, #aeSportAllNewsFooter, #aeMoreNews, #mainContent > .editorial-layout, #aeFootballMobileStage > .editorial-trending',
+      noticias: '#championsRankings, #heroSection, #aeNewsHeadingRow, #aeSportLatestNews, #articlesGrid, #aeSportAllNewsFooter, #camSportNewsCommunity, #aeMoreNews, #mainContent > .editorial-layout, #aeFootballMobileStage > .editorial-trending',
       takes: '#freeTakes'
     },
     picks: {

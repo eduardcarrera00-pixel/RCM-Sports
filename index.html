@@ -3050,6 +3050,17 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
                     <!-- Cards JS Injected -->
                 </section>
                 <div id="aeSportAllNewsFooter" class="ae-sport-news-footer" hidden></div>
+                <div id="camSportNewsCommunity" hidden aria-label="Conversaciones de este deporte">
+                  <section aria-labelledby="camSportDebatedTitle">
+                    <header class="cam-snc-heading"><h2 id="camSportDebatedTitle">Lo más debatido</h2></header>
+                    <div id="camSportDebatedList" aria-live="polite"></div>
+                  </section>
+                  <section aria-labelledby="camSportLeadersTitle">
+                    <header class="cam-snc-heading"><h2 id="camSportLeadersTitle">Opinadores distinguidos</h2></header>
+                    <div id="camSportLeadersList" aria-live="polite"></div>
+                  </section>
+                  <p id="camSportCommunityStatus" role="status" aria-live="polite"></p>
+                </div>
                 <div id="aeHomeAllNewsActions" class="ae-home-news-actions" hidden>
                   <button id="aeHomeAllNewsButton" type="button" class="ae-news-all-button" data-ae-news-category="Todas" aria-label="Abrir todas las noticias de CAM SPORTS">
                     Todas las noticias <span aria-hidden="true">→</span>
@@ -5754,7 +5765,7 @@ updateThemeButton();
 <script src="assets/cam-nfl-quiniela-logos.js?v=20261022-integration-1"></script>
 <script src="assets/cam-article-seo.js?v=20261105-link-preview-2"></script>
 <script src="assets/community.js?v=20261110-navigation-loading-1"></script>
-<script src="assets/ae-home-community-spotlight.js?v=20261109-calm-unity-1"></script>
+<script src="assets/ae-home-community-spotlight.js?v=20261110-sport-conversations-1"></script>
 <script src="assets/champions.js?v=20261110-branded-loading-1"></script>
 <script src="assets/ae-ranking-notes.js?v=20261105-resume-motion-1"></script>
 <script src="assets/ae-pick-capture.js?v=20261104-apuesta-real-1"></script>
@@ -6680,7 +6691,7 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 </style>
 
 <!-- Componentes finales: móvil, conversación, parties, perfil y Takes; orden en performance-css-packs.json. -->
-<link rel="stylesheet" href="assets/cam-perf-app-panels.css?v=20261110-home-takes-carousel-1">
+<link rel="stylesheet" href="assets/cam-perf-app-panels.css?v=20261110-home-takes-carousel-2">
 <script src="assets/cam-parties.js?v=20261110-section-entrance-only-1"></script>
 <script src="assets/cam-sport-quiniela-loader.js?v=20261110-cuadro-previo-2"></script>
 <script src="assets/ae-season-predictions.js?v=20261021-champion-guide-1"></script>
@@ -6698,12 +6709,12 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 <script src="assets/cam-admin-news-editor-loader.js?v=20261024-lazy-1"></script>
 
 <script src="assets/ae-mobile-compact-home.js?v=20261016-top3-swipe-v1"></script>
-<script src="assets/ae-football-mobile-redesign.js?v=20261109-desktop-continuous-1"></script>
+<script src="assets/ae-football-mobile-redesign.js?v=20261110-sport-conversations-1"></script>
 <script src="assets/ae-home-weekly-layout.js?v=20261109-escritorio-4"></script>
 <script src="assets/ae-notifications.js?v=20261109-rango-avisos-1"></script>
 <script src="assets/cam-analytics.js?v=20261026-sin-robots"></script>
 <!-- Pestañas dentro de NFL, Fútbol y Picks, y una dirección por sección (?s=nfl&v=quiniela); desde el 8 nov también en escritorio. -->
-<script src="assets/cam-mobile-sections.js?v=20261110-section-entrance-only-1"></script>
+<script src="assets/cam-mobile-sections.js?v=20261110-sport-conversations-1"></script>
 <!-- Inicio como «Tu jornada» (3 nov, teléfono; desde el 8 nov también en escritorio con tira, rejillas y carriles). -->
 <script src="assets/cam-home-jornada.js?v=20261110-home-takes-carousel-1"></script>
 <!-- NFL y Fútbol · La semana (4 nov, teléfono; desde el 8 nov también en escritorio, en columnas). Power Rankings en Noticias. -->
@@ -6711,6 +6722,7 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 <script src="assets/cam-football-semana.js?v=20261110-mis-8-1"></script>
 <!-- Escritorio: páginas completas de NFL/Fútbol y dos columnas de contenido real. El teléfono conserva sus pestañas. -->
 <script defer src="assets/cam-escritorio.js?v=20261110-desktop-shortcuts-1"></script>
+<script defer src="assets/cam-sport-news-community.js?v=20261110-sport-conversations-1"></script>
 
 <script id="ae-home-news-carousel-motion">
 /* Movimiento ligero y reversible: sin clones, sin alterar enlaces, votos o artículos. */
