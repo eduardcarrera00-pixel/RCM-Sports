@@ -128,7 +128,7 @@ try{sessionStorage.setItem('cam_sports_home_welcome_seen_session_v1','1')}catch(
   // Paso 1: los 18 de la tabla. 1-4 ya clasificados, 5-12 en juego, 13-18 eliminados.
   const PRE = MODE === 'none' || MODE === 'q8closed';
   const CAND = TEAMS.concat(EXTRA).map(([id,name,abbr], i) => ({team_id:id, name, short_name:name.replace('Atlético de ','Atl. '),
-    abbreviation:abbr, logo:null, rank:i+1, played:16, points:36-2*i, goal_diff:14-2*i, status: i<4?'in':i<12?'alive':'out'}));
+    abbreviation:abbr, logo:'data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><circle cx="20" cy="20" r="18" fill="hsl('+(i*47%%360)+' 55%% 48%%)" stroke="#fff" stroke-width="3"/></svg>'), rank:i+1, played:16, points:36-2*i, goal_diff:14-2*i, status: i<4?'in':i<12?'alive':'out'}));
   f.q8 = MODE === 'q8closed' ? ids.slice(0,7).concat(['220']) : null;
   const win = () => ({id:3, competition:'ligamx', season, name:'Apertura '+season,
     closes_at: new Date(MODE === 'q8closed' ? now - H : now + 3*D).toISOString(),
@@ -375,6 +375,19 @@ def run():
         assert 'Ya eliminados:' in root.inner_text() and 'Atlas' in root.locator('.cam-lg-hint').first.inner_text()
         assert root.locator('.cam-lg-q8-team[data-team="216"]').count() == 0, 'un eliminado no se puede elegir'
         assert root.locator('.cam-lg-q8-status.is-in').count() == 4, 'los ya clasificados llevan su etiqueta'
+        # Paso 2: vista previa del cuadro con los 8 primeros de hoy, de cuartos al trofeo, y «Próximamente».
+        pv = root.locator('.cam-lg-q8-next .cam-lg-pv')
+        assert pv.count() == 1, 'falta la vista previa del cuadro'
+        seeds = pv.locator('.cam-lg-pv-seed').evaluate_all('n => n.map(x => x.textContent)')
+        assert seeds == ['1', '8', '4', '5', '2', '7', '3', '6'], seeds
+        abbrs = pv.locator('.cam-lg-pv-abbr').evaluate_all('n => n.map(x => x.textContent)')
+        assert abbrs == ['CAZ', 'PAC', 'TOL', 'ASL', 'AME', 'LEO', 'GDL', 'SAN'], abbrs
+        assert 'Próximamente' in pv.locator('.cam-lg-pv-soon').inner_text()
+        assert pv.locator('.cam-lg-pv-cup svg').count() == 1, 'falta el trofeo'
+        assert '1.º Cruz Azul contra 8.º Pachuca' in pv.locator('[role="img"]').get_attribute('aria-label')
+        assert 'tabla de hoy' in pv.locator('figcaption').inner_text()
+        assert root.locator('.cam-lg-how li').count() == 3, 'Tu cuadro se explica en tres líneas'
+        assert pv.locator('button').count() == 0, 'la vista previa no se puede tocar'
         save = root.locator('.cam-lg-q8-save')
         assert save.is_disabled()
         for team in ['218', '227', '219', '223', '15720', '225', '228']:
@@ -423,6 +436,13 @@ def run():
                 page.locator('#camLiguilla .cam-lg-q8-team[data-team="%s"]' % team).click()
             problems = layout_problems(page)
             assert not problems, 'mis 8 %d %s: %s' % (width, 'noche' if dark else 'día', problems)
+            # El aviso «Próximamente» no tapa los cuartos, el trofeo ni «Campeón».
+            overlap = page.evaluate("""() => {
+              const q = s => document.querySelector('#camLiguilla .cam-lg-pv ' + s).getBoundingClientRect();
+              const soon = q('.cam-lg-pv-soon'), hit = (a, b) => a.left < b.right - 1 && b.left < a.right - 1 && a.top < b.bottom - 1 && b.top < a.bottom - 1;
+              return ['.cam-lg-pv-col.is-qf', '.cam-lg-pv-cup', '.cam-lg-pv-champ', '.cam-lg-pv-cell .cam-lg-pv-match'].filter(s => hit(soon, q(s)));
+            }""")
+            assert not overlap, 'mis 8 %d: el aviso tapa %s' % (width, overlap)
             if width == 1366:
                 cols, wide = page.evaluate("() => [getComputedStyle(document.querySelector('#camLiguilla .cam-lg-q8-list')).gridTemplateColumns.split(' ').length,"
                     " document.querySelector('#camLiguilla .cam-lg-bracket').clientWidth]")
