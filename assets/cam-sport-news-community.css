@@ -1,0 +1,74 @@
+/* Below-news conversations share the site's reading palette in both sports. */
+@layer cam-display-clarity {
+  html body #camSportNewsCommunity {
+    display:grid;
+    gap:28px;
+    min-width:0;
+    margin:28px 0 0;
+    color:var(--cam-calm-ink);
+    font:400 14px/1.55 Inter,system-ui,sans-serif;
+  }
+  html body #camSportNewsCommunity[hidden],
+  html body #camSportNewsCommunity [hidden],
+  html body[data-cam-tabs="sport"]:not([data-cam-tab="noticias"]) #camSportNewsCommunity { display:none!important; }
+  #camSportNewsCommunity > section { min-width:0; }
+  #camSportNewsCommunity .cam-snc-heading {
+    margin:0 0 16px;
+    padding:16px 20px;
+    border:1px solid var(--cam-calm-line);
+    border-radius:var(--cam-calm-radius);
+    background:var(--cam-calm-soft);
+  }
+  #camSportNewsCommunity h2 {
+    margin:0;
+    font:600 clamp(21px,2vw,27px)/1.3 "Playfair Display",Georgia,serif;
+  }
+  #camSportNewsCommunity h3 {
+    margin:0 0 12px;
+    font:600 17px/1.4 "Libre Baskerville",Georgia,serif;
+  }
+  #camSportNewsCommunity :is(#camSportDebatedList,.cam-snc-leaders-group) { display:grid; gap:12px; align-content:start; min-width:0; }
+  #camSportNewsCommunity #camSportLeadersList { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; }
+  #camSportNewsCommunity .cam-snc-card {
+    position:relative;
+    min-width:0;
+    padding:16px;
+    border:1px solid var(--cam-calm-line);
+    border-radius:var(--cam-calm-radius);
+    background:var(--cam-calm-surface);
+  }
+  #camSportNewsCommunity h4 { margin:0; font:600 18px/1.4 "Playfair Display",Georgia,serif; overflow-wrap:anywhere; }
+  #camSportNewsCommunity :is(button,a) { color:inherit; cursor:pointer; }
+  #camSportNewsCommunity button { border:0; background:none; font:inherit; }
+  #camSportNewsCommunity :is(button,a):focus-visible { outline:3px solid var(--cam-calm-action); outline-offset:3px; }
+  #camSportNewsCommunity .cam-snc-open { display:block; padding:0; text-align:left; text-decoration:none; }
+  #camSportNewsCommunity .cam-snc-open:hover { text-decoration:underline; text-underline-offset:4px; }
+  #camSportNewsCommunity .cam-snc-author { display:inline-flex; align-items:center; min-height:44px; padding:4px 0; color:var(--cam-calm-muted); font-size:12px; overflow-wrap:anywhere; }
+  #camSportNewsCommunity .cam-snc-excerpt {
+    display:-webkit-box;
+    -webkit-box-orient:vertical;
+    -webkit-line-clamp:3;
+    overflow:hidden;
+    margin:0 0 12px;
+    padding:0;
+    border:0;
+    color:var(--cam-calm-muted);
+    font:400 14px/1.6 Inter,system-ui,sans-serif;
+    white-space:pre-line;
+    overflow-wrap:anywhere;
+  }
+  #camSportNewsCommunity .cam-snc-rank { display:block; margin:0 0 6px; color:var(--cam-calm-action); font:600 12px/1.4 Inter,system-ui,sans-serif; }
+  #camSportNewsCommunity .cam-snc-actions { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; border-top:1px solid var(--cam-calm-line); padding-top:8px; }
+  #camSportNewsCommunity .cam-snc-votes { display:flex; gap:8px; }
+  #camSportNewsCommunity .cam-snc-votes button { min-width:44px; min-height:44px; padding:6px; border:1px solid var(--cam-calm-line); border-radius:8px; font-size:12px; }
+  #camSportNewsCommunity .cam-snc-votes [data-direction="1"] { color:var(--cam-calm-up); }
+  #camSportNewsCommunity .cam-snc-votes [data-direction="-1"] { color:var(--cam-calm-down); }
+  #camSportNewsCommunity .cam-snc-votes [aria-pressed="true"] { background:var(--cam-calm-soft); border-color:currentColor; }
+  #camSportNewsCommunity button:disabled { opacity:.55; cursor:progress; }
+  #camSportNewsCommunity :is(.cam-snc-reply,.cam-snc-more) { min-height:44px; padding:6px 0; color:var(--cam-calm-action); font-size:12px; font-weight:600; text-align:left; }
+  #camSportNewsCommunity .cam-snc-empty { margin:0; color:var(--cam-calm-muted); font-size:13px; }
+  #camSportCommunityStatus:empty { display:none; }
+  @media(max-width:620px) {
+    #camSportNewsCommunity #camSportLeadersList { grid-template-columns:minmax(0,1fr); gap:24px; }
+  }
+}

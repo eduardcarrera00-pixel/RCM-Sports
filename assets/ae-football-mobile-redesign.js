@@ -115,6 +115,7 @@
       moveTo(grid, stage);
       // The same footer follows the mobile news grid.
       moveTo(byId('aeSportAllNewsFooter'), stage);
+      moveTo(byId('camSportNewsCommunity'), stage);
       moveTo(byId('freeTakes'), stage);
       // El bloque real de opiniones se muestra debajo de "Demuestra tu
       // conocimiento" y antes de los últimos Takes; nunca en la barra lateral.
@@ -127,7 +128,7 @@
         footballFeed.insertBefore(leaders,before);
       }
       moveTo(byId('aeNflLatestComments'), stage);
-      // Opinadores distinguidos pertenece a la portada, no a Fútbol móvil.
+      // Los destacados globales conservan su ubicación; el bloque de noticias tiene sus propios datos de Fútbol.
       const trending = document.querySelector('.editorial-trending');
       moveTo(trending, stage);
       if (trending) trending.hidden = false;
