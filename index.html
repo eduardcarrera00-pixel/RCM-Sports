@@ -310,7 +310,50 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
 <link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261110-liguilla-1">
-<link rel="stylesheet" href="assets/cam-liguilla-week.css?v=20261109-week-first-1">
+<style id="cam-liguilla-week-styles">
+/* Integración de la Liguilla existente en Fútbol → La semana */
+#camFootballSemana #camLiguilla{width:100%;max-width:none;min-width:0;grid-area:liguilla;gap:0;margin:0 0 14px}
+#camLiguilla .cam-lg-bracket+.cam-lg-rounds{border-top:0}
+#camLiguilla .cam-lg-board-scroll{max-width:100%;min-width:0;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;scrollbar-color:var(--q-edge) transparent;overscroll-behavior-inline:contain;padding-bottom:8px}
+#camLiguilla .cam-lg-board{display:grid;grid-template-columns:repeat(3,minmax(218px,1fr)) minmax(176px,.82fr);gap:18px;align-items:center;min-width:888px}
+#camLiguilla .cam-lg-round{position:relative;min-width:0}
+#camLiguilla .cam-lg-round::after{content:"";position:absolute;top:51%;right:-18px;width:18px;height:1px;background:var(--q-ornament);pointer-events:none}
+#camLiguilla .cam-lg-pending-board{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+#camLiguilla .cam-lg-pending-stage{display:grid;gap:8px;min-width:0}
+#camLiguilla .cam-lg-pending-slot{display:flex;align-items:center;justify-content:center;min-height:74px;padding:12px;background:var(--q-panel);border:1px dashed var(--q-line);color:var(--q-meta);font-size:13px}
+#camLiguilla .cam-lg-table{min-width:340px}
+#camLiguilla .cam-lg-table :is(th,td):nth-child(n+3){text-align:right}
+#camLiguilla .cam-lg-rail-btn>span{display:none}
+#camLiguilla .cam-lg-stage{gap:8px}
+#camLiguilla .cam-lg-archive{padding:14px 18px;background:var(--q-card);border:1px solid var(--q-line)}
+#camLiguilla .cam-lg-archive>summary{cursor:pointer;color:var(--q-ink);font-weight:650;min-height:40px;align-content:center}
+#camLiguilla .cam-lg-archive[open]{display:grid;gap:12px}
+@container (min-width:960px){#camLiguilla .cam-lg-board{min-width:0;grid-template-columns:1.2fr 1fr 1fr .8fr}}
+@media(max-width:760px){
+  #camLiguilla .cam-lg-board-scroll{margin-right:-10px;padding-right:10px}
+  #camLiguilla .cam-lg-board{grid-template-columns:repeat(3,230px) 178px;min-width:922px;gap:16px}
+  #camLiguilla .cam-lg-pending-board{grid-template-columns:repeat(4,164px);overflow-x:auto;padding-bottom:8px}
+}
+@media(min-width:900px){
+  html body[data-cam-desk][data-cam-tabs="sport"][data-cam-tab="semana"].ae-is-football #freeTakes:has(#camLiguilla:not([hidden])){
+    grid-template-areas:"head head" "rail rail" "liguilla liguilla" "live live" "duel score" "quin quin"!important;
+  }
+  html body[data-cam-desk][data-cam-tabs="sport"][data-cam-tab="semana"].ae-is-football #freeTakes:has(#camLiguilla:not([hidden])):not(:has(.cam-ns-live)){
+    grid-template-areas:"head head" "rail rail" "liguilla liguilla" "duel score" "quin quin"!important;
+  }
+  html body[data-cam-desk][data-cam-tab="semana"].ae-is-football #camLiguilla:not([hidden]){grid-area:liguilla!important;min-width:0}
+}
+@media(min-width:1250px){
+  #camLiguilla .cam-lg-bracket{grid-template-columns:minmax(0,1fr) minmax(228px,270px);align-items:start;column-gap:22px}
+  #camLiguilla .cam-lg-bracket>.cam-lg-head{grid-column:1/-1}
+  #camLiguilla .cam-lg-bracket>.cam-lg-board-scroll{grid-column:1;grid-row:2 / span 4}
+  #camLiguilla .cam-lg-bracket>.cam-lg-ranking{grid-column:2;grid-row:2}
+  #camLiguilla .cam-lg-bracket>:not(.cam-lg-head):not(.cam-lg-board-scroll):not(.cam-lg-ranking){grid-column:1}
+  #camLiguilla .cam-lg-board{min-width:750px;grid-template-columns:repeat(3,minmax(170px,1fr)) minmax(138px,.75fr)}
+}
+@media(prefers-reduced-motion:reduce){#camLiguilla .cam-lg-board-scroll{scroll-behavior:auto}}
+
+</style>
 <script defer src="assets/ae-nfl-mobile-telephoto.js?v=20261016-1"></script>
 <link rel="stylesheet" href="assets/cam-perf-sport-banners.css?v=20261104-css-consolidated-1">
 <style id="ae-opinions-reused-home-panels">
