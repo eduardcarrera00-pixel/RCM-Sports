@@ -3028,7 +3028,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
           <button id="aeFootballMoreTakes" type="button" class="ae-football-mobile-cta" aria-controls="freeTakesFeed" aria-expanded="false">Ver todos los Takes <span aria-hidden="true">→</span></button>
           <button id="freeTakesMore" type="button" class="ae-history-more" hidden>Ver todos los Takes <span aria-hidden="true">→</span></button>
           <div id="aeNflTakeFooterCta" class="ae-nfl-take-footer" hidden></div>
-          <!-- NFL · La semana (4 nov 2026): primera pestaña de NFL en el teléfono (cam-nfl-semana.js). En escritorio no se ve. -->
+          <!-- NFL · La semana (4 nov 2026): La semana en móvil y en la página continua de escritorio (cam-nfl-semana.js). -->
           <section id="camNflSemana" class="cam-nfl-semana" aria-labelledby="camNflSemanaTitle">
             <div id="camNflSemanaBody" class="cam-ns-body" aria-live="polite"></div>
           </section>
@@ -6483,7 +6483,7 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 </style>
 
 <!-- Componentes finales: móvil, conversación, parties, perfil y Takes; orden en performance-css-packs.json. -->
-<link rel="stylesheet" href="assets/cam-perf-app-panels.css?v=20261109-calm-unity-2">
+<link rel="stylesheet" href="assets/cam-perf-app-panels.css?v=20261109-desktop-continuous-1">
 <script src="assets/cam-parties.js?v=20261104-perfil-claro-1"></script>
 <script src="assets/cam-sport-quiniela-loader.js?v=20261110-liguilla-1"></script>
 <script src="assets/ae-season-predictions.js?v=20261021-champion-guide-1"></script>
@@ -6501,19 +6501,19 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 <script src="assets/cam-admin-news-editor-loader.js?v=20261024-lazy-1"></script>
 
 <script src="assets/ae-mobile-compact-home.js?v=20261016-top3-swipe-v1"></script>
-<script src="assets/ae-football-mobile-redesign.js?v=20261109-text-clarity-1"></script>
+<script src="assets/ae-football-mobile-redesign.js?v=20261109-desktop-continuous-1"></script>
 <script src="assets/ae-home-weekly-layout.js?v=20261109-escritorio-4"></script>
 <script src="assets/ae-notifications.js?v=20261109-rango-avisos-1"></script>
 <script src="assets/cam-analytics.js?v=20261026-sin-robots"></script>
 <!-- Pestañas dentro de NFL, Fútbol y Picks, y una dirección por sección (?s=nfl&v=quiniela); desde el 8 nov también en escritorio. -->
-<script src="assets/cam-mobile-sections.js?v=20261109-picks-chefs-historial-1"></script>
+<script src="assets/cam-mobile-sections.js?v=20261109-desktop-continuous-1"></script>
 <!-- Inicio como «Tu jornada» (3 nov, teléfono; desde el 8 nov también en escritorio con tira, rejillas y carriles). -->
-<script src="assets/cam-home-jornada.js?v=20261109-calm-unity-1"></script>
+<script src="assets/cam-home-jornada.js?v=20261109-desktop-continuous-1"></script>
 <!-- NFL y Fútbol · La semana (4 nov, teléfono; desde el 8 nov también en escritorio, en columnas). Power Rankings en Noticias. -->
-<script src="assets/cam-nfl-semana.js?v=20261109-single-login-2"></script>
-<script src="assets/cam-football-semana.js?v=20261109-single-login-2"></script>
-<!-- Escritorio (8 nov): mismas secciones y pestañas que el teléfono, en columnas (cam-escritorio.css va en cam-perf-app-panels.css). -->
-<script defer src="assets/cam-escritorio.js?v=20261109-calm-unity-1"></script>
+<script src="assets/cam-nfl-semana.js?v=20261109-desktop-continuous-1"></script>
+<script src="assets/cam-football-semana.js?v=20261109-desktop-continuous-1"></script>
+<!-- Escritorio: páginas completas de NFL/Fútbol y dos columnas de contenido real. El teléfono conserva sus pestañas. -->
+<script defer src="assets/cam-escritorio.js?v=20261109-desktop-continuous-1"></script>
 
 <script id="ae-home-news-carousel-motion">
 /* Movimiento ligero y reversible: sin clones, sin alterar enlaces, votos o artículos. */

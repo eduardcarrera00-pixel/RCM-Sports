@@ -237,6 +237,7 @@
   }
 
   function place() {
+    if (root.closest('#camDeskLayout')) return;
     const tabs = document.getElementById('camSectionTabs');
     if (tabs && tabs.parentNode === main) { if (tabs.nextSibling !== root) tabs.after(root); }
     else if (main.firstChild !== root) main.prepend(root);

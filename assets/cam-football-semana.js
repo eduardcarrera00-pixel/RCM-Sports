@@ -197,7 +197,7 @@
   new MutationObserver(schedule).observe(document.body,{attributes:true,attributeFilter:['class']});
   window.camFootballSemana=Object.freeze({render,_choose:chooseDuel});schedule();
   function refreshLive(){
-    if(active()&&!document.hidden&&document.body.dataset.camTab==='semana'&&ui.liveOpen)
+    if(active()&&!document.hidden&&(document.body.dataset.camTab==='semana'||document.body.dataset.camSportPage)&&ui.liveOpen)
       void q()?.refreshLive?.();
   }
   setInterval(refreshLive,60000);

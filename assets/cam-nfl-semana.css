@@ -1,6 +1,6 @@
 /* CAM SPORTS · NFL y Fútbol «La semana» (4 nov 2026).
    1. La sección :is(#camNflSemana,#camNflScore,#camFootballSemana,#camFootballScore): en la pestaña La semana de
-      NFL y Fútbol (body[data-cam-section][data-cam-tab="semana"], que pone
+      NFL y Fútbol (body[data-cam-section]:is([data-cam-tab="semana"],[data-cam-sport-page]), que pone
       cam-mobile-sections.js). Desde el 8 nov 2026 también en escritorio, donde
       cam-escritorio.css la compone en columnas. Los Power
       Rankings viven en Noticias, con su diseño de siempre.
@@ -14,8 +14,8 @@
   html body :is(#camNflSemana,#camNflScore,#camFootballSemana,#camFootballScore) { display:none!important; }
 
   /* 8 nov 2026: en todos los anchos; en escritorio cam-escritorio.css (capa cam-header) la compone en columnas. */
-    html body[data-cam-section="nfl"][data-cam-tab="semana"] :is(#camNflSemana,#camNflScore),
-    html body[data-cam-section="futbol"][data-cam-tab="semana"] :is(#camFootballSemana,#camFootballScore) {
+    html body[data-cam-section="nfl"]:is([data-cam-tab="semana"],[data-cam-sport-page]) :is(#camNflSemana,#camNflScore),
+    html body[data-cam-section="futbol"]:is([data-cam-tab="semana"],[data-cam-sport-page]) :is(#camFootballSemana,#camFootballScore) {
       --ns-card:#fffdf9;
       --ns-soft:#f4ece0;
       --ns-ink:#13324d;
@@ -38,8 +38,8 @@
       font:400 14px/1.45 Inter,system-ui,sans-serif!important;
       text-align:left!important;
     }
-    html.dark body[data-cam-section="nfl"][data-cam-tab="semana"] :is(#camNflSemana,#camNflScore),
-    html.dark body[data-cam-section="futbol"][data-cam-tab="semana"] :is(#camFootballSemana,#camFootballScore) {
+    html.dark body[data-cam-section="nfl"]:is([data-cam-tab="semana"],[data-cam-sport-page]) :is(#camNflSemana,#camNflScore),
+    html.dark body[data-cam-section="futbol"]:is([data-cam-tab="semana"],[data-cam-sport-page]) :is(#camFootballSemana,#camFootballScore) {
       --ns-card:#11293d;
       --ns-soft:#163450;
       --ns-ink:#f6ecdf;
@@ -220,7 +220,7 @@
     html body #camFootballSemana .cam-ns-league-name { margin-top:6px!important; color:var(--ns-muted)!important; font:600 12px/1.4 Inter,system-ui,sans-serif!important; }
     html body #camFootballSemana .cam-ns-pick strong { font-size:12px!important; }
     html body :is(#camNflSemana,#camFootballSemana) .cam-ns-section-title { margin-bottom:10px!important; }
-    html body[data-cam-tabs="sport"][data-cam-tab="semana"] :is(#camNflScore,#camFootballScore):empty { display:none!important; }
+    html body[data-cam-tabs="sport"]:is([data-cam-tab="semana"],[data-cam-sport-page]) :is(#camNflScore,#camFootballScore):empty { display:none!important; }
 
     /* En juego: un único control compacto; la lista solo ocupa espacio al abrir. */
     html body :is(#camNflSemana,#camFootballSemana) .cam-ns-block.cam-ns-live { padding:0 14px!important; }

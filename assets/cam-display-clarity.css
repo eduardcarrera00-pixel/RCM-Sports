@@ -206,10 +206,6 @@ html body #aeProfileDialog .cam-ov-card { width:100%!important; max-width:none!i
 html body #aeProfileDialog .cam-ov-title { white-space:normal!important; -webkit-line-clamp:3!important; font-size:18px!important; line-height:1.35!important; }
 
 @media(min-width:761px) {
-  html body[data-cam-desk].ae-is-home #mainContent { --dk-pr:var(--dk-pad)!important; max-width:1120px!important; }
-  html body[data-cam-desk].ae-is-home #camDeskAside { position:static!important; width:100%!important; margin:24px 0 0!important; }
-  html body[data-cam-desk].ae-is-home #camDeskAside > .cam-desk-aside-in { position:static!important; }
-  html body[data-cam-desk].ae-is-home #camDeskAside .cam-desk-rankings-list { display:grid!important; grid-template-columns:repeat(2,minmax(0,1fr))!important; gap:24px!important; }
   html body[data-cam-tab="picks"] #footballTakes { grid-template-columns:minmax(0,1fr)!important; grid-template-rows:none!important; }
   html body[data-cam-tab="picks"] #communityPicks > .ae-chefs-dual-standings { display:none!important; }
   html body[data-cam-tab="picks"] #communityPicks > #camPartyEntryPicks { grid-column:1!important; grid-row:auto!important; }

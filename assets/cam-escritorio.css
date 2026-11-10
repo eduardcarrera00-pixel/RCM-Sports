@@ -872,3 +872,228 @@
     html body[data-cam-desk] #mainContent > nav#camSectionTabs > button.cam-section-tab::after { transition: none !important; }
   }
 }
+
+/* Desktop composition authority. The content columns stay in normal flow;
+   their independent heights never reserve empty rails or stretch card images. */
+@layer cam-display-clarity {
+  @media (min-width:761px) {
+    html body[data-cam-desk] #mainContent {
+      --dk-pad:28px;
+      --dk-aside:320px;
+      --dk-gap:32px;
+      --dk-pl:var(--dk-pad);
+      --dk-pr:var(--dk-pad);
+      width:100%!important;
+      max-width:1440px!important;
+      min-height:0!important;
+      margin-inline:auto!important;
+      padding:24px var(--dk-pad) 48px!important;
+    }
+    html body[data-cam-desk] #camDeskLayout {
+      display:grid!important;
+      grid-template-columns:minmax(0,1fr) var(--dk-aside)!important;
+      align-items:start!important;
+      gap:var(--dk-gap)!important;
+      width:100%!important;
+      min-width:0!important;
+      border-radius:0!important;
+    }
+    html body[data-cam-desk] #camDeskMain {
+      display:flex!important;
+      flex-direction:column!important;
+      min-width:0!important;
+      gap:32px!important;
+    }
+    html body[data-cam-desk] #camDeskMain > * {
+      width:100%!important;
+      min-width:0!important;
+      max-width:none!important;
+      margin:0!important;
+    }
+    html body[data-cam-desk] #camDeskAside {
+      position:sticky!important;
+      top:var(--cam-desk-aside-top,112px)!important;
+      inset:auto!important;
+      top:var(--cam-desk-aside-top,112px)!important;
+      width:100%!important;
+      min-width:0!important;
+      margin:0!important;
+      padding:0!important;
+    }
+    html body[data-cam-desk] #camDeskAside > .cam-desk-aside-in {
+      position:static!important;
+      display:flex!important;
+      flex-direction:column!important;
+      gap:28px!important;
+    }
+    html body[data-cam-desk] #camDeskAside > .cam-desk-aside-in > * { min-width:0!important; margin:0!important; }
+    html body[data-cam-desk] #mainContent [id] { scroll-margin-top:calc(var(--cam-desk-head,88px) + 24px)!important; }
+    html body[data-cam-desk] #camDeskRail { margin:0 0 16px!important; }
+
+    /* Home: an editorial lead and two useful secondary stories, rather than
+       a full-width photograph dictating the entire first screen's height. */
+    html body[data-cam-desk] #camHomeJornada { gap:32px!important; margin:0!important; }
+    html body[data-cam-desk] #camHomeJornada > .cam-hj-top { display:none!important; }
+    html body[data-cam-desk] #camHomeJornada .cam-hj-section[data-row="news"] .cam-hj-row {
+      display:grid!important;
+      grid-template-columns:repeat(2,minmax(0,1fr))!important;
+      gap:16px!important;
+      align-items:stretch!important;
+    }
+    html body[data-cam-desk] #camHomeJornada .cam-hj-section[data-row="news"] .cam-hj-item:first-child { grid-column:1 / -1!important; }
+    html body[data-cam-desk] #camHomeJornada .cam-hj-news { width:100%!important; min-width:0!important; }
+    html body[data-cam-desk] #camHomeJornada .cam-hj-news .cam-hj-news-open {
+      display:grid!important;
+      grid-template-columns:100px minmax(0,1fr)!important;
+      align-items:stretch!important;
+      flex:1 1 auto!important;
+      min-width:0!important;
+    }
+    html body[data-cam-desk] #camHomeJornada .cam-hj-news .cam-hj-media {
+      position:relative!important;
+      height:auto!important;
+      min-height:120px!important;
+      aspect-ratio:auto!important;
+      overflow:hidden!important;
+      border-radius:15px 0 0 0!important;
+    }
+    html body[data-cam-desk] #camHomeJornada .cam-hj-news .cam-hj-media img {
+      position:absolute!important;
+      inset:0!important;
+      width:100%!important;
+      height:100%!important;
+      object-fit:cover!important;
+    }
+    html body[data-cam-desk] #camHomeJornada .cam-hj-news .cam-hj-news-body { padding:16px!important; justify-content:center!important; }
+    html body[data-cam-desk] #camHomeJornada .cam-hj-news .cam-hj-card-title { font-size:18px!important; line-height:1.3!important; }
+    html body[data-cam-desk] #camHomeJornada .cam-hj-item:first-child > .cam-hj-news .cam-hj-news-open {
+      grid-template-columns:48% minmax(0,1fr)!important;
+      min-height:280px!important;
+    }
+    html body[data-cam-desk] #camHomeJornada .cam-hj-item:first-child > .cam-hj-news .cam-hj-media { min-height:280px!important; }
+    html body[data-cam-desk] #camHomeJornada .cam-hj-item:first-child > .cam-hj-news .cam-hj-news-body { padding:24px!important; gap:14px!important; }
+    html body[data-cam-desk] #camHomeJornada .cam-hj-item:first-child > .cam-hj-news .cam-hj-card-title { font-size:clamp(24px,2.1vw,32px)!important; -webkit-line-clamp:4!important; }
+    html body[data-cam-desk] #camHomeJornada .cam-hj-item:first-child > .cam-hj-news .cam-hj-news-summary { -webkit-line-clamp:3!important; line-clamp:3!important; }
+    html body[data-cam-desk] #camHomeJornada .cam-hj-section[data-row="jornada"] { padding:0!important; }
+    html body[data-cam-desk] #camHomeJornada .cam-hj-section[data-row="jornada"] .cam-hj-row {
+      display:grid!important;
+      grid-template-columns:repeat(2,minmax(0,1fr))!important;
+      gap:16px!important;
+    }
+    html body[data-cam-desk] #camHomeJornada .cam-hj-game { width:100%!important; min-height:184px!important; padding:20px!important; }
+    html body[data-cam-desk] #camHomeJornada .cam-hj-game .cam-hj-picks { gap:12px!important; }
+    html body[data-cam-desk] #camHomeJornada .cam-hj-section[data-row="takes"] .cam-hj-row,
+    html body[data-cam-desk] #camHomeJornada .ae-home-take-feature .ae-discovery-list { display:grid!important; grid-template-columns:repeat(2,minmax(0,1fr))!important; gap:16px!important; margin:0!important; padding:0!important; overflow:visible!important; }
+    html body[data-cam-desk] #camHomeJornada .cam-hj-take { min-height:220px!important; padding:20px!important; }
+    html body[data-cam-desk] #camHomeJornada .cam-hj-take .cam-hj-card-title { font-size:21px!important; -webkit-line-clamp:3!important; }
+    html body[data-cam-desk] #camHomeJornada .cam-hj-take .cam-hj-excerpt { -webkit-line-clamp:3!important; line-clamp:3!important; }
+    html body[data-cam-desk].ae-is-home #camDeskMain > .editorial-layout { display:flex!important; flex-direction:column!important; gap:28px!important; }
+    html body[data-cam-desk].ae-is-home #camDeskMain > .editorial-layout > * { width:100%!important; max-width:none!important; margin:0!important; }
+    html body[data-cam-desk].ae-is-home #camDeskMain :is(#aeNewsHeadingRow,#aeSportLatestNews,#articlesGrid,#aeSportAllNewsFooter,#aeHomeAllNewsActions,#noResults,#aeHomeTakesSectionHeading,#aeHomeSidebarFeatures,.editorial-community) { display:none!important; }
+    html body[data-cam-desk].ae-is-home #camDeskMain #aeHomeTopTakes .ae-top-takes-grid { grid-template-columns:repeat(2,minmax(0,1fr))!important; }
+
+    /* Sport pages: news, quiniela and Takes all remain available. The week and
+       the score column can repaint independently without stretching each other. */
+    html body[data-cam-sport-page] #mainContent > #camSectionTabs { display:none!important; }
+    html body[data-cam-sport-page] #camDeskMain > .editorial-layout { display:block!important; }
+    html body[data-cam-sport-page] #camDeskMain > .editorial-layout > div { width:100%!important; max-width:none!important; margin:0!important; }
+    html body[data-cam-sport-page] #camDeskMain > .editorial-layout > aside { display:none!important; }
+    html body[data-cam-sport-page] #camDeskMain > :is(#camNflSemana,#camFootballSemana) { display:block!important; }
+    html body[data-cam-sport-page] .cam-ns-head {
+      display:flex!important; align-items:center!important; justify-content:space-between!important;
+      flex-wrap:wrap!important; gap:16px!important; margin:0 0 18px!important; padding:0!important;
+    }
+    html body[data-cam-sport-page] .cam-ns-head .cam-ns-rule { display:none!important; }
+    html body[data-cam-sport-page] .cam-ns-head .cam-football-leagues { margin:0!important; width:auto!important; }
+    html body[data-cam-sport-page] .cam-ns-feature { margin:0!important; padding:24px!important; }
+    html body[data-cam-sport-page] .cam-ns-duel-name { font-size:30px!important; }
+    html body[data-cam-sport-page="nfl"] #camNflScore,
+    html body[data-cam-sport-page="futbol"] #camFootballScore { display:block!important; }
+    html body[data-cam-sport-page] :is(#camNflScore,#camFootballScore):empty { display:none!important; }
+    html body[data-cam-sport-page] #camDeskMain #freeTakes {
+      display:flex!important; flex-direction:column!important; gap:20px!important;
+      margin:0!important; padding:0!important; border:0!important; background:none!important; box-shadow:none!important;
+    }
+    html body[data-cam-sport-page] #camDeskMain #freeTakes > * { margin-block:0!important; }
+    html body[data-cam-sport-page] #freeTakesFeed {
+      display:grid!important; grid-template-columns:repeat(2,minmax(0,1fr))!important;
+      grid-auto-columns:auto!important; grid-auto-flow:row!important;
+      gap:20px!important; max-height:none!important; overflow:visible!important;
+    }
+    html body[data-cam-sport-page] #freeTakesFeed > .ae-free-take-card { width:auto!important; min-width:0!important; max-width:none!important; }
+    html body[data-cam-sport-page] :is(#camNflQuiniela,#camFootballQuiniela):not([hidden]) { width:100%!important; margin:0!important; }
+    html body[data-cam-sport-page] #aeNflTwinRankings:not([hidden]) { display:grid!important; grid-template-columns:repeat(2,minmax(0,1fr))!important; gap:20px!important; }
+    html body[data-cam-sport-page] #aeNewsHeadingRow { margin:0 0 16px!important; }
+    html body[data-cam-sport-page] #aeSportLatestNews .cam-sport-latest-card { min-height:280px!important; }
+    html body[data-cam-sport-page] #aeSportLatestNews .cam-sport-latest-copy { padding:24px!important; }
+    html body[data-cam-sport-page] #articlesGrid.ae-sport-news-carousel:not(.hidden):not([hidden]) {
+      display:grid!important; grid-template-columns:repeat(3,minmax(0,1fr))!important;
+      gap:18px!important; padding:0!important; overflow:visible!important;
+    }
+    html body[data-cam-sport-page] #articlesGrid.ae-sport-news-carousel > article {
+      width:auto!important; min-width:0!important; flex:none!important; max-width:none!important; margin:0!important;
+    }
+    html body[data-cam-sport-page] #articlesGrid > article .p-5 { padding:16px!important; }
+    html body[data-cam-sport-page] #articlesGrid > article h3 { font-size:19px!important; }
+    html body[data-cam-sport-page] #articlesGrid > article > div:first-child { height:150px!important; }
+    html body[data-cam-sport-page] #camDeskAside #aeSportTakeLeaders .ae-sport-takes-grid { display:grid!important; grid-template-columns:minmax(0,1fr)!important; gap:24px!important; }
+
+    /* The football news sidebar is the shared reference: artwork, thumbnails,
+       readable headlines, quiet separators and one frame per module. */
+    html body[data-cam-desk] #camDeskAside #aeTrendingPortada { display:block!important; border-radius:18px!important; overflow:hidden!important; border:1px solid var(--cam-calm-line)!important; background:var(--cam-calm-surface)!important; }
+    html body[data-cam-desk] #camDeskAside #aeTrendingPortada .ae-section-heading { padding:20px!important; min-height:88px!important; }
+    html body[data-cam-desk] #camDeskAside #aeTrendingPortada #trendingList { padding:0 18px!important; }
+    html body[data-cam-desk] #camDeskAside #aeTrendingPortada .ae-trending-link { align-items:center!important; gap:12px!important; padding:8px 0!important; }
+    html body[data-cam-desk] #camDeskAside #aeTrendingPortada .ae-trending-title { font:600 18px/1.3 "Playfair Display",Georgia,serif!important; -webkit-line-clamp:3!important; white-space:normal!important; }
+    html body[data-cam-desk] #camDeskAside #aeTrendingPortada .ae-trending-byline { display:none!important; }
+    html body[data-cam-desk] #camDeskAside #aeTrendingPortada .ae-trending-image { flex:0 0 64px!important; width:64px!important; height:64px!important; }
+
+    html body[data-cam-desk] #camDeskAside #aeTrendingPortada .ae-trending-item { background:transparent!important; }
+    html body[data-cam-desk] #camDeskAside #aeTrendingPortada .ae-trending-link {
+      display:flex!important; position:relative!important; flex-direction:row!important; justify-content:flex-start!important;
+      min-height:0!important; height:auto!important; aspect-ratio:auto!important;
+      background:none!important; isolation:auto!important; color:var(--cam-calm-ink)!important;
+    }
+    html body[data-cam-desk] #camDeskAside #aeTrendingPortada .ae-trending-link::after { display:none!important; }
+    html body[data-cam-desk] #camDeskAside #aeTrendingPortada .ae-trending-image { position:relative!important; inset:auto!important; z-index:auto!important; }
+    html body[data-cam-desk] #camDeskAside #aeTrendingPortada .ae-trending-story { display:flex!important; position:static!important; gap:6px!important; flex:1!important; min-width:0!important; }
+    html body[data-cam-desk] #camDeskAside #aeTrendingPortada .ae-trending-title { color:var(--cam-calm-ink)!important; }
+    html body[data-cam-desk] #camDeskAside #aeTrendingPortada .ae-trending-category { color:var(--cam-calm-action)!important; padding:0!important; border:0!important; background:none!important; }
+    html body[data-cam-desk] #camDeskAside #aeTrendingPortada .ae-trending-meta { position:static!important; align-self:flex-start!important; text-align:left!important; color:var(--cam-calm-muted)!important; }
+    html body[data-cam-sport-page] #camDeskAside :is(#camNflViewTabs,#camFootballViewTabs,.cam-ns-block,.cam-quiniela-ranking) { border-radius:16px!important; }
+    html body[data-cam-sport-page] #camDeskAside :is(#camNflViewTabs,#camFootballViewTabs) button { border-radius:12px!important; }
+    html body[data-cam-sport-page] #camDeskAside :is(#camNflScore,#camFootballScore) details { border-radius:12px!important; }
+
+    /* Actualidad retains its own two-column layout and generous lead. */
+    html body[data-cam-desk].ae-is-opinions #aeOpinions .ae-opinion-card.is-lead .ae-opinion-open { min-height:380px!important; }
+    html body[data-cam-desk].ae-is-opinions #aeOpinions .ae-opinion-card.is-lead .ae-opinion-title { font-size:clamp(30px,2.8vw,42px)!important; }
+    html body[data-cam-desk].ae-is-opinions #aeOpinions > #aeOpinionsList { margin-bottom:32px!important; }
+
+    /* Picks: the feed and its Chef standings share the desktop's full width. */
+    html body[data-cam-desk][data-cam-tab="picks"] #footballTakes {
+      display:grid!important; grid-template-columns:minmax(0,1fr) var(--dk-aside)!important;
+      grid-template-rows:repeat(14,auto) 1fr!important; gap:20px 32px!important;
+    }
+    html body[data-cam-desk][data-cam-tab="picks"] #footballTakes #communityPicks > .ae-chefs-dual-standings {
+      display:grid!important; grid-column:2!important; grid-row:2 / -1!important;
+      grid-template-columns:minmax(0,1fr)!important;
+    }
+    html body[data-cam-desk][data-cam-tab="picks"] #footballTakes #communityPicks > #camPartyEntryPicks { grid-column:2!important; grid-row:1!important; }
+  }
+  @media (min-width:1600px) {
+    html body[data-cam-desk] #mainContent { max-width:1560px!important; --dk-aside:350px; --dk-gap:40px; --dk-pad:32px; }
+    html body[data-cam-desk] #camHomeJornada .cam-hj-section[data-row="takes"] .cam-hj-row,
+    html body[data-cam-desk] #camHomeJornada .ae-home-take-feature .ae-discovery-list { grid-template-columns:repeat(3,minmax(0,1fr))!important; }
+  }
+  @media (min-width:761px) and (max-width:1100px) {
+    html body[data-cam-desk] #mainContent { --dk-pad:24px; --dk-aside:280px; --dk-gap:24px; }
+    html body[data-cam-sport-page] #articlesGrid.ae-sport-news-carousel:not(.hidden):not([hidden]) { grid-template-columns:repeat(2,minmax(0,1fr))!important; }
+  }
+  @media (min-width:761px) and (max-width:960px) {
+    html body[data-cam-desk] #camDeskLayout { grid-template-columns:minmax(0,1fr)!important; }
+    html body[data-cam-desk] #camDeskAside { position:static!important; }
+    html body[data-cam-desk] #camHomeJornada .cam-hj-section[data-row="takes"] .cam-hj-row { grid-template-columns:repeat(2,minmax(0,1fr))!important; }
+    html body[data-cam-desk][data-cam-tab="picks"] #footballTakes { display:flex!important; flex-direction:column!important; }
+    html body[data-cam-desk][data-cam-tab="picks"] #footballTakes #communityPicks { display:flex!important; }
+  }
+}

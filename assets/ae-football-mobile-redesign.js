@@ -81,6 +81,7 @@
   // No creamos un segundo ticker, un Top 10 modal ni controles de pausa.
 
   function compose() {
+    if (mobile.matches) window.camEscritorio?.restore?.();
     if (working) return;
     working = true;
     try {

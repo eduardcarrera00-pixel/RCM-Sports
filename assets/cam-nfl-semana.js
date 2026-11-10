@@ -396,7 +396,7 @@
 
   window.camNflSemana = Object.freeze({ render, _ui: ui, _choose: chooseDuel, _phase: phase });
   function refreshLive() {
-    if (active() && !document.hidden && document.body.dataset.camTab === 'semana' && ui.liveOpen)
+    if (active() && !document.hidden && (document.body.dataset.camTab === 'semana' || document.body.dataset.camSportPage) && ui.liveOpen)
       void quiniela()?.refreshLive?.();
   }
   setInterval(refreshLive, 60000);

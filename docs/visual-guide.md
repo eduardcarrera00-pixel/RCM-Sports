@@ -1,5 +1,28 @@
 # AE SPORTS · Guía visual v1
 
+### Escritorio como página completa · 9 nov 2026
+
+NFL y Fútbol ya no separan La semana, Takes y Noticias en tres pestañas del
+ordenador. Cada deporte muestra el duelo, noticias, Power Rankings, quiniela y
+Takes en una página continua, con clasificaciones, marcador, Lo más leído y
+Takes populares/impopulares a la derecha. El teléfono conserva sus pestañas.
+Las direcciones antiguas con `v=` siguen abriendo el módulo correspondiente.
+
+Inicio aprovecha el ancho con una noticia principal de altura estable, dos
+secundarias y Lo más leído al lado. Picks recupera sus clasificaciones de Chefs
+en la columna lateral; Actualidad mantiene sus dos columnas. El contenedor usa
+hasta 1440 px, o 1560 px en pantallas grandes, con una columna lateral de 320–350
+px. Las columnas tienen alturas independientes en el flujo normal, sin reservar
+espacio mediante posiciones absolutas ni alturas mínimas calculadas.
+
+`cam-escritorio.js` mueve los nodos reales con marcas de retorno y restaura su
+ubicación al cambiar de sección o tamaño. Los controladores, votos, formularios,
+datos y las composiciones del teléfono se conservan. La última sección de
+`cam-escritorio.css` es la autoridad de composición de escritorio dentro de la
+capa de lectura compartida. Pruebas: `npm run test:desktop`, `test:clarity`,
+`test:news-loading`, `test:mobile-nav` y `test:performance`; revisión adaptable de
+Inicio, NFL, Fútbol, Picks y Actualidad en día/noche y al pasar de móvil a escritorio.
+
 ### Calma y unidad de lectura · 9 nov 2026
 
 Todas las vistas comparten superficie, texto, separador, acento y jerarquía en

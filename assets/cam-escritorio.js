@@ -1,52 +1,30 @@
-/* CAM SPORTS · Escritorio (8 nov 2026).
-   El ordenador tiene las mismas secciones, pestañas y direcciones que el
-   teléfono (?s=…&v=…, cam-mobile-sections.js), con una composición pensada
-   para pantalla grande:
-     · cabecera: Inicio · NFL · Fútbol · Picks · Actualidad · Perfil (los
-       mismos botones; Inicio y Perfil son los de la barra del teléfono);
-     · sub-barra de pestañas fija bajo la cabecera (la misma #camSectionTabs);
-     · atajos opcionales en todas las secciones;
-     · una columna de lectura en Inicio; en deportes, hasta dos columnas;
-     · 761–1023 px: una columna (los destacados van al final).
-   No copia HTML ni lógica: los atajos son los de «Tu jornada» (se mueven al
-   carril y vuelven a su sitio en el teléfono) y el carril derecho muestra lo
-   que la página ya cargó (Power Rankings de #rankingList y #championsList).
-   Todo vuelve a su sitio al pasar a ≤ 760 px. Sin consultas a Supabase.
-   Estilos: cam-escritorio.css (paquete cam-perf-app-panels.css).
-   Fases: 1) navegación, rejilla e Inicio; 2) NFL y Fútbol; 3) Picks,
-   Actualidad y Perfil (ver la nota escritorio-secciones.md del proyecto). */
+/* CAM SPORTS · Desktop pages, 9 November 2026.
+   Two independent content columns reuse the live modules. NFL/Fútbol show the
+   week, news, rankings, quiniela and Takes together. Every moved node has a
+   return marker: routing and resizing restore the exact original nodes before
+   the phone composition takes over. No copies, data requests or inline heights. */
 (() => {
   'use strict';
-
   const main = document.getElementById('mainContent');
   const header = document.querySelector('body > header');
   if (!main || !header || !window.matchMedia) return;
-
   const mobile = window.matchMedia('(max-width: 760px), (orientation: landscape) and (max-height: 500px) and (hover: none) and (pointer: coarse)');
-  const wide = window.matchMedia('(min-width: 1280px)');
-  const medium = window.matchMedia('(min-width: 1024px)');
   const body = document.body;
-  const desk = () => !mobile.matches;
-
+  const byId = id => document.getElementById(id);
+  const category = () => { try { return typeof currentCategory === 'string' ? currentCategory : 'Todos'; } catch { return 'Todos'; } };
   function el(tag, text, className, attrs) {
     const node = document.createElement(tag);
     if (text != null) node.textContent = text;
     if (className) node.className = className;
-    if (attrs) for (const [k, v] of Object.entries(attrs)) if (v != null) node.setAttribute(k, v);
+    if (attrs) for (const [k,v] of Object.entries(attrs)) node.setAttribute(k,v);
     return node;
   }
-  const shown = node => !!node && node.isConnected && !node.hidden && node.getClientRects().length > 0;
-  const category = () => { try { return typeof currentCategory === 'string' ? currentCategory : 'Todos'; } catch { return 'Todos'; } };
-
-  /* ---------- Página actual: 'home', 'nfl:semana', 'futbol:takes', 'picks:chefs', 'opiniones'… ---------- */
   function page() {
     if (body.classList.contains('ae-is-home')) return 'home';
-    const now = window.camSectionTabs?.current?.();
-    if (now && now.section && now.tab) return now.section + ':' + now.tab;
+    if (body.dataset.camSportPage) return body.dataset.camSportPage;
     if (body.classList.contains('ae-is-opinions')) return 'opiniones';
-    return 'otra';
+    return window.camSectionTabs?.current?.().section || 'otra';
   }
-
   /* ---------- 1. Cabecera: Inicio y Perfil también en el ordenador ---------- */
   const nav = header.querySelector('nav.ae-sport-nav');
   const home = nav ? nav.querySelector('button.category-btn[data-category="Todos"]') : null;
@@ -115,282 +93,125 @@
     }
   }
 
-  /* ---------- 3. Carril derecho: qué lleva cada página ---------- */
-  // Power Rankings compactos (top 5) con las listas que la página ya pintó.
-  const rankings = el('details', null, 'cam-desk-panel cam-desk-rankings', { 'aria-labelledby': 'camDeskRankingsTitle' });
-  const rankingsList = el('div', null, 'cam-desk-rankings-list');
-  rankings.append(el('summary', 'Power Rankings', 'cam-desk-panel-title', { id: 'camDeskRankingsTitle' }), rankingsList);
-  function initials(name) {
-    return String(name || '?').split(/\s+/).filter(Boolean).map(s => s[0]).slice(0, 3).join('').toUpperCase();
-  }
-  function crest(src, text) {
-    const box = el('span', null, 'cam-desk-crest', { 'aria-hidden': 'true' });
-    box.append(el('span', text || '?', 'cam-desk-crest-text'));
-    if (src) {
-      const img = el('img', null, null, { alt: '', decoding: 'async', loading: 'lazy' });
-      img.addEventListener('error', () => img.remove());
-      img.src = src;
-      box.append(img);
-    }
-    return box;
-  }
-  function rankingCard(sport, listId, editionId, open) {
-    const items = [...(document.getElementById(listId)?.querySelectorAll('li.rcm-team') || [])].slice(0, 5);
-    if (!items.length) return null;
-    const label = sport === 'nfl' ? 'NFL' : 'Champions';
-    const edition = (document.getElementById(editionId)?.textContent || '').trim();
-    const card = el('button', null, 'cam-desk-rank-card', { type: 'button', 'data-sport': sport });
-    const top = el('span', null, 'cam-desk-rank-top');
-    top.append(el('span', label, 'cam-desk-rank-league'), el('span', edition, 'cam-desk-rank-edition'));
-    const list = el('span', null, 'cam-desk-rank-list');
-    for (const li of items) {
-      const line = el('span', null, 'cam-desk-rank');
-      const rank = li.dataset.rank || li.querySelector('strong')?.textContent || '';
-      const name = li.dataset.teamName || li.querySelector('.ae-team-name')?.textContent || '';
-      line.append(el('span', rank, 'cam-desk-rank-n'),
-        crest(li.querySelector('img')?.src, li.querySelector('.ae-logo-initials')?.textContent || initials(name)),
-        el('span', name, 'cam-desk-rank-name'));
-      // Solo los cambios (▲ ▼ Nuevo), como hacía Inicio en el teléfono.
-      const trend = li.querySelector('.ae-rank-trend');
-      const kind = trend && ['up', 'down', 'new'].find(k => trend.classList.contains('ae-rank-' + k));
-      if (kind) line.append(el('span', trend.textContent.trim(), 'cam-desk-trend is-' + kind, { 'aria-label': trend.getAttribute('aria-label') || '' }));
-      list.append(line);
-    }
-    card.append(top, list, el('span', 'Ver Top 10 ›', 'cam-desk-rank-cta'));
-    card.setAttribute('aria-label', 'Power Rankings ' + label + (edition ? ' ' + edition : '') + ': abrir el Top 10');
-    card.addEventListener('click', open);
-    return card;
-  }
-  function paintRankings() {
-    const cards = [
-      rankingCard('nfl', 'rankingList', 'rankingEdition', () => window.openNflTopTen?.()),
-      rankingCard('champions', 'championsList', 'championsEdition', () => window.openChampionsTopTen?.())
-    ].filter(Boolean);
-    rankingsList.replaceChildren(...cards);
-    rankings.hidden = cards.length === 0;
-  }
-  for (const id of ['rankingList', 'championsList']) {
-    const list = document.getElementById(id);
-    if (list) new MutationObserver(() => { if (asideFor === 'home') { paintRankings(); queue(); } }).observe(list, { childList: true });
-  }
 
-  // Módulos que ya existen y se prestan al carril derecho (vuelven a su sitio después).
-  const borrowed = new Map();   // nodo → comentario que marca su sitio
-  function borrow(node) {
-    if (!node || !node.parentNode) return null;
-    if (!borrowed.has(node)) {
-      const mark = document.createComment(' cam-escritorio: ' + (node.id || node.className || node.nodeName) + ' ');
-      node.parentNode.insertBefore(mark, node);
-      borrowed.set(node, mark);
-    }
-    return node;
-  }
-  function giveBack(node) {
-    const mark = borrowed.get(node);
-    borrowed.delete(node);
-    if (!mark) return;
-    // Si otro script ya se lo llevó (p. ej. Lo más leído a Actualidad), manda ese script.
-    if (node.parentNode === asideIn && mark.parentNode) mark.parentNode.replaceChild(node, mark);
-    else mark.remove();
-  }
-  const byId = id => document.getElementById(id);
-  const ASIDE = {
-    home: () => { paintRankings(); return [rankings]; },
-    // NFL y Fútbol: ¿Quién será campeón? junto a La semana; las opiniones junto a
-    // los Takes (el Take histórico y el Top 10 necesitan ancho: siguen en el centro);
-    // Lo más leído junto a las noticias de Fútbol.
-    'nfl:semana': () => [borrow(byId('aeSeasonPredictions'))],
-    'futbol:semana': () => [borrow(byId('aeSeasonPredictions'))],
-    'nfl:takes': () => [borrow(byId('aeSportTakeLeaders'))],
-    'futbol:takes': () => [borrow(byId('aeSportTakeLeaders'))],
-    'futbol:noticias': () => [borrow(byId('aeTrendingPortada'))]
-    // Picks no presta nada: sus estilos dependen de #communityPicks, así que su
-    // columna derecha (Chefs y Mis parties; Pick histórico) se compone en su sitio
-    // con una rejilla en cam-escritorio.css.
-    // Actualidad (9 nov, «Actualidad moderna»): ya trae su propia columna derecha con
-    // Opinadores distinguidos y Lo más leído, y sus estilos dependen de #aeOpinions;
-    // no se presta nada.
-  };
+  const shell = el('div', null, 'cam-desk-layout', {id:'camDeskLayout'});
+  const primary = el('div', null, 'cam-desk-main', {id:'camDeskMain'});
+  shell.append(primary, aside);
+  const editorial = main.querySelector('.editorial-layout');
+  const placements = new Map();
+  let mounted = null;
   let asideFor = null;
-  function fillAside(p) {
-    // Otro script puede llevarse un módulo prestado (p. ej. Lo más leído vuelve a su
-    // sitio al cambiar una clase de <body>): entonces se vuelve a pedir.
-    if (asideFor === p && [...borrowed.keys()].every(node => node.parentNode === asideIn)) return;
-    asideFor = p;
-    for (const node of [...borrowed.keys()]) giveBack(node);
-    const nodes = (ASIDE[p] ? ASIDE[p]() : []).filter(Boolean);
-    asideIn.replaceChildren(...nodes);
-  }
-  // Algunos módulos prestados se muestran solos cuando llegan sus datos (atributo hidden).
-  function asideHasContent() {
-    const was = aside.hidden;
-    aside.hidden = false;
-    const any = [...asideIn.children].some(node => node.getClientRects().length > 0);
-    aside.hidden = was;
-    return any;
-  }
-  new MutationObserver(() => queue()).observe(asideIn, { attributes: true, attributeFilter: ['hidden'], subtree: true });
 
-  /* ---------- 4. Inicio: «Cierran pronto» a todo el ancho, con flechas ---------- */
-  const strip = () => document.querySelector('#camHomeJornada .cam-hj-section[data-row="jornada"]');
-  const arrows = el('div', null, 'cam-desk-arrows', { role: 'group', 'aria-label': 'Mover partidos de quiniela' });
-  const prev = el('button', '‹', 'cam-desk-arrow', { type: 'button', 'aria-label': 'Partidos anteriores' });
-  const next = el('button', '›', 'cam-desk-arrow', { type: 'button', 'aria-label': 'Más partidos' });
-  arrows.append(prev, next);
-  let stripList = null;
-  function updateArrows() {
-    if (!stripList) return;
-    const max = stripList.scrollWidth - stripList.clientWidth;
-    prev.disabled = stripList.scrollLeft <= 2;
-    next.disabled = stripList.scrollLeft >= max - 2;
-    arrows.hidden = max <= 2;
+  function move(node, target) {
+    if (!node || !node.parentNode || node.parentNode === target) return;
+    if (!placements.has(node)) {
+      const mark = document.createComment('CAM desktop return: ' + (node.id || node.className));
+      node.before(mark);
+      placements.set(node, {mark,target});
+    } else placements.get(node).target = target;
+    target.append(node);
   }
-  function slide(direction) {
-    if (!stripList) return;
-    const step = Math.max(220, stripList.clientWidth - 120);
-    stripList.scrollBy({ left: direction * step, behavior: 'smooth' });
-  }
-  prev.addEventListener('click', () => slide(-1));
-  next.addEventListener('click', () => slide(1));
-  const stripWatch = new MutationObserver(() => requestAnimationFrame(updateArrows));
-  function addArrows() {
-    const section = strip();
-    if (!section) return;
-    const head = section.querySelector('.cam-hj-head');
-    const list = section.querySelector('.cam-hj-row');
-    if (head && arrows.parentNode !== head) head.append(arrows);
-    if (list && list !== stripList) {
-      stripList?.removeEventListener('scroll', updateArrows);
-      stripList = list;
-      list.addEventListener('scroll', updateArrows, { passive: true });
-      stripWatch.disconnect();
-      stripWatch.observe(list, { childList: true });
+  function order(target, nodes) {
+    let previous = null;
+    for (const node of nodes.filter(node => node?.parentNode === target)) {
+      const next = previous ? previous.nextElementSibling : target.firstElementChild;
+      if (next !== node) target.insertBefore(node,next);
+      previous = node;
     }
-    updateArrows();
   }
-  function removeArrows() {
-    arrows.remove();
-    const section = strip();
-    if (section) delete section.dataset.camDeskFull;
-    stripWatch.disconnect();
-    stripList?.removeEventListener('scroll', updateArrows);
-    stripList = null;
+  function restore() {
+    for (const [node,{mark,target}] of placements) {
+      // A different page (e.g. Actualidad) may already own the original node.
+      if (node.parentNode === target && mark.parentNode) mark.replaceWith(node);
+      else mark.remove();
+    }
+    placements.clear();
+    shell.remove();
+    rail.remove();
+    returnShortcuts();
+    mounted = null;
+    asideFor = null;
+    delete body.dataset.camDeskAside;
   }
-
-  /* ---------- 5. Dónde van los carriles ---------- */
-  function placeRail(p) {
-    const root = document.getElementById('camHomeJornada');
-    const bar = document.getElementById('camSectionTabs');
-    if (p === 'home' && root && !root.hidden) {
-      // Inicio: los atajos siguen a la tira «Cierran pronto» (o a la cabecera de Tu jornada).
-      const after = root.querySelector('.cam-hj-top');
-      if (after && after.nextSibling !== rail) after.after(rail);
-      else if (!after && root.firstChild !== rail) root.prepend(rail);
-    } else if (/^(nfl|futbol):semana$/.test(p) && semana(p)) {
-      // La semana: los atajos entran en su rejilla, bajo la cabecera a todo el ancho.
-      const box = semana(p);
-      if (box.nextSibling !== rail) box.after(rail);
-    } else if (bar && bar.parentNode === main) {
-      if (bar.nextSibling !== rail) bar.after(rail);
-    } else if (main.firstChild !== rail) main.prepend(rail);
-  }
-  const semana = p => document.getElementById(p.startsWith('nfl') ? 'camNflSemana' : 'camFootballSemana');
-  function placeAside() {
-    if (main.lastElementChild !== aside) main.append(aside);
-  }
-
-  /* ---------- 6. Medidas: arranque de los carriles, carriles fijos y alto mínimo ---------- */
-  const px = value => (Math.round(value * 10) / 10) + 'px';
-  function setVar(name, value) {
-    if (main.style.getPropertyValue(name) !== value) main.style.setProperty(name, value);
+  function compose(p) {
+    if (p !== mounted) { restore(); mounted = p; }
+    adoptShortcuts();
+    rail.hidden = !shortcuts;
+    if (p === 'home' || p === 'nfl' || p === 'futbol') {
+      if (!shell.isConnected) main.append(shell);
+      if (rail.parentNode !== main || rail.nextSibling !== shell) main.insertBefore(rail,shell);
+      if (p === 'home') {
+        move(byId('camHomeJornada'), primary);
+        move(editorial, primary);
+        move(byId('aeTrendingPortada'), asideIn);
+        order(primary,[byId('camHomeJornada'),editorial]);
+      } else {
+        const prefix = p === 'nfl' ? 'camNfl' : 'camFootball';
+        move(byId(prefix + 'Semana'), primary);
+        move(editorial, primary);
+        move(byId(p === 'nfl' ? 'nflRankings' : 'championsRankings'), primary);
+        move(byId(prefix + 'Quiniela'), primary);
+        move(byId('freeTakes'), primary);
+        move(byId(prefix + 'Score'), asideIn);
+        move(byId('aeTrendingPortada'), asideIn);
+        move(byId('aeSportTakeLeaders'), asideIn);
+        order(primary,[byId(prefix+'Semana'),editorial,byId(p==='nfl'?'nflRankings':'championsRankings'),byId(prefix+'Quiniela'),byId('freeTakes')]);
+        order(asideIn,[byId(prefix+'Score'),byId('aeTrendingPortada'),byId('aeSportTakeLeaders')]);
+      }
+      aside.hidden = false;
+      body.dataset.camDeskAside = '';
+      asideFor = p;
+    } else {
+      const bar = byId('camSectionTabs');
+      if (bar?.parentNode === main) { if (bar.nextSibling !== rail) bar.after(rail); }
+      else if (main.firstChild !== rail) main.prepend(rail);
+    }
   }
   function measure() {
-    if (!desk()) return;
-    const headerStyle = getComputedStyle(header);
-    const headerH = /sticky|fixed/.test(headerStyle.position) ? header.getBoundingClientRect().height : 0;
-    const bar = document.getElementById('camSectionTabs');
-    const barH = shown(bar) ? bar.getBoundingClientRect().height : 0;
-    setVar('--cam-desk-head', px(headerH));
-    // Lo que va pegado a la cabecera (sub-barra, «Cierran pronto») recupera el relleno superior de la página.
-    setVar('--cam-desk-pull', getComputedStyle(main).paddingTop);
-    const stick = headerH + barH + 16;
-    const mainStyle = getComputedStyle(main);
-    const mainTop = main.getBoundingClientRect().top;
-    let top = parseFloat(mainStyle.paddingTop) || 0;
-    // Lo que va a todo el ancho: la tira de Inicio y la cabecera de La semana (se repinta, por eso va por selector).
-    for (const node of [bar, ...main.querySelectorAll('[data-cam-desk-full], body[data-cam-tab="semana"] .cam-nfl-semana .cam-ns-head')]) {
-      if (!shown(node)) continue;
-      top = Math.max(top, node.getBoundingClientRect().bottom - mainTop + 24);
-    }
-    setVar('--cam-desk-top', px(top));
-    setVar('--cam-desk-stick', px(stick));
-    // Un carril más alto que la pantalla se queda fijo por su pie, no por su cabeza.
-    const asideH = asideIn.getBoundingClientRect().height;
-    const room = window.innerHeight - stick - 16;
-    setVar('--cam-desk-stick-aside', px(asideH > room ? Math.min(stick, window.innerHeight - asideH - 16) : stick));
-    const railH = 0; // Atajos está en el flujo, sin una tercera columna fija.
-    const sideH = medium.matches && !aside.hidden ? asideH : 0;
-    const bottom = parseFloat(mainStyle.paddingBottom) || 0;
-    setVar('--cam-desk-minh', px(Math.max(railH, sideH) ? top + Math.max(railH, sideH) + bottom : 0));
+    if (mobile.matches) return;
+    const style = getComputedStyle(header);
+    const headerH = /sticky|fixed/.test(style.position) ? header.getBoundingClientRect().height : 0;
+    const bar = byId('camSectionTabs');
+    const barH = bar && !bar.hidden ? bar.getBoundingClientRect().height : 0;
+    const values = {
+      '--cam-desk-head':headerH + 'px',
+      '--cam-desk-stick':(headerH + barH + 20) + 'px',
+      '--cam-desk-pull':getComputedStyle(main).paddingTop,
+      '--cam-desk-aside-top':Math.min(headerH + barH + 20, innerHeight - asideIn.getBoundingClientRect().height - 24) + 'px'
+    };
+    for (const [name,value] of Object.entries(values)) if(main.style.getPropertyValue(name)!==value) main.style.setProperty(name,value);
   }
-
-  /* ---------- 7. Montar y desmontar ---------- */
   function layout() {
-    if (!desk()) return teardown();
+    if (mobile.matches) {
+      restore();
+      delete body.dataset.camDesk;
+      for (const name of ['--cam-desk-head','--cam-desk-stick','--cam-desk-pull','--cam-desk-aside-top']) main.style.removeProperty(name);
+      return;
+    }
     body.dataset.camDesk = '';
     headerLayout();
-    const p = page();
-    adoptShortcuts();
-    fillAside(p);
-    if (p === 'home') addArrows(); else removeArrows();
-    rail.hidden = !shortcuts;
-    aside.hidden = !asideHasContent();
-    if (aside.hidden) delete body.dataset.camDeskAside;
-    else body.dataset.camDeskAside = '';
-    placeRail(p);
-    placeAside();
+    compose(page());
     measure();
-    updateArrows();
   }
-  function teardown() {
-    if (!('camDesk' in body.dataset) && !rail.isConnected && !aside.isConnected) return;
-    delete body.dataset.camDesk;
-    delete body.dataset.camDeskAside;
-    for (const node of [...borrowed.keys()]) giveBack(node);
-    asideIn.replaceChildren();
-    asideFor = null;
-    returnShortcuts();
-    removeArrows();
-    rail.remove();
-    aside.remove();
-    for (const name of ['--cam-desk-head', '--cam-desk-pull', '--cam-desk-top', '--cam-desk-stick', '--cam-desk-stick-aside', '--cam-desk-minh']) main.style.removeProperty(name);
-  }
-
   let frame = 0;
   function queue() {
     if (frame) return;
-    frame = requestAnimationFrame(() => { frame = 0; layout(); });
+    frame = requestAnimationFrame(() => { frame=0; layout(); });
   }
-  let measureFrame = 0;
-  function queueMeasure() {
-    if (measureFrame) return;
-    measureFrame = requestAnimationFrame(() => { measureFrame = 0; measure(); });
-  }
-
-  for (const query of [mobile, wide, medium]) {
-    if (typeof query.addEventListener === 'function') query.addEventListener('change', queue);
-    else if (typeof query.addListener === 'function') query.addListener(queue);
-  }
-  // Cambio de sección (clases ae-is-*) o de pestaña (data-cam-tab).
-  new MutationObserver(queue).observe(body, { attributes: true, attributeFilter: ['class', 'data-cam-tab', 'data-cam-section'] });
-  document.addEventListener('cam:section-tab', queue);
-  window.addEventListener('resize', queueMeasure);
-  window.addEventListener('pageshow', queue);
+  mobile.addEventListener?.('change',queue);
+  new MutationObserver(queue).observe(body,{attributes:true,attributeFilter:['class','data-cam-section','data-cam-sport-page','data-cam-tab']});
+  // Mobile and legacy renderers may restore their own nodes after a resize.
+  // Re-adopt only when ownership actually changes; stable nodes keep focus.
+  const children = new MutationObserver(queue);
+  for (const node of [main,primary,asideIn]) children.observe(node,{childList:true});
+  document.addEventListener('cam:section-tab',queue);
+  window.addEventListener('resize',queue);
+  window.addEventListener('pageshow',queue);
   if (typeof ResizeObserver === 'function') {
-    const sizes = new ResizeObserver(queueMeasure);
-    for (const node of [main, header, railIn, asideIn]) sizes.observe(node);
+    const sizes = new ResizeObserver(measure);
+    sizes.observe(header);
+    sizes.observe(asideIn);
   }
+  window.camEscritorio = Object.freeze({layout:queue,restore,page,_aside:()=>asideFor});
   layout();
-
-  window.camEscritorio = Object.freeze({ layout: queue, page, _aside: () => asideFor });
 })();

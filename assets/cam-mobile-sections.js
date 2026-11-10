@@ -10,8 +10,8 @@
    the same live modules stay where their own scripts put them.
    Every section and tab has its own address (?s=nfl&v=quiniela), so the phone's
    Back button works and a link can open a section directly.
-   Desktop (8 nov 2026): the same sections, tabs and addresses on every width;
-   cam-escritorio.js and cam-escritorio.css give them the large-screen layout. */
+   Desktop sports use one continuous page; Picks keeps its section tabs.
+   Existing sport-tab addresses remain anchors into the complete desktop page. */
 (() => {
   'use strict';
 
@@ -106,8 +106,18 @@
       delete body.dataset.camTabs;
       delete body.dataset.camTab;
       delete body.dataset.camSection;
+      delete body.dataset.camSportPage;
       return;
     }
+    if (!mobile.matches && section.group === 'sport') {
+      body.dataset.camSection = section.key;
+      body.dataset.camSportPage = section.key;
+      delete body.dataset.camTabs;
+      delete body.dataset.camTab;
+      bar.hidden = true;
+      return;
+    }
+    delete body.dataset.camSportPage;
     buildBar(cat);
     // Each section pads #mainContent differently; the bar always meets the header.
     main.style.setProperty('--cam-tabs-pull', getComputedStyle(main).paddingTop);
@@ -139,8 +149,8 @@
     const cat = category();
     const slug = SLUGS[cat] || null;
     const section = SECTIONS[cat];
-    // The tab is part of the address on every width (desktop has the same tabs).
-    const tab = section && !searching() ? tabOf(cat) : null;
+    // Desktop sports are complete pages; phone and Picks tabs retain their addresses.
+    const tab = section && !searching() && (mobile.matches || section.group !== 'sport') ? tabOf(cat) : null;
     return { slug, tab };
   }
   function userGesture() {
@@ -179,8 +189,20 @@
     const cat = category();
     const section = SECTIONS[cat];
     if (!section || !validTab(section, tab)) return false;
+    const askedTab = tab;
     tab = aliasOf(section, tab);
     const previous = tabOf(cat);
+    if (!mobile.matches && section.group === 'sport') {
+      chosen.set(cat, tab);
+      render();
+      if (options.scroll !== false) requestAnimationFrame(() => {
+        const selector = tab === 'noticias' ? '#aeNewsHeadingRow' : tab === 'takes' ? '#freeTakes' : '#cam' + (cat === 'NFL' ? 'Nfl' : 'Football') + (askedTab === 'quiniela' ? 'Quiniela' : 'Semana');
+        document.querySelector(selector)?.scrollIntoView({block:'start', behavior:'instant'});
+      });
+      if (options.url !== false) syncUrl({replace:true});
+      document.dispatchEvent(new CustomEvent('cam:section-tab', {detail:{section:section.key,tab}}));
+      return true;
+    }
     if (previous === tab && !options.force) {
       if (options.scroll !== false) jumpTop();
       return true;
@@ -227,7 +249,7 @@
   function reveal(element) {
     const cat = category();
     const section = sectionOf(cat);
-    if (!section || !(element instanceof Element)) return;
+    if (!section || !(element instanceof Element) || (!mobile.matches && section.group === 'sport')) return;
     const owners = OWNERS[section.owners || section.group];
     for (const [tab, selector] of Object.entries(owners)) {
       if (element.closest(selector)) {
@@ -262,6 +284,7 @@
   });
 
   function onLayoutChange() {
+    window.camEscritorio?.restore?.();
     render();
     syncUrl();
   }
@@ -289,6 +312,9 @@
   }
   render();
   if (start.old) syncUrl({ replace: true });
+  if (!mobile.matches && SECTIONS[start.cat]?.group === 'sport' && start.tab) {
+    requestAnimationFrame(() => selectTab(start.tab, {url:false}));
+  }
 
   window.camSectionTabs = Object.freeze({
     select: (tab, options) => selectTab(tab, options),
