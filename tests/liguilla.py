@@ -277,10 +277,10 @@ def run():
         assert '56' in page.locator('#camLiguilla .cam-lg-potential').inner_text(), page.locator('#camLiguilla .cam-lg-potential').inner_text()
         assert not page.locator('#camLiguilla .cam-lg-share').is_disabled(), 'con los 7 elegidos ya se puede compartir'
         assert 'acertaste 7 de 8' in page.locator('#camLiguilla .cam-lg-q8-hits').inner_text().lower(), 'falta «Tus 8» en el cuadro'
-        # La Liguilla como evento: cabecera con los tres pasos, el 2 en curso y la fecha de cierre.
+        # La Liguilla como evento: cabecera compacta, torneo a la derecha y tres pasos.
         assert page.locator('#camLiguilla .cam-lg-event h3').inner_text() == 'La Liguilla'
         assert page.locator('#camLiguilla .cam-lg-steps li').nth(1).get_attribute('aria-current') == 'step'
-        assert 'al empezar los cuartos' in page.locator('#camLiguilla .cam-lg-event-close').inner_text()
+        assert page.locator('#camLiguilla .cam-lg-event-close').count() == 0, 'no mostrar aviso de cierre en el encabezado'
         # Una sola nota de reglas para todos los cruces, no una bajo cada uno.
         assert page.locator('#camLiguilla .cam-lg-foot').count() == 0 and page.locator('#camLiguilla .cam-lg-board-note').count() == 1
         assert page.locator('#camLiguilla .cam-lg-bracket').count() == 1, 'debe haber un solo cuadro'
@@ -381,7 +381,8 @@ def run():
         assert root.locator('h3').first.inner_text() == 'La Liguilla'
         steps = root.locator('.cam-lg-steps li')
         assert steps.count() == 3 and steps.nth(0).get_attribute('aria-current') == 'step', 'paso 1 en curso'
-        assert 'al empezar la última jornada' in root.locator('.cam-lg-event-close').inner_text()
+        assert root.locator('.cam-lg-event-close').count() == 0, 'sin aviso de cierre en el encabezado'
+        assert root.locator('.cam-lg-event-kicker').inner_text() == 'Apertura 26', 'temporada abreviada a la derecha'
         assert root.locator('[class*="cam-fan-"]').count() == 0 and not page.evaluate('() => !!window.CamFanBracket')
         teams = root.locator('.cam-lg-q8-team')
         assert teams.count() == 12, 'solo los que aún pueden clasificar: %d' % teams.count()
