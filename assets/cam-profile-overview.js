@@ -7,9 +7,10 @@
    ajeno, la quiniela va primero si va en el podio. highlights() da las
    etiquetas de la cabecera.
    10 nov 2026: «Mi liguilla» (Liga MX) con mis 8 y mi cuadro, de cam_profile_overview.
-   11 nov 2026: «Primeros pasos» solo con Mi liguilla y Quiniela; en el perfil
-   propio ya no salen tarjetas vacías de Takes ni Picks (tienen su pestaña con
-   «Publicar»). El rango y el enlace a «Rangos» van encima (cam-leagues.js).
+   11 nov 2026: en el perfil propio ya no salen tarjetas vacías de Takes ni
+   Picks (tienen su pestaña con «Publicar»). El rango y el enlace a «Rangos»
+   van encima (cam-leagues.js). Por la tarde, «Primeros pasos» vuelve a sus
+   cuatro pasos: Take, quiniela, Pick y grupo.
    Solo pinta: los datos llegan de ae-profile.js (cam_profile_overview y, una
    vez por perfil, campeones y prestigio). Sin llamadas, bucles ni
    temporizadores propios. */
@@ -335,20 +336,17 @@ function liguillaCard(data, ctx) {
 }
 
 /* ---------- «Primeros pasos» (solo el perfil propio) ----------
-   11 nov 2026: Mi liguilla y Quiniela. Mi liguilla solo sale cuando se puede
-   jugar ahora (o ya está hecha): steps.liguilla es true, false o null. */
-const LIGUILLA_STEP = {
-  qualifiers_open: ['Elige a tus 8 clasificados', 'Los equipos que crees que entran en la liguilla de la Liga MX'],
-  bracket_open: ['Arma tu cuadro', 'Elige quién avanza en la liguilla de la Liga MX']
-};
-function stepList(steps) {
-  const list = [];
-  if (steps.liguilla === true || steps.liguilla === false) {
-    const [name, hint] = LIGUILLA_STEP[steps.liguillaPhase] || ['Arma tu liguilla', 'Tu pronóstico de la liguilla de la Liga MX'];
-    list.push(['liguilla', name, hint, () => goLiguilla()]);
-  }
-  list.push(['quiniela', 'Juega la quiniela', 'Elige quién gana en la NFL o el fútbol', ctx => ctx.play('nfl')]);
-  return list;
+   11 nov 2026 (tarde): vuelven los cuatro pasos que invitan a jugar (Take,
+   quiniela, Pick y grupo), como el 4 nov. La liguilla tiene su tarjeta
+   «Mi liguilla» («Elige a tus 8 ›» / «Arma tu cuadro ›») debajo. */
+const STEPS = [
+  ['take', 'Publica tu primer Take', 'Da tu opinión y deja que la comunidad vote', ctx => ctx.newTake()],
+  ['quiniela', 'Juega la quiniela', 'Elige quién gana en la NFL o el fútbol', ctx => ctx.play('nfl')],
+  ['pick', 'Prepara tu primer Pick', 'Sube la captura de tu apuesta antes del partido', ctx => ctx.newPick()],
+  ['party', 'Únete a un grupo', 'Compite con tus amigos en su propia tabla', ctx => ctx.tab('party')]
+];
+function stepList() {
+  return STEPS;
 }
 function stepsCard(steps, ctx) {
   const STEPS = stepList(steps);

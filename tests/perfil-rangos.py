@@ -8,8 +8,8 @@ tests/fake-supabase.js (sin red). Cubre, a 320, 390 y 1366 px, de día y de noch
     las cinco y a 320 la barra se desliza con la elegida siempre a la vista;
     flechas del teclado;
   · «Perfil»: solo el escudo y «Rango: <rango real>», el enlace «¿Quieres
-    entender el sistema de rangos?» (abre «Rangos»), «Primeros pasos» con Mi
-    liguilla y Quiniela (sin Take) y debajo «Mi liguilla»; sin tarjetas por
+    entender el sistema de rangos?» (abre «Rangos»), «Primeros pasos» con sus
+    cuatro pasos (Take, quiniela, Pick, grupo) y debajo «Mi liguilla»; sin tarjetas por
     modalidad, sin «Ver/Cerrar detalle» ni «Rango provisional»;
   · «Rangos»: rango actual, mejor rango y «Rango provisional · Por clasificar»;
     progreso con su barra y lo que falta; las tres tarjetas por modalidad con
@@ -176,15 +176,15 @@ def own_provisional(width, dark, tag):
             check(s['tabsFit'], f'{t}: las cinco pestañas no caben a {width} px')
         else:
             check(not s['tabsFit'] and 'has-more-end' in s['barClass'], f'{t}: a {width} px la barra debería deslizarse {s["barClass"]}')
-        # Perfil: rango sencillo + enlace + Primeros pasos (Mi liguilla, Quiniela) + Mi liguilla.
+        # Perfil: rango sencillo + enlace + Primeros pasos (cuatro pasos) + Mi liguilla.
         check(s['simpleVisible'] and s['simple'].startswith('Rango: Cobre'), f'{t}: rango sencillo «{s["simple"]}»')
         check(s['simpleLink'] == '¿Quieres entender el sistema de rangos?›', f'{t}: enlace «{s["simpleLink"]}»')
         for word in ('provisional', 'clasificar', 'detalle', 'Mejor rango', 'Picks', 'Quiniela'):
             check(word not in s['simple'], f'{t}: el rango del perfil lleva «{word}»: {s["simple"]}')
         check(s['perfilExtras'] == 0, f'{t}: quedan tarjetas o desplegables del rango en Perfil')
         check(s['kinds'] == ['steps', 'liguilla'], f'{t}: tarjetas {s["kinds"]}')
-        check(s['steps'] == ['Elige a tus 8 clasificados', 'Juega la quiniela'], f'{t}: pasos {s["steps"]}')
-        check(s['stepsCount'] == '0 de 2' and s['stepBars'] == 2 and s['stepBarCols'] == 2, f'{t}: progreso de pasos {s["stepsCount"]} {s["stepBars"]} {s["stepBarCols"]}')
+        check(s['steps'] == ['Publica tu primer Take', 'Juega la quiniela', 'Prepara tu primer Pick', 'Únete a un grupo'], f'{t}: pasos {s["steps"]}')
+        check(s['stepsCount'] == '0 de 4' and s['stepBars'] == 4 and s['stepBarCols'] == 4, f'{t}: progreso de pasos {s["stepsCount"]} {s["stepBars"]} {s["stepBarCols"]}')
         clean(page, t)
         shot(page, f'{tag}-perfil')
         # El enlace abre «Rangos» (y el foco pasa a su pestaña).

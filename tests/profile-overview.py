@@ -338,11 +338,10 @@ def scenario_own_empty(dark, width, tag):
         st = state(page)
         assert st['kinds'] == ['steps'], (tag, 'Primeros pasos en lugar de tarjetas vacías', st['cards'])
         steps = st['cards'][0]
-        # 11 nov 2026: solo Mi liguilla y Quiniela; sin liguilla abierta, solo Quiniela.
-        assert steps.startswith('Primeros pasos 0 de 1'), steps
-        assert 'Juega la quiniela' in steps, steps
-        for name in ('Publica tu primer Take', 'Prepara tu primer Pick', 'Únete a una party'):
-            assert name not in steps, (name, steps)
+        # Los cuatro pasos que invitan a jugar (vuelven el 11 nov por la tarde).
+        assert steps.startswith('Primeros pasos 0 de 4'), steps
+        for name in ('Publica tu primer Take', 'Juega la quiniela', 'Prepara tu primer Pick', 'Únete a un grupo'):
+            assert name in steps, (name, steps)
         assert not st['highlights'], st['highlights']
         check_clean(page, tag + ' resumen vacío')
         shot(page, f'{tag}-perfil-vacio')
@@ -354,13 +353,13 @@ def scenario_own_empty(dark, width, tag):
         page.evaluate("closeAeProfile()")
         page.wait_for_timeout(200)
         open_own(page, width)
-        page.wait_for_selector('#camProfileOverview .cam-ov-card[data-kind="takes"]', timeout=8000)
+        page.wait_for_selector('#camProfileOverview .cam-ov-steps .cam-ov-step.is-done', timeout=8000)
         page.wait_for_timeout(250)
         st = state(page)
-        # El Take ya no es un paso: sale su tarjeta y los pasos siguen en Quiniela.
-        assert st['kinds'] == ['steps', 'takes'] and st['cards'][0].startswith('Primeros pasos 0 de 1'), (tag, st['cards'])
+        # Con un Take, ese paso sale hecho y aparece su tarjeta.
+        assert st['kinds'] == ['steps', 'takes'] and st['cards'][0].startswith('Primeros pasos 1 de 4'), (tag, st['cards'])
         assert 'Tu Take' in st['cards'][1] and 'Take más apoyado' not in st['cards'][1], st['cards'][1]
-        check_clean(page, tag + ' primeros pasos con un Take')
+        check_clean(page, tag + ' primeros pasos 1 de 4')
         shot(page, f'{tag}-primeros-pasos')
         page.click('#aeProfileTabParty')
         page.wait_for_selector('#camProfileParties .cam-pp-invite')

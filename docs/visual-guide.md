@@ -118,8 +118,9 @@ vista y el borde se desvanece donde queda algo por ver. Ningún texto se recorta
 
 «Perfil» solo enseña el escudo y «Rango: <nombre>» (el rango más alto), con el
 enlace «¿Quieres entender el sistema de rangos?», que abre «Rangos». Debajo,
-«Primeros pasos» con Mi liguilla (solo si se puede jugar ahora) y Quiniela, y
-«Mi liguilla». En el perfil propio ya no hay tarjetas vacías de Takes ni Picks.
+«Primeros pasos» con sus cuatro pasos (Take, quiniela, Pick y grupo; vuelven el
+11 nov por la tarde porque invitan a jugar) y «Mi liguilla». En el perfil propio
+ya no hay tarjetas vacías de Takes ni Picks.
 
 «Rangos» reúne lo que antes se desplegaba en el perfil: rango actual en grande,
 mejor rango y «Rango provisional · Por clasificar»; progreso al siguiente rango

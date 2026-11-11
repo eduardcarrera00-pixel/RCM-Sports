@@ -10,7 +10,7 @@
  * 11 nov 2026: cinco pestañas, Perfil · Takes · Picks · Rangos · Mi grupo.
  * «Rangos» la pinta cam-leagues.js (?tab=rangos). En el teléfono la barra se
  * desliza de lado y la pestaña elegida siempre queda a la vista. «Primeros
- * pasos» se queda en Mi liguilla y Quiniela.
+ * pasos» vuelve a Take, quiniela, Pick y grupo.
  */
 (() => {
 'use strict';
@@ -62,7 +62,7 @@ let overview=null,overviewError='',overviewStale=false,overviewTimer=0;
 // Lo que el resumen y la cabecera piden junto al resumen (una vez por perfil):
 // campeones elegidos y perfil de prestigio. La pestaña Takes los reutiliza.
 let extras=null;
-// «Primeros pasos» del perfil propio: Mi liguilla y Quiniela.
+// «Primeros pasos» del perfil propio: qué le falta probar (Take, quiniela, Pick, grupo).
 let steps=null,stepsTicket=0;
 
 /* Perfil de prestigio: aciertos medidos por dificultad (escala 1–20). */
@@ -936,46 +936,42 @@ function renderHighlights(){
   list.hidden=!items.length;
 }
 
-/* «Primeros pasos» del perfil propio (11 nov 2026): solo Mi liguilla y
-   Quiniela. Mi liguilla sale del resumen (cam_profile_overview → liguilla) y
-   solo aparece si se puede jugar ahora o ya está hecha; la quiniela se cuenta
-   sin traer filas, solo si el resumen no lo dice ya. Con los dos hechos se
-   recuerda en este navegador (clave v2: los pasos cambiaron) y no se vuelve a
-   preguntar. */
-const STEPS_KEY='cam_profile_steps_done_v2:';
+/* «Primeros pasos» del perfil propio: Take, quiniela, Pick y grupo (vuelven
+   los cuatro el 11 nov 2026 por la tarde). Take y Pick salen del resumen;
+   quiniela y grupo se cuentan sin traer filas (solo si el resumen no lo dice
+   ya). Con todo hecho se recuerda en este navegador (clave v3: los pasos
+   cambiaron otra vez) y no se vuelve a preguntar. */
+const STEPS_KEY='cam_profile_steps_done_v3:';
 function stepsDone(id){try{return localStorage.getItem(STEPS_KEY+id)==='1';}catch{return false;}}
-// true = hecho · false = pendiente y se puede hacer ya · null = ahora no hay liguilla que jugar.
-function liguillaStep(lg){
-  if(!lg)return null;
-  if(lg.phase==='bracket_open')return Boolean(lg.bracket);
-  if(lg.bracket||lg.qualifiers)return true;
-  return lg.phase==='qualifiers_open'?false:null;
-}
 async function loadSteps(author,ticket){
   const mine=++stepsTicket;
   if(stepsDone(author)){steps={complete:true};return;}
   const o=overview||{},q=o.quiniela||{};
   const next={
-    liguilla:liguillaStep(o.liguilla),
-    liguillaPhase:String(o.liguilla?.phase||''),
-    quiniela:Boolean(q.nfl?.position||q.football?.position)
+    take:Number(o.takes?.count)>0,
+    pick:Number(o.picks?.count)>0,
+    quiniela:Boolean(q.nfl?.position||q.football?.position),
+    party:Array.isArray(q.parties)&&q.parties.length>0
   };
-  steps={...next,checking:!next.quiniela};
-  if(!next.quiniela){
-    const count=async(table)=>{
-      try{
-        const r=await db.from(table).select('game_id',{count:'exact',head:true}).eq('user_id',author);
-        if(r.error)return null;
-        return Number(r.count)||0;
-      }catch{return null;}
-    };
-    const [nfl,football]=await Promise.all([count('cam_nfl_picks'),count('cam_football_picks')]);
-    if(mine!==stepsTicket||ticket!==request||activeAuthor!==author)return;
-    // Si no se pudo contar, no se insiste con ese paso.
-    next.quiniela=nfl===null||football===null||nfl+football>0;
-  }
+  steps={...next,checking:!(next.quiniela&&next.party)};
+  const count=async(table)=>{
+    try{
+      const r=await db.from(table).select(table==='cam_party_members'?'party_id':'game_id',{count:'exact',head:true}).eq('user_id',author);
+      if(r.error)return null;
+      return Number(r.count)||0;
+    }catch{return null;}
+  };
+  const [nfl,football,parties]=await Promise.all([
+    next.quiniela?0:count('cam_nfl_picks'),
+    next.quiniela?0:count('cam_football_picks'),
+    next.party?0:count('cam_party_members')
+  ]);
+  if(mine!==stepsTicket||ticket!==request||activeAuthor!==author)return;
+  // Si no se pudo contar, no se insiste con ese paso.
+  if(!next.quiniela)next.quiniela=nfl===null||football===null||nfl+football>0;
+  if(!next.party)next.party=parties===null||parties>0;
   steps={...next,checking:false};
-  if(next.quiniela&&next.liguilla===true){
+  if(next.take&&next.pick&&next.quiniela&&next.party){
     try{localStorage.setItem(STEPS_KEY+author,'1');}catch{}
     steps={complete:true};
   }
