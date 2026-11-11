@@ -11,7 +11,13 @@ function todayToronto(){
 }
 const isActive=p=>p.event_date&&p.event_date>=todayToronto()&&p.outcome==='pending';
 const pickLeagueImpact=p=>{
- if(p.moderation_status!=='approved'||p.outcome!=='pending')return '';
+ if(p.moderation_status!=='approved')return '';
+ if(['won','lost','void'].includes(p.outcome)){
+   const earned=Number(p.result_points||0);
+   if(!Number.isFinite(earned))return '';
+   return 'Liga '+(earned>0?'+':earned<0?'−':'')+Math.abs(earned).toFixed(2).replace('.',',')+' pts';
+ }
+ if(p.outcome!=='pending')return '';
  const odds=Number(p.american_odds);
  if(!Number.isFinite(odds)||Math.abs(odds)<100)return '';
  const score=(Math.abs(odds)/100).toFixed(2).replace('.',',');
