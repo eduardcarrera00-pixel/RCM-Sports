@@ -61,8 +61,24 @@ function topRank(ranks){
   const order=Object.keys(COMPETITIONS);
   return [...(ranks||[])].sort((a,b)=>level(b.rank)-level(a.rank)||order.indexOf(a.competition)-order.indexOf(b.competition))[0]||null;
 }
-let profileId=null,profileTab='perfil',profileData=null,profileTicket=0,selected=null,expandNext=false;
-const cache=new Map(),pending=new Map();
+/* ===========================================================================
+   Perfil (11 nov 2026). Dos sitios:
+   · Pestaña «Perfil» (#camProfileLeagues): solo el escudo y «Rango: Cobre»,
+     con el enlace «¿Quieres entender el sistema de rangos?» que abre «Rangos».
+   · Pestaña «Rangos» (#camProfileRanks): rango actual y mejor rango, progreso
+     al siguiente rango, rango por modalidad, escalera, historial y cómo
+     funcionan. Todo sale de cam_league_profile (una llamada, caché de 60 s) y,
+     para el progreso y los rivales, de cam_league_board de la modalidad elegida
+     (también con caché de 60 s), solo con la pestaña «Rangos» abierta.
+   Las reglas son las de supabase/migrations/20261108134701_cam_monthly_leagues.sql
+   (cam_league_outcome y refresh_month) y los mínimos de cam_league_competitions.
+   =========================================================================== */
+// cam_league_competitions.minimum (comprobado en producción el 11 nov 2026).
+const MINIMUM={picks:10,nfl:1,football:1};
+const SHORT={picks:'Picks',nfl:'NFL',football:'Fútbol'};
+const clamp01=x=>Math.max(0,Math.min(1,Number(x)||0));
+let profileId=null,profileTab='perfil',profileOwn=false,profileData=null,profileTicket=0,selected=null,progressTicket=0;
+const cache=new Map(),pending=new Map(),progressBoards=new Map();
 async function profile(user,force=false){
   const hit=cache.get(user);
   if(!force&&hit&&Date.now()-hit.time<60000)return hit.data;
@@ -79,78 +95,245 @@ function resetProfile(){
   const dialog=$('aeProfileDialog');if(dialog)delete dialog.dataset.leagueRank;
   $('camProfileRank')?.replaceChildren();$('camProfileAwards')?.replaceChildren();
   const panel=$('camProfileLeagues');if(panel){panel.replaceChildren();panel.hidden=true;}
+  $('camProfileRanks')?.replaceChildren();
+  progressBoards.clear();++progressTicket;
 }
-function chooseRank(r){
-  selected=r.competition;
-  const dialog=$('aeProfileDialog');if(!dialog)return;
-  dialog.dataset.leagueRank=KEYS[level(r.rank)];
-  const identity=$('camProfileRank');identity.replaceChildren(emblem(r.rank),el('span',LEVELS[level(r.rank)]+' · '+r.label));
-  if($('camRankFeatureName')){$('camRankFeatureLabel').textContent='RANGO ACTUAL · '+r.label;$('camRankFeatureName').textContent=LEVELS[level(r.rank)];$('camRankFeatureBest').textContent='Mejor rango · '+LEVELS[level(r.best_rank)];$('camRankFeatureCrest').replaceChildren(emblem(r.rank));}
-  const situation=$('camRankFeatureSituation');
-  if(situation)situation.textContent=stateText(r);
-  if($('camLeagueRivals')&&!$('camLeagueRivals').hidden)void loadRivals();
-  const earned=profileData.awards.filter(a=>a.active);
-  const badges=$('camProfileAwards');badges.replaceChildren(...earned.slice(0,3).map(a=>award(a)));
-  for(const card of $('camProfileLeagues')?.querySelectorAll('[data-competition]')||[])card.setAttribute('aria-pressed',String(card.dataset.competition===selected));
+const rankOf=key=>profileData?.ranks?.find(r=>r.competition===key)||null;
+// Modalidad que se mira primero en el progreso: la del rango más alto; en
+// empate, la que ya clasifica este mes o la que lleva más resultados.
+function featured(ranks){
+  const order=Object.keys(COMPETITIONS);
+  return [...(ranks||[])].sort((a,b)=>level(b.rank)-level(a.rank)
+    ||Number(Boolean(b.current?.eligible))-Number(Boolean(a.current?.eligible))
+    ||(Number(b.current?.resolved)||0)-(Number(a.current?.resolved)||0)
+    ||order.indexOf(a.competition)-order.indexOf(b.competition))[0]||null;
 }
-function rules(){
-  const details=el('details',null,'cam-league-rules');details.append(el('summary','Cómo funcionan las ligas'));
-  const text=el('div');
-  text.append(el('p','Cada acierto suma y cada fallo resta. Un Pick vale el momio absoluto / 100; en quinielas cada opción enseña sus puntos. Anulados: 0.'));
-  text.append(el('p','Al cerrar el mes, el 20 % mejor clasificado sube de rango; el 20 % de abajo baja. El resto mantiene su rango.'));
-  text.append(el('p','Para clasificar necesitas 10 Picks acertados o fallados, o participar en la mitad de los partidos resueltos de tu quiniela. El Top 10 del mes gana una insignia con su puesto y mes.'));
-  const advanced=el('details',null,'cam-league-fine-print');advanced.append(el('summary','Reglas completas'));
-  advanced.append(el('p','El cierre es el día 1 a las 12:00 de Toronto. Las plazas de ascenso se redondean hacia arriba y las de descenso hacia abajo. Dos meses sin el mínimo bajan un rango; las pausas deportivas no penalizan.'));
-  advanced.append(el('p','Desde Diamante, dos meses seguidos en el mejor 5 % dan acceso a Leyenda. Para conservarla, termina en el mejor 10 %. El laurel NFL duplica el acierto; el fallo resta los puntos base. Los empates NFL valen 0.'));
-  advanced.append(el('p','En caso de empate: puntos, aciertos, porcentaje de acierto y primer resultado registrado. Los premios quedan guardados en tu historial.'));
-  text.append(advanced);
-  const ladder=el('ol',null,'cam-league-ladder');LEVELS.forEach((name,i)=>{const li=el('li');li.append(emblem(i),el('span',name));ladder.append(li);});
-  text.append(ladder);details.append(text);return details;
+// TODO(Eduard): «provisional» no es una regla guardada en la base de datos. Aquí
+// significa que esa persona todavía no ha pasado ningún cierre mensual en esa
+// modalidad (no tiene fila en cam_league_members): su Cobre es el de partida y
+// se confirma en el primer cierre en el que tenga resultados. Confirmar.
+const isProvisional=r=>!r?.last_month;
+// Cabecera del perfil: el rango más alto tiñe el perfil; debajo del nombre, su
+// escudo y las insignias Top 10 del mes pasado (como hasta ahora).
+function paintIdentity(){
+  const dialog=$('aeProfileDialog'),top=topRank(profileData?.ranks);
+  if(!dialog||!top)return;
+  dialog.dataset.leagueRank=KEYS[level(top.rank)];
+  $('camProfileRank')?.replaceChildren(emblem(top.rank),el('span',LEVELS[level(top.rank)]+' · '+top.label));
+  const earned=(profileData.awards||[]).filter(a=>a.active);
+  $('camProfileAwards')?.replaceChildren(...earned.slice(0,3).map(a=>award(a)));
 }
-function renderProfile(){
-  const panel=$('camProfileLeagues');if(!panel||!profileData)return;
-  panel.hidden=profileTab!=='perfil';panel.replaceChildren();
-  const disclosure=el('details',null,'cam-rank-disclosure');
-  const summary=el('summary',null,'cam-rank-summary');
-  const crest=el('span',null,'cam-rank-feature-crest');crest.id='camRankFeatureCrest';
-  const copy=el('span',null,'cam-rank-feature-copy');
-  const label=el('small','RANGO ACTUAL');label.id='camRankFeatureLabel';copy.append(label);
-  const name=el('strong');name.id='camRankFeatureName';
-  const best=el('span');best.id='camRankFeatureBest';
-  const situation=el('span',null,'cam-rank-situation');situation.id='camRankFeatureSituation';
-  const expand=el('span','Ver detalle ↓','cam-rank-expand');
-  disclosure.addEventListener('toggle',()=>{
-    expand.textContent=disclosure.open?'Cerrar detalle ↑':'Ver detalle ↓';
-    const rivals=$('camLeagueRivals');
-    if(rivals)rivals.hidden=!disclosure.open;
-    if(disclosure.open)void loadRivals();
-  });
-  copy.append(name,best,situation);summary.append(crest,copy,expand);
-  disclosure.append(summary);panel.append(disclosure);
+function openRanksTab(){
+  const tab=$('aeProfileTabRanks');if(!tab)return;
+  tab.click();
+  try{tab.focus({preventScroll:true});}catch{}
+  try{$('aeProfileTabs')?.scrollIntoView({block:'nearest'});}catch{}
+}
+/* ---------- Pestaña «Perfil»: el rango, fijo y sencillo ---------- */
+function renderSimple(panel){
+  const top=topRank(profileData.ranks);
+  panel.replaceChildren();
+  if(!top){panel.hidden=true;return;}
+  const box=el('div',null,'cam-rank-simple');box.dataset.rank=KEYS[level(top.rank)];
+  const line=el('p',null,'cam-rank-simple-line');
+  const text=el('span','Rango: ','cam-rank-simple-text');text.append(el('strong',LEVELS[level(top.rank)],'cam-rank-simple-name'));
+  line.append(emblem(top.rank),text);
+  const link=btn('','cam-rank-simple-link',openRanksTab);
+  link.setAttribute('aria-controls','camProfileRanks');
+  link.append(el('span','¿Quieres entender el sistema de rangos?'),el('span','›','cam-rank-simple-chevron'));
+  link.lastChild.setAttribute('aria-hidden','true');
+  box.append(line,link);panel.append(box);
+}
+/* ---------- Pestaña «Rangos» ---------- */
+function section(cls,title,id){
+  const s=el('section',null,'cam-rk-block '+cls);
+  if(title){const h=el('h3',title,'cam-rk-title');h.id=id;s.setAttribute('aria-labelledby',id);s.append(h);}
+  return s;
+}
+function hero(){
+  const ranks=profileData.ranks,top=topRank(ranks),lv=level(top.rank);
+  const best=Math.max(lv,...ranks.map(r=>level(r.best_rank)));
+  const box=el('section',null,'cam-rk-block cam-rk-hero');box.dataset.rank=KEYS[lv];box.setAttribute('aria-labelledby','camRankHeroName');
+  const crest=el('div',null,'cam-rk-hero-crest');crest.append(emblem(lv));
+  const copy=el('div',null,'cam-rk-hero-copy');
+  copy.append(el('p','Rango actual','cam-rk-kicker'));
+  const name=el('h3',LEVELS[lv],'cam-rk-hero-name');name.id='camRankHeroName';copy.append(name);
+  copy.append(el('p','Mejor rango: '+LEVELS[best],'cam-rk-hero-best'));
+  if(ranks.every(isProvisional)){
+    const ready=ranks.some(r=>r.current?.eligible);
+    copy.append(el('p','Rango provisional · '+(ready?'Se confirma al cierre del mes':'Por clasificar'),'cam-rk-chip'+(ready?'':' is-pending')));
+  }
+  const earned=(profileData.awards||[]).filter(a=>a.active);
+  if(earned.length){const awards=el('div',null,'cam-rk-awards');awards.append(...earned.slice(0,3).map(a=>award(a)));copy.append(awards);}
+  box.append(crest,copy);return box;
+}
+// Qué falta para el siguiente rango, con las reglas de cam_league_outcome.
+function nextStep(r,board){
+  const lv=level(r.rank),c=r.current,own=profileOwn,rows=Array.isArray(board?.rows)?board.rows:[];
+  const say=(mine,theirs)=>own?mine:theirs;
+  const info={from:lv,to:lv<5?lv+1:lv===5?6:null,fraction:0,label:'',main:'',notes:[]};
+  const goal=lv<5?'Después, el 20 % mejor de los clasificados sube a '+LEVELS[lv+1]+' al cierre del mes.':
+    lv===5?'Para llegar a Leyenda CAM hacen falta dos meses seguidos en el 5 % mejor.':
+    'Para conservar Leyenda CAM hay que terminar el mes en el 10 % mejor.';
+  const available=c?Number(c.available):rows.length?Number(rows[0].available):NaN;
+  if(available===0){
+    info.label='Temporada en pausa';
+    info.main='Este mes todavía no hay resultados en '+r.label+'.';
+    info.notes.push('Los meses en pausa no cuentan: el rango no cambia.');
+    return info;
+  }
+  if(!c?.eligible){
+    const need=Number(c?.required)||Number(rows[0]?.required)||(r.competition==='picks'?MINIMUM.picks:0);
+    const done=Math.max(0,Number(c?.resolved)||0),left=Math.max(0,need-done);
+    if(need){
+      info.fraction=clamp01(done/need);
+      info.label=done+' / '+need+' resultados · faltan '+left;
+      info.main='Faltan '+left+(left===1?' resultado':' resultados')+' para clasificar este mes en '+r.label+'.';
+    }else{
+      info.label='Sin resultados este mes';
+      info.main=say('Juega la quiniela de este mes para empezar a clasificar.','Todavía no tiene resultados este mes en '+r.label+'.');
+    }
+    info.notes.push(goal);
+    if(c?.zone==='inactividad')info.notes.push(say('Ojo: si el mes cierra sin clasificar, bajas a ','Si el mes cierra sin clasificar, baja a ')+LEVELS[level(c.rank_after)]+' (dos meses seguidos sin clasificar).');
+    return info;
+  }
+  const total=Math.max(1,Number(c.participants)||1),pos=Math.max(1,Number(c.position)||total);
+  const share=lv<5?.2:lv===5?.05:.1,cut=Math.max(1,Math.ceil(total*share));
+  const cutText=cut===1?'el primer puesto':'los '+cut+' primeros';
+  const ranked=rows.filter(x=>x.eligible);
+  const atCut=ranked.find(x=>Number(x.position)===cut);
+  const gap=atCut?Math.max(0,Number(atCut.points||0)-Number(c.points||0)):0;
+  info.label='Puesto #'+pos+' de '+total+' · '+points(c.points)+' pts';
+  if(pos<=cut){
+    info.fraction=lv===5&&Number(c.next_streak)<2?.5:1;
+    if(lv<5)info.main=say('Si el mes cerrara hoy, subirías a ','Si el mes cerrara hoy, subiría a ')+LEVELS[lv+1]+'.';
+    else if(lv===5)info.main=Number(c.next_streak)>=2?say('Si el mes cerrara hoy, llegarías a Leyenda CAM.','Si el mes cerrara hoy, llegaría a Leyenda CAM.'):
+      say('Vas en el 5 % mejor: si repites el mes que viene, llegas a Leyenda CAM.','Va en el 5 % mejor: si repite el mes que viene, llega a Leyenda CAM.');
+    else info.main=say('Si el mes cerrara hoy, conservarías Leyenda CAM.','Si el mes cerrara hoy, conservaría Leyenda CAM.');
+    info.notes.push('Hay que seguir entre '+cutText+' hasta el cierre.');
+  }else{
+    const places=pos-cut;
+    info.fraction=total>cut?clamp01((total-pos)/(total-cut)):0;
+    if(lv===5)info.fraction/=2;
+    const target=lv<5?'la zona de ascenso':lv===5?'el 5 % mejor':'el 10 % mejor';
+    info.main='Faltan '+places+(places===1?' puesto':' puestos')+' para '+target+(gap?' ('+points(gap)+' pts)':'')+'.';
+    info.notes.push(lv<5?'Suben '+cutText+' (el 20 % mejor).':lv===5?goal:say('Si el mes cerrara hoy, volverías a Diamante.','Si el mes cerrara hoy, volvería a Diamante.'));
+  }
+  if(c.zone==='descenso'&&lv<6)info.notes.push(say('Ahora mismo estás en zona de descenso: si el mes cerrara hoy, bajarías a ','Ahora mismo está en zona de descenso: si el mes cerrara hoy, bajaría a ')+LEVELS[level(c.rank_after)]+'.');
+  return info;
+}
+function rivalList(target,me,rows){
+  const ranked=orderedEligible(rows),index=ranked.findIndex(r=>r.user_id===me.user_id);
+  if(!me.eligible||index<0)return;
+  const list=el('div',null,'cam-rival-list');
+  for(const [r,kind] of [[ranked[index-1],'Por alcanzar'],[ranked[index+1],'Le persigue']]){
+    if(!r)continue;
+    const delta=Math.max(0,Math.abs(Number(r.points||0)-Number(me.points||0)));
+    const b=btn('','cam-rival',()=>window.openAePublicProfile?.(r.user_id));
+    b.append(el('small',kind==='Le persigue'&&profileOwn?'Te persigue':kind),el('strong','@'+(r.username||'Aficionado')),
+      el('span','#'+r.position+' · '+points(r.points)+' pts'),
+      el('small',delta?'Diferencia: '+points(delta)+' pts':'Empate a puntos · decide el desempate'));
+    list.append(b);
+  }
+  if(!list.children.length)return;
+  target.append(el('h4','Rivales cercanos','cam-rk-subtitle'),list);
+}
+function paintProgress(){
+  const body=$('camRankProgressBody'),r=rankOf(selected);
+  if(!body||!r)return;
+  const board=progressBoards.get(r.competition)||null;
+  const info=nextStep(r,board);
+  for(const b of document.querySelectorAll('#camRankProgressPick button'))b.setAttribute('aria-pressed',String(b.dataset.competition===r.competition));
+  body.replaceChildren();body.dataset.rank=KEYS[info.from];
+  const track=el('div',null,'cam-rk-track');
+  const from=el('span',null,'cam-rk-track-end');from.dataset.rank=KEYS[info.from];from.append(emblem(info.from),el('span',LEVELS[info.from]));
+  const bar=el('span',null,'cam-rk-bar');
+  bar.setAttribute('role','progressbar');bar.setAttribute('aria-valuemin','0');bar.setAttribute('aria-valuemax','100');
+  bar.setAttribute('aria-valuenow',String(Math.round(info.fraction*100)));
+  bar.setAttribute('aria-label',info.to===null?'Rango máximo · '+info.label:'Progreso hacia '+LEVELS[info.to]+' en '+r.label+' · '+info.label);
+  const fill=el('span',null,'cam-rk-bar-fill');fill.style.width=Math.round(info.fraction*100)+'%';bar.append(fill);
+  track.append(from,bar);
+  if(info.to!==null){const to=el('span',null,'cam-rk-track-end is-next');to.dataset.rank=KEYS[info.to];to.append(emblem(info.to),el('span',LEVELS[info.to]));track.append(to);}
+  else{const to=el('span',null,'cam-rk-track-end is-next is-top');to.append(el('span','Rango máximo'));track.append(to);}
+  body.append(track,el('p',info.label,'cam-rk-progress-label'),el('p',info.main,'cam-rk-progress-main'));
+  for(const note of info.notes)body.append(el('p',note,'cam-rk-progress-note'));
+  const me=Array.isArray(board?.rows)?board.rows.find(x=>x.user_id===profileId):null;
+  if(me)rivalList(body,me,board.rows);
+  const actions=el('div',null,'cam-rk-actions');
+  actions.append(btn('Ver clasificación mensual de '+r.label,'cam-league-link',()=>openBoard(r.competition)));
+  body.append(actions);
+}
+async function loadProgress(){
+  const comp=selected,user=profileId,ticket=++progressTicket;
+  if(!COMPETITIONS[comp]||profileTab!=='rangos'||progressBoards.has(comp))return;
+  try{
+    const data=await getBoard(comp);
+    if(ticket!==progressTicket||profileId!==user||selected!==comp||profileTab!=='rangos')return;
+    progressBoards.set(comp,data);paintProgress();
+  }catch{/* Sin clasificación: el progreso sigue con los datos del perfil. */}
+}
+function selectProgress(key){
+  if(!rankOf(key)||selected===key)return;
+  selected=key;paintProgress();void loadProgress();
+}
+function progressBlock(){
+  const s=section('cam-rk-progress','Progreso al siguiente rango','camRankProgressTitle');
+  const pick=el('div',null,'cam-rk-pick');pick.id='camRankProgressPick';pick.setAttribute('role','group');pick.setAttribute('aria-label','Modalidad');
+  for(const key of Object.keys(COMPETITIONS)){
+    if(!rankOf(key))continue;
+    const b=btn(SHORT[key],'cam-rk-pick-btn',()=>selectProgress(key));
+    b.dataset.competition=key;b.setAttribute('aria-label',COMPETITIONS[key]);b.setAttribute('aria-pressed',String(key===selected));
+    pick.append(b);
+  }
+  const body=el('div',null,'cam-rk-progress-body');body.id='camRankProgressBody';body.setAttribute('aria-live','polite');
+  s.append(pick,body);return s;
+}
+function modalities(){
+  const s=section('cam-rk-modes','Rango por modalidad','camRankModesTitle');
   const cards=el('div',null,'cam-league-cards');
   for(const key of Object.keys(COMPETITIONS)){
-    const r=profileData.ranks.find(x=>x.competition===key);if(!r)continue;
-    const card=btn('','cam-league-card',()=>chooseRank(r));card.dataset.competition=key;card.dataset.rank=KEYS[level(r.rank)];
+    const r=rankOf(key);if(!r)continue;
+    const card=el('article',null,'cam-league-card');card.dataset.competition=key;card.dataset.rank=KEYS[level(r.rank)];
     card.setAttribute('aria-label',r.label+': '+LEVELS[level(r.rank)]+'. '+stateText(r));
-    const copy=el('span',null,'cam-league-card-copy');copy.append(el('small',r.label),el('strong',LEVELS[level(r.rank)]),el('span',stateText(r),'cam-league-state'));
+    const progress=meter(r);
+    const copy=el('span',null,'cam-league-card-copy');copy.append(el('small',r.label),el('strong',LEVELS[level(r.rank)]));
+    // La barra ya dice «X / N resultados · faltan M»: sin repetirlo encima.
+    if(!(progress&&!r.current?.eligible))copy.append(el('span',stateText(r),'cam-league-state'));
     copy.append(el('small','Mejor rango: '+LEVELS[level(r.best_rank)]));
     card.append(emblem(r.rank),copy);
-    const progress=meter(r);if(progress)card.append(progress);
-    if(r.current?.eligible){card.append(el('span','#'+r.current.position+' de '+r.current.participants,'cam-league-place'));}
+    if(progress)card.append(progress);
     if(r.current?.eligible&&r.current.position<=10)card.append(award(r.current,true));
     cards.append(card);
   }
-  disclosure.append(cards);
-  const rivals=el('section',null,'cam-league-rivals');rivals.id='camLeagueRivals';rivals.hidden=!disclosure.open;
-  rivals.setAttribute('aria-label','Rivales cercanos en la clasificación');
-  disclosure.append(rivals);
-  const actions=el('div',null,'cam-league-actions');
-  actions.append(btn('Ver clasificación mensual','cam-league-link',()=>openBoard(selected||'picks')));disclosure.append(actions);
-  const log=el('details',null,'cam-league-history');log.append(el('summary','Historial de rangos e insignias'));
-  if(!profileData.history.length)log.append(el('p','La primera temporada es '+month(profileData.ranks[0]?.starts_on)+'. Tus logros quedarán aquí después del cierre mensual.'));
+  s.append(cards);return s;
+}
+function ladderList(current=null,best=null){
+  const list=el('ol',null,'cam-rk-ladder');
+  LEVELS.forEach((name,i)=>{
+    const state=current===null?'is-reached':i<current?'is-reached':i===current?'is-current':'is-locked';
+    const li=el('li',null,'cam-rk-step '+state);li.dataset.rank=KEYS[i];
+    if(i===current)li.setAttribute('aria-current','step');
+    const copy=el('span',null,'cam-rk-step-copy');copy.append(el('span',name,'cam-rk-step-name'));
+    if(i===current)copy.append(el('small',profileOwn?'Tu rango':'Su rango','cam-rk-step-tag'));
+    else if(best!==null&&i===best&&best>current)copy.append(el('small','Mejor rango','cam-rk-step-tag is-best'));
+    else if(state==='is-locked')copy.append(el('small','Aún no alcanzado','cam-rk-step-hidden'));
+    li.append(emblem(i),copy);list.append(li);
+  });
+  return list;
+}
+function ladderBlock(){
+  const ranks=profileData.ranks,top=topRank(ranks),lv=level(top.rank);
+  const best=Math.max(lv,...ranks.map(r=>level(r.best_rank)));
+  const s=section('cam-rk-ladder-block','Escalera de rangos','camRankLadderTitle');
+  s.append(ladderList(lv,best));return s;
+}
+function historyBlock(){
+  const log=el('details',null,'cam-league-history cam-rk-history');log.append(el('summary','Historial de rangos e insignias'));
+  const history=profileData.history||[];
+  if(!history.length)log.append(el('p','La primera temporada es '+month(profileData.ranks[0]?.starts_on)+'. Los logros quedarán aquí después del cierre mensual.'));
   else{
     const list=el('ul');
-    for(const h of profileData.history){
+    for(const h of history){
       const before=level(h.rank_before),after=level(h.rank_after);
       const outcome=after>before?'↑ Ascenso a ':after<before?'↓ Descenso a ':'';
       const li=el('li');li.append(el('span',month(h.season_month)+' · '+COMPETITIONS[h.competition]),
@@ -161,32 +344,87 @@ function renderProfile(){
     }
     log.append(list);
   }
-  disclosure.append(log,rules());
-  const preferred=profileData.ranks.find(r=>r.competition===selected)||topRank(profileData.ranks);
-  if(preferred)chooseRank(preferred);
-  // Desde el icono del rango de la cabecera: el detalle llega abierto.
-  if(expandNext&&profileTab==='perfil'&&profileId===headerUser){expandNext=false;disclosure.open=true;}
+  return log;
+}
+/* «¿Cómo funcionan los rangos?»: textos sacados de cam_league_outcome,
+   refresh_month, close_month, el cron cam-monthly-leagues (cada 15 min) y los
+   mínimos de cam_league_competitions. */
+const HOW=[
+  ['¿Qué es un rango provisional?',[
+    'Todos empiezan en Cobre. Cada modalidad (Picks, Quiniela NFL y Quiniela Fútbol) tiene su propio rango; en el perfil se muestra el más alto.',
+    'El rango es provisional hasta el primer cierre de mes en el que tienes resultados en esa modalidad. Desde ahí queda confirmado y solo cambia en cada cierre.']],
+  ['¿Cuántos resultados hacen falta para clasificar?',[
+    'Picks: '+MINIMUM.picks+' Picks resueltos en el mes, acertados o fallados. Los anulados no cuentan.',
+    'Quinielas: pronosticar al menos la mitad de los partidos ya terminados del mes (como mínimo '+MINIMUM.nfl+'). Como cada semana terminan más partidos, la cifra crece durante el mes.',
+    'Solo quien clasifica entra en la lucha por subir. La clasificación del mes se actualiza cada 15 minutos.']],
+  ['¿Cómo se sube y se baja?',[
+    'Cada acierto suma y cada fallo resta. Un Pick vale el momio absoluto / 100; en las quinielas cada opción enseña sus puntos. Anulados: 0. El laurel NFL duplica el acierto y el fallo resta los puntos base; los empates NFL valen 0.',
+    'El mes cierra el día 1 a las 12:00 (hora de Toronto). Entre los clasificados, el 20 % mejor sube un rango y el 20 % de abajo baja uno; el resto se queda igual. Las plazas para subir se redondean hacia arriba y las de bajar, hacia abajo.',
+    'En empate a puntos deciden los aciertos, el porcentaje de acierto y quién tuvo antes su primer resultado.',
+    'Dos meses seguidos sin clasificar bajan un rango. Los meses sin partidos (en pausa) no cuentan. Nadie baja de Cobre.',
+    'Subiendo así se llega hasta Diamante. Leyenda CAM: desde Diamante, dos meses seguidos en el 5 % mejor. Para conservarla, termina cada mes en el 10 % mejor; si no, vuelves a Diamante.']],
+  ['¿Qué significa «mejor rango»?',[
+    'Es el rango más alto que has tenido en algún cierre de mes. No baja nunca, aunque tu rango actual baje. En el perfil se muestra el mejor de las tres modalidades.']],
+  ['¿Y las insignias Top 10?',[
+    'Los 10 primeros clasificados del mes ganan una insignia con su puesto y el mes. Mientras el mes sigue abierto se ve «En zona Top 10», que es provisional. Las insignias quedan en el historial.']]
+];
+function howItWorks(){
+  const s=section('cam-rk-how','¿Cómo funcionan los rangos?','camRankHowTitle');
+  const list=el('div',null,'cam-rk-how-list');
+  for(const [question,answers] of HOW){
+    const d=el('details',null,'cam-rk-how-item');
+    d.append(el('summary',question));
+    const body=el('div',null,'cam-rk-how-body');
+    for(const a of answers)body.append(el('p',a));
+    d.append(body);list.append(d);
+  }
+  s.append(list);return s;
+}
+function renderRanks(panel){
+  const top=topRank(profileData.ranks);
+  if(!top){panel.replaceChildren(el('p','Los rangos no están disponibles ahora.','cam-league-status'));return;}
+  if(!rankOf(selected))selected=featured(profileData.ranks)?.competition||top.competition;
+  panel.replaceChildren(hero(),progressBlock(),modalities(),ladderBlock(),historyBlock(),howItWorks());
+  paintProgress();void loadProgress();
+}
+function render(){
+  if(!profileData)return;
+  paintIdentity();
+  const simple=$('camProfileLeagues');
+  if(simple){simple.hidden=profileTab!=='perfil';if(profileTab==='perfil')renderSimple(simple);}
+  const full=$('camProfileRanks');
+  if(full&&profileTab==='rangos')renderRanks(full);
+}
+function loadingState(){
+  const simple=$('camProfileLeagues');
+  if(simple){simple.hidden=profileTab!=='perfil';simple.replaceChildren(el('p','Cargando rango…','cam-league-status'));}
+  $('camProfileRanks')?.replaceChildren(el('p','Cargando rangos…','cam-league-status'));
 }
 async function onProfile(event){
   const detail=event.detail||{};
   if(!detail.userId){profileId=null;profileData=null;selected=null;++profileTicket;resetProfile();return;}
-  profileTab=detail.tab||'perfil';
-  if(profileId===detail.userId&&profileData){if(profileTab==='picks')selected='picks';renderProfile();return;}
-  const user=detail.userId,ticket=++profileTicket;profileId=user;profileData=null;selected=profileTab==='picks'?'picks':null;resetProfile();
-  const panel=$('camProfileLeagues');if(!panel)return;
-  panel.hidden=profileTab!=='perfil';panel.append(el('p','Cargando ligas…','cam-league-status'));
+  profileTab=detail.tab||'perfil';profileOwn=Boolean(detail.own);
+  if(profileId===detail.userId&&profileData){render();return;}
+  // Mientras llega, la pestaña abierta no se repinta con «Cargando» otra vez.
+  if(profileId===detail.userId&&pending.has(detail.userId)){loadingState();return;}
+  const user=detail.userId,ticket=++profileTicket;profileId=user;profileData=null;selected=null;resetProfile();
+  if(!$('camProfileLeagues'))return;
+  loadingState();
   try{
     const data=await profile(user);
     if(ticket!==profileTicket||profileId!==user||!$('aeProfileDialog')?.open)return;
-    profileData=data;renderProfile();
+    profileData=data;render();
     if(user===headerUser)paintHeader(data);
   }catch{
     if(ticket!==profileTicket)return;
-    panel.replaceChildren(el('p','No se pudieron cargar las ligas.','cam-league-status'),btn('Reintentar','cam-league-link',()=>{profileId=null;onProfile({detail});}));
+    const retry=()=>{profileId=null;onProfile({detail:{...detail,tab:profileTab}});};
+    const simple=$('camProfileLeagues');
+    if(simple){simple.hidden=profileTab!=='perfil';simple.replaceChildren(el('p','No se pudo cargar el rango.','cam-league-status'),btn('Reintentar','cam-league-link',retry));}
+    $('camProfileRanks')?.replaceChildren(el('p','No se pudieron cargar los rangos.','cam-league-status'),btn('Reintentar','cam-league-link',retry));
   }
 }
 
-let boardTicket=0,rivalTicket=0;
+let boardTicket=0;
 const boardCache=new Map();
 async function getBoard(competition){
   const cached=boardCache.get(competition);
@@ -222,22 +460,12 @@ function raceContext(target,me,rows){
   if(list.children.length)target.append(list);
   else target.append(el('p','Eres el único participante clasificado de momento.','cam-rival-note'));
 }
-async function loadRivals(){
-  const target=$('camLeagueRivals'),user=profileId,comp=selected;
-  if(!target||target.hidden||!user||!COMPETITIONS[comp])return;
-  const ticket=++rivalTicket;
-  target.replaceChildren(el('h4','Tus rivales más cercanos'),el('p','Consultando clasificación…','cam-rival-note'));
-  try{
-    const data=await getBoard(comp);
-    if(ticket!==rivalTicket||profileId!==user||selected!==comp||!target.isConnected||target.hidden)return;
-    const rows=Array.isArray(data.rows)?data.rows:[];
-    const me=rows.find(r=>r.user_id===user);
-    target.replaceChildren(el('h4','Rivales cercanos · '+COMPETITIONS[comp]));
-    if(me)raceContext(target,me,rows);
-    else target.append(el('p','Sin resultados registrados todavía en esta liga.','cam-rival-note'));
-  }catch{
-    if(ticket===rivalTicket&&target.isConnected)target.replaceChildren(el('p','Los rivales no están disponibles ahora.','cam-rival-note'));
-  }
+// Reglas dentro de la clasificación mensual: las mismas de la pestaña «Rangos».
+function rulesDetails(){
+  const d=el('details',null,'cam-league-rules');d.append(el('summary','¿Cómo funcionan los rangos?'));
+  const body=el('div');
+  for(const [question,answers] of HOW){body.append(el('h4',question,'cam-league-rules-q'));for(const a of answers)body.append(el('p',a));}
+  body.append(ladderList());d.append(body);return d;
 }
 async function openBoard(competition='picks'){
   if(!COMPETITIONS[competition])competition='picks';
@@ -277,7 +505,7 @@ async function openBoard(competition='picks'){
       }
       target.append(list);
     }
-    target.append(rules());
+    target.append(rulesDetails());
   }catch{
     if(ticket!==boardTicket)return;
     target.replaceChildren(el('p','No se pudo cargar la clasificación.','cam-league-status'),btn('Reintentar','cam-league-link',()=>openBoard(competition)));
@@ -348,7 +576,8 @@ async function syncHeader(force=false){
 }
 function bindHeader(){
   const b=$('camHeaderRank');if(!b)return;
-  b.addEventListener('click',()=>{expandNext=true;window.openAeProfile?.();});
+  // Desde el icono del rango de la cabecera: el perfil abre en «Rangos».
+  b.addEventListener('click',()=>window.openAeProfile?.('rangos'));
   if(typeof db!=='undefined'&&typeof db?.auth?.onAuthStateChange==='function')db.auth.onAuthStateChange(()=>setTimeout(()=>void syncHeader(),40));
   window.addEventListener('cam:admin-state-change',()=>void syncHeader());
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)void syncHeader();});
@@ -360,7 +589,10 @@ function init(){
   const names=document.querySelector('#aeProfileDialog .cam-profile-names');
   if(names&&!$('camProfileRank')){const rank=el('div',null,'cam-profile-rank');rank.id='camProfileRank';const awards=el('div',null,'cam-profile-awards');awards.id='camProfileAwards';names.append(rank,awards);}
   const overview=$('camProfileOverview');
-  if(overview&&!$('camProfileLeagues')){const panel=el('section',null,'cam-profile-leagues');panel.id='camProfileLeagues';panel.hidden=true;panel.setAttribute('aria-label','Ligas, rangos e insignias');overview.before(panel);}
+  // Pestaña «Perfil»: el rango sencillo va encima de «Primeros pasos».
+  if(overview&&!$('camProfileLeagues')){const panel=el('section',null,'cam-profile-leagues');panel.id='camProfileLeagues';panel.hidden=true;panel.setAttribute('aria-label','Rango');overview.before(panel);}
+  // Pestaña «Rangos» (está en index.html; por si una página antigua no la trae).
+  if(overview&&!$('camProfileRanks')){const ranks=el('section',null,'cam-profile-ranks');ranks.id='camProfileRanks';ranks.hidden=true;ranks.setAttribute('role','tabpanel');ranks.setAttribute('aria-label','Rangos');($('camProfileParties')||overview).before(ranks);}
   const dialog=el('dialog',null,'cam-league-dialog');dialog.id='camLeagueDialog';dialog.setAttribute('aria-labelledby','camLeagueTitle');
   const header=el('header');const title=el('h2','Ligas CAM');title.id='camLeagueTitle';
   const close=btn('×','cam-league-close',()=>dialog.close());close.setAttribute('aria-label','Cerrar clasificación');header.append(title,close);
@@ -373,10 +605,9 @@ function init(){
     mountEntry(host,comp);
   }
   document.addEventListener('cam:profile-view',onProfile);
-  $('aeProfileDialog')?.addEventListener('close',()=>{expandNext=false;});
-  document.addEventListener('ae:picks-updated',()=>{cache.clear();identityCache.clear();boardCache.clear();});
+  document.addEventListener('ae:picks-updated',()=>{cache.clear();identityCache.clear();boardCache.clear();progressBoards.clear();});
 }
-window.CamLeagues=Object.freeze({markAuthor,mountEntry,open:openBoard,emblem,award,levels:LEVELS,stateText,topRank,syncHeader});
+window.CamLeagues=Object.freeze({markAuthor,mountEntry,open:openBoard,emblem,award,levels:LEVELS,stateText,topRank,syncHeader,nextStep});
 // This script follows the profile markup. Bind before the profile's own
 // DOMContentLoaded listener: an already-resolved session can emit its view event
 // in a microtask between DOMContentLoaded listeners on a direct profile URL.

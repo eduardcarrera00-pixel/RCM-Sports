@@ -112,7 +112,7 @@ def run(width, dark):
         assert st['edit'] and st['kicker'].startswith('MI PERFIL'), f'{where}: botones propios {st}'
         assert st['stats'] == 0, f'{where}: sin fila de cifras {st}'
         assert st['figures'] == ['3·63 % apoyo', '3·50 % acierto'], f'{where}: cifras en el resumen {st}'
-        assert st['tabs'] == ['Perfil', 'Takes', 'Picks', 'Mi Party'] and st['selected'] == 'aeProfileTabOverview', f'{where}: pestañas {st}'
+        assert st['tabs'] == ['Perfil', 'Takes', 'Picks', 'Rangos', 'Mi grupo'] and st['selected'] == 'aeProfileTabOverview', f'{where}: pestañas {st}'
         assert st['overflow'] <= 1, f'{where}: desbordamiento {st}'
         if width < 700:
             box = page.evaluate("document.getElementById('aeProfileDialog').getBoundingClientRect().toJSON()")
@@ -166,7 +166,7 @@ def run(width, dark):
         page.evaluate(f"openAePublicProfile('{OTHER}', false)"); page.wait_for_timeout(1200)
         st = page.evaluate(STATE)
         assert st['title'] == '@beto_crack' and not st['edit'] and st['kicker'].startswith('AFICIONADO'), f'{where}: público {st}'
-        assert st['tabs'] == ['Perfil', 'Takes', 'Picks', 'Party'] and st['selected'] == 'aeProfileTabOverview', f'{where}: pestañas públicas {st}'
+        assert st['tabs'] == ['Perfil', 'Takes', 'Picks', 'Rangos', 'Party'] and st['selected'] == 'aeProfileTabOverview', f'{where}: pestañas públicas {st}'
         assert not page.locator('#aeProfileDialog [data-cam-welcome-again]').count(), f'{where}: cabecera sin botón de bienvenida'
         if SHOTS: page.screenshot(path=str(SHOTS / f'{where}-publico.png'))
         assert page.errors == [], f'{where}: errores {page.errors}'

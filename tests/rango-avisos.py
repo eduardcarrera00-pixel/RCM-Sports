@@ -18,7 +18,8 @@ tests/fake-supabase.js (sin red). Cubre, a 320, 390 y 1366 px, de día y de noch
     marca los avisos como leídos al abrirlos (siguen resaltados mientras está
     abierto) y cada aviso lleva a su publicación cerrando el perfil;
   · tocar el globito abre el perfil directamente con el panel;
-  · tocar el rango abre el perfil con el detalle del rango desplegado;
+  · tocar el rango abre el perfil en la pestaña «Rangos» (11 nov 2026: el
+    detalle del rango vive ahí; en «Perfil» solo queda «Rango: <nombre>»);
   · perfil ajeno: sin campana; el perfil abre bien con y sin avisos;
   · sin errores de consola ni textos cortados.
 
@@ -115,7 +116,8 @@ PROFILE = """() => {
     // El número de la campana sobresale: su caja (con overflow visible) no lo recorta.
     badgeInside: !vis(badge) || badge.getBoundingClientRect().top >= bell.parentElement.getBoundingClientRect().top - 0.5,
     share: vis(document.getElementById('camProfileShare')) ? box(document.getElementById('camProfileShare')) : null,
-    rankCard: Boolean(d.querySelector('.cam-rank-disclosure')), rankOpen: Boolean(d.querySelector('.cam-rank-disclosure[open]'))};
+    rankCard: Boolean(d.querySelector('#camProfileLeagues .cam-rank-simple') || d.querySelector('#camProfileRanks .cam-rk-hero')),
+    rankOpen: document.getElementById('aeProfileTabRanks')?.getAttribute('aria-selected') === 'true' && vis(d.querySelector('#camProfileRanks .cam-rk-hero'))};
 }"""
 
 PANEL = """() => {
@@ -257,7 +259,7 @@ def run(width, dark):
                 check(gone[0] is False and gone[1] is False and gone[2] == ['c1000000'], f'{t}: el aviso no lleva a su Pick {gone}')
             check(not page.errors, f'{t}: errores {page.errors[:2]}')
 
-    # Tocar el globito abre el perfil con el panel; tocar el rango, el detalle del rango.
+    # Tocar el globito abre el perfil con el panel; tocar el rango, la pestaña «Rangos».
     with fp.full_page(fake_js=model(unread=12), dark=dark, width=width, height=height) as page:
         page.wait_for_timeout(300)
         b = page.locator('#camNavProfile .cam-profile-badge').bounding_box()
@@ -269,9 +271,9 @@ def run(width, dark):
         page.evaluate("closeAeProfile()"); page.wait_for_timeout(300)
         page.click('#camHeaderRank'); page.wait_for_timeout(1000)
         p = page.evaluate(PROFILE)
-        check(p['open'] and p['rankOpen'], f'{tag}: el rango no abre el perfil con su detalle {p}')
+        check(p['open'] and p['rankOpen'], f'{tag}: el rango no abre el perfil en «Rangos» {p}')
         page.evaluate("closeAeProfile()"); page.wait_for_timeout(300)
-        # Tocar el icono de Perfil (no el globito) abre el perfil sin el panel y con el detalle cerrado.
+        # Tocar el icono de Perfil (no el globito) abre el perfil sin el panel y en «Perfil».
         pr = page.locator('#camNavProfile').bounding_box()
         page.mouse.click(pr['x'] + pr['width'] / 2, pr['y'] + pr['height'] - 6); page.wait_for_timeout(900)
         p = page.evaluate(PROFILE)

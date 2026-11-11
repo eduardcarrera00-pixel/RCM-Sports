@@ -25,7 +25,7 @@ for(const group of groups){
     assert(!links.includes(source),source+' must not also load separately');
   }
 }
-assert.equal(allSources.size,77,'Original pack sources plus monthly leagues, desktop sections, display clarity, Picks moderno, unified CAM UI, expandable Picks, header rank and sport conversations; editorial sources must not load in later packs');
+assert.equal(allSources.size,78,'Original pack sources plus monthly leagues, desktop sections, display clarity, Picks moderno, unified CAM UI, expandable Picks, header rank, sport conversations and the profile Rangos tab; editorial sources must not load in later packs');
 assert(editorialSources.every(source=>!links.includes(source)), 'Editorial sources cannot also load separately');
 const redundancies=editorialSources.filter(source=>allSources.has(source));
 assert.deepEqual(redundancies,[],'Do not ship duplicate CSS files inside both the editorial bundle and later CSS packs');

@@ -1,0 +1,328 @@
+/* CAM SPORTS · Perfil con pestaña «Rangos» (11 nov 2026).
+   · Pestañas Perfil · Takes · Picks · Rangos · Mi grupo. En el teléfono, si no
+     caben, la barra se desliza de lado (sin cortar textos) y los bordes se
+     desvanecen solo donde queda algo por ver (clases que pone ae-profile.js).
+   · Pestaña «Perfil»: el rango fijo y sencillo (escudo + «Rango: Cobre») y el
+     enlace «¿Quieres entender el sistema de rangos?».
+   · Pestaña «Rangos»: rango actual, progreso, rango por modalidad, escalera,
+     historial y «¿Cómo funcionan los rangos?» en desplegables.
+   Misma paleta del perfil (--rs-*, cam-profile-resumen.css): marfil de día,
+   azul noche de noche, filete cobre y títulos en Playfair. Va en la capa
+   cam-banners con !important como el resto del perfil; las esquinas, en
+   cam-header (la primera capa registrada). Mucho aire y nada saturado. */
+@layer cam-banners {
+  /* ---------- pestañas ---------- */
+  html body #aeProfileDialog .ae-profile-tabs:not([hidden]) {
+    /* Con overflow, su alto mínimo pasaría a 0 y en el ordenador la barra se
+       aplastaba bajo una pestaña larga (Rangos): nunca menos que su contenido. */
+    flex:0 0 auto!important;
+    min-height:max-content!important;
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+    overscroll-behavior-x:contain!important;
+    scrollbar-width:none!important;
+    scroll-padding-inline:16px!important;
+    -webkit-overflow-scrolling:touch;
+  }
+  html body #aeProfileDialog .ae-profile-tabs::-webkit-scrollbar { display:none!important; }
+  html body #aeProfileDialog .ae-profile-tabs button { flex-shrink:0!important; }
+  html body #aeProfileDialog .ae-profile-tabs button:focus-visible { outline:2px solid var(--rs-gold)!important; outline-offset:-3px!important; }
+  @media (min-width:761px) {
+    /* Cinco pestañas en una fila sin que ninguna se apriete. */
+    html body #aeProfileDialog .ae-profile-tabs button { min-width:96px!important; padding:0 13px!important; }
+  }
+  @media (max-width:760px) {
+    html body #aeProfileDialog .ae-profile-tabs:not([hidden]) { gap:6px!important; padding:10px 14px!important; }
+    /* Nunca encogen por debajo de su texto: si no caben, la barra se desliza. */
+    html body #aeProfileDialog .ae-profile-tabs button { flex:1 0 auto!important; min-width:max-content!important; padding:0 12px!important; }
+    html body #aeProfileDialog .ae-profile-tabs.has-more-end:not(.has-more-start) {
+      -webkit-mask-image:linear-gradient(to right,#000 calc(100% - 40px),transparent)!important;
+      mask-image:linear-gradient(to right,#000 calc(100% - 40px),transparent)!important;
+    }
+    html body #aeProfileDialog .ae-profile-tabs.has-more-start:not(.has-more-end) {
+      -webkit-mask-image:linear-gradient(to left,#000 calc(100% - 40px),transparent)!important;
+      mask-image:linear-gradient(to left,#000 calc(100% - 40px),transparent)!important;
+    }
+    html body #aeProfileDialog .ae-profile-tabs.has-more-start.has-more-end {
+      -webkit-mask-image:linear-gradient(to right,transparent,#000 40px,#000 calc(100% - 40px),transparent)!important;
+      mask-image:linear-gradient(to right,transparent,#000 40px,#000 calc(100% - 40px),transparent)!important;
+    }
+  }
+  /* Teléfonos: las cinco se compactan (sin icono, menos relleno) para caber
+     de 360 a 430 px; por debajo, la barra se desliza. */
+  @media (max-width:420px) {
+    html body #aeProfileDialog .ae-profile-tabs:not([hidden]) { gap:5px!important; padding:10px 12px!important; }
+    html body #aeProfileDialog .ae-profile-tabs button { padding:0 9px!important; }
+    html body #aeProfileDialog .ae-profile-tabs .cam-tab-icon { display:none!important; }
+  }
+  @media (max-width:360px) {
+    html body #aeProfileDialog .ae-profile-tabs:not([hidden]) { padding:10px 10px!important; }
+    html body #aeProfileDialog .ae-profile-tabs button { padding:0 8px!important; font-size:10.5px!important; letter-spacing:.03em!important; }
+  }
+
+  /* ---------- «Primeros pasos»: tantas rayitas como pasos ---------- */
+  html body #camProfileOverview .cam-ov-progress { grid-template-columns:repeat(var(--cam-steps,2),minmax(0,1fr))!important; }
+
+  /* ---------- pestaña «Perfil»: el rango sencillo ---------- */
+  html body #aeProfileDialog #camProfileLeagues.cam-profile-leagues {
+    margin:0!important; padding:22px 30px 0!important;
+    border:0!important; background:transparent!important; background-image:none!important; color:var(--rs-text)!important;
+  }
+  html body #aeProfileDialog #camProfileLeagues .cam-league-status { margin:0!important; color:var(--rs-muted)!important; font:500 13px/1.5 Inter,system-ui,sans-serif!important; }
+  html body #camProfileLeagues .cam-rank-simple {
+    display:grid!important; gap:8px!important; min-width:0!important;
+    margin:0!important; padding:16px 18px 6px!important;
+    border:1px solid var(--rs-line)!important;
+    background:var(--rs-card)!important; background-image:none!important;
+    box-shadow:inset 0 2px 0 var(--rs-gold)!important;
+  }
+  html body #camProfileLeagues .cam-rank-simple-line { display:flex!important; align-items:center!important; gap:14px!important; margin:0!important; padding:0!important; }
+  html body #camProfileLeagues .cam-rank-simple-line .cam-rank-emblem { flex:0 0 38px!important; width:38px!important; height:44px!important; }
+  html body #camProfileLeagues .cam-rank-simple-text {
+    min-width:0!important; color:var(--rs-muted)!important;
+    font:600 15px/1.3 Inter,system-ui,sans-serif!important; letter-spacing:0!important; text-transform:none!important;
+  }
+  html body #camProfileLeagues .cam-rank-simple-name {
+    color:var(--rs-ink)!important; font:600 23px/1.2 "Playfair Display",Georgia,serif!important; letter-spacing:0!important;
+  }
+  html body #camProfileLeagues .cam-rank-simple-link {
+    display:flex!important; align-items:center!important; justify-content:space-between!important; gap:12px!important;
+    width:100%!important; min-height:48px!important; margin:0!important; padding:8px 0!important;
+    border:0!important; border-top:1px solid var(--rs-line)!important;
+    background:transparent!important; background-image:none!important; box-shadow:none!important;
+    color:var(--rs-accent)!important; font:650 14px/1.4 Inter,system-ui,sans-serif!important;
+    letter-spacing:0!important; text-align:left!important; text-transform:none!important; white-space:normal!important; cursor:pointer!important;
+  }
+  html body #camProfileLeagues .cam-rank-simple-link:hover > span:first-child { text-decoration:underline!important; text-underline-offset:3px!important; }
+  html body #camProfileLeagues .cam-rank-simple-chevron { flex:0 0 auto!important; font:400 22px/1 Inter,system-ui,sans-serif!important; }
+  /* El resumen va justo debajo, con el mismo aire. */
+  html body #aeProfileDialog #camProfileLeagues:not([hidden]) + #camProfileOverview { padding-top:16px!important; }
+
+  /* ---------- pestaña «Rangos» ---------- */
+  html body #aeProfileDialog #camProfileRanks {
+    display:grid!important; gap:16px!important; min-width:0!important;
+    margin:0!important; padding:22px 30px 30px!important;
+    color:var(--rs-text)!important; font:400 14px/1.6 Inter,system-ui,sans-serif!important;
+  }
+  html body #aeProfileDialog #camProfileRanks[hidden] { display:none!important; }
+  html body #camProfileRanks *,
+  html body #camProfileRanks *::before,
+  html body #camProfileRanks *::after { box-sizing:border-box!important; }
+  html body #camProfileRanks .cam-league-status { margin:0!important; color:var(--rs-muted)!important; font:500 13px/1.5 Inter,system-ui,sans-serif!important; }
+  html body #camProfileRanks > .cam-league-link { justify-self:start!important; }
+  html body #camProfileRanks .cam-rk-block {
+    display:grid!important; gap:14px!important; min-width:0!important;
+    margin:0!important; padding:20px!important;
+    border:1px solid var(--rs-line)!important;
+    background:var(--rs-card)!important; background-image:none!important;
+    box-shadow:inset 0 2px 0 var(--rs-gold)!important;
+  }
+  html body #camProfileRanks .cam-rk-title {
+    margin:0!important; padding:0!important; color:var(--rs-ink)!important;
+    font:600 20px/1.25 "Playfair Display",Georgia,serif!important; letter-spacing:0!important; text-transform:none!important;
+  }
+  html body #camProfileRanks .cam-rk-subtitle {
+    margin:6px 0 0!important; color:var(--rs-ink)!important;
+    font:600 16px/1.3 "Playfair Display",Georgia,serif!important; letter-spacing:0!important; text-transform:none!important;
+  }
+
+  /* Arriba: rango actual en grande, mejor rango y si es provisional. */
+  html body #camProfileRanks .cam-rk-hero {
+    grid-template-columns:auto minmax(0,1fr)!important; align-items:center!important; gap:22px!important; padding:24px 22px!important;
+    background:radial-gradient(ellipse at 100% 0%,var(--league-wash,transparent),transparent 62%),var(--rs-card)!important;
+  }
+  html body #camProfileRanks .cam-rk-hero-crest .cam-rank-emblem { flex:0 0 74px!important; width:74px!important; height:86px!important; }
+  html body #camProfileRanks .cam-rk-hero-copy { display:grid!important; gap:6px!important; min-width:0!important; }
+  html body #camProfileRanks .cam-rk-kicker {
+    margin:0!important; color:var(--rs-muted)!important;
+    font:800 10.5px/1.4 Inter,system-ui,sans-serif!important; letter-spacing:.14em!important; text-transform:uppercase!important;
+  }
+  html body #camProfileRanks .cam-rk-hero-name {
+    margin:0!important; padding:0!important; color:var(--rs-ink)!important;
+    font:600 clamp(32px,6vw,42px)/1.1 "Playfair Display",Georgia,serif!important; letter-spacing:0!important; overflow-wrap:anywhere!important;
+  }
+  html body #camProfileRanks .cam-rk-hero-best { margin:0!important; color:var(--rs-text)!important; font:500 14px/1.45 Inter,system-ui,sans-serif!important; }
+  html body #camProfileRanks .cam-rk-chip {
+    justify-self:start!important; display:inline-flex!important; align-items:center!important;
+    margin:4px 0 0!important; padding:4px 12px!important;
+    border:1px solid var(--rs-gold)!important; background:var(--rs-accent-soft)!important;
+    color:var(--rs-accent)!important; font:700 12.5px/1.35 Inter,system-ui,sans-serif!important; letter-spacing:0!important;
+  }
+  html body #camProfileRanks .cam-rk-chip.is-pending { border-style:dashed!important; }
+  html body #camProfileRanks .cam-rk-awards { display:flex!important; flex-wrap:wrap!important; gap:6px!important; margin-top:4px!important; }
+
+  /* Progreso al siguiente rango. */
+  html body #camProfileRanks .cam-rk-pick { display:flex!important; flex-wrap:wrap!important; gap:8px!important; margin:0!important; }
+  html body #camProfileRanks .cam-rk-pick-btn {
+    display:inline-flex!important; align-items:center!important; justify-content:center!important;
+    min-height:40px!important; min-width:0!important; margin:0!important; padding:0 16px!important;
+    border:1px solid var(--rs-line-strong)!important; background:transparent!important; background-image:none!important; box-shadow:none!important;
+    color:var(--rs-muted)!important; font:700 13px/1.2 Inter,system-ui,sans-serif!important;
+    letter-spacing:0!important; text-transform:none!important; white-space:nowrap!important; cursor:pointer!important;
+  }
+  html body #camProfileRanks .cam-rk-pick-btn:hover { color:var(--rs-ink)!important; border-color:var(--rs-gold)!important; }
+  html body #camProfileRanks .cam-rk-pick-btn[aria-pressed="true"] { border-color:var(--rs-gold)!important; background:var(--rs-accent-soft)!important; color:var(--rs-ink)!important; }
+  html body #camProfileRanks .cam-rk-progress-body { display:grid!important; gap:8px!important; min-width:0!important; }
+  html body #camProfileRanks .cam-rk-track {
+    display:grid!important; grid-template-columns:auto minmax(0,1fr) auto!important; align-items:center!important; gap:14px!important;
+    margin:4px 0 6px!important;
+  }
+  html body #camProfileRanks .cam-rk-track-end {
+    display:grid!important; justify-items:center!important; gap:4px!important; min-width:56px!important;
+    color:var(--rs-ink)!important; font:700 12px/1.3 Inter,system-ui,sans-serif!important; text-align:center!important;
+  }
+  html body #camProfileRanks .cam-rk-track-end .cam-rank-emblem { flex:0 0 32px!important; width:32px!important; height:37px!important; }
+  html body #camProfileRanks .cam-rk-track-end.is-next { color:var(--rs-muted)!important; }
+  html body #camProfileRanks .cam-rk-track-end.is-next .cam-rank-emblem { filter:grayscale(1)!important; opacity:.5!important; }
+  html body #camProfileRanks .cam-rk-track-end.is-top { align-self:center!important; }
+  html body #camProfileRanks .cam-rk-bar {
+    position:relative!important; display:block!important; height:8px!important; overflow:hidden!important;
+    background:var(--rs-soft)!important; box-shadow:inset 0 0 0 1px var(--rs-line)!important;
+  }
+  html body #camProfileRanks .cam-rk-bar-fill { display:block!important; height:100%!important; max-width:100%!important; background:var(--rs-gold)!important; }
+  html body #camProfileRanks .cam-rk-progress-label { margin:0!important; color:var(--rs-muted)!important; font:700 12.5px/1.45 Inter,system-ui,sans-serif!important; letter-spacing:.01em!important; }
+  html body #camProfileRanks .cam-rk-progress-main { margin:0!important; color:var(--rs-ink)!important; font:600 15.5px/1.5 Inter,system-ui,sans-serif!important; }
+  html body #camProfileRanks .cam-rk-progress-note {
+    max-width:62ch!important; margin:0!important; color:var(--rs-text)!important;
+    font:400 13.5px/1.65 "Libre Baskerville",Georgia,serif!important;
+  }
+  html body #camProfileRanks .cam-rival-list { margin:0!important; }
+  html body #camProfileRanks .cam-rival { border-color:var(--rs-line-strong)!important; background:var(--rs-soft)!important; }
+  html body #camProfileRanks .cam-rival small:first-child { color:var(--rs-accent)!important; }
+  html body #camProfileRanks .cam-rk-actions { display:flex!important; flex-wrap:wrap!important; gap:8px!important; margin-top:6px!important; }
+  html body #camProfileRanks .cam-league-link {
+    display:inline-flex!important; align-items:center!important; min-height:44px!important; margin:0!important; padding:0 16px!important;
+    border:1px solid var(--rs-line-strong)!important; background:transparent!important; background-image:none!important; box-shadow:none!important;
+    color:var(--rs-accent)!important; font:700 13px/1.35 Inter,system-ui,sans-serif!important;
+    letter-spacing:0!important; text-align:left!important; text-transform:none!important; white-space:normal!important; cursor:pointer!important;
+  }
+  html body #camProfileRanks .cam-league-link:hover { background:var(--rs-accent-soft)!important; }
+
+  /* Rango por modalidad: las tarjetas que estaban en el perfil. */
+  html body #camProfileRanks .cam-league-cards { display:grid!important; grid-template-columns:repeat(3,minmax(0,1fr))!important; gap:12px!important; margin:0!important; }
+  html body #camProfileRanks .cam-league-card {
+    display:flex!important; flex-wrap:wrap!important; align-content:flex-start!important; align-items:flex-start!important; gap:10px 12px!important;
+    min-width:0!important; margin:0!important; padding:14px!important;
+    border:1px solid var(--rs-line)!important;
+    background:linear-gradient(145deg,var(--league-wash,transparent),transparent 70%),var(--rs-soft)!important;
+    box-shadow:none!important; color:var(--rs-text)!important; text-align:left!important; cursor:default!important;
+  }
+  html body #camProfileRanks .cam-league-card > .cam-rank-emblem { flex:0 0 34px!important; width:34px!important; height:40px!important; }
+  html body #camProfileRanks .cam-league-card-copy { flex:1 1 120px!important; gap:3px!important; }
+  html body #camProfileRanks .cam-league-card-copy > small { color:var(--rs-muted)!important; font:700 11.5px/1.4 Inter,system-ui,sans-serif!important; letter-spacing:0!important; }
+  html body #camProfileRanks .cam-league-card-copy > small:first-child { color:var(--rs-accent)!important; letter-spacing:.06em!important; text-transform:uppercase!important; font-size:10.5px!important; }
+  html body #camProfileRanks .cam-league-card-copy > strong { color:var(--rs-ink)!important; font:600 20px/1.2 "Playfair Display",Georgia,serif!important; }
+  html body #camProfileRanks .cam-league-state { min-height:0!important; color:var(--rs-text)!important; font:600 12.5px/1.45 Inter,system-ui,sans-serif!important; }
+  html body #camProfileRanks .cam-league-meter { gap:6px!important; color:var(--rs-muted)!important; }
+  html body #camProfileRanks .cam-league-meter-label { color:var(--rs-ink)!important; font:700 12px/1.4 Inter,system-ui,sans-serif!important; }
+  html body #camProfileRanks .cam-league-meter-track { height:6px!important; background:var(--rs-line)!important; }
+  html body #camProfileRanks .cam-league-meter-fill { background:var(--rs-gold)!important; }
+
+  /* Escalera de rangos: teléfono en columna, ordenador en fila. */
+  html body #camProfileRanks .cam-rk-ladder { display:grid!important; margin:0!important; padding:0!important; list-style:none!important; }
+  html body #camProfileRanks .cam-rk-step {
+    position:relative!important; display:grid!important; grid-template-columns:40px minmax(0,1fr)!important; align-items:center!important; gap:14px!important;
+    margin:0!important; padding:9px 10px!important; list-style:none!important;
+  }
+  html body #camProfileRanks .cam-rk-step .cam-rank-emblem { position:relative!important; z-index:1!important; flex:0 0 34px!important; width:34px!important; height:40px!important; justify-self:center!important; }
+  /* Línea que une los escalones. */
+  html body #camProfileRanks .cam-rk-step:not(:last-child)::after {
+    content:""!important; position:absolute!important; left:29px!important; top:calc(50% + 20px)!important; height:calc(100% - 40px)!important; width:2px!important;
+    background:var(--rs-gold)!important;
+  }
+  html body #camProfileRanks .cam-rk-step.is-current::after,
+  html body #camProfileRanks .cam-rk-step.is-locked::after { background:var(--rs-line-strong)!important; }
+  html body #camProfileRanks .cam-rk-step-copy { display:flex!important; flex-wrap:wrap!important; align-items:center!important; gap:4px 10px!important; min-width:0!important; }
+  html body #camProfileRanks .cam-rk-step-name { color:var(--rs-ink)!important; font:600 16px/1.3 "Playfair Display",Georgia,serif!important; }
+  html body #camProfileRanks .cam-rk-step-tag {
+    display:inline-flex!important; padding:2px 10px!important; border:1px solid var(--rs-gold)!important;
+    background:var(--rs-accent-soft)!important; color:var(--rs-accent)!important;
+    font:800 10.5px/1.4 Inter,system-ui,sans-serif!important; letter-spacing:.08em!important; text-transform:uppercase!important; white-space:nowrap!important;
+  }
+  html body #camProfileRanks .cam-rk-step-tag.is-best { background:transparent!important; border-style:dashed!important; }
+  html body #camProfileRanks .cam-rk-step.is-current { background:var(--rs-accent-soft)!important; box-shadow:inset 0 0 0 1px var(--rs-line-strong)!important; }
+  html body #camProfileRanks .cam-rk-step.is-locked .cam-rank-emblem { filter:grayscale(1)!important; opacity:.42!important; }
+  html body #camProfileRanks .cam-rk-step.is-locked .cam-rk-step-name { color:var(--rs-muted)!important; opacity:.8!important; }
+  html body #camProfileRanks .cam-rk-step-hidden {
+    position:absolute!important; width:1px!important; height:1px!important; margin:-1px!important; padding:0!important;
+    overflow:hidden!important; clip:rect(0 0 0 0)!important; white-space:nowrap!important; border:0!important;
+  }
+
+  /* Historial y «¿Cómo funcionan los rangos?»: desplegables tranquilos. */
+  html body #camProfileRanks .cam-rk-history {
+    margin:0!important; padding:4px 20px!important;
+    border:1px solid var(--rs-line)!important; background:var(--rs-card)!important; color:var(--rs-text)!important;
+    font:400 13.5px/1.6 Inter,system-ui,sans-serif!important;
+  }
+  html body #camProfileRanks .cam-rk-history > p { margin:0 0 14px!important; color:var(--rs-text)!important; font:400 13.5px/1.65 "Libre Baskerville",Georgia,serif!important; }
+  html body #camProfileRanks .cam-rk-history li { border-color:var(--rs-line)!important; }
+  html body #camProfileRanks .cam-rk-how-list { display:grid!important; margin:0!important; border-top:1px solid var(--rs-line)!important; }
+  html body #camProfileRanks .cam-rk-how-item { margin:0!important; padding:0!important; border-bottom:1px solid var(--rs-line)!important; }
+  html body #camProfileRanks :is(.cam-rk-how-item, .cam-rk-history) > summary {
+    position:relative!important; display:flex!important; align-items:center!important; justify-content:space-between!important; gap:14px!important;
+    min-height:52px!important; margin:0!important; padding:10px 0!important;
+    color:var(--rs-ink)!important; font:650 15px/1.4 Inter,system-ui,sans-serif!important;
+    list-style:none!important; cursor:pointer!important;
+  }
+  html body #camProfileRanks :is(.cam-rk-how-item, .cam-rk-history) > summary::-webkit-details-marker { display:none!important; }
+  html body #camProfileRanks :is(.cam-rk-how-item, .cam-rk-history) > summary::after {
+    content:""!important; flex:0 0 9px!important; width:9px!important; height:9px!important; margin-right:4px!important;
+    border-right:1.8px solid var(--rs-accent)!important; border-bottom:1.8px solid var(--rs-accent)!important;
+    transform:translateY(-2px) rotate(45deg)!important; transition:transform .2s ease!important;
+  }
+  html body #camProfileRanks :is(.cam-rk-how-item, .cam-rk-history)[open] > summary::after { transform:translateY(2px) rotate(-135deg)!important; }
+  html body #camProfileRanks :is(.cam-rk-how-item, .cam-rk-history) > summary:hover { color:var(--rs-accent)!important; }
+  html body #camProfileRanks :is(.cam-rk-how-item, .cam-rk-history) > summary:focus-visible { outline:2px solid var(--rs-gold)!important; outline-offset:2px!important; }
+  html body #camProfileRanks .cam-rk-how-body { display:grid!important; gap:10px!important; padding:0 0 16px!important; }
+  html body #camProfileRanks .cam-rk-how-body p {
+    max-width:62ch!important; margin:0!important; color:var(--rs-text)!important;
+    font:400 14px/1.7 "Libre Baskerville",Georgia,serif!important;
+  }
+  @media (prefers-reduced-motion:reduce) {
+    html body #camProfileRanks :is(.cam-rk-how-item, .cam-rk-history) > summary::after { transition:none!important; }
+  }
+
+  /* Reglas dentro de la clasificación mensual (mismos textos). */
+  html body .cam-league-dialog .cam-league-rules-q { margin:16px 0 4px!important; font:700 13px/1.4 Inter,system-ui,sans-serif!important; }
+
+  /* ---------- ordenador ---------- */
+  @media (min-width:761px) {
+    html body #camProfileRanks .cam-rk-ladder { grid-template-columns:repeat(7,minmax(0,1fr))!important; align-items:start!important; gap:4px!important; }
+    html body #camProfileRanks .cam-rk-step { grid-template-columns:minmax(0,1fr)!important; align-content:start!important; align-items:start!important; justify-items:center!important; gap:8px!important; padding:12px 4px!important; text-align:center!important; }
+    html body #camProfileRanks .cam-rk-step-copy { flex-direction:column!important; justify-content:flex-start!important; gap:6px!important; }
+    html body #camProfileRanks .cam-rk-step-name { font-size:14px!important; }
+    html body #camProfileRanks .cam-rk-step-tag { padding:2px 7px!important; font-size:9.5px!important; letter-spacing:.05em!important; }
+    html body #camProfileRanks .cam-rk-step:not(:last-child)::after {
+      left:calc(50% + 21px)!important; top:32px!important; width:calc(100% - 38px)!important; height:2px!important;
+    }
+  }
+  /* ---------- teléfono ---------- */
+  @media (max-width:760px) {
+    html body #aeProfileDialog #camProfileLeagues.cam-profile-leagues { padding:16px 14px 0!important; }
+    html body #aeProfileDialog #camProfileLeagues:not([hidden]) + #camProfileOverview { padding-top:12px!important; }
+    html body #aeProfileDialog #camProfileRanks { gap:12px!important; padding:14px 14px 24px!important; }
+    html body #camProfileRanks .cam-rk-block { padding:16px!important; gap:12px!important; }
+    html body #camProfileRanks .cam-rk-hero { gap:16px!important; padding:20px 16px!important; }
+    html body #camProfileRanks .cam-rk-hero-crest .cam-rank-emblem { flex-basis:60px!important; width:60px!important; height:70px!important; }
+    html body #camProfileRanks .cam-league-cards { grid-template-columns:minmax(0,1fr)!important; gap:10px!important; }
+    html body #camProfileRanks .cam-rk-history { padding:2px 16px!important; }
+    html body #camProfileRanks .cam-rk-track { gap:10px!important; }
+    html body #camProfileRanks .cam-rk-track-end { min-width:48px!important; }
+  }
+  @media (max-width:360px) {
+    html body #camProfileRanks .cam-rk-pick-btn { padding:0 13px!important; }
+    html body #camProfileRanks .cam-rk-hero { grid-template-columns:minmax(0,1fr)!important; }
+  }
+}
+
+/* Esquinas (la capa cam-header manda sobre la esquina 0 global). */
+@layer cam-header {
+  html body #camProfileLeagues .cam-rank-simple,
+  html body #camProfileRanks :is(.cam-rk-block, .cam-rk-history) { border-radius:16px!important; }
+  html body #camProfileLeagues :is(.cam-rank-simple-link, .cam-rank-simple-line, .cam-rank-simple-text) { border-radius:0!important; }
+  html body #camProfileRanks :is(.cam-league-card, .cam-rival, .cam-rk-step.is-current) { border-radius:12px!important; }
+  html body #camProfileRanks :is(.cam-rk-chip, .cam-rk-pick-btn, .cam-rk-step-tag, .cam-league-link) { border-radius:999px!important; }
+  html body #camProfileRanks :is(.cam-rk-bar, .cam-rk-bar-fill, .cam-league-meter-track, .cam-league-meter-fill) { border-radius:99px!important; }
+  html body #camProfileRanks :is(.cam-rk-title, .cam-rk-subtitle, .cam-rk-hero-name, .cam-rk-progress-main, .cam-rk-progress-note, .cam-rk-progress-label,
+    .cam-rk-how-list, .cam-rk-how-item, .cam-rk-how-body, .cam-rk-how-body p, .cam-rk-ladder, .cam-rk-step:not(.is-current), .cam-rk-track, summary) { border-radius:0!important; }
+}

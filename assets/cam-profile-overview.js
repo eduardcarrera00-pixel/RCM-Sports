@@ -7,6 +7,9 @@
    ajeno, la quiniela va primero si va en el podio. highlights() da las
    etiquetas de la cabecera.
    10 nov 2026: «Mi liguilla» (Liga MX) con mis 8 y mi cuadro, de cam_profile_overview.
+   11 nov 2026: «Primeros pasos» solo con Mi liguilla y Quiniela; en el perfil
+   propio ya no salen tarjetas vacías de Takes ni Picks (tienen su pestaña con
+   «Publicar»). El rango y el enlace a «Rangos» van encima (cam-leagues.js).
    Solo pinta: los datos llegan de ae-profile.js (cam_profile_overview y, una
    vez por perfil, campeones y prestigio). Sin llamadas, bucles ni
    temporizadores propios. */
@@ -181,7 +184,7 @@ function takesCard(data, ctx) {
   const t = data.takes || {};
   const top = t.top;
   const count = num(t.count);
-  if (!top && !count) return ctx.own && !ctx.stepsShown ? emptyCard('takes', 'Takes', 'Publicar mi Take ›', ctx.newTake) : null;
+  if (!top && !count) return null;
   const support = pct(num(t.up), num(t.down));
   const card = shell('takes', 'Takes', [count ? String(count) : '', support && support + ' apoyo'], () => ctx.tab('takes'));
   if (top) {
@@ -212,7 +215,7 @@ function picksCard(data, ctx) {
   const p = data.picks || {};
   const top = p.top;
   const count = num(p.count);
-  if (!top && !count) return ctx.own && !ctx.stepsShown ? emptyCard('picks', 'Picks', 'Prepara tu Pick ›', ctx.newPick) : null;
+  if (!top && !count) return null;
   const hits = pct(num(p.won), num(p.lost));
   const card = shell('picks', 'Picks', [String(count), hits && hits + ' acierto'], () => ctx.tab('picks'));
   if (top) {
@@ -331,14 +334,24 @@ function liguillaCard(data, ctx) {
   return card;
 }
 
-/* ---------- «Primeros pasos» (solo el perfil propio) ---------- */
-const STEPS = [
-  ['take', 'Publica tu primer Take', 'Da tu opinión y deja que la comunidad vote', ctx => ctx.newTake()],
-  ['quiniela', 'Juega la quiniela', 'Elige quién gana en la NFL o el fútbol', ctx => ctx.play('nfl')],
-  ['pick', 'Prepara tu primer Pick', 'Sube la captura de tu apuesta antes del partido', ctx => ctx.newPick()],
-  ['party', 'Únete a una party', 'Compite con tus amigos en su propia tabla', ctx => ctx.tab('party')]
-];
+/* ---------- «Primeros pasos» (solo el perfil propio) ----------
+   11 nov 2026: Mi liguilla y Quiniela. Mi liguilla solo sale cuando se puede
+   jugar ahora (o ya está hecha): steps.liguilla es true, false o null. */
+const LIGUILLA_STEP = {
+  qualifiers_open: ['Elige a tus 8 clasificados', 'Los equipos que crees que entran en la liguilla de la Liga MX'],
+  bracket_open: ['Arma tu cuadro', 'Elige quién avanza en la liguilla de la Liga MX']
+};
+function stepList(steps) {
+  const list = [];
+  if (steps.liguilla === true || steps.liguilla === false) {
+    const [name, hint] = LIGUILLA_STEP[steps.liguillaPhase] || ['Arma tu liguilla', 'Tu pronóstico de la liguilla de la Liga MX'];
+    list.push(['liguilla', name, hint, () => goLiguilla()]);
+  }
+  list.push(['quiniela', 'Juega la quiniela', 'Elige quién gana en la NFL o el fútbol', ctx => ctx.play('nfl')]);
+  return list;
+}
 function stepsCard(steps, ctx) {
+  const STEPS = stepList(steps);
   const done = STEPS.filter(([key]) => steps[key]).length;
   const card = el('section', null, 'cam-ov-card cam-ov-steps', {'data-kind': 'steps', 'aria-label': 'Primeros pasos'});
   const head = el('header', null, 'cam-ov-head');
@@ -347,6 +360,7 @@ function stepsCard(steps, ctx) {
   head.append(title, el('p', done + ' de ' + STEPS.length, 'cam-ov-steps-count'));
   card.append(head);
   const bar = el('div', null, 'cam-ov-progress', {role: 'progressbar', 'aria-valuemin': 0, 'aria-valuemax': STEPS.length, 'aria-valuenow': done, 'aria-label': done + ' de ' + STEPS.length + ' pasos hechos'});
+  bar.style.setProperty('--cam-steps', String(STEPS.length));
   for (const [key] of STEPS) bar.append(el('span', null, steps[key] ? 'is-done' : ''));
   card.append(bar);
   const list = el('ol', null, 'cam-ov-step-list');
@@ -399,7 +413,7 @@ function render(target, data, ctx) {
     return;
   }
   const steps = ctx.own && ctx.steps && !ctx.steps.complete ? ctx.steps : null;
-  const stepsShown = Boolean(steps && !(steps.take && steps.quiniela && steps.pick && steps.party));
+  const stepsShown = Boolean(steps && stepList(steps).some(([key]) => !steps[key]));
   const c = {...ctx, stepsShown};
   const takes = takesCard(data, c), picks = picksCard(data, c), quiniela = quinielaCard(data, c), liguilla = liguillaCard(data, c);
   // En un perfil ajeno, la quiniela va primero si va en el podio.

@@ -230,9 +230,9 @@ def scenario_own(dark, width, tag):
         open_own(page, width)
         st = state(page)
         assert st['tab'] == 'aeProfileTabOverview' and st['overview'] and not st['takes'], (tag, 'abre en Perfil', st)
-        assert st['tabs'] == ['Perfil', 'Takes', 'Picks', 'Mi Party'], (tag, st['tabs'])
+        assert st['tabs'] == ['Perfil', 'Takes', 'Picks', 'Rangos', 'Mi grupo'], (tag, st['tabs'])
         assert not st['kicker'] and st['focus'] == 'aeProfileTitle', (tag, 'cabecera sin antetítulo y foco en el nombre', st['kicker'], st['focus'])
-        assert st['edit'] and not st['invite'] and not st['shareIcon'] and st['shareText'] == 'Compartir', (tag, st)
+        assert st['edit'] and not st['invite'] and not st['shareIcon'] and st['shareText'] == 'Compartir perfil', (tag, st)
         shown = 2 if width <= 360 else 3   # a 320 px, dos etiquetas como mucho
         assert st['highlights'] == ['2.º en la Quiniela Fútbol', '63 % de acierto en Picks', '80 % de apoyo en Takes'][:shown], st['highlights']
         assert st['strong'] == ['2.º en la Quiniela Fútbol'], st['strong']
@@ -338,9 +338,11 @@ def scenario_own_empty(dark, width, tag):
         st = state(page)
         assert st['kinds'] == ['steps'], (tag, 'Primeros pasos en lugar de tarjetas vacías', st['cards'])
         steps = st['cards'][0]
-        assert steps.startswith('Primeros pasos 0 de 4'), steps
-        for name in ('Publica tu primer Take', 'Juega la quiniela', 'Prepara tu primer Pick', 'Únete a una party'):
-            assert name in steps, (name, steps)
+        # 11 nov 2026: solo Mi liguilla y Quiniela; sin liguilla abierta, solo Quiniela.
+        assert steps.startswith('Primeros pasos 0 de 1'), steps
+        assert 'Juega la quiniela' in steps, steps
+        for name in ('Publica tu primer Take', 'Prepara tu primer Pick', 'Únete a una party'):
+            assert name not in steps, (name, steps)
         assert not st['highlights'], st['highlights']
         check_clean(page, tag + ' resumen vacío')
         shot(page, f'{tag}-perfil-vacio')
@@ -352,11 +354,13 @@ def scenario_own_empty(dark, width, tag):
         page.evaluate("closeAeProfile()")
         page.wait_for_timeout(200)
         open_own(page, width)
-        page.wait_for_selector('#camProfileOverview .cam-ov-steps .cam-ov-step.is-done', timeout=8000)
+        page.wait_for_selector('#camProfileOverview .cam-ov-card[data-kind="takes"]', timeout=8000)
+        page.wait_for_timeout(250)
         st = state(page)
-        assert st['kinds'] == ['steps', 'takes'] and st['cards'][0].startswith('Primeros pasos 1 de 4'), (tag, st['cards'])
+        # El Take ya no es un paso: sale su tarjeta y los pasos siguen en Quiniela.
+        assert st['kinds'] == ['steps', 'takes'] and st['cards'][0].startswith('Primeros pasos 0 de 1'), (tag, st['cards'])
         assert 'Tu Take' in st['cards'][1] and 'Take más apoyado' not in st['cards'][1], st['cards'][1]
-        check_clean(page, tag + ' primeros pasos 1 de 4')
+        check_clean(page, tag + ' primeros pasos con un Take')
         shot(page, f'{tag}-primeros-pasos')
         page.click('#aeProfileTabParty')
         page.wait_for_selector('#camProfileParties .cam-pp-invite')
@@ -413,7 +417,7 @@ def scenario_public(dark, width, tag):
         page.wait_for_selector('#camProfileOverview .cam-ov-card', timeout=8000)
         st = state(page)
         assert st['tab'] == 'aeProfileTabOverview' and st['title'] == '@ana_futbolera', st
-        assert st['tabs'] == ['Perfil', 'Takes', 'Picks', 'Party'], st['tabs']
+        assert st['tabs'] == ['Perfil', 'Takes', 'Picks', 'Rangos', 'Party'], st['tabs']
         assert len(st['cards']) == 3 and not page.locator('#camProfileEditOpen').is_visible()
         assert st['invite'] and not st['edit'] and st['shareIcon'], (tag, 'Invitar a mi party y compartir como icono', st)
         assert page.get_attribute('#camProfileShare', 'aria-label') == 'Compartir perfil'

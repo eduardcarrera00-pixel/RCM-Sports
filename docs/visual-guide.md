@@ -109,6 +109,28 @@ El perfil propio cambia las tarjetas vacías por «Primeros pasos» (Take, quini
 Pick y party); con todo hecho, desaparece. En un perfil ajeno la quiniela va
 primero si va en el podio.
 
+### Pestaña «Rangos» · 11 nov 2026
+
+Cinco pestañas: Perfil · Takes · Picks · Rangos · Mi grupo (Party en un perfil
+ajeno). En el teléfono se compactan (sin el icono de Mi grupo) y caben de 360 px
+en adelante; por debajo, la barra se desliza de lado, la elegida se trae a la
+vista y el borde se desvanece donde queda algo por ver. Ningún texto se recorta.
+
+«Perfil» solo enseña el escudo y «Rango: <nombre>» (el rango más alto), con el
+enlace «¿Quieres entender el sistema de rangos?», que abre «Rangos». Debajo,
+«Primeros pasos» con Mi liguilla (solo si se puede jugar ahora) y Quiniela, y
+«Mi liguilla». En el perfil propio ya no hay tarjetas vacías de Takes ni Picks.
+
+«Rangos» reúne lo que antes se desplegaba en el perfil: rango actual en grande,
+mejor rango y «Rango provisional · Por clasificar»; progreso al siguiente rango
+(una modalidad cada vez, con su barra y lo que falta: resultados para clasificar,
+puestos y puntos hasta la zona de ascenso, rivales cercanos y la clasificación
+mensual); las tarjetas por modalidad; la escalera de Cobre a Leyenda CAM con el
+rango actual marcado y los no alcanzados en gris; el historial; y «¿Cómo
+funcionan los rangos?» en desplegables con las reglas de
+`cam_league_outcome`/`refresh_month`. El escudo de la cabecera abre «Rangos».
+Estilos: `assets/cam-perfil-rangos.css` (paquete de paneles).
+
 ### Jornadas en el perfil · 3 nov 2026
 
 Las vistas principales de Quiniela NFL y Fútbol abren automáticamente la jornada

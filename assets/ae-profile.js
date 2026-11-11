@@ -7,6 +7,10 @@
  * final de «Mi grupo»; la pestaña «quiniela» de antes abre Mi grupo y baja a
  * las jornadas. La cabecera enseña lo que destaca de cada uno y, en un perfil
  * ajeno, «Invitar a mi grupo».
+ * 11 nov 2026: cinco pestañas, Perfil · Takes · Picks · Rangos · Mi grupo.
+ * «Rangos» la pinta cam-leagues.js (?tab=rangos). En el teléfono la barra se
+ * desliza de lado y la pestaña elegida siempre queda a la vista. «Primeros
+ * pasos» se queda en Mi liguilla y Quiniela.
  */
 (() => {
 'use strict';
@@ -35,7 +39,8 @@ let request=0;
 let activeAuthor=null;
 let privateView=false;
 let working=false;
-const TABS=['perfil','takes','picks','party'];
+const TABS=['perfil','takes','picks','rangos','party'];
+const TAB_IDS={perfil:'aeProfileTabOverview',takes:'aeProfileTabTakes',picks:'aeProfileTabPicks',rangos:'aeProfileTabRanks',party:'aeProfileTabParty'};
 // «quiniela» (Mis jornadas) vive dentro de «Mi grupo» desde el 4 nov.
 const validTab=tab=>tab==='quiniela'?'party':TABS.includes(tab)?tab:'perfil';
 let activeTab='perfil';
@@ -57,7 +62,7 @@ let overview=null,overviewError='',overviewStale=false,overviewTimer=0;
 // Lo que el resumen y la cabecera piden junto al resumen (una vez por perfil):
 // campeones elegidos y perfil de prestigio. La pestaña Takes los reutiliza.
 let extras=null;
-// «Primeros pasos» del perfil propio: qué le falta probar.
+// «Primeros pasos» del perfil propio: Mi liguilla y Quiniela.
 let steps=null,stepsTicket=0;
 
 /* Perfil de prestigio: aciertos medidos por dificultad (escala 1–20). */
@@ -744,13 +749,14 @@ function setPrivateTab(tab,options={}){
   labelTabs();
   const toJornadas=tab==='quiniela'&&privateView;
   activeTab=validTab(tab);
-  for(const [id,value] of [['aeProfileTabOverview','perfil'],['aeProfileTabTakes','takes'],['aeProfileTabPicks','picks'],['aeProfileTabParty','party']]){
+  for(const [value,id] of Object.entries(TAB_IDS)){
     const button=$(id);
     if(!button)continue;
     button.setAttribute('aria-selected',String(activeTab===value));
     button.classList.toggle('is-active',activeTab===value);
     button.tabIndex=activeTab===value?0:-1;
   }
+  revealActiveTab();
 
   renderPublishAction();
   const isTakes=activeTab==='takes',isPicks=activeTab==='picks';
@@ -765,6 +771,8 @@ function setPrivateTab(tab,options={}){
   if($('camProfileOverview'))$('camProfileOverview').hidden=activeTab!=='perfil';
   if($('camProfileQuiniela'))$('camProfileQuiniela').hidden=activeTab!=='party'||!privateView;
   if($('camProfileParties'))$('camProfileParties').hidden=activeTab!=='party';
+  // «Rangos» (cam-leagues.js la pinta al recibir la pestaña visible).
+  if($('camProfileRanks'))$('camProfileRanks').hidden=activeTab!=='rangos';
 
   let loading=null;
   if(activeTab==='perfil'){
@@ -794,6 +802,26 @@ function setPrivateTab(tab,options={}){
   jornadasPending=toJornadas;
   if(toJornadas)requestAnimationFrame(scrollToJornadas);
   return loading;
+}
+/* Barra de pestañas en el teléfono: si no caben las cinco, se desliza de lado
+   (sin recortar ningún texto). La elegida se trae a la vista y los bordes se
+   desvanecen solo donde queda algo por ver. */
+function tabEdges(){
+  const bar=$('aeProfileTabs');
+  if(!bar)return;
+  const max=bar.scrollWidth-bar.clientWidth;
+  bar.classList.toggle('has-more-start',max>1&&bar.scrollLeft>1);
+  bar.classList.toggle('has-more-end',max>1&&bar.scrollLeft<max-1);
+}
+function revealActiveTab(){
+  const bar=$('aeProfileTabs'),button=$(TAB_IDS[activeTab]);
+  if(!bar||!button||bar.hidden)return;
+  if(bar.scrollWidth>bar.clientWidth+1){
+    const box=bar.getBoundingClientRect(),r=button.getBoundingClientRect(),pad=28;
+    if(r.left<box.left+pad)bar.scrollLeft-=box.left+pad-r.left;
+    else if(r.right>box.right-pad)bar.scrollLeft+=r.right-(box.right-pad);
+  }
+  tabEdges();
 }
 let jornadasPending=false;
 function scrollToJornadas(){
@@ -908,40 +936,46 @@ function renderHighlights(){
   list.hidden=!items.length;
 }
 
-/* «Primeros pasos» del perfil propio: Take y Pick salen del resumen; quiniela
-   y party se cuentan sin traer filas (solo si el resumen no lo dice ya). Con
-   todo hecho se recuerda en este navegador y no se vuelve a preguntar. */
-const STEPS_KEY='cam_profile_steps_done_v1:';
+/* «Primeros pasos» del perfil propio (11 nov 2026): solo Mi liguilla y
+   Quiniela. Mi liguilla sale del resumen (cam_profile_overview → liguilla) y
+   solo aparece si se puede jugar ahora o ya está hecha; la quiniela se cuenta
+   sin traer filas, solo si el resumen no lo dice ya. Con los dos hechos se
+   recuerda en este navegador (clave v2: los pasos cambiaron) y no se vuelve a
+   preguntar. */
+const STEPS_KEY='cam_profile_steps_done_v2:';
 function stepsDone(id){try{return localStorage.getItem(STEPS_KEY+id)==='1';}catch{return false;}}
+// true = hecho · false = pendiente y se puede hacer ya · null = ahora no hay liguilla que jugar.
+function liguillaStep(lg){
+  if(!lg)return null;
+  if(lg.phase==='bracket_open')return Boolean(lg.bracket);
+  if(lg.bracket||lg.qualifiers)return true;
+  return lg.phase==='qualifiers_open'?false:null;
+}
 async function loadSteps(author,ticket){
   const mine=++stepsTicket;
   if(stepsDone(author)){steps={complete:true};return;}
   const o=overview||{},q=o.quiniela||{};
   const next={
-    take:Number(o.takes?.count)>0,
-    pick:Number(o.picks?.count)>0,
-    quiniela:Boolean(q.nfl?.position||q.football?.position),
-    party:Array.isArray(q.parties)&&q.parties.length>0
+    liguilla:liguillaStep(o.liguilla),
+    liguillaPhase:String(o.liguilla?.phase||''),
+    quiniela:Boolean(q.nfl?.position||q.football?.position)
   };
-  steps={...next,checking:!(next.quiniela&&next.party)};
-  const count=async(table)=>{
-    try{
-      const r=await db.from(table).select(table==='cam_party_members'?'party_id':'game_id',{count:'exact',head:true}).eq('user_id',author);
-      if(r.error)return null;
-      return Number(r.count)||0;
-    }catch{return null;}
-  };
-  const [nfl,football,parties]=await Promise.all([
-    next.quiniela?0:count('cam_nfl_picks'),
-    next.quiniela?0:count('cam_football_picks'),
-    next.party?0:count('cam_party_members')
-  ]);
-  if(mine!==stepsTicket||ticket!==request||activeAuthor!==author)return;
-  // Si no se pudo contar, no se insiste con ese paso.
-  if(!next.quiniela)next.quiniela=nfl===null||football===null||nfl+football>0;
-  if(!next.party)next.party=parties===null||parties>0;
+  steps={...next,checking:!next.quiniela};
+  if(!next.quiniela){
+    const count=async(table)=>{
+      try{
+        const r=await db.from(table).select('game_id',{count:'exact',head:true}).eq('user_id',author);
+        if(r.error)return null;
+        return Number(r.count)||0;
+      }catch{return null;}
+    };
+    const [nfl,football]=await Promise.all([count('cam_nfl_picks'),count('cam_football_picks')]);
+    if(mine!==stepsTicket||ticket!==request||activeAuthor!==author)return;
+    // Si no se pudo contar, no se insiste con ese paso.
+    next.quiniela=nfl===null||football===null||nfl+football>0;
+  }
   steps={...next,checking:false};
-  if(next.take&&next.pick&&next.quiniela&&next.party){
+  if(next.quiniela&&next.liguilla===true){
     try{localStorage.setItem(STEPS_KEY+author,'1');}catch{}
     steps={complete:true};
   }
@@ -1167,7 +1201,7 @@ async function inviteToParty(){
 }
 function labelTabs(){
   const own=privateView;
-  for(const [id,mine,theirs] of [['aeProfileTabOverview','Perfil','Perfil'],['aeProfileTabTakes','Takes','Takes'],['aeProfileTabPicks','Picks','Picks'],['aeProfileTabParty','Mi grupo','Party']]){
+  for(const [id,mine,theirs] of [['aeProfileTabOverview','Perfil','Perfil'],['aeProfileTabTakes','Takes','Takes'],['aeProfileTabPicks','Picks','Picks'],['aeProfileTabRanks','Rangos','Rangos'],['aeProfileTabParty','Mi grupo','Party']]){
     const b=$(id);if(!b)continue;
     const label=b.querySelector('.cam-tab-label')||b;
     label.textContent=own?mine:theirs;
@@ -1358,8 +1392,10 @@ function bindProfileApp(){
     const next=event.key==='Home'?0:event.key==='End'?TABS.length-1:(index+(event.key==='ArrowRight'?1:-1)+TABS.length)%TABS.length;
     event.preventDefault();
     setPrivateTab(TABS[next]);
-    $({perfil:'aeProfileTabOverview',takes:'aeProfileTabTakes',picks:'aeProfileTabPicks',party:'aeProfileTabParty'}[TABS[next]])?.focus();
+    $(TAB_IDS[TABS[next]])?.focus();
   });
+  $('aeProfileTabs')?.addEventListener('scroll',tabEdges,{passive:true});
+  window.addEventListener('resize',()=>{if($('aeProfileDialog')?.open)revealActiveTab();},{passive:true});
   $('camUsernameInput')?.addEventListener('input',onNameInput);
   $('camUsernameForm')?.addEventListener('submit',event=>{
     event.preventDefault();
@@ -1397,6 +1433,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   $('aeProfileTabOverview')?.addEventListener('click',()=>setPrivateTab('perfil'));
   $('aeProfileTabTakes')?.addEventListener('click',()=>setPrivateTab('takes'));
   $('aeProfileTabPicks')?.addEventListener('click',()=>setPrivateTab('picks'));
+  $('aeProfileTabRanks')?.addEventListener('click',()=>setPrivateTab('rangos'));
   $('aeProfileTabParty')?.addEventListener('click',()=>setPrivateTab('party'));
 
   $('aeProfileDialog')?.addEventListener('click',e=>{if(e.target===$('aeProfileDialog'))close();});
