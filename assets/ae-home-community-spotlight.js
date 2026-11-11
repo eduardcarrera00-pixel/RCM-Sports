@@ -80,7 +80,9 @@
     const footer=node('div',null,'ae-community-card-footer');
     // Fila 1: perfil; fila 2: ▲ y ▼ a la izquierda, Responder a la derecha.
     const left=node('div',null,'ae-community-user-actions');
-    left.append(node('span',row.author||'Usuario','ae-community-author'));
+    const author=node('span',row.author||'Usuario','ae-community-author');
+    author.dataset.camAuthorId=String(row.author_id||'');
+    left.append(author);
     const actions=node('div',null,'ae-community-controls');
     const votes=node('div',null,'ae-community-votes');
     for(const direction of [1,-1]){
@@ -216,6 +218,15 @@
       ]);
       if(request!==communityRequest)return;
       const replyCounts=await loadReplyCounts(supported,questioned);
+      if(request!==communityRequest)return;
+      const authorIds=[...new Set([...supported,...questioned].map(row=>row.id).filter(Boolean))];
+      if(authorIds.length){
+        const {data:owners,error:ownerError}=await db.from('comments').select('id,user_id').in('id',authorIds);
+        if(!ownerError){
+          const byId=new Map((owners||[]).map(row=>[String(row.id),row.user_id]));
+          for(const row of [...supported,...questioned])row.author_id=byId.get(String(row.id))||null;
+        }
+      }
       if(request!==communityRequest)return;
       target.replaceChildren(
         scrollingLeaders('supported',supported,replyCounts),
