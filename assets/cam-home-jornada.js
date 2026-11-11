@@ -19,7 +19,7 @@
   const state = {
     loadedAt: 0, loading: false,
     nfl: [], football: [], teams: new Map(), gamesOk: false,
-    takes: [], takesOk: false, takesError: false
+    takes: [], takesOk: false, takesError: false, replyCounts: new Map()
   };
 
   /* ---------- utilidades ---------- */
@@ -170,61 +170,40 @@
   shortcutDisclosure.append(el('summary', 'Atajos', 'cam-desk-rail-toggle'), shortcuts);
   root.append(head, shortcutDisclosure, rows.news.section, rows.jornada.section, rows.takes.section);
 
-  // Una sola comunidad: reutiliza los listados reales y sus votos/respuestas.
-  // Cada filtro conserva su lista y usa el mismo carrusel horizontal nativo.
-  let takeView = 'recent';
-  const takeViews = new Map();
-  const takeFilters = el('div', null, 'cam-take-filters', { role: 'group', 'aria-label': 'Orden de los Takes' });
-  rows.takes.list.id = 'camHomeTakesRecent';
-  function takeTrack(list, label) {
-    list.classList.add('cam-home-takes-track');
-    list.setAttribute('tabindex', '0');
-    list.setAttribute('aria-label', label);
-    list.setAttribute('aria-roledescription', 'carrusel');
+  // Los tres tipos de Takes permanecen visibles, sin cambiar de pestaña.
+  const takeTracks=new Map();
+  const takeColumns=el('div',null,'cam-hj-take-columns');
+  const proof=el('div',null,'cam-hj-takes-proof',{id:'camJornadaCommunityLegend'});
+  proof.append(el('p','Comprobando procedencia de los Takes…','cam-hj-proof-note',{id:'camJornadaCommunityProofNote'}));
+  const filters=el('div',null,'cam-community-filter',{role:'group','aria-label':'Filtrar Takes por origen'});
+  for(const [key,label] of [['all','Todos'],['community','Comunidad'],['demo','Pruebas']]){
+    filters.append(el('button',label,'cam-hj-proof-filter',{type:'button','data-cam-demo-filter':key,'aria-pressed':String(key==='all'),disabled:''}));
   }
-  takeTrack(rows.takes.list, 'Takes recientes');
-  const takeButtons = new Map();
-  for (const [key, label, id] of [
-    ['recent', 'Recientes', 'camHomeTakesRecent'],
-    ['positive', 'Populares', 'aeHomeTakesPopular'],
-    ['negative', 'Impopulares', 'aeHomeTakesUnpopular']
-  ]) {
-    const button = el('button', label, 'cam-take-filter', { type: 'button', 'aria-controls': id, 'aria-pressed': String(key === takeView) });
-    button.addEventListener('click', () => selectTakeView(key));
-    takeButtons.set(key, button);
-    takeFilters.append(button);
-  }
-  rows.takes.section.querySelector('.cam-hj-head').after(takeFilters);
-  function selectTakeView(key) {
-    takeView = key;
-    rows.takes.section.dataset.takeView = key;
-    rows.takes.list.hidden = key !== 'recent';
-    for (const [view, button] of takeButtons) button.setAttribute('aria-pressed', String(view === key));
-    for (const [view, entry] of takeViews) entry.node.hidden = view !== key;
-  }
-  function mountTakeViews() {
-    for (const [key, id] of [['positive', 'aeHomeTakesPopular'], ['negative', 'aeHomeTakesUnpopular']]) {
-      const node = document.getElementById(id);
-      if (!node || takeViews.has(key)) continue;
-      const mark = document.createComment(' cam-home: ' + id + ' ');
-      node.before(mark);
-      takeViews.set(key, { node, mark });
-      rows.takes.section.append(node);
-      const list = node.querySelector('ol');
-      takeTrack(list, key === 'positive' ? 'Takes populares' : 'Takes impopulares');
+  proof.append(filters);
+  rows.takes.section.querySelector('.cam-hj-head').after(proof);
+  for(const [key,label,id] of [
+    ['recent','Recientes','camHomeTakesRecent'],
+    ['positive','Populares','camHomeTakesPositive'],
+    ['negative','Impopulares','camHomeTakesNegative']
+  ]){
+    const panel=el('section',null,'cam-hj-take-panel',{ 'aria-label':'Takes '+label.toLowerCase()});
+    const heading=el('header',null,'cam-hj-take-panel-head');
+    heading.append(el('h4',label,'cam-hj-take-panel-title'));
+    const controls=el('div',null,'cam-community-carousel-controls');
+    for(const [dir,glyph,text] of [[-1,'‹','Anteriores'],[1,'›','Siguientes']]){
+      controls.append(el('button',glyph,'cam-hj-take-arrow',{
+        type:'button','data-cam-take-scroll':id,'data-cam-take-direction':String(dir),
+        'aria-label':text+' Takes '+label.toLowerCase()
+      }));
     }
-    selectTakeView(takeView);
+    heading.append(controls);
+    const track=key==='recent'?rows.takes.list:el('div',null,'cam-hj-row');
+    track.id=id;track.classList.add('cam-home-takes-track');
+    track.setAttribute('role','list');track.setAttribute('tabindex','0');
+    track.setAttribute('aria-label','Carrusel de Takes '+label.toLowerCase());
+    panel.append(heading,track);takeColumns.append(panel);takeTracks.set(key,track);
   }
-  function returnTakeViews() {
-    for (const { node, mark } of takeViews.values()) {
-      node.hidden = false;
-      const list = node.querySelector('ol');
-      list.classList.remove('cam-home-takes-track');
-      for (const attribute of ['tabindex', 'aria-label', 'aria-roledescription']) list.removeAttribute(attribute);
-      if (mark.parentNode) mark.replaceWith(node);
-    }
-    takeViews.clear();
-  }
+  rows.takes.section.append(takeColumns);
 
   function place() {
     if (root.closest('#camDeskLayout')) return;
@@ -338,28 +317,52 @@
   }
 
   /* ---------- Takes de la comunidad ---------- */
-  function takeCard(t) {
-    const card = el('button', null, 'cam-hj-card cam-hj-take', { type: 'button' });
-    const top = el('span', null, 'cam-hj-kicker');
-    const league = String(t.competition || '').trim() || (t.sport === 'nfl' ? 'NFL' : 'Fútbol');
-    top.append(el('span', league, 'cam-hj-league'), el('span', shortDate(t.created_at), 'cam-hj-when'));
-    card.append(top, el('span', t.title || 'Take', 'cam-hj-card-title'));
-    if (t.body) card.append(el('span', String(t.body).replace(/\s+/g, ' ').trim(), 'cam-hj-excerpt'));
-    const foot = el('span', null, 'cam-hj-take-foot');
-    foot.append(el('span', '@' + (t.author || 'aficionado'), 'cam-hj-author'));
-    const votes = el('span', null, 'cam-hj-votes');
-    votes.append(el('span', '▲ ' + (Number(t.upvotes) || 0), 'is-up'), el('span', '▼ ' + (Number(t.downvotes) || 0), 'is-down'));
+  function takeCard(t){
+    const card=el('button',null,'cam-hj-card cam-hj-take',{type:'button'});
+    const top=el('span',null,'cam-hj-kicker');
+    const league=String(t.competition||'').trim()||(t.sport==='nfl'?'NFL':'Fútbol');
+    top.append(el('span',league,'cam-hj-league'),el('span',shortDate(t.created_at),'cam-hj-when'));
+    card.append(top,el('span',t.title||'Take','cam-hj-card-title'));
+    if(t.body)card.append(el('span',String(t.body).replace(/\s+/g,' ').trim(),'cam-hj-excerpt'));
+    const foot=el('span',null,'cam-hj-take-foot');
+    const author=el('span','@'+(t.author||'aficionado'),'cam-hj-author');
+    author.dataset.camAuthorId=String(t.author_id||'');foot.append(author);
+    const votes=el('span',null,'cam-hj-votes');
+    votes.append(el('span','▲ '+(Number(t.upvotes)||0),'is-up'),el('span','▼ '+(Number(t.downvotes)||0),'is-down'));
     foot.append(votes);
+    const n=state.replyCounts?.get(String(t.id));
+    if(Number.isFinite(n))foot.append(el('span',n+' '+(n===1?'respuesta':'respuestas'),'cam-hj-replies'));
     card.append(foot);
-    card.setAttribute('aria-label', 'Take de @' + (t.author || 'aficionado') + ': ' + (t.title || '') + '. ' + (Number(t.upvotes) || 0) + ' apoyos, ' + (Number(t.downvotes) || 0) + ' cuestionados');
-    card.addEventListener('click', () => window.aeTakeReplies?.open?.(t));
+    card.setAttribute('aria-label','Take de @'+(t.author||'aficionado')+': '+(t.title||'')+'. '+(Number(t.upvotes)||0)+' apoyos, '+(Number(t.downvotes)||0)+' cuestionados'+(Number.isFinite(n)?', '+n+' respuestas':''));
+    card.addEventListener('click',()=>window.aeTakeReplies?.open?.(t));
     return card;
   }
-  function paintTakes() {
-    const cards = state.takes.map(takeCard);
-    if (!cards.length) cards.push(el('p', state.takesOk ? 'Aún no hay Takes.' : state.takesError ? 'No se pudieron cargar los Takes.' : 'Cargando Takes…', 'cam-hj-empty'));
-    fill(rows.takes, cards);
-    rows.takes.list.dataset.camContentState = state.takesOk ? (state.takes.length ? 'ready' : 'empty') : state.takesError ? 'error' : 'loading';
+  function rankTakes(rows,kind){
+    const score=t=>(Number(t.upvotes)||0)-(Number(t.downvotes)||0);
+    return rows.filter(t=>kind==='positive'?(Number(t.upvotes)||0)>0:(Number(t.downvotes)||0)>0)
+      .sort((a,b)=>kind==='positive'?
+        score(b)-score(a)||(Number(b.upvotes)||0)-(Number(a.upvotes)||0):
+        score(a)-score(b)||(Number(b.downvotes)||0)-(Number(a.downvotes)||0))
+      .slice(0,10);
+  }
+  function paintTakes(){
+    const all=state.takes||[];
+    for(const [key,records] of [
+      ['recent',all.slice(0,12)],
+      ['positive',rankTakes(all,'positive')],
+      ['negative',rankTakes(all,'negative')]
+    ]){
+      const track=takeTracks.get(key);if(!track)continue;
+      const cards=records.map(t=>item(takeCard(t)));
+      if(!cards.length){
+        const message=state.takesError?'No se pudieron cargar los Takes.':
+          !state.takesOk?'Cargando Takes…':key==='recent'?'Aún no hay Takes.':'Aún sin Takes con votos para este carrusel.';
+        cards.push(item(el('p',message,'cam-hj-empty')));
+      }
+      track.replaceChildren(...cards);
+      track.dataset.camContentState=state.takesOk?(records.length?'ready':'empty'):state.takesError?'error':'loading';
+    }
+    rows.takes.section.hidden=false;
   }
 
   /* ---------- datos ---------- */
@@ -384,7 +387,16 @@
       if (!football.error) state.football = (football.data || []).filter(isOpen).sort((a, b) => new Date(a.kickoff) - new Date(b.kickoff));
       state.takesOk = !takes.error;
       state.takesError = Boolean(takes.error);
-      if (!takes.error) state.takes = Array.isArray(takes.data) ? takes.data : [];
+      if (!takes.error) {
+        state.takes = Array.isArray(takes.data) ? takes.data : [];
+        const chosen=[...state.takes.slice(0,12),...rankTakes(state.takes,'positive'),...rankTakes(state.takes,'negative')];
+        const ids=[...new Set(chosen.map(t=>String(t.id)).filter(Boolean))];
+        state.replyCounts=new Map();
+        if(ids.length){
+          const replies=await c.rpc('ae_public_take_reply_counts',{p_take_ids:ids});
+          if(!replies.error)state.replyCounts=new Map((replies.data||[]).map(r=>[String(r.take_id),Math.max(0,Number(r.reply_count)||0)]));
+        }
+      }
       // Escudos solo de los partidos que se van a ver.
       const ids = [...new Set(state.football.slice(0, 12).flatMap(g => [g.home_id, g.away_id]).map(String))]
         .filter(id => !state.teams.has(id));
@@ -419,10 +431,9 @@
       root.hidden = !on;
       document.body.classList.toggle('cam-home-jornada', on);
       if (on) {
-        mountTakeViews();
         paint();
         void load(false);
-      } else returnTakeViews();
+      }
     }
   }
   const repaint = () => { if (on) paint(); };
