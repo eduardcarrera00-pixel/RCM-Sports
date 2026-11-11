@@ -36,67 +36,72 @@
       window.alert(e.message||'No se pudo guardar tu voto.');
     }finally{button.disabled=false;}
   }
+  // La portada usa la misma anatomía de tarjeta en Recientes, Populares e Impopulares.
+  // Conserva las votaciones, perfiles y respuestas sin una segunda fila de acciones.
   function communityCard(t,kind,replyCounts,viewerId){
-    const item=make('li',null,'ae-top-take ae-community-popular-take');
+    const item=make('li',null,'ae-top-take ae-community-popular-take cam-hj-take cam-home-take-unified');
     item.dataset.kind=kind;
-    const content=make('div',null,'ae-top-take-content');
-    const header=make('div',null,'ae-home-take-head');
-    const titleRow=make('div',null,'ae-home-take-title-row');
-    titleRow.append(make('span',String(t.rank_number||'').padStart(2,'0'),'ae-top-take-number'));
-    const title=make('h4',null,'ae-top-take-title');
-    const openBtn=make('button',t.title||'Ver Take','ae-top-take-open');
-    openBtn.type='button';
-    openBtn.addEventListener('click',()=>open(t));
-    openBtn.setAttribute('aria-label','Leer Take y abrir conversación: '+(t.title||'Publicación'));
-    title.append(openBtn);titleRow.append(title);
-    header.append(titleRow,make('span',t.competition|| (t.sport==='nfl'?'NFL':'Fútbol'),'ae-top-take-sport'));
-    content.append(header);
-    const excerpt=String(t.body||'').replace(/^NFL[^\n]*\n\n/,'').trim();
-    if(excerpt)content.append(make('p',excerpt.length>160?excerpt.slice(0,157).trimEnd()+'…':excerpt,'ae-top-take-summary'));
 
-    const bottom=make('div',null,'ae-take-reference-footer');
-    const identity=make('div',null,'ae-take-reference-identity');
-    const avatar=make('span','','ae-take-reference-avatar');
-    avatar.setAttribute('aria-hidden','true');
-    const author=make('button','@'+(t.author||'Comunidad'),'ae-top-take-author');
+    const top=make('span',null,'cam-hj-kicker');
+    const league=String(t.competition||'').trim()||(t.sport==='nfl'?'NFL':'Fútbol');
+    top.append(make('span',league,'cam-hj-league'));
+    const created=new Date(t.created_at);
+    if(Number.isFinite(created.getTime())){
+      const day=make('time',created.toLocaleDateString('es',{day:'numeric',month:'short'}).replace(/\\./g,''),'cam-hj-when');
+      day.dateTime=t.created_at||'';
+      top.append(day);
+    }
+    item.append(top);
+
+    const title=make('button',t.title||'Ver Take','cam-hj-card-title cam-home-take-open');
+    title.type='button';
+    title.setAttribute('aria-label','Leer Take y abrir conversación: '+(t.title||'Publicación'));
+    title.addEventListener('click',()=>open(t));
+    item.append(title);
+
+    const excerpt=String(t.body||'').replace(/^NFL[^\\n]*\\n\\n/,'').replace(/\\s+/g,' ').trim();
+    if(excerpt)item.append(make('span',excerpt,'cam-hj-excerpt'));
+
+    const footer=make('div',null,'cam-hj-take-foot');
+    const author=make('button','@'+String(t.author||'aficionado').replace(/^@+/,''),'cam-hj-author cam-home-take-author');
     author.type='button';
     author.dataset.camAuthorId=String(t.author_id||'');
     author.setAttribute('aria-label','Ver perfil de '+(t.author||'la comunidad'));
-    author.addEventListener('click',()=>window.openAePublicProfile?.(t.author_id));
-    identity.append(avatar,author);
-    const when=date(t.created_at);
-    if(when)identity.append(make('span','· '+when,'ae-take-reference-date'));
-    bottom.append(identity);
-    const stats=make('div',null,'ae-top-take-votes');
-    if(!(viewerId&&t.author_id&&String(viewerId)===String(t.author_id))){
-      for(const [dir,label,value,cls] of [
-        [1,'▲',count(t,'upvotes'),'ae-top-take-up'],
-        [-1,'▼',count(t,'downvotes'),'ae-top-take-down']
-      ]){
-        const b=make('button',label+' '+value,cls);
-        b.type='button';
-        b.setAttribute('aria-label',(dir===1?'Apoyar':'Cuestionar')+' este Take. Votos actuales: '+value);
-        b.addEventListener('click',()=>vote(t,dir,b));
-        stats.append(b);
-      }
+    author.addEventListener('click',()=>{if(t.author_id)window.openAePublicProfile?.(t.author_id);});
+    footer.append(author);
+
+    const stats=make('span',null,'cam-hj-votes cam-home-take-stats');
+    const own=Boolean(viewerId&&t.author_id&&String(viewerId)===String(t.author_id));
+    for(const [direction,label,key,css] of [
+      [1,'▲','upvotes','is-up'],
+      [-1,'▼','downvotes','is-down']
+    ]){
+      const value=count(t,key);
+      const button=make('button',label+' '+value,css+' cam-home-take-vote');
+      button.type='button';
+      button.disabled=own;
+      button.setAttribute('aria-label',(direction===1?'Apoyar':'Cuestionar')+' este Take. Votos actuales: '+value+(own?'. No puedes votar tu propio Take.':''));
+      button.addEventListener('click',()=>vote(t,direction,button));
+      stats.append(button);
     }
-    const replyCount=replyCounts?.get(String(t.id));
-    if(Number.isFinite(replyCount)){
-      const indicator=make('span',null,'ae-top-take-reply-count');
-      indicator.setAttribute('aria-label',replyCount===1?'1 respuesta':replyCount+' respuestas');
-      indicator.title=replyCount===1?'1 respuesta':replyCount+' respuestas';
-      const bubble=make('i',null,'fa-regular fa-comment');
-      bubble.setAttribute('aria-hidden','true');
-      indicator.append(bubble,make('strong',String(replyCount)));
-      stats.append(indicator);
+    const comments=make('button',null,'cam-home-take-comments');
+    comments.type='button';
+    comments.setAttribute('aria-label','Responder al Take y ver su conversación');
+    const bubble=make('i',null,'fa-regular fa-comment');
+    bubble.setAttribute('aria-hidden','true');
+    comments.append(bubble);
+    // Una consulta fallida no se presenta como cero comentarios.
+    const replies=replyCounts?.get(String(t.id));
+    if(replyCounts){
+      const replyTotal=Math.max(0,Number(replies)||0);
+      comments.append(make('span',String(replyTotal)));
+      comments.setAttribute('aria-label','Abrir conversación: '+replyTotal+' '+(replyTotal===1?'respuesta':'respuestas'));
     }
-    const reply=make('button','Responder','ae-top-take-reply');
-    reply.type='button';
-    reply.setAttribute('aria-label','Responder al Take: '+(t.title||'Publicación'));
-    reply.addEventListener('click',()=>window.aeTakeReplies?.open(t,{focusComposer:true}));
-    stats.append(reply);
-    bottom.append(stats);content.append(bottom);
-    item.append(content);
+    comments.addEventListener('click',()=>window.aeTakeReplies?.open(t,{focusComposer:true}));
+    stats.append(comments);
+    footer.append(stats);
+    item.append(footer);
+
     item.addEventListener('click',event=>{
       if(!event.target.closest('button'))open(t);
     });
