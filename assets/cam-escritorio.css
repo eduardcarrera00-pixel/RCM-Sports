@@ -1138,3 +1138,237 @@
     html body[data-cam-desk][data-cam-tab="picks"] #footballTakes #communityPicks { display:flex!important; }
   }
 }
+/* CAM SPORTS · Desktop fluid-width pass (Nov 2026).
+   Wide reading surface, a useful right rail and shortcuts that become a
+   horizontal strip before they would squeeze the content. Affects >760px only.
+   Stay in cam-header: this layer owns the original important desktop rules. */
+@layer cam-header {
+  @media (min-width:761px) {
+    html body[data-cam-desk] #mainContent {
+      --dk-pad:clamp(20px,2.1vw,34px)!important;
+      --dk-gap:clamp(18px,1.8vw,30px)!important;
+      max-width:1840px!important;
+    }
+    html body[data-cam-desk] #camDeskMain {
+      gap:clamp(26px,2.5vw,40px)!important;
+    }
+    html body[data-cam-desk] #camDeskAside > .cam-desk-aside-in {
+      gap:22px!important;
+      align-items:stretch!important;
+      min-width:0!important;
+    }
+    /* The actual live leaderboard shares the news rail, without duplication. */
+    html body[data-cam-desk] #camDeskAside > .cam-desk-aside-in > .editorial-community {
+      display:block!important;
+      box-sizing:border-box!important;
+      min-width:0!important;
+      width:100%!important;
+      max-width:none!important;
+      margin:0!important;
+      padding:0!important;
+      border:1px solid var(--cam-calm-line,var(--dk-line))!important;
+      border-radius:18px!important;
+      background:var(--cam-calm-surface,var(--dk-card))!important;
+      color:var(--cam-calm-ink,var(--dk-ink))!important;
+      overflow:hidden!important;
+      box-shadow:none!important;
+    }
+    html body[data-cam-desk] #camDeskAside .editorial-community > .ae-section-heading {
+      display:block!important;
+      margin:0!important;
+      padding:20px 20px 14px!important;
+      border-bottom:1px solid var(--cam-calm-line,var(--dk-line))!important;
+    }
+    html body[data-cam-desk] #camDeskAside .editorial-community #communityTitle {
+      margin:0!important;
+      font:600 clamp(20px,1.7vw,25px)/1.25 "Playfair Display",Georgia,serif!important;
+      color:var(--cam-calm-ink,var(--dk-ink))!important;
+    }
+    html body[data-cam-desk] #camDeskAside #communityLeaders {
+      min-width:0!important;
+      max-width:100%!important;
+      padding:16px 18px 20px!important;
+      overflow-wrap:anywhere!important;
+    }
+    html body[data-cam-desk] #camDeskAside #aeTrendingPortada .ae-trending-title {
+      font-size:clamp(16px,1.3vw,19px)!important;
+      line-height:1.32!important;
+    }
+    html body[data-cam-desk] #camDeskMain :is(#articlesGrid,#freeTakesFeed,#aeHomeTopTakes,.cam-hj-row) {
+      min-width:0!important;
+    }
+  }
+  /* Small desktops: no permanent left-column tax and no overflow from the
+     right sidebar. Both have their own flow and breathable widths. */
+  @media (min-width:761px) and (max-width:979px) {
+    html body[data-cam-desk] #mainContent {
+      --dk-pl:var(--dk-pad)!important;
+      --dk-pr:var(--dk-pad)!important;
+    }
+    html body[data-cam-desk] #mainContent #camDeskRail:not([hidden]) {
+      position:static!important;
+      inset:auto!important;
+      width:100%!important;
+      height:auto!important;
+      margin:0 0 22px!important;
+      z-index:auto!important;
+    }
+    html body[data-cam-desk] #mainContent #camDeskRail .cam-desk-rail-in {
+      position:static!important;
+      inset:auto!important;
+      max-height:none!important;
+      overflow:visible!important;
+      padding:0!important;
+    }
+    html body[data-cam-desk] #mainContent #camDeskRail .cam-desk-rail-toggle {
+      display:none!important;
+    }
+    html body[data-cam-desk] #mainContent #camDeskRail .cam-hj-shortcuts {
+      display:grid!important;
+      grid-template-columns:repeat(5,minmax(0,1fr))!important;
+      gap:8px!important;
+    }
+    html body[data-cam-desk] #mainContent #camDeskRail .cam-hj-shortcut {
+      flex-direction:column!important;
+      justify-content:center!important;
+      align-items:center!important;
+      min-height:86px!important;
+      gap:7px!important;
+      padding:10px 5px!important;
+      text-align:center!important;
+    }
+    html body[data-cam-desk] #mainContent #camDeskRail .cam-hj-shortcut::after {
+      text-align:center!important;
+      overflow-wrap:anywhere!important;
+    }
+    html body[data-cam-desk] #camDeskLayout {
+      display:grid!important;
+      grid-template-columns:minmax(0,1fr)!important;
+      gap:24px!important;
+    }
+    html body[data-cam-desk] #camDeskAside {
+      position:static!important;
+      inset:auto!important;
+      width:100%!important;
+      margin:0!important;
+    }
+    html body[data-cam-desk] #camDeskAside > .cam-desk-aside-in {
+      display:grid!important;
+      grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr))!important;
+      gap:18px!important;
+    }
+    html body[data-cam-sport-page] #articlesGrid.ae-sport-news-carousel:not(.hidden):not([hidden]) {
+      grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    }
+    html body[data-cam-desk] #camHomeJornada .cam-hj-section[data-row="takes"] .cam-hj-row {
+      grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    }
+  }
+  /* 980–1159: horizontal shortcuts but a real immediate news sidebar. */
+  @media (min-width:980px) and (max-width:1159px) {
+    html body[data-cam-desk] #mainContent {
+      --dk-pl:var(--dk-pad)!important;
+      --dk-pr:var(--dk-pad)!important;
+      --dk-aside:270px!important;
+      --dk-gap:20px!important;
+    }
+    html body[data-cam-desk] #mainContent #camDeskRail:not([hidden]) {
+      position:static!important;
+      inset:auto!important;
+      width:100%!important;
+      margin:0 0 22px!important;
+      z-index:auto!important;
+    }
+    html body[data-cam-desk] #mainContent #camDeskRail .cam-desk-rail-in {
+      position:static!important;
+      max-height:none!important;
+      overflow:visible!important;
+      padding:0!important;
+    }
+    html body[data-cam-desk] #mainContent #camDeskRail .cam-desk-rail-toggle { display:none!important; }
+    html body[data-cam-desk] #mainContent #camDeskRail .cam-hj-shortcuts {
+      grid-template-columns:repeat(5,minmax(0,1fr))!important;
+      gap:9px!important;
+    }
+    html body[data-cam-desk] #mainContent #camDeskRail .cam-hj-shortcut {
+      flex-direction:row!important;
+      align-items:center!important;
+      justify-content:center!important;
+      min-height:60px!important;
+      gap:8px!important;
+      padding:10px 8px!important;
+      font-size:12px!important;
+    }
+    html body[data-cam-desk] #mainContent #camDeskRail .cam-hj-shortcut::after {
+      text-align:left!important;
+      overflow-wrap:anywhere!important;
+    }
+    html body[data-cam-desk] #camDeskLayout {
+      grid-template-columns:minmax(0,1fr) var(--dk-aside)!important;
+      gap:var(--dk-gap)!important;
+    }
+    html body[data-cam-desk] #camDeskAside {
+      position:sticky!important;
+      inset:auto!important;
+      top:var(--cam-desk-aside-top,112px)!important;
+      width:100%!important;
+      margin:0!important;
+    }
+    html body[data-cam-desk] #camDeskAside > .cam-desk-aside-in {
+      display:flex!important;
+      flex-direction:column!important;
+    }
+    html body[data-cam-sport-page] #articlesGrid.ae-sport-news-carousel:not(.hidden):not([hidden]) {
+      grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    }
+    html body[data-cam-desk] #camHomeJornada .cam-hj-section[data-row="takes"] .cam-hj-row {
+      grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    }
+  }
+  /* Standard laptop: preserve three columns, but protect reading width. */
+  @media (min-width:1160px) and (max-width:1439px) {
+    html body[data-cam-desk] #mainContent {
+      --dk-rail:148px!important;
+      --dk-aside:278px!important;
+      --dk-gap:22px!important;
+      --dk-pl:calc(var(--dk-pad) + var(--dk-rail) + var(--dk-gap))!important;
+      --dk-pr:var(--dk-pad)!important;
+    }
+    html body[data-cam-desk] #camDeskLayout {
+      grid-template-columns:minmax(0,1fr) var(--dk-aside)!important;
+    }
+    html body[data-cam-sport-page] #articlesGrid.ae-sport-news-carousel:not(.hidden):not([hidden]) {
+      grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    }
+    html body[data-cam-desk] #camHomeJornada .cam-hj-section[data-row="takes"] .cam-hj-row {
+      grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    }
+    html body[data-cam-desk] #camDeskMain #aeHomeTopTakes .ae-top-takes-grid {
+      grid-template-columns:minmax(0,1fr)!important;
+    }
+  }
+  /* Spacious desktop: more editorial rhythm instead of stretched cards. */
+  @media (min-width:1440px) {
+    html body[data-cam-desk] #mainContent {
+      --dk-rail:168px!important;
+      --dk-aside:318px!important;
+      --dk-gap:28px!important;
+      --dk-pl:calc(var(--dk-pad) + var(--dk-rail) + var(--dk-gap))!important;
+      --dk-pr:var(--dk-pad)!important;
+    }
+    html body[data-cam-desk] #camDeskLayout {
+      grid-template-columns:minmax(0,1fr) var(--dk-aside)!important;
+    }
+    html body[data-cam-sport-page] #articlesGrid.ae-sport-news-carousel:not(.hidden):not([hidden]) {
+      grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    }
+    html body[data-cam-desk] #camDeskAside > .cam-desk-aside-in {gap:26px!important;}
+  }
+  @media (min-width:1800px) {
+    html body[data-cam-desk] #mainContent {
+      --dk-rail:180px!important;
+      --dk-aside:340px!important;
+      --dk-gap:32px!important;
+    }
+  }
+}
