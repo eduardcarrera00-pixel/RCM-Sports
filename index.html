@@ -3050,7 +3050,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
                     <!-- Cards JS Injected -->
                 </section>
                 <div id="aeSportAllNewsFooter" class="ae-sport-news-footer" hidden></div>
-                <div id="camSportNewsCommunity" hidden aria-label="Conversaciones de este deporte">
+                <div id="camSportNewsCommunity" hidden aria-label="Conversaciones de este deporte"><p class="cam-snc-note">Debates de este deporte. Las cuentas de prueba se identifican con «Prueba».</p>
                   <section aria-labelledby="camSportDebatedTitle">
                     <header class="cam-snc-heading"><h2 id="camSportDebatedTitle">Lo más debatido</h2></header>
                     <div id="camSportDebatedList" aria-live="polite"></div>
@@ -3087,13 +3087,25 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
                 </h2>
                 <p id="aeTopTakesStatus" class="sr-only" role="status" aria-live="polite">Cargando los Takes destacados…</p>
               </header>
+                <div id="camCommunityLegend" class="cam-community-legend">
+                  <p id="camCommunityProofNote">Comprobando procedencia de los Takes…</p>
+                  <div class="cam-community-filter" role="group" aria-label="Filtrar Takes por tipo de cuenta">
+                    <button type="button" data-cam-demo-filter="all" aria-pressed="true" disabled>Todos</button>
+                    <button type="button" data-cam-demo-filter="community" aria-pressed="false" disabled>Comunidad</button>
+                    <button type="button" data-cam-demo-filter="demo" aria-pressed="false" disabled>Pruebas</button>
+                  </div>
+                </div>
+                <section id="aeHomeTakesRecent" class="ae-home-take-feature ae-vote-column is-recent" aria-labelledby="aeHomeTakesRecentTitle">
+                  <header class="ae-vote-column-heading"><h3 id="aeHomeTakesRecentTitle">Takes recientes</h3><div class="cam-community-carousel-controls"><button type="button" data-cam-take-scroll="aeHomeTakesRecentList" data-cam-take-direction="-1" aria-label="Takes recientes anteriores">‹</button><button type="button" data-cam-take-scroll="aeHomeTakesRecentList" data-cam-take-direction="1" aria-label="Más Takes recientes">›</button></div></header>
+                  <ol id="aeHomeTakesRecentList" class="ae-discovery-list" tabindex="0" role="region" aria-label="Takes recientes; carrusel horizontal" aria-live="polite"><li class="ae-discovery-empty">Cargando Takes…</li></ol>
+                </section>
                 <section id="aeHomeTakesPopular" class="ae-home-take-feature ae-vote-column is-positive" aria-labelledby="aeHomeTakesPositiveTitle">
-                  <header class="ae-vote-column-heading"><h3 id="aeHomeTakesPositiveTitle">Takes populares</h3></header>
-                  <ol id="aeHomeTakesPositiveList" class="ae-discovery-list" aria-live="polite"><li class="ae-discovery-empty">Cargando Takes…</li></ol>
+                  <header class="ae-vote-column-heading"><h3 id="aeHomeTakesPositiveTitle">Takes populares</h3><div class="cam-community-carousel-controls"><button type="button" data-cam-take-scroll="aeHomeTakesPositiveList" data-cam-take-direction="-1" aria-label="Takes populares anteriores">‹</button><button type="button" data-cam-take-scroll="aeHomeTakesPositiveList" data-cam-take-direction="1" aria-label="Más Takes populares">›</button></div></header>
+                  <ol id="aeHomeTakesPositiveList" class="ae-discovery-list" role="region" tabindex="0" aria-label="Takes populares; carrusel horizontal" aria-live="polite"><li class="ae-discovery-empty">Cargando Takes…</li></ol>
                 </section>
                 <section id="aeHomeTakesUnpopular" class="ae-home-take-feature ae-vote-column is-negative" aria-labelledby="aeHomeTakesNegativeTitle">
-                  <header class="ae-vote-column-heading"><h3 id="aeHomeTakesNegativeTitle">Takes impopulares</h3></header>
-                  <ol id="aeHomeTakesNegativeList" class="ae-discovery-list" aria-live="polite"><li class="ae-discovery-empty">Cargando Takes…</li></ol>
+                  <header class="ae-vote-column-heading"><h3 id="aeHomeTakesNegativeTitle">Takes impopulares</h3><div class="cam-community-carousel-controls"><button type="button" data-cam-take-scroll="aeHomeTakesNegativeList" data-cam-take-direction="-1" aria-label="Takes impopulares anteriores">‹</button><button type="button" data-cam-take-scroll="aeHomeTakesNegativeList" data-cam-take-direction="1" aria-label="Más Takes impopulares">›</button></div></header>
+                  <ol id="aeHomeTakesNegativeList" class="ae-discovery-list" role="region" tabindex="0" aria-label="Takes impopulares; carrusel horizontal" aria-live="polite"><li class="ae-discovery-empty">Cargando Takes…</li></ol>
                 </section>
             <section id="aeHomeTopTakes" class="ae-esports-standings" aria-label="Liga de Takes de la comunidad: Genios y Anoetos" data-cam-optional>
               <div class="ae-points-period" role="group" aria-label="Periodo de la clasificación por puntos de Takes">
@@ -5774,7 +5786,7 @@ updateThemeButton();
 <script src="assets/username-auth.js?v=20261103-remove-welcome-1"></script>
 <script src="assets/ae-category-visibility.js?v=20261016-dynamic-nav-1"></script>
 <script src="assets/ae-nfl-takes.js?v=20261015-3"></script>
-<script src="assets/free-takes.js?v=20261110-branded-loading-1"></script>
+<script src="assets/free-takes.js?v=20261110-community-1"></script>
 <script src="assets/ae-take-rankings.js?v=20261110-branded-loading-1"></script>
 <script src="assets/cam-image-compress.js?v=20261021-1"></script>
 <script src="assets/ae-editorial-weekly.js?v=20261110-branded-loading-1"></script>
@@ -6697,11 +6709,12 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 <script src="assets/ae-season-predictions.js?v=20261021-champion-guide-1"></script>
 <script src="assets/cam-lazy-editorial-loader.js?v=20261110-section-entrance-only-1"></script>
 <script src="assets/cam-opinions-section-banners.js?v=20261104-actualidad-1"></script>
-<script src="assets/ae-home-takes.js?v=20261109-text-clarity-1"></script>
-<script src="assets/ae-home-take-discoveries.js?v=20261110-branded-loading-1"></script>
+<script src="assets/cam-community-proof.js?v=20261110-community-1"></script>
+<script src="assets/ae-home-takes.js?v=20261110-community-1"></script>
+<script src="assets/ae-home-take-discoveries.js?v=20261110-community-1"></script>
 
-<script src="assets/ae-sport-top-takes.js?v=20261109-text-clarity-1"></script>
-<script src="assets/ae-take-replies.js?v=20261103-la-cita-1"></script>
+<script src="assets/ae-sport-top-takes.js?v=20261110-community-1"></script>
+<script src="assets/ae-take-replies.js?v=20261110-community-1"></script>
 <script src="assets/ae-draft-guard.js?v=20261019-photo-date-1"></script>
 <script src="assets/ae-take-category-edit.js?v=20261016-1"></script>
 <script src="assets/ae-picks-premium.js?v=20261109-eres-chef-arriba-1"></script>
@@ -6722,7 +6735,7 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 <script src="assets/cam-football-semana.js?v=20261110-liguilla-evento-1"></script>
 <!-- Escritorio: páginas completas de NFL/Fútbol y dos columnas de contenido real. El teléfono conserva sus pestañas. -->
 <script defer src="assets/cam-escritorio.js?v=20261110-desktop-shortcuts-1"></script>
-<script defer src="assets/cam-sport-news-community.js?v=20261110-sport-conversations-1"></script>
+<script defer src="assets/cam-sport-news-community.js?v=20261110-community-1"></script>
 
 <script id="ae-home-news-carousel-motion">
 /* Movimiento ligero y reversible: sin clones, sin alterar enlaces, votos o artículos. */
