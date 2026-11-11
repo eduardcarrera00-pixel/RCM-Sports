@@ -130,6 +130,7 @@
      if(typeof openAePublicProfile==='function'&&t.author_id)openAePublicProfile(t.author_id);
    },'ae-take-author-link cam-tk-author');
    author.setAttribute('aria-label','Ver perfil y Takes de '+name);
+   author.dataset.camAuthorId=String(t.author_id||'');
    const when=new Date(t.created_at);
    const date=el('time',Number.isNaN(when.getTime())?'':when.toLocaleDateString('es',{day:'numeric',month:'short'}),'ae-take-date cam-tk-date');
    date.dateTime=t.created_at||'';
