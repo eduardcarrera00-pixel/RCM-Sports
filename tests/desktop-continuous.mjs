@@ -33,6 +33,8 @@ const ids=['freeTakes','camNflSemana','camFootballSemana','camNflQuiniela','camF
 for(const id of ['camNflScore','camFootballScore']) if(!d.getElementById(id)){const n=d.createElement('section');n.id=id;d.getElementById('freeTakes').append(n);}
 const original = new Map(ids.map(id=>{const node=d.getElementById(id);return[id,{node,parent:node.parentNode}];}));
 const editorial=d.querySelector('.editorial-layout');
+const community=d.querySelector('.editorial-community');
+const originalCommunityParent=community.parentNode;
 const originalEditorialParent=editorial.parentNode;
 let clicks=0;const button=d.createElement('button');button.addEventListener('click',()=>clicks++);d.getElementById('aeSportTakeLeaders').append(button);
 w.eval(fs.readFileSync('assets/cam-mobile-sections.js','utf8'));
@@ -41,6 +43,7 @@ const settle=()=>new Promise(resolve=>setTimeout(resolve,35));
 await settle();
 assert.equal(d.getElementById('camDeskMain').firstElementChild,home);
 assert.equal(d.querySelector('#camDeskAside #aeTrendingPortada'),original.get('aeTrendingPortada').node);
+assert.equal(d.querySelector('#camDeskAside > .cam-desk-aside-in > .editorial-community'),community,'Home uses the live Opinadores distinguidos card on the right');
 for(const [category,slug,prefix] of [['NFL','nfl','camNfl'],['Fútbol','futbol','camFootball']]) {
   w.filterByCategory(category); await settle();
   assert.equal(d.body.dataset.camSportPage,slug);
@@ -54,6 +57,7 @@ for(const [category,slug,prefix] of [['NFL','nfl','camNfl'],['Fútbol','futbol',
   assert.equal(d.querySelector('#camDeskRail summary'),null);
   for(const id of [prefix+'Semana',prefix+'Quiniela','freeTakes']) assert.equal(d.getElementById(id).parentNode,d.getElementById('camDeskMain'));
   assert.equal(editorial.parentNode,d.getElementById('camDeskMain'));
+  assert.equal(community.parentNode,originalCommunityParent,'The home community module is restored for sports');
   assert.equal(d.getElementById(prefix+'Score').parentNode,d.querySelector('#camDeskAside > div'));
   for(const tab of ['noticias','takes','quiniela']){
     w.camSectionTabs.select(tab);await settle();
@@ -68,6 +72,7 @@ assert.equal(clicks,2,'Moving a live community module keeps its original event l
 w.filterByCategory('Opiniones');await settle();
 assert.equal(d.getElementById('camDeskLayout'),null);
 assert.equal(editorial.parentNode,originalEditorialParent);
+assert.equal(community.parentNode,originalCommunityParent);
 assert.equal(d.getElementById('aeTrendingPortada').parentNode,d.getElementById('aeOpinionsTrendingSlot'),'The renderer can take ownership without restoration stealing its node');
 w.filterByCategory('Fútbol');await settle();
 phone=true;for(const query of queries.values()) for(const listener of query.listeners) listener({matches:query.matches});await settle();
@@ -78,6 +83,7 @@ assert.equal(d.getElementById('camDeskLayout'),null);
 assert.equal(d.getElementById('camDeskTop'),null);
 assert.equal(shortcuts.parentNode,disclosure);
 for(const id of ids.filter(id=>id!=='aeTrendingPortada'))assert.equal(d.getElementById(id).parentNode,original.get(id).parent,'Restored '+id);
+assert.equal(community.parentNode,originalCommunityParent,'Mobile gets the original community module');
 w.camSectionTabs.select('noticias');assert.equal(d.body.dataset.camTab,'noticias');
 phone=false;for(const query of queries.values()) for(const listener of query.listeners) listener({matches:query.matches});await settle();
 assert.equal(d.body.dataset.camSportPage,'futbol');assert.equal(d.body.dataset.camTabs,undefined);
@@ -89,11 +95,15 @@ original.get('aeTrendingPortada').parent.append(d.getElementById('aeTrendingPort
 await settle();
 assert.equal(d.getElementById('freeTakes').parentNode,d.getElementById('camDeskMain'));
 assert.equal(d.getElementById('championsRankings').parentNode.id,'camDeskTop');
-assert.deepEqual([...d.querySelector('#camDeskAside > div').children].map(n=>n.id),['camFootballScore','aeTrendingPortada','aeSportTakeLeaders']);
+assert.deepEqual([...d.querySelector('#camDeskAside > div').children].map(n=>n.id),['aeTrendingPortada','camFootballScore','aeSportTakeLeaders']);
 for(const id of ids)assert.equal(d.querySelectorAll('#'+id).length,1,'One live '+id+' after width changes');
 w.filterByCategory('Picks');await settle();
 assert.equal(d.body.dataset.camTabs,'picks');
 assert.equal(d.getElementById('camSectionTabs').hidden,false);
 assert.equal(d.getElementById('camDeskLayout'),null);
+const desktopCSS=fs.readFileSync('assets/cam-escritorio.css','utf8');
+for(const point of ['max-width:979px','min-width:980px','max-width:1159px','min-width:1160px','min-width:1440px'])
+  assert.ok(desktopCSS.includes(point),'Desktop responsive breakpoint: '+point);
+assert.ok(desktopCSS.includes('#camDeskAside > .cam-desk-aside-in > .editorial-community'),'Live community sidebar has desktop styling');
 await w.happyDOM.close();
 console.log('PASS: continuous desktop sports, anchor navigation, original handlers, route ownership, tablet/phone restoration and independent Picks tabs.');
