@@ -119,7 +119,8 @@
      const name=String(t.author||'Aficionado').replace(/^@+/,'');
      const author=el('button','@'+name,'cam-op-author');
      author.type='button';
-     author.disabled=!t.author_id;
+     author.dataset.camAuthorId=String(t.author_id||'');
+      author.disabled=!t.author_id;
      author.setAttribute('aria-label','Ver perfil y Takes de '+name);
      author.addEventListener('click',()=>{if(t.author_id)window.openAePublicProfile?.(t.author_id);});
      meta.append(author);
