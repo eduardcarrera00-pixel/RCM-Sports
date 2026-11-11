@@ -2,7 +2,7 @@
 (() => {
   'use strict';
   const ids = new Set();
-  const listIds = ['aeHomeTakesRecentList','aeHomeTakesPositiveList','aeHomeTakesNegativeList'];
+  const listIds = ['aeHomeTakesRecentList','aeHomeTakesPositiveList','aeHomeTakesNegativeList','camHomeTakesRecent','camHomeTakesPositive','camHomeTakesNegative'];
   const $ = id => document.getElementById(id);
   const client = () => typeof db !== 'undefined' ? db : window.db;
   let loaded = false, filter = 'all', scheduled = false;
@@ -27,7 +27,7 @@
     for (const id of listIds) {
       const list = $(id);
       if (!list) continue;
-      const cards = [...list.querySelectorAll(':scope > li.ae-community-popular-take')];
+      const cards = [...list.children].filter(node => node.matches('li.ae-community-popular-take, .cam-hj-item') && node.querySelector('[data-cam-author-id]'));
       let shown = 0;
       for (const card of cards) {
         const authorId = card.querySelector('[data-cam-author-id]')?.dataset.camAuthorId || '';
@@ -40,7 +40,7 @@
       if (loaded && cards.length && !shown) {
         const msg = filter === 'demo' ? 'No hay Takes de prueba en esta lista.' : 'No hay Takes de otras cuentas en esta lista.';
         if (!currentEmpty) {
-          const row = document.createElement('li');
+          const row = document.createElement(list.tagName === 'OL' ? 'li' : 'div');
           row.className = 'cam-community-filter-empty';
           row.textContent = msg;
           list.append(row);
@@ -74,12 +74,16 @@
       (data || []).forEach(row => { if (row.user_id) ids.add(String(row.user_id)); });
       loaded = true;
       document.querySelectorAll('[data-cam-demo-filter]').forEach(b => { b.disabled = false; });
-      const note = $('camCommunityProofNote');
-      if (note) note.textContent = '«Prueba» identifica cuentas administradas por CAM SPORTS. Los votos pueden incluir actividad de prueba.';
+      for(const id of ['camCommunityProofNote','camJornadaCommunityProofNote']){
+        const note=$(id);
+        if(note)note.textContent='«Prueba» identifica cuentas administradas por CAM SPORTS. Los votos pueden incluir actividad de prueba.';
+      }
       schedule();
     } catch (err) {
-      const note = $('camCommunityProofNote');
-      if (note) note.textContent = 'No se pudo verificar el origen de las cuentas. Los votos pueden incluir pruebas.';
+      for(const id of ['camCommunityProofNote','camJornadaCommunityProofNote']){
+        const note=$(id);
+        if(note)note.textContent='No se pudo verificar el origen de las cuentas. Los votos pueden incluir pruebas.';
+      }
       console.warn('Etiquetas de comunidad no disponibles', err);
     }
   }
