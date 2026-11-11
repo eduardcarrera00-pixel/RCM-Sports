@@ -44,7 +44,7 @@
   /* ---------- 2. Carriles ---------- */
   const rail = el('aside', null, 'cam-desk-rail', { id: 'camDeskRail', 'aria-labelledby': 'camDeskRailTitle' });
   const railIn = el('div', null, 'cam-desk-rail-in');
-  railIn.append(el('h2', 'Atajos', 'cam-desk-rail-toggle', { id: 'camDeskRailTitle' }));
+  railIn.append(el('h2', 'Comparte tu sabiduría', 'cam-desk-rail-toggle', { id: 'camDeskRailTitle' }));
   rail.append(railIn);
   const aside = el('aside', null, 'cam-desk-aside', { id: 'camDeskAside', 'aria-label': 'Destacados' });
   const asideIn = el('div', null, 'cam-desk-aside-in');
