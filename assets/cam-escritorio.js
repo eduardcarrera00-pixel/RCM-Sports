@@ -104,7 +104,6 @@
   const primary = el('div', null, 'cam-desk-main', {id:'camDeskMain'});
   shell.append(primary, aside);
   const editorial = main.querySelector('.editorial-layout');
-  const editorialCommunity = main.querySelector('.editorial-community');
   const placements = new Map();
   let mounted = null;
   let asideFor = null;
@@ -152,11 +151,7 @@
         move(byId('camHomeJornada'), primary);
         move(editorial, primary);
         move(byId('aeTrendingPortada'), asideIn);
-        // Reuse the existing live community leaderboard rather than leaving a
-        // large empty rail beside the home news and Picks.
-        move(editorialCommunity, asideIn);
         order(primary,[byId('camHomeJornada'),editorial]);
-        order(asideIn,[byId('aeTrendingPortada'),editorialCommunity]);
       } else {
         const prefix = p === 'nfl' ? 'camNfl' : 'camFootball';
         move(byId(prefix + 'Semana'), primary);
@@ -169,8 +164,7 @@
         move(byId('aeTrendingPortada'), asideIn);
         move(byId('aeSportTakeLeaders'), asideIn);
         order(primary,[byId(prefix+'Semana'),byId(prefix+'Quiniela'),byId('freeTakes'),editorial]);
-        // Lead with news discovery on both sports, like on the home page.
-        order(asideIn,[byId('aeTrendingPortada'),byId(prefix+'Score'),byId('aeSportTakeLeaders')]);
+        order(asideIn,[byId(prefix+'Score'),byId('aeTrendingPortada'),byId('aeSportTakeLeaders')]);
       }
       aside.hidden = false;
       body.dataset.camDeskAside = '';
