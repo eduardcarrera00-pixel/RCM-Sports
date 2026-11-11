@@ -60,6 +60,7 @@
     avatar.setAttribute('aria-hidden','true');
     const author=make('button','@'+(t.author||'Comunidad'),'ae-top-take-author');
     author.type='button';
+    author.dataset.camAuthorId=String(t.author_id||'');
     author.setAttribute('aria-label','Ver perfil de '+(t.author||'la comunidad'));
     author.addEventListener('click',()=>window.openAePublicProfile?.(t.author_id));
     identity.append(avatar,author);
@@ -118,7 +119,9 @@
     const excerpt=String(t.body||'').replace(/\r\n/g,'\n').replace(/^NFL(?: · [^\n]*)?\n\n/,'').trim();
     if(excerpt)body.append(make('span',excerpt.length>170?excerpt.slice(0,167).trimEnd()+'…':excerpt,'ae-discovery-excerpt'));
     const foot=make('span',null,'ae-discovery-meta cam-take-record-byline');
-    foot.append(make('span','@'+String(t.author||'Aficionado').replace(/^@+/,''),'cam-take-record-author'));
+    const historicAuthor=make('span','@'+String(t.author||'Aficionado').replace(/^@+/,''),'cam-take-record-author');
+    historicAuthor.dataset.camAuthorId=String(t.author_id||'');
+    foot.append(historicAuthor);
     const when=date(t.created_at);
     if(when)foot.append(make('span',when,'cam-take-record-date'));
     body.append(foot);
@@ -157,7 +160,7 @@
   function empty(target,message,isList=false){
     if(target)target.replaceChildren(make(isList?'li':'p',message,'ae-discovery-empty'));
   }
-  function render(data,replyCounts,viewerId){
+  function render(data,replyCounts,viewerId,recentRows){
     const positive=$('aeHomeTakesPositiveList'),negative=$('aeHomeTakesNegativeList'),historic=$('aeHomeTakeHistoricTake');
     if(!positive||!negative||!historic)return;
     const rows=Array.isArray(data)?data:[];
@@ -169,6 +172,12 @@
     }
     ranked('positive',positive,'Todavía no hay Takes con votos positivos.');
     ranked('negative',negative,'Todavía no hay Takes con votos negativos.');
+    const recent=$('aeHomeTakesRecentList');
+    if(recent){
+      const unique=[...new Map((Array.isArray(recentRows)?recentRows:[]).filter(t=>t?.id).map(t=>[String(t.id),t])).values()].slice(0,12);
+      if(unique.length)recent.replaceChildren(...unique.map((t,i)=>communityCard({...t,rank_number:i+1},'recent',replyCounts,viewerId)));
+      else empty(recent,'Todavía no hay Takes recientes.',true);
+    }
     const winner=rows.find(r=>r?.kind==='historical'&&Number(r.points)>0);
     $('aeHomeTakeHistoric').dataset.camContentState=winner?'ready':'empty';
     if(winner)historic.replaceChildren(historicalCard(winner));
@@ -183,14 +192,17 @@
     loading=true;
     const finishEntrance=window.camPageLoader?.begin?.();
     try{
-      const [result,session]=await Promise.all([
+      const [result,newest,session]=await Promise.all([
         db.rpc('ae_home_take_showcase'),
+        db.rpc('ae_public_take_feed',{p_sport:'all'}),
         db.auth.getUser().catch(()=>({data:{user:null}}))
       ]);
       if(result.error)throw result.error;
+      if(newest.error)throw newest.error;
       if(request!==sequence)return;
       const rows=Array.isArray(result.data)?result.data:[];
-      const takeIds=[...new Set(rows.filter(t=>t?.id && (t.kind==='positive'||t.kind==='negative')).map(t=>String(t.id)))];
+      const recentRows=Array.isArray(newest.data)?newest.data:[];
+      const takeIds=[...new Set([...rows.filter(t=>t?.id && (t.kind==='positive'||t.kind==='negative')),...recentRows.slice(0,12)].map(t=>String(t.id)))];
       let replyCounts=new Map();
       if(takeIds.length){
         const countsResult=await db.rpc('ae_public_take_reply_counts',{p_take_ids:takeIds});
@@ -203,9 +215,10 @@
         }
       }
       if(request!==sequence)return;
-      render(rows,replyCounts,session.data?.user?.id||null);
+      render(rows,replyCounts,session.data?.user?.id||null,recentRows);
       lastFetch=Date.now();
     }catch(error){
+      empty($('aeHomeTakesRecentList'),'No se pudieron cargar los Takes recientes.',true);
       empty($('aeHomeTakesPositiveList'),'No se pudieron cargar los Takes populares.',true);
       empty($('aeHomeTakesNegativeList'),'No se pudieron cargar los Takes impopulares.',true);
       $('aeHomeTakeHistoric').dataset.camContentState='error';
