@@ -118,7 +118,7 @@
     if (rank) item.append(el('span', String(rank).padStart(2, '0'), 'cam-snc-rank'));
     item.append(head);
     const author = el(row.author_id ? 'button' : 'span', '@' + (row.author || 'Aficionado').replace(/^@+/, ''), 'cam-snc-author');
-    if (row.author_id) { author.type = 'button'; author.onclick = () => window.openAePublicProfile?.(row.author_id); }
+    if (row.author_id) { author.type = 'button'; author.dataset.camAuthorId = String(row.author_id); author.onclick = () => window.openAePublicProfile?.(row.author_id); }
     item.append(author);
     if (row.body) item.append(el(type === 'take' ? 'p' : 'blockquote', row.body, 'cam-snc-excerpt'));
     const actions = el('div', null, 'cam-snc-actions');
@@ -144,6 +144,8 @@
     const debated = document.getElementById('camSportDebatedList');
     const distinguished = document.getElementById('camSportLeadersList');
     debated.replaceChildren(); distinguished.replaceChildren();
+    document.getElementById('camSportDebatedTitle').textContent='Lo más debatido · '+sports[sport].category;
+    document.getElementById('camSportLeadersTitle').textContent='Opinadores distinguidos · '+sports[sport].category;
     for (const [kind, target] of [['debates', debated], ['leaders', distinguished]]) {
       target.setAttribute('aria-busy', String(Boolean(state.loading && !state[kind])));
       if (state.errors[kind]) message(target, 'No pudimos cargar ' + (kind === 'debates' ? 'los debates.' : 'los opinadores.'), true);
