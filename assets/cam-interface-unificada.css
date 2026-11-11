@@ -1,0 +1,324 @@
+/* CAM SPORTS · A shared reading and Pick-ticket interface.
+   Visual references: sportsbook event → market → selection → odds hierarchy,
+   with a clearly grouped multi-selection ticket. NO betting, stakes or payouts.
+   The real data, rankings, editorial images and interactions are unchanged.
+   Packaged last in cam-perf-app-panels.css to retain one CSS request. */
+
+@layer cam-header {
+  /* A compact system that works in Inicio, Picks, NFL, Fútbol and Actualidad.
+     Hue/contrast come from CAM's calm day/night tokens, not betting-brand colors. */
+  html body {
+    --cam-ui-paper:var(--cam-calm-surface,#fffcf8);
+    --cam-ui-ink:var(--cam-calm-ink,#273b49);
+    --cam-ui-muted:var(--cam-calm-muted,#566876);
+    --cam-ui-rule:var(--cam-calm-line,rgba(39,59,73,.17));
+    --cam-ui-soft:var(--cam-calm-soft,#f3ebdd);
+    --cam-ui-accent:var(--cam-calm-action,#855b43);
+    --cam-ui-radius:14px;
+    --cam-ui-gap:14px;
+    --cam-ui-shadow:none;
+  }
+  /* Each Pick is one legible ticket, not a wall of bare text or nested frames. */
+  html body #mainContent #footballTakes #communityPicks #cpFeed {
+    display:flex!important;
+    flex-direction:column!important;
+    gap:12px!important;
+    padding:0!important;
+    margin:0!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+  }
+  html body #mainContent #footballTakes #communityPicks #cpFeed > .cp-card.cam-pk {
+    display:block!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    min-width:0!important;
+    margin:0!important;
+    padding:16px 18px 14px!important;
+    border:1px solid var(--cam-ui-rule)!important;
+    border-radius:var(--cam-ui-radius)!important;
+    background:var(--cam-ui-paper)!important;
+    color:var(--cam-ui-ink)!important;
+    box-shadow:var(--cam-ui-shadow)!important;
+    overflow:visible!important;
+    transition:border-color .16s ease,background-color .16s ease!important;
+  }
+  html body #mainContent #footballTakes #communityPicks #cpFeed > .cp-card.cam-pk:first-child {
+    border-top:1px solid var(--cam-ui-rule)!important;
+  }
+  @media (hover:hover) {
+    html body #mainContent #footballTakes #communityPicks #cpFeed > .cp-card.cam-pk:hover {
+      border-color:var(--pk-odds-line,var(--cam-ui-accent))!important;
+    }
+  }
+  html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-head {
+    gap:8px!important;
+    min-height:36px!important;
+    flex-wrap:wrap!important;
+    padding:0 0 9px!important;
+    border-bottom:1px solid var(--cam-ui-rule)!important;
+  }
+  html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-author {
+    min-height:36px!important;
+  }
+  html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-sport {
+    color:var(--cam-ui-muted)!important;
+    font-size:11px!important;
+    font-weight:650!important;
+  }
+  html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-body {
+    grid-template-columns:minmax(0,1fr) minmax(82px,auto)!important;
+    align-items:start!important;
+    gap:14px!important;
+    margin:13px 0 0!important;
+  }
+  html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-title {
+    margin:0 0 8px!important;
+    color:var(--cam-ui-muted)!important;
+    font:500 12px/1.45 Inter,system-ui,sans-serif!important;
+  }
+  /* Singles stay label-free as requested; multiples have one compact cue. */
+  html body #mainContent #footballTakes #communityPicks .cam-pk[data-pick-type="combinada"] .cam-pk-combo {
+    display:inline-flex!important;
+    align-items:center!important;
+    width:fit-content!important;
+    max-width:100%!important;
+    margin:0 0 10px!important;
+    padding:5px 9px!important;
+    border:1px solid var(--cam-ui-rule)!important;
+    border-radius:7px!important;
+    background:var(--cam-ui-soft)!important;
+    color:var(--cam-ui-accent)!important;
+    font:700 11px/1.3 Inter,system-ui,sans-serif!important;
+    letter-spacing:0!important;
+    text-transform:none!important;
+  }
+  html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-legs {
+    gap:0!important;
+  }
+  html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-leg {
+    min-width:0!important;
+    padding-block:0 9px!important;
+  }
+  html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-leg:last-child {
+    padding-bottom:0!important;
+  }
+  html body #mainContent #footballTakes #communityPicks .cam-pk[data-pick-type="combinada"] .cam-pk-leg + .cam-pk-leg {
+    margin-top:9px!important;
+    padding-top:12px!important;
+    border-top:1px solid var(--cam-ui-rule)!important;
+  }
+  html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-event {
+    display:block!important;
+    margin:0 0 5px!important;
+    color:var(--cam-ui-muted)!important;
+    font:500 12px/1.4 Inter,system-ui,sans-serif!important;
+    overflow-wrap:anywhere!important;
+  }
+  html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-choice {
+    display:block!important;
+    margin:0!important;
+    color:var(--cam-ui-ink)!important;
+    font:700 clamp(16px,1.4vw,19px)/1.35 Inter,system-ui,sans-serif!important;
+    letter-spacing:-.012em!important;
+    overflow-wrap:anywhere!important;
+  }
+  /* A single selection's own quoted odds; not a second total. */
+  html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-leg-odds {
+    display:inline-flex!important;
+    align-items:center!important;
+    min-height:24px!important;
+    width:fit-content!important;
+    margin:6px 0 2px!important;
+    padding:2px 7px!important;
+    border:1px solid var(--cam-ui-rule)!important;
+    border-radius:6px!important;
+    background:var(--cam-ui-soft)!important;
+    color:var(--cam-ui-accent)!important;
+    font:700 11px/1.2 Inter,system-ui,sans-serif!important;
+    font-variant-numeric:tabular-nums!important;
+    white-space:nowrap!important;
+  }
+  html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-meta {
+    display:block!important;
+    margin:4px 0 0!important;
+    color:var(--cam-ui-muted)!important;
+    font:500 11px/1.4 Inter,system-ui,sans-serif!important;
+  }
+  html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-odds-panel {
+    align-items:flex-end!important;
+    gap:5px!important;
+    min-width:82px!important;
+    max-width:132px!important;
+  }
+  html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-odds-label {
+    color:var(--cam-ui-muted)!important;
+    font:700 10px/1.2 Inter,system-ui,sans-serif!important;
+  }
+  /* The site's existing soft cyan odds, not sportsbook green. */
+  html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-odds {
+    min-width:78px!important;
+    margin:0!important;
+    padding:8px 10px!important;
+    border:1px solid var(--pk-momio-line)!important;
+    border-radius:8px!important;
+    background:var(--pk-momio-bg)!important;
+    color:var(--pk-momio-ink)!important;
+    font:750 18px/1.2 Inter,system-ui,sans-serif!important;
+    font-variant-numeric:tabular-nums!important;
+    text-align:center!important;
+    white-space:nowrap!important;
+  }
+  html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-odds-panel > .cam-pick-impact {
+    margin:0!important;
+    color:var(--cam-ui-muted)!important;
+    font:500 11px/1.3 Inter,system-ui,sans-serif!important;
+    text-align:right!important;
+  }
+  /* New compact feed puts impact points inside the odds element. */
+  html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-odds > .cam-pick-impact {
+    display:block!important;
+    margin:5px auto 0!important;
+    color:var(--cam-ui-muted)!important;
+    font:500 10px/1.35 Inter,system-ui,sans-serif!important;
+    white-space:normal!important;
+    text-align:center!important;
+  }
+  html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-result {
+    margin-left:auto!important;
+    padding:4px 8px!important;
+    border-radius:6px!important;
+    background:var(--cam-ui-soft)!important;
+    font-size:11px!important;
+    white-space:nowrap!important;
+  }
+  html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-open {
+    border-radius:var(--cam-ui-radius)!important;
+  }
+  html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-open:focus-visible,
+  html body #mainContent #footballTakes #communityPicks .cam-pk :is(button,summary):focus-visible {
+    outline:2px solid var(--cam-ui-accent)!important;
+    outline-offset:3px!important;
+  }
+  html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-analysis {
+    margin:9px 0 0!important;
+    padding:9px 0 0!important;
+    border-top:1px solid var(--cam-ui-rule)!important;
+  }
+  html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-analysis > summary,
+  html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-more > summary {
+    min-height:40px!important;
+    display:inline-flex!important;
+    align-items:center!important;
+  }
+  html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-actions {
+    width:100%!important;
+    min-height:44px!important;
+    max-width:none!important;
+    gap:10px!important;
+    margin:10px 0 0!important;
+    padding:8px 0 0!important;
+    border-top:1px solid var(--cam-ui-rule)!important;
+  }
+  html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-actions button {
+    min-width:44px!important;
+    min-height:44px!important;
+    border-radius:8px!important;
+  }
+  html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-votes {
+    border-radius:9px!important;
+  }
+  html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-votes button {
+    border-radius:0!important;
+  }
+  html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-actions .cam-pk-share {
+    min-width:44px!important;
+    margin-left:auto!important;
+  }
+
+  /* Archive/profile previews follow the same Pick-ticket rhythm. These are
+     read-only visual adjustments: do not interfere with original vote handlers. */
+  html body :is(#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog #aeProfilePicks,#aeProfileDialog #aeProfilePickHighlights) .cam-ticket-card {
+    border:1px solid var(--cam-ui-rule)!important;
+    border-radius:var(--cam-ui-radius)!important;
+    background:var(--cam-ui-paper)!important;
+    color:var(--cam-ui-ink)!important;
+    box-shadow:none!important;
+  }
+  html body :is(#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog #aeProfilePicks,#aeProfileDialog #aeProfilePickHighlights) .cam-ticket-card :is(.cp-card-header,.cam-ticket-legs) {
+    min-width:0!important;
+  }
+  html body :is(#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog #aeProfilePicks,#aeProfileDialog #aeProfilePickHighlights) .cam-ticket-card :is(.cp-pick-line-event,.cp-pick-line-market) {
+    color:var(--cam-ui-muted)!important;
+    font:500 12px/1.4 Inter,system-ui,sans-serif!important;
+  }
+  html body :is(#cpArchiveDialog #cpArchiveFeed,#aeProfileDialog #aeProfilePicks,#aeProfileDialog #aeProfilePickHighlights) .cam-ticket-card .cp-pick-line-choice {
+    font:700 16px/1.35 Inter,system-ui,sans-serif!important;
+    color:var(--cam-ui-ink)!important;
+    overflow-wrap:anywhere!important;
+  }
+
+  /* Common surfaces and interaction cues in sports and community. Artwork,
+     editorial accents, rank colours and native card interactions are retained. */
+  html body #mainContent :is(.cam-snc-card,.cam-sport-latest-card,.cam-hj-news,.cam-hj-take,.ae-free-take-card,.cam-ov-card,.ae-top-takes-card) {
+    border-color:var(--cam-ui-rule)!important;
+    border-radius:var(--cam-ui-radius)!important;
+    box-shadow:none!important;
+  }
+  html body #mainContent :is(.cam-snc-card,.cam-hj-news,.cam-hj-take,.ae-free-take-card,.cam-ov-card) {
+    min-width:0!important;
+  }
+  html body #mainContent :is(.cam-snc-card,.cam-ov-card) {
+    background:var(--cam-ui-paper)!important;
+    color:var(--cam-ui-ink)!important;
+  }
+  html body #mainContent :is(.cam-snc-card h4,.cam-sport-latest-card h3,.cam-hj-card-title,.ae-top-take-title) {
+    line-height:1.32!important;
+    overflow-wrap:anywhere!important;
+  }
+  html body #mainContent :is(.cam-snc-card,.cam-sport-latest-card,.cam-hj-news,.cam-hj-take,.ae-free-take-card,.cam-ov-card) :is(button,a,summary):focus-visible {
+    outline:2px solid var(--cam-ui-accent)!important;
+    outline-offset:2px!important;
+  }
+  html body #mainContent :is(.cam-chef-period,.cam-nfl-view-tabs,.cam-football-leagues) :is(button,[role="button"]) {
+    font-family:Inter,system-ui,sans-serif!important;
+  }
+  html body #mainContent :is(.cam-chef-period,.cam-nfl-view-tabs) :is(button,[role="button"]):focus-visible {
+    outline:2px solid var(--cam-ui-accent)!important;
+    outline-offset:2px!important;
+  }
+
+  @media (max-width:560px) {
+    html body #mainContent #footballTakes #communityPicks #cpFeed {
+      gap:10px!important;
+    }
+    html body #mainContent #footballTakes #communityPicks #cpFeed > .cp-card.cam-pk {
+      padding:13px 12px 10px!important;
+    }
+    html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-body {
+      grid-template-columns:minmax(0,1fr) minmax(72px,auto)!important;
+      gap:10px!important;
+    }
+    html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-choice {
+      font-size:16px!important;
+    }
+    html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-odds-panel {
+      min-width:72px!important;max-width:96px!important;
+    }
+    html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-odds {
+      min-width:70px!important;
+      padding:7px 6px!important;
+      font-size:16px!important;
+    }
+    html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-actions {
+      gap:6px!important;
+    }
+  }
+  @media (prefers-reduced-motion:reduce) {
+    html body #mainContent #footballTakes #communityPicks #cpFeed > .cp-card.cam-pk {
+      transition:none!important;
+    }
+  }
+}
