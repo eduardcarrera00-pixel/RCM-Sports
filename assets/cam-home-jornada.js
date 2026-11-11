@@ -116,7 +116,7 @@
   const today = el('p', '', 'cam-hj-date');
   head.append(title, today);
 
-  const shortcuts = el('nav', null, 'cam-hj-shortcuts', { 'aria-label': 'Atajos' });
+  const shortcuts = el('nav', null, 'cam-hj-shortcuts', { 'aria-label': 'Demuestra tu conocimiento' });
   function shortcut(label, icon, action, extra) {
     const b = el('button', null, 'cam-hj-shortcut', { type: 'button' });
     b.append(icon);
@@ -167,7 +167,7 @@
   };
   // La lectura abre Inicio. Los partidos y la comunidad se descubren después.
   const shortcutDisclosure = el('details', null, 'cam-hj-shortcuts-disclosure');
-  shortcutDisclosure.append(el('summary', 'Atajos', 'cam-desk-rail-toggle'), shortcuts);
+  shortcutDisclosure.append(el('summary', 'Demuestra tu conocimiento', 'cam-desk-rail-toggle'), shortcuts);
   root.append(head, shortcutDisclosure, rows.news.section, rows.jornada.section, rows.takes.section);
 
   // Una sola comunidad: reutiliza los listados reales y sus votos/respuestas.
