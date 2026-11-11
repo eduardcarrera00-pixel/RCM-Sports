@@ -93,6 +93,21 @@ await form.onsubmit({preventDefault(){}});
 await settle();
 assert.equal(records.length,1,'The first Pick must be saved');
 assert.equal(d.querySelectorAll('#cpFeed .cp-card').length,1,'Pending Picks must appear in public feed');
+assert.equal(d.querySelector('#cpFeed .cam-pk').dataset.pickType,'simple','A single-selection Pick remains obvious without a redundant label');
+assert.equal(d.querySelector('#cpFeed .cam-pk-combo'),null,'Simple Picks never display a combinada badge');
+const comboFixture={...records[0],id:'unit-combo',moderation_status:'approved',american_odds:400,
+  legs:[
+    {sport:'NFL',event:'Bills vs Dolphins',selection:'Bills gana',odds:'+170'},
+    {sport:'NFL',event:'Seahawks vs Rams',selection:'Más de 44.5 puntos',odds:'-110'}
+  ]};
+const comboTicket=w.renderCamPickCard(comboFixture,{variant:'stream'});
+assert.equal(comboTicket.dataset.pickType,'combinada','Multiples have one grouped visual treatment');
+assert.equal(comboTicket.querySelectorAll('.cam-pk-leg').length,2,'Every selection stays readable');
+assert.deepEqual([...comboTicket.querySelectorAll('.cam-pk-leg-odds')].map(n=>n.textContent),
+ ['+170','−110'],'Only verified per-leg prices appear on separate selections');
+assert.equal(comboTicket.querySelector('.cam-pk-odds').firstChild.textContent,'+400','Total combo odds remain distinct from leg odds');
+assert.equal(comboTicket.querySelectorAll('.cam-pk-combo').length,1,'A combined Pick uses just one type cue');
+
 assert.equal(d.querySelector('#cpFeed .cp-upvote'),null,'Authors do not see voting controls on their own Pick');
 assert.equal(d.getElementById('cpComposePanel').open,false,'Publish form closes after success');
 assert.doesNotMatch(form.textContent,/Una publicación al día/);
@@ -219,6 +234,14 @@ fill('Borrador sin sesión','Equipo G vs H');user=null;w.authOpened=false;
 await form.onsubmit({preventDefault(){}});await settle();assert.equal(w.authOpened,true);assert.equal(modal.open,false);
 assert.equal(field('explanation').value,'Borrador sin sesión');assert.equal(records.length,3);
 assert.equal(d.body.classList.contains('ae-pick-composing'),false);
+// The same display system is bundled without introducing a CSS request.
+const visualCss=fs.readFileSync('assets/cam-interface-unificada.css','utf8');
+assert.match(visualCss,/\.cam-pk\[data-pick-type="combinada"\]/,'Grouped-combination styling exists');
+assert.match(visualCss,/\.cam-pk-leg-odds/,'Individual combined-leg odds are styled');
+assert.match(visualCss,/\.cam-snc-card/,'Sport debate cards share CAM visual tokens');
+const packs=JSON.parse(fs.readFileSync('assets/performance-css-packs.json','utf8'));
+assert.ok(packs.groups.some(g=>g.sources.includes('assets/cam-interface-unificada.css')),
+ 'All CAM SPORTS interfaces share the same compiled CSS pack');
 // Mobile Chef recipe: review responsive structure without opening a browser viewport.
 const chefMobileCss=fs.readFileSync('assets/ae-chef-parchment-mobile.css','utf8');
 assert.ok(chefMobileCss.includes('@media screen and (max-width:780px)'), 'Phone-specific styles must exist');
