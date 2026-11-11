@@ -61,6 +61,7 @@
     const player=el('td',null,'ae-sports-stand-player');
     const user=el('button',null,'ae-points-user');
     user.type='button';
+    user.dataset.camAuthorId=String(r.user_id||'');
     const nickname=(r.username||'Aficionado').replace(/^@+/,'');
     const avatar=el('span',nickname.slice(0,1).toUpperCase()||'A','ae-points-avatar');
     avatar.setAttribute('aria-hidden','true');
