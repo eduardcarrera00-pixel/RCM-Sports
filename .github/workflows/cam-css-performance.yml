@@ -12,6 +12,9 @@ on:
       - 'assets/style-sources.json'
       - 'tests/css-consolidation.mjs'
       - 'tests/performance-css.mjs'
+      - 'assets/cam-escritorio.js'
+      - 'tests/desktop-continuous.mjs'
+      - 'tests/navigation-top.mjs'
       - 'tests/opinions-section-banners.mjs'
       - 'package.json'
       - '.github/workflows/cam-css-performance.yml'
@@ -47,5 +50,7 @@ jobs:
       - run: npm ci
       - name: Check compiled pack integrity and stylesheet order
         run: npm run test:performance
+      - name: Verify desktop composition, navigation and mobile restoration
+        run: npm run test:desktop
       - name: Verify Picks, mobile navigation, banners and account UX
         run: npm run test:picks && npm run test:mobile-nav && npm run test:opinions-banners && npm run test:site-banners && npm run test:auth
