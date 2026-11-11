@@ -111,3 +111,35 @@ html:not(.dark) body .cam-league-board-list>li{border-color:#d4c9b9}
  .cam-league-dialog{padding:16px;max-height:92dvh}
  .cam-league-board-list>li{grid-template-columns:24px 26px minmax(0,1fr) auto;gap:6px}
 }
+/* Competition clarity: real rank, qualification and nearby rivals. */
+html body #aeProfileDialog #camProfileRank{display:inline-flex;flex-wrap:wrap;gap:6px;min-height:28px;margin-top:6px;color:var(--league-metal,#b88e58);font-weight:700}
+html body #aeProfileDialog #camProfileRank .cam-rank-emblem{width:24px;height:28px;flex-basis:24px}
+.cam-rank-situation{display:block;font:650 12px/1.5 Inter,system-ui,sans-serif;color:var(--league-metal,#d4ad78)}
+.cam-league-meter{display:flex;flex-direction:column;gap:6px;width:100%;font:600 10px/1.4 Inter,system-ui,sans-serif;min-width:0}
+.cam-league-meter-label{overflow-wrap:anywhere}
+.cam-league-meter-track{display:block;position:relative;height:5px;width:100%;overflow:hidden;border-radius:50px;background:rgba(125,149,164,.3)}
+.cam-league-meter-fill{display:block;height:100%;max-width:100%;border-radius:inherit;background:var(--league-metal,#d4ad78)}
+.cam-league-rivals{margin-top:16px;border-top:1px solid var(--ae-profile-line,#49606c);padding-top:12px}
+.cam-league-rivals[hidden]{display:none!important}
+.cam-league-rivals h4,.cam-league-my-race h3{margin:4px 0 8px;font:600 18px/1.3 'Playfair Display',Georgia,serif}
+.cam-rival-note{margin:6px 0 12px;font:500 12px/1.5 Inter,system-ui,sans-serif}
+.cam-rival-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+html body .cam-rival{display:flex;flex-direction:column;align-items:flex-start;gap:4px;min-width:0;padding:12px;border:1px solid #677783;border-radius:12px;background:transparent;color:inherit;text-align:left;cursor:pointer}
+.cam-rival strong{font:700 13px/1.4 Inter,system-ui,sans-serif;overflow-wrap:anywhere}
+.cam-rival span,.cam-rival small{font:500 11px/1.4 Inter,system-ui,sans-serif}
+.cam-rival small:first-child{font-weight:700;letter-spacing:.04em;color:var(--league-metal,#d4ad78)}
+.cam-league-my-race{border-block:1px solid #677783;padding:10px 0;margin:10px 0 14px}
+.cam-league-board-list>li.is-you{padding-inline:8px;border-inline-start:3px solid #d4ad78;background:rgba(212,173,120,.11)}
+.cam-pick-impact{display:block;margin-top:4px;font:600 10px/1.35 Inter,system-ui,sans-serif;letter-spacing:0;white-space:normal;text-align:end;color:inherit;opacity:.8}
+.cam-pk-odds .cam-pick-impact{max-width:110px}
+html body :is(.cam-rival):focus-visible{outline:2px solid #bd8d6b;outline-offset:3px}
+html:not(.dark) body #aeProfileDialog #camProfileRank{color:var(--league-ink,#6e4b22)}
+html:not(.dark) body .cam-rank-situation{color:var(--league-ink,#695024)}
+html:not(.dark) body .cam-rival{border-color:#c7b9a7}
+html:not(.dark) body .cam-league-my-race{border-color:#c7b9a7}
+@media(max-width:640px){
+ .cam-rival-list{grid-template-columns:1fr}
+ .cam-league-card .cam-league-meter{grid-column:2}
+ .cam-league-meter-label{font-size:10px}
+ .cam-league-rivals h4,.cam-league-my-race h3{font-size:17px}
+}
