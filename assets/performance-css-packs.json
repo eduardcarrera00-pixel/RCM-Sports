@@ -114,7 +114,8 @@
         "assets/cam-sport-news-community.css",
         "assets/cam-display-clarity.css",
         "assets/cam-cabecera-rango.css",
-        "assets/cam-interface-unificada.css"
+        "assets/cam-interface-unificada.css",
+        "assets/cam-picks-desplegables.css"
       ]
     }
   ]
