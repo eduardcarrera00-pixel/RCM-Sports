@@ -1,0 +1,32 @@
+
+/* CAM SPORTS · picks tipo cupón editorial: no hay pago ni apuesta real.
+   La cuota no cambia la lógica de resultados ni la puntuación. */
+html body #mainContent #footballTakes #communityPicks #cpFeed > .cam-pk{padding:15px 0 13px!important}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-body{grid-template-columns:minmax(0,1fr) minmax(86px,auto)!important;gap:12px!important;margin-top:11px!important}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-main{min-width:0!important}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-title{margin:0 0 8px!important;font:500 13px/1.4 var(--pk-sans)!important}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-combo{display:inline-flex!important;align-items:center!important;width:fit-content!important;max-width:100%!important;margin:0 0 10px!important;padding:4px 9px!important;border:1px solid var(--pk-line)!important;border-radius:7px!important;background:var(--pk-soft)!important;color:var(--pk-accent)!important;font:700 11px/1.25 var(--pk-sans)!important;letter-spacing:.02em!important}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-legs{gap:0!important}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-leg{min-width:0!important;padding-bottom:10px!important}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-leg:last-child{padding-bottom:0!important}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-event{display:block!important;margin:0 0 3px!important;color:var(--pk-muted)!important;font:500 12px/1.4 var(--pk-sans)!important;overflow-wrap:anywhere!important}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-choice{font:700 19px/1.25 var(--pk-sans)!important;letter-spacing:-.015em!important}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-meta{margin:3px 0 0!important;font:400 12px/1.45 var(--pk-sans)!important}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-combo ~ .cam-pk-legs > .cam-pk-leg,html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-more .cam-pk-leg{padding-left:30px!important}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-combo ~ .cam-pk-legs > .cam-pk-leg::before,html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-more .cam-pk-leg::before{content:attr(data-leg-index)!important;display:flex!important;align-items:center!important;justify-content:center!important;position:absolute!important;top:1px!important;left:0!important;width:20px!important;height:20px!important;border:1px solid var(--pk-line)!important;border-radius:6px!important;background:var(--pk-soft)!important;color:var(--pk-accent)!important;font:700 11px/1 var(--pk-sans)!important}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-combo ~ .cam-pk-legs .cam-pk-choice,html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-more .cam-pk-choice{font-size:16px!important;line-height:1.35!important}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-more{margin:6px 0 0!important}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-odds-panel{display:flex!important;flex-direction:column!important;align-items:flex-end!important;min-width:86px!important;max-width:118px!important;gap:4px!important}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-odds-label{display:block!important;color:var(--pk-muted)!important;font:700 10px/1.25 var(--pk-sans)!important;letter-spacing:.08em!important;text-transform:uppercase!important}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-odds{min-width:76px!important;padding:7px 10px!important;border-radius:8px!important;font:700 19px/1.2 var(--pk-sans)!important;text-align:center!important}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-odds-panel > .cam-pick-impact{display:block!important;margin:2px 0 0!important;color:var(--pk-muted)!important;font:500 11px/1.35 var(--pk-sans)!important;text-align:right!important;white-space:normal!important}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-analysis{margin-top:8px!important}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-actions{margin-top:7px!important}
+@media(max-width:560px){
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-body{gap:9px!important;grid-template-columns:minmax(0,1fr) minmax(76px,auto)!important}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-choice{font-size:17px!important}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-combo ~ .cam-pk-legs .cam-pk-choice,html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-more .cam-pk-choice{font-size:15px!important}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-odds-panel{min-width:76px!important;max-width:100px!important}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-odds{min-width:72px!important;padding:7px!important;font-size:17px!important}
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-odds-panel > .cam-pick-impact{font-size:10px!important}
+}
