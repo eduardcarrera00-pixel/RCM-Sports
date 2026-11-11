@@ -474,6 +474,7 @@ Ligas con icono y nombre visible; platos identificados por votos y Chefs por res
 La fase de clasificados se llama Elige tus 8 y el cuadro futuro se presenta como Próximamente.
 La selección del duelo precede a Publicar Take; en escritorio la quiniela sigue al duelo.
 Los periodos de quiniela abren en mensual con tabla visible. Los detalles de Picks usan
-la superficie común; el Pick histórico pone el título arriba y elimina brillos en momios.
+la superficie común. El Pick histórico conserva su diseño propio (perfil arriba, partido como
+título, ficha del momio y puntos): el 10 nov a las 17:36 se había aplanado y se restauró.
 Historial y Chefs aprovechan el desplazamiento de la página. Se conserva la navegación
 móvil, las rutas, los controles y las reglas de puntuación. Los grupos usan Mis grupos.
