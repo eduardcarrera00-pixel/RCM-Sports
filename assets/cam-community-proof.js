@@ -10,14 +10,19 @@
     const id = el.dataset.camAuthorId;
     if (!loaded || !id) return;
     const demo = ids.has(id);
+    // Los Takes conservan la atribución interna a una cuenta de prueba, pero
+    // la ficha de lectura no lleva un distintivo dentro de la firma del autor.
+    // Fuera de Takes se conserva el identificador visible y los filtros.
+    const takeSurface = el.closest('#aeTakeDiscussion, [data-take-id], .ae-community-popular-take, .cam-take-record');
+    const showBadge = demo && !takeSurface;
     const badge = el.nextElementSibling?.classList?.contains('cam-demo-account-tag') ? el.nextElementSibling : null;
-    if (demo && !badge) {
+    if (showBadge && !badge) {
       const tag = document.createElement('span');
       tag.className = 'cam-demo-account-tag';
       tag.textContent = 'Prueba';
       tag.title = 'Cuenta de prueba administrada por CAM SPORTS';
       el.insertAdjacentElement('afterend', tag);
-    } else if (!demo && badge) badge.remove();
+    } else if (!showBadge && badge) badge.remove();
     if (demo) el.setAttribute('aria-description', 'Cuenta de prueba; su actividad no es participación independiente');
     else el.removeAttribute('aria-description');
   }
@@ -76,7 +81,7 @@
       document.querySelectorAll('[data-cam-demo-filter]').forEach(b => { b.disabled = false; });
       for(const id of ['camCommunityProofNote','camJornadaCommunityProofNote']){
         const note=$(id);
-        if(note)note.textContent='«Prueba» identifica cuentas administradas por CAM SPORTS. Los votos pueden incluir actividad de prueba.';
+        if(note)note.textContent='CAM SPORTS utiliza cuentas de prueba en la comunidad; sus votos pueden incluir actividad de demostración. Las cuentas siguen identificadas en el filtro de comunidad.';
       }
       schedule();
     } catch (err) {
