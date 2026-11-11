@@ -52,13 +52,13 @@ const server=http.createServer((req,res)=>{
  assert.equal(await card.getAttribute('data-open'),'false');
  assert.equal(await card.locator('.cam-pk-leg').count(),4);
  assert.equal(await card.locator('.cam-pk-combo').textContent(),'Combinada');
- await card.locator('.cam-pk-toggle').click();
+ await card.locator('.cam-pk-main > .cam-pk-toggle-combo').click();
  assert.equal(await card.getAttribute('data-open'),'true');
  assert.equal(await card.locator('.cam-pk-toggle').getAttribute('aria-expanded'),'true');
  await page.waitForTimeout(400);
  assert.match(await card.innerText(),/Buffalo Bills gana/);
  assert.equal(await card.locator('.cam-pk-odds').innerText(),'+850','El momio es la cuota total');
- assert.equal(await card.locator('.cp-actions button').count(),5);
+ assert.equal(await card.locator('.cp-actions button').count(),4);
  for(const width of [360,390,768,1366])for(const dark of [false,true]){
   await page.setViewportSize({width,height:1000});await page.evaluate(dark=>document.documentElement.classList.toggle('dark',dark),dark);
   const fits=await page.locator('#cpFeed .cam-pk, .cam-ticket-card').evaluateAll(cards=>cards.every(card=>card.scrollWidth<=card.clientWidth+2));

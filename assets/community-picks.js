@@ -329,19 +329,6 @@ function comboSummary(p,choices,legs){
  if(t&&!legs.some(l=>{const e=normalizeText(l?.event);return e&&t===e;}))return stripped;
  return choices.map(({leg,selection})=>pickSelectionDisplay(selection,leg.sport).choice.replace(/^Gana\s+/,'')).filter(Boolean).join(' + ');
 }
-function streamLeague(p){
- const text=pickLeagueImpact(p);if(!text)return null;
- const row=el('div',null,'cam-pk-league');
- row.append(el('span','Liga de Chefs','cam-pk-label'));
- if(p.outcome==='pending'){
-   const value=(Math.abs(Number(p.american_odds))/100).toFixed(2).replace('.',',');
-   row.append(el('span','+'+value+' si acierta','cam-pk-chip is-up'),el('span','−'+value+' si falla','cam-pk-chip is-down'));
- }else{
-   const earned=Number(p.result_points||0);
-   row.append(el('span',text.replace(/^Liga\s+/,''),'cam-pk-chip '+(earned>0?'is-up':earned<0?'is-down':'is-even')));
- }
- return row;
-}
 function streamCard(p,viewerId){
  const n=el('article',null,'cp-card cam-pk cam-pk-fold');
  const choices=ticketChoices(p),legs=Array.isArray(p.legs)?p.legs:[],first=legs[0]||null;
@@ -411,7 +398,7 @@ function streamCard(p,viewerId){
  if(!choices.length)legList.append(el('li',title||'Pronóstico','cam-pk-leg cam-pk-choice'));
  if(combo){
    const tag=el('p',null,'cam-pk-kind');
-   tag.append(el('span','Combinada','cam-pk-combo'),el('span',' · '+choices.length+' selecciones','cam-pk-count'));
+   tag.append(el('span','Combinada','cam-pk-combo'));
    main.append(tag,el('p',comboSummary(p,choices,legs),'cam-pk-summary'));
  }else{
    // Un título escrito por el Chef se conserva; los automáticos repiten el partido.
@@ -427,7 +414,6 @@ function streamCard(p,viewerId){
  panel.id='camPkPanel-'+String(p.id||Math.random().toString(36).slice(2)).replace(/[^a-zA-Z0-9_-]/g,'');
  const inner=el('div',null,'cam-pk-panel-in');
  if(combo)inner.append(legList);
- const league=streamLeague(p);if(league)inner.append(league);
  if(p.explanation){
    const analysis=el('div',null,'cam-pk-analysis');
    analysis.append(el('span','Análisis del Chef','cam-pk-label'),el('p',p.explanation,'cp-explanation'));
@@ -475,18 +461,23 @@ function streamCard(p,viewerId){
    share.classList.add('cam-pk-share');
    actions.append(share);
  }
- const toggleLabel=el('span','Detalles','cam-pk-toggle-label');
+ // Combinadas: «Ver las N selecciones» bajo el resumen abre hacia abajo.
+ // Sencillos: «Detalles» al final de las acciones (análisis y ficha).
+ const closedText=combo?'Ver las '+choices.length+' selecciones':'Detalles';
+ const openText=combo?'Ocultar selecciones':'Ocultar';
+ const toggleLabel=el('span',closedText,'cam-pk-toggle-label');
  const toggle=button('',()=>setOpen(n.dataset.open!=='true'));
  toggle.classList.add('cam-pk-toggle');
+ if(combo)toggle.classList.add('cam-pk-toggle-combo');
  toggle.setAttribute('aria-controls',panel.id);
  toggle.append(toggleLabel,chevronIcon());
- actions.append(toggle);
+ if(combo)main.append(toggle);else actions.append(toggle);
  n.append(actions);
  function setOpen(value){
    n.dataset.open=String(value);
    toggle.setAttribute('aria-expanded',String(value));
-   toggle.setAttribute('aria-label',(value?'Ocultar detalles':'Ver detalles')+' del Pick de '+author);
-   toggleLabel.textContent=value?'Ocultar':'Detalles';
+   toggle.setAttribute('aria-label',(value?(combo?'Ocultar las selecciones':'Ocultar detalles'):(combo?'Ver las '+choices.length+' selecciones':'Ver detalles'))+' del Pick de '+author);
+   toggleLabel.textContent=value?openText:closedText;
    panel.inert=!value;
    panel.setAttribute('aria-hidden',String(!value));
    if(p.id!=null){if(value)openStreamPicks.add(p.id);else openStreamPicks.delete(p.id);}

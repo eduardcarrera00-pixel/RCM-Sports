@@ -14,7 +14,9 @@ Comprueba en 360/390/900/1366 px, día y noche:
   · sin desplazamiento horizontal y sin errores; Inicio sigue con la tarjeta de siempre.
   · Picks desplegables (11 nov): cada Pick empieza recogido y «Detalles» (o tocar el
     pronóstico) despliega selecciones con su cuota, Liga de Chefs, análisis y ficha;
-  · Chefs: Mejores y Peores Chefs primero, luego Mis grupos, sin el feed de Picks.
+  · Chefs: Mejores y Peores Chefs primero (gorro con check / cruz, sin «Por resultados»
+    ni la fila de columnas), luego Mis grupos, sin el feed de Picks;
+  · momios en azul cielo; las combinadas se abren con «Ver las N selecciones».
 Sustituye a picks-feed-scroll-browser.cjs (la ventana con scroll interno ya no existe).
 """
 import importlib.util, json, pathlib, sys
@@ -154,11 +156,18 @@ def check(width, dark):
         page.click('#cpFeed > .cam-pk:first-child .cam-pk-toggle'); page.wait_for_timeout(450)
         opened = page.evaluate("""() => { const c = document.querySelector('#cpFeed > .cam-pk'), p = c.querySelector('.cam-pk-panel');
           return [c.dataset.open, p.inert, p.getBoundingClientRect().height > 60, p.innerText.includes('Mi razonamiento del Pick.'),
-                  p.innerText.includes('Ver Pick y comentarios'), p.innerText.includes('+1,10 si acierta'), c.scrollWidth <= c.clientWidth + 1]; }""")
-        assert opened == ['true', False, True, True, True, True, True], f'{where}: «Detalles» despliega análisis, liga y ficha {opened}'
-        page.click('#cpFeed > .cam-pk:nth-child(3) .cam-pk-summary'); page.wait_for_timeout(450)
-        combo = page.evaluate("() => { const c = document.querySelectorAll('#cpFeed > .cam-pk')[2]; return [c.dataset.open, [...c.querySelectorAll('.cam-pk-panel .cam-pk-leg-odds')].map(e => e.textContent)]; }")
-        assert combo == ['true', ['−278', '−198']], f'{where}: tocar la combinada la despliega con sus cuotas {combo}'
+                  p.innerText.includes('Ver Pick y comentarios'), /si acierta|si falla|Liga de Chefs/.test(c.innerText), c.scrollWidth <= c.clientWidth + 1]; }""")
+        assert opened == ['true', False, True, True, True, False, True], f'{where}: «Detalles» despliega análisis y ficha, sin «si acierta / si falla» {opened}'
+        combo0 = page.evaluate("() => { const c = document.querySelectorAll('#cpFeed > .cam-pk')[2], t = c.querySelector('.cam-pk-main > .cam-pk-toggle-combo'); return [!!t && t.innerText.trim(), !c.querySelector('.cam-pk-actions .cam-pk-toggle')]; }")
+        assert combo0 == ['Ver las 2 selecciones', True], f'{where}: la combinada se abre desde su resumen {combo0}'
+        page.click('#cpFeed > .cam-pk:nth-child(3) .cam-pk-toggle-combo'); page.wait_for_timeout(450)
+        combo = page.evaluate("""() => { const c = document.querySelectorAll('#cpFeed > .cam-pk')[2], t = c.querySelector('.cam-pk-toggle-combo'), p = c.querySelector('.cam-pk-panel');
+          return [c.dataset.open, t.innerText.trim(), [...p.querySelectorAll('.cam-pk-leg-odds')].map(e => e.textContent), p.getBoundingClientRect().top >= t.getBoundingClientRect().bottom - 1]; }""")
+        assert combo == ['true', 'Ocultar selecciones', ['−278', '−198'], True], f'{where}: la combinada se despliega hacia abajo con sus cuotas {combo}'
+        page.click('#cpFeed > .cam-pk:nth-child(3) .cam-pk-toggle-combo'); page.wait_for_timeout(450)
+        assert page.evaluate("document.querySelectorAll('#cpFeed > .cam-pk')[2].dataset.open") == 'false', f'{where}: «Ocultar selecciones» la recoge'
+        blue = page.evaluate("getComputedStyle(document.querySelector('#cpFeed .cam-pk-odds')).color")
+        assert blue in ('rgb(11, 86, 137)', 'rgb(163, 217, 248)'), f'{where}: momio en azul cielo {blue}'
         page.click('#cpFeed > .cam-pk:first-child .cam-pk-toggle'); page.wait_for_timeout(450)
         assert page.evaluate("document.querySelector('#cpFeed > .cam-pk').dataset.open") == 'false', f'{where}: «Ocultar» lo recoge'
         page.click('.ae-chef-best > .cam-platos-more'); page.wait_for_timeout(150)
@@ -170,8 +179,12 @@ def check(width, dark):
         page.goto(page.url.split('?')[0] + '?s=picks&v=chefs', wait_until='load'); page.wait_for_timeout(1500)
         chefs = page.evaluate("""() => { const vis = e => !!e && e.getClientRects().length > 0, top = e => e.getBoundingClientRect().top;
           const d = document.querySelector('#communityPicks > .ae-chefs-dual-standings'), g = document.getElementById('camPartyEntryPicks');
-          return [vis(d), vis(g), vis(d) && vis(g) && top(d) < top(g), ['cpFeed', 'cpFeedHeading', 'cpFeedFooter'].some(id => vis(document.getElementById(id)))]; }""")
-        assert chefs == [True, True, True, False], f'{where}: Chefs empieza con Mejores y Peores Chefs y sin Picks {chefs}'
+          const heads = [...document.querySelectorAll('.ae-chefs-art-heading')].map(h => h.style.getPropertyValue('--cam-banner-art'));
+          return [vis(d), vis(g), vis(d) && vis(g) && top(d) < top(g), ['cpFeed', 'cpFeedHeading', 'cpFeedFooter'].some(id => vis(document.getElementById(id))),
+                  heads.length === 2 && /cam-banner-best-chef[.]svg/.test(heads[0]) && /cam-banner-worst-chef[.]svg/.test(heads[1]),
+                  [...document.querySelectorAll('.ae-chefs-dual-standings .ae-chefs-table-cols, .ae-chefs-dual-standings .cam-metric-label')].length,
+                  /Por resultados|AFICIONADO/.test(d.innerText)]; }""")
+        assert chefs == [True, True, True, False, True, 0, False], f'{where}: Chefs: Mejores y Peores Chefs primero, gorro con check/cruz, sin «Por resultados» ni columnas, sin Picks {chefs}'
         if SHOTS:
             page.evaluate("window.scrollTo(0,document.getElementById('communityPicks').getBoundingClientRect().top+scrollY-80)")
             page.wait_for_timeout(300)
