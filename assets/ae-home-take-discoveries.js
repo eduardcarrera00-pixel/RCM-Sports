@@ -47,7 +47,7 @@
     top.append(make('span',league,'cam-hj-league'));
     const created=new Date(t.created_at);
     if(Number.isFinite(created.getTime())){
-      const day=make('time',created.toLocaleDateString('es',{day:'numeric',month:'short'}).replace(/\\./g,''),'cam-hj-when');
+      const day=make('time',created.toLocaleDateString('es',{day:'numeric',month:'short'}).replace(/\./g,''),'cam-hj-when');
       day.dateTime=t.created_at||'';
       top.append(day);
     }
@@ -59,7 +59,7 @@
     title.addEventListener('click',()=>open(t));
     item.append(title);
 
-    const excerpt=String(t.body||'').replace(/^NFL[^\\n]*\\n\\n/,'').replace(/\\s+/g,' ').trim();
+    const excerpt=String(t.body||'').replace(/^NFL[^\n]*\n\n/,'').replace(/\s+/g,' ').trim();
     if(excerpt)item.append(make('span',excerpt,'cam-hj-excerpt'));
 
     const footer=make('div',null,'cam-hj-take-foot');
