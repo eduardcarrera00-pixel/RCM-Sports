@@ -474,6 +474,17 @@ html.dark [data-reading-size][aria-pressed="true"] {
 <style id="cam-liguilla-week-styles">
 /* Integración de la Liguilla en Fútbol → La semana. Un solo recuadro, «Arma tu cuadro»:
    primero «mis 8» y después el cuadro con puntos (estilos en assets/cam-liguilla.css). */
+/* Cabecera compacta de La Liguilla: el título sube y «Apertura 26» queda a la derecha. */
+#camLiguilla .cam-lg-event{gap:12px;padding:16px 18px 15px}
+#camLiguilla .cam-lg-event-name{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:8px;min-width:0}
+#camLiguilla .cam-lg-event-title{font-size:clamp(30px,8.4vw,36px);line-height:1.08;min-width:0}
+#camLiguilla .cam-lg-event-kicker{justify-self:end;text-align:right;white-space:nowrap;padding-top:5px;font-size:11px;letter-spacing:.1em;text-transform:none}
+#camLiguilla .cam-lg-bracket{gap:14px}
+@media(max-width:370px){
+  #camLiguilla .cam-lg-event{padding:15px 14px 14px}
+  #camLiguilla .cam-lg-event-title{font-size:clamp(27px,8.5vw,31px)}
+  #camLiguilla .cam-lg-event-kicker{padding-top:4px;font-size:10px;letter-spacing:.06em}
+}
 #camFootballSemana #camLiguilla{width:100%;max-width:none;min-width:0;grid-area:liguilla;gap:0;margin:0 0 14px}
 #camLiguilla .cam-lg-bracket+.cam-lg-rounds{border-top:0}
 #camLiguilla .cam-lg-pending-board{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
