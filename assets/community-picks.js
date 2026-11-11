@@ -163,6 +163,7 @@ function card(p,compact=false,detail=false,viewerId=currentViewerId,variant='fee
  n.dataset.sport=hasNfl&&hasFootball?'mixed':hasNfl?'nfl':hasFootball?'football':'general';
  const first=Array.isArray(p.legs)&&p.legs.length?p.legs[0]:null;
  n.dataset.outcome=ticketStates[p.outcome]?p.outcome:'pending';
+ if(!detail)n.dataset.pickType=ticketChoices(p).length>1?'combinada':'simple';
  const header=el('div',null,'cp-card-header');
  if(p.user_id){
    const profileButton=button('@'+(p.author||'Aficionado'),event=>{
@@ -297,6 +298,7 @@ function streamCard(p,viewerId){
  const body=el('div',null,'cam-pk-body');
  const main=el('div',null,'cam-pk-main');
  const combo=choices.length>1;
+ n.dataset.pickType=combo?'combinada':'simple';
  const title=String(p.title||'').trim();
  const redundant=!title||/^combinada\b/i.test(title)||legs.some(l=>{
    const t=normalizeText(title),e=normalizeText(l?.event);
@@ -315,6 +317,13 @@ function streamCard(p,viewerId){
    const meta=[key&&key!==previous?String(leg.event).trim():'',display.market].filter(Boolean).join(' · ');
    previous=key;
    if(meta)li.append(el('span',meta,'cam-pk-meta'));
+   // Leg odds are displayed only when the price belongs to a single market.
+   const legOdds=Number(leg.odds);
+   if(combo&&splitPickSelections(leg.selection).length===1&&Number.isFinite(legOdds)&&Math.abs(legOdds)>=100){
+     const price=el('span',momioText(leg.odds),'cam-pk-leg-odds');
+     price.setAttribute('aria-label','Cuota de esta selección '+momioText(leg.odds));
+     li.append(price);
+   }
    const outcome=legOutcome(p,leg,choices.length);
    li.dataset.outcome=outcome||'pending';
    if(outcome&&outcome!=='pending'&&combo)li.append(el('span',ticketStates[outcome].join(' '),'cam-pk-leg-state'));
