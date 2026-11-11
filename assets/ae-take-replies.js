@@ -147,6 +147,7 @@
         author.setAttribute('aria-label','Ver perfil y Takes de '+(r.author||'Aficionado'));
         author.addEventListener('click',()=>openAuthorProfile(authorId));
       }
+      author.dataset.camAuthorId=String(authorId||'');
       const time=el('time',new Date(r.created_at).toLocaleDateString('es',{day:'numeric',month:'short',year:'numeric'}));
       try{time.dateTime=new Date(r.created_at).toISOString();}catch(_){}
       meta.append(author,time);
@@ -188,6 +189,19 @@
         actions.append(badge);
       }
       content.append(actions);
+      if(!r.parent_id&&Number(score.reply_count)>0){
+        const n=Number(score.reply_count)||0;
+        const toggle=el('button','Ocultar '+n+' '+(n===1?'respuesta':'respuestas'),'cam-discussion-thread-toggle');
+        toggle.type='button';toggle.setAttribute('aria-expanded','true');
+        toggle.onclick=()=>{
+          const children=[...card.children].filter(child=>child.classList.contains('ae-discussion-nested'));
+          const open=toggle.getAttribute('aria-expanded')!=='true';
+          children.forEach(child=>{child.hidden=!open;});
+          toggle.setAttribute('aria-expanded',String(open));
+          toggle.textContent=(open?'Ocultar ':'Ver ')+n+' '+(n===1?'respuesta':'respuestas');
+        };
+        content.append(toggle);
+      }
       card.append(avatar,content);
       nodes.set(r.id,{card,data:r});
     }
@@ -394,6 +408,7 @@
     // La etiqueta "Mis Takes" queda reservada al perfil personal.
     const authorName=String(take.author||'').trim().replace(/^@+/, '').trim() || 'Aficionado';
     $('aeDiscussionAuthor').textContent='@'+authorName;
+    $('aeDiscussionAuthor').dataset.camAuthorId=String(take.author_id||'');
     $('aeDiscussionAuthor').disabled=!take.author_id;
     $('aeDiscussionAuthor').title=take.author_id?'Ver perfil de @'+authorName:'Perfil no disponible';
     $('aeDiscussionAuthor').setAttribute('aria-label','Ver perfil de '+authorName);
