@@ -163,6 +163,7 @@ function card(p,compact=false,detail=false,viewerId=currentViewerId,variant='fee
  n.dataset.sport=hasNfl&&hasFootball?'mixed':hasNfl?'nfl':hasFootball?'football':'general';
  const first=Array.isArray(p.legs)&&p.legs.length?p.legs[0]:null;
  n.dataset.outcome=ticketStates[p.outcome]?p.outcome:'pending';
+ if(!detail)n.dataset.pickType=ticketChoices(p).length>1?'combinada':'simple';
  const header=el('div',null,'cp-card-header');
  if(p.user_id){
    const profileButton=button('@'+(p.author||'Aficionado'),event=>{
@@ -266,6 +267,7 @@ function streamCard(p,viewerId){
  const n=el('article',null,'cp-card cam-pk');
  const choices=ticketChoices(p),legs=Array.isArray(p.legs)?p.legs:[],first=legs[0]||null;
  const combo=choices.length>1;
+ n.dataset.pickType=combo?'combinada':'simple';
  n.dataset.sport=pickSportKind(p);
  n.dataset.outcome=ticketStates[p.outcome]?p.outcome:'pending';
  const author=String(p.author||'Aficionado').replace(/^@+/,'');
@@ -317,6 +319,14 @@ function streamCard(p,viewerId){
    if(eventName&&(!combo||key!==previous))li.append(el('span',eventName,'cam-pk-event'));
    li.append(el('strong',display.choice||'Consultar pronóstico','cam-pk-choice'));
    if(display.market)li.append(el('span',display.market,'cam-pk-meta'));
+   // Show the verified leg price only when it belongs to one selection.
+   // Multiple markets on one leg cannot be assigned a reliable per-market price.
+   const legOdds=Number(leg.odds);
+   if(combo&&splitPickSelections(leg.selection).length===1&&Number.isFinite(legOdds)&&Math.abs(legOdds)>=100){
+     const price=el('span',momioText(leg.odds),'cam-pk-leg-odds');
+     price.setAttribute('aria-label','Cuota de esta selección '+momioText(leg.odds));
+     li.append(price);
+   }
    if(combo)li.dataset.legIndex=String(i+1);
    previous=key;
    const outcome=legOutcome(p,leg,choices.length);
