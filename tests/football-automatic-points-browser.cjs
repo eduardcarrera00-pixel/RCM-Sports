@@ -39,7 +39,9 @@ const {chromium}=require('playwright');
   assert.deepEqual(await page.locator('#camFootballGames .cam-nfl-team small,#camFootballGames .cam-nfl-draw small').allTextContents(),['6 pts','6 pts','6 pts']);
   assert.equal(await page.locator('#camFootballGames .cam-nfl-draw:not([disabled])').count(),1,'Default day must allow voting');
   await page.locator('#camFootballGames .cam-nfl-draw').click();
-  await page.locator('#camFootballSaveDay').click();
+  // Desde el 10 nov 2026 la elección se guarda al tocarla: no hay que pulsar «Guardar picks del día».
+  await page.waitForFunction(()=>window.__calls.some(c=>c.name==='cam_football_save_pick'));
+  assert.equal(await page.locator('#camFootballSaveDay').isHidden(),true,'sin nada pendiente no debe quedar el botón de guardar');
   await page.waitForFunction(()=>document.getElementById('camFootballStatus').textContent.includes('guardado'));
   const calls=await page.evaluate(()=>window.__calls.filter(c=>c.name==='cam_football_save_pick'));
   assert.equal(calls.length,1);assert.equal(calls[0].args.p_pick,'draw');

@@ -124,13 +124,13 @@ def run():
         card = page.locator('#camFootballGames .cam-nfl-game').first
         assert card.locator('.cam-nfl-draw.is-selected').count() == 0, 'el empate sigue marcado'
         assert card.locator('.cam-nfl-team.is-selected').count() == 1, 'no se marcó el equipo'
-        assert not page.locator('#camFootballSaveDay').is_disabled(), 'no deja guardar'
 
-        # Guardar llama al RPC de fútbol, nunca al de Takes ni al de NFL.
-        page.locator('#camFootballSaveDay').click()
+        # Cada toque se guarda solo (10 nov 2026) con el RPC de fútbol, nunca el de Takes ni el de NFL;
+        # queda el último y no hay botón que pulsar.
         page.wait_for_timeout(600)
-        saved = page.evaluate("() => window.__fake.calls.filter(c => c.rpc === 'cam_football_save_pick').length")
-        assert saved == 1, 'guardó %d pronósticos' % saved
+        picks = page.evaluate("() => window.__fake.calls.filter(c => c.rpc === 'cam_football_save_pick').map(c => c.args.p_pick)")
+        assert picks and picks[-1] == 'home', 'se guardó %s' % picks
+        assert page.locator('#camFootballSaveDay').is_hidden(), 'sin nada pendiente no debe quedar el botón de guardar'
 
         if SHOTS:
             page.screenshot(path=SHOTS + '/futbol-390-dia.png', full_page=False)

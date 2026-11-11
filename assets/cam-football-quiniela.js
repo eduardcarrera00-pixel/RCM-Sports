@@ -85,7 +85,8 @@
   };
 
   let games=[],teams=new Map(),user=null,mine=new Map(),draft=new Map();
-  let competition=COMPETITIONS[0].id,season=seasonGuess(),matchday=1,dayKey=null;
+  // Fútbol abre en la Liga MX (primera del selector y la de la Liguilla); si no tiene partidos, la primera que tenga.
+  let competition='ligamx',season=seasonGuess(),matchday=1,dayKey=null;
   let scope='month',showAll=false,loading=false,loaded=false,saving=false,request=0,rankingRequest=0;
   let loadError='',changingCompetition=false,competitionRequest=0,mineRequest=0;
 
