@@ -10,6 +10,13 @@ function todayToronto(){
  return v('year')+'-'+v('month')+'-'+v('day');
 }
 const isActive=p=>p.event_date&&p.event_date>=todayToronto()&&p.outcome==='pending';
+const pickLeagueImpact=p=>{
+ if(p.moderation_status!=='approved'||p.outcome!=='pending')return '';
+ const odds=Number(p.american_odds);
+ if(!Number.isFinite(odds)||Math.abs(odds)<100)return '';
+ const score=(Math.abs(odds)/100).toFixed(2).replace('.',',');
+ return 'Liga +'+score+' / −'+score+' pts';
+};
 const resultLabel=p=>p.outcome==='won'?'Acertado · +'+Math.abs(Number(p.result_points||0)).toFixed(2)+' pts':
  p.outcome==='lost'?'Fallado · −'+Math.abs(Number(p.result_points||0)).toFixed(2)+' pts':
  p.outcome==='void'?'Anulado · 0 pts':(isActive(p)?'Activo':'Pendiente de calificación');
@@ -206,6 +213,7 @@ function card(p,compact=false,detail=false,viewerId=currentViewerId,variant='fee
  quota.setAttribute('aria-label','Momio '+momio);
  quota.append(el('span',momio,'cam-ticket-odds-value'));
  odds.append(quota);
+ const effect=pickLeagueImpact(p);if(effect){const hint=el('small',effect,'cam-pick-impact');odds.append(hint);}
  if(publication)feedMeta.append(odds);else n.append(odds);
  if(p.explanation){
   if(detail)n.append(el('p',p.explanation,'cp-explanation'));
@@ -316,6 +324,7 @@ function streamCard(p,viewerId){
  }
  const odds=el('strong',momioText(p.american_odds),'cp-odds cam-pk-odds');
  odds.setAttribute('aria-label','Momio '+momioText(p.american_odds));
+ const effect=pickLeagueImpact(p);if(effect)odds.append(el('small',effect,'cam-pick-impact'));
  body.append(main,odds);
  n.append(body);
  const read=el('a',null,'cp-card-read-link cam-pk-open');
