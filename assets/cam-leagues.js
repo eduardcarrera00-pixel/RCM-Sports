@@ -20,6 +20,24 @@ function emblem(rank){
   mark.setAttribute('d',n===6?'m13 30-3-13 9 7 5-12 5 12 9-7-3 13Zm1 7h20':n===5?'m24 12 12 14-12 17-12-17Z':n===4?'m12 20 12-8 12 8-12 22Zm0 0h24':n===3?'m24 12 4 9 10 1-8 7 2 11-8-5-8 5 2-11-8-7 10-1Z':n===2?'m13 30 11-12 11 12m-22 8 11-12 11 12':n===1?'m13 25 11-12 11 12m-22 10 11-12 11 12':'m13 30 11-12 11 12');
   mark.setAttribute('class','cam-rank-symbol');svg.append(mark);box.append(svg);return box;
 }
+function meter(r){
+  const c=r.current;
+  if(!c||!Number(c.available))return null;
+  const ready=!!c.eligible,done=Math.max(0,Number(c.resolved)||0),need=Math.max(0,Number(c.required)||0);
+  const count=Math.max(1,Number(c.participants)||1),place=Math.max(1,Number(c.position)||count);
+  const fraction=ready?Math.max(0,1-(place-1)/count):need?Math.min(1,done/need):0;
+  const box=el('span',null,'cam-league-meter');
+  const label=ready?'Puesto #'+place+' de '+count+' · '+points(c.points)+' pts':
+    done+' / '+need+' resultados · faltan '+Math.max(0,need-done);
+  box.append(el('span',label,'cam-league-meter-label'));
+  const track=el('span',null,'cam-league-meter-track'),fill=el('span',null,'cam-league-meter-fill');
+  fill.style.width=Math.round(fraction*100)+'%';
+  track.append(fill);box.append(track);return box;
+}
+function impact(p){
+  const n=Number(p?.american_odds);
+  return Number.isFinite(n)&&Math.abs(n)>=100?(Math.abs(n)/100).toFixed(2):null;
+}
 function award(item,provisional=false){
   const position=Number(item.position)||0;
   const b=el('span',null,'cam-top10-badge'+(provisional?' is-provisional':''));
@@ -72,6 +90,9 @@ function chooseRank(r){
   dialog.dataset.leagueRank=KEYS[level(r.rank)];
   const identity=$('camProfileRank');identity.replaceChildren(emblem(r.rank),el('span',LEVELS[level(r.rank)]+' · '+r.label));
   if($('camRankFeatureName')){$('camRankFeatureLabel').textContent='RANGO ACTUAL · '+r.label;$('camRankFeatureName').textContent=LEVELS[level(r.rank)];$('camRankFeatureBest').textContent='Mejor rango · '+LEVELS[level(r.best_rank)];$('camRankFeatureCrest').replaceChildren(emblem(r.rank));}
+  const situation=$('camRankFeatureSituation');
+  if(situation)situation.textContent=stateText(r);
+  if($('camLeagueRivals')&&!$('camLeagueRivals').hidden)void loadRivals();
   const earned=profileData.awards.filter(a=>a.active);
   const badges=$('camProfileAwards');badges.replaceChildren(...earned.slice(0,3).map(a=>award(a)));
   for(const card of $('camProfileLeagues')?.querySelectorAll('[data-competition]')||[])card.setAttribute('aria-pressed',String(card.dataset.competition===selected));
@@ -79,7 +100,7 @@ function chooseRank(r){
 function rules(){
   const details=el('details',null,'cam-league-rules');details.append(el('summary','Cómo funcionan las ligas'));
   const text=el('div');
-  text.append(el('p','Cada acierto suma puntos y cada fallo resta. Los anulados valen 0.'));
+  text.append(el('p','Cada acierto suma y cada fallo resta. Un Pick vale el momio absoluto / 100; en quinielas cada opción enseña sus puntos. Anulados: 0.'));
   text.append(el('p','Al cerrar el mes, el 20 % mejor clasificado sube de rango; el 20 % de abajo baja. El resto mantiene su rango.'));
   text.append(el('p','Para clasificar necesitas 10 Picks acertados o fallados, o participar en la mitad de los partidos resueltos de tu quiniela. El Top 10 del mes gana una insignia con su puesto y mes.'));
   const advanced=el('details',null,'cam-league-fine-print');advanced.append(el('summary','Reglas completas'));
@@ -100,9 +121,15 @@ function renderProfile(){
   const label=el('small','RANGO ACTUAL');label.id='camRankFeatureLabel';copy.append(label);
   const name=el('strong');name.id='camRankFeatureName';
   const best=el('span');best.id='camRankFeatureBest';
+  const situation=el('span',null,'cam-rank-situation');situation.id='camRankFeatureSituation';
   const expand=el('span','Ver detalle ↓','cam-rank-expand');
-  disclosure.addEventListener('toggle',()=>{expand.textContent=disclosure.open?'Cerrar detalle ↑':'Ver detalle ↓';});
-  copy.append(name,best);summary.append(crest,copy,expand);
+  disclosure.addEventListener('toggle',()=>{
+    expand.textContent=disclosure.open?'Cerrar detalle ↑':'Ver detalle ↓';
+    const rivals=$('camLeagueRivals');
+    if(rivals)rivals.hidden=!disclosure.open;
+    if(disclosure.open)void loadRivals();
+  });
+  copy.append(name,best,situation);summary.append(crest,copy,expand);
   disclosure.append(summary);panel.append(disclosure);
   const cards=el('div',null,'cam-league-cards');
   for(const key of Object.keys(COMPETITIONS)){
@@ -112,11 +139,15 @@ function renderProfile(){
     const copy=el('span',null,'cam-league-card-copy');copy.append(el('small',r.label),el('strong',LEVELS[level(r.rank)]),el('span',stateText(r),'cam-league-state'));
     copy.append(el('small','Mejor rango: '+LEVELS[level(r.best_rank)]));
     card.append(emblem(r.rank),copy);
+    const progress=meter(r);if(progress)card.append(progress);
     if(r.current?.eligible){card.append(el('span','#'+r.current.position+' de '+r.current.participants,'cam-league-place'));}
     if(r.current?.eligible&&r.current.position<=10)card.append(award(r.current,true));
     cards.append(card);
   }
   disclosure.append(cards);
+  const rivals=el('section',null,'cam-league-rivals');rivals.id='camLeagueRivals';rivals.hidden=!disclosure.open;
+  rivals.setAttribute('aria-label','Rivales cercanos en la clasificación');
+  disclosure.append(rivals);
   const actions=el('div',null,'cam-league-actions');
   actions.append(btn('Ver clasificación mensual','cam-league-link',()=>openBoard(selected||'picks')));disclosure.append(actions);
   const log=el('details',null,'cam-league-history');log.append(el('summary','Historial de rangos e insignias'));
@@ -156,7 +187,59 @@ async function onProfile(event){
   }
 }
 
-let boardTicket=0;
+let boardTicket=0,rivalTicket=0;
+const boardCache=new Map();
+async function getBoard(competition){
+  const cached=boardCache.get(competition);
+  if(cached&&Date.now()-cached.time<60000)return cached.data;
+  const result=await db.rpc('cam_league_board',{p_competition:competition});
+  if(result.error)throw result.error;
+  const data=result.data||{};
+  boardCache.set(competition,{time:Date.now(),data});return data;
+}
+function orderedEligible(rows){
+  return rows.filter(r=>r.eligible).sort((a,b)=>Number(a.position)-Number(b.position));
+}
+function raceContext(target,me,rows){
+  const ranked=orderedEligible(rows),index=ranked.findIndex(r=>r.user_id===me.user_id);
+  if(!me.eligible){
+    const missing=Math.max(0,Number(me.required||0)-Number(me.resolved||0));
+    target.append(el('p','Faltan '+missing+' resultados para entrar en la lucha por el ascenso.','cam-rival-note'));
+    return;
+  }
+  const ahead=ranked[index-1],behind=ranked[index+1];
+  const intro=el('p','Puesto #'+me.position+' · '+points(me.points)+' pts · '+stateText({current:me}),'cam-rival-note');
+  target.append(intro);
+  const list=el('div',null,'cam-rival-list');
+  for(const [r,kind] of [[ahead,'Por alcanzar'],[behind,'Te persigue']]){
+    if(!r)continue;
+    const delta=Math.max(0,Math.abs(Number(r.points||0)-Number(me.points||0)));
+    const b=btn('','cam-rival',()=>window.openAePublicProfile?.(r.user_id));
+    b.append(el('small',kind),el('strong','@'+(r.username||'Aficionado')),
+      el('span','#'+r.position+' · '+points(r.points)+' pts'),
+      el('small',delta?'Diferencia: '+points(delta)+' pts':'Empate a puntos · decide el desempate'));
+    list.append(b);
+  }
+  if(list.children.length)target.append(list);
+  else target.append(el('p','Eres el único participante clasificado de momento.','cam-rival-note'));
+}
+async function loadRivals(){
+  const target=$('camLeagueRivals'),user=profileId,comp=selected;
+  if(!target||target.hidden||!user||!COMPETITIONS[comp])return;
+  const ticket=++rivalTicket;
+  target.replaceChildren(el('h4','Tus rivales más cercanos'),el('p','Consultando clasificación…','cam-rival-note'));
+  try{
+    const data=await getBoard(comp);
+    if(ticket!==rivalTicket||profileId!==user||selected!==comp||!target.isConnected||target.hidden)return;
+    const rows=Array.isArray(data.rows)?data.rows:[];
+    const me=rows.find(r=>r.user_id===user);
+    target.replaceChildren(el('h4','Rivales cercanos · '+COMPETITIONS[comp]));
+    if(me)raceContext(target,me,rows);
+    else target.append(el('p','Sin resultados registrados todavía en esta liga.','cam-rival-note'));
+  }catch{
+    if(ticket===rivalTicket&&target.isConnected)target.replaceChildren(el('p','Los rivales no están disponibles ahora.','cam-rival-note'));
+  }
+}
 async function openBoard(competition='picks'){
   if(!COMPETITIONS[competition])competition='picks';
   const dialog=$('camLeagueDialog');if(!dialog)return;
@@ -169,17 +252,24 @@ async function openBoard(competition='picks'){
   const target=$('camLeagueBoard');target.replaceChildren(el('p','Cargando clasificación…','cam-league-status'));
   const ticket=++boardTicket;
   try{
-    const r=await db.rpc('cam_league_board',{p_competition:competition});if(r.error)throw r.error;
+    const data=await getBoard(competition);
     if(ticket!==boardTicket||!dialog.open)return;
-    const data=r.data||{},rows=(Array.isArray(data.rows)?[...data.rows]:[]).sort((a,b)=>
+    const rows=(Array.isArray(data.rows)?[...data.rows]:[]).sort((a,b)=>
       Number(b.eligible)-Number(a.eligible)||(a.eligible?a.position-b.position:Number(b.points)-Number(a.points)||b.correct-a.correct||b.resolved-a.resolved));
     target.replaceChildren(el('p',month(data.month)+' · '+(data.closed?'Clasificación definitiva':'Clasificación provisional'),'cam-league-status'));
     const eligible=rows.filter(x=>x.eligible);
     if(!eligible.length)target.append(el('p','Todavía no hay participantes que cumplan el mínimo de esta liga.','cam-league-status'));
+    const myRow=headerUser&&rows.find(x=>x.user_id===headerUser);
+    if(myRow){
+      const race=el('section',null,'cam-league-my-race');
+      race.append(el('h3','Tu carrera este mes'));
+      raceContext(race,myRow,rows);target.append(race);
+    }
     if(rows.length){
       const list=el('ol',null,'cam-league-board-list');
       for(const row of rows){
         const li=el('li');li.dataset.zone=row.zone;
+        if(row.user_id===headerUser)li.classList.add('is-you');
         const name=btn('@'+row.username,'cam-league-person',()=>{dialog.close();window.openAePublicProfile?.(row.user_id);});
         li.append(el('b',row.eligible?'#'+row.position:'—'),emblem(data.closed?row.rank_after:row.rank_before),name,
           el('strong',points(row.points)+' pts'));
@@ -285,7 +375,7 @@ function init(){
   }
   document.addEventListener('cam:profile-view',onProfile);
   $('aeProfileDialog')?.addEventListener('close',()=>{expandNext=false;});
-  document.addEventListener('ae:picks-updated',()=>{cache.clear();identityCache.clear();});
+  document.addEventListener('ae:picks-updated',()=>{cache.clear();identityCache.clear();boardCache.clear();});
 }
 window.CamLeagues=Object.freeze({markAuthor,mountEntry,open:openBoard,emblem,award,levels:LEVELS,stateText,topRank,syncHeader});
 // This script follows the profile markup. Bind before the profile's own
