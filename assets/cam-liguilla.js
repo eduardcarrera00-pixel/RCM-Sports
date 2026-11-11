@@ -99,13 +99,14 @@
     if(full)wrap.append(el('figcaption','Referencia con la tabla de hoy.','cam-lg-pv-caption'));
     return wrap;
   }
-  // La Liguilla como evento: azul noche y dorado (los de la ficha que se comparte), los tres
-  // pasos y una sola fecha de cierre. `when` es lo que se lee bajo cada paso.
-  function eventHero(step,{name,when,closes,closesWhat}){
+  // Cabecera compacta de La Liguilla: título a la izquierda y torneo abreviado a la derecha.
+  // Las elecciones, el cierre real y el guardado de «Tus 8» se mantienen independientes.
+  function eventHero(step,{name,when}){
     const hero=el('header',null,'cam-lg-event');
     const top=el('div',null,'cam-lg-event-name');
-    top.append(el('p','Liga MX'+(name?' · '+name:''),'cam-lg-event-kicker'));
-    const h=el('h3','La Liguilla','cam-lg-event-title');h.id='camLiguillaTitle';top.append(h);hero.append(top);
+    const h=el('h3','La Liguilla','cam-lg-event-title');h.id='camLiguillaTitle';
+    const season=String(name||W()?.name||('Apertura '+new Date().getFullYear())).replace(/\b20(\d{2})\b/g,'$1');
+    top.append(h,el('p',season,'cam-lg-event-kicker'));hero.append(top);
     const steps=el('ol',null,'cam-lg-steps');steps.setAttribute('aria-label','Pasos de la liguilla');
     ['Tus 8','Tu cuadro','Ronda a ronda'].forEach((label,i)=>{
       const n=i+1,li=el('li',null,n<step?'is-done':n===step?'is-now':'');
@@ -117,11 +118,6 @@
       steps.append(li);
     });
     hero.append(steps);
-    if(closes){
-      const p=el('p',null,'cam-lg-event-close');
-      p.append('Cierra el ',el('strong',closes),closesWhat?', '+closesWhat+'.':'.');
-      hero.append(p);
-    }
     return hero;
   }
   // «Tu cuadro» mientras no se abre: una tarjeta plegada con la vista previa dentro.
