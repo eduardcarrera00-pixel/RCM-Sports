@@ -142,7 +142,7 @@ assert.equal(d.querySelector('#cpDialog .cp-recipe-card .cp-card-legs').tagName,
 assert.equal(d.querySelectorAll('#cpDialog .cp-recipe-card .cp-pick-line').length,3,'Combo keeps every selection when opened');
 assert.match(d.querySelectorAll('#cpDialog .cp-recipe-card .cp-pick-line-choice')[1].textContent,/Más de 3.5 goles/);
 assert.match(d.querySelectorAll('#cpDialog .cp-recipe-card .cp-pick-line-choice')[2].textContent,/Ambos equipos marcan/);
-assert.equal(d.querySelector('#cpDialog .cp-recipe-card .cp-feed-meta .cp-odds').textContent,'+150');
+assert.equal(d.querySelector('#cpDialog .cp-recipe-card .cam-chef-total .cp-odds').textContent,'+150');
 assert.match(d.querySelector('#cpDialog .cp-recipe-card .cp-pick-line-market').textContent,/Ganador · 3 vías/,'Chef recipe includes a readable market label');
 assert.match(d.querySelectorAll('#cpDialog .cp-recipe-card .cp-pick-line-market')[1].textContent,/Total de goles/);
 assert.match(d.querySelectorAll('#cpDialog .cp-recipe-card .cp-pick-line-market')[2].textContent,/Ambos equipos marcan/);

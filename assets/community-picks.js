@@ -212,7 +212,7 @@ function card(p,compact=false,detail=false,viewerId=currentViewerId,variant='fee
    };
    n.append(readLink);
  }
- n.append(ticketRows(p,detail));
+ n.append(ticketRows(p,detail,detail?{groupEvents:true}:{}));
  const odds=el('div',null,'cp-card-odds');
  
  const quota=el('strong',null,'cp-odds cam-ticket-quota');
@@ -243,7 +243,52 @@ function card(p,compact=false,detail=false,viewerId=currentViewerId,variant='fee
  if(window.CamPickShare)controls.append(window.CamPickShare.button(p));
  if(!detail){const replies=button(String(Number(p.comments_count||0)),()=>requestPickReply(p.id));replies.classList.add('cp-replies-button');if(editorial){const icon=document.createElementNS('http://www.w3.org/2000/svg','svg');icon.setAttribute('viewBox','0 0 24 24');icon.setAttribute('aria-hidden','true');const path=document.createElementNS('http://www.w3.org/2000/svg','path');path.setAttribute('d','M5 4h14v11H10l-5 5V4Z');path.setAttribute('fill','none');path.setAttribute('stroke','currentColor');path.setAttribute('stroke-width','1.6');icon.append(path);replies.prepend(icon);}replies.setAttribute('aria-label','Abrir respuestas del Pick: '+p.title+' ('+Number(p.comments_count||0)+')');controls.append(replies);}
  n.append(controls);
+ if(detail)formatChefRecipe(n,p);
  return n;
+}
+// Reuse the real profile, voting and sharing controls inside the approved recipe.
+// No feed cards or persisted Pick values are changed by this presentation step.
+function formatChefRecipe(n,p){
+ const choices=ticketChoices(p),combo=choices.length>1;
+ n.classList.add('cam-chef-recipe-v2');
+ n.dataset.pickType=combo?'combinada':'simple';
+ const header=n.querySelector('.cp-card-header');
+ const title=n.querySelector('.cp-card-title');
+ const normalize=value=>String(value||'').toLocaleLowerCase('es').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
+ const events=[...new Map(choices.map(({leg})=>[normalize(leg.event),String(leg.event||'').trim()]).filter(([key])=>key)).values()];
+ if(!p.title||/^combinada\b/i.test(p.title)||events.some(event=>normalize(event)===normalize(p.title)))title?.remove();
+ if(combo)header.querySelector('.cp-detail-author,.cp-feed-author-label')?.append(el('small',choices.length+' selecciones','cam-chef-selection-count'));
+ const content=n.querySelector('.cam-ticket-content');
+ if(events.length===1)content.prepend(el('p',events[0],'cam-chef-event'));
+ const odds=n.querySelector('.cp-card-odds');
+ const quota=odds.querySelector('.cp-odds');
+ const impact=odds.querySelector('.cam-pick-impact');
+ const rows=[...content.querySelectorAll('.cp-pick-line')];
+ rows.forEach((row,i)=>{
+  const marker=row.querySelector('.cam-ticket-leg-number');
+  if(marker)marker.textContent=combo?String(i+1):'';
+  const leg=choices[i].leg;
+  const price=Number(leg.odds);
+  if(combo&&splitPickSelections(leg.selection).length===1&&Number.isFinite(price)&&Math.abs(price)>=100){
+   const chip=el('strong',momioText(price),'cp-odds cam-chef-leg-odds');
+   chip.setAttribute('aria-label','Momio de esta selección '+momioText(price));row.append(chip);
+  }
+ });
+ if(combo||!rows.length){
+  const total=el('div',null,'cam-chef-total');
+  total.append(el('span',combo?'Combinada':'Momio'),quota);content.append(total);
+ }else rows[0].append(quota);
+ if(impact){
+  const points=el('div',null,'cam-chef-league');
+  impact.textContent=impact.textContent.replace(/^Liga\s*/,'');
+  points.append(el('span','Puntos en liga'),impact);content.after(points);
+ }
+ odds.remove();
+ const explanation=n.querySelector('.cp-explanation');
+ if(explanation){
+  const analysis=el('div',null,'cam-chef-analysis');
+  explanation.before(analysis);analysis.append(el('p','Análisis del Chef','cam-chef-analysis-label'),explanation);
+ }
 }
 /* Picks moderno (9 nov 2026) · feed de Picks › Picks.
    La misma información con menos cajas: pronóstico grande, partido y mercado en
@@ -1351,7 +1396,7 @@ async function showDetail(id,options={}){
    history.replaceState({},'',u);
   });
  }
- dialog.classList.add('ae-cp-detail-dialog');
+ dialog.classList.add('ae-cp-detail-dialog','cam-chef-detail-v2');
  const finishEntrance=window.camPageLoader?.begin?.();
  dialog.replaceChildren(pickDetailClose(),el('p','Cargando Pick…','ae-cp-detail-loading'));
  if(!dialog.open)dialog.showModal();
@@ -1373,11 +1418,12 @@ async function showDetail(id,options={}){
   const content=el('div',null,'ae-cp-detail-content');
   const forecast=el('section',null,'ae-cp-detail-forecast');
   forecast.setAttribute('aria-label','Pronóstico del chef');
-  forecast.append(el('span','EL PRONÓSTICO','ae-cp-detail-overline'),card(pick.data,false,true,session.data?.user?.id||null));
+  forecast.append(card(pick.data,false,true,session.data?.user?.id||null));
   content.append(forecast);
   const conversation=el('section',null,'ae-cp-detail-conversation');
   conversation.setAttribute('aria-label','Conversación del Pick');
-  const heading=el('h3','La conversación · '+Number(pick.data.comments_count||comments.data.length),'cp-detail-replies-heading');
+  const heading=el('h3','La conversación','cp-detail-replies-heading');
+  heading.append(el('span',String(Number(pick.data.comments_count||comments.data.length)),'cam-chef-comment-count'));
   conversation.append(heading);
   content.append(conversation);
   dialog.append(hero,content);
@@ -1488,7 +1534,6 @@ async function showDetail(id,options={}){
    voteControls.set(c.id,{up,down,replies});
    updateVotes(c.id);
   }
-  if(!comments.data.length)conversation.append(el('p','Todavía no hay respuestas. Puedes abrir la conversación.','ae-cp-detail-empty'));
   if(comments.data.length===200)conversation.append(el('p','Se muestran los primeros 200 comentarios.'));
   form.onsubmit=async e=>{
    e.preventDefault();
@@ -1522,7 +1567,7 @@ async function showDetail(id,options={}){
     body.input.focus({preventScroll:true});
    }
   }else{
-   const reply=button('Escribir comentario',()=>{void requestPickReply(id,null,closeDetail);});
+   const reply=button('Comparte tu análisis',()=>{void requestPickReply(id,null,closeDetail);});
    reply.className='cp-login-to-reply';
    reply.setAttribute('aria-label','Iniciar sesión para comentar este Pick');
    conversation.insertBefore(reply,conversation.children[1]||null);
