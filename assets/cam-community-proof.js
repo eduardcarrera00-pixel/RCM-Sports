@@ -12,8 +12,9 @@
     const demo = ids.has(id);
     // Los Takes conservan la atribución interna a una cuenta de prueba, pero
     // la ficha de lectura no lleva un distintivo dentro de la firma del autor.
-    // Fuera de Takes se conserva el identificador visible y los filtros.
-    const takeSurface = el.closest('#aeTakeDiscussion, [data-take-id], .ae-community-popular-take, .cam-take-record');
+    // Las conversaciones de Noticias también usan firmas sin distintivo.
+    // La atribución interna y los filtros de comunidad se conservan.
+    const takeSurface = el.closest('#aeTakeDiscussion, [data-take-id], .ae-community-popular-take, .cam-take-record, #camSportNewsCommunity');
     const showBadge = demo && !takeSurface;
     const badge = el.nextElementSibling?.classList?.contains('cam-demo-account-tag') ? el.nextElementSibling : null;
     if (showBadge && !badge) {

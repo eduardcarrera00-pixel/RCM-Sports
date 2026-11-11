@@ -91,6 +91,11 @@ assert.ok(!d.querySelector('#camSportLeadersList').textContent.includes('n-best'
 blockNfl = false; releaseNfl(); await settle();
 assert.ok(!d.querySelector('#camSportDebatedList').textContent.includes('Debate nfl'));
 assert.ok(!d.querySelector('#camSportNewsCommunity').textContent.includes('other'));
+assert.equal(d.querySelector('.cam-snc-rank').textContent, '1');
+assert.equal(d.querySelector('.cam-snc-take .cam-snc-excerpt'), null, 'Debate cards do not repeat the Take body');
+assert.equal(d.querySelector('.cam-snc-take .cam-snc-meter').getAttribute('aria-label'), '5 a favor y 1 en contra');
+assert.ok(d.querySelector('.is-supported .cam-snc-comment blockquote'));
+assert.ok(d.querySelector('.is-questioned .cam-snc-comment .cam-snc-context a').textContent.startsWith('En '));
 
 d.body.className = 'ae-is-nfl'; await settle();
 assert.equal(d.querySelector('#camSportLeadersList article').dataset.recordId, 'n-best', 'Rank within the sport across all article pages and ID chunks');
@@ -108,6 +113,18 @@ d.querySelector('#camSportLeadersList [data-record-id="n-best"] [data-direction=
 assert.equal(mutations.at(-1).args.p_vote, 1);
 d.querySelector('#camSportLeadersList [data-record-id="n-best"] [data-direction="1"]').click(); await settle();
 assert.equal(mutations.at(-1).args.p_vote, 0, 'A repeated comment vote removes the existing vote');
+d.querySelector('#camSportLeadersList .cam-snc-reply').click();
+assert.equal(opens.at(-1), 'article', 'Responder retains the original article conversation');
+d.querySelector('#camSportLeadersList .cam-snc-author').click();
+assert.equal(opens.at(-1), 'comment-author', 'Author profiles keep their public ID');
+const otherAuthor = d.createElement('button');
+otherAuthor.dataset.camAuthorId = 'comment-author'; d.body.append(otherAuthor);
+w.eval(fs.readFileSync('assets/cam-community-proof.js', 'utf8'));
+await settle();
+assert.equal(w.camDemoProfiles.isDemo('comment-author'), true, 'Internal attribution is preserved');
+assert.equal(d.querySelector('#camSportNewsCommunity .cam-demo-account-tag'), null, 'No visible test badge is reinserted in sport news');
+assert.ok(otherAuthor.nextElementSibling?.classList.contains('cam-demo-account-tag'), 'The change stays scoped to the approved surface');
+assert.equal(d.querySelector('#camSportNewsCommunity .cam-snc-note'), null);
 // Errors remain distinct from a real empty conversation and offer a retry.
 fail = true; await w.camSportNewsCommunity.refresh(true);
 assert.match(d.querySelector('#camSportDebatedList').textContent, /No pudimos cargar/);

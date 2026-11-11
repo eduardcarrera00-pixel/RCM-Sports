@@ -99,41 +99,60 @@
     } finally { pending.delete(key); render(); }
   }
   function card(row, type, rank) {
-    const item = el('article', null, 'cam-snc-card');
+    const item = el('article', null, 'cam-snc-card cam-snc-' + type);
     item.dataset.recordId = row.id;
     const open = () => {
       if (type === 'take') { window.aeTakeReplies?.open(row); return; }
       history.pushState({}, '', articleURL(row.article_id, row.id));
       void openArticleFromShareLink();
     };
-    const head = el('h4');
-    const title = el(type === 'take' ? 'button' : 'a', type === 'take' ? row.title : row.article_title, 'cam-snc-open');
+    const content = el('div', null, 'cam-snc-content');
+    content.append(el('div', sports[sportNow()].category, 'cam-snc-category'));
+    const head = el(type === 'take' ? 'h3' : 'p', null, type === 'take' ? 'cam-snc-title' : 'cam-snc-context');
+    const title = el(type === 'take' ? 'button' : 'a', type === 'take' ? row.title : 'En ' + (row.article_title || 'Ver artículo'), 'cam-snc-open');
     if (type === 'comment') title.href = articleURL(row.article_id, row.id);
     else title.type = 'button';
     title.onclick = event => {
       if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
       event.preventDefault(); open();
     };
-    head.append(title);
-    if (rank) item.append(el('span', String(rank).padStart(2, '0'), 'cam-snc-rank'));
-    item.append(head);
-    const author = el(row.author_id ? 'button' : 'span', '@' + (row.author || 'Aficionado').replace(/^@+/, ''), 'cam-snc-author');
+    if (type === 'comment') {
+      const arrow = el('i', null, 'cam-snc-context-arrow fa-solid fa-arrow-up-right-from-square');
+      arrow.setAttribute('aria-hidden', 'true'); title.append(arrow);
+      if (row.body) content.append(el('blockquote', row.body, 'cam-snc-excerpt'));
+    }
+    head.append(title); content.append(head);
+    if (rank) {
+      const position = el('span', rank, 'cam-snc-rank');
+      position.setAttribute('aria-label', 'Posición ' + rank); item.append(position);
+    }
+    const author = el(row.author_id ? 'button' : 'span', (type === 'take' ? '@' : '') + (row.author || 'Aficionado').replace(/^@+/, ''), 'cam-snc-author');
     if (row.author_id) { author.type = 'button'; author.dataset.camAuthorId = String(row.author_id); author.onclick = () => window.openAePublicProfile?.(row.author_id); }
-    item.append(author);
-    if (row.body) item.append(el(type === 'take' ? 'p' : 'blockquote', row.body, 'cam-snc-excerpt'));
+    content.append(author); item.append(content);
     const actions = el('div', null, 'cam-snc-actions');
     const votes = el('div', null, 'cam-snc-votes');
+    const up = Math.max(0, Number(row.upvotes) || 0), down = Math.max(0, Number(row.downvotes) || 0);
+    const meter = el('span', null, 'cam-snc-meter');
+    meter.setAttribute('role', 'img'); meter.setAttribute('aria-label', up + ' a favor y ' + down + ' en contra');
+    const share = el('span'); share.style.width = (up + down ? up / (up + down) * 100 : 50) + '%';
+    meter.append(share);
     for (const direction of [1, -1]) {
-      const count = Math.max(0, Number(direction === 1 ? row.upvotes : row.downvotes) || 0);
-      const button = el('button', (direction === 1 ? '▲ ' : '▼ ') + count);
+      const count = direction === 1 ? up : down;
+      const button = el('button');
+      const glyph = el('span', direction === 1 ? '▲' : '▼', 'cam-snc-vote-glyph');
+      glyph.setAttribute('aria-hidden', 'true'); button.append(glyph, el('strong', count));
       button.type = 'button'; button.dataset.direction = direction;
       button.setAttribute('aria-label', (direction === 1 ? 'Votar a favor: ' : 'Votar en contra: ') + count);
       button.setAttribute('aria-pressed', String(Number(row.my_vote) === direction));
       button.disabled = pending.has(type + ':' + row.id);
       button.onclick = () => vote(row, type, direction);
       votes.append(button);
+      if (direction === 1) votes.append(meter);
     }
-    const reply = el('button', type === 'take' ? row.reply_count + (row.reply_count === 1 ? ' respuesta' : ' respuestas') : 'Ver conversación', 'cam-snc-reply');
+    const reply = el('button', null, 'cam-snc-reply');
+    const bubble = el('i', null, 'fa-regular fa-comment'); bubble.setAttribute('aria-hidden', 'true');
+    reply.append(bubble, el('span', type === 'take' ? row.reply_count + (row.reply_count === 1 ? ' respuesta' : ' respuestas') : 'Responder'));
+    if (type === 'comment') reply.setAttribute('aria-label', 'Responder al comentario de ' + (row.author || 'Aficionado'));
     reply.type = 'button'; reply.onclick = open;
     actions.append(votes, reply); item.append(actions);
     return item;
@@ -158,8 +177,8 @@
         state.debates.forEach((row, i) => target.append(card(row, 'take', i + 1)));
       } else {
         for (const [key, label] of [['supported', 'Más apoyados'], ['questioned', 'Más cuestionados']]) {
-          const group = el('section', null, 'cam-snc-leaders-group');
-          group.append(el('h3', label));
+          const group = el('section', null, 'cam-snc-leaders-group is-' + key);
+          group.append(el('h3', (key === 'supported' ? '▲ ' : '▼ ') + label, 'cam-snc-group-title'));
           const rows = state.leaders[key];
           if (!rows.length) message(group, 'Todavía no hay comentarios con estos votos.');
           rows.forEach((row, i) => {

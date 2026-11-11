@@ -9,7 +9,8 @@ const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
 const groups=JSON.parse(fs.readFileSync(path.join(root,'assets/performance-css-packs.json'),'utf8')).groups;
 const links=[...html.matchAll(/<link\b(?=[^>]*\brel="stylesheet")[^>]*>/gi)]
   .map(match=>(match[0].match(/\bhref="([^"]+)"/)||[])[1]?.split('?')[0]);
-assert.equal(links.length,13,'Eleven local CSS bundles plus the two external font stylesheets');
+assert.equal(links.length,14,'Eleven local CSS bundles, the existing unified home Takes stylesheet and two external font stylesheets');
+assert.equal(links.filter(link=>link==='assets/cam-home-takes-unified.css').length,1,'The existing home Takes override loads once');
 assert.equal(groups.length,8);
 const editorialSources=JSON.parse(fs.readFileSync(path.join(root,'assets/style-sources.json'),'utf8'));
 assert.equal(new Set(editorialSources).size,editorialSources.length,'Editorial CSS bundle must not repeat source entries');

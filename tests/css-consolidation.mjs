@@ -45,7 +45,8 @@ for (const {output, sources} of groups) {
 const html = read('index.html');
 const links = [...html.matchAll(/<link\b(?=[^>]*\brel="stylesheet")[^>]*href="([^"]+)"[^>]*>/g)]
   .map(match => match[1].split('?')[0]);
-assert.equal(links.filter(href => href.startsWith('assets/')).length, 11);
+assert.equal(links.filter(href => href.startsWith('assets/')).length, 12,
+  'Eleven consolidated requests plus the existing unified home Takes override');
 assert.equal(new Set(links).size, links.length, 'No bundle may load twice');
 const position = marker => { const index = html.indexOf(marker); assert(index >= 0, marker); return index; };
 const order = (...markers) => {
@@ -62,4 +63,4 @@ order('assets/ae-editorial-bundle.css', 'assets/ae-nfl-mobile-telephoto.js',
   'assets/cam-perf-controls.css', 'assets/cam-take-cta.js',
   'assets/cam-perf-football-headings.css', 'id="cam-weekly-results-style"',
   'id="cam-nfl-quiniela-theme"', 'assets/cam-perf-app-panels.css', 'assets/cam-parties.js');
-console.log('PASS: all authored CSS rules retained in order; 28 → 11 own stylesheet requests; inline and script boundaries preserved.');
+console.log('PASS: all authored CSS rules retained in order; consolidated bundles and existing home override preserved; inline and script boundaries preserved.');
