@@ -48,14 +48,17 @@ const server=http.createServer((req,res)=>{
  await page.locator('#cpFeed .cam-pk').first().waitFor();
  await page.locator('#picksPopular .cam-plato').first().waitFor();
  const card=page.locator('#cpFeed .cam-pk').filter({hasText:'El parlay del domingo'});
- assert.equal(await card.locator('.cam-pk-more').getAttribute('open'),null);
+ // Picks desplegables (11 nov 2026): la combinada empieza recogida y «Detalles» la abre.
+ assert.equal(await card.getAttribute('data-open'),'false');
  assert.equal(await card.locator('.cam-pk-leg').count(),4);
- assert.equal(await card.locator('.cam-pk-combo').innerText(),'Combinada');
- await card.locator('.cam-pk-more summary').click();
- assert.equal(await card.locator('.cam-pk-more').getAttribute('open'),'');
+ assert.equal(await card.locator('.cam-pk-combo').textContent(),'Combinada');
+ await card.locator('.cam-pk-toggle').click();
+ assert.equal(await card.getAttribute('data-open'),'true');
+ assert.equal(await card.locator('.cam-pk-toggle').getAttribute('aria-expanded'),'true');
+ await page.waitForTimeout(400);
  assert.match(await card.innerText(),/Buffalo Bills gana/);
  assert.equal(await card.locator('.cam-pk-odds').innerText(),'+850','El momio es la cuota total');
- assert.equal(await card.locator('.cp-actions button').count(),4);
+ assert.equal(await card.locator('.cp-actions button').count(),5);
  for(const width of [360,390,768,1366])for(const dark of [false,true]){
   await page.setViewportSize({width,height:1000});await page.evaluate(dark=>document.documentElement.classList.toggle('dark',dark),dark);
   const fits=await page.locator('#cpFeed .cam-pk, .cam-ticket-card').evaluateAll(cards=>cards.every(card=>card.scrollWidth<=card.clientWidth+2));

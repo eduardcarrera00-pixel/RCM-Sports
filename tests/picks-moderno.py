@@ -12,6 +12,9 @@ Comprueba en 360/390/900/1366 px, día y noche:
     despliega del 6.º en adelante; en el ordenador los dos tableros lado a lado y
     Chefs a la derecha desde 1024 px;
   · sin desplazamiento horizontal y sin errores; Inicio sigue con la tarjeta de siempre.
+  · Picks desplegables (11 nov): cada Pick empieza recogido y «Detalles» (o tocar el
+    pronóstico) despliega selecciones con su cuota, Liga de Chefs, análisis y ficha;
+  · Chefs: Mejores y Peores Chefs primero, luego Mis grupos, sin el feed de Picks.
 Sustituye a picks-feed-scroll-browser.cjs (la ventana con scroll interno ya no existe).
 """
 import importlib.util, json, pathlib, sys
@@ -123,7 +126,6 @@ def check(width, dark):
         assert not st['hintVisible'] and st['footerVisible'], f'{where}: sin «Desliza…» y con «Ver todos los Picks»'
         for text in st['texts']:
             assert not any(w in text.lower() for w in ('paga', 'cierra', '2099', 'nov ')), f'{where}: texto de sobra en «{text[:80]}»'
-            assert 'Leer análisis' in text
         assert st['odds'][:2] == ['+110', '−175'], f'{where}: momios {st["odds"][:2]}'
         assert st['oddsRight'], f'{where}: el momio va a la derecha del pronóstico'
         assert st['actions'], f'{where}: ▲ ▼, responder y compartir en cada Pick'
@@ -145,11 +147,31 @@ def check(width, dark):
         assert st['sideBySide'] == (width >= 761), f'{where}: tableros lado a lado solo en el ordenador'
         if width >= 1024:
             assert st['chefsRight'], f'{where}: Mejores y Peores Chefs a la derecha'
+        # Picks desplegables (11 nov): recogido por defecto; «Detalles» o tocar el pronóstico lo abre.
+        fold = page.evaluate("""() => { const c = document.querySelector('#cpFeed > .cam-pk'), t = c.querySelector('.cam-pk-toggle'), p = c.querySelector('.cam-pk-panel');
+          return [c.dataset.open, t.getAttribute('aria-expanded'), p.inert, Math.round(p.getBoundingClientRect().height)]; }""")
+        assert fold == ['false', 'false', True, 0], f'{where}: el Pick empieza recogido {fold}'
+        page.click('#cpFeed > .cam-pk:first-child .cam-pk-toggle'); page.wait_for_timeout(450)
+        opened = page.evaluate("""() => { const c = document.querySelector('#cpFeed > .cam-pk'), p = c.querySelector('.cam-pk-panel');
+          return [c.dataset.open, p.inert, p.getBoundingClientRect().height > 60, p.innerText.includes('Mi razonamiento del Pick.'),
+                  p.innerText.includes('Ver Pick y comentarios'), p.innerText.includes('+1,10 si acierta'), c.scrollWidth <= c.clientWidth + 1]; }""")
+        assert opened == ['true', False, True, True, True, True, True], f'{where}: «Detalles» despliega análisis, liga y ficha {opened}'
+        page.click('#cpFeed > .cam-pk:nth-child(3) .cam-pk-summary'); page.wait_for_timeout(450)
+        combo = page.evaluate("() => { const c = document.querySelectorAll('#cpFeed > .cam-pk')[2]; return [c.dataset.open, [...c.querySelectorAll('.cam-pk-panel .cam-pk-leg-odds')].map(e => e.textContent)]; }")
+        assert combo == ['true', ['−278', '−198']], f'{where}: tocar la combinada la despliega con sus cuotas {combo}'
+        page.click('#cpFeed > .cam-pk:first-child .cam-pk-toggle'); page.wait_for_timeout(450)
+        assert page.evaluate("document.querySelector('#cpFeed > .cam-pk').dataset.open") == 'false', f'{where}: «Ocultar» lo recoge'
         page.click('.ae-chef-best > .cam-platos-more'); page.wait_for_timeout(150)
         st3 = page.evaluate(STATE)
         assert st3['bestShown'] == len(BEST) and st3['moreText'] == 'Ver menos', f'{where}: «Ver los N» despliega'
         # Inicio, archivo y perfil siguen con la tarjeta de siempre.
         assert page.evaluate("window.renderCamPickCard(" + json.dumps(FEED[0]) + ").classList.contains('cam-ticket-card')")
+        # Chefs: Mejores y Peores Chefs primero, luego Mis grupos; los Picks no se cuelan.
+        page.goto(page.url.split('?')[0] + '?s=picks&v=chefs', wait_until='load'); page.wait_for_timeout(1500)
+        chefs = page.evaluate("""() => { const vis = e => !!e && e.getClientRects().length > 0, top = e => e.getBoundingClientRect().top;
+          const d = document.querySelector('#communityPicks > .ae-chefs-dual-standings'), g = document.getElementById('camPartyEntryPicks');
+          return [vis(d), vis(g), vis(d) && vis(g) && top(d) < top(g), ['cpFeed', 'cpFeedHeading', 'cpFeedFooter'].some(id => vis(document.getElementById(id)))]; }""")
+        assert chefs == [True, True, True, False], f'{where}: Chefs empieza con Mejores y Peores Chefs y sin Picks {chefs}'
         if SHOTS:
             page.evaluate("window.scrollTo(0,document.getElementById('communityPicks').getBoundingClientRect().top+scrollY-80)")
             page.wait_for_timeout(300)
@@ -160,4 +182,4 @@ def check(width, dark):
 for dark in (False, True):
     for width in (360, 390, 900, 1366):
         check(width, dark)
-print('PASS: Picks moderno · pestañas Picks · Chefs · Historial, «¿Eres Chef?» primero con «Cocina Picks» grande, platos con sus banners y luego los Picks, feed sin scroll propio (6 + «Ver todos»), Pick sin texto de sobra (360/390/900/1366, día y noche).')
+print('PASS: Picks moderno · Picks desplegables · Chefs con Mejores y Peores Chefs primero · pestañas Picks · Chefs · Historial, «¿Eres Chef?» primero con «Cocina Picks» grande, platos con sus banners y luego los Picks, feed sin scroll propio (6 + «Ver todos»), Pick sin texto de sobra (360/390/900/1366, día y noche).')
