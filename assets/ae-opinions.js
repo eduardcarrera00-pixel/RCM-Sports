@@ -304,6 +304,7 @@
     const by=el('div',null,'ae-opinions-take-by');
     const author=el('button','@'+(t.author||'Aficionado'),'ae-opinions-take-author');
     author.type='button';
+    author.dataset.camAuthorId=String(t.author_id||'');
     author.addEventListener('click',()=>window.openAePublicProfile?.(t.author_id));
     by.append(author);
     const when=timeEl(t.created_at);
