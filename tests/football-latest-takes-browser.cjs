@@ -79,9 +79,6 @@ const server=http.createServer((req,res)=>{
      noOverflow:feed.scrollWidth<=feed.clientWidth+2,
      cardFits:cards.slice(0,6).every(card=>{const box=card.getBoundingClientRect();return box.width>150&&box.height>=150;}),
      actionsInside:cards.slice(0,6).every(card=>{const box=card.getBoundingClientRect(),row=card.querySelector('.cam-tk-actions').getBoundingClientRect();return row.height>=36&&row.bottom<=box.bottom+1&&row.top>=box.top;}),
-     // 10 nov 2026: autor abajo a la izquierda; comentarios (icono y número) justo a la izquierda de los votos, abajo a la derecha.
-     authorBottomLeft:cards.slice(0,6).every(card=>{const row=card.querySelector('.cam-tk-actions').getBoundingClientRect(),by=card.querySelector('.cam-tk-actions .cam-tk-by').getBoundingClientRect(),author=card.querySelector('.cam-tk-by .ae-take-author-link');return Math.abs(by.left-row.left)<=1&&card.querySelector('.cam-tk-by .cam-tk-avatar')&&author.scrollWidth<=author.clientWidth+1;}),
-     repliesLeftOfVotes:cards.slice(0,6).every(card=>{const row=card.querySelector('.cam-tk-actions').getBoundingClientRect(),reply=card.querySelector('.cam-tk-tools .cam-football-replies').getBoundingClientRect(),votes=card.querySelector('.cam-tk-tools .cam-tk-vote').getBoundingClientRect();return reply.right<=votes.left+1&&votes.left-reply.right<=12&&Math.abs(votes.right-row.right)<=1&&!/responder/i.test(card.querySelector('.cam-football-replies').textContent);}),
      feedFits:r.left>=-1&&r.right<=innerWidth+1
     };
    });
@@ -89,7 +86,7 @@ const server=http.createServer((req,res)=>{
    assert.equal(result.gridColumns,width<=760?1:width<=960?2:width<=1299?3:4,JSON.stringify({width,dark,result}));
    if([390,1366].includes(width))await page.locator('#freeTakesFeed').screenshot({path:path.join(qa,'football-'+width+'-'+(dark?'night':'day')+'.png')});
   }
-  // El icono de comentarios abre el cuadro de respuesta dentro de la tarjeta, sin salir de la lista.
+  // «Responder» abre el cuadro de respuesta dentro de la tarjeta, sin salir de la lista.
   await page.locator('#freeTakesFeed [data-take-id="take-1"] .cam-football-replies').click();
   await page.waitForTimeout(150);
   assert.deepEqual(await page.evaluate(()=>{

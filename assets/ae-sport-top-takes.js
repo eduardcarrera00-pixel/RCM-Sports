@@ -86,24 +86,10 @@
      desktopHomeMarker.after(root);
    }
  }
- // Misma tarjeta que «Últimos Takes» (10 nov 2026): populares e impopulares usan
- // la tarjeta de free-takes.js (window.aeTakeCards), con sus votos, su respuesta
- // rápida y su enlace al perfil. Se ven las tres primeras; «Ver las N» despliega
- // el resto (hasta 10).
+ // Lista simétrica (3 nov 2026): populares e impopulares con la misma forma.
+ // Cada fila ocupa todo el ancho: posición, título, autor y balance de votos.
+ // Se ven las tres primeras; «Ver las N» despliega el resto (hasta 10).
  const VISIBLE_ROWS=3;
- const net=t=>Number(t.upvotes||0)-Number(t.downvotes||0);
- // Clasificación compartida: free-takes.js la usa para pedir, en su misma consulta,
- // el número de respuestas de estos Takes.
- function rank(data){
-   const recent=(a,b)=>new Date(b.created_at)-new Date(a.created_at);
-   return {
-     positive:data.filter(t=>net(t)>0)
-       .sort((a,b)=>net(b)-net(a)||Number(b.upvotes||0)-Number(a.upvotes||0)||recent(a,b)).slice(0,10),
-     negative:data.filter(t=>net(t)<0)
-       .sort((a,b)=>net(a)-net(b)||Number(b.downvotes||0)-Number(a.downvotes||0)||recent(a,b)).slice(0,10)
-   };
- }
- window.aeSportTopTakes=Object.freeze({rank});
  function renderList(id,items,mode){
    const list=$(id);if(!list)return;
    const root=list.closest('#aeSportTakeLeaders');
@@ -118,27 +104,49 @@
    list.setAttribute('role','list');
    const label=mode==='up'?'Takes populares':'Takes impopulares';
    list.setAttribute('aria-label',label+' de '+(sport==='nfl'?'NFL':'Fútbol')+'; '+items.length+' '+(items.length===1?'Take':'Takes')+'.');
-   const cards=window.aeTakeCards;
-   const restoreFocus=cards?.keepFocus?.(list);
    list.replaceChildren();
    for(const [i,t] of items.entries()){
      const li=el('li',undefined,'cam-op-row'+(i>=VISIBLE_ROWS?' cam-op-extra':''));
      li.dataset.takeId=String(t.id);
-     if(cards)li.append(cards.build(t,mode));
-     else{
-       // Sin el módulo de tarjetas queda el título, que abre la conversación.
-       const open=el('button',t.title||'Ver Take','cam-op-title');
-       open.type='button';
-       open.addEventListener('click',()=>window.aeTakeReplies?.open(t));
-       li.append(open);
-     }
+     const rank=el('span',String(i+1).padStart(2,'0'),'cam-op-rank');
+     rank.setAttribute('aria-hidden','true');
+     const main=el('div',undefined,'cam-op-main');
+     const open=el('button',t.title||'Ver Take','cam-op-title');
+     open.type='button';
+     open.setAttribute('aria-label',(i+1)+'. '+(t.title||'Take')+'. Leer y ver su conversación.');
+     open.addEventListener('click',()=>window.aeTakeReplies?.open(t));
+     const meta=el('p',undefined,'cam-op-meta');
+     const name=String(t.author||'Aficionado').replace(/^@+/,'');
+     const author=el('button','@'+name,'cam-op-author');
+     author.type='button';
+     author.dataset.camAuthorId=String(t.author_id||'');
+      author.disabled=!t.author_id;
+     author.setAttribute('aria-label','Ver perfil y Takes de '+name);
+     author.addEventListener('click',()=>{if(t.author_id)window.openAePublicProfile?.(t.author_id);});
+     meta.append(author);
+     const competition=String(t.competition||'').trim();
+     if(competition&&competition.toUpperCase()!=='NFL')meta.append(el('span',competition,'cam-op-competition'));
+     main.append(open,meta);
+     const up=Number(t.upvotes||0),down=Number(t.downvotes||0),net=up-down;
+     const score=el('span',undefined,'cam-op-score');
+     score.dataset.trend=net>0?'up':net<0?'down':'even';
+     score.title=up+' a favor · '+down+' en contra';
+     score.setAttribute('aria-label','Balance '+(net>0?'+':'')+net+': '+up+' votos a favor y '+down+' en contra');
+     const arrow=el('span',net>=0?'▲':'▼','cam-op-score-arrow');
+     arrow.setAttribute('aria-hidden','true');
+     const value=el('strong',String(Math.abs(net)),'cam-op-score-value');
+     value.setAttribute('aria-hidden','true');
+     score.append(arrow,value);
+     li.append(rank,main,score);
+     li.addEventListener('click',event=>{
+       if(!event.target.closest('button'))window.aeTakeReplies?.open(t);
+     });
      list.append(li);
    }
    if(!items.length){
      const empty=el('li','Aún sin votos '+(mode==='up'?'positivos.':'negativos.'),'cam-op-empty');
      list.append(empty);
    }
-   restoreFocus?.();
    // Botón propio para ver el resto; el antiguo «Ver todos» queda oculto.
    const group=list.closest('.ae-sport-takes-group');
    if(group)group.dataset.camContentState=items.length?'ready':'empty';
@@ -223,7 +231,11 @@
      if(r.error)throw r.error;
      if(seq!==request||current!==sport)return;
      const data=(r.data||[]).filter(t=>sport==='nfl'?t.sport==='nfl':footballSports.has(t.sport));
-     const {positive,negative}=rank(data);
+     const net=t=>Number(t.upvotes||0)-Number(t.downvotes||0);
+     const positive=data.filter(t=>net(t)>0)
+       .sort((a,b)=>net(b)-net(a)||Number(b.upvotes||0)-Number(a.upvotes||0)||new Date(b.created_at)-new Date(a.created_at)).slice(0,10);
+     const negative=data.filter(t=>net(t)<0)
+       .sort((a,b)=>net(a)-net(b)||Number(b.downvotes||0)-Number(a.downvotes||0)||new Date(b.created_at)-new Date(a.created_at)).slice(0,10);
      renderList('aeSportTakePositive',positive,'up');
      renderList('aeSportTakeNegative',negative,'down');
      status.textContent='Clasificación según los votos de Takes de '+(sport==='nfl'?'NFL.':'Fútbol.');

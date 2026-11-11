@@ -19,30 +19,6 @@ abren, y una petición existente se espera sin duplicarla.
 Se conserva el foco y los bloqueos anteriores, y se respeta movimiento reducido.
 Verificación: `npm run test:loading`, `test:desktop` y revisión de navegación.
 
-### Misma tarjeta de Take, «Comparte tu sabiduría» y momio en cian · 10 nov 2026
-
-En NFL y Fútbol, «Últimos Takes», «Takes populares» y «Takes impopulares» pintan la
-misma tarjeta (`buildCard` de `assets/free-takes.js`, estilos en
-`assets/cam-takes-tarjetas.css`): arriba competición, fecha y compartir; título y dos
-líneas de texto; abajo a la izquierda el autor (inicial en círculo y @usuario) y a la
-derecha los comentarios (icono y número, abre la respuesta dentro de la tarjeta) junto
-a los votos ▲ n | ▼ n. Si el pie no cabe en una línea, comentarios y votos bajan a la
-siguiente, a la derecha: no se recorta ningún texto. Populares e impopulares conservan
-«Ver las N ›» / «Ver menos»; en el carril del ordenador la tarjeta mantiene su círculo
-y sus píldoras y los paneles siguen rectos. Un Take que está en dos listas comparte
-votos, respuestas y estado. No hay consultas nuevas: el número de respuestas de las
-tres listas sale de la consulta de siempre (30 Takes como máximo).
-
-El bloque de atajos se titula «Comparte tu sabiduría» (desplegable del teléfono y
-carril del ordenador), sin subtítulo.
-
-El momio del feed de Picks usa un cian neón apagado derivado de `#22D3EE`
-(`--pk-momio-*` en `assets/cam-picks-moderno.css`): de día texto `#0a6578`, de noche
-`#6fd8e8`; borde y un fondo al 10 % del mismo tono. Contraste del texto 6,1:1 y 7,1:1.
-Es solo para ese momio; el resto de Picks conserva sus colores.
-Verificación: `python3 -B tests/takes-misma-tarjeta.py` y
-`python3 -B tests/inicio-atajos-y-momio.py`.
-
 ### Power Rankings arriba y atajos persistentes · 10 nov 2026
 
 En el ordenador, NFL y Fútbol abren con el Power Ranking original por encima
