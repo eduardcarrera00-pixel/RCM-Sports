@@ -72,6 +72,8 @@
       identity.title='Ver perfil de @'+line.username;
       const initial=el('span',String(line.username||'A').replace(/^@/,'').charAt(0).toLocaleUpperCase('es'),'cam-q-avatar');
       initial.setAttribute('aria-hidden','true');
+      // Foto = escudo de su rango (cam-leagues.js).
+      initial.dataset.rankFace=String(line.user_id||'');window.CamLeagues?.avatar?.(initial,line.user_id);
       const name=el('span',null,'cam-q-name');
       name.append(el('span','@'+line.username,'cam-q-username'));
       if(own)name.append(el('span','Tú','cam-q-you'));

@@ -16,17 +16,31 @@ html body #aeProfileDialog .cam-profile-footer-actions .cam-profile-action svg{w
 .cam-league-fine-print{margin:12px 0}
 .cam-league-rules p{max-width:62ch;line-height:1.7;margin:12px 0}
 @media(max-width:640px){.cam-rank-disclosure>summary{gap:12px}.cam-rank-feature-crest .cam-rank-emblem{width:54px;height:64px}.cam-rank-expand{max-width:45px;font-size:10px}html body #aeProfileDialog .cam-profile-footer-actions{padding:18px 14px 28px}}
-[data-rank="cobre"],[data-league-rank="cobre"]{--league-metal:#cc9878;--league-wash:rgba(173,112,76,.16)}
-[data-rank="bronce"],[data-league-rank="bronce"]{--league-metal:#dbac79;--league-wash:rgba(179,125,64,.17)}
-[data-rank="plata"],[data-league-rank="plata"]{--league-metal:#c6d8e8;--league-wash:rgba(155,184,210,.18)}
-[data-rank="oro"],[data-league-rank="oro"]{--league-metal:#edc76b;--league-wash:rgba(207,163,54,.18)}
-[data-rank="platino"],[data-league-rank="platino"]{--league-metal:#87ddd0;--league-wash:rgba(64,183,169,.16)}
-[data-rank="diamante"],[data-league-rank="diamante"]{--league-metal:#97caff;--league-wash:rgba(75,149,227,.19)}
-[data-rank="leyenda"],[data-league-rank="leyenda"]{--league-metal:#dbb3fa;--league-wash:rgba(165,103,211,.19)}
+/* Cada rango, su metal (11 nov 2026): --rank-fill rellena el escudo, --rank-deep es su
+   filo, --rank-ink el símbolo y --rank-text el nombre (oscuro de día, claro de noche).
+   Cobre rojizo y Bronce pardo se distinguen de un vistazo, igual que Plata y Platino. */
+[data-rank="cobre"],[data-league-rank="cobre"]{--league-metal:#d99070;--league-wash:rgba(185,98,62,.16);--rank-fill:#c96f4b;--rank-deep:#86391d;--rank-text:#efa385}
+[data-rank="bronce"],[data-league-rank="bronce"]{--league-metal:#cfa66b;--league-wash:rgba(160,118,60,.17);--rank-fill:#a8804a;--rank-deep:#5f4320;--rank-text:#dcb986}
+[data-rank="plata"],[data-league-rank="plata"]{--league-metal:#c6d8e8;--league-wash:rgba(155,184,210,.18);--rank-fill:#c4ccd6;--rank-deep:#6c7886;--rank-text:#dde5ee}
+[data-rank="oro"],[data-league-rank="oro"]{--league-metal:#edc76b;--league-wash:rgba(207,163,54,.18);--rank-fill:#e5b53d;--rank-deep:#8f6912;--rank-text:#f3d27a}
+[data-rank="platino"],[data-league-rank="platino"]{--league-metal:#87ddd0;--league-wash:rgba(64,183,169,.16);--rank-fill:#6fcfc0;--rank-deep:#23766b;--rank-text:#93e6d9}
+[data-rank="diamante"],[data-league-rank="diamante"]{--league-metal:#97caff;--league-wash:rgba(75,149,227,.19);--rank-fill:#72b2f4;--rank-deep:#245fa6;--rank-text:#addaff}
+[data-rank="leyenda"],[data-league-rank="leyenda"]{--league-metal:#dbb3fa;--league-wash:rgba(165,103,211,.19);--rank-fill:#b88ae6;--rank-deep:#62358f;--rank-text:#dfc3fb}
+[data-rank="pending"],[data-rank="none"]{--rank-fill:rgba(128,143,156,.22);--rank-deep:rgba(128,143,156,.55);--rank-text:transparent}
+html:not(.dark) [data-rank="cobre"]{--rank-text:#8a4024}
+html:not(.dark) [data-rank="bronce"]{--rank-text:#6c4d20}
+html:not(.dark) [data-rank="plata"]{--rank-text:#4b5a69}
+html:not(.dark) [data-rank="oro"]{--rank-text:#765810}
+html:not(.dark) [data-rank="platino"]{--rank-text:#1e665c}
+html:not(.dark) [data-rank="diamante"]{--rank-text:#1f5a9c}
+html:not(.dark) [data-rank="leyenda"]{--rank-text:#673891}
 .cam-rank-emblem{display:inline-flex;flex:0 0 38px;width:38px;height:44px;align-items:center;justify-content:center;color:var(--league-metal,#cc9878)}
 .cam-rank-emblem svg{width:100%;height:100%;overflow:visible}
-.cam-rank-shield{fill:#0d2c44;stroke:currentColor;stroke-width:2}
-.cam-rank-symbol{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.cam-rank-shield{fill:var(--rank-fill,#c96f4b);stroke:var(--rank-deep,#86391d);stroke-width:2.4;stroke-linejoin:round}
+.cam-rank-facet{fill:#fff;opacity:.24;pointer-events:none}
+.cam-rank-symbol{fill:none;stroke:var(--rank-ink,#10293b);stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round}
+.cam-rank-emblem[data-rank="leyenda"] svg{filter:drop-shadow(0 0 3px rgba(184,138,230,.55))}
+.cam-rank-emblem:is([data-rank="pending"],[data-rank="none"]) :is(.cam-rank-symbol,.cam-rank-facet){opacity:0}
 html body #aeProfileDialog[data-league-rank]{border-color:var(--league-metal)}
 html body #aeProfileDialog[data-league-rank] .cam-profile-head{border-bottom:1px solid var(--league-metal);background:radial-gradient(ellipse at 95% 10%,var(--league-wash),transparent 65%),#0b2233}
 html body #aeProfileDialog[data-league-rank] .cam-profile-avatar{border-color:var(--league-metal);color:var(--league-metal);background:linear-gradient(135deg,var(--league-wash),transparent),#0d2c44;box-shadow:0 0 0 3px var(--league-wash)}

@@ -137,6 +137,8 @@
       const card=el('article',undefined,'ae-discussion-comment');
       const avatar=el('span',String(r.author||'Aficionado').trim().charAt(0).toUpperCase()||'A','ae-discussion-avatar');
       avatar.setAttribute('aria-hidden','true');
+      // Foto = escudo de su rango (cam-leagues.js).
+      const faceId=r.author_id||r.user_id||'';avatar.dataset.rankFace=String(faceId);window.CamLeagues?.avatar?.(avatar,faceId);
       const content=el('div',undefined,'ae-discussion-comment-content');
       const meta=el('div',undefined,'ae-discussion-meta');
       const authorId=r.author_id||r.user_id||null;
@@ -413,6 +415,8 @@
     $('aeDiscussionAuthor').title=take.author_id?'Ver perfil de @'+authorName:'Perfil no disponible';
     $('aeDiscussionAuthor').setAttribute('aria-label','Ver perfil de '+authorName);
     $('aeDiscussionAvatar').textContent=authorName.charAt(0).toUpperCase()||'A';
+    $('aeDiscussionAvatar').dataset.rankFace=String(take.author_id||'');
+    window.CamLeagues?.avatar?.($('aeDiscussionAvatar'),take.author_id);
     $('aeDiscussionSubject').textContent=take.title||'Take de la comunidad';
     const published=take.created_at?new Date(take.created_at):null;
     const day=published&&!Number.isNaN(published.getTime())?published.toLocaleDateString('es',{day:'numeric',month:'short',year:'numeric'}):'';

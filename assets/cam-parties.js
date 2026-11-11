@@ -81,6 +81,13 @@ const kindLabel = p => KINDS[p?.kind] || 'Party';
 const membersText = n => { n = Math.max(0, Number(n) || 0); return n === 1 ? '1 miembro' : n + ' miembros'; };
 const placeText = (pos, total) => pos ? pos + '.º de ' + (total || pos) : '—';
 const initial = name => (String(name || 'A').replace(/^@+/, '').trim().charAt(0) || 'A').toLocaleUpperCase('es');
+/* Foto de cada miembro (11 nov 2026): el escudo de su rango, que pinta cam-leagues.js
+   (si ese archivo aún no llegó, la inicial se convierte en escudo al cargar). */
+function face(name, user, cls) {
+  const n = el('span', initial(name), cls, {'aria-hidden': 'true', 'data-rank-face': user || ''});
+  window.CamLeagues?.avatar?.(n, user);
+  return n;
+}
 function formatPoints(v, kind, sign = true) {
   const n = Number(v) || 0;
   if (kind === 'picks') {
@@ -572,7 +579,7 @@ function boardRow(r, kind) {
   const li = el('li', null, 'cam-party-row' + (r.is_me ? ' is-me' : '') + (r.position <= 3 && Number(r.attempts) > 0 ? ' is-top is-top-' + r.position : ''));
   const name = String(r.username || 'Aficionado').replace(/^@+/, '');
   li.append(el('span', String(r.position), 'cam-party-pos', {'aria-label': 'Posición ' + r.position}));
-  li.append(el('span', initial(name), 'cam-party-avatar', {'aria-hidden': 'true'}));
+  li.append(face(name, r.user_id, 'cam-party-avatar'));
   const who = el('span', null, 'cam-party-who');
   const link = el('a', '@' + name, 'cam-party-name', {href: '?perfil=' + r.user_id, title: 'Perfil de @' + name});
   link.addEventListener('click', e => {
@@ -686,7 +693,7 @@ function quinielaCard(it) {
   const name = String(it.username || 'Aficionado').replace(/^@+/, '');
   const card = el('div', null, 'cam-party-item is-quiniela');
   const top = el('span', null, 'cam-party-item-top');
-  top.append(el('span', initial(name), 'cam-party-avatar is-small', {'aria-hidden': 'true'}), el('span', '@' + name, 'cam-party-item-author'), el('span', shortDate(it.kickoff || it.created_at), 'cam-party-item-date'));
+  top.append(face(name, it.user_id, 'cam-party-avatar is-small'), el('span', '@' + name, 'cam-party-item-author'), el('span', shortDate(it.kickoff || it.created_at), 'cam-party-item-date'));
   card.append(top, el('span', matchTitle(it), 'cam-party-item-title'));
   const score = Number.isFinite(Number(it.home_score)) && Number.isFinite(Number(it.away_score)) && it.home_score !== null && it.away_score !== null
     ? (it.sport === 'nfl' ? it.away_score + '–' + it.home_score : it.home_score + '–' + it.away_score) : '';
@@ -703,7 +710,7 @@ function itemCard(it) {
   const name = String(it.username || 'Aficionado').replace(/^@+/, '');
   const card = button('', 'cam-party-item', () => openItem(it));
   const top = el('span', null, 'cam-party-item-top');
-  top.append(el('span', initial(name), 'cam-party-avatar is-small', {'aria-hidden': 'true'}), el('span', '@' + name, 'cam-party-item-author'), el('span', shortDate(it.created_at), 'cam-party-item-date'));
+  top.append(face(name, it.user_id, 'cam-party-avatar is-small'), el('span', '@' + name, 'cam-party-item-author'), el('span', shortDate(it.created_at), 'cam-party-item-date'));
   card.append(top, el('span', it.title || (it.type === 'pick' ? 'Pick' : 'Take'), 'cam-party-item-title'));
   let detail = '';
   if (it.type === 'pick') {
@@ -859,7 +866,7 @@ function openMembers() {
   for (const r of S.data.total || []) {
     const name = String(r.username || 'Aficionado').replace(/^@+/, '');
     const li = el('li', null, 'cam-party-member');
-    li.append(el('span', initial(name), 'cam-party-avatar is-small', {'aria-hidden': 'true'}), el('span', '@' + name, 'cam-party-member-name'));
+    li.append(face(name, r.user_id, 'cam-party-avatar is-small'), el('span', '@' + name, 'cam-party-member-name'));
     if (r.user_id === p.owner_id) li.append(el('span', 'Creador', 'cam-party-owner'));
     else li.append(button('Expulsar', 'cam-party-btn is-small is-danger', () => confirmSheet('Expulsar', '¿Sacar a @' + name + ' del party?', 'Expulsar', async () => {
       await rpc('cam_party_kick', {p_party: p.id, p_user: r.user_id});

@@ -77,7 +77,7 @@ try { sessionStorage.setItem('cam_sports_home_welcome_seen_session_v1', '1'); } 
 
 STATE = """() => {
   const $ = id => document.getElementById(id);
-  return {title: $('aeProfileTitle').textContent, sub: $('aeProfileUsername').textContent, avatar: $('camProfileAvatar').textContent,
+  return {title: $('aeProfileTitle').textContent, sub: $('aeProfileUsername').textContent, avatar: $('camProfileAvatar').classList.contains('cam-rank-avatar') && $('camProfileAvatar').querySelector('.cam-rank-emblem') ? 'escudo' : $('camProfileAvatar').textContent,
     kicker: $('camProfileKicker').textContent, edit: !$('camProfileEditOpen').hidden,
     stats: document.querySelectorAll('#camProfileStats').length,
     figures: [...document.querySelectorAll('#camProfileOverview .cam-ov-figures')].map(n => n.textContent),
@@ -107,7 +107,8 @@ def run(width, dark):
         page.wait_for_timeout(1200)
         page.evaluate('openAeProfile()'); page.wait_for_timeout(1300)
         st = page.evaluate(STATE)
-        assert st['title'] == '@ana_futbolera' and st['avatar'] == 'A', f'{where}: identidad {st}'
+        # Desde el 11 nov 2026 la foto es el escudo del rango (tests/escudo-foto.py), no la inicial.
+        assert st['title'] == '@ana_futbolera' and st['avatar'] == 'escudo', f'{where}: identidad {st}'
         assert st['sub'] == 'Miembro desde octubre de 2026', f'{where}: miembro desde {st}'
         assert st['edit'] and st['kicker'].startswith('MI PERFIL'), f'{where}: botones propios {st}'
         assert st['stats'] == 0, f'{where}: sin fila de cifras {st}'

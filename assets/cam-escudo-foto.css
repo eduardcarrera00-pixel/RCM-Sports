@@ -1,0 +1,120 @@
+/* CAM SPORTS · El escudo del rango como foto (11 nov 2026).
+   Petición de Eduard: en el perfil, en vez de la inicial («E»), el escudo del
+   rango con su color y el nombre del rango debajo («Cobre»); y en el resto de
+   la página, donde salga la foto de alguien, también su escudo.
+
+   · Perfil y «Editar perfil»: el escudo grande y debajo el nombre del rango en
+     su color (oscuro de día, claro de noche). La línea pequeña «COBRE · PICKS»
+     bajo el nombre ya no hace falta y se oculta.
+   · Takes, conversación, Picks, Chefs, quinielas y grupos: la inicial pasa a
+     ser el escudo, en la misma caja que tenía (nada se mueve). Sin círculo,
+     sin fondo y sin letra.
+   · Mientras llega el rango, un escudo neutro del mismo tamaño.
+   La lógica es de cam-leagues.js (CamLeagues.avatar). Los colores de cada rango,
+   --rank-*, están en cam-leagues.css. Quitar el círculo va en cam-display-clarity
+   (la capa más fuerte: cada tarjeta lo pinta con varios id y !important); el
+   resto, en cam-header con !important como el perfil. */
+@layer cam-display-clarity {
+  /* ---------- Cualquier foto convertida en escudo: fuera círculo, fondo y borde ----------
+     En la capa más fuerte (la primera que se registra, index.html), porque cada
+     tarjeta pinta su círculo con selectores de varios id y !important. Solo se
+     quita lo que dibujaba la inicial; el tamaño lo sigue poniendo cada tarjeta. */
+  html body .cam-rank-avatar.cam-rank-avatar {
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: none !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    overflow: visible !important;
+  }
+  html body .cam-rank-avatar.cam-rank-avatar::before,
+  html body .cam-rank-avatar.cam-rank-avatar::after { content: none !important; display: none !important; }
+}
+@layer cam-header {
+  html body .cam-rank-avatar.cam-rank-avatar {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: inherit !important;
+  }
+  html body .cam-rank-avatar.cam-rank-avatar > .cam-rank-emblem {
+    display: block !important;
+    flex: none !important;
+    width: auto !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    aspect-ratio: 48 / 56 !important;
+    margin: 0 !important;
+  }
+  html body .cam-rank-avatar.cam-rank-avatar > .cam-rank-emblem svg { display: block !important; width: 100% !important; height: 100% !important; }
+
+  /* ---------- Perfil: escudo grande y el nombre del rango debajo ---------- */
+  html body #aeProfileDialog .cam-profile-avatar.cam-rank-avatar.is-profile {
+    flex: 0 0 auto !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    gap: 6px !important;
+    width: auto !important;
+    min-width: 64px !important;
+    max-width: 88px !important;
+    height: auto !important;
+    margin: 0 !important;
+    font: inherit !important;
+    text-transform: none !important;
+    user-select: none !important;
+  }
+  html body #aeProfileDialog .cam-profile-avatar.cam-rank-avatar.is-profile > .cam-rank-emblem {
+    width: 56px !important;
+    height: 65px !important;
+    max-width: none !important;
+    filter: drop-shadow(0 4px 10px rgba(6, 22, 34, .18));
+  }
+  html body #aeProfileDialog .cam-profile-avatar.cam-rank-avatar.is-profile > .cam-rank-emblem[data-rank="leyenda"] {
+    filter: drop-shadow(0 0 10px rgba(184, 138, 230, .55)) drop-shadow(0 4px 10px rgba(6, 22, 34, .18));
+  }
+  html body #aeProfileDialog .cam-rank-avatar-name {
+    display: block !important;
+    max-width: 100% !important;
+    min-height: 1.25em !important;
+    margin: 0 !important;
+    color: var(--rank-text, currentColor) !important;
+    font: 800 11px/1.25 Inter, system-ui, sans-serif !important;
+    letter-spacing: .11em !important;
+    text-align: center !important;
+    text-transform: uppercase !important;
+    overflow-wrap: normal !important;
+    white-space: normal !important;
+  }
+  /* Con el escudo y su nombre a la vista, la línea «COBRE · PICKS» sobra. */
+  html body #aeProfileDialog #camProfileRank { display: none !important; }
+  html body #aeProfileDialog .cam-profile-identity:has(.cam-rank-avatar.is-profile) { align-items: center !important; }
+
+  /* «Editar perfil»: el mismo escudo, algo más grande. */
+  html body #aeProfileDialog .cam-profile-edit-avatar .cam-profile-avatar.cam-rank-avatar.is-profile { min-width: 96px !important; max-width: 120px !important; }
+  html body #aeProfileDialog .cam-profile-edit-avatar .cam-profile-avatar.cam-rank-avatar.is-profile > .cam-rank-emblem { width: 74px !important; height: 86px !important; }
+  html body #aeProfileDialog .cam-profile-edit-avatar .cam-rank-avatar-name { font-size: 12px !important; }
+
+  @media (max-width: 760px) {
+    html body #aeProfileDialog .cam-profile-identity .cam-profile-avatar.cam-rank-avatar.is-profile { min-width: 56px !important; max-width: 78px !important; gap: 5px !important; }
+    html body #aeProfileDialog .cam-profile-identity .cam-profile-avatar.cam-rank-avatar.is-profile > .cam-rank-emblem { width: 48px !important; height: 56px !important; }
+    html body #aeProfileDialog .cam-profile-identity .cam-rank-avatar-name { font-size: 10px !important; letter-spacing: .09em !important; }
+  }
+  /* Ordenador: el perfil pone la foto encima del nombre; el escudo, a juego. */
+  @media (min-width: 761px) {
+    html body[data-cam-desk] #aeProfileDialog.ae-profile-dialog[open] > .cam-profile-head .cam-profile-avatar.cam-rank-avatar.is-profile {
+      flex: 0 0 auto !important; width: auto !important; height: auto !important; min-width: 84px !important; max-width: 110px !important;
+      align-items: center !important;
+    }
+    html body[data-cam-desk] #aeProfileDialog.ae-profile-dialog[open] > .cam-profile-head .cam-profile-avatar.cam-rank-avatar.is-profile > .cam-rank-emblem {
+      width: 66px !important; height: 77px !important;
+    }
+    html body[data-cam-desk] #aeProfileDialog.ae-profile-dialog[open] > .cam-profile-head .cam-profile-identity:has(.cam-rank-avatar.is-profile) { align-items: flex-start !important; }
+  }
+}
+@layer cam-display-clarity {
+  /* Detalle de un Pick: su foto dorada redonda (en esta misma capa) pasa a escudo, en la misma caja. */
+  html body dialog#cpDialog.ae-cp-detail-dialog.cam-chef-detail-v2 .cp-detail-author .cp-feed-initial.cam-rank-avatar {
+    display: inline-flex !important; border: 0 !important; border-radius: 0 !important; background: none !important; box-shadow: none !important;
+  }
+}

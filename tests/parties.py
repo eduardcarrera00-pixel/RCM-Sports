@@ -280,7 +280,7 @@ def scenario_create_and_ranking(dark, width, tag):
         # final, los de Picks y Takes («Otros parties»). Takes y Picks ya no los llevan.
         page.evaluate("window.openAeProfile()")
         page.wait_for_selector('#camProfileOverview .cam-ov-card', timeout=8000)
-        assert 'MI PARTY' in page.inner_text('#aeProfileTabs').upper()
+        assert 'MI GRUPO' in page.inner_text('#aeProfileTabs').upper()  # pestaña renombrada el 11 nov
         page.click('#aeProfileTabTakes')
         page.wait_for_timeout(300)
         assert not visible(page, '#camProfileParties'), 'Takes sin bloque de parties'
@@ -324,7 +324,10 @@ def scenario_create_and_ranking(dark, width, tag):
         page.evaluate("window.camParties.openParty('f1000000-0000-4000-8000-000000000001','hub')")
         page.wait_for_selector('#camPartyBoard .cam-party-row')
         rows = page.eval_on_selector_all('#camPartyBoard .cam-party-row', "rs => rs.map(r => r.innerText.replace(/\\s+/g,' ').trim().toLowerCase())")
-        assert rows[0].startswith('1 b @beto_crack') and '+2,40' in rows[0] and '1/1 aciertos' in rows[0], rows
+        assert rows[0].startswith('1 @beto_crack') and '+2,40' in rows[0] and '1/1 aciertos' in rows[0], rows
+        # La foto de cada miembro es el escudo de su rango (sin inicial; 11 nov 2026).
+        faces = page.evaluate("[...document.querySelectorAll('#camPartyBoard .cam-party-avatar')].map(n => [n.classList.contains('cam-rank-avatar'), n.textContent.trim(), !!n.querySelector('.cam-rank-emblem')])")
+        assert faces and all(f[0] and not f[1] and f[2] for f in faces), faces
         assert '@ana' in rows[1] and '+0,50' in rows[1] and '1/2 aciertos' in rows[1] and 'creador' in rows[1], rows
         assert 'sin resultados' in rows[2] and '0,00' in rows[2], rows
         assert page.locator('#camPartyBoard .cam-party-row.is-me').count() == 1
@@ -435,7 +438,7 @@ def scenario_takes_and_creator(dark, width, tag):
         page.click('#camPartyMenu')
         page.click('#camParty .cam-party-sheet >> text=Borrar party')
         page.click('#camParty .cam-party-sheet .cam-party-btn.is-danger >> text="Borrar"')
-        page.wait_for_function("document.getElementById('camPartyTitle')?.textContent === 'Mis parties'")
+        page.wait_for_function("document.getElementById('camPartyTitle')?.textContent === 'Mis grupos'")
         page.wait_for_function("document.querySelector('#camParty .cam-party-list')?.textContent === 'Aún no estás en ningún party de Takes.'")
         assert page.evaluate("window.__fake.parties.length") == 2
 
@@ -448,7 +451,7 @@ def scenario_takes_and_creator(dark, width, tag):
         assert 'Renombrar' not in menu and 'Borrar party' not in menu and 'Salir del party' in menu, menu
         page.click('#camParty .cam-party-sheet >> text=Salir del party')
         page.click('#camParty .cam-party-sheet .cam-party-btn.is-danger >> text="Salir"')
-        page.wait_for_function("document.getElementById('camPartyTitle')?.textContent === 'Mis parties'")
+        page.wait_for_function("document.getElementById('camPartyTitle')?.textContent === 'Mis grupos'")
         assert page.evaluate("window.__fake.parties[0].members.length") == 2
         check_clean(page, tag + ' tras salir')
     finally:

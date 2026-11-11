@@ -132,6 +132,22 @@ funcionan los rangos?» en desplegables con las reglas de
 `cam_league_outcome`/`refresh_month`. El escudo de la cabecera abre «Rangos».
 Estilos: `assets/cam-perfil-rangos.css` (paquete de paneles).
 
+### El escudo del rango como foto · 11 nov 2026
+
+La foto de cada persona ya no es su inicial: es el escudo de su rango, el mismo
+que su perfil llama «Rango actual» (el más alto de sus ligas; sin ligas, Cobre).
+Cada rango tiene su dibujo y su metal, relleno y con una cara más clara:
+Cobre rojizo, Bronce pardo, Plata gris azulado, Oro amarillo, Platino verde agua,
+Diamante azul y Leyenda CAM morado con un leve brillo (`--rank-fill`,
+`--rank-deep`, `--rank-text` en `cam-leagues.css`). En el perfil y en «Editar
+perfil» va grande con el nombre del rango debajo, en su color; la línea pequeña
+«COBRE · PICKS» bajo el nombre ya no se muestra. En Takes, la conversación,
+Picks, Chefs, las quinielas y los grupos el escudo ocupa la caja que tenía la
+inicial (nada se mueve). Mientras llega el rango, o si no hay cuenta detrás, un
+escudo neutro gris. Se pinta con `CamLeagues.avatar(nodo, id)`; los rangos se
+piden en tandas con `cam_league_identities`, solo para los escudos a la vista.
+Estilos: `assets/cam-escudo-foto.css`. Prueba: `tests/escudo-foto.py`.
+
 ### Jornadas en el perfil · 3 nov 2026
 
 Las vistas principales de Quiniela NFL y Fútbol abren automáticamente la jornada

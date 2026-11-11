@@ -116,7 +116,8 @@
         "assets/cam-cabecera-rango.css",
         "assets/cam-interface-unificada.css",
         "assets/cam-picks-desplegables.css",
-        "assets/cam-perfil-rangos.css"
+        "assets/cam-perfil-rangos.css",
+        "assets/cam-escudo-foto.css"
       ]
     }
   ]

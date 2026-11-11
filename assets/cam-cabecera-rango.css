@@ -38,8 +38,9 @@
   html body > header #camHeaderRank .cam-rank-emblem svg {
     display: block !important; width: 100% !important; height: 100% !important; overflow: visible !important;
   }
-  html body > header #camHeaderRank .cam-rank-shield { fill: #0d2c44 !important; stroke: currentColor !important; stroke-width: 2.6 !important; }
-  html body > header #camHeaderRank .cam-rank-symbol { stroke: currentColor !important; stroke-width: 2.8 !important; }
+  /* 11 nov 2026: el escudo va relleno del metal de su rango (como en todo el sitio). */
+  html body > header #camHeaderRank .cam-rank-shield { fill: var(--rank-fill, #c96f4b) !important; stroke: var(--rank-deep, #86391d) !important; stroke-width: 2.6 !important; }
+  html body > header #camHeaderRank .cam-rank-symbol { stroke: var(--rank-ink, #10293b) !important; stroke-width: 3.2 !important; }
 
   /* Ordenador ancho: Editar y Publicar antes de la luna, en la misma fila. */
   @media (min-width: 1101px) {

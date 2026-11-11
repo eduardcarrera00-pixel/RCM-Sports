@@ -65,6 +65,8 @@
     const nickname=(r.username||'Aficionado').replace(/^@+/,'');
     const avatar=el('span',nickname.slice(0,1).toUpperCase()||'A','ae-points-avatar');
     avatar.setAttribute('aria-hidden','true');
+    // Foto = escudo de su rango (cam-leagues.js; si aún no cargó, lo convierte al llegar).
+    avatar.dataset.rankFace=String(r.user_id||'');window.CamLeagues?.avatar?.(avatar,r.user_id);
     const name=el('span','@'+nickname,'ae-sports-stand-name');
     user.append(avatar,name);
     user.setAttribute('aria-label','Ver perfil y Takes de '+nickname);

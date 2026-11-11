@@ -24,6 +24,8 @@ const tick=()=>new Promise(r=>setTimeout(r,10));
 view(one);await tick();
 assert.equal(profileDialog.dataset.leagueRank,'oro','highest earned rank themes header');
 assert.match(d.getElementById('camProfileRank').textContent,/Oro · Picks/);
+assert.equal(d.getElementById('camProfileAvatar').dataset.rank,'oro','the profile picture is the top-rank shield');
+assert.equal(d.getElementById('camProfileAvatar').textContent,'Oro','the rank name goes under the shield, no initial');
 assert.match(d.getElementById('camProfileAwards').textContent,/Top 10 · #2/,'earned badge shows position');
 assert.match(d.getElementById('camProfileAwards').querySelector('.cam-top10-badge').title,/octubre de 2026/,'badge includes award month');
 // «Perfil» (11 nov 2026): solo el escudo y «Rango: Oro», con el enlace a «Rangos».
@@ -43,7 +45,7 @@ assert.equal(ranks.querySelector('.cam-rk-ladder').children.length,7,'all seven 
 assert.equal(ranks.querySelector('.cam-rk-step.is-current .cam-rk-step-name').textContent,'Oro');
 assert.equal(ranks.querySelectorAll('.cam-rk-how-item').length,5,'five short explanations');
 assert.match(ranks.textContent,/En zona Top 10/,'live badge is explicitly provisional');
-assert.match(ranks.querySelector('.cam-rk-progress-main').textContent,/subirías a Platino|Faltan/);
+assert.match(ranks.querySelector('.cam-rk-progress-main').textContent,/subirías? a Platino|Faltan/);
 ranks.querySelector('.cam-rk-pick-btn[data-competition="nfl"]').click();
 assert.equal(profileDialog.dataset.leagueRank,'oro','the profile accent stays on the top rank');
 assert.match(ranks.querySelector('.cam-rk-progress-label').textContent,/Puesto #4 de 20/);
@@ -65,6 +67,7 @@ resolveOld({data:make(0)});await tick();assert.equal(profileDialog.dataset.leagu
 view(null);fail=true;const three='00000000-0000-0000-0000-000000000003';view(three);await tick();
 assert.match(d.getElementById('camProfileLeagues').textContent,/No se pudo cargar el rango/);
 assert.equal(profileDialog.dataset.leagueRank,undefined);
+assert.equal(d.getElementById('camProfileAvatar').dataset.rank,'pending','a failed request leaves a neutral shield');
 fail=false;d.getElementById('camProfileLeagues').querySelector('button').click();await tick();
 assert.equal(profileDialog.dataset.leagueRank,'oro');
 console.log('PASS: league themes, simple Perfil rank, Rangos tab, earned/provisional and dated badges, tab/cache behavior, safe text, stale-request guard and retry.');

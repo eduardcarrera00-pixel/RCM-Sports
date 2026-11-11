@@ -126,6 +126,8 @@
    const name=String(t.author||'Aficionado').replace(/^@+/,'');
    const avatar=el('span',name.charAt(0).toUpperCase()||'A','cam-tk-avatar');
    avatar.setAttribute('aria-hidden','true');
+   // Foto = escudo de su rango (cam-leagues.js; si aún no cargó, lo convierte al llegar).
+   avatar.dataset.rankFace=String(t.author_id||'');window.CamLeagues?.avatar?.(avatar,t.author_id);
    const author=button('@'+name,()=>{
      if(typeof openAePublicProfile==='function'&&t.author_id)openAePublicProfile(t.author_id);
    },'ae-take-author-link cam-tk-author');

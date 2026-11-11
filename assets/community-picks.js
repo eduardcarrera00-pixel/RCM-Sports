@@ -174,6 +174,7 @@ function card(p,compact=false,detail=false,viewerId=currentViewerId,variant='fee
    if(publication){
      const avatar=el('span',String(p.author||'A').replace(/^@/,'').charAt(0).toLocaleUpperCase('es'),'cp-feed-initial');
      avatar.setAttribute('aria-hidden','true');
+     avatar.dataset.rankFace=String(p.user_id||'');window.CamLeagues?.avatar?.(avatar,p.user_id);
      profileButton.replaceChildren(avatar,el('span','@'+(p.author||'Aficionado'),'cp-feed-username'));
    }
    profileButton.setAttribute('aria-label','Ver perfil de '+(p.author||'Aficionado'));
@@ -344,6 +345,8 @@ function streamCard(p,viewerId){
    profile.className='cp-feed-author cam-pk-author';
    const avatar=el('span',author.charAt(0).toLocaleUpperCase('es'),'cam-pk-avatar');
    avatar.setAttribute('aria-hidden','true');
+   // Foto = escudo de su rango (cam-leagues.js; si aún no cargó, lo convierte al llegar).
+   avatar.dataset.rankFace=String(p.user_id||'');window.CamLeagues?.avatar?.(avatar,p.user_id);
    profile.append(avatar,el('span','@'+author,'cam-pk-user'));
    profile.setAttribute('aria-label','Ver perfil de '+author);
    window.CamLeagues?.markAuthor(profile,p.user_id,'picks');
@@ -352,6 +355,8 @@ function streamCard(p,viewerId){
    const label=el('span',null,'cp-feed-author-label cam-pk-author');
    const avatar=el('span',author.charAt(0).toLocaleUpperCase('es'),'cam-pk-avatar');
    avatar.setAttribute('aria-hidden','true');
+   // Sin cuenta detrás: escudo neutro.
+   avatar.dataset.rankFace='';window.CamLeagues?.avatar?.(avatar,'');
    label.append(avatar,el('span','@'+author,'cam-pk-user'));
    head.append(label);
  }

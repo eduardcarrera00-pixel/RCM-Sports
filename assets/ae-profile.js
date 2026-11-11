@@ -1156,7 +1156,8 @@ async function showPublic(id,push=true,tab='perfil'){
 
 
 /* ---------- Cabecera de perfil (3 nov 2026): identidad, cifras, compartir ----------
-   Como en otras apps: inicial como foto, @usuario, «Miembro desde», botones
+   Como en otras apps: foto (desde el 11 nov 2026, el escudo del rango con su
+   nombre debajo, que pinta cam-leagues.js), @usuario, «Miembro desde», botones
    Editar perfil / Compartir perfil y una fila de cifras que lleva a cada pestaña. */
 function monthText(value){
   const d=new Date(value);
@@ -1175,7 +1176,8 @@ function setIdentity(name,subtitle){
   const title=$('aeProfileTitle');
   if(title)title.textContent=clean?'@'+clean:(privateView?'Mi perfil':'Perfil de aficionado');
   if(subtitle!==undefined&&$('aeProfileUsername'))$('aeProfileUsername').textContent=subtitle;
-  for(const id of ['camProfileAvatar','camProfileEditAvatar']){const n=$(id);if(n)n.textContent=initialOf(clean);}
+  // La foto es el escudo del rango (cam-leagues.js); la inicial solo si ese archivo no llegó.
+  if(!window.CamLeagues?.avatar)for(const id of ['camProfileAvatar','camProfileEditAvatar']){const n=$(id);if(n)n.textContent=initialOf(clean);}
   if($('camProfileKicker'))$('camProfileKicker').textContent=privateView?'MI PERFIL · CAM SPORTS':'AFICIONADO · CAM SPORTS';
   if($('camProfileEditOpen'))$('camProfileEditOpen').hidden=!privateView;
   // Acciones al final del perfil, siempre con etiquetas legibles.
