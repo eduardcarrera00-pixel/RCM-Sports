@@ -265,7 +265,6 @@ function legOutcome(p,leg,count){
 function streamCard(p,viewerId){
  const n=el('article',null,'cp-card cam-pk');
  const choices=ticketChoices(p),legs=Array.isArray(p.legs)?p.legs:[],first=legs[0]||null;
- const combo=choices.length>1;
  n.dataset.sport=pickSportKind(p);
  n.dataset.outcome=ticketStates[p.outcome]?p.outcome:'pending';
  const author=String(p.author||'Aficionado').replace(/^@+/,'');
@@ -297,6 +296,7 @@ function streamCard(p,viewerId){
  n.append(head);
  const body=el('div',null,'cam-pk-body');
  const main=el('div',null,'cam-pk-main');
+ const combo=choices.length>1;
  const title=String(p.title||'').trim();
  const redundant=!title||/^combinada\b/i.test(title)||legs.some(l=>{
    const t=normalizeText(title),e=normalizeText(l?.event);
@@ -304,21 +304,17 @@ function streamCard(p,viewerId){
  });
  // Un título escrito por el Chef se conserva; los automáticos repiten el partido.
  if(!redundant)main.append(el('h3',title,'cam-pk-title'));
- if(combo)main.append(el('span','Combinada · '+choices.length+' selecciones','cam-pk-combo'));
+ if(combo)main.append(el('span','Combinada','cam-pk-combo'));
  const list=el('ol',null,'cam-pk-legs'),more=el('ol',null,'cam-pk-legs');
  let previous='';
  choices.forEach(({leg,selection},i)=>{
    const li=el('li',null,'cam-pk-leg');
    const display=pickSelectionDisplay(selection,leg.sport);
-   const eventName=String(leg.event||'').trim();
-   const key=normalizeText(eventName);
-   // Cupón deportivo: primero el encuentro, después la selección y su mercado.
-   // En una combinada, un encuentro repetido no ocupa otra línea de contexto.
-   if(eventName&&(!combo||key!==previous))li.append(el('span',eventName,'cam-pk-event'));
    li.append(el('strong',display.choice||'Consultar pronóstico','cam-pk-choice'));
-   if(display.market)li.append(el('span',display.market,'cam-pk-meta'));
-   if(combo)li.dataset.legIndex=String(i+1);
+   const key=normalizeText(leg.event);
+   const meta=[key&&key!==previous?String(leg.event).trim():'',display.market].filter(Boolean).join(' · ');
    previous=key;
+   if(meta)li.append(el('span',meta,'cam-pk-meta'));
    const outcome=legOutcome(p,leg,choices.length);
    li.dataset.outcome=outcome||'pending';
    if(outcome&&outcome!=='pending'&&combo)li.append(el('span',ticketStates[outcome].join(' '),'cam-pk-leg-state'));
@@ -332,14 +328,10 @@ function streamCard(p,viewerId){
    details.addEventListener('click',e=>e.stopPropagation());
    main.append(details);
  }
- const oddsPanel=el('div',null,'cam-pk-odds-panel');
- oddsPanel.append(el('span','Cuota','cam-pk-odds-label'));
  const odds=el('strong',momioText(p.american_odds),'cp-odds cam-pk-odds');
  odds.setAttribute('aria-label','Momio '+momioText(p.american_odds));
- oddsPanel.append(odds);
- const effect=pickLeagueImpact(p);
- if(effect)oddsPanel.append(el('small',effect,'cam-pick-impact'));
- body.append(main,oddsPanel);
+ const effect=pickLeagueImpact(p);if(effect)odds.append(el('small',effect,'cam-pick-impact'));
+ body.append(main,odds);
  n.append(body);
  const read=el('a',null,'cp-card-read-link cam-pk-open');
  read.href=link(p.id);
