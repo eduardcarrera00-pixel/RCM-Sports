@@ -34,10 +34,6 @@ function meter(r){
   fill.style.width=Math.round(fraction*100)+'%';
   track.append(fill);box.append(track);return box;
 }
-function impact(p){
-  const n=Number(p?.american_odds);
-  return Number.isFinite(n)&&Math.abs(n)>=100?(Math.abs(n)/100).toFixed(2):null;
-}
 function award(item,provisional=false){
   const position=Number(item.position)||0;
   const b=el('span',null,'cam-top10-badge'+(provisional?' is-provisional':''));
@@ -155,7 +151,10 @@ function renderProfile(){
   else{
     const list=el('ul');
     for(const h of profileData.history){
-      const li=el('li');li.append(el('span',month(h.season_month)+' · '+COMPETITIONS[h.competition]),el('strong',LEVELS[level(h.rank_after)]));
+      const before=level(h.rank_before),after=level(h.rank_after);
+      const outcome=after>before?'↑ Ascenso a ':after<before?'↓ Descenso a ':'';
+      const li=el('li');li.append(el('span',month(h.season_month)+' · '+COMPETITIONS[h.competition]),
+        el('strong',outcome+LEVELS[after]));
       if(h.eligible&&h.position<=10)li.append(award(h));
       else li.append(el('small',h.position?'Puesto #'+h.position:h.zone==='pausa'?'En pausa':'Participación insuficiente'));
       list.append(li);
