@@ -367,6 +367,11 @@ html body #cpDialog.ae-cp-detail-dialog .ae-cp-detail-hero{background:var(--cam-
 html body #cpDialog.ae-cp-detail-dialog .ae-cp-detail-hero::before,html body #cpDialog.ae-cp-detail-dialog .ae-cp-detail-hero::after{display:none!important}
 html body #cpDialog.ae-cp-detail-dialog .cp-recipe-card,html body #cpDialog.ae-cp-detail-dialog .ae-cp-detail-conversation{background:var(--cam-calm-surface)!important;color:var(--cam-calm-ink)!important;border:1px solid var(--cam-calm-line)!important;border-radius:12px!important;box-shadow:none!important}
 html body #mainContent #footballTakes :is(.cp-odds,.ae-weekly-odds){background:var(--cam-calm-surface)!important;color:var(--cam-calm-ink)!important;border:1px solid var(--cam-calm-line)!important;border-radius:6px!important;text-shadow:none!important;box-shadow:none!important;font:700 13px/1.3 Inter,system-ui,sans-serif!important}
+/* Momio del feed de Picks en cian suave (10 nov 2026, pedido del dueño): texto, borde y un fondo
+   muy tenue del mismo tono. Colores en cam-picks-moderno.css (--pk-momio-*). Solo el momio del feed. */
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-odds{background:var(--pk-momio-bg)!important;color:var(--pk-momio-ink)!important;border-color:var(--pk-momio-line)!important}
+/* La nota de liga que acompaña al momio conserva su color de siempre. */
+html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-odds .cam-pick-impact{color:var(--cam-calm-ink)!important}
 html body #mainContent #footballTakes :is(#cpSettleHistory,#cpSettleHistory > ol,#cpLeaderboard,#cpWorstLeaderboard){height:auto!important;max-height:none!important;overflow:visible!important}
 html body #mainContent #footballTakes #cpSettleHistory{border:0!important;padding:0!important;background:transparent!important}
 html body :is(.cam-chef-period,.cam-nfl-view-tabs) button{min-height:44px!important;border-radius:8px!important;font-family:Inter,system-ui,sans-serif!important}

@@ -1,22 +1,25 @@
-/* CAM SPORTS · Takes de la comunidad (3 nov 2026).
-   1. «Últimos Takes» de Fútbol y NFL: una sola tarjeta para los dos deportes.
-      Autor y fecha arriba, competición, título y dos líneas del texto; debajo,
-      votar arriba/abajo y «Responder», que abre un cuadro de respuesta dentro
-      de la misma tarjeta. La tarjeta crece con su contenido: nada se corta.
-   2. «Opiniones populares / impopulares» (y «apoyadas / hateadas» en NFL):
-      las dos listas con la misma forma, filas a todo el ancho, tres visibles y
-      «Ver las N» para el resto. Sin carrusel ni tarjetas a medio asomar.
+/* CAM SPORTS · Takes de la comunidad (3 nov 2026; misma tarjeta el 10 nov 2026).
+   1. La tarjeta de Take, una sola para «Últimos Takes», «Takes populares» y
+      «Takes impopulares» en Fútbol y NFL: arriba, competición, fecha y compartir;
+      título y dos líneas del texto; abajo a la izquierda el autor (inicial y
+      @usuario) y a la derecha los comentarios (icono y número, abre la respuesta
+      dentro de la tarjeta) junto a los votos ▲ n | ▼ n. La tarjeta crece con su
+      contenido y el pie pasa a dos líneas si no cabe: nada se corta.
+   2. «Takes populares / impopulares»: las dos listas con la misma forma, tres
+      tarjetas visibles y «Ver las N» para el resto. Sin carrusel.
 
-   Va al final de la página, en la capa cam-banners con !important, como los
-   demás ajustes: las reglas antiguas de estas tarjetas también usan !important
-   y una declaración importante en esta capa gana a las que no tienen capa. El
-   «:not(#cam-tk)» sube la especificidad por encima de las capas por deporte.
-   Las esquinas se fijan aquí mismo porque cam-rounded-editorial pone 14 px a
-   todos los elementos. */
+   Va en la capa cam-banners con !important, como los demás ajustes: las reglas
+   antiguas de estas tarjetas también usan !important y una declaración importante
+   en esta capa gana a las que no tienen capa. El «:not(#cam-tk)» sube la
+   especificidad por encima de las capas por deporte; el «:is()» mantiene la misma
+   especificidad en el feed y en las listas (que en el ordenador viven en el carril
+   derecho, fuera de #freeTakes). Las esquinas se fijan aquí mismo porque
+   cam-rounded-editorial pone 14 px a todos los elementos. */
 
 /* ---------- 1 · Últimos Takes ---------- */
 @layer cam-banners {
-  html body:is(.ae-is-football,.ae-is-nfl) #mainContent #freeTakes[data-sport] {
+  html body:is(.ae-is-football,.ae-is-nfl) #mainContent #freeTakes[data-sport],
+  html body:is(.ae-is-football,.ae-is-nfl) #mainContent #aeSportTakeLeaders[data-sport] {
     --tk-paper:#fffcf8;
     --tk-field:#ffffff;
     --tk-ink:#13324d;
@@ -33,7 +36,8 @@
     --tk-down-ink:#ffffff;
     --tk-shadow:0 1px 2px rgba(31,40,48,.05),0 8px 22px rgba(31,40,48,.06);
   }
-  html.dark body:is(.ae-is-football,.ae-is-nfl) #mainContent #freeTakes[data-sport] {
+  html.dark body:is(.ae-is-football,.ae-is-nfl) #mainContent #freeTakes[data-sport],
+  html.dark body:is(.ae-is-football,.ae-is-nfl) #mainContent #aeSportTakeLeaders[data-sport] {
     --tk-paper:#102b3e;
     --tk-field:#0b1f30;
     --tk-ink:#f6ecdf;
@@ -104,7 +108,7 @@
   }
 
   /* La tarjeta */
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) {
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) {
     position:relative!important;
     display:flex!important;
     flex-direction:column!important;
@@ -129,24 +133,24 @@
     transform:none!important;
     transition:border-color .18s ease!important;
   }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk):hover { border-color:var(--tk-line-strong)!important; }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk)::before,
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk)::after {
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk):hover { border-color:var(--tk-line-strong)!important; }
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk)::before,
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk)::after {
     content:none!important;
     display:none!important;
   }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) :where(*) {
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) :where(*) {
     border-radius:0!important;
     text-shadow:none!important;
   }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) :where(button)::before,
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) :where(button)::after {
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) :where(button)::before,
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) :where(button)::after {
     content:none!important;
     display:none!important;
   }
 
-  /* Autor · fecha · compartir */
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-top {
+  /* Arriba: competición · fecha · compartir */
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-top {
     display:flex!important;
     align-items:center!important;
     gap:8px!important;
@@ -157,53 +161,20 @@
     border:0!important;
     background:transparent!important;
   }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-avatar {
-    display:inline-grid!important;
-    place-items:center!important;
-    flex:0 0 26px!important;
-    width:26px!important;
-    height:26px!important;
-    margin:0!important;
-    border:1px solid var(--tk-line-strong)!important;
-    border-radius:50%!important;
-    background:var(--tk-accent-soft)!important;
-    color:var(--tk-accent)!important;
-    font:600 13px/1 "Playfair Display",Georgia,serif!important;
-  }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-author {
-    flex:0 1 auto!important;
-    min-width:0!important;
-    min-height:32px!important;
-    margin:0!important;
-    padding:0!important;
-    overflow:hidden!important;
-    border:0!important;
-    background:transparent!important;
-    box-shadow:none!important;
-    color:var(--tk-ink)!important;
-    font:600 13px/32px Inter,system-ui,sans-serif!important;
-    text-align:left!important;
-    text-decoration:none!important;
-    text-overflow:ellipsis!important;
-    text-transform:none!important;
-    white-space:nowrap!important;
-    cursor:pointer!important;
-  }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-author:hover { text-decoration:underline!important; text-underline-offset:3px!important; }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-date {
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-date {
     flex:0 0 auto!important;
     margin:0!important;
     padding:0!important;
     color:var(--tk-muted)!important;
-    font:500 12px/1 Inter,system-ui,sans-serif!important;
+    font:500 12px/1.35 Inter,system-ui,sans-serif!important;
     white-space:nowrap!important;
   }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-date:not(:empty)::before {
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-date:not(:empty)::before {
     content:"·"!important;
     display:inline!important;
     margin:0 6px 0 0!important;
   }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-share {
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-share {
     display:inline-grid!important;
     place-items:center!important;
     flex:0 0 32px!important;
@@ -222,8 +193,8 @@
     opacity:1!important;
     cursor:pointer!important;
   }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-share:hover { color:var(--tk-accent)!important; border-color:var(--tk-line-strong)!important; }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-share svg {
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-share:hover { color:var(--tk-accent)!important; border-color:var(--tk-line-strong)!important; }
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-share svg {
     width:15px!important;
     height:15px!important;
     fill:none!important;
@@ -234,22 +205,24 @@
   }
 
   /* Competición, título y texto */
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-kicker {
-    margin:10px 0 4px!important;
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-kicker {
+    flex:0 1 auto!important;
+    min-width:0!important;
+    margin:0!important;
     padding:0!important;
-    overflow:hidden!important;
+    overflow:visible!important;
     border:0!important;
     background:transparent!important;
     color:var(--tk-kicker)!important;
     font:700 10.5px/1.35 Inter,system-ui,sans-serif!important;
     letter-spacing:.12em!important;
-    text-overflow:ellipsis!important;
     text-transform:uppercase!important;
-    white-space:nowrap!important;
+    white-space:normal!important;
+    overflow-wrap:anywhere!important;
   }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-title {
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-title {
     display:block!important;
-    margin:0!important;
+    margin:6px 0 0!important;
     padding:0!important;
     border:0!important;
     background:transparent!important;
@@ -257,7 +230,7 @@
     font:600 19px/1.24 "Playfair Display",Georgia,serif!important;
     font-variant-numeric:lining-nums!important;
   }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-open {
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-open {
     display:-webkit-box!important;
     -webkit-box-orient:vertical!important;
     -webkit-line-clamp:3!important;
@@ -278,8 +251,8 @@
     overflow-wrap:anywhere!important;
     cursor:pointer!important;
   }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-open:hover { text-decoration:underline!important; text-decoration-thickness:1px!important; text-underline-offset:4px!important; }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-excerpt {
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-open:hover { text-decoration:underline!important; text-decoration-thickness:1px!important; text-underline-offset:4px!important; }
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-excerpt {
     display:-webkit-box!important;
     -webkit-box-orient:vertical!important;
     -webkit-line-clamp:2!important;
@@ -294,32 +267,87 @@
     overflow-wrap:anywhere!important;
   }
 
-  /* Votar y responder */
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-actions {
+  /* Pie: autor a la izquierda; comentarios y votos a la derecha. Si no caben en
+     una línea, comentarios y votos bajan a la siguiente, pegados a la derecha. */
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-actions {
     display:flex!important;
     flex-wrap:wrap!important;
     align-items:center!important;
     justify-content:space-between!important;
-    gap:8px!important;
+    gap:6px 8px!important;
     margin:auto 0 0!important;
     padding:12px 0 0!important;
     border:0!important;
     background:transparent!important;
   }
-  /* Separador recto encima de las acciones; en una fila de tarjetas, todas las
-     acciones quedan a la misma altura (margin-top:auto) y el aire mínimo lo da el texto. */
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) :is(.cam-tk-title,.cam-tk-excerpt):has(+ .cam-tk-actions) {
+  /* Separador recto encima del pie; en una fila de tarjetas, todos los pies quedan
+     a la misma altura (margin-top:auto) y el aire mínimo lo da el texto. */
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) :is(.cam-tk-title,.cam-tk-excerpt):has(+ .cam-tk-actions) {
     margin-bottom:12px!important;
   }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) > .cam-tk-actions {
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) > .cam-tk-actions {
     border-top:1px solid var(--tk-line)!important;
     padding-top:10px!important;
   }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-vote {
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-by {
+    display:flex!important;
+    align-items:center!important;
+    gap:8px!important;
+    flex:0 1 auto!important;
+    min-width:0!important;
+    max-width:100%!important;
+    margin:0!important;
+    padding:0!important;
+  }
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-avatar {
+    display:inline-grid!important;
+    place-items:center!important;
+    flex:0 0 26px!important;
+    width:26px!important;
+    height:26px!important;
+    margin:0!important;
+    border:1px solid var(--tk-line-strong)!important;
+    border-radius:50%!important;
+    background:var(--tk-accent-soft)!important;
+    color:var(--tk-accent)!important;
+    font:600 13px/1 "Playfair Display",Georgia,serif!important;
+  }
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-author {
+    flex:0 1 auto!important;
+    min-width:0!important;
+    max-width:none!important;
+    min-height:36px!important;
+    margin:0!important;
+    padding:0!important;
+    overflow:visible!important;
+    border:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    color:var(--tk-ink)!important;
+    font:600 13px/1.3 Inter,system-ui,sans-serif!important;
+    text-align:left!important;
+    text-decoration:none!important;
+    text-overflow:clip!important;
+    text-transform:none!important;
+    /* Un @usuario muy largo en una tarjeta estrecha pasa a dos líneas; no se recorta. */
+    white-space:normal!important;
+    overflow-wrap:anywhere!important;
+    cursor:pointer!important;
+  }
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-author:hover { text-decoration:underline!important; text-underline-offset:3px!important; }
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-tools {
+    display:flex!important;
+    align-items:center!important;
+    gap:4px!important;
+    flex:0 0 auto!important;
+    margin:0 0 0 auto!important;
+    padding:0!important;
+  }
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-vote {
     display:inline-flex!important;
     align-items:stretch!important;
     flex:0 0 auto!important;
-    height:40px!important;
+    height:36px!important;
     margin:0!important;
     padding:0!important;
     overflow:hidden!important;
@@ -327,16 +355,16 @@
     border-radius:999px!important;
     background:transparent!important;
   }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-vote-btn {
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-vote-btn {
     display:inline-flex!important;
     align-items:center!important;
     justify-content:center!important;
-    gap:5px!important;
-    min-width:58px!important;
+    gap:4px!important;
+    min-width:42px!important;
     height:100%!important;
     min-height:0!important;
     margin:0!important;
-    padding:0 13px!important;
+    padding:0 8px!important;
     border:0!important;
     border-radius:0!important;
     background:transparent!important;
@@ -348,92 +376,88 @@
     cursor:pointer!important;
     transition:background-color .15s ease,color .15s ease!important;
   }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-vote-btn + .cam-tk-vote-btn { border-left:1px solid var(--tk-line-strong)!important; }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-vote-btn svg {
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-vote-btn + .cam-tk-vote-btn { border-left:1px solid var(--tk-line-strong)!important; }
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-vote-btn svg {
     flex:0 0 auto!important;
-    width:17px!important;
-    height:17px!important;
+    width:16px!important;
+    height:16px!important;
     fill:currentColor!important;
     stroke:none!important;
   }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-vote-btn .cam-football-vote-count {
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-vote-btn .cam-football-vote-count {
     display:inline!important;
     margin:0!important;
     padding:0!important;
     color:inherit!important;
     font:inherit!important;
   }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-vote-btn:not(:disabled):hover { background:var(--tk-accent-soft)!important; }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-vote-btn[data-vote="up"][aria-pressed="true"] {
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-vote-btn:not(:disabled):hover { background:var(--tk-accent-soft)!important; }
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-vote-btn[data-vote="up"][aria-pressed="true"] {
     background:var(--tk-up)!important;
     color:var(--tk-up-ink)!important;
   }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-vote-btn[data-vote="down"][aria-pressed="true"] {
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-vote-btn[data-vote="down"][aria-pressed="true"] {
     background:var(--tk-down)!important;
     color:var(--tk-down-ink)!important;
   }
   /* Tu propio Take: se ven los votos, pero no se puede votar. */
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-vote-btn:disabled {
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-vote-btn:disabled {
     color:var(--tk-muted)!important;
     cursor:default!important;
   }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-vote-btn:focus-visible,
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) :is(.cam-tk-reply,.cam-tk-share,.cam-tk-open,.cam-tk-author,.cam-tk-quick-send,.cam-tk-quick-cancel,.cam-tk-quick-open):focus-visible {
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-vote-btn:focus-visible,
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) :is(.cam-tk-reply,.cam-tk-share,.cam-tk-open,.cam-tk-author,.cam-tk-quick-send,.cam-tk-quick-cancel,.cam-tk-quick-open):focus-visible {
     outline:2px solid var(--tk-accent)!important;
     outline-offset:-2px!important;
   }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-reply {
+  /* Comentarios: icono y número, justo a la izquierda de los votos. */
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-reply {
     display:inline-flex!important;
     align-items:center!important;
-    gap:7px!important;
+    justify-content:center!important;
+    gap:5px!important;
     flex:0 0 auto!important;
-    height:40px!important;
+    min-width:36px!important;
+    height:36px!important;
     min-height:0!important;
     margin:0!important;
-    padding:0 14px 0 12px!important;
-    border:1px solid var(--tk-line-strong)!important;
+    padding:0 6px!important;
+    border:0!important;
     border-radius:999px!important;
     background:transparent!important;
     box-shadow:none!important;
     color:var(--tk-accent)!important;
     font:600 13.5px/1 Inter,system-ui,sans-serif!important;
+    font-variant-numeric:tabular-nums!important;
     text-decoration:none!important;
     text-transform:none!important;
     cursor:pointer!important;
   }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-reply:hover,
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-reply[aria-expanded="true"] { background:var(--tk-accent-soft)!important; }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-reply svg {
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-reply:hover,
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-reply[aria-expanded="true"] { background:var(--tk-accent-soft)!important; }
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-reply svg {
     flex:0 0 auto!important;
-    width:17px!important;
-    height:17px!important;
+    width:18px!important;
+    height:18px!important;
     fill:none!important;
     stroke:currentColor!important;
     stroke-width:1.8!important;
     stroke-linejoin:round!important;
   }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-reply .cam-tk-reply-label {
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-reply .ae-take-reply-count {
     display:inline!important;
     margin:0!important;
+    padding:0!important;
+    min-width:0!important;
+    min-height:0!important;
+    height:auto!important;
+    border:0!important;
+    background:transparent!important;
     color:inherit!important;
     font:inherit!important;
   }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-reply .ae-take-reply-count {
-    display:inline-grid!important;
-    place-items:center!important;
-    min-width:20px!important;
-    height:20px!important;
-    margin:0 0 0 1px!important;
-    padding:0 6px!important;
-    box-sizing:border-box!important;
-    border-radius:999px!important;
-    background:var(--tk-accent-soft)!important;
-    color:var(--tk-accent)!important;
-    font:700 11.5px/1 Inter,system-ui,sans-serif!important;
-    font-variant-numeric:tabular-nums!important;
-  }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-reply .ae-take-reply-count[hidden] { display:none!important; }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-hide {
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-reply .ae-take-reply-count[hidden] { display:none!important; }
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-hide {
     margin:0!important;
     padding:4px 0!important;
     border:0!important;
@@ -445,8 +469,10 @@
   }
 
   /* Respuesta rápida dentro de la tarjeta */
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-quick {
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-quick {
     display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    min-width:0!important;
     gap:8px!important;
     margin:10px 0 0!important;
     padding:0!important;
@@ -454,8 +480,8 @@
     background:transparent!important;
     cursor:default!important;
   }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-quick[hidden] { display:none!important; }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-quick-text {
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-quick[hidden] { display:none!important; }
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-quick-text {
     box-sizing:border-box!important;
     display:block!important;
     width:100%!important;
@@ -472,20 +498,30 @@
     resize:none!important;
     cursor:text!important;
   }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-quick-text::placeholder { color:var(--tk-muted)!important; opacity:1!important; }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-quick-text:focus {
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-quick-text::placeholder { color:var(--tk-muted)!important; opacity:1!important; }
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-quick-text:focus {
     outline:0!important;
     border-color:var(--tk-accent)!important;
     box-shadow:0 0 0 3px color-mix(in srgb,var(--tk-accent) 18%,transparent)!important;
   }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-quick-row {
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-quick-row {
     display:flex!important;
+    flex-wrap:wrap!important;
     align-items:center!important;
-    gap:6px!important;
+    gap:2px 4px!important;
+    min-width:0!important;
     margin:0!important;
     padding:0!important;
   }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-quick-open {
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-quick-buttons {
+    display:flex!important;
+    align-items:center!important;
+    gap:6px!important;
+    flex:0 0 auto!important;
+    margin:0 0 0 auto!important;
+    padding:0!important;
+  }
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-quick-open {
     min-width:0!important;
     min-height:36px!important;
     margin:0 auto 0 0!important;
@@ -502,12 +538,12 @@
     white-space:nowrap!important;
     cursor:pointer!important;
   }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-quick-open:hover { text-decoration:underline!important; text-underline-offset:3px!important; }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-quick-cancel {
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-quick-open:hover { text-decoration:underline!important; text-underline-offset:3px!important; }
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-quick-cancel {
     flex:0 0 auto!important;
     min-height:36px!important;
     margin:0!important;
-    padding:0 10px!important;
+    padding:0 8px!important;
     border:0!important;
     background:transparent!important;
     box-shadow:none!important;
@@ -515,12 +551,12 @@
     font:600 13px/1 Inter,system-ui,sans-serif!important;
     cursor:pointer!important;
   }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-quick-send {
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-quick-send {
     flex:0 0 auto!important;
     height:38px!important;
     min-height:0!important;
     margin:0!important;
-    padding:0 18px!important;
+    padding:0 14px!important;
     border:0!important;
     border-radius:999px!important;
     background:var(--tk-up)!important;
@@ -530,8 +566,8 @@
     font:600 13.5px/1 Inter,system-ui,sans-serif!important;
     cursor:pointer!important;
   }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-quick-send:disabled { opacity:.65!important; cursor:wait!important; }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-note {
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-quick-send:disabled { opacity:.65!important; cursor:wait!important; }
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-note {
     margin:8px 0 0!important;
     padding:0!important;
     border:0!important;
@@ -540,27 +576,11 @@
     font:500 12.5px/1.4 Inter,system-ui,sans-serif!important;
     cursor:default!important;
   }
-  html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-note:empty { display:none!important; }
+  html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) .cam-tk-note:empty { display:none!important; }
 
-  /* Tarjetas estrechas (4 columnas): el voto y «Responder» se reparten la fila. */
-  @media(min-width:1300px){
-    html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-vote-btn { min-width:50px!important; padding:0 10px!important; }
-    html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-reply { padding:0 11px 0 10px!important; }
-  }
-  /* Pantallas muy estrechas: «Responder» se queda solo con el icono y el número. */
-  @media(max-width:345px){
-    html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) .cam-tk-reply .cam-tk-reply-label {
-      position:absolute!important;
-      width:1px!important;
-      height:1px!important;
-      overflow:hidden!important;
-      clip:rect(0 0 0 0)!important;
-      white-space:nowrap!important;
-    }
-  }
   @media(prefers-reduced-motion:reduce){
-    html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk),
-    html body #mainContent #freeTakes[data-sport] > #freeTakesFeed > article.cam-tk:not(#cam-tk) * { transition:none!important; }
+    html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk),
+    html body #mainContent :is(#freeTakes[data-sport] > #freeTakesFeed,#aeSportTakeLeaders[data-sport] ol.ae-sport-takes-list > li) > article.cam-tk:not(#cam-tk) * { transition:none!important; }
   }
 }
 
@@ -573,11 +593,6 @@
     --op-line:rgba(133,91,67,.18);
     --op-line-strong:rgba(133,91,67,.32);
     --op-accent:#855b43;
-    --op-rank:#a0704f;
-    --op-up:#2f6b4f;
-    --op-up-soft:rgba(47,107,79,.1);
-    --op-down:#9a3f33;
-    --op-down-soft:rgba(154,63,51,.09);
   }
   html.dark body #mainContent #aeSportTakeLeaders.cam-op[data-sport]:not(#cam-op) {
     --op-paper:#102b3e;
@@ -586,11 +601,6 @@
     --op-line:rgba(214,166,112,.18);
     --op-line-strong:rgba(214,166,112,.32);
     --op-accent:#e0b37c;
-    --op-rank:#d9ac74;
-    --op-up:#8fd3ae;
-    --op-up-soft:rgba(143,211,174,.1);
-    --op-down:#f09a8c;
-    --op-down-soft:rgba(240,154,140,.1);
   }
   /* Las dos tarjetas, iguales: misma altura en la fila del ordenador. */
   html body #mainContent #aeSportTakeLeaders.cam-op[data-sport]:not(#cam-op) .ae-sport-takes-grid {
@@ -611,9 +621,12 @@
   }
   html body #mainContent #aeSportTakeLeaders.cam-op[data-sport]:not(#cam-op) .ae-sport-takes-group > .ae-football-leaders-more { display:none!important; }
 
-  /* La lista: sin carrusel, filas a todo el ancho. */
+  /* La lista: sin carrusel, una tarjeta debajo de otra (la misma de «Últimos Takes»). */
   html body #mainContent #aeSportTakeLeaders.cam-op[data-sport]:not(#cam-op) .ae-sport-takes-group > ol.ae-sport-takes-list {
-    display:block!important;
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    align-content:start!important;
+    gap:10px!important;
     flex:1 1 auto!important;
     width:auto!important;
     min-width:0!important;
@@ -621,7 +634,7 @@
     min-height:0!important;
     max-height:none!important;
     margin:0!important;
-    padding:4px 18px 6px!important;
+    padding:12px!important;
     overflow:visible!important;
     border:0!important;
     border-radius:0!important;
@@ -632,6 +645,9 @@
     -webkit-mask-image:none!important;
     mask-image:none!important;
   }
+  @media(max-width:760px){
+    html body #mainContent #aeSportTakeLeaders.cam-op[data-sport]:not(#cam-op) .ae-sport-takes-group > ol.ae-sport-takes-list { padding:8px!important; }
+  }
   html body #mainContent #aeSportTakeLeaders.cam-op[data-sport]:not(#cam-op) .ae-sport-takes-group > ol.ae-sport-takes-list::before,
   html body #mainContent #aeSportTakeLeaders.cam-op[data-sport]:not(#cam-op) .ae-sport-takes-group > ol.ae-sport-takes-list::after { content:none!important; display:none!important; }
   html body #mainContent #aeSportTakeLeaders.cam-op[data-sport]:not(#cam-op) ol.ae-sport-takes-list :where(*) {
@@ -639,137 +655,31 @@
     text-shadow:none!important;
   }
   html body #mainContent #aeSportTakeLeaders.cam-op[data-sport]:not(#cam-op) ol.ae-sport-takes-list > .cam-op-row {
-    display:grid!important;
-    grid-template-columns:30px minmax(0,1fr) auto!important;
-    align-items:center!important;
-    gap:12px!important;
+    display:flex!important;
     box-sizing:border-box!important;
     width:100%!important;
     min-width:0!important;
     height:auto!important;
-    min-height:68px!important;
+    min-height:0!important;
     margin:0!important;
-    padding:12px 0!important;
+    padding:0!important;
     border:0!important;
-    border-top:1px solid var(--op-line)!important;
     border-radius:0!important;
     background:transparent!important;
     box-shadow:none!important;
     flex:none!important;
-    cursor:pointer!important;
     scroll-snap-align:none!important;
   }
-  html body #mainContent #aeSportTakeLeaders.cam-op[data-sport]:not(#cam-op) ol.ae-sport-takes-list > .cam-op-row:first-child { border-top:0!important; }
   html body #mainContent #aeSportTakeLeaders.cam-op[data-sport]:not(#cam-op) ol.ae-sport-takes-list:not([data-expanded="true"]) > .cam-op-extra { display:none!important; }
   html body #mainContent #aeSportTakeLeaders.cam-op[data-sport]:not(#cam-op) ol.ae-sport-takes-list > .cam-op-row::before,
   html body #mainContent #aeSportTakeLeaders.cam-op[data-sport]:not(#cam-op) ol.ae-sport-takes-list > .cam-op-row::after { content:none!important; display:none!important; }
-  html body #mainContent #aeSportTakeLeaders.cam-op[data-sport]:not(#cam-op) .cam-op-rank {
-    margin:0!important;
-    color:var(--op-rank)!important;
-    font:600 21px/1 "Playfair Display",Georgia,serif!important;
-    font-variant-numeric:lining-nums tabular-nums!important;
-    text-align:left!important;
-  }
-  html body #mainContent #aeSportTakeLeaders.cam-op[data-sport]:not(#cam-op) .cam-op-main {
-    display:grid!important;
-    gap:3px!important;
-    min-width:0!important;
-    margin:0!important;
-    padding:0!important;
-  }
-  html body #mainContent #aeSportTakeLeaders.cam-op[data-sport]:not(#cam-op) .cam-op-title {
-    display:-webkit-box!important;
-    -webkit-box-orient:vertical!important;
-    -webkit-line-clamp:2!important;
-    min-height:0!important;
-    margin:0!important;
-    padding:1px 0!important;
-    overflow:hidden!important;
-    border:0!important;
-    background:transparent!important;
-    box-shadow:none!important;
-    color:var(--op-ink)!important;
-    font:600 16px/1.25 "Playfair Display",Georgia,serif!important;
-    font-variant-numeric:lining-nums!important;
-    text-align:left!important;
-    text-decoration:none!important;
-    text-transform:none!important;
-    overflow-wrap:anywhere!important;
-    cursor:pointer!important;
-  }
-  html body #mainContent #aeSportTakeLeaders.cam-op[data-sport]:not(#cam-op) .cam-op-title::after,
-  html body #mainContent #aeSportTakeLeaders.cam-op[data-sport]:not(#cam-op) .cam-op-title::before { content:none!important; display:none!important; }
-  html body #mainContent #aeSportTakeLeaders.cam-op[data-sport]:not(#cam-op) .cam-op-title:hover { text-decoration:underline!important; text-decoration-thickness:1px!important; text-underline-offset:3px!important; }
-  html body #mainContent #aeSportTakeLeaders.cam-op[data-sport]:not(#cam-op) .cam-op-meta {
-    display:flex!important;
-    align-items:center!important;
-    gap:6px!important;
-    min-width:0!important;
-    margin:0!important;
-    padding:0!important;
-    overflow:hidden!important;
-    color:var(--op-muted)!important;
-    font:500 12px/1.3 Inter,system-ui,sans-serif!important;
-    white-space:nowrap!important;
-  }
-  html body #mainContent #aeSportTakeLeaders.cam-op[data-sport]:not(#cam-op) .cam-op-author {
-    flex:0 0 auto!important;
-    min-width:0!important;
-    max-width:65%!important;
-    min-height:0!important;
-    margin:0!important;
-    padding:2px 0!important;
-    overflow:hidden!important;
-    border:0!important;
-    background:transparent!important;
-    box-shadow:none!important;
-    color:var(--op-accent)!important;
-    font:600 12px/1.3 Inter,system-ui,sans-serif!important;
-    text-decoration:none!important;
-    text-overflow:ellipsis!important;
-    text-transform:none!important;
-    cursor:pointer!important;
-  }
-  html body #mainContent #aeSportTakeLeaders.cam-op[data-sport]:not(#cam-op) .cam-op-author:disabled { cursor:default!important; }
-  html body #mainContent #aeSportTakeLeaders.cam-op[data-sport]:not(#cam-op) .cam-op-competition {
-    flex:0 1 auto!important;
-    white-space:nowrap!important;
-    min-width:0!important;
-    overflow:hidden!important;
-    text-overflow:ellipsis!important;
-  }
-  html body #mainContent #aeSportTakeLeaders.cam-op[data-sport]:not(#cam-op) .cam-op-competition::before {
-    content:"·"!important;
-    margin:0 6px 0 0!important;
-  }
-  /* Balance de votos: flecha + número, con el color como ayuda (no como único aviso). */
-  html body #mainContent #aeSportTakeLeaders.cam-op[data-sport]:not(#cam-op) .cam-op-score {
-    display:inline-flex!important;
-    align-items:center!important;
-    justify-content:center!important;
-    gap:5px!important;
-    min-width:52px!important;
-    height:34px!important;
-    margin:0!important;
-    padding:0 10px!important;
-    box-sizing:border-box!important;
-    border-radius:999px!important;
-    background:var(--op-up-soft)!important;
-    color:var(--op-up)!important;
-  }
-  html body #mainContent #aeSportTakeLeaders.cam-op[data-sport]:not(#cam-op) .cam-op-score[data-trend="down"] {
-    background:var(--op-down-soft)!important;
-    color:var(--op-down)!important;
-  }
-  html body #mainContent #aeSportTakeLeaders.cam-op[data-sport]:not(#cam-op) .cam-op-score-arrow { font:600 10px/1 Inter,system-ui,sans-serif!important; }
-  html body #mainContent #aeSportTakeLeaders.cam-op[data-sport]:not(#cam-op) .cam-op-score-value { font:700 16px/1 Inter,system-ui,sans-serif!important; font-variant-numeric:tabular-nums!important; color:inherit!important; }
   html body #mainContent #aeSportTakeLeaders.cam-op[data-sport]:not(#cam-op) ol.ae-sport-takes-list > .cam-op-empty {
     display:grid!important;
     place-items:center!important;
     box-sizing:border-box!important;
     width:100%!important;
     min-height:68px!important;
-    margin:10px 0 8px!important;
+    margin:0!important;
     padding:14px 16px!important;
     border:1px dashed var(--op-line-strong)!important;
     border-radius:14px!important;
@@ -796,7 +706,7 @@
     cursor:pointer!important;
   }
   html body #mainContent #aeSportTakeLeaders.cam-op[data-sport]:not(#cam-op) .cam-op-more[hidden] { display:none!important; }
-  html body #mainContent #aeSportTakeLeaders.cam-op[data-sport]:not(#cam-op) :is(.cam-op-title,.cam-op-author,.cam-op-more):focus-visible {
+  html body #mainContent #aeSportTakeLeaders.cam-op[data-sport]:not(#cam-op) .cam-op-more:focus-visible {
     outline:2px solid var(--op-accent)!important;
     outline-offset:2px!important;
   }

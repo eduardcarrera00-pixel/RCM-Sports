@@ -32,6 +32,11 @@ html body #mainContent #footballTakes #communityPicks {
   --pk-odds-bg: #f3ebdd;
   --pk-odds-line: #d7cbb9;
   --pk-odds-ink: #0a3268;
+  /* Momio del feed (10 nov 2026): cian neón apagado, a partir de #22D3EE. Texto
+     #0a6578 sobre su fondo ≈ 6,1:1 de día; #6fd8e8 ≈ 7,1:1 de noche. */
+  --pk-momio-ink: #0a6578;
+  --pk-momio-bg: rgba(34, 211, 238, .1);
+  --pk-momio-line: rgba(14, 116, 144, .45);
   --pk-serif: Newsreader, Georgia, "Times New Roman", serif;
   --pk-sans: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
 }
@@ -50,6 +55,9 @@ html.dark body #mainContent #footballTakes #communityPicks {
   --pk-odds-bg: #0b2233;
   --pk-odds-line: #52616a;
   --pk-odds-ink: #e8bf79;
+  --pk-momio-ink: #6fd8e8;
+  --pk-momio-bg: rgba(34, 211, 238, .1);
+  --pk-momio-line: rgba(34, 211, 238, .45);
 }
 
 /* ---------- el marco de la sección desaparece en Picks › Picks ---------- */
@@ -336,20 +344,21 @@ html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-more > sum
 }
 html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-more > summary::-webkit-details-marker { display: none !important; }
 html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-more > .cam-pk-legs { margin-top: 10px !important; }
-/* Momio en su recuadro (9 nov, pedido del dueño), con los colores de los banners:
-   marfil y azul de título de día, azul noche y dorado de noche. */
+/* Momio en su recuadro (9 nov, pedido del dueño). Desde el 10 nov, en cian suave:
+   texto, borde y un fondo muy tenue del mismo tono, de día y de noche. Solo el
+   momio del feed; el título «Últimos Picks» sigue con los colores de los banners. */
 html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-odds {
   display: block !important;
   margin: 0 !important;
   padding: 5px 11px !important;
-  background: var(--pk-odds-bg) !important;
-  border: 1px solid var(--pk-odds-line) !important;
+  background: var(--pk-momio-bg) !important;
+  border: 1px solid var(--pk-momio-line) !important;
   border-radius: 8px !important;
   box-shadow: none !important;
   font: 700 18px/1.2 var(--pk-sans) !important;
   font-variant-numeric: tabular-nums !important;
   letter-spacing: -.01em !important;
-  color: var(--pk-odds-ink) !important;
+  color: var(--pk-momio-ink) !important;
   text-align: center !important;
   white-space: nowrap !important;
 }

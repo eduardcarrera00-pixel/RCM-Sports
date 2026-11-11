@@ -1,7 +1,7 @@
 /* CAM SPORTS · Inicio: lectura y comunidad, 9 nov 2026.
    Una noticia principal y dos secundarias; la próxima cita de cada quiniela;
    un carrusel de Takes compartido por Recientes, Populares e Impopulares.
-   Atajos opcionales en un desplegable. Se reutilizan los listados originales,
+   Atajos opcionales («Comparte tu sabiduría») en un desplegable. Se reutilizan los listados originales,
    sus conversaciones y sus votos; vuelven a su sitio al salir de Inicio.
    Los calendarios y sus contadores siguen completos. Se conservan la caché de
    cinco minutos y las consultas públicas existentes, sin temporizadores. */
@@ -116,7 +116,9 @@
   const today = el('p', '', 'cam-hj-date');
   head.append(title, today);
 
-  const shortcuts = el('nav', null, 'cam-hj-shortcuts', { 'aria-label': 'Atajos' });
+  // 10 nov 2026: el bloque de atajos se titula «Comparte tu sabiduría» (igual que el carril de cam-escritorio.js).
+  const SHORTCUTS_TITLE = 'Comparte tu sabiduría';
+  const shortcuts = el('nav', null, 'cam-hj-shortcuts', { 'aria-label': SHORTCUTS_TITLE });
   function shortcut(label, icon, action, extra) {
     const b = el('button', null, 'cam-hj-shortcut', { type: 'button' });
     b.append(icon);
@@ -167,7 +169,7 @@
   };
   // La lectura abre Inicio. Los partidos y la comunidad se descubren después.
   const shortcutDisclosure = el('details', null, 'cam-hj-shortcuts-disclosure');
-  shortcutDisclosure.append(el('summary', 'Atajos', 'cam-desk-rail-toggle'), shortcuts);
+  shortcutDisclosure.append(el('summary', SHORTCUTS_TITLE, 'cam-desk-rail-toggle'), shortcuts);
   root.append(head, shortcutDisclosure, rows.news.section, rows.jornada.section, rows.takes.section);
 
   // Los tres tipos de Takes permanecen visibles, sin cambiar de pestaña.

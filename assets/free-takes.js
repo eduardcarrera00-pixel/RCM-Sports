@@ -7,11 +7,15 @@
  let replyCounts = null;
  let footballVisibleCount=20;
  const footballSports=new Set(['football','laliga','premier','ligamx','champions']);
- // Tarjeta rápida (3 nov 2026): votar y responder sin salir de «Últimos Takes».
- // openReply = id del Take con el cuadro de respuesta abierto; drafts guarda lo escrito
- // para que una recarga (p. ej. tras iniciar sesión) no lo borre.
+ // Tarjeta rápida (3 nov 2026): votar y responder sin salir de la lista.
+ // Desde el 10 nov 2026 la misma tarjeta sirve a «Últimos Takes» (scope 'feed') y a
+ // «Takes populares / impopulares» ('up' / 'down', ae-sport-top-takes.js). Un Take
+ // puede estar en dos listas: `known` guarda un único objeto por Take y cada voto o
+ // respuesta repinta todas sus tarjetas. openReply, drafts y notes van por tarjeta
+ // (scope:id) para que una recarga (p. ej. tras iniciar sesión) no borre lo escrito.
  let openReply=null;
- const drafts=new Map(), notes=new Map(), pendingVotes=new Set(), posting=new Set();
+ const drafts=new Map(), notes=new Map(), pendingVotes=new Set(), posting=new Set(), known=new Map();
+ const keyOf=(scope,t)=>scope+':'+String(t.id);
  const SVG={
    up:'<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5.5 5 13.5h4.4V19h5.2v-5.5H19z"/></svg>',
    down:'<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 18.5 19 10.5h-4.4V5H9.4v5.5H5z"/></svg>',
@@ -61,28 +65,40 @@
      .sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)||String(b.id||'').localeCompare(String(a.id||'')));
  }
  function latestTakes(){return sortedSectionTakes().slice(0,footballVisibleCount);}
- function replyCount(t){return replyCounts?.get(String(t.id))??(replyCounts?0:null);}
+ const cardsOf=t=>[...document.querySelectorAll('article.cam-tk[data-take-id="'+cssId(String(t.id))+'"]')];
+ const cardAt=(scope,t)=>cardsOf(t).find(card=>card.dataset.camTkScope===scope)||null;
+ // null = todavía no se sabe (o falló la consulta): se ve el icono sin número.
+ function replyCount(t){const id=String(t.id);return replyCounts?.has(id)?replyCounts.get(id):null;}
  function showReplyCount(reply,t){
    if(!reply)return;
    const count=replyCount(t);
    const badge=reply.querySelector('.ae-take-reply-count');
    badge.textContent=count===null?'':String(count);
-   badge.hidden=!count;
+   badge.hidden=count===null;
    reply.setAttribute('aria-label','Responder al Take: '+t.title+'. '+(count===null?'Número de respuestas no disponible':count+' '+(count===1?'respuesta':'respuestas')));
    const link=reply.closest('article')?.querySelector('.cam-tk-quick-open');
    if(link)link.textContent=count?'Ver conversación ('+count+') ›':'Ver conversación ›';
  }
+ // Una sola consulta por carga, como antes: los Takes visibles de «Últimos Takes» y,
+ // si caben, los de populares/impopulares que no estén ya entre ellos. La consulta
+ // admite 30 identificadores; solo se piden los que aún no tienen número.
+ const REPLY_COUNT_LIMIT=30;
  async function loadReplyCounts(seq){
    const takes=latestTakes();
-   if(!takes.length)return;
+   const section=items.filter(t=>activeSection==='NFL'?t.sport==='nfl':footballSports.has(t.sport));
+   const top=window.aeSportTopTakes?.rank?.(section);
+   const wanted=[...new Set([...takes,...(top?[...top.positive,...top.negative]:[])].map(t=>String(t.id)))]
+     .filter(id=>!replyCounts?.has(id)).slice(0,REPLY_COUNT_LIMIT);
+   if(!wanted.length)return;
    try{
-     const result=await db.rpc('ae_public_take_reply_counts',{p_take_ids:takes.map(t=>t.id)});
+     const result=await db.rpc('ae_public_take_reply_counts',{p_take_ids:wanted});
      if(seq!==request)return;
      if(result.error)throw result.error;
-     replyCounts=new Map((result.data||[]).map(r=>[String(r.take_id),Math.max(0,Number(r.reply_count)||0)]));
-     const byId=new Map(takes.map(t=>[String(t.id),t]));
-     $('freeTakesFeed')?.querySelectorAll('article[data-take-id]').forEach(card=>{
-       const take=byId.get(card.dataset.takeId);
+     replyCounts=replyCounts||new Map();
+     for(const id of wanted)replyCounts.set(id,0);
+     for(const r of result.data||[])replyCounts.set(String(r.take_id),Math.max(0,Number(r.reply_count)||0));
+     document.querySelectorAll('article.cam-tk[data-take-id]').forEach(card=>{
+       const take=known.get(card.dataset.takeId);
        if(take)showReplyCount(card.querySelector('.cam-tk-reply'),take);
      });
    }catch(_){
@@ -113,28 +129,39 @@
    // Fútbol y NFL comparten la misma tarjeta: Take, extracto, votos y respuesta rápida.
    for(const t of sorted)area.append(buildCard(t));
  }
- function buildCard(t){
+ // Mismo objeto para todas las tarjetas de un Take. Si otra lista trae datos más
+ // nuevos del mismo Take (los populares se vuelven a pedir tras cada voto), sus
+ // números pasan al objeto compartido y se repintan las demás tarjetas.
+ function adopt(t){
+   const id=String(t.id),mine=known.get(id);
+   if(!mine||mine===t){known.set(id,t);return t;}
+   if(pendingVotes.has(id))return mine;
+   const n=v=>Number(v)||0;
+   if(n(mine.upvotes)!==n(t.upvotes)||n(mine.downvotes)!==n(t.downvotes)||n(mine.my_vote)!==n(t.my_vote)){
+     mine.upvotes=t.upvotes;mine.downvotes=t.downvotes;mine.my_vote=t.my_vote;
+     queueMicrotask(()=>replaceCards(mine));
+   }
+   return mine;
+ }
+ // scope: 'feed' (Últimos Takes), 'up' (populares) o 'down' (impopulares).
+ function buildCard(source,scope='feed'){
+   const t=adopt(source);
    const own=isOwn(t);
-   const id=String(t.id);
+   const id=String(t.id),key=keyOf(scope,t);
    const card=el('article',null,'ae-free-take-card cam-tk');
    card.dataset.takeId=id;
+   card.dataset.camTkScope=scope;
    // Acento basado exclusivamente en el deporte real; no altera contenido ni votos.
    card.dataset.sport=Object.prototype.hasOwnProperty.call(sports,t.sport)?t.sport:'general';
 
-   // Autor y fecha arriba, como una publicación; compartir a la derecha.
+   // Arriba: competición y fecha; compartir a la derecha.
    const top=el('div',null,'cam-tk-top');
    const name=String(t.author||'Aficionado').replace(/^@+/,'');
-   const avatar=el('span',name.charAt(0).toUpperCase()||'A','cam-tk-avatar');
-   avatar.setAttribute('aria-hidden','true');
-   const author=button('@'+name,()=>{
-     if(typeof openAePublicProfile==='function'&&t.author_id)openAePublicProfile(t.author_id);
-   },'ae-take-author-link cam-tk-author');
-   author.setAttribute('aria-label','Ver perfil y Takes de '+name);
-   author.dataset.camAuthorId=String(t.author_id||'');
+   const label=el('p',kicker(t),'cam-tk-kicker');
    const when=new Date(t.created_at);
    const date=el('time',Number.isNaN(when.getTime())?'':when.toLocaleDateString('es',{day:'numeric',month:'short'}),'ae-take-date cam-tk-date');
    date.dateTime=t.created_at||'';
-   top.append(avatar,author,date);
+   top.append(label,date);
    // Botón pequeño para compartir el Take como ficha «La cita».
    if(window.CamPickShare&&t.author_id){
      const share=button(null,()=>window.CamPickShare.open(t,{kind:'take',opener:share}),'cam-take-share-mini cam-tk-share');
@@ -144,24 +171,39 @@
      top.append(share);
    }
 
-   const label=el('p',kicker(t),'cam-tk-kicker');
    const heading=el('h3',undefined,'cam-tk-title');
    const openTake=button(t.title,()=>window.aeTakeReplies?.open(t),'cam-tk-open');
    openTake.setAttribute('aria-label','Leer Take y abrir conversación: '+t.title);
    heading.append(openTake);
    const preview=splitNflContext(t).text;
-   card.append(top,label,heading);
+   card.append(top,heading);
    if(preview)card.append(el('p',preview,'cam-tk-excerpt'));
 
-   // Acciones: votar arriba/abajo y responder, siempre visibles en la tarjeta.
+   // Pie: autor abajo a la izquierda; a la derecha, comentarios y votos ▲ n | ▼ n.
    const actions=el('div',null,'cam-tk-actions');
+   const by=el('div',null,'cam-tk-by');
+   const avatar=el('span',name.charAt(0).toUpperCase()||'A','cam-tk-avatar');
+   avatar.setAttribute('aria-hidden','true');
+   const author=button('@'+name,()=>{
+     if(typeof openAePublicProfile==='function'&&t.author_id)openAePublicProfile(t.author_id);
+   },'ae-take-author-link cam-tk-author');
+   author.setAttribute('aria-label','Ver perfil y Takes de '+name);
+   author.dataset.camAuthorId=String(t.author_id||'');
+   by.append(avatar,author);
+   const tools=el('div',null,'cam-tk-tools');
+   const reply=button(null,()=>toggleQuick(t,scope),'ae-take-reply-link cam-football-replies cam-tk-reply');
+   reply.innerHTML=SVG.reply;
+   reply.append(el('span',null,'ae-take-reply-count'));
+   reply.title='Responder';
+   reply.setAttribute('aria-expanded',String(openReply===key));
+   reply.setAttribute('aria-controls','camTkQuick-'+scope+'-'+id);
    const votes=el('div',null,'cam-tk-vote');
    votes.setAttribute('role','group');
    votes.setAttribute('aria-label','Votar este Take');
    const pending=pendingVotes.has(id);
    for(const [val,count] of [[1,t.upvotes],[-1,t.downvotes]]){
      const n=Math.max(0,Number(count)||0);
-     const b=button(null,()=>vote(t,val),'cam-football-vote cam-tk-vote-btn');
+     const b=button(null,()=>vote(t,val,scope),'cam-football-vote cam-tk-vote-btn');
      b.dataset.vote=val===1?'up':'down';
      b.innerHTML=val===1?SVG.up:SVG.down;
      b.append(el('span',String(n),'cam-football-vote-count'));
@@ -171,22 +213,23 @@
      b.title=own?'No puedes votar tu propio Take':(val===1?'Apoyar':'Cuestionar');
      votes.append(b);
    }
-   const reply=button(null,()=>toggleQuick(t),'ae-take-reply-link cam-football-replies cam-tk-reply');
-   reply.innerHTML=SVG.reply;
-   reply.append(el('span','Responder','cam-tk-reply-label'),el('span',null,'ae-take-reply-count'));
-   reply.setAttribute('aria-expanded',String(openReply===id));
-   reply.setAttribute('aria-controls','camTkQuick-'+id);
-   showReplyCount(reply,t);
-   actions.append(votes,reply);
+   tools.append(reply,votes);
+   actions.append(by,tools);
    if(typeof currentAdmin!=='undefined'&&currentAdmin)actions.append(button('Ocultar',async()=>{
-     if(!confirm('¿Ocultar este Take?'))return;try{const r=await db.rpc('ae_hide_free_take',{p_take_id:t.id});if(r.error)throw r.error;await load();}catch(e){status(e.message||'No se pudo ocultar.');}
+     if(!confirm('¿Ocultar este Take?'))return;
+     try{
+       const r=await db.rpc('ae_hide_free_take',{p_take_id:t.id});if(r.error)throw r.error;
+       await load();
+       // Las listas de populares e impopulares se actualizan con su propia consulta.
+       document.dispatchEvent(new CustomEvent('ae:takes-updated',{detail:{source:'feed',takeId:id}}));
+     }catch(e){status(e.message||'No se pudo ocultar.');}
    },'ae-take-minor cam-tk-hide'));
    card.append(actions);
 
    // Respuesta rápida dentro del cuadro.
    const form=el('form',null,'cam-tk-quick');
-   form.id='camTkQuick-'+id;
-   form.hidden=openReply!==id;
+   form.id='camTkQuick-'+scope+'-'+id;
+   form.hidden=openReply!==key;
    form.noValidate=true;
    const field=el('textarea',null,'cam-tk-quick-text');
    field.name='body';
@@ -194,23 +237,26 @@
    field.maxLength=900;
    field.placeholder='Responde a @'+name+'…';
    field.setAttribute('aria-label','Tu respuesta al Take: '+t.title);
-   field.value=drafts.get(id)||'';
-   field.addEventListener('input',()=>{drafts.set(id,field.value);grow(field);});
+   field.value=drafts.get(key)||'';
+   field.addEventListener('input',()=>{drafts.set(key,field.value);grow(field);});
    field.addEventListener('keydown',event=>{
      if(event.key==='Enter'&&(event.metaKey||event.ctrlKey)){event.preventDefault();form.requestSubmit?.();}
-     if(event.key==='Escape'){event.preventDefault();closeQuick(t);}
+     if(event.key==='Escape'){event.preventDefault();closeQuick(t,scope);}
    });
    const row=el('div',null,'cam-tk-quick-row');
    const full=button(null,()=>window.aeTakeReplies?.open(t),'cam-tk-quick-open');
-   const cancel=button('Cancelar',()=>closeQuick(t),'cam-tk-quick-cancel');
+   const cancel=button('Cancelar',()=>closeQuick(t,scope),'cam-tk-quick-cancel');
    const send=el('button',posting.has(id)?'Publicando…':'Publicar','cam-tk-quick-send');
    send.type='submit';
    send.disabled=posting.has(id);
-   row.append(full,cancel,send);
+   // Cancelar y Publicar van juntos: en tarjetas estrechas bajan a su propia línea.
+   const buttons=el('span',null,'cam-tk-quick-buttons');
+   buttons.append(cancel,send);
+   row.append(full,buttons);
    form.append(field,row);
-   form.addEventListener('submit',event=>{event.preventDefault();postQuick(t,form);});
+   form.addEventListener('submit',event=>{event.preventDefault();postQuick(t,scope,form);});
    card.append(form);
-   const note=el('p',notes.get(id)||'','cam-tk-note');
+   const note=el('p',notes.get(key)||'','cam-tk-note');
    note.setAttribute('role','status');
    note.setAttribute('aria-live','polite');
    card.append(note);
@@ -229,34 +275,49 @@
    field.style.height='auto';
    field.style.height=Math.min(field.scrollHeight+2,140)+'px';
  }
- function replaceCard(t,focusSelector){
-   const area=$('freeTakesFeed');
-   const old=area?.querySelector('article[data-take-id="'+cssId(String(t.id))+'"]');
-   if(!old)return null;
-   const fresh=buildCard(t);
-   old.replaceWith(fresh);
-   if(focusSelector)fresh.querySelector(focusSelector)?.focus({preventScroll:true});
-   return fresh;
+ // Qué control tenía el foco dentro de una tarjeta, para devolvérselo tras repintarla.
+ function focusedControl(card){
+   const active=document.activeElement;
+   if(!active||!card.contains(active))return '';
+   if(active.dataset.vote)return '[data-vote="'+active.dataset.vote+'"]';
+   for(const cls of ['cam-tk-quick-text','cam-tk-reply','cam-tk-open','cam-tk-author','cam-tk-quick-send','cam-tk-quick-cancel','cam-tk-quick-open','cam-tk-share'])
+     if(active.classList.contains(cls))return '.'+cls;
+   return '';
  }
- function note(t,text){
-   const id=String(t.id);
-   if(text)notes.set(id,text);else notes.delete(id);
-   const n=$('freeTakesFeed')?.querySelector('article[data-take-id="'+cssId(id)+'"] .cam-tk-note');
+ // Repinta todas las tarjetas de un Take; el foco pasa a `focusSelector` en la
+ // tarjeta de `focusScope` o se queda donde estaba.
+ function replaceCards(t,focusScope,focusSelector){
+   let target=null;
+   for(const old of cardsOf(t)){
+     const scope=old.dataset.camTkScope||'feed';
+     const selector=scope===focusScope&&focusSelector?focusSelector:focusedControl(old);
+     const fresh=buildCard(t,scope);
+     old.replaceWith(fresh);
+     if(!fresh.querySelector('.cam-tk-quick').hidden)grow(fresh.querySelector('.cam-tk-quick-text'));
+     if(selector)fresh.querySelector(selector)?.focus({preventScroll:true});
+     if(scope===focusScope)target=fresh;
+   }
+   return target;
+ }
+ function note(t,scope,text){
+   const key=keyOf(scope,t);
+   if(text)notes.set(key,text);else notes.delete(key);
+   const n=cardAt(scope,t)?.querySelector('.cam-tk-note');
    if(n)n.textContent=text||'';
  }
- function openQuick(t){
-   const id=String(t.id);
-   openReply=id;
-   note(t,'');
+ function openQuick(t,scope){
+   const key=keyOf(scope,t);
+   openReply=key;
+   note(t,scope,'');
+   const card=cardAt(scope,t);
    // Cierra cualquier otro cuadro abierto y abre este.
-   $('freeTakesFeed')?.querySelectorAll('.cam-tk-quick:not([hidden])').forEach(form=>{
+   document.querySelectorAll('article.cam-tk .cam-tk-quick:not([hidden])').forEach(form=>{
      const other=form.closest('article');
-     if(other&&other.dataset.takeId!==id){
+     if(other&&other!==card){
        form.hidden=true;
        other.querySelector('.cam-tk-reply')?.setAttribute('aria-expanded','false');
      }
    });
-   const card=$('freeTakesFeed')?.querySelector('article[data-take-id="'+cssId(id)+'"]');
    if(!card)return;
    card.querySelector('.cam-tk-quick').hidden=false;
    card.querySelector('.cam-tk-reply')?.setAttribute('aria-expanded','true');
@@ -266,53 +327,52 @@
    // Que se vean el cuadro y su botón «Publicar», también si la tarjeta está al fondo de la lista.
    card.querySelector('.cam-tk-quick-row')?.scrollIntoView?.({block:'nearest',behavior:'smooth'});
  }
- function closeQuick(t){
-   const id=String(t.id);
-   if(openReply===id)openReply=null;
-   const card=$('freeTakesFeed')?.querySelector('article[data-take-id="'+cssId(id)+'"]');
+ function closeQuick(t,scope){
+   if(openReply===keyOf(scope,t))openReply=null;
+   const card=cardAt(scope,t);
    if(!card)return;
    card.querySelector('.cam-tk-quick').hidden=true;
    const reply=card.querySelector('.cam-tk-reply');
    reply?.setAttribute('aria-expanded','false');
    reply?.focus({preventScroll:true});
  }
- function toggleQuick(t){
-   if(openReply===String(t.id))return closeQuick(t);
+ function toggleQuick(t,scope){
+   if(openReply===keyOf(scope,t))return closeQuick(t,scope);
    // Para responder hace falta una cuenta; después de entrar se vuelve a este cuadro.
-   if(typeof aeRequestPublication==='function')return aeRequestPublication('reply',()=>openQuick(t));
-   requireLogin().then(user=>{if(user)openQuick(t);}).catch(e=>note(t,e.message||'No se pudo comprobar tu sesión.'));
+   if(typeof aeRequestPublication==='function')return aeRequestPublication('reply',()=>openQuick(t,scope));
+   requireLogin().then(user=>{if(user)openQuick(t,scope);}).catch(e=>note(t,scope,e.message||'No se pudo comprobar tu sesión.'));
  }
- async function postQuick(t,form){
-   const id=String(t.id);
+ async function postQuick(t,scope,form){
+   const id=String(t.id),key=keyOf(scope,t);
    if(posting.has(id))return;
    const text=form.elements.body.value.trim();
-   if(text.length<2){note(t,'Escribe al menos dos caracteres.');form.elements.body.focus();return;}
-   if(text.length>900){note(t,'La respuesta debe tener menos de 900 caracteres.');return;}
+   if(text.length<2){note(t,scope,'Escribe al menos dos caracteres.');form.elements.body.focus();return;}
+   if(text.length>900){note(t,scope,'La respuesta debe tener menos de 900 caracteres.');return;}
    try{
      if(typeof db==='undefined'||!db)throw Error('No hay conexión.');
      const session=await db.auth.getUser();
      if(!session.data?.user){
-       drafts.set(id,text);
-       if(typeof aeRequestPublication==='function')await aeRequestPublication('reply',()=>openQuick(t));
+       drafts.set(key,text);
+       if(typeof aeRequestPublication==='function')await aeRequestPublication('reply',()=>openQuick(t,scope));
        else if(typeof openUserAuthModal==='function')openUserAuthModal();
        return;
      }
      posting.add(id);
-     replaceCard(t);
+     replaceCards(t);
      const r=await db.rpc('ae_post_take_reply',{p_take_id:t.id,p_body:text,p_parent_id:null});
      if(r.error)throw r.error;
-     drafts.delete(id);
-     if(openReply===id)openReply=null;
-     if(replyCounts)replyCounts.set(id,(replyCounts.get(id)||0)+1);
-     notes.set(id,'Respuesta publicada ✓');
+     drafts.delete(key);
+     if(openReply===key)openReply=null;
+     if(replyCounts?.has(id))replyCounts.set(id,replyCounts.get(id)+1);
+     notes.set(key,'Respuesta publicada ✓');
      posting.delete(id);
-     replaceCard(t,'.cam-tk-reply');
-     setTimeout(()=>{if(notes.get(id)==='Respuesta publicada ✓')note(t,'');},6000);
+     replaceCards(t,scope,'.cam-tk-reply');
+     setTimeout(()=>{if(notes.get(key)==='Respuesta publicada ✓')note(t,scope,'');},6000);
      document.dispatchEvent(new CustomEvent('ae:takes-updated',{detail:{source:'feed',takeId:id}}));
    }catch(e){
      posting.delete(id);
-     notes.set(id,'No se pudo publicar la respuesta. '+(e.message||''));
-     replaceCard(t,'.cam-tk-quick-text');
+     notes.set(key,'No se pudo publicar la respuesta. '+(e.message||''));
+     replaceCards(t,scope,'.cam-tk-quick-text');
    }finally{
      posting.delete(id);
    }
@@ -337,7 +397,9 @@
      if(r.error)throw r.error;
      viewerId=viewer.data?.user?.id||null;
      items=r.data||[];
+     for(const t of items)known.set(String(t.id),t);
      render();
+     refreshOtherLists();
      await loadReplyCounts(seq);
    } catch(e) {
      if(seq!==request)return;
@@ -355,19 +417,19 @@
    if(next===-1)t.downvotes=(Number(t.downvotes)||0)+1;
    t.my_vote=next||null;
  }
- async function vote(t,value){
+ async function vote(t,value,scope='feed'){
    const id=String(t.id);
    if(busy||pendingVotes.has(id))return;
    const focus='[data-vote="'+(value===1?'up':'down')+'"]';
    try{
      const user=await requireLogin();if(!user)return;
-     if(String(user.id)===String(t.author_id)){note(t,'No puedes votar tu propio Take.');return;}
+     if(String(user.id)===String(t.author_id)){note(t,scope,'No puedes votar tu propio Take.');return;}
      const prev=Number(t.my_vote)||0;
      const expected=prev===value?0:value;
      pendingVotes.add(id);
      applyVote(t,expected);
-     note(t,'');
-     replaceCard(t,focus);
+     note(t,scope,'');
+     replaceCards(t,scope,focus);
      try{
        const r=await db.rpc('ae_vote_free_take',{p_take_id:t.id,p_value:value});
        if(r.error)throw r.error;
@@ -376,14 +438,44 @@
        if(saved!==expected)applyVote(t,saved);
      }catch(e){
        applyVote(t,prev);
-       notes.set(id,'No se pudo guardar tu voto. '+(e.message||''));
+       notes.set(keyOf(scope,t),'No se pudo guardar tu voto. '+(e.message||''));
      }
      pendingVotes.delete(id);
-     replaceCard(t,focus);
+     replaceCards(t,scope,focus);
      document.dispatchEvent(new CustomEvent('ae:takes-updated',{detail:{source:'feed',takeId:id}}));
-   }catch(e){note(t,e.message||'No se pudo votar.');}
+   }catch(e){note(t,scope,e.message||'No se pudo votar.');}
    finally{pendingVotes.delete(id);}
  }
+ // Tarjetas de populares/impopulares: se repintan cuando «Últimos Takes» vuelve a
+ // cargar (p. ej. al iniciar sesión), para que sepan quién mira y qué votó.
+ function refreshOtherLists(){
+   document.querySelectorAll('article.cam-tk[data-take-id]:not([data-cam-tk-scope="feed"])').forEach(card=>{
+     const take=known.get(card.dataset.takeId);
+     if(!take)return;
+     const selector=focusedControl(card);
+     const fresh=buildCard(take,card.dataset.camTkScope);
+     card.replaceWith(fresh);
+     if(!fresh.querySelector('.cam-tk-quick').hidden)grow(fresh.querySelector('.cam-tk-quick-text'));
+     if(selector)fresh.querySelector(selector)?.focus({preventScroll:true});
+   });
+ }
+ // Lo usa ae-sport-top-takes.js para pintar populares e impopulares con esta tarjeta.
+ window.aeTakeCards=Object.freeze({
+   build:(take,scope)=>buildCard(take,scope==='up'||scope==='down'?scope:'feed'),
+   // Devuelve una función que restaura el foco tras volver a pintar `container`.
+   keepFocus(container){
+     const card=document.activeElement?.closest?.('article.cam-tk');
+     if(!card||!container.contains(card))return()=>{};
+     const id=card.dataset.takeId,selector=focusedControl(card);
+     return()=>{
+       if(!selector)return;
+       const fresh=[...container.querySelectorAll('article.cam-tk')].find(c=>c.dataset.takeId===id);
+       const quick=fresh?.querySelector('.cam-tk-quick');
+       if(quick&&!quick.hidden)grow(fresh.querySelector('.cam-tk-quick-text'));
+       fresh?.querySelector(selector)?.focus({preventScroll:true});
+     };
+   }
+ });
  async function create(e){
    e.preventDefault();if(busy)return;
    const form=e.currentTarget,send=form.querySelector('button[type="submit"]');

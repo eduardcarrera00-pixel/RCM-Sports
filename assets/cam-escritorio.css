@@ -196,6 +196,11 @@
     html body[data-cam-desk] #camHomeJornada > #camDeskRail { margin: 0 !important; }
     html body[data-cam-desk] #camDeskRail *,
     html body[data-cam-desk] #camDeskAside * { box-sizing: border-box !important; border-radius: 0 !important; }
+    /* La tarjeta de Take es la misma que en «Últimos Takes» (10 nov 2026): dentro del
+       carril conserva la inicial en círculo y sus píldoras; los paneles siguen rectos. */
+    html body[data-cam-desk] #camDeskAside article.cam-tk :is(.cam-tk-avatar, .cam-tk-share) { border-radius: 50% !important; }
+    html body[data-cam-desk] #camDeskAside article.cam-tk :is(.cam-tk-vote, .cam-tk-reply, .cam-tk-quick-send) { border-radius: 999px !important; }
+    html body[data-cam-desk] #camDeskAside article.cam-tk .cam-tk-quick-text { border-radius: 14px !important; }
     html body[data-cam-desk] #camDeskRail .cam-desk-rail-title {
       position: absolute !important;
       width: 1px !important; height: 1px !important;

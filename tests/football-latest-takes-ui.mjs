@@ -64,7 +64,11 @@ assert.equal(own.querySelector('.ae-take-reply-count').textContent,'3');
 assert.equal(other.querySelector('.ae-take-reply-count').textContent,'3');
 assert.equal(own.querySelectorAll('.cam-football-replies').length,1);
 assert.equal(other.querySelectorAll('.cam-football-replies').length,1);
-// «Responder» abre el cuadro de respuesta dentro de la tarjeta (no la conversación).
+// 10 nov 2026: autor en el pie (izquierda) y, a la derecha, comentarios (icono y número) antes de los votos.
+assert.equal(other.querySelector('.cam-tk-actions > .cam-tk-by > .ae-take-author-link').textContent,'@autor1');
+assert.deepEqual([...other.querySelector('.cam-tk-actions > .cam-tk-tools').children].map(n=>n.className.split(' ').pop()),['cam-tk-reply','cam-tk-vote']);
+assert.equal(other.querySelector('.cam-football-replies').textContent,'3','Comments show the icon and the number only');
+// El icono de comentarios abre el cuadro de respuesta dentro de la tarjeta (no la conversación).
 own.querySelector('.cam-football-replies').click();
 await tick();
 assert.equal(replies.length,0,'Reply stays inside the card');
@@ -92,7 +96,7 @@ assert.equal(d.getElementById('freeTakesMore').hidden,true,'Pagination ends only
 w.currentCategory='NFL';w.renderFreeTakesVisibility();await tick();
 assert.equal(d.querySelectorAll('#freeTakesFeed .ae-free-take-card').length,1);
 assert.equal(d.getElementById('freeTakesMore').hidden,true);
-// NFL usa ya la misma tarjeta: votos visibles (el propio Take no se puede votar) y «Responder».
+// NFL usa ya la misma tarjeta: votos visibles (el propio Take no se puede votar) y comentarios.
 assert.equal(d.querySelectorAll('#freeTakesFeed .cam-football-vote').length,2,'NFL shares the Football card');
 assert(voteButtons(d.querySelector('#freeTakesFeed .ae-free-take-card')).every(button=>button.disabled),'NFL self-voting remains forbidden');
 assert.equal(d.querySelectorAll('#freeTakesFeed .cam-tk-actions .ae-take-reply-link').length,1);
