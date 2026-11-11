@@ -65,7 +65,8 @@ await settle();
 w.eval(fs.readFileSync('assets/community-picks.js','utf8'));
 d.dispatchEvent(new w.Event('DOMContentLoaded'));
 await settle();
-assert.equal(d.querySelectorAll('.ae-chefs-classical .ae-chefs-table-cols span').length,8);
+// 11 nov 2026: sin «Por resultados» ni la fila # · AFICIONADO · % acierto · PTS.
+assert.equal(d.querySelectorAll('.ae-chefs-classical .ae-chefs-table-cols').length,0);
 assert.equal(d.querySelectorAll('#cpLeaderboard .ae-cp-leader').length,10);
 assert.equal(d.querySelectorAll('#cpWorstLeaderboard .ae-cp-leader').length,10);
 assert.equal(d.querySelector('#cpLeaderboard .ae-chef-score-points').textContent,'+10.00');

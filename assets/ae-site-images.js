@@ -212,7 +212,13 @@
     // El mármol realista de «¿Eres Chef?» se retira (9 nov 2026): vuelve el gorro de
     // línea. Una imagen nueva subida desde el editor sigue mandando.
     ['picks.marmol-dia', 'picks.marmol-dia-1792782244747.png'],
-    ['picks.marmol-noche', 'picks.marmol-noche-1792723523113.jpg']
+    ['picks.marmol-noche', 'picks.marmol-noche-1792723523113.jpg'],
+    // Las escenas guardadas de Mejores y Peores Chefs se retiran (11 nov 2026): manda
+    // el gorro con check / cruz. Una imagen nueva subida desde el editor sigue mandando.
+    ['picks.chefs-mejores-dia', 'picks.chefs-mejores-dia-1792782271097.png'],
+    ['picks.chefs-mejores-noche', 'picks.chefs-mejores-noche-1792726040230.jpg'],
+    ['picks.chefs-peores-dia', 'picks.chefs-peores-dia-1792782288040.png'],
+    ['picks.chefs-peores-noche', 'picks.chefs-peores-noche-1792726574435.jpg']
   ]);
   // La cabecera de lectores comparte el mismo recorte del mosaico en los dos temas,
   // pero cada tema guarda su propio reemplazo: una foto nocturna no debe oscurecer el
@@ -239,6 +245,14 @@
   slotPair('picks.archivo-noticias', 'Archivo de noticias de Picks', 'Picks', 'picks.archivo-noticias-atlas', '#picksNews .ae-picks-news-heading', stacked.night, stacked.day);
   slotPair('picks.chefs-mejores', 'Cabecera de mejores chefs', 'Picks', 'picks.chefs-mejores-atlas', '.ae-chefs-art-heading', stacked.night, stacked.day);
   slotPair('picks.chefs-peores', 'Cabecera de peores chefs', 'Picks', 'picks.chefs-peores-atlas', '.ae-chefs-art-heading', stacked.night, stacked.day);
+  // Mejores y Peores Chefs (11 nov 2026, pedido del dueño): gorro de chef de línea con
+  // un check o una cruz, como «¿Eres Chef?» y los platos, en vez de las escenas.
+  for (const [base, path] of [
+    ['picks.chefs-mejores', 'assets/cam-banner-best-chef.svg'],
+    ['picks.chefs-peores', 'assets/cam-banner-worst-chef.svg']
+  ]) for (const theme of ['dia', 'noche']) {
+    SLOTS.find(entry => entry.key === base + '-' + theme).bannerOriginalPath = path;
+  }
 
   // Fondos que hasta ahora usaban la MISMA imagen en día y en noche. Al sustituirlos
   // desde el editor con una foto nocturna, el modo día también se oscurecía. Cada tema
@@ -691,7 +705,8 @@
     'assets/cam-home-popular.svg', 'assets/cam-home-unpopular.svg',
     'assets/cam-home-genios.svg', 'assets/cam-home-anoetos.svg', 'assets/cam-home-knowledge-day.svg',
     'assets/cam-banner-best-plate.svg', 'assets/cam-banner-worst-plate.svg',
-    'assets/cam-banner-nfl-news.svg', 'assets/cam-banner-chef-hat.svg'
+    'assets/cam-banner-nfl-news.svg', 'assets/cam-banner-chef-hat.svg',
+    'assets/cam-banner-best-chef.svg', 'assets/cam-banner-worst-chef.svg'
   ];
   function fitBannerArtwork(el, url, focus, crop = null) {
     const vector = vectorBannerPaths.some(path => toURL(path)?.href === url);

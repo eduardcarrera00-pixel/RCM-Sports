@@ -2,8 +2,9 @@
    1) Chefs: Mejores y Peores Chefs encabezan la pestaña; luego Mis grupos. El feed
       de Picks vuelve a vivir solo en Picks › Picks (cam-interface-unificada.css lo
       forzaba a display:flex y se colaba en Chefs e Historial).
-   2) Feed: cada Pick recogido (quién, pronóstico, partido, momio) se despliega al
-      tocarlo (selecciones con su cuota, Liga de Chefs, análisis y «Ver Pick»).
+   2) Feed: cada Pick recogido (quién, pronóstico, partido, momio en azul cielo) se
+      despliega al tocarlo; las combinadas, con «Ver las N selecciones» bajo su
+      resumen (selecciones con su cuota, análisis y «Ver Pick»).
    Colores: los de cam-picks-moderno.css (--pk-*), día y noche. Va al final de
    cam-perf-app-panels.css, en la capa cam-header, para mandar sobre las capas
    anteriores sin tocar sus archivos. */
@@ -28,8 +29,17 @@ html body[data-cam-tabs="picks"][data-cam-tab="chefs"] #mainContent #footballTak
 }
 
 /* ---------- 2 · Picks desplegables ---------- */
+/* Momios en azul cielo (11 nov 2026, pedido del dueño). Contraste ≥ 6:1. */
 html body #mainContent #footballTakes #communityPicks #cpFeed {
   gap: 12px !important;
+  --pk-blue-bg: #e8f3fb;
+  --pk-blue-line: #b5d7ee;
+  --pk-blue-ink: #0b5689;
+}
+html.dark body #mainContent #footballTakes #communityPicks #cpFeed {
+  --pk-blue-bg: rgba(126, 200, 245, .12);
+  --pk-blue-line: rgba(126, 200, 245, .45);
+  --pk-blue-ink: #a3d9f8;
 }
 html body #mainContent #footballTakes #communityPicks #cpFeed > .cp-card.cam-pk.cam-pk-fold {
   position: relative !important;
@@ -173,15 +183,49 @@ html body #mainContent #footballTakes #communityPicks #cpFeed > .cam-pk-fold .ca
   min-width: 64px !important;
   margin: 0 !important;
   padding: 7px 11px !important;
-  background: var(--pk-odds-bg) !important;
-  border: 1px solid var(--pk-odds-line) !important;
+  background: var(--pk-blue-bg) !important;
+  border: 1px solid var(--pk-blue-line) !important;
   border-radius: 10px !important;
   font: 700 18px/1.2 var(--pk-sans) !important;
   font-variant-numeric: tabular-nums !important;
-  color: var(--pk-odds-ink) !important;
+  color: var(--pk-blue-ink) !important;
   text-align: center !important;
   white-space: nowrap !important;
 }
+
+/* combinada: «Ver las N selecciones ⌄» bajo el resumen, abre hacia abajo */
+html body #mainContent #footballTakes #communityPicks #cpFeed > .cam-pk-fold .cam-pk-main button.cam-pk-toggle-combo {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  min-height: 40px !important;
+  width: auto !important;
+  margin: 10px 0 0 !important;
+  padding: 0 12px 0 14px !important;
+  border: 1px solid var(--pk-line) !important;
+  border-radius: 999px !important;
+  background: var(--pk-soft) !important;
+  box-shadow: none !important;
+  font: 600 13px/1 var(--pk-sans) !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--pk-accent) !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+}
+html body #mainContent #footballTakes #communityPicks #cpFeed > .cam-pk-fold .cam-pk-main button.cam-pk-toggle-combo::before,
+html body #mainContent #footballTakes #communityPicks #cpFeed > .cam-pk-fold .cam-pk-main button.cam-pk-toggle-combo::after { content: none !important; display: none !important; }
+html body #mainContent #footballTakes #communityPicks #cpFeed > .cam-pk-fold .cam-pk-main button.cam-pk-toggle-combo:focus-visible {
+  outline: 2px solid var(--pk-accent) !important;
+  outline-offset: 2px !important;
+}
+html body #mainContent #footballTakes #communityPicks #cpFeed > .cam-pk-fold .cam-pk-toggle-combo .cam-pk-chevron {
+  width: 16px !important;
+  height: 16px !important;
+  flex: none !important;
+  transition: transform .25s ease !important;
+}
+html body #mainContent #footballTakes #communityPicks #cpFeed > .cam-pk-fold[data-open="true"] .cam-pk-toggle-combo .cam-pk-chevron { transform: rotate(180deg) !important; }
 
 /* desplegado */
 html body #mainContent #footballTakes #communityPicks #cpFeed > .cam-pk-fold .cam-pk-panel {
@@ -288,35 +332,14 @@ html body #mainContent #footballTakes #communityPicks #cpFeed > .cam-pk-fold .ca
   min-height: 0 !important;
   margin: 0 !important;
   padding: 3px 8px !important;
-  border: 1px solid var(--pk-line) !important;
+  border: 1px solid var(--pk-blue-line) !important;
   border-radius: 7px !important;
-  background: none !important;
+  background: var(--pk-blue-bg) !important;
   font: 600 13px/1.3 var(--pk-sans) !important;
   font-variant-numeric: tabular-nums !important;
-  color: var(--pk-text) !important;
+  color: var(--pk-blue-ink) !important;
   white-space: nowrap !important;
 }
-
-/* Liga de Chefs: lo que suma o resta */
-html body #mainContent #footballTakes #communityPicks #cpFeed > .cam-pk-fold .cam-pk-league {
-  display: flex !important;
-  flex-wrap: wrap !important;
-  align-items: center !important;
-  gap: 6px 8px !important;
-}
-html body #mainContent #footballTakes #communityPicks #cpFeed > .cam-pk-fold .cam-pk-league > .cam-pk-label { flex-basis: 100% !important; margin: 0 0 2px !important; }
-html body #mainContent #footballTakes #communityPicks #cpFeed > .cam-pk-fold .cam-pk-chip {
-  display: inline-flex !important;
-  align-items: center !important;
-  padding: 4px 10px !important;
-  border-radius: 999px !important;
-  font: 600 12.5px/1.3 var(--pk-sans) !important;
-  font-variant-numeric: tabular-nums !important;
-  background: var(--pk-soft) !important;
-  color: var(--pk-text) !important;
-}
-html body #mainContent #footballTakes #communityPicks #cpFeed > .cam-pk-fold .cam-pk-chip.is-up { background: var(--pk-up-soft) !important; color: var(--pk-up) !important; }
-html body #mainContent #footballTakes #communityPicks #cpFeed > .cam-pk-fold .cam-pk-chip.is-down { background: var(--pk-down-soft) !important; color: var(--pk-down) !important; }
 
 /* análisis y ficha */
 html body #mainContent #footballTakes #communityPicks #cpFeed > .cam-pk-fold .cam-pk-analysis {
@@ -412,4 +435,14 @@ html body #mainContent #footballTakes #communityPicks #cpFeed > .cam-pk-fold .ca
   html body #mainContent #footballTakes #communityPicks #cpFeed > .cam-pk-fold .cam-pk-panel,
   html body #mainContent #footballTakes #communityPicks #cpFeed > .cam-pk-fold .cam-pk-chevron { transition: none !important; }
 }
+}
+
+/* El momio también lo pinta cam-display-clarity (capa anterior: su !important manda
+   sobre cam-header), así que el azul cielo se declara en esa misma capa. */
+@layer cam-display-clarity {
+  html body #mainContent #footballTakes #communityPicks #cpFeed > .cam-pk-fold .cp-odds.cam-pk-odds {
+    background: var(--pk-blue-bg) !important;
+    border-color: var(--pk-blue-line) !important;
+    color: var(--pk-blue-ink) !important;
+  }
 }
