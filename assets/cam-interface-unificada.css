@@ -125,6 +125,22 @@
     letter-spacing:-.012em!important;
     overflow-wrap:anywhere!important;
   }
+  /* A single selection's own quoted odds; not a second total. */
+  html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-leg-odds {
+    display:inline-flex!important;
+    align-items:center!important;
+    min-height:24px!important;
+    width:fit-content!important;
+    margin:6px 0 2px!important;
+    padding:2px 7px!important;
+    border:1px solid var(--cam-ui-rule)!important;
+    border-radius:6px!important;
+    background:var(--cam-ui-soft)!important;
+    color:var(--cam-ui-accent)!important;
+    font:700 11px/1.2 Inter,system-ui,sans-serif!important;
+    font-variant-numeric:tabular-nums!important;
+    white-space:nowrap!important;
+  }
   html body #mainContent #footballTakes #communityPicks .cam-pk .cam-pk-meta {
     display:block!important;
     margin:4px 0 0!important;
