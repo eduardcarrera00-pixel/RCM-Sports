@@ -1,0 +1,30 @@
+/* CAM SPORTS · 2026-11-10 · Tres carruseles uniformes y procedencia visible. */
+html body #aeHomeTakeHighlights .ae-home-take-extras{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:16px!important;align-items:stretch!important}
+html body #aeHomeTakeHighlights .ae-home-take-extras > :is(#aeHomeTakesSectionHeading,#camCommunityLegend,#aeHomeTopTakes,#aeHomeTakeHistoric){grid-column:1/-1!important}
+html body #aeHomeTakeHighlights .ae-home-take-extras > .ae-vote-column{min-width:0!important;max-width:none!important;align-self:stretch;padding:13px!important;border:1px solid var(--ae-discovery-line,rgba(173,151,126,.3));border-radius:var(--cam-calm-radius,4px)}
+html body #aeHomeTakeHighlights .ae-home-take-extras > .ae-vote-column .ae-vote-column-heading{display:flex!important;align-items:center;justify-content:space-between;gap:8px;margin:0 0 11px!important}
+html body #aeHomeTakeHighlights .ae-home-take-extras > .ae-vote-column .ae-vote-column-heading h3{min-width:0;margin:0!important;font-size:clamp(16px,1.5vw,20px)!important;line-height:1.25!important}
+html body #aeHomeTakeHighlights .ae-home-take-extras > .ae-vote-column > .ae-discovery-list{display:flex!important;flex-direction:row!important;align-items:stretch!important;gap:10px!important;max-height:none!important;min-height:255px;overflow-x:auto!important;overflow-y:hidden!important;scroll-snap-type:x mandatory;scroll-padding-inline:1px;overscroll-behavior-inline:contain;padding:0 0 8px!important;margin:0!important;scrollbar-width:thin}
+html body #aeHomeTakeHighlights .ae-home-take-extras > .ae-vote-column > .ae-discovery-list > li.ae-community-popular-take{display:flex!important;flex:0 0 calc(100% - 26px)!important;width:calc(100% - 26px)!important;min-width:0!important;min-height:245px!important;scroll-snap-align:start;margin:0!important;padding:13px!important;box-sizing:border-box;border:1px solid var(--ae-discovery-line,rgba(173,151,126,.3))!important;border-radius:var(--cam-calm-radius,4px)!important;background:var(--cam-calm-surface,rgba(255,255,255,.035))!important}
+html body #aeHomeTakeHighlights .ae-home-take-extras > .ae-vote-column > .ae-discovery-list > li.ae-community-popular-take .ae-top-take-content{width:100%;min-height:100%;display:flex!important;flex-direction:column!important}
+html body #aeHomeTakeHighlights .ae-home-take-extras > .ae-vote-column > .ae-discovery-list > li.ae-community-popular-take .ae-take-reference-footer{margin-top:auto;gap:8px!important}
+html body #aeHomeTakeHighlights .cam-community-carousel-controls{display:flex;gap:5px;flex:0 0 auto}
+html body #aeHomeTakeHighlights .cam-community-carousel-controls button{width:36px;height:36px;min-width:36px;min-height:36px;border:1px solid var(--ae-discovery-line,rgba(173,151,126,.3))!important;background:transparent!important;color:inherit!important;border-radius:4px!important;font:600 21px/1 Georgia,serif!important;cursor:pointer}
+html body #aeHomeTakeHighlights .cam-community-carousel-controls button:hover{background:rgba(177,144,92,.12)!important}
+html body #aeHomeTakeHighlights .cam-community-carousel-controls button:focus-visible,html body #camCommunityLegend button:focus-visible{outline:2px solid #c39156;outline-offset:2px}
+html body #camCommunityLegend{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin:0!important;padding:8px 0 10px;border-bottom:1px solid var(--ae-discovery-line,rgba(173,151,126,.3))}
+html body #camCommunityLegend p{margin:0;font:500 12px/1.5 Inter,system-ui,sans-serif;color:var(--ae-discovery-muted,inherit)}
+html body #camCommunityLegend .cam-community-filter{display:inline-flex;gap:5px;flex-wrap:wrap}
+html body #camCommunityLegend button{min-height:34px;padding:6px 10px;border:1px solid var(--ae-discovery-line,rgba(173,151,126,.3));border-radius:4px;background:transparent;color:inherit;font:650 11px/1.3 Inter,system-ui,sans-serif;cursor:pointer}
+html body #camCommunityLegend button[aria-pressed="true"]{border-color:#ad8555;background:rgba(173,133,85,.16)}
+html body #camCommunityLegend button:disabled{opacity:.55;cursor:not-allowed}
+html body .cam-demo-account-tag{display:inline-flex;vertical-align:middle;align-items:center;flex:0 0 auto;padding:2px 5px;margin-inline-start:5px;min-height:17px;border:1px solid currentColor;border-radius:3px;font:700 9px/1.2 Inter,system-ui,sans-serif!important;letter-spacing:.02em;color:var(--ae-discovery-muted,#85939c)!important;background:rgba(122,133,144,.09);white-space:nowrap}
+html body #aeHomeTakeHighlights .ae-community-popular-take .cam-demo-account-tag{margin-left:0;margin-right:5px}
+html body #aeHomeTakeHighlights li.cam-community-filter-empty{flex:1 0 100%;list-style:none;padding:16px 8px;color:var(--ae-discovery-muted,inherit);font:500 12px/1.5 Inter,system-ui,sans-serif}
+html body #aeHomeTakeHighlights .ae-home-take-extras > .ae-vote-column > .ae-discovery-list > li[hidden],html body #aeTakeDiscussion .ae-discussion-comment[hidden]{display:none!important}
+html body #camSportNewsCommunity .cam-snc-note{margin:0!important;font-size:12px;line-height:1.5;color:var(--cam-calm-muted)}
+html body #aeTakeDiscussion .cam-discussion-thread-toggle{display:inline-flex;gap:5px;align-items:center;min-height:32px;margin:6px 0 0;padding:4px 7px;border:1px solid currentColor;border-radius:3px;background:transparent;color:inherit;font:650 11px/1.3 Inter,system-ui,sans-serif;cursor:pointer}
+html body #aeTakeDiscussion .ae-discussion-nested{margin:8px 0 0 14px;padding-left:12px;border-left:2px solid rgba(192,149,93,.4)}
+@media(max-width:980px){html body #aeHomeTakeHighlights .ae-home-take-extras{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important}html body #aeHomeTakeHighlights #aeHomeTakesUnpopular{grid-column:1/-1}}
+@media(max-width:640px){html body #aeHomeTakeHighlights .ae-home-take-extras{grid-template-columns:minmax(0,1fr)!important}html body #aeHomeTakeHighlights .ae-home-take-extras > .ae-vote-column{grid-column:1!important}}
+@media(prefers-reduced-motion:reduce){html body #aeHomeTakeHighlights .ae-discovery-list{scroll-behavior:auto!important}}
