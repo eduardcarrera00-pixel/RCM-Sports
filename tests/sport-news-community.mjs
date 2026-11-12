@@ -111,7 +111,8 @@ assert.equal(supportedTrack.tabIndex, 0, 'Native scrolling is keyboard accessibl
 assert.equal(supportedTrack.querySelector('.cam-snc-category'), null, 'No repeated sport label');
 assert.equal(supportedTrack.querySelector('.cam-snc-author').textContent, '', 'Only the real profile shield is displayed');
 assert.equal(supportedTrack.querySelector('.cam-snc-author').getAttribute('aria-label'), 'Ver perfil de Autor');
-assert.ok(rankFaces.some(face => face.user === 'comment-author' && face.node.dataset.rankLetter === ''), 'The shared profile rank API paints the official symbol');
+assert.ok(rankFaces.some(face => face.user === 'comment-author' && face.node.dataset.rankLetter === 'A'), 'Distinguished opinion shows the author initial inside the actual rank shield');
+assert.ok(rankFaces.some(face => face.user === 'author-0' && face.node.dataset.rankLetter === 'A'), 'Most debated Take shows the author initial inside the actual rank shield');
 assert.equal(supportedTrack.querySelector('.cam-snc-context-arrow').tagName.toLowerCase(), 'svg', 'A thin vector replaces the old link glyph');
 d.querySelector('#camSportDebatedList .cam-snc-reply').click();
 assert.equal(opens.at(-1), 'take-nfl');
