@@ -386,7 +386,7 @@ def run():
         assert root.locator('[class*="cam-fan-"]').count() == 0 and not page.evaluate('() => !!window.CamFanBracket')
         teams = root.locator('.cam-lg-q8-team')
         assert teams.count() == 12, 'solo los que aún pueden clasificar: %d' % teams.count()
-        assert 'Ya no pueden entrar:' in root.inner_text() and 'Atlas' in root.locator('.cam-lg-hint').first.inner_text()
+        assert 'Ya no pueden entrar:' not in root.inner_text(), 'no mostrar aviso redundante de eliminados'
         assert root.locator('.cam-lg-q8-team[data-team="216"]').count() == 0, 'un eliminado no se puede elegir'
         # Los ya clasificados van fijos: no son botones, llevan candado y nadie los elige ni los quita.
         fixed = root.locator('.cam-lg-q8-team.is-fixed')
@@ -418,13 +418,13 @@ def run():
         assert 'CAZ' in page.evaluate("() => decodeURIComponent(document.querySelector('#camLiguilla .cam-lg-pv img.cam-lg-crest').src)")
         save = root.locator('.cam-lg-q8-save')
         assert save.is_disabled()
-        assert 'Elige 4 más' in save.inner_text()
+        assert save.inner_text() == 'Guardar mis 8', 'el botón conserva su nombre al estar incompleto'
         root.locator('.cam-lg-q8-team.is-fixed[data-team="218"]').click(); page.wait_for_timeout(100)
         assert '0 de 4' in root.locator('.cam-lg-count').inner_text(), 'tocar un fijo no debe contar'
         for team in ['15720', '225', '228']:
             root.locator('.cam-lg-q8-team[data-team="%s"]' % team).click()
         assert '3 de 4' in root.locator('.cam-lg-count').inner_text() and save.is_disabled()
-        assert 'Elige 1 más' in save.inner_text()
+        assert save.inner_text() == 'Guardar mis 8', 'no sustituir el texto por instrucciones'
         root.locator('.cam-lg-q8-team[data-team="220"]').click()
         assert '4 de 4' in root.locator('.cam-lg-count').inner_text()
         assert root.locator('.cam-lg-q8-team[data-team="234"]').is_disabled(), 'no se puede elegir un quinto'
