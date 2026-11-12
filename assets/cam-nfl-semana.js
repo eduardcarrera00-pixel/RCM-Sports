@@ -195,7 +195,7 @@
     const mark = el('span', null, 'cam-ns-side-mark', { 'aria-hidden': 'true' });
     if (chosen) mark.append(icon('check'));
     const label = el('span', null, 'cam-ns-side-label');
-    label.append(el('span', nick(id), 'cam-ns-side-name'), el('span', chosen ? 'Tu pick' : (home ? 'Local' : 'Visitante'), 'cam-ns-side-sub'));
+    label.append(el('span', nick(id), 'cam-ns-side-name'), el('span', home ? 'Local' : 'Visitante', 'cam-ns-side-sub'));
     tile.append(mark, crest(id, 52), label);
     if (!open) {
       if (chosen) tile.setAttribute('aria-label', name + ': tu pick');
@@ -239,8 +239,7 @@
       const rel = relativeDay(duel.kickoff);
       hint.append(icon('check'), el('span', 'Guardado. Puedes cambiarlo hasta ' + (rel || 'el ' + dayLong(duel.kickoff)) + ' a las ' + clock(duel.kickoff) + '.'));
     } else {
-      const left = closesIn(duel.kickoff);
-      hint.textContent = 'Un toque y estás dentro' + (left ? ' · cierra en ' + left : '');
+      // Sin texto promocional ni cuenta atrás antes de elegir.
     }
     return hint;
   }
@@ -353,24 +352,21 @@
   }
 
   function duelBlock(snap, duel, rankIds, weekGames) {
-    const pos = id => { const i = rankIds.indexOf(id); return i < 0 ? null : i + 1; };
-    const a = pos(duel.away_id), h = pos(duel.home_id);
-    const label = a && h ? 'n.º ' + a + ' vs n.º ' + h : a || h ? 'juega el n.º ' + Math.min(a || 99, h || 99) : 'el más parejo';
-    const box = section('duelo', 'Duelo de la semana · ' + label);
+    const box = el('section', null, 'cam-ns-block', { 'data-block': 'duelo' });
     box.classList.add('cam-ns-feature', 'cam-ns-duelo');
     if (finished(duel)) {
       box.append(el('p', duel.away_id + ' ' + duel.away_score + ' – ' + duel.home_score + ' ' + duel.home_id, 'cam-ns-duel-score'));
-    } else {
-      box.append(el('p', (started(duel) ? (duel.status === 'live' ? 'En juego · ' : 'Cerrado · ') : '') + when(duel.kickoff) + ' · ' + dayMonth(duel.kickoff), 'cam-ns-duel-when'));
     }
     box.append(el('p', (teamOf(duel.away_id)?.name || duel.away_id) + ' en casa de ' + (teamOf(duel.home_id)?.name || duel.home_id), 'cam-ns-sr'));
 
     const open = !started(duel) && !!quiniela()?.isOpen?.(duel);
     const pick = el('div', null, 'cam-ns-step cam-ns-step-pick', { role: 'group', 'aria-labelledby': 'camNsPickTitle' });
-    pick.append(stepLabel('pick', 'Tu pick'), el('h4', finished(duel) ? '¿Quién ganó?' : '¿Quién gana?', 'cam-ns-step-title', { id: 'camNsPickTitle' }));
+    pick.append(el('h4', finished(duel) ? '¿Quién ganó?' : '¿Quién gana?', 'cam-ns-step-title', { id: 'camNsPickTitle' }));
     const sides = el('div', null, 'cam-ns-sides');
     sides.append(sideTile(duel, duel.away_id, snap, open), el('span', '@', 'cam-ns-at', { 'aria-hidden': 'true' }), sideTile(duel, duel.home_id, snap, open));
-    pick.append(sides, hintLine(snap, duel, open));
+    pick.append(sides);
+    const hint = hintLine(snap, duel, open);
+    if (hint.textContent) pick.append(hint);
     const share = snap.split?.get(duel.id);
     if (share && Number(share.total) >= 5) {
       const away = Math.round(100 * Number(share.away_picks) / Number(share.total));
