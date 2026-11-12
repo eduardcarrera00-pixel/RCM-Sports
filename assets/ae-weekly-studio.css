@@ -1,0 +1,105 @@
+/* CAM SPORTS · Pick del editor (12 nov 2026).
+   Ventana de edición (misma familia que «Modo edición») con foto, título y
+   descripción, y barra de vista previa debajo del bloque antes de publicar. */
+
+/* ---------- Ventana ---------- */
+#aeWeeklyPickAdmin.ae-weekly-studio{max-width:560px;width:min(560px,calc(100vw - 20px))}
+/* El antiguo panel desplegable tenía fondo, margen y relleno propios: la ventana usa los de «Modo edición». */
+html body #footballTakes #aeWeeklyPickAdmin.ae-weekly-studio{margin:auto!important;padding:0!important;border:1px solid #bc9a6d!important;background:#f6f0e6!important}
+html.dark body #footballTakes #aeWeeklyPickAdmin.ae-weekly-studio{border-color:#755f45!important;background:#152a38!important}
+#aeWeeklyPickAdmin .ae-weekly-studio-body{gap:15px}
+#aeWeeklyPickAdmin .cam-site-text-body :is(input[type=text],input:not([type]),input[type=datetime-local]),
+#aeWeeklyPickAdmin .cam-site-text-body textarea{
+  width:100%;box-sizing:border-box;min-height:42px;padding:9px 11px;
+  border:1px solid #bcb2a4;border-radius:6px;background:#fffdfa;color:#1d2b35;
+  font:16px/1.4 Inter,system-ui,sans-serif;
+}
+#aeWeeklyPickAdmin .cam-site-text-body textarea{min-height:120px;resize:vertical}
+#aeWeeklyPickAdmin .cam-site-text-body :is(input,textarea)::placeholder{color:#8a8f93}
+#aeWeeklyPickAdmin .cam-site-text-body :is(input,textarea):focus-visible{outline:2px solid #c9a07e;outline-offset:1px}
+#aeWeeklyPickAdmin .ae-weekly-studio-fields{display:grid;gap:11px}
+#aeWeeklyPickAdmin #aeWeeklyEditorMode.ae-weekly-edit-status{margin:8px 0 0;padding:8px 10px;font-size:12px}
+#aeWeeklyPickAdmin .ae-weekly-studio-status{margin:0;min-height:18px;font-size:12.5px;line-height:1.45;color:#855331}
+#aeWeeklyPickAdmin .ae-weekly-studio-status:empty{display:none}
+#aeWeeklyPickAdmin .cam-site-text-form>footer :is(#aeWeeklyCancelEdit,#aeWeeklyNewPick,#aeWeeklyPreviewButton){
+  min-height:40px;padding:8px 13px;border-radius:999px;font:700 13px/1.2 Inter,system-ui,sans-serif;
+}
+
+/* ---------- Foto ---------- */
+#aeWeeklyPickAdmin .ae-weekly-photo-field{position:relative;display:grid;gap:7px}
+#aeWeeklyPickAdmin .ae-weekly-field-label{font-size:12px;font-weight:650}
+#aeWeeklyPickAdmin .ae-weekly-photo-input{position:absolute;width:1px;height:1px;margin:0;padding:0;opacity:0;overflow:hidden;clip:rect(0 0 0 0);pointer-events:none}
+#aeWeeklyPickAdmin .ae-weekly-photo-pick{
+  position:relative;display:block;cursor:pointer;overflow:hidden;
+  border:1.5px dashed #b99a74;border-radius:10px;background:#efe6d8;
+}
+#aeWeeklyPickAdmin .has-photo .ae-weekly-photo-pick{border-style:solid;background:#0d2232}
+#aeWeeklyPickAdmin .ae-weekly-photo-input:focus-visible + .ae-weekly-photo-pick{outline:2px solid #dfb57e;outline-offset:2px}
+#aeWeeklyPickAdmin #aeWeeklyBannerPreview{
+  display:flex;align-items:center;justify-content:center;box-sizing:border-box;
+  width:100%;height:auto;min-height:0;max-height:none;aspect-ratio:8/3;margin:0;padding:12px;
+  border:0;border-radius:0;background:transparent;color:#6b5a48;
+  font:600 14px/1.35 Inter,system-ui,sans-serif;text-align:center;
+}
+#aeWeeklyPickAdmin .has-photo #aeWeeklyBannerPreview{padding:0}
+#aeWeeklyPickAdmin #aeWeeklyBannerPreview img{width:100%;height:100%;object-fit:cover}
+#aeWeeklyPickAdmin .ae-weekly-photo-cta{
+  position:absolute;right:10px;bottom:10px;padding:7px 13px;border-radius:999px;
+  background:#213f54;color:#fff;font:700 12px/1.2 Inter,system-ui,sans-serif;
+  box-shadow:0 4px 14px rgba(9,22,32,.28);pointer-events:none;
+}
+#aeWeeklyPickAdmin .ae-weekly-photo-field>small{margin:0;color:#66737f;font-size:11.5px;line-height:1.4}
+#aeWeeklyPickAdmin .ae-weekly-frame summary{cursor:pointer;font-size:12px;font-weight:650;color:#855331;padding:2px 0}
+#aeWeeklyPickAdmin .ae-weekly-frame .ae-framing-controls{display:grid;gap:8px;margin-top:8px}
+#aeWeeklyPickAdmin .ae-weekly-frame .ae-framing-controls label{display:grid;gap:4px;font-size:12px}
+#aeWeeklyPickAdmin .ae-weekly-frame input[type=range]{width:100%;accent-color:#866137}
+#aeWeeklyPickAdmin .ae-weekly-frame button{justify-self:start;min-height:34px;padding:6px 12px;border:1px solid #c1a37e;border-radius:999px;background:transparent;color:inherit;font:700 12px Inter,system-ui,sans-serif;cursor:pointer}
+
+/* ---------- Vista previa ---------- */
+#picksFeatured.is-draft-preview{outline:2px dashed #c9a07e!important;outline-offset:4px}
+/* En la vista previa solo se ve lo que verá la gente: fuera los controles de admin. */
+html body #picksFeatured.is-draft-preview :is(#aeWeeklyEditButton,#aeWeeklyShareButton,.cam-weekly-quick-result,#camWeeklySharedResult){display:none!important}
+#aeWeeklyPreviewBar{
+  display:grid;gap:8px;margin:14px 0 4px;padding:14px 16px;box-sizing:border-box;
+  border:1px solid #c9a07e;border-radius:12px;background:#fbf4ea;color:#24333e;
+  font:14px/1.45 Inter,system-ui,sans-serif;grid-column:1 / -1;
+  /* Siempre a mano mientras se revisa el Pick, por encima de la barra inferior del teléfono. */
+  position:sticky;bottom:calc(var(--cam-bottom-nav-height,0px) + env(safe-area-inset-bottom,0px) + 10px);z-index:6;
+  box-shadow:0 10px 30px rgba(9,22,32,.22);
+}
+#aeWeeklyPreviewBar .ae-weekly-preview-kicker{margin:0;font-size:11px;font-weight:750;letter-spacing:.12em;text-transform:uppercase;color:#855331}
+#aeWeeklyPreviewBar .ae-weekly-preview-status{margin:0;font-size:13.5px}
+#aeWeeklyPreviewBar .ae-weekly-preview-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:2px}
+#aeWeeklyPreviewBar .ae-weekly-preview-actions button{
+  flex:1 1 150px;min-height:44px;padding:10px 14px;border-radius:999px;cursor:pointer;
+  font:700 14px/1.2 Inter,system-ui,sans-serif;
+}
+#aeWeeklyPreviewBar #aeWeeklyPreviewBack{border:1px solid #bcb2a4;background:transparent;color:inherit}
+#aeWeeklyPreviewBar #aeWeeklySaveButton{border:1px solid #213f54;background:#213f54;color:#fff}
+#aeWeeklyPreviewBar button:disabled{opacity:.55;cursor:wait}
+#aeWeeklyPreviewBar button:focus-visible{outline:2px solid #c9a07e;outline-offset:2px}
+
+/* Pista «Ver detalles / Ocultar análisis»: el texto lo cambia el script. */
+#picksFeaturedCard .ae-weekly-expand-hint[data-toggle-text]::after{content:none!important}
+
+/* ---------- Noche ---------- */
+html.dark #aeWeeklyPickAdmin .cam-site-text-body :is(input[type=text],input:not([type]),input[type=datetime-local]),
+html.dark #aeWeeklyPickAdmin .cam-site-text-body textarea{background:#1e3647;color:#eee3d1;border-color:#697480;color-scheme:dark}
+html.dark #aeWeeklyPickAdmin .cam-site-text-body :is(input,textarea)::placeholder{color:#93a1ab}
+html.dark #aeWeeklyPickAdmin .ae-weekly-photo-pick{background:#1b3344;border-color:#8a7354}
+html.dark #aeWeeklyPickAdmin #aeWeeklyBannerPreview{color:#d6c3a6}
+html.dark #aeWeeklyPickAdmin .ae-weekly-photo-cta{background:#bc9968;color:#132939}
+html.dark #aeWeeklyPickAdmin .ae-weekly-photo-field>small{color:#b3bec6}
+html.dark #aeWeeklyPickAdmin :is(.ae-weekly-frame summary,.ae-weekly-studio-status){color:#d9b48a}
+html.dark #aeWeeklyPreviewBar{background:#152a38;border-color:#755f45;color:#eee3d1}
+html.dark #aeWeeklyPreviewBar .ae-weekly-preview-kicker{color:#d9b48a}
+html.dark #aeWeeklyPreviewBar #aeWeeklyPreviewBack{border-color:#697480}
+html.dark #aeWeeklyPreviewBar #aeWeeklySaveButton{background:#bc9968;border-color:#bc9968;color:#132939}
+html.dark #picksFeatured.is-draft-preview{outline-color:#bc9968!important}
+
+@media (max-width:540px){
+  /* Momio y cierre uno debajo del otro: el selector de fecha necesita todo el ancho. */
+  #aeWeeklyPickAdmin .ae-weekly-studio-fields .cam-site-text-two{grid-template-columns:1fr}
+  #aeWeeklyPickAdmin .cam-site-text-form>footer{flex-wrap:wrap}
+  #aeWeeklyPickAdmin .cam-site-text-form>footer #aeWeeklyPreviewButton{flex:1 1 auto}
+}

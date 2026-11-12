@@ -86,6 +86,7 @@
       "sources": [
         "assets/cam-pick-editor-night.css",
         "assets/cam-global-edit.css",
+        "assets/ae-weekly-studio.css",
         "assets/cam-mobile-bottom-nav.css",
         "assets/cam-take-cta.css"
       ]

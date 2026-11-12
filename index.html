@@ -2721,7 +2721,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
 <script src="assets/ae-site-images.js?v=20261111-chefs-gorro-1"></script>
 <script src="assets/cam-site-texts.js?v=20261110-branded-loading-1"></script>
 <script defer src="assets/cam-mobile-bottom-nav.js?v=20261109-rango-avisos-1"></script>
-<link rel="stylesheet" href="assets/cam-perf-controls.css?v=20261108-escritorio-1">
+<link rel="stylesheet" href="assets/cam-perf-controls.css?v=20261112-pick-studio-1">
 
 <script defer src="assets/cam-take-cta.js?v=20261023-take-cta-unificado-1"></script>
 <link rel="stylesheet" href="assets/cam-perf-football-headings.css?v=20261104-css-consolidated-1">
@@ -2886,6 +2886,14 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
             <div id="picksFeaturedCard" aria-live="polite"><p>Cargando Pick editorial…</p></div>
             <div class="ae-weekly-odds-footer"><span id="aeWeeklyOddsHighlight" class="ae-weekly-odds-highlight" hidden></span></div>
           </section>
+          <div id="aeWeeklyPreviewBar" class="ae-weekly-preview-bar" hidden role="region" aria-label="Vista previa del Pick del editor">
+            <p class="ae-weekly-preview-kicker">Vista previa · todavía no está publicado</p>
+            <p id="aeWeeklyPreviewStatus" class="ae-weekly-preview-status" role="status" aria-live="polite">Así lo verá la gente. Si todo está bien, publícalo.</p>
+            <div class="ae-weekly-preview-actions">
+              <button type="button" id="aeWeeklyPreviewBack">Volver a editar</button>
+              <button type="submit" form="aeWeeklyPickForm" id="aeWeeklySaveButton">Publicar</button>
+            </div>
+          </div>
           </div>
           <div class="ae-picks-layout">
             <section class="ae-picks-feed" id="communityPicks" hidden aria-label="Picks de la comunidad">
@@ -2955,50 +2963,52 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
                 </section>
             </section>
           </div>
-          <details id="aeWeeklyPickAdmin" class="ae-takes-admin ae-weekly-admin" hidden><summary id="aeWeeklyAdminSummary">Administrar · Publicar Pick del editor</summary>
-            <form id="aeWeeklyPickForm">
-               <p id="aeWeeklyEditorMode" class="ae-weekly-edit-status" hidden role="status">Editando el Pick del editor. Los archivos originales se conservarán mientras no los sustituyas.</p>
-              <label class="ae-full">Título del Pick<input name="title" minlength="5" maxlength="160" required placeholder="Nuestra selección del día"></label>
-              <label>Evento o partido<input name="event_name" minlength="3" maxlength="160" required placeholder="Equipo A vs Equipo B"></label>
-              <label>Selección<input name="selection" minlength="2" maxlength="180" required placeholder="Ganador, hándicap, más de…"></label>
-              <label>Cuota americana<input name="american_odds" type="text" pattern="[+-]?[0-9]{3,6}" required placeholder="+150 o -110"></label>
-              <label>Cierre de la recomendación<input name="expires_at" type="datetime-local" required></label>
-              <label class="ae-full">Análisis del Pick<textarea name="analysis" minlength="12" maxlength="2400" required placeholder="Explica los motivos de la recomendación."></textarea></label>
-              <div class="ae-weekly-media-fields">
-                <div class="ae-upload-field"><label for="aeWeeklyBannerInput">Banner del Pick del editor</label>
-                  <small>Imagen horizontal para el encabezado (recomendado 1600 × 600). JPG, PNG o WEBP; se optimiza automáticamente al subirla.</small>
-                  <input id="aeWeeklyBannerInput" type="file" name="banner_file" accept="image/jpeg,image/png,image/webp">
-                  <span id="aeWeeklyBannerPreview" class="ae-upload-preview">Vista previa del banner</span>
-                  <span class="ae-framing-note">También puedes pegar un enlace directo HTTPS.</span>
-                  <input type="url" name="banner_url" id="aeWeeklyBannerUrl" aria-label="Enlace directo HTTPS del banner" placeholder="https://ejemplo.com/banner.jpg" inputmode="url">
-                  <div class="ae-framing-controls" data-ae-frame="banner">
-                    <label>Encuadre horizontal <input id="aeWeeklyBannerX" type="range" min="0" max="100" value="50"></label>
-                    <label>Encuadre vertical <input id="aeWeeklyBannerY" type="range" min="0" max="100" value="50"></label>
-                    <button type="button" data-ae-center="banner">Centrar imagen</button>
-                  </div>
+          <!-- Pick del editor (12 nov 2026): ventana de edición con foto, título y descripción; vista previa en su sitio antes de publicar. -->
+          <dialog id="aeWeeklyPickAdmin" class="cam-site-text-dialog ae-weekly-studio" aria-labelledby="aeWeeklyAdminSummary" hidden>
+            <form id="aeWeeklyPickForm" class="cam-site-text-form">
+              <header><div><small>CAM SPORTS · PICK DEL EDITOR</small><h2 id="aeWeeklyAdminSummary">Publicar Pick del editor</h2>
+                <p id="aeWeeklyEditorMode" class="ae-weekly-edit-status" hidden>Editando el Pick publicado. La foto actual se conserva si no eliges otra.</p></div>
+                <button type="button" data-weekly-close aria-label="Cerrar sin perder lo escrito">×</button></header>
+              <div class="cam-site-text-body ae-weekly-studio-body">
+                <div class="ae-weekly-photo-field">
+                  <span class="ae-weekly-field-label" id="aeWeeklyPhotoLabel">Foto</span>
+                  <input id="aeWeeklyBannerInput" class="ae-weekly-photo-input" type="file" name="banner_file" accept="image/jpeg,image/png,image/webp" aria-labelledby="aeWeeklyPhotoLabel">
+                  <label class="ae-weekly-photo-pick" for="aeWeeklyBannerInput">
+                    <span id="aeWeeklyBannerPreview" class="ae-upload-preview">Toca para elegir una foto</span>
+                    <span class="ae-weekly-photo-cta" data-weekly-photo-cta>Elegir foto</span>
+                  </label>
+                  <small>Mejor horizontal. Se recorta para el banner y se optimiza sola al publicar.</small>
+                  <details class="ae-weekly-frame"><summary>Ajustar encuadre</summary>
+                    <div class="ae-framing-controls" data-ae-frame="banner">
+                      <label>Horizontal <input id="aeWeeklyBannerX" type="range" min="0" max="100" value="50"></label>
+                      <label>Vertical <input id="aeWeeklyBannerY" type="range" min="0" max="100" value="50"></label>
+                      <button type="button" data-ae-center="banner">Centrar</button>
+                    </div>
+                  </details>
                 </div>
-                <div class="ae-upload-field"><label for="aeWeeklyImageInput">Imagen de la publicación</label>
-                  <small>Imagen para la tarjeta y el análisis (recomendado 800 × 450). Opcional.</small>
-                  <input id="aeWeeklyImageInput" type="file" name="image_file" accept="image/jpeg,image/png,image/webp">
-                  <span id="aeWeeklyImagePreview" class="ae-upload-preview">Vista previa de publicación</span>
-                  <span class="ae-framing-note">O pega el enlace HTTPS de una imagen.</span>
-                  <input type="url" name="image_url" id="aeWeeklyImageUrl" aria-label="Enlace directo HTTPS de la imagen editorial" placeholder="https://ejemplo.com/imagen.jpg" inputmode="url">
-                  <div class="ae-framing-controls" data-ae-frame="weekly">
-                    <label>Encuadre horizontal <input id="aeWeeklyImageX" type="range" min="0" max="100" value="50"></label>
-                    <label>Encuadre vertical <input id="aeWeeklyImageY" type="range" min="0" max="100" value="50"></label>
-                    <button type="button" data-ae-center="weekly">Centrar imagen</button>
+                <label>Título<input name="title" minlength="5" maxlength="160" required placeholder="Ej.: Los Bills no fallan en casa" autocomplete="off"></label>
+                <label>Descripción<textarea name="analysis" rows="5" minlength="12" maxlength="2400" required placeholder="Cuenta por qué es tu pick."></textarea></label>
+                <section><h3>Datos del pick</h3>
+                  <div class="ae-weekly-studio-fields">
+                    <label>Partido<input name="event_name" minlength="3" maxlength="160" required placeholder="Equipo A vs Equipo B" autocomplete="off"></label>
+                    <label>Selección<input name="selection" minlength="2" maxlength="180" required placeholder="Gana Equipo A" autocomplete="off"></label>
+                    <div class="cam-site-text-two">
+                      <label>Momio<input name="american_odds" type="text" inputmode="text" pattern="[+-]?[0-9]{3,6}" required placeholder="+150 o -110" autocomplete="off"></label>
+                      <label>Cierra<input name="expires_at" type="datetime-local" required></label>
+                    </div>
                   </div>
-                </div>
+                </section>
+                <p id="aeWeeklyPickAdminStatus" class="ae-weekly-studio-status" role="status" aria-live="polite"></p>
+                <button id="aeWeeklyCheckSave" type="button" class="ae-weekly-check-save" hidden>Comprobar si se guardó</button>
               </div>
-              <div class="ae-full ae-weekly-admin-actions">
-                <button type="submit" id="aeWeeklySaveButton">Publicar Pick del editor</button>
-                <button type="button" id="aeWeeklyCancelEdit" hidden>Cancelar edición</button>
-                <button type="button" id="aeWeeklyNewPick" hidden>Publicar un Pick nuevo</button>
-              </div>
-              <p id="aeWeeklyPickAdminStatus" class="ae-full ae-takes-status" role="status" aria-live="polite"></p>
-              <div class="ae-full"><button id="aeWeeklyCheckSave" type="button" class="ae-weekly-check-save" hidden>Comprobar si se guardó</button></div>
+              <footer>
+                <button type="button" id="aeWeeklyNewPick" hidden>Publicar uno nuevo</button>
+                <span></span>
+                <button type="button" id="aeWeeklyCancelEdit">Cancelar</button>
+                <button type="button" id="aeWeeklyPreviewButton" data-save>Ver vista previa</button>
+              </footer>
             </form>
-          </details>
+          </dialog>
         </section>
         <!-- Active Filter Indicator Bar -->
         <div id="filterIndicator" class="hidden mb-6 flex items-center justify-between bg-pitch-50 border border-pitch-200 px-4 py-3 rounded-xl text-pitch-900">
@@ -5743,7 +5753,7 @@ updateThemeButton();
 <script src="assets/free-takes.js?v=20261111-escudo-rango-1"></script>
 <script src="assets/ae-take-rankings.js?v=20261110-branded-loading-1"></script>
 <script src="assets/cam-image-compress.js?v=20261021-1"></script>
-<script src="assets/ae-editorial-weekly.js?v=20261110-branded-loading-1"></script>
+<script src="assets/ae-editorial-weekly.js?v=20261112-pick-studio-1"></script>
 
 <style id="cam-weekly-results-style">
 .cam-weekly-review{margin-top:16px;clear:both}
