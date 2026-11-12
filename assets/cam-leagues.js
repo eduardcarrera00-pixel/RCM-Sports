@@ -642,7 +642,16 @@ const rememberProfile=(user,data)=>{
   identityCache.set(user,{ranks:data.ranks.map(r=>({competition:r.competition,rank_level:level(r.rank)})),awards:(data.awards||[]).filter(a=>a.active)});
 };
 function mountEntry(host,comp){
-  if(!host||host.querySelector(':scope > .cam-league-entry'))return;
+  if(!host)return;
+  // En Fútbol: Clasificación mensual/histórica → tabla → reglas → Liga CAM.
+  const rules=comp==='football'?host.parentElement?.querySelector(':scope > .cam-nfl-rules'):null;
+  if(rules){
+    if(!rules.nextElementSibling?.classList.contains('cam-league-entry')){
+      rules.after(btn('Liga CAM ›','cam-league-entry',()=>openBoard(comp)));
+    }
+    return;
+  }
+  if(host.querySelector(':scope > .cam-league-entry'))return;
   const link=btn('Liga CAM ›','cam-league-entry',()=>openBoard(comp));
   if(host.tagName==='OL'){if(!host.previousElementSibling?.classList.contains('cam-league-entry'))host.before(link);}else host.prepend(link);
 }
