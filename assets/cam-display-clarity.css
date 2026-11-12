@@ -471,3 +471,94 @@ html body dialog#cpDialog.ae-cp-detail-dialog.cam-chef-detail-v2 [data-pick-type
 }
 
 @layer cam-display-clarity{html body dialog#cpDialog.ae-cp-detail-dialog.cam-chef-detail-v2 .cp-feed-meta{flex:0 0 auto!important;}html body dialog#cpDialog.ae-cp-detail-dialog.cam-chef-detail-v2 .cp-card-sport{flex:none!important;min-width:32px!important;white-space:nowrap!important;justify-content:center!important;}html body dialog#cpDialog.ae-cp-detail-dialog.cam-chef-detail-v2 .cp-detail-author{flex:0 1 auto!important;max-width:calc(100% - 48px)!important;}}
+
+/* Approved news preview: content sets the height; counters close the card. */
+@layer cam-display-clarity {
+html body:is(.ae-is-nfl,.ae-is-football) #mainContent #articlesGrid.ae-sport-news-carousel > article {
+  display:flex!important;
+  flex-direction:column!important;
+  align-self:flex-start!important;
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  aspect-ratio:auto!important;
+}
+html body:is(.ae-is-nfl,.ae-is-football) #mainContent #articlesGrid.ae-sport-news-carousel > article > div:first-child {
+  display:flex!important;
+  flex-direction:column!important;
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  flex:1 0 auto!important;
+  overflow:visible!important;
+}
+html body:is(.ae-is-nfl,.ae-is-football) #mainContent #articlesGrid.ae-sport-news-carousel > article .p-5 {
+  display:block!important;
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  padding:14px 14px 10px!important;
+  overflow:visible!important;
+}
+html body:is(.ae-is-nfl,.ae-is-football) #mainContent #articlesGrid.ae-sport-news-carousel > article .p-5 h3 {
+  display:block!important;
+  -webkit-line-clamp:unset!important;
+  line-clamp:unset!important;
+  height:auto!important;
+  max-height:none!important;
+  margin:0 0 9px!important;
+  overflow:visible!important;
+  overflow-wrap:anywhere!important;
+  font-size:20px!important;
+  line-height:1.22!important;
+}
+html body:is(.ae-is-nfl,.ae-is-football) #mainContent #articlesGrid.ae-sport-news-carousel > article .p-5 > .cam-news-card-summary {
+  display:-webkit-box!important;
+  -webkit-line-clamp:3!important;
+  line-clamp:3!important;
+  margin:0!important;
+  color:var(--cam-calm-muted)!important;
+  font-size:14px!important;
+  line-height:1.45!important;
+}
+html body:is(.ae-is-nfl,.ae-is-football) #mainContent #articlesGrid.ae-sport-news-carousel > article > .cam-news-card-footer {
+  display:flex!important;
+  position:static!important;
+  flex:0 0 auto!important;
+  flex-wrap:wrap!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  height:auto!important;
+  min-height:52px!important;
+  max-height:none!important;
+  width:auto!important;
+  margin:0 14px!important;
+  padding:3px 0 5px!important;
+  gap:4px 12px!important;
+  border:0!important;
+  border-top:1px solid var(--cam-calm-line)!important;
+  overflow:visible!important;
+}
+html body:is(.ae-is-nfl,.ae-is-football) #mainContent #articlesGrid.ae-sport-news-carousel > article > .cam-news-card-footer > .cam-news-interactions {
+  display:flex!important;
+  flex:0 0 auto!important;
+  width:auto!important;
+  margin:0 0 0 -6px!important;
+  overflow:visible!important;
+}
+html body:is(.ae-is-nfl,.ae-is-football) #mainContent #articlesGrid.ae-sport-news-carousel > article > .cam-news-card-footer .cam-news-interaction {
+  min-height:44px!important;
+  font-size:12px!important;
+  color:var(--cam-calm-muted)!important;
+}
+html body:is(.ae-is-nfl,.ae-is-football) #mainContent #articlesGrid.ae-sport-news-carousel > article > .cam-news-card-footer .cam-news-interaction:is(:hover,[aria-pressed="true"]) {
+  color:var(--cam-calm-action)!important;
+}
+@media(max-width:760px) {
+  html body:is(.ae-is-nfl,.ae-is-football) #mainContent #articlesGrid.ae-sport-news-carousel > article,
+  html body.ae-is-football #mainContent #aeFootballMobileStage #articlesGrid.ae-sport-news-carousel > article {
+    flex-basis:88%!important;
+    width:88%!important;
+  }
+}
+}
