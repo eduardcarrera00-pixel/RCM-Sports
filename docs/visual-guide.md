@@ -134,8 +134,10 @@ Estilos: `assets/cam-perfil-rangos.css` (paquete de paneles).
 
 ### El escudo del rango como foto · 11 nov 2026
 
-La foto de cada persona ya no es su inicial: es el escudo de su rango, el mismo
-que su perfil llama «Rango actual» (el más alto de sus ligas; sin ligas, Cobre).
+La foto de cada persona es su inicial en el centro del escudo de su rango (en
+lugar del símbolo del rango), el mismo que su perfil llama «Rango actual» (el
+más alto de sus ligas; sin ligas, Cobre). Las insignias de rango que no son la
+foto de nadie (cabecera, pestaña Rangos, escalera, Liga CAM) llevan su símbolo.
 Cada rango tiene su dibujo y su metal, relleno y con una cara más clara:
 Cobre rojizo, Bronce pardo, Plata gris azulado, Oro amarillo, Platino verde agua,
 Diamante azul y Leyenda CAM morado con un leve brillo (`--rank-fill`,
@@ -144,7 +146,7 @@ perfil» va grande con el nombre del rango debajo, en su color; la línea peque�
 «COBRE · PICKS» bajo el nombre ya no se muestra. En Takes, la conversación,
 Picks, Chefs, las quinielas y los grupos el escudo ocupa la caja que tenía la
 inicial (nada se mueve). Mientras llega el rango, o si no hay cuenta detrás, un
-escudo neutro gris. Se pinta con `CamLeagues.avatar(nodo, id)`; los rangos se
+escudo neutro gris con la inicial. Se pinta con `CamLeagues.avatar(nodo, id)`; los rangos se
 piden en tandas con `cam_league_identities`, solo para los escudos a la vista.
 Estilos: `assets/cam-escudo-foto.css`. Prueba: `tests/escudo-foto.py`.
 

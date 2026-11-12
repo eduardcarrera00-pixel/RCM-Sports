@@ -15,12 +15,19 @@ const points=n=>Number(n||0).toLocaleString('es',{maximumFractionDigits:2});
 /* Escudo de rango (11 nov 2026): el escudo va relleno del metal de su rango
    (cobre, bronce, plata, oro, platino, diamante, leyenda), con una cara algo
    más clara a la izquierda para que se lea como metal, y el símbolo encima.
-   Los colores salen de --rank-fill / --rank-deep / --rank-ink (cam-leagues.css). */
-function emblem(rank){
+   Los colores salen de --rank-fill / --rank-deep / --rank-ink (cam-leagues.css).
+   Con letter (la foto de una persona, desde el 11 nov 2026 a petición de Eduard),
+   su inicial va en el centro del escudo en lugar del símbolo del rango. */
+function emblem(rank,letter=''){
   const n=level(rank),box=el('span',null,'cam-rank-emblem');box.dataset.rank=KEYS[n];box.setAttribute('aria-hidden','true');
   const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 48 56');
   const shape=document.createElementNS(svg.namespaceURI,'path');shape.setAttribute('d',n>=5?'M24 2 44 12 41 37 24 54 7 37 4 12Z':'M24 2 43 10 41 36 24 54 7 36 5 10Z');shape.setAttribute('class','cam-rank-shield');svg.append(shape);
   const facet=document.createElementNS(svg.namespaceURI,'path');facet.setAttribute('d',n>=5?'M24 3.2 24 52.6 7.9 36.6 5.1 12.6Z':'M24 3.2 24 52.6 7.9 35.6 6.1 10.7Z');facet.setAttribute('class','cam-rank-facet');svg.append(facet);
+  if(letter){
+    const t=document.createElementNS(svg.namespaceURI,'text');
+    t.setAttribute('x','24');t.setAttribute('y','27.5');t.setAttribute('text-anchor','middle');t.setAttribute('dominant-baseline','central');
+    t.setAttribute('class','cam-rank-letter');t.textContent=letter;svg.append(t);box.append(svg);return box;
+  }
   const mark=document.createElementNS(svg.namespaceURI,'path');
   mark.setAttribute('d',n===6?'m13 30-3-13 9 7 5-12 5 12 9-7-3 13Zm1 7h20':n===5?'m24 12 12 14-12 17-12-17Z':n===4?'m12 20 12-8 12 8-12 22Zm0 0h24':n===3?'m24 12 4 9 10 1-8 7 2 11-8-5-8 5 2-11-8-7 10-1Z':n===2?'m13 30 11-12 11 12m-22 8 11-12 11 12':n===1?'m13 25 11-12 11 12m-22 10 11-12 11 12':'m13 30 11-12 11 12');
   mark.setAttribute('class','cam-rank-symbol');svg.append(mark);box.append(svg);return box;
@@ -544,10 +551,14 @@ const watcher=typeof IntersectionObserver==='function'
 const watched=new Set();
 const watch=node=>{if(watcher){watcher.observe(node);watched.add(node);}else scheduleDecorate();};
 const unwatch=node=>{if(watched.delete(node))watcher.unobserve(node);};
+// Inicial de la foto: la que la lista ya había escrito en el nodo (o la que pone
+// el perfil en data-rank-letter). Se guarda para repintar al llegar el rango.
+const firstLetter=text=>(String(text||'').match(/[\p{L}\p{N}]/u)?.[0]||'').toLocaleUpperCase('es');
 function paintAvatar(node,lv,named=false){
   if(!node)return node;
+  if(node.dataset.rankLetter===undefined&&!node.classList.contains('cam-rank-avatar'))node.dataset.rankLetter=firstLetter(node.textContent);
   node.classList.add('cam-rank-avatar');
-  const known=lv!=null&&lv!=='none',pic=emblem(known?lv:0);
+  const known=lv!=null&&lv!=='none',pic=emblem(known?lv:0,node.dataset.rankLetter||'');
   if(!known)pic.dataset.rank='pending';
   node.dataset.rank=known?KEYS[level(lv)]:(lv==='none'?'none':'pending');
   const kids=[pic];
@@ -610,11 +621,21 @@ async function decorate(){
 function paintProfileFaces(lv){
   for(const id of ['camProfileAvatar','camProfileEditAvatar']){
     const n=$(id);if(!n)continue;
+    if(n.dataset.rankLetter===undefined)n.dataset.rankLetter='';
     paintAvatar(n,lv,true);
     n.classList.add('is-profile');
     n.removeAttribute('aria-hidden');n.setAttribute('role','img');
     n.setAttribute('aria-label',lv==null||lv==='none'?'Rango':'Rango: '+LEVELS[level(lv)]);
   }
+}
+// El perfil cambia la inicial cuando cambia el nombre (ae-profile.js).
+function setLetter(node,name){
+  if(!node)return;
+  const letter=firstLetter(name);node.dataset.rankLetter=letter;
+  const pic=node.querySelector(':scope > .cam-rank-emblem');if(!pic)return;
+  const waiting=pic.dataset.rank==='pending',next=emblem(waiting?0:KEYS.indexOf(pic.dataset.rank),letter);
+  if(waiting)next.dataset.rank='pending';
+  pic.replaceWith(next);
 }
 const rememberProfile=(user,data)=>{
   if(!UUID.test(user||'')||!Array.isArray(data?.ranks))return;
@@ -694,7 +715,7 @@ function init(){
   for(const n of document.querySelectorAll('[data-rank-face]:not(.cam-rank-avatar)'))avatar(n,n.dataset.rankFace);
   if(!$('camProfileAvatar')?.classList.contains('cam-rank-avatar'))paintProfileFaces('none');
 }
-window.CamLeagues=Object.freeze({markAuthor,mountEntry,open:openBoard,emblem,avatar,award,levels:LEVELS,stateText,topRank,syncHeader,nextStep});
+window.CamLeagues=Object.freeze({markAuthor,mountEntry,open:openBoard,emblem,avatar,setLetter,award,levels:LEVELS,stateText,topRank,syncHeader,nextStep});
 // This script follows the profile markup. Bind before the profile's own
 // DOMContentLoaded listener: an already-resolved session can emit its view event
 // in a microtask between DOMContentLoaded listeners on a direct profile URL.

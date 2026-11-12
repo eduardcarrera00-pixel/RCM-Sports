@@ -324,10 +324,10 @@ def scenario_create_and_ranking(dark, width, tag):
         page.evaluate("window.camParties.openParty('f1000000-0000-4000-8000-000000000001','hub')")
         page.wait_for_selector('#camPartyBoard .cam-party-row')
         rows = page.eval_on_selector_all('#camPartyBoard .cam-party-row', "rs => rs.map(r => r.innerText.replace(/\\s+/g,' ').trim().toLowerCase())")
-        assert rows[0].startswith('1 @beto_crack') and '+2,40' in rows[0] and '1/1 aciertos' in rows[0], rows
-        # La foto de cada miembro es el escudo de su rango (sin inicial; 11 nov 2026).
-        faces = page.evaluate("[...document.querySelectorAll('#camPartyBoard .cam-party-avatar')].map(n => [n.classList.contains('cam-rank-avatar'), n.textContent.trim(), !!n.querySelector('.cam-rank-emblem')])")
-        assert faces and all(f[0] and not f[1] and f[2] for f in faces), faces
+        assert rows[0].startswith('1 b @beto_crack') and '+2,40' in rows[0] and '1/1 aciertos' in rows[0], rows
+        # La foto de cada miembro es su inicial sobre el escudo de su rango (11 nov 2026).
+        faces = page.evaluate("[...document.querySelectorAll('#camPartyBoard .cam-party-avatar')].map(n => [n.classList.contains('cam-rank-avatar'), n.textContent.trim(), !!n.querySelector('.cam-rank-emblem .cam-rank-letter')])")
+        assert faces and [f[1] for f in faces] == ['B', 'A', 'D'] and all(f[0] and f[2] for f in faces), faces
         assert '@ana' in rows[1] and '+0,50' in rows[1] and '1/2 aciertos' in rows[1] and 'creador' in rows[1], rows
         assert 'sin resultados' in rows[2] and '0,00' in rows[2], rows
         assert page.locator('#camPartyBoard .cam-party-row.is-me').count() == 1

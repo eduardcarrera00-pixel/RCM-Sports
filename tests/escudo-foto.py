@@ -4,14 +4,14 @@ Página completa en Chromium con tests/full-page.py y el Supabase falso de
 tests/fake-supabase.js (sin red). Comprueba:
 
   · Perfil propio, de Cobre a Leyenda CAM (390 px de día y de noche; 320 y
-    1366 px con Oro y Leyenda CAM): en vez de la inicial, el escudo del rango
-    relleno de su metal (un color distinto por rango), con el nombre del rango
-    debajo en su color; se lee «Rango: Oro»; ninguna letra; la línea pequeña
+    1366 px con Oro y Leyenda CAM): el escudo del rango relleno de su metal (un
+    color distinto por rango) con la inicial («E») en el centro, en lugar del
+    símbolo, y el nombre del rango debajo en su color; se lee «Rango: Oro»; la línea pequeña
     «COBRE · PICKS» ya no se ve; el nombre no queda cortado ni montado; el
     escudo de la cabecera, del mismo color.
-  · Mientras llega el rango: escudo neutro del mismo tamaño, sin letra.
+  · Mientras llega el rango: escudo neutro del mismo tamaño, ya con la inicial.
   · «Editar perfil»: el mismo escudo con su nombre y el texto nuevo.
-  · Resto de la web, cada persona con el escudo de su rango y ninguna inicial:
+  · Resto de la web, cada persona con el escudo de su rango y su inicial en el centro:
     Picks (tarjetas y detalle), Chefs (escudo junto al nombre, del rango de la
     persona), Inicio · clasificación de Takes, Últimos Takes y la conversación
     de un Take (autor y respuestas). Sin cuenta detrás: escudo neutro.
@@ -123,7 +123,10 @@ FACE = """() => {
     cls: a.className, rank: a.dataset.rank, role: a.getAttribute('role'), hidden: a.getAttribute('aria-hidden'),
     label: a.getAttribute('aria-label'), text: a.textContent.trim(), emblem: em ? em.dataset.rank : null,
     fill: em ? getComputedStyle(em.querySelector('.cam-rank-shield')).fill : null,
-    symbol: em ? getComputedStyle(em.querySelector('.cam-rank-symbol')).opacity : null,
+    symbol: em ? em.querySelectorAll('.cam-rank-symbol').length : null,
+    letter: em?.querySelector('.cam-rank-letter')?.textContent ?? null,
+    letterBox: em?.querySelector('.cam-rank-letter') ? box(em.querySelector('.cam-rank-letter')) : null,
+    letterFill: em?.querySelector('.cam-rank-letter') ? getComputedStyle(em.querySelector('.cam-rank-letter')).fill : null,
     nameText: name ? name.textContent : null, nameColor: name ? getComputedStyle(name).color : null,
     nameClipped: name ? name.scrollWidth > name.clientWidth + 1 : null,
     bg: getComputedStyle(a).backgroundImage + ' ' + getComputedStyle(a).backgroundColor, radius: getComputedStyle(a).borderTopLeftRadius,
@@ -147,7 +150,13 @@ def profile_case(width, dark, levels, tag):
             t = f'{tag} {LEVELS[lv]}'
             check('cam-rank-avatar' in s['cls'] and 'is-profile' in s['cls'], f'{t}: la foto no es el escudo ({s["cls"]})')
             check(s['rank'] == KEYS[lv] and s['emblem'] == KEYS[lv], f'{t}: rango {s["rank"]}/{s["emblem"]}')
-            check(s['text'] == LEVELS[lv] and s['nameText'] == LEVELS[lv], f'{t}: debajo del escudo «{s["nameText"]}» (texto «{s["text"]}»)')
+            check(s['nameText'] == LEVELS[lv] and s['text'] == 'E' + LEVELS[lv], f'{t}: debajo del escudo «{s["nameText"]}» (texto «{s["text"]}»)')
+            # La inicial («E» de eduard_carrera) en el centro del escudo, en lugar del símbolo del rango.
+            check(s['letter'] == 'E' and s['symbol'] == 0, f'{t}: inicial «{s["letter"]}», símbolos {s["symbol"]}')
+            lb, sb = s['letterBox'], s['shield']
+            check(lb and abs((lb['l'] + lb['r']) / 2 - (sb['l'] + sb['r']) / 2) <= 1.5 and lb['l'] > sb['l'] and lb['r'] < sb['r']
+                  and lb['t'] > sb['t'] and lb['b'] < sb['b'] and lb['h'] >= sb['h'] * .3, f'{t}: la inicial no va centrada dentro del escudo {lb} {sb}')
+            check(s['letterFill'] == 'rgb(16, 41, 59)', f'{t}: color de la inicial {s["letterFill"]}')
             check(s['role'] == 'img' and s['hidden'] is None and s['label'] == 'Rango: ' + LEVELS[lv], f'{t}: accesible {s["role"]} {s["hidden"]} «{s["label"]}»')
             check(s['fill'] == FILL[lv], f'{t}: relleno {s["fill"]} ≠ {FILL[lv]}')
             check(s['nameColor'] == (TEXT_NIGHT if dark else TEXT_DAY)[lv], f'{t}: color del nombre {s["nameColor"]}')
@@ -171,8 +180,8 @@ def profile_case(width, dark, levels, tag):
               return {rank: a.dataset.rank, text: a.textContent.trim(), h: em ? em.getBoundingClientRect().height : 0,
                 fill: em ? getComputedStyle(em.querySelector('.cam-rank-shield')).fill : null,
                 p: a.parentElement.querySelector('p').textContent}; }""")
-            check(e['rank'] == 'leyenda' and e['text'] == 'Leyenda CAM' and e['h'] >= 80 and e['fill'] == FILL[6], f'{tag} editar: {e}')
-            check(e['p'] == 'Tu foto de perfil es el escudo de tu rango: cambia de dibujo y de color cada vez que subes.', f'{tag} editar: texto «{e["p"]}»')
+            check(e['rank'] == 'leyenda' and e['text'] == 'ELeyenda CAM' and e['h'] >= 80 and e['fill'] == FILL[6], f'{tag} editar: {e}')
+            check(e['p'] == 'Tu foto de perfil es tu inicial sobre el escudo de tu rango: cambia de color cada vez que subes.', f'{tag} editar: texto «{e["p"]}»')
             clean(page, tag + ' editar')
             shot(page, f'{tag}-editar')
 
@@ -182,7 +191,7 @@ def pending_case():
         page.evaluate("window.__fake.slow = 1500; document.dispatchEvent(new Event('ae:picks-updated')); openAeProfile()")
         page.wait_for_timeout(500)
         s = page.evaluate(FACE)
-        check(s['rank'] == 'pending' and s['emblem'] == 'pending' and s['text'] == '' and s['symbol'] == '0', f'pendiente: {s["rank"]} «{s["text"]}» {s["symbol"]}')
+        check(s['rank'] == 'pending' and s['emblem'] == 'pending' and s['letter'] == 'E' and s['nameText'].strip() == '', f'pendiente: {s["rank"]} «{s["letter"]}» «{s["nameText"]}»')
         check(s['shield']['h'] >= 54, 'pendiente: el escudo neutro no guarda el tamaño')
         before = s['avatar']
         page.wait_for_timeout(1700)
@@ -228,7 +237,11 @@ SITE = base(0) + ('window.__fake.tables = Object.assign(window.__fake.tables || 
 
 FACES = """sel => [...document.querySelectorAll(sel)].filter(n => n.getClientRects().length).map(n => {
   const em = n.querySelector('.cam-rank-emblem'), cs = getComputedStyle(n);
+  const who = (n.parentElement.textContent.match(/@([\\p{L}\\p{N}_]+)/u) || [])[1] || '';
+  const lt = em?.querySelector('.cam-rank-letter'), lb = lt?.getBoundingClientRect(), sb = em?.getBoundingClientRect();
   return {cls: n.className, rank: n.dataset.rank || null, face: n.dataset.rankFace ?? null, text: n.textContent.trim(),
+    want: (who.match(/[\\p{L}\\p{N}]/u) || [''])[0].toUpperCase(), symbols: em ? em.querySelectorAll('.cam-rank-symbol').length : -1,
+    centred: Boolean(lb && sb && Math.abs((lb.left + lb.right) / 2 - (sb.left + sb.right) / 2) <= 1.5 && lb.left > sb.left && lb.right < sb.right && lb.top > sb.top && lb.bottom < sb.bottom),
     fill: em ? getComputedStyle(em.querySelector('.cam-rank-shield')).fill : null,
     h: em ? Math.round(em.getBoundingClientRect().height) : 0, boxH: Math.round(n.getBoundingClientRect().height),
     bg: cs.backgroundImage + ' ' + cs.backgroundColor, border: cs.borderTopWidth};
@@ -245,7 +258,7 @@ def faces_ok(page, sel, t, minimum=1):
     for r in rows:
         want = 'none' if not r['face'] else expect(int(r['face'][:8]))
         check('cam-rank-avatar' in r['cls'] and r['rank'] == want, f'{t}: foto {r["face"]} → {r["rank"]} (esperado {want})')
-        check(r['text'] == '', f'{t}: queda la inicial «{r["text"]}»')
+        check(r['want'] and r['text'] == r['want'] and r['symbols'] == 0 and r['centred'], f'{t}: inicial «{r["text"]}» (esperada «{r["want"]}»), símbolos {r["symbols"]}, centrada {r["centred"]}')
         check(r['h'] >= 16 and r['h'] <= r['boxH'] + 1, f'{t}: escudo de {r["h"]} px en caja de {r["boxH"]}')
         check(r['bg'].startswith('none') and r['bg'].endswith('rgba(0, 0, 0, 0)') and r['border'] == '0px', f'{t}: queda el círculo {r["bg"]} {r["border"]}')
         if want != 'none': check(r['fill'] == FILL[KEYS.index(want)], f'{t}: relleno {r["fill"]} para {want}')

@@ -41,6 +41,10 @@ html:not(.dark) [data-rank="leyenda"]{--rank-text:#673891}
 .cam-rank-symbol{fill:none;stroke:var(--rank-ink,#10293b);stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round}
 .cam-rank-emblem[data-rank="leyenda"] svg{filter:drop-shadow(0 0 3px rgba(184,138,230,.55))}
 .cam-rank-emblem:is([data-rank="pending"],[data-rank="none"]) :is(.cam-rank-symbol,.cam-rank-facet){opacity:0}
+/* Foto de una persona: su inicial en el centro del escudo (en lugar del símbolo). */
+.cam-rank-letter{fill:var(--rank-ink,#10293b);font:700 26px/1 "Playfair Display",Georgia,serif;letter-spacing:0;pointer-events:none;user-select:none}
+.cam-rank-emblem:is([data-rank="pending"],[data-rank="none"]) .cam-rank-letter{fill:#6b7c89}
+html.dark .cam-rank-emblem:is([data-rank="pending"],[data-rank="none"]) .cam-rank-letter{fill:#a9b8c3}
 html body #aeProfileDialog[data-league-rank]{border-color:var(--league-metal)}
 html body #aeProfileDialog[data-league-rank] .cam-profile-head{border-bottom:1px solid var(--league-metal);background:radial-gradient(ellipse at 95% 10%,var(--league-wash),transparent 65%),#0b2233}
 html body #aeProfileDialog[data-league-rank] .cam-profile-avatar{border-color:var(--league-metal);color:var(--league-metal);background:linear-gradient(135deg,var(--league-wash),transparent),#0d2c44;box-shadow:0 0 0 3px var(--league-wash)}
