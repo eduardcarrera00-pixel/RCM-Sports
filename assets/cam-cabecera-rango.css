@@ -327,3 +327,21 @@
     }
   }
 }
+
+
+/* CAM SPORTS · admin duplicate profile fix (12 nov 2026).
+   The mobile dock already inserts #camNavProfile, which handles both
+   authentication and the logged-in profile. Hide only the redundant
+   admin profile button, leaving the single shared profile control. */
+@layer cam-header {
+  @media (max-width: 760px) {
+    html body > header .ae-mobile-header-grid > .ae-header-actions:has(#loggedAdminContainer:not(.hidden))
+      #loggedAdminContainer .ae-admin-profile {
+      display: none !important;
+    }
+    html body > header .ae-mobile-header-grid > .ae-header-actions:has(#loggedAdminContainer:not(.hidden))
+      > #camNavProfile {
+      order: 1 !important;
+    }
+  }
+}
