@@ -107,7 +107,7 @@
       void openArticleFromShareLink();
     };
     const content = el('div', null, 'cam-snc-content');
-    content.append(el('div', sports[sportNow()].category, 'cam-snc-category'));
+    if (type !== 'take') content.append(el('div', sports[sportNow()].category, 'cam-snc-category'));
     const head = el(type === 'take' ? 'h3' : 'p', null, type === 'take' ? 'cam-snc-title' : 'cam-snc-context');
     const title = el(type === 'take' ? 'button' : 'a', type === 'take' ? row.title : 'En ' + (row.article_title || 'Ver artículo'), 'cam-snc-open');
     if (type === 'comment') title.href = articleURL(row.article_id, row.id);
@@ -128,7 +128,20 @@
     }
     const author = el(row.author_id ? 'button' : 'span', (type === 'take' ? '@' : '') + (row.author || 'Aficionado').replace(/^@+/, ''), 'cam-snc-author');
     if (row.author_id) { author.type = 'button'; author.dataset.camAuthorId = String(row.author_id); author.onclick = () => window.openAePublicProfile?.(row.author_id); }
-    content.append(author); item.append(content);
+    if (type === 'take') {
+      // The same identity cache and highest rank used by the public profile.
+      author.textContent = '';
+      author.classList.add('cam-snc-profile-rank');
+      author.setAttribute('aria-label', 'Ver perfil de ' + (row.author || 'Aficionado'));
+      author.title = 'Ver perfil de ' + (row.author || 'Aficionado');
+      const face = el('span', null, 'cam-snc-rank-face');
+      face.dataset.rankLetter = '';
+      face.dataset.rankFace = row.author_id || '';
+      author.append(face);
+      window.CamLeagues?.avatar(face, row.author_id);
+      item.append(author);
+    } else content.append(author);
+    item.append(content);
     const actions = el('div', null, 'cam-snc-actions');
     const votes = el('div', null, 'cam-snc-votes');
     const up = Math.max(0, Number(row.upvotes) || 0), down = Math.max(0, Number(row.downvotes) || 0);

@@ -116,3 +116,53 @@
   html body #mainContent #camSportNewsCommunity .is-supported .cam-snc-comment { border-left-color:var(--cam-calm-up)!important; }
   html body #mainContent #camSportNewsCommunity .is-questioned .cam-snc-comment { border-left-color:var(--cam-calm-down)!important; }
 }
+
+/* Approved compact debate cards: title-led, small position and actual profile rank. */
+@layer cam-display-clarity {
+  html body #mainContent #camSportNewsCommunity .cam-snc-take {
+    grid-template-columns:16px minmax(0,1fr) 28px!important;
+    align-items:start!important;
+    gap:12px 8px!important;
+    padding:14px 12px 10px!important;
+    min-height:0!important;
+    height:auto!important;
+  }
+  html body #mainContent #camSportNewsCommunity .cam-snc-take > .cam-snc-rank {
+    grid-column:1!important;grid-row:1!important;
+    margin:0!important;padding:1px 0 0!important;
+    font-size:21px!important;line-height:1.25!important;
+  }
+  html body #mainContent #camSportNewsCommunity .cam-snc-take > .cam-snc-content {
+    grid-column:2!important;grid-row:1!important;
+    margin:0!important;padding:0!important;border:0!important;
+  }
+  html body #mainContent #camSportNewsCommunity .cam-snc-take .cam-snc-title {
+    margin:0!important;padding:0!important;border:0!important;
+    font-size:20px!important;line-height:1.28!important;
+    display:block!important;max-height:none!important;overflow:visible!important;
+  }
+  html body #mainContent #camSportNewsCommunity .cam-snc-take > .cam-snc-profile-rank {
+    grid-column:3!important;grid-row:1!important;
+    display:flex!important;align-items:flex-start!important;justify-content:center!important;
+    position:relative!important;width:28px!important;height:32px!important;min-height:0!important;
+    padding:0!important;margin:0!important;border:0!important;background:none!important;
+  }
+  html body #mainContent #camSportNewsCommunity .cam-snc-take .cam-snc-rank-face {
+    width:24px!important;height:28px!important;min-width:0!important;min-height:0!important;
+  }
+  html body #mainContent #camSportNewsCommunity .cam-snc-take > .cam-snc-profile-rank::after {
+    content:"";position:absolute;inset:-6px -8px;
+  }
+  html body #mainContent #camSportNewsCommunity .cam-snc-take > .cam-snc-actions {
+    grid-column:1/-1!important;grid-row:2!important;
+    margin:0!important;padding:0!important;border:0!important;
+  }
+  @media(min-width:761px) {
+    html body #mainContent #camSportNewsCommunity .cam-snc-take {
+      padding:16px 18px 12px!important;column-gap:10px!important;
+    }
+    html body #mainContent #camSportNewsCommunity .cam-snc-take .cam-snc-title {
+      font-size:22px!important;
+    }
+  }
+}
