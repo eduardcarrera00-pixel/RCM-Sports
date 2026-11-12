@@ -439,7 +439,9 @@
    else if(!items.length && !busy)load();
  }
  window.renderFreeTakesVisibility=visibility;
- window.aeOpenTakeComposer=(requestedSport)=>{
+ // preset (opcional, 12 nov 2026): {competition,title} para empezar un Take desde el duelo de NFL.
+ // Solo rellena un formulario vacío: nunca pisa un borrador.
+ window.aeOpenTakeComposer=(requestedSport,preset)=>{
   if(typeof aeRequestPublication!=='function')return;
   return aeRequestPublication('take',async()=>{
    await window.aeDraftGuard?.restore('take');
@@ -457,9 +459,16 @@
      const radio=form.querySelector('input[name="sport"][value="'+value+'"]');
      if(radio)radio.checked=true;
    }
+   const filled=!hasDraft&&preset&&typeof preset==='object';
+   if(filled){
+     if(typeof preset.competition==='string')form.elements.competition.value=preset.competition.slice(0,80);
+     if(typeof preset.title==='string')form.elements.title.value=preset.title.slice(0,160);
+   }
    if(!dialog.open)dialog.showModal();
    window.setTimeout(()=>{
-     const focusTarget=value?form.elements.competition:form.querySelector('input[name="sport"]');
+     const focusTarget=filled&&form.elements.title.value?form.elements.body
+       :filled&&form.elements.competition.value?form.elements.title
+       :value?form.elements.competition:form.querySelector('input[name="sport"]');
      focusTarget?.focus();
    },40);
   });

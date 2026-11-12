@@ -15,7 +15,9 @@
    llamada por jornada). Los partidos, tus elecciones y las del editor salen de
    La Quiniela (window.camNflQuiniela); el ranking, de community.js.
    Escritorio (8 nov 2026): la misma pestaña, compuesta en columnas por
-   cam-escritorio.css. */
+   cam-escritorio.css.
+   Duelo (12 nov 2026): «Tu pick» (los equipos son los botones, sin puntos),
+   «Tu jornada» al elegir y «Tu Take» como campo para escribir. */
 (() => {
   'use strict';
 
@@ -27,7 +29,7 @@
   const mobile = window.matchMedia('(max-width: 760px), (orientation: landscape) and (max-height: 500px) and (hover: none) and (pointer: coarse)');
   const TZ = 'America/Toronto';
   const H = 36e5;
-  const ui = { scoreOpen: false, liveOpen: false, liveKey: null, savingGame: null, saveResult: null };
+  const ui = { scoreOpen: false, liveOpen: false, liveKey: null, savingGame: null, saveResult: null, focusTeam: null };
   const duelCache = new Map();   // 'temporada|semana|usuario' → fila de cam_nfl_expert_duel (o null)
 
   /* ---------- utilidades ---------- */
@@ -46,7 +48,6 @@
   const nflOn = () => document.body.classList.contains('ae-is-nfl');
   // 8 nov 2026: también en escritorio (cam-escritorio.css la compone en columnas).
   const active = () => nflOn();
-  const pts = n => n + (Number(n) === 1 ? ' pt' : ' pts');
 
   const parts = (value, options) => new Intl.DateTimeFormat('es', { timeZone: TZ, ...options }).format(new Date(value)).replace(/\./g, '');
   const cap = s => s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
@@ -131,88 +132,255 @@
     return head;
   }
 
-  function sideButton(g, id, snap) {
-    const chosen = snap.mine.get(g.id) === id;
-    const b = el('button', null, 'cam-ns-pick' + (chosen ? ' is-selected' : ''));
+  /* ---------- Duelo de la semana (12 nov 2026) ----------
+     Dos pasos con aspecto distinto:
+       · Tu pick: los equipos, con su logo, SON los botones (un toque guarda el
+         pronóstico de la quiniela). Sin puntos a la vista: todos los aciertos valen igual.
+       · Tu Take: un campo para escribir; cuanto más atrevido, más vale.
+     Al elegir aparece «Tu jornada»: cuántos llevas, los días (jueves, domingo,
+     lunes…) y un botón al siguiente partido abierto, o cuándo volver. */
+  const ICONS = {
+    pick: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/>',
+    take: '<path d="M4 5h16v11H10l-6 4V5z"/>',
+    pen: '<path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/>',
+    check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>'
+  };
+  function icon(name) {
+    const box = el('span', null, 'cam-ns-ico', { 'aria-hidden': 'true' });
+    box.innerHTML = '<svg viewBox="0 0 24 24" focusable="false">' + ICONS[name] + '</svg>';
+    return box;
+  }
+  const dayOf = value => new Intl.DateTimeFormat('en-CA', { timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(value));
+  const dayLong = iso => parts(iso, { weekday: 'long' });
+  const dayShort = iso => cap(parts(iso, { weekday: 'short' }));
+  const byKickoff = (a, b) => Date.parse(a.kickoff) - Date.parse(b.kickoff);
+  function relativeDay(iso) {
+    const key = dayOf(iso);
+    if (key === dayOf(Date.now())) return 'hoy';
+    if (key === dayOf(Date.now() + 24 * H)) return 'mañana';
+    return null;
+  }
+  function closesIn(iso) {
+    const ms = Date.parse(iso) - Date.now();
+    if (!(ms > 0)) return null;
+    const m = Math.max(1, Math.round(ms / 6e4)), d = Math.floor(m / 1440), h = Math.floor((m % 1440) / 60);
+    if (d >= 1) return d + ' d ' + h + ' h';
+    if (h >= 1) return h + ' h ' + (m % 60) + ' min';
+    return m + ' min';
+  }
+  function stepLabel(kind, text) {
+    const label = el('p', null, 'cam-ns-step-label');
+    label.append(icon(kind), el('span', text));
+    return label;
+  }
+  function action(text, fn, className, attrs) {
+    const b = el('button', text, className, attrs);
     b.type = 'button';
-    b.disabled = ui.savingGame != null;
-    b.setAttribute('aria-pressed', String(chosen));
-    const p = pointsFor(g, id);
-    const doubled = p != null && snap.laurel === g.id;
-    b.append(el('strong', nick(id)), el('span', p == null ? 'pts pendientes' : (doubled ? pts(p * 2) + ' · x2' : pts(p)), 'cam-ns-pick-points'));
-    b.setAttribute('aria-label', 'Quiniela: elegir ' + (teamOf(id)?.name || id) + (p == null ? '' : ', ' + pts(doubled ? p * 2 : p)) + (chosen ? ' (tu elección guardada)' : ''));
-    b.addEventListener('click', async () => {
-      const q = quiniela();
-      if (!q || ui.savingGame != null) return;
-      ui.savingGame = g.id;
-      ui.saveResult = null;
-      for (const button of b.parentElement.children) if (button.tagName === 'BUTTON') button.disabled = true;
-      try {
-        const saved = await q.save(g.id, id);
-        if (saved) ui.saveResult = { game: g.id, text: 'Quiniela guardada: ' + nick(id) + '.' };
-        else if (snap.user) ui.saveResult = { game: g.id, text: document.getElementById('camNflStatus')?.textContent || 'No se pudo guardar. Inténtalo de nuevo.' };
-      } finally { ui.savingGame = null; schedule(); }
-    });
+    b.addEventListener('click', fn);
     return b;
   }
+  function openTake(title) {
+    if (typeof window.aeOpenTakeComposer !== 'function') return;
+    window.aeOpenTakeComposer('NFL', title ? { competition: 'NFL', title } : { competition: 'NFL' });
+  }
 
-  function duelBlock(snap, duel, rankIds) {
+  function sideTile(g, id, snap, open) {
+    const home = id === g.home_id;
+    const chosen = snap.mine.get(g.id) === id;
+    const other = snap.mine.has(g.id) && !chosen;
+    const name = teamOf(id)?.name || id;
+    let cls = 'cam-ns-side' + (chosen ? ' is-selected' : '') + (other ? ' is-other' : '') + (open ? '' : ' is-static');
+    if (finished(g) && g.winner_id) cls += g.winner_id === id ? ' is-winner' : ' is-loser';
+    const tile = el(open ? 'button' : 'div', null, cls, { 'data-side': home ? 'home' : 'away', 'data-team': id });
+    const mark = el('span', null, 'cam-ns-side-mark', { 'aria-hidden': 'true' });
+    if (chosen) mark.append(icon('check'));
+    const label = el('span', null, 'cam-ns-side-label');
+    label.append(el('span', nick(id), 'cam-ns-side-name'), el('span', chosen ? 'Tu pick' : (home ? 'Local' : 'Visitante'), 'cam-ns-side-sub'));
+    tile.append(mark, crest(id, 52), label);
+    if (!open) {
+      if (chosen) tile.setAttribute('aria-label', name + ': tu pick');
+      return tile;
+    }
+    tile.type = 'button';
+    tile.disabled = ui.savingGame != null;
+    tile.setAttribute('aria-pressed', String(chosen));
+    tile.setAttribute('aria-label', (chosen ? 'Tu pick: ' : 'Elegir a ') + name);
+    tile.addEventListener('click', async () => {
+      const q = quiniela();
+      if (!q || ui.savingGame != null || snap.mine.get(g.id) === id) return;
+      ui.savingGame = g.id;
+      ui.saveResult = null;
+      for (const button of tile.parentElement.querySelectorAll('button')) button.disabled = true;
+      try {
+        const saved = await q.save(g.id, id);
+        if (saved) { ui.saveResult = { game: g.id, ok: true }; ui.focusTeam = id; }
+        else if (snap.user) ui.saveResult = { game: g.id, ok: false, text: document.getElementById('camNflStatus')?.textContent || 'No se pudo guardar. Inténtalo de nuevo.' };
+      } finally { ui.savingGame = null; schedule(); }
+    });
+    return tile;
+  }
+
+  function hintLine(snap, duel, open) {
+    const mine = snap.mine.get(duel.id) || null;
+    const result = ui.saveResult?.game === duel.id ? ui.saveResult : null;
+    const hint = el('p', null, 'cam-ns-hint', { role: 'status' });
+    if (result && !result.ok) {
+      hint.classList.add('is-error');
+      hint.textContent = result.text;
+    } else if (finished(duel)) {
+      if (mine && mine === duel.winner_id) { hint.classList.add('is-saved'); hint.append(icon('check'), el('span', 'Acertaste: ' + nick(mine) + '.')); }
+      else hint.textContent = mine ? 'Elegiste ' + nick(mine) + '.' : 'No elegiste en este duelo.';
+    } else if (started(duel)) {
+      hint.textContent = mine ? 'Tu pick: ' + nick(mine) + ' · pronósticos cerrados' : 'Pronósticos cerrados';
+    } else if (!open) {
+      hint.textContent = 'Se abre cuando lleguen las cuotas.';
+    } else if (mine) {
+      hint.classList.add('is-saved');
+      const rel = relativeDay(duel.kickoff);
+      hint.append(icon('check'), el('span', 'Guardado. Puedes cambiarlo hasta ' + (rel || 'el ' + dayLong(duel.kickoff)) + ' a las ' + clock(duel.kickoff) + '.'));
+    } else {
+      const left = closesIn(duel.kickoff);
+      hint.textContent = 'Un toque y estás dentro' + (left ? ' · cierra en ' + left : '');
+    }
+    return hint;
+  }
+
+  /* «Tu jornada»: la quiniela NFL se juega por jornada (jueves, domingo, lunes…).
+     Tras elegir el duelo, invita a seguir con lo abierto o a volver el día que toque. */
+  function journeyBlock(snap, weekGames, duel) {
+    const q = quiniela();
+    const now = Date.now();
+    const games = weekGames.filter(g => g.status !== 'cancelled' && g.status !== 'postponed');
+    if (!games.length) return null;
+    const isOpen = g => !!q?.isOpen?.(g);
+    const upcoming = g => g.status === 'scheduled' && Date.parse(g.kickoff) > now;
+    const has = g => snap.mine.has(g.id);
+    const days = [];
+    for (const g of games.slice().sort(byKickoff)) {
+      const key = dayOf(g.kickoff);
+      let day = days.find(d => d.key === key);
+      if (!day) days.push(day = { key, games: [] });
+      day.games.push(g);
+    }
+    for (const day of days) {
+      day.done = day.games.filter(has).length;
+      day.open = day.games.filter(g => isOpen(g) && !has(g));
+      day.later = day.games.filter(g => upcoming(g) && !isOpen(g) && !has(g));
+      day.state = day.done === day.games.length ? 'done' : day.open.length ? 'open' : day.later.length ? 'later' : 'closed';
+    }
+    const total = games.length, picked = games.filter(has).length;
+    const open = days.flatMap(d => d.open).sort(byKickoff);
+    const later = days.flatMap(d => d.later).sort(byKickoff);
+    const complete = picked === total && games.some(upcoming);
+    if (!open.length && !later.length && !complete) return null;
+
+    const box = el('div', null, 'cam-ns-next', { role: 'group', 'aria-labelledby': 'camNsNextTitle' });
+    const head = el('div', null, 'cam-ns-next-head');
+    head.append(el('p', 'Tu jornada', 'cam-ns-next-title', { id: 'camNsNextTitle' }), el('span', picked + ' de ' + total, 'cam-ns-next-count'));
+    const bar = el('span', null, 'cam-ns-next-bar', { role: 'progressbar', 'aria-label': 'Partidos elegidos en la jornada',
+      'aria-valuemin': '0', 'aria-valuemax': String(total), 'aria-valuenow': String(picked) });
+    bar.style.setProperty('--done', Math.round(100 * picked / total) + '%');
+    bar.append(el('span', null, 'cam-ns-next-fill'));
+    const row = el('div', null, 'cam-ns-days');
+    for (const day of days) {
+      const first = day.games[0];
+      const target = day.open[0] || day.games.find(g => !has(g)) || first;
+      const status = day.state === 'done' ? '✓' : day.state === 'later' ? 'Pronto' : day.done + '/' + day.games.length;
+      const label = cap(dayLong(first.kickoff)) + ' ' + dayMonth(first.kickoff) + ': ' +
+        (day.state === 'later' ? 'se abre más adelante' : day.done + ' de ' + day.games.length + ' elegidos');
+      const chip = action(null, () => focusGame(target.id), 'cam-ns-day is-' + day.state, { 'aria-label': label });
+      chip.append(el('strong', dayShort(first.kickoff)), el('span', status, 'cam-ns-day-status', { 'aria-hidden': 'true' }));
+      row.append(chip);
+    }
+    box.append(head, bar, row);
+
+    let message, cta = null;
+    if (open.length) {
+      const next = open[0];
+      const rel = relativeDay(next.kickoff);
+      const sameDay = open.filter(g => dayOf(g.kickoff) === dayOf(next.kickoff)).length;
+      message = (open.length === 1 ? 'Te queda 1 partido por elegir.' : 'Te quedan ' + open.length + ' partidos por elegir.') +
+        (rel ? ' El siguiente empieza ' + rel + ' a las ' + clock(next.kickoff) + '.' : '');
+      const what = (sameDay === 1 ? 'el' : 'los ' + sameDay) + (rel ? ' de ' + rel : ' del ' + dayLong(next.kickoff));
+      cta = action('Elegir ' + what + ' →', () => focusGame(next.id), 'cam-ns-next-cta');
+    } else if (later.length) {
+      const next = later[0];
+      const rel = relativeDay(next.kickoff);
+      message = 'Ya elegiste todo lo abierto. Lo ' + (rel ? 'de ' + rel : 'del ' + dayLong(next.kickoff)) +
+        ' se abre cuando lleguen sus cuotas: vuelve ' + (rel ? '' : 'el ' + dayLong(next.kickoff) + ' ') + 'antes de las ' + clock(next.kickoff) + '.';
+    } else {
+      message = '¡Jornada completa! Ya elegiste ' + (total === 1 ? 'el partido.' : 'los ' + total + ' partidos.');
+      const laurelTarget = snap.laurel === null ? [duel, ...games].find(g => has(g) && isOpen(g)) : null;
+      if (laurelTarget) {
+        message += ' Ponle el laurel a tu partido más seguro: si aciertas, vale el doble.';
+        cta = action('Poner el laurel →', () => focusGame(laurelTarget.id), 'cam-ns-next-cta');
+      } else {
+        message += ' Vuelve cuando acabe cada día para ver cómo te fue.';
+      }
+    }
+    box.append(el('p', message, 'cam-ns-next-text'));
+    if (cta) box.append(cta);
+    return box;
+  }
+
+  function takeBlock(snap, duel) {
+    const mine = snap.mine.get(duel.id) || null;
+    const invited = !!mine && !started(duel);
+    const pickedNick = mine ? nick(mine) : null;
+    const box = el('div', null, 'cam-ns-take' + (invited ? ' is-invited' : ''), { role: 'group', 'aria-labelledby': 'camNsTakeTitle' });
+    box.append(stepLabel('take', 'Tu Take'),
+      el('h4', invited ? '¿Y cómo ganan los ' + pickedNick + '?' : '¿Qué crees que va a pasar?', 'cam-ns-step-title', { id: 'camNsTakeTitle' }),
+      el('p', 'Una predicción con tus palabras. Lo que se publica aquí no se borra.', 'cam-ns-take-text'));
+    if (invited) {
+      const ideas = el('div', null, 'cam-ns-ideas');
+      const list = el('div', null, 'cam-ns-ideas-row');
+      for (const idea of ['Los ' + pickedNick + ' ganan por 10 o más', 'Los ' + pickedNick + ' remontan en el último cuarto'])
+        list.append(action(idea, () => openTake(idea), 'cam-ns-idea', { 'aria-haspopup': 'dialog', 'aria-controls': 'aeTakeComposerDialog' }));
+      ideas.append(el('p', 'Ideas para empezar', 'cam-ns-ideas-label'), list);
+      box.append(ideas);
+    }
+    const example = pickedNick || nick(duel.home_id);
+    const field = action(null, () => openTake(), 'cam-ns-take-field', { 'aria-label': 'Escribir mi Take', 'aria-haspopup': 'dialog', 'aria-controls': 'aeTakeComposerDialog' });
+    const pen = el('span', null, 'cam-ns-take-pen', { 'aria-hidden': 'true' });
+    pen.append(icon('pen'));
+    field.append(el('span', '«Los ' + example + ' ganan por más de 10…»', 'cam-ns-take-placeholder', { 'aria-hidden': 'true' }), pen);
+    const scale = el('p', null, 'cam-ns-take-scale');
+    const bars = el('span', null, 'cam-ns-bars', { 'aria-hidden': 'true' });
+    bars.append(el('span'), el('span'), el('span'));
+    scale.append(bars, el('span', 'Cuanto más atrevido, más vale si aciertas'));
+    box.append(field, scale);
+    return box;
+  }
+
+  function duelBlock(snap, duel, rankIds, weekGames) {
     const pos = id => { const i = rankIds.indexOf(id); return i < 0 ? null : i + 1; };
     const a = pos(duel.away_id), h = pos(duel.home_id);
     const label = a && h ? 'n.º ' + a + ' vs n.º ' + h : a || h ? 'juega el n.º ' + Math.min(a || 99, h || 99) : 'el más parejo';
     const box = section('duelo', 'Duelo de la semana · ' + label);
-    box.classList.add('cam-ns-feature');
-    const teams = el('div', null, 'cam-ns-duel');
-    const team = (id, side) => {
-      const t = el('div', null, 'cam-ns-duel-team', { 'data-side': side });
-      t.append(crest(id, 40), el('span', nick(id), 'cam-ns-duel-name'));
-      return t;
-    };
-    teams.append(team(duel.away_id, 'away'), el('span', '@', 'cam-ns-at', { 'aria-hidden': 'true' }), team(duel.home_id, 'home'));
-    box.append(teams);
-    const sr = el('p', (teamOf(duel.away_id)?.name || duel.away_id) + ' en casa de ' + (teamOf(duel.home_id)?.name || duel.home_id), 'cam-ns-sr');
-    box.append(sr);
-
+    box.classList.add('cam-ns-feature', 'cam-ns-duelo');
     if (finished(duel)) {
       box.append(el('p', duel.away_id + ' ' + duel.away_score + ' – ' + duel.home_score + ' ' + duel.home_id, 'cam-ns-duel-score'));
     } else {
       box.append(el('p', (started(duel) ? (duel.status === 'live' ? 'En juego · ' : 'Cerrado · ') : '') + when(duel.kickoff) + ' · ' + dayMonth(duel.kickoff), 'cam-ns-duel-when'));
     }
+    box.append(el('p', (teamOf(duel.away_id)?.name || duel.away_id) + ' en casa de ' + (teamOf(duel.home_id)?.name || duel.home_id), 'cam-ns-sr'));
 
-    const opinion = el('div', null, 'cam-ns-opinion');
-    const take = link('Publicar Take', () => {
-      window.aeOpenTakeComposer?.('NFL');
-    }, 'cam-ns-link-take');
-    take.setAttribute('aria-controls', 'aeTakeComposerDialog');
-    take.setAttribute('aria-haspopup', 'dialog');
-    opinion.append(take);
-    box.append(opinion);
-
-    const play = el('div', null, 'cam-ns-quiniela', { role: 'group', 'aria-label': 'Quiniela del duelo de la semana' });
-    if (finished(duel)) {
-      const mine = snap.mine.get(duel.id);
-      const winner = duel.winner_id;
-      if (mine) play.append(el('p', mine === winner ? 'Acertaste: ' + nick(mine) + '.' : 'Elegiste ' + nick(mine) + '.', 'cam-ns-note'));
-    } else if (started(duel)) {
-      const mine = snap.mine.get(duel.id);
-      play.append(el('p', mine ? 'Tu elección: ' + nick(mine) : 'Pronósticos cerrados', 'cam-ns-note'));
-    } else {
-      const picks = el('div', null, 'cam-ns-picks');
-      if (quiniela()?.isOpen?.(duel)) picks.append(sideButton(duel, duel.away_id, snap), sideButton(duel, duel.home_id, snap));
-      else picks.append(el('p', 'Se abre cuando lleguen las cuotas.', 'cam-ns-note'));
-      play.append(picks);
-    }
-    if (ui.saveResult?.game === duel.id) {
-      play.append(el('p', ui.saveResult.text, 'cam-ns-note', { role: 'status' }));
-    } else if (!started(duel) && snap.mine.has(duel.id)) {
-      play.append(el('p', 'Tu elección guardada: ' + nick(snap.mine.get(duel.id)), 'cam-ns-note'));
-    }
+    const open = !started(duel) && !!quiniela()?.isOpen?.(duel);
+    const pick = el('div', null, 'cam-ns-step cam-ns-step-pick', { role: 'group', 'aria-labelledby': 'camNsPickTitle' });
+    pick.append(stepLabel('pick', 'Tu pick'), el('h4', finished(duel) ? '¿Quién ganó?' : '¿Quién gana?', 'cam-ns-step-title', { id: 'camNsPickTitle' }));
+    const sides = el('div', null, 'cam-ns-sides');
+    sides.append(sideTile(duel, duel.away_id, snap, open), el('span', '@', 'cam-ns-at', { 'aria-hidden': 'true' }), sideTile(duel, duel.home_id, snap, open));
+    pick.append(sides, hintLine(snap, duel, open));
     const share = snap.split?.get(duel.id);
     if (share && Number(share.total) >= 5) {
       const away = Math.round(100 * Number(share.away_picks) / Number(share.total));
-      play.append(el('p', 'La comunidad: ' + away + ' % ' + nick(duel.away_id) + ' · ' + (100 - away) + ' % ' + nick(duel.home_id), 'cam-ns-note'));
+      pick.append(el('p', 'La comunidad: ' + away + ' % ' + nick(duel.away_id) + ' · ' + (100 - away) + ' % ' + nick(duel.home_id), 'cam-ns-note'));
     }
-    box.append(play);
+    if (snap.mine.has(duel.id)) {
+      const journey = journeyBlock(snap, weekGames, duel);
+      if (journey) pick.append(journey);
+    }
+    box.append(pick, takeBlock(snap, duel));
     return box;
   }
 
@@ -328,7 +496,7 @@
     if (scoreWeek != null && snap.expert) void loadDuel(season, scoreWeek, snap.user);
     const blocks = {
       envivo: liveBlock(snap.liveGames || weekGames),
-      duelo: duel ? duelBlock(snap, duel, rankIds) : null,
+      duelo: duel ? duelBlock(snap, duel, rankIds, weekGames) : null,
             marcador: score
     };
     // La quiniela precede al editor y al marcador en todos los días de la semana.
@@ -339,6 +507,11 @@
     const liveFocused = body.querySelector('.cam-ns-live-toggle') === document.activeElement;
     body.replaceChildren(fragment);
     if (liveFocused) body.querySelector('.cam-ns-live-toggle')?.focus({ preventScroll: true });
+    // Tras guardar el pick, el foco vuelve al equipo elegido (la tarjeta se repinta entera).
+    if (ui.focusTeam) {
+      body.querySelector('.cam-ns-side[data-team="' + CSS.escape(ui.focusTeam) + '"]')?.focus({ preventScroll: true });
+      ui.focusTeam = null;
+    }
     keepAnchor();
   }
 
