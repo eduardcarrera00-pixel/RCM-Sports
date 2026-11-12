@@ -21,6 +21,7 @@
   };
   const chunks = (rows, size) => Array.from({length: Math.ceil(rows.length / size)}, (_, i) => rows.slice(i * size, (i + 1) * size));
   const latest = (a, b) => (Date.parse(b.created_at) || 0) - (Date.parse(a.created_at) || 0) || String(b.id).localeCompare(String(a.id));
+  const firstInitial = value => (String(value || 'Aficionado').match(/[\p{L}\p{N}]/u)?.[0] || 'A').toLocaleUpperCase('es');
   async function dataOf(query) {
     const result = await query;
     if (result.error) throw result.error;
@@ -141,7 +142,7 @@
       author.textContent = '';
       author.setAttribute('aria-label', 'Ver perfil de ' + (row.author || 'Aficionado'));
       const face = el('span', null, 'cam-snc-profile-rank');
-      face.dataset.rankLetter = '';
+      face.dataset.rankLetter = firstInitial(row.author);
       face.dataset.rankFace = row.author_id || '';
       face.setAttribute('aria-hidden', 'true');
       author.append(face);
@@ -156,7 +157,7 @@
       author.setAttribute('aria-label', 'Ver perfil de ' + (row.author || 'Aficionado'));
       author.title = 'Ver perfil de ' + (row.author || 'Aficionado');
       const face = el('span', null, 'cam-snc-rank-face');
-      face.dataset.rankLetter = '';
+      face.dataset.rankLetter = firstInitial(row.author);
       face.dataset.rankFace = row.author_id || '';
       author.append(face);
       window.CamLeagues?.avatar(face, row.author_id);
