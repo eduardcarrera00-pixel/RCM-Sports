@@ -409,7 +409,8 @@ html.dark #camLiguilla .cam-lg-event{border-color:rgba(232,191,121,.3)}
 #camFootballQuiniela{--lg-sel:#0A3268;--lg-on-sel:#F3EBDD;--lg-on-sel-pts:#E8BF79}
 html.dark #camFootballQuiniela{--lg-sel:#E8BF79;--lg-on-sel:#0B2233;--lg-on-sel-pts:#0B2233}
 html body #camFootballSemana.has-competition-nav~#camFootballQuiniela #camFootballNav .cam-football-leagues{display:none}
-html body #camFootballSemana.has-competition-nav~#camFootballQuiniela #camFootballNav{margin-top:12px;padding-top:12px}
+/* 12 nov 2026: «Ver mis jornadas» se mudó debajo de los botones de guardar; sin logos, esta fila queda vacía. */
+html body #camFootballSemana.has-competition-nav~#camFootballQuiniela #camFootballNav{display:none}
 html body #camFootballQuiniela .cam-nfl-sides{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;align-items:stretch}
 html body #camFootballQuiniela .cam-nfl-sides :is(.cam-nfl-team,.cam-nfl-draw){display:grid;grid-template-columns:minmax(0,1fr);justify-items:center;align-content:center;gap:5px;width:100%;min-width:0;min-height:96px;margin:0;padding:10px 6px;border:1px solid var(--q-line);background:var(--q-card);color:var(--q-ink);text-align:center;box-shadow:none}
 html body #camFootballQuiniela .cam-nfl-sides .cam-nfl-team::before,

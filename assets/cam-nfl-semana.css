@@ -424,6 +424,8 @@
 
 
   /* ---------- 2. La Quiniela NFL: editor, laurel y comunidad ---------- */
+  /* 12 nov 2026: la línea de cada partido (NFL y Fútbol) solo lleva el estado; sigue a la derecha. */
+  html body :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-game-meta > .cam-nfl-badge:only-child { margin-left:auto!important; }
   html body #camNflQuiniela .cam-nfl-extras {
     display:flex!important; flex-wrap:wrap!important; align-items:center!important; gap:6px!important;
     margin:10px 0 0!important; padding:10px 0 0!important; border-top:1px solid var(--q-line)!important; border-radius:0!important;

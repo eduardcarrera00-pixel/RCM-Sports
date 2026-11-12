@@ -284,7 +284,11 @@
     // Pausa manual durante la Liguilla de Liga MX. Reactivar solo cuando lo pida el club.
     root.classList.toggle('cam-ligamx-regular-paused',competition==='ligamx');
     const nav=$('camFootballNav');if(!nav)return;
-    nav.replaceChildren(competitionNav(),button('Ver mis jornadas ›',()=>window.camOpenQuinielaHistory?.('football'),'cam-nfl-action cam-nfl-action-secondary'));
+    const history=button('Ver mis jornadas ›',()=>window.camOpenQuinielaHistory?.('football'),'cam-nfl-action cam-nfl-action-secondary');
+    // 12 nov 2026: «Ver mis jornadas» va debajo de «Inicia sesión para participar» / «Guardar picks del día».
+    const below=$('camFootballHistory');
+    if(below){nav.replaceChildren(competitionNav());below.replaceChildren(history);}
+    else nav.replaceChildren(competitionNav(),history);
   }
   function logo(id){
     const team=teams.get(id);
@@ -341,16 +345,6 @@
     b.addEventListener('click',()=>choose(g,'draw'));
     if(disabled)b.title=unavailableReason();
     return b;
-  }
-  // Hora del partido y, en el partido bonus de la jornada, su etiqueta.
-  function when(g){
-    const span=el('span',clock(g.kickoff));
-    if(g.is_bonus){
-      const tag=el('b','Bonus +5','cam-q-bonus');
-      tag.title='Partido bonus: si aciertas y tu opción fue la menos elegida, +5 puntos extra.';
-      span.append(' · ',tag);
-    }
-    return span;
   }
   // Mismo criterio que gameStatus(): el color nunca contradice al texto.
   function gameState(g){
@@ -462,7 +456,8 @@
       box.dataset.gameId=g.id;
       box.dataset.state=gameState(g);
       const top=el('div',null,'cam-nfl-game-meta');
-      top.append(when(g),el('span',gameStatus(g),'cam-nfl-badge'));box.append(top);
+      // 12 nov 2026: la línea solo lleva el estado («Abierto»…); sin hora ni «Bonus +5».
+      top.append(el('span',gameStatus(g),'cam-nfl-badge'));box.append(top);
       if(g.is_bonus)box.classList.add('is-bonus');
       const sides=el('div',null,'cam-nfl-sides');
       sides.append(side(g,'home'),drawOption(g),side(g,'away'));

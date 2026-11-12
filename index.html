@@ -470,7 +470,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
     </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
-<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261112-liguilla-visible-1">
+<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261112-jornadas-abajo-1">
 <style id="cam-liguilla-week-styles">
 /* Integración de la Liguilla en Fútbol → La semana. Un solo recuadro, «Arma tu cuadro»:
    primero «mis 8» y después el cuadro con puntos (estilos en assets/cam-liguilla.css). */
@@ -3287,7 +3287,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
                 <img class="cam-football-quiniela-illustration cam-football-quiniela-illustration--day" src="assets/cam-football-quiniela-day.svg" alt="" aria-hidden="true" width="300" height="240" loading="lazy" decoding="async">
                 <img class="cam-football-quiniela-illustration cam-football-quiniela-illustration--night" src="assets/cam-football-quiniela-night.svg" alt="" aria-hidden="true" width="300" height="240" loading="lazy" decoding="async">
               </header>
-              <div id="camFootballNav" class="cam-nfl-nav" aria-label="Competición y mi quiniela"></div>
+              <div id="camFootballNav" class="cam-nfl-nav" aria-label="Competición"></div>
             </div>
             <div id="camFootballMatchPanel">
             <p id="camFootballStatus" class="cam-nfl-status" role="status" aria-live="polite"></p>
@@ -3297,6 +3297,8 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
               <button id="camFootballSaveDay" type="button" class="cam-nfl-action">Guardar picks del día</button>
               <button id="camFootballSave" type="button" hidden style="display:none!important" class="cam-nfl-action cam-nfl-action-secondary">Guardar toda la jornada</button>
             </div>
+            <!-- 12 nov 2026: «Ver mis jornadas» va debajo de «Inicia sesión para participar» / «Guardar picks del día», como en NFL. -->
+            <div id="camFootballHistory" class="cam-nfl-nav cam-nfl-nav-after" aria-label="Mi quiniela"></div>
 
 
             <section id="camFootballAdmin" class="cam-nfl-admin" aria-label="Controles de administradores" hidden></section>
@@ -6665,10 +6667,10 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 </style>
 
 <!-- Componentes finales: móvil, conversación, parties, perfil y Takes; orden en performance-css-packs.json. -->
-<link rel="stylesheet" href="assets/cam-perf-app-panels.css?v=20261112-duelo-pick-take-1">
+<link rel="stylesheet" href="assets/cam-perf-app-panels.css?v=20261112-linea-solo-estado-1">
 <link rel="stylesheet" href="assets/cam-home-takes-unified.css?v=20261112-symmetric-tabs-2">
 <script src="assets/cam-parties.js?v=20261111-escudo-rango-1"></script>
-<script src="assets/cam-sport-quiniela-loader.js?v=20261112-cuadro-visible-1"></script>
+<script src="assets/cam-sport-quiniela-loader.js?v=20261112-linea-solo-estado-1"></script>
 <script src="assets/ae-season-predictions.js?v=20261021-champion-guide-1"></script>
 <script src="assets/cam-lazy-editorial-loader.js?v=20261112-blended-carousel-2"></script>
 <script src="assets/cam-opinions-section-banners.js?v=20261104-actualidad-1"></script>

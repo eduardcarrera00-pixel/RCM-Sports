@@ -344,16 +344,6 @@
     if(disabled)b.title='Este partido está cerrado';
     return b;
   }
-  // Hora del partido y, en el partido bonus de la semana, su etiqueta.
-  function when(g){
-    const span=el('span',clock(g.kickoff));
-    if(g.is_bonus){
-      const tag=el('b','Bonus +5','cam-q-bonus');
-      tag.title='Partido bonus: si aciertas y tu equipo fue el menos elegido, +5 puntos extra.';
-      span.append(' · ',tag);
-    }
-    return span;
-  }
   // Mismo criterio que gameStatus(): el color nunca contradice al texto.
   function gameState(g){
     const pick=mine.get(g.id);
@@ -461,7 +451,8 @@
       box.dataset.gameId=g.id;
       if(laurelOf(g)===g.id)box.classList.add('has-laurel');
       const top=el('div',null,'cam-nfl-game-meta');
-      top.append(when(g),el('span',gameStatus(g),'cam-nfl-badge'));box.append(top);
+      // 12 nov 2026: la línea solo lleva el estado («Abierto»…); sin hora ni «Bonus +5».
+      top.append(el('span',gameStatus(g),'cam-nfl-badge'));box.append(top);
       if(g.is_bonus)box.classList.add('is-bonus');
       const sides=el('div',null,'cam-nfl-sides');
       sides.append(side(g,g.away_id),el('span','@','cam-nfl-versus'),side(g,g.home_id));

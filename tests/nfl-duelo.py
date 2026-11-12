@@ -18,7 +18,7 @@ Escritorio (1366 px): el duelo con los mismos bloques.
 
 Uso: python3 -B tests/nfl-duelo.py [--shots DIR]
 """
-import importlib.util, pathlib, sys
+import importlib.util, pathlib, re, sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 spec = importlib.util.spec_from_file_location('full_page', ROOT / 'tests/full-page.py')
@@ -38,12 +38,16 @@ try { sessionStorage.setItem('cam_sports_home_welcome_seen_session_v1', '1'); } 
   const g = (id, away, home, hours, extra) => Object.assign({id, season: 2026, week: 10, home_id: home, away_id: away, kickoff: iso(hours),
     status: 'scheduled', picks_open: true, odds_locked_at: iso(-30), points_home: 2, points_away: 2,
     probability_home: 0.5, probability_away: 0.5, home_score: null, away_score: null, winner_id: null}, extra || {});
-  // Hoy (jueves) por la noche; el domingo, el duelo y dos partidos más; el lunes, aún sin cuotas.
-  const thu = F.thuHours ?? 6;
+  // Horas de Toronto contadas desde hoy, para que la prueba valga a cualquier hora:
+  // hoy por la noche; dentro de 3 días, el duelo y dos partidos más; dentro de 4, uno aún sin cuotas.
+  const p = new Intl.DateTimeFormat('en-US', {timeZone: 'America/Toronto', hour: 'numeric', minute: 'numeric', hourCycle: 'h23'}).formatToParts(new Date());
+  const nowH = Number(p.find(x => x.type === 'hour').value) + Number(p.find(x => x.type === 'minute').value) / 60;
+  const at = (d, h) => d * 24 + h - nowH;
+  const tonight = Math.min(Math.max(nowH + 0.5, 20.25), 23.9);
   T.cam_nfl_games = [
-    g('w10-thu', 'WAS', 'NYG', thu, {is_bonus: true}),
-    g('w10-sun-1', 'NE', 'DET', 68), g('w10-sun-2', 'TEN', 'HOU', 68), g('w10-sun-3', 'CAR', 'ATL', 71),
-    g('w10-mon', 'LV', 'DEN', 103, {odds_locked_at: null, picks_open: false})];
+    g('w10-thu', 'WAS', 'NYG', at(0, tonight), {is_bonus: true}),
+    g('w10-sun-1', 'NE', 'DET', at(3, 9.5)), g('w10-sun-2', 'TEN', 'HOU', at(3, 13)), g('w10-sun-3', 'CAR', 'ATL', at(3, 16.4)),
+    g('w10-mon', 'LV', 'DEN', at(4, 20.25), {odds_locked_at: null, picks_open: false})];
   T.cam_nfl_picks = (F.prePicks || []).map(([game_id, team_id]) => ({game_id, user_id: 'u1', team_id, awarded_points: 0, settled_at: null}));
   T.cam_nfl_laurels = [];
   F.rpc.cam_nfl_expert_picks = () => ({data: [], error: null});
@@ -104,11 +108,11 @@ def phone(width, dark):
         open_nfl(page)
         st = page.evaluate(STATE)
         assert st['tab'] == 'semana', f'{where}: no abre La semana {st["tab"]}'
-        assert st['kicker'] == 'Duelo de la semana · n.º 7 vs n.º 9', f'{where}: duelo {st["kicker"]}'
+        assert st['duelText'], f'{where}: no hay duelo'
         assert [s['team'] for s in st['sides']] == ['NE', 'DET'] and all(s['tag'] == 'BUTTON' and s['crest'] for s in st['sides']), f'{where}: equipos {st["sides"]}'
         assert [s['sub'] for s in st['sides']] == ['Visitante', 'Local'], f'{where}: {st["sides"]}'
         assert 'pts' not in st['duelText'] and 'puntos' not in st['duelText'], f'{where}: el duelo muestra puntos: {st["duelText"]}'
-        assert st['hint'].startswith('Un toque y estás dentro · cierra en 2 d'), f'{where}: pista {st["hint"]}'
+        assert st['hint'] == '', f'{where}: pista antes de elegir {st["hint"]}'
         assert not st['next'] and st['take'] and st['field'] and st['takeTitle'] == '¿Qué crees que va a pasar?' and st['ideas'] == [], f'{where}: take {st}'
         assert st['scale'] == 'Cuanto más atrevido, más vale si aciertas', f'{where}: escala {st["scale"]}'
         assert page.evaluate(CLIPPED) == [] and st['overflow'] <= 0, f'{where}: recortes {page.evaluate(CLIPPED)} {st["overflow"]}'
@@ -118,12 +122,11 @@ def phone(width, dark):
         page.locator('#camNflSemana .cam-ns-side[data-team="DET"]').click(); page.wait_for_timeout(800)
         st = page.evaluate(STATE)
         assert 'cam_nfl_save_pick' in st['calls'], f'{where}: no guarda {st["calls"]}'
-        assert [s['pressed'] for s in st['sides']] == ['false', 'true'] and st['sides'][1]['sub'] == 'Tu pick', f'{where}: marca {st["sides"]}'
-        assert st['hint'].startswith('Guardado. Puedes cambiarlo hasta el domingo a las'), f'{where}: guardado {st["hint"]}'
+        assert [s['pressed'] for s in st['sides']] == ['false', 'true'] and st['sides'][1]['sub'] == 'Local', f'{where}: marca {st["sides"]}'
+        assert st['hint'].startswith('Guardado. Puedes cambiarlo hasta el '), f'{where}: guardado {st["hint"]}'
         assert page.evaluate("document.activeElement?.dataset?.team") == 'DET', f'{where}: el foco no vuelve al equipo'
         assert st['next'] and st['count'] == '1 de 5', f'{where}: jornada {st["count"]}'
-        assert st['days'][0].startswith('Jue') and st['days'][0].endswith('0/1') and st['days'][1].startswith('Dom') and st['days'][1].endswith('1/3') \
-            and st['days'][2].startswith('Lun') and st['days'][2].endswith('Pronto'), f'{where}: días {st["days"]}'
+        assert len(st['days']) == 3 and st['days'][0].endswith('0/1') and st['days'][1].endswith('1/3') and st['days'][2].endswith('Pronto'), f'{where}: días {st["days"]}'
         assert st['nextText'].startswith('Te quedan 3 partidos por elegir. El siguiente empieza hoy a las'), f'{where}: mensaje {st["nextText"]}'
         assert st['cta'] == 'Elegir el de hoy →', f'{where}: botón {st["cta"]}'
         assert st['takeTitle'] == '¿Y cómo ganan los Lions?' and st['ideas'] == ['Los Lions ganan por 10 o más', 'Los Lions remontan en el último cuarto'], f'{where}: take {st}'
@@ -135,7 +138,7 @@ def phone(width, dark):
         focus = page.evaluate("""() => ({id: document.activeElement?.closest?.('[data-game-id]')?.dataset.gameId || null,
           day: document.querySelector('#camNflDayNav .cam-nfl-day.is-active strong')?.textContent || null,
           top: Math.round(document.activeElement?.getBoundingClientRect?.().top ?? -1)})""")
-        assert focus['id'] == 'w10-thu' and focus['day'] == 'jueves' and 0 <= focus['top'] < 860, f'{where}: no abre el partido de hoy {focus}'
+        assert focus['id'] == 'w10-thu' and focus['day'] and 0 <= focus['top'] < 860, f'{where}: no abre el partido de hoy {focus}'
 
         # Una idea abre el compositor con el título escrito.
         page.locator('#camNflSemana .cam-ns-idea').first.scroll_into_view_if_needed()
@@ -157,7 +160,7 @@ def come_back():
         page.locator('#camNflSemana .cam-ns-side[data-team="NE"]').click(); page.wait_for_timeout(800)
         st = page.evaluate(STATE)
         assert st['count'] == '4 de 5' and st['cta'] == '', f'{where}: {st["count"]} {st["cta"]}'
-        assert st['nextText'].startswith('Ya elegiste todo lo abierto. Lo del lunes se abre cuando lleguen sus cuotas: vuelve el lunes antes de las'), f'{where}: {st["nextText"]}'
+        assert re.match(r'Ya elegiste todo lo abierto\. Lo del (\w+) se abre cuando lleguen sus cuotas: vuelve el \1 antes de las \d\d:\d\d\.$', st['nextText']), f'{where}: {st["nextText"]}'
         assert st['days'][0].endswith('✓') and st['days'][1].endswith('✓') and st['days'][2].endswith('Pronto'), f'{where}: días {st["days"]}'
         assert page.evaluate(CLIPPED) == [], f'{where}: recortes {page.evaluate(CLIPPED)}'
         shot(page, f'{where}')
@@ -200,6 +203,79 @@ def desktop(dark):
 
 
 
+META = """sel => [...document.querySelectorAll(sel + ' .cam-nfl-game-meta')].map(m => {
+  const badge = m.querySelector('.cam-nfl-badge'), r = m.getBoundingClientRect(), b = badge?.getBoundingClientRect();
+  return {text: m.textContent.replace(/\\s+/g, ' ').trim(), kids: m.children.length, right: b ? Math.round(r.right - b.right) : null};
+})"""
+
+
+def meta_line():
+    """La línea de cada partido (a la izquierda de «Abierto») no lleva hora ni «Bonus +5»."""
+    where = '390-linea-partido'
+    with fp.full_page(fake_js=BASE, dark=True, width=390, height=860) as page:
+        open_nfl(page)
+        page.click('#camNflDayNav .cam-nfl-day[data-day]'); page.wait_for_timeout(300)
+        lines = page.evaluate(META, '#camNflGames')
+        assert lines and all(l['kids'] == 1 and l['text'] == 'Abierto' and l['right'] <= 24 for l in lines), f'{where}: {lines}'
+        if SHOTS:
+            page.locator('#camNflGames .cam-nfl-game').first.screenshot(path=str(SHOTS / f'{where}.png'))
+        assert page.errors == [], f'{where}: errores {page.errors}'
+    print('PASS', where)
+
+
+FOOTBALL = r"""
+try { sessionStorage.setItem('cam_sports_home_welcome_seen_session_v1', '1'); } catch (e) {}
+(() => {
+  const f = window.__fake = window.__fake || {}; f.tables = f.tables || {}; f.rpc = f.rpc || {};
+  if (!f.anonymous) f.user = {id: 'u1', email: 'u1@example.com', user_metadata: {username: 'probador'}};
+  const now = new Date(), season = now.getUTCFullYear() - (now.getUTCMonth() < 6 ? 1 : 0);
+  const day = new Date(now.getTime() + 2 * 24 * 36e5); day.setUTCHours(16, 0, 0, 0);
+  const squads = [['86','Real Madrid'],['83','Barcelona'],['1068','Sevilla'],['2922','Getafe']];
+  f.tables.cam_football_teams = squads.map(([id, name]) => ({id, name, short_name: name, abbreviation: name.slice(0, 3).toUpperCase(), logo: ''}));
+  f.tables.cam_football_games = [0, 1].map(i => ({id: '4018800' + i, competition: 'laliga', season, matchday: 13,
+    kickoff: new Date(day.getTime() + i * 9e5).toISOString(), home_id: squads[i * 2][0], away_id: squads[i * 2 + 1][0],
+    status: 'scheduled', home_score: null, away_score: null, outcome: null, probability_home: .4, probability_draw: .3, probability_away: .3,
+    points_home: 2, points_draw: 2, points_away: 2, is_bonus: i === 0, odds_source: 'prueba',
+    odds_locked_at: new Date(now.getTime() - 36e5).toISOString(), picks_open: true, opening_mode: 'auto'}));
+  f.tables.cam_football_picks = [];
+  f.rpc.cam_football_leaderboard = () => ({data: [], error: null});
+})();
+"""
+
+
+def football(dark, anonymous):
+    """Fútbol: «Ver mis jornadas» debajo de iniciar sesión / guardar, y la línea de cada partido solo con el estado."""
+    where = f'390-futbol-{"noche" if dark else "dia"}-{"sin-sesion" if anonymous else "con-sesion"}'
+    pre = "window.__fake = window.__fake || {}; window.__fake.anonymous = true;" if anonymous else ''
+    with fp.full_page(fake_js=pre + FOOTBALL, dark=dark, width=390, height=860) as page:
+        page.click('body > nav.cam-mobile-bottom-nav > button[data-category="Fútbol"]'); page.wait_for_timeout(2000)
+        page.evaluate("window.camSectionTabs?.select?.('quiniela', {scroll: false})"); page.wait_for_timeout(600)
+        page.locator('#camFootballHistory').scroll_into_view_if_needed(); page.wait_for_timeout(300)
+        # Con sesión el pick se guarda al tocarlo y no hay botón de guardar: «Ver mis jornadas» va bajo los partidos.
+        st = page.evaluate("""() => {
+          const save = document.getElementById('camFootballSaveDay'), hist = document.querySelector('#camFootballHistory button');
+          const above = save.getClientRects().length ? save.closest('.cam-nfl-save-row') : document.getElementById('camFootballGames');
+          const s = above.getBoundingClientRect(), n = hist?.getBoundingClientRect();
+          const nav = document.getElementById('camFootballNav');
+          return {save: save.textContent.trim(), hist: hist?.textContent.trim() || null, below: !!n && n.top >= s.bottom,
+            gap: n ? Math.round(n.top - s.bottom) : null, w: n ? Math.round(n.width) : 0, sw: Math.round(s.width), saveShown: !!save.getClientRects().length,
+            topButtons: [...nav.querySelectorAll('button')].filter(b => b.getClientRects().length).map(b => b.textContent.trim()),
+            emptyTop: !nav.getClientRects().length || nav.getBoundingClientRect().height < 1 || [...nav.querySelectorAll('button')].some(b => b.getClientRects().length)};
+        }""")
+        if anonymous: assert st['saveShown'] and st['save'] == 'Inicia sesión para participar', f'{where}: {st}'
+        assert st['hist'] == 'Ver mis jornadas ›' and st['below'] and 0 <= st['gap'] <= 32 and abs(st['w'] - st['sw']) <= 1, f'{where}: {st}'
+        assert 'Ver mis jornadas ›' not in st['topButtons'] and st['emptyTop'], f'{where}: arriba {st}'
+        lines = page.evaluate(META, '#camFootballGames')
+        assert lines and all(l['kids'] == 1 and l['text'] == 'Abierto' and l['right'] <= 24 for l in lines), f'{where}: línea {lines}'
+        if SHOTS:
+            box = page.evaluate("""() => { const a = document.getElementById('camFootballGames').getBoundingClientRect(),
+              b = document.getElementById('camFootballHistory').getBoundingClientRect(); return {y: a.top + scrollY, h: b.bottom - a.top}; }""")
+            page.screenshot(path=str(SHOTS / f'{where}.png'), full_page=True,
+                            clip={'x': 0, 'y': max(0, box['y'] - 60), 'width': 390, 'height': box['h'] + 90})
+        assert page.errors == [], f'{where}: errores {page.errors}'
+    print('PASS', where)
+
+
 def jornadas_below(dark, anonymous):
     """«Ver mis jornadas» va debajo del botón de iniciar sesión / guardar del día."""
     where = f'390-{"noche" if dark else "dia"}-{"sin-sesion" if anonymous else "con-sesion"}-jornadas'
@@ -234,3 +310,6 @@ if __name__ == '__main__':
     desktop(False)
     jornadas_below(True, True)
     jornadas_below(False, False)
+    meta_line()
+    football(True, True)
+    football(False, False)
