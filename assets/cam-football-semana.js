@@ -32,6 +32,8 @@
   const label=(snap,g,pick)=>pick==='draw'?'Empate':name(snap,pick==='home'?g.home_id:g.away_id);
   const points=(g,pick)=>g['points_'+pick];
   const pts=n=>n+(Number(n)===1?' pt':' pts');
+  // Lo parejo se mide con las probabilidades: desde el 12 nov 2026 todos los aciertos valen 2.
+  const even=g=>g.probability_home==null?1:Math.abs(Number(g.probability_home)-Number(g.probability_away));
   const when=value=>new Intl.DateTimeFormat('es',{timeZone:'America/Toronto',weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date(value)).replace(/\./g,'');
   function crest(snap,id,size=28){
     const box=el('span',null,'cam-ns-crest');box.style.setProperty('--crest',size+'px');
@@ -69,7 +71,7 @@
     const candidates=games.filter(g=>g.status==='live'||!started(g));
     const list=candidates.length?candidates:games.filter(g=>g.status==='final');
     return list.slice().sort((a,b)=>
-      appeal(b)-appeal(a)||Math.abs((a.points_home??6)-(a.points_away??6))-Math.abs((b.points_home??6)-(b.points_away??6))||Date.parse(a.kickoff)-Date.parse(b.kickoff))[0]||null;
+      appeal(b)-appeal(a)||even(a)-even(b)||Date.parse(a.kickoff)-Date.parse(b.kickoff))[0]||null;
   }
   function focusGame(id){release();window.camSectionTabs?.select?.('quiniela',{scroll:false});void q()?.focus(id);}
   function pickButton(snap,g,pick){

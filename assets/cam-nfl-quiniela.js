@@ -246,7 +246,7 @@
         const b=el('button',null,'cam-nfl-laurel'+(here?' is-on':''));
         b.type='button';b.setAttribute('aria-pressed',String(here));b.disabled=laurelBusy;
         b.append(el('span',here?'Laurel · x2':'Poner el laurel','cam-nfl-laurel-text'));
-        b.title=here?'Quitar el laurel de este partido':'Suma el doble si aciertas; resta los puntos base si fallas. Uno por jornada.';
+        b.title=here?'Quitar el laurel de este partido':'Suma el doble si aciertas (4 puntos); si fallas, 0. Uno por jornada.';
         b.addEventListener('click',()=>toggleLaurel(g));
         row.append(b);
       }else if(here){
@@ -339,10 +339,20 @@
     // Sin probabilidad visible: el usuario ve solo los puntos del acierto (el doble con el laurel).
     const doubled=points!=null&&laurelOf(g)===g.id;
     b.append(el('small',points==null?'Pts pendientes':doubled?(points*2)+' pts · x2':points+' pts'));
-    if(points!=null)b.title='Acierto: +'+(doubled?points*2:points)+' puntos. Fallo: −'+points+' puntos.';
+    if(points!=null)b.title='Acierto: +'+(doubled?points*2:points)+' puntos'+(g.is_bonus?' (+5 si fue la opción menos elegida)':'')+'. Fallo: 0.';
     b.addEventListener('click',()=>{if(!isOpen(g))return;if(!user){window.openUserAuthModal?.();return;}draft.set(g.id,id);saveDraft();paintGames();});
     if(disabled)b.title='Este partido está cerrado';
     return b;
+  }
+  // Hora del partido y, en el partido bonus de la semana, su etiqueta.
+  function when(g){
+    const span=el('span',clock(g.kickoff));
+    if(g.is_bonus){
+      const tag=el('b','Bonus +5','cam-q-bonus');
+      tag.title='Partido bonus: si aciertas y tu equipo fue el menos elegido, +5 puntos extra.';
+      span.append(' · ',tag);
+    }
+    return span;
   }
   // Mismo criterio que gameStatus(): el color nunca contradice al texto.
   function gameState(g){
@@ -363,7 +373,7 @@
       if(!pick)return 'Finalizado · sin pick';
       if(!g.winner_id||!pick.settled_at)return 'Puntuación pendiente';
       const value=Number(pick.awarded_points||0);
-      return (pick.team_id===g.winner_id?'Acertado · ':'Fallado · ')+(value>0?'+':value<0?'−':'')+Math.abs(value)+' pts';
+      return (pick.team_id===g.winner_id?'Acertado · ':'Fallado · ')+(value>0?'+':value<0?'−':'')+Math.abs(value)+' pts'+(g.is_bonus&&value>=7?' · bonus':'');
     }
     if(g.status==='live')return 'En vivo';
     if(g.status==='postponed')return 'Pospuesto';
@@ -451,7 +461,8 @@
       box.dataset.gameId=g.id;
       if(laurelOf(g)===g.id)box.classList.add('has-laurel');
       const top=el('div',null,'cam-nfl-game-meta');
-      top.append(el('span',clock(g.kickoff)),el('span',gameStatus(g),'cam-nfl-badge'));box.append(top);
+      top.append(when(g),el('span',gameStatus(g),'cam-nfl-badge'));box.append(top);
+      if(g.is_bonus)box.classList.add('is-bonus');
       const sides=el('div',null,'cam-nfl-sides');
       sides.append(side(g,g.away_id),el('span','@','cam-nfl-versus'),side(g,g.home_id));
       box.append(sides);

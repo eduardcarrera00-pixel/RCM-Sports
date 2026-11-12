@@ -47,7 +47,8 @@ try { sessionStorage.setItem('cam_sports_home_welcome_seen_session_v1', '1'); } 
     {id: 4, edition: 'Week 5', superseded_at: '2026-10-29T17:24:07Z', team_ids: ['SF','KC','BUF','MIN','JAX','CHI','DEN','GB','NE','CLE']},
     {id: 3, edition: 'Week 5', superseded_at: '2026-10-19T19:46:24Z', team_ids: ['SF','ARI','GB','IND','CHI','BAL','DAL','LV','DEN','LAR']}];
   const g = (id, week, away, home, hours, pa, ph, extra) => Object.assign({id, season: 2026, week, home_id: home, away_id: away, kickoff: iso(hours),
-    status: 'scheduled', picks_open: true, odds_locked_at: iso(-200), points_home: ph, points_away: pa, home_score: null, away_score: null, winner_id: null}, extra || {});
+    status: 'scheduled', picks_open: true, odds_locked_at: iso(-200), points_home: ph, points_away: pa,
+    probability_home: (2 / ph) / (2 / ph + 2 / pa), probability_away: (2 / pa) / (2 / ph + 2 / pa), home_score: null, away_score: null, winner_id: null}, extra || {});
   const fin = (id, away, home, hours, pa, ph, as, hs) => g(id, 8, away, home, hours, pa, ph, {status: 'final', picks_open: false, away_score: as, home_score: hs, winner_id: as > hs ? away : home});
   T.cam_nfl_games = [
     fin('w8-1', 'CAR', 'GB', -150, 5, 3, 19, 27), fin('w8-2', 'ARI', 'DAL', -80, 7, 3, 33, 30), fin('w8-3', 'MIN', 'DET', -80, 5, 3, 15, 19),
@@ -146,7 +147,7 @@ def phone(width, dark):
         assert any('Semana 8: tú 7 pts · editor 3 pts · Le ganaste.' in p for p in st['editor']), f'{where}: tú contra el editor {st["editor"]}'
         # Marcador: la sorpresa primero, luego las caídas del Top 10.
         assert st['scoreTitle'] in ('El marcador · Semana 8', 'La crónica · Semana 8'), f'{where}: marcador {st["scoreTitle"]}'
-        assert st['scoreTags'][:3] == ['Sorpresa · pagó 7', 'Cae el n.º 2', 'Cae el n.º 4'] and st['scoreRows'] == 3, f'{where}: marcador {st["scoreTags"]}'
+        assert st['scoreTags'][:3] == ['Sorpresa', 'Cae el n.º 2', 'Cae el n.º 4'] and st['scoreRows'] == 3, f'{where}: marcador {st["scoreTags"]}'
         # Power Rankings queda fuera de La semana, con movimiento real (≥ 12 h).
         assert st['order'] is None, f'{where}: ranking visible en La semana'
         assert page.locator('#nflRankings').count() == 1

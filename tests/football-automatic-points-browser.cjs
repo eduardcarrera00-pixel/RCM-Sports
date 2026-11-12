@@ -50,23 +50,11 @@ const {chromium}=require('playwright');
   assert.equal(await page.locator('#camFootballGames .cam-nfl-team small').filter({hasText:'%'}).count(),0);
   assert.deepEqual(errors,[]);
   await page.evaluate(()=>{window.currentAdmin=true;window.dispatchEvent(new CustomEvent('cam:admin-state-change'));});
-  await page.waitForSelector('.cam-nfl-admin-game summary');
-  if(width===390)await page.locator('.cam-nfl-admin-game summary').tap();else await page.locator('.cam-nfl-admin-game summary').click();
-  assert.ok(await page.getByLabel('Puntos local',{exact:true}).evaluate(e=>parseFloat(getComputedStyle(e).fontSize)>=16));
-  await page.getByLabel('Puntos local',{exact:true}).fill('5');
-  await page.getByLabel('Puntos empate',{exact:true}).fill('7');
-  await page.getByLabel('Puntos visitante',{exact:true}).fill('9');
-  await page.getByLabel('Puntos local',{exact:true}).focus();
-  await page.evaluate(()=>window.dispatchEvent(new Event('focus')));
+  // Desde el 12 nov 2026 los puntos son fijos (2 por acierto): no hay ajuste manual por partido.
   await page.waitForTimeout(200);
-  assert.equal(await page.getByLabel('Puntos local',{exact:true}).inputValue(),'5','Mobile keyboard focus must preserve the editor');
-  assert.equal(await page.locator('.cam-nfl-admin-game[open]').count(),1);
-  await page.getByRole('button',{name:'Guardar ajuste'}).click();
-  await page.waitForFunction(()=>window.__calls.some(c=>c.name==='cam_football_admin_points'));
-  const adjustment=await page.evaluate(()=>window.__calls.find(c=>c.name==='cam_football_admin_points').args);
-  assert.deepEqual(adjustment,{p_game_id:'900000001',p_home:5,p_draw:7,p_away:9});
+  assert.equal(await page.locator('.cam-nfl-admin-game').count(),0,'sin panel de ajuste de puntos');
   await page.close();
  }
  }finally{await browser.close();}
- console.log('PASS: football mobile/desktop, day/night, automatic points only, no manual odds inputs, draw selection and saved pick.');
+ console.log('PASS: football mobile/desktop, day/night, fixed points, no manual odds or points inputs, draw selection and saved pick.');
 })().catch(e=>{console.error(e);process.exitCode=1});

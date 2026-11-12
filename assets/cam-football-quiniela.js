@@ -324,7 +324,7 @@
     const points=pick==='home'?g.points_home:g.points_away;
     // Sin probabilidad visible: el usuario ve solo los puntos del acierto.
     b.append(el('small',points==null?'Pts pendientes':points+' pts'));
-    if(points!=null)b.title='Acierto: +'+points+' puntos. Fallo: −'+points+' puntos.';
+    if(points!=null)b.title='Acierto: +'+points+' puntos'+(g.is_bonus?' (+5 si fue la opción menos elegida)':'')+'. Fallo: 0.';
     b.addEventListener('click',()=>choose(g,pick));
     if(disabled)b.title=unavailableReason();
     return b;
@@ -337,10 +337,20 @@
     if(g.status==='final'&&g.outcome)b.classList.add(g.outcome==='draw'?'is-winner':'is-loser');
     b.append(el('span','Empate','cam-nfl-draw-label'));
     b.append(el('small',g.points_draw==null?'Pts pendientes':g.points_draw+' pts'));
-    if(g.points_draw!=null)b.title='Acierto: +'+g.points_draw+' puntos. Fallo: −'+g.points_draw+' puntos.';
+    if(g.points_draw!=null)b.title='Acierto: +'+g.points_draw+' puntos'+(g.is_bonus?' (+5 si fue la opción menos elegida)':'')+'. Fallo: 0.';
     b.addEventListener('click',()=>choose(g,'draw'));
     if(disabled)b.title=unavailableReason();
     return b;
+  }
+  // Hora del partido y, en el partido bonus de la jornada, su etiqueta.
+  function when(g){
+    const span=el('span',clock(g.kickoff));
+    if(g.is_bonus){
+      const tag=el('b','Bonus +5','cam-q-bonus');
+      tag.title='Partido bonus: si aciertas y tu opción fue la menos elegida, +5 puntos extra.';
+      span.append(' · ',tag);
+    }
+    return span;
   }
   // Mismo criterio que gameStatus(): el color nunca contradice al texto.
   function gameState(g){
@@ -363,7 +373,7 @@
       if(!pick)return 'Finalizado · sin pick';
       if(!g.outcome||!pick.settled_at)return 'Puntuación pendiente';
       const value=Number(pick.awarded_points||0);
-      return (pick.pick===g.outcome?'Acertado · ':'Fallado · ')+(value>0?'+':value<0?'−':'')+Math.abs(value)+' pts';
+      return (pick.pick===g.outcome?'Acertado · ':'Fallado · ')+(value>0?'+':value<0?'−':'')+Math.abs(value)+' pts'+(g.is_bonus&&value>=7?' · bonus':'');
     }
     if(g.status==='live')return 'En vivo';
     if(g.status==='postponed')return 'Pospuesto';
@@ -452,11 +462,12 @@
       box.dataset.gameId=g.id;
       box.dataset.state=gameState(g);
       const top=el('div',null,'cam-nfl-game-meta');
-      top.append(el('span',clock(g.kickoff)),el('span',gameStatus(g),'cam-nfl-badge'));box.append(top);
+      top.append(when(g),el('span',gameStatus(g),'cam-nfl-badge'));box.append(top);
+      if(g.is_bonus)box.classList.add('is-bonus');
       const sides=el('div',null,'cam-nfl-sides');
       sides.append(side(g,'home'),drawOption(g),side(g,'away'));
       box.append(sides);
-      if(typeof currentAdmin!=='undefined'&&currentAdmin&&isOpen(g))box.append(adminPoints(g));
+      // Puntos fijos desde el 12 nov 2026: ya no hay ajuste manual por partido.
       if(g.status==='final')box.append(el('p',g.home_score+' — '+g.away_score,'cam-nfl-result'));
 
       target.append(box);
@@ -659,28 +670,6 @@
         ()=>{showAll=!showAll;paintRanking();},'cam-nfl-more'));
     }catch(error){if(ticket===rankingRequest){target.replaceChildren(el('p','Ranking no disponible: '+error.message));}}
     finally{finishEntrance?.();}
-  }
-  function adminPoints(g){
-    const panel=el('details',null,'cam-nfl-admin-game');
-    panel.append(el('summary','Ajustar puntos (opcional)'));
-    panel.append(el('p','El cálculo es automático. Puedes ajustar de 2 a 12 puntos antes de que alguien guarde un pronóstico.'));
-    const fields=el('div',null,'cam-football-point-fields');panel.append(fields);
-    const inputs=['home','draw','away'].map((side,i)=>{
-      const label=el('label',['Local','Empate','Visitante'][i]);
-      const input=el('input');input.type='number';input.min='2';input.max='12';input.step='1';input.inputMode='numeric';
-      input.value=String(g['points_'+side]);input.setAttribute('aria-label','Puntos '+['local','empate','visitante'][i]);
-      label.append(input);fields.append(label);return input;
-    });
-    const save=button('Guardar ajuste',async()=>{
-      const values=inputs.map(i=>Number(i.value));
-      if(values.some(v=>!Number.isInteger(v)||v<2||v>12)){st('camFootballStatus','Usa puntos enteros de 2 a 12.','error');return;}
-      save.disabled=true;
-      try{
-        await run(client().rpc('cam_football_admin_points',{p_game_id:g.id,p_home:values[0],p_draw:values[1],p_away:values[2]}));
-        await hydrate();st('camFootballStatus','Puntos ajustados. El resto de partidos sigue en automático.','ok');
-      }catch(e){st('camFootballStatus',e.message,'error');}finally{save.disabled=false;}
-    });
-    panel.append(save);return panel;
   }
   function renderAdmin(){
     // Football is automatic. No per-game or per-round administration is required.

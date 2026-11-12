@@ -113,7 +113,8 @@
   function chooseDuel(weekGames, rankIds) {
     if (!weekGames.length) return null;
     const pos = id => { const i = rankIds.indexOf(id); return i < 0 ? 99 : i + 1; };
-    const balance = g => Math.abs((Number(g.points_home) || 6) - (Number(g.points_away) || 6));
+    // Desde el 12 nov 2026 todos los aciertos valen 2: lo parejo se mide con las probabilidades congeladas.
+    const balance = g => g.probability_home == null ? 10 : Math.abs(Number(g.probability_home) - Number(g.probability_away)) * 10;
     const score = g => {
       const a = pos(g.away_id), h = pos(g.home_id);
       if (a < 99 && h < 99) return a + h;
@@ -249,10 +250,11 @@
     const pos = id => { const i = rankIds.indexOf(id); return i < 0 ? null : i + 1; };
     const scored = results.map(g => {
       const loser = g.winner_id ? (g.winner_id === g.home_id ? g.away_id : g.home_id) : null;
-      const paid = g.winner_id ? pointsFor(g, g.winner_id) : null;
+      const chance = g.winner_id ? (g.winner_id === g.home_id ? g.probability_home : g.probability_away) : null;
       const fall = loser ? pos(loser) : null;
       let tag = null, weight = 0;
-      if (paid != null && paid >= 6) { tag = 'Sorpresa · pagó ' + paid; weight = 100 + paid; }
+      if (chance != null && Number(chance) <= 1 / 3) { tag = 'Sorpresa'; weight = 100 + Math.round((1 - Number(chance)) * 10); }
+      else if (g.is_bonus) { tag = 'Partido bonus'; weight = 90; }
       else if (fall) { tag = 'Cae el n.º ' + fall; weight = 50 - fall; }
       return { g, tag, weight };
     }).sort((a, b) => b.weight - a.weight || Date.parse(a.g.kickoff) - Date.parse(b.g.kickoff));

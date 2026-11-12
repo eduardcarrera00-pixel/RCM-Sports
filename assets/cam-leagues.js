@@ -371,7 +371,7 @@ const HOW=[
     'Quinielas: pronosticar al menos la mitad de los partidos ya terminados del mes (como mínimo '+MINIMUM.nfl+'). Como cada semana terminan más partidos, la cifra crece durante el mes.',
     'Solo quien clasifica entra en la lucha por subir. La clasificación del mes se actualiza cada 15 minutos.']],
   ['¿Cómo se sube y se baja?',[
-    'Cada acierto suma y cada fallo resta. Un Pick vale el momio absoluto / 100; en las quinielas cada opción enseña sus puntos. Anulados: 0. El laurel NFL duplica el acierto y el fallo resta los puntos base; los empates NFL valen 0.',
+    'Picks: cada acierto suma y cada fallo resta; un Pick vale el momio absoluto / 100. Quinielas: cada acierto suma 2 y fallar vale 0; el partido bonus de cada semana suma 5 más si aciertas lo que menos gente eligió, y el laurel NFL duplica el acierto. Anulados y empates NFL: 0.',
     'El mes cierra el día 1 a las 12:00 (hora de Toronto). Entre los clasificados, el 20 % mejor sube un rango y el 20 % de abajo baja uno; el resto se queda igual. Las plazas para subir se redondean hacia arriba y las de bajar, hacia abajo.',
     'En empate a puntos deciden los aciertos, el porcentaje de acierto y quién tuvo antes su primer resultado.',
     'Dos meses seguidos sin clasificar bajan un rango. Los meses sin partidos (en pausa) no cuentan. Nadie baja de Cobre.',

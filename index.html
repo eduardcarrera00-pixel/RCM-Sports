@@ -3344,10 +3344,10 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
               </nav>
             <details class="cam-nfl-rules">
               <summary>¿Cómo funcionan los puntos?</summary>
-              <p>Antes de abrir cada partido congelamos las probabilidades reales, sin el margen de la casa. Redondeamos 2 dividido entre la probabilidad, con un <strong>mínimo de 2 y un máximo de 12 puntos</strong>.</p>
-              <p>Favorito al 80 %: 3 puntos. Partido equilibrado al 50 %: 4 puntos. Sorpresa al 25 %: 8 puntos.</p>
-              <p>Acertar suma los puntos de tu selección; fallar resta esa misma cantidad. Un empate NFL o una anulación vale 0. Por ejemplo, una selección de 4 puntos suma +4 al acertar y resta −4 al fallar. Ese saldo decide tu clasificación y el ascenso o descenso mensual en la liga NFL. Puedes editar hasta el inicio del partido.</p>
-              <p id="camNflLaurelRule" hidden><strong>El laurel.</strong> Una vez por jornada puedes ponerle el laurel a un partido que ya pronosticaste: si aciertas, suma el doble; si fallas, resta los puntos base. Puedes cambiarlo de partido hasta que empiece el que lo lleva.</p>
+              <p>Cada acierto suma <strong>2 puntos</strong>. Si fallas no pierdes nada: 0 puntos. Un empate NFL o una anulación también vale 0.</p>
+              <p><strong>Partido bonus.</strong> Cada semana el partido más parejo según las probabilidades lleva la etiqueta «Bonus +5». Si lo aciertas y tu equipo fue el menos elegido (o fuiste el único que acertó), sumas <strong>5 puntos extra</strong>: 7 en total. Si gana el equipo que eligió la mayoría, son los 2 de siempre. Cuánta gente eligió cada lado se ve cuando empieza el partido.</p>
+              <p>Esos puntos deciden tu clasificación y el ascenso o descenso mensual en la liga NFL. Puedes editar hasta el inicio del partido.</p>
+              <p id="camNflLaurelRule" hidden><strong>El laurel.</strong> Una vez por jornada puedes ponerle el laurel a un partido que ya pronosticaste: si aciertas, suma el doble (4 puntos, más el bonus si toca); si fallas, 0. Puedes cambiarlo de partido hasta que empiece el que lo lleva.</p>
             </details>
               <section id="camNflQuinielaStandings" class="cam-nfl-standings" aria-labelledby="camNflStandingTitle">
                 <h3 id="camNflStandingTitle">Clasificación de La Quiniela</h3>
@@ -3370,9 +3370,9 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
               </section>
             <details class="cam-nfl-rules">
               <summary>¿Cómo funcionan los puntos?</summary>
-              <p>Los puntos de local, empate y visitante se calculan automáticamente y quedan fijados antes de abrir el partido. Con datos disponibles, el sistema descuenta el margen de la casa y redondea 2 dividido entre la probabilidad, con un mínimo de 2 y un máximo de 12 puntos.</p>
-              <p>Un resultado menos probable suma más puntos. Si faltan datos, las tres opciones valen 6 puntos. Los puntos publicados son iguales para todos y no cambian con las cuotas posteriores.</p>
-              <p>Acertar suma los puntos de tu selección; fallar resta esa misma cantidad. Una anulación vale 0. El empate es un resultado más: suma sus puntos si lo aciertas y los resta si lo fallas. Ese saldo decide tu clasificación y el ascenso o descenso mensual en la liga de Fútbol. Puedes editar hasta el inicio del partido.</p>
+              <p>Cada acierto suma <strong>2 puntos</strong>, ya sea local, empate o visitante. Si fallas no pierdes nada: 0 puntos. Una anulación también vale 0.</p>
+              <p><strong>Partido bonus.</strong> En cada jornada de cada competición, el partido más parejo según las probabilidades lleva la etiqueta «Bonus +5». Si lo aciertas y tu opción fue la menos elegida (o fuiste el único que acertó), sumas <strong>5 puntos extra</strong>: 7 en total. Si gana lo que eligió la mayoría, son los 2 de siempre. Cuánta gente eligió cada opción se ve cuando empieza el partido.</p>
+              <p>Esos puntos deciden tu clasificación y el ascenso o descenso mensual en la liga de Fútbol. Puedes editar hasta el inicio del partido.</p>
             </details>
             </div>
             <div id="camFootballScoreBody" class="cam-sport-score-body" aria-live="polite"></div>
@@ -5869,7 +5869,7 @@ html .cam-weekly-result-surface .cam-weekly-result-on-photo{
 <script src="assets/cam-profile-overview.js?v=20261111-primeros-pasos-1"></script>
 <script src="assets/cam-profile-quiniela.js?v=20261110-navigation-loading-1"></script>
 <script src="assets/ae-profile.js?v=20261111-escudo-inicial-1"></script>
-<script src="assets/cam-leagues.js?v=20261112-clasificacion-football-1"></script>
+<script src="assets/cam-leagues.js?v=20261112-puntos-bonus-1"></script>
 <style id="cam-nfl-quiniela-theme">
 /* ===========================================================================
    CAM SPORTS · La Quiniela NFL — lenguaje visual curvo, editorial y compacto.
@@ -6049,6 +6049,8 @@ html.dark :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking,#camLig
   font-size:var(--ds-text-2xs,11px);color:var(--q-meta);padding:0 0 8px;
 }
 .cam-nfl-game-meta>span:first-child{font-weight:600;letter-spacing:.01em;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* Partido bonus (12 nov 2026): etiqueta junto a la hora, sin cambiar el alto de la tarjeta. */
+.cam-nfl-game-meta .cam-q-bonus{color:var(--q-gold-text);font-weight:700;letter-spacing:.04em;text-transform:uppercase;cursor:help}
 .cam-nfl-badge{
   display:inline-flex;align-items:center;gap:5px;padding:3px 9px;flex:none;
   font:700 var(--ds-text-2xs,11px)/1.35 var(--ds-font-sans,Inter,system-ui,sans-serif);letter-spacing:.02em;
@@ -6660,7 +6662,7 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 <link rel="stylesheet" href="assets/cam-perf-app-panels.css?v=20261112-chef-slip-1">
 <link rel="stylesheet" href="assets/cam-home-takes-unified.css?v=20261112-compact-shared-rank-1">
 <script src="assets/cam-parties.js?v=20261111-escudo-rango-1"></script>
-<script src="assets/cam-sport-quiniela-loader.js?v=20261112-ficha-compacta-1"></script>
+<script src="assets/cam-sport-quiniela-loader.js?v=20261112-puntos-bonus-1"></script>
 <script src="assets/ae-season-predictions.js?v=20261021-champion-guide-1"></script>
 <script src="assets/cam-lazy-editorial-loader.js?v=20261110-section-entrance-only-1"></script>
 <script src="assets/cam-opinions-section-banners.js?v=20261104-actualidad-1"></script>
@@ -6686,8 +6688,8 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 <!-- Inicio como «Tu jornada» (3 nov, teléfono; desde el 8 nov también en escritorio con tira, rejillas y carriles). -->
 <script src="assets/cam-home-jornada.js?v=20261112-compact-shared-rank-1"></script>
 <!-- NFL y Fútbol · La semana (4 nov, teléfono; desde el 8 nov también en escritorio, en columnas). Power Rankings en Noticias. -->
-<script src="assets/cam-nfl-semana.js?v=20261109-desktop-continuous-1"></script>
-<script src="assets/cam-football-semana.js?v=20261110-liguilla-evento-1"></script>
+<script src="assets/cam-nfl-semana.js?v=20261112-puntos-bonus-1"></script>
+<script src="assets/cam-football-semana.js?v=20261112-puntos-bonus-1"></script>
 <!-- Escritorio: páginas completas de NFL/Fútbol y dos columnas de contenido real. El teléfono conserva sus pestañas. -->
 <script defer src="assets/cam-escritorio.js?v=20261110-desktop-shortcuts-1"></script>
 <script defer src="assets/cam-sport-news-community.js?v=20261112-rank-initials-2"></script>
