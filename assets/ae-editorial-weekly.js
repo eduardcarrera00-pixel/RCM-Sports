@@ -17,7 +17,7 @@
      return u.protocol==='https:'&&!u.username&&!u.password?u.href:'';
    }catch{return '';}
  };
- let refreshing=false,active=null,submitting=false,editing=null,uncertainSave=null;
+ let refreshing=false,active=null,submitting=false,editing=null,uncertainSave=null,previewing=false,previewUrl='';
  const resolvedActive=()=>Boolean(active&&window.camWeeklyResults?.getResult(active.id)?.outcome);
 
  // The id avoids accidentally displaying a different weekly selection on an old link.
@@ -119,7 +119,10 @@
    const summary=make('summary',undefined,'ae-weekly-expand-summary');
    summary.append(make('strong',p.title,'ae-weekly-title'));
    summary.append(make('span',p.selection,'ae-weekly-compact-selection'));
-   summary.append(make('span','Ver detalles ↓','ae-weekly-expand-hint'));
+   // El texto cambia al abrir: en el teléfono una regla de tamaño dejaba ver las dos pistas a la vez.
+   const hint=make('span','Ver detalles ↓','ae-weekly-expand-hint');hint.dataset.toggleText='';
+   summary.append(hint);
+   details.addEventListener('toggle',()=>{hint.textContent=details.open?'Ocultar análisis ↑':'Ver detalles ↓';});
    const expanded=make('div',undefined,'ae-weekly-expanded-content');
    const photoUrl=editorialUrl(p.image_path,p.image_url);
    if(photoUrl){const photo=make('img',undefined,'ae-weekly-inline-photo');photo.src=photoUrl;photo.style.setProperty('--ae-image-focus',framedPosition(p,'image'));photo.alt='Imagen del Pick del editor';photo.loading='lazy';expanded.append(photo);}
@@ -138,6 +141,8 @@
    }
  }
  function render(){
+   // La vista previa del admin ocupa el bloque hasta que vuelve a editar o publica.
+   if(previewing)return;
    syncShareButtons();
    setDisplayState(active?'ready':'empty');
    // Single non-interactive odds badge in the lower-right footer, from the published Pick.
@@ -234,6 +239,9 @@
    const form=$('aeWeeklyPickForm');
    form?.reset();
    updateEditorLabels();
+   closeStudio();
+   leavePreview(false);
+   if(typeof notifyCommunity==='function')notifyCommunity(isEditing?'Cambios guardados en el Pick del editor.':'Pick del editor publicado.');
    const status=$('aeWeeklyPickAdminStatus');
    if(status)status.textContent=recovered?
      'Confirmado en Supabase: los cambios sí se habían guardado. Ya están aplicados al Pick del editor.':
@@ -262,20 +270,21 @@
    if(panel)panel.hidden=!admin;
    const button=$('aeWeeklyEditButton');
    if(button){
-     button.hidden=!(admin&&active);
-     button.textContent=resolvedActive()?'Publicar nuevo Pick del editor':'Editar Pick del editor';
+     // Visible para el admin aunque no haya Pick vigente (en modo edición, como el resto de controles).
+     button.hidden=!admin;
+     button.textContent=!active?'Publicar Pick del editor':resolvedActive()?'Publicar nuevo Pick del editor':'Editar Pick del editor';
    }
+   if(!admin){closeStudio();if(previewing)leavePreview();}
    if(!admin&&editing)cancelEdit();
  }
  function updateEditorLabels(){
    const isEditing=Boolean(editing);
    const save=$('aeWeeklySaveButton');
-   if(save)save.textContent=isEditing?'Guardar cambios':'Publicar Pick del editor';
-   const cancel=$('aeWeeklyCancelEdit');if(cancel)cancel.hidden=!isEditing;
+   if(save)save.textContent=isEditing?'Guardar cambios':'Publicar';
    const fresh=$('aeWeeklyNewPick');if(fresh)fresh.hidden=!isEditing;
    const note=$('aeWeeklyEditorMode');if(note)note.hidden=!isEditing;
    const summary=$('aeWeeklyAdminSummary');
-   if(summary)summary.textContent=isEditing?'Administrar · Editando Pick del editor':'Administrar · Publicar Pick del editor';
+   if(summary)summary.textContent=isEditing?'Editar Pick del editor':'Publicar Pick del editor';
  }
  function cancelEdit(){
    if(submitting)return;
@@ -289,10 +298,13 @@
    if(status)status.textContent='';
  }
  function startEdit(){
-   if(submitting||!(typeof currentAdmin!=='undefined'&&currentAdmin)||!active)return;
-   if(resolvedActive()){startNewPick();return;}
+   if(submitting||!(typeof currentAdmin!=='undefined'&&currentAdmin))return;
+   if(!active||resolvedActive()){startNewPick();return;}
    const p=active,form=$('aeWeeklyPickForm');
    if(!form)return;
+   if(previewing)leavePreview();
+   // Reabrir la misma edición conserva lo que ya se había cambiado.
+   if(editing&&editing.id===p.id){openStudio();return;}
    editing={id:p.id,expectedEditedAt:p.edited_at||null};
    uncertainSave=null;
    setCheckVisible(false);
@@ -311,28 +323,30 @@
    framing?.setExisting('weekly',editorialUrl(p.image_path,p.image_url));
    framing?.set('weekly',p.image_focus_x??50,p.image_focus_y??50);
    updateEditorLabels();
+   syncPhoto();
    const status=$('aeWeeklyPickAdminStatus');
-   if(status)status.textContent='Modifica lo necesario y guarda. Las fotos actuales se conservan si no eliges una nueva.';
-   const panel=$('aeWeeklyPickAdmin');
-   panel.hidden=false;
-   panel.open=true;
-   panel.scrollIntoView?.({behavior:'smooth',block:'start'});
+   if(status)status.textContent='Cambia lo que quieras y pulsa «Ver vista previa».';
+   openStudio();
    form.elements.title.focus({preventScroll:true});
  }
  function startNewPick(){
    if(submitting||!(typeof currentAdmin!=='undefined'&&currentAdmin))return;
    const form=$('aeWeeklyPickForm'),panel=$('aeWeeklyPickAdmin');
    if(!form||!panel)return;
-   if(editing&&!confirm('¿Preparar un Pick nuevo y descartar los cambios de este formulario?'))return;
-   cancelEdit();
-   panel.hidden=false;panel.open=true;
-   $('aeWeeklyPickAdminStatus').textContent='Prepara el nuevo Pick. Se mostrará al publicarlo; el Pick anterior y su resultado se conservarán en el historial.';
-   panel.scrollIntoView?.({behavior:'smooth',block:'start'});
+   if(editing){
+     if(!confirm('¿Preparar un Pick nuevo y descartar los cambios de este formulario?'))return;
+     cancelEdit();
+   }
+   if(previewing)leavePreview();
+   updateEditorLabels();
+   $('aeWeeklyPickAdminStatus').textContent='Elige la foto, escribe el título y la descripción, y revisa la vista previa antes de publicar.'+
+     (active?' El Pick anterior y su resultado se conservan en el historial.':'');
+   openStudio();
    form.elements.title.focus({preventScroll:true});
  }
  async function publish(e){
    e.preventDefault();if(submitting)return;
-   const form=e.currentTarget,status=$('aeWeeklyPickAdminStatus'),send=form.querySelector('[type=submit]');
+   const form=$('aeWeeklyPickForm')||e.currentTarget,status=statusOut(),send=$('aeWeeklySaveButton');
    if(!(typeof currentAdmin!=='undefined'&&currentAdmin)){status.textContent='Solo administradores';return;}
    const raw=form.elements.american_odds.value.trim();
    if(!/^[+-]?\d{3,6}$/.test(raw)){status.textContent='Introduce una cuota americana válida, por ejemplo +150 o -110.';return;}
@@ -341,8 +355,8 @@
    const expires=new Date(form.elements.expires_at.value);
    if(!Number.isFinite(expires.getTime())||expires.getTime()<=Date.now()){status.textContent='Elige un cierre futuro.';return;}
    const isEditing=Boolean(editing), editSnapshot=editing?{...editing}:null;
-   if(!confirm(isEditing?'¿Guardar los cambios en este Pick del editor? La publicación conservará su identidad.':'¿Publicar el Pick editorial y sustituir el anterior?'))return;
-   submitting=true;send.disabled=true;uncertainSave=null;setCheckVisible(false);
+   submitting=true;if(send)send.disabled=true;uncertainSave=null;setCheckVisible(false);
+   const back=$('aeWeeklyPreviewBack');if(back)back.disabled=true;
    let stage='guardar',rpcAttempted=false,attemptedParams=null;
    status.textContent=isEditing?'Comprobando el estado del Pick…':'Preparando imágenes…';
    try{
@@ -356,8 +370,8 @@
      const banner=await window.aeEditorialMedia.upload(form.elements.banner_file?.files?.[0],'weekly/banner');
      stage='imagen';
      const image=await window.aeEditorialMedia.upload(form.elements.image_file?.files?.[0],'weekly/article');
-     const bannerTyped=form.elements.banner_url.value.trim();
-     const imageTyped=form.elements.image_url.value.trim();
+     const bannerTyped=form.elements.banner_url?.value.trim()||'';
+     const imageTyped=form.elements.image_url?.value.trim()||'';
      const bannerUrl=banner?null:(bannerTyped?window.aeImageFraming?.safeUrl(bannerTyped):null);
      const imageUrl=image?null:(imageTyped?window.aeImageFraming?.safeUrl(imageTyped):null);
      if(bannerTyped&&!banner&&!bannerUrl)throw Error('El banner necesita un enlace HTTPS válido.');
@@ -407,12 +421,132 @@
          setCheckVisible(true);
        }
        status.textContent='No se pudo confirmar la respuesta de Supabase. Puede ser un problema temporal de conexión. Tus cambios siguen aquí; pulsa «Comprobar si se guardó» antes de volver a guardar.';
+       // El botón de comprobación vive en la ventana de edición.
+       if(previewing){leavePreview();openStudio();}
      }else if(editNetworkError(err)){
        status.textContent='No se pudo conectar con Supabase durante '+(stage==='banner'?'la subida del banner':stage==='imagen'?'la subida de la imagen':'la publicación')+'. Los datos del formulario siguen aquí. Comprueba la conexión e inténtalo de nuevo.';
      }else{
        status.textContent=err?.message||'No se pudo guardar. Conservamos los cambios del formulario.';
      }
-   }finally{submitting=false;send.disabled=false;}
+   }finally{
+     submitting=false;if(send)send.disabled=false;
+     const back=$('aeWeeklyPreviewBack');if(back)back.disabled=false;
+   }
+ }
+ /* ---------- Ventana del Pick del editor y vista previa (12 nov 2026) ---------- */
+ const studio=()=>$('aeWeeklyPickAdmin');
+ function openStudio(){
+   const d=studio();if(!d)return;
+   // Igual que «Modo edición»: la ventana vive en <body> para no heredar los estilos de la sección Picks.
+   if(d.parentElement!==document.body)document.body.append(d);
+   d.hidden=false;
+   syncPhoto();
+   if(d.open)return;
+   try{if(typeof d.showModal==='function')d.showModal();else d.setAttribute('open','');}
+   catch{d.setAttribute('open','');}
+ }
+ function closeStudio(){
+   const d=studio();if(!d?.open)return;
+   try{d.close();}catch{d.removeAttribute('open');}
+ }
+ // Escribe el estado en la ventana y, durante la vista previa, también en su barra.
+ function statusOut(){
+   const targets=[$('aeWeeklyPickAdminStatus')];
+   if(previewing)targets.push($('aeWeeklyPreviewStatus'));
+   return {set textContent(text){for(const t of targets)if(t)t.textContent=text;},
+           get textContent(){return targets[0]?.textContent||'';}};
+ }
+ function syncPhoto(){
+   const field=$('aeWeeklyBannerInput')?.closest('.ae-weekly-photo-field');
+   const preview=$('aeWeeklyBannerPreview');
+   if(!field||!preview)return;
+   const has=Boolean(preview.querySelector('img'));
+   field.classList.toggle('has-photo',has);
+   const cta=field.querySelector('[data-weekly-photo-cta]');
+   if(cta)cta.textContent=has?'Cambiar foto':'Elegir foto';
+   if(!has&&!preview.textContent.trim().startsWith('Selecciona'))preview.textContent='Toca para elegir una foto';
+ }
+ function formHasDraft(){
+   const form=$('aeWeeklyPickForm');if(!form)return false;
+   return ['title','analysis','event_name','selection','american_odds','expires_at']
+     .some(name=>String(form.elements[name]?.value||'').trim())||Boolean(form.elements.banner_file?.files?.length);
+ }
+ function discardDraft(){
+   if(submitting)return;
+   if(!editing&&formHasDraft()&&!confirm('¿Descartar este borrador del Pick del editor?'))return;
+   cancelEdit();
+   if(previewing)leavePreview();
+   closeStudio();
+ }
+ // Mismas reglas que al publicar, para que la vista previa nunca enseñe algo que luego no se guarda.
+ function readDraft(){
+   const form=$('aeWeeklyPickForm'),status=$('aeWeeklyPickAdminStatus');
+   if(!form)return null;
+   if(typeof form.reportValidity==='function'&&!form.reportValidity()){
+     if(status)status.textContent='Completa los campos marcados para ver la vista previa.';
+     return null;
+   }
+   const raw=form.elements.american_odds.value.trim();
+   const oddsValue=Number(raw);
+   if(!/^[+-]?\d{3,6}$/.test(raw)||Math.abs(oddsValue)<100||Math.abs(oddsValue)>100000){
+     if(status)status.textContent='Escribe el momio americano, por ejemplo +150 o -110.';
+     form.elements.american_odds.focus();return null;
+   }
+   const expires=new Date(form.elements.expires_at.value);
+   if(!Number.isFinite(expires.getTime())||expires.getTime()<=Date.now()){
+     if(status)status.textContent='Elige un cierre futuro.';
+     form.elements.expires_at.focus();return null;
+   }
+   const focus=window.aeImageFraming?.get('banner')||{x:50,y:50};
+   const same=editing&&active&&active.id===editing.id?active:null;
+   return {id:'',title:form.elements.title.value.trim(),event_name:form.elements.event_name.value.trim(),
+     selection:form.elements.selection.value.trim(),american_odds:oddsValue,
+     analysis:form.elements.analysis.value.trim(),expires_at:expires.toISOString(),
+     banner_focus_x:focus.x,banner_focus_y:focus.y,
+     image_path:same?.image_path||null,image_url:same?.image_url||null,
+     image_focus_x:same?.image_focus_x??50,image_focus_y:same?.image_focus_y??50,
+     _banner:same?editorialUrl(same.banner_path,same.banner_url):''};
+ }
+ function showPreview(){
+   if(submitting)return;
+   const draft=readDraft();if(!draft)return;
+   const featured=$('picksFeatured'),area=$('picksFeaturedCard'),bar=$('aeWeeklyPreviewBar');
+   if(!featured||!area||!bar)return;
+   if(previewUrl){URL.revokeObjectURL(previewUrl);previewUrl='';}
+   const file=$('aeWeeklyPickForm').elements.banner_file?.files?.[0];
+   if(file)previewUrl=URL.createObjectURL(file);
+   const bannerSrc=previewUrl||draft._banner;
+   previewing=true;
+   const pair=$('aePicksTopPair');if(pair)pair.dataset.camContentState='ready';
+   featured.dataset.camEditorState='ready';
+   featured.classList.add('is-draft-preview');
+   featured.querySelector('.ae-weekly-banner')?.remove();
+   if(bannerSrc){
+     const banner=make('img',undefined,'ae-weekly-banner');banner.src=bannerSrc;banner.alt='';
+     banner.style.setProperty('--ae-image-focus',framedPosition(draft,'banner'));
+     featured.prepend(banner);
+   }
+   const card=createCard(draft,false);
+   card.removeAttribute('data-cam-weekly-id');
+   const details=card.querySelector('details');if(details)details.open=true;
+   area.replaceChildren(card);
+   const oddsHighlight=$('aeWeeklyOddsHighlight');
+   if(oddsHighlight){oddsHighlight.hidden=false;oddsHighlight.textContent=odds(draft.american_odds);}
+   const message=$('aeWeeklyPreviewStatus');
+   if(message)message.textContent=editing?'Así quedará con tus cambios. Si todo está bien, guárdalos.':'Así lo verá la gente. Si todo está bien, publícalo.';
+   bar.hidden=false;
+   closeStudio();
+   window.requestAnimationFrame(()=>featured.scrollIntoView?.({behavior:'smooth',block:'start'}));
+ }
+ function leavePreview(redraw=true){
+   if(!previewing)return;
+   previewing=false;
+   if(previewUrl){URL.revokeObjectURL(previewUrl);previewUrl='';}
+   const bar=$('aeWeeklyPreviewBar');if(bar)bar.hidden=true;
+   const featured=$('picksFeatured');
+   featured?.classList.remove('is-draft-preview');
+   featured?.querySelector('.ae-weekly-banner')?.remove();
+   if(redraw)render();
  }
  window.refreshEditorialWeeklyPick=load;
  window.updateAeWeeklyAdmin=adminVisibility;
@@ -424,7 +558,16 @@
    $('aeWeeklyEditButton')?.addEventListener('click',startEdit);
    $('aeWeeklyShareButton')?.addEventListener('click',shareWeeklyPick);
    $('aeHomeWeeklyShareButton')?.addEventListener('click',shareWeeklyPick);
-   $('aeWeeklyCancelEdit')?.addEventListener('click',cancelEdit);
+   $('aeWeeklyCancelEdit')?.addEventListener('click',discardDraft);
+   $('aeWeeklyPreviewButton')?.addEventListener('click',showPreview);
+   $('aeWeeklyPreviewBack')?.addEventListener('click',()=>{if(submitting)return;leavePreview();openStudio();});
+   studio()?.querySelector('[data-weekly-close]')?.addEventListener('click',closeStudio);
+   // Intro en un campo lleva a la vista previa, nunca publica directamente.
+   studio()?.addEventListener('keydown',event=>{
+     if(event.key==='Enter'&&event.target?.matches?.('input:not([type=file]):not([type=range])')){event.preventDefault();showPreview();}
+   });
+   $('aeWeeklyBannerInput')?.addEventListener('change',()=>setTimeout(syncPhoto,0));
+   $('aeWeeklyPickForm')?.addEventListener('reset',()=>setTimeout(syncPhoto,20));
    $('aeWeeklyNewPick')?.addEventListener('click',startNewPick);
    $('aeWeeklyCheckSave')?.addEventListener('click',manuallyCheckSave);
    document.addEventListener('cam:weekly-result',adminVisibility);

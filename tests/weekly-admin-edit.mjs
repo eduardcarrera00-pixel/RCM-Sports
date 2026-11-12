@@ -3,7 +3,9 @@ import assert from 'node:assert/strict';
 import {Window} from 'happy-dom';
 
 const index=fs.readFileSync('index.html','utf8');
-const formHTML=index.match(/<details id="aeWeeklyPickAdmin"[\s\S]*?<\/details>/)[0];
+// Desde el 12 nov 2026 el formulario vive en una ventana y se publica desde la barra de vista previa.
+const formHTML=index.match(/<dialog id="aeWeeklyPickAdmin"[\s\S]*?<\/dialog>/)[0];
+const previewBar='<div id="aeWeeklyPreviewBar" hidden><p id="aeWeeklyPreviewStatus"></p><button id="aeWeeklyPreviewBack" type="button">Volver a editar</button><button id="aeWeeklySaveButton" type="submit" form="aeWeeklyPickForm">Publicar</button></div>';
 const weekly=fs.readFileSync('assets/ae-editorial-weekly.js','utf8');
 const results=fs.readFileSync('assets/cam-weekly-results.js','utf8');
 const original={id:'00000000-0000-0000-0000-000000000001',title:'Pick del editor original',
@@ -15,7 +17,7 @@ const original={id:'00000000-0000-0000-0000-000000000001',title:'Pick del editor
 const tick=async()=>{for(let i=0;i<12;i++)await new Promise(r=>setTimeout(r,0));};
 async function setup({settled=false,admin=true}={}){
   const w=new Window({url:'https://camsports.github.io/'});
-  w.document.body.innerHTML='<div id="cpWeekly"></div><section id="picksFeatured"><button id="aeWeeklyEditButton" hidden>Editar</button><div id="picksFeaturedCard"></div></section>'+formHTML;
+  w.document.body.innerHTML='<div id="cpWeekly"></div><section id="picksFeatured"><button id="aeWeeklyEditButton" hidden>Editar</button><div id="picksFeaturedCard"></div></section>'+previewBar+formHTML;
   w.currentAdmin=admin?{id:'another-editor'}:null;
   w.confirm=()=>true;
   const calls=[],uploads=[],rows=[{...original}],outcomes=new Map();
@@ -83,7 +85,7 @@ await settled.w.happyDOM.close();
 const pending=await setup();
 pending.w.document.getElementById('aeWeeklyEditButton').click();
 assert.equal(pending.form.elements.title.value,original.title);
-assert.equal(pending.form.elements.banner_url.value,'','Existing assets are retained rather than reuploaded');
+assert.equal(pending.form.elements.banner_file.value,'','Existing assets are retained rather than reuploaded');
 pending.form.elements.title.value='Pick actualizado por otro admin';await submit(pending);
 assert.equal(writes(pending).length,1);
 assert.equal(writes(pending)[0].name,'ae_update_editorial_weekly_pick');
@@ -102,7 +104,7 @@ race.w.confirm=()=>false;race.w.document.getElementById('aeWeeklyNewPick').click
 assert.equal(race.form.elements.title.value,'Borrador que debe conservarse','Cancelling preserves the draft');
 race.w.confirm=()=>true;race.w.document.getElementById('aeWeeklyNewPick').click();await tick();
 assert.equal(race.form.elements.title.value,'');
-assert.equal(race.w.document.getElementById('aeWeeklySaveButton').textContent,'Publicar Pick del editor');
+assert.equal(race.w.document.getElementById('aeWeeklySaveButton').textContent,'Publicar');
 await race.w.happyDOM.close();
 
 const late=await setup();late.w.document.getElementById('aeWeeklyEditButton').click();
