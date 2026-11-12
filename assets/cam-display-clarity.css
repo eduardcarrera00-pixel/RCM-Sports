@@ -562,3 +562,40 @@ html body:is(.ae-is-nfl,.ae-is-football) #mainContent #articlesGrid.ae-sport-new
   }
 }
 }
+
+/* Approved compact Chef slip · 12 Nov 2026. Real controls remain in place. */
+@layer cam-display-clarity {
+html body dialog#cpDialog.ae-cp-detail-dialog.cam-chef-detail-v2{width:min(610px,calc(100vw - 24px))!important;max-width:610px!important;}
+html body dialog#cpDialog.ae-cp-detail-dialog.cam-chef-detail-v2 .ae-cp-detail-hero{padding:22px 26px!important;}
+html body dialog#cpDialog.ae-cp-detail-dialog.cam-chef-detail-v2 .ae-cp-detail-hero-title{font-size:31px!important;}
+html body dialog#cpDialog.ae-cp-detail-dialog.cam-chef-detail-v2 .ae-cp-detail-content{padding:22px 26px 26px!important;}
+html body dialog#cpDialog.ae-cp-detail-dialog.cam-chef-detail-v2 .cp-recipe-card{border:0!important;background:none!important;overflow:visible!important;}
+html body dialog#cpDialog.ae-cp-detail-dialog.cam-chef-detail-v2 .cp-card-header{padding:0 0 20px!important;}
+html body dialog#cpDialog.ae-cp-detail-dialog.cam-chef-detail-v2 .cam-chef-slip{overflow:hidden;border:1px solid var(--chef-line);border-radius:12px;background:var(--chef-ticket);}
+html body dialog#cpDialog.ae-cp-detail-dialog.cam-chef-detail-v2 .cam-ticket-content{margin:0!important;}
+html body dialog#cpDialog.ae-cp-detail-dialog.cam-chef-detail-v2 .cam-chef-event{padding:13px 18px!important;border-top:0!important;border-bottom:1px solid var(--chef-line)!important;font:400 12px/1.5 Inter,system-ui,sans-serif!important;}
+html body dialog#cpDialog.ae-cp-detail-dialog.cam-chef-detail-v2 .cp-card-title{margin:16px 18px 0!important;}
+html body dialog#cpDialog.ae-cp-detail-dialog.cam-chef-detail-v2 .cam-ticket-legs{padding:0 18px!important;}
+html body dialog#cpDialog.ae-cp-detail-dialog.cam-chef-detail-v2 .cp-pick-line{padding:20px 0!important;align-items:center!important;grid-template-columns:minmax(0,1fr) auto!important;}
+html body dialog#cpDialog.ae-cp-detail-dialog.cam-chef-detail-v2 .cp-pick-line-choice{font-size:22px!important;line-height:1.25!important;}
+html body dialog#cpDialog.ae-cp-detail-dialog.cam-chef-detail-v2 .cp-pick-line-market{margin:0 0 6px!important;font-size:11px!important;}
+html body dialog#cpDialog.ae-cp-detail-dialog.cam-chef-detail-v2 .cp-odds{align-self:center!important;padding:8px 12px!important;font-size:20px!important;}
+html body dialog#cpDialog.ae-cp-detail-dialog.cam-chef-detail-v2 .cam-chef-total{margin:0 18px!important;}
+html body dialog#cpDialog.ae-cp-detail-dialog.cam-chef-detail-v2 .cam-chef-analysis{margin:0 18px 20px!important;padding:17px 0 0!important;border:0!important;border-top:1px solid var(--chef-line)!important;border-radius:0!important;background:none!important;}
+html body dialog#cpDialog.ae-cp-detail-dialog.cam-chef-detail-v2 .cam-chef-analysis-label{font-size:10px!important;}
+html body dialog#cpDialog.ae-cp-detail-dialog.cam-chef-detail-v2 .cp-explanation{font:400 14px/1.65 Inter,system-ui,sans-serif!important;}
+html body dialog#cpDialog.ae-cp-detail-dialog.cam-chef-detail-v2 .cp-actions{background:rgba(0,0,0,.06)!important;padding:11px 15px!important;}
+html body dialog#cpDialog.ae-cp-detail-dialog.cam-chef-detail-v2 .cp-detail-replies-heading{font-size:24px!important;}
+html body dialog#cpDialog.ae-cp-detail-dialog.cam-chef-detail-v2 .ae-cp-comment-composer{display:flex!important;flex-direction:column!important;gap:8px!important;background:rgba(0,0,0,.05)!important;}
+html body dialog#cpDialog.ae-cp-detail-dialog.cam-chef-detail-v2 .ae-cp-comment-composer label{display:block!important;width:100%!important;margin:0!important;padding:0!important;}
+html body dialog#cpDialog.ae-cp-detail-dialog.cam-chef-detail-v2 .ae-cp-comment-composer textarea{min-height:62px!important;padding:5px!important;border:0!important;background:transparent!important;color:var(--chef-ink)!important;font-size:16px!important;}
+html body dialog#cpDialog.ae-cp-detail-dialog.cam-chef-detail-v2 .ae-cp-comment-composer button[type=submit]{align-self:flex-end!important;width:auto!important;min-height:38px!important;padding:8px 13px!important;background:var(--chef-gold)!important;color:var(--chef-paper)!important;border:0!important;border-radius:5px!important;font:700 12px/1.4 Inter,system-ui,sans-serif!important;}
+html body dialog#cpDialog.ae-cp-detail-dialog.cam-chef-detail-v2 .ae-cp-reply-context:has(.ae-cp-reply-status:empty){display:none!important;}
+@media(max-width:599px){
+html body dialog#cpDialog.ae-cp-detail-dialog.cam-chef-detail-v2 .ae-cp-detail-hero{padding:21px 18px!important;}
+html body dialog#cpDialog.ae-cp-detail-dialog.cam-chef-detail-v2 .ae-cp-detail-hero-title{font-size:27px!important;}
+html body dialog#cpDialog.ae-cp-detail-dialog.cam-chef-detail-v2 .ae-cp-detail-content{padding:18px 16px!important;}
+html body dialog#cpDialog.ae-cp-detail-dialog.cam-chef-detail-v2 .cp-pick-line-choice{font-size:20px!important;}
+html body dialog#cpDialog.ae-cp-detail-dialog.cam-chef-detail-v2 .cp-explanation{font-size:13px!important;}
+}
+}

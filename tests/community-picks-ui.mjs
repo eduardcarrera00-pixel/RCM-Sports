@@ -135,7 +135,7 @@ assert.equal(d.querySelector('#cpFeed .cam-pk-odds').parentElement.className,'ca
 assert.match(d.querySelectorAll('#cpFeed .cam-pk-leg')[1].textContent,/Más de 3.5 goles/);
 assert.match(d.querySelectorAll('#cpFeed .cam-pk-leg')[2].textContent,/Ambos equipos marcan/);
 
-d.querySelector('#cpFeed .cp-card-read-link').click();await settle();
+d.querySelector('#cpFeed .cam-pk-full').click();await settle();
 assert.equal(d.querySelector('#cpDialog .cp-card-detail')!==null,true);
 assert.ok(d.querySelector('#cpDialog .cp-recipe-card'),'Chef recipe uses unified design');
 assert.equal(d.querySelector('#cpDialog .cp-recipe-card .cp-card-legs').tagName,'OL');
@@ -196,7 +196,7 @@ d.querySelector('#cpDialog button').click();await settle();
 d.getElementById('cpArchiveClose').click();await settle();
 // Reading a Pick remains public, but its reply form stays behind login.
 user=null;w.authOpened=false;
-d.querySelector('#cpFeed .cp-card-read-link').click();await settle();
+d.querySelector('#cpFeed .cam-pk-full').click();await settle();
 assert.ok(d.querySelector('#cpDialog .cp-login-to-reply'),'Guests receive a sign-in CTA instead of the reply form');
 assert.equal(d.querySelector('#cpDialog form'),null);
 d.querySelector('#cpDialog .cp-login-to-reply').click();await settle();

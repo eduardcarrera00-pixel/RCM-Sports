@@ -263,11 +263,14 @@ function formatChefRecipe(n,p){
  if(events.length===1)content.prepend(el('p',events[0],'cam-chef-event'));
  const odds=n.querySelector('.cp-card-odds');
  const quota=odds.querySelector('.cp-odds');
- const impact=odds.querySelector('.cam-pick-impact');
  const rows=[...content.querySelectorAll('.cp-pick-line')];
  rows.forEach((row,i)=>{
   const marker=row.querySelector('.cam-ticket-leg-number');
   if(marker)marker.textContent=combo?String(i+1):'';
+  const body=row.querySelector('.cp-pick-line-body');
+  const market=body?.querySelector('.cp-pick-line-market');
+  const choice=body?.querySelector('.cp-pick-line-choice');
+  if(market&&choice)body.insertBefore(market,choice);
   const leg=choices[i].leg;
   const price=Number(leg.odds);
   if(combo&&splitPickSelections(leg.selection).length===1&&Number.isFinite(price)&&Math.abs(price)>=100){
@@ -279,17 +282,15 @@ function formatChefRecipe(n,p){
   const total=el('div',null,'cam-chef-total');
   total.append(el('span',combo?'Combinada':'Momio'),quota);content.append(total);
  }else rows[0].append(quota);
- if(impact){
-  const points=el('div',null,'cam-chef-league');
-  impact.textContent=impact.textContent.replace(/^Liga\s*/,'');
-  points.append(el('span','Puntos en liga'),impact);content.after(points);
- }
  odds.remove();
  const explanation=n.querySelector('.cp-explanation');
  if(explanation){
   const analysis=el('div',null,'cam-chef-analysis');
   explanation.before(analysis);analysis.append(el('p','Análisis del Chef','cam-chef-analysis-label'),explanation);
  }
+ const slip=el('div',null,'cam-chef-slip');
+ header.after(slip);
+ for(const node of [...n.children])if(node!==header&&node!==slip)slip.append(node);
 }
 /* Picks moderno (9 nov 2026) · feed de Picks › Picks.
    La misma información con menos cajas: pronóstico grande, partido y mercado en
@@ -1436,7 +1437,6 @@ function pickDetailHero(p){
  hero.dataset.pickSport=(p.legs||[]).some(l=>/nfl|americano/i.test(l.sport||''))?'nfl':'football';
  const copy=el('div',null,'ae-cp-detail-hero-copy');
  copy.append(
-   el('span','CAM SPORTS · LA COCINA DE PICKS','ae-cp-detail-kicker'),
    el('h2','La receta del Chef','ae-cp-detail-hero-title')
  );
  hero.append(copy);
@@ -1497,6 +1497,9 @@ async function showDetail(id,options={}){
   form.id='aeCpCommentComposer';
   const body=field('Tu comentario','textarea');
   body.input.maxLength=2000;
+  body.input.placeholder='¿Cómo ves este pick?';
+  body.input.setAttribute('aria-label','Tu comentario');
+  body.wrap.firstChild.remove();
   let parent=null;
   const resetReply=button('×',()=>{
    parent=null;
@@ -1509,7 +1512,7 @@ async function showDetail(id,options={}){
   resetReply.hidden=true;
   const replyContext=el('div',null,'ae-cp-reply-context');
   replyContext.append(replyStatus,resetReply);
-  const send=el('button','Enviar comentario');
+  const send=el('button','Comentar');
   send.type='submit';
   form.append(replyContext,body.wrap,send);
   // El compositor va ARRIBA de la conversación; no hay botón grande
