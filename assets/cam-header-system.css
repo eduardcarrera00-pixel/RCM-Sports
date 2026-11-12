@@ -309,4 +309,108 @@
   }
   body > header :is(#readerSession,#loggedAdminContainer,#guestAdminContainer).hidden,
   body > header [hidden] { display: none !important; }
+
+  /* CAM SPORTS · admin mobile icon row. Keep the controls in one rail:
+     theme, profile, rank, edit, publish and sign out. */
+  @media (max-width: 760px) {
+    body > header .ae-mobile-header-grid:has(#loggedAdminContainer:not(.hidden)) {
+      grid-template-columns: minmax(0,auto) minmax(0,1fr) !important;
+      grid-template-areas: "brand account" !important;
+      align-items: center !important;
+      column-gap: 4px !important;
+      row-gap: 0 !important;
+      height: 76px !important;
+      min-height: 76px !important;
+      padding-block: 0 !important;
+    }
+    body > header .ae-mobile-header-grid:has(#loggedAdminContainer:not(.hidden)) .cam-brand {
+      box-sizing: border-box !important;
+      width: clamp(86px,29vw,128px) !important;
+      min-width: 0 !important;
+      max-width: clamp(86px,29vw,128px) !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      justify-self: start !important;
+    }
+    body > header .ae-mobile-header-grid > .ae-header-actions:has(#loggedAdminContainer:not(.hidden)) {
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: nowrap !important;
+      justify-content: flex-end !important;
+      align-items: center !important;
+      justify-self: end !important;
+      box-sizing: border-box !important;
+      width: 100% !important;
+      min-width: 0 !important;
+      max-width: 100% !important;
+      height: 44px !important;
+      min-height: 44px !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      gap: clamp(1px,.45vw,3px) !important;
+      border: 0 !important;
+    }
+    /* Flatten only the visible admin container so the six controls
+       can follow their visual order without moving any DOM handlers. */
+    body > header .ae-header-actions:has(#loggedAdminContainer:not(.hidden)) #loggedAdminContainer {
+      display: contents !important;
+    }
+    body > header .ae-header-actions:has(#loggedAdminContainer:not(.hidden))
+      :is(#themeToggle,#camHeaderRank:not([hidden]),#camGlobalEditToggle:not([hidden]),
+          #loggedAdminContainer .ae-admin-profile,
+          #loggedAdminContainer .ae-publish-action,
+          #loggedAdminContainer .ae-signout-action) {
+      position: relative !important;
+      inset: auto !important;
+      box-sizing: border-box !important;
+      display: grid !important;
+      place-items: center !important;
+      grid-template-rows: 1fr !important;
+      flex: 0 0 clamp(32px,8.7vw,38px) !important;
+      width: clamp(32px,8.7vw,38px) !important;
+      min-width: clamp(32px,8.7vw,38px) !important;
+      max-width: clamp(32px,8.7vw,38px) !important;
+      height: 44px !important;
+      min-height: 44px !important;
+      max-height: 44px !important;
+      align-self: center !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      gap: 0 !important;
+      border: 0 !important;
+      border-radius: 10px !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      transform: none !important;
+    }
+    body > header .ae-header-actions:has(#loggedAdminContainer:not(.hidden)) #themeToggle { order: 0 !important; }
+    body > header .ae-header-actions:has(#loggedAdminContainer:not(.hidden)) #loggedAdminContainer .ae-admin-profile { order: 1 !important; }
+    body > header .ae-header-actions:has(#loggedAdminContainer:not(.hidden)) #camHeaderRank { order: 2 !important; }
+    body > header .ae-header-actions:has(#loggedAdminContainer:not(.hidden)) #camGlobalEditToggle { order: 3 !important; }
+    body > header .ae-header-actions:has(#loggedAdminContainer:not(.hidden)) #loggedAdminContainer .ae-publish-action { order: 4 !important; }
+    body > header .ae-header-actions:has(#loggedAdminContainer:not(.hidden)) #loggedAdminContainer .ae-signout-action { order: 5 !important; }
+    /* The pencil is icon only; its existing aria-label/title explain its action. */
+    body > header .ae-header-actions:has(#loggedAdminContainer:not(.hidden))
+      #camGlobalEditToggle .cam-global-edit-label,
+    body > header .ae-header-actions:has(#loggedAdminContainer:not(.hidden))
+      #loggedAdminContainer #adminNameDisplay {
+      display: none !important;
+    }
+    body > header .ae-header-actions:has(#loggedAdminContainer:not(.hidden))
+      :is(#themeToggle,#camHeaderRank,#camGlobalEditToggle,
+          #loggedAdminContainer .ae-admin-profile,
+          #loggedAdminContainer .ae-publish-action,
+          #loggedAdminContainer .ae-signout-action)::after {
+      content: none !important;
+      display: none !important;
+    }
+    body > header .ae-header-actions:has(#loggedAdminContainer:not(.hidden))
+      :is(#themeToggle,#camGlobalEditToggle,
+          #loggedAdminContainer .ae-admin-profile,
+          #loggedAdminContainer .ae-publish-action) .cam-control-icon {
+      display: grid !important;
+      place-items: center !important;
+      margin: 0 !important;
+    }
+  }
 }
