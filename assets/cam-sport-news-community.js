@@ -41,8 +41,8 @@
       const groups = await Promise.all(chunks(ids, 50).map(part => dataOf(client().from('rcm_comment_totals')
         .select('id,article_id,author,body,created_at,article_title,upvotes,downvotes,my_vote')
         .in('article_id', part).gt(column, 0).order(column, {ascending: false})
-        .order('created_at', {ascending: false}).order('id', {ascending: false}).limit(3))));
-      return groups.flat().sort((a, b) => Number(b[column]) - Number(a[column]) || latest(a, b)).slice(0, 3);
+        .order('created_at', {ascending: false}).order('id', {ascending: false}).limit(5))));
+      return groups.flat().sort((a, b) => Number(b[column]) - Number(a[column]) || latest(a, b)).slice(0, 5);
     };
     const [supported, questioned] = await Promise.all([top('upvotes'), top('downvotes')]);
     const commentIds = [...new Set([...supported, ...questioned].map(row => row.id))];
@@ -107,7 +107,6 @@
       void openArticleFromShareLink();
     };
     const content = el('div', null, 'cam-snc-content');
-    if (type !== 'take') content.append(el('div', sports[sportNow()].category, 'cam-snc-category'));
     const head = el(type === 'take' ? 'h3' : 'p', null, type === 'take' ? 'cam-snc-title' : 'cam-snc-context');
     const title = el(type === 'take' ? 'button' : 'a', type === 'take' ? row.title : 'En ' + (row.article_title || 'Ver artículo'), 'cam-snc-open');
     if (type === 'comment') title.href = articleURL(row.article_id, row.id);
@@ -117,18 +116,40 @@
       event.preventDefault(); open();
     };
     if (type === 'comment') {
-      const arrow = el('i', null, 'cam-snc-context-arrow fa-solid fa-arrow-up-right-from-square');
+      const arrow = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      arrow.setAttribute('class', 'cam-snc-context-arrow');
+      arrow.setAttribute('viewBox', '0 0 24 24');
+      arrow.setAttribute('fill', 'none');
+      arrow.setAttribute('stroke', 'currentColor');
+      arrow.setAttribute('stroke-width', '1.5');
+      arrow.setAttribute('stroke-linecap', 'round');
+      arrow.setAttribute('stroke-linejoin', 'round');
+      const path = document.createElementNS(arrow.namespaceURI, 'path');
+      path.setAttribute('d', 'M14 3h7v7M21 3 10 14M10 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5');
+      arrow.append(path);
       arrow.setAttribute('aria-hidden', 'true'); title.append(arrow);
       if (row.body) content.append(el('blockquote', row.body, 'cam-snc-excerpt'));
     }
     head.append(title); content.append(head);
-    if (rank) {
+    if (rank && type === 'take') {
       const position = el('span', rank, 'cam-snc-rank');
       position.setAttribute('aria-label', 'Posición ' + rank); item.append(position);
     }
     const author = el(row.author_id ? 'button' : 'span', (type === 'take' ? '@' : '') + (row.author || 'Aficionado').replace(/^@+/, ''), 'cam-snc-author');
     if (row.author_id) { author.type = 'button'; author.dataset.camAuthorId = String(row.author_id); author.onclick = () => window.openAePublicProfile?.(row.author_id); }
-    if (type === 'take') {
+    if (type === 'comment') {
+      author.textContent = '';
+      author.setAttribute('aria-label', 'Ver perfil de ' + (row.author || 'Aficionado'));
+      const face = el('span', null, 'cam-snc-profile-rank');
+      face.dataset.rankLetter = '';
+      face.dataset.rankFace = row.author_id || '';
+      face.setAttribute('aria-hidden', 'true');
+      author.append(face);
+      const header = el('div', null, 'cam-snc-comment-head');
+      header.append(el('span', '#' + rank, 'cam-snc-comment-position'), author);
+      item.append(header);
+      window.CamLeagues?.avatar(face, row.author_id);
+    } else if (type === 'take') {
       // The same identity cache and highest rank used by the public profile.
       author.textContent = '';
       author.classList.add('cam-snc-profile-rank');
@@ -175,6 +196,8 @@
     if (!sport || !state) return;
     const debated = document.getElementById('camSportDebatedList');
     const distinguished = document.getElementById('camSportLeadersList');
+    const scrollPositions = new Map([...distinguished.querySelectorAll('.cam-snc-track')]
+      .map(track => [track.dataset.group, track.scrollLeft]));
     debated.replaceChildren(); distinguished.replaceChildren();
     document.getElementById('camSportDebatedTitle').textContent='Lo más debatido · '+sports[sport].category;
     document.getElementById('camSportLeadersTitle').textContent='Opinadores distinguidos · '+sports[sport].category;
@@ -194,19 +217,43 @@
           group.append(el('h3', (key === 'supported' ? '▲ ' : '▼ ') + label, 'cam-snc-group-title'));
           const rows = state.leaders[key];
           if (!rows.length) message(group, 'Todavía no hay comentarios con estos votos.');
-          rows.forEach((row, i) => {
-            const entry = card(row, 'comment'); entry.hidden = i > 0;
-            group.append(entry);
-          });
-          if (rows.length > 1) {
-            const more = el('button', 'Ver más', 'cam-snc-more'); more.type = 'button';
-            more.setAttribute('aria-expanded', 'false');
-            more.onclick = () => {
-              const expanded = more.getAttribute('aria-expanded') !== 'true';
-              more.setAttribute('aria-expanded', String(expanded)); more.textContent = expanded ? 'Ver menos' : 'Ver más';
-              [...group.querySelectorAll('.cam-snc-card')].forEach((n, i) => { n.hidden = i > 0 && !expanded; });
+          if (rows.length) {
+            const track = el('div', null, 'cam-snc-track');
+            track.dataset.group = key;
+            track.setAttribute('role', 'region');
+            track.setAttribute('aria-label', label + ': desliza para ver los comentarios');
+            track.tabIndex = 0;
+            rows.forEach((row, i) => track.append(card(row, 'comment', i + 1)));
+            group.append(track);
+            const nav = el('div', null, 'cam-snc-carousel-nav');
+            const count = el('span', '1 de ' + rows.length, 'cam-snc-carousel-count');
+            count.setAttribute('aria-live', 'polite');
+            const arrows = el('div', null, 'cam-snc-carousel-arrows');
+            const controls = [];
+            const position = () => {
+              const first = track.firstElementChild, second = first?.nextElementSibling;
+              const step = second ? second.offsetLeft - first.offsetLeft : track.clientWidth;
+              return {step, index: Math.max(0, Math.min(rows.length - 1, Math.round(track.scrollLeft / (step || 1))))};
             };
-            group.append(more);
+            const update = () => {
+              const {index} = position();
+              count.textContent = (index + 1) + ' de ' + rows.length;
+              controls.forEach((button, i) => { button.disabled = i === 0 ? index === 0 : index === rows.length - 1; });
+            };
+            if (rows.length > 1) for (const direction of [-1, 1]) {
+              const button = el('button', direction === -1 ? '‹' : '›', 'cam-snc-carousel-arrow');
+              button.type = 'button';
+              button.setAttribute('aria-label', (direction === -1 ? 'Anterior: ' : 'Siguiente: ') + label);
+              button.onclick = () => {
+                const {index, step} = position();
+                track.scrollTo({left: Math.max(0, Math.min(rows.length - 1, index + direction)) * step,
+                  behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
+              };
+              controls.push(button); arrows.append(button);
+            }
+            nav.append(count, arrows); group.append(nav);
+            track.addEventListener('scroll', update, {passive: true});
+            requestAnimationFrame(() => { track.scrollLeft = scrollPositions.get(key) || 0; update(); });
           }
           target.append(group);
         }

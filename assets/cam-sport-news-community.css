@@ -166,3 +166,65 @@
     }
   }
 }
+
+/* Approved compact opinion carousels. Profile shields reuse CamLeagues. */
+@layer cam-display-clarity {
+  html body #camSportNewsCommunity .cam-snc-track {
+    position:relative!important; display:flex!important; gap:12px!important; min-width:0!important;
+    overflow-x:auto!important; overscroll-behavior-x:contain; scroll-snap-type:x mandatory;
+    padding:3px 3px 9px!important; scrollbar-width:thin; scrollbar-color:var(--cam-calm-line) transparent;
+  }
+  html body #mainContent #camSportNewsCommunity .cam-snc-track .cam-snc-comment {
+    flex:0 0 90%!important; box-sizing:border-box!important; scroll-snap-align:start;
+    display:grid!important; grid-template-rows:auto 1fr auto!important; gap:8px!important;
+    padding:10px 14px 8px!important; min-width:0!important; margin:0!important;
+  }
+  html body #camSportNewsCommunity .cam-snc-comment-head {
+    display:flex!important; align-items:center!important; justify-content:space-between!important; gap:12px!important;
+  }
+  html body #camSportNewsCommunity .cam-snc-comment-position {
+    color:var(--cam-calm-action)!important; font:600 12px/1.4 Inter,system-ui,sans-serif!important;
+  }
+  html body #mainContent #camSportNewsCommunity .cam-snc-comment .cam-snc-author {
+    display:inline-flex!important; align-items:center!important; justify-content:center!important;
+    width:44px!important; height:44px!important; min-height:44px!important; padding:0!important;
+    margin:0!important; border:0!important; background:none!important; flex:none!important;
+  }
+  html body #camSportNewsCommunity .cam-snc-profile-rank {
+    display:inline-flex!important; width:32px!important; height:38px!important;
+    align-items:center!important; justify-content:center!important;
+  }
+  html body #camSportNewsCommunity .cam-snc-comment .cam-snc-excerpt {
+    margin:0 0 10px!important; font-size:16px!important; line-height:1.45!important; -webkit-line-clamp:3!important;
+  }
+  html body #camSportNewsCommunity .cam-snc-comment .cam-snc-context {
+    margin:0!important; font-size:12px!important; line-height:1.45!important;
+  }
+  html body #camSportNewsCommunity .cam-snc-comment .cam-snc-context .cam-snc-open { align-items:center!important; }
+  html body #camSportNewsCommunity .cam-snc-context-arrow {
+    display:block!important; width:15px!important; height:15px!important; flex:0 0 15px!important;
+  }
+  html body #camSportNewsCommunity .cam-snc-comment .cam-snc-actions {
+    padding-top:4px!important; border-top:1px solid var(--cam-calm-line)!important; gap:8px!important;
+  }
+  html body #camSportNewsCommunity .cam-snc-comment .cam-snc-votes { flex:0 0 auto!important; gap:6px!important; }
+  html body #camSportNewsCommunity .cam-snc-comment .cam-snc-meter { display:none!important; }
+  html body #camSportNewsCommunity .cam-snc-comment .cam-snc-votes button {
+    border:0!important; border-radius:8px!important; padding:6px!important; min-width:44px!important; min-height:44px!important;
+  }
+  html body #camSportNewsCommunity .cam-snc-carousel-nav {
+    display:flex!important; align-items:center!important; justify-content:space-between!important; gap:12px!important;
+  }
+  html body #camSportNewsCommunity .cam-snc-carousel-count {
+    color:var(--cam-calm-muted)!important; font:400 11px/1.4 Inter,system-ui,sans-serif!important;
+  }
+  html body #camSportNewsCommunity .cam-snc-carousel-arrows { display:flex!important; gap:8px!important; }
+  html body #camSportNewsCommunity .cam-snc-carousel-arrow {
+    display:inline-flex!important; align-items:center!important; justify-content:center!important;
+    min-width:44px!important; min-height:44px!important; padding:0!important;
+    border:1px solid var(--cam-calm-line)!important; border-radius:10px!important;
+    background:transparent!important; color:var(--cam-calm-action)!important; font:400 24px/1 Inter,system-ui,sans-serif!important;
+  }
+  html body #camSportNewsCommunity .cam-snc-carousel-arrow:disabled { opacity:.35!important; cursor:default!important; }
+  html body #camSportNewsCommunity .cam-snc-track:focus-visible { outline:2px solid var(--cam-calm-action); outline-offset:2px; }
+}

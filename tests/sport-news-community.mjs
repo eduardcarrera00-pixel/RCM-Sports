@@ -14,6 +14,7 @@ const comments = [
   {id: 'other', article_id: 'c0', upvotes: 999, downvotes: 999},
   {id: 'n-best', article_id: 'n200', upvotes: 12, downvotes: 1},
   {id: 'n-second', article_id: 'n0', upvotes: 3, downvotes: 0},
+  ...Array.from({length: 5}, (_, i) => ({id: 'n-extra-' + i, article_id: 'n0', upvotes: 2, downvotes: 0})),
   {id: 'f-best', article_id: 'f0', upvotes: 7, downvotes: 0},
   {id: 'f-worst', article_id: 'f0', upvotes: 0, downvotes: 8}
 ].map(t => ({...t, article_title: t.id, body: 'Comentario ' + t.id, author: 'Autor', created_at: '2026-11-10', my_vote: 0}));
@@ -69,6 +70,8 @@ w.db = {from, auth: {onAuthStateChange(fn) { authChange = fn; }}, async rpc(name
   }
   return {data: null};
 }};
+const rankFaces = [];
+w.CamLeagues = {avatar(node, user) { rankFaces.push({node, user}); }};
 w.currentUser = null;
 w.articleURL = (a, c) => 'https://camsports.github.io/?article=' + a + '&comment=' + c;
 w.openArticleFromShareLink = () => opens.push('article');
@@ -100,9 +103,16 @@ assert.ok(d.querySelector('.is-questioned .cam-snc-comment .cam-snc-context a').
 d.body.className = 'ae-is-nfl'; await settle();
 assert.equal(d.querySelector('#camSportLeadersList article').dataset.recordId, 'n-best', 'Rank within the sport across all article pages and ID chunks');
 assert.ok(reads.some(r => r.table === 'articles' && r.range[0] === 200), 'Article lookup is paginated');
-assert.equal(d.querySelector('#camSportLeadersList [data-record-id="n-second"]').hidden, true);
-d.querySelector('#camSportLeadersList .cam-snc-more').click();
-assert.equal(d.querySelector('#camSportLeadersList [data-record-id="n-second"]').hidden, false);
+const supportedTrack = d.querySelector('#camSportLeadersList .is-supported .cam-snc-track');
+assert.equal(supportedTrack.querySelectorAll('article').length, 5, 'The sport-specific top five stays available in the carousel');
+assert.ok([...supportedTrack.querySelectorAll('article')].every(n => !n.hidden), 'Scrolling replaces the old expansion gate');
+assert.equal(d.querySelector('#camSportLeadersList .cam-snc-more'), null);
+assert.equal(supportedTrack.tabIndex, 0, 'Native scrolling is keyboard accessible');
+assert.equal(supportedTrack.querySelector('.cam-snc-category'), null, 'No repeated sport label');
+assert.equal(supportedTrack.querySelector('.cam-snc-author').textContent, '', 'Only the real profile shield is displayed');
+assert.equal(supportedTrack.querySelector('.cam-snc-author').getAttribute('aria-label'), 'Ver perfil de Autor');
+assert.ok(rankFaces.some(face => face.user === 'comment-author' && face.node.dataset.rankLetter === ''), 'The shared profile rank API paints the official symbol');
+assert.equal(supportedTrack.querySelector('.cam-snc-context-arrow').tagName.toLowerCase(), 'svg', 'A thin vector replaces the old link glyph');
 d.querySelector('#camSportDebatedList .cam-snc-reply').click();
 assert.equal(opens.at(-1), 'take-nfl');
 d.querySelector('#camSportLeadersList [data-direction="1"]').click(); await settle();
@@ -136,4 +146,4 @@ assert.equal(d.getElementById('camSportNewsCommunity').hidden, true);
 assert.ok(html.includes('assets/cam-sport-news-community.js'));
 assert.ok(fs.readFileSync('assets/ae-football-mobile-redesign.js', 'utf8').includes("moveTo(byId('camSportNewsCommunity'), stage)"));
 await w.happyDOM.close();
-console.log('PASS: sport separation, football competitions, ranked replies, paginated leaders, stale responses, votes, auth, expansion and retries.');
+console.log('PASS: sport separation, football competitions, ranked replies, paginated leaders, stale responses, votes, auth, top-five carousels, profile rank shields and retries.');
