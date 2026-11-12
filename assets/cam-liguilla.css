@@ -3,6 +3,10 @@
    El campeón y la final llevan el azul noche y el dorado de la marca en los dos temas. */
 #camLiguilla{display:grid;gap:14px;margin:0 0 14px;color:var(--q-ink)}
 #camLiguilla[hidden]{display:none!important}
+/* La Liguilla y La semana ya presentan los partidos de Liga MX.
+   Mantener la quiniela regular oculta hasta que el club solicite reactivarla. */
+#camFootballQuiniela.cam-ligamx-regular-paused > .cam-nfl-top,
+#camFootballQuiniela.cam-ligamx-regular-paused > #camFootballMatchPanel{display:none!important}
 #camFootballQuiniela.cam-liguilla-round #camFootballDayNav,
 #camFootballQuiniela.cam-liguilla-round #camFootballGames,
 #camFootballQuiniela.cam-liguilla-round .cam-nfl-save-row{display:none!important}

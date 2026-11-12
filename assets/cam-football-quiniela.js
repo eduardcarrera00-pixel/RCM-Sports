@@ -281,6 +281,8 @@
     return leagues;
   }
   function paintNav(){
+    // Pausa manual durante la Liguilla de Liga MX. Reactivar solo cuando lo pida el club.
+    root.classList.toggle('cam-ligamx-regular-paused',competition==='ligamx');
     const nav=$('camFootballNav');if(!nav)return;
     nav.replaceChildren(competitionNav(),button('Ver mis jornadas ›',()=>window.camOpenQuinielaHistory?.('football'),'cam-nfl-action cam-nfl-action-secondary'));
   }
