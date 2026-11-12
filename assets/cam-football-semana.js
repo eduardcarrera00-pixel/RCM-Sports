@@ -73,7 +73,6 @@
     return list.slice().sort((a,b)=>
       appeal(b)-appeal(a)||even(a)-even(b)||Date.parse(a.kickoff)-Date.parse(b.kickoff))[0]||null;
   }
-  function focusGame(id){release();window.camSectionTabs?.select?.('quiniela',{scroll:false});void q()?.focus(id);}
   function pickButton(snap,g,pick){
     const selected=(snap.draft.get(g.id)||snap.mine.get(g.id))===pick;
     const b=button(null,async()=>{
@@ -112,7 +111,7 @@
     const mine=snap.mine.get(g.id),draft=snap.draft.get(g.id);
     if(ui.result?.game===g.id)play.append(el('p',ui.result.text,'cam-ns-note',{role:'status'}));
     else if(draft||mine)play.append(el('p',(draft?'Tu elección sin guardar: ':'Tu elección guardada: ')+label(snap,g,draft||mine),'cam-ns-note'));
-    play.append(button('Ver este partido en la quiniela →',()=>focusGame(g.id)));box.append(play);return box;
+    box.append(play);return box;
   }
 
   function liveBlock(snap){

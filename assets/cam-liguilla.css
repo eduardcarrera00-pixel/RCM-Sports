@@ -337,7 +337,8 @@ html.dark #camLiguilla .cam-lg-event{border-color:rgba(232,191,121,.3)}
 @container (min-width:560px){#camLiguilla .cam-lg-q8-list{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @container (min-width:760px){#camLiguilla .cam-lg-q8-list{grid-template-columns:repeat(4,minmax(0,1fr))}}
 #camLiguilla .cam-lg-q8-save{min-width:180px}
-/* «Tu cuadro» plegado hasta que se abre. */
+/* Cuadro visible primero; fecha y explicación desplegable debajo. */
+#camLiguilla .cam-lg-upcoming{display:grid;gap:12px;min-width:0}
 #camLiguilla .cam-lg-teaser{border:1px solid var(--q-line);background:var(--q-card);min-width:0}
 #camLiguilla .cam-lg-teaser-sum{list-style:none;display:grid;grid-template-columns:44px minmax(0,1fr);gap:14px;align-items:center;padding:16px;cursor:pointer}
 #camLiguilla .cam-lg-teaser-sum::-webkit-details-marker{display:none}

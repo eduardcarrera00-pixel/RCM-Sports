@@ -394,12 +394,14 @@ def run():
         assert fixed.locator('svg').count() == 4 and fixed.first.get_attribute('aria-pressed') is None
         assert '4 ya están dentro. Elige los 4 que faltan.' in root.inner_text()
         assert root.locator('.cam-lg-track i.is-fixed').count() == 4
-        # Paso 2: la vista previa del cuadro va plegada en «Tu cuadro se abre…».
+        # Paso 2: el cuadro se ve primero; solo la explicación empieza plegada.
         teaser = root.locator('.cam-lg-teaser')
-        assert teaser.count() == 1 and not teaser.locator('.cam-lg-pv').is_visible(), 'la vista previa debía empezar plegada'
+        pv = root.locator('.cam-lg-upcoming > .cam-lg-pv')
+        assert teaser.count() == 1 and pv.is_visible(), 'el cuadro debe verse sin desplegar nada'
+        assert not teaser.locator('.cam-lg-how').is_visible(), 'la explicación empieza plegada'
+        assert pv.bounding_box()['y'] + pv.bounding_box()['height'] <= teaser.bounding_box()['y'], 'la fecha va debajo del cuadro'
         teaser.locator('summary').click(); page.wait_for_timeout(150)
-        pv = root.locator('.cam-lg-teaser .cam-lg-pv')
-        assert pv.is_visible(), 'la vista previa no se abre'
+        assert teaser.locator('.cam-lg-how').is_visible() and pv.is_visible(), 'se despliega la explicación conservando el cuadro'
         assert pv.count() == 1, 'falta la vista previa del cuadro'
         seeds = pv.locator('.cam-lg-pv-seed').evaluate_all('n => n.map(x => x.textContent)')
         assert seeds == ['1', '8', '4', '5', '2', '7', '3', '6'], seeds

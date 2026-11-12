@@ -120,8 +120,9 @@
     hero.append(steps);
     return hero;
   }
-  // «Tu cuadro» mientras no se abre: una tarjeta plegada con la vista previa dentro.
+  // El cuadro siempre visible; la fecha y la explicación plegable van debajo.
   function teaser(teams,title){
+    const wrap=el('div',null,'cam-lg-upcoming');
     const box=el('details',null,'cam-lg-teaser');
     const sum=el('summary',null,'cam-lg-teaser-sum');
     const icon=el('span',null,'cam-lg-teaser-icon');icon.innerHTML=BRACKET_ICON;
@@ -133,8 +134,9 @@
     for(const line of ['Eliges quién gana cada cruce, de cuartos al campeón.',
       'Cada acierto suma puntos en la quiniela; una sorpresa vale más.',
       'Lo compartes en redes y queda en tu perfil.'])how.append(el('li',line));
-    body.append(previewBracket(teams),how);box.append(body);
-    return box;
+    body.append(how);box.append(body);
+    wrap.append(previewBracket(teams),box);
+    return wrap;
   }
   // Sin liguilla ni ventana de «mis 8» (o mientras carga): el recuadro espera.
   function pendingPanel(){
