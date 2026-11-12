@@ -208,6 +208,9 @@ META = """sel => [...document.querySelectorAll(sel + ' .cam-nfl-game-meta')].map
   return {text: m.textContent.replace(/\\s+/g, ' ').trim(), kids: m.children.length, right: b ? Math.round(r.right - b.right) : null};
 })"""
 
+# Texto y título de cada opción (equipos y empate): sin puntos.
+OPTIONS = """sel => [...document.querySelectorAll(sel + ' :is(.cam-nfl-team,.cam-nfl-draw)')].map(b => b.textContent.replace(/\\s+/g, ' ').trim() + ' | ' + (b.title || ''))"""
+
 
 def meta_line():
     """La línea de cada partido (a la izquierda de «Abierto») no lleva hora ni «Bonus +5»."""
@@ -217,6 +220,8 @@ def meta_line():
         page.click('#camNflDayNav .cam-nfl-day[data-day]'); page.wait_for_timeout(300)
         lines = page.evaluate(META, '#camNflGames')
         assert lines and all(l['kids'] == 1 and l['text'] == 'Abierto' and l['right'] <= 24 for l in lines), f'{where}: {lines}'
+        options = page.evaluate(OPTIONS, '#camNflGames')
+        assert options and not any('pts' in o or 'punto' in o.lower() for o in options), f'{where}: puntos en las opciones {options}'
         if SHOTS:
             page.locator('#camNflGames .cam-nfl-game').first.screenshot(path=str(SHOTS / f'{where}.png'))
         assert page.errors == [], f'{where}: errores {page.errors}'
@@ -267,6 +272,8 @@ def football(dark, anonymous):
         assert 'Ver mis jornadas ›' not in st['topButtons'] and st['emptyTop'], f'{where}: arriba {st}'
         lines = page.evaluate(META, '#camFootballGames')
         assert lines and all(l['kids'] == 1 and l['text'] == 'Abierto' and l['right'] <= 24 for l in lines), f'{where}: línea {lines}'
+        options = page.evaluate(OPTIONS, '#camFootballGames')
+        assert len(options) == 6 and not any('pts' in o or 'punto' in o.lower() for o in options), f'{where}: puntos en las opciones {options}'
         if SHOTS:
             box = page.evaluate("""() => { const a = document.getElementById('camFootballGames').getBoundingClientRect(),
               b = document.getElementById('camFootballHistory').getBoundingClientRect(); return {y: a.top + scrollY, h: b.bottom - a.top}; }""")

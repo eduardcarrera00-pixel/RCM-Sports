@@ -335,11 +335,7 @@
     const team=window.CamNFLQuinielaTeams?.getTeam(id)||teams.get(id);
     summary.append(el('strong',team?.name||id),el('span',(team?.id||id)+' · '+(home?'Local':'Visitante')));
     b.append(logo(id),summary);
-    const points=id===g.home_id?g.points_home:g.points_away;
-    // Sin probabilidad visible: el usuario ve solo los puntos del acierto (el doble con el laurel).
-    const doubled=points!=null&&laurelOf(g)===g.id;
-    b.append(el('small',points==null?'Pts pendientes':doubled?(points*2)+' pts · x2':points+' pts'));
-    if(points!=null)b.title='Acierto: +'+(doubled?points*2:points)+' puntos'+(g.is_bonus?' (+5 si fue la opción menos elegida)':'')+'. Fallo: 0.';
+    // 12 nov 2026: sin puntos a la vista en las opciones (todos los aciertos valen igual).
     b.addEventListener('click',()=>{if(!isOpen(g))return;if(!user){window.openUserAuthModal?.();return;}draft.set(g.id,id);saveDraft();paintGames();});
     if(disabled)b.title='Este partido está cerrado';
     return b;

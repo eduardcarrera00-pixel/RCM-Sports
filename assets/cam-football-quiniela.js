@@ -325,10 +325,7 @@
     const summary=el('span',null,'cam-nfl-team-name');
     summary.append(el('strong',teamName(id)),el('span',teamAbbr(id)+' · '+(pick==='home'?'Local':'Visitante')));
     b.append(logo(id),summary);
-    const points=pick==='home'?g.points_home:g.points_away;
-    // Sin probabilidad visible: el usuario ve solo los puntos del acierto.
-    b.append(el('small',points==null?'Pts pendientes':points+' pts'));
-    if(points!=null)b.title='Acierto: +'+points+' puntos'+(g.is_bonus?' (+5 si fue la opción menos elegida)':'')+'. Fallo: 0.';
+    // 12 nov 2026: sin puntos a la vista en las opciones (todos los aciertos valen igual).
     b.addEventListener('click',()=>choose(g,pick));
     if(disabled)b.title=unavailableReason();
     return b;
@@ -340,8 +337,6 @@
     b.type='button';b.disabled=disabled;b.setAttribute('aria-pressed',String(chosen));
     if(g.status==='final'&&g.outcome)b.classList.add(g.outcome==='draw'?'is-winner':'is-loser');
     b.append(el('span','Empate','cam-nfl-draw-label'));
-    b.append(el('small',g.points_draw==null?'Pts pendientes':g.points_draw+' pts'));
-    if(g.points_draw!=null)b.title='Acierto: +'+g.points_draw+' puntos'+(g.is_bonus?' (+5 si fue la opción menos elegida)':'')+'. Fallo: 0.';
     b.addEventListener('click',()=>choose(g,'draw'));
     if(disabled)b.title=unavailableReason();
     return b;
