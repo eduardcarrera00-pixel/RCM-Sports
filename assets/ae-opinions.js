@@ -12,6 +12,8 @@
   const SPORTS = [
     ['nfl', 'NFL'], ['futbol', 'Fútbol'], ['colegial', 'Colegial'], ['ciclismo', 'Ciclismo'], ['tenis', 'Tenis']
   ];
+  // Ocultar Tenis de las secciones visibles sin perder la categoría histórica ni sus artículos.
+  const VISIBLE_SPORTS = SPORTS.filter(([key]) => key !== 'tenis');
   const SPORT_NAME = Object.fromEntries(SPORTS);
   const IMAGE_TYPES = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
   const MAX_IMAGE = 8 * 1024 * 1024;
@@ -134,7 +136,7 @@
   function renderTabs() {
     const root = $('aeOpinionsTabs'); if (!root) return;
     root.replaceChildren();
-    for (const [key, label] of [['todas', 'Todas'], ...SPORTS]) {
+    for (const [key, label] of [['todas', 'Todas'], ...VISIBLE_SPORTS]) {
       const b = el('button', null, 'ae-opinions-tab');
       b.type = 'button'; b.setAttribute('role', 'tab'); b.dataset.sport = key;
       b.setAttribute('aria-selected', String(active === key));
@@ -420,7 +422,7 @@
     sportTarget.replaceChildren();
     if(active!=='todas')return;
     const bySport=new Map();
-    for(const [key,label] of SPORTS){
+    for(const [key,label] of VISIBLE_SPORTS){
       const story=editorialRemainder.filter(o=>o.sport===key);
       // Primero los Takes con conversación; después, los más recientes.
       const sportTakes=leftovers.filter(t=>takeSport(t)===key)
