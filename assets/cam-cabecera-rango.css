@@ -212,3 +212,118 @@
     html body #aeNotificationsDialog.ae-notifications-dialog[open] { animation: none !important; }
   }
 }
+
+
+/* CAM SPORTS · correction: admin controls alongside logo, no overlap (12 nov 2026). */
+@layer cam-header {
+  @media (max-width: 760px) {
+    /* The logo and admin toolbar are peers; no absolute offsets and no implicit rows. */
+    html body > header .ae-mobile-header-grid:has(#loggedAdminContainer:not(.hidden)) {
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: nowrap !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      position: relative !important;
+      box-sizing: border-box !important;
+      width: 100% !important;
+      height: 78px !important;
+      min-height: 78px !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      gap: 4px !important;
+    }
+    html body > header .ae-mobile-header-grid:has(#loggedAdminContainer:not(.hidden)) > a.cam-brand {
+      position: relative !important;
+      flex: 0 0 clamp(75px, calc(100vw - 260px), 145px) !important;
+      box-sizing: border-box !important;
+      width: clamp(75px, calc(100vw - 260px), 145px) !important;
+      min-width: 0 !important;
+      max-width: clamp(75px, calc(100vw - 260px), 145px) !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      transform: none !important;
+      align-self: center !important;
+      justify-self: start !important;
+    }
+    html body > header .ae-mobile-header-grid:has(#loggedAdminContainer:not(.hidden)) > .ae-header-actions {
+      position: relative !important;
+      inset: auto !important;
+      left: auto !important;
+      right: auto !important;
+      top: auto !important;
+      bottom: auto !important;
+      display: flex !important;
+      flex: 0 0 auto !important;
+      flex-direction: row !important;
+      flex-wrap: nowrap !important;
+      align-items: center !important;
+      justify-content: flex-end !important;
+      box-sizing: border-box !important;
+      width: auto !important;
+      min-width: 0 !important;
+      max-width: none !important;
+      height: 44px !important;
+      min-height: 44px !important;
+      max-height: 44px !important;
+      margin: 0 0 0 auto !important;
+      padding: 0 !important;
+      gap: 2px !important;
+      border: 0 !important;
+      transform: none !important;
+    }
+    html body > header .ae-mobile-header-grid > .ae-header-actions:has(#loggedAdminContainer:not(.hidden))::after {
+      display: none !important;
+      content: none !important;
+    }
+    /* Flatten the wrapper only after flex geometry is established. */
+    html body > header .ae-mobile-header-grid > .ae-header-actions #loggedAdminContainer:not(.hidden) {
+      display: contents !important;
+    }
+    html body > header .ae-mobile-header-grid > .ae-header-actions:has(#loggedAdminContainer:not(.hidden))
+      :is(#themeToggle,#camHeaderRank:not([hidden]),#camGlobalEditToggle:not([hidden]),
+          #loggedAdminContainer .ae-admin-profile,
+          #loggedAdminContainer .ae-publish-action,
+          #loggedAdminContainer .ae-signout-action) {
+      position: relative !important;
+      inset: auto !important;
+      display: grid !important;
+      place-items: center !important;
+      flex: 0 0 clamp(30px, 8.2vw, 35px) !important;
+      box-sizing: border-box !important;
+      width: clamp(30px, 8.2vw, 35px) !important;
+      min-width: clamp(30px, 8.2vw, 35px) !important;
+      max-width: clamp(30px, 8.2vw, 35px) !important;
+      height: 44px !important;
+      min-height: 44px !important;
+      max-height: 44px !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      gap: 0 !important;
+      border: 0 !important;
+      border-radius: 8px !important;
+      box-shadow: none !important;
+      background: transparent !important;
+      transform: none !important;
+      align-self: center !important;
+    }
+    html body > header .ae-mobile-header-grid .ae-header-actions:has(#loggedAdminContainer:not(.hidden)) #themeToggle { order: 0 !important; }
+    html body > header .ae-mobile-header-grid .ae-header-actions:has(#loggedAdminContainer:not(.hidden)) #loggedAdminContainer .ae-admin-profile { order: 1 !important; }
+    html body > header .ae-mobile-header-grid .ae-header-actions:has(#loggedAdminContainer:not(.hidden)) #camHeaderRank { order: 2 !important; }
+    html body > header .ae-mobile-header-grid .ae-header-actions:has(#loggedAdminContainer:not(.hidden)) #camGlobalEditToggle { order: 3 !important; }
+    html body > header .ae-mobile-header-grid .ae-header-actions:has(#loggedAdminContainer:not(.hidden)) #loggedAdminContainer .ae-publish-action { order: 4 !important; }
+    html body > header .ae-mobile-header-grid .ae-header-actions:has(#loggedAdminContainer:not(.hidden)) #loggedAdminContainer .ae-signout-action { order: 5 !important; }
+    html body > header .ae-mobile-header-grid .ae-header-actions:has(#loggedAdminContainer:not(.hidden)) #camGlobalEditToggle .cam-global-edit-label,
+    html body > header .ae-mobile-header-grid .ae-header-actions:has(#loggedAdminContainer:not(.hidden)) #loggedAdminContainer #adminNameDisplay {
+      display: none !important;
+    }
+    html body > header .ae-mobile-header-grid .ae-header-actions:has(#loggedAdminContainer:not(.hidden))
+      :is(#themeToggle,#camHeaderRank,#camGlobalEditToggle,
+          #loggedAdminContainer .ae-admin-profile,
+          #loggedAdminContainer .ae-publish-action,
+          #loggedAdminContainer .ae-signout-action)::after {
+      display: none !important;
+      content: none !important;
+    }
+  }
+}
