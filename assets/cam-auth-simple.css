@@ -1,0 +1,165 @@
+/* Approved simple Greek access screen. Scoped to the existing account modal. */
+html body #userAuthModal {
+  --cam-access-paper:#0b2233;--cam-access-field:#112e41;--cam-access-ink:#f3ebdd;
+  --cam-access-muted:#a5b8c5;--cam-access-line:#385365;--cam-access-gold:#c6a173;
+  --cam-access-action:#d0ad7f;
+  font-family:Inter,system-ui,sans-serif!important;
+}
+html:not(.dark) body #userAuthModal {
+  --cam-access-paper:#f3ebdd;--cam-access-field:#fffaf2;--cam-access-ink:#18374c;
+  --cam-access-muted:#586b79;--cam-access-line:#b3b8b5;--cam-access-gold:#89613f;
+  --cam-access-action:#d0ad7f;
+}
+html body #userAuthModal:not(.hidden) {
+  padding:16px!important;padding-top:max(16px,env(safe-area-inset-top))!important;
+  padding-bottom:max(16px,env(safe-area-inset-bottom))!important;
+  align-items:center!important;background:rgba(4,14,24,.82)!important;
+}
+html body #userAuthModal .cam-access-shell {
+  position:relative;display:block;width:min(100%,460px);max-width:460px;
+  max-height:calc(100vh - 32px);max-height:calc(100dvh - 32px);
+  margin:auto;padding:0;border:1px solid #b79a76;border-radius:22px;
+  background:var(--cam-access-paper);color:var(--cam-access-ink);
+  overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;
+  box-shadow:0 20px 70px #0005;scrollbar-width:thin;scrollbar-color:#b79a76 transparent;
+}
+html body #userAuthModal .cam-access-header {
+  position:relative;isolation:isolate;min-height:230px;padding:22px 24px 26px;
+  overflow:hidden;background:#0b2233;color:#f3ebdd;
+}
+html body #userAuthModal .cam-access-header::before {
+  content:"";position:absolute;inset:0;z-index:-1;
+  background:url('cam-auth-greek-simple.svg') right bottom/auto 100% no-repeat;
+  pointer-events:none;
+}
+html body #userAuthModal .cam-access-brand {position:relative;width:92px;height:47px;overflow:hidden;}
+html body #userAuthModal .cam-access-brand img {
+  display:block;position:absolute;width:148px!important;max-width:none!important;
+  height:auto!important;left:-28px;top:-30px;object-fit:contain;
+}
+html body #userAuthModal .cam-access-header #camAuthTitle {
+  max-width:70%;margin:30px 0 9px!important;padding:0!important;
+  color:#f3ebdd!important;font-family:'Playfair Display',Georgia,serif!important;
+  font-size:34px!important;font-weight:600!important;line-height:1.12!important;
+  letter-spacing:-.025em!important;text-wrap:balance;text-shadow:none!important;
+}
+html body #userAuthModal .cam-access-subtitle {
+  position:relative;margin:0;max-width:70%;color:#e2d9cc;
+  font:400 13px/1.5 Inter,system-ui,sans-serif!important;
+}
+html body #userAuthModal .cam-access-close {
+  position:absolute;top:14px;right:14px;width:44px;height:44px;display:grid;place-items:center;
+  padding:10px;border:0;border-radius:8px;background:transparent;color:#d1ad7e;
+}
+html body #userAuthModal .cam-access-close svg {width:21px;height:21px;}
+html body #userAuthModal #userAuthForm,
+html body #userAuthModal #authRecoveryResult {
+  display:block;min-width:0;margin:0!important;padding:0 24px 24px!important;
+  background:transparent!important;color:var(--cam-access-ink)!important;
+}
+html body #userAuthModal #userAuthForm[hidden],
+html body #userAuthModal #authRecoveryResult[hidden],
+html body #userAuthModal [hidden] {display:none!important;}
+html body #userAuthModal .cam-access-tabs {
+  display:grid;grid-template-columns:1fr 1fr;gap:12px;border-bottom:1px solid var(--cam-access-line);
+  margin:0 0 24px;padding:8px 0 0;
+}
+html body #userAuthModal .cam-access-tabs button {
+  min-height:52px;padding:13px 3px;margin:0;border:0;border-bottom:2px solid transparent;
+  border-radius:0;background:transparent;color:var(--cam-access-muted);
+  font:500 14px/1.4 Inter,system-ui,sans-serif!important;
+}
+html body #userAuthModal .cam-access-tabs button[aria-pressed="true"] {
+  color:var(--cam-access-ink);border-bottom-color:var(--cam-access-gold);font-weight:600!important;
+}
+html body #userAuthModal .cam-access-field {margin:0 0 20px;}
+html body #userAuthModal #userAuthForm label,
+html body #userAuthModal #authConfirmWrap,
+html body #userAuthModal #authCodeWrap {
+  display:block;margin:0 0 9px!important;color:var(--cam-access-ink)!important;
+  font:500 13px/1.5 Inter,system-ui,sans-serif!important;letter-spacing:0!important;text-transform:none!important;
+}
+html body #userAuthModal input:not([type=hidden]) {
+  display:block;width:100%!important;min-width:0!important;min-height:49px!important;
+  padding:12px 14px!important;margin:0!important;border:1px solid var(--cam-access-line)!important;
+  border-radius:9px!important;background:var(--cam-access-field)!important;color:var(--cam-access-ink)!important;
+  font:400 16px/1.5 Inter,system-ui,sans-serif!important;box-shadow:none!important;
+}
+html body #userAuthModal input::placeholder {color:var(--cam-access-muted)!important;opacity:1;}
+html body #userAuthModal .cam-access-password {position:relative;}
+html body #userAuthModal #userAuthPassword {padding-right:54px!important;}
+html body #userAuthModal #authShowPassword {
+  position:absolute;right:3px;top:3px;display:grid!important;place-items:center;
+  width:44px!important;min-height:44px!important;height:44px;margin:0!important;padding:10px!important;
+  border:0!important;border-radius:7px!important;background:transparent!important;
+  color:var(--cam-access-muted)!important;text-decoration:none!important;
+}
+html body #userAuthModal #authShowPassword svg {width:21px;height:21px;}
+html body #userAuthModal #authShowPassword .cam-access-eye-slash {display:none;}
+html body #userAuthModal #authShowPassword[aria-pressed="true"] .cam-access-eye-slash {display:block;}
+html body #userAuthModal #authConfirmWrap,
+html body #userAuthModal #authCodeWrap {margin:0 0 20px!important;}
+html body #userAuthModal #authModeHelp {
+  margin:-5px 0 23px!important;color:var(--cam-access-muted)!important;
+  font:400 11.5px/1.6 Inter,system-ui,sans-serif!important;
+}
+html body #userAuthModal #aeAuthPublishHint {
+  margin:0 0 18px;color:var(--cam-access-ink);font:500 12px/1.6 Inter,system-ui,sans-serif!important;
+}
+html body #userAuthModal #userAuthError:not(.hidden) {
+  margin:0 0 18px!important;border-radius:9px!important;
+}
+html body #userAuthModal #authSubmit {
+  display:block;width:100%;min-height:51px;padding:12px 15px;margin:0;
+  border:0!important;border-radius:10px!important;background:var(--cam-access-action)!important;
+  color:#0b2233!important;font:600 18px/1.4 'Playfair Display',Georgia,serif!important;
+  box-shadow:none!important;
+}
+html body #userAuthModal .cam-access-recovery {border-top:1px solid var(--cam-access-line);margin-top:24px;padding-top:10px;}
+html body #userAuthModal .cam-access-recovery summary {
+  display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px;
+  list-style:none;cursor:pointer;color:var(--cam-access-ink);font:400 12px/1.5 Inter,system-ui,sans-serif!important;
+}
+html body #userAuthModal .cam-access-recovery summary::-webkit-details-marker {display:none;}
+html body #userAuthModal .cam-access-recovery summary svg {width:17px;height:17px;color:var(--cam-access-gold);flex:none;}
+html body #userAuthModal .cam-access-recovery[open] summary svg {transform:rotate(180deg);}
+html body #userAuthModal .cam-access-recovery-actions {display:grid;gap:8px;padding-top:10px;}
+html body #userAuthModal .cam-access-recovery-actions button,
+html body #userAuthModal .cam-access-back {
+  display:block;min-height:44px;width:100%;padding:10px 12px;margin:0;
+  border:1px solid var(--cam-access-line);border-radius:8px;background:transparent;
+  color:var(--cam-access-ink);font:400 12px/1.5 Inter,system-ui,sans-serif!important;
+}
+html body #userAuthModal .cam-access-back {margin-top:16px;}
+html body #userAuthModal #authRecoveryResult {padding-top:22px!important;}
+html body #userAuthModal #authRecoveryResult h2 {
+  color:var(--cam-access-ink)!important;font:600 25px/1.25 'Playfair Display',Georgia,serif!important;
+}
+html body #userAuthModal #authRecoveryResult p,
+html body #userAuthModal #authRecoveryResult label {
+  color:var(--cam-access-muted)!important;font:400 13px/1.6 Inter,system-ui,sans-serif!important;
+}
+html body #userAuthModal #authRecoveryResult button {
+  border:1px solid var(--cam-access-line)!important;border-radius:8px!important;
+  color:var(--cam-access-ink)!important;font:500 13px/1.5 Inter,system-ui,sans-serif!important;
+}
+html body #userAuthModal #authRecoveryResult button:last-child {
+  background:var(--cam-access-action)!important;color:#0b2233!important;
+}
+html body #userAuthModal #authRecoveryOutput {font-family:monospace!important;}
+html body #userAuthModal button:focus-visible,
+html body #userAuthModal summary:focus-visible,
+html body #userAuthModal input:focus-visible {
+  outline:2px solid var(--cam-access-gold)!important;outline-offset:3px!important;
+}
+@media(max-width:370px) {
+  html body #userAuthModal:not(.hidden) {padding:8px!important;}
+  html body #userAuthModal .cam-access-shell {max-height:calc(100dvh - 16px);}
+  html body #userAuthModal .cam-access-header {padding-left:20px;padding-right:20px;}
+  html body #userAuthModal #userAuthForm,
+  html body #userAuthModal #authRecoveryResult {padding-left:20px!important;padding-right:20px!important;}
+}
+@media(max-height:650px) {
+  html body #userAuthModal .cam-access-header {min-height:190px;padding-top:16px;padding-bottom:18px;}
+  html body #userAuthModal .cam-access-header #camAuthTitle {margin-top:15px!important;font-size:29px!important;}
+}

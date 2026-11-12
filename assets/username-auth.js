@@ -83,16 +83,30 @@ function setAuthMode(mode){
  document.getElementById('userAuthForm').dataset.camAuthMode=mode;
  const title=document.getElementById('camAuthTitle');
  if(title)title.textContent={login:'Entra a la comunidad',register:'Únete a CAM SPORTS',recover:'Recupera tu acceso',code:'Renueva tu código'}[mode]||'Tu cuenta';
+ const recovery=mode==='recover'||mode==='code';
+ for(const [id,selected] of [['camAuthLoginTab',mode==='login'],['camAuthRegisterTab',mode==='register']]){
+  document.getElementById(id)?.setAttribute('aria-pressed',String(selected));
+ }
+ const options=document.getElementById('camAuthRecoveryOptions');
+ if(options){options.hidden=mode!=='login';options.open=false;}
+ const back=document.getElementById('camAuthBackToLogin');
+ if(back)back.hidden=!recovery;
  const extra=mode==='register'||mode==='recover';
  document.getElementById('authConfirmWrap').hidden=!extra;document.getElementById('authPasswordConfirm').required=extra;
  document.getElementById('authCodeWrap').hidden=mode!=='recover';document.getElementById('authRecoveryCode').required=mode==='recover';
  const password=document.getElementById('userAuthPassword');password.minLength=extra?8:1;password.maxLength=128;password.autocomplete=extra?'new-password':'current-password';
  document.getElementById('authSubmit').textContent={login:'Iniciar sesión',register:'Crear cuenta',recover:'Restablecer contraseña',code:'Generar código de recuperación'}[mode];
- document.getElementById('authModeHelp').textContent={login:'Inicia sesión con tu usuario. Las cuentas anteriores también pueden usar su correo.',register:'Usuario único y contraseña de al menos 8 caracteres. No necesitas correo. Al terminar, guarda tu código de recuperación.',recover:'Introduce tu usuario, una contraseña nueva y tu código de recuperación. El código se sustituirá por uno nuevo.',code:'Confirma tu usuario y contraseña actual. El código nuevo sustituirá al anterior.'}[mode];
+ document.getElementById('authModeHelp').textContent={login:'También puedes usar tu correo anterior.',register:'Usuario único y contraseña de al menos 8 caracteres. No necesitas correo. Al terminar, guarda tu código de recuperación.',recover:'Introduce tu usuario, una contraseña nueva y tu código de recuperación. El código se sustituirá por uno nuevo.',code:'Confirma tu usuario y contraseña actual. El código nuevo sustituirá al anterior.'}[mode];
  document.getElementById('userAuthError').classList.add('hidden');
 }
-function clearAuthSecrets(){for(const id of ['userAuthPassword','authPasswordConfirm','authRecoveryCode','authRecoveryOutput'])document.getElementById(id).value='';document.getElementById('userAuthForm').hidden=false;document.getElementById('authRecoveryResult').hidden=true;document.getElementById('userAuthPassword').type='password';document.getElementById('authShowPassword').textContent='Mostrar contraseña';setAuthMode('login');}
-function toggleAuthPassword(){const p=document.getElementById('userAuthPassword');p.type=p.type==='password'?'text':'password';document.getElementById('authShowPassword').textContent=p.type==='password'?'Mostrar contraseña':'Ocultar contraseña';}
+function clearAuthSecrets(){for(const id of ['userAuthPassword','authPasswordConfirm','authRecoveryCode','authRecoveryOutput'])document.getElementById(id).value='';document.getElementById('userAuthForm').hidden=false;document.getElementById('authRecoveryResult').hidden=true;document.getElementById('userAuthPassword').type='password';syncAuthPasswordControl();setAuthMode('login');}
+function syncAuthPasswordControl(){
+ const shown=document.getElementById('userAuthPassword').type==='text';
+ const button=document.getElementById('authShowPassword');
+ const label=shown?'Ocultar contraseña':'Mostrar contraseña';
+ button.setAttribute('aria-label',label);button.setAttribute('aria-pressed',String(shown));button.title=label;
+}
+function toggleAuthPassword(){const p=document.getElementById('userAuthPassword');p.type=p.type==='password'?'text':'password';syncAuthPasswordControl();}
 function handleUserRegister(){setAuthMode('register');}
 async function handleUserLogin(event){
  event.preventDefault();if(authSubmitting)return;
@@ -113,3 +127,4 @@ async function handleUserLogin(event){
 }
 async function copyRecoveryCode(){const input=document.getElementById('authRecoveryOutput');try{await navigator.clipboard.writeText(input.value);document.getElementById('authRecoveryMessage').textContent='Código copiado. Guárdalo en un lugar privado.';}catch{input.focus();input.select();document.getElementById('authRecoveryMessage').textContent='Copia el código seleccionado y guárdalo.';}}
 function finishRecoveryCode(){const login=authRecoveryNeedsLogin;clearAuthSecrets();if(!login)closeUserAuthModal(true);else document.getElementById('userAuthUsername').focus();}
+

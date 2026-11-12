@@ -470,7 +470,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
     </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
-<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261112-jornadas-abajo-1">
+<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261112-auth-greek-simple-1">
 <style id="cam-liguilla-week-styles">
 /* Integración de la Liguilla en Fútbol → La semana. Un solo recuadro, «Arma tu cuadro»:
    primero «mis 8» y después el cuadro con puntos (estilos en assets/cam-liguilla.css). */
@@ -3580,83 +3580,48 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
      class="fixed inset-0 z-[60] hidden overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4"
      style="z-index: 10000;">
 
-    <div class="cam-auth-shell relative bg-white border border-slate-200 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden my-auto">
-        <aside class="cam-auth-story">
-            <div class="cam-auth-story-brand" aria-hidden="true"><span>CAM</span> SPORTS</div>
-            <div class="cam-auth-story-message" aria-hidden="true">
-                <p class="cam-auth-story-overline">HAY SITIO PARA TI</p>
-                <h2>El deporte nos reúne.</h2>
-                <p>Comparte tus Picks. Defiende tus Takes. Aquí cada voz cuenta.</p>
-            </div>
-            <div class="cam-auth-story-foot" aria-hidden="true">UNA COMUNIDAD. MIL HISTORIAS.</div>
-        </aside>
-        <div class="cam-auth-work">
-        <div class="cam-auth-heading flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50">
-            <div class="cam-auth-heading-text">
-                <p class="cam-auth-kicker">CAM SPORTS · TU CUENTA</p>
-                <h2 id="camAuthTitle">Entra a la comunidad</h2>
-            </div>
-
-            <button type="button"
-                    onclick="closeUserAuthModal()" aria-label="Cerrar ventana de acceso"
-                    class="cam-auth-close w-8 h-8 rounded-full bg-slate-200/60 text-slate-500 hover:text-slate-800 flex items-center justify-center">
-                <i class="fa-solid fa-xmark"></i>
+    <div class="cam-access-shell">
+        <header class="cam-access-header">
+            <div class="cam-access-brand"><img src="assets/cam-sports-logo.webp" alt="CAM SPORTS" width="1536" height="1024" decoding="async"></div>
+            <button type="button" onclick="closeUserAuthModal()" aria-label="Cerrar ventana de acceso" class="cam-access-close">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="m5 5 14 14M19 5 5 19"/></svg>
             </button>
-        </div>
-
-        <form id="userAuthForm" data-cam-auth-mode="login" onsubmit="handleUserLogin(event)" class="p-6 space-y-4">
-
-            <p id="aeAuthPublishHint" hidden class="text-sm font-semibold text-pitch-700" role="status"></p>
-            <p class="cam-auth-intro text-sm text-slate-600">Tu cancha está aquí. Entra, opina y vive cada partido.</p>
-            <p id="aeAuthPrivacyNote" class="text-xs text-slate-500 leading-relaxed">
-                Sin correo para registrarte. Guardamos tu sesión y tus publicaciones.
-            </p>
-
-            <div id="userAuthError"
-                 class="hidden p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl">
+            <h2 id="camAuthTitle">Entra a la comunidad</h2>
+            <p class="cam-access-subtitle">Tu cancha está aquí.</p>
+        </header>
+        <div class="cam-access-body">
+        <form id="userAuthForm" data-cam-auth-mode="login" onsubmit="handleUserLogin(event)" class="cam-access-form">
+            <nav class="cam-access-tabs" aria-label="Acceso a tu cuenta">
+                <button id="camAuthLoginTab" type="button" onclick="setAuthMode('login')" aria-pressed="true">Iniciar sesión</button>
+                <button id="camAuthRegisterTab" type="button" onclick="setAuthMode('register')" aria-pressed="false">Crear cuenta</button>
+            </nav>
+            <p id="aeAuthPublishHint" hidden role="status"></p>
+            <div id="userAuthError" class="hidden" role="alert"></div>
+            <div class="cam-access-field">
+                <label for="userAuthUsername">Usuario</label>
+                <input type="text" id="userAuthUsername" required minlength="3" maxlength="254" autocomplete="username" placeholder="Tu nombre de usuario">
             </div>
-
-            <div>
-                <label for="userAuthUsername" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                    Nombre de usuario
-                </label>
-
-                <input type="text"
-                       id="userAuthUsername"
-                       required
-                       minlength="3"
-                       maxlength="254"
-                       autocomplete="username"
-                       placeholder="Ej: FutbolFan23"
-                       class="w-full bg-slate-50 border border-slate-200 text-sm text-slate-800 rounded-xl px-4 py-2.5 focus:outline-none focus:border-pitch-600 focus:bg-white">
+            <div class="cam-access-field">
+                <label for="userAuthPassword">Contraseña</label>
+                <div class="cam-access-password">
+                    <input type="password" id="userAuthPassword" required minlength="1" autocomplete="current-password" placeholder="Tu contraseña">
+                    <button type="button" onclick="toggleAuthPassword()" id="authShowPassword" aria-label="Mostrar contraseña" aria-pressed="false" title="Mostrar contraseña">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="2.5"/><path class="cam-access-eye-slash" d="m4 4 16 16"/></svg>
+                    </button>
+                </div>
             </div>
-
-            <div>
-                <label for="userAuthPassword" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                    Contraseña
-                </label>
-
-                <input type="password"
-                       id="userAuthPassword"
-                       required
-                       minlength="1"
-                       autocomplete="current-password"
-                       placeholder="••••••••"
-                       class="w-full bg-slate-50 border border-slate-200 text-sm text-slate-800 rounded-xl px-4 py-2.5 focus:outline-none focus:border-pitch-600 focus:bg-white">
-            </div>
-
-            <button type="button" onclick="toggleAuthPassword()" id="authShowPassword">Mostrar contraseña</button>
             <label id="authConfirmWrap" hidden>Confirmar contraseña<input id="authPasswordConfirm" type="password" autocomplete="new-password"></label>
             <label id="authCodeWrap" hidden>Código de recuperación<input id="authRecoveryCode" autocomplete="off" spellcheck="false"></label>
-            <p id="authModeHelp">Inicia sesión con tu usuario. Las cuentas anteriores también pueden usar su correo.</p>
-            <div class="space-y-2 pt-2">
-                <button id="authSubmit" type="submit" class="w-full bg-pitch-600 text-white font-bold px-5 py-3 rounded-xl">Iniciar sesión</button>
-                <button type="button" class="cam-auth-nav-register" onclick="setAuthMode('register')">Crear una cuenta <span aria-hidden="true">↗</span></button>
-                <button type="button" class="cam-auth-nav-login" onclick="setAuthMode('login')">Volver a iniciar sesión</button>
-                <button type="button" class="cam-auth-nav-recover" onclick="setAuthMode('recover')">Recuperar con mi código</button>
-                <button type="button" class="cam-auth-nav-code" onclick="setAuthMode('code')">Generar un código nuevo</button>
-            </div>
-
+            <p id="authModeHelp">También puedes usar tu correo anterior.</p>
+            <button id="authSubmit" type="submit">Iniciar sesión</button>
+            <details id="camAuthRecoveryOptions" class="cam-access-recovery">
+                <summary>¿Problemas para entrar?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+                <div class="cam-access-recovery-actions">
+                    <button type="button" onclick="setAuthMode('recover')">Recuperar con mi código</button>
+                    <button type="button" onclick="setAuthMode('code')">Generar un código nuevo</button>
+                </div>
+            </details>
+            <button id="camAuthBackToLogin" type="button" class="cam-access-back" onclick="setAuthMode('login')" hidden>Volver a iniciar sesión</button>
         </form>
         <section id="authRecoveryResult" hidden class="p-6" aria-labelledby="authRecoveryTitle">
             <h2 id="authRecoveryTitle">Guarda tu código de recuperación</h2>
@@ -5745,7 +5710,7 @@ updateThemeButton();
 <script src="assets/ae-pick-capture.js?v=20261104-apuesta-real-1"></script>
 <script src="assets/community-picks.js?v=20261112-chef-slip-1"></script>
 <script src="assets/weekly-picks.js?v=20261015-1"></script>
-<script src="assets/username-auth.js?v=20261103-remove-welcome-1"></script>
+<script src="assets/username-auth.js?v=20261112-auth-greek-simple-1"></script>
 <script src="assets/ae-category-visibility.js?v=20261016-dynamic-nav-1"></script>
 <script src="assets/ae-nfl-takes.js?v=20261015-3"></script>
 <script src="assets/free-takes.js?v=20261112-duelo-pick-take-1"></script>
@@ -6762,6 +6727,7 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 </script>
 </body>
 </html>
+
 
 
 

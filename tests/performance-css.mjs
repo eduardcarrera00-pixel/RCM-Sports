@@ -25,7 +25,7 @@ for(const group of groups){
     assert(!links.includes(source),source+' must not also load separately');
   }
 }
-assert.equal(allSources.size,79,'Original pack sources plus monthly leagues, desktop sections, display clarity, Picks moderno, unified CAM UI, expandable Picks, header rank, sport conversations, the profile Rangos tab and the rank shield as profile picture; editorial sources must not load in later packs');
+assert.equal(allSources.size,80,'Original pack sources plus monthly leagues, desktop sections, display clarity, Picks moderno, unified CAM UI, expandable Picks, header rank, sport conversations, the profile Rangos tab and the rank shield as profile picture; editorial sources must not load in later packs');
 assert(editorialSources.every(source=>!links.includes(source)), 'Editorial sources cannot also load separately');
 const redundancies=editorialSources.filter(source=>allSources.has(source));
 assert.deepEqual(redundancies,[],'Do not ship duplicate CSS files inside both the editorial bundle and later CSS packs');
@@ -40,3 +40,4 @@ assert.deepEqual(sport.sources, ['assets/ae-football-mobile-redesign.css','asset
 assert(links.indexOf(sport.output)>links.indexOf('assets/ae-editorial-bundle.css'));
 assert(links.indexOf(sport.output)<links.indexOf('assets/cam-perf-home-components.css'));
 console.log('PASS: consolidated header CSS, no duplicated sources and original component cascade boundaries retained.');
+

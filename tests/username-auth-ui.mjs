@@ -18,15 +18,41 @@ await w.handleUserLogin({preventDefault(){}});assert.equal(calls,0);assert.match
 d.getElementById('authPasswordConfirm').value='password123';await w.handleUserLogin({preventDefault(){}});assert.equal(calls,1);assert.equal(w.currentUser.id,'reader');assert.equal(d.getElementById('authRecoveryResult').hidden,false);assert.equal(d.getElementById('authRecoveryOutput').value.length,64);assert.equal(d.getElementById('userAuthPassword').value,'');
 w.finishRecoveryCode();assert.equal(w.closed,true);assert.equal(publicationOpens,1,'Registration resumes the requested Pick');assert.equal(d.getElementById('aeAuthPublishHint').hidden,true);assert.equal(d.getElementById('authRecoveryOutput').value,'');
 await w.aeRequestPublication('take',()=>publicationOpens++);assert.equal(publicationOpens,2,'Logged-in users open a composer directly');w.setAuthMode('recover');assert.equal(d.getElementById('authRecoveryCode').required,true);w.setAuthMode('login');assert.equal(d.getElementById('authRecoveryCode').required,false);assert.equal(d.getElementById('userAuthPassword').minLength,1);
-// The friendly acknowledgment must be a compact notice inside the login,
-// not a separate full-screen dialog, and must require OK before form access.
-const loginNotice=d.getElementById('aeAuthIntroNotice');
-assert.ok(loginNotice,'The login has the compact OK notice');
-assert.equal(loginNotice.closest('#userAuthModal')?.id,'userAuthModal');
-assert.equal(loginNotice.hidden,true);
-assert.equal(d.getElementById('aeAuthMiniOk').textContent.trim(),'OK');
-assert.equal(d.getElementById('aeAuthIntroModal'),null,'The old separate modal is removed');
-const htmlSource=fs.readFileSync('index.html','utf8');
-assert.match(htmlSource, /document\.getElementById\('userAuthForm'\)\.inert = true/);
-assert.match(htmlSource, /document\.getElementById\('userAuthForm'\)\.inert = false/);
-console.log('PASS: auth, mini OK notice, cancellation, pending Pick resume, logged-in shortcut and recovery.');await w.happyDOM.close();
+// The approved access screen opens directly, with registration and recovery
+// reachable from the same form rather than a separate acknowledgment dialog.
+assert.equal(d.getElementById('aeAuthIntroNotice'),null);
+assert.equal(d.getElementById('aeAuthIntroModal'),null);
+assert.equal(d.getElementById('camAuthLoginTab').getAttribute('aria-pressed'),'true');
+assert.equal(d.getElementById('camAuthRegisterTab').getAttribute('aria-pressed'),'false');
+const recovery=d.getElementById('camAuthRecoveryOptions');
+assert.equal(recovery.hidden,false);
+recovery.open=true;
+w.setAuthMode('recover');
+assert.equal(recovery.hidden,true);
+assert.equal(recovery.open,false);
+assert.equal(d.getElementById('camAuthBackToLogin').hidden,false);
+assert.equal(d.getElementById('authRecoveryCode').required,true);
+w.setAuthMode('register');
+assert.equal(d.getElementById('camAuthRegisterTab').getAttribute('aria-pressed'),'true');
+assert.equal(d.getElementById('camAuthLoginTab').getAttribute('aria-pressed'),'false');
+assert.equal(d.getElementById('camAuthBackToLogin').hidden,true);
+w.setAuthMode('code');
+assert.equal(d.getElementById('authRecoveryCode').required,false);
+assert.equal(d.getElementById('authPasswordConfirm').required,false);
+assert.equal(d.getElementById('camAuthBackToLogin').hidden,false);
+w.setAuthMode('login');
+assert.equal(recovery.hidden,false);
+assert.equal(d.getElementById('authPasswordConfirm').required,false);
+const eye=d.getElementById('authShowPassword');
+w.toggleAuthPassword();
+assert.equal(d.getElementById('userAuthPassword').type,'text');
+assert.equal(eye.getAttribute('aria-label'),'Ocultar contraseña');
+assert.equal(eye.getAttribute('aria-pressed'),'true');
+assert.ok(eye.querySelector('svg'),'Visibility changes preserve the eye control');
+w.clearAuthSecrets();
+assert.equal(d.getElementById('userAuthPassword').type,'password');
+assert.equal(eye.getAttribute('aria-pressed'),'false');
+assert.equal(eye.getAttribute('aria-label'),'Mostrar contraseña');
+assert.equal(recovery.open,false);
+console.log('PASS: auth, registration, recovery navigation, visibility control, cancellation and pending Pick resume.');await w.happyDOM.close();
+
