@@ -3567,30 +3567,6 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
  </div>
 </dialog>
 
-<style id="ae-login-intro-css">
-/* Compact OK card floats over, not before, the AE SPORTS login form. */
-#aeAuthIntroNotice{position:absolute;z-index:5;top:67px;left:50%;transform:translateX(-50%);
-width:calc(100% - 36px);max-width:330px;box-sizing:border-box;padding:12px 14px;
-border:1px solid #c29b70;border-radius:0;background:#182d3a;color:#f5e7d8;
-box-shadow:0 11px 32px rgba(0,0,0,.35)}
-#aeAuthIntroNotice[hidden]{display:none!important}
-#aeAuthIntroNotice h2{margin:0 0 6px;font:700 10px/1.3 Inter,system-ui,sans-serif;
-text-transform:uppercase;letter-spacing:.14em;color:#dcb486}
-#aeAuthIntroNotice p{margin:0 0 7px;font:500 12px/1.45 Inter,system-ui,sans-serif;color:#f0e4d6}
-#aeAuthIntroNotice strong{color:#fff2dc}
-#aeAuthIntroNotice .ae-mini-foot{display:flex;align-items:center;gap:12px;justify-content:space-between}
-#aeAuthIntroNotice small{flex:1;color:#cbd3d2;font:400 10px/1.4 Inter,system-ui,sans-serif}
-#aeAuthIntroNotice button{flex-shrink:0;min-width:62px;min-height:36px;
-padding:8px 12px;background:#d5aa76;color:#203242;border:1px solid #e4bc8a;
-border-radius:0;cursor:pointer;font:800 12px Inter,system-ui,sans-serif}
-#aeAuthIntroNotice button:focus-visible{outline:2px solid #fff2d7;outline-offset:3px}
-#userAuthForm[inert],#authRecoveryResult[inert]{opacity:.55;filter:blur(1px);pointer-events:none}
-html:not(.dark) #aeAuthIntroNotice{background:#fff8ed;color:#263b49;border-color:#ac7b48}
-html:not(.dark) #aeAuthIntroNotice h2{color:#825329}
-html:not(.dark) #aeAuthIntroNotice p,html:not(.dark) #aeAuthIntroNotice strong{color:#263b49}
-html:not(.dark) #aeAuthIntroNotice small{color:#5b6d76}
-@media(max-width:480px){#aeAuthIntroNotice{top:63px;max-width:300px;padding:12px}}
-</style>
 <!-- User Account Modal -->
 <div id="userAuthModal" role="dialog" aria-modal="true" aria-labelledby="camAuthTitle"
      class="fixed inset-0 z-[60] hidden overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4"
@@ -3618,15 +3594,6 @@ html:not(.dark) #aeAuthIntroNotice small{color:#5b6d76}
                     class="cam-auth-close w-8 h-8 rounded-full bg-slate-200/60 text-slate-500 hover:text-slate-800 flex items-center justify-center">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-        </div>
-
-        <div id="aeAuthIntroNotice" role="alertdialog" aria-modal="true" aria-labelledby="aeAuthMiniTitle" aria-describedby="aeAuthMiniText" hidden>
-            <h2 id="aeAuthMiniTitle">Antes de iniciar sesión…</h2>
-            <p id="aeAuthMiniText"><strong>¿Correo?</strong> Ni te lo pedimos. <strong>¿Información?</strong> Ni te la robamos.</p>
-            <div class="ae-mini-foot">
-                <small>Tu sesión y tus publicaciones sí se guardan.</small>
-                <button type="button" id="aeAuthMiniOk" onclick="aeConfirmAuthIntro()">OK</button>
-            </div>
         </div>
 
         <form id="userAuthForm" data-cam-auth-mode="login" onsubmit="handleUserLogin(event)" class="p-6 space-y-4">
@@ -4209,26 +4176,12 @@ function openUserAuthModal() {
         if (dialog?.open) dialog.close();
     }
     document.getElementById('userAuthError').classList.add('hidden');
-    document.getElementById('userAuthForm').inert = true;
-    document.getElementById('authRecoveryResult').inert = true;
-    document.getElementById('aeAuthIntroNotice').hidden = false;
     modal.classList.remove('hidden');
-    document.getElementById('aeAuthMiniOk').focus();
+    document.getElementById('userAuthUsername').focus();
     syncModalScrollLock();
 }
 
-function aeConfirmAuthIntro() {
-    if (document.getElementById('userAuthModal').classList.contains('hidden')) return;
-    document.getElementById('aeAuthIntroNotice').hidden = true;
-    document.getElementById('userAuthForm').inert = false;
-    document.getElementById('authRecoveryResult').inert = false;
-    document.getElementById('userAuthUsername').focus();
-}
-
 function closeUserAuthModal(resumePublication = false) {
-    document.getElementById('aeAuthIntroNotice').hidden = true;
-    document.getElementById('userAuthForm').inert = false;
-    document.getElementById('authRecoveryResult').inert = false;
     document.getElementById('userAuthModal').classList.add('hidden');
     if (typeof clearAuthSecrets === 'function') clearAuthSecrets();
     authPreviousFocus?.focus();
