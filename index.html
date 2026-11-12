@@ -3353,18 +3353,18 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
                 <button type="button" data-view="month" aria-pressed="true" aria-expanded="true" aria-controls="camNflQuinielaStandings"><span class="cam-q-tab-kicker">Clasificación</span> <span class="cam-q-tab-name">mensual</span></button>
                 <button type="button" data-view="all" aria-pressed="false" aria-expanded="false" aria-controls="camNflQuinielaStandings"><span class="cam-q-tab-kicker">Clasificación</span> <span class="cam-q-tab-name">histórica</span></button>
               </nav>
-            <details class="cam-nfl-rules">
+            <section id="camNflQuinielaStandings" class="cam-nfl-standings" aria-labelledby="camNflStandingTitle">
+                <h3 id="camNflStandingTitle">Clasificación de La Quiniela</h3>
+                <p id="camNflRankingCaption" class="cam-quiniela-ranking-caption"></p>
+                <div id="camNflRanking" aria-live="polite"></div>
+              </section>
+              <details class="cam-nfl-rules">
               <summary>¿Cómo funcionan los puntos?</summary>
               <p>Cada acierto suma <strong>2 puntos</strong>. Si fallas no pierdes nada: 0 puntos. Un empate NFL o una anulación también vale 0.</p>
               <p><strong>Partido bonus.</strong> Cada semana el partido más parejo según las probabilidades lleva la etiqueta «Bonus +5». Si lo aciertas y tu equipo fue el menos elegido (o fuiste el único que acertó), sumas <strong>5 puntos extra</strong>: 7 en total. Si gana el equipo que eligió la mayoría, son los 2 de siempre. Cuánta gente eligió cada lado se ve cuando empieza el partido.</p>
               <p>Esos puntos deciden tu clasificación y el ascenso o descenso mensual en la liga NFL. Puedes editar hasta el inicio del partido.</p>
               <p id="camNflLaurelRule" hidden><strong>El laurel.</strong> Una vez por jornada puedes ponerle el laurel a un partido que ya pronosticaste: si aciertas, suma el doble (4 puntos, más el bonus si toca); si fallas, 0. Puedes cambiarlo de partido hasta que empiece el que lo lleva.</p>
             </details>
-              <section id="camNflQuinielaStandings" class="cam-nfl-standings" aria-labelledby="camNflStandingTitle">
-                <h3 id="camNflStandingTitle">Clasificación de La Quiniela</h3>
-                <p id="camNflRankingCaption" class="cam-quiniela-ranking-caption"></p>
-                <div id="camNflRanking" aria-live="polite"></div>
-              </section>
             </div>
             <div id="camNflScoreBody" class="cam-sport-score-body" aria-live="polite"></div>
           </div>
