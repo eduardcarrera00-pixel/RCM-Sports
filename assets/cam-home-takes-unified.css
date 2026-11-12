@@ -6,7 +6,10 @@
     flex-direction:column!important;
     align-items:stretch!important;
     justify-content:flex-start!important;
-    gap:10px!important;
+    gap:8px!important;
+    min-height:0!important;
+    height:auto!important;
+    padding:14px!important;
     overflow:hidden!important;
     cursor:pointer!important;
   }
@@ -52,13 +55,15 @@
     flex-wrap:nowrap!important;
     width:100%!important;
     min-width:0!important;
-    margin:auto 0 0!important;
+    margin:4px 0 0!important;
     padding:10px 0 0!important;
     gap:8px!important;
     border-top:1px solid var(--hj-line)!important;
   }
   html body #camHomeJornada .cam-home-take-unified .cam-hj-author {
-    display:block!important;
+    display:flex!important;
+    align-items:center!important;
+    gap:6px!important;
     flex:1 1 auto!important;
     min-width:0!important;
     width:auto!important;
@@ -75,6 +80,16 @@
     text-align:left!important;
     cursor:pointer!important;
   }
+  html body #camHomeJornada .cam-home-take-unified .cam-home-take-rank {
+    display:inline-flex!important; flex:0 0 20px!important;
+    width:20px!important; height:24px!important;
+  }
+  html body #camHomeJornada .cam-home-take-unified .cam-home-take-name {
+    min-width:0!important; overflow:hidden!important; text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+  }
+  html body #camHomeJornada .cam-home-take-unified .cam-hj-card-title { min-height:2.56em!important; }
+  html body #camHomeJornada .cam-home-take-unified .cam-hj-excerpt { min-height:2.9em!important; }
   html body #camHomeJornada .cam-home-take-unified .cam-hj-votes {
     display:flex!important;
     align-items:center!important;

@@ -39,7 +39,7 @@
   // La portada usa la misma anatomía de tarjeta en Recientes, Populares e Impopulares.
   // Conserva las votaciones, perfiles y respuestas sin una segunda fila de acciones.
   function communityCard(t,kind,replyCounts,viewerId){
-    const item=make('li',null,'ae-top-take ae-community-popular-take cam-hj-take cam-home-take-unified');
+    const item=make(kind==='recent'?'article':'li',null,'ae-top-take ae-community-popular-take cam-hj-take cam-home-take-unified');
     item.dataset.kind=kind;
 
     const top=make('span',null,'cam-hj-kicker');
@@ -68,6 +68,11 @@
     author.dataset.camAuthorId=String(t.author_id||'');
     author.setAttribute('aria-label','Ver perfil de '+(t.author||'la comunidad'));
     author.addEventListener('click',()=>{if(t.author_id)window.openAePublicProfile?.(t.author_id);});
+    const rank=make('span',null,'cam-home-take-rank');
+    rank.dataset.rankFace=String(t.author_id||'');
+    window.CamLeagues?.avatar?.(rank,t.author_id);
+    const name=make('span',author.textContent,'cam-home-take-name');
+    author.replaceChildren(rank,name);
     footer.append(author);
 
     const stats=make('span',null,'cam-hj-votes cam-home-take-stats');
@@ -107,6 +112,7 @@
     });
     return item;
   }
+  window.camHomeTakeCard=communityCard;
   // Placa del Salón de la fama: medalla con los puntos + el Take.
   function historicalCard(t){
     const btn=make('button',null,'ae-discovery-take cam-take-record');

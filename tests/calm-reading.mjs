@@ -26,6 +26,7 @@ for (const id of ['aeHomeTakesPositiveList', 'aeHomeTakesNegativeList']) {
     li.append(button); list.append(li);
   }
 }
+w.eval(fs.readFileSync('assets/ae-home-take-discoveries.js', 'utf8'));
 w.eval(fs.readFileSync('assets/cam-home-jornada.js', 'utf8'));
 const root = d.getElementById('camHomeJornada');
 const state = w.camHomeJornada._state();
@@ -40,6 +41,14 @@ assert.equal(root.querySelectorAll('.cam-hj-news').length,3);
 assert.equal(root.querySelectorAll('.cam-hj-game').length,2);
 assert.equal(root.querySelectorAll('.cam-hj-take').length,6,'All recent Takes remain reachable in the carousel');
 assert.equal(root.querySelectorAll('.cam-home-takes-track').length,3,'Every filter uses the same carousel');
+assert.equal(root.querySelectorAll('#camHomeTakesRecent .cam-home-take-comments').length,6,'Every recent Take has a conversation button');
+assert.equal(root.querySelectorAll('#camHomeTakesRecent .cam-home-take-rank + .cam-home-take-name').length,6,'The real profile rank precedes the username');
+for (const kind of ['recent','positive','negative']) {
+  const card=w.camHomeTakeCard(state.takes[0],kind,new Map([['t0',2]]),null);
+  assert.equal(card.querySelector('.cam-home-take-comments').textContent,'2');
+  assert.equal(card.className,root.querySelector('.cam-home-take-unified').className,'All three filters share the same component');
+}
+
 for (const track of root.querySelectorAll('.cam-home-takes-track')) {
   assert.equal(track.getAttribute('tabindex'),'0','Every carousel is reachable by keyboard');
   assert.equal(track.getAttribute('aria-roledescription'),'carrusel');

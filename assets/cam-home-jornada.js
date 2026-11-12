@@ -19,7 +19,7 @@
   const state = {
     loadedAt: 0, loading: false,
     nfl: [], football: [], teams: new Map(), gamesOk: false,
-    takes: [], takesOk: false, takesError: false
+    takes: [], takesOk: false, takesError: false, takeReplyCounts: null, takeViewerId: null
   };
 
   /* ---------- utilidades ---------- */
@@ -339,21 +339,7 @@
 
   /* ---------- Takes de la comunidad ---------- */
   function takeCard(t) {
-    const card = el('button', null, 'cam-hj-card cam-hj-take', { type: 'button' });
-    const top = el('span', null, 'cam-hj-kicker');
-    const league = String(t.competition || '').trim() || (t.sport === 'nfl' ? 'NFL' : 'Fútbol');
-    top.append(el('span', league, 'cam-hj-league'), el('span', shortDate(t.created_at), 'cam-hj-when'));
-    card.append(top, el('span', t.title || 'Take', 'cam-hj-card-title'));
-    if (t.body) card.append(el('span', String(t.body).replace(/\s+/g, ' ').trim(), 'cam-hj-excerpt'));
-    const foot = el('span', null, 'cam-hj-take-foot');
-    foot.append(el('span', '@' + (t.author || 'aficionado'), 'cam-hj-author'));
-    const votes = el('span', null, 'cam-hj-votes');
-    votes.append(el('span', '▲ ' + (Number(t.upvotes) || 0), 'is-up'), el('span', '▼ ' + (Number(t.downvotes) || 0), 'is-down'));
-    foot.append(votes);
-    card.append(foot);
-    card.setAttribute('aria-label', 'Take de @' + (t.author || 'aficionado') + ': ' + (t.title || '') + '. ' + (Number(t.upvotes) || 0) + ' apoyos, ' + (Number(t.downvotes) || 0) + ' cuestionados');
-    card.addEventListener('click', () => window.aeTakeReplies?.open?.(t));
-    return card;
+    return window.camHomeTakeCard(t,'recent',state.takeReplyCounts,state.takeViewerId);
   }
   function paintTakes() {
     const cards = state.takes.map(takeCard);
@@ -385,6 +371,15 @@
       state.takesOk = !takes.error;
       state.takesError = Boolean(takes.error);
       if (!takes.error) state.takes = Array.isArray(takes.data) ? takes.data : [];
+      if (!takes.error) {
+        const takeIds=state.takes.map(t=>String(t.id));
+        const [counts,viewer]=await Promise.all([
+          takeIds.length ? c.rpc('ae_public_take_reply_counts',{p_take_ids:takeIds}) : Promise.resolve({data:[]}),
+          c.auth.getUser().catch(()=>({data:{user:null}}))
+        ]);
+        state.takeReplyCounts=counts.error ? null : new Map((counts.data||[]).map(r=>[String(r.take_id),Math.max(0,Number(r.reply_count)||0)]));
+        state.takeViewerId=viewer.data?.user?.id||null;
+      }
       // Escudos solo de los partidos que se van a ver.
       const ids = [...new Set(state.football.slice(0, 12).flatMap(g => [g.home_id, g.away_id]).map(String))]
         .filter(id => !state.teams.has(id));
