@@ -338,7 +338,7 @@
     const points=id===g.home_id?g.points_home:g.points_away;
     // Sin probabilidad visible: el usuario ve solo los puntos del acierto (el doble con el laurel).
     const doubled=points!=null&&laurelOf(g)===g.id;
-    b.append(el('small',points==null?'Pts pendientes':'+ '+(doubled?points*2:points)+' / −'+points+' pts'+(doubled?' · x2':'')));
+    b.append(el('small',points==null?'Pts pendientes':doubled?(points*2)+' pts · x2':points+' pts'));
     if(points!=null)b.title='Acierto: +'+(doubled?points*2:points)+' puntos. Fallo: −'+points+' puntos.';
     b.addEventListener('click',()=>{if(!isOpen(g))return;if(!user){window.openUserAuthModal?.();return;}draft.set(g.id,id);saveDraft();paintGames();});
     if(disabled)b.title='Este partido está cerrado';

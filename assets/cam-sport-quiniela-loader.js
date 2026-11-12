@@ -6,9 +6,9 @@
   const base=new URL('.',document.currentScript?.src||new URL('assets/',location.href));
   const config={
     nfl:{className:'ae-is-nfl',root:'camNflQuiniela',status:'camNflStatus',
-      src:'cam-nfl-quiniela.js?v=20261110-branded-loading-1'},
+      src:'cam-nfl-quiniela.js?v=20261112-solo-puntos-1'},
     football:{className:'ae-is-football',root:'camFootballQuiniela',status:'camFootballStatus',
-      src:'cam-football-quiniela.js?v=20261110-abre-ligamx-1',
+      src:'cam-football-quiniela.js?v=20261112-solo-puntos-1',
       // La liguilla de la Liga MX vive dentro de la quiniela de fútbol y se carga después.
       extra:['cam-liguilla.js?v=20261111-liguilla-compacta-1']}
   };

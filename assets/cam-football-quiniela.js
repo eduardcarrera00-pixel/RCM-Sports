@@ -321,7 +321,7 @@
     b.append(logo(id),summary);
     const points=pick==='home'?g.points_home:g.points_away;
     // Sin probabilidad visible: el usuario ve solo los puntos del acierto.
-    b.append(el('small',points==null?'Pts pendientes':'+ '+points+' / −'+points+' pts'));
+    b.append(el('small',points==null?'Pts pendientes':points+' pts'));
     if(points!=null)b.title='Acierto: +'+points+' puntos. Fallo: −'+points+' puntos.';
     b.addEventListener('click',()=>choose(g,pick));
     if(disabled)b.title=unavailableReason();
@@ -334,7 +334,7 @@
     b.type='button';b.disabled=disabled;b.setAttribute('aria-pressed',String(chosen));
     if(g.status==='final'&&g.outcome)b.classList.add(g.outcome==='draw'?'is-winner':'is-loser');
     b.append(el('span','Empate','cam-nfl-draw-label'));
-    b.append(el('small',g.points_draw==null?'Pts pendientes':'+ '+g.points_draw+' / −'+g.points_draw+' pts'));
+    b.append(el('small',g.points_draw==null?'Pts pendientes':g.points_draw+' pts'));
     if(g.points_draw!=null)b.title='Acierto: +'+g.points_draw+' puntos. Fallo: −'+g.points_draw+' puntos.';
     b.addEventListener('click',()=>choose(g,'draw'));
     if(disabled)b.title=unavailableReason();
