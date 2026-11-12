@@ -1,19 +1,29 @@
 /* CAM SPORTS: las tres pestañas de Takes en Inicio comparten anatomía y pie compacto.
    Ámbito exclusivo de Takes; no altera las tarjetas ni los carruseles de Picks. */
 @layer cam-display-clarity {
-  html body #camHomeJornada .cam-home-takes-track > .cam-home-take-unified {
-    display:flex!important;
-    flex-direction:column!important;
+  html body #camHomeJornada .cam-home-takes-track .cam-home-take-unified {
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    grid-template-rows:16px 51.2px 37.7px 43px!important;
     align-items:stretch!important;
     justify-content:flex-start!important;
     gap:8px!important;
-    min-height:0!important;
-    height:auto!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    min-height:204px!important;
+    height:204px!important;
+    max-height:204px!important;
     padding:14px!important;
     overflow:hidden!important;
     cursor:pointer!important;
   }
+  /* Recent cards sit inside .cam-hj-item; ranked cards are direct track children. */
+  html body #camHomeJornada .cam-home-takes-track > .cam-home-take-unified {
+    width:var(--cam-take-width)!important;
+    flex:0 0 var(--cam-take-width)!important;
+  }
   html body #camHomeJornada .cam-home-take-unified .cam-hj-kicker {
+    grid-row:1!important;
     display:flex!important;
     align-items:baseline!important;
     justify-content:space-between!important;
@@ -55,7 +65,11 @@
     flex-wrap:nowrap!important;
     width:100%!important;
     min-width:0!important;
-    margin:4px 0 0!important;
+    grid-row:4!important;
+    height:43px!important;
+    min-height:0!important;
+    align-self:end!important;
+    margin:0!important;
     padding:10px 0 0!important;
     gap:8px!important;
     border-top:1px solid var(--hj-line)!important;
@@ -88,8 +102,8 @@
     min-width:0!important; overflow:hidden!important; text-overflow:ellipsis!important;
     white-space:nowrap!important;
   }
-  html body #camHomeJornada .cam-home-take-unified .cam-hj-card-title { min-height:2.56em!important; }
-  html body #camHomeJornada .cam-home-take-unified .cam-hj-excerpt { min-height:2.9em!important; }
+  html body #camHomeJornada .cam-home-take-unified .cam-hj-card-title { grid-row:2!important; height:51.2px!important; min-height:0!important; align-self:start!important; }
+  html body #camHomeJornada .cam-home-take-unified .cam-hj-excerpt { grid-row:3!important; height:37.7px!important; min-height:0!important; }
   html body #camHomeJornada .cam-home-take-unified .cam-hj-votes {
     display:flex!important;
     align-items:center!important;
