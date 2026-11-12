@@ -50,7 +50,7 @@
       ['#','Posición','position'],['Usuario','Usuario','user'],
       ['PJ','Pronósticos resueltos','played'],['A','Aciertos','hits'],
       ['F','Fallos','misses'],['%','Porcentaje de acierto','accuracy'],
-      ['Pts','Puntos','points'],['','Estadísticas y pronósticos','expand']
+      ['Pts','Puntos','points'],['','Estadísticas','expand']
     ]){
       const th=el('th',text);th.scope='col';th.dataset.kind=kind;th.title=title;
       th.setAttribute('aria-label',title);header.append(th);
@@ -91,28 +91,33 @@
       const details=row.querySelector('details');
       const panelRow=el('tr',null,'cam-q-detail-row');
       panelRow.hidden=true;panelRow.id=target.id+'Detail'+index;
+      // La ficha ocupa solo las columnas visibles: en el teléfono se ocultan % (y PJ
+      // en pantallas mínimas) y un colspan mayor creaba una columna vacía que
+      // estrechaba la tabla y cortaba los nombres.
       const panel=el('td');panel.colSpan=8;panelRow.append(panel);panel.append(details);
       const expand=el('button',null,'cam-q-expand');expand.type='button';
       const arrow=el('span','⌄');arrow.setAttribute('aria-hidden','true');expand.append(arrow);
-      expand.setAttribute('aria-label','Ver estadísticas y pronósticos de @'+line.username);
+      expand.setAttribute('aria-label','Ver estadísticas de @'+line.username);
       expand.setAttribute('aria-controls',panelRow.id);expand.setAttribute('aria-expanded','false');
-      const sync=()=>{panelRow.hidden=!details.open;expand.setAttribute('aria-expanded',String(details.open));};
+      const sync=()=>{
+        if(details.open)fitPanels(board);
+        panelRow.hidden=!details.open;expand.setAttribute('aria-expanded',String(details.open));
+      };
       expand.addEventListener('click',()=>{details.open=!details.open;sync();});
       details.addEventListener('toggle',sync);
       cell(null,'expand').append(expand);
       standing.addEventListener('click',event=>{if(!event.target.closest('button'))expand.click();});
-      details.querySelector('summary').textContent='Estadísticas y pronósticos';
+      details.querySelector('summary').textContent='Estadísticas';
+      // Ficha corta: PJ, aciertos, fallos y puntos ya están en la fila; aquí solo
+      // tres cifras en una línea y los últimos resultados (sin los partidos elegidos).
       const stats=el('dl',null,'cam-q-stats');
-      const stat=(label,value)=>{
-        const pair=el('div');pair.append(el('dt',label));
+      const stat=(label,value,title)=>{
+        const pair=el('div');const term=el('dt',label);if(title)term.title=title;pair.append(term);
         const output=el('dd',value);pair.append(output);stats.append(pair);return output;
       };
-      stat('Pronósticos resueltos',format(line.resolved));
-      stat('Aciertos',format(line.hits));
-      stat('Fallos',format(Math.max(0,number(line.resolved)-number(line.hits))));
       stat('Efectividad',format(line.accuracy)+' %');
-      stat('Distancia al líder',format(gap(line))+' pts');
-      const current=stat('Racha de aciertos','Consultando…');
+      stat('Al líder',number(line.rank_position)===1?'Líder':format(gap(line))+' pts','Distancia al líder');
+      const current=stat('Racha','Consultando…','Racha de aciertos');
       current.className='cam-q-streak';
       current.title='Aciertos consecutivos en este periodo, ordenados por inicio del partido. Los anulados no cuentan.';
       const form=el('div',null,'cam-q-form');
@@ -124,7 +129,7 @@
         current.dataset.positive=String(!!value?.count);
         form.replaceChildren();
         if(value){
-          form.append(el('span','Últimos resultados:','cam-q-form-label'));
+          form.append(el('span','Últimos resultados','cam-q-form-label'));
           for(const item of value.recent){
             const mark=el('span',item.result==='correct'?'✓':'×','cam-q-form-result');
             mark.dataset.result=item.result;
@@ -138,7 +143,21 @@
     const wrap=el('div',null,'cam-q-table-wrap');wrap.append(board);
     const legend=el('p','PJ: resueltos · A: aciertos · F: fallos','cam-q-legend');
     table.replaceWith(wrap,legend);
+    if(!fitting){
+      fitting=true;
+      let frame=0;
+      window.addEventListener('resize',()=>{
+        cancelAnimationFrame(frame);
+        frame=requestAnimationFrame(()=>document.querySelectorAll('table.cam-q-board').forEach(fitPanels));
+      },{passive:true});
+    }
     mountLeague(target);
+  }
+  let fitting=false;
+  function fitPanels(board){
+    const visible=[...board.querySelectorAll('thead th')]
+      .filter(th=>getComputedStyle(th).display!=='none').length||8;
+    board.querySelectorAll('.cam-q-detail-row > td').forEach(td=>{if(td.colSpan!==visible)td.colSpan=visible;});
   }
   function empty(target,onPlay){
     const card=el('div',null,'cam-q-race cam-q-empty');

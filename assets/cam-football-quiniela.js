@@ -623,8 +623,10 @@
               const game=lookup.get(p.game_id);
               return game&&(rankingScope!=='month'||monthOf(game)===month);
             });
-            if(!relevant.length)content.append(el('p','Aún no hay pronósticos resueltos.'));
-            for(const pick of relevant.slice(0,60)){
+            // En la clasificación solo se usan para la racha y los últimos resultados.
+            const compact=!!details.closest('.cam-q-detail-row');
+            if(!relevant.length&&!compact)content.append(el('p','Aún no hay pronósticos resueltos.'));
+            for(const pick of compact?[]:relevant.slice(0,60)){
               const game=lookup.get(pick.game_id);
               const row=el('div',null,'cam-nfl-ranking-pick');
               row.dataset.result=pickResultFor(game,pick)||'';
