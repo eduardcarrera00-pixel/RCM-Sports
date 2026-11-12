@@ -7,6 +7,7 @@
  */
 (() => {
   'use strict';
+  if(!document.getElementById('cam-actualidad-approved-style')){const style=document.createElement('style');style.id='cam-actualidad-approved-style';style.textContent="\n#aeOpinions #aeOpinionsList.cam-act-approved{display:flex!important;flex-direction:column!important;gap:20px!important;min-width:0}\n#aeOpinions .cam-act-approved-hero{position:relative!important;isolation:isolate;overflow:hidden!important;border-radius:22px!important;background:var(--op-panel)!important;border:1px solid var(--op-line)!important;box-shadow:0 18px 44px -30px #0009!important;transform:none!important}\n#aeOpinions .cam-act-approved-glow{position:absolute;z-index:-1;inset:-30px;width:calc(100% + 60px);height:calc(100% + 60px);object-fit:cover;filter:blur(30px);opacity:.22;pointer-events:none}\n#aeOpinions .cam-act-approved-hero>.ae-opinion-open{display:block!important;position:relative!important;height:auto!important}\n#aeOpinions .cam-act-approved-hero .ae-opinion-media{position:absolute!important;inset:0 0 auto!important;width:100%!important;height:222px!important;min-height:0!important;aspect-ratio:auto!important;mask-image:linear-gradient(#000 0%,#000 56%,transparent 100%);-webkit-mask-image:linear-gradient(#000 0%,#000 56%,transparent 100%);background:transparent!important}\n#aeOpinions .cam-act-approved-hero .ae-opinion-media img{width:100%!important;height:100%!important;object-fit:cover!important}\n#aeOpinions .cam-act-approved-hero .ae-opinion-text{position:relative!important;display:flex!important;flex-direction:column!important;margin:0!important;padding:170px 21px 20px!important;gap:11px!important;background:none!important}\n#aeOpinions .cam-act-approved-hero .ae-opinion-title{font-size:29px!important;line-height:1.1!important;display:block!important;overflow:visible!important}\n#aeOpinions .cam-act-approved-hero .ae-opinion-excerpt{display:block!important;font-size:13.5px!important;line-height:1.6!important;overflow:visible!important;max-height:none!important;margin:0!important}\n#aeOpinions .cam-act-approved-hero .ae-opinion-author{margin:0!important;padding:0!important;font-size:10px!important}\n#aeOpinions .cam-act-approved-hero .ae-opinion-meta{font-size:10px!important}\n#aeOpinions .cam-act-approved-hero .cam-actualidad-news-actions{position:relative!important;padding:0 21px 15px!important;background:none!important}\n#aeOpinions .cam-act-approved-rail{display:flex!important;gap:12px!important;overflow-x:auto!important;min-width:0!important;width:100%!important;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;scrollbar-width:thin;padding:0 0 8px!important}\n#aeOpinions .cam-act-approved-rail>.ae-opinion-card{display:flex!important;flex-direction:column!important;flex:0 0 246px!important;width:246px!important;min-width:0!important;max-width:none!important;scroll-snap-align:start;border-radius:16px!important;overflow:hidden!important;margin:0!important;transform:none!important}\n#aeOpinions .cam-act-approved-rail .ae-opinion-open{display:flex!important;flex-direction:column!important;height:auto!important;flex:1!important;gap:0!important;padding:0!important}\n#aeOpinions .cam-act-approved-rail .ae-opinion-media{display:block!important;width:100%!important;height:108px!important;min-height:0!important;aspect-ratio:auto!important;margin:0!important;flex:none!important}\n#aeOpinions .cam-act-approved-rail .ae-opinion-text{display:flex!important;flex-direction:column!important;gap:8px!important;padding:13px 14px 12px!important;min-width:0!important;flex:1!important}\n#aeOpinions .cam-act-approved-rail .ae-opinion-title{font-size:19px!important;line-height:1.17!important;display:block!important;overflow:visible!important;margin:0!important}\n#aeOpinions .cam-act-approved-rail .ae-opinion-excerpt{display:-webkit-box!important;-webkit-line-clamp:2!important;-webkit-box-orient:vertical!important;overflow:hidden!important;font-size:12px!important;line-height:1.5!important;margin:0!important;max-height:3em!important}\n#aeOpinions .cam-act-approved-rail .ae-opinion-meta{font-size:9px!important;gap:4px 8px!important}\n#aeOpinions .cam-act-approved-rail .ae-opinion-sport{font-size:9px!important}\n#aeOpinions .cam-act-approved-rail .ae-opinion-author{font-size:9px!important;margin-top:auto!important;padding:2px 0 0!important}\n#aeOpinions .cam-act-approved-rail .cam-actualidad-news-actions{padding:0 14px 12px!important;background:none!important}\n#aeOpinions .cam-act-approved :is(.ae-opinion-read,.ae-opinion-flag){display:none!important}\n@media(min-width:760px){\n#aeOpinions .cam-act-approved-hero .ae-opinion-open{min-height:355px!important}\n#aeOpinions .cam-act-approved-hero .ae-opinion-media{width:60%!important;height:100%!important;mask-image:linear-gradient(90deg,#000 30%,transparent 100%);-webkit-mask-image:linear-gradient(90deg,#000 30%,transparent 100%)}\n#aeOpinions .cam-act-approved-hero .ae-opinion-media img{object-fit:contain!important}\n#aeOpinions .cam-act-approved-hero .ae-opinion-text{margin-left:48%!important;padding:35px 30px!important;min-height:355px!important;justify-content:center!important}\n#aeOpinions .cam-act-approved-hero .ae-opinion-title{font-size:35px!important}\n#aeOpinions .cam-act-approved-hero .ae-opinion-excerpt{font-size:15px!important}\n#aeOpinions .cam-act-approved-rail>.ae-opinion-card{flex-basis:270px!important;width:270px!important}\n}";document.head.append(style);}
   const $ = id => document.getElementById(id);
   const el = (tag, text, cls) => { const n = document.createElement(tag); if (text != null) n.textContent = String(text); if (cls) n.className = cls; return n; };
   const SPORTS = [
@@ -418,7 +419,7 @@
     const leftovers=communityTakes.filter(t=>!debated.some(d=>String(d.id)===String(t.id)));
     const latest=visible();
     const front=pickCover(latest),remaining=latest.filter(o=>!front.includes(o));
-    const editorialRemainder=remaining.slice(6);
+    const editorialRemainder=[]; // Editorial stories all live in the single carousel.
     sportTarget.replaceChildren();
     if(active!=='todas')return;
     const bySport=new Map();
@@ -459,7 +460,7 @@
   }
   function pickCover(stories){
     const publicStories=stories.filter(o=>o.is_published);
-    return [...publicStories].sort((a,b)=>(Number(Boolean(b.featured))-Number(Boolean(a.featured)))||latestFirst(a,b)).slice(0,3);
+    return [...publicStories].sort(latestFirst).slice(0,1);
   }
   function render(){
     const root=$('aeOpinions');if(!root)return;
@@ -483,26 +484,34 @@
       list.append(empty);
     }else{
       const cover=pickCover(shown);
-      if(cover.length){
-        const section=el('section',null,'ae-opinions-front');
-        section.append(sectionHeader('En portada','El análisis que marca la conversación.'));
-        const grid=el('div',null,'ae-opinions-front-grid');
-        grid.append(card(cover[0],true));
-        if(cover.length>1){
-          // En el teléfono las otras dos se deslizan de lado; en el ordenador van debajo.
-          const rail=el('div',null,'cam-act-front-rail');
-          for(const o of cover.slice(1))rail.append(card(o,false,false,true));
-          grid.append(rail);
+      const lead=cover[0];
+      list.classList.add('cam-act-approved');
+      if(lead){
+        const hero=card(lead,true);
+        hero.classList.add('cam-act-approved-hero');
+        const img=hero.querySelector('.ae-opinion-media img');
+        if(img){
+          const glow=img.cloneNode();
+          glow.className='cam-act-approved-glow';glow.setAttribute('aria-hidden','true');
+          hero.prepend(glow);
         }
-        section.append(grid);list.append(section);
+        list.append(hero);
       }
-      const recent=shown.filter(o=>!cover.includes(o)).slice(0,6);
-      if(recent.length){
-        const section=el('section',null,'ae-opinions-recent');
-        section.append(sectionHeader('Últimas publicaciones','Publicaciones en orden de fecha, de más recientes a más antiguas.'));
-        const rows=el('div',null,'ae-opinions-recent-list');
-        for(const o of recent)rows.append(card(o,false,true));
-        section.append(rows);list.append(section);
+      const remaining=shown.filter(o=>o!==lead);
+      if(remaining.length){
+        const rail=el('div',null,'cam-act-approved-rail');
+        rail.setAttribute('role','region');
+        rail.setAttribute('aria-roledescription','carrusel');
+        rail.setAttribute('aria-label','Más publicaciones. Desliza para explorar.');
+        rail.tabIndex=0;
+        for(const o of remaining)rail.append(card(o,false,false,true));
+        rail.addEventListener('keydown',e=>{
+          if(e.target!==rail||!['ArrowLeft','ArrowRight'].includes(e.key))return;
+          e.preventDefault();
+          const first=rail.firstElementChild;
+          rail.scrollBy({left:(e.key==='ArrowRight'?1:-1)*((first?.getBoundingClientRect().width||246)+12),behavior:reducedMotion()?'auto':'smooth'});
+        });
+        list.append(rail);
       }
     }
     renderTakes();
