@@ -31,7 +31,7 @@ try { sessionStorage.setItem('cam_sports_home_welcome_seen_session_v1', '1'); } 
 (() => {
   const F = window.__fake; F.tables = F.tables || {}; F.rpc = F.rpc || {};
   const T = F.tables, H = 36e5, iso = h => new Date(Date.now() + h * H).toISOString();
-  F.user = {id: 'u1', email: 'u1@example.com', user_metadata: {username: 'probador'}};
+  if (!F.anonymous) F.user = {id: 'u1', email: 'u1@example.com', user_metadata: {username: 'probador'}};
   T.articles = [];
   T.nfl_rankings = [{id: 1, edition: 'Week 10', team_ids: ['SF','KC','BUF','PHI','BAL','MIN','NE','GB','DET','SEA'], updated_at: '2026-11-10T18:00:00Z'}];
   T.nfl_ranking_history = [];
@@ -199,6 +199,31 @@ def desktop(dark):
     print('PASS', where)
 
 
+
+def jornadas_below(dark, anonymous):
+    """«Ver mis jornadas» va debajo del botón de iniciar sesión / guardar del día."""
+    where = f'390-{"noche" if dark else "dia"}-{"sin-sesion" if anonymous else "con-sesion"}-jornadas'
+    pre = "window.__fake = window.__fake || {}; window.__fake.anonymous = true;" if anonymous else ''
+    with fp.full_page(fake_js=pre + BASE, dark=dark, width=390, height=860) as page:
+        open_nfl(page)
+        page.locator('#camNflSaveDay').scroll_into_view_if_needed(); page.wait_for_timeout(300)
+        st = page.evaluate("""() => {
+          const save = document.getElementById('camNflSaveDay'), nav = document.querySelector('#camNflNav button');
+          const s = save.closest('.cam-nfl-save-row').getBoundingClientRect(), n = nav?.getBoundingClientRect();
+          return {save: save.textContent.trim(), nav: nav?.textContent.trim() || null, below: !!n && n.top >= s.bottom,
+            gap: n ? Math.round(n.top - s.bottom) : null, w: n ? Math.round(n.width) : 0, sw: Math.round(save.getBoundingClientRect().width)};
+        }""")
+        assert st['save'] == ('Inicia sesión para participar' if anonymous else 'Guardar picks del día'), f'{where}: {st}'
+        assert st['nav'] == 'Ver mis jornadas ›' and st['below'] and 0 <= st['gap'] <= 24 and abs(st['w'] - st['sw']) <= 1, f'{where}: {st}'
+        if SHOTS:
+            box = page.evaluate("""() => { const a = document.getElementById('camNflDayNav').getBoundingClientRect(),
+              b = document.getElementById('camNflNav').getBoundingClientRect(); return {y: a.top + scrollY, h: b.bottom - a.top}; }""")
+            page.screenshot(path=str(SHOTS / f'{where}.png'), full_page=True,
+                            clip={'x': 0, 'y': max(0, box['y'] - 120), 'width': 390, 'height': box['h'] + 150})
+        assert page.errors == [], f'{where}: errores {page.errors}'
+    print('PASS', where)
+
+
 if __name__ == '__main__':
     for width in (390, 320):
         for dark in (False, True):
@@ -207,3 +232,5 @@ if __name__ == '__main__':
     complete()
     desktop(True)
     desktop(False)
+    jornadas_below(True, True)
+    jornadas_below(False, False)
