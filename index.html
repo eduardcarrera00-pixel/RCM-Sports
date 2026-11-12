@@ -3363,17 +3363,17 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
                 <button type="button" data-view="month" aria-pressed="true" aria-expanded="true" aria-controls="camFootballQuinielaStandings"><span class="cam-q-tab-kicker">Clasificación</span> <span class="cam-q-tab-name">mensual</span></button>
                 <button type="button" data-view="all" aria-pressed="false" aria-expanded="false" aria-controls="camFootballQuinielaStandings"><span class="cam-q-tab-kicker">Clasificación</span> <span class="cam-q-tab-name">histórica</span></button>
               </nav>
+              <section id="camFootballQuinielaStandings" class="cam-nfl-standings" aria-labelledby="camFootballStandingTitle">
+                <h3 id="camFootballStandingTitle">Clasificación de La Quiniela</h3>
+                <p id="camFootballRankingCaption" class="cam-quiniela-ranking-caption"></p>
+                <div id="camFootballRanking" aria-live="polite"></div>
+              </section>
             <details class="cam-nfl-rules">
               <summary>¿Cómo funcionan los puntos?</summary>
               <p>Los puntos de local, empate y visitante se calculan automáticamente y quedan fijados antes de abrir el partido. Con datos disponibles, el sistema descuenta el margen de la casa y redondea 2 dividido entre la probabilidad, con un mínimo de 2 y un máximo de 12 puntos.</p>
               <p>Un resultado menos probable suma más puntos. Si faltan datos, las tres opciones valen 6 puntos. Los puntos publicados son iguales para todos y no cambian con las cuotas posteriores.</p>
               <p>Acertar suma los puntos de tu selección; fallar resta esa misma cantidad. Una anulación vale 0. El empate es un resultado más: suma sus puntos si lo aciertas y los resta si lo fallas. Ese saldo decide tu clasificación y el ascenso o descenso mensual en la liga de Fútbol. Puedes editar hasta el inicio del partido.</p>
             </details>
-              <section id="camFootballQuinielaStandings" class="cam-nfl-standings" aria-labelledby="camFootballStandingTitle">
-                <h3 id="camFootballStandingTitle">Clasificación de La Quiniela</h3>
-                <p id="camFootballRankingCaption" class="cam-quiniela-ranking-caption"></p>
-                <div id="camFootballRanking" aria-live="polite"></div>
-              </section>
             </div>
             <div id="camFootballScoreBody" class="cam-sport-score-body" aria-live="polite"></div>
           </div>
@@ -5916,7 +5916,7 @@ html .cam-weekly-result-surface .cam-weekly-result-on-photo{
 <script src="assets/cam-profile-overview.js?v=20261111-primeros-pasos-1"></script>
 <script src="assets/cam-profile-quiniela.js?v=20261110-navigation-loading-1"></script>
 <script src="assets/ae-profile.js?v=20261111-escudo-inicial-1"></script>
-<script src="assets/cam-leagues.js?v=20261111-escudo-inicial-1"></script>
+<script src="assets/cam-leagues.js?v=20261112-clasificacion-football-1"></script>
 <style id="cam-nfl-quiniela-theme">
 /* ===========================================================================
    CAM SPORTS · La Quiniela NFL — lenguaje visual curvo, editorial y compacto.
