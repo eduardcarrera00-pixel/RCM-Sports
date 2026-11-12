@@ -578,11 +578,9 @@
       const track=el('div',null,'cam-lg-track is-eight');track.setAttribute('aria-hidden','true');
       for(let i=0;i<8;i++)track.append(el('i',null,i<fixed.length?'is-fixed':i<fixed.length+q8.length?'is-on':''));
       body.append(track);
-      body.append(el('p',need===8?'Toca los 8 equipos que crees que juegan la Liguilla.'
-        :need===0?'Ya se conocen los 8: van solos en tu lista.'
-        :fixed.length+(fixed.length===1?' ya está dentro. ':' ya están dentro. ')+(need===1?'Elige el que falta.':'Elige los '+need+' que faltan.'),'cam-lg-sub'));
+      if(need===8||need===0)body.append(el('p',need===8?'Toca los 8 equipos que crees que juegan la Liguilla.'
+        :'Ya se conocen los 8: van solos en tu lista.','cam-lg-sub'));
       if(fixed.length){
-        body.append(el('p','Ya dentro','cam-lg-group-label'));
         const list=el('div',null,'cam-lg-q8-list is-fixed');list.setAttribute('role','list');list.setAttribute('aria-label','Ya clasificados: van en tus 8');
         for(const id of fixed){const t=cteam(id);if(t)list.append(q8Team(t,{fixed:true}));}
         body.append(list);
