@@ -599,13 +599,11 @@
         }
         body.append(list);
       }
-      const outs=candTeams().filter(t=>t.status==='out').map(t=>t.short_name||t.name);
-      if(outs.length)body.append(el('p','Ya no pueden entrar: '+listText(outs)+'.','cam-lg-hint'));
       if(need){
         const eight=fullEight(),dirty=!sameSet(eight,saved||[]),over=q8.length-need,who=viewer();
         const actions=el('div',null,'cam-lg-actions');
-        const save=btn(q8Saving?'Guardando…':over>0?'Quita '+over:q8.length<need?'Elige '+(need-q8.length)+' más'
-          :who&&!dirty?'Tus 8 están guardados':'Guardar mis 8','cam-nfl-action cam-lg-q8-save',saveQ8);
+        const save=btn(q8Saving?'Guardando…':q8.length===need&&who&&!dirty?'Tus 8 están guardados':'Guardar mis 8',
+          'cam-nfl-action cam-lg-q8-save',saveQ8);
         save.disabled=q8Saving||q8.length!==need||(!!who&&!dirty);
         actions.append(save);
         if(!who)actions.append(btn('Iniciar sesión','cam-lg-link',()=>window.openUserAuthModal?.()));
