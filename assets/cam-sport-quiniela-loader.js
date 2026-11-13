@@ -10,7 +10,7 @@
     football:{className:'ae-is-football',root:'camFootballQuiniela',status:'camFootballStatus',
       src:'cam-football-quiniela.js?v=20261112-circulo-1',
       // La liguilla de la Liga MX vive dentro de la quiniela de fútbol y se carga después.
-      extra:['cam-liguilla.js?v=20261112-cuadro-visible-1']}
+      extra:['cam-liguilla.js?v=20261112-clasifican-dropdown-1']}
   };
   const requests=new Map();
   const loaded=new Set();

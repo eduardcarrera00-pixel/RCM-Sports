@@ -337,6 +337,20 @@ html.dark #camLiguilla .cam-lg-event{border-color:rgba(232,191,121,.3)}
 @container (min-width:560px){#camLiguilla .cam-lg-q8-list{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @container (min-width:760px){#camLiguilla .cam-lg-q8-list{grid-template-columns:repeat(4,minmax(0,1fr))}}
 #camLiguilla .cam-lg-q8-save{min-width:180px}
+#camLiguilla .cam-lg-qualifiers{min-width:0}
+#camLiguilla .cam-lg-qualifiers-summary{box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr) auto 16px;align-items:center;gap:12px;min-height:44px;padding:10px 14px;list-style:none;border:1px solid var(--q-gold);background:var(--q-panel);cursor:pointer;color:var(--q-ink)}
+#camLiguilla .cam-lg-qualifiers-summary::-webkit-details-marker{display:none}
+#camLiguilla .cam-lg-qualifiers-title{min-width:0;font:500 clamp(13px,3.8vw,16px)/1.3 var(--ds-font-serif,"Playfair Display",Georgia,serif)}
+#camLiguilla .cam-lg-qualifiers-summary .cam-lg-count{white-space:nowrap;font:400 12px/1.3 var(--ds-font-sans,Inter,system-ui,sans-serif);color:var(--q-meta)}
+#camLiguilla .cam-lg-qualifiers-summary .cam-lg-count b{font-weight:400}
+#camLiguilla .cam-lg-qualifiers-arrow{width:16px;height:16px;color:var(--q-gold-text);transition:transform .2s ease}
+#camLiguilla .cam-lg-qualifiers-arrow svg{display:block;width:100%;height:100%}
+#camLiguilla .cam-lg-qualifiers[open] .cam-lg-qualifiers-arrow{transform:rotate(180deg)}
+#camLiguilla .cam-lg-qualifiers-body{display:grid;gap:12px;margin-top:12px;min-width:0}
+#camLiguilla .cam-lg-qualifiers-summary:focus-visible{outline:2px solid var(--q-gold-text);outline-offset:3px}
+@layer cam-rounded-editorial{
+  html body #camLiguilla .cam-lg-qualifiers-summary{border-radius:11px!important}
+}
 /* Cuadro visible primero; fecha y explicación desplegable debajo. */
 #camLiguilla .cam-lg-upcoming{display:grid;gap:12px;min-width:0}
 #camLiguilla .cam-lg-teaser{border:1px solid var(--q-line);background:var(--q-card);min-width:0}

@@ -42,7 +42,7 @@
   let state=null,seasonLoaded=null,userLoaded=undefined,stale=true,loading=false,request=0,loadError='';
   let draft=null,saving=false,note='',noteKind='',roundView=null,board=null,boardOpen=false,adminTable=null,adminMessage='';
   // «Mis 8»: la tabla y la ventana llegan de cam_liguilla_candidates mientras no hay liguilla.
-  let cand=null,q8=[],q8Saving=false,q8Note='',q8Kind='';
+  let cand=null,q8=[],q8Saving=false,q8Note='',q8Kind='',q8Expanded=false;
   let animate='';
   const openLegs=new Set();
 
@@ -571,11 +571,7 @@
       wrap.append(el('p','La tabla de la Liga MX no está disponible ahora mismo. Vuelve a entrar en unos minutos.','cam-lg-wait'));
       return wrap;
     }
-    const body=el('section',null,'cam-lg-q8-body');body.setAttribute('aria-labelledby','camLiguillaQ8Title');
-    const head=el('div',null,'cam-lg-sec-head');
-    const h=el('h4',open?'¿Quién entra?':'Tus 8','cam-lg-sec-title');h.id='camLiguillaQ8Title';head.append(h);
-    if(open&&need){const c=el('span',null,'cam-lg-count');c.append(el('b',String(Math.min(q8.length,need))),' de '+need);head.append(c);}
-    body.append(head);
+    const body=el('section',null,'cam-lg-q8-body');body.setAttribute('aria-label',open?'Elige quiénes clasifican':'Clasificados elegidos');
     if(open){
       const track=el('div',null,'cam-lg-track is-eight');track.setAttribute('aria-hidden','true');
       for(let i=0;i<8;i++)track.append(el('i',null,i<fixed.length?'is-fixed':i<fixed.length+q8.length?'is-on':''));
@@ -587,8 +583,16 @@
         for(const id of fixed){const t=cteam(id);if(t)list.append(q8Team(t,{fixed:true}));}
         body.append(list);
       }
+      const choices=el('div',null,'cam-lg-qualifiers-body');
       if(need){
-        if(fixed.length)body.append(el('p','Se juegan el lugar','cam-lg-group-label'));
+        const dropdown=el('details',null,'cam-lg-qualifiers');dropdown.open=q8Expanded;
+        const summary=el('summary',null,'cam-lg-qualifiers-summary');
+        const title=el('span','Elige quiénes clasifican','cam-lg-qualifiers-title');title.id='camLiguillaQ8Title';
+        const count=el('span',null,'cam-lg-count');count.append(el('b',String(Math.min(q8.length,need))),' de '+need);
+        const arrow=el('span',null,'cam-lg-qualifiers-arrow');arrow.setAttribute('aria-hidden','true');
+        arrow.innerHTML='<svg viewBox="0 0 16 16" focusable="false"><path d="m3 6 5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+        summary.append(title,count,arrow);dropdown.append(summary,choices);
+        dropdown.addEventListener('toggle',()=>{if(dropdown.isConnected)q8Expanded=dropdown.open;});body.append(dropdown);
         const list=el('div',null,'cam-lg-q8-list');list.setAttribute('role','group');
         list.setAttribute('aria-label',need===8?'Elige a tus 8 clasificados':'Elige '+(need===1?'el que falta':'los '+need+' que faltan'));
         for(const t of candTeams().filter(t=>t.status==='alive')){
@@ -597,7 +601,7 @@
           b.addEventListener('click',()=>toggleQ8(String(t.team_id)));
           list.append(b);
         }
-        body.append(list);
+        choices.append(list);
       }
       if(need){
         const eight=fullEight(),dirty=!sameSet(eight,saved||[]),over=q8.length-need,who=viewer();
@@ -608,11 +612,11 @@
         actions.append(save);
         if(!who)actions.append(btn('Iniciar sesión','cam-lg-link',()=>window.openUserAuthModal?.()));
         if(q8.length){const clear=btn('Quitar mis elecciones','cam-lg-link',()=>{q8=[];storeQ8();q8Note='';render();});clear.disabled=q8Saving;actions.append(clear);}
-        body.append(actions);
-        body.append(el('p',over>0?'Otro equipo ya entró por su cuenta: quita '+(over===1?'uno':over)+' de tus elegidos.'
+        choices.append(actions);
+        choices.append(el('p',over>0?'Otro equipo ya entró por su cuenta: quita '+(over===1?'uno':over)+' de tus elegidos.'
           :dirty&&q8.length===need?(who?'Tienes cambios sin guardar.':'Pulsa «Guardar mis 8».')
           :'Puedes cambiarlos hasta el cierre.','cam-lg-hint'));
-        const p=el('p',q8Note,'cam-lg-note'+(q8Kind?' is-'+q8Kind:''));p.setAttribute('role','status');p.setAttribute('aria-live','polite');body.append(p);
+        const p=el('p',q8Note,'cam-lg-note'+(q8Kind?' is-'+q8Kind:''));p.setAttribute('role','status');p.setAttribute('aria-live','polite');choices.append(p);
       }
     }else{
       const mine=saved||[];
