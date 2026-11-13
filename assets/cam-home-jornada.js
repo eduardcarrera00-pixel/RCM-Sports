@@ -4,7 +4,10 @@
    Atajos opcionales en un desplegable. Se reutilizan los listados originales,
    sus conversaciones y sus votos; vuelven a su sitio al salir de Inicio.
    Los calendarios y sus contadores siguen completos. Se conservan la caché de
-   cinco minutos y las consultas públicas existentes, sin temporizadores. */
+   cinco minutos y las consultas públicas existentes, sin temporizadores.
+   13 nov 2026: con un evento especial en marcha (la Liguilla), «Quinielas» se
+   vuelve ese evento (paso actual, botón directo y «También en la quiniela»);
+   las tarjetas de partido llevan un círculo de elección en vez de «2 pts». */
 (() => {
   'use strict';
 
@@ -15,11 +18,18 @@
   const REFRESH_MS = 5 * 60 * 1000;
   const MAX_GAMES = 80;
   const LEAGUES = { champions: 'Champions', laliga: 'LaLiga', premier: 'Premier', ligamx: 'Liga MX' };
+  // Evento especial (13 nov 2026): mientras hay uno en marcha (hoy, la Liguilla de la
+  // Liga MX) la sección «Quinielas» se vuelve ese evento y lleva directo a participar.
+  // El campeón se queda 4 días en Inicio; después vuelve la sección de siempre.
+  const TZ = 'America/Toronto';
+  const EVENT_AFTER_MS = 4 * 864e5;
+  const seasonGuess = () => { const d = new Date(); return d.getUTCFullYear() - (d.getUTCMonth() < 6 ? 1 : 0); };
 
   const state = {
     loadedAt: 0, loading: false,
     nfl: [], football: [], teams: new Map(), gamesOk: false,
-    takes: [], takesOk: false, takesError: false, takeReplyCounts: null, takeViewerId: null
+    takes: [], takesOk: false, takesError: false, takeReplyCounts: null, takeViewerId: null,
+    ev: null, evLoadedAt: 0, evLoading: false, evDirty: false
   };
 
   /* ---------- utilidades ---------- */
@@ -263,8 +273,9 @@
     if (prefix) name.append(el('span', prefix, 'cam-hj-at', { 'aria-hidden': 'true' }));
     name.append(document.createTextNode(team ? team.short : 'Empate'));
     line.append(name);
-    const pts = Number(points);
-    if (Number.isFinite(pts) && pts > 0) line.append(el('span', pts + ' pts', 'cam-hj-pts'));
+    // 13 nov 2026: sin «2 pts» en Inicio (no invitaban a jugar); un círculo de elección,
+    // solo decorativo. Los puntos siguen en la quiniela.
+    line.append(el('span', null, 'cam-hj-choice', { 'aria-hidden': 'true' }));
     return line;
   }
   function gameCard(g, sport) {
@@ -289,6 +300,338 @@
     card.addEventListener('click', () => goQuiniela(sport));
     return card;
   }
+  /* ---------- Evento especial: la Liguilla ---------- */
+  const CHECK = '<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 8.5 6.5 12 13 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  const PLUS = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+  const ROUND_NAME = { qf: 'Cuartos de final', sf: 'Semifinales', final: 'Final' };
+  // Orden del cuadro: 1-8 y 4-5 arriba, 2-7 y 3-6 abajo; la elección de cuartos se guarda
+  // en el hueco del mejor sembrado menos uno (1-8 → 0, 2-7 → 1, 3-6 → 2, 4-5 → 3).
+  const BRACKET = [[1, 8], [4, 5], [2, 7], [3, 6]];
+
+  function viewerId() {
+    try { if (typeof currentUser !== 'undefined' && currentUser?.id) return currentUser.id; } catch {}
+    return state.takeViewerId || null;
+  }
+  function tzDay(iso) {
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return '';
+    return d.toLocaleDateString('es', { timeZone: TZ, weekday: 'short', day: 'numeric', month: 'short' }).replace(/\./g, '').replace(',', '');
+  }
+  function longClock(iso) {
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return '';
+    return d.toLocaleString('es', { timeZone: TZ, weekday: 'long', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false })
+      .replace(/\./g, '').replace(/^(\p{L}+),\s*/u, '$1 ');
+  }
+  function closesIn(iso) {
+    const t = Date.parse(iso);
+    if (!Number.isFinite(t)) return '';
+    const ymd = ms => Date.parse(new Intl.DateTimeFormat('en-CA', { timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(ms)));
+    const days = Math.round((ymd(t) - ymd(now())) / 864e5);
+    const hm = new Date(t).toLocaleTimeString('es', { timeZone: TZ, hour: '2-digit', minute: '2-digit', hour12: false });
+    if (days <= 0) return 'Cierra hoy, ' + hm;
+    if (days === 1) return 'Cierra mañana, ' + hm;
+    return 'Cierra en ' + days + ' días';
+  }
+  const shortName = t => String(t?.short_name || t?.name || 'Por definir');
+  const abbrOf = t => String(t?.abbreviation || t?.short_name || t?.name || '?').normalize('NFD').replace(/[^A-Za-z0-9]/g, '').slice(0, 4).toUpperCase();
+  // El mismo escudo de reserva que la liguilla: azul y dorado con las siglas.
+  function shieldUri(ab) {
+    const text = String(ab || '?').slice(0, 3);
+    return 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 46">'
+      + '<path d="M20 2 37 8v14c0 11-7.5 18.5-17 22C10.5 40.5 3 33 3 22V8Z" fill="#0B2233" stroke="#BE9270" stroke-width="2.4" stroke-linejoin="round"/>'
+      + '<path d="M8 11.5 20 7.6l12 3.9" fill="none" stroke="#E8BF79" stroke-width="1.4" stroke-linecap="round" opacity=".7"/>'
+      + '<text x="20" y="28" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="' + (text.length > 2 ? 10.5 : 13) + '" fill="#E8BF79">' + text.replace(/[<&>]/g, '') + '</text></svg>');
+  }
+  function evCrest(t) {
+    const box = el('span', null, 'cam-hj-ev-crest', { 'aria-hidden': 'true' });
+    const img = el('img', null, null, { alt: '', width: '24', height: '24', decoding: 'async' });
+    const fallback = () => { if (img.dataset.fallback) return; img.dataset.fallback = '1'; img.src = shieldUri(abbrOf(t)); };
+    img.addEventListener('error', fallback);
+    if (/^https:\/\//i.test(String(t?.logo || ''))) img.src = t.logo; else fallback();
+    box.append(img);
+    return box;
+  }
+  // Lo que la liguilla guarda en este aparato mientras se elige (invitado o sin guardar).
+  function localEight(win) {
+    for (const who of [...new Set([viewerId() || 'anon', 'anon'])]) {
+      try {
+        const raw = JSON.parse(localStorage.getItem('cam:liguilla:mis8:' + who + ':' + (win?.id || 0)) || 'null');
+        if (Array.isArray(raw) && raw.length) return raw.map(String);
+      } catch {}
+    }
+    return [];
+  }
+
+  // Paso 1 · Tus 8 (cam_liguilla_candidates). Los ya clasificados van fijos.
+  function qualifiersView(cand, at) {
+    const win = cand.window;
+    const teams = Array.isArray(cand.teams) ? cand.teams : [];
+    const byId = new Map(teams.map(t => [String(t.team_id), t]));
+    const fixed = teams.filter(t => t.status === 'in').sort((a, b) => a.rank - b.rank).slice(0, 8);
+    const alive = teams.filter(t => t.status === 'alive');
+    const free = Math.max(0, 8 - fixed.length);
+    const server = Array.isArray(cand.mine) ? cand.mine.map(String) : null;
+    const saved = !!server && server.length === 8;
+    const chosen = [...new Set(saved ? server : localEight(win))]
+      .map(id => byId.get(id)).filter(t => t && t.status === 'alive').slice(0, free);
+    const ready = free > 0 && chosen.length >= free;
+    const closes = Date.parse(win.closes_at);
+    const step = 'Paso 1 de 3 · Tus 8';
+    const slots = [...fixed.map(t => ({ t, kind: 'fixed' })), ...chosen.map(t => ({ t, kind: 'mine' }))];
+    if (win.open && closes > at) {
+      for (let i = chosen.length; i < free; i++) slots.push({ kind: 'open' });
+      const left = free - chosen.length;
+      if (saved) return { step, badge: 'Guardado', badgeDone: true, title: 'Tus 8 están listos', slots,
+        note: 'Puedes cambiarlos hasta el ' + longClock(win.closes_at) + '. Después armas tu cuadro.', cta: 'Ver mi liguilla ›' };
+      if (ready) return { step, badge: closesIn(win.closes_at), title: 'Tus 8 están listos', slots, picker: true,
+        note: viewerId() ? 'Aún no están guardados: guárdalos antes del ' + longClock(win.closes_at) + '.'
+          : 'Entra con tu cuenta y guárdalos antes del ' + longClock(win.closes_at) + ' para que cuenten.',
+        cta: 'Guardar mis 8 ›' };
+      if (!free) return { step, badge: closesIn(win.closes_at), title: 'Los 8 ya están dentro', slots,
+        note: 'Tu cuadro se abre al terminar la última jornada.', cta: 'Ver la Liguilla ›' };
+      const places = free === 1 ? 'el lugar que falta' : 'los ' + free + ' lugares que faltan';
+      return { step, badge: closesIn(win.closes_at), picker: true,
+        title: chosen.length ? (left === 1 ? 'Te falta 1' : 'Te faltan ' + left) : '¿Quiénes completan los 8?', slots,
+        note: (fixed.length ? fixed.length + ' ya están dentro. ' : '') + alive.length + ' equipos pelean por ' + places + '.',
+        cta: fixed.length ? 'Completar mis 8 ›' : 'Elegir mis 8 ›', sub: 'Después armas tu cuadro y compites hasta la final.' };
+    }
+    // Cerrado y a la espera de que se abra el cuadro (al terminar la última jornada).
+    if (!win.opened && Number.isFinite(closes) && at - closes < EVENT_AFTER_MS) {
+      return { step: 'Paso 2 de 3 · Tu cuadro', badge: 'Se abre ' + tzDay(closes + 2 * 864e5),
+        title: saved ? 'Tus 8 están guardados' : 'Tu cuadro se abre pronto', slots: saved ? slots : null,
+        note: 'Al terminar la última jornada eliges quién gana cada cruce, de cuartos al campeón.', cta: 'Ver la Liguilla ›' };
+    }
+    return null;
+  }
+
+  // Pasos 2 y 3 (cam_liguilla_state): el cuadro y, después, ronda a ronda.
+  function liguillaView(st, at) {
+    const L = st.liguilla;
+    const seeds = (Array.isArray(st.seeds) ? st.seeds : []).slice().sort((a, b) => a.seed - b.seed);
+    const team = id => seeds.find(s => String(s.team_id) === String(id)) || null;
+    const seed = n => seeds.find(s => Number(s.seed) === n) || null;
+    const mine = st.mine || null;
+    if (L.open && Date.parse(L.closes_at) > at) {
+      const semis = new Map((mine?.bracket || []).filter(p => p.stage === 'semis').map(p => [Number(p.slot), String(p.team_id)]));
+      const count = (mine?.bracket || []).length;
+      return { step: 'Paso 2 de 3 · Tu cuadro', badge: 'Cierra ' + tzDay(L.closes_at),
+        title: count >= 7 ? 'Tu cuadro está listo' : 'Arma tu cuadro',
+        rows: BRACKET.map(([a, b]) => ({ a: seed(a), b: seed(b), pick: semis.get(a - 1) })).filter(r => r.a && r.b),
+        note: count + ' de 7 elecciones · cada acierto suma; una sorpresa vale más.',
+        cta: count >= 7 ? 'Ver mi cuadro ›' : count ? 'Seguir con mi cuadro ›' : 'Armar mi cuadro ›' };
+    }
+    const series = Array.isArray(st.series) ? st.series : [];
+    const order = ['qf', 'sf', 'final'];
+    const round = order.find(r => series.some(s => s.round === r && s.status !== 'decided'))
+      || [...order].reverse().find(r => series.some(s => s.round === r));
+    if (!round) return null;
+    const list = series.filter(s => s.round === round).sort((a, b) => a.slot - b.slot);
+    const fin = round === 'final' ? list.find(s => s.winner_id) : null;
+    if (fin) {
+      const kicks = (fin.legs || []).map(g => Date.parse(g.kickoff)).filter(Number.isFinite);
+      if (!kicks.length || at - Math.max(...kicks) > EVENT_AFTER_MS) return null;
+      const champ = team(fin.winner_id);
+      const myChamp = (mine?.bracket || []).find(p => p.stage === 'champion')?.team_id;
+      return { step: 'La Liguilla · Final', badge: 'Terminó', badgeDone: true, title: 'Campeón: ' + shortName(champ),
+        rows: [{ a: champ, b: null, status: 'Campeón' }],
+        note: myChamp && String(myChamp) === String(fin.winner_id) ? '¡Acertaste al campeón!' : 'Mira cómo quedó tu cuadro y la clasificación.',
+        cta: 'Ver la Liguilla ›' };
+    }
+    const pickOf = id => (mine?.series || []).find(p => Number(p.series_id) === Number(id))?.team_id || null;
+    const status = s => {
+      if (s.status === 'decided' && s.winner_id) return 'Pasa ' + shortName(team(s.winner_id));
+      const first = (s.legs || []).slice().sort((a, b) => Date.parse(a.kickoff) - Date.parse(b.kickoff))[0];
+      if (first && Date.parse(first.kickoff) > at) return 'Ida · ' + tzDay(first.kickoff);
+      return 'En juego';
+    };
+    const picked = list.filter(s => pickOf(s.id)).length;
+    const done = picked >= list.length;
+    return { step: 'Paso 3 de 3 · Ronda a ronda', badge: ROUND_NAME[round],
+      title: round === 'final' ? 'La Final' : '¿Quién pasa?',
+      rows: list.map(s => ({ a: team(s.high_id), b: team(s.low_id), pick: pickOf(s.id), status: status(s) })).filter(r => r.a && r.b),
+      note: mine ? 'Elegiste ' + picked + ' de ' + list.length + ' · cada serie cierra con el saque de la ida.'
+        : 'Cada serie cierra con el saque de la ida.',
+      cta: mine && done ? 'Ver la Liguilla ›' : round === 'final' ? 'Elegir campeón ›' : 'Elegir quién pasa ›' };
+  }
+
+  function eventView() {
+    const ev = state.ev;
+    if (!ev) return null;
+    try {
+      const v = ev.state ? liguillaView(ev.state, now()) : ev.cand ? qualifiersView(ev.cand, now()) : null;
+      return v ? { name: 'La Liguilla', ...v } : null;
+    } catch (error) {
+      console.warn('Inicio: no se pudo pintar la Liguilla.', error);
+      return null;
+    }
+  }
+  async function loadEvent(c) {
+    const season = seasonGuess();
+    let ev = null;
+    try {
+      const st = await c.rpc('cam_liguilla_state', { p_season: season });
+      if (!st.error && st.data?.liguilla && liguillaView(st.data, now())) ev = { state: st.data };
+      else {
+        const cd = await c.rpc('cam_liguilla_candidates', { p_season: season });
+        if (!cd.error && cd.data?.window && !cd.data.window.opened && qualifiersView(cd.data, now())) ev = { cand: cd.data };
+      }
+    } catch (error) {
+      console.warn('Inicio: no se pudo cargar la Liguilla.', error);
+      return state.ev;
+    }
+    state.ev = ev;
+    state.evLoadedAt = now();
+    return ev;
+  }
+  async function refreshEvent() {
+    const c = client();
+    if (!c || state.evLoading) return;
+    state.evLoading = true;
+    try { await loadEvent(c); } finally { state.evLoading = false; if (on) paintJornada(); }
+  }
+  // En «Tus 8», la liguilla tiene el selector plegado: al llegar desde aquí se abre solo.
+  function openPicker() {
+    let tries = 0;
+    const step = () => {
+      const lg = document.getElementById('camLiguilla');
+      const picker = lg && !lg.hidden ? lg.querySelector('details.cam-lg-qualifiers') : null;
+      if (!picker) { if (++tries < 40) setTimeout(step, 100); return; }
+      if (!picker.open) picker.open = true;
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        try { window.scrollTo({ top: Math.max(0, picker.getBoundingClientRect().top + window.scrollY - 76), behavior: 'auto' }); } catch {}
+      }));
+    };
+    setTimeout(step, 60);
+  }
+  function goEvent(picker) {
+    state.evDirty = true;   // al volver a Inicio se relee (por si guardó sus 8 o su cuadro)
+    if (typeof window.camGoLiguilla === 'function') window.camGoLiguilla();
+    else goQuiniela('football');
+    if (picker === true) openPicker();
+  }
+
+  function evSlot(s) {
+    if (s.kind === 'open') {
+      const b = el('button', null, 'cam-hj-ev-slot is-open', { type: 'button', 'aria-label': 'Elegir un equipo' });
+      b.insertAdjacentHTML('beforeend', PLUS);
+      b.append(el('span', 'Elige', 'cam-hj-ev-slot-label', { 'aria-hidden': 'true' }));
+      b.addEventListener('click', () => goEvent(true));
+      return b;
+    }
+    const box = el('span', null, 'cam-hj-ev-slot is-' + s.kind);
+    box.append(evCrest(s.t));
+    const name = el('span', null, 'cam-hj-ev-slot-name');
+    name.append(el('span', shortName(s.t), 'cam-hj-ev-long'), el('span', abbrOf(s.t), 'cam-hj-ev-abbr', { 'aria-hidden': 'true' }));
+    name.append(el('span', s.kind === 'fixed' ? ', ya dentro' : ', tu elección', 'cam-hj-sr'));
+    box.append(name);
+    if (s.kind === 'fixed') {
+      const tick = el('span', null, 'cam-hj-ev-tick', { 'aria-hidden': 'true' });
+      tick.innerHTML = CHECK;
+      box.append(tick);
+    }
+    return box;
+  }
+  function evRow(r) {
+    const row = el('button', null, 'cam-hj-ev-row' + (r.b ? '' : ' is-single'), { type: 'button' });
+    const side = t => {
+      const mine = r.pick && String(r.pick) === String(t.team_id);
+      const s = el('span', null, 'cam-hj-ev-side' + (mine ? ' is-mine' : ''));
+      s.append(evCrest(t), el('span', shortName(t), 'cam-hj-ev-side-name'));
+      if (mine) s.append(el('span', ', tu elección', 'cam-hj-sr'));
+      return s;
+    };
+    const match = el('span', null, 'cam-hj-ev-match');
+    match.append(side(r.a));
+    if (r.b) match.append(el('span', 'vs', 'cam-hj-ev-vs', { 'aria-hidden': 'true' }), side(r.b));
+    row.append(match);
+    if (r.status) row.append(el('span', r.status, 'cam-hj-ev-status'));
+    row.addEventListener('click', () => goEvent(false));
+    return row;
+  }
+  function eventCard(v) {
+    const card = el('section', null, 'cam-hj-ev', { 'aria-labelledby': 'camHjEvTitle' });
+    const top = el('div', null, 'cam-hj-ev-top');
+    top.append(el('span', v.step, 'cam-hj-ev-step'));
+    if (v.badge) {
+      const badgeEl = el('span', null, 'cam-hj-ev-badge' + (v.badgeDone ? ' is-done' : ''));
+      if (v.badgeDone) badgeEl.innerHTML = CHECK;
+      badgeEl.append(document.createTextNode(v.badge));
+      top.append(badgeEl);
+    }
+    card.append(top, el('h4', v.title, 'cam-hj-ev-title', { id: 'camHjEvTitle' }));
+    if (v.slots && v.slots.length) {
+      const grid = el('div', null, 'cam-hj-ev-grid');
+      v.slots.forEach(s => grid.append(evSlot(s)));
+      card.append(grid);
+    }
+    if (v.rows && v.rows.length) {
+      const list = el('div', null, 'cam-hj-ev-rows');
+      v.rows.forEach(r => list.append(evRow(r)));
+      card.append(list);
+    }
+    if (v.note) card.append(el('p', v.note, 'cam-hj-ev-note'));
+    const cta = el('button', v.cta, 'cam-hj-ev-cta', { type: 'button' });
+    cta.addEventListener('click', () => goEvent(!!v.picker));
+    card.append(cta);
+    if (v.sub) card.append(el('p', v.sub, 'cam-hj-ev-sub'));
+    return card;
+  }
+  // «También en la quiniela»: la próxima cita de cada deporte, en una fila compacta.
+  function otherRow(g, sport) {
+    const b = el('button', null, 'cam-hj-other', { type: 'button', 'data-sport': sport });
+    let first, second, match, aria;
+    if (sport === 'nfl') {
+      first = nflTeam(g.away_id); second = nflTeam(g.home_id);
+      match = first.short + ' @ ' + second.short; aria = first.name + ' en ' + second.name;
+    } else {
+      first = footballTeam(g.home_id); second = footballTeam(g.away_id);
+      match = first.short + ' vs ' + second.short; aria = first.name + ' contra ' + second.name;
+    }
+    const league = sport === 'nfl' ? 'NFL' + (g.week ? ' · Semana ' + g.week : '') : (LEAGUES[g.competition] || 'Fútbol');
+    const crests = el('span', null, 'cam-hj-other-crests', { 'aria-hidden': 'true' });
+    crests.append(crest(first.logo, first.abbr, ''), crest(second.logo, second.abbr, ''));
+    const text = el('span', null, 'cam-hj-other-text');
+    text.append(el('span', match, 'cam-hj-other-match'), el('span', league + ' · ' + dayLabel(g.kickoff), 'cam-hj-other-meta'));
+    const go = el('span', null, 'cam-hj-other-cta', { 'aria-hidden': 'true' });
+    go.append(el('span', 'Jugar ', 'cam-hj-other-cta-word'), document.createTextNode('›'));
+    b.append(crests, text, go);
+    b.setAttribute('aria-label', league + ', ' + aria + ', ' + dayLabel(g.kickoff) + '. Jugar en la quiniela');
+    b.addEventListener('click', () => goQuiniela(sport));
+    return b;
+  }
+  function othersCard(games) {
+    const box = el('div', null, 'cam-hj-others');
+    box.append(el('h4', 'También en la quiniela', 'cam-hj-others-title'));
+    games.forEach(g => box.append(otherRow(g, g.sport)));
+    return box;
+  }
+  // Cabecera de la sección: «Quinielas» o, con evento, «Quinielas · Evento especial / La Liguilla».
+  function jornadaHead(view) {
+    const section = rows.jornada.section;
+    const head = section.querySelector('.cam-hj-head');
+    const heading = head.querySelector('.cam-hj-heading');
+    let titles = head.querySelector('.cam-hj-titles');
+    if (!titles) {
+      titles = el('div', null, 'cam-hj-titles');
+      heading.before(titles);
+      titles.append(el('span', 'Quinielas · Evento especial', 'cam-hj-eyebrow'), heading);
+    }
+    titles.querySelector('.cam-hj-eyebrow').hidden = !view;
+    heading.textContent = view ? view.name : 'Quinielas';
+    const more = head.querySelector('.cam-hj-more');
+    // En teléfonos estrechos el enlace se queda en «Otras ›» para que la cabecera quepa en una línea.
+    if (view) {
+      const label = el('span', null, 'cam-hj-more-label');   // un solo hijo: el flex no se come los espacios
+      label.append('Otras', el('span', ' quinielas', 'cam-hj-more-long'), ' ›');
+      more.replaceChildren(label);
+    }
+    else more.textContent = 'Ver partidos ›';
+    more.setAttribute('aria-label', view ? 'Ver las otras quinielas' : 'Ver partidos');
+    if (view) section.dataset.mode = 'event'; else delete section.dataset.mode;
+    rows.jornada.list.setAttribute('aria-label', view ? view.name : 'Quinielas');
+  }
+
   function paintJornada() {
     const cards = [];
     const nfl = state.nfl.filter(isOpen).map(g => ({ ...g, sport: 'nfl' }));
@@ -297,7 +640,12 @@
     // su quiniela y los contadores de los atajos siguen contando todos los juegos.
     const upcoming = [nfl[0], football[0]].filter(Boolean)
       .sort((a, b) => new Date(a.kickoff) - new Date(b.kickoff));
-    for (const g of upcoming) cards.push(gameCard(g, g.sport));
+    const view = eventView();
+    jornadaHead(view);
+    if (view) {
+      cards.push(eventCard(view));
+      if (upcoming.length) cards.push(othersCard(upcoming));
+    } else for (const g of upcoming) cards.push(gameCard(g, g.sport));
     rows.jornada.section.dataset.nextSport = upcoming[0]?.sport || 'nfl';
     fill(rows.jornada, cards);
     badge(nflShortcut, nfl.length, nfl.length === 1 ? 'partido abierto' : 'partidos abiertos');
@@ -363,7 +711,9 @@
       const [nfl, football, takes] = await Promise.all([
         open('cam_nfl_games', 'id,week,home_id,away_id,kickoff,status,picks_open,odds_locked_at,points_home,points_away'),
         open('cam_football_games', 'id,competition,matchday,home_id,away_id,kickoff,status,picks_open,odds_locked_at,points_home,points_draw,points_away'),
-        c.rpc('ae_public_take_feed', { p_sport: 'all' })
+        c.rpc('ae_public_take_feed', { p_sport: 'all' }),
+        // Evento especial: una o dos llamadas públicas (el estado y, si aún no hay cuadro, «Tus 8»).
+        loadEvent(c)
       ]);
       state.gamesOk = !nfl.error && !football.error;
       if (!nfl.error) state.nfl = (nfl.data || []).filter(isOpen).sort((a, b) => new Date(a.kickoff) - new Date(b.kickoff));
@@ -417,6 +767,8 @@
         mountTakeViews();
         paint();
         void load(false);
+        // Vuelve de la Liguilla: puede haber guardado sus 8 o su cuadro.
+        if (state.evDirty) { state.evDirty = false; void refreshEvent(); }
       } else returnTakeViews();
     }
   }
@@ -439,6 +791,12 @@
     };
   }
   document.addEventListener('ae:takes-updated', () => { state.loadedAt = 0; if (on) void load(true); });
+  // Al entrar o salir de la cuenta cambia lo propio de la Liguilla (tus 8, tu cuadro).
+  try {
+    client()?.auth?.onAuthStateChange?.(() => {
+      if (state.evLoadedAt) setTimeout(() => { if (on) void refreshEvent(); else state.evDirty = true; }, 80);
+    });
+  } catch {}
   // Al volver a la página (otra app, otra pestaña) se refresca si pasaron 5 min.
   document.addEventListener('visibilitychange', () => { if (!document.hidden && on) void load(false); });
   window.addEventListener('pageshow', sync);
