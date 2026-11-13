@@ -670,3 +670,62 @@ html body #camNflWeekActions .cam-nfl-action {
 html body #camNflWeekActions .cam-party-entry-row { margin:12px 0 0; }
 
 html body #camNflWeekActions #camNflSave { display:none!important; }
+
+/* 13 nov 2026 · Duelo deportivo aprobado. Solo «¿Quién gana?» de NFL. */
+@layer cam-banners {
+  html body #camNflSemana [data-block="duelo"] {
+    padding:0!important; border:0!important; border-radius:0!important;
+    background:none!important; box-shadow:none!important;
+  }
+  html body #camNflSemana [data-block="duelo"] .cam-ns-step-pick { margin:0!important; }
+  html body #camNflSemana [data-block="duelo"] .cam-ns-step-title {
+    margin:0!important; font-size:22px!important;
+  }
+  html body #camNflSemana [data-block="duelo"] .cam-ns-sides {
+    grid-template-columns:minmax(0,1fr) 30px minmax(0,1fr)!important;
+    align-items:stretch!important; margin-top:12px!important;
+  }
+  html body #camNflSemana [data-block="duelo"] .cam-ns-at {
+    display:flex!important; flex-direction:column!important; align-items:center!important;
+    justify-content:center!important; gap:7px!important; font-size:17px!important;
+  }
+  html body #camNflSemana [data-block="duelo"] .cam-ns-at::before,
+  html body #camNflSemana [data-block="duelo"] .cam-ns-at::after {
+    content:""!important; display:block!important; width:13px!important; height:1px!important;
+    background:var(--ns-line-strong)!important; border:0!important; border-radius:0!important;
+  }
+  html body #camNflSemana [data-block="duelo"] .cam-ns-side {
+    min-height:120px!important; padding:15px 10px 12px!important; gap:7px!important;
+    border:1px solid var(--ns-line-strong)!important; border-radius:13px!important;
+    background:var(--ns-card)!important; box-shadow:none!important;
+  }
+  html body #camNflSemana [data-block="duelo"] .cam-ns-side[data-side="away"] {
+    border-left:4px solid var(--duel-team-accent)!important;
+  }
+  html body #camNflSemana [data-block="duelo"] .cam-ns-side[data-side="home"] {
+    border-right:4px solid var(--duel-team-accent)!important;
+  }
+  html body #camNflSemana [data-block="duelo"] .cam-ns-side.is-selected {
+    border-color:var(--ns-gold)!important; background:var(--ns-accent-soft)!important;
+    box-shadow:0 0 0 1px var(--ns-gold)!important;
+  }
+  html body #camNflSemana [data-block="duelo"] .cam-ns-side.is-other { opacity:1!important; }
+  html body #camNflSemana [data-block="duelo"] .cam-ns-side .cam-ns-crest {
+    width:56px!important; height:56px!important;
+  }
+  html body #camNflSemana [data-block="duelo"] .cam-ns-side-name {
+    font:800 16px/1.2 Inter,system-ui,sans-serif!important;
+    letter-spacing:.02em!important; text-transform:uppercase!important;
+  }
+  html body #camNflSemana [data-block="duelo"] .cam-ns-side-sub {
+    color:var(--ns-muted)!important; font:500 10px/1.3 Inter,system-ui,sans-serif!important;
+    letter-spacing:.06em!important; text-transform:uppercase!important;
+  }
+  html body #camNflSemana [data-block="duelo"] .cam-ns-side-mark {
+    top:8px!important; right:8px!important; width:18px!important; height:18px!important; padding:3px!important;
+  }
+  html body #camNflSemana [data-block="duelo"] .cam-ns-side:not(.is-selected) .cam-ns-side-mark { display:none!important; }
+  html body #camNflSemana [data-block="duelo"] .cam-ns-side.is-selected .cam-ns-side-mark {
+    border-color:var(--ns-gold)!important; background:transparent!important; color:var(--ns-gold)!important;
+  }
+}

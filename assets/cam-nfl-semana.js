@@ -198,6 +198,9 @@
     let cls = 'cam-ns-side' + (chosen ? ' is-selected' : '') + (other ? ' is-other' : '') + (open ? '' : ' is-static');
     if (finished(g) && g.winner_id) cls += g.winner_id === id ? ' is-winner' : ' is-loser';
     const tile = el(open ? 'button' : 'div', null, cls, { 'data-side': home ? 'home' : 'away', 'data-team': id });
+    // Team accents belong only to the featured duel, not the weekly quiniela.
+    const accents = { ARI:'#97233f', ATL:'#a71930', BAL:'#7562a3', BUF:'#3181ca', CAR:'#0085ca', CHI:'#c95627', CIN:'#fb4f14', CLE:'#d56a24', DAL:'#869cae', DEN:'#fb4f14', DET:'#0076b6', GB:'#b59a45', HOU:'#b52b40', IND:'#497cbd', JAX:'#279b9d', KC:'#e31837', LAC:'#0080c6', LAR:'#4586d3', LV:'#a5acaf', MIA:'#008e97', MIN:'#8e69b8', NE:'#c6364c', NO:'#d3bc8d', NYG:'#4178b8', NYJ:'#35896d', PHI:'#388b84', PIT:'#ffb612', SEA:'#69be28', SF:'#c7464b', TB:'#d50a0a', TEN:'#4b92db', WAS:'#ba8e4b' };
+    tile.style.setProperty('--duel-team-accent', accents[id] || 'var(--ns-gold)');
     const mark = el('span', null, 'cam-ns-side-mark', { 'aria-hidden': 'true' });
     if (chosen) mark.append(icon('check'));
     const label = el('span', null, 'cam-ns-side-label');
@@ -373,7 +376,7 @@
     const pick = el('div', null, 'cam-ns-step cam-ns-step-pick', { role: 'group', 'aria-labelledby': 'camNsPickTitle' });
     pick.append(el('h4', finished(duel) ? '¿Quién ganó?' : '¿Quién gana?', 'cam-ns-step-title', { id: 'camNsPickTitle' }));
     const sides = el('div', null, 'cam-ns-sides');
-    sides.append(sideTile(duel, duel.away_id, snap, open), el('span', '@', 'cam-ns-at', { 'aria-hidden': 'true' }), sideTile(duel, duel.home_id, snap, open));
+    sides.append(sideTile(duel, duel.away_id, snap, open), el('span', 'VS', 'cam-ns-at', { 'aria-hidden': 'true' }), sideTile(duel, duel.home_id, snap, open));
     pick.append(sides);
     const hint = hintLine(snap, duel, open);
     if (hint.textContent) pick.append(hint);
