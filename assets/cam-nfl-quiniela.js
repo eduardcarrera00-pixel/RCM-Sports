@@ -312,7 +312,7 @@
   }
   function paintNav(){
     const nav=$('camNflNav');nav.replaceChildren();
-    nav.append(button('Ver mis jornadas ›',()=>window.camOpenQuinielaHistory?.('nfl'),'cam-nfl-action cam-nfl-action-secondary'));
+    nav.append(button('Ver mis jornadas',()=>window.camOpenQuinielaHistory?.('nfl'),'cam-nfl-action cam-nfl-action-secondary'));
   }
   function logo(id){
     const team=window.CamNFLQuinielaTeams?.getTeam(id)||teams.get(id);
@@ -466,11 +466,11 @@
     const save=$('camNflSave'),saveDay=$('camNflSaveDay');
     if(save){
       save.disabled=saving||(user?!chosen.some(g=>draft.has(g.id)&&isOpen(g)):false);
-      save.textContent=user?'Guardar toda la jornada':'Inicia sesión para participar';
+      save.textContent=user?'Guardar toda la jornada':'Iniciar sesión';
     }
     if(saveDay){
       saveDay.disabled=saving||(user?!visible.some(g=>draft.has(g.id)&&isOpen(g)):false);
-      saveDay.textContent=user?'Guardar picks del día':'Inicia sesión para participar';
+      saveDay.textContent=user?'Guardar picks del día':'Iniciar sesión';
     }
   }
   async function persist(mode='week'){

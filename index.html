@@ -3266,14 +3266,6 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
             <p id="camNflStatus" class="cam-nfl-status" role="status" aria-live="polite"></p>
             <div id="camNflDayNav" class="cam-nfl-day-nav" aria-label="Seleccionar día de partido"></div>
             <div id="camNflGames" class="cam-nfl-games" role="region" tabindex="0" aria-label="Partidos de la jornada: desliza para ver el resto"></div>
-            <div class="cam-nfl-save-row">
-              <button id="camNflSaveDay" type="button" class="cam-nfl-action">Guardar picks del día</button>
-              <button id="camNflSave" type="button" hidden style="display:none!important" class="cam-nfl-action cam-nfl-action-secondary">Guardar toda la jornada</button>
-            </div>
-            <!-- 12 nov 2026: «Ver mis jornadas» va debajo de «Inicia sesión para participar» / «Guardar picks del día». -->
-            <div id="camNflNav" class="cam-nfl-nav cam-nfl-nav-after" aria-label="Mi quiniela"></div>
-
-
             <section id="camNflAdmin" class="cam-nfl-admin" aria-label="Controles de administradores" hidden></section>
             </div>
           </section>
@@ -3367,6 +3359,15 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
             </details>
             </div>
             <div id="camNflScoreBody" class="cam-sport-score-body" aria-live="polite"></div>
+            <div id="camNflWeekActions" class="cam-quiniela-ranking cam-nfl-week-actions">
+              <div class="cam-nfl-week-action-buttons">
+            <div class="cam-nfl-save-row">
+              <button id="camNflSaveDay" type="button" class="cam-nfl-action">Guardar picks del día</button>
+              <button id="camNflSave" type="button" hidden style="display:none!important" class="cam-nfl-action cam-nfl-action-secondary">Guardar toda la jornada</button>
+            </div>
+            <div id="camNflNav" class="cam-nfl-nav cam-nfl-nav-after" aria-label="Mi quiniela"></div>
+              </div>
+            </div>
           </div>
           <div id="camFootballScore" class="cam-sport-score">
             <div class="cam-quiniela-ranking">
@@ -6635,10 +6636,10 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 </style>
 
 <!-- Componentes finales: móvil, conversación, parties, perfil y Takes; orden en performance-css-packs.json. -->
-<link rel="stylesheet" href="assets/cam-perf-app-panels.css?v=20261113-marcador-menu-1">
+<link rel="stylesheet" href="assets/cam-perf-app-panels.css?v=20261113-week-actions-1">
 <link rel="stylesheet" href="assets/cam-home-takes-unified.css?v=20261112-symmetric-tabs-2">
-<script src="assets/cam-parties.js?v=20261111-escudo-rango-1"></script>
-<script src="assets/cam-sport-quiniela-loader.js?v=20261112-clasifican-dropdown-1"></script>
+<script src="assets/cam-parties.js?v=20261113-week-actions-1"></script>
+<script src="assets/cam-sport-quiniela-loader.js?v=20261113-week-actions-1"></script>
 <script src="assets/ae-season-predictions.js?v=20261021-champion-guide-1"></script>
 <script src="assets/cam-actualidad-simetria.js?v=20261113-simetria-1"></script>
 <script src="assets/cam-lazy-editorial-loader.js?v=20261113-simetria-1"></script>

@@ -1088,7 +1088,7 @@ function mountEntries() {
   const twin = $('aeNflTwinRankings');
   if (twin && !$('camPartyEntryTakes')) twin.prepend(entry('camPartyEntryTakes', 'Mis grupos de Takes', () => openHub('takes', sportNow())));
   // Quinielas: también se juegan en grupo.
-  for (const [root, id, sport] of [['camNflQuiniela', 'camPartyEntryQuinielaNfl', 'nfl'], ['camFootballQuiniela', 'camPartyEntryQuinielaFootball', 'football']]) {
+  for (const [root, id, sport] of [['camNflWeekActions', 'camPartyEntryQuinielaNfl', 'nfl'], ['camFootballQuiniela', 'camPartyEntryQuinielaFootball', 'football']]) {
     const section = $(root);
     if (!section || $(id)) continue;
     const row = entry(id, 'Mis grupos de Quiniela', () => openHub('quiniela', sport));

@@ -654,3 +654,19 @@
     html body :is(#camNflScore,#camFootballScore) .cam-st-menu :is(.cam-st-chevron,.cam-st-icon) { transition:none!important; }
   }
 }
+
+/* NFL: accesos al final de La semana, debajo del marcador. */
+html body #camNflWeekActions { margin-top:16px; }
+html body #camNflWeekActions .cam-nfl-week-action-buttons {
+  display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:10px; align-items:stretch;
+}
+html body #camNflWeekActions :is(.cam-nfl-save-row,.cam-nfl-nav) {
+  display:flex; margin:0; width:100%; min-width:0;
+}
+html body #camNflWeekActions .cam-nfl-action {
+  width:100%; min-width:0; min-height:44px; margin:0; padding:10px 6px;
+  font-size:clamp(12px,3.5vw,15px); line-height:1.25; white-space:nowrap;
+}
+html body #camNflWeekActions .cam-party-entry-row { margin:12px 0 0; }
+
+html body #camNflWeekActions #camNflSave { display:none!important; }

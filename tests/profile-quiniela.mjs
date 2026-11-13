@@ -83,7 +83,7 @@ for(const sport of ['nfl','football']){
   const prefix=sport==='nfl'?'camNfl':'camFootball';
   assert.equal(doc.querySelectorAll('#'+prefix+'Nav select').length,0,'no round selector in '+sport);
   assert.equal(doc.querySelectorAll('#'+prefix+'Games .cam-nfl-game').length,1,'only the current round in '+sport);
-  [...doc.querySelectorAll('#'+prefix+'Nav button, #'+prefix+'History button')].find(n=>n.textContent==='Ver mis jornadas ›').click();
+  [...doc.querySelectorAll('#'+prefix+'Nav button, #'+prefix+'History button')].find(n=>n.textContent===(sport==='nfl'?'Ver mis jornadas':'Ver mis jornadas ›')).click();
   assert.equal(historySport,sport);
   if(sport==='football')assert.equal(doc.querySelectorAll('#camFootballNav .cam-football-league').length,4,'all competition logos remain');
   win.happyDOM.abort();

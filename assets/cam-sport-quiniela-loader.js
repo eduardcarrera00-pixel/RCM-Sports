@@ -6,7 +6,7 @@
   const base=new URL('.',document.currentScript?.src||new URL('assets/',location.href));
   const config={
     nfl:{className:'ae-is-nfl',root:'camNflQuiniela',status:'camNflStatus',
-      src:'cam-nfl-quiniela.js?v=20261112-circulo-1'},
+      src:'cam-nfl-quiniela.js?v=20261113-week-actions-1'},
     football:{className:'ae-is-football',root:'camFootballQuiniela',status:'camFootballStatus',
       src:'cam-football-quiniela.js?v=20261112-circulo-1',
       // La liguilla de la Liga MX vive dentro de la quiniela de fútbol y se carga después.
