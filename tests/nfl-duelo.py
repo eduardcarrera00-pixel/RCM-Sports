@@ -10,8 +10,9 @@ Cubre, en 390 y 320 px, de día y de noche:
   · al tocar un equipo se guarda (cam_nfl_save_pick), queda marcado «Tu pick»
     y aparece «Tu jornada»: 1 de N, los días (el lunes «Pronto») y el botón al
     siguiente partido abierto, que abre ese partido en La Quiniela;
-  · «Tu Take» es otro bloque (campo para escribir) y, tras elegir, sus ideas
-    abren el compositor con el título ya escrito;
+  · «Tu Take» ya no va en La semana: abre la pestaña Takes (#camNflTakePrompt),
+    con el ejemplo del duelo; tras elegir, sus ideas abren el compositor con el
+    título ya escrito; «Demuestra tu conocimiento» cierra Takes (12 nov 2026);
   · con todo lo abierto elegido: «vuelve el lunes antes de las …»;
   · sin desbordamientos ni textos recortados, y sin errores.
 Escritorio (1366 px): el duelo con los mismos bloques.
@@ -60,6 +61,8 @@ try { sessionStorage.setItem('cam_sports_home_welcome_seen_session_v1', '1'); } 
 STATE = """() => {
   const q = s => document.querySelector('#camNflSemana ' + s);
   const text = s => [...document.querySelectorAll('#camNflSemana ' + s)].map(e => e.textContent.replace(/\\s+/g, ' ').trim());
+  const p = s => document.querySelector('#camNflTakePrompt ' + s);
+  const ptext = s => [...document.querySelectorAll('#camNflTakePrompt ' + s)].map(e => e.textContent.replace(/\\s+/g, ' ').trim());
   const duel = q('[data-block=duelo]');
   return {
     tab: document.body.dataset.camTab || null,
@@ -71,8 +74,10 @@ STATE = """() => {
     hint: text('.cam-ns-hint')[0] || '',
     next: !!q('.cam-ns-next'), count: text('.cam-ns-next-count')[0] || '', days: text('.cam-ns-day'),
     nextText: text('.cam-ns-next-text')[0] || '', cta: text('.cam-ns-next-cta')[0] || '',
-    take: !!q('.cam-ns-take'), takeTitle: text('.cam-ns-take .cam-ns-step-title')[0] || '', ideas: text('.cam-ns-idea'),
-    field: !!q('.cam-ns-take-field'), scale: text('.cam-ns-take-scale')[0] || '',
+    takeInSemana: !!q('.cam-ns-take'),
+    take: !!p('.cam-ns-take'), takeTitle: ptext('.cam-ns-take .cam-ns-step-title')[0] || '', ideas: ptext('.cam-ns-idea'),
+    field: !!p('.cam-ns-take-field'), scale: ptext('.cam-ns-take-scale')[0] || '',
+    example: ptext('.cam-ns-take-placeholder')[0] || '',
     overflow: document.documentElement.scrollWidth - innerWidth,
     calls: window.__fake.calls.filter(c => c.rpc).map(c => c.rpc)
   };
@@ -80,15 +85,25 @@ STATE = """() => {
 
 CLIPPED = """() => {
   const out = [];
-  for (const node of document.querySelectorAll('#camNflSemana :is(.cam-ns-kicker,.cam-ns-step-label,.cam-ns-step-title,.cam-ns-side-name,.cam-ns-side-sub,.cam-ns-hint,.cam-ns-next-title,.cam-ns-next-count,.cam-ns-day,.cam-ns-next-text,.cam-ns-next-cta,.cam-ns-take-text,.cam-ns-idea,.cam-ns-take-scale)')) {
+  for (const node of document.querySelectorAll(':is(#camNflSemana,#camNflTakePrompt) :is(.cam-ns-kicker,.cam-ns-step-label,.cam-ns-step-title,.cam-ns-side-name,.cam-ns-side-sub,.cam-ns-hint,.cam-ns-next-title,.cam-ns-next-count,.cam-ns-day,.cam-ns-next-text,.cam-ns-next-cta,.cam-ns-take-text,.cam-ns-idea,.cam-ns-take-scale)')) {
     if (!node.getClientRects().length) continue;
     if (node.scrollWidth > node.clientWidth + 1 || node.scrollHeight > node.clientHeight + 2) out.push(node.className + ': ' + node.textContent.trim().slice(0, 40));
   }
-  for (const node of document.querySelectorAll('#camNflSemana :is(.cam-ns-side,.cam-ns-day,.cam-ns-next-cta,.cam-ns-idea,.cam-ns-take-field)')) {
+  for (const node of document.querySelectorAll(':is(#camNflSemana,#camNflTakePrompt) :is(.cam-ns-side,.cam-ns-day,.cam-ns-next-cta,.cam-ns-idea,.cam-ns-take-field)')) {
+    if (!node.getClientRects().length) continue;
     const r = node.getBoundingClientRect();
     if (r.height < 43.5) out.push('objetivo pequeño ' + node.className + ' ' + Math.round(r.height));
   }
   return out;
+}"""
+
+
+TAKES_ORDER = """() => {
+  const top = el => el && el.getClientRects().length ? Math.round(el.getBoundingClientRect().top + scrollY) : null;
+  const first = [...document.getElementById('freeTakes').children].find(e => e.getClientRects().length && e.getBoundingClientRect().height > 4);
+  return {prompt: top(document.getElementById('camNflTakePrompt')), latest: top(document.getElementById('aeTakesFeedHeading')),
+    ranking: top(document.getElementById('aeSportTakeRanking')), cta: top(document.querySelector('#freeTakes > .ae-takes-head')),
+    first: first ? (first.id || first.className) : null};
 }"""
 
 
@@ -113,7 +128,9 @@ def phone(width, dark):
         assert [s['sub'] for s in st['sides']] == ['Visitante', 'Local'], f'{where}: {st["sides"]}'
         assert 'pts' not in st['duelText'] and 'puntos' not in st['duelText'], f'{where}: el duelo muestra puntos: {st["duelText"]}'
         assert st['hint'] == '', f'{where}: pista antes de elegir {st["hint"]}'
-        assert not st['next'] and st['take'] and st['field'] and st['takeTitle'] == '¿Qué crees que va a pasar?' and st['ideas'] == [], f'{where}: take {st}'
+        assert not st['next'] and not st['takeInSemana'] and st['take'] and st['field'] and st['takeTitle'] == '¿Qué crees que va a pasar?' and st['ideas'] == [], f'{where}: take {st}'
+        assert st['example'] == '«Los Lions ganan por más de 10…»', f'{where}: ejemplo {st["example"]}'
+        assert page.evaluate("document.getElementById('camNflTakePrompt').getClientRects().length") == 0, f'{where}: «Tu Take» se ve en La semana'
         assert st['scale'] == 'Cuanto más atrevido, más vale si aciertas', f'{where}: escala {st["scale"]}'
         assert page.evaluate(CLIPPED) == [] and st['overflow'] <= 0, f'{where}: recortes {page.evaluate(CLIPPED)} {st["overflow"]}'
         shot(page, f'{where}-1-antes')
@@ -129,7 +146,7 @@ def phone(width, dark):
         assert len(st['days']) == 3 and st['days'][0].endswith('0/1') and st['days'][1].endswith('1/3') and st['days'][2].endswith('Pronto'), f'{where}: días {st["days"]}'
         assert st['nextText'].startswith('Te quedan 3 partidos por elegir. El siguiente empieza hoy a las'), f'{where}: mensaje {st["nextText"]}'
         assert st['cta'] == 'Elegir el de hoy →', f'{where}: botón {st["cta"]}'
-        assert st['takeTitle'] == '¿Y cómo ganan los Lions?' and st['ideas'] == ['Los Lions ganan por 10 o más', 'Los Lions remontan en el último cuarto'], f'{where}: take {st}'
+        assert st['takeTitle'] == '¿Qué crees que va a pasar?' and st['ideas'] == ['Los Lions ganan por 10 o más', 'Los Lions remontan en el último cuarto'], f'{where}: take {st}'
         assert page.evaluate(CLIPPED) == [] and st['overflow'] <= 0, f'{where}: recortes tras elegir {page.evaluate(CLIPPED)}'
         shot(page, f'{where}-2-elegido')
 
@@ -140,9 +157,18 @@ def phone(width, dark):
           top: Math.round(document.activeElement?.getBoundingClientRect?.().top ?? -1)})""")
         assert focus['id'] == 'w10-thu' and focus['day'] and 0 <= focus['top'] < 860, f'{where}: no abre el partido de hoy {focus}'
 
+        # Takes: «Tu Take» arriba, «Demuestra tu conocimiento» al final; sin recortes.
+        page.click('#camSectionTabs button[data-tab="takes"]'); page.wait_for_timeout(700)
+        tops = page.evaluate(TAKES_ORDER)
+        assert all(tops[k] is not None for k in ('prompt', 'latest', 'ranking', 'cta')), f'{where}: Takes {tops}'
+        assert tops['prompt'] < tops['latest'] < tops['ranking'] < tops['cta'], f'{where}: orden de Takes {tops}'
+        assert tops['first'] == 'camNflTakePrompt', f'{where}: Takes empieza con {tops["first"]}'
+        assert page.evaluate(CLIPPED) == [], f'{where}: recortes en Takes {page.evaluate(CLIPPED)}'
+        if SHOTS: page.locator('#camNflTakePrompt').screenshot(path=str(SHOTS / f'{where}-3-takes.png'))
+
         # Una idea abre el compositor con el título escrito.
-        page.locator('#camNflSemana .cam-ns-idea').first.scroll_into_view_if_needed()
-        page.locator('#camNflSemana .cam-ns-idea').first.click(); page.wait_for_timeout(500)
+        page.locator('#camNflTakePrompt .cam-ns-idea').first.scroll_into_view_if_needed()
+        page.locator('#camNflTakePrompt .cam-ns-idea').first.click(); page.wait_for_timeout(500)
         comp = page.evaluate("""() => { const d = document.getElementById('aeTakeComposerDialog'), f = document.getElementById('freeTakesForm');
           return {open: !!d?.open, title: f?.elements.title.value, competition: f?.elements.competition.value,
             sport: f?.querySelector('input[name=sport]:checked')?.value || null, focus: document.activeElement?.name || null}; }""")
@@ -195,6 +221,9 @@ def desktop(dark):
         page.locator('#camNflSemana .cam-ns-side[data-team="DET"]').click(); page.wait_for_timeout(800)
         st = page.evaluate(STATE)
         assert st['next'] and st['cta'] == 'Elegir el de hoy →' and st['overflow'] <= 0, f'{where}: {st}'
+        assert not st['takeInSemana'] and st['take'] and st['ideas'], f'{where}: take {st}'
+        tops = page.evaluate(TAKES_ORDER)
+        assert None not in (tops['prompt'], tops['latest'], tops['ranking'], tops['cta']) and tops['prompt'] < tops['latest'] < tops['ranking'] < tops['cta'], f'{where}: orden de Takes {tops}'
         if SHOTS:
             page.locator('#camNflSemana [data-block=duelo]').scroll_into_view_if_needed(); page.wait_for_timeout(200)
             page.screenshot(path=str(SHOTS / f'{where}.png'))

@@ -68,15 +68,15 @@
      }
      return;
    }
-   // NFL: las opiniones destacadas van justo debajo de "Demuestra tu conocimiento"
-   // y antes de los Takes publicados, tanto en escritorio como en teléfono.
-   // Mover el nodo existente conserva votos, comentarios y escuchas.
+   // NFL: las opiniones destacadas van justo antes de los Takes publicados
+   // («Últimos Takes»). Desde el 12 nov 2026 «Demuestra tu conocimiento» cierra
+   // la sección y «Tu Take» la abre. Mover el nodo existente conserva votos,
+   // comentarios y escuchas.
    if(section==='NFL'){
-     const feed=$('freeTakes'),header=feed?.querySelector(':scope > .ae-takes-head');
-     const anchor=header;
-     if(feed&&anchor&&
-        (root.parentElement!==feed||root.previousElementSibling!==anchor)){
-       anchor.after(root);
+     const feed=$('freeTakes'),anchor=$('aeTakesFeedHeading');
+     if(feed&&anchor?.parentElement===feed&&
+        (root.parentElement!==feed||root.nextElementSibling!==anchor)){
+       feed.insertBefore(root,anchor);
      }
      root.style.removeProperty('--ae-nfl-opinions-height');
      return;

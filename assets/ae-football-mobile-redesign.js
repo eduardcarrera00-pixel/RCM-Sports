@@ -27,14 +27,14 @@
       else root.parentNode?.insertBefore(nflTakeAnchor,root);
     }
     const takeFeed = byId('freeTakes');
-    const header = takeFeed?.querySelector(':scope > .ae-takes-head');
+    const latest = byId('aeTakesFeedHeading');
     const nflSection = document.body.classList.contains('ae-is-nfl');
-    // Teléfono NFL: justo después de "Demuestra tu conocimiento" van
-    // las dos opiniones; siguen los Takes recientes y después Savant/Rookie.
+    // Teléfono NFL: «Tu Take», las dos opiniones, los Takes recientes,
+    // Savant/Rookie y, al final, «Demuestra tu conocimiento» (12 nov 2026).
     // Reordenar el nodo real conserva votos, eventos y datos publicados.
-    if(onNfl && nflSection && takeFeed && header?.parentElement === takeFeed){
-      if(root.parentElement !== takeFeed || root.previousElementSibling !== header){
-        takeFeed.insertBefore(root,header.nextSibling);
+    if(onNfl && nflSection && takeFeed && latest?.parentElement === takeFeed){
+      if(root.parentElement !== takeFeed || root.nextElementSibling !== latest){
+        takeFeed.insertBefore(root,latest);
       }
     } else if(mobile.matches && nflTakeAnchor.parentNode &&
               (root.parentElement !== nflTakeAnchor.parentElement || nflTakeAnchor.nextSibling !== root)){

@@ -17,13 +17,17 @@
    Escritorio (8 nov 2026): la misma pestaña, compuesta en columnas por
    cam-escritorio.css.
    Duelo (12 nov 2026): «Tu pick» (los equipos son los botones, sin puntos),
-   «Tu jornada» al elegir y «Tu Take» como campo para escribir. */
+   «Tu jornada» al elegir y «Tu Take» como campo para escribir.
+   12 nov 2026 (noche): «Tu Take» ya no va en el duelo: abre la pestaña Takes
+   (#camNflTakePrompt, primer hijo de #freeTakes); el ejemplo sigue usando el
+   duelo de la semana. «Demuestra tu conocimiento» cierra Takes. */
 (() => {
   'use strict';
 
   const root = document.getElementById('camNflSemana');
   const body = document.getElementById('camNflSemanaBody');
   const scoreRoot = document.getElementById('camNflScoreBody');
+  const promptRoot = document.getElementById('camNflTakePrompt');
   if (!root || !body || !window.matchMedia) return;
 
   const mobile = window.matchMedia('(max-width: 760px), (orientation: landscape) and (max-height: 500px) and (hover: none) and (pointer: coarse)');
@@ -322,13 +326,16 @@
     return box;
   }
 
-  function takeBlock(snap, duel) {
-    const mine = snap.mine.get(duel.id) || null;
+  /* «Tu Take» abre la pestaña Takes. El ejemplo sale del duelo de la semana (o del
+     n.º 1 del Power Ranking mientras cargan los partidos). Lejos del duelo, el título
+     es siempre «¿Qué crees que va a pasar?»; si ya elegiste equipo, salen las ideas. */
+  function takeBlock(snap, duel, fallbackId) {
+    const mine = (duel && snap?.mine?.get(duel.id)) || null;
     const invited = !!mine && !started(duel);
     const pickedNick = mine ? nick(mine) : null;
     const box = el('div', null, 'cam-ns-take' + (invited ? ' is-invited' : ''), { role: 'group', 'aria-labelledby': 'camNsTakeTitle' });
     box.append(stepLabel('take', 'Tu Take'),
-      el('h4', invited ? '¿Y cómo ganan los ' + pickedNick + '?' : '¿Qué crees que va a pasar?', 'cam-ns-step-title', { id: 'camNsTakeTitle' }),
+      el('h2', '¿Qué crees que va a pasar?', 'cam-ns-step-title', { id: 'camNsTakeTitle' }),
       el('p', 'Una predicción con tus palabras. Lo que se publica aquí no se borra.', 'cam-ns-take-text'));
     if (invited) {
       const ideas = el('div', null, 'cam-ns-ideas');
@@ -338,11 +345,12 @@
       ideas.append(el('p', 'Ideas para empezar', 'cam-ns-ideas-label'), list);
       box.append(ideas);
     }
-    const example = pickedNick || nick(duel.home_id);
+    const exampleId = pickedNick ? null : (duel?.home_id || fallbackId || null);
+    const example = pickedNick || (exampleId ? nick(exampleId) : null);
     const field = action(null, () => openTake(), 'cam-ns-take-field', { 'aria-label': 'Escribir mi Take', 'aria-haspopup': 'dialog', 'aria-controls': 'aeTakeComposerDialog' });
     const pen = el('span', null, 'cam-ns-take-pen', { 'aria-hidden': 'true' });
     pen.append(icon('pen'));
-    field.append(el('span', '«Los ' + example + ' ganan por más de 10…»', 'cam-ns-take-placeholder', { 'aria-hidden': 'true' }), pen);
+    field.append(el('span', example ? '«Los ' + example + ' ganan por más de 10…»' : '«Este domingo pasa algo que nadie espera…»', 'cam-ns-take-placeholder', { 'aria-hidden': 'true' }), pen);
     const scale = el('p', null, 'cam-ns-take-scale');
     const bars = el('span', null, 'cam-ns-bars', { 'aria-hidden': 'true' });
     bars.append(el('span'), el('span'), el('span'));
@@ -376,7 +384,7 @@
       const journey = journeyBlock(snap, weekGames, duel);
       if (journey) pick.append(journey);
     }
-    box.append(pick, takeBlock(snap, duel));
+    box.append(pick);
     return box;
   }
 
@@ -463,6 +471,16 @@
   }
 
   /* ---------- pintar ---------- */
+  // Repintar «Tu Take» sin perder el foco de quien lo está usando con el teclado.
+  function paintPrompt(snap, duel, fallbackId) {
+    if (!promptRoot) return;
+    const focused = promptRoot.contains(document.activeElement) ? (document.activeElement.textContent || document.activeElement.className) : null;
+    promptRoot.replaceChildren(takeBlock(snap, duel, fallbackId));
+    if (focused == null) return;
+    const again = [...promptRoot.querySelectorAll('button')].find(b => (b.textContent || b.className) === focused) || promptRoot.querySelector('.cam-ns-take-field');
+    again?.focus({ preventScroll: true });
+  }
+
   function render() {
     if (!active()) return;
     const q = quiniela();
@@ -471,6 +489,7 @@
     const fragment = document.createDocumentFragment();
     const rankIds = Array.isArray(published()?.team_ids) ? published().team_ids : [];
     if (!snap || !snap.loaded) {
+      paintPrompt(null, null, rankIds[0]);
       fragment.append(el('p', 'Cargando la semana…', 'cam-ns-loading'));
       body.replaceChildren(fragment);
       scoreRoot?.replaceChildren();
@@ -487,6 +506,7 @@
     root.dataset.phase = mode;
     fragment.append(header(snap, week, weekGames));
     const duel = chooseDuel(weekGames, rankIds);
+    paintPrompt(snap, duel, rankIds[0]);
     const score = scoreBlock(snap, games, season, week, rankIds, mode);
     const scoreWeek = score ? Number(score.dataset.week) : null;
     if (scoreWeek != null && snap.expert) void loadDuel(season, scoreWeek, snap.user);
