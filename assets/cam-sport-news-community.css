@@ -228,3 +228,15 @@
   html body #camSportNewsCommunity .cam-snc-carousel-arrow:disabled { opacity:.35!important; cursor:default!important; }
   html body #camSportNewsCommunity .cam-snc-track:focus-visible { outline:2px solid var(--cam-calm-action); outline-offset:2px; }
 }
+
+/* Carruseles de comentarios: deslizar con el dedo, sin navegación adicional en móvil. */
+@layer cam-display-clarity {
+  @media (max-width:760px) {
+    html body #camSportNewsCommunity .cam-snc-carousel-nav { display:none!important; }
+    html body #camSportNewsCommunity .cam-snc-track {
+      -webkit-overflow-scrolling:touch;
+      scrollbar-width:none!important;
+    }
+    html body #camSportNewsCommunity .cam-snc-track::-webkit-scrollbar { display:none!important; }
+  }
+}
