@@ -62,7 +62,7 @@ async function scenario({anonymous=false,failed=false}={}){
   await settle();
   assert.equal(w.camSectionTabs.current().tab,'semana','legacy quiniela URL opens La semana');
   assert.match(w.location.search,/v=semana/);
-  assert.deepEqual([...d.querySelectorAll('#camSectionTabs button')].map(n=>n.textContent),['La semana','Takes','Noticias']);
+  assert.deepEqual([...d.querySelectorAll('#camSectionTabs button')].map(n=>n.textContent),['Noticias','La semana','Takes']);
   if(failed){
     assert.match(one('#camFootballSemanaBody').textContent,/No se pudo cargar la semana/);
     assert.equal(one('.cam-ns-feature'),null,'a failed calendar never becomes fabricated matches');
@@ -77,8 +77,8 @@ async function scenario({anonymous=false,failed=false}={}){
   assert.deepEqual([...d.querySelectorAll('#camFootballSemana .cam-ns-side .cam-ns-side-name')].map(n=>n.textContent),['madrid','barca']);
   assert.ok(one('#camFootballSemana .cam-ns-draw'));
   assert.doesNotMatch(one('#camFootballSemana [data-block=duelo]').textContent,/\bpts?\b/);
-  assert.equal(d.querySelectorAll('#camFootballSemana [data-competition]').length,4);
-  for(const area of ['#camFootballSemana','#camFootballNav'])assert.deepEqual([...d.querySelectorAll(area+' [data-competition]')].map(n=>n.dataset.competition),['ligamx','champions','laliga','premier']);
+  assert.equal(d.querySelectorAll('#camFootballWeekLeagues [data-competition]').length,4);
+  for(const area of ['#camFootballWeekLeagues','#camFootballNav'])assert.deepEqual([...d.querySelectorAll(area+' [data-competition]')].map(n=>n.dataset.competition),['ligamx','champions','laliga','premier']);
   const choose=w.camFootballSemana._choose;
   const teams=new Map([['1',{name:'Club América'}],['2',{name:'Guadalajara'}],['3',{name:'Paris Saint-Germain'}],['4',{name:'FC Barcelona'}],['5',{name:'Manchester United'}],['6',{name:'Liverpool'}]]);
   const fixture=(id,home,away,status='scheduled')=>({id,home_id:home,away_id:away,status,kickoff:iso(status==='final'?-24:24),points_home:4,points_away:4});
@@ -135,7 +135,7 @@ async function scenario({anonymous=false,failed=false}={}){
   assert.equal(one('#camFootballMatchPanel').hidden,false,'matches remain available');
   assert.equal(api.snapshot().mine.get('first'),anonymous?undefined:'home');
   const beforeReads=reads;
-  one('#camFootballSemana [data-competition=premier]').click();await settle();
+  one('#camFootballWeekLeagues [data-competition=premier]').click();await settle();
   assert.equal(api.snapshot().competition,'premier');
   assert.ok(one('#camFootballQuiniela').classList.contains('cam-football-sin-banner'),'Premier hides the quiniela banner');
   assert.match(one('#camFootballSemana .cam-ns-duelo').textContent,/arsenal/);

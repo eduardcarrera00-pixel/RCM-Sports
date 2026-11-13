@@ -3390,6 +3390,7 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
             <div id="camFootballWeekActions" class="cam-quiniela-ranking cam-nfl-week-actions cam-football-week-actions">
               <div id="camFootballHistory" class="cam-nfl-nav cam-nfl-nav-after" aria-label="Mi quiniela"></div>
             </div>
+            <div id="camFootballWeekLeagues"></div>
           </div>
           <details id="aeTakeReview" class="ae-take-review" hidden><summary>Administrar · Puntuar Takes</summary><p>Primero calcula la dificultad de cada Take (tabla de la liga, nivel de sorpresa o cuota) y después marca si se cumplió. Los puntos (1–20) salen solos: lo obvio vale poco y la sorpresa vale mucho. Si recalculas un Take ya puntuado, su puntuación se actualiza.</p><p id="aeTakeReviewStatus" role="status" aria-live="polite"></p><div id="aeTakeReviewList"></div></details>
           <section id="aeSportTakeHistoric" class="ae-home-take-feature" hidden aria-labelledby="aeSportTakeHistoricTitle" data-cam-optional>
@@ -6456,35 +6457,35 @@ button.cam-quiniela-team:focus-visible{outline:var(--ds-focus-width,3px) solid v
 #camFootballQuiniela #camFootballNav select:focus-visible{
   outline:2px solid var(--q-focus);outline-offset:3px;
 }
-:is(#camFootballQuiniela,#camFootballSemana) .cam-football-leagues{
+:is(#camFootballQuiniela,#camFootballSemana,#camFootballWeekLeagues) .cam-football-leagues{
   display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;min-width:0;
 }
-:is(#camFootballQuiniela,#camFootballSemana) .cam-football-league{
+:is(#camFootballQuiniela,#camFootballSemana,#camFootballWeekLeagues) .cam-football-league{
   display:grid;justify-items:center;align-content:center;min-width:0;min-height:84px;
   margin:0;padding:10px 4px 8px;border:1px solid var(--q-band-line);
   background:var(--q-band-control);color:var(--q-on-band-muted);cursor:pointer;
   font:600 11px/1.25 var(--ds-font-sans,Inter,system-ui,sans-serif);text-align:center;
   transition:border-color .18s,background-color .18s,color .18s,box-shadow .18s;
 }
-:is(#camFootballQuiniela,#camFootballSemana) .cam-football-league:hover{color:var(--q-on-band);border-color:var(--q-gold)}
-:is(#camFootballQuiniela,#camFootballSemana) .cam-football-league.is-active{
+:is(#camFootballQuiniela,#camFootballSemana,#camFootballWeekLeagues) .cam-football-league:hover{color:var(--q-on-band);border-color:var(--q-gold)}
+:is(#camFootballQuiniela,#camFootballSemana,#camFootballWeekLeagues) .cam-football-league.is-active{
   color:var(--q-on-band);border-color:var(--q-gold);
   background:color-mix(in srgb,var(--q-gold) 16%,var(--q-band-control));
   box-shadow:inset 0 0 0 1px var(--q-gold);
 }
-:is(#camFootballQuiniela,#camFootballSemana) .cam-football-league:focus-visible{outline:2px solid var(--q-focus);outline-offset:3px}
-:is(#camFootballQuiniela,#camFootballSemana) .cam-football-league-logo{
+:is(#camFootballQuiniela,#camFootballSemana,#camFootballWeekLeagues) .cam-football-league:focus-visible{outline:2px solid var(--q-focus);outline-offset:3px}
+:is(#camFootballQuiniela,#camFootballSemana,#camFootballWeekLeagues) .cam-football-league-logo{
   position:relative;display:grid;place-items:center;width:58px;height:58px;
 }
-:is(#camFootballQuiniela,#camFootballSemana) .cam-football-league-logo > span{
+:is(#camFootballQuiniela,#camFootballSemana,#camFootballWeekLeagues) .cam-football-league-logo > span{
   display:block;width:100%;height:100%;
   background-image:url("assets/cam-football-leagues-20261028.png");
   background-repeat:no-repeat;background-size:400% 200%;
 }
-html:not(.dark) :is(#camFootballQuiniela,#camFootballSemana) .cam-football-league-logo--night,
-html.dark :is(#camFootballQuiniela,#camFootballSemana) .cam-football-league-logo--day{display:none}
+html:not(.dark) :is(#camFootballQuiniela,#camFootballSemana,#camFootballWeekLeagues) .cam-football-league-logo--night,
+html.dark :is(#camFootballQuiniela,#camFootballSemana,#camFootballWeekLeagues) .cam-football-league-logo--day{display:none}
 @media(max-width:480px){
-  :is(#camFootballQuiniela,#camFootballSemana) .cam-football-league{padding-inline:2px}
+  :is(#camFootballQuiniela,#camFootballSemana,#camFootballWeekLeagues) .cam-football-league{padding-inline:2px}
 }
 /* La esquina global de 14 px curvaba la línea de arriba y la píldora de los
    botones convertía las tarjetas de logo en óvalos. */
@@ -6495,8 +6496,8 @@ html.dark :is(#camFootballQuiniela,#camFootballSemana) .cam-football-league-logo
 /* En la clasificación no hay jornada que elegir, pero sí competición. */
 #camFootballQuiniela.is-ranking #camFootballNav .cam-football-round-control{display:none}
 @media(min-width:761px){
-  :is(#camFootballQuiniela,#camFootballSemana) .cam-football-league{min-height:96px}
-  :is(#camFootballQuiniela,#camFootballSemana) .cam-football-league-logo{width:68px;height:68px}
+  :is(#camFootballQuiniela,#camFootballSemana,#camFootballWeekLeagues) .cam-football-league{min-height:96px}
+  :is(#camFootballQuiniela,#camFootballSemana,#camFootballWeekLeagues) .cam-football-league-logo{width:68px;height:68px}
 }
 
 /* Competiciones de quiniela: estilos heredados para otros componentes. */
@@ -6638,7 +6639,7 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 </style>
 
 <!-- Componentes finales: móvil, conversación, parties, perfil y Takes; orden en performance-css-packs.json. -->
-<link rel="stylesheet" href="assets/cam-perf-app-panels.css?v=20261113-semana-marcador-1">
+<link rel="stylesheet" href="assets/cam-perf-app-panels.css?v=20261113-footer-20261113-semana-marcador-1">
 <link rel="stylesheet" href="assets/cam-home-takes-unified.css?v=20261112-symmetric-tabs-2">
 <script src="assets/cam-parties.js?v=20261113-login-after-groups-1"></script>
 <script src="assets/cam-sport-quiniela-loader.js?v=20261113-login-after-groups-1"></script>
@@ -6673,7 +6674,7 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 <!-- 13 nov: El marcador como menú vertical (El marcador · Clasificación · Mejores anotadores / Goleadores) en NFL y las 4 ligas. -->
 <script src="assets/cam-sport-tables.js?v=20261113-marcador-menu-1"></script>
 <script src="assets/cam-nfl-semana.js?v=20261113-take-historia-1"></script>
-<script src="assets/cam-football-semana.js?v=20261113-take-sin-ideas-1"></script>
+<script src="assets/cam-football-semana.js?v=20261113-leagues-footer-1"></script>
 <!-- Escritorio: páginas completas de NFL/Fútbol y dos columnas de contenido real. El teléfono conserva sus pestañas. -->
 <script defer src="assets/cam-escritorio.js?v=20261110-desktop-shortcuts-1"></script>
 <script defer src="assets/cam-sport-news-community.js?v=20261112-rank-initials-2"></script>

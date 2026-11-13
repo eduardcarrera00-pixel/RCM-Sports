@@ -216,16 +216,16 @@
     /* Fútbol comparte las tarjetas; la quiniela añade el empate. */
     html body #camFootballSemana .cam-ns-picks { grid-template-columns:repeat(3,minmax(0,1fr))!important; }
     html body #camFootballSemana .cam-ns-head { margin-bottom:12px!important; }
-    html body #camFootballSemana .cam-football-leagues {
+    html body :is(#camFootballSemana,#camFootballWeekLeagues) .cam-football-leagues {
       --q-ink:var(--ns-ink); --q-band-line:var(--ns-line); --q-gold:var(--ns-accent);
       --q-band-control:var(--ns-card); --q-on-band-muted:var(--ns-muted); --q-on-band:var(--ns-ink); --q-focus:var(--ns-accent);
       display:grid!important; grid-template-columns:repeat(4,minmax(0,1fr))!important; gap:6px!important;
       margin:10px 0 0!important; padding:0!important; border-radius:0!important;
     }
-    html body #camFootballSemana .cam-football-league {
+    html body :is(#camFootballSemana,#camFootballWeekLeagues) .cam-football-league {
       min-width:0!important; min-height:54px!important; padding:4px!important; border-radius:12px!important;
     }
-    html body #camFootballSemana .cam-football-league-logo { width:44px!important; height:44px!important; }
+    html body :is(#camFootballSemana,#camFootballWeekLeagues) .cam-football-league-logo { width:44px!important; height:44px!important; }
     html body #camFootballSemana .cam-ns-league-name { margin-top:6px!important; color:var(--ns-muted)!important; font:600 12px/1.4 Inter,system-ui,sans-serif!important; }
     html body #camFootballSemana .cam-ns-pick strong { font-size:12px!important; }
     html body :is(#camNflSemana,#camFootballSemana) .cam-ns-section-title { margin-bottom:10px!important; }
