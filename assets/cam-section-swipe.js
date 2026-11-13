@@ -22,7 +22,8 @@
    Enseñar el gesto (12 nov 2026, pedido de Eduard): al entrar en un área con
    apartados, tras 1,5 s sin tocar nada, el contenido amaga un deslizamiento y
    asoma el siguiente apartado («Takes ›»); luego todo vuelve a su sitio. Sin
-   flechas fijas en pantalla. Una vez por visita, como mucho 3 visitas en días
+   flechas fijas en pantalla. Si sigue sin deslizar, una última vez a los 45 s,
+   cuando esté en una de estas áreas. Como mucho 3 visitas en días
    distintos, y nunca más en cuanto la persona desliza una vez. Solo en pantallas
    táctiles. Con «reducir movimiento», un texto discreto bajo las pestañas. */
 (() => {
@@ -382,8 +383,10 @@
   // ---------- Enseñar el gesto ----------
   const LEARNED = 'cam_swipe_learned_v1';        // '1' en cuanto desliza una vez
   const SHOWN = 'cam_swipe_hint_v1';             // { count, day }: visitas en que se enseñó
-  const SESSION = 'cam_swipe_hint_session_v1';   // '1' si ya se enseñó en esta visita
+  const SESSION = 'cam_swipe_hint_session_v1';   // { n, at }: veces en esta visita y cuándo la primera
   const HINT_MAX = 3, HINT_IDLE = 1500, HINT_WINDOW = 12000;
+  const SECOND_AFTER = 45 * 1000;               // la segunda y última vez, 45 s después de la primera (pedido de Eduard)
+  const SECOND_WAIT = 60 * 1000;                 // llegado ese momento, hasta 1 min esperando un momento de calma
   const NUDGE_IN = 420, NUDGE_HOLD = 650, NUDGE_OUT = 480, TIP_MS = 2600;
   const touchscreen = window.matchMedia ? window.matchMedia('(hover: none) and (pointer: coarse)') : null;
 
@@ -392,20 +395,47 @@
   function today() { const d = new Date(); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
   function seen() { try { return JSON.parse(read('localStorage', SHOWN) || '{}') || {}; } catch { return {}; } }
 
-  let hintedThisPage = false;   // por si el navegador no guarda nada (modo privado)
-  let hint = null, hintTimer = 0, hintUntil = 0, hintKey = '', tip = null;
+  let memVisit = null;          // por si el navegador no guarda nada (modo privado)
+  let hint = null, hintTimer = 0, hintUntil = 0, hintKey = '', tip = null, secondTimer = 0;
+
+  // La visita (la pestaña abierta): cuántas veces se enseñó ya y cuándo fue la primera.
+  function visit() {
+    const raw = read('sessionStorage', SESSION);
+    if (raw === '1') return { n: 2, at: 0 };          // formato anterior (12 nov): ya cumplido
+    if (raw) { try { const v = JSON.parse(raw); if (v && typeof v.n === 'number') return v; } catch {} }
+    return memVisit || { n: 0, at: 0 };
+  }
+  function saveVisit(v) { memVisit = v; write('sessionStorage', SESSION, JSON.stringify(v)); }
 
   function learned() {
     write('localStorage', LEARNED, '1');
     endHint();
     hintUntil = 0;
     clearTimeout(hintTimer);
+    clearTimeout(secondTimer);
   }
   function hintAllowed() {
-    if (hintedThisPage || !touchscreen || !touchscreen.matches) return false;
-    if (read('localStorage', LEARNED) === '1' || read('sessionStorage', SESSION) === '1') return false;
+    if (!touchscreen || !touchscreen.matches) return false;
+    if (read('localStorage', LEARNED) === '1') return false;
+    const v = visit();
+    if (v.n >= 2) return false;
+    if (v.n === 1) return Date.now() - v.at >= SECOND_AFTER;   // la última vez
     const s = seen();
     return (s.count || 0) < HINT_MAX && s.day !== today();
+  }
+  // A los 45 s: si está en una de estas áreas, se enseña en el siguiente momento
+  // de calma; si no, al volver a entrar en una (considerHint).
+  function armSecond(delay) {
+    clearTimeout(secondTimer);
+    secondTimer = setTimeout(() => {
+      if (hint || !hintAllowed()) return;
+      const key = areaKey();
+      if (!key) return;
+      hintKey = key;
+      hintUntil = now() + SECOND_WAIT;
+      clearTimeout(hintTimer);
+      hintTimer = setTimeout(tryHint, HINT_IDLE);
+    }, Math.max(0, delay));
   }
   function loading() {
     if (document.documentElement.classList.contains('cam-booting')) return true;
@@ -449,14 +479,19 @@
     const visible = els.some(el => { const r = el.getBoundingClientRect(); return r.height > 40 && r.bottom > 0 && r.top < window.innerHeight; });
     if (!visible) { postpone(); return; }
 
-    hintedThisPage = true;
     hintUntil = 0;
-    const s = seen();
-    write('localStorage', SHOWN, JSON.stringify({ count: (s.count || 0) + 1, day: today() }));
-    write('sessionStorage', SESSION, '1');
+    const v = visit();
+    if (v.n === 0) {
+      const s = seen();
+      write('localStorage', SHOWN, JSON.stringify({ count: (s.count || 0) + 1, day: today() }));
+      saveVisit({ n: 1, at: Date.now() });
+      armSecond(SECOND_AFTER);
+    } else {
+      saveVisit({ n: 2, at: v.at });
+    }
     const label = ctx.tabs[(ctx.index + 1) % ctx.tabs.length].textContent.trim();
     hint = { els: [], timers: [] };
-    document.dispatchEvent(new CustomEvent('cam:section-swipe-hint', { detail: { area: ctx.kind, style: reduced() ? 'text' : 'nudge' } }));
+    document.dispatchEvent(new CustomEvent('cam:section-swipe-hint', { detail: { area: ctx.kind, style: reduced() ? 'text' : 'nudge', time: v.n + 1 } }));
 
     if (reduced()) { showTip(ctx); return; }
 
@@ -534,6 +569,7 @@
     requestAnimationFrame(() => { considerQueued = false; considerHint(); });
   }).observe(document.body, { attributes: true, attributeFilter: ['class', 'data-cam-tabs', 'data-cam-section'] });
   considerHint();   // enlace directo (?s=nfl)
+  { const v = visit(); if (v.n === 1) armSecond(v.at + SECOND_AFTER - Date.now()); }   // al recargar la página
 
   window.camSectionSwipe = Object.freeze({
     area: () => { const ctx = context(); return ctx ? { area: ctx.kind, tabs: ctx.tabs.length, index: ctx.index } : null; },

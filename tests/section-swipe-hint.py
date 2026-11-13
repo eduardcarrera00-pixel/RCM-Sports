@@ -7,7 +7,9 @@ Cubre:
   · teléfono táctil (390 px, día y noche): al entrar en NFL, tras 1,5 s sin
     tocar nada, el contenido amaga hacia la izquierda y asoma «Takes ›»; luego
     todo vuelve a su sitio, sin estilos en línea ni desbordamiento lateral;
-  · una sola vez por visita (Picks después ya no lo enseña) y se apunta la visita;
+  · en la misma visita no se repite antes de 45 s (Picks después no lo enseña);
+  · a los 45 s, si sigue en una de estas áreas sin haber deslizado, una última
+    vez; si en ese momento está en Inicio, al volver a entrar; y nunca una tercera;
   · Actualidad lo enseña con su siguiente apartado («NFL ›»);
   · tocar o bajar la página mientras espera lo retrasa; tocar durante el amago
     lo quita al momento;
@@ -45,11 +47,13 @@ STATE = """() => {
   const moved = [...document.querySelectorAll('#mainContent > *, #aeOpinions > *')]
     .filter(e => e.style.transform || e.style.opacity || e.style.transition)
     .map(e => ({ id: e.id || e.className, x: new DOMMatrix(getComputedStyle(e).transform).m41 }));
-  let shown = null; try { shown = JSON.parse(localStorage.getItem('cam_swipe_hint_v1') || 'null'); } catch (e) {}
+  let shown = null, visit = null;
+  try { shown = JSON.parse(localStorage.getItem('cam_swipe_hint_v1') || 'null'); } catch (e) {}
+  try { visit = JSON.parse(sessionStorage.getItem('cam_swipe_hint_session_v1') || 'null'); } catch (e) {}
   return { hinting: window.camSectionSwipe.hinting(), moved,
            peek: peek && !peek.hidden ? { text: peek.textContent, ready: peek.classList.contains('is-ready') } : null,
            tip: tip && !tip.hidden ? { text: tip.textContent, on: tip.classList.contains('is-on'), top: tip.getBoundingClientRect().top } : null,
-           shown, learned: localStorage.getItem('cam_swipe_learned_v1'), session: sessionStorage.getItem('cam_swipe_hint_session_v1'),
+           shown, visit, learned: localStorage.getItem('cam_swipe_learned_v1'),
            overflow: document.documentElement.scrollWidth - innerWidth };
 }"""
 
@@ -112,9 +116,9 @@ def first_visit(dark):
         assert st['moved'] and all(-30 <= m['x'] <= -4 for m in st['moved']), f'{where}: el contenido no amagó {st["moved"]}'
         if SHOTS: page.screenshot(path=str(SHOTS / f'{where.replace(" ", "-")}-nfl.png'))
         st = clean(page, where)
-        assert st['shown'] and st['shown']['count'] == 1 and st['session'] == '1', f'{where}: no se apuntó la visita {st}'
+        assert st['shown'] and st['shown']['count'] == 1 and st['visit'] and st['visit']['n'] == 1, f'{where}: no se apuntó la visita {st}'
         assert st['learned'] is None, f'{where}: enseñar no es aprender'
-        # Una sola vez por visita.
+        # Antes de 45 s no se repite.
         open_area(page, 'Picks')
         no_hint(page, f'{where} · Picks después')
         assert not page.errors, page.errors
@@ -204,6 +208,50 @@ def remembered():
         print('ok otro día')
 
 
+def last_time():
+    """A los 45 s, una última vez (en el área o al volver a entrar), y nunca una tercera."""
+    with fp.full_page(fake_js=FAKE, width=390, height=800, touch=True, clock=True) as page:
+        open_area(page, 'NFL')
+        wait_hint(page, '45 s · primera')
+        clean(page, '45 s · primera')
+        page.clock.fast_forward('00:30')
+        no_hint(page, '45 s · a los 30 s', wait=2500)
+        page.clock.fast_forward('00:20')
+        st = wait_hint(page, '45 s · última vez')
+        assert st['peek'] and 'Takes' in st['peek']['text'] and st['moved'], f'45 s: {st}'
+        st = clean(page, '45 s · última vez')
+        assert st['visit']['n'] == 2 and st['shown']['count'] == 1, f'45 s: la última vez no debe contar como otra visita {st}'
+        page.clock.fast_forward('06:00')
+        open_area(page, 'Picks')
+        no_hint(page, '45 s · nunca una tercera')
+        assert not page.errors, page.errors
+        print('ok última vez en el área')
+
+    with fp.full_page(fake_js=FAKE, width=390, height=800, touch=True, clock=True) as page:
+        open_area(page, 'Picks')
+        wait_hint(page, '45 s · primera (Picks)')
+        clean(page, '45 s · primera (Picks)')
+        open_area(page, 'Todos')
+        page.wait_for_timeout(600)
+        page.clock.fast_forward('00:50')
+        no_hint(page, '45 s · en Inicio', wait=2500)
+        open_area(page, 'Fútbol')
+        st = wait_hint(page, '45 s · al volver a entrar')
+        assert st['peek'] and 'Takes' in st['peek']['text'], f'45 s al volver: {st}'
+        clean(page, '45 s · al volver a entrar')
+        print('ok última vez al volver')
+
+    # Si desliza entre la primera y los 45 s, ya no hay última vez.
+    with fp.full_page(fake_js=FAKE, width=390, height=800, touch=True, clock=True) as page:
+        open_area(page, 'NFL')
+        wait_hint(page, '45 s · primera (desliza)')
+        clean(page, '45 s · primera (desliza)')
+        page.evaluate("localStorage.setItem('cam_swipe_learned_v1', '1')")
+        page.clock.fast_forward('00:50')
+        no_hint(page, '45 s · ya sabe')
+        print('ok sin última vez si ya sabe')
+
+
 def desktop():
     with fp.full_page(fake_js=FAKE, width=1366, height=900, scale=1) as page:
         open_area(page, 'Picks')
@@ -233,6 +281,7 @@ first_visit(True)
 actualidad()
 interactions()
 remembered()
+last_time()
 desktop()
 reduced()
 print('section-swipe-hint: todo bien')

@@ -24,7 +24,7 @@ def _server():
 
 
 @contextlib.contextmanager
-def full_page(fake_js='', dark=False, width=390, height=900, scale=2, touch=False, reduced_motion=False):
+def full_page(fake_js='', dark=False, width=390, height=900, scale=2, touch=False, reduced_motion=False, clock=False):
     with _server() as base, sync_playwright() as p:
         browser = p.chromium.launch()
         ctx = browser.new_context(viewport={'width': width, 'height': height}, device_scale_factor=scale,
@@ -43,6 +43,8 @@ def full_page(fake_js='', dark=False, width=390, height=900, scale=2, touch=Fals
         ctx.route('**/*', route)
         ctx.add_init_script('window.__fake=window.__fake||{};' + fake_js)
         ctx.add_init_script("try{localStorage.setItem('rcm_sports_theme','%s')}catch(e){}" % ('dark' if dark else 'light'))
+        if clock:
+            ctx.clock.install()   # reloj controlable (page.clock.fast_forward); por defecto avanza solo
         page = ctx.new_page()
         page.errors = []
         page.on('pageerror', lambda e: page.errors.append(str(e)))
