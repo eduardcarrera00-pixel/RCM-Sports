@@ -253,81 +253,40 @@
     return hint;
   }
 
-  /* «Tu jornada»: la quiniela NFL se juega por jornada (jueves, domingo, lunes…).
-     Tras elegir el duelo, invita a seguir con lo abierto o a volver el día que toque. */
-  function journeyBlock(snap, weekGames, duel) {
+  /* «Tu jornada»: solo días pendientes y su contador, sin promoción ni total semanal. */
+  function journeyBlock(snap, weekGames) {
     const q = quiniela();
-    const now = Date.now();
+    const today = dayOf(Date.now());
     const games = weekGames.filter(g => g.status !== 'cancelled' && g.status !== 'postponed');
-    if (!games.length) return null;
-    const isOpen = g => !!q?.isOpen?.(g);
-    const upcoming = g => g.status === 'scheduled' && Date.parse(g.kickoff) > now;
     const has = g => snap.mine.has(g.id);
     const days = [];
     for (const g of games.slice().sort(byKickoff)) {
       const key = dayOf(g.kickoff);
+      if (key < today) continue;
       let day = days.find(d => d.key === key);
       if (!day) days.push(day = { key, games: [] });
       day.games.push(g);
     }
-    for (const day of days) {
-      day.done = day.games.filter(has).length;
-      day.open = day.games.filter(g => isOpen(g) && !has(g));
-      day.later = day.games.filter(g => upcoming(g) && !isOpen(g) && !has(g));
-      day.state = day.done === day.games.length ? 'done' : day.open.length ? 'open' : day.later.length ? 'later' : 'closed';
-    }
-    const total = games.length, picked = games.filter(has).length;
-    const open = days.flatMap(d => d.open).sort(byKickoff);
-    const later = days.flatMap(d => d.later).sort(byKickoff);
-    const complete = picked === total && games.some(upcoming);
-    if (!open.length && !later.length && !complete) return null;
+    const remaining = days.filter(day => day.games.some(g => !finished(g)));
+    if (!remaining.length) return null;
 
     const box = el('div', null, 'cam-ns-next', { role: 'group', 'aria-labelledby': 'camNsNextTitle' });
     const head = el('div', null, 'cam-ns-next-head');
-    head.append(el('p', 'Tu jornada', 'cam-ns-next-title', { id: 'camNsNextTitle' }), el('span', picked + ' de ' + total, 'cam-ns-next-count'));
-    const bar = el('span', null, 'cam-ns-next-bar', { role: 'progressbar', 'aria-label': 'Partidos elegidos en la jornada',
-      'aria-valuemin': '0', 'aria-valuemax': String(total), 'aria-valuenow': String(picked) });
-    bar.style.setProperty('--done', Math.round(100 * picked / total) + '%');
-    bar.append(el('span', null, 'cam-ns-next-fill'));
+    head.append(el('p', 'Tu jornada', 'cam-ns-next-title', { id: 'camNsNextTitle' }));
     const row = el('div', null, 'cam-ns-days');
-    for (const day of days) {
+    for (const day of remaining) {
       const first = day.games[0];
-      const target = day.open[0] || day.games.find(g => !has(g)) || first;
-      const status = day.state === 'done' ? '✓' : day.state === 'later' ? 'Pronto' : day.done + '/' + day.games.length;
-      const label = cap(dayLong(first.kickoff)) + ' ' + dayMonth(first.kickoff) + ': ' +
-        (day.state === 'later' ? 'se abre más adelante' : day.done + ' de ' + day.games.length + ' elegidos');
-      const chip = action(null, () => focusGame(target.id), 'cam-ns-day is-' + day.state, { 'aria-label': label });
-      chip.append(el('strong', dayShort(first.kickoff)), el('span', status, 'cam-ns-day-status', { 'aria-hidden': 'true' }));
+      const done = day.games.filter(has).length;
+      const open = day.games.filter(g => !!q?.isOpen?.(g) && !has(g));
+      const state = done === day.games.length ? 'done' : open.length ? 'open' : 'later';
+      const target = open[0] || day.games.find(g => !finished(g) && !has(g)) || first;
+      const count = done + ' de ' + day.games.length;
+      const label = cap(dayLong(first.kickoff)) + ' ' + dayMonth(first.kickoff) + ': ' + count + ' elegidos';
+      const chip = action(null, () => focusGame(target.id), 'cam-ns-day is-' + state, { 'aria-label': label });
+      chip.append(el('strong', cap(dayLong(first.kickoff))), el('span', count, 'cam-ns-day-status', { 'aria-hidden': 'true' }));
       row.append(chip);
     }
-    box.append(head, bar, row);
-
-    let message, cta = null;
-    if (open.length) {
-      const next = open[0];
-      const rel = relativeDay(next.kickoff);
-      const sameDay = open.filter(g => dayOf(g.kickoff) === dayOf(next.kickoff)).length;
-      message = (open.length === 1 ? 'Te queda 1 partido por elegir.' : 'Te quedan ' + open.length + ' partidos por elegir.') +
-        (rel ? ' El siguiente empieza ' + rel + ' a las ' + clock(next.kickoff) + '.' : '');
-      const what = (sameDay === 1 ? 'el' : 'los ' + sameDay) + (rel ? ' de ' + rel : ' del ' + dayLong(next.kickoff));
-      cta = action('Elegir ' + what + ' →', () => focusGame(next.id), 'cam-ns-next-cta');
-    } else if (later.length) {
-      const next = later[0];
-      const rel = relativeDay(next.kickoff);
-      message = 'Ya elegiste todo lo abierto. Lo ' + (rel ? 'de ' + rel : 'del ' + dayLong(next.kickoff)) +
-        ' se abre cuando lleguen sus cuotas: vuelve ' + (rel ? '' : 'el ' + dayLong(next.kickoff) + ' ') + 'antes de las ' + clock(next.kickoff) + '.';
-    } else {
-      message = '¡Jornada completa! Ya elegiste ' + (total === 1 ? 'el partido.' : 'los ' + total + ' partidos.');
-      const laurelTarget = snap.laurel === null ? [duel, ...games].find(g => has(g) && isOpen(g)) : null;
-      if (laurelTarget) {
-        message += ' Ponle el laurel a tu partido más seguro: si aciertas, vale el doble.';
-        cta = action('Poner el laurel →', () => focusGame(laurelTarget.id), 'cam-ns-next-cta');
-      } else {
-        message += ' Vuelve cuando acabe cada día para ver cómo te fue.';
-      }
-    }
-    box.append(el('p', message, 'cam-ns-next-text'));
-    if (cta) box.append(cta);
+    box.append(head, row);
     return box;
   }
 
@@ -386,7 +345,7 @@
       pick.append(el('p', 'La comunidad: ' + away + ' % ' + nick(duel.away_id) + ' · ' + (100 - away) + ' % ' + nick(duel.home_id), 'cam-ns-note'));
     }
     if (snap.mine.has(duel.id)) {
-      const journey = journeyBlock(snap, weekGames, duel);
+      const journey = journeyBlock(snap, weekGames);
       if (journey) pick.append(journey);
     }
     box.append(pick);
