@@ -265,37 +265,43 @@
     const name = team?.name || 'Por confirmar';
     return { short: team?.short_name || name, name, logo: team?.logo, abbr: team?.abbreviation || initials(name) };
   }
-  function pickLine(team, points, prefix) {
-    const line = el('span', null, 'cam-hj-pick');
-    if (team) line.append(crest(team.logo, team.abbr, ''));
-    else line.append(el('span', '=', 'cam-hj-crest cam-hj-crest--draw', { 'aria-hidden': 'true' }));
-    const name = el('span', null, 'cam-hj-pick-name');
-    if (prefix) name.append(el('span', prefix, 'cam-hj-at', { 'aria-hidden': 'true' }));
-    name.append(document.createTextNode(team ? team.short : 'Empate'));
-    line.append(name);
-    // 13 nov 2026: sin «2 pts» en Inicio (no invitaban a jugar); un círculo de elección,
-    // solo decorativo. Los puntos siguen en la quiniela.
-    line.append(el('span', null, 'cam-hj-choice', { 'aria-hidden': 'true' }));
-    return line;
+  // Ficha de partido (13 nov 2026): cara a cara, como en las apps de resultados. Los dos
+  // escudos grandes con su nombre, la hora en medio y debajo los círculos de la quiniela
+  // (1 · X · 2 en fútbol; uno por equipo en la NFL), solo decorativos: toda la ficha abre
+  // la quiniela. Sin puntos: siguen dentro de la quiniela.
+  function kickoffParts(iso) {
+    const text = dayLabel(iso);
+    const cut = text.lastIndexOf(' · ');
+    const day = cut > 0 ? text.slice(0, cut) : '';
+    return [day ? day.charAt(0).toUpperCase() + day.slice(1) : '', cut > 0 ? text.slice(cut + 3) : text];
+  }
+  function teamSide(team) {
+    const side = el('span', null, 'cam-hj-side');
+    side.append(crest(team.logo, team.abbr, ''), el('span', team.short, 'cam-hj-side-name'));
+    return side;
   }
   function gameCard(g, sport) {
     const card = el('button', null, 'cam-hj-card cam-hj-game', { type: 'button', 'data-sport': sport });
-    const top = el('span', null, 'cam-hj-kicker');
     const league = sport === 'nfl' ? 'NFL' + (g.week ? ' · Semana ' + g.week : '') : (LEAGUES[g.competition] || 'Fútbol');
-    top.append(el('span', league, 'cam-hj-league'), el('span', dayLabel(g.kickoff), 'cam-hj-when'));
-    card.append(top);
-    const picks = el('span', null, 'cam-hj-picks');
-    let aria;
+    let first, second, aria;
     if (sport === 'nfl') {
-      const away = nflTeam(g.away_id), home = nflTeam(g.home_id);
-      picks.append(pickLine(away, g.points_away), pickLine(home, g.points_home, '@ '));
-      aria = away.name + ' en ' + home.name;
+      first = nflTeam(g.away_id); second = nflTeam(g.home_id);
+      aria = first.name + ' en ' + second.name;
     } else {
-      const home = footballTeam(g.home_id), away = footballTeam(g.away_id);
-      picks.append(pickLine(home, g.points_home), pickLine(null, g.points_draw), pickLine(away, g.points_away));
-      aria = home.name + ' contra ' + away.name;
+      first = footballTeam(g.home_id); second = footballTeam(g.away_id);
+      aria = first.name + ' contra ' + second.name;
     }
-    card.append(picks, el('span', 'Jugar ›', 'cam-hj-cta'));
+    const [day, time] = kickoffParts(g.kickoff);
+    const face = el('span', null, 'cam-hj-face');
+    const kick = el('span', null, 'cam-hj-kick');
+    if (day) kick.append(el('span', day, 'cam-hj-kick-day'));
+    kick.append(el('span', time, 'cam-hj-kick-time'));
+    face.append(teamSide(first), kick, teamSide(second));
+    const marks = el('span', null, 'cam-hj-marks', { 'aria-hidden': 'true' });
+    for (const label of sport === 'nfl' ? ['', null, ''] : ['1', 'X', '2']) {
+      marks.append(label === null ? el('span', null, 'cam-hj-mark-gap') : el('span', label, 'cam-hj-choice'));
+    }
+    card.append(el('span', league, 'cam-hj-league'), face, marks, el('span', 'Jugar ›', 'cam-hj-cta'));
     card.setAttribute('aria-label', league + ', ' + aria + ', ' + dayLabel(g.kickoff) + '. Jugar en la quiniela');
     card.addEventListener('click', () => goQuiniela(sport));
     return card;

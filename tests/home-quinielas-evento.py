@@ -9,7 +9,7 @@ Cubre:
     separador «Participa en la quiniela de otras ligas» y después la próxima cita de cada liga
     (Liga MX, Champions, LaLiga, Premier, NFL), cada resultado con su círculo y sin «pts»;
   · paso 1 (Tus 8) a 320 y 390 px de día y de noche: 5 escudos + 3 «?», «Completar mis 8 ›»,
-    tarjeta pequeña (236 px de ancho, como mucho ~230 de alto), nada recortado;
+    tarjeta pequeña (248 px de ancho, como las fichas de partido), nada recortado;
   · el botón (y un «?») lleva a Fútbol → Liga MX → La semana → #camLiguilla con el selector de
     «Tus 8» abierto; al volver a Inicio se relee el evento;
   · invitado con 1 elegido → «Te faltan 2»; con cuenta y 8 guardados → «Tus 8 están listos»
@@ -87,7 +87,7 @@ STATE = """() => {
   const txt = s => { const e = sec && sec.querySelector(s); return e ? e.textContent.trim() : null; };
   const card = sec && sec.querySelector('.cam-hj-ev');
   const box = e => { if (!e) return null; const r = e.getBoundingClientRect(); return [Math.round(r.width), Math.round(r.height)]; };
-  const clipped = q('.cam-hj-ev-kicker, .cam-hj-ev-title, .cam-hj-ev-cta, .cam-hj-heading, .cam-hj-more, .cam-hj-pick-name, .cam-hj-sep-text')
+  const clipped = q('.cam-hj-ev-kicker, .cam-hj-ev-title, .cam-hj-ev-cta, .cam-hj-heading, .cam-hj-more, .cam-hj-side-name, .cam-hj-kick-day, .cam-hj-kick-time, .cam-hj-sep-text')
     .filter(e => vis(e) && e.clientWidth > 1 && (e.scrollWidth > e.clientWidth || e.scrollHeight > e.clientHeight + 2)).map(e => e.className + ':' + e.textContent.trim());
   const items = q('.cam-hj-item');
   const root = document.scrollingElement;
@@ -104,6 +104,9 @@ STATE = """() => {
     cardText: card ? card.innerText : '', sectionText: sec ? sec.innerText : '',
     card: box(card), firstGame: box(sec?.querySelector('.cam-hj-game')),
     games: q('.cam-hj-game').map(g => g.querySelectorAll('.cam-hj-choice').length),
+    marks: q('.cam-hj-game').map(g => [...g.querySelectorAll('.cam-hj-choice')].map(c => c.textContent).join('')),
+    faces: q('.cam-hj-game').map(g => [...g.querySelectorAll('.cam-hj-side-name')].map(n => n.textContent).join(' | ') + ' @ ' + (g.querySelector('.cam-hj-kick-time')?.textContent || '')),
+    sideCrest: box(sec?.querySelector('.cam-hj-side .cam-hj-crest')),
     pts: (sec ? (sec.textContent.match(/\\bpts\\b/g) || []).length : 0) + q('.cam-hj-pts').length,
     circle: (() => { const c = sec?.querySelector('.cam-hj-choice'); if (!c) return null; const s = getComputedStyle(c); return [s.width, s.height, s.borderTopLeftRadius]; })(),
     fonts: (() => { const f = s => { const e = sec?.querySelector(s); return e ? getComputedStyle(e).fontFamily.split(',')[0].replace(/"/g, '') : null; };
@@ -166,10 +169,13 @@ for width, dark in [(390, True), (390, False), (320, True)]:
         assert (st['fixed'], st['mine'], st['open'], st['openButtons']) == (5, 0, 3, 3), f'{where}: huecos {st}'
         assert st['cta'] == 'Completar mis 8 ›', f'{where}: botón {st["cta"]}'
         assert st['slotBoxes'] == ['32x32'], f'{where}: escudos y «?» deben ser círculos iguales {st["slotBoxes"]}'
-        assert st['card'][0] == 236 and st['card'][1] <= 256, f'{where}: la tarjeta no es pequeña {st["card"]}'
+        assert st['card'][0] == 248 and st['card'][1] <= 256 and st['firstGame'][0] == 248, f'{where}: la tarjeta no es pequeña {st["card"]}'
         assert st['fonts'] == ['Playfair Display', 'Inter', 'Inter'], f'{where}: letras {st["fonts"]}'
         assert st['ctaBox'][1] >= 40, f'{where}: botón bajo {st["ctaBox"]}'
         assert st['crests'] == 5, f'{where}: escudos sin pintar {st["crests"]}'
+        assert st['marks'] == ['1X2', '1X2', '1X2', '1X2', ''], f'{where}: círculos de la quiniela {st["marks"]}'
+        assert st['faces'][0].startswith('Queretaro | Monterrey @ ') and st['faces'][-1].startswith('Patriots | Lions @ '), f'{where}: fichas {st["faces"]}'
+        assert st['sideCrest'] == [48, 48], f'{where}: escudos de la ficha {st["sideCrest"]}'
         assert st['calls'] == ['state', 'candidates'], f'{where}: llamadas {st["calls"]}'
         common(st, where)
         assert not page.errors, f'{where}: errores {page.errors}'
@@ -233,7 +239,7 @@ for mode in ['champ', 'none']:
         st = open_home(page)
         assert st['event'] is None and [o.upper() for o in st['order']] == LEAGUES, f'{mode}: {st["order"]}'
         w, h, radius = st['circle']
-        assert w == h == '18px' and radius == '50%', f'{mode}: círculo {st["circle"]}'
+        assert w == h == '28px' and radius == '50%', f'{mode}: círculo {st["circle"]}'
         common(st, mode)
         if mode == 'none': shot(page, 'sin-evento')
 

@@ -14,6 +14,7 @@
   html body #camHomeJornada {
     --hj-card:#fffdf9;
     --hj-soft:#f4ece0;
+    --hj-disc:#f4ece0;
     --hj-ink:#13324d;
     --hj-text:#34444f;
     --hj-muted:#66727c;
@@ -31,6 +32,7 @@
   html.dark body #camHomeJornada {
     --hj-card:#11293d;
     --hj-soft:#163450;
+    --hj-disc:#F3EBDD;
     --hj-ink:#f6ecdf;
     --hj-text:#dcd3c8;
     --hj-muted:#a9b6bf;
@@ -199,7 +201,7 @@
   html body #camHomeJornada .cam-hj-crest--draw { font:800 14px/1 Inter,system-ui,sans-serif!important; color:var(--hj-muted)!important; }
 
   /* ---------- Cierran pronto ---------- */
-  html body #camHomeJornada .cam-hj-game { width:224px!important; }
+  html body #camHomeJornada .cam-hj-game { width:248px!important; }
   html body #camHomeJornada .cam-hj-picks { display:flex!important; flex-direction:column!important; gap:7px!important; }
   html body #camHomeJornada .cam-hj-pick {
     display:grid!important; grid-template-columns:28px minmax(0,1fr) auto!important; align-items:center!important; gap:9px!important;
@@ -308,19 +310,52 @@
   html body #camHomeJornada .cam-hj-trend.is-down { color:var(--hj-down)!important; }
   html body #camHomeJornada .cam-hj-trend.is-new { color:var(--hj-accent)!important; background:var(--hj-accent-soft)!important; }
 
-  /* ---------- círculo de elección (13 nov 2026, en lugar de «2 pts») ---------- */
+  /* ---------- Ficha de partido (13 nov 2026): cara a cara ----------
+     Escudos grandes sobre un disco crema, nombre debajo, la hora en medio y, abajo, los
+     círculos de la quiniela (1 · X · 2; en la NFL uno por equipo), en lugar de «2 pts». */
+  html body #camHomeJornada .cam-hj-game { gap:12px!important; padding:14px 16px 13px!important; }
+  html body #camHomeJornada .cam-hj-game > .cam-hj-league { display:block!important; }
+  html body #camHomeJornada :is(.cam-hj-face, .cam-hj-marks) {
+    display:grid!important; grid-template-columns:minmax(0,1fr) 60px minmax(0,1fr)!important; gap:4px!important; width:100%!important;
+  }
+  html body #camHomeJornada .cam-hj-face { align-items:start!important; margin:2px 0 0!important; }
+  html body #camHomeJornada .cam-hj-side { display:flex!important; flex-direction:column!important; align-items:center!important; gap:8px!important; min-width:0!important; text-align:center!important; }
+  html body #camHomeJornada .cam-hj-side .cam-hj-crest {
+    width:48px!important; height:48px!important; background:var(--hj-disc)!important; color:#13324d!important;
+    font:800 10.5px/1 Inter,system-ui,sans-serif!important; box-shadow:0 1px 2px rgba(0,0,0,.12)!important;
+  }
+  html body #camHomeJornada .cam-hj-side .cam-hj-crest.is-loaded { background:var(--hj-disc)!important; }
+  html body #camHomeJornada .cam-hj-side .cam-hj-crest img { inset:8px!important; width:32px!important; height:32px!important; }
+  html body #camHomeJornada .cam-hj-side-name {
+    display:block!important; max-width:100%!important; color:var(--hj-ink)!important;
+    font:650 12.5px/1.25 Inter,system-ui,sans-serif!important; text-wrap:balance!important; overflow-wrap:break-word!important;
+  }
+  html body #camHomeJornada .cam-hj-kick {
+    display:flex!important; flex-direction:column!important; align-items:center!important; justify-content:center!important;
+    gap:4px!important; height:48px!important; min-width:0!important; text-align:center!important;
+  }
+  html body #camHomeJornada .cam-hj-kick-day {
+    color:var(--hj-muted)!important; font:700 9.5px/1.2 Inter,system-ui,sans-serif!important;
+    letter-spacing:.08em!important; text-transform:uppercase!important; white-space:nowrap!important;
+  }
+  html body #camHomeJornada .cam-hj-kick-time {
+    color:var(--hj-ink)!important; font:700 16px/1 Inter,system-ui,sans-serif!important; font-variant-numeric:tabular-nums!important; white-space:nowrap!important;
+  }
+  html body #camHomeJornada .cam-hj-marks { justify-items:center!important; align-items:center!important; margin:auto 0 0!important; padding-top:2px!important; }
+  html body #camHomeJornada .cam-hj-game > .cam-hj-cta { margin-top:0!important; }
   html body #camHomeJornada .cam-hj-choice {
-    display:block!important; flex:0 0 auto!important; width:18px!important; height:18px!important;
-    margin:0 1px 0 0!important; padding:0!important;
+    display:flex!important; align-items:center!important; justify-content:center!important; flex:0 0 auto!important;
+    width:28px!important; height:28px!important; margin:0!important; padding:0!important; box-sizing:border-box!important;
     border:1.5px solid var(--hj-line-strong)!important; background:transparent!important;
-    transition:border-color .15s ease, background-color .15s ease!important;
+    color:var(--hj-muted)!important; font:700 11.5px/1 Inter,system-ui,sans-serif!important;
+    transition:border-color .15s ease, background-color .15s ease, color .15s ease!important;
   }
   @media (hover:hover) {
-    html body #camHomeJornada .cam-hj-game:hover .cam-hj-choice { border-color:var(--hj-accent)!important; background:var(--hj-accent-soft)!important; }
+    html body #camHomeJornada .cam-hj-game:hover .cam-hj-choice { border-color:var(--hj-accent)!important; color:var(--hj-accent)!important; }
   }
 
   /* ---------- Evento especial en «Quinielas» (13 nov 2026): la Liguilla ----------
-     Una tarjeta pequeña, la primera del carrusel: escudos de los clasificados, «?» en los
+     Una tarjeta pequeña (248 px, como las de partido), la primera del carrusel: escudos de los clasificados, «?» en los
      lugares por decidir y un botón. Azul noche y dorado (los de la Liguilla), de día y de noche. */
   html body #camHomeJornada .cam-hj-sr {
     position:absolute!important; width:1px!important; height:1px!important; margin:-1px!important; padding:0!important;
@@ -329,7 +364,7 @@
   html body #camHomeJornada .cam-hj-ev {
     --ev-bg:#0B2233; --ev-ink:#F3EBDD; --ev-muted:#C2CDD4; --ev-gold:#E8BF79;
     position:relative!important; display:flex!important; flex-direction:column!important; align-items:stretch!important; gap:10px!important;
-    width:236px!important; min-width:0!important; height:auto!important; margin:0!important; padding:14px 16px 16px!important;
+    width:248px!important; min-width:0!important; height:auto!important; margin:0!important; padding:14px 16px 16px!important;
     border:1px solid rgba(232,191,121,.4)!important; border-radius:18px!important;
     background:var(--ev-bg)!important; background-image:none!important; color:var(--ev-ink)!important; box-shadow:var(--hj-shadow)!important;
     text-align:left!important; font:400 13px/1.4 Inter,system-ui,sans-serif!important;
