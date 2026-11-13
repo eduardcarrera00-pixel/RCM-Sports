@@ -1087,14 +1087,26 @@ function mountEntries() {
   if (chefs && !$('camPartyEntryPicks')) chefs.before(entry('camPartyEntryPicks', 'Mis grupos de Picks', () => openHub('picks', 'all')));
   const twin = $('aeNflTwinRankings');
   if (twin && !$('camPartyEntryTakes')) twin.prepend(entry('camPartyEntryTakes', 'Mis grupos de Takes', () => openHub('takes', sportNow())));
-  // Quinielas: también se juegan en grupo.
-  // 13 nov 2026: en Fútbol también al final de La semana, debajo del marcador.
+  // Quinielas: «Mis grupos» antes del acceso/guardado, al fondo de La semana.
+  // «Ver mis jornadas» conserva su propia fila superior en NFL y Fútbol.
   for (const [root, id, sport] of [['camNflWeekActions', 'camPartyEntryQuinielaNfl', 'nfl'], ['camFootballWeekActions', 'camPartyEntryQuinielaFootball', 'football']]) {
     const section = $(root);
-    if (!section || $(id)) continue;
-    const row = entry(id, 'Mis grupos de Quiniela', () => openHub('quiniela', sport));
-    row.classList.add('is-quiniela');
-    section.append(row);
+    if (!section) continue;
+    if (sport === 'nfl') {
+      // La fila a dos columnas ya no es necesaria: solo alberga «Ver mis jornadas».
+      const buttonRow = section.querySelector('.cam-nfl-week-action-buttons');
+      const history = $('camNflNav');
+      if (buttonRow && history?.parentElement === buttonRow) buttonRow.replaceWith(history);
+    }
+    if (!$(id)) {
+      const row = entry(id, 'Mis grupos de Quiniela', () => openHub('quiniela', sport));
+      row.classList.add('is-quiniela');
+      section.append(row);
+    }
+    // Reutilizar el botón real conserva sus eventos y su estado de autenticación.
+    const saveId = sport === 'nfl' ? 'camNflSaveDay' : 'camFootballSaveDay';
+    const saveRow = $(saveId)?.closest('.cam-nfl-save-row');
+    if (saveRow) section.append(saveRow);
   }
 }
 
