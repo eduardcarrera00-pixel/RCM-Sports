@@ -150,9 +150,9 @@
     const top = el('div', null, 'cam-hj-head');
     top.append(el('h3', label, 'cam-hj-heading', { id: 'camHj-' + key }));
     if (more) {
-      const b = el('button', more.text, 'cam-hj-more', { type: 'button', 'aria-label': more.aria || more.text });
-      if (more.newsCategory) b.dataset.aeNewsCategory = more.newsCategory; // abre el archivo de noticias
-      else b.addEventListener('click', more.action);
+      const b = el(more.href ? 'a' : 'button', more.text, 'cam-hj-more', { 'aria-label': more.aria || more.text });
+      if (more.href) b.href = more.href;
+      else { b.type = 'button'; b.addEventListener('click', more.action); }
       top.append(b);
     }
     const list = el('div', null, 'cam-hj-row', { role: 'list', 'aria-label': label });
@@ -162,7 +162,7 @@
   }
   const rows = {
     jornada: row('jornada', 'Quinielas', { text: 'Ver partidos ›', action: () => goQuiniela(rows.jornada.section.dataset.nextSport || 'nfl') }),
-    news: row('news', 'Últimas noticias', { text: 'Ver todas ›', aria: 'Ver todas las noticias', newsCategory: 'Todas' }),
+    news: row('news', 'Últimas noticias', { text: 'Ver todas ›', aria: 'Ver todas las noticias', href: '?s=opiniones' }),
     takes: row('takes', 'Takes de la comunidad', { text: 'Publicar ›', aria: 'Publicar un Take', action: openTakeComposer })
   };
   // La lectura abre Inicio. Los partidos y la comunidad se descubren después.
