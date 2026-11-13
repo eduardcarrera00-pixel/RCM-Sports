@@ -309,12 +309,10 @@
       ideas.append(el('p', 'Ideas para empezar', 'cam-ns-ideas-label'), list);
       box.append(ideas);
     }
-    const exampleId = pickedNick ? null : (duel?.home_id || fallbackId || null);
-    const example = pickedNick || (exampleId ? nick(exampleId) : null);
     const field = action(null, () => openTake(), 'cam-ns-take-field', { 'aria-label': 'Escribir mi Take', 'aria-haspopup': 'dialog', 'aria-controls': 'aeTakeComposerDialog' });
     const pen = el('span', null, 'cam-ns-take-pen', { 'aria-hidden': 'true' });
     pen.append(icon('pen'));
-    field.append(el('span', example ? '«Los ' + example + ' ganan por más de 10…»' : '«Este domingo pasa algo que nadie espera…»', 'cam-ns-take-placeholder', { 'aria-hidden': 'true' }), pen);
+    field.append(el('span', '«Dak se va a retirar sin ningún anillo»', 'cam-ns-take-placeholder', { 'aria-hidden': 'true' }), pen);
     const scale = el('p', null, 'cam-ns-take-scale');
     const bars = el('span', null, 'cam-ns-bars', { 'aria-hidden': 'true' });
     bars.append(el('span'), el('span'), el('span'));
