@@ -283,6 +283,13 @@
   function paintNav(){
     // Pausa manual durante la Liguilla de Liga MX. Reactivar solo cuando lo pida el club.
     root.classList.toggle('cam-ligamx-regular-paused',competition==='ligamx');
+    // El botón de acceso ahora está al pie de La semana, tras «Mis grupos».
+    // Mantenerlo oculto cuando la quiniela regular de Liga MX está en pausa.
+    const weekSaveRow=$('camFootballSaveDay')?.closest('.cam-nfl-save-row');
+    if(weekSaveRow){
+      weekSaveRow.hidden=competition==='ligamx';
+      weekSaveRow.style.display=competition==='ligamx'?'none':'';
+    }
     // 13 nov 2026: sin el banner «La quiniela de fútbol» en Champions, LaLiga y Premier;
     // los días de partido quedan pegados al partido destacado de La semana (cam-liguilla.css).
     root.classList.toggle('cam-football-sin-banner',['champions','laliga','premier'].includes(competition));
