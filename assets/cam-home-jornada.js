@@ -5,9 +5,10 @@
    sus conversaciones y sus votos; vuelven a su sitio al salir de Inicio.
    Los calendarios y sus contadores siguen completos. Se conservan la caché de
    cinco minutos y las consultas públicas existentes, sin temporizadores.
-   13 nov 2026: con un evento especial en marcha (la Liguilla), «Quinielas» se
-   vuelve ese evento (paso actual, botón directo y «También en la quiniela»);
-   las tarjetas de partido llevan un círculo de elección en vez de «2 pts». */
+   13 nov 2026: con un evento especial en marcha (la Liguilla), su tarjeta abre
+   el carrusel de «Quinielas» (escudos, «?» y un botón directo); después, la
+   próxima cita de cada liga. Las tarjetas de partido llevan un círculo de
+   elección en vez de «2 pts». */
 (() => {
   'use strict';
 
@@ -21,7 +22,6 @@
   // Evento especial (13 nov 2026): mientras hay uno en marcha (hoy, la Liguilla de la
   // Liga MX) la sección «Quinielas» se vuelve ese evento y lleva directo a participar.
   // El campeón se queda 4 días en Inicio; después vuelve la sección de siempre.
-  const TZ = 'America/Toronto';
   const EVENT_AFTER_MS = 4 * 864e5;
   const seasonGuess = () => { const d = new Date(); return d.getUTCFullYear() - (d.getUTCMonth() < 6 ? 1 : 0); };
 
@@ -301,9 +301,7 @@
     return card;
   }
   /* ---------- Evento especial: la Liguilla ---------- */
-  const CHECK = '<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 8.5 6.5 12 13 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-  const PLUS = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
-  const ROUND_NAME = { qf: 'Cuartos de final', sf: 'Semifinales', final: 'Final' };
+  const ROUND_NAME = { qf: 'Cuartos', sf: 'Semifinales', final: 'Final' };
   // Orden del cuadro: 1-8 y 4-5 arriba, 2-7 y 3-6 abajo; la elección de cuartos se guarda
   // en el hueco del mejor sembrado menos uno (1-8 → 0, 2-7 → 1, 3-6 → 2, 4-5 → 3).
   const BRACKET = [[1, 8], [4, 5], [2, 7], [3, 6]];
@@ -311,27 +309,6 @@
   function viewerId() {
     try { if (typeof currentUser !== 'undefined' && currentUser?.id) return currentUser.id; } catch {}
     return state.takeViewerId || null;
-  }
-  function tzDay(iso) {
-    const d = new Date(iso);
-    if (Number.isNaN(d.getTime())) return '';
-    return d.toLocaleDateString('es', { timeZone: TZ, weekday: 'short', day: 'numeric', month: 'short' }).replace(/\./g, '').replace(',', '');
-  }
-  function longClock(iso) {
-    const d = new Date(iso);
-    if (Number.isNaN(d.getTime())) return '';
-    return d.toLocaleString('es', { timeZone: TZ, weekday: 'long', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false })
-      .replace(/\./g, '').replace(/^(\p{L}+),\s*/u, '$1 ');
-  }
-  function closesIn(iso) {
-    const t = Date.parse(iso);
-    if (!Number.isFinite(t)) return '';
-    const ymd = ms => Date.parse(new Intl.DateTimeFormat('en-CA', { timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(ms)));
-    const days = Math.round((ymd(t) - ymd(now())) / 864e5);
-    const hm = new Date(t).toLocaleTimeString('es', { timeZone: TZ, hour: '2-digit', minute: '2-digit', hour12: false });
-    if (days <= 0) return 'Cierra hoy, ' + hm;
-    if (days === 1) return 'Cierra mañana, ' + hm;
-    return 'Cierra en ' + days + ' días';
   }
   const shortName = t => String(t?.short_name || t?.name || 'Por definir');
   const abbrOf = t => String(t?.abbreviation || t?.short_name || t?.name || '?').normalize('NFD').replace(/[^A-Za-z0-9]/g, '').slice(0, 4).toUpperCase();
@@ -363,13 +340,14 @@
     return [];
   }
 
+  // 13 nov 2026 (tarde): la Liguilla es una tarjeta pequeña, la primera del carrusel de
+  // «Quinielas»: escudos de los clasificados, «?» en los lugares por decidir y un botón.
   // Paso 1 · Tus 8 (cam_liguilla_candidates). Los ya clasificados van fijos.
   function qualifiersView(cand, at) {
     const win = cand.window;
     const teams = Array.isArray(cand.teams) ? cand.teams : [];
     const byId = new Map(teams.map(t => [String(t.team_id), t]));
     const fixed = teams.filter(t => t.status === 'in').sort((a, b) => a.rank - b.rank).slice(0, 8);
-    const alive = teams.filter(t => t.status === 'alive');
     const free = Math.max(0, 8 - fixed.length);
     const server = Array.isArray(cand.mine) ? cand.mine.map(String) : null;
     const saved = !!server && server.length === 8;
@@ -377,30 +355,21 @@
       .map(id => byId.get(id)).filter(t => t && t.status === 'alive').slice(0, free);
     const ready = free > 0 && chosen.length >= free;
     const closes = Date.parse(win.closes_at);
-    const step = 'Paso 1 de 3 · Tus 8';
+    const open = !!win.open && closes > at;
     const slots = [...fixed.map(t => ({ t, kind: 'fixed' })), ...chosen.map(t => ({ t, kind: 'mine' }))];
-    if (win.open && closes > at) {
-      for (let i = chosen.length; i < free; i++) slots.push({ kind: 'open' });
+    for (let i = chosen.length; i < free; i++) slots.push({ kind: 'open', live: open });
+    const kicker = 'Liga MX';
+    if (open) {
       const left = free - chosen.length;
-      if (saved) return { step, badge: 'Guardado', badgeDone: true, title: 'Tus 8 están listos', slots,
-        note: 'Puedes cambiarlos hasta el ' + longClock(win.closes_at) + '. Después armas tu cuadro.', cta: 'Ver mi liguilla ›' };
-      if (ready) return { step, badge: closesIn(win.closes_at), title: 'Tus 8 están listos', slots, picker: true,
-        note: viewerId() ? 'Aún no están guardados: guárdalos antes del ' + longClock(win.closes_at) + '.'
-          : 'Entra con tu cuenta y guárdalos antes del ' + longClock(win.closes_at) + ' para que cuenten.',
-        cta: 'Guardar mis 8 ›' };
-      if (!free) return { step, badge: closesIn(win.closes_at), title: 'Los 8 ya están dentro', slots,
-        note: 'Tu cuadro se abre al terminar la última jornada.', cta: 'Ver la Liguilla ›' };
-      const places = free === 1 ? 'el lugar que falta' : 'los ' + free + ' lugares que faltan';
-      return { step, badge: closesIn(win.closes_at), picker: true,
-        title: chosen.length ? (left === 1 ? 'Te falta 1' : 'Te faltan ' + left) : '¿Quiénes completan los 8?', slots,
-        note: (fixed.length ? fixed.length + ' ya están dentro. ' : '') + alive.length + ' equipos pelean por ' + places + '.',
-        cta: fixed.length ? 'Completar mis 8 ›' : 'Elegir mis 8 ›', sub: 'Después armas tu cuadro y compites hasta la final.' };
+      if (saved) return { kicker, title: 'Tus 8 están listos', slots, cta: 'Ver mi liguilla ›' };
+      if (ready) return { kicker, title: 'Tus 8 están listos', slots, cta: 'Guardar mis 8 ›', picker: true };
+      if (!free) return { kicker, title: 'Los 8 ya están dentro', slots, cta: 'Ver la Liguilla ›' };
+      return { kicker, title: chosen.length ? (left === 1 ? 'Te falta 1' : 'Te faltan ' + left) : '¿Quiénes completan los 8?',
+        slots, cta: fixed.length ? 'Completar mis 8 ›' : 'Elegir mis 8 ›', picker: true };
     }
     // Cerrado y a la espera de que se abra el cuadro (al terminar la última jornada).
     if (!win.opened && Number.isFinite(closes) && at - closes < EVENT_AFTER_MS) {
-      return { step: 'Paso 2 de 3 · Tu cuadro', badge: 'Se abre ' + tzDay(closes + 2 * 864e5),
-        title: saved ? 'Tus 8 están guardados' : 'Tu cuadro se abre pronto', slots: saved ? slots : null,
-        note: 'Al terminar la última jornada eliges quién gana cada cruce, de cuartos al campeón.', cta: 'Ver la Liguilla ›' };
+      return { kicker, title: saved ? 'Tus 8 están guardados' : 'Tu cuadro se abre pronto', slots, cta: 'Ver la Liguilla ›' };
     }
     return null;
   }
@@ -415,10 +384,8 @@
     if (L.open && Date.parse(L.closes_at) > at) {
       const semis = new Map((mine?.bracket || []).filter(p => p.stage === 'semis').map(p => [Number(p.slot), String(p.team_id)]));
       const count = (mine?.bracket || []).length;
-      return { step: 'Paso 2 de 3 · Tu cuadro', badge: 'Cierra ' + tzDay(L.closes_at),
-        title: count >= 7 ? 'Tu cuadro está listo' : 'Arma tu cuadro',
-        rows: BRACKET.map(([a, b]) => ({ a: seed(a), b: seed(b), pick: semis.get(a - 1) })).filter(r => r.a && r.b),
-        note: count + ' de 7 elecciones · cada acierto suma; una sorpresa vale más.',
+      return { kicker: 'Liga MX · Cuadro', title: count >= 7 ? 'Tu cuadro está listo' : 'Arma tu cuadro',
+        pairs: BRACKET.map(([a, b]) => ({ a: seed(a), b: seed(b), pick: semis.get(a - 1) })).filter(r => r.a && r.b),
         cta: count >= 7 ? 'Ver mi cuadro ›' : count ? 'Seguir con mi cuadro ›' : 'Armar mi cuadro ›' };
     }
     const series = Array.isArray(st.series) ? st.series : [];
@@ -431,27 +398,12 @@
     if (fin) {
       const kicks = (fin.legs || []).map(g => Date.parse(g.kickoff)).filter(Number.isFinite);
       if (!kicks.length || at - Math.max(...kicks) > EVENT_AFTER_MS) return null;
-      const champ = team(fin.winner_id);
-      const myChamp = (mine?.bracket || []).find(p => p.stage === 'champion')?.team_id;
-      return { step: 'La Liguilla · Final', badge: 'Terminó', badgeDone: true, title: 'Campeón: ' + shortName(champ),
-        rows: [{ a: champ, b: null, status: 'Campeón' }],
-        note: myChamp && String(myChamp) === String(fin.winner_id) ? '¡Acertaste al campeón!' : 'Mira cómo quedó tu cuadro y la clasificación.',
-        cta: 'Ver la Liguilla ›' };
+      return { kicker: 'Liga MX · Final', title: 'Campeón: ' + shortName(team(fin.winner_id)), champ: team(fin.winner_id), cta: 'Ver la Liguilla ›' };
     }
     const pickOf = id => (mine?.series || []).find(p => Number(p.series_id) === Number(id))?.team_id || null;
-    const status = s => {
-      if (s.status === 'decided' && s.winner_id) return 'Pasa ' + shortName(team(s.winner_id));
-      const first = (s.legs || []).slice().sort((a, b) => Date.parse(a.kickoff) - Date.parse(b.kickoff))[0];
-      if (first && Date.parse(first.kickoff) > at) return 'Ida · ' + tzDay(first.kickoff);
-      return 'En juego';
-    };
-    const picked = list.filter(s => pickOf(s.id)).length;
-    const done = picked >= list.length;
-    return { step: 'Paso 3 de 3 · Ronda a ronda', badge: ROUND_NAME[round],
-      title: round === 'final' ? 'La Final' : '¿Quién pasa?',
-      rows: list.map(s => ({ a: team(s.high_id), b: team(s.low_id), pick: pickOf(s.id), status: status(s) })).filter(r => r.a && r.b),
-      note: mine ? 'Elegiste ' + picked + ' de ' + list.length + ' · cada serie cierra con el saque de la ida.'
-        : 'Cada serie cierra con el saque de la ida.',
+    const done = list.every(s => pickOf(s.id));
+    return { kicker: 'Liga MX · ' + ROUND_NAME[round], title: round === 'final' ? 'La Final' : '¿Quién pasa?',
+      pairs: list.map(s => ({ a: team(s.high_id), b: team(s.low_id), pick: pickOf(s.id) })).filter(r => r.a && r.b),
       cta: mine && done ? 'Ver la Liguilla ›' : round === 'final' ? 'Elegir campeón ›' : 'Elegir quién pasa ›' };
   }
 
@@ -513,139 +465,66 @@
 
   function evSlot(s) {
     if (s.kind === 'open') {
-      const b = el('button', null, 'cam-hj-ev-slot is-open', { type: 'button', 'aria-label': 'Elegir un equipo' });
-      b.insertAdjacentHTML('beforeend', PLUS);
-      b.append(el('span', 'Elige', 'cam-hj-ev-slot-label', { 'aria-hidden': 'true' }));
-      b.addEventListener('click', () => goEvent(true));
+      if (!s.live) return el('span', '?', 'cam-hj-ev-slot is-open', { 'aria-hidden': 'true' });
+      const b = el('button', '?', 'cam-hj-ev-slot is-open', { type: 'button', 'aria-label': 'Elegir un equipo' });
+      b.addEventListener('click', event => { event.stopPropagation(); goEvent(true); });
       return b;
     }
     const box = el('span', null, 'cam-hj-ev-slot is-' + s.kind);
-    box.append(evCrest(s.t));
-    const name = el('span', null, 'cam-hj-ev-slot-name');
-    name.append(el('span', shortName(s.t), 'cam-hj-ev-long'), el('span', abbrOf(s.t), 'cam-hj-ev-abbr', { 'aria-hidden': 'true' }));
-    name.append(el('span', s.kind === 'fixed' ? ', ya dentro' : ', tu elección', 'cam-hj-sr'));
-    box.append(name);
-    if (s.kind === 'fixed') {
-      const tick = el('span', null, 'cam-hj-ev-tick', { 'aria-hidden': 'true' });
-      tick.innerHTML = CHECK;
-      box.append(tick);
-    }
+    box.append(evCrest(s.t), el('span', shortName(s.t) + (s.kind === 'fixed' ? ', ya dentro' : ', tu elección'), 'cam-hj-sr'));
     return box;
   }
-  function evRow(r) {
-    const row = el('button', null, 'cam-hj-ev-row' + (r.b ? '' : ' is-single'), { type: 'button' });
+  function evPair(r) {
+    const pair = el('span', null, 'cam-hj-ev-pair');
     const side = t => {
       const mine = r.pick && String(r.pick) === String(t.team_id);
       const s = el('span', null, 'cam-hj-ev-side' + (mine ? ' is-mine' : ''));
-      s.append(evCrest(t), el('span', shortName(t), 'cam-hj-ev-side-name'));
-      if (mine) s.append(el('span', ', tu elección', 'cam-hj-sr'));
+      s.append(evCrest(t), el('span', shortName(t) + (mine ? ', tu elección' : ''), 'cam-hj-sr'));
       return s;
     };
-    const match = el('span', null, 'cam-hj-ev-match');
-    match.append(side(r.a));
-    if (r.b) match.append(el('span', 'vs', 'cam-hj-ev-vs', { 'aria-hidden': 'true' }), side(r.b));
-    row.append(match);
-    if (r.status) row.append(el('span', r.status, 'cam-hj-ev-status'));
-    row.addEventListener('click', () => goEvent(false));
-    return row;
+    pair.append(side(r.a), el('span', 'vs', 'cam-hj-ev-vs', { 'aria-hidden': 'true' }), side(r.b));
+    return pair;
   }
   function eventCard(v) {
     const card = el('section', null, 'cam-hj-ev', { 'aria-labelledby': 'camHjEvTitle' });
-    const top = el('div', null, 'cam-hj-ev-top');
-    top.append(el('span', v.step, 'cam-hj-ev-step'));
-    if (v.badge) {
-      const badgeEl = el('span', null, 'cam-hj-ev-badge' + (v.badgeDone ? ' is-done' : ''));
-      if (v.badgeDone) badgeEl.innerHTML = CHECK;
-      badgeEl.append(document.createTextNode(v.badge));
-      top.append(badgeEl);
-    }
-    card.append(top, el('h4', v.title, 'cam-hj-ev-title', { id: 'camHjEvTitle' }));
+    card.append(el('span', v.kicker, 'cam-hj-ev-kicker'), el('h4', v.title, 'cam-hj-ev-title', { id: 'camHjEvTitle' }));
     if (v.slots && v.slots.length) {
       const grid = el('div', null, 'cam-hj-ev-grid');
       v.slots.forEach(s => grid.append(evSlot(s)));
       card.append(grid);
     }
-    if (v.rows && v.rows.length) {
-      const list = el('div', null, 'cam-hj-ev-rows');
-      v.rows.forEach(r => list.append(evRow(r)));
-      card.append(list);
+    if (v.pairs && v.pairs.length) {
+      const grid = el('div', null, 'cam-hj-ev-pairs');
+      v.pairs.forEach(r => grid.append(evPair(r)));
+      card.append(grid);
     }
-    if (v.note) card.append(el('p', v.note, 'cam-hj-ev-note'));
+    if (v.champ) {
+      const champ = el('div', null, 'cam-hj-ev-champ');
+      champ.append(evCrest(v.champ), el('span', shortName(v.champ), 'cam-hj-ev-champ-name'));
+      card.append(champ);
+    }
     const cta = el('button', v.cta, 'cam-hj-ev-cta', { type: 'button' });
-    cta.addEventListener('click', () => goEvent(!!v.picker));
     card.append(cta);
-    if (v.sub) card.append(el('p', v.sub, 'cam-hj-ev-sub'));
+    // Toda la tarjeta lleva a la Liguilla, como las de partido (el botón es el control accesible).
+    card.addEventListener('click', event => { if (!event.target.closest('button:not(.cam-hj-ev-cta)')) goEvent(!!v.picker); });
     return card;
-  }
-  // «También en la quiniela»: la próxima cita de cada deporte, en una fila compacta.
-  function otherRow(g, sport) {
-    const b = el('button', null, 'cam-hj-other', { type: 'button', 'data-sport': sport });
-    let first, second, match, aria;
-    if (sport === 'nfl') {
-      first = nflTeam(g.away_id); second = nflTeam(g.home_id);
-      match = first.short + ' @ ' + second.short; aria = first.name + ' en ' + second.name;
-    } else {
-      first = footballTeam(g.home_id); second = footballTeam(g.away_id);
-      match = first.short + ' vs ' + second.short; aria = first.name + ' contra ' + second.name;
-    }
-    const league = sport === 'nfl' ? 'NFL' + (g.week ? ' · Semana ' + g.week : '') : (LEAGUES[g.competition] || 'Fútbol');
-    const crests = el('span', null, 'cam-hj-other-crests', { 'aria-hidden': 'true' });
-    crests.append(crest(first.logo, first.abbr, ''), crest(second.logo, second.abbr, ''));
-    const text = el('span', null, 'cam-hj-other-text');
-    text.append(el('span', match, 'cam-hj-other-match'), el('span', league + ' · ' + dayLabel(g.kickoff), 'cam-hj-other-meta'));
-    const go = el('span', null, 'cam-hj-other-cta', { 'aria-hidden': 'true' });
-    go.append(el('span', 'Jugar ', 'cam-hj-other-cta-word'), document.createTextNode('›'));
-    b.append(crests, text, go);
-    b.setAttribute('aria-label', league + ', ' + aria + ', ' + dayLabel(g.kickoff) + '. Jugar en la quiniela');
-    b.addEventListener('click', () => goQuiniela(sport));
-    return b;
-  }
-  function othersCard(games) {
-    const box = el('div', null, 'cam-hj-others');
-    box.append(el('h4', 'También en la quiniela', 'cam-hj-others-title'));
-    games.forEach(g => box.append(otherRow(g, g.sport)));
-    return box;
-  }
-  // Cabecera de la sección: «Quinielas» o, con evento, «Quinielas · Evento especial / La Liguilla».
-  function jornadaHead(view) {
-    const section = rows.jornada.section;
-    const head = section.querySelector('.cam-hj-head');
-    const heading = head.querySelector('.cam-hj-heading');
-    let titles = head.querySelector('.cam-hj-titles');
-    if (!titles) {
-      titles = el('div', null, 'cam-hj-titles');
-      heading.before(titles);
-      titles.append(el('span', 'Quinielas · Evento especial', 'cam-hj-eyebrow'), heading);
-    }
-    titles.querySelector('.cam-hj-eyebrow').hidden = !view;
-    heading.textContent = view ? view.name : 'Quinielas';
-    const more = head.querySelector('.cam-hj-more');
-    // En teléfonos estrechos el enlace se queda en «Otras ›» para que la cabecera quepa en una línea.
-    if (view) {
-      const label = el('span', null, 'cam-hj-more-label');   // un solo hijo: el flex no se come los espacios
-      label.append('Otras', el('span', ' quinielas', 'cam-hj-more-long'), ' ›');
-      more.replaceChildren(label);
-    }
-    else more.textContent = 'Ver partidos ›';
-    more.setAttribute('aria-label', view ? 'Ver las otras quinielas' : 'Ver partidos');
-    if (view) section.dataset.mode = 'event'; else delete section.dataset.mode;
-    rows.jornada.list.setAttribute('aria-label', view ? view.name : 'Quinielas');
   }
 
   function paintJornada() {
     const cards = [];
     const nfl = state.nfl.filter(isOpen).map(g => ({ ...g, sport: 'nfl' }));
     const football = state.football.filter(isOpen).map(g => ({ ...g, sport: 'football' }));
-    // Muestra la próxima cita de cada deporte. Todo el calendario permanece en
-    // su quiniela y los contadores de los atajos siguen contando todos los juegos.
-    const upcoming = [nfl[0], football[0]].filter(Boolean)
+    // Carrusel: la próxima cita de cada liga (NFL, Liga MX, Champions, LaLiga, Premier).
+    // Todo el calendario permanece en su quiniela y los atajos siguen contando todos los juegos.
+    const leagues = new Set();
+    const firsts = football.filter(g => !leagues.has(g.competition) && leagues.add(g.competition));
+    const upcoming = [nfl[0], ...firsts].filter(Boolean)
       .sort((a, b) => new Date(a.kickoff) - new Date(b.kickoff));
+    // Con un evento especial en marcha (la Liguilla), su tarjeta abre el carrusel.
     const view = eventView();
-    jornadaHead(view);
-    if (view) {
-      cards.push(eventCard(view));
-      if (upcoming.length) cards.push(othersCard(upcoming));
-    } else for (const g of upcoming) cards.push(gameCard(g, g.sport));
+    if (view) cards.push(eventCard(view));
+    for (const g of upcoming) cards.push(gameCard(g, g.sport));
+    if (view) rows.jornada.section.dataset.event = 'liguilla'; else delete rows.jornada.section.dataset.event;
     rows.jornada.section.dataset.nextSport = upcoming[0]?.sport || 'nfl';
     fill(rows.jornada, cards);
     badge(nflShortcut, nfl.length, nfl.length === 1 ? 'partido abierto' : 'partidos abiertos');
@@ -731,7 +610,8 @@
         state.takeViewerId=viewer.data?.user?.id||null;
       }
       // Escudos solo de los partidos que se van a ver.
-      const ids = [...new Set(state.football.slice(0, 12).flatMap(g => [g.home_id, g.away_id]).map(String))]
+      const leagueFirsts = state.football.filter((g, i, all) => all.findIndex(x => x.competition === g.competition) === i);
+      const ids = [...new Set(state.football.slice(0, 12).concat(leagueFirsts).flatMap(g => [g.home_id, g.away_id]).map(String))]
         .filter(id => !state.teams.has(id));
       if (ids.length) {
         const teams = await c.from('cam_football_teams').select('id,name,short_name,abbreviation,logo').in('id', ids);
