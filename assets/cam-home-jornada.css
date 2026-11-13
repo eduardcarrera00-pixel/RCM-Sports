@@ -395,9 +395,40 @@
     html body #camHomeJornada .cam-hj-ev-cta:hover { background:#F0CD92!important; }
     html body #camHomeJornada button.cam-hj-ev-slot.is-open:hover { background:rgba(232,191,121,.12)!important; }
   }
-  /* En escritorio la fila es una rejilla de dos: la tarjeta ocupa su celda. */
+  /* Separador «Participa en la quiniela de otras ligas»: filete dorado que se desvanece,
+     dos rombos pequeños y el texto en la serif de lectura. De pie en el carrusel. */
+  html body #camHomeJornada .cam-hj-item.is-sep { scroll-snap-align:none!important; }
+  html body #camHomeJornada .cam-hj-sep {
+    display:flex!important; flex-direction:column!important; align-items:center!important; justify-content:center!important;
+    gap:8px!important; width:112px!important; min-height:100%!important; margin:0!important; padding:4px 2px!important;
+    color:var(--hj-muted)!important; text-align:center!important;
+  }
+  html body #camHomeJornada .cam-hj-sep-line {
+    display:block!important; flex:1 1 0!important; width:1px!important; min-height:16px!important;
+    background:linear-gradient(to bottom, transparent, var(--hj-gold))!important; opacity:.75!important;
+  }
+  html body #camHomeJornada .cam-hj-sep-line:last-child { background:linear-gradient(to top, transparent, var(--hj-gold))!important; }
+  html body #camHomeJornada .cam-hj-sep-diamond {
+    display:block!important; flex:0 0 auto!important; width:6px!important; height:6px!important;
+    border:1px solid var(--hj-gold)!important; transform:rotate(45deg)!important;
+  }
+  html body #camHomeJornada .cam-hj-sep-text {
+    margin:2px 0 0!important; padding:0!important; color:var(--hj-ink)!important;
+    font:italic 500 14px/1.35 "Playfair Display",Georgia,serif!important; letter-spacing:0!important; text-transform:none!important;
+    text-wrap:balance!important;
+  }
+  html body #camHomeJornada .cam-hj-sep-arrow { display:block!important; color:var(--hj-accent)!important; font:600 17px/1 Inter,system-ui,sans-serif!important; }
+
+  /* En escritorio la fila es una rejilla de dos: la tarjeta ocupa su celda y el
+     separador cruza la rejilla, en horizontal. */
   @media (min-width:761px) {
     html body #camHomeJornada .cam-hj-ev { width:100%!important; }
+    html body #camHomeJornada .cam-hj-item.is-sep { grid-column:1 / -1!important; }
+    html body #camHomeJornada .cam-hj-sep { flex-direction:row!important; gap:12px!important; width:100%!important; min-height:0!important; padding:6px 0!important; }
+    html body #camHomeJornada .cam-hj-sep-line { width:auto!important; height:1px!important; min-height:0!important; background:linear-gradient(to right, transparent, var(--hj-gold))!important; }
+    html body #camHomeJornada .cam-hj-sep-line:last-child { background:linear-gradient(to left, transparent, var(--hj-gold))!important; }
+    html body #camHomeJornada .cam-hj-sep-text { margin:0!important; white-space:nowrap!important; }
+    html body #camHomeJornada .cam-hj-sep-arrow { display:none!important; }
   }
 
   /* ---------- esquinas (después del reset a 0) ---------- */

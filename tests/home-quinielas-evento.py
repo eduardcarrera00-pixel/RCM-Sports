@@ -5,7 +5,8 @@ Página completa en Chromium con tests/full-page.py y el Supabase falso (sin red
 Cubre:
   · la sección se llama siempre «Quinielas» («Ver partidos ›»), sin antetítulo, sin «La Liguilla»,
     sin «Paso 1 de 3», sin «Cierra en…», sin notas: solo escudos, «?» y el botón;
-  · el carrusel: la tarjeta de la Liguilla primero y después la próxima cita de cada liga
+  · el carrusel: la tarjeta de la Liguilla primero («¿Quiénes crees que serán el top 8?»), el
+    separador «Participa en la quiniela de otras ligas» y después la próxima cita de cada liga
     (Liga MX, Champions, LaLiga, Premier, NFL), cada resultado con su círculo y sin «pts»;
   · paso 1 (Tus 8) a 320 y 390 px de día y de noche: 5 escudos + 3 «?», «Completar mis 8 ›»,
     tarjeta pequeña (236 px de ancho, como mucho ~230 de alto), nada recortado;
@@ -86,14 +87,15 @@ STATE = """() => {
   const txt = s => { const e = sec && sec.querySelector(s); return e ? e.textContent.trim() : null; };
   const card = sec && sec.querySelector('.cam-hj-ev');
   const box = e => { if (!e) return null; const r = e.getBoundingClientRect(); return [Math.round(r.width), Math.round(r.height)]; };
-  const clipped = q('.cam-hj-ev-kicker, .cam-hj-ev-title, .cam-hj-ev-cta, .cam-hj-heading, .cam-hj-more, .cam-hj-pick-name')
+  const clipped = q('.cam-hj-ev-kicker, .cam-hj-ev-title, .cam-hj-ev-cta, .cam-hj-heading, .cam-hj-more, .cam-hj-pick-name, .cam-hj-sep-text')
     .filter(e => vis(e) && e.clientWidth > 1 && (e.scrollWidth > e.clientWidth || e.scrollHeight > e.clientHeight + 2)).map(e => e.className + ':' + e.textContent.trim());
   const items = q('.cam-hj-item');
   const root = document.scrollingElement;
   return {
     on: document.body.classList.contains('cam-home-jornada'), shown: vis(sec), event: sec?.dataset.event || null,
     heading: txt('.cam-hj-heading'), more: txt('.cam-hj-more'),
-    order: items.map(i => i.querySelector('.cam-hj-ev') ? 'evento' : (i.querySelector('.cam-hj-league')?.textContent || '?')),
+    order: items.map(i => i.querySelector('.cam-hj-ev') ? 'evento' : i.querySelector('.cam-hj-sep') ? 'separador' : (i.querySelector('.cam-hj-league')?.textContent || '?')),
+    sep: txt('.cam-hj-sep-text'), sepBox: box(sec?.querySelector('.cam-hj-sep')), rowBox: box(sec?.querySelector('.cam-hj-row')),
     kicker: txt('.cam-hj-ev-kicker'), title: txt('.cam-hj-ev-title'), cta: txt('.cam-hj-ev-cta'),
     fixed: q('.cam-hj-ev-slot.is-fixed').length, mine: q('.cam-hj-ev-slot.is-mine').length, open: q('.cam-hj-ev-slot.is-open').length,
     openButtons: q('button.cam-hj-ev-slot.is-open').length,
@@ -158,12 +160,13 @@ for width, dark in [(390, True), (390, False), (320, True)]:
     with fp.full_page(fixture('q8'), dark=dark, width=width, height=900) as page:
         st = open_home(page)
         assert st['on'] and st['shown'] and st['event'] == 'liguilla', f'{where}: no se ve {st}'
-        assert [o.upper() for o in st['order']] == ['EVENTO'] + LEAGUES, f'{where}: carrusel {st["order"]}'
-        assert st['kicker'] == 'Liga MX' and st['title'] == '¿Quiénes completan los 8?', f'{where}: {st["kicker"]} / {st["title"]}'
+        assert [o.upper() for o in st['order']] == ['EVENTO', 'SEPARADOR'] + LEAGUES, f'{where}: carrusel {st["order"]}'
+        assert st['kicker'] == 'Liga MX' and st['title'] == '¿Quiénes crees que serán el top 8?', f'{where}: {st["kicker"]} / {st["title"]}'
+        assert st['sep'] == 'Participa en la quiniela de otras ligas' and st['sepBox'][0] == 112, f'{where}: separador {st["sep"]} {st["sepBox"]}'
         assert (st['fixed'], st['mine'], st['open'], st['openButtons']) == (5, 0, 3, 3), f'{where}: huecos {st}'
         assert st['cta'] == 'Completar mis 8 ›', f'{where}: botón {st["cta"]}'
         assert st['slotBoxes'] == ['32x32'], f'{where}: escudos y «?» deben ser círculos iguales {st["slotBoxes"]}'
-        assert st['card'][0] == 236 and st['card'][1] <= 232, f'{where}: la tarjeta no es pequeña {st["card"]}'
+        assert st['card'][0] == 236 and st['card'][1] <= 256, f'{where}: la tarjeta no es pequeña {st["card"]}'
         assert st['fonts'] == ['Playfair Display', 'Inter', 'Inter'], f'{where}: letras {st["fonts"]}'
         assert st['ctaBox'][1] >= 40, f'{where}: botón bajo {st["ctaBox"]}'
         assert st['crests'] == 5, f'{where}: escudos sin pintar {st["crests"]}'
@@ -214,7 +217,7 @@ with fp.full_page(fixture('closed'), dark=True) as page:
 with fp.full_page(fixture('bracket', user=True), dark=True) as page:
     st = open_home(page)
     assert st['title'] == 'Arma tu cuadro' and st['pairs'] == 4 and st['pairMine'] == 2, f'cuadro: {st}'
-    assert st['cta'] == 'Seguir con mi cuadro ›' and st['card'][1] <= 232, f'cuadro: {st["cta"]} {st["card"]}'
+    assert st['cta'] == 'Seguir con mi cuadro ›' and st['card'][1] <= 256, f'cuadro: {st["cta"]} {st["card"]}'
     common(st, 'cuadro'); shot(page, 'paso2-cuadro')
 
 # 6 · Paso 3: ronda a ronda
@@ -237,7 +240,8 @@ for mode in ['champ', 'none']:
 # 8 · Escritorio
 with fp.full_page(fixture('q8'), dark=True, width=1366, height=900, scale=1) as page:
     st = open_home(page)
-    assert st['event'] == 'liguilla' and st['order'][0] == 'evento', f'escritorio: {st["order"]}'
+    assert st['event'] == 'liguilla' and st['order'][:2] == ['evento', 'separador'], f'escritorio: {st["order"]}'
+    assert abs(st['sepBox'][0] - st['rowBox'][0]) <= 6 and st['sepBox'][1] < 50, f'escritorio: el separador debe cruzar la fila {st["sepBox"]} {st["rowBox"]}'
     common(st, 'escritorio'); shot(page, 'escritorio')
     assert not page.errors, f'escritorio: errores {page.errors}'
 

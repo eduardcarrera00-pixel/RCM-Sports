@@ -243,7 +243,7 @@
     else if (main.firstChild !== root) main.prepend(root);
   }
   function item(card) {
-    const wrap = el('div', null, 'cam-hj-item', { role: 'listitem' });
+    const wrap = el('div', null, 'cam-hj-item' + (card.classList.contains('cam-hj-sep') ? ' is-sep' : ''), { role: 'listitem' });
     wrap.append(card);
     return wrap;
   }
@@ -364,7 +364,7 @@
       if (saved) return { kicker, title: 'Tus 8 están listos', slots, cta: 'Ver mi liguilla ›' };
       if (ready) return { kicker, title: 'Tus 8 están listos', slots, cta: 'Guardar mis 8 ›', picker: true };
       if (!free) return { kicker, title: 'Los 8 ya están dentro', slots, cta: 'Ver la Liguilla ›' };
-      return { kicker, title: chosen.length ? (left === 1 ? 'Te falta 1' : 'Te faltan ' + left) : '¿Quiénes completan los 8?',
+      return { kicker, title: chosen.length ? (left === 1 ? 'Te falta 1' : 'Te faltan ' + left) : '¿Quiénes crees que serán el top 8?',
         slots, cta: fixed.length ? 'Completar mis 8 ›' : 'Elegir mis 8 ›', picker: true };
     }
     // Cerrado y a la espera de que se abra el cuadro (al terminar la última jornada).
@@ -510,6 +510,17 @@
     return card;
   }
 
+  // Entre la Liguilla y los partidos: un filete dorado con una línea de texto.
+  // En el teléfono va de pie dentro del carrusel; en escritorio cruza la rejilla.
+  function separator(text) {
+    const sep = el('div', null, 'cam-hj-sep');
+    const ornament = () => el('span', null, 'cam-hj-sep-diamond', { 'aria-hidden': 'true' });
+    sep.append(el('span', null, 'cam-hj-sep-line', { 'aria-hidden': 'true' }), ornament(),
+      el('p', text, 'cam-hj-sep-text'), el('span', '→', 'cam-hj-sep-arrow', { 'aria-hidden': 'true' }),
+      ornament(), el('span', null, 'cam-hj-sep-line', { 'aria-hidden': 'true' }));
+    return sep;
+  }
+
   function paintJornada() {
     const cards = [];
     const nfl = state.nfl.filter(isOpen).map(g => ({ ...g, sport: 'nfl' }));
@@ -523,6 +534,7 @@
     // Con un evento especial en marcha (la Liguilla), su tarjeta abre el carrusel.
     const view = eventView();
     if (view) cards.push(eventCard(view));
+    if (view && upcoming.length) cards.push(separator('Participa en la quiniela de otras ligas'));
     for (const g of upcoming) cards.push(gameCard(g, g.sport));
     if (view) rows.jornada.section.dataset.event = 'liguilla'; else delete rows.jornada.section.dataset.event;
     rows.jornada.section.dataset.nextSport = upcoming[0]?.sport || 'nfl';
