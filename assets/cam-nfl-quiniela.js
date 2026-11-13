@@ -335,6 +335,8 @@
     const team=window.CamNFLQuinielaTeams?.getTeam(id)||teams.get(id);
     summary.append(el('strong',team?.name||id),el('span',(team?.id||id)+' · '+(home?'Local':'Visitante')));
     b.append(logo(id),summary);
+    // 12 nov 2026: un círculo de color en lugar de los puntos (hueco; relleno al elegir).
+    const dot=el('span',null,'cam-q-dot');dot.setAttribute('aria-hidden','true');b.append(dot);
     // 12 nov 2026: sin puntos a la vista en las opciones (todos los aciertos valen igual).
     b.addEventListener('click',()=>{if(!isOpen(g))return;if(!user){window.openUserAuthModal?.();return;}draft.set(g.id,id);saveDraft();paintGames();});
     if(disabled)b.title='Este partido está cerrado';

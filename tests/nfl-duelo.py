@@ -222,6 +222,8 @@ def meta_line():
         assert lines and all(l['kids'] == 1 and l['text'] == 'Abierto' and l['right'] <= 24 for l in lines), f'{where}: {lines}'
         options = page.evaluate(OPTIONS, '#camNflGames')
         assert options and not any('pts' in o or 'punto' in o.lower() for o in options), f'{where}: puntos en las opciones {options}'
+        dots = page.evaluate("[...document.querySelectorAll('#camNflGames .cam-nfl-team')].map(b => b.querySelectorAll('.cam-q-dot').length)")
+        assert dots and all(n == 1 for n in dots), f'{where}: falta el círculo {dots}'
         if SHOTS:
             page.locator('#camNflGames .cam-nfl-game').first.screenshot(path=str(SHOTS / f'{where}.png'))
         assert page.errors == [], f'{where}: errores {page.errors}'
@@ -274,6 +276,8 @@ def football(dark, anonymous):
         assert lines and all(l['kids'] == 1 and l['text'] == 'Abierto' and l['right'] <= 24 for l in lines), f'{where}: línea {lines}'
         options = page.evaluate(OPTIONS, '#camFootballGames')
         assert len(options) == 6 and not any('pts' in o or 'punto' in o.lower() for o in options), f'{where}: puntos en las opciones {options}'
+        dots = page.evaluate("[...document.querySelectorAll('#camFootballGames :is(.cam-nfl-team,.cam-nfl-draw)')].map(b => b.querySelectorAll('.cam-q-dot').length)")
+        assert len(dots) == 6 and all(n == 1 for n in dots), f'{where}: falta el círculo {dots}'
         if SHOTS:
             box = page.evaluate("""() => { const a = document.getElementById('camFootballGames').getBoundingClientRect(),
               b = document.getElementById('camFootballHistory').getBoundingClientRect(); return {y: a.top + scrollY, h: b.bottom - a.top}; }""")

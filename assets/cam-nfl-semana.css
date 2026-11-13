@@ -426,6 +426,32 @@
   /* ---------- 2. La Quiniela NFL: editor, laurel y comunidad ---------- */
   /* 12 nov 2026: la línea de cada partido (NFL y Fútbol) solo lleva el estado; sigue a la derecha. */
   html body :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-game-meta > .cam-nfl-badge:only-child { margin-left:auto!important; }
+  /* 12 nov 2026: donde estaban los puntos, un círculo pequeño del color de cada lado
+     (visitante azul, local dorado; empate neutro). Hueco con un punto suave; al elegir se rellena;
+     al cerrar, verde si acertaste y rojo si fallaste. */
+  html body :is(#camNflQuiniela,#camFootballQuiniela) .cam-q-dot {
+    position:relative!important; display:inline-block!important; flex:none!important; justify-self:end!important; align-self:center!important;
+    width:18px!important; height:18px!important; margin:0!important; padding:0!important; box-sizing:border-box!important;
+    border:2px solid var(--q-side,var(--q-edge))!important; border-radius:50%!important; background:transparent!important;
+    transition:background-color .15s ease,border-color .15s ease!important;
+  }
+  html body :is(#camNflQuiniela,#camFootballQuiniela) .cam-q-dot::after {
+    content:""!important; position:absolute!important; inset:3px!important; border-radius:50%!important;
+    background:var(--q-side,var(--q-edge))!important; opacity:.3!important;
+  }
+  html body :is(#camNflQuiniela,#camFootballQuiniela) :is(.cam-nfl-team,.cam-nfl-draw).is-selected .cam-q-dot { border-color:var(--q-gold)!important; background:var(--q-gold)!important; }
+  html body :is(#camNflQuiniela,#camFootballQuiniela) :is(.cam-nfl-team,.cam-nfl-draw).is-selected .cam-q-dot::after { background:var(--q-on-gold)!important; opacity:1!important; inset:4px!important; }
+  html body :is(#camNflQuiniela,#camFootballQuiniela) :is(.cam-nfl-team,.cam-nfl-draw).is-winner .cam-q-dot { border-color:var(--q-ok)!important; }
+  html body :is(#camNflQuiniela,#camFootballQuiniela) :is(.cam-nfl-team,.cam-nfl-draw).is-winner .cam-q-dot::after { background:var(--q-ok)!important; opacity:.45!important; }
+  html body :is(#camNflQuiniela,#camFootballQuiniela) :is(.cam-nfl-team,.cam-nfl-draw).is-winner.is-selected .cam-q-dot { background:var(--q-ok)!important; }
+  html body :is(#camNflQuiniela,#camFootballQuiniela) :is(.cam-nfl-team,.cam-nfl-draw).is-winner.is-selected .cam-q-dot::after { background:var(--q-ok-bg)!important; opacity:1!important; }
+  html body :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-game[data-state="fallo"] :is(.cam-nfl-team,.cam-nfl-draw).is-selected:not(.is-winner) .cam-q-dot { border-color:var(--q-bad)!important; background:var(--q-bad)!important; }
+  html body :is(#camNflQuiniela,#camFootballQuiniela) .cam-nfl-game[data-state="fallo"] :is(.cam-nfl-team,.cam-nfl-draw).is-selected:not(.is-winner) .cam-q-dot::after { background:var(--q-bad-bg)!important; }
+  /* Fútbol: la opción elegida se pinta con --lg-sel (azul de día, oro de noche): el círculo usa su color de texto. */
+  html body #camFootballQuiniela :is(.cam-nfl-team,.cam-nfl-draw).is-selected .cam-q-dot { border-color:var(--lg-on-sel,var(--q-gold))!important; background:var(--lg-on-sel,var(--q-gold))!important; }
+  html body #camFootballQuiniela :is(.cam-nfl-team,.cam-nfl-draw).is-selected .cam-q-dot::after { background:var(--lg-sel,var(--q-on-gold))!important; }
+  html body #camFootballQuiniela .cam-nfl-sides :is(.cam-nfl-team,.cam-nfl-draw) .cam-q-dot { justify-self:center!important; margin-top:2px!important; }
+  @media (prefers-reduced-motion: reduce) { html body :is(#camNflQuiniela,#camFootballQuiniela) .cam-q-dot { transition:none!important; } }
   html body #camNflQuiniela .cam-nfl-extras {
     display:flex!important; flex-wrap:wrap!important; align-items:center!important; gap:6px!important;
     margin:10px 0 0!important; padding:10px 0 0!important; border-top:1px solid var(--q-line)!important; border-radius:0!important;

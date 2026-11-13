@@ -325,6 +325,8 @@
     const summary=el('span',null,'cam-nfl-team-name');
     summary.append(el('strong',teamName(id)),el('span',teamAbbr(id)+' · '+(pick==='home'?'Local':'Visitante')));
     b.append(logo(id),summary);
+    // 12 nov 2026: un círculo de color en lugar de los puntos (hueco; relleno al elegir).
+    const dot=el('span',null,'cam-q-dot');dot.setAttribute('aria-hidden','true');b.append(dot);
     // 12 nov 2026: sin puntos a la vista en las opciones (todos los aciertos valen igual).
     b.addEventListener('click',()=>choose(g,pick));
     if(disabled)b.title=unavailableReason();
@@ -337,6 +339,8 @@
     b.type='button';b.disabled=disabled;b.setAttribute('aria-pressed',String(chosen));
     if(g.status==='final'&&g.outcome)b.classList.add(g.outcome==='draw'?'is-winner':'is-loser');
     b.append(el('span','Empate','cam-nfl-draw-label'));
+    // 12 nov 2026: un círculo de color en lugar de los puntos (hueco; relleno al elegir).
+    const dot=el('span',null,'cam-q-dot');dot.setAttribute('aria-hidden','true');b.append(dot);
     b.addEventListener('click',()=>choose(g,'draw'));
     if(disabled)b.title=unavailableReason();
     return b;
