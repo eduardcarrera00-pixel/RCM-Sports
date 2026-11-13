@@ -81,7 +81,7 @@ def run(width, dark):
             assert all(st[k] is not None for k in expected), f'{where} {cat}: falta algo visible {st}'
             got = sorted(expected, key=lambda k: st[k])
             assert got == expected, f'{where} {cat}: orden {got}, esperado {expected}'
-            example = '«Los Lions ganan por más de 10…»' if cat == 'NFL' else '«Real Madrid gana por 2 goles o más…»'
+            example = '«Los Lions ganan por más de 10…»' if cat == 'NFL' else '«Gilberto Mora balón de oro 2030»'
             assert '¿Qué crees que va a pasar?' in st['promptText'] and example in st['promptText'], f'{where} {cat}: {st["promptText"]}'
             assert not st['otherShown'], f'{where} {cat}: se ve el «Tu Take» del otro deporte'
             assert st['last'] == 'ae-takes-head', f'{where} {cat}: lo último de Takes es {st["last"]}'

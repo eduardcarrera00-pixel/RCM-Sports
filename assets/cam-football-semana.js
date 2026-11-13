@@ -319,10 +319,9 @@
     return box;
   }
 
-  /* «Tu Take» al principio de Takes (12 nov 2026), con la misma maqueta que NFL
-     (clases cam-ns-take*, estilos en cam-nfl-semana.css). El ejemplo usa el partido
-     destacado; si ya elegiste en ese partido, salen dos ideas que abren el compositor
-     con el título escrito. Sin partido, un ejemplo genérico. */
+  /* Guía al principio de Takes, con la misma maqueta que NFL
+     (clases cam-ns-take*, estilos en cam-nfl-semana.css). El ejemplo de Gilberto Mora
+     es estable; al elegir en el duelo, las ideas conservan el contexto del partido. */
   const ICONS={
     take:'<path d="M4 5h16v11H10l-6 4V5z"/>',
     pen:'<path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/>'
@@ -342,10 +341,10 @@
   function takeBlock(snap,duel){
     const pick=duel&&!started(duel)?(snap.draft.get(duel.id)||snap.mine.get(duel.id)||null):null;
     const box=el('div',null,'cam-ns-take'+(pick?' is-invited':''),{role:'group','aria-labelledby':'camFootballTakeTitle'});
-    const tag=el('p',null,'cam-ns-step-label');tag.append(icon('take'),el('span','Tu Take'));
+    const tag=el('p',null,'cam-ns-step-label');tag.append(icon('take'),el('span','Cómo hacer tu take'));
     box.append(tag,
       el('h2','¿Qué crees que va a pasar?','cam-ns-step-title',{id:'camFootballTakeTitle'}),
-      el('p','Una predicción con tus palabras. Lo que se publica aquí no se borra.','cam-ns-take-text'));
+      el('p','¿Has dicho algo que no quedó para la historia? Con tu take se podrá quedar para la historia.','cam-ns-take-text'));
     if(pick){
       const team=pick==='draw'?null:name(snap,pick==='home'?duel.home_id:duel.away_id);
       const ideas=team?[team+' gana por 2 goles o más',team+' remonta en la segunda parte']:['Empate con goles de los dos','Empate sin goles'];
@@ -356,11 +355,10 @@
       }
       wrap.append(el('p','Ideas para empezar','cam-ns-ideas-label'),row);box.append(wrap);
     }
-    const exampleTeam=pick&&pick!=='draw'?name(snap,pick==='home'?duel.home_id:duel.away_id):duel?name(snap,duel.home_id):null;
     const field=button(null,()=>openTake(snap),'cam-ns-take-field');
     field.setAttribute('aria-label','Escribir mi Take');field.setAttribute('aria-haspopup','dialog');field.setAttribute('aria-controls','aeTakeComposerDialog');
     const pen=el('span',null,'cam-ns-take-pen',{'aria-hidden':'true'});pen.append(icon('pen'));
-    field.append(el('span',exampleTeam?'«'+exampleTeam+' gana por 2 goles o más…»':'«Este fin de semana pasa algo que nadie espera…»','cam-ns-take-placeholder',{'aria-hidden':'true'}),pen);
+    field.append(el('span','«Gilberto Mora balón de oro 2030»','cam-ns-take-placeholder',{'aria-hidden':'true'}),pen);
     const scale=el('p',null,'cam-ns-take-scale'),bars=el('span',null,'cam-ns-bars',{'aria-hidden':'true'});
     bars.append(el('span'),el('span'),el('span'));
     scale.append(bars,el('span','Cuanto más atrevido, más vale si aciertas'));

@@ -298,9 +298,9 @@
     const invited = !!mine && !started(duel);
     const pickedNick = mine ? nick(mine) : null;
     const box = el('div', null, 'cam-ns-take' + (invited ? ' is-invited' : ''), { role: 'group', 'aria-labelledby': 'camNsTakeTitle' });
-    box.append(stepLabel('take', 'Tu Take'),
+    box.append(stepLabel('take', 'Cómo hacer tu take'),
       el('h2', '¿Qué crees que va a pasar?', 'cam-ns-step-title', { id: 'camNsTakeTitle' }),
-      el('p', 'Una predicción con tus palabras. Lo que se publica aquí no se borra.', 'cam-ns-take-text'));
+      el('p', '¿Has dicho algo que no quedó para la historia? Con tu take se podrá quedar para la historia.', 'cam-ns-take-text'));
     if (invited) {
       const ideas = el('div', null, 'cam-ns-ideas');
       const list = el('div', null, 'cam-ns-ideas-row');
