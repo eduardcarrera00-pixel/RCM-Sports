@@ -280,26 +280,26 @@ try { sessionStorage.setItem('cam_sports_home_welcome_seen_session_v1', '1'); } 
 
 
 def football(dark, anonymous):
-    """Fútbol: «Ver mis jornadas» debajo de iniciar sesión / guardar, y la línea de cada partido solo con el estado."""
+    """Fútbol: «Ver mis jornadas» al final de La semana, debajo del marcador (13 nov 2026), y la línea de cada partido solo con el estado."""
     where = f'390-futbol-{"noche" if dark else "dia"}-{"sin-sesion" if anonymous else "con-sesion"}'
     pre = "window.__fake = window.__fake || {}; window.__fake.anonymous = true;" if anonymous else ''
     with fp.full_page(fake_js=pre + FOOTBALL, dark=dark, width=390, height=860) as page:
         page.click('body > nav.cam-mobile-bottom-nav > button[data-category="Fútbol"]'); page.wait_for_timeout(2000)
         page.evaluate("window.camSectionTabs?.select?.('quiniela', {scroll: false})"); page.wait_for_timeout(600)
         page.locator('#camFootballHistory').scroll_into_view_if_needed(); page.wait_for_timeout(300)
-        # Con sesión el pick se guarda al tocarlo y no hay botón de guardar: «Ver mis jornadas» va bajo los partidos.
+        # 13 nov 2026: «Ver mis jornadas» cierra La semana, debajo del marcador (#camFootballWeekActions).
         st = page.evaluate("""() => {
           const save = document.getElementById('camFootballSaveDay'), hist = document.querySelector('#camFootballHistory button');
-          const above = save.getClientRects().length ? save.closest('.cam-nfl-save-row') : document.getElementById('camFootballGames');
+          const above = document.getElementById('camFootballScoreBody');
           const s = above.getBoundingClientRect(), n = hist?.getBoundingClientRect();
           const nav = document.getElementById('camFootballNav');
           return {save: save.textContent.trim(), hist: hist?.textContent.trim() || null, below: !!n && n.top >= s.bottom,
-            gap: n ? Math.round(n.top - s.bottom) : null, w: n ? Math.round(n.width) : 0, sw: Math.round(s.width), saveShown: !!save.getClientRects().length,
+            end: !!hist && document.getElementById('camFootballWeekActions').contains(hist), saveShown: !!save.getClientRects().length,
             topButtons: [...nav.querySelectorAll('button')].filter(b => b.getClientRects().length).map(b => b.textContent.trim()),
             emptyTop: !nav.getClientRects().length || nav.getBoundingClientRect().height < 1 || [...nav.querySelectorAll('button')].some(b => b.getClientRects().length)};
         }""")
         if anonymous: assert st['saveShown'] and st['save'] == 'Inicia sesión para participar', f'{where}: {st}'
-        assert st['hist'] == 'Ver mis jornadas ›' and st['below'] and 0 <= st['gap'] <= 32 and abs(st['w'] - st['sw']) <= 1, f'{where}: {st}'
+        assert st['hist'] == 'Ver mis jornadas ›' and st['below'] and st['end'], f'{where}: {st}'
         assert 'Ver mis jornadas ›' not in st['topButtons'] and st['emptyTop'], f'{where}: arriba {st}'
         lines = page.evaluate(META, '#camFootballGames')
         assert lines and all(l['kids'] == 1 and l['text'] == 'Abierto' and l['right'] <= 24 for l in lines), f'{where}: línea {lines}'
@@ -309,7 +309,7 @@ def football(dark, anonymous):
         assert len(dots) == 6 and all(n == 1 for n in dots), f'{where}: falta el círculo {dots}'
         if SHOTS:
             box = page.evaluate("""() => { const a = document.getElementById('camFootballGames').getBoundingClientRect(),
-              b = document.getElementById('camFootballHistory').getBoundingClientRect(); return {y: a.top + scrollY, h: b.bottom - a.top}; }""")
+              b = document.getElementById('camFootballGames').getBoundingClientRect(); return {y: a.top + scrollY, h: b.bottom - a.top}; }""")
             page.screenshot(path=str(SHOTS / f'{where}.png'), full_page=True,
                             clip={'x': 0, 'y': max(0, box['y'] - 60), 'width': 390, 'height': box['h'] + 90})
         assert page.errors == [], f'{where}: errores {page.errors}'

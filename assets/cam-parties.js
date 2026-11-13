@@ -1088,7 +1088,8 @@ function mountEntries() {
   const twin = $('aeNflTwinRankings');
   if (twin && !$('camPartyEntryTakes')) twin.prepend(entry('camPartyEntryTakes', 'Mis grupos de Takes', () => openHub('takes', sportNow())));
   // Quinielas: también se juegan en grupo.
-  for (const [root, id, sport] of [['camNflWeekActions', 'camPartyEntryQuinielaNfl', 'nfl'], ['camFootballQuiniela', 'camPartyEntryQuinielaFootball', 'football']]) {
+  // 13 nov 2026: en Fútbol también al final de La semana, debajo del marcador.
+  for (const [root, id, sport] of [['camNflWeekActions', 'camPartyEntryQuinielaNfl', 'nfl'], ['camFootballWeekActions', 'camPartyEntryQuinielaFootball', 'football']]) {
     const section = $(root);
     if (!section || $(id)) continue;
     const row = entry(id, 'Mis grupos de Quiniela', () => openHub('quiniela', sport));

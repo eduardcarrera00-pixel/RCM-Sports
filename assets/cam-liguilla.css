@@ -7,6 +7,8 @@
    Mantener la quiniela regular oculta hasta que el club solicite reactivarla. */
 #camFootballQuiniela.cam-ligamx-regular-paused > .cam-nfl-top,
 #camFootballQuiniela.cam-ligamx-regular-paused > #camFootballMatchPanel{display:none!important}
+/* 13 nov 2026: «Mis grupos» ya no vive aquí (va al final de La semana); sin la Liguilla dentro, la quiniela en pausa no deja una tarjeta vacía. */
+html body #camFootballQuiniela.cam-ligamx-regular-paused:not(:has(> #camLiguilla:not([hidden]))){display:none!important}
 #camFootballQuiniela.cam-liguilla-round #camFootballDayNav,
 #camFootballQuiniela.cam-liguilla-round #camFootballGames,
 #camFootballQuiniela.cam-liguilla-round .cam-nfl-save-row{display:none!important}

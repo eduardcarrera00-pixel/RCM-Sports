@@ -73,7 +73,10 @@ async function scenario({anonymous=false,failed=false}={}){
   assert.equal(one('#camFootballSemana .cam-ns-edition'),null);
   assert.equal(one('#camFootballSemana .cam-ns-opinion .cam-ns-action-label'),null);
   assert.equal(one('#camFootballSemana .cam-ns-intro'),null);
-  assert.deepEqual([...d.querySelectorAll('#camFootballSemana .cam-ns-pick strong')].map(n=>n.textContent),['madrid','Empate','barca']);
+  // 13 nov 2026: las cuatro ligas eligen con las tarjetas de «¿Quién gana?» (sin puntos a la vista).
+  assert.deepEqual([...d.querySelectorAll('#camFootballSemana .cam-ns-side .cam-ns-side-name')].map(n=>n.textContent),['madrid','barca']);
+  assert.ok(one('#camFootballSemana .cam-ns-draw'));
+  assert.doesNotMatch(one('#camFootballSemana [data-block=duelo]').textContent,/\bpts?\b/);
   assert.equal(d.querySelectorAll('#camFootballSemana [data-competition]').length,4);
   for(const area of ['#camFootballSemana','#camFootballNav'])assert.deepEqual([...d.querySelectorAll(area+' [data-competition]')].map(n=>n.dataset.competition),['ligamx','champions','laliga','premier']);
   const choose=w.camFootballSemana._choose;
@@ -113,12 +116,12 @@ async function scenario({anonymous=false,failed=false}={}){
   assert.equal(one('#camFootballSemana .cam-ns-link-take'),null,'13 nov 2026: the featured match has no Publicar Take button');
   assert.equal(takeSport,null);
   assert.equal(F.calls.filter(c=>c.rpc==='cam_football_save_pick').length,0,'a take never saves quiniela data');
-  one('#camFootballSemana .cam-ns-pick:nth-child(2)').click();await settle();
+  one('#camFootballSemana .cam-ns-draw').click();await settle();
   if(anonymous){assert.equal(logins,1);assert.equal(F.calls.filter(c=>c.rpc==='cam_football_save_pick').length,0);}
   else{
     assert.equal(api.snapshot().mine.get('duel'),'draw','the duel saves the 1X2 result through the existing RPC');
-    assert.match(one('#camFootballSemana [role=status]').textContent,/Quiniela guardada: Empate/);
-    rejectSave=true;one('#camFootballSemana .cam-ns-pick').click();await settle();
+    assert.match(one('#camFootballSemana [role=status]').textContent,/Guardado/);
+    rejectSave=true;one('#camFootballSemana .cam-ns-side[data-side=home]').click();await settle();
     assert.equal(api.snapshot().mine.get('duel'),'draw','a rejected save preserves the saved result');
     assert.match(one('#camFootballSemana [role=status]').textContent,/No se pudo guardar/);rejectSave=false;
   }
@@ -135,7 +138,7 @@ async function scenario({anonymous=false,failed=false}={}){
   one('#camFootballSemana [data-competition=premier]').click();await settle();
   assert.equal(api.snapshot().competition,'premier');
   assert.ok(one('#camFootballQuiniela').classList.contains('cam-football-sin-banner'),'Premier hides the quiniela banner');
-  assert.match(one('#camFootballSemana .cam-ns-duel').textContent,/arsenal/);
+  assert.match(one('#camFootballSemana .cam-ns-duelo').textContent,/arsenal/);
   assert.equal(api.snapshot().mine.get('premier'),anonymous?undefined:'draw');
   one('#camFootballNav [data-competition=laliga]').click();await settle();
   assert.equal(api.snapshot().mine.get('first'),anonymous?undefined:'home');

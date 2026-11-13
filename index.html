@@ -470,7 +470,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
     </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
-<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261113-auth-terrace-1">
+<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261113-semana-marcador-1">
 <style id="cam-liguilla-week-styles">
 /* Integración de la Liguilla en Fútbol → La semana. Un solo recuadro, «Arma tu cuadro»:
    primero «mis 8» y después el cuadro con puntos (estilos en assets/cam-liguilla.css). */
@@ -3291,8 +3291,6 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
               <button id="camFootballSaveDay" type="button" class="cam-nfl-action">Guardar picks del día</button>
               <button id="camFootballSave" type="button" hidden style="display:none!important" class="cam-nfl-action cam-nfl-action-secondary">Guardar toda la jornada</button>
             </div>
-            <!-- 12 nov 2026: «Ver mis jornadas» va debajo de «Inicia sesión para participar» / «Guardar picks del día», como en NFL. -->
-            <div id="camFootballHistory" class="cam-nfl-nav cam-nfl-nav-after" aria-label="Mi quiniela"></div>
 
 
             <section id="camFootballAdmin" class="cam-nfl-admin" aria-label="Controles de administradores" hidden></section>
@@ -3388,6 +3386,10 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
             </details>
             </div>
             <div id="camFootballScoreBody" class="cam-sport-score-body" aria-live="polite"></div>
+            <!-- 13 nov 2026: «Ver mis jornadas» y «Mis grupos» cierran La semana, debajo del marcador (como en NFL). -->
+            <div id="camFootballWeekActions" class="cam-quiniela-ranking cam-nfl-week-actions cam-football-week-actions">
+              <div id="camFootballHistory" class="cam-nfl-nav cam-nfl-nav-after" aria-label="Mi quiniela"></div>
+            </div>
           </div>
           <details id="aeTakeReview" class="ae-take-review" hidden><summary>Administrar · Puntuar Takes</summary><p>Primero calcula la dificultad de cada Take (tabla de la liga, nivel de sorpresa o cuota) y después marca si se cumplió. Los puntos (1–20) salen solos: lo obvio vale poco y la sorpresa vale mucho. Si recalculas un Take ya puntuado, su puntuación se actualiza.</p><p id="aeTakeReviewStatus" role="status" aria-live="polite"></p><div id="aeTakeReviewList"></div></details>
           <section id="aeSportTakeHistoric" class="ae-home-take-feature" hidden aria-labelledby="aeSportTakeHistoricTitle" data-cam-optional>
@@ -6636,10 +6638,10 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 </style>
 
 <!-- Componentes finales: móvil, conversación, parties, perfil y Takes; orden en performance-css-packs.json. -->
-<link rel="stylesheet" href="assets/cam-perf-app-panels.css?v=20261113-futbol-quien-gana-1">
+<link rel="stylesheet" href="assets/cam-perf-app-panels.css?v=20261113-semana-marcador-1">
 <link rel="stylesheet" href="assets/cam-home-takes-unified.css?v=20261112-symmetric-tabs-2">
-<script src="assets/cam-parties.js?v=20261113-week-actions-1"></script>
-<script src="assets/cam-sport-quiniela-loader.js?v=20261113-week-actions-1"></script>
+<script src="assets/cam-parties.js?v=20261113-semana-marcador-1"></script>
+<script src="assets/cam-sport-quiniela-loader.js?v=20261113-semana-marcador-1"></script>
 <script src="assets/ae-season-predictions.js?v=20261021-champion-guide-1"></script>
 <script src="assets/cam-actualidad-simetria.js?v=20261113-simetria-1"></script>
 <script src="assets/cam-lazy-editorial-loader.js?v=20261113-actualidad-ajustes-1"></script>
@@ -6671,7 +6673,7 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 <!-- 13 nov: El marcador como menú vertical (El marcador · Clasificación · Mejores anotadores / Goleadores) en NFL y las 4 ligas. -->
 <script src="assets/cam-sport-tables.js?v=20261113-marcador-menu-1"></script>
 <script src="assets/cam-nfl-semana.js?v=20261113-take-historia-1"></script>
-<script src="assets/cam-football-semana.js?v=20261113-take-historia-1"></script>
+<script src="assets/cam-football-semana.js?v=20261113-semana-marcador-1"></script>
 <!-- Escritorio: páginas completas de NFL/Fútbol y dos columnas de contenido real. El teléfono conserva sus pestañas. -->
 <script defer src="assets/cam-escritorio.js?v=20261110-desktop-shortcuts-1"></script>
 <script defer src="assets/cam-sport-news-community.js?v=20261112-rank-initials-2"></script>

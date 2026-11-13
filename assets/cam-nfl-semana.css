@@ -671,6 +671,19 @@ html body #camNflWeekActions .cam-party-entry-row { margin:12px 0 0; }
 
 html body #camNflWeekActions #camNflSave { display:none!important; }
 
+/* Fútbol (13 nov 2026): «Ver mis jornadas» y «Mis grupos» cierran La semana, debajo del
+   marcador, igual que en NFL (antes iban entre la quiniela y «¿Quién será campeón?»). */
+html body #camFootballWeekActions { margin-top:16px; }
+html body #camFootballWeekActions:not(:has(> :not([hidden]))) { display:none!important; }
+html body #camFootballWeekActions #camFootballHistory { display:flex; justify-content:center; margin:0; width:100%; min-width:0; }
+html body #camFootballWeekActions #camFootballHistory[hidden] { display:none!important; }
+html body #camFootballWeekActions #camFootballHistory .cam-nfl-action {
+  width:100%; max-width:360px; min-width:0; min-height:44px; margin:0; padding:10px 6px;
+  font-size:clamp(13px,3.6vw,15px); line-height:1.25; white-space:nowrap;
+}
+html body #camFootballWeekActions .cam-party-entry-row { margin:12px 0 0!important; }
+html body #camFootballWeekActions #camFootballHistory[hidden] + .cam-party-entry-row { margin-top:0!important; }
+
 /* 13 nov 2026 · Duelo deportivo aprobado. Solo «¿Quién gana?» de NFL. */
 @layer cam-banners {
   html body #camNflSemana [data-block="duelo"] {
@@ -730,11 +743,11 @@ html body #camNflWeekActions #camNflSave { display:none!important; }
   }
 }
 
-/* 13 nov 2026 · Fútbol: el mismo «¿Quién gana?» que NFL, solo en Champions, LaLiga y
-   Premier (#camFootballSemana.cam-fs-duelo, que pone cam-football-semana.js). Los dos
-   equipos en grande con la franja sutil del color de cada club por fuera (local a la
-   izquierda, visitante a la derecha) y el empate debajo. La Liga MX no lleva la clase:
-   su duelo y la Liguilla siguen igual. */
+/* 13 nov 2026 · Fútbol: el mismo «¿Quién gana?» que NFL en Champions, LaLiga, Premier
+   y (desde la noche del 13 nov) Liga MX (#camFootballSemana.cam-fs-duelo, que pone
+   cam-football-semana.js). Los dos equipos en grande con la franja sutil del color de
+   cada club por fuera (local a la izquierda, visitante a la derecha) y el empate debajo.
+   En la Liga MX la Liguilla sigue arriba sin cambios. */
 @layer cam-banners {
   /* Sin el panel de fondo de Fútbol, como La semana de NFL. */
   html body[data-cam-section="futbol"]:is([data-cam-tab="semana"],[data-cam-sport-page]) #freeTakes:has(> #camFootballSemana.cam-fs-duelo) {
@@ -747,7 +760,6 @@ html body #camNflWeekActions #camNflSave { display:none!important; }
     margin:16px 0 0!important; padding:0!important; border:0!important; border-radius:0!important;
     background:none!important; box-shadow:none!important;
   }
-  html body #camFootballSemana.cam-fs-duelo [data-block="duelo"] .cam-ns-duel-score { margin:0 0 6px!important; text-align:left!important; }
   html body #camFootballSemana.cam-fs-duelo .cam-ns-step { display:block!important; margin:0!important; }
   html body #camFootballSemana.cam-fs-duelo .cam-ns-step-title {
     margin:0!important; padding:0!important; color:var(--ns-ink)!important;
@@ -807,6 +819,16 @@ html body #camNflWeekActions #camNflSave { display:none!important; }
   html body #camFootballSemana.cam-fs-duelo .cam-ns-side-sub {
     color:var(--ns-muted)!important; font:500 10px/1.3 Inter,system-ui,sans-serif!important; letter-spacing:.06em!important; text-transform:uppercase!important;
   }
+
+  /* 13 nov 2026 (noche): en juego o terminado, los goles dentro de cada tarjeta
+     (sin la línea del marcador encima). El que perdió queda atenuado. */
+  html body #camFootballSemana.cam-fs-duelo .cam-ns-side-score {
+    display:block!important; margin:2px 0 0!important; color:var(--ns-ink)!important;
+    font:600 36px/1 "Playfair Display",Georgia,serif!important; font-variant-numeric:lining-nums tabular-nums!important;
+  }
+  html body #camFootballSemana.cam-fs-duelo .has-score .cam-ns-sides .cam-ns-at { font:500 26px/1 "Playfair Display",Georgia,serif!important; gap:0!important; }
+  html body #camFootballSemana.cam-fs-duelo .has-score .cam-ns-sides .cam-ns-at::before,
+  html body #camFootballSemana.cam-fs-duelo .has-score .cam-ns-sides .cam-ns-at::after { display:none!important; }
 
   /* el empate: tercer resultado, debajo de los equipos */
   html body #camFootballSemana.cam-fs-duelo .cam-ns-draw {

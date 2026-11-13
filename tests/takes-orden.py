@@ -96,7 +96,8 @@ def football_ideas(dark):
     where = f'390px {"noche" if dark else "día"} ideas Fútbol'
     with fp.full_page(fake_js=BASE, dark=dark, width=390, height=860, scale=1) as page:
         page.click('body > nav.cam-mobile-bottom-nav > button[data-category="Fútbol"]'); page.wait_for_timeout(1800)
-        page.locator('#camFootballSemana [data-block=duelo] .cam-ns-pick').nth(2).click(); page.wait_for_timeout(900)
+        # 13 nov 2026: también la Liga MX elige con las tarjetas de «¿Quién gana?» (visitante a la derecha).
+        page.locator('#camFootballSemana [data-block=duelo] .cam-ns-side[data-side="away"]').click(); page.wait_for_timeout(900)
         page.click('#camSectionTabs button[data-tab="takes"]'); page.wait_for_timeout(800)
         ideas = page.evaluate("[...document.querySelectorAll('#camFootballTakePrompt .cam-ns-idea')].map(b => b.textContent)")
         assert ideas == ['Barcelona gana por 2 goles o más', 'Barcelona remonta en la segunda parte'], f'{where}: {ideas}'

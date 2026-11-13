@@ -288,9 +288,10 @@
     root.classList.toggle('cam-football-sin-banner',['champions','laliga','premier'].includes(competition));
     const nav=$('camFootballNav');if(!nav)return;
     const history=button('Ver mis jornadas ›',()=>window.camOpenQuinielaHistory?.('football'),'cam-nfl-action cam-nfl-action-secondary');
-    // 12 nov 2026: «Ver mis jornadas» va debajo de «Inicia sesión para participar» / «Guardar picks del día».
+    // 13 nov 2026: «Ver mis jornadas» cierra La semana, debajo del marcador (#camFootballWeekActions).
+    // Con la quiniela regular de Liga MX en pausa no hay jornadas que ver: se oculta, como antes.
     const below=$('camFootballHistory');
-    if(below){nav.replaceChildren(competitionNav());below.replaceChildren(history);}
+    if(below){nav.replaceChildren(competitionNav());below.replaceChildren(history);below.hidden=competition==='ligamx';}
     else nav.replaceChildren(competitionNav(),history);
   }
   function logo(id){

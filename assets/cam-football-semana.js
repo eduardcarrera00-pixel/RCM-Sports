@@ -9,7 +9,10 @@
    Goleadores) de la liga elegida arriba; lo construye cam-sport-tables.js.
    13 nov 2026 (tarde): Champions, LaLiga y Premier usan el «¿Quién gana?» de NFL
    (los dos equipos en grande, con una franja sutil del color de cada club, y el
-   empate debajo). La Liga MX conserva su duelo y la Liguilla sin cambios. */
+   empate debajo).
+   13 nov 2026 (noche): la Liga MX también (sin «2 pts» en los botones); la Liguilla
+   sigue arriba igual. Con el partido en juego o terminado, el marcador va dentro de
+   cada tarjeta (Atlético 0 · Bayern 2) y no en una línea encima. */
 (() => {
   'use strict';
   const root=document.getElementById('camFootballSemana');
@@ -34,15 +37,13 @@
     const b=el('button',text,cls);b.type='button';b.addEventListener('click',action);return b;
   };
   const started=g=>g.status!=='scheduled'||Date.parse(g.kickoff)<=Date.now();
+  const hasScore=g=>['live','final'].includes(g.status)&&g.home_score!=null&&g.away_score!=null;
   const name=(snap,id)=>snap.teams.get(id)?.short_name||snap.teams.get(id)?.name||id;
   const fullName=(snap,id)=>snap.teams.get(id)?.name||name(snap,id);
   const abbr=(snap,id)=>snap.teams.get(id)?.abbreviation||name(snap,id).split(/\s+/).map(s=>s[0]).join('').slice(0,3);
   const label=(snap,g,pick)=>pick==='draw'?'Empate':name(snap,pick==='home'?g.home_id:g.away_id);
-  const points=(g,pick)=>g['points_'+pick];
-  const pts=n=>n+(Number(n)===1?' pt':' pts');
   // Lo parejo se mide con las probabilidades: desde el 12 nov 2026 todos los aciertos valen 2.
   const even=g=>g.probability_home==null?1:Math.abs(Number(g.probability_home)-Number(g.probability_away));
-  const when=value=>new Intl.DateTimeFormat('es',{timeZone:'America/Toronto',weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date(value)).replace(/\./g,'');
   function crest(snap,id,size=28){
     const box=el('span',null,'cam-ns-crest');box.style.setProperty('--crest',size+'px');
     box.append(el('span',abbr(snap,id),'cam-ns-crest-text',{'aria-hidden':'true'}));
@@ -81,52 +82,11 @@
     return list.slice().sort((a,b)=>
       appeal(b)-appeal(a)||even(a)-even(b)||Date.parse(a.kickoff)-Date.parse(b.kickoff))[0]||null;
   }
-  function pickButton(snap,g,pick){
-    const selected=(snap.draft.get(g.id)||snap.mine.get(g.id))===pick;
-    const b=button(null,async()=>{
-      if(ui.saving)return;
-      ui.saving=true;ui.result=null;
-      for(const n of b.parentElement.children)if(n.tagName==='BUTTON')n.disabled=true;
-      try{
-        const saved=await q().save(g.id,pick);
-        if(saved)ui.result={game:g.id,text:'Quiniela guardada: '+label(snap,g,pick)+'.'};
-        else if(snap.user)ui.result={game:g.id,text:document.getElementById('camFootballStatus')?.textContent||'No se pudo guardar. Inténtalo de nuevo.'};
-      }finally{ui.saving=false;schedule();}
-    },'cam-ns-pick'+(selected?' is-selected':''));
-    b.disabled=ui.saving;
-    b.setAttribute('aria-pressed',String(selected));
-    b.setAttribute('aria-label','Quiniela: elegir '+label(snap,g,pick)+(points(g,pick)==null?'':', '+pts(points(g,pick))));
-    b.append(el('strong',label(snap,g,pick)),el('span',points(g,pick)==null?'Pts pendientes':pts(points(g,pick)),'cam-ns-pick-points'));
-    return b;
-  }
-  function duelBlock(snap,g){
-    const box=el('section',null,'cam-ns-block',{'data-block':'duelo','aria-label':'Partido destacado'});box.classList.add('cam-ns-feature');
-    const teams=el('div',null,'cam-ns-duel');
-    const side=id=>{const n=el('div',null,'cam-ns-duel-team');n.append(crest(snap,id,40),el('span',name(snap,id),'cam-ns-duel-name'));return n;};
-    teams.append(side(g.home_id),el('span','vs','cam-ns-at',{'aria-hidden':'true'}),side(g.away_id));box.append(teams);
-    box.append(el('p',fullName(snap,g.home_id)+' contra '+fullName(snap,g.away_id),'cam-ns-sr'));
-    box.append(el('p',(g.status==='live'?'En juego · ':g.status==='final'?'Finalizado · ':'')+when(g.kickoff),'cam-ns-duel-when'));
-    if(['live','final'].includes(g.status)&&g.home_score!=null&&g.away_score!=null)box.append(el('p',g.home_score+' – '+g.away_score,'cam-ns-duel-score'));
-    // 13 nov 2026: sin «Publicar Take» bajo el marcador; el Take se escribe desde la pestaña Takes.
-    const play=el('div',null,'cam-ns-quiniela',{role:'group','aria-label':'Quiniela del duelo de la semana'});
-    if(q().isOpen(g)){
-      const picks=el('div',null,'cam-ns-picks');
-      for(const pick of ['home','draw','away'])picks.append(pickButton(snap,g,pick));
-      play.append(picks);
-    }else if(!started(g))play.append(el('p','Puntos pendientes','cam-ns-note'));
-    const mine=snap.mine.get(g.id),draft=snap.draft.get(g.id);
-    if(ui.result?.game===g.id)play.append(el('p',ui.result.text,'cam-ns-note',{role:'status'}));
-    else if(draft||mine)play.append(el('p',(draft?'Tu elección sin guardar: ':'Tu elección guardada: ')+label(snap,g,draft||mine),'cam-ns-note'));
-    // Un partido terminado sin elección no deja una línea ni un hueco vacío debajo del marcador.
-    if(play.childNodes.length)box.append(play);
-    return box;
-  }
-
   /* ---------- «¿Quién gana?» como en NFL (13 nov 2026) ----------
-     Solo Champions, LaLiga y Premier. Mismas piezas y clases que el duelo de NFL
+     Champions, LaLiga, Premier y (desde el 13 nov, noche) Liga MX. Mismas piezas y clases que el duelo de NFL
      (cam-ns-side…): el equipo es el botón, sin puntos a la vista; un toque guarda.
      El empate, tercer resultado del fútbol, va debajo de los dos equipos. */
-  const NFL_FORMAT=new Set(['champions','laliga','premier']);
+  const NFL_FORMAT=new Set(['champions','laliga','premier','ligamx']);
   // Color de cada club para la franja de su tarjeta (como los acentos de NFL): tonos
   // legibles de día y de noche. Clubes blanco y negro o azul marino usan su segundo
   // color o un plateado. Un club que no esté aquí lleva el dorado de la casa.
@@ -210,7 +170,22 @@
     ['#2a7fc8',['Club Brugge','Brugge']],
     ['#f2c300',['Union St.-Gilloise','Union Saint-Gilloise','Union SG','Fenerbahce','Fenerbahçe','Bodo/Glimt','Bodø/Glimt','FK Bodo/Glimt','Young Boys','BSC Young Boys','Kairat','Kairat Almaty']],
     ['#7b48a8',['Anderlecht']],
-    ['#f37021',['Shakhtar Donetsk','Shakhtar']]
+    ['#f37021',['Shakhtar Donetsk','Shakhtar']],
+    // Liga MX (13 nov 2026, noche: la Liga MX también usa las tarjetas). Nombres de ESPN.
+    ['#f6c300',['América','Club América']],
+    ['#cd1f2d',['Guadalajara','Chivas','Chivas Guadalajara']],
+    ['#1f4fa8',['Cruz Azul']],
+    ['#c4a25c',['Pumas UNAM','UNAM','Pumas']],
+    ['#fbb800',['Tigres UANL','Tigres']],
+    ['#2b4f96',['Monterrey','Rayados']],
+    ['#d0021b',['Toluca']],
+    ['#2a6ab8',['Querétaro','Queretaro']],
+    ['#0b8f4c',['Santos','Santos Laguna']],
+    ['#0f7a3f',['León','Leon']],
+    ['#2a5caa',['Pachuca','Puebla']],
+    ['#c8102e',['Atlas','Tijuana','Xolos','Necaxa']],
+    ['#d0102e',['Atlético de San Luis','Atl. San Luis','San Luis']],
+    ['#2f55a4',['Atlante']]
   ];
   const clubColors=new Map(CLUB_COLORS.flatMap(([color,aliases])=>aliases.map(alias=>[normalizeClub(alias),color])));
   // ESPN escribe a veces «FC», «CF» o «AFC»: segunda vuelta sin esas siglas.
@@ -261,7 +236,17 @@
     const text=el('span',null,'cam-ns-side-label');
     text.append(el('span',name(snap,id),'cam-ns-side-name'),el('span',pick==='home'?'Local':'Visitante','cam-ns-side-sub'));
     tile.append(mark,crest(snap,id,52),text);
-    if(!open){if(chosen)tile.setAttribute('aria-label',fullName(snap,id)+': tu pick');return tile;}
+    // En juego o terminado: los goles de cada equipo dentro de su tarjeta.
+    const goals=hasScore(g)?(pick==='home'?g.home_score:g.away_score):null;
+    if(goals!=null)tile.append(el('span',goals,'cam-ns-side-score',{'aria-hidden':'true'}));
+    if(!open){
+      const said=[fullName(snap,id)];
+      if(goals!=null)said.push(goals+(Number(goals)===1?' gol':' goles'));
+      if(g.status==='final'&&g.outcome===pick)said.push('ganó');
+      if(chosen)said.push('tu pick');
+      if(goals!=null||chosen)tile.setAttribute('aria-label',said.join(', '));
+      return tile;
+    }
     tile.type='button';tile.disabled=ui.saving;
     tile.setAttribute('aria-pressed',String(chosen));
     tile.setAttribute('aria-label',(chosen?'Tu pick: ':'Elegir a ')+fullName(snap,id));
@@ -292,7 +277,8 @@
     else if(g.status==='final'){
       if(mine&&g.outcome&&mine===g.outcome){hint.classList.add('is-saved');hint.append(nsIcon('check'),el('span','Acertaste: '+label(snap,g,mine)+'.'));}
       else hint.textContent=mine?'Elegiste '+label(snap,g,mine)+'.':'No elegiste en este partido.';
-    }else if(started(g))hint.textContent=mine?'Tu pick: '+label(snap,g,mine)+' · pronósticos cerrados':'Pronósticos cerrados';
+    }else if(g.status==='live')hint.textContent='En juego'+(mine?' · Tu pick: '+label(snap,g,mine):'');
+    else if(started(g))hint.textContent=mine?'Tu pick: '+label(snap,g,mine)+' · pronósticos cerrados':'Pronósticos cerrados';
     else if(!open)hint.textContent='Se abre cuando lleguen las cuotas.';
     else if(draft&&draft!==mine)hint.textContent='Tu elección sin guardar: '+label(snap,g,draft);
     else if(mine){
@@ -303,15 +289,17 @@
     return hint;
   }
   function duelTiles(snap,g){
-    const box=el('section',null,'cam-ns-block cam-ns-feature cam-ns-duelo',{'data-block':'duelo'});
-    if(['live','final'].includes(g.status)&&g.home_score!=null&&g.away_score!=null)
-      box.append(el('p',name(snap,g.home_id)+' '+g.home_score+' – '+g.away_score+' '+name(snap,g.away_id),'cam-ns-duel-score'));
-    box.append(el('p',fullName(snap,g.home_id)+' contra '+fullName(snap,g.away_id),'cam-ns-sr'));
+    // 13 nov 2026 (noche): sin la línea del marcador encima; cada tarjeta lleva sus goles.
+    const scored=hasScore(g);
+    const box=el('section',null,'cam-ns-block cam-ns-feature cam-ns-duelo'+(scored?' has-score':''),{'data-block':'duelo'});
+    box.append(el('p',scored
+      ?(g.status==='final'?'Final: ':'En juego: ')+fullName(snap,g.home_id)+' '+g.home_score+', '+fullName(snap,g.away_id)+' '+g.away_score
+      :fullName(snap,g.home_id)+' contra '+fullName(snap,g.away_id),'cam-ns-sr'));
     const open=!started(g)&&!!q()?.isOpen(g);
     const step=el('div',null,'cam-ns-step cam-ns-step-pick',{role:'group','aria-labelledby':'camFsPickTitle'});
     step.append(el('h3',g.status==='final'?'¿Quién ganó?':'¿Quién gana?','cam-ns-step-title',{id:'camFsPickTitle'}));
     const sides=el('div',null,'cam-ns-sides');
-    sides.append(sideTile(snap,g,'home',open),el('span','VS','cam-ns-at',{'aria-hidden':'true'}),sideTile(snap,g,'away',open));
+    sides.append(sideTile(snap,g,'home',open),el('span',scored?'–':'VS','cam-ns-at',{'aria-hidden':'true'}),sideTile(snap,g,'away',open));
     step.append(sides,drawTile(snap,g,open));
     const hint=hintLine(snap,g,open);
     if(hint.textContent)step.append(hint);
@@ -457,7 +445,7 @@
   function render(){
     if(!active())return;
     const api=q(),snap=api?.snapshot();
-    // Champions, LaLiga y Premier: la misma cabecera que NFL (título y filete) antes de las ligas.
+    // Las cuatro ligas: la misma cabecera que NFL (título y filete) antes de las ligas.
     const nflFormat=NFL_FORMAT.has(snap?.competition);
     root.classList.toggle('cam-fs-duelo',nflFormat);
     const head=el('header',null,'cam-ns-head');head.append(el('h2','La semana','cam-ns-title',{id:'camFootballSemanaTitle'}));
@@ -484,7 +472,7 @@
       const live=liveBlock(snap);if(live)fragment.append(live);
       const duel=chooseDuel(snap.games,snap.teams);
       paintPrompt(snap,duel);
-      if(duel)fragment.append(nflFormat?duelTiles(snap,duel):duelBlock(snap,duel));
+      if(duel)fragment.append(duelTiles(snap,duel));
       else fragment.append(el('p','Todavía no hay partidos de esta competición.','cam-ns-text'));
       const score=scoreBlock(snap);scores.replaceChildren(...(score?[score]:[]));
     }
