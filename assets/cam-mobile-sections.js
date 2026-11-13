@@ -1,8 +1,8 @@
 /* CAM SPORTS — phone section tabs and addresses.
-   Inside NFL: La semana · Takes · Noticias (4 nov 2026: La semana holds the
+   Inside NFL: Noticias · La semana · Takes (4 nov 2026: La semana holds the
    quiniela, the duel of the week and the scores; Power Rankings lives in Noticias;
    ?v=quiniela still works and opens it).
-   Inside Fútbol: La semana · Takes · Noticias, with the same saved quiniela
+   Inside Fútbol: Noticias · La semana · Takes, with the same saved quiniela
    and its competition selector. Both scoreboards close La semana.
    Inside Picks: Picks · Chefs · Historial (9 nov 2026, pedido del dueño).
    A sticky bar at the top of the section shows one part at a time (the hiding
@@ -19,8 +19,8 @@
   if (!main || typeof window.filterByCategory !== 'function' || !window.matchMedia) return;
 
   const mobile = window.matchMedia('(max-width: 760px), (orientation: landscape) and (max-height: 500px) and (hover: none) and (pointer: coarse)');
-  // NFL: La semana abre la sección; Power Rankings pertenece a Noticias.
-  const NFL_TABS = [['semana', 'La semana'], ['takes', 'Takes'], ['noticias', 'Noticias']];
+  // NFL y Fútbol: Noticias abre la sección; Power Rankings pertenece a Noticias.
+  const NFL_TABS = [['noticias', 'Noticias'], ['semana', 'La semana'], ['takes', 'Takes']];
   // Old addresses keep working: ?v=clasificacion now opens Takes.
   const OLD_TABS = { clasificacion: 'takes' };
   const SECTIONS = {
