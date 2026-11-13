@@ -1,5 +1,6 @@
 /* CAM SPORTS — deslizar entre apartados (12 nov 2026).
-   El aviso que asoma en el borde mientras se arrastra el contenido («Takes ›»).
+   El aviso que asoma en el borde mientras se arrastra el contenido («Takes ›»),
+   el mismo que enseña el gesto la primera vez, y la frase de «reducir movimiento».
    El movimiento del contenido lo pone cam-section-swipe.js con estilos en línea
    temporales; aquí solo vive el aviso. Colores de la barra de pestañas. */
 html body > .cam-swipe-peek {
@@ -64,6 +65,42 @@ html:not(.dark) body > .cam-swipe-peek.is-ready {
   border-color: #7a5229;
   background: #7a5229;
   color: #fffaf2;
+}
+
+/* Enseñar el gesto: el aviso entra y sale despacio mientras el contenido amaga. */
+html body > .cam-swipe-peek.is-hint {
+  transition: transform 420ms cubic-bezier(.2, .8, .2, 1), opacity 420ms ease;
+}
+
+/* «Reducir movimiento»: en vez del amago, una frase bajo las pestañas. */
+html body > .cam-swipe-tip {
+  position: fixed;
+  left: 50%;
+  z-index: 45;
+  box-sizing: border-box;
+  max-width: calc(100vw - 32px);
+  margin: 0;
+  padding: 8px 14px;
+  border: 1px solid rgba(201, 154, 91, .5);
+  border-radius: 999px;
+  background: rgba(16, 37, 53, .94);
+  color: #e3b979;
+  font: 600 12.5px/1 Inter, system-ui, sans-serif;
+  letter-spacing: .01em;
+  white-space: nowrap;
+  box-shadow: 0 12px 28px -16px rgba(6, 18, 28, .6);
+  pointer-events: none;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 280ms ease;
+}
+html body > .cam-swipe-tip[hidden] { display: none; }
+html body > .cam-swipe-tip.is-on { opacity: 1; }
+html:not(.dark) body > .cam-swipe-tip {
+  border-color: rgba(143, 104, 72, .36);
+  background: rgba(248, 242, 232, .96);
+  color: #7a5229;
+  box-shadow: 0 12px 26px -16px rgba(36, 32, 24, .4);
 }
 
 @media (prefers-reduced-motion: reduce) {

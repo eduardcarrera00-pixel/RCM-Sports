@@ -31,6 +31,8 @@ if SHOTS: SHOTS.mkdir(parents=True, exist_ok=True)
 
 FAKE = r"""
 try { sessionStorage.setItem('cam_sports_home_welcome_seen_session_v1', '1'); } catch (e) {}
+// El amago que enseña el gesto se prueba en tests/section-swipe-hint.py; aquí no debe cruzarse.
+try { localStorage.setItem('cam_swipe_learned_v1', '1'); } catch (e) {}
 (() => {
   const F = window.__fake; F.tables = F.tables || {};
   const art = (n, category, days) => ({id: 'a000000' + n + '-0000-4000-8000-000000000000', title: category + ' · nota ' + n, category,

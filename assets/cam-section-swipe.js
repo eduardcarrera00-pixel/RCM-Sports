@@ -17,7 +17,14 @@
    que al tocarla (dirección ?s=…&v=…, botón Atrás, medición). Mientras se
    arrastra, el contenido acompaña un poco al dedo y en el borde asoma el nombre
    del apartado al que se va. Con «reducir movimiento» no hay animación.
-   Nada se mueve de sitio en el documento: solo estilos en línea temporales. */
+   Nada se mueve de sitio en el documento: solo estilos en línea temporales.
+
+   Enseñar el gesto (12 nov 2026, pedido de Eduard): al entrar en un área con
+   apartados, tras 1,5 s sin tocar nada, el contenido amaga un deslizamiento y
+   asoma el siguiente apartado («Takes ›»); luego todo vuelve a su sitio. Sin
+   flechas fijas en pantalla. Una vez por visita, como mucho 3 visitas en días
+   distintos, y nunca más en cuanto la persona desliza una vez. Solo en pantallas
+   táctiles. Con «reducir movimiento», un texto discreto bajo las pestañas. */
 (() => {
   'use strict';
 
@@ -234,6 +241,7 @@
     const way = Math.sign(s.dx) || -1;
     const from = ctx.tabs[ctx.index];
     busy = true;
+    learned();                // ya sabe deslizar: no se le vuelve a enseñar
     hidePeek(true);
     settleNow();
 
@@ -371,8 +379,165 @@
     }
   }, true);
 
+  // ---------- Enseñar el gesto ----------
+  const LEARNED = 'cam_swipe_learned_v1';        // '1' en cuanto desliza una vez
+  const SHOWN = 'cam_swipe_hint_v1';             // { count, day }: visitas en que se enseñó
+  const SESSION = 'cam_swipe_hint_session_v1';   // '1' si ya se enseñó en esta visita
+  const HINT_MAX = 3, HINT_IDLE = 1500, HINT_WINDOW = 12000;
+  const NUDGE_IN = 420, NUDGE_HOLD = 650, NUDGE_OUT = 480, TIP_MS = 2600;
+  const touchscreen = window.matchMedia ? window.matchMedia('(hover: none) and (pointer: coarse)') : null;
+
+  function read(area, key) { try { return window[area].getItem(key); } catch { return null; } }
+  function write(area, key, value) { try { window[area].setItem(key, value); } catch {} }
+  function today() { const d = new Date(); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
+  function seen() { try { return JSON.parse(read('localStorage', SHOWN) || '{}') || {}; } catch { return {}; } }
+
+  let hintedThisPage = false;   // por si el navegador no guarda nada (modo privado)
+  let hint = null, hintTimer = 0, hintUntil = 0, hintKey = '', tip = null;
+
+  function learned() {
+    write('localStorage', LEARNED, '1');
+    endHint();
+    hintUntil = 0;
+    clearTimeout(hintTimer);
+  }
+  function hintAllowed() {
+    if (hintedThisPage || !touchscreen || !touchscreen.matches) return false;
+    if (read('localStorage', LEARNED) === '1' || read('sessionStorage', SESSION) === '1') return false;
+    const s = seen();
+    return (s.count || 0) < HINT_MAX && s.day !== today();
+  }
+  function loading() {
+    if (document.documentElement.classList.contains('cam-booting')) return true;
+    const loader = document.getElementById('camPageLoader');
+    return Boolean(loader && getComputedStyle(loader).display !== 'none');
+  }
+
+  // Al entrar en un área (no al cambiar de apartado dentro de ella) se programa el aviso.
+  function areaKey() {
+    const body = document.body;
+    if (body.dataset.camTabs) return 'sec:' + (body.dataset.camSection || '');
+    return body.classList.contains('ae-is-opinions') ? 'act' : '';
+  }
+  function considerHint() {
+    const key = areaKey();
+    if (key === hintKey) return;
+    hintKey = key;
+    endHint();
+    clearTimeout(hintTimer);
+    hintUntil = 0;
+    if (!key || !hintAllowed()) return;
+    hintUntil = now() + HINT_WINDOW;
+    hintTimer = setTimeout(tryHint, HINT_IDLE);
+  }
+  // Cualquier toque, rueda, tecla o desplazamiento: si el aviso está en marcha se
+  // quita al momento; si aún no salió, espera otros 1,5 s de calma (hasta 12 s).
+  function postpone() {
+    if (hint) { endHint(); return; }
+    if (!hintUntil) return;
+    clearTimeout(hintTimer);
+    if (now() + HINT_IDLE > hintUntil) { hintUntil = 0; return; }   // no hubo calma: en otra visita
+    hintTimer = setTimeout(tryHint, HINT_IDLE);
+  }
+
+  function tryHint() {
+    hintTimer = 0;
+    if (hint || g || busy || !hintAllowed() || areaKey() !== hintKey) return;
+    const ctx = context();
+    if (!ctx || document.hidden || loading() || pageLocked() || typing() || zoomed()) { postpone(); return; }
+    const els = movers(ctx);
+    const visible = els.some(el => { const r = el.getBoundingClientRect(); return r.height > 40 && r.bottom > 0 && r.top < window.innerHeight; });
+    if (!visible) { postpone(); return; }
+
+    hintedThisPage = true;
+    hintUntil = 0;
+    const s = seen();
+    write('localStorage', SHOWN, JSON.stringify({ count: (s.count || 0) + 1, day: today() }));
+    write('sessionStorage', SESSION, '1');
+    const label = ctx.tabs[(ctx.index + 1) % ctx.tabs.length].textContent.trim();
+    hint = { els: [], timers: [] };
+    document.dispatchEvent(new CustomEvent('cam:section-swipe-hint', { detail: { area: ctx.kind, style: reduced() ? 'text' : 'nudge' } }));
+
+    if (reduced()) { showTip(ctx); return; }
+
+    // El contenido amaga hacia la izquierda y asoma el siguiente apartado.
+    const w = document.documentElement.clientWidth || window.innerWidth;
+    const shift = -Math.min(28, w * 0.07);
+    hint.els = els;
+    place(els, 0, 1);
+    const p = peekEl();
+    showPeek(label, 'end', 0);
+    p.classList.add('is-hint');
+    void p.offsetWidth;
+    const h = hint;
+    requestAnimationFrame(() => {
+      if (hint !== h) return;
+      place(els, shift, 1, NUDGE_IN, 'cubic-bezier(.3,0,.2,1)');
+      p.style.setProperty('--cam-swipe-p', '1');
+    });
+    h.timers.push(setTimeout(() => {
+      if (hint !== h) return;
+      place(els, 0, 1, NUDGE_OUT, 'cubic-bezier(.4,0,.2,1)');
+      p.style.setProperty('--cam-swipe-p', '0');
+    }, NUDGE_IN + NUDGE_HOLD));
+    h.timers.push(setTimeout(endHint, NUDGE_IN + NUDGE_HOLD + NUDGE_OUT + 40));
+  }
+
+  // «Reducir movimiento»: una frase bajo las pestañas que aparece y se va sola.
+  function showTip(ctx) {
+    if (!tip) {
+      tip = document.createElement('div');
+      tip.className = 'cam-swipe-tip';
+      tip.setAttribute('aria-hidden', 'true');
+      tip.textContent = 'Desliza para cambiar ›';
+      document.body.append(tip);
+    }
+    const bottom = ctx.bar.getBoundingClientRect().bottom;
+    tip.style.top = Math.round(Math.max(12, bottom) + 10) + 'px';
+    tip.hidden = false;
+    void tip.offsetWidth;
+    tip.classList.add('is-on');
+    const h = hint;
+    h.timers.push(setTimeout(() => { if (hint === h) tip.classList.remove('is-on'); }, TIP_MS));
+    h.timers.push(setTimeout(endHint, TIP_MS + 320));
+  }
+
+  function endHint() {
+    if (!hint) return;
+    const h = hint;
+    hint = null;
+    h.timers.forEach(clearTimeout);
+    release(h.els);
+    if (peek && peek.classList.contains('is-hint')) {
+      clearTimeout(peekTimer);
+      peek.hidden = true;
+      peek.classList.remove('is-hint', 'is-ready', 'is-settling', 'is-gone');
+      peek.style.setProperty('--cam-swipe-p', '0');
+    }
+    if (tip) { tip.classList.remove('is-on'); tip.hidden = true; }
+  }
+
+  for (const type of ['touchstart', 'wheel', 'keydown', 'pointerdown']) {
+    window.addEventListener(type, postpone, { capture: true, passive: true });
+  }
+  window.addEventListener('scroll', postpone, { passive: true });
+  document.addEventListener('visibilitychange', () => { if (document.hidden) postpone(); });
+  // La pantalla de carga tapa la sección al entrar: el 1,5 s se cuenta desde que se va.
+  const calmAgain = () => { if (!hint) postpone(); };
+  new MutationObserver(calmAgain).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+  const loaderEl = document.getElementById('camPageLoader');
+  if (loaderEl) new MutationObserver(calmAgain).observe(loaderEl, { attributes: true, attributeFilter: ['class', 'style', 'hidden'] });
+  let considerQueued = false;
+  new MutationObserver(() => {
+    if (considerQueued) return;
+    considerQueued = true;
+    requestAnimationFrame(() => { considerQueued = false; considerHint(); });
+  }).observe(document.body, { attributes: true, attributeFilter: ['class', 'data-cam-tabs', 'data-cam-section'] });
+  considerHint();   // enlace directo (?s=nfl)
+
   window.camSectionSwipe = Object.freeze({
     area: () => { const ctx = context(); return ctx ? { area: ctx.kind, tabs: ctx.tabs.length, index: ctx.index } : null; },
-    busy: () => busy || Boolean(g && g.state === 'drag')
+    busy: () => busy || Boolean(g && g.state === 'drag'),
+    hinting: () => Boolean(hint)
   });
 })();
