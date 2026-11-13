@@ -6,7 +6,10 @@
    12 nov 2026: «Tu Take · ¿Qué crees que va a pasar?» abre la pestaña Takes
    (#camFootballTakePrompt), como en NFL; el ejemplo sale del partido destacado.
    13 nov 2026: El marcador es un menú vertical (El marcador · Clasificación ·
-   Goleadores) de la liga elegida arriba; lo construye cam-sport-tables.js. */
+   Goleadores) de la liga elegida arriba; lo construye cam-sport-tables.js.
+   13 nov 2026 (tarde): Champions, LaLiga y Premier usan el «¿Quién gana?» de NFL
+   (los dos equipos en grande, con una franja sutil del color de cada club, y el
+   empate debajo). La Liga MX conserva su duelo y la Liguilla sin cambios. */
 (() => {
   'use strict';
   const root=document.getElementById('camFootballSemana');
@@ -15,7 +18,7 @@
   const promptRoot=document.getElementById('camFootballTakePrompt');
   if(!root||!body||!scores||!window.matchMedia)return;
   const mobile=window.matchMedia('(max-width: 760px), (orientation: landscape) and (max-height: 500px) and (hover: none) and (pointer: coarse)');
-  const ui={scoreOpen:false,liveOpen:false,liveKey:null,saving:false,result:null};
+  const ui={scoreOpen:false,liveOpen:false,liveKey:null,saving:false,result:null,focusPick:null};
   // Antes de que cargue la quiniela, window.camFootballQuiniela es la <section> con ese id.
   const q=()=>{const api=window.camFootballQuiniela;return api&&typeof api.snapshot==='function'?api:null;};
   // 8 nov 2026: también en escritorio (cam-escritorio.css la compone en columnas).
@@ -116,6 +119,203 @@
     else if(draft||mine)play.append(el('p',(draft?'Tu elección sin guardar: ':'Tu elección guardada: ')+label(snap,g,draft||mine),'cam-ns-note'));
     // Un partido terminado sin elección no deja una línea ni un hueco vacío debajo del marcador.
     if(play.childNodes.length)box.append(play);
+    return box;
+  }
+
+  /* ---------- «¿Quién gana?» como en NFL (13 nov 2026) ----------
+     Solo Champions, LaLiga y Premier. Mismas piezas y clases que el duelo de NFL
+     (cam-ns-side…): el equipo es el botón, sin puntos a la vista; un toque guarda.
+     El empate, tercer resultado del fútbol, va debajo de los dos equipos. */
+  const NFL_FORMAT=new Set(['champions','laliga','premier']);
+  // Color de cada club para la franja de su tarjeta (como los acentos de NFL): tonos
+  // legibles de día y de noche. Clubes blanco y negro o azul marino usan su segundo
+  // color o un plateado. Un club que no esté aquí lleva el dorado de la casa.
+  const CLUB_COLORS=[
+    // LaLiga
+    ['#febe10',['Real Madrid','Real Madrid CF']],
+    ['#b3104c',['Barcelona','FC Barcelona','Barça']],
+    ['#cb3524',['Atlético Madrid','Atlético de Madrid','Atletico Madrid','Atlético','Atletico']],
+    ['#ee2523',['Athletic Club','Athletic Bilbao','Athletic']],
+    ['#1f6fc0',['Real Sociedad']],
+    ['#f2d130',['Villarreal','Villarreal CF']],
+    ['#0bb363',['Real Betis','Betis']],
+    ['#d71920',['Sevilla','Sevilla FC']],
+    ['#f18e00',['Valencia','Valencia CF']],
+    ['#8ac3ee',['Celta Vigo','Celta','RC Celta']],
+    ['#c8102e',['Osasuna','CA Osasuna']],
+    ['#2a6db5',['Getafe','Getafe CF']],
+    ['#e53027',['Rayo Vallecano','Rayo']],
+    ['#e20613',['Mallorca','RCD Mallorca']],
+    ['#cd2534',['Girona','Girona FC']],
+    ['#2f6cb8',['Alavés','Deportivo Alavés','Alaves']],
+    ['#1f84c8',['Espanyol','RCD Espanyol']],
+    ['#0f8a44',['Elche','Elche CF']],
+    ['#b4053f',['Levante','Levante UD']],
+    ['#2a6ab8',['Real Oviedo','Oviedo']],
+    ['#f2d300',['Las Palmas','UD Las Palmas','Cádiz','Cadiz']],
+    ['#8b3a9a',['Real Valladolid','Valladolid']],
+    ['#2f62b8',['Leganés','Leganes','Deportivo La Coruña','Deportivo','Real Zaragoza','Zaragoza']],
+    ['#0e9a4d',['Racing Santander','Racing','Córdoba','Cordoba']],
+    ['#e2001a',['Almería','Almeria','Granada','Sporting Gijón','Sporting Gijon']],
+    ['#3aa6e0',['Málaga','Malaga']],
+    ['#a50034',['Huesca','SD Huesca','Eibar','SD Eibar']],
+    // Premier League
+    ['#ef0107',['Arsenal']],
+    ['#9c2a5b',['Aston Villa']],
+    ['#da291c',['AFC Bournemouth','Bournemouth','Manchester United','Man United','Man Utd']],
+    ['#e30613',['Brentford']],
+    ['#1f6fc4',['Brighton & Hove Albion','Brighton and Hove Albion','Brighton']],
+    ['#99305f',['Burnley']],
+    ['#2a63c4',['Chelsea','Everton']],
+    ['#c4122e',['Crystal Palace']],
+    ['#cc1f1f',['Fulham']],
+    ['#ffcd00',['Leeds United','Leeds']],
+    ['#c8102e',['Liverpool']],
+    ['#6cabdd',['Manchester City','Man City']],
+    ['#a5acaf',['Newcastle United','Newcastle']],
+    ['#dd0000',['Nottingham Forest','Nottm Forest',"Nott'm Forest"]],
+    ['#eb172b',['Sunderland']],
+    ['#5f72b0',['Tottenham Hotspur','Tottenham','Spurs']],
+    ['#a0384f',['West Ham United','West Ham']],
+    ['#fdb913',['Wolverhampton Wanderers','Wolverhampton','Wolves']],
+    ['#59cbe8',['Coventry City','Coventry']],
+    ['#3a64a3',['Ipswich Town','Ipswich','Leicester City','Leicester','Millwall','West Bromwich Albion','West Brom']],
+    ['#e11b22',['Middlesbrough','Southampton','Sheffield United','Stoke City','Stoke','Bristol City','Charlton Athletic','Wrexham']],
+    ['#f5a12d',['Hull City','Hull']],
+    ['#f2d500',['Norwich City','Norwich','Watford']],
+    // Champions League
+    ['#dc052d',['Bayern Munich','Bayern München','Bayern Múnich','Bayern']],
+    ['#fde100',['Borussia Dortmund','Dortmund']],
+    ['#e32221',['Bayer Leverkusen','Leverkusen']],
+    ['#dd0741',['RB Leipzig','Leipzig']],
+    ['#e1000f',['Eintracht Frankfurt','Frankfurt','VfB Stuttgart','Stuttgart']],
+    ['#2f62b0',['Paris Saint-Germain','Paris Saint Germain','Paris SG','PSG']],
+    ['#2faee0',['Marseille','Olympique de Marseille','Olympique Marseille']],
+    ['#e51b22',['Monaco','AS Monaco','Lille','LOSC Lille']],
+    ['#2b55b0',['Lyon','Olympique Lyonnais']],
+    ['#ffd600',['Lens','RC Lens']],
+    ['#a5acaf',['Juventus','Besiktas','Beşiktaş','Sturm Graz']],
+    ['#1f78c8',['Internazionale','Inter','Inter Milan']],
+    ['#fb090b',['AC Milan','Milan']],
+    ['#12a0d7',['Napoli','SSC Napoli']],
+    ['#1e71b8',['Atalanta']],
+    ['#a6273b',['Roma','AS Roma','Bologna']],
+    ['#87c8ef',['Lazio']],
+    ['#2a68b8',['Como','Como 1907']],
+    ['#e83030',['Benfica','SL Benfica','Braga','SC Braga']],
+    ['#1f6fc4',['Porto','FC Porto','Rangers','Dinamo Zagreb','GNK Dinamo Zagreb','FC Copenhagen','Copenhagen','Pafos','Pafos FC']],
+    ['#16955f',['Sporting CP','Sporting','Sporting Lisbon','Celtic','Panathinaikos']],
+    ['#d2122e',['Ajax','PSV Eindhoven','PSV','Feyenoord','AZ Alkmaar','AZ','Galatasaray','Olympiacos','Slavia Prague','Red Bull Salzburg','Salzburg','Red Star Belgrade','Crvena Zvezda','FC Basel','Basel','FC Midtjylland','Midtjylland']],
+    ['#a50034',['Sparta Prague']],
+    ['#2a7fc8',['Club Brugge','Brugge']],
+    ['#f2c300',['Union St.-Gilloise','Union Saint-Gilloise','Union SG','Fenerbahce','Fenerbahçe','Bodo/Glimt','Bodø/Glimt','FK Bodo/Glimt','Young Boys','BSC Young Boys','Kairat','Kairat Almaty']],
+    ['#7b48a8',['Anderlecht']],
+    ['#f37021',['Shakhtar Donetsk','Shakhtar']]
+  ];
+  const clubColors=new Map(CLUB_COLORS.flatMap(([color,aliases])=>aliases.map(alias=>[normalizeClub(alias),color])));
+  // ESPN escribe a veces «FC», «CF» o «AFC»: segunda vuelta sin esas siglas.
+  const bareClub=value=>normalizeClub(value).split(' ').filter(w=>!['fc','cf','afc','cd','ud','rcd','sc','ac','as','ssc','club','sl'].includes(w)).join(' ');
+  const clubsBare=new Map([...clubColors].map(([key,color])=>[bareClub(key),color]));
+  function clubColor(snap,id){
+    const team=snap.teams.get(id);
+    for(const value of [team?.name,team?.short_name])if(value&&clubColors.has(normalizeClub(value)))return clubColors.get(normalizeClub(value));
+    for(const value of [team?.name,team?.short_name])if(value&&clubsBare.has(bareClub(value)))return clubsBare.get(bareClub(value));
+    return null;
+  }
+  const NS_ICONS={check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>'};
+  function nsIcon(kind){
+    const box=el('span',null,'cam-ns-ico',{'aria-hidden':'true'});
+    box.innerHTML='<svg viewBox="0 0 24 24" focusable="false">'+NS_ICONS[kind]+'</svg>';
+    return box;
+  }
+  const TZ='America/Toronto';
+  const dayKey=value=>new Intl.DateTimeFormat('en-CA',{timeZone:TZ,year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(value));
+  const clockOf=value=>new Intl.DateTimeFormat('es',{timeZone:TZ,hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date(value));
+  const dayLongOf=value=>new Intl.DateTimeFormat('es',{timeZone:TZ,weekday:'long'}).format(new Date(value));
+  function relativeDay(value){
+    const key=dayKey(value);
+    if(key===dayKey(Date.now()))return 'hoy';
+    if(key===dayKey(Date.now()+864e5))return 'mañana';
+    return null;
+  }
+  async function choosePick(snap,g,pick,node){
+    if(ui.saving||(snap.draft.get(g.id)||snap.mine.get(g.id))===pick&&snap.mine.get(g.id)===pick)return;
+    ui.saving=true;ui.result=null;
+    for(const n of node.closest('.cam-ns-step')?.querySelectorAll('button')||[])n.disabled=true;
+    try{
+      const saved=await q().save(g.id,pick);
+      if(saved){ui.result={game:g.id,ok:true};ui.focusPick=pick;}
+      else if(snap.user)ui.result={game:g.id,ok:false,text:document.getElementById('camFootballStatus')?.textContent||'No se pudo guardar. Inténtalo de nuevo.'};
+    }finally{ui.saving=false;schedule();}
+  }
+  function sideTile(snap,g,pick,open){
+    const id=pick==='home'?g.home_id:g.away_id;
+    const current=snap.draft.get(g.id)||snap.mine.get(g.id)||null;
+    const chosen=current===pick,other=!!current&&!chosen;
+    let cls='cam-ns-side'+(chosen?' is-selected':'')+(other?' is-other':'')+(open?'':' is-static');
+    if(g.status==='final'&&g.outcome)cls+=g.outcome===pick?' is-winner':' is-loser';
+    const tile=el(open?'button':'div',null,cls,{'data-side':pick,'data-pick':pick,'data-team':id});
+    tile.style.setProperty('--duel-team-accent',clubColor(snap,id)||'var(--ns-gold)');
+    const mark=el('span',null,'cam-ns-side-mark',{'aria-hidden':'true'});
+    if(chosen)mark.append(nsIcon('check'));
+    const text=el('span',null,'cam-ns-side-label');
+    text.append(el('span',name(snap,id),'cam-ns-side-name'),el('span',pick==='home'?'Local':'Visitante','cam-ns-side-sub'));
+    tile.append(mark,crest(snap,id,52),text);
+    if(!open){if(chosen)tile.setAttribute('aria-label',fullName(snap,id)+': tu pick');return tile;}
+    tile.type='button';tile.disabled=ui.saving;
+    tile.setAttribute('aria-pressed',String(chosen));
+    tile.setAttribute('aria-label',(chosen?'Tu pick: ':'Elegir a ')+fullName(snap,id));
+    tile.addEventListener('click',()=>void choosePick(snap,g,pick,tile));
+    return tile;
+  }
+  function drawTile(snap,g,open){
+    const current=snap.draft.get(g.id)||snap.mine.get(g.id)||null;
+    const chosen=current==='draw';
+    let cls='cam-ns-draw'+(chosen?' is-selected':'')+(open?'':' is-static');
+    if(g.status==='final'&&g.outcome)cls+=g.outcome==='draw'?' is-winner':' is-loser';
+    const tile=el(open?'button':'div',null,cls,{'data-pick':'draw'});
+    const mark=el('span',null,'cam-ns-draw-mark',{'aria-hidden':'true'});
+    if(chosen)mark.append(nsIcon('check'));
+    tile.append(mark,el('span','Empate','cam-ns-draw-label'));
+    if(!open){if(chosen)tile.setAttribute('aria-label','Empate: tu pick');return tile;}
+    tile.type='button';tile.disabled=ui.saving;
+    tile.setAttribute('aria-pressed',String(chosen));
+    tile.setAttribute('aria-label',chosen?'Tu pick: empate':'Elegir empate');
+    tile.addEventListener('click',()=>void choosePick(snap,g,'draw',tile));
+    return tile;
+  }
+  function hintLine(snap,g,open){
+    const mine=snap.mine.get(g.id)||null,draft=snap.draft.get(g.id)||null;
+    const result=ui.result?.game===g.id?ui.result:null;
+    const hint=el('p',null,'cam-ns-hint',{role:'status'});
+    if(result&&!result.ok){hint.classList.add('is-error');hint.textContent=result.text;}
+    else if(g.status==='final'){
+      if(mine&&g.outcome&&mine===g.outcome){hint.classList.add('is-saved');hint.append(nsIcon('check'),el('span','Acertaste: '+label(snap,g,mine)+'.'));}
+      else hint.textContent=mine?'Elegiste '+label(snap,g,mine)+'.':'No elegiste en este partido.';
+    }else if(started(g))hint.textContent=mine?'Tu pick: '+label(snap,g,mine)+' · pronósticos cerrados':'Pronósticos cerrados';
+    else if(!open)hint.textContent='Se abre cuando lleguen las cuotas.';
+    else if(draft&&draft!==mine)hint.textContent='Tu elección sin guardar: '+label(snap,g,draft);
+    else if(mine){
+      hint.classList.add('is-saved');
+      const rel=relativeDay(g.kickoff);
+      hint.append(nsIcon('check'),el('span','Guardado. Puedes cambiarlo hasta '+(rel||'el '+dayLongOf(g.kickoff))+' a las '+clockOf(g.kickoff)+'.'));
+    }
+    return hint;
+  }
+  function duelTiles(snap,g){
+    const box=el('section',null,'cam-ns-block cam-ns-feature cam-ns-duelo',{'data-block':'duelo'});
+    if(['live','final'].includes(g.status)&&g.home_score!=null&&g.away_score!=null)
+      box.append(el('p',name(snap,g.home_id)+' '+g.home_score+' – '+g.away_score+' '+name(snap,g.away_id),'cam-ns-duel-score'));
+    box.append(el('p',fullName(snap,g.home_id)+' contra '+fullName(snap,g.away_id),'cam-ns-sr'));
+    const open=!started(g)&&!!q()?.isOpen(g);
+    const step=el('div',null,'cam-ns-step cam-ns-step-pick',{role:'group','aria-labelledby':'camFsPickTitle'});
+    step.append(el('h3',g.status==='final'?'¿Quién ganó?':'¿Quién gana?','cam-ns-step-title',{id:'camFsPickTitle'}));
+    const sides=el('div',null,'cam-ns-sides');
+    sides.append(sideTile(snap,g,'home',open),el('span','VS','cam-ns-at',{'aria-hidden':'true'}),sideTile(snap,g,'away',open));
+    step.append(sides,drawTile(snap,g,open));
+    const hint=hintLine(snap,g,open);
+    if(hint.textContent)step.append(hint);
+    box.append(step);
     return box;
   }
 
@@ -259,7 +459,11 @@
   function render(){
     if(!active())return;
     const api=q(),snap=api?.snapshot();
+    // Champions, LaLiga y Premier: la misma cabecera que NFL (título y filete) antes de las ligas.
+    const nflFormat=NFL_FORMAT.has(snap?.competition);
+    root.classList.toggle('cam-fs-duelo',nflFormat);
     const head=el('header',null,'cam-ns-head');head.append(el('h2','La semana','cam-ns-title',{id:'camFootballSemanaTitle'}));
+    if(nflFormat)head.append(el('span',null,'cam-ns-rule',{'aria-hidden':'true'}));
     if(api)head.append(api.competitionNav());
     // Un solo selector de competición: con el de La semana arriba, la quiniela no repite el suyo.
     root.classList.toggle('has-competition-nav',!!api);
@@ -282,13 +486,15 @@
       const live=liveBlock(snap);if(live)fragment.append(live);
       const duel=chooseDuel(snap.games,snap.teams);
       paintPrompt(snap,duel);
-      if(duel)fragment.append(duelBlock(snap,duel));
+      if(duel)fragment.append(nflFormat?duelTiles(snap,duel):duelBlock(snap,duel));
       else fragment.append(el('p','Todavía no hay partidos de esta competición.','cam-ns-text'));
       const score=scoreBlock(snap);scores.replaceChildren(...(score?[score]:[]));
     }
     const liveFocused=body.querySelector('.cam-ns-live-toggle')===document.activeElement;
     body.replaceChildren(fragment);
     if(liveFocused)body.querySelector('.cam-ns-live-toggle')?.focus({preventScroll:true});
+    // Tras guardar, el foco vuelve a la opción elegida (el duelo se repinta entero).
+    if(ui.focusPick){body.querySelector('[data-block="duelo"] [data-pick="'+ui.focusPick+'"]')?.focus({preventScroll:true});ui.focusPick=null;}
     keepAnchor();
   }
   let anchorUntil=0;

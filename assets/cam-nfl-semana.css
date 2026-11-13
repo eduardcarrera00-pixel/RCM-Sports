@@ -729,3 +729,117 @@ html body #camNflWeekActions #camNflSave { display:none!important; }
     border-color:var(--ns-gold)!important; background:transparent!important; color:var(--ns-gold)!important;
   }
 }
+
+/* 13 nov 2026 · Fútbol: el mismo «¿Quién gana?» que NFL, solo en Champions, LaLiga y
+   Premier (#camFootballSemana.cam-fs-duelo, que pone cam-football-semana.js). Los dos
+   equipos en grande con la franja sutil del color de cada club por fuera (local a la
+   izquierda, visitante a la derecha) y el empate debajo. La Liga MX no lleva la clase:
+   su duelo y la Liguilla siguen igual. */
+@layer cam-banners {
+  /* Sin el panel de fondo de Fútbol, como La semana de NFL. */
+  html body[data-cam-section="futbol"]:is([data-cam-tab="semana"],[data-cam-sport-page]) #freeTakes:has(> #camFootballSemana.cam-fs-duelo) {
+    border-radius:0!important; background:transparent!important; background-image:none!important; box-shadow:none!important;
+  }
+  html body #camFootballSemana.cam-fs-duelo .cam-ns-head .cam-ns-rule { margin:12px 0 14px!important; }
+  html body #camFootballSemana.cam-fs-duelo .cam-ns-ico { display:inline-flex!important; flex:0 0 auto!important; width:14px!important; height:14px!important; }
+  html body #camFootballSemana.cam-fs-duelo .cam-ns-ico svg { display:block!important; width:100%!important; height:100%!important; fill:none!important; stroke:currentColor!important; stroke-width:2.4!important; stroke-linecap:round!important; stroke-linejoin:round!important; }
+  html body #camFootballSemana.cam-fs-duelo [data-block="duelo"] {
+    margin:16px 0 0!important; padding:0!important; border:0!important; border-radius:0!important;
+    background:none!important; box-shadow:none!important;
+  }
+  html body #camFootballSemana.cam-fs-duelo [data-block="duelo"] .cam-ns-duel-score { margin:0 0 6px!important; text-align:left!important; }
+  html body #camFootballSemana.cam-fs-duelo .cam-ns-step { display:block!important; margin:0!important; }
+  html body #camFootballSemana.cam-fs-duelo .cam-ns-step-title {
+    margin:0!important; padding:0!important; color:var(--ns-ink)!important;
+    font:600 22px/1.2 "Playfair Display",Georgia,serif!important; letter-spacing:0!important; text-transform:none!important; text-align:left!important;
+  }
+
+  /* los equipos */
+  html body #camFootballSemana.cam-fs-duelo .cam-ns-sides {
+    display:grid!important; grid-template-columns:minmax(0,1fr) 30px minmax(0,1fr)!important;
+    align-items:stretch!important; margin:12px 0 0!important;
+  }
+  html body #camFootballSemana.cam-fs-duelo .cam-ns-sides .cam-ns-at {
+    display:flex!important; flex-direction:column!important; align-items:center!important; justify-content:center!important; gap:7px!important;
+    color:var(--ns-gold)!important; font:italic 500 17px/1 "Playfair Display",Georgia,serif!important; text-align:center!important;
+  }
+  html body #camFootballSemana.cam-fs-duelo .cam-ns-sides .cam-ns-at::before,
+  html body #camFootballSemana.cam-fs-duelo .cam-ns-sides .cam-ns-at::after {
+    content:""!important; display:block!important; width:13px!important; height:1px!important;
+    background:var(--ns-line-strong)!important; border:0!important; border-radius:0!important;
+  }
+  html body #camFootballSemana.cam-fs-duelo .cam-ns-side {
+    position:relative!important; display:flex!important; flex-direction:column!important; align-items:center!important; justify-content:center!important; gap:7px!important;
+    width:100%!important; min-width:0!important; min-height:120px!important; margin:0!important; padding:15px 10px 12px!important;
+    border:1px solid var(--ns-line-strong)!important; border-radius:13px!important;
+    background:var(--ns-card)!important; background-image:none!important; box-shadow:none!important;
+    color:var(--ns-ink)!important; text-align:center!important; text-transform:none!important; letter-spacing:0!important;
+    -webkit-tap-highlight-color:transparent!important; touch-action:manipulation!important;
+    transition:border-color .18s ease,background-color .18s ease,opacity .18s ease,transform .12s ease,box-shadow .18s ease!important;
+  }
+  html body #camFootballSemana.cam-fs-duelo .cam-ns-side[data-side="home"] { border-left:4px solid var(--duel-team-accent)!important; }
+  html body #camFootballSemana.cam-fs-duelo .cam-ns-side[data-side="away"] { border-right:4px solid var(--duel-team-accent)!important; }
+  html body #camFootballSemana.cam-fs-duelo :is(button.cam-ns-side,button.cam-ns-draw) { cursor:pointer!important; }
+  html body #camFootballSemana.cam-fs-duelo :is(button.cam-ns-side,button.cam-ns-draw):active { transform:scale(.98)!important; }
+  html body #camFootballSemana.cam-fs-duelo :is(button.cam-ns-side,button.cam-ns-draw):disabled { cursor:progress!important; }
+  html body #camFootballSemana.cam-fs-duelo :is(.cam-ns-side,.cam-ns-draw):focus-visible { outline:3px solid var(--ns-accent)!important; outline-offset:3px!important; }
+  html body #camFootballSemana.cam-fs-duelo :is(.cam-ns-side,.cam-ns-draw).is-selected {
+    border-color:var(--ns-gold)!important; background:var(--ns-accent-soft)!important; box-shadow:0 0 0 1px var(--ns-gold)!important;
+  }
+  html body #camFootballSemana.cam-fs-duelo :is(.cam-ns-side,.cam-ns-draw).is-loser { opacity:.72!important; }
+  html body #camFootballSemana.cam-fs-duelo .cam-ns-side-mark {
+    position:absolute!important; top:8px!important; right:8px!important; display:inline-flex!important; align-items:center!important; justify-content:center!important;
+    width:18px!important; height:18px!important; margin:0!important; padding:3px!important;
+    border:1.5px solid var(--ns-gold)!important; border-radius:50%!important; background:transparent!important; color:var(--ns-gold)!important;
+  }
+  html body #camFootballSemana.cam-fs-duelo .cam-ns-side:not(.is-selected) .cam-ns-side-mark { display:none!important; }
+  html body #camFootballSemana.cam-fs-duelo :is(.cam-ns-side-mark,.cam-ns-draw-mark) .cam-ns-ico { width:100%!important; height:100%!important; }
+  html body #camFootballSemana.cam-fs-duelo :is(.cam-ns-side-mark,.cam-ns-draw-mark) .cam-ns-ico svg { stroke-width:3.4!important; }
+  html body #camFootballSemana.cam-fs-duelo .cam-ns-side .cam-ns-crest { width:56px!important; height:56px!important; background:transparent!important; }
+  html body #camFootballSemana.cam-fs-duelo .cam-ns-side .cam-ns-crest:not(.is-loaded) { background:var(--ns-soft)!important; }
+  html body #camFootballSemana.cam-fs-duelo .cam-ns-side .cam-ns-crest img { padding:0!important; }
+  html body #camFootballSemana.cam-fs-duelo .cam-ns-side-label { display:flex!important; flex-direction:column!important; align-items:center!important; gap:3px!important; max-width:100%!important; }
+  html body #camFootballSemana.cam-fs-duelo .cam-ns-side-name {
+    max-width:100%!important; color:var(--ns-ink)!important;
+    font:800 16px/1.2 Inter,system-ui,sans-serif!important; letter-spacing:.02em!important; text-transform:uppercase!important;
+    overflow-wrap:break-word!important; hyphens:auto!important;
+  }
+  html body #camFootballSemana.cam-fs-duelo .cam-ns-side-sub {
+    color:var(--ns-muted)!important; font:500 10px/1.3 Inter,system-ui,sans-serif!important; letter-spacing:.06em!important; text-transform:uppercase!important;
+  }
+
+  /* el empate: tercer resultado, debajo de los equipos */
+  html body #camFootballSemana.cam-fs-duelo .cam-ns-draw {
+    position:relative!important; display:flex!important; align-items:center!important; justify-content:center!important; gap:8px!important;
+    width:min(100%,200px)!important; min-height:44px!important; margin:10px auto 0!important; padding:0 18px!important;
+    border:1px solid var(--ns-line-strong)!important; border-radius:999px!important;
+    background:var(--ns-card)!important; background-image:none!important; box-shadow:none!important;
+    color:var(--ns-ink)!important; font:700 12px/1.2 Inter,system-ui,sans-serif!important; letter-spacing:.12em!important; text-transform:uppercase!important;
+    -webkit-tap-highlight-color:transparent!important; touch-action:manipulation!important;
+    transition:border-color .18s ease,background-color .18s ease,opacity .18s ease,transform .12s ease,box-shadow .18s ease!important;
+  }
+  html body #camFootballSemana.cam-fs-duelo .cam-ns-draw-mark {
+    display:inline-flex!important; align-items:center!important; justify-content:center!important;
+    width:18px!important; height:18px!important; margin:0!important; padding:3px!important;
+    border:1.5px solid var(--ns-gold)!important; border-radius:50%!important; color:var(--ns-gold)!important;
+  }
+  html body #camFootballSemana.cam-fs-duelo .cam-ns-draw:not(.is-selected) .cam-ns-draw-mark { display:none!important; }
+
+  /* la línea bajo los equipos */
+  html body #camFootballSemana.cam-fs-duelo .cam-ns-hint {
+    display:block!important; margin:12px 0 0!important;
+    color:var(--ns-muted)!important; font:600 13px/1.4 Inter,system-ui,sans-serif!important; text-align:center!important;
+  }
+  html body #camFootballSemana.cam-fs-duelo .cam-ns-hint.is-saved { color:var(--ns-text)!important; }
+  html body #camFootballSemana.cam-fs-duelo .cam-ns-hint .cam-ns-ico { width:16px!important; height:16px!important; margin:0 6px 0 0!important; vertical-align:-3px!important; color:var(--ns-accent)!important; }
+  html body #camFootballSemana.cam-fs-duelo .cam-ns-hint.is-error { color:var(--ns-down)!important; }
+  @media (prefers-reduced-motion: reduce) {
+    html body #camFootballSemana.cam-fs-duelo :is(.cam-ns-side,.cam-ns-draw) { transition:none!important; }
+    html body #camFootballSemana.cam-fs-duelo :is(.cam-ns-side,.cam-ns-draw):active { transform:none!important; }
+  }
+  @media (max-width: 340px) {
+    html body #camFootballSemana.cam-fs-duelo .cam-ns-side-name { font-size:14px!important; }
+  }
+  /* Escritorio: los equipos no se estiran de más, como en NFL. */
+  html body:is([data-cam-desk],[data-cam-sport-page]) #camFootballSemana.cam-fs-duelo .cam-ns-step { max-width:640px!important; }
+}
