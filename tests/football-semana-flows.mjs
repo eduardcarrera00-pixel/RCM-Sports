@@ -110,7 +110,8 @@ async function scenario({anonymous=false,failed=false}={}){
   live=one('#camFootballSemana details');live.open=false;live.dispatchEvent(new w.Event('toggle'));
   const closedReads=reads;poll();await settle();assert.equal(reads,closedReads);
   assert.ok(one('#camFootballQuiniela').compareDocumentPosition(one('#camFootballScore'))&w.Node.DOCUMENT_POSITION_FOLLOWING,'the scoreboard follows the actual quiniela');
-  one('.cam-ns-link-take').click();assert.equal(takeSport,'Fútbol');
+  assert.equal(one('#camFootballSemana .cam-ns-link-take'),null,'13 nov 2026: the featured match has no Publicar Take button');
+  assert.equal(takeSport,null);
   assert.equal(F.calls.filter(c=>c.rpc==='cam_football_save_pick').length,0,'a take never saves quiniela data');
   one('#camFootballSemana .cam-ns-pick:nth-child(2)').click();await settle();
   if(anonymous){assert.equal(logins,1);assert.equal(F.calls.filter(c=>c.rpc==='cam_football_save_pick').length,0);}
@@ -133,6 +134,7 @@ async function scenario({anonymous=false,failed=false}={}){
   const beforeReads=reads;
   one('#camFootballSemana [data-competition=premier]').click();await settle();
   assert.equal(api.snapshot().competition,'premier');
+  assert.ok(one('#camFootballQuiniela').classList.contains('cam-football-sin-banner'),'Premier hides the quiniela banner');
   assert.match(one('#camFootballSemana .cam-ns-duel').textContent,/arsenal/);
   assert.equal(api.snapshot().mine.get('premier'),anonymous?undefined:'draw');
   one('#camFootballNav [data-competition=laliga]').click();await settle();

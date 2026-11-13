@@ -425,6 +425,11 @@ html.dark #camFootballQuiniela{--lg-sel:#E8BF79;--lg-on-sel:#0B2233;--lg-on-sel-
 html body #camFootballSemana.has-competition-nav~#camFootballQuiniela #camFootballNav .cam-football-leagues{display:none}
 /* 12 nov 2026: «Ver mis jornadas» se mudó debajo de los botones de guardar; sin logos, esta fila queda vacía. */
 html body #camFootballSemana.has-competition-nav~#camFootballQuiniela #camFootballNav{display:none}
+/* 13 nov 2026: Champions, LaLiga y Premier van sin el banner «La quiniela de fútbol»: los días
+   de partido (p. ej. «Sábado 21») suben pegados al partido destacado. Liga MX no cambia.
+   Solo con el selector de La semana arriba, para no esconder nunca el de la quiniela. */
+html body #camFootballSemana.has-competition-nav~#camFootballQuiniela.cam-football-sin-banner>.cam-nfl-top{display:none!important}
+html body #camFootballSemana.has-competition-nav~#camFootballQuiniela.cam-football-sin-banner{padding-top:0!important}
 html body #camFootballQuiniela .cam-nfl-sides{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;align-items:stretch}
 html body #camFootballQuiniela .cam-nfl-sides :is(.cam-nfl-team,.cam-nfl-draw){display:grid;grid-template-columns:minmax(0,1fr);justify-items:center;align-content:center;gap:5px;width:100%;min-width:0;min-height:96px;margin:0;padding:10px 6px;border:1px solid var(--q-line);background:var(--q-card);color:var(--q-ink);text-align:center;box-shadow:none}
 html body #camFootballQuiniela .cam-nfl-sides .cam-nfl-team::before,

@@ -104,9 +104,7 @@
     box.append(el('p',fullName(snap,g.home_id)+' contra '+fullName(snap,g.away_id),'cam-ns-sr'));
     box.append(el('p',(g.status==='live'?'En juego · ':g.status==='final'?'Finalizado · ':'')+when(g.kickoff),'cam-ns-duel-when'));
     if(['live','final'].includes(g.status)&&g.home_score!=null&&g.away_score!=null)box.append(el('p',g.home_score+' – '+g.away_score,'cam-ns-duel-score'));
-    const opinion=el('div',null,'cam-ns-opinion');
-    const take=button('Publicar Take',()=>window.aeOpenTakeComposer?.('Fútbol'),'cam-ns-link cam-ns-link-take');
-    take.setAttribute('aria-controls','aeTakeComposerDialog');take.setAttribute('aria-haspopup','dialog');opinion.append(take);box.append(opinion);
+    // 13 nov 2026: sin «Publicar Take» bajo el marcador; el Take se escribe desde la pestaña Takes.
     const play=el('div',null,'cam-ns-quiniela',{role:'group','aria-label':'Quiniela del duelo de la semana'});
     if(q().isOpen(g)){
       const picks=el('div',null,'cam-ns-picks');
@@ -116,7 +114,9 @@
     const mine=snap.mine.get(g.id),draft=snap.draft.get(g.id);
     if(ui.result?.game===g.id)play.append(el('p',ui.result.text,'cam-ns-note',{role:'status'}));
     else if(draft||mine)play.append(el('p',(draft?'Tu elección sin guardar: ':'Tu elección guardada: ')+label(snap,g,draft||mine),'cam-ns-note'));
-    box.append(play);return box;
+    // Un partido terminado sin elección no deja una línea ni un hueco vacío debajo del marcador.
+    if(play.childNodes.length)box.append(play);
+    return box;
   }
 
   /* «Tu Take» al principio de Takes (12 nov 2026), con la misma maqueta que NFL
