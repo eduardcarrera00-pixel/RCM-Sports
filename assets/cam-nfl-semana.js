@@ -20,7 +20,9 @@
    «Tu jornada» al elegir y «Tu Take» como campo para escribir.
    12 nov 2026 (noche): «Tu Take» ya no va en el duelo: abre la pestaña Takes
    (#camNflTakePrompt, primer hijo de #freeTakes); el ejemplo sigue usando el
-   duelo de la semana. «Demuestra tu conocimiento» cierra Takes. */
+   duelo de la semana. «Demuestra tu conocimiento» cierra Takes.
+   13 nov 2026: El marcador pasa a ser un menú vertical (El marcador ·
+   Clasificación NFL · Mejores anotadores) que construye cam-sport-tables.js. */
 (() => {
   'use strict';
 
@@ -417,42 +419,61 @@
   function scoreBlock(snap, games, season, week, rankIds, mode) {
     const has = w => games.some(g => Number(g.season) === season && Number(g.week) === w && finished(g));
     const target = has(week) ? week : (week > 1 && has(week - 1) ? week - 1 : null);
-    if (target == null) return null;
-    const results = games.filter(g => Number(g.season) === season && Number(g.week) === target && finished(g));
-    const pos = id => { const i = rankIds.indexOf(id); return i < 0 ? null : i + 1; };
-    const scored = results.map(g => {
-      const loser = g.winner_id ? (g.winner_id === g.home_id ? g.away_id : g.home_id) : null;
-      const chance = g.winner_id ? (g.winner_id === g.home_id ? g.probability_home : g.probability_away) : null;
-      const fall = loser ? pos(loser) : null;
-      let tag = null, weight = 0;
-      if (chance != null && Number(chance) <= 1 / 3) { tag = 'Sorpresa'; weight = 100 + Math.round((1 - Number(chance)) * 10); }
-      else if (g.is_bonus) { tag = 'Partido bonus'; weight = 90; }
-      else if (fall) { tag = 'Cae el n.º ' + fall; weight = 50 - fall; }
-      return { g, tag, weight };
-    }).sort((a, b) => b.weight - a.weight || Date.parse(a.g.kickoff) - Date.parse(b.g.kickoff));
-    const title = (mode === 'cronica' ? 'La crónica · ' : 'El marcador · ') + weekName(target);
-    const box = section('marcador', title);
-    const list = el('ul', null, 'cam-ns-results');
-    const shown = ui.scoreOpen ? scored : scored.slice(0, 3);
-    for (const { g, tag } of shown) {
-      const row = el('li', null, 'cam-ns-result');
-      const score = el('span', null, 'cam-ns-result-score');
-      const team = (id, value) => { const s = el('span', id + ' ' + value, g.winner_id === id ? 'is-winner' : null); return s; };
-      score.append(team(g.away_id, g.away_score), el('span', ' – ', 'cam-ns-dash'), team(g.home_id, g.home_score));
-      score.setAttribute('aria-label', (teamOf(g.away_id)?.name || g.away_id) + ' ' + g.away_score + ', ' + (teamOf(g.home_id)?.name || g.home_id) + ' ' + g.home_score);
-      row.append(score);
-      if (tag) row.append(el('span', tag, 'cam-ns-result-tag' + (tag.startsWith('Sorpresa') ? ' is-surprise' : '')));
-      const mine = snap.mine.get(g.id);
-      if (mine && g.winner_id) row.append(el('span', mine === g.winner_id ? 'Acertaste' : 'Fallaste', 'cam-ns-result-mine' + (mine === g.winner_id ? ' is-hit' : ' is-miss')));
-      list.append(row);
+    const title = mode === 'cronica' ? 'La crónica' : 'El marcador';
+    let content = null, teaser = '';
+    if (target != null) {
+      const results = games.filter(g => Number(g.season) === season && Number(g.week) === target && finished(g));
+      const pos = id => { const i = rankIds.indexOf(id); return i < 0 ? null : i + 1; };
+      const scored = results.map(g => {
+        const loser = g.winner_id ? (g.winner_id === g.home_id ? g.away_id : g.home_id) : null;
+        const chance = g.winner_id ? (g.winner_id === g.home_id ? g.probability_home : g.probability_away) : null;
+        const fall = loser ? pos(loser) : null;
+        let tag = null, weight = 0;
+        if (chance != null && Number(chance) <= 1 / 3) { tag = 'Sorpresa'; weight = 100 + Math.round((1 - Number(chance)) * 10); }
+        else if (g.is_bonus) { tag = 'Partido bonus'; weight = 90; }
+        else if (fall) { tag = 'Cae el n.º ' + fall; weight = 50 - fall; }
+        return { g, tag, weight };
+      }).sort((a, b) => b.weight - a.weight || Date.parse(a.g.kickoff) - Date.parse(b.g.kickoff));
+      content = el('div', null, 'cam-st-score');
+      const list = el('ul', null, 'cam-ns-results');
+      const shown = ui.scoreOpen ? scored : scored.slice(0, 3);
+      for (const { g, tag } of shown) {
+        const row = el('li', null, 'cam-ns-result');
+        const score = el('span', null, 'cam-ns-result-score');
+        const team = (id, value) => { const s = el('span', id + ' ' + value, g.winner_id === id ? 'is-winner' : null); return s; };
+        score.append(team(g.away_id, g.away_score), el('span', ' – ', 'cam-ns-dash'), team(g.home_id, g.home_score));
+        score.setAttribute('aria-label', (teamOf(g.away_id)?.name || g.away_id) + ' ' + g.away_score + ', ' + (teamOf(g.home_id)?.name || g.home_id) + ' ' + g.home_score);
+        row.append(score);
+        if (tag) row.append(el('span', tag, 'cam-ns-result-tag' + (tag.startsWith('Sorpresa') ? ' is-surprise' : '')));
+        const mine = snap.mine.get(g.id);
+        if (mine && g.winner_id) row.append(el('span', mine === g.winner_id ? 'Acertaste' : 'Fallaste', 'cam-ns-result-mine' + (mine === g.winner_id ? ' is-hit' : ' is-miss')));
+        list.append(row);
+      }
+      content.append(list);
+      if (scored.length > 3) {
+        const more = link(ui.scoreOpen ? 'Ver menos' : 'Ver los ' + scored.length + ' resultados ›', () => { ui.scoreOpen = !ui.scoreOpen; render(); });
+        more.setAttribute('aria-expanded', String(ui.scoreOpen));
+        content.append(more);
+      }
+      teaser = weekName(target) + ' · ' + scored.length + (scored.length === 1 ? ' resultado' : ' resultados');
     }
-    box.append(list);
-    if (scored.length > 3) {
-      const more = link(ui.scoreOpen ? 'Ver menos' : 'Ver los ' + scored.length + ' resultados ›', () => { ui.scoreOpen = !ui.scoreOpen; render(); });
-      more.setAttribute('aria-expanded', String(ui.scoreOpen));
-      box.append(more);
+    // 13 nov 2026: el marcador es la primera fila de un menú vertical con la
+    // clasificación y los mejores anotadores (cam-sport-tables.js).
+    const tables = window.camSportTables;
+    if (!tables) {
+      if (!content) return null;
+      const box = section('marcador', title + ' · ' + weekName(target));
+      box.append(...content.childNodes);
+      box.dataset.week = String(target);
+      return box;
     }
-    box.dataset.week = String(target);
+    const box = tables.menu({
+      sport: 'nfl', competition: 'nfl', league: 'NFL', label: 'NFL',
+      score: content ? { title, teaser, content } : null,
+      team: id => { const t = teamOf(id); return t ? { name: t.name, nick: nick(id), logo: t.logo } : null; },
+      rebuild: schedule
+    });
+    if (box && target != null) box.dataset.week = String(target);
     return box;
   }
 
@@ -508,7 +529,7 @@
     const duel = chooseDuel(weekGames, rankIds);
     paintPrompt(snap, duel, rankIds[0]);
     const score = scoreBlock(snap, games, season, week, rankIds, mode);
-    const scoreWeek = score ? Number(score.dataset.week) : null;
+    const scoreWeek = score?.dataset.week ? Number(score.dataset.week) : null;
     if (scoreWeek != null && snap.expert) void loadDuel(season, scoreWeek, snap.user);
     const blocks = {
       envivo: liveBlock(snap.liveGames || weekGames),
@@ -573,6 +594,8 @@
 
   document.addEventListener('cam:nfl-quiniela-data', schedule);
   document.addEventListener('cam:nfl-ranking', schedule);
+  // La clasificación y los anotadores llegan después (una llamada, al acercarse al marcador).
+  document.addEventListener('cam:sport-tables', event => { if (event.detail?.competition === 'nfl') schedule(); });
   document.addEventListener('cam:section-tab', event => {
     if (event.detail?.section !== 'nfl') return;
     // A delayed data repaint must not undo the visitor's next tab choice.

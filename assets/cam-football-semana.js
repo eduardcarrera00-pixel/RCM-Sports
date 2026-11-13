@@ -4,7 +4,9 @@
    El selector de ligas es el componente de la quiniela. El marcador cierra la
    pestaña, detrás de la quiniela; Power Rankings permanece en Noticias.
    12 nov 2026: «Tu Take · ¿Qué crees que va a pasar?» abre la pestaña Takes
-   (#camFootballTakePrompt), como en NFL; el ejemplo sale del partido destacado. */
+   (#camFootballTakePrompt), como en NFL; el ejemplo sale del partido destacado.
+   13 nov 2026: El marcador es un menú vertical (El marcador · Clasificación ·
+   Goleadores) de la liga elegida arriba; lo construye cam-sport-tables.js. */
 (() => {
   'use strict';
   const root=document.getElementById('camFootballSemana');
@@ -199,22 +201,41 @@
     }
     box.append(list);return box;
   }
+  // 13 nov 2026: el marcador es la primera fila de un menú vertical con la
+  // clasificación y los goleadores de la liga elegida (cam-sport-tables.js).
+  const LEAGUE_SHORT={ligamx:'Liga MX',champions:'Champions',laliga:'LaLiga',premier:'Premier'};
   function scoreBlock(snap){
     const finals=snap.results.filter(g=>g.home_score!=null&&g.away_score!=null).sort((a,b)=>Date.parse(b.kickoff)-Date.parse(a.kickoff));
-    if(!finals.length)return null;
-    const target=finals.some(g=>Number(g.matchday)===snap.matchday)?snap.matchday:Number(finals[0].matchday);
-    const results=finals.filter(g=>Number(g.matchday)===target);
-    const box=section('marcador','El marcador',snap.competitionName);const list=el('ul',null,'cam-ns-results');
-    for(const g of (ui.scoreOpen?results:results.slice(0,3))){
-      const row=el('li',null,'cam-ns-result');
-      row.append(el('span',name(snap,g.home_id)+' '+g.home_score+' – '+g.away_score+' '+name(snap,g.away_id),'cam-ns-result-score'));
-      const mine=snap.mine.get(g.id);
-      if(mine&&g.outcome)row.append(el('span',mine===g.outcome?'Acertaste':'Fallaste','cam-ns-result-mine '+(mine===g.outcome?'is-hit':'is-miss')));
-      list.append(row);
+    let content=null,teaser='';
+    if(finals.length){
+      const target=finals.some(g=>Number(g.matchday)===snap.matchday)?snap.matchday:Number(finals[0].matchday);
+      const results=finals.filter(g=>Number(g.matchday)===target);
+      content=el('div',null,'cam-st-score');const list=el('ul',null,'cam-ns-results');
+      for(const g of (ui.scoreOpen?results:results.slice(0,3))){
+        const row=el('li',null,'cam-ns-result');
+        const score=el('span',null,'cam-ns-result-score');
+        const home=el('span',name(snap,g.home_id)+' '+g.home_score,g.home_score>g.away_score?'is-winner':null);
+        const away=el('span',g.away_score+' '+name(snap,g.away_id),g.away_score>g.home_score?'is-winner':null);
+        score.append(home,el('span',' – ','cam-ns-dash'),away);
+        score.setAttribute('aria-label',fullName(snap,g.home_id)+' '+g.home_score+', '+fullName(snap,g.away_id)+' '+g.away_score);
+        row.append(score);
+        const mine=snap.mine.get(g.id);
+        if(mine&&g.outcome)row.append(el('span',mine===g.outcome?'Acertaste':'Fallaste','cam-ns-result-mine '+(mine===g.outcome?'is-hit':'is-miss')));
+        list.append(row);
+      }
+      content.append(list);
+      if(results.length>3){const b=button(ui.scoreOpen?'Ver menos':'Ver los '+results.length+' resultados ›',()=>{ui.scoreOpen=!ui.scoreOpen;render();});b.setAttribute('aria-expanded',String(ui.scoreOpen));content.append(b);}
+      teaser=snap.competitionName+' · '+results.length+(results.length===1?' resultado':' resultados');
     }
-    box.append(list);
-    if(results.length>3){const b=button(ui.scoreOpen?'Ver menos':'Ver los '+results.length+' resultados ›',()=>{ui.scoreOpen=!ui.scoreOpen;render();});b.setAttribute('aria-expanded',String(ui.scoreOpen));box.append(b);}
-    return box;
+    const tables=window.camSportTables;
+    if(!tables){
+      if(!content)return null;
+      const box=section('marcador','El marcador',snap.competitionName);box.append(...content.childNodes);return box;
+    }
+    return tables.menu({
+      sport:'futbol',competition:snap.competition,league:LEAGUE_SHORT[snap.competition]||snap.competitionName,label:snap.competitionName,
+      score:content?{title:'El marcador',teaser,content}:null,rebuild:schedule
+    });
   }
   // Mostrar la Liguilla en La semana incluso cuando el complemento todavía carga.
   // Nunca inventar cruces, equipos ni cuotas: la versión completa sustituye este estado.
@@ -282,6 +303,7 @@
   let queued=false;
   function schedule(){if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;render();});}
   document.addEventListener('cam:football-quiniela-data',schedule);
+  document.addEventListener('cam:sport-tables',event=>{if(event.detail?.competition&&event.detail.competition===q()?.snapshot()?.competition)schedule();});
   document.addEventListener('cam:section-tab',event=>{if(event.detail?.section==='futbol'){if(event.detail.tab!=='semana')release();schedule();}});
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)schedule();});
   mobile.addEventListener?.('change',schedule);

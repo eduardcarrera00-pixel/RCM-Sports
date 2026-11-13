@@ -505,4 +505,152 @@
   html body #camNflQuiniela .cam-nfl-split-side { white-space:nowrap!important; }
   html body #camNflQuiniela .cam-nfl-split-track { position:relative!important; display:block!important; height:6px!important; border-radius:3px!important; background:var(--q-sunken)!important; overflow:hidden!important; }
   html body #camNflQuiniela .cam-nfl-split-fill { position:absolute!important; inset:0 auto 0 0!important; display:block!important; background:var(--q-away)!important; }
+  /* ---------- 3. El marcador como menú vertical (13 nov 2026) ----------
+     cam-sport-tables.js: tres filas que se tocan (El marcador · Clasificación ·
+     Mejores anotadores / Goleadores) en #camNflScore y #camFootballScore, en
+     teléfono y en la columna de escritorio. Una abierta cada vez. */
+  html body :is(#camNflScore,#camFootballScore) .cam-ns-block.cam-st-menu {
+    --ns-z1:#13324d; --ns-z2:#8a5f2f; --ns-z3:#c9a67e; --ns-z4:#a3433a;
+    padding:0!important; overflow:hidden!important;
+  }
+  html.dark body :is(#camNflScore,#camFootballScore) .cam-ns-block.cam-st-menu { --ns-z1:#9fc4e8; --ns-z2:#e3b979; --ns-z3:rgba(214,166,112,.5); --ns-z4:#f2a397; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu :is(.cam-st-item,.cam-st-heading,.cam-st-panel,.cam-st-list,.cam-st-group,.cam-st-row,.cam-st-player,.cam-st-legend) { border-radius:0!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-item { display:block!important; margin:0!important; padding:0!important; background:none!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-item + .cam-st-item { border-top:1px solid var(--ns-line)!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-heading { display:block!important; margin:0!important; padding:0!important; font:inherit!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-toggle {
+    display:flex!important; align-items:center!important; gap:12px!important;
+    width:100%!important; min-width:0!important; min-height:64px!important; height:auto!important; margin:0!important; padding:10px 18px 10px 14px!important;
+    border:0!important; border-radius:0!important; background:transparent!important; background-image:none!important; box-shadow:none!important;
+    color:var(--ns-ink)!important; font:inherit!important; letter-spacing:0!important; text-transform:none!important; text-align:left!important;
+    cursor:pointer!important; -webkit-tap-highlight-color:transparent!important; touch-action:manipulation!important;
+  }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-toggle:focus-visible { outline:2px solid var(--ns-accent)!important; outline-offset:-4px!important; border-radius:12px!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-icon {
+    display:inline-flex!important; align-items:center!important; justify-content:center!important;
+    flex:0 0 34px!important; width:34px!important; height:34px!important; border-radius:50%!important;
+    background:var(--ns-accent-soft)!important; color:var(--ns-accent)!important;
+    transition:background-color .18s ease,color .18s ease!important;
+  }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-icon svg { display:block!important; width:18px!important; height:18px!important; fill:none!important; stroke:currentColor!important; stroke-width:2!important; stroke-linecap:round!important; stroke-linejoin:round!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .is-open .cam-st-icon { background:var(--ns-accent)!important; color:var(--ns-on-accent)!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-text { display:flex!important; flex-direction:column!important; gap:3px!important; flex:1 1 auto!important; min-width:0!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-title {
+    display:block!important; color:var(--ns-ink)!important; font:600 18px/1.2 "Playfair Display",Georgia,serif!important;
+    letter-spacing:0!important; text-transform:none!important; overflow-wrap:anywhere!important;
+  }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-teaser {
+    display:block!important; color:var(--ns-muted)!important; font:600 12px/1.35 Inter,system-ui,sans-serif!important;
+    white-space:nowrap!important; overflow:hidden!important; text-overflow:ellipsis!important;
+  }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-chevron {
+    display:block!important; flex:0 0 8px!important; width:8px!important; height:8px!important; box-sizing:border-box!important;
+    border:solid var(--ns-accent)!important; border-width:0 2px 2px 0!important; border-radius:0!important;
+    margin:0 2px 4px 0!important; transform:rotate(45deg)!important; transition:transform .2s ease!important;
+  }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .is-open .cam-st-chevron { transform:rotate(225deg)!important; margin:4px 2px 0 0!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-panel { display:block!important; margin:0!important; padding:0 16px 16px!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-panel[hidden] { display:none!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-score { display:block!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-ns-result-score .is-winner { color:var(--ns-ink)!important; font-weight:800!important; }
+
+  /* textos */
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-note { display:block!important; margin:12px 0 0!important; color:var(--ns-muted)!important; font:500 12.5px/1.45 Inter,system-ui,sans-serif!important; text-align:left!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-note.is-intro { margin:0 0 6px!important; font-weight:600!important; font-size:12px!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-note.is-source { margin:6px 0 0!important; font-weight:600!important; font-size:11.5px!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-note.is-loading { margin:0!important; padding:6px 0!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-note.is-error { margin:0!important; color:var(--ns-down)!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-more { display:inline-flex!important; min-height:40px!important; }
+
+  /* AFC · NFC */
+  html body #camNflScore .cam-st-menu .cam-st-seg { display:grid!important; grid-template-columns:repeat(2,minmax(0,1fr))!important; gap:8px!important; margin:2px 0 14px!important; padding:0!important; }
+  html body #camNflScore .cam-st-menu .cam-st-seg-btn {
+    display:flex!important; align-items:center!important; justify-content:center!important;
+    width:100%!important; min-width:0!important; height:44px!important; min-height:44px!important; margin:0!important; padding:0 12px!important;
+    border:1px solid var(--ns-line-strong)!important; border-radius:999px!important; background:var(--ns-card)!important; background-image:none!important; box-shadow:none!important;
+    color:var(--ns-ink)!important; font:700 13.5px/1 Inter,system-ui,sans-serif!important; letter-spacing:.04em!important; text-transform:none!important;
+    cursor:pointer!important; -webkit-tap-highlight-color:transparent!important; touch-action:manipulation!important;
+  }
+  html body #camNflScore .cam-st-menu .cam-st-seg-btn[aria-pressed="true"] { border-color:var(--ns-accent)!important; background:var(--ns-accent)!important; color:var(--ns-on-accent)!important; }
+  html body #camNflScore .cam-st-menu .cam-st-seg-btn:focus-visible { outline:2px solid var(--ns-accent)!important; outline-offset:2px!important; }
+
+  /* tablas */
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-group { display:block!important; margin:0!important; padding:0!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-group + .cam-st-group { margin-top:14px!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-list { display:block!important; margin:0!important; padding:0!important; list-style:none!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-row { display:flex!important; align-items:center!important; gap:10px!important; margin:0!important; padding:0!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-head { min-height:26px!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-group-name {
+    flex:1 1 auto!important; min-width:0!important; color:var(--ns-gold)!important;
+    font:800 10.5px/1.3 Inter,system-ui,sans-serif!important; letter-spacing:.12em!important; text-transform:uppercase!important;
+  }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-team { min-height:44px!important; border-top:1px solid var(--ns-line)!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-team.is-cut { border-top:1px dashed var(--ns-line-strong)!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-name { display:flex!important; align-items:center!important; gap:7px!important; flex:1 1 auto!important; min-width:0!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-name-text {
+    min-width:0!important; color:var(--ns-ink)!important; font:600 14px/1.25 Inter,system-ui,sans-serif!important;
+    white-space:nowrap!important; overflow:hidden!important; text-overflow:ellipsis!important;
+  }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-seed {
+    flex:0 0 auto!important; padding:2px 7px!important; border-radius:999px!important;
+    background:var(--ns-accent-soft)!important; color:var(--ns-accent)!important; font:800 10.5px/1.3 Inter,system-ui,sans-serif!important; white-space:nowrap!important;
+  }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-num {
+    flex:0 0 auto!important; text-align:right!important; color:var(--ns-muted)!important;
+    font:600 12.5px/1.2 Inter,system-ui,sans-serif!important; font-variant-numeric:tabular-nums!important; letter-spacing:0!important; white-space:nowrap!important;
+  }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-head .cam-st-num { font:700 10.5px/1 Inter,system-ui,sans-serif!important; letter-spacing:.06em!important; text-transform:uppercase!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-strong { color:var(--ns-ink)!important; font-weight:700!important; font-size:13.5px!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-num.is-up { color:var(--ns-up)!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-num.is-down { color:var(--ns-down)!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-w20 { flex-basis:20px!important; width:20px!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-w26 { flex-basis:26px!important; width:26px!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-w30 { flex-basis:30px!important; width:30px!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-w34 { flex-basis:34px!important; width:34px!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-w40 { flex-basis:40px!important; width:40px!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-w52 { flex-basis:52px!important; width:52px!important; }
+  /* Fútbol: franja de zona, puesto, escudo, equipo, PJ, DG y puntos. */
+  html body #camFootballScore .cam-st-menu .cam-st-soccer { gap:8px!important; }
+  html body #camFootballScore .cam-st-menu .cam-st-team.cam-st-soccer { min-height:40px!important; }
+  html body #camFootballScore .cam-st-menu .cam-st-team-head { padding-left:30px!important; color:var(--ns-muted)!important; font-weight:700!important; letter-spacing:.06em!important; }
+  html body #camFootballScore .cam-st-menu .cam-st-soccer .cam-st-name-text { font-size:13.5px!important; }
+  html body #camFootballScore .cam-st-menu .cam-st-soccer .cam-st-strong { font-weight:800!important; }
+  html body #camFootballScore .cam-st-menu .cam-st-rank { color:var(--ns-muted)!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-zone { display:block!important; flex:0 0 3px!important; width:3px!important; height:20px!important; border-radius:2px!important; background:transparent!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-zone.is-z1 { background:var(--ns-z1)!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-zone.is-z2 { background:var(--ns-z2)!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-zone.is-z3 { background:var(--ns-z3)!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-zone.is-z4 { background:var(--ns-z4)!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-legend { display:flex!important; flex-wrap:wrap!important; gap:6px 14px!important; margin:6px 0 0!important; padding:0!important; list-style:none!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-legend-item { display:inline-flex!important; align-items:center!important; gap:6px!important; margin:0!important; padding:0!important; color:var(--ns-text)!important; font:600 11.5px/1.3 Inter,system-ui,sans-serif!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-legend-item .cam-st-zone { height:12px!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-row .cam-ns-crest { font-size:7px!important; }
+
+  /* anotadores y goleadores */
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-player {
+    display:flex!important; align-items:center!important; gap:12px!important; min-height:56px!important; margin:0!important; padding:7px 0!important;
+    border-top:1px solid var(--ns-line)!important;
+  }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-player:first-child { border-top:0!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-player-rank {
+    flex:0 0 22px!important; text-align:center!important; color:var(--ns-muted)!important;
+    font:600 17px/1.15 "Playfair Display",Georgia,serif!important; font-variant-numeric:tabular-nums!important;
+  }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-player-rank.is-top { color:var(--ns-gold)!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-who { display:flex!important; flex-direction:column!important; gap:3px!important; flex:1 1 auto!important; min-width:0!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-player-name {
+    display:block!important; color:var(--ns-ink)!important; font:700 14px/1.25 Inter,system-ui,sans-serif!important;
+    white-space:nowrap!important; overflow:hidden!important; text-overflow:ellipsis!important;
+  }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-player-sub {
+    display:flex!important; align-items:center!important; gap:6px!important; min-width:0!important;
+    color:var(--ns-muted)!important; font:600 12px/1.35 Inter,system-ui,sans-serif!important;
+  }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-player-sub .cam-ns-crest { font-size:5.5px!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-total { display:flex!important; flex-direction:column!important; align-items:flex-end!important; gap:2px!important; flex:0 0 auto!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-total-value { color:var(--ns-ink)!important; font:600 22px/1.15 "Playfair Display",Georgia,serif!important; font-variant-numeric:tabular-nums!important; }
+  html body :is(#camNflScore,#camFootballScore) .cam-st-menu .cam-st-total-unit { color:var(--ns-gold)!important; font:800 9.5px/1.2 Inter,system-ui,sans-serif!important; letter-spacing:.12em!important; }
+  @media (prefers-reduced-motion: reduce) {
+    html body :is(#camNflScore,#camFootballScore) .cam-st-menu :is(.cam-st-chevron,.cam-st-icon) { transition:none!important; }
+  }
 }

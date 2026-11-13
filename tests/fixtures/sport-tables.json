@@ -1,0 +1,2057 @@
+{
+ "ligamx": {
+  "competition": "ligamx",
+  "standings_at": "2026-11-13T03:41:00Z",
+  "leaders_at": "2026-11-13T03:41:00Z",
+  "standings": {
+   "season": "2026-27 Liga BBVA MX",
+   "group": "2026 Torneo Apertura",
+   "rows": [
+    {
+     "rank": 1,
+     "team_id": "218",
+     "abbr": "CAZ",
+     "name": "Cruz Azul",
+     "logo": null,
+     "played": 16,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 11,
+     "pts": 32,
+     "note": null
+    },
+    {
+     "rank": 2,
+     "team_id": "227",
+     "abbr": "AME",
+     "name": "América",
+     "logo": null,
+     "played": 16,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 15,
+     "pts": 30,
+     "note": null
+    },
+    {
+     "rank": 3,
+     "team_id": "219",
+     "abbr": "GDL",
+     "name": "Guadalajara",
+     "logo": null,
+     "played": 16,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 11,
+     "pts": 30,
+     "note": null
+    },
+    {
+     "rank": 4,
+     "team_id": "223",
+     "abbr": "TOL",
+     "name": "Toluca",
+     "logo": null,
+     "played": 16,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 14,
+     "pts": 27,
+     "note": null
+    },
+    {
+     "rank": 5,
+     "team_id": "216",
+     "abbr": "ATS",
+     "name": "Atlas",
+     "logo": null,
+     "played": 16,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -3,
+     "pts": 27,
+     "note": null
+    },
+    {
+     "rank": 6,
+     "team_id": "225",
+     "abbr": "SAN",
+     "name": "Santos",
+     "logo": null,
+     "played": 16,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 3,
+     "pts": 25,
+     "note": null
+    },
+    {
+     "rank": 7,
+     "team_id": "228",
+     "abbr": "LEO",
+     "name": "León",
+     "logo": null,
+     "played": 16,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 2,
+     "pts": 23,
+     "note": null
+    },
+    {
+     "rank": 8,
+     "team_id": "234",
+     "abbr": "PAC",
+     "name": "Pachuca",
+     "logo": null,
+     "played": 16,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 9,
+     "pts": 22,
+     "note": null
+    },
+    {
+     "rank": 9,
+     "team_id": "10125",
+     "abbr": "TIJ",
+     "name": "Tijuana",
+     "logo": null,
+     "played": 16,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 3,
+     "pts": 22,
+     "note": null
+    },
+    {
+     "rank": 10,
+     "team_id": "220",
+     "abbr": "MTY",
+     "name": "Monterrey",
+     "logo": null,
+     "played": 15,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 1,
+     "pts": 21,
+     "note": null
+    },
+    {
+     "rank": 11,
+     "team_id": "233",
+     "abbr": "UNAM",
+     "name": "UNAM",
+     "logo": null,
+     "played": 16,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -2,
+     "pts": 21,
+     "note": null
+    },
+    {
+     "rank": 12,
+     "team_id": "222",
+     "abbr": "QRO",
+     "name": "Queretaro",
+     "logo": null,
+     "played": 15,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -5,
+     "pts": 20,
+     "note": null
+    },
+    {
+     "rank": 13,
+     "team_id": "231",
+     "abbr": "PUE",
+     "name": "Puebla",
+     "logo": null,
+     "played": 16,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -4,
+     "pts": 19,
+     "note": null
+    },
+    {
+     "rank": 14,
+     "team_id": "15720",
+     "abbr": "ASL",
+     "name": "Atl. San Luis",
+     "logo": null,
+     "played": 16,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -5,
+     "pts": 19,
+     "note": null
+    },
+    {
+     "rank": 15,
+     "team_id": "232",
+     "abbr": "UANL",
+     "name": "Tigres",
+     "logo": null,
+     "played": 16,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -8,
+     "pts": 15,
+     "note": null
+    },
+    {
+     "rank": 16,
+     "team_id": "226",
+     "abbr": "ATL",
+     "name": "Atlante",
+     "logo": null,
+     "played": 16,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -10,
+     "pts": 14,
+     "note": null
+    },
+    {
+     "rank": 17,
+     "team_id": "229",
+     "abbr": "NCX",
+     "name": "Necaxa",
+     "logo": null,
+     "played": 16,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -11,
+     "pts": 13,
+     "note": null
+    },
+    {
+     "rank": 18,
+     "team_id": "17851",
+     "abbr": "JUA",
+     "name": "Juárez",
+     "logo": null,
+     "played": 16,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -21,
+     "pts": 11,
+     "note": null
+    }
+   ]
+  },
+  "leaders": [
+   {
+    "name": "Salomón Rondón",
+    "team_id": "234",
+    "team": "Pachuca",
+    "goals": 16,
+    "apps": 16
+   },
+   {
+    "name": "Henry Martín",
+    "team_id": "227",
+    "team": "América",
+    "goals": 11,
+    "apps": 14
+   },
+   {
+    "name": "Juninho",
+    "team_id": "233",
+    "team": "UNAM",
+    "goals": 9,
+    "apps": 16
+   },
+   {
+    "name": "Juan Brunetta",
+    "team_id": "232",
+    "team": "Tigres",
+    "goals": 9,
+    "apps": 15
+   },
+   {
+    "name": "Óscar Estupiñán",
+    "team_id": "17851",
+    "team": "Juárez",
+    "goals": 8,
+    "apps": 16
+   },
+   {
+    "name": "Federico Viñas",
+    "team_id": "223",
+    "team": "Toluca",
+    "goals": 8,
+    "apps": 13
+   },
+   {
+    "name": "Julián Carranza",
+    "team_id": "229",
+    "team": "Necaxa",
+    "goals": 7,
+    "apps": 14
+   },
+   {
+    "name": "Lucas Ocampos",
+    "team_id": "220",
+    "team": "Monterrey",
+    "goals": 7,
+    "apps": 13
+   },
+   {
+    "name": "Ali Avila",
+    "team_id": "222",
+    "team": "Queretaro",
+    "goals": 6,
+    "apps": 15
+   },
+   {
+    "name": "Nicolás Ibáñez",
+    "team_id": "218",
+    "team": "Cruz Azul",
+    "goals": 6,
+    "apps": 15
+   }
+  ]
+ },
+ "champions": {
+  "competition": "champions",
+  "standings_at": "2026-11-13T03:41:00Z",
+  "leaders_at": "2026-11-13T03:41:00Z",
+  "standings": {
+   "season": "2026-27 UEFA Champions League",
+   "group": "League Phase",
+   "rows": [
+    {
+     "rank": 1,
+     "team_id": "160",
+     "abbr": "PSG",
+     "name": "PSG",
+     "logo": null,
+     "played": 4,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 15,
+     "pts": 12,
+     "note": "Qualifies for round of 16"
+    },
+    {
+     "rank": 2,
+     "team_id": "86",
+     "abbr": "RMA",
+     "name": "Real Madrid",
+     "logo": null,
+     "played": 4,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 6,
+     "pts": 12,
+     "note": "Qualifies for round of 16"
+    },
+    {
+     "rank": 3,
+     "team_id": "359",
+     "abbr": "ARS",
+     "name": "Arsenal",
+     "logo": null,
+     "played": 4,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 5,
+     "pts": 10,
+     "note": "Qualifies for round of 16"
+    },
+    {
+     "rank": 4,
+     "team_id": "2572",
+     "abbr": "COMO",
+     "name": "Como",
+     "logo": null,
+     "played": 4,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 13,
+     "pts": 9,
+     "note": "Qualifies for round of 16"
+    },
+    {
+     "rank": 5,
+     "team_id": "83",
+     "abbr": "BAR",
+     "name": "Barcelona",
+     "logo": null,
+     "played": 4,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 8,
+     "pts": 9,
+     "note": "Qualifies for round of 16"
+    },
+    {
+     "rank": 6,
+     "team_id": "362",
+     "abbr": "AVL",
+     "name": "Aston Villa",
+     "logo": null,
+     "played": 4,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 6,
+     "pts": 9,
+     "note": "Qualifies for round of 16"
+    },
+    {
+     "rank": 7,
+     "team_id": "382",
+     "abbr": "MNC",
+     "name": "Man City",
+     "logo": null,
+     "played": 4,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 5,
+     "pts": 9,
+     "note": "Qualifies for round of 16"
+    },
+    {
+     "rank": 8,
+     "team_id": "364",
+     "abbr": "LIV",
+     "name": "Liverpool",
+     "logo": null,
+     "played": 4,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 4,
+     "pts": 9,
+     "note": "Qualifies for round of 16"
+    },
+    {
+     "rank": 9,
+     "team_id": "570",
+     "abbr": "BRU",
+     "name": "Club Brugge",
+     "logo": null,
+     "played": 4,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 4,
+     "pts": 9,
+     "note": "Knockout phase playoffs - seeded"
+    },
+    {
+     "rank": 10,
+     "team_id": "2250",
+     "abbr": "SCP",
+     "name": "Sporting",
+     "logo": null,
+     "played": 4,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 4,
+     "pts": 9,
+     "note": "Knockout phase playoffs - seeded"
+    },
+    {
+     "rank": 11,
+     "team_id": "244",
+     "abbr": "BET",
+     "name": "Betis",
+     "logo": null,
+     "played": 4,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 2,
+     "pts": 9,
+     "note": "Knockout phase playoffs - seeded"
+    },
+    {
+     "rank": 12,
+     "team_id": "124",
+     "abbr": "DOR",
+     "name": "Dortmund",
+     "logo": null,
+     "played": 4,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 2,
+     "pts": 9,
+     "note": "Knockout phase playoffs - seeded"
+    },
+    {
+     "rank": 13,
+     "team_id": "132",
+     "abbr": "MUN",
+     "name": "Bayern",
+     "logo": null,
+     "played": 4,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 7,
+     "pts": 8,
+     "note": "Knockout phase playoffs - seeded"
+    },
+    {
+     "rank": 14,
+     "team_id": "134",
+     "abbr": "VFB",
+     "name": "Stuttgart",
+     "logo": null,
+     "played": 4,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 3,
+     "pts": 7,
+     "note": "Knockout phase playoffs - seeded"
+    },
+    {
+     "rank": 15,
+     "team_id": "110",
+     "abbr": "INT",
+     "name": "Inter Milan",
+     "logo": null,
+     "played": 4,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 2,
+     "pts": 6,
+     "note": "Knockout phase playoffs - seeded"
+    },
+    {
+     "rank": 16,
+     "team_id": "4411",
+     "abbr": "LAS",
+     "name": "LASK Linz",
+     "logo": null,
+     "played": 4,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 1,
+     "pts": 6,
+     "note": "Knockout phase playoffs - seeded"
+    },
+    {
+     "rank": 17,
+     "team_id": "360",
+     "abbr": "MAN",
+     "name": "Man Utd",
+     "logo": null,
+     "played": 4,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 0,
+     "pts": 6,
+     "note": "Knockout phase playoffs - seeded"
+    },
+    {
+     "rank": 18,
+     "team_id": "432",
+     "abbr": "GAL",
+     "name": "Galatasaray",
+     "logo": null,
+     "played": 4,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -1,
+     "pts": 6,
+     "note": "Knockout phase playoffs - seeded"
+    },
+    {
+     "rank": 19,
+     "team_id": "436",
+     "abbr": "FEN",
+     "name": "Fenerbahce",
+     "logo": null,
+     "played": 4,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -5,
+     "pts": 5,
+     "note": "Knockout phase playoffs - seeded"
+    },
+    {
+     "rank": 20,
+     "team_id": "104",
+     "abbr": "ROMA",
+     "name": "AS Roma",
+     "logo": null,
+     "played": 4,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 2,
+     "pts": 4,
+     "note": "Knockout phase playoffs - seeded"
+    },
+    {
+     "rank": 21,
+     "team_id": "493",
+     "abbr": "SHK",
+     "name": "Shakhtar",
+     "logo": null,
+     "played": 4,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 0,
+     "pts": 4,
+     "note": "Knockout phase playoffs - seeded"
+    },
+    {
+     "rank": 22,
+     "team_id": "510",
+     "abbr": "VFK",
+     "name": "Viking FK",
+     "logo": null,
+     "played": 4,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -1,
+     "pts": 4,
+     "note": "Knockout phase playoffs - seeded"
+    },
+    {
+     "rank": 23,
+     "team_id": "1068",
+     "abbr": "ATM",
+     "name": "Atlético",
+     "logo": null,
+     "played": 4,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -1,
+     "pts": 4,
+     "note": "Knockout phase playoffs - seeded"
+    },
+    {
+     "rank": 24,
+     "team_id": "148",
+     "abbr": "PSV",
+     "name": "PSV",
+     "logo": null,
+     "played": 4,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -1,
+     "pts": 4,
+     "note": "Knockout phase playoffs - seeded"
+    },
+    {
+     "rank": 25,
+     "team_id": "2980",
+     "abbr": "BODO",
+     "name": "Bodo/Glimt",
+     "logo": null,
+     "played": 4,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -5,
+     "pts": 4,
+     "note": "Eliminated"
+    },
+    {
+     "rank": 26,
+     "team_id": "437",
+     "abbr": "FCP",
+     "name": "FC Porto",
+     "logo": null,
+     "played": 4,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -1,
+     "pts": 3,
+     "note": "Eliminated"
+    },
+    {
+     "rank": 27,
+     "team_id": "114",
+     "abbr": "NAP",
+     "name": "Napoli",
+     "logo": null,
+     "played": 4,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -5,
+     "pts": 3,
+     "note": "Eliminated"
+    },
+    {
+     "rank": 28,
+     "team_id": "102",
+     "abbr": "VIL",
+     "name": "Villarreal",
+     "logo": null,
+     "played": 4,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -6,
+     "pts": 3,
+     "note": "Eliminated"
+    },
+    {
+     "rank": 29,
+     "team_id": "887",
+     "abbr": "AEK",
+     "name": "AEK Athens",
+     "logo": null,
+     "played": 4,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -6,
+     "pts": 3,
+     "note": "Eliminated"
+    },
+    {
+     "rank": 30,
+     "team_id": "11420",
+     "abbr": "RBL",
+     "name": "RB Leipzig",
+     "logo": null,
+     "played": 4,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -6,
+     "pts": 3,
+     "note": "Eliminated"
+    },
+    {
+     "rank": 31,
+     "team_id": "21922",
+     "abbr": "SAB",
+     "name": "Sabah",
+     "logo": null,
+     "played": 4,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -6,
+     "pts": 3,
+     "note": "Eliminated"
+    },
+    {
+     "rank": 32,
+     "team_id": "142",
+     "abbr": "FEY",
+     "name": "Feyenoord",
+     "logo": null,
+     "played": 4,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -7,
+     "pts": 3,
+     "note": "Eliminated"
+    },
+    {
+     "rank": 33,
+     "team_id": "175",
+     "abbr": "RCL",
+     "name": "Lens",
+     "logo": null,
+     "played": 4,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -12,
+     "pts": 3,
+     "note": "Eliminated"
+    },
+    {
+     "rank": 34,
+     "team_id": "494",
+     "abbr": "SLP",
+     "name": "Slavia Prague",
+     "logo": null,
+     "played": 4,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -4,
+     "pts": 1,
+     "note": "Eliminated"
+    },
+    {
+     "rank": 35,
+     "team_id": "166",
+     "abbr": "LILL",
+     "name": "Lille",
+     "logo": null,
+     "played": 4,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -6,
+     "pts": 1,
+     "note": "Eliminated"
+    },
+    {
+     "rank": 36,
+     "team_id": "521",
+     "abbr": "SLB",
+     "name": "S Bratislava",
+     "logo": null,
+     "played": 4,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -16,
+     "pts": 0,
+     "note": "Eliminated"
+    }
+   ]
+  },
+  "leaders": [
+   {
+    "name": "Tasos Douvikas",
+    "team_id": "2572",
+    "team": "Como",
+    "goals": 6,
+    "apps": 4
+   },
+   {
+    "name": "Nicolo Tresoldi",
+    "team_id": "570",
+    "team": "Club Brugge",
+    "goals": 5,
+    "apps": 4
+   },
+   {
+    "name": "Erling Haaland",
+    "team_id": "382",
+    "team": "Man City",
+    "goals": 5,
+    "apps": 3
+   },
+   {
+    "name": "Harry Kane",
+    "team_id": "132",
+    "team": "Bayern",
+    "goals": 4,
+    "apps": 4
+   },
+   {
+    "name": "Kylian Mbappé",
+    "team_id": "86",
+    "team": "Real Madrid",
+    "goals": 4,
+    "apps": 4
+   },
+   {
+    "name": "Fabián Ruiz",
+    "team_id": "160",
+    "team": "PSG",
+    "goals": 4,
+    "apps": 4
+   },
+   {
+    "name": "Luis Suárez",
+    "team_id": "2250",
+    "team": "Sporting",
+    "goals": 4,
+    "apps": 4
+   },
+   {
+    "name": "Donyell Malen",
+    "team_id": "104",
+    "team": "AS Roma",
+    "goals": 4,
+    "apps": 4
+   },
+   {
+    "name": "Alexey Batrakov",
+    "team_id": "432",
+    "team": "Galatasaray",
+    "goals": 4,
+    "apps": 4
+   },
+   {
+    "name": "Serhou Guirassy",
+    "team_id": "124",
+    "team": "Dortmund",
+    "goals": 4,
+    "apps": 4
+   }
+  ]
+ },
+ "laliga": {
+  "competition": "laliga",
+  "standings_at": "2026-11-13T03:41:00Z",
+  "leaders_at": "2026-11-13T03:41:00Z",
+  "standings": {
+   "season": "2026-27 Spanish LALIGA",
+   "group": "2026-27 LALIGA",
+   "rows": [
+    {
+     "rank": 1,
+     "team_id": "83",
+     "abbr": "BAR",
+     "name": "Barcelona",
+     "logo": null,
+     "played": 12,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 35,
+     "pts": 33,
+     "note": "Champions League"
+    },
+    {
+     "rank": 2,
+     "team_id": "86",
+     "abbr": "RMA",
+     "name": "Real Madrid",
+     "logo": null,
+     "played": 12,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 21,
+     "pts": 30,
+     "note": "Champions League"
+    },
+    {
+     "rank": 3,
+     "team_id": "1068",
+     "abbr": "ATM",
+     "name": "Atlético",
+     "logo": null,
+     "played": 12,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 13,
+     "pts": 28,
+     "note": "Champions League"
+    },
+    {
+     "rank": 4,
+     "team_id": "244",
+     "abbr": "BET",
+     "name": "Betis",
+     "logo": null,
+     "played": 12,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 5,
+     "pts": 26,
+     "note": "Champions League"
+    },
+    {
+     "rank": 5,
+     "team_id": "89",
+     "abbr": "RSO",
+     "name": "Real Sociedad",
+     "logo": null,
+     "played": 12,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 1,
+     "pts": 22,
+     "note": "Champions League"
+    },
+    {
+     "rank": 6,
+     "team_id": "243",
+     "abbr": "SEV",
+     "name": "Sevilla",
+     "logo": null,
+     "played": 12,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -2,
+     "pts": 18,
+     "note": "Europa League"
+    },
+    {
+     "rank": 7,
+     "team_id": "93",
+     "abbr": "ATH",
+     "name": "Athletic",
+     "logo": null,
+     "played": 11,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 4,
+     "pts": 16,
+     "note": "Conference League qualifying"
+    },
+    {
+     "rank": 8,
+     "team_id": "102",
+     "abbr": "VIL",
+     "name": "Villarreal",
+     "logo": null,
+     "played": 12,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 2,
+     "pts": 15,
+     "note": null
+    },
+    {
+     "rank": 9,
+     "team_id": "90",
+     "abbr": "DEP",
+     "name": "Deportivo",
+     "logo": null,
+     "played": 12,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 1,
+     "pts": 15,
+     "note": null
+    },
+    {
+     "rank": 10,
+     "team_id": "87",
+     "abbr": "RAC",
+     "name": "Racing",
+     "logo": null,
+     "played": 12,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -13,
+     "pts": 14,
+     "note": "Europa League"
+    },
+    {
+     "rank": 11,
+     "team_id": "85",
+     "abbr": "CEL",
+     "name": "Celta Vigo",
+     "logo": null,
+     "played": 12,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 0,
+     "pts": 13,
+     "note": null
+    },
+    {
+     "rank": 12,
+     "team_id": "96",
+     "abbr": "ALA",
+     "name": "Alavés",
+     "logo": null,
+     "played": 12,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -2,
+     "pts": 13,
+     "note": null
+    },
+    {
+     "rank": 13,
+     "team_id": "88",
+     "abbr": "ESP",
+     "name": "Espanyol",
+     "logo": null,
+     "played": 12,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -1,
+     "pts": 12,
+     "note": null
+    },
+    {
+     "rank": 14,
+     "team_id": "101",
+     "abbr": "RAY",
+     "name": "Rayo",
+     "logo": null,
+     "played": 11,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -6,
+     "pts": 12,
+     "note": null
+    },
+    {
+     "rank": 15,
+     "team_id": "2922",
+     "abbr": "GET",
+     "name": "Getafe",
+     "logo": null,
+     "played": 12,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -10,
+     "pts": 12,
+     "note": null
+    },
+    {
+     "rank": 16,
+     "team_id": "97",
+     "abbr": "OSA",
+     "name": "Osasuna",
+     "logo": null,
+     "played": 12,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -11,
+     "pts": 12,
+     "note": null
+    },
+    {
+     "rank": 17,
+     "team_id": "1538",
+     "abbr": "LEV",
+     "name": "Levante",
+     "logo": null,
+     "played": 12,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -5,
+     "pts": 11,
+     "note": null
+    },
+    {
+     "rank": 18,
+     "team_id": "3751",
+     "abbr": "ELC",
+     "name": "Elche",
+     "logo": null,
+     "played": 12,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -6,
+     "pts": 10,
+     "note": "Relegation"
+    },
+    {
+     "rank": 19,
+     "team_id": "94",
+     "abbr": "VAL",
+     "name": "Valencia",
+     "logo": null,
+     "played": 12,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -12,
+     "pts": 9,
+     "note": "Relegation"
+    },
+    {
+     "rank": 20,
+     "team_id": "99",
+     "abbr": "MCF",
+     "name": "Málaga",
+     "logo": null,
+     "played": 12,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -14,
+     "pts": 5,
+     "note": "Relegation"
+    }
+   ]
+  },
+  "leaders": [
+   {
+    "name": "Raphinha",
+    "team_id": "83",
+    "team": "Barcelona",
+    "goals": 15,
+    "apps": 11
+   },
+   {
+    "name": "Kylian Mbappé",
+    "team_id": "86",
+    "team": "Real Madrid",
+    "goals": 13,
+    "apps": 12
+   },
+   {
+    "name": "Lamine Yamal",
+    "team_id": "83",
+    "team": "Barcelona",
+    "goals": 10,
+    "apps": 12
+   },
+   {
+    "name": "Yassir Zabiri",
+    "team_id": "87",
+    "team": "Racing",
+    "goals": 9,
+    "apps": 12
+   },
+   {
+    "name": "Ante Budimir",
+    "team_id": "97",
+    "team": "Osasuna",
+    "goals": 8,
+    "apps": 12
+   },
+   {
+    "name": "Sergio Camello",
+    "team_id": "101",
+    "team": "Rayo",
+    "goals": 7,
+    "apps": 12
+   },
+   {
+    "name": "Fermín López",
+    "team_id": "83",
+    "team": "Barcelona",
+    "goals": 7,
+    "apps": 11
+   },
+   {
+    "name": "Roberto Fernández",
+    "team_id": "88",
+    "team": "Espanyol",
+    "goals": 6,
+    "apps": 12
+   },
+   {
+    "name": "Fer Niño",
+    "team_id": "3751",
+    "team": "Elche",
+    "goals": 6,
+    "apps": 12
+   },
+   {
+    "name": "Álex Baena",
+    "team_id": "1068",
+    "team": "Atlético",
+    "goals": 5,
+    "apps": 12
+   }
+  ]
+ },
+ "premier": {
+  "competition": "premier",
+  "standings_at": "2026-11-13T03:41:00Z",
+  "leaders_at": "2026-11-13T03:41:00Z",
+  "standings": {
+   "season": "2026-27 English Premier League",
+   "group": "2026-27 English Premier League",
+   "rows": [
+    {
+     "rank": 1,
+     "team_id": "359",
+     "abbr": "ARS",
+     "name": "Arsenal",
+     "logo": null,
+     "played": 10,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 10,
+     "pts": 27,
+     "note": "Champions League"
+    },
+    {
+     "rank": 2,
+     "team_id": "331",
+     "abbr": "BHA",
+     "name": "Brighton",
+     "logo": null,
+     "played": 10,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 19,
+     "pts": 22,
+     "note": "Champions League"
+    },
+    {
+     "rank": 3,
+     "team_id": "382",
+     "abbr": "MNC",
+     "name": "Man City",
+     "logo": null,
+     "played": 10,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 8,
+     "pts": 21,
+     "note": "Champions League"
+    },
+    {
+     "rank": 4,
+     "team_id": "364",
+     "abbr": "LIV",
+     "name": "Liverpool",
+     "logo": null,
+     "played": 10,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 4,
+     "pts": 18,
+     "note": "Champions League"
+    },
+    {
+     "rank": 5,
+     "team_id": "363",
+     "abbr": "CHE",
+     "name": "Chelsea",
+     "logo": null,
+     "played": 10,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 3,
+     "pts": 16,
+     "note": "Europa League"
+    },
+    {
+     "rank": 6,
+     "team_id": "368",
+     "abbr": "EVE",
+     "name": "Everton",
+     "logo": null,
+     "played": 10,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 2,
+     "pts": 16,
+     "note": null
+    },
+    {
+     "rank": 7,
+     "team_id": "349",
+     "abbr": "BOU",
+     "name": "Bournemouth",
+     "logo": null,
+     "played": 10,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 2,
+     "pts": 15,
+     "note": null
+    },
+    {
+     "rank": 8,
+     "team_id": "337",
+     "abbr": "BRE",
+     "name": "Brentford",
+     "logo": null,
+     "played": 10,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 5,
+     "pts": 14,
+     "note": null
+    },
+    {
+     "rank": 9,
+     "team_id": "357",
+     "abbr": "LEE",
+     "name": "Leeds",
+     "logo": null,
+     "played": 10,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 2,
+     "pts": 14,
+     "note": null
+    },
+    {
+     "rank": 10,
+     "team_id": "362",
+     "abbr": "AVL",
+     "name": "Aston Villa",
+     "logo": null,
+     "played": 10,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -3,
+     "pts": 13,
+     "note": null
+    },
+    {
+     "rank": 11,
+     "team_id": "367",
+     "abbr": "TOT",
+     "name": "Spurs",
+     "logo": null,
+     "played": 10,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -1,
+     "pts": 12,
+     "note": null
+    },
+    {
+     "rank": 12,
+     "team_id": "361",
+     "abbr": "NEW",
+     "name": "Newcastle",
+     "logo": null,
+     "played": 10,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -3,
+     "pts": 12,
+     "note": null
+    },
+    {
+     "rank": 13,
+     "team_id": "306",
+     "abbr": "HUL",
+     "name": "Hull",
+     "logo": null,
+     "played": 10,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": 0,
+     "pts": 11,
+     "note": null
+    },
+    {
+     "rank": 14,
+     "team_id": "373",
+     "abbr": "IPS",
+     "name": "Ipswich",
+     "logo": null,
+     "played": 10,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -5,
+     "pts": 11,
+     "note": null
+    },
+    {
+     "rank": 15,
+     "team_id": "370",
+     "abbr": "FUL",
+     "name": "Fulham",
+     "logo": null,
+     "played": 10,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -2,
+     "pts": 10,
+     "note": null
+    },
+    {
+     "rank": 16,
+     "team_id": "393",
+     "abbr": "NFO",
+     "name": "Nottm Forest",
+     "logo": null,
+     "played": 10,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -4,
+     "pts": 9,
+     "note": null
+    },
+    {
+     "rank": 17,
+     "team_id": "388",
+     "abbr": "COV",
+     "name": "Coventry",
+     "logo": null,
+     "played": 10,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -9,
+     "pts": 9,
+     "note": null
+    },
+    {
+     "rank": 18,
+     "team_id": "360",
+     "abbr": "MAN",
+     "name": "Man Utd",
+     "logo": null,
+     "played": 10,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -5,
+     "pts": 8,
+     "note": "Relegation"
+    },
+    {
+     "rank": 19,
+     "team_id": "366",
+     "abbr": "SUN",
+     "name": "Sunderland",
+     "logo": null,
+     "played": 10,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -9,
+     "pts": 8,
+     "note": "Relegation"
+    },
+    {
+     "rank": 20,
+     "team_id": "384",
+     "abbr": "CRY",
+     "name": "C Palace",
+     "logo": null,
+     "played": 10,
+     "won": null,
+     "draw": null,
+     "lost": null,
+     "gd": -14,
+     "pts": 7,
+     "note": "Relegation"
+    }
+   ]
+  },
+  "leaders": [
+   {
+    "name": "Erling Haaland",
+    "team_id": "382",
+    "team": "Man City",
+    "goals": 9,
+    "apps": 10
+   },
+   {
+    "name": "Alexander Isak",
+    "team_id": "364",
+    "team": "Liverpool",
+    "goals": 7,
+    "apps": 9
+   },
+   {
+    "name": "Thierno Barry",
+    "team_id": "368",
+    "team": "Everton",
+    "goals": 6,
+    "apps": 10
+   },
+   {
+    "name": "Nicolas Jackson",
+    "team_id": "362",
+    "team": "Aston Villa",
+    "goals": 6,
+    "apps": 9
+   },
+   {
+    "name": "Morgan Rogers",
+    "team_id": "363",
+    "team": "Chelsea",
+    "goals": 5,
+    "apps": 10
+   },
+   {
+    "name": "Marcus Tavernier",
+    "team_id": "349",
+    "team": "Bournemouth",
+    "goals": 5,
+    "apps": 10
+   },
+   {
+    "name": "Evanilson",
+    "team_id": "349",
+    "team": "Bournemouth",
+    "goals": 5,
+    "apps": 10
+   },
+   {
+    "name": "Rayan Cherki",
+    "team_id": "382",
+    "team": "Man City",
+    "goals": 5,
+    "apps": 9
+   },
+   {
+    "name": "João Pedro",
+    "team_id": "363",
+    "team": "Chelsea",
+    "goals": 5,
+    "apps": 6
+   },
+   {
+    "name": "Bryan Mbeumo",
+    "team_id": "360",
+    "team": "Man Utd",
+    "goals": 4,
+    "apps": 10
+   }
+  ]
+ },
+ "nfl": {
+  "competition": "nfl",
+  "standings_at": "2026-11-13T03:41:00Z",
+  "leaders_at": "2026-11-13T03:41:00Z",
+  "standings": {
+   "conferences": [
+    {
+     "name": "AFC",
+     "divisions": [
+      {
+       "name": "AFC East",
+       "teams": [
+        {
+         "id": "BUF",
+         "w": 7,
+         "l": 1,
+         "t": 0,
+         "seed": 1,
+         "diff": 69
+        },
+        {
+         "id": "NE",
+         "w": 5,
+         "l": 4,
+         "t": 0,
+         "seed": 7,
+         "diff": 4
+        },
+        {
+         "id": "NYJ",
+         "w": 2,
+         "l": 7,
+         "t": 0,
+         "seed": 12,
+         "diff": -41
+        },
+        {
+         "id": "MIA",
+         "w": 1,
+         "l": 7,
+         "t": 0,
+         "seed": 14,
+         "diff": -74
+        }
+       ]
+      },
+      {
+       "name": "AFC North",
+       "teams": [
+        {
+         "id": "PIT",
+         "w": 6,
+         "l": 2,
+         "t": 0,
+         "seed": 4,
+         "diff": 36
+        },
+        {
+         "id": "CIN",
+         "w": 6,
+         "l": 2,
+         "t": 0,
+         "seed": 6,
+         "diff": 65
+        },
+        {
+         "id": "CLE",
+         "w": 5,
+         "l": 4,
+         "t": 0,
+         "seed": 8,
+         "diff": -35
+        },
+        {
+         "id": "BAL",
+         "w": 4,
+         "l": 5,
+         "t": 0,
+         "seed": 10,
+         "diff": -47
+        }
+       ]
+      },
+      {
+       "name": "AFC South",
+       "teams": [
+        {
+         "id": "JAX",
+         "w": 6,
+         "l": 2,
+         "t": 0,
+         "seed": 3,
+         "diff": 108
+        },
+        {
+         "id": "HOU",
+         "w": 3,
+         "l": 5,
+         "t": 0,
+         "seed": 11,
+         "diff": 17
+        },
+        {
+         "id": "IND",
+         "w": 2,
+         "l": 7,
+         "t": 0,
+         "seed": 13,
+         "diff": -65
+        },
+        {
+         "id": "TEN",
+         "w": 1,
+         "l": 7,
+         "t": 0,
+         "seed": 15,
+         "diff": -55
+        }
+       ]
+      },
+      {
+       "name": "AFC West",
+       "teams": [
+        {
+         "id": "DEN",
+         "w": 7,
+         "l": 2,
+         "t": 0,
+         "seed": 2,
+         "diff": 12
+        },
+        {
+         "id": "KC",
+         "w": 6,
+         "l": 2,
+         "t": 0,
+         "seed": 5,
+         "diff": 59
+        },
+        {
+         "id": "LV",
+         "w": 4,
+         "l": 5,
+         "t": 0,
+         "seed": 9,
+         "diff": -30
+        },
+        {
+         "id": "LAC",
+         "w": 0,
+         "l": 8,
+         "t": 0,
+         "seed": 16,
+         "diff": -98
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "NFC",
+     "divisions": [
+      {
+       "name": "NFC East",
+       "teams": [
+        {
+         "id": "NYG",
+         "w": 5,
+         "l": 2,
+         "t": 1,
+         "seed": 3,
+         "diff": 10
+        },
+        {
+         "id": "DAL",
+         "w": 4,
+         "l": 5,
+         "t": 0,
+         "seed": 10,
+         "diff": 10
+        },
+        {
+         "id": "WAS",
+         "w": 2,
+         "l": 5,
+         "t": 1,
+         "seed": 15,
+         "diff": -30
+        },
+        {
+         "id": "PHI",
+         "w": 2,
+         "l": 7,
+         "t": 0,
+         "seed": 16,
+         "diff": -73
+        }
+       ]
+      },
+      {
+       "name": "NFC North",
+       "teams": [
+        {
+         "id": "CHI",
+         "w": 7,
+         "l": 2,
+         "t": 0,
+         "seed": 2,
+         "diff": 57
+        },
+        {
+         "id": "DET",
+         "w": 6,
+         "l": 2,
+         "t": 0,
+         "seed": 5,
+         "diff": 33
+        },
+        {
+         "id": "MIN",
+         "w": 6,
+         "l": 2,
+         "t": 0,
+         "seed": 6,
+         "diff": 30
+        },
+        {
+         "id": "GB",
+         "w": 6,
+         "l": 3,
+         "t": 0,
+         "seed": 7,
+         "diff": 25
+        }
+       ]
+      },
+      {
+       "name": "NFC South",
+       "teams": [
+        {
+         "id": "CAR",
+         "w": 3,
+         "l": 5,
+         "t": 0,
+         "seed": 4,
+         "diff": -20
+        },
+        {
+         "id": "NO",
+         "w": 3,
+         "l": 5,
+         "t": 0,
+         "seed": 11,
+         "diff": -31
+        },
+        {
+         "id": "TB",
+         "w": 3,
+         "l": 6,
+         "t": 0,
+         "seed": 12,
+         "diff": 24
+        },
+        {
+         "id": "ATL",
+         "w": 3,
+         "l": 6,
+         "t": 0,
+         "seed": 13,
+         "diff": -35
+        }
+       ]
+      },
+      {
+       "name": "NFC West",
+       "teams": [
+        {
+         "id": "SF",
+         "w": 7,
+         "l": 1,
+         "t": 0,
+         "seed": 1,
+         "diff": 79
+        },
+        {
+         "id": "SEA",
+         "w": 5,
+         "l": 4,
+         "t": 0,
+         "seed": 8,
+         "diff": 40
+        },
+        {
+         "id": "LAR",
+         "w": 5,
+         "l": 4,
+         "t": 0,
+         "seed": 9,
+         "diff": 33
+        },
+        {
+         "id": "ARI",
+         "w": 3,
+         "l": 6,
+         "t": 0,
+         "seed": 14,
+         "diff": -77
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "leaders": [
+   {
+    "name": "Jahmyr Gibbs",
+    "team": "DET",
+    "pos": "RB",
+    "rush": 9,
+    "rec": 2,
+    "ret": 0,
+    "td": 11
+   },
+   {
+    "name": "Kenneth Walker III",
+    "team": "KC",
+    "pos": "RB",
+    "rush": 7,
+    "rec": 4,
+    "ret": 0,
+    "td": 11
+   },
+   {
+    "name": "Christian McCaffrey",
+    "team": "SF",
+    "pos": "RB",
+    "rush": 9,
+    "rec": 1,
+    "ret": 0,
+    "td": 10
+   },
+   {
+    "name": "D'Andre Swift",
+    "team": "CHI",
+    "pos": "RB",
+    "rush": 10,
+    "rec": 0,
+    "ret": 0,
+    "td": 10
+   },
+   {
+    "name": "Javonte Williams",
+    "team": "DAL",
+    "pos": "RB",
+    "rush": 9,
+    "rec": 1,
+    "ret": 0,
+    "td": 10
+   },
+   {
+    "name": "Derrick Henry",
+    "team": "BAL",
+    "pos": "RB",
+    "rush": 8,
+    "rec": 1,
+    "ret": 0,
+    "td": 9
+   },
+   {
+    "name": "Josh Allen",
+    "team": "BUF",
+    "pos": "QB",
+    "rush": 9,
+    "rec": 0,
+    "ret": 0,
+    "td": 9
+   },
+   {
+    "name": "Jaxon Smith-Njigba",
+    "team": "SEA",
+    "pos": "WR",
+    "rush": 0,
+    "rec": 9,
+    "ret": 0,
+    "td": 9
+   },
+   {
+    "name": "Jonathan Taylor",
+    "team": "IND",
+    "pos": "RB",
+    "rush": 8,
+    "rec": 0,
+    "ret": 0,
+    "td": 8
+   },
+   {
+    "name": "James Cook III",
+    "team": "BUF",
+    "pos": "RB",
+    "rush": 8,
+    "rec": 0,
+    "ret": 0,
+    "td": 8
+   }
+  ]
+ }
+}

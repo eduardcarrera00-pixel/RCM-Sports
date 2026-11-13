@@ -1,5 +1,21 @@
 # AE SPORTS · Guía visual v1
 
+### El marcador como menú vertical · 13 nov 2026
+
+Al final de La semana (NFL y Fútbol), «El marcador» es la primera de tres filas
+que se tocan como un menú: El marcador (o La crónica), Clasificación y Mejores
+anotadores (NFL, touchdowns) / Goleadores (Fútbol). Se abre una y se cierra la
+otra; al cargar, El marcador. Cada fila lleva un icono en círculo, el título en
+Playfair y un adelanto en una línea («Líder: Barcelona · 33 pts»). NFL separa
+AFC y NFC con dos botones y enseña sus 4 divisiones con «n.º» para los 7 puestos
+de playoff; Fútbol sigue a la liga del selector de arriba, con 10 equipos, una
+franja de color por zona (Champions, Europa, Conference, descenso, liguilla,
+octavos, play-off) y su leyenda. Los datos son una copia de ESPN que
+`cam_sport_tables_private.refresh_all()` renueva cada hora; la web hace una sola
+lectura (`cam_sport_tables_get`) por competición y visita, al acercarse al menú.
+Sin datos, solo El marcador, como antes. Módulo: `assets/cam-sport-tables.js`;
+estilos en `assets/cam-nfl-semana.css` (sección 3). Prueba: `tests/marcador-menu.py`.
+
 ### Entrada con marca · 10 nov 2026
 
 La entrada y los cambios entre Inicio, NFL, Fútbol, Picks y Actualidad muestran el

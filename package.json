@@ -49,7 +49,8 @@
     "test:takes:historic": "node tests/sport-take-historic.mjs && node tests/sport-take-historic-ui.mjs",
     "build:styles": "node scripts/build-editorial-css.mjs && node scripts/build-performance-css.mjs",
     "test:desktop": "node tests/desktop-continuous.mjs && node tests/navigation-top.mjs",
-    "test:clarity": "node tests/calm-reading.mjs"
+    "test:clarity": "node tests/calm-reading.mjs",
+    "test:marcador": "python3 -B tests/marcador-menu.py"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.9",
