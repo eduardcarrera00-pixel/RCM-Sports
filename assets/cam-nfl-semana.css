@@ -12,14 +12,15 @@
 @layer cam-banners {
   /* ---------- 1. La semana ---------- */
   html body :is(#camNflSemana,#camNflScore,#camFootballSemana,#camFootballScore) { display:none!important; }
-  /* 12 nov 2026: «Tu Take» abre la pestaña Takes de NFL (#camNflTakePrompt, primer hijo de #freeTakes).
+  /* 12 nov 2026: «Tu Take» abre la pestaña Takes de NFL (#camNflTakePrompt) y de Fútbol (#camFootballTakePrompt), al principio de #freeTakes.
      En La semana no se ve; en escritorio (página continua) va al principio de los Takes. */
-  html body #camNflTakePrompt { display:none!important; }
+  html body :is(#camNflTakePrompt,#camFootballTakePrompt) { display:none!important; }
 
   /* 8 nov 2026: en todos los anchos; en escritorio cam-escritorio.css (capa cam-header) la compone en columnas. */
     html body[data-cam-section="nfl"]:is([data-cam-tab="semana"],[data-cam-sport-page]) :is(#camNflSemana,#camNflScore),
     html body[data-cam-section="futbol"]:is([data-cam-tab="semana"],[data-cam-sport-page]) :is(#camFootballSemana,#camFootballScore),
-    html body.ae-is-nfl[data-cam-section="nfl"]:not([data-cam-tab="semana"]):not([data-cam-tab="noticias"]) #camNflTakePrompt:not(:empty) {
+    html body.ae-is-nfl[data-cam-section="nfl"]:not([data-cam-tab="semana"]):not([data-cam-tab="noticias"]) #camNflTakePrompt:not(:empty),
+    html body.ae-is-football[data-cam-section="futbol"]:not([data-cam-tab="semana"]):not([data-cam-tab="noticias"]) #camFootballTakePrompt:not(:empty) {
       --ns-card:#fffdf9;
       --ns-soft:#f4ece0;
       --ns-ink:#13324d;
@@ -45,7 +46,8 @@
     }
     html.dark body[data-cam-section="nfl"]:is([data-cam-tab="semana"],[data-cam-sport-page]) :is(#camNflSemana,#camNflScore),
     html.dark body[data-cam-section="futbol"]:is([data-cam-tab="semana"],[data-cam-sport-page]) :is(#camFootballSemana,#camFootballScore),
-    html.dark body.ae-is-nfl[data-cam-section="nfl"]:not([data-cam-tab="semana"]):not([data-cam-tab="noticias"]) #camNflTakePrompt:not(:empty) {
+    html.dark body.ae-is-nfl[data-cam-section="nfl"]:not([data-cam-tab="semana"]):not([data-cam-tab="noticias"]) #camNflTakePrompt:not(:empty),
+    html.dark body.ae-is-football[data-cam-section="futbol"]:not([data-cam-tab="semana"]):not([data-cam-tab="noticias"]) #camFootballTakePrompt:not(:empty) {
       --ns-card:#11293d;
       --ns-soft:#163450;
       --ns-ink:#f6ecdf;
@@ -62,8 +64,8 @@
       --ns-shadow:0 1px 2px rgba(0,0,0,.25),0 8px 20px -14px rgba(0,0,0,.6);
       --ns-inset:#0c2133;
     }
-    html body :is(#camNflSemana,#camNflScoreBody,#camFootballSemana,#camFootballScoreBody,#camNflTakePrompt) *, html body :is(#camNflSemana,#camNflScoreBody,#camFootballSemana,#camFootballScoreBody,#camNflTakePrompt) *::before, html body :is(#camNflSemana,#camNflScoreBody,#camFootballSemana,#camFootballScoreBody,#camNflTakePrompt) *::after { box-sizing:border-box!important; }
-    html body :is(#camNflSemana,#camNflScoreBody,#camFootballSemana,#camFootballScoreBody,#camNflTakePrompt) :is(h2,h3,p,ul,ol,li) { margin:0!important; padding:0!important; list-style:none!important; text-transform:none!important; }
+    html body :is(#camNflSemana,#camNflScoreBody,#camFootballSemana,#camFootballScoreBody,#camNflTakePrompt,#camFootballTakePrompt) *, html body :is(#camNflSemana,#camNflScoreBody,#camFootballSemana,#camFootballScoreBody,#camNflTakePrompt,#camFootballTakePrompt) *::before, html body :is(#camNflSemana,#camNflScoreBody,#camFootballSemana,#camFootballScoreBody,#camNflTakePrompt,#camFootballTakePrompt) *::after { box-sizing:border-box!important; }
+    html body :is(#camNflSemana,#camNflScoreBody,#camFootballSemana,#camFootballScoreBody,#camNflTakePrompt,#camFootballTakePrompt) :is(h2,h3,p,ul,ol,li) { margin:0!important; padding:0!important; list-style:none!important; text-transform:none!important; }
     /* Solo para lectores de pantalla. */
     html body :is(#camNflSemana,#camNflScore,#camFootballSemana,#camFootballScore) .cam-ns-sr {
       position:absolute!important; width:1px!important; height:1px!important; margin:-1px!important; padding:0!important;
@@ -282,14 +284,14 @@
     html body #camNflSemana .cam-ns-duelo .cam-ns-block-head { margin-bottom:4px!important; }
     html body #camNflSemana .cam-ns-duelo :is(.cam-ns-duel-when,.cam-ns-duel-score) { margin:0!important; text-align:left!important; }
     html body #camNflSemana .cam-ns-duelo .cam-ns-duel-when { font-size:13px!important; }
-    html body :is(#camNflSemana,#camNflTakePrompt) .cam-ns-ico { display:inline-flex!important; flex:0 0 auto!important; width:14px!important; height:14px!important; }
-    html body :is(#camNflSemana,#camNflTakePrompt) .cam-ns-ico svg { display:block!important; width:100%!important; height:100%!important; fill:none!important; stroke:currentColor!important; stroke-width:2.4!important; stroke-linecap:round!important; stroke-linejoin:round!important; }
+    html body :is(#camNflSemana,#camNflTakePrompt,#camFootballTakePrompt) .cam-ns-ico { display:inline-flex!important; flex:0 0 auto!important; width:14px!important; height:14px!important; }
+    html body :is(#camNflSemana,#camNflTakePrompt,#camFootballTakePrompt) .cam-ns-ico svg { display:block!important; width:100%!important; height:100%!important; fill:none!important; stroke:currentColor!important; stroke-width:2.4!important; stroke-linecap:round!important; stroke-linejoin:round!important; }
     html body #camNflSemana .cam-ns-step { display:block!important; margin:18px 0 0!important; }
-    html body :is(#camNflSemana,#camNflTakePrompt) .cam-ns-step-label {
+    html body :is(#camNflSemana,#camNflTakePrompt,#camFootballTakePrompt) .cam-ns-step-label {
       display:flex!important; align-items:center!important; gap:7px!important; margin:0!important;
       color:var(--ns-gold)!important; font:800 11px/1.35 Inter,system-ui,sans-serif!important; letter-spacing:.14em!important; text-transform:uppercase!important; text-align:left!important;
     }
-    html body :is(#camNflSemana,#camNflTakePrompt) .cam-ns-step-title {
+    html body :is(#camNflSemana,#camNflTakePrompt,#camFootballTakePrompt) .cam-ns-step-title {
       margin:4px 0 0!important; padding:0!important; color:var(--ns-ink)!important;
       font:600 24px/1.2 "Playfair Display",Georgia,serif!important; letter-spacing:0!important; text-transform:none!important; text-align:left!important;
     }
@@ -376,44 +378,44 @@
     html body #camNflSemana .cam-ns-next-cta:active { transform:scale(.99)!important; }
 
     /* tu Take */
-    html body #camNflTakePrompt .cam-ns-take {
+    html body :is(#camNflTakePrompt,#camFootballTakePrompt) .cam-ns-take {
       display:block!important; margin:0!important; padding:18px 16px 16px!important;
       border:1px solid var(--ns-line-strong)!important; border-radius:18px!important; background:var(--ns-inset)!important; box-shadow:var(--ns-shadow)!important;
     }
-    html body #camNflTakePrompt .cam-ns-take.is-invited { border-color:var(--ns-line-strong)!important; }
-    html body #camNflTakePrompt .cam-ns-take .cam-ns-step-title { font-size:21px!important; }
-    html body #camNflTakePrompt .cam-ns-take-text { margin:6px 0 0!important; color:var(--ns-muted)!important; font:500 13.5px/1.5 Inter,system-ui,sans-serif!important; text-align:left!important; }
-    html body #camNflTakePrompt .cam-ns-ideas { margin:12px 0 0!important; }
-    html body #camNflTakePrompt .cam-ns-ideas-label { color:var(--ns-muted)!important; font:600 12px/1.3 Inter,system-ui,sans-serif!important; text-align:left!important; }
-    html body #camNflTakePrompt .cam-ns-ideas-row { display:flex!important; flex-wrap:wrap!important; gap:8px!important; margin:8px 0 0!important; }
-    html body #camNflTakePrompt .cam-ns-idea {
+    html body :is(#camNflTakePrompt,#camFootballTakePrompt) .cam-ns-take.is-invited { border-color:var(--ns-line-strong)!important; }
+    html body :is(#camNflTakePrompt,#camFootballTakePrompt) .cam-ns-take .cam-ns-step-title { font-size:21px!important; }
+    html body :is(#camNflTakePrompt,#camFootballTakePrompt) .cam-ns-take-text { margin:6px 0 0!important; color:var(--ns-muted)!important; font:500 13.5px/1.5 Inter,system-ui,sans-serif!important; text-align:left!important; }
+    html body :is(#camNflTakePrompt,#camFootballTakePrompt) .cam-ns-ideas { margin:12px 0 0!important; }
+    html body :is(#camNflTakePrompt,#camFootballTakePrompt) .cam-ns-ideas-label { color:var(--ns-muted)!important; font:600 12px/1.3 Inter,system-ui,sans-serif!important; text-align:left!important; }
+    html body :is(#camNflTakePrompt,#camFootballTakePrompt) .cam-ns-ideas-row { display:flex!important; flex-wrap:wrap!important; gap:8px!important; margin:8px 0 0!important; }
+    html body :is(#camNflTakePrompt,#camFootballTakePrompt) .cam-ns-idea {
       display:inline-flex!important; align-items:center!important; width:auto!important; min-width:0!important; max-width:100%!important; min-height:44px!important; margin:0!important; padding:8px 14px!important;
       border:1px solid var(--ns-line-strong)!important; border-radius:999px!important; background:var(--ns-card)!important; background-image:none!important; box-shadow:none!important;
       color:var(--ns-ink)!important; font:600 13px/1.3 Inter,system-ui,sans-serif!important; letter-spacing:0!important; text-transform:none!important; text-align:left!important; white-space:normal!important;
       cursor:pointer!important; -webkit-tap-highlight-color:transparent!important;
     }
-    html body #camNflTakePrompt .cam-ns-take-field {
+    html body :is(#camNflTakePrompt,#camFootballTakePrompt) .cam-ns-take-field {
       display:flex!important; align-items:center!important; gap:12px!important; width:100%!important; min-height:58px!important; margin:14px 0 0!important; padding:8px 8px 8px 16px!important;
       border:1px solid var(--ns-line-strong)!important; border-radius:14px!important; background:var(--ns-card)!important; background-image:none!important; box-shadow:none!important;
       color:var(--ns-muted)!important; text-align:left!important; text-transform:none!important; letter-spacing:0!important; cursor:pointer!important;
       -webkit-tap-highlight-color:transparent!important;
     }
-    html body #camNflTakePrompt .cam-ns-take-placeholder {
+    html body :is(#camNflTakePrompt,#camFootballTakePrompt) .cam-ns-take-placeholder {
       flex:1 1 auto!important; min-width:0!important; white-space:normal!important; overflow-wrap:anywhere!important;
       color:var(--ns-muted)!important; font:italic 500 16px/1.3 "Playfair Display",Georgia,serif!important;
     }
-    html body #camNflTakePrompt .cam-ns-take-pen {
+    html body :is(#camNflTakePrompt,#camFootballTakePrompt) .cam-ns-take-pen {
       display:inline-flex!important; flex:0 0 auto!important; align-items:center!important; justify-content:center!important; width:42px!important; height:42px!important; padding:11px!important;
       border-radius:50%!important; background:var(--ns-accent)!important; color:var(--ns-on-accent)!important;
     }
-    html body #camNflTakePrompt .cam-ns-take-pen .cam-ns-ico { width:100%!important; height:100%!important; }
-    html body #camNflTakePrompt .cam-ns-take-scale { display:flex!important; align-items:center!important; gap:10px!important; margin:12px 0 0!important; color:var(--ns-gold)!important; font:700 13px/1.4 Inter,system-ui,sans-serif!important; text-align:left!important; }
-    html body #camNflTakePrompt .cam-ns-bars { display:inline-flex!important; flex:0 0 auto!important; align-items:flex-end!important; gap:3px!important; height:16px!important; }
-    html body #camNflTakePrompt .cam-ns-bars > span { display:block!important; width:5px!important; border-radius:1px!important; background:currentColor!important; }
-    html body #camNflTakePrompt .cam-ns-bars > span:nth-child(1) { height:6px!important; opacity:.45!important; }
-    html body #camNflTakePrompt .cam-ns-bars > span:nth-child(2) { height:11px!important; opacity:.7!important; }
-    html body #camNflTakePrompt .cam-ns-bars > span:nth-child(3) { height:16px!important; }
-    html body :is(#camNflSemana,#camNflTakePrompt) :is(.cam-ns-day,.cam-ns-next-cta,.cam-ns-idea,.cam-ns-take-field):focus-visible { outline:3px solid var(--ns-accent)!important; outline-offset:3px!important; }
+    html body :is(#camNflTakePrompt,#camFootballTakePrompt) .cam-ns-take-pen .cam-ns-ico { width:100%!important; height:100%!important; }
+    html body :is(#camNflTakePrompt,#camFootballTakePrompt) .cam-ns-take-scale { display:flex!important; align-items:center!important; gap:10px!important; margin:12px 0 0!important; color:var(--ns-gold)!important; font:700 13px/1.4 Inter,system-ui,sans-serif!important; text-align:left!important; }
+    html body :is(#camNflTakePrompt,#camFootballTakePrompt) .cam-ns-bars { display:inline-flex!important; flex:0 0 auto!important; align-items:flex-end!important; gap:3px!important; height:16px!important; }
+    html body :is(#camNflTakePrompt,#camFootballTakePrompt) .cam-ns-bars > span { display:block!important; width:5px!important; border-radius:1px!important; background:currentColor!important; }
+    html body :is(#camNflTakePrompt,#camFootballTakePrompt) .cam-ns-bars > span:nth-child(1) { height:6px!important; opacity:.45!important; }
+    html body :is(#camNflTakePrompt,#camFootballTakePrompt) .cam-ns-bars > span:nth-child(2) { height:11px!important; opacity:.7!important; }
+    html body :is(#camNflTakePrompt,#camFootballTakePrompt) .cam-ns-bars > span:nth-child(3) { height:16px!important; }
+    html body :is(#camNflSemana,#camNflTakePrompt,#camFootballTakePrompt) :is(.cam-ns-day,.cam-ns-next-cta,.cam-ns-idea,.cam-ns-take-field):focus-visible { outline:3px solid var(--ns-accent)!important; outline-offset:3px!important; }
     @keyframes cam-ns-rise { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
     @media (prefers-reduced-motion: reduce) {
       html body #camNflSemana .cam-ns-next { animation:none!important; }
@@ -422,11 +424,11 @@
     }
     @media (max-width: 340px) {
       html body #camNflSemana .cam-ns-side-name { font-size:18px!important; }
-      html body #camNflTakePrompt .cam-ns-take-placeholder { font-size:14.5px!important; }
+      html body :is(#camNflTakePrompt,#camFootballTakePrompt) .cam-ns-take-placeholder { font-size:14.5px!important; }
     }
     /* Escritorio: la tarjeta es ancha; los equipos no se estiran de más. */
     html body:is([data-cam-desk],[data-cam-sport-page]) #camNflSemana .cam-ns-step { max-width:640px!important; }
-    html body:is([data-cam-desk],[data-cam-sport-page]) #camNflTakePrompt .cam-ns-take { padding:22px 24px 20px!important; }
+    html body:is([data-cam-desk],[data-cam-sport-page]) :is(#camNflTakePrompt,#camFootballTakePrompt) .cam-ns-take { padding:22px 24px 20px!important; }
 
 
   /* ---------- 2. La Quiniela NFL: editor, laurel y comunidad ---------- */

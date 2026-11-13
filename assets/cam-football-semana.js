@@ -2,12 +2,15 @@
    Comparte las tarjetas y la jerarquía de NFL. Lee la misma jornada, equipos y
    elecciones de camFootballQuiniela: sin consultas, partidos ni puntos inventados.
    El selector de ligas es el componente de la quiniela. El marcador cierra la
-   pestaña, detrás de la quiniela; Power Rankings permanece en Noticias. */
+   pestaña, detrás de la quiniela; Power Rankings permanece en Noticias.
+   12 nov 2026: «Tu Take · ¿Qué crees que va a pasar?» abre la pestaña Takes
+   (#camFootballTakePrompt), como en NFL; el ejemplo sale del partido destacado. */
 (() => {
   'use strict';
   const root=document.getElementById('camFootballSemana');
   const body=document.getElementById('camFootballSemanaBody');
   const scores=document.getElementById('camFootballScoreBody');
+  const promptRoot=document.getElementById('camFootballTakePrompt');
   if(!root||!body||!scores||!window.matchMedia)return;
   const mobile=window.matchMedia('(max-width: 760px), (orientation: landscape) and (max-height: 500px) and (hover: none) and (pointer: coarse)');
   const ui={scoreOpen:false,liveOpen:false,liveKey:null,saving:false,result:null};
@@ -114,6 +117,63 @@
     box.append(play);return box;
   }
 
+  /* «Tu Take» al principio de Takes (12 nov 2026), con la misma maqueta que NFL
+     (clases cam-ns-take*, estilos en cam-nfl-semana.css). El ejemplo usa el partido
+     destacado; si ya elegiste en ese partido, salen dos ideas que abren el compositor
+     con el título escrito. Sin partido, un ejemplo genérico. */
+  const ICONS={
+    take:'<path d="M4 5h16v11H10l-6 4V5z"/>',
+    pen:'<path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/>'
+  };
+  function icon(kind){
+    const box=el('span',null,'cam-ns-ico',{'aria-hidden':'true'});
+    box.innerHTML='<svg viewBox="0 0 24 24" focusable="false">'+ICONS[kind]+'</svg>';
+    return box;
+  }
+  function openTake(snap,title){
+    if(typeof window.aeOpenTakeComposer!=='function')return;
+    const preset={};
+    if(snap?.competitionName)preset.competition=snap.competitionName;
+    if(title)preset.title=title;
+    window.aeOpenTakeComposer('Fútbol',preset);
+  }
+  function takeBlock(snap,duel){
+    const pick=duel&&!started(duel)?(snap.draft.get(duel.id)||snap.mine.get(duel.id)||null):null;
+    const box=el('div',null,'cam-ns-take'+(pick?' is-invited':''),{role:'group','aria-labelledby':'camFootballTakeTitle'});
+    const tag=el('p',null,'cam-ns-step-label');tag.append(icon('take'),el('span','Tu Take'));
+    box.append(tag,
+      el('h2','¿Qué crees que va a pasar?','cam-ns-step-title',{id:'camFootballTakeTitle'}),
+      el('p','Una predicción con tus palabras. Lo que se publica aquí no se borra.','cam-ns-take-text'));
+    if(pick){
+      const team=pick==='draw'?null:name(snap,pick==='home'?duel.home_id:duel.away_id);
+      const ideas=team?[team+' gana por 2 goles o más',team+' remonta en la segunda parte']:['Empate con goles de los dos','Empate sin goles'];
+      const wrap=el('div',null,'cam-ns-ideas'),row=el('div',null,'cam-ns-ideas-row');
+      for(const idea of ideas){
+        const b=button(idea,()=>openTake(snap,idea),'cam-ns-idea');
+        b.setAttribute('aria-haspopup','dialog');b.setAttribute('aria-controls','aeTakeComposerDialog');row.append(b);
+      }
+      wrap.append(el('p','Ideas para empezar','cam-ns-ideas-label'),row);box.append(wrap);
+    }
+    const exampleTeam=pick&&pick!=='draw'?name(snap,pick==='home'?duel.home_id:duel.away_id):duel?name(snap,duel.home_id):null;
+    const field=button(null,()=>openTake(snap),'cam-ns-take-field');
+    field.setAttribute('aria-label','Escribir mi Take');field.setAttribute('aria-haspopup','dialog');field.setAttribute('aria-controls','aeTakeComposerDialog');
+    const pen=el('span',null,'cam-ns-take-pen',{'aria-hidden':'true'});pen.append(icon('pen'));
+    field.append(el('span',exampleTeam?'«'+exampleTeam+' gana por 2 goles o más…»':'«Este fin de semana pasa algo que nadie espera…»','cam-ns-take-placeholder',{'aria-hidden':'true'}),pen);
+    const scale=el('p',null,'cam-ns-take-scale'),bars=el('span',null,'cam-ns-bars',{'aria-hidden':'true'});
+    bars.append(el('span'),el('span'),el('span'));
+    scale.append(bars,el('span','Cuanto más atrevido, más vale si aciertas'));
+    box.append(field,scale);
+    return box;
+  }
+  // Repintar sin perder el foco de quien lo usa con el teclado.
+  function paintPrompt(snap,duel){
+    if(!promptRoot)return;
+    const focused=promptRoot.contains(document.activeElement)?(document.activeElement.textContent||document.activeElement.className):null;
+    promptRoot.replaceChildren(takeBlock(snap,duel));
+    if(focused==null)return;
+    ([...promptRoot.querySelectorAll('button')].find(b=>(b.textContent||b.className)===focused)||promptRoot.querySelector('.cam-ns-take-field'))?.focus({preventScroll:true});
+  }
+
   function liveBlock(snap){
     const live=(snap.liveGames||snap.games).filter(g=>g.status==='live'||
       (g.status==='scheduled'&&started(g)&&Date.parse(g.kickoff)+4*36e5>Date.now()))
@@ -190,14 +250,17 @@
     if(snap?.competition==='ligamx'&&liguilla&&!liguilla.hidden&&liguilla.dataset.complete!=='true')
       fragment.append(liguilla);
     if(snap?.error){
+      paintPrompt(snap,null);
       fragment.append(el('p',snap.error,'cam-ns-text'),button('Reintentar',()=>void api.refresh()));scores.replaceChildren();
     }else if(!snap?.loaded||snap.loading){
+      paintPrompt(snap,null);
       fragment.append(el('p','Cargando la semana…','cam-ns-loading'));scores.replaceChildren();
     }else{
       const liveKey=snap.competition+'|'+snap.season;
       if(ui.liveKey!==liveKey){ui.liveKey=liveKey;ui.liveOpen=false;}
       const live=liveBlock(snap);if(live)fragment.append(live);
       const duel=chooseDuel(snap.games,snap.teams);
+      paintPrompt(snap,duel);
       if(duel)fragment.append(duelBlock(snap,duel));
       else fragment.append(el('p','Todavía no hay partidos de esta competición.','cam-ns-text'));
       const score=scoreBlock(snap);scores.replaceChildren(...(score?[score]:[]));
