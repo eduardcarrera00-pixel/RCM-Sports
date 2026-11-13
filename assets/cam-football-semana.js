@@ -309,7 +309,7 @@
 
   /* Guía al principio de Takes, con la misma maqueta que NFL
      (clases cam-ns-take*, estilos en cam-nfl-semana.css). El ejemplo de Gilberto Mora
-     es estable; al elegir en el duelo, las ideas conservan el contexto del partido. */
+     permanece estable. */
   const ICONS={
     take:'<path d="M4 5h16v11H10l-6 4V5z"/>',
     pen:'<path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/>'
@@ -333,16 +333,6 @@
     box.append(tag,
       el('h2','¿Qué crees que va a pasar?','cam-ns-step-title',{id:'camFootballTakeTitle'}),
       el('p','¿Has dicho algo que no quedó para la historia? Con tu take se podrá quedar para la historia.','cam-ns-take-text'));
-    if(pick){
-      const team=pick==='draw'?null:name(snap,pick==='home'?duel.home_id:duel.away_id);
-      const ideas=team?[team+' gana por 2 goles o más',team+' remonta en la segunda parte']:['Empate con goles de los dos','Empate sin goles'];
-      const wrap=el('div',null,'cam-ns-ideas'),row=el('div',null,'cam-ns-ideas-row');
-      for(const idea of ideas){
-        const b=button(idea,()=>openTake(snap,idea),'cam-ns-idea');
-        b.setAttribute('aria-haspopup','dialog');b.setAttribute('aria-controls','aeTakeComposerDialog');row.append(b);
-      }
-      wrap.append(el('p','Ideas para empezar','cam-ns-ideas-label'),row);box.append(wrap);
-    }
     const field=button(null,()=>openTake(snap),'cam-ns-take-field');
     field.setAttribute('aria-label','Escribir mi Take');field.setAttribute('aria-haspopup','dialog');field.setAttribute('aria-controls','aeTakeComposerDialog');
     const pen=el('span',null,'cam-ns-take-pen',{'aria-hidden':'true'});pen.append(icon('pen'));
