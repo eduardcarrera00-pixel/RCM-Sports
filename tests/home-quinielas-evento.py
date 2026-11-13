@@ -10,6 +10,8 @@ Cubre:
     (Liga MX, Champions, LaLiga, Premier, NFL), cada resultado con su círculo y sin «pts»;
   · paso 1 (Tus 8) a 320 y 390 px de día y de noche: 5 escudos + 3 «?», «Completar mis 8 ›»,
     tarjeta pequeña (248 px de ancho, como las fichas de partido), nada recortado;
+  · tocar una ficha lleva a ese partido en su quiniela (Champions → Fútbol · Champions, NFL);
+    círculos 1 · X · 2 con su color (1 y 2 en la NFL), sin «Jugar»; con la Liguilla, Liga MX al final;
   · el botón (y un «?») lleva a Fútbol → Liga MX → La semana → #camLiguilla con el selector de
     «Tus 8» abierto; al volver a Inicio se relee el evento;
   · invitado con 1 elegido → «Te faltan 2»; con cuenta y 8 guardados → «Tus 8 están listos»
@@ -96,6 +98,10 @@ STATE = """() => {
     heading: txt('.cam-hj-heading'), more: txt('.cam-hj-more'),
     order: items.map(i => i.querySelector('.cam-hj-ev') ? 'evento' : i.querySelector('.cam-hj-sep') ? 'separador' : (i.querySelector('.cam-hj-league')?.textContent || '?')),
     sep: txt('.cam-hj-sep-text'), sepBox: box(sec?.querySelector('.cam-hj-sep')), rowBox: box(sec?.querySelector('.cam-hj-row')),
+    sepLines: q('.cam-hj-sep-line').length, sepDiamonds: q('.cam-hj-sep-diamond').length,
+    markColors: (() => { const g = sec?.querySelector('.cam-hj-game[data-sport=football]'); if (!g) return [];
+      return [...g.querySelectorAll('.cam-hj-choice')].map(c => getComputedStyle(c).color + '/' + getComputedStyle(c).borderTopColor); })(),
+    gameIds: q('.cam-hj-game').map(g => g.dataset.gameId),
     kicker: txt('.cam-hj-ev-kicker'), title: txt('.cam-hj-ev-title'), cta: txt('.cam-hj-ev-cta'),
     fixed: q('.cam-hj-ev-slot.is-fixed').length, mine: q('.cam-hj-ev-slot.is-mine').length, open: q('.cam-hj-ev-slot.is-open').length,
     openButtons: q('button.cam-hj-ev-slot.is-open').length,
@@ -150,12 +156,14 @@ def common(st, where):
     assert not st['hscroll'], f'{where}: la página se sale de lado'
     assert st['pts'] == 0, f'{where}: aún se ven puntos'
     assert st['heading'] == 'Quinielas' and st['more'] == 'Ver partidos ›', f'{where}: cabecera {st["heading"]} / {st["more"]}'
-    for gone in ['Evento especial', 'La Liguilla', 'Paso ', 'Cierra', 'ya están dentro', 'pelean', 'Después armas', 'También en la quiniela']:
+    for gone in ['Evento especial', 'La Liguilla', 'Paso ', 'Cierra', 'ya están dentro', 'pelean', 'Después armas', 'También en la quiniela', 'Jugar']:
         assert gone not in st['sectionText'], f'{where}: sigue el texto «{gone}»'
     assert all(n in (2, 3) for n in st['games']), f'{where}: círculos {st["games"]}'
 
 
 LEAGUES = ['LIGA MX', 'CHAMPIONS', 'LALIGA', 'PREMIER', 'NFL · SEMANA 10']
+# Con la Liguilla abriendo el carrusel, el partido de Liga MX va al final.
+EVENT_ORDER = ['EVENTO', 'SEPARADOR', 'CHAMPIONS', 'LALIGA', 'PREMIER', 'NFL · SEMANA 10', 'LIGA MX']
 
 # 1 · Paso 1 sin elegir: 320/390, día y noche
 for width, dark in [(390, True), (390, False), (320, True)]:
@@ -163,9 +171,11 @@ for width, dark in [(390, True), (390, False), (320, True)]:
     with fp.full_page(fixture('q8'), dark=dark, width=width, height=900) as page:
         st = open_home(page)
         assert st['on'] and st['shown'] and st['event'] == 'liguilla', f'{where}: no se ve {st}'
-        assert [o.upper() for o in st['order']] == ['EVENTO', 'SEPARADOR'] + LEAGUES, f'{where}: carrusel {st["order"]}'
+        assert [o.upper() for o in st['order']] == EVENT_ORDER, f'{where}: carrusel {st["order"]}'
         assert st['kicker'] == 'Liga MX' and st['title'] == '¿Quiénes crees que serán el top 8?', f'{where}: {st["kicker"]} / {st["title"]}'
         assert st['sep'] == 'Participa en la quiniela de otras ligas' and st['sepBox'][0] == 112, f'{where}: separador {st["sep"]} {st["sepBox"]}'
+        assert st['sepLines'] == 0 and st['sepDiamonds'] == 2, f'{where}: el separador lleva solo los rombos {st["sepLines"]} {st["sepDiamonds"]}'
+        assert len(set(st['markColors'])) == 3, f'{where}: 1, X y 2 deben tener su color {st["markColors"]}'
         assert (st['fixed'], st['mine'], st['open'], st['openButtons']) == (5, 0, 3, 3), f'{where}: huecos {st}'
         assert st['cta'] == 'Completar mis 8 ›', f'{where}: botón {st["cta"]}'
         assert st['slotBoxes'] == ['32x32'], f'{where}: escudos y «?» deben ser círculos iguales {st["slotBoxes"]}'
@@ -173,8 +183,8 @@ for width, dark in [(390, True), (390, False), (320, True)]:
         assert st['fonts'] == ['Playfair Display', 'Inter', 'Inter'], f'{where}: letras {st["fonts"]}'
         assert st['ctaBox'][1] >= 40, f'{where}: botón bajo {st["ctaBox"]}'
         assert st['crests'] == 5, f'{where}: escudos sin pintar {st["crests"]}'
-        assert st['marks'] == ['1X2', '1X2', '1X2', '1X2', ''], f'{where}: círculos de la quiniela {st["marks"]}'
-        assert st['faces'][0].startswith('Queretaro | Monterrey @ ') and st['faces'][-1].startswith('Patriots | Lions @ '), f'{where}: fichas {st["faces"]}'
+        assert st['marks'] == ['1X2', '1X2', '1X2', '12', '1X2'], f'{where}: círculos de la quiniela {st["marks"]}'
+        assert st['faces'][3].startswith('Patriots | Lions @ ') and st['faces'][-1].startswith('Queretaro | Monterrey @ '), f'{where}: fichas {st["faces"]}'
         assert st['sideCrest'] == [48, 48], f'{where}: escudos de la ficha {st["sideCrest"]}'
         assert st['calls'] == ['state', 'candidates'], f'{where}: llamadas {st["calls"]}'
         common(st, where)
@@ -198,6 +208,22 @@ for width, dark in [(390, True), (390, False), (320, True)]:
                 back = page.evaluate(STATE)
                 assert back['shown'] and back['event'] == 'liguilla', f'{where}: al volver {back}'
                 assert 'candidates' in back['calls'], f'{where}: al volver no se releyó {back["calls"]}'
+
+            # Tocar una ficha lleva a ese mismo partido dentro de su quiniela, a la vista.
+            for gid, sport in [('f2', 'football'), ('n1', 'nfl')]:
+                box_id = '#camFootballGames' if sport == 'football' else '#camNflGames'
+                page.click('#camHomeJornada .cam-hj-game[data-game-id="%s"]' % gid)
+                page.wait_for_function("""([sel, id]) => { const c = document.querySelector(sel + ' [data-game-id="' + id + '"]');
+                  if (!c || !c.getClientRects().length) return false; const r = c.getBoundingClientRect(); return r.top >= 40 && r.bottom <= innerHeight - 60; }""",
+                  arg=[box_id, gid], timeout=10000)
+                page.wait_for_timeout(800)
+                info = page.evaluate("""([sel, id]) => { const r = document.querySelector(sel + ' [data-game-id="' + id + '"]').getBoundingClientRect();
+                  return {cat: currentCategory, top: Math.round(r.top), bottom: Math.round(r.bottom), h: innerHeight, comp: window.camFootballQuiniela?.snapshot?.()?.competition}; }""", [box_id, gid])
+                assert info['cat'] == ('Fútbol' if sport == 'football' else 'NFL') and 40 <= info['top'] and info['bottom'] <= info['h'] - 60, f'{where}: partido {gid} {info}'
+                if sport == 'football': assert info['comp'] == 'champions', f'{where}: competición {info}'
+                shot(page, where + '-partido-' + gid, full=True)
+                page.click('body > nav.cam-mobile-bottom-nav > button[data-category="Todos"]')
+                page.wait_for_timeout(900)
 
 # 2 · Invitado con 1 elegido en el aparato
 with fp.full_page(fixture('q8', local=['218', '227', '219', '223', '216', '228']), dark=True) as page:
@@ -238,6 +264,7 @@ for mode in ['champ', 'none']:
     with fp.full_page(fixture(mode), dark=True) as page:
         st = open_home(page)
         assert st['event'] is None and [o.upper() for o in st['order']] == LEAGUES, f'{mode}: {st["order"]}'
+        assert st['marks'] == ['1X2', '1X2', '1X2', '1X2', '12'], f'{mode}: círculos {st["marks"]}'
         w, h, radius = st['circle']
         assert w == h == '28px' and radius == '50%', f'{mode}: círculo {st["circle"]}'
         common(st, mode)
@@ -247,7 +274,7 @@ for mode in ['champ', 'none']:
 with fp.full_page(fixture('q8'), dark=True, width=1366, height=900, scale=1) as page:
     st = open_home(page)
     assert st['event'] == 'liguilla' and st['order'][:2] == ['evento', 'separador'], f'escritorio: {st["order"]}'
-    assert abs(st['sepBox'][0] - st['rowBox'][0]) <= 6 and st['sepBox'][1] < 50, f'escritorio: el separador debe cruzar la fila {st["sepBox"]} {st["rowBox"]}'
+    assert abs(st['sepBox'][0] - st['rowBox'][0]) <= 6 and st['sepBox'][1] < 50 and st['sepLines'] == 0, f'escritorio: el separador debe cruzar la fila {st["sepBox"]} {st["rowBox"]}'
     common(st, 'escritorio'); shot(page, 'escritorio')
     assert not page.errors, f'escritorio: errores {page.errors}'
 

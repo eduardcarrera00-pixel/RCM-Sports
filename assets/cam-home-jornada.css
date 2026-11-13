@@ -15,6 +15,9 @@
     --hj-card:#fffdf9;
     --hj-soft:#f4ece0;
     --hj-disc:#f4ece0;
+    --hj-m1:#2f6690; --hj-m1-line:rgba(47,102,144,.45); --hj-m1-bg:rgba(47,102,144,.08);
+    --hj-mx:#86602e; --hj-mx-line:rgba(176,128,63,.5); --hj-mx-bg:rgba(176,128,63,.1);
+    --hj-m2:#9f4639; --hj-m2-line:rgba(160,71,58,.42); --hj-m2-bg:rgba(160,71,58,.07);
     --hj-ink:#13324d;
     --hj-text:#34444f;
     --hj-muted:#66727c;
@@ -33,6 +36,9 @@
     --hj-card:#11293d;
     --hj-soft:#163450;
     --hj-disc:#F3EBDD;
+    --hj-m1:#a9cbe6; --hj-m1-line:rgba(140,186,226,.55); --hj-m1-bg:rgba(140,186,226,.12);
+    --hj-mx:#e9c896; --hj-mx-line:rgba(224,179,124,.55); --hj-mx-bg:rgba(224,179,124,.12);
+    --hj-m2:#eeab9c; --hj-m2-line:rgba(232,150,130,.55); --hj-m2-bg:rgba(232,150,130,.12);
     --hj-ink:#f6ecdf;
     --hj-text:#dcd3c8;
     --hj-muted:#a9b6bf;
@@ -318,7 +324,8 @@
   html body #camHomeJornada :is(.cam-hj-face, .cam-hj-marks) {
     display:grid!important; grid-template-columns:minmax(0,1fr) 60px minmax(0,1fr)!important; gap:4px!important; width:100%!important;
   }
-  html body #camHomeJornada .cam-hj-face { align-items:start!important; margin:2px 0 0!important; }
+  /* Escudos y círculos van juntos y centrados en el alto que sobre (la fila se estira al de la Liguilla). */
+  html body #camHomeJornada .cam-hj-face { align-items:start!important; margin:auto 0 0!important; padding-top:4px!important; }
   html body #camHomeJornada .cam-hj-side { display:flex!important; flex-direction:column!important; align-items:center!important; gap:8px!important; min-width:0!important; text-align:center!important; }
   html body #camHomeJornada .cam-hj-side .cam-hj-crest {
     width:48px!important; height:48px!important; background:var(--hj-disc)!important; color:#13324d!important;
@@ -329,6 +336,7 @@
   html body #camHomeJornada .cam-hj-side-name {
     display:block!important; max-width:100%!important; color:var(--hj-ink)!important;
     font:650 12.5px/1.25 Inter,system-ui,sans-serif!important; text-wrap:balance!important; overflow-wrap:break-word!important;
+    min-height:2.5em!important;   /* dos líneas siempre: los círculos quedan a la misma altura en todas las fichas */
   }
   html body #camHomeJornada .cam-hj-kick {
     display:flex!important; flex-direction:column!important; align-items:center!important; justify-content:center!important;
@@ -341,8 +349,7 @@
   html body #camHomeJornada .cam-hj-kick-time {
     color:var(--hj-ink)!important; font:700 16px/1 Inter,system-ui,sans-serif!important; font-variant-numeric:tabular-nums!important; white-space:nowrap!important;
   }
-  html body #camHomeJornada .cam-hj-marks { justify-items:center!important; align-items:center!important; margin:auto 0 0!important; padding-top:2px!important; }
-  html body #camHomeJornada .cam-hj-game > .cam-hj-cta { margin-top:0!important; }
+  html body #camHomeJornada .cam-hj-marks { justify-items:center!important; align-items:center!important; margin:6px 0 auto!important; padding:0 0 6px!important; }
   html body #camHomeJornada .cam-hj-choice {
     display:flex!important; align-items:center!important; justify-content:center!important; flex:0 0 auto!important;
     width:28px!important; height:28px!important; margin:0!important; padding:0!important; box-sizing:border-box!important;
@@ -350,8 +357,11 @@
     color:var(--hj-muted)!important; font:700 11.5px/1 Inter,system-ui,sans-serif!important;
     transition:border-color .15s ease, background-color .15s ease, color .15s ease!important;
   }
+  html body #camHomeJornada .cam-hj-choice.is-1 { border-color:var(--hj-m1-line)!important; background:var(--hj-m1-bg)!important; color:var(--hj-m1)!important; }
+  html body #camHomeJornada .cam-hj-choice.is-x { border-color:var(--hj-mx-line)!important; background:var(--hj-mx-bg)!important; color:var(--hj-mx)!important; }
+  html body #camHomeJornada .cam-hj-choice.is-2 { border-color:var(--hj-m2-line)!important; background:var(--hj-m2-bg)!important; color:var(--hj-m2)!important; }
   @media (hover:hover) {
-    html body #camHomeJornada .cam-hj-game:hover .cam-hj-choice { border-color:var(--hj-accent)!important; color:var(--hj-accent)!important; }
+    html body #camHomeJornada .cam-hj-game:hover .cam-hj-choice { border-color:currentColor!important; }
   }
 
   /* ---------- Evento especial en «Quinielas» (13 nov 2026): la Liguilla ----------
@@ -430,19 +440,14 @@
     html body #camHomeJornada .cam-hj-ev-cta:hover { background:#F0CD92!important; }
     html body #camHomeJornada button.cam-hj-ev-slot.is-open:hover { background:rgba(232,191,121,.12)!important; }
   }
-  /* Separador «Participa en la quiniela de otras ligas»: filete dorado que se desvanece,
-     dos rombos pequeños y el texto en la serif de lectura. De pie en el carrusel. */
+  /* Separador «Participa en la quiniela de otras ligas»: dos rombos pequeños, el texto en
+     la serif de lectura y una flecha. De pie en el carrusel (sin filetes, 13 nov 2026). */
   html body #camHomeJornada .cam-hj-item.is-sep { scroll-snap-align:none!important; }
   html body #camHomeJornada .cam-hj-sep {
     display:flex!important; flex-direction:column!important; align-items:center!important; justify-content:center!important;
-    gap:8px!important; width:112px!important; min-height:100%!important; margin:0!important; padding:4px 2px!important;
+    gap:10px!important; width:112px!important; min-height:100%!important; margin:0!important; padding:4px 2px!important;
     color:var(--hj-muted)!important; text-align:center!important;
   }
-  html body #camHomeJornada .cam-hj-sep-line {
-    display:block!important; flex:1 1 0!important; width:1px!important; min-height:16px!important;
-    background:linear-gradient(to bottom, transparent, var(--hj-gold))!important; opacity:.75!important;
-  }
-  html body #camHomeJornada .cam-hj-sep-line:last-child { background:linear-gradient(to top, transparent, var(--hj-gold))!important; }
   html body #camHomeJornada .cam-hj-sep-diamond {
     display:block!important; flex:0 0 auto!important; width:6px!important; height:6px!important;
     border:1px solid var(--hj-gold)!important; transform:rotate(45deg)!important;
@@ -459,9 +464,7 @@
   @media (min-width:761px) {
     html body #camHomeJornada .cam-hj-ev { width:100%!important; }
     html body #camHomeJornada .cam-hj-item.is-sep { grid-column:1 / -1!important; }
-    html body #camHomeJornada .cam-hj-sep { flex-direction:row!important; gap:12px!important; width:100%!important; min-height:0!important; padding:6px 0!important; }
-    html body #camHomeJornada .cam-hj-sep-line { width:auto!important; height:1px!important; min-height:0!important; background:linear-gradient(to right, transparent, var(--hj-gold))!important; }
-    html body #camHomeJornada .cam-hj-sep-line:last-child { background:linear-gradient(to left, transparent, var(--hj-gold))!important; }
+    html body #camHomeJornada .cam-hj-sep { flex-direction:row!important; gap:12px!important; width:100%!important; min-height:0!important; padding:4px 0!important; }
     html body #camHomeJornada .cam-hj-sep-text { margin:0!important; white-space:nowrap!important; }
     html body #camHomeJornada .cam-hj-sep-arrow { display:none!important; }
   }

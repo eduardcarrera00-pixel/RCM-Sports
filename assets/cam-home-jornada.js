@@ -106,6 +106,20 @@
     if (typeof window.filterByCategory === 'function') window.filterByCategory(sport === 'football' ? 'Fútbol' : 'NFL');
     window.camSectionTabs?.select?.('quiniela');
   }
+  // Tocar una ficha lleva a ese mismo partido dentro de su quiniela (13 nov 2026).
+  // La quiniela se carga bajo demanda: se espera a que esté lista y se enfoca el partido.
+  function goGame(g, sport) {
+    const football = sport === 'football';
+    goQuiniela(sport);
+    const api = () => (football ? window.camFootballQuiniela : window.camNflQuiniela) || null;
+    const ready = () => { const q = api(); return !!q?.focus && (football || !!q.snapshot?.().loaded); };
+    let tries = 0;
+    const step = () => {
+      if (ready()) { try { api().focus(g.id); } catch {} return; }
+      if (++tries < 80) setTimeout(step, 100);
+    };
+    Promise.resolve(window.camSportQuinielaLoader?.ensure?.(football ? 'football' : 'nfl')).catch(() => {}).then(step);
+  }
   function goPicks(tab) {
     if (typeof window.filterByCategory === 'function') window.filterByCategory('Picks');
     if (tab) window.camSectionTabs?.select?.(tab);
@@ -267,8 +281,8 @@
   }
   // Ficha de partido (13 nov 2026): cara a cara, como en las apps de resultados. Los dos
   // escudos grandes con su nombre, la hora en medio y debajo los círculos de la quiniela
-  // (1 · X · 2 en fútbol; uno por equipo en la NFL), solo decorativos: toda la ficha abre
-  // la quiniela. Sin puntos: siguen dentro de la quiniela.
+  // (1 · X · 2 en fútbol; 1 y 2 en la NFL), en colores suaves y decorativos: toda la ficha abre
+  // el partido en su quiniela. Sin puntos ni «Jugar»: los puntos siguen dentro de la quiniela.
   function kickoffParts(iso) {
     const text = dayLabel(iso);
     const cut = text.lastIndexOf(' · ');
@@ -298,12 +312,13 @@
     kick.append(el('span', time, 'cam-hj-kick-time'));
     face.append(teamSide(first), kick, teamSide(second));
     const marks = el('span', null, 'cam-hj-marks', { 'aria-hidden': 'true' });
-    for (const label of sport === 'nfl' ? ['', null, ''] : ['1', 'X', '2']) {
-      marks.append(label === null ? el('span', null, 'cam-hj-mark-gap') : el('span', label, 'cam-hj-choice'));
+    for (const label of sport === 'nfl' ? ['1', null, '2'] : ['1', 'X', '2']) {
+      marks.append(label === null ? el('span', null, 'cam-hj-mark-gap') : el('span', label, 'cam-hj-choice is-' + label.toLowerCase()));
     }
-    card.append(el('span', league, 'cam-hj-league'), face, marks, el('span', 'Jugar ›', 'cam-hj-cta'));
-    card.setAttribute('aria-label', league + ', ' + aria + ', ' + dayLabel(g.kickoff) + '. Jugar en la quiniela');
-    card.addEventListener('click', () => goQuiniela(sport));
+    card.append(el('span', league, 'cam-hj-league'), face, marks);
+    card.dataset.gameId = g.id;
+    card.setAttribute('aria-label', league + ', ' + aria + ', ' + dayLabel(g.kickoff) + '. Elegir en la quiniela');
+    card.addEventListener('click', () => goGame(g, sport));
     return card;
   }
   /* ---------- Evento especial: la Liguilla ---------- */
@@ -516,14 +531,12 @@
     return card;
   }
 
-  // Entre la Liguilla y los partidos: un filete dorado con una línea de texto.
+  // Entre la Liguilla y los partidos: dos rombos dorados y una línea de texto.
   // En el teléfono va de pie dentro del carrusel; en escritorio cruza la rejilla.
   function separator(text) {
     const sep = el('div', null, 'cam-hj-sep');
     const ornament = () => el('span', null, 'cam-hj-sep-diamond', { 'aria-hidden': 'true' });
-    sep.append(el('span', null, 'cam-hj-sep-line', { 'aria-hidden': 'true' }), ornament(),
-      el('p', text, 'cam-hj-sep-text'), el('span', '→', 'cam-hj-sep-arrow', { 'aria-hidden': 'true' }),
-      ornament(), el('span', null, 'cam-hj-sep-line', { 'aria-hidden': 'true' }));
+    sep.append(ornament(), el('p', text, 'cam-hj-sep-text'), el('span', '→', 'cam-hj-sep-arrow', { 'aria-hidden': 'true' }), ornament());
     return sep;
   }
 
@@ -541,7 +554,9 @@
     const view = eventView();
     if (view) cards.push(eventCard(view));
     if (view && upcoming.length) cards.push(separator('Participa en la quiniela de otras ligas'));
-    for (const g of upcoming) cards.push(gameCard(g, g.sport));
+    // Con la Liguilla abriendo el carrusel, el partido de Liga MX va al final.
+    const ordered = view ? upcoming.filter(g => g.competition !== 'ligamx').concat(upcoming.filter(g => g.competition === 'ligamx')) : upcoming;
+    for (const g of ordered) cards.push(gameCard(g, g.sport));
     if (view) rows.jornada.section.dataset.event = 'liguilla'; else delete rows.jornada.section.dataset.event;
     rows.jornada.section.dataset.nextSport = upcoming[0]?.sport || 'nfl';
     fill(rows.jornada, cards);
