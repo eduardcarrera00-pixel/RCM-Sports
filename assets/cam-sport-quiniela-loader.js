@@ -8,7 +8,7 @@
     nfl:{className:'ae-is-nfl',root:'camNflQuiniela',status:'camNflStatus',
       src:'cam-nfl-quiniela.js?v=20261113-week-actions-1'},
     football:{className:'ae-is-football',root:'camFootballQuiniela',status:'camFootballStatus',
-      src:'cam-football-quiniela.js?v=20261113-semana-marcador-1',
+      src:'cam-football-quiniela.js?v=20261113-login-after-groups-1',
       // La liguilla de la Liga MX vive dentro de la quiniela de fútbol y se carga después.
       extra:['cam-liguilla.js?v=20261112-clasifican-dropdown-1']}
   };
