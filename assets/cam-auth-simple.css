@@ -1,102 +1,115 @@
-/* Approved simple Greek access screen. Scoped to the existing account modal. */
+/* Approved terrace access screen. The first shared layer owns scoped important
+   geometry so global rounded controls cannot clip the logo, tabs or panel seams. */
+@layer cam-display-clarity {
 html body #userAuthModal {
-  --cam-access-paper:#0b2233;--cam-access-field:#112e41;--cam-access-ink:#f3ebdd;
+  --cam-access-paper:#0b2233;--cam-access-field:#0b2233;--cam-access-header:#0b2233;--cam-access-ink:#f3ebdd;
   --cam-access-muted:#a5b8c5;--cam-access-line:#385365;--cam-access-gold:#c6a173;
   --cam-access-action:#d0ad7f;
   font-family:Inter,system-ui,sans-serif!important;
 }
 html:not(.dark) body #userAuthModal {
-  --cam-access-paper:#f3ebdd;--cam-access-field:#fffaf2;--cam-access-ink:#18374c;
+  --cam-access-paper:#f3ebdd;--cam-access-field:#fbf5eb;--cam-access-header:#f3ebdd;--cam-access-ink:#18374c;
   --cam-access-muted:#586b79;--cam-access-line:#b3b8b5;--cam-access-gold:#89613f;
   --cam-access-action:#d0ad7f;
 }
 html body #userAuthModal:not(.hidden) {
   padding:16px!important;padding-top:max(16px,env(safe-area-inset-top))!important;
   padding-bottom:max(16px,env(safe-area-inset-bottom))!important;
-  align-items:center!important;background:rgba(4,14,24,.82)!important;
+  display:flex!important;align-items:center!important;background:rgba(4,14,24,.82)!important;
+  border-radius:0!important;
 }
 html body #userAuthModal .cam-access-shell {
-  position:relative;display:block;width:min(100%,460px);max-width:460px;
-  max-height:calc(100vh - 32px);max-height:calc(100dvh - 32px);
-  margin:auto;padding:0;border:1px solid #b79a76;border-radius:22px;
-  background:var(--cam-access-paper);color:var(--cam-access-ink);
-  overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;
-  box-shadow:0 20px 70px #0005;scrollbar-width:thin;scrollbar-color:#b79a76 transparent;
+  position:relative !important;display:block !important;width:min(100%,460px) !important;max-width:460px !important;
+  max-height:calc(100vh - 32px) !important;max-height:calc(100dvh - 32px) !important;
+  flex:0 1 460px !important;box-sizing:border-box!important;margin:auto !important;padding:0 !important;border:1px solid #b79a76 !important;border-radius:22px!important;
+  background:var(--cam-access-paper) !important;color:var(--cam-access-ink) !important;
+  overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior:contain !important;
+  box-shadow:0 20px 70px #0005 !important;scrollbar-width:thin !important;scrollbar-color:#b79a76 transparent !important;
 }
 html body #userAuthModal .cam-access-header {
-  position:relative;isolation:isolate;min-height:230px;padding:22px 24px 26px;
-  overflow:hidden;background:#0b2233;color:#f3ebdd;
+  position:relative !important;isolation:isolate !important;min-height:236px !important;padding:24px 24px 42px!important;border-radius:0!important;
+  border-bottom:1px solid var(--cam-access-line)!important;
+  overflow:hidden !important;background:var(--cam-access-header)!important;color:var(--cam-access-ink)!important;
 }
 html body #userAuthModal .cam-access-header::before {
-  content:"";position:absolute;inset:0;z-index:-1;
-  background:url('cam-auth-greek-simple.svg') right bottom/auto 100% no-repeat;
-  pointer-events:none;
+  content:"" !important;position:absolute !important;inset:0 !important;z-index:-1 !important;
+  background:url('cam-auth-terrace-night.svg') right bottom/100% 100% no-repeat !important;
+  border-radius:0!important;
+  pointer-events:none !important;
 }
-html body #userAuthModal .cam-access-brand {position:relative;width:92px;height:47px;overflow:hidden;}
+html body #userAuthModal .cam-access-brand {
+  position:relative !important;width:108px !important;height:auto !important;overflow:visible!important;border-radius:0!important;
+}
 html body #userAuthModal .cam-access-brand img {
-  display:block;position:absolute;width:148px!important;max-width:none!important;
-  height:auto!important;left:-28px;top:-30px;object-fit:contain;
+  display:block !important;position:static!important;width:108px!important;max-width:100%!important;
+  height:auto!important;aspect-ratio:1760/894 !important;object-fit:contain !important;filter:none !important;
+}
+html:not(.dark) body #userAuthModal .cam-access-brand img {
+  filter:brightness(0) saturate(100%) invert(17%) sepia(24%) saturate(1524%) hue-rotate(162deg) brightness(93%) contrast(94%) !important;
+}
+html:not(.dark) body #userAuthModal .cam-access-header::before {
+  background-image:url('cam-auth-terrace-day.svg') !important;
 }
 html body #userAuthModal .cam-access-header #camAuthTitle {
-  max-width:70%;margin:30px 0 9px!important;padding:0!important;
-  color:#f3ebdd!important;font-family:'Playfair Display',Georgia,serif!important;
-  font-size:34px!important;font-weight:600!important;line-height:1.12!important;
-  letter-spacing:-.025em!important;text-wrap:balance;text-shadow:none!important;
+  position:relative !important;max-width:68% !important;margin:24px 0 9px!important;padding:0!important;
+  color:var(--cam-access-ink)!important;font-family:'Playfair Display',Georgia,serif!important;
+  font-size:32px!important;font-weight:600!important;line-height:1.12!important;
+  letter-spacing:-.025em!important;text-wrap:balance !important;text-shadow:none!important;
 }
 html body #userAuthModal .cam-access-subtitle {
-  position:relative;margin:0;max-width:70%;color:#e2d9cc;
+  position:relative !important;margin:0 !important;max-width:68% !important;color:var(--cam-access-muted)!important;
   font:400 13px/1.5 Inter,system-ui,sans-serif!important;
 }
 html body #userAuthModal .cam-access-close {
-  position:absolute;top:14px;right:14px;width:44px;height:44px;display:grid;place-items:center;
-  padding:10px;border:0;border-radius:8px;background:transparent;color:#d1ad7e;
+  position:absolute !important;top:18px !important;right:18px !important;width:44px !important;height:44px !important;display:grid !important;place-items:center !important;
+  padding:12px !important;border:1px solid var(--cam-access-line)!important;border-radius:50%!important;background:transparent !important;color:var(--cam-access-ink)!important;
 }
-html body #userAuthModal .cam-access-close svg {width:21px;height:21px;}
+html body #userAuthModal .cam-access-close svg {width:21px !important;height:21px !important;}
 html body #userAuthModal #userAuthForm,
 html body #userAuthModal #authRecoveryResult {
-  display:block;min-width:0;margin:0!important;padding:0 24px 24px!important;
+  display:block !important;min-width:0 !important;margin:0!important;padding:0 24px 24px!important;
   background:transparent!important;color:var(--cam-access-ink)!important;
 }
 html body #userAuthModal #userAuthForm[hidden],
 html body #userAuthModal #authRecoveryResult[hidden],
 html body #userAuthModal [hidden] {display:none!important;}
 html body #userAuthModal .cam-access-tabs {
-  display:grid;grid-template-columns:1fr 1fr;gap:12px;border-bottom:1px solid var(--cam-access-line);
-  margin:0 0 24px;padding:8px 0 0;
+  display:grid !important;grid-template-columns:1fr 1fr !important;gap:0 !important;border-bottom:1px solid var(--cam-access-line) !important;
+  margin:0 0 24px !important;padding:0 !important;border-radius:0!important;
 }
 html body #userAuthModal .cam-access-tabs button {
-  min-height:52px;padding:13px 3px;margin:0;border:0;border-bottom:2px solid transparent;
-  border-radius:0;background:transparent;color:var(--cam-access-muted);
+  min-height:54px !important;padding:16px 3px 13px !important;margin:0 !important;border:0 !important;border-bottom:2px solid transparent !important;
+  border-radius:0!important;background:transparent !important;color:var(--cam-access-muted) !important;
   font:500 14px/1.4 Inter,system-ui,sans-serif!important;
 }
 html body #userAuthModal .cam-access-tabs button[aria-pressed="true"] {
-  color:var(--cam-access-ink);border-bottom-color:var(--cam-access-gold);font-weight:600!important;
+  color:var(--cam-access-ink) !important;border-bottom-color:var(--cam-access-gold) !important;font-weight:600!important;
 }
-html body #userAuthModal .cam-access-field {margin:0 0 20px;}
+html body #userAuthModal .cam-access-field {margin:0 0 18px !important;}
 html body #userAuthModal #userAuthForm label,
 html body #userAuthModal #authConfirmWrap,
 html body #userAuthModal #authCodeWrap {
-  display:block;margin:0 0 9px!important;color:var(--cam-access-ink)!important;
+  display:block !important;margin:0 0 9px!important;color:var(--cam-access-ink)!important;
   font:500 13px/1.5 Inter,system-ui,sans-serif!important;letter-spacing:0!important;text-transform:none!important;
 }
 html body #userAuthModal input:not([type=hidden]) {
-  display:block;width:100%!important;min-width:0!important;min-height:49px!important;
+  display:block !important;width:100%!important;min-width:0!important;min-height:49px!important;
   padding:12px 14px!important;margin:0!important;border:1px solid var(--cam-access-line)!important;
   border-radius:9px!important;background:var(--cam-access-field)!important;color:var(--cam-access-ink)!important;
   font:400 16px/1.5 Inter,system-ui,sans-serif!important;box-shadow:none!important;
 }
-html body #userAuthModal input::placeholder {color:var(--cam-access-muted)!important;opacity:1;}
-html body #userAuthModal .cam-access-password {position:relative;}
+html body #userAuthModal input::placeholder {color:var(--cam-access-muted)!important;opacity:1 !important;}
+html body #userAuthModal .cam-access-password {position:relative !important;}
 html body #userAuthModal #userAuthPassword {padding-right:54px!important;}
 html body #userAuthModal #authShowPassword {
-  position:absolute;right:3px;top:3px;display:grid!important;place-items:center;
-  width:44px!important;min-height:44px!important;height:44px;margin:0!important;padding:10px!important;
+  position:absolute !important;right:3px !important;top:3px !important;display:grid!important;place-items:center !important;
+  width:44px!important;min-height:44px!important;height:44px !important;margin:0!important;padding:10px!important;
   border:0!important;border-radius:7px!important;background:transparent!important;
   color:var(--cam-access-muted)!important;text-decoration:none!important;
 }
-html body #userAuthModal #authShowPassword svg {width:21px;height:21px;}
-html body #userAuthModal #authShowPassword .cam-access-eye-slash {display:none;}
-html body #userAuthModal #authShowPassword[aria-pressed="true"] .cam-access-eye-slash {display:block;}
+html body #userAuthModal #authShowPassword svg {width:21px !important;height:21px !important;}
+html body #userAuthModal #authShowPassword .cam-access-eye-slash {display:none !important;}
+html body #userAuthModal #authShowPassword[aria-pressed="true"] .cam-access-eye-slash {display:block !important;}
 html body #userAuthModal #authConfirmWrap,
 html body #userAuthModal #authCodeWrap {margin:0 0 20px!important;}
 html body #userAuthModal #authModeHelp {
@@ -104,33 +117,33 @@ html body #userAuthModal #authModeHelp {
   font:400 11.5px/1.6 Inter,system-ui,sans-serif!important;
 }
 html body #userAuthModal #aeAuthPublishHint {
-  margin:0 0 18px;color:var(--cam-access-ink);font:500 12px/1.6 Inter,system-ui,sans-serif!important;
+  margin:0 0 18px !important;color:var(--cam-access-ink) !important;font:500 12px/1.6 Inter,system-ui,sans-serif!important;
 }
 html body #userAuthModal #userAuthError:not(.hidden) {
   margin:0 0 18px!important;border-radius:9px!important;
 }
 html body #userAuthModal #authSubmit {
-  display:block;width:100%;min-height:51px;padding:12px 15px;margin:0;
+  display:block !important;width:100% !important;min-height:51px !important;padding:12px 15px !important;margin:0 !important;
   border:0!important;border-radius:10px!important;background:var(--cam-access-action)!important;
   color:#0b2233!important;font:600 18px/1.4 'Playfair Display',Georgia,serif!important;
   box-shadow:none!important;
 }
-html body #userAuthModal .cam-access-recovery {border-top:1px solid var(--cam-access-line);margin-top:24px;padding-top:10px;}
+html body #userAuthModal .cam-access-recovery {border-top:1px solid var(--cam-access-line) !important;margin-top:24px !important;padding-top:10px !important;}
 html body #userAuthModal .cam-access-recovery summary {
-  display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px;
-  list-style:none;cursor:pointer;color:var(--cam-access-ink);font:400 12px/1.5 Inter,system-ui,sans-serif!important;
+  display:flex !important;align-items:center !important;justify-content:space-between !important;gap:12px !important;min-height:44px !important;
+  list-style:none !important;cursor:pointer !important;color:var(--cam-access-ink) !important;font:400 12px/1.5 Inter,system-ui,sans-serif!important;
 }
-html body #userAuthModal .cam-access-recovery summary::-webkit-details-marker {display:none;}
-html body #userAuthModal .cam-access-recovery summary svg {width:17px;height:17px;color:var(--cam-access-gold);flex:none;}
-html body #userAuthModal .cam-access-recovery[open] summary svg {transform:rotate(180deg);}
-html body #userAuthModal .cam-access-recovery-actions {display:grid;gap:8px;padding-top:10px;}
+html body #userAuthModal .cam-access-recovery summary::-webkit-details-marker {display:none !important;}
+html body #userAuthModal .cam-access-recovery summary svg {width:17px !important;height:17px !important;color:var(--cam-access-gold) !important;flex:none !important;}
+html body #userAuthModal .cam-access-recovery[open] summary svg {transform:rotate(180deg) !important;}
+html body #userAuthModal .cam-access-recovery-actions {display:grid !important;gap:8px !important;padding-top:10px !important;}
 html body #userAuthModal .cam-access-recovery-actions button,
 html body #userAuthModal .cam-access-back {
-  display:block;min-height:44px;width:100%;padding:10px 12px;margin:0;
-  border:1px solid var(--cam-access-line);border-radius:8px;background:transparent;
-  color:var(--cam-access-ink);font:400 12px/1.5 Inter,system-ui,sans-serif!important;
+  display:block !important;min-height:44px !important;width:100% !important;padding:10px 12px !important;margin:0 !important;
+  border:1px solid var(--cam-access-line) !important;border-radius:8px !important;background:transparent !important;
+  color:var(--cam-access-ink) !important;font:400 12px/1.5 Inter,system-ui,sans-serif!important;
 }
-html body #userAuthModal .cam-access-back {margin-top:16px;}
+html body #userAuthModal .cam-access-back {margin-top:16px !important;}
 html body #userAuthModal #authRecoveryResult {padding-top:22px!important;}
 html body #userAuthModal #authRecoveryResult h2 {
   color:var(--cam-access-ink)!important;font:600 25px/1.25 'Playfair Display',Georgia,serif!important;
@@ -154,12 +167,35 @@ html body #userAuthModal input:focus-visible {
 }
 @media(max-width:370px) {
   html body #userAuthModal:not(.hidden) {padding:8px!important;}
-  html body #userAuthModal .cam-access-shell {max-height:calc(100dvh - 16px);}
-  html body #userAuthModal .cam-access-header {padding-left:20px;padding-right:20px;}
+  html body #userAuthModal .cam-access-shell {max-height:calc(100dvh - 16px) !important;}
+  html body #userAuthModal .cam-access-header {padding-left:20px !important;padding-right:20px !important;}
   html body #userAuthModal #userAuthForm,
   html body #userAuthModal #authRecoveryResult {padding-left:20px!important;padding-right:20px!important;}
 }
 @media(max-height:650px) {
-  html body #userAuthModal .cam-access-header {min-height:190px;padding-top:16px;padding-bottom:18px;}
+  html body #userAuthModal .cam-access-header {min-height:202px !important;padding-top:16px!important;padding-bottom:34px!important;}
   html body #userAuthModal .cam-access-header #camAuthTitle {margin-top:15px!important;font-size:29px!important;}
+}
+
+/* Only the outer shell and actual controls have curved edges. Keep wrappers,
+   the backdrop and the header/form join straight even under shared page rules. */
+html body #userAuthModal :is(.cam-access-body,.cam-access-form,.cam-access-field,
+  .cam-access-password,.cam-access-recovery,.cam-access-recovery-actions,
+  .cam-access-tabs,#authRecoveryResult,summary,label) {border-radius:0!important;}
+html body #userAuthModal .cam-access-body {background:var(--cam-access-paper)!important;}
+html body #userAuthModal :is(button,input,label,p,summary) {font-family:Inter,system-ui,sans-serif!important;}
+html body #userAuthModal #authSubmit {font-family:'Playfair Display',Georgia,serif!important;}
+html body #userAuthModal .cam-access-tabs button {border-radius:0!important;box-shadow:none!important;}
+html body #userAuthModal .cam-access-recovery {border-radius:0!important;}
+html body #userAuthModal :is(input,button) {box-sizing:border-box!important;}
+html body #userAuthModal #userAuthError {overflow-wrap:anywhere !important;}
+html body #userAuthModal .cam-access-shell {max-height:calc(100dvh - max(16px,env(safe-area-inset-top)) - max(16px,env(safe-area-inset-bottom))) !important;}
+@media(max-width:370px) {
+  html body #userAuthModal .cam-access-shell {max-height:calc(100dvh - max(8px,env(safe-area-inset-top)) - max(8px,env(safe-area-inset-bottom))) !important;}
+  html body #userAuthModal:not(.hidden) {padding-top:max(8px,env(safe-area-inset-top))!important;padding-bottom:max(8px,env(safe-area-inset-bottom))!important;}
+  html body #userAuthModal .cam-access-header #camAuthTitle {font-size:29px!important;}
+}
+html:not(.dark) body #userAuthModal:not(.hidden) {background:rgba(21,39,53,.52)!important;}
+/* Hidden account states outrank their own field/layout rules in this layer. */
+html body #userAuthModal :is(#userAuthForm,#authRecoveryResult,#authConfirmWrap,#authCodeWrap,#camAuthBackToLogin,[hidden])[hidden] {display:none!important;}
 }
