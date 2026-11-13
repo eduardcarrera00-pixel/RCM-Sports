@@ -269,6 +269,18 @@
     if (article && typeof renderArticleInteractions === 'function') {
       const actions = el('div', null, 'cam-actualidad-news-actions');
       actions.innerHTML = renderArticleInteractions(article);
+      // «Responder», a la derecha y con el mismo estilo: abre la noticia con la caja de comentario.
+      const group = actions.querySelector('.cam-news-interactions');
+      if (group && typeof openArticleComments === 'function') {
+        const reply = el('button', null, 'cam-news-interaction cam-news-reply');
+        reply.type = 'button';
+        reply.title = 'Responder';
+        reply.setAttribute('aria-label', 'Responder a «' + o.title + '»');
+        const icon = el('i', null, 'fa-solid fa-reply'); icon.setAttribute('aria-hidden', 'true');
+        reply.append(icon, el('span', 'Responder'));
+        reply.addEventListener('click', e => openArticleComments(article.id, e));
+        group.append(reply);
+      }
       a.append(actions);
     }
     return a;

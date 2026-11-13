@@ -203,3 +203,81 @@ html body.ae-is-opinions #mainContent #aeOpinions #aeOpinionsList.cam-act-approv
 html body.ae-is-opinions #mainContent #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-rail .ae-opinion-open { display:grid!important; grid-template-rows:108px minmax(0,1fr)!important; }
 html body.ae-is-opinions #mainContent #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-rail .ae-opinion-text { min-height:0!important; overflow:hidden!important; }
 }
+
+/* 13 nov (tarde) · Actualidad en todas las pestañas.
+   1) Opinadores distinguidos a todo el ancho: los paneles de Inicio traen
+      align-items:start (pensado para la antigua rejilla) y, en esta columna
+      flexible, encogían las tarjetas a 0 px (texto en vertical, letra a letra).
+   2) La portada y las tarjetas del carrusel no guardan huecos para líneas que
+      no existen: el texto ocupa lo que mide y la imagen llena el resto, así la
+      tarjeta conserva el tamaño de la de Fútbol aunque haya poco texto.
+   3) «Responder», pequeño, a la derecha de me gusta y comentarios. */
+@layer cam-display-clarity {
+html body.ae-is-opinions #mainContent #aeOpinions > #aeOpinionsHighlights,
+html body.ae-is-opinions #mainContent #aeOpinions .ae-opinions-highlight-grid { align-items:stretch!important; }
+html body.ae-is-opinions #mainContent #aeOpinions .ae-opinions-highlight-slot,
+html body.ae-is-opinions #mainContent #aeOpinions .ae-opinions-highlight-slot > .editorial-community { width:100%!important; min-width:0!important; max-width:100%!important; }
+/* Una tarjeta a todo el ancho; «Ver más comentarios» abre las demás debajo (no de lado,
+   porque la vista previa ya no desliza y se saldrían de la pantalla). */
+html body.ae-is-opinions #mainContent #aeOpinions #communityLeaders .ae-community-scroll-viewport { flex-direction:column!important; gap:12px!important; overflow:visible!important; }
+html body.ae-is-opinions #mainContent #aeOpinions #communityLeaders .ae-community-scroll-entry { flex:none!important; width:100%!important; max-width:100%!important; box-sizing:border-box!important; }
+html body.ae-is-opinions #mainContent #aeOpinions #communityLeaders .ae-community-story-link { display:block!important; }
+html body.ae-is-opinions #mainContent #aeOpinions #communityLeaders .ae-community-story-link::before { content:"En "!important; white-space:pre!important; }
+html body.ae-is-opinions #mainContent #aeOpinions #communityLeaders .ae-community-story-link::after { content:" ↗"!important; white-space:pre!important; }
+
+/* Portada: imagen arriba (crece si sobra sitio), texto justo debajo, acciones al pie. */
+html body.ae-is-opinions #mainContent #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero {
+  display:flex!important; flex-direction:column!important;
+}
+html body.ae-is-opinions #mainContent #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero > .ae-opinion-open {
+  display:flex!important; flex-direction:column!important; flex:1 1 auto!important;
+}
+html body.ae-is-opinions #mainContent #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero .ae-opinion-media {
+  position:relative!important; inset:auto!important; flex:1 0 165px!important; height:auto!important; min-height:165px!important;
+}
+html body.ae-is-opinions #mainContent #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero .ae-opinion-media img {
+  position:absolute!important; inset:0!important;
+}
+html body.ae-is-opinions #mainContent #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero .ae-opinion-text {
+  flex:none!important; margin:-40px 0 0!important; padding:0 18px 12px!important;
+}
+html body.ae-is-opinions #mainContent #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero .ae-opinion-title {
+  height:auto!important; min-height:0!important; max-height:80.64px!important;
+}
+html body.ae-is-opinions #mainContent #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero .ae-opinion-excerpt {
+  height:auto!important; min-height:0!important; max-height:58.5px!important;
+}
+html body.ae-is-opinions #mainContent #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero > .cam-actualidad-news-actions { flex:0 0 44px!important; }
+/* Mismo alto que la portada de Fútbol (medida por cam-actualidad-simetria.js, nunca sobre la propia referencia). */
+html body.ae-is-opinions #mainContent #aeOpinions.cam-act-symmetric:not([data-cam-actualidad="futbol"]) #aeOpinionsList.cam-act-approved .cam-act-approved-hero {
+  min-height:var(--cam-sym-hero,0px)!important;
+}
+
+/* Carrusel: el título usa solo las líneas que tiene; la imagen absorbe el resto. */
+html body.ae-is-opinions #mainContent #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-rail .ae-opinion-open {
+  grid-template-rows:minmax(108px,1fr) auto!important;
+}
+html body.ae-is-opinions #mainContent #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-rail .ae-opinion-media {
+  position:relative!important; height:auto!important; min-height:108px!important;
+}
+html body.ae-is-opinions #mainContent #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-rail .ae-opinion-media img {
+  position:absolute!important; inset:0!important;
+}
+html body.ae-is-opinions #mainContent #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-rail .ae-opinion-title {
+  /* Exactamente dos líneas (18px × 1.17): sin asomar el borde de la tercera bajo los puntos suspensivos. */
+  height:auto!important; min-height:0!important; max-height:2.34em!important;
+}
+
+/* Sin publicaciones (p. ej. Colegial): el nombre del deporte, centrado en el hueco de la imagen. */
+html body.ae-is-opinions #mainContent #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-rail .cam-sym-empty-media { display:flex!important; align-items:center!important; justify-content:center!important; }
+
+/* Lo más debatido: con pocos debates la lista no deja un hueco vacío. */
+html body.ae-is-opinions #mainContent #aeOpinions.cam-act-symmetric:not([data-cam-actualidad="futbol"]) #aeOpinionsDebatedContent {
+  height:auto!important; min-height:0!important; max-height:var(--cam-sym-debates)!important;
+}
+
+/* «Responder»: mismo estilo que me gusta y comentarios, alineado a la derecha. */
+html body.ae-is-opinions #mainContent #aeOpinions #aeOpinionsList .cam-actualidad-news-actions .cam-news-interactions { width:auto!important; }
+html body.ae-is-opinions #mainContent #aeOpinions #aeOpinionsList .cam-actualidad-news-actions .cam-news-reply { margin:0 0 0 auto!important; }
+html body.ae-is-opinions #mainContent #aeOpinions #aeOpinionsList .cam-actualidad-news-actions .cam-news-reply i { font-size:12px!important; }
+}
