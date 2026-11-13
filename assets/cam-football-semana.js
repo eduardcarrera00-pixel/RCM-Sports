@@ -440,10 +440,12 @@
     root.classList.toggle('cam-fs-duelo',nflFormat);
     const head=el('header',null,'cam-ns-head');head.append(el('h2','La semana','cam-ns-title',{id:'camFootballSemanaTitle'}));
     if(nflFormat)head.append(el('span',null,'cam-ns-rule',{'aria-hidden':'true'}));
-    // El selector cierra La semana, debajo del cuadro de acceso.
+    // Los mismos cuatro botones abren y cierran La semana.
+    if(api)head.append(api.competitionNav());
+    // Segundo selector debajo del cuadro de acceso.
     const leagueFooter=document.getElementById('camFootballWeekLeagues');
     if(leagueFooter)leagueFooter.replaceChildren(...(api?[api.competitionNav()]:[]));
-    // Un solo selector visible; la quiniela no repite el suyo.
+    // La quiniela no añade un tercer selector.
     root.classList.toggle('has-competition-nav',!!api);
     const fragment=document.createDocumentFragment();fragment.append(head);
     // El evento de Liga MX pertenece a La semana; comparte datos con la quiniela.
