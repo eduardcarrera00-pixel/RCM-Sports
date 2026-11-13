@@ -470,7 +470,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
     </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
-<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261112-chef-timeline-2">
+<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261113-actualidad-compacta-1">
 <style id="cam-liguilla-week-styles">
 /* Integración de la Liguilla en Fútbol → La semana. Un solo recuadro, «Arma tu cuadro»:
    primero «mis 8» y después el cuadro con puntos (estilos en assets/cam-liguilla.css). */
@@ -3024,6 +3024,14 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
           <div id="aeOpinionsTabs" class="ae-opinions-tabs" role="tablist" aria-label="Actualidad por deporte"></div>
           <p id="aeOpinionsStatus" class="ae-opinions-status" role="status" aria-live="polite"></p>
           <div id="aeOpinionsList" class="ae-opinions-list" role="tabpanel" aria-labelledby="aeOpinionsHeading"></div>
+          <section id="aeOpinionsSports" class="ae-opinions-sports" aria-label="Actualidad por deporte"></section>
+          <section id="aeOpinionsDebated" class="ae-opinions-debated" aria-labelledby="aeOpinionsDebatedHeading">
+            <header class="ae-opinions-section-head" data-cam-opinions-banner="debated">
+              <h3 id="aeOpinionsDebatedHeading">Lo más debatido</h3>
+              <p>Takes públicos con respuestas verificadas. Abre cada conversación para participar.</p>
+            </header>
+            <div id="aeOpinionsDebatedContent" class="ae-opinions-debated-list" aria-live="polite"></div>
+          </section>
           <!-- Reutilizar los paneles originales de Home (no crear rankings alternativos). -->
           <section id="aeOpinionsHighlights" class="ae-opinions-highlights" aria-labelledby="aeOpinionsDistinguishedHeading">
             <header class="ae-opinions-section-head" data-cam-opinions-banner="distinguished">
@@ -3035,14 +3043,6 @@ html:not(.dark) body #footballTakes #communityPicks .ae-chefs-dual-standings ol.
               <aside id="aeOpinionsTrendingSlot" class="ae-opinions-highlight-slot" aria-label="Lo más leído"></aside>
             </div>
           </section>
-          <section id="aeOpinionsDebated" class="ae-opinions-debated" aria-labelledby="aeOpinionsDebatedHeading">
-            <header class="ae-opinions-section-head" data-cam-opinions-banner="debated">
-              <h3 id="aeOpinionsDebatedHeading">Lo más debatido</h3>
-              <p>Takes públicos con respuestas verificadas. Abre cada conversación para participar.</p>
-            </header>
-            <div id="aeOpinionsDebatedContent" class="ae-opinions-debated-list" aria-live="polite"></div>
-          </section>
-          <section id="aeOpinionsSports" class="ae-opinions-sports" aria-label="Actualidad por deporte"></section>
         </section>
         <section id="heroSection" aria-label="Portada editorial"></section>
         <div class="editorial-layout grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -6640,7 +6640,8 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 <script src="assets/cam-parties.js?v=20261111-escudo-rango-1"></script>
 <script src="assets/cam-sport-quiniela-loader.js?v=20261112-clasifican-dropdown-1"></script>
 <script src="assets/ae-season-predictions.js?v=20261021-champion-guide-1"></script>
-<script src="assets/cam-lazy-editorial-loader.js?v=20261112-blended-carousel-2"></script>
+<script src="assets/cam-actualidad-simetria.js?v=20261113-simetria-1"></script>
+<script src="assets/cam-lazy-editorial-loader.js?v=20261113-simetria-1"></script>
 <script src="assets/cam-opinions-section-banners.js?v=20261104-actualidad-1"></script>
 <script src="assets/cam-community-proof.js?v=20261111-news-community-1"></script>
 <script src="assets/ae-home-takes.js?v=20261111-escudo-rango-1"></script>

@@ -1,0 +1,205 @@
+/* Shared approved Actualidad composition. */
+@layer cam-display-clarity{
+
+#aeOpinions #aeOpinionsList.cam-act-approved{display:flex!important;flex-direction:column!important;gap:20px!important;min-width:0}
+html body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero{position:relative!important;isolation:isolate;overflow:hidden!important;border-radius:22px!important;background:var(--op-panel)!important;border:1px solid var(--op-line)!important;box-shadow:0 18px 44px -30px #0009!important;transform:none!important}
+html body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-glow{position:absolute;z-index:-1;inset:-30px;width:calc(100% + 60px);height:calc(100% + 60px);object-fit:cover;filter:blur(30px);opacity:.22;pointer-events:none}
+html body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero>.ae-opinion-open{display:block!important;position:relative!important;height:auto!important}
+html body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero .ae-opinion-media{position:absolute!important;inset:0 0 auto!important;width:100%!important;height:222px!important;min-height:0!important;aspect-ratio:auto!important;mask-image:linear-gradient(#000 0%,#000 56%,transparent 100%);-webkit-mask-image:linear-gradient(#000 0%,#000 56%,transparent 100%);background:transparent!important}
+html body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero .ae-opinion-media img{width:100%!important;height:100%!important;object-fit:cover!important}
+html body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero .ae-opinion-text{position:relative!important;display:flex!important;flex-direction:column!important;margin:0!important;padding:170px 21px 20px!important;gap:11px!important;background:none!important}
+html body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero .ae-opinion-title{font-size:29px!important;line-height:1.1!important;display:block!important;overflow:visible!important}
+html body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero .ae-opinion-excerpt{display:block!important;font-size:13.5px!important;line-height:1.6!important;overflow:visible!important;max-height:none!important;margin:0!important}
+html body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero .ae-opinion-author{margin:0!important;padding:0!important;font-size:10px!important}
+html body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero .ae-opinion-meta{font-size:10px!important}
+html body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero .cam-actualidad-news-actions{position:relative!important;padding:0 21px 15px!important;background:none!important}
+html body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-rail{display:flex!important;gap:12px!important;overflow-x:auto!important;min-width:0!important;width:100%!important;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;scrollbar-width:thin;padding:0 0 8px!important}
+html body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-rail>.ae-opinion-card{display:flex!important;flex-direction:column!important;flex:0 0 246px!important;width:246px!important;min-width:0!important;max-width:none!important;scroll-snap-align:start;border-radius:16px!important;overflow:hidden!important;margin:0!important;transform:none!important}
+html body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-rail .ae-opinion-open{display:flex!important;flex-direction:column!important;height:auto!important;flex:1!important;gap:0!important;padding:0!important}
+html body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-rail .ae-opinion-media{display:block!important;width:100%!important;height:108px!important;min-height:0!important;aspect-ratio:auto!important;margin:0!important;flex:none!important}
+html body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-rail .ae-opinion-text{display:flex!important;flex-direction:column!important;gap:8px!important;padding:13px 14px 12px!important;min-width:0!important;flex:1!important}
+html body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-rail .ae-opinion-title{font-size:19px!important;line-height:1.17!important;display:block!important;overflow:visible!important;margin:0!important}
+html body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-rail .ae-opinion-excerpt{display:-webkit-box!important;-webkit-line-clamp:2!important;-webkit-box-orient:vertical!important;overflow:hidden!important;font-size:12px!important;line-height:1.5!important;margin:0!important;max-height:3em!important}
+html body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-rail .ae-opinion-meta{font-size:9px!important;gap:4px 8px!important}
+html body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-rail .ae-opinion-sport{font-size:9px!important}
+html body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-rail .ae-opinion-author{font-size:9px!important;margin-top:auto!important;padding:2px 0 0!important}
+html body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-rail .cam-actualidad-news-actions{padding:0 14px 12px!important;background:none!important}
+html body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved :is(.ae-opinion-read,.ae-opinion-flag){display:none!important}
+@media(min-width:760px){
+html body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero .ae-opinion-open{min-height:355px!important}
+html body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero .ae-opinion-media{width:60%!important;height:100%!important;mask-image:linear-gradient(90deg,#000 30%,transparent 100%);-webkit-mask-image:linear-gradient(90deg,#000 30%,transparent 100%)}
+html body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero .ae-opinion-media img{object-fit:contain!important}
+html body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero .ae-opinion-text{margin-left:48%!important;padding:35px 30px!important;min-height:355px!important;justify-content:center!important}
+html body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero .ae-opinion-title{font-size:35px!important}
+html body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero .ae-opinion-excerpt{font-size:15px!important}
+html body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-rail>.ae-opinion-card{flex-basis:270px!important;width:270px!important}
+}
+html body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero .ae-opinion-excerpt{-webkit-line-clamp:unset!important;max-height:none!important;text-overflow:clip!important;white-space:normal!important}
+
+}
+/* All Actualidad filters share Football's approved lead and horizontal story rail.
+   Keep the three closing modules in reading order at every width. */
+@layer cam-display-clarity {
+html body.ae-is-opinions #mainContent #aeOpinions:not([hidden]) {
+  display:flex!important; flex-direction:column!important;
+  gap:32px!important; max-width:1050px!important; width:100%!important; align-items:stretch!important;
+}
+html body.ae-is-opinions #mainContent #aeOpinions > :is(#aeOpinionsTabs,#aeOpinionsStatus,#aeOpinionsList,#aeOpinionsDebated,#aeOpinionsHighlights) { width:100%!important; min-width:0!important; box-sizing:border-box!important; }
+html body.ae-is-opinions #mainContent #aeOpinions > #aeOpinionsTabs { order:0!important; margin-bottom:0!important; }
+html body.ae-is-opinions #mainContent #aeOpinions > #aeOpinionsStatus { order:0!important; margin:0!important; }
+html body.ae-is-opinions #mainContent #aeOpinions > #aeOpinionsStatus:empty { display:none!important; }
+html body.ae-is-opinions #mainContent #aeOpinions > #aeOpinionsList { order:1!important; margin:0!important; }
+/* The category tabs already provide the sport index. Keep all filters on the same sequence. */
+html body.ae-is-opinions #mainContent #aeOpinions > #aeOpinionsSports { display:none!important; }
+html body.ae-is-opinions #mainContent #aeOpinions > #aeOpinionsSports:empty { display:none!important; }
+html body.ae-is-opinions #mainContent #aeOpinions > #aeOpinionsDebated { order:3!important; margin:0!important; }
+html body.ae-is-opinions #mainContent #aeOpinions > #aeOpinionsHighlights {
+  order:4!important; display:flex!important; flex-direction:column!important;
+  gap:20px!important; margin:0!important; padding:0!important;
+  border:0!important; border-radius:0!important; background:none!important;
+}
+html body.ae-is-opinions #mainContent #aeOpinions .ae-opinions-highlight-grid {
+  display:flex!important; flex-direction:column!important; gap:32px!important;
+}
+html body.ae-is-opinions #mainContent #aeOpinions #aeOpinionsCommunitySlot { order:0!important; }
+html body.ae-is-opinions #mainContent #aeOpinions #aeOpinionsTrendingSlot { order:1!important; }
+html body.ae-is-opinions #mainContent #aeOpinions .cam-act-approved-hero .ae-opinion-meta { order:0!important; }
+html body.ae-is-opinions #mainContent #aeOpinions .cam-act-approved-hero .ae-opinion-title { order:1!important; }
+html body.ae-is-opinions #mainContent #aeOpinions .cam-act-approved-hero .ae-opinion-excerpt { order:2!important; }
+html body.ae-is-opinions #mainContent #aeOpinions .cam-act-approved-hero .ae-opinion-author { order:3!important; }
+/* Reserve consistent image and text spaces in the secondary cards. */
+html body.ae-is-opinions #mainContent #aeOpinions .cam-act-approved-rail .ae-opinion-title {
+  display:-webkit-box!important; -webkit-box-orient:vertical!important;
+  -webkit-line-clamp:4!important; overflow:hidden!important;
+}
+html body.ae-is-opinions #mainContent #aeOpinions .cam-act-approved-rail .ae-opinion-text { justify-content:flex-start!important; }
+html body.ae-is-opinions #mainContent #aeOpinions .cam-act-approved-rail .ae-opinion-excerpt { margin-top:2px!important; }
+html body.ae-is-opinions #mainContent #aeOpinions .cam-act-approved-rail .cam-actualidad-news-actions { margin-top:auto!important; }
+@media(min-width:761px) {
+  html body.ae-is-opinions #mainContent #aeOpinions #communityLeaders { display:grid!important; grid-template-columns:repeat(2,minmax(0,1fr))!important; gap:20px!important; }
+}
+}
+
+@layer cam-display-clarity {
+@media(max-width:759px) {
+html body.ae-is-opinions #mainContent #aeOpinions .cam-act-approved-hero > .ae-opinion-open { min-height:0!important; align-content:normal!important; }
+}
+}
+
+@layer cam-display-clarity {
+/* The approved blended lead uses the active theme's text, including day mode. */
+html body.ae-is-opinions #mainContent #aeOpinions .cam-act-approved-hero .ae-opinion-title {
+  color:var(--act-ink,#273b49)!important; text-shadow:none!important;
+}
+html body.ae-is-opinions #mainContent #aeOpinions .cam-act-approved-hero :is(.ae-opinion-excerpt,.ae-opinion-author,.ae-opinion-meta) {
+  color:var(--act-muted,#566876)!important; text-shadow:none!important;
+}
+}
+
+/* Symmetry is geometric, not just a common card style. Football is the ruler. */
+@layer cam-display-clarity {
+html body.ae-is-opinions #mainContent #aeOpinions #aeOpinionsList { position:relative!important; }
+html body.ae-is-opinions #mainContent #aeOpinions .cam-sym-reference {
+  position:absolute!important; left:0!important; top:0!important; width:100%!important;
+  display:flex!important; flex-direction:column!important; gap:20px!important;
+  visibility:hidden!important; pointer-events:none!important;
+}
+html body.ae-is-opinions #mainContent #aeOpinions.cam-act-symmetric:not([data-cam-actualidad="futbol"]) .cam-act-approved-hero {
+  height:var(--cam-sym-hero)!important; min-height:var(--cam-sym-hero)!important;
+}
+html body.ae-is-opinions #mainContent #aeOpinions.cam-act-symmetric:not([data-cam-actualidad="futbol"]) .cam-act-approved-hero > .ae-opinion-open {
+  height:var(--cam-sym-open)!important; min-height:var(--cam-sym-open)!important; align-content:normal!important;
+}
+html body.ae-is-opinions #mainContent #aeOpinions.cam-act-symmetric:not([data-cam-actualidad="futbol"]) .cam-act-approved-hero .ae-opinion-text {
+  height:var(--cam-sym-text)!important; min-height:var(--cam-sym-text)!important; justify-content:flex-start!important;
+}
+html body.ae-is-opinions #mainContent #aeOpinions.cam-act-symmetric:not([data-cam-actualidad="futbol"]) .cam-act-approved-hero .ae-opinion-title {
+  height:var(--cam-sym-title)!important; min-height:var(--cam-sym-title)!important; max-height:var(--cam-sym-title)!important;
+  flex-shrink:0!important; display:-webkit-box!important; -webkit-box-orient:vertical!important;
+  -webkit-line-clamp:var(--cam-sym-title-lines)!important; overflow:hidden!important;
+}
+html body.ae-is-opinions #mainContent #aeOpinions.cam-act-symmetric:not([data-cam-actualidad="futbol"]) .cam-act-approved-hero .ae-opinion-excerpt {
+  max-height:var(--cam-sym-excerpt)!important; display:-webkit-box!important;
+  -webkit-box-orient:vertical!important; -webkit-line-clamp:var(--cam-sym-excerpt-lines)!important; overflow:hidden!important;
+}
+html body.ae-is-opinions #mainContent #aeOpinions.cam-act-symmetric:not([data-cam-actualidad="futbol"]) .cam-act-approved-hero .ae-opinion-author {
+  position:absolute!important; bottom:20px!important;
+}
+html body.ae-is-opinions #mainContent #aeOpinions.cam-act-symmetric:not([data-cam-actualidad="futbol"]) .cam-act-approved-hero .cam-actualidad-news-actions {
+  height:var(--cam-sym-footer)!important; min-height:var(--cam-sym-footer)!important; box-sizing:border-box!important;
+}
+html body.ae-is-opinions #mainContent #aeOpinions.cam-act-symmetric:not([data-cam-actualidad="futbol"]) .cam-act-approved-rail {
+  height:var(--cam-sym-rail)!important; min-height:var(--cam-sym-rail)!important; align-items:stretch!important;
+}
+html body.ae-is-opinions #mainContent #aeOpinions.cam-act-symmetric:not([data-cam-actualidad="futbol"]) .cam-act-approved-rail .ae-opinion-title {
+  height:var(--cam-sym-rail-title)!important; min-height:var(--cam-sym-rail-title)!important; max-height:var(--cam-sym-rail-title)!important;
+  -webkit-line-clamp:var(--cam-sym-rail-title-lines)!important; flex-shrink:0!important;
+}
+html body.ae-is-opinions #mainContent #aeOpinions.cam-act-symmetric:not([data-cam-actualidad="futbol"]) #aeOpinionsDebatedContent {
+  height:var(--cam-sym-debates)!important; min-height:var(--cam-sym-debates)!important;
+  overflow-y:auto!important; overscroll-behavior-y:contain; scrollbar-width:thin;
+}
+html body.ae-is-opinions #mainContent #aeOpinions .cam-sym-empty-media {
+  display:flex!important; align-items:center!important; justify-content:center!important;
+  color:var(--act-bronze)!important; background:var(--act-soft)!important;
+  font:600 24px/1.2 Georgia,serif!important; letter-spacing:.03em;
+}
+html body.ae-is-opinions #mainContent #aeOpinions .is-sym-empty .cam-sym-empty-actions { visibility:hidden!important; }
+html body.ae-is-opinions #mainContent #aeOpinions .cam-sym-empty-rail .ae-opinion-card {
+  border:1px dashed var(--act-line)!important; background:var(--act-surface)!important;
+}
+html body.ae-is-opinions #mainContent #aeOpinions .ae-opinions-empty[hidden] { display:none!important; }
+}
+
+/* Compact cover and a separate, stable action row in every card. */
+@layer cam-display-clarity {
+html body.ae-is-opinions #mainContent #aeOpinions #aeOpinionsList.cam-act-approved .ae-opinion-author { display:none!important; }
+html body.ae-is-opinions #mainContent #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero {
+  height:auto!important; min-height:0!important;
+}
+html body.ae-is-opinions #mainContent #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero > .ae-opinion-open {
+  height:auto!important; min-height:0!important; align-content:normal!important;
+}
+html body.ae-is-opinions #mainContent #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero .ae-opinion-media {
+  height:165px!important; width:100%!important; mask-image:linear-gradient(#000 35%,transparent 100%)!important;
+  -webkit-mask-image:linear-gradient(#000 35%,transparent 100%)!important;
+}
+html body.ae-is-opinions #mainContent #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero .ae-opinion-media img { object-fit:cover!important; }
+html body.ae-is-opinions #mainContent #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero .ae-opinion-text {
+  height:auto!important; min-height:0!important; margin:0!important; padding:125px 18px 12px!important; gap:9px!important; justify-content:flex-start!important;
+}
+html body.ae-is-opinions #mainContent #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero .ae-opinion-title {
+  font-size:24px!important; line-height:1.12!important; height:80.64px!important; min-height:80.64px!important; max-height:80.64px!important;
+  display:-webkit-box!important; -webkit-box-orient:vertical!important; -webkit-line-clamp:3!important; overflow:hidden!important;
+}
+html body.ae-is-opinions #mainContent #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero .ae-opinion-excerpt {
+  font-size:13px!important; line-height:1.5!important; height:58.5px!important; min-height:58.5px!important; max-height:58.5px!important;
+  display:-webkit-box!important; -webkit-box-orient:vertical!important; -webkit-line-clamp:3!important; overflow:hidden!important;
+}
+html body.ae-is-opinions #mainContent #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-rail {
+  height:278px!important; min-height:278px!important; align-items:stretch!important;
+}
+html body.ae-is-opinions #mainContent #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-rail > .ae-opinion-card {
+  height:270px!important; min-height:270px!important; display:flex!important; flex-direction:column!important;
+}
+html body.ae-is-opinions #mainContent #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-rail .ae-opinion-open {
+  flex:1 1 0!important; min-height:0!important; overflow:hidden!important;
+}
+html body.ae-is-opinions #mainContent #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-rail .ae-opinion-text { flex:1 1 auto!important; padding:12px 14px 8px!important; gap:7px!important; }
+html body.ae-is-opinions #mainContent #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-rail .ae-opinion-title {
+  font-size:18px!important; line-height:1.17!important; height:44.12px!important; min-height:44.12px!important; max-height:44.12px!important; -webkit-line-clamp:2!important;
+}
+html body.ae-is-opinions #mainContent #aeOpinions #aeOpinionsList.cam-act-approved .cam-actualidad-news-actions {
+  position:static!important; flex:0 0 44px!important; height:44px!important; min-height:44px!important; margin:0!important;
+  padding:0 14px 6px!important; box-sizing:border-box!important; clear:both!important;
+}
+html body.ae-is-opinions #mainContent #aeOpinions #aeOpinionsList.cam-act-approved .cam-news-interactions {
+  display:flex!important; align-items:center!important; gap:12px!important; height:38px!important; margin:0!important;
+}
+}
+@layer cam-display-clarity {
+html body.ae-is-opinions #mainContent #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-rail { height:308px!important; min-height:308px!important; overflow-y:hidden!important; }
+html body.ae-is-opinions #mainContent #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-rail > .ae-opinion-card { height:300px!important; min-height:300px!important; }
+html body.ae-is-opinions #mainContent #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-rail .ae-opinion-open { display:grid!important; grid-template-rows:108px minmax(0,1fr)!important; }
+html body.ae-is-opinions #mainContent #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-rail .ae-opinion-text { min-height:0!important; overflow:hidden!important; }
+}

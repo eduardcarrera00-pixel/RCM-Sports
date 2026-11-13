@@ -7,7 +7,6 @@
  */
 (() => {
   'use strict';
-  if(!document.getElementById('cam-actualidad-approved-style')){const style=document.createElement('style');style.id='cam-actualidad-approved-style';style.textContent="@layer cam-display-clarity{\n\n#aeOpinions #aeOpinionsList.cam-act-approved{display:flex!important;flex-direction:column!important;gap:20px!important;min-width:0}\nhtml body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero{position:relative!important;isolation:isolate;overflow:hidden!important;border-radius:22px!important;background:var(--op-panel)!important;border:1px solid var(--op-line)!important;box-shadow:0 18px 44px -30px #0009!important;transform:none!important}\nhtml body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-glow{position:absolute;z-index:-1;inset:-30px;width:calc(100% + 60px);height:calc(100% + 60px);object-fit:cover;filter:blur(30px);opacity:.22;pointer-events:none}\nhtml body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero>.ae-opinion-open{display:block!important;position:relative!important;height:auto!important}\nhtml body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero .ae-opinion-media{position:absolute!important;inset:0 0 auto!important;width:100%!important;height:222px!important;min-height:0!important;aspect-ratio:auto!important;mask-image:linear-gradient(#000 0%,#000 56%,transparent 100%);-webkit-mask-image:linear-gradient(#000 0%,#000 56%,transparent 100%);background:transparent!important}\nhtml body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero .ae-opinion-media img{width:100%!important;height:100%!important;object-fit:cover!important}\nhtml body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero .ae-opinion-text{position:relative!important;display:flex!important;flex-direction:column!important;margin:0!important;padding:170px 21px 20px!important;gap:11px!important;background:none!important}\nhtml body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero .ae-opinion-title{font-size:29px!important;line-height:1.1!important;display:block!important;overflow:visible!important}\nhtml body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero .ae-opinion-excerpt{display:block!important;font-size:13.5px!important;line-height:1.6!important;overflow:visible!important;max-height:none!important;margin:0!important}\nhtml body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero .ae-opinion-author{margin:0!important;padding:0!important;font-size:10px!important}\nhtml body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero .ae-opinion-meta{font-size:10px!important}\nhtml body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero .cam-actualidad-news-actions{position:relative!important;padding:0 21px 15px!important;background:none!important}\nhtml body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-rail{display:flex!important;gap:12px!important;overflow-x:auto!important;min-width:0!important;width:100%!important;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;scrollbar-width:thin;padding:0 0 8px!important}\nhtml body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-rail>.ae-opinion-card{display:flex!important;flex-direction:column!important;flex:0 0 246px!important;width:246px!important;min-width:0!important;max-width:none!important;scroll-snap-align:start;border-radius:16px!important;overflow:hidden!important;margin:0!important;transform:none!important}\nhtml body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-rail .ae-opinion-open{display:flex!important;flex-direction:column!important;height:auto!important;flex:1!important;gap:0!important;padding:0!important}\nhtml body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-rail .ae-opinion-media{display:block!important;width:100%!important;height:108px!important;min-height:0!important;aspect-ratio:auto!important;margin:0!important;flex:none!important}\nhtml body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-rail .ae-opinion-text{display:flex!important;flex-direction:column!important;gap:8px!important;padding:13px 14px 12px!important;min-width:0!important;flex:1!important}\nhtml body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-rail .ae-opinion-title{font-size:19px!important;line-height:1.17!important;display:block!important;overflow:visible!important;margin:0!important}\nhtml body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-rail .ae-opinion-excerpt{display:-webkit-box!important;-webkit-line-clamp:2!important;-webkit-box-orient:vertical!important;overflow:hidden!important;font-size:12px!important;line-height:1.5!important;margin:0!important;max-height:3em!important}\nhtml body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-rail .ae-opinion-meta{font-size:9px!important;gap:4px 8px!important}\nhtml body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-rail .ae-opinion-sport{font-size:9px!important}\nhtml body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-rail .ae-opinion-author{font-size:9px!important;margin-top:auto!important;padding:2px 0 0!important}\nhtml body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-rail .cam-actualidad-news-actions{padding:0 14px 12px!important;background:none!important}\nhtml body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved :is(.ae-opinion-read,.ae-opinion-flag){display:none!important}\n@media(min-width:760px){\nhtml body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero .ae-opinion-open{min-height:355px!important}\nhtml body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero .ae-opinion-media{width:60%!important;height:100%!important;mask-image:linear-gradient(90deg,#000 30%,transparent 100%);-webkit-mask-image:linear-gradient(90deg,#000 30%,transparent 100%)}\nhtml body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero .ae-opinion-media img{object-fit:contain!important}\nhtml body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero .ae-opinion-text{margin-left:48%!important;padding:35px 30px!important;min-height:355px!important;justify-content:center!important}\nhtml body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero .ae-opinion-title{font-size:35px!important}\nhtml body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero .ae-opinion-excerpt{font-size:15px!important}\nhtml body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-rail>.ae-opinion-card{flex-basis:270px!important;width:270px!important}\n}\nhtml body #aeOpinions #aeOpinionsList.cam-act-approved .cam-act-approved-hero .ae-opinion-excerpt{-webkit-line-clamp:unset!important;max-height:none!important;text-overflow:clip!important;white-space:normal!important}\n\n}";document.head.append(style);}
   const $ = id => document.getElementById(id);
   const el = (tag, text, cls) => { const n = document.createElement(tag); if (text != null) n.textContent = String(text); if (cls) n.className = cls; return n; };
   const SPORTS = [
@@ -119,11 +118,11 @@
     .replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
   const publishedDate = o => Number.isFinite(Date.parse(o.created_at)) ? Date.parse(o.created_at) : 0;
   const latestFirst = (a,b) => publishedDate(b)-publishedDate(a) || String(b.id).localeCompare(String(a.id));
-  function visible() {
+  function visible(selectedSport = active) {
     const unique=new Map();
     // Una columna original conserva su portada y fecha si la noticia se enlaza
     // también en Opiniones. Nunca sustituir una pieza destacada por un duplicado.
-    for(const o of [...items,...sportNews()].filter(o=>active==='todas'||o.sport===active)){
+    for(const o of [...items,...sportNews()].filter(o=>selectedSport==='todas'||o.sport===selectedSport)){
       const key=storyKey(o);
       const previous=unique.get(key);
       if(!previous||(
@@ -416,6 +415,7 @@
     }else if(takesLoaded){
       target.append(el('p',known.length?'Aún no hay discusiones con respuestas en este deporte.':'Todavía no hay debates publicados con respuestas verificadas.','ae-opinions-empty'));
     }else target.append(skeleton('rows',3,'Consultando los debates de la comunidad…'));
+    syncReferenceLayout();
     const leftovers=communityTakes.filter(t=>!debated.some(d=>String(d.id)===String(t.id)));
     const latest=visible();
     const front=pickCover(latest),remaining=latest.filter(o=>!front.includes(o));
@@ -462,11 +462,31 @@
     const publicStories=stories.filter(o=>o.is_published);
     return [...publicStories].sort(latestFirst).slice(0,1);
   }
+  function syncReferenceLayout(){
+    if(!window.camActualidadSymmetry)return;
+    const stories=visible('futbol');
+    const lead=pickCover(stories)[0];
+    if(!lead)return;
+    const hero=card(lead,true);hero.classList.add('cam-act-approved-hero');
+    const image=hero.querySelector('.ae-opinion-media img');
+    if(image){const glow=image.cloneNode();glow.className='cam-act-approved-glow';glow.setAttribute('aria-hidden','true');hero.prepend(glow);}
+    const rail=el('div',null,'cam-act-approved-rail');
+    for(const story of stories.filter(o=>o!==lead))rail.append(card(story,false,false,true));
+    if(!rail.children.length)return;
+    const debates=el('div',null,'ae-opinions-debated-list');
+    const candidates=communityTakes.filter(t=>takeSport(t)==='futbol'&&(takeReplies.get(String(t.id))||0)>0)
+      .sort((a,b)=>(takeReplies.get(String(b.id))-takeReplies.get(String(a.id)))||
+        ((Number(b.upvotes)||0)+(Number(b.downvotes)||0))-((Number(a.upvotes)||0)+(Number(a.downvotes)||0))||latestFirst(a,b)).slice(0,5);
+    for(const [i,take] of candidates.entries())debates.append(takeRow(take,false,i+1));
+    window.camActualidadSymmetry.configure($('aeOpinions'),hero.outerHTML+rail.outerHTML+debates.outerHTML);
+  }
   function render(){
     const root=$('aeOpinions');if(!root)return;
+    root.dataset.camActualidad = active;
     renderTabs();
     const list=$('aeOpinionsList');if(!list)return;
     list.replaceChildren();
+    list.classList.add('cam-act-approved');
     list.setAttribute('aria-busy',String(!loaded));
     const shown=visible();
     if(!loaded&&!shown.length){list.append(skeleton('front',3,'Cargando actualidad…'));return;}
