@@ -24,11 +24,12 @@ def _server():
 
 
 @contextlib.contextmanager
-def full_page(fake_js='', dark=False, width=390, height=900, scale=2):
+def full_page(fake_js='', dark=False, width=390, height=900, scale=2, touch=False, reduced_motion=False):
     with _server() as base, sync_playwright() as p:
         browser = p.chromium.launch()
         ctx = browser.new_context(viewport={'width': width, 'height': height}, device_scale_factor=scale,
-                                  color_scheme='dark' if dark else 'light')
+                                  color_scheme='dark' if dark else 'light', has_touch=touch,
+                                  reduced_motion='reduce' if reduced_motion else 'no-preference')
         def route(r):
             url = r.request.url
             if 'supabase-js' in url:
