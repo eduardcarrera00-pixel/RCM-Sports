@@ -257,7 +257,8 @@
     else if (main.firstChild !== root) main.prepend(root);
   }
   function item(card) {
-    const wrap = el('div', null, 'cam-hj-item' + (card.classList.contains('cam-hj-sep') ? ' is-sep' : ''), { role: 'listitem' });
+    const kind = card.classList.contains('cam-hj-sep') ? ' is-sep' : card.classList.contains('cam-hj-take-intro') ? ' is-take-intro' : '';
+    const wrap = el('div', null, 'cam-hj-item' + kind, { role: 'listitem' });
     wrap.append(card);
     return wrap;
   }
@@ -601,8 +602,38 @@
   function takeCard(t) {
     return window.camHomeTakeCard(t,'recent',state.takeReplyCounts,state.takeViewerId);
   }
+  // 14 nov 2026: «Tu take» abre Recientes, como la Liguilla abre «Quinielas»: una tarjeta
+  // pequeña con un ejemplo y un botón y, al lado, los rombos que llevan a los Takes.
+  // Solo en Recientes: Populares e Impopulares son otras listas y muestran solo Takes.
+  function takeIntroCard() {
+    const card = el('section', null, 'cam-hj-ev cam-hj-take-intro', { 'aria-labelledby': 'camHjTakeIntroTitle' });
+    card.append(
+      el('span', 'Tu take', 'cam-hj-ev-kicker'),
+      el('h4', 'Comparte esa opinión en la que solo tú crees', 'cam-hj-ev-title', { id: 'camHjTakeIntroTitle' }),
+      el('p', 'Ej.: Gilberto Mora será Balón de Oro en 2030', 'cam-hj-take-example'),
+      el('button', 'Hacer mi take ›', 'cam-hj-ev-cta', { type: 'button' })
+    );
+    // Toda la tarjeta abre el compositor (el botón es el control accesible).
+    card.addEventListener('click', openTakeComposer);
+    return card;
+  }
+  function takesLink(list) {
+    const link = el('button', null, 'cam-hj-sep cam-hj-sep-link', { type: 'button' });
+    const ornament = () => el('span', null, 'cam-hj-sep-diamond', { 'aria-hidden': 'true' });
+    link.append(ornament(), el('span', 'Mira los takes de la comunidad', 'cam-hj-sep-text'),
+      el('span', '→', 'cam-hj-sep-arrow', { 'aria-hidden': 'true' }), ornament());
+    link.addEventListener('click', () => {
+      const first = list.querySelector('.cam-hj-item:not(.is-sep):not(.is-take-intro)');
+      if (!first) return;
+      const left = list.scrollLeft + first.getBoundingClientRect().left - list.getBoundingClientRect().left - 2;
+      const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      try { list.scrollTo({ left: Math.max(0, left), behavior: calm ? 'auto' : 'smooth' }); } catch { list.scrollLeft = Math.max(0, left); }
+    });
+    return link;
+  }
   function paintTakes() {
     const cards = state.takes.map(takeCard);
+    if (cards.length) cards.unshift(takeIntroCard(), takesLink(rows.takes.list));
     if (!cards.length) cards.push(el('p', state.takesOk ? 'Aún no hay Takes.' : state.takesError ? 'No se pudieron cargar los Takes.' : 'Cargando Takes…', 'cam-hj-empty'));
     fill(rows.takes, cards);
     rows.takes.list.dataset.camContentState = state.takesOk ? (state.takes.length ? 'ready' : 'empty') : state.takesError ? 'error' : 'loading';

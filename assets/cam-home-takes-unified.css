@@ -139,4 +139,34 @@
   html body #camHomeJornada .cam-home-take-unified .cam-demo-account-tag{display:none!important}
   html body #camHomeJornada .cam-home-take-unified button:focus-visible{outline:2px solid var(--hj-accent)!important;outline-offset:3px!important}
   html body #camHomeJornada .cam-home-take-unified button:disabled{cursor:default!important}
+
+  /* 14 nov 2026 · «Tu take» abre Recientes, como la Liguilla abre «Quinielas»: la misma
+     tarjeta pequeña (248 px, azul noche y dorado) con un ejemplo y un botón, y los rombos
+     que llevan a los Takes. Solo existen en Recientes (#camHomeTakesRecent); Populares e
+     Impopulares muestran solo Takes. La tarjeta usa las clases .cam-hj-ev de la Liguilla. */
+  html body #camHomeJornada .cam-home-takes-track > .cam-hj-item.is-take-intro {
+    flex:0 0 248px!important; width:248px!important;
+  }
+  /* Los rombos caben junto a la tarjeta en un teléfono de 375 px: 8 px de hueco y 100 de ancho. */
+  html body #camHomeJornada .cam-home-takes-track > .cam-hj-item.is-sep {
+    flex:0 0 100px!important; width:100px!important; margin-left:-8px!important; scroll-snap-align:none!important;
+  }
+  html body #camHomeJornada .cam-home-takes-track .cam-hj-take-intro {
+    gap:8px!important; min-height:204px!important;
+  }
+  html body #camHomeJornada .cam-hj-take-intro .cam-hj-take-example {
+    display:block!important; margin:0!important; padding:6px 10px!important;
+    border:1.5px dashed rgba(232,191,121,.7)!important; border-radius:12px!important;
+    background:transparent!important; box-shadow:none!important; color:var(--ev-muted)!important;
+    font:italic 500 13.5px/1.35 "Playfair Display",Georgia,serif!important; letter-spacing:0!important; text-transform:none!important;
+  }
+  html body #camHomeJornada .cam-home-takes-track button.cam-hj-sep-link {
+    display:flex!important; flex-direction:column!important; align-items:center!important; justify-content:center!important;
+    gap:10px!important; width:100px!important; min-height:100%!important; margin:0!important; padding:4px 2px!important;
+    border:0!important; border-radius:12px!important; background:transparent!important; box-shadow:none!important;
+    text-align:center!important; cursor:pointer!important; -webkit-tap-highlight-color:transparent!important;
+  }
+  html body #camHomeJornada .cam-home-takes-track button.cam-hj-sep-link .cam-hj-sep-text { margin:2px 0 0!important; white-space:normal!important; }
+  html body #camHomeJornada .cam-home-takes-track button.cam-hj-sep-link .cam-hj-sep-arrow { display:block!important; }
+  html body #camHomeJornada .cam-home-takes-track button.cam-hj-sep-link:focus-visible { outline:2px solid var(--cam-calm-action)!important; outline-offset:2px!important; }
 }
