@@ -416,8 +416,10 @@
      15 nov 2026 · modo día: estas tarjetas de invitación (Liguilla, «Tu take» y el boleto del
      parlay en cam-picks-compact.css) tienen color propio, «arena dorada», para distinguirse de
      las tarjetas blancas, de las fichas de partido (azul claro) y del fondo: de día arena clara
-     con letra azul tinta y contorno dorado; de noche café oscuro con el dorado de siempre.
-     (El azul se descartó: es el de las fichas de partido.) Los colores salen de las variables --ev-*. */
+     con letra azul tinta y contorno dorado. De noche (15 nov, a petición de Eduard, «un azul más
+     acorde a CAM Sports»), el degradado azul de la marca (el de --hj-photo: #264B74 → #122F4E)
+     con el dorado de siempre; el degradado lo separa de las fichas de partido, que son azul liso.
+     Los colores salen de las variables --ev-* (--ev-fill es el fondo; --ev-bg, su tono medio). */
   html body #camHomeJornada .cam-hj-sr {
     position:absolute!important; width:1px!important; height:1px!important; margin:-1px!important; padding:0!important;
     overflow:hidden!important; clip:rect(0 0 0 0)!important; white-space:nowrap!important; border:0!important;
@@ -432,14 +434,15 @@
     position:relative!important; display:flex!important; flex-direction:column!important; align-items:stretch!important; gap:10px!important;
     width:248px!important; min-width:0!important; height:auto!important; margin:0!important; padding:14px 16px 16px!important;
     border:1px solid var(--ev-line)!important; border-radius:18px!important;
-    background:var(--ev-bg)!important; background-image:none!important; color:var(--ev-ink)!important; box-shadow:var(--ev-shadow)!important;
+    background:var(--ev-fill,var(--ev-bg))!important; color:var(--ev-ink)!important; box-shadow:var(--ev-shadow)!important;
     text-align:left!important; font:400 13px/1.4 Inter,system-ui,sans-serif!important;
     cursor:pointer!important; -webkit-tap-highlight-color:transparent!important;
   }
-  /* Noche: café oscuro, cálido frente al azul del fondo (#081724), de las tarjetas (#11293d) y de
-     las fichas de partido (#1b3c50), con el dorado de siempre. */
+  /* Noche: degradado azul CAM, más claro arriba a la izquierda, por encima del fondo (#081724) y
+     de las tarjetas (#11293d); las fichas de partido (#1b3c50) son lisas. Dorado de siempre. */
   html.dark body #camHomeJornada .cam-hj-ev {
-    --ev-bg:#2C251F; --ev-ink:#F3EBDD; --ev-muted:#CFC3B3; --ev-gold:#E8BF79;
+    --ev-bg:#18395E; --ev-fill:linear-gradient(150deg,#264B74 0%,#18395E 55%,#122F4E 100%);
+    --ev-ink:#F3EBDD; --ev-muted:#C2CDD4; --ev-gold:#E8BF79;
     --ev-line:rgba(232,191,121,.45); --ev-line-hover:rgba(232,191,121,.7);
     --ev-dash:rgba(232,191,121,.7); --ev-crest:#F3EBDD; --ev-pair:rgba(243,235,221,.08);
     --ev-cta-base:transparent; --ev-slot-hover:rgba(232,191,121,.12);

@@ -145,7 +145,8 @@
     padding:0!important;margin:0!important;border:0!important;list-style:none!important;scroll-snap-align:start;
   }
   /* 15 nov 2026 · modo día: el boleto es «arena dorada» como la Liguilla y «Tu take» en
-     cam-home-jornada.css: de día arena clara con letra azul tinta; de noche café oscuro y dorado.
+     cam-home-jornada.css: de día arena clara con letra azul tinta; de noche el degradado azul CAM
+     (#264B74 → #122F4E) y dorado.
      El ticket deportivo (cian) va claro de día y azul noche de noche; sus muescas toman el color de la tarjeta. */
   html body #mainContent #camHomePicks .cam-home-parlay {
     --pl-bg:#F2E5CE;--pl-ink:#13324D;--pl-muted:#5E5446;--pl-line:rgba(176,128,63,.42);--pl-line-hover:rgba(176,128,63,.7);
@@ -155,11 +156,11 @@
     display:flex!important;flex-direction:column!important;align-items:stretch!important;box-sizing:border-box!important;
     width:100%!important;height:100%!important;min-width:0!important;margin:0!important;padding:13px 14px 12px!important;
     border:1px solid var(--pl-line)!important;border-radius:16px!important;
-    background:var(--pl-bg)!important;background-image:none!important;color:var(--pl-ink)!important;box-shadow:var(--pl-shadow)!important;
+    background:var(--pl-fill,var(--pl-bg))!important;color:var(--pl-ink)!important;box-shadow:var(--pl-shadow)!important;
     text-align:left!important;cursor:pointer!important;-webkit-tap-highlight-color:transparent!important;
   }
   html.dark body #mainContent #camHomePicks .cam-home-parlay {
-    --pl-bg:#2C251F;--pl-ink:#F3EBDD;--pl-muted:#CFC3B3;--pl-line:rgba(232,191,121,.45);--pl-line-hover:rgba(232,191,121,.7);
+    --pl-bg:#18395E;--pl-fill:linear-gradient(150deg,#264B74 0%,#18395E 55%,#122F4E 100%);--pl-ink:#F3EBDD;--pl-muted:#C2CDD4;--pl-line:rgba(232,191,121,.45);--pl-line-hover:rgba(232,191,121,.7);
     --pl-ticket:#112C40;--pl-ticket-ink:#F3EBDD;--pl-ticket-line:#5C8394;--pl-ticket-sep:#38596C;
     --pl-cta:232,124,100;--pl-cta-ink:#F39580;--pl-cta-base:transparent;
     --pl-shadow:0 1px 2px rgba(0,0,0,.28),0 10px 22px -14px rgba(0,0,0,.7);
