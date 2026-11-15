@@ -258,6 +258,20 @@
       return false;
     }finally{if(ticket===competitionRequest){changingCompetition=false;paintGames();announce();}finishEntrance?.();}
   }
+  // El selector repetido al final de La semana también devuelve al inicio de
+  // la liga elegida, dejando visible el título bajo las pestañas fijas en móvil.
+  function scrollToWeekStart(){
+    const week=$('camFootballSemana');if(!week)return;
+    const tabs=$('camSectionTabs');
+    const tabStyle=tabs?getComputedStyle(tabs):null;
+    const tabsVisible=!!tabs&&!tabs.hidden&&tabStyle.display!=='none'&&tabStyle.visibility!=='hidden';
+    const clearance=tabsVisible
+      ?tabs.getBoundingClientRect().height+Math.max(0,parseFloat(tabStyle.top)||0)+12
+      :12;
+    const top=Math.max(0,window.scrollY+week.getBoundingClientRect().top-clearance);
+    const reduceMotion=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({top,behavior:reduceMotion?'auto':'smooth'});
+  }
   // La semana y la quiniela usan los mismos botones, logos y cambio de competición.
   function competitionNav(){
     const leagues=el('div',null,'cam-football-leagues');
@@ -271,10 +285,19 @@
       button.setAttribute('aria-label',option.full);
       button.append(leagueLogo(id),el('span',({ligamx:'Liga MX',champions:'Champions',laliga:'LaLiga',premier:'Premier'})[id]||option.full,'cam-football-league-label'));
       button.addEventListener('click',async()=>{
-        if(competition===id)return;
+        const fromWeekFooter=!!leagues.closest('#camFootballWeekLeagues');
+        // Volver arriba también si se toca la liga que ya estaba seleccionada.
+        if(competition===id){
+          if(fromWeekFooter)requestAnimationFrame(scrollToWeekStart);
+          return;
+        }
         const origin=leagues.closest('[id]')?.id;
-        await selectCompetition(id);
-        requestAnimationFrame(()=>$(origin)?.querySelector('[data-competition="'+competition+'"]')?.focus({preventScroll:true}));
+        const selection=selectCompetition(id);
+        // No esperar a la red: la pantalla cambia de liga y sube en el mismo toque.
+        if(fromWeekFooter)requestAnimationFrame(scrollToWeekStart);
+        await selection;
+        if(!fromWeekFooter)
+          requestAnimationFrame(()=>$(origin)?.querySelector('[data-competition="'+competition+'"]')?.focus({preventScroll:true}));
       });
       leagues.append(button);
     }
