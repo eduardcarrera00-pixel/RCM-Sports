@@ -931,7 +931,13 @@ function homeParlayIntro(){
  ticket.setAttribute('role','img');
  ticket.setAttribute('aria-label','Ejemplo de parlay: más de 49.5 puntos en Patriots contra Lions y más de 47.5 en Chiefs contra Falcons, momio +275');
  const legs=el('span',null,'cam-home-parlay-legs');
- legs.append(el('span','Más de 49.5 · NE–DET'),el('span','Más de 47.5 · KC–ATL'));
+ ['Más de 49.5 · NE–DET','Más de 47.5 · KC–ATL'].forEach((selection,index)=>{
+   const row=el('span',null,'cam-home-parlay-leg');
+   const number=el('span',String(index+1),'cam-home-parlay-number');
+   number.setAttribute('aria-hidden','true');
+   row.append(number,el('span',selection,'cam-home-parlay-selection'));
+   legs.append(row);
+ });
  ticket.append(legs,el('span','+275','cam-home-parlay-odds'));
  const cta=el('button','Subir mi parlay ›','cam-home-parlay-cta');
  cta.type='button';
