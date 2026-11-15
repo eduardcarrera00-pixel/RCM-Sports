@@ -9,6 +9,8 @@ usan el azul NFL de noche y azul pálido en modo claro; 1 azul, X gris azulado y
 Los logos de competición cambian de variante con el tema para mantener el contraste.
 No hay líneas divisorias ni contornos.
 La ficha completa mantiene el acceso al partido concreto dentro de su quiniela;
+espera al calendario y a sus actualizaciones antes de enfocar el encuentro, sin
+activar el anclaje genérico al inicio de la sección. Al salir se cancela ese acceso.
 las opciones no guardan pronósticos desde Inicio. El carrusel, el orden de las
 ligas y la tarjeta especial de Liguilla conservan su comportamiento.
 Origen: `assets/cam-home-jornada.js` y `assets/cam-home-jornada.css`, compilado

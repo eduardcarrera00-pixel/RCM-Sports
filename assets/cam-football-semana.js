@@ -482,8 +482,8 @@
   function keepAnchor(){if(active()&&Date.now()<anchorUntil)document.getElementById('camFootballQuiniela')?.scrollIntoView({block:'start'});}
   for(const type of ['touchmove','wheel','keydown'])window.addEventListener(type,release,{passive:true,capture:true});
   const originalGo=window.camGoQuiniela;
-  window.camGoQuiniela=function camFootballWeekGo(sport){
-    if(sport==='football')anchorUntil=Date.now()+6000;
+  window.camGoQuiniela=function camFootballWeekGo(sport,options){
+    if(sport==='football'){if(options?.gameId)release();else anchorUntil=Date.now()+6000;}
     return originalGo?.apply(this,arguments);
   };
   let queued=false;

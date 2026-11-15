@@ -108,22 +108,28 @@
   }
 
   /* ---------- acciones ---------- */
-  function goQuiniela(sport) {
-    if (typeof window.camGoQuiniela === 'function') return window.camGoQuiniela(sport);
+  function goQuiniela(sport, options) {
+    if (typeof window.camGoQuiniela === 'function') return window.camGoQuiniela(sport, options);
     if (typeof window.filterByCategory === 'function') window.filterByCategory(sport === 'football' ? 'Fútbol' : 'NFL');
     window.camSectionTabs?.select?.('quiniela');
   }
   // Tocar una ficha lleva a ese mismo partido dentro de su quiniela (13 nov 2026).
   // La quiniela se carga bajo demanda: se espera a que esté lista y se enfoca el partido.
+  let gameNavigation = 0;
   function goGame(g, sport) {
+    const navigation = ++gameNavigation;
     const football = sport === 'football';
-    goQuiniela(sport);
+    goQuiniela(sport, { gameId: g.id });
     const api = () => (football ? window.camFootballQuiniela : window.camNflQuiniela) || null;
-    const ready = () => { const q = api(); return !!q?.focus && (football || !!q.snapshot?.().loaded); };
+    const ready = () => {
+      const q = api(), snapshot = q?.snapshot?.();
+      return !!q?.focus && !!snapshot?.loaded && !snapshot.loading;
+    };
     let tries = 0;
     const step = () => {
-      if (ready()) { try { api().focus(g.id); } catch {} return; }
-      if (++tries < 80) setTimeout(step, 100);
+      if (navigation !== gameNavigation || !document.body.classList.contains(football ? 'ae-is-football' : 'ae-is-nfl')) return;
+      if (ready()) { try { Promise.resolve(api().focus(g.id)).catch(() => {}); } catch {} return; }
+      if (++tries < 200) setTimeout(step, 100);
     };
     Promise.resolve(window.camSportQuinielaLoader?.ensure?.(football ? 'football' : 'nfl')).catch(() => {}).then(step);
   }

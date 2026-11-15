@@ -526,8 +526,8 @@
     if (target && target.getClientRects().length) { try { target.scrollIntoView({ block: 'start' }); } catch {} }
   }
   const originalGo = typeof window.camGoQuiniela === 'function' ? window.camGoQuiniela : null;
-  window.camGoQuiniela = function camSemanaGoQuiniela(sport) {
-    if (sport !== 'football') anchor('camNflQuiniela');
+  window.camGoQuiniela = function camSemanaGoQuiniela(sport, options) {
+    if (sport !== 'football') { if (options?.gameId) anchorUntil = 0; else anchor('camNflQuiniela'); }
     if (originalGo) return originalGo.apply(this, arguments);
     if (typeof window.filterByCategory === 'function') window.filterByCategory(sport === 'football' ? 'Fútbol' : 'NFL');
     window.camSectionTabs?.select?.('quiniela');
