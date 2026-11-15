@@ -913,6 +913,46 @@ function sizePlateWindow(target){
    plateWindowObservers.set(target,observer);
  }
 }
+// 14 nov 2026: «Mejores platos» abre con el boleto, como «Tu take» abre Recientes:
+// una tarjeta pequeña que pide la foto del parlay (el compositor ya lee la captura)
+// y, al lado, los rombos que llevan a los platos. Solo en Mejores platos.
+function homeParlayIntro(){
+ const item=el('li',null,'cam-home-plate-intro');
+ const card=el('section',null,'cam-home-parlay');
+ card.setAttribute('aria-labelledby','camHomeParlayTitle');
+ const title=el('h4','Sube la foto de tu parlay','cam-home-parlay-title');
+ title.id='camHomeParlayTitle';
+ const ticket=el('div',null,'cam-home-parlay-ticket');
+ ticket.setAttribute('role','img');
+ ticket.setAttribute('aria-label','Ejemplo de parlay: más de 49.5 puntos en Patriots contra Lions y más de 47.5 en Chiefs contra Falcons, momio +275');
+ const legs=el('span',null,'cam-home-parlay-legs');
+ legs.append(el('span','Más de 49.5 · NE–DET'),el('span','Más de 47.5 · KC–ATL'));
+ ticket.append(legs,el('span','+275','cam-home-parlay-odds'));
+ const cta=el('button','Subir mi parlay ›','cam-home-parlay-cta');
+ cta.type='button';
+ card.append(title,ticket,cta);
+ // Toda la tarjeta abre el compositor (el botón es el control accesible).
+ card.addEventListener('click',()=>{void openPickComposer();});
+ item.append(card);
+ return item;
+}
+function homePlatesLink(target){
+ const item=el('li',null,'cam-home-plate-sep');
+ const link=el('button',null,'cam-home-plate-sep-link');
+ link.type='button';
+ const ornament=()=>{const d=el('span',null,'cam-home-plate-sep-diamond');d.setAttribute('aria-hidden','true');return d;};
+ const arrow=el('span','→','cam-home-plate-sep-arrow');arrow.setAttribute('aria-hidden','true');
+ link.append(ornament(),el('span','Mira los mejores platos','cam-home-plate-sep-text'),arrow,ornament());
+ link.addEventListener('click',()=>{
+  const first=target.querySelector('.cam-home-plate-row');
+  if(!first)return;
+  const left=Math.max(0,target.scrollLeft+first.getBoundingClientRect().left-target.getBoundingClientRect().left-1);
+  const calm=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  try{target.scrollTo({left,behavior:calm?'auto':'smooth'});}catch{target.scrollLeft=left;}
+ });
+ item.append(link);
+ return item;
+}
 // Home uses the same weekly vote ranking and refresh, without another query.
 function paintHomePlateList(result,kind){
  const target=$(kind==='best'?'camHomeBestPlates':'camHomeWorstPlates');
@@ -928,6 +968,7 @@ function paintHomePlateList(result,kind){
  const picks=Array.isArray(result?.data)?result.data:[];
  target.dataset.camContentState=picks.length?'ready':'empty';
  if(!picks.length){target.append(el('li','Aún sin votos esta semana.','cam-home-plate-empty'));return;}
+ if(kind==='best')target.append(homeParlayIntro(),homePlatesLink(target));
  for(const p of picks){
   // Reuse the history card's structure, without a result badge or outcome data.
   const item=el('li',null,'cam-home-plate-row ae-pick-history-entry');

@@ -130,6 +130,77 @@
   }
   html body #mainContent #camHomePicks .cam-home-plate-votes {color:var(--cam-h-muted)!important;font:600 10px/1.3 Inter,system-ui,sans-serif!important;white-space:nowrap!important;}
   html body #mainContent #camHomePicks .cam-home-plate-empty {flex:0 0 100%!important;padding:8px 0!important;color:var(--ds-text-muted,#566876)!important;font:400 12px/1.5 Inter,system-ui,sans-serif!important;}
+
+  /* 14 nov 2026 · «Mejores platos» abre con el boleto, como «Tu take» abre Recientes:
+     una tarjeta azul noche y dorado de 248 px, del alto de un plato, que pide la foto del
+     parlay, y los rombos que llevan a los platos. Peores platos no cambia. */
+  html body #mainContent #camHomePicks .cam-home-plate-intro {
+    display:block!important;flex:0 0 248px!important;width:248px!important;height:164px!important;min-width:0!important;
+    padding:0!important;margin:0!important;border:0!important;list-style:none!important;scroll-snap-align:start;
+  }
+  html body #mainContent #camHomePicks .cam-home-parlay {
+    display:flex!important;flex-direction:column!important;align-items:stretch!important;box-sizing:border-box!important;
+    width:100%!important;height:100%!important;min-width:0!important;margin:0!important;padding:13px 14px 12px!important;
+    border:1px solid rgba(232,191,121,.45)!important;border-radius:16px!important;
+    background:#0B2233!important;background-image:none!important;color:#F3EBDD!important;box-shadow:var(--cam-h-shadow)!important;
+    text-align:left!important;cursor:pointer!important;-webkit-tap-highlight-color:transparent!important;
+  }
+  html body #mainContent #camHomePicks .cam-home-parlay-title {
+    margin:0!important;padding:0!important;color:#F3EBDD!important;
+    font:600 16.5px/1.25 "Playfair Display",Georgia,serif!important;letter-spacing:0!important;text-transform:none!important;
+  }
+  html body #mainContent #camHomePicks .cam-home-parlay-ticket {
+    position:relative!important;display:flex!important;align-items:center!important;gap:10px!important;
+    margin:11px 2px 0!important;padding:7px 10px 7px 12px!important;border:0!important;border-radius:10px!important;
+    background:#F3EBDD!important;color:#0B2233!important;box-shadow:0 6px 14px rgba(0,0,0,.28)!important;
+    transform:rotate(-1.5deg)!important;
+  }
+  html body #mainContent #camHomePicks .cam-home-parlay-ticket::before,
+  html body #mainContent #camHomePicks .cam-home-parlay-ticket::after {
+    content:""!important;position:absolute!important;top:50%!important;width:14px!important;height:14px!important;margin-top:-7px!important;
+    border-radius:50%!important;background:#0B2233!important;
+  }
+  html body #mainContent #camHomePicks .cam-home-parlay-ticket::before {left:-7px!important;}
+  html body #mainContent #camHomePicks .cam-home-parlay-ticket::after {right:-7px!important;}
+  html body #mainContent #camHomePicks .cam-home-parlay-legs {
+    display:flex!important;flex-direction:column!important;gap:2px!important;flex:1 1 auto!important;min-width:0!important;
+    font:700 11px/1.25 Inter,system-ui,sans-serif!important;white-space:nowrap!important;
+  }
+  html body #mainContent #camHomePicks .cam-home-parlay-odds {
+    flex:0 0 auto!important;padding-left:10px!important;border-left:1.5px dashed rgba(11,34,51,.45)!important;
+    font:800 16px/1 Inter,system-ui,sans-serif!important;letter-spacing:-.01em!important;font-variant-numeric:tabular-nums!important;
+  }
+  html body #mainContent #camHomePicks .cam-home-parlay-cta {
+    display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;min-height:38px!important;
+    margin:auto 0 0!important;padding:0 14px!important;border:0!important;border-radius:999px!important;
+    background:#E8BF79!important;background-image:none!important;color:#0B2233!important;box-shadow:none!important;
+    font:800 14px/1.1 Inter,system-ui,sans-serif!important;letter-spacing:0!important;text-transform:none!important;cursor:pointer!important;
+  }
+  html body #mainContent #camHomePicks .cam-home-parlay-cta:focus-visible {outline:2px solid #E8BF79!important;outline-offset:2px!important;}
+  html body #mainContent #camHomePicks .cam-home-parlay:active {transform:scale(.985)!important;}
+  @media (hover:hover) {
+    html body #mainContent #camHomePicks .cam-home-parlay:hover {border-color:rgba(232,191,121,.7)!important;}
+    html body #mainContent #camHomePicks .cam-home-parlay-cta:hover {background:#F0CD92!important;}
+  }
+  html body #mainContent #camHomePicks .cam-home-plate-sep {
+    display:flex!important;flex:0 0 100px!important;width:100px!important;height:164px!important;min-width:0!important;
+    margin:0 0 0 -2px!important;padding:0!important;border:0!important;list-style:none!important;scroll-snap-align:none!important;
+  }
+  html body #mainContent #camHomePicks .cam-home-plate-sep-link {
+    display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:10px!important;
+    width:100%!important;height:100%!important;margin:0!important;padding:4px 2px!important;border:0!important;border-radius:12px!important;
+    background:transparent!important;box-shadow:none!important;color:var(--cam-h-ink)!important;text-align:center!important;
+    cursor:pointer!important;-webkit-tap-highlight-color:transparent!important;
+  }
+  html body #mainContent #camHomePicks .cam-home-plate-sep-diamond {
+    display:block!important;flex:0 0 auto!important;width:6px!important;height:6px!important;
+    border:1px solid var(--hj-gold,#b0803f)!important;transform:rotate(45deg)!important;
+  }
+  html body #mainContent #camHomePicks .cam-home-plate-sep-text {
+    display:block!important;margin:2px 0 0!important;padding:0!important;color:var(--cam-h-ink)!important;
+    font:italic 500 14px/1.35 "Playfair Display",Georgia,serif!important;letter-spacing:0!important;text-transform:none!important;text-wrap:balance!important;
+  }
+  html body #mainContent #camHomePicks .cam-home-plate-sep-arrow {display:block!important;color:var(--cam-h-action)!important;font:600 17px/1 Inter,system-ui,sans-serif!important;}
   html body #mainContent #camHomePicks :is(a,button,[tabindex]):focus-visible {outline:2px solid var(--cam-odds-ink)!important;outline-offset:2px!important;}
 
   /* Reduce padding and gaps; retain complete selections and all actions. */
