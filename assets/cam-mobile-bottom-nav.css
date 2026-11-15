@@ -31,13 +31,11 @@ html body nav.ae-sport-nav svg.cam-mobile-nav-symbol {
   /* Full-bleed background covers the home-indicator area, without moving icons into it. */
   html body > nav.ae-sport-nav.cam-mobile-bottom-nav {
     position: fixed !important;
-    /* Use the visible viewport's top anchor when available. Safari can retain
-       an old bottom anchor after its toolbar or keyboard changes height. */
-    top: var(--cam-dock-top, auto) !important;
+    top: auto !important;
     bottom: 0 !important;
     left: 0 !important;
     right: 0 !important;
-    transform: translate3d(0, 0, 0) !important;
+    transform: none !important;
     z-index: 35 !important;
     display: flex !important;
     align-items: stretch !important;
@@ -64,6 +62,18 @@ html body nav.ae-sport-nav svg.cam-mobile-nav-symbol {
     isolation: isolate;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
+  }
+
+  /* Let the browser track its own toolbar height, including async scrolling.
+     A top anchor avoids Safari's bottom-fixed layer drift. Do not position this
+     from VisualViewport: its height/offset can stay stale after keyboard use.
+     Keep this layer untransformed; promoting it can worsen iOS scroll drift.
+     Older browsers retain the native bottom:0 fallback above. */
+  @supports (height: 100dvh) {
+    html body > nav.ae-sport-nav.cam-mobile-bottom-nav {
+      top: max(0px, calc(100dvh - var(--cam-bottom-nav-height) - env(safe-area-inset-bottom, 0px))) !important;
+      bottom: auto !important;
+    }
   }
 
   /* Retire the former moving copper capsule: the active state carries selection. */
