@@ -23,9 +23,10 @@
    apartados, tras 1,5 s sin tocar nada, el contenido amaga un deslizamiento y
    asoma el siguiente apartado («Takes ›»); luego todo vuelve a su sitio. Sin
    flechas fijas en pantalla. Si sigue sin deslizar, una última vez a los 45 s,
-   cuando esté en una de estas áreas. Como mucho 3 visitas en días
-   distintos, y nunca más en cuanto la persona desliza una vez. Solo en pantallas
-   táctiles. Con «reducir movimiento», un texto discreto bajo las pestañas. */
+   cuando esté en una de estas áreas. Desde el 14 nov vuelve una vez cada día
+   que la persona regresa, aunque ya sepa deslizar (entonces sin la de los 45 s),
+   para que no se le olvide. Solo en pantallas táctiles. Con «reducir
+   movimiento», un texto discreto bajo las pestañas. */
 (() => {
   'use strict';
 
@@ -242,7 +243,7 @@
     const way = Math.sign(s.dx) || -1;
     const from = ctx.tabs[ctx.index];
     busy = true;
-    learned();                // ya sabe deslizar: no se le vuelve a enseñar
+    learned();                // ya sabe deslizar: hoy no se repite (mañana, un recordatorio)
     hidePeek(true);
     settleNow();
 
@@ -381,10 +382,12 @@
   }, true);
 
   // ---------- Enseñar el gesto ----------
-  const LEARNED = 'cam_swipe_learned_v1';        // '1' en cuanto desliza una vez
-  const SHOWN = 'cam_swipe_hint_v1';             // { count, day }: visitas en que se enseñó
+  // 14 nov 2026 (pedido de Eduard): el amago vuelve una vez cada día que regresa,
+  // aunque ya haya deslizado antes, para que no se le olvide. Sin tope de días.
+  const LEARNED = 'cam_swipe_learned_v1';        // '1' en cuanto desliza una vez (ya no hay «última vez» a los 45 s)
+  const SHOWN = 'cam_swipe_hint_v1';             // { count, day }: días en que se enseñó y el último
   const SESSION = 'cam_swipe_hint_session_v1';   // { n, at }: veces en esta visita y cuándo la primera
-  const HINT_MAX = 3, HINT_IDLE = 1500, HINT_WINDOW = 12000;
+  const HINT_IDLE = 1500, HINT_WINDOW = 12000;
   const SECOND_AFTER = 45 * 1000;               // la segunda y última vez, 45 s después de la primera (pedido de Eduard)
   const SECOND_WAIT = 60 * 1000;                 // llegado ese momento, hasta 1 min esperando un momento de calma
   const NUDGE_IN = 420, NUDGE_HOLD = 650, NUDGE_OUT = 480, TIP_MS = 2600;
@@ -392,18 +395,22 @@
 
   function read(area, key) { try { return window[area].getItem(key); } catch { return null; } }
   function write(area, key, value) { try { window[area].setItem(key, value); } catch {} }
-  function today() { const d = new Date(); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
+  function dayOf(t) { const d = new Date(t); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
+  function today() { return dayOf(Date.now()); }
   function seen() { try { return JSON.parse(read('localStorage', SHOWN) || '{}') || {}; } catch { return {}; } }
 
   let memVisit = null;          // por si el navegador no guarda nada (modo privado)
   let hint = null, hintTimer = 0, hintUntil = 0, hintKey = '', tip = null, secondTimer = 0;
 
   // La visita (la pestaña abierta): cuántas veces se enseñó ya y cuándo fue la primera.
+  // Una pestaña que sigue abierta desde otro día cuenta como visita nueva (y el
+  // formato anterior, '1', también: el día ya lo decide `cam_swipe_hint_v1`).
   function visit() {
     const raw = read('sessionStorage', SESSION);
-    if (raw === '1') return { n: 2, at: 0 };          // formato anterior (12 nov): ya cumplido
-    if (raw) { try { const v = JSON.parse(raw); if (v && typeof v.n === 'number') return v; } catch {} }
-    return memVisit || { n: 0, at: 0 };
+    let v = memVisit;
+    if (raw && raw !== '1') { try { const p = JSON.parse(raw); if (p && typeof p.n === 'number') v = p; } catch {} }
+    if (!v || !v.at || dayOf(v.at) !== today()) return { n: 0, at: 0 };
+    return v;
   }
   function saveVisit(v) { memVisit = v; write('sessionStorage', SESSION, JSON.stringify(v)); }
 
@@ -416,12 +423,10 @@
   }
   function hintAllowed() {
     if (!touchscreen || !touchscreen.matches) return false;
-    if (read('localStorage', LEARNED) === '1') return false;
     const v = visit();
     if (v.n >= 2) return false;
-    if (v.n === 1) return Date.now() - v.at >= SECOND_AFTER;   // la última vez
-    const s = seen();
-    return (s.count || 0) < HINT_MAX && s.day !== today();
+    if (v.n === 1) return read('localStorage', LEARNED) !== '1' && Date.now() - v.at >= SECOND_AFTER;   // la última vez, solo si aún no sabe
+    return seen().day !== today();   // una vez cada día que vuelve
   }
   // A los 45 s: si está en una de estas áreas, se enseña en el siguiente momento
   // de calma; si no, al volver a entrar en una (considerHint).
@@ -484,8 +489,8 @@
     if (v.n === 0) {
       const s = seen();
       write('localStorage', SHOWN, JSON.stringify({ count: (s.count || 0) + 1, day: today() }));
-      saveVisit({ n: 1, at: Date.now() });
-      armSecond(SECOND_AFTER);
+      if (read('localStorage', LEARNED) === '1') saveVisit({ n: 2, at: Date.now() });   // ya sabe: solo un recordatorio
+      else { saveVisit({ n: 1, at: Date.now() }); armSecond(SECOND_AFTER); }
     } else {
       saveVisit({ n: 2, at: v.at });
     }
@@ -556,7 +561,11 @@
     window.addEventListener(type, postpone, { capture: true, passive: true });
   }
   window.addEventListener('scroll', postpone, { passive: true });
-  document.addEventListener('visibilitychange', () => { if (document.hidden) postpone(); });
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) { postpone(); return; }
+    // Vuelve a una pestaña que dejó abierta otro día: el recordatorio de hoy.
+    if (!hint && seen().day !== today()) { hintKey = ''; considerHint(); }
+  });
   // La pantalla de carga tapa la sección al entrar: el 1,5 s se cuenta desde que se va.
   const calmAgain = () => { if (!hint) postpone(); };
   new MutationObserver(calmAgain).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });

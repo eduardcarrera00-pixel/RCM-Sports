@@ -5,7 +5,8 @@ toques reales enviados por el protocolo del navegador: el gesto pasa por el
 mismo camino que en un teléfono, con el desplazamiento de la página incluido.
 
 Cubre, a 390 px de día y de noche y a 320 px:
-  · NFL y Fútbol: La semana → Takes → Noticias → La semana (vuelta) y hacia atrás;
+  · NFL y Fútbol: Noticias → La semana → Takes → Noticias (vuelta) y hacia atrás
+    (abren en Noticias desde el 14 nov);
   · Picks: Picks → Chefs → Historial → Picks; Actualidad: Todas → NFL → Fútbol →
     Colegial → Ciclismo → Todas, y hacia atrás;
   · la dirección (?s=nfl&v=takes) cambia igual que al tocar la pestaña;
@@ -261,7 +262,7 @@ def phone(width, dark):
         page.wait_for_timeout(600)
 
         open_area(page, 'NFL')
-        loop(page, cdp, 'sec', ['semana', 'takes', 'noticias'], f'{where} NFL', url=True)
+        loop(page, cdp, 'sec', ['noticias', 'semana', 'takes'], f'{where} NFL', url=True)
         # Arrastre lento y largo («arrastrar»), y gesto rápido corto: los dos cambian.
         w = page.evaluate('innerWidth')
         before = state(page)['tab']
@@ -277,7 +278,7 @@ def phone(width, dark):
         drag_feel(page, cdp, 'sec', f'{where} NFL', 'Takes', SHOTS / f'{where}-nfl-arrastrando.png' if SHOTS else None)
 
         open_area(page, 'Fútbol')
-        loop(page, cdp, 'sec', ['semana', 'takes', 'noticias'], f'{where} Fútbol', url=True)
+        loop(page, cdp, 'sec', ['noticias', 'semana', 'takes'], f'{where} Fútbol', url=True)
 
         open_area(page, 'Picks')
         loop(page, cdp, 'sec', ['picks', 'chefs', 'historial'], f'{where} Picks', url=True)
@@ -315,7 +316,7 @@ def reduced():
         assert not st['moved'], f'reducir movimiento: el contenido se movió {st["moved"]}'
         touch(cdp, 'touchEnd', []); page.wait_for_timeout(120)
         st = settled(page, 'reducir movimiento')
-        assert st['tab'] == 'takes', f'reducir movimiento: no cambió ({st["tab"]})'
+        assert st['tab'] == 'semana', f'reducir movimiento: no cambió ({st["tab"]})'
         assert not page.errors, page.errors
         print('ok reducir movimiento')
 

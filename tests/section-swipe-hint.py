@@ -5,7 +5,8 @@ caso abre un navegador nuevo: es como alguien que llega por primera vez.
 
 Cubre:
   · teléfono táctil (390 px, día y noche): al entrar en NFL, tras 1,5 s sin
-    tocar nada, el contenido amaga hacia la izquierda y asoma «Takes ›»; luego
+    tocar nada, el contenido amaga hacia la izquierda y asoma «La semana ›»
+    (NFL y Fútbol abren en Noticias desde el 14 nov); luego
     todo vuelve a su sitio, sin estilos en línea ni desbordamiento lateral;
   · en la misma visita no se repite antes de 45 s (Picks después no lo enseña);
   · a los 45 s, si sigue en una de estas áreas sin haber deslizado, una última
@@ -13,9 +14,12 @@ Cubre:
   · Actualidad lo enseña con su siguiente apartado («NFL ›»);
   · tocar o bajar la página mientras espera lo retrasa; tocar durante el amago
     lo quita al momento;
-  · no sale: si ya deslizó alguna vez, si ya salió hoy, tras 3 visitas, en Inicio,
-    en una pantalla sin tacto (ordenador), ni si desliza antes de que salga
-    (y entonces queda apuntado que ya sabe);
+  · cada día que vuelve (14 nov 2026), una vez, aunque ya sepa deslizar y sin
+    tope de días; si ya sabe, sin la de los 45 s; también en una pestaña que
+    dejó abierta desde ayer (al recargar o al volver a ella);
+  · no sale: si ya salió hoy (aunque abra otra pestaña), en Inicio, en una
+    pantalla sin tacto (ordenador), ni si desliza antes de que salga (y entonces
+    queda apuntado que ya sabe);
   · «reducir movimiento»: en vez del amago, la frase «Desliza para cambiar ›»
     bajo las pestañas, sin mover el contenido, y se va sola.
 
@@ -112,7 +116,7 @@ def first_visit(dark):
         st = page.evaluate(STATE)
         assert not st['hinting'], f'{where}: salió antes de 1,5 s'
         st = wait_hint(page, where)
-        assert st['peek'] and 'Takes' in st['peek']['text'] and not st['peek']['ready'], f'{where}: aviso {st["peek"]}'
+        assert st['peek'] and 'La semana' in st['peek']['text'] and not st['peek']['ready'], f'{where}: aviso {st["peek"]}'
         assert st['moved'] and all(-30 <= m['x'] <= -4 for m in st['moved']), f'{where}: el contenido no amagó {st["moved"]}'
         if SHOTS: page.screenshot(path=str(SHOTS / f'{where.replace(" ", "-")}-nfl.png'))
         st = clean(page, where)
@@ -147,7 +151,7 @@ def interactions():
         page.wait_for_timeout(1100)
         assert not page.evaluate(STATE)['hinting'], 'tocar no retrasó el aviso'
         st = wait_hint(page, 'tras bajar la página', within=3000)
-        assert st['peek'] and 'Takes' in st['peek']['text'], st
+        assert st['peek'] and 'La semana' in st['peek']['text'], st
         # Tocar durante el amago lo quita al momento.
         touch(cdp, 'touchStart', [(200, 420)])
         page.wait_for_timeout(60)
@@ -155,7 +159,7 @@ def interactions():
         assert not st['hinting'] and not st['moved'] and not st['peek'], f'tocar no quitó el aviso {st}'
         touch(cdp, 'touchEnd', [])
         page.wait_for_timeout(300)
-        assert page.evaluate("document.body.dataset.camTab") == 'semana', 'el toque cambió de apartado'
+        assert page.evaluate("document.body.dataset.camTab") == 'noticias', 'el toque cambió de apartado'
         assert not page.errors, page.errors
         print('ok toques')
 
@@ -182,15 +186,17 @@ def interactions():
         assert page.evaluate('performance.now()') - t0 < 1400, 'la prueba tardó demasiado en deslizar'
         page.wait_for_timeout(700)
         st = no_hint(page, 'deslizó antes')
-        assert st['learned'] == '1' and page.evaluate("document.body.dataset.camTab") == 'takes', f'deslizó antes: {st}'
+        assert st['learned'] == '1' and page.evaluate("document.body.dataset.camTab") == 'semana', f'deslizó antes: {st}'
         print('ok ya sabe')
 
 
 def remembered():
+    TODAY_SHOWN = f"localStorage.setItem('cam_swipe_hint_v1', JSON.stringify({{count: 1, day: {TODAY}}}));"
     cases = {
-        'ya deslizó otra vez': "localStorage.setItem('cam_swipe_learned_v1', '1');",
-        'ya salió hoy': f"localStorage.setItem('cam_swipe_hint_v1', JSON.stringify({{count: 1, day: {TODAY}}}));",
-        'tres visitas': "localStorage.setItem('cam_swipe_hint_v1', JSON.stringify({count: 3, day: '2000-1-1'}));",
+        'ya salió hoy': TODAY_SHOWN,
+        'ya salió hoy y ya sabe': TODAY_SHOWN + "localStorage.setItem('cam_swipe_learned_v1', '1');",
+        # Otra pestaña el mismo día (sessionStorage vacío): tampoco.
+        'ya salió hoy en otra pestaña': TODAY_SHOWN + "sessionStorage.removeItem('cam_swipe_hint_session_v1');",
     }
     for name, js in cases.items():
         with fp.full_page(fake_js=seed(js), width=390, height=800, touch=True) as page:
@@ -206,6 +212,67 @@ def remembered():
         st = clean(page, 'otro día')
         assert st['shown']['count'] == 2, f'otro día: cuenta {st["shown"]}'
         print('ok otro día')
+    # Sin tope de días: la cuarta, la décima… siguen saliendo.
+    with fp.full_page(fake_js=seed("localStorage.setItem('cam_swipe_hint_v1', JSON.stringify({count: 9, day: '2000-1-1'}));"),
+                      width=390, height=800, touch=True) as page:
+        open_area(page, 'NFL')
+        wait_hint(page, 'décimo día')
+        st = clean(page, 'décimo día')
+        assert st['shown']['count'] == 10 and st['shown']['day'] == page.evaluate(TODAY), f'décimo día: {st["shown"]}'
+        print('ok sin tope de días')
+
+
+def returning():
+    """Ya sabe deslizar y vuelve otro día: un recordatorio, solo uno."""
+    js = ("localStorage.setItem('cam_swipe_learned_v1', '1');"
+          "localStorage.setItem('cam_swipe_hint_v1', JSON.stringify({count: 3, day: '2000-1-1'}));")
+    with fp.full_page(fake_js=seed(js), width=390, height=800, touch=True, clock=True) as page:
+        open_area(page, 'NFL')
+        st = wait_hint(page, 'vuelve y ya sabe')
+        assert st['peek'] and 'La semana' in st['peek']['text'] and st['moved'], f'vuelve y ya sabe: {st}'
+        if SHOTS: page.screenshot(path=str(SHOTS / 'vuelve-otro-dia.png'))
+        st = clean(page, 'vuelve y ya sabe')
+        assert st['shown']['count'] == 4 and st['visit']['n'] == 2 and st['learned'] == '1', f'vuelve y ya sabe: {st}'
+        # Ese día ya no se repite: ni a los 45 s ni al entrar en otra área.
+        page.clock.fast_forward('01:00')
+        no_hint(page, 'vuelve y ya sabe · a los 60 s', wait=2500)
+        open_area(page, 'Picks')
+        no_hint(page, 'vuelve y ya sabe · Picks después')
+        assert not page.errors, page.errors
+        print('ok vuelve otro día y ya sabe: una vez')
+
+    # Pestaña que dejó abierta ayer (sessionStorage de ayer con la visita cumplida):
+    # al recargar hoy, sale.
+    js = ("localStorage.setItem('cam_swipe_learned_v1', '1');"
+          "localStorage.setItem('cam_swipe_hint_v1', JSON.stringify({count: 2, day: '2000-1-1'}));"
+          "sessionStorage.setItem('cam_swipe_hint_session_v1', JSON.stringify({n: 2, at: Date.now() - 864e5}));")
+    with fp.full_page(fake_js=seed(js), width=390, height=800, touch=True) as page:
+        open_area(page, 'Fútbol')
+        st = wait_hint(page, 'pestaña de ayer')
+        assert st['peek'] and 'La semana' in st['peek']['text'], f'pestaña de ayer: {st}'
+        st = clean(page, 'pestaña de ayer')
+        assert st['visit']['n'] == 2 and st['shown']['count'] == 3, f'pestaña de ayer: {st}'
+        print('ok pestaña abierta desde ayer (al recargar)')
+
+    # Pestaña abierta sin recargar: ya sabe, se queda en NFL, pasa la noche y vuelve a ella.
+    js = ("localStorage.setItem('cam_swipe_learned_v1', '1');"
+          "localStorage.setItem('cam_swipe_hint_v1', JSON.stringify({count: 1, day: '2000-1-1'}));")
+    with fp.full_page(fake_js=seed(js), width=390, height=800, touch=True, clock=True) as page:
+        open_area(page, 'NFL')
+        wait_hint(page, 'sin recargar · hoy')
+        clean(page, 'sin recargar · hoy')
+        page.clock.fast_forward('24:00:00')
+        no_hint(page, 'sin recargar · antes de volver', wait=2500)
+        page.evaluate("document.dispatchEvent(new Event('visibilitychange'))")   # vuelve a la pestaña
+        st = wait_hint(page, 'sin recargar · al día siguiente')
+        assert st['peek'] and 'La semana' in st['peek']['text'], f'sin recargar: {st}'
+        st = clean(page, 'sin recargar · al día siguiente')
+        assert st['shown']['count'] == 3 and st['visit']['n'] == 2, f'sin recargar: {st}'
+        # Volver otra vez el mismo día: nada.
+        page.evaluate("document.dispatchEvent(new Event('visibilitychange'))")
+        no_hint(page, 'sin recargar · otra vez el mismo día')
+        assert not page.errors, page.errors
+        print('ok pestaña abierta desde ayer (al volver a ella)')
 
 
 def last_time():
@@ -218,7 +285,7 @@ def last_time():
         no_hint(page, '45 s · a los 30 s', wait=2500)
         page.clock.fast_forward('00:20')
         st = wait_hint(page, '45 s · última vez')
-        assert st['peek'] and 'Takes' in st['peek']['text'] and st['moved'], f'45 s: {st}'
+        assert st['peek'] and 'La semana' in st['peek']['text'] and st['moved'], f'45 s: {st}'
         st = clean(page, '45 s · última vez')
         assert st['visit']['n'] == 2 and st['shown']['count'] == 1, f'45 s: la última vez no debe contar como otra visita {st}'
         page.clock.fast_forward('06:00')
@@ -237,7 +304,7 @@ def last_time():
         no_hint(page, '45 s · en Inicio', wait=2500)
         open_area(page, 'Fútbol')
         st = wait_hint(page, '45 s · al volver a entrar')
-        assert st['peek'] and 'Takes' in st['peek']['text'], f'45 s al volver: {st}'
+        assert st['peek'] and 'La semana' in st['peek']['text'], f'45 s al volver: {st}'
         clean(page, '45 s · al volver a entrar')
         print('ok última vez al volver')
 
@@ -281,6 +348,7 @@ first_visit(True)
 actualidad()
 interactions()
 remembered()
+returning()
 last_time()
 desktop()
 reduced()
