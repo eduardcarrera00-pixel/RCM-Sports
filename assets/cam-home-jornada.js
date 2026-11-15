@@ -608,7 +608,6 @@
   function takeIntroCard() {
     const card = el('section', null, 'cam-hj-ev cam-hj-take-intro', { 'aria-labelledby': 'camHjTakeIntroTitle' });
     card.append(
-      el('span', 'Tu take', 'cam-hj-ev-kicker'),
       el('h4', 'Comparte esa opinión en la que solo tú crees', 'cam-hj-ev-title', { id: 'camHjTakeIntroTitle' }),
       el('p', 'Ej.: Gilberto Mora será Balón de Oro en 2030', 'cam-hj-take-example'),
       el('button', 'Hacer mi take ›', 'cam-hj-ev-cta', { type: 'button' })
