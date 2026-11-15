@@ -372,7 +372,7 @@
   }
   html body #camHomeJornada .cam-hj-side .cam-hj-crest.is-loaded { background:transparent!important; }
   html body #camHomeJornada .cam-hj-game .cam-hj-side .cam-hj-crest img {
-    inset:0!important; width:100%!important; height:100%!important; max-width:100%!important; max-height:100%!important;
+    inset:4px!important; width:calc(100% - 8px)!important; height:calc(100% - 8px)!important; max-width:100%!important; max-height:100%!important;
     object-fit:contain!important; object-position:center!important; transform:none!important;
   }
   html body #camHomeJornada .cam-hj-side-name {
