@@ -641,7 +641,7 @@
     card.append(
       el('h4', 'Comparte esa opinión en la que solo tú crees', 'cam-hj-ev-title', { id: 'camHjTakeIntroTitle' }),
       el('p', 'Ej.: Gilberto Mora será Balón de Oro en 2030', 'cam-hj-take-example'),
-      el('button', 'Hacer mi take ›', 'cam-hj-ev-cta', { type: 'button' })
+      el('button', 'Publicar mi take ›', 'cam-hj-ev-cta', { type: 'button' })
     );
     // Toda la tarjeta abre el compositor (el botón es el control accesible).
     card.addEventListener('click', openTakeComposer);
