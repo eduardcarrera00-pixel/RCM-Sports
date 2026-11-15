@@ -913,15 +913,20 @@ function sizePlateWindow(target){
    plateWindowObservers.set(target,observer);
  }
 }
-// 14 nov 2026: «Mejores platos» abre con el boleto, como «Tu take» abre Recientes:
-// una tarjeta pequeña que pide la foto del parlay (el compositor ya lee la captura)
-// y, al lado, los rombos que llevan a los platos. Solo en Mejores platos.
+// 14 nov 2026 (noche): en Inicio, «Picks de la comunidad» es UN carrusel. Primero el
+// boleto, que explica qué es un Pick (la foto del parlay, votada por la comunidad); al
+// lado, los rombos con dos accesos («Mejores platos →» y «Peores platos →») para que los
+// dos se vean desde el principio; después hasta 5 mejores, el rótulo «Peores platos» y
+// hasta 5 peores; al final, «Ver todos los Picks →». Los votos llevan ▲ verde o ▼ teja.
+const HOME_PLATES=5;
+const homePlates={best:null,worst:null};
 function homeParlayIntro(){
  const item=el('li',null,'cam-home-plate-intro');
  const card=el('section',null,'cam-home-parlay');
  card.setAttribute('aria-labelledby','camHomeParlayTitle');
  const title=el('h4','Sube la foto de tu parlay','cam-home-parlay-title');
  title.id='camHomeParlayTitle';
+ const lead=el('p','Tu apuesta, votada por la comunidad','cam-home-parlay-lead');
  const ticket=el('div',null,'cam-home-parlay-ticket');
  ticket.setAttribute('role','img');
  ticket.setAttribute('aria-label','Ejemplo de parlay: más de 49.5 puntos en Patriots contra Lions y más de 47.5 en Chiefs contra Falcons, momio +275');
@@ -930,71 +935,109 @@ function homeParlayIntro(){
  ticket.append(legs,el('span','+275','cam-home-parlay-odds'));
  const cta=el('button','Subir mi parlay ›','cam-home-parlay-cta');
  cta.type='button';
- card.append(title,ticket,cta);
+ card.append(title,lead,ticket,cta);
  // Toda la tarjeta abre el compositor (el botón es el control accesible).
  card.addEventListener('click',()=>{void openPickComposer();});
  item.append(card);
  return item;
 }
-function homePlatesLink(target){
- const item=el('li',null,'cam-home-plate-sep');
- const link=el('button',null,'cam-home-plate-sep-link');
- link.type='button';
- const ornament=()=>{const d=el('span',null,'cam-home-plate-sep-diamond');d.setAttribute('aria-hidden','true');return d;};
+function homeDiamond(){const d=el('span',null,'cam-home-plate-sep-diamond');d.setAttribute('aria-hidden','true');return d;}
+function homeScrollTo(target,node){
+ if(!node)return;
+ const left=Math.max(0,target.scrollLeft+node.getBoundingClientRect().left-target.getBoundingClientRect().left-1);
+ const calm=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+ try{target.scrollTo({left,behavior:calm?'auto':'smooth'});}catch{target.scrollLeft=left;}
+}
+// Junto al boleto: un acceso por cada lista que tenga Picks (o una nota si aún no hay votos).
+function homePlatesAccess(target,hasBest,hasWorst){
+ const item=el('li',null,'cam-home-plate-sep cam-home-plate-access');
+ const box=el('div',null,'cam-home-plate-sep-link');
+ box.append(homeDiamond());
+ const go=(text,kind,selector)=>{
+  const b=el('button',null,'cam-home-plate-jump is-'+kind);
+  b.type='button';
+  const arrow=el('span','→','cam-home-plate-sep-arrow');arrow.setAttribute('aria-hidden','true');
+  b.append(el('span',text,'cam-home-plate-sep-text'),arrow);
+  b.addEventListener('click',()=>homeScrollTo(target,target.querySelector(selector)));
+  box.append(b);
+ };
+ if(hasBest)go('Mejores platos','best','.cam-home-plate-row.is-best');
+ if(hasWorst)go('Peores platos','worst',hasBest?'.cam-home-plate-label':'.cam-home-plate-row.is-worst');
+ if(!hasBest&&!hasWorst)box.append(el('span','Aún sin votos esta semana','cam-home-plate-sep-text'));
+ box.append(homeDiamond());
+ item.append(box);
+ return item;
+}
+// Rótulo entre los mejores y los peores (no es un botón).
+function homePlatesLabel(){
+ const item=el('li',null,'cam-home-plate-sep cam-home-plate-label');
+ const box=el('div',null,'cam-home-plate-sep-link');
+ box.append(homeDiamond(),el('span','Peores platos','cam-home-plate-sep-text'),homeDiamond());
+ item.append(box);
+ return item;
+}
+function homePlatesMore(){
+ const item=el('li',null,'cam-home-plate-sep cam-home-plate-more');
+ const b=el('button',null,'cam-home-plate-sep-link');
+ b.type='button';
  const arrow=el('span','→','cam-home-plate-sep-arrow');arrow.setAttribute('aria-hidden','true');
- link.append(ornament(),el('span','Mira los mejores platos','cam-home-plate-sep-text'),arrow,ornament());
- link.addEventListener('click',()=>{
-  const first=target.querySelector('.cam-home-plate-row');
-  if(!first)return;
-  const left=Math.max(0,target.scrollLeft+first.getBoundingClientRect().left-target.getBoundingClientRect().left-1);
-  const calm=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-  try{target.scrollTo({left,behavior:calm?'auto':'smooth'});}catch{target.scrollLeft=left;}
+ b.append(homeDiamond(),el('span','Ver todos los Picks','cam-home-plate-sep-text'),arrow,homeDiamond());
+ b.addEventListener('click',()=>{if(typeof window.filterByCategory==='function')window.filterByCategory('Picks');});
+ item.append(b);
+ return item;
+}
+function homePlateRow(p,kind){
+ // Reuse the history card's structure, without a result badge or outcome data.
+ const item=el('li',null,'cam-home-plate-row ae-pick-history-entry is-'+kind);
+ item.dataset.pickId=p.id;
+ const first=p.legs?.[0];
+ const match=first?.event||p.title;
+ const prediction=window.camPickChoiceText(first?.selection||p.title,first?.sport);
+ const read=el('a',null,'cam-home-plate-open ae-pick-history-card');
+ read.href=link(p.id);read.setAttribute('aria-label',(kind==='best'?'Mejor plato':'Peor plato')+'. Abrir Pick de '+(p.author||'Aficionado')+': '+match+'. '+prediction);
+ read.addEventListener('click',event=>{
+  if(event.ctrlKey||event.metaKey||event.shiftKey||event.altKey||event.button!==0)return;
+  event.preventDefault();open(p.id);
  });
- item.append(link);
+ const top=el('div',null,'ae-pick-history-card-top');
+ top.append(el('span','@'+String(p.author||'Aficionado').replace(/^@+/,''),'ae-pick-history-user'));
+ const content=el('div',null,'ae-pick-history-card-content');
+ content.append(el('strong',match,'ae-pick-history-match'),el('span',prediction,'ae-pick-history-prediction'));
+ const count=ticketChoices(p).length;
+ if(count>1)content.append(el('small','Combinada · '+count+' selecciones','ae-pick-history-multiple'));
+ const figures=el('div',null,'cam-home-plate-figures ae-pick-history-card-bottom');
+ const odds=el('span',p.american_odds==null?'—':(Number(p.american_odds)>0?'+':'')+p.american_odds,'ae-pick-history-odds');
+ odds.setAttribute('aria-label','Momio '+odds.textContent);
+ const score=Number(p.score||0),size=Math.abs(score),word=size===1?' voto':' votos';
+ const votes=el('small',null,'cam-home-plate-votes '+(score<0?'is-down':'is-up'));
+ const mark=el('span',score<0?'▼':'▲','cam-home-plate-vote-mark');mark.setAttribute('aria-hidden','true');
+ votes.append(mark,document.createTextNode(' '+size+word));
+ votes.setAttribute('aria-label',(score>0?'+':score<0?'−':'')+size+word);
+ figures.append(odds,votes);
+ read.append(top,content,figures);item.append(read);
  return item;
 }
 // Home uses the same weekly vote ranking and refresh, without another query.
+// Each list arrives on its own; the carousel is painted with whatever is known.
 function paintHomePlateList(result,kind){
- const target=$(kind==='best'?'camHomeBestPlates':'camHomeWorstPlates');
+ homePlates[kind]=result||null;
+ const target=$('camHomeBestPlates');
  if(!target)return;
- target.replaceChildren();
- if(result?.error){
-  target.dataset.camContentState='error';
+ const best=Array.isArray(homePlates.best?.data)?homePlates.best.data.slice(0,HOME_PLATES):[];
+ const worst=Array.isArray(homePlates.worst?.data)?homePlates.worst.data.slice(0,HOME_PLATES):[];
+ const failed=Boolean(homePlates.best?.error||homePlates.worst?.error);
+ const items=[homeParlayIntro(),homePlatesAccess(target,best.length>0,worst.length>0)];
+ best.forEach(p=>items.push(homePlateRow(p,'best')));
+ if(worst.length&&best.length)items.push(homePlatesLabel());
+ worst.forEach(p=>items.push(homePlateRow(p,'worst')));
+ if(failed){
   const retry=button('Reintentar',()=>loadChefLists());
   const empty=el('li','No se pudo cargar la clasificación. ','cam-home-plate-empty');
-  empty.append(retry);target.append(empty);
-  return;
+  empty.append(retry);items.push(empty);
  }
- const picks=Array.isArray(result?.data)?result.data:[];
- target.dataset.camContentState=picks.length?'ready':'empty';
- if(!picks.length){target.append(el('li','Aún sin votos esta semana.','cam-home-plate-empty'));return;}
- if(kind==='best')target.append(homeParlayIntro(),homePlatesLink(target));
- for(const p of picks){
-  // Reuse the history card's structure, without a result badge or outcome data.
-  const item=el('li',null,'cam-home-plate-row ae-pick-history-entry');
-  item.dataset.pickId=p.id;
-  const first=p.legs?.[0];
-  const match=first?.event||p.title;
-  const prediction=window.camPickChoiceText(first?.selection||p.title,first?.sport);
-  const read=el('a',null,'cam-home-plate-open ae-pick-history-card');
-  read.href=link(p.id);read.setAttribute('aria-label','Abrir Pick de '+(p.author||'Aficionado')+': '+match+'. '+prediction);
-  read.addEventListener('click',event=>{
-   if(event.ctrlKey||event.metaKey||event.shiftKey||event.altKey||event.button!==0)return;
-   event.preventDefault();open(p.id);
-  });
-  const top=el('div',null,'ae-pick-history-card-top');
-  top.append(el('span','@'+String(p.author||'Aficionado').replace(/^@+/,''),'ae-pick-history-user'));
-  const content=el('div',null,'ae-pick-history-card-content');
-  content.append(el('strong',match,'ae-pick-history-match'),el('span',prediction,'ae-pick-history-prediction'));
-  const count=ticketChoices(p).length;
-  if(count>1)content.append(el('small','Combinada · '+count+' selecciones','ae-pick-history-multiple'));
-  const figures=el('div',null,'cam-home-plate-figures ae-pick-history-card-bottom');
-  const odds=el('span',p.american_odds==null?'—':(Number(p.american_odds)>0?'+':'')+p.american_odds,'ae-pick-history-odds');
-  odds.setAttribute('aria-label','Momio '+odds.textContent);
-  const score=Number(p.score||0);
-  figures.append(odds,el('small',(score>0?'+':'')+score+(Math.abs(score)===1?' voto':' votos'),'cam-home-plate-votes'));
-  read.append(top,content,figures);item.append(read);target.append(item);
- }
+ if(best.length||worst.length)items.push(homePlatesMore());
+ target.replaceChildren(...items);
+ target.dataset.camContentState=failed?'error':(best.length||worst.length)?'ready':'empty';
 }
 function paintChefList(id,result,kind){
  paintHomePlateList(result,kind);

@@ -252,10 +252,10 @@ html:not(.cam-global-edit-active) body :is(#aePicksTopPair,#aeHomeTakeHistoric,#
 }
 
 /* Home shows published content. The dedicated Picks page retains a concise
-   empty state and its history action; failed reads remain visible everywhere. */
+   empty state and its history action; failed reads remain visible everywhere.
+   14 nov 2026: the Home Picks carousel opens with the parlay ticket, so it stays
+   visible even before the week's first votes (no empty-board rule here). */
 html:not(.cam-global-edit-active) body #mainContent #camHomePicks[data-cam-editor-state="empty"] > :is(.cam-home-weekly-label,.ae-home-weekly-more,.editorial-pick-body),
-html:not(.cam-global-edit-active) body #mainContent #camHomePicks .cam-home-plate-board:has(> ol[data-cam-content-state="empty"]),
-html:not(.cam-global-edit-active) body #mainContent #camHomePicks[data-cam-editor-state="empty"]:has(#camHomeBestPlates[data-cam-content-state="empty"]):has(#camHomeWorstPlates[data-cam-content-state="empty"]),
 html:not(.cam-global-edit-active) body #mainContent #footballTakes #communityPicks .ae-picks-rail:has(#picksPopular[data-cam-content-state="empty"]):has(#picksQuestioned[data-cam-content-state="empty"]) {
   display:none!important;
 }

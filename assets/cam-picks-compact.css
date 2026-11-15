@@ -9,6 +9,7 @@
     --cam-h-edge:var(--hj-line,rgba(133,91,67,.2));--cam-h-action:var(--hj-accent,#855b43);--cam-h-hover:var(--hj-soft,#f4ece0);
     --cam-h-shadow:var(--hj-shadow,0 1px 2px rgba(19,50,77,.06),0 6px 18px -12px rgba(19,50,77,.28));
     --cam-h-odds-bg:var(--hj-accent-soft,rgba(133,91,67,.1));
+    --cam-h-up:var(--hj-up,#2c6a4c);--cam-h-down:var(--hj-down,#a3433a);
     display:block!important;position:relative!important;isolation:isolate!important;
     box-sizing:border-box!important;width:100%!important;min-width:0!important;
     height:auto!important;min-height:0!important;margin:0 0 16px!important;padding:0!important;
@@ -22,6 +23,7 @@
     --cam-h-edge:var(--hj-line,rgba(214,166,112,.2));--cam-h-action:var(--hj-accent,#e0b37c);--cam-h-hover:var(--hj-soft,#163450);
     --cam-h-shadow:var(--hj-shadow,0 1px 2px rgba(0,0,0,.25),0 8px 20px -14px rgba(0,0,0,.6));
     --cam-h-odds-bg:var(--hj-accent-soft,rgba(224,179,124,.12));
+    --cam-h-up:var(--hj-up,#93d3aa);--cam-h-down:var(--hj-down,#f2a397);
   }
   html body #mainContent #camHomePicks[hidden] {display:none!important;}
   html body #mainContent #camHomePicks::before,
@@ -129,11 +131,15 @@
     font:800 11px/1.3 Inter,system-ui,sans-serif!important;font-variant-numeric:tabular-nums!important;white-space:nowrap!important;
   }
   html body #mainContent #camHomePicks .cam-home-plate-votes {color:var(--cam-h-muted)!important;font:600 10px/1.3 Inter,system-ui,sans-serif!important;white-space:nowrap!important;}
+  html body #mainContent #camHomePicks .cam-home-plate-votes.is-up {color:var(--cam-h-up)!important;}
+  html body #mainContent #camHomePicks .cam-home-plate-votes.is-down {color:var(--cam-h-down)!important;}
+  html body #mainContent #camHomePicks .cam-home-plate-vote-mark {font-size:9px!important;}
   html body #mainContent #camHomePicks .cam-home-plate-empty {flex:0 0 100%!important;padding:8px 0!important;color:var(--ds-text-muted,#566876)!important;font:400 12px/1.5 Inter,system-ui,sans-serif!important;}
 
-  /* 14 nov 2026 · «Mejores platos» abre con el boleto, como «Tu take» abre Recientes:
-     una tarjeta azul noche y dorado de 248 px, del alto de un plato, que pide la foto del
-     parlay, y los rombos que llevan a los platos. Peores platos no cambia. */
+  /* 14 nov 2026 · «Picks de la comunidad» es un solo carrusel: el boleto (tarjeta azul
+     noche y dorado de 248 px, del alto de un plato, que pide la foto del parlay y dice qué
+     es un Pick), los rombos con «Mejores platos →» y «Peores platos →», hasta 5 mejores,
+     el rótulo «Peores platos», hasta 5 peores y «Ver todos los Picks →». */
   html body #mainContent #camHomePicks .cam-home-plate-intro {
     display:block!important;flex:0 0 248px!important;width:248px!important;height:164px!important;min-width:0!important;
     padding:0!important;margin:0!important;border:0!important;list-style:none!important;scroll-snap-align:start;
@@ -149,9 +155,13 @@
     margin:0!important;padding:0!important;color:#F3EBDD!important;
     font:600 16.5px/1.25 "Playfair Display",Georgia,serif!important;letter-spacing:0!important;text-transform:none!important;
   }
+  html body #mainContent #camHomePicks .cam-home-parlay-lead {
+    margin:2px 0 0!important;padding:0!important;color:#A9B6BF!important;
+    font:500 11.5px/1.35 Inter,system-ui,sans-serif!important;letter-spacing:0!important;text-transform:none!important;
+  }
   html body #mainContent #camHomePicks .cam-home-parlay-ticket {
     position:relative!important;display:flex!important;align-items:center!important;gap:10px!important;
-    margin:11px 2px 0!important;padding:7px 10px 7px 12px!important;border:0!important;border-radius:10px!important;
+    margin:9px 2px 0!important;padding:6px 10px 6px 12px!important;border:0!important;border-radius:10px!important;
     background:#F3EBDD!important;color:#0B2233!important;box-shadow:0 6px 14px rgba(0,0,0,.28)!important;
     transform:rotate(-1.5deg)!important;
   }
@@ -195,6 +205,27 @@
   html body #mainContent #camHomePicks .cam-home-plate-sep-diamond {
     display:block!important;flex:0 0 auto!important;width:6px!important;height:6px!important;
     border:1px solid var(--hj-gold,#b0803f)!important;transform:rotate(45deg)!important;
+  }
+  html body #mainContent #camHomePicks .cam-home-plate-label {flex-basis:92px!important;width:92px!important;scroll-snap-align:start!important;}
+  html body #mainContent #camHomePicks .cam-home-plate-label .cam-home-plate-sep-link {cursor:default!important;}
+  html body #mainContent #camHomePicks .cam-home-plate-access .cam-home-plate-sep-link {gap:8px!important;cursor:default!important;}
+  html body #mainContent #camHomePicks .cam-home-plate-jump {
+    display:flex!important;flex-direction:column!important;align-items:center!important;gap:3px!important;
+    min-width:44px!important;min-height:44px!important;margin:0!important;padding:4px 2px!important;
+    border:0!important;border-radius:10px!important;background:transparent!important;box-shadow:none!important;
+    color:var(--cam-h-ink)!important;text-align:center!important;cursor:pointer!important;-webkit-tap-highlight-color:transparent!important;
+  }
+  html body #mainContent #camHomePicks .cam-home-plate-jump .cam-home-plate-sep-arrow {font-size:15px!important;}
+  @media (hover:hover) {
+    html body #mainContent #camHomePicks :is(.cam-home-plate-jump,.cam-home-plate-more .cam-home-plate-sep-link):hover .cam-home-plate-sep-text {text-decoration:underline!important;text-underline-offset:3px!important;text-decoration-thickness:1px!important;}
+  }
+  /* Teléfonos estrechos (≤ 380 px): boleto y rombos algo más angostos para que los dos
+     accesos se vean enteros junto al boleto desde 360 px. */
+  @media (max-width:380px) {
+    html body #mainContent #camHomePicks .cam-home-plate-intro {flex-basis:232px!important;width:232px!important;}
+    html body #mainContent #camHomePicks .cam-home-parlay {padding:13px 12px 12px!important;}
+    html body #mainContent #camHomePicks .cam-home-parlay-lead {font-size:11px!important;}
+    html body #mainContent #camHomePicks .cam-home-plate-access {flex-basis:90px!important;width:90px!important;}
   }
   html body #mainContent #camHomePicks .cam-home-plate-sep-text {
     display:block!important;margin:2px 0 0!important;padding:0!important;color:var(--cam-h-ink)!important;

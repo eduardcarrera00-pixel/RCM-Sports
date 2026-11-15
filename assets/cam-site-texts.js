@@ -16,8 +16,6 @@
     ['home.pick.historic','#aeHomePickHistoricTitle','Home · Pick histórico'],
     ['home.pick.historic.description','#aeHomePickHistoric .ae-home-take-feature-intro','Home · Pick histórico · Descripción'],
     ['home.picks.community.title','#weeklyPickTitle','Home · Picks de la comunidad'],
-    ['home.picks.best.title','#camHomeBestTitle','Home · Mejores platos'],
-    ['home.picks.worst.title','#camHomeWorstTitle','Home · Peores platos'],
     ['home.trending','#trendingTitle','Home · Lo más leído'],
     ['home.opinadores','#communityTitle','Home · Opinadores distinguidos'],
     ['home.news.all','#aeHomeAllNewsButton','Home · Todas las noticias'],
