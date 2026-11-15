@@ -461,18 +461,25 @@
   html body #camHomeJornada .cam-hj-ev-champ .cam-hj-ev-crest img { width:32px!important; height:32px!important; }
   html body #camHomeJornada .cam-hj-ev-champ-name { color:var(--ev-ink)!important; font:700 15px/1.3 Inter,system-ui,sans-serif!important; }
 
+  /* 14 nov 2026 · botones más tenues («A · Velo de color»): en vez del relleno dorado, un velo
+     del color al 12 % con contorno fino y el texto en ese color. Cada botón de Inicio lleva su
+     tono: la Liguilla dorado, «Hacer mi take» teja (más rojiza que el dorado) y «Subir mi
+     parlay» azul (en cam-picks-compact.css). Las tarjetas son azul noche de día y de noche. */
   html body #camHomeJornada .cam-hj-ev-cta {
+    --ev-cta:232,191,121; --ev-cta-ink:#ECC98C;
     display:flex!important; align-items:center!important; justify-content:center!important; width:100%!important; min-height:40px!important;
-    margin:auto 0 0!important; padding:0 14px!important; border:0!important; border-radius:999px!important;
-    background:var(--ev-gold)!important; background-image:none!important; color:#0B2233!important; box-shadow:none!important;
-    font:800 14px/1.1 Inter,system-ui,sans-serif!important; letter-spacing:0!important; text-transform:none!important;
+    margin:auto 0 0!important; padding:0 14px!important; border:1px solid rgba(var(--ev-cta),.42)!important; border-radius:999px!important;
+    background:rgba(var(--ev-cta),.12)!important; background-image:none!important; color:var(--ev-cta-ink)!important; box-shadow:none!important;
+    font:700 14px/1.1 Inter,system-ui,sans-serif!important; letter-spacing:0!important; text-transform:none!important;
     cursor:pointer!important; -webkit-tap-highlight-color:transparent!important;
   }
+  html body #camHomeJornada .cam-hj-take-intro .cam-hj-ev-cta { --ev-cta:232,124,100; --ev-cta-ink:#F39580; }
   html body #camHomeJornada :is(.cam-hj-ev-cta, button.cam-hj-ev-slot):focus-visible { outline:2px solid var(--ev-gold)!important; outline-offset:2px!important; }
+  html body #camHomeJornada .cam-hj-ev-cta:focus-visible { outline-color:var(--ev-cta-ink)!important; }
   html body #camHomeJornada .cam-hj-ev:active { transform:scale(.985)!important; }
   @media (hover:hover) {
     html body #camHomeJornada .cam-hj-ev:hover { border-color:rgba(232,191,121,.7)!important; }
-    html body #camHomeJornada .cam-hj-ev-cta:hover { background:#F0CD92!important; }
+    html body #camHomeJornada .cam-hj-ev-cta:hover { background:rgba(var(--ev-cta),.2)!important; border-color:rgba(var(--ev-cta),.6)!important; }
     html body #camHomeJornada button.cam-hj-ev-slot.is-open:hover { background:rgba(232,191,121,.12)!important; }
   }
   /* Separador «Participa en la quiniela de otras ligas»: dos rombos pequeños, el texto en
