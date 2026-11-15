@@ -102,6 +102,7 @@
     nav.classList.remove('cam-mobile-bottom-nav', 'cam-nav-has-active');
     nav.style.removeProperty('--cam-pill-left');
     nav.style.removeProperty('--cam-pill-width');
+    nav.style.removeProperty('--cam-dock-top');
     nav.setAttribute('aria-label', originalLabel);
     document.body.classList.remove('cam-mobile-input-focus');
     for (const button of buttons) {
@@ -111,10 +112,36 @@
     }
   }
 
+  // iOS may leave a bottom-fixed layer at the keyboard's former edge. Anchor
+  // from the top of the visible viewport instead, and refresh as browser chrome
+  // expands/collapses, focus returns or Safari restores a page from its cache.
+  // offsetTop is relative to the layout viewport; pageTop/scrollY must not be
+  // added, or the dock would travel with the document. Native bottom:0 remains
+  // the fallback without VisualViewport and while the user is pinch-zooming.
+  const viewport = window.visualViewport;
+  let viewportFrame = 0;
+  function syncViewportPlacement() {
+    if (!mobile.matches || !viewport || Math.abs(viewport.scale - 1) > 0.01 ||
+        !Number.isFinite(viewport.height) || viewport.height <= 0) {
+      nav.style.removeProperty('--cam-dock-top');
+      return;
+    }
+    const top = Math.max(0, viewport.offsetTop + viewport.height - nav.offsetHeight);
+    nav.style.setProperty('--cam-dock-top', top + 'px');
+  }
+  function scheduleViewportPlacement() {
+    if (viewportFrame) return;
+    viewportFrame = window.requestAnimationFrame(() => {
+      viewportFrame = 0;
+      syncViewportPlacement();
+    });
+  }
+
   function updatePlacement() {
     if (mobile.matches) phoneLayout();
     else desktopLayout();
     updateActive();
+    syncViewportPlacement();
   }
 
   // Reflect section changes from the nav, footer, logo and every existing script.
@@ -138,9 +165,17 @@
       }
     });
   });
-  window.addEventListener('pageshow', updateActive);
+  window.addEventListener('pageshow', () => { updateActive(); scheduleViewportPlacement(); });
   window.addEventListener('popstate', updateActive);
-  window.addEventListener('resize', updateActive);
+  window.addEventListener('resize', () => { updateActive(); scheduleViewportPlacement(); });
+  window.addEventListener('orientationchange', scheduleViewportPlacement);
+  if (viewport) {
+    viewport.addEventListener('resize', scheduleViewportPlacement, { passive: true });
+    viewport.addEventListener('scroll', scheduleViewportPlacement, { passive: true });
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) scheduleViewportPlacement();
+  });
   document.addEventListener('focusin', event => { if (event.target === profile) labelProfile(); });
 
   function isEditing(element) {
@@ -153,6 +188,7 @@
     setTimeout(() => {
       document.body.classList.toggle('cam-mobile-input-focus',
         mobile.matches && isEditing(document.activeElement));
+      scheduleViewportPlacement();
     }, 0);
   }, true);
 

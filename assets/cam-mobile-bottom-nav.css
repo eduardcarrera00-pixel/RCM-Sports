@@ -31,11 +31,13 @@ html body nav.ae-sport-nav svg.cam-mobile-nav-symbol {
   /* Full-bleed background covers the home-indicator area, without moving icons into it. */
   html body > nav.ae-sport-nav.cam-mobile-bottom-nav {
     position: fixed !important;
-    top: auto !important;
+    /* Use the visible viewport's top anchor when available. Safari can retain
+       an old bottom anchor after its toolbar or keyboard changes height. */
+    top: var(--cam-dock-top, auto) !important;
     bottom: 0 !important;
     left: 0 !important;
     right: 0 !important;
-    transform: none !important;
+    transform: translate3d(0, 0, 0) !important;
     z-index: 35 !important;
     display: flex !important;
     align-items: stretch !important;

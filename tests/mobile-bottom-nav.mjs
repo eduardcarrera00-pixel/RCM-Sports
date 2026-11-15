@@ -74,6 +74,14 @@ const media = {
   addEventListener(type, listener) { if (type === 'change') mobileListeners.push(listener); },
 };
 window.matchMedia = () => media;
+// Safari's visible viewport changes independently from document scroll position.
+const viewport = new window.EventTarget();
+Object.assign(viewport, { height: 844, offsetTop: 0, pageTop: 1500, scale: 1 });
+Object.defineProperty(window, 'visualViewport', { value: viewport });
+Object.defineProperty(nav, 'offsetHeight', { get: () => 72 });
+let viewportFrames = [];
+window.requestAnimationFrame = callback => { viewportFrames.push(callback); return viewportFrames.length; };
+const flushViewport = () => { for (const callback of viewportFrames.splice(0)) callback(); };
 vm.runInNewContext(js, {
   document, window, Element: window.Element, MutationObserver: window.MutationObserver,
   Promise, setTimeout,
@@ -81,6 +89,25 @@ vm.runInNewContext(js, {
 
 assert.equal(nav.parentElement, document.body, 'phone: move original nav outside sticky/backdrop header');
 assert.equal(nav.classList.contains('cam-mobile-bottom-nav'), true);
+assert.equal(nav.style.getPropertyValue('--cam-dock-top'), '772px');
+viewport.height = 700;
+viewport.dispatchEvent(new window.Event('resize'));
+viewport.dispatchEvent(new window.Event('scroll'));
+assert.equal(viewportFrames.length, 1, 'viewport events share one animation frame');
+flushViewport();
+assert.equal(nav.style.getPropertyValue('--cam-dock-top'), '628px', 'toolbar height follows visible viewport');
+viewport.offsetTop = 80;
+viewport.dispatchEvent(new window.Event('scroll'));
+flushViewport();
+assert.equal(nav.style.getPropertyValue('--cam-dock-top'), '708px', 'use viewport offset, never pageTop');
+viewport.scale = 2;
+viewport.dispatchEvent(new window.Event('resize'));
+flushViewport();
+assert.equal(nav.style.getPropertyValue('--cam-dock-top'), '', 'pinch zoom retains native fixed positioning');
+Object.assign(viewport, { height: 844, offsetTop: 0, scale: 1 });
+window.dispatchEvent(new window.Event('pageshow'));
+flushViewport();
+assert.equal(nav.style.getPropertyValue('--cam-dock-top'), '772px', 'Safari page restoration recomputes the anchor');
 const profile = document.getElementById('camNavProfile');
 assert.ok(profile, 'phone: Perfil tab exists');
 assert.equal(profile.parentElement, document.querySelector('header .ae-header-actions'));
@@ -183,6 +210,10 @@ for (const category of primary) {
   assert.equal(originalButtons.get(category).querySelectorAll('svg.cam-mobile-nav-symbol').length, 1);
 }
 assert.equal(nav.classList.contains('cam-mobile-bottom-nav'), false);
+viewport.height = 700;
+viewport.dispatchEvent(new window.Event('resize'));
+flushViewport();
+assert.equal(nav.style.getPropertyValue('--cam-dock-top'), '', 'desktop never inherits the phone offset');
 assert.equal(document.getElementById('camNavProfile'), null, 'desktop: no Perfil tab');
 assert.equal(opinions.parentElement, nav, 'desktop: Opiniones returns to the nav');
 assert.deepEqual(Array.from(nav.children), allButtons, 'desktop: original order restored');
@@ -197,6 +228,7 @@ assert.equal(allButtons.every(button => originalButtons.get(button.dataset.categ
 isPhone = true;
 mobileListeners.forEach(listener => listener({ matches: true }));
 assert.equal(nav.parentElement, document.body);
+assert.equal(nav.style.getPropertyValue('--cam-dock-top'), '628px', 'returning to phone recomputes the current viewport');
 assert.equal(document.querySelectorAll('.category-btn').length, 10);
 assert.equal(document.querySelectorAll('#camNavProfile').length, 1);
 
