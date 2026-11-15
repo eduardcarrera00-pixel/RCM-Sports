@@ -19,6 +19,13 @@
   const REFRESH_MS = 5 * 60 * 1000;
   const MAX_GAMES = 80;
   const LEAGUES = { champions: 'Champions', laliga: 'LaLiga', premier: 'Premier', ligamx: 'Liga MX' };
+  const LEAGUE_LOGOS = {
+    nfl: 'https://a.espncdn.com/i/teamlogos/leagues/500/nfl.png',
+    ligamx: 'https://a.espncdn.com/i/leaguelogos/soccer/500/22.png',
+    champions: 'https://a.espncdn.com/i/leaguelogos/soccer/500/2.png',
+    laliga: 'https://a.espncdn.com/i/leaguelogos/soccer/500/15.png',
+    premier: 'https://a.espncdn.com/i/leaguelogos/soccer/500/23.png'
+  };
   // Evento especial (13 nov 2026): mientras hay uno en marcha (hoy, la Liguilla de la
   // Liga MX) la sección «Quinielas» se vuelve ese evento y lleva directo a participar.
   // El campeón se queda 4 días en Inicio; después vuelve la sección de siempre.
@@ -280,10 +287,9 @@
     const name = team?.name || 'Por confirmar';
     return { short: team?.short_name || name, name, logo: team?.logo, abbr: team?.abbreviation || initials(name) };
   }
-  // Ficha de partido (13 nov 2026): cara a cara, como en las apps de resultados. Los dos
-  // escudos grandes con su nombre, la hora en medio y debajo los círculos de la quiniela
-  // (1 · X · 2 en fútbol; 1 y 2 en la NFL), en colores suaves y decorativos: toda la ficha abre
-  // el partido en su quiniela. Sin puntos ni «Jugar»: los puntos siguen dentro de la quiniela.
+  // Inicio: identidad de liga arriba, escudos sin discos y opciones amplias de color.
+  // Toda la ficha sigue abriendo el partido; las opciones son decorativas, no botones
+  // de guardado (1 · X · 2 en fútbol; 1 y 2 en la NFL).
   function kickoffParts(iso) {
     const text = dayLabel(iso);
     const cut = text.lastIndexOf(' · ');
@@ -292,12 +298,28 @@
   }
   function teamSide(team) {
     const side = el('span', null, 'cam-hj-side');
-    side.append(crest(team.logo, team.abbr, ''), el('span', team.short, 'cam-hj-side-name'));
+    side.append(crest(team.logo, team.abbr, ''), el('span', team.short,
+      'cam-hj-side-name' + (team.short.length > 9 ? ' is-long-name' : '')));
     return side;
   }
   function gameCard(g, sport) {
     const card = el('button', null, 'cam-hj-card cam-hj-game', { type: 'button', 'data-sport': sport });
     const league = sport === 'nfl' ? 'NFL' + (g.week ? ' · Semana ' + g.week : '') : (LEAGUES[g.competition] || 'Fútbol');
+    const competition = sport === 'nfl' ? 'nfl' : g.competition;
+    card.dataset.competition = competition;
+    const heading = el('span', null, 'cam-hj-league');
+    if (LEAGUE_LOGOS[competition]) {
+      const logo = el('img', null, 'cam-hj-league-logo', {
+        alt: '', width: '30', height: '30', loading: 'lazy', decoding: 'async', 'aria-hidden': 'true'
+      });
+      logo.addEventListener('error', () => logo.remove());
+      logo.src = LEAGUE_LOGOS[competition];
+      heading.append(logo);
+    }
+    heading.append(el('span', sport === 'nfl' ? 'NFL' : (LEAGUES[g.competition] || 'Fútbol'), 'cam-hj-league-name'));
+    if (sport === 'nfl' && g.week) {
+      heading.append(el('span', ' · ', 'cam-hj-sr'), el('span', 'Semana ' + g.week, 'cam-hj-round'));
+    }
     let first, second, aria;
     if (sport === 'nfl') {
       first = nflTeam(g.away_id); second = nflTeam(g.home_id);
@@ -313,10 +335,10 @@
     kick.append(el('span', time, 'cam-hj-kick-time'));
     face.append(teamSide(first), kick, teamSide(second));
     const marks = el('span', null, 'cam-hj-marks', { 'aria-hidden': 'true' });
-    for (const label of sport === 'nfl' ? ['1', null, '2'] : ['1', 'X', '2']) {
-      marks.append(label === null ? el('span', null, 'cam-hj-mark-gap') : el('span', label, 'cam-hj-choice is-' + label.toLowerCase()));
+    for (const label of sport === 'nfl' ? ['1', '2'] : ['1', 'X', '2']) {
+      marks.append(el('span', label, 'cam-hj-choice is-' + label.toLowerCase()));
     }
-    card.append(el('span', league, 'cam-hj-league'), face, marks);
+    card.append(heading, face, marks);
     card.dataset.gameId = g.id;
     card.setAttribute('aria-label', league + ', ' + aria + ', ' + dayLabel(g.kickoff) + '. Elegir en la quiniela');
     card.addEventListener('click', () => goGame(g, sport));

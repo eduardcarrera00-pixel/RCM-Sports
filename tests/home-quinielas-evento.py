@@ -179,13 +179,13 @@ for width, dark in [(390, True), (390, False), (320, True)]:
         assert (st['fixed'], st['mine'], st['open'], st['openButtons']) == (5, 0, 3, 3), f'{where}: huecos {st}'
         assert st['cta'] == 'Completar mis 8 ›', f'{where}: botón {st["cta"]}'
         assert st['slotBoxes'] == ['32x32'], f'{where}: escudos y «?» deben ser círculos iguales {st["slotBoxes"]}'
-        assert st['card'][0] == 248 and st['card'][1] <= 256 and st['firstGame'][0] == 248, f'{where}: la tarjeta no es pequeña {st["card"]}'
+        assert st['card'][0] == 248 and st['card'][1] <= 256 and st['firstGame'][0] == min(280, width - 64), f'{where}: ancho de las fichas {st["firstGame"]}'
         assert st['fonts'] == ['Playfair Display', 'Inter', 'Inter'], f'{where}: letras {st["fonts"]}'
         assert st['ctaBox'][1] >= 40, f'{where}: botón bajo {st["ctaBox"]}'
         assert st['crests'] == 5, f'{where}: escudos sin pintar {st["crests"]}'
         assert st['marks'] == ['1X2', '1X2', '1X2', '12', '1X2'], f'{where}: círculos de la quiniela {st["marks"]}'
         assert st['faces'][3].startswith('Patriots | Lions @ ') and st['faces'][-1].startswith('Queretaro | Monterrey @ '), f'{where}: fichas {st["faces"]}'
-        assert st['sideCrest'] == [48, 48], f'{where}: escudos de la ficha {st["sideCrest"]}'
+        assert st['sideCrest'] == [72, 64], f'{where}: escudos de la ficha {st["sideCrest"]}'
         assert st['calls'] == ['state', 'candidates'], f'{where}: llamadas {st["calls"]}'
         common(st, where)
         assert not page.errors, f'{where}: errores {page.errors}'
@@ -266,7 +266,7 @@ for mode in ['champ', 'none']:
         assert st['event'] is None and [o.upper() for o in st['order']] == LEAGUES, f'{mode}: {st["order"]}'
         assert st['marks'] == ['1X2', '1X2', '1X2', '1X2', '12'], f'{mode}: círculos {st["marks"]}'
         w, h, radius = st['circle']
-        assert w == h == '28px' and radius == '50%', f'{mode}: círculo {st["circle"]}'
+        assert float(w[:-2]) > 36 and h == '36px' and radius == '10px', f'{mode}: opciones amplias {st["circle"]}'
         common(st, mode)
         if mode == 'none': shot(page, 'sin-evento')
 

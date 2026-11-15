@@ -1,5 +1,18 @@
 # AE SPORTS · Guía visual v1
 
+### Fichas de Quinielas en Inicio · 14 nov 2026
+
+NFL, Liga MX, Champions, LaLiga y Premier comparten cabecera con logo y nombre
+de competición, escudos sin discos, hora al centro y nombres en Playfair. NFL
+lleva superficie azul y dos opciones amplias (1 azul, 2 coral); fútbol conserva
+el marfil con 1 azul, X gris y 2 coral. No hay líneas divisorias ni contornos.
+La ficha completa mantiene el acceso al partido concreto dentro de su quiniela;
+las opciones no guardan pronósticos desde Inicio. El carrusel, el orden de las
+ligas y la tarjeta especial de Liguilla conservan su comportamiento.
+Origen: `assets/cam-home-jornada.js` y `assets/cam-home-jornada.css`, compilado
+en el paquete de paneles. Se conserva el calendario completo y no se añaden
+consultas de datos.
+
 ### El marcador como menú vertical · 13 nov 2026
 
 Al final de La semana (NFL y Fútbol), «El marcador» es la primera de tres filas
