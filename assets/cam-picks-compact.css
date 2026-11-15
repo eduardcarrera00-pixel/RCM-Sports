@@ -180,19 +180,19 @@
     flex:0 0 auto!important;padding-left:10px!important;border-left:1.5px dashed rgba(11,34,51,.45)!important;
     font:800 16px/1 Inter,system-ui,sans-serif!important;letter-spacing:-.01em!important;font-variant-numeric:tabular-nums!important;
   }
-  /* 14 nov 2026 · «A · Velo de color»: velo azul suave al 12 % con contorno fino, como los
-     botones de la Liguilla (dorado) y «Hacer mi take» (teja) en cam-home-jornada.css. */
+  /* 14 nov 2026 · «A · Velo de color»: velo teja rojiza al 12 % con contorno fino, como los
+     botones de la Liguilla (dorado) y «Hacer mi take» (azul) en cam-home-jornada.css. */
   html body #mainContent #camHomePicks .cam-home-parlay-cta {
     display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;min-height:38px!important;
-    margin:auto 0 0!important;padding:0 14px!important;border:1px solid rgba(140,194,228,.42)!important;border-radius:999px!important;
-    background:rgba(140,194,228,.12)!important;background-image:none!important;color:#A5D1ED!important;box-shadow:none!important;
+    margin:auto 0 0!important;padding:0 14px!important;border:1px solid rgba(232,124,100,.42)!important;border-radius:999px!important;
+    background:rgba(232,124,100,.12)!important;background-image:none!important;color:#F39580!important;box-shadow:none!important;
     font:700 14px/1.1 Inter,system-ui,sans-serif!important;letter-spacing:0!important;text-transform:none!important;cursor:pointer!important;
   }
-  html body #mainContent #camHomePicks .cam-home-parlay-cta:focus-visible {outline:2px solid #A5D1ED!important;outline-offset:2px!important;}
+  html body #mainContent #camHomePicks .cam-home-parlay-cta:focus-visible {outline:2px solid #F39580!important;outline-offset:2px!important;}
   html body #mainContent #camHomePicks .cam-home-parlay:active {transform:scale(.985)!important;}
   @media (hover:hover) {
     html body #mainContent #camHomePicks .cam-home-parlay:hover {border-color:rgba(232,191,121,.7)!important;}
-    html body #mainContent #camHomePicks .cam-home-parlay-cta:hover {background:rgba(140,194,228,.2)!important;border-color:rgba(140,194,228,.6)!important;}
+    html body #mainContent #camHomePicks .cam-home-parlay-cta:hover {background:rgba(232,124,100,.2)!important;border-color:rgba(232,124,100,.6)!important;}
   }
   html body #mainContent #camHomePicks .cam-home-plate-sep {
     display:flex!important;flex:0 0 100px!important;width:100px!important;height:164px!important;min-width:0!important;

@@ -463,8 +463,8 @@
 
   /* 14 nov 2026 · botones más tenues («A · Velo de color»): en vez del relleno dorado, un velo
      del color al 12 % con contorno fino y el texto en ese color. Cada botón de Inicio lleva su
-     tono: la Liguilla dorado, «Hacer mi take» teja (más rojiza que el dorado) y «Subir mi
-     parlay» azul (en cam-picks-compact.css). Las tarjetas son azul noche de día y de noche. */
+     tono: la Liguilla dorado, «Hacer mi take» azul suave y «Subir mi parlay» teja rojiza
+     (en cam-picks-compact.css; colores invertidos el mismo día a petición de Eduard). Las tarjetas son azul noche de día y de noche. */
   html body #camHomeJornada .cam-hj-ev-cta {
     --ev-cta:232,191,121; --ev-cta-ink:#ECC98C;
     display:flex!important; align-items:center!important; justify-content:center!important; width:100%!important; min-height:40px!important;
@@ -473,7 +473,7 @@
     font:700 14px/1.1 Inter,system-ui,sans-serif!important; letter-spacing:0!important; text-transform:none!important;
     cursor:pointer!important; -webkit-tap-highlight-color:transparent!important;
   }
-  html body #camHomeJornada .cam-hj-take-intro .cam-hj-ev-cta { --ev-cta:232,124,100; --ev-cta-ink:#F39580; }
+  html body #camHomeJornada .cam-hj-take-intro .cam-hj-ev-cta { --ev-cta:140,194,228; --ev-cta-ink:#A5D1ED; }
   html body #camHomeJornada :is(.cam-hj-ev-cta, button.cam-hj-ev-slot):focus-visible { outline:2px solid var(--ev-gold)!important; outline-offset:2px!important; }
   html body #camHomeJornada .cam-hj-ev-cta:focus-visible { outline-color:var(--ev-cta-ink)!important; }
   html body #camHomeJornada .cam-hj-ev:active { transform:scale(.985)!important; }
