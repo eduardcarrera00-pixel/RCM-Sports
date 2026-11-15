@@ -309,12 +309,15 @@
     card.dataset.competition = competition;
     const heading = el('span', null, 'cam-hj-league');
     if (LEAGUE_LOGOS[competition]) {
-      const logo = el('img', null, 'cam-hj-league-logo', {
+      for (const theme of ['day', 'night']) {
+      const logo = el('img', null, 'cam-hj-league-logo cam-hj-league-logo--' + theme, {
         alt: '', width: '30', height: '30', loading: 'lazy', decoding: 'async', 'aria-hidden': 'true'
       });
       logo.addEventListener('error', () => logo.remove());
-      logo.src = LEAGUE_LOGOS[competition];
+      logo.src = theme === 'night' && competition !== 'ligamx'
+        ? LEAGUE_LOGOS[competition].replace('/500/', '/500-dark/') : LEAGUE_LOGOS[competition];
       heading.append(logo);
+      }
     }
     heading.append(el('span', sport === 'nfl' ? 'NFL' : (LEAGUES[g.competition] || 'Fútbol'), 'cam-hj-league-name'));
     if (sport === 'nfl' && g.week) {

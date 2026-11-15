@@ -317,20 +317,22 @@
   html body #camHomeJornada .cam-hj-trend.is-new { color:var(--hj-accent)!important; background:var(--hj-accent-soft)!important; }
 
   /* ---------- Fichas de Quinielas en Inicio · referencia aprobada, 14 nov ----------
-     Marfil en fútbol y azul en NFL, identidad de liga arriba, sin reglas ni discos.
+     Azul compartido por todas las ligas, con paletas clara y oscura, sin reglas ni discos.
      Los resultados son accesos decorativos dentro del único botón de partido. */
   html body #camHomeJornada .cam-hj-game {
-    --fixture-bg:#f3ebdd; --fixture-ink:#0c2939; --fixture-muted:#53636d;
-    --fixture-one:#13749c; --fixture-one-bg:#c3e3ef;
-    --fixture-draw:#52636c; --fixture-draw-bg:#deddd9;
-    --fixture-two:#b74437; --fixture-two-bg:#f6d1c8;
+    --fixture-bg:#e5eff5; --fixture-ink:#14374b; --fixture-muted:#536b7a;
+    --fixture-one:#14678d; --fixture-one-bg:#c4e0ef;
+    --fixture-draw:#4e6370; --fixture-draw-bg:#d1dee5;
+    --fixture-two:#a3433a; --fixture-two-bg:#f1d4d2;
+    --fixture-crest-width:72px; --fixture-crest-height:64px;
     gap:16px!important; width:min(280px,calc(100vw - 64px))!important; padding:15px 14px 16px!important;
     border:0!important; background:var(--fixture-bg)!important; box-shadow:none!important;
     color:var(--fixture-ink)!important;
   }
-  html body #camHomeJornada .cam-hj-game[data-sport="nfl"] {
+  html.dark body #camHomeJornada .cam-hj-game {
     --fixture-bg:#1b3c50; --fixture-ink:#f3ebdd; --fixture-muted:#b2c8d5;
     --fixture-one:#91d8f5; --fixture-one-bg:#2b5770;
+    --fixture-draw:#d3e0e8; --fixture-draw-bg:#3b5363;
     --fixture-two:#ffb0a2; --fixture-two-bg:#68515f;
   }
   html body #camHomeJornada .cam-hj-game > .cam-hj-league {
@@ -341,6 +343,12 @@
     display:block!important; flex:0 0 30px!important; width:30px!important; height:30px!important;
     margin:0!important; padding:0!important; object-fit:contain!important; background:none!important;
     border:0!important; border-radius:0!important; box-shadow:none!important;
+  }
+  html body #camHomeJornada .cam-hj-game .cam-hj-league-logo--night { display:none!important; }
+  html.dark body #camHomeJornada .cam-hj-game .cam-hj-league-logo--day { display:none!important; }
+  html.dark body #camHomeJornada .cam-hj-game .cam-hj-league-logo--night { display:block!important; }
+  html.dark body #camHomeJornada .cam-hj-game[data-competition="ligamx"] .cam-hj-league-logo--night {
+    background:#e5eff5!important; padding:2px!important; border-radius:4px!important;
   }
   html body #camHomeJornada .cam-hj-league-name {
     min-width:0!important; font:700 17px/1.2 "Playfair Display",Georgia,serif!important;
@@ -357,13 +365,16 @@
     margin:auto 0 0!important; padding:4px 0 0!important;
   }
   html body #camHomeJornada .cam-hj-side { display:flex!important; flex-direction:column!important; align-items:center!important; gap:8px!important; min-width:0!important; text-align:center!important; }
-  html body #camHomeJornada .cam-hj-side .cam-hj-crest {
-    width:72px!important; max-width:100%!important; height:64px!important;
+  html body #camHomeJornada .cam-hj-game .cam-hj-side .cam-hj-crest {
+    width:var(--fixture-crest-width)!important; max-width:100%!important; height:var(--fixture-crest-height)!important;
     background:transparent!important; color:var(--fixture-muted)!important; border-radius:0!important;
     font:800 12px/1 Inter,system-ui,sans-serif!important; box-shadow:none!important;
   }
   html body #camHomeJornada .cam-hj-side .cam-hj-crest.is-loaded { background:transparent!important; }
-  html body #camHomeJornada .cam-hj-side .cam-hj-crest img { inset:0!important; width:100%!important; height:100%!important; }
+  html body #camHomeJornada .cam-hj-game .cam-hj-side .cam-hj-crest img {
+    inset:0!important; width:100%!important; height:100%!important; max-width:100%!important; max-height:100%!important;
+    object-fit:contain!important; object-position:center!important; transform:none!important;
+  }
   html body #camHomeJornada .cam-hj-side-name {
     display:block!important; max-width:100%!important; color:var(--fixture-ink)!important;
     font:700 17px/1.2 "Playfair Display",Georgia,serif!important; text-wrap:balance!important; overflow-wrap:anywhere!important;

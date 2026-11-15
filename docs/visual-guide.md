@@ -3,9 +3,11 @@
 ### Fichas de Quinielas en Inicio · 14 nov 2026
 
 NFL, Liga MX, Champions, LaLiga y Premier comparten cabecera con logo y nombre
-de competición, escudos sin discos, hora al centro y nombres en Playfair. NFL
-lleva superficie azul y dos opciones amplias (1 azul, 2 coral); fútbol conserva
-el marfil con 1 azul, X gris y 2 coral. No hay líneas divisorias ni contornos.
+de competición, escudos sin discos, hora al centro y nombres en Playfair. Todas
+usan el azul NFL de noche y azul pálido en modo claro; 1 azul, X gris azulado y
+2 coral. Los escudos comparten la caja NFL de 72 × 64 px, sin deformación.
+Los logos de competición cambian de variante con el tema para mantener el contraste.
+No hay líneas divisorias ni contornos.
 La ficha completa mantiene el acceso al partido concreto dentro de su quiniela;
 las opciones no guardan pronósticos desde Inicio. El carrusel, el orden de las
 ligas y la tarjeta especial de Liguilla conservan su comportamiento.
