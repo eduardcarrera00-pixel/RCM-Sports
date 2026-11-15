@@ -412,19 +412,38 @@
 
   /* ---------- Evento especial en «Quinielas» (13 nov 2026): la Liguilla ----------
      Una tarjeta pequeña (248 px, como las de partido), la primera del carrusel: escudos de los clasificados, «?» en los
-     lugares por decidir y un botón. Azul noche y dorado (los de la Liguilla), de día y de noche. */
+     lugares por decidir y un botón. Azul noche y dorado (los de la Liguilla).
+     15 nov 2026 · modo día: estas tarjetas de invitación (Liguilla, «Tu take» y el boleto del
+     parlay en cam-picks-compact.css) tienen color propio, «arena dorada», para distinguirse de
+     las tarjetas blancas, de las fichas de partido (azul claro) y del fondo: de día arena clara
+     con letra azul tinta y contorno dorado; de noche café oscuro con el dorado de siempre.
+     (El azul se descartó: es el de las fichas de partido.) Los colores salen de las variables --ev-*. */
   html body #camHomeJornada .cam-hj-sr {
     position:absolute!important; width:1px!important; height:1px!important; margin:-1px!important; padding:0!important;
     overflow:hidden!important; clip:rect(0 0 0 0)!important; white-space:nowrap!important; border:0!important;
   }
   html body #camHomeJornada .cam-hj-ev {
-    --ev-bg:#0B2233; --ev-ink:#F3EBDD; --ev-muted:#C2CDD4; --ev-gold:#E8BF79;
+    /* Día: arena clara, letra azul tinta, dorado oscuro (contraste AA sobre la arena). */
+    --ev-bg:#F2E5CE; --ev-ink:#13324D; --ev-muted:#5E5446; --ev-gold:#7A5526;
+    --ev-line:rgba(176,128,63,.42); --ev-line-hover:rgba(176,128,63,.7);
+    --ev-dash:rgba(122,85,38,.55); --ev-crest:#FFFDF9; --ev-pair:rgba(255,253,249,.7);
+    --ev-cta-base:rgba(255,253,249,.72); --ev-slot-hover:rgba(176,128,63,.14);
+    --ev-shadow:0 1px 2px rgba(19,50,77,.07),0 8px 20px -14px rgba(19,50,77,.38);
     position:relative!important; display:flex!important; flex-direction:column!important; align-items:stretch!important; gap:10px!important;
     width:248px!important; min-width:0!important; height:auto!important; margin:0!important; padding:14px 16px 16px!important;
-    border:1px solid rgba(232,191,121,.4)!important; border-radius:18px!important;
-    background:var(--ev-bg)!important; background-image:none!important; color:var(--ev-ink)!important; box-shadow:var(--hj-shadow)!important;
+    border:1px solid var(--ev-line)!important; border-radius:18px!important;
+    background:var(--ev-bg)!important; background-image:none!important; color:var(--ev-ink)!important; box-shadow:var(--ev-shadow)!important;
     text-align:left!important; font:400 13px/1.4 Inter,system-ui,sans-serif!important;
     cursor:pointer!important; -webkit-tap-highlight-color:transparent!important;
+  }
+  /* Noche: café oscuro, cálido frente al azul del fondo (#081724), de las tarjetas (#11293d) y de
+     las fichas de partido (#1b3c50), con el dorado de siempre. */
+  html.dark body #camHomeJornada .cam-hj-ev {
+    --ev-bg:#2C251F; --ev-ink:#F3EBDD; --ev-muted:#CFC3B3; --ev-gold:#E8BF79;
+    --ev-line:rgba(232,191,121,.45); --ev-line-hover:rgba(232,191,121,.7);
+    --ev-dash:rgba(232,191,121,.7); --ev-crest:#F3EBDD; --ev-pair:rgba(243,235,221,.08);
+    --ev-cta-base:transparent; --ev-slot-hover:rgba(232,191,121,.12);
+    --ev-shadow:0 1px 2px rgba(0,0,0,.28),0 10px 22px -14px rgba(0,0,0,.7);
   }
   html body #camHomeJornada .cam-hj-ev-kicker {
     display:block!important; color:var(--ev-gold)!important;
@@ -444,13 +463,13 @@
   }
   html body #camHomeJornada .cam-hj-ev-slot.is-mine .cam-hj-ev-crest { box-shadow:0 0 0 2px var(--ev-bg),0 0 0 3.5px var(--ev-gold)!important; }
   html body #camHomeJornada .cam-hj-ev-slot.is-open {
-    border:1.5px dashed rgba(232,191,121,.7)!important; color:var(--ev-gold)!important;
+    border:1.5px dashed var(--ev-dash)!important; color:var(--ev-gold)!important;
     font:700 15px/1 "Playfair Display",Georgia,serif!important; cursor:pointer!important; -webkit-tap-highlight-color:transparent!important;
   }
   html body #camHomeJornada span.cam-hj-ev-slot.is-open { cursor:inherit!important; opacity:.7!important; }
   html body #camHomeJornada .cam-hj-ev-crest {
     display:inline-flex!important; align-items:center!important; justify-content:center!important; flex:0 0 auto!important;
-    width:32px!important; height:32px!important; border-radius:50%!important; background:#F3EBDD!important; overflow:hidden!important;
+    width:32px!important; height:32px!important; border-radius:50%!important; background:var(--ev-crest)!important; overflow:hidden!important;
   }
   html body #camHomeJornada .cam-hj-ev-crest img {
     display:block!important; width:23px!important; height:23px!important; max-width:none!important; margin:0!important; object-fit:contain!important;
@@ -459,7 +478,7 @@
   html body #camHomeJornada .cam-hj-ev-pairs { display:grid!important; grid-template-columns:repeat(2,minmax(0,1fr))!important; gap:8px!important; margin:2px 0 0!important; }
   html body #camHomeJornada .cam-hj-ev-pair {
     display:flex!important; align-items:center!important; justify-content:center!important; gap:5px!important; min-width:0!important;
-    padding:5px 4px!important; border-radius:999px!important; background:rgba(243,235,221,.07)!important;
+    padding:5px 4px!important; border-radius:999px!important; background:var(--ev-pair)!important;
   }
   html body #camHomeJornada .cam-hj-ev-side { display:inline-flex!important; border-radius:50%!important; }
   html body #camHomeJornada .cam-hj-ev-side .cam-hj-ev-crest { width:26px!important; height:26px!important; }
@@ -475,23 +494,27 @@
   /* 14 nov 2026 · botones más tenues («A · Velo de color»): en vez del relleno dorado, un velo
      del color al 12 % con contorno fino y el texto en ese color. Cada botón de Inicio lleva su
      tono: la Liguilla dorado, «Hacer mi take» azul suave y «Subir mi parlay» teja rojiza
-     (en cam-picks-compact.css; colores invertidos el mismo día a petición de Eduard). Las tarjetas son azul noche de día y de noche. */
+     (en cam-picks-compact.css; colores invertidos el mismo día a petición de Eduard).
+     15 nov 2026 · de día el velo va sobre una base clara y el texto en el tono oscuro del color
+     (dorado #7A5526, azul #245A82); de noche, los tonos claros de siempre. */
   html body #camHomeJornada .cam-hj-ev-cta {
-    --ev-cta:232,191,121; --ev-cta-ink:#ECC98C;
+    --ev-cta:176,128,63; --ev-cta-ink:#7A5526;
     display:flex!important; align-items:center!important; justify-content:center!important; width:100%!important; min-height:40px!important;
     margin:auto 0 0!important; padding:0 14px!important; border:1px solid rgba(var(--ev-cta),.42)!important; border-radius:999px!important;
-    background:rgba(var(--ev-cta),.12)!important; background-image:none!important; color:var(--ev-cta-ink)!important; box-shadow:none!important;
+    background:linear-gradient(rgba(var(--ev-cta),.12),rgba(var(--ev-cta),.12)),var(--ev-cta-base)!important; color:var(--ev-cta-ink)!important; box-shadow:none!important;
     font:700 14px/1.1 Inter,system-ui,sans-serif!important; letter-spacing:0!important; text-transform:none!important;
     cursor:pointer!important; -webkit-tap-highlight-color:transparent!important;
   }
-  html body #camHomeJornada .cam-hj-take-intro .cam-hj-ev-cta { --ev-cta:140,194,228; --ev-cta-ink:#A5D1ED; }
+  html body #camHomeJornada .cam-hj-take-intro .cam-hj-ev-cta { --ev-cta:47,102,144; --ev-cta-ink:#245A82; }
+  html.dark body #camHomeJornada .cam-hj-ev-cta { --ev-cta:232,191,121; --ev-cta-ink:#ECC98C; }
+  html.dark body #camHomeJornada .cam-hj-take-intro .cam-hj-ev-cta { --ev-cta:140,194,228; --ev-cta-ink:#A5D1ED; }
   html body #camHomeJornada :is(.cam-hj-ev-cta, button.cam-hj-ev-slot):focus-visible { outline:2px solid var(--ev-gold)!important; outline-offset:2px!important; }
   html body #camHomeJornada .cam-hj-ev-cta:focus-visible { outline-color:var(--ev-cta-ink)!important; }
   html body #camHomeJornada .cam-hj-ev:active { transform:scale(.985)!important; }
   @media (hover:hover) {
-    html body #camHomeJornada .cam-hj-ev:hover { border-color:rgba(232,191,121,.7)!important; }
-    html body #camHomeJornada .cam-hj-ev-cta:hover { background:rgba(var(--ev-cta),.2)!important; border-color:rgba(var(--ev-cta),.6)!important; }
-    html body #camHomeJornada button.cam-hj-ev-slot.is-open:hover { background:rgba(232,191,121,.12)!important; }
+    html body #camHomeJornada .cam-hj-ev:hover { border-color:var(--ev-line-hover)!important; }
+    html body #camHomeJornada .cam-hj-ev-cta:hover { background:linear-gradient(rgba(var(--ev-cta),.2),rgba(var(--ev-cta),.2)),var(--ev-cta-base)!important; border-color:rgba(var(--ev-cta),.6)!important; }
+    html body #camHomeJornada button.cam-hj-ev-slot.is-open:hover { background:var(--ev-slot-hover)!important; }
   }
   /* Separador «Participa en la quiniela de otras ligas»: dos rombos pequeños, el texto en
      la serif de lectura y una flecha. De pie en el carrusel (sin filetes, 13 nov 2026). */

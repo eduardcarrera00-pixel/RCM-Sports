@@ -156,7 +156,7 @@
   }
   html body #camHomeJornada .cam-hj-take-intro .cam-hj-take-example {
     display:block!important; margin:0!important; padding:6px 10px!important;
-    border:1.5px dashed rgba(232,191,121,.7)!important; border-radius:12px!important;
+    border:1.5px dashed var(--ev-dash,rgba(232,191,121,.7))!important; border-radius:12px!important;
     background:transparent!important; box-shadow:none!important; color:var(--ev-muted)!important;
     font:italic 500 13.5px/1.35 "Playfair Display",Georgia,serif!important; letter-spacing:0!important; text-transform:none!important;
   }
