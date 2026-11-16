@@ -568,4 +568,13 @@
     html body #camHomeJornada :is(.cam-hj-card, .cam-hj-shortcut):active { transform:none!important; }
     html body #camHomeJornada .cam-hj-row { scroll-behavior:auto!important; }
   }
+
+  /* 16 nov 2026 (teléfono): sin «Demuestra tu conocimiento»; orden Quinielas → Takes de la
+     comunidad → Picks de la comunidad → Últimas noticias al final. Solo con body.cam-home-jornada (Inicio en el teléfono);
+     el escritorio conserva su orden y su carril de atajos. */
+  html body.cam-home-jornada #camHomeJornada > .cam-hj-shortcuts-disclosure { display:none!important; }
+  html body.cam-home-jornada #camHomeJornada > .cam-hj-section[data-row="jornada"] { order:1!important; }
+  html body.cam-home-jornada #camHomeJornada > .cam-hj-section[data-row="takes"] { order:2!important; }
+  html body.cam-home-jornada #camHomeJornada > .cam-hj-section[data-row="news"] { order:4!important; }
+  html body.cam-home-jornada #camHomeJornada > #camHomePicks { order:3!important; }
 }
