@@ -920,28 +920,54 @@ function sizePlateWindow(target){
 // hasta 5 peores; al final, «Ver todos los Picks →». Los votos llevan ▲ verde o ▼ teja.
 const HOME_PLATES=5;
 const homePlates={best:null,worst:null};
+// 18 nov 2026 · opción C «La comanda del Chef» (la gente no entendía el boleto): el parlay es
+// el plato. Gorro de Chef (el mismo dibujo de «¿Eres Chef?») y «Cocina tu Pick»; el ejemplo es
+// una comanda de cocina (papel crema con borde dentado) y una línea une el Pick con «Mejores
+// platos». «Cocinar mi Pick ›» abre el mismo compositor que antes.
+function homeChefHat(){
+ const ns='http://www.w3.org/2000/svg';
+ const svg=document.createElementNS(ns,'svg');
+ svg.setAttribute('viewBox','0 0 160 112');
+ svg.setAttribute('class','cam-home-parlay-hat');
+ svg.setAttribute('aria-hidden','true');
+ svg.setAttribute('focusable','false');
+ [['M47.6 72.2H112.4V99.2H47.6Z','is-fill'],
+  ['M47.6 72.2C26 72.2 15.2 53.3 24.7 37.1C32.8 23.6 50.3 20.9 61.1 29C66.5 12.8 93.5 12.8 98.9 29C109.7 20.9 127.3 23.6 135.4 37.1C144.8 53.3 134 72.2 112.4 72.2',''],
+  ['M47.6 72.2V99.2H112.4V72.2M47.6 83H112.4M66.5 72.2V53.3M93.5 72.2V53.3','']].forEach(([d,cls])=>{
+  const path=document.createElementNS(ns,'path');
+  path.setAttribute('d',d);
+  if(cls)path.setAttribute('class',cls);
+  svg.append(path);
+ });
+ return svg;
+}
 function homeParlayIntro(){
  const item=el('li',null,'cam-home-plate-intro');
  const card=el('section',null,'cam-home-parlay');
  card.setAttribute('aria-labelledby','camHomeParlayTitle');
- const title=el('h4','Sube la foto de tu parlay','cam-home-parlay-title');
+ const head=el('div',null,'cam-home-parlay-head');
+ const title=el('h4','Cocina tu Pick','cam-home-parlay-title');
  title.id='camHomeParlayTitle';
- const lead=el('p','Tu apuesta, votada por la comunidad','cam-home-parlay-lead');
+ head.append(homeChefHat(),title);
  const ticket=el('div',null,'cam-home-parlay-ticket');
  ticket.setAttribute('role','img');
- ticket.setAttribute('aria-label','Ejemplo de parlay: más de 49.5 puntos en Patriots contra Lions y más de 47.5 en Chiefs contra Falcons, momio +275');
+ ticket.setAttribute('aria-label','Ejemplo de comanda: parlay de NFL con más de 49.5 puntos en Patriots contra Lions y más de 47.5 en Chiefs contra Falcons, momio +275');
+ const paper=el('div',null,'cam-home-parlay-paper');
+ const top=el('span',null,'cam-home-parlay-top');
+ top.append(el('span','Comanda','cam-home-parlay-tag'),el('span','NFL · Parlay','cam-home-parlay-kind'));
  const legs=el('span',null,'cam-home-parlay-legs');
- ['Más de 49.5 · NE–DET','Más de 47.5 · KC–ATL'].forEach((selection,index)=>{
-   const row=el('span',null,'cam-home-parlay-leg');
-   const number=el('span',String(index+1),'cam-home-parlay-number');
-   number.setAttribute('aria-hidden','true');
-   row.append(number,el('span',selection,'cam-home-parlay-selection'));
-   legs.append(row);
- });
- ticket.append(legs,el('span','+275','cam-home-parlay-odds'));
- const cta=el('button','Subir mi parlay ›','cam-home-parlay-cta');
+ ['Más de 49.5 · NE–DET','Más de 47.5 · KC–ATL'].forEach(selection=>legs.append(el('span',selection,'cam-home-parlay-leg')));
+ const total=el('span',null,'cam-home-parlay-total');
+ total.append(el('span','Momio','cam-home-parlay-total-label'),el('span','+275','cam-home-parlay-odds'));
+ paper.append(top,legs,total);
+ ticket.append(paper);
+ const lead=el('p','Tu parlay es el plato: la comunidad lo prueba ','cam-home-parlay-lead');
+ const up=el('span','▲','cam-home-parlay-up'),down=el('span','▼','cam-home-parlay-down');
+ up.setAttribute('aria-label','a favor');down.setAttribute('aria-label','en contra');
+ lead.append(up,document.createTextNode(' '),down,document.createTextNode(' y los mejores salen en '),el('strong','Mejores platos','cam-home-parlay-best'),document.createTextNode('.'));
+ const cta=el('button','Cocinar mi Pick ›','cam-home-parlay-cta');
  cta.type='button';
- card.append(title,lead,ticket,cta);
+ card.append(head,ticket,lead,cta);
  // Toda la tarjeta abre el compositor (el botón es el control accesible).
  card.addEventListener('click',()=>{void openPickComposer();});
  item.append(card);

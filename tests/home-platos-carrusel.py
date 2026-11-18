@@ -9,7 +9,10 @@ Página completa en Chromium con tests/full-page.py y el Supabase falso (sin red
 Cubre:
   · orden: boleto → rombos con «Mejores platos →» y «Peores platos →» → 5 mejores →
     rótulo «Peores platos» → 5 peores → «Ver todos los Picks →» (las listas traen más);
-  · el boleto lleva «Tu apuesta, votada por la comunidad» y nada se sale de la tarjeta;
+  · 18 nov 2026 · la tarjeta es «La comanda del Chef» (opción C): gorro, «Cocina tu Pick», la comanda
+    en papel con borde dentado (dos selecciones y momio +275), la línea que la une con Mejores platos y
+    «Cocinar mi Pick ›»; nada se sale de la tarjeta, los rombos la acompañan a todo su alto y los
+    platos siguen de 164 px, arriba;
   · ya no hay títulos «Mejores platos»/«Peores platos» ni una segunda fila (#camHomeWorstPlates);
   · tocar «Peores platos →» deja el rótulo al principio del carrusel; «Mejores platos →», el primer plato;
   · votos con ▲ (verde) en los mejores y ▼ (teja) en los peores, colores distintos;
@@ -77,6 +80,17 @@ STATE = """() => {
     label: list.querySelector('.cam-home-plate-label')?.textContent || null,
     more: list.querySelector('.cam-home-plate-more')?.textContent || null,
     lead: list.querySelector('.cam-home-parlay-lead')?.textContent || null,
+    title: card?.querySelector('.cam-home-parlay-title')?.textContent || null,
+    cta: card?.querySelector('.cam-home-parlay-cta')?.textContent || null,
+    hat: !!card?.querySelector('.cam-home-parlay-head svg.cam-home-parlay-hat[aria-hidden="true"]'),
+    paper: (() => { const e = card?.querySelector('.cam-home-parlay-paper'); if (!e) return null; const cs = getComputedStyle(e);
+      return { clip: cs.clipPath.startsWith('polygon'), bg: cs.backgroundColor, ink: cs.color,
+        legs: [...e.querySelectorAll('.cam-home-parlay-leg')].map(l => l.textContent), odds: e.querySelector('.cam-home-parlay-odds')?.textContent,
+        cut: [...e.querySelectorAll('.cam-home-parlay-leg')].some(l => l.scrollWidth > l.clientWidth + 1),
+        rounded: [...e.querySelectorAll('span'), ...list.querySelectorAll('.cam-home-plate-sep-diamond')].some(x => getComputedStyle(x).borderRadius !== '0px') }; })(),
+    ctaHeight: Math.round(card?.querySelector('.cam-home-parlay-cta')?.getBoundingClientRect().height || 0),
+    accessHeight: Math.round(list.querySelector('.cam-home-plate-access')?.getBoundingClientRect().height || 0),
+    rowTop: (() => { const r = list.querySelector('.cam-home-plate-row'), i = list.querySelector('.cam-home-plate-intro'); return r && i ? Math.round(r.getBoundingClientRect().top - i.getBoundingClientRect().top) : null; })(),
     cardFits: !!card && [...card.children].every(c => inside(card, c)),
     titleOneLine: !!card && card.querySelector('.cam-home-parlay-title').getBoundingClientRect().height < 30,
     introHeight: Math.round(list.querySelector('.cam-home-plate-intro')?.getBoundingClientRect().height || 0),
@@ -106,6 +120,22 @@ def ready(page):
     page.wait_for_timeout(200)
 
 
+def comanda(st, where):
+    assert st['title'] == 'Cocina tu Pick' and st['hat'], f'{where}: gorro y título {st["title"]}'
+    assert st['lead'] == 'Tu parlay es el plato: la comunidad lo prueba ▲ ▼ y los mejores salen en Mejores platos.', f'{where}: texto {st["lead"]}'
+    assert st['cta'] == 'Cocinar mi Pick ›' and st['ctaHeight'] >= 38, f'{where}: botón {st["cta"]} ({st["ctaHeight"]} px)'
+    pa = st['paper']
+    assert pa and pa['clip'] and pa['legs'] == ['Más de 49.5 · NE–DET', 'Más de 47.5 · KC–ATL'] and pa['odds'] == '+275', f'{where}: comanda {pa}'
+    assert not pa['cut'], f'{where}: las selecciones de la comanda se leen enteras'
+    assert not pa['rounded'], f'{where}: filetes rectos en la comanda y rombos (no círculos)'
+    assert pa['ink'] == 'rgb(19, 50, 77)' and pa['bg'] in ('rgb(255, 253, 249)', 'rgb(244, 232, 219)'), f'{where}: papel {pa["bg"]} / {pa["ink"]}'
+    assert st['cardFits'] and st['titleOneLine'], f'{where}: la comanda cabe en su tarjeta'
+    assert 164 <= st['introHeight'] <= 300, f'{where}: alto de la tarjeta {st["introHeight"]}'
+    assert st['accessHeight'] == st['introHeight'], f'{where}: rombos a todo el alto ({st["accessHeight"]}/{st["introHeight"]})'
+    if st['rowHeight']:
+        assert st['rowHeight'] == 164 and st['rowTop'] == 0, f'{where}: platos de 164 px arriba ({st["rowHeight"]}, {st["rowTop"]})'
+
+
 def full(width, dark):
     where = f'{width}-{"noche" if dark else "dia"}'
     with open_page(SCORES, width, dark) as page:
@@ -116,9 +146,7 @@ def full(width, dark):
         assert st['order'] == ['intro', 'access'] + ['best'] * 5 + ['label'] + ['worst'] * 5 + ['more'], f'{where}: orden {st["order"]}'
         assert st['access'] == ['Mejores platos', 'Peores platos'] and st['accessButtons'] == 2, f'{where}: accesos {st["access"]}'
         assert st['label'] == 'Peores platos' and st['more'].startswith('Ver todos los Picks'), f'{where}: rótulos {st["label"]} / {st["more"]}'
-        assert st['lead'] == 'Tu apuesta, votada por la comunidad', f'{where}: subtítulo {st["lead"]}'
-        assert st['cardFits'] and st['titleOneLine'], f'{where}: el boleto cabe en su tarjeta'
-        assert st['introHeight'] == st['rowHeight'] == 164, f'{where}: alto {st["introHeight"]}/{st["rowHeight"]}'
+        comanda(st, where)
         assert st['accessFits'], f'{where}: los rombos y sus textos caben'
         need = 40 if width < 360 else 80
         assert st['accessShown'] >= need or width >= 1024, f'{where}: los accesos se ven junto al boleto ({st["accessShown"]} px)'
@@ -152,6 +180,7 @@ def partial():
         st = page.evaluate(STATE)
         assert st['visible'] and st['state'] == 'empty', f'sin votos: la sección sigue a la vista ({st["state"]})'
         assert st['order'] == ['intro', 'access'] and st['access'] == ['Aún sin votos esta semana'] and st['accessButtons'] == 0, f'sin votos: {st}'
+        comanda(st, 'sin votos')
         if SHOTS: page.locator('#camHomePicks').screenshot(path=str(SHOTS / 'carrusel-sin-votos.png'))
         assert not page.errors, page.errors
     print('ok solo peores / sin votos')
@@ -160,4 +189,4 @@ def partial():
 for w, d in [(390, True), (390, False), (360, True), (320, True), (320, False), (1366, True)]:
     full(w, d)
 partial()
-print('PASS: un solo carrusel con el boleto, accesos a Mejores y Peores platos, ▲/▼ y casos sin votos.')
+print('PASS: un solo carrusel con la comanda del Chef, accesos a Mejores y Peores platos, ▲/▼ y casos sin votos.')
