@@ -922,8 +922,9 @@ const HOME_PLATES=5;
 const homePlates={best:null,worst:null};
 // 18 nov 2026 · opción C «La comanda del Chef» (la gente no entendía el boleto): el parlay es
 // el plato. Gorro de Chef (el mismo dibujo de «¿Eres Chef?») y «Cocina tu Pick»; el ejemplo es
-// una comanda de cocina (papel crema con borde dentado) y una línea une el Pick con «Mejores
-// platos». «Cocinar mi Pick ›» abre el mismo compositor que antes.
+// una comanda de cocina (papel crema con borde dentado, momio de cada selección en gris y el
+// total combinado) y una línea invita a competir por el primer lugar. «Cocinar mi Pick ›» abre
+// el mismo compositor que antes.
 function homeChefHat(){
  const ns='http://www.w3.org/2000/svg';
  const svg=document.createElementNS(ns,'svg');
@@ -949,22 +950,31 @@ function homeParlayIntro(){
  const title=el('h4','Cocina tu Pick','cam-home-parlay-title');
  title.id='camHomeParlayTitle';
  head.append(homeChefHat(),title);
+ // 18 nov 2026 (tarde): cada selección lleva su momio en gris y el total sale de combinarlos
+ // (−150 y +125 → 1,667 × 2,25 = 3,75 → +275), como lo calcula una casa de apuestas.
+ const legsData=[['Más de 49.5 · NE–DET',-150],['Más de 47.5 · KC–ATL',125]];
+ const decimal=legsData.reduce((product,[,odds])=>product*(odds>0?1+odds/100:1+100/-odds),1);
+ const combined=Math.round(decimal>=2?(decimal-1)*100:-100/(decimal-1));
+ const odds=n=>(n>0?'+':'−')+Math.abs(n);
  const ticket=el('div',null,'cam-home-parlay-ticket');
  ticket.setAttribute('role','img');
- ticket.setAttribute('aria-label','Ejemplo de comanda: parlay de NFL con más de 49.5 puntos en Patriots contra Lions y más de 47.5 en Chiefs contra Falcons, momio +275');
+ ticket.setAttribute('aria-label','Ejemplo de comanda: parlay de NFL con más de 49.5 puntos en Patriots contra Lions, momio '+odds(legsData[0][1])+', y más de 47.5 en Chiefs contra Falcons, momio '+odds(legsData[1][1])+'; momio total '+odds(combined));
  const paper=el('div',null,'cam-home-parlay-paper');
  const top=el('span',null,'cam-home-parlay-top');
  top.append(el('span','Comanda','cam-home-parlay-tag'),el('span','NFL · Parlay','cam-home-parlay-kind'));
  const legs=el('span',null,'cam-home-parlay-legs');
- ['Más de 49.5 · NE–DET','Más de 47.5 · KC–ATL'].forEach(selection=>legs.append(el('span',selection,'cam-home-parlay-leg')));
+ legsData.forEach(([selection,price])=>{
+  const row=el('span',null,'cam-home-parlay-leg');
+  row.append(el('span',selection,'cam-home-parlay-selection'),el('span',odds(price),'cam-home-parlay-leg-odds'));
+  legs.append(row);
+ });
  const total=el('span',null,'cam-home-parlay-total');
- total.append(el('span','Momio','cam-home-parlay-total-label'),el('span','+275','cam-home-parlay-odds'));
+ total.append(el('span','Momio total','cam-home-parlay-total-label'),el('span',odds(combined),'cam-home-parlay-odds'));
  paper.append(top,legs,total);
  ticket.append(paper);
- const lead=el('p','Tu parlay es el plato: la comunidad lo prueba ','cam-home-parlay-lead');
- const up=el('span','▲','cam-home-parlay-up'),down=el('span','▼','cam-home-parlay-down');
- up.setAttribute('aria-label','a favor');down.setAttribute('aria-label','en contra');
- lead.append(up,document.createTextNode(' '),down,document.createTextNode(' y los mejores salen en '),el('strong','Mejores platos','cam-home-parlay-best'),document.createTextNode('.'));
+ // Texto (18 nov, tarde, idea de Eduard): compartir la apuesta para pelear por el primer lugar.
+ const lead=el('p','Comparte tu apuesta y pelea por el ','cam-home-parlay-lead');
+ lead.append(el('strong','primer lugar','cam-home-parlay-best'),document.createTextNode(' de CAM Sports. Compite y demuestra que eres el mejor.'));
  const cta=el('button','Cocinar mi Pick ›','cam-home-parlay-cta');
  cta.type='button';
  card.append(head,ticket,lead,cta);

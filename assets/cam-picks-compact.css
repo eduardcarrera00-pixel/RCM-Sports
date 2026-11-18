@@ -150,11 +150,12 @@
      cam-home-jornada.css: de día arena clara con letra azul tinta; de noche el degradado azul CAM
      (#264B74 → #122F4E) y dorado.
      18 nov 2026 · la comanda es papel: blanco cálido de día (#FFFDF9) y crema de noche (#F4E8DB),
-     siempre con letra azul tinta; el gorro y «Mejores platos» van en el dorado de cada tema. */
+     siempre con letra azul tinta y los momios de cada selección en gris; el gorro y «primer lugar»
+     van en el dorado de cada tema. */
   html body #mainContent #camHomePicks .cam-home-parlay {
     --pl-bg:#F2E5CE;--pl-ink:#13324D;--pl-muted:#5E5446;--pl-line:rgba(176,128,63,.42);--pl-line-hover:rgba(176,128,63,.7);
     --pl-gold:#7A5526;--pl-gold-fill:rgba(176,128,63,.2);
-    --pl-paper:#FFFDF9;--pl-paper-ink:#13324D;--pl-paper-muted:#5E5446;--pl-paper-tag:#7A5526;--pl-paper-rule:rgba(19,50,77,.3);
+    --pl-paper:#FFFDF9;--pl-paper-ink:#13324D;--pl-paper-muted:#5E5446;--pl-paper-tag:#7A5526;--pl-paper-rule:rgba(19,50,77,.3);--pl-paper-odds:#5D646B;
     --pl-paper-shadow:drop-shadow(0 0 .6px rgba(19,50,77,.5)) drop-shadow(0 3px 5px rgba(19,50,77,.12));
     --pl-cta:160,71,58;--pl-cta-ink:#923F33;--pl-cta-base:rgba(255,253,249,.72);
     --pl-shadow:0 1px 2px rgba(19,50,77,.07),0 8px 20px -14px rgba(19,50,77,.38);
@@ -205,9 +206,17 @@
     display:flex!important;flex-direction:column!important;gap:2px!important;min-width:0!important;padding:4px 0!important;
     border-top:1px dashed var(--pl-paper-rule)!important;border-bottom:1px dashed var(--pl-paper-rule)!important;
   }
+  /* Cada selección con su momio en gris a la derecha; el total, abajo, en tinta. */
   html body #mainContent #camHomePicks .cam-home-parlay-leg {
-    display:block!important;min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;
+    display:flex!important;align-items:baseline!important;justify-content:space-between!important;gap:8px!important;min-width:0!important;
     font:600 11.5px/1.35 Inter,system-ui,sans-serif!important;
+  }
+  html body #mainContent #camHomePicks .cam-home-parlay-selection {
+    min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;
+  }
+  html body #mainContent #camHomePicks .cam-home-parlay-leg-odds {
+    flex:none!important;color:var(--pl-paper-odds)!important;font:600 11px/1.35 Inter,system-ui,sans-serif!important;
+    font-variant-numeric:tabular-nums!important;white-space:nowrap!important;
   }
   html body #mainContent #camHomePicks .cam-home-parlay-odds {
     color:var(--pl-paper-ink)!important;font:800 15px/1.1 Inter,system-ui,sans-serif!important;letter-spacing:-.01em!important;font-variant-numeric:tabular-nums!important;
@@ -218,7 +227,7 @@
   }
   html body #mainContent #camHomePicks .cam-home-parlay-up {color:var(--cam-h-up)!important;}
   html body #mainContent #camHomePicks .cam-home-parlay-down {color:var(--cam-h-down)!important;}
-  html body #mainContent #camHomePicks .cam-home-parlay-best {color:var(--pl-gold)!important;font-weight:650!important;}
+  html body #mainContent #camHomePicks .cam-home-parlay-best {color:var(--pl-gold)!important;font-weight:650!important;white-space:nowrap!important;}
   /* En escritorio, todo lo que no fija sus esquinas sale redondeado (14 px): la comanda lleva
      filetes rectos y los rombos siguen siendo rombos. */
   html body #mainContent #camHomePicks .cam-home-parlay-paper :is(span,strong),
