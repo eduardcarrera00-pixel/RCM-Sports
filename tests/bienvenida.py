@@ -7,7 +7,8 @@ window.__camIntroTest = true (salvo en el caso que comprueba justo eso).
 
 Cubre:
   · primera visita a Inicio sin sesión (390 px, día y noche): sale sola, en tres
-    pasos (Takes con el ejemplo → NFL, Fútbol y Picks → los 7 escudos de rango);
+    pasos (el logotipo y qué es la web, con un Take de ejemplo → «Aparte del Take»:
+    Takes de Fútbol y NFL, quinielas y Picks → «Rankings» con los 7 escudos);
     «Publicar mi primer Take» la cierra y abre el formulario del Take SIN pedir
     cuenta (con el aviso de que se pedirá al publicar);
   · al publicar sin cuenta: pide iniciar sesión; al entrar, el formulario vuelve
@@ -71,7 +72,11 @@ STATE = """() => {
   const cut = d ? [...d.querySelectorAll('button, p:not(.cam-intro-sr), h2, li, blockquote, span')].filter(e => e.getClientRects().length && e.scrollWidth > e.clientWidth + 1 && getComputedStyle(e).overflow !== 'visible').map(e => e.className || e.tagName) : [];
   return {
     open: !!(d && d.open), card: window.camIntro.card(), step: window.camIntro.step(), pending: window.camIntro.pending(),
-    kicker: q('.cam-intro-kicker')?.textContent || '', title: q('.cam-intro-title')?.textContent || '',
+    kicker: q('.cam-intro-kicker') && !q('.cam-intro-kicker').hidden ? q('.cam-intro-kicker').textContent : '',
+    logo: (() => { const l = q('.cam-intro-logo'); if (!l || l.hidden || !l.getClientRects().length) return null;
+      const r = l.getBoundingClientRect(), s = getComputedStyle(l);
+      return {w: Math.round(r.width), h: Math.round(r.height), color: s.backgroundColor, mask: (s.maskImage || s.webkitMaskImage || '').includes('cam-sports-logo')}; })(),
+    title: q('.cam-intro-title')?.textContent || '',
     body: (q('.cam-intro-body')?.textContent || '').replace(/\\s+/g, ' ').trim(),
     rows: d ? d.querySelectorAll('.cam-intro-row').length : 0, emblems: d ? d.querySelectorAll('.cam-intro-rank .cam-rank-emblem').length : 0,
     hooks: d ? [...d.querySelectorAll('.cam-intro-hook')].map(e => e.textContent.trim()) : [],
@@ -132,7 +137,10 @@ def first_visit(dark):
     with fp.full_page(fake_js=ON + DATA, dark=dark, width=390, height=844, touch=True) as page:
         st = wait_open(page, f'bienvenida {tag}')
         assert st['card'] == 'bienvenida' and st['step'] == 0, st
-        assert st['title'] == 'Tú lo viste primero. Que quede escrito.', st['title']
+        assert st['title'] == 'Demuestra cuánto sabes de deporte', st['title']
+        assert st['kicker'] == '' and st['logo'] and st['logo']['mask'] and st['logo']['w'] >= 96, f'{tag}: el logotipo en lugar de «Bienvenido» {st["logo"]}'
+        assert st['logo']['color'] == ('rgb(244, 232, 219)' if dark else 'rgb(19, 40, 58)'), f'{tag}: color del logotipo {st["logo"]}'
+        assert 'opinas, predices y compites' in st['body'], st['body']
         assert 'Gilberto Mora será Balón de Oro en 2030' in st['body'] and st['dots'] == 3, st
         assert st['primary'] == 'Ver cómo funciona' and st['secondary'] == 'Explorar por mi cuenta', st
         assert 'Inter' in st['font'], f'botón con letra de interfaz: {st["font"]}'
@@ -142,12 +150,15 @@ def first_visit(dark):
         shot(page, f'bienvenida-1-{tag}')
         page.click('#camIntro .cam-intro-primary'); page.wait_for_timeout(400)
         st = state(page)
-        assert st['step'] == 1 and st['rows'] == 3 and st['title'] == 'Cada deporte, su conversación', st
-        assert 'NFL.' in st['body'] and 'Fútbol.' in st['body'] and 'Picks.' in st['body'], st['body']
+        assert st['step'] == 1 and st['rows'] == 4 and st['title'] == 'Más maneras de demostrar lo que sabes', st
+        assert st['kicker'] == 'Aparte del Take' and st['logo'] is None, st
+        for part in ('Takes de Fútbol.', 'Takes de NFL.', 'Quinielas.', 'Picks.'):
+            assert part in st['body'], f'{part} en {st["body"]}'
         shot(page, f'bienvenida-2-{tag}')
         page.click('#camIntro .cam-intro-primary'); page.wait_for_timeout(400)
         st = state(page)
-        assert st['step'] == 2 and st['emblems'] == 7, st
+        assert st['step'] == 2 and st['emblems'] == 7 and st['kicker'] == 'Rankings', st
+        assert 'ranking de quinielas y de Picks' in st['body'], st['body']
         assert st['title'] == 'Todos empiezan en Cobre. Pocos llegan a Leyenda.' and st['primary'] == 'Publicar mi primer Take', st
         shot(page, f'bienvenida-3-{tag}')
         page.click('#camIntro .cam-intro-primary')

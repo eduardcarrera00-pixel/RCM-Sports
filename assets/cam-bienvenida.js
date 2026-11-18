@@ -1,10 +1,12 @@
 /* CAM SPORTS — Bienvenida y tarjetas de sección (18 nov 2026, pedido de Eduard).
 
    Bienvenida (la primera vez que alguien entra por Inicio): una hoja que sube
-   desde abajo con tres pasos. El centro de CAM Sports son los Takes:
-     1. «Tú lo viste primero. Que quede escrito.» (qué es un Take, con un ejemplo);
-     2. dónde se juega: NFL, Fútbol y Picks;
-     3. el camino de rangos, de Cobre a Leyenda CAM.
+   desde abajo con tres pasos. El centro de CAM Sports son los Takes
+   (ajuste de Eduard, 18 nov 2026, 13:37):
+     1. el logotipo y «Demuestra cuánto sabes de deporte»: qué es la web, con
+        un Take de ejemplo;
+     2. «Aparte del Take»: Takes de Fútbol y de NFL, quinielas y Picks;
+     3. «Rankings»: el ranking de cada mes y los rangos, de Cobre a Leyenda CAM.
    El último botón abre «Publicar mi primer Take».
      · Una sola vez por teléfono/navegador (localStorage `cam_intro_seen_v1`).
      · No sale a quien ya tiene la sesión iniciada, ni a quien llega desde un
@@ -126,6 +128,7 @@
     week: '<rect x="4" y="5.5" width="16" height="14" rx="2"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/>',
     news: '<path d="M5 4.5h11v15H6.5A1.5 1.5 0 0 1 5 18z"/><path d="M16 8.5h3v9.5a1.5 1.5 0 0 1-3 0M8 8.5h5M8 12h5M8 15.5h3"/>',
     cup: '<path d="M7.5 4.5h9v4.5a4.5 4.5 0 0 1-9 0z"/><path d="M7.5 6.5H5a2.5 2.5 0 0 0 2.6 3M16.5 6.5H19a2.5 2.5 0 0 1-2.6 3M12 13.5v3.5M8.5 19.5h7"/>',
+    quiniela: '<rect x="4.5" y="4" width="15" height="16" rx="2"/><path d="M7.8 9.2l1.4 1.4 2.4-2.6M7.8 15.2l1.4 1.4 2.4-2.6M14 9.5h2.6M14 15.5h2.6"/>',
     camera: '<path d="M4 8.5h3.2l1.8-2.5h6l1.8 2.5H20v10H4z"/><circle cx="12" cy="13" r="3.3"/>',
     plate: '<circle cx="12" cy="12.5" r="4.8"/><circle cx="12" cy="12.5" r="2.4"/><path d="M4 4.5v4a1.5 1.5 0 0 0 3 0v-4M5.5 4.5v15M20 4.5c-1.5 1-2.3 3-2.3 6.3H20v8.7"/>',
     chef: '<path d="M7.5 15.5V12.6A3.8 3.8 0 1 1 9.4 5.6a3.8 3.8 0 0 1 5.2 0 3.8 3.8 0 1 1 1.9 7v2.9z"/><path d="M7.5 19.5h9v-4h-9zM10.5 15.5v-2.5M13.5 15.5v-2.5"/>',
@@ -276,10 +279,10 @@
   function welcome(step) {
     if (step === 0) {
       const body = document.createDocumentFragment();
-      body.append(el('p', 'Comparte tus Takes: esa opinión que hoy nadie te cree. La comunidad vota y, si se cumple, sumas puntos. Cuanto más atrevido, más vale.', 'cam-intro-text'));
+      body.append(el('p', 'En CAM Sports opinas, predices y compites con gente que vive la NFL y el fútbol como tú. Empieza con un Take: esa opinión que hoy nadie te cree.', 'cam-intro-text'));
       const sample = el('figure', null, 'cam-intro-take', { 'aria-label': 'Ejemplo de Take: Gilberto Mora será Balón de Oro en 2030' });
       const tag = el('span', null, 'cam-intro-take-tag', { 'aria-hidden': 'true' });
-      tag.append(svg('take'), el('span', 'Tu Take · Fútbol'));
+      tag.append(svg('take'), el('span', 'Un Take · Fútbol'));
       const quote = el('blockquote', 'Gilberto Mora será Balón de Oro en 2030', null, { 'aria-hidden': 'true' });
       const votes = el('figcaption', null, 'cam-intro-take-votes', { 'aria-hidden': 'true' });
       const up = el('span', null, 'is-up'); up.append(svg('vote'), el('span', 'Apoyar'));
@@ -287,14 +290,15 @@
       votes.append(up, down);
       sample.append(tag, quote, votes);
       body.append(sample);
-      return { kicker: 'Bienvenido a CAM Sports', title: 'Tú lo viste primero. Que quede escrito.', body,
+      return { logo: true, kicker: '', title: 'Demuestra cuánto sabes de deporte', body,
         primary: ['Ver cómo funciona', () => showStep(1)], secondary: ['Explorar por mi cuenta', () => close('cerrada')] };
     }
     if (step === 1) {
-      return { kicker: 'Dónde se juega', title: 'Cada deporte, su conversación', body: rows([
-        ['nfl', 'NFL.', 'Takes, la quiniela de cada semana y el reto al editor.'],
-        ['futbol', 'Fútbol.', 'Takes y quiniela de Liga MX, LaLiga, Premier y Champions.'],
-        ['picks', 'Picks.', 'Sube la captura de tu apuesta antes del partido y mira si pega.']
+      return { kicker: 'Aparte del Take', title: 'Más maneras de demostrar lo que sabes', body: rows([
+        ['futbol', 'Takes de Fútbol.', 'Liga MX, LaLiga, Premier y Champions. Si se cumple, suma: cuanto más atrevido, más puntos.'],
+        ['nfl', 'Takes de NFL.', 'Equipos, jugadores y playoffs. La comunidad apoya o cuestiona cada uno.'],
+        ['quiniela', 'Quinielas.', 'Elige quién gana cada partido de la NFL y del fútbol; en la NFL, además, retas al editor.'],
+        ['picks', 'Picks.', 'Sube la captura de tu apuesta antes del partido. Si pega, tu plato entra al menú de los mejores.']
       ]), primary: ['Siguiente', () => showStep(2)], secondary: ['Saltar', () => close('cerrada')] };
     }
     const body = document.createDocumentFragment();
@@ -310,8 +314,8 @@
     const ends = el('div', null, 'cam-intro-ranks-ends', { 'aria-hidden': 'true' });
     ends.append(el('span', levels[0]), el('span', levels[levels.length - 1]));
     ranks.append(line, ends);
-    body.append(ranks, el('p', 'Tus aciertos en las quinielas y en los Picks te suben de rango cada mes. ¿Hasta dónde llegas?', 'cam-intro-text'));
-    return { kicker: 'Tu camino', title: 'Todos empiezan en Cobre. Pocos llegan a Leyenda.', body,
+    body.append(ranks, el('p', 'Cada mes hay ranking de quinielas y de Picks: el 20 % mejor sube de rango. ¿Hasta dónde llegas?', 'cam-intro-text'));
+    return { kicker: 'Rankings', title: 'Todos empiezan en Cobre. Pocos llegan a Leyenda.', body,
       primary: ['Publicar mi primer Take', () => close('boton', () => window.aeOpenTakeComposer?.())],
       secondary: ['Primero quiero mirar', () => close('cerrada')] };
   }
@@ -373,10 +377,13 @@
     const grip = el('span', null, 'cam-intro-grip', { 'aria-hidden': 'true' });
     const head = el('div', null, 'cam-intro-head');
     const kicker = el('p', null, 'cam-intro-kicker');
+    // El logotipo de CAM Sports (el mismo de la cabecera, pintado con el color de cada modo).
+    const logo = el('span', null, 'cam-intro-logo', { role: 'img', 'aria-label': 'CAM Sports' });
+    logo.hidden = true;
     const x = el('button', null, 'cam-intro-close', { type: 'button', 'aria-label': 'Cerrar' });
     x.append(svg('close'));
     x.addEventListener('click', () => close('cerrada'));
-    head.append(kicker, x);
+    head.append(logo, kicker, x);
     const content = el('div', null, 'cam-intro-content');
     const title = el('h2', null, 'cam-intro-title', { id: 'camIntroTitle', tabindex: '-1' });
     const body = el('div', null, 'cam-intro-body', { id: 'camIntroBody' });
@@ -392,7 +399,7 @@
     sheet.append(grip, head, content, dots, step, actions);
     dialog.append(sheet);
     document.body.append(dialog);
-    ui = { sheet, kicker, title, body, content, dots, step, primary, secondary, primaryRun: null, secondaryRun: null };
+    ui = { sheet, logo, kicker, title, body, content, dots, step, primary, secondary, primaryRun: null, secondaryRun: null };
 
     dialog.addEventListener('cancel', event => { event.preventDefault(); close('cerrada'); });
     // Tocar fuera de la hoja (el fondo oscuro) la cierra; el fondo no se desplaza.
@@ -409,7 +416,9 @@
 
   function paint(model, animate) {
     const apply = () => {
-      ui.kicker.textContent = model.kicker;
+      ui.kicker.textContent = model.kicker || '';
+      ui.kicker.hidden = !model.kicker;
+      ui.logo.hidden = !model.logo;
       ui.title.textContent = model.title;
       ui.body.replaceChildren(model.body);
       ui.primary.replaceChildren(el('span', model.primary[0]), el('span', '›', 'cam-intro-chevron', { 'aria-hidden': 'true' }));

@@ -16,6 +16,7 @@ html body dialog#camIntro {
   --ci-cta-hover: #e3bf93;
   --ci-cta-ink: #0b2233;
   --ci-hook: rgba(212, 174, 131, .1);
+  --ci-logo: #f4e8db;
   position: fixed !important;
   inset: auto 0 0 0 !important;
   box-sizing: border-box !important;
@@ -45,6 +46,7 @@ html:not(.dark) body dialog#camIntro {
   --ci-cta-hover: #6a4622;
   --ci-cta-ink: #fffaf2;
   --ci-hook: rgba(168, 114, 47, .08);
+  --ci-logo: #13283a;
 }
 html body dialog#camIntro:not([open]) { display: none !important; }
 html body dialog#camIntro[open] {
@@ -99,6 +101,20 @@ html body dialog#camIntro .cam-intro-kicker {
   letter-spacing: .18em !important;
   text-transform: uppercase !important;
 }
+/* Paso 1: el logotipo de la cabecera en lugar de «Bienvenido». Se pinta con una
+   máscara del mismo archivo para que sea crema de noche y azul noche de día. */
+html body dialog#camIntro .cam-intro-logo {
+  display: block !important;
+  flex: none !important;
+  width: 112px !important;
+  height: 57px !important;              /* 1760 × 894 */
+  margin: 6px 0 6px !important;
+  background-color: var(--ci-logo) !important;
+  -webkit-mask: url("cam-sports-logo-completo.webp?v=20261024-lossless-1") left center / contain no-repeat;
+  mask: url("cam-sports-logo-completo.webp?v=20261024-lossless-1") left center / contain no-repeat;
+}
+html body dialog#camIntro .cam-intro-logo[hidden],
+html body dialog#camIntro .cam-intro-kicker[hidden] { display: none !important; }
 html body dialog#camIntro button.cam-intro-close {
   display: flex !important;
   flex: none !important;
@@ -367,6 +383,7 @@ html body dialog#camIntro :is(button.cam-intro-primary, button.cam-intro-seconda
   html body dialog#camIntro .cam-intro-sheet { padding-left: 18px !important; padding-right: 18px !important; }
   html body dialog#camIntro .cam-intro-title { font-size: 23px !important; }
   html body dialog#camIntro .cam-intro-text { font-size: 14.5px !important; }
+  html body dialog#camIntro .cam-intro-logo { width: 96px !important; height: 49px !important; }
   html body dialog#camIntro .cam-intro-rank .cam-rank-emblem { width: 24px !important; height: 28px !important; }
   html body dialog#camIntro .cam-intro-rank:nth-child(n+4) .cam-rank-emblem { width: 28px !important; height: 33px !important; }
   html body dialog#camIntro .cam-intro-rank:nth-child(7) .cam-rank-emblem { width: 34px !important; height: 40px !important; }
