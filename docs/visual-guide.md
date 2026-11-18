@@ -552,3 +552,12 @@ la superficie común. El Pick histórico conserva su diseño propio (perfil arri
 título, ficha del momio y puntos): el 10 nov a las 17:36 se había aplanado y se restauró.
 Historial y Chefs aprovechan el desplazamiento de la página. Se conserva la navegación
 móvil, las rutas, los controles y las reglas de puntuación. Los grupos usan Mis grupos.
+
+## Bienvenida y tarjetas de sección · 18 nov 2026
+
+- **Centro: los Takes.** La bienvenida (solo la primera vez que alguien llega a Inicio, sin sesión y sin un enlace a algo concreto) tiene tres pasos: «Tú lo viste primero. Que quede escrito.» con un Take de ejemplo → NFL, Fútbol y Picks → los 7 escudos de rango. El último botón abre «Publicar mi primer Take», que ya no pide cuenta para escribir: la pide al publicar.
+- **Tarjetas de sección** (NFL, Fútbol, Picks, Actualidad), la primera vez que se abre cada una: tres filas con icono (los de la barra de navegación) y un botón a lo que más engancha. En NFL y Fútbol, si hay datos: «Quedan 1 d 2 h para elegir el próximo partido de la NFL» y «El editor va con los Lions contra los Patriots. ¿Y tú?». Una «i» al final de las pestañas la vuelve a abrir.
+- **Forma:** hoja que sube desde abajo en el teléfono (también apaisado) y tarjeta centrada de 460 px en ordenador y tableta. Noche: fondo #0d2536, dorado #e3b979, crema #f4e8db, botón #d4ae83 con texto #0b2233. Día: papel #fffaf2, cobre #7a5229 (botón) y tinta #13283a.
+- **Letra:** título y cita en Playfair; texto corrido en la serif del cuerpo; etiquetas y botones en Inter (capa `cam-rounded-editorial`, como el resto).
+- **Calma:** sale 0,9 s después de la pantalla de carga y solo si no se está tocando ni bajando la página; si en 10 s no hay calma, se queda para otra visita. Nunca encima de otra ventana ni del aviso de «desliza», que espera a que se cierre. Se cierra con ×, tocando fuera, deslizando hacia abajo, Escape o el botón secundario. «Reducir movimiento»: sin animaciones.
+- Archivos: `assets/cam-bienvenida.js/.css` (al final de `style-sources.json`). Prueba: `python3 -B tests/bienvenida.py [--shots DIR]`.

@@ -83,7 +83,7 @@ STATE = """() => {
   const root = document.getElementById('camNflSemana');
   return {
     cat: currentCategory, tab: document.body.dataset.camTab || null, url: location.search,
-    tabs: [...document.querySelectorAll('#camSectionTabs button')].map(b => b.textContent.trim()),
+    tabs: [...document.querySelectorAll('#camSectionTabs button.cam-section-tab')].map(b => b.textContent.trim()),
     semana: shown('#camNflSemana'), quiniela: shown('#camNflQuiniela'), rankings: shown('#nflRankings'),
     phase: root.dataset.phase || null,
     blocks: [...root.querySelectorAll('[data-block]')].map(b => b.dataset.block),

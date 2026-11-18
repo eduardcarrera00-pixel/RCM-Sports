@@ -62,7 +62,7 @@ PICKS_EXPECT = {
 STATE = """() => ({
   cat: currentCategory, tab: document.body.dataset.camTab || null, url: location.search,
   bar: !document.getElementById('camSectionTabs').hidden,
-  tabs: [...document.querySelectorAll('#camSectionTabs button')].map(b => b.dataset.tab),
+  tabs: [...document.querySelectorAll('#camSectionTabs button.cam-section-tab')].map(b => b.dataset.tab),
   current: document.querySelector('#camSectionTabs [aria-current="true"]')?.dataset.tab || null,
   barTop: document.getElementById('camSectionTabs').getBoundingClientRect().top,
   headerBottom: document.querySelector('body > header').getBoundingClientRect().bottom,

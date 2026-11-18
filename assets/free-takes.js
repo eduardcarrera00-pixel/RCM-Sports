@@ -50,7 +50,10 @@
     if(resumeComposer&&typeof aeRequestPublication==='function'){
       const dialog=$('aeTakeComposerDialog');
       if(dialog?.open)dialog.close();
-      await aeRequestPublication('take',()=>{if(dialog&&!dialog.open)dialog.showModal();});
+      await aeRequestPublication('take',()=>{
+        if(dialog&&!dialog.open)dialog.showModal();
+        status('Sesión iniciada. Toca «Publicar mi Take» para publicarlo.');
+      });
     }else if(typeof openUserAuthModal==='function')openUserAuthModal();
     return null;
   }
@@ -441,15 +444,19 @@
  window.renderFreeTakesVisibility=visibility;
  // preset (opcional, 12 nov 2026): {competition,title} para empezar un Take desde el duelo de NFL.
  // Solo rellena un formulario vacío: nunca pisa un borrador.
+ // 18 nov 2026 (pedido de Eduard): se puede escribir el Take sin cuenta. La cuenta
+ // se pide al tocar «Publicar» (create → requireLogin(true)), y después el formulario
+ // vuelve abierto con el texto intacto.
  window.aeOpenTakeComposer=(requestedSport,preset)=>{
-  if(typeof aeRequestPublication!=='function')return;
-  return aeRequestPublication('take',async()=>{
+  return (async()=>{
    await window.aeDraftGuard?.restore('take');
    const dialog=$('aeTakeComposerDialog');
    const form=$('freeTakesForm');
    if(!dialog||!form)return;
    if(dialog.open)return;
-   status('');
+   let signed=true;
+   try{const r=await db?.auth?.getSession?.();signed=Boolean(r?.data?.session?.user);}catch{}
+   status(signed?'':'Escríbelo con calma: al publicarlo te pediremos iniciar sesión o crear tu cuenta.');
    form.querySelector('button[type="submit"]').textContent='Publicar mi Take';
    const hasDraft=Boolean(form.elements.competition.value||form.elements.title.value||form.elements.body.value);
    const section=requestedSport==='NFL'||requestedSport==='Fútbol'
@@ -471,7 +478,7 @@
        :value?form.elements.competition:form.querySelector('input[name="sport"]');
      focusTarget?.focus();
    },40);
-  });
+  })();
  };
  document.addEventListener('DOMContentLoaded',()=>{
    $('freeTakesForm')?.addEventListener('submit',create);

@@ -136,16 +136,33 @@
     }
     state[kind].silent=false;
   }
+  // Sin sesión (18 nov 2026: los Takes se pueden escribir antes de tener cuenta) el
+  // borrador se guarda como «anon» en este navegador. Al iniciar sesión, la cuenta que
+  // entra se queda con ese borrador; al cerrar sesión, el de la cuenta no se muestra.
+  const ANON='anon';
   async function restore(kind) {
     if(!configs[kind])return;
-    const id=await accountId();
+    const id=await accountId()||ANON;
     const form=$(configs[kind].form),st=state[kind];
     if(!form)return;
-    if(!id){notice(kind,'No se pudo verificar la cuenta para recuperar el borrador. Comprueba tu sesión.');return;}
     cancelTimer(kind);
+    const store=getStore();
+    if((st.owner===ANON||!st.owner)&&id!==ANON){
+      const wasAnon=st.owner===ANON;
+      st.owner=id;
+      if(wasAnon&&meaningful(kind,snapshot(kind))){
+        save(kind);
+        if(store)try{store.removeItem(key(kind,ANON));}catch{}
+        return;
+      }
+      let anon=null;
+      try{anon=JSON.parse(store?.getItem(key(kind,ANON))||'null');}catch{}
+      if(store&&anon?.version===1&&meaningful(kind,anon.data)&&!store.getItem(key(kind,id))){
+        try{store.setItem(key(kind,id),JSON.stringify(anon));store.removeItem(key(kind,ANON));}catch{}
+      }
+    }
     if(st.owner&&st.owner!==id)reset(kind);
     st.owner=id;
-    const store=getStore();
     if(!store){notice(kind,'El almacenamiento local no está disponible. Copia tu texto antes de salir.');return;}
     // Reopening the same form during this session must not overwrite new typing.
     if(meaningful(kind,snapshot(kind))) {save(kind);return;}

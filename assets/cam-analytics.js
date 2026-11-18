@@ -86,6 +86,18 @@
     }).catch(()=>{});
   }
 
+  // Bienvenida y tarjetas de sección (18 nov 2026): vista, pasos, botón o cerrada.
+  // Una vez por visita y acción; la misma sesión anónima del contador de visitas.
+  function trackIntro(card,action) {
+    if(OPT_OUT||typeof db==='undefined'||!db?.rpc)return;
+    const session=sessionId(),visitor=visitorId();
+    if(!session||!visitor)return;
+    db.rpc('cam_track_intro',{p_session_id:session,p_visitor_id:visitor,
+      p_card:safe(card,20),p_action:safe(action,20)}).then(({error})=>{
+      if(error)console.warn('CAM estadísticas: bienvenida no registrada',error.code||error.message);
+    }).catch(()=>{});
+  }
+
   const number = value => Number(value||0).toLocaleString('es-ES');
   const element=(tag,className,text)=>{
     const node=document.createElement(tag);
@@ -143,6 +155,25 @@
     ranked('camAnalyticsSections',data.sections,'Todavía no hay actividad por secciones.');
     ranked('camAnalyticsCampaigns',data.campaigns,'Todavía no hay enlaces con campañas UTM.');
   }
+  const INTRO_NAMES={bienvenida:'Bienvenida',nfl:'NFL',futbol:'Fútbol',picks:'Picks',actualidad:'Actualidad'};
+  async function intro() {
+    const box=$('camAnalyticsIntroBox'),list=$('camAnalyticsIntro');
+    if(!box||!list)return;
+    try {
+      const {data,error}=await db.rpc('cam_intro_summary');
+      if(error)throw error;
+      list.replaceChildren();
+      for(const r of Array.isArray(data)?data:[]){
+        const item=element('li','cam-analytics-rank');
+        const top=element('div','cam-analytics-rank-top');
+        const parts=[number(r.vista)+' la vieron',number(r.boton)+' tocaron el botón',number(r.cerrada)+' la cerraron'];
+        if(r.card==='bienvenida')parts.splice(1,0,number(r.paso3)+' llegaron al paso 3');
+        top.append(element('span',null,INTRO_NAMES[r.card]||String(r.card||'')),element('strong',null,parts.join(' · ')));
+        item.append(top);list.append(item);
+      }
+      box.hidden=false;
+    } catch {box.hidden=true;}
+  }
   async function open() {
     if(typeof currentAdmin==='undefined'||!currentAdmin)return;
     const dialog=$('camAnalyticsDialog');
@@ -155,6 +186,7 @@
       if(error)throw error;
       if(!dialog.open)return;
       render(data||{});
+      void intro();
       status.textContent='Datos desde que se activó el contador · Hora de Toronto';
     } catch(e) {
       status.textContent='No se pudieron cargar las estadísticas. Revisa la conexión o los permisos de administrador.';
@@ -166,7 +198,7 @@
     if(entry)entry.hidden=!isAdmin;
     if(!isAdmin&&$('camAnalyticsDialog')?.open)$('camAnalyticsDialog').close();
   }
-  window.camAnalytics={syncAdmin,trackSection:track};
+  window.camAnalytics={syncAdmin,trackSection:track,trackIntro};
 
   document.addEventListener('DOMContentLoaded',()=>{
     track('Inicio');

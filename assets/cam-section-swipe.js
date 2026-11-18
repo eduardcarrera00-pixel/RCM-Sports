@@ -560,6 +560,13 @@
   for (const type of ['touchstart', 'wheel', 'keydown', 'pointerdown']) {
     window.addEventListener(type, postpone, { capture: true, passive: true });
   }
+  // 18 nov 2026: la primera vez en una sección sale antes su tarjeta (cam-bienvenida.js).
+  // Al cerrarla, el aviso vuelve a esperar su momento de calma en esta misma área.
+  document.addEventListener('cam:intro', event => {
+    if (event.detail?.action !== 'close' || hint) return;
+    hintKey = '';
+    considerHint();
+  });
   window.addEventListener('scroll', postpone, { passive: true });
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) { postpone(); return; }

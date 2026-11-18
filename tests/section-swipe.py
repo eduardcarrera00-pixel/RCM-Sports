@@ -200,7 +200,7 @@ def sideways_scroller(page, cdp, area, where):
 
 
 NEXT_LABEL = """() => {
-  const tabs = [...document.querySelectorAll('#camSectionTabs:not([hidden]) button, #aeOpinions:not([hidden]) #aeOpinionsTabs [role=tab]')];
+  const tabs = [...document.querySelectorAll('#camSectionTabs:not([hidden]) button.cam-section-tab, #aeOpinions:not([hidden]) #aeOpinionsTabs [role=tab]')];
   const i = tabs.findIndex(b => b.getAttribute('aria-current') === 'true' || b.getAttribute('aria-selected') === 'true');
   return tabs[(i + 1) % tabs.length].textContent.trim();
 }"""
