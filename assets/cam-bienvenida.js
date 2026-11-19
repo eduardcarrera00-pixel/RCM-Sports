@@ -279,7 +279,7 @@
   function welcome(step) {
     if (step === 0) {
       const body = document.createDocumentFragment();
-      body.append(el('p', 'En CAM Sports opinas, predices y compites con gente que vive la NFL y el fútbol como tú. Empieza con un Take: esa opinión que hoy nadie te cree.', 'cam-intro-text'));
+      body.append(el('p', 'CAM Sports, el lugar donde tu conocimiento deportivo queda para la historia. Empieza con un Take de cualquier deporte: eso que crees que va a pasar y que hoy nadie te cree.', 'cam-intro-text'));
       const sample = el('figure', null, 'cam-intro-take', { 'aria-label': 'Ejemplo de Take: Gilberto Mora será Balón de Oro en 2030' });
       const tag = el('span', null, 'cam-intro-take-tag', { 'aria-hidden': 'true' });
       tag.append(svg('take'), el('span', 'Un Take · Fútbol'));
@@ -314,7 +314,7 @@
     const ends = el('div', null, 'cam-intro-ranks-ends', { 'aria-hidden': 'true' });
     ends.append(el('span', levels[0]), el('span', levels[levels.length - 1]));
     ranks.append(line, ends);
-    body.append(ranks, el('p', 'Cada mes hay ranking de quinielas y de Picks: el 20 % mejor sube de rango. ¿Hasta dónde llegas?', 'cam-intro-text'));
+    body.append(ranks, el('p', 'Cada mes, el 20 % de arriba en Quinielas y Picks sube de rango. Cuanta más sabiduría compartas, más alto podrás llegar. ¿Tienes lo que se necesita?', 'cam-intro-text'));
     return { kicker: 'Rankings', title: 'Todos empiezan en Cobre. Pocos llegan a Leyenda.', body,
       primary: ['Publicar mi primer Take', () => close('boton', () => window.aeOpenTakeComposer?.())],
       secondary: ['Primero quiero mirar', () => close('cerrada')] };

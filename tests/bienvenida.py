@@ -140,7 +140,7 @@ def first_visit(dark):
         assert st['title'] == 'Demuestra cuánto sabes de deporte', st['title']
         assert st['kicker'] == '' and st['logo'] and st['logo']['mask'] and st['logo']['w'] >= 96, f'{tag}: el logotipo en lugar de «Bienvenido» {st["logo"]}'
         assert st['logo']['color'] == ('rgb(244, 232, 219)' if dark else 'rgb(19, 40, 58)'), f'{tag}: color del logotipo {st["logo"]}'
-        assert 'opinas, predices y compites' in st['body'], st['body']
+        assert 'tu conocimiento deportivo queda para la historia' in st['body'], st['body']
         assert 'Gilberto Mora será Balón de Oro en 2030' in st['body'] and st['dots'] == 3, st
         assert st['primary'] == 'Ver cómo funciona' and st['secondary'] == 'Explorar por mi cuenta', st
         assert 'Inter' in st['font'], f'botón con letra de interfaz: {st["font"]}'
@@ -158,7 +158,7 @@ def first_visit(dark):
         page.click('#camIntro .cam-intro-primary'); page.wait_for_timeout(400)
         st = state(page)
         assert st['step'] == 2 and st['emblems'] == 7 and st['kicker'] == 'Rankings', st
-        assert 'ranking de quinielas y de Picks' in st['body'], st['body']
+        assert 'Cuanta más sabiduría compartas' in st['body'], st['body']
         assert st['title'] == 'Todos empiezan en Cobre. Pocos llegan a Leyenda.' and st['primary'] == 'Publicar mi primer Take', st
         shot(page, f'bienvenida-3-{tag}')
         page.click('#camIntro .cam-intro-primary')
