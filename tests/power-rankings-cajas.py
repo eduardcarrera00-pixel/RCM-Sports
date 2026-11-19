@@ -177,6 +177,12 @@ def run(width, dark):
         leader = page.evaluate(NOTE_OF_LEADER)
         assert 'Los 49ers siguen arriba' in leader['text'], f'{where}: tarjeta del n.º 1 tras publicar {leader}'
 
+        # 6b) Aunque el título no diga «Power Rankings», las cajas marcadas la delatan.
+        other = page.evaluate("""() => { const a = articles.find(x => String(x.title).includes('Semana 11'));
+          const copy = Object.assign({}, a, {id: 'otra', title: 'Mi top 10', summary: 'Semana movida', createdAt: new Date(Date.now() + 6e4).toISOString()});
+          articles.unshift(copy); const r = window.aeRankingNotes.notesFor('nfl'); articles.shift(); return r.article && r.article.id; }""")
+        assert other == 'otra', f'{where}: sin «Power Rankings» en el título no se reconoce {other}'
+
         # 7) La noticia se lee normal (subtítulo por equipo) y editarla vuelve a abrir las cajas.
         new_id = payload['id']
         page.evaluate(f"() => openArticleModal({json.dumps(new_id)})"); page.wait_for_timeout(400)

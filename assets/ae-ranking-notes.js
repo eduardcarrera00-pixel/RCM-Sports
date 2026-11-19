@@ -122,7 +122,7 @@
 
   function articleFor(scope) {
     const list = typeof articles === 'undefined' || !Array.isArray(articles) ? [] : articles;
-    const isRanking = a => /power\s*-?\s*rank/i.test((a.title || '') + ' ' + (a.summary || '')) || /data-cam-power-rankings/.test(a.body || '');
+    const isRanking = a => /power\s*-?\s*rank/i.test((a.title || '') + ' ' + (a.summary || '')) || /data-cam-rank-team=/.test(a.body || '');
     const sport = a => norm(a.category);
     const match = scope === 'nfl'
       ? a => sport(a) === 'nfl'
