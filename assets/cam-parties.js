@@ -1096,7 +1096,10 @@ function mountEntries() {
       // La fila a dos columnas ya no es necesaria: solo alberga «Ver mis jornadas».
       const buttonRow = section.querySelector('.cam-nfl-week-action-buttons');
       const history = $('camNflNav');
-      if (buttonRow && history?.parentElement === buttonRow) buttonRow.replaceWith(history);
+      // 18 nov 2026: sacar antes la fila de guardar; al reemplazar la fila se perdía con ella
+      // y la NFL se quedaba sin «Guardar picks del día» (ahora solo aparece si un guardado falla).
+      const keep = buttonRow?.querySelector('.cam-nfl-save-row');
+      if (buttonRow && history?.parentElement === buttonRow) { buttonRow.replaceWith(history); if (keep) history.after(keep); }
     }
     if (!$(id)) {
       const row = entry(id, 'Mis grupos de Quiniela', () => openHub('quiniela', sport));

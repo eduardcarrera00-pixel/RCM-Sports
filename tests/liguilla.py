@@ -285,8 +285,10 @@ def run():
         assert page.locator('#camLiguilla .cam-lg-foot').count() == 0 and page.locator('#camLiguilla .cam-lg-board-note').count() == 1
         assert page.locator('#camLiguilla .cam-lg-bracket').count() == 1, 'debe haber un solo cuadro'
         assert page.locator('#camLiguilla [class*="cam-fan-"]').count() == 0 and not page.evaluate('() => !!window.CamFanBracket'), 'quedan restos del cuadro libre'
-        page.locator('#camLiguilla .cam-lg-save').click()
+        # 18 nov 2026: cada toque se guarda solo; el botón solo dice cómo va.
         page.wait_for_timeout(400)
+        save_btn = page.locator('#camLiguilla .cam-lg-save')
+        assert save_btn.is_disabled() and save_btn.inner_text() == '✓ Guardado', save_btn.inner_text()
         call = page.evaluate("() => window.__fake.calls.filter(c => c.rpc === 'cam_liguilla_save_bracket').pop()")
         assert call and call['args']['p_semis'] == ['218', '228', '219', '15720'] and call['args']['p_champion'] == '228', call
         assert 'guardado' in page.locator('#camLiguilla .cam-lg-note').inner_text().lower()
@@ -437,10 +439,10 @@ def run():
         assert page.evaluate("() => document.activeElement?.dataset?.team") == '220', 'el foco se perdió al quitar'
         page.keyboard.press('Enter'); page.wait_for_timeout(100)
         assert '4 de 4' in root.locator('.cam-lg-count').inner_text()
-        assert not save.is_disabled() and save.inner_text() == 'Guardar mis 8'
+        # 18 nov 2026: al completar se guardan solos (sin cuenta, en este aparato) y el botón invita a entrar.
+        assert not save.is_disabled() and save.inner_text() == 'Inicia sesión para guardar', save.inner_text()
         if SHOTS:
             root.screenshot(path=SHOTS + '/mis8-390-dia.png')
-        save.click(); page.wait_for_timeout(150)
         assert 'este dispositivo' in root.locator('.cam-lg-note').inner_text()
         stored = page.evaluate("() => JSON.parse(localStorage.getItem('cam:liguilla:mis8:anon:3'))")
         assert stored and len(stored) == 8, stored
@@ -450,11 +452,11 @@ def run():
         page.evaluate("() => { window.__fake.user = JSON.parse(%r); currentUser = {id:'u-1', username:'QA_Liguilla_Larga'}; window.camLiguilla.refresh(); }" % USER)
         page.wait_for_timeout(500)
         assert '4 de 4' in root.locator('.cam-lg-count').inner_text(), 'se perdieron los 8 al entrar con cuenta'
-        assert root.locator('.cam-lg-q8-save').is_enabled()
-        root.locator('.cam-lg-q8-save').click(); page.wait_for_timeout(400)
+        # Al entrar se guardan solos: no hay que pulsar nada.
+        page.wait_for_timeout(400)
         call = page.evaluate("() => window.__fake.calls.filter(c => c.rpc === 'cam_liguilla_save_qualifiers').pop()")
         assert call and call['args']['p_window'] == 3 and sorted(call['args']['p_teams']) == sorted(['218', '227', '219', '223', '15720', '225', '228', '220']), call
-        assert 'salen en tu perfil' in root.locator('.cam-lg-note').inner_text()
+        assert 'Guardado' in root.locator('.cam-lg-note').inner_text() and 'salen en tu perfil' in root.locator('.cam-lg-note').inner_text()
         assert root.locator('.cam-lg-q8-save').is_disabled(), 'sin cambios no hay nada que guardar'
         assert 'guardados' in root.locator('.cam-lg-q8-save').inner_text()
         assert not page.evaluate("() => localStorage.getItem('cam:liguilla:mis8:anon:3')"), 'el borrador del aparato debía borrarse'

@@ -470,7 +470,7 @@ html.dark [data-reading-size][aria-pressed="true"] {
     </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
-<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261118-comanda-chef-1">
+<link rel="stylesheet" href="assets/ae-editorial-bundle.css?v=20261118-guardar-al-tocar-1">
 <style id="cam-liguilla-week-styles">
 /* Integración de la Liguilla en Fútbol → La semana. Un solo recuadro, «Arma tu cuadro»:
    primero «mis 8» y después el cuadro con puntos (estilos en assets/cam-liguilla.css). */
@@ -6051,6 +6051,13 @@ html.dark :is(#camNflQuiniela,#camFootballQuiniela,.cam-quiniela-ranking,#camLig
 .cam-nfl-game[data-state="guardado"] .cam-nfl-badge::before{content:"✓";font-size:11px}
 .cam-nfl-game[data-state="borrador"]{border-left-color:var(--q-warn)}
 .cam-nfl-game[data-state="borrador"] .cam-nfl-badge{background:var(--q-warn-bg);color:var(--q-warn-text);border-color:color-mix(in srgb,var(--q-warn) 45%,transparent)}
+/* 18 nov 2026: elegir es guardar. «Guardando…» mientras va al servidor y un destello al quedar guardado. */
+.cam-nfl-game[data-state="guardando"]{border-left-color:var(--q-gold)}
+.cam-nfl-game[data-state="guardando"] .cam-nfl-badge{background:var(--q-gold-soft);color:var(--q-gold-text);border-color:color-mix(in srgb,var(--q-gold) 30%,transparent)}
+.cam-nfl-game[data-state="guardando"] .cam-nfl-badge::before{animation:camNflPulse 1s ease-in-out infinite}
+.cam-nfl-game.is-just-saved .cam-nfl-badge{animation:camQSaved .9s cubic-bezier(.2,.8,.2,1)}
+@keyframes camQSaved{0%{transform:scale(.9);box-shadow:0 0 0 0 color-mix(in srgb,var(--q-gold) 45%,transparent)}45%{transform:scale(1.06)}100%{transform:scale(1);box-shadow:0 0 0 7px transparent}}
+@media(prefers-reduced-motion:reduce){.cam-nfl-game.is-just-saved .cam-nfl-badge{animation:none}}
 .cam-nfl-game[data-state="abierto"]{border-left-color:var(--q-info)}
 .cam-nfl-game[data-state="abierto"] .cam-nfl-badge{background:var(--q-info-bg);color:var(--q-info-text,var(--q-info));border-color:color-mix(in srgb,var(--q-info) 40%,transparent)}
 .cam-nfl-game[data-state="abierto"] .cam-nfl-badge::before{content:"○"}
@@ -6638,8 +6645,8 @@ html.dark #camFootballQuiniela .cam-football-quiniela-illustration--night{displa
 <!-- Componentes finales: móvil, conversación, parties, perfil y Takes; orden en performance-css-packs.json. -->
 <link rel="stylesheet" href="assets/cam-perf-app-panels.css?v=20261116-inicio-orden-2">
 <link rel="stylesheet" href="assets/cam-home-takes-unified.css?v=20261115-modo-dia-1">
-<script src="assets/cam-parties.js?v=20261113-login-after-groups-1"></script>
-<script src="assets/cam-sport-quiniela-loader.js?v=20261113-login-after-groups-1"></script>
+<script src="assets/cam-parties.js?v=20261118-guardar-al-tocar-1"></script>
+<script src="assets/cam-sport-quiniela-loader.js?v=20261118-guardar-al-tocar-1"></script>
 <script src="assets/ae-season-predictions.js?v=20261021-champion-guide-1"></script>
 <script src="assets/cam-actualidad-simetria.js?v=20261113-simetria-1"></script>
 <script src="assets/cam-lazy-editorial-loader.js?v=20261113-actualidad-ajustes-1"></script>

@@ -87,9 +87,40 @@
       const team=localStorage.getItem(draftKey(g.id));
       if(team&&[g.home_id,g.away_id].includes(team)&&!mine.has(g.id))draft.set(g.id,team);
     }catch{}}
+    // 18 nov 2026: elegir es guardar. Lo que alguien eligió antes y no llegó a guardar
+    // (cuando hacía falta el botón) se guarda ahora solo, si el partido sigue abierto.
+    for(const [id] of draft){const g=games.find(x=>x.id===id);if(g&&isOpen(g))queueSave(g.id);}
   }
   function isOpen(g){return g.status==='scheduled'&&g.picks_open&&new Date(g.kickoff).getTime()>now()&&g.odds_locked_at!=null;}
   function active(g){return draft.get(g.id)||mine.get(g.id)?.team_id||null;}
+  // Un borrador igual a lo ya guardado no cuenta como pendiente.
+  const unsaved=g=>draft.has(g.id)&&draft.get(g.id)!==mine.get(g.id)?.team_id;
+  // 18 nov 2026: como en Fútbol y en el Duelo de la semana, la elección se guarda al tocarla.
+  // Los toques seguidos van en fila; si uno falla, queda como borrador («Sin guardar») y
+  // vuelve «Guardar picks del día» para reintentar.
+  const queued=new Map();            // id del partido → toques esperando su turno
+  const busy=id=>queued.has(id);
+  let tapQueue=Promise.resolve(),justSaved=null,justSavedTimer=0;
+  function queueSave(gameId){
+    queued.set(gameId,(queued.get(gameId)||0)+1);
+    tapQueue=tapQueue.then(async()=>{
+      try{const latest=draft.get(gameId);if(latest&&user)await saveOne(gameId,latest);}
+      finally{
+        const left=(queued.get(gameId)||1)-1;
+        if(left>0)queued.set(gameId,left);else queued.delete(gameId);
+        paintGames();
+      }
+    }).catch(()=>{});
+  }
+  function choose(g,id){
+    if(!isOpen(g))return;
+    if(!user){window.openUserAuthModal?.();return;}
+    // Tocar lo que ya está guardado no hace nada.
+    if(!draft.has(g.id)&&mine.get(g.id)?.team_id===id)return;
+    draft.set(g.id,id);saveDraft();
+    queueSave(g.id);
+    paintGames();
+  }
   function chooseWeek(){
     // La jornada vigente se decide por sus partidos, nunca por los de la semana pasada.
     // Un partido en curso conserva su jornada hasta terminar (margen de 6 h tras el kickoff).
@@ -282,8 +313,13 @@
     try{
       await run(client().rpc('cam_nfl_save_pick',{p_game_id:g.id,p_team_id:teamId}));
       mine.set(g.id,{game_id:g.id,team_id:teamId,awarded_points:0});
-      draft.delete(g.id);
-      try{localStorage.removeItem(draftKey(g.id));}catch{}
+      // Si mientras tanto tocó el otro equipo, ese toque sigue en la fila: no se borra.
+      if(!draft.has(g.id)||draft.get(g.id)===teamId){
+        draft.delete(g.id);
+        try{localStorage.removeItem(draftKey(g.id));}catch{}
+      }
+      justSaved=g.id;clearTimeout(justSavedTimer);
+      justSavedTimer=setTimeout(()=>{if(justSaved===g.id)justSaved=null;},1600);
       st('camNflStatus','Pronóstico guardado: '+nickname(teamId)+'.','ok');
       document.dispatchEvent(new CustomEvent('cam:nfl-picks-updated'));
       return true;
@@ -338,7 +374,7 @@
     // 12 nov 2026: un círculo de color en lugar de los puntos (hueco; relleno al elegir).
     const dot=el('span',null,'cam-q-dot');dot.setAttribute('aria-hidden','true');b.append(dot);
     // 12 nov 2026: sin puntos a la vista en las opciones (todos los aciertos valen igual).
-    b.addEventListener('click',()=>{if(!isOpen(g))return;if(!user){window.openUserAuthModal?.();return;}draft.set(g.id,id);saveDraft();paintGames();});
+    b.addEventListener('click',()=>choose(g,id));
     if(disabled)b.title='Este partido está cerrado';
     return b;
   }
@@ -352,7 +388,8 @@
     if(new Date(g.kickoff).getTime()<=now())return 'cerrado';
     if(!g.odds_locked_at)return 'pendiente';
     if(!g.picks_open)return 'cerrado';
-    return mine.has(g.id)?'guardado':draft.has(g.id)?'borrador':'abierto';
+    if(busy(g.id))return 'guardando';
+    return unsaved(g)?'borrador':mine.has(g.id)?'guardado':'abierto';
   }
   function gameStatus(g){
     const pick=mine.get(g.id);
@@ -368,7 +405,8 @@
     if(new Date(g.kickoff).getTime()<=now())return 'Bloqueado';
     if(!g.odds_locked_at)return 'Pendiente de cuotas';
     if(!g.picks_open)return 'Cerrada';
-    return mine.has(g.id)?'Pronóstico guardado':draft.has(g.id)?'Sin guardar':'Abierto';
+    if(busy(g.id))return 'Guardando…';
+    return unsaved(g)?'Sin guardar':mine.has(g.id)?'Pronóstico guardado':'Abierto';
   }
   function paintDayNav(fixtures){
     const target=$('camNflDayNav');if(!target)return;
@@ -447,6 +485,7 @@
       const box=el('article',null,'cam-nfl-game');
       box.dataset.state=gameState(g);
       box.dataset.gameId=g.id;
+      if(justSaved===g.id&&box.dataset.state==='guardado')box.classList.add('is-just-saved');
       if(laurelOf(g)===g.id)box.classList.add('has-laurel');
       const top=el('div',null,'cam-nfl-game-meta');
       // 12 nov 2026: la línea solo lleva el estado («Abierto»…); sin hora ni «Bonus +5».
@@ -464,19 +503,30 @@
     sizeGameViewport();
 
     const save=$('camNflSave'),saveDay=$('camNflSaveDay');
+    const stuck=g=>unsaved(g)&&isOpen(g)&&!busy(g.id);
     if(save){
-      save.disabled=saving||(user?!chosen.some(g=>draft.has(g.id)&&isOpen(g)):false);
+      const pendingWeek=chosen.some(stuck);
+      // Cada toque ya se guarda: «Guardar toda la jornada» solo aparece si algo quedó sin guardar.
+      if(user&&!pendingWeek&&!saving){save.hidden=true;save.style.setProperty('display','none','important');}
+      else if(user){save.hidden=false;save.style.removeProperty('display');}
+      save.disabled=saving||(user?!pendingWeek:false);
       save.textContent=user?'Guardar toda la jornada':'Iniciar sesión';
     }
     if(saveDay){
-      saveDay.disabled=saving||(user?!visible.some(g=>draft.has(g.id)&&isOpen(g)):false);
+      const pendingDay=visible.some(stuck);
+      // Sin sesión tampoco se muestra: tocar un equipo ya abre el acceso (y La semana tiene el suyo).
+      saveDay.hidden=!user||(!pendingDay&&!saving);
+      saveDay.disabled=saving||(user?!pendingDay:false);
       saveDay.textContent=user?'Guardar picks del día':'Iniciar sesión';
     }
+    // Sin botones a la vista, la fila no deja un hueco sobre «Ver mis jornadas».
+    const row=saveDay?.closest('.cam-nfl-save-row');
+    if(row)row.style.display=save?.hidden!==false&&saveDay?.hidden?'none':'';
   }
   async function persist(mode='week'){
     if(saving)return;
     if(!user){window.openUserAuthModal?.();return;}
-    const pending=weekGames().filter(g=>draft.has(g.id)&&isOpen(g)&&(mode!=='day'||gameDay(g)===dayKey));
+    const pending=weekGames().filter(g=>unsaved(g)&&isOpen(g)&&!busy(g.id)&&(mode!=='day'||gameDay(g)===dayKey));
     if(!pending.length)return;
     saving=true;paintGames();
     let successes=0;const errors=[];

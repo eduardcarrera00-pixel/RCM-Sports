@@ -40,9 +40,9 @@
 
   // Estado
   let state=null,seasonLoaded=null,userLoaded=undefined,stale=true,loading=false,request=0,loadError='';
-  let draft=null,saving=false,note='',noteKind='',roundView=null,board=null,boardOpen=false,adminTable=null,adminMessage='';
+  let draft=null,saving=false,saveAgain=false,note='',noteKind='',roundView=null,board=null,boardOpen=false,adminTable=null,adminMessage='';
   // «Mis 8»: la tabla y la ventana llegan de cam_liguilla_candidates mientras no hay liguilla.
-  let cand=null,q8=[],q8Saving=false,q8Note='',q8Kind='',q8Expanded=false;
+  let cand=null,q8=[],q8Saving=false,q8Again=false,q8Note='',q8Kind='',q8Expanded=false;
   let animate='';
   const openLegs=new Set();
 
@@ -232,7 +232,15 @@
     }catch{
       if(ticket!==request)return;
       loadError='No se pudo cargar la liguilla. Vuelve a abrir la sección para reintentarlo.';
-    }finally{if(ticket===request){loading=false;render();}finishEntrance?.();}
+    }finally{if(ticket===request){loading=false;render();flushPending();}finishEntrance?.();}
+  }
+  // 18 nov 2026: elegir es guardar. Si al cargar hay elecciones de este aparato que nunca
+  // llegaron a la cuenta (las hizo como invitado), se guardan solas. Solo cuando la cuenta no
+  // tiene nada guardado: así un borrador viejo de otro aparato nunca pisa lo guardado.
+  function flushPending(){
+    if(!viewer())return;
+    if(state&&isOpen()&&draft&&count(draft)&&!count(saved())&&!saving)void saveBracket();
+    if(!state&&cand&&q8Open()&&!(q8Saved()||[]).length&&q8Complete()&&!q8Saving)void saveQ8();
   }
   function sync(){
     const s=api()?.snapshot?.();
@@ -354,18 +362,20 @@
     if(open){
       const actions=el('div',null,'cam-lg-actions');
       const dirty=!same(draft,mine),who=viewer();
-      const save=btn(!who?'Inicia sesión para guardar':saving?'Guardando…':'Guardar mi cuadro','cam-nfl-action cam-lg-save',saveBracket);
-      save.disabled=!!who&&(saving||!dirty||!count(draft));
+      // Cada toque se guarda solo: el botón dice cómo va y solo se pulsa para reintentar.
+      const save=btn(!who?'Inicia sesión para guardar':saving?'Guardando…':dirty?'Guardar mi cuadro':count(draft)?'✓ Guardado':'Guardar mi cuadro','cam-nfl-action cam-lg-save'+(who&&!saving&&!dirty&&count(draft)?' is-saved':''),saveBracket);
+      save.disabled=!!who&&(saving||!dirty);
       const share=btn('Compartir mi cuadro','cam-nfl-action cam-nfl-action-secondary cam-lg-share',e=>shareBracket(e.currentTarget));
       share.disabled=count(draft)!==7||!window.CamPickShare?.openBracket;
-      const reset=btn('Empezar de nuevo','cam-lg-link',()=>{draft={semis:[null,null,null,null],finals:[null,null],champion:null};storeDraft();note='';render();});
+      const reset=btn('Empezar de nuevo','cam-lg-link',()=>{draft={semis:[null,null,null,null],finals:[null,null],champion:null};afterPick();});
       reset.disabled=!count(draft);
       actions.append(save,share,reset);
       wrap.append(actions);
       wrap.append(el('p',!who&&count(draft)===7?'Inicia sesión para que tu cuadro cuente para la quiniela y salga en tu perfil. Ya puedes compartirlo.'
+        :saving?'Guardando tu cuadro…'
         :done&&!dirty?'Cuadro guardado: sale en tu perfil. Puedes cambiarlo hasta el cierre.'
-        :dirty&&count(draft)?'Tienes cambios sin guardar.'
-        :'Faltan '+(7-count(draft))+' elecciones para poder compartirlo.','cam-lg-hint'));
+        :dirty&&who?'El último cambio no se guardó: toca «Guardar mi cuadro» para reintentarlo.'
+        :'Faltan '+(7-count(draft))+' elecciones para poder compartirlo.'+(who?' Cada toque se guarda solo.':''),'cam-lg-hint'));
       wrap.append(message());
     }
     wrap.append(rules());
@@ -392,28 +402,40 @@
     if(foot)card.append(el('p',foot,'cam-lg-foot'));
     return card;
   }
+  // 18 nov 2026: elegir es guardar. Cada toque del cuadro se guarda solo (con sesión).
   function afterPick(){
-    clean(draft);storeDraft();note='';render();
+    clean(draft);storeDraft();note='';
+    if(viewer()&&isOpen()&&!same(draft,saved())&&!saving)void saveBracket();
+    else{if(saving)saveAgain=true;render();}
   }
   async function saveBracket(){
     if(!viewer()){window.openUserAuthModal?.();return;}
-    if(saving||!isOpen())return;
+    if(!isOpen())return;
+    // Toques seguidos: se guarda uno y, al terminar, el último cuadro que quedó.
+    if(saving){saveAgain=true;return;}
     saving=true;note='';render();
+    const sent=JSON.parse(JSON.stringify(draft));
     try{
-      const {data,error}=await client().rpc('cam_liguilla_save_bracket',{p_liguilla:L().id,p_semis:draft.semis,
-        p_finalists:draft.finals,p_champion:draft.champion});
+      const {data,error}=await client().rpc('cam_liguilla_save_bracket',{p_liguilla:L().id,p_semis:sent.semis,
+        p_finalists:sent.finals,p_champion:sent.champion});
       if(error)throw error;
       // Lo guardado pasa a ser la verdad; el borrador local ya no hace falta.
       const rows=[];
-      draft.semis.forEach((id,i)=>id&&rows.push({stage:'semis',slot:i,team_id:id,points:pts(id,'semis'),awarded_points:0,settled_at:null}));
-      draft.finals.forEach((id,i)=>id&&rows.push({stage:'final',slot:i,team_id:id,points:pts(id,'final'),awarded_points:0,settled_at:null}));
-      if(draft.champion)rows.push({stage:'champion',slot:0,team_id:draft.champion,points:pts(draft.champion,'champion'),awarded_points:0,settled_at:null});
+      sent.semis.forEach((id,i)=>id&&rows.push({stage:'semis',slot:i,team_id:id,points:pts(id,'semis'),awarded_points:0,settled_at:null}));
+      sent.finals.forEach((id,i)=>id&&rows.push({stage:'final',slot:i,team_id:id,points:pts(id,'final'),awarded_points:0,settled_at:null}));
+      if(sent.champion)rows.push({stage:'champion',slot:0,team_id:sent.champion,points:pts(sent.champion,'champion'),awarded_points:0,settled_at:null});
       state.mine={...(state.mine||{series:[]}),bracket:rows};
-      try{localStorage.removeItem(draftKey());}catch{}
-      note=count(draft)===7?'Cuadro guardado: '+(data?.potential??potential(draft))+' pts posibles. Ya puedes compartirlo.':'Guardado a medias: te faltan '+(7-count(draft))+' elecciones.';
+      if(same(draft,sent))try{localStorage.removeItem(draftKey());}catch{}
+      const n=count(sent);
+      note=n===7?'Guardado: '+(data?.potential??potential(sent))+' pts posibles. Ya puedes compartirlo.'
+        :n?'Guardado. Te faltan '+(7-n)+(7-n===1?' elección.':' elecciones.'):'Guardado: cuadro vacío.';
       noteKind='ok';
     }catch(error){note=error?.message||'No se pudo guardar. Inténtalo de nuevo.';noteKind='error';}
-    finally{saving=false;render();}
+    finally{
+      saving=false;
+      if(saveAgain){saveAgain=false;if(!same(draft,saved())){void saveBracket();return;}}
+      render();
+    }
   }
   function shareModel(){
     // Lo que se ve en el recuadro: el borrador mientras está abierto, lo guardado después.
@@ -511,29 +533,40 @@
     if(gone.length&&!q8Note){q8Note=gone.join(' y ')+(gone.length===1?' ya quedó eliminado':' ya quedaron eliminados')+': elige otro.';q8Kind='error';}
   }
   function storeQ8(){try{localStorage.setItem(q8Key(viewer()?.id),JSON.stringify(fullEight()));}catch{}}
+  const q8Complete=()=>q8.length===slots()&&fullEight().length===8;
+  const q8Dirty=()=>!sameSet(fullEight(),q8Saved()||[]);
   function toggleQ8(id){
-    if(!q8Open()||q8Saving||isFixed(id))return;
+    if(!q8Open()||isFixed(id))return;
     const i=q8.indexOf(id);
     if(i>=0)q8.splice(i,1);else if(q8.length<slots())q8.push(id);
-    storeQ8();q8Note='';render();
+    storeQ8();q8Note='';
+    // 18 nov 2026: elegir es guardar. Al completar tus 8 se guardan solos, y cada cambio después.
+    if(q8Complete()&&q8Dirty()&&!q8Saving)void saveQ8();
+    else{if(q8Saving)q8Again=true;render();}
     section.querySelector('.cam-lg-q8-team[data-team="'+CSS.escape(id)+'"]')?.focus({preventScroll:true});
   }
   async function saveQ8(){
     const eight=fullEight();
-    if(q8Saving||!q8Open()||q8.length!==slots()||eight.length!==8)return;
+    if(!q8Open()||q8.length!==slots()||eight.length!==8)return;
     storeQ8();
     if(!viewer()){
-      q8Note='Guardado en este dispositivo. Inicia sesión para que tus 8 salgan en tu perfil.';q8Kind='ok';render();return;
+      q8Note='Guardado en este dispositivo. Inicia sesión para que tus 8 cuenten y salgan en tu perfil.';q8Kind='ok';render();return;
     }
+    // Si cambia algo mientras se guarda, al terminar se guarda lo último.
+    if(q8Saving){q8Again=true;return;}
     q8Saving=true;q8Note='';render();
     try{
       const {error}=await client().rpc('cam_liguilla_save_qualifiers',{p_window:W().id,p_teams:eight});
       if(error)throw error;
       cand.mine=[...eight];
-      try{localStorage.removeItem(q8Key(viewer()?.id));localStorage.removeItem(q8Key('anon'));}catch{}
-      q8Note='Tus 8 están guardados y salen en tu perfil.';q8Kind='ok';
+      if(sameSet(fullEight(),eight))try{localStorage.removeItem(q8Key(viewer()?.id));localStorage.removeItem(q8Key('anon'));}catch{}
+      q8Note='Guardado: tus 8 salen en tu perfil.';q8Kind='ok';
     }catch(error){q8Note=error?.message||'No se pudo guardar. Inténtalo de nuevo.';q8Kind='error';}
-    finally{q8Saving=false;render();}
+    finally{
+      q8Saving=false;
+      if(q8Again){q8Again=false;if(q8Complete()&&q8Dirty()){void saveQ8();return;}}
+      render();
+    }
   }
   // Una ficha por equipo, en dos columnas. `fixed`: ya dentro, no se toca. `showStatus`: tras el cierre.
   function q8Team(t,{chosen,disabled,fixed,readonly,showStatus}){
@@ -597,25 +630,37 @@
         list.setAttribute('aria-label',need===8?'Elige a tus 8 clasificados':'Elige '+(need===1?'el que falta':'los '+need+' que faltan'));
         for(const t of candTeams().filter(t=>t.status==='alive')){
           const chosen=q8.includes(String(t.team_id));
-          const b=q8Team(t,{chosen,disabled:q8Saving||(!chosen&&q8.length>=need)});
+          const b=q8Team(t,{chosen,disabled:!chosen&&q8.length>=need});
           b.addEventListener('click',()=>toggleQ8(String(t.team_id)));
           list.append(b);
         }
         choices.append(list);
       }
       if(need){
-        const eight=fullEight(),dirty=!sameSet(eight,saved||[]),over=q8.length-need,who=viewer();
+        const eight=fullEight(),dirty=!sameSet(eight,saved||[]),over=q8.length-need,left=need-q8.length,who=viewer();
         const actions=el('div',null,'cam-lg-actions');
-        const save=btn(q8Saving?'Guardando…':q8.length===need&&who&&!dirty?'Tus 8 están guardados':'Guardar mis 8',
-          'cam-nfl-action cam-lg-q8-save',saveQ8);
-        save.disabled=q8Saving||q8.length!==need||(!!who&&!dirty);
+        // Se guardan solos al completar los 8: el botón dice cómo va y solo se pulsa para
+        // reintentar (o, sin sesión, para entrar y que cuenten).
+        const isSaved=!!who&&left===0&&!dirty&&!q8Saving;
+        // (Incompleto conserva su nombre, «Guardar mis 8»: las instrucciones van en la pista.)
+        const complete=left===0&&over<=0;
+        const save=btn(!complete?'Guardar mis 8':q8Saving?'Guardando…':!who?'Inicia sesión para guardar'
+          :dirty?'Guardar mis 8':'✓ Tus 8 están guardados','cam-nfl-action cam-lg-q8-save'+(isSaved?' is-saved':''),
+          who?saveQ8:()=>window.openUserAuthModal?.());
+        save.disabled=!complete||q8Saving||(!!who&&!dirty);
         actions.append(save);
-        if(!who)actions.append(btn('Iniciar sesión','cam-lg-link',()=>window.openUserAuthModal?.()));
+        if(!who&&left>0)actions.append(btn('Iniciar sesión','cam-lg-link',()=>window.openUserAuthModal?.()));
         if(q8.length){const clear=btn('Quitar mis elecciones','cam-lg-link',()=>{q8=[];storeQ8();q8Note='';render();});clear.disabled=q8Saving;actions.append(clear);}
         choices.append(actions);
-        choices.append(el('p',over>0?'Otro equipo ya entró por su cuenta: quita '+(over===1?'uno':over)+' de tus elegidos.'
-          :dirty&&q8.length===need?(who?'Tienes cambios sin guardar.':'Pulsa «Guardar mis 8».')
-          :'Puedes cambiarlos hasta el cierre.','cam-lg-hint'));
+        const keptOld=!!who&&left>0&&(saved||[]).length===8;
+        const hint=over>0?'Otro equipo ya entró por su cuenta: quita '+(over===1?'uno':over)+' de tus elegidos.'
+          :left>0?(keptOld?'Elige '+(left===1?'otro':left+' más')+' y el cambio se guarda solo. Mientras, sigue guardada tu lista anterior.'
+            :'Se guardan solos en cuanto elijas '+(left===1?'el que falta':'los '+left+' que faltan')+'.')
+          :q8Saving?'Guardando tus 8…'
+          :dirty&&who?'No se pudieron guardar: toca «Guardar mis 8» para reintentarlo.'
+          :'Puedes cambiarlos hasta el cierre: cada cambio se guarda solo.';
+        // Con el aviso de «Guardado» a la vista, la pista no repite lo mismo.
+        if(!q8Note||over>0)choices.append(el('p',hint,'cam-lg-hint'));
         const p=el('p',q8Note,'cam-lg-note'+(q8Kind?' is-'+q8Kind:''));p.setAttribute('role','status');p.setAttribute('aria-live','polite');choices.append(p);
       }
     }else{

@@ -458,6 +458,8 @@ html body #camLiguilla :is(.cam-lg-q8-save,.cam-lg-save):disabled{background:var
   html body #camFootballQuiniela .cam-nfl-sides :is(.cam-nfl-team,.cam-nfl-draw) small{border-radius:0!important}
   html body #camFootballQuiniela .cam-nfl-sides :is(.cam-nfl-team,.cam-nfl-draw) :is(strong,small,span){font-family:var(--ds-font-sans,Inter,system-ui,sans-serif)!important}
   html body #camLiguilla :is(.cam-lg-q8-save,.cam-lg-save):disabled{background:var(--q-panel)!important;color:var(--q-meta)!important;opacity:1!important}
+  /* 18 nov 2026: «✓ Guardado» se lee como hecho (dorado suave), no como botón apagado. */
+  html body #camLiguilla :is(.cam-lg-q8-save,.cam-lg-save).is-saved:disabled{background:var(--q-gold-soft)!important;color:var(--q-gold-text)!important;border-color:color-mix(in srgb,var(--q-gold) 45%,transparent)!important}
 }
 /* cam-display-clarity (la primera capa) fuerza display:flex en todos los selectores de liga;
    solo otra regla !important de esa misma capa, con más peso, puede esconder el duplicado. */

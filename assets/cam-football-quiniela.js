@@ -107,6 +107,8 @@
   }
   function isOpen(g){return g.status==='scheduled'&&g.picks_open&&new Date(g.kickoff).getTime()>now()&&g.odds_locked_at!=null;}
   const active=g=>draft.get(g.id)||mine.get(g.id)?.pick||null;
+  // Un borrador igual a lo ya guardado no cuenta como pendiente.
+  const unsaved=g=>draft.has(g.id)&&draft.get(g.id)!==mine.get(g.id)?.pick;
 
   function chooseRound(){
     // La jornada vigente se decide por sus partidos, no por el calendario.
@@ -336,15 +338,26 @@
   }
   // 10 nov 2026: como en el Duelo de la semana, la elección se guarda al tocarla. Los toques
   // seguidos van en fila; si uno falla, queda como borrador y vuelve «Guardar picks del día».
-  let tapQueue=Promise.resolve();
+  // 18 nov 2026: mientras va al servidor la tarjeta dice «Guardando…» (antes «Sin guardar»).
+  let tapQueue=Promise.resolve(),justSaved=null,justSavedTimer=0,bulk=false;
+  const queued=new Map();            // id del partido → toques esperando su turno
+  const busy=id=>queued.has(id);
   function choose(g,pick){
     if(!isOpen(g)||changingCompetition||loadError)return;
     if(!user){window.openUserAuthModal?.();return;}
-    draft.set(g.id,pick);saveDraft();paintGames();announce();
-    tapQueue=tapQueue.then(()=>{
-      const latest=draft.get(g.id);
-      return latest&&user?saveOne(g.id,latest):false;
-    }).catch(()=>false);
+    // Tocar lo que ya está guardado no hace nada.
+    if(!draft.has(g.id)&&mine.get(g.id)?.pick===pick)return;
+    draft.set(g.id,pick);saveDraft();
+    queued.set(g.id,(queued.get(g.id)||0)+1);
+    paintGames();announce();
+    tapQueue=tapQueue.then(async()=>{
+      try{const latest=draft.get(g.id);if(latest&&user)await saveOne(g.id,latest);}
+      finally{
+        const left=(queued.get(g.id)||1)-1;
+        if(left>0)queued.set(g.id,left);else queued.delete(g.id);
+        paintGames();
+      }
+    }).catch(()=>{});
   }
   // Un bloqueo temporal de carga no significa que el partido esté cerrado.
   const unavailableReason=()=>changingCompetition?'Actualizando competición…'
@@ -391,7 +404,8 @@
     if(new Date(g.kickoff).getTime()<=now())return 'cerrado';
     if(!g.odds_locked_at)return 'pendiente';
     if(!g.picks_open)return 'cerrado';
-    return mine.has(g.id)?'guardado':draft.has(g.id)?'borrador':'abierto';
+    if(busy(g.id))return 'guardando';
+    return unsaved(g)?'borrador':mine.has(g.id)?'guardado':'abierto';
   }
   function gameStatus(g){
     const pick=mine.get(g.id);
@@ -409,7 +423,8 @@
     if(new Date(g.kickoff).getTime()<=now())return 'Bloqueado';
     if(!g.odds_locked_at)return 'Preparando puntos';
     if(!g.picks_open)return 'Cerrada';
-    return mine.has(g.id)?'Pronóstico guardado':draft.has(g.id)?'Sin guardar':'Abierto';
+    if(busy(g.id))return 'Guardando…';
+    return unsaved(g)?'Sin guardar':mine.has(g.id)?'Pronóstico guardado':'Abierto';
   }
   function paintDayNav(fixtures){
     const target=$('camFootballDayNav');if(!target)return;
@@ -488,6 +503,7 @@
       const box=el('article',null,'cam-nfl-game');
       box.dataset.gameId=g.id;
       box.dataset.state=gameState(g);
+      if(justSaved===g.id&&box.dataset.state==='guardado')box.classList.add('is-just-saved');
       const top=el('div',null,'cam-nfl-game-meta');
       // 12 nov 2026: la línea solo lleva el estado («Abierto»…); sin hora ni «Bonus +5».
       top.append(el('span',gameStatus(g),'cam-nfl-badge'));box.append(top);
@@ -503,17 +519,18 @@
     sizeGameViewport();
     const save=$('camFootballSave'),saveDay=$('camFootballSaveDay');
     if(save){
-      const pendingRound=chosen.some(g=>draft.has(g.id)&&isOpen(g));
+      const pendingRound=chosen.some(g=>unsaved(g)&&isOpen(g)&&!busy(g.id));
       // Cada toque ya se guarda: «Guardar toda la jornada» solo aparece si algo quedó sin guardar.
-      if(user&&!pendingRound&&!saving){save.hidden=true;save.style.setProperty('display','none','important');}
+      if(user&&!pendingRound&&!bulk){save.hidden=true;save.style.setProperty('display','none','important');}
       else if(user){save.hidden=false;save.style.removeProperty('display');}
       save.disabled=saving||changingCompetition||!!loadError||(user?!pendingRound:false);
       save.textContent=user?'Guardar toda la jornada':'Inicia sesión para participar';
     }
     if(saveDay){
-      const pendingDay=visible.some(g=>draft.has(g.id)&&isOpen(g));
+      const pendingDay=visible.some(g=>unsaved(g)&&isOpen(g)&&!busy(g.id));
       // Con sesión, cada toque ya se guarda: el botón solo vuelve si algo quedó sin guardar.
-      saveDay.hidden=!!user&&!pendingDay&&!saving;
+      // (Un guardado de un solo toque no lo hace aparecer: solo el guardado en bloque.)
+      saveDay.hidden=!!user&&!pendingDay&&!bulk;
       saveDay.disabled=saving||changingCompetition||!!loadError||(user?!pendingDay:false);
       saveDay.textContent=user?'Guardar picks del día':'Inicia sesión para participar';
     }
@@ -521,9 +538,9 @@
   async function persist(mode='round'){
     if(saving||changingCompetition||loadError)return;
     if(!user){window.openUserAuthModal?.();return;}
-    const pending=roundGames().filter(g=>draft.has(g.id)&&isOpen(g)&&(mode!=='day'||gameDay(g)===dayKey));
+    const pending=roundGames().filter(g=>unsaved(g)&&isOpen(g)&&!busy(g.id)&&(mode!=='day'||gameDay(g)===dayKey));
     if(!pending.length)return;
-    saving=true;paintGames();
+    saving=true;bulk=true;paintGames();
     let successes=0;const errors=[];
     try{
       for(const g of pending){
@@ -535,7 +552,7 @@
           successes++;
         }catch(error){errors.push(teamName(g.home_id)+': '+error.message);}
       }
-    }finally{saving=false;paintGames();announce();}
+    }finally{saving=false;bulk=false;paintGames();announce();}
     st('camFootballStatus',successes+' pronóstico(s) guardado(s)'+(mode==='day'?' en este día':' en la jornada')+'.'+
       (errors.length?' '+errors.join(' · '):''),errors.length?'error':successes?'ok':undefined);
     if(successes)document.dispatchEvent(new CustomEvent('cam:football-picks-updated'));
@@ -555,8 +572,13 @@
       await run(client().rpc('cam_football_save_pick',{p_game_id:g.id,p_pick:pick}));
       if(owner!==user?.id)return false;
       if(g.competition===competition&&Number(g.season)===season)mine.set(g.id,{game_id:g.id,pick,awarded_points:0});
-      draft.delete(g.id);
-      try{localStorage.removeItem(draftKey(g.id));}catch{}
+      // Si mientras tanto tocó otra opción, ese toque sigue en la fila: no se borra.
+      if(!draft.has(g.id)||draft.get(g.id)===pick){
+        draft.delete(g.id);
+        try{localStorage.removeItem(draftKey(g.id));}catch{}
+      }
+      justSaved=g.id;clearTimeout(justSavedTimer);
+      justSavedTimer=setTimeout(()=>{if(justSaved===g.id)justSaved=null;},1600);
       st('camFootballStatus','Pronóstico guardado: '+pickLabel(g,pick)+'.','ok');
       document.dispatchEvent(new CustomEvent('cam:football-picks-updated'));
       return true;
