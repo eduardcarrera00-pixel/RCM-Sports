@@ -1,0 +1,29 @@
+/* 18 nov 2026 · Publicar «NFL · Power Rankings» en 10 cajas (assets/cam-power-rankings-publish.js).
+   Solo lo ven los administradores dentro de «Publicar». */
+#publishModal .cam-prp { display:grid; gap:12px; }
+#publishModal .cam-prp[hidden] { display:none !important; }
+#publishModal .cam-prp-head h3 { margin:0; font:700 15px/1.3 var(--ds-font-sans,Inter,system-ui,sans-serif); letter-spacing:.01em; color:#183342; }
+#publishModal .cam-prp-sub { margin:4px 0 0; font-size:13px; line-height:1.5; color:#405969; }
+#publishModal .cam-prp-use { margin-top:6px; padding:8px 0; min-height:40px; border:0; background:none; color:#8a5a2b; font-size:13px; font-weight:600; text-decoration:underline; text-underline-offset:3px; cursor:pointer; text-align:left; }
+#publishModal .cam-prp-use[hidden] { display:none !important; }
+#publishModal .cam-prp-list { list-style:none; margin:0; padding:0; display:grid; gap:10px; }
+#publishModal .cam-prp-box { display:grid; gap:8px; padding:10px 12px 12px; border:1px solid #c9d3da; border-radius:14px; background:#fff; transition:border-color .2s ease; }
+#publishModal .cam-prp-box.has-text { border-color:#b38b51; box-shadow:inset 3px 0 0 #b38b51; }
+#publishModal .cam-prp-box-head { display:grid; grid-template-columns:30px 28px minmax(0,1fr); align-items:center; gap:10px; }
+#publishModal .cam-prp-num { font:600 22px/1 "Playfair Display",Georgia,serif; color:#9a6b3f; text-align:center; font-variant-numeric:tabular-nums; }
+#publishModal .cam-prp-logo { width:28px; height:28px; object-fit:contain; }
+#publishModal .cam-prp-logo.is-empty { visibility:hidden; }
+#publishModal .cam-prp-team { width:100%; min-width:0; min-height:40px; padding:6px 10px; font-size:14px; font-weight:600; }
+#publishModal .cam-prp-text { width:100%; min-height:96px; resize:vertical; padding:10px 12px; font-size:15px; line-height:1.55; }
+#publishModal .cam-prp-foot { display:flex; flex-wrap:wrap; justify-content:space-between; gap:4px 12px; margin:0; font-size:12.5px; line-height:1.4; color:#405969; }
+#publishModal .cam-prp-count { font-weight:600; }
+html.dark #publishModal .cam-prp-head h3 { color:#f3eadb; }
+html.dark #publishModal :is(.cam-prp-sub,.cam-prp-foot) { color:#d2dde2; }
+html.dark #publishModal .cam-prp-use { color:#e8bf79; }
+html.dark #publishModal .cam-prp-box { background:#102d3d; border-color:#46606e; }
+html.dark #publishModal .cam-prp-box.has-text { border-color:#c99a64; box-shadow:inset 3px 0 0 #c99a64; }
+html.dark #publishModal .cam-prp-num { color:#e8bf79; }
+@media (max-width:640px) {
+  #publishModal .cam-prp-box-head { grid-template-columns:26px 26px minmax(0,1fr); gap:8px; }
+  #publishModal .cam-prp-text { font-size:16px; }
+}

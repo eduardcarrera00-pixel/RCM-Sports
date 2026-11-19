@@ -76,7 +76,7 @@ function updateArticleEditorButton(article) {
 function openArticleEditor() {
     const article = articles.find(a => String(a.id) === String(activeModalArticleId));
     if (!currentAdmin || !article?.remote) return;
-    openPublishModal(); editingArticleId = article.id;
+    const ready = openPublishModal(); editingArticleId = article.id;
     document.getElementById('pubModalTitle').textContent = 'Editar publicación';
     document.getElementById('pubSubmitButton').textContent = 'Guardar cambios';
     for (const [id, value] of Object.entries({pubTitle: article.title, pubAuthor: article.author,
@@ -93,6 +93,8 @@ function openArticleEditor() {
     window.aeNewsEditor?.set(cleanBody(article.body));
     document.getElementById('pubBody').value = editingBodyText;
     document.getElementById('pubTitle').focus();
+    // Una publicación hecha con las 10 cajas de Power Rankings se edita en sus cajas.
+    Promise.resolve(ready).then(() => window.camPowerRankingsPublish?.sync?.(article));
 }
 
 async function fetchAll(query) {

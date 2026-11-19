@@ -55,9 +55,48 @@
   const headingText = t => t.replace(/^\s*(?:#|n\.?º)?\s*\d{1,2}\s*[.)\-–—:]?\s*/i, '').replace(/\s*\([^)]*\)\s*$/, '').trim();
   const looksHeading = t => t.length <= 60 && words(t).length <= 7 && !/[.!?;:,]$/.test(t.trim());
 
+  // 18 nov 2026: las publicaciones hechas con las 10 cajas de «NFL · Power Rankings» marcan
+  // cada equipo con data-cam-rank-team: se conectan por su id, sin adivinar nombres.
+  function parseMarked(root) {
+    const marks = [...root.querySelectorAll('[data-cam-rank-team]')];
+    if (!marks.length) return null;
+    const notes = new Map();
+    for (const mark of marks) {
+      const id = mark.getAttribute('data-cam-rank-team'), list = [];
+      for (let n = mark.nextElementSibling; n && !n.hasAttribute('data-cam-rank-team') && !/^H[1-5]$/.test(n.tagName); n = n.nextElementSibling) {
+        const text = n.textContent.replace(/\s+/g, ' ').trim();
+        if (text) list.push(text);
+      }
+      if (id && list.length && !notes.has(id)) notes.set(id, list);
+    }
+    return notes;
+  }
+  // Texto suelto fuera de un párrafo (p. ej. «<b>San Francisco 49ers</b>» directamente en el
+  // cuerpo, como la Semana 10): se agrupa en un párrafo para que el nombre abra su apartado.
+  const INLINE = /^(?:#text|A|ABBR|B|BR|CITE|CODE|EM|I|MARK|Q|S|SMALL|SPAN|STRONG|SUB|SUP|TIME|U)$/;
+  function wrapLoose(root) {
+    let run = [];
+    const flush = () => {
+      if (run.some(n => n.textContent.trim())) { const p = document.createElement('p'); run[0].before(p); p.append(...run); }
+      run = [];
+    };
+    for (const n of [...root.childNodes]) {
+      if (n.nodeType === 8) continue;
+      if (INLINE.test(n.nodeName)) {
+        // Un <br> suelto separa líneas: corta el grupo (como un cambio de párrafo).
+        if (n.nodeName === 'BR') { flush(); continue; }
+        run.push(n);
+      } else flush();
+    }
+    flush();
+  }
+
   function parse(html, teams) {
     const tpl = document.createElement('template');
     tpl.innerHTML = String(html || '');
+    const marked = parseMarked(tpl.content);
+    if (marked) return marked;
+    wrapLoose(tpl.content);
     const blocks = [...tpl.content.querySelectorAll('h1,h2,h3,h4,h5,p,li,blockquote')]
       .filter(el => !el.querySelector('p,li,h1,h2,h3,h4,h5'))
       .flatMap(el => {
@@ -83,7 +122,7 @@
 
   function articleFor(scope) {
     const list = typeof articles === 'undefined' || !Array.isArray(articles) ? [] : articles;
-    const isRanking = a => /power\s*-?\s*rank/i.test((a.title || '') + ' ' + (a.summary || ''));
+    const isRanking = a => /power\s*-?\s*rank/i.test((a.title || '') + ' ' + (a.summary || '')) || /data-cam-power-rankings/.test(a.body || '');
     const sport = a => norm(a.category);
     const match = scope === 'nfl'
       ? a => sport(a) === 'nfl'
