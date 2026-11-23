@@ -827,28 +827,15 @@
   }
 
   // ------------------------------------------------------------- Abrir (administración)
-  function torontoISO(local){
-    // «2026-11-25T19:00» en hora de Toronto → instante exacto.
-    const m=/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(local||'');if(!m)return null;
-    const guess=Date.UTC(+m[1],+m[2]-1,+m[3],+m[4],+m[5]);
-    const offset=at=>{const p=new Intl.DateTimeFormat('en-US',{timeZone:'America/Toronto',hourCycle:'h23',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}).formatToParts(new Date(at));
-      const v=k=>+p.find(x=>x.type===k).value;return Date.UTC(v('year'),v('month')-1,v('day'),v('hour'),v('minute'))-at;};
-    const first=guess-offset(guess);return new Date(guess-offset(first)).toISOString();
-  }
-  function torontoLocal(iso){
-    const p=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Toronto',hourCycle:'h23',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}).formatToParts(new Date(iso));
-    const v=k=>p.find(x=>x.type===k).value;return v('year')+'-'+v('month')+'-'+v('day')+'T'+v('hour')+':'+v('minute');
-  }
   function adminPanel(){
     const d=el('details',null,'cam-lg-admin');d.open=!state;
     const status=el('p','','cam-lg-note');status.setAttribute('role','status');status.setAttribute('aria-live','polite');
     d.append(el('summary',state?'Administrar · Rehacer la apertura (nadie ha guardado su cuadro)':'Administrar · Abrir «Tu liguilla»'));
-    d.append(el('p','Cuando termine la jornada 17, carga la tabla oficial, revisa los 8 y abre el cuadro. Se cerrará solo en el primer partido de cuartos y los puntos quedan congelados al abrir.','cam-lg-hint'));
+    d.append(el('p','Cuando termine la jornada 17, carga la tabla oficial, revisa los 8 y abre el cuadro. No hace falta poner la hora: se cierra solo en el primer partido de cuartos, con el horario de ESPN. Los puntos quedan congelados al abrir.','cam-lg-hint'));
     const loadBtn=btn(adminTable?'Volver a cargar la tabla':'Cargar tabla de ESPN','cam-nfl-action cam-nfl-action-secondary',async()=>{
       adminMessage='Cargando tabla…';render();
       try{const {data,error}=await client().rpc('cam_liguilla_admin_table');if(error)throw error;
         adminTable=(Array.isArray(data)?data:[]).map(r=>({team_id:String(r.team_id),name:r.name,played:+r.played,points:+r.points,goal_diff:+r.goal_diff,rank:+r.rank}));
-        adminTable.start=await firstKickoff(adminTable.slice(0,8));
         adminMessage='Tabla cargada. Revisa el orden antes de abrir.';}
       catch(error){adminMessage=error?.message||'No se pudo cargar la tabla.';}
       render();
@@ -872,11 +859,9 @@
       });
       form.append(grid);
       const name=el('input');name.name='lgName';name.value=state?.liguilla?.name||W()?.name||'Apertura '+(api()?.snapshot?.()?.season||new Date().getFullYear());
-      const start=el('input');start.type='datetime-local';start.name='lgStart';
-      const startISO=adminTable?.start||state?.liguilla?.starts_at||null;if(startISO)start.value=torontoLocal(startISO);
       const reseed=el('input');reseed.type='checkbox';reseed.name='lgReseed';reseed.checked=state?.liguilla?.reseed!==false;
       const field=(label,input)=>{const l=el('label',label,'cam-lg-admin-field');l.append(input);return l;};
-      form.append(field('Nombre',name),field('Primer partido de cuartos (hora de Toronto)',start));
+      form.append(field('Nombre',name),el('p','Cierre: automático, en el primer partido de cuartos.','cam-lg-hint cam-lg-admin-close'));
       const chk=el('label',null,'cam-lg-admin-check');chk.append(reseed,el('span','Reclasificar en semifinales (el mejor que sigue vivo contra el peor)'));form.append(chk);
       const submit=btn('Abrir «Tu liguilla»','cam-nfl-action');submit.type='submit';
       // Confirmar sin repintar: lo que el administrador escribió se queda en el formulario.
@@ -887,14 +872,12 @@
       form.addEventListener('submit',async e=>{
         e.preventDefault();
         const f=form.elements,v=n=>f.namedItem(n)?.value,say=text=>{status.textContent=text;};
-        const iso=torontoISO(v('lgStart'));
-        if(!iso){say('Pon la fecha y la hora del primer partido de cuartos.');return;}
         if(confirm.hidden){confirm.hidden=false;submit.textContent='Sí, abrir con estos 8';say('');return;}
         const teams=rows.map((_,i)=>({team_id:v('team'+i),played:+v('played'+i),points:+v('points'+i),goal_diff:+v('gd'+i)}));
         submit.disabled=true;say('Abriendo…');
         try{
           const {error}=await client().rpc('cam_liguilla_admin_open',{p_season:api()?.snapshot?.()?.season,p_name:String(v('lgName')||'').trim(),
-            p_starts_at:iso,p_teams:teams,p_reseed:!!f.namedItem('lgReseed')?.checked});
+            p_starts_at:null,p_teams:teams,p_reseed:!!f.namedItem('lgReseed')?.checked});
           if(error)throw error;
           adminMessage='«Tu liguilla» está abierta.';adminTable=null;stale=true;sync();
         }catch(error){submit.disabled=false;confirm.hidden=true;submit.textContent='Abrir «Tu liguilla»';say(error?.message||'No se pudo abrir.');}
@@ -904,18 +887,6 @@
     status.textContent=adminMessage;d.append(status);
     return d;
   }
-  async function firstKickoff(top8){
-    // Primer saque entre dos rivales de cuartos (en casa del peor sembrado), si ESPN ya lo publicó.
-    try{
-      const {data}=await client().from('cam_football_games').select('kickoff,home_id,away_id')
-        .eq('competition','ligamx').gt('kickoff',new Date().toISOString()).order('kickoff',{ascending:true}).limit(80);
-      const ids=top8.map(r=>r.team_id);
-      const hit=(data||[]).filter(g=>QF.some(([h,l])=>g.home_id===ids[l-1]&&g.away_id===ids[h-1]))
-        .sort((a,b)=>Date.parse(a.kickoff)-Date.parse(b.kickoff))[0];
-      return hit?.kickoff||null;
-    }catch{return null;}
-  }
-
   // ------------------------------------------------------------- Pintar
   function render(){
     const snap=api()?.snapshot?.();

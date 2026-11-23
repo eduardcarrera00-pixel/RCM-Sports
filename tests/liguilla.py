@@ -170,6 +170,8 @@ def fake(mode='open', user=True):
 
 def open_liga_mx(page):
     page.evaluate("() => filterByCategory('Fútbol')")
+    # Fútbol abre en Noticias: la liguilla vive en «La semana».
+    page.evaluate("() => window.camSectionTabs?.select?.('semana', {scroll: false})")
     page.wait_for_function("() => window.camFootballQuiniela && window.camLiguilla", timeout=15000)
     page.evaluate("() => window.camFootballQuiniela.selectCompetition('ligamx')")
     page.wait_for_timeout(700)
@@ -355,21 +357,22 @@ def run():
     with fp.full_page(fake_js=fake('none'), width=390, height=900) as page:
         open_liga_mx(page)
         assert page.locator('#camLiguilla').is_visible(), 'sin equipos oficiales debe aparecer estado pendiente'
-        assert '¿Quién entra?' in page.locator('#camLiguilla').inner_text(), 'antes de abrir se eligen los 8'
+        assert 'Elige quiénes clasifican' in page.locator('#camLiguilla').inner_text(), 'antes de abrir se eligen los 8'
         page.evaluate("() => { currentAdmin = {id:'u-1'}; window.dispatchEvent(new Event('cam:admin-state-change')); }")
         page.wait_for_timeout(200)
         page.locator('#camLiguilla .cam-lg-admin .cam-nfl-action').first.click()
         page.wait_for_selector('#camLiguilla .cam-lg-admin-form')
-        page.fill('#camLiguilla input[name="lgStart"]', '2026-11-25T19:00')
+        # Sin hora que escribir: el cierre es automático (primer partido de cuartos, de ESPN).
+        assert page.locator('#camLiguilla .cam-lg-admin-form input[type="datetime-local"]').count() == 0, 'no se pide la hora'
+        assert 'automático' in page.locator('#camLiguilla .cam-lg-admin-close').inner_text()
         page.locator('#camLiguilla .cam-lg-admin-form button[type="submit"]').click()
         page.wait_for_timeout(150)
         assert page.locator('#camLiguilla .cam-lg-admin-confirm').is_visible(), 'falta la confirmación'
-        assert page.input_value('#camLiguilla input[name="lgStart"]') == '2026-11-25T19:00', 'la confirmación borró la fecha'
         page.locator('#camLiguilla .cam-lg-admin-form button[type="submit"]').click()
         page.wait_for_timeout(400)
         opened = page.evaluate('() => window.__fake.opened')
         assert opened and len(opened['p_teams']) == 8 and opened['p_teams'][0]['team_id'] == '218', opened
-        assert opened['p_starts_at'] == '2026-11-26T00:00:00.000Z', opened['p_starts_at']
+        assert opened['p_starts_at'] is None, opened['p_starts_at']
         assert opened['p_reseed'] is True
         problems = layout_problems(page)
         assert not problems, 'admin: ' + str(problems)
