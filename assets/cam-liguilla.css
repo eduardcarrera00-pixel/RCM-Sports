@@ -466,3 +466,123 @@ html body #camLiguilla :is(.cam-lg-q8-save,.cam-lg-save):disabled{background:var
 @layer cam-display-clarity{
   html body #camFootballSemana.has-competition-nav~#camFootballQuiniela #camFootballNav .cam-football-leagues{display:none!important}
 }
+
+/* ---- El cuadro con llaves (23 nov 2026) -------------------------------------------
+   «Arma tu cuadro» como un cuadro de verdad, igual que la vista previa y los cuadros de la
+   Liga MX: cuartos → semis → final → trofeo, azul noche con llaves doradas. Se toca el
+   equipo que pasa y avanza a la siguiente casilla. Elegido = dorado; el otro se apaga.
+   Teléfono: siglas con los puntos debajo; desde 440 px, en una línea; desde 640 px, nombres. */
+#camLiguilla .cam-lg-tree{--tr-ink:#F3EBDD;--tr-muted:#C2CDD4;--tr-gold:#E8BF79;--tr-line:rgba(232,191,121,.5);--tr-soft:rgba(243,235,221,.15);
+  --tr-gap:14px;--tr-pair-gap:14px;--tr-match-gap:8px;--tr-row:42px;
+  position:relative;isolation:isolate;display:grid;gap:10px;padding:14px 10px 16px;background:#0B2233;border:1px solid rgba(190,146,112,.6);color:var(--tr-ink);container-type:inline-size;min-width:0;overflow:hidden}
+#camLiguilla .cam-lg-tree::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:radial-gradient(70% 55% at 94% 50%,rgba(232,191,121,.15),transparent 70%),radial-gradient(70% 60% at 0% 0%,rgba(10,50,104,.6),transparent 70%)}
+html.dark #camLiguilla .cam-lg-tree{border-color:rgba(232,191,121,.32)}
+#camLiguilla .cam-lg-tree-heads,#camLiguilla .cam-lg-tree-body{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,.95fr);column-gap:var(--tr-gap);min-width:0}
+#camLiguilla .cam-lg-tree-heads span{font:700 10px/1.2 var(--ds-font-sans,Inter,system-ui,sans-serif);letter-spacing:.14em;text-transform:uppercase;color:var(--tr-gold);opacity:.85}
+#camLiguilla .cam-lg-tree-heads span:last-child{text-align:center}
+#camLiguilla .cam-lg-tree .cam-lg-round{grid-row:1;display:grid;grid-template-rows:1fr 1fr;gap:var(--tr-pair-gap) 0;align-content:stretch;position:relative;min-width:0}
+#camLiguilla .cam-lg-tree .cam-lg-round.is-qf{grid-column:1}
+#camLiguilla .cam-lg-tree .cam-lg-round.is-sf{grid-column:2}
+#camLiguilla .cam-lg-tree .cam-lg-round.is-final{grid-column:3;grid-template-rows:1fr auto 1fr;row-gap:8px;justify-items:center}
+#camLiguilla .cam-lg-tree-pair{position:relative;display:grid;grid-template-rows:1fr 1fr;row-gap:var(--tr-match-gap);min-width:0}
+#camLiguilla .cam-lg-tree-cell{display:flex;align-items:center;min-width:0}
+#camLiguilla .cam-lg-tree-cell>.cam-lg-match{flex:1}
+/* Llaves «]» de un cruce al otro y una línea hasta el siguiente (como en la vista previa). */
+#camLiguilla .cam-lg-tree-pair::after,#camLiguilla .cam-lg-tree .cam-lg-round.is-sf::after{content:"";position:absolute;left:100%;width:calc(var(--tr-gap)/2);border:1.5px solid var(--tr-line);border-left:0;pointer-events:none}
+#camLiguilla .cam-lg-tree-pair::after{top:calc((100% - var(--tr-match-gap))/4);bottom:calc((100% - var(--tr-match-gap))/4)}
+#camLiguilla .cam-lg-tree .cam-lg-round.is-sf::after{top:calc((100% - var(--tr-pair-gap))/4);bottom:calc((100% - var(--tr-pair-gap))/4)}
+#camLiguilla .cam-lg-tree-pair::before,#camLiguilla .cam-lg-tree .cam-lg-round.is-sf::before{content:"";position:absolute;top:50%;left:calc(100% + var(--tr-gap)/2);width:calc(var(--tr-gap)/2);border-top:1.5px solid var(--tr-line);pointer-events:none}
+/* Cada cruce: una cajita con dos casillas. */
+#camLiguilla .cam-lg-tree .cam-lg-match{position:relative;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:1fr 1fr;gap:0;padding:0;background:rgba(243,235,221,.05);border:1px solid var(--tr-soft);overflow:hidden;min-width:0;width:100%}
+#camLiguilla .cam-lg-tree .cam-lg-match>*+*{border-top:1px solid var(--tr-soft)}
+#camLiguilla .cam-lg-tree .cam-lg-match.is-waiting{background:transparent;border-style:dashed;border-color:rgba(243,235,221,.22)}
+#camLiguilla .cam-lg-tree .cam-lg-match.is-final{grid-row:2;border-color:rgba(232,191,121,.6)}
+#camLiguilla .cam-lg-tree :is(.cam-lg-team,.cam-lg-slot){box-sizing:border-box;display:grid;grid-template-columns:10px 20px minmax(0,1fr);grid-template-rows:auto auto;align-content:center;align-items:center;column-gap:5px;row-gap:2px;
+  width:100%;min-width:0;min-height:var(--tr-row);margin:0;padding:4px 6px;border:0;background:transparent;color:var(--tr-ink);text-align:left;box-shadow:none;transform:none;opacity:1;
+  font:600 12px/1.15 var(--ds-font-sans,Inter,system-ui,sans-serif);transition:background .2s ease,color .2s ease,opacity .25s ease}
+#camLiguilla .cam-lg-tree .cam-lg-team+.cam-lg-team{border-top:1px solid var(--tr-soft)}
+#camLiguilla .cam-lg-tree :is(.cam-lg-team,.cam-lg-slot) .cam-lg-seed{grid-row:1/3;font:700 10.5px/1 var(--ds-font-sans,Inter,system-ui,sans-serif);color:var(--tr-gold);text-align:center;font-variant-numeric:tabular-nums}
+#camLiguilla .cam-lg-tree :is(.cam-lg-team,.cam-lg-slot) .cam-lg-crest{grid-row:1/3;width:20px;height:20px}
+#camLiguilla .cam-lg-tree :is(.cam-lg-team,.cam-lg-slot) .cam-lg-name{display:block;min-width:0}
+#camLiguilla .cam-lg-tree :is(.cam-lg-team,.cam-lg-slot) .cam-lg-name strong{display:block;font:inherit;font-size:12px;line-height:1.15;letter-spacing:.02em;white-space:nowrap}
+#camLiguilla .cam-lg-tree .cam-lg-tree-name{display:none!important}
+#camLiguilla .cam-lg-tree :is(.cam-lg-team,.cam-lg-slot) .cam-lg-pts{grid-column:3;justify-self:start;padding:2px 5px;border-radius:999px;font:700 10px/1.2 var(--ds-font-sans,Inter,system-ui,sans-serif);background:rgba(232,191,121,.16);color:var(--tr-gold);border:0}
+#camLiguilla .cam-lg-tree :is(.cam-lg-team,.cam-lg-slot) .cam-lg-pts.is-blank{display:none}
+/* En semis y final, sin el número de la tabla: el escudo y las siglas bastan. */
+#camLiguilla .cam-lg-tree :is(.is-sf,.is-final) :is(.cam-lg-team,.cam-lg-slot){grid-template-columns:0 20px minmax(0,1fr);column-gap:0}
+#camLiguilla .cam-lg-tree :is(.is-sf,.is-final) :is(.cam-lg-team,.cam-lg-slot) .cam-lg-seed{visibility:hidden}
+#camLiguilla .cam-lg-tree :is(.is-sf,.is-final) :is(.cam-lg-team,.cam-lg-slot) .cam-lg-crest{margin-right:5px}
+@media (hover:hover){#camLiguilla .cam-lg-tree .cam-lg-team:not(:disabled):not(.is-chosen):hover{background:rgba(232,191,121,.13)}}
+#camLiguilla .cam-lg-tree .cam-lg-team:focus-visible{outline:2px solid var(--tr-gold);outline-offset:-3px}
+#camLiguilla .cam-lg-tree .cam-lg-team.is-chosen{background:linear-gradient(90deg,#E8BF79,#DDB06A);color:#0B2233}
+#camLiguilla .cam-lg-tree .cam-lg-team.is-chosen::before{display:none}
+#camLiguilla .cam-lg-tree .cam-lg-team.is-chosen .cam-lg-seed{color:#0B2233}
+#camLiguilla .cam-lg-tree .cam-lg-team.is-chosen .cam-lg-pts:not(.is-hit):not(.is-miss):not(.is-live):not(.is-blank){background:rgba(11,34,51,.14);color:#0B2233;padding:2px 5px}
+@media (hover:hover){#camLiguilla .cam-lg-tree .cam-lg-team.is-chosen:not(:disabled):hover{background:linear-gradient(90deg,#EFCB8C,#E2B774);opacity:1}}
+/* La web apaga los botones deshabilitados (--ds-disabled-opacity); en el cuadro cerrado lo elegido se sigue leyendo. */
+#camLiguilla .cam-lg-tree .cam-lg-team{--ds-disabled-opacity:1}
+#camLiguilla .cam-lg-tree .cam-lg-team:disabled{opacity:1}
+#camLiguilla .cam-lg-tree .cam-lg-team.is-behind,#camLiguilla .cam-lg-tree .cam-lg-team.is-behind:disabled{--ds-disabled-opacity:.42;opacity:.42;transform:none}
+#camLiguilla .cam-lg-tree .cam-lg-team:disabled{cursor:default}
+/* Casillas que todavía no se tocan. */
+#camLiguilla .cam-lg-tree .cam-lg-slot.is-ghost{grid-template-columns:minmax(0,1fr);justify-items:center}
+#camLiguilla .cam-lg-tree .cam-lg-slot-text{font:italic 500 10.5px/1.2 var(--ds-font-sans,Inter,system-ui,sans-serif);color:rgba(243,235,221,.4);white-space:nowrap}
+#camLiguilla .cam-lg-tree .cam-lg-slot.is-filled{opacity:.85}
+/* Cuadro cerrado: cómo le fue a cada elección. */
+#camLiguilla .cam-lg-tree .cam-lg-pts.is-hit{background:rgba(139,215,164,.2);color:#A6E3BB}
+#camLiguilla .cam-lg-tree .cam-lg-pts.is-miss{background:rgba(242,164,151,.2);color:#F6B3A8}
+#camLiguilla .cam-lg-tree .cam-lg-pts.is-live{background:transparent;border:1px dashed rgba(243,235,221,.45);color:var(--tr-muted)}
+#camLiguilla .cam-lg-tree .cam-lg-team.is-chosen .cam-lg-pts.is-hit{background:#1E6B3B;color:#F3EBDD}
+#camLiguilla .cam-lg-tree .cam-lg-team.is-chosen .cam-lg-pts.is-miss{background:#8E2F25;color:#F3EBDD}
+#camLiguilla .cam-lg-tree .cam-lg-team.is-chosen .cam-lg-pts.is-live{border-color:rgba(11,34,51,.45);color:#0B2233}
+/* El que acaba de avanzar entra desde la izquierda. */
+#camLiguilla .cam-lg-tree .is-new{animation:cam-lg-advance .38s cubic-bezier(.2,.8,.2,1) both}
+@keyframes cam-lg-advance{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:none}}
+/* Trofeo y campeón. */
+#camLiguilla .cam-lg-tree-cup{grid-row:1;align-self:end;display:block;width:clamp(28px,9cqi,50px);color:var(--tr-gold);opacity:.5;transition:opacity .3s ease,filter .3s ease}
+#camLiguilla .cam-lg-tree-cup svg{display:block;width:100%;height:auto}
+#camLiguilla .cam-lg-tree-cup.is-lit{opacity:1;filter:drop-shadow(0 0 10px rgba(232,191,121,.45))}
+#camLiguilla .cam-lg-tree .cam-lg-champion{grid-row:3;align-self:start;display:grid;gap:3px;justify-items:center;width:100%;min-width:0;padding:0;background:none;border:0;color:var(--tr-ink);text-align:center;overflow:visible}
+#camLiguilla .cam-lg-tree .cam-lg-champion-label{font:700 9.5px/1.2 var(--ds-font-sans,Inter,system-ui,sans-serif);letter-spacing:.16em;text-transform:uppercase;color:var(--tr-gold)}
+#camLiguilla .cam-lg-tree .cam-lg-champion-name{font:italic 600 clamp(15px,5.2cqi,22px)/1.15 var(--ds-font-serif,"Playfair Display",Georgia,serif);color:var(--tr-ink);overflow-wrap:anywhere;text-wrap:balance}
+#camLiguilla .cam-lg-tree .cam-lg-champion-name.is-empty{font:italic 400 12px/1.35 var(--ds-font-serif-secondary,"Libre Baskerville",Georgia,serif);color:rgba(243,235,221,.5)}
+#camLiguilla .cam-lg-tree .cam-lg-champion-sub{font:500 11px/1.3 var(--ds-font-sans,Inter,system-ui,sans-serif);color:var(--tr-muted)}
+#camLiguilla .cam-lg-tree .cam-lg-champion.is-crowned::before{inset:-60% -30%}
+/* Desde 440 px: cada equipo en una línea (número, escudo, siglas y puntos). */
+@container (min-width:440px){
+  #camLiguilla .cam-lg-tree{--tr-gap:22px;--tr-pair-gap:16px;--tr-row:40px;padding:16px 14px 18px}
+  #camLiguilla .cam-lg-tree :is(.cam-lg-team,.cam-lg-slot){grid-template-columns:12px 22px minmax(0,1fr) auto;grid-template-rows:auto;column-gap:7px;padding:0 8px}
+  #camLiguilla .cam-lg-tree :is(.cam-lg-team,.cam-lg-slot) :is(.cam-lg-seed,.cam-lg-crest){grid-row:auto}
+  #camLiguilla .cam-lg-tree :is(.cam-lg-team,.cam-lg-slot) .cam-lg-crest{width:22px;height:22px}
+  #camLiguilla .cam-lg-tree :is(.cam-lg-team,.cam-lg-slot) .cam-lg-pts{grid-column:auto;justify-self:end}
+  #camLiguilla .cam-lg-tree :is(.is-sf,.is-final) :is(.cam-lg-team,.cam-lg-slot){grid-template-columns:22px minmax(0,1fr) auto;column-gap:7px}
+  #camLiguilla .cam-lg-tree :is(.is-sf,.is-final) :is(.cam-lg-team,.cam-lg-slot) .cam-lg-seed{display:none}
+  #camLiguilla .cam-lg-tree :is(.is-sf,.is-final) :is(.cam-lg-team,.cam-lg-slot) .cam-lg-crest{margin-right:0}
+  #camLiguilla .cam-lg-tree .cam-lg-slot.is-ghost{grid-template-columns:minmax(0,1fr)}
+}
+/* Desde 640 px: nombres completos y más aire. */
+@container (min-width:640px){
+  #camLiguilla .cam-lg-tree{--tr-gap:30px;--tr-pair-gap:20px;--tr-match-gap:10px;--tr-row:46px;padding:18px 18px 20px}
+  #camLiguilla .cam-lg-tree-heads span{font-size:11px}
+  #camLiguilla .cam-lg-tree .cam-lg-tree-name{display:block!important}
+  #camLiguilla .cam-lg-tree .cam-lg-tree-abbr{display:none!important}
+  #camLiguilla .cam-lg-tree :is(.cam-lg-team,.cam-lg-slot){grid-template-columns:14px 26px minmax(0,1fr) auto;column-gap:9px;padding:0 10px;font-size:14px}
+  #camLiguilla .cam-lg-tree :is(.cam-lg-team,.cam-lg-slot) .cam-lg-name strong{font-size:14px;letter-spacing:0}
+  #camLiguilla .cam-lg-tree :is(.cam-lg-team,.cam-lg-slot) .cam-lg-crest{width:26px;height:26px}
+  #camLiguilla .cam-lg-tree :is(.is-sf,.is-final) :is(.cam-lg-team,.cam-lg-slot){grid-template-columns:26px minmax(0,1fr) auto;column-gap:9px}
+  #camLiguilla .cam-lg-tree :is(.cam-lg-team,.cam-lg-slot) .cam-lg-pts,#camLiguilla .cam-lg-tree .cam-lg-team.is-chosen .cam-lg-pts:not(.is-hit):not(.is-miss):not(.is-live):not(.is-blank){padding:3px 7px;font-size:11px}
+  #camLiguilla .cam-lg-tree .cam-lg-slot-text{font-size:12px}
+  #camLiguilla .cam-lg-tree .cam-lg-champion-label{font-size:10.5px}
+  #camLiguilla .cam-lg-tree .cam-lg-champion-sub{font-size:12px}
+}
+@layer cam-banners{
+  html body #camLiguilla .cam-lg-tree .cam-lg-champion{padding:0!important}
+}
+@layer cam-rounded-editorial{
+  html body #camLiguilla .cam-lg-tree{border-radius:18px!important}
+  html body #camLiguilla .cam-lg-tree .cam-lg-match{border-radius:10px!important}
+  html body #camLiguilla .cam-lg-tree .cam-lg-match :is(.cam-lg-team,.cam-lg-slot){border-radius:0!important}
+  html body #camLiguilla .cam-lg-tree .cam-lg-pts{border-radius:999px!important}
+  html body #camLiguilla :is(.cam-lg-tree-heads,.cam-lg-tree-heads *,.cam-lg-slot,.cam-lg-slot *,.cam-lg-tree .cam-lg-champion-label,.cam-lg-tree .cam-lg-champion-sub){font-family:var(--ds-font-sans,Inter,system-ui,sans-serif)!important}
+}

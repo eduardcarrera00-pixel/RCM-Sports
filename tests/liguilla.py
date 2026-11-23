@@ -274,7 +274,11 @@ def run():
         open_liga_mx(page)
         assert page.locator('#camFootballSemana #camLiguilla').is_visible(), 'la liguilla debe estar dentro de La semana'
         assert page.locator('#camLiguilla .cam-lg-round').nth(0).locator('.cam-lg-team').count() == 8
-        assert page.locator('#camLiguilla .cam-lg-wait').count() >= 2
+        # 23 nov 2026: un cuadro con llaves; semis y final empiezan como casillas por definir.
+        assert page.locator('#camLiguilla .cam-lg-tree .cam-lg-slot.is-ghost').count() == 6
+        page.locator('#camLiguilla .cam-lg-round').nth(0).locator('.cam-lg-team[data-team="218"]').click(); page.wait_for_timeout(120)
+        assert page.locator('#camLiguilla .cam-lg-round').nth(1).locator('.cam-lg-slot.is-filled').count() == 1, 'el que pasa avanza a semis'
+        page.locator('#camLiguilla .cam-lg-round').nth(0).locator('.cam-lg-team[data-team="218"]').click(); page.wait_for_timeout(120)
         build_bracket(page)
         assert '56' in page.locator('#camLiguilla .cam-lg-potential').inner_text(), page.locator('#camLiguilla .cam-lg-potential').inner_text()
         assert not page.locator('#camLiguilla .cam-lg-share').is_disabled(), 'con los 7 elegidos ya se puede compartir'
@@ -322,11 +326,11 @@ def run():
             build_bracket(page)
             problems = layout_problems(page)
             assert not problems, '%d %s: %s' % (width, 'noche' if dark else 'día', problems)
-            if width == 1366:
-                cols, wide = page.evaluate("() => { const b = document.querySelector('#camLiguilla .cam-lg-board');"
-                    " return [getComputedStyle(b).gridTemplateColumns.split(' ').length, document.querySelector('#camLiguilla .cam-lg-bracket').clientWidth]; }")
-                # Con los atajos a la izquierda la liguilla mide ~800 px: cuartos y semis lado a lado; desde 900 px, las 4 rondas.
-                assert cols == (4 if wide >= 900 else 2), 'en escritorio el cuadro va en %s columnas (ancho %s)' % (cols, wide)
+            # El cuadro con llaves: cuartos, semis y final lado a lado en cualquier ancho.
+            lefts = page.evaluate("() => ['qf','sf','final'].map(r => Math.round(document.querySelector('#camLiguilla .cam-lg-round[data-round=\"' + r + '\"]').getBoundingClientRect().left))")
+            assert lefts[0] < lefts[1] < lefts[2], 'las rondas no van lado a lado: %s' % lefts
+            names = page.evaluate("() => getComputedStyle(document.querySelector('#camLiguilla .cam-lg-tree .cam-lg-tree-name')).display")
+            assert (names != 'none') == (width == 1366), 'nombres completos solo con espacio (%d): %s' % (width, names)
             if SHOTS:
                 page.locator('#camLiguilla').screenshot(path=SHOTS + '/liguilla-%d-%s.png' % (width, 'noche' if dark else 'dia'))
             assert not page.errors, page.errors
