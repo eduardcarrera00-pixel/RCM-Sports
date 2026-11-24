@@ -775,7 +775,8 @@
       teams:new Map([...teams].map(([id,t])=>[id,{...t}])),
       mine:new Map([...mine].map(([id,row])=>[id,row.pick])),draft:new Map(draft),
       user:user?{id:user.id}:null,competitionName:competitionName(competition)}),
-    isOpen,save:saveOne,focus:focusGame,selectCompetition,competitionNav,refresh:hydrate,refreshLive
+    isOpen,save:saveOne,focus:focusGame,selectCompetition,competitionNav,refresh:hydrate,refreshLive,
+    refreshStandings:paintRanking
   });
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup,{once:true});
   else setup();

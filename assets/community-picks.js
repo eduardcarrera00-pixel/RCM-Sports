@@ -1865,7 +1865,15 @@ function refreshVisiblePicks(){
  void refreshOpenPickVisibility();
 }
 window.addEventListener('focus',refreshVisiblePicks);
-window.setInterval(refreshVisiblePicks,30000);
+// The shared revision check replaces unconditional full-feed reads every 30s.
+document.addEventListener('cam:live-picks',()=>{
+ if(document.hidden)return;
+ if(typeof currentCategory!=='undefined'&&currentCategory==='Picks')refreshVisiblePicks();
+ else if(typeof currentCategory!=='undefined'&&currentCategory==='Todos'){
+   void loadRanking();void loadChefLists();
+ }
+ void refreshOpenPickVisibility();
+});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){load();void refreshOpenPickVisibility();}});
 window.addEventListener('popstate',()=>{const id=new URL(location.href).searchParams.get('pick');if(id)showDetail(id);else closeDetail();});
 })();
