@@ -788,6 +788,7 @@
     }),
     isOpen,
     refreshLive,
+    refreshStandings:paintRanking,
     save:saveOne,
     focus:focusGame
   });

@@ -322,7 +322,8 @@
      posting.delete(id);
    }
  }
- async function load(){
+ async function load(options={}){
+   const silent=options.silent===true;
    const seq=++request;
    replyCounts=null;
    const area=$('freeTakesFeed');
@@ -330,9 +331,9 @@
      if(area)area.replaceChildren(el('p','No hay conexión con los Takes.','ae-take-empty'));
      return status('No hay conexión.');
    }
-   if(area)area.replaceChildren(el('p','Cargando Takes publicados…','ae-take-empty'));
-   status('');
-   const finishEntrance=window.camPageLoader?.begin?.();
+   if(area&&!silent)area.replaceChildren(el('p','Cargando Takes publicados…','ae-take-empty'));
+   if(!silent)status('');
+   const finishEntrance=silent?null:window.camPageLoader?.begin?.();
    try {
      const [r, viewer] = await Promise.all([
        db.rpc('ae_public_take_feed',{p_sport:filter}),
@@ -346,6 +347,7 @@
      await loadReplyCounts(seq);
    } catch(e) {
      if(seq!==request)return;
+     if(silent)return;
      items=[];
      if(area)area.replaceChildren(el('p','No se pudo cargar el historial. Intenta actualizar.','ae-take-empty'));
      status('No se pudieron cargar los Takes. '+(e.message||''));
@@ -503,7 +505,7 @@
    document.addEventListener('ae:takes-updated',event=>{
      // Los votos y respuestas hechos en la propia tarjeta ya están pintados.
      if(event.detail?.source==='feed')return;
-     if(activeSection==='NFL'||activeSection==='Fútbol')load();
+     if(activeSection==='NFL'||activeSection==='Fútbol')load({silent:event.detail?.source==='live'});
    });
    visibility();
  });

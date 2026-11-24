@@ -561,8 +561,8 @@ async function refreshVisibleCommunity() {
 }
 window.addEventListener('DOMContentLoaded',()=>{
     refreshCommunity();loadRanking();
-    // A bounded background refresh shares other visitors' changes, with no Realtime setup required.
-    setInterval(refreshVisibleCommunity,30000);
+    // Share one revision check with takes, picks and scores; unchanged data costs no full reload.
+    document.addEventListener('cam:live-community',refreshVisibleCommunity);
     document.addEventListener('visibilitychange',refreshVisibleCommunity);
     if(db)db.auth.onAuthStateChange(()=>setTimeout(async()=>{
         await Promise.all([loadUserSession(),loadAdminSession()]);

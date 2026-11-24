@@ -3,6 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
+    "test:live": "node tests/live-updates.mjs && node tests/low-token-editorial.mjs",
     "test:loading": "node tests/page-loader.mjs",
     "test:social:x": "node tests/social-x-only-daily-plates.mjs",
     "test:liguilla": "python3 -B tests/liguilla.py",
