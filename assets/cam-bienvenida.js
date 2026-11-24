@@ -1,13 +1,16 @@
 /* CAM SPORTS — Bienvenida y tarjetas de sección (18 nov 2026, pedido de Eduard).
 
    Bienvenida (la primera vez que alguien entra por Inicio): una hoja que sube
-   desde abajo con tres pasos. El centro de CAM Sports son los Takes
-   (ajuste de Eduard, 18 nov 2026, 13:37):
-     1. el logotipo y «Demuestra cuánto sabes de deporte»: qué es la web, con
-        un Take de ejemplo;
-     2. «Aparte del Take»: Takes de Fútbol y de NFL, quinielas y Picks;
-     3. «Rankings»: el ranking de cada mes y los rangos, de Cobre a Leyenda CAM.
-   El último botón abre «Publicar mi primer Take».
+   desde abajo con tres pasos, una idea por paso y pocas palabras
+   (más sencilla, pedido de Eduard, 24 nov 2026): qué es → qué ganas → por dónde empiezas.
+     1. el logotipo y «Demuestra cuánto sabes de deporte», con un Take de ejemplo;
+     2. «Rangos»: de Cobre a Leyenda CAM; cada mes sube el 20 % mejor en
+        Quinielas y Picks;
+     3. «Por dónde empiezas»: tres cuadros que se tocan enteros, con los mismos
+        textos que «Primeros pasos» del perfil. El Take va destacado (borde
+        dorado, como el Take de ejemplo); Quiniela y Pick van después. Este paso no
+        tiene botón grande: los cuadros son los botones.
+   El botón secundario dice «Saltar» en los tres pasos.
      · Una sola vez por teléfono/navegador (localStorage `cam_intro_seen_v1`).
      · No sale a quien ya tiene la sesión iniciada, ni a quien llega desde un
        enlace a algo concreto (?s=nfl, una noticia, un Take…): llegó buscando algo.
@@ -139,6 +142,7 @@
     clock: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
     target: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r=".8" fill="currentColor"/>',
     close: '<path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/>',
+    chevron: '<path d="M9.5 6.5 15 12l-5.5 5.5"/>',
     info: '<circle cx="12" cy="12" r="8.5"/><path d="M12 11v5.5"/><circle cx="12" cy="7.8" r=".9" fill="currentColor" stroke="none"/>'
   };
   const NAV = { nfl: 'NFL', futbol: 'Fútbol', picks: 'Picks', actualidad: 'Opiniones' };
@@ -187,6 +191,19 @@
     const ul = el('ul', null, 'cam-intro-rows');
     for (const r of list) ul.append(row(...r));
     return ul;
+  }
+  // Paso 3 de la bienvenida: un cuadro que se toca entero (icono, título, una línea y ›).
+  function choice(icon, label, text, run, featured) {
+    const button = el('button', null, 'cam-intro-choice' + (featured ? ' is-featured' : ''), { type: 'button' });
+    const ico = el('span', null, 'cam-intro-ico');
+    ico.append(svg(icon));
+    const copy = el('span', null, 'cam-intro-choice-copy');
+    copy.append(el('span', label, 'cam-intro-choice-title'), el('span', text, 'cam-intro-choice-text'));
+    const arrow = el('span', null, 'cam-intro-choice-arrow', { 'aria-hidden': 'true' });
+    arrow.append(svg('chevron'));
+    button.append(ico, copy, arrow);
+    button.addEventListener('click', run);
+    return button;
   }
   function hook(icon, text) {
     const p = el('div', null, 'cam-intro-hook');   // div: las <p> de la web van sin esquinas
@@ -279,7 +296,7 @@
   function welcome(step) {
     if (step === 0) {
       const body = document.createDocumentFragment();
-      body.append(el('p', 'CAM Sports, el lugar donde tu conocimiento deportivo queda para la historia. Empieza con un Take de cualquier deporte: eso que crees que va a pasar y que hoy nadie te cree.', 'cam-intro-text'));
+      body.append(el('p', 'Di lo que crees que va a pasar. Si aciertas, queda para la historia.', 'cam-intro-text'));
       const sample = el('figure', null, 'cam-intro-take', { 'aria-label': 'Ejemplo de Take: Gilberto Mora será Balón de Oro en 2030' });
       const tag = el('span', null, 'cam-intro-take-tag', { 'aria-hidden': 'true' });
       tag.append(svg('take'), el('span', 'Un Take · Fútbol'));
@@ -291,15 +308,21 @@
       sample.append(tag, quote, votes);
       body.append(sample);
       return { logo: true, kicker: '', title: 'Demuestra cuánto sabes de deporte', body,
-        primary: ['Ver cómo funciona', () => showStep(1)], secondary: ['Explorar por mi cuenta', () => close('cerrada')] };
+        primary: ['Siguiente', () => showStep(1)], secondary: ['Saltar', () => close('cerrada')] };
     }
-    if (step === 1) {
-      return { kicker: 'Aparte del Take', title: 'Más maneras de demostrar lo que sabes', body: rows([
-        ['futbol', 'Takes de Fútbol.', 'Liga MX, LaLiga, Premier y Champions. Si se cumple, suma: cuanto más atrevido, más puntos.'],
-        ['nfl', 'Takes de NFL.', 'Equipos, jugadores y playoffs. La comunidad apoya o cuestiona cada uno.'],
-        ['quiniela', 'Quinielas.', 'Elige quién gana cada partido de la NFL y del fútbol; en la NFL, además, retas al editor.'],
-        ['picks', 'Picks.', 'Sube la captura de tu apuesta antes del partido. Si pega, tu plato entra al menú de los mejores.']
-      ]), primary: ['Siguiente', () => showStep(2)], secondary: ['Saltar', () => close('cerrada')] };
+    if (step === 2) {
+      // Quien elige la quiniela o el Pick ya sabe a qué va: su tarjeta de sección no sale encima.
+      const choices = el('div', null, 'cam-intro-choices');
+      choices.append(
+        choice('take', 'Publica tu primer Take', 'Opina y la comunidad vota',
+          () => close('boton', () => window.aeOpenTakeComposer?.()), true),
+        choice('quiniela', 'Juega la quiniela', 'Elige quién gana cada partido',
+          () => { mark('nfl'); close('boton', () => window.camGoQuiniela?.('nfl')); }),
+        choice('picks', 'Prepara tu primer Pick', 'Sube tu apuesta antes del partido',
+          () => { mark('picks'); close('boton', () => window.aeOpenPickComposer?.()); })
+      );
+      return { kicker: 'Por dónde empiezas', title: 'Elige cómo empezar', body: choices,
+        primary: null, secondary: ['Saltar', () => close('cerrada')] };
     }
     const body = document.createDocumentFragment();
     const levels = window.CamLeagues?.levels || ['Cobre', 'Bronce', 'Plata', 'Oro', 'Platino', 'Diamante', 'Leyenda CAM'];
@@ -314,10 +337,9 @@
     const ends = el('div', null, 'cam-intro-ranks-ends', { 'aria-hidden': 'true' });
     ends.append(el('span', levels[0]), el('span', levels[levels.length - 1]));
     ranks.append(line, ends);
-    body.append(ranks, el('p', 'Cada mes, el 20 % de arriba en Quinielas y Picks sube de rango. Cuanta más sabiduría compartas, más alto podrás llegar. ¿Tienes lo que se necesita?', 'cam-intro-text'));
-    return { kicker: 'Rankings', title: 'Todos empiezan en Cobre. Pocos llegan a Leyenda.', body,
-      primary: ['Publicar mi primer Take', () => close('boton', () => window.aeOpenTakeComposer?.())],
-      secondary: ['Primero quiero mirar', () => close('cerrada')] };
+    body.append(ranks, el('p', 'Cada mes, el 20 % mejor en Quinielas y Picks sube de rango.', 'cam-intro-text'));
+    return { kicker: 'Rangos', title: 'Todos empiezan en Cobre. Pocos llegan a Leyenda.', body,
+      primary: ['Siguiente', () => showStep(2)], secondary: ['Saltar', () => close('cerrada')] };
   }
 
   function sectionCard(card) {
@@ -421,8 +443,11 @@
       ui.logo.hidden = !model.logo;
       ui.title.textContent = model.title;
       ui.body.replaceChildren(model.body);
-      ui.primary.replaceChildren(el('span', model.primary[0]), el('span', '›', 'cam-intro-chevron', { 'aria-hidden': 'true' }));
-      ui.primaryRun = model.primary[1];
+      // Sin botón grande (paso 3 de la bienvenida): si tenía el foco, pasa al título.
+      const hadFocus = document.activeElement === ui.primary;
+      ui.primary.hidden = !model.primary;
+      if (model.primary) ui.primary.replaceChildren(el('span', model.primary[0]), el('span', '›', 'cam-intro-chevron', { 'aria-hidden': 'true' }));
+      ui.primaryRun = model.primary ? model.primary[1] : null;
       ui.secondary.textContent = model.secondary[0];
       ui.secondaryRun = model.secondary[1];
       const welcomeOn = current.card === 'bienvenida';
@@ -433,6 +458,7 @@
       dialog.dataset.card = current.card;
       dialog.dataset.step = welcomeOn ? String(current.step) : '';
       ui.sheet.scrollTop = 0;
+      if (hadFocus && ui.primary.hidden) ui.title.focus({ preventScroll: true });
     };
     if (!animate || reduced()) { apply(); return; }
     ui.content.classList.add('is-turning');

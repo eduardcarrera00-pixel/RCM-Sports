@@ -7,10 +7,13 @@ window.__camIntroTest = true (salvo en el caso que comprueba justo eso).
 
 Cubre:
   · primera visita a Inicio sin sesión (390 px, día y noche): sale sola, en tres
-    pasos (el logotipo y qué es la web, con un Take de ejemplo → «Aparte del Take»:
-    Takes de Fútbol y NFL, quinielas y Picks → «Rankings» con los 7 escudos);
-    «Publicar mi primer Take» la cierra y abre el formulario del Take SIN pedir
-    cuenta (con el aviso de que se pedirá al publicar);
+    pasos (24 nov: qué es → qué ganas → por dónde empiezas): el logotipo con un
+    Take de ejemplo → «Rangos» con los 7 escudos → «Por dónde empiezas» con tres
+    cuadros (Take destacado, quiniela, Pick) y sin botón grande; «Saltar» en los
+    tres. El cuadro del Take la cierra y abre el formulario SIN pedir cuenta
+    (con el aviso de que se pedirá al publicar);
+  · el cuadro de la quiniela lleva a la quiniela NFL sin que salga encima la
+    tarjeta de NFL;
   · al publicar sin cuenta: pide iniciar sesión; al entrar, el formulario vuelve
     con el texto intacto y «Sesión iniciada…»;
   · no se repite (recargar), no sale con sesión iniciada ni al llegar con un
@@ -80,7 +83,12 @@ STATE = """() => {
     body: (q('.cam-intro-body')?.textContent || '').replace(/\\s+/g, ' ').trim(),
     rows: d ? d.querySelectorAll('.cam-intro-row').length : 0, emblems: d ? d.querySelectorAll('.cam-intro-rank .cam-rank-emblem').length : 0,
     hooks: d ? [...d.querySelectorAll('.cam-intro-hook')].map(e => e.textContent.trim()) : [],
-    primary: (q('.cam-intro-primary')?.textContent || '').replace('›', '').trim(), secondary: q('.cam-intro-secondary')?.textContent || '',
+    primary: (() => { const b = q('.cam-intro-primary'); return b && !b.hidden && b.getClientRects().length ? b.textContent.replace('›', '').trim() : ''; })(),
+    secondary: q('.cam-intro-secondary')?.textContent || '',
+    choices: d ? [...d.querySelectorAll('.cam-intro-choice')].map(b => ({title: b.querySelector('.cam-intro-choice-title')?.textContent || '',
+      text: b.querySelector('.cam-intro-choice-text')?.textContent || '', featured: b.classList.contains('is-featured'),
+      h: Math.round(b.getBoundingClientRect().height), border: getComputedStyle(b).borderTopColor})) : [],
+    focusLost: !!(d && d.open && (document.activeElement === document.body || !document.activeElement)),
     dots: d ? d.querySelectorAll('.cam-intro-dots > span').length : 0,
     box: box && {top: Math.round(box.top), bottom: Math.round(box.bottom), left: Math.round(box.left), width: Math.round(box.width), height: Math.round(box.height)},
     font: q('.cam-intro-primary') ? getComputedStyle(q('.cam-intro-primary')).fontFamily : '',
@@ -140,9 +148,9 @@ def first_visit(dark):
         assert st['title'] == 'Demuestra cuánto sabes de deporte', st['title']
         assert st['kicker'] == '' and st['logo'] and st['logo']['mask'] and st['logo']['w'] >= 96, f'{tag}: el logotipo en lugar de «Bienvenido» {st["logo"]}'
         assert st['logo']['color'] == ('rgb(244, 232, 219)' if dark else 'rgb(19, 40, 58)'), f'{tag}: color del logotipo {st["logo"]}'
-        assert 'tu conocimiento deportivo queda para la historia' in st['body'], st['body']
+        assert 'Di lo que crees que va a pasar. Si aciertas, queda para la historia.' in st['body'], st['body']
         assert 'Gilberto Mora será Balón de Oro en 2030' in st['body'] and st['dots'] == 3, st
-        assert st['primary'] == 'Ver cómo funciona' and st['secondary'] == 'Explorar por mi cuenta', st
+        assert st['primary'] == 'Siguiente' and st['secondary'] == 'Saltar', st
         assert 'Inter' in st['font'], f'botón con letra de interfaz: {st["font"]}'
         assert st['titleRing'] == 'none', f'el título recibe el foco sin recuadro: {st["titleRing"]}'
         assert st['box']['bottom'] >= 843 and st['box']['width'] == 390, f'{tag}: hoja abajo y a todo el ancho {st["box"]}'
@@ -150,18 +158,23 @@ def first_visit(dark):
         shot(page, f'bienvenida-1-{tag}')
         page.click('#camIntro .cam-intro-primary'); page.wait_for_timeout(400)
         st = state(page)
-        assert st['step'] == 1 and st['rows'] == 4 and st['title'] == 'Más maneras de demostrar lo que sabes', st
-        assert st['kicker'] == 'Aparte del Take' and st['logo'] is None, st
-        for part in ('Takes de Fútbol.', 'Takes de NFL.', 'Quinielas.', 'Picks.'):
-            assert part in st['body'], f'{part} en {st["body"]}'
+        assert st['step'] == 1 and st['emblems'] == 7 and st['kicker'] == 'Rangos' and st['logo'] is None, st
+        assert st['title'] == 'Todos empiezan en Cobre. Pocos llegan a Leyenda.', st
+        assert st['body'].replace(' ', ' ').endswith('Cada mes, el 20 % mejor en Quinielas y Picks sube de rango.'), st['body']
+        assert st['primary'] == 'Siguiente' and st['secondary'] == 'Saltar', st
         shot(page, f'bienvenida-2-{tag}')
         page.click('#camIntro .cam-intro-primary'); page.wait_for_timeout(400)
         st = state(page)
-        assert st['step'] == 2 and st['emblems'] == 7 and st['kicker'] == 'Rankings', st
-        assert 'Cuanta más sabiduría compartas' in st['body'], st['body']
-        assert st['title'] == 'Todos empiezan en Cobre. Pocos llegan a Leyenda.' and st['primary'] == 'Publicar mi primer Take', st
+        assert st['step'] == 2 and st['kicker'] == 'Por dónde empiezas' and st['title'] == 'Elige cómo empezar', st
+        assert [c['title'] for c in st['choices']] == ['Publica tu primer Take', 'Juega la quiniela', 'Prepara tu primer Pick'], st['choices']
+        assert [c['text'] for c in st['choices']] == ['Opina y la comunidad vota', 'Elige quién gana cada partido', 'Sube tu apuesta antes del partido'], st['choices']
+        assert [c['featured'] for c in st['choices']] == [True, False, False], 'solo el Take va destacado'
+        assert st['choices'][0]['border'] != st['choices'][1]['border'], f'el Take con borde dorado {st["choices"]}'
+        assert all(c['h'] >= 44 for c in st['choices']), f'cuadros fáciles de tocar {st["choices"]}'
+        assert st['primary'] == '' and st['secondary'] == 'Saltar', f'sin botón grande en el paso 3: {st}'
+        assert not st['focusLost'], 'el foco no se pierde al quitar el botón grande'
         shot(page, f'bienvenida-3-{tag}')
-        page.click('#camIntro .cam-intro-primary')
+        page.click('#camIntro .cam-intro-choice.is-featured')
         st = wait_closed(page, tag)
         page.wait_for_function("document.getElementById('aeTakeComposerDialog').open", timeout=3000)
         st = state(page)
@@ -192,6 +205,22 @@ def first_visit(dark):
 
 def localStorage_has(page, key, text):
     return text in (page.evaluate(f"localStorage.getItem({key!r}) || ''") or '')
+
+
+def choose_quiniela():
+    with fp.full_page(fake_js=ON + DATA, width=390, height=844, touch=True) as page:
+        wait_open(page, 'bienvenida para la quiniela')
+        page.click('#camIntro .cam-intro-primary'); page.wait_for_timeout(400)
+        page.click('#camIntro .cam-intro-primary'); page.wait_for_timeout(400)
+        page.click('#camIntro .cam-intro-choice >> nth=1')
+        wait_closed(page, 'cuadro de la quiniela')
+        page.wait_for_timeout(300)
+        assert page.evaluate("currentCategory") == 'NFL', 'lleva a la NFL'
+        st = never_opens(page, 'tarjeta de NFL tras elegir la quiniela', 3500)
+        assert st['tab'] == 'semana', f'abre La semana, donde vive la quiniela: {st["tab"]}'
+        assert st['seen'].get('nfl') and st['seen'].get('bienvenida'), st['seen']
+        assert not page.errors, page.errors
+    print('  ok · cuadro de la quiniela: va a la quiniela NFL sin otra ventana encima')
 
 
 def no_welcome_cases():
@@ -321,6 +350,7 @@ def narrow_desktop_motion():
 
 first_visit(True)
 first_visit(False)
+choose_quiniela()
 no_welcome_cases()
 sections(True)
 sections(False)

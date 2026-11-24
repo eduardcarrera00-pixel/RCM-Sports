@@ -236,6 +236,75 @@ html body dialog#camIntro .cam-intro-row-text {
 }
 html body dialog#camIntro .cam-intro-row-text strong { color: var(--ci-ink) !important; font-weight: 700 !important; }
 
+/* Paso 3 de la bienvenida (24 nov 2026): tres cuadros que se tocan enteros.
+   El Take va destacado con el borde dorado del Take de ejemplo del paso 1. */
+html body dialog#camIntro .cam-intro-choices {
+  display: grid !important;
+  gap: 10px !important;
+  margin: 4px 0 0 !important;
+}
+html body dialog#camIntro button.cam-intro-choice {
+  display: grid !important;
+  grid-template-columns: 44px minmax(0, 1fr) 20px !important;
+  align-items: center !important;
+  gap: 12px !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+  min-height: 72px !important;
+  margin: 0 !important;
+  padding: 13px 14px !important;
+  border: 1px solid var(--ci-line) !important;
+  border-radius: 16px !important;
+  background: var(--ci-card) !important;
+  box-shadow: none !important;
+  color: var(--ci-ink) !important;
+  text-align: left !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  cursor: pointer !important;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition: border-color .16s ease, transform .12s ease;
+}
+html body dialog#camIntro button.cam-intro-choice.is-featured {
+  border: 1.5px solid var(--ci-gold-deep) !important;
+}
+html body dialog#camIntro button.cam-intro-choice:hover { border-color: var(--ci-gold-deep) !important; }
+html body dialog#camIntro button.cam-intro-choice:active { transform: scale(.99); }
+html body dialog#camIntro button.cam-intro-choice:focus-visible {
+  outline: 2px solid var(--ci-gold) !important;
+  outline-offset: 3px !important;
+}
+html body dialog#camIntro button.cam-intro-choice .cam-intro-ico {
+  width: 44px !important;
+  height: 44px !important;
+  background: var(--ci-bg) !important;
+}
+html body dialog#camIntro button.cam-intro-choice.is-featured .cam-intro-ico { border-color: var(--ci-gold-deep) !important; }
+html body dialog#camIntro .cam-intro-choice-copy {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 3px !important;
+  min-width: 0 !important;
+}
+html body dialog#camIntro .cam-intro-choice-title {
+  display: block !important;
+  color: var(--ci-ink) !important;
+  font: 600 17px/1.25 "Playfair Display", Georgia, serif !important;
+}
+html body dialog#camIntro .cam-intro-choice-text {
+  display: block !important;
+  color: var(--ci-muted) !important;
+  font: 400 13.5px/1.35 Inter, system-ui, sans-serif !important;
+}
+html body dialog#camIntro .cam-intro-choice-arrow {
+  display: flex !important;
+  justify-content: flex-end !important;
+  color: var(--ci-muted) !important;
+}
+html body dialog#camIntro button.cam-intro-choice.is-featured .cam-intro-choice-arrow { color: var(--ci-gold) !important; }
+html body dialog#camIntro .cam-intro-choice-arrow svg { width: 20px !important; height: 20px !important; }
+
 /* Ganchos con datos reales: cuenta atrás y el reto al editor */
 html body dialog#camIntro .cam-intro-hook {
   display: flex !important;
@@ -354,6 +423,7 @@ html body dialog#camIntro button.cam-intro-primary {
   cursor: pointer !important;
   transition: background-color .16s ease, transform .12s ease;
 }
+html body dialog#camIntro button.cam-intro-primary[hidden] { display: none !important; }
 html body dialog#camIntro button.cam-intro-primary:hover { background: var(--ci-cta-hover) !important; }
 html body dialog#camIntro button.cam-intro-primary:active { transform: scale(.985); }
 html body dialog#camIntro .cam-intro-chevron { font: 400 24px/.8 Georgia, "Times New Roman", serif !important; transform: translateY(-1px); }
@@ -387,6 +457,10 @@ html body dialog#camIntro :is(button.cam-intro-primary, button.cam-intro-seconda
   html body dialog#camIntro .cam-intro-rank .cam-rank-emblem { width: 24px !important; height: 28px !important; }
   html body dialog#camIntro .cam-intro-rank:nth-child(n+4) .cam-rank-emblem { width: 28px !important; height: 33px !important; }
   html body dialog#camIntro .cam-intro-rank:nth-child(7) .cam-rank-emblem { width: 34px !important; height: 40px !important; }
+  html body dialog#camIntro button.cam-intro-choice { gap: 10px !important; padding: 12px !important; grid-template-columns: 40px minmax(0, 1fr) 18px !important; }
+  html body dialog#camIntro button.cam-intro-choice .cam-intro-ico { width: 40px !important; height: 40px !important; }
+  html body dialog#camIntro .cam-intro-choice-title { font-size: 16px !important; }
+  html body dialog#camIntro .cam-intro-choice-text { font-size: 13px !important; }
 }
 
 /* Ordenador y tableta: tarjeta centrada (el teléfono apaisado sigue con la hoja de abajo) */
@@ -432,10 +506,12 @@ html body dialog#camIntro :is(button.cam-intro-primary, button.cam-intro-seconda
 @layer cam-rounded-editorial {
   html body dialog#camIntro :is(.cam-intro-kicker, .cam-intro-take-tag, .cam-intro-take-votes > span,
     .cam-intro-hook, .cam-intro-ranks-ends, .cam-intro-rank-letter,
-    button.cam-intro-primary, button.cam-intro-secondary) {
+    button.cam-intro-primary, button.cam-intro-secondary, button.cam-intro-choice, .cam-intro-choice-text) {
     font-family: Inter, system-ui, sans-serif !important;
   }
-  html body dialog#camIntro :is(h2.cam-intro-title, figure.cam-intro-take blockquote) {
+  /* Los cuadros del paso 3, con la misma esquina que el Take de ejemplo. */
+  html body dialog#camIntro button.cam-intro-choice { border-radius: 16px !important; }
+  html body dialog#camIntro :is(h2.cam-intro-title, figure.cam-intro-take blockquote, .cam-intro-choice-title) {
     font-family: "Playfair Display", Georgia, serif !important;
   }
 }
