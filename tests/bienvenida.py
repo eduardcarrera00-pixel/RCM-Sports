@@ -18,9 +18,11 @@ Cubre:
     con el texto intacto y «Sesión iniciada…»;
   · no se repite (recargar), no sale con sesión iniciada ni al llegar con un
     enlace a una sección (?s=nfl: sale la tarjeta de NFL, no la bienvenida);
-  · NFL con datos: cuenta atrás del próximo partido y «El editor va con los Lions
-    contra los Patriots. ¿Y tú?»; el botón abre La semana; la «i» de las pestañas
-    vuelve a abrirla; Fútbol (cuenta atrás de LaLiga), Picks y Actualidad;
+  · tarjetas de sección (24 nov): tres cuadros por sección, el primero destacado
+    y con el dato en vivo (NFL: «¿Le ganas al editor?» · «Va con los Lions. ¿Y tú?»;
+    Fútbol: «LaLiga · cierra en 2 d…»), sin botón grande y con «Ahora no». El
+    cuadro destacado de NFL abre La semana; el de Chefs, su pestaña; la «i» de las
+    pestañas vuelve a abrirlas; Picks y Actualidad sin la jerga de antes;
   · se cierra con la ×, Escape, tocando fuera y deslizando hacia abajo;
   · calma: si la persona no deja de bajar la página, no sale (se queda para otra vez);
   · el aviso de «desliza» espera a que se cierre la tarjeta y luego sale;
@@ -233,6 +235,14 @@ def no_welcome_cases():
     print('  ok · sin bienvenida: con sesión y en navegadores automáticos')
 
 
+def cards(st, titles):
+    assert [c['title'] for c in st['choices']] == titles, st['choices']
+    assert [c['featured'] for c in st['choices']] == [True] + [False] * (len(titles) - 1), 'solo el primero va destacado'
+    assert all(c['h'] >= 44 for c in st['choices']), f'cuadros fáciles de tocar {st["choices"]}'
+    assert st['primary'] == '' and st['secondary'] == 'Ahora no', f'sin botón grande; «Ahora no» la cierra: {st}'
+    assert st['rows'] == 0 and not st['hooks'], 'sin las filas de texto ni los recuadros de antes'
+
+
 def sections(dark):
     tag = 'noche' if dark else 'dia'
     js = ON + DATA + "try{localStorage.setItem('cam_intro_seen_v1', JSON.stringify({bienvenida:'2026-11-18'}))}catch(e){}"
@@ -240,12 +250,11 @@ def sections(dark):
         never_opens(page, 'Inicio ya vista', 2500)
         go(page, 'NFL')
         st = wait_open(page, f'NFL {tag}')
-        assert st['card'] == 'nfl' and st['title'] == 'La NFL, semana a semana' and st['rows'] == 3, st
-        assert any(h == 'El editor va con los Lions contra los Patriots. ¿Y tú?' for h in st['hooks']), st['hooks']
-        assert any(h.replace('\u00a0', ' ').startswith('Quedan 1 d') and h.endswith('para elegir el próximo partido de la NFL.') for h in st['hooks']), st['hooks']
-        assert st['primary'] == '¿Le ganas al editor?', st
+        assert st['card'] == 'nfl' and st['title'] == 'La NFL, semana a semana', st
+        cards(st, ['¿Le ganas al editor?', 'Publica tu Take', 'Lee las noticias'])
+        assert st['choices'][0]['text'] == 'Va con los Lions. ¿Y tú?', f'el dato del editor en el cuadro destacado: {st["choices"][0]}'
         shot(page, f'nfl-{tag}')
-        page.click('#camIntro .cam-intro-primary')
+        page.click('#camIntro .cam-intro-choice.is-featured')
         st = wait_closed(page, 'NFL')
         assert st['tab'] == 'semana', f'abre La semana: {st["tab"]}'
         assert st['info'] == '¿Qué hay en NFL?', st['info']
@@ -256,22 +265,30 @@ def sections(dark):
 
         go(page, 'Fútbol')
         st = wait_open(page, f'Fútbol {tag}')
-        assert st['card'] == 'futbol' and st['title'] == 'Liga MX, LaLiga, Premier y Champions', st
-        assert any(h.replace('\u00a0', ' ').startswith('Quedan 2 d') and h.endswith('para elegir el próximo partido de LaLiga.') for h in st['hooks']), st['hooks']
+        assert st['card'] == 'futbol' and st['title'] == 'El fútbol, jornada a jornada', st
+        cards(st, ['Juega la jornada', 'Publica tu Take', 'Lee las noticias'])
+        assert st['choices'][0]['text'].replace('\u00a0', ' ').startswith('LaLiga · cierra en 2 d'), f'cuenta atrás de la liga: {st["choices"][0]}'
         shot(page, f'futbol-{tag}')
         page.mouse.click(195, 60)   # fuera de la hoja
         wait_closed(page, 'tocar fuera')
 
         go(page, 'Picks')
         st = wait_open(page, f'Picks {tag}')
-        assert st['card'] == 'picks' and st['primary'] == 'Preparar mi primer Pick', st
+        assert st['card'] == 'picks' and st['title'] == 'Aquí se cocinan los Picks', st
+        cards(st, ['Prepara tu primer Pick', 'Mira la tabla de Chefs', 'Revisa el historial'])
+        assert not any('plato' in c['text'] or 'menú' in c['text'] for c in st['choices']), st['choices']
         shot(page, f'picks-{tag}')
         swipe_down(page)
         wait_closed(page, 'deslizar hacia abajo')
+        page.click('#camSectionTabs > .cam-intro-info'); wait_open(page, 'la «i» de Picks')
+        page.click('#camIntro .cam-intro-choice >> nth=1')
+        st = wait_closed(page, 'cuadro de Chefs')
+        assert st['tab'] == 'chefs', f'el cuadro de Chefs abre su pestaña: {st["tab"]}'
 
         go(page, 'Opiniones')
         st = wait_open(page, f'Actualidad {tag}')
-        assert st['card'] == 'actualidad' and st['primary'] == 'Ver lo más debatido', st
+        assert st['card'] == 'actualidad' and st['title'] == 'Lo que se dice y lo que se debate', st
+        cards(st, ['Mira lo más debatido', 'Lee las columnas', 'Conoce a los distinguidos'])
         shot(page, f'actualidad-{tag}')
         page.click('#camIntro .cam-intro-close'); wait_closed(page, 'la ×')
 

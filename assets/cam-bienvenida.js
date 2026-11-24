@@ -16,9 +16,10 @@
        enlace a algo concreto (?s=nfl, una noticia, un Take…): llegó buscando algo.
 
    Tarjetas de sección (NFL, Fútbol, Picks y Actualidad): la primera vez que se
-   abre cada sección, una tarjeta más corta con lo que hay dentro y un botón a
-   lo que más engancha. En NFL y Fútbol, si hay datos reales: cuánto falta para
-   que cierre el próximo partido de la quiniela y (NFL) con quién va el editor.
+   abre cada sección, una tarjeta corta con tres cuadros que llevan a su sitio
+   (como el paso 3 de la bienvenida, 24 nov 2026). El primero va destacado y, en
+   NFL y Fútbol, lleva el dato real: con quién va el editor o cuánto falta para
+   que cierre el próximo partido de la quiniela.
    Una «i» pequeña al final de las pestañas de la sección vuelve a abrirla.
 
    Calma: sale 0,9 s después de que se vaya la pantalla de carga y solo si la
@@ -178,20 +179,6 @@
     if (attrs) for (const [k, v] of Object.entries(attrs)) if (v != null) node.setAttribute(k, v);
     return node;
   }
-  function row(icon, label, text) {
-    const item = el('li', null, 'cam-intro-row');
-    const ico = el('span', null, 'cam-intro-ico');
-    ico.append(svg(icon));
-    const copy = el('p', null, 'cam-intro-row-text');
-    copy.append(el('strong', label), document.createTextNode(' ' + text));
-    item.append(ico, copy);
-    return item;
-  }
-  function rows(list) {
-    const ul = el('ul', null, 'cam-intro-rows');
-    for (const r of list) ul.append(row(...r));
-    return ul;
-  }
   // Paso 3 de la bienvenida: un cuadro que se toca entero (icono, título, una línea y ›).
   function choice(icon, label, text, run, featured) {
     const button = el('button', null, 'cam-intro-choice' + (featured ? ' is-featured' : ''), { type: 'button' });
@@ -204,13 +191,6 @@
     button.append(ico, copy, arrow);
     button.addEventListener('click', run);
     return button;
-  }
-  function hook(icon, text) {
-    const p = el('div', null, 'cam-intro-hook');   // div: las <p> de la web van sin esquinas
-    const ico = el('span', null, 'cam-intro-hook-ico');
-    ico.append(svg(icon));
-    p.append(ico, el('span', text));
-    return p;
   }
 
   // ---------- Datos reales para los ganchos ----------
@@ -231,21 +211,23 @@
       return open.length ? { snap, open } : null;
     } catch { return null; }
   }
+  // Una línea corta para el cuadro de la quiniela: «Cierra en 1 d 5 h» (NFL),
+  // «Liga MX · cierra en 1 d 5 h» (fútbol, con la liga de la jornada).
   function countdown(sport) {
     const found = nextOpen(sport === 'nfl' ? window.camNflQuiniela : window.camFootballQuiniela);
     if (!found) return null;
     const left = closesIn(found.open[0].kickoff);
     if (!left) return null;
-    const where = sport === 'nfl' ? 'la NFL' : (found.snap.competitionName || 'la jornada');
-    return 'Quedan ' + left + ' para elegir el próximo partido de ' + where + '.';
+    const league = sport === 'nfl' ? '' : (found.snap.competitionName || '');
+    return league ? league + ' · cierra en ' + left : 'Cierra en ' + left;
   }
   const nflTeam = id => {
     try { return window.CamNFLQuinielaTeams?.getTeam?.(id) || (typeof NFL_TEAMS !== 'undefined' ? NFL_TEAMS.find(t => t.id === id) : null) || null; }
     catch { return null; }
   };
   const nick = id => { const words = String(nflTeam(id)?.name || id).trim().split(/\s+/); return words[words.length - 1] || id; };
-  // «El editor va con los Chiefs contra los Bills. ¿Y tú?» — solo con un partido
-  // abierto en el que el editor ya eligió (si no, la línea no sale).
+  // «Va con los Chiefs. ¿Y tú?» (debajo de «¿Le ganas al editor?») — solo con un
+  // partido abierto en el que el editor ya eligió (si no, la línea no sale).
   function editorChallenge() {
     const found = nextOpen(window.camNflQuiniela);
     const picks = found?.snap?.expert?.picks;
@@ -262,7 +244,7 @@
     const team = picks.get(game.id);
     const other = team === game.home_id ? game.away_id : game.home_id;
     if (!team || !other) return null;
-    return 'El editor va con los ' + nick(team) + ' contra los ' + nick(other) + '. ¿Y tú?';
+    return 'Va con los ' + nick(team) + '. ¿Y tú?';
   }
   function liguillaPhase() {
     try {
@@ -342,52 +324,48 @@
       primary: ['Siguiente', () => showStep(2)], secondary: ['Saltar', () => close('cerrada')] };
   }
 
+  // Tarjetas de sección (24 nov 2026, «haz lo mismo» que en la bienvenida): título
+  // corto y tres cuadros que se tocan enteros y llevan a su sitio; el primero va
+  // destacado y lleva el dato en vivo (cuenta atrás, con quién va el editor). Sin
+  // botón grande; «Ahora no» la cierra.
+  function choices(list) {
+    const box = el('div', null, 'cam-intro-choices');
+    list.forEach(([icon, label, text, run], i) => box.append(choice(icon, label, text, () => close('boton', run), i === 0)));
+    return box;
+  }
+  function scrollToId(id) {
+    try { $(id)?.scrollIntoView({ block: 'start', behavior: reduced() ? 'auto' : 'smooth' }); } catch {}
+  }
   function sectionCard(card) {
+    const later = ['Ahora no', () => close('cerrada')];
     if (card === 'nfl') {
-      const body = document.createDocumentFragment();
-      body.append(rows([
-        ['take', 'Takes.', 'Suelta tu opinión; si se cumple, suma.'],
-        ['week', 'La semana.', 'Elige ganadores en la quiniela y reta al editor.'],
-        ['news', 'Noticias.', 'Lo último de la NFL y los Power Rankings de CAM.']
-      ]));
-      const left = countdown('nfl'), dare = editorChallenge();
-      if (dare) body.append(hook('target', dare));
-      if (left) body.append(hook('clock', left));
-      return { kicker: 'NFL', title: 'La NFL, semana a semana', body,
-        primary: ['¿Le ganas al editor?', () => close('boton', () => goTab('semana'))], secondary: ['Ahora no', () => close('cerrada')] };
+      return { kicker: 'NFL', title: 'La NFL, semana a semana', body: choices([
+        ['week', '¿Le ganas al editor?', editorChallenge() || countdown('nfl') || 'Elige quién gana cada partido', () => goTab('semana')],
+        ['take', 'Publica tu Take', 'Lo que crees que va a pasar', () => window.aeOpenTakeComposer?.('NFL')],
+        ['news', 'Lee las noticias', 'Y los Power Rankings de CAM', () => goTab('noticias')]
+      ]), primary: null, secondary: later };
     }
     if (card === 'futbol') {
       const phase = liguillaPhase();
-      const body = document.createDocumentFragment();
-      body.append(rows([
-        ['take', 'Takes.', 'Lo que tú ves y los demás todavía no.'],
-        ['week', 'La semana.', 'La quiniela de cada jornada, liga por liga.'],
-        phase === 'mis8' ? ['cup', 'Liguilla.', 'Elige a los 8 que crees que clasificarán en la Liga MX.']
-          : phase === 'cuadro' ? ['cup', 'Liguilla.', 'Arma tu cuadro de la Liga MX, de cuartos a campeón.']
-          : ['news', 'Noticias.', 'Lo último de tus ligas y su Power Ranking.']
-      ]));
-      const left = countdown('futbol');
-      if (left) body.append(hook('clock', left));
-      const primary = phase === 'mis8' ? ['Elegir mis 8', () => close('boton', () => { window.camGoLiguilla?.(); openQualifiers(); })]
-        : phase === 'cuadro' ? ['Arma tu cuadro', () => close('boton', () => window.camGoLiguilla?.())]
-        : ['Ver la jornada', () => close('boton', () => goTab('semana'))];
-      return { kicker: 'Fútbol', title: 'Liga MX, LaLiga, Premier y Champions', body, primary, secondary: ['Ahora no', () => close('cerrada')] };
+      const jornada = ['week', 'Juega la jornada', countdown('futbol') || 'Liga MX, LaLiga, Premier y Champions', () => goTab('semana')];
+      const take = ['take', 'Publica tu Take', 'Lo que ves y los demás todavía no', () => window.aeOpenTakeComposer?.('Fútbol')];
+      const list = phase === 'mis8' ? [['cup', 'Elige a tus 8', '¿Quién clasifica a la Liguilla?', () => { window.camGoLiguilla?.(); openQualifiers(); }], jornada, take]
+        : phase === 'cuadro' ? [['cup', 'Arma tu cuadro', 'La Liguilla, de cuartos a campeón', () => window.camGoLiguilla?.()], jornada, take]
+        : [jornada, take, ['news', 'Lee las noticias', 'Y el Power Ranking de cada liga', () => goTab('noticias')]];
+      return { kicker: 'Fútbol', title: 'El fútbol, jornada a jornada', body: choices(list), primary: null, secondary: later };
     }
     if (card === 'picks') {
-      return { kicker: 'Picks', title: 'Aquí se cocinan los Picks', body: rows([
-        ['camera', 'Tu Pick.', 'Sube la captura de tu apuesta antes del partido.'],
-        ['plate', 'Si pega,', 'tu plato entra al menú de los mejores.'],
-        ['chef', 'Chefs.', 'Compite con tus amigos en la tabla de Chefs.']
-      ]), primary: ['Preparar mi primer Pick', () => close('boton', () => window.aeOpenPickComposer?.())],
-      secondary: ['Ahora no', () => close('cerrada')] };
+      return { kicker: 'Picks', title: 'Aquí se cocinan los Picks', body: choices([
+        ['camera', 'Prepara tu primer Pick', 'Sube tu apuesta antes del partido', () => window.aeOpenPickComposer?.()],
+        ['chef', 'Mira la tabla de Chefs', 'Los que más aciertan sus Picks', () => goTab('chefs')],
+        ['clock', 'Revisa el historial', 'Los Picks que ya se resolvieron', () => goTab('historial')]
+      ]), primary: null, secondary: later };
     }
-    return { kicker: 'Actualidad', title: 'Lo que se dice y lo que se debate', body: rows([
-      ['pen', 'Columnas.', 'Lo que escriben los opinadores de CAM.'],
-      ['flame', 'Lo más debatido.', 'Las publicaciones que más conversación levantan.'],
-      ['vote', 'Tu voz.', 'Comenta y vota: los más apoyados se distinguen.']
-    ]), primary: ['Ver lo más debatido', () => close('boton', () => {
-      try { $('aeOpinionsDebated')?.scrollIntoView({ block: 'start', behavior: reduced() ? 'auto' : 'smooth' }); } catch {}
-    })], secondary: ['Ahora no', () => close('cerrada')] };
+    return { kicker: 'Actualidad', title: 'Lo que se dice y lo que se debate', body: choices([
+      ['flame', 'Mira lo más debatido', 'Lo que más conversación levanta', () => scrollToId('aeOpinionsDebated')],
+      ['pen', 'Lee las columnas', 'Lo que escriben los opinadores', () => scrollToId('aeOpinionsList')],
+      ['vote', 'Conoce a los distinguidos', 'Las voces más apoyadas de CAM', () => scrollToId('aeOpinionsHighlights')]
+    ]), primary: null, secondary: later };
   }
 
   // ---------- La ventana ----------

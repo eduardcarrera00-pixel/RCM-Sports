@@ -15,7 +15,6 @@ html body dialog#camIntro {
   --ci-cta: #d4ae83;
   --ci-cta-hover: #e3bf93;
   --ci-cta-ink: #0b2233;
-  --ci-hook: rgba(212, 174, 131, .1);
   --ci-logo: #f4e8db;
   position: fixed !important;
   inset: auto 0 0 0 !important;
@@ -45,7 +44,6 @@ html:not(.dark) body dialog#camIntro {
   --ci-cta: #7a5229;
   --ci-cta-hover: #6a4622;
   --ci-cta-ink: #fffaf2;
-  --ci-hook: rgba(168, 114, 47, .08);
   --ci-logo: #13283a;
 }
 html body dialog#camIntro:not([open]) { display: none !important; }
@@ -199,24 +197,7 @@ html body dialog#camIntro .cam-intro-take-votes > span {
 html body dialog#camIntro .cam-intro-take-votes svg { width: 14px !important; height: 14px !important; flex: none !important; }
 html body dialog#camIntro .cam-intro-take-votes > .is-down svg { transform: rotate(180deg); }
 
-/* Filas con icono (paso 2 y tarjetas de sección) */
-html body dialog#camIntro ul.cam-intro-rows {
-  display: grid !important;
-  gap: 12px !important;
-  margin: 0 0 4px !important;
-  padding: 0 !important;
-  list-style: none !important;
-}
-html body dialog#camIntro li.cam-intro-row {
-  display: grid !important;
-  grid-template-columns: 40px minmax(0, 1fr) !important;
-  align-items: center !important;
-  gap: 12px !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-html body dialog#camIntro li.cam-intro-row::before,
-html body dialog#camIntro li.cam-intro-row::marker { content: none !important; }
+/* Icono en recuadro (cuadros de la bienvenida y de las tarjetas de sección) */
 html body dialog#camIntro .cam-intro-ico {
   display: flex !important;
   align-items: center !important;
@@ -229,15 +210,8 @@ html body dialog#camIntro .cam-intro-ico {
   color: var(--ci-gold) !important;
 }
 html body dialog#camIntro .cam-intro-ico svg { width: 22px !important; height: 22px !important; }
-html body dialog#camIntro .cam-intro-row-text {
-  margin: 0 !important;
-  color: var(--ci-text) !important;
-  font: 400 14.5px/1.45 Inter, system-ui, sans-serif !important;
-}
-html body dialog#camIntro .cam-intro-row-text strong { color: var(--ci-ink) !important; font-weight: 700 !important; }
-
-/* Paso 3 de la bienvenida (24 nov 2026): tres cuadros que se tocan enteros.
-   El Take va destacado con el borde dorado del Take de ejemplo del paso 1. */
+/* Cuadros que se tocan enteros (24 nov 2026): paso 3 de la bienvenida y tarjetas
+   de sección. El primero va destacado con el borde dorado del Take de ejemplo. */
 html body dialog#camIntro .cam-intro-choices {
   display: grid !important;
   gap: 10px !important;
@@ -304,22 +278,6 @@ html body dialog#camIntro .cam-intro-choice-arrow {
 }
 html body dialog#camIntro button.cam-intro-choice.is-featured .cam-intro-choice-arrow { color: var(--ci-gold) !important; }
 html body dialog#camIntro .cam-intro-choice-arrow svg { width: 20px !important; height: 20px !important; }
-
-/* Ganchos con datos reales: cuenta atrás y el reto al editor */
-html body dialog#camIntro .cam-intro-hook {
-  display: flex !important;
-  align-items: center !important;
-  gap: 9px !important;
-  margin: 10px 0 0 !important;
-  padding: 10px 12px !important;
-  border: 1px solid var(--ci-line) !important;
-  border-radius: 12px !important;
-  background: var(--ci-hook) !important;
-  color: var(--ci-gold) !important;
-  font: 600 13.5px/1.4 Inter, system-ui, sans-serif !important;
-}
-html body dialog#camIntro .cam-intro-hook-ico { display: flex !important; flex: none !important; }
-html body dialog#camIntro .cam-intro-hook-ico svg { width: 18px !important; height: 18px !important; }
 
 /* El camino de rangos (paso 3): los escudos crecen de Cobre a Leyenda CAM */
 html body dialog#camIntro .cam-intro-ranks { margin: 6px 0 14px !important; }
@@ -505,7 +463,7 @@ html body dialog#camIntro :is(button.cam-intro-primary, button.cam-intro-seconda
    la serif del cuerpo. */
 @layer cam-rounded-editorial {
   html body dialog#camIntro :is(.cam-intro-kicker, .cam-intro-take-tag, .cam-intro-take-votes > span,
-    .cam-intro-hook, .cam-intro-ranks-ends, .cam-intro-rank-letter,
+    .cam-intro-ranks-ends, .cam-intro-rank-letter,
     button.cam-intro-primary, button.cam-intro-secondary, button.cam-intro-choice, .cam-intro-choice-text) {
     font-family: Inter, system-ui, sans-serif !important;
   }
